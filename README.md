@@ -32,3 +32,24 @@ node -v
 npm -v
 
 ```
+
+4. After the installation got to your project directory
+
+```
+cd lynk-dash-app
+```
+
+5. and then run these commands
+
+```
+npm install
+
+npm run start
+
+```
+
+6. If you have any project running on localhost:3000 then it will ask for other port just press yes. then it will start on
+
+```
+port 3001
+```
