@@ -1,0 +1,60 @@
+import {
+      Button,
+      Flex,
+      Td,
+      Text,
+      Tr,
+      useColorModeValue,
+      Icon,
+      Tag,
+      useDisclosure,
+    } from "@chakra-ui/react";
+    import React from "react";
+    import { LinkIcon, DeleteIcon, ExternalLinkIcon, SearchIcon, CopyIcon } from "@chakra-ui/icons";
+    import { LetterCIcon, LetterHIcon, LetterMIcon, LetterLIcon,  } from "components/Icons/Icons";
+
+    import {
+      FaEllipsisV
+    } from "react-icons/fa";
+
+    function VulnerabilityRow(props) {
+      const { type, component, version, description, recommendation, score } = props;
+      const textColor = useColorModeValue("gray.700", "white");
+      const bgStatus = useColorModeValue("gray.400", "#1a202c");
+      const colorStatus = useColorModeValue("white", "gray.400");
+      const { isOpen, onOpen, onClose } = useDisclosure()
+      const btnRef = React.useRef()
+      const sevColor = (score >= 10) ? ('red') : (score >= 6 ? 'orange' : ( score >= 3 ? 'yellow' : 'green' ));
+      return (
+        <Tr>
+            <Td>
+            <Tag size='md' key='md' variant='subtle' colorScheme={sevColor}>
+              {score}
+            </Tag>
+            </Td>
+            <Td>
+            <Flex direction="row">
+              <Text
+                fontSize="sm"
+                color={textColor}
+              >
+                {type}
+              </Text>
+            </Flex>
+            </Td>
+            <Td maxW='200px'>{description}</Td>
+            <Td>{component}</Td>
+            <Td>{version}</Td>
+            <Td>{recommendation}</Td>
+            <Td>
+            <Button p="0px" bg="transparent"
+              ref={btnRef}
+              onClick={onOpen}
+              >
+                <Icon as={FaEllipsisV} color="gray.400" cursor="pointer" />
+            </Button>
+            </Td>
+        </Tr>
+      );
+    }
+    export default VulnerabilityRow;

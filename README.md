@@ -1,2 +1,1 @@
-# lynk-dash-app
-Interlynk Dashboard
+# Interlynk Demo APp
