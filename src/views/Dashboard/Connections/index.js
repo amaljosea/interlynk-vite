@@ -1,4 +1,4 @@
-import {  DeleteIcon, EditIcon } from '@chakra-ui/icons'
+import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 import {
   Box,
   Button,
@@ -24,21 +24,17 @@ import {
   Tr,
   Tbody,
   Th,
-  Td,
-  Text
+  Td
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
-import GlobalContext from 'context/GlobalContext'
 import { GetAllConnectors, GetAllOrgConnectors } from 'graphQL/Queries'
 import React, { useEffect, useState } from 'react'
-import { useContext } from 'react'
 import { useMutation, useQuery } from '@apollo/client'
 import { OrgConnectorCreate } from 'graphQL/Mutation'
 import { OrgConnectorUpdate } from 'graphQL/Mutation'
 
 const Index = () => {
-
   const getConImg = (id) => {
     switch (id) {
       case 'd2d3eb63-3378-4f14-92a6-41eb46c7b39c':
@@ -61,6 +57,12 @@ const Index = () => {
     }
   }
 
+  const orgID = process.env.REACT_APP_ORGID
+
+  useEffect(() => {
+    console.log('orgID', orgID)
+  }, [])
+
   const [connectors, setConnectors] = useState([])
 
   const { data: allConnectors } = useQuery(GetAllConnectors, {
@@ -68,7 +70,7 @@ const Index = () => {
   })
 
   const { data: orgConnectors } = useQuery(GetAllOrgConnectors, {
-    variables: { id: '8d24b663-b337-4718-bfd6-ceca31b769fa' }
+    variables: { id: orgID }
   })
 
   // sofueled id : 'f0b30788-3fa6-417f-b372-0c580f5ed876'
@@ -154,7 +156,7 @@ const Index = () => {
       try {
         await organizationConnectorCreate({
           variables: {
-            orgId: '8d24b663-b337-4718-bfd6-ceca31b769fa',
+            orgId: orgID,
             connId: activeConnection,
             name: connectorName,
             user: username,
