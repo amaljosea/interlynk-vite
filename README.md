@@ -9,6 +9,15 @@
 5. Now you can test the new api integration for updating and creating connections
 
 
+# Important point
+
+The main API URL - 'http://localhost:3000/lynkapi' 
+
+Incase if you have a different URL then you need to change the URL inside 
+
+## /src/index.js --> ApolloClient object
+
+
 # Install Node JS & NPM
 
 1. If using Zsh, install NVM like so:
