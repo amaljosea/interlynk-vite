@@ -14,12 +14,14 @@ export const GetAllOrgConnectors = gql`
   query GetAllOrgConnectors($id: ID!) {
     organizationConnectors(organizationId: $id) {
       id
-      connectorId
-      organizationId
+      connector {
+        name
+      }
       name
       username
       token
       updatedAt
+      enabled
     }
   }
 `
