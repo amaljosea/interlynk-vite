@@ -25,8 +25,9 @@ export const OrgConnectorCreate = gql`
     ) {
       organizationConnector {
         id
-        organizationId
-        connectorId
+        connector {
+          name
+        }
         name
         username
         readOnly
@@ -69,6 +70,16 @@ export const OrgConnectorUpdate = gql`
         username
         readOnly
         enabled
+      }
+    }
+  }
+`
+
+export const OrgConnectorDelete = gql`
+  mutation OrgConnectorDelete($id: ID!) {
+    organizationConnectorDelete(input: { id: $id }) {
+      organizationConnector {
+        id
       }
     }
   }

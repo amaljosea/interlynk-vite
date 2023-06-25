@@ -7,6 +7,7 @@
 3. name REACT_APP_ORGID, just remove the existing id and paste the new ID
 4. After that run the project 
 5. Now you can test the new api integration for updating and creating connections
+<<<<<<< HEAD
 
 
 # Important point
@@ -62,3 +63,4 @@ npm run start
 ```
 port 3001
 ```
+

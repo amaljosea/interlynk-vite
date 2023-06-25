@@ -34,23 +34,30 @@ import { useMutation, useQuery } from '@apollo/client'
 import { OrgConnectorCreate } from 'graphQL/Mutation'
 import { OrgConnectorUpdate } from 'graphQL/Mutation'
 
+import docker from 'assets/img/docker.png'
+import amazon from 'assets/img/amazon.png'
+import azure from 'assets/img/azure.png'
+import github from 'assets/img/github.png'
+import gitlab from 'assets/img/gitlab.png'
+import { OrgConnectorDelete } from 'graphQL/Mutation'
+
 const Index = () => {
-  const getConImg = (id) => {
-    switch (id) {
-      case 'd2d3eb63-3378-4f14-92a6-41eb46c7b39c':
-        return 'https://img.icons8.com/fluency/48/docker.png'
+  const getConImg = (name) => {
+    switch (name) {
+      case 'Docker Hub':
+        return docker
         break
-      case '6fd06afe-1b4b-4c94-a56a-c77a9495b690':
-        return 'https://img.icons8.com/color/48/amazon-web-services.png'
+      case 'Amazon ECR':
+        return amazon
         break
-      case 'ccf97810-5576-421f-989a-eb800ac4b6e3':
-        return 'https://img.icons8.com/fluency/48/azure-1.png'
+      case 'Azure Container Registry':
+        return azure
         break
-      case '2ab9d03a-c856-466f-96ca-ad8c0512bc3f':
-        return 'https://img.icons8.com/glyph-neue/64/github.png'
+      case 'Github (ghcr.io)':
+        return github
         break
-      case '37149b5d-3ab2-41e1-b829-e09db05165fb':
-        return 'https://img.icons8.com/color/48/gitlab.png'
+      case 'Gitlab':
+        return gitlab
         break
       default:
         break
@@ -79,9 +86,12 @@ const Index = () => {
 
   const [organizationConnectorUpdate] = useMutation(OrgConnectorUpdate)
 
+  const [organizationConnectorDelete] = useMutation(OrgConnectorDelete)
+
   useEffect(() => {
     if (allConnectors) {
       setConnectors(allConnectors.connectors)
+      console.log('connectors', allConnectors.connectors)
     }
   }, [allConnectors])
 
@@ -91,44 +101,27 @@ const Index = () => {
   const [activeConnection, setActiveConnection] = useState('')
   const [selectedConnection, setSelectedConnection] = useState(null)
 
+  const [conStatus, setConStatus] = useState(false)
   const [connectorName, setConnectorName] = useState('')
   const [username, setUsername] = useState('')
   const [accessToken, setAccessToken] = useState('')
 
-  const handleOpen = (id) => {
+  const handleOpen = (item) => {
+    setSelectedConnection(null)
     setConnectorName('')
     setUsername('')
     setAccessToken('')
-    setActiveConnection(id)
-    switch (id) {
-      case 'd2d3eb63-3378-4f14-92a6-41eb46c7b39c':
-        setRegistryName('Docker Hub')
-        break
-      case '6fd06afe-1b4b-4c94-a56a-c77a9495b690':
-        setRegistryName('Amazon ECR')
-        break
-      case 'ccf97810-5576-421f-989a-eb800ac4b6e3':
-        setRegistryName('Azure Container Registry')
-        break
-      case '2ab9d03a-c856-466f-96ca-ad8c0512bc3f':
-        setRegistryName('Github (ghcr.io)')
-        break
-      case '37149b5d-3ab2-41e1-b829-e09db05165fb':
-        setRegistryName('Gitlab')
-        break
-      default:
-        break
-    }
-
+    setActiveConnection(item.id)
+    setRegistryName(item.name)
     onOpen()
   }
 
   const handleEdit = async (item) => {
-    onOpen()
     setSelectedConnection(item)
     setConnectorName(item.name)
     setUsername(item.username)
     setAccessToken(item.token)
+    onOpen()
   }
 
   const handleSubmit = async (e) => {
@@ -139,13 +132,11 @@ const Index = () => {
         await organizationConnectorUpdate({
           variables: {
             id: selectedConnection.id,
-            orgId: selectedConnection.organizationId,
-            connId: selectedConnection.connectorId,
             name: connectorName,
-            user: username,
-            token: accessToken,
+            user: selectedConnection.username,
+            token: selectedConnection.token,
             readOnly: true,
-            enabled: true
+            enabled: conStatus
           }
         })
         window.location.reload()
@@ -162,14 +153,16 @@ const Index = () => {
             user: username,
             token: accessToken,
             readOnly: true,
-            enabled: true
+            enabled: conStatus
           }
         })
         window.location.reload()
       } catch (error) {
         if (error.networkError && error.networkError.statusCode === 500) {
           // Handle the specific error
-          alert('Multiple connection not allowed from single organization.')
+          alert(
+            'Duplicate connector is being created for Dockerhub with the same account ID.'
+          )
           window.location.reload()
         } else {
           // Handle other errors
@@ -179,6 +172,32 @@ const Index = () => {
       setSelectedConnection(null)
     }
   }
+
+  const handleDelete = async (id) => {
+    try {
+      await organizationConnectorDelete({
+        variables: {
+          id
+        }
+      })
+      window.location.reload()
+    } catch (error) {
+      if (error.networkError && error.networkError.statusCode === 500) {
+        // Handle the specific error
+        alert('Multiple connection not allowed from single organization.')
+        window.location.reload()
+      } else {
+        // Handle other errors
+        console.error(error.message)
+      }
+    }
+  }
+
+  useEffect(() => {
+    selectedConnection && selectedConnection.enabled
+      ? setConStatus(selectedConnection.enabled)
+      : setConStatus(false)
+  }, [selectedConnection])
 
   return (
     <>
@@ -214,6 +233,8 @@ const Index = () => {
                     alignItems={'center'}
                     justifyContent={'space-between'}
                     p={6}
+                    bg={'whiteAlpha.900'}
+                    rounded={'md'}
                     textAlign={'center'}
                   >
                     <Flex
@@ -225,7 +246,7 @@ const Index = () => {
                       <Image
                         width='16'
                         height='16'
-                        src={getConImg(item.id)}
+                        src={getConImg(item.name)}
                         alt={`${item.name}`}
                       />
                       <Heading size='md'>{item.name}</Heading>
@@ -234,7 +255,7 @@ const Index = () => {
                       <Button
                         colorScheme='blue'
                         variant='ghost'
-                        onClick={() => handleOpen(item.id)}
+                        onClick={() => handleOpen(item)}
                       >
                         Connect
                       </Button>
@@ -262,21 +283,20 @@ const Index = () => {
                           gap={2}
                           alignItems='flex-start'
                         >
-                          <Switch id='disabled' />
-                          <FormLabel htmlFor='disabled' mb='0'>
-                            Disabled
+                          <Switch
+                            id='connStatus'
+                            isChecked={conStatus}
+                            onChange={() => setConStatus(!conStatus)}
+                          />
+                          <FormLabel htmlFor='connStatus' mb='0'>
+                            {conStatus === true ? 'Enabled' : 'Disabled'}
                           </FormLabel>
                         </FormControl>
                         <FormControl
                           display='flex'
                           gap={2}
                           alignItems='flex-start'
-                        >
-                          {/* <Switch id='readOnly' checked /> */}
-                          {/* <FormLabel htmlFor='readOnly' mb='0'>
-                              Read Only
-                            </FormLabel> */}
-                        </FormControl>
+                        ></FormControl>
                       </Flex>
                       <Flex width={'100%'} direction={'column'} gap={4}>
                         <FormControl isRequired>
@@ -288,8 +308,13 @@ const Index = () => {
                             placeholder={'Enter connector name'}
                           />
                         </FormControl>
-                        <FormControl isRequired>
-                          <FormLabel>Username</FormLabel>
+                        <FormControl
+                          isRequired
+                          isDisabled={
+                            selectedConnection === null ? false : true
+                          }
+                        >
+                          <FormLabel>Account ID</FormLabel>
                           <Input
                             type='text'
                             value={username}
@@ -297,15 +322,17 @@ const Index = () => {
                             placeholder={'Enter your username'}
                           />
                         </FormControl>
-                        <FormControl isRequired>
-                          <FormLabel>Access Token</FormLabel>
-                          <Input
-                            type='text'
-                            value={accessToken}
-                            onChange={(e) => setAccessToken(e.target.value)}
-                            placeholder={'Enter access token'}
-                          />
-                        </FormControl>
+                        {selectedConnection === null && (
+                          <FormControl isRequired>
+                            <FormLabel>Access Token</FormLabel>
+                            <Input
+                              type='text'
+                              value={accessToken}
+                              onChange={(e) => setAccessToken(e.target.value)}
+                              placeholder={'Enter access token'}
+                            />
+                          </FormControl>
+                        )}
                       </Flex>
                     </Flex>
                   </ModalBody>
@@ -337,10 +364,10 @@ const Index = () => {
                 <Table>
                   <Thead>
                     <Tr>
-                      <Th px={8}>Connector</Th>
-                      <Th px={8}>Username</Th>
-                      <Th px={8}>Token</Th>
-                      <Th px={8}>Updated at</Th>
+                      <Th px={8}>Status</Th>
+                      <Th px={8}>Connector Name</Th>
+                      <Th px={8}>Account ID</Th>
+                      <Th px={8}>Updated At</Th>
                       <Th px={8}>Actions</Th>
                     </Tr>
                   </Thead>
@@ -350,6 +377,19 @@ const Index = () => {
                       orgConnectors.organizationConnectors.map(
                         (item, index) => (
                           <Tr key={index}>
+                            <Td>
+                              <FormControl
+                                display='flex'
+                                gap={2}
+                                alignItems='flex-start'
+                              >
+                                <Switch
+                                  id='status'
+                                  defaultChecked={item.enabled}
+                                  readOnly
+                                />
+                              </FormControl>
+                            </Td>
                             <Td mt={2} px={8}>
                               <Flex
                                 direction={'row'}
@@ -357,7 +397,7 @@ const Index = () => {
                                 alignItems={'center'}
                               >
                                 <Image
-                                  src={getConImg(item.connectorId)}
+                                  src={getConImg(item.connector.name)}
                                   width={8}
                                   height={8}
                                 />
@@ -367,7 +407,6 @@ const Index = () => {
                                   alignItems={'start'}
                                 >
                                   <Heading size='base'>{item.name}</Heading>
-                                  {/* <Text size='xs'>Read only</Text> */}
                                 </Flex>
                               </Flex>
                             </Td>
@@ -375,10 +414,9 @@ const Index = () => {
                               {item.username}
                             </Td>
                             <Td mt={2} px={8}>
-                              {item.token}
-                            </Td>
-                            <Td mt={2} px={8}>
-                              {new Date(item.updatedAt).toLocaleDateString()}
+                              {new Date(item.updatedAt)
+                                .toISOString()
+                                .slice(0, 10)}
                             </Td>
                             <Td mt={2} px={8}>
                               <Flex
@@ -395,6 +433,7 @@ const Index = () => {
                                 <DeleteIcon
                                   color={'red.400'}
                                   cursor={'pointer'}
+                                  onClick={() => handleDelete(item.id)}
                                 />
                               </Flex>
                             </Td>
