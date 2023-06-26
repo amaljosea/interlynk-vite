@@ -33,7 +33,6 @@ import React, { useEffect, useState } from 'react'
 import { useMutation, useQuery } from '@apollo/client'
 import { OrgConnectorCreate } from 'graphQL/Mutation'
 import { OrgConnectorUpdate } from 'graphQL/Mutation'
-
 import docker from 'assets/img/docker.png'
 import amazon from 'assets/img/amazon.png'
 import azure from 'assets/img/azure.png'
@@ -133,9 +132,6 @@ const Index = () => {
           variables: {
             id: selectedConnection.id,
             name: connectorName,
-            user: selectedConnection.username,
-            token: selectedConnection.token,
-            readOnly: true,
             enabled: conStatus
           }
         })

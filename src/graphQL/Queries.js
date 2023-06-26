@@ -19,7 +19,6 @@ export const GetAllOrgConnectors = gql`
       }
       name
       username
-      token
       updatedAt
       enabled
     }
