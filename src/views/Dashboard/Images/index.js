@@ -35,6 +35,9 @@ import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
 import { AddIcon } from '@chakra-ui/icons'
+import { getAllScanners } from 'graphQL/Queries'
+import { useQuery } from '@apollo/client'
+import { GetAllImages } from 'graphQL/Queries'
 
 const Index = () => {
   const toast = useToast()
@@ -114,7 +117,7 @@ const Index = () => {
       case 'Trivy':
         return 'https://raw.githubusercontent.com/aquasecurity/trivy/main/docs/imgs/logo.png'
         break
-      case 'Docker Scout':
+      case 'Scout':
         return 'https://www.docker.com/wp-content/uploads/2023/02/analyze-vulnerabilities_icon.png'
         break
       case 'Snyk':
@@ -146,6 +149,16 @@ const Index = () => {
   const handleOpen = (item) => {
     onOpen()
   }
+
+  const orgID = process.env.REACT_APP_ORGID
+
+  const { data: allScanners } = useQuery(getAllScanners, {
+    variables: {}
+  })
+
+  const { data: allImages } = useQuery(GetAllImages, {
+    variables: { id: orgID }
+  })
 
   useEffect(() => {
     setTimeout(() => {
@@ -288,9 +301,9 @@ const Index = () => {
           </TableContainer> */}
 
           <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
-            <CardHeader>
+            {/* <CardHeader>
               <Input placeholder='Search' maxW='300px' mb={4} />
-            </CardHeader>
+            </CardHeader> */}
             <CardBody>
               <Table variant='simple'>
                 <Thead>
@@ -302,115 +315,115 @@ const Index = () => {
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {images.map((item) => (
-                    <Tr key={item.id}>
-                      <Td>
-                        <Link
-                          href={`#/admin/sboms?p=${item.image}&v=${item.version}`}
-                        >
-                          {item.image}
-                        </Link>
-                      </Td>
-                      <Td>{item.connection}</Td>
-                      <Td>
-                        <Flex direction={'row'} gap={2} alignItems={'center'}>
-                          {isLoading && activeImageId === item.id ? (
-                            <Spinner mx={2} />
-                          ) : (
-                            item.scanResult.map((result) => (
-                              <Image
-                                width={8}
-                                objectFit={'contain'}
-                                key={result}
-                                src={`${scanImage(result)}`}
-                                alt={result}
-                              />
-                            ))
-                          )}
-                        </Flex>
-                      </Td>
-                      <Td>
-                        <Flex direction={'row'} alignItems={'center'} gap={4}>
-                          <Button
-                            colorScheme='blue'
-                            leftIcon={<AddIcon />}
-                            variant='outline'
-                            size='sm'
-                            fontWeight={400}
-                            onClick={() => {
-                              setActiveImageId(item.id)
-                              onScanOpen()
-                            }}
+                  {allImages &&
+                    allImages.images.map((item) => (
+                      <Tr key={item.id}>
+                        <Td>
+                          <Link
+                            href={`#/admin/sboms?p=${item.image}&v=${item.version}`}
                           >
-                            Scanner
-                          </Button>
-                          <Modal isOpen={isScanOpen} onClose={onScanClose}>
-                            <ModalOverlay />
-                            <ModalContent>
-                              <ModalHeader>Add Scanner</ModalHeader>
-                              <ModalCloseButton />
-                              <ModalBody mb={12}>
-                                <Select
-                                  id='scanner'
-                                  placeholder='Select a scanner'
-                                  value={selectedScanner}
-                                  onChange={(e) =>
-                                    setSelectedScanner(e.target.value)
-                                  }
-                                >
-                                  <option value='Grype'>Grype</option>
-                                  <option value='Trivy'>Trivy</option>
-                                  <option value='Docker Scout'>
-                                    Docker Scout
-                                  </option>
-                                  <option value='Snyk'>Snyk</option>
-                                  <option value='Custom'>Custom</option>
-                                </Select>
-                              </ModalBody>
-                              <ModalFooter>
-                                <Button
-                                  colorScheme='blue'
-                                  variant='outline'
-                                  mr={3}
-                                  onClick={() => onScanClose()}
-                                >
-                                  Cancel
-                                </Button>
-                                <Button
-                                  colorScheme='blue'
-                                  onClick={handleScanAdd}
-                                >
-                                  Add
-                                </Button>
-                              </ModalFooter>
-                            </ModalContent>
-                          </Modal>
-                          <Button
-                            colorScheme='blue'
-                            size='sm'
-                            leftIcon={<AddIcon />}
-                            fontWeight={400}
-                            ref={btnRef}
-                            onClick={onOpen}
-                          >
-                            SBOM Link
-                          </Button>
-                          <ImagesDrawer
-                            isOpen={isOpen}
-                            onClose={onClose}
-                            btnRef={btnRef}
-                            activeImageId={activeImageId}
-                          />
-                        </Flex>
-                      </Td>
-                    </Tr>
-                  ))}
+                            {item.name}
+                          </Link>
+                        </Td>
+                        <Td>{item.organizationConnector.connector.name}</Td>
+                        <Td>
+                          <Flex direction={'row'} gap={2} alignItems={'center'}>
+                            {/* {isLoading && activeImageId === item.id ? (
+                              <Spinner mx={2} />
+                            ) : (
+                              item.scanResult.map((result) => (
+                                <Image
+                                  width={8}
+                                  objectFit={'contain'}
+                                  key={result}
+                                  src={`${scanImage(result)}`}
+                                  alt={result}
+                                />
+                              ))
+                            )} */}
+                          </Flex>
+                        </Td>
+                        <Td>
+                          <Flex direction={'row'} alignItems={'center'} gap={4}>
+                            <Button
+                              colorScheme='blue'
+                              leftIcon={<AddIcon />}
+                              variant='outline'
+                              size='sm'
+                              fontWeight={400}
+                              onClick={() => {
+                                setActiveImageId(item.id)
+                                onScanOpen()
+                              }}
+                            >
+                              Scanner
+                            </Button>
+
+                            <Button
+                              colorScheme='blue'
+                              size='sm'
+                              leftIcon={<AddIcon />}
+                              fontWeight={400}
+                              ref={btnRef}
+                              onClick={onOpen}
+                            >
+                              SBOM Link
+                            </Button>
+                          </Flex>
+                        </Td>
+                      </Tr>
+                    ))}
                 </Tbody>
               </Table>
             </CardBody>
           </Card>
         </Flex>
       </Flex>
+
+      {/* add scanners */}
+      <Modal isOpen={isScanOpen} onClose={onScanClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Add Scanner</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody mb={12}>
+            <Select
+              id='scanner'
+              placeholder='Select a scanner'
+              value={selectedScanner}
+              onChange={(e) => setSelectedScanner(e.target.value)}
+            >
+              {allScanners &&
+                allScanners.scanners.map((item) => (
+                  <option key={item.id} value={item.name}>
+                    {item.name}
+                  </option>
+                ))}
+            </Select>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              colorScheme='blue'
+              variant='outline'
+              mr={3}
+              onClick={() => onScanClose()}
+            >
+              Cancel
+            </Button>
+            <Button colorScheme='blue' onClick={handleScanAdd}>
+              Add
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* add sbom link  */}
+      <ImagesDrawer
+        isOpen={isOpen}
+        onClose={onClose}
+        btnRef={btnRef}
+        activeImageId={activeImageId}
+      />
     </>
   )
 }

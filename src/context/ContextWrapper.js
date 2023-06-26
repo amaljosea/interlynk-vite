@@ -56,7 +56,7 @@ const ContextWrapper = (props) => {
       version: 'v1.0',
       image: 'interlynk/sbomasm',
       connection: 'Interlynk Prod',
-      scanResult: ['Trivy', 'Docker Scout']
+      scanResult: ['Trivy', 'Scout']
     },
     {
       id: 3,
