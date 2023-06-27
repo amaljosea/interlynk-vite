@@ -1,4 +1,4 @@
-import { CopyIcon, DeleteIcon, EditIcon } from '@chakra-ui/icons'
+import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 import {
   Box,
   Button,
@@ -24,101 +24,176 @@ import {
   Tr,
   Tbody,
   Th,
-  Td,
-  Text
+  Td
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
-import GlobalContext from 'context/GlobalContext'
+import { GetAllConnectors, GetAllOrgConnectors } from 'graphQL/Queries'
 import React, { useEffect, useState } from 'react'
-import { useContext } from 'react'
+import { useMutation, useQuery } from '@apollo/client'
+import { OrgConnectorCreate } from 'graphQL/Mutation'
+import { OrgConnectorUpdate } from 'graphQL/Mutation'
+import docker from 'assets/img/docker.png'
+import amazon from 'assets/img/amazon.png'
+import azure from 'assets/img/azure.png'
+import github from 'assets/img/github.png'
+import gitlab from 'assets/img/gitlab.png'
+import { OrgConnectorDelete } from 'graphQL/Mutation'
 
 const Index = () => {
-  const { registryList, setRegistryList } = useContext(GlobalContext)
-  const registry = [
-    {
-      id: 1,
-      icon: 'https://img.icons8.com/fluency/48/docker.png',
-      title: 'Docker Hub',
-      alt: 'docker'
-    },
-    {
-      id: 2,
-      icon: 'https://img.icons8.com/color/48/amazon-web-services.png',
-      title: 'Amazon ECR',
-      alt: 'aws'
-    },
-    {
-      id: 3,
-      icon: 'https://img.icons8.com/fluency/48/azure-1.png',
-      title: 'Azure Container Registry (ACR)',
-      alt: 'azure'
-    },
-    {
-      id: 4,
-      icon: 'https://img.icons8.com/glyph-neue/64/github.png',
-      title: 'Github',
-      alt: 'github'
-    },
-    {
-      id: 5,
-      icon: 'https://img.icons8.com/color/48/gitlab.png',
-      title: 'GitLab',
-      alt: 'gitlab'
+  const getConImg = (name) => {
+    switch (name) {
+      case 'Docker Hub':
+        return docker
+        break
+      case 'Amazon ECR':
+        return amazon
+        break
+      case 'Azure Container Registry':
+        return azure
+        break
+      case 'Github (ghcr.io)':
+        return github
+        break
+      case 'Gitlab':
+        return gitlab
+        break
+      default:
+        break
     }
-  ]
+  }
+
+  const orgID = process.env.REACT_APP_ORGID
+
+  useEffect(() => {
+    console.log('orgID', orgID)
+  }, [])
+
+  const [connectors, setConnectors] = useState([])
+
+  const { data: allConnectors } = useQuery(GetAllConnectors, {
+    variables: {}
+  })
+
+  const { data: orgConnectors } = useQuery(GetAllOrgConnectors, {
+    variables: { id: orgID }
+  })
+
+  // sofueled id : 'f0b30788-3fa6-417f-b372-0c580f5ed876'
+
+  const [organizationConnectorCreate] = useMutation(OrgConnectorCreate)
+
+  const [organizationConnectorUpdate] = useMutation(OrgConnectorUpdate)
+
+  const [organizationConnectorDelete] = useMutation(OrgConnectorDelete)
+
+  useEffect(() => {
+    if (allConnectors) {
+      setConnectors(allConnectors.connectors)
+      console.log('connectors', allConnectors.connectors)
+    }
+  }, [allConnectors])
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const [connectorName, setConnectorName] = useState('Interlynk-Prod')
-  const [dockerAccountId, setDockerAccountId] = useState('Interlynk-io')
-  const [accessToken, setAccessToken] = useState(
-    'Fee7ea3a-979b-47c7-92bb-9d9d0419fe80'
-  )
-  const [orgAccountId, setOrgAccountId] = useState('327914055')
+  const [registryName, setRegistryName] = useState('')
+  const [activeConnection, setActiveConnection] = useState('')
+  const [selectedConnection, setSelectedConnection] = useState(null)
 
-  const [gitConnectorName, setGitConnectorName] = useState('Interlynk-GH')
-  const [gitUsername, setGitUsername] = useState('surendrapathak')
-  const [gitAccessToken, setGitAccessToken] = useState(
-    'Fee7ea3a-979b-47c7-92bb-9d9d0419fe80'
-  )
-  const [gitConnectorId, setGitConnectorId] = useState(
-    'sdvdffd979bdfdd234dZHfab21'
-  )
+  const [conStatus, setConStatus] = useState(false)
+  const [connectorName, setConnectorName] = useState('')
+  const [username, setUsername] = useState('')
+  const [accessToken, setAccessToken] = useState('')
 
-  const [isSelected, setIsSelected] = useState('')
+  const handleOpen = (item) => {
+    setSelectedConnection(null)
+    setConnectorName('')
+    setUsername('')
+    setAccessToken('')
+    setActiveConnection(item.id)
+    setRegistryName(item.name)
+    onOpen()
+  }
 
-  const handleOpen = (registry) => {
-    if (registry === 'docker' || registry === 'github') {
-      onOpen()
-    }
+  const handleEdit = async (item) => {
+    setSelectedConnection(item)
+    setConnectorName(item.name)
+    setUsername(item.username)
+    setAccessToken(item.token)
+    onOpen()
+  }
 
-    if (registry === 'docker') {
-      setIsSelected('docker')
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+
+    if (selectedConnection) {
+      try {
+        await organizationConnectorUpdate({
+          variables: {
+            id: selectedConnection.id,
+            name: connectorName,
+            enabled: conStatus
+          }
+        })
+        window.location.reload()
+      } catch (error) {
+        console.error('Mutation error:', error)
+      }
     } else {
-      setIsSelected('github')
+      try {
+        await organizationConnectorCreate({
+          variables: {
+            orgId: orgID,
+            connId: activeConnection,
+            name: connectorName,
+            user: username,
+            token: accessToken,
+            readOnly: true,
+            enabled: conStatus
+          }
+        })
+        window.location.reload()
+      } catch (error) {
+        if (error.networkError && error.networkError.statusCode === 500) {
+          // Handle the specific error
+          alert(
+            'Duplicate connector is being created for Dockerhub with the same account ID.'
+          )
+          window.location.reload()
+        } else {
+          // Handle other errors
+          console.error(error.message)
+        }
+      }
+      setSelectedConnection(null)
     }
   }
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    const data = {
-      readOnly: true,
-      registry: isSelected,
-      connector: connectorName,
-      service:
-        isSelected === 'docker'
-          ? 'Docker Hub Registry'
-          : 'Github Container Registry',
-      endpoint: isSelected === 'docker' ? 'ghcr.io' : 'docker.io'
+  const handleDelete = async (id) => {
+    try {
+      await organizationConnectorDelete({
+        variables: {
+          id
+        }
+      })
+      window.location.reload()
+    } catch (error) {
+      if (error.networkError && error.networkError.statusCode === 500) {
+        // Handle the specific error
+        alert('Multiple connection not allowed from single organization.')
+        window.location.reload()
+      } else {
+        // Handle other errors
+        console.error(error.message)
+      }
     }
-    setRegistryList((prev) => [data, ...prev])
-    onClose()
   }
 
   useEffect(() => {
-    console.log('registryList', registryList)
-  }, [registryList])
+    selectedConnection && selectedConnection.enabled
+      ? setConStatus(selectedConnection.enabled)
+      : setConStatus(false)
+  }, [selectedConnection])
 
   return (
     <>
@@ -138,7 +213,7 @@ const Index = () => {
               templateColumns='repeat(5, 1fr)'
               gap={6}
             >
-              {registry.map((item) => (
+              {connectors.map((item) => (
                 <GridItem
                   w='100%'
                   h='250px'
@@ -154,6 +229,8 @@ const Index = () => {
                     alignItems={'center'}
                     justifyContent={'space-between'}
                     p={6}
+                    bg={'whiteAlpha.900'}
+                    rounded={'md'}
                     textAlign={'center'}
                   >
                     <Flex
@@ -165,16 +242,16 @@ const Index = () => {
                       <Image
                         width='16'
                         height='16'
-                        src={`${item.icon}`}
-                        alt={`${item.alt}`}
+                        src={getConImg(item.name)}
+                        alt={`${item.name}`}
                       />
-                      <Heading size='md'>{item.title}</Heading>
+                      <Heading size='md'>{item.name}</Heading>
                     </Flex>
                     <Flex>
                       <Button
                         colorScheme='blue'
                         variant='ghost'
-                        onClick={() => handleOpen(item.alt)}
+                        onClick={() => handleOpen(item)}
                       >
                         Connect
                       </Button>
@@ -186,178 +263,89 @@ const Index = () => {
             <Modal isOpen={isOpen} onClose={onClose}>
               <ModalOverlay />
               <ModalContent>
-                {isSelected === 'docker' ? (
-                  <form onSubmit={handleSubmit}>
-                    <ModalHeader>Docker Hub (Authenticated)</ModalHeader>
-                    <ModalCloseButton />
-                    <ModalBody>
-                      <Flex
-                        width={'100%'}
-                        direction='column'
-                        gap={6}
-                        alignItems={'flex-start'}
-                      >
-                        <Flex width={'100%'} direction={'row'} gap={2}>
-                          <FormControl
-                            display='flex'
-                            gap={2}
-                            alignItems='flex-start'
-                          >
-                            <Switch id='disabled' />
-                            <FormLabel htmlFor='disabled' mb='0'>
-                              Disabled
-                            </FormLabel>
-                          </FormControl>
-                          {/* <FormControl
-                            display='flex'
-                            gap={2}
-                            alignItems='flex-start'
-                          >
-                            <Switch id='readOnly' checked />
-                            <FormLabel htmlFor='readOnly' mb='0'>
-                              Read Only
-                            </FormLabel>
-                          </FormControl> */}
-                        </Flex>
-                        <Flex width={'100%'} direction={'column'} gap={4}>
-                          <FormControl isRequired>
-                            <FormLabel>Connector name</FormLabel>
-                            <Input
-                              type='text'
-                              value={connectorName}
-                              onChange={(e) => setConnectorName(e.target.value)}
-                              placeholder={'Connector Name'}
-                            />
-                          </FormControl>
-                          <FormControl isRequired>
-                            <FormLabel>Docker Account ID</FormLabel>
-                            <Input
-                              type='text'
-                              value={dockerAccountId}
-                              onChange={(e) =>
-                                setDockerAccountId(e.target.value)
-                              }
-                              placeholder={'Docker Account ID'}
-                            />
-                          </FormControl>
+                <form onSubmit={handleSubmit}>
+                  <ModalHeader>{registryName}</ModalHeader>
+                  <ModalCloseButton />
+                  <ModalBody>
+                    <Flex
+                      width={'100%'}
+                      direction='column'
+                      gap={6}
+                      alignItems={'flex-start'}
+                    >
+                      <Flex width={'100%'} direction={'row'} gap={2}>
+                        <FormControl
+                          display='flex'
+                          gap={2}
+                          alignItems='flex-start'
+                        >
+                          <Switch
+                            id='connStatus'
+                            isChecked={conStatus}
+                            onChange={() => setConStatus(!conStatus)}
+                          />
+                          <FormLabel htmlFor='connStatus' mb='0'>
+                            {conStatus === true ? 'Enabled' : 'Disabled'}
+                          </FormLabel>
+                        </FormControl>
+                        <FormControl
+                          display='flex'
+                          gap={2}
+                          alignItems='flex-start'
+                        ></FormControl>
+                      </Flex>
+                      <Flex width={'100%'} direction={'column'} gap={4}>
+                        <FormControl isRequired>
+                          <FormLabel>Connector Name</FormLabel>
+                          <Input
+                            type='text'
+                            value={connectorName}
+                            onChange={(e) => setConnectorName(e.target.value)}
+                            placeholder={'Enter connector name'}
+                          />
+                        </FormControl>
+                        <FormControl
+                          isRequired
+                          isDisabled={
+                            selectedConnection === null ? false : true
+                          }
+                        >
+                          <FormLabel>Account ID</FormLabel>
+                          <Input
+                            type='text'
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            placeholder={'Enter your username'}
+                          />
+                        </FormControl>
+                        {selectedConnection === null && (
                           <FormControl isRequired>
                             <FormLabel>Access Token</FormLabel>
                             <Input
-                              type='password'
+                              type='text'
                               value={accessToken}
                               onChange={(e) => setAccessToken(e.target.value)}
-                              placeholder={'Access Token'}
+                              placeholder={'Enter access token'}
                             />
                           </FormControl>
-                          {/* <FormControl isRequired>
-                            <FormLabel>Organization Account ID</FormLabel>
-                            <Input
-                              type='text'
-                              value={orgAccountId}
-                              onChange={(e) => setOrgAccountId(e.target.value)}
-                              placeholder={'Organization Account ID'}
-                            />
-                          </FormControl> */}
-                        </Flex>
+                        )}
                       </Flex>
-                    </ModalBody>
-                    <ModalFooter>
-                      <Button
-                        colorScheme='blue'
-                        variant='outline'
-                        onClick={onClose}
-                        mr={4}
-                      >
-                        Cancel
-                      </Button>
-                      <Button colorScheme='blue' type='submit'>
-                        Save
-                      </Button>
-                    </ModalFooter>
-                  </form>
-                ) : (
-                  <form onSubmit={handleSubmit}>
-                    <ModalHeader>Github (Authenticated)</ModalHeader>
-                    <ModalCloseButton />
-                    <ModalBody>
-                      <Flex
-                        width={'100%'}
-                        direction='column'
-                        gap={6}
-                        alignItems={'flex-start'}
-                      >
-                        <Flex width={'100%'} direction={'row'} gap={2}>
-                          <FormControl
-                            display='flex'
-                            gap={2}
-                            alignItems='flex-start'
-                          >
-                            <Switch id='disabled' />
-                            <FormLabel htmlFor='disabled' mb='0'>
-                              Disabled
-                            </FormLabel>
-                          </FormControl>
-                          {/* <FormControl
-                            display='flex'
-                            gap={2}
-                            alignItems='flex-start'
-                          >
-                            <Switch id='readOnly' checked />
-                            <FormLabel htmlFor='readOnly' mb='0'>
-                              Read Only
-                            </FormLabel>
-                          </FormControl> */}
-                        </Flex>
-                        <Flex width={'100%'} direction={'column'} gap={4}>
-                          <FormControl isRequired>
-                            <FormLabel>Connector name</FormLabel>
-                            <Input
-                              type='text'
-                              value={gitConnectorName}
-                              onChange={(e) =>
-                                setGitConnectorName(e.target.value)
-                              }
-                            />
-                          </FormControl>
-                          <FormControl isRequired>
-                            <FormLabel>Github username</FormLabel>
-                            <Input
-                              type='text'
-                              value={gitUsername}
-                              onChange={(e) => setGitUsername(e.target.value)}
-                            />
-                          </FormControl>
-                          <FormControl isRequired>
-                            <FormLabel>Github Access Token</FormLabel>
-                            <Input
-                              type='password'
-                              value={gitAccessToken}
-                              onChange={(e) =>
-                                setGitAccessToken(e.target.value)
-                              }
-                            />
-                          </FormControl>
-                          <Box>
-                            <Text>Connector ID - {gitConnectorId}</Text>
-                          </Box>
-                        </Flex>
-                      </Flex>
-                    </ModalBody>
-                    <ModalFooter>
-                      <Button
-                        colorScheme='blue'
-                        variant='outline'
-                        onClick={onClose}
-                        mr={4}
-                      >
-                        Cancel
-                      </Button>
-                      <Button colorScheme='blue' type='submit'>
-                        Save
-                      </Button>
-                    </ModalFooter>
-                  </form>
-                )}
+                    </Flex>
+                  </ModalBody>
+                  <ModalFooter>
+                    <Button
+                      colorScheme='blue'
+                      variant='outline'
+                      onClick={onClose}
+                      mr={4}
+                    >
+                      Cancel
+                    </Button>
+                    <Button colorScheme='blue' type='submit'>
+                      Save
+                    </Button>
+                  </ModalFooter>
+                </form>
               </ModalContent>
             </Modal>
           </Box>
@@ -372,66 +360,82 @@ const Index = () => {
                 <Table>
                   <Thead>
                     <Tr>
-                      <Th px={8}>Connector</Th>
-                      <Th px={8}>Service</Th>
-                      <Th px={8}>Endpoint</Th>
+                      <Th px={8}>Status</Th>
+                      <Th px={8}>Connector Name</Th>
+                      <Th px={8}>Account ID</Th>
+                      <Th px={8}>Updated At</Th>
                       <Th px={8}>Actions</Th>
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {registryList.length > 0 &&
-                      registryList.map((item, index) => (
-                        <Tr key={index}>
-                          <Td mt={2} px={8}>
-                            <Flex
-                              direction={'row'}
-                              gap={4}
-                              alignItems={'start'}
-                            >
-                              {item.registry === 'docker' ? (
-                                <Image
-                                  src='https://img.icons8.com/fluency/48/docker.png'
-                                  width={8}
-                                  height={8}
+                    {orgConnectors &&
+                      orgConnectors.organizationConnectors.length > 0 &&
+                      orgConnectors.organizationConnectors.map(
+                        (item, index) => (
+                          <Tr key={index}>
+                            <Td>
+                              <FormControl
+                                display='flex'
+                                gap={2}
+                                alignItems='flex-start'
+                              >
+                                <Switch
+                                  id='status'
+                                  defaultChecked={item.enabled}
+                                  readOnly
                                 />
-                              ) : (
-                                <Image
-                                  src='https://img.icons8.com/glyph-neue/64/github.png'
-                                  width={8}
-                                  height={8}
-                                />
-                              )}
+                              </FormControl>
+                            </Td>
+                            <Td mt={2} px={8}>
                               <Flex
-                                direction={'column'}
-                                gap={1}
+                                direction={'row'}
+                                gap={4}
+                                alignItems={'center'}
+                              >
+                                <Image
+                                  src={getConImg(item.connector.name)}
+                                  width={8}
+                                  height={8}
+                                />
+                                <Flex
+                                  direction={'column'}
+                                  gap={1}
+                                  alignItems={'start'}
+                                >
+                                  <Heading size='base'>{item.name}</Heading>
+                                </Flex>
+                              </Flex>
+                            </Td>
+                            <Td mt={2} px={8}>
+                              {item.username}
+                            </Td>
+                            <Td mt={2} px={8}>
+                              {new Date(item.updatedAt)
+                                .toISOString()
+                                .slice(0, 10)}
+                            </Td>
+                            <Td mt={2} px={8}>
+                              <Flex
+                                direction={'row'}
+                                gap={4}
                                 alignItems={'start'}
                               >
-                                <Heading size='base'>{item.connector}</Heading>
+                                <EditIcon
+                                  color={'blue.500'}
+                                  cursor={'pointer'}
+                                  onClick={() => handleEdit(item)}
+                                />
+
+                                <DeleteIcon
+                                  color={'red.400'}
+                                  cursor={'pointer'}
+                                  onClick={() => handleDelete(item.id)}
+                                />
                               </Flex>
-                            </Flex>
-                          </Td>
-                          <Td mt={2} px={8}>
-                            {item.service}
-                          </Td>
-                          <Td mt={2} px={8}>
-                            {item.endpoint}
-                          </Td>
-                          <Td mt={2} px={8}>
-                            <Flex
-                              direction={'row'}
-                              gap={4}
-                              alignItems={'start'}
-                            >
-                              <EditIcon color={'blue.500'} cursor={'pointer'} />
-                              <CopyIcon color={'blue.500'} cursor={'pointer'} />
-                              <DeleteIcon
-                                color={'blue.500'}
-                                cursor={'pointer'}
-                              />
-                            </Flex>
-                          </Td>
-                        </Tr>
-                      ))}
+                            </Td>
+                          </Tr>
+                        )
+                      )}
                   </Tbody>
                 </Table>
               </CardBody>
