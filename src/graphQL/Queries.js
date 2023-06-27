@@ -41,18 +41,31 @@ export const GetAllImages = gql`
     images(organizationId: $id) {
       id
       name
+      imageVersions {
+        name
+      }
       organizationConnector {
         id
-        connector {
+        name
+      }
+      imageScanners {
+        id
+        name
+        version
+        company
+      }
+      scanResults {
+        id
+        cveId
+        compName
+        compVersion
+        fixedInComp
+        cvssv3
+        scanner {
+          id
           name
         }
-        name
-        username
-        updatedAt
-        enabled
       }
-      organizationConnectorId
-      updatedAt
     }
   }
 `
@@ -70,6 +83,28 @@ export const getImageVersion = gql`
       name
       sizeInBytes
       updatedAt
+    }
+  }
+`
+
+export const getVulnerabilities = gql`
+  query getVulnerabilities($id: ID!) {
+    images(organizationId: $id) {
+      id
+      name
+      scanResults {
+        id
+        cveId
+        compName
+        compVersion
+        fixedInComp
+        fixedInImage
+        cvssv3
+        scanner {
+          id
+          name
+        }
+      }
     }
   }
 `

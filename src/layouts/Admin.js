@@ -24,12 +24,9 @@ import { useLocation } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
 
 export default function Dashboard(props) {
-  const {
-    setCustomerView,
-    minimize,
-    userLocation,
-    setUserLocation
-  } = useContext(GlobalContext)
+  const { setCustomerView, minimize, setUserLocation } = useContext(
+    GlobalContext
+  )
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition((position) => {

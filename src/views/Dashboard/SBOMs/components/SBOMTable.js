@@ -47,7 +47,8 @@ import {
 import { productVersionsData } from 'variables/general'
 import { BiImport, BiExport, BiFilter } from 'react-icons/bi'
 import { BsFilterRight } from 'react-icons/bs'
-import { FaFilter } from 'react-icons/fa'
+import { useQuery } from '@apollo/client'
+import { getVulnerabilities } from 'graphQL/Queries'
 
 const SBOMTable = ({
   title,
@@ -64,6 +65,13 @@ const SBOMTable = ({
     tabIndex,
     setTabIndex
   } = useContext(GlobalContext)
+
+  const orgID = process.env.REACT_APP_ORGID
+
+  const { data: vulData } = useQuery(getVulnerabilities, {
+    variables: { id: orgID }
+  })
+
   const textColor = useColorModeValue('gray.700', 'white')
   const [searchInput, setSearchInput] = useState('')
   const [searchVul, setSearchVul] = useState('')
@@ -135,15 +143,6 @@ const SBOMTable = ({
       }
     })
   })
-  // var sbom_content
-  // fetch(
-  //   'https://raw.githubusercontent.com/interlynk-io/sbomqs/main/samples/sbomqs-cdx-cgomod.json'
-  // )
-  //   .then((response) => response.text())
-  //   .then((text) => {
-  //     sbom_content = text
-  //   })
-  // console.log(sbom_content)
 
   const handleSearch = (e) => {
     setSearchInput(e.target.value)
@@ -157,8 +156,9 @@ const SBOMTable = ({
 
   const filteredVulItems = vulnerabilitiesData.filter(
     (item) =>
-      item.cve.toLowerCase().includes(searchVul.toLowerCase()) ||
-      item.component.toLowerCase().includes(searchVul.toLowerCase())
+      (item.cveId || item.compName) &&
+      (item.cveId.toLowerCase().includes(searchVul.toLowerCase()) ||
+        item.compName.toLowerCase().includes(searchVul.toLowerCase()))
   )
 
   const filteredRiskItems = Risks.filter((item) =>
@@ -272,10 +272,13 @@ const SBOMTable = ({
   }, [selectedScanner])
 
   useEffect(() => {
-    const vulnaData = vulnerabilitiesData.sort((a, b) =>
-      b.cvss.localeCompare(a.cvss)
-    )
-    setVulnerabilitiesData(vulnaData)
+    if (vulData) {
+      const result = [...vulData.images[0].scanResults]
+      const data = result.sort(
+        (a, b) => (a.cvssv3 || b.cvssv3) && b.cvssv3.localeCompare(a.cvssv3)
+      )
+      setVulnerabilitiesData(data)
+    }
   }, [])
 
   useEffect(() => {
@@ -288,6 +291,8 @@ const SBOMTable = ({
   const [sortComponentData, setSortComponentData] = useState([])
   const [defaultRiskScore, setDefaultRiskScore] = useState([])
   const [sortRiskScoreData, setSortRiskScoreData] = useState([])
+
+  const [vulSortData, setVulSortData] = useState([])
 
   const handleSort = (field) => {
     if (field === sortField) {
@@ -326,11 +331,15 @@ const SBOMTable = ({
   }
 
   const sortVulnData = (field, order) => {
-    const sortedData = vulnerabilitiesData.sort((a, b) => {
-      const comparison = a[field].localeCompare(b[field])
-      return order === 'asc' ? comparison : -comparison
-    })
-    setVulnerabilitiesData(sortedData)
+    if (vulData) {
+      const result = [...vulData.images[0].scanResults]
+      const sortedData = result.sort((a, b) => {
+        const comparison = a[field].localeCompare(b[field])
+        return order === 'asc' ? comparison : -comparison
+      })
+      console.log('sortedData', sortedData)
+      setVulSortData(sortedData)
+    }
   }
 
   const handleRiskSort = (field) => {
@@ -603,13 +612,13 @@ const SBOMTable = ({
                       color='gray.400'
                       py={4}
                       position='relative'
-                      onClick={() => handleVulSort('cve')}
+                      onClick={() => handleVulSort('cveId')}
                       cursor={'pointer'}
                     >
                       <Flex direction={'row'} alignItems={'center'} gap={2}>
                         <Box>CVE</Box>
                         <Box>
-                          {sortField === 'cve' && sortOrder === 'asc' ? (
+                          {sortField === 'cveId' && sortOrder === 'asc' ? (
                             <TriangleUpIcon />
                           ) : (
                             <TriangleDownIcon />
@@ -621,13 +630,13 @@ const SBOMTable = ({
                       color='gray.400'
                       py={4}
                       position='relative'
-                      onClick={() => handleVulSort('cvss')}
+                      onClick={() => handleVulSort('cvssv3')}
                       cursor={'pointer'}
                     >
                       <Flex direction={'row'} alignItems={'center'} gap={2}>
                         <Box>CVSS</Box>
                         <Box>
-                          {sortField === 'cvss' && sortOrder === 'asc' ? (
+                          {sortField === 'cvssv3' && sortOrder === 'asc' ? (
                             <TriangleUpIcon />
                           ) : (
                             <TriangleDownIcon />
@@ -642,13 +651,13 @@ const SBOMTable = ({
                       color='gray.400'
                       py={4}
                       position='relative'
-                      onClick={() => handleVulSort('component')}
+                      onClick={() => handleVulSort('compName')}
                       cursor={'pointer'}
                     >
                       <Flex direction={'row'} alignItems={'center'} gap={2}>
                         <Box>Component</Box>
                         <Box>
-                          {sortField === 'component' && sortOrder === 'asc' ? (
+                          {sortField === 'compName' && sortOrder === 'asc' ? (
                             <TriangleUpIcon />
                           ) : (
                             <TriangleDownIcon />
@@ -660,31 +669,13 @@ const SBOMTable = ({
                       color='gray.400'
                       py={4}
                       position='relative'
-                      onClick={() => handleVulSort('version')}
+                      onClick={() => handleVulSort('compVersion')}
                       cursor={'pointer'}
                     >
                       <Flex direction={'row'} alignItems={'center'} gap={2}>
                         <Box>Version</Box>
                         <Box>
-                          {sortField === 'version' && sortOrder === 'asc' ? (
-                            <TriangleUpIcon />
-                          ) : (
-                            <TriangleDownIcon />
-                          )}
-                        </Box>
-                      </Flex>
-                    </Th>
-                    <Th
-                      color='gray.400'
-                      py={4}
-                      position='relative'
-                      onClick={() => handleVulSort('fixed_component')}
-                      cursor={'pointer'}
-                    >
-                      <Flex direction={'row'} alignItems={'center'} gap={2}>
-                        <Box>Fixed (Component)</Box>
-                        <Box>
-                          {sortField === 'fixed_component' &&
+                          {sortField === 'compVersion' &&
                           sortOrder === 'asc' ? (
                             <TriangleUpIcon />
                           ) : (
@@ -697,13 +688,32 @@ const SBOMTable = ({
                       color='gray.400'
                       py={4}
                       position='relative'
-                      onClick={() => handleVulSort('fixed_product')}
+                      onClick={() => handleVulSort('fixedInComp')}
+                      cursor={'pointer'}
+                    >
+                      <Flex direction={'row'} alignItems={'center'} gap={2}>
+                        <Box>Fixed (Component)</Box>
+                        <Box>
+                          {sortField === 'fixedInComp' &&
+                          sortOrder === 'asc' ? (
+                            <TriangleUpIcon />
+                          ) : (
+                            <TriangleDownIcon />
+                          )}
+                        </Box>
+                      </Flex>
+                    </Th>
+                    <Th
+                      color='gray.400'
+                      py={4}
+                      position='relative'
+                      onClick={() => handleVulSort('fixedInImage')}
                       cursor={'pointer'}
                     >
                       <Flex direction={'row'} alignItems={'center'} gap={2}>
                         <Box>Fixed (Product)</Box>
                         <Box>
-                          {sortField === 'fixed_product' &&
+                          {sortField === 'fixedInImage' &&
                           sortOrder === 'asc' ? (
                             <TriangleUpIcon />
                           ) : (
@@ -749,12 +759,12 @@ const SBOMTable = ({
                           <VulnerabilityRow
                             key={idx}
                             id={row.id}
-                            component={row.component}
-                            version={row.version}
-                            cvss={row.cvss}
-                            cve={row.cve}
-                            fixed_component={row.fixed_component}
-                            fixed_product={row.fixed_product}
+                            component={row.compName}
+                            version={row.compVersion}
+                            cvss={row.cvssv3}
+                            cve={row.cveId}
+                            fixed_component={row.fixedInComp}
+                            fixed_product={row.fixedInImage}
                             description={row.description}
                             status={row.status}
                             scanner={row.scanner}
@@ -769,12 +779,12 @@ const SBOMTable = ({
                           <VulnerabilityRow
                             key={idx}
                             id={row.id}
-                            component={row.component}
-                            version={row.version}
-                            cvss={row.cvss}
-                            cve={row.cve}
-                            fixed_component={row.fixed_component}
-                            fixed_product={row.fixed_product}
+                            component={row.compName}
+                            version={row.compVersion}
+                            cvss={row.cvssv3}
+                            cve={row.cveId}
+                            fixed_component={row.fixedInComp}
+                            fixed_product={row.fixedInImage}
                             description={row.description}
                             status={row.status}
                             scanner={row.scanner}
@@ -789,12 +799,12 @@ const SBOMTable = ({
                           <VulnerabilityRow
                             key={idx}
                             id={row.id}
-                            component={row.component}
-                            version={row.version}
-                            cvss={row.cvss}
-                            cve={row.cve}
-                            fixed_component={row.fixed_component}
-                            fixed_product={row.fixed_product}
+                            component={row.compName}
+                            version={row.compVersion}
+                            cvss={row.cvssv3}
+                            cve={row.cveId}
+                            fixed_component={row.fixedInComp}
+                            fixed_product={row.fixedInImage}
                             description={row.description}
                             status={row.status}
                             scanner={row.scanner}
@@ -803,17 +813,58 @@ const SBOMTable = ({
                           />
                         )
                       })
-                    : vulnerabilitiesData.map((row, idx) => {
+                    : vulSortData.length > 0
+                    ? vulSortData.map((row, idx) => {
                         return (
                           <VulnerabilityRow
                             key={idx}
                             id={row.id}
-                            component={row.component}
-                            version={row.version}
-                            cvss={row.cvss}
-                            cve={row.cve}
-                            fixed_component={row.fixed_component}
-                            fixed_product={row.fixed_product}
+                            component={row.compName}
+                            version={row.compVersion}
+                            cvss={row.cvssv3}
+                            cve={row.cveId}
+                            fixed_component={row.fixedInComp}
+                            fixed_product={row.fixedInImage}
+                            description={row.description}
+                            status={row.status}
+                            scanner={row.scanner}
+                            shared_data={row.shared_data}
+                            versions={row.versions}
+                          />
+                        )
+                      })
+                    : vulnerabilitiesData.length > 0
+                    ? vulnerabilitiesData.map((row, idx) => {
+                        return (
+                          <VulnerabilityRow
+                            key={idx}
+                            id={row.id}
+                            component={row.compName}
+                            version={row.compVersion}
+                            cvss={row.cvssv3}
+                            cve={row.cveId}
+                            fixed_component={row.fixedInComp}
+                            fixed_product={row.fixedInImage}
+                            description={row.description}
+                            status={row.status}
+                            scanner={row.scanner}
+                            shared_data={row.shared_data}
+                            versions={row.versions}
+                          />
+                        )
+                      })
+                    : vulData &&
+                      vulData.images[0].scanResults.map((row, idx) => {
+                        return (
+                          <VulnerabilityRow
+                            key={idx}
+                            id={row.id}
+                            component={row.compName}
+                            version={row.compVersion}
+                            cvss={row.cvssv3}
+                            cve={row.cveId}
+                            fixed_component={row.fixedInComp}
+                            fixed_product={row.fixedInImage}
                             description={row.description}
                             status={row.status}
                             scanner={row.scanner}
@@ -826,6 +877,7 @@ const SBOMTable = ({
               </Table>
             </CardBody>
           </TabPanel>
+          {/* component */}
           <TabPanel>
             <CardHeader mb={4} as={Flex}>
               <Flex
@@ -1025,6 +1077,7 @@ const SBOMTable = ({
               </Table>
             </CardBody>
           </TabPanel>
+          {/* risks */}
           <TabPanel>
             <CardHeader mb={4} as={Flex}>
               <Input

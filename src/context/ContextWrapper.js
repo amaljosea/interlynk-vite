@@ -10,9 +10,7 @@ const ContextWrapper = (props) => {
     dashboardTableData
   )
   const [SBOMLinksData, setSBOMLinksData] = useState(SBOMLinks)
-  const [vulnerabilitiesData, setVulnerabilitiesData] = useState(
-    Vulnerabilities
-  )
+  const [vulnerabilitiesData, setVulnerabilitiesData] = useState([])
   const [activitiesData, setActivitiesData] = useState(activitiesDataLong)
 
   const productExploded = []

@@ -22,7 +22,8 @@ import {
   useDisclosure,
   Spinner,
   Link,
-  Input
+  Input,
+  Spacer
 } from '@chakra-ui/react'
 import GlobalContext from 'context/GlobalContext'
 import React, { useContext } from 'react'
@@ -56,6 +57,7 @@ const Index = () => {
 
   const [selectedImage, setSelectedImage] = useState('')
   const [selectedScanner, setSelectedScanner] = useState('')
+  const [selectedVersion, setSelectedVersion] = useState('')
   const [hasAnalyzed, setHasAnalyzed] = useState(false)
   const [isActive, setIsActive] = useState(false)
 
@@ -320,27 +322,31 @@ const Index = () => {
                       <Tr key={item.id}>
                         <Td>
                           <Link
-                            href={`#/admin/sboms?p=${item.image}&v=${item.version}`}
+                            href={`#/admin/sboms?p=${item.name}&v=${item.imageVersions[0].name}`}
+                            _hover={{
+                              color: '#3182CE',
+                              textDecoration: 'underline'
+                            }}
                           >
                             {item.name}
                           </Link>
                         </Td>
-                        <Td>{item.organizationConnector.connector.name}</Td>
+                        <Td>{item.organizationConnector.name}</Td>
                         <Td>
                           <Flex direction={'row'} gap={2} alignItems={'center'}>
-                            {/* {isLoading && activeImageId === item.id ? (
+                            {isLoading && activeImageId === item.id ? (
                               <Spinner mx={2} />
                             ) : (
-                              item.scanResult.map((result) => (
+                              item.imageScanners.map((result) => (
                                 <Image
                                   width={8}
                                   objectFit={'contain'}
                                   key={result}
-                                  src={`${scanImage(result)}`}
+                                  src={`${scanImage(result.name)}`}
                                   alt={result}
                                 />
                               ))
-                            )} */}
+                            )}
                           </Flex>
                         </Td>
                         <Td>
@@ -386,7 +392,7 @@ const Index = () => {
         <ModalContent>
           <ModalHeader>Add Scanner</ModalHeader>
           <ModalCloseButton />
-          <ModalBody mb={12}>
+          <ModalBody mb={6}>
             <Select
               id='scanner'
               placeholder='Select a scanner'
@@ -396,9 +402,30 @@ const Index = () => {
               {allScanners &&
                 allScanners.scanners.map((item) => (
                   <option key={item.id} value={item.name}>
-                    {item.name}
+                    {item.company} - {item.name}
                   </option>
                 ))}
+            </Select>
+            <Select
+              id='version'
+              value={selectedVersion}
+              onChange={(e) => setSelectedVersion(e.target.value)}
+              mt={4}
+            >
+              {allScanners && selectedScanner !== ''
+                ? allScanners.scanners
+                    .filter((scanner) => selectedScanner === `${scanner.name}`)
+                    .map((item) => (
+                      <option key={item.id} value={item.version}>
+                        {item.version}
+                      </option>
+                    ))
+                : allScanners &&
+                  allScanners.scanners.map((item) => (
+                    <option key={item.id} value={item.version}>
+                      {item.version}
+                    </option>
+                  ))}
             </Select>
           </ModalBody>
           <ModalFooter>

@@ -28,8 +28,7 @@ import {
   MenuItemOption,
   Box,
   Select,
-  Checkbox,
-  CheckboxGroup
+  Checkbox
 } from '@chakra-ui/react'
 import React, { useContext, useEffect, useState } from 'react'
 import Card from 'components/Card/Card.js'
@@ -49,8 +48,16 @@ import {
 import { useLocation } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
 import SBOMDrawer from 'components/Drawer/SBOMDrawer'
+import { getVulnerabilities } from 'graphQL/Queries'
+import { useQuery } from '@apollo/client'
 
 function SBOMs(data) {
+  const orgID = process.env.REACT_APP_ORGID
+
+  const { data: vulnData } = useQuery(getVulnerabilities, {
+    variables: { id: orgID }
+  })
+
   const [jsonData] = useState({
     id: 74,
     parentId: null,
@@ -129,6 +136,7 @@ function SBOMs(data) {
   const {
     productVersionsData,
     setTabIndex,
+    setVulnerabilitiesData,
     vulnerabilitiesData,
     componentsVal,
     setComponentsVal,
@@ -139,6 +147,12 @@ function SBOMs(data) {
     riskScoreVal,
     setRiskScoreVal
   } = useContext(GlobalContext)
+
+  // useEffect(() => {
+  //   if (vulnData) {
+  //     console.log('vulnData', vulnData.images[0].scanResults)
+  //   }
+  // }, [])
 
   const {
     isOpen: isSBMOpen,
@@ -457,12 +471,12 @@ function SBOMs(data) {
                         </RadioGroup>
 
                         <Stack direction='column' gap='5px'>
-                        <Checkbox defaultChecked>
-                          Include Vulnerabilities
-                        </Checkbox>
-                        <Checkbox defaultChecked>
-                          Include Vulnerability Status (VEX)
-                        </Checkbox>
+                          <Checkbox defaultChecked>
+                            Include Vulnerabilities
+                          </Checkbox>
+                          <Checkbox defaultChecked>
+                            Include Vulnerability Status (VEX)
+                          </Checkbox>
                         </Stack>
                       </Stack>
                     </ModalBody>
@@ -524,6 +538,7 @@ function SBOMs(data) {
           'last_updated',
           ''
         ]}
+        vulData={vulnData && vulnData.images[0].scanResults}
         data={sortSBOM}
         filteredVul={filteredVulItems}
         setFilteredVulItems={setFilteredVulItems}
