@@ -41,9 +41,6 @@ export const GetAllImages = gql`
     images(organizationId: $id) {
       id
       name
-      imageVersions {
-        name
-      }
       organizationConnector {
         id
         name
@@ -54,17 +51,9 @@ export const GetAllImages = gql`
         version
         company
       }
-      scanResults {
+      imageVersions {
         id
-        cveId
-        compName
-        compVersion
-        fixedInComp
-        cvssv3
-        scanner {
-          id
-          name
-        }
+        name
       }
     }
   }

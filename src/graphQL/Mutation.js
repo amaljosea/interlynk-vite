@@ -115,11 +115,34 @@ export const imageCreate = gql`
   }
 `
 
-export const imageScannerCreate = gql`
-  mutation imageScannerCreate($imgVersionId: Uuid!, $scannerId: Uuid!) {
+export const imgScannerCreate = gql`
+  mutation imgScannerCreate($imgVersionId: Uuid!, $scannerId: Uuid!) {
     imageScannerCreate(
       input: { imageVersionId: $imgVersionId, scannerId: $scannerId }
     ) {
+      imageScanner {
+        id
+        imageVersion {
+          id
+          imageId
+          name
+        }
+        imageVersionId
+        scanner {
+          id
+          company
+          name
+        }
+        scannerId
+        updatedAt
+      }
+    }
+  }
+`
+
+export const imgScannerDelete = gql`
+  mutation imgScannerDelete($id: ID!) {
+    imageScannerDelete(input: { id: $id }) {
       imageScanner {
         id
         imageVersion {

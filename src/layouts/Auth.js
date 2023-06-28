@@ -106,8 +106,8 @@ export default function Pages(props) {
   const navRef = React.useRef()
   document.documentElement.dir = 'ltr'
 
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [email, setEmail] = useState('demo@interlynk.io')
+  const [password, setPassword] = useState('demointerlynk0719')
   const [error, setError] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
 

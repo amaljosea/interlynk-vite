@@ -37,13 +37,24 @@ import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
 import { AddIcon } from '@chakra-ui/icons'
 import { getAllScanners } from 'graphQL/Queries'
-import { useQuery } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import { GetAllImages } from 'graphQL/Queries'
+
+import grype from 'assets/img/grype.png'
+import trivy from 'assets/img/trivy.png'
+import scout from 'assets/img/scout.png'
+import snyk from 'assets/img/snyk.png'
+import custom from 'assets/img/custom.png'
+import { imgScannerCreate } from 'graphQL/Mutation'
 
 const Index = () => {
   const toast = useToast()
   const { setProductVersionExploded, images, setImages } = useContext(
     GlobalContext
+  )
+
+  const [imageScannerCreate, { data: scanResult }] = useMutation(
+    imgScannerCreate
   )
 
   const {
@@ -62,6 +73,8 @@ const Index = () => {
   const [isActive, setIsActive] = useState(false)
 
   const [activeImageId, setActiveImageId] = useState(null)
+  const [activeScannerId, setActiveScannerId] = useState(null)
+  const [selectedImgVersions, setSelectedImgVersions] = useState([])
 
   const [isLoading, setIsLoading] = useState(false)
 
@@ -114,38 +127,47 @@ const Index = () => {
   const scanImage = (name) => {
     switch (name) {
       case 'Grype':
-        return 'https://user-images.githubusercontent.com/5199289/136855393-d0a9eef9-ccf1-4e2b-9d7c-7aad16a567e5.png'
+        return grype
         break
       case 'Trivy':
-        return 'https://raw.githubusercontent.com/aquasecurity/trivy/main/docs/imgs/logo.png'
+        return trivy
         break
       case 'Scout':
-        return 'https://www.docker.com/wp-content/uploads/2023/02/analyze-vulnerabilities_icon.png'
+        return scout
         break
       case 'Snyk':
-        return 'https://w7.pngwing.com/pngs/314/10/png-transparent-snyk-full-logo-tech-companies-thumbnail.png'
+        return snyk
         break
       case 'Custom':
-        return 'https://seeklogo.com/images/A/azure-container-apps-logo-2CCDCF7E10-seeklogo.com.png'
+        return custom
         break
     }
   }
 
-  const handleScanAdd = () => {
-    const selectedItem = images.find((item) => item.id === activeImageId)
-    console.log('selectedItem', selectedItem)
-    if (selectedItem && selectedScanner) {
-      const updatedSubArray = [...selectedItem.scanResult, selectedScanner]
-      if (selectedItem.scanResult.includes(`${selectedScanner}`)) {
-        setImages([...images])
-      } else {
-        selectedItem.scanResult = updatedSubArray
-        setImages([...images])
-        setIsLoading(true)
+  const handleScanAdd = (e) => {
+    e.preventDefault()
+    if (selectedImgVersions.length > 0) {
+      try {
+        selectedImgVersions.map((version) => {
+          imageScannerCreate({
+            variables: {
+              imgVersionId: `${version.id}`,
+              scannerId: `${selectedVersion}`
+            }
+          })
+        })
+        window.location.reload()
+      } catch (error) {
+        if (error.networkError && error.networkError.statusCode === 500) {
+          // Handle the specific error
+          alert('Invalid entry')
+          window.location.reload()
+        } else {
+          // Handle other errors
+          console.error(error.message)
+        }
       }
-      setSelectedImage('')
     }
-    onScanClose()
   }
 
   const handleOpen = (item) => {
@@ -163,10 +185,16 @@ const Index = () => {
   })
 
   useEffect(() => {
-    setTimeout(() => {
-      setIsLoading(false)
-    }, 10000)
-  }, [isLoading])
+    if (allImages) {
+      console.log('allImages', allImages)
+    }
+  }, [allImages])
+
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     setIsLoading(false)
+  //   }, 10000)
+  // }, [isLoading])
 
   return (
     <>
@@ -179,129 +207,6 @@ const Index = () => {
           justifyContent={'space-between'}
           mt={{ base: '200px', md: '75px' }}
         >
-          {/* <TableContainer width={'100%'}>
-            <Table variant='simple'>
-              <Thead>
-                <Tr>
-                  <Th>Select Image</Th>
-                  <Th>Select Scanner</Th>
-                  <Th>Vulnerability</Th>
-                  <Th></Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                <Tr>
-                  <Td>
-                    <Select
-                      id='images'
-                      placeholder='Select an image to analyze'
-                      value={selectedImage}
-                      onChange={(e) => setSelectedImage(e.target.value)}
-                    >
-                      <option value='dependencytrack/apisever:latest'>
-                        dependencytrack/apisever:latest
-                      </option>
-                      <option value='dependencytrack/frontend:latest'>
-                        dependencytrack/frontend:latest
-                      </option>
-                      <option value='ghcr.io/interlynk-io/sbomqs:latest'>
-                        ghcr.io/interlynk-io/sbomqs:latest
-                      </option>
-                      <option value='k8s.gcr.io/coredns/coredns:v1.8.4'>
-                        k8s.gcr.io/coredns/coredns:v1.8.4
-                      </option>
-                      <option value='k8s.gcr.io/etcd:3.5.0-0'>
-                        k8s.gcr.io/etcd:3.5.0-0
-                      </option>
-                      <option value='k8s.gcr.io/kube-apiserver:v1.22.5'>
-                        k8s.gcr.io/kube-apiserver:v1.22.5
-                      </option>
-                      <option value='k8s.gcr.io/kube-controller-manager:v1.22.5'>
-                        k8s.gcr.io/kube-controller-manager:v1.22.5
-                      </option>
-                      <option value='k8s.gcr.io/kube-proxy:v1.22.5'>
-                        k8s.gcr.io/kube-proxy:v1.22.5
-                      </option>
-                      <option value='k8s.gcr.io/kube-scheduler:v1.22.5'>
-                        k8s.gcr.io/kube-scheduler:v1.22.5
-                      </option>
-                    </Select>
-                  </Td>
-                  <Td>
-                    <Select
-                      id='scanner'
-                      placeholder='Select an scanner to analyze'
-                      value={selectedScanner}
-                      onChange={(e) => setSelectedScanner(e.target.value)}
-                    >
-                      <option value='Trivy'>Trivy</option>
-                      <option value='Syft'>Syft</option>
-                      <option value='Docker Scout'>Docker Scout</option>
-                      <option value='Snyk'>Snyk</option>
-                    </Select>
-                  </Td>
-                  <Td>
-                    {isActive ? (
-                      <Flex direction='row' gap='2'>
-                        <Flex
-                          alignItems={'center'}
-                          gap={0.5}
-                          px={4}
-                          py={1}
-                          rounded={'md'}
-                          bg='red.500'
-                          color={'white'}
-                        >
-                          <Text>3</Text>
-                          <Text>C</Text>
-                        </Flex>
-                        <Flex
-                          alignItems={'center'}
-                          gap={0.5}
-                          px={4}
-                          py={1}
-                          rounded={'md'}
-                          bg='red.300'
-                        >
-                          <Text>2</Text>
-                          <Text>H</Text>
-                        </Flex>
-                        <Flex
-                          alignItems={'center'}
-                          gap={0.5}
-                          px={4}
-                          py={1}
-                          rounded={'md'}
-                          bg='orange'
-                        >
-                          <Text>5</Text>
-                          <Text>M</Text>
-                        </Flex>
-                      </Flex>
-                    ) : (
-                      <Text>Not analysed</Text>
-                    )}
-                  </Td>
-                  <Td>
-                    {isActive ? (
-                      <Button colorScheme='blue' onClick={handleAddProduct}>
-                        Add as Product
-                      </Button>
-                    ) : (
-                      <Button
-                        isLoading={hasAnalyzed}
-                        colorScheme='blue'
-                        onClick={handleAnalyze}
-                      >
-                        Analyze Image
-                      </Button>
-                    )}
-                  </Td>
-                </Tr>
-              </Tbody>
-            </Table>
-          </TableContainer> */}
-
           <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
             {/* <CardHeader>
               <Input placeholder='Search' maxW='300px' mb={4} />
@@ -323,7 +228,7 @@ const Index = () => {
                         <Td>
                           <Link
                             href={`#/admin/sboms?p=${item.name}&v=${item.imageVersions[0].name}`}
-                            _hover={{
+                            style={{
                               color: '#3182CE',
                               textDecoration: 'underline'
                             }}
@@ -358,7 +263,7 @@ const Index = () => {
                               size='sm'
                               fontWeight={400}
                               onClick={() => {
-                                setActiveImageId(item.id)
+                                setSelectedImgVersions(item.imageVersions)
                                 onScanOpen()
                               }}
                             >
@@ -390,57 +295,64 @@ const Index = () => {
       <Modal isOpen={isScanOpen} onClose={onScanClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Add Scanner</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody mb={6}>
-            <Select
-              id='scanner'
-              placeholder='Select a scanner'
-              value={selectedScanner}
-              onChange={(e) => setSelectedScanner(e.target.value)}
-            >
-              {allScanners &&
-                allScanners.scanners.map((item) => (
-                  <option key={item.id} value={item.name}>
-                    {item.company} - {item.name}
-                  </option>
-                ))}
-            </Select>
-            <Select
-              id='version'
-              value={selectedVersion}
-              onChange={(e) => setSelectedVersion(e.target.value)}
-              mt={4}
-            >
-              {allScanners && selectedScanner !== ''
-                ? allScanners.scanners
-                    .filter((scanner) => selectedScanner === `${scanner.name}`)
-                    .map((item) => (
-                      <option key={item.id} value={item.version}>
-                        {item.version}
-                      </option>
-                    ))
-                : allScanners &&
+          <form onSubmit={handleScanAdd}>
+            <ModalHeader>Add Scanner</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody mb={6}>
+              <Select
+                id='scanner'
+                placeholder='Select a scanner'
+                isRequired
+                value={selectedScanner}
+                onChange={(e) => setSelectedScanner(e.target.value)}
+              >
+                {allScanners &&
                   allScanners.scanners.map((item) => (
-                    <option key={item.id} value={item.version}>
-                      {item.version}
+                    <option key={item.id} value={item.name}>
+                      {item.company} - {item.name}
                     </option>
                   ))}
-            </Select>
-          </ModalBody>
-          <ModalFooter>
-            <Button
-              colorScheme='blue'
-              variant='outline'
-              mr={3}
-              onClick={() => onScanClose()}
-            >
-              Cancel
-            </Button>
-            <Button colorScheme='blue' onClick={handleScanAdd}>
-              Add
-            </Button>
-          </ModalFooter>
+              </Select>
+              <Select
+                id='version'
+                placeholder='Select a version'
+                isRequired
+                value={selectedVersion}
+                onChange={(e) => setSelectedVersion(e.target.value)}
+                mt={4}
+              >
+                {allScanners && selectedScanner !== ''
+                  ? allScanners.scanners
+                      .filter(
+                        (scanner) => selectedScanner === `${scanner.name}`
+                      )
+                      .map((item) => (
+                        <option key={item.id} value={item.id}>
+                          {item.version}
+                        </option>
+                      ))
+                  : allScanners &&
+                    allScanners.scanners.map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.version}
+                      </option>
+                    ))}
+              </Select>
+            </ModalBody>
+            <ModalFooter>
+              <Button
+                colorScheme='blue'
+                variant='outline'
+                mr={3}
+                onClick={() => onScanClose()}
+              >
+                Cancel
+              </Button>
+              <Button type='submit' colorScheme='blue'>
+                Add
+              </Button>
+            </ModalFooter>
+          </form>
         </ModalContent>
       </Modal>
 
