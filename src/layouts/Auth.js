@@ -5,23 +5,20 @@ import {
   AlertIcon,
   Box,
   Button,
-  Center,
   ChakraProvider,
   Flex,
   FormControl,
-  FormLabel,
   Heading,
   Image,
   Input,
-  Portal,
   Text
 } from '@chakra-ui/react'
 import Footer from 'components/Footer/Footer.js'
 // core components
-import AuthNavbar from 'components/Navbars/AuthNavbar.js'
+
 import React from 'react'
 import { Link, Redirect, Route } from 'react-router-dom'
-import routes from 'routes.js'
+
 import '@fontsource/roboto/400.css'
 import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
@@ -30,9 +27,7 @@ import { InterlynkLogo } from 'components/Icons/Icons'
 import { useState } from 'react'
 
 export default function Pages(props) {
-  const { ...rest } = props
-  // ref for the wrapper div
-  const wrapper = React.createRef()
+
   React.useEffect(() => {
     document.body.style.overflow = 'unset'
     // Specify how to clean up after this effect:
@@ -159,8 +154,8 @@ export default function Pages(props) {
                 alignItems={'center'}
                 justifyContent={'center'}
               >
-                <InterlynkLogo w='48px' h='48px' me='10px' />
-                <Heading fontSize={'3xl'}>Interlynk</Heading>
+                <InterlynkLogo w='40px' h='40px' me='10px' />
+                <Text fontSize={'3xl'} fontWeight={600}>Interlynk</Text>
               </Flex>
               <Flex
                 direction={'column'}
@@ -168,10 +163,10 @@ export default function Pages(props) {
                 alignItems={'center'}
                 justifyContent={'center'}
               >
-                <Text fontSize={'xl'} textAlign={'center'}>
+                <Text fontSize={'lg'} textAlign={'center'}>
                   Welcome
                 </Text>
-                <Text fontSize={'base'} textAlign={'center'}>
+                <Text fontSize={'sm'} textAlign={'center'}>
                   Log in to Interlynk to continue to the dashboard.
                 </Text>
                 {error === true && (

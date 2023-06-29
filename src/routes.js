@@ -32,13 +32,13 @@ var dashRoutes = [
     component: Images,
     layout: '/admin'
   },
-  {
-    path: '/products',
-    name: 'Products',
-    icon: <FaWindowMaximize color='inherit' />,
-    component: Products,
-    layout: '/admin'
-  },
+  // {
+  //   path: '/products',
+  //   name: 'Products',
+  //   icon: <FaWindowMaximize color='inherit' />,
+  //   component: Products,
+  //   layout: '/admin'
+  // },
   {
     path: '/sboms',
     name: 'SBOM',

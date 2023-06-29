@@ -89,8 +89,21 @@ const Index = () => {
 
   useEffect(() => {
     if (allConnectors) {
-      setConnectors(allConnectors.connectors)
-      console.log('connectors', allConnectors.connectors)
+      const con = [...allConnectors.connectors]
+      const result = con.sort((a, b) => {
+        const nameA = a.name.toUpperCase()
+        const nameB = b.name.toUpperCase()
+
+        if (nameA < nameB) {
+          return -1
+        }
+        if (nameA > nameB) {
+          return 1
+        }
+        return 0
+      })
+      setConnectors(result)
+      console.log('connectors', result)
     }
   }, [allConnectors])
 

@@ -1,68 +1,138 @@
 // Chakra imports
 import {
   Flex,
-  Icon,
   Table,
-  Tbody,
-  Text,
-  Th,
   Thead,
+  Tbody,
   Tr,
-  useColorModeValue,
-} from "@chakra-ui/react";
+  Th,
+  Td,
+  Image,
+  Text,
+  Heading,
+  Link
+} from '@chakra-ui/react'
 // Custom components
-import Card from "components/Card/Card.js";
-import CardHeader from "components/Card/CardHeader.js";
-import ProductsOverviewTableRow from "components/Tables/ProductsOverviewTableRow";
-import React from "react";
-import { IoCheckmarkDoneCircleSharp } from "react-icons/io5";
+import Card from 'components/Card/Card'
+import CardHeader from 'components/Card/CardHeader'
+import CardBody from 'components/Card/CardBody'
+
+import React, { useEffect } from 'react'
+
+import { GetAllImages } from 'graphQL/Queries'
+
+import grype from 'assets/img/grype.png'
+import trivy from 'assets/img/trivy.png'
+import scout from 'assets/img/scout.png'
+import snyk from 'assets/img/snyk.png'
+import custom from 'assets/img/custom.png'
+import { useQuery } from '@apollo/client'
 
 const ProductsOverview = ({ title, amount, captions, data }) => {
-  const textColor = useColorModeValue("gray.700", "white");
-  data.sort((a, b) => {
-    const sumA = a.versions.reduce((sum, version) => sum + version.sbom_links, 0);
-    const sumB = b.versions.reduce((sum, version) => sum + version.sbom_links, 0);
-    return sumB - sumA; // Sort in descending order
-  });
-  return (
-    <Card p='16px' overflowX={{ sm: "scroll", xl: "hidden" }}>
-      <CardHeader p='12px 0px 28px 0px'>
-        <Flex direction='column'>
-          <Text fontSize='lg' color={textColor} fontWeight='bold' pb='.5rem'>
-            {title}
-          </Text>
-        </Flex>
-      </CardHeader>
-      <Table variant='simple' color={textColor}>
-        <Thead>
-          <Tr my='.8rem' ps='0px'>
-            {captions.map((caption, idx) => {
-              return (
-                <Th color='gray.400' key={idx} ps={idx === 0 ? "0px" : null}>
-                  {caption}
-                </Th>
-              );
-            })}
-          </Tr>
-        </Thead>
-        <Tbody>
-          {data.map((row) => {
-            return (
-              <ProductsOverviewTableRow
-                name={row.name}
-                project={row.project}
-                description={row.description}
-                logo={row.logo}
-                versions={row.versions}
-                sbom_links={row.versions.reduce((sum, version) => sum + version.sbom_links, 0)}
-                risk_score={row.risk_score}
-              />
-            );
-          })}
-        </Tbody>
-      </Table>
-    </Card>
-  );
-};
+  const scanImage = (name) => {
+    switch (name) {
+      case 'Grype':
+        return grype
+        break
+      case 'Trivy':
+        return trivy
+        break
+      case 'Scout':
+        return scout
+        break
+      case 'Snyk':
+        return snyk
+        break
+      case 'Custom':
+        return custom
+        break
+    }
+  }
 
-export default ProductsOverview;
+  const orgID = process.env.REACT_APP_ORGID
+
+  const { data: allImages } = useQuery(GetAllImages, {
+    variables: { id: orgID }
+  })
+
+  useEffect(() => {
+    if (allImages) {
+      console.log('allImages', allImages)
+    }
+  }, [allImages])
+
+  return (
+    <Flex width={'100%'} direction='column' mt={{ base: '120px', md: '0px' }}>
+      <Flex
+        dir='row'
+        width={'100%'}
+        alignItems={'center'}
+        px={2}
+        justifyContent={'space-between'}
+      >
+        <Card overflowX={{ sm: 'scroll', xl: 'hidden' }}>
+          <CardHeader>
+            <Heading fontSize={'xl'}>{title}</Heading>
+          </CardHeader>
+          <CardBody>
+            <Table variant='simple' mt={10}>
+              <Thead>
+                <Tr>
+                  <Th>Images</Th>
+                  <Th>Connection</Th>
+                  <Th>Versions</Th>
+                  <Th>Scan Result</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {allImages &&
+                  allImages.images.map((item) => (
+                    <Tr key={item.id}>
+                      <Td>
+                        <Link
+                          href={`#/admin/sboms?p=${item.name}&v=${item.imageVersions[0].name}`}
+                          style={{
+                            color: '#3182CE',
+                            textDecoration: 'underline'
+                          }}
+                        >
+                          {item.name}
+                        </Link>
+                      </Td>
+                      <Td>{item.organizationConnector.name}</Td>
+                      <Td>
+                        <Flex>
+                          {item.imageVersions.map((version, index) => (
+                            <Text>
+                              {index > 0 && ','}{' '}
+                              {/* Render comma for all elements except the first one */}
+                              {version.name}
+                            </Text>
+                          ))}
+                        </Flex>
+                      </Td>
+                      <Td>
+                        <Flex direction={'row'} gap={2} alignItems={'center'}>
+                          {item.imageScanners.map((result) => (
+                            <Image
+                              width={8}
+                              objectFit={'contain'}
+                              key={result}
+                              src={`${scanImage(result.name)}`}
+                              alt={result}
+                            />
+                          ))}
+                        </Flex>
+                      </Td>
+                    </Tr>
+                  ))}
+              </Tbody>
+            </Table>
+          </CardBody>
+        </Card>
+      </Flex>
+    </Flex>
+  )
+}
+
+export default ProductsOverview
