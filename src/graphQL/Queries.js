@@ -44,6 +44,9 @@ export const GetAllImages = gql`
       organizationConnector {
         id
         name
+        connector {
+          name
+        }
       }
       imageScanners {
         id
@@ -55,23 +58,80 @@ export const GetAllImages = gql`
         id
         name
       }
+      updatedAt
+    }
+  }
+`
+
+export const getImage = gql`
+  query getImage($id: ID!) {
+    image(id: $id) {
+      id
+      name
+      updatedAt
+      imageScanners {
+        id
+        name
+        company
+      }
+      imageVersions {
+        name
+        imageVulns {
+          cveId
+          cvss {
+            v2Score
+            v3Score
+          }
+          component {
+            fixedInVersion
+            name
+            version
+          }
+          scanners {
+            name
+          }
+          severity
+        }
+      }
     }
   }
 `
 
 export const getImageVersion = gql`
-  query getImageVersion($id: ID!) {
-    imageVersions(imageId: $id) {
+  query getImageVersion($id: ID!, $imageID: ID) {
+    imageVersion(id: $id) {
       id
       image {
+        name
+      }
+      imageScanners {
         id
         name
-        organizationConnectorId
+        version
       }
-      imageId
+      imageShaId
       name
       sizeInBytes
       updatedAt
+      imageVulns(imageVersionId: $id, imageId: $imageID) {
+        cveId
+        component {
+          fixedInVersion
+          name
+          version
+        }
+        cvss {
+          v2Score
+          v3Score
+        }
+        severity
+        fixedInImage
+        scanners {
+          id
+          name
+          version
+        }
+      }
     }
   }
 `

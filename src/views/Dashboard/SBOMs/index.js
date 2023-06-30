@@ -40,13 +40,7 @@ import SBOMStatistics from './components/SBOMStatistics'
 
 import { sbom } from 'variables/general'
 import { ChevronDownIcon, AddIcon } from '@chakra-ui/icons'
-import {
-  FaBalanceScale,
-  FaCubes,
-  FaBug,
-  FaUnlock,
-  FaFileDownload
-} from 'react-icons/fa'
+import { FaCubes, FaBug, FaUnlock, FaFileDownload } from 'react-icons/fa'
 import { useLocation } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
 import SBOMDrawer from 'components/Drawer/SBOMDrawer'
@@ -58,22 +52,10 @@ import trivy from 'assets/img/trivy.png'
 import scout from 'assets/img/scout.png'
 import snyk from 'assets/img/snyk.png'
 import custom from 'assets/img/custom.png'
+import { getImageVersion, getImage } from 'graphQL/Queries'
 
 function SBOMs() {
   const [scanResults, setScanResults] = useState([])
-
-  const orgID = process.env.REACT_APP_ORGID
-
-  const { data: vulnData } = useQuery(getVulnerabilities, {
-    variables: { id: orgID }
-  })
-
-  useEffect(() => {
-    if (vulnData) {
-      console.log('vulData', vulnData)
-      setScanResults(vulnData.images[1].scanResults)
-    }
-  }, [vulnData])
 
   const scanImage = (name) => {
     switch (name) {
@@ -105,17 +87,39 @@ function SBOMs() {
       )
     },
     {
+      Header: 'SEVERITY',
+      Footer: 'SEVERITY',
+      accessor: 'severity',
+      Cell: (row) => (
+        <Flex>
+          {row?.cell?.value.map((item, index) => (
+            <chakra.span
+              fontSize={'sm'}
+              textTransform={'capitalize'}
+              key={index}
+            >
+              {item}
+            </chakra.span>
+          ))}
+        </Flex>
+      )
+    },
+    {
       Header: 'CVSS',
       Footer: 'CVSS',
-      accessor: 'cvssv3',
+      accessor: 'cvss',
       Cell: (row) => (
-        <chakra.span fontSize={'sm'}>{row?.cell?.value}</chakra.span>
+        <chakra.span fontSize={'sm'}>
+          {row?.cell?.value.v3Score
+            ? row?.cell?.value.v3Score
+            : row?.cell?.value.v2Score}
+        </chakra.span>
       )
     },
     {
       Header: 'COMPONENT',
       Footer: 'COMPONENT',
-      accessor: 'compName',
+      accessor: 'component.name',
       Cell: (row) => (
         <chakra.span fontSize={'sm'}>{row?.cell?.value}</chakra.span>
       )
@@ -123,7 +127,7 @@ function SBOMs() {
     {
       Header: 'VERSION',
       Footer: 'VERSION',
-      accessor: 'compVersion',
+      accessor: 'component.version',
       Cell: (row) => (
         <chakra.span fontSize={'sm'}>{row?.cell?.value}</chakra.span>
       )
@@ -131,7 +135,22 @@ function SBOMs() {
     {
       Header: 'FIXED (COMPONENT)',
       Footer: 'FIXED (COMPONENT)',
-      accessor: 'fixedInComp',
+      accessor: 'component.fixedInVersion',
+      Cell: (row) => (
+        <Flex>
+          {row?.cell?.value?.length > 0 &&
+            row?.cell?.value?.map((item, index) => (
+              <chakra.span fontSize={'sm'} key={index}>
+                {item}
+              </chakra.span>
+            ))}
+        </Flex>
+      )
+    },
+    {
+      Header: 'FIXED (IMAGE)',
+      Footer: 'FIXED (IMAGE)',
+      accessor: 'fixedInImage',
       Cell: (row) => (
         <chakra.span fontSize={'sm'}>{row?.cell?.value}</chakra.span>
       )
@@ -139,15 +158,17 @@ function SBOMs() {
     {
       Header: 'SCANNER',
       Footer: 'SCANNER',
-      accessor: 'scanner',
+      accessor: 'scanners',
       Cell: (row) => (
         <chakra.span>
-          <Image
-            src={scanImage(row?.cell?.value.name)}
-            height={12}
-            width={12}
-            objectFit={'contain'}
-          />
+          {row?.cell?.value.map((item) => (
+            <Image
+              src={scanImage(item.name)}
+              height={12}
+              width={12}
+              objectFit={'contain'}
+            />
+          ))}
         </chakra.span>
       )
     }
@@ -257,9 +278,30 @@ function SBOMs() {
 
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
-  const product = queryParams.get('p')
-  const version = queryParams.get('v')
+  const versionId = queryParams.get('v')
+  const imageId = queryParams.get('id')
   const { isOpen, onOpen, onClose } = useDisclosure()
+
+  const { data: imageData } = useQuery(getImage, {
+    variables: { id: imageId }
+  })
+
+  const { data: imageVersionData } = useQuery(getImageVersion, {
+    variables: { id: versionId, imageId: imageId }
+  })
+
+  useEffect(() => {
+    if (imageVersionData) {
+      console.log('imageVersionData', imageVersionData)
+      setScanResults(imageVersionData.imageVersion.imageVulns)
+    }
+  }, [imageVersionData])
+
+  useEffect(() => {
+    if (imageData) {
+      console.log('imageData', imageData.image)
+    }
+  }, [imageData])
 
   const cloudVersion = window.localStorage.getItem('version')
   const cloudScanner = window.localStorage.getItem('scanner')
@@ -271,11 +313,6 @@ function SBOMs() {
   const finalRef = React.useRef(null)
 
   const exportData = () => {
-    // const jsonString = "hello";
-    // const link = document.createElement("a");
-    // link.href = jsonString;
-    // link.download = "data.json";
-    // link.click();
     const fileData = JSON.stringify(jsonData)
     const blob = new Blob([fileData])
     const url = URL.createObjectURL(blob)
@@ -343,14 +380,7 @@ function SBOMs() {
     }
   }
 
-  // const handleScannerUpdate = (e) => {
-  //   setSelectedScanner(e.target.value)
-  //   window.localStorage.setItem('scanner', e.target.value)
-  //   window.location.reload()
-  // }
-
   const [selectedScannerItem, setSelectedScannerItem] = useState([])
-  const [selectedCompany, setSelectedCompany] = useState([])
   const [filteredVulItems, setFilteredVulItems] = useState([])
 
   const handleScanner = (e) => {
@@ -425,12 +455,22 @@ function SBOMs() {
                 <Icon as={FaCubes} h={'64px'} w={'64px'} color='blue.300' />
                 <Box>
                   <Heading as='h3' size='md' noOfLines={1} color='gray.600'>
-                    {product ? product : 'interlynk/sbomqs'}
+                    {imageData && imageData.image.name}
                   </Heading>
                   <Text fontSize='sm'>
-                    {cloudVersion ? cloudVersion : 'v0.3'}
+                    {imageData &&
+                      imageData.image.imageVersions &&
+                      imageData.image.imageVersions[
+                        imageData.image.imageVersions.length - 1
+                      ].name}
                   </Text>
-                  <Text fontSize='sm'>Last Updated: 2023-03-31 06:31:25</Text>
+                  <Text fontSize='sm'>
+                    Last Updated:{' '}
+                    {imageData &&
+                      new Date(imageData.image.updatedAt)
+                        .toISOString()
+                        .slice(0, 10)}
+                  </Text>
                 </Box>
               </Flex>
             </GridItem>
@@ -449,23 +489,13 @@ function SBOMs() {
                   width={'150px'}
                   color='gray.500'
                 >
-                  {product === 'interlynkio/sbomqs'
-                    ? sbomqsVersions.map((p) => (
-                        <option key={p} value={p}>
-                          {p}
-                        </option>
-                      ))
-                    : product === 'interlynkio/sbomasm'
-                    ? sbomasmVersion.map((p) => (
-                        <option key={p} value={p}>
-                          {p}
-                        </option>
-                      ))
-                    : sbomgrVersion.map((p) => (
-                        <option key={p} value={p}>
-                          {p}
-                        </option>
-                      ))}
+                  {imageData &&
+                    imageData.image.imageVersions &&
+                    imageData.image.imageVersions.map((img, index) => (
+                      <option key={index} value={img.name}>
+                        {img.name}
+                      </option>
+                    ))}
                 </Select>
                 <Select
                   id='scanner'
@@ -475,11 +505,13 @@ function SBOMs() {
                   width={'150px'}
                   color='gray.500'
                 >
-                  {scanner.map((item) => (
-                    <option key={item.id} value={item.name}>
-                      {item.name}
-                    </option>
-                  ))}
+                  {imageData &&
+                    imageData.image.imageScanners &&
+                    imageData.image.imageScanners.map((item) => (
+                      <option key={item.id} value={item.name}>
+                        {item.name}
+                      </option>
+                    ))}
                 </Select>
                 <Menu>
                   <MenuButton

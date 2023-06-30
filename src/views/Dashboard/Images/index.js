@@ -6,12 +6,11 @@ import {
   Tr,
   Th,
   Td,
-  TableContainer,
   Select,
   Button,
   Text,
   Image,
-  IconButton,
+  Tooltip,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -20,22 +19,26 @@ import {
   ModalBody,
   ModalCloseButton,
   useDisclosure,
-  Spinner,
   Link,
   Input,
-  Spacer
+  IconButton,
+  Menu,
+  Portal,
+  MenuList,
+  MenuItem,
+  MenuButton,
+  Skeleton,
+  useToast
 } from '@chakra-ui/react'
-import GlobalContext from 'context/GlobalContext'
-import React, { useContext } from 'react'
+import React from 'react'
 import { useState } from 'react'
-import { FaGithub, FaSprayCan } from 'react-icons/fa'
-import { useToast } from '@chakra-ui/react'
+import { FaEllipsisV } from 'react-icons/fa'
 import { useEffect } from 'react'
 import ImagesDrawer from 'components/Drawer/ImagesDrawer'
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
-import { AddIcon } from '@chakra-ui/icons'
+import { AddIcon, DeleteIcon } from '@chakra-ui/icons'
 import { getAllScanners } from 'graphQL/Queries'
 import { useMutation, useQuery } from '@apollo/client'
 import { GetAllImages } from 'graphQL/Queries'
@@ -45,17 +48,33 @@ import trivy from 'assets/img/trivy.png'
 import scout from 'assets/img/scout.png'
 import snyk from 'assets/img/snyk.png'
 import custom from 'assets/img/custom.png'
-import { imgScannerCreate } from 'graphQL/Mutation'
+import { GetAllOrgConnectors } from 'graphQL/Queries'
+
+import { getConImg } from 'utils'
+import { AddScannerImage } from 'graphQL/Mutation'
+import { RemoveScannerImage } from 'graphQL/Mutation'
 
 const Index = () => {
   const toast = useToast()
-  const { setProductVersionExploded, images, setImages } = useContext(
-    GlobalContext
-  )
 
-  const [imageScannerCreate, { data: scanResult }] = useMutation(
-    imgScannerCreate
-  )
+  const orgID = process.env.REACT_APP_ORGID
+
+  const { data: orgConnectors } = useQuery(GetAllOrgConnectors, {
+    variables: { id: orgID }
+  })
+
+  const { data: allScanners } = useQuery(getAllScanners, {
+    variables: {}
+  })
+
+  const { data: allImages } = useQuery(GetAllImages, {
+    variables: { id: orgID }
+  })
+
+  const [imageScannerAdd] = useMutation(AddScannerImage)
+  const [imageScannerRemove] = useMutation(RemoveScannerImage)
+
+  const { isOpen, onOpen, onClose } = useDisclosure()
 
   const {
     isOpen: isScanOpen,
@@ -63,66 +82,20 @@ const Index = () => {
     onClose: onScanClose
   } = useDisclosure()
 
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const {
+    isOpen: isDeleteOpen,
+    onOpen: onDeleteOpen,
+    onClose: onDeleteClose
+  } = useDisclosure()
+
   const btnRef = React.useRef()
 
   const [selectedImage, setSelectedImage] = useState('')
   const [selectedScanner, setSelectedScanner] = useState('')
-  const [selectedVersion, setSelectedVersion] = useState('')
-  const [hasAnalyzed, setHasAnalyzed] = useState(false)
-  const [isActive, setIsActive] = useState(false)
-
   const [activeImageId, setActiveImageId] = useState(null)
-  const [activeScannerId, setActiveScannerId] = useState(null)
-  const [selectedImgVersions, setSelectedImgVersions] = useState([])
 
+  const [activeScanners, setActiveScanners] = useState([])
   const [isLoading, setIsLoading] = useState(false)
-
-  const handleAnalyze = () => {
-    if (selectedImage !== '' && selectedScanner !== '') {
-      setHasAnalyzed(true)
-      setTimeout(() => {
-        setHasAnalyzed(false)
-        setIsActive(true)
-      }, 4000)
-    } else {
-      toast({
-        title: `Input fields required`,
-        status: 'error',
-        position: 'top-right',
-        isClosable: true
-      })
-    }
-  }
-
-  const handleAddProduct = () => {
-    setProductVersionExploded((prev) => [
-      {
-        logo: FaGithub,
-        name: selectedImage.split(':')[0],
-        description: 'A tool to compose your various sboms into a single sbom',
-        version: selectedImage.split(':')[1],
-        vendor: 'Interlynk',
-        quality_score: 0,
-        sbom_links: 0,
-        risk_score: 'Not Defined',
-        updated_at: new Date().toISOString(),
-        active: true,
-        source: 'Assembled'
-      },
-      ...prev
-    ])
-
-    toast({
-      title: `Product added successfully`,
-      status: 'success',
-      position: 'top-right',
-      isClosable: true
-    })
-
-    setSelectedImage('')
-    setSelectedScanner('')
-  }
 
   const scanImage = (name) => {
     switch (name) {
@@ -144,63 +117,93 @@ const Index = () => {
     }
   }
 
-  const handleScanAdd = (e) => {
+  const handleScanAdd = async (e) => {
     e.preventDefault()
-    if (selectedImgVersions.length > 0) {
-      try {
-        selectedImgVersions.map((version) => {
-          imageScannerCreate({
-            variables: {
-              imgVersionId: `${version.id}`,
-              scannerId: `${selectedVersion}`
-            }
-          })
-        })
-        window.location.reload()
-      } catch (error) {
-        if (error.networkError && error.networkError.statusCode === 500) {
-          // Handle the specific error
-          alert('Invalid entry')
-          window.location.reload()
-        } else {
-          // Handle other errors
-          console.error(error.message)
+    try {
+      await imageScannerAdd({
+        variables: {
+          imageID: `${selectedImage}`,
+          scannerID: `${selectedScanner}`
         }
+      })
+      window.location.reload()
+    } catch (error) {
+      if (error.networkError && error.networkError.statusCode === 500) {
+        // Handle the specific error
+        alert('Invalid entry')
+        window.location.reload()
+      } else {
+        // Handle other errors
+        alert('Invalid entry')
+        console.error(error.message)
       }
     }
   }
 
-  const handleOpen = (item) => {
-    onOpen()
+  const handleDelete = async (e) => {
+    e.preventDefault()
+    try {
+      await imageScannerRemove({
+        variables: {
+          imageID: `${selectedImage}`,
+          scannerID: `${selectedScanner}`
+        }
+      })
+      window.location.reload()
+    } catch (error) {
+      if (error.networkError && error.networkError.statusCode === 500) {
+        // Handle the specific error
+        alert('Invalid request')
+        window.location.reload()
+      } else {
+        // Handle other errors
+        alert('Invalid request')
+        console.error(error.message)
+      }
+    }
   }
 
-  const orgID = process.env.REACT_APP_ORGID
+  const existingScanners =
+    activeScanners && activeScanners.map((item) => item.id)
 
-  const { data: allScanners } = useQuery(getAllScanners, {
-    variables: {}
-  })
+  // console.log('existingScanners', existingScanners)
 
-  const { data: allImages } = useQuery(GetAllImages, {
-    variables: { id: orgID }
-  })
+  // const filteredScanners =
+  //   allScanners &&
+  //   allScanners.scanners.filter(
+  //     (scanner) => !existingScanners.includes(scanner.version)
+  //   )
+
+  // const filteredScanners =
+  //   existingScanners && !existingScanners.includes(selectedScanner)
+
+  // console.log('filteredScanners', filteredScanners)
+
+  const handleScannerChange = (e) => {
+    const { value } = e.target
+    setSelectedScanner(value)
+    if (existingScanners.includes(value)) {
+      toast({
+        description: 'This scanner is already being used on the image',
+        status: 'error',
+        duration: 4000,
+        isClosable: true,
+        position: 'top-right'
+      })
+    }
+  }
 
   useEffect(() => {
-    if (allImages) {
-      console.log('allImages', allImages)
-    }
-  }, [allImages])
-
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     setIsLoading(false)
-  //   }, 10000)
-  // }, [isLoading])
+    setTimeout(() => {
+      setIsLoading(false)
+    }, 10000)
+  }, [isLoading])
 
   return (
     <>
       <Flex width={'100%'} direction='column' mt={{ base: '120px', md: '0px' }}>
         <Flex
-          dir='row'
+          flexDirection='column'
           width={'100%'}
           alignItems={'center'}
           px={2}
@@ -208,79 +211,176 @@ const Index = () => {
           mt={{ base: '200px', md: '75px' }}
         >
           <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
-            {/* <CardHeader>
-              <Input placeholder='Search' maxW='300px' mb={4} />
-            </CardHeader> */}
-            <CardBody>
+            {/* <Stack>
+              <Skeleton height='20px' />
+              <Skeleton height='20px' />
+            </Stack> */}
+            <CardHeader>
+              <Flex
+                width={'100%'}
+                direction={'row'}
+                alignItems={'center'}
+                justifyContent={'space-between'}
+              >
+                <Input
+                  placeholder='Search'
+                  maxW='300px'
+                  mb={4}
+                  fontSize={'sm'}
+                />
+                <Button
+                  fontSize={'sm'}
+                  fontWeight={'normal'}
+                  colorScheme='blue'
+                  onClick={() => setIsLoading(true)}
+                >
+                  Refresh
+                </Button>
+              </Flex>
+            </CardHeader>
+            <CardBody mt={2}>
               <Table variant='simple'>
                 <Thead>
                   <Tr>
-                    <Th>Images</Th>
-                    <Th>Connection</Th>
-                    <Th>Scan Result</Th>
-                    <Th>Actions</Th>
+                    <Th pl={1}>Image</Th>
+                    <Th pl={1}>Connection</Th>
+                    <Th pl={1}>Tags</Th>
+                    <Th pl={1}>Last Pushed</Th>
+                    <Th pl={1}>Scanners</Th>
+                    <Th pl={1}>Actions</Th>
                   </Tr>
                 </Thead>
+
                 <Tbody>
                   {allImages &&
+                    allImages.images.length > 0 &&
                     allImages.images.map((item) => (
                       <Tr key={item.id}>
-                        <Td>
-                          <Link
-                            href={`#/admin/sboms?p=${item.name}&v=${item.imageVersions[0].name}`}
-                            style={{
-                              color: '#3182CE',
-                              textDecoration: 'underline'
-                            }}
-                          >
-                            {item.name}
-                          </Link>
-                        </Td>
-                        <Td>{item.organizationConnector.name}</Td>
-                        <Td>
-                          <Flex direction={'row'} gap={2} alignItems={'center'}>
-                            {isLoading && activeImageId === item.id ? (
-                              <Spinner mx={2} />
-                            ) : (
-                              item.imageScanners.map((result) => (
-                                <Image
-                                  width={8}
-                                  objectFit={'contain'}
-                                  key={result}
-                                  src={`${scanImage(result.name)}`}
-                                  alt={result}
-                                />
-                              ))
-                            )}
-                          </Flex>
-                        </Td>
-                        <Td>
-                          <Flex direction={'row'} alignItems={'center'} gap={4}>
-                            <Button
-                              colorScheme='blue'
-                              leftIcon={<AddIcon />}
-                              variant='outline'
-                              size='sm'
-                              fontWeight={400}
-                              onClick={() => {
-                                setSelectedImgVersions(item.imageVersions)
-                                onScanOpen()
+                        <Td fontSize={'sm'} pl={1}>
+                          {isLoading ? (
+                            <Skeleton height='20px' />
+                          ) : (
+                            <Link
+                              href={`#/admin/sboms?v=${
+                                item.imageVersions[
+                                  item.imageVersions.length - 1
+                                ].id
+                              }&id=${item.id}`}
+                              style={{
+                                color: '#3182CE',
+                                textDecoration: 'underline'
                               }}
                             >
-                              Scanner
-                            </Button>
-
-                            <Button
-                              colorScheme='blue'
-                              size='sm'
-                              leftIcon={<AddIcon />}
-                              fontWeight={400}
-                              ref={btnRef}
-                              onClick={onOpen}
+                              {item.name}
+                            </Link>
+                          )}
+                        </Td>
+                        <Td fontSize={'sm'} pl={1}>
+                          {isLoading ? (
+                            <Skeleton height='20px' />
+                          ) : (
+                            <Flex
+                              direction={'row'}
+                              alignItems={'center'}
+                              justifyContent={'start'}
+                              gap={2}
                             >
-                              SBOM Link
-                            </Button>
-                          </Flex>
+                              <Image
+                                width='6'
+                                height='6'
+                                src={getConImg(
+                                  item.organizationConnector.connector.name
+                                )}
+                                alt={`${item.organizationConnector.connector.name}`}
+                              />
+                              <Text size='sm'>
+                                {item.organizationConnector.name}
+                              </Text>
+                            </Flex>
+                          )}
+                        </Td>
+                        <Td fontSize={'sm'} pl={1}>
+                          {isLoading ? (
+                            <Skeleton height='20px' />
+                          ) : (
+                            <Text>{item.imageVersions.length}</Text>
+                          )}
+                        </Td>
+                        <Td fontSize={'sm'} pl={1}>
+                          {isLoading ? (
+                            <Skeleton height='20px' />
+                          ) : (
+                            <Text>
+                              {new Date(item.updatedAt)
+                                .toISOString()
+                                .slice(0, 10)}
+                            </Text>
+                          )}
+                        </Td>
+                        <Td pl={1}>
+                          {isLoading ? (
+                            <Skeleton height='20px' />
+                          ) : (
+                            <Flex
+                              direction={'row'}
+                              gap={2}
+                              alignItems={'center'}
+                            >
+                              {item.imageScanners.map((result, index) => (
+                                <Tooltip
+                                  key={index}
+                                  label={`${result.name}`}
+                                  placement='top'
+                                >
+                                  <Image
+                                    width={8}
+                                    objectFit={'contain'}
+                                    src={`${scanImage(result.name)}`}
+                                    alt={result}
+                                  />
+                                </Tooltip>
+                              ))}
+                            </Flex>
+                          )}
+                        </Td>
+                        <Td pl={1}>
+                          {isLoading ? (
+                            <Skeleton height='20px' />
+                          ) : (
+                            <Menu>
+                              <MenuButton
+                                as={IconButton}
+                                aria-label='Options'
+                                icon={<FaEllipsisV />}
+                                variant='none'
+                                color='gray.400'
+                              />
+                              <Portal>
+                                <MenuList style={{ width: '100px' }}>
+                                  <MenuItem
+                                    icon={<AddIcon />}
+                                    onClick={() => {
+                                      setSelectedImage(item.id)
+                                      setActiveScanners(item.imageScanners)
+                                      onScanOpen()
+                                    }}
+                                  >
+                                    <Text fontSize={'sm'}>Add Scanner</Text>
+                                  </MenuItem>
+                                  <MenuItem
+                                    icon={<DeleteIcon />}
+                                    onClick={() => {
+                                      setSelectedImage(item.id)
+                                      setActiveScanners(item.imageScanners)
+                                      onDeleteOpen()
+                                    }}
+                                  >
+                                    <Text fontSize={'sm'}>Delete Scanner</Text>
+                                  </MenuItem>
+                                </MenuList>
+                              </Portal>
+                            </Menu>
+                          )}
                         </Td>
                       </Tr>
                     ))}
@@ -288,6 +388,45 @@ const Index = () => {
               </Table>
             </CardBody>
           </Card>
+
+          {orgConnectors &&
+          orgConnectors.organizationConnectors.length === 0 ? (
+            <Flex
+              mx={'auto'}
+              p={24}
+              alignItems={'center'}
+              justifyContent={'center'}
+            >
+              <Text color={'gray.500'}>
+                Please connect to a container registry under
+                <Link
+                  href='/#/admin/connections'
+                  color={'blue.500'}
+                  textDecoration={'underline'}
+                  _hover={{ textDecoration: 'underline' }}
+                  mx={2}
+                >
+                  Connections
+                </Link>
+                to see your images
+              </Text>
+            </Flex>
+          ) : (
+            allImages &&
+            allImages.images.length === 0 && (
+              <Flex
+                mx={'auto'}
+                p={24}
+                alignItems={'center'}
+                justifyContent={'center'}
+              >
+                <Text color={'gray.500'}>
+                  No image found in connected registries. Refresh or edit
+                  connections
+                </Text>
+              </Flex>
+            )
+          )}
         </Flex>
       </Flex>
 
@@ -304,39 +443,14 @@ const Index = () => {
                 placeholder='Select a scanner'
                 isRequired
                 value={selectedScanner}
-                onChange={(e) => setSelectedScanner(e.target.value)}
+                onChange={handleScannerChange}
               >
                 {allScanners &&
                   allScanners.scanners.map((item) => (
-                    <option key={item.id} value={item.name}>
+                    <option key={item.id} value={item.id}>
                       {item.company} - {item.name}
                     </option>
                   ))}
-              </Select>
-              <Select
-                id='version'
-                placeholder='Select a version'
-                isRequired
-                value={selectedVersion}
-                onChange={(e) => setSelectedVersion(e.target.value)}
-                mt={4}
-              >
-                {allScanners && selectedScanner !== ''
-                  ? allScanners.scanners
-                      .filter(
-                        (scanner) => selectedScanner === `${scanner.name}`
-                      )
-                      .map((item) => (
-                        <option key={item.id} value={item.id}>
-                          {item.version}
-                        </option>
-                      ))
-                  : allScanners &&
-                    allScanners.scanners.map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.version}
-                      </option>
-                    ))}
               </Select>
             </ModalBody>
             <ModalFooter>
@@ -348,8 +462,59 @@ const Index = () => {
               >
                 Cancel
               </Button>
-              <Button type='submit' colorScheme='blue'>
+              <Button
+                type='submit'
+                colorScheme='blue'
+                isDisabled={existingScanners.includes(selectedScanner)}
+              >
                 Add
+              </Button>
+            </ModalFooter>
+          </form>
+        </ModalContent>
+      </Modal>
+
+      {/* delete scanners */}
+      <Modal isOpen={isDeleteOpen} onClose={onDeleteClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <form onSubmit={handleDelete}>
+            <ModalHeader>Delete Scanner</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody mb={6}>
+              <Select
+                id='scanner'
+                placeholder='Select a scanner'
+                isRequired
+                value={selectedScanner}
+                onChange={(e) => setSelectedScanner(e.target.value)}
+              >
+                {activeScanners.length > 0 &&
+                  activeScanners.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.company} - {item.name}
+                    </option>
+                  ))}
+              </Select>
+              {selectedScanner !== '' && (
+                <Text mt={6} fontSize={'sm'} color={'red.500'}>
+                  This scan will stop scanning new images and tags with the
+                  selected scanner. Are you sure you want to remove it ?
+                </Text>
+              )}
+            </ModalBody>
+            <ModalFooter>
+              <Button
+                colorScheme='blue'
+                variant='outline'
+                mr={3}
+                onClick={() => onDeleteClose()}
+                size='md'
+              >
+                {selectedScanner !== '' ? 'No' : 'Cancel'}
+              </Button>
+              <Button type='submit' size='md' colorScheme='red'>
+                {selectedScanner !== '' ? 'Yes' : 'Delete'}
               </Button>
             </ModalFooter>
           </form>

@@ -115,50 +115,33 @@ export const imageCreate = gql`
   }
 `
 
-export const imgScannerCreate = gql`
-  mutation imgScannerCreate($imgVersionId: Uuid!, $scannerId: Uuid!) {
-    imageScannerCreate(
-      input: { imageVersionId: $imgVersionId, scannerId: $scannerId }
-    ) {
+export const AddScannerImage = gql`
+  mutation AddScannerImage($imageID: Uuid!, $scannerID: Uuid!) {
+    imageScannerAdd(input: { imageId: $imageID, scannerId: $scannerID }) {
       imageScanner {
         id
-        imageVersion {
-          id
-          imageId
-          name
-        }
-        imageVersionId
         scanner {
           id
-          company
           name
         }
-        scannerId
-        updatedAt
+        imageVersion {
+          id
+          name
+          image {
+            id
+            name
+          }
+        }
       }
+      errors
     }
   }
 `
 
-export const imgScannerDelete = gql`
-  mutation imgScannerDelete($id: ID!) {
-    imageScannerDelete(input: { id: $id }) {
-      imageScanner {
-        id
-        imageVersion {
-          id
-          imageId
-          name
-        }
-        imageVersionId
-        scanner {
-          id
-          company
-          name
-        }
-        scannerId
-        updatedAt
-      }
+export const RemoveScannerImage = gql`
+  mutation RemoveScannerImage($imageID: Uuid!, $scannerID: Uuid!) {
+    imageScannerRemove(input: { imageId: $imageID, scannerId: $scannerID }) {
+      errors
     }
   }
 `

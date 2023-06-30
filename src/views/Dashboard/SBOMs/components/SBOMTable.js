@@ -47,8 +47,6 @@ import {
 import { productVersionsData } from 'variables/general'
 import { BiImport, BiExport, BiFilter } from 'react-icons/bi'
 import { BsFilterRight } from 'react-icons/bs'
-import { useQuery } from '@apollo/client'
-import { getVulnerabilities } from 'graphQL/Queries'
 import BasicTable from './BasicTable'
 
 const SBOMTable = ({
@@ -418,7 +416,7 @@ const SBOMTable = ({
               </Table>
             </CardBody>
           </TabPanel>
-          <TabPanel height={'8xl'}>
+          <TabPanel>
             <CardHeader mb={4} display={'none'}>
               <Flex
                 width={'100%'}

@@ -66,7 +66,7 @@ function SBOMLinkDrawer(props) {
     setProduct(e.target.value)
   }
 
-  const handleKeyDown = () => {
+  const handleKeyDown = (event) => {
     if (event.key === 'Enter') {
       setEmailList((prev) => [email, ...prev])
       setEmail('')
@@ -78,7 +78,7 @@ function SBOMLinkDrawer(props) {
       (project) => project.name === product
     )
 
-    console.log('filterProduct', filterProduct)
+    // console.log('filterProduct', filterProduct)
 
     const uniqVersion = []
     filterProduct.map((project) => {
@@ -87,7 +87,7 @@ function SBOMLinkDrawer(props) {
       })
     })
 
-    console.log('uniqVersion', uniqVersion)
+    // console.log('uniqVersion', uniqVersion)
     setSelectedVersion(uniqVersion)
   }, [product])
 

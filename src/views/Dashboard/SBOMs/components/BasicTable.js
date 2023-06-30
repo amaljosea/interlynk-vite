@@ -89,15 +89,15 @@ const BasicTable = ({ columns, data }) => {
     }
   )
 
-  useEffect(() => {
-    console.log('Rows', rows)
-  }, [rows])
+  // useEffect(() => {
+  //   console.log('Rows', rows)
+  // }, [rows])
 
   const { globalFilter, pageIndex, pageSize } = state
 
   return (
     <>
-      <Flex flexDir={'column'} gap={4} mb={10} width={'100%'}>
+      <Flex flexDir={'column'} gap={4} width={'100%'}>
         <GlobalFilter filter={globalFilter} setFilter={setGlobalFilter} />
         <Table {...getTableProps()}>
           <Thead>
@@ -186,17 +186,6 @@ const BasicTable = ({ columns, data }) => {
           </Flex>
         </Flex>
       </Flex>
-      {/* <pre>
-        <code>
-          {JSON.stringify(
-            {
-              selectedRows: selectedFlatRows.map((row) => row.original)
-            },
-            null,
-            2
-          )}
-        </code>
-      </pre> */}
     </>
   )
 }

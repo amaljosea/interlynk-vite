@@ -27,6 +27,7 @@ import scout from 'assets/img/scout.png'
 import snyk from 'assets/img/snyk.png'
 import custom from 'assets/img/custom.png'
 import { useQuery } from '@apollo/client'
+import { getConImg } from 'utils'
 
 const ProductsOverview = ({ title, amount, captions, data }) => {
   const scanImage = (name) => {
@@ -78,17 +79,18 @@ const ProductsOverview = ({ title, amount, captions, data }) => {
             <Table variant='simple' mt={10}>
               <Thead>
                 <Tr>
-                  <Th>Images</Th>
-                  <Th>Connection</Th>
-                  <Th>Versions</Th>
-                  <Th>Scan Result</Th>
+                  <Th pl={1}>Image</Th>
+                  <Th pl={1}>Connection</Th>
+                  <Th pl={1}>Tags</Th>
+                  <Th pl={1}>Last Pushed</Th>
+                  <Th pl={1}>Scanners</Th>
                 </Tr>
               </Thead>
               <Tbody>
                 {allImages &&
                   allImages.images.map((item) => (
                     <Tr key={item.id}>
-                      <Td>
+                      <Td fontSize={'sm'} pl={1}>
                         <Link
                           href={`#/admin/sboms?p=${item.name}&v=${item.imageVersions[0].name}`}
                           style={{
@@ -99,23 +101,39 @@ const ProductsOverview = ({ title, amount, captions, data }) => {
                           {item.name}
                         </Link>
                       </Td>
-                      <Td>{item.organizationConnector.name}</Td>
-                      <Td>
-                        <Flex>
-                          {item.imageVersions.map((version, index) => (
-                            <Text>
-                              {index > 0 && ','}{' '}
-                              {/* Render comma for all elements except the first one */}
-                              {version.name}
-                            </Text>
-                          ))}
+                      <Td fontSize={'sm'} pl={1}>
+                        <Flex
+                          direction={'row'}
+                          alignItems={'center'}
+                          justifyContent={'start'}
+                          gap={2}
+                        >
+                          <Image
+                            width='6'
+                            height='6'
+                            src={getConImg(
+                              item.organizationConnector.connector.name
+                            )}
+                            alt={`${item.organizationConnector.connector.name}`}
+                          />
+                          <Text size='sm'>
+                            {item.organizationConnector.name.slice(0, 20)}...
+                          </Text>
                         </Flex>
                       </Td>
-                      <Td>
+                      <Td fontSize={'sm'} pl={1}>
+                        <Text>{item.imageVersions.length}</Text>
+                      </Td>
+                      <Td fontSize={'sm'} pl={1}>
+                        <Text>
+                          {new Date(item.updatedAt).toISOString().slice(0, 10)}
+                        </Text>
+                      </Td>
+                      <Td fontSize={'sm'} pl={1}>
                         <Flex direction={'row'} gap={2} alignItems={'center'}>
                           {item.imageScanners.map((result) => (
                             <Image
-                              width={8}
+                              width={7}
                               objectFit={'contain'}
                               key={result}
                               src={`${scanImage(result.name)}`}
