@@ -10,9 +10,7 @@ const ContextWrapper = (props) => {
     dashboardTableData
   )
   const [SBOMLinksData, setSBOMLinksData] = useState(SBOMLinks)
-  const [vulnerabilitiesData, setVulnerabilitiesData] = useState(
-    Vulnerabilities
-  )
+  const [vulnerabilitiesData, setVulnerabilitiesData] = useState([])
   const [activitiesData, setActivitiesData] = useState(activitiesDataLong)
 
   const productExploded = []
@@ -56,7 +54,7 @@ const ContextWrapper = (props) => {
       version: 'v1.0',
       image: 'interlynk/sbomasm',
       connection: 'Interlynk Prod',
-      scanResult: ['Trivy', 'Docker Scout']
+      scanResult: ['Trivy', 'Scout']
     },
     {
       id: 3,

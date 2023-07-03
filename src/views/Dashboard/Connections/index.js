@@ -33,36 +33,11 @@ import React, { useEffect, useState } from 'react'
 import { useMutation, useQuery } from '@apollo/client'
 import { OrgConnectorCreate } from 'graphQL/Mutation'
 import { OrgConnectorUpdate } from 'graphQL/Mutation'
-import docker from 'assets/img/docker.png'
-import amazon from 'assets/img/amazon.png'
-import azure from 'assets/img/azure.png'
-import github from 'assets/img/github.png'
-import gitlab from 'assets/img/gitlab.png'
 import { OrgConnectorDelete } from 'graphQL/Mutation'
 
-const Index = () => {
-  const getConImg = (name) => {
-    switch (name) {
-      case 'Docker Hub':
-        return docker
-        break
-      case 'Amazon ECR':
-        return amazon
-        break
-      case 'Azure Container Registry':
-        return azure
-        break
-      case 'Github (ghcr.io)':
-        return github
-        break
-      case 'Gitlab':
-        return gitlab
-        break
-      default:
-        break
-    }
-  }
+import { getConImg } from 'utils'
 
+const Index = () => {
   const orgID = process.env.REACT_APP_ORGID
 
   useEffect(() => {
@@ -89,8 +64,21 @@ const Index = () => {
 
   useEffect(() => {
     if (allConnectors) {
-      setConnectors(allConnectors.connectors)
-      console.log('connectors', allConnectors.connectors)
+      const con = [...allConnectors.connectors]
+      const result = con.sort((a, b) => {
+        const nameA = a.name.toUpperCase()
+        const nameB = b.name.toUpperCase()
+
+        if (nameA < nameB) {
+          return -1
+        }
+        if (nameA > nameB) {
+          return 1
+        }
+        return 0
+      })
+      setConnectors(result)
+      console.log('connectors', result)
     }
   }, [allConnectors])
 
