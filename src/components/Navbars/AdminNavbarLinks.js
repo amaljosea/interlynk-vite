@@ -26,9 +26,13 @@ import React from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import routes from 'routes.js'
 import { FaSignOutAlt } from 'react-icons/fa'
+import { useContext } from 'react'
+import GlobalContext from 'context/GlobalContext'
 
 export default function HeaderLinks(props) {
   const { variant, children, fixed, secondary, onOpen, ...rest } = props
+
+  const { authUser, setAuthUser } = useContext(GlobalContext)
 
   // Chakra Color Mode
   let mainTeal = useColorModeValue('teal.300', 'teal.300')
@@ -75,14 +79,25 @@ export default function HeaderLinks(props) {
             )
           }
         >
-          <Text display={{ sm: 'none', md: 'flex' }}>Surendra Pathak</Text>
+          <Text display={{ sm: 'none', md: 'flex' }}>
+            {authUser ? authUser.name : 'Surendra Pathak'}
+          </Text>
         </MenuButton>
         <MenuList size='sm'>
           <MenuGroup title=''>
             <MenuItem icon={<SettingsIcon />}>Settings</MenuItem>
-            <Link to={'/auth'}>
-              <MenuItem icon={<FaSignOutAlt />}>Logout</MenuItem>
-            </Link>
+            {authUser ? (
+              <MenuItem
+                icon={<FaSignOutAlt />}
+                onClick={() => setAuthUser(null)}
+              >
+                Logout
+              </MenuItem>
+            ) : (
+              <Link to='/'>
+                <MenuItem icon={<FaSignOutAlt />}>Login</MenuItem>
+              </Link>
+            )}
           </MenuGroup>
         </MenuList>
       </Menu>

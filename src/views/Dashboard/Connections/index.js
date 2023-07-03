@@ -38,29 +38,27 @@ import { OrgConnectorDelete } from 'graphQL/Mutation'
 import { getConImg } from 'utils'
 
 const Index = () => {
-  const orgID = process.env.REACT_APP_ORGID
-
-  useEffect(() => {
-    console.log('orgID', orgID)
-  }, [])
-
   const [connectors, setConnectors] = useState([])
 
   const { data: allConnectors } = useQuery(GetAllConnectors, {
     variables: {}
   })
 
-  const { data: orgConnectors } = useQuery(GetAllOrgConnectors, {
-    variables: { id: orgID }
+  const { data: orgConnectors, refetch } = useQuery(GetAllOrgConnectors, {
+    variables: {}
   })
 
-  // sofueled id : 'f0b30788-3fa6-417f-b372-0c580f5ed876'
+  const [organizationConnectorCreate] = useMutation(OrgConnectorCreate, {
+    onCompleted: refetch
+  })
 
-  const [organizationConnectorCreate] = useMutation(OrgConnectorCreate)
+  const [organizationConnectorUpdate] = useMutation(OrgConnectorUpdate, {
+    onCompleted: refetch
+  })
 
-  const [organizationConnectorUpdate] = useMutation(OrgConnectorUpdate)
-
-  const [organizationConnectorDelete] = useMutation(OrgConnectorDelete)
+  const [organizationConnectorDelete] = useMutation(OrgConnectorDelete, {
+    onCompleted: refetch
+  })
 
   useEffect(() => {
     if (allConnectors) {
@@ -78,7 +76,7 @@ const Index = () => {
         return 0
       })
       setConnectors(result)
-      console.log('connectors', result)
+      // console.log('connectors', result)
     }
   }, [allConnectors])
 
@@ -123,7 +121,7 @@ const Index = () => {
             enabled: conStatus
           }
         })
-        window.location.reload()
+        onClose()
       } catch (error) {
         console.error('Mutation error:', error)
       }
@@ -131,7 +129,6 @@ const Index = () => {
       try {
         await organizationConnectorCreate({
           variables: {
-            orgId: orgID,
             connId: activeConnection,
             name: connectorName,
             user: username,
@@ -140,17 +137,17 @@ const Index = () => {
             enabled: conStatus
           }
         })
-        window.location.reload()
+        onClose()
       } catch (error) {
         if (error.networkError && error.networkError.statusCode === 500) {
           // Handle the specific error
           alert(
             'Duplicate connector is being created for Dockerhub with the same account ID.'
           )
-          window.location.reload()
+          onClose()
         } else {
           // Handle other errors
-          console.error(error.message)
+          alert(error.message)
         }
       }
       setSelectedConnection(null)
@@ -164,23 +161,23 @@ const Index = () => {
           id
         }
       })
-      window.location.reload()
+      onClose()
     } catch (error) {
       if (error.networkError && error.networkError.statusCode === 500) {
         // Handle the specific error
         alert('Multiple connection not allowed from single organization.')
-        window.location.reload()
       } else {
         // Handle other errors
-        console.error(error.message)
+        alert(error.message)
       }
     }
   }
 
   useEffect(() => {
-    selectedConnection && selectedConnection.enabled
+    // console.log('selectedConnection', selectedConnection)
+    selectedConnection
       ? setConStatus(selectedConnection.enabled)
-      : setConStatus(false)
+      : setConStatus(true)
   }, [selectedConnection])
 
   return (
@@ -362,17 +359,11 @@ const Index = () => {
                         (item, index) => (
                           <Tr key={index}>
                             <Td>
-                              <FormControl
-                                display='flex'
-                                gap={2}
-                                alignItems='flex-start'
-                              >
-                                <Switch
-                                  id='status'
-                                  defaultChecked={item.enabled}
-                                  readOnly
-                                />
-                              </FormControl>
+                              <Switch
+                                id='status'
+                                isChecked={item.enabled}
+                                readOnly
+                              />
                             </Td>
                             <Td mt={2} px={8}>
                               <Flex

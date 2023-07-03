@@ -47,35 +47,11 @@ import SBOMDrawer from 'components/Drawer/SBOMDrawer'
 import { getVulnerabilities } from 'graphQL/Queries'
 import { useQuery } from '@apollo/client'
 
-import grype from 'assets/img/grype.png'
-import trivy from 'assets/img/trivy.png'
-import scout from 'assets/img/scout.png'
-import snyk from 'assets/img/snyk.png'
-import custom from 'assets/img/custom.png'
+import { scanImage } from 'utils'
 import { getImageVersion, getImage } from 'graphQL/Queries'
 
 function SBOMs() {
   const [scanResults, setScanResults] = useState([])
-
-  const scanImage = (name) => {
-    switch (name) {
-      case 'Grype':
-        return grype
-        break
-      case 'Trivy':
-        return trivy
-        break
-      case 'Scout':
-        return scout
-        break
-      case 'Snyk':
-        return snyk
-        break
-      case 'Custom':
-        return custom
-        break
-    }
-  }
 
   const columns = [
     {
@@ -107,14 +83,14 @@ function SBOMs() {
     {
       Header: 'CVSS',
       Footer: 'CVSS',
-      accessor: 'cvss',
-      Cell: (row) => (
-        <chakra.span fontSize={'sm'}>
-          {row?.cell?.value.v3Score
-            ? row?.cell?.value.v3Score
-            : row?.cell?.value.v2Score}
-        </chakra.span>
-      )
+      accessor: ({ cvss }) => {
+        if (cvss.v3Score) {
+          return cvss.v3Score
+        } else {
+          return cvss.v2Score
+        }
+      },
+      Cell: ({ value }) => <chakra.span fontSize={'sm'}>{value}</chakra.span>
     },
     {
       Header: 'COMPONENT',
@@ -161,9 +137,10 @@ function SBOMs() {
       accessor: 'scanners',
       Cell: (row) => (
         <chakra.span>
-          {row?.cell?.value.map((item) => (
+          {row?.cell?.value.map((item, index) => (
             <Image
               src={scanImage(item.name)}
+              key={index}
               height={12}
               width={12}
               objectFit={'contain'}
@@ -292,16 +269,16 @@ function SBOMs() {
 
   useEffect(() => {
     if (imageVersionData) {
-      console.log('imageVersionData', imageVersionData)
+      // console.log('imageVersionData', imageVersionData)
       setScanResults(imageVersionData.imageVersion.imageVulns)
     }
   }, [imageVersionData])
 
-  useEffect(() => {
-    if (imageData) {
-      console.log('imageData', imageData.image)
-    }
-  }, [imageData])
+  // useEffect(() => {
+  //   if (imageData) {
+  //     console.log('imageData', imageData.image)
+  //   }
+  // }, [imageData])
 
   const cloudVersion = window.localStorage.getItem('version')
   const cloudScanner = window.localStorage.getItem('scanner')
@@ -424,8 +401,8 @@ function SBOMs() {
   }, [selectedScannerItem])
 
   useEffect(() => {
-    console.log(cloudVersion)
-    console.log(cloudScanner)
+    // console.log(cloudVersion)
+    // console.log(cloudScanner)
     cloudVersion !== null
       ? setSelectedVersion(`${cloudVersion}`)
       : setSelectedVersion('v0.0.3')

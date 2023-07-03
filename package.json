@@ -53,8 +53,6 @@
 		"test": "react-scripts test --env=jsdom",
 		"eject": "react-scripts eject",
 		"deploy": "npm run build",
-		"lint:check": "eslint . --ext=js,jsx;  exit 0",
-		"lint:fix": "eslint . --ext=js,jsx --fix;  exit 0",
 		"install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm start"
 	},
 	"optionalDependencies": {
@@ -67,7 +65,8 @@
 		"eslint-plugin-prettier": "3.4.0",
 		"gulp": "^3.9.1",
 		"gulp-append-prepend": "1.0.9",
-		"prettier": "2.2.1"
+		"prettier": "2.2.1",
+		"react-error-overlay": "^6.0.9"
 	},
 	"browserslist": {
 		"production": [

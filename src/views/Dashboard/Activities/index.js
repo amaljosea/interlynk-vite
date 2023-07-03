@@ -105,8 +105,8 @@ function Activities() {
           </MenuButton>
           <MenuList fontWeight='none' fontSize='sm'>
             <MenuOptionGroup title='Products'>
-              {uniqProjects.map((p) => (
-                <MenuItemOption value={p} onClick={() => filterByProduct(p)}>
+              {uniqProjects.map((p, index) => (
+                <MenuItemOption key={index} value={p} onClick={() => filterByProduct(p)}>
                   {p}
                 </MenuItemOption>
               ))}
@@ -233,8 +233,8 @@ function Activities() {
           </MenuButton>
           <MenuList fontWeight='none' fontSize='sm'>
             <MenuOptionGroup title='Users'>
-              {uniqUsers.map((v) => (
-                <MenuItemOption value={v} onClick={() => filterByUser(v)}>
+              {uniqUsers.map((v, index) => (
+                <MenuItemOption key={index} value={v} onClick={() => filterByUser(v)}>
                   {v}
                 </MenuItemOption>
               ))}

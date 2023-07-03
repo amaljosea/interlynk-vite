@@ -24,7 +24,7 @@ const ActivitiesOverview = ({ title, amount, data }) => {
           {data.map((row, index, arr) => {
             return (
               <ActivitiesOverviewRow
-                key={row.title}
+                key={index}
                 logo={row.logo}
                 title={row.title}
                 date={row.date}
