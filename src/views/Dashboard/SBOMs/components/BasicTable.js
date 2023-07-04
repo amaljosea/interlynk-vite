@@ -9,7 +9,14 @@ import {
   Flex,
   Button,
   chakra,
-  Select
+  Select,
+  Tooltip,
+  Box,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuOptionGroup,
+  MenuItemOption
 } from '@chakra-ui/react'
 import {
   useTable,
@@ -27,6 +34,8 @@ import {
   TriangleDownIcon,
   TriangleUpIcon
 } from '@chakra-ui/icons'
+import { BiExport, BiImport } from 'react-icons/bi'
+import { BsFilterRight } from 'react-icons/bs'
 
 const BasicTable = ({ columns, data }) => {
   const COLUMNS = useMemo(() => columns, [columns])
@@ -98,7 +107,56 @@ const BasicTable = ({ columns, data }) => {
   return (
     <>
       <Flex flexDir={'column'} gap={4} width={'100%'}>
-        <GlobalFilter filter={globalFilter} setFilter={setGlobalFilter} />
+        <Flex
+          width={'100%'}
+          gap={2}
+          direction={'row'}
+          alignItems={'center'}
+          justifyContent={'space-between'}
+        >
+          <Flex gap={2} direction={'row'}>
+            <GlobalFilter filter={globalFilter} setFilter={setGlobalFilter} />
+            <Menu closeOnSelect={true}>
+              <MenuButton
+                as={Button}
+                colorScheme='blue'
+                leftIcon={<BsFilterRight size={24} />}
+              >
+                Filter
+              </MenuButton>
+              <MenuList minWidth='240px'>
+                <MenuOptionGroup
+                  title='Vulnerability Resolution'
+                  type='checkbox'
+                >
+                  {['Unesolved', 'Total'].map((p, index) => (
+                    <MenuItemOption
+                      value={p}
+                      key={index}
+                      // onClick={() => handleStatusSelect(p)}
+                    >
+                      {p}
+                    </MenuItemOption>
+                  ))}
+                </MenuOptionGroup>
+              </MenuList>
+            </Menu>
+          </Flex>
+          <Flex gap={2} direction={'row'}>
+            <Box as={Flex} direction={'row'} gap={2}>
+              <Tooltip label='Import'>
+                <Button colorScheme='blue' size='md'>
+                  <BiImport />
+                </Button>
+              </Tooltip>
+              <Tooltip label='Export'>
+                <Button colorScheme='blue' size='md'>
+                  <BiExport />
+                </Button>
+              </Tooltip>
+            </Box>
+          </Flex>
+        </Flex>
         <Table {...getTableProps()}>
           <Thead>
             {headerGroups.map((headerGroup) => (
@@ -185,6 +243,17 @@ const BasicTable = ({ columns, data }) => {
             </chakra.span>
           </Flex>
         </Flex>
+        {/* <pre>
+          <code>
+            {JSON.stringify(
+              {
+                selectedRows: selectedFlatRows.map((row) => row.original)
+              },
+              null,
+              2
+            )}
+          </code>
+        </pre> */}
       </Flex>
     </>
   )

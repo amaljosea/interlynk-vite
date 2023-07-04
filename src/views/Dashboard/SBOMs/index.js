@@ -30,7 +30,9 @@ import {
   Select,
   Checkbox,
   chakra,
-  Image
+  Image,
+  Skeleton,
+  TagLeftIcon
 } from '@chakra-ui/react'
 import React, { useContext, useEffect, useState } from 'react'
 import Card from 'components/Card/Card.js'
@@ -40,11 +42,18 @@ import SBOMStatistics from './components/SBOMStatistics'
 
 import { sbom } from 'variables/general'
 import { ChevronDownIcon, AddIcon } from '@chakra-ui/icons'
-import { FaCubes, FaBug, FaUnlock, FaFileDownload } from 'react-icons/fa'
+import {
+  FaCubes,
+  FaBug,
+  FaUnlock,
+  FaFileDownload,
+  FaTag,
+  FaMicroscope
+} from 'react-icons/fa'
 import { useLocation } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
 import SBOMDrawer from 'components/Drawer/SBOMDrawer'
-import { getVulnerabilities } from 'graphQL/Queries'
+import Tooltip from 'components/Tooltip'
 import { useQuery } from '@apollo/client'
 
 import { scanImage } from 'utils'
@@ -90,7 +99,9 @@ function SBOMs() {
           return cvss.v2Score
         }
       },
-      Cell: ({ value }) => <chakra.span fontSize={'sm'}>{value}</chakra.span>
+      Cell: (row) => (
+        <chakra.span fontSize={'sm'}>{row?.cell?.value}</chakra.span>
+      )
     },
     {
       Header: 'COMPONENT',
@@ -141,8 +152,8 @@ function SBOMs() {
             <Image
               src={scanImage(item.name)}
               key={index}
-              height={12}
-              width={12}
+              height={8}
+              width={8}
               objectFit={'contain'}
             />
           ))}
@@ -210,8 +221,7 @@ function SBOMs() {
     { id: 1, name: 'Grype' },
     { id: 2, name: 'Scout' },
     { id: 3, name: 'Snyk' },
-    { id: 4, name: 'Trivy' },
-    { id: 5, name: 'Custom' }
+    { id: 4, name: 'Trivy' }
   ])
 
   const [sharedWith] = useState([
@@ -229,7 +239,6 @@ function SBOMs() {
   const {
     productVersionsData,
     setTabIndex,
-    setVulnerabilitiesData,
     vulnerabilitiesData,
     componentsVal,
     setComponentsVal,
@@ -238,7 +247,9 @@ function SBOMs() {
     activeVulnVal,
     setActiveVulnVal,
     riskScoreVal,
-    setRiskScoreVal
+    setRiskScoreVal,
+    imageDetails,
+    setImageDetails
   } = useContext(GlobalContext)
 
   // useEffect(() => {
@@ -263,8 +274,12 @@ function SBOMs() {
     variables: { id: imageId }
   })
 
-  const { data: imageVersionData } = useQuery(getImageVersion, {
-    variables: { id: versionId, imageId: imageId }
+  const { data: imageVersionData, refetch } = useQuery(getImageVersion, {
+    variables: {
+      id: versionId,
+      imageId: imageId
+    },
+    onCompleted: refetch
   })
 
   useEffect(() => {
@@ -274,17 +289,26 @@ function SBOMs() {
     }
   }, [imageVersionData])
 
-  // useEffect(() => {
-  //   if (imageData) {
-  //     console.log('imageData', imageData.image)
-  //   }
-  // }, [imageData])
+  useEffect(() => {
+    if (imageData) {
+      // console.log('imageData', imageData.image)
+      setImageDetails(imageData.image)
+    }
+  }, [imageData])
 
   const cloudVersion = window.localStorage.getItem('version')
   const cloudScanner = window.localStorage.getItem('scanner')
 
   const [selectedVersion, setSelectedVersion] = useState('')
   const [selectedScanner, setSelectedScanner] = useState('')
+
+  useEffect(() => {
+    if (imageData) {
+      setSelectedVersion(
+        imageData.image.imageVersions[imageData.image.imageVersions.length - 1]
+      )
+    }
+  }, [imageData])
 
   const initialRef = React.useRef(null)
   const finalRef = React.useRef(null)
@@ -432,22 +456,46 @@ function SBOMs() {
                 <Icon as={FaCubes} h={'64px'} w={'64px'} color='blue.300' />
                 <Box>
                   <Heading as='h3' size='md' noOfLines={1} color='gray.600'>
-                    {imageData && imageData.image.name}
+                    {imageDetails
+                      ? `${imageDetails.name}:${
+                          imageDetails.imageVersions[
+                            imageDetails.imageVersions.length - 1
+                          ].name
+                        }`
+                      : 'Loading....'}
                   </Heading>
-                  <Text fontSize='sm'>
-                    {imageData &&
-                      imageData.image.imageVersions &&
-                      imageData.image.imageVersions[
-                        imageData.image.imageVersions.length - 1
-                      ].name}
+                  <Text fontSize='sm'>linux/amd64</Text>
+                  <Text fontSize='sm' mb={2}>
+                    Last Pushed:{' '}
+                    {imageDetails
+                      ? new Date(imageDetails.updatedAt)
+                          .toISOString()
+                          .slice(0, 10)
+                      : 'Loading..'}
                   </Text>
-                  <Text fontSize='sm'>
-                    Last Updated:{' '}
-                    {imageData &&
-                      new Date(imageData.image.updatedAt)
-                        .toISOString()
-                        .slice(0, 10)}
-                  </Text>
+                  {imageDetails ? (
+                    imageDetails.imageScanners.map((result, index) => (
+                      <Flex
+                        key={index}
+                        flexDirection={'row'}
+                        alignItems={'center'}
+                        gap={2}
+                        mb={2}
+                      >
+                        <Tooltip text={`${result.name}`}>
+                          <Image
+                            width={4}
+                            objectFit={'contain'}
+                            src={`${scanImage(result.name)}`}
+                            alt={result}
+                          />
+                        </Tooltip>
+                        <Text fontSize={'xs'}>2023-07-01</Text>
+                      </Flex>
+                    ))
+                  ) : (
+                    <Skeleton height={'2'} />
+                  )}
                 </Box>
               </Flex>
             </GridItem>
@@ -458,39 +506,51 @@ function SBOMs() {
                 justifyContent='flex-end'
                 ml={'auto'}
               >
-                <Select
-                  id='version'
-                  value={selectedVersion}
-                  onChange={handleVersionUpdate}
-                  size='md'
-                  width={'150px'}
-                  color='gray.500'
-                >
-                  {imageData &&
-                    imageData.image.imageVersions &&
-                    imageData.image.imageVersions.map((img, index) => (
-                      <option key={index} value={img.name}>
-                        {img.name}
-                      </option>
-                    ))}
-                </Select>
-                <Select
-                  id='scanner'
-                  value={selectedScanner}
-                  onChange={handleScanner}
-                  size='md'
-                  width={'150px'}
-                  color='gray.500'
-                >
-                  {imageData &&
-                    imageData.image.imageScanners &&
-                    imageData.image.imageScanners.map((item) => (
+                <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
+                  <FaTag size={18} color='darkgray' />
+                  <Select
+                    id='version'
+                    value={selectedVersion.name}
+                    onChange={handleVersionUpdate}
+                    size='md'
+                    width={'150px'}
+                    color='gray.500'
+                  >
+                    {imageDetails &&
+                      imageDetails.imageVersions &&
+                      imageDetails.imageVersions.map((img, index) => (
+                        <option key={index} value={img.id}>
+                          {img.name}
+                        </option>
+                      ))}
+                  </Select>
+                </Flex>
+                <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
+                  <FaMicroscope size={20} color='darkgray' />
+                  <Select
+                    id='scanner'
+                    value={selectedScanner}
+                    onChange={handleScanner}
+                    size='md'
+                    width={'150px'}
+                    color='gray.500'
+                  >
+                    {scanner.map((item) => (
                       <option key={item.id} value={item.name}>
                         {item.name}
                       </option>
                     ))}
-                </Select>
-                <Menu>
+
+                    {/* {imageDetails &&
+                    imageDetails.imageScanners &&
+                    imageDetails.imageScanners.map((item) => (
+                      <option key={item.id} value={item.name}>
+                        {item.name}
+                      </option>
+                    ))} */}
+                  </Select>
+                </Flex>
+                {/* <Menu>
                   <MenuButton
                     as={Button}
                     rightIcon={<ChevronDownIcon />}
@@ -519,15 +579,15 @@ function SBOMs() {
                       ))}
                     </MenuOptionGroup>
                   </MenuList>
-                </Menu>
-                <Button
+                </Menu> */}
+                {/* <Button
                   width={'120px'}
                   colorScheme='blue'
                   fontSize={'sm'}
                   leftIcon={<AddIcon />}
                   onClick={setSBMOpen}
                 >
-                  SBOM Link
+                  Share Link
                 </Button>
                 <SBOMDrawer
                   isOpen={isSBMOpen}
@@ -535,14 +595,14 @@ function SBOMs() {
                   btnRef={btnRef}
                   uniqProjects={uniqProjects}
                   uniqVersions={uniqVersions}
-                />
-                <IconButton
+                /> */}
+                {/* <IconButton
                   aria-label='Download SBOM'
                   icon={<FaFileDownload />}
                   onClick={onOpen}
                   colorScheme='blue'
-                />
-                <Modal
+                /> */}
+                {/* <Modal
                   initialFocusRef={initialRef}
                   finalFocusRef={finalRef}
                   isOpen={isOpen}
@@ -593,7 +653,7 @@ function SBOMs() {
                       <Button onClick={onClose}>Cancel</Button>
                     </ModalFooter>
                   </ModalContent>
-                </Modal>
+                </Modal> */}
               </Flex>
             </GridItem>
           </Grid>

@@ -15,7 +15,7 @@ import { useContext } from 'react'
 import GlobalContext from 'context/GlobalContext'
 
 export default function AdminNavbar(props) {
-  const { minimize } = useContext(GlobalContext)
+  const { minimize, imageDetails } = useContext(GlobalContext)
   const [scrolled, setScrolled] = useState(false)
   const {
     variant,
@@ -105,7 +105,12 @@ export default function AdminNavbar(props) {
       }}
       pt='8px'
       top='18px'
-      w={{ sm: 'calc(100vw - 30px)', xl:  minimize ? 'calc(100vw - 75px - 110px)' : 'calc(100vw - 75px - 220px)' }}
+      w={{
+        sm: 'calc(100vw - 30px)',
+        xl: minimize
+          ? 'calc(100vw - 75px - 110px)'
+          : 'calc(100vw - 75px - 220px)'
+      }}
     >
       <Flex
         w='100%'
@@ -124,10 +129,20 @@ export default function AdminNavbar(props) {
             </BreadcrumbItem>
 
             <BreadcrumbItem color={mainText}>
-              <BreadcrumbLink href='#' color={mainText}>
-                {brandText}
+              <BreadcrumbLink href='#' color={secondaryText}>
+                {brandText === 'SBOM' ? 'Image' : brandText}
               </BreadcrumbLink>
             </BreadcrumbItem>
+
+            {imageDetails && brandText === 'SBOM' ? (
+              <BreadcrumbItem color={mainText}>
+                <BreadcrumbLink href='#' color={mainText}>
+                  {imageDetails.name}
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+            ) : (
+              ''
+            )}
           </Breadcrumb>
         </Box>
         <Box ms='auto' w={{ sm: '100%', md: 'unset' }}>

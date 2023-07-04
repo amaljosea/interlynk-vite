@@ -35,7 +35,14 @@ import { v4 as uuidv4 } from 'uuid'
 import { useEffect } from 'react'
 
 function SBOMDrawer(props) {
-  const { setSBOMLinksData, productVersionsData } = useContext(GlobalContext)
+  const { setSBOMLinksData, productVersionsData, imageDetails } = useContext(
+    GlobalContext
+  )
+
+  const sbomqsVersions = ['v0.0.1', 'v0.0.2', 'v0.0.3']
+  const sbomasmVersion = ['v1.0', 'v1.1', 'v1.2']
+  const sbomgrVersion = ['v0.1', 'v0.2', 'v0.3']
+
   const { isOpen, onClose, btnRef, uniqProjects, uniqVersions } = props
 
   const [product, setProduct] = useState('dashboard-app')
@@ -129,26 +136,27 @@ function SBOMDrawer(props) {
       placement='right'
       onClose={onClose}
       finalFocusRef={btnRef}
-      size='lg'
+      size='md'
     >
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />
         <DrawerHeader borderBottomWidth='1px' color='gray.600'>
-          SBOM Link
+          Share Link
         </DrawerHeader>
         <DrawerBody>
           <Stack spacing='24px'>
             <Box>
-              <FormLabel
-                py='4px'
-                htmlFor='product'
-                fontSize='sm'
-                color='gray.600'
-              >
-                Product
+              <FormLabel htmlFor='product' fontSize='sm' color='gray.600'>
+                Image
               </FormLabel>
-              <Select
+              <Input
+                defaultValue={imageDetails && imageDetails.name}
+                readOnly
+                fontSize={'sm'}
+                mb={4}
+              />
+              {/* <Select
                 id='product'
                 value={product}
                 onChange={handleProductChange}
@@ -162,14 +170,9 @@ function SBOMDrawer(props) {
                       {p}
                     </option>
                   ))}
-              </Select>
-              <FormLabel
-                py='4px'
-                htmlFor='product'
-                fontSize='sm'
-                color='gray.600'
-              >
-                Version
+              </Select> */}
+              <FormLabel htmlFor='product' fontSize='sm' color='gray.600'>
+                Tags
               </FormLabel>
               <Select
                 id='version'
@@ -179,17 +182,37 @@ function SBOMDrawer(props) {
                 }}
                 size='sm'
                 color='gray.500'
+                mb={4}
               >
-                {selectedVersion.length > 0 ? (
-                  selectedVersion.map((p) => (
+                {sbomqsVersions.length > 0 ? (
+                  sbomqsVersions.map((p) => (
                     <option key={p} value={p}>
-                      {p}
+                      {p}+
                     </option>
                   ))
                 ) : (
                   <option value='No version found'>No version found</option>
                 )}
               </Select>
+              <Box>
+                <FormLabel htmlFor='scanners' fontSize={'sm'} color='gray.600'>
+                  Scanners
+                </FormLabel>
+                <Flex direction={'row'} gap={4}>
+                  <Checkbox size='sm' colorScheme='blue' color='gray.500'>
+                    Grype
+                  </Checkbox>
+                  <Checkbox size='sm' colorScheme='blue' color='gray.500'>
+                    Trivy
+                  </Checkbox>
+                  <Checkbox size='sm' colorScheme='blue' color='gray.500'>
+                    Scout
+                  </Checkbox>
+                  <Checkbox size='sm' colorScheme='blue' color='gray.500'>
+                    Snyk
+                  </Checkbox>
+                </Flex>
+              </Box>
               <Text fontSize='md' mt='20px'>
                 LINK OPTIONS
               </Text>
@@ -223,7 +246,7 @@ function SBOMDrawer(props) {
                 >
                   Requires agreeing to terms
                 </Checkbox>
-                <Checkbox
+                {/* <Checkbox
                   isChecked={hasRedactions}
                   onChange={(e) => setHasRedactions(e.target.checked)}
                   px='10px'
@@ -245,7 +268,7 @@ function SBOMDrawer(props) {
                   color='gray.500'
                 >
                   Set as public
-                </Checkbox>
+                </Checkbox> */}
                 <Checkbox
                   isChecked={hasLimitAccess}
                   onChange={(e) => {
@@ -286,7 +309,8 @@ function SBOMDrawer(props) {
                   ))}
                 </Flex>
                 <Spacer />
-                <Text fontSize='sm' mt='30px'>
+              </Stack>
+              {/* <Text fontSize='sm' mt='30px'>
                   SBOM Content
                 </Text>
                 <Text fontSize='xs' color='gray.500'>
@@ -356,7 +380,7 @@ function SBOMDrawer(props) {
                 >
                   SPDX
                 </Checkbox>
-              </Stack>
+              </Stack> */}
             </Box>
           </Stack>
         </DrawerBody>

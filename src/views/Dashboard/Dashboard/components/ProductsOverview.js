@@ -108,7 +108,7 @@ const ProductsOverview = ({ title, amount, captions, data }) => {
                         <Flex direction={'row'} gap={2} alignItems={'center'}>
                           {item.imageScanners.map((result, index) => (
                             <Image
-                              width={7}
+                              width={6}
                               objectFit={'contain'}
                               key={index}
                               src={`${scanImage(result.name)}`}

@@ -15,7 +15,7 @@ const GlobalContext = React.createContext({
   setCustomerView: () => {},
   minimize: false,
   setMinimize: () => {},
-  activeDockerHub: false,
+  activeDockerHub: true,
   setActiveDockerHub: () => {},
   userLocation: null,
   setUserLocation: () => {},
@@ -38,7 +38,9 @@ const GlobalContext = React.createContext({
   authUser: null,
   setAuthUser: () => {},
   token: '',
-  setToken: ''
+  setToken: '',
+  imageDetails: null,
+  setImageDetails: () => {}
 })
 
 export default GlobalContext

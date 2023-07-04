@@ -37,7 +37,7 @@ const ContextWrapper = (props) => {
   )
   const [customerView, setCustomerView] = useState('')
   const [minimize, setMinimize] = useState(false)
-  const [activeDockerHub, setActiveDockerHub] = useState(false)
+  const [activeDockerHub, setActiveDockerHub] = useState(true)
   const [userLocation, setUserLocation] = useState(null)
   const [selectedRows, setSelectedRows] = useState([])
   const [registryList, setRegistryList] = useState([])
@@ -81,14 +81,16 @@ const ContextWrapper = (props) => {
   const [authUser, setAuthUser] = useState(null)
   const [token, setToken] = useState('')
 
-  useEffect(() => {
-    const docker = window.localStorage.getItem('DockerHub')
-    if (docker === 'true') {
-      setActiveDockerHub(true)
-    } else {
-      setActiveDockerHub(false)
-    }
-  }, [])
+  const [imageDetails, setImageDetails] = useState(null)
+
+  // useEffect(() => {
+  //   const docker = window.localStorage.getItem('DockerHub')
+  //   if (docker === 'true') {
+  //     setActiveDockerHub(true)
+  //   } else {
+  //     setActiveDockerHub(false)
+  //   }
+  // }, [])
 
   return (
     <GlobalContext.Provider
@@ -130,7 +132,9 @@ const ContextWrapper = (props) => {
         authUser,
         setAuthUser,
         token,
-        setToken
+        setToken,
+        imageDetails,
+        setImageDetails
       }}
     >
       {props.children}
