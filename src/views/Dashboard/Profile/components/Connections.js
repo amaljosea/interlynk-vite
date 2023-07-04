@@ -52,9 +52,8 @@ const Connections = ({ title }) => {
     if (!isSwitchOn) {
       setIsLoading(false)
     }
-
-    console.log('activeDockerHub', activeDockerHub)
-  }, [isSwitchOn, activeDockerHub])
+    // console.log('activeDockerHub', activeDockerHub)
+  }, [isSwitchOn])
 
  
 

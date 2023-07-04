@@ -9,58 +9,31 @@ import {
   Td,
   Image,
   Text,
-  Heading,
-  Link
+  Heading
 } from '@chakra-ui/react'
 // Custom components
 import Card from 'components/Card/Card'
 import CardHeader from 'components/Card/CardHeader'
 import CardBody from 'components/Card/CardBody'
 
-import React, { useEffect } from 'react'
-
+import React from 'react'
+import { Link } from 'react-router-dom'
 import { GetAllImages } from 'graphQL/Queries'
 
-import grype from 'assets/img/grype.png'
-import trivy from 'assets/img/trivy.png'
-import scout from 'assets/img/scout.png'
-import snyk from 'assets/img/snyk.png'
-import custom from 'assets/img/custom.png'
+import { scanImage } from 'utils'
 import { useQuery } from '@apollo/client'
 import { getConImg } from 'utils'
 
 const ProductsOverview = ({ title, amount, captions, data }) => {
-  const scanImage = (name) => {
-    switch (name) {
-      case 'Grype':
-        return grype
-        break
-      case 'Trivy':
-        return trivy
-        break
-      case 'Scout':
-        return scout
-        break
-      case 'Snyk':
-        return snyk
-        break
-      case 'Custom':
-        return custom
-        break
-    }
-  }
-
-  const orgID = process.env.REACT_APP_ORGID
-
   const { data: allImages } = useQuery(GetAllImages, {
-    variables: { id: orgID }
+    variables: {}
   })
 
-  useEffect(() => {
-    if (allImages) {
-      console.log('allImages', allImages)
-    }
-  }, [allImages])
+  // useEffect(() => {
+  //   if (allImages) {
+  //     console.log('allImages', allImages)
+  //   }
+  // }, [allImages])
 
   return (
     <Flex width={'100%'} direction='column' mt={{ base: '120px', md: '0px' }}>
@@ -92,7 +65,9 @@ const ProductsOverview = ({ title, amount, captions, data }) => {
                     <Tr key={item.id}>
                       <Td fontSize={'sm'} pl={1}>
                         <Link
-                          href={`#/admin/sboms?p=${item.name}&v=${item.imageVersions[0].name}`}
+                          to={`/admin/sboms?v=${
+                            item.imageVersions[item.imageVersions.length - 1].id
+                          }&id=${item.id}`}
                           style={{
                             color: '#3182CE',
                             textDecoration: 'underline'
@@ -131,11 +106,11 @@ const ProductsOverview = ({ title, amount, captions, data }) => {
                       </Td>
                       <Td fontSize={'sm'} pl={1}>
                         <Flex direction={'row'} gap={2} alignItems={'center'}>
-                          {item.imageScanners.map((result) => (
+                          {item.imageScanners.map((result, index) => (
                             <Image
                               width={7}
                               objectFit={'contain'}
-                              key={result}
+                              key={index}
                               src={`${scanImage(result.name)}`}
                               alt={result}
                             />

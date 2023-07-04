@@ -78,6 +78,9 @@ const ContextWrapper = (props) => {
   const [activeVulnVal, setActiveVulnVal] = useState('')
   const [riskScoreVal, setRiskScoreVal] = useState('')
 
+  const [authUser, setAuthUser] = useState(null)
+  const [token, setToken] = useState('')
+
   useEffect(() => {
     const docker = window.localStorage.getItem('DockerHub')
     if (docker === 'true') {
@@ -123,7 +126,11 @@ const ContextWrapper = (props) => {
         activeVulnVal,
         setActiveVulnVal,
         riskScoreVal,
-        setRiskScoreVal
+        setRiskScoreVal,
+        authUser,
+        setAuthUser,
+        token,
+        setToken
       }}
     >
       {props.children}

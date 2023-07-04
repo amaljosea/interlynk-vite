@@ -8,16 +8,14 @@ import {
   ChakraProvider,
   Flex,
   FormControl,
-  Heading,
   Image,
   Input,
   Text
 } from '@chakra-ui/react'
-import Footer from 'components/Footer/Footer.js'
 // core components
 
 import React from 'react'
-import { Link, Redirect, Route } from 'react-router-dom'
+import { Redirect, Route } from 'react-router-dom'
 
 import '@fontsource/roboto/400.css'
 import '@fontsource/roboto/500.css'
@@ -25,9 +23,12 @@ import '@fontsource/roboto/700.css'
 import theme from 'theme/theme.js'
 import { InterlynkLogo } from 'components/Icons/Icons'
 import { useState } from 'react'
+import axios from 'axios'
+import { useContext } from 'react'
+import GlobalContext from 'context/GlobalContext'
 
-export default function Pages(props) {
-
+export default function Pages(props) {  
+  const { setAuthUser, setToken } = useContext(GlobalContext)
   React.useEffect(() => {
     document.body.style.overflow = 'unset'
     // Specify how to clean up after this effect:
@@ -101,23 +102,38 @@ export default function Pages(props) {
   const navRef = React.useRef()
   document.documentElement.dir = 'ltr'
 
-  const [email, setEmail] = useState('demo@interlynk.io')
-  const [password, setPassword] = useState('demointerlynk0719')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [error, setError] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (email === 'demo@interlynk.io' && password === 'demointerlynk0719') {
-      setEmail('')
-      setPassword('')
-      setIsLoggedIn(true)
-    } else {
-      setError(true)
-      setEmail('')
-      setPassword('')
-    }
+    axios
+      .post('http://localhost:3000/login', {
+        user: {
+          email,
+          password
+        }
+      })
+      .then((response) => {
+        console.log(response.data)
+        const { status } = response.data
+        if (status.code === 200) {
+          setEmail('')
+          setPassword('')
+          setAuthUser(status.data.user)
+          setToken(response.headers.authorization)
+          setIsLoggedIn(true)
+        }
+      })
+      .catch((error) => {
+        setError(true)
+        setEmail('')
+        setPassword('')
+      })
   }
+
 
   if (isLoggedIn === true) {
     return <Redirect to={'/admin/dashboard'} />
@@ -155,7 +171,9 @@ export default function Pages(props) {
                 justifyContent={'center'}
               >
                 <InterlynkLogo w='40px' h='40px' me='10px' />
-                <Text fontSize={'3xl'} fontWeight={600}>Interlynk</Text>
+                <Text fontSize={'3xl'} fontWeight={600}>
+                  Interlynk
+                </Text>
               </Flex>
               <Flex
                 direction={'column'}
@@ -211,7 +229,7 @@ export default function Pages(props) {
                     Continue
                   </Button>
                 </form>
-                <Flex gap={2} alignItems={'center'}>
+                {/* <Flex gap={2} alignItems={'center'}>
                   <Text>Don't have an account ?</Text>
                   <Link to={'#'}>
                     <Text color={'blue.500'}>Sign up</Text>
@@ -265,7 +283,7 @@ export default function Pages(props) {
                     />
                     <Text>Continue with Github</Text>
                   </Flex>
-                </Flex>
+                </Flex> */}
               </Flex>
             </Flex>
           </Box>

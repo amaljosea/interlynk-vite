@@ -19,7 +19,6 @@ import {
   ModalBody,
   ModalCloseButton,
   useDisclosure,
-  Link,
   Input,
   IconButton,
   Menu,
@@ -53,26 +52,29 @@ import { GetAllOrgConnectors } from 'graphQL/Queries'
 import { getConImg } from 'utils'
 import { AddScannerImage } from 'graphQL/Mutation'
 import { RemoveScannerImage } from 'graphQL/Mutation'
+import { Link } from 'react-router-dom'
 
 const Index = () => {
   const toast = useToast()
 
-  const orgID = process.env.REACT_APP_ORGID
-
   const { data: orgConnectors } = useQuery(GetAllOrgConnectors, {
-    variables: { id: orgID }
+    variables: {}
   })
 
   const { data: allScanners } = useQuery(getAllScanners, {
     variables: {}
   })
 
-  const { data: allImages } = useQuery(GetAllImages, {
-    variables: { id: orgID }
+  const { data: allImages, refetch } = useQuery(GetAllImages, {
+    variables: {}
   })
 
-  const [imageScannerAdd] = useMutation(AddScannerImage)
-  const [imageScannerRemove] = useMutation(RemoveScannerImage)
+  const [imageScannerAdd] = useMutation(AddScannerImage, {
+    onCompleted: refetch
+  })
+  const [imageScannerRemove] = useMutation(RemoveScannerImage, {
+    onCompleted: refetch
+  })
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
@@ -126,18 +128,20 @@ const Index = () => {
           scannerID: `${selectedScanner}`
         }
       })
-      window.location.reload()
+      onScanClose()
     } catch (error) {
       if (error.networkError && error.networkError.statusCode === 500) {
         // Handle the specific error
         alert('Invalid entry')
-        window.location.reload()
+        onScanClose()
       } else {
         // Handle other errors
         alert('Invalid entry')
-        console.error(error.message)
+        onScanClose()
       }
     }
+
+    setSelectedScanner('')
   }
 
   const handleDelete = async (e) => {
@@ -149,35 +153,24 @@ const Index = () => {
           scannerID: `${selectedScanner}`
         }
       })
-      window.location.reload()
+      onDeleteClose()
     } catch (error) {
       if (error.networkError && error.networkError.statusCode === 500) {
         // Handle the specific error
         alert('Invalid request')
-        window.location.reload()
+        onDeleteClose()
       } else {
         // Handle other errors
         alert('Invalid request')
-        console.error(error.message)
+        onDeleteClose()
       }
     }
+
+    setSelectedScanner('')
   }
 
   const existingScanners =
     activeScanners && activeScanners.map((item) => item.id)
-
-  // console.log('existingScanners', existingScanners)
-
-  // const filteredScanners =
-  //   allScanners &&
-  //   allScanners.scanners.filter(
-  //     (scanner) => !existingScanners.includes(scanner.version)
-  //   )
-
-  // const filteredScanners =
-  //   existingScanners && !existingScanners.includes(selectedScanner)
-
-  // console.log('filteredScanners', filteredScanners)
 
   const handleScannerChange = (e) => {
     const { value } = e.target
@@ -261,7 +254,7 @@ const Index = () => {
                             <Skeleton height='20px' />
                           ) : (
                             <Link
-                              href={`#/admin/sboms?v=${
+                              to={`/admin/sboms?v=${
                                 item.imageVersions[
                                   item.imageVersions.length - 1
                                 ].id

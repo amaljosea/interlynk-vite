@@ -16,10 +16,8 @@ import CardHeader from 'components/Card/CardHeader.js'
 import ActivityLogRow from 'components/Tables/ActivityLogRow.js'
 import React from 'react'
 
-
 const ActivityLog = ({ title, captions, data, filterData }) => {
   const textColor = useColorModeValue('gray.700', 'white')
-
 
   return (
     <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
@@ -38,9 +36,10 @@ const ActivityLog = ({ title, captions, data, filterData }) => {
           </Thead>
           <Tbody>
             {filterData.length > 0 &&
-              filterData.map((row) => {
+              filterData.map((row, index) => {
                 return (
                   <ActivityLogRow
+                    key={index}
                     type={row.type}
                     product={row.product}
                     version={row.version}
@@ -51,9 +50,10 @@ const ActivityLog = ({ title, captions, data, filterData }) => {
                 )
               })}
             {filterData.length === 0 &&
-              data.map((row) => {
+              data.map((row, index) => {
                 return (
                   <ActivityLogRow
+                    key={index}
                     type={row.type}
                     product={row.product}
                     version={row.version}

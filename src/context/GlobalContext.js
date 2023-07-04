@@ -34,7 +34,11 @@ const GlobalContext = React.createContext({
   activeVulnVal: '',
   setActiveVulnVal: () => {},
   riskScoreVal: '',
-  setRiskScoreVal: () => {}
+  setRiskScoreVal: () => {},
+  authUser: null,
+  setAuthUser: () => {},
+  token: '',
+  setToken: ''
 })
 
 export default GlobalContext

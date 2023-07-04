@@ -23,10 +23,22 @@ import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
 
+import {
+  ApolloClient,
+  InMemoryCache,
+  ApolloProvider,
+  createHttpLink
+} from '@apollo/client'
+import { setContext } from '@apollo/client/link/context'
+
 export default function Dashboard(props) {
-  const { setCustomerView, minimize, setUserLocation } = useContext(
-    GlobalContext
-  )
+  const {
+    setCustomerView,
+    minimize,
+    setUserLocation,
+    authUser,
+    token
+  } = useContext(GlobalContext)
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition((position) => {
@@ -37,7 +49,7 @@ export default function Dashboard(props) {
       )
         .then((response) => response.json())
         .then((data) => {
-          console.log('data', data)
+          // console.log('data', data)
           setUserLocation({
             country: data.results[0].components.country,
             city: data.results[0].components.city,
@@ -134,43 +146,69 @@ export default function Dashboard(props) {
     console.log(location.pathname)
   }, [location])
 
+  const httpLink = createHttpLink({
+    uri: 'http://localhost:3000/lynkapi'
+  })
+
+  const authLink = setContext((_, { headers }) => {
+    // get the authentication token from local storage if it exists
+    // return the headers to the context so httpLink can read them
+    return {
+      headers: {
+        ...headers,
+        authorization: token ? token : ''
+      }
+    }
+  })
+  const client = new ApolloClient({
+    link: authLink.concat(httpLink),
+    cache: new InMemoryCache()
+  })
+
   return (
-    <ChakraProvider theme={theme} resetCss={false}>
-      <Sidebar
-        routes={routes}
-        logoText={'Interlynk DASHBOARD'}
-        display='none'
-        sidebarVariant={sidebarVariant}
-        {...rest}
-      />
-      <MainPanel
-        w={{
-          base: '100%',
-          xl: minimize ? 'calc(100% - 110px)' : 'calc(100% - 220px)'
-        }}
-      >
-        <Portal>
-          <AdminNavbar
-            onOpen={onOpen}
-            logoText={'Interlynk DASHBOARD'}
-            brandText={getActiveRoute(routes)}
-            secondary={getActiveNavbar(routes)}
-            fixed={fixed}
-            {...rest}
-          />
-        </Portal>
-        {getRoute() ? (
-          <PanelContent>
-            <PanelContainer>
-              <Switch>
-                {getRoutes(routes)}
-                <Redirect from='/admin' to='/admin/dashboard' />
-              </Switch>
-            </PanelContainer>
-          </PanelContent>
-        ) : null}
-        <Footer />
-      </MainPanel>
-    </ChakraProvider>
+    <ApolloProvider client={client}>
+      <ChakraProvider theme={theme} resetCss={false}>
+        <Sidebar
+          routes={routes}
+          logoText={'Interlynk DASHBOARD'}
+          display='none'
+          sidebarVariant={sidebarVariant}
+          {...rest}
+        />
+        <MainPanel
+          w={{
+            base: '100%',
+            xl: minimize ? 'calc(100% - 110px)' : 'calc(100% - 220px)'
+          }}
+        >
+          <Portal>
+            <AdminNavbar
+              onOpen={onOpen}
+              logoText={'Interlynk DASHBOARD'}
+              brandText={getActiveRoute(routes)}
+              secondary={getActiveNavbar(routes)}
+              fixed={fixed}
+              {...rest}
+            />
+          </Portal>
+          {getRoute() && (
+            <PanelContent>
+              <PanelContainer>
+                <Switch>
+                  {getRoutes(routes)}
+                  <Redirect from='/admin' to='/admin/dashboard' />
+                </Switch>
+              </PanelContainer>
+            </PanelContent>
+          )}
+          {!authUser && (
+            <Switch>
+              <Redirect to='/' />
+            </Switch>
+          )}
+          <Footer />
+        </MainPanel>
+      </ChakraProvider>
+    </ApolloProvider>
   )
 }

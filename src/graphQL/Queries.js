@@ -11,8 +11,8 @@ export const GetAllConnectors = gql`
 `
 
 export const GetAllOrgConnectors = gql`
-  query GetAllOrgConnectors($id: ID!) {
-    organizationConnectors(organizationId: $id) {
+  query GetAllOrgConnectors {
+    organizationConnectors {
       id
       connector {
         name
@@ -37,8 +37,8 @@ export const getAllScanners = gql`
 `
 
 export const GetAllImages = gql`
-  query GetAllImages($id: ID!) {
-    images(organizationId: $id) {
+  query GetAllImages {
+    images {
       id
       name
       organizationConnector {

@@ -2,7 +2,6 @@ import { gql } from '@apollo/client'
 
 export const OrgConnectorCreate = gql`
   mutation OrgConnectorCreate(
-    $orgId: Uuid!
     $connId: Uuid!
     $name: String!
     $user: String!
@@ -11,7 +10,6 @@ export const OrgConnectorCreate = gql`
   ) {
     organizationConnectorCreate(
       input: {
-        organizationId: $orgId
         connectorId: $connId
         name: $name
         username: $user
