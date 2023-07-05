@@ -431,7 +431,7 @@ const SBOMTable = ({
           onChange={(index) => setTabIndex(index)}
         >
           <TabList mt='20px'>
-            <Tab>Share Links</Tab>
+            <Tab>Share Lynks</Tab>
             <Tab>Vulnerabilities</Tab>
             <Tab>Affected Components</Tab>
             {/* <Tab>Risks</Tab> */}
