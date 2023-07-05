@@ -146,7 +146,7 @@ function ImagesDrawer({ isOpen, onClose, btnRef, activeImageId }) {
       <DrawerContent>
         <DrawerCloseButton />
         <DrawerHeader borderBottomWidth='1px' color='gray.600'>
-          SBOM Link
+          Share Lynk
         </DrawerHeader>
 
         <DrawerBody>

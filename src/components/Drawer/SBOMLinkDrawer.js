@@ -103,7 +103,7 @@ function SBOMLinkDrawer(props) {
       <DrawerContent>
         <DrawerCloseButton />
         <DrawerHeader borderBottomWidth='1px' color='gray.600'>
-          SBOM Link
+          SBOM Lynk
         </DrawerHeader>
         <DrawerBody>
           <Stack spacing='24px'>

@@ -142,7 +142,7 @@ function SBOMDrawer(props) {
       <DrawerContent>
         <DrawerCloseButton />
         <DrawerHeader borderBottomWidth='1px' color='gray.600'>
-          Share Link
+          Share Lynk
         </DrawerHeader>
         <DrawerBody>
           <Stack spacing='24px'>
