@@ -54,7 +54,7 @@ const Connections = ({ title }) => {
     setActiveDockerHub(!activeDockerHub)
   }
 
-  console.log('activeDockerHub', activeDockerHub)
+  // console.log('activeDockerHub', activeDockerHub)
 
   useEffect(() => {
     if (!isSwitchOn) {

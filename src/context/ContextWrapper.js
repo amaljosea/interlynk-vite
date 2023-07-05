@@ -81,7 +81,7 @@ const ContextWrapper = (props) => {
   const [authUser, setAuthUser] = useState(null)
   const [token, setToken] = useState('')
 
-  const [imageDetails, setImageDetails] = useState(null)
+  const [imageDetails, setImageDetails] = useState('')
 
   // useEffect(() => {
   //   const docker = window.localStorage.getItem('DockerHub')

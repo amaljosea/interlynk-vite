@@ -174,3 +174,39 @@ export const imageVersionCreate = gql`
     }
   }
 `
+
+export const VexVulnCreate = gql`
+  mutation VexVulnCreate(
+    $imageVersionID: Uuid!
+    $cveID: String!
+    $compName: String!
+    $compVersion: String!
+    $notes: String
+    $vexJustificationID: Uuid!
+    $vexStatusID: Uuid!
+  ) {
+    vexVulnCreate(
+      input: {
+        imageVersionId: $imageVersionID
+        cveId: $cveID
+        compName: $compName
+        compVersion: $compVersion
+        notes: $notes
+        vexJustificationId: $vexJustificationID
+        vexStatusId: $vexStatusID
+      }
+    ) {
+      vexVuln {
+        id
+        cveId
+        vexJustification {
+          name
+        }
+        vexStatus {
+          name
+        }
+      }
+      errors
+    }
+  }
+`

@@ -57,7 +57,7 @@ export default function Dashboard(props) {
           })
         })
     })
-  }, [])
+  }, [navigator])
 
   const { ...rest } = props
   const location = useLocation()
@@ -113,7 +113,7 @@ export default function Dashboard(props) {
     return activeNavbar
   }
   const getRoutes = (routes) => {
-    return routes.map((prop, key) => {
+    const route = routes.map((prop, key) => {
       // console.log('getting routes')
       if (prop.collapse) {
         // console.log('getting routes collapse')
@@ -136,6 +136,8 @@ export default function Dashboard(props) {
         return null
       }
     })
+
+    return route
   }
   const { isOpen, onOpen, onClose } = useDisclosure()
   document.documentElement.dir = 'ltr'
@@ -151,8 +153,6 @@ export default function Dashboard(props) {
   })
 
   const authLink = setContext((_, { headers }) => {
-    // get the authentication token from local storage if it exists
-    // return the headers to the context so httpLink can read them
     return {
       headers: {
         ...headers,
