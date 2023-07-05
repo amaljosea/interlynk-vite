@@ -31,7 +31,6 @@ export const getAllScanners = gql`
       id
       company
       name
-      version
     }
   }
 `
@@ -51,7 +50,6 @@ export const GetAllImages = gql`
       imageScanners {
         id
         name
-        version
         company
       }
       imageVersions {
@@ -107,7 +105,6 @@ export const getImageVersion = gql`
       imageScanners {
         id
         name
-        version
       }
       imageShaId
       name
@@ -129,7 +126,6 @@ export const getImageVersion = gql`
         scanners {
           id
           name
-          version
         }
       }
     }

@@ -204,7 +204,7 @@ function SBOMLinkRow(props) {
           size='md'
         />
       </Td>
-      <Td>
+      <Td display={'none'}>
         <Stack direction='row' spacing={2}>
           <Tooltip label='Components'>
             <IconButton
@@ -265,7 +265,7 @@ function SBOMLinkRow(props) {
           })}
         </Stack>
       </Td>
-      <Td>{visits}</Td>
+      {/* <Td>{visits}</Td> */}
       <Td>{timeSince(created)}</Td>
       <Td minWidth={{ sm: '80px' }} pl='0px'>
         {/* </Link> */}

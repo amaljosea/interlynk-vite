@@ -52,10 +52,24 @@ import { GetAllOrgConnectors } from 'graphQL/Queries'
 import { getConImg } from 'utils'
 import { AddScannerImage } from 'graphQL/Mutation'
 import { RemoveScannerImage } from 'graphQL/Mutation'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
+import { useContext } from 'react'
+import GlobalContext from 'context/GlobalContext'
 
 const Index = () => {
   const toast = useToast()
+
+  const { setImageDetails, setVulnerabilitiesData } = useContext(GlobalContext)
+
+  const location = useLocation()
+  const path = location.pathname
+
+  useEffect(() => {
+    if (path === '/admin/images') {
+      setImageDetails(null)
+      setVulnerabilitiesData([])
+    }
+  }, [path])
 
   const { data: orgConnectors } = useQuery(GetAllOrgConnectors, {
     variables: {}
@@ -171,6 +185,19 @@ const Index = () => {
 
   const existingScanners =
     activeScanners && activeScanners.map((item) => item.id)
+
+  // console.log('existingScanners', existingScanners)
+
+  const filteredScanners =
+    allScanners &&
+    allScanners.scanners.filter(
+      (scanner) => !existingScanners.includes(scanner.id)
+    )
+
+  // const filteredScanners =
+  //   existingScanners && !existingScanners.includes(selectedScanner)
+
+  // console.log('filteredScanners', filteredScanners)
 
   const handleScannerChange = (e) => {
     const { value } = e.target
@@ -316,7 +343,7 @@ const Index = () => {
                           ) : (
                             <Flex
                               direction={'row'}
-                              gap={2}
+                              gap={3}
                               alignItems={'center'}
                             >
                               {item.imageScanners.map((result, index) => (
@@ -326,7 +353,7 @@ const Index = () => {
                                   placement='top'
                                 >
                                   <Image
-                                    width={8}
+                                    width={6}
                                     objectFit={'contain'}
                                     src={`${scanImage(result.name)}`}
                                     alt={result}
@@ -438,8 +465,8 @@ const Index = () => {
                 value={selectedScanner}
                 onChange={handleScannerChange}
               >
-                {allScanners &&
-                  allScanners.scanners.map((item) => (
+                {filteredScanners &&
+                  filteredScanners.map((item) => (
                     <option key={item.id} value={item.id}>
                       {item.company} - {item.name}
                     </option>

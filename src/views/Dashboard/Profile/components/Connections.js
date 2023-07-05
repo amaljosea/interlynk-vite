@@ -18,7 +18,13 @@ import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
 import React, { useState, useEffect, useContext } from 'react'
 
-import { FaJira, FaSlack, FaGithubSquare, FaGitlab, FaDocker } from 'react-icons/fa'
+import {
+  FaJira,
+  FaSlack,
+  FaGithubSquare,
+  FaGitlab,
+  FaDocker
+} from 'react-icons/fa'
 import { CheckIcon } from '@chakra-ui/icons'
 
 import GitHubButton from 'react-github-btn'
@@ -48,14 +54,13 @@ const Connections = ({ title }) => {
     setActiveDockerHub(!activeDockerHub)
   }
 
+  console.log('activeDockerHub', activeDockerHub)
+
   useEffect(() => {
     if (!isSwitchOn) {
       setIsLoading(false)
     }
-    // console.log('activeDockerHub', activeDockerHub)
   }, [isSwitchOn])
-
- 
 
   return (
     <Card p='16px'>
