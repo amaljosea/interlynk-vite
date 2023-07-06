@@ -41,7 +41,7 @@ import { AddIcon, DeleteIcon } from '@chakra-ui/icons'
 import { getAllScanners } from 'graphQL/Queries'
 import { useMutation, useQuery } from '@apollo/client'
 import { GetAllImages } from 'graphQL/Queries'
-
+import SBOM from 'views/Dashboard/SBOMs'
 import grype from 'assets/img/grype.png'
 import trivy from 'assets/img/trivy.png'
 import scout from 'assets/img/scout.png'
@@ -59,14 +59,19 @@ import GlobalContext from 'context/GlobalContext'
 const Index = () => {
   const toast = useToast()
 
-  const { setImageDetails, setVulnerabilitiesData } = useContext(GlobalContext)
-
   const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const versionId = queryParams.get('v')
+  const imageId = queryParams.get('id')
+
+  // console.log('versionId', versionId)
+
+  const { setVulnerabilitiesData, setScannerItems } = useContext(GlobalContext)
+
   const path = location.pathname
 
   useEffect(() => {
     if (path === '/admin/images') {
-      setImageDetails('')
       setVulnerabilitiesData([])
     }
   }, [path])
@@ -78,6 +83,15 @@ const Index = () => {
   const { data: allScanners } = useQuery(getAllScanners, {
     variables: {}
   })
+
+  useEffect(() => {
+    if (allScanners) {
+      window.localStorage.setItem(
+        'scanners',
+        JSON.stringify(allScanners.scanners)
+      )
+    }
+  }, [allScanners])
 
   const { data: allImages, refetch } = useQuery(GetAllImages, {
     variables: {}
@@ -219,6 +233,9 @@ const Index = () => {
     }, 10000)
   }, [isLoading])
 
+  if (versionId) {
+    return <SBOM />
+  }
   return (
     <>
       <Flex width={'100%'} direction='column' mt={{ base: '120px', md: '0px' }}>
@@ -281,7 +298,7 @@ const Index = () => {
                             <Skeleton height='20px' />
                           ) : (
                             <Link
-                              to={`/admin/sboms?v=${
+                              to={`/admin/images?v=${
                                 item.imageVersions[
                                   item.imageVersions.length - 1
                                 ].id
@@ -290,6 +307,9 @@ const Index = () => {
                                 color: '#3182CE',
                                 textDecoration: 'underline'
                               }}
+                              onClick={() =>
+                                window.localStorage.setItem('Image', item.name)
+                              }
                             >
                               {item.name}
                             </Link>

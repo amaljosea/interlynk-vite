@@ -30,6 +30,7 @@ import {
   createHttpLink
 } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
+import SBOM from './SBOM'
 
 export default function Dashboard(props) {
   const {
@@ -40,24 +41,6 @@ export default function Dashboard(props) {
     token
   } = useContext(GlobalContext)
 
-  useEffect(() => {
-    navigator.geolocation.getCurrentPosition((position) => {
-      const lat = position.coords.latitude
-      const lon = position.coords.longitude
-      fetch(
-        `https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lon}&key=6eb77ed2b21f4358a2d83d051c9c3d21`
-      )
-        .then((response) => response.json())
-        .then((data) => {
-          // console.log('data', data)
-          setUserLocation({
-            country: data.results[0].components.country,
-            city: data.results[0].components.city,
-            state: data.results[0].components.state
-          })
-        })
-    })
-  }, [navigator])
 
   const { ...rest } = props
   const location = useLocation()
@@ -124,7 +107,7 @@ export default function Dashboard(props) {
         return getRoutes(prop.views)
       }
       if (prop.layout === '/admin') {
-        // console.log('getting admin')
+        // console.log('getting admin', prop)
         return (
           <Route
             path={prop.layout + prop.path}
@@ -145,7 +128,7 @@ export default function Dashboard(props) {
 
   useEffect(() => {
     setCustomerView(location.pathname)
-    console.log(location.pathname)
+    // console.log(location.pathname)
   }, [location])
 
   const httpLink = createHttpLink({

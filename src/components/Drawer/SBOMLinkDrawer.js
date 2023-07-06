@@ -1,7 +1,6 @@
 // Chakra imports
 import { Flex, Button, Input, Spacer, Stack } from '@chakra-ui/react'
 import React, { useState } from 'react'
-import { CopyIcon } from '@chakra-ui/icons'
 import {
   Drawer,
   DrawerBody,
@@ -12,7 +11,6 @@ import {
   DrawerCloseButton,
   Box,
   FormLabel,
-  InputGroup,
   Select,
   Checkbox,
   Divider,
@@ -22,49 +20,54 @@ import {
   TagCloseButton
 } from '@chakra-ui/react'
 import { useEffect } from 'react'
-import { productVersionsData } from 'variables/general'
+import { useMutation, useQuery } from '@apollo/client'
+import { UpdateShareLynk } from 'graphQL/Mutation'
+import { getAllScanners } from 'graphQL/Queries'
 
 function SBOMLinkDrawer(props) {
   const {
+    id,
     isOpen,
     onClose,
     btnRef,
-    uniqProjects,
-    uniqVersions,
-    name,
-    version,
-    shared_with,
-    conf_email,
-    conf_terms,
-    components,
-    licenses,
-    vulnerability,
-    cyclonedx,
-    spdx,
-    link,
-    redactions
+    imageDataRefetch,
+    shareScanner,
+    shareUsers
   } = props
-  const handleChange = (event) => setValue(event.target.value)
 
-  const [hasEmail, setHasEmail] = useState(conf_email)
-  const [hasTerms, setHasTerms] = useState(conf_terms)
-  const [hasRedactions, setHasRedactions] = useState(redactions)
+  const sbomqsVersions = ['v0.0.1', 'v0.0.2', 'v0.0.3']
+
+  const { data: allScanners } = useQuery(getAllScanners, {
+    variables: {}
+  })
+
+  const [shareLynkUpdate] = useMutation(UpdateShareLynk, {
+    onCompleted: imageDataRefetch
+  })
+
+  const [hasEmail, setHasEmail] = useState(true)
+  const [hasTerms, setHasTerms] = useState(true)
   const [hasLimitAccess, setHasLimitAccess] = useState(true)
-  //  shared_with && shared_with.length > 0 ? true : false
-  const [hasComponents, setHasComponents] = useState(components)
-  const [hasLicenses, setHasLicenses] = useState(licenses)
-  const [hasVul, setHasVul] = useState(vulnerability)
-  const [hasCyclonDx, setHasCyclonDx] = useState(cyclonedx)
-  const [hasSpdx, setHasSpdx] = useState(spdx)
-  const [isPublic, setIsPublic] = useState(false)
-  const [selectedVersion, setSelectedVersion] = useState([])
   const [email, setEmail] = useState('')
   const [emailList, setEmailList] = useState([])
-  const [product, setProduct] = useState('dashboard-app')
 
-  const handleProductChange = (e) => {
-    setProduct(e.target.value)
-  }
+  const [checkboxData, setCheckboxData] = useState([])
+  const [checkedValues, setCheckedValues] = useState([])
+  const [isAllChecked, setIsAllChecked] = useState(false)
+
+  useEffect(() => {
+    if (shareUsers.length > 0) {
+      setEmailList(shareUsers.map((item) => item.email))
+    }
+  }, [shareUsers])
+
+  useEffect(() => {
+    if (shareScanner.length > 0) {
+      setCheckboxData(shareScanner.map((scanner) => scanner))
+    }
+  }, [shareScanner])
+
+  // console.log('checkboxData', checkboxData)
 
   const handleKeyDown = (event) => {
     if (event.key === 'Enter') {
@@ -73,23 +76,42 @@ function SBOMLinkDrawer(props) {
     }
   }
 
-  useEffect(() => {
-    const filterProduct = productVersionsData.filter(
-      (project) => project.name === product
-    )
-
-    // console.log('filterProduct', filterProduct)
-
-    const uniqVersion = []
-    filterProduct.map((project) => {
-      project.versions.map((version) => {
-        uniqVersion.push(version.version)
+  const handleUpdate = async () => {
+    try {
+      await shareLynkUpdate({
+        variables: {
+          shareLynkId: id,
+          enabled: true,
+          emails: emailList
+        }
       })
-    })
+      onClose()
+    } catch (error) {
+      if (error.networkError && error.networkError.statusCode === 500) {
+        // Handle the specific error
+        alert(
+          'Duplicate connector is being created for Dockerhub with the same account ID.'
+        )
+        onClose()
+      } else {
+        // Handle other errors
+        alert(error.message)
+        onClose()
+      }
+    }
+  }
 
-    // console.log('uniqVersion', uniqVersion)
-    setSelectedVersion(uniqVersion)
-  }, [product])
+  const imageName = window.localStorage.getItem('Image')
+
+  const handleRemove = (item) => {
+    const updatedList = emailList.filter((email) => email !== item)
+    setEmailList(updatedList)
+  }
+
+  // useEffect(() => {
+  //   console.log('selected emails', emailList)
+  //   console.log('shareScanner', shareScanner)
+  // }, [emailList])
 
   return (
     <Drawer
@@ -97,13 +119,13 @@ function SBOMLinkDrawer(props) {
       placement='right'
       onClose={onClose}
       finalFocusRef={btnRef}
-      size='lg'
+      size='sm'
     >
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />
         <DrawerHeader borderBottomWidth='1px' color='gray.600'>
-          SBOM Lynk
+          Share Lynk
         </DrawerHeader>
         <DrawerBody>
           <Stack spacing='24px'>
@@ -114,21 +136,14 @@ function SBOMLinkDrawer(props) {
                 fontSize='sm'
                 color='gray.600'
               >
-                Product
+                Image
               </FormLabel>
-              <Select
-                id='product'
-                size='sm'
-                color='gray.500'
-                value={product}
-                onChange={handleProductChange}
-              >
-                {uniqProjects
-                  .sort((a, b) => a.localeCompare(b))
-                  .map((p) => (
-                    <option key={p}>{p}</option>
-                  ))}
-              </Select>
+              <Input
+                value={imageName ? imageName : ''}
+                readOnly
+                fontSize={'sm'}
+                mb={4}
+              />
               <FormLabel
                 py='4px'
                 htmlFor='product'
@@ -137,17 +152,42 @@ function SBOMLinkDrawer(props) {
               >
                 Version
               </FormLabel>
-              <Select id='version' value={version} size='sm' color='gray.500'>
-                {selectedVersion.length > 0 ? (
-                  selectedVersion.map((p) => (
+              <Select
+                id='version'
+                value={version}
+                size='sm'
+                color='gray.500'
+                mb={4}
+              >
+                {sbomqsVersions.length > 0 ? (
+                  sbomqsVersions.map((p) => (
                     <option key={p} value={p}>
-                      {p}
+                      {p}+
                     </option>
                   ))
                 ) : (
                   <option value='No version found'>No version found</option>
                 )}
               </Select>
+              <Box>
+                <FormLabel htmlFor='scanners' fontSize={'sm'} color='gray.600'>
+                  Scanners
+                </FormLabel>
+                <Flex direction={'row'} gap={4}>
+                  <Checkbox size='sm' colorScheme='blue' color='gray.500'>
+                    All
+                  </Checkbox>
+                  <Checkbox size='sm' colorScheme='blue' color='gray.500'>
+                    Grype
+                  </Checkbox>
+                  <Checkbox size='sm' colorScheme='blue' color='gray.500'>
+                    Trivy
+                  </Checkbox>
+                  <Checkbox size='sm' colorScheme='blue' color='gray.500'>
+                    Scout
+                  </Checkbox>
+                </Flex>
+              </Box>
               <Text fontSize='md' mt='20px'>
                 LINK OPTIONS
               </Text>
@@ -182,33 +222,9 @@ function SBOMLinkDrawer(props) {
                   Requires agreeing to terms
                 </Checkbox>
                 <Checkbox
-                  isChecked={hasRedactions}
-                  onChange={(e) => setHasRedactions(e.target.checked)}
-                  px='10px'
-                  size='sm'
-                  colorScheme='blue'
-                  color='gray.500'
-                >
-                  Apply redactions
-                </Checkbox>
-                <Checkbox
-                  isChecked={isPublic}
-                  onChange={(e) => {
-                    setIsPublic(e.target.checked)
-                    setHasLimitAccess(false)
-                  }}
-                  px='10px'
-                  size='sm'
-                  colorScheme='blue'
-                  color='gray.500'
-                >
-                  Set as public
-                </Checkbox>
-                <Checkbox
                   isChecked={hasLimitAccess}
                   onChange={(e) => {
                     setHasLimitAccess(e.target.checked)
-                    setIsPublic(false)
                   }}
                   px='10px'
                   size='sm'
@@ -217,20 +233,6 @@ function SBOMLinkDrawer(props) {
                 >
                   Limit access to:{' '}
                 </Checkbox>
-                <Stack direction='row' spacing={2}>
-                  {shared_with.map((p, idx) => (
-                    <Tag
-                      size='sm'
-                      key={idx}
-                      borderRadius='full'
-                      variant='solid'
-                      colorScheme='blue'
-                    >
-                      <TagLabel>{p}</TagLabel>
-                      <TagCloseButton />
-                    </Tag>
-                  ))}
-                </Stack>
                 <Input
                   placeholder='Enter email address'
                   size='sm'
@@ -238,92 +240,25 @@ function SBOMLinkDrawer(props) {
                   onChange={(e) => setEmail(e.target.value)}
                   onKeyDown={handleKeyDown}
                 />
-                <Flex direction={'column'} alignItems={'start'} gap={2}>
+                <Flex
+                  direction={'row'}
+                  alignItems={'start'}
+                  gap={3}
+                  flexWrap={'wrap'}
+                >
                   {emailList.map((item) => (
-                    <Box key={item}>
-                      <Text
-                        fontSize={'sm'}
-                        px={4}
-                        py={1}
-                        bg={'blue.500'}
-                        color={'white'}
-                        borderRadius={20}
-                      >
-                        {item}
-                      </Text>
-                    </Box>
+                    <Tag
+                      size='md'
+                      key={item}
+                      borderRadius='full'
+                      colorScheme={'blue'}
+                    >
+                      <TagLabel>{item}</TagLabel>
+                      <TagCloseButton onClick={() => handleRemove(item)} />
+                    </Tag>
                   ))}
                 </Flex>
                 <Spacer />
-                <Text fontSize='sm' mt='30px'>
-                  SBOM Content
-                </Text>
-                <Text fontSize='xs' color='gray.500'>
-                  Select SBOM content that is required for this link
-                </Text>
-                <Checkbox
-                  isChecked={hasComponents}
-                  onChange={(e) => setHasComponents(e.target.checked)}
-                  px='10px'
-                  size='sm'
-                  colorScheme='blue'
-                  color='gray.500'
-                >
-                  Components
-                </Checkbox>
-                <Checkbox
-                  isChecked={hasLicenses}
-                  onChange={(e) => setHasLicenses(e.target.checked)}
-                  px='10px'
-                  size='sm'
-                  colorScheme='blue'
-                  color='gray.500'
-                >
-                  Licenses
-                </Checkbox>
-                <Checkbox
-                  isChecked={hasVul}
-                  onChange={(e) => setHasVul(e.target.checked)}
-                  px='10px'
-                  size='sm'
-                  colorScheme='blue'
-                  color='gray.500'
-                >
-                  Vulnerabilities
-                </Checkbox>
-              </Stack>
-              <Text fontSize='md' mt='20px'>
-                ADVANCED OPTIONS
-              </Text>
-              <Divider />
-              <Stack spacing='12px'>
-                <Text fontSize='sm' mt='20px'>
-                  SBOM Format
-                </Text>
-                <Text fontSize='xs' color='gray.500'>
-                  Select SBOM format supported by this link
-                </Text>
-                <Checkbox
-                  isChecked={hasCyclonDx}
-                  onChange={(e) => setHasCyclonDx(e.target.checked)}
-                  px='10px'
-                  mt='10px'
-                  size='sm'
-                  colorScheme='blue'
-                  color='gray.500'
-                >
-                  CycloneDX
-                </Checkbox>
-                <Checkbox
-                  isChecked={hasSpdx}
-                  onChange={(e) => setHasSpdx(e.target.checked)}
-                  px='10px'
-                  size='sm'
-                  colorScheme='blue'
-                  color='gray.500'
-                >
-                  SPDX
-                </Checkbox>
               </Stack>
             </Box>
           </Stack>
@@ -333,7 +268,9 @@ function SBOMLinkDrawer(props) {
           <Button variant='outline' mr={3} onClick={onClose}>
             Cancel
           </Button>
-          <Button colorScheme='blue'>Save</Button>
+          <Button colorScheme='blue' onClick={handleUpdate}>
+            Update
+          </Button>
         </DrawerFooter>
       </DrawerContent>
     </Drawer>

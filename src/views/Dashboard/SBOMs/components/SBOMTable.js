@@ -28,7 +28,8 @@ import {
   useDisclosure,
   chakra,
   Skeleton,
-  Td
+  Td,
+  useQuery
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card.js'
@@ -54,6 +55,7 @@ import { BiImport, BiExport, BiFilter } from 'react-icons/bi'
 import { BsFilterRight } from 'react-icons/bs'
 import BasicTable from './BasicTable'
 import SBOMDrawer from 'components/Drawer/SBOMDrawer'
+import { getAllScanners } from 'graphQL/Queries'
 
 const SBOMTable = ({
   title,
@@ -63,7 +65,10 @@ const SBOMTable = ({
   setFilteredVulItems,
   vulData,
   imgVersionId,
-  refetch
+  refetch,
+  imageInfo,
+  shareLynks,
+  imageDataRefetch
 }) => {
   const {
     SBOMLinksData,
@@ -74,6 +79,8 @@ const SBOMTable = ({
     setTabIndex,
     productVersionsData
   } = useContext(GlobalContext)
+
+  const { data: allScanners } = useQuery(getAllScanners, {})
 
   const textColor = useColorModeValue('gray.700', 'white')
   const [searchInput, setSearchInput] = useState('')
@@ -119,6 +126,8 @@ const SBOMTable = ({
     ''
   ]
 
+  const vulnData = [...vulData]
+
   const uniqVersions = []
   productVersionsData.map((project) => {
     project.versions.map((version) => {
@@ -138,11 +147,9 @@ const SBOMTable = ({
       item.license.toLowerCase().includes(searchInput.toLowerCase())
   )
 
-  const filteredVulItems = vulnerabilitiesData.filter(
+  const filteredVulItems = vulnData.filter(
     (item) =>
-      (item.cveId || item.compName) &&
-      (item.cveId.toLowerCase().includes(searchVul.toLowerCase()) ||
-        item.compName.toLowerCase().includes(searchVul.toLowerCase()))
+      item.cveId && item.cveId.toLowerCase().includes(searchVul.toLowerCase())
   )
 
   const filteredRiskItems = Risks.filter((item) =>
@@ -168,31 +175,6 @@ const SBOMTable = ({
       setSelectedStatus((prev) => [...prev, item])
     }
   }
-
-  // useEffect(() => {
-  //   // If no options are selected, display all data
-  //   if (selectedOptions.length === 0 && selectedStatus.length === 0) {
-  //     setFilterData(vulnerabilitiesData)
-  //   }
-
-  //   if (selectedOptions.length > 0 && selectedStatus.length === 0) {
-  //     // Filter the data based on selected options
-  //     const items = vulnerabilitiesData.filter((item) =>
-  //       selectedOptions.includes(item.severity)
-  //     )
-  //     setFilterData(items)
-  //   }
-
-  //   if (selectedOptions.length > 0 && selectedStatus.length > 0) {
-  //     // Filter the data based on selected options
-  //     const items = vulnerabilitiesData.filter(
-  //       (item) =>
-  //         selectedOptions.includes(item.severity) &&
-  //         selectedStatus.includes(item.status)
-  //     )
-  //     setFilterData(items)
-  //   }
-  // }, [selectedOptions])
 
   useEffect(() => {
     // If no options are selected, display all data
@@ -389,7 +371,6 @@ const SBOMTable = ({
   // Calculate the index range for the current page
   const startIndex = (currentPage - 1) * pageSize
   const endIndex = startIndex + pageSize
-  const vulnData = [...vulData]
   const visibleData = vulnData.slice(startIndex, endIndex)
 
   const totalPages = Math.ceil(vulnData.length / pageSize)
@@ -417,10 +398,11 @@ const SBOMTable = ({
           <TabList mt='20px'>
             <Tab>Share Lynks</Tab>
             <Tab>Vulnerabilities</Tab>
-            <Tab>Affected Components</Tab>
+            {/* <Tab>Affected Components</Tab> */}
             {/* <Tab>Risks</Tab> */}
           </TabList>
           <TabPanels>
+            {/* share lynks */}
             <TabPanel>
               <CardHeader mb={4}>
                 <Flex
@@ -458,28 +440,39 @@ const SBOMTable = ({
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {SBOMLinksData.map((row, idx) => {
-                      return (
+                    {shareLynks.length > 0 ? (
+                      shareLynks.map((row, idx) => (
                         <SBOMLinkRow
                           key={idx}
                           id={row.id}
-                          link={row.link}
-                          visits={row.visits}
-                          created={row.created}
-                          shared_with={row.shared_with}
-                          conf_email={row.conf_email}
-                          conf_terms={row.conf_terms}
-                          redactions={row.redactions}
-                          components={row.components}
-                          licenses={row.licenses}
-                          vulnerabilities={row.vulnerabilities}
-                          cyclonedx={row.cyclonedx}
-                          spdx={row.spdx}
-                          active={row.active}
-                          project={row.project}
+                          signedUrlParams={row.signedUrlParams}
+                          updatedAt={row.updatedAt}
+                          shareUsers={row.shareUsers}
+                          shareScanners={row.shareScanners}
+                          enabled={row.enabled}
+                          imageDataRefetch={imageDataRefetch}
+                          imgVersionId={imgVersionId}
                         />
-                      )
-                    })}
+                      ))
+                    ) : (
+                      <Tr>
+                        <Td fontSize={'sm'} pl={1}>
+                          <Skeleton height='20px' />
+                        </Td>
+                        <Td fontSize={'sm'} pl={1}>
+                          <Skeleton height='20px' />
+                        </Td>
+                        <Td fontSize={'sm'} pl={1}>
+                          <Skeleton height='20px' />
+                        </Td>
+                        <Td fontSize={'sm'} pl={1}>
+                          <Skeleton height='20px' />
+                        </Td>
+                        <Td fontSize={'sm'} pl={1}>
+                          <Skeleton height='20px' />
+                        </Td>
+                      </Tr>
+                    )}
                   </Tbody>
                 </Table>
               </CardBody>
@@ -689,7 +682,29 @@ const SBOMTable = ({
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {vulnerabilitiesData.length > 0 ? (
+                    {filteredVulItems.length > 0 ? (
+                      filteredVulItems.map((row, idx) => (
+                        <VulnerabilityRow
+                          refetch={refetch}
+                          key={idx}
+                          id={row.id}
+                          imgVersionId={imgVersionId}
+                          component={row.component.name}
+                          version={row.component.version}
+                          cvss={row.cvss.v3Score}
+                          cve={row.cveId}
+                          fixed_component={row.component.fixedInVersion}
+                          fixed_product={row.fixedInImage}
+                          description={row.component.name}
+                          status={row.vexVuln?.vexStatus}
+                          justify={row.vexVuln?.vexJustification}
+                          scanner={row.scanners}
+                          shared_data={row.component.name}
+                          versions={row.component.name}
+                          imageInfo={imageInfo}
+                        />
+                      ))
+                    ) : vulnerabilitiesData.length > 0 ? (
                       vulnerabilitiesData.map((row, idx) => (
                         <VulnerabilityRow
                           refetch={refetch}
@@ -708,10 +723,11 @@ const SBOMTable = ({
                           scanner={row.scanners}
                           shared_data={row.component.name}
                           versions={row.component.name}
+                          imageInfo={imageInfo}
                         />
                       ))
-                    ) : visibleData.length > 0 ? (
-                      visibleData.map((row, idx) => {
+                    ) : vulData.length > 0 ? (
+                      vulData.map((row, idx) => {
                         return (
                           <VulnerabilityRow
                             refetch={refetch}
@@ -730,6 +746,7 @@ const SBOMTable = ({
                             scanner={row.scanners}
                             shared_data={row.component.name}
                             versions={row.component.name}
+                            imageInfo={imageInfo}
                           />
                         )
                       })
@@ -767,7 +784,7 @@ const SBOMTable = ({
                   </Tbody>
                 </Table>
               </CardBody>
-              <Flex
+              {/* <Flex
                 flexDir={'row'}
                 gap={4}
                 alignItems={'center'}
@@ -789,302 +806,7 @@ const SBOMTable = ({
                   Next
                 </Button>
                 <chakra.span>Page - {currentPage}</chakra.span>
-              </Flex>
-            </TabPanel>
-            {/* component */}
-            <TabPanel>
-              <CardHeader mb={4} as={Flex}>
-                <Flex
-                  width={'100%'}
-                  gap={2}
-                  direction={'row'}
-                  alignItems={'center'}
-                  justifyContent={'space-between'}
-                >
-                  <Input
-                    placeholder='Search'
-                    width={'300px'}
-                    size='md'
-                    id='components'
-                    value={searchInput}
-                    onChange={handleSearch}
-                  />
-                  <Flex direction={'row'} gap={2}>
-                    <Tooltip label='Import'>
-                      <Button colorScheme='blue'>
-                        <BiImport />
-                      </Button>
-                    </Tooltip>
-                    <Tooltip label='Export'>
-                      <Button colorScheme='blue'>
-                        <BiExport />
-                      </Button>
-                    </Tooltip>
-                  </Flex>
-                </Flex>
-              </CardHeader>
-              <CardBody>
-                <Table variant='simple' color={textColor} size='sm'>
-                  <Thead>
-                    <Tr my='.8rem' pl='0px'>
-                      <Th
-                        ref={componentRef}
-                        color='gray.400'
-                        py={4}
-                        position='relative'
-                        onClick={() => handleSort('component')}
-                        cursor={'pointer'}
-                      >
-                        <Flex direction={'row'} alignItems={'center'} gap={2}>
-                          <Box>Component</Box>
-                          <Box>
-                            {sortField === 'component' &&
-                            sortOrder === 'asc' ? (
-                              <TriangleUpIcon />
-                            ) : (
-                              <TriangleDownIcon />
-                            )}
-                          </Box>
-                        </Flex>
-                      </Th>
-                      <Th
-                        color='gray.400'
-                        py={4}
-                        position='relative'
-                        onClick={() => handleSort('version')}
-                        cursor={'pointer'}
-                      >
-                        <Flex direction={'row'} alignItems={'center'} gap={2}>
-                          <Box>Version</Box>
-                          <Box>
-                            {sortField === 'version' && sortOrder === 'asc' ? (
-                              <TriangleUpIcon />
-                            ) : (
-                              <TriangleDownIcon />
-                            )}
-                          </Box>
-                        </Flex>
-                      </Th>
-                      <Th color='gray.400' py={4} position='relative'>
-                        Relates to
-                      </Th>
-                      <Th
-                        color='gray.400'
-                        py={4}
-                        position='relative'
-                        onClick={() => handleSort('license')}
-                        cursor={'pointer'}
-                      >
-                        <Flex direction={'row'} alignItems={'center'} gap={2}>
-                          <Box>License</Box>
-                          <Box>
-                            {sortField === 'license' && sortOrder === 'asc' ? (
-                              <TriangleUpIcon />
-                            ) : (
-                              <TriangleDownIcon />
-                            )}
-                          </Box>
-                        </Flex>
-                      </Th>
-                      <Th
-                        color='gray.400'
-                        py={4}
-                        position='relative'
-                        onClick={() => handleSort('risk_score')}
-                        cursor={'pointer'}
-                      >
-                        <Flex direction={'row'} alignItems={'center'} gap={2}>
-                          <Box>Risk Score</Box>
-                          <Box>
-                            {sortField === 'risk_score' &&
-                            sortOrder === 'asc' ? (
-                              <TriangleUpIcon />
-                            ) : (
-                              <TriangleDownIcon />
-                            )}
-                          </Box>
-                        </Flex>
-                      </Th>
-                      <Th color='gray.400' py={4} position='relative'>
-                        Vulnerabilities
-                      </Th>
-                      <Th
-                        color='gray.400'
-                        py={4}
-                        position='relative'
-                        cursor={'pointer'}
-                        onClick={() => handleSort('updated')}
-                      >
-                        <Flex direction={'row'} alignItems={'center'} gap={2}>
-                          <Box>Last Updated</Box>
-                          <Box>
-                            {sortField === 'updated' && sortOrder === 'asc' ? (
-                              <TriangleUpIcon />
-                            ) : (
-                              <TriangleDownIcon />
-                            )}
-                          </Box>
-                        </Flex>
-                      </Th>
-                      <Th color='gray.400' py={4} position='relative'></Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {sortComponentData.length > 0
-                      ? sortComponentData.map((row) => {
-                          return (
-                            <SBOMComponentRow
-                              key={row.component + row.version}
-                              component={row.component}
-                              logo={row.logo}
-                              version={row.version}
-                              dependsOn={row.dependsOn}
-                              license={row.license}
-                              risk_score={row.risk_score}
-                              critical={row.critical}
-                              high={row.high}
-                              medium={row.medium}
-                              low={row.low}
-                              updated={row.updated}
-                              redacted={row.redacted}
-                            />
-                          )
-                        })
-                      : filteredItems.length > 0
-                      ? filteredItems.map((row) => {
-                          return (
-                            <SBOMComponentRow
-                              key={row.component + row.version}
-                              component={row.component}
-                              logo={row.logo}
-                              version={row.version}
-                              dependsOn={row.dependsOn}
-                              license={row.license}
-                              risk_score={row.risk_score}
-                              critical={row.critical}
-                              high={row.high}
-                              medium={row.medium}
-                              low={row.low}
-                              updated={row.updated}
-                              redacted={row.redacted}
-                            />
-                          )
-                        })
-                      : data.map((row) => {
-                          return (
-                            <SBOMComponentRow
-                              key={row.component + row.version}
-                              component={row.component}
-                              logo={row.logo}
-                              version={row.version}
-                              dependsOn={row.dependsOn}
-                              license={row.license}
-                              risk_score={row.risk_score}
-                              critical={row.critical}
-                              high={row.high}
-                              medium={row.medium}
-                              low={row.low}
-                              updated={row.updated}
-                              redacted={row.redacted}
-                            />
-                          )
-                        })}
-                  </Tbody>
-                </Table>
-              </CardBody>
-            </TabPanel>
-            {/* risks */}
-            <TabPanel>
-              <CardHeader mb={4} as={Flex}>
-                <Input
-                  placeholder='Search'
-                  width={'300px'}
-                  size='md'
-                  id='risk'
-                  value={riskInput}
-                  onChange={(e) => setRiskInput(e.target.value)}
-                />
-              </CardHeader>
-              <CardBody>
-                <Table variant='simple' color={textColor} size='sm'>
-                  <Thead>
-                    <Tr my='.8rem' pl='0px'>
-                      {risk_captions.map((caption, idx) => {
-                        return (
-                          <Th
-                            color='gray.400'
-                            key={idx}
-                            ps={idx === 0 ? '0px' : null}
-                            cursor={'pointer'}
-                            onClick={() => handleRiskSort(caption)}
-                          >
-                            {caption !== '' && (
-                              <Flex
-                                direction={'row'}
-                                alignItems={'center'}
-                                gap={2}
-                              >
-                                <Box>{caption}</Box>
-                                <Box>
-                                  {sortField === `${caption}` &&
-                                  sortOrder === 'asc' ? (
-                                    <TriangleUpIcon />
-                                  ) : (
-                                    <TriangleDownIcon />
-                                  )}
-                                </Box>
-                              </Flex>
-                            )}
-                          </Th>
-                        )
-                      })}
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {sortRiskScoreData.length > 0
-                      ? sortRiskScoreData.map((row, idx) => {
-                          return (
-                            <RiskRow
-                              key={idx}
-                              component={row.component}
-                              version={row.version}
-                              description={row.description}
-                              type={row.type}
-                              recommendation={row.recommendation}
-                              score={row.score}
-                            />
-                          )
-                        })
-                      : filteredRiskItems.length > 0
-                      ? filteredRiskItems.map((row, idx) => {
-                          return (
-                            <RiskRow
-                              key={idx}
-                              component={row.component}
-                              version={row.version}
-                              description={row.description}
-                              type={row.type}
-                              recommendation={row.recommendation}
-                              score={row.score}
-                            />
-                          )
-                        })
-                      : defaultRiskScore.map((row, idx) => {
-                          return (
-                            <RiskRow
-                              key={idx}
-                              component={row.component}
-                              version={row.version}
-                              description={row.description}
-                              type={row.type}
-                              recommendation={row.recommendation}
-                              score={row.score}
-                            />
-                          )
-                        })}
-                  </Tbody>
-                </Table>
-              </CardBody>
+              </Flex> */}
             </TabPanel>
           </TabPanels>
         </Tabs>
@@ -1095,6 +817,8 @@ const SBOMTable = ({
         btnRef={btnRef}
         uniqProjects={uniqProjects}
         uniqVersions={uniqVersions}
+        imgVersionId={imgVersionId}
+        imageDataRefetch={imageDataRefetch}
       />
     </>
   )

@@ -133,7 +133,7 @@ export default function Customer(props) {
             <PanelContainer>
               <Switch>
                 {getRoutes(customerRoutes)}
-                <Redirect from='/customer' to='/customer/sboms/' />
+                <Redirect from='/customer' to='/customer/sboms' />
               </Switch>
             </PanelContainer>
           </PanelContent>
