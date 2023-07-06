@@ -5,7 +5,6 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
   Flex,
-  Link,
   useColorModeValue
 } from '@chakra-ui/react'
 import PropTypes from 'prop-types'
@@ -15,7 +14,7 @@ import { useContext } from 'react'
 import GlobalContext from 'context/GlobalContext'
 
 export default function AdminNavbar(props) {
-  const { minimize, imageDetails } = useContext(GlobalContext)
+  const { minimize } = useContext(GlobalContext)
   const [scrolled, setScrolled] = useState(false)
   const {
     variant,
@@ -26,6 +25,8 @@ export default function AdminNavbar(props) {
     onOpen,
     ...rest
   } = props
+
+  const imageName = window.localStorage.getItem('Image')
 
   // Here are all the props that may change depending on navbar's type or state.(secondary, variant, scrolled)
   let mainText = useColorModeValue('gray.700', 'gray.200')
@@ -134,10 +135,10 @@ export default function AdminNavbar(props) {
               </BreadcrumbLink>
             </BreadcrumbItem>
 
-            {imageDetails && brandText === 'SBOM' ? (
+            {imageName !== '' && brandText === 'SBOM' ? (
               <BreadcrumbItem color={mainText}>
                 <BreadcrumbLink href='#' color={mainText}>
-                  {imageDetails.name}
+                  {imageName}
                 </BreadcrumbLink>
               </BreadcrumbItem>
             ) : (

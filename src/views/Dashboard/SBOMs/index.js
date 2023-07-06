@@ -1,38 +1,17 @@
 // Chakra imports
 import {
   Flex,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
   Heading,
   Spacer,
   Icon,
-  Modal,
-  ModalBody,
-  FormLabel,
-  ModalFooter,
-  Button,
-  Radio,
-  RadioGroup,
-  Stack,
   Grid,
   GridItem,
   Text,
-  IconButton,
-  useDisclosure,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuOptionGroup,
-  MenuItemOption,
   Box,
   Select,
-  Checkbox,
   chakra,
   Image,
-  Skeleton,
-  TagLeftIcon
+  Skeleton
 } from '@chakra-ui/react'
 import React, { useContext, useEffect, useState } from 'react'
 import Card from 'components/Card/Card.js'
@@ -41,27 +20,16 @@ import SBOMTable from './components/SBOMTable'
 import SBOMStatistics from './components/SBOMStatistics'
 
 import { sbom } from 'variables/general'
-import { ChevronDownIcon, AddIcon } from '@chakra-ui/icons'
-import {
-  FaCubes,
-  FaBug,
-  FaUnlock,
-  FaFileDownload,
-  FaTag,
-  FaMicroscope
-} from 'react-icons/fa'
+import { FaCubes, FaBug, FaUnlock, FaTag, FaMicroscope } from 'react-icons/fa'
 import { useLocation } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
-import SBOMDrawer from 'components/Drawer/SBOMDrawer'
 import Tooltip from 'components/Tooltip'
 import { useQuery } from '@apollo/client'
-
 import { scanImage } from 'utils'
 import { getImageVersion, getImage } from 'graphQL/Queries'
 
 function SBOMs() {
-  const [scanResults, setScanResults] = useState([])
-
+  const [scanResults, setScanResults] = useState(null)
   const columns = [
     {
       Header: 'CVE',
@@ -224,51 +192,24 @@ function SBOMs() {
     { id: 4, name: 'Trivy' }
   ])
 
-  const [sharedWith] = useState([
-    { id: 0, name: 'All' },
-    { id: 1, name: 'IBM' },
-    { id: 2, name: 'Oracle' },
-    { id: 3, name: 'Redhat' },
-    { id: 4, name: 'Uber' }
-  ])
-
-  const sbomqsVersions = ['v0.0.3', 'v0.0.2', 'v0.0.1']
-  const sbomasmVersion = ['v1.2', 'v1.1', 'v1.0']
-  const sbomgrVersion = ['v0.3', 'v0.2', 'v0.1']
-
   const {
     productVersionsData,
     setTabIndex,
     vulnerabilitiesData,
     componentsVal,
-    setComponentsVal,
     VulnerabilitiesVal,
-    setVulnerabilitiesVal,
     activeVulnVal,
-    setActiveVulnVal,
-    riskScoreVal,
-    setRiskScoreVal,
-    imageDetails,
-    setImageDetails
+    riskScoreVal
   } = useContext(GlobalContext)
-
-  // useEffect(() => {
-  //   if (vulnData) {
-  //     console.log('vulnData', vulnData.images[0].scanResults)
-  //   }
-  // }, [])
-
-  const {
-    isOpen: isSBMOpen,
-    onOpen: setSBMOpen,
-    onClose: setSBMClose
-  } = useDisclosure()
 
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const versionId = queryParams.get('v')
   const imageId = queryParams.get('id')
-  const { isOpen, onOpen, onClose } = useDisclosure()
+
+
+  const [selectedVersion, setSelectedVersion] = useState('')
+  const [selectedScanner, setSelectedScanner] = useState('')
 
   const { data: imageData } = useQuery(getImage, {
     variables: { id: imageId }
@@ -276,42 +217,40 @@ function SBOMs() {
 
   const { data: imageVersionData, refetch } = useQuery(getImageVersion, {
     variables: {
-      id: versionId,
-      imageId: imageId
-    },
-    onCompleted: refetch
+      id: versionId
+    }
   })
 
   useEffect(() => {
     if (imageVersionData) {
-      // console.log('imageVersionData', imageVersionData)
-      setScanResults(imageVersionData.imageVersion.imageVulns)
+      console.log('imageVersionData', imageVersionData)
+      setScanResults(imageVersionData.imageVersion)
+      window.localStorage.setItem(
+        'Image',
+        imageVersionData.imageVersion.image.name
+      )
     }
   }, [imageVersionData])
 
-  useEffect(() => {
-    if (imageData) {
-      // console.log('imageData', imageData.image)
-      setImageDetails(imageData.image)
-    }
-  }, [imageData])
-
-  const cloudVersion = window.localStorage.getItem('version')
-  const cloudScanner = window.localStorage.getItem('scanner')
-
-  const [selectedVersion, setSelectedVersion] = useState('')
-  const [selectedScanner, setSelectedScanner] = useState('')
+  const [imageInfo, setImageInfo] = useState([])
 
   useEffect(() => {
     if (imageData) {
+      console.log('imageData', imageData.image)
+      setImageInfo(imageData.image.imageVersions)
       setSelectedVersion(
         imageData.image.imageVersions[imageData.image.imageVersions.length - 1]
+          .id
       )
     }
   }, [imageData])
 
-  const initialRef = React.useRef(null)
-  const finalRef = React.useRef(null)
+  const handleVersionUpdate = (e) => {
+    const { value } = e.target
+    setSelectedVersion(value)
+    console.log('value', value)
+    refetch({ id: value })
+  }
 
   const exportData = () => {
     const fileData = JSON.stringify(jsonData)
@@ -341,45 +280,6 @@ function SBOMs() {
   })
 
   const sortSBOM = sbom.sort((a, b) => a.component.localeCompare(b.component))
-
-  const handleVersionUpdate = (e) => {
-    const { value } = e.target
-    setSelectedVersion(value)
-    window.localStorage.setItem('version', value)
-    // window.location.reload()
-
-    if (value === 'v0.1') {
-      setComponentsVal(131)
-    } else if (value === 'v0.2') {
-      setComponentsVal(142)
-    } else if (value === 'v0.3') {
-      setComponentsVal(126)
-    }
-
-    if (value === 'v0.1') {
-      setVulnerabilitiesVal('2C, 10H, 5M, 4L')
-    } else if (value === 'v0.2') {
-      setVulnerabilitiesVal('2C, 9H, 6M, 4L')
-    } else if (value === 'v0.3') {
-      setVulnerabilitiesVal('2C, 9H, 5M, 4L')
-    }
-
-    if (value === 'v0.1') {
-      setActiveVulnVal('2C, 3H, 3M, 4L')
-    } else if (value === 'v0.2') {
-      setActiveVulnVal('1C, 3H, 3M, 4L')
-    } else if (value === 'v0.3') {
-      setActiveVulnVal('1C, 1H, 3M, 4L')
-    }
-
-    if (value === 'v0.1') {
-      setRiskScoreVal(26)
-    } else if (value === 'v0.2') {
-      setRiskScoreVal(25)
-    } else if (value === 'v0.3') {
-      setRiskScoreVal(22)
-    }
-  }
 
   const [selectedScannerItem, setSelectedScannerItem] = useState([])
   const [filteredVulItems, setFilteredVulItems] = useState([])
@@ -424,17 +324,17 @@ function SBOMs() {
     // console.log('filter', filterObjectsByScanner(selectedScanner))
   }, [selectedScannerItem])
 
-  useEffect(() => {
-    // console.log(cloudVersion)
-    // console.log(cloudScanner)
-    cloudVersion !== null
-      ? setSelectedVersion(`${cloudVersion}`)
-      : setSelectedVersion('v0.0.3')
+  // useEffect(() => {
+  //   console.log(cloudVersion)
+  //   console.log(cloudScanner)
+  //   cloudVersion !== null
+  //     ? setSelectedVersion(`${cloudVersion}`)
+  //     : setSelectedVersion('v0.0.3')
 
-    cloudScanner !== null
-      ? setSelectedScanner(cloudScanner)
-      : setSelectedScanner('All')
-  }, [cloudVersion, cloudScanner])
+  //   cloudScanner !== null
+  //     ? setSelectedScanner(cloudScanner)
+  //     : setSelectedScanner('All')
+  // }, [cloudVersion, cloudScanner])
 
   useEffect(() => {
     setTabIndex(1)
@@ -456,25 +356,21 @@ function SBOMs() {
                 <Icon as={FaCubes} h={'64px'} w={'64px'} color='blue.300' />
                 <Box>
                   <Heading as='h3' size='md' noOfLines={1} color='gray.600'>
-                    {imageDetails
-                      ? `${imageDetails.name}:${
-                          imageDetails.imageVersions[
-                            imageDetails.imageVersions.length - 1
-                          ].name
-                        }`
+                    {scanResults
+                      ? `${scanResults.image.name}:${scanResults.name}`
                       : 'Loading....'}
                   </Heading>
                   <Text fontSize='sm'>linux/amd64</Text>
                   <Text fontSize='sm' mb={2}>
                     Last Pushed:{' '}
-                    {imageDetails
-                      ? new Date(imageDetails.updatedAt)
+                    {scanResults
+                      ? new Date(scanResults.updatedAt)
                           .toISOString()
                           .slice(0, 10)
                       : 'Loading..'}
                   </Text>
-                  {imageDetails ? (
-                    imageDetails.imageScanners.map((result, index) => (
+                  {scanResults ? (
+                    scanResults.imageScanners.map((result, index) => (
                       <Flex
                         key={index}
                         flexDirection={'row'}
@@ -510,15 +406,14 @@ function SBOMs() {
                   <FaTag size={18} color='darkgray' />
                   <Select
                     id='version'
-                    value={selectedVersion.name}
+                    value={selectedVersion}
                     onChange={handleVersionUpdate}
                     size='md'
                     width={'150px'}
                     color='gray.500'
                   >
-                    {imageDetails &&
-                      imageDetails.imageVersions &&
-                      imageDetails.imageVersions.map((img, index) => (
+                    {imageInfo.length > 0 &&
+                      imageInfo.map((img, index) => (
                         <option key={index} value={img.id}>
                           {img.name}
                         </option>
@@ -702,9 +597,12 @@ function SBOMs() {
           'last_updated',
           ''
         ]}
-        vulData={scanResults}
+        refetch={refetch}
+        imgVersionId={imageVersionData ? imageVersionData.imageVersion.id : ''}
+        vulData={
+          imageVersionData ? imageVersionData.imageVersion.imageVulns : []
+        }
         data={sortSBOM}
-        columns={columns}
         filteredVul={filteredVulItems}
         setFilteredVulItems={setFilteredVulItems}
       />

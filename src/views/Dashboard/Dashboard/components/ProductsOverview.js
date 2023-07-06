@@ -9,7 +9,8 @@ import {
   Td,
   Image,
   Text,
-  Heading
+  Heading,
+  Skeleton
 } from '@chakra-ui/react'
 // Custom components
 import Card from 'components/Card/Card'
@@ -60,7 +61,7 @@ const ProductsOverview = ({ title, amount, captions, data }) => {
                 </Tr>
               </Thead>
               <Tbody>
-                {allImages &&
+                {allImages ? (
                   allImages.images.map((item) => (
                     <Tr key={item.id}>
                       <Td fontSize={'sm'} pl={1}>
@@ -118,7 +119,26 @@ const ProductsOverview = ({ title, amount, captions, data }) => {
                         </Flex>
                       </Td>
                     </Tr>
-                  ))}
+                  ))
+                ) : (
+                  <Tr>
+                    <Td fontSize={'sm'} pl={1}>
+                      <Skeleton height='20px' />
+                    </Td>
+                    <Td fontSize={'sm'} pl={1}>
+                      <Skeleton height='20px' />
+                    </Td>
+                    <Td fontSize={'sm'} pl={1}>
+                      <Skeleton height='20px' />
+                    </Td>
+                    <Td fontSize={'sm'} pl={1}>
+                      <Skeleton height='20px' />
+                    </Td>
+                    <Td fontSize={'sm'} pl={1}>
+                      <Skeleton height='20px' />
+                    </Td>
+                  </Tr>
+                )}
               </Tbody>
             </Table>
           </CardBody>

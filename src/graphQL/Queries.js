@@ -67,55 +67,44 @@ export const getImage = gql`
       id
       name
       updatedAt
-      imageScanners {
+      imageVersions {
         id
         name
-        company
-      }
-      imageVersions {
-        name
-        imageVulns {
-          cveId
-          cvss {
-            v2Score
-            v3Score
-          }
-          component {
-            fixedInVersion
-            name
-            version
-          }
-          scanners {
-            name
-          }
-          severity
-        }
       }
     }
   }
 `
 
 export const getImageVersion = gql`
-  query getImageVersion($id: ID!, $imageID: ID) {
+  query getImageVersion($id: ID!) {
     imageVersion(id: $id) {
       id
       image {
+        id
         name
       }
       imageScanners {
         id
         name
       }
-      imageShaId
       name
-      sizeInBytes
       updatedAt
-      imageVulns(imageVersionId: $id, imageId: $imageID) {
+      imageVulns(imageVersionId: $id) {
         cveId
         component {
           fixedInVersion
           name
           version
+        }
+        vexVuln {
+          vexStatus {
+            id
+            name
+          }
+          vexJustification {
+            id
+            name
+          }
         }
         cvss {
           v2Score
@@ -150,6 +139,54 @@ export const getVulnerabilities = gql`
           name
         }
       }
+    }
+  }
+`
+
+export const getVexLogs = gql`
+  query getVexLogs(
+    $imageVersionId: ID!
+    $cveId: String!
+    $compName: String!
+    $version: String!
+  ) {
+    vexLogs(
+      imageVersionId: $imageVersionId
+      cveId: $cveId
+      compName: $compName
+      version: $version
+    ) {
+      id
+      note
+      vexJustification {
+        name
+      }
+      vexStatus {
+        name
+      }
+      user {
+        name
+        email
+      }
+      updatedAt
+    }
+  }
+`
+
+export const getVexStatuses = gql`
+  query getVexStatuses {
+    vexStatuses {
+      id
+      name
+    }
+  }
+`
+
+export const getVexJustifications = gql`
+  query getVexJustifications {
+    vexJustifications {
+      id
+      name
     }
   }
 `

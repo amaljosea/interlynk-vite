@@ -26,7 +26,9 @@ import {
   Tooltip,
   MenuDivider,
   useDisclosure,
-  chakra
+  chakra,
+  Skeleton,
+  Td
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card.js'
@@ -59,8 +61,9 @@ const SBOMTable = ({
   data,
   filteredVul,
   setFilteredVulItems,
-  columns,
-  vulData
+  vulData,
+  imgVersionId,
+  refetch
 }) => {
   const {
     SBOMLinksData,
@@ -78,26 +81,7 @@ const SBOMTable = ({
   const [riskInput, setRiskInput] = useState('')
   const [selectVersion, setSelectVersion] = useState('')
   const [selectStatus, setSelectStatus] = useState('')
-  const [severity] = useState([
-    { id: 1, name: 'Critical' },
-    { id: 2, name: 'High' },
-    { id: 3, name: 'Medium' },
-    { id: 4, name: 'Low' }
-  ])
-  const [scanner] = useState([
-    { id: 1, name: 'Grype' },
-    { id: 2, name: 'Scout' },
-    { id: 3, name: 'Snyk' },
-    { id: 4, name: 'Trivy' },
-    { id: 5, name: 'Custom' }
-  ])
-  const [status] = useState([
-    'Affected',
-    'False Positive',
-    'Fixed',
-    'In Triage',
-    'Not Affected'
-  ])
+
   const [selectedOptions, setSelectedOptions] = useState([])
   const [selectedScanner, setSelectedScanner] = useState([])
   const [selectedStatus, setSelectedStatus] = useState([])
@@ -408,7 +392,7 @@ const SBOMTable = ({
   const vulnData = [...vulData]
   const visibleData = vulnData.slice(startIndex, endIndex)
 
-  const totalPages = Math.ceil(data.length / pageSize)
+  const totalPages = Math.ceil(vulnData.length / pageSize)
 
   const handlePreviousPage = () => {
     if (currentPage > 1) {
@@ -681,7 +665,7 @@ const SBOMTable = ({
                         </Flex>
                       </Th>
                       <Th color='gray.400' py={4} position='relative'>
-                        Scanner
+                        <Box>Scanner</Box>
                       </Th>
                       <Th
                         color='gray.400'
@@ -705,11 +689,35 @@ const SBOMTable = ({
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {vulnerabilitiesData.length > 0
-                      ? vulnerabilitiesData.map((row, idx) => (
+                    {vulnerabilitiesData.length > 0 ? (
+                      vulnerabilitiesData.map((row, idx) => (
+                        <VulnerabilityRow
+                          refetch={refetch}
+                          key={idx}
+                          id={row.id}
+                          imgVersionId={imgVersionId}
+                          component={row.component.name}
+                          version={row.component.version}
+                          cvss={row.cvss.v3Score}
+                          cve={row.cveId}
+                          fixed_component={row.component.fixedInVersion}
+                          fixed_product={row.fixedInImage}
+                          description={row.component.name}
+                          status={row.vexVuln?.vexStatus}
+                          justify={row.vexVuln?.vexJustification}
+                          scanner={row.scanners}
+                          shared_data={row.component.name}
+                          versions={row.component.name}
+                        />
+                      ))
+                    ) : visibleData.length > 0 ? (
+                      visibleData.map((row, idx) => {
+                        return (
                           <VulnerabilityRow
+                            refetch={refetch}
                             key={idx}
                             id={row.id}
+                            imgVersionId={imgVersionId}
                             component={row.component.name}
                             version={row.component.version}
                             cvss={row.cvss.v3Score}
@@ -717,32 +725,45 @@ const SBOMTable = ({
                             fixed_component={row.component.fixedInVersion}
                             fixed_product={row.fixedInImage}
                             description={row.component.name}
-                            status={row.component.name}
+                            status={row.vexVuln?.vexStatus}
+                            justify={row.vexVuln?.vexJustification}
                             scanner={row.scanners}
                             shared_data={row.component.name}
                             versions={row.component.name}
                           />
-                        ))
-                      : visibleData.length > 0 &&
-                        visibleData.map((row, idx) => {
-                          return (
-                            <VulnerabilityRow
-                              key={idx}
-                              id={row.id}
-                              component={row.component.name}
-                              version={row.component.version}
-                              cvss={row.cvss.v3Score}
-                              cve={row.cveId}
-                              fixed_component={row.component.fixedInVersion}
-                              fixed_product={row.fixedInImage}
-                              description={row.component.name}
-                              status={row.component.name}
-                              scanner={row.scanners}
-                              shared_data={row.component.name}
-                              versions={row.component.name}
-                            />
-                          )
-                        })}
+                        )
+                      })
+                    ) : (
+                      <Tr>
+                        <Td fontSize={'sm'} pl={1}>
+                          <Skeleton height='20px' />
+                        </Td>
+                        <Td fontSize={'sm'} pl={1}>
+                          <Skeleton height='20px' />
+                        </Td>
+                        <Td fontSize={'sm'} pl={1}>
+                          <Skeleton height='20px' />
+                        </Td>
+                        <Td fontSize={'sm'} pl={1}>
+                          <Skeleton height='20px' />
+                        </Td>
+                        <Td fontSize={'sm'} pl={1}>
+                          <Skeleton height='20px' />
+                        </Td>
+                        <Td fontSize={'sm'} pl={1}>
+                          <Skeleton height='20px' />
+                        </Td>
+                        <Td fontSize={'sm'} pl={1}>
+                          <Skeleton height='20px' />
+                        </Td>
+                        <Td fontSize={'sm'} pl={1}>
+                          <Skeleton height='20px' />
+                        </Td>
+                        <Td fontSize={'sm'} pl={1}>
+                          <Skeleton height='20px' />
+                        </Td>
+                      </Tr>
+                    )}
                   </Tbody>
                 </Table>
               </CardBody>

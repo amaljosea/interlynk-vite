@@ -1,33 +1,28 @@
 // Chakra imports
 import { ChakraProvider, Portal, useDisclosure } from '@chakra-ui/react'
-import Configurator from 'components/Configurator/Configurator'
 import Footer from 'components/Footer/Footer.js'
 // Layout components
 import AdminNavbar from 'components/Navbars/AdminNavbar.js'
 import Sidebar from 'components/Sidebar'
 import React, { useContext, useState } from 'react'
 import { Redirect, Route, Switch } from 'react-router-dom'
-import routes from 'routes.js'
 import '@fontsource/roboto/400.css'
 import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
 // Custom Chakra theme
 import theme from 'theme/theme.js'
-import FixedPlugin from '../components/FixedPlugin/FixedPlugin'
 // Custom components
 import MainPanel from '../components/Layout/MainPanel'
 import PanelContainer from '../components/Layout/PanelContainer'
 import PanelContent from '../components/Layout/PanelContent'
 
-import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
 import customerRoutes from 'customerRoutes'
 
 export default function Customer(props) {
   const { ...rest } = props
-  const location = useLocation()
-  const { setCustomerView, customerView, minimize } = useContext(GlobalContext)
+  const { minimize } = useContext(GlobalContext)
   // states and functions
   const [sidebarVariant, setSidebarVariant] = useState('transparent')
   const [fixed, setFixed] = useState(false)

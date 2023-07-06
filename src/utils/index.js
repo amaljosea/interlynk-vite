@@ -4,30 +4,29 @@ import azure from 'assets/img/azure.png'
 import github from 'assets/img/github.png'
 import gitlab from 'assets/img/gitlab.png'
 
-
 import grype from 'assets/img/grype.png'
 import trivy from 'assets/img/trivy.png'
 import scout from 'assets/img/scout.png'
 import snyk from 'assets/img/snyk.png'
 import custom from 'assets/img/custom.png'
 
+import { LetterCIcon } from 'components/Icons/Icons'
+import { LetterHIcon } from 'components/Icons/Icons'
+import { LetterMIcon } from 'components/Icons/Icons'
+import { LetterLIcon } from 'components/Icons/Icons'
+
 export const getConImg = (name) => {
   switch (name) {
     case 'Docker Hub':
       return docker
-      break
     case 'Amazon ECR':
       return amazon
-      break
     case 'Azure Container Registry':
       return azure
-      break
     case 'Github (ghcr.io)':
       return github
-      break
     case 'Gitlab':
       return gitlab
-      break
     default:
       break
   }
@@ -37,18 +36,51 @@ export const scanImage = (name) => {
   switch (name) {
     case 'Grype':
       return grype
-      break
     case 'Trivy':
       return trivy
-      break
     case 'Scout':
       return scout
-      break
     case 'Snyk':
       return snyk
-      break
     case 'Custom':
       return custom
-      break
+  }
+}
+
+export const sevIcon = (version) => {
+  if (version >= 9.0) {
+    return LetterCIcon
+  } else if (version >= 7.0) {
+    return LetterHIcon
+  } else if (version >= 6.0) {
+    return LetterMIcon
+  } else {
+    return LetterLIcon
+  }
+}
+
+export const sevColor = (verion) => {
+  if (verion >= 9.0) {
+    return 'red'
+  } else if (verion >= 7.0) {
+    return 'orange'
+  } else if (verion >= 6.0) {
+    return 'yellow'
+  } else {
+    return 'green'
+  }
+}
+
+export const statusColor = (status) => {
+  if (status && status.name === 'Fixed') {
+    return 'blue'
+  } else if (status && status.name === 'Not Affected') {
+    return 'green'
+  } else if (status && status.name == 'Affected') {
+    return 'red'
+  } else if (status && status.name === 'False Positive') {
+    return 'gray'
+  } else {
+    return 'cyan'
   }
 }

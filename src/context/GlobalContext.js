@@ -39,7 +39,7 @@ const GlobalContext = React.createContext({
   setAuthUser: () => {},
   token: '',
   setToken: '',
-  imageDetails: null,
+  imageDetails: '',
   setImageDetails: () => {}
 })
 

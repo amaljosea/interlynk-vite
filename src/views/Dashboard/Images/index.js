@@ -66,7 +66,7 @@ const Index = () => {
 
   useEffect(() => {
     if (path === '/admin/images') {
-      setImageDetails(null)
+      setImageDetails('')
       setVulnerabilitiesData([])
     }
   }, [path])
@@ -272,7 +272,7 @@ const Index = () => {
                 </Thead>
 
                 <Tbody>
-                  {allImages &&
+                  {allImages ? (
                     allImages.images.length > 0 &&
                     allImages.images.map((item) => (
                       <Tr key={item.id}>
@@ -403,7 +403,29 @@ const Index = () => {
                           )}
                         </Td>
                       </Tr>
-                    ))}
+                    ))
+                  ) : (
+                    <Tr>
+                      <Td fontSize={'sm'} pl={1}>
+                        <Skeleton height='20px' />
+                      </Td>
+                      <Td fontSize={'sm'} pl={1}>
+                        <Skeleton height='20px' />
+                      </Td>
+                      <Td fontSize={'sm'} pl={1}>
+                        <Skeleton height='20px' />
+                      </Td>
+                      <Td fontSize={'sm'} pl={1}>
+                        <Skeleton height='20px' />
+                      </Td>
+                      <Td fontSize={'sm'} pl={1}>
+                        <Skeleton height='20px' />
+                      </Td>
+                      <Td fontSize={'sm'} pl={1}>
+                        <Skeleton height='20px' />
+                      </Td>
+                    </Tr>
+                  )}
                 </Tbody>
               </Table>
             </CardBody>

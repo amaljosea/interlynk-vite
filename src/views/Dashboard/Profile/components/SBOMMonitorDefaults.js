@@ -28,13 +28,13 @@ const SBOMMonitorDefaults = () => {
             </Text>
           </Flex>
           <Flex align='center' mb='20px'>
-            <Switch colorScheme='blue' me='10px' checked='true' id='lic_conflict'/>
+            <Switch colorScheme='blue' me='10px' isChecked id='lic_conflict'/>
             <Text noOfLines={1} fontSize='md' color='gray.500' fontWeight='400' htmlFor='lic_conflict'>
               License Conflict Detection
             </Text>
           </Flex>
           <Flex align='center' mb='20px'>
-            <Switch colorScheme='blue' me='10px' isChecked='true' id='isApprovedLicenses'/>
+            <Switch colorScheme='blue' me='10px' isChecked id='isApprovedLicenses'/>
             <Text noOfLines={1} fontSize='md' color='gray.500' fontWeight='400' htmlFor='isApprovedLicenses'>
               Approved License List
             </Text>

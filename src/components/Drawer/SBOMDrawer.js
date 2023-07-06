@@ -9,7 +9,6 @@ import {
   filter
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
-import { CopyIcon } from '@chakra-ui/icons'
 import {
   Drawer,
   DrawerBody,
@@ -35,9 +34,11 @@ import { v4 as uuidv4 } from 'uuid'
 import { useEffect } from 'react'
 
 function SBOMDrawer(props) {
-  const { setSBOMLinksData, productVersionsData, imageDetails } = useContext(
+  const { setSBOMLinksData, productVersionsData } = useContext(
     GlobalContext
   )
+
+  const imageName = window.localStorage.getItem('Image')
 
   const sbomqsVersions = ['v0.0.1', 'v0.0.2', 'v0.0.3']
   const sbomasmVersion = ['v1.0', 'v1.1', 'v1.2']
@@ -136,7 +137,7 @@ function SBOMDrawer(props) {
       placement='right'
       onClose={onClose}
       finalFocusRef={btnRef}
-      size='md'
+      size='sm'
     >
       <DrawerOverlay />
       <DrawerContent>
@@ -151,7 +152,7 @@ function SBOMDrawer(props) {
                 Image
               </FormLabel>
               <Input
-                defaultValue={imageDetails && imageDetails.name}
+                defaultValue={imageName ? imageName : ''}
                 readOnly
                 fontSize={'sm'}
                 mb={4}
