@@ -426,7 +426,7 @@ const SBOMTable = ({
                 <Flex
                   width={'100%'}
                   direction={'row'}
-                  justifyContent={'flex-start'}
+                  justifyContent={'flex-end'}
                   alignItems={'center'}
                 >
                   <Button
@@ -436,7 +436,7 @@ const SBOMTable = ({
                     leftIcon={<AddIcon />}
                     onClick={setSBMOpen}
                   >
-                    Share Link
+                    Share Lynk
                   </Button>
                 </Flex>
               </CardHeader>
