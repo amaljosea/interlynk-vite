@@ -12,6 +12,7 @@ import React, { useState } from 'react'
 import AdminNavbarLinks from './AdminNavbarLinks'
 import { useContext } from 'react'
 import GlobalContext from 'context/GlobalContext'
+import { Link, useLocation } from 'react-router-dom'
 
 export default function AdminNavbar(props) {
   const { minimize } = useContext(GlobalContext)
@@ -25,6 +26,11 @@ export default function AdminNavbar(props) {
     onOpen,
     ...rest
   } = props
+
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const versionId = queryParams.get('v')
+  const imageId = queryParams.get('id')
 
   const imageName = window.localStorage.getItem('Image')
 
@@ -124,18 +130,18 @@ export default function AdminNavbar(props) {
         <Box mb={{ sm: '8px', md: '0px' }}>
           <Breadcrumb>
             <BreadcrumbItem color={mainText}>
-              <BreadcrumbLink href='#' color={secondaryText}>
+              <Link to='#' color={secondaryText}>
                 Interlynk
-              </BreadcrumbLink>
+              </Link>
             </BreadcrumbItem>
 
             <BreadcrumbItem color={mainText}>
-              <BreadcrumbLink href='#' color={secondaryText}>
+              <Link to='/admin/images' color={secondaryText}>
                 {brandText === 'SBOM' ? 'Image' : brandText}
-              </BreadcrumbLink>
+              </Link>
             </BreadcrumbItem>
 
-            {imageName !== '' && brandText === 'SBOM' ? (
+            {imageName !== '' && versionId && brandText === 'Images' ? (
               <BreadcrumbItem color={mainText}>
                 <BreadcrumbLink href='#' color={mainText}>
                   {imageName}

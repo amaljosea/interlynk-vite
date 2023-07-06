@@ -39,34 +39,34 @@ var dashRoutes = [
   //   component: Products,
   //   layout: '/admin'
   // },
-  {
-    path: '/sboms',
-    name: 'SBOM',
-    icon: <FaCode color='inherit' />,
-    component: SBOMs,
-    layout: '/admin'
-  },
-  {
-    path: '/activities',
-    name: 'Activities',
-    icon: <FaRegChartBar color='inherit' />,
-    component: Activities,
-    layout: '/admin'
-  },
+  // {
+  //   path: '/sboms',
+  //   name: 'SBOM',
+  //   icon: <FaCode color='inherit' />,
+  //   component: SBOMs,
+  //   layout: '/admin'
+  // },
+  // {
+  //   path: '/activities',
+  //   name: 'Activities',
+  //   icon: <FaRegChartBar color='inherit' />,
+  //   component: Activities,
+  //   layout: '/admin'
+  // },
   {
     path: '/connections',
     name: 'Connections',
     icon: <FaPlug color='inherit' />,
     component: Connections,
     layout: '/admin'
-  },
-  {
-    path: '/profiles',
-    name: 'Settings',
-    icon: <FaRegSun color='inherit' />,
-    component: Profile,
-    layout: '/admin'
   }
+  // {
+  //   path: '/profiles',
+  //   name: 'Settings',
+  //   icon: <FaRegSun color='inherit' />,
+  //   component: Profile,
+  //   layout: '/admin'
+  // }
 ]
 
 export default dashRoutes

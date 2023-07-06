@@ -71,6 +71,21 @@ export const getImage = gql`
         id
         name
       }
+      shareLynks {
+        id
+        enabled
+        signedUrlParams
+        shareUsers {
+          email
+        }
+        shareScanners {
+          scanner {
+            id
+            name
+          }
+        }
+        updatedAt
+      }
     }
   }
 `
@@ -86,6 +101,7 @@ export const getImageVersion = gql`
       imageScanners {
         id
         name
+        updatedAt
       }
       name
       updatedAt

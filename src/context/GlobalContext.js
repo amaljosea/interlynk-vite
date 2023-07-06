@@ -39,8 +39,8 @@ const GlobalContext = React.createContext({
   setAuthUser: () => {},
   token: '',
   setToken: '',
-  imageDetails: '',
-  setImageDetails: () => {}
+  scannerItems: [],
+  SetScannerItems: () => {}
 })
 
 export default GlobalContext

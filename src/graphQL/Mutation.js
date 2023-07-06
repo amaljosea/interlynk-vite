@@ -210,3 +210,83 @@ export const VexVulnCreate = gql`
     }
   }
 `
+
+export const CreateShareLynk = gql`
+  mutation CreateShareLynk(
+    $imageVersionID: Uuid!
+    $enabled: Boolean
+    $emails: [String!]!
+    $scanners: [Uuid!]
+  ) {
+    shareLynkCreate(
+      input: {
+        imageVersionId: $imageVersionID
+        enabled: $enabled
+        shareUsers: $emails
+        shareScanners: $scanners
+      }
+    ) {
+      shareLynk {
+        id
+        imageId
+        imageVersionId
+        enabled
+        shareScanners {
+          scanner {
+            id
+            name
+          }
+        }
+        shareUsers {
+          email
+        }
+      }
+      errors
+    }
+  }
+`
+
+export const UpdateShareLynk = gql`
+  mutation UpdateShareLynk(
+    $shareLynkId: Uuid!
+    $enabled: Boolean
+    $emails: [String!]
+    $scanners: [Uuid!]
+  ) {
+    shareLynkUpdate(
+      input: {
+        shareLynkId: $shareLynkId
+        enabled: $enabled
+        shareUsers: $emails
+        shareScanners: $scanners
+      }
+    ) {
+      shareLynk {
+        id
+        imageId
+        imageVersionId
+        enabled
+        shareScanners {
+          scanner {
+            id
+            name
+          }
+        }
+        shareUsers {
+          email
+        }
+      }
+      errors
+    }
+  }
+`
+
+export const DeleteShareLynk = gql`
+  mutation DeleteShareLynk($id: ID!) {
+    shareLynkDelete(input: { id: $id }) {
+      shareLynk {
+        id
+      }
+    }
+  }
+`

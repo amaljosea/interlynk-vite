@@ -4,7 +4,7 @@ import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom'
 
 import './main.css'
 
-import SBOMLayout from './layouts/SBOM.js'
+// import SBOMLayout from './layouts/SBOM.js'
 import AuthLayout from './layouts/Auth.js'
 import AdminLayout from './layouts/Admin.js'
 import ContextWrapper from 'context/ContextWrapper.js'
@@ -16,7 +16,7 @@ ReactDOM.render(
     <BrowserRouter>
       <ScrollToTop />
       <Switch>
-        <Route path={`/sbom`} component={SBOMLayout} />
+        {/* <Route path={`/sbom`} component={SBOMLayout} /> */}
         <Route path={`/auth`} component={AuthLayout} />
         <Route path={`/admin`} component={AdminLayout} />
         <Route path={`/customer`} component={CustomerLayout} />

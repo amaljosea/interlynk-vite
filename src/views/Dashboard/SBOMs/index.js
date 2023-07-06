@@ -30,105 +30,7 @@ import { getImageVersion, getImage } from 'graphQL/Queries'
 
 function SBOMs() {
   const [scanResults, setScanResults] = useState(null)
-  const columns = [
-    {
-      Header: 'CVE',
-      Footer: 'CVE',
-      accessor: 'cveId',
-      Cell: (row) => (
-        <chakra.span fontSize={'sm'}>{row?.cell?.value}</chakra.span>
-      )
-    },
-    {
-      Header: 'SEVERITY',
-      Footer: 'SEVERITY',
-      accessor: 'severity',
-      Cell: (row) => (
-        <Flex>
-          {row?.cell?.value.map((item, index) => (
-            <chakra.span
-              fontSize={'sm'}
-              textTransform={'capitalize'}
-              key={index}
-            >
-              {item}
-            </chakra.span>
-          ))}
-        </Flex>
-      )
-    },
-    {
-      Header: 'CVSS',
-      Footer: 'CVSS',
-      accessor: ({ cvss }) => {
-        if (cvss.v3Score) {
-          return cvss.v3Score
-        } else {
-          return cvss.v2Score
-        }
-      },
-      Cell: (row) => (
-        <chakra.span fontSize={'sm'}>{row?.cell?.value}</chakra.span>
-      )
-    },
-    {
-      Header: 'COMPONENT',
-      Footer: 'COMPONENT',
-      accessor: 'component.name',
-      Cell: (row) => (
-        <chakra.span fontSize={'sm'}>{row?.cell?.value}</chakra.span>
-      )
-    },
-    {
-      Header: 'VERSION',
-      Footer: 'VERSION',
-      accessor: 'component.version',
-      Cell: (row) => (
-        <chakra.span fontSize={'sm'}>{row?.cell?.value}</chakra.span>
-      )
-    },
-    {
-      Header: 'FIXED (COMPONENT)',
-      Footer: 'FIXED (COMPONENT)',
-      accessor: 'component.fixedInVersion',
-      Cell: (row) => (
-        <Flex>
-          {row?.cell?.value?.length > 0 &&
-            row?.cell?.value?.map((item, index) => (
-              <chakra.span fontSize={'sm'} key={index}>
-                {item}
-              </chakra.span>
-            ))}
-        </Flex>
-      )
-    },
-    {
-      Header: 'FIXED (IMAGE)',
-      Footer: 'FIXED (IMAGE)',
-      accessor: 'fixedInImage',
-      Cell: (row) => (
-        <chakra.span fontSize={'sm'}>{row?.cell?.value}</chakra.span>
-      )
-    },
-    {
-      Header: 'SCANNER',
-      Footer: 'SCANNER',
-      accessor: 'scanners',
-      Cell: (row) => (
-        <chakra.span>
-          {row?.cell?.value.map((item, index) => (
-            <Image
-              src={scanImage(item.name)}
-              key={index}
-              height={8}
-              width={8}
-              objectFit={'contain'}
-            />
-          ))}
-        </chakra.span>
-      )
-    }
-  ]
+
 
   const [jsonData] = useState({
     id: 74,
@@ -207,28 +109,27 @@ function SBOMs() {
   const versionId = queryParams.get('v')
   const imageId = queryParams.get('id')
 
-
   const [selectedVersion, setSelectedVersion] = useState('')
   const [selectedScanner, setSelectedScanner] = useState('')
 
-  const { data: imageData } = useQuery(getImage, {
+  const { data: imageData, refetch: imageDataRefetch } = useQuery(getImage, {
     variables: { id: imageId }
   })
 
-  const { data: imageVersionData, refetch } = useQuery(getImageVersion, {
-    variables: {
-      id: versionId
+  const { data: imageVersionData, refetch, loading } = useQuery(
+    getImageVersion,
+    {
+      variables: {
+        id: versionId
+      },
+      notifyOnNetworkStatusChange: true
     }
-  })
+  )
 
   useEffect(() => {
     if (imageVersionData) {
-      console.log('imageVersionData', imageVersionData)
+      // console.log('imageVersionData', imageVersionData)
       setScanResults(imageVersionData.imageVersion)
-      window.localStorage.setItem(
-        'Image',
-        imageVersionData.imageVersion.image.name
-      )
     }
   }, [imageVersionData])
 
@@ -386,7 +287,26 @@ function SBOMs() {
                             alt={result}
                           />
                         </Tooltip>
-                        <Text fontSize={'xs'}>2023-07-01</Text>
+                        <Text fontSize={'xs'}>
+                          {new Date(result.updatedAt).toLocaleDateString(
+                            'en-US',
+                            {
+                              year: 'numeric',
+                              month: '2-digit',
+                              day: '2-digit',
+                              timeZone: 'America/Los_Angeles'
+                            }
+                          )}{' '}
+                          {new Date(result.updatedAt).toLocaleTimeString(
+                            'en-US',
+                            {
+                              hour: 'numeric',
+                              minute: '2-digit',
+                              hour12: true,
+                              timeZone: 'America/Los_Angeles'
+                            }
+                          )}
+                        </Text>
                       </Flex>
                     ))
                   ) : (
@@ -435,120 +355,8 @@ function SBOMs() {
                         {item.name}
                       </option>
                     ))}
-
-                    {/* {imageDetails &&
-                    imageDetails.imageScanners &&
-                    imageDetails.imageScanners.map((item) => (
-                      <option key={item.id} value={item.name}>
-                        {item.name}
-                      </option>
-                    ))} */}
                   </Select>
                 </Flex>
-                {/* <Menu>
-                  <MenuButton
-                    as={Button}
-                    rightIcon={<ChevronDownIcon />}
-                    px={4}
-                    py={2}
-                    me={2}
-                    width={'150px'}
-                    transition='all 0.2s'
-                    borderRadius='md'
-                    borderWidth='1px'
-                    fontSize='sm'
-                    fontWeight='none'
-                  >
-                    Shared with
-                  </MenuButton>
-                  <MenuList fontWeight='none' fontSize='sm'>
-                    <MenuOptionGroup>
-                      {sharedWith.map((item) => (
-                        <MenuItemOption
-                          key={item.id}
-                          value={item.name}
-                          onClick={() => filteredByCompany(item)}
-                        >
-                          {item.name}
-                        </MenuItemOption>
-                      ))}
-                    </MenuOptionGroup>
-                  </MenuList>
-                </Menu> */}
-                {/* <Button
-                  width={'120px'}
-                  colorScheme='blue'
-                  fontSize={'sm'}
-                  leftIcon={<AddIcon />}
-                  onClick={setSBMOpen}
-                >
-                  Share Link
-                </Button>
-                <SBOMDrawer
-                  isOpen={isSBMOpen}
-                  onClose={setSBMClose}
-                  btnRef={btnRef}
-                  uniqProjects={uniqProjects}
-                  uniqVersions={uniqVersions}
-                /> */}
-                {/* <IconButton
-                  aria-label='Download SBOM'
-                  icon={<FaFileDownload />}
-                  onClick={onOpen}
-                  colorScheme='blue'
-                /> */}
-                {/* <Modal
-                  initialFocusRef={initialRef}
-                  finalFocusRef={finalRef}
-                  isOpen={isOpen}
-                  onClose={onClose}
-                >
-                  <ModalOverlay />
-                  <ModalContent>
-                    <ModalHeader>SBOM Download</ModalHeader>
-                    <ModalCloseButton />
-                    <ModalBody pb={6}>
-                      <FormLabel align='center'>SBOM Specification</FormLabel>
-                      <Stack direction='column' gap='20px'>
-                        <RadioGroup defaultValue='1'>
-                          <Stack spacing={4} direction='row'>
-                            <Radio value='1'>CycloneDX</Radio>
-                            <Radio value='2'>SPDX</Radio>
-                          </Stack>
-                        </RadioGroup>
-                      </Stack>
-
-                      <FormLabel align='center' pt='30px'>
-                        File Format
-                      </FormLabel>
-                      <Stack direction='column' gap='20px'>
-                        <RadioGroup defaultValue='1'>
-                          <Stack spacing={4} direction='row'>
-                            <Radio value='1'>JSON</Radio>
-                            <Radio value='2'>XML</Radio>
-                          </Stack>
-                        </RadioGroup>
-
-                        <Stack direction='column' gap='5px'>
-                          <Checkbox defaultChecked>
-                            Include Vulnerabilities
-                          </Checkbox>
-                          <Checkbox defaultChecked>
-                            Include Vulnerability Status (VEX)
-                          </Checkbox>
-                        </Stack>
-                      </Stack>
-                    </ModalBody>
-
-                    <ModalFooter>
-                      <Button colorScheme='blue' mr={3} onClick={exportData}>
-                        Download
-                      </Button>
-
-                      <Button onClick={onClose}>Cancel</Button>
-                    </ModalFooter>
-                  </ModalContent>
-                </Modal> */}
               </Flex>
             </GridItem>
           </Grid>
@@ -602,6 +410,9 @@ function SBOMs() {
         vulData={
           imageVersionData ? imageVersionData.imageVersion.imageVulns : []
         }
+        shareLynks={imageData ? imageData.image.shareLynks : []}
+        imageDataRefetch={imageDataRefetch}
+        imageInfo={imageInfo}
         data={sortSBOM}
         filteredVul={filteredVulItems}
         setFilteredVulItems={setFilteredVulItems}

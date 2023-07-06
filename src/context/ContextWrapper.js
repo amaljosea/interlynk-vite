@@ -81,7 +81,7 @@ const ContextWrapper = (props) => {
   const [authUser, setAuthUser] = useState(null)
   const [token, setToken] = useState('')
 
-  const [imageDetails, setImageDetails] = useState('')
+  const [scannerItems, setScannerItems] = useState('')
 
   // useEffect(() => {
   //   const docker = window.localStorage.getItem('DockerHub')
@@ -133,8 +133,8 @@ const ContextWrapper = (props) => {
         setAuthUser,
         token,
         setToken,
-        imageDetails,
-        setImageDetails
+        scannerItems,
+        setScannerItems
       }}
     >
       {props.children}

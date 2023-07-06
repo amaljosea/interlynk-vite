@@ -1,13 +1,5 @@
 // Chakra imports
-import {
-  Flex,
-  Button,
-  Input,
-  Spacer,
-  Stack,
-  useConst,
-  filter
-} from '@chakra-ui/react'
+import { Flex, Button, Input, Spacer, Stack, useQuery } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import {
   Drawer,
@@ -19,7 +11,6 @@ import {
   DrawerCloseButton,
   Box,
   FormLabel,
-  InputGroup,
   Select,
   Checkbox,
   Divider,
@@ -28,38 +19,34 @@ import {
   TagLabel,
   TagCloseButton
 } from '@chakra-ui/react'
-import { useContext } from 'react'
-import GlobalContext from 'context/GlobalContext'
-import { v4 as uuidv4 } from 'uuid'
+import { useMutation } from '@apollo/client'
+import { CreateShareLynk } from 'graphQL/Mutation'
+import { UpdateShareLynk } from 'graphQL/Mutation'
+import { getAllScanners } from 'graphQL/Queries'
 import { useEffect } from 'react'
 
 function SBOMDrawer(props) {
-  const { setSBOMLinksData, productVersionsData } = useContext(
-    GlobalContext
-  )
+  const { id, isOpen, onClose, btnRef, imageDataRefetch, imgVersionId } = props
+
+  const { data: allScanners } = useQuery(getAllScanners, {
+    variables: {}
+  })
+
+  const [shareLynkCreate] = useMutation(CreateShareLynk, {
+    onCompleted: imageDataRefetch
+  })
 
   const imageName = window.localStorage.getItem('Image')
 
   const sbomqsVersions = ['v0.0.1', 'v0.0.2', 'v0.0.3']
-  const sbomasmVersion = ['v1.0', 'v1.1', 'v1.2']
-  const sbomgrVersion = ['v0.1', 'v0.2', 'v0.3']
 
-  const { isOpen, onClose, btnRef, uniqProjects, uniqVersions } = props
-
-  const [product, setProduct] = useState('dashboard-app')
   const [version, setVersion] = useState('')
+  const [selectAll, setSelectAll] = useState(false)
+  const [selectedScanner, setSelectedScanner] = useState([])
   const [hasEmail, setHasEmail] = useState(true)
   const [hasTerms, setHasTerms] = useState(true)
-  const [hasRedactions, setHasRedactions] = useState(true)
   const [hasLimitAccess, setHasLimitAccess] = useState(true)
-  //  shared_with && shared_with.length > 0 ? true : false
-  // const [hasComponents, setHasComponents] = useState(true)
-  const [hasLicenses, setHasLicenses] = useState(true)
-  const [hasVul, setHasVul] = useState(false)
-  const [hasCyclonDx, setHasCyclonDx] = useState(true)
-  const [hasSpdx, setHasSpdx] = useState(true)
   const [isPublic, setIsPublic] = useState(false)
-  const [selectedVersion, setSelectedVersion] = useState([])
 
   const [email, setEmail] = useState('')
   const [emailList, setEmailList] = useState([])
@@ -71,59 +58,65 @@ function SBOMDrawer(props) {
     }
   }
 
-  const handleProductChange = (e) => {
-    setProduct(e.target.value)
+  const scannerItems = JSON.parse(window.localStorage.getItem('scanners'))
+
+  const handleScannerChange = (event) => {
+    const { name, checked } = event.target
+    if (name === 'selectAll') {
+      setSelectAll(checked)
+      const allData = scannerItems.map((item) => item.id)
+      if (checked) {
+        setSelectedScanner(allData)
+      } else {
+        setSelectedScanner([])
+      }
+    } else {
+      const filteredScanner = scannerItems.filter(
+        (scanner) => scanner.name === name
+      )
+      console.log('filter', filteredScanner)
+      if (checked) {
+        setSelectedScanner((prevTools) => [...prevTools, filteredScanner[0].id])
+      } else {
+        setSelectedScanner((prevTools) =>
+          prevTools.filter((tool) => tool !== filteredScanner[0].id)
+        )
+      }
+    }
   }
 
-  useEffect(() => {
-    const filterProduct = productVersionsData.filter(
-      (project) => project.name === product
-    )
+  // useEffect(() => {
+  //   console.log('selected scanner', selectedScanner)
+  // }, [selectedScanner])
 
-    // console.log('filterProduct', filterProduct)
+  // useEffect(() => {
+  //   console.log('selected emails', emailList)
+  // }, [emailList])
 
-    const uniqVersion = []
-    filterProduct.map((project) => {
-      project.versions.map((version) => {
-        uniqVersion.push(version.version)
-      })
-    })
-
-    // console.log('uniqVersion', uniqVersion)
-    setSelectedVersion(uniqVersion)
-  }, [product])
-
-  const handleSave = () => {
-    setSBOMLinksData((prev) => [
-      {
-        id: uuidv4(),
-        link: 'https://dashboard-app.fly.dev/#/admin/dashboard/sbom/z55E8gz3FN',
-        shared_with: emailList,
-        created: new Date().toISOString(),
-        visits: 0,
-        active: true,
-        project: product,
-        version: version,
-        conf_email: hasEmail,
-        conf_terms: hasTerms,
-        redactions: hasRedactions,
-        components: true,
-        licenses: hasLicenses,
-        vulnerabilities: hasVul,
-        cyclonedx: hasCyclonDx,
-        spdx: hasSpdx
-      },
-      ...prev
-    ])
-
-    setProduct('')
-    setVersion('')
-    setIsPublic(false)
-    setHasLimitAccess(true)
-    setHasVul(false)
-    setEmail('')
-    setEmailList([])
-    onClose()
+  const handleSave = async () => {
+    try {
+      await shareLynkCreate({
+        variables: {
+          imageVersionID: imgVersionId,
+          enabled: true,
+          emails: emailList,
+          scanners: selectedScanner
+        }
+      }).then(() => setEmailList([]))
+      onClose()
+    } catch (error) {
+      if (error.networkError && error.networkError.statusCode === 500) {
+        // Handle the specific error
+        alert(
+          'Duplicate connector is being created for Dockerhub with the same account ID.'
+        )
+        onClose()
+      } else {
+        // Handle other errors
+        alert(error.message)
+        onClose()
+      }
+    }
   }
 
   const handleRemove = (item) => {
@@ -157,21 +150,6 @@ function SBOMDrawer(props) {
                 fontSize={'sm'}
                 mb={4}
               />
-              {/* <Select
-                id='product'
-                value={product}
-                onChange={handleProductChange}
-                size='sm'
-                color='gray.500'
-              >
-                {uniqProjects
-                  .sort((a, b) => a.localeCompare(b))
-                  .map((p) => (
-                    <option key={p} value={p}>
-                      {p}
-                    </option>
-                  ))}
-              </Select> */}
               <FormLabel htmlFor='product' fontSize='sm' color='gray.600'>
                 Tags
               </FormLabel>
@@ -200,17 +178,57 @@ function SBOMDrawer(props) {
                   Scanners
                 </FormLabel>
                 <Flex direction={'row'} gap={4}>
-                  <Checkbox size='sm' colorScheme='blue' color='gray.500'>
+                  <Checkbox
+                    name='selectAll'
+                    isChecked={
+                      allScanners &&
+                      allScanners.some((tool) => tool.name !== 'All')
+                    }
+                    onChange={handleScannerChange}
+                    size='sm'
+                    colorScheme='blue'
+                    color='gray.500'
+                  >
+                    All
+                  </Checkbox>
+                  <Checkbox
+                    name='Grype'
+                    isChecked={
+                      allScanners &&
+                      allScanners.some((tool) => tool.name === 'Grype')
+                    }
+                    onChange={handleScannerChange}
+                    size='sm'
+                    colorScheme='blue'
+                    color='gray.500'
+                  >
                     Grype
                   </Checkbox>
-                  <Checkbox size='sm' colorScheme='blue' color='gray.500'>
+                  <Checkbox
+                    name='Trivy'
+                    isChecked={
+                      allScanners &&
+                      allScanners.some((tool) => tool.name === 'Trivy')
+                    }
+                    onChange={handleScannerChange}
+                    size='sm'
+                    colorScheme='blue'
+                    color='gray.500'
+                  >
                     Trivy
                   </Checkbox>
-                  <Checkbox size='sm' colorScheme='blue' color='gray.500'>
+                  <Checkbox
+                    name='Scout'
+                    isChecked={
+                      allScanners &&
+                      allScanners.some((tool) => tool.name === 'Scout')
+                    }
+                    onChange={handleScannerChange}
+                    size='sm'
+                    colorScheme='blue'
+                    color='gray.500'
+                  >
                     Scout
-                  </Checkbox>
-                  <Checkbox size='sm' colorScheme='blue' color='gray.500'>
-                    Snyk
                   </Checkbox>
                 </Flex>
               </Box>
@@ -247,29 +265,6 @@ function SBOMDrawer(props) {
                 >
                   Requires agreeing to terms
                 </Checkbox>
-                {/* <Checkbox
-                  isChecked={hasRedactions}
-                  onChange={(e) => setHasRedactions(e.target.checked)}
-                  px='10px'
-                  size='sm'
-                  colorScheme='blue'
-                  color='gray.500'
-                >
-                  Apply redactions
-                </Checkbox>
-                <Checkbox
-                  isChecked={isPublic}
-                  onChange={(e) => {
-                    setIsPublic(e.target.checked)
-                    setHasLimitAccess(false)
-                  }}
-                  px='10px'
-                  size='sm'
-                  colorScheme='blue'
-                  color='gray.500'
-                >
-                  Set as public
-                </Checkbox> */}
                 <Checkbox
                   isChecked={hasLimitAccess}
                   onChange={(e) => {
@@ -311,77 +306,6 @@ function SBOMDrawer(props) {
                 </Flex>
                 <Spacer />
               </Stack>
-              {/* <Text fontSize='sm' mt='30px'>
-                  SBOM Content
-                </Text>
-                <Text fontSize='xs' color='gray.500'>
-                  Select SBOM content that is required for this link
-                </Text>
-                <Checkbox
-                  defaultChecked
-                  readOnly
-                  // onChange={(e) => setHasComponents(e.target.checked)}
-                  px='10px'
-                  size='sm'
-                  colorScheme='blue'
-                  color='gray.500'
-                >
-                  Components
-                </Checkbox>
-                <Checkbox
-                  isChecked={hasLicenses}
-                  onChange={(e) => setHasLicenses(e.target.checked)}
-                  px='10px'
-                  size='sm'
-                  colorScheme='blue'
-                  color='gray.500'
-                >
-                  Licenses
-                </Checkbox>
-                <Checkbox
-                  isChecked={hasVul}
-                  onChange={(e) => setHasVul(e.target.checked)}
-                  px='10px'
-                  size='sm'
-                  colorScheme='blue'
-                  color='gray.500'
-                >
-                  Vulnerabilities
-                </Checkbox>
-              </Stack>
-              <Text fontSize='md' mt='20px'>
-                ADVANCED OPTIONS
-              </Text>
-              <Divider />
-              <Stack spacing='12px'>
-                <Text fontSize='sm' mt='20px'>
-                  SBOM Format
-                </Text>
-                <Text fontSize='xs' color='gray.500'>
-                  Select SBOM format supported by this link
-                </Text>
-                <Checkbox
-                  isChecked={hasCyclonDx}
-                  onChange={(e) => setHasCyclonDx(e.target.checked)}
-                  px='10px'
-                  mt='10px'
-                  size='sm'
-                  colorScheme='blue'
-                  color='gray.500'
-                >
-                  CycloneDX
-                </Checkbox>
-                <Checkbox
-                  isChecked={hasSpdx}
-                  onChange={(e) => setHasSpdx(e.target.checked)}
-                  px='10px'
-                  size='sm'
-                  colorScheme='blue'
-                  color='gray.500'
-                >
-                  SPDX
-                </Checkbox>
-              </Stack> */}
             </Box>
           </Stack>
         </DrawerBody>

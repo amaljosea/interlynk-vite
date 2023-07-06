@@ -28,19 +28,7 @@ import {
   useClipboard
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
-import {
-  LinkIcon,
-  DeleteIcon,
-  ExternalLinkIcon,
-  SearchIcon,
-  CopyIcon
-} from '@chakra-ui/icons'
-import {
-  LetterCIcon,
-  LetterHIcon,
-  LetterMIcon,
-  LetterLIcon
-} from 'components/Icons/Icons'
+
 import { productVersionsData } from 'variables/general'
 import SBOMLinkDrawer from 'components/Drawer/SBOMLinkDrawer.js'
 import {
@@ -52,6 +40,10 @@ import {
 } from 'react-icons/fa'
 import { useContext, useEffect } from 'react'
 import GlobalContext from 'context/GlobalContext'
+import SBOMDrawer from 'components/Drawer/SBOMDrawer'
+import { useMutation } from '@apollo/client'
+import { UpdateShareLynk } from 'graphQL/Mutation'
+import { DeleteShareLynk } from 'graphQL/Mutation'
 
 function SBOMLinkRow(props) {
   const {
@@ -64,17 +56,13 @@ function SBOMLinkRow(props) {
   } = useContext(GlobalContext)
   const {
     id,
-    link,
-    visits,
-    active,
-    created,
-    components,
-    licenses,
-    vulnerabilities,
-    shared_with,
-    redactions,
-    cyclonedx,
-    spdx
+    signedUrlParams,
+    updatedAt,
+    shareUsers,
+    shareScanners,
+    enabled,
+    imageDataRefetch,
+    imgVersionId
   } = props
   const textColor = useColorModeValue('gray.700', 'white')
   const bgStatus = useColorModeValue('gray.400', '#1a202c')
@@ -85,15 +73,64 @@ function SBOMLinkRow(props) {
 
   const [checked, setChecked] = useState(false)
 
-  const customerId = link.split('/')
+  // const customerId = link.split('/')
 
   const sbomLink = useClipboard(
-    `https://dashboard-app.fly.dev/#/customer/sboms/${customerId[7]}`
+    `https://dashboard-app.fly.dev/#/customer/sboms/${signedUrlParams}`
   )
 
   // `https://dashboard-app.fly.dev/#/customer/sboms/${customerId[7]}`
 
   // `http://localhost/#/customer/sboms/${customerId[7]}`
+
+  const [shareLynkUpdate] = useMutation(UpdateShareLynk, {
+    onCompleted: imageDataRefetch
+  })
+
+  const [shareLynkDelete] = useMutation(DeleteShareLynk, {
+    onCompleted: imageDataRefetch
+  })
+
+  const handleStatus = async () => {
+    try {
+      await shareLynkUpdate({
+        variables: {
+          shareLynkId: id,
+          enabled: enabled ? false : true
+        }
+      })
+    } catch (error) {
+      if (error.networkError && error.networkError.statusCode === 500) {
+        // Handle the specific error
+        alert(
+          'Duplicate connector is being created for Dockerhub with the same account ID.'
+        )
+      } else {
+        // Handle other errors
+        alert(error.message)
+      }
+    }
+  }
+
+  const handleArchive = async () => {
+    try {
+      await shareLynkDelete({
+        variables: {
+          id: id
+        }
+      })
+    } catch (error) {
+      if (error.networkError && error.networkError.statusCode === 500) {
+        // Handle the specific error
+        alert(
+          'Duplicate connector is being created for Dockerhub with the same account ID.'
+        )
+      } else {
+        // Handle other errors
+        alert(error.message)
+      }
+    }
+  }
 
   function timeSince(dateStr) {
     var date = new Date(dateStr)
@@ -136,44 +173,12 @@ function SBOMLinkRow(props) {
   })
   let shared, shared_col
 
-  if (shared_with.length === 0) {
+  if (shareUsers.length === 0) {
     shared = ['Public']
     shared_col = 'green'
   } else {
-    shared = shared_with
+    shared = shareUsers
     shared_col = 'blue'
-  }
-
-  useEffect(() => {
-    setChecked(active)
-  }, [SBOMLinksData])
-
-  const handleArchive = () => {
-    const filterData = SBOMLinksData.map((item) =>
-      item.id === id
-        ? {
-            id: item.id,
-            link: item.link,
-            shared_with: item.shared_with,
-            created: item.created,
-            visits: item.visits,
-            active: false,
-            project: item.project,
-            version: item.version,
-            conf_email: item.conf_email,
-            conf_terms: item.conf_terms,
-            redactions: item.redactions,
-            components: item.components,
-            licenses: item.licenses,
-            vulnerabilities: item.vulnerabilities,
-            cyclonedx: item.cyclonedx,
-            spdx: item.spdx
-          }
-        : item
-    )
-
-    console.log('filterData', filterData)
-    setSBOMLinksData(filterData)
   }
 
   const handleCopy = () => {
@@ -195,88 +200,43 @@ function SBOMLinkRow(props) {
     )
   }
   return (
-    <Tr bg={active ? 'transparent' : 'gray.400'}>
-      <Td>
-        <Switch
-          isChecked={checked}
-          onChange={(e) => setChecked(!checked)}
-          isFocusable
-          size='md'
-        />
-      </Td>
-      <Td display={'none'}>
-        <Stack direction='row' spacing={2}>
-          <Tooltip label='Components'>
-            <IconButton
-              colorScheme={components ? 'blue' : 'gray'}
-              aria-label='Components'
-              borderRadius='5px'
-              size='sm'
-              icon={<FaCubes />}
-            />
-          </Tooltip>
-
-          <Tooltip label='Licenses'>
-            <IconButton
-              colorScheme={licenses ? 'blue' : 'gray'}
-              aria-label='Licenses'
-              borderRadius='5px'
-              size='sm'
-              icon={<FaBalanceScale />}
-            />
-          </Tooltip>
-
-          <Tooltip label='Vulnerabilities'>
-            <IconButton
-              colorScheme={vulnerabilities ? 'blue' : 'gray'}
-              aria-label='Vulnerabilities'
-              borderRadius='5px'
-              size='sm'
-              icon={<FaBug />}
-            />
-          </Tooltip>
-
-          <Tooltip label='Redactions'>
-            <IconButton
-              colorScheme={redactions ? 'blue' : 'gray'}
-              aria-label='Apply redactions'
-              borderRadius='5px'
-              size='sm'
-              icon={<FaEyeSlash />}
-            />
-          </Tooltip>
-        </Stack>
+    <Tr>
+      <Td pl={0}>
+        <Switch isChecked={enabled} readOnly size='md' />
       </Td>
       <Td maxW='400px'>
-        <Stack direction={['column', 'row']} spacing={2}>
-          {shared.map((email, idx) => {
+        <Flex flexDirection={'row'} flexWrap={'wrap'} spacing={2} gap={2}>
+          {shareUsers.map((user, idx) => {
             return (
               <Tag
-                size='md'
+                size='sm'
                 key={idx}
                 borderRadius='full'
                 variant='solid'
                 colorScheme={shared_col}
               >
-                <TagLabel mt={0.5}>{email}</TagLabel>
-                <TagCloseButton />
+                <TagLabel>{user.email}</TagLabel>
+                {/* <TagCloseButton /> */}
               </Tag>
             )
           })}
-        </Stack>
+        </Flex>
       </Td>
       {/* <Td>{visits}</Td> */}
-      <Td>{timeSince(created)}</Td>
+      <Td>
+        <Text fontSize={'sm'}>{timeSince(updatedAt)}</Text>
+      </Td>
       <Td minWidth={{ sm: '80px' }} pl='0px'>
         {/* </Link> */}
         <Flex mb={2}>
           <Input
-            value={sbomLink.value}
+            value={`https://localhost:3001/customer/sboms/${signedUrlParams}`}
             onChange={(e) => sbomLink.setValue(e.target.value)}
             mr={2}
             disabled
+            fontSize={'sm'}
           />
-          <Button onClick={handleCopy}>
+          <Button onClick={handleCopy} fontSize={'sm'}>
             {sbomLink.hasCopied ? 'Copied!' : 'Copy'}
           </Button>
         </Flex>
@@ -293,31 +253,23 @@ function SBOMLinkRow(props) {
           />
           <Portal>
             <MenuList>
-              <MenuItem>{active ? 'Deactivate' : 'Activate'}</MenuItem>
+              <MenuItem onClick={handleStatus}>
+                {enabled ? 'Deactivate' : 'Activate'}
+              </MenuItem>
               <MenuItem onClick={onOpen}>Edit</MenuItem>
               <MenuItem onClick={handleArchive}>Archive</MenuItem>
             </MenuList>
           </Portal>
         </Menu>
         <SBOMLinkDrawer
-          key={props.id}
+          id={id}
+          shareUsers={shareUsers}
+          shareScanner={shareScanners}
+          imageDataRefetch={imageDataRefetch}
+          imgVersionId={imgVersionId}
           isOpen={isOpen}
           onClose={onClose}
           btnRef={btnRef}
-          uniqProjects={uniqProjects}
-          uniqVersions={uniqVersions}
-          project={props.project}
-          version={props.version}
-          link={props.link}
-          shared_with={props.shared_with}
-          components={props.components}
-          licenses={props.licenses}
-          vulnerability={vulnerabilities}
-          conf_email={props.conf_email}
-          conf_terms={props.conf_terms}
-          redactions={props.redactions}
-          cyclonedx={props.cyclonedx}
-          spdx={props.spdx}
         />
       </Td>
     </Tr>
