@@ -78,8 +78,7 @@ const ContextWrapper = (props) => {
   const [activeVulnVal, setActiveVulnVal] = useState('')
   const [riskScoreVal, setRiskScoreVal] = useState('')
 
-  const [authUser, setAuthUser] = useState(null)
-  const [token, setToken] = useState('')
+  const [isAuthenticate, setIsAuthenticate] = useState(false)
 
   const [scannerItems, setScannerItems] = useState('')
 
@@ -129,10 +128,8 @@ const ContextWrapper = (props) => {
         setActiveVulnVal,
         riskScoreVal,
         setRiskScoreVal,
-        authUser,
-        setAuthUser,
-        token,
-        setToken,
+        isAuthenticate,
+        setIsAuthenticate,
         scannerItems,
         setScannerItems
       }}

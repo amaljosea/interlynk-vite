@@ -49,12 +49,13 @@ import snyk from 'assets/img/snyk.png'
 import custom from 'assets/img/custom.png'
 import { GetAllOrgConnectors } from 'graphQL/Queries'
 
-import { getConImg } from 'utils'
+import { getConImg, scanImage } from 'utils'
 import { AddScannerImage } from 'graphQL/Mutation'
 import { RemoveScannerImage } from 'graphQL/Mutation'
 import { Link, useLocation } from 'react-router-dom'
 import { useContext } from 'react'
 import GlobalContext from 'context/GlobalContext'
+import ImageRow from 'components/Tables/ImageRow'
 
 const Index = () => {
   const toast = useToast()
@@ -67,6 +68,8 @@ const Index = () => {
   // console.log('versionId', versionId)
 
   const { setVulnerabilitiesData, setScannerItems } = useContext(GlobalContext)
+
+  const [searchInput, setSearchInput] = useState('')
 
   const path = location.pathname
 
@@ -97,6 +100,12 @@ const Index = () => {
     variables: {}
   })
 
+  const filteredImages =
+    allImages &&
+    allImages.images.filter((item) =>
+      item.name.toLowerCase().includes(searchInput.toLowerCase())
+    )
+
   const [imageScannerAdd] = useMutation(AddScannerImage, {
     onCompleted: refetch
   })
@@ -126,26 +135,6 @@ const Index = () => {
 
   const [activeScanners, setActiveScanners] = useState([])
   const [isLoading, setIsLoading] = useState(false)
-
-  const scanImage = (name) => {
-    switch (name) {
-      case 'Grype':
-        return grype
-        break
-      case 'Trivy':
-        return trivy
-        break
-      case 'Scout':
-        return scout
-        break
-      case 'Snyk':
-        return snyk
-        break
-      case 'Custom':
-        return custom
-        break
-    }
-  }
 
   const handleScanAdd = async (e) => {
     e.preventDefault()
@@ -263,6 +252,8 @@ const Index = () => {
                   placeholder='Search'
                   maxW='300px'
                   mb={4}
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
                   fontSize={'sm'}
                 />
                 <Button
@@ -289,140 +280,31 @@ const Index = () => {
                 </Thead>
 
                 <Tbody>
-                  {allImages ? (
+                  {filteredImages ? (
+                    filteredImages.map((item, index) => (
+                      <ImageRow
+                        key={index}
+                        item={item}
+                        isLoading={isLoading}
+                        setSelectedImage={setSelectedImage}
+                        setActiveScanners={setActiveScanners}
+                        onScanOpen={onScanOpen}
+                        onDeleteOpen={onDeleteOpen}
+                        filteredScanners={filteredScanners}
+                      />
+                    ))
+                  ) : allImages ? (
                     allImages.images.length > 0 &&
-                    allImages.images.map((item) => (
-                      <Tr key={item.id}>
-                        <Td fontSize={'sm'} pl={1}>
-                          {isLoading ? (
-                            <Skeleton height='20px' />
-                          ) : (
-                            <Link
-                              to={`/admin/images?v=${
-                                item.imageVersions[
-                                  item.imageVersions.length - 1
-                                ].id
-                              }&id=${item.id}`}
-                              style={{
-                                color: '#3182CE',
-                                textDecoration: 'underline'
-                              }}
-                              onClick={() =>
-                                window.localStorage.setItem('Image', item.name)
-                              }
-                            >
-                              {item.name}
-                            </Link>
-                          )}
-                        </Td>
-                        <Td fontSize={'sm'} pl={1}>
-                          {isLoading ? (
-                            <Skeleton height='20px' />
-                          ) : (
-                            <Flex
-                              direction={'row'}
-                              alignItems={'center'}
-                              justifyContent={'start'}
-                              gap={2}
-                            >
-                              <Image
-                                width='6'
-                                height='6'
-                                src={getConImg(
-                                  item.organizationConnector.connector.name
-                                )}
-                                alt={`${item.organizationConnector.connector.name}`}
-                              />
-                              <Text size='sm'>
-                                {item.organizationConnector.name}
-                              </Text>
-                            </Flex>
-                          )}
-                        </Td>
-                        <Td fontSize={'sm'} pl={1}>
-                          {isLoading ? (
-                            <Skeleton height='20px' />
-                          ) : (
-                            <Text>{item.imageVersions.length}</Text>
-                          )}
-                        </Td>
-                        <Td fontSize={'sm'} pl={1}>
-                          {isLoading ? (
-                            <Skeleton height='20px' />
-                          ) : (
-                            <Text>
-                              {new Date(item.updatedAt)
-                                .toISOString()
-                                .slice(0, 10)}
-                            </Text>
-                          )}
-                        </Td>
-                        <Td pl={1}>
-                          {isLoading ? (
-                            <Skeleton height='20px' />
-                          ) : (
-                            <Flex
-                              direction={'row'}
-                              gap={3}
-                              alignItems={'center'}
-                            >
-                              {item.imageScanners.map((result, index) => (
-                                <Tooltip
-                                  key={index}
-                                  label={`${result.name}`}
-                                  placement='top'
-                                >
-                                  <Image
-                                    width={6}
-                                    objectFit={'contain'}
-                                    src={`${scanImage(result.name)}`}
-                                    alt={result}
-                                  />
-                                </Tooltip>
-                              ))}
-                            </Flex>
-                          )}
-                        </Td>
-                        <Td pl={1}>
-                          {isLoading ? (
-                            <Skeleton height='20px' />
-                          ) : (
-                            <Menu>
-                              <MenuButton
-                                as={IconButton}
-                                aria-label='Options'
-                                icon={<FaEllipsisV />}
-                                variant='none'
-                                color='gray.400'
-                              />
-                              <Portal>
-                                <MenuList style={{ width: '100px' }}>
-                                  <MenuItem
-                                    icon={<AddIcon />}
-                                    onClick={() => {
-                                      setSelectedImage(item.id)
-                                      setActiveScanners(item.imageScanners)
-                                      onScanOpen()
-                                    }}
-                                  >
-                                    <Text fontSize={'sm'}>Add Scanner</Text>
-                                  </MenuItem>
-                                  <MenuItem
-                                    icon={<DeleteIcon />}
-                                    onClick={() => {
-                                      setSelectedImage(item.id)
-                                      setActiveScanners(item.imageScanners)
-                                      onDeleteOpen()
-                                    }}
-                                  >
-                                    <Text fontSize={'sm'}>Delete Scanner</Text>
-                                  </MenuItem>
-                                </MenuList>
-                              </Portal>
-                            </Menu>
-                          )}
-                        </Td>
-                      </Tr>
+                    allImages.images.map((item, index) => (
+                      <ImageRow
+                        key={index}
+                        item={item}
+                        isLoading={isLoading}
+                        setSelectedImage={setSelectedImage}
+                        setActiveScanners={setActiveScanners}
+                        onScanOpen={onScanOpen}
+                        onDeleteOpen={onDeleteOpen}
+                      />
                     ))
                   ) : (
                     <Tr>

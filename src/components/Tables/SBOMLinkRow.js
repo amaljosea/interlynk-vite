@@ -62,7 +62,8 @@ function SBOMLinkRow(props) {
     shareScanners,
     enabled,
     imageDataRefetch,
-    imgVersionId
+    imgVersionId,
+    scanResults
   } = props
   const textColor = useColorModeValue('gray.700', 'white')
   const bgStatus = useColorModeValue('gray.400', '#1a202c')
@@ -76,7 +77,7 @@ function SBOMLinkRow(props) {
   // const customerId = link.split('/')
 
   const sbomLink = useClipboard(
-    `https://dashboard-app.fly.dev/#/customer/sboms/${signedUrlParams}`
+    `http://localhost:3001/customer/sboms?${signedUrlParams}`
   )
 
   // `https://dashboard-app.fly.dev/#/customer/sboms/${customerId[7]}`
@@ -187,9 +188,9 @@ function SBOMLinkRow(props) {
     window.localStorage.setItem(
       'contains',
       JSON.stringify({
-        redactions: redactions,
-        vulnerabilities: vulnerabilities,
-        cycloneDX: cyclonedx,
+        redactions: false,
+        vulnerabilities: false,
+        cycloneDX: false,
         componentsVal: componentsVal ? componentsVal : 126,
         VulnerabilitiesVal: VulnerabilitiesVal
           ? VulnerabilitiesVal
@@ -230,7 +231,7 @@ function SBOMLinkRow(props) {
         {/* </Link> */}
         <Flex mb={2}>
           <Input
-            value={`https://localhost:3001/customer/sboms/${signedUrlParams}`}
+            value={`http://localhost:3001/customer/sboms?${signedUrlParams}`}
             onChange={(e) => sbomLink.setValue(e.target.value)}
             mr={2}
             disabled
@@ -270,6 +271,7 @@ function SBOMLinkRow(props) {
           isOpen={isOpen}
           onClose={onClose}
           btnRef={btnRef}
+          scanResults={scanResults}
         />
       </Td>
     </Tr>
