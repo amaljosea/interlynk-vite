@@ -31,7 +31,6 @@ import { getImageVersion, getImage } from 'graphQL/Queries'
 function SBOMs() {
   const [scanResults, setScanResults] = useState(null)
 
-
   const [jsonData] = useState({
     id: 74,
     parentId: null,
@@ -128,7 +127,7 @@ function SBOMs() {
 
   useEffect(() => {
     if (imageVersionData) {
-      // console.log('imageVersionData', imageVersionData)
+      console.log('imageVersionData', imageVersionData)
       setScanResults(imageVersionData.imageVersion)
     }
   }, [imageVersionData])
@@ -279,7 +278,7 @@ function SBOMs() {
                         gap={2}
                         mb={2}
                       >
-                        <Tooltip text={`${result.name}`}>
+                        <Tooltip text={`${result.company}-${result.name}`}>
                           <Image
                             width={4}
                             objectFit={'contain'}
@@ -347,14 +346,14 @@ function SBOMs() {
                     value={selectedScanner}
                     onChange={handleScanner}
                     size='md'
-                    width={'150px'}
                     color='gray.500'
                   >
-                    {scanner.map((item) => (
-                      <option key={item.id} value={item.name}>
-                        {item.name}
-                      </option>
-                    ))}
+                    {scanResults &&
+                      scanResults.imageScanners.map((result) => (
+                        <option key={result.id} value={result.id}>
+                          {result.company}-{result.name}
+                        </option>
+                      ))}
                   </Select>
                 </Flex>
               </Flex>
@@ -363,13 +362,13 @@ function SBOMs() {
         </CardBody>
       </Card>
       <Flex direction='row' gap='2'>
-        <SBOMStatistics
+        {/* <SBOMStatistics
           icon={<Icon h={'24px'} w={'24px'} color='white' as={FaCubes} />}
           title={'Components'}
           description={'Components included in SBOM'}
           amount={componentsVal !== '' ? componentsVal : 126}
         />
-        <Spacer />
+        <Spacer /> */}
         <SBOMStatistics
           icon={<Icon h={'24px'} w={'24px'} color='white' as={FaBug} />}
           title={'Total Vulnerabilities'}
@@ -385,13 +384,13 @@ function SBOMs() {
           description={'Vulnerabilities included in SBOM'}
           amount={activeVulnVal !== '' ? activeVulnVal : '1C, 1H, 3M, 4L'}
         />
-        <Spacer />
+        {/* <Spacer />
         <SBOMStatistics
           icon={<Icon h={'24px'} w={'24px'} color='white' as={FaUnlock} />}
           title={'Risk Score'}
           description={'Aggregage Risk Score of SBOM'}
           amount={riskScoreVal !== '' ? riskScoreVal : 22}
-        />
+        /> */}
       </Flex>
       <SBOMTable
         title={'SBOM'}
@@ -407,6 +406,7 @@ function SBOMs() {
         ]}
         refetch={refetch}
         imgVersionId={imageVersionData ? imageVersionData.imageVersion.id : ''}
+        scanResults={scanResults ? scanResults.imageScanners : []}
         vulData={
           imageVersionData ? imageVersionData.imageVersion.imageVulns : []
         }
@@ -415,6 +415,7 @@ function SBOMs() {
         imageInfo={imageInfo}
         data={sortSBOM}
         filteredVul={filteredVulItems}
+        loading={loading}
         setFilteredVulItems={setFilteredVulItems}
       />
     </Flex>

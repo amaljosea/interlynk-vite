@@ -13,7 +13,6 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 // Custom Chakra theme
 import theme from 'theme/theme.js';
-import FixedPlugin from '../components/FixedPlugin/FixedPlugin';
 // Custom components
 import MainPanel from '../components/Layout/MainPanel';
 import PanelContainer from '../components/Layout/PanelContainer';

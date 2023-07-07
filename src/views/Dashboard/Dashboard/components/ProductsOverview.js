@@ -66,7 +66,7 @@ const ProductsOverview = ({ title, amount, captions, data }) => {
                     <Tr key={item.id}>
                       <Td fontSize={'sm'} pl={1}>
                         <Link
-                          to={`/admin/sboms?v=${
+                          to={`/admin/images?v=${
                             item.imageVersions[item.imageVersions.length - 1].id
                           }&id=${item.id}`}
                           style={{

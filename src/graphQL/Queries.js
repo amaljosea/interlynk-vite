@@ -47,6 +47,7 @@ export const GetAllImages = gql`
           name
         }
       }
+      lastPushedAt
       imageScanners {
         id
         name
@@ -100,6 +101,7 @@ export const getImageVersion = gql`
       }
       imageScanners {
         id
+        company
         name
         updatedAt
       }

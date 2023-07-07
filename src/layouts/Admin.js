@@ -30,17 +30,12 @@ import {
   createHttpLink
 } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
-import SBOM from './SBOM'
+import Cookies from 'js-cookie'
 
 export default function Dashboard(props) {
-  const {
-    setCustomerView,
-    minimize,
-    setUserLocation,
-    authUser,
-    token
-  } = useContext(GlobalContext)
+  const { setCustomerView, minimize, token } = useContext(GlobalContext)
 
+  const authToken = Cookies.get('authToken')
 
   const { ...rest } = props
   const location = useLocation()
@@ -139,7 +134,7 @@ export default function Dashboard(props) {
     return {
       headers: {
         ...headers,
-        authorization: token ? token : ''
+        authorization: authToken ? authToken : ''
       }
     }
   })
@@ -183,11 +178,6 @@ export default function Dashboard(props) {
                 </Switch>
               </PanelContainer>
             </PanelContent>
-          )}
-          {!authUser && (
-            <Switch>
-              <Redirect to='/' />
-            </Switch>
           )}
           <Footer />
         </MainPanel>

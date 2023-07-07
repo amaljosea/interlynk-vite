@@ -182,7 +182,7 @@ export const VexVulnCreate = gql`
     $compName: String!
     $compVersion: String!
     $notes: String
-    $vexJustificationID: Uuid!
+    $vexJustificationID: Uuid
     $vexStatusID: Uuid!
   ) {
     vexVulnCreate(

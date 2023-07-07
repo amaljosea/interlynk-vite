@@ -22,17 +22,21 @@ import { ProfileIcon, SettingsIcon, LogoutIcon } from 'components/Icons/Icons'
 import { ItemContent } from 'components/Menu/ItemContent'
 import SidebarResponsive from 'components/Sidebar/SidebarResponsive'
 import PropTypes from 'prop-types'
-import React from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import React, { useContext } from 'react'
+import { Link } from 'react-router-dom'
 import routes from 'routes.js'
 import { FaSignOutAlt } from 'react-icons/fa'
-import { useContext } from 'react'
 import GlobalContext from 'context/GlobalContext'
+
+import Cookies from 'js-cookie'
 
 export default function HeaderLinks(props) {
   const { variant, children, fixed, secondary, onOpen, ...rest } = props
+  const { setIsAuthenticate } = useContext(GlobalContext)
 
-  const { authUser, setAuthUser } = useContext(GlobalContext)
+  const userName = Cookies.get('username')
+
+  // console.log('User info', userName)
 
   // Chakra Color Mode
   let mainTeal = useColorModeValue('teal.300', 'teal.300')
@@ -80,16 +84,20 @@ export default function HeaderLinks(props) {
           }
         >
           <Text display={{ sm: 'none', md: 'flex' }}>
-            {authUser ? authUser.name : 'Surendra Pathak'}
+            {userName ? userName : 'Surendra Pathak'}
           </Text>
         </MenuButton>
         <MenuList size='sm'>
           <MenuGroup title=''>
             <MenuItem icon={<SettingsIcon />}>Settings</MenuItem>
-            {authUser ? (
+            {userName ? (
               <MenuItem
                 icon={<FaSignOutAlt />}
-                onClick={() => setAuthUser(null)}
+                onClick={() => {
+                  Cookies.remove('username')
+                  Cookies.remove('authToken')
+                  setIsAuthenticate(false)
+                }}
               >
                 Logout
               </MenuItem>

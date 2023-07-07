@@ -68,7 +68,10 @@ const SBOMTable = ({
   refetch,
   imageInfo,
   shareLynks,
-  imageDataRefetch
+  imageDataRefetch,
+  scanResults,
+  loading,
+  columns
 }) => {
   const {
     SBOMLinksData,
@@ -105,26 +108,8 @@ const SBOMTable = ({
     'Link',
     ''
   ]
-  const vuln_captions = [
-    'CVE',
-    'CVSS',
-    'Description',
-    'component',
-    'version',
-    'Fixed (Component)',
-    'Fixed (Product)',
-    'Status',
-    ''
-  ]
-  const risk_captions = [
-    'score',
-    'type',
-    'description',
-    'component',
-    'version',
-    'recommendation',
-    ''
-  ]
+
+  const [filteredRow, setFilteredRow] = useState([])
 
   const vulnData = [...vulData]
 
@@ -145,11 +130,6 @@ const SBOMTable = ({
     (item) =>
       item.component.toLowerCase().includes(searchInput.toLowerCase()) ||
       item.license.toLowerCase().includes(searchInput.toLowerCase())
-  )
-
-  const filteredVulItems = vulnData.filter(
-    (item) =>
-      item.cveId && item.cveId.toLowerCase().includes(searchVul.toLowerCase())
   )
 
   const filteredRiskItems = Risks.filter((item) =>
@@ -249,6 +229,20 @@ const SBOMTable = ({
   const [sortRiskScoreData, setSortRiskScoreData] = useState([])
 
   const [vulSortData, setVulSortData] = useState([])
+
+  useEffect(() => {
+    setVulnerabilitiesData([])
+    const data = vulnData.filter(
+      (item) =>
+        item.cveId &&
+        item.cveId.toLowerCase().includes(searchInput.toLowerCase())
+    )
+    setFilteredRow(data)
+  }, [searchInput])
+
+  // useEffect(() => {
+  //   console.log('filtered row', filteredRow)
+  // }, [filteredRow])
 
   const handleSort = (field) => {
     if (field === sortField) {
@@ -375,18 +369,6 @@ const SBOMTable = ({
 
   const totalPages = Math.ceil(vulnData.length / pageSize)
 
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1)
-    }
-  }
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1)
-    }
-  }
-
   return (
     <>
       <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
@@ -452,6 +434,7 @@ const SBOMTable = ({
                           enabled={row.enabled}
                           imageDataRefetch={imageDataRefetch}
                           imgVersionId={imgVersionId}
+                          scanResults={scanResults}
                         />
                       ))
                     ) : (
@@ -493,8 +476,8 @@ const SBOMTable = ({
                       width={'300px'}
                       size='md'
                       id='vulnerabilities'
-                      value={searchVul}
-                      onChange={(e) => setSearchVul(e.target.value)}
+                      value={searchInput}
+                      onChange={(e) => setSearchInput(e.target.value)}
                     />
                     <Menu closeOnSelect={true}>
                       <MenuButton
@@ -682,53 +665,8 @@ const SBOMTable = ({
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {filteredVulItems.length > 0 ? (
-                      filteredVulItems.map((row, idx) => (
-                        <VulnerabilityRow
-                          refetch={refetch}
-                          key={idx}
-                          id={row.id}
-                          imgVersionId={imgVersionId}
-                          component={row.component.name}
-                          version={row.component.version}
-                          cvss={row.cvss.v3Score}
-                          cve={row.cveId}
-                          fixed_component={row.component.fixedInVersion}
-                          fixed_product={row.fixedInImage}
-                          description={row.component.name}
-                          status={row.vexVuln?.vexStatus}
-                          justify={row.vexVuln?.vexJustification}
-                          scanner={row.scanners}
-                          shared_data={row.component.name}
-                          versions={row.component.name}
-                          imageInfo={imageInfo}
-                        />
-                      ))
-                    ) : vulnerabilitiesData.length > 0 ? (
-                      vulnerabilitiesData.map((row, idx) => (
-                        <VulnerabilityRow
-                          refetch={refetch}
-                          key={idx}
-                          id={row.id}
-                          imgVersionId={imgVersionId}
-                          component={row.component.name}
-                          version={row.component.version}
-                          cvss={row.cvss.v3Score}
-                          cve={row.cveId}
-                          fixed_component={row.component.fixedInVersion}
-                          fixed_product={row.fixedInImage}
-                          description={row.component.name}
-                          status={row.vexVuln?.vexStatus}
-                          justify={row.vexVuln?.vexJustification}
-                          scanner={row.scanners}
-                          shared_data={row.component.name}
-                          versions={row.component.name}
-                          imageInfo={imageInfo}
-                        />
-                      ))
-                    ) : vulData.length > 0 ? (
-                      vulData.map((row, idx) => {
-                        return (
+                    {searchInput !== ''
+                      ? filteredRow.map((row, idx) => (
                           <VulnerabilityRow
                             refetch={refetch}
                             key={idx}
@@ -748,39 +686,84 @@ const SBOMTable = ({
                             versions={row.component.name}
                             imageInfo={imageInfo}
                           />
-                        )
-                      })
-                    ) : (
-                      <Tr>
-                        <Td fontSize={'sm'} pl={1}>
-                          <Skeleton height='20px' />
-                        </Td>
-                        <Td fontSize={'sm'} pl={1}>
-                          <Skeleton height='20px' />
-                        </Td>
-                        <Td fontSize={'sm'} pl={1}>
-                          <Skeleton height='20px' />
-                        </Td>
-                        <Td fontSize={'sm'} pl={1}>
-                          <Skeleton height='20px' />
-                        </Td>
-                        <Td fontSize={'sm'} pl={1}>
-                          <Skeleton height='20px' />
-                        </Td>
-                        <Td fontSize={'sm'} pl={1}>
-                          <Skeleton height='20px' />
-                        </Td>
-                        <Td fontSize={'sm'} pl={1}>
-                          <Skeleton height='20px' />
-                        </Td>
-                        <Td fontSize={'sm'} pl={1}>
-                          <Skeleton height='20px' />
-                        </Td>
-                        <Td fontSize={'sm'} pl={1}>
-                          <Skeleton height='20px' />
-                        </Td>
-                      </Tr>
-                    )}
+                        ))
+                      : vulnerabilitiesData.length > 0
+                      ? vulnerabilitiesData.map((row, idx) => (
+                          <VulnerabilityRow
+                            refetch={refetch}
+                            key={idx}
+                            id={row.id}
+                            imgVersionId={imgVersionId}
+                            component={row.component.name}
+                            version={row.component.version}
+                            cvss={row.cvss.v3Score}
+                            cve={row.cveId}
+                            fixed_component={row.component.fixedInVersion}
+                            fixed_product={row.fixedInImage}
+                            description={row.component.name}
+                            status={row.vexVuln?.vexStatus}
+                            justify={row.vexVuln?.vexJustification}
+                            scanner={row.scanners}
+                            shared_data={row.component.name}
+                            versions={row.component.name}
+                            imageInfo={imageInfo}
+                          />
+                        ))
+                      : vulData.length > 0
+                      ? vulData.map((row, idx) => {
+                          return (
+                            <VulnerabilityRow
+                              refetch={refetch}
+                              key={idx}
+                              id={row.id}
+                              imgVersionId={imgVersionId}
+                              component={row.component.name}
+                              version={row.component.version}
+                              cvss={row.cvss.v3Score}
+                              cve={row.cveId}
+                              fixed_component={row.component.fixedInVersion}
+                              fixed_product={row.fixedInImage}
+                              description={row.component.name}
+                              status={row.vexVuln?.vexStatus}
+                              justify={row.vexVuln?.vexJustification}
+                              scanner={row.scanners}
+                              shared_data={row.component.name}
+                              versions={row.component.name}
+                              imageInfo={imageInfo}
+                            />
+                          )
+                        })
+                      : loading && (
+                          <Tr>
+                            <Td fontSize={'sm'} pl={1}>
+                              <Skeleton height='20px' />
+                            </Td>
+                            <Td fontSize={'sm'} pl={1}>
+                              <Skeleton height='20px' />
+                            </Td>
+                            <Td fontSize={'sm'} pl={1}>
+                              <Skeleton height='20px' />
+                            </Td>
+                            <Td fontSize={'sm'} pl={1}>
+                              <Skeleton height='20px' />
+                            </Td>
+                            <Td fontSize={'sm'} pl={1}>
+                              <Skeleton height='20px' />
+                            </Td>
+                            <Td fontSize={'sm'} pl={1}>
+                              <Skeleton height='20px' />
+                            </Td>
+                            <Td fontSize={'sm'} pl={1}>
+                              <Skeleton height='20px' />
+                            </Td>
+                            <Td fontSize={'sm'} pl={1}>
+                              <Skeleton height='20px' />
+                            </Td>
+                            <Td fontSize={'sm'} pl={1}>
+                              <Skeleton height='20px' />
+                            </Td>
+                          </Tr>
+                        )}
                   </Tbody>
                 </Table>
               </CardBody>
@@ -819,6 +802,7 @@ const SBOMTable = ({
         uniqVersions={uniqVersions}
         imgVersionId={imgVersionId}
         imageDataRefetch={imageDataRefetch}
+        scanResults={scanResults}
       />
     </>
   )

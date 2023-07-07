@@ -16,7 +16,7 @@ import {
 
 import React from 'react'
 import { Redirect, Route } from 'react-router-dom'
-
+import Cookies from 'js-cookie'
 import '@fontsource/roboto/400.css'
 import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
@@ -27,8 +27,8 @@ import axios from 'axios'
 import { useContext } from 'react'
 import GlobalContext from 'context/GlobalContext'
 
-export default function Pages(props) {  
-  const { setAuthUser, setToken } = useContext(GlobalContext)
+export default function Pages(props) {
+  const { isAuthenticate, setIsAuthenticate } = useContext(GlobalContext)
   React.useEffect(() => {
     document.body.style.overflow = 'unset'
     // Specify how to clean up after this effect:
@@ -105,7 +105,6 @@ export default function Pages(props) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState(false)
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -122,9 +121,13 @@ export default function Pages(props) {
         if (status.code === 200) {
           setEmail('')
           setPassword('')
-          setAuthUser(status.data.user)
-          setToken(response.headers.authorization)
-          setIsLoggedIn(true)
+          Cookies.set('username', status.data.user.name, {
+            expires: 1
+          })
+          Cookies.set('authToken', response.headers.authorization, {
+            expires: 1
+          })
+          setIsAuthenticate(true)
         }
       })
       .catch((error) => {
@@ -134,8 +137,7 @@ export default function Pages(props) {
       })
   }
 
-
-  if (isLoggedIn === true) {
+  if (isAuthenticate === true) {
     return <Redirect to={'/admin/dashboard'} />
   } else {
     return (
@@ -230,77 +232,77 @@ export default function Pages(props) {
                   </Button>
                 </form>
                 {/* <Flex gap={2} alignItems={'center'}>
-                  <Text>Don't have an account ?</Text>
-                  <Link to={'#'}>
-                    <Text color={'blue.500'}>Sign up</Text>
-                  </Link>
-                </Flex>
-                <Flex width={'100%'} alignItems={'center'} gap={4} py={3}>
-                  <Box width={'100%'} height={0.5} bg={'blackAlpha.200'}></Box>
-                  <Text>OR</Text>
-                  <Box width={'100%'} height={0.5} bg={'blackAlpha.200'}></Box>
+                <Text>Don't have an account ?</Text>
+                <Link to={'#'}>
+                  <Text color={'blue.500'}>Sign up</Text>
+                </Link>
+              </Flex>
+              <Flex width={'100%'} alignItems={'center'} gap={4} py={3}>
+                <Box width={'100%'} height={0.5} bg={'blackAlpha.200'}></Box>
+                <Text>OR</Text>
+                <Box width={'100%'} height={0.5} bg={'blackAlpha.200'}></Box>
+              </Flex>
+              <Flex
+                direction={'column'}
+                width={'100%'}
+                alignItems={'center'}
+                gap={4}
+                py={3}
+              >
+                <Flex
+                  cursor={'pointer'}
+                  bg={'blackAlpha.50'}
+                  rounded={'lg'}
+                  fontWeight={'medium'}
+                  alignItems={'center'}
+                  gap={3}
+                  width={'100%'}
+                  p={4}
+                >
+                  <Image
+                    width='6'
+                    height='6'
+                    src='https://img.icons8.com/fluency/48/google-logo.png'
+                    alt='google-logo'
+                  />
+                  <Text>Continue with Google</Text>
                 </Flex>
                 <Flex
-                  direction={'column'}
-                  width={'100%'}
+                  cursor={'pointer'}
+                  bg={'blackAlpha.50'}
+                  rounded={'lg'}
+                  fontWeight={'medium'}
                   alignItems={'center'}
-                  gap={4}
-                  py={3}
+                  gap={3}
+                  width={'100%'}
+                  p={4}
                 >
-                  <Flex
-                    cursor={'pointer'}
-                    bg={'blackAlpha.50'}
-                    rounded={'lg'}
-                    fontWeight={'medium'}
-                    alignItems={'center'}
-                    gap={3}
-                    width={'100%'}
-                    p={4}
-                  >
-                    <Image
-                      width='6'
-                      height='6'
-                      src='https://img.icons8.com/fluency/48/google-logo.png'
-                      alt='google-logo'
-                    />
-                    <Text>Continue with Google</Text>
-                  </Flex>
-                  <Flex
-                    cursor={'pointer'}
-                    bg={'blackAlpha.50'}
-                    rounded={'lg'}
-                    fontWeight={'medium'}
-                    alignItems={'center'}
-                    gap={3}
-                    width={'100%'}
-                    p={4}
-                  >
-                    <Image
-                      width='6'
-                      height='6'
-                      src='https://img.icons8.com/fluency/48/github.png'
-                      alt='github'
-                    />
-                    <Text>Continue with Github</Text>
-                  </Flex>
-                </Flex> */}
+                  <Image
+                    width='6'
+                    height='6'
+                    src='https://img.icons8.com/fluency/48/github.png'
+                    alt='github'
+                  />
+                  <Text>Continue with Github</Text>
+                </Flex>
+              </Flex> */}
               </Flex>
             </Flex>
           </Box>
           {/* <Portal containerRef={navRef}>
-					<AuthNavbar secondary={getActiveNavbar(routes)} logoText='Interlynk DASHBOARD' />
-				</Portal>
-				<Box w='100%'>
-					<Box ref={wrapper} w='100%'>
-						<Switch>
-							{getRoutes(routes)}
-							<Redirect from='/auth' to='/auth/login-page' />
-						</Switch>
-					</Box>
-				</Box>
-				<Box px='24px' mx='auto' width='1044px' maxW='100%'>
-					<Footer />
-				</Box> */}
+        <AuthNavbar secondary={getActiveNavbar(routes)} logoText='Interlynk DASHBOARD' />
+      </Portal>
+      <Box w='100%'>
+        <Box ref={wrapper} w='100%'>
+          <Switch>
+            {getRoutes(routes)}
+            <Redirect from='/auth' to='/auth/login-page' />
+          </Switch>
+        </Box>
+      </Box>
+      <Box px='24px' mx='auto' width='1044px' maxW='100%'>
+        <Footer />
+      </Box> */}
         </Box>
       </ChakraProvider>
     )

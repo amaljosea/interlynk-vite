@@ -1,0 +1,168 @@
+import React from 'react'
+import {
+  Flex,
+  IconButton,
+  Image,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Portal,
+  Skeleton,
+  Td,
+  Text,
+  Tooltip,
+  Tr
+} from '@chakra-ui/react'
+import { AddIcon, DeleteIcon } from '@chakra-ui/icons'
+import { Link } from 'react-router-dom'
+import { getConImg, scanImage } from 'utils'
+import { FaEllipsisV } from 'react-icons/fa'
+
+const ImageRow = ({
+  item,
+  isLoading,
+  setSelectedImage,
+  setActiveScanners,
+  onScanOpen,
+  onDeleteOpen,
+  filteredScanners
+}) => {
+  const sortImages = [...item.imageScanners].sort((a, b) =>
+    a.company.localeCompare(b.company)
+  )
+
+  // console.log('filteredScanners', filteredScanners)
+
+  return (
+    <Tr key={item.id}>
+      <Td fontSize={'sm'} pl={1}>
+        {isLoading ? (
+          <Skeleton height='20px' />
+        ) : (
+          <Link
+            to={`/admin/images?v=${
+              item.imageVersions[item.imageVersions.length - 1].id
+            }&id=${item.id}`}
+            style={{
+              color: '#3182CE',
+              textDecoration: 'underline'
+            }}
+            onClick={() => window.localStorage.setItem('Image', item.name)}
+          >
+            {item.name}
+          </Link>
+        )}
+      </Td>
+      <Td fontSize={'sm'} pl={1}>
+        {isLoading ? (
+          <Skeleton height='20px' />
+        ) : (
+          <Flex
+            direction={'row'}
+            alignItems={'center'}
+            justifyContent={'start'}
+            gap={2}
+          >
+            <Image
+              width='6'
+              height='6'
+              src={getConImg(item.organizationConnector.connector.name)}
+              alt={`${item.organizationConnector.connector.name}`}
+            />
+            <Text size='sm'>{item.organizationConnector.name}</Text>
+          </Flex>
+        )}
+      </Td>
+      <Td fontSize={'sm'} pl={1}>
+        {isLoading ? (
+          <Skeleton height='20px' />
+        ) : (
+          <Text>{item.imageVersions.length}</Text>
+        )}
+      </Td>
+      <Td fontSize={'sm'} pl={1}>
+        {isLoading ? (
+          <Skeleton height='20px' />
+        ) : (
+          <Text>
+            {new Date(item.lastPushedAt).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+              timeZone: 'America/Los_Angeles'
+            })}{' '}
+            {new Date(item.lastPushedAt).toLocaleTimeString('en-US', {
+              hour: 'numeric',
+              minute: '2-digit',
+              hour12: true,
+              timeZone: 'America/Los_Angeles'
+            })}
+          </Text>
+        )}
+      </Td>
+      <Td pl={1}>
+        {isLoading ? (
+          <Skeleton height='20px' />
+        ) : (
+          <Flex direction={'row'} gap={3} alignItems={'center'}>
+            {sortImages &&
+              sortImages.map((result, index) => (
+                <Tooltip
+                  key={index}
+                  label={`${result.company} - ${result.name}`}
+                  placement='top'
+                >
+                  <Image
+                    width={6}
+                    objectFit={'contain'}
+                    src={`${scanImage(result.name)}`}
+                    alt={result}
+                  />
+                </Tooltip>
+              ))}
+          </Flex>
+        )}
+      </Td>
+      <Td pl={1}>
+        {isLoading ? (
+          <Skeleton height='20px' />
+        ) : (
+          <Menu>
+            <MenuButton
+              as={IconButton}
+              aria-label='Options'
+              icon={<FaEllipsisV />}
+              variant='none'
+              color='gray.400'
+              onClick={() => {
+                setSelectedImage(item.id)
+                setActiveScanners(item.imageScanners)
+              }}
+            />
+            <Portal>
+              <MenuList style={{ width: '100px' }}>
+                <MenuItem
+                  icon={<AddIcon />}
+                  onClick={onScanOpen}
+                  isDisabled={filteredScanners.length === 0 ? true : false}
+                >
+                  <Text fontSize={'sm'}>Add Scanner</Text>
+                </MenuItem>
+                <MenuItem
+                  icon={<DeleteIcon />}
+                  onClick={onDeleteOpen}
+                  isDisabled={filteredScanners.length === 3 ? true : false}
+                >
+                  <Text fontSize={'sm'}>Delete Scanner</Text>
+                </MenuItem>
+              </MenuList>
+            </Portal>
+          </Menu>
+        )}
+      </Td>
+    </Tr>
+  )
+}
+
+export default ImageRow

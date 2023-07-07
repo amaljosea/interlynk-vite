@@ -35,12 +35,10 @@ const GlobalContext = React.createContext({
   setActiveVulnVal: () => {},
   riskScoreVal: '',
   setRiskScoreVal: () => {},
-  authUser: null,
-  setAuthUser: () => {},
-  token: '',
-  setToken: '',
   scannerItems: [],
-  SetScannerItems: () => {}
+  SetScannerItems: () => {},
+  isAuthenticate: false,
+  setIsAuthenticate: () => {}
 })
 
 export default GlobalContext

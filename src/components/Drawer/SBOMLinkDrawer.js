@@ -32,8 +32,13 @@ function SBOMLinkDrawer(props) {
     btnRef,
     imageDataRefetch,
     shareScanner,
-    shareUsers
+    shareUsers,
+    scanResults
   } = props
+
+  const sortScanResult = [...scanResults].sort((a, b) =>
+    a.company.localeCompare(b.company)
+  )
 
   const sbomqsVersions = ['v0.0.1', 'v0.0.2', 'v0.0.3']
 
@@ -48,12 +53,9 @@ function SBOMLinkDrawer(props) {
   const [hasEmail, setHasEmail] = useState(true)
   const [hasTerms, setHasTerms] = useState(true)
   const [hasLimitAccess, setHasLimitAccess] = useState(true)
+  const [version, setVersion] = useState('')
   const [email, setEmail] = useState('')
   const [emailList, setEmailList] = useState([])
-
-  const [checkboxData, setCheckboxData] = useState([])
-  const [checkedValues, setCheckedValues] = useState([])
-  const [isAllChecked, setIsAllChecked] = useState(false)
 
   useEffect(() => {
     if (shareUsers.length > 0) {
@@ -61,13 +63,14 @@ function SBOMLinkDrawer(props) {
     }
   }, [shareUsers])
 
+  const [selectedOptions, setSelectedOptions] = useState([])
+
   useEffect(() => {
     if (shareScanner.length > 0) {
-      setCheckboxData(shareScanner.map((scanner) => scanner))
+      const ids = shareScanner.map((item) => item.scanner.id)
+      setSelectedOptions(ids)
     }
-  }, [shareScanner])
-
-  // console.log('checkboxData', checkboxData)
+  }, [shareScanner, setSelectedOptions])
 
   const handleKeyDown = (event) => {
     if (event.key === 'Enter') {
@@ -82,16 +85,15 @@ function SBOMLinkDrawer(props) {
         variables: {
           shareLynkId: id,
           enabled: true,
-          emails: emailList
+          emails: emailList,
+          scanners: selectedOptions
         }
       })
       onClose()
     } catch (error) {
       if (error.networkError && error.networkError.statusCode === 500) {
         // Handle the specific error
-        alert(
-          'Duplicate connector is being created for Dockerhub with the same account ID.'
-        )
+        alert('Limit access required')
         onClose()
       } else {
         // Handle other errors
@@ -108,10 +110,30 @@ function SBOMLinkDrawer(props) {
     setEmailList(updatedList)
   }
 
+  const handleChange = (value) => {
+    if (selectedOptions.includes(value)) {
+      setSelectedOptions(selectedOptions.filter((option) => option !== value))
+    } else {
+      setSelectedOptions([...selectedOptions, value])
+    }
+  }
+
+  const handleSelectAll = () => {
+    if (selectedOptions.length === scanResults.length) {
+      setSelectedOptions([])
+    } else {
+      const allOptionIds = scanResults.map((option) => option.id)
+      setSelectedOptions(allOptionIds)
+    }
+  }
+
+  const isSelected = (value) => {
+    return selectedOptions.includes(value)
+  }
+
   // useEffect(() => {
-  //   console.log('selected emails', emailList)
-  //   console.log('shareScanner', shareScanner)
-  // }, [emailList])
+  //   console.log('selectedOptions', selectedOptions)
+  // }, [selectedOptions])
 
   return (
     <Drawer
@@ -139,8 +161,7 @@ function SBOMLinkDrawer(props) {
                 Image
               </FormLabel>
               <Input
-                value={imageName ? imageName : ''}
-                readOnly
+                defaultValue={imageName ? imageName : ''}
                 fontSize={'sm'}
                 mb={4}
               />
@@ -155,6 +176,7 @@ function SBOMLinkDrawer(props) {
               <Select
                 id='version'
                 value={version}
+                onChange={(e) => setVersion(e.target.value)}
                 size='sm'
                 color='gray.500'
                 mb={4}
@@ -173,19 +195,33 @@ function SBOMLinkDrawer(props) {
                 <FormLabel htmlFor='scanners' fontSize={'sm'} color='gray.600'>
                   Scanners
                 </FormLabel>
-                <Flex direction={'row'} gap={4}>
-                  <Checkbox size='sm' colorScheme='blue' color='gray.500'>
+                <Flex direction={'column'} gap={1}>
+                  <Checkbox
+                    isChecked={selectedOptions.length === scanResults.length}
+                    onChange={handleSelectAll}
+                    size='sm'
+                    colorScheme='blue'
+                    color='gray.500'
+                  >
                     All
                   </Checkbox>
-                  <Checkbox size='sm' colorScheme='blue' color='gray.500'>
-                    Grype
-                  </Checkbox>
-                  <Checkbox size='sm' colorScheme='blue' color='gray.500'>
-                    Trivy
-                  </Checkbox>
-                  <Checkbox size='sm' colorScheme='blue' color='gray.500'>
-                    Scout
-                  </Checkbox>
+                  {sortScanResult &&
+                    sortScanResult.map((item) => (
+                      <Checkbox
+                        key={item.id}
+                        isChecked={isSelected(item.id)}
+                        onChange={() => handleChange(item.id)}
+                        isDisabled={
+                          selectedOptions.length === scanResults.length &&
+                          !isSelected(item.id)
+                        }
+                        size='sm'
+                        colorScheme='blue'
+                        color='gray.500'
+                      >
+                        {item.company}-{item.name}
+                      </Checkbox>
+                    ))}
                 </Flex>
               </Box>
               <Text fontSize='md' mt='20px'>
@@ -203,7 +239,6 @@ function SBOMLinkDrawer(props) {
                 <Checkbox
                   isChecked={hasEmail}
                   onChange={(e) => setHasEmail(e.target.checked)}
-                  px='10px'
                   mt='10px'
                   size='sm'
                   colorScheme='blue'
@@ -214,7 +249,6 @@ function SBOMLinkDrawer(props) {
                 <Checkbox
                   isChecked={hasTerms}
                   onChange={(e) => setHasTerms(e.target.checked)}
-                  px='10px'
                   size='sm'
                   colorScheme='blue'
                   color='gray.500'
@@ -226,7 +260,6 @@ function SBOMLinkDrawer(props) {
                   onChange={(e) => {
                     setHasLimitAccess(e.target.checked)
                   }}
-                  px='10px'
                   size='sm'
                   colorScheme='blue'
                   color='gray.500'

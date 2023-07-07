@@ -1,6 +1,6 @@
 // Chakra imports
 import { Flex, Button, Input, Spacer, Stack, useQuery } from '@chakra-ui/react'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Drawer,
   DrawerBody,
@@ -21,12 +21,17 @@ import {
 } from '@chakra-ui/react'
 import { useMutation } from '@apollo/client'
 import { CreateShareLynk } from 'graphQL/Mutation'
-import { UpdateShareLynk } from 'graphQL/Mutation'
 import { getAllScanners } from 'graphQL/Queries'
-import { useEffect } from 'react'
 
 function SBOMDrawer(props) {
-  const { id, isOpen, onClose, btnRef, imageDataRefetch, imgVersionId } = props
+  const {
+    scanResults,
+    isOpen,
+    onClose,
+    btnRef,
+    imageDataRefetch,
+    imgVersionId
+  } = props
 
   const { data: allScanners } = useQuery(getAllScanners, {
     variables: {}
@@ -55,33 +60,6 @@ function SBOMDrawer(props) {
     if (event.key === 'Enter') {
       setEmailList((prev) => [email, ...prev])
       setEmail('')
-    }
-  }
-
-  const scannerItems = JSON.parse(window.localStorage.getItem('scanners'))
-
-  const handleScannerChange = (event) => {
-    const { name, checked } = event.target
-    if (name === 'selectAll') {
-      setSelectAll(checked)
-      const allData = scannerItems.map((item) => item.id)
-      if (checked) {
-        setSelectedScanner(allData)
-      } else {
-        setSelectedScanner([])
-      }
-    } else {
-      const filteredScanner = scannerItems.filter(
-        (scanner) => scanner.name === name
-      )
-      console.log('filter', filteredScanner)
-      if (checked) {
-        setSelectedScanner((prevTools) => [...prevTools, filteredScanner[0].id])
-      } else {
-        setSelectedScanner((prevTools) =>
-          prevTools.filter((tool) => tool !== filteredScanner[0].id)
-        )
-      }
     }
   }
 
@@ -123,6 +101,33 @@ function SBOMDrawer(props) {
     const updatedList = emailList.filter((email) => email !== item)
     setEmailList(updatedList)
   }
+
+  const [selectedOptions, setSelectedOptions] = useState([])
+
+  const handleChange = (value) => {
+    if (selectedOptions.includes(value)) {
+      setSelectedOptions(selectedOptions.filter((option) => option !== value))
+    } else {
+      setSelectedOptions([...selectedOptions, value])
+    }
+  }
+
+  const handleSelectAll = () => {
+    if (selectedOptions.length === scanResults.length) {
+      setSelectedOptions([])
+    } else {
+      const allOptionIds = scanResults.map((option) => option.id)
+      setSelectedOptions(allOptionIds)
+    }
+  }
+
+  const isSelected = (value) => {
+    return selectedOptions.includes(value)
+  }
+
+  // useEffect(() => {
+  //   console.log('selectedOptions', selectedOptions)
+  // }, [selectedOptions])
 
   return (
     <Drawer
@@ -177,59 +182,32 @@ function SBOMDrawer(props) {
                 <FormLabel htmlFor='scanners' fontSize={'sm'} color='gray.600'>
                   Scanners
                 </FormLabel>
-                <Flex direction={'row'} gap={4}>
+                <Flex direction={'column'} gap={1}>
                   <Checkbox
-                    name='selectAll'
-                    isChecked={
-                      allScanners &&
-                      allScanners.some((tool) => tool.name !== 'All')
-                    }
-                    onChange={handleScannerChange}
+                    isChecked={selectedOptions.length === scanResults.length}
+                    onChange={handleSelectAll}
                     size='sm'
                     colorScheme='blue'
                     color='gray.500'
                   >
                     All
                   </Checkbox>
-                  <Checkbox
-                    name='Grype'
-                    isChecked={
-                      allScanners &&
-                      allScanners.some((tool) => tool.name === 'Grype')
-                    }
-                    onChange={handleScannerChange}
-                    size='sm'
-                    colorScheme='blue'
-                    color='gray.500'
-                  >
-                    Grype
-                  </Checkbox>
-                  <Checkbox
-                    name='Trivy'
-                    isChecked={
-                      allScanners &&
-                      allScanners.some((tool) => tool.name === 'Trivy')
-                    }
-                    onChange={handleScannerChange}
-                    size='sm'
-                    colorScheme='blue'
-                    color='gray.500'
-                  >
-                    Trivy
-                  </Checkbox>
-                  <Checkbox
-                    name='Scout'
-                    isChecked={
-                      allScanners &&
-                      allScanners.some((tool) => tool.name === 'Scout')
-                    }
-                    onChange={handleScannerChange}
-                    size='sm'
-                    colorScheme='blue'
-                    color='gray.500'
-                  >
-                    Scout
-                  </Checkbox>
+                  {scanResults.map((item) => (
+                    <Checkbox
+                      key={item.id}
+                      isChecked={isSelected(item.id)}
+                      onChange={() => handleChange(item.id)}
+                      isDisabled={
+                        selectedOptions.length === scanResults.length &&
+                        !isSelected(item.id)
+                      }
+                      size='sm'
+                      colorScheme='blue'
+                      color='gray.500'
+                    >
+                      {item.company}-{item.name}
+                    </Checkbox>
+                  ))}
                 </Flex>
               </Box>
               <Text fontSize='md' mt='20px'>
@@ -247,7 +225,6 @@ function SBOMDrawer(props) {
                 <Checkbox
                   isChecked={hasEmail}
                   onChange={(e) => setHasEmail(e.target.checked)}
-                  px='10px'
                   mt='10px'
                   size='sm'
                   colorScheme='blue'
@@ -258,7 +235,6 @@ function SBOMDrawer(props) {
                 <Checkbox
                   isChecked={hasTerms}
                   onChange={(e) => setHasTerms(e.target.checked)}
-                  px='10px'
                   size='sm'
                   colorScheme='blue'
                   color='gray.500'
@@ -271,7 +247,6 @@ function SBOMDrawer(props) {
                     setHasLimitAccess(e.target.checked)
                     setIsPublic(false)
                   }}
-                  px='10px'
                   size='sm'
                   colorScheme='blue'
                   color='gray.500'
