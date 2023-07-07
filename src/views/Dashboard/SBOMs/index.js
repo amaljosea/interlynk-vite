@@ -261,12 +261,30 @@ function SBOMs() {
                       : 'Loading....'}
                   </Heading>
                   <Text fontSize='sm'>linux/amd64</Text>
-                  <Text fontSize='sm' mb={2}>
+                  <Text fontSize='xs' mb={2}>
                     Last Pushed:{' '}
                     {scanResults
-                      ? new Date(scanResults.updatedAt)
-                          .toISOString()
-                          .slice(0, 10)
+                      ? `${
+                          new Date(scanResults.updatedAt).toLocaleDateString(
+                            'en-US',
+                            {
+                              year: 'numeric',
+                              month: '2-digit',
+                              day: '2-digit',
+                              timeZone: 'America/Los_Angeles'
+                            }
+                          ) +
+                          ' ' +
+                          new Date(scanResults.updatedAt).toLocaleTimeString(
+                            'en-US',
+                            {
+                              hour: 'numeric',
+                              minute: '2-digit',
+                              hour12: true,
+                              timeZone: 'America/Los_Angeles'
+                            }
+                          )
+                        }`
                       : 'Loading..'}
                   </Text>
                   {scanResults ? (
