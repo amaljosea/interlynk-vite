@@ -57,6 +57,17 @@ npm install
 npm run start
 
 ```
+5.5 If `npm run start` gives you error:
+```
+....
+  code: 'ERR_OSSL_EVP_UNSUPPORTED'
+....
+```
+set 
+```
+export NODE_OPTIONS=--openssl-legacy-provider
+```
+and retry
 
 6. If you have any project running on localhost:3000 then it will ask for other port just press yes. then it will start on
 
