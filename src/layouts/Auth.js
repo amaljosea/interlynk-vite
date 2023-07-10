@@ -121,9 +121,7 @@ export default function Pages(props) {
         if (status.code === 200) {
           setEmail('')
           setPassword('')
-          Cookies.set('username', status.data.user.name, {
-            expires: 1
-          })
+          localStorage.setItem('username', status.data.user.name)
           Cookies.set('authToken', response.headers.authorization, {
             expires: 1
           })
@@ -131,13 +129,14 @@ export default function Pages(props) {
         }
       })
       .catch((error) => {
+        console.log(`Error: ${error}`)
         setError(true)
         setEmail('')
         setPassword('')
       })
   }
 
-  if (isAuthenticate === true) {
+  if (isAuthenticate) {
     return <Redirect to={'/admin/dashboard'} />
   } else {
     return (

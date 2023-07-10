@@ -5,20 +5,23 @@ import Footer from 'components/Footer/Footer.js'
 import AdminNavbar from 'components/Navbars/AdminNavbar.js'
 import Sidebar from 'components/Sidebar'
 import React, { useContext, useState } from 'react'
-import { Redirect, Route, Switch } from 'react-router-dom'
-import '@fontsource/roboto/400.css'
-import '@fontsource/roboto/500.css'
-import '@fontsource/roboto/700.css'
+import { Route, Switch } from 'react-router-dom'
 // Custom Chakra theme
 import theme from 'theme/theme.js'
 // Custom components
 import MainPanel from '../components/Layout/MainPanel'
 import PanelContainer from '../components/Layout/PanelContainer'
 import PanelContent from '../components/Layout/PanelContent'
-
-import { useLocation } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
 import customerRoutes from 'customerRoutes'
+import {
+  ApolloClient,
+  InMemoryCache,
+  ApolloProvider,
+  createHttpLink
+} from '@apollo/client'
+import { setContext } from '@apollo/client/link/context'
+import Cookies from 'js-cookie'
 
 export default function Customer(props) {
   const { ...rest } = props
@@ -103,43 +106,61 @@ export default function Customer(props) {
   document.documentElement.dir = 'ltr'
   // Chakra Color Mode
 
+  const userToken = Cookies.get('userToken')
+
+  const httpLink = createHttpLink({
+    uri: 'http://localhost:3000/lynkapi'
+  })
+
+  const authLink = setContext((_, { headers }) => {
+    return {
+      headers: {
+        ...headers,
+        authorization: userToken ? userToken : ''
+      }
+    }
+  })
+  const client = new ApolloClient({
+    link: authLink.concat(httpLink),
+    cache: new InMemoryCache()
+  })
+
   return (
-    <ChakraProvider theme={theme} resetCss={false}>
-      <Sidebar
-        routes={customerRoutes}
-        logoText={'Interlynk DASHBOARD'}
-        display='none'
-        sidebarVariant={sidebarVariant}
-        {...rest}
-      />
-      <MainPanel
-        w={{
-          base: '100%',
-          xl: minimize ? 'calc(100% - 110px)' : 'calc(100% - 220px)'
-        }}
-      >
-        <Portal>
-          <AdminNavbar
-            onOpen={onOpen}
-            logoText={'Interlynk DASHBOARD'}
-            brandText={getActiveRoute(customerRoutes)}
-            secondary={getActiveNavbar(customerRoutes)}
-            fixed={fixed}
-            {...rest}
-          />
-        </Portal>
-        {getRoute() ? (
-          <PanelContent>
-            <PanelContainer>
-              <Switch>
-                {getRoutes(customerRoutes)}
-                <Redirect from='/customer' to='/customer/sboms' />
-              </Switch>
-            </PanelContainer>
-          </PanelContent>
-        ) : null}
-        <Footer />
-      </MainPanel>
-    </ChakraProvider>
+    <ApolloProvider client={client}>
+      <ChakraProvider theme={theme} resetCss={false}>
+        <Sidebar
+          routes={customerRoutes}
+          logoText={'Interlynk DASHBOARD'}
+          display='none'
+          sidebarVariant={sidebarVariant}
+          {...rest}
+        />
+        <MainPanel
+          w={{
+            base: '100%',
+            xl: minimize ? 'calc(100% - 110px)' : 'calc(100% - 220px)'
+          }}
+        >
+          <Portal>
+            <AdminNavbar
+              onOpen={onOpen}
+              logoText={'Interlynk DASHBOARD'}
+              brandText={getActiveRoute(customerRoutes)}
+              secondary={getActiveNavbar(customerRoutes)}
+              fixed={fixed}
+              {...rest}
+            />
+          </Portal>
+          {getRoute() ? (
+            <PanelContent>
+              <PanelContainer>
+                <Switch>{getRoutes(customerRoutes)}</Switch>
+              </PanelContainer>
+            </PanelContent>
+          ) : null}
+          <Footer />
+        </MainPanel>
+      </ChakraProvider>
+    </ApolloProvider>
   )
 }

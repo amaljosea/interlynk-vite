@@ -1,6 +1,7 @@
 import { Td, Tr, Tooltip } from '@chakra-ui/react'
 import React from 'react'
 import { BiNote } from 'react-icons/bi'
+import { timeSince } from 'utils'
 
 const VulLinkRow = ({
   id,
@@ -22,7 +23,7 @@ const VulLinkRow = ({
         {status}
       </Td>
       <Td fontSize={'xs'} textTransform={'capitalize'}>
-        {new Date(timestamp).toISOString().slice(0, 10)}
+        {timeSince(timestamp)}
       </Td>
       <Tooltip label={notes}>
         <Td fontSize={'xs'} textTransform={'capitalize'}>

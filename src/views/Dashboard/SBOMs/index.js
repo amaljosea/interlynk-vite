@@ -20,7 +20,7 @@ import SBOMTable from './components/SBOMTable'
 import SBOMStatistics from './components/SBOMStatistics'
 
 import { sbom } from 'variables/general'
-import { FaCubes, FaBug, FaUnlock, FaTag, FaMicroscope } from 'react-icons/fa'
+import { FaCubes, FaBug, FaUnlock, FaTag, FaMicroscope, FaExclamationTriangle } from 'react-icons/fa'
 import { useLocation } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
 import Tooltip from 'components/Tooltip'
@@ -224,17 +224,6 @@ function SBOMs() {
     // console.log('filter', filterObjectsByScanner(selectedScanner))
   }, [selectedScannerItem])
 
-  // useEffect(() => {
-  //   console.log(cloudVersion)
-  //   console.log(cloudScanner)
-  //   cloudVersion !== null
-  //     ? setSelectedVersion(`${cloudVersion}`)
-  //     : setSelectedVersion('v0.0.3')
-
-  //   cloudScanner !== null
-  //     ? setSelectedScanner(cloudScanner)
-  //     : setSelectedScanner('All')
-  // }, [cloudVersion, cloudScanner])
 
   useEffect(() => {
     setTabIndex(1)
@@ -397,7 +386,7 @@ function SBOMs() {
         />
         <Spacer />
         <SBOMStatistics
-          icon={<Icon h={'24px'} w={'24px'} color='white' as={FaBug} />}
+          icon={<Icon h={'24px'} w={'24px'} color='white' as={FaExclamationTriangle} />}
           title={'Active Vulnerabilities'}
           description={'Vulnerabilities included in SBOM'}
           amount={activeVulnVal !== '' ? activeVulnVal : '1C, 1H, 3M, 4L'}

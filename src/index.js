@@ -21,7 +21,7 @@ ReactDOM.render(
         <Route path={`/admin`} component={AdminLayout} />
         <Route path={`/customer`} component={CustomerLayout} />
         <Redirect from={`/`} to='/auth' />
-        <Redirect from={`/customer`} to='/customer/sbom' />
+        <Redirect from={`/customer`} to='/customer' />
       </Switch>
     </BrowserRouter>
   </ContextWrapper>,

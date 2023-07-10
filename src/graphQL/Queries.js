@@ -208,3 +208,22 @@ export const getVexJustifications = gql`
     }
   }
 `
+
+export const GetSignedImage = gql`
+  query GetSignedImage($signedParams: String!) {
+    image(signedParams: $signedParams) {
+      name
+      imageVersions {
+        id
+      }
+    }
+  }
+`
+
+export const GetSignedImageVersion = gql`
+  query GetSignedImageVersion($signedParams: String!) {
+    imageVersion(signedParams: $signedParams) {
+      name
+    }
+  }
+`

@@ -29,7 +29,9 @@ import {
   chakra,
   Skeleton,
   Td,
-  useQuery
+  useQuery,
+  MenuGroup,
+  MenuItem
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card.js'
@@ -153,6 +155,22 @@ const SBOMTable = ({
       setSelectedStatus(filterItem)
     } else {
       setSelectedStatus((prev) => [...prev, item])
+    }
+  }
+
+  const onVulnFilter = (item) => {
+    console.log('item', item)
+    if (item === 'Unresolved') {
+      const filterData = vulnData.filter(
+        (item) =>
+          item.vexVuln?.vexStatus?.name !== 'Fixed' &&
+          item.vexVuln?.vexStatus?.name !== 'False Positive' &&
+          item.vexVuln?.vexStatus?.name !== 'Not Affected'
+      )
+      console.log(`filter data`, filterData)
+      setVulnerabilitiesData(filterData)
+    } else {
+      setVulnerabilitiesData(vulnData)
     }
   }
 
@@ -488,27 +506,26 @@ const SBOMTable = ({
                         Filter
                       </MenuButton>
                       <MenuList minWidth='240px'>
-                        <MenuOptionGroup
-                          title='Vulnerability Resolution'
-                          type='checkbox'
-                        >
-                          {['Unesolved', 'Total'].map((p, index) => (
-                            <MenuItemOption
+                        <MenuGroup title='Resolution'>
+                          {['Unresolved', 'Total'].map((p, index) => (
+                            <MenuItem
                               value={p}
                               key={index}
-                              // onClick={() => handleStatusSelect(p)}
+                              pl={4}
+                              fontSize={'sm'}
+                              onClick={() => onVulnFilter(p)}
                             >
                               {p}
-                            </MenuItemOption>
+                            </MenuItem>
                           ))}
-                        </MenuOptionGroup>
+                        </MenuGroup>
                       </MenuList>
                     </Menu>
                   </Flex>
                   <Flex gap={2} direction={'row'}>
                     <Box as={Flex} direction={'row'} gap={2}>
                       <Tooltip label='Import'>
-                        <Button colorScheme='blue' size='md'>
+                        <Button colorScheme='blue' size='md' disabled>
                           <BiImport />
                         </Button>
                       </Tooltip>
@@ -639,9 +656,6 @@ const SBOMTable = ({
                             )}
                           </Box>
                         </Flex>
-                      </Th>
-                      <Th color='gray.400' py={4} position='relative'>
-                        <Box>Scanner</Box>
                       </Th>
                       <Th
                         color='gray.400'

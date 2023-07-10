@@ -1,3 +1,4 @@
+import axios from 'axios'
 import React from 'react'
 import { useEffect } from 'react'
 const {
@@ -16,8 +17,14 @@ const {
   FormLabel,
   Checkbox,
   Flex,
-  Box
+  Box,
+  Alert,
+  AlertIcon,
+  AlertDescription
 } = require('@chakra-ui/react')
+import { useLocation } from 'react-router-dom'
+import Cookies from 'js-cookie'
+import { useState } from 'react'
 
 export default function CustomerModal() {
   const OverlayOne = () => (
@@ -27,6 +34,11 @@ export default function CustomerModal() {
     />
   )
 
+  const location = useLocation()
+
+  const [userEmail, setUserEmail] = useState('')
+  const [error, setError] = useState(false)
+
   useEffect(() => {
     setOverlay(<OverlayOne />)
     onOpen()
@@ -34,8 +46,29 @@ export default function CustomerModal() {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    onClose()
-    window.localStorage.removeItem('path')
+    axios
+      .post('http://localhost:3000/share_users/login', {
+        share_user: {
+          email: userEmail,
+          signed_params: `${location.search.replace(/\?/g, '')}`
+        }
+      })
+      .then((response) => {
+        console.log(response.data)
+        const { status } = response.data
+        if (status.code === 200) {
+          setUserEmail('')
+          localStorage.setItem('userEmail', status.data.user.email)
+          Cookies.set('userToken', response.headers.authorization)
+          onClose()
+          window.localStorage.removeItem('path')
+        }
+      })
+      .catch((error) => {
+        console.log(`Error: ${error}`)
+        setError(true)
+        setUserEmail('')
+      })
   }
 
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -48,11 +81,25 @@ export default function CustomerModal() {
         <ModalContent>
           <form onSubmit={handleSubmit}>
             <ModalHeader>Customer Verification</ModalHeader>
-            {/* <ModalCloseButton /> */}
             <ModalBody>
+              {error === true && (
+                <Box mb={5} width={'100%'}>
+                  <Alert status='error' borderRadius={4}>
+                    <AlertIcon />
+                    <AlertDescription>Invalid email id</AlertDescription>
+                  </Alert>
+                </Box>
+              )}
               <FormControl isRequired>
                 <FormLabel>Email address</FormLabel>
-                <Input size='lg' placeholder={'Enter your email address'} />
+                <Input
+                  size='lg'
+                  type='email'
+                  name='userEmail'
+                  placeholder={'Enter your email address'}
+                  value={userEmail}
+                  onChange={(e) => setUserEmail(e.target.value)}
+                />
               </FormControl>
               <FormControl isRequired mt={4}>
                 <FormLabel>Terms of service</FormLabel>
@@ -95,7 +142,9 @@ export default function CustomerModal() {
               </FormControl>
             </ModalBody>
             <ModalFooter>
-              <Button type='submit' colorScheme='blue'>Submit</Button>
+              <Button type='submit' colorScheme='blue'>
+                Submit
+              </Button>
             </ModalFooter>
           </form>
         </ModalContent>

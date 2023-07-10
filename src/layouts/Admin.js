@@ -123,7 +123,6 @@ export default function Dashboard(props) {
 
   useEffect(() => {
     setCustomerView(location.pathname)
-    // console.log(location.pathname)
   }, [location])
 
   const httpLink = createHttpLink({
