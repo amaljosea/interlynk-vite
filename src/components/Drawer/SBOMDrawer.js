@@ -78,9 +78,12 @@ function SBOMDrawer(props) {
           imageVersionID: imgVersionId,
           enabled: true,
           emails: emailList,
-          scanners: selectedScanner
+          scanners: selectedOptions
         }
-      }).then(() => setEmailList([]))
+      }).then(() => {
+        setEmailList([])
+        setSelectedOptions([])
+      })
       onClose()
     } catch (error) {
       if (error.networkError && error.networkError.statusCode === 500) {
@@ -125,9 +128,9 @@ function SBOMDrawer(props) {
     return selectedOptions.includes(value)
   }
 
-  // useEffect(() => {
-  //   console.log('selectedOptions', selectedOptions)
-  // }, [selectedOptions])
+  useEffect(() => {
+    console.log('selectedOptions', selectedOptions)
+  }, [selectedOptions])
 
   return (
     <Drawer

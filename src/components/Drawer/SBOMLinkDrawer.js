@@ -131,9 +131,9 @@ function SBOMLinkDrawer(props) {
     return selectedOptions.includes(value)
   }
 
-  // useEffect(() => {
-  //   console.log('selectedOptions', selectedOptions)
-  // }, [selectedOptions])
+  useEffect(() => {
+    console.log('selectedOptions', selectedOptions)
+  }, [selectedOptions])
 
   return (
     <Drawer

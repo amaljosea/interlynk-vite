@@ -20,7 +20,9 @@ import {
   MenuList,
   MenuItemOption,
   Box,
-  MenuDivider
+  MenuDivider,
+  MenuGroup,
+  MenuItem
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card.js'
@@ -274,31 +276,92 @@ const CustomerSBOMTable = ({ title, captions, data }) => {
     <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
       <Tabs variant='enclosed'>
         <TabList mt='20px'>
-          <Tab>Components</Tab>
-          {contains.vulnerabilities && <Tab>Vulnerabilities</Tab>}
+          <Tab>Vulnerabilities</Tab>
         </TabList>
         <TabPanels>
-          <TabPanel>
-            <CardHeader mb={4} as={Flex}>
+          <TabPanel height={'8xl'}>
+            <CardHeader mb={4} as={Flex} gap={2}>
               <Input
                 placeholder='Search'
                 width={'300px'}
                 size='md'
-                id='components'
-                value={searchInput}
-                onChange={handleSearch}
+                id='vulnerabilities'
+                value={searchVul}
+                onChange={(e) => setSearchVul(e.target.value)}
               />
+              <Menu closeOnSelect={true}>
+                <MenuButton
+                  as={Button}
+                  colorScheme='blue'
+                  leftIcon={<BsFilterRight size={24} />}
+                >
+                  Filter
+                </MenuButton>
+                <MenuList minWidth='240px'>
+                  <MenuGroup title='Resolution'>
+                    {['Unresolved', 'Total'].map((p, index) => (
+                      <MenuItem
+                        value={p}
+                        key={index}
+                        pl={4}
+                        fontSize={'sm'}
+                        // onClick={() => onVulnFilter(p)}
+                      >
+                        {p}
+                      </MenuItem>
+                    ))}
+                  </MenuGroup>
+                </MenuList>
+              </Menu>
             </CardHeader>
             <CardBody>
               <Table variant='simple' color={textColor} size='sm'>
                 <Thead>
                   <Tr my='.8rem' pl='0px'>
                     <Th
-                      ref={componentRef}
                       color='gray.400'
                       py={4}
                       position='relative'
-                      onClick={() => handleSort('component')}
+                      onClick={() => handleVulSort('cve')}
+                      cursor={'pointer'}
+                    >
+                      <Flex direction={'row'} alignItems={'center'} gap={2}>
+                        <Box>CVE ID</Box>
+                        <Box>
+                          {sortField === 'cve' && sortOrder === 'asc' ? (
+                            <TriangleUpIcon />
+                          ) : (
+                            <TriangleDownIcon />
+                          )}
+                        </Box>
+                      </Flex>
+                    </Th>
+                    <Th
+                      color='gray.400'
+                      py={4}
+                      position='relative'
+                      onClick={() => handleVulSort('cvss')}
+                      cursor={'pointer'}
+                    >
+                      <Flex direction={'row'} alignItems={'center'} gap={2}>
+                        <Box>CVSS</Box>
+                        <Box>
+                          {sortField === 'cvss' && sortOrder === 'asc' ? (
+                            <TriangleUpIcon />
+                          ) : (
+                            <TriangleDownIcon />
+                          )}
+                        </Box>
+                      </Flex>
+                    </Th>
+                    {/* <Th color='gray.400' py={4} position='relative'>
+                        Description
+                      </Th> */}
+                    <Th
+                      color='gray.400'
+                      py={4}
+                      position='relative'
+                      onClick={() => handleVulSort('component')}
                       cursor={'pointer'}
                     >
                       <Flex direction={'row'} alignItems={'center'} gap={2}>
@@ -316,7 +379,7 @@ const CustomerSBOMTable = ({ title, captions, data }) => {
                       color='gray.400'
                       py={4}
                       position='relative'
-                      onClick={() => handleSort('version')}
+                      onClick={() => handleVulSort('version')}
                       cursor={'pointer'}
                     >
                       <Flex direction={'row'} alignItems={'center'} gap={2}>
@@ -330,20 +393,18 @@ const CustomerSBOMTable = ({ title, captions, data }) => {
                         </Box>
                       </Flex>
                     </Th>
-                    <Th color='gray.400' py={4} position='relative'>
-                      Relates to
-                    </Th>
                     <Th
                       color='gray.400'
                       py={4}
                       position='relative'
-                      onClick={() => handleSort('license')}
+                      onClick={() => handleVulSort('fixed_component')}
                       cursor={'pointer'}
                     >
                       <Flex direction={'row'} alignItems={'center'} gap={2}>
-                        <Box>License</Box>
+                        <Box>Fixed (Component)</Box>
                         <Box>
-                          {sortField === 'license' && sortOrder === 'asc' ? (
+                          {sortField === 'fixed_component' &&
+                          sortOrder === 'asc' ? (
                             <TriangleUpIcon />
                           ) : (
                             <TriangleDownIcon />
@@ -351,87 +412,103 @@ const CustomerSBOMTable = ({ title, captions, data }) => {
                         </Box>
                       </Flex>
                     </Th>
-                    {/* <Th color='gray.400' py={4} position='relative'>
-                      Vulnerabilities
-                    </Th>
                     <Th
                       color='gray.400'
                       py={4}
                       position='relative'
+                      onClick={() => handleVulSort('fixed_product')}
                       cursor={'pointer'}
-                      onClick={() => handleSort('updated')}
                     >
                       <Flex direction={'row'} alignItems={'center'} gap={2}>
-                        <Box>Last Updated</Box>
+                        <Box>Fixed (Product)</Box>
                         <Box>
-                          {sortField === 'updated' && sortOrder === 'asc' ? (
+                          {sortField === 'fixed_product' &&
+                          sortOrder === 'asc' ? (
                             <TriangleUpIcon />
                           ) : (
                             <TriangleDownIcon />
                           )}
                         </Box>
                       </Flex>
-                    </Th> */}
+                    </Th>
+                    <Th
+                      color='gray.400'
+                      py={4}
+                      position='relative'
+                      onClick={() => handleVulSort('status')}
+                      cursor={'pointer'}
+                    >
+                      <Flex direction={'row'} alignItems={'center'} gap={2}>
+                        <Box>Status</Box>
+                        <Box>
+                          {sortField === 'status' && sortOrder === 'asc' ? (
+                            <TriangleUpIcon />
+                          ) : (
+                            <TriangleDownIcon />
+                          )}
+                        </Box>
+                      </Flex>
+                    </Th>
                     <Th color='gray.400' py={4} position='relative'></Th>
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {sortComponentData.length > 0
-                    ? sortComponentData.map((row) => {
+                  {filterData.length > 0
+                    ? filterData.map((row, idx) => {
                         return (
-                          <CustomerComponentRow
-                            key={row.component + row.version}
+                          <VulnerabilityRow
+                            key={idx}
+                            id={row.id}
                             component={row.component}
-                            logo={row.logo}
                             version={row.version}
-                            dependsOn={row.dependsOn}
-                            license={row.license}
-                            risk_score={row.risk_score}
-                            critical={row.critical}
-                            high={row.high}
-                            medium={row.medium}
-                            low={row.low}
-                            updated={row.updated}
-                            redacted={row.redacted}
+                            cvss={row.cvss}
+                            cve={row.cve}
+                            fixed_component={row.fixed_component}
+                            fixed_product={row.fixed_product}
+                            description={row.description}
+                            status={row.status}
+                            scanner={row.scanner}
+                            shared_data={row.shared_data}
+                            versions={row.versions}
                           />
                         )
                       })
-                    : filteredItems.length > 0
-                    ? filteredItems.map((row) => {
+                    : filteredVulItems.length > 0
+                    ? filteredVulItems.map((row, idx) => {
                         return (
-                          <CustomerComponentRow
-                            key={row.component + row.version}
+                          <VulnerabilityRow
+                            key={idx}
+                            id={row.id}
                             component={row.component}
-                            logo={row.logo}
                             version={row.version}
-                            dependsOn={row.dependsOn}
-                            license={row.license}
-                            risk_score={row.risk_score}
-                            critical={row.critical}
-                            high={row.high}
-                            medium={row.medium}
-                            low={row.low}
-                            updated={row.updated}
-                            redacted={row.redacted}
+                            cvss={row.cvss}
+                            cve={row.cve}
+                            fixed_component={row.fixed_component}
+                            fixed_product={row.fixed_product}
+                            description={row.description}
+                            status={row.status}
+                            scanner={row.scanner}
+                            shared_data={row.shared_data}
+                            versions={row.versions}
                           />
                         )
                       })
-                    : data.map((row) => {
+                    : vulnerabilitiesData.map((row, idx) => {
                         return (
-                          <CustomerComponentRow
-                            key={row.component + row.version}
+                          <VulnerabilityRow
+                            key={idx}
+                            id={row.id}
                             component={row.component}
-                            logo={row.logo}
                             version={row.version}
-                            dependsOn={row.dependsOn}
-                            license={row.license}
-                            risk_score={row.risk_score}
-                            critical={row.critical}
-                            high={row.high}
-                            medium={row.medium}
-                            low={row.low}
-                            updated={row.updated}
-                            redacted={row.redacted}
+                            cvss={row.cvss}
+                            cve={row.cve}
+                            fixed_component={row.fixed_component}
+                            fixed_product={row.fixed_product}
+                            description={row.description}
+                            status={row.status}
+                            scanner={row.scanner}
+                            shared_data={row.shared_data}
+                            versions={row.versions}
                           />
                         )
                       })}
@@ -439,264 +516,6 @@ const CustomerSBOMTable = ({ title, captions, data }) => {
               </Table>
             </CardBody>
           </TabPanel>
-          {contains.vulnerabilities && (
-            <TabPanel height={'8xl'}>
-              <CardHeader mb={4} as={Flex} gap={2}>
-                <Input
-                  placeholder='Search'
-                  width={'300px'}
-                  size='md'
-                  id='vulnerabilities'
-                  value={searchVul}
-                  onChange={(e) => setSearchVul(e.target.value)}
-                />
-                <Menu closeOnSelect={true}>
-                  <MenuButton
-                    as={Button}
-                    colorScheme='blue'
-                    leftIcon={<BsFilterRight size={24} />}
-                  >
-                    Filter
-                  </MenuButton>
-                  <MenuList minWidth='240px'>
-                    <MenuOptionGroup title='Status' type='checkbox'>
-                      {status.map((p) => (
-                        <MenuItemOption
-                          value={p}
-                          onClick={() => handleStatusSelect(p)}
-                        >
-                          {p}
-                        </MenuItemOption>
-                      ))}
-                    </MenuOptionGroup>
-                    <MenuDivider />
-                    <MenuOptionGroup title='Severity' type='checkbox'>
-                      {severity.map((item) => (
-                        <MenuItemOption
-                          key={item.id}
-                          value={`${item.name}`}
-                          onClick={() => handleSelect(item)}
-                        >
-                          {item.name}
-                        </MenuItemOption>
-                      ))}
-                    </MenuOptionGroup>
-                  </MenuList>
-                </Menu>
-              </CardHeader>
-              <CardBody>
-                <Table variant='simple' color={textColor} size='sm'>
-                  <Thead>
-                    <Tr my='.8rem' pl='0px'>
-                      <Th
-                        color='gray.400'
-                        py={4}
-                        position='relative'
-                        onClick={() => handleVulSort('cve')}
-                        cursor={'pointer'}
-                      >
-                        <Flex direction={'row'} alignItems={'center'} gap={2}>
-                          <Box>CVE</Box>
-                          <Box>
-                            {sortField === 'cve' && sortOrder === 'asc' ? (
-                              <TriangleUpIcon />
-                            ) : (
-                              <TriangleDownIcon />
-                            )}
-                          </Box>
-                        </Flex>
-                      </Th>
-                      <Th
-                        color='gray.400'
-                        py={4}
-                        position='relative'
-                        onClick={() => handleVulSort('cvss')}
-                        cursor={'pointer'}
-                      >
-                        <Flex direction={'row'} alignItems={'center'} gap={2}>
-                          <Box>CVSS</Box>
-                          <Box>
-                            {sortField === 'cvss' && sortOrder === 'asc' ? (
-                              <TriangleUpIcon />
-                            ) : (
-                              <TriangleDownIcon />
-                            )}
-                          </Box>
-                        </Flex>
-                      </Th>
-                      {/* <Th color='gray.400' py={4} position='relative'>
-                        Description
-                      </Th> */}
-                      <Th
-                        color='gray.400'
-                        py={4}
-                        position='relative'
-                        onClick={() => handleVulSort('component')}
-                        cursor={'pointer'}
-                      >
-                        <Flex direction={'row'} alignItems={'center'} gap={2}>
-                          <Box>Component</Box>
-                          <Box>
-                            {sortField === 'component' &&
-                            sortOrder === 'asc' ? (
-                              <TriangleUpIcon />
-                            ) : (
-                              <TriangleDownIcon />
-                            )}
-                          </Box>
-                        </Flex>
-                      </Th>
-                      <Th
-                        color='gray.400'
-                        py={4}
-                        position='relative'
-                        onClick={() => handleVulSort('version')}
-                        cursor={'pointer'}
-                      >
-                        <Flex direction={'row'} alignItems={'center'} gap={2}>
-                          <Box>Version</Box>
-                          <Box>
-                            {sortField === 'version' && sortOrder === 'asc' ? (
-                              <TriangleUpIcon />
-                            ) : (
-                              <TriangleDownIcon />
-                            )}
-                          </Box>
-                        </Flex>
-                      </Th>
-                      <Th
-                        color='gray.400'
-                        py={4}
-                        position='relative'
-                        onClick={() => handleVulSort('fixed_component')}
-                        cursor={'pointer'}
-                      >
-                        <Flex direction={'row'} alignItems={'center'} gap={2}>
-                          <Box>Fixed (Component)</Box>
-                          <Box>
-                            {sortField === 'fixed_component' &&
-                            sortOrder === 'asc' ? (
-                              <TriangleUpIcon />
-                            ) : (
-                              <TriangleDownIcon />
-                            )}
-                          </Box>
-                        </Flex>
-                      </Th>
-                      <Th
-                        color='gray.400'
-                        py={4}
-                        position='relative'
-                        onClick={() => handleVulSort('fixed_product')}
-                        cursor={'pointer'}
-                      >
-                        <Flex direction={'row'} alignItems={'center'} gap={2}>
-                          <Box>Fixed (Product)</Box>
-                          <Box>
-                            {sortField === 'fixed_product' &&
-                            sortOrder === 'asc' ? (
-                              <TriangleUpIcon />
-                            ) : (
-                              <TriangleDownIcon />
-                            )}
-                          </Box>
-                        </Flex>
-                      </Th>
-                      <Th color='gray.400' py={4} position='relative'>
-                        Scanner
-                      </Th>
-                      <Th color='gray.400' py={4} position='relative'>
-                        Shared data
-                      </Th>
-                      <Th color='gray.400' py={4} position='relative'>
-                        Versions
-                      </Th>
-                      <Th
-                        color='gray.400'
-                        py={4}
-                        position='relative'
-                        onClick={() => handleVulSort('status')}
-                        cursor={'pointer'}
-                      >
-                        <Flex direction={'row'} alignItems={'center'} gap={2}>
-                          <Box>Status</Box>
-                          <Box>
-                            {sortField === 'status' && sortOrder === 'asc' ? (
-                              <TriangleUpIcon />
-                            ) : (
-                              <TriangleDownIcon />
-                            )}
-                          </Box>
-                        </Flex>
-                      </Th>
-                      <Th color='gray.400' py={4} position='relative'></Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {filterData.length > 0
-                      ? filterData.map((row, idx) => {
-                          return (
-                            <VulnerabilityRow
-                              key={idx}
-                              id={row.id}
-                              component={row.component}
-                              version={row.version}
-                              cvss={row.cvss}
-                              cve={row.cve}
-                              fixed_component={row.fixed_component}
-                              fixed_product={row.fixed_product}
-                              description={row.description}
-                              status={row.status}
-                              scanner={row.scanner}
-                              shared_data={row.shared_data}
-                              versions={row.versions}
-                            />
-                          )
-                        })
-                      : filteredVulItems.length > 0
-                      ? filteredVulItems.map((row, idx) => {
-                          return (
-                            <VulnerabilityRow
-                              key={idx}
-                              id={row.id}
-                              component={row.component}
-                              version={row.version}
-                              cvss={row.cvss}
-                              cve={row.cve}
-                              fixed_component={row.fixed_component}
-                              fixed_product={row.fixed_product}
-                              description={row.description}
-                              status={row.status}
-                              scanner={row.scanner}
-                              shared_data={row.shared_data}
-                              versions={row.versions}
-                            />
-                          )
-                        })
-                      : vulnerabilitiesData.map((row, idx) => {
-                          return (
-                            <VulnerabilityRow
-                              key={idx}
-                              id={row.id}
-                              component={row.component}
-                              version={row.version}
-                              cvss={row.cvss}
-                              cve={row.cve}
-                              fixed_component={row.fixed_component}
-                              fixed_product={row.fixed_product}
-                              description={row.description}
-                              status={row.status}
-                              scanner={row.scanner}
-                              shared_data={row.shared_data}
-                              versions={row.versions}
-                            />
-                          )
-                        })}
-                  </Tbody>
-                </Table>
-              </CardBody>
-            </TabPanel>
-          )}
         </TabPanels>
       </Tabs>
     </Card>

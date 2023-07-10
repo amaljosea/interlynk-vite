@@ -1,5 +1,5 @@
 // Chakra Icons
-import { BellIcon, SearchIcon } from '@chakra-ui/icons'
+import { BellIcon } from '@chakra-ui/icons'
 // Chakra Imports
 import {
   Flex,
@@ -12,31 +12,42 @@ import {
   Text,
   useColorModeValue
 } from '@chakra-ui/react'
-// Assets
-import avatar1 from 'assets/img/avatars/avatar1.png'
-import avatar2 from 'assets/img/avatars/avatar2.png'
-import avatar3 from 'assets/img/avatars/avatar3.png'
 // Custom Icons
-import { ProfileIcon, SettingsIcon, LogoutIcon } from 'components/Icons/Icons'
+import { ProfileIcon, SettingsIcon } from 'components/Icons/Icons'
 // Custom Components
 import { ItemContent } from 'components/Menu/ItemContent'
 import SidebarResponsive from 'components/Sidebar/SidebarResponsive'
 import PropTypes from 'prop-types'
 import React, { useContext } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useHistory, useLocation } from 'react-router-dom'
 import routes from 'routes.js'
 import { FaSignOutAlt } from 'react-icons/fa'
 import GlobalContext from 'context/GlobalContext'
 
 import Cookies from 'js-cookie'
+import { useState, useEffect } from 'react'
 
 export default function HeaderLinks(props) {
+  const location = useLocation()
+  const history = useHistory()
+
   const { variant, children, fixed, secondary, onOpen, ...rest } = props
   const { setIsAuthenticate } = useContext(GlobalContext)
 
-  const userName = Cookies.get('username')
+  // console.log(`location`, location)
 
-  // console.log('User info', userName)
+  const [username, setUsername] = useState('')
+
+  const userName = localStorage.getItem('username')
+  const userEmail = localStorage.getItem('userEmail')
+
+  useEffect(() => {
+    if (location.pathname.startsWith('/admin')) {
+      setUsername(userName)
+    } else if (location.pathname.startsWith('/customer')) {
+      setUsername(userEmail)
+    }
+  }, [location.pathname])
 
   // Chakra Color Mode
   let mainTeal = useColorModeValue('teal.300', 'teal.300')
@@ -49,7 +60,14 @@ export default function HeaderLinks(props) {
     navbarIcon = 'white'
     mainText = 'white'
   }
-  const settingsRef = React.useRef()
+
+  const handleLogout = () => {
+    localStorage.removeItem('username')
+    Cookies.remove('authToken')
+    setIsAuthenticate(false)
+    history.push('/auth')
+  }
+
   return (
     <Flex
       pe={{ sm: '0px', md: '0px' }}
@@ -83,22 +101,17 @@ export default function HeaderLinks(props) {
             )
           }
         >
-          <Text display={{ sm: 'none', md: 'flex' }}>
-            {userName ? userName : 'Surendra Pathak'}
+          <Text display={{ sm: 'none', md: 'flex' }} fontSize={'sm'}>
+            {username ? username : 'Surendra Pathak'}
           </Text>
         </MenuButton>
         <MenuList size='sm'>
           <MenuGroup title=''>
-            <MenuItem icon={<SettingsIcon />}>Settings</MenuItem>
+            <Link to='/admin/connections'>
+              <MenuItem icon={<SettingsIcon />}>Settings</MenuItem>
+            </Link>
             {userName ? (
-              <MenuItem
-                icon={<FaSignOutAlt />}
-                onClick={() => {
-                  Cookies.remove('username')
-                  Cookies.remove('authToken')
-                  setIsAuthenticate(false)
-                }}
-              >
+              <MenuItem icon={<FaSignOutAlt />} onClick={handleLogout}>
                 Logout
               </MenuItem>
             ) : (
@@ -116,39 +129,41 @@ export default function HeaderLinks(props) {
         // logo={logo}
         {...rest}
       />
-      <Menu>
-        <MenuButton>
-          <BellIcon color={navbarIcon} w='18px' h='18px' />
-        </MenuButton>
-        <MenuList p='16px 8px'>
-          <Flex flexDirection='column'>
-            <MenuItem borderRadius='8px' mb='10px'>
-              <ItemContent
-                time='6 hours ago'
-                info='SPDX 3.0 Support'
-                boldInfo='[New Feature]'
-                aName='Feature'
-              />
-            </MenuItem>
-            <MenuItem borderRadius='8px' mb='10px'>
-              <ItemContent
-                time='3 days ago'
-                info='CycloneDX 1.4 Export'
-                boldInfo='[Fix]'
-                aName='Bug'
-              />
-            </MenuItem>
-            <MenuItem borderRadius='8px'>
-              <ItemContent
-                time='4 days ago'
-                info='SBOMQS Depth Fixed'
-                boldInfo='[Fix'
-                aName='Bug'
-              />
-            </MenuItem>
-          </Flex>
-        </MenuList>
-      </Menu>
+      {!userName && (
+        <Menu>
+          <MenuButton>
+            <BellIcon color={navbarIcon} w='18px' h='18px' />
+          </MenuButton>
+          <MenuList p='16px 8px'>
+            <Flex flexDirection='column'>
+              <MenuItem borderRadius='8px' mb='10px'>
+                <ItemContent
+                  time='6 hours ago'
+                  info='SPDX 3.0 Support'
+                  boldInfo='[New Feature]'
+                  aName='Feature'
+                />
+              </MenuItem>
+              <MenuItem borderRadius='8px' mb='10px'>
+                <ItemContent
+                  time='3 days ago'
+                  info='CycloneDX 1.4 Export'
+                  boldInfo='[Fix]'
+                  aName='Bug'
+                />
+              </MenuItem>
+              <MenuItem borderRadius='8px'>
+                <ItemContent
+                  time='4 days ago'
+                  info='SBOMQS Depth Fixed'
+                  boldInfo='[Fix'
+                  aName='Bug'
+                />
+              </MenuItem>
+            </Flex>
+          </MenuList>
+        </Menu>
+      )}
     </Flex>
   )
 }

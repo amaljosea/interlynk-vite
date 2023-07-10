@@ -38,9 +38,9 @@ import {
   FaBug,
   FaEyeSlash
 } from 'react-icons/fa'
-import { useContext, useEffect } from 'react'
+import { useContext } from 'react'
 import GlobalContext from 'context/GlobalContext'
-import SBOMDrawer from 'components/Drawer/SBOMDrawer'
+import { timeSince } from 'utils'
 import { useMutation } from '@apollo/client'
 import { UpdateShareLynk } from 'graphQL/Mutation'
 import { DeleteShareLynk } from 'graphQL/Mutation'
@@ -77,7 +77,7 @@ function SBOMLinkRow(props) {
   // const customerId = link.split('/')
 
   const sbomLink = useClipboard(
-    `http://localhost:3001/customer/sboms?${signedUrlParams}`
+    `http://localhost:3001/customer/signed_url_params?${signedUrlParams}`
   )
 
   // `https://dashboard-app.fly.dev/#/customer/sboms/${customerId[7]}`
@@ -131,32 +131,6 @@ function SBOMLinkRow(props) {
         alert(error.message)
       }
     }
-  }
-
-  function timeSince(dateStr) {
-    var date = new Date(dateStr)
-    var seconds = Math.floor((new Date() - date) / 1000)
-    var interval = seconds / 31536000
-    if (interval > 1) {
-      return Math.floor(interval) + ' years ago'
-    }
-    interval = seconds / 2592000
-    if (interval > 1) {
-      return Math.floor(interval) + ' months ago'
-    }
-    interval = seconds / 86400
-    if (interval > 1) {
-      return Math.floor(interval) + ' days ago'
-    }
-    interval = seconds / 3600
-    if (interval > 1) {
-      return Math.floor(interval) + ' hours ago'
-    }
-    interval = seconds / 60
-    if (interval > 1) {
-      return Math.floor(interval) + ' minutes ago'
-    }
-    return Math.floor(seconds) + ' seconds ago'
   }
 
   productVersionsData.map((project) => {
@@ -231,7 +205,7 @@ function SBOMLinkRow(props) {
         {/* </Link> */}
         <Flex mb={2}>
           <Input
-            value={`http://localhost:3001/customer/sboms?${signedUrlParams}`}
+            value={`http://localhost:3001/customer/signed_url_params?${signedUrlParams}`}
             onChange={(e) => sbomLink.setValue(e.target.value)}
             mr={2}
             disabled
@@ -262,7 +236,7 @@ function SBOMLinkRow(props) {
             </MenuList>
           </Portal>
         </Menu>
-        <SBOMLinkDrawer
+      <SBOMLinkDrawer
           id={id}
           shareUsers={shareUsers}
           shareScanner={shareScanners}
