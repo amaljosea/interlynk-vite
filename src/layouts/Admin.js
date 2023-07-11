@@ -121,6 +121,8 @@ export default function Dashboard(props) {
   document.documentElement.dir = 'ltr'
   // Chakra Color Mode
 
+  const userName = localStorage.getItem('username')
+
   useEffect(() => {
     setCustomerView(location.pathname)
   }, [location])
@@ -172,8 +174,12 @@ export default function Dashboard(props) {
             <PanelContent>
               <PanelContainer>
                 <Switch>
-                  {getRoutes(routes)}
-                  <Redirect from='/admin' to='/admin/dashboard' />
+                  {userName && getRoutes(routes)}
+                  {userName ? (
+                    <Redirect from='/admin' to='/admin/dashboard' />
+                  ) : (
+                    <Redirect from='/admin' to='/auth' />
+                  )}
                 </Switch>
               </PanelContainer>
             </PanelContent>

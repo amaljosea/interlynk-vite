@@ -17,10 +17,10 @@ const VulLinkRow = ({
         {username}
       </Td>
       <Td fontSize={'xs'} textTransform={'capitalize'}>
-        {justification}
+        {status}
       </Td>
       <Td fontSize={'xs'} textTransform={'capitalize'}>
-        {status}
+        {justification}
       </Td>
       <Td fontSize={'xs'} textTransform={'capitalize'}>
         {timeSince(timestamp)}

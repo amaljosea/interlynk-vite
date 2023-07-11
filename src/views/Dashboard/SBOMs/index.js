@@ -20,7 +20,14 @@ import SBOMTable from './components/SBOMTable'
 import SBOMStatistics from './components/SBOMStatistics'
 
 import { sbom } from 'variables/general'
-import { FaCubes, FaBug, FaUnlock, FaTag, FaMicroscope, FaExclamationTriangle } from 'react-icons/fa'
+import {
+  FaCubes,
+  FaBug,
+  FaUnlock,
+  FaTag,
+  FaMicroscope,
+  FaExclamationTriangle
+} from 'react-icons/fa'
 import { useLocation } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
 import Tooltip from 'components/Tooltip'
@@ -85,14 +92,6 @@ function SBOMs() {
     ]
   })
 
-  const [scanner] = useState([
-    { id: 0, name: 'All' },
-    { id: 1, name: 'Grype' },
-    { id: 2, name: 'Scout' },
-    { id: 3, name: 'Snyk' },
-    { id: 4, name: 'Trivy' }
-  ])
-
   const {
     productVersionsData,
     setTabIndex,
@@ -111,7 +110,15 @@ function SBOMs() {
   const [selectedVersion, setSelectedVersion] = useState('')
   const [selectedScanner, setSelectedScanner] = useState('')
 
-  const { data: imageData, refetch: imageDataRefetch } = useQuery(getImage, {
+  const [allResults, setAllResults] = useState([])
+
+  const [filteredVulItems, setFilteredVulItems] = useState([])
+
+  const {
+    data: imageData,
+    refetch: imageDataRefetch,
+    loading: shareLynkLoading
+  } = useQuery(getImage, {
     variables: { id: imageId }
   })
 
@@ -128,6 +135,7 @@ function SBOMs() {
   useEffect(() => {
     if (imageVersionData) {
       console.log('imageVersionData', imageVersionData)
+      setAllResults(imageVersionData.imageVersion.imageVulns)
       setScanResults(imageVersionData.imageVersion)
     }
   }, [imageVersionData])
@@ -146,6 +154,7 @@ function SBOMs() {
   }, [imageData])
 
   const handleVersionUpdate = (e) => {
+    setFilteredVulItems([])
     const { value } = e.target
     setSelectedVersion(value)
     console.log('value', value)
@@ -181,49 +190,18 @@ function SBOMs() {
 
   const sortSBOM = sbom.sort((a, b) => a.component.localeCompare(b.component))
 
-  const [selectedScannerItem, setSelectedScannerItem] = useState([])
-  const [filteredVulItems, setFilteredVulItems] = useState([])
-
   const handleScanner = (e) => {
     const { value } = e.target
     setSelectedScanner(value)
-    setSelectedScannerItem(value)
-    window.localStorage.setItem('scanner', value)
-    if (selectedScannerItem.includes(value)) {
-      const filterItem = selectedScannerItem.filter((itm) => itm !== `${value}`)
-      setSelectedScannerItem(filterItem)
-    } else {
-      setSelectedScannerItem((prev) => [...prev, value])
-    }
-  }
-
-  const filteredByCompany = (com) => {
-    const company = vulnerabilitiesData.filter((item) =>
-      item.shared_data.includes(com.name)
-    )
-    setFilteredVulItems(company)
-    console.log('company', company)
-  }
-
-  const filterObjectsByScanner = (selectedScanner) => {
-    return vulnerabilitiesData.filter((obj) => {
-      return selectedScanner.some((scanner) => obj.scanner.includes(scanner))
-    })
   }
 
   useEffect(() => {
-    // If no options are selected, display all data
-    if (selectedScannerItem.length === 0) {
-      setFilteredVulItems(vulnerabilitiesData)
-    }
-
-    // Filter the data based on selected options
-    const items = filterObjectsByScanner(selectedScannerItem)
-    setFilteredVulItems(items)
-
-    // console.log('filter', filterObjectsByScanner(selectedScanner))
-  }, [selectedScannerItem])
-
+    const filteredData = allResults.filter((item) =>
+      item.scanners.some((scanner) => scanner.id === selectedScanner)
+    )
+    console.log('filteredData', filteredData)
+    setFilteredVulItems(filteredData)
+  }, [selectedScanner])
 
   useEffect(() => {
     setTabIndex(1)
@@ -352,9 +330,11 @@ function SBOMs() {
                     id='scanner'
                     value={selectedScanner}
                     onChange={handleScanner}
+                    defaultValue={'All'}
                     size='md'
                     color='gray.500'
                   >
+                    <option value={'all'}>All</option>
                     {scanResults &&
                       scanResults.imageScanners.map((result) => (
                         <option key={result.id} value={result.id}>
@@ -386,7 +366,14 @@ function SBOMs() {
         />
         <Spacer />
         <SBOMStatistics
-          icon={<Icon h={'24px'} w={'24px'} color='white' as={FaExclamationTriangle} />}
+          icon={
+            <Icon
+              h={'24px'}
+              w={'24px'}
+              color='white'
+              as={FaExclamationTriangle}
+            />
+          }
           title={'Active Vulnerabilities'}
           description={'Vulnerabilities included in SBOM'}
           amount={activeVulnVal !== '' ? activeVulnVal : '1C, 1H, 3M, 4L'}
@@ -423,6 +410,7 @@ function SBOMs() {
         data={sortSBOM}
         filteredVul={filteredVulItems}
         loading={loading}
+        shareLynkLoading={shareLynkLoading}
         setFilteredVulItems={setFilteredVulItems}
       />
     </Flex>

@@ -60,8 +60,8 @@ export default function CustomerModal() {
           setUserEmail('')
           localStorage.setItem('userEmail', status.data.user.email)
           Cookies.set('userToken', response.headers.authorization)
-          onClose()
           window.localStorage.removeItem('path')
+          window.location.reload()
         }
       })
       .catch((error) => {

@@ -84,7 +84,7 @@ export const statusColor = (status) => {
     return 'cyan'
   }
 }
-  
+
 export const timeSince = (dateStr) => {
   var date = new Date(dateStr)
   var seconds = Math.floor((new Date() - date) / 1000)
@@ -110,3 +110,122 @@ export const timeSince = (dateStr) => {
   }
   return Math.floor(seconds) + ' seconds ago'
 }
+
+export const regions = [
+  {
+    name: 'US East (Ohio) - us-east-2',
+    id: 'us-east-2'
+  },
+  {
+    name: 'US East (N. Virginia) - us-east-1',
+    id: 'us-east-1'
+  },
+  {
+    name: 'US West (N. California) - us-west-1',
+    id: 'us-west-1'
+  },
+  {
+    name: 'US West (Oregon) - us-west-2',
+    id: 'us-west-2'
+  },
+  {
+    name: 'Africa (Cape Town) - af-south-1',
+    id: 'af-south-1'
+  },
+  {
+    name: 'Asia Pacific (Hong Kong) - ap-east-1',
+    id: 'ap-east-1'
+  },
+  {
+    name: 'Asia Pacific (Hyderabad) - ap-south-2',
+    id: 'ap-south-2'
+  },
+  {
+    name: 'Asia Pacific (Jakarta) - ap-southeast-3',
+    id: 'ap-southeast-3'
+  },
+  {
+    name: 'Asia Pacific (Melbourne) - ap-southeast-4',
+    id: 'ap-southeast-4'
+  },
+  {
+    name: 'Asia Pacific (Mumbai) - ap-south-1',
+    id: 'ap-south-1'
+  },
+  {
+    name: 'Asia Pacific (Osaka) - ap-northeast-3',
+    id: 'ap-northeast-3'
+  },
+  {
+    name: 'Asia Pacific (Seoul) - ap-northeast-2',
+    id: 'ap-northeast-2'
+  },
+  {
+    name: 'Asia Pacific (Singapore) - ap-southeast-1',
+    id: 'ap-southeast-1'
+  },
+  {
+    name: 'Asia Pacific (Sydney) - ap-southeast-2',
+    id: 'ap-southeast-2'
+  },
+  {
+    name: 'Asia Pacific (Tokyo) - ap-northeast-1',
+    id: 'ap-northeast-1'
+  },
+  {
+    name: 'Canada (Central) - ca-central-1',
+    id: 'ca-central-1'
+  },
+  {
+    name: 'Europe (Frankfurt) - eu-central-1',
+    id: 'eu-central-1'
+  },
+  {
+    name: 'Europe (Ireland) - eu-west-1',
+    id: 'eu-west-1'
+  },
+  {
+    name: 'Europe (London) - eu-west-2',
+    id: 'eu-west-2'
+  },
+  {
+    name: 'Europe (Milan) - eu-south-1',
+    id: 'eu-south-1'
+  },
+  {
+    name: 'Europe (Paris) - eu-west-3',
+    id: 'eu-west-3'
+  },
+  {
+    name: 'Europe (Spain) - eu-south-2',
+    id: 'eu-south-2'
+  },
+  {
+    name: 'Europe (Stockholm) - eu-north-1',
+    id: 'eu-north-1'
+  },
+  {
+    name: 'Europe (Zurich) - eu-central-2',
+    id: 'eu-central-2'
+  },
+  {
+    name: 'Middle East (Bahrain) - me-south-1',
+    id: 'me-south-1'
+  },
+  {
+    name: 'Middle East (UAE) - me-central-1',
+    id: 'me-central-1'
+  },
+  {
+    name: 'South America (São Paulo) - sa-east-1',
+    id: 'sa-east-1'
+  },
+  {
+    name: 'AWS GovCloud (US-East) - us-gov-east-1',
+    id: 'us-gov-east-1'
+  },
+  {
+    name: 'AWS GovCloud (US-West) - us-gov-west-1',
+    id: 'us-gov-west-1'
+  }
+]

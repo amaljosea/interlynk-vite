@@ -7,6 +7,7 @@ export const OrgConnectorCreate = gql`
     $user: String!
     $token: String!
     $enabled: Boolean
+    $region: String
   ) {
     organizationConnectorCreate(
       input: {
@@ -15,6 +16,7 @@ export const OrgConnectorCreate = gql`
         username: $user
         token: $token
         enabled: $enabled
+        awsRegion: $region
       }
     ) {
       organizationConnector {

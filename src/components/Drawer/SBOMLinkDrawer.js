@@ -93,7 +93,7 @@ function SBOMLinkDrawer(props) {
     } catch (error) {
       if (error.networkError && error.networkError.statusCode === 500) {
         // Handle the specific error
-        alert('Limit access required')
+        alert('Please specify at least one email address.')
         onClose()
       } else {
         // Handle other errors
@@ -131,9 +131,9 @@ function SBOMLinkDrawer(props) {
     return selectedOptions.includes(value)
   }
 
-  useEffect(() => {
-    console.log('selectedOptions', selectedOptions)
-  }, [selectedOptions])
+  // useEffect(() => {
+  //   console.log('selectedOptions', selectedOptions)
+  // }, [selectedOptions])
 
   return (
     <Drawer

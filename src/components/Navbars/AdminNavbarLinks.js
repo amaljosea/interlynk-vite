@@ -47,7 +47,7 @@ export default function HeaderLinks(props) {
     } else if (location.pathname.startsWith('/customer')) {
       setUsername(userEmail)
     }
-  }, [location.pathname])
+  }, [])
 
   // Chakra Color Mode
   let mainTeal = useColorModeValue('teal.300', 'teal.300')
@@ -105,22 +105,24 @@ export default function HeaderLinks(props) {
             {username ? username : 'Surendra Pathak'}
           </Text>
         </MenuButton>
-        <MenuList size='sm'>
-          <MenuGroup title=''>
-            <Link to='/admin/connections'>
-              <MenuItem icon={<SettingsIcon />}>Settings</MenuItem>
-            </Link>
-            {userName ? (
-              <MenuItem icon={<FaSignOutAlt />} onClick={handleLogout}>
-                Logout
-              </MenuItem>
-            ) : (
-              <Link to='/'>
-                <MenuItem icon={<FaSignOutAlt />}>Login</MenuItem>
+        {!location.pathname.startsWith('/customer') && (
+          <MenuList size='sm'>
+            <MenuGroup title=''>
+              <Link to='/admin/connections'>
+                <MenuItem icon={<SettingsIcon />}>Settings</MenuItem>
               </Link>
-            )}
-          </MenuGroup>
-        </MenuList>
+              {userName ? (
+                <MenuItem icon={<FaSignOutAlt />} onClick={handleLogout}>
+                  Logout
+                </MenuItem>
+              ) : (
+                <Link to='/'>
+                  <MenuItem icon={<FaSignOutAlt />}>Login</MenuItem>
+                </Link>
+              )}
+            </MenuGroup>
+          </MenuList>
+        )}
       </Menu>
       <SidebarResponsive
         logoText={props.logoText}
