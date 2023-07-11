@@ -22,12 +22,12 @@ RUN apt-get update -qq && \
     apt-get install -y python-is-python3 pkg-config build-essential
 
 # Install node modules
-COPY --link package.json package-lock.json ./
+COPY package.json package-lock.json ./
 RUN npm install --production=false
 RUN npm install serve -g
 
 # Copy application code
-COPY --link . .
+COPY . .
 
 # Build application
 RUN npm run build
