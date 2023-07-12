@@ -1,6 +1,9 @@
 name: Build and Push to ECR
 
 on:
+  push:
+    branches:
+      - main
   release:
     types: [published]
 
@@ -23,14 +26,19 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Extract tag name
-      run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+    - name: Determine Docker tag
+      id: determine-tag
+      run: |
+        if [[ "${{ github.event_name }}" == "release" ]]; then
+          echo "::set-output name=VERSION::${{ github.event.release.tag_name }}"
+        else
+          echo "::set-output name=VERSION::latest"
+        fi
 
     - name: Build, tag, and push image to Amazon ECR
-      id: build-image
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
       run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$VERSION
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ steps.determine-tag.outputs.VERSION }} .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ steps.determine-tag.outputs.VERSION }}
