@@ -33,6 +33,7 @@ export default function AdminNavbar(props) {
   const imageId = queryParams.get('id')
 
   const imageName = window.localStorage.getItem('Image')
+  const signedImageName = localStorage.getItem(`signedImageName`)
 
   // Here are all the props that may change depending on navbar's type or state.(secondary, variant, scrolled)
   let mainText = useColorModeValue('gray.700', 'gray.200')
@@ -135,20 +136,28 @@ export default function AdminNavbar(props) {
               </Link>
             </BreadcrumbItem>
 
-            <BreadcrumbItem color={mainText}>
-              <Link to='/admin/images' color={secondaryText}>
-                {brandText === 'SBOM' ? 'Image' : brandText}
-              </Link>
-            </BreadcrumbItem>
+            {!location.pathname.startsWith('/customer') && (
+              <BreadcrumbItem color={mainText}>
+                <Link to='/admin/images' color={secondaryText}>
+                  {brandText === 'SBOM' ? 'Image' : brandText}
+                </Link>
+              </BreadcrumbItem>
+            )}
 
-            {imageName !== '' && versionId && brandText === 'Images' ? (
+            {imageName !== '' && versionId && brandText === 'Images' && (
               <BreadcrumbItem color={mainText}>
                 <BreadcrumbLink href='#' color={mainText}>
                   {imageName}
                 </BreadcrumbLink>
               </BreadcrumbItem>
-            ) : (
-              ''
+            )}
+
+            {signedImageName && location.pathname.startsWith('/customer') && (
+              <BreadcrumbItem color={mainText}>
+                <BreadcrumbLink href='#' color={mainText}>
+                  {signedImageName}
+                </BreadcrumbLink>
+              </BreadcrumbItem>
             )}
           </Breadcrumb>
         </Box>

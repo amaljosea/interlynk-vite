@@ -5,7 +5,7 @@ import Customer from 'views/Dashboard/Customer'
 var customerRoutes = [
   {
     path: '/signed_url_params',
-    name: 'SBOM',
+    name: 'Images',
     icon: <FaCode color='inherit' />,
     component: Customer,
     layout: '/customer'

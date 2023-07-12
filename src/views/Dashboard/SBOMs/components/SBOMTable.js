@@ -73,7 +73,7 @@ const SBOMTable = ({
   imageDataRefetch,
   scanResults,
   loading,
-  columns
+  shareLynkLoading
 }) => {
   const {
     SBOMLinksData,
@@ -128,16 +128,6 @@ const SBOMTable = ({
     setSearchInput(e.target.value)
   }
 
-  const filteredItems = sbom.filter(
-    (item) =>
-      item.component.toLowerCase().includes(searchInput.toLowerCase()) ||
-      item.license.toLowerCase().includes(searchInput.toLowerCase())
-  )
-
-  const filteredRiskItems = Risks.filter((item) =>
-    item.component.toLowerCase().includes(riskInput.toLowerCase())
-  )
-
   const handleSelect = (item) => {
     setFilteredVulItems([])
     if (selectedOptions.includes(item.name)) {
@@ -159,7 +149,7 @@ const SBOMTable = ({
   }
 
   const onVulnFilter = (item) => {
-    console.log('item', item)
+    setFilteredRow([])
     if (item === 'Unresolved') {
       const filterData = vulnData.filter(
         (item) =>
@@ -440,40 +430,40 @@ const SBOMTable = ({
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {shareLynks.length > 0 ? (
-                      shareLynks.map((row, idx) => (
-                        <SBOMLinkRow
-                          key={idx}
-                          id={row.id}
-                          signedUrlParams={row.signedUrlParams}
-                          updatedAt={row.updatedAt}
-                          shareUsers={row.shareUsers}
-                          shareScanners={row.shareScanners}
-                          enabled={row.enabled}
-                          imageDataRefetch={imageDataRefetch}
-                          imgVersionId={imgVersionId}
-                          scanResults={scanResults}
-                        />
-                      ))
-                    ) : (
-                      <Tr>
-                        <Td fontSize={'sm'} pl={1}>
-                          <Skeleton height='20px' />
-                        </Td>
-                        <Td fontSize={'sm'} pl={1}>
-                          <Skeleton height='20px' />
-                        </Td>
-                        <Td fontSize={'sm'} pl={1}>
-                          <Skeleton height='20px' />
-                        </Td>
-                        <Td fontSize={'sm'} pl={1}>
-                          <Skeleton height='20px' />
-                        </Td>
-                        <Td fontSize={'sm'} pl={1}>
-                          <Skeleton height='20px' />
-                        </Td>
-                      </Tr>
-                    )}
+                    {shareLynks.length > 0
+                      ? shareLynks.map((row, idx) => (
+                          <SBOMLinkRow
+                            key={idx}
+                            id={row.id}
+                            signedUrlParams={row.signedUrlParams}
+                            updatedAt={row.updatedAt}
+                            shareUsers={row.shareUsers}
+                            shareScanners={row.shareScanners}
+                            enabled={row.enabled}
+                            imageDataRefetch={imageDataRefetch}
+                            imgVersionId={imgVersionId}
+                            scanResults={scanResults}
+                          />
+                        ))
+                      : shareLynkLoading && (
+                          <Tr>
+                            <Td fontSize={'sm'} pl={1}>
+                              <Skeleton height='20px' />
+                            </Td>
+                            <Td fontSize={'sm'} pl={1}>
+                              <Skeleton height='20px' />
+                            </Td>
+                            <Td fontSize={'sm'} pl={1}>
+                              <Skeleton height='20px' />
+                            </Td>
+                            <Td fontSize={'sm'} pl={1}>
+                              <Skeleton height='20px' />
+                            </Td>
+                            <Td fontSize={'sm'} pl={1}>
+                              <Skeleton height='20px' />
+                            </Td>
+                          </Tr>
+                        )}
                   </Tbody>
                 </Table>
               </CardBody>
@@ -506,19 +496,22 @@ const SBOMTable = ({
                         Filter
                       </MenuButton>
                       <MenuList minWidth='240px'>
-                        <MenuGroup title='Resolution'>
+                        <MenuOptionGroup
+                          defaultValue='Total'
+                          title='Resolution'
+                          type='radio'
+                        >
                           {['Unresolved', 'Total'].map((p, index) => (
-                            <MenuItem
+                            <MenuItemOption
                               value={p}
                               key={index}
-                              pl={4}
                               fontSize={'sm'}
                               onClick={() => onVulnFilter(p)}
                             >
                               {p}
-                            </MenuItem>
+                            </MenuItemOption>
                           ))}
-                        </MenuGroup>
+                        </MenuOptionGroup>
                       </MenuList>
                     </Menu>
                   </Flex>
@@ -661,6 +654,15 @@ const SBOMTable = ({
                         color='gray.400'
                         py={4}
                         position='relative'
+                        // onClick={() => handleVulSort('fixed_product')}
+                        cursor={'pointer'}
+                      >
+                        <Box>Scanner</Box>
+                      </Th>
+                      <Th
+                        color='gray.400'
+                        py={4}
+                        position='relative'
                         // onClick={() => handleVulSort('status')}
                         cursor={'pointer'}
                       >
@@ -723,6 +725,30 @@ const SBOMTable = ({
                             imageInfo={imageInfo}
                           />
                         ))
+                      : filteredVul.length > 0
+                      ? filteredVul.map((row, idx) => {
+                          return (
+                            <VulnerabilityRow
+                              refetch={refetch}
+                              key={idx}
+                              id={row.id}
+                              imgVersionId={imgVersionId}
+                              component={row.component.name}
+                              version={row.component.version}
+                              cvss={row.cvss.v3Score}
+                              cve={row.cveId}
+                              fixed_component={row.component.fixedInVersion}
+                              fixed_product={row.fixedInImage}
+                              description={row.component.name}
+                              status={row.vexVuln?.vexStatus}
+                              justify={row.vexVuln?.vexJustification}
+                              scanner={row.scanners}
+                              shared_data={row.component.name}
+                              versions={row.component.name}
+                              imageInfo={imageInfo}
+                            />
+                          )
+                        })
                       : vulData.length > 0
                       ? vulData.map((row, idx) => {
                           return (

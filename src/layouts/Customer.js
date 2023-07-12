@@ -5,7 +5,7 @@ import Footer from 'components/Footer/Footer.js'
 import AdminNavbar from 'components/Navbars/AdminNavbar.js'
 import Sidebar from 'components/Sidebar'
 import React, { useContext, useState } from 'react'
-import { Route, Switch } from 'react-router-dom'
+import { Route, Switch, Redirect } from 'react-router-dom'
 // Custom Chakra theme
 import theme from 'theme/theme.js'
 // Custom components
@@ -154,7 +154,10 @@ export default function Customer(props) {
           {getRoute() ? (
             <PanelContent>
               <PanelContainer>
-                <Switch>{getRoutes(customerRoutes)}</Switch>
+                <Switch>
+                  {getRoutes(customerRoutes)}
+                  <Redirect from={`/customer`} to='/customer' />
+                </Switch>
               </PanelContainer>
             </PanelContent>
           ) : null}

@@ -24,7 +24,8 @@ import {
   Tr,
   Tbody,
   Th,
-  Td
+  Td,
+  Select
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
@@ -35,7 +36,7 @@ import { OrgConnectorCreate } from 'graphQL/Mutation'
 import { OrgConnectorUpdate } from 'graphQL/Mutation'
 import { OrgConnectorDelete } from 'graphQL/Mutation'
 
-import { getConImg } from 'utils'
+import { getConImg, regions } from 'utils'
 
 const Index = () => {
   const [connectors, setConnectors] = useState([])
@@ -90,6 +91,7 @@ const Index = () => {
   const [connectorName, setConnectorName] = useState('')
   const [username, setUsername] = useState('')
   const [accessToken, setAccessToken] = useState('')
+  const [region, setRegion] = useState()
 
   const handleOpen = (item) => {
     setSelectedConnection(null)
@@ -134,7 +136,8 @@ const Index = () => {
             user: username,
             token: accessToken,
             readOnly: true,
-            enabled: conStatus
+            enabled: conStatus,
+            region: region ? region : ''
           }
         })
         onClose()
@@ -312,6 +315,22 @@ const Index = () => {
                               onChange={(e) => setAccessToken(e.target.value)}
                               placeholder={'Enter access token'}
                             />
+                          </FormControl>
+                        )}
+                        {registryName === 'Amazon ECR' && (
+                          <FormControl isRequired>
+                            <FormLabel>AWS Region</FormLabel>
+                            <Select
+                              defaultValue={'us-east-1'}
+                              value={region}
+                              onChange={(e) => setRegion(e.target.value)}
+                            >
+                              {regions.map((item, index) => (
+                                <option key={index} value={item.id}>
+                                  {item.name}
+                                </option>
+                              ))}
+                            </Select>
                           </FormControl>
                         )}
                       </Flex>

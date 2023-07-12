@@ -16,12 +16,10 @@ ReactDOM.render(
     <BrowserRouter>
       <ScrollToTop />
       <Switch>
-        {/* <Route path={`/sbom`} component={SBOMLayout} /> */}
         <Route path={`/auth`} component={AuthLayout} />
         <Route path={`/admin`} component={AdminLayout} />
         <Route path={`/customer`} component={CustomerLayout} />
         <Redirect from={`/`} to='/auth' />
-        <Redirect from={`/customer`} to='/customer' />
       </Switch>
     </BrowserRouter>
   </ContextWrapper>,

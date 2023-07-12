@@ -212,18 +212,57 @@ export const getVexJustifications = gql`
 export const GetSignedImage = gql`
   query GetSignedImage($signedParams: String!) {
     image(signedParams: $signedParams) {
+      id
       name
+      imageScanners {
+        id
+        name
+        company
+        updatedAt
+      }
       imageVersions {
         id
+        name
       }
+      lastPushedAt
+      updatedAt
     }
   }
 `
 
 export const GetSignedImageVersion = gql`
-  query GetSignedImageVersion($signedParams: String!) {
+  query GetSignedImageVersion($signedParams: String!, $imgVersionId: ID!) {
     imageVersion(signedParams: $signedParams) {
+      id
       name
+      imageVulns(imageVersionId: $imgVersionId) {
+        component {
+          name
+          version
+          fixedInVersion
+        }
+        cveId
+        cvss {
+          v2Score
+          v3Score
+        }
+        scanners {
+          id
+          name
+          company
+        }
+        severity
+        vexVuln {
+          vexStatus {
+            id
+            name
+          }
+          vexJustification {
+            id
+            name
+          }
+        }
+      }
     }
   }
 `

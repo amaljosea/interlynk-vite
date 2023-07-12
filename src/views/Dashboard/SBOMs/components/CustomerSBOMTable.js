@@ -22,7 +22,9 @@ import {
   Box,
   MenuDivider,
   MenuGroup,
-  MenuItem
+  MenuItem,
+  Skeleton,
+  Td
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card.js'
@@ -44,15 +46,23 @@ import { useRef } from 'react'
 import CustomerComponentRow from 'components/Tables/CustomerComponentRow'
 import { BsFilterRight } from 'react-icons/bs'
 
-const CustomerSBOMTable = ({ title, captions, data }) => {
+const CustomerSBOMTable = ({
+  data,
+  loading,
+  refetch,
+  imgVersionId,
+  imageInfo,
+  filteredVul,
+  setFilteredVulItems
+}) => {
   const { vulnerabilitiesData, setVulnerabilitiesData } = useContext(
     GlobalContext
   )
   const textColor = useColorModeValue('gray.700', 'white')
 
-  const componentRef = useRef()
+  const [filteredRow, setFilteredRow] = useState([])
+  const [sortedVulnData, setSortedVulnData] = useState([])
 
-  const [searchInput, setSearchInput] = useState('')
   const [searchVul, setSearchVul] = useState('')
 
   // const [selectedOptions, setSelectedOptions] = useState([])
@@ -63,92 +73,18 @@ const CustomerSBOMTable = ({ title, captions, data }) => {
   const [sortOrder, setSortOrder] = useState('asc')
   const [sortComponentData, setSortComponentData] = useState([])
 
-  const vuln_captions = [
-    'CVE',
-    'CVSS',
-    'Description',
-    'component',
-    'version',
-    'Fixed (Component)',
-    'Fixed (Product)',
-    'Status',
-    ''
-  ]
-
-  const [severity] = useState([
-    { id: 1, name: 'Critical' },
-    { id: 2, name: 'High' },
-    { id: 3, name: 'Medium' },
-    { id: 4, name: 'Low' }
-  ])
-
-  const [scanner] = useState([
-    { id: 1, name: 'Grype' },
-    { id: 2, name: 'Scout' },
-    { id: 3, name: 'Syft' },
-    { id: 4, name: 'Trivy' }
-  ])
-
-  const [status] = useState([
-    'Affected',
-    'False Positive',
-    'Fixed',
-    'In Triage',
-    'Not Affected'
-  ])
-
-  const [contains, setcontains] = useState({})
-
-  const handleSearch = (e) => {
-    setSearchInput(e.target.value)
-  }
-
-  const filteredItems = sbom.filter(
-    (item) =>
-      item.component.toLowerCase().includes(searchInput.toLowerCase()) ||
-      item.license.toLowerCase().includes(searchInput.toLowerCase())
-  )
-
-  const filteredVulItems = vulnerabilitiesData.filter(
-    (item) =>
-      item.cve.toLowerCase().includes(searchVul.toLowerCase()) ||
-      item.component.toLowerCase().includes(searchVul.toLowerCase())
-  )
-
-  // const handleSelect = (item) => {
-  //   if (selectedOptions.includes(item.name)) {
-  //     const filterItem = selectedOptions.filter((itm) => itm !== `${item.name}`)
-  //     setSelectedOptions(filterItem)
-  //   } else {
-  //     setSelectedOptions((prev) => [...prev, item.name])
-  //   }
-  // }
-
-  const handleSort = (field) => {
-    if (field === sortField) {
-      const newSortOrder = sortOrder === 'asc' ? 'desc' : 'asc'
-      setSortOrder(newSortOrder)
-      sortData(field, newSortOrder)
-    } else {
-      setSortField(field)
-      setSortOrder('asc')
-      sortData(field, 'asc')
-    }
-  }
-
-  const sortData = (field, order) => {
-    const sortedData = data.sort((a, b) => {
-      if (typeof a[field] === 'number' && typeof b[field] === 'number') {
-        return order === 'asc' ? a[field] - b[field] : b[field] - a[field]
-      } else {
-        const comparison = a[field].localeCompare(b[field])
-        return order === 'asc' ? comparison : -comparison
-      }
-    })
-    setSortComponentData(sortedData)
-  }
+  useEffect(() => {
+    const filterData =
+      data &&
+      data.filter((item) =>
+        item.cveId.toLowerCase().includes(searchVul.toLowerCase())
+      )
+    console.log('filterData', filterData)
+    setFilteredRow(filterData)
+  }, [searchVul])
 
   const handleVulSort = (field) => {
+    setFilteredRow([])
     if (field === sortField) {
       const newSortOrder = sortOrder === 'asc' ? 'desc' : 'asc'
       setSortOrder(newSortOrder)
@@ -161,11 +97,25 @@ const CustomerSBOMTable = ({ title, captions, data }) => {
   }
 
   const sortVulnData = (field, order) => {
-    const sortedData = vulnerabilitiesData.sort((a, b) => {
-      const comparison = a[field].localeCompare(b[field])
-      return order === 'asc' ? comparison : -comparison
+    const vuldata = [...data]
+    const sortedData = vuldata.sort((a, b) => {
+      if (
+        field === 'v3Score' &&
+        typeof a.cvss[field] === 'number' &&
+        typeof b.cvss[field] === 'number'
+      ) {
+        return order === 'asc'
+          ? a.cvss[field] - b.cvss[field]
+          : b.cvss[field] - a.cvss[field]
+      } else if (field === 'name' || field === 'version') {
+        const comparison = a.component[field].localeCompare(b.component[field])
+        return order === 'asc' ? comparison : -comparison
+      } else {
+        const comparison = a[field].localeCompare(b[field])
+        return order === 'asc' ? comparison : -comparison
+      }
     })
-    setVulnerabilitiesData(sortedData)
+    setSortedVulnData(sortedData)
   }
 
   useEffect(() => {
@@ -212,11 +162,6 @@ const CustomerSBOMTable = ({ title, captions, data }) => {
     setFilterData(items)
   }, [selectedScanner])
 
-  useEffect(() => {
-    const containsData = window.localStorage.getItem('contains')
-    setcontains(JSON.parse(containsData))
-  }, [])
-
   const [selectedStatus, setSelectedStatus] = useState([])
   const [selectedOptions, setSelectedOptions] = useState([])
   const [filterData, setFilterData] = useState([])
@@ -236,6 +181,22 @@ const CustomerSBOMTable = ({ title, captions, data }) => {
       setSelectedOptions(filterItem)
     } else {
       setSelectedOptions((prev) => [...prev, item.name])
+    }
+  }
+
+  const onVulnFilter = (item) => {
+    setFilteredRow([])
+    if (item === 'Unresolved') {
+      const filterData = data.filter(
+        (item) =>
+          item.vexVuln?.vexStatus?.name !== 'Fixed' &&
+          item.vexVuln?.vexStatus?.name !== 'False Positive' &&
+          item.vexVuln?.vexStatus?.name !== 'Not Affected'
+      )
+      console.log(`filter data`, filterData)
+      setSortedVulnData(filterData)
+    } else {
+      setSortedVulnData(data)
     }
   }
 
@@ -298,19 +259,22 @@ const CustomerSBOMTable = ({ title, captions, data }) => {
                   Filter
                 </MenuButton>
                 <MenuList minWidth='240px'>
-                  <MenuGroup title='Resolution'>
+                  <MenuOptionGroup
+                    defaultValue='Total'
+                    title='Resolution'
+                    type='radio'
+                  >
                     {['Unresolved', 'Total'].map((p, index) => (
-                      <MenuItem
+                      <MenuItemOption
                         value={p}
                         key={index}
-                        pl={4}
                         fontSize={'sm'}
-                        // onClick={() => onVulnFilter(p)}
+                        onClick={() => onVulnFilter(p)}
                       >
                         {p}
-                      </MenuItem>
+                      </MenuItemOption>
                     ))}
-                  </MenuGroup>
+                  </MenuOptionGroup>
                 </MenuList>
               </Menu>
             </CardHeader>
@@ -322,13 +286,13 @@ const CustomerSBOMTable = ({ title, captions, data }) => {
                       color='gray.400'
                       py={4}
                       position='relative'
-                      onClick={() => handleVulSort('cve')}
+                      onClick={() => handleVulSort('cveId')}
                       cursor={'pointer'}
                     >
                       <Flex direction={'row'} alignItems={'center'} gap={2}>
                         <Box>CVE ID</Box>
                         <Box>
-                          {sortField === 'cve' && sortOrder === 'asc' ? (
+                          {sortField === 'cveId' && sortOrder === 'asc' ? (
                             <TriangleUpIcon />
                           ) : (
                             <TriangleDownIcon />
@@ -340,13 +304,13 @@ const CustomerSBOMTable = ({ title, captions, data }) => {
                       color='gray.400'
                       py={4}
                       position='relative'
-                      onClick={() => handleVulSort('cvss')}
+                      onClick={() => handleVulSort('v3Score')}
                       cursor={'pointer'}
                     >
                       <Flex direction={'row'} alignItems={'center'} gap={2}>
                         <Box>CVSS</Box>
                         <Box>
-                          {sortField === 'cvss' && sortOrder === 'asc' ? (
+                          {sortField === 'v3Score' && sortOrder === 'asc' ? (
                             <TriangleUpIcon />
                           ) : (
                             <TriangleDownIcon />
@@ -354,20 +318,18 @@ const CustomerSBOMTable = ({ title, captions, data }) => {
                         </Box>
                       </Flex>
                     </Th>
-                    {/* <Th color='gray.400' py={4} position='relative'>
-                        Description
-                      </Th> */}
+
                     <Th
                       color='gray.400'
                       py={4}
                       position='relative'
-                      onClick={() => handleVulSort('component')}
+                      onClick={() => handleVulSort('name')}
                       cursor={'pointer'}
                     >
                       <Flex direction={'row'} alignItems={'center'} gap={2}>
                         <Box>Component</Box>
                         <Box>
-                          {sortField === 'component' && sortOrder === 'asc' ? (
+                          {sortField === 'name' && sortOrder === 'asc' ? (
                             <TriangleUpIcon />
                           ) : (
                             <TriangleDownIcon />
@@ -397,7 +359,7 @@ const CustomerSBOMTable = ({ title, captions, data }) => {
                       color='gray.400'
                       py={4}
                       position='relative'
-                      onClick={() => handleVulSort('fixed_component')}
+                      // onClick={() => handleVulSort('fixed_component')}
                       cursor={'pointer'}
                     >
                       <Flex direction={'row'} alignItems={'center'} gap={2}>
@@ -416,7 +378,7 @@ const CustomerSBOMTable = ({ title, captions, data }) => {
                       color='gray.400'
                       py={4}
                       position='relative'
-                      onClick={() => handleVulSort('fixed_product')}
+                      // onClick={() => handleVulSort('fixed_product')}
                       cursor={'pointer'}
                     >
                       <Flex direction={'row'} alignItems={'center'} gap={2}>
@@ -431,11 +393,14 @@ const CustomerSBOMTable = ({ title, captions, data }) => {
                         </Box>
                       </Flex>
                     </Th>
+                    <Th color='gray.400' py={4} position='relative'>
+                      <Box>Scanner</Box>
+                    </Th>
                     <Th
                       color='gray.400'
                       py={4}
                       position='relative'
-                      onClick={() => handleVulSort('status')}
+                      // onClick={() => handleVulSort('status')}
                       cursor={'pointer'}
                     >
                       <Flex direction={'row'} alignItems={'center'} gap={2}>
@@ -453,65 +418,129 @@ const CustomerSBOMTable = ({ title, captions, data }) => {
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {filterData.length > 0
-                    ? filterData.map((row, idx) => {
+                  {filteredRow && filteredRow.length > 0
+                    ? filteredRow.map((row, idx) => (
+                        <VulnerabilityRow
+                          refetch={refetch}
+                          key={idx}
+                          id={row.id}
+                          imgVersionId={imgVersionId}
+                          component={row.component.name}
+                          version={row.component.version}
+                          cvss={row.cvss.v3Score}
+                          cve={row.cveId}
+                          fixed_component={row.component.fixedInVersion}
+                          fixed_product={row.fixedInImage}
+                          description={row.component.name}
+                          status={row.vexVuln?.vexStatus}
+                          justify={row.vexVuln?.vexJustification}
+                          scanner={row.scanners}
+                          shared_data={row.component.name}
+                          versions={row.component.name}
+                          imageInfo={imageInfo}
+                        />
+                      ))
+                    : sortedVulnData.length > 0
+                    ? sortedVulnData.map((row, idx) => (
+                        <VulnerabilityRow
+                          refetch={refetch}
+                          key={idx}
+                          id={row.id}
+                          imgVersionId={imgVersionId}
+                          component={row.component.name}
+                          version={row.component.version}
+                          cvss={row.cvss.v3Score}
+                          cve={row.cveId}
+                          fixed_component={row.component.fixedInVersion}
+                          fixed_product={row.fixedInImage}
+                          description={row.component.name}
+                          status={row.vexVuln?.vexStatus}
+                          justify={row.vexVuln?.vexJustification}
+                          scanner={row.scanners}
+                          shared_data={row.component.name}
+                          versions={row.component.name}
+                          imageInfo={imageInfo}
+                        />
+                      ))
+                    : filteredVul.length > 0
+                    ? filteredVul.map((row, idx) => {
                         return (
                           <VulnerabilityRow
+                            refetch={refetch}
                             key={idx}
                             id={row.id}
-                            component={row.component}
-                            version={row.version}
-                            cvss={row.cvss}
-                            cve={row.cve}
-                            fixed_component={row.fixed_component}
-                            fixed_product={row.fixed_product}
-                            description={row.description}
-                            status={row.status}
-                            scanner={row.scanner}
-                            shared_data={row.shared_data}
-                            versions={row.versions}
+                            imgVersionId={imgVersionId}
+                            component={row.component.name}
+                            version={row.component.version}
+                            cvss={row.cvss.v3Score}
+                            cve={row.cveId}
+                            fixed_component={row.component.fixedInVersion}
+                            fixed_product={row.fixedInImage}
+                            description={row.component.name}
+                            status={row.vexVuln?.vexStatus}
+                            justify={row.vexVuln?.vexJustification}
+                            scanner={row.scanners}
+                            shared_data={row.component.name}
+                            versions={row.component.name}
+                            imageInfo={imageInfo}
                           />
                         )
                       })
-                    : filteredVulItems.length > 0
-                    ? filteredVulItems.map((row, idx) => {
+                    : data
+                    ? data.map((row, idx) => {
                         return (
                           <VulnerabilityRow
+                            refetch={refetch}
                             key={idx}
                             id={row.id}
-                            component={row.component}
-                            version={row.version}
-                            cvss={row.cvss}
-                            cve={row.cve}
-                            fixed_component={row.fixed_component}
-                            fixed_product={row.fixed_product}
-                            description={row.description}
-                            status={row.status}
-                            scanner={row.scanner}
-                            shared_data={row.shared_data}
-                            versions={row.versions}
+                            imgVersionId={imgVersionId}
+                            component={row.component.name}
+                            version={row.component.version}
+                            cvss={row.cvss.v3Score}
+                            cve={row.cveId}
+                            fixed_component={row.component.fixedInVersion}
+                            fixed_product={row.fixedInImage}
+                            description={row.component.name}
+                            status={row.vexVuln?.vexStatus}
+                            justify={row.vexVuln?.vexJustification}
+                            scanner={row.scanners}
+                            shared_data={row.component.name}
+                            versions={row.component.name}
+                            imageInfo={imageInfo}
                           />
                         )
                       })
-                    : vulnerabilitiesData.map((row, idx) => {
-                        return (
-                          <VulnerabilityRow
-                            key={idx}
-                            id={row.id}
-                            component={row.component}
-                            version={row.version}
-                            cvss={row.cvss}
-                            cve={row.cve}
-                            fixed_component={row.fixed_component}
-                            fixed_product={row.fixed_product}
-                            description={row.description}
-                            status={row.status}
-                            scanner={row.scanner}
-                            shared_data={row.shared_data}
-                            versions={row.versions}
-                          />
-                        )
-                      })}
+                    : loading && (
+                        <Tr>
+                          <Td fontSize={'sm'} pl={1}>
+                            <Skeleton height='20px' />
+                          </Td>
+                          <Td fontSize={'sm'} pl={1}>
+                            <Skeleton height='20px' />
+                          </Td>
+                          <Td fontSize={'sm'} pl={1}>
+                            <Skeleton height='20px' />
+                          </Td>
+                          <Td fontSize={'sm'} pl={1}>
+                            <Skeleton height='20px' />
+                          </Td>
+                          <Td fontSize={'sm'} pl={1}>
+                            <Skeleton height='20px' />
+                          </Td>
+                          <Td fontSize={'sm'} pl={1}>
+                            <Skeleton height='20px' />
+                          </Td>
+                          <Td fontSize={'sm'} pl={1}>
+                            <Skeleton height='20px' />
+                          </Td>
+                          <Td fontSize={'sm'} pl={1}>
+                            <Skeleton height='20px' />
+                          </Td>
+                          <Td fontSize={'sm'} pl={1}>
+                            <Skeleton height='20px' />
+                          </Td>
+                        </Tr>
+                      )}
                 </Tbody>
               </Table>
             </CardBody>
