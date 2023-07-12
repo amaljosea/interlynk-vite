@@ -127,8 +127,10 @@ export default function Dashboard(props) {
     setCustomerView(location.pathname)
   }, [location])
 
+  const graphqlAPI = process.env.REACT_APP_GRAPHQL_API
+
   const httpLink = createHttpLink({
-    uri: 'http://localhost:3000/lynkapi'
+    uri: `${graphqlAPI}`
   })
 
   const authLink = setContext((_, { headers }) => {

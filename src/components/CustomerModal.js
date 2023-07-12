@@ -44,10 +44,12 @@ export default function CustomerModal() {
     onOpen()
   }, [])
 
+  const userLoginURL = process.env.REACT_APP_USER_LOGIN_URL
+
   const handleSubmit = (e) => {
     e.preventDefault()
     axios
-      .post('http://localhost:3000/share_users/login', {
+      .post(`${userLoginURL}`, {
         share_user: {
           email: userEmail,
           signed_params: `${location.search.replace(/\?/g, '')}`

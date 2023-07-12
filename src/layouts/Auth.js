@@ -106,10 +106,14 @@ export default function Pages(props) {
   const [password, setPassword] = useState('')
   const [error, setError] = useState(false)
 
+  const loginURL = process.env.REACT_APP_VENDOR_LOGIN_URL
+
+  console.log(`login URl`, loginURL)
+
   const handleSubmit = (e) => {
     e.preventDefault()
     axios
-      .post('http://localhost:3000/login', {
+      .post(`${loginURL}`, {
         user: {
           email,
           password

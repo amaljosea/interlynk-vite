@@ -192,6 +192,7 @@ function SBOMs() {
 
   const handleScanner = (e) => {
     const { value } = e.target
+    localStorage.setItem('cloudScanner', value)
     setSelectedScanner(value)
   }
 

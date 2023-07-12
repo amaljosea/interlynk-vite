@@ -25,7 +25,9 @@ import {
   Tbody,
   Th,
   Td,
-  Select
+  Select,
+  Text,
+  useToast
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
@@ -37,8 +39,12 @@ import { OrgConnectorUpdate } from 'graphQL/Mutation'
 import { OrgConnectorDelete } from 'graphQL/Mutation'
 
 import { getConImg, regions } from 'utils'
+import { timeSince } from 'utils'
+import { OrgConnectorRefresh } from 'graphQL/Mutation'
 
 const Index = () => {
+  const toast = useToast()
+
   const [connectors, setConnectors] = useState([])
 
   const { data: allConnectors } = useQuery(GetAllConnectors, {
@@ -47,6 +53,10 @@ const Index = () => {
 
   const { data: orgConnectors, refetch } = useQuery(GetAllOrgConnectors, {
     variables: {}
+  })
+
+  const [organizationConnectorRefresh] = useMutation(OrgConnectorRefresh, {
+    onCompleted: refetch
   })
 
   const [organizationConnectorCreate] = useMutation(OrgConnectorCreate, {
@@ -93,17 +103,57 @@ const Index = () => {
   const [accessToken, setAccessToken] = useState('')
   const [region, setRegion] = useState()
 
+  const [connectorResults, setConnectorResults] = useState([])
+
+  useEffect(() => {
+    if (orgConnectors) {
+      const sortedData = [...orgConnectors.organizationConnectors].sort(
+        (a, b) => {
+          const dateA = new Date(a.updatedAt).getTime()
+          const dateB = new Date(b.updatedAt).getTime()
+          return dateB - dateA
+        }
+      )
+      setConnectorResults(sortedData)
+    }
+  }, [orgConnectors])
+
+  const handleRefresh = async () => {
+    try {
+      await organizationConnectorRefresh().then(() =>
+        toast({
+          description: 'Connections updated successfully',
+          status: 'success',
+          duration: 5000,
+          isClosable: true,
+          position: 'top'
+        })
+      )
+    } catch (error) {
+      if (error.networkError && error.networkError.statusCode === 500) {
+        // Handle the specific error
+        alert('Something went wrong')
+      } else {
+        // Handle other errors
+        alert(error.message)
+      }
+    }
+  }
+
   const handleOpen = (item) => {
     setSelectedConnection(null)
     setConnectorName('')
     setUsername('')
     setAccessToken('')
+    setRegion('us-east-1')
     setActiveConnection(item.id)
     setRegistryName(item.name)
     onOpen()
   }
 
   const handleEdit = async (item) => {
+    console.log('item', item)
+    setRegistryName(item.connector.name)
     setSelectedConnection(item)
     setConnectorName(item.name)
     setUsername(item.username)
@@ -298,7 +348,11 @@ const Index = () => {
                             selectedConnection === null ? false : true
                           }
                         >
-                          <FormLabel>Account ID</FormLabel>
+                          <FormLabel>
+                            {registryName === 'Amazon ECR'
+                              ? 'AWS Access Key ID'
+                              : 'Account ID'}
+                          </FormLabel>
                           <Input
                             type='text'
                             value={username}
@@ -308,7 +362,11 @@ const Index = () => {
                         </FormControl>
                         {selectedConnection === null && (
                           <FormControl isRequired>
-                            <FormLabel>Access Token</FormLabel>
+                            <FormLabel>
+                              {registryName === 'Amazon ECR'
+                                ? 'AWS Secret Access Key'
+                                : 'Access Token'}
+                            </FormLabel>
                             <Input
                               type='text'
                               value={accessToken}
@@ -317,22 +375,23 @@ const Index = () => {
                             />
                           </FormControl>
                         )}
-                        {registryName === 'Amazon ECR' && (
-                          <FormControl isRequired>
-                            <FormLabel>AWS Region</FormLabel>
-                            <Select
-                              defaultValue={'us-east-1'}
-                              value={region}
-                              onChange={(e) => setRegion(e.target.value)}
-                            >
-                              {regions.map((item, index) => (
-                                <option key={index} value={item.id}>
-                                  {item.name}
-                                </option>
-                              ))}
-                            </Select>
-                          </FormControl>
-                        )}
+                        {selectedConnection === null &&
+                          registryName === 'Amazon ECR' && (
+                            <FormControl isRequired>
+                              <FormLabel>AWS Region</FormLabel>
+                              <Select
+                                defaultValue={'us-east-1'}
+                                value={region}
+                                onChange={(e) => setRegion(e.target.value)}
+                              >
+                                {regions.map((item, index) => (
+                                  <option key={index} value={item.id}>
+                                    {item.name}
+                                  </option>
+                                ))}
+                              </Select>
+                            </FormControl>
+                          )}
                       </Flex>
                     </Flex>
                   </ModalBody>
@@ -354,11 +413,19 @@ const Index = () => {
             </Modal>
           </Box>
           <Flex direction={'column'} gap={4} mt={12}>
-            <Box px={6}>
+            <Flex
+              px={6}
+              width={'100%'}
+              justifyContent={'space-between'}
+              alignItems={'center'}
+            >
               <Heading size='md' px={2}>
                 Authenticated Connections
               </Heading>
-            </Box>
+              <Button colorScheme='blue' onClick={handleRefresh}>
+                Refresh
+              </Button>
+            </Flex>
             <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
               <CardBody>
                 <Table>
@@ -372,68 +439,65 @@ const Index = () => {
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {orgConnectors &&
-                      orgConnectors.organizationConnectors.length > 0 &&
-                      orgConnectors.organizationConnectors.map(
-                        (item, index) => (
-                          <Tr key={index}>
-                            <Td>
-                              <Switch
-                                id='status'
-                                isChecked={item.enabled}
-                                readOnly
+                    {connectorResults &&
+                      connectorResults.map((item, index) => (
+                        <Tr key={index}>
+                          <Td>
+                            <Switch
+                              id='status'
+                              isChecked={item.enabled}
+                              readOnly
+                            />
+                          </Td>
+                          <Td mt={2} px={8}>
+                            <Flex
+                              direction={'row'}
+                              gap={4}
+                              alignItems={'center'}
+                            >
+                              <Image
+                                src={getConImg(item.connector.name)}
+                                width={7}
+                                height={7}
                               />
-                            </Td>
-                            <Td mt={2} px={8}>
                               <Flex
-                                direction={'row'}
-                                gap={4}
-                                alignItems={'center'}
-                              >
-                                <Image
-                                  src={getConImg(item.connector.name)}
-                                  width={8}
-                                  height={8}
-                                />
-                                <Flex
-                                  direction={'column'}
-                                  gap={1}
-                                  alignItems={'start'}
-                                >
-                                  <Heading size='base'>{item.name}</Heading>
-                                </Flex>
-                              </Flex>
-                            </Td>
-                            <Td mt={2} px={8}>
-                              {item.username}
-                            </Td>
-                            <Td mt={2} px={8}>
-                              {new Date(item.updatedAt)
-                                .toISOString()
-                                .slice(0, 10)}
-                            </Td>
-                            <Td mt={2} px={8}>
-                              <Flex
-                                direction={'row'}
-                                gap={4}
+                                direction={'column'}
+                                gap={1}
                                 alignItems={'start'}
                               >
-                                <EditIcon
-                                  color={'blue.500'}
-                                  cursor={'pointer'}
-                                  onClick={() => handleEdit(item)}
-                                />
-
-                                <DeleteIcon
-                                  color={'red.400'}
-                                  cursor={'pointer'}
-                                  onClick={() => handleDelete(item.id)}
-                                />
+                                <Text fontSize='sm' fontWeight={600}>
+                                  {item.name}
+                                </Text>
                               </Flex>
-                            </Td>
-                          </Tr>
-                        )
-                      )}
+                            </Flex>
+                          </Td>
+                          <Td mt={2} px={8} fontSize={'sm'}>
+                            {item.username}
+                          </Td>
+                          <Td mt={2} px={8} fontSize={'sm'}>
+                            {timeSince(item.updatedAt)}
+                          </Td>
+                          <Td mt={2} px={8}>
+                            <Flex
+                              direction={'row'}
+                              gap={4}
+                              alignItems={'start'}
+                            >
+                              <EditIcon
+                                color={'blue.500'}
+                                cursor={'pointer'}
+                                onClick={() => handleEdit(item)}
+                              />
+
+                              <DeleteIcon
+                                color={'red.400'}
+                                cursor={'pointer'}
+                                onClick={() => handleDelete(item.id)}
+                              />
+                            </Flex>
+                          </Td>
+                        </Tr>
+                      ))}
                   </Tbody>
                 </Table>
               </CardBody>
