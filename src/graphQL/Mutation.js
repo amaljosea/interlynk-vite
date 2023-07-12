@@ -1,5 +1,13 @@
 import { gql } from '@apollo/client'
 
+export const OrgConnectorRefresh = gql`
+  mutation OrgConnectorRefresh {
+    organizationConnectorRefresh(input: {}) {
+      errors
+    }
+  }
+`
+
 export const OrgConnectorCreate = gql`
   mutation OrgConnectorCreate(
     $connId: Uuid!
@@ -184,8 +192,9 @@ export const VexVulnCreate = gql`
     $compName: String!
     $compVersion: String!
     $notes: String
-    $vexJustificationID: Uuid
     $vexStatusID: Uuid!
+    $vexJustificationID: Uuid
+    $fixedVersionID: Uuid
   ) {
     vexVulnCreate(
       input: {
@@ -196,11 +205,13 @@ export const VexVulnCreate = gql`
         notes: $notes
         vexJustificationId: $vexJustificationID
         vexStatusId: $vexStatusID
+        fixedByImageVersionId: $fixedVersionID
       }
     ) {
       vexVuln {
         id
         cveId
+        fixedByImageVersionId
         vexJustification {
           name
         }

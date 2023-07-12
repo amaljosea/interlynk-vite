@@ -32,8 +32,9 @@ function SBOMLinkDrawer(props) {
     btnRef,
     imageDataRefetch,
     shareScanner,
-    shareUsers,
-    scanResults
+    scanResults,
+    emailList,
+    setEmailList
   } = props
 
   const sortScanResult = [...scanResults].sort((a, b) =>
@@ -55,13 +56,6 @@ function SBOMLinkDrawer(props) {
   const [hasLimitAccess, setHasLimitAccess] = useState(true)
   const [version, setVersion] = useState('')
   const [email, setEmail] = useState('')
-  const [emailList, setEmailList] = useState([])
-
-  useEffect(() => {
-    if (shareUsers.length > 0) {
-      setEmailList(shareUsers.map((item) => item.email))
-    }
-  }, [shareUsers])
 
   const [selectedOptions, setSelectedOptions] = useState([])
 
@@ -94,7 +88,7 @@ function SBOMLinkDrawer(props) {
       if (error.networkError && error.networkError.statusCode === 500) {
         // Handle the specific error
         alert('Please specify at least one email address.')
-        onClose()
+        // window.location.reload()
       } else {
         // Handle other errors
         alert(error.message)
@@ -287,7 +281,9 @@ function SBOMLinkDrawer(props) {
                       colorScheme={'blue'}
                     >
                       <TagLabel>{item}</TagLabel>
-                      <TagCloseButton onClick={() => handleRemove(item)} />
+                      {emailList.length > 1 && (
+                        <TagCloseButton onClick={() => handleRemove(item)} />
+                      )}
                     </Tag>
                   ))}
                 </Flex>

@@ -108,8 +108,10 @@ export default function Customer(props) {
 
   const userToken = Cookies.get('userToken')
 
+  const graphqlAPI = process.env.REACT_APP_GRAPHQL_API
+
   const httpLink = createHttpLink({
-    uri: 'http://localhost:3000/lynkapi'
+    uri: `${graphqlAPI}`
   })
 
   const authLink = setContext((_, { headers }) => {

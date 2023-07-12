@@ -145,14 +145,22 @@ const ImageRow = ({
                 <MenuItem
                   icon={<AddIcon />}
                   onClick={onScanOpen}
-                  isDisabled={filteredScanners.length === 0 ? true : false}
+                  isDisabled={
+                    filteredScanners && filteredScanners.length === 0
+                      ? true
+                      : false
+                  }
                 >
                   <Text fontSize={'sm'}>Add Scanner</Text>
                 </MenuItem>
                 <MenuItem
                   icon={<DeleteIcon />}
                   onClick={onDeleteOpen}
-                  isDisabled={filteredScanners.length === 3 ? true : false}
+                  isDisabled={
+                    filteredScanners && filteredScanners.length === 3
+                      ? true
+                      : false
+                  }
                 >
                   <Text fontSize={'sm'}>Delete Scanner</Text>
                 </MenuItem>

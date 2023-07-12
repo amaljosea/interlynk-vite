@@ -47,8 +47,6 @@ import { DeleteShareLynk } from 'graphQL/Mutation'
 
 function SBOMLinkRow(props) {
   const {
-    SBOMLinksData,
-    setSBOMLinksData,
     componentsVal,
     VulnerabilitiesVal,
     activeVulnVal,
@@ -65,14 +63,13 @@ function SBOMLinkRow(props) {
     imgVersionId,
     scanResults
   } = props
-  const textColor = useColorModeValue('gray.700', 'white')
-  const bgStatus = useColorModeValue('gray.400', '#1a202c')
-  const colorStatus = useColorModeValue('white', 'gray.400')
+
   const { isOpen, onOpen, onClose } = useDisclosure()
+
   const uniqProjects = []
   const btnRef = React.useRef()
 
-  const [checked, setChecked] = useState(false)
+  const [emailList, setEmailList] = useState([])
 
   // const customerId = link.split('/')
 
@@ -174,6 +171,14 @@ function SBOMLinkRow(props) {
       })
     )
   }
+
+  const handleEdit = () => {
+    onOpen()
+    if (shareUsers.length > 0) {
+      setEmailList(shareUsers.map((item) => item.email))
+    }
+  }
+
   return (
     <Tr>
       <Td pl={0}>
@@ -231,14 +236,15 @@ function SBOMLinkRow(props) {
               <MenuItem onClick={handleStatus}>
                 {enabled ? 'Deactivate' : 'Activate'}
               </MenuItem>
-              <MenuItem onClick={onOpen}>Edit</MenuItem>
+              <MenuItem onClick={handleEdit}>Edit</MenuItem>
               <MenuItem onClick={handleArchive}>Archive</MenuItem>
             </MenuList>
           </Portal>
         </Menu>
-      <SBOMLinkDrawer
+        <SBOMLinkDrawer
           id={id}
-          shareUsers={shareUsers}
+          emailList={emailList}
+          setEmailList={setEmailList}
           shareScanner={shareScanners}
           imageDataRefetch={imageDataRefetch}
           imgVersionId={imgVersionId}
