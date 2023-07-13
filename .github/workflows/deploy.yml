@@ -29,7 +29,8 @@ jobs:
     - name: Deploy to AWS S3
       uses: jakejarvis/s3-sync-action@master
       with:
-        args: --acl public-read --follow-symlinks --delete ./build
+        args: --acl public-read --follow-symlinks --delete
+        source_dir: ./build
       env:
         AWS_S3_BUCKET: lynk-dash-app  # Use bucket name, not ARN
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
