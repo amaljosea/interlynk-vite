@@ -1,44 +1,35 @@
-name: Build and Push to ECR
+name: CI/CD Pipeline
 
 on:
-  #push:
-    #branches:
-      #- main
-  release:
-    types: [published]
+  push:
+    branches:
+      - main 
 
 jobs:
-  build-and-push:
+  build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
+    - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
       with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ secrets.AWS_REGION }}
+        node-version: '14'  # Set a Node.js version here
 
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+    - name: Install Dependencies
+      run: npm install  # You can change this to "npm install" if "npm ci" doesn't work
 
-    - name: Determine Docker tag
-      id: determine-tag
-      run: |
-        if [[ "${{ github.event_name }}" == "release" ]]; then
-          echo "::set-output name=VERSION::${{ github.event.release.tag_name }}"
-        else
-          echo "::set-output name=VERSION::latest"
-        fi
+    - name: Build
+      run: npm run build  # Build your project
 
-    - name: Build, tag, and push image to Amazon ECR
+    - name: Deploy to AWS S3
+      uses: jakejarvis/s3-sync-action@master
+      with:
+        args: --acl public-read --follow-symlinks --delete
+        path: ./build/*  # Path to your build directory
       env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-      run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ steps.determine-tag.outputs.VERSION }} .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ steps.determine-tag.outputs.VERSION }}
+        AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: ${{ secrets.AWS_REGION }}
