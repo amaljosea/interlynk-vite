@@ -339,7 +339,7 @@ const Index = () => {
                             type='text'
                             value={connectorName}
                             onChange={(e) => setConnectorName(e.target.value)}
-                            placeholder={'Enter connector name'}
+                            placeholder={'e.g. Interlynk ECR-Prod'}
                           />
                         </FormControl>
                         <FormControl
@@ -357,7 +357,7 @@ const Index = () => {
                             type='text'
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
-                            placeholder={'Enter your username'}
+                            placeholder={'e.g. AKIAIOSFODNN7EXAMPLE'}
                           />
                         </FormControl>
                         {selectedConnection === null && (
@@ -371,7 +371,7 @@ const Index = () => {
                               type='text'
                               value={accessToken}
                               onChange={(e) => setAccessToken(e.target.value)}
-                              placeholder={'Enter access token'}
+                              placeholder={'e.g. wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY'}
                             />
                           </FormControl>
                         )}
