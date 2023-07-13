@@ -1,4 +1,9 @@
-import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
+import {
+  DeleteIcon,
+  EditIcon,
+  TriangleDownIcon,
+  TriangleUpIcon
+} from '@chakra-ui/icons'
 import {
   Box,
   Button,
@@ -41,6 +46,7 @@ import { OrgConnectorDelete } from 'graphQL/Mutation'
 import { getConImg, regions } from 'utils'
 import { timeSince } from 'utils'
 import { OrgConnectorRefresh } from 'graphQL/Mutation'
+import ConnectionRow from './ConnectionRow'
 
 const Index = () => {
   const toast = useToast()
@@ -105,6 +111,10 @@ const Index = () => {
 
   const [connectorResults, setConnectorResults] = useState([])
 
+  const [sortField, setSortField] = useState('')
+  const [sortOrder, setSortOrder] = useState('')
+  const [connectionData, setConnectionData] = useState([])
+
   useEffect(() => {
     if (orgConnectors) {
       const sortedData = [...orgConnectors.organizationConnectors].sort(
@@ -115,6 +125,11 @@ const Index = () => {
         }
       )
       setConnectorResults(sortedData)
+      if (sortField === '' && sortOrder === '') {
+        setSortField('name')
+        setSortOrder('asc')
+        refetch()
+      }
     }
   }, [orgConnectors])
 
@@ -152,6 +167,7 @@ const Index = () => {
   }
 
   const handleEdit = async (item) => {
+    console.log('connector result', connectorResults)
     console.log('item', item)
     setRegistryName(item.connector.name)
     setSelectedConnection(item)
@@ -165,6 +181,8 @@ const Index = () => {
     e.preventDefault()
 
     if (selectedConnection) {
+      // Check if the name already exists in the predefined array
+
       try {
         await organizationConnectorUpdate({
           variables: {
@@ -173,24 +191,52 @@ const Index = () => {
             enabled: conStatus
           }
         })
-        onClose()
+        window.location.reload()
       } catch (error) {
         console.error('Mutation error:', error)
       }
     } else {
       try {
-        await organizationConnectorCreate({
-          variables: {
-            connId: activeConnection,
-            name: connectorName,
-            user: username,
-            token: accessToken,
-            readOnly: true,
-            enabled: conStatus,
-            region: region ? region : ''
-          }
-        })
-        onClose()
+        const isNameDuplicate = connectorResults.some(
+          (item) =>
+            (item.connector.name === 'Amazon ECR' &&
+              item.username === username) ||
+            item.name === connectorName
+        )
+        if (isNameDuplicate) {
+          toast({
+            description:
+              'An Amazon ECR connection with the same AWS Key ID already exists',
+            status: 'error',
+            duration: 5000,
+            isClosable: true,
+            position: 'top-right'
+          })
+        } else if (
+          connectorName === username ||
+          connectorName === accessToken
+        ) {
+          toast({
+            description: 'AWS connection details is not validated. ',
+            status: 'error',
+            duration: 5000,
+            isClosable: true,
+            position: 'top-right'
+          })
+        } else {
+          await organizationConnectorCreate({
+            variables: {
+              connId: activeConnection,
+              name: connectorName,
+              user: username,
+              token: accessToken,
+              readOnly: true,
+              enabled: conStatus,
+              region: region ? region : ''
+            }
+          })
+          window.location.reload()
+        }
       } catch (error) {
         if (error.networkError && error.networkError.statusCode === 500) {
           // Handle the specific error
@@ -214,7 +260,7 @@ const Index = () => {
           id
         }
       })
-      onClose()
+      window.location.reload()
     } catch (error) {
       if (error.networkError && error.networkError.statusCode === 500) {
         // Handle the specific error
@@ -227,11 +273,34 @@ const Index = () => {
   }
 
   useEffect(() => {
-    // console.log('selectedConnection', selectedConnection)
     selectedConnection
       ? setConStatus(selectedConnection.enabled)
       : setConStatus(true)
   }, [selectedConnection])
+
+  const handleConSort = (field) => {
+    if (field === sortField) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortField(field)
+      setSortOrder('asc')
+    }
+  }
+
+  const sortConData = () => {
+    const data = connectorResults && [...connectorResults]
+    if (sortField === 'name' || sortField === 'updatedAt') {
+      const sortedData = data.sort((a, b) => {
+        const comparison = a[sortField].localeCompare(b[sortField])
+        return sortOrder === 'asc' ? comparison : -comparison
+      })
+      setConnectionData(sortedData)
+    }
+  }
+
+  useEffect(() => {
+    sortConData()
+  }, [sortOrder, sortField])
 
   return (
     <>
@@ -431,73 +500,88 @@ const Index = () => {
                 <Table>
                   <Thead>
                     <Tr>
-                      <Th px={8}>Status</Th>
-                      <Th px={8}>Connector Name</Th>
-                      <Th px={8}>Account ID</Th>
-                      <Th px={8}>Updated At</Th>
-                      <Th px={8}>Actions</Th>
+                      <Th
+                        color={'gray.'}
+                        px={8}
+                        position='relative'
+                        cursor={'pointer'}
+                      >
+                        <Box>Status</Box>
+                      </Th>
+                      <Th
+                        color={'gray.'}
+                        px={8}
+                        position='relative'
+                        onClick={() => handleConSort('name')}
+                        cursor={'pointer'}
+                      >
+                        <Flex direction={'row'} alignItems={'center'} gap={2}>
+                          <Box>Connector Name</Box>
+                          <Box>
+                            {sortField === 'name' && sortOrder === 'asc' ? (
+                              <TriangleUpIcon />
+                            ) : (
+                              <TriangleDownIcon />
+                            )}
+                          </Box>
+                        </Flex>
+                      </Th>
+                      <Th
+                        color={'gray.'}
+                        px={8}
+                        position='relative'
+                        cursor={'pointer'}
+                      >
+                        <Box>Account ID</Box>
+                      </Th>
+                      <Th
+                        color={'gray.'}
+                        px={8}
+                        position='relative'
+                        onClick={() => handleConSort('updatedAt')}
+                        cursor={'pointer'}
+                      >
+                        <Flex direction={'row'} alignItems={'center'} gap={2}>
+                          <Box>Update At</Box>
+                          <Box>
+                            {sortField === 'updatedAt' &&
+                            sortOrder === 'asc' ? (
+                              <TriangleUpIcon />
+                            ) : (
+                              <TriangleDownIcon />
+                            )}
+                          </Box>
+                        </Flex>
+                      </Th>
+                      <Th
+                        color={'gray.'}
+                        px={8}
+                        position='relative'
+                        cursor={'pointer'}
+                      >
+                        <Box>Action</Box>
+                      </Th>
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {connectorResults &&
-                      connectorResults.map((item, index) => (
-                        <Tr key={index}>
-                          <Td>
-                            <Switch
-                              id='status'
-                              isChecked={item.enabled}
-                              readOnly
-                            />
-                          </Td>
-                          <Td mt={2} px={8}>
-                            <Flex
-                              direction={'row'}
-                              gap={4}
-                              alignItems={'center'}
-                            >
-                              <Image
-                                src={getConImg(item.connector.name)}
-                                width={7}
-                                height={7}
-                              />
-                              <Flex
-                                direction={'column'}
-                                gap={1}
-                                alignItems={'start'}
-                              >
-                                <Text fontSize='sm' fontWeight={600}>
-                                  {item.name}
-                                </Text>
-                              </Flex>
-                            </Flex>
-                          </Td>
-                          <Td mt={2} px={8} fontSize={'sm'}>
-                            {item.username}
-                          </Td>
-                          <Td mt={2} px={8} fontSize={'sm'}>
-                            {timeSince(item.updatedAt)}
-                          </Td>
-                          <Td mt={2} px={8}>
-                            <Flex
-                              direction={'row'}
-                              gap={4}
-                              alignItems={'start'}
-                            >
-                              <EditIcon
-                                color={'blue.500'}
-                                cursor={'pointer'}
-                                onClick={() => handleEdit(item)}
-                              />
-
-                              <DeleteIcon
-                                color={'red.400'}
-                                cursor={'pointer'}
-                                onClick={() => handleDelete(item.id)}
-                              />
-                            </Flex>
-                          </Td>
-                        </Tr>
-                      ))}
+                    {connectionData.length > 0
+                      ? connectionData.map((item, index) => (
+                          <ConnectionRow
+                            key={index}
+                            item={item}
+                            handleEdit={handleEdit}
+                            handleDelete={handleDelete}
+                          />
+                        ))
+                      : connectorResults &&
+                        connectorResults.map((item, index) => (
+                          <ConnectionRow
+                            key={index}
+                            item={item}
+                            handleEdit={handleEdit}
+                            handleDelete={handleDelete}
+                          />
+                        ))}
                   </Tbody>
                 </Table>
               </CardBody>

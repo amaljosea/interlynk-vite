@@ -9,8 +9,6 @@ import {
   Select,
   Button,
   Text,
-  Image,
-  Tooltip,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -20,42 +18,29 @@ import {
   ModalCloseButton,
   useDisclosure,
   Input,
-  IconButton,
-  Menu,
-  Portal,
-  MenuList,
-  MenuItem,
-  MenuButton,
   Skeleton,
-  useToast
+  useToast,
+  Box
 } from '@chakra-ui/react'
 import React from 'react'
 import { useState } from 'react'
-import { FaEllipsisV } from 'react-icons/fa'
 import { useEffect } from 'react'
 import ImagesDrawer from 'components/Drawer/ImagesDrawer'
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
-import { AddIcon, DeleteIcon } from '@chakra-ui/icons'
 import { getAllScanners } from 'graphQL/Queries'
 import { useMutation, useQuery } from '@apollo/client'
 import { GetAllImages } from 'graphQL/Queries'
 import SBOM from 'views/Dashboard/SBOMs'
-import grype from 'assets/img/grype.png'
-import trivy from 'assets/img/trivy.png'
-import scout from 'assets/img/scout.png'
-import snyk from 'assets/img/snyk.png'
-import custom from 'assets/img/custom.png'
 import { GetAllOrgConnectors } from 'graphQL/Queries'
-
-import { getConImg, scanImage } from 'utils'
 import { AddScannerImage } from 'graphQL/Mutation'
 import { RemoveScannerImage } from 'graphQL/Mutation'
 import { Link, useLocation } from 'react-router-dom'
 import { useContext } from 'react'
 import GlobalContext from 'context/GlobalContext'
 import ImageRow from 'components/Tables/ImageRow'
+import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
 
 const Index = () => {
   const toast = useToast()
@@ -135,6 +120,10 @@ const Index = () => {
 
   const [activeScanners, setActiveScanners] = useState([])
   const [isLoading, setIsLoading] = useState(false)
+
+  const [sortField, setSortField] = useState('')
+  const [sortOrder, setSortOrder] = useState('asc')
+  const [imageData, setImageData] = useState([])
 
   const handleScanAdd = async (e) => {
     e.preventDefault()
@@ -222,9 +211,48 @@ const Index = () => {
     }, 10000)
   }, [isLoading])
 
+  const handleImgSort = (field) => {
+    if (field === sortField) {
+      const newSortOrder = sortOrder === 'asc' ? 'desc' : 'asc'
+      setSortOrder(newSortOrder)
+      sortImgData(field, newSortOrder)
+    } else {
+      setSortField(field)
+      setSortOrder('asc')
+      sortImgData(field, 'asc')
+    }
+  }
+
+  const sortImgData = (field, order) => {
+    const data = allImages && [...allImages.images]
+    const sortedData = data.sort((a, b) => {
+      if (
+        field === 'imageVersions' &&
+        typeof a[field].length === 'number' &&
+        typeof b[field].length === 'number'
+      ) {
+        return order === 'asc'
+          ? a[field].length - b[field].length
+          : b[field].length - a[field].length
+      } else if (field === 'lastPushedAt') {
+        const comparison = a[field].localeCompare(b[field])
+        return order === 'asc' ? comparison : -comparison
+      } else if (field === 'organizationConnector') {
+        const comparison = a[field].name.localeCompare(b[field].name)
+        return order === 'asc' ? comparison : -comparison
+      } else {
+        const comparison = a[field].localeCompare(b[field])
+        return order === 'asc' ? comparison : -comparison
+      }
+    })
+    // console.log('sortedData', sortedData)
+    setImageData(sortedData)
+  }
+
   if (versionId) {
     return <SBOM />
   }
+
   return (
     <>
       <Flex width={'100%'} direction='column' mt={{ base: '120px', md: '0px' }}>
@@ -237,10 +265,6 @@ const Index = () => {
           mt={{ base: '200px', md: '75px' }}
         >
           <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
-            {/* <Stack>
-              <Skeleton height='20px' />
-              <Skeleton height='20px' />
-            </Stack> */}
             <CardHeader>
               <Flex
                 width={'100%'}
@@ -270,17 +294,92 @@ const Index = () => {
               <Table variant='simple'>
                 <Thead>
                   <Tr>
-                    <Th pl={1}>Image</Th>
-                    <Th pl={1}>Connection</Th>
-                    <Th pl={1}>Tags</Th>
-                    <Th pl={1}>Last Pushed</Th>
-                    <Th pl={1}>Scanners</Th>
-                    <Th pl={1}>Actions</Th>
+                    <Th
+                      color={'gray.'}
+                      pl={1}
+                      position='relative'
+                      onClick={() => handleImgSort('name')}
+                      cursor={'pointer'}
+                    >
+                      <Flex direction={'row'} alignItems={'center'} gap={2}>
+                        <Box>Image</Box>
+                        <Box>
+                          {sortField === 'name' && sortOrder === 'asc' ? (
+                            <TriangleUpIcon />
+                          ) : (
+                            <TriangleDownIcon />
+                          )}
+                        </Box>
+                      </Flex>
+                    </Th>
+                    <Th
+                      color={'gray.'}
+                      pl={1}
+                      position='relative'
+                      onClick={() => handleImgSort('organizationConnector')}
+                      cursor={'pointer'}
+                    >
+                      <Flex direction={'row'} alignItems={'center'} gap={2}>
+                        <Box>Connection</Box>
+                        <Box>
+                          {sortField === 'organizationConnector' &&
+                          sortOrder === 'asc' ? (
+                            <TriangleUpIcon />
+                          ) : (
+                            <TriangleDownIcon />
+                          )}
+                        </Box>
+                      </Flex>
+                    </Th>
+                    <Th
+                      color={'gray.'}
+                      pl={1}
+                      position='relative'
+                      onClick={() => handleImgSort('imageVersions')}
+                      cursor={'pointer'}
+                    >
+                      <Flex direction={'row'} alignItems={'center'} gap={2}>
+                        <Box>Tags</Box>
+                        <Box>
+                          {sortField === 'imageVersions' &&
+                          sortOrder === 'asc' ? (
+                            <TriangleUpIcon />
+                          ) : (
+                            <TriangleDownIcon />
+                          )}
+                        </Box>
+                      </Flex>
+                    </Th>
+                    <Th
+                      color={'gray.'}
+                      pl={1}
+                      position='relative'
+                      onClick={() => handleImgSort('lastPushedAt')}
+                      cursor={'pointer'}
+                    >
+                      <Flex direction={'row'} alignItems={'center'} gap={2}>
+                        <Box>Last Pushed</Box>
+                        <Box>
+                          {sortField === 'lastPushedAt' &&
+                          sortOrder === 'asc' ? (
+                            <TriangleUpIcon />
+                          ) : (
+                            <TriangleDownIcon />
+                          )}
+                        </Box>
+                      </Flex>
+                    </Th>
+                    <Th color={'gray.'} pl={1} position='relative'>
+                      <Box>Scanners</Box>
+                    </Th>
+                    <Th color={'gray.'} pl={1} position='relative'>
+                      <Box>Actions</Box>
+                    </Th>
                   </Tr>
                 </Thead>
 
                 <Tbody>
-                  {filteredImages ? (
+                  {searchInput !== '' ? (
                     filteredImages.map((item, index) => (
                       <ImageRow
                         key={index}
@@ -291,6 +390,18 @@ const Index = () => {
                         onScanOpen={onScanOpen}
                         onDeleteOpen={onDeleteOpen}
                         filteredScanners={filteredScanners}
+                      />
+                    ))
+                  ) : imageData.length > 0 ? (
+                    imageData.map((item, index) => (
+                      <ImageRow
+                        key={index}
+                        item={item}
+                        isLoading={isLoading}
+                        setSelectedImage={setSelectedImage}
+                        setActiveScanners={setActiveScanners}
+                        onScanOpen={onScanOpen}
+                        onDeleteOpen={onDeleteOpen}
                       />
                     ))
                   ) : allImages ? (

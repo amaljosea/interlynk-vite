@@ -17,7 +17,7 @@ import {
 import { AddIcon, DeleteIcon } from '@chakra-ui/icons'
 import { Link } from 'react-router-dom'
 import { getConImg, scanImage } from 'utils'
-import { FaEllipsisV } from 'react-icons/fa'
+import { FaCircleNotch, FaEllipsisV } from 'react-icons/fa'
 
 const ImageRow = ({
   item,
@@ -142,6 +142,9 @@ const ImageRow = ({
             />
             <Portal>
               <MenuList style={{ width: '100px' }}>
+                <MenuItem icon={<FaCircleNotch />}>
+                  <Text fontSize={'sm'}>Refresh</Text>
+                </MenuItem>
                 <MenuItem
                   icon={<AddIcon />}
                   onClick={onScanOpen}

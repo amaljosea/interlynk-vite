@@ -270,9 +270,7 @@ function Customer() {
             icon={<Icon h={'24px'} w={'24px'} color='white' as={FaBug} />}
             title={'Total Vulnerabilities'}
             description={'Vulnerabilities included in SBOM'}
-            amount={
-              contains.VulnerabilitiesVal ? contains.VulnerabilitiesVal : ''
-            }
+            amount={contains ? contains.VulnerabilitiesVal : ''}
           />
           <Spacer />
           <SBOMStatistics
@@ -286,7 +284,7 @@ function Customer() {
             }
             title={'Active Vulnerabilities'}
             description={'Vulnerabilities included in SBOM'}
-            amount={contains.activeVulnVal ? contains.activeVulnVal : ''}
+            amount={contains ? contains.activeVulnVal : ''}
           />
         </Flex>
         <CustomerSBOMTable

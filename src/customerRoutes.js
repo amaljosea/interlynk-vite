@@ -1,12 +1,12 @@
 // import
-import { FaCode } from 'react-icons/fa'
+import { FaImages } from 'react-icons/fa'
 import Customer from 'views/Dashboard/Customer'
 
 var customerRoutes = [
   {
     path: '/signed_url_params',
     name: 'Images',
-    icon: <FaCode color='inherit' />,
+    icon: <FaImages color='inherit' />,
     component: Customer,
     layout: '/customer'
   }

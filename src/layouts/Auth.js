@@ -104,11 +104,11 @@ export default function Pages(props) {
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState(false)
+  const [error, setError] = useState('')
 
   const loginURL = process.env.REACT_APP_VENDOR_LOGIN_URL
 
-  console.log(`login URl`, loginURL)
+  // console.log(`login URl`, loginURL)
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -120,7 +120,7 @@ export default function Pages(props) {
         }
       })
       .then((response) => {
-        console.log(response.data)
+        console.log('response', response)
         const { status } = response.data
         if (status.code === 200) {
           setEmail('')
@@ -134,7 +134,11 @@ export default function Pages(props) {
       })
       .catch((error) => {
         console.log(`Error: ${error}`)
-        setError(true)
+        if (error === `AxiosError: Request failed with status code 401`) {
+          setError(`Invalid username or password`)
+        } else {
+          setError(`Internal Server Error: Please re-try in a few minutes`)
+        }
         setEmail('')
         setPassword('')
       })
@@ -192,13 +196,11 @@ export default function Pages(props) {
                 <Text fontSize={'sm'} textAlign={'center'}>
                   Log in to Interlynk to continue to the dashboard.
                 </Text>
-                {error === true && (
+                {error !== '' && (
                   <Box mt={4} width={'100%'}>
                     <Alert status='error' borderRadius={4}>
                       <AlertIcon />
-                      <AlertDescription>
-                        Invalid username or password
-                      </AlertDescription>
+                      <AlertDescription>{error}</AlertDescription>
                     </Alert>
                   </Box>
                 )}

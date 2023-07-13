@@ -4,7 +4,7 @@ import Footer from 'components/Footer/Footer.js'
 // Layout components
 import AdminNavbar from 'components/Navbars/AdminNavbar.js'
 import Sidebar from 'components/Sidebar'
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import { Route, Switch, Redirect } from 'react-router-dom'
 // Custom Chakra theme
 import theme from 'theme/theme.js'
@@ -126,6 +126,21 @@ export default function Customer(props) {
     link: authLink.concat(httpLink),
     cache: new InMemoryCache()
   })
+
+  useEffect(() => {
+    window.localStorage.setItem(
+      'contains',
+      JSON.stringify({
+        redactions: false,
+        vulnerabilities: false,
+        cycloneDX: false,
+        componentsVal: 126,
+        VulnerabilitiesVal: '2C, 9H, 5M, 4L',
+        activeVulnVal: '1C, 1H, 3M, 4L',
+        riskScoreVal: 22
+      })
+    )
+  }, [])
 
   return (
     <ApolloProvider client={client}>
