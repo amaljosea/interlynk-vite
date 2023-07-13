@@ -15,21 +15,21 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '16.16.0'  # Set a Node.js version here
+        node-version: '16.16.0'
 
     - name: Install Dependencies
-      run: npm install  # You can change this to "npm install" if "npm ci" doesn't work
+      run: npm install
 
     - name: Build
-      run: export NODE_OPTIONS=--openssl-legacy-provider && npm run build  # Build your project
+      run: NODE_OPTIONS="--openssl-legacy-provider" npm run build
 
     - name: Deploy to AWS S3
       uses: jakejarvis/s3-sync-action@master
       with:
         args: --acl public-read --follow-symlinks --delete
-        path: ./build/*  # Path to your build directory
+        SOURCE_DIR: './build'  # Assuming 'build' is your build directory
       env:
-        AWS_S3_BUCKET: arn:aws:s3:::lynk-dash-app
+        AWS_S3_BUCKET: lynk-dash-app  # Use bucket name, not ARN
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_REGION: ${{ secrets.AWS_REGION }}
