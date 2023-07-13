@@ -15,7 +15,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '14'  # Set a Node.js version here
+        node-version: '16.16.0'  # Set a Node.js version here
 
     - name: Install Dependencies
       run: npm install  # You can change this to "npm install" if "npm ci" doesn't work
