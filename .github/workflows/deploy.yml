@@ -22,7 +22,12 @@ jobs:
 
     - name: Build
       run: npm run build
-      
+      env:
+        NODE_ENV: development
+        REACT_APP_VENDOR_LOGIN_URL: http://api.intelynk.io/login
+        REACT_APP_USER_LOGIN_URL: http://api.intelynk.io//share_users/login
+        REACT_APP_GRAPHQL_API: http://api.intelynk.io//lynkapi
+
     - name: List build directory contents
       run: ls -la ./build
 
