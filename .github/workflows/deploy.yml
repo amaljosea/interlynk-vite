@@ -18,7 +18,7 @@ jobs:
         node-version: '14'  # Set a Node.js version here
 
     - name: Install Dependencies
-      run: npm install  # You can change this to "npm install" if "npm ci" doesn't work
+      run: npm ci  # You can change this to "npm install" if "npm ci" doesn't work
 
     - name: Build
       run: npm run build  # Build your project
