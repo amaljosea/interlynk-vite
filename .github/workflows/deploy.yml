@@ -24,9 +24,9 @@ jobs:
       run: npm run build
       env:
         NODE_ENV: development
-        REACT_APP_VENDOR_LOGIN_URL: http://api.intelynk.io/login
-        REACT_APP_USER_LOGIN_URL: http://api.intelynk.io//share_users/login
-        REACT_APP_GRAPHQL_API: http://api.intelynk.io//lynkapi
+        REACT_APP_VENDOR_LOGIN_URL: http://api.interlynk.io/login
+        REACT_APP_USER_LOGIN_URL: http://api.interlynk.io//share_users/login
+        REACT_APP_GRAPHQL_API: http://api.interlynk.io//lynkapi
 
     - name: List build directory contents
       run: ls -la ./build
@@ -39,4 +39,4 @@ jobs:
         aws-region: ${{ secrets.AWS_REGION }}
 
     - name: Sync directory to S3
-      run: aws s3 sync build/ s3://app.intelynk.io --acl public-read
+      run: aws s3 sync build/ s3://app.interlynk.io --acl public-read
