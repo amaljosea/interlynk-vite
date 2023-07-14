@@ -23,7 +23,7 @@ export const getConImg = (name) => {
       return amazon
     case 'Azure Container Registry':
       return azure
-    case 'Github (ghcr.io)':
+    case 'Github Container Registry':
       return github
     case 'Gitlab':
       return gitlab
