@@ -49,7 +49,7 @@ function ProductVersionsRow(props) {
 
   const uniqProjects = []
   const btnRef = React.useRef()
-  const url = `#/admin/sboms?p=${name}&v=${version}`
+  const url = `#/vendor/sboms?p=${name}&v=${version}`
 
   productVersionsData.map((project) => {
     if (uniqProjects.indexOf(project.name) === -1) {

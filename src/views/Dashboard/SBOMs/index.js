@@ -331,7 +331,6 @@ function SBOMs() {
                     id='scanner'
                     value={selectedScanner}
                     onChange={handleScanner}
-                    defaultValue={'All'}
                     size='md'
                     color='gray.500'
                   >

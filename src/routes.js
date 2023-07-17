@@ -23,49 +23,49 @@ var dashRoutes = [
     name: 'Dashboard',
     icon: <HomeIcon color='inherit' />,
     component: Dashboard,
-    layout: '/admin'
+    layout: '/vendor'
   },
   {
     path: '/images',
     name: 'Images',
     icon: <FaImages color='inherit' />,
     component: Images,
-    layout: '/admin'
+    layout: '/vendor'
   },
   // {
   //   path: '/products',
   //   name: 'Products',
   //   icon: <FaWindowMaximize color='inherit' />,
   //   component: Products,
-  //   layout: '/admin'
+  //   layout: '/vendor'
   // },
   // {
   //   path: '/sboms',
   //   name: 'SBOM',
   //   icon: <FaCode color='inherit' />,
   //   component: SBOMs,
-  //   layout: '/admin'
+  //   layout: '/vendor'
   // },
   // {
   //   path: '/activities',
   //   name: 'Activities',
   //   icon: <FaRegChartBar color='inherit' />,
   //   component: Activities,
-  //   layout: '/admin'
+  //   layout: '/vendor'
   // },
   {
     path: '/connections',
     name: 'Connections',
     icon: <FaPlug color='inherit' />,
     component: Connections,
-    layout: '/admin'
+    layout: '/vendor'
   }
   // {
   //   path: '/profiles',
   //   name: 'Settings',
   //   icon: <FaRegSun color='inherit' />,
   //   component: Profile,
-  //   layout: '/admin'
+  //   layout: '/vendor'
   // }
 ]
 

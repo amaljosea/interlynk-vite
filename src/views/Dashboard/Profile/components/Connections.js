@@ -27,7 +27,6 @@ import {
 } from 'react-icons/fa'
 import { CheckIcon } from '@chakra-ui/icons'
 
-import GitHubButton from 'react-github-btn'
 import GlobalContext from 'context/GlobalContext'
 
 const Connections = ({ title }) => {

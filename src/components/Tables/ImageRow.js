@@ -9,6 +9,7 @@ import {
   MenuList,
   Portal,
   Skeleton,
+  Switch,
   Td,
   Text,
   Tooltip,
@@ -18,6 +19,10 @@ import { AddIcon, DeleteIcon } from '@chakra-ui/icons'
 import { Link } from 'react-router-dom'
 import { getConImg, scanImage } from 'utils'
 import { FaCircleNotch, FaEllipsisV } from 'react-icons/fa'
+import { useState } from 'react'
+import { useEffect } from 'react'
+import { useMutation } from '@apollo/client'
+import { ImageUpdate } from 'graphQL/Mutation'
 
 const ImageRow = ({
   item,
@@ -32,16 +37,50 @@ const ImageRow = ({
     a.company.localeCompare(b.company)
   )
 
+  const [checked, setChecked] = useState(false)
+  const [isRefreshed, setIsRefreshed] = useState(false)
   // console.log('filteredScanners', filteredScanners)
+
+  const handleChange = () => {
+    setChecked(!checked)
+  }
+
+  const [imageUpdate, { data }] = useMutation(ImageUpdate)
+
+  const updateImage = async () => {
+    try {
+      setIsRefreshed(true)
+      await imageUpdate({
+        variables: {
+          id: item.id,
+          scanEnabled: false,
+          scanRefresh: true
+        }
+      })
+    } catch (error) {
+      console.error('Mutation error:', error)
+    }
+  }
+
+  useEffect(() => {
+    if (data?.imageUpdate?.image?.id === item.id) {
+      setTimeout(() => {
+        setIsRefreshed(false)
+      }, 2000)
+    }
+  }, [data])
 
   return (
     <Tr key={item.id}>
+      <Td pl={1} width={'160px'}>
+        <Switch id='status' isChecked={checked} onChange={handleChange} />
+      </Td>
       <Td fontSize={'sm'} pl={1}>
-        {isLoading ? (
+        {isLoading || isRefreshed ? (
           <Skeleton height='20px' />
         ) : (
           <Link
-            to={`/admin/images?v=${
+            to={`/vendor/images?v=${
               item.imageVersions[item.imageVersions.length - 1].id
             }&id=${item.id}`}
             style={{
@@ -55,7 +94,7 @@ const ImageRow = ({
         )}
       </Td>
       <Td fontSize={'sm'} pl={1}>
-        {isLoading ? (
+        {isLoading || isRefreshed ? (
           <Skeleton height='20px' />
         ) : (
           <Flex
@@ -75,14 +114,14 @@ const ImageRow = ({
         )}
       </Td>
       <Td fontSize={'sm'} pl={1}>
-        {isLoading ? (
+        {isLoading || isRefreshed ? (
           <Skeleton height='20px' />
         ) : (
           <Text>{item.imageVersions.length}</Text>
         )}
       </Td>
       <Td fontSize={'sm'} pl={1}>
-        {isLoading ? (
+        {isLoading || isRefreshed ? (
           <Skeleton height='20px' />
         ) : (
           <Text>
@@ -102,7 +141,7 @@ const ImageRow = ({
         )}
       </Td>
       <Td pl={1}>
-        {isLoading ? (
+        {isLoading || isRefreshed ? (
           <Skeleton height='20px' />
         ) : (
           <Flex direction={'row'} gap={3} alignItems={'center'}>
@@ -142,7 +181,7 @@ const ImageRow = ({
             />
             <Portal>
               <MenuList style={{ width: '100px' }}>
-                <MenuItem icon={<FaCircleNotch />}>
+                <MenuItem icon={<FaCircleNotch />} onClick={updateImage}>
                   <Text fontSize={'sm'}>Refresh</Text>
                 </MenuItem>
                 <MenuItem

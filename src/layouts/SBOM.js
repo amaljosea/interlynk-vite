@@ -25,7 +25,7 @@ export default function SBOM(props) {
     console.log('tryng sbom routes')
 	// functions for changing the states from components
 	const getRoute = () => {
-		return window.location.pathname !== '/admin/full-screen-maps';
+		return window.location.pathname !== '/vendor/full-screen-maps';
 	};
 	const getActiveRoute = (routes) => {
 		let activeRoute = 'Default Brand Text';
@@ -77,7 +77,7 @@ export default function SBOM(props) {
                 console.log('returning null2')
 				return getRoutes(prop.views);
 			}
-			if (prop.layout === '/admin') {
+			if (prop.layout === '/vendor') {
                 console.log('returning null3')
 				return <Route path={prop.layout + prop.path} component={prop.component} key={key} />;
 			} else {
@@ -118,7 +118,7 @@ export default function SBOM(props) {
 						<PanelContainer>
 							<Switch>
 								{getRoutes(routes)}
-								<Redirect from='/admin' to='/admin/dashboard' />
+								<Redirect from='/vendor' to='/vendor/dashboard' />
 							</Switch>
 						</PanelContainer>
 					</PanelContent>

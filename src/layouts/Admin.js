@@ -44,7 +44,7 @@ export default function Dashboard(props) {
   const [fixed, setFixed] = useState(false)
   // functions for changing the states from components
   const getRoute = () => {
-    return window.location.pathname !== '/admin/full-screen-maps'
+    return window.location.pathname !== '/vendor/full-screen-maps'
   }
   const getActiveRoute = (routes) => {
     let activeRoute = 'Default Brand Text'
@@ -101,7 +101,7 @@ export default function Dashboard(props) {
         // console.log('getting account')
         return getRoutes(prop.views)
       }
-      if (prop.layout === '/admin') {
+      if (prop.layout === '/vendor') {
         // console.log('getting admin', prop)
         return (
           <Route
@@ -178,9 +178,9 @@ export default function Dashboard(props) {
                 <Switch>
                   {userName && getRoutes(routes)}
                   {userName ? (
-                    <Redirect from='/admin' to='/admin/dashboard' />
+                    <Redirect from='/vendor' to='/vendor/dashboard' />
                   ) : (
-                    <Redirect from='/admin' to='/auth' />
+                    <Redirect from='/vendor' to='/auth' />
                   )}
                 </Switch>
               </PanelContainer>

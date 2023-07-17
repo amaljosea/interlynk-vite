@@ -138,7 +138,7 @@ export default function AdminNavbar(props) {
 
             {!location.pathname.startsWith('/customer') && (
               <BreadcrumbItem color={mainText}>
-                <Link to='/admin/images' color={secondaryText}>
+                <Link to='/vendor/images' color={secondaryText}>
                   {brandText === 'SBOM' ? 'Image' : brandText}
                 </Link>
               </BreadcrumbItem>

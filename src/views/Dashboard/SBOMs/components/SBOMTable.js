@@ -58,6 +58,7 @@ import { BsFilterRight } from 'react-icons/bs'
 import BasicTable from './BasicTable'
 import SBOMDrawer from 'components/Drawer/SBOMDrawer'
 import { getAllScanners } from 'graphQL/Queries'
+import { CSVLink } from 'react-csv'
 
 const SBOMTable = ({
   title,
@@ -100,6 +101,28 @@ const SBOMTable = ({
   const [filterData, setFilterData] = useState([])
 
   const componentRef = useRef()
+
+  const flattenedData = vulData.map((item, index) => {
+    const allVulData = {
+      ID: index + 1,
+      CVEID: item.cveId,
+      SEVERITY: item.severity[0],
+      CVSS: item.cvss?.v3Score,
+      COMPONENT: item.component?.name,
+      VERSION: item.component?.version,
+      FIXED_COMPONENT: item.component?.fixedInVersion[0],
+      FIXED_PRODUCT: item.fixedInImage,
+      SCANNER: item.scanners?.map((scanner) => scanner.name),
+      VEX_JUSTIFICATION: item.vexVuln?.vexJustification?.name,
+      VEX_STATUS: item.vexVuln?.vexStatus?.name
+    }
+
+    return allVulData
+  })
+
+  // useEffect(() => {
+  //   console.log(`flattenedData`, flattenedData)
+  // }, [vulData])
 
   const link_captions = [
     'Active',
@@ -522,9 +545,24 @@ const SBOMTable = ({
                           <BiImport />
                         </Button>
                       </Tooltip>
+                      {/* <Tooltip label='Export'>
+                        <Button colorScheme='blue' size='md'>
+                          <CSVLink
+                            data={vulData}
+                            filename='vulnerabilities.csv'
+                          >
+                            <BiExport />
+                          </CSVLink>
+                        </Button>
+                      </Tooltip> */}
                       <Tooltip label='Export'>
                         <Button colorScheme='blue' size='md'>
-                          <BiExport />
+                          <CSVLink
+                            data={flattenedData.length > 0 ? flattenedData : ''}
+                            filename='vulnerabilities.csv'
+                          >
+                            <BiExport />
+                          </CSVLink>
                         </Button>
                       </Tooltip>
                     </Box>

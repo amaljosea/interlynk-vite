@@ -92,38 +92,6 @@ function ImagesDrawer({ isOpen, onClose, btnRef, activeImageId }) {
     setSelectedVersion(uniqVersion)
   }, [product])
 
-  const handleSave = () => {
-    setSBOMLinksData((prev) => [
-      {
-        id: uuidv4(),
-        link: 'https://dashboard-app.fly.dev/#/admin/dashboard/sbom/z55E8gz3FN',
-        shared_with: emailList,
-        created: new Date().toISOString(),
-        visits: 0,
-        active: true,
-        project: product,
-        version: version,
-        conf_email: hasEmail,
-        conf_terms: hasTerms,
-        redactions: hasRedactions,
-        components: true,
-        licenses: hasLicenses,
-        vulnerabilities: hasVul,
-        cyclonedx: hasCyclonDx,
-        spdx: hasSpdx
-      },
-      ...prev
-    ])
-
-    setProduct('')
-    setVersion('')
-    setIsPublic(false)
-    setHasLimitAccess(true)
-    setHasVul(false)
-    setEmail('')
-    setEmailList([])
-    onClose()
-  }
 
   const handleRemove = (item) => {
     const updatedList = emailList.filter((email) => email !== item)
