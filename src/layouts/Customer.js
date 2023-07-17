@@ -31,7 +31,7 @@ export default function Customer(props) {
   const [fixed, setFixed] = useState(false)
   // functions for changing the states from components
   const getRoute = () => {
-    return window.location.pathname !== '/admin/full-screen-maps'
+    return window.location.pathname !== '/vendor/full-screen-maps'
   }
   const getActiveRoute = (routes) => {
     let activeRoute = 'Default Brand Text'

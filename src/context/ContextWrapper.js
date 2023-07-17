@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import GlobalContext from './GlobalContext'
 import { dashboardTableData } from 'variables/general'
 import { SBOMLinks } from 'variables/general'
-import { Vulnerabilities } from 'variables/general'
 import { activitiesDataLong } from 'variables/general'
 
 const ContextWrapper = (props) => {

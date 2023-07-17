@@ -36,7 +36,7 @@ function ProductsOverviewTableRow(props) {
                 fontWeight='semibold'
                 minWidth="100%"
               >
-                <Link href='#/admin/products'>{name}</Link>
+                <Link href='#/vendor/products'>{name}</Link>
               </Text>
               <Text
                 fontSize="xs"

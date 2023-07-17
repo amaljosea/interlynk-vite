@@ -123,6 +123,21 @@ export const imageCreate = gql`
   }
 `
 
+export const ImageUpdate = gql`
+  mutation ImageUpdate($id: ID!, $scanEnabled: Boolean, $scanRefresh: Boolean) {
+    imageUpdate(
+      input: { id: $id, scanEnabled: $scanEnabled, scanRefresh: $scanRefresh }
+    ) {
+      image {
+        id
+        name
+        updatedAt
+      }
+      errors
+    }
+  }
+`
+
 export const AddScannerImage = gql`
   mutation AddScannerImage($imageID: Uuid!, $scannerID: Uuid!) {
     imageScannerAdd(input: { imageId: $imageID, scannerId: $scannerID }) {

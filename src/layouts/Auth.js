@@ -145,7 +145,7 @@ export default function Pages(props) {
   }
 
   if (isAuthenticate) {
-    return <Redirect to={'/admin/dashboard'} />
+    return <Redirect to={'/vendor/dashboard'} />
   } else {
     return (
       <ChakraProvider theme={theme} resetCss={false} w='100%'>

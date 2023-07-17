@@ -21,7 +21,6 @@ import React, { useState, useEffect } from 'react'
 import { FaJira, FaSlack, FaGithubSquare, FaGitlab } from 'react-icons/fa'
 import { CheckIcon } from '@chakra-ui/icons'
 
-import GitHubButton from 'react-github-btn'
 
 const Connections = ({ title }) => {
   // Chakra color mode

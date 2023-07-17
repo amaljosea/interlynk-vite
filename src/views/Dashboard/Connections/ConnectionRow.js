@@ -15,46 +15,113 @@ import {
   ModalBody,
   ModalCloseButton,
   useDisclosure,
-  Button
+  Button,
+  Skeleton,
+  useToast
 } from '@chakra-ui/react'
 import { timeSince, getConImg } from 'utils'
+import { useState } from 'react'
+import { useEffect } from 'react'
 
-const ConnectionRow = ({ item, handleEdit, handleDelete }) => {
+const ConnectionRow = ({
+  item,
+  handleEdit,
+  isLoading,
+  handleDelete,
+  organizationConnectorUpdate,
+}) => {
+  const toast = useToast()
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const [checked, setChecked] = useState(item.enabled ? true : false)
+
+  const handleChange = (e) => {
+    setChecked(e.target.checked ? true : false)
+    updateConnection(e.target.checked)
+  }
+
+  const updateConnection = async (e) => {
+    try {
+      await organizationConnectorUpdate({
+        variables: {
+          id: item.id,
+          name: item.name,
+          enabled: e ? true : false
+        }
+      }).then(() => {
+        if (e === false) {
+          toast({
+            description: 'Connections is disabled. You can not use it anymore',
+            status: 'warning',
+            duration: 2000,
+            isClosable: true,
+            position: 'top'
+          })
+        }
+      })
+    } catch (error) {
+      console.error('Mutation error:', error)
+    }
+  }
+
   return (
     <>
-      <Tr>
-        <Td>
-          <Switch id='status' isChecked={item.enabled} readOnly />
-        </Td>
-        <Td mt={2} px={8}>
-          <Flex direction={'row'} gap={4} alignItems={'center'}>
-            <Image src={getConImg(item.connector.name)} width={7} height={7} />
-            <Flex direction={'column'} gap={1} alignItems={'start'}>
-              <Text fontSize='sm' fontWeight={600}>
-                {item.name}
-              </Text>
+      {isLoading ? (
+        <Tr>
+          <Td fontSize={'sm'} pl={1}>
+            <Skeleton height='20px' />
+          </Td>
+          <Td fontSize={'sm'} pl={1}>
+            <Skeleton height='20px' />
+          </Td>
+          <Td fontSize={'sm'} pl={1}>
+            <Skeleton height='20px' />
+          </Td>
+          <Td fontSize={'sm'} pl={1}>
+            <Skeleton height='20px' />
+          </Td>
+        </Tr>
+      ) : (
+        <Tr>
+          <Td>
+            <Switch id='status' isChecked={checked} onChange={handleChange} />
+          </Td>
+          <Td mt={2} px={8}>
+            <Flex direction={'row'} gap={4} alignItems={'center'}>
+              <Image
+                src={getConImg(item.connector.name)}
+                width={7}
+                height={7}
+              />
+              <Flex direction={'column'} gap={1} alignItems={'start'}>
+                <Text fontSize='sm' fontWeight={600}>
+                  {item.name}
+                </Text>
+              </Flex>
             </Flex>
-          </Flex>
-        </Td>
-        <Td mt={2} px={8} fontSize={'sm'}>
-          {item.username}
-        </Td>
-        <Td mt={2} px={8} fontSize={'sm'}>
-          {timeSince(item.updatedAt)}
-        </Td>
-        <Td mt={2} px={8}>
-          <Flex direction={'row'} gap={4} alignItems={'start'}>
-            <EditIcon
-              color={'blue.500'}
-              cursor={'pointer'}
-              onClick={() => handleEdit(item)}
-            />
+          </Td>
+          <Td mt={2} px={8} fontSize={'sm'}>
+            {item.username}
+          </Td>
+          <Td mt={2} px={8} fontSize={'sm'}>
+            {timeSince(item.updatedAt)}
+          </Td>
+          <Td mt={2} px={8}>
+            <Flex direction={'row'} gap={4} alignItems={'start'}>
+              <EditIcon
+                color={'blue.500'}
+                cursor={'pointer'}
+                onClick={() => handleEdit(item)}
+              />
 
-            <DeleteIcon color={'red.400'} cursor={'pointer'} onClick={onOpen} />
-          </Flex>
-        </Td>
-      </Tr>
+              <DeleteIcon
+                color={'red.400'}
+                cursor={'pointer'}
+                onClick={onOpen}
+              />
+            </Flex>
+          </Td>
+        </Tr>
+      )}
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />

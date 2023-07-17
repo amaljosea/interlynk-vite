@@ -42,7 +42,7 @@ export default function HeaderLinks(props) {
   const userEmail = localStorage.getItem('userEmail')
 
   useEffect(() => {
-    if (location.pathname.startsWith('/admin')) {
+    if (location.pathname.startsWith('/vendor')) {
       setUsername(userName)
     } else if (location.pathname.startsWith('/customer')) {
       setUsername(userEmail)
@@ -105,10 +105,18 @@ export default function HeaderLinks(props) {
             {username ? username : 'Surendra Pathak'}
           </Text>
         </MenuButton>
-        {!location.pathname.startsWith('/customer') && (
+        {location.pathname.startsWith('/customer') ? (
           <MenuList size='sm'>
             <MenuGroup title=''>
-              <Link to='/admin/connections'>
+              <Link to='/register'>
+                <MenuItem icon={<SettingsIcon />}>Register</MenuItem>
+              </Link>
+            </MenuGroup>
+          </MenuList>
+        ) : (
+          <MenuList size='sm'>
+            <MenuGroup title=''>
+              <Link to='/vendor/connections'>
                 <MenuItem icon={<SettingsIcon />}>Settings</MenuItem>
               </Link>
               {userName ? (

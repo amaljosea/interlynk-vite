@@ -52,6 +52,7 @@ const Index = () => {
   const toast = useToast()
 
   const [connectors, setConnectors] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
 
   const { data: allConnectors } = useQuery(GetAllConnectors, {
     variables: {}
@@ -69,9 +70,12 @@ const Index = () => {
     onCompleted: refetch
   })
 
-  const [organizationConnectorUpdate] = useMutation(OrgConnectorUpdate, {
-    onCompleted: refetch
-  })
+  const [organizationConnectorUpdate, { data: updatedConnector }] = useMutation(
+    OrgConnectorUpdate,
+    {
+      onCompleted: refetch
+    }
+  )
 
   const [organizationConnectorDelete] = useMutation(OrgConnectorDelete, {
     onCompleted: refetch
@@ -135,14 +139,20 @@ const Index = () => {
 
   const handleRefresh = async () => {
     try {
+      setIsLoading(true)
       await organizationConnectorRefresh().then(() =>
-        toast({
-          description: 'Connections updated successfully',
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-          position: 'top'
-        })
+        // toast({
+        //   description: 'Connections updated successfully',
+        //   status: 'success',
+        //   duration: 5000,
+        //   isClosable: true,
+        //   position: 'top'
+        // })
+        {
+          setTimeout(() => {
+            setIsLoading(false)
+          }, 2000)
+        }
       )
     } catch (error) {
       if (error.networkError && error.networkError.statusCode === 500) {
@@ -569,8 +579,12 @@ const Index = () => {
                           <ConnectionRow
                             key={index}
                             item={item}
+                            isLoading={isLoading}
                             handleEdit={handleEdit}
                             handleDelete={handleDelete}
+                            organizationConnectorUpdate={
+                              organizationConnectorUpdate
+                            }
                           />
                         ))
                       : connectorResults &&
@@ -578,8 +592,12 @@ const Index = () => {
                           <ConnectionRow
                             key={index}
                             item={item}
+                            isLoading={isLoading}
                             handleEdit={handleEdit}
                             handleDelete={handleDelete}
+                            organizationConnectorUpdate={
+                              organizationConnectorUpdate
+                            }
                           />
                         ))}
                   </Tbody>

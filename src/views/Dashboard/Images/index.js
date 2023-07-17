@@ -41,6 +41,7 @@ import { useContext } from 'react'
 import GlobalContext from 'context/GlobalContext'
 import ImageRow from 'components/Tables/ImageRow'
 import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
+import { ImageUpdate } from 'graphQL/Mutation'
 
 const Index = () => {
   const toast = useToast()
@@ -59,7 +60,7 @@ const Index = () => {
   const path = location.pathname
 
   useEffect(() => {
-    if (path === '/admin/images') {
+    if (path === '/vendor/images') {
       setVulnerabilitiesData([])
     }
   }, [path])
@@ -97,7 +98,7 @@ const Index = () => {
   const [imageScannerRemove] = useMutation(RemoveScannerImage, {
     onCompleted: refetch
   })
-
+  
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const {
@@ -298,6 +299,14 @@ const Index = () => {
                       color={'gray.'}
                       pl={1}
                       position='relative'
+                      cursor={'pointer'}
+                    >
+                      <Box>Scan Enabled</Box>
+                    </Th>
+                    <Th
+                      color={'gray.'}
+                      pl={1}
+                      position='relative'
                       onClick={() => handleImgSort('name')}
                       cursor={'pointer'}
                     >
@@ -455,7 +464,7 @@ const Index = () => {
               <Text color={'gray.500'}>
                 Please connect to a container registry under
                 <Link
-                  href='/#/admin/connections'
+                  href='/#/vendor/connections'
                   color={'blue.500'}
                   textDecoration={'underline'}
                   _hover={{ textDecoration: 'underline' }}
