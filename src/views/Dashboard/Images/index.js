@@ -98,7 +98,7 @@ const Index = () => {
   const [imageScannerRemove] = useMutation(RemoveScannerImage, {
     onCompleted: refetch
   })
-  
+
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const {
@@ -301,7 +301,7 @@ const Index = () => {
                       position='relative'
                       cursor={'pointer'}
                     >
-                      <Box>Scan Enabled</Box>
+                      <Box>Scan</Box>
                     </Th>
                     <Th
                       color={'gray.'}
@@ -329,7 +329,7 @@ const Index = () => {
                       cursor={'pointer'}
                     >
                       <Flex direction={'row'} alignItems={'center'} gap={2}>
-                        <Box>Connection</Box>
+                        <Box>Connector</Box>
                         <Box>
                           {sortField === 'organizationConnector' &&
                           sortOrder === 'asc' ? (

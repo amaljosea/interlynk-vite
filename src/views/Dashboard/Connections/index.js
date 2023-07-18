@@ -318,7 +318,7 @@ const Index = () => {
         <Flex direction='column' pt={{ base: '200px', md: '75px' }}>
           <Box px={6}>
             <Heading size='md' px={2}>
-              Connect a registry to get started with Interlynk
+              New Connection
             </Heading>
           </Box>
           <Box px={6}>
@@ -499,10 +499,10 @@ const Index = () => {
               alignItems={'center'}
             >
               <Heading size='md' px={2}>
-                Authenticated Connections
+                Existing Connections
               </Heading>
               <Button colorScheme='blue' onClick={handleRefresh}>
-                Refresh
+                Verify
               </Button>
             </Flex>
             <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
@@ -512,11 +512,10 @@ const Index = () => {
                     <Tr>
                       <Th
                         color={'gray.'}
-                        px={8}
                         position='relative'
                         cursor={'pointer'}
                       >
-                        <Box>Status</Box>
+                        <Box>Connect</Box>
                       </Th>
                       <Th
                         color={'gray.'}
@@ -526,7 +525,7 @@ const Index = () => {
                         cursor={'pointer'}
                       >
                         <Flex direction={'row'} alignItems={'center'} gap={2}>
-                          <Box>Connector Name</Box>
+                          <Box>Connector</Box>
                           <Box>
                             {sortField === 'name' && sortOrder === 'asc' ? (
                               <TriangleUpIcon />

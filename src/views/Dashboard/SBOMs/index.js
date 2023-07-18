@@ -374,7 +374,7 @@ function SBOMs() {
               as={FaExclamationTriangle}
             />
           }
-          title={'Active Vulnerabilities'}
+          title={'Unresolved Vulnerabilities'}
           description={'Vulnerabilities included in SBOM'}
           amount={activeVulnVal !== '' ? activeVulnVal : '1C, 1H, 3M, 4L'}
         />

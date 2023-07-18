@@ -282,7 +282,7 @@ function Customer() {
                 as={FaExclamationTriangle}
               />
             }
-            title={'Active Vulnerabilities'}
+            title={'Unresolved Vulnerabilities'}
             description={'Vulnerabilities included in SBOM'}
             amount={contains ? contains.activeVulnVal : ''}
           />

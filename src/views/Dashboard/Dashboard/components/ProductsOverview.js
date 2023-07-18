@@ -54,7 +54,7 @@ const ProductsOverview = ({ title, amount, captions, data }) => {
               <Thead>
                 <Tr>
                   <Th pl={1}>Image</Th>
-                  <Th pl={1}>Connection</Th>
+                  <Th pl={1}>Connector</Th>
                   <Th pl={1}>Tags</Th>
                   <Th pl={1}>Last Pushed</Th>
                   <Th pl={1}>Scanners</Th>

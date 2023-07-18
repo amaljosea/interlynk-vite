@@ -126,27 +126,28 @@ const ConnectionRow = ({
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Connection</ModalHeader>
+          <ModalHeader>Delete?</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Text fontSize={'lg'}>Deleting a connection will -</Text>
-            <Flex flexDir={'column'} gap={1} mt={1}>
+            <Text fontSize={'lg'}>Deleting this connection will: </Text>
+            <br />
+            <Flex flexDir={'column'} gap={2} mt={2}>
               {[
-                '- Remove any associated images and tags from Interlynk',
-                '- Remove scanned image data',
-                '- Disables any Share Lynk associated with the associated images'
+                'Remove connected images and tags',
+                'Remove scan data for connected images',
+                'Disable all Share Lynk\'s for connected images'
               ].map((item, index) => (
                 <Text key={index} fontSize={'sm'}>
-                  {item}
+                  <li>{item}</li>
                 </Text>
               ))}
             </Flex>
-            <Text mt={4} fontSize={'sm'}>
-              To stop Interlynk from syncing with this connection, you can
-              disable the connection instead.
+            <br />
+            <Text mt={2} fontSize={'sm'}>
+              Alternatively, you can disable the connection to prevent future scans while retaining existing data.
             </Text>
             <Text mt={4} fontSize={'sm'}>
-              Are you sure you want to continue with deleting the connection ?
+              Are you sure you want to continue with the deletion?
             </Text>
           </ModalBody>
           <ModalFooter>
