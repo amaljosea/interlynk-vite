@@ -8,7 +8,7 @@ import {
   useColorModeValue
 } from '@chakra-ui/react'
 import PropTypes from 'prop-types'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import AdminNavbarLinks from './AdminNavbarLinks'
 import { useContext } from 'react'
 import GlobalContext from 'context/GlobalContext'
@@ -34,6 +34,7 @@ export default function AdminNavbar(props) {
 
   const imageName = window.localStorage.getItem('Image')
   const signedImageName = localStorage.getItem(`signedImageName`)
+
 
   // Here are all the props that may change depending on navbar's type or state.(secondary, variant, scrolled)
   let mainText = useColorModeValue('gray.700', 'gray.200')
@@ -79,6 +80,18 @@ export default function AdminNavbar(props) {
     }
   }
   window.addEventListener('scroll', changeNavbar)
+
+  const path = (name) => {
+    switch (name) {
+      case 'Dashboard':
+        return '/vendor/dashboard'
+      case 'Images':
+        return '/vendor/images'
+      case 'Connections':
+        return '/vendor/connections'
+    }
+  }
+
   return (
     <Flex
       position={navbarPosition}
@@ -138,8 +151,8 @@ export default function AdminNavbar(props) {
 
             {!location.pathname.startsWith('/customer') && (
               <BreadcrumbItem color={mainText}>
-                <Link to='/vendor/images' color={secondaryText}>
-                  {brandText === 'SBOM' ? 'Image' : brandText}
+                <Link to={`${path(brandText)}`} color={secondaryText}>
+                  {brandText}
                 </Link>
               </BreadcrumbItem>
             )}

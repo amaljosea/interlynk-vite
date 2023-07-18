@@ -44,6 +44,13 @@ function Customer() {
   const [selectedScanner, setSelectedScanner] = useState('')
   const [allResults, setAllResults] = useState([])
   const [filteredVulItems, setFilteredVulItems] = useState([])
+  const [total, setTotal] = useState({ C: 0, H: 0, M: 0, L: 0 })
+  const [unresolve, setUnresolve] = useState({
+    C: 0,
+    H: 0,
+    M: 0,
+    L: 0
+  })
 
   const location = useLocation()
   const paramId = `${location.search.replace(/\?/g, '')}`
@@ -119,6 +126,50 @@ function Customer() {
     setSelectedVersion(value)
     refetch({ signedParams: `${paramId}`, imgVersionId: value })
   }
+
+  // Calculate the counts for each severity level
+  const totalCount = allResults.reduce((acc, item) => {
+    acc[item.severity[0]] = (acc[item.severity[0]] || 0) + 1
+    return acc
+  }, {})
+
+  const unresolveFilter = allResults.filter(
+    (item) =>
+      item.vexVuln?.vexStatus?.name !== 'Fixed' &&
+      item.vexVuln?.vexStatus?.name !== 'False Positive' &&
+      item.vexVuln?.vexStatus?.name !== 'Not Affected'
+  )
+
+  const unresolveCount = unresolveFilter?.reduce((acc, item) => {
+    acc[item.severity[0]] = (acc[item.severity[0]] || 0) + 1
+    return acc
+  }, {})
+
+  useEffect(() => {
+    const critical = totalCount['critical'] || 0
+    const high = totalCount['super high'] || 0
+    const medium = totalCount['medium'] || 0
+    const low = totalCount['low'] || 0
+    setTotal({
+      C: critical,
+      H: high,
+      M: medium,
+      L: low
+    })
+  }, [allResults])
+
+  useEffect(() => {
+    const critical = unresolveCount['critical'] || 0
+    const high = unresolveCount['super high'] || 0
+    const medium = unresolveCount['medium'] || 0
+    const low = unresolveCount['low'] || 0
+    setUnresolve({
+      C: critical,
+      H: high,
+      M: medium,
+      L: low
+    })
+  }, [allResults])
 
   return (
     <>
@@ -270,7 +321,7 @@ function Customer() {
             icon={<Icon h={'24px'} w={'24px'} color='white' as={FaBug} />}
             title={'Total Vulnerabilities'}
             description={'Vulnerabilities included in SBOM'}
-            amount={contains ? contains.VulnerabilitiesVal : ''}
+            amount={`${total.C}C,${total.H}H,${total.M}M,${total.L}C`}
           />
           <Spacer />
           <SBOMStatistics
@@ -284,7 +335,7 @@ function Customer() {
             }
             title={'Unresolved Vulnerabilities'}
             description={'Vulnerabilities included in SBOM'}
-            amount={contains ? contains.activeVulnVal : ''}
+            amount={`${unresolve.C}C,${unresolve.H}H,${unresolve.M}M,${unresolve.L}C`}
           />
         </Flex>
         <CustomerSBOMTable

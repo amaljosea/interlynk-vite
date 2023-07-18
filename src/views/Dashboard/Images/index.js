@@ -209,7 +209,7 @@ const Index = () => {
   useEffect(() => {
     setTimeout(() => {
       setIsLoading(false)
-    }, 10000)
+    }, 5000)
   }, [isLoading])
 
   const handleImgSort = (field) => {
@@ -281,12 +281,7 @@ const Index = () => {
                   onChange={(e) => setSearchInput(e.target.value)}
                   fontSize={'sm'}
                 />
-                <Button
-                  fontSize={'sm'}
-                  fontWeight={'normal'}
-                  colorScheme='blue'
-                  onClick={() => setIsLoading(true)}
-                >
+                <Button colorScheme='blue' onClick={() => setIsLoading(true)}>
                   Refresh
                 </Button>
               </Flex>

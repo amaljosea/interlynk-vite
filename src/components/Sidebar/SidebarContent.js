@@ -6,7 +6,6 @@ import {
   Button,
   Center,
   Flex,
-  Link,
   Stack,
   Text,
   useColorModeValue
@@ -18,9 +17,7 @@ import { SidebarHelp } from 'components/Sidebar/SidebarHelp'
 import GlobalContext from 'context/GlobalContext'
 import React from 'react'
 import { useContext } from 'react'
-import { BsArrowRight } from 'react-icons/bs'
-import {} from 'react-icons/fa'
-import { NavLink, useLocation } from 'react-router-dom'
+import { NavLink, useLocation, Link } from 'react-router-dom'
 
 // this function creates the links and collapses that appear in the sidebar (left menu)
 
@@ -194,26 +191,26 @@ const SidebarContent = ({ logoText, routes }) => {
   return (
     <>
       <Box pt={'25px'} mb='12px' pos={'relative'}>
-        <Link
-          href={`${process.env.PUBLIC_URL}/#/`}
-          target='_blank'
-          display='flex'
-          lineHeight='100%'
-          mb='30px'
-          ml={'20px'}
-          fontWeight='bold'
-          justifyContent='start'
-          alignItems='center'
-          fontSize='11px'
-        >
-          <InterlynkLogo w='32px' h='32px' me='10px' />
-          {minimize ? (
-            ''
-          ) : (
-            <Text fontSize='lg' mt='3px'>
-              {logoText}
-            </Text>
-          )}
+        <Link to={`/vendor/dashboard`}>
+          <Box
+            display='flex'
+            lineHeight='100%'
+            mb='30px'
+            ml={'20px'}
+            fontWeight='bold'
+            justifyContent='start'
+            alignItems='center'
+            fontSize='11px'
+          >
+            <InterlynkLogo w='32px' h='32px' me='10px' />
+            {minimize ? (
+              ''
+            ) : (
+              <Text fontSize='lg' mt='3px'>
+                {logoText}
+              </Text>
+            )}
+          </Box>
         </Link>
         <Separator></Separator>
       </Box>

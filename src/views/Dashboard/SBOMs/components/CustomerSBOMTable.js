@@ -24,27 +24,21 @@ import {
   MenuGroup,
   MenuItem,
   Skeleton,
-  Td
+  Td,
+  Tooltip
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 import VulnerabilityRow from 'components/Tables/VulnerabilityRow.js'
-import SBOMComponentRow from 'components/Tables/SBOMComponentRow.js'
 import GlobalContext from 'context/GlobalContext'
 import React, { useState } from 'react'
 import { useContext } from 'react'
 import { useEffect } from 'react'
 import CardHeader from 'components/Card/CardHeader'
-import { sbom } from 'variables/general'
-import {
-  ChevronDownIcon,
-  TriangleDownIcon,
-  TriangleUpIcon
-} from '@chakra-ui/icons'
-import { useRef } from 'react'
-import CustomerComponentRow from 'components/Tables/CustomerComponentRow'
+import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
 import { BsFilterRight } from 'react-icons/bs'
+import { BiExport, BiImport } from 'react-icons/bi'
 
 const CustomerSBOMTable = ({
   data,
@@ -72,6 +66,24 @@ const CustomerSBOMTable = ({
   const [sortField, setSortField] = useState('')
   const [sortOrder, setSortOrder] = useState('asc')
   const [sortComponentData, setSortComponentData] = useState([])
+
+  const flattenedData = data.map((item, index) => {
+    const allVulData = {
+      ID: index + 1,
+      CVEID: item.cveId,
+      SEVERITY: item.severity[0],
+      CVSS: item.cvss?.v3Score,
+      COMPONENT: item.component?.name,
+      VERSION: item.component?.version,
+      FIXED_COMPONENT: item.component?.fixedInVersion[0],
+      FIXED_PRODUCT: item.fixedInImage,
+      SCANNER: item.scanners?.map((scanner) => scanner.name),
+      VEX_JUSTIFICATION: item.vexVuln?.vexJustification?.name,
+      VEX_STATUS: item.vexVuln?.vexStatus?.name
+    }
+
+    return allVulData
+  })
 
   useEffect(() => {
     const filterData =
@@ -242,41 +254,73 @@ const CustomerSBOMTable = ({
         <TabPanels>
           <TabPanel height={'8xl'}>
             <CardHeader mb={4} as={Flex} gap={2}>
-              <Input
-                placeholder='Search'
-                width={'300px'}
-                size='md'
-                id='vulnerabilities'
-                value={searchVul}
-                onChange={(e) => setSearchVul(e.target.value)}
-              />
-              <Menu closeOnSelect={true}>
-                <MenuButton
-                  as={Button}
-                  colorScheme='blue'
-                  leftIcon={<BsFilterRight size={24} />}
-                >
-                  Filter
-                </MenuButton>
-                <MenuList minWidth='240px'>
-                  <MenuOptionGroup
-                    defaultValue='Total'
-                    title='Resolution'
-                    type='radio'
-                  >
-                    {['Unresolved', 'Total'].map((p, index) => (
-                      <MenuItemOption
-                        value={p}
-                        key={index}
-                        fontSize={'sm'}
-                        onClick={() => onVulnFilter(p)}
+              <Flex
+                width={'100%'}
+                gap={2}
+                direction={'row'}
+                alignItems={'center'}
+                justifyContent={'space-between'}
+              >
+                <Flex gap={2} direction={'row'} alignItems={'center'}>
+                  <Input
+                    placeholder='Search'
+                    width={'300px'}
+                    size='md'
+                    id='vulnerabilities'
+                    value={searchVul}
+                    onChange={(e) => setSearchVul(e.target.value)}
+                  />
+                  <Menu closeOnSelect={true}>
+                    <MenuButton
+                      as={Button}
+                      colorScheme='blue'
+                      leftIcon={<BsFilterRight size={24} />}
+                    >
+                      Filter
+                    </MenuButton>
+                    <MenuList minWidth='240px'>
+                      <MenuOptionGroup
+                        defaultValue='Total'
+                        title='Resolution'
+                        type='radio'
                       >
-                        {p}
-                      </MenuItemOption>
-                    ))}
-                  </MenuOptionGroup>
-                </MenuList>
-              </Menu>
+                        {['Unresolved', 'Total'].map((p, index) => (
+                          <MenuItemOption
+                            value={p}
+                            key={index}
+                            fontSize={'sm'}
+                            onClick={() => onVulnFilter(p)}
+                          >
+                            {p}
+                          </MenuItemOption>
+                        ))}
+                      </MenuOptionGroup>
+                    </MenuList>
+                  </Menu>
+                </Flex>
+                <Flex gap={2} direction={'row'}>
+                  <Box as={Flex} direction={'row'} gap={2}>
+                    <Tooltip label='Import'>
+                      <Button colorScheme='blue' size='md' disabled>
+                        <BiImport />
+                      </Button>
+                    </Tooltip>
+                    <Tooltip label='Export'>
+                      <Button colorScheme='blue' size='md'>
+                        <CSVLink
+                          data={flattenedData.length > 0 ? flattenedData : ''}
+                          filename='vulnerabilities.csv'
+                        >
+                          <BiExport />
+                        </CSVLink>
+                      </Button>
+                    </Tooltip>
+                    <Button colorScheme='blue' size='md'>
+                      Refresh
+                    </Button>
+                  </Box>
+                </Flex>
+              </Flex>
             </CardHeader>
             <CardBody>
               <Table variant='simple' color={textColor} size='sm'>
