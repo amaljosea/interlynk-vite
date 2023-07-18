@@ -109,6 +109,13 @@ function SBOMs() {
 
   const [selectedVersion, setSelectedVersion] = useState('')
   const [selectedScanner, setSelectedScanner] = useState('')
+  const [total, setTotal] = useState({ C: 0, H: 0, M: 0, L: 0 })
+  const [unresolve, setUnresolve] = useState({
+    C: 0,
+    H: 0,
+    M: 0,
+    L: 0
+  })
 
   const [allResults, setAllResults] = useState([])
 
@@ -161,15 +168,6 @@ function SBOMs() {
     refetch({ id: value })
   }
 
-  const exportData = () => {
-    const fileData = JSON.stringify(jsonData)
-    const blob = new Blob([fileData])
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.download = 'user-info44444.json'
-    link.href = url
-    link.click()
-  }
 
   const uniqProjects = []
   const btnRef = React.useRef()
@@ -195,6 +193,50 @@ function SBOMs() {
     localStorage.setItem('cloudScanner', value)
     setSelectedScanner(value)
   }
+
+  // Calculate the counts for each severity level
+  const totalCount = allResults.reduce((acc, item) => {
+    acc[item.severity[0]] = (acc[item.severity[0]] || 0) + 1
+    return acc
+  }, {})
+
+  const unresolveFilter = allResults.filter(
+    (item) =>
+      item.vexVuln?.vexStatus?.name !== 'Fixed' &&
+      item.vexVuln?.vexStatus?.name !== 'False Positive' &&
+      item.vexVuln?.vexStatus?.name !== 'Not Affected'
+  )
+
+  const unresolveCount = unresolveFilter?.reduce((acc, item) => {
+    acc[item.severity[0]] = (acc[item.severity[0]] || 0) + 1
+    return acc
+  }, {})
+
+  useEffect(() => {
+    const critical = totalCount['critical'] || 0
+    const high = totalCount['super high'] || 0
+    const medium = totalCount['medium'] || 0
+    const low = totalCount['low'] || 0
+    setTotal({
+      C: critical,
+      H: high,
+      M: medium,
+      L: low
+    })
+  }, [allResults])
+
+  useEffect(() => {
+    const critical = unresolveCount['critical'] || 0
+    const high = unresolveCount['super high'] || 0
+    const medium = unresolveCount['medium'] || 0
+    const low = unresolveCount['low'] || 0
+    setUnresolve({
+      C: critical,
+      H: high,
+      M: medium,
+      L: low
+    })
+  }, [allResults])
 
   useEffect(() => {
     const filteredData = allResults.filter((item) =>
@@ -360,9 +402,7 @@ function SBOMs() {
           icon={<Icon h={'24px'} w={'24px'} color='white' as={FaBug} />}
           title={'Total Vulnerabilities'}
           description={'Vulnerabilities included in SBOM'}
-          amount={
-            VulnerabilitiesVal !== '' ? VulnerabilitiesVal : '2C, 9H, 5M, 4L'
-          }
+          amount={`${total.C}C,${total.H}H,${total.M}M,${total.L}C`}
         />
         <Spacer />
         <SBOMStatistics
@@ -376,7 +416,7 @@ function SBOMs() {
           }
           title={'Unresolved Vulnerabilities'}
           description={'Vulnerabilities included in SBOM'}
-          amount={activeVulnVal !== '' ? activeVulnVal : '1C, 1H, 3M, 4L'}
+          amount={`${unresolve.C}C,${unresolve.H}H,${unresolve.M}M,${unresolve.L}C`}
         />
         {/* <Spacer />
         <SBOMStatistics

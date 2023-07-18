@@ -318,3 +318,23 @@ export const DeleteShareLynk = gql`
     }
   }
 `
+
+export const OrgConnectorValidate = gql`
+  mutation OrgConnectorValidate($id: ID!) {
+    organizationConnectorValidate(input: { id: $id }) {
+      errors
+    }
+  }
+`
+
+export const UpdateImageVersion = gql`
+  mutation UpdateImageVersion($id: ID!, $scanRefresh: Boolean) {
+    imageVersionUpdate(input: { id: $id, scanRefresh: $scanRefresh }) {
+      imageVersion {
+        id
+        name
+      }
+      errors
+    }
+  }
+`

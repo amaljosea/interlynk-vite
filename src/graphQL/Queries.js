@@ -40,6 +40,7 @@ export const GetAllImages = gql`
     images {
       id
       name
+      scanEnabled
       organizationConnector {
         id
         name

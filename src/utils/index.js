@@ -47,28 +47,51 @@ export const scanImage = (name) => {
   }
 }
 
-export const sevIcon = (version) => {
-  if (version >= 9.0) {
-    return LetterCIcon
-  } else if (version >= 7.0) {
-    return LetterHIcon
-  } else if (version >= 6.0) {
-    return LetterMIcon
-  } else {
-    return LetterLIcon
+export const sevIcon = (severity) => {
+  switch (severity) {
+    case 'critical':
+      return LetterCIcon
+    case 'super critical':
+      return LetterCIcon
+    case 'high':
+      return LetterHIcon
+    case 'super high':
+      return LetterHIcon
+    case 'medium':
+      return LetterMIcon
+    case 'low':
+      return LetterLIcon
+    case 'super low':
+      return LetterLIcon
+    case 'negligible':
+      return LetterLIcon
+    default:
+      return LetterLIcon
   }
 }
 
-export const sevColor = (verion) => {
-  if (verion >= 9.0) {
-    return 'red'
-  } else if (verion >= 7.0) {
-    return 'orange'
-  } else if (verion >= 6.0) {
-    return 'yellow'
-  } else {
-    return 'green'
+export const sevColor = (severity) => {
+  switch (severity) {
+    case 'critical':
+      return 'red'
+    case 'super critical':
+      return 'red'
+    case 'high':
+      return 'orange'
+    case 'super high':
+      return 'orange'
+    case 'medium':
+      return 'yellow'
+    case 'low':
+      return 'green'
+    case 'super low':
+      return 'green'
+    case 'negligible':
+      return 'green'
+    default:
+      return 'blue'
   }
+
 }
 
 export const statusColor = (status) => {

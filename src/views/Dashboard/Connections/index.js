@@ -418,7 +418,7 @@ const Index = () => {
                             type='text'
                             value={connectorName}
                             onChange={(e) => setConnectorName(e.target.value)}
-                            placeholder={'e.g. Interlynk ECR-Prod'}
+                            placeholder={registryName === 'Docker Hub' ? 'e.g. Interlynk DockerHub' :'e.g. Interlynk ECR-Prod'}
                           />
                         </FormControl>
                         <FormControl
@@ -430,6 +430,8 @@ const Index = () => {
                           <FormLabel>
                             {registryName === 'Amazon ECR'
                               ? 'AWS Access Key ID'
+                              : registryName === 'Docker Hub'
+                              ? 'Docker Account ID'
                               : 'Account ID'}
                           </FormLabel>
                           <Input
@@ -450,7 +452,9 @@ const Index = () => {
                               type='text'
                               value={accessToken}
                               onChange={(e) => setAccessToken(e.target.value)}
-                              placeholder={'e.g. wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY'}
+                              placeholder={
+                                'e.g. wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY'
+                              }
                             />
                           </FormControl>
                         )}
@@ -501,9 +505,9 @@ const Index = () => {
               <Heading size='md' px={2}>
                 Existing Connections
               </Heading>
-              <Button colorScheme='blue' onClick={handleRefresh}>
+              {/* <Button colorScheme='blue' onClick={handleRefresh}>
                 Verify
-              </Button>
+              </Button> */}
             </Flex>
             <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
               <CardBody>

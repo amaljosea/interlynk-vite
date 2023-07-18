@@ -59,6 +59,8 @@ import BasicTable from './BasicTable'
 import SBOMDrawer from 'components/Drawer/SBOMDrawer'
 import { getAllScanners } from 'graphQL/Queries'
 import { CSVLink } from 'react-csv'
+import { useMutation } from '@apollo/client'
+import { UpdateImageVersion } from 'graphQL/Mutation'
 
 const SBOMTable = ({
   title,
@@ -87,6 +89,7 @@ const SBOMTable = ({
   } = useContext(GlobalContext)
 
   const { data: allScanners } = useQuery(getAllScanners, {})
+  const [imageVersionUpdate] = useMutation(UpdateImageVersion)
 
   const textColor = useColorModeValue('gray.700', 'white')
   const [searchInput, setSearchInput] = useState('')
@@ -99,8 +102,6 @@ const SBOMTable = ({
   const [selectedScanner, setSelectedScanner] = useState([])
   const [selectedStatus, setSelectedStatus] = useState([])
   const [filterData, setFilterData] = useState([])
-
-  const componentRef = useRef()
 
   const flattenedData = vulData.map((item, index) => {
     const allVulData = {
@@ -123,6 +124,19 @@ const SBOMTable = ({
   // useEffect(() => {
   //   console.log(`flattenedData`, flattenedData)
   // }, [vulData])
+
+  const refreshImage = async () => {
+    try {
+      await imageVersionUpdate({
+        variables: {
+          id: imgVersionId,
+          scanRefresh: false
+        }
+      })
+    } catch (error) {
+      console.error('Mutation error:', error)
+    }
+  }
 
   const link_captions = [
     'Active',
@@ -545,16 +559,6 @@ const SBOMTable = ({
                           <BiImport />
                         </Button>
                       </Tooltip>
-                      {/* <Tooltip label='Export'>
-                        <Button colorScheme='blue' size='md'>
-                          <CSVLink
-                            data={vulData}
-                            filename='vulnerabilities.csv'
-                          >
-                            <BiExport />
-                          </CSVLink>
-                        </Button>
-                      </Tooltip> */}
                       <Tooltip label='Export'>
                         <Button colorScheme='blue' size='md'>
                           <CSVLink
@@ -565,6 +569,13 @@ const SBOMTable = ({
                           </CSVLink>
                         </Button>
                       </Tooltip>
+                      <Button
+                        colorScheme='blue'
+                        size='md'
+                        onClick={refreshImage}
+                      >
+                        Refresh
+                      </Button>
                     </Box>
                   </Flex>
                 </Flex>
@@ -725,6 +736,7 @@ const SBOMTable = ({
                             refetch={refetch}
                             key={idx}
                             id={row.id}
+                            severity={row.severity[0]}
                             imgVersionId={imgVersionId}
                             component={row.component.name}
                             version={row.component.version}
@@ -747,6 +759,7 @@ const SBOMTable = ({
                             refetch={refetch}
                             key={idx}
                             id={row.id}
+                            severity={row.severity[0]}
                             imgVersionId={imgVersionId}
                             component={row.component.name}
                             version={row.component.version}
@@ -771,6 +784,7 @@ const SBOMTable = ({
                               key={idx}
                               id={row.id}
                               imgVersionId={imgVersionId}
+                              severity={row.severity[0]}
                               component={row.component.name}
                               version={row.component.version}
                               cvss={row.cvss.v3Score}
@@ -794,6 +808,7 @@ const SBOMTable = ({
                               refetch={refetch}
                               key={idx}
                               id={row.id}
+                              severity={row.severity[0]}
                               imgVersionId={imgVersionId}
                               component={row.component.name}
                               version={row.component.version}

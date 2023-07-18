@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Flex,
   IconButton,
@@ -19,8 +19,6 @@ import { AddIcon, DeleteIcon } from '@chakra-ui/icons'
 import { Link } from 'react-router-dom'
 import { getConImg, scanImage } from 'utils'
 import { FaCircleNotch, FaEllipsisV } from 'react-icons/fa'
-import { useState } from 'react'
-import { useEffect } from 'react'
 import { useMutation } from '@apollo/client'
 import { ImageUpdate } from 'graphQL/Mutation'
 
@@ -37,24 +35,25 @@ const ImageRow = ({
     a.company.localeCompare(b.company)
   )
 
-  const [checked, setChecked] = useState(false)
+  const [checked, setChecked] = useState(item.scanEnabled ? true : false)
   const [isRefreshed, setIsRefreshed] = useState(false)
   // console.log('filteredScanners', filteredScanners)
 
-  const handleChange = () => {
+  const handleChange = (e) => {
     setChecked(!checked)
+    updateImage(e.target.checked)
   }
 
   const [imageUpdate, { data }] = useMutation(ImageUpdate)
 
-  const updateImage = async () => {
+  const updateImage = async (e) => {
     try {
       setIsRefreshed(true)
       await imageUpdate({
         variables: {
           id: item.id,
-          scanEnabled: false,
-          scanRefresh: true
+          scanRefresh: true,
+          scanEnabled: e ? true : false
         }
       })
     } catch (error) {

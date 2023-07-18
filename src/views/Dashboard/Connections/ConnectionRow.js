@@ -1,5 +1,5 @@
 import React from 'react'
-import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
+import { DeleteIcon, EditIcon, LinkIcon } from '@chakra-ui/icons'
 import {
   Flex,
   Image,
@@ -17,18 +17,22 @@ import {
   useDisclosure,
   Button,
   Skeleton,
-  useToast
+  useToast,
 } from '@chakra-ui/react'
 import { timeSince, getConImg } from 'utils'
 import { useState } from 'react'
+import { FaEdit, FaLink, FaTrash, FaUnlink } from 'react-icons/fa'
+import { useMutation } from '@apollo/client'
+import { OrgConnectorValidate } from 'graphQL/Mutation'
 import { useEffect } from 'react'
+import Tooltip from 'components/Tooltip'
 
 const ConnectionRow = ({
   item,
   handleEdit,
   isLoading,
   handleDelete,
-  organizationConnectorUpdate,
+  organizationConnectorUpdate
 }) => {
   const toast = useToast()
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -38,6 +42,10 @@ const ConnectionRow = ({
     setChecked(e.target.checked ? true : false)
     updateConnection(e.target.checked)
   }
+
+  const [organizationConnectorValidate, { data, loading }] = useMutation(
+    OrgConnectorValidate
+  )
 
   const updateConnection = async (e) => {
     try {
@@ -62,6 +70,28 @@ const ConnectionRow = ({
       console.error('Mutation error:', error)
     }
   }
+
+  const handleValidate = async (id) => {
+    try {
+      await organizationConnectorValidate({
+        variables: {
+          id: id
+        }
+      })
+    } catch (error) {
+      console.error('Mutation error:', error)
+    }
+  }
+
+  useEffect(() => {
+    handleValidate(item.id)
+  }, [item])
+
+  // useEffect(() => {
+  //   if (data) {
+  //     console.log(data)
+  //   }
+  // }, [data])
 
   return (
     <>
@@ -107,17 +137,32 @@ const ConnectionRow = ({
           </Td>
           <Td mt={2} px={8}>
             <Flex direction={'row'} gap={4} alignItems={'start'}>
-              <EditIcon
-                color={'blue.500'}
+              <FaEdit
+                color={'#3182CE'}
                 cursor={'pointer'}
                 onClick={() => handleEdit(item)}
               />
 
-              <DeleteIcon
-                color={'red.400'}
-                cursor={'pointer'}
-                onClick={onOpen}
-              />
+              <FaTrash color={'#F56565'} cursor={'pointer'} onClick={onOpen} />
+
+              {data &&
+              data.organizationConnectorValidate?.errors.length === 0 ? (
+                <Tooltip text='Connected'>
+                  <FaLink
+                    color={'#48BB78'}
+                    cursor={'pointer'}
+                    onClick={() => handleValidate(item.id)}
+                  />
+                </Tooltip>
+              ) : (
+                <Tooltip text='Not connected'>
+                  <FaUnlink
+                    color={'#48BB78'}
+                    cursor={'pointer'}
+                    onClick={() => handleValidate(item.id)}
+                  />
+                </Tooltip>
+              )}
             </Flex>
           </Td>
         </Tr>
@@ -135,7 +180,7 @@ const ConnectionRow = ({
               {[
                 'Remove connected images and tags',
                 'Remove scan data for connected images',
-                'Disable all Share Lynk\'s for connected images'
+                "Disable all Share Lynk's for connected images"
               ].map((item, index) => (
                 <Text key={index} fontSize={'sm'}>
                   <li>{item}</li>
@@ -144,7 +189,8 @@ const ConnectionRow = ({
             </Flex>
             <br />
             <Text mt={2} fontSize={'sm'}>
-              Alternatively, you can disable the connection to prevent future scans while retaining existing data.
+              Alternatively, you can disable the connection to prevent future
+              scans while retaining existing data.
             </Text>
             <Text mt={4} fontSize={'sm'}>
               Are you sure you want to continue with the deletion?
