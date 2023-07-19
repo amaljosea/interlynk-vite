@@ -134,11 +134,7 @@ export default function Pages(props) {
       })
       .catch((error) => {
         console.log(`Error: ${error}`)
-        if (error === `AxiosError: Request failed with status code 401`) {
-          setError(`Invalid username or password`)
-        } else {
-          setError(`Internal Server Error: Please re-try in a few minutes`)
-        }
+        setError(`Invalid username or password`)
         setEmail('')
         setPassword('')
       })

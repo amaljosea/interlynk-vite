@@ -11,24 +11,24 @@ import {
   Select,
   chakra,
   Image,
-  Skeleton
+  Skeleton,
+  Tag,
+  TagLabel
 } from '@chakra-ui/react'
 import React, { useContext, useEffect, useState } from 'react'
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 import SBOMTable from './components/SBOMTable'
 import SBOMStatistics from './components/SBOMStatistics'
-
 import { sbom } from 'variables/general'
 import {
   FaCubes,
   FaBug,
-  FaUnlock,
   FaTag,
   FaMicroscope,
   FaExclamationTriangle
 } from 'react-icons/fa'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useHistory } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
 import Tooltip from 'components/Tooltip'
 import { useQuery } from '@apollo/client'
@@ -38,71 +38,13 @@ import { getImageVersion, getImage } from 'graphQL/Queries'
 function SBOMs() {
   const [scanResults, setScanResults] = useState(null)
 
-  const [jsonData] = useState({
-    id: 74,
-    parentId: null,
-    value: '',
-    children: [
-      {
-        id: 62,
-        parentId: 74,
-        value: 'Task 7',
-        children: [
-          {
-            id: 56,
-            parentId: 62,
-            value: 'Task 1'
-          },
-          {
-            id: 63,
-            parentId: 62,
-            value: 'Task 4'
-          }
-        ]
-      },
-      {
-        id: 86,
-        parentId: 74,
-        value: 'Task 8',
-        children: [
-          {
-            id: 80,
-            parentId: 86,
-            value: 'Task 5',
-            children: [
-              {
-                id: 81,
-                parentId: 80,
-                value: 'Task 2'
-              },
-              {
-                id: 76,
-                parentId: 80,
-                value: 'Task 3'
-              }
-            ]
-          },
-          {
-            id: 87,
-            parentId: 86,
-            value: 'Task 6'
-          }
-        ]
-      }
-    ]
-  })
-
-  const {
-    productVersionsData,
-    setTabIndex,
-    vulnerabilitiesData,
-    componentsVal,
-    VulnerabilitiesVal,
-    activeVulnVal,
-    riskScoreVal
-  } = useContext(GlobalContext)
+  const { productVersionsData, setTabIndex, scanEnabled } = useContext(
+    GlobalContext
+  )
 
   const location = useLocation()
+  const history = useHistory()
+
   const queryParams = new URLSearchParams(location.search)
   const versionId = queryParams.get('v')
   const imageId = queryParams.get('id')
@@ -153,10 +95,7 @@ function SBOMs() {
     if (imageData) {
       console.log('imageData', imageData.image)
       setImageInfo(imageData.image.imageVersions)
-      setSelectedVersion(
-        imageData.image.imageVersions[imageData.image.imageVersions.length - 1]
-          .id
-      )
+      setSelectedVersion(imageVersionData?.imageVersion?.id)
     }
   }, [imageData])
 
@@ -166,8 +105,9 @@ function SBOMs() {
     setSelectedVersion(value)
     console.log('value', value)
     refetch({ id: value })
+    queryParams.set('v', value)
+    history.push(`/vendor/images?v=${value}&id=${imageId}`)
   }
-
 
   const uniqProjects = []
   const btnRef = React.useRef()
@@ -215,7 +155,7 @@ function SBOMs() {
   useEffect(() => {
     const critical = totalCount['critical'] || 0
     const high = totalCount['super high'] || 0
-    const medium = totalCount['medium'] || 0
+    const medium = totalCount['medium' || 'unknown'] || 0
     const low = totalCount['low'] || 0
     setTotal({
       C: critical,
@@ -227,9 +167,9 @@ function SBOMs() {
 
   useEffect(() => {
     const critical = unresolveCount['critical'] || 0
-    const high = unresolveCount['super high'] || 0
+    const high = unresolveCount['high'] || 0
     const medium = unresolveCount['medium'] || 0
-    const low = unresolveCount['low'] || 0
+    const low = unresolveCount['low' || 'unknown'] || 0
     setUnresolve({
       C: critical,
       H: high,
@@ -242,7 +182,7 @@ function SBOMs() {
     const filteredData = allResults.filter((item) =>
       item.scanners.some((scanner) => scanner.id === selectedScanner)
     )
-    console.log('filteredData', filteredData)
+    // console.log('filteredData', filteredData)
     setFilteredVulItems(filteredData)
   }, [selectedScanner])
 
@@ -266,9 +206,20 @@ function SBOMs() {
                 <Icon as={FaCubes} h={'64px'} w={'64px'} color='blue.300' />
                 <Box>
                   <Heading as='h3' size='md' noOfLines={1} color='gray.600'>
-                    {scanResults
-                      ? `${scanResults.image.name}:${scanResults.name}`
-                      : 'Loading....'}
+                    <Flex alignItems={'center'} flexDirection={'row'} gap={3}>
+                      {scanResults
+                        ? `${scanResults.image.name}:${scanResults.name}`
+                        : 'Loading....'}
+                      <Tag
+                        size={'sm'}
+                        variant='outline'
+                        colorScheme={scanEnabled ? 'blue' : 'red'}
+                      >
+                        <TagLabel>
+                          Scan {scanEnabled ? 'Enabled' : 'Disabled'}
+                        </TagLabel>
+                      </Tag>
+                    </Flex>
                   </Heading>
                   <Text fontSize='sm'>linux/amd64</Text>
                   <Text fontSize='xs' mb={2}>
@@ -402,7 +353,7 @@ function SBOMs() {
           icon={<Icon h={'24px'} w={'24px'} color='white' as={FaBug} />}
           title={'Total Vulnerabilities'}
           description={'Vulnerabilities included in SBOM'}
-          amount={`${total.C}C,${total.H}H,${total.M}M,${total.L}C`}
+          amount={`${total.C}C,${total.H}H,${total.M}M,${total.L}L`}
         />
         <Spacer />
         <SBOMStatistics
@@ -416,7 +367,7 @@ function SBOMs() {
           }
           title={'Unresolved Vulnerabilities'}
           description={'Vulnerabilities included in SBOM'}
-          amount={`${unresolve.C}C,${unresolve.H}H,${unresolve.M}M,${unresolve.L}C`}
+          amount={`${unresolve.C}C,${unresolve.H}H,${unresolve.M}M,${unresolve.L}L`}
         />
         {/* <Spacer />
         <SBOMStatistics
@@ -427,17 +378,6 @@ function SBOMs() {
         /> */}
       </Flex>
       <SBOMTable
-        title={'SBOM'}
-        captions={[
-          'component',
-          'version',
-          'relates to',
-          'license',
-          'risk_score',
-          'vulnerabilities',
-          'last_updated',
-          ''
-        ]}
         refetch={refetch}
         imgVersionId={imageVersionData ? imageVersionData.imageVersion.id : ''}
         scanResults={scanResults ? scanResults.imageScanners : []}
@@ -452,6 +392,7 @@ function SBOMs() {
         loading={loading}
         shareLynkLoading={shareLynkLoading}
         setFilteredVulItems={setFilteredVulItems}
+        imageId={imageId}
       />
     </Flex>
   )

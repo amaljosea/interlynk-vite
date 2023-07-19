@@ -6,13 +6,11 @@ import {
   Thead,
   Tr,
   useColorModeValue,
-  Tag,
   Tabs,
   TabList,
   Tab,
   TabPanel,
   TabPanels,
-  Textarea,
   Input,
   Flex,
   Button,
@@ -22,49 +20,42 @@ import {
   MenuOptionGroup,
   MenuButton,
   Box,
-  Select,
   Tooltip,
-  MenuDivider,
   useDisclosure,
-  chakra,
   Skeleton,
   Td,
-  useQuery,
-  MenuGroup,
-  MenuItem
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+  Text,
+  chakra
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
-import SBOMComponentRow from 'components/Tables/SBOMComponentRow.js'
 import SBOMLinkRow from 'components/Tables/SBOMLinkRow.js'
 import VulnerabilityRow from 'components/Tables/VulnerabilityRow.js'
-import RiskRow from 'components/Tables/RiskRow.js'
-import { Risks, sbom_content } from 'variables/general'
+import { Risks } from 'variables/general'
 import React, { useContext, useEffect } from 'react'
 import GlobalContext from 'context/GlobalContext'
 import CardHeader from 'components/Card/CardHeader'
-import { sbom } from 'variables/general'
 import { useState, useRef } from 'react'
-import {
-  AddIcon,
-  ChevronDownIcon,
-  TriangleDownIcon,
-  TriangleUpIcon
-} from '@chakra-ui/icons'
-import { productVersionsData } from 'variables/general'
-import { BiImport, BiExport, BiFilter } from 'react-icons/bi'
+import { AddIcon, TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
+import { BiImport, BiExport } from 'react-icons/bi'
 import { BsFilterRight } from 'react-icons/bs'
-import BasicTable from './BasicTable'
 import SBOMDrawer from 'components/Drawer/SBOMDrawer'
-import { getAllScanners } from 'graphQL/Queries'
 import { CSVLink } from 'react-csv'
 import { useMutation } from '@apollo/client'
 import { UpdateImageVersion } from 'graphQL/Mutation'
+import { ImageUpdate } from 'graphQL/Mutation'
 
 const SBOMTable = ({
-  title,
-  captions,
+  scan,
+  imageId,
   data,
   filteredVul,
   setFilteredVulItems,
@@ -79,22 +70,22 @@ const SBOMTable = ({
   shareLynkLoading
 }) => {
   const {
-    SBOMLinksData,
     vulnerabilitiesData,
     setVulnerabilitiesData,
     selectedRows,
     tabIndex,
     setTabIndex,
-    productVersionsData
+    productVersionsData,
+    setScanEnabled,
+    scanEnabled
   } = useContext(GlobalContext)
 
-  const { data: allScanners } = useQuery(getAllScanners, {})
+  const vulnData = [...vulData]
+
   const [imageVersionUpdate] = useMutation(UpdateImageVersion)
 
   const textColor = useColorModeValue('gray.700', 'white')
   const [searchInput, setSearchInput] = useState('')
-  const [searchVul, setSearchVul] = useState('')
-  const [riskInput, setRiskInput] = useState('')
   const [selectVersion, setSelectVersion] = useState('')
   const [selectStatus, setSelectStatus] = useState('')
 
@@ -102,6 +93,43 @@ const SBOMTable = ({
   const [selectedScanner, setSelectedScanner] = useState([])
   const [selectedStatus, setSelectedStatus] = useState([])
   const [filterData, setFilterData] = useState([])
+
+  const [isLoading, setIsLoading] = useState(false)
+
+  const pageSize = 8 // Number of rows to display per page
+  const [currentPage, setCurrentPage] = useState(1)
+
+  // Calculate the index range for the current page
+  const startIndex = (currentPage - 1) * pageSize
+  const endIndex = startIndex + pageSize
+
+  const visibleData = vulnData.slice(startIndex, endIndex)
+
+  const totalPages = Math.ceil(vulnData.length / pageSize)
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1)
+    }
+  }
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1)
+    }
+  }
+
+  const {
+    isOpen: isSBMOpen,
+    onOpen: setSBMOpen,
+    onClose: setSBMClose
+  } = useDisclosure()
+
+  const {
+    isOpen: isRefreshOpen,
+    onOpen: setRefreshOpen,
+    onClose: setRefreshClose
+  } = useDisclosure()
 
   const flattenedData = vulData.map((item, index) => {
     const allVulData = {
@@ -121,18 +149,39 @@ const SBOMTable = ({
     return allVulData
   })
 
-  // useEffect(() => {
-  //   console.log(`flattenedData`, flattenedData)
-  // }, [vulData])
+  const [imageUpdate] = useMutation(ImageUpdate)
 
   const refreshImage = async () => {
     try {
+      setIsLoading(true)
       await imageVersionUpdate({
         variables: {
           id: imgVersionId,
-          scanRefresh: false
+          scanRefresh: true
         }
       })
+      setRefreshClose()
+      setTimeout(() => {
+        setIsLoading(false)
+      }, 2000)
+    } catch (error) {
+      console.error('Mutation error:', error)
+    }
+  }
+
+  const handleYes = async () => {
+    try {
+      await imageUpdate({
+        variables: {
+          id: imageId,
+          scanEnabled: true
+        }
+      }).then(() => {
+        refreshImage()
+      })
+      setTimeout(() => {
+        setScanEnabled(true)
+      }, 2000)
     } catch (error) {
       console.error('Mutation error:', error)
     }
@@ -149,8 +198,6 @@ const SBOMTable = ({
   ]
 
   const [filteredRow, setFilteredRow] = useState([])
-
-  const vulnData = [...vulData]
 
   const uniqVersions = []
   productVersionsData.map((project) => {
@@ -273,8 +320,6 @@ const SBOMTable = ({
   const [defaultRiskScore, setDefaultRiskScore] = useState([])
   const [sortRiskScoreData, setSortRiskScoreData] = useState([])
 
-  const [vulSortData, setVulSortData] = useState([])
-
   useEffect(() => {
     setVulnerabilitiesData([])
     const data = vulnData.filter(
@@ -336,6 +381,9 @@ const SBOMTable = ({
         return order === 'asc'
           ? a.cvss[field] - b.cvss[field]
           : b.cvss[field] - a.cvss[field]
+      } else if (field === 'severity') {
+        const comparison = a[field][0].localeCompare(b[field][0])
+        return order === 'asc' ? comparison : -comparison
       } else if (field === 'name' || field === 'version') {
         const comparison = a.component[field].localeCompare(b.component[field])
         return order === 'asc' ? comparison : -comparison
@@ -345,18 +393,6 @@ const SBOMTable = ({
       }
     })
     setVulnerabilitiesData(sortedData)
-  }
-
-  const handleRiskSort = (field) => {
-    if (field === sortField) {
-      const newSortOrder = sortOrder === 'asc' ? 'desc' : 'asc'
-      setSortOrder(newSortOrder)
-      sortRiskData(field, newSortOrder)
-    } else {
-      setSortField(field)
-      setSortOrder('asc')
-      sortRiskData(field, 'asc')
-    }
   }
 
   const sortRiskData = (field, order) => {
@@ -397,22 +433,6 @@ const SBOMTable = ({
       uniqProjects.push(project.name)
     }
   })
-
-  const {
-    isOpen: isSBMOpen,
-    onOpen: setSBMOpen,
-    onClose: setSBMClose
-  } = useDisclosure()
-
-  const pageSize = 8 // Number of rows to display per page
-  const [currentPage, setCurrentPage] = useState(1)
-
-  // Calculate the index range for the current page
-  const startIndex = (currentPage - 1) * pageSize
-  const endIndex = startIndex + pageSize
-  const visibleData = vulnData.slice(startIndex, endIndex)
-
-  const totalPages = Math.ceil(vulnData.length / pageSize)
 
   return (
     <>
@@ -572,7 +592,7 @@ const SBOMTable = ({
                       <Button
                         colorScheme='blue'
                         size='md'
-                        onClick={refreshImage}
+                        onClick={scanEnabled ? refreshImage : setRefreshOpen}
                       >
                         Refresh
                       </Button>
@@ -582,232 +602,183 @@ const SBOMTable = ({
               </CardHeader>
               <CardBody>
                 {/* <BasicTable data={vulData} columns={columns} /> */}
-                <Table variant='simple' color={textColor} size='sm'>
-                  <Thead>
-                    <Tr my='.8rem' pl='0px'>
-                      <Th></Th>
-                      <Th
-                        color='gray.400'
-                        py={4}
-                        position='relative'
-                        onClick={() => handleVulSort('cveId')}
-                        cursor={'pointer'}
-                      >
-                        <Flex direction={'row'} alignItems={'center'} gap={2}>
-                          <Box>CVE ID</Box>
-                          <Box>
-                            {sortField === 'cveId' && sortOrder === 'asc' ? (
-                              <TriangleUpIcon />
-                            ) : (
-                              <TriangleDownIcon />
-                            )}
-                          </Box>
-                        </Flex>
-                      </Th>
-                      <Th
-                        color='gray.400'
-                        py={4}
-                        position='relative'
-                        onClick={() => handleVulSort('v3Score')}
-                        cursor={'pointer'}
-                      >
-                        <Flex direction={'row'} alignItems={'center'} gap={2}>
-                          <Box>CVSS</Box>
-                          <Box>
-                            {sortField === 'v3Score' && sortOrder === 'asc' ? (
-                              <TriangleUpIcon />
-                            ) : (
-                              <TriangleDownIcon />
-                            )}
-                          </Box>
-                        </Flex>
-                      </Th>
-                      {/* <Th color='gray.400' py={4} position='relative'>
+                {vulData !== [] ? (
+                  <Table variant='simple' color={textColor} size='sm'>
+                    <Thead>
+                      <Tr my='.8rem' pl='0px'>
+                        <Th></Th>
+                        <Th
+                          color='gray.400'
+                          py={4}
+                          position='relative'
+                          onClick={() => handleVulSort('cveId')}
+                          cursor={'pointer'}
+                        >
+                          <Flex direction={'row'} alignItems={'center'} gap={2}>
+                            <Box>CVE ID</Box>
+                            <Box>
+                              {sortField === 'cveId' && sortOrder === 'asc' ? (
+                                <TriangleUpIcon />
+                              ) : (
+                                <TriangleDownIcon />
+                              )}
+                            </Box>
+                          </Flex>
+                        </Th>
+                        <Th
+                          color='gray.400'
+                          py={4}
+                          position='relative'
+                          onClick={() => handleVulSort('severity')}
+                          cursor={'pointer'}
+                        >
+                          <Flex direction={'row'} alignItems={'center'} gap={2}>
+                            <Box>Severity</Box>
+                            <Box>
+                              {sortField === 'severity' &&
+                              sortOrder === 'asc' ? (
+                                <TriangleUpIcon />
+                              ) : (
+                                <TriangleDownIcon />
+                              )}
+                            </Box>
+                          </Flex>
+                        </Th>
+                        <Th
+                          color='gray.400'
+                          py={4}
+                          position='relative'
+                          onClick={() => handleVulSort('v3Score')}
+                          cursor={'pointer'}
+                        >
+                          <Flex direction={'row'} alignItems={'center'} gap={2}>
+                            <Box>CVSS</Box>
+                            <Box>
+                              {sortField === 'v3Score' &&
+                              sortOrder === 'asc' ? (
+                                <TriangleUpIcon />
+                              ) : (
+                                <TriangleDownIcon />
+                              )}
+                            </Box>
+                          </Flex>
+                        </Th>
+                        {/* <Th color='gray.400' py={4} position='relative'>
                       Description
                     </Th> */}
-                      <Th
-                        color='gray.400'
-                        py={4}
-                        position='relative'
-                        onClick={() => handleVulSort('name')}
-                        cursor={'pointer'}
-                      >
-                        <Flex direction={'row'} alignItems={'center'} gap={2}>
-                          <Box>Component</Box>
-                          <Box>
-                            {sortField === 'name' && sortOrder === 'asc' ? (
-                              <TriangleUpIcon />
-                            ) : (
-                              <TriangleDownIcon />
-                            )}
-                          </Box>
-                        </Flex>
-                      </Th>
-                      <Th
-                        color='gray.400'
-                        py={4}
-                        position='relative'
-                        onClick={() => handleVulSort('version')}
-                        cursor={'pointer'}
-                      >
-                        <Flex direction={'row'} alignItems={'center'} gap={2}>
-                          <Box>Version</Box>
-                          <Box>
-                            {sortField === 'version' && sortOrder === 'asc' ? (
-                              <TriangleUpIcon />
-                            ) : (
-                              <TriangleDownIcon />
-                            )}
-                          </Box>
-                        </Flex>
-                      </Th>
-                      <Th
-                        color='gray.400'
-                        py={4}
-                        position='relative'
-                        // onClick={() => handleVulSort('fixed_component')}
-                        cursor={'pointer'}
-                      >
-                        <Flex direction={'row'} alignItems={'center'} gap={2}>
-                          <Box>Fixed (Component)</Box>
-                          <Box>
-                            {sortField === 'fixed_component' &&
-                            sortOrder === 'asc' ? (
-                              <TriangleUpIcon />
-                            ) : (
-                              <TriangleDownIcon />
-                            )}
-                          </Box>
-                        </Flex>
-                      </Th>
-                      <Th
-                        color='gray.400'
-                        py={4}
-                        position='relative'
-                        // onClick={() => handleVulSort('fixed_product')}
-                        cursor={'pointer'}
-                      >
-                        <Flex direction={'row'} alignItems={'center'} gap={2}>
-                          <Box>Fixed (Product)</Box>
-                          <Box>
-                            {sortField === 'fixed_product' &&
-                            sortOrder === 'asc' ? (
-                              <TriangleUpIcon />
-                            ) : (
-                              <TriangleDownIcon />
-                            )}
-                          </Box>
-                        </Flex>
-                      </Th>
-                      <Th
-                        color='gray.400'
-                        py={4}
-                        position='relative'
-                        // onClick={() => handleVulSort('fixed_product')}
-                        cursor={'pointer'}
-                      >
-                        <Box>Scanner</Box>
-                      </Th>
-                      <Th
-                        color='gray.400'
-                        py={4}
-                        position='relative'
-                        // onClick={() => handleVulSort('status')}
-                        cursor={'pointer'}
-                      >
-                        <Flex direction={'row'} alignItems={'center'} gap={2}>
-                          <Box>Status</Box>
-                          <Box>
-                            {sortField === 'status' && sortOrder === 'asc' ? (
-                              <TriangleUpIcon />
-                            ) : (
-                              <TriangleDownIcon />
-                            )}
-                          </Box>
-                        </Flex>
-                      </Th>
-                      <Th color='gray.400' py={4} position='relative'></Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {searchInput !== ''
-                      ? filteredRow.map((row, idx) => (
-                          <VulnerabilityRow
-                            refetch={refetch}
-                            key={idx}
-                            id={row.id}
-                            severity={row.severity[0]}
-                            imgVersionId={imgVersionId}
-                            component={row.component.name}
-                            version={row.component.version}
-                            cvss={row.cvss.v3Score}
-                            cve={row.cveId}
-                            fixed_component={row.component.fixedInVersion}
-                            fixed_product={row.fixedInImage}
-                            description={row.component.name}
-                            status={row.vexVuln?.vexStatus}
-                            justify={row.vexVuln?.vexJustification}
-                            scanner={row.scanners}
-                            shared_data={row.component.name}
-                            versions={row.component.name}
-                            imageInfo={imageInfo}
-                          />
-                        ))
-                      : vulnerabilitiesData.length > 0
-                      ? vulnerabilitiesData.map((row, idx) => (
-                          <VulnerabilityRow
-                            refetch={refetch}
-                            key={idx}
-                            id={row.id}
-                            severity={row.severity[0]}
-                            imgVersionId={imgVersionId}
-                            component={row.component.name}
-                            version={row.component.version}
-                            cvss={row.cvss.v3Score}
-                            cve={row.cveId}
-                            fixed_component={row.component.fixedInVersion}
-                            fixed_product={row.fixedInImage}
-                            description={row.component.name}
-                            status={row.vexVuln?.vexStatus}
-                            justify={row.vexVuln?.vexJustification}
-                            scanner={row.scanners}
-                            shared_data={row.component.name}
-                            versions={row.component.name}
-                            imageInfo={imageInfo}
-                          />
-                        ))
-                      : filteredVul.length > 0
-                      ? filteredVul.map((row, idx) => {
-                          return (
+                        <Th
+                          color='gray.400'
+                          py={4}
+                          position='relative'
+                          onClick={() => handleVulSort('name')}
+                          cursor={'pointer'}
+                        >
+                          <Flex direction={'row'} alignItems={'center'} gap={2}>
+                            <Box>Component</Box>
+                            <Box>
+                              {sortField === 'name' && sortOrder === 'asc' ? (
+                                <TriangleUpIcon />
+                              ) : (
+                                <TriangleDownIcon />
+                              )}
+                            </Box>
+                          </Flex>
+                        </Th>
+                        <Th
+                          color='gray.400'
+                          py={4}
+                          position='relative'
+                          onClick={() => handleVulSort('version')}
+                          cursor={'pointer'}
+                        >
+                          <Flex direction={'row'} alignItems={'center'} gap={2}>
+                            <Box>Version</Box>
+                            <Box>
+                              {sortField === 'version' &&
+                              sortOrder === 'asc' ? (
+                                <TriangleUpIcon />
+                              ) : (
+                                <TriangleDownIcon />
+                              )}
+                            </Box>
+                          </Flex>
+                        </Th>
+                        <Th
+                          color='gray.400'
+                          py={4}
+                          position='relative'
+                          // onClick={() => handleVulSort('fixed_component')}
+                          cursor={'pointer'}
+                        >
+                          <Flex direction={'row'} alignItems={'center'} gap={2}>
+                            <Box>Fixed (Component)</Box>
+                            <Box>
+                              {sortField === 'fixed_component' &&
+                              sortOrder === 'asc' ? (
+                                <TriangleUpIcon />
+                              ) : (
+                                <TriangleDownIcon />
+                              )}
+                            </Box>
+                          </Flex>
+                        </Th>
+                        <Th
+                          color='gray.400'
+                          py={4}
+                          position='relative'
+                          // onClick={() => handleVulSort('fixed_product')}
+                          cursor={'pointer'}
+                        >
+                          <Flex direction={'row'} alignItems={'center'} gap={2}>
+                            <Box>Fixed (Product)</Box>
+                            <Box>
+                              {sortField === 'fixed_product' &&
+                              sortOrder === 'asc' ? (
+                                <TriangleUpIcon />
+                              ) : (
+                                <TriangleDownIcon />
+                              )}
+                            </Box>
+                          </Flex>
+                        </Th>
+                        <Th
+                          color='gray.400'
+                          py={4}
+                          position='relative'
+                          // onClick={() => handleVulSort('fixed_product')}
+                          cursor={'pointer'}
+                        >
+                          <Box>Scanner</Box>
+                        </Th>
+                        <Th
+                          color='gray.400'
+                          py={4}
+                          position='relative'
+                          // onClick={() => handleVulSort('status')}
+                          cursor={'pointer'}
+                        >
+                          <Flex direction={'row'} alignItems={'center'} gap={2}>
+                            <Box>Status</Box>
+                            <Box>
+                              {sortField === 'status' && sortOrder === 'asc' ? (
+                                <TriangleUpIcon />
+                              ) : (
+                                <TriangleDownIcon />
+                              )}
+                            </Box>
+                          </Flex>
+                        </Th>
+                        <Th color='gray.400' py={4} position='relative'></Th>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {searchInput !== ''
+                        ? filteredRow.map((row, idx) => (
                             <VulnerabilityRow
                               refetch={refetch}
                               key={idx}
                               id={row.id}
-                              imgVersionId={imgVersionId}
-                              severity={row.severity[0]}
-                              component={row.component.name}
-                              version={row.component.version}
-                              cvss={row.cvss.v3Score}
-                              cve={row.cveId}
-                              fixed_component={row.component.fixedInVersion}
-                              fixed_product={row.fixedInImage}
-                              description={row.component.name}
-                              status={row.vexVuln?.vexStatus}
-                              justify={row.vexVuln?.vexJustification}
-                              scanner={row.scanners}
-                              shared_data={row.component.name}
-                              versions={row.component.name}
-                              imageInfo={imageInfo}
-                            />
-                          )
-                        })
-                      : vulData.length > 0
-                      ? vulData.map((row, idx) => {
-                          return (
-                            <VulnerabilityRow
-                              refetch={refetch}
-                              key={idx}
-                              id={row.id}
+                              isRefresh={isLoading}
                               severity={row.severity[0]}
                               imgVersionId={imgVersionId}
                               component={row.component.name}
@@ -824,43 +795,130 @@ const SBOMTable = ({
                               versions={row.component.name}
                               imageInfo={imageInfo}
                             />
-                          )
-                        })
-                      : loading && (
-                          <Tr>
-                            <Td fontSize={'sm'} pl={1}>
-                              <Skeleton height='20px' />
-                            </Td>
-                            <Td fontSize={'sm'} pl={1}>
-                              <Skeleton height='20px' />
-                            </Td>
-                            <Td fontSize={'sm'} pl={1}>
-                              <Skeleton height='20px' />
-                            </Td>
-                            <Td fontSize={'sm'} pl={1}>
-                              <Skeleton height='20px' />
-                            </Td>
-                            <Td fontSize={'sm'} pl={1}>
-                              <Skeleton height='20px' />
-                            </Td>
-                            <Td fontSize={'sm'} pl={1}>
-                              <Skeleton height='20px' />
-                            </Td>
-                            <Td fontSize={'sm'} pl={1}>
-                              <Skeleton height='20px' />
-                            </Td>
-                            <Td fontSize={'sm'} pl={1}>
-                              <Skeleton height='20px' />
-                            </Td>
-                            <Td fontSize={'sm'} pl={1}>
-                              <Skeleton height='20px' />
-                            </Td>
-                          </Tr>
-                        )}
-                  </Tbody>
-                </Table>
+                          ))
+                        : vulnerabilitiesData.length > 0
+                        ? vulnerabilitiesData.map((row, idx) => (
+                            <VulnerabilityRow
+                              refetch={refetch}
+                              key={idx}
+                              id={row.id}
+                              isRefresh={isLoading}
+                              severity={row.severity[0]}
+                              imgVersionId={imgVersionId}
+                              component={row.component.name}
+                              version={row.component.version}
+                              cvss={row.cvss.v3Score}
+                              cve={row.cveId}
+                              fixed_component={row.component.fixedInVersion}
+                              fixed_product={row.fixedInImage}
+                              description={row.component.name}
+                              status={row.vexVuln?.vexStatus}
+                              justify={row.vexVuln?.vexJustification}
+                              scanner={row.scanners}
+                              shared_data={row.component.name}
+                              versions={row.component.name}
+                              imageInfo={imageInfo}
+                            />
+                          ))
+                        : filteredVul.length > 0
+                        ? filteredVul.map((row, idx) => {
+                            return (
+                              <VulnerabilityRow
+                                refetch={refetch}
+                                key={idx}
+                                id={row.id}
+                                isRefresh={isLoading}
+                                imgVersionId={imgVersionId}
+                                severity={row.severity[0]}
+                                component={row.component.name}
+                                version={row.component.version}
+                                cvss={row.cvss.v3Score}
+                                cve={row.cveId}
+                                fixed_component={row.component.fixedInVersion}
+                                fixed_product={row.fixedInImage}
+                                description={row.component.name}
+                                status={row.vexVuln?.vexStatus}
+                                justify={row.vexVuln?.vexJustification}
+                                scanner={row.scanners}
+                                shared_data={row.component.name}
+                                versions={row.component.name}
+                                imageInfo={imageInfo}
+                              />
+                            )
+                          })
+                        : visibleData.length > 0
+                        ? visibleData.map((row, idx) => {
+                            return (
+                              <VulnerabilityRow
+                                refetch={refetch}
+                                key={idx}
+                                id={row.id}
+                                isRefresh={isLoading}
+                                severity={row.severity[0]}
+                                imgVersionId={imgVersionId}
+                                component={row.component.name}
+                                version={row.component.version}
+                                cvss={row.cvss.v3Score}
+                                cve={row.cveId}
+                                fixed_component={row.component.fixedInVersion}
+                                fixed_product={row.fixedInImage}
+                                description={row.component.name}
+                                status={row.vexVuln?.vexStatus}
+                                justify={row.vexVuln?.vexJustification}
+                                scanner={row.scanners}
+                                shared_data={row.component.name}
+                                versions={row.component.name}
+                                imageInfo={imageInfo}
+                              />
+                            )
+                          })
+                        : loading && (
+                            <Tr>
+                              <Td fontSize={'sm'} pl={1}>
+                                <Skeleton height='20px' />
+                              </Td>
+                              <Td fontSize={'sm'} pl={1}>
+                                <Skeleton height='20px' />
+                              </Td>
+                              <Td fontSize={'sm'} pl={1}>
+                                <Skeleton height='20px' />
+                              </Td>
+                              <Td fontSize={'sm'} pl={1}>
+                                <Skeleton height='20px' />
+                              </Td>
+                              <Td fontSize={'sm'} pl={1}>
+                                <Skeleton height='20px' />
+                              </Td>
+                              <Td fontSize={'sm'} pl={1}>
+                                <Skeleton height='20px' />
+                              </Td>
+                              <Td fontSize={'sm'} pl={1}>
+                                <Skeleton height='20px' />
+                              </Td>
+                              <Td fontSize={'sm'} pl={1}>
+                                <Skeleton height='20px' />
+                              </Td>
+                              <Td fontSize={'sm'} pl={1}>
+                                <Skeleton height='20px' />
+                              </Td>
+                            </Tr>
+                          )}
+                    </Tbody>
+                  </Table>
+                ) : (
+                  <Flex
+                    width={'100%'}
+                    flexDirection={'row'}
+                    alignItems={'center'}
+                    justifyContent={'center'}
+                    mt={24}
+                  >
+                    <Text>No vulnerability discovered on this tag</Text>
+                  </Flex>
+                )}
               </CardBody>
-              {/* <Flex
+
+              <Flex
                 flexDir={'row'}
                 gap={4}
                 alignItems={'center'}
@@ -882,7 +940,7 @@ const SBOMTable = ({
                   Next
                 </Button>
                 <chakra.span>Page - {currentPage}</chakra.span>
-              </Flex> */}
+              </Flex>
             </TabPanel>
           </TabPanels>
         </Tabs>
@@ -897,6 +955,30 @@ const SBOMTable = ({
         imageDataRefetch={imageDataRefetch}
         scanResults={scanResults}
       />
+
+      <Modal isOpen={isRefreshOpen} onClose={setRefreshClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Enable Scan</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text fontSize='lg'>
+              Refreshing this will enable scan for this image
+            </Text>
+            <Text fontSize='sm' mt={5}>
+              Are you sure you want to continue refreshing this page ?
+            </Text>
+          </ModalBody>
+          <ModalFooter>
+            <Button variant='outline' mr={3} onClick={refreshImage}>
+              No
+            </Button>
+            <Button colorScheme='blue' onClick={handleYes}>
+              Yes
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </>
   )
 }

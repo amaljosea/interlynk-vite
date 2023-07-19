@@ -71,15 +71,11 @@ function SBOMLinkRow(props) {
 
   const [emailList, setEmailList] = useState([])
 
-  // const customerId = link.split('/')
+  const domain = process.env.REACT_APP_DOMAIN
 
   const sbomLink = useClipboard(
-    `http://localhost:3001/customer/signed_url_params?${signedUrlParams}`
+    `${domain}/customer/signed_url_params?${signedUrlParams}`
   )
-
-  // `https://dashboard-app.fly.dev/#/customer/sboms/${customerId[7]}`
-
-  // `http://localhost/#/customer/sboms/${customerId[7]}`
 
   const [shareLynkUpdate] = useMutation(UpdateShareLynk, {
     onCompleted: imageDataRefetch
@@ -210,7 +206,7 @@ function SBOMLinkRow(props) {
         {/* </Link> */}
         <Flex mb={2}>
           <Input
-            value={`http://localhost:3001/customer/signed_url_params?${signedUrlParams}`}
+            value={`${domain}/customer/signed_url_params?${signedUrlParams}`}
             onChange={(e) => sbomLink.setValue(e.target.value)}
             mr={2}
             disabled

@@ -21,6 +21,8 @@ import { getConImg, scanImage } from 'utils'
 import { FaCircleNotch, FaEllipsisV } from 'react-icons/fa'
 import { useMutation } from '@apollo/client'
 import { ImageUpdate } from 'graphQL/Mutation'
+import { useContext } from 'react'
+import GlobalContext from 'context/GlobalContext'
 
 const ImageRow = ({
   item,
@@ -31,6 +33,8 @@ const ImageRow = ({
   onDeleteOpen,
   filteredScanners
 }) => {
+  const { setScanEnabled } = useContext(GlobalContext)
+
   const sortImages = [...item.imageScanners].sort((a, b) =>
     a.company.localeCompare(b.company)
   )
@@ -72,7 +76,11 @@ const ImageRow = ({
   return (
     <Tr key={item.id}>
       <Td pl={1} width={'160px'}>
-        <Switch id='status' isChecked={checked} onChange={handleChange} />
+        {isLoading || isRefreshed ? (
+          <Skeleton height='20px' />
+        ) : (
+          <Switch id='status' isChecked={checked} onChange={handleChange} />
+        )}
       </Td>
       <Td fontSize={'sm'} pl={1}>
         {isLoading || isRefreshed ? (
@@ -86,7 +94,7 @@ const ImageRow = ({
               color: '#3182CE',
               textDecoration: 'underline'
             }}
-            onClick={() => window.localStorage.setItem('Image', item.name)}
+            onClick={() => setScanEnabled(item.scanEnabled ? true : false)}
           >
             {item.name}
           </Link>

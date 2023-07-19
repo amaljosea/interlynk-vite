@@ -84,6 +84,7 @@ export const getImage = gql`
           scanner {
             id
             name
+            company
           }
         }
         updatedAt
@@ -134,6 +135,8 @@ export const getImageVersion = gql`
         scanners {
           id
           name
+          company
+          updatedAt
         }
       }
     }

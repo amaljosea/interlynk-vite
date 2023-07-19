@@ -260,10 +260,12 @@ function SBOMLinkDrawer(props) {
                 >
                   Limit access to:{' '}
                 </Checkbox>
+
                 <Input
                   placeholder='Enter email address'
                   size='sm'
                   value={email}
+                  autoComplete='off'
                   onChange={(e) => setEmail(e.target.value)}
                   onKeyDown={handleKeyDown}
                 />
