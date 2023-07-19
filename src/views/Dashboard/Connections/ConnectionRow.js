@@ -17,7 +17,7 @@ import {
   useDisclosure,
   Button,
   Skeleton,
-  useToast,
+  useToast
 } from '@chakra-ui/react'
 import { timeSince, getConImg } from 'utils'
 import { useState } from 'react'
@@ -36,35 +36,40 @@ const ConnectionRow = ({
 }) => {
   const toast = useToast()
   const { isOpen, onOpen, onClose } = useDisclosure()
+
+  const {
+    isOpen: isConnect,
+    onOpen: onConnectOpen,
+    onClose: onConnectClose
+  } = useDisclosure()
+
   const [checked, setChecked] = useState(item.enabled ? true : false)
+  const [connected, setConnected] = useState(false)
 
   const handleChange = (e) => {
-    setChecked(e.target.checked ? true : false)
-    updateConnection(e.target.checked)
+    setConnected(e.target.checked ? true : false)
+    if (item.enabled === false) {
+      updateConnection()
+    } else {
+      onConnectOpen()
+    }
   }
 
   const [organizationConnectorValidate, { data, loading }] = useMutation(
     OrgConnectorValidate
   )
 
-  const updateConnection = async (e) => {
+  const updateConnection = async () => {
     try {
       await organizationConnectorUpdate({
         variables: {
           id: item.id,
           name: item.name,
-          enabled: e ? true : false
+          enabled: connected
         }
       }).then(() => {
-        if (e === false) {
-          toast({
-            description: 'Connections is disabled. You can not use it anymore',
-            status: 'warning',
-            duration: 2000,
-            isClosable: true,
-            position: 'top'
-          })
-        }
+        setChecked(connected)
+        onConnectClose()
       })
     } catch (error) {
       console.error('Mutation error:', error)
@@ -143,13 +148,11 @@ const ConnectionRow = ({
                 onClick={() => handleEdit(item)}
               />
 
-              <FaTrash color={'#F56565'} cursor={'pointer'} onClick={onOpen} />
-
               {data &&
               data.organizationConnectorValidate?.errors.length === 0 ? (
                 <Tooltip text='Connected'>
                   <FaLink
-                    color={'#48BB78'}
+                    color={'#3182CE'}
                     cursor={'pointer'}
                     onClick={() => handleValidate(item.id)}
                   />
@@ -157,17 +160,20 @@ const ConnectionRow = ({
               ) : (
                 <Tooltip text='Not connected'>
                   <FaUnlink
-                    color={'#48BB78'}
+                    color={'#3182CE'}
                     cursor={'pointer'}
                     onClick={() => handleValidate(item.id)}
                   />
                 </Tooltip>
               )}
+
+              <FaTrash color={'#F56565'} cursor={'pointer'} onClick={onOpen} />
             </Flex>
           </Td>
         </Tr>
       )}
 
+      {/* delete */}
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
@@ -201,6 +207,42 @@ const ConnectionRow = ({
               No
             </Button>
             <Button colorScheme='red' onClick={() => handleDelete(item.id)}>
+              Yes
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* connect status */}
+      <Modal isOpen={isConnect} onClose={onConnectClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>
+            {connected === true ? 'Enable ' : 'Disable '} connection ?
+          </ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text mt={2} fontSize={'md'}>
+              {connected === true
+                ? 'Enabling connection will enable scanning of images'
+                : 'Disabling connection will disable scanning of images in the future. Existing scan data will not change'}
+            </Text>
+            <Text mt={4} fontSize={'sm'}>
+              Are you sure you want to{' '}
+              {connected === true ? 'enable ' : 'disable '} the connection ?
+            </Text>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              mr={3}
+              onClick={() => {
+                setConnected(!connected)
+                onConnectClose()
+              }}
+            >
+              No
+            </Button>
+            <Button colorScheme='red' onClick={updateConnection}>
               Yes
             </Button>
           </ModalFooter>

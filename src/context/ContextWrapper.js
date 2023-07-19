@@ -80,15 +80,7 @@ const ContextWrapper = (props) => {
   const [isAuthenticate, setIsAuthenticate] = useState(false)
 
   const [scannerItems, setScannerItems] = useState('')
-
-  // useEffect(() => {
-  //   const docker = window.localStorage.getItem('DockerHub')
-  //   if (docker === 'true') {
-  //     setActiveDockerHub(true)
-  //   } else {
-  //     setActiveDockerHub(false)
-  //   }
-  // }, [])
+  const [scanEnabled, setScanEnabled] = useState(false)
 
   return (
     <GlobalContext.Provider
@@ -130,7 +122,9 @@ const ContextWrapper = (props) => {
         isAuthenticate,
         setIsAuthenticate,
         scannerItems,
-        setScannerItems
+        setScannerItems,
+        scanEnabled,
+        setScanEnabled
       }}
     >
       {props.children}

@@ -38,7 +38,9 @@ const GlobalContext = React.createContext({
   scannerItems: [],
   SetScannerItems: () => {},
   isAuthenticate: false,
-  setIsAuthenticate: () => {}
+  setIsAuthenticate: () => {},
+  scanEnabled: false,
+  setScanEnabled: () => {}
 })
 
 export default GlobalContext

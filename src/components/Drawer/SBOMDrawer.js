@@ -1,7 +1,12 @@
-// Chakra imports
-import { Flex, Button, Input, Spacer, Stack, useQuery } from '@chakra-ui/react'
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import {
+  Flex,
+  Button,
+  Input,
+  Spacer,
+  Stack,
+  useQuery,
+  useToast,
   Drawer,
   DrawerBody,
   DrawerFooter,
@@ -17,7 +22,8 @@ import {
   Text,
   Tag,
   TagLabel,
-  TagCloseButton
+  TagCloseButton,
+  Code
 } from '@chakra-ui/react'
 import { useMutation } from '@apollo/client'
 import { CreateShareLynk } from 'graphQL/Mutation'
@@ -56,6 +62,8 @@ function SBOMDrawer(props) {
   const [email, setEmail] = useState('')
   const [emailList, setEmailList] = useState([])
 
+  const toast = useToast()
+
   const handleKeyDown = (event) => {
     if (event.key === 'Enter') {
       setEmailList((prev) => [email, ...prev])
@@ -73,18 +81,28 @@ function SBOMDrawer(props) {
 
   const handleSave = async () => {
     try {
-      await shareLynkCreate({
-        variables: {
-          imageVersionID: imgVersionId,
-          enabled: true,
-          emails: emailList,
-          scanners: selectedOptions
-        }
-      }).then(() => {
-        setEmailList([])
-        setSelectedOptions([])
-      })
-      onClose()
+      if (emailList.length === 0) {
+        toast({
+          description: 'Email is required !',
+          status: 'warning',
+          duration: 2000,
+          isClosable: true,
+          position: 'top'
+        })
+      } else {
+        await shareLynkCreate({
+          variables: {
+            imageVersionID: imgVersionId,
+            enabled: true,
+            emails: emailList,
+            scanners: selectedOptions
+          }
+        }).then(() => {
+          setEmailList([])
+          setSelectedOptions([])
+        })
+        onClose()
+      }
     } catch (error) {
       if (error.networkError && error.networkError.statusCode === 500) {
         // Handle the specific error
@@ -128,9 +146,9 @@ function SBOMDrawer(props) {
     return selectedOptions.includes(value)
   }
 
-  useEffect(() => {
-    console.log('selectedOptions', selectedOptions)
-  }, [selectedOptions])
+  // useEffect(() => {
+  //   console.log('selectedOptions', selectedOptions)
+  // }, [selectedOptions])
 
   return (
     <Drawer
@@ -264,6 +282,9 @@ function SBOMDrawer(props) {
                   onChange={(e) => setEmail(e.target.value)}
                   onKeyDown={handleKeyDown}
                 />
+                <Text fontSize={'xs'}>
+                  Press <Code colorScheme={'blue'}>enter</Code> to add emails
+                </Text>
                 <Flex
                   direction={'row'}
                   alignItems={'start'}

@@ -41,7 +41,6 @@ import { useContext } from 'react'
 import GlobalContext from 'context/GlobalContext'
 import ImageRow from 'components/Tables/ImageRow'
 import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
-import { ImageUpdate } from 'graphQL/Mutation'
 
 const Index = () => {
   const toast = useToast()
@@ -85,6 +84,12 @@ const Index = () => {
   const { data: allImages, refetch } = useQuery(GetAllImages, {
     variables: {}
   })
+
+  // useEffect(() => {
+  //   if (allImages) {
+  //     console.log(`all Images`, allImages)
+  //   }
+  // }, [allImages])
 
   const filteredImages =
     allImages &&

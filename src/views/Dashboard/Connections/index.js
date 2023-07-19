@@ -32,7 +32,11 @@ import {
   Td,
   Select,
   Text,
-  useToast
+  useToast,
+  Spinner,
+  Alert,
+  AlertIcon,
+  AlertDescription
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
@@ -47,12 +51,15 @@ import { getConImg, regions } from 'utils'
 import { timeSince } from 'utils'
 import { OrgConnectorRefresh } from 'graphQL/Mutation'
 import ConnectionRow from './ConnectionRow'
+import { OrgConnectorValidate } from 'graphQL/Mutation'
 
 const Index = () => {
   const toast = useToast()
 
   const [connectors, setConnectors] = useState([])
   const [isLoading, setIsLoading] = useState(false)
+  const [isValidate, setIsValidate] = useState(false)
+  const [errorMsg, setErrorMsg] = useState(false)
 
   const { data: allConnectors } = useQuery(GetAllConnectors, {
     variables: {}
@@ -80,6 +87,11 @@ const Index = () => {
   const [organizationConnectorDelete] = useMutation(OrgConnectorDelete, {
     onCompleted: refetch
   })
+
+  const [
+    organizationConnectorValidate,
+    { data: validateData, loading: validateLoading }
+  ] = useMutation(OrgConnectorValidate)
 
   useEffect(() => {
     if (allConnectors) {
@@ -140,20 +152,11 @@ const Index = () => {
   const handleRefresh = async () => {
     try {
       setIsLoading(true)
-      await organizationConnectorRefresh().then(() =>
-        // toast({
-        //   description: 'Connections updated successfully',
-        //   status: 'success',
-        //   duration: 5000,
-        //   isClosable: true,
-        //   position: 'top'
-        // })
-        {
-          setTimeout(() => {
-            setIsLoading(false)
-          }, 2000)
-        }
-      )
+      await organizationConnectorRefresh().then(() => {
+        setTimeout(() => {
+          setIsLoading(false)
+        }, 2000)
+      })
     } catch (error) {
       if (error.networkError && error.networkError.statusCode === 500) {
         // Handle the specific error
@@ -187,12 +190,23 @@ const Index = () => {
     onOpen()
   }
 
+  const handleValidate = async (id) => {
+    try {
+      await organizationConnectorValidate({
+        variables: {
+          id: id
+        }
+      })
+    } catch (error) {
+      console.error('Mutation error:', error)
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
 
     if (selectedConnection) {
       // Check if the name already exists in the predefined array
-
       try {
         await organizationConnectorUpdate({
           variables: {
@@ -209,30 +223,31 @@ const Index = () => {
       try {
         const isNameDuplicate = connectorResults.some(
           (item) =>
-            (item.connector.name === 'Amazon ECR' &&
-              item.username === username) ||
-            item.name === connectorName
+            item.connector.name === 'Amazon ECR' &&
+            (item.username === username || item.name === connectorName)
         )
         if (isNameDuplicate) {
-          toast({
-            description:
-              'An Amazon ECR connection with the same AWS Key ID already exists',
-            status: 'error',
-            duration: 5000,
-            isClosable: true,
-            position: 'top-right'
-          })
+          setIsValidate(true)
+          setTimeout(() => {
+            setIsValidate(false)
+            setErrorMsg(true)
+          }, 4000)
         } else if (
           connectorName === username ||
           connectorName === accessToken
         ) {
-          toast({
-            description: 'AWS connection details is not validated. ',
-            status: 'error',
-            duration: 5000,
-            isClosable: true,
-            position: 'top-right'
-          })
+          // toast({
+          //   description: 'AWS connection details is not validated. ',
+          //   status: 'error',
+          //   duration: 5000,
+          //   isClosable: true,
+          //   position: 'top-right'
+          // })
+          setIsValidate(true)
+          setTimeout(() => {
+            setIsValidate(false)
+            setErrorMsg(true)
+          }, 4000)
         } else {
           await organizationConnectorCreate({
             variables: {
@@ -390,6 +405,33 @@ const Index = () => {
                       gap={6}
                       alignItems={'flex-start'}
                     >
+                      <Flex
+                        width={'100%'}
+                        alignItems={'center'}
+                        justifyContent={'center'}
+                        my={isValidate ? 4 : 0}
+                      >
+                        {isValidate ? (
+                          <Spinner
+                            thickness='4px'
+                            speed='0.65s'
+                            emptyColor='gray.200'
+                            color='blue.500'
+                            size='xl'
+                          />
+                        ) : (
+                          ''
+                        )}
+
+                        {errorMsg && (
+                          <Alert status='error'>
+                            <AlertIcon />
+                            <AlertDescription>
+                              Connection in not valid
+                            </AlertDescription>
+                          </Alert>
+                        )}
+                      </Flex>
                       <Flex width={'100%'} direction={'row'} gap={2}>
                         <FormControl
                           display='flex'
@@ -418,7 +460,11 @@ const Index = () => {
                             type='text'
                             value={connectorName}
                             onChange={(e) => setConnectorName(e.target.value)}
-                            placeholder={registryName === 'Docker Hub' ? 'e.g. Interlynk DockerHub' :'e.g. Interlynk ECR-Prod'}
+                            placeholder={
+                              registryName === 'Docker Hub'
+                                ? 'e.g. Interlynk DockerHub'
+                                : 'e.g. Interlynk ECR-Prod'
+                            }
                           />
                         </FormControl>
                         <FormControl
