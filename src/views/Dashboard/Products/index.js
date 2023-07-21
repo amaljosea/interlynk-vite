@@ -319,7 +319,7 @@ function Products() {
           'Vendor',
           'Quality Score',
           'Version',
-          'SBOM Links',
+          'Share Lynks',
           'Risk Score',
           'Last Updated',
           ''

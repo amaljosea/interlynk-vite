@@ -57,7 +57,7 @@ const SBOMTable = ({ title, captions, data, vulData }) => {
     <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
       <Tabs>
         <TabList mt='20px'>
-          <Tab>SBOM Links</Tab>
+          <Tab>Share Lynks</Tab>
           <Tab>Components</Tab>
           <Tab>Vulnerabilities</Tab>
           <Tab>Risks</Tab>

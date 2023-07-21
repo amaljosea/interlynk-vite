@@ -31,25 +31,25 @@ export default function Dashboard() {
     <Flex flexDirection='column' pt={{ base: "120px", md: "75px" }}>
       <SimpleGrid columns={{ sm: 1, md: 2, xl: 4 }} spacing='24px'>
         <MiniStatistics
-          title={"Products"}
+          title={"Images"}
           amount={"12"}
           percentage={9}
           icon={<FaWindowMaximize h={"24px"} w={"24px"} color={iconBoxInside} />}
         />
         <MiniStatistics
-          title={"Repositories"}
+          title={"Vulnerabilities"}
           amount={"21"}
           percentage={10}
           icon={<FaCode h={"24px"} w={"24px"} color={iconBoxInside} />}
         />
         <MiniStatistics
-          title={"Versions"}
+          title={"Active"}
           amount={"113"}
           percentage={8}
           icon={<FaCodeBranch h={"24px"} w={"24px"} color={iconBoxInside} />}
         />
         <MiniStatistics
-          title={"SBOM Links"}
+          title={"Share Lynks"}
           amount={"72"}
           percentage={16}
           icon={<FaLink h={"24px"} w={"24px"} color={iconBoxInside} />}
@@ -80,7 +80,7 @@ export default function Dashboard() {
         <ProductsOverview
           title={"Products Overview"}
           amount={30}
-          captions={["Product", "Versions", "SBOM Links", "Risk Score"]}
+          captions={["Product", "Versions", "Share Lynks", "Risk Score"]}
           data={productsOverviewData}
         />
         <ActivitiesOverview
