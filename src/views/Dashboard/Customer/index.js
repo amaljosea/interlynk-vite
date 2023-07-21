@@ -20,7 +20,7 @@ import {
   FaCubes,
   FaBug,
   FaExclamationTriangle,
-  FaTag,
+  FaLayerGroup,
   FaMicroscope
 } from 'react-icons/fa'
 import { useLocation } from 'react-router-dom'
@@ -273,7 +273,7 @@ function Customer() {
                   ml={'auto'}
                 >
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
-                    <FaTag size={18} color='darkgray' />
+                    <FaLayerGroup size={18} color='darkgray' />
                     <Select
                       id='version'
                       value={selectedVersion}

@@ -24,7 +24,7 @@ import { sbom } from 'variables/general'
 import {
   FaCubes,
   FaBug,
-  FaTag,
+  FaLayerGroup,
   FaMicroscope,
   FaExclamationTriangle
 } from 'react-icons/fa'
@@ -301,7 +301,7 @@ function SBOMs() {
                 ml={'auto'}
               >
                 <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
-                  <FaTag size={18} color='darkgray' />
+                  <FaLayerGroup size={18} color='darkgray' />
                   <Select
                     id='version'
                     value={selectedVersion}

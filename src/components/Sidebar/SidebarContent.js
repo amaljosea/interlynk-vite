@@ -88,7 +88,7 @@ const SidebarContent = ({ logoText, routes }) => {
                 sm: '10px',
                 xl: '16px'
               }}
-              py='12px'
+              py='4px'
               borderRadius='15px'
               _hover='none'
               w='100%'
@@ -108,8 +108,8 @@ const SidebarContent = ({ logoText, routes }) => {
                   <IconBox
                     bg='blue.300'
                     color='white'
-                    h='30px'
-                    w='30px'
+                    h='36px'
+                    w='36px'
                     me='12px'
                   >
                     {prop.icon}
@@ -138,7 +138,7 @@ const SidebarContent = ({ logoText, routes }) => {
               mx={{
                 xl: 'auto'
               }}
-              py='12px'
+              py='4px'
               ps={{
                 sm: '10px',
                 xl: '16px'
@@ -162,8 +162,8 @@ const SidebarContent = ({ logoText, routes }) => {
                   <IconBox
                     bg={inactiveBg}
                     color='blue.300'
-                    h='30px'
-                    w='30px'
+                    h='36px'
+                    w='36px'
                     me='12px'
                   >
                     {prop.icon}
@@ -231,9 +231,9 @@ const SidebarContent = ({ logoText, routes }) => {
         onClick={() => setMinimize(!minimize)}
       >
         {minimize ? (
-          <ArrowRightIcon fontSize={12} />
+          <ArrowRightIcon fontSize={16} />
         ) : (
-          <ArrowLeftIcon fontSize={12} />
+          <ArrowLeftIcon fontSize={16} />
         )}
       </Center>
       <SidebarHelp />

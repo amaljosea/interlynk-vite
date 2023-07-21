@@ -4,7 +4,7 @@ import { Flex, Grid, SimpleGrid, useColorModeValue } from '@chakra-ui/react'
 import BarChart from 'components/Charts/BarChart'
 import LineChart from 'components/Charts/LineChart'
 
-import { FaWindowMaximize, FaCode, FaCodeBranch, FaLink } from 'react-icons/fa'
+import { FaLayerGroup, FaCode, FaCodeBranch, FaLink, FaBug, FaImages } from 'react-icons/fa'
 
 import React from 'react'
 import {
@@ -24,29 +24,29 @@ export default function Dashboard() {
     <Flex flexDirection='column' pt={{ base: '120px', md: '75px' }}>
       <SimpleGrid columns={{ sm: 1, md: 2, xl: 4 }} spacing='24px'>
         <MiniStatistics
-          title={'Products'}
+          title={'Images'}
           amount={'12'}
           percentage={9}
           icon={
-            <FaWindowMaximize h={'24px'} w={'24px'} color={iconBoxInside} />
+            <FaImages h={'24px'} w={'24px'} color={iconBoxInside} />
           }
         />
         <MiniStatistics
-          title={'Repositories'}
-          amount={'21'}
-          percentage={10}
-          icon={<FaCode h={'24px'} w={'24px'} color={iconBoxInside} />}
+          title={'Tags'}
+          amount={'79'}
+          percentage={4}
+          icon={<FaLayerGroup h={'24px'} w={'24px'} color={iconBoxInside} />}
         />
         <MiniStatistics
-          title={'Versions'}
+          title={'Vulnerabilities'}
           amount={'113'}
-          percentage={8}
-          icon={<FaCodeBranch h={'24px'} w={'24px'} color={iconBoxInside} />}
+          percentage={-8}
+          icon={<FaBug h={'24px'} w={'24px'} color={iconBoxInside} />}
         />
         <MiniStatistics
-          title={'SBOM Links'}
-          amount={'72'}
-          percentage={16}
+          title={'Share Lynks'}
+          amount={'8'}
+          percentage={14}
           icon={<FaLink h={'24px'} w={'24px'} color={iconBoxInside} />}
         />
       </SimpleGrid>
@@ -77,7 +77,7 @@ export default function Dashboard() {
         <ProductsOverview
           title={'Images overview'}
           amount={10}
-          captions={['Product', 'Versions', 'SBOM Links', 'Risk Score']}
+          captions={['Product', 'Versions', 'Share Lynks', 'Risk Score']}
         />
         <ActivitiesOverview
           title={'Recent Activities'}

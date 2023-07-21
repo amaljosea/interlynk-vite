@@ -1,7 +1,7 @@
 export const barChartData = [
   {
-    name: "SBOM Activities",
-    data: [9, 15, 46, 60, 48],
+    name: "Activities",
+    data: [9, 15, 46, 60, 48, 39, 65],
   },
 ];
 
@@ -26,7 +26,7 @@ export const barChartOptions = {
     },
   },
   xaxis: {
-    categories: ["Jan", "Feb", "Mar", "Apr", "May"],
+    categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"],
     show: true,
     labels: {
       show: true,
