@@ -15,18 +15,24 @@ import { LetterHIcon } from 'components/Icons/Icons'
 import { LetterMIcon } from 'components/Icons/Icons'
 import { LetterLIcon } from 'components/Icons/Icons'
 
+import DockerIcon from 'assets/svg/docker.svg';
+import AWSIcon from 'assets/svg/aws.svg';
+import AzureIcon from 'assets/svg/azure.svg';
+import GitHubIcon from 'assets/svg/github.svg';
+import GitlabIcon from 'assets/svg/gitlab.svg';
+
 export const getConImg = (name) => {
   switch (name) {
     case 'Docker Hub':
-      return docker
+      return DockerIcon
     case 'Amazon ECR':
-      return amazon
+      return AWSIcon
     case 'Azure Container Registry':
-      return azure
+      return AzureIcon
     case 'Github Container Registry':
-      return github
+      return GitHubIcon
     case 'Gitlab':
-      return gitlab
+      return GitlabIcon
     default:
       break
   }

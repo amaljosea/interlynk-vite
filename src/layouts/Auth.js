@@ -134,7 +134,20 @@ export default function Pages(props) {
       })
       .catch((error) => {
         console.log(`Error: ${error}`)
-        setError(`Invalid username or password`)
+        if (error.response) {
+          const { status } = error.response;
+          console.log('Status code:', status);
+          if (status === 401) {
+            setError(`Invalid email or password`)
+          }
+          else if (status === 404) {
+            setError(`Internal routing error. Please try again`)
+          } else {
+            setError(`Internal error. Please try again`)
+          }
+        } else {
+          setError(`Internal error. Please try again`)
+        }
         setEmail('')
         setPassword('')
       })
@@ -229,7 +242,7 @@ export default function Pages(props) {
                     type='submit'
                     colorScheme='blue'
                   >
-                    Continue
+                    Log in
                   </Button>
                 </form>
                 {/* <Flex gap={2} alignItems={'center'}>
