@@ -83,21 +83,32 @@ const ImageRow = ({
         )}
       </Td>
       <Td fontSize={'sm'} pl={1}>
-        {isLoading || isRefreshed ? (
+      {isLoading || isRefreshed ? (
           <Skeleton height='20px' />
         ) : (
-          <Link
-            to={`/vendor/images?v=${
-              item.imageVersions[item.imageVersions.length - 1].id
-            }&id=${item.id}`}
-            style={{
-              color: '#3182CE',
-              textDecoration: 'underline'
-            }}
-            onClick={() => setScanEnabled(item.scanEnabled ? true : false)}
-          >
-            {item.name}
-          </Link>
+          item.imageVersions.length === 0 ? (
+            <Link
+              to={`/vendor/images`}
+              style={{
+                color: '#3182CE',
+                textDecoration: 'underline'
+              }}
+              onClick={() => setScanEnabled(item.scanEnabled ? true : false)}
+            >
+              {item.name}
+            </Link>
+          ) : (
+            <Link
+              to={`/vendor/images?v=${item.imageVersions[item.imageVersions.length - 1].id}&id=${item.id}`}
+              style={{
+                color: '#3182CE',
+                textDecoration: 'underline'
+              }}
+              onClick={() => setScanEnabled(item.scanEnabled ? true : false)}
+            >
+              {item.name}
+            </Link>
+          )
         )}
       </Td>
       <Td fontSize={'sm'} pl={1}>
