@@ -23,6 +23,7 @@ import { useMutation } from '@apollo/client'
 import { ImageUpdate } from 'graphQL/Mutation'
 import { useContext } from 'react'
 import GlobalContext from 'context/GlobalContext'
+import semver from 'semver';
 
 const ImageRow = ({
   item,
@@ -73,6 +74,21 @@ const ImageRow = ({
     }
   }, [data])
 
+  const getMostRecentVersion = () => {
+    const sortedVersions = item.imageVersions.slice().sort((a, b) => {
+      // If either a or b is 'latest', handle the special case.
+      if (a.name === 'latest') {
+        return -1;
+      } else if (b.name === 'latest') {
+        return 1;
+      }
+      return semver.compare(semver.coerce(b.name), semver.coerce(a.name));
+    });
+
+    return sortedVersions.length > 0 ? sortedVersions[0] : null;
+  };
+  const mostRecentVersion = getMostRecentVersion();
+
   return (
     <Tr key={item.id}>
       <Td pl={1} width={'160px'}>
@@ -87,19 +103,12 @@ const ImageRow = ({
           <Skeleton height='20px' />
         ) : (
           item.imageVersions.length === 0 ? (
-            <Link
-              to={`/vendor/images`}
-              style={{
-                color: '#3182CE',
-                textDecoration: 'underline'
-              }}
-              onClick={() => setScanEnabled(item.scanEnabled ? true : false)}
-            >
+            <Text>
               {item.name}
-            </Link>
+            </Text>
           ) : (
             <Link
-              to={`/vendor/images?v=${item.imageVersions[item.imageVersions.length - 1].id}&id=${item.id}`}
+              to={`/vendor/images?v=${mostRecentVersion.id}&id=${item.id}`}
               style={{
                 color: '#3182CE',
                 textDecoration: 'underline'
