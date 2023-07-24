@@ -87,16 +87,9 @@ const ImageRow = ({
           <Skeleton height='20px' />
         ) : (
           item.imageVersions.length === 0 ? (
-            <Link
-              to={`/vendor/images`}
-              style={{
-                color: '#3182CE',
-                textDecoration: 'underline'
-              }}
-              onClick={() => setScanEnabled(item.scanEnabled ? true : false)}
-            >
+            <Text>
               {item.name}
-            </Link>
+            </Text>
           ) : (
             <Link
               to={`/vendor/images?v=${item.imageVersions[item.imageVersions.length - 1].id}&id=${item.id}`}
