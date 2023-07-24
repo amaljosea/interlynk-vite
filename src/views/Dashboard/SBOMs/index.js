@@ -34,6 +34,7 @@ import Tooltip from 'components/Tooltip'
 import { useQuery } from '@apollo/client'
 import { scanImage } from 'utils'
 import { getImageVersion, getImage } from 'graphQL/Queries'
+import semver from 'semver';
 
 function SBOMs() {
   const [scanResults, setScanResults] = useState(null)
@@ -94,7 +95,21 @@ function SBOMs() {
   useEffect(() => {
     if (imageData) {
       console.log('imageData', imageData.image)
-      setImageInfo(imageData.image.imageVersions)
+      const clonedImageVersions = imageData.image.imageVersions.map((info) => ({ ...info }));
+      console.log('clonedImageVersions', clonedImageVersions)
+
+      clonedImageVersions.sort((a, b) => {
+        // If either a or b is 'latest', handle the special case.
+        if (a.name === 'latest') {
+          return -1;
+        } else if (b.name === 'latest') {
+          return 1;
+        }
+        return semver.compare(semver.coerce(b.name), semver.coerce(a.name));
+      });
+
+
+      setImageInfo(clonedImageVersions)
       setSelectedVersion(imageVersionData?.imageVersion?.id)
     }
   }, [imageData])
