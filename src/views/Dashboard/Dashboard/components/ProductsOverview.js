@@ -65,6 +65,7 @@ const ProductsOverview = ({ title, amount, captions, data }) => {
                   allImages.images.map((item) => (
                     <Tr key={item.id}>
                       <Td fontSize={'sm'} pl={1}>
+                      {item.imageVersions && item.imageVersions.length > 0 ? (
                         <Link
                           to={`/vendor/images?v=${
                             item.imageVersions[item.imageVersions.length - 1].id
@@ -76,6 +77,9 @@ const ProductsOverview = ({ title, amount, captions, data }) => {
                         >
                           {item.name}
                         </Link>
+                      ) : (
+                        <Text>{item.name}</Text>
+                      )}
                       </Td>
                       <Td fontSize={'sm'} pl={1}>
                         <Flex
