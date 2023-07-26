@@ -84,7 +84,6 @@ function SBOMs() {
 
   useEffect(() => {
     if (imageVersionData) {
-      console.log('imageVersionData', imageVersionData)
       setAllResults(imageVersionData.imageVersion.imageVulns)
       setScanResults(imageVersionData.imageVersion)
     }
@@ -94,9 +93,7 @@ function SBOMs() {
 
   useEffect(() => {
     if (imageData) {
-      console.log('imageData', imageData.image)
       const clonedImageVersions = imageData.image.imageVersions.map((info) => ({ ...info }));
-      console.log('clonedImageVersions', clonedImageVersions)
 
       clonedImageVersions.sort((a, b) => {
         // If either a or b is 'latest', handle the special case.

@@ -92,17 +92,13 @@ export default function Dashboard(props) {
   }
   const getRoutes = (routes) => {
     const route = routes.map((prop, key) => {
-      // console.log('getting routes')
       if (prop.collapse) {
-        // console.log('getting routes collapse')
         return getRoutes(prop.views)
       }
       if (prop.category === 'account') {
-        // console.log('getting account')
         return getRoutes(prop.views)
       }
       if (prop.layout === '/vendor') {
-        // console.log('getting admin', prop)
         return (
           <Route
             path={prop.layout + prop.path}

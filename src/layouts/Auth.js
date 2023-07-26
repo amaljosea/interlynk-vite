@@ -108,8 +108,6 @@ export default function Pages(props) {
 
   const loginURL = process.env.REACT_APP_VENDOR_LOGIN_URL
 
-  // console.log(`login URl`, loginURL)
-
   const handleSubmit = (e) => {
     e.preventDefault()
     axios
@@ -120,7 +118,7 @@ export default function Pages(props) {
         }
       })
       .then((response) => {
-        console.log('response', response)
+        // console.log('response', response)
         const { status } = response.data
         if (status.code === 200) {
           setEmail('')

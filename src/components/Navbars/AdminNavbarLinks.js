@@ -34,8 +34,6 @@ export default function HeaderLinks(props) {
   const { variant, children, fixed, secondary, onOpen, ...rest } = props
   const { setIsAuthenticate } = useContext(GlobalContext)
 
-  // console.log(`location`, location)
-
   const [username, setUsername] = useState('')
 
   const userName = localStorage.getItem('username')
