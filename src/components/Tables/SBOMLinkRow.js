@@ -71,7 +71,7 @@ function SBOMLinkRow(props) {
 
   const [emailList, setEmailList] = useState([])
 
-  const domain = window.location.host;
+  const domain = window.location.origin;
 
   const sbomLink = useClipboard(
     `${domain}/customer/signed_url_params?${signedUrlParams}`
