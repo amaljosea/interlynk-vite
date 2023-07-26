@@ -82,7 +82,12 @@ const ImageRow = ({
       } else if (b.name === 'latest') {
         return 1;
       }
-      return semver.compare(semver.coerce(b.name), semver.coerce(a.name));
+      var coerced_a = semver.valid(semver.coerce(a.name));
+      var coerced_b = semver.valid(semver.coerce(b.name));
+      if (coerced_a === null || coerced_b === null) {
+        return b.name.localeCompare(a.name);
+      }
+      return semver.compare(coerced_b, coerced_a);
     });
 
     return sortedVersions.length > 0 ? sortedVersions[0] : null;
