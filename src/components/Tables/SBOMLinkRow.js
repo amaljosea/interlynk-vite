@@ -71,28 +71,7 @@ function SBOMLinkRow(props) {
 
   const [emailList, setEmailList] = useState([])
 
-  function getTopLevelDomain() {
-    const currentURL = window.location.hostname;
-
-    // Check if the URL is "localhost"
-    if (currentURL === 'localhost' || currentURL.startsWith('localhost:')) {
-      return window.location.host;
-    }
-
-    // Check for IP addresses (e.g., 127.0.0.1)
-    const ipAddressRegex = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/;
-    if (ipAddressRegex.test(currentURL)) {
-      return currentURL;
-    }
-
-    // Use the regular expression to extract the TLD
-    const tldRegex = /\.([^.]+)$/;
-    const match = currentURL.match(tldRegex);
-    return match ? match[1] : null;
-  }
-
-  // Usage in your React component:
-  const domain = getTopLevelDomain();
+  const domain = window.location.host;
 
   const sbomLink = useClipboard(
     `${domain}/customer/signed_url_params?${signedUrlParams}`
