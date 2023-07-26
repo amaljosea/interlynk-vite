@@ -113,7 +113,10 @@ const ImageRow = ({
                 color: '#3182CE',
                 textDecoration: 'underline'
               }}
-              onClick={() => setScanEnabled(item.scanEnabled ? true : false)}
+              onClick={() => {
+                window.localStorage.setItem('Image', item.name);
+                setScanEnabled(item.scanEnabled ? true : false)
+              }}
             >
               {item.name}
             </Link>
