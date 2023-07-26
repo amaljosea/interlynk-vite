@@ -153,7 +153,7 @@ function SBOMs() {
 
   // Calculate the counts for each severity level
   const totalCount = allResults.reduce((acc, item) => {
-    acc[item.severity[0]] = (acc[item.severity[0]] || 0) + 1
+    acc[item.severity[0].toLowerCase()] = (acc[item.severity[0].toLowerCase()] || 0) + 1
     return acc
   }, {})
 
@@ -165,13 +165,13 @@ function SBOMs() {
   )
 
   const unresolveCount = unresolveFilter?.reduce((acc, item) => {
-    acc[item.severity[0]] = (acc[item.severity[0]] || 0) + 1
+    acc[item.severity[0].toLowerCase()] = (acc[item.severity[0].toLowerCase()] || 0) + 1
     return acc
   }, {})
 
   useEffect(() => {
     const critical = totalCount['critical'] || 0
-    const high = totalCount['super high'] || 0
+    const high = totalCount['high'] || 0
     const medium = totalCount['medium' || 'unknown'] || 0
     const low = totalCount['low'] || 0
     setTotal({

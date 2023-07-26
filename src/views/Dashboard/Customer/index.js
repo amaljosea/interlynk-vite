@@ -129,7 +129,7 @@ function Customer() {
 
   // Calculate the counts for each severity level
   const totalCount = allResults.reduce((acc, item) => {
-    acc[item.severity[0]] = (acc[item.severity[0]] || 0) + 1
+    acc[item.severity[0].toLowerCase()] = (acc[item.severity[0].toLowerCase()] || 0) + 1
     return acc
   }, {})
 
@@ -141,13 +141,13 @@ function Customer() {
   )
 
   const unresolveCount = unresolveFilter?.reduce((acc, item) => {
-    acc[item.severity[0]] = (acc[item.severity[0]] || 0) + 1
+    acc[item.severity[0].toLowerCase()] = (acc[item.severity[0].toLowerCase()] || 0) + 1
     return acc
   }, {})
 
   useEffect(() => {
     const critical = totalCount['critical'] || 0
-    const high = totalCount['super high'] || 0
+    const high = totalCount['high'] || 0
     const medium = totalCount['medium'] || 0
     const low = totalCount['low'] || 0
     setTotal({
@@ -160,7 +160,7 @@ function Customer() {
 
   useEffect(() => {
     const critical = unresolveCount['critical'] || 0
-    const high = unresolveCount['super high'] || 0
+    const high = unresolveCount['high'] || 0
     const medium = unresolveCount['medium'] || 0
     const low = unresolveCount['low'] || 0
     setUnresolve({
