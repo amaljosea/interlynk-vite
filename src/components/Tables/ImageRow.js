@@ -54,6 +54,7 @@ const ImageRow = ({
   const updateImage = async (e) => {
     try {
       setIsRefreshed(true)
+      setScanEnabled(e ? true : false)
       await imageUpdate({
         variables: {
           id: item.id,
