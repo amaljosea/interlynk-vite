@@ -23,7 +23,7 @@ import { useMutation } from '@apollo/client'
 import { ImageUpdate } from 'graphQL/Mutation'
 import { useContext } from 'react'
 import GlobalContext from 'context/GlobalContext'
-import semver from 'semver';
+import semver from 'semver'
 
 const ImageRow = ({
   item,
@@ -32,7 +32,8 @@ const ImageRow = ({
   setActiveScanners,
   onScanOpen,
   onDeleteOpen,
-  filteredScanners
+  filteredScanners,
+  refetch
 }) => {
   const { setScanEnabled } = useContext(GlobalContext)
 
@@ -40,16 +41,35 @@ const ImageRow = ({
     a.company.localeCompare(b.company)
   )
 
-  const [checked, setChecked] = useState(item.scanEnabled ? true : false)
+  const [checked, setChecked] = useState(false)
   const [isRefreshed, setIsRefreshed] = useState(false)
   // console.log('filteredScanners', filteredScanners)
 
+  useEffect(() => {
+    setChecked(item.scanEnabled ? true : false)
+  }, [item])
+
   const handleChange = (e) => {
     setChecked(!checked)
-    updateImage(e.target.checked)
+    EnableImage(e.target.checked)
   }
 
   const [imageUpdate, { data }] = useMutation(ImageUpdate)
+
+  const EnableImage = async (e) => {
+    try {
+      setIsRefreshed(true)
+      setScanEnabled(e ? true : false)
+      await imageUpdate({
+        variables: {
+          id: item.id,
+          scanEnabled: e ? true : false
+        }
+      }).then(() => refetch())
+    } catch (error) {
+      console.error('Mutation error:', error)
+    }
+  }
 
   const updateImage = async (e) => {
     try {
@@ -58,10 +78,9 @@ const ImageRow = ({
       await imageUpdate({
         variables: {
           id: item.id,
-          scanRefresh: true,
-          scanEnabled: e ? true : false
+          scanRefresh: true
         }
-      })
+      }).then(() => refetch())
     } catch (error) {
       console.error('Mutation error:', error)
     }
@@ -79,21 +98,21 @@ const ImageRow = ({
     const sortedVersions = item.imageVersions.slice().sort((a, b) => {
       // If either a or b is 'latest', handle the special case.
       if (a.name === 'latest') {
-        return -1;
+        return -1
       } else if (b.name === 'latest') {
-        return 1;
+        return 1
       }
-      var coerced_a = semver.valid(semver.coerce(a.name));
-      var coerced_b = semver.valid(semver.coerce(b.name));
+      var coerced_a = semver.valid(semver.coerce(a.name))
+      var coerced_b = semver.valid(semver.coerce(b.name))
       if (coerced_a === null || coerced_b === null) {
-        return b.name.localeCompare(a.name);
+        return b.name.localeCompare(a.name)
       }
-      return semver.compare(coerced_b, coerced_a);
-    });
+      return semver.compare(coerced_b, coerced_a)
+    })
 
-    return sortedVersions.length > 0 ? sortedVersions[0] : null;
-  };
-  const mostRecentVersion = getMostRecentVersion();
+    return sortedVersions.length > 0 ? sortedVersions[0] : null
+  }
+  const mostRecentVersion = getMostRecentVersion()
 
   return (
     <Tr key={item.id}>
@@ -105,28 +124,24 @@ const ImageRow = ({
         )}
       </Td>
       <Td fontSize={'sm'} pl={1}>
-      {isLoading || isRefreshed ? (
+        {isLoading || isRefreshed ? (
           <Skeleton height='20px' />
+        ) : item.imageVersions.length === 0 ? (
+          <Text>{item.name}</Text>
         ) : (
-          item.imageVersions.length === 0 ? (
-            <Text>
-              {item.name}
-            </Text>
-          ) : (
-            <Link
-              to={`/vendor/images?v=${mostRecentVersion.id}&id=${item.id}`}
-              style={{
-                color: '#3182CE',
-                textDecoration: 'underline'
-              }}
-              onClick={() => {
-                window.localStorage.setItem('Image', item.name);
-                setScanEnabled(item.scanEnabled ? true : false)
-              }}
-            >
-              {item.name}
-            </Link>
-          )
+          <Link
+            to={`/vendor/images?v=${mostRecentVersion.id}&id=${item.id}`}
+            style={{
+              color: '#3182CE',
+              textDecoration: 'underline'
+            }}
+            onClick={() => {
+              window.localStorage.setItem('Image', item.name)
+              setScanEnabled(item.scanEnabled ? true : false)
+            }}
+          >
+            {item.name}
+          </Link>
         )}
       </Td>
       <Td fontSize={'sm'} pl={1}>

@@ -99,7 +99,8 @@ export const getImageVersion = gql`
       id
       image {
         id
-        name
+        name,
+        scanEnabled
       }
       imageScanners {
         id
