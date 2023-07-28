@@ -127,7 +127,7 @@ const Index = () => {
   const [activeScanners, setActiveScanners] = useState([])
   const [isLoading, setIsLoading] = useState(false)
 
-  const [sortField, setSortField] = useState('')
+  const [sortField, setSortField] = useState('lastPushedAt')
   const [sortOrder, setSortOrder] = useState('asc')
   const [imageData, setImageData] = useState([])
 
@@ -222,6 +222,8 @@ const Index = () => {
       const newSortOrder = sortOrder === 'asc' ? 'desc' : 'asc'
       setSortOrder(newSortOrder)
       sortImgData(field, newSortOrder)
+      localStorage.setItem('sortField', field)
+      localStorage.setItem('sortOrder', newSortOrder)
     } else {
       setSortField(field)
       setSortOrder('asc')
@@ -229,9 +231,49 @@ const Index = () => {
     }
   }
 
+  useEffect(() => {
+    const field = localStorage.getItem('sortField')
+    const order = localStorage.getItem('sortOrder')
+    if (field) setSortField(field)
+    if (order) setSortOrder(order)
+    if (allImages && field && order) {
+      const data = allImages && allImages.images
+      const sortedData = [...data].sort((a, b) => {
+        if (
+          field === 'imageVersions' &&
+          typeof a[field].length === 'number' &&
+          typeof b[field].length === 'number'
+        ) {
+          return order === 'asc'
+            ? a[field].length - b[field].length
+            : b[field].length - a[field].length
+        } else if (field === 'lastPushedAt') {
+          const comparison = a[field].localeCompare(b[field])
+          return order === 'asc' ? comparison : -comparison
+        } else if (field === 'scanEnabled') {
+          const aValue = a[field]
+          const bValue = b[field]
+          if (order === 'asc') {
+            return aValue > bValue ? 1 : -1
+          } else {
+            return aValue < bValue ? 1 : -1
+          }
+        } else if (field === 'organizationConnector') {
+          const comparison = a[field].name.localeCompare(b[field].name)
+          return order === 'asc' ? comparison : -comparison
+        } else {
+          const comparison = a[field].localeCompare(b[field])
+          return order === 'asc' ? comparison : -comparison
+        }
+      })
+      // console.log('sortedData', sortedData)
+      setImageData(sortedData)
+    }
+  }, [allImages])
+
   const sortImgData = (field, order) => {
-    const data = allImages && [...allImages.images]
-    const sortedData = data.sort((a, b) => {
+    const data = allImages && allImages.images
+    const sortedData = [...data].sort((a, b) => {
       if (
         field === 'imageVersions' &&
         typeof a[field].length === 'number' &&
@@ -243,6 +285,14 @@ const Index = () => {
       } else if (field === 'lastPushedAt') {
         const comparison = a[field].localeCompare(b[field])
         return order === 'asc' ? comparison : -comparison
+      } else if (field === 'scanEnabled') {
+        const aValue = a[field]
+        const bValue = b[field]
+        if (order === 'asc') {
+          return aValue > bValue ? 1 : -1
+        } else {
+          return aValue < bValue ? 1 : -1
+        }
       } else if (field === 'organizationConnector') {
         const comparison = a[field].name.localeCompare(b[field].name)
         return order === 'asc' ? comparison : -comparison
@@ -300,8 +350,19 @@ const Index = () => {
                       pl={1}
                       position='relative'
                       cursor={'pointer'}
+                      onClick={() => handleImgSort('scanEnabled')}
                     >
-                      <Box>Scan</Box>
+                      <Flex direction={'row'} alignItems={'center'} gap={2}>
+                        <Box>Scan</Box>
+                        <Box>
+                          {sortField === 'scanEnabled' &&
+                            (sortOrder === 'asc' ? (
+                              <TriangleUpIcon />
+                            ) : (
+                              <TriangleDownIcon />
+                            ))}
+                        </Box>
+                      </Flex>
                     </Th>
                     <Th
                       color={'gray.'}
@@ -313,11 +374,12 @@ const Index = () => {
                       <Flex direction={'row'} alignItems={'center'} gap={2}>
                         <Box>Image</Box>
                         <Box>
-                          {sortField === 'name' && sortOrder === 'asc' ? (
-                            <TriangleUpIcon />
-                          ) : (
-                            <TriangleDownIcon />
-                          )}
+                          {sortField === 'name' &&
+                            (sortOrder === 'asc' ? (
+                              <TriangleUpIcon />
+                            ) : (
+                              <TriangleDownIcon />
+                            ))}
                         </Box>
                       </Flex>
                     </Th>
@@ -332,11 +394,11 @@ const Index = () => {
                         <Box>Connector</Box>
                         <Box>
                           {sortField === 'organizationConnector' &&
-                          sortOrder === 'asc' ? (
-                            <TriangleUpIcon />
-                          ) : (
-                            <TriangleDownIcon />
-                          )}
+                            (sortOrder === 'asc' ? (
+                              <TriangleUpIcon />
+                            ) : (
+                              <TriangleDownIcon />
+                            ))}
                         </Box>
                       </Flex>
                     </Th>
@@ -351,11 +413,11 @@ const Index = () => {
                         <Box>Tags</Box>
                         <Box>
                           {sortField === 'imageVersions' &&
-                          sortOrder === 'asc' ? (
-                            <TriangleUpIcon />
-                          ) : (
-                            <TriangleDownIcon />
-                          )}
+                            (sortOrder === 'asc' ? (
+                              <TriangleUpIcon />
+                            ) : (
+                              <TriangleDownIcon />
+                            ))}
                         </Box>
                       </Flex>
                     </Th>
@@ -370,11 +432,11 @@ const Index = () => {
                         <Box>Last Pushed</Box>
                         <Box>
                           {sortField === 'lastPushedAt' &&
-                          sortOrder === 'asc' ? (
-                            <TriangleUpIcon />
-                          ) : (
-                            <TriangleDownIcon />
-                          )}
+                            (sortOrder === 'asc' ? (
+                              <TriangleUpIcon />
+                            ) : (
+                              <TriangleDownIcon />
+                            ))}
                         </Box>
                       </Flex>
                     </Th>
@@ -393,6 +455,7 @@ const Index = () => {
                       <ImageRow
                         key={index}
                         item={item}
+                        refetch={refetch}
                         isLoading={isLoading}
                         setSelectedImage={setSelectedImage}
                         setActiveScanners={setActiveScanners}
@@ -406,6 +469,7 @@ const Index = () => {
                       <ImageRow
                         key={index}
                         item={item}
+                        refetch={refetch}
                         isLoading={isLoading}
                         setSelectedImage={setSelectedImage}
                         setActiveScanners={setActiveScanners}
@@ -419,6 +483,7 @@ const Index = () => {
                       <ImageRow
                         key={index}
                         item={item}
+                        refetch={refetch}
                         isLoading={isLoading}
                         setSelectedImage={setSelectedImage}
                         setActiveScanners={setActiveScanners}
@@ -428,6 +493,9 @@ const Index = () => {
                     ))
                   ) : (
                     <Tr>
+                      <Td fontSize={'sm'} pl={1}>
+                        <Skeleton height='20px' />
+                      </Td>
                       <Td fontSize={'sm'} pl={1}>
                         <Skeleton height='20px' />
                       </Td>

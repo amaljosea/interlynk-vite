@@ -34,7 +34,7 @@ import Tooltip from 'components/Tooltip'
 import { useQuery } from '@apollo/client'
 import { scanImage } from 'utils'
 import { getImageVersion, getImage } from 'graphQL/Queries'
-import semver from 'semver';
+import semver from 'semver'
 
 function SBOMs() {
   const [scanResults, setScanResults] = useState(null)
@@ -86,6 +86,8 @@ function SBOMs() {
     if (imageVersionData) {
       setAllResults(imageVersionData.imageVersion.imageVulns)
       setScanResults(imageVersionData.imageVersion)
+      console.log('imageVersionData', imageVersionData)
+      setSelectedVersion(imageVersionData.imageVersion.id)
     }
   }, [imageVersionData])
 
@@ -93,26 +95,27 @@ function SBOMs() {
 
   useEffect(() => {
     if (imageData) {
-      const clonedImageVersions = imageData.image.imageVersions.map((info) => ({ ...info }));
+      const clonedImageVersions = imageData.image.imageVersions.map((info) => ({
+        ...info
+      }))
 
       clonedImageVersions.sort((a, b) => {
         // If either a or b is 'latest', handle the special case.
         if (a.name === 'latest') {
-          return -1;
+          return -1
         } else if (b.name === 'latest') {
-          return 1;
+          return 1
         }
-        var coerced_a = semver.valid(semver.coerce(a.name));
-        var coerced_b = semver.valid(semver.coerce(b.name));
+        var coerced_a = semver.valid(semver.coerce(a.name))
+        var coerced_b = semver.valid(semver.coerce(b.name))
         if (coerced_a === null || coerced_b === null) {
-          return b.name.localeCompare(a.name);
+          return b.name.localeCompare(a.name)
         }
-        return semver.compare(coerced_b, coerced_a);
-      });
-
+        return semver.compare(coerced_b, coerced_a)
+      })
 
       setImageInfo(clonedImageVersions)
-      setSelectedVersion(imageVersionData?.imageVersion?.id)
+      // setSelectedVersion(imageVersionData?.imageVersion?.id)
     }
   }, [imageData])
 
@@ -153,7 +156,8 @@ function SBOMs() {
 
   // Calculate the counts for each severity level
   const totalCount = allResults.reduce((acc, item) => {
-    acc[item.severity[0].toLowerCase()] = (acc[item.severity[0].toLowerCase()] || 0) + 1
+    acc[item.severity[0].toLowerCase()] =
+      (acc[item.severity[0].toLowerCase()] || 0) + 1
     return acc
   }, {})
 
@@ -165,7 +169,8 @@ function SBOMs() {
   )
 
   const unresolveCount = unresolveFilter?.reduce((acc, item) => {
-    acc[item.severity[0].toLowerCase()] = (acc[item.severity[0].toLowerCase()] || 0) + 1
+    acc[item.severity[0].toLowerCase()] =
+      (acc[item.severity[0].toLowerCase()] || 0) + 1
     return acc
   }, {})
 
@@ -203,9 +208,10 @@ function SBOMs() {
     setFilteredVulItems(filteredData)
   }, [selectedScanner])
 
+  const cldScanner = localStorage.getItem('cloudScanner')
   useEffect(() => {
     setTabIndex(1)
-    setSelectedScanner('All')
+    setSelectedScanner(cldScanner ? cldScanner : 'All')
   }, [])
 
   return (
@@ -230,10 +236,17 @@ function SBOMs() {
                       <Tag
                         size={'sm'}
                         variant='outline'
-                        colorScheme={scanEnabled ? 'blue' : 'red'}
+                        colorScheme={
+                          scanResults && scanResults.image.scanEnabled === true
+                            ? 'blue'
+                            : 'red'
+                        }
                       >
                         <TagLabel>
-                          Scan {scanEnabled ? 'Enabled' : 'Disabled'}
+                          Scan{' '}
+                          {scanResults && scanResults.image.scanEnabled === true
+                            ? 'Enabled'
+                            : 'Disabled'}
                         </TagLabel>
                       </Tag>
                     </Flex>

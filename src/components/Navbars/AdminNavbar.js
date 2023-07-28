@@ -35,7 +35,6 @@ export default function AdminNavbar(props) {
   const imageName = window.localStorage.getItem('Image')
   const signedImageName = localStorage.getItem(`signedImageName`)
 
-
   // Here are all the props that may change depending on navbar's type or state.(secondary, variant, scrolled)
   let mainText = useColorModeValue('gray.700', 'gray.200')
   let secondaryText = useColorModeValue('gray.400', 'gray.200')
@@ -151,7 +150,11 @@ export default function AdminNavbar(props) {
 
             {!location.pathname.startsWith('/customer') && (
               <BreadcrumbItem color={mainText}>
-                <Link to={`${path(brandText)}`} color={secondaryText}>
+                <Link
+                  to={`${path(brandText)}`}
+                  color={secondaryText}
+                  onClick={() => localStorage.removeItem('cloudScanner')}
+                >
                   {brandText}
                 </Link>
               </BreadcrumbItem>

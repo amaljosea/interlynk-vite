@@ -39,6 +39,7 @@ import CardHeader from 'components/Card/CardHeader'
 import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
 import { BsFilterRight } from 'react-icons/bs'
 import { BiExport, BiImport } from 'react-icons/bi'
+import { CSVLink } from 'react-csv'
 
 const CustomerSBOMTable = ({
   data,
@@ -67,23 +68,25 @@ const CustomerSBOMTable = ({
   const [sortOrder, setSortOrder] = useState('asc')
   const [sortComponentData, setSortComponentData] = useState([])
 
-  const flattenedData = data.map((item, index) => {
-    const allVulData = {
-      ID: index + 1,
-      CVEID: item.cveId,
-      SEVERITY: item.severity[0],
-      CVSS: item.cvss?.v3Score,
-      COMPONENT: item.component?.name,
-      VERSION: item.component?.version,
-      FIXED_COMPONENT: item.component?.fixedInVersion[0],
-      FIXED_PRODUCT: item.fixedInImage,
-      SCANNER: item.scanners?.map((scanner) => scanner.name),
-      VEX_JUSTIFICATION: item.vexVuln?.vexJustification?.name,
-      VEX_STATUS: item.vexVuln?.vexStatus?.name
-    }
+  const flattenedData =
+    data &&
+    data.map((item, index) => {
+      const allVulData = {
+        ID: index + 1,
+        CVEID: item.cveId,
+        SEVERITY: item.severity[0],
+        CVSS: item.cvss?.v3Score,
+        COMPONENT: item.component?.name,
+        VERSION: item.component?.version,
+        FIXED_COMPONENT: item.component?.fixedInVersion[0],
+        FIXED_PRODUCT: item.fixedInImage,
+        SCANNER: item.scanners?.map((scanner) => scanner.name),
+        VEX_JUSTIFICATION: item.vexVuln?.vexJustification?.name,
+        VEX_STATUS: item.vexVuln?.vexStatus?.name
+      }
 
-    return allVulData
-  })
+      return allVulData
+    })
 
   useEffect(() => {
     const filterData =
@@ -119,8 +122,17 @@ const CustomerSBOMTable = ({
         return order === 'asc'
           ? a.cvss[field] - b.cvss[field]
           : b.cvss[field] - a.cvss[field]
+      } else if (field === 'severity') {
+        const comparison = a[field][0].localeCompare(b[field][0])
+        return order === 'asc' ? comparison : -comparison
       } else if (field === 'name' || field === 'version') {
         const comparison = a.component[field].localeCompare(b.component[field])
+        return order === 'asc' ? comparison : -comparison
+      } else if (field === 'vexVuln') {
+        const comparison =
+          a &&
+          b &&
+          a[field]?.vexStatus?.name.localeCompare(b[field]?.vexStatus?.name)
         return order === 'asc' ? comparison : -comparison
       } else {
         const comparison = a[field].localeCompare(b[field])
@@ -252,7 +264,7 @@ const CustomerSBOMTable = ({
           <Tab>Vulnerabilities</Tab>
         </TabList>
         <TabPanels>
-          <TabPanel height={'8xl'}>
+          <TabPanel>
             <CardHeader mb={4} as={Flex} gap={2}>
               <Flex
                 width={'100%'}
@@ -308,7 +320,7 @@ const CustomerSBOMTable = ({
                     <Tooltip label='Export'>
                       <Button colorScheme='blue' size='md'>
                         <CSVLink
-                          data={flattenedData.length > 0 ? flattenedData : ''}
+                          data={flattenedData ? flattenedData : ''}
                           filename='vulnerabilities.csv'
                         >
                           <BiExport />
@@ -348,6 +360,24 @@ const CustomerSBOMTable = ({
                       color='gray.400'
                       py={4}
                       position='relative'
+                      onClick={() => handleVulSort('severity')}
+                      cursor={'pointer'}
+                    >
+                      <Flex direction={'row'} alignItems={'center'} gap={2}>
+                        <Box>Severity</Box>
+                        <Box>
+                          {sortField === 'severity' && sortOrder === 'asc' ? (
+                            <TriangleUpIcon />
+                          ) : (
+                            <TriangleDownIcon />
+                          )}
+                        </Box>
+                      </Flex>
+                    </Th>
+                    <Th
+                      color='gray.400'
+                      py={4}
+                      position='relative'
                       onClick={() => handleVulSort('v3Score')}
                       cursor={'pointer'}
                     >
@@ -362,7 +392,6 @@ const CustomerSBOMTable = ({
                         </Box>
                       </Flex>
                     </Th>
-
                     <Th
                       color='gray.400'
                       py={4}
@@ -444,13 +473,13 @@ const CustomerSBOMTable = ({
                       color='gray.400'
                       py={4}
                       position='relative'
-                      // onClick={() => handleVulSort('status')}
+                      onClick={() => handleVulSort('vexVuln')}
                       cursor={'pointer'}
                     >
                       <Flex direction={'row'} alignItems={'center'} gap={2}>
                         <Box>Status</Box>
                         <Box>
-                          {sortField === 'status' && sortOrder === 'asc' ? (
+                          {sortField === 'vexVuln' && sortOrder === 'asc' ? (
                             <TriangleUpIcon />
                           ) : (
                             <TriangleDownIcon />
@@ -468,6 +497,7 @@ const CustomerSBOMTable = ({
                           refetch={refetch}
                           key={idx}
                           id={row.id}
+                          severity={row.severity[0]}
                           imgVersionId={imgVersionId}
                           component={row.component.name}
                           version={row.component.version}
@@ -490,6 +520,7 @@ const CustomerSBOMTable = ({
                           refetch={refetch}
                           key={idx}
                           id={row.id}
+                          severity={row.severity[0]}
                           imgVersionId={imgVersionId}
                           component={row.component.name}
                           version={row.component.version}
@@ -513,6 +544,7 @@ const CustomerSBOMTable = ({
                             refetch={refetch}
                             key={idx}
                             id={row.id}
+                            severity={row.severity[0]}
                             imgVersionId={imgVersionId}
                             component={row.component.name}
                             version={row.component.version}
@@ -537,6 +569,7 @@ const CustomerSBOMTable = ({
                             refetch={refetch}
                             key={idx}
                             id={row.id}
+                            severity={row.severity[0]}
                             imgVersionId={imgVersionId}
                             component={row.component.name}
                             version={row.component.version}

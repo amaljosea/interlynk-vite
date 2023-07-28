@@ -387,6 +387,12 @@ const SBOMTable = ({
       } else if (field === 'name' || field === 'version') {
         const comparison = a.component[field].localeCompare(b.component[field])
         return order === 'asc' ? comparison : -comparison
+      } else if (field === 'vexVuln') {
+        const comparison =
+          a &&
+          b &&
+          a[field]?.vexStatus?.name.localeCompare(b[field]?.vexStatus?.name)
+        return order === 'asc' ? comparison : -comparison
       } else {
         const comparison = a[field].localeCompare(b[field])
         return order === 'asc' ? comparison : -comparison
@@ -754,13 +760,14 @@ const SBOMTable = ({
                           color='gray.400'
                           py={4}
                           position='relative'
-                          // onClick={() => handleVulSort('status')}
+                          onClick={() => handleVulSort('vexVuln')}
                           cursor={'pointer'}
                         >
                           <Flex direction={'row'} alignItems={'center'} gap={2}>
                             <Box>Status</Box>
                             <Box>
-                              {sortField === 'status' && sortOrder === 'asc' ? (
+                              {sortField === 'vexVuln' &&
+                              sortOrder === 'asc' ? (
                                 <TriangleUpIcon />
                               ) : (
                                 <TriangleDownIcon />
@@ -918,7 +925,7 @@ const SBOMTable = ({
                 )}
               </CardBody>
 
-              <Flex
+              {/* <Flex
                 flexDir={'row'}
                 gap={4}
                 alignItems={'center'}
@@ -940,7 +947,8 @@ const SBOMTable = ({
                   Next
                 </Button>
                 <chakra.span>Page - {currentPage}</chakra.span>
-              </Flex>
+              </Flex> */}
+              
             </TabPanel>
           </TabPanels>
         </Tabs>

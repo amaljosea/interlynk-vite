@@ -84,6 +84,7 @@ function Customer() {
     if (signedImgVerion) {
       console.log(`signedImgVerion`, signedImgVerion)
       setAllResults(signedImgVerion.imageVersion.imageVulns)
+      setSelectedVersion(signedImgVerion.imageVersion.id)
     }
   }, [signedImgVerion])
 
