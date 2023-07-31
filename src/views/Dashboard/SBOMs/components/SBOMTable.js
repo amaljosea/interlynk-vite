@@ -49,9 +49,10 @@ import { BiImport, BiExport } from 'react-icons/bi'
 import { BsFilterRight } from 'react-icons/bs'
 import SBOMDrawer from 'components/Drawer/SBOMDrawer'
 import { CSVLink } from 'react-csv'
-import { useMutation } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import { UpdateImageVersion } from 'graphQL/Mutation'
 import { ImageUpdate } from 'graphQL/Mutation'
+import { getImageVersion } from 'graphQL/Queries'
 
 const SBOMTable = ({
   scan,
@@ -59,7 +60,7 @@ const SBOMTable = ({
   data,
   filteredVul,
   setFilteredVulItems,
-  vulData,
+  versionId,
   imgVersionId,
   refetch,
   imageInfo,
@@ -80,7 +81,23 @@ const SBOMTable = ({
     scanEnabled
   } = useContext(GlobalContext)
 
-  const vulnData = [...vulData]
+  const [allVulResult, setAllVulResult] = useState([])
+
+  const { data: imageVersionData } = useQuery(getImageVersion, {
+    variables: {
+      id: versionId
+    },
+    notifyOnNetworkStatusChange: true
+  })
+
+  useEffect(() => {
+    if (imageVersionData) {
+      setAllVulResult(imageVersionData.imageVersion.imageVulns)
+      console.log('imageVersionData', imageVersionData)
+    }
+  }, [imageVersionData])
+
+  const vulnData = allVulResult
 
   const [imageVersionUpdate] = useMutation(UpdateImageVersion)
 
@@ -96,29 +113,6 @@ const SBOMTable = ({
 
   const [isLoading, setIsLoading] = useState(false)
 
-  const pageSize = 8 // Number of rows to display per page
-  const [currentPage, setCurrentPage] = useState(1)
-
-  // Calculate the index range for the current page
-  const startIndex = (currentPage - 1) * pageSize
-  const endIndex = startIndex + pageSize
-
-  const visibleData = vulnData.slice(startIndex, endIndex)
-
-  const totalPages = Math.ceil(vulnData.length / pageSize)
-
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1)
-    }
-  }
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1)
-    }
-  }
-
   const {
     isOpen: isSBMOpen,
     onOpen: setSBMOpen,
@@ -131,7 +125,7 @@ const SBOMTable = ({
     onClose: setRefreshClose
   } = useDisclosure()
 
-  const flattenedData = vulData.map((item, index) => {
+  const flattenedData = allVulResult.map((item, index) => {
     const allVulData = {
       ID: index + 1,
       CVEID: item.cveId,
@@ -363,15 +357,19 @@ const SBOMTable = ({
       const newSortOrder = sortOrder === 'asc' ? 'desc' : 'asc'
       setSortOrder(newSortOrder)
       sortVulnData(field, newSortOrder)
+      localStorage.setItem('vulSortField', field)
+      localStorage.setItem('vulSortOrder', newSortOrder)
     } else {
       setSortField(field)
       setSortOrder('asc')
       sortVulnData(field, 'asc')
+      localStorage.setItem('vulSortField', field)
+      localStorage.setItem('vulSortOrder', 'asc')
     }
   }
 
   const sortVulnData = (field, order) => {
-    const data = [...vulData]
+    const data = [...allVulResult]
     const sortedData = data.sort((a, b) => {
       if (
         field === 'v3Score' &&
@@ -400,6 +398,46 @@ const SBOMTable = ({
     })
     setVulnerabilitiesData(sortedData)
   }
+
+  useEffect(() => {
+    const field = localStorage.getItem('vulSortField')
+    const order = localStorage.getItem('vulSortOrder')
+    if (field && order) {
+      setSortField(field)
+      setSortOrder(order)
+      const data = [...allVulResult]
+      const sortedData = data.sort((a, b) => {
+        if (
+          field === 'v3Score' &&
+          typeof a.cvss[field] === 'number' &&
+          typeof b.cvss[field] === 'number'
+        ) {
+          return order === 'asc'
+            ? a.cvss[field] - b.cvss[field]
+            : b.cvss[field] - a.cvss[field]
+        } else if (field === 'severity') {
+          const comparison = a[field][0].localeCompare(b[field][0])
+          return order === 'asc' ? comparison : -comparison
+        } else if (field === 'name' || field === 'version') {
+          const comparison = a.component[field].localeCompare(
+            b.component[field]
+          )
+          return order === 'asc' ? comparison : -comparison
+        } else if (field === 'vexVuln') {
+          const comparison =
+            a &&
+            b &&
+            a[field]?.vexStatus?.name.localeCompare(b[field]?.vexStatus?.name)
+          return order === 'asc' ? comparison : -comparison
+        } else {
+          const comparison = a[field].localeCompare(b[field])
+          return order === 'asc' ? comparison : -comparison
+        }
+      })
+      setVulnerabilitiesData(sortedData)
+      // console.log('sortedData', sortedData)
+    }
+  }, [imageVersionData])
 
   const sortRiskData = (field, order) => {
     const sortedData = Risks.sort((a, b) => {
@@ -608,7 +646,7 @@ const SBOMTable = ({
               </CardHeader>
               <CardBody>
                 {/* <BasicTable data={vulData} columns={columns} /> */}
-                {vulData !== [] ? (
+                {allVulResult !== [] ? (
                   <Table variant='simple' color={textColor} size='sm'>
                     <Thead>
                       <Tr my='.8rem' pl='0px'>
@@ -623,11 +661,12 @@ const SBOMTable = ({
                           <Flex direction={'row'} alignItems={'center'} gap={2}>
                             <Box>CVE ID</Box>
                             <Box>
-                              {sortField === 'cveId' && sortOrder === 'asc' ? (
-                                <TriangleUpIcon />
-                              ) : (
-                                <TriangleDownIcon />
-                              )}
+                              {sortField === 'cveId' &&
+                                (sortOrder === 'asc' ? (
+                                  <TriangleUpIcon />
+                                ) : (
+                                  <TriangleDownIcon />
+                                ))}
                             </Box>
                           </Flex>
                         </Th>
@@ -642,11 +681,11 @@ const SBOMTable = ({
                             <Box>Severity</Box>
                             <Box>
                               {sortField === 'severity' &&
-                              sortOrder === 'asc' ? (
-                                <TriangleUpIcon />
-                              ) : (
-                                <TriangleDownIcon />
-                              )}
+                                (sortOrder === 'asc' ? (
+                                  <TriangleUpIcon />
+                                ) : (
+                                  <TriangleDownIcon />
+                                ))}
                             </Box>
                           </Flex>
                         </Th>
@@ -661,11 +700,11 @@ const SBOMTable = ({
                             <Box>CVSS</Box>
                             <Box>
                               {sortField === 'v3Score' &&
-                              sortOrder === 'asc' ? (
-                                <TriangleUpIcon />
-                              ) : (
-                                <TriangleDownIcon />
-                              )}
+                                (sortOrder === 'asc' ? (
+                                  <TriangleUpIcon />
+                                ) : (
+                                  <TriangleDownIcon />
+                                ))}
                             </Box>
                           </Flex>
                         </Th>
@@ -682,11 +721,12 @@ const SBOMTable = ({
                           <Flex direction={'row'} alignItems={'center'} gap={2}>
                             <Box>Component</Box>
                             <Box>
-                              {sortField === 'name' && sortOrder === 'asc' ? (
-                                <TriangleUpIcon />
-                              ) : (
-                                <TriangleDownIcon />
-                              )}
+                              {sortField === 'name' &&
+                                (sortOrder === 'asc' ? (
+                                  <TriangleUpIcon />
+                                ) : (
+                                  <TriangleDownIcon />
+                                ))}
                             </Box>
                           </Flex>
                         </Th>
@@ -701,11 +741,11 @@ const SBOMTable = ({
                             <Box>Version</Box>
                             <Box>
                               {sortField === 'version' &&
-                              sortOrder === 'asc' ? (
-                                <TriangleUpIcon />
-                              ) : (
-                                <TriangleDownIcon />
-                              )}
+                                (sortOrder === 'asc' ? (
+                                  <TriangleUpIcon />
+                                ) : (
+                                  <TriangleDownIcon />
+                                ))}
                             </Box>
                           </Flex>
                         </Th>
@@ -720,11 +760,11 @@ const SBOMTable = ({
                             <Box>Fixed (Component)</Box>
                             <Box>
                               {sortField === 'fixed_component' &&
-                              sortOrder === 'asc' ? (
-                                <TriangleUpIcon />
-                              ) : (
-                                <TriangleDownIcon />
-                              )}
+                                (sortOrder === 'asc' ? (
+                                  <TriangleUpIcon />
+                                ) : (
+                                  <TriangleDownIcon />
+                                ))}
                             </Box>
                           </Flex>
                         </Th>
@@ -739,11 +779,11 @@ const SBOMTable = ({
                             <Box>Fixed (Product)</Box>
                             <Box>
                               {sortField === 'fixed_product' &&
-                              sortOrder === 'asc' ? (
-                                <TriangleUpIcon />
-                              ) : (
-                                <TriangleDownIcon />
-                              )}
+                                (sortOrder === 'asc' ? (
+                                  <TriangleUpIcon />
+                                ) : (
+                                  <TriangleDownIcon />
+                                ))}
                             </Box>
                           </Flex>
                         </Th>
@@ -767,11 +807,11 @@ const SBOMTable = ({
                             <Box>Status</Box>
                             <Box>
                               {sortField === 'vexVuln' &&
-                              sortOrder === 'asc' ? (
-                                <TriangleUpIcon />
-                              ) : (
-                                <TriangleDownIcon />
-                              )}
+                                (sortOrder === 'asc' ? (
+                                  <TriangleUpIcon />
+                                ) : (
+                                  <TriangleDownIcon />
+                                ))}
                             </Box>
                           </Flex>
                         </Th>
@@ -793,7 +833,9 @@ const SBOMTable = ({
                               cvss={row.cvss.v3Score}
                               cve={row.cveId}
                               fixed_component={row.component.fixedInVersion}
-                              fixed_product={row.fixedInImage}
+                              fixed_product={
+                                row.vexVuln?.fixedByImageVersion?.name
+                              }
                               description={row.component.name}
                               status={row.vexVuln?.vexStatus}
                               justify={row.vexVuln?.vexJustification}
@@ -817,7 +859,9 @@ const SBOMTable = ({
                               cvss={row.cvss.v3Score}
                               cve={row.cveId}
                               fixed_component={row.component.fixedInVersion}
-                              fixed_product={row.fixedInImage}
+                              fixed_product={
+                                row.vexVuln?.fixedByImageVersion?.name
+                              }
                               description={row.component.name}
                               status={row.vexVuln?.vexStatus}
                               justify={row.vexVuln?.vexJustification}
@@ -842,7 +886,9 @@ const SBOMTable = ({
                                 cvss={row.cvss.v3Score}
                                 cve={row.cveId}
                                 fixed_component={row.component.fixedInVersion}
-                                fixed_product={row.fixedInImage}
+                                fixed_product={
+                                  row.vexVuln?.fixedByImageVersion?.name
+                                }
                                 description={row.component.name}
                                 status={row.vexVuln?.vexStatus}
                                 justify={row.vexVuln?.vexJustification}
@@ -853,22 +899,24 @@ const SBOMTable = ({
                               />
                             )
                           })
-                        : visibleData.length > 0
-                        ? visibleData.map((row, idx) => {
+                        : allVulResult.length > 0
+                        ? allVulResult.map((row, idx) => {
                             return (
                               <VulnerabilityRow
                                 refetch={refetch}
                                 key={idx}
                                 id={row.id}
                                 isRefresh={isLoading}
-                                severity={row.severity[0]}
                                 imgVersionId={imgVersionId}
+                                severity={row.severity[0]}
                                 component={row.component.name}
                                 version={row.component.version}
                                 cvss={row.cvss.v3Score}
                                 cve={row.cveId}
                                 fixed_component={row.component.fixedInVersion}
-                                fixed_product={row.fixedInImage}
+                                fixed_product={
+                                  row.vexVuln?.fixedByImageVersion?.name
+                                }
                                 description={row.component.name}
                                 status={row.vexVuln?.vexStatus}
                                 justify={row.vexVuln?.vexJustification}
@@ -948,7 +996,6 @@ const SBOMTable = ({
                 </Button>
                 <chakra.span>Page - {currentPage}</chakra.span>
               </Flex> */}
-              
             </TabPanel>
           </TabPanels>
         </Tabs>
