@@ -49,12 +49,9 @@ const ImageRow = ({
     setChecked(item.scanEnabled ? true : false)
   }, [item])
 
-  const handleChange = (e) => {
-    setChecked(!checked)
-    EnableImage(e.target.checked)
-  }
-
-  const [imageUpdate, { data }] = useMutation(ImageUpdate)
+  const [imageUpdate, { data }] = useMutation(ImageUpdate, {
+    onCompleted: refetch
+  })
 
   const EnableImage = async (e) => {
     try {
@@ -71,6 +68,11 @@ const ImageRow = ({
     }
   }
 
+  const handleChange = (e) => {
+    setChecked(!checked)
+    EnableImage(e.target.checked)
+  }
+
   const updateImage = async (e) => {
     try {
       setIsRefreshed(true)
@@ -80,7 +82,7 @@ const ImageRow = ({
           id: item.id,
           scanRefresh: true
         }
-      }).then(() => refetch())
+      })
     } catch (error) {
       console.error('Mutation error:', error)
     }

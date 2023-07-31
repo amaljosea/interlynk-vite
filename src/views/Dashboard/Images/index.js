@@ -41,6 +41,7 @@ import { useContext } from 'react'
 import GlobalContext from 'context/GlobalContext'
 import ImageRow from 'components/Tables/ImageRow'
 import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
+import { OrgConnectorRefresh } from 'graphQL/Mutation'
 
 const Index = () => {
   const toast = useToast()
@@ -101,6 +102,10 @@ const Index = () => {
     onCompleted: refetch
   })
   const [imageScannerRemove] = useMutation(RemoveScannerImage, {
+    onCompleted: refetch
+  })
+
+  const [organizationConnectorRefresh] = useMutation(OrgConnectorRefresh, {
     onCompleted: refetch
   })
 
@@ -211,11 +216,24 @@ const Index = () => {
     }
   }
 
-  useEffect(() => {
-    setTimeout(() => {
-      setIsLoading(false)
-    }, 5000)
-  }, [isLoading])
+  const onImageRefresh = async () => {
+    try {
+      setIsLoading(true)
+      await organizationConnectorRefresh().then(() => {
+        setTimeout(() => {
+          setIsLoading(false)
+        }, 2000)
+      })
+    } catch (error) {
+      if (error.networkError && error.networkError.statusCode === 500) {
+        // Handle the specific error
+        alert('Something went wrong')
+      } else {
+        // Handle other errors
+        alert(error.message)
+      }
+    }
+  }
 
   const handleImgSort = (field) => {
     if (field === sortField) {
@@ -228,6 +246,8 @@ const Index = () => {
       setSortField(field)
       setSortOrder('asc')
       sortImgData(field, 'asc')
+      localStorage.setItem('sortField', field)
+      localStorage.setItem('sortOrder', 'asc')
     }
   }
 
@@ -336,7 +356,7 @@ const Index = () => {
                   onChange={(e) => setSearchInput(e.target.value)}
                   fontSize={'sm'}
                 />
-                <Button colorScheme='blue' onClick={() => setIsLoading(true)}>
+                <Button colorScheme='blue' onClick={onImageRefresh}>
                   Refresh
                 </Button>
               </Flex>

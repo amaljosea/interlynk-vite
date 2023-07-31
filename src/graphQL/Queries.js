@@ -99,7 +99,7 @@ export const getImageVersion = gql`
       id
       image {
         id
-        name,
+        name
         scanEnabled
       }
       imageScanners {
@@ -110,6 +110,16 @@ export const getImageVersion = gql`
       }
       name
       updatedAt
+      lastPushedAt
+      imageScannerRun(id: $id) {
+        initiatedAt
+        completedAt
+        status
+        vulnDbVersion
+        dbLastUpdatedAt
+        scannerVersion
+        scannerId
+      }
       imageVulns(imageVersionId: $id) {
         cveId
         component {
@@ -118,6 +128,9 @@ export const getImageVersion = gql`
           version
         }
         vexVuln {
+          fixedByImageVersion {
+            name
+          }
           vexStatus {
             id
             name

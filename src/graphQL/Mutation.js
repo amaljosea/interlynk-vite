@@ -226,11 +226,18 @@ export const VexVulnCreate = gql`
       vexVuln {
         id
         cveId
+        compName
+        compVersion
         fixedByImageVersionId
+        fixedByImageVersion {
+          name
+        }
         vexJustification {
+          id
           name
         }
         vexStatus {
+          id
           name
         }
       }
@@ -318,6 +325,7 @@ export const DeleteShareLynk = gql`
     }
   }
 `
+
 
 export const OrgConnectorValidate = gql`
   mutation OrgConnectorValidate($id: ID!) {

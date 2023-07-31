@@ -52,12 +52,13 @@ function SBOMs() {
 
   const [selectedVersion, setSelectedVersion] = useState('')
   const [selectedScanner, setSelectedScanner] = useState('')
-  const [total, setTotal] = useState({ C: 0, H: 0, M: 0, L: 0 })
+  const [total, setTotal] = useState({ C: 0, H: 0, M: 0, L: 0, U: 0 })
   const [unresolve, setUnresolve] = useState({
     C: 0,
     H: 0,
     M: 0,
-    L: 0
+    L: 0,
+    U: 0
   })
 
   const [allResults, setAllResults] = useState([])
@@ -179,11 +180,13 @@ function SBOMs() {
     const high = totalCount['high'] || 0
     const medium = totalCount['medium' || 'unknown'] || 0
     const low = totalCount['low'] || 0
+    const unknown = totalCount['unknown'] || 0
     setTotal({
       C: critical,
       H: high,
       M: medium,
-      L: low
+      L: low,
+      U: unknown
     })
   }, [allResults])
 
@@ -191,12 +194,14 @@ function SBOMs() {
     const critical = unresolveCount['critical'] || 0
     const high = unresolveCount['high'] || 0
     const medium = unresolveCount['medium'] || 0
-    const low = unresolveCount['low' || 'unknown'] || 0
+    const low = unresolveCount['low'] || 0
+    const unknown = unresolveCount['unknown'] || 0
     setUnresolve({
       C: critical,
       H: high,
       M: medium,
-      L: low
+      L: low,
+      U: unknown
     })
   }, [allResults])
 
@@ -256,7 +261,7 @@ function SBOMs() {
                     Last Pushed:{' '}
                     {scanResults
                       ? `${
-                          new Date(scanResults.updatedAt).toLocaleDateString(
+                          new Date(scanResults.lastPushedAt).toLocaleDateString(
                             'en-US',
                             {
                               year: 'numeric',
@@ -266,7 +271,7 @@ function SBOMs() {
                             }
                           ) +
                           ' ' +
-                          new Date(scanResults.updatedAt).toLocaleTimeString(
+                          new Date(scanResults.lastPushedAt).toLocaleTimeString(
                             'en-US',
                             {
                               hour: 'numeric',
@@ -287,34 +292,46 @@ function SBOMs() {
                         gap={2}
                         mb={2}
                       >
-                        <Tooltip text={`${result.company}-${result.name}`}>
-                          <Image
-                            width={4}
-                            objectFit={'contain'}
-                            src={`${scanImage(result.name)}`}
-                            alt={result}
-                          />
-                        </Tooltip>
-                        <Text fontSize={'xs'}>
-                          {new Date(result.updatedAt).toLocaleDateString(
-                            'en-US',
-                            {
-                              year: 'numeric',
-                              month: '2-digit',
-                              day: '2-digit',
-                              timeZone: 'America/Los_Angeles'
-                            }
-                          )}{' '}
-                          {new Date(result.updatedAt).toLocaleTimeString(
-                            'en-US',
-                            {
-                              hour: 'numeric',
-                              minute: '2-digit',
-                              hour12: true,
-                              timeZone: 'America/Los_Angeles'
-                            }
-                          )}
-                        </Text>
+                        {scanResults.imageScannerRun.map(
+                          (scan) =>
+                            result.id === scan.scannerId && (
+                              <>
+                                <Tooltip
+                                  text={`${result.company}-${result.name}`}
+                                >
+                                  <Image
+                                    width={4}
+                                    objectFit={'contain'}
+                                    src={`${scanImage(result.name)}`}
+                                    alt={result}
+                                  />
+                                </Tooltip>
+                                <Text fontSize={'xs'}>
+                                  {scan.status === 'pending' && '! '}
+                                  {new Date(
+                                    scan.status === 'pending'
+                                      ? scan.dbLastUpdatedAt
+                                      : scan.completedAt
+                                  ).toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: '2-digit',
+                                    day: '2-digit',
+                                    timeZone: 'America/Los_Angeles'
+                                  })}{' '}
+                                  {new Date(
+                                    scan.status === 'pending'
+                                      ? scan.dbLastUpdatedAt
+                                      : scan.completedAt
+                                  ).toLocaleTimeString('en-US', {
+                                    hour: 'numeric',
+                                    minute: '2-digit',
+                                    hour12: true,
+                                    timeZone: 'America/Los_Angeles'
+                                  })}
+                                </Text>
+                              </>
+                            )
+                        )}
                       </Flex>
                     ))
                   ) : (
@@ -383,7 +400,7 @@ function SBOMs() {
           icon={<Icon h={'24px'} w={'24px'} color='white' as={FaBug} />}
           title={'Total Vulnerabilities'}
           description={'Vulnerabilities included in SBOM'}
-          amount={`${total.C}C,${total.H}H,${total.M}M,${total.L}L`}
+          amount={`${total.C}C,${total.H}H,${total.M}M,${total.L}L,${total.U}U`}
         />
         <Spacer />
         <SBOMStatistics
@@ -397,7 +414,7 @@ function SBOMs() {
           }
           title={'Unresolved Vulnerabilities'}
           description={'Vulnerabilities included in SBOM'}
-          amount={`${unresolve.C}C,${unresolve.H}H,${unresolve.M}M,${unresolve.L}L`}
+          amount={`${unresolve.C}C,${unresolve.H}H,${unresolve.M}M,${unresolve.L}L,${total.U}U`}
         />
         {/* <Spacer />
         <SBOMStatistics
@@ -407,13 +424,12 @@ function SBOMs() {
           amount={riskScoreVal !== '' ? riskScoreVal : 22}
         /> */}
       </Flex>
+
       <SBOMTable
         refetch={refetch}
         imgVersionId={imageVersionData ? imageVersionData.imageVersion.id : ''}
         scanResults={scanResults ? scanResults.imageScanners : []}
-        vulData={
-          imageVersionData ? imageVersionData.imageVersion.imageVulns : []
-        }
+        versionId={versionId}
         shareLynks={imageData ? imageData.image.shareLynks : []}
         imageDataRefetch={imageDataRefetch}
         imageInfo={imageInfo}
