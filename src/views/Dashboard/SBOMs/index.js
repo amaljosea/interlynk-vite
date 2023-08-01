@@ -35,6 +35,7 @@ import { useQuery } from '@apollo/client'
 import { scanImage } from 'utils'
 import { getImageVersion, getImage } from 'graphQL/Queries'
 import semver from 'semver'
+import { ImageVersionPagination } from 'graphQL/Queries'
 
 function SBOMs() {
   const [scanResults, setScanResults] = useState(null)
@@ -73,24 +74,39 @@ function SBOMs() {
     variables: { id: imageId }
   })
 
+  // const { data: imageVersionData, refetch, loading } = useQuery(
+  //   getImageVersion,
+  //   {
+  //     variables: {
+  //       id: versionId
+  //     },
+  //     notifyOnNetworkStatusChange: true
+  //   }
+  // )
+
   const { data: imageVersionData, refetch, loading } = useQuery(
-    getImageVersion,
+    ImageVersionPagination,
     {
-      variables: {
-        id: versionId
-      },
-      notifyOnNetworkStatusChange: true
+      variables: { imageVersionId: versionId, first: 10, after: '' }
     }
   )
 
   useEffect(() => {
     if (imageVersionData) {
-      setAllResults(imageVersionData.imageVersion.imageVulns)
-      setScanResults(imageVersionData.imageVersion)
       console.log('imageVersionData', imageVersionData)
       setSelectedVersion(imageVersionData.imageVersion.id)
+      setScanResults(imageVersionData.imageVersion)
     }
   }, [imageVersionData])
+
+  // useEffect(() => {
+  //   if (imageVersionData) {
+  //     setAllResults(imageVersionData.imageVersion.imageVulns)
+  //     setScanResults(imageVersionData.imageVersion)
+  //     console.log('imageVersionData', imageVersionData)
+  //     setSelectedVersion(imageVersionData.imageVersion.id)
+  //   }
+  // }, [imageVersionData])
 
   const [imageInfo, setImageInfo] = useState([])
 
@@ -125,7 +141,7 @@ function SBOMs() {
     const { value } = e.target
     setSelectedVersion(value)
     console.log('value', value)
-    refetch({ id: value })
+    refetch({ imageVersionId: value })
     queryParams.set('v', value)
     history.push(`/vendor/images?v=${value}&id=${imageId}`)
   }
@@ -307,7 +323,7 @@ function SBOMs() {
                                   />
                                 </Tooltip>
                                 <Text fontSize={'xs'}>
-                                  {scan.status === 'pending' && '! '}
+                                  {scan.status === 'failed' && '! '}
                                   {new Date(
                                     scan.status === 'pending'
                                       ? scan.dbLastUpdatedAt
@@ -429,7 +445,9 @@ function SBOMs() {
         refetch={refetch}
         imgVersionId={imageVersionData ? imageVersionData.imageVersion.id : ''}
         scanResults={scanResults ? scanResults.imageScanners : []}
-        versionId={versionId}
+        imageVulns={
+          imageVersionData && imageVersionData.imageVersion.imageVulns.nodes
+        }
         shareLynks={imageData ? imageData.image.shareLynks : []}
         imageDataRefetch={imageDataRefetch}
         imageInfo={imageInfo}

@@ -60,7 +60,7 @@ const SBOMTable = ({
   data,
   filteredVul,
   setFilteredVulItems,
-  versionId,
+  imageVulns,
   imgVersionId,
   refetch,
   imageInfo,
@@ -83,19 +83,12 @@ const SBOMTable = ({
 
   const [allVulResult, setAllVulResult] = useState([])
 
-  const { data: imageVersionData } = useQuery(getImageVersion, {
-    variables: {
-      id: versionId
-    },
-    notifyOnNetworkStatusChange: true
-  })
-
   useEffect(() => {
-    if (imageVersionData) {
-      setAllVulResult(imageVersionData.imageVersion.imageVulns)
-      console.log('imageVersionData', imageVersionData)
+    if (imageVulns) {
+      // setAllVulResult(imageVersionData.imageVersion.imageVulns)
+      console.log('imageVulns', imageVulns)
     }
-  }, [imageVersionData])
+  }, [imageVulns])
 
   const vulnData = allVulResult
 
@@ -437,7 +430,7 @@ const SBOMTable = ({
       setVulnerabilitiesData(sortedData)
       // console.log('sortedData', sortedData)
     }
-  }, [imageVersionData])
+  }, [])
 
   const sortRiskData = (field, order) => {
     const sortedData = Risks.sort((a, b) => {
@@ -646,7 +639,7 @@ const SBOMTable = ({
               </CardHeader>
               <CardBody>
                 {/* <BasicTable data={vulData} columns={columns} /> */}
-                {allVulResult !== [] ? (
+                {imageVulns?.length > 0 ? (
                   <Table variant='simple' color={textColor} size='sm'>
                     <Thead>
                       <Tr my='.8rem' pl='0px'>
@@ -966,7 +959,7 @@ const SBOMTable = ({
                     flexDirection={'row'}
                     alignItems={'center'}
                     justifyContent={'center'}
-                    mt={24}
+                    mt={14}
                   >
                     <Text>No vulnerability discovered on this tag</Text>
                   </Flex>

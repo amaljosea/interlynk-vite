@@ -284,3 +284,116 @@ export const GetSignedImageVersion = gql`
     }
   }
 `
+
+export const ImagePagination = gql`
+  query GetImagesForOrg($numOfImages: Int, $after: String, $before: String) {
+    images(
+      first: $numOfImages
+      after: $after
+      last: $numOfImages
+      before: $before
+    ) {
+      pageInfo {
+        hasPreviousPage
+        startCursor
+        endCursor
+        hasNextPage
+      }
+      nodes {
+        id
+        name
+        scanEnabled
+        organizationConnector {
+          id
+          name
+          connector {
+            name
+          }
+        }
+        lastPushedAt
+        imageScanners {
+          id
+          name
+          company
+        }
+        imageVersions {
+          id
+          name
+        }
+        updatedAt
+      }
+    }
+  }
+`
+
+export const ImageVersionPagination = gql`
+  query GetImageVersion(
+    $imageVersionId: ID!
+    $first: Int
+    $after: String
+    $last: Int
+    $before: String
+  ) {
+    imageVersion(id: $imageVersionId) {
+      id
+      image {
+        id
+        name
+        scanEnabled
+      }
+      imageScanners {
+        id
+        company
+        name
+        updatedAt
+      }
+      name
+      updatedAt
+      lastPushedAt
+      imageScannerRun(id: $imageVersionId) {
+        initiatedAt
+        completedAt
+        status
+        vulnDbVersion
+        dbLastUpdatedAt
+        scannerVersion
+        scannerId
+      }
+      imageVulns(
+        imageVersionId: $imageVersionId
+        first: $first
+        after: $after
+        last: $last
+        before: $before
+      ) {
+        pageInfo {
+          startCursor
+          hasPreviousPage
+          endCursor
+          hasNextPage
+        }
+        nodes {
+          cveId
+          component {
+            name
+            version
+            fixedInVersion
+          }
+          cvss {
+            v2Score
+            v3Score
+          }
+          severity
+          vexVuln {
+            vexJustification {
+              name
+            }
+            vexStatus {
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+`
