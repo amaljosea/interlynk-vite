@@ -19,15 +19,17 @@ import CardBody from 'components/Card/CardBody'
 
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { GetAllImages } from 'graphQL/Queries'
 
 import { scanImage } from 'utils'
 import { useQuery } from '@apollo/client'
 import { getConImg } from 'utils'
+import { ImagePagination } from 'graphQL/Queries'
 
 const ProductsOverview = ({ title, amount, captions, data }) => {
-  const { data: allImages } = useQuery(GetAllImages, {
-    variables: {}
+  const { data: allImages } = useQuery(ImagePagination, {
+    variables: {
+      numOfImages: 10
+    }
   })
 
   // useEffect(() => {
@@ -62,24 +64,25 @@ const ProductsOverview = ({ title, amount, captions, data }) => {
               </Thead>
               <Tbody>
                 {allImages ? (
-                  allImages.images.map((item) => (
+                  allImages.images.nodes.map((item) => (
                     <Tr key={item.id}>
                       <Td fontSize={'sm'} pl={1}>
-                      {item.imageVersions && item.imageVersions.length > 0 ? (
-                        <Link
-                          to={`/vendor/images?v=${
-                            item.imageVersions[item.imageVersions.length - 1].id
-                          }&id=${item.id}`}
-                          style={{
-                            color: '#3182CE',
-                            textDecoration: 'underline'
-                          }}
-                        >
-                          {item.name}
-                        </Link>
-                      ) : (
-                        <Text>{item.name}</Text>
-                      )}
+                        {item.imageVersions && item.imageVersions.length > 0 ? (
+                          <Link
+                            to={`/vendor/images?v=${
+                              item.imageVersions[item.imageVersions.length - 1]
+                                .id
+                            }&id=${item.id}`}
+                            style={{
+                              color: '#3182CE',
+                              textDecoration: 'underline'
+                            }}
+                          >
+                            {item.name}
+                          </Link>
+                        ) : (
+                          <Text>{item.name}</Text>
+                        )}
                       </Td>
                       <Td fontSize={'sm'} pl={1}>
                         <Flex

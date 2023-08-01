@@ -22,26 +22,26 @@ import {
   useToast,
   Box
 } from '@chakra-ui/react'
-import React from 'react'
-import { useState } from 'react'
-import { useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import ImagesDrawer from 'components/Drawer/ImagesDrawer'
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
-import { getAllScanners } from 'graphQL/Queries'
 import { useMutation, useQuery } from '@apollo/client'
-import { GetAllImages } from 'graphQL/Queries'
 import SBOM from 'views/Dashboard/SBOMs'
-import { GetAllOrgConnectors } from 'graphQL/Queries'
-import { AddScannerImage } from 'graphQL/Mutation'
-import { RemoveScannerImage } from 'graphQL/Mutation'
+import {
+  GetAllOrgConnectors,
+  ImagePagination,
+  getAllScanners
+} from 'graphQL/Queries'
+import {
+  AddScannerImage,
+  RemoveScannerImage,
+  OrgConnectorRefresh
+} from 'graphQL/Mutation'
 import { Link, useLocation } from 'react-router-dom'
-import { useContext } from 'react'
 import GlobalContext from 'context/GlobalContext'
 import ImageRow from 'components/Tables/ImageRow'
-import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
-import { OrgConnectorRefresh } from 'graphQL/Mutation'
 
 const Index = () => {
   const toast = useToast()
@@ -50,8 +50,6 @@ const Index = () => {
   const queryParams = new URLSearchParams(location.search)
   const versionId = queryParams.get('v')
   const imageId = queryParams.get('id')
-
-  // console.log('versionId', versionId)
 
   const { setVulnerabilitiesData, setScannerItems } = useContext(GlobalContext)
 
@@ -82,9 +80,25 @@ const Index = () => {
     }
   }, [allScanners])
 
-  const { data: allImages, refetch } = useQuery(GetAllImages, {
-    variables: {}
+  const { data: allImages, refetch } = useQuery(ImagePagination, {
+    variables: { numOfImages: 10 }
   })
+
+  const handlePreviousPage = () => {
+    refetch({
+      numOfImages: 10,
+      before: allImages.images.pageInfo.startCursor,
+      after: ''
+    })
+  }
+
+  const handleNextPage = () => {
+    refetch({
+      numOfImages: 10,
+      after: allImages.images.pageInfo.endCursor,
+      before: ''
+    })
+  }
 
   // useEffect(() => {
   //   if (allImages) {
@@ -92,11 +106,11 @@ const Index = () => {
   //   }
   // }, [allImages])
 
-  const filteredImages =
-    allImages &&
-    allImages.images.filter((item) =>
-      item.name.toLowerCase().includes(searchInput.toLowerCase())
-    )
+  // const filteredImages =
+  //   allImages &&
+  //   allImages.images.filter((item) =>
+  //     item.name.toLowerCase().includes(searchInput.toLowerCase())
+  //   )
 
   const [imageScannerAdd] = useMutation(AddScannerImage, {
     onCompleted: refetch
@@ -189,8 +203,6 @@ const Index = () => {
   const existingScanners =
     activeScanners && activeScanners.map((item) => item.id)
 
-  // console.log('existingScanners', existingScanners)
-
   const filteredScanners =
     allScanners &&
     allScanners.scanners.filter(
@@ -251,45 +263,45 @@ const Index = () => {
     }
   }
 
-  useEffect(() => {
-    const field = localStorage.getItem('sortField')
-    const order = localStorage.getItem('sortOrder')
-    if (field) setSortField(field)
-    if (order) setSortOrder(order)
-    if (allImages && field && order) {
-      const data = allImages && allImages.images
-      const sortedData = [...data].sort((a, b) => {
-        if (
-          field === 'imageVersions' &&
-          typeof a[field].length === 'number' &&
-          typeof b[field].length === 'number'
-        ) {
-          return order === 'asc'
-            ? a[field].length - b[field].length
-            : b[field].length - a[field].length
-        } else if (field === 'lastPushedAt') {
-          const comparison = a[field].localeCompare(b[field])
-          return order === 'asc' ? comparison : -comparison
-        } else if (field === 'scanEnabled') {
-          const aValue = a[field]
-          const bValue = b[field]
-          if (order === 'asc') {
-            return aValue > bValue ? 1 : -1
-          } else {
-            return aValue < bValue ? 1 : -1
-          }
-        } else if (field === 'organizationConnector') {
-          const comparison = a[field].name.localeCompare(b[field].name)
-          return order === 'asc' ? comparison : -comparison
-        } else {
-          const comparison = a[field].localeCompare(b[field])
-          return order === 'asc' ? comparison : -comparison
-        }
-      })
-      // console.log('sortedData', sortedData)
-      setImageData(sortedData)
-    }
-  }, [allImages])
+  // useEffect(() => {
+  //   const field = localStorage.getItem('sortField')
+  //   const order = localStorage.getItem('sortOrder')
+  //   if (field) setSortField(field)
+  //   if (order) setSortOrder(order)
+  //   if (allImages && field && order) {
+  //     const data = allImages && allImages.images
+  //     const sortedData = [...data].sort((a, b) => {
+  //       if (
+  //         field === 'imageVersions' &&
+  //         typeof a[field].length === 'number' &&
+  //         typeof b[field].length === 'number'
+  //       ) {
+  //         return order === 'asc'
+  //           ? a[field].length - b[field].length
+  //           : b[field].length - a[field].length
+  //       } else if (field === 'lastPushedAt') {
+  //         const comparison = a[field].localeCompare(b[field])
+  //         return order === 'asc' ? comparison : -comparison
+  //       } else if (field === 'scanEnabled') {
+  //         const aValue = a[field]
+  //         const bValue = b[field]
+  //         if (order === 'asc') {
+  //           return aValue > bValue ? 1 : -1
+  //         } else {
+  //           return aValue < bValue ? 1 : -1
+  //         }
+  //       } else if (field === 'organizationConnector') {
+  //         const comparison = a[field].name.localeCompare(b[field].name)
+  //         return order === 'asc' ? comparison : -comparison
+  //       } else {
+  //         const comparison = a[field].localeCompare(b[field])
+  //         return order === 'asc' ? comparison : -comparison
+  //       }
+  //     })
+  //     // console.log('sortedData', sortedData)
+  //     setImageData(sortedData)
+  //   }
+  // }, [allImages])
 
   const sortImgData = (field, order) => {
     const data = allImages && allImages.images
@@ -346,7 +358,7 @@ const Index = () => {
                 width={'100%'}
                 direction={'row'}
                 alignItems={'center'}
-                justifyContent={'space-between'}
+                justifyContent={'flex-end'}
               >
                 <Input
                   placeholder='Search'
@@ -355,151 +367,44 @@ const Index = () => {
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                   fontSize={'sm'}
+                  display={'none'}
                 />
                 <Button colorScheme='blue' onClick={onImageRefresh}>
                   Refresh
                 </Button>
               </Flex>
             </CardHeader>
-            <CardBody mt={2}>
+            <CardBody mt={4}>
               <Table variant='simple'>
                 <Thead>
                   <Tr>
-                    <Th
-                      color={'gray.'}
-                      pl={1}
-                      position='relative'
-                      cursor={'pointer'}
-                      onClick={() => handleImgSort('scanEnabled')}
-                    >
-                      <Flex direction={'row'} alignItems={'center'} gap={2}>
-                        <Box>Scan</Box>
-                        <Box>
-                          {sortField === 'scanEnabled' &&
-                            (sortOrder === 'asc' ? (
-                              <TriangleUpIcon />
-                            ) : (
-                              <TriangleDownIcon />
-                            ))}
-                        </Box>
-                      </Flex>
+                    <Th pl={1}>
+                      <Box>Scan</Box>
                     </Th>
-                    <Th
-                      color={'gray.'}
-                      pl={1}
-                      position='relative'
-                      onClick={() => handleImgSort('name')}
-                      cursor={'pointer'}
-                    >
-                      <Flex direction={'row'} alignItems={'center'} gap={2}>
-                        <Box>Image</Box>
-                        <Box>
-                          {sortField === 'name' &&
-                            (sortOrder === 'asc' ? (
-                              <TriangleUpIcon />
-                            ) : (
-                              <TriangleDownIcon />
-                            ))}
-                        </Box>
-                      </Flex>
+                    <Th pl={1}>
+                      <Box>Image</Box>
                     </Th>
-                    <Th
-                      color={'gray.'}
-                      pl={1}
-                      position='relative'
-                      onClick={() => handleImgSort('organizationConnector')}
-                      cursor={'pointer'}
-                    >
-                      <Flex direction={'row'} alignItems={'center'} gap={2}>
-                        <Box>Connector</Box>
-                        <Box>
-                          {sortField === 'organizationConnector' &&
-                            (sortOrder === 'asc' ? (
-                              <TriangleUpIcon />
-                            ) : (
-                              <TriangleDownIcon />
-                            ))}
-                        </Box>
-                      </Flex>
+                    <Th pl={1}>
+                      <Box>Connector</Box>
                     </Th>
-                    <Th
-                      color={'gray.'}
-                      pl={1}
-                      position='relative'
-                      onClick={() => handleImgSort('imageVersions')}
-                      cursor={'pointer'}
-                    >
-                      <Flex direction={'row'} alignItems={'center'} gap={2}>
-                        <Box>Tags</Box>
-                        <Box>
-                          {sortField === 'imageVersions' &&
-                            (sortOrder === 'asc' ? (
-                              <TriangleUpIcon />
-                            ) : (
-                              <TriangleDownIcon />
-                            ))}
-                        </Box>
-                      </Flex>
+                    <Th pl={1}>
+                      <Box>Tags</Box>
                     </Th>
-                    <Th
-                      color={'gray.'}
-                      pl={1}
-                      position='relative'
-                      onClick={() => handleImgSort('lastPushedAt')}
-                      cursor={'pointer'}
-                    >
-                      <Flex direction={'row'} alignItems={'center'} gap={2}>
-                        <Box>Last Pushed</Box>
-                        <Box>
-                          {sortField === 'lastPushedAt' &&
-                            (sortOrder === 'asc' ? (
-                              <TriangleUpIcon />
-                            ) : (
-                              <TriangleDownIcon />
-                            ))}
-                        </Box>
-                      </Flex>
+                    <Th pl={1}>
+                      <Box>Last Pushed</Box>
                     </Th>
-                    <Th color={'gray.'} pl={1} position='relative'>
+                    <Th pl={1}>
                       <Box>Scanners</Box>
                     </Th>
-                    <Th color={'gray.'} pl={1} position='relative'>
+                    <Th pl={1}>
                       <Box>Actions</Box>
                     </Th>
                   </Tr>
                 </Thead>
 
                 <Tbody>
-                  {searchInput !== '' ? (
-                    filteredImages.map((item, index) => (
-                      <ImageRow
-                        key={index}
-                        item={item}
-                        refetch={refetch}
-                        isLoading={isLoading}
-                        setSelectedImage={setSelectedImage}
-                        setActiveScanners={setActiveScanners}
-                        onScanOpen={onScanOpen}
-                        onDeleteOpen={onDeleteOpen}
-                        filteredScanners={filteredScanners}
-                      />
-                    ))
-                  ) : imageData.length > 0 ? (
-                    imageData.map((item, index) => (
-                      <ImageRow
-                        key={index}
-                        item={item}
-                        refetch={refetch}
-                        isLoading={isLoading}
-                        setSelectedImage={setSelectedImage}
-                        setActiveScanners={setActiveScanners}
-                        onScanOpen={onScanOpen}
-                        onDeleteOpen={onDeleteOpen}
-                      />
-                    ))
-                  ) : allImages ? (
-                    allImages.images.length > 0 &&
-                    allImages.images.map((item, index) => (
+                  {allImages ? (
+                    allImages.images.nodes.map((item, index) => (
                       <ImageRow
                         key={index}
                         item={item}
@@ -539,6 +444,30 @@ const Index = () => {
                 </Tbody>
               </Table>
             </CardBody>
+            <Flex
+              flexDir={'row'}
+              gap={4}
+              alignItems={'center'}
+              mt={6}
+              justifyContent={'flex-start'}
+            >
+              <Button
+                colorScheme='blue'
+                onClick={handlePreviousPage}
+                isDisabled={
+                  allImages && !allImages.images.pageInfo.hasPreviousPage
+                }
+              >
+                Previous
+              </Button>
+              <Button
+                colorScheme='blue'
+                onClick={handleNextPage}
+                isDisabled={allImages && !allImages.images.pageInfo.hasNextPage}
+              >
+                Next
+              </Button>
+            </Flex>
           </Card>
 
           {orgConnectors &&
@@ -565,7 +494,7 @@ const Index = () => {
             </Flex>
           ) : (
             allImages &&
-            allImages.images.length === 0 && (
+            allImages.images.nodes.length === 0 && (
               <Flex
                 mx={'auto'}
                 p={24}

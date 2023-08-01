@@ -284,3 +284,122 @@ export const GetSignedImageVersion = gql`
     }
   }
 `
+
+export const ImagePagination = gql`
+  query GetImagesForOrg($numOfImages: Int, $after: String, $before: String) {
+    images(
+      first: $numOfImages
+      after: $after
+      last: $numOfImages
+      before: $before
+    ) {
+      pageInfo {
+        hasPreviousPage
+        startCursor
+        endCursor
+        hasNextPage
+      }
+      nodes {
+        id
+        name
+        scanEnabled
+        organizationConnector {
+          id
+          name
+          connector {
+            name
+          }
+        }
+        lastPushedAt
+        imageScanners {
+          id
+          name
+          company
+        }
+        imageVersions {
+          id
+          name
+        }
+        updatedAt
+      }
+    }
+  }
+`
+
+export const ImageVersionPagination = gql`
+  query GetImageVersion(
+    $imageVersionId: ID!
+    $numOfVulns: Int
+    $after: String
+    $before: String
+  ) {
+    imageVersion(id: $imageVersionId) {
+      id
+      image {
+        id
+        name
+        scanEnabled
+      }
+      imageScanners {
+        id
+        company
+        name
+        updatedAt
+      }
+      name
+      updatedAt
+      lastPushedAt
+      imageScannerRun(id: $imageVersionId) {
+        initiatedAt
+        completedAt
+        status
+        vulnDbVersion
+        dbLastUpdatedAt
+        scannerVersion
+        scannerId
+      }
+      imageVulns(
+        imageVersionId: $imageVersionId
+        first: $numOfVulns
+        after: $after
+        last: $numOfVulns
+        before: $before
+      ) {
+        pageInfo {
+          startCursor
+          hasPreviousPage
+          endCursor
+          hasNextPage
+        }
+        nodes {
+          cveId
+          component {
+            name
+            version
+            fixedInVersion
+          }
+          cvss {
+            v2Score
+            v3Score
+          }
+          severity
+          fixedInImage
+          scanners {
+            id
+            name
+            company
+            updatedAt
+          }
+          vexVuln {
+            vexJustification {
+              name
+            }
+            vexStatus {
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+`
