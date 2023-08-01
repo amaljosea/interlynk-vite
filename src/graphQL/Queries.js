@@ -329,9 +329,8 @@ export const ImagePagination = gql`
 export const ImageVersionPagination = gql`
   query GetImageVersion(
     $imageVersionId: ID!
-    $first: Int
+    $numOfVulns: Int
     $after: String
-    $last: Int
     $before: String
   ) {
     imageVersion(id: $imageVersionId) {
@@ -361,9 +360,9 @@ export const ImageVersionPagination = gql`
       }
       imageVulns(
         imageVersionId: $imageVersionId
-        first: $first
+        first: $numOfVulns
         after: $after
-        last: $last
+        last: $numOfVulns
         before: $before
       ) {
         pageInfo {
@@ -384,6 +383,13 @@ export const ImageVersionPagination = gql`
             v3Score
           }
           severity
+          fixedInImage
+          scanners {
+            id
+            name
+            company
+            updatedAt
+          }
           vexVuln {
             vexJustification {
               name

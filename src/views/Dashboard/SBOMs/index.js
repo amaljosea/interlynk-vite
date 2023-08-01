@@ -87,9 +87,25 @@ function SBOMs() {
   const { data: imageVersionData, refetch, loading } = useQuery(
     ImageVersionPagination,
     {
-      variables: { imageVersionId: versionId, first: 10, after: '' }
+      variables: { imageVersionId: versionId, numOfVulns: 10 }
     }
   )
+
+  const handlePreviousPage = () => {
+    refetch({
+      numOfVulns: 10,
+      before: imageVersionData.imageVersion.imageVulns.pageInfo.startCursor,
+      after: ''
+    })
+  }
+
+  const handleNextPage = () => {
+    refetch({
+      numOfVulns: 10,
+      after: imageVersionData.imageVersion.imageVulns.pageInfo.endCursor,
+      before: ''
+    })
+  }
 
   useEffect(() => {
     if (imageVersionData) {
@@ -445,9 +461,7 @@ function SBOMs() {
         refetch={refetch}
         imgVersionId={imageVersionData ? imageVersionData.imageVersion.id : ''}
         scanResults={scanResults ? scanResults.imageScanners : []}
-        imageVulns={
-          imageVersionData && imageVersionData.imageVersion.imageVulns.nodes
-        }
+        imageVersionData={imageVersionData && imageVersionData.imageVersion}
         shareLynks={imageData ? imageData.image.shareLynks : []}
         imageDataRefetch={imageDataRefetch}
         imageInfo={imageInfo}
@@ -457,6 +471,8 @@ function SBOMs() {
         shareLynkLoading={shareLynkLoading}
         setFilteredVulItems={setFilteredVulItems}
         imageId={imageId}
+        handlePreviousPage={handlePreviousPage}
+        handleNextPage={handleNextPage}
       />
     </Flex>
   )

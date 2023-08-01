@@ -60,7 +60,7 @@ const SBOMTable = ({
   data,
   filteredVul,
   setFilteredVulItems,
-  imageVulns,
+  imageVersionData,
   imgVersionId,
   refetch,
   imageInfo,
@@ -68,7 +68,9 @@ const SBOMTable = ({
   imageDataRefetch,
   scanResults,
   loading,
-  shareLynkLoading
+  shareLynkLoading,
+  handlePreviousPage,
+  handleNextPage
 }) => {
   const {
     vulnerabilitiesData,
@@ -84,11 +86,10 @@ const SBOMTable = ({
   const [allVulResult, setAllVulResult] = useState([])
 
   useEffect(() => {
-    if (imageVulns) {
-      // setAllVulResult(imageVersionData.imageVersion.imageVulns)
-      console.log('imageVulns', imageVulns)
+    if (imageVersionData) {
+      console.log('image version data', imageVersionData.imageVulns.nodes)
     }
-  }, [imageVulns])
+  }, [imageVersionData])
 
   const vulnData = allVulResult
 
@@ -639,7 +640,8 @@ const SBOMTable = ({
               </CardHeader>
               <CardBody>
                 {/* <BasicTable data={vulData} columns={columns} /> */}
-                {imageVulns?.length > 0 ? (
+                {imageVersionData &&
+                imageVersionData.imageVulns.nodes.length > 0 ? (
                   <Table variant='simple' color={textColor} size='sm'>
                     <Thead>
                       <Tr my='.8rem' pl='0px'>
@@ -812,88 +814,9 @@ const SBOMTable = ({
                       </Tr>
                     </Thead>
                     <Tbody>
-                      {searchInput !== ''
-                        ? filteredRow.map((row, idx) => (
-                            <VulnerabilityRow
-                              refetch={refetch}
-                              key={idx}
-                              id={row.id}
-                              isRefresh={isLoading}
-                              severity={row.severity[0]}
-                              imgVersionId={imgVersionId}
-                              component={row.component.name}
-                              version={row.component.version}
-                              cvss={row.cvss.v3Score}
-                              cve={row.cveId}
-                              fixed_component={row.component.fixedInVersion}
-                              fixed_product={
-                                row.vexVuln?.fixedByImageVersion?.name
-                              }
-                              description={row.component.name}
-                              status={row.vexVuln?.vexStatus}
-                              justify={row.vexVuln?.vexJustification}
-                              scanner={row.scanners}
-                              shared_data={row.component.name}
-                              versions={row.component.name}
-                              imageInfo={imageInfo}
-                            />
-                          ))
-                        : vulnerabilitiesData.length > 0
-                        ? vulnerabilitiesData.map((row, idx) => (
-                            <VulnerabilityRow
-                              refetch={refetch}
-                              key={idx}
-                              id={row.id}
-                              isRefresh={isLoading}
-                              severity={row.severity[0]}
-                              imgVersionId={imgVersionId}
-                              component={row.component.name}
-                              version={row.component.version}
-                              cvss={row.cvss.v3Score}
-                              cve={row.cveId}
-                              fixed_component={row.component.fixedInVersion}
-                              fixed_product={
-                                row.vexVuln?.fixedByImageVersion?.name
-                              }
-                              description={row.component.name}
-                              status={row.vexVuln?.vexStatus}
-                              justify={row.vexVuln?.vexJustification}
-                              scanner={row.scanners}
-                              shared_data={row.component.name}
-                              versions={row.component.name}
-                              imageInfo={imageInfo}
-                            />
-                          ))
-                        : filteredVul.length > 0
-                        ? filteredVul.map((row, idx) => {
-                            return (
-                              <VulnerabilityRow
-                                refetch={refetch}
-                                key={idx}
-                                id={row.id}
-                                isRefresh={isLoading}
-                                imgVersionId={imgVersionId}
-                                severity={row.severity[0]}
-                                component={row.component.name}
-                                version={row.component.version}
-                                cvss={row.cvss.v3Score}
-                                cve={row.cveId}
-                                fixed_component={row.component.fixedInVersion}
-                                fixed_product={
-                                  row.vexVuln?.fixedByImageVersion?.name
-                                }
-                                description={row.component.name}
-                                status={row.vexVuln?.vexStatus}
-                                justify={row.vexVuln?.vexJustification}
-                                scanner={row.scanners}
-                                shared_data={row.component.name}
-                                versions={row.component.name}
-                                imageInfo={imageInfo}
-                              />
-                            )
-                          })
-                        : allVulResult.length > 0
-                        ? allVulResult.map((row, idx) => {
+                      {imageVersionData &&
+                      imageVersionData.imageVulns.nodes.length > 0
+                        ? imageVersionData.imageVulns.nodes.map((row, idx) => {
                             return (
                               <VulnerabilityRow
                                 refetch={refetch}
@@ -966,7 +889,7 @@ const SBOMTable = ({
                 )}
               </CardBody>
 
-              {/* <Flex
+              <Flex
                 flexDir={'row'}
                 gap={4}
                 alignItems={'center'}
@@ -976,19 +899,24 @@ const SBOMTable = ({
                 <Button
                   colorScheme='blue'
                   onClick={handlePreviousPage}
-                  isDisabled={currentPage === 1}
+                  isDisabled={
+                    imageVersionData &&
+                    !imageVersionData.imageVulns.pageInfo.hasPreviousPage
+                  }
                 >
                   Previous
                 </Button>
                 <Button
                   colorScheme='blue'
                   onClick={handleNextPage}
-                  isDisabled={currentPage === totalPages}
+                  isDisabled={
+                    imageVersionData &&
+                    !imageVersionData.imageVulns.pageInfo.hasNextPage
+                  }
                 >
                   Next
                 </Button>
-                <chakra.span>Page - {currentPage}</chakra.span>
-              </Flex> */}
+              </Flex>
             </TabPanel>
           </TabPanels>
         </Tabs>
