@@ -81,30 +81,36 @@ const Index = () => {
   }, [allScanners])
 
   const { data: allImages, refetch } = useQuery(ImagePagination, {
-    variables: { numOfImages: 10 }
+    variables: { first: 10 }
   })
 
   const handlePreviousPage = () => {
-    refetch({
-      numOfImages: 10,
-      before: allImages.images.pageInfo.startCursor,
-      after: ''
-    })
+    if (allImages.images.pageInfo.hasPreviousPage) {
+      refetch({
+        first: undefined,
+        last: 10,
+        before: `${allImages.images.pageInfo.startCursor}`,
+        after: ''
+      })
+    }
   }
 
   const handleNextPage = () => {
-    refetch({
-      numOfImages: 10,
-      after: allImages.images.pageInfo.endCursor,
-      before: ''
-    })
+    if (allImages.images.pageInfo.hasNextPage) {
+      refetch({
+        first: 10,
+        last: undefined,
+        after: `${allImages.images.pageInfo.endCursor}`,
+        before: ''
+      })
+    }
   }
 
-  // useEffect(() => {
-  //   if (allImages) {
-  //     console.log(`all Images`, allImages)
-  //   }
-  // }, [allImages])
+  useEffect(() => {
+    if (allImages) {
+      console.log(`all Images`, allImages)
+    }
+  }, [allImages])
 
   // const filteredImages =
   //   allImages &&

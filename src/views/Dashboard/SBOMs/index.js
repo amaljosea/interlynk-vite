@@ -9,7 +9,6 @@ import {
   Text,
   Box,
   Select,
-  chakra,
   Image,
   Skeleton,
   Tag,
@@ -33,9 +32,12 @@ import GlobalContext from 'context/GlobalContext'
 import Tooltip from 'components/Tooltip'
 import { useQuery } from '@apollo/client'
 import { scanImage } from 'utils'
-import { getImageVersion, getImage } from 'graphQL/Queries'
+import { getImage } from 'graphQL/Queries'
 import semver from 'semver'
-import { ImageVersionPagination } from 'graphQL/Queries'
+import { GetImgVersionPagination } from 'graphQL/Queries'
+import { getAllScanners } from 'graphQL/Queries'
+import { timeSince } from 'utils'
+import { formattedTime } from 'utils'
 
 function SBOMs() {
   const [scanResults, setScanResults] = useState(null)
@@ -50,6 +52,10 @@ function SBOMs() {
   const queryParams = new URLSearchParams(location.search)
   const versionId = queryParams.get('v')
   const imageId = queryParams.get('id')
+
+  // useEffect(() => {
+  //   console.log(`versionId`, versionId)
+  // }, [versionId])
 
   const [selectedVersion, setSelectedVersion] = useState('')
   const [selectedScanner, setSelectedScanner] = useState('')
@@ -66,6 +72,8 @@ function SBOMs() {
 
   const [filteredVulItems, setFilteredVulItems] = useState([])
 
+  const [scannerRun, setScannerRun] = useState([])
+
   const {
     data: imageData,
     refetch: imageDataRefetch,
@@ -74,55 +82,50 @@ function SBOMs() {
     variables: { id: imageId }
   })
 
-  // const { data: imageVersionData, refetch, loading } = useQuery(
-  //   getImageVersion,
-  //   {
-  //     variables: {
-  //       id: versionId
-  //     },
-  //     notifyOnNetworkStatusChange: true
-  //   }
-  // )
+  const { data: allScanners } = useQuery(getAllScanners)
+
+  const scannerName = (id) => {
+    if (allScanners) {
+      const scanner = allScanners.scanners.find((item) => item.id === id)
+      return scanner.name
+    }
+  }
 
   const { data: imageVersionData, refetch, loading } = useQuery(
-    ImageVersionPagination,
+    GetImgVersionPagination,
     {
-      variables: { imageVersionId: versionId, numOfVulns: 10 }
+      variables: { imageVersionId: versionId, first: 30 }
     }
   )
-
-  const handlePreviousPage = () => {
-    refetch({
-      numOfVulns: 10,
-      before: imageVersionData.imageVersion.imageVulns.pageInfo.startCursor,
-      after: ''
-    })
-  }
-
-  const handleNextPage = () => {
-    refetch({
-      numOfVulns: 10,
-      after: imageVersionData.imageVersion.imageVulns.pageInfo.endCursor,
-      before: ''
-    })
-  }
 
   useEffect(() => {
     if (imageVersionData) {
       console.log('imageVersionData', imageVersionData)
       setSelectedVersion(imageVersionData.imageVersion.id)
+      setScannerRun(imageVersionData.imageVersion.imageScannerRun)
       setScanResults(imageVersionData.imageVersion)
     }
   }, [imageVersionData])
 
-  // useEffect(() => {
-  //   if (imageVersionData) {
-  //     setAllResults(imageVersionData.imageVersion.imageVulns)
-  //     setScanResults(imageVersionData.imageVersion)
-  //     console.log('imageVersionData', imageVersionData)
-  //     setSelectedVersion(imageVersionData.imageVersion.id)
-  //   }
-  // }, [imageVersionData])
+  const onPreviousPage = () => {
+    refetch({
+      imageVersionId: versionId,
+      first: undefined,
+      last: 30,
+      before: imageVersionData.imageVersion.imageVulns.pageInfo.startCursor,
+      after: ''
+    })
+  }
+
+  const onNextPage = () => {
+    refetch({
+      imageVersionId: versionId,
+      first: 30,
+      last: undefined,
+      after: imageVersionData.imageVersion.imageVulns.pageInfo.endCursor,
+      before: ''
+    })
+  }
 
   const [imageInfo, setImageInfo] = useState([])
 
@@ -156,8 +159,8 @@ function SBOMs() {
     setFilteredVulItems([])
     const { value } = e.target
     setSelectedVersion(value)
-    console.log('value', value)
-    refetch({ imageVersionId: value })
+    // console.log('value', value)
+    refetch({ imageVersionId: value, first: 30 })
     queryParams.set('v', value)
     history.push(`/vendor/images?v=${value}&id=${imageId}`)
   }
@@ -325,9 +328,9 @@ function SBOMs() {
                         mb={2}
                       >
                         {scanResults.imageScannerRun.map(
-                          (scan) =>
+                          (scan, index) =>
                             result.id === scan.scannerId && (
-                              <>
+                              <Flex flexDirection={'row'} gap={3} key={index}>
                                 <Tooltip
                                   text={`${result.company}-${result.name}`}
                                 >
@@ -361,7 +364,7 @@ function SBOMs() {
                                     timeZone: 'America/Los_Angeles'
                                   })}
                                 </Text>
-                              </>
+                              </Flex>
                             )
                         )}
                       </Flex>
@@ -420,6 +423,39 @@ function SBOMs() {
           </Grid>
         </CardBody>
       </Card>
+      {scannerRun.length > 0 && (
+        <Card mb={6}>
+          <CardBody>
+            <Grid width={'100%'} templateColumns='repeat(3, 1fr)'>
+              {scannerRun.map((item) => (
+                <Flex flexDirection={'column'} alignItems={'self-start'}>
+                  <Heading fontSize={'lg'} mb={2}>
+                    {scannerName(item.scannerId)}
+                  </Heading>
+                  <Text fontSize={'sm'} textTransform={'capitalize'}>
+                    Status: {item.status}
+                  </Text>
+                  <Text fontSize={'sm'}>
+                    {item.completedAt
+                      ? timeSince(item.completedAt)
+                      : timeSince(item.failedAt)}{' '}
+                    {item.status !== 'failed' &&
+                      `- (${formattedTime(
+                        item.initiatedAt,
+                        item.completedAt
+                      )})`}
+                  </Text>
+                  {item.status !== 'failed' && (
+                    <Text fontSize={'sm'}>
+                      Scanner version - {item.scannerVersion}
+                    </Text>
+                  )}
+                </Flex>
+              ))}
+            </Grid>
+          </CardBody>
+        </Card>
+      )}
       <Flex direction='row' gap='2'>
         {/* <SBOMStatistics
           icon={<Icon h={'24px'} w={'24px'} color='white' as={FaCubes} />}
@@ -456,7 +492,6 @@ function SBOMs() {
           amount={riskScoreVal !== '' ? riskScoreVal : 22}
         /> */}
       </Flex>
-
       <SBOMTable
         refetch={refetch}
         imgVersionId={imageVersionData ? imageVersionData.imageVersion.id : ''}
@@ -471,8 +506,8 @@ function SBOMs() {
         shareLynkLoading={shareLynkLoading}
         setFilteredVulItems={setFilteredVulItems}
         imageId={imageId}
-        handlePreviousPage={handlePreviousPage}
-        handleNextPage={handleNextPage}
+        handlePreviousPage={onPreviousPage}
+        handleNextPage={onNextPage}
       />
     </Flex>
   )

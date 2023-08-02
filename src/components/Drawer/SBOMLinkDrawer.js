@@ -43,10 +43,6 @@ function SBOMLinkDrawer(props) {
 
   const sbomqsVersions = ['v0.0.1', 'v0.0.2', 'v0.0.3']
 
-  const { data: allScanners } = useQuery(getAllScanners, {
-    variables: {}
-  })
-
   const [shareLynkUpdate] = useMutation(UpdateShareLynk, {
     onCompleted: imageDataRefetch
   })
@@ -124,10 +120,6 @@ function SBOMLinkDrawer(props) {
   const isSelected = (value) => {
     return selectedOptions.includes(value)
   }
-
-  // useEffect(() => {
-  //   console.log('selectedOptions', selectedOptions)
-  // }, [selectedOptions])
 
   return (
     <Drawer
