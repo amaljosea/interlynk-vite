@@ -15,11 +15,11 @@ import { LetterHIcon } from 'components/Icons/Icons'
 import { LetterMIcon } from 'components/Icons/Icons'
 import { LetterLIcon } from 'components/Icons/Icons'
 
-import DockerIcon from 'assets/svg/docker.svg';
-import AWSIcon from 'assets/svg/aws.svg';
-import AzureIcon from 'assets/svg/azure.svg';
-import GitHubIcon from 'assets/svg/github.svg';
-import GitlabIcon from 'assets/svg/gitlab.svg';
+import DockerIcon from 'assets/svg/docker.svg'
+import AWSIcon from 'assets/svg/aws.svg'
+import AzureIcon from 'assets/svg/azure.svg'
+import GitHubIcon from 'assets/svg/github.svg'
+import GitlabIcon from 'assets/svg/gitlab.svg'
 
 export const getConImg = (name) => {
   switch (name) {
@@ -97,7 +97,6 @@ export const sevColor = (severity) => {
     default:
       return 'blue'
   }
-
 }
 
 export const statusColor = (status) => {
@@ -258,3 +257,18 @@ export const regions = [
     id: 'us-gov-west-1'
   }
 ]
+
+export const formattedTime = (initiated, completed) => {
+  const initiatedAt = new Date(initiated)
+  const completedAt = new Date(completed)
+
+  const timeTakenInMillis = completedAt.getTime() - initiatedAt.getTime()
+
+  const seconds = Math.floor(timeTakenInMillis / 1000)
+  const minutes = Math.floor(seconds / 60)
+  const hours = Math.floor(minutes / 60)
+
+  const timeTaken = `${minutes % 60}m ${seconds % 60}s`
+
+  return timeTaken
+}

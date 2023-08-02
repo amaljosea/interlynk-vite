@@ -93,69 +93,69 @@ export const getImage = gql`
   }
 `
 
-export const getImageVersion = gql`
-  query getImageVersion($id: ID!) {
-    imageVersion(id: $id) {
-      id
-      image {
-        id
-        name
-        scanEnabled
-      }
-      imageScanners {
-        id
-        company
-        name
-        updatedAt
-      }
-      name
-      updatedAt
-      lastPushedAt
-      imageScannerRun(id: $id) {
-        initiatedAt
-        completedAt
-        status
-        vulnDbVersion
-        dbLastUpdatedAt
-        scannerVersion
-        scannerId
-      }
-      imageVulns(imageVersionId: $id) {
-        cveId
-        component {
-          fixedInVersion
-          name
-          version
-        }
-        vexVuln {
-          fixedByImageVersion {
-            name
-          }
-          vexStatus {
-            id
-            name
-          }
-          vexJustification {
-            id
-            name
-          }
-        }
-        cvss {
-          v2Score
-          v3Score
-        }
-        severity
-        fixedInImage
-        scanners {
-          id
-          name
-          company
-          updatedAt
-        }
-      }
-    }
-  }
-`
+// export const getImageVersion = gql`
+//   query getImageVersion($id: ID!) {
+//     imageVersion(id: $id) {
+//       id
+//       image {
+//         id
+//         name
+//         scanEnabled
+//       }
+//       imageScanners {
+//         id
+//         company
+//         name
+//         updatedAt
+//       }
+//       name
+//       updatedAt
+//       lastPushedAt
+//       imageScannerRun(id: $id) {
+//         initiatedAt
+//         completedAt
+//         status
+//         vulnDbVersion
+//         dbLastUpdatedAt
+//         scannerVersion
+//         scannerId
+//       }
+//       imageVulns(imageVersionId: $id) {
+//         cveId
+//         component {
+//           fixedInVersion
+//           name
+//           version
+//         }
+//         vexVuln {
+//           fixedByImageVersion {
+//             name
+//           }
+//           vexStatus {
+//             id
+//             name
+//           }
+//           vexJustification {
+//             id
+//             name
+//           }
+//         }
+//         cvss {
+//           v2Score
+//           v3Score
+//         }
+//         severity
+//         fixedInImage
+//         scanners {
+//           id
+//           name
+//           company
+//           updatedAt
+//         }
+//       }
+//     }
+//   }
+// `
 
 export const getVulnerabilities = gql`
   query getVulnerabilities($id: ID!) {
@@ -286,13 +286,13 @@ export const GetSignedImageVersion = gql`
 `
 
 export const ImagePagination = gql`
-  query GetImagesForOrg($numOfImages: Int, $after: String, $before: String) {
-    images(
-      first: $numOfImages
-      after: $after
-      last: $numOfImages
-      before: $before
-    ) {
+  query GetImagesForOrg(
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+  ) {
+    images(first: $first, after: $after, last: $last, before: $before) {
       pageInfo {
         hasPreviousPage
         startCursor
@@ -326,15 +326,18 @@ export const ImagePagination = gql`
   }
 `
 
-export const ImageVersionPagination = gql`
+export const GetImgVersionPagination = gql`
   query GetImageVersion(
     $imageVersionId: ID!
-    $numOfVulns: Int
+    $first: Int
+    $last: Int
     $after: String
     $before: String
   ) {
     imageVersion(id: $imageVersionId) {
       id
+      name
+      lastPushedAt
       image {
         id
         name
@@ -346,9 +349,6 @@ export const ImageVersionPagination = gql`
         name
         updatedAt
       }
-      name
-      updatedAt
-      lastPushedAt
       imageScannerRun(id: $imageVersionId) {
         initiatedAt
         completedAt
@@ -357,12 +357,13 @@ export const ImageVersionPagination = gql`
         dbLastUpdatedAt
         scannerVersion
         scannerId
+        failedAt
       }
       imageVulns(
         imageVersionId: $imageVersionId
-        first: $numOfVulns
+        first: $first
+        last: $last
         after: $after
-        last: $numOfVulns
         before: $before
       ) {
         pageInfo {
@@ -391,6 +392,9 @@ export const ImageVersionPagination = gql`
             updatedAt
           }
           vexVuln {
+            fixedByImageVersion {
+              name
+            }
             vexJustification {
               name
             }

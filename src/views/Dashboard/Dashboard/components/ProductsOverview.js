@@ -10,7 +10,8 @@ import {
   Image,
   Text,
   Heading,
-  Skeleton
+  Skeleton,
+  Button
 } from '@chakra-ui/react'
 // Custom components
 import Card from 'components/Card/Card'
@@ -25,18 +26,28 @@ import { useQuery } from '@apollo/client'
 import { getConImg } from 'utils'
 import { ImagePagination } from 'graphQL/Queries'
 
-const ProductsOverview = ({ title, amount, captions, data }) => {
-  const { data: allImages } = useQuery(ImagePagination, {
+const ProductsOverview = ({ title }) => {
+  const { data: allImages, refetch } = useQuery(ImagePagination, {
     variables: {
-      numOfImages: 10
+      first: 10
     }
   })
 
-  // useEffect(() => {
-  //   if (allImages) {
-  //     console.log('allImages', allImages)
-  //   }
-  // }, [allImages])
+  const handlePreviousPage = () => {
+    refetch({
+      last: 10,
+      before: allImages.images.pageInfo.startCursor,
+      after: ''
+    })
+  }
+
+  const handleNextPage = () => {
+    refetch({
+      first: 10,
+      after: allImages.images.pageInfo.endCursor,
+      before: ''
+    })
+  }
 
   return (
     <Flex width={'100%'} direction='column' mt={{ base: '120px', md: '0px' }}>
@@ -147,6 +158,32 @@ const ProductsOverview = ({ title, amount, captions, data }) => {
                   </Tr>
                 )}
               </Tbody>
+              <Flex
+                flexDir={'row'}
+                gap={4}
+                alignItems={'center'}
+                mt={6}
+                justifyContent={'flex-start'}
+              >
+                <Button
+                  colorScheme='blue'
+                  onClick={handlePreviousPage}
+                  isDisabled={
+                    allImages && !allImages.images.pageInfo.hasPreviousPage
+                  }
+                >
+                  Previous
+                </Button>
+                <Button
+                  colorScheme='blue'
+                  onClick={handleNextPage}
+                  isDisabled={
+                    allImages && !allImages.images.pageInfo.hasNextPage
+                  }
+                >
+                  Next
+                </Button>
+              </Flex>
             </Table>
           </CardBody>
         </Card>

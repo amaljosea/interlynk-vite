@@ -49,16 +49,14 @@ import { BiImport, BiExport } from 'react-icons/bi'
 import { BsFilterRight } from 'react-icons/bs'
 import SBOMDrawer from 'components/Drawer/SBOMDrawer'
 import { CSVLink } from 'react-csv'
-import { useMutation, useQuery } from '@apollo/client'
+import { useMutation } from '@apollo/client'
 import { UpdateImageVersion } from 'graphQL/Mutation'
 import { ImageUpdate } from 'graphQL/Mutation'
-import { getImageVersion } from 'graphQL/Queries'
 
 const SBOMTable = ({
   scan,
   imageId,
   data,
-  filteredVul,
   setFilteredVulItems,
   imageVersionData,
   imgVersionId,
@@ -85,11 +83,11 @@ const SBOMTable = ({
 
   const [allVulResult, setAllVulResult] = useState([])
 
-  useEffect(() => {
-    if (imageVersionData) {
-      console.log('image version data', imageVersionData.imageVulns.nodes)
-    }
-  }, [imageVersionData])
+  // useEffect(() => {
+  //   if (imageVersionData) {
+  //     console.log('Vuln Data', imageVersionData.imageVulns.nodes)
+  //   }
+  // }, [imageVersionData])
 
   const vulnData = allVulResult
 
@@ -646,169 +644,32 @@ const SBOMTable = ({
                     <Thead>
                       <Tr my='.8rem' pl='0px'>
                         <Th></Th>
-                        <Th
-                          color='gray.400'
-                          py={4}
-                          position='relative'
-                          onClick={() => handleVulSort('cveId')}
-                          cursor={'pointer'}
-                        >
-                          <Flex direction={'row'} alignItems={'center'} gap={2}>
-                            <Box>CVE ID</Box>
-                            <Box>
-                              {sortField === 'cveId' &&
-                                (sortOrder === 'asc' ? (
-                                  <TriangleUpIcon />
-                                ) : (
-                                  <TriangleDownIcon />
-                                ))}
-                            </Box>
-                          </Flex>
+                        <Th py={4}>
+                          <Box>CVE ID</Box>
                         </Th>
-                        <Th
-                          color='gray.400'
-                          py={4}
-                          position='relative'
-                          onClick={() => handleVulSort('severity')}
-                          cursor={'pointer'}
-                        >
-                          <Flex direction={'row'} alignItems={'center'} gap={2}>
-                            <Box>Severity</Box>
-                            <Box>
-                              {sortField === 'severity' &&
-                                (sortOrder === 'asc' ? (
-                                  <TriangleUpIcon />
-                                ) : (
-                                  <TriangleDownIcon />
-                                ))}
-                            </Box>
-                          </Flex>
+                        <Th py={4}>
+                          <Box>Severity</Box>
                         </Th>
-                        <Th
-                          color='gray.400'
-                          py={4}
-                          position='relative'
-                          onClick={() => handleVulSort('v3Score')}
-                          cursor={'pointer'}
-                        >
-                          <Flex direction={'row'} alignItems={'center'} gap={2}>
-                            <Box>CVSS</Box>
-                            <Box>
-                              {sortField === 'v3Score' &&
-                                (sortOrder === 'asc' ? (
-                                  <TriangleUpIcon />
-                                ) : (
-                                  <TriangleDownIcon />
-                                ))}
-                            </Box>
-                          </Flex>
+                        <Th py={4}>
+                          <Box>CVSS</Box>
                         </Th>
-                        {/* <Th color='gray.400' py={4} position='relative'>
-                      Description
-                    </Th> */}
-                        <Th
-                          color='gray.400'
-                          py={4}
-                          position='relative'
-                          onClick={() => handleVulSort('name')}
-                          cursor={'pointer'}
-                        >
-                          <Flex direction={'row'} alignItems={'center'} gap={2}>
-                            <Box>Component</Box>
-                            <Box>
-                              {sortField === 'name' &&
-                                (sortOrder === 'asc' ? (
-                                  <TriangleUpIcon />
-                                ) : (
-                                  <TriangleDownIcon />
-                                ))}
-                            </Box>
-                          </Flex>
+                        <Th py={4}>
+                          <Box>Component</Box>
                         </Th>
-                        <Th
-                          color='gray.400'
-                          py={4}
-                          position='relative'
-                          onClick={() => handleVulSort('version')}
-                          cursor={'pointer'}
-                        >
-                          <Flex direction={'row'} alignItems={'center'} gap={2}>
-                            <Box>Version</Box>
-                            <Box>
-                              {sortField === 'version' &&
-                                (sortOrder === 'asc' ? (
-                                  <TriangleUpIcon />
-                                ) : (
-                                  <TriangleDownIcon />
-                                ))}
-                            </Box>
-                          </Flex>
+                        <Th py={4}>
+                          <Box>Version</Box>
                         </Th>
-                        <Th
-                          color='gray.400'
-                          py={4}
-                          position='relative'
-                          // onClick={() => handleVulSort('fixed_component')}
-                          cursor={'pointer'}
-                        >
-                          <Flex direction={'row'} alignItems={'center'} gap={2}>
-                            <Box>Fixed (Component)</Box>
-                            <Box>
-                              {sortField === 'fixed_component' &&
-                                (sortOrder === 'asc' ? (
-                                  <TriangleUpIcon />
-                                ) : (
-                                  <TriangleDownIcon />
-                                ))}
-                            </Box>
-                          </Flex>
+                        <Th py={4}>
+                          <Box>Fixed (Component)</Box>
                         </Th>
-                        <Th
-                          color='gray.400'
-                          py={4}
-                          position='relative'
-                          // onClick={() => handleVulSort('fixed_product')}
-                          cursor={'pointer'}
-                        >
-                          <Flex direction={'row'} alignItems={'center'} gap={2}>
-                            <Box>Fixed (Product)</Box>
-                            <Box>
-                              {sortField === 'fixed_product' &&
-                                (sortOrder === 'asc' ? (
-                                  <TriangleUpIcon />
-                                ) : (
-                                  <TriangleDownIcon />
-                                ))}
-                            </Box>
-                          </Flex>
+                        <Th py={4}>
+                          <Box>Fixed (Product)</Box>
                         </Th>
-                        <Th
-                          color='gray.400'
-                          py={4}
-                          position='relative'
-                          // onClick={() => handleVulSort('fixed_product')}
-                          cursor={'pointer'}
-                        >
+                        <Th py={4}>
                           <Box>Scanner</Box>
                         </Th>
-                        <Th
-                          color='gray.400'
-                          py={4}
-                          position='relative'
-                          onClick={() => handleVulSort('vexVuln')}
-                          cursor={'pointer'}
-                        >
-                          <Flex direction={'row'} alignItems={'center'} gap={2}>
-                            <Box>Status</Box>
-                            <Box>
-                              {sortField === 'vexVuln' &&
-                                (sortOrder === 'asc' ? (
-                                  <TriangleUpIcon />
-                                ) : (
-                                  <TriangleDownIcon />
-                                ))}
-                            </Box>
-                          </Flex>
+                        <Th py={4}>
+                          <Box>Status</Box>
                         </Th>
                         <Th color='gray.400' py={4} position='relative'></Th>
                       </Tr>
@@ -889,34 +750,34 @@ const SBOMTable = ({
                 )}
               </CardBody>
 
-              <Flex
-                flexDir={'row'}
-                gap={4}
-                alignItems={'center'}
-                mt={6}
-                justifyContent={'flex-start'}
-              >
-                <Button
-                  colorScheme='blue'
-                  onClick={handlePreviousPage}
-                  isDisabled={
-                    imageVersionData &&
-                    !imageVersionData.imageVulns.pageInfo.hasPreviousPage
-                  }
+              {imageVersionData && (
+                <Flex
+                  flexDir={'row'}
+                  gap={4}
+                  alignItems={'center'}
+                  mt={6}
+                  justifyContent={'flex-start'}
                 >
-                  Previous
-                </Button>
-                <Button
-                  colorScheme='blue'
-                  onClick={handleNextPage}
-                  isDisabled={
-                    imageVersionData &&
-                    !imageVersionData.imageVulns.pageInfo.hasNextPage
-                  }
-                >
-                  Next
-                </Button>
-              </Flex>
+                  <Button
+                    colorScheme='blue'
+                    onClick={handlePreviousPage}
+                    isDisabled={
+                      !imageVersionData.imageVulns.pageInfo.hasPreviousPage
+                    }
+                  >
+                    Previous
+                  </Button>
+                  <Button
+                    colorScheme='blue'
+                    onClick={handleNextPage}
+                    isDisabled={
+                      !imageVersionData.imageVulns.pageInfo.hasNextPage
+                    }
+                  >
+                    Next
+                  </Button>
+                </Flex>
+              )}
             </TabPanel>
           </TabPanels>
         </Tabs>
