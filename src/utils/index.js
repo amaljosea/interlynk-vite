@@ -1,9 +1,3 @@
-import docker from 'assets/img/docker.png'
-import amazon from 'assets/img/amazon.png'
-import azure from 'assets/img/azure.png'
-import github from 'assets/img/github.png'
-import gitlab from 'assets/img/gitlab.png'
-
 import grype from 'assets/img/grype.png'
 import trivy from 'assets/img/trivy.png'
 import scout from 'assets/img/scout.png'
@@ -272,3 +266,35 @@ export const formattedTime = (initiated, completed) => {
 
   return timeTaken
 }
+
+export const dateTime = (updatedAt) => {
+  const date = new Date(updatedAt).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    timeZone: 'America/Los_Angeles'
+  })
+  const time = new Date(updatedAt).toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+    timeZone: 'America/Los_Angeles'
+  })
+
+  return `${date} ${time}`
+}
+
+export const link_captions = ['Active', 'Shared With', 'Created', 'Link', '']
+export const vuln_captions = [
+  '',
+  'CVE ID',
+  'Severity',
+  'CVSS',
+  'Component',
+  'Version',
+  'Fixed (Component)',
+  'Fixed (Product)',
+  'Scanner',
+  'Status',
+  ''
+]

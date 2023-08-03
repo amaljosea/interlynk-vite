@@ -71,15 +71,6 @@ const Index = () => {
     variables: {}
   })
 
-  useEffect(() => {
-    if (allScanners) {
-      window.localStorage.setItem(
-        'scanners',
-        JSON.stringify(allScanners.scanners)
-      )
-    }
-  }, [allScanners])
-
   const { data: allImages, refetch } = useQuery(ImagePagination, {
     variables: { first: 10 }
   })
@@ -106,11 +97,11 @@ const Index = () => {
     }
   }
 
-  useEffect(() => {
-    if (allImages) {
-      console.log(`all Images`, allImages)
-    }
-  }, [allImages])
+  // useEffect(() => {
+  //   if (allImages) {
+  //     console.log(`all Images`, allImages)
+  //   }
+  // }, [allImages])
 
   // const filteredImages =
   //   allImages &&

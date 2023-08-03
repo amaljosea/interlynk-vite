@@ -39,7 +39,6 @@ import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 import SBOMLinkRow from 'components/Tables/SBOMLinkRow.js'
 import VulnerabilityRow from 'components/Tables/VulnerabilityRow.js'
-import { Risks } from 'variables/general'
 import React, { useContext, useEffect } from 'react'
 import GlobalContext from 'context/GlobalContext'
 import CardHeader from 'components/Card/CardHeader'
@@ -52,6 +51,8 @@ import { CSVLink } from 'react-csv'
 import { useMutation } from '@apollo/client'
 import { UpdateImageVersion } from 'graphQL/Mutation'
 import { ImageUpdate } from 'graphQL/Mutation'
+import { link_captions } from 'utils'
+import { vuln_captions } from 'utils'
 
 const SBOMTable = ({
   scan,
@@ -173,16 +174,6 @@ const SBOMTable = ({
     }
   }
 
-  const link_captions = [
-    'Active',
-    // 'Contains',
-    'Shared With',
-    // 'Visits',
-    'Created',
-    'Link',
-    ''
-  ]
-
   const [filteredRow, setFilteredRow] = useState([])
 
   const uniqVersions = []
@@ -296,17 +287,6 @@ const SBOMTable = ({
   }, [selectedScanner])
 
   useEffect(() => {
-    const scoreData = Risks.sort((a, b) => a.score - b.score)
-    setDefaultRiskScore(scoreData)
-  }, [])
-
-  const [sortField, setSortField] = useState('')
-  const [sortOrder, setSortOrder] = useState('asc')
-  const [sortComponentData, setSortComponentData] = useState([])
-  const [defaultRiskScore, setDefaultRiskScore] = useState([])
-  const [sortRiskScoreData, setSortRiskScoreData] = useState([])
-
-  useEffect(() => {
     setVulnerabilitiesData([])
     const data = vulnData.filter(
       (item) =>
@@ -315,133 +295,6 @@ const SBOMTable = ({
     )
     setFilteredRow(data)
   }, [searchInput])
-
-  // useEffect(() => {
-  //   console.log('filtered row', filteredRow)
-  // }, [filteredRow])
-
-  const handleSort = (field) => {
-    if (field === sortField) {
-      const newSortOrder = sortOrder === 'asc' ? 'desc' : 'asc'
-      setSortOrder(newSortOrder)
-      sortData(field, newSortOrder)
-    } else {
-      setSortField(field)
-      setSortOrder('asc')
-      sortData(field, 'asc')
-    }
-  }
-
-  const sortData = (field, order) => {
-    const sortedData = data.sort((a, b) => {
-      if (typeof a[field] === 'number' && typeof b[field] === 'number') {
-        return order === 'asc' ? a[field] - b[field] : b[field] - a[field]
-      } else {
-        const comparison = a[field].localeCompare(b[field])
-        return order === 'asc' ? comparison : -comparison
-      }
-    })
-    setSortComponentData(sortedData)
-  }
-
-  const handleVulSort = (field) => {
-    if (field === sortField) {
-      const newSortOrder = sortOrder === 'asc' ? 'desc' : 'asc'
-      setSortOrder(newSortOrder)
-      sortVulnData(field, newSortOrder)
-      localStorage.setItem('vulSortField', field)
-      localStorage.setItem('vulSortOrder', newSortOrder)
-    } else {
-      setSortField(field)
-      setSortOrder('asc')
-      sortVulnData(field, 'asc')
-      localStorage.setItem('vulSortField', field)
-      localStorage.setItem('vulSortOrder', 'asc')
-    }
-  }
-
-  const sortVulnData = (field, order) => {
-    const data = [...allVulResult]
-    const sortedData = data.sort((a, b) => {
-      if (
-        field === 'v3Score' &&
-        typeof a.cvss[field] === 'number' &&
-        typeof b.cvss[field] === 'number'
-      ) {
-        return order === 'asc'
-          ? a.cvss[field] - b.cvss[field]
-          : b.cvss[field] - a.cvss[field]
-      } else if (field === 'severity') {
-        const comparison = a[field][0].localeCompare(b[field][0])
-        return order === 'asc' ? comparison : -comparison
-      } else if (field === 'name' || field === 'version') {
-        const comparison = a.component[field].localeCompare(b.component[field])
-        return order === 'asc' ? comparison : -comparison
-      } else if (field === 'vexVuln') {
-        const comparison =
-          a &&
-          b &&
-          a[field]?.vexStatus?.name.localeCompare(b[field]?.vexStatus?.name)
-        return order === 'asc' ? comparison : -comparison
-      } else {
-        const comparison = a[field].localeCompare(b[field])
-        return order === 'asc' ? comparison : -comparison
-      }
-    })
-    setVulnerabilitiesData(sortedData)
-  }
-
-  useEffect(() => {
-    const field = localStorage.getItem('vulSortField')
-    const order = localStorage.getItem('vulSortOrder')
-    if (field && order) {
-      setSortField(field)
-      setSortOrder(order)
-      const data = [...allVulResult]
-      const sortedData = data.sort((a, b) => {
-        if (
-          field === 'v3Score' &&
-          typeof a.cvss[field] === 'number' &&
-          typeof b.cvss[field] === 'number'
-        ) {
-          return order === 'asc'
-            ? a.cvss[field] - b.cvss[field]
-            : b.cvss[field] - a.cvss[field]
-        } else if (field === 'severity') {
-          const comparison = a[field][0].localeCompare(b[field][0])
-          return order === 'asc' ? comparison : -comparison
-        } else if (field === 'name' || field === 'version') {
-          const comparison = a.component[field].localeCompare(
-            b.component[field]
-          )
-          return order === 'asc' ? comparison : -comparison
-        } else if (field === 'vexVuln') {
-          const comparison =
-            a &&
-            b &&
-            a[field]?.vexStatus?.name.localeCompare(b[field]?.vexStatus?.name)
-          return order === 'asc' ? comparison : -comparison
-        } else {
-          const comparison = a[field].localeCompare(b[field])
-          return order === 'asc' ? comparison : -comparison
-        }
-      })
-      setVulnerabilitiesData(sortedData)
-      // console.log('sortedData', sortedData)
-    }
-  }, [])
-
-  const sortRiskData = (field, order) => {
-    const sortedData = Risks.sort((a, b) => {
-      if (typeof a[field] === 'number' && typeof b[field] === 'number') {
-        return order === 'asc' ? a[field] - b[field] : b[field] - a[field]
-      } else {
-        const comparison = a[field].localeCompare(b[field])
-        return order === 'asc' ? comparison : -comparison
-      }
-    })
-    setSortRiskScoreData(sortedData)
-  }
 
   const handleUpdateClick = () => {
     const updatedData = vulnerabilitiesData.map((row) => {
@@ -536,6 +389,7 @@ const SBOMTable = ({
                             imageDataRefetch={imageDataRefetch}
                             imgVersionId={imgVersionId}
                             scanResults={scanResults}
+                            imageInfo={imageInfo}
                           />
                         ))
                       : shareLynkLoading && (
@@ -643,35 +497,11 @@ const SBOMTable = ({
                   <Table variant='simple' color={textColor} size='sm'>
                     <Thead>
                       <Tr my='.8rem' pl='0px'>
-                        <Th></Th>
-                        <Th py={4}>
-                          <Box>CVE ID</Box>
-                        </Th>
-                        <Th py={4}>
-                          <Box>Severity</Box>
-                        </Th>
-                        <Th py={4}>
-                          <Box>CVSS</Box>
-                        </Th>
-                        <Th py={4}>
-                          <Box>Component</Box>
-                        </Th>
-                        <Th py={4}>
-                          <Box>Version</Box>
-                        </Th>
-                        <Th py={4}>
-                          <Box>Fixed (Component)</Box>
-                        </Th>
-                        <Th py={4}>
-                          <Box>Fixed (Product)</Box>
-                        </Th>
-                        <Th py={4}>
-                          <Box>Scanner</Box>
-                        </Th>
-                        <Th py={4}>
-                          <Box>Status</Box>
-                        </Th>
-                        <Th color='gray.400' py={4} position='relative'></Th>
+                        {vuln_captions.map((item, index) => (
+                          <Th key={index} py={4}>
+                            <Box>{item}</Box>
+                          </Th>
+                        ))}
                       </Tr>
                     </Thead>
                     <Tbody>
@@ -791,6 +621,7 @@ const SBOMTable = ({
         imgVersionId={imgVersionId}
         imageDataRefetch={imageDataRefetch}
         scanResults={scanResults}
+        imageInfo={imageInfo}
       />
 
       <Modal isOpen={isRefreshOpen} onClose={setRefreshClose}>

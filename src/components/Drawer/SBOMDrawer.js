@@ -36,7 +36,8 @@ function SBOMDrawer(props) {
     onClose,
     btnRef,
     imageDataRefetch,
-    imgVersionId
+    imgVersionId,
+    imageInfo
   } = props
 
   const { data: allScanners } = useQuery(getAllScanners, {
@@ -189,10 +190,10 @@ function SBOMDrawer(props) {
                 color='gray.500'
                 mb={4}
               >
-                {sbomqsVersions.length > 0 ? (
-                  sbomqsVersions.map((p) => (
-                    <option key={p} value={p}>
-                      {p}+
+                {imageInfo.length > 0 ? (
+                  imageInfo.map((img, index) => (
+                    <option key={index} value={img.id}>
+                      {img.name}+
                     </option>
                   ))
                 ) : (

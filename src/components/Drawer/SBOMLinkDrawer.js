@@ -34,7 +34,8 @@ function SBOMLinkDrawer(props) {
     shareScanner,
     scanResults,
     emailList,
-    setEmailList
+    setEmailList,
+    imageInfo
   } = props
 
   const sortScanResult = [...scanResults].sort((a, b) =>
@@ -167,10 +168,10 @@ function SBOMLinkDrawer(props) {
                 color='gray.500'
                 mb={4}
               >
-                {sbomqsVersions.length > 0 ? (
-                  sbomqsVersions.map((p) => (
-                    <option key={p} value={p}>
-                      {p}+
+                {imageInfo.length > 0 ? (
+                  imageInfo.map((img, index) => (
+                    <option key={index} value={img.id}>
+                      {img.name}+
                     </option>
                   ))
                 ) : (

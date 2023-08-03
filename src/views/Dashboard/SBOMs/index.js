@@ -2,7 +2,6 @@
 import {
   Flex,
   Heading,
-  Spacer,
   Icon,
   Grid,
   GridItem,
@@ -10,15 +9,18 @@ import {
   Box,
   Select,
   Image,
-  Skeleton,
+  chakra,
   Tag,
-  TagLabel
+  TagLabel,
+  Tooltip,
+  Stack,
+  StackDivider
 } from '@chakra-ui/react'
 import React, { useContext, useEffect, useState } from 'react'
 import Card from 'components/Card/Card.js'
+import CardHeader from 'components/Card/CardHeader'
 import CardBody from 'components/Card/CardBody.js'
 import SBOMTable from './components/SBOMTable'
-import SBOMStatistics from './components/SBOMStatistics'
 import { sbom } from 'variables/general'
 import {
   FaCubes,
@@ -29,7 +31,7 @@ import {
 } from 'react-icons/fa'
 import { useLocation, useHistory } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
-import Tooltip from 'components/Tooltip'
+
 import { useQuery } from '@apollo/client'
 import { scanImage } from 'utils'
 import { getImage } from 'graphQL/Queries'
@@ -38,6 +40,7 @@ import { GetImgVersionPagination } from 'graphQL/Queries'
 import { getAllScanners } from 'graphQL/Queries'
 import { timeSince } from 'utils'
 import { formattedTime } from 'utils'
+import { dateTime } from 'utils'
 
 function SBOMs() {
   const [scanResults, setScanResults] = useState(null)
@@ -52,6 +55,8 @@ function SBOMs() {
   const queryParams = new URLSearchParams(location.search)
   const versionId = queryParams.get('v')
   const imageId = queryParams.get('id')
+
+  localStorage.setItem('selectedVersion', versionId)
 
   // useEffect(() => {
   //   console.log(`versionId`, versionId)
@@ -151,7 +156,6 @@ function SBOMs() {
       })
 
       setImageInfo(clonedImageVersions)
-      // setSelectedVersion(imageVersionData?.imageVersion?.id)
     }
   }, [imageData])
 
@@ -159,7 +163,7 @@ function SBOMs() {
     setFilteredVulItems([])
     const { value } = e.target
     setSelectedVersion(value)
-    // console.log('value', value)
+    localStorage.setItem('selectedVersion', versionId)
     refetch({ imageVersionId: value, first: 30 })
     queryParams.set('v', value)
     history.push(`/vendor/images?v=${value}&id=${imageId}`)
@@ -256,6 +260,7 @@ function SBOMs() {
 
   return (
     <Flex direction='column' pt={{ base: '120px', md: '75px' }}>
+      {/* Image Details */}
       <Card mb='6'>
         <CardBody>
           <Grid width={'100%'} templateColumns='repeat(5, 1fr)'>
@@ -267,112 +272,55 @@ function SBOMs() {
                 width={'100%'}
               >
                 <Icon as={FaCubes} h={'64px'} w={'64px'} color='blue.300' />
-                <Box>
-                  <Heading as='h3' size='md' noOfLines={1} color='gray.600'>
-                    <Flex alignItems={'center'} flexDirection={'row'} gap={3}>
-                      {scanResults
-                        ? `${scanResults.image.name}:${scanResults.name}`
-                        : 'Loading....'}
-                      <Tag
-                        size={'sm'}
-                        variant='outline'
-                        colorScheme={
-                          scanResults && scanResults.image.scanEnabled === true
-                            ? 'blue'
-                            : 'red'
-                        }
-                      >
-                        <TagLabel>
-                          Scan{' '}
-                          {scanResults && scanResults.image.scanEnabled === true
-                            ? 'Enabled'
-                            : 'Disabled'}
-                        </TagLabel>
-                      </Tag>
-                    </Flex>
-                  </Heading>
-                  <Text fontSize='sm'>linux/amd64</Text>
-                  <Text fontSize='xs' mb={2}>
-                    Last Pushed:{' '}
-                    {scanResults
-                      ? `${
-                          new Date(scanResults.lastPushedAt).toLocaleDateString(
-                            'en-US',
-                            {
-                              year: 'numeric',
-                              month: '2-digit',
-                              day: '2-digit',
-                              timeZone: 'America/Los_Angeles'
-                            }
-                          ) +
-                          ' ' +
-                          new Date(scanResults.lastPushedAt).toLocaleTimeString(
-                            'en-US',
-                            {
-                              hour: 'numeric',
-                              minute: '2-digit',
-                              hour12: true,
-                              timeZone: 'America/Los_Angeles'
-                            }
-                          )
-                        }`
-                      : 'Loading..'}
-                  </Text>
-                  {scanResults ? (
-                    scanResults.imageScanners.map((result, index) => (
-                      <Flex
-                        key={index}
-                        flexDirection={'row'}
-                        alignItems={'center'}
-                        gap={2}
-                        mb={2}
-                      >
-                        {scanResults.imageScannerRun.map(
-                          (scan, index) =>
-                            result.id === scan.scannerId && (
-                              <Flex flexDirection={'row'} gap={3} key={index}>
-                                <Tooltip
-                                  text={`${result.company}-${result.name}`}
-                                >
-                                  <Image
-                                    width={4}
-                                    objectFit={'contain'}
-                                    src={`${scanImage(result.name)}`}
-                                    alt={result}
-                                  />
-                                </Tooltip>
-                                <Text fontSize={'xs'}>
-                                  {scan.status === 'failed' && '! '}
-                                  {new Date(
-                                    scan.status === 'pending'
-                                      ? scan.dbLastUpdatedAt
-                                      : scan.completedAt
-                                  ).toLocaleDateString('en-US', {
-                                    year: 'numeric',
-                                    month: '2-digit',
-                                    day: '2-digit',
-                                    timeZone: 'America/Los_Angeles'
-                                  })}{' '}
-                                  {new Date(
-                                    scan.status === 'pending'
-                                      ? scan.dbLastUpdatedAt
-                                      : scan.completedAt
-                                  ).toLocaleTimeString('en-US', {
-                                    hour: 'numeric',
-                                    minute: '2-digit',
-                                    hour12: true,
-                                    timeZone: 'America/Los_Angeles'
-                                  })}
-                                </Text>
-                              </Flex>
-                            )
-                        )}
+                {scanResults && imageVersionData ? (
+                  <Flex direction={'column'} gap={1}>
+                    <Heading as='h3' size='md' noOfLines={1}>
+                      <Flex alignItems={'center'} flexDirection={'row'} gap={3}>
+                        {scanResults.image.name}:{scanResults.name}
+                        <Tag
+                          size={'sm'}
+                          variant='outline'
+                          colorScheme={
+                            scanResults.image.scanEnabled === true
+                              ? 'blue'
+                              : 'red'
+                          }
+                        >
+                          <TagLabel>
+                            Scan{' '}
+                            {scanResults.image.scanEnabled === true
+                              ? 'Enabled'
+                              : 'Disabled'}
+                          </TagLabel>
+                        </Tag>
                       </Flex>
-                    ))
-                  ) : (
-                    <Skeleton height={'2'} />
-                  )}
-                </Box>
+                    </Heading>
+                    <Text fontSize='sm'>linux/amd64</Text>
+                    <Tooltip label={dateTime(scanResults.lastPushedAt)}>
+                      <Text fontSize='xs' cursor={'pointer'}>
+                        Last Pushed: {timeSince(scanResults.lastPushedAt)}
+                      </Text>
+                    </Tooltip>
+                    <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
+                      {imageVersionData.imageVersion.tags &&
+                        imageVersionData.imageVersion.tags.length > 0 &&
+                        imageVersionData.imageVersion.tags.map(
+                          (item, index) => (
+                            <Text
+                              fontSize={'xs'}
+                              color={'blue.500'}
+                              textDecoration={'underline'}
+                              key={index}
+                            >
+                              {item}
+                            </Text>
+                          )
+                        )}
+                    </Flex>
+                  </Flex>
+                ) : (
+                  <Text>Loading....</Text>
+                )}
               </Flex>
             </GridItem>
             <GridItem colSpan={3}>
@@ -423,75 +371,90 @@ function SBOMs() {
           </Grid>
         </CardBody>
       </Card>
+      {/* Scanner Details */}
       {scannerRun.length > 0 && (
-        <Card mb={6}>
-          <CardBody>
-            <Grid width={'100%'} templateColumns='repeat(3, 1fr)'>
-              {scannerRun.map((item) => (
-                <Flex flexDirection={'column'} alignItems={'self-start'}>
-                  <Heading fontSize={'lg'} mb={2}>
-                    {scannerName(item.scannerId)}
-                  </Heading>
-                  <Text fontSize={'sm'} textTransform={'capitalize'}>
-                    Status: {item.status}
-                  </Text>
-                  <Text fontSize={'sm'}>
-                    {item.completedAt
-                      ? timeSince(item.completedAt)
-                      : timeSince(item.failedAt)}{' '}
-                    {item.status !== 'failed' &&
-                      `- (${formattedTime(
-                        item.initiatedAt,
-                        item.completedAt
-                      )})`}
-                  </Text>
+        <Card>
+          <CardHeader>
+            <Heading size='md'>Scanner Summary</Heading>
+          </CardHeader>
+
+          <CardBody width='100%'>
+            <Stack width={'100%'} mt={8} divider={<StackDivider />} spacing='4'>
+              {scannerRun.map((item, index) => (
+                <Flex
+                  key={index}
+                  flexDir={'row'}
+                  alignItems={'flex-start'}
+                  justifyContent={'space-between'}
+                  gap={4}
+                >
+                  <Flex
+                    flexDir={'row'}
+                    alignItems={'flex-start'}
+                    gap={4}
+                    cursor={'pointer'}
+                  >
+                    {allScanners && (
+                      <Image
+                        width={7}
+                        objectFit={'contain'}
+                        src={`${scanImage(scannerName(item.scannerId))}`}
+                        alt={scannerName(item.scannerId)}
+                      />
+                    )}
+                    <Tooltip
+                      label={`${
+                        item.status !== 'failed'
+                          ? `${formattedTime(
+                              item.initiatedAt,
+                              item.completedAt
+                            )}`
+                          : ''
+                      }`}
+                    >
+                      <Box>
+                        <Flex alignItems={'center'} gap={3}>
+                          <Heading size='sm' color={'gray.600'}>
+                            {scannerName(item.scannerId)}
+                          </Heading>
+                          {item.status !== 'failed' && (
+                            <Text fontSize={'sm'}>{item.scannerVersion}</Text>
+                          )}
+                        </Flex>
+                        <Text pt={2} fontSize='sm' textTransform={'capitalize'}>
+                          Status - {''}
+                          <chakra.span
+                            color={`${
+                              item.status === 'completed'
+                                ? 'green.500'
+                                : item.status === 'failed'
+                                ? 'red.500'
+                                : 'orange.400'
+                            }`}
+                          >
+                            {item.status}
+                          </chakra.span>
+                        </Text>
+                      </Box>
+                    </Tooltip>
+                  </Flex>
                   {item.status !== 'failed' && (
                     <Text fontSize={'sm'}>
-                      Scanner version - {item.scannerVersion}
+                      <em>
+                        Updated{' '}
+                        {item.completedAt
+                          ? timeSince(item.completedAt)
+                          : timeSince(item.failedAt)}
+                      </em>
                     </Text>
                   )}
                 </Flex>
               ))}
-            </Grid>
+            </Stack>
           </CardBody>
         </Card>
       )}
-      <Flex direction='row' gap='2'>
-        {/* <SBOMStatistics
-          icon={<Icon h={'24px'} w={'24px'} color='white' as={FaCubes} />}
-          title={'Components'}
-          description={'Components included in SBOM'}
-          amount={componentsVal !== '' ? componentsVal : 126}
-        />
-        <Spacer /> */}
-        <SBOMStatistics
-          icon={<Icon h={'24px'} w={'24px'} color='white' as={FaBug} />}
-          title={'Total Vulnerabilities'}
-          description={'Vulnerabilities included in SBOM'}
-          amount={`${total.C}C,${total.H}H,${total.M}M,${total.L}L,${total.U}U`}
-        />
-        <Spacer />
-        <SBOMStatistics
-          icon={
-            <Icon
-              h={'24px'}
-              w={'24px'}
-              color='white'
-              as={FaExclamationTriangle}
-            />
-          }
-          title={'Unresolved Vulnerabilities'}
-          description={'Vulnerabilities included in SBOM'}
-          amount={`${unresolve.C}C,${unresolve.H}H,${unresolve.M}M,${unresolve.L}L,${total.U}U`}
-        />
-        {/* <Spacer />
-        <SBOMStatistics
-          icon={<Icon h={'24px'} w={'24px'} color='white' as={FaUnlock} />}
-          title={'Risk Score'}
-          description={'Aggregage Risk Score of SBOM'}
-          amount={riskScoreVal !== '' ? riskScoreVal : 22}
-        /> */}
-      </Flex>
+      {/* Table */}
       <SBOMTable
         refetch={refetch}
         imgVersionId={imageVersionData ? imageVersionData.imageVersion.id : ''}
