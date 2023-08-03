@@ -61,7 +61,8 @@ function SBOMLinkRow(props) {
     enabled,
     imageDataRefetch,
     imgVersionId,
-    scanResults
+    scanResults,
+    imageInfo
   } = props
 
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -71,7 +72,7 @@ function SBOMLinkRow(props) {
 
   const [emailList, setEmailList] = useState([])
 
-  const domain = window.location.origin;
+  const domain = window.location.origin
 
   const sbomLink = useClipboard(
     `${domain}/customer/signed_url_params?${signedUrlParams}`
@@ -248,6 +249,7 @@ function SBOMLinkRow(props) {
           onClose={onClose}
           btnRef={btnRef}
           scanResults={scanResults}
+          imageInfo={imageInfo}
         />
       </Td>
     </Tr>

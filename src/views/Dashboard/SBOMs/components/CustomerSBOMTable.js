@@ -1,4 +1,5 @@
-// Chakra imports
+import React, { useState, useEffect, useContext } from 'react'
+// COMPONENTS
 import {
   Table,
   Tbody,
@@ -20,26 +21,22 @@ import {
   MenuList,
   MenuItemOption,
   Box,
-  MenuDivider,
-  MenuGroup,
-  MenuItem,
   Skeleton,
   Td,
   Tooltip
 } from '@chakra-ui/react'
-
+import { CSVLink } from 'react-csv'
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
-import VulnerabilityRow from 'components/Tables/VulnerabilityRow.js'
-import GlobalContext from 'context/GlobalContext'
-import React, { useState } from 'react'
-import { useContext } from 'react'
-import { useEffect } from 'react'
 import CardHeader from 'components/Card/CardHeader'
-import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
+
+// HELPERS
+import GlobalContext from 'context/GlobalContext'
+import VulnerabilityRow from 'components/Tables/VulnerabilityRow.js'
+
+// ICONS
 import { BsFilterRight } from 'react-icons/bs'
 import { BiExport, BiImport } from 'react-icons/bi'
-import { CSVLink } from 'react-csv'
 
 const CustomerSBOMTable = ({
   data,
@@ -47,8 +44,9 @@ const CustomerSBOMTable = ({
   refetch,
   imgVersionId,
   imageInfo,
-  filteredVul,
-  setFilteredVulItems
+  imageVersionData,
+  handlePreviousPage,
+  handleNextPage
 }) => {
   const { vulnerabilitiesData, setVulnerabilitiesData } = useContext(
     GlobalContext
@@ -69,8 +67,8 @@ const CustomerSBOMTable = ({
   const [sortComponentData, setSortComponentData] = useState([])
 
   const flattenedData =
-    data &&
-    data.map((item, index) => {
+    imageVersionData &&
+    imageVersionData.imageVulns.nodes.map((item, index) => {
       const allVulData = {
         ID: index + 1,
         CVEID: item.cveId,
@@ -90,64 +88,13 @@ const CustomerSBOMTable = ({
 
   useEffect(() => {
     const filterData =
-      data &&
-      data.filter((item) =>
+      imageVersionData &&
+      imageVersionData.imageVulns.nodes.filter((item) =>
         item.cveId.toLowerCase().includes(searchVul.toLowerCase())
       )
     console.log('filterData', filterData)
     setFilteredRow(filterData)
   }, [searchVul])
-
-  const handleVulSort = (field) => {
-    setFilteredRow([])
-    if (field === sortField) {
-      const newSortOrder = sortOrder === 'asc' ? 'desc' : 'asc'
-      setSortOrder(newSortOrder)
-      sortVulnData(field, newSortOrder)
-    } else {
-      setSortField(field)
-      setSortOrder('asc')
-      sortVulnData(field, 'asc')
-    }
-  }
-
-  const sortVulnData = (field, order) => {
-    const vuldata = [...data]
-    const sortedData = vuldata.sort((a, b) => {
-      if (
-        field === 'v3Score' &&
-        typeof a.cvss[field] === 'number' &&
-        typeof b.cvss[field] === 'number'
-      ) {
-        return order === 'asc'
-          ? a.cvss[field] - b.cvss[field]
-          : b.cvss[field] - a.cvss[field]
-      } else if (field === 'severity') {
-        const comparison = a[field][0].localeCompare(b[field][0])
-        return order === 'asc' ? comparison : -comparison
-      } else if (field === 'name' || field === 'version') {
-        const comparison = a.component[field].localeCompare(b.component[field])
-        return order === 'asc' ? comparison : -comparison
-      } else if (field === 'vexVuln') {
-        const comparison =
-          a &&
-          b &&
-          a[field]?.vexStatus?.name.localeCompare(b[field]?.vexStatus?.name)
-        return order === 'asc' ? comparison : -comparison
-      } else {
-        const comparison = a[field].localeCompare(b[field])
-        return order === 'asc' ? comparison : -comparison
-      }
-    })
-    setSortedVulnData(sortedData)
-  }
-
-  useEffect(() => {
-    const vulnaData = vulnerabilitiesData.sort((a, b) =>
-      b.cvss.localeCompare(a.cvss)
-    )
-    setVulnerabilitiesData(vulnaData)
-  }, [])
 
   useEffect(() => {
     // If no options are selected, display all data
@@ -211,16 +158,18 @@ const CustomerSBOMTable = ({
   const onVulnFilter = (item) => {
     setFilteredRow([])
     if (item === 'Unresolved') {
-      const filterData = data.filter(
-        (item) =>
-          item.vexVuln?.vexStatus?.name !== 'Fixed' &&
-          item.vexVuln?.vexStatus?.name !== 'False Positive' &&
-          item.vexVuln?.vexStatus?.name !== 'Not Affected'
-      )
+      const filterData =
+        imageVersionData &&
+        imageVersionData.imageVulns.nodes.filter(
+          (item) =>
+            item.vexVuln?.vexStatus?.name !== 'Fixed' &&
+            item.vexVuln?.vexStatus?.name !== 'False Positive' &&
+            item.vexVuln?.vexStatus?.name !== 'Not Affected'
+        )
       console.log(`filter data`, filterData)
       setSortedVulnData(filterData)
     } else {
-      setSortedVulnData(data)
+      setSortedVulnData(imageVersionData.imageVulns.nodes)
     }
   }
 
@@ -335,292 +284,128 @@ const CustomerSBOMTable = ({
               </Flex>
             </CardHeader>
             <CardBody>
-              <Table variant='simple' color={textColor} size='sm'>
-                <Thead>
-                  <Tr my='.8rem' pl='0px'>
-                    <Th
-                      color='gray.400'
-                      py={4}
-                      position='relative'
-                      onClick={() => handleVulSort('cveId')}
-                      cursor={'pointer'}
-                    >
-                      <Flex direction={'row'} alignItems={'center'} gap={2}>
-                        <Box>CVE ID</Box>
-                        <Box>
-                          {sortField === 'cveId' && sortOrder === 'asc' ? (
-                            <TriangleUpIcon />
-                          ) : (
-                            <TriangleDownIcon />
-                          )}
-                        </Box>
-                      </Flex>
-                    </Th>
-                    <Th
-                      color='gray.400'
-                      py={4}
-                      position='relative'
-                      onClick={() => handleVulSort('severity')}
-                      cursor={'pointer'}
-                    >
-                      <Flex direction={'row'} alignItems={'center'} gap={2}>
-                        <Box>Severity</Box>
-                        <Box>
-                          {sortField === 'severity' && sortOrder === 'asc' ? (
-                            <TriangleUpIcon />
-                          ) : (
-                            <TriangleDownIcon />
-                          )}
-                        </Box>
-                      </Flex>
-                    </Th>
-                    <Th
-                      color='gray.400'
-                      py={4}
-                      position='relative'
-                      onClick={() => handleVulSort('v3Score')}
-                      cursor={'pointer'}
-                    >
-                      <Flex direction={'row'} alignItems={'center'} gap={2}>
-                        <Box>CVSS</Box>
-                        <Box>
-                          {sortField === 'v3Score' && sortOrder === 'asc' ? (
-                            <TriangleUpIcon />
-                          ) : (
-                            <TriangleDownIcon />
-                          )}
-                        </Box>
-                      </Flex>
-                    </Th>
-                    <Th
-                      color='gray.400'
-                      py={4}
-                      position='relative'
-                      onClick={() => handleVulSort('name')}
-                      cursor={'pointer'}
-                    >
-                      <Flex direction={'row'} alignItems={'center'} gap={2}>
-                        <Box>Component</Box>
-                        <Box>
-                          {sortField === 'name' && sortOrder === 'asc' ? (
-                            <TriangleUpIcon />
-                          ) : (
-                            <TriangleDownIcon />
-                          )}
-                        </Box>
-                      </Flex>
-                    </Th>
-                    <Th
-                      color='gray.400'
-                      py={4}
-                      position='relative'
-                      onClick={() => handleVulSort('version')}
-                      cursor={'pointer'}
-                    >
-                      <Flex direction={'row'} alignItems={'center'} gap={2}>
-                        <Box>Version</Box>
-                        <Box>
-                          {sortField === 'version' && sortOrder === 'asc' ? (
-                            <TriangleUpIcon />
-                          ) : (
-                            <TriangleDownIcon />
-                          )}
-                        </Box>
-                      </Flex>
-                    </Th>
-                    <Th
-                      color='gray.400'
-                      py={4}
-                      position='relative'
-                      // onClick={() => handleVulSort('fixed_component')}
-                      cursor={'pointer'}
-                    >
-                      <Flex direction={'row'} alignItems={'center'} gap={2}>
-                        <Box>Fixed (Component)</Box>
-                        <Box>
-                          {sortField === 'fixed_component' &&
-                          sortOrder === 'asc' ? (
-                            <TriangleUpIcon />
-                          ) : (
-                            <TriangleDownIcon />
-                          )}
-                        </Box>
-                      </Flex>
-                    </Th>
-                    <Th
-                      color='gray.400'
-                      py={4}
-                      position='relative'
-                      // onClick={() => handleVulSort('fixed_product')}
-                      cursor={'pointer'}
-                    >
-                      <Flex direction={'row'} alignItems={'center'} gap={2}>
-                        <Box>Fixed (Product)</Box>
-                        <Box>
-                          {sortField === 'fixed_product' &&
-                          sortOrder === 'asc' ? (
-                            <TriangleUpIcon />
-                          ) : (
-                            <TriangleDownIcon />
-                          )}
-                        </Box>
-                      </Flex>
-                    </Th>
-                    <Th color='gray.400' py={4} position='relative'>
-                      <Box>Scanner</Box>
-                    </Th>
-                    <Th
-                      color='gray.400'
-                      py={4}
-                      position='relative'
-                      onClick={() => handleVulSort('vexVuln')}
-                      cursor={'pointer'}
-                    >
-                      <Flex direction={'row'} alignItems={'center'} gap={2}>
-                        <Box>Status</Box>
-                        <Box>
-                          {sortField === 'vexVuln' && sortOrder === 'asc' ? (
-                            <TriangleUpIcon />
-                          ) : (
-                            <TriangleDownIcon />
-                          )}
-                        </Box>
-                      </Flex>
-                    </Th>
-                    <Th color='gray.400' py={4} position='relative'></Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {filteredRow && filteredRow.length > 0
-                    ? filteredRow.map((row, idx) => (
-                        <VulnerabilityRow
-                          refetch={refetch}
-                          key={idx}
-                          id={row.id}
-                          severity={row.severity[0]}
-                          imgVersionId={imgVersionId}
-                          component={row.component.name}
-                          version={row.component.version}
-                          cvss={row.cvss.v3Score}
-                          cve={row.cveId}
-                          fixed_component={row.component.fixedInVersion}
-                          fixed_product={row.fixedInImage}
-                          description={row.component.name}
-                          status={row.vexVuln?.vexStatus}
-                          justify={row.vexVuln?.vexJustification}
-                          scanner={row.scanners}
-                          shared_data={row.component.name}
-                          versions={row.component.name}
-                          imageInfo={imageInfo}
-                        />
-                      ))
-                    : sortedVulnData.length > 0
-                    ? sortedVulnData.map((row, idx) => (
-                        <VulnerabilityRow
-                          refetch={refetch}
-                          key={idx}
-                          id={row.id}
-                          severity={row.severity[0]}
-                          imgVersionId={imgVersionId}
-                          component={row.component.name}
-                          version={row.component.version}
-                          cvss={row.cvss.v3Score}
-                          cve={row.cveId}
-                          fixed_component={row.component.fixedInVersion}
-                          fixed_product={row.fixedInImage}
-                          description={row.component.name}
-                          status={row.vexVuln?.vexStatus}
-                          justify={row.vexVuln?.vexJustification}
-                          scanner={row.scanners}
-                          shared_data={row.component.name}
-                          versions={row.component.name}
-                          imageInfo={imageInfo}
-                        />
-                      ))
-                    : filteredVul.length > 0
-                    ? filteredVul.map((row, idx) => {
-                        return (
-                          <VulnerabilityRow
-                            refetch={refetch}
-                            key={idx}
-                            id={row.id}
-                            severity={row.severity[0]}
-                            imgVersionId={imgVersionId}
-                            component={row.component.name}
-                            version={row.component.version}
-                            cvss={row.cvss.v3Score}
-                            cve={row.cveId}
-                            fixed_component={row.component.fixedInVersion}
-                            fixed_product={row.fixedInImage}
-                            description={row.component.name}
-                            status={row.vexVuln?.vexStatus}
-                            justify={row.vexVuln?.vexJustification}
-                            scanner={row.scanners}
-                            shared_data={row.component.name}
-                            versions={row.component.name}
-                            imageInfo={imageInfo}
-                          />
-                        )
-                      })
-                    : data
-                    ? data.map((row, idx) => {
-                        return (
-                          <VulnerabilityRow
-                            refetch={refetch}
-                            key={idx}
-                            id={row.id}
-                            severity={row.severity[0]}
-                            imgVersionId={imgVersionId}
-                            component={row.component.name}
-                            version={row.component.version}
-                            cvss={row.cvss.v3Score}
-                            cve={row.cveId}
-                            fixed_component={row.component.fixedInVersion}
-                            fixed_product={row.fixedInImage}
-                            description={row.component.name}
-                            status={row.vexVuln?.vexStatus}
-                            justify={row.vexVuln?.vexJustification}
-                            scanner={row.scanners}
-                            shared_data={row.component.name}
-                            versions={row.component.name}
-                            imageInfo={imageInfo}
-                          />
-                        )
-                      })
-                    : loading && (
-                        <Tr>
-                          <Td fontSize={'sm'} pl={1}>
-                            <Skeleton height='20px' />
-                          </Td>
-                          <Td fontSize={'sm'} pl={1}>
-                            <Skeleton height='20px' />
-                          </Td>
-                          <Td fontSize={'sm'} pl={1}>
-                            <Skeleton height='20px' />
-                          </Td>
-                          <Td fontSize={'sm'} pl={1}>
-                            <Skeleton height='20px' />
-                          </Td>
-                          <Td fontSize={'sm'} pl={1}>
-                            <Skeleton height='20px' />
-                          </Td>
-                          <Td fontSize={'sm'} pl={1}>
-                            <Skeleton height='20px' />
-                          </Td>
-                          <Td fontSize={'sm'} pl={1}>
-                            <Skeleton height='20px' />
-                          </Td>
-                          <Td fontSize={'sm'} pl={1}>
-                            <Skeleton height='20px' />
-                          </Td>
-                          <Td fontSize={'sm'} pl={1}>
-                            <Skeleton height='20px' />
-                          </Td>
-                        </Tr>
-                      )}
-                </Tbody>
-              </Table>
+              {imageVersionData &&
+              imageVersionData.imageVulns.nodes.length > 0 ? (
+                <Table variant='simple' color={textColor} size='sm'>
+                  <Thead>
+                    <Tr my='.8rem' pl='0px'>
+                      {[
+                        'CVE ID',
+                        'Severity',
+                        'CVSS',
+                        'Component',
+                        'Version',
+                        'Fixed (Component)',
+                        'Fixed (Product)',
+                        'Scanner',
+                        'Status',
+                        ''
+                      ].map((item, index) => (
+                        <Th key={index} py={4}>
+                          <Box>{item}</Box>
+                        </Th>
+                      ))}
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {imageVersionData.imageVulns.nodes.length > 0
+                      ? imageVersionData.imageVulns.nodes.map((row, idx) => {
+                          return (
+                            <VulnerabilityRow
+                              refetch={refetch}
+                              key={idx}
+                              id={row.id}
+                              severity={row.severity[0]}
+                              imgVersionId={imgVersionId}
+                              component={row.component.name}
+                              version={row.component.version}
+                              cvss={row.cvss.v3Score}
+                              cve={row.cveId}
+                              fixed_component={row.component.fixedInVersion}
+                              fixed_product={
+                                row.vexVuln?.fixedByImageVersion?.name
+                              }
+                              description={row.component.name}
+                              status={row.vexVuln?.vexStatus}
+                              justify={row.vexVuln?.vexJustification}
+                              scanner={row.scanners}
+                              shared_data={row.component.name}
+                              versions={row.component.name}
+                              imageInfo={imageInfo}
+                            />
+                          )
+                        })
+                      : loading && (
+                          <Tr>
+                            <Td fontSize={'sm'} pl={1}>
+                              <Skeleton height='20px' />
+                            </Td>
+                            <Td fontSize={'sm'} pl={1}>
+                              <Skeleton height='20px' />
+                            </Td>
+                            <Td fontSize={'sm'} pl={1}>
+                              <Skeleton height='20px' />
+                            </Td>
+                            <Td fontSize={'sm'} pl={1}>
+                              <Skeleton height='20px' />
+                            </Td>
+                            <Td fontSize={'sm'} pl={1}>
+                              <Skeleton height='20px' />
+                            </Td>
+                            <Td fontSize={'sm'} pl={1}>
+                              <Skeleton height='20px' />
+                            </Td>
+                            <Td fontSize={'sm'} pl={1}>
+                              <Skeleton height='20px' />
+                            </Td>
+                            <Td fontSize={'sm'} pl={1}>
+                              <Skeleton height='20px' />
+                            </Td>
+                            <Td fontSize={'sm'} pl={1}>
+                              <Skeleton height='20px' />
+                            </Td>
+                          </Tr>
+                        )}
+                  </Tbody>
+                </Table>
+              ) : (
+                <Flex
+                  width={'100%'}
+                  flexDirection={'row'}
+                  alignItems={'center'}
+                  justifyContent={'center'}
+                  mt={14}
+                >
+                  <Text>No vulnerability discovered on this tag</Text>
+                </Flex>
+              )}
             </CardBody>
+            {imageVersionData && (
+              <Flex
+                flexDir={'row'}
+                gap={4}
+                alignItems={'center'}
+                mt={6}
+                justifyContent={'flex-start'}
+              >
+                <Button
+                  colorScheme='blue'
+                  onClick={handlePreviousPage}
+                  isDisabled={
+                    !imageVersionData.imageVulns.pageInfo.hasPreviousPage
+                  }
+                >
+                  Previous
+                </Button>
+                <Button
+                  colorScheme='blue'
+                  onClick={handleNextPage}
+                  isDisabled={!imageVersionData.imageVulns.pageInfo.hasNextPage}
+                >
+                  Next
+                </Button>
+              </Flex>
+            )}
           </TabPanel>
         </TabPanels>
       </Tabs>

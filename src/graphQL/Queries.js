@@ -249,35 +249,82 @@ export const GetSignedImage = gql`
 `
 
 export const GetSignedImageVersion = gql`
-  query GetSignedImageVersion($signedParams: String!, $imgVersionId: ID!) {
+  query GetSignedImageVersion(
+    $signedParams: String!
+    $imgVersionId: ID!
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+  ) {
     imageVersion(signedParams: $signedParams) {
       id
       name
-      imageVulns(imageVersionId: $imgVersionId) {
-        component {
-          name
-          version
-          fixedInVersion
+      lastPushedAt
+      tags
+      image {
+        id
+        name
+        scanEnabled
+      }
+      imageScanners {
+        id
+        company
+        name
+        updatedAt
+      }
+      imageScannerRun(id: $imgVersionId) {
+        initiatedAt
+        completedAt
+        status
+        vulnDbVersion
+        dbLastUpdatedAt
+        scannerVersion
+        scannerId
+        failedAt
+      }
+      imageVulns(
+        imageVersionId: $imgVersionId
+        first: $first
+        last: $last
+        after: $after
+        before: $before
+      ) {
+        pageInfo {
+          startCursor
+          hasPreviousPage
+          endCursor
+          hasNextPage
         }
-        cveId
-        cvss {
-          v2Score
-          v3Score
-        }
-        scanners {
-          id
-          name
-          company
-        }
-        severity
-        vexVuln {
-          vexStatus {
-            id
+        nodes {
+          cveId
+          component {
             name
+            version
+            fixedInVersion
           }
-          vexJustification {
+          cvss {
+            v2Score
+            v3Score
+          }
+          severity
+          fixedInImage
+          scanners {
             id
             name
+            company
+            updatedAt
+          }
+          vexVuln {
+            fixedByImageVersion {
+              name
+            }
+            vexJustification {
+              name
+            }
+            vexStatus {
+              name
+            }
           }
         }
       }
@@ -338,6 +385,7 @@ export const GetImgVersionPagination = gql`
       id
       name
       lastPushedAt
+      tags
       image {
         id
         name

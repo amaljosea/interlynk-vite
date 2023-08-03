@@ -26,7 +26,12 @@ import { useLocation } from 'react-router-dom'
 import Cookies from 'js-cookie'
 import { useState } from 'react'
 
-export default function CustomerModal() {
+const CustomerModal = () => {
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const [overlay, setOverlay] = React.useState(<OverlayOne />)
+
+  const userLoginURL = process.env.REACT_APP_USER_LOGIN_URL
+
   const OverlayOne = () => (
     <ModalOverlay
       bg='blackAlpha.300'
@@ -43,8 +48,6 @@ export default function CustomerModal() {
     setOverlay(<OverlayOne />)
     onOpen()
   }, [])
-
-  const userLoginURL = process.env.REACT_APP_USER_LOGIN_URL
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -73,12 +76,15 @@ export default function CustomerModal() {
       })
   }
 
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const [overlay, setOverlay] = React.useState(<OverlayOne />)
-
   return (
     <>
-      <Modal isCentered isOpen={isOpen} onClose={onClose} size='lg' closeOnOverlayClick={false}>
+      <Modal
+        isCentered
+        isOpen={isOpen}
+        onClose={onClose}
+        size='lg'
+        closeOnOverlayClick={false}
+      >
         {overlay}
         <ModalContent>
           <form onSubmit={handleSubmit}>
@@ -123,7 +129,9 @@ export default function CustomerModal() {
                   overflow={'scroll'}
                   mt={4}
                 >
-                  <Text fontSize={'lg'} fontWeight={'medium'}>Non-Disclosure Agreement</Text>
+                  <Text fontSize={'lg'} fontWeight={'medium'}>
+                    Non-Disclosure Agreement
+                  </Text>
                   <Text fontSize={'sm'}>
                     THIS NONDISCLOSURE AGREEMENT AND CONFIDENTIALITY AGREEMENT
                     (“Agreement”) is made as of this 2023-07-12, by Interlynk
@@ -167,3 +175,5 @@ export default function CustomerModal() {
     </>
   )
 }
+
+export default CustomerModal

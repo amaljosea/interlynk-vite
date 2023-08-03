@@ -1,44 +1,44 @@
-// Chakra imports
+import React, { useEffect, useState } from 'react'
 import {
   Flex,
   Heading,
-  Spacer,
   Icon,
   Grid,
   GridItem,
   Text,
   Select,
-  Skeleton,
   Image,
-  Box
+  Box,
+  Tag,
+  TagLabel,
+  Tooltip,
+  Stack,
+  StackDivider,
+  chakra
 } from '@chakra-ui/react'
-import React, { useContext, useEffect, useState } from 'react'
-
-import { sbom } from 'variables/general'
-
-import {
-  FaCubes,
-  FaBug,
-  FaExclamationTriangle,
-  FaLayerGroup,
-  FaMicroscope
-} from 'react-icons/fa'
-import { useLocation } from 'react-router-dom'
-
-import SBOMStatistics from '../SBOMs/components/SBOMStatistics'
-
-import GlobalContext from 'context/GlobalContext'
 import Card from 'components/Card/Card'
-import CardBody from 'components/Card/CardBody'
+import CardHeader from 'components/Card/CardHeader'
+import CardBody from 'components/Card/CardBody.js'
+import { FaCubes, FaLayerGroup, FaMicroscope } from 'react-icons/fa'
+import { useLocation } from 'react-router-dom'
 import CustomerSBOMTable from '../SBOMs/components/CustomerSBOMTable'
 import CustomerModal from 'components/CustomerModal'
 import { GetSignedImage } from 'graphQL/Queries'
 import { useQuery } from '@apollo/client'
-import Tooltip from 'components/Tooltip'
-import { scanImage } from 'utils'
 import { GetSignedImageVersion } from 'graphQL/Queries'
+import { dateTime, timeSince, scanImage } from 'utils'
+import { getAllScanners } from 'graphQL/Queries'
+import { formattedTime } from 'utils'
+import semver from 'semver'
+
 
 function Customer() {
+  const selectedImgVersion = localStorage.getItem('selectedVersion')
+
+  const [scanResults, setScanResults] = useState(null)
+  const [scannerRun, setScannerRun] = useState([])
+  const [imageInfo, setImageInfo] = useState([])
+
   const [isConfirmed, setIsConfirmed] = useState(false)
   const [selectedVersion, setSelectedVersion] = useState('')
   const [selectedScanner, setSelectedScanner] = useState('')
@@ -55,10 +55,19 @@ function Customer() {
   const location = useLocation()
   const paramId = `${location.search.replace(/\?/g, '')}`
 
+  const { data: allScanners } = useQuery(getAllScanners)
+
+  const scannerName = (id) => {
+    if (allScanners) {
+      const scanner = allScanners.scanners.find((item) => item.id === id)
+      return scanner.name
+    }
+  }
+
   const { data: signedImageData, refetch: imgDataFetch } = useQuery(
     GetSignedImage,
     {
-      variables: { signedParams: `${paramId}` }
+      variables: { signedParams: paramId }
     }
   )
 
@@ -66,27 +75,80 @@ function Customer() {
     GetSignedImageVersion,
     {
       variables: {
-        signedParams: `${paramId}`,
-        imgVersionId:
-          signedImageData && signedImageData.image.imageVersions[0].id
+        signedParams: paramId,
+        imgVersionId: selectedVersion,
+        first: 10
       }
     }
   )
 
+  const onPreviousPage = () => {
+    refetch({
+      signedParams: paramId,
+      imageVersionId: selectedVersion,
+      first: undefined,
+      last: 10,
+      before: signedImgVerion.imageVersion.imageVulns.pageInfo.startCursor,
+      after: ''
+    })
+  }
+
+  const onNextPage = () => {
+    refetch({
+      signedParams: `${paramId}`,
+      imageVersionId: selectedVersion,
+      first: 10,
+      last: undefined,
+      after: signedImgVerion.imageVersion.imageVulns.pageInfo.endCursor,
+      before: ''
+    })
+  }
+
   useEffect(() => {
     if (signedImageData) {
       console.log(`signedImageData`, signedImageData)
-      localStorage.setItem(`signedImageName`, signedImageData.image.name)
+      const imgV = signedImageData.image.imageVersions.find(
+        (item) => item.id === selectedImgVersion
+      )
+      setScanResults(imgV)
+      setSelectedVersion(imgV.id)
     }
   }, [signedImageData])
 
   useEffect(() => {
     if (signedImgVerion) {
       console.log(`signedImgVerion`, signedImgVerion)
-      setAllResults(signedImgVerion.imageVersion.imageVulns)
-      setSelectedVersion(signedImgVerion.imageVersion.id)
+      setAllResults(signedImgVerion.imageVersion.imageVulns.nodes)
+      setScannerRun(signedImgVerion.imageVersion.imageScannerRun)
     }
   }, [signedImgVerion])
+
+  useEffect(() => {
+    if (signedImageData) {
+      const clonedImageVersions = signedImageData.image.imageVersions.map(
+        (info) => ({
+          ...info
+        })
+      )
+
+      clonedImageVersions.sort((a, b) => {
+        // If either a or b is 'latest', handle the special case.
+        if (a.name === 'latest') {
+          return -1
+        } else if (b.name === 'latest') {
+          return 1
+        }
+        var coerced_a = semver.valid(semver.coerce(a.name))
+        var coerced_b = semver.valid(semver.coerce(b.name))
+        if (coerced_a === null || coerced_b === null) {
+          return b.name.localeCompare(a.name)
+        }
+        return semver.compare(coerced_b, coerced_a)
+      })
+
+      setImageInfo(clonedImageVersions)
+    }
+  }, [signedImageData])
 
   const [contains, setcontains] = useState({})
 
@@ -122,15 +184,20 @@ function Customer() {
   }, [selectedScanner])
 
   const handleVersionUpdate = (e) => {
-    setFilteredVulItems([])
     const { value } = e.target
     setSelectedVersion(value)
+    localStorage.setItem('selectedVersion', value)
+    const imgV =
+      signedImageData &&
+      signedImageData.image.imageVersions.find((item) => item.id === value)
+    setScanResults(imgV)
     refetch({ signedParams: `${paramId}`, imgVersionId: value })
   }
 
   // Calculate the counts for each severity level
   const totalCount = allResults.reduce((acc, item) => {
-    acc[item.severity[0].toLowerCase()] = (acc[item.severity[0].toLowerCase()] || 0) + 1
+    acc[item.severity[0].toLowerCase()] =
+      (acc[item.severity[0].toLowerCase()] || 0) + 1
     return acc
   }, {})
 
@@ -142,7 +209,8 @@ function Customer() {
   )
 
   const unresolveCount = unresolveFilter?.reduce((acc, item) => {
-    acc[item.severity[0].toLowerCase()] = (acc[item.severity[0].toLowerCase()] || 0) + 1
+    acc[item.severity[0].toLowerCase()] =
+      (acc[item.severity[0].toLowerCase()] || 0) + 1
     return acc
   }, {})
 
@@ -175,6 +243,7 @@ function Customer() {
   return (
     <>
       <Flex direction='column' pt={{ base: '120px', md: '75px' }}>
+        {/* Image Details */}
         <Card mb='6'>
           <CardBody>
             <Grid width={'100%'} templateColumns='repeat(5, 1fr)'>
@@ -186,84 +255,50 @@ function Customer() {
                   width={'100%'}
                 >
                   <Icon as={FaCubes} h={'64px'} w={'64px'} color='blue.300' />
-                  <Box>
-                    <Heading as='h3' size='md' noOfLines={1} color='gray.600'>
-                      {signedImageData
-                        ? `${signedImageData.image.name}:${
-                            signedImgVerion && signedImgVerion.imageVersion.name
-                          }`
-                        : 'Loading....'}
-                    </Heading>
-                    <Text fontSize='sm'>linux/amd64</Text>
-                    <Text fontSize='xs' mb={2}>
-                      Last Pushed:{' '}
-                      {signedImageData
-                        ? `${
-                            new Date(
-                              signedImageData.image.updatedAt
-                            ).toLocaleDateString('en-US', {
-                              year: 'numeric',
-                              month: '2-digit',
-                              day: '2-digit',
-                              timeZone: 'America/Los_Angeles'
-                            }) +
-                            ' ' +
-                            new Date(
-                              signedImageData.image.updatedAt
-                            ).toLocaleTimeString('en-US', {
-                              hour: 'numeric',
-                              minute: '2-digit',
-                              hour12: true,
-                              timeZone: 'America/Los_Angeles'
-                            })
-                          }`
-                        : 'Loading..'}
-                    </Text>
-                    {signedImageData ? (
-                      signedImageData.image.imageScanners?.map(
-                        (result, index) => (
-                          <Flex
-                            key={index}
-                            flexDirection={'row'}
-                            alignItems={'center'}
-                            gap={2}
-                            mb={2}
+                  {scanResults && signedImageData && signedImgVerion ? (
+                    <Flex direction={'column'} gap={1}>
+                      <Heading as='h3' size='md' noOfLines={1}>
+                        <Flex
+                          alignItems={'center'}
+                          flexDirection={'row'}
+                          gap={3}
+                        >
+                          {signedImageData.image.name}:{scanResults.name}
+                          <Tag
+                            size={'sm'}
+                            variant='outline'
+                            colorScheme={
+                              signedImgVerion.imageVersion.image.scanEnabled ===
+                              true
+                                ? 'blue'
+                                : 'red'
+                            }
                           >
-                            <Tooltip text={`${result.company}-${result.name}`}>
-                              <Image
-                                width={4}
-                                objectFit={'contain'}
-                                src={`${scanImage(result.name)}`}
-                                alt={result}
-                              />
-                            </Tooltip>
-                            <Text fontSize={'xs'}>
-                              {new Date(result.updatedAt).toLocaleDateString(
-                                'en-US',
-                                {
-                                  year: 'numeric',
-                                  month: '2-digit',
-                                  day: '2-digit',
-                                  timeZone: 'America/Los_Angeles'
-                                }
-                              )}{' '}
-                              {new Date(result.updatedAt).toLocaleTimeString(
-                                'en-US',
-                                {
-                                  hour: 'numeric',
-                                  minute: '2-digit',
-                                  hour12: true,
-                                  timeZone: 'America/Los_Angeles'
-                                }
-                              )}
-                            </Text>
-                          </Flex>
-                        )
-                      )
-                    ) : (
-                      <Skeleton height={'2'} />
-                    )}
-                  </Box>
+                            <TagLabel>
+                              Scan{' '}
+                              {signedImgVerion.imageVersion.image
+                                .scanEnabled === true
+                                ? 'Enabled'
+                                : 'Disabled'}
+                            </TagLabel>
+                          </Tag>
+                        </Flex>
+                      </Heading>
+                      <Text fontSize='sm'>linux/amd64</Text>
+                      <Tooltip
+                        label={dateTime(
+                          signedImgVerion.imageVersion.lastPushedAt
+                        )}
+                      >
+                        <Text fontSize='xs' cursor={'pointer'}>
+                          Last Pushed:{' '}
+                          {timeSince(signedImgVerion.imageVersion.lastPushedAt)}
+                        </Text>
+                      </Tooltip>
+                    </Flex>
+                  ) : (
+                    <Text>Loading....</Text>
+                  )}
                 </Flex>
               </GridItem>
               <GridItem colSpan={3}>
@@ -283,14 +318,12 @@ function Customer() {
                       width={'150px'}
                       color='gray.500'
                     >
-                      {signedImageData &&
-                        signedImageData.image.imageVersions?.map(
-                          (img, index) => (
-                            <option key={index} value={img.id}>
-                              {img.name}
-                            </option>
-                          )
-                        )}
+                      {imageInfo.length > 0 &&
+                        imageInfo.map((img, index) => (
+                          <option key={index} value={img.id}>
+                            {img.name}
+                          </option>
+                        ))}
                     </Select>
                   </Flex>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
@@ -316,38 +349,110 @@ function Customer() {
             </Grid>
           </CardBody>
         </Card>
-        {/* status bar */}
-        <Flex direction='row' gap='2'>
-          <SBOMStatistics
-            icon={<Icon h={'24px'} w={'24px'} color='white' as={FaBug} />}
-            title={'Total Vulnerabilities'}
-            description={'Vulnerabilities included in SBOM'}
-            amount={`${total.C}C,${total.H}H,${total.M}M,${total.L}C`}
+        {/* Scanner Details */}
+        {scannerRun.length > 0 && (
+          <Card>
+            <CardHeader>
+              <Heading size='md'>Scanner Summary</Heading>
+            </CardHeader>
+
+            <CardBody width='100%'>
+              <Stack
+                width={'100%'}
+                mt={8}
+                divider={<StackDivider />}
+                spacing='4'
+              >
+                {scannerRun.map((item, index) => (
+                  <Flex
+                    key={index}
+                    flexDir={'row'}
+                    alignItems={'flex-start'}
+                    justifyContent={'space-between'}
+                    gap={4}
+                  >
+                    <Flex
+                      flexDir={'row'}
+                      alignItems={'flex-start'}
+                      gap={4}
+                      cursor={'pointer'}
+                    >
+                      {allScanners && (
+                        <Image
+                          width={7}
+                          objectFit={'contain'}
+                          src={`${scanImage(scannerName(item.scannerId))}`}
+                          alt={scannerName(item.scannerId)}
+                        />
+                      )}
+                      <Tooltip
+                        label={`${
+                          item.status !== 'failed'
+                            ? `${formattedTime(
+                                item.initiatedAt,
+                                item.completedAt
+                              )}`
+                            : ''
+                        }`}
+                      >
+                        <Box>
+                          <Flex alignItems={'center'} gap={3}>
+                            <Heading size='sm' color={'gray.600'}>
+                              {scannerName(item.scannerId)}
+                            </Heading>
+                            {item.status !== 'failed' && (
+                              <Text fontSize={'sm'}>{item.scannerVersion}</Text>
+                            )}
+                          </Flex>
+                          <Text
+                            pt={2}
+                            fontSize='sm'
+                            textTransform={'capitalize'}
+                          >
+                            <chakra.span
+                              color={`${
+                                item.status === 'completed'
+                                  ? 'green.500'
+                                  : item.status === 'failed'
+                                  ? 'red.500'
+                                  : 'orange.400'
+                              }`}
+                            >
+                              {item.status}
+                            </chakra.span>
+                          </Text>
+                        </Box>
+                      </Tooltip>
+                    </Flex>
+                    {item.status !== 'failed' && (
+                      <Text fontSize={'sm'}>
+                        <em>
+                          Updated{' '}
+                          {item.completedAt
+                            ? timeSince(item.completedAt)
+                            : timeSince(item.failedAt)}
+                        </em>
+                      </Text>
+                    )}
+                  </Flex>
+                ))}
+              </Stack>
+            </CardBody>
+          </Card>
+        )}
+        {signedImgVerion && signedImgVerion && (
+          <CustomerSBOMTable
+            loading={loading}
+            refetch={refetch}
+            imageVersionData={signedImgVerion.imageVersion}
+            imgVersionId={signedImgVerion.imageVersion.id}
+            imageInfo={signedImageData.image.imageVersions}
+            filteredVul={filteredVulItems}
+            setFilteredVulItems={setFilteredVulItems}
+            handlePreviousPage={onPreviousPage}
+            handleNextPage={onNextPage}
           />
-          <Spacer />
-          <SBOMStatistics
-            icon={
-              <Icon
-                h={'24px'}
-                w={'24px'}
-                color='white'
-                as={FaExclamationTriangle}
-              />
-            }
-            title={'Unresolved Vulnerabilities'}
-            description={'Vulnerabilities included in SBOM'}
-            amount={`${unresolve.C}C,${unresolve.H}H,${unresolve.M}M,${unresolve.L}C`}
-          />
-        </Flex>
-        <CustomerSBOMTable
-          data={signedImgVerion && signedImgVerion.imageVersion.imageVulns}
-          loading={loading}
-          refetch={refetch}
-          imgVersionId={signedImgVerion && signedImgVerion.imageVersion.id}
-          imageInfo={signedImageData && signedImageData.image.imageVersions}
-          filteredVul={filteredVulItems}
-          setFilteredVulItems={setFilteredVulItems}
-        />
+        )}
         {isConfirmed && <CustomerModal />}
       </Flex>
     </>

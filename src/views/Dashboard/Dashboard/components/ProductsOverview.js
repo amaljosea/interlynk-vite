@@ -21,9 +21,8 @@ import CardBody from 'components/Card/CardBody'
 import React from 'react'
 import { Link } from 'react-router-dom'
 
-import { scanImage } from 'utils'
+import { scanImage, getConImg } from 'utils'
 import { useQuery } from '@apollo/client'
-import { getConImg } from 'utils'
 import { ImagePagination } from 'graphQL/Queries'
 
 const ProductsOverview = ({ title }) => {
@@ -158,34 +157,32 @@ const ProductsOverview = ({ title }) => {
                   </Tr>
                 )}
               </Tbody>
-              <Flex
-                flexDir={'row'}
-                gap={4}
-                alignItems={'center'}
-                mt={6}
-                justifyContent={'flex-start'}
-              >
-                <Button
-                  colorScheme='blue'
-                  onClick={handlePreviousPage}
-                  isDisabled={
-                    allImages && !allImages.images.pageInfo.hasPreviousPage
-                  }
-                >
-                  Previous
-                </Button>
-                <Button
-                  colorScheme='blue'
-                  onClick={handleNextPage}
-                  isDisabled={
-                    allImages && !allImages.images.pageInfo.hasNextPage
-                  }
-                >
-                  Next
-                </Button>
-              </Flex>
             </Table>
           </CardBody>
+          {allImages && (
+            <Flex
+              flexDir={'row'}
+              gap={4}
+              alignItems={'center'}
+              mt={6}
+              justifyContent={'flex-start'}
+            >
+              <Button
+                colorScheme='blue'
+                onClick={handlePreviousPage}
+                isDisabled={!allImages.images.pageInfo.hasPreviousPage}
+              >
+                Previous
+              </Button>
+              <Button
+                colorScheme='blue'
+                onClick={handleNextPage}
+                isDisabled={!allImages.images.pageInfo.hasNextPage}
+              >
+                Next
+              </Button>
+            </Flex>
+          )}
         </Card>
       </Flex>
     </Flex>
