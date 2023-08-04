@@ -1,8 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import GlobalContext from './GlobalContext'
-import { dashboardTableData } from 'variables/general'
-import { SBOMLinks } from 'variables/general'
-import { activitiesDataLong } from 'variables/general'
+import {
+  dashboardTableData,
+  SBOMLinks,
+  advisoriesDataLong,
+  activitiesDataLong
+} from 'variables/general'
 
 const ContextWrapper = (props) => {
   const [productVersionsData, setProductVersionsData] = useState(
@@ -82,6 +85,8 @@ const ContextWrapper = (props) => {
   const [scannerItems, setScannerItems] = useState('')
   const [scanEnabled, setScanEnabled] = useState(false)
 
+  const [advisoriesData, setAdvisoriesData] = useState(advisoriesDataLong)
+
   return (
     <GlobalContext.Provider
       value={{
@@ -124,7 +129,9 @@ const ContextWrapper = (props) => {
         scannerItems,
         setScannerItems,
         scanEnabled,
-        setScanEnabled
+        setScanEnabled,
+        advisoriesData,
+        setAdvisoriesData
       }}
     >
       {props.children}

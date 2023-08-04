@@ -326,7 +326,6 @@ export const DeleteShareLynk = gql`
   }
 `
 
-
 export const OrgConnectorValidate = gql`
   mutation OrgConnectorValidate($id: ID!) {
     organizationConnectorValidate(input: { id: $id }) {
@@ -343,6 +342,34 @@ export const UpdateImageVersion = gql`
         name
       }
       errors
+    }
+  }
+`
+
+export const OrgSettingCreate = gql`
+  mutation OrgSettingCreate($settingId: Uuid!, $value: Boolean) {
+    organizationSettingCreate(input: { settingId: $settingId, value: $value }) {
+      organizationSetting {
+        id
+        value
+        setting {
+          name
+        }
+      }
+    }
+  }
+`
+
+export const OrgSettingUpdate = gql`
+  mutation OrgSettingUpdate($id: ID!, $value: Boolean!) {
+    organizationSettingUpdate(input: { id: $id, value: $value }) {
+      organizationSetting {
+        id
+        value
+        setting {
+          name
+        }
+      }
     }
   }
 `

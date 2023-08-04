@@ -62,7 +62,8 @@ function SBOMLinkRow(props) {
     imageDataRefetch,
     imgVersionId,
     scanResults,
-    imageInfo
+    imageInfo,
+    imageVersionData
   } = props
 
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -213,9 +214,15 @@ function SBOMLinkRow(props) {
             disabled
             fontSize={'sm'}
           />
-          <Button onClick={handleCopy} fontSize={'sm'}>
-            {sbomLink.hasCopied ? 'Copied!' : 'Copy'}
-          </Button>
+          {imageVersionData && (
+            <Button
+              onClick={handleCopy}
+              fontSize={'sm'}
+              isDisabled={imageVersionData.imageVulns.nodes.length === 0}
+            >
+              {sbomLink.hasCopied ? 'Copied!' : 'Copy'}
+            </Button>
+          )}
         </Flex>
         {/* <Link to={`/admin/sboms/${customerId[7]}`}> */}
       </Td>

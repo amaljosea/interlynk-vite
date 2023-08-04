@@ -124,6 +124,7 @@ export default function Pages(props) {
           setEmail('')
           setPassword('')
           localStorage.setItem('username', status.data.user.name)
+          localStorage.setItem('email', status.data.user.email)
           Cookies.set('authToken', response.headers.authorization, {
             expires: 1
           })
@@ -133,12 +134,11 @@ export default function Pages(props) {
       .catch((error) => {
         console.log(`Error: ${error}`)
         if (error.response) {
-          const { status } = error.response;
-          console.log('Status code:', status);
+          const { status } = error.response
+          console.log('Status code:', status)
           if (status === 401) {
             setError(`Invalid email or password`)
-          }
-          else if (status === 404) {
+          } else if (status === 404) {
             setError(`Internal routing error. Please try again`)
           } else {
             setError(`Internal error. Please try again`)
