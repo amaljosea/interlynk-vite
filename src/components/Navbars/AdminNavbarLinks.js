@@ -81,7 +81,7 @@ export default function HeaderLinks(props) {
           color='gray.400'
           ms='0px'
           px='0px'
-          me={{ sm: '2px', md: '16px' }}
+          // me={{ sm: '2px', md: '16px' }}
           // color={navbarIcon}
           // variant='transparent-with-icon'
           rightIcon={

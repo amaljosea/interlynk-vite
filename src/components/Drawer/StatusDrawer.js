@@ -219,6 +219,7 @@ const StatusDrawer = ({
                         value={statusTitle}
                         onChange={handleStatusChange}
                       >
+                        <option value=''>-- Select Status --</option>
                         {allVexStatus ? (
                           allVexStatus.vexStatuses.map((st, idx) => (
                             <option key={idx} value={st.id}>

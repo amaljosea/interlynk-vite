@@ -1,20 +1,17 @@
 // import
 import Dashboard from 'views/Dashboard/Dashboard'
-import Products from 'views/Dashboard/Products'
-import Activities from 'views/Dashboard/Activities'
 import Profile from 'views/Dashboard/Profile'
-import SBOMs from 'views/Dashboard/SBOMs'
 import Images from 'views/Dashboard/Images'
+import Feed from 'views/Dashboard/Feed'
 import { HomeIcon } from 'components/Icons/Icons'
 
 import {
-  FaWindowMaximize,
-  FaRegChartBar,
   FaRegSun,
-  FaCode,
   FaImages,
-  FaPlug
+  FaPlug,
+  FaBullhorn
 } from 'react-icons/fa'
+
 import Connections from 'views/Dashboard/Connections'
 
 var dashRoutes = [
@@ -54,19 +51,26 @@ var dashRoutes = [
   //   layout: '/vendor'
   // },
   {
+    path: '/feed',
+    name: 'Feed',
+    icon: <FaBullhorn color='inherit' />,
+    component: Feed,
+    layout: '/vendor'
+  },
+  {
     path: '/connections',
     name: 'Connections',
     icon: <FaPlug color='inherit' />,
     component: Connections,
     layout: '/vendor'
+  },
+  {
+    path: '/profiles',
+    name: 'Settings',
+    icon: <FaRegSun color='inherit' />,
+    component: Profile,
+    layout: '/vendor'
   }
-  // {
-  //   path: '/profiles',
-  //   name: 'Settings',
-  //   icon: <FaRegSun color='inherit' />,
-  //   component: Profile,
-  //   layout: '/vendor'
-  // }
 ]
 
 export default dashRoutes

@@ -827,7 +827,6 @@ export const activitiesDataLong = [
   }
 ]
 
-
 export const Risks = [
   {
     type: 'Exploitable Vulnerability',
@@ -1677,5 +1676,138 @@ export const olderTransactions = [
     date: '25 March 2021, at 16:30 PM',
     price: '- $987',
     logo: FaArrowDown
+  }
+]
+
+export const advisoriesDataLong = [
+  // ID, Description, Source, Updated, Severity, Affected
+  {
+    ID: 'CVE-2023-3329',
+    desc:
+      "SpiderControl SCADA Webserver versions 2.08 and prior are vulnerable to path traversal. \
+          An attacker with administrative privileges could overwrite files on the webserver using the HMI's upload file feature. \
+          This could create size zero files anywhere on the webserver, potentially overwriting system files and creating a denial-of-service condition.",
+    source: 'NVD',
+    updated: '2023-08-02',
+    severity: '',
+    affected: [],
+    aliases: []
+  },
+  {
+    ID: 'CVE-2023-39114',
+    desc:
+      "GNU libmicrohttpd before 0.9.76 allows remote DoS (Denial of Service) \
+            due to improper parsing of a multipart/form-data boundary in the postprocessor.c \
+            MHD_create_post_processor() method. This allows an attacker to remotely \
+            send a malicious HTTP POST packet that includes one or more '\0' bytes \
+            in a multipart/form-data boundary field, which - assuming a specific heap \
+            layout - will result in an out-of-bounds read and a crash in the find_boundary() function.",
+    source: 'NVD',
+    updated: '2023-08-02',
+    severity: 'Medium',
+    affected: ['libmicrohttpd <0.9.76'],
+    aliases: []
+  },
+  {
+    ID: 'CVE-2023-39113',
+    desc:
+      'In Progress MOVEit Transfer before 2021.0.9 (13.0.9), 2021.1.7 (13.1.7), 2022.0.7 (14.0.7), 2022.1.8 (14.1.8), and 2023.0.4 (15.0.4), it is possible for an attacker to invoke a method that results in an unhandled exception. Triggering this workflow can cause the MOVEit Transfer application to terminate unexpectedly.',
+    source: 'NVD',
+    updated: '2023-08-02',
+    severity: 'High',
+    affected: [
+      'moveit_transfer >= 2022.1.0 < 2022.1.8',
+      'moveit_transfer >= 2023.0.0 < 2023.0.4'
+    ],
+    aliases: []
+  },
+  {
+    ID: 'CVE-2023-1935',
+    desc:
+      'ROC800-Series RTU devices are vulnerable to an authentication bypass, which could allow an attacker to gain unauthorized access to data or control of the device and cause a denial-of-service condition.',
+    source: 'NVD',
+    updated: '2023-08-02',
+    severity: 'Critical',
+    affected: [],
+    aliases: []
+  },
+  {
+    ID: 'CVE-2023-38418',
+    desc:
+      'The BIG-IP Edge Client Installer on macOS does not follow best practices for elevating privileges during the installation process.  Note: Software versions which have reached End of Technical Support (EoTS) are not evaluated.',
+    source: 'NVD',
+    updated: '2023-08-02',
+    severity: 'High',
+    affected: [],
+    aliases: []
+  },
+  {
+    ID: 'GHSA-jm77-qphf-c4w8',
+    desc: "pyca/cryptography's wheels include vulnerable OpenSSL",
+    source: 'GHSA',
+    updated: '2023-08-01',
+    severity: 'Low',
+    affected: ['cryptography >=0.8, <41.0.3'],
+    aliases: []
+  },
+  {
+    ID: 'GHSA-pg75-v6fp-8q59',
+    desc:
+      "Keylime's registrar vulnerable to Denial-of-service attack via a single open connection",
+    source: 'GHSA',
+    updated: '2023-08-01',
+    severity: 'High',
+    affected: ['keylime <7.4.0'],
+    aliases: ['CVE-2023-38200']
+  },
+  {
+    ID: 'GHSA-8hx6-qv6f-xgcw',
+    desc:
+      "MindsDB 'Call to requests with verify=False disabling SSL certificate checks, security issue.' issue",
+    source: 'GHSA',
+    updated: '2023-08-01',
+    severity: 'Critical',
+    affected: ['MindsDB < 23.7.4.0'],
+    aliases: []
+  },
+  {
+    ID: 'GHSA-xqcq-j8w9-3pxv',
+    desc: 'Jettison parser crash by stackoverflow',
+    source: 'GHSA',
+    updated: '2023-08-01',
+    severity: 'Medium',
+    affected: [
+      'com.tencyle.fixes:org.codehaus.jettison--jettison = 1.1-tencyle-2.1.0'
+    ],
+    aliases: []
+  },
+  {
+    ID: 'GHSA-rrxv-q8m4-wch3',
+    desc:
+      '.eth registrar controller can shorten the duration of registered name',
+    source: 'GHSA',
+    updated: '2023-08-01',
+    severity: 'Medium',
+    affected: ['@ensdomains/ens-contracts <= 0.0.21'],
+    aliases: []
+  },
+  {
+    ID: 'USN-6269-1',
+    desc: 'GStreamer Good Plugins vulnerability',
+    source: 'USN',
+    updated: '2023-08-02',
+    severity: 'Medium',
+    affected: ['Ubuntu 23.04', 'Ubuntu 22.04 LTS', 'Ubuntu 20.04 LTS'],
+    aliases: ['CVE-2023-37327']
+  },
+  {
+    ID: 'USN-6242-2',
+    desc:
+      'OpenSSH could be made to run programs as your login when using ssh-agent forwarding.',
+    source: 'USN',
+    updated: '2023-07-31',
+    severity: 'Medium',
+    affected: ['Ubuntu 18.04 ESM', 'Ubuntu 16.04 ESM', 'Ubuntu 14.04 ESM'],
+    aliases: ['CVE-2023-38408']
   }
 ]

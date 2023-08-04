@@ -1,5 +1,25 @@
 import { gql } from '@apollo/client'
 
+export const GetOrgInfo = gql`
+  query GetOrganization {
+    organization {
+      id
+      name
+      email
+      url
+      organizationSettings {
+        id
+        value
+        setting {
+          id
+          name
+          kind
+        }
+      }
+    }
+  }
+`
+
 export const GetAllConnectors = gql`
   query GetAllConnectors {
     connectors {
@@ -452,6 +472,33 @@ export const GetImgVersionPagination = gql`
           }
         }
       }
+    }
+  }
+`
+
+export const GetSettings = gql`
+  query GetAllSettings {
+    settings {
+      id
+      name
+      kind
+      friendlyName
+    }
+  }
+`
+
+export const GetFeedLogs = gql`
+  query getFeedLogs($date: String!, $severity: String, $source: String) {
+    feedLogs(date: $date, severity: $severity, source: $source) {
+      id
+      affected
+      aliasId
+      description
+      editedAt
+      publishedAt
+      refId
+      severity
+      source
     }
   }
 `

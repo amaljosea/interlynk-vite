@@ -129,7 +129,7 @@ export default function AdminNavbar(props) {
         sm: 'calc(100vw - 30px)',
         xl: minimize
           ? 'calc(100vw - 75px - 110px)'
-          : 'calc(100vw - 75px - 220px)'
+          : 'calc(100vw - 75px - 210px)'
       }}
     >
       <Flex

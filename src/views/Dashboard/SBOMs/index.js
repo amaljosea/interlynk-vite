@@ -306,14 +306,14 @@ function SBOMs() {
                         imageVersionData.imageVersion.tags.length > 0 &&
                         imageVersionData.imageVersion.tags.map(
                           (item, index) => (
-                            <Text
-                              fontSize={'xs'}
-                              color={'blue.500'}
-                              textDecoration={'underline'}
+                            <Tag
+                              size={'sm'}
                               key={index}
+                              variant='outline'
+                              colorScheme='blue'
                             >
                               {item}
-                            </Text>
+                            </Tag>
                           )
                         )}
                     </Flex>

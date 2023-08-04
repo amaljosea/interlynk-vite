@@ -57,7 +57,6 @@ import { vuln_captions } from 'utils'
 const SBOMTable = ({
   scan,
   imageId,
-  data,
   setFilteredVulItems,
   imageVersionData,
   imgVersionId,
@@ -390,6 +389,7 @@ const SBOMTable = ({
                             imgVersionId={imgVersionId}
                             scanResults={scanResults}
                             imageInfo={imageInfo}
+                            imageVersionData={imageVersionData}
                           />
                         ))
                       : shareLynkLoading && (
@@ -490,123 +490,140 @@ const SBOMTable = ({
                   </Flex>
                 </Flex>
               </CardHeader>
-              <CardBody>
-                {/* <BasicTable data={vulData} columns={columns} /> */}
-                {imageVersionData &&
-                imageVersionData.imageVulns.nodes.length > 0 ? (
-                  <Table variant='simple' color={textColor} size='sm'>
-                    <Thead>
-                      <Tr my='.8rem' pl='0px'>
-                        {vuln_captions.map((item, index) => (
-                          <Th key={index} py={4}>
-                            <Box>{item}</Box>
-                          </Th>
-                        ))}
-                      </Tr>
-                    </Thead>
-                    <Tbody>
-                      {imageVersionData &&
-                      imageVersionData.imageVulns.nodes.length > 0
-                        ? imageVersionData.imageVulns.nodes.map((row, idx) => {
-                            return (
-                              <VulnerabilityRow
-                                refetch={refetch}
-                                key={idx}
-                                id={row.id}
-                                isRefresh={isLoading}
-                                imgVersionId={imgVersionId}
-                                severity={row.severity[0]}
-                                component={row.component.name}
-                                version={row.component.version}
-                                cvss={row.cvss.v3Score}
-                                cve={row.cveId}
-                                fixed_component={row.component.fixedInVersion}
-                                fixed_product={
-                                  row.vexVuln?.fixedByImageVersion?.name
-                                }
-                                description={row.component.name}
-                                status={row.vexVuln?.vexStatus}
-                                justify={row.vexVuln?.vexJustification}
-                                scanner={row.scanners}
-                                shared_data={row.component.name}
-                                versions={row.component.name}
-                                imageInfo={imageInfo}
-                              />
-                            )
-                          })
-                        : loading && (
-                            <Tr>
-                              <Td fontSize={'sm'} pl={1}>
-                                <Skeleton height='20px' />
-                              </Td>
-                              <Td fontSize={'sm'} pl={1}>
-                                <Skeleton height='20px' />
-                              </Td>
-                              <Td fontSize={'sm'} pl={1}>
-                                <Skeleton height='20px' />
-                              </Td>
-                              <Td fontSize={'sm'} pl={1}>
-                                <Skeleton height='20px' />
-                              </Td>
-                              <Td fontSize={'sm'} pl={1}>
-                                <Skeleton height='20px' />
-                              </Td>
-                              <Td fontSize={'sm'} pl={1}>
-                                <Skeleton height='20px' />
-                              </Td>
-                              <Td fontSize={'sm'} pl={1}>
-                                <Skeleton height='20px' />
-                              </Td>
-                              <Td fontSize={'sm'} pl={1}>
-                                <Skeleton height='20px' />
-                              </Td>
-                              <Td fontSize={'sm'} pl={1}>
-                                <Skeleton height='20px' />
-                              </Td>
-                            </Tr>
-                          )}
-                    </Tbody>
-                  </Table>
-                ) : (
-                  <Flex
-                    width={'100%'}
-                    flexDirection={'row'}
-                    alignItems={'center'}
-                    justifyContent={'center'}
-                    mt={14}
-                  >
-                    <Text>No vulnerability discovered on this tag</Text>
-                  </Flex>
-                )}
-              </CardBody>
-
               {imageVersionData && (
-                <Flex
-                  flexDir={'row'}
-                  gap={4}
-                  alignItems={'center'}
-                  mt={6}
-                  justifyContent={'flex-start'}
-                >
-                  <Button
-                    colorScheme='blue'
-                    onClick={handlePreviousPage}
-                    isDisabled={
-                      !imageVersionData.imageVulns.pageInfo.hasPreviousPage
-                    }
+                <>
+                  <CardBody>
+                    {imageVersionData.imageScannerRun.length > 0 &&
+                    (imageVersionData.imageScannerRun[0].status === 'failed' ||
+                      imageVersionData.image.scanEnabled === false) ? (
+                      <Flex
+                        width={'100%'}
+                        flexDirection={'row'}
+                        alignItems={'center'}
+                        justifyContent={'center'}
+                        mt={14}
+                      >
+                        <Text>
+                          No scan result found, click on "Refresh" to lanch a
+                          new scan
+                        </Text>
+                      </Flex>
+                    ) : imageVersionData.imageVulns.nodes.length > 0 ? (
+                      <Table variant='simple' color={textColor} size='sm'>
+                        <Thead>
+                          <Tr my='.8rem' pl='0px'>
+                            {vuln_captions.map((item, index) => (
+                              <Th key={index} py={4}>
+                                <Box>{item}</Box>
+                              </Th>
+                            ))}
+                          </Tr>
+                        </Thead>
+                        <Tbody>
+                          {imageVersionData.imageVulns.nodes.length > 0
+                            ? imageVersionData.imageVulns.nodes.map(
+                                (row, idx) => {
+                                  return (
+                                    <VulnerabilityRow
+                                      refetch={refetch}
+                                      key={idx}
+                                      id={row.id}
+                                      isRefresh={isLoading}
+                                      imgVersionId={imgVersionId}
+                                      severity={row.severity[0]}
+                                      component={row.component.name}
+                                      version={row.component.version}
+                                      cvss={row.cvss.v3Score}
+                                      cve={row.cveId}
+                                      fixed_component={
+                                        row.component.fixedInVersion
+                                      }
+                                      fixed_product={
+                                        row.vexVuln?.fixedByImageVersion?.name
+                                      }
+                                      description={row.component.name}
+                                      status={row.vexVuln?.vexStatus}
+                                      justify={row.vexVuln?.vexJustification}
+                                      scanner={row.scanners}
+                                      shared_data={row.component.name}
+                                      versions={row.component.name}
+                                      imageInfo={imageInfo}
+                                    />
+                                  )
+                                }
+                              )
+                            : loading && (
+                                <Tr>
+                                  <Td fontSize={'sm'} pl={1}>
+                                    <Skeleton height='20px' />
+                                  </Td>
+                                  <Td fontSize={'sm'} pl={1}>
+                                    <Skeleton height='20px' />
+                                  </Td>
+                                  <Td fontSize={'sm'} pl={1}>
+                                    <Skeleton height='20px' />
+                                  </Td>
+                                  <Td fontSize={'sm'} pl={1}>
+                                    <Skeleton height='20px' />
+                                  </Td>
+                                  <Td fontSize={'sm'} pl={1}>
+                                    <Skeleton height='20px' />
+                                  </Td>
+                                  <Td fontSize={'sm'} pl={1}>
+                                    <Skeleton height='20px' />
+                                  </Td>
+                                  <Td fontSize={'sm'} pl={1}>
+                                    <Skeleton height='20px' />
+                                  </Td>
+                                  <Td fontSize={'sm'} pl={1}>
+                                    <Skeleton height='20px' />
+                                  </Td>
+                                  <Td fontSize={'sm'} pl={1}>
+                                    <Skeleton height='20px' />
+                                  </Td>
+                                </Tr>
+                              )}
+                        </Tbody>
+                      </Table>
+                    ) : (
+                      <Flex
+                        width={'100%'}
+                        flexDirection={'row'}
+                        alignItems={'center'}
+                        justifyContent={'center'}
+                        mt={14}
+                      >
+                        <Text>No vulnerability discovered on this tag</Text>
+                      </Flex>
+                    )}
+                  </CardBody>
+                  <Flex
+                    flexDir={'row'}
+                    gap={4}
+                    alignItems={'center'}
+                    mt={6}
+                    justifyContent={'flex-start'}
                   >
-                    Previous
-                  </Button>
-                  <Button
-                    colorScheme='blue'
-                    onClick={handleNextPage}
-                    isDisabled={
-                      !imageVersionData.imageVulns.pageInfo.hasNextPage
-                    }
-                  >
-                    Next
-                  </Button>
-                </Flex>
+                    <Button
+                      colorScheme='blue'
+                      onClick={handlePreviousPage}
+                      isDisabled={
+                        !imageVersionData.imageVulns.pageInfo.hasPreviousPage
+                      }
+                    >
+                      Previous
+                    </Button>
+                    <Button
+                      colorScheme='blue'
+                      onClick={handleNextPage}
+                      isDisabled={
+                        !imageVersionData.imageVulns.pageInfo.hasNextPage
+                      }
+                    >
+                      Next
+                    </Button>
+                  </Flex>
+                </>
               )}
             </TabPanel>
           </TabPanels>
