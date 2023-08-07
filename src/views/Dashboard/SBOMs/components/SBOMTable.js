@@ -32,7 +32,8 @@ import {
   ModalBody,
   ModalFooter,
   Text,
-  chakra
+  chakra,
+  Icon
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card.js'
@@ -53,6 +54,8 @@ import { UpdateImageVersion } from 'graphQL/Mutation'
 import { ImageUpdate } from 'graphQL/Mutation'
 import { link_captions } from 'utils'
 import { vuln_captions } from 'utils'
+import { FaEllipsisV } from 'react-icons/fa'
+import MultiStatusDrawer from 'components/Drawer/MultiStatusDrawer'
 
 const SBOMTable = ({
   scan,
@@ -74,8 +77,6 @@ const SBOMTable = ({
     vulnerabilitiesData,
     setVulnerabilitiesData,
     selectedRows,
-    tabIndex,
-    setTabIndex,
     productVersionsData,
     setScanEnabled,
     scanEnabled
@@ -83,11 +84,12 @@ const SBOMTable = ({
 
   const [allVulResult, setAllVulResult] = useState([])
 
-  // useEffect(() => {
-  //   if (imageVersionData) {
-  //     console.log('Vuln Data', imageVersionData.imageVulns.nodes)
-  //   }
-  // }, [imageVersionData])
+  useEffect(() => {
+    if (imageVersionData) {
+      console.log('Vuln Data', imageVersionData.imageVulns.nodes)
+      setAllVulResult(imageVersionData.imageVulns.nodes)
+    }
+  }, [imageVersionData])
 
   const vulnData = allVulResult
 
@@ -115,6 +117,12 @@ const SBOMTable = ({
     isOpen: isRefreshOpen,
     onOpen: setRefreshOpen,
     onClose: setRefreshClose
+  } = useDisclosure()
+
+  const {
+    isOpen: isStatusOpen,
+    onOpen: setStatusOpen,
+    onClose: setStatusClose
   } = useDisclosure()
 
   const flattenedData = allVulResult.map((item, index) => {
@@ -146,10 +154,14 @@ const SBOMTable = ({
           scanRefresh: true
         }
       })
-      setRefreshClose()
-      setTimeout(() => {
-        setIsLoading(false)
-      }, 2000)
+        .then(() => {
+          setRefreshClose()
+        })
+        .finally(() => {
+          setTimeout(() => {
+            setIsLoading(false)
+          }, 2000)
+        })
     } catch (error) {
       console.error('Mutation error:', error)
     }
@@ -162,12 +174,15 @@ const SBOMTable = ({
           id: imageId,
           scanEnabled: true
         }
-      }).then(() => {
-        refreshImage()
       })
-      setTimeout(() => {
-        setScanEnabled(true)
-      }, 2000)
+        .then(() => {
+          refreshImage()
+        })
+        .finally(() => {
+          setTimeout(() => {
+            setScanEnabled(true)
+          }, 1000)
+        })
     } catch (error) {
       console.error('Mutation error:', error)
     }
@@ -322,19 +337,15 @@ const SBOMTable = ({
     }
   })
 
+  const [checkedRows, setCheckedRows] = useState([])
+
   return (
     <>
       <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
-        <Tabs
-          variant='enclosed'
-          index={tabIndex}
-          onChange={(index) => setTabIndex(index)}
-        >
+        <Tabs variant='enclosed' defaultIndex={1}>
           <TabList mt='20px'>
             <Tab>Share Lynks</Tab>
             <Tab>Vulnerabilities</Tab>
-            {/* <Tab>Affected Components</Tab> */}
-            {/* <Tab>Risks</Tab> */}
           </TabList>
           <TabPanels>
             {/* share lynks */}
@@ -479,13 +490,28 @@ const SBOMTable = ({
                           </CSVLink>
                         </Button>
                       </Tooltip>
-                      <Button
-                        colorScheme='blue'
-                        size='md'
-                        onClick={scanEnabled ? refreshImage : setRefreshOpen}
-                      >
-                        Refresh
-                      </Button>
+                      {!scanEnabled && (
+                        <Button
+                          colorScheme='blue'
+                          size='md'
+                          onClick={setRefreshOpen}
+                        >
+                          Scan
+                        </Button>
+                      )}
+                      {checkedRows.length > 0 && (
+                        <Button
+                          colorScheme='blue'
+                          size='md'
+                          onClick={setStatusOpen}
+                        >
+                          <Icon
+                            as={FaEllipsisV}
+                            color='gray.100'
+                            cursor='pointer'
+                          />
+                        </Button>
+                      )}
                     </Box>
                   </Flex>
                 </Flex>
@@ -527,7 +553,7 @@ const SBOMTable = ({
                                     <VulnerabilityRow
                                       refetch={refetch}
                                       key={idx}
-                                      id={row.id}
+                                      id={idx}
                                       isRefresh={isLoading}
                                       imgVersionId={imgVersionId}
                                       severity={row.severity[0]}
@@ -548,6 +574,8 @@ const SBOMTable = ({
                                       shared_data={row.component.name}
                                       versions={row.component.name}
                                       imageInfo={imageInfo}
+                                      checkedRows={checkedRows}
+                                      setCheckedRows={setCheckedRows}
                                     />
                                   )
                                 }
@@ -629,6 +657,7 @@ const SBOMTable = ({
           </TabPanels>
         </Tabs>
       </Card>
+
       <SBOMDrawer
         isOpen={isSBMOpen}
         onClose={setSBMClose}
@@ -641,26 +670,42 @@ const SBOMTable = ({
         imageInfo={imageInfo}
       />
 
+      {isStatusOpen && (
+        <MultiStatusDrawer
+          isOpen={isStatusOpen}
+          onClose={setStatusClose}
+          imgVersionId={imgVersionId}
+          vulnRefetch={refetch}
+          imageInfo={imageInfo}
+          checkedRows={checkedRows}
+          setCheckedRows={setCheckedRows}
+        />
+      )}
+
       <Modal isOpen={isRefreshOpen} onClose={setRefreshClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Enable Scan</ModalHeader>
+          <ModalHeader>Scan</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Text fontSize='lg'>
+            {/* <Text fontSize='lg'>
               Refreshing this will enable scan for this image
-            </Text>
-            <Text fontSize='sm' mt={5}>
+            </Text> */}
+            <Text mt={5}>This image is disabled.</Text>
+            {/* <Text fontSize='sm' mt={5}>
               Are you sure you want to continue refreshing this page ?
+            </Text> */}
+            <Text fontSize='sm' mt={4}>
+              ** Please enable it from image page
             </Text>
           </ModalBody>
           <ModalFooter>
-            <Button variant='outline' mr={3} onClick={refreshImage}>
+            {/* <Button variant='outline' mr={3} onClick={setRefreshClose}>
               No
             </Button>
-            <Button colorScheme='blue' onClick={handleYes}>
+            <Button colorScheme='blue' onClick={refreshImage}>
               Yes
-            </Button>
+            </Button> */}
           </ModalFooter>
         </ModalContent>
       </Modal>

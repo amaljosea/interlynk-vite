@@ -441,6 +441,7 @@ export const GetImgVersionPagination = gql`
           hasNextPage
         }
         nodes {
+          
           cveId
           component {
             name
