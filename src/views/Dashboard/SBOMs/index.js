@@ -58,9 +58,9 @@ function SBOMs() {
 
   localStorage.setItem('selectedVersion', versionId)
 
-  // useEffect(() => {
-  //   console.log(`versionId`, versionId)
-  // }, [versionId])
+  useEffect(() => {
+    console.log(`scanEnabled`, scanEnabled)
+  }, [scanEnabled])
 
   const [selectedVersion, setSelectedVersion] = useState('')
   const [selectedScanner, setSelectedScanner] = useState('')
@@ -253,8 +253,8 @@ function SBOMs() {
   }, [selectedScanner])
 
   const cldScanner = localStorage.getItem('cloudScanner')
+
   useEffect(() => {
-    setTabIndex(1)
     setSelectedScanner(cldScanner ? cldScanner : 'All')
   }, [])
 
@@ -438,16 +438,17 @@ function SBOMs() {
                       </Box>
                     </Tooltip>
                   </Flex>
-                  {item.status !== 'failed' && (
-                    <Text fontSize={'sm'}>
-                      <em>
-                        Updated{' '}
-                        {item.completedAt
-                          ? timeSince(item.completedAt)
-                          : timeSince(item.failedAt)}
-                      </em>
-                    </Text>
-                  )}
+                  {item.status !== 'failed' ||
+                    (item.status !== 'running' && (
+                      <Text fontSize={'sm'}>
+                        <em>
+                          Updated{' '}
+                          {item.completedAt
+                            ? timeSince(item.completedAt)
+                            : timeSince(item.failedAt)}
+                        </em>
+                      </Text>
+                    ))}
                 </Flex>
               ))}
             </Stack>

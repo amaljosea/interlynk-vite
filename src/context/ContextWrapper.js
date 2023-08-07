@@ -73,7 +73,6 @@ const ContextWrapper = (props) => {
       scanResult: ['Grype', 'Custom']
     }
   ])
-  const [tabIndex, setTabIndex] = useState(0)
 
   const [componentsVal, setComponentsVal] = useState('')
   const [VulnerabilitiesVal, setVulnerabilitiesVal] = useState('')
@@ -114,8 +113,6 @@ const ContextWrapper = (props) => {
         setRegistryList,
         images,
         setImages,
-        tabIndex,
-        setTabIndex,
         componentsVal,
         setComponentsVal,
         VulnerabilitiesVal,

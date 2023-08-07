@@ -1,0 +1,230 @@
+import { useMutation, useQuery } from '@apollo/client'
+import {
+  Box,
+  Button,
+  Divider,
+  Drawer,
+  DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
+  DrawerHeader,
+  DrawerOverlay,
+  FormLabel,
+  Select,
+  SimpleGrid,
+  Stack,
+  Table,
+  Tbody,
+  Text,
+  Textarea,
+  Th,
+  Thead,
+  chakra,
+  Flex
+} from '@chakra-ui/react'
+import VulLinkRow from 'components/Tables/VulLinkRow'
+import { VexVulnCreate } from 'graphQL/Mutation'
+import {
+  getVexStatuses,
+  getVexJustifications,
+  getVexLogs
+} from 'graphQL/Queries'
+import React from 'react'
+import { useEffect } from 'react'
+import { useState } from 'react'
+
+const MultiStatusDrawer = ({
+  isOpen,
+  onClose,
+  btnRef,
+  imgVersionId,
+  imageInfo,
+  checkedRows,
+  setCheckedRows,
+  vulnRefetch
+}) => {
+  const [statusTitle, setStatusTitle] = useState('')
+  const [statusName, setStatusName] = useState('')
+  const [selectedTag, setSelectedTag] = useState('')
+  const [notes, setNotes] = useState('')
+
+  const { data: allVexStatus } = useQuery(getVexStatuses)
+
+  const [vexVulnCreate] = useMutation(VexVulnCreate)
+
+  const handleStatusChange = (e) => {
+    const { value } = e.target
+    setStatusTitle(value)
+    setStatusName(e.target.options[e.target.selectedIndex].text)
+  }
+
+  const handleAdd = () => {
+    try {
+      checkedRows.length > 0 &&
+        checkedRows.map(async (item) => {
+          await vexVulnCreate({
+            variables: {
+              imageVersionID: imgVersionId,
+              cveID: item.cve,
+              compName: item.component,
+              compVersion: item.version,
+              notes: notes,
+              vexStatusID: statusTitle,
+              fixedVersionID: selectedTag
+            }
+          })
+            .then(() => {
+              vulnRefetch()
+              setNotes('')
+              setCheckedRows([])
+            })
+            .finally(() => {
+              onClose()
+            })
+        })
+    } catch (error) {
+      if (error.networkError && error.networkError.statusCode === 500) {
+        // Handle the specific error
+        alert('Invalid entry')
+      } else {
+        // Handle other errors
+        alert(error.message)
+      }
+    }
+  }
+
+  return (
+    <Drawer
+      isOpen={isOpen}
+      placement='right'
+      onClose={onClose}
+      finalFocusRef={btnRef}
+      closeOnOverlayClick={false}
+      size={location.pathname.startsWith('/customer') ? 'sm' : 'lg'}
+    >
+      <DrawerOverlay />
+      <DrawerContent>
+        <DrawerCloseButton onClick={onClose} />
+        <DrawerHeader borderBottomWidth='1px' color='gray.600'>
+          Status
+        </DrawerHeader>
+        <DrawerBody>
+          <Box mb={6}>
+            <Text fontSize={'sm'}>
+              Apply status for -{' '}
+              {checkedRows.map((item, index) => (
+                <chakra.span key={index} fontSize={'xs'}>
+                  {item.cve}
+                  {checkedRows.length > 1 ? ',' : ''}
+                  {'  '}
+                </chakra.span>
+              ))}
+            </Text>
+          </Box>
+          <Stack spacing='24px'>
+            <Box>
+              <SimpleGrid row={5} spacing={4}>
+                {location.pathname.startsWith('/customer') ? (
+                  ''
+                ) : (
+                  <>
+                    <Box>
+                      <FormLabel
+                        htmlFor='product'
+                        fontSize='sm'
+                        color='gray.600'
+                      >
+                        Status
+                      </FormLabel>
+                      <Select
+                        id='product'
+                        size='sm'
+                        color='gray.500'
+                        value={statusTitle}
+                        onChange={handleStatusChange}
+                      >
+                        <option value=''>-- Select Status --</option>
+                        {allVexStatus ? (
+                          allVexStatus.vexStatuses
+                            .filter(
+                              (item) =>
+                                item.name !== 'Not Affected' &&
+                                item.name !== 'Affected'
+                            )
+                            .map((st, idx) => (
+                              <option key={idx} value={st.id}>
+                                {st.name}
+                              </option>
+                            ))
+                        ) : (
+                          <option value={''}>No data found</option>
+                        )}
+                      </Select>
+                    </Box>
+                    {statusName === 'Fixed' ? (
+                      <Box>
+                        <FormLabel
+                          py='4px'
+                          htmlFor='product'
+                          fontSize='sm'
+                          color='gray.600'
+                        >
+                          Tag
+                        </FormLabel>
+                        <Select
+                          id='tag'
+                          value={selectedTag}
+                          onChange={(e) => setSelectedTag(e.target.value)}
+                          size='sm'
+                          color='gray.500'
+                        >
+                          <option value={'select'}>--Select--</option>
+                          {imageInfo && imageInfo.length > 0 ? (
+                            imageInfo.map((img, index) => (
+                              <option key={index} value={img.id}>
+                                {img.name}
+                              </option>
+                            ))
+                          ) : (
+                            <option value={''}>No data found</option>
+                          )}
+                        </Select>
+                      </Box>
+                    ) : (
+                      ''
+                    )}
+                  </>
+                )}
+                <Box>
+                  <Textarea
+                    placeholder='Notes'
+                    size='sm'
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                  />
+                </Box>
+                {location.pathname.startsWith('/customer') ? (
+                  <Flex dir='row' gap={2} width={'100%'}>
+                    <Button colorScheme='red' width={'100%'}>
+                      Request Status
+                    </Button>
+                    <Button colorScheme='green' width={'100%'}>
+                      Accept Status
+                    </Button>
+                  </Flex>
+                ) : (
+                  <Button colorScheme='blue' onClick={handleAdd}>
+                    Add
+                  </Button>
+                )}
+              </SimpleGrid>
+              <Divider />
+            </Box>
+          </Stack>
+        </DrawerBody>
+      </DrawerContent>
+    </Drawer>
+  )
+}
+
+export default MultiStatusDrawer

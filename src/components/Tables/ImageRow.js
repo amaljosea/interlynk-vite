@@ -41,48 +41,40 @@ const ImageRow = ({
     a.company.localeCompare(b.company)
   )
 
-  const [checked, setChecked] = useState(false)
   const [isRefreshed, setIsRefreshed] = useState(false)
   // console.log('filteredScanners', filteredScanners)
 
   useEffect(() => {
-    setChecked(item.scanEnabled ? true : false)
-  }, [item])
+    setScanEnabled(item.scanEnabled)
+  }, [item.scanEnabled])
 
-  const [imageUpdate, { data }] = useMutation(ImageUpdate, {
-    onCompleted: refetch
-  })
+  const [imageUpdate, { data }] = useMutation(ImageUpdate)
 
-  const EnableImage = async (e) => {
+  const enableImage = async (e) => {
     try {
-      setIsRefreshed(true)
-      setScanEnabled(e ? true : false)
       await imageUpdate({
         variables: {
           id: item.id,
-          scanEnabled: e ? true : false
+          scanEnabled: e
         }
-      }).then(() => refetch())
+      }).then(() => refetch({ first: 10 }))
     } catch (error) {
       console.error('Mutation error:', error)
     }
   }
 
   const handleChange = (e) => {
-    setChecked(!checked)
-    EnableImage(e.target.checked)
+    enableImage(e.target.checked)
   }
 
-  const updateImage = async (e) => {
+  const updateImage = async () => {
     try {
-      setIsRefreshed(true)
-      setScanEnabled(e ? true : false)
       await imageUpdate({
         variables: {
           id: item.id,
           scanRefresh: true
         }
-      })
+      }).then(() => refetch({ first: 10 }))
     } catch (error) {
       console.error('Mutation error:', error)
     }
@@ -122,7 +114,11 @@ const ImageRow = ({
         {isLoading || isRefreshed ? (
           <Skeleton height='20px' />
         ) : (
-          <Switch id='status' isChecked={checked} onChange={handleChange} />
+          <Switch
+            id='status'
+            isChecked={item.scanEnabled}
+            onChange={handleChange}
+          />
         )}
       </Td>
       <Td fontSize={'sm'} pl={1}>

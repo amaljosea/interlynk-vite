@@ -25,8 +25,6 @@ const GlobalContext = React.createContext({
   setRegistryList: () => {},
   images: [],
   setImages: () => {},
-  tabIndex: 0,
-  setTabIndex: () => {},
   componentsVal: '',
   setComponentsVal: () => {},
   VulnerabilitiesVal: '',

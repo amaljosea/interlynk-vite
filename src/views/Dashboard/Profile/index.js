@@ -40,11 +40,11 @@ function Profile() {
 
   const { data } = useQuery(GetSettings)
 
-  useEffect(() => {
-    if (data) {
-      console.log(`allSetting`, data)
-    }
-  }, [data])
+  // useEffect(() => {
+  //   if (data) {
+  //     console.log(`allSetting`, data)
+  //   }
+  // }, [data])
 
   const { data: orgInfo } = useQuery(GetOrgInfo)
 
