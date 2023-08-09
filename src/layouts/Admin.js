@@ -13,7 +13,6 @@ import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
 // Custom Chakra theme
 import theme from 'theme/theme.js'
-import FixedPlugin from '../components/FixedPlugin/FixedPlugin'
 // Custom components
 import MainPanel from '../components/Layout/MainPanel'
 import PanelContainer from '../components/Layout/PanelContainer'
@@ -32,8 +31,10 @@ import {
 import { setContext } from '@apollo/client/link/context'
 import Cookies from 'js-cookie'
 
+import { getActiveNavbar, getActiveRoute } from '../utils'
+
 export default function Dashboard(props) {
-  const { setCustomerView, minimize, token } = useContext(GlobalContext)
+  const { setCustomerView, minimize } = useContext(GlobalContext)
 
   const authToken = Cookies.get('authToken')
 
@@ -46,50 +47,7 @@ export default function Dashboard(props) {
   const getRoute = () => {
     return window.location.pathname !== '/vendor/full-screen-maps'
   }
-  const getActiveRoute = (routes) => {
-    let activeRoute = 'Default Brand Text'
-    for (let i = 0; i < routes.length; i++) {
-      if (routes[i].collapse) {
-        let collapseActiveRoute = getActiveRoute(routes[i].views)
-        if (collapseActiveRoute !== activeRoute) {
-          return collapseActiveRoute
-        }
-      } else if (routes[i].category) {
-        let categoryActiveRoute = getActiveRoute(routes[i].views)
-        if (categoryActiveRoute !== activeRoute) {
-          return categoryActiveRoute
-        }
-      } else {
-        if (
-          window.location.href.indexOf(routes[i].layout + routes[i].path) !== -1
-        ) {
-          return routes[i].name
-        }
-      }
-    }
-    return activeRoute
-  }
-  // This changes navbar state(fixed or not)
-  const getActiveNavbar = (routes) => {
-    let activeNavbar = false
-    for (let i = 0; i < routes.length; i++) {
-      if (routes[i].category) {
-        let categoryActiveNavbar = getActiveNavbar(routes[i].views)
-        if (categoryActiveNavbar !== activeNavbar) {
-          return categoryActiveNavbar
-        }
-      } else {
-        if (
-          window.location.href.indexOf(routes[i].layout + routes[i].path) !== -1
-        ) {
-          if (routes[i].secondaryNavbar) {
-            return routes[i].secondaryNavbar
-          }
-        }
-      }
-    }
-    return activeNavbar
-  }
+
   const getRoutes = (routes) => {
     const route = routes.map((prop, key) => {
       if (prop.collapse) {

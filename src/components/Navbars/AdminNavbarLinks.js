@@ -32,7 +32,6 @@ export default function HeaderLinks(props) {
   const history = useHistory()
 
   const { variant, children, fixed, secondary, onOpen, ...rest } = props
-  const { setIsAuthenticate } = useContext(GlobalContext)
 
   const [username, setUsername] = useState('')
 
@@ -61,8 +60,8 @@ export default function HeaderLinks(props) {
 
   const handleLogout = () => {
     localStorage.removeItem('username')
+    localStorage.removeItem('email')
     Cookies.remove('authToken')
-    setIsAuthenticate(false)
     history.push('/auth')
   }
 

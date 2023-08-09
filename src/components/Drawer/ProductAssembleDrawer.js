@@ -1,14 +1,5 @@
-// Chakra imports
-import {
-  Flex,
-  Button,
-  Input,
-  Spacer,
-  Stack,
-  FormControl
-} from '@chakra-ui/react'
-import React, { useEffect, useState } from 'react'
-import { CopyIcon } from '@chakra-ui/icons'
+import React, { useState, useContext } from 'react'
+import { Flex, Button, Input, Stack } from '@chakra-ui/react'
 import {
   Drawer,
   DrawerBody,
@@ -19,25 +10,17 @@ import {
   DrawerCloseButton,
   Box,
   FormLabel,
-  InputGroup,
   Select,
   Checkbox,
   Divider,
-  Text,
-  Tag,
-  TagLabel,
-  TagCloseButton
+  Text
 } from '@chakra-ui/react'
-import Products from 'views/SBOM/Products'
 import GlobalContext from 'context/GlobalContext'
-import { useContext } from 'react'
 import { FaGithub } from 'react-icons/fa'
 import { useToast } from '@chakra-ui/react'
 
 function ProductAssembleDrawer(props) {
-  const { setProductVersionsData, setProductVersionExploded } = useContext(
-    GlobalContext
-  )
+  const { setProductVersionExploded } = useContext(GlobalContext)
   const {
     isOpen,
     onClose,
@@ -46,16 +29,8 @@ function ProductAssembleDrawer(props) {
     uniqVersions,
     project,
     version,
-    shared_with,
     conf_email,
-    conf_terms,
-    components,
-    licenses,
-    vulnerabilities,
-    cyclonedx,
-    spdx,
-    link,
-    redactions
+    conf_terms
   } = props
 
   const [productName, setProductName] = useState('')

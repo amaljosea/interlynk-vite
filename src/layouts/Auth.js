@@ -13,70 +13,19 @@ import {
   Text
 } from '@chakra-ui/react'
 // core components
-
-import React from 'react'
 import { Redirect, Route } from 'react-router-dom'
 import Cookies from 'js-cookie'
-import '@fontsource/roboto/400.css'
-import '@fontsource/roboto/500.css'
-import '@fontsource/roboto/700.css'
 import theme from 'theme/theme.js'
 import { InterlynkLogo } from 'components/Icons/Icons'
-import { useState } from 'react'
 import axios from 'axios'
-import { useContext } from 'react'
+import { useContext, useState } from 'react'
 import GlobalContext from 'context/GlobalContext'
+
+// import { getActiveNavbar, getActiveRoute } from '../utils'
 
 export default function Pages(props) {
   const { isAuthenticate, setIsAuthenticate } = useContext(GlobalContext)
-  React.useEffect(() => {
-    document.body.style.overflow = 'unset'
-    // Specify how to clean up after this effect:
-    return function cleanup() {}
-  })
-  const getActiveRoute = (routes) => {
-    let activeRoute = 'Default Brand Text'
-    for (let i = 0; i < routes.length; i++) {
-      if (routes[i].collapse) {
-        let collapseActiveRoute = getActiveRoute(routes[i].views)
-        if (collapseActiveRoute !== activeRoute) {
-          return collapseActiveRoute
-        }
-      } else if (routes[i].category) {
-        let categoryActiveRoute = getActiveRoute(routes[i].views)
-        if (categoryActiveRoute !== activeRoute) {
-          return categoryActiveRoute
-        }
-      } else {
-        if (
-          window.location.href.indexOf(routes[i].layout + routes[i].path) !== -1
-        ) {
-          return routes[i].name
-        }
-      }
-    }
-    return activeRoute
-  }
-  const getActiveNavbar = (routes) => {
-    let activeNavbar = false
-    for (let i = 0; i < routes.length; i++) {
-      if (routes[i].category) {
-        let categoryActiveNavbar = getActiveNavbar(routes[i].views)
-        if (categoryActiveNavbar !== activeNavbar) {
-          return categoryActiveNavbar
-        }
-      } else {
-        if (
-          window.location.href.indexOf(routes[i].layout + routes[i].path) !== -1
-        ) {
-          if (routes[i].secondaryNavbar) {
-            return routes[i].secondaryNavbar
-          }
-        }
-      }
-    }
-    return activeNavbar
-  }
+
   const getRoutes = (routes) => {
     return routes.map((prop, key) => {
       console.log('Prop: ' + prop + ' Key: ' + key)
@@ -99,6 +48,7 @@ export default function Pages(props) {
       }
     })
   }
+
   const navRef = React.useRef()
   document.documentElement.dir = 'ltr'
 
@@ -151,7 +101,7 @@ export default function Pages(props) {
       })
   }
 
-  if (isAuthenticate) {
+  if (isAuthenticate || localStorage.getItem(`username`)) {
     return <Redirect to={'/vendor/dashboard'} />
   } else {
     return (

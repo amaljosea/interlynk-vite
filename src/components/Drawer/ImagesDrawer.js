@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import {
   Drawer,
   DrawerBody,
@@ -27,24 +27,9 @@ import {
   AccordionPanel,
   AccordionIcon
 } from '@chakra-ui/react'
-import GlobalContext from 'context/GlobalContext'
-import { useState } from 'react'
-import { useEffect } from 'react'
+
 
 function ImagesDrawer({ isOpen, onClose, btnRef, activeImageId }) {
-  const { productVersionsData, setSBOMLinksData } = useContext(GlobalContext)
-  const uniqProjects = [
-    'interlynkio/sbomqs',
-    'interlynkio/sbomasm',
-    'interlynk/sbomgr',
-    'interlynk/sbomex'
-  ]
-  // productVersionsData.map((project) => {
-  //   if (uniqProjects.indexOf(project.name) === -1) {
-  //     uniqProjects.push(project.name)
-  //   }
-  // })
-
   const [product, setProduct] = useState('dashboard-app')
   const [version, setVersion] = useState('')
   const [hasEmail, setHasEmail] = useState(true)
@@ -73,25 +58,6 @@ function ImagesDrawer({ isOpen, onClose, btnRef, activeImageId }) {
   const handleProductChange = (e) => {
     setProduct(e.target.value)
   }
-
-  useEffect(() => {
-    const filterProduct = productVersionsData.filter(
-      (project) => project.name === product
-    )
-
-    // console.log('filterProduct', filterProduct)
-
-    const uniqVersion = []
-    filterProduct.map((project) => {
-      project.versions.map((version) => {
-        uniqVersion.push(version.version)
-      })
-    })
-
-    // console.log('uniqVersion', uniqVersion)
-    setSelectedVersion(uniqVersion)
-  }, [product])
-
 
   const handleRemove = (item) => {
     const updatedList = emailList.filter((email) => email !== item)
@@ -124,13 +90,13 @@ function ImagesDrawer({ isOpen, onClose, btnRef, activeImageId }) {
                 Image name
               </FormLabel>
               <Select id='product' size='sm' color='gray.500'>
-                {uniqProjects
+                {/* {uniqProjects
                   .sort((a, b) => a.localeCompare(b))
                   .map((p) => (
                     <option key={p} value={p}>
                       {p}
                     </option>
-                  ))}
+                  ))} */}
               </Select>
             </Box>
             <Box>
@@ -323,9 +289,7 @@ function ImagesDrawer({ isOpen, onClose, btnRef, activeImageId }) {
                       justifyContent={'space-between'}
                       direction={'row'}
                     >
-                      <Text fontSize='sm'>
-                        ADVANCED OPTIONS
-                      </Text>
+                      <Text fontSize='sm'>ADVANCED OPTIONS</Text>
                       <AccordionIcon />
                     </Flex>
                   </AccordionButton>
