@@ -18,7 +18,7 @@ import Cookies from 'js-cookie'
 import theme from 'theme/theme.js'
 import { InterlynkLogo } from 'components/Icons/Icons'
 import axios from 'axios'
-import { useContext, useState } from 'react'
+import { useContext, useState, useRef } from 'react'
 import GlobalContext from 'context/GlobalContext'
 
 // import { getActiveNavbar, getActiveRoute } from '../utils'
@@ -49,7 +49,7 @@ export default function Pages(props) {
     })
   }
 
-  const navRef = React.useRef()
+  const navRef = useRef()
   document.documentElement.dir = 'ltr'
 
   const [email, setEmail] = useState('')
