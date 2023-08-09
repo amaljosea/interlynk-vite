@@ -4,13 +4,9 @@ import { Flex, Grid, SimpleGrid, useColorModeValue } from '@chakra-ui/react'
 import BarChart from 'components/Charts/BarChart'
 import LineChart from 'components/Charts/LineChart'
 
-import { FaLayerGroup, FaCode, FaCodeBranch, FaLink, FaBug, FaImages } from 'react-icons/fa'
+import { FaLayerGroup, FaLink, FaBug, FaImages } from 'react-icons/fa'
 
-import React from 'react'
-import {
-  dashboardTableData as productsOverviewData,
-  activitiesData as activitiesOverviewData
-} from 'variables/general'
+import { activitiesData as activitiesOverviewData } from 'variables/general'
 import SBOMActivities from './components/ActiveUsers'
 import MiniStatistics from './components/MiniStatistics'
 import ActivitiesOverview from './components/ActivitiesOverview'
@@ -27,9 +23,7 @@ export default function Dashboard() {
           title={'Images'}
           amount={'12'}
           percentage={9}
-          icon={
-            <FaImages h={'24px'} w={'24px'} color={iconBoxInside} />
-          }
+          icon={<FaImages h={'24px'} w={'24px'} color={iconBoxInside} />}
         />
         <MiniStatistics
           title={'Tags'}

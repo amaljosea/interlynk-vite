@@ -45,9 +45,7 @@ import { dateTime } from 'utils'
 function SBOMs() {
   const [scanResults, setScanResults] = useState(null)
 
-  const { productVersionsData, setTabIndex, scanEnabled } = useContext(
-    GlobalContext
-  )
+  const { setTabIndex, scanEnabled } = useContext(GlobalContext)
 
   const location = useLocation()
   const history = useHistory()
@@ -171,20 +169,6 @@ function SBOMs() {
 
   const uniqProjects = []
   const btnRef = React.useRef()
-
-  productVersionsData.map((project) => {
-    if (uniqProjects.indexOf(project.name) === -1) {
-      uniqProjects.push(project.name)
-    }
-  })
-  const uniqVersions = []
-  productVersionsData.map((project) => {
-    project.versions.map((version) => {
-      if (uniqVersions.indexOf(version.version) === -1) {
-        uniqVersions.push(version.version)
-      }
-    })
-  })
 
   const sortSBOM = sbom.sort((a, b) => a.component.localeCompare(b.component))
 

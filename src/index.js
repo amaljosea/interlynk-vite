@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom'
+import { BrowserRouter, Route, Switch } from 'react-router-dom'
 import './main.css'
 
 // import SBOMLayout from './layouts/SBOM.js'
@@ -10,6 +10,7 @@ import ContextWrapper from 'context/ContextWrapper.js'
 import CustomerLayout from './layouts/Customer.js'
 import Register from './layouts/Register.js'
 import ScrollToTop from 'components/ScrollToTop.js'
+import PrivateRoute from 'components/PrivateRoute'
 
 ReactDOM.render(
   <ContextWrapper>
@@ -17,10 +18,12 @@ ReactDOM.render(
       <ScrollToTop />
       <Switch>
         <Route path={`/auth`} component={AuthLayout} />
-        <Route path={`/vendor`} component={AdminLayout} />
-        <Route path={`/customer`} component={CustomerLayout} />
+        <Route path='/' component={PrivateRoute}>
+          <Route path={`/vendor`} component={AdminLayout} />
+          <Route path={`/customer`} component={CustomerLayout} />
+        </Route>
         <Route path={`/register`} component={Register} />
-        <Redirect from={`/`} to='/auth' />
+        <Route path={`/`} component={AuthLayout} />
       </Switch>
     </BrowserRouter>
   </ContextWrapper>,

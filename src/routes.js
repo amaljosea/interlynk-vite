@@ -5,12 +5,7 @@ import Images from 'views/Dashboard/Images'
 import Feed from 'views/Dashboard/Feed'
 import { HomeIcon } from 'components/Icons/Icons'
 
-import {
-  FaRegSun,
-  FaImages,
-  FaPlug,
-  FaBullhorn
-} from 'react-icons/fa'
+import { FaRegSun, FaImages, FaPlug, FaBullhorn } from 'react-icons/fa'
 
 import Connections from 'views/Dashboard/Connections'
 
@@ -29,27 +24,6 @@ var dashRoutes = [
     component: Images,
     layout: '/vendor'
   },
-  // {
-  //   path: '/products',
-  //   name: 'Products',
-  //   icon: <FaWindowMaximize color='inherit' />,
-  //   component: Products,
-  //   layout: '/vendor'
-  // },
-  // {
-  //   path: '/sboms',
-  //   name: 'SBOM',
-  //   icon: <FaCode color='inherit' />,
-  //   component: SBOMs,
-  //   layout: '/vendor'
-  // },
-  // {
-  //   path: '/activities',
-  //   name: 'Activities',
-  //   icon: <FaRegChartBar color='inherit' />,
-  //   component: Activities,
-  //   layout: '/vendor'
-  // },
   {
     path: '/feed',
     name: 'Feed',

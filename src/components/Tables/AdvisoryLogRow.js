@@ -1,16 +1,5 @@
 import {
-  Stack,
   Tag,
-  Button,
-  IconButton,
-  Drawer,
-  DrawerBody,
-  DrawerFooter,
-  DrawerOverlay,
-  DrawerContent,
-  DrawerCloseButton,
-  DrawerHeader,
-  Input,
   Icon,
   Flex,
   Td,
@@ -22,30 +11,10 @@ import {
   Tooltip,
   Link
 } from '@chakra-ui/react'
-import React, { useEffect, useState } from 'react'
-
-import {
-  FaEllipsisV,
-  FaEye,
-  FaThumbsUp,
-  FaTools,
-  FaBug,
-  FaShare,
-  FaNeos,
-  FaDesktop,
-  FaMobile,
-  FaWindows,
-  FaApple,
-  FaLinux,
-  FaAndroid,
-  FaAppStoreIos
-} from 'react-icons/fa'
-
+import { useEffect, useState, useRef } from 'react'
+import { FaTools, FaNeos } from 'react-icons/fa'
 import { ExternalLinkIcon } from '@chakra-ui/icons'
 
-import { isBrowser, isMobile } from 'react-device-detect'
-import { useContext } from 'react'
-import GlobalContext from 'context/GlobalContext'
 
 function AdvisoryLogRow(props) {
   const { ID, desc, source, updated, severity, affected, aliases } = props
@@ -53,9 +22,7 @@ function AdvisoryLogRow(props) {
   const bgStatus = useColorModeValue('gray.400', '#1a202c')
   const colorStatus = useColorModeValue('white', 'gray.400')
   const { isOpen, onOpen, onClose } = useDisclosure()
-  const btnRef = React.useRef()
-
-  const { userLocation } = useContext(GlobalContext)
+  const btnRef = useRef()
 
   // set value of icon based on type
   let icon

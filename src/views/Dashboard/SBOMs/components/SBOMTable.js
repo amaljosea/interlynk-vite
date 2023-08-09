@@ -32,7 +32,6 @@ import {
   ModalBody,
   ModalFooter,
   Text,
-  chakra,
   Icon
 } from '@chakra-ui/react'
 
@@ -44,7 +43,7 @@ import React, { useContext, useEffect } from 'react'
 import GlobalContext from 'context/GlobalContext'
 import CardHeader from 'components/Card/CardHeader'
 import { useState, useRef } from 'react'
-import { AddIcon, TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
+import { AddIcon } from '@chakra-ui/icons'
 import { BiImport, BiExport } from 'react-icons/bi'
 import { BsFilterRight } from 'react-icons/bs'
 import SBOMDrawer from 'components/Drawer/SBOMDrawer'
@@ -58,7 +57,6 @@ import { FaEllipsisV } from 'react-icons/fa'
 import MultiStatusDrawer from 'components/Drawer/MultiStatusDrawer'
 
 const SBOMTable = ({
-  scan,
   imageId,
   setFilteredVulItems,
   imageVersionData,
@@ -77,7 +75,6 @@ const SBOMTable = ({
     vulnerabilitiesData,
     setVulnerabilitiesData,
     selectedRows,
-    productVersionsData,
     setScanEnabled,
     scanEnabled
   } = useContext(GlobalContext)
@@ -86,7 +83,7 @@ const SBOMTable = ({
 
   useEffect(() => {
     if (imageVersionData) {
-      console.log('Vuln Data', imageVersionData.imageVulns.nodes)
+      // console.log('Vuln Data', imageVersionData.imageVulns.nodes)
       setAllVulResult(imageVersionData.imageVulns.nodes)
     }
   }, [imageVersionData])
@@ -189,15 +186,6 @@ const SBOMTable = ({
   }
 
   const [filteredRow, setFilteredRow] = useState([])
-
-  const uniqVersions = []
-  productVersionsData.map((project) => {
-    project.versions.map((version) => {
-      if (uniqVersions.indexOf(version.version) === -1) {
-        uniqVersions.push(version.version)
-      }
-    })
-  })
 
   const handleSearch = (e) => {
     setSearchInput(e.target.value)
@@ -328,14 +316,7 @@ const SBOMTable = ({
     setVulnerabilitiesData(updatedData)
   }
 
-  const uniqProjects = []
   const btnRef = useRef()
-
-  productVersionsData.map((project) => {
-    if (uniqProjects.indexOf(project.name) === -1) {
-      uniqProjects.push(project.name)
-    }
-  })
 
   const [checkedRows, setCheckedRows] = useState([])
 
@@ -662,8 +643,6 @@ const SBOMTable = ({
         isOpen={isSBMOpen}
         onClose={setSBMClose}
         btnRef={btnRef}
-        uniqProjects={uniqProjects}
-        uniqVersions={uniqVersions}
         imgVersionId={imgVersionId}
         imageDataRefetch={imageDataRefetch}
         scanResults={scanResults}

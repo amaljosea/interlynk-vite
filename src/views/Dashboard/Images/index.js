@@ -1,11 +1,5 @@
 import {
   Flex,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
   Select,
   Button,
   Text,
@@ -18,14 +12,11 @@ import {
   ModalCloseButton,
   useDisclosure,
   Input,
-  Skeleton,
-  useToast,
-  Box
+  useToast
 } from '@chakra-ui/react'
 import React, { useState, useEffect, useContext } from 'react'
 import ImagesDrawer from 'components/Drawer/ImagesDrawer'
 import Card from 'components/Card/Card'
-import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
 import { useMutation, useQuery } from '@apollo/client'
 import SBOM from 'views/Dashboard/SBOMs'
@@ -41,7 +32,7 @@ import {
 } from 'graphQL/Mutation'
 import { Link, useLocation } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
-import ImageRow from 'components/Tables/ImageRow'
+import ImageTable from './ImageTable'
 
 const Index = () => {
   const toast = useToast()
@@ -76,32 +67,26 @@ const Index = () => {
   })
 
   const handlePreviousPage = () => {
-    if (allImages.images.pageInfo.hasPreviousPage) {
-      refetch({
-        first: undefined,
-        last: 10,
-        before: `${allImages.images.pageInfo.startCursor}`,
-        after: ''
-      })
-    }
+    refetch({
+      last: 10,
+      before: allImages.images.pageInfo.startCursor,
+      after: ''
+    })
   }
 
   const handleNextPage = () => {
-    if (allImages.images.pageInfo.hasNextPage) {
-      refetch({
-        first: 10,
-        last: undefined,
-        after: `${allImages.images.pageInfo.endCursor}`,
-        before: ''
-      })
-    }
+    refetch({
+      first: 10,
+      after: allImages.images.pageInfo.endCursor,
+      before: ''
+    })
   }
 
-  // useEffect(() => {
-  //   if (allImages) {
-  //     console.log(`all Images`, allImages)
-  //   }
-  // }, [allImages])
+  useEffect(() => {
+    if (allImages) {
+      console.log(`all Images`, allImages)
+    }
+  }, [allImages])
 
   // const filteredImages =
   //   allImages &&
@@ -152,11 +137,13 @@ const Index = () => {
     try {
       await imageScannerAdd({
         variables: {
-          imageID: `${selectedImage}`,
-          scannerID: `${selectedScanner}`
+          imageID: selectedImage,
+          scannerID: selectedScanner
         }
+      }).then(() => {
+        refetch({ first: 10 })
+        onScanClose()
       })
-      onScanClose()
     } catch (error) {
       if (error.networkError && error.networkError.statusCode === 500) {
         // Handle the specific error
@@ -180,8 +167,10 @@ const Index = () => {
           imageID: `${selectedImage}`,
           scannerID: `${selectedScanner}`
         }
+      }).then(() => {
+        refetch({ first: 10 })
+        onDeleteClose()
       })
-      onDeleteClose()
     } catch (error) {
       if (error.networkError && error.networkError.statusCode === 500) {
         // Handle the specific error
@@ -297,100 +286,18 @@ const Index = () => {
                 </Button>
               </Flex>
             </CardHeader>
-            <CardBody mt={4}>
-              <Table variant='simple'>
-                <Thead>
-                  <Tr>
-                    <Th pl={1}>
-                      <Box>Scan</Box>
-                    </Th>
-                    <Th pl={1}>
-                      <Box>Image</Box>
-                    </Th>
-                    <Th pl={1}>
-                      <Box>Connector</Box>
-                    </Th>
-                    <Th pl={1}>
-                      <Box>Tags</Box>
-                    </Th>
-                    <Th pl={1}>
-                      <Box>Last Pushed</Box>
-                    </Th>
-                    <Th pl={1}>
-                      <Box>Scanners</Box>
-                    </Th>
-                    <Th pl={1}>
-                      <Box>Actions</Box>
-                    </Th>
-                  </Tr>
-                </Thead>
 
-                <Tbody>
-                  {allImages ? (
-                    allImages.images.nodes.map((item, index) => (
-                      <ImageRow
-                        key={index}
-                        item={item}
-                        refetch={refetch}
-                        isLoading={isLoading}
-                        setSelectedImage={setSelectedImage}
-                        setActiveScanners={setActiveScanners}
-                        onScanOpen={onScanOpen}
-                        onDeleteOpen={onDeleteOpen}
-                      />
-                    ))
-                  ) : (
-                    <Tr>
-                      <Td fontSize={'sm'} pl={1}>
-                        <Skeleton height='20px' />
-                      </Td>
-                      <Td fontSize={'sm'} pl={1}>
-                        <Skeleton height='20px' />
-                      </Td>
-                      <Td fontSize={'sm'} pl={1}>
-                        <Skeleton height='20px' />
-                      </Td>
-                      <Td fontSize={'sm'} pl={1}>
-                        <Skeleton height='20px' />
-                      </Td>
-                      <Td fontSize={'sm'} pl={1}>
-                        <Skeleton height='20px' />
-                      </Td>
-                      <Td fontSize={'sm'} pl={1}>
-                        <Skeleton height='20px' />
-                      </Td>
-                      <Td fontSize={'sm'} pl={1}>
-                        <Skeleton height='20px' />
-                      </Td>
-                    </Tr>
-                  )}
-                </Tbody>
-              </Table>
-            </CardBody>
-            <Flex
-              flexDir={'row'}
-              gap={4}
-              alignItems={'center'}
-              mt={6}
-              justifyContent={'flex-start'}
-            >
-              <Button
-                colorScheme='blue'
-                onClick={handlePreviousPage}
-                isDisabled={
-                  allImages && !allImages.images.pageInfo.hasPreviousPage
-                }
-              >
-                Previous
-              </Button>
-              <Button
-                colorScheme='blue'
-                onClick={handleNextPage}
-                isDisabled={allImages && !allImages.images.pageInfo.hasNextPage}
-              >
-                Next
-              </Button>
-            </Flex>
+            <ImageTable
+              refetch={refetch}
+              imageList={allImages}
+              isLoading={isLoading}
+              onScanOpen={onScanOpen}
+              onDeleteOpen={onDeleteOpen}
+              setSelectedImage={setSelectedImage}
+              setActiveScanners={setActiveScanners}
+              handleNextPage={handleNextPage}
+              handlePreviousPage={handlePreviousPage}
+            />
           </Card>
 
           {orgConnectors &&

@@ -31,7 +31,6 @@ import { getAllScanners } from 'graphQL/Queries'
 import { formattedTime } from 'utils'
 import semver from 'semver'
 
-
 function Customer() {
   const selectedImgVersion = localStorage.getItem('selectedVersion')
 
@@ -295,6 +294,22 @@ function Customer() {
                           {timeSince(signedImgVerion.imageVersion.lastPushedAt)}
                         </Text>
                       </Tooltip>
+                      <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
+                        {signedImgVerion.imageVersion.tags &&
+                          signedImgVerion.imageVersion.tags.length > 0 &&
+                          signedImgVerion.imageVersion.tags.map(
+                            (item, index) => (
+                              <Tag
+                                size={'sm'}
+                                key={index}
+                                variant='outline'
+                                colorScheme='blue'
+                              >
+                                {item}
+                              </Tag>
+                            )
+                          )}
+                      </Flex>
                     </Flex>
                   ) : (
                     <Text>Loading....</Text>

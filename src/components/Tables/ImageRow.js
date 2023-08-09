@@ -57,7 +57,7 @@ const ImageRow = ({
           id: item.id,
           scanEnabled: e
         }
-      }).then(() => refetch({ first: 10 }))
+      }).then(() => window.location.reload())
     } catch (error) {
       console.error('Mutation error:', error)
     }
@@ -74,7 +74,7 @@ const ImageRow = ({
           id: item.id,
           scanRefresh: true
         }
-      }).then(() => refetch({ first: 10 }))
+      })
     } catch (error) {
       console.error('Mutation error:', error)
     }
