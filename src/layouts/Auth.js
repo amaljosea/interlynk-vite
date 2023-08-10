@@ -101,7 +101,7 @@ export default function Pages(props) {
       })
   }
 
-  if (isAuthenticate || localStorage.getItem(`username`)) {
+  if (localStorage.getItem('username')) {
     return <Redirect to={'/vendor/dashboard'} />
   } else {
     return (
