@@ -10,7 +10,7 @@ import ContextWrapper from 'context/ContextWrapper.js'
 import CustomerLayout from './layouts/Customer.js'
 import Register from './layouts/Register.js'
 import ScrollToTop from 'components/ScrollToTop.js'
-import PrivateRoute from 'components/PrivateRoute'
+import { Redirect } from 'react-router-dom/cjs/react-router-dom.min'
 
 ReactDOM.render(
   <ContextWrapper>
@@ -18,12 +18,10 @@ ReactDOM.render(
       <ScrollToTop />
       <Switch>
         <Route path={`/auth`} component={AuthLayout} />
-        <Route path='/' component={PrivateRoute}>
-          <Route path={`/vendor`} component={AdminLayout} />
-          <Route path={`/customer`} component={CustomerLayout} />
-        </Route>
+        <Route path={`/vendor`} component={AdminLayout} />
+        <Route path={`/customer`} component={CustomerLayout} />
         <Route path={`/register`} component={Register} />
-        <Route path={`/`} component={AuthLayout} />
+        <Redirect from={`/`} to='/auth' />
       </Switch>
     </BrowserRouter>
   </ContextWrapper>,
