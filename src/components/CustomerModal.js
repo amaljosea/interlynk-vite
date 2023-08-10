@@ -26,7 +26,7 @@ import { useLocation } from 'react-router-dom'
 import Cookies from 'js-cookie'
 import { useState } from 'react'
 
-const CustomerModal = () => {
+const CustomerModal = ({ refetch }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [overlay, setOverlay] = React.useState(<OverlayOne />)
 
@@ -40,6 +40,10 @@ const CustomerModal = () => {
   )
 
   const location = useLocation()
+
+  const queryParams = new URLSearchParams(location.search)
+  const paramId = queryParams.get('signed_url_params')
+  const imageVersionId = queryParams.get('id')
 
   const [userEmail, setUserEmail] = useState('')
   const [error, setError] = useState(false)
@@ -55,17 +59,15 @@ const CustomerModal = () => {
       .post(`${userLoginURL}`, {
         share_user: {
           email: userEmail,
-          signed_params: `${location.search.replace(/\?/g, '')}`
+          signed_params: paramId
         }
       })
       .then((response) => {
         console.log(response.data)
         const { status } = response.data
         if (status.code === 200) {
-          setUserEmail('')
           localStorage.setItem('userEmail', status.data.user.email)
           Cookies.set('userToken', response.headers.authorization)
-          window.localStorage.removeItem('path')
           window.location.reload()
         }
       })

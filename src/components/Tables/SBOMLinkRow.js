@@ -47,12 +47,6 @@ import { DeleteShareLynk } from 'graphQL/Mutation'
 
 function SBOMLinkRow(props) {
   const {
-    componentsVal,
-    VulnerabilitiesVal,
-    activeVulnVal,
-    riskScoreVal
-  } = useContext(GlobalContext)
-  const {
     id,
     signedUrlParams,
     updatedAt,
@@ -76,7 +70,7 @@ function SBOMLinkRow(props) {
   const domain = window.location.origin
 
   const sbomLink = useClipboard(
-    `${domain}/customer/signed_url_params?${signedUrlParams}`
+    `${domain}/customer?signed_url_params=${signedUrlParams}&id=${imgVersionId}`
   )
 
   const [shareLynkUpdate] = useMutation(UpdateShareLynk, {
@@ -153,21 +147,6 @@ function SBOMLinkRow(props) {
 
   const handleCopy = () => {
     sbomLink.onCopy()
-    window.localStorage.setItem('path', sbomLink.value)
-    window.localStorage.setItem(
-      'contains',
-      JSON.stringify({
-        redactions: false,
-        vulnerabilities: false,
-        cycloneDX: false,
-        componentsVal: componentsVal ? componentsVal : 126,
-        VulnerabilitiesVal: VulnerabilitiesVal
-          ? VulnerabilitiesVal
-          : '2C, 9H, 5M, 4L',
-        activeVulnVal: activeVulnVal ? activeVulnVal : '1C, 1H, 3M, 4L',
-        riskScoreVal: riskScoreVal ? riskScoreVal : 22
-      })
-    )
   }
 
   const handleEdit = () => {
@@ -208,7 +187,7 @@ function SBOMLinkRow(props) {
         {/* </Link> */}
         <Flex mb={2}>
           <Input
-            value={`${domain}/customer/signed_url_params?${signedUrlParams}`}
+            value={`${domain}/customer?signed_url_params=${signedUrlParams}&id=${imgVersionId}`}
             onChange={(e) => sbomLink.setValue(e.target.value)}
             mr={2}
             disabled

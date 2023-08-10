@@ -441,7 +441,6 @@ export const GetImgVersionPagination = gql`
           hasNextPage
         }
         nodes {
-          
           cveId
           component {
             name
@@ -489,17 +488,39 @@ export const GetSettings = gql`
 `
 
 export const GetFeedLogs = gql`
-  query getFeedLogs($date: String!, $severity: String, $source: String) {
-    feedLogs(date: $date, severity: $severity, source: $source) {
-      id
-      affected
-      aliasId
-      description
-      editedAt
-      publishedAt
-      refId
-      severity
-      source
+  query GetFeed(
+    $date: String!
+    $severity: String
+    $source: String
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+  ) {
+    feedLogs(
+      date: $date
+      severity: $severity
+      source: $source
+      first: $first
+      last: $last
+      after: $after
+      before: $before
+    ) {
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      nodes {
+        refId
+        editedAt
+        publishedAt
+        severity
+        source
+        id
+        description
+      }
     }
   }
 `

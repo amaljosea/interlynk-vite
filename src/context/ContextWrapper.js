@@ -25,6 +25,8 @@ const ContextWrapper = (props) => {
 
   const [advisoriesData, setAdvisoriesData] = useState(advisoriesDataLong)
 
+  const [isConfirmed, setIsConfirmed] = useState(false)
+
   return (
     <GlobalContext.Provider
       value={{
@@ -57,7 +59,9 @@ const ContextWrapper = (props) => {
         scanEnabled,
         setScanEnabled,
         advisoriesData,
-        setAdvisoriesData
+        setAdvisoriesData,
+        isConfirmed,
+        setIsConfirmed
       }}
     >
       {props.children}

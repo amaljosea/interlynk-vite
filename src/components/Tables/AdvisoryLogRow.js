@@ -14,15 +14,21 @@ import {
 import { useEffect, useState, useRef } from 'react'
 import { FaTools, FaNeos } from 'react-icons/fa'
 import { ExternalLinkIcon } from '@chakra-ui/icons'
-
+import { timeSince } from 'utils'
 
 function AdvisoryLogRow(props) {
-  const { ID, desc, source, updated, severity, affected, aliases } = props
+  const {
+    id,
+    refId,
+    desc,
+    source,
+    publishedAt,
+    editedAt,
+    severity,
+    affected,
+    aliasId
+  } = props
   const textColor = useColorModeValue('gray.700', 'white')
-  const bgStatus = useColorModeValue('gray.400', '#1a202c')
-  const colorStatus = useColorModeValue('white', 'gray.400')
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const btnRef = useRef()
 
   // set value of icon based on type
   let icon
@@ -30,52 +36,33 @@ function AdvisoryLogRow(props) {
   let tooltip
   let link
   switch (source) {
-    case 'NVD':
+    case 'nvd':
       icon = FaNeos
       color = 'black'
       tooltip = 'National Vulnerability Database (NVD)'
-      link = 'https://nvd.nist.gov/vuln/detail/' + ID
+      link = 'https://nvd.nist.gov/vuln/detail/' + refId
       break
-    case 'GHSA':
+    case 'ghsa':
       icon = FaTools
       tooltip = 'Github Security Advisory'
-      link = 'https://github.com/advisories/' + ID
+      link = 'https://github.com/advisories/' + refId
       color = 'black'
       break
-    case 'USN':
+    case 'usn':
       icon = FaTools
       tooltip = 'Ubuntu Security Advisory'
-      link = 'https://ubuntu.com/security/notices/' + ID
+      link = 'https://ubuntu.com/security/notices/' + refId
       color = 'black'
       break
   }
   const sevColor =
-    severity == 'Critical'
+    severity == 'critical'
       ? 'red'
-      : severity == 'High'
+      : severity == 'high'
       ? 'orange'
-      : severity == 'Medium'
+      : severity == 'medium'
       ? 'yellow'
       : 'green'
-
-  const [operatingSystem, setOperatingSystem] = useState('')
-
-  useEffect(() => {
-    const userAgent = window.navigator.userAgent
-    if (userAgent.match(/Windows/i)) {
-      setOperatingSystem('Windows')
-    } else if (userAgent.match(/Mac/i)) {
-      setOperatingSystem('MacOS')
-    } else if (userAgent.match(/Linux/i)) {
-      setOperatingSystem('Linux')
-    } else if (userAgent.match(/Android/i)) {
-      setOperatingSystem('Android')
-    } else if (userAgent.match(/iOS|iPad|iPhone/i)) {
-      setOperatingSystem('iOS')
-    } else {
-      setOperatingSystem('Unknown')
-    }
-  }, [])
 
   return (
     <Tr>
@@ -86,10 +73,15 @@ function AdvisoryLogRow(props) {
               <Icon as={ExternalLinkIcon} h={'16px'} w={'16px'} me='5px' />
               <Flex flexDirection={'column'} alignItems={'self-start'} gap={2}>
                 <Text fontSize='sm' color={textColor} minWidth='100%'>
-                  {ID}
+                  {refId}
                 </Text>
                 <Tooltip label={tooltip} aria-label={tooltip}>
-                  <Tag size='sm' colorScheme='blue' variant='outline'>
+                  <Tag
+                    size='sm'
+                    colorScheme='blue'
+                    variant='outline'
+                    textTransform={'uppercase'}
+                  >
                     {source}
                   </Tag>
                 </Tooltip>
@@ -101,34 +93,21 @@ function AdvisoryLogRow(props) {
       <Td width={{ sm: '500px' }}>{desc}</Td>
       <Td width={'150px'}>
         <Text fontSize='sm' color={textColor}>
-          {updated}
+          {timeSince(publishedAt)}
         </Text>
       </Td>
       <Td>
         <Text fontSize='sm' color={textColor}>
           <Tag size='md' key='md' variant='subtle' colorScheme={sevColor}>
-            <TagLabel>{severity ? severity : 'Unknown'}</TagLabel>
+            <TagLabel>{severity}</TagLabel>
           </Tag>
         </Text>
       </Td>
       <Td width={'100px'}>
-        <Flex direction='column'>
-          {affected.map((entry, index) => (
-            <Text fontSize='sm' color={textColor} key={index}>
-              {entry}
-            </Text>
-          ))}
-        </Flex>
+        <Flex direction='column'>{affected ? affected : ''}</Flex>
       </Td>
       <Td>
-        <Flex direction='column'>
-          {aliases.map((alias, index) => (
-            <Flex direction='row' key={index}>
-              <Icon as={ExternalLinkIcon} h={'16px'} w={'16px'} me='5px' />
-              <Text fontSize='sm'>{alias}</Text>
-            </Flex>
-          ))}
-        </Flex>
+        <Flex direction='column'>{aliasId ? aliases : ''}</Flex>
       </Td>
     </Tr>
   )

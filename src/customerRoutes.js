@@ -4,7 +4,7 @@ import Customer from 'views/Dashboard/Customer'
 
 var customerRoutes = [
   {
-    path: '/signed_url_params',
+    path: '/',
     name: 'Images',
     icon: <FaImages color='inherit' />,
     component: Customer,

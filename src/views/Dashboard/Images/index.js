@@ -68,6 +68,7 @@ const Index = () => {
 
   const handlePreviousPage = () => {
     refetch({
+      first: undefined,
       last: 10,
       before: allImages.images.pageInfo.startCursor,
       after: ''
@@ -77,16 +78,17 @@ const Index = () => {
   const handleNextPage = () => {
     refetch({
       first: 10,
+      last: undefined,
       after: allImages.images.pageInfo.endCursor,
       before: ''
     })
   }
 
-  useEffect(() => {
-    if (allImages) {
-      console.log(`all Images`, allImages)
-    }
-  }, [allImages])
+  // useEffect(() => {
+  //   if (allImages) {
+  //     console.log(`all Images`, allImages)
+  //   }
+  // }, [allImages])
 
   // const filteredImages =
   //   allImages &&

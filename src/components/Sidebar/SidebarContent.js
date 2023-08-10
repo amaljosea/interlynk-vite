@@ -8,7 +8,8 @@ import {
   Flex,
   Stack,
   Text,
-  useColorModeValue
+  useColorModeValue,
+  Link
 } from '@chakra-ui/react'
 import IconBox from 'components/Icons/IconBox'
 import { InterlynkLogo } from 'components/Icons/Icons'
@@ -17,7 +18,7 @@ import { SidebarHelp } from 'components/Sidebar/SidebarHelp'
 import GlobalContext from 'context/GlobalContext'
 import React from 'react'
 import { useContext } from 'react'
-import { NavLink, useLocation, Link } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 
 // this function creates the links and collapses that appear in the sidebar (left menu)
 
@@ -30,7 +31,11 @@ const SidebarContent = ({ logoText, routes }) => {
 
   // verifies if routeName is the one active (in browser input)
   const activeRoute = (routeName) => {
-    return location.pathname === routeName ? 'active' : ''
+    if (routeName === '/customer/') {
+      return 'active'
+    } else {
+      return location.pathname === routeName ? 'active' : ''
+    }
   }
   const createLinks = (routes) => {
     // Chakra Color Mode
@@ -70,119 +75,173 @@ const SidebarContent = ({ logoText, routes }) => {
         )
       }
 
-      return (
-        <NavLink to={prop.layout + prop.path} key={prop.name}>
-          {activeRoute(prop.layout + prop.path) === 'active' ? (
-            <Button
-              boxSize='initial'
-              justifyContent='flex-start'
-              alignItems='center'
-              bg={activeBg}
-              mb={{
-                xl: '12px'
-              }}
-              mx={{
-                xl: 'auto'
-              }}
-              ps={{
-                sm: '10px',
-                xl: '16px'
-              }}
-              py='4px'
-              borderRadius='15px'
-              _hover='none'
-              w='100%'
-              _active={{
-                bg: 'inherit',
-                transform: 'none',
-                borderColor: 'transparent'
-              }}
-              _focus={{
-                boxShadow: 'none'
-              }}
-            >
-              <Flex>
-                {typeof prop.icon === 'string' ? (
-                  <Icon>{prop.icon}</Icon>
-                ) : (
-                  <IconBox
-                    bg='blue.300'
-                    color='white'
-                    h='36px'
-                    w='36px'
-                    me='12px'
-                  >
-                    {prop.icon}
-                  </IconBox>
-                )}
-                {minimize ? (
-                  ''
-                ) : (
-                  <Text color={activeColor} my='auto' fontSize='sm'>
-                    {document.documentElement.dir === 'rtl'
-                      ? prop.rtlName
-                      : prop.name}
-                  </Text>
-                )}
-              </Flex>
-            </Button>
-          ) : (
-            <Button
-              boxSize='initial'
-              justifyContent='flex-start'
-              alignItems='center'
-              bg='transparent'
-              mb={{
-                xl: '12px'
-              }}
-              mx={{
-                xl: 'auto'
-              }}
-              py='4px'
-              ps={{
-                sm: '10px',
-                xl: '16px'
-              }}
-              borderRadius='15px'
-              _hover='none'
-              w='100%'
-              _active={{
-                bg: 'inherit',
-                transform: 'none',
-                borderColor: 'transparent'
-              }}
-              _focus={{
-                boxShadow: 'none'
-              }}
-            >
-              <Flex>
-                {typeof prop.icon === 'string' ? (
-                  <Icon>{prop.icon}</Icon>
-                ) : (
-                  <IconBox
-                    bg={inactiveBg}
-                    color='blue.300'
-                    h='36px'
-                    w='36px'
-                    me='12px'
-                  >
-                    {prop.icon}
-                  </IconBox>
-                )}
-                {minimize ? (
-                  ''
-                ) : (
-                  <Text color={inactiveColor} my='auto' fontSize='sm'>
-                    {document.documentElement.dir === 'rtl'
-                      ? prop.rtlName
-                      : prop.name}
-                  </Text>
-                )}
-              </Flex>
-            </Button>
-          )}
-        </NavLink>
-      )
+      if (prop.layout === '/customer') {
+        return (
+          <Button
+            boxSize='initial'
+            justifyContent='flex-start'
+            alignItems='center'
+            bg='transparent'
+            mb={{
+              xl: '12px'
+            }}
+            mx={{
+              xl: 'auto'
+            }}
+            py='4px'
+            ps={{
+              sm: '10px',
+              xl: '16px'
+            }}
+            borderRadius='15px'
+            _hover='none'
+            w='100%'
+            _active={{
+              bg: '',
+              transform: 'none',
+              borderColor: 'transparent'
+            }}
+            _focus={{
+              boxShadow: 'none'
+            }}
+          >
+            <Flex>
+              <IconBox
+                bg={'blue.300'}
+                color='white'
+                h='36px'
+                w='36px'
+                me='12px'
+              >
+                {prop.icon}
+              </IconBox>
+              {minimize ? (
+                ''
+              ) : (
+                <Text color={inactiveColor} my='auto' fontSize='sm'>
+                  {document.documentElement.dir === 'rtl'
+                    ? prop.rtlName
+                    : prop.name}
+                </Text>
+              )}
+            </Flex>
+          </Button>
+        )
+      } else {
+        return (
+          <NavLink to={prop.layout + prop.path} key={prop.name}>
+            {activeRoute(prop.layout + prop.path) === 'active' ? (
+              <Button
+                boxSize='initial'
+                justifyContent='flex-start'
+                alignItems='center'
+                bg={activeBg}
+                mb={{
+                  xl: '12px'
+                }}
+                mx={{
+                  xl: 'auto'
+                }}
+                ps={{
+                  sm: '10px',
+                  xl: '16px'
+                }}
+                py='4px'
+                borderRadius='15px'
+                _hover='none'
+                w='100%'
+                _active={{
+                  bg: 'inherit',
+                  transform: 'none',
+                  borderColor: 'transparent'
+                }}
+                _focus={{
+                  boxShadow: 'none'
+                }}
+              >
+                <Flex>
+                  {typeof prop.icon === 'string' ? (
+                    <Icon>{prop.icon}</Icon>
+                  ) : (
+                    <IconBox
+                      bg='blue.300'
+                      color='white'
+                      h='36px'
+                      w='36px'
+                      me='12px'
+                    >
+                      {prop.icon}
+                    </IconBox>
+                  )}
+                  {minimize ? (
+                    ''
+                  ) : (
+                    <Text color={activeColor} my='auto' fontSize='sm'>
+                      {document.documentElement.dir === 'rtl'
+                        ? prop.rtlName
+                        : prop.name}
+                    </Text>
+                  )}
+                </Flex>
+              </Button>
+            ) : (
+              <Button
+                boxSize='initial'
+                justifyContent='flex-start'
+                alignItems='center'
+                bg='transparent'
+                mb={{
+                  xl: '12px'
+                }}
+                mx={{
+                  xl: 'auto'
+                }}
+                py='4px'
+                ps={{
+                  sm: '10px',
+                  xl: '16px'
+                }}
+                borderRadius='15px'
+                _hover='none'
+                w='100%'
+                _active={{
+                  bg: 'inherit',
+                  transform: 'none',
+                  borderColor: 'transparent'
+                }}
+                _focus={{
+                  boxShadow: 'none'
+                }}
+              >
+                <Flex>
+                  {typeof prop.icon === 'string' ? (
+                    <Icon>{prop.icon}</Icon>
+                  ) : (
+                    <IconBox
+                      bg={inactiveBg}
+                      color='blue.300'
+                      h='36px'
+                      w='36px'
+                      me='12px'
+                    >
+                      {prop.icon}
+                    </IconBox>
+                  )}
+                  {minimize ? (
+                    ''
+                  ) : (
+                    <Text color={inactiveColor} my='auto' fontSize='sm'>
+                      {document.documentElement.dir === 'rtl'
+                        ? prop.rtlName
+                        : prop.name}
+                    </Text>
+                  )}
+                </Flex>
+              </Button>
+            )}
+          </NavLink>
+        )
+      }
     })
   }
 

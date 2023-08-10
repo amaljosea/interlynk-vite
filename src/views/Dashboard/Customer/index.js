@@ -20,7 +20,7 @@ import Card from 'components/Card/Card'
 import CardHeader from 'components/Card/CardHeader'
 import CardBody from 'components/Card/CardBody.js'
 import { FaCubes, FaLayerGroup, FaMicroscope } from 'react-icons/fa'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useHistory } from 'react-router-dom'
 import CustomerSBOMTable from '../SBOMs/components/CustomerSBOMTable'
 import CustomerModal from 'components/CustomerModal'
 import { GetSignedImage } from 'graphQL/Queries'
@@ -30,15 +30,16 @@ import { dateTime, timeSince, scanImage } from 'utils'
 import { getAllScanners } from 'graphQL/Queries'
 import { formattedTime } from 'utils'
 import semver from 'semver'
+import { useContext } from 'react'
+import GlobalContext from 'context/GlobalContext'
 
 function Customer() {
-  const selectedImgVersion = localStorage.getItem('selectedVersion')
+  const { isConfirmed, setIsConfirmed } = useContext(GlobalContext)
 
   const [scanResults, setScanResults] = useState(null)
   const [scannerRun, setScannerRun] = useState([])
   const [imageInfo, setImageInfo] = useState([])
 
-  const [isConfirmed, setIsConfirmed] = useState(false)
   const [selectedVersion, setSelectedVersion] = useState('')
   const [selectedScanner, setSelectedScanner] = useState('')
   const [allResults, setAllResults] = useState([])
@@ -52,7 +53,11 @@ function Customer() {
   })
 
   const location = useLocation()
-  const paramId = `${location.search.replace(/\?/g, '')}`
+  const history = useHistory()
+
+  const queryParams = new URLSearchParams(location.search)
+  const paramId = queryParams.get('signed_url_params')
+  const imageVersionId = queryParams.get('id')
 
   const { data: allScanners } = useQuery(getAllScanners)
 
@@ -75,7 +80,7 @@ function Customer() {
     {
       variables: {
         signedParams: paramId,
-        imgVersionId: selectedVersion,
+        imgVersionId: imageVersionId,
         first: 10
       }
     }
@@ -84,7 +89,7 @@ function Customer() {
   const onPreviousPage = () => {
     refetch({
       signedParams: paramId,
-      imageVersionId: selectedVersion,
+      imageVersionId: imageVersionId,
       first: undefined,
       last: 10,
       before: signedImgVerion.imageVersion.imageVulns.pageInfo.startCursor,
@@ -95,7 +100,7 @@ function Customer() {
   const onNextPage = () => {
     refetch({
       signedParams: `${paramId}`,
-      imageVersionId: selectedVersion,
+      imageVersionId: imageVersionId,
       first: 10,
       last: undefined,
       after: signedImgVerion.imageVersion.imageVulns.pageInfo.endCursor,
@@ -107,7 +112,7 @@ function Customer() {
     if (signedImageData) {
       console.log(`signedImageData`, signedImageData)
       const imgV = signedImageData.image.imageVersions.find(
-        (item) => item.id === selectedImgVersion
+        (item) => item.id === imageVersionId
       )
       setScanResults(imgV)
       setSelectedVersion(imgV.id)
@@ -149,14 +154,9 @@ function Customer() {
     }
   }, [signedImageData])
 
-  const [contains, setcontains] = useState({})
-
   useEffect(() => {
-    const containsData = window.localStorage.getItem('contains')
-    setcontains(JSON.parse(containsData))
-    const path = window.localStorage.getItem('path')
     const checkURL = () => {
-      if (window.location.href === path) {
+      if (!localStorage.getItem('userEmail')) {
         setIsConfirmed(true)
       }
     }
@@ -184,13 +184,14 @@ function Customer() {
 
   const handleVersionUpdate = (e) => {
     const { value } = e.target
+    console.log(`value`, value)
     setSelectedVersion(value)
-    localStorage.setItem('selectedVersion', value)
     const imgV =
       signedImageData &&
       signedImageData.image.imageVersions.find((item) => item.id === value)
     setScanResults(imgV)
-    refetch({ signedParams: `${paramId}`, imgVersionId: value })
+    refetch({ signedParams: paramId, imgVersionId: value, first: 10 })
+    history.push(`/customer?signed_url_params=${paramId}&id=${value}`)
   }
 
   // Calculate the counts for each severity level
@@ -238,6 +239,22 @@ function Customer() {
       L: low
     })
   }, [allResults])
+
+  useEffect(() => {
+    console.log(`scanResults`, scanResults)
+  }, [scanResults])
+
+  useEffect(() => {
+    if (signedImageData) {
+      console.log(`signedImageData`, signedImageData)
+    }
+  }, [signedImageData])
+
+  useEffect(() => {
+    if (signedImgVerion) {
+      console.log(`signedImgVerion`, signedImgVerion)
+    }
+  }, [signedImgVerion])
 
   return (
     <>
@@ -455,7 +472,7 @@ function Customer() {
             </CardBody>
           </Card>
         )}
-        {signedImgVerion && signedImgVerion && (
+        {signedImgVerion && signedImgVerion && signedImageData && (
           <CustomerSBOMTable
             loading={loading}
             refetch={refetch}

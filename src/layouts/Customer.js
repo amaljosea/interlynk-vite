@@ -85,21 +85,6 @@ export default function Customer(props) {
     cache: new InMemoryCache()
   })
 
-  useEffect(() => {
-    window.localStorage.setItem(
-      'contains',
-      JSON.stringify({
-        redactions: false,
-        vulnerabilities: false,
-        cycloneDX: false,
-        componentsVal: 126,
-        VulnerabilitiesVal: '2C, 9H, 5M, 4L',
-        activeVulnVal: '1C, 1H, 3M, 4L',
-        riskScoreVal: 22
-      })
-    )
-  }, [])
-
   return (
     <ApolloProvider client={client}>
       <ChakraProvider theme={theme} resetCss={false}>
@@ -131,7 +116,7 @@ export default function Customer(props) {
               <PanelContainer>
                 <Switch>
                   {getRoutes(customerRoutes)}
-                  <Redirect from={`/customer`} to='/customer' />
+                  {/* <Redirect from={`/customer`} to='/customer' /> */}
                 </Switch>
               </PanelContainer>
             </PanelContent>
