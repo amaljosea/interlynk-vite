@@ -1,17 +1,22 @@
 import React from 'react'
 import { Flex, Tag } from '@chakra-ui/react'
+import { getDate } from 'utils'
 
 function formatDate(date) {
   const options = { month: 'short', day: 'numeric' }
   return new Intl.DateTimeFormat('en-US', options).format(date)
 }
 
-const Timeline = () => {
+const Timeline = ({ setFormattedDate }) => {
   const today = new Date()
 
   const days = [...Array(30)].map((_, index) => {
     const date = new Date(today)
     date.setDate(today.getDate() + index)
+
+    const getCurrentDate = (date) => {
+      setFormattedDate(getDate(date))
+    }
 
     return (
       <Tag
@@ -21,6 +26,7 @@ const Timeline = () => {
         textAlign={'center'}
         variant={'outline'}
         colorScheme={'blue'}
+        onClick={() => getCurrentDate(date)}
       >
         {formatDate(date)}
       </Tag>

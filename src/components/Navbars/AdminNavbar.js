@@ -32,6 +32,8 @@ export default function AdminNavbar(props) {
   const versionId = queryParams.get('v')
   const imageId = queryParams.get('id')
 
+
+
   const imageName = window.localStorage.getItem('Image')
   const signedImageName = localStorage.getItem(`signedImageName`)
 

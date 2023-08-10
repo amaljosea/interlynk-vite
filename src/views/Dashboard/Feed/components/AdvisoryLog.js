@@ -2,22 +2,43 @@
 import {
   Box,
   Flex,
+  Skeleton,
   Table,
   Tbody,
-  Text,
+  Button,
   Th,
   Thead,
   Tr,
+  Td,
   useColorModeValue
 } from '@chakra-ui/react'
 // Custom components
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 import AdvisoryLogRow from 'components/Tables/AdvisoryLogRow.js'
-import React from 'react'
 
-const AdvisoryLog = ({ title, captions, data, filterData }) => {
+const AdvisoryLog = ({ captions, data, loading, currentDate, refetch }) => {
   const textColor = useColorModeValue('gray.700', 'white')
+
+  const onPreviousPage = () => {
+    refetch({
+      date: currentDate,
+      first: undefined,
+      last: 10,
+      before: data.pageInfo.startCursor,
+      after: ''
+    })
+  }
+
+  const onNextPage = () => {
+    refetch({
+      date: currentDate,
+      first: 10,
+      last: undefined,
+      after: data.pageInfo.endCursor,
+      before: ''
+    })
+  }
 
   return (
     <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
@@ -35,38 +56,74 @@ const AdvisoryLog = ({ title, captions, data, filterData }) => {
             </Tr>
           </Thead>
           <Tbody>
-            {filterData.length > 0 &&
-              filterData.map((row) => {
+            {data.nodes.length > 0 &&
+              data.nodes.map((row) => {
                 return (
                   <AdvisoryLogRow
-                    ID={row.ID}
-                    desc={row.desc}
+                    key={row.id}
+                    id={row.id}
+                    refId={row.refId}
+                    desc={row.description}
                     source={row.source}
-                    updated={row.updated}
+                    publishedAt={row.publishedAt}
+                    editedAt={row.editedAt}
                     severity={row.severity}
                     affected={row.affected}
-                    aliases={row.aliases}
+                    aliasId={row.aliasId}
                   />
                 )
               })}
-            {filterData.length === 0 &&
-              data.map((row) => {
-                return (
-                  <AdvisoryLogRow
-                    key={row.ID}
-                    ID={row.ID}
-                    desc={row.desc}
-                    source={row.source}
-                    updated={row.updated}
-                    severity={row.severity}
-                    affected={row.affected}
-                    aliases={row.aliases}
-                  />
-                )
-              })}
+
+            {loading && (
+              <Tr>
+                <Td fontSize={'sm'} pl={1}>
+                  <Skeleton height='20px' />
+                </Td>
+                <Td fontSize={'sm'} pl={1}>
+                  <Skeleton height='20px' />
+                </Td>
+                <Td fontSize={'sm'} pl={1}>
+                  <Skeleton height='20px' />
+                </Td>
+                <Td fontSize={'sm'} pl={1}>
+                  <Skeleton height='20px' />
+                </Td>
+                <Td fontSize={'sm'} pl={1}>
+                  <Skeleton height='20px' />
+                </Td>
+                <Td fontSize={'sm'} pl={1}>
+                  <Skeleton height='20px' />
+                </Td>
+              </Tr>
+            )}
           </Tbody>
         </Table>
       </CardBody>
+
+      {data.nodes.length > 0 && (
+        <Flex
+          flexDir={'row'}
+          gap={4}
+          alignItems={'center'}
+          mt={6}
+          justifyContent={'flex-start'}
+        >
+          <Button
+            colorScheme='blue'
+            onClick={onPreviousPage}
+            isDisabled={!data.pageInfo.hasPreviousPage}
+          >
+            Previous
+          </Button>
+          <Button
+            colorScheme='blue'
+            onClick={onNextPage}
+            isDisabled={!data.pageInfo.hasNextPage}
+          >
+            Next
+          </Button>
+        </Flex>
+      )}
     </Card>
   )
 }

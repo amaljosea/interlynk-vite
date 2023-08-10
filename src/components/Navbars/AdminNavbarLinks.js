@@ -46,6 +46,8 @@ export default function HeaderLinks(props) {
     }
   }, [])
 
+  const { setIsConfirmed } = useContext(GlobalContext)
+
   // Chakra Color Mode
   let mainTeal = useColorModeValue('teal.300', 'teal.300')
   let inputBg = useColorModeValue('white', 'gray.800')
@@ -65,10 +67,17 @@ export default function HeaderLinks(props) {
     history.push('/auth')
   }
 
+  const handleCustomerLogout = () => {
+    localStorage.removeItem('userEmail')
+    Cookies.remove('userToken')
+    setIsConfirmed(true)
+  }
+
   return (
     <Flex
       pe={{ sm: '0px', md: '0px' }}
       w={{ sm: '100%', md: 'auto' }}
+      gap={4}
       alignItems='center'
       flexDirection='row'
     >
@@ -105,9 +114,9 @@ export default function HeaderLinks(props) {
         {location.pathname.startsWith('/customer') ? (
           <MenuList size='sm'>
             <MenuGroup title=''>
-              <Link to='/register'>
-                <MenuItem icon={<SettingsIcon />}>Register</MenuItem>
-              </Link>
+              <MenuItem icon={<SettingsIcon />} onClick={handleCustomerLogout}>
+                Log out
+              </MenuItem>
             </MenuGroup>
           </MenuList>
         ) : (

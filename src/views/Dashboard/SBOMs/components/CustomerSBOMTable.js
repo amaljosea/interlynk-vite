@@ -23,7 +23,8 @@ import {
   Box,
   Skeleton,
   Td,
-  Tooltip
+  Tooltip,
+  Text
 } from '@chakra-ui/react'
 import { CSVLink } from 'react-csv'
 import Card from 'components/Card/Card.js'

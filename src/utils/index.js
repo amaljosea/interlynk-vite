@@ -284,6 +284,15 @@ export const dateTime = (updatedAt) => {
   return `${date} ${time}`
 }
 
+export const getDate = (date) => {
+  const currentDate = date
+  const year = currentDate.getFullYear()
+  const month = String(currentDate.getMonth() + 1).padStart(2, '0')
+  const day = String(currentDate.getDate()).padStart(2, '0')
+  const formatted = `${year}-${month}-${day}`
+  return formatted
+}
+
 export const link_captions = ['Active', 'Shared With', 'Created', 'Link', '']
 
 export const vuln_captions = [

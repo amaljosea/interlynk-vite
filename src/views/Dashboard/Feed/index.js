@@ -13,92 +13,48 @@ import {
   IconButton,
   Spacer
 } from '@chakra-ui/react'
-import React, { useContext, useState, useEffect } from 'react'
+import React, {  useState, useEffect } from 'react'
 import { ChevronDownIcon, RepeatIcon } from '@chakra-ui/icons'
-import GlobalContext from 'context/GlobalContext'
 import Timeline from './components/Timeline'
 
 import { FaDownload, FaSlack } from 'react-icons/fa'
 import AdvisoryLog from './components/AdvisoryLog'
 import { useQuery } from '@apollo/client'
 import { GetFeedLogs } from 'graphQL/Queries'
+import { getDate } from 'utils'
 
 function Advisories() {
-  const { advisoriesData } = useContext(GlobalContext)
-
-  const dates = advisoriesData.map((item) => ({ date: item.updated }))
-
-  const [filterData, setFilterData] = useState([])
-  const uniqProjects = ['All', 'NVD', 'GHSA', 'USN', 'PyAdvisory', 'GoAdvisory']
-  // advisoryData.map((project) => {
-  //   if (uniqProjects.indexOf(project.product) === -1) {
-  //     uniqProjects.push(project.product)
-  //   }
-  // })
-
-  const uniqVersions = []
-  advisoriesData.map((project) => {
-    if (uniqVersions.indexOf(project.version) === -1) {
-      uniqVersions.push(project.version)
-    }
-  })
-  const uniqUsers = [
-    'All',
-    'Peter.Gregory@svc.ai',
-    'Ritesh.Noronha@interlynk.io',
-    'NVD-Monitor',
-    'Galvin.Belson@hooli.ai'
-  ]
-
-  const filterByProduct = (product) => {
-    const filterList =
-      product !== 'All'
-        ? advisoriesData.filter((item) => item.source == product)
-        : advisoriesData
-    setFilterData(filterList)
-  }
-
-  const filterByType = (type) => {
-    const filterList =
-      type !== 'All'
-        ? advisoriesData.filter((item) => item.severity == type)
-        : advisoriesData
-    setFilterData(filterList)
-  }
-
-  const filterBySource = (source) => {
-    const filterList =
-      source !== 'All'
-        ? advisoriesData.filter((item) => item.source == source)
-        : advisoriesData
-    setFilterData(filterList)
-  }
-
-  const filterByUser = (user) => {
-    const filterList =
-      user !== 'All'
-        ? advisoriesData.filter((item) => item.user == user)
-        : advisoriesData
-    setFilterData(filterList)
-  }
+  const source = ['all', 'nvd', 'ghsa', 'usn', 'pyadvisory', 'goadvisory']
+  const severity = ['all', 'critical', 'high', 'low', 'medium', 'unknown']
 
   const [formattedDate, setFormattedDate] = useState('')
 
   useEffect(() => {
-    const currentDate = new Date()
-    const year = currentDate.getFullYear()
-    const month = String(currentDate.getMonth() + 1).padStart(2, '0')
-    const day = String(currentDate.getDate()).padStart(2, '0')
-
-    const formatted = `${year}-${month}-${day}`
-    setFormattedDate(formatted)
+    setFormattedDate(getDate(new Date()))
   }, [])
 
-  const { data } = useQuery(GetFeedLogs, {
+  const { data, refetch, loading, error } = useQuery(GetFeedLogs, {
     variables: {
-      date: '2023-08-01'
+      date: formattedDate,
+      first: 10
     }
   })
+
+  const filterBySource = (source) => {
+    refetch({
+      date: formattedDate,
+      source: source === 'all' ? '' : source,
+      first: 10
+    })
+  }
+
+  const filterBySeverity = (severity) => {
+    refetch({
+      date: formattedDate,
+      severity: severity === 'all' ? '' : severity,
+      first: 10
+    })
+  }
 
   useEffect(() => {
     if (data) {
@@ -108,7 +64,7 @@ function Advisories() {
 
   return (
     <Flex direction='column' pt={{ base: '120px', md: '75px' }}>
-      <Timeline events={dates} />
+      <Timeline setFormattedDate={setFormattedDate} />
       <Flex direction='row' pt={{ base: '120px', md: '0px' }}>
         <Menu>
           <MenuButton
@@ -128,11 +84,12 @@ function Advisories() {
           </MenuButton>
           <MenuList fontWeight='none' fontSize='sm'>
             <MenuOptionGroup title='Products'>
-              {uniqProjects.map((p) => (
+              {source.map((p) => (
                 <MenuItemOption
                   value={p}
                   key={p}
-                  onClick={() => filterByProduct(p)}
+                  onClick={() => filterBySource(p)}
+                  textTransform={'uppercase'}
                 >
                   {p}
                 </MenuItemOption>
@@ -158,33 +115,16 @@ function Advisories() {
           </MenuButton>
           <MenuList fontWeight='none' fontSize='sm'>
             <MenuOptionGroup title='Version'>
-              <MenuItemOption value='All' onClick={() => filterByType('All')}>
-                All
-              </MenuItemOption>
-              <MenuItemOption
-                value='Critical'
-                onClick={() => filterByType('Critical')}
-              >
-                Critical
-              </MenuItemOption>
-              <MenuItemOption value='High' onClick={() => filterByType('High')}>
-                High
-              </MenuItemOption>
-              <MenuItemOption
-                value='Medium'
-                onClick={() => filterByType('Medium')}
-              >
-                Medium
-              </MenuItemOption>
-              <MenuItemOption value='Low' onClick={() => filterByType('Low')}>
-                Low
-              </MenuItemOption>
-              <MenuItemOption
-                value='Unknown'
-                onClick={() => filterByType('Unknown')}
-              >
-                Unknown
-              </MenuItemOption>
+              {severity.map((p) => (
+                <MenuItemOption
+                  value={p}
+                  key={p}
+                  onClick={() => filterBySeverity(p)}
+                  textTransform={'capitalize'}
+                >
+                  {p}
+                </MenuItemOption>
+              ))}
             </MenuOptionGroup>
           </MenuList>
         </Menu>
@@ -216,19 +156,23 @@ function Advisories() {
           </Box>
         </Flex>
       </Flex>
-      <AdvisoryLog
-        title={'Feed'}
-        captions={[
-          'ID',
-          'Description',
-          'Updated at',
-          'Severity',
-          'Affected',
-          'Aliases'
-        ]}
-        filterData={filterData}
-        data={advisoriesData}
-      />
+      {data && (
+        <AdvisoryLog
+          title={'Feed'}
+          captions={[
+            'ID',
+            'Description',
+            'Published at',
+            'Severity',
+            'Affected',
+            'Aliases'
+          ]}
+          currentDate={formattedDate}
+          data={data.feedLogs}
+          loading={loading}
+          refetch={refetch}
+        />
+      )}
     </Flex>
   )
 }
