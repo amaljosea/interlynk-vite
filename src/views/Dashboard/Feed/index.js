@@ -165,8 +165,8 @@ function Advisories() {
           captions={[
             'ID',
             'Description',
-            'Updated at',
             'Published at',
+            'Updated at',
             'Severity',
             'Affected',
             'Aliases'
