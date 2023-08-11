@@ -65,6 +65,7 @@ const AdvisoryLog = ({ captions, data, loading, currentDate, refetch }) => {
                     refId={row.refId}
                     desc={row.description}
                     source={row.source}
+                    updatedAt={row.editedAt}
                     publishedAt={row.publishedAt}
                     editedAt={row.editedAt}
                     severity={row.severity}

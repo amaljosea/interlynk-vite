@@ -152,7 +152,7 @@ const SBOMTable = ({
         }
       })
         .then(() => {
-          setRefreshClose()
+          window.location.reload()
         })
         .finally(() => {
           setTimeout(() => {
@@ -474,9 +474,9 @@ const SBOMTable = ({
                       <Button
                         colorScheme='blue'
                         size='md'
-                        onClick={setRefreshOpen}
+                        onClick={scanEnabled ? refreshImage : setRefreshOpen}
                       >
-                        Scan
+                        Refresh
                       </Button>
                       {checkedRows.length > 0 && (
                         <Button
@@ -665,24 +665,24 @@ const SBOMTable = ({
           <ModalHeader>Scan</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            {/* <Text fontSize='lg'>
+            <Text fontSize='lg'>
               Refreshing this will enable scan for this image
-            </Text> */}
-            <Text mt={5}>This image is disabled.</Text>
-            {/* <Text fontSize='sm' mt={5}>
-              Are you sure you want to continue refreshing this page ?
-            </Text> */}
-            <Text fontSize='sm' mt={4}>
-              ** Please enable it from image page
             </Text>
+            {/* <Text mt={5}>This image is disabled.</Text> */}
+            <Text fontSize='sm' mt={5}>
+              Are you sure you want to continue refresh this page ?
+            </Text>
+            {/* <Text fontSize='sm' mt={4}>
+              ** Please enable it from image page
+            </Text> */}
           </ModalBody>
           <ModalFooter>
-            {/* <Button variant='outline' mr={3} onClick={setRefreshClose}>
+            <Button variant='outline' mr={3} onClick={setRefreshClose}>
               No
             </Button>
-            <Button colorScheme='blue' onClick={refreshImage}>
+            <Button colorScheme='blue' onClick={handleYes}>
               Yes
-            </Button> */}
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

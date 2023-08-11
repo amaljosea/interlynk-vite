@@ -284,8 +284,8 @@ export const dateTime = (updatedAt) => {
   return `${date} ${time}`
 }
 
-export const getDate = (date) => {
-  const currentDate = date
+export const getDateFormat = (date) => {
+  const currentDate = new Date(date)
   const year = currentDate.getFullYear()
   const month = String(currentDate.getMonth() + 1).padStart(2, '0')
   const day = String(currentDate.getDate()).padStart(2, '0')
@@ -362,4 +362,11 @@ export const getActiveNavbar = (routes) => {
     }
   }
   return activeNavbar
+}
+
+export const convertDateFormat = (inputDate) => {
+  const date = new Date(inputDate)
+  const month = date.toLocaleString('default', { month: 'short' })
+  const day = date.getDate()
+  return `${month} ${day}`
 }

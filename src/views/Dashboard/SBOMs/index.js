@@ -356,86 +356,105 @@ function SBOMs() {
         </CardBody>
       </Card>
       {/* Scanner Details */}
-      {scannerRun.length > 0 && (
+      {imageVersionData && (
         <Card>
           <CardHeader>
             <Heading size='md'>Scanner Summary</Heading>
           </CardHeader>
-
           <CardBody width='100%'>
-            <Stack width={'100%'} mt={8} divider={<StackDivider />} spacing='4'>
-              {scannerRun.map((item, index) => (
-                <Flex
-                  key={index}
-                  flexDir={'row'}
-                  alignItems={'flex-start'}
-                  justifyContent={'space-between'}
-                  gap={4}
-                >
+            {imageVersionData.imageVersion.imageScannerRun.length > 0 && (
+              <Stack
+                width={'100%'}
+                mt={8}
+                divider={<StackDivider />}
+                spacing='4'
+              >
+                {scannerRun.map((item, index) => (
                   <Flex
+                    key={index}
                     flexDir={'row'}
                     alignItems={'flex-start'}
+                    justifyContent={'space-between'}
                     gap={4}
-                    cursor={'pointer'}
                   >
-                    {allScanners && (
-                      <Image
-                        width={7}
-                        objectFit={'contain'}
-                        src={`${scanImage(scannerName(item.scannerId))}`}
-                        alt={scannerName(item.scannerId)}
-                      />
-                    )}
-                    <Tooltip
-                      label={`${
-                        item.status !== 'failed'
-                          ? `${formattedTime(
-                              item.initiatedAt,
-                              item.completedAt
-                            )}`
-                          : ''
-                      }`}
+                    <Flex
+                      flexDir={'row'}
+                      alignItems={'flex-start'}
+                      gap={4}
+                      cursor={'pointer'}
                     >
-                      <Box>
-                        <Flex alignItems={'center'} gap={3}>
-                          <Heading size='sm' color={'gray.600'}>
-                            {scannerName(item.scannerId)}
-                          </Heading>
-                          {item.status !== 'failed' && (
-                            <Text fontSize={'sm'}>{item.scannerVersion}</Text>
-                          )}
-                        </Flex>
-                        <Text pt={2} fontSize='sm' textTransform={'capitalize'}>
-                          Status - {''}
-                          <chakra.span
-                            color={`${
-                              item.status === 'completed'
-                                ? 'green.500'
-                                : item.status === 'failed'
-                                ? 'red.500'
-                                : 'orange.400'
-                            }`}
+                      {allScanners && (
+                        <Image
+                          width={7}
+                          objectFit={'contain'}
+                          src={`${scanImage(scannerName(item.scannerId))}`}
+                          alt={scannerName(item.scannerId)}
+                        />
+                      )}
+                      <Tooltip
+                        label={`${
+                          item.status !== 'failed'
+                            ? `${formattedTime(
+                                item.initiatedAt,
+                                item.completedAt
+                              )}`
+                            : ''
+                        }`}
+                      >
+                        <Box>
+                          <Flex alignItems={'center'} gap={3}>
+                            <Heading size='sm' color={'gray.600'}>
+                              {scannerName(item.scannerId)}
+                            </Heading>
+                            {item.status !== 'failed' && (
+                              <Text fontSize={'sm'}>{item.scannerVersion}</Text>
+                            )}
+                          </Flex>
+                          <Text
+                            pt={2}
+                            fontSize='sm'
+                            textTransform={'capitalize'}
                           >
-                            {item.status}
-                          </chakra.span>
+                            Status - {''}
+                            <chakra.span
+                              color={`${
+                                item.status === 'completed'
+                                  ? 'green.500'
+                                  : item.status === 'failed'
+                                  ? 'red.500'
+                                  : 'orange.400'
+                              }`}
+                            >
+                              {item.status}
+                            </chakra.span>
+                          </Text>
+                        </Box>
+                      </Tooltip>
+                    </Flex>
+                    {item.status !== 'failed' ||
+                      (item.status !== 'running' && (
+                        <Text fontSize={'sm'}>
+                          <em>
+                            Updated{' '}
+                            {item.completedAt
+                              ? timeSince(item.completedAt)
+                              : timeSince(item.failedAt)}
+                          </em>
                         </Text>
-                      </Box>
-                    </Tooltip>
+                      ))}
                   </Flex>
-                  {item.status !== 'failed' ||
-                    (item.status !== 'running' && (
-                      <Text fontSize={'sm'}>
-                        <em>
-                          Updated{' '}
-                          {item.completedAt
-                            ? timeSince(item.completedAt)
-                            : timeSince(item.failedAt)}
-                        </em>
-                      </Text>
-                    ))}
-                </Flex>
-              ))}
-            </Stack>
+                ))}
+              </Stack>
+            )}
+
+            {loading && <Text mt={6}>Loading...</Text>}
+
+            {imageVersionData.imageVersion.imageScannerRun.length === 0 && (
+              <Text mt={6}>
+                No scan was performed on this image tag. Click on refresh to
+                launch a new scan
+              </Text>
+            )}
           </CardBody>
         </Card>
       )}

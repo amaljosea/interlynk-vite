@@ -1,34 +1,33 @@
 import React from 'react'
 import { Flex, Tag } from '@chakra-ui/react'
-import { getDate } from 'utils'
+import { getDateFormat, convertDateFormat } from 'utils'
 
-function formatDate(date) {
-  const options = { month: 'short', day: 'numeric' }
-  return new Intl.DateTimeFormat('en-US', options).format(date)
-}
+const Timeline = ({ formattedDate, setFormattedDate }) => {
+  const currentDate = new Date()
+  const last30DaysList = []
 
-const Timeline = ({ setFormattedDate }) => {
-  const today = new Date()
+  for (let i = 0; i < 30; i++) {
+    const date = new Date()
+    date.setDate(currentDate.getDate() - i)
+    last30DaysList.push(date.toDateString())
+  }
 
-  const days = [...Array(30)].map((_, index) => {
-    const date = new Date(today)
-    date.setDate(today.getDate() + index)
+  const getCurrentDate = (date) => {
+    setFormattedDate(getDateFormat(date))
+  }
 
-    const getCurrentDate = (date) => {
-      setFormattedDate(getDate(date))
-    }
-
+  const days = last30DaysList.map((date, index) => {
     return (
       <Tag
         p={2}
         key={index}
         borderRadius={5}
         textAlign={'center'}
-        variant={'outline'}
+        variant={formattedDate === getDateFormat(date) ? 'solid' : 'outline'}
         colorScheme={'blue'}
         onClick={() => getCurrentDate(date)}
       >
-        {formatDate(date)}
+        {convertDateFormat(date)}
       </Tag>
     )
   })

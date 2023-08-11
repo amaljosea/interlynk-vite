@@ -18,7 +18,7 @@ import React, { useState, useEffect, useContext } from 'react'
 import ImagesDrawer from 'components/Drawer/ImagesDrawer'
 import Card from 'components/Card/Card'
 import CardHeader from 'components/Card/CardHeader'
-import { useMutation, useQuery } from '@apollo/client'
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import SBOM from 'views/Dashboard/SBOMs'
 import {
   GetAllOrgConnectors,
@@ -30,13 +30,13 @@ import {
   RemoveScannerImage,
   OrgConnectorRefresh
 } from 'graphQL/Mutation'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useHistory } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
 import ImageTable from './ImageTable'
 
 const Index = () => {
   const toast = useToast()
-
+  const history = useHistory()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const versionId = queryParams.get('v')
@@ -62,33 +62,45 @@ const Index = () => {
     variables: {}
   })
 
-  const { data: allImages, refetch } = useQuery(ImagePagination, {
-    variables: { first: 10 }
-  })
+  const [getAllImages, { data: allImages, refetch }] = useLazyQuery(
+    ImagePagination
+  )
+
+  useEffect(() => {
+    if (allImages === undefined) {
+      getAllImages({
+        variables: {
+          first: 10
+        }
+      })
+    }
+  }, [])
 
   const handlePreviousPage = () => {
-    refetch({
-      first: undefined,
-      last: 10,
-      before: allImages.images.pageInfo.startCursor,
-      after: ''
+    getAllImages({
+      variables: {
+        first: undefined,
+        last: 10,
+        before: allImages.images.pageInfo.startCursor,
+        after: ''
+      }
     })
   }
 
   const handleNextPage = () => {
-    refetch({
-      first: 10,
-      last: undefined,
-      after: allImages.images.pageInfo.endCursor,
-      before: ''
+    getAllImages({
+      variables: {
+        first: 10,
+        last: undefined,
+        after: allImages.images.pageInfo.endCursor,
+        before: ''
+      }
     })
   }
 
-  // useEffect(() => {
-  //   if (allImages) {
-  //     console.log(`all Images`, allImages)
-  //   }
-  // }, [allImages])
+  useEffect(() => {
+    console.log(`all Images`, allImages)
+  }, [allImages])
 
   // const filteredImages =
   //   allImages &&
@@ -143,7 +155,12 @@ const Index = () => {
           scannerID: selectedScanner
         }
       }).then(() => {
-        refetch({ first: 10 })
+        getAllImages({
+          variables: {
+            first: 10
+          }
+        })
+        history.push('/vendor/images')
         onScanClose()
       })
     } catch (error) {
@@ -170,7 +187,12 @@ const Index = () => {
           scannerID: `${selectedScanner}`
         }
       }).then(() => {
-        refetch({ first: 10 })
+        getAllImages({
+          variables: {
+            first: 10
+          }
+        })
+        history.push('/vendor/images')
         onDeleteClose()
       })
     } catch (error) {
@@ -290,7 +312,7 @@ const Index = () => {
             </CardHeader>
 
             <ImageTable
-              refetch={refetch}
+              refetch={getAllImages}
               imageList={allImages}
               isLoading={isLoading}
               onScanOpen={onScanOpen}
