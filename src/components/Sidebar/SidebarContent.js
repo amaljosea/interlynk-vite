@@ -44,7 +44,7 @@ const SidebarContent = ({ logoText, routes }) => {
     const activeColor = useColorModeValue('gray.700', 'white')
     const inactiveColor = useColorModeValue('gray.400', 'gray.400')
 
-    return routes.map((prop, key) => {
+    return routes.map((prop, index) => {
       if (prop.redirect) {
         return null
       }
@@ -78,6 +78,7 @@ const SidebarContent = ({ logoText, routes }) => {
       if (prop.layout === '/customer') {
         return (
           <Button
+            key={index}
             boxSize='initial'
             justifyContent='flex-start'
             alignItems='center'

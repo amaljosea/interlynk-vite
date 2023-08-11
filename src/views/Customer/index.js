@@ -21,7 +21,7 @@ import CardHeader from 'components/Card/CardHeader'
 import CardBody from 'components/Card/CardBody.js'
 import { FaCubes, FaLayerGroup, FaMicroscope } from 'react-icons/fa'
 import { useLocation, useHistory } from 'react-router-dom'
-import CustomerSBOMTable from '../SBOMs/components/CustomerSBOMTable'
+import CustomerSBOMTable from '../Dashboard/SBOMs/components/CustomerSBOMTable'
 import CustomerModal from 'components/CustomerModal'
 import { GetSignedImage } from 'graphQL/Queries'
 import { useQuery } from '@apollo/client'
@@ -129,6 +129,7 @@ function Customer() {
 
   useEffect(() => {
     if (signedImageData) {
+      window.localStorage.setItem('signedImageName', signedImageData.image.name)
       const clonedImageVersions = signedImageData.image.imageVersions.map(
         (info) => ({
           ...info
