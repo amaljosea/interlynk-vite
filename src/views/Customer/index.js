@@ -110,7 +110,7 @@ function Customer() {
 
   useEffect(() => {
     if (signedImageData) {
-      console.log(`signedImageData`, signedImageData)
+      // console.log(`signedImageData`, signedImageData)
       const imgV = signedImageData.image.imageVersions.find(
         (item) => item.id === imageVersionId
       )
@@ -121,7 +121,7 @@ function Customer() {
 
   useEffect(() => {
     if (signedImgVerion) {
-      console.log(`signedImgVerion`, signedImgVerion)
+      // console.log(`signedImgVerion`, signedImgVerion)
       setAllResults(signedImgVerion.imageVersion.imageVulns.nodes)
       setScannerRun(signedImgVerion.imageVersion.imageScannerRun)
     }
@@ -179,7 +179,7 @@ function Customer() {
     const filteredData = allResults.filter((item) =>
       item.scanners.some((scanner) => scanner.id === selectedScanner)
     )
-    console.log('filteredData', filteredData)
+    // console.log('filteredData', filteredData)
     setFilteredVulItems(filteredData)
   }, [selectedScanner])
 
@@ -241,21 +241,21 @@ function Customer() {
     })
   }, [allResults])
 
-  useEffect(() => {
-    console.log(`scanResults`, scanResults)
-  }, [scanResults])
+  // useEffect(() => {
+  //   console.log(`scanResults`, scanResults)
+  // }, [scanResults])
 
-  useEffect(() => {
-    if (signedImageData) {
-      console.log(`signedImageData`, signedImageData)
-    }
-  }, [signedImageData])
+  // useEffect(() => {
+  //   if (signedImageData) {
+  //     console.log(`signedImageData`, signedImageData)
+  //   }
+  // }, [signedImageData])
 
-  useEffect(() => {
-    if (signedImgVerion) {
-      console.log(`signedImgVerion`, signedImgVerion)
-    }
-  }, [signedImgVerion])
+  // useEffect(() => {
+  //   if (signedImgVerion) {
+  //     console.log(`signedImgVerion`, signedImgVerion)
+  //   }
+  // }, [signedImgVerion])
 
   return (
     <>

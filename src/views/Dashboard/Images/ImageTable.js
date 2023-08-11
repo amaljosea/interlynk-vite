@@ -45,7 +45,6 @@ const ImageTable = ({
                 <ImageRow
                   key={index}
                   item={item}
-                  refetch={refetch}
                   isLoading={isLoading}
                   setSelectedImage={setSelectedImage}
                   setActiveScanners={setActiveScanners}

@@ -13,7 +13,7 @@ import {
   IconButton,
   Spacer
 } from '@chakra-ui/react'
-import React, {  useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { ChevronDownIcon, RepeatIcon } from '@chakra-ui/icons'
 import Timeline from './components/Timeline'
 
@@ -21,7 +21,7 @@ import { FaDownload, FaSlack } from 'react-icons/fa'
 import AdvisoryLog from './components/AdvisoryLog'
 import { useQuery } from '@apollo/client'
 import { GetFeedLogs } from 'graphQL/Queries'
-import { getDate } from 'utils'
+import { getDateFormat } from 'utils'
 
 function Advisories() {
   const source = ['all', 'nvd', 'ghsa', 'usn', 'pyadvisory', 'goadvisory']
@@ -30,7 +30,7 @@ function Advisories() {
   const [formattedDate, setFormattedDate] = useState('')
 
   useEffect(() => {
-    setFormattedDate(getDate(new Date()))
+    setFormattedDate(getDateFormat(new Date()))
   }, [])
 
   const { data, refetch, loading, error } = useQuery(GetFeedLogs, {
@@ -64,7 +64,10 @@ function Advisories() {
 
   return (
     <Flex direction='column' pt={{ base: '120px', md: '75px' }}>
-      <Timeline setFormattedDate={setFormattedDate} />
+      <Timeline
+        setFormattedDate={setFormattedDate}
+        formattedDate={formattedDate}
+      />
       <Flex direction='row' pt={{ base: '120px', md: '0px' }}>
         <Menu>
           <MenuButton
@@ -162,6 +165,7 @@ function Advisories() {
           captions={[
             'ID',
             'Description',
+            'Updated at',
             'Published at',
             'Severity',
             'Affected',

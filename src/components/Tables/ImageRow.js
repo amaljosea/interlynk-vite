@@ -32,8 +32,7 @@ const ImageRow = ({
   setActiveScanners,
   onScanOpen,
   onDeleteOpen,
-  filteredScanners,
-  refetch
+  filteredScanners
 }) => {
   const { setScanEnabled } = useContext(GlobalContext)
 
@@ -74,7 +73,7 @@ const ImageRow = ({
           id: item.id,
           scanRefresh: true
         }
-      })
+      }).then(() => window.location.reload())
     } catch (error) {
       console.error('Mutation error:', error)
     }

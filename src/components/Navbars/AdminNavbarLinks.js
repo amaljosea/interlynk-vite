@@ -50,7 +50,6 @@ export default function HeaderLinks(props) {
     }
   }, [])
 
-  const { setIsConfirmed } = useContext(GlobalContext)
 
   // Chakra Color Mode
   let mainTeal = useColorModeValue('teal.300', 'teal.300')

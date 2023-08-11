@@ -23,7 +23,7 @@ function AdvisoryLogRow(props) {
     desc,
     source,
     publishedAt,
-    editedAt,
+    updatedAt,
     severity,
     affected,
     aliasId
@@ -94,6 +94,11 @@ function AdvisoryLogRow(props) {
       <Td width={'150px'}>
         <Text fontSize='sm' color={textColor}>
           {timeSince(publishedAt)}
+        </Text>
+      </Td>
+      <Td width={'150px'}>
+        <Text fontSize='sm' color={textColor}>
+          {timeSince(updatedAt)}
         </Text>
       </Td>
       <Td>

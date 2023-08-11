@@ -69,6 +69,7 @@ function SBOMLinkRow(props) {
 
   const domain = window.location.origin
 
+
   const sbomLink = useClipboard(
     `${domain}/login?signed_url_params=${signedUrlParams}&id=${imgVersionId}`
   )
