@@ -1,6 +1,6 @@
 // import
 import { FaImages } from 'react-icons/fa'
-import Customer from 'views/Dashboard/Customer'
+import Customer from 'views/Customer'
 
 var customerRoutes = [
   {

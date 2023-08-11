@@ -471,15 +471,13 @@ const SBOMTable = ({
                           </CSVLink>
                         </Button>
                       </Tooltip>
-                      {!scanEnabled && (
-                        <Button
-                          colorScheme='blue'
-                          size='md'
-                          onClick={setRefreshOpen}
-                        >
-                          Scan
-                        </Button>
-                      )}
+                      <Button
+                        colorScheme='blue'
+                        size='md'
+                        onClick={setRefreshOpen}
+                      >
+                        Scan
+                      </Button>
                       {checkedRows.length > 0 && (
                         <Button
                           colorScheme='blue'

@@ -31,6 +31,10 @@ export default function HeaderLinks(props) {
   const location = useLocation()
   const history = useHistory()
 
+  const queryParams = new URLSearchParams(location.search)
+  const paramId = queryParams.get('signed_url_params')
+  const imageVersionId = queryParams.get('id')
+
   const { variant, children, fixed, secondary, onOpen, ...rest } = props
 
   const [username, setUsername] = useState('')
@@ -70,7 +74,7 @@ export default function HeaderLinks(props) {
   const handleCustomerLogout = () => {
     localStorage.removeItem('userEmail')
     Cookies.remove('userToken')
-    setIsConfirmed(true)
+    window.location.href = `/login?signed_url_params=${paramId}&id=${imageVersionId}`
   }
 
   return (

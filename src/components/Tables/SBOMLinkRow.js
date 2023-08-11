@@ -70,7 +70,7 @@ function SBOMLinkRow(props) {
   const domain = window.location.origin
 
   const sbomLink = useClipboard(
-    `${domain}/customer?signed_url_params=${signedUrlParams}&id=${imgVersionId}`
+    `${domain}/login?signed_url_params=${signedUrlParams}&id=${imgVersionId}`
   )
 
   const [shareLynkUpdate] = useMutation(UpdateShareLynk, {
@@ -187,7 +187,7 @@ function SBOMLinkRow(props) {
         {/* </Link> */}
         <Flex mb={2}>
           <Input
-            value={`${domain}/customer?signed_url_params=${signedUrlParams}&id=${imgVersionId}`}
+            value={`${domain}/login?signed_url_params=${signedUrlParams}&id=${imgVersionId}`}
             onChange={(e) => sbomLink.setValue(e.target.value)}
             mr={2}
             disabled
