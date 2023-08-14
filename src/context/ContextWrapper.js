@@ -1,9 +1,43 @@
 import { useState } from 'react'
-
+import { v4 as uuidv4 } from 'uuid'
 import GlobalContext from './GlobalContext'
-import { advisoriesDataLong } from 'variables/general'
+import {
+  advisoriesDataLong,
+  dashboardTableData,
+  SBOMLinks
+} from 'variables/general'
 
 const ContextWrapper = (props) => {
+  const [productVersionsData, setProductVersionsData] = useState(
+    dashboardTableData
+  )
+
+  const productExploded = []
+  dashboardTableData.map((p) => {
+    p.versions.map((v) => {
+      productExploded.push({
+        id: uuidv4(),
+        name: p.name,
+        description: p.description,
+        logo: p.logo,
+        version: v.version,
+        vendor: p.vendor,
+        quality_score: p.quality_score,
+        sbom_links: v.sbom_links,
+        risk_score: v.risk_score,
+        updated_at: v.updated_at,
+        active: v.active,
+        source: p.source
+      })
+    })
+  })
+
+  const [productVersionExploded, setProductVersionExploded] = useState(
+    productExploded
+  )
+
+  const [SBOMLinksData, setSBOMLinksData] = useState(SBOMLinks)
+
   const [vulnerabilitiesData, setVulnerabilitiesData] = useState([])
 
   const [customerView, setCustomerView] = useState('')
@@ -30,6 +64,12 @@ const ContextWrapper = (props) => {
   return (
     <GlobalContext.Provider
       value={{
+        productVersionsData,
+        setProductVersionsData,
+        productVersionExploded,
+        setProductVersionExploded,
+        SBOMLinksData,
+        setSBOMLinksData,
         vulnerabilitiesData,
         setVulnerabilitiesData,
         customerView,

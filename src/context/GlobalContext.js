@@ -1,6 +1,12 @@
 import React from 'react'
 
 const GlobalContext = React.createContext({
+  productVersionsData: [],
+  setProductVersionsData: () => {},
+  productVersionExploded: [],
+  setProductVersionExploded: () => {},
+  SBOMLinksData: [],
+  setSBOMLinksData: () => {},
   vulnerabilitiesData: [],
   setVulnerabilitiesData: () => {},
   customerView: '',

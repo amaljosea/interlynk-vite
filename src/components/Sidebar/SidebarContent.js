@@ -75,7 +75,7 @@ const SidebarContent = ({ logoText, routes }) => {
         )
       }
 
-      if (prop.layout === '/customer') {
+      if (prop.layout === '/customer' || prop.layout === '/sharelynk') {
         return (
           <Button
             key={index}

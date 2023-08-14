@@ -524,3 +524,19 @@ export const GetFeedLogs = gql`
     }
   }
 `
+
+export const GetProjectData = gql`
+  query GetProjects($first: Int, $last: Int, $after: String, $before: String) {
+    projects(first: $first, last: $last, after: $after, before: $before) {
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+      nodes {
+        id
+        name
+        description
+      }
+    }
+  }
+`

@@ -32,7 +32,7 @@ export default function AdminNavbar(props) {
   const versionId = queryParams.get('v')
   const imageId = queryParams.get('id')
 
-
+  const product = queryParams.get('p')
 
   const imageName = window.localStorage.getItem('Image')
   const signedImageName = localStorage.getItem(`signedImageName`)
@@ -150,17 +150,18 @@ export default function AdminNavbar(props) {
               </Link>
             </BreadcrumbItem>
 
-            {!location.pathname.startsWith('/customer') && (
-              <BreadcrumbItem color={mainText}>
-                <Link
-                  to={`${path(brandText)}`}
-                  color={secondaryText}
-                  onClick={() => localStorage.removeItem('cloudScanner')}
-                >
-                  {brandText}
-                </Link>
-              </BreadcrumbItem>
-            )}
+            {!location.pathname.startsWith('/customer') &&
+              !location.pathname.startsWith('/sharelynk') && (
+                <BreadcrumbItem color={mainText}>
+                  <Link
+                    to={`${path(brandText)}`}
+                    color={secondaryText}
+                    onClick={() => localStorage.removeItem('cloudScanner')}
+                  >
+                    {brandText}
+                  </Link>
+                </BreadcrumbItem>
+              )}
 
             {imageName !== '' && versionId && brandText === 'Images' && (
               <BreadcrumbItem color={mainText}>
@@ -174,6 +175,14 @@ export default function AdminNavbar(props) {
               <BreadcrumbItem color={mainText}>
                 <BreadcrumbLink href='#' color={mainText}>
                   {signedImageName}
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+            )}
+
+            {location.pathname.startsWith('/sharelynk') && (
+              <BreadcrumbItem color={mainText}>
+                <BreadcrumbLink href='#' color={mainText}>
+                  {product}
                 </BreadcrumbLink>
               </BreadcrumbItem>
             )}
