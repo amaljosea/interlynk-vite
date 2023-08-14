@@ -373,3 +373,16 @@ export const OrgSettingUpdate = gql`
     }
   }
 `
+
+export const CreateProject = gql`
+  mutation CreateProject($name: String!, $desc: String) {
+    projectCreate(input: { name: $name, description: $desc }) {
+      project {
+        id
+        name
+        description
+      }
+      errors
+    }
+  }
+`

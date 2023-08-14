@@ -90,46 +90,7 @@ function SBOMComponentRow(props) {
       </Td>
       <Td>{dependsOn}</Td>
       <Td>{license}</Td>
-      {location.pathname.startsWith('/customer') ? (
-        ''
-      ) : (
-        <Td>
-          <Tag
-            minW='40px'
-            colorScheme={
-              risk_score > 25 ? 'red' : risk_score > 20 ? 'blue' : 'green'
-            }
-          >
-            {risk_score}
-          </Tag>
-        </Td>
-      )}
-      <Td>
-        <Flex direction='row' gap='2'>
-          <Tag size='md' variant='subtle' colorScheme='red'>
-            <TagLeftIcon boxSize='12px' as={LetterCIcon} />
-            <TagLabel>{critical}</TagLabel>
-          </Tag>
-          <Tag size='md' variant='subtle' colorScheme='orange'>
-            <TagLeftIcon boxSize='12px' as={LetterHIcon} />
-            <TagLabel>{high}</TagLabel>
-          </Tag>
-          <Tag size='md' variant='subtle' colorScheme='yellow'>
-            <TagLeftIcon boxSize='12px' as={LetterMIcon} />
-            <TagLabel>{medium}</TagLabel>
-          </Tag>
-          <Tag size='md' variant='subtle' colorScheme='green'>
-            <TagLeftIcon boxSize='12px' as={LetterLIcon} />
-            <TagLabel>{low}</TagLabel>
-          </Tag>
-        </Flex>
-      </Td>
       <Td>{updated}</Td>
-      <Td>
-        <Button p='0px' bg='transparent'>
-          <Icon as={FaEllipsisV} color='gray.400' cursor='pointer' />
-        </Button>
-      </Td>
     </Tr>
   )
 }

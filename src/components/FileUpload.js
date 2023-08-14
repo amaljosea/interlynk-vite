@@ -53,9 +53,9 @@ const FileUpload = () => {
     onUploadClose()
   }
 
-  useEffect(() => {
-    console.log('progress', progress)
-  }, [progress])
+  // useEffect(() => {
+  //   console.log('progress', progress)
+  // }, [progress])
 
   return (
     <>

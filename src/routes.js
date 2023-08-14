@@ -3,9 +3,18 @@ import Dashboard from 'views/Dashboard/Dashboard'
 import Profile from 'views/Dashboard/Profile'
 import Images from 'views/Dashboard/Images'
 import Feed from 'views/Dashboard/Feed'
+import Products from 'views/Dashboard/Products'
+import SBOM from 'views/Sbom'
 import { HomeIcon } from 'components/Icons/Icons'
 
-import { FaRegSun, FaImages, FaPlug, FaBullhorn } from 'react-icons/fa'
+import {
+  FaRegSun,
+  FaImages,
+  FaPlug,
+  FaBullhorn,
+  FaWindowMaximize,
+  FaCode
+} from 'react-icons/fa'
 
 import Connections from 'views/Dashboard/Connections'
 
@@ -22,6 +31,20 @@ var dashRoutes = [
     name: 'Images',
     icon: <FaImages color='inherit' />,
     component: Images,
+    layout: '/vendor'
+  },
+  {
+    path: '/products',
+    name: 'Products',
+    icon: <FaWindowMaximize color='inherit' />,
+    component: Products,
+    layout: '/vendor'
+  },
+  {
+    path: '/sboms',
+    name: 'SBOM',
+    icon: <FaCode color='inherit' />,
+    component: SBOM,
     layout: '/vendor'
   },
   {

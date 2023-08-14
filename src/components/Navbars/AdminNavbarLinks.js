@@ -50,7 +50,6 @@ export default function HeaderLinks(props) {
     }
   }, [])
 
-
   // Chakra Color Mode
   let mainTeal = useColorModeValue('teal.300', 'teal.300')
   let inputBg = useColorModeValue('white', 'gray.800')
@@ -114,15 +113,7 @@ export default function HeaderLinks(props) {
             {username ? username : 'Surendra Pathak'}
           </Text>
         </MenuButton>
-        {location.pathname.startsWith('/customer') ? (
-          <MenuList size='sm'>
-            <MenuGroup title=''>
-              <MenuItem icon={<SettingsIcon />} onClick={handleCustomerLogout}>
-                Log out
-              </MenuItem>
-            </MenuGroup>
-          </MenuList>
-        ) : (
+        {location.pathname.startsWith('/vendor') && (
           <MenuList size='sm'>
             <MenuGroup title=''>
               <Link to='/vendor/connections'>
@@ -137,6 +128,15 @@ export default function HeaderLinks(props) {
                   <MenuItem icon={<FaSignOutAlt />}>Login</MenuItem>
                 </Link>
               )}
+            </MenuGroup>
+          </MenuList>
+        )}
+        {location.pathname.startsWith('/customer') && (
+          <MenuList size='sm'>
+            <MenuGroup title=''>
+              <MenuItem icon={<SettingsIcon />} onClick={handleCustomerLogout}>
+                Log out
+              </MenuItem>
             </MenuGroup>
           </MenuList>
         )}
