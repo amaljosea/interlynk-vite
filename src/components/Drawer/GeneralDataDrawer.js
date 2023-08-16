@@ -116,7 +116,7 @@ const GeneralDataDrawer = ({
   }
 
   const handleToolAdd = () => {
-    if ((toolName && toolVersion) || toolVendor) {
+    if ((toolName && toolVersion)) {
       setTools((prev) => [
         {
           name: toolName,
@@ -129,7 +129,7 @@ const GeneralDataDrawer = ({
       setToolVersion('')
       setToolVendor('')
     } else {
-      alert(`Please fill up required fields`)
+      alert(`Tool Name and Tool Version are required`)
     }
   }
 
@@ -191,25 +191,25 @@ const GeneralDataDrawer = ({
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
-          <DrawerHeader>Update</DrawerHeader>
+          <DrawerHeader>Creation Tool(s)</DrawerHeader>
 
           <DrawerBody>
             {selectedKey === 'tools' && (
               <Flex direction={'column'} alignItems={'flex-start'} gap={3}>
                 <Input
-                  placeholder='Tool name'
+                  placeholder='Tool Name*'
                   value={toolName}
                   onChange={(e) => setToolName(e.target.value)}
                 />
 
                 <Input
-                  placeholder='Version'
+                  placeholder='Tool Version*'
                   value={toolVersion}
                   onChange={(e) => setToolVersion(e.target.value)}
                 />
 
                 <Input
-                  placeholder='Vendor'
+                  placeholder='Vendor Name'
                   value={toolVendor}
                   onChange={(e) => setToolVendor(e.target.value)}
                 />
@@ -219,9 +219,6 @@ const GeneralDataDrawer = ({
                 </Button>
 
                 <Flex width={'100%'} flexDir={'column'}>
-                  <Text size='md' my={2}>
-                    Author History
-                  </Text>
                   {tools.length > 0 ? (
                     <Table variant='simple' size='sm' mt={4}>
                       <Thead>
@@ -258,7 +255,7 @@ const GeneralDataDrawer = ({
                     </Table>
                   ) : (
                     <Text mt={4} color={'darkgrey'}>
-                      No author found
+                      No creation tool specified
                     </Text>
                   )}
                 </Flex>
@@ -268,13 +265,13 @@ const GeneralDataDrawer = ({
             {selectedKey === 'author' && (
               <Flex direction={'column'} alignItems={'flex-start'} gap={3}>
                 <Input
-                  placeholder='Name'
+                  placeholder='Author Name*'
                   value={authorName}
                   onChange={(e) => setAuthorName(e.target.value)}
                 />
 
                 <Input
-                  placeholder='Email'
+                  placeholder='Author Email*'
                   value={authorEmail}
                   onChange={(e) => setAuthorEmail(e.target.value)}
                 />
@@ -290,9 +287,6 @@ const GeneralDataDrawer = ({
                 </Button>
 
                 <Flex width={'100%'} flexDir={'column'}>
-                  <Text size='md' my={2}>
-                    Author History
-                  </Text>
                   {authors.length > 0 ? (
                     <Table variant='simple' size='sm' mt={4}>
                       <Thead>
@@ -424,7 +418,7 @@ const GeneralDataDrawer = ({
                 <FormControl isDisabled={selectedLicense !== ''}>
                   <FormLabel>Or</FormLabel>
                   <Input
-                    placeholder='Enter a valid SPDX license'
+                    placeholder='Enter a valid SPDX license expression'
                     value={licenseName}
                     onChange={(e) => setLicenseName(e.target.value)}
                   />
@@ -434,9 +428,6 @@ const GeneralDataDrawer = ({
                 </Button>
 
                 <Flex width={'100%'} flexDir={'column'}>
-                  <Text size='md' my={2}>
-                    License History
-                  </Text>
                   {license.length > 0 ? (
                     <Table variant='simple' size='sm' mt={4}>
                       <Thead>
