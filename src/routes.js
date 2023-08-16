@@ -41,13 +41,6 @@ var dashRoutes = [
     layout: '/vendor'
   },
   {
-    path: '/sboms',
-    name: 'SBOM',
-    icon: <FaCode color='inherit' />,
-    component: SBOM,
-    layout: '/vendor'
-  },
-  {
     path: '/feed',
     name: 'Feed',
     icon: <FaBullhorn color='inherit' />,

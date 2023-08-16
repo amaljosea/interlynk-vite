@@ -102,11 +102,13 @@ function AdvisoryLogRow(props) {
         </Text>
       </Td>
       <Td>
-        <Text fontSize='sm' color={textColor}>
-          <Tag size='md' key='md' variant='subtle' colorScheme={sevColor}>
-            <TagLabel>{severity}</TagLabel>
-          </Tag>
-        </Text>
+        {severity && (
+          <Text fontSize='sm' color={textColor}>
+            <Tag size='md' key='md' variant='subtle' colorScheme={sevColor}>
+              <TagLabel>{severity}</TagLabel>
+            </Tag>
+          </Text>
+        )}
       </Td>
       <Td width={'100px'}>
         <Flex direction='column'>{affected ? affected : ''}</Flex>

@@ -125,7 +125,7 @@ function SBOM() {
         return semver.compare(coerced_b, coerced_a)
       })
 
-      console.log(clonedImageVersions)
+      // console.log(clonedImageVersions)
 
       setImageInfo(clonedImageVersions)
     }
@@ -244,7 +244,8 @@ function SBOM() {
             'Version',
             'Relates to',
             'License',
-            'Last Updated'
+            'Last Updated',
+            ''
           ]}
           data={sbom}
         />

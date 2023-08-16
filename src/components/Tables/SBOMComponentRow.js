@@ -1,54 +1,48 @@
 import {
   Tag,
-  Button,
   Flex,
   Td,
   Text,
   Tr,
   useColorModeValue,
-  TagLeftIcon,
-  TagLabel,
-  Icon
+  Icon,
+  Stack,
+  useDisclosure
 } from '@chakra-ui/react'
-import React from 'react'
-
-import {
-  LetterCIcon,
-  LetterHIcon,
-  LetterMIcon,
-  LetterLIcon
-} from 'components/Icons/Icons'
-
-import { FaEllipsisV } from 'react-icons/fa'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
+import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
+import ComponentDrawer from 'components/Drawer/ComponentDrawer'
+import ComponentModal from 'views/Sbom/components/ComponentModal'
 
 function SBOMComponentRow(props) {
   const {
     logo,
     component,
     version,
-    source,
-    depth,
     dependsOn,
-    language,
     license,
     updated,
-    repo,
-    risk_score,
-    critical,
-    high,
-    medium,
-    low,
     redacted
   } = props
   const location = useLocation()
+
+  const customerView = location.pathname.startsWith('/sharelynk')
+
+  const compBtn = useRef(null)
 
   const textColor = useColorModeValue('gray.700', 'white')
   const bgStatus = useColorModeValue('gray.400', '#1a202c')
   const colorStatus = useColorModeValue('white', 'gray.400')
 
   const [contains, setcontains] = useState({})
+
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const {
+    isOpen: isDelOpen,
+    onOpen: onDelOpen,
+    onClose: onDelClose
+  } = useDisclosure()
 
   useEffect(() => {
     const containsData = window.localStorage.getItem('contains')
@@ -91,6 +85,33 @@ function SBOMComponentRow(props) {
       <Td>{dependsOn}</Td>
       <Td>{license}</Td>
       <Td>{updated}</Td>
+      <Td>
+        {!customerView && (
+          <Stack direction={'row'} spacing='24px'>
+            <Icon
+              as={EditIcon}
+              color={'blue.500'}
+              cursor={'pointer'}
+              onClick={onOpen}
+            />
+            <Icon
+              as={DeleteIcon}
+              color={'red.500'}
+              cursor={'pointer'}
+              onClick={onDelOpen}
+            />
+          </Stack>
+        )}
+        <ComponentDrawer
+          isOpen={isOpen}
+          onClose={onClose}
+          btnRef={compBtn}
+          component={component}
+          version={version}
+          license={license}
+        />
+        <ComponentModal isOpen={isDelOpen} onClose={onDelClose} />
+      </Td>
     </Tr>
   )
 }
