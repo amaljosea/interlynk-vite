@@ -25,17 +25,14 @@ const GeneralDataRow = ({
     <>
       <Tr>
         <Td pl={0} fontWeight={'medium'}>
-          Creation Tools
+          Creation Tool(s)
         </Td>
         <Td pl={0}>
           <Flex flexDirection={'column'} alignItems={'flex-start'} gap={4}>
             {tools.map((item, index) => (
               <Flex key={index} flexDir={'row'} alignItems={'center'} gap={4}>
                 <Text pl={0} fontSize={'sm'}>
-                  {`(${item.vendor})`}
-                </Text>
-                <Text pl={0} fontSize={'sm'}>
-                  {`(${item.name})`} - {`(${item.version})`}
+                  {`${item.name}`}-{`${item.version}`} {`(${item.vendor})`}
                 </Text>
               </Flex>
             ))}
@@ -51,31 +48,31 @@ const GeneralDataRow = ({
       </Tr>
       <Tr>
         <Td pl={0} fontWeight={'medium'}>
-          Create At
+          Created At
         </Td>
         <Td pl={0}>{createdAt}</Td>
         <Td pl={0}></Td>
       </Tr>
       <Tr>
         <Td pl={0} fontWeight={'medium'}>
-          Last Modified At
+          Updated At
         </Td>
         <Td pl={0}>{lastUpdatedAt}</Td>
         <Td pl={0}></Td>
       </Tr>
       <Tr>
         <Td pl={0} fontWeight={'medium'}>
-          Author's
+          Author(s)
         </Td>
         <Td pl={0}>
           <Flex flexDirection={'column'} alignItems={'flex-start'} gap={4}>
             {authors.map((item, index) => (
               <Flex key={index} flexDir={'row'} alignItems={'center'} gap={4}>
                 <Text pl={0} fontSize={'sm'}>
-                  {item.name ? `(${item.name})` : ''}
+                  {item.name ? `${item.name}` : ''}
                 </Text>
                 <Text pl={0} fontSize={'sm'}>
-                  {item.email ? `(${item.email})` : ''}
+                  {item.email ? `${item.email}` : ''}
                 </Text>
                 <Text pl={0} fontSize={'sm'}>
                   {item.organization ? `(${item.organization})` : ''}
@@ -94,7 +91,7 @@ const GeneralDataRow = ({
       </Tr>
       <Tr>
         <Td pl={0} fontWeight={'medium'}>
-          Supplier's
+          Supplier(s)
         </Td>
         <Td pl={0}>
           <Flex flexDirection={'column'} alignItems={'flex-start'} gap={4}>
@@ -124,7 +121,7 @@ const GeneralDataRow = ({
       </Tr>
       <Tr>
         <Td pl={0} fontWeight={'medium'}>
-          Product License
+          License
         </Td>
         <Td pl={0}>
           <Flex flexDirection={'column'} alignItems={'flex-start'} gap={4}>
@@ -149,7 +146,7 @@ const GeneralDataRow = ({
       </Tr>
       <Tr>
         <Td pl={0} fontWeight={'medium'}>
-          Identifier's
+          Identifier(s)
         </Td>
         <Td pl={0}>
           <Flex mt={2} flexDir={'column'} alignItems={'self-start'} gap={2}>
@@ -172,7 +169,7 @@ const GeneralDataRow = ({
       </Tr>
       <Tr>
         <Td pl={0} fontWeight={'medium'}>
-          Hashe's
+          Hash(es)
         </Td>
         <Td pl={0}>
           <Flex mt={2} flexDir={'column'} alignItems={'self-start'} gap={2}>
@@ -190,7 +187,7 @@ const GeneralDataRow = ({
       </Tr>
       <Tr>
         <Td pl={0} fontWeight={'medium'}>
-          Copyright
+          Copyright Text
         </Td>
         <Td pl={0}>Copyright Interlynk Inc 2023</Td>
       </Tr>
