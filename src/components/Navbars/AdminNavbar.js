@@ -27,12 +27,13 @@ export default function AdminNavbar(props) {
     ...rest
   } = props
 
+  // console.log(`brand text`, brandText)
+
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const versionId = queryParams.get('v')
-  const imageId = queryParams.get('id')
-
   const product = queryParams.get('p')
+  const imageId = queryParams.get('id')
 
   const imageName = window.localStorage.getItem('Image')
   const signedImageName = localStorage.getItem(`signedImageName`)
@@ -88,6 +89,8 @@ export default function AdminNavbar(props) {
         return '/vendor/dashboard'
       case 'Images':
         return '/vendor/images'
+      case 'Products':
+        return '/vendor/products'
       case 'Connections':
         return '/vendor/connections'
     }
@@ -167,6 +170,14 @@ export default function AdminNavbar(props) {
               <BreadcrumbItem color={mainText}>
                 <BreadcrumbLink href='#' color={mainText}>
                   {imageName}
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+            )}
+
+            {brandText === 'Products' && product && (
+              <BreadcrumbItem color={mainText}>
+                <BreadcrumbLink href='#' color={mainText}>
+                  {product}
                 </BreadcrumbLink>
               </BreadcrumbItem>
             )}

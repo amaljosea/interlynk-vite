@@ -50,6 +50,7 @@ export default function Dashboard(props) {
 
   const getRoutes = (routes) => {
     const route = routes.map((prop, key) => {
+      // console.log('prop', prop)
       if (prop.collapse) {
         return getRoutes(prop.views)
       }

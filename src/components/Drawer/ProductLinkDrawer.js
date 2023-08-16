@@ -78,7 +78,7 @@ function ProductLinkDrawer(props) {
       (project) => project.name === product
     )
 
-    console.log('filterProduct', filterProduct)
+    // console.log('filterProduct', filterProduct)
 
     const uniqVersion = []
     filterProduct.map((project) => {
@@ -87,7 +87,7 @@ function ProductLinkDrawer(props) {
       })
     })
 
-    console.log('uniqVersion', uniqVersion)
+    // console.log('uniqVersion', uniqVersion)
     setSelectedVersion(uniqVersion)
   }, [product])
 

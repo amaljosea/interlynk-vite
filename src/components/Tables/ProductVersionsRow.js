@@ -43,7 +43,7 @@ function ProductVersionsRow(props) {
 
   const uniqProjects = []
   const btnRef = useRef()
-  const url = `/vendor/sboms?p=${name}&v=${version}`
+  const url = `/vendor/products?p=${name}&v=${version}`
 
   productVersionsData.map((project) => {
     if (uniqProjects.indexOf(project.name) === -1) {
@@ -98,7 +98,7 @@ function ProductVersionsRow(props) {
         <Td pl={0}>
           <Flex direction='column'>
             <Text fontSize='sm' color={textColor}>
-              {version}
+              {(Math.random() * 10).toFixed()}
             </Text>
           </Flex>
         </Td>

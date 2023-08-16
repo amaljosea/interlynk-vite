@@ -5,7 +5,7 @@ import SBOM from 'views/Sbom'
 const ShareLynkRoutes = [
   {
     path: '/',
-    name: 'SBOM',
+    name: 'Products',
     icon: <FaImages color='inherit' />,
     component: SBOM,
     layout: '/sharelynk'

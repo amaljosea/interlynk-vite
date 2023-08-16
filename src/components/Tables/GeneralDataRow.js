@@ -1,35 +1,20 @@
-import {
-  Button,
-  Flex,
-  Tag,
-  TagLabel,
-  Td,
-  Text,
-  Tr,
-  chakra
-} from '@chakra-ui/react'
+import { Button, Flex, Td, Text, Tr } from '@chakra-ui/react'
 import { useLocation } from 'react-router-dom'
 
-const GeneralDataRow = ({ onOpen, data, setSelectedKey }) => {
+const GeneralDataRow = ({
+  onOpen,
+  data,
+  setSelectedKey,
+  tools,
+  authors,
+  suppliers,
+  license
+}) => {
   const location = useLocation()
 
   const customerView = location.pathname.startsWith('/sharelynk')
 
-  const {
-    createdAt,
-    lastUpdatedAt,
-    authors,
-    orgs,
-    emails,
-    supplierName,
-    product,
-    license,
-    cpe,
-    purl,
-    swid,
-    md5,
-    sha
-  } = data
+  const { createdAt, lastUpdatedAt, cpe, purl, swid, md5, sha } = data
 
   const handleClick = (ref) => {
     setSelectedKey(ref)
@@ -39,45 +24,64 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey }) => {
   return (
     <>
       <Tr>
-        <Td pl={0}>Create At</Td>
+        <Td pl={0} fontWeight={'medium'}>
+          Creation Tools
+        </Td>
+        <Td pl={0}>
+          <Flex flexDirection={'column'} alignItems={'flex-start'} gap={4}>
+            {tools.map((item, index) => (
+              <Flex key={index} flexDir={'row'} alignItems={'center'} gap={4}>
+                <Text pl={0} fontSize={'sm'}>
+                  {`(${item.vendor})`}
+                </Text>
+                <Text pl={0} fontSize={'sm'}>
+                  {`(${item.name})`} - {`(${item.version})`}
+                </Text>
+              </Flex>
+            ))}
+          </Flex>
+        </Td>
+        <Td pl={0}>
+          {!customerView && (
+            <Button size='sm' onClick={() => handleClick('tools')}>
+              Update
+            </Button>
+          )}
+        </Td>
+      </Tr>
+      <Tr>
+        <Td pl={0} fontWeight={'medium'}>
+          Create At
+        </Td>
         <Td pl={0}>{createdAt}</Td>
         <Td pl={0}></Td>
       </Tr>
       <Tr>
-        <Td pl={0}>Last Modified At</Td>
+        <Td pl={0} fontWeight={'medium'}>
+          Last Modified At
+        </Td>
         <Td pl={0}>{lastUpdatedAt}</Td>
         <Td pl={0}></Td>
       </Tr>
       <Tr>
-        <Td pl={0}>Author's</Td>
+        <Td pl={0} fontWeight={'medium'}>
+          Author's
+        </Td>
         <Td pl={0}>
-          <Flex flexDir={'row'} alignItems={'self-start'} gap={2}>
-            <Text>Name:</Text>
-            <Tag borderRadius='full' colorScheme={'blue'}>
-              <TagLabel>{authors}</TagLabel>
-            </Tag>
-          </Flex>
-          <Flex mt={3} flexDir={'row'} alignItems={'self-start'} gap={2}>
-            <Text>Organization:</Text>
-            <Tag borderRadius='full' colorScheme={'blue'} variant='outline'>
-              <TagLabel>{orgs}</TagLabel>
-            </Tag>
-          </Flex>
-          <Flex mt={3} flexDir={'row'} alignItems={'center'} gap={2}>
-            <Text>Email:</Text>
-            <chakra.span
-              display={'flex'}
-              flex={'row'}
-              alignItems={'center'}
-              gap={2}
-            >
-              {emails.length > 0 &&
-                emails.map((item) => (
-                  <Tag key={item} borderRadius='full' colorScheme={'green'}>
-                    <TagLabel>{item}</TagLabel>
-                  </Tag>
-                ))}
-            </chakra.span>
+          <Flex flexDirection={'column'} alignItems={'flex-start'} gap={4}>
+            {authors.map((item, index) => (
+              <Flex key={index} flexDir={'row'} alignItems={'center'} gap={4}>
+                <Text pl={0} fontSize={'sm'}>
+                  {item.name ? `(${item.name})` : ''}
+                </Text>
+                <Text pl={0} fontSize={'sm'}>
+                  {item.email ? `(${item.email})` : ''}
+                </Text>
+                <Text pl={0} fontSize={'sm'}>
+                  {item.organization ? `(${item.organization})` : ''}
+                </Text>
+              </Flex>
+            ))}
           </Flex>
         </Td>
         <Td pl={0}>
@@ -89,21 +93,21 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey }) => {
         </Td>
       </Tr>
       <Tr>
-        <Td pl={0}>Supplier's</Td>
+        <Td pl={0} fontWeight={'medium'}>
+          Supplier's
+        </Td>
         <Td pl={0}>
-          <Flex mt={2} flexDir={'column'} alignItems={'self-start'} gap={4}>
-            <Text>
-              Name -{' '}
-              <Tag borderRadius='full' colorScheme={'blue'}>
-                <TagLabel>{supplierName}</TagLabel>
-              </Tag>
-            </Text>
-            <Text>
-              Product -{' '}
-              <Tag borderRadius='full' colorScheme={'blue'} variant='outline'>
-                <TagLabel>{product}</TagLabel>
-              </Tag>
-            </Text>
+          <Flex flexDirection={'column'} alignItems={'flex-start'} gap={4}>
+            {suppliers.map((item, index) => (
+              <Flex key={index} flexDir={'row'} alignItems={'center'} gap={4}>
+                <Text pl={0} fontSize={'sm'}>
+                  {item.name ? `(${item.name})` : ''}
+                </Text>
+                <Text pl={0} fontSize={'sm'}>
+                  {item.product ? `(${item.product})` : ''}
+                </Text>
+              </Flex>
+            ))}
           </Flex>
         </Td>
         <Td pl={0}>
@@ -119,8 +123,18 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey }) => {
         </Td>
       </Tr>
       <Tr>
-        <Td pl={0}>Product License</Td>
-        <Td pl={0}>{license}</Td>
+        <Td pl={0} fontWeight={'medium'}>
+          Product License
+        </Td>
+        <Td pl={0}>
+          <Flex flexDirection={'column'} alignItems={'flex-start'} gap={4}>
+            {license.map((item, index) => (
+              <Text pl={0} fontSize={'sm'} key={index}>
+                {item.name}
+              </Text>
+            ))}
+          </Flex>
+        </Td>
         <Td pl={0}>
           {!customerView && (
             <Button
@@ -134,7 +148,9 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey }) => {
         </Td>
       </Tr>
       <Tr>
-        <Td pl={0}>Identifier's</Td>
+        <Td pl={0} fontWeight={'medium'}>
+          Identifier's
+        </Td>
         <Td pl={0}>
           <Flex mt={2} flexDir={'column'} alignItems={'self-start'} gap={2}>
             <Text>{cpe}</Text>
@@ -155,7 +171,9 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey }) => {
         </Td>
       </Tr>
       <Tr>
-        <Td pl={0}>Hashe's</Td>
+        <Td pl={0} fontWeight={'medium'}>
+          Hashe's
+        </Td>
         <Td pl={0}>
           <Flex mt={2} flexDir={'column'} alignItems={'self-start'} gap={2}>
             <Text>MD5: {md5}</Text>
@@ -171,7 +189,9 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey }) => {
         </Td>
       </Tr>
       <Tr>
-        <Td pl={0}>Copyright</Td>
+        <Td pl={0} fontWeight={'medium'}>
+          Copyright
+        </Td>
         <Td pl={0}>Copyright Interlynk Inc 2023</Td>
       </Tr>
     </>

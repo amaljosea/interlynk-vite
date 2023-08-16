@@ -25,8 +25,15 @@ import FileUpload from 'components/FileUpload'
 import ProductModal from './components/ProductModal.js'
 import { useLazyQuery } from '@apollo/client'
 import { GetProjectData } from 'graphQL/Queries'
+import { useLocation } from 'react-router-dom'
+import SBOM from 'views/Sbom'
 
-function Products() {
+function Index() {
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const product = queryParams.get('p')
+  const version = queryParams.get('v')
+
   const [getAllProjects, { data: allProjects, loading }] = useLazyQuery(
     GetProjectData
   )
@@ -165,6 +172,10 @@ function Products() {
     setFilterData(filterRowList)
   }
 
+  if (product) {
+    return <SBOM />
+  }
+
   return (
     <>
       <Flex direction='column' pt={{ base: '120px', md: '0px' }}>
@@ -277,42 +288,6 @@ function Products() {
           groupVersionData={groupVersionData}
           productVersionsData={productVersionExploded}
         />
-        <Menu>
-          <MenuButton
-            as={Button}
-            rightIcon={<ChevronDownIcon />}
-            maxW='fit-content'
-            px={4}
-            py={2}
-            me={2}
-            transition='all 0.2s'
-            borderRadius='md'
-            borderWidth='1px'
-            fontSize='sm'
-            fontWeight='none'
-          >
-            Rows
-          </MenuButton>
-          <MenuList fontWeight='none' fontSize='sm' width={'fit-content'}>
-            <MenuOptionGroup title='No of rows'>
-              <MenuItemOption value={'5'} onClick={() => filterByRow(5)}>
-                5
-              </MenuItemOption>
-              <MenuItemOption value={'10'} onClick={() => filterByRow(10)}>
-                10
-              </MenuItemOption>
-              <MenuItemOption value={'15'} onClick={() => filterByRow(15)}>
-                15
-              </MenuItemOption>
-              <MenuItemOption value={'20'} onClick={() => filterByRow(20)}>
-                20
-              </MenuItemOption>
-              <MenuItemOption value={'25'} onClick={() => filterByRow(25)}>
-                25
-              </MenuItemOption>
-            </MenuOptionGroup>
-          </MenuList>
-        </Menu>
       </Flex>
 
       <ProductModal
@@ -321,8 +296,9 @@ function Products() {
         product={''}
         vendorName={''}
       />
+      
     </>
   )
 }
 
-export default Products
+export default Index
