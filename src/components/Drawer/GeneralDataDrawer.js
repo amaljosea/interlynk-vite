@@ -50,8 +50,9 @@ const GeneralDataDrawer = ({
   const [orgName, setOrgName] = useState('')
   const [authorEmail, setAuthorEmail] = useState('')
 
-  const [supplier, setSupplier] = useState('')
-  const [supplierProduct, setSupplierProduct] = useState('')
+  const [supName, setSupName] = useState('')
+  const [supEmail, setSupEmail] = useState('')
+  const [supOrg, setSupOrg] = useState('')
 
   const [licenseName, setLicenseName] = useState('')
   const [selectedLicense, setSelectedLicense] = useState('')
@@ -61,19 +62,24 @@ const GeneralDataDrawer = ({
   const [MD5Value, setMD5Value] = useState('')
   const [shaValue, setShaValue] = useState('')
 
+  const [creationTools, setCreationTools] = useState([])
+  const [authorList, setAuthorList] = useState([])
+  const [supplierList, setSupplierList] = useState([])
+  const [licenseList, setLicenseList] = useState([])
+
   useEffect(() => {
+    setCreationTools(tools)
+    setSupplierList(suppliers)
+    setAuthorList(authors)
+    setLicenseList(license)
     setCpeValue(cpe)
     setPurlValue(purl)
     setSwidValue(swid)
-    setMD5Value(md5)
-    setShaValue(sha)
-
-    console.log('data')
   }, [data])
 
   const handleAuthorAdd = () => {
     if (authorName || authorEmail || orgName) {
-      setAuthors((prev) => [
+      setAuthorList((prev) => [
         {
           name: authorName,
           email: authorEmail,
@@ -90,34 +96,38 @@ const GeneralDataDrawer = ({
   }
 
   const handleAuthorRemove = (author) => {
-    const updatedList = authors.filter((item) => item.name !== author.name)
-    setAuthors(updatedList)
+    const updatedList = authorList.filter((item) => item.name !== author.name)
+    setAuthorList(updatedList)
   }
 
   const handleSupAdd = () => {
-    if (supplier || supplierProduct) {
-      setSuppliers((prev) => [
+    if (supName || supEmail || supOrg) {
+      setSupplierList((prev) => [
         {
-          name: supplier,
-          product: supplierProduct
+          name: supName,
+          email: supEmail,
+          organization: supOrg
         },
         ...prev
       ])
-      setSupplier('')
-      setSupplierProduct('')
+      setSupName('')
+      setSupEmail('')
+      setSupOrg('')
     } else {
       alert(`Please add atleast one value`)
     }
   }
 
   const handleSupRemove = (supplier) => {
-    const updatedList = suppliers.filter((item) => item.name !== supplier.name)
-    setSuppliers(updatedList)
+    const updatedList = supplierList.filter(
+      (item) => item.name !== supplier.name
+    )
+    setSupplierList(updatedList)
   }
 
   const handleToolAdd = () => {
     if ((toolName && toolVersion) || toolVendor) {
-      setTools((prev) => [
+      setCreationTools((prev) => [
         {
           name: toolName,
           version: toolVersion,
@@ -134,15 +144,18 @@ const GeneralDataDrawer = ({
   }
 
   const handleToolRemove = (tool) => {
-    const updatedList = tools.filter((item) => item.name !== tool.name)
-    setTools(updatedList)
+    const updatedList = creationTools.filter((item) => item.name !== tool.name)
+    setCreationTools(updatedList)
   }
 
   const onLicenselAdd = () => {
     if (licenseName !== '' || selectedLicense !== '') {
-      setLicense((prev) => [
+      setLicenseList((prev) => [
         {
-          name: selectedLicense ? selectedLicense : licenseName
+          name:
+            selectedLicense && selectedLicense !== 'Custom'
+              ? selectedLicense
+              : licenseName
         },
         ...prev
       ])
@@ -154,12 +167,24 @@ const GeneralDataDrawer = ({
   }
 
   const onLicenselRemove = (ls) => {
-    const updatedList = license.filter((item) => item.name !== ls.name)
-    setLicense(updatedList)
+    const updatedList = licenseList.filter((item) => item.name !== ls.name)
+    setLicenseList(updatedList)
   }
 
-  const handleAuthorSave = () => {
+  const handleSave = () => {
     const result = { ...data }
+    if (creationTools) {
+      setTools(creationTools)
+    }
+    if (authorList) {
+      setAuthors(authorList)
+    }
+    if (supplierList) {
+      setSuppliers(supplierList)
+    }
+    if (licenseList) {
+      setLicense(licenseList)
+    }
     if (cpeValue) {
       result.cpe = cpeValue
     }
@@ -169,14 +194,23 @@ const GeneralDataDrawer = ({
     if (swidValue) {
       result.swid = swidValue
     }
-    if (MD5Value) {
-      result.md5 = MD5Value
-    }
-    if (shaValue) {
-      result.sha = shaValue
-    }
     setGeneralData(result)
     onClose()
+  }
+
+  const heading = (name) => {
+    switch (name) {
+      case 'tools':
+        return 'Creation Tool(s)'
+      case 'author':
+        return 'Author(s)'
+      case 'supplier':
+        return 'Supplier(s)'
+      case 'license':
+        return 'License'
+      case 'identifier':
+        return 'Identifier(s)'
+    }
   }
 
   return (
@@ -191,7 +225,7 @@ const GeneralDataDrawer = ({
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
-          <DrawerHeader>Update</DrawerHeader>
+          <DrawerHeader>{heading(selectedKey)}</DrawerHeader>
 
           <DrawerBody>
             {selectedKey === 'tools' && (
@@ -220,9 +254,9 @@ const GeneralDataDrawer = ({
 
                 <Flex width={'100%'} flexDir={'column'}>
                   <Text size='md' my={2}>
-                    Author History
+                    Tool History
                   </Text>
-                  {tools.length > 0 ? (
+                  {creationTools.length > 0 ? (
                     <Table variant='simple' size='sm' mt={4}>
                       <Thead>
                         <Tr my='.8rem'>
@@ -233,7 +267,7 @@ const GeneralDataDrawer = ({
                         </Tr>
                       </Thead>
                       <Tbody>
-                        {tools.map((item, index) => (
+                        {creationTools.map((item, index) => (
                           <Tr key={index}>
                             <Td pl={0} fontSize={'sm'}>
                               {item.name}
@@ -293,7 +327,7 @@ const GeneralDataDrawer = ({
                   <Text size='md' my={2}>
                     Author History
                   </Text>
-                  {authors.length > 0 ? (
+                  {authorList.length > 0 ? (
                     <Table variant='simple' size='sm' mt={4}>
                       <Thead>
                         <Tr my='.8rem'>
@@ -304,7 +338,7 @@ const GeneralDataDrawer = ({
                         </Tr>
                       </Thead>
                       <Tbody>
-                        {authors.map((item, index) => (
+                        {authorList.map((item, index) => (
                           <Tr key={index}>
                             <Td pl={0} fontSize={'sm'}>
                               {item.name}
@@ -339,19 +373,24 @@ const GeneralDataDrawer = ({
             {selectedKey === 'supplier' && (
               <Flex direction={'column'} alignItems={'flex-start'} gap={3}>
                 <FormControl>
-                  <FormLabel>Supplier Name</FormLabel>
                   <Input
                     placeholder='Name'
-                    value={supplier}
-                    onChange={(e) => setSupplier(e.target.value)}
+                    value={supName}
+                    onChange={(e) => setSupName(e.target.value)}
                   />
                 </FormControl>
                 <FormControl>
-                  <FormLabel>Product</FormLabel>
                   <Input
-                    placeholder='Product'
-                    value={supplierProduct}
-                    onChange={(e) => setSupplierProduct(e.target.value)}
+                    placeholder='Email'
+                    value={supEmail}
+                    onChange={(e) => setSupEmail(e.target.value)}
+                  />
+                </FormControl>
+                <FormControl>
+                  <Input
+                    placeholder='Organization'
+                    value={supOrg}
+                    onChange={(e) => setSupOrg(e.target.value)}
                   />
                 </FormControl>
 
@@ -363,23 +402,27 @@ const GeneralDataDrawer = ({
                   <Text size='md' my={2}>
                     Supplier History
                   </Text>
-                  {suppliers.length > 0 ? (
+                  {supplierList.length > 0 ? (
                     <Table variant='simple' size='sm' mt={4}>
                       <Thead>
                         <Tr my='.8rem'>
                           <Th pl={0}>Name</Th>
-                          <Th pl={0}>Product</Th>
+                          <Th pl={0}>Email</Th>
+                          <Th pl={0}>Organization</Th>
                           <Th pl={0}></Th>
                         </Tr>
                       </Thead>
                       <Tbody>
-                        {suppliers.map((item, index) => (
+                        {supplierList.map((item, index) => (
                           <Tr key={index}>
                             <Td pl={0} fontSize={'sm'}>
                               {item.name}
                             </Td>
                             <Td pl={0} fontSize={'sm'}>
-                              {item.product}
+                              {item.email}
+                            </Td>
+                            <Td pl={0} fontSize={'sm'}>
+                              {item.organization}
                             </Td>
                             <Td>
                               <Icon
@@ -405,7 +448,6 @@ const GeneralDataDrawer = ({
             {selectedKey === 'license' && (
               <Flex direction={'column'} alignItems={'flex-start'} gap={3}>
                 <FormControl>
-                  <FormLabel>License</FormLabel>
                   <Select
                     isDisabled={licenseName !== ''}
                     name='license'
@@ -414,6 +456,7 @@ const GeneralDataDrawer = ({
                     onChange={(e) => setSelectedLicense(e.target.value)}
                   >
                     <option value={''}>-- Select --</option>
+                    <option value={'Custom'}>Custom</option>
                     <option value='AGPL-1.0-Only'>AGPL-1.0-Only</option>
                     <option value='AGPL-2.0-Only'>AGPL-2.0-Only</option>
                     <option value='MIT'>MIT</option>
@@ -421,14 +464,15 @@ const GeneralDataDrawer = ({
                     <option value='LGPL-2.0'>LGPL-2.0</option>
                   </Select>
                 </FormControl>
-                <FormControl isDisabled={selectedLicense !== ''}>
-                  <FormLabel>Or</FormLabel>
-                  <Input
-                    placeholder='Enter a valid SPDX license'
-                    value={licenseName}
-                    onChange={(e) => setLicenseName(e.target.value)}
-                  />
-                </FormControl>
+                {selectedLicense === 'Custom' && (
+                  <FormControl>
+                    <Input
+                      placeholder='Enter a valid SPDX license'
+                      value={licenseName}
+                      onChange={(e) => setLicenseName(e.target.value)}
+                    />
+                  </FormControl>
+                )}
                 <Button colorScheme='blue' onClick={onLicenselAdd}>
                   Add
                 </Button>
@@ -437,7 +481,7 @@ const GeneralDataDrawer = ({
                   <Text size='md' my={2}>
                     License History
                   </Text>
-                  {license.length > 0 ? (
+                  {licenseList.length > 0 ? (
                     <Table variant='simple' size='sm' mt={4}>
                       <Thead>
                         <Tr my='.8rem'>
@@ -446,7 +490,7 @@ const GeneralDataDrawer = ({
                         </Tr>
                       </Thead>
                       <Tbody>
-                        {license.map((item, index) => (
+                        {licenseList.map((item, index) => (
                           <Tr key={index}>
                             <Td pl={0} fontSize={'sm'}>
                               {item.name}
@@ -475,28 +519,25 @@ const GeneralDataDrawer = ({
             {selectedKey === 'identifier' && (
               <Flex direction={'column'} alignItems={'flex-start'} gap={3}>
                 <FormControl>
-                  <FormLabel>CPE</FormLabel>
                   <Input
                     size='sm'
-                    placeholder='Ex. CPEXYZ123'
+                    placeholder='CPE'
                     value={cpeValue}
                     onChange={(e) => setCpeValue(e.target.value)}
                   />
                 </FormControl>
                 <FormControl>
-                  <FormLabel>PURL</FormLabel>
                   <Input
                     size='sm'
-                    placeholder='Ex. PURLABCDEF'
+                    placeholder='PURL'
                     value={purlValue}
                     onChange={(e) => setPurlValue(e.target.value)}
                   />
                 </FormControl>
                 <FormControl>
-                  <FormLabel>SWID</FormLabel>
                   <Input
                     size='sm'
-                    placeholder='Ex. SWID3556411'
+                    placeholder='SWID'
                     value={swidValue}
                     onChange={(e) => setSwidValue(e.target.value)}
                   />
@@ -504,7 +545,7 @@ const GeneralDataDrawer = ({
               </Flex>
             )}
 
-            {selectedKey === 'hashes' && (
+            {/* {selectedKey === 'hashes' && (
               <Flex direction={'column'} alignItems={'flex-start'} gap={3}>
                 <FormControl>
                   <FormLabel>MD5</FormLabel>
@@ -525,14 +566,14 @@ const GeneralDataDrawer = ({
                   />
                 </FormControl>
               </Flex>
-            )}
+            )} */}
           </DrawerBody>
 
           <DrawerFooter>
             <Button variant='outline' mr={3} onClick={onClose}>
               Cancel
             </Button>
-            <Button colorScheme='blue' onClick={handleAuthorSave}>
+            <Button colorScheme='blue' onClick={handleSave}>
               Save
             </Button>
           </DrawerFooter>

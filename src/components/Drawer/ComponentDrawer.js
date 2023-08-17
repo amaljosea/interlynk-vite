@@ -44,26 +44,31 @@ function ComponentDrawer(props) {
     },
     {
       id: 2,
+      value: 'Custom',
+      label: 'Custom'
+    },
+    {
+      id: 3,
       value: 'AGPL-1.0-Only',
       label: 'AGPL-1.0-Only'
     },
     {
-      id: 3,
+      id: 4,
       value: 'AGPL-2.0-Only',
       label: 'AGPL-2.0-Only'
     },
     {
-      id: 4,
+      id: 5,
       value: 'MIT',
       label: 'MIT'
     },
     {
-      id: 5,
+      id: 6,
       value: 'BSD',
       label: 'BSD'
     },
     {
-      id: 6,
+      id: 7,
       value: 'LGPL-2.0',
       label: 'LGPL-2.0'
     }
@@ -177,15 +182,16 @@ function ComponentDrawer(props) {
                   ))}
                 </Select>
               </FormControl>
-              <FormControl isDisabled={selectedLicense !== ''}>
-                <FormLabel fontSize={'sm'}>Or</FormLabel>
-                <Input
-                  size='sm'
-                  placeholder='Enter a valid SPDX license'
-                  value={licenseName}
-                  onChange={(e) => setLicenseName(e.target.value)}
-                />
-              </FormControl>
+              {selectedLicense === 'Custom' && (
+                <FormControl>
+                  <Input
+                    size='sm'
+                    placeholder='Enter a valid SPDX license'
+                    value={licenseName}
+                    onChange={(e) => setLicenseName(e.target.value)}
+                  />
+                </FormControl>
+              )}
               <FormControl>
                 <FormLabel fontSize={'sm'}>Indentifiers</FormLabel>
                 <Stack spacing={2}>

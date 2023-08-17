@@ -1,3 +1,4 @@
+import { useMutation } from '@apollo/client'
 import {
   Modal,
   ModalOverlay,
@@ -15,62 +16,74 @@ import {
   AlertIcon,
   Text
 } from '@chakra-ui/react'
-import GlobalContext from 'context/GlobalContext'
-import { useState, useContext, useEffect } from 'react'
-import { FaGithub } from 'react-icons/fa'
-import { v4 as uuidv4 } from 'uuid'
+import { UpdateProject } from 'graphQL/Mutation'
+import { CreateProject } from 'graphQL/Mutation'
+import { useState, useEffect } from 'react'
 
-const ProductModal = ({ isOpen, onClose, product, vendorName }) => {
-  const { productVersionExploded, setProductVersionExploded } = useContext(
-    GlobalContext
-  )
+const ProductModal = ({
+  id,
+  isOpen,
+  onClose,
+  product,
+  vendorName,
+  description,
+  allProjects
+}) => {
+  const [projectCreate] = useMutation(CreateProject)
+  const [projectUpdate] = useMutation(UpdateProject)
 
   const [productName, setProductName] = useState('')
+  const [productDesc, setProductDesc] = useState('')
   const [vendor, setVendor] = useState('')
   const [uniqueId, setUniqueId] = useState('')
 
   useEffect(() => {
     setProductName(product)
+    setProductDesc(description)
     setVendor(vendorName)
   }, [isOpen])
 
   const [error, setError] = useState('')
 
-  const productExist = productVersionExploded.find(
-    (item) => item.name === `${productName}`
-  )
+  // console.log(`id`, id)
 
-  const handleSave = (e) => {
-    e.preventDefault()
-    if (!productExist) {
-      setProductVersionExploded((prev) => [
-        {
-          id: uuidv4(),
-          logo: FaGithub,
+  const productExist =
+    allProjects &&
+    allProjects.projects.nodes.find((item) => item.name === `${productName}`)
+
+  const updateProduct = async () => {
+    try {
+      await projectUpdate({
+        variables: {
+          id: id,
           name: productName,
-          description:
-            'A tool to compose your various sboms into a single sbom',
-          version: 'v0',
-          vendor: vendor,
-          quality_score: 0,
-          sbom_links: 0,
-          risk_score: 'Not Defined',
-          updated_at: new Date().toISOString(),
-          active: true,
-          source: 'Assembled'
-        },
-        ...prev
-      ])
+          desc: productDesc
+        }
+      }).then((res) => window.location.reload())
+    } catch (error) {
+      console.error('Mutation error:', error)
+    }
+  }
 
-      setProductName('')
-      setVendor('')
-      setUniqueId('')
-      onClose()
+  const handleSave = async () => {
+    if (!productExist) {
+      try {
+        await projectCreate({
+          variables: {
+            name: productName,
+            desc: productDesc
+          }
+        }).then(() => window.location.reload())
+      } catch (error) {
+        console.error('Mutation error:', error)
+      }
     } else {
       setError(
         `A project with same name already exists. Please choose a unique name`
       )
       setProductName('')
+      setProductDesc('')
+      setUniqueId('')
     }
   }
 
@@ -78,56 +91,71 @@ const ProductModal = ({ isOpen, onClose, product, vendorName }) => {
     <>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-        <form onSubmit={handleSave}>
-          <ModalContent>
-            <ModalHeader>Add Product</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Flex width={'100%'} direction={'column'} gap={4}>
-                {error !== '' && (
-                  <Alert status='error'>
-                    <AlertIcon />
-                    <Text fontSize={'sm'}>{error}</Text>
-                  </Alert>
-                )}
-                <FormControl isRequired>
-                  <FormLabel>Name</FormLabel>
-                  <Input
-                    type='text'
-                    value={productName}
-                    onChange={(e) => setProductName(e.target.value)}
-                    placeholder='Enter name'
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Vendor</FormLabel>
-                  <Input
-                    type='text'
-                    value={vendor}
-                    onChange={(e) => setVendor(e.target.value)}
-                    placeholder='Enter vendor name'
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Unique Identifier</FormLabel>
-                  <Input
-                    type='text'
-                    value={uniqueId}
-                    onChange={(e) => setUniqueId(e.target.value)}
-                  />
-                </FormControl>
-              </Flex>
-            </ModalBody>
-            <ModalFooter>
-              <Button colorScheme='gray' mr={3} onClick={onClose}>
-                Cancel
+
+        <ModalContent>
+          <ModalHeader>{productName ? 'Update' : 'Add'} Product</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Flex width={'100%'} direction={'column'} gap={4}>
+              {error !== '' && (
+                <Alert status='error'>
+                  <AlertIcon />
+                  <Text fontSize={'sm'}>{error}</Text>
+                </Alert>
+              )}
+              <FormControl isRequired>
+                <FormLabel>Name</FormLabel>
+                <Input
+                  type='text'
+                  value={productName}
+                  onChange={(e) => setProductName(e.target.value)}
+                  placeholder='Enter name'
+                />
+              </FormControl>
+              <FormControl isRequired>
+                <FormLabel>Description</FormLabel>
+                <Input
+                  type='text'
+                  value={productDesc}
+                  onChange={(e) => setProductDesc(e.target.value)}
+                  placeholder='Enter product description'
+                />
+              </FormControl>
+              <FormControl>
+                <FormLabel>Vendor</FormLabel>
+                <Input
+                  type='text'
+                  value={vendor}
+                  onChange={(e) => setVendor(e.target.value)}
+                  placeholder='Enter vendor name'
+                />
+              </FormControl>
+              <FormControl>
+                <FormLabel>Unique Identifier</FormLabel>
+                <Input
+                  type='text'
+                  value={uniqueId}
+                  placeholder={`Add identifier`}
+                  onChange={(e) => setUniqueId(e.target.value)}
+                />
+              </FormControl>
+            </Flex>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme='gray' mr={3} onClick={onClose}>
+              Cancel
+            </Button>
+            {id ? (
+              <Button colorScheme='blue' onClick={updateProduct}>
+                Update
               </Button>
-              <Button colorScheme='blue' type='submit'>
+            ) : (
+              <Button colorScheme='blue' onClick={handleSave}>
                 Save
               </Button>
-            </ModalFooter>
-          </ModalContent>
-        </form>
+            )}
+          </ModalFooter>
+        </ModalContent>
       </Modal>
     </>
   )

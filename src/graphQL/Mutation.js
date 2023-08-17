@@ -386,3 +386,27 @@ export const CreateProject = gql`
     }
   }
 `
+
+export const UpdateProject = gql`
+  mutation UpdateProject($id: Uuid!, $name: String, $desc: String) {
+    projectUpdate(input: { id: $id, name: $name, description: $desc }) {
+      errors
+    }
+  }
+`
+
+export const DeleteProject = gql`
+  mutation DeleteProject($id: Uuid!) {
+    projectDelete(input: { id: $id }) {
+      errors
+    }
+  }
+`
+
+export const UploadSbom = gql`
+  mutation uploadSbom($doc: Upload!) {
+    sbomUpload(input: { doc: $doc }) {
+      errors
+    }
+  }
+`

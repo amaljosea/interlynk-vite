@@ -34,9 +34,10 @@ function Index() {
   const product = queryParams.get('p')
   const version = queryParams.get('v')
 
-  const [getAllProjects, { data: allProjects, loading }] = useLazyQuery(
-    GetProjectData
-  )
+  const [
+    getAllProjects,
+    { data: allProjects, loading, refetch }
+  ] = useLazyQuery(GetProjectData)
 
   useEffect(() => {
     if (allProjects === undefined) {
@@ -260,7 +261,7 @@ function Index() {
           <Spacer />
           <Stack direction='row' spacing={2}>
             {/* upload */}
-            <FileUpload />
+            {/* <FileUpload /> */}
             <Button
               ref={btnRefProduct}
               onClick={onOpenProduct}
@@ -274,20 +275,17 @@ function Index() {
             </Button>
           </Stack>
         </Flex>
-        <ProductVersions
-          title={'Products'}
-          captions={[
-            'Active',
-            'Product',
-            'Vendor',
-            'Version',
-            'Last Updated',
-            'Action'
-          ]}
-          filterData={filterData}
-          groupVersionData={groupVersionData}
-          productVersionsData={productVersionExploded}
-        />
+
+        {allProjects && (
+          <ProductVersions
+            title={'Products'}
+            captions={['Active', 'Product', 'Description', 'Action']}
+            filterData={filterData}
+            groupVersionData={groupVersionData}
+            productVersionsData={productVersionExploded}
+            allProjects={allProjects}
+          />
+        )}
       </Flex>
 
       <ProductModal
@@ -296,7 +294,6 @@ function Index() {
         product={''}
         vendorName={''}
       />
-      
     </>
   )
 }

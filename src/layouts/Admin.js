@@ -30,7 +30,7 @@ import {
 } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
 import Cookies from 'js-cookie'
-
+import { createUploadLink } from 'apollo-upload-client'
 import { getActiveNavbar, getActiveRoute } from '../utils'
 
 export default function Dashboard(props) {
@@ -88,6 +88,10 @@ export default function Dashboard(props) {
     uri: `${graphqlAPI}`
   })
 
+  const uploadLink = createUploadLink({
+    uri: `${graphqlAPI}`
+  })
+
   const authLink = setContext((_, { headers }) => {
     return {
       headers: {
@@ -97,7 +101,7 @@ export default function Dashboard(props) {
     }
   })
   const client = new ApolloClient({
-    link: authLink.concat(httpLink),
+    link: authLink.concat(uploadLink.concat(httpLink)),
     cache: new InMemoryCache()
   })
 
