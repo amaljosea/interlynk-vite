@@ -126,8 +126,8 @@ const GeneralDataDrawer = ({
   }
 
   const handleToolAdd = () => {
-    if ((toolName && toolVersion) || toolVendor) {
-      setCreationTools((prev) => [
+    if ((toolName && toolVersion)) {
+      setTools((prev) => [
         {
           name: toolName,
           version: toolVersion,
@@ -139,7 +139,7 @@ const GeneralDataDrawer = ({
       setToolVersion('')
       setToolVendor('')
     } else {
-      alert(`Please fill up required fields`)
+      alert(`Tool Name and Tool Version are required`)
     }
   }
 
@@ -226,24 +226,23 @@ const GeneralDataDrawer = ({
         <DrawerContent>
           <DrawerCloseButton />
           <DrawerHeader>{heading(selectedKey)}</DrawerHeader>
-
           <DrawerBody>
             {selectedKey === 'tools' && (
               <Flex direction={'column'} alignItems={'flex-start'} gap={3}>
                 <Input
-                  placeholder='Tool name'
+                  placeholder='Tool Name*'
                   value={toolName}
                   onChange={(e) => setToolName(e.target.value)}
                 />
 
                 <Input
-                  placeholder='Version'
+                  placeholder='Tool Version*'
                   value={toolVersion}
                   onChange={(e) => setToolVersion(e.target.value)}
                 />
 
                 <Input
-                  placeholder='Vendor'
+                  placeholder='Vendor Name'
                   value={toolVendor}
                   onChange={(e) => setToolVendor(e.target.value)}
                 />
@@ -292,7 +291,7 @@ const GeneralDataDrawer = ({
                     </Table>
                   ) : (
                     <Text mt={4} color={'darkgrey'}>
-                      No author found
+                      No creation tool specified
                     </Text>
                   )}
                 </Flex>
@@ -302,13 +301,13 @@ const GeneralDataDrawer = ({
             {selectedKey === 'author' && (
               <Flex direction={'column'} alignItems={'flex-start'} gap={3}>
                 <Input
-                  placeholder='Name'
+                  placeholder='Author Name*'
                   value={authorName}
                   onChange={(e) => setAuthorName(e.target.value)}
                 />
 
                 <Input
-                  placeholder='Email'
+                  placeholder='Author Email*'
                   value={authorEmail}
                   onChange={(e) => setAuthorEmail(e.target.value)}
                 />
