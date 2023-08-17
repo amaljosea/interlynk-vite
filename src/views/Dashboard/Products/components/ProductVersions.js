@@ -1,5 +1,6 @@
 // Chakra imports
 import {
+  Box,
   Table,
   Tbody,
   Th,
@@ -13,7 +14,7 @@ import CardBody from 'components/Card/CardBody.js'
 import ProductVersionsRow from 'components/Tables/ProductVersionsRow.js'
 import React from 'react'
 
-const ProductVersions = ({ captions, productVersionsData, filterData }) => {
+const ProductVersions = ({ captions, allProjects }) => {
   const textColor = useColorModeValue('gray.700', 'white')
 
   return (
@@ -24,51 +25,26 @@ const ProductVersions = ({ captions, productVersionsData, filterData }) => {
             <Tr my='.8rem'>
               {captions.map((caption, idx) => {
                 return (
-                  <Th color='gray.400' key={idx} pl={0}>
-                    {caption}
+                  <Th color='gray.800' key={idx} pl={0}>
+                    <Box>{caption}</Box>
                   </Th>
                 )
               })}
             </Tr>
           </Thead>
           <Tbody>
-            {filterData.length >= 1
-              ? filterData.map((pv, index) => {
-                  return (
-                    <ProductVersionsRow
-                      key={pv.name + pv.updated_at}
-                      id={pv.id}
-                      name={pv.name}
-                      description={pv.description}
-                      logo={pv.logo}
-                      version={pv.version}
-                      sbomlinks={pv.sbom_links}
-                      risk_score={pv.risk_score}
-                      updated_at={pv.updated_at}
-                      active={pv.active}
-                      vendor={pv.vendor}
-                      quality_score={pv.quality_score}
-                    />
-                  )
-                })
-              : productVersionsData.map((pv, index) => {
-                  return (
-                    <ProductVersionsRow
-                      key={pv.name + pv.updated_at}
-                      id={Math.random() * 100}
-                      name={pv.name}
-                      description={pv.description}
-                      logo={pv.logo}
-                      version={pv.version}
-                      sbomlinks={pv.sbom_links}
-                      risk_score={pv.risk_score}
-                      updated_at={pv.updated_at}
-                      active={pv.active}
-                      vendor={pv.vendor}
-                      quality_score={pv.quality_score}
-                    />
-                  )
-                })}
+            {allProjects.projects.nodes.length >= 1 &&
+              allProjects.projects.nodes.map((pv, index) => {
+                return (
+                  <ProductVersionsRow
+                    key={index}
+                    id={pv.id}
+                    name={pv.name}
+                    description={pv.description}
+                    allProjects={allProjects}
+                  />
+                )
+              })}
           </Tbody>
         </Table>
       </CardBody>

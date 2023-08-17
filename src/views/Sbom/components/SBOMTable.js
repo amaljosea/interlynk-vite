@@ -69,8 +69,9 @@ const SBOMTable = ({ title, captions, data, vulData }) => {
 
   const [suppliers, setSuppliers] = useState([
     {
-      name: 'Interlynk Inc',
-      product: 'SBOM-Tool v1.0'
+      name: 'SBOM-Tool v1.0',
+      email: 'sp@interlynk.io',
+      organization: 'Interlynk Inc'
     }
   ])
 

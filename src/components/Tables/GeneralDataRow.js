@@ -1,4 +1,5 @@
-import { Button, Flex, Td, Text, Tr } from '@chakra-ui/react'
+import { EditIcon } from '@chakra-ui/icons'
+import { Flex, Icon, Td, Text, Tr } from '@chakra-ui/react'
 import { useLocation } from 'react-router-dom'
 
 const GeneralDataRow = ({
@@ -30,19 +31,20 @@ const GeneralDataRow = ({
         <Td pl={0}>
           <Flex flexDirection={'column'} alignItems={'flex-start'} gap={4}>
             {tools.map((item, index) => (
-              <Flex key={index} flexDir={'row'} alignItems={'center'} gap={4}>
-                <Text pl={0} fontSize={'sm'}>
-                  {`${item.name}`}-{`${item.version}`} {`(${item.vendor})`}
-                </Text>
-              </Flex>
+              <Text pl={0} fontSize={'sm'} key={index}>
+                {item.name}-{item.version} {`(${item.vendor})`}
+              </Text>
             ))}
           </Flex>
         </Td>
         <Td pl={0}>
           {!customerView && (
-            <Button size='sm' onClick={() => handleClick('tools')}>
-              Update
-            </Button>
+            <Icon
+              as={EditIcon}
+              color={'blue.500'}
+              cursor={'pointer'}
+              onClick={() => handleClick('tools')}
+            />
           )}
         </Td>
       </Tr>
@@ -69,10 +71,10 @@ const GeneralDataRow = ({
             {authors.map((item, index) => (
               <Flex key={index} flexDir={'row'} alignItems={'center'} gap={4}>
                 <Text pl={0} fontSize={'sm'}>
-                  {item.name ? `${item.name}` : ''}
+                  {item.name ? item.name : ''}
                 </Text>
                 <Text pl={0} fontSize={'sm'}>
-                  {item.email ? `${item.email}` : ''}
+                  {item.email ? item.email : ''}
                 </Text>
                 <Text pl={0} fontSize={'sm'}>
                   {item.organization ? `(${item.organization})` : ''}
@@ -83,9 +85,12 @@ const GeneralDataRow = ({
         </Td>
         <Td pl={0}>
           {!customerView && (
-            <Button size='sm' onClick={() => handleClick('author')}>
-              Update
-            </Button>
+            <Icon
+              as={EditIcon}
+              color={'blue.500'}
+              cursor={'pointer'}
+              onClick={() => handleClick('author')}
+            />
           )}
         </Td>
       </Tr>
@@ -98,10 +103,13 @@ const GeneralDataRow = ({
             {suppliers.map((item, index) => (
               <Flex key={index} flexDir={'row'} alignItems={'center'} gap={4}>
                 <Text pl={0} fontSize={'sm'}>
-                  {item.name ? `(${item.name})` : ''}
+                  {item.name ? item.name : ''}
                 </Text>
                 <Text pl={0} fontSize={'sm'}>
-                  {item.product ? `(${item.product})` : ''}
+                  {item.email ? item.email : ''}
+                </Text>
+                <Text pl={0} fontSize={'sm'}>
+                  {item.organization ? `(${item.organization})` : ''}
                 </Text>
               </Flex>
             ))}
@@ -109,13 +117,12 @@ const GeneralDataRow = ({
         </Td>
         <Td pl={0}>
           {!customerView && (
-            <Button
-              size='sm'
-              id='supplier'
+            <Icon
+              as={EditIcon}
+              color={'blue.500'}
+              cursor={'pointer'}
               onClick={() => handleClick('supplier')}
-            >
-              Update
-            </Button>
+            />
           )}
         </Td>
       </Tr>
@@ -134,13 +141,12 @@ const GeneralDataRow = ({
         </Td>
         <Td pl={0}>
           {!customerView && (
-            <Button
-              size='sm'
-              id='license'
+            <Icon
+              as={EditIcon}
+              color={'blue.500'}
+              cursor={'pointer'}
               onClick={() => handleClick('license')}
-            >
-              Update
-            </Button>
+            />
           )}
         </Td>
       </Tr>
@@ -157,13 +163,12 @@ const GeneralDataRow = ({
         </Td>
         <Td pl={0}>
           {!customerView && (
-            <Button
-              size='sm'
-              id='identifier'
+            <Icon
+              as={EditIcon}
+              color={'blue.500'}
+              cursor={'pointer'}
               onClick={() => handleClick('identifier')}
-            >
-              Update
-            </Button>
+            />
           )}
         </Td>
       </Tr>
@@ -177,13 +182,7 @@ const GeneralDataRow = ({
             <Text>SHA: {sha}</Text>
           </Flex>
         </Td>
-        <Td pl={0}>
-          {!customerView && (
-            <Button size='sm' id='hashes' onClick={() => handleClick('hashes')}>
-              Update
-            </Button>
-          )}
-        </Td>
+        <Td pl={0}></Td>
       </Tr>
       <Tr>
         <Td pl={0} fontWeight={'medium'}>
