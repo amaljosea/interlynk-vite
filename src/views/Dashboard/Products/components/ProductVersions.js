@@ -1,6 +1,8 @@
 // Chakra imports
 import {
   Box,
+  Button,
+  Flex,
   Table,
   Tbody,
   Th,
@@ -14,7 +16,12 @@ import CardBody from 'components/Card/CardBody.js'
 import ProductVersionsRow from 'components/Tables/ProductVersionsRow.js'
 import React from 'react'
 
-const ProductVersions = ({ captions, allProjects }) => {
+const ProductVersions = ({
+  captions,
+  allProjects,
+  handlePreviousPage,
+  handleNextPage
+}) => {
   const textColor = useColorModeValue('gray.700', 'white')
 
   return (
@@ -41,6 +48,7 @@ const ProductVersions = ({ captions, allProjects }) => {
                     id={pv.id}
                     name={pv.name}
                     description={pv.description}
+                    updatedAt={pv.updatedAt}
                     allProjects={allProjects}
                   />
                 )
@@ -48,6 +56,31 @@ const ProductVersions = ({ captions, allProjects }) => {
           </Tbody>
         </Table>
       </CardBody>
+
+      {allProjects && (
+        <Flex
+          flexDir={'row'}
+          gap={4}
+          alignItems={'center'}
+          mt={6}
+          justifyContent={'flex-start'}
+        >
+          <Button
+            colorScheme='blue'
+            onClick={handlePreviousPage}
+            isDisabled={!allProjects.projects.pageInfo.hasPreviousPage}
+          >
+            Previous
+          </Button>
+          <Button
+            colorScheme='blue'
+            onClick={handleNextPage}
+            isDisabled={!allProjects.projects.pageInfo.hasNextPage}
+          >
+            Next
+          </Button>
+        </Flex>
+      )}
     </Card>
   )
 }

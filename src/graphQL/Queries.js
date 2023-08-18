@@ -531,11 +531,55 @@ export const GetProjectData = gql`
       pageInfo {
         endCursor
         hasNextPage
+        startCursor
+        hasPreviousPage
       }
       nodes {
         id
         name
         description
+        updatedAt
+        organizationId
+        sboms {
+          id
+        }
+      }
+    }
+  }
+`
+
+export const GetSBOM = gql`
+  query GetSbom($projectId: Uuid!, $sbomId: Uuid!) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      id
+      cpes
+      spec
+      creationAt
+      specVersion
+      project {
+        id
+      }
+      tools {
+        id
+        name
+      }
+      authors {
+        name
+        email
+      }
+      suppliers {
+        name
+        email
+      }
+      components {
+        id
+        name
+        version
+        primary
+        internal
+        purl
+        cpes
+        licenses
       }
     }
   }

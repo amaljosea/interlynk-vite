@@ -22,7 +22,7 @@ import { UploadSbom } from 'graphQL/Mutation'
 import { useEffect, useState } from 'react'
 import { FaUpload } from 'react-icons/fa'
 
-const UploadModal = ({ isOpen, onClose }) => {
+const UploadModal = ({ id, isOpen, onClose }) => {
   const toast = useToast()
   const [sbomUpload, { data }] = useMutation(UploadSbom)
 
@@ -35,7 +35,8 @@ const UploadModal = ({ isOpen, onClose }) => {
     try {
       await sbomUpload({
         variables: {
-          doc: e
+          doc: e,
+          projectId: id
         }
       }).then((res) => {
         const uploadTask = setInterval(() => {

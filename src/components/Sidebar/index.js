@@ -1,7 +1,7 @@
 /*eslint-disable*/
 // chakra imports
 import { Box, useColorModeValue } from '@chakra-ui/react'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import SidebarContent from './SidebarContent'
 import { useContext } from 'react'
 import GlobalContext from 'context/GlobalContext'
@@ -12,7 +12,7 @@ function Sidebar(props) {
   const { minimize, activeDockerHub } = useContext(GlobalContext)
   const [filterRoutes, setFilterRoutes] = useState([])
   // to check for active links and opened collapses
-  const mainPanel = React.useRef()
+  const mainPanel = useRef()
   let variantChange = '0.2s linear'
 
   const { logoText, routes, sidebarVariant } = props

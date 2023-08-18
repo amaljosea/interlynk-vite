@@ -404,8 +404,8 @@ export const DeleteProject = gql`
 `
 
 export const UploadSbom = gql`
-  mutation uploadSbom($doc: Upload!) {
-    sbomUpload(input: { doc: $doc }) {
+  mutation uploadSbom($doc: Upload!, $projectId: ID!) {
+    sbomUpload(input: { doc: $doc, projectId: $projectId }) {
       errors
     }
   }

@@ -2,7 +2,7 @@ import React from 'react'
 import { Flex, Tag } from '@chakra-ui/react'
 import { getDateFormat, convertDateFormat } from 'utils'
 
-const Timeline = ({ formattedDate, setFormattedDate }) => {
+const Timeline = ({ formattedDate, setFormattedDate, getFeed }) => {
   const currentDate = new Date()
   const last30DaysList = []
 
@@ -14,6 +14,12 @@ const Timeline = ({ formattedDate, setFormattedDate }) => {
 
   const getCurrentDate = (date) => {
     setFormattedDate(getDateFormat(date))
+    getFeed({
+      variables: {
+        date: getDateFormat(date),
+        first: 10
+      }
+    })
   }
 
   const days = last30DaysList.map((date, index) => {
