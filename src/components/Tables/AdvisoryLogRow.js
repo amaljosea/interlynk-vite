@@ -90,7 +90,7 @@ function AdvisoryLogRow(props) {
           </Link>
         </Flex>
       </Td>
-      <Td width={{ sm: '500px' }}>{desc}</Td>
+      <Td width={{ sm: '500px' }}>{desc.substring(0, 100)}...</Td>
       <Td width={'150px'}>
         <Text fontSize='sm' color={textColor}>
           {timeSince(publishedAt)}

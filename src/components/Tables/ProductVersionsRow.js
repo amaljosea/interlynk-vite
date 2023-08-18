@@ -21,11 +21,20 @@ import ProductModal from 'views/Dashboard/Products/components/ProductModal'
 import UploadModal from 'views/Dashboard/Products/components/UploadModal'
 import { useMutation } from '@apollo/client'
 import { DeleteProject } from 'graphQL/Mutation'
+import { timeSince } from 'utils'
 
 function ProductVersionsRow(props) {
   const [projectDelete] = useMutation(DeleteProject)
 
-  const { id, name, version, active, description, vendor, allProjects } = props
+  const {
+    id,
+    name,
+    active,
+    description,
+    updatedAt,
+    vendor,
+    allProjects
+  } = props
   const textColor = useColorModeValue('gray.700', 'white')
   const [checked, setChecked] = useState(active ? true : false)
 
@@ -38,7 +47,9 @@ function ProductVersionsRow(props) {
 
   const btnRefProduct = useRef()
 
-  const url = `/vendor/products?p=${name}&v=${version}`
+  const version = (Math.random() * 10).toFixed()
+
+  const url = `/vendor/products?p=${name}&v=1.${version}`
 
   const onProductDelete = async () => {
     try {
@@ -63,14 +74,8 @@ function ProductVersionsRow(props) {
             <Link to={url}>{name}</Link>
           </Text>
         </Td>
-        <Td pl={0}>
-          <Flex direction='column'>
-            <Text color={textColor} minWidth='100%'>
-              {description}
-            </Text>
-          </Flex>
-        </Td>
-
+        <Td pl={0}>{description}</Td>
+        <Td pl={0}>{timeSince(updatedAt)}</Td>
         <Td pl={0}>
           <Menu>
             <MenuButton
@@ -91,7 +96,11 @@ function ProductVersionsRow(props) {
             </Portal>
           </Menu>
 
-          <UploadModal isOpen={isOpenProduct} onClose={onCloseProduct} />
+          <UploadModal
+            id={id}
+            isOpen={isOpenProduct}
+            onClose={onCloseProduct}
+          />
 
           <ProductModal
             id={id}

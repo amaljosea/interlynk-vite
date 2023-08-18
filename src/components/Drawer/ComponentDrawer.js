@@ -77,6 +77,10 @@ function ComponentDrawer(props) {
   useEffect(() => {
     setCompName(component)
     setCompVersion(version)
+    if (license) {
+      setSelectedLicense('Custom')
+      setLicenseName(license)
+    }
   }, [component])
 
   useEffect(() => {
@@ -169,7 +173,7 @@ function ComponentDrawer(props) {
                 <FormLabel fontSize={'sm'}>License</FormLabel>
                 <Select
                   size='sm'
-                  isDisabled={licenseName !== ''}
+                  // isDisabled={licenseName !== ''}
                   name='license'
                   id='license'
                   value={selectedLicense}

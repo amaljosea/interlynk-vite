@@ -41,7 +41,7 @@ const ContextWrapper = (props) => {
   const [vulnerabilitiesData, setVulnerabilitiesData] = useState([])
 
   const [customerView, setCustomerView] = useState('')
-  const [minimize, setMinimize] = useState(false)
+  const [minimize, setMinimize] = useState(true)
   const [activeDockerHub, setActiveDockerHub] = useState(true)
   const [userLocation, setUserLocation] = useState(null)
   const [selectedRows, setSelectedRows] = useState([])

@@ -17,28 +17,14 @@ import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 import AdvisoryLogRow from 'components/Tables/AdvisoryLogRow.js'
 
-const AdvisoryLog = ({ captions, data, loading, currentDate, refetch }) => {
+const AdvisoryLog = ({
+  captions,
+  data,
+  loading,
+  onPreviousPage,
+  onNextPage
+}) => {
   const textColor = useColorModeValue('gray.700', 'white')
-
-  const onPreviousPage = () => {
-    refetch({
-      date: currentDate,
-      first: undefined,
-      last: 10,
-      before: data.pageInfo.startCursor,
-      after: ''
-    })
-  }
-
-  const onNextPage = () => {
-    refetch({
-      date: currentDate,
-      first: 10,
-      last: undefined,
-      after: data.pageInfo.endCursor,
-      before: ''
-    })
-  }
 
   return (
     <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
@@ -101,7 +87,7 @@ const AdvisoryLog = ({ captions, data, loading, currentDate, refetch }) => {
         </Table>
       </CardBody>
 
-      {data.nodes.length > 0 && (
+      {data && (
         <Flex
           flexDir={'row'}
           gap={4}

@@ -3,7 +3,6 @@ import {
   Flex,
   Menu,
   MenuList,
-  MenuItem,
   MenuButton,
   MenuOptionGroup,
   MenuItemOption,
@@ -11,17 +10,12 @@ import {
   Input,
   Spacer,
   Stack,
-  Text,
-  Switch,
   useDisclosure
 } from '@chakra-ui/react'
-import React, { useState, useContext, useEffect } from 'react'
+import { useState, useContext, useEffect, useRef } from 'react'
 import ProductVersions from './components/ProductVersions'
 import { ChevronDownIcon, AddIcon } from '@chakra-ui/icons'
-import SBOMLinkDrawer from 'components/Drawer/SBOMLinkDrawer.js'
-import ProductAssembleDrawer from 'components/Drawer/ProductAssembleDrawer.js'
 import GlobalContext from 'context/GlobalContext'
-import FileUpload from 'components/FileUpload'
 import ProductModal from './components/ProductModal.js'
 import { useLazyQuery } from '@apollo/client'
 import { GetProjectData } from 'graphQL/Queries'
@@ -34,14 +28,13 @@ function Index() {
   const product = queryParams.get('p')
   const version = queryParams.get('v')
 
-  const [
-    getAllProjects,
-    { data: allProjects, loading, refetch }
-  ] = useLazyQuery(GetProjectData)
+  const [GetProjects, { data: allProjects, refetch }] = useLazyQuery(
+    GetProjectData
+  )
 
   useEffect(() => {
     if (allProjects === undefined) {
-      getAllProjects({
+      GetProjects({
         variables: {
           first: 10
         }
@@ -49,15 +42,35 @@ function Index() {
     }
   }, [])
 
+  const handlePreviousPage = () => {
+    GetProjects({
+      variables: {
+        first: undefined,
+        last: 10,
+        before: allProjects.projects.pageInfo.startCursor,
+        after: ''
+      }
+    })
+  }
+
+  const handleNextPage = () => {
+    GetProjects({
+      variables: {
+        first: 10,
+        last: undefined,
+        after: allProjects.projects.pageInfo.endCursor,
+        before: ''
+      }
+    })
+  }
+
   useEffect(() => {
     console.log(`all projects`, allProjects)
   }, [allProjects])
 
-  const {
-    productVersionsData,
-    productVersionExploded,
-    setProductVersionExploded
-  } = useContext(GlobalContext)
+  const { productVersionsData, productVersionExploded } = useContext(
+    GlobalContext
+  )
   const [filterData, setFilterData] = useState([])
   const [groupVersionData, setGroupVersionData] = useState([])
   const [showVersion, setShowVersion] = useState(true)
@@ -86,8 +99,8 @@ function Index() {
     'lynk_model_mapping',
     'lynk-service'
   ]
-  const btnRefProduct = React.useRef('Product')
-  const btnRefSBOMLink = React.useRef('SBOMLink')
+  const btnRefProduct = useRef('Product')
+  const btnRefSBOMLink = useRef('SBOMLink')
 
   // productVersionsData.map((project) => {
   //   if (uniqProjects.indexOf(project.name) === -1) {
@@ -275,15 +288,19 @@ function Index() {
             </Button>
           </Stack>
         </Flex>
-
         {allProjects && (
           <ProductVersions
             title={'Products'}
-            captions={['Active', 'Product', 'Description', 'Action']}
-            filterData={filterData}
-            groupVersionData={groupVersionData}
-            productVersionsData={productVersionExploded}
+            captions={[
+              'Active',
+              'Product',
+              'Description',
+              'Updated At',
+              'Action'
+            ]}
             allProjects={allProjects}
+            handlePreviousPage={handlePreviousPage}
+            handleNextPage={handleNextPage}
           />
         )}
       </Flex>

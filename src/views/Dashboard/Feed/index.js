@@ -19,7 +19,7 @@ import Timeline from './components/Timeline'
 
 import { FaDownload, FaSlack } from 'react-icons/fa'
 import AdvisoryLog from './components/AdvisoryLog'
-import { useQuery } from '@apollo/client'
+import { useLazyQuery, useQuery } from '@apollo/client'
 import { GetFeedLogs } from 'graphQL/Queries'
 import { getDateFormat } from 'utils'
 
@@ -27,46 +27,90 @@ function Advisories() {
   const source = ['all', 'nvd', 'ghsa', 'usn', 'pyadvisory', 'goadvisory']
   const severity = ['all', 'critical', 'high', 'low', 'medium', 'unknown']
 
-  const [formattedDate, setFormattedDate] = useState('')
+  const [formattedDate, setFormattedDate] = useState(getDateFormat(new Date()))
+
+  const [severityValue, setSeverityValue] = useState('')
+  const [sourceValue, setSourceValue] = useState('')
+
+  const [GetFeed, { data: feedData, loading, error }] = useLazyQuery(
+    GetFeedLogs
+  )
 
   useEffect(() => {
-    setFormattedDate(getDateFormat(new Date()))
+    if (feedData === undefined) {
+      GetFeed({
+        variables: {
+          date: formattedDate,
+          first: 10
+        }
+      })
+    }
   }, [])
 
-  const { data, refetch, loading, error } = useQuery(GetFeedLogs, {
-    variables: {
-      date: formattedDate,
-      first: 10
-    }
-  })
-
-  const filterBySource = (source) => {
-    refetch({
-      date: formattedDate,
-      source: source === 'all' ? '' : source,
-      first: 10
+  useEffect(() => {
+    GetFeed({
+      variables: {
+        date: formattedDate,
+        source: sourceValue === 'all' ? '' : sourceValue,
+        first: 10
+      }
     })
+  }, [sourceValue])
+
+  useEffect(() => {
+    GetFeed({
+      variables: {
+        date: formattedDate,
+        severity: severityValue === 'all' ? '' : severityValue,
+        first: 10
+      }
+    })
+  }, [severityValue])
+
+  const onPreviousPage = () => {
+    if (feedData) {
+      GetFeed({
+        variables: {
+          date: formattedDate,
+          first: undefined,
+          last: 10,
+          before: feedData.feedLogs.pageInfo.startCursor,
+          after: '',
+          severity: severityValue === 'all' ? '' : severityValue,
+          source: sourceValue === 'all' ? '' : sourceValue
+        }
+      })
+    }
   }
 
-  const filterBySeverity = (severity) => {
-    refetch({
-      date: formattedDate,
-      severity: severity === 'all' ? '' : severity,
-      first: 10
-    })
+  const onNextPage = () => {
+    if (feedData) {
+      GetFeed({
+        variables: {
+          date: formattedDate,
+          first: 10,
+          last: undefined,
+          after: feedData.feedLogs.pageInfo.endCursor,
+          before: '',
+          severity: severityValue === 'all' ? '' : severityValue,
+          source: sourceValue === 'all' ? '' : sourceValue
+        }
+      })
+    }
   }
 
   useEffect(() => {
-    if (data) {
-      console.log(`feedLogs`, data.feedLogs)
+    if (feedData) {
+      console.log(`feedLogs`, feedData.feedLogs)
     }
-  }, [data])
+  }, [feedData])
 
   return (
     <Flex direction='column' pt={{ base: '120px', md: '75px' }}>
       <Timeline
         setFormattedDate={setFormattedDate}
         formattedDate={formattedDate}
+        getFeed={GetFeed}
       />
       <Flex direction='row' pt={{ base: '120px', md: '0px' }}>
         <Menu>
@@ -91,7 +135,7 @@ function Advisories() {
                 <MenuItemOption
                   value={p}
                   key={p}
-                  onClick={() => filterBySource(p)}
+                  onClick={() => setSourceValue(p)}
                   textTransform={'uppercase'}
                 >
                   {p}
@@ -122,7 +166,7 @@ function Advisories() {
                 <MenuItemOption
                   value={p}
                   key={p}
-                  onClick={() => filterBySeverity(p)}
+                  onClick={() => setSeverityValue(p)}
                   textTransform={'capitalize'}
                 >
                   {p}
@@ -159,7 +203,7 @@ function Advisories() {
           </Box>
         </Flex>
       </Flex>
-      {data && (
+      {feedData && (
         <AdvisoryLog
           title={'Feed'}
           captions={[
@@ -171,10 +215,10 @@ function Advisories() {
             'Affected',
             'Aliases'
           ]}
-          currentDate={formattedDate}
-          data={data.feedLogs}
+          data={feedData.feedLogs}
           loading={loading}
-          refetch={refetch}
+          onPreviousPage={onPreviousPage}
+          onNextPage={onNextPage}
         />
       )}
     </Flex>
