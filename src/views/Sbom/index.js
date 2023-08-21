@@ -38,8 +38,6 @@ import { sbom } from 'variables/general'
 import {
   FaBalanceScale,
   FaCubes,
-  FaBug,
-  FaUnlock,
   FaLayerGroup,
   FaFileDownload
 } from 'react-icons/fa'
@@ -47,6 +45,9 @@ import { useLocation } from 'react-router-dom'
 import { AddIcon } from '@chakra-ui/icons'
 import ShareLynkDrawer from 'components/Drawer/ShareLynkDrawer'
 import GlobalContext from 'context/GlobalContext'
+import { useQuery } from '@apollo/client'
+import { GetSBOM } from 'graphQL/Queries'
+import { timeSince } from 'utils'
 
 function SBOM() {
   const { productVersionsData } = useContext(GlobalContext)
@@ -57,8 +58,9 @@ function SBOM() {
 
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
-  const product = queryParams.get('p')
-  const version = queryParams.get('v')
+
+  const productId = queryParams.get('p')
+  const sbomId = queryParams.get('sbom')
 
   const customerView = location.pathname.startsWith('/sharelynk')
 
@@ -83,6 +85,19 @@ function SBOM() {
     onOpen: setSBMOpen,
     onClose: setSBMClose
   } = useDisclosure()
+
+  const { data: sbomData, refetch, loading } = useQuery(GetSBOM, {
+    variables: {
+      projectId: productId,
+      sbomId: sbomId
+    }
+  })
+
+  useEffect(() => {
+    if (sbomData) {
+      console.log(`SBOM Data`, sbomData)
+    }
+  }, [sbomData])
 
   const uniqProjects = []
   const uniqVersions = []
@@ -139,34 +154,43 @@ function SBOM() {
             <CardBody>
               <Grid width={'100%'} templateColumns='repeat(5, 1fr)'>
                 <GridItem colSpan={2}>
-                  <Flex
-                    direction={'row'}
-                    alignItems={'center'}
-                    gap={5}
-                    width={'100%'}
-                  >
-                    <Icon as={FaCubes} h={'64px'} w={'64px'} color='blue.300' />
-                    <Flex direction={'column'} gap={1}>
-                      <Heading as='h3' size='md' noOfLines={1}>
-                        <Flex
-                          alignItems={'center'}
-                          flexDirection={'row'}
-                          gap={3}
-                        >
-                          {product ? product : 'sbomqs'}:
-                          {version ? version : 'v0.1'}
+                  {sbomData ? (
+                    <Flex
+                      direction={'row'}
+                      alignItems={'center'}
+                      gap={5}
+                      width={'100%'}
+                    >
+                      <Icon
+                        as={FaCubes}
+                        h={'64px'}
+                        w={'64px'}
+                        color='blue.300'
+                      />
+                      <Flex direction={'column'} gap={1}>
+                        <Heading as='h3' size='md' noOfLines={1}>
+                          <Flex
+                            alignItems={'center'}
+                            flexDirection={'row'}
+                            gap={3}
+                          >
+                            {sbomData.sbom.project.name}:
+                            {sbomData.sbom.specVersion}
+                          </Flex>
+                        </Heading>
+                        <Text fontSize='xs' cursor={'pointer'}>
+                          Last Pushed: {timeSince(sbomData.sbom.creationAt)}
+                        </Text>
+                        <Flex>
+                          <Tag size={'sm'} variant='outline' colorScheme='blue'>
+                            <TagLabel>Created</TagLabel>
+                          </Tag>
                         </Flex>
-                      </Heading>
-                      <Text fontSize='xs' cursor={'pointer'}>
-                        Last Pushed: 2021-08-31 12:00:00
-                      </Text>
-                      <Flex>
-                        <Tag size={'sm'} variant='outline' colorScheme='blue'>
-                          <TagLabel>Created</TagLabel>
-                        </Tag>
                       </Flex>
                     </Flex>
-                  </Flex>
+                  ) : (
+                    <Text>Loading...</Text>
+                  )}
                 </GridItem>
                 <GridItem colSpan={3}>
                   <Flex
@@ -237,18 +261,21 @@ function SBOM() {
             amount={19}
           />
         </Flex>
-        <SBOMTable
-          title={'SBOM'}
-          captions={[
-            'Component',
-            'Version',
-            'Relates to',
-            'License',
-            'Last Updated',
-            ''
-          ]}
-          data={sbom}
-        />
+        {sbomData && (
+          <SBOMTable
+            title={'SBOM'}
+            captions={[
+              'Component',
+              'Version',
+              'PURL',
+              'CPES',
+              'Licenses',
+              'Updated At',
+              ''
+            ]}
+            data={sbomData.sbom}
+          />
+        )}
       </Flex>
 
       <ShareLynkDrawer

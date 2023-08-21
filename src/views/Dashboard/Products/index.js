@@ -17,7 +17,7 @@ import ProductVersions from './components/ProductVersions'
 import { ChevronDownIcon, AddIcon } from '@chakra-ui/icons'
 import GlobalContext from 'context/GlobalContext'
 import ProductModal from './components/ProductModal.js'
-import { useLazyQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 import { GetProjectData } from 'graphQL/Queries'
 import { useLocation } from 'react-router-dom'
 import SBOM from 'views/Sbom'
@@ -28,39 +28,33 @@ function Index() {
   const product = queryParams.get('p')
   const version = queryParams.get('v')
 
-  const [GetProjects, { data: allProjects, refetch }] = useLazyQuery(
-    GetProjectData
-  )
-
-  useEffect(() => {
-    if (allProjects === undefined) {
-      GetProjects({
-        variables: {
-          first: 10
-        }
-      })
+  const { data: allProjects, refetch } = useQuery(GetProjectData, {
+    variables: {
+      first: 10
     }
-  }, [])
+  })
+
+  const fetchProjects = () => {
+    refetch({
+      first: 10
+    })
+  }
 
   const handlePreviousPage = () => {
-    GetProjects({
-      variables: {
-        first: undefined,
-        last: 10,
-        before: allProjects.projects.pageInfo.startCursor,
-        after: ''
-      }
+    refetch({
+      first: undefined,
+      last: 10,
+      before: allProjects.projects.pageInfo.startCursor,
+      after: ''
     })
   }
 
   const handleNextPage = () => {
-    GetProjects({
-      variables: {
-        first: 10,
-        last: undefined,
-        after: allProjects.projects.pageInfo.endCursor,
-        before: ''
-      }
+    refetch({
+      first: 10,
+      last: undefined,
+      after: allProjects.projects.pageInfo.endCursor,
+      before: ''
     })
   }
 
@@ -301,6 +295,7 @@ function Index() {
             allProjects={allProjects}
             handlePreviousPage={handlePreviousPage}
             handleNextPage={handleNextPage}
+            fetchProjects={fetchProjects}
           />
         )}
       </Flex>

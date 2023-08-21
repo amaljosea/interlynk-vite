@@ -15,7 +15,8 @@ import {
   Td,
   useDisclosure,
   Button,
-  Flex
+  Flex,
+  Box
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card.js'
@@ -30,6 +31,7 @@ import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
 import CardHeader from 'components/Card/CardHeader'
 import { AddIcon, PlusSquareIcon } from '@chakra-ui/icons'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
+import { timeSince } from 'utils'
 
 const SBOMTable = ({ title, captions, data, vulData }) => {
   const { SBOMLinksData } = useContext(GlobalContext)
@@ -51,39 +53,17 @@ const SBOMTable = ({ title, captions, data, vulData }) => {
   const btnRef = useRef(null)
   const compBtn = useRef(null)
 
-  const [tools, setTools] = useState([
-    {
-      name: 'Synk',
-      version: '1.2.0',
-      vendor: 'Interlynk Inc'
-    }
-  ])
+  const [tools, setTools] = useState(data.tools)
 
-  const [authors, setAuthors] = useState([
-    {
-      name: 'Surendra Pathak',
-      email: 'sp@interlynk.io',
-      organization: 'Interlynk Inc'
-    }
-  ])
+  const [authors, setAuthors] = useState(data.authors)
 
-  const [suppliers, setSuppliers] = useState([
-    {
-      name: 'SBOM-Tool v1.0',
-      email: 'sp@interlynk.io',
-      organization: 'Interlynk Inc'
-    }
-  ])
+  const [suppliers, setSuppliers] = useState(data.suppliers)
 
-  const [license, setLicense] = useState([
-    {
-      name: 'AGPL-1.0-only'
-    }
-  ])
+  const [license, setLicense] = useState(data.licenses)
 
   const [generalData, setGeneralData] = useState({
-    createdAt: '05-08-2023',
-    lastUpdatedAt: '12-08-2023',
+    createdAt: timeSince(data.creationAt),
+    lastUpdatedAt: timeSince(data.updatedAt),
     license: 'MIT',
     cpe: 'CPEXYZ123',
     purl: 'PURLABCDEF',
@@ -97,7 +77,7 @@ const SBOMTable = ({ title, captions, data, vulData }) => {
   return (
     <>
       <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
-        <Tabs variant='enclosed'>
+        <Tabs variant='enclosed' defaultIndex={1}>
           <TabList mt='20px'>
             {!location.pathname.startsWith('/sharelynk') && (
               <Tab>Share Lynks</Tab>
@@ -130,7 +110,7 @@ const SBOMTable = ({ title, captions, data, vulData }) => {
                       {SBOMLinksData.map((row, idx) => {
                         return (
                           <ShareLynkRow
-                            key={'SBOMLinkRow' + idx}
+                            key={idx}
                             id={'SBOMLinkRow' + idx}
                             link={row.link}
                             visits={row.visits}
@@ -171,7 +151,7 @@ const SBOMTable = ({ title, captions, data, vulData }) => {
                       authors={authors}
                       suppliers={suppliers}
                       tools={tools}
-                      license={license}
+                      licenses={license}
                     />
                   </Tbody>
                 </Table>
@@ -206,34 +186,25 @@ const SBOMTable = ({ title, captions, data, vulData }) => {
                     <Tr my='.8rem' pl='0px'>
                       {captions.map((caption, idx) => {
                         return (
-                          <Th
-                            color='gray.400'
-                            key={idx}
-                            ps={idx === 0 ? '0px' : null}
-                          >
-                            {caption}
+                          <Th key={idx} ps={idx === 0 ? '0px' : null}>
+                            <Box>{caption}</Box>
                           </Th>
                         )
                       })}
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {data.map((row) => {
+                    {data.components.map((row, index) => {
                       return (
                         <SBOMComponentRow
-                          key={row.component + row.version}
-                          component={row.component}
-                          logo={row.logo}
+                          key={index}
+                          component={row.name}
                           version={row.version}
-                          dependsOn={row.dependsOn}
-                          license={row.license}
-                          risk_score={row.risk_score}
-                          critical={row.critical}
-                          high={row.high}
-                          medium={row.medium}
-                          low={row.low}
-                          updated={row.updated}
-                          redacted={row.redacted}
+                          purl={row.purl}
+                          licenses={row.licenses}
+                          cpes={row.cpes}
+                          updatedAt={row.updatedAt}
+                          uniqueId={row.uniqueId}
                         />
                       )
                     })}

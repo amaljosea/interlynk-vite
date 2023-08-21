@@ -1,20 +1,19 @@
 import { useMutation } from '@apollo/client'
 import {
   Box,
+  Button,
   Flex,
-  FormControl,
   FormLabel,
   Input,
-  Progress,
+  ModalFooter,
+  Text,
   useToast
 } from '@chakra-ui/react'
 import {
-  Button,
   Modal,
   ModalOverlay,
   ModalContent,
   ModalHeader,
-  ModalFooter,
   ModalBody,
   ModalCloseButton
 } from '@chakra-ui/react'
@@ -22,13 +21,9 @@ import { UploadSbom } from 'graphQL/Mutation'
 import { useEffect, useState } from 'react'
 import { FaUpload } from 'react-icons/fa'
 
-const UploadModal = ({ id, isOpen, onClose }) => {
+const UploadModal = ({ id, isOpen, onClose, fetchProjects }) => {
   const toast = useToast()
-  const [sbomUpload, { data }] = useMutation(UploadSbom)
-
-  const [file, setFile] = useState(null)
-  const [progress, setProgress] = useState(0)
-  const [fileName, setFileName] = useState('')
+  const [sbomUpload, { data, loading, error }] = useMutation(UploadSbom)
 
   const uploadData = async (e) => {
     console.log(e)
@@ -39,48 +34,31 @@ const UploadModal = ({ id, isOpen, onClose }) => {
           projectId: id
         }
       }).then((res) => {
-        const uploadTask = setInterval(() => {
-          setProgress((prevProgress) => {
-            if (prevProgress >= 100) {
-              clearInterval(uploadTask)
-              // console.log(`data`, res)
-              return 100
-            }
-            return prevProgress + 10
+        if (res.data.sbomUpload.errors === '[]') {
+          toast({
+            description: 'Data uploaded successfully',
+            status: 'success',
+            duration: 9000,
+            isClosable: true,
+            position: 'top'
           })
-        }, 1000)
+        } else {
+          toast({
+            description: 'Upload failed !',
+            status: 'error',
+            duration: 9000,
+            isClosable: true,
+            position: 'top'
+          })
+        }
       })
-      // .finally(() => console.log(`data`, data))
     } catch (error) {
       console.error('Mutation error:', error)
     }
   }
 
   const handleFileChange = (event) => {
-    setFile(event.target.files[0])
     uploadData(event.target.files[0])
-  }
-
-  const handleSubmit = () => {
-    setFile(null)
-    if (data && data.sbomUpload.errors === '[]') {
-      toast({
-        description: 'Data uploaded successfully',
-        status: 'success',
-        duration: 9000,
-        isClosable: true,
-        position: 'top'
-      })
-      onClose()
-    } else {
-      toast({
-        description: 'Upload failed !',
-        status: 'error',
-        duration: 9000,
-        isClosable: true,
-        position: 'top'
-      })
-    }
   }
 
   useEffect(() => {
@@ -117,29 +95,28 @@ const UploadModal = ({ id, isOpen, onClose }) => {
                 </Flex>
               </FormLabel>
             </Box>
-            <Box mt={4}>
-              {file && (
-                <Flex direction={'column'} gap={4}>
-                  <p>Uploading: {file.name}</p>
-                  <Progress value={progress} />
-                </Flex>
-              )}
-            </Box>
-            {progress === 100 && (
-              <FormControl isRequired mt={4}>
-                <Input
-                  type='email'
-                  size='lg'
-                  value={fileName}
-                  onChange={(e) => setFileName(e.target.value)}
-                  placeholder='Enter file name'
-                />
-              </FormControl>
+            {loading && (
+              <Box my={4}>
+                <Text>Uploading...</Text>
+              </Box>
+            )}
+            {error && (
+              <Box my={4}>
+                <Text>Something went wrong!!</Text>
+              </Box>
             )}
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme='blue' borderRadius={8} onClick={handleSubmit}>
-              Submit
+            <Button
+              colorScheme='blue'
+              borderRadius={8}
+              onClick={() => {
+                onClose()
+                fetchProjects()
+              }}
+              disabled={!data}
+            >
+              Save
             </Button>
           </ModalFooter>
         </ModalContent>

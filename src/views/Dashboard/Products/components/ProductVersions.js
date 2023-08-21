@@ -20,7 +20,8 @@ const ProductVersions = ({
   captions,
   allProjects,
   handlePreviousPage,
-  handleNextPage
+  handleNextPage,
+  fetchProjects
 }) => {
   const textColor = useColorModeValue('gray.700', 'white')
 
@@ -46,10 +47,12 @@ const ProductVersions = ({
                   <ProductVersionsRow
                     key={index}
                     id={pv.id}
+                    sbomId={pv.sboms}
                     name={pv.name}
                     description={pv.description}
                     updatedAt={pv.updatedAt}
                     allProjects={allProjects}
+                    fetchProjects={fetchProjects}
                   />
                 )
               })}

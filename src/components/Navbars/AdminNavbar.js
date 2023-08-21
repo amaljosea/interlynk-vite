@@ -13,6 +13,8 @@ import AdminNavbarLinks from './AdminNavbarLinks'
 import { useContext } from 'react'
 import GlobalContext from 'context/GlobalContext'
 import { Link, useLocation } from 'react-router-dom'
+import { GetSBOM } from 'graphQL/Queries'
+import { useQuery } from '@apollo/client'
 
 export default function AdminNavbar(props) {
   const { minimize } = useContext(GlobalContext)
@@ -33,7 +35,14 @@ export default function AdminNavbar(props) {
   const queryParams = new URLSearchParams(location.search)
   const versionId = queryParams.get('v')
   const product = queryParams.get('p')
-  const imageId = queryParams.get('id')
+  const sbomId = queryParams.get('sbom')
+
+  const { data: sbomData } = useQuery(GetSBOM, {
+    variables: {
+      projectId: product,
+      sbomId: sbomId
+    }
+  })
 
   const imageName = window.localStorage.getItem('Image')
   const signedImageName = localStorage.getItem(`signedImageName`)
@@ -177,7 +186,7 @@ export default function AdminNavbar(props) {
             {brandText === 'Products' && product && (
               <BreadcrumbItem color={mainText}>
                 <BreadcrumbLink href='#' color={mainText}>
-                  {product}
+                  {sbomData && sbomData.sbom.project.name}
                 </BreadcrumbLink>
               </BreadcrumbItem>
             )}
@@ -193,7 +202,7 @@ export default function AdminNavbar(props) {
             {location.pathname.startsWith('/sharelynk') && (
               <BreadcrumbItem color={mainText}>
                 <BreadcrumbLink href='#' color={mainText}>
-                  {product}
+                  {sbomData && sbomData.sbom.project.name}
                 </BreadcrumbLink>
               </BreadcrumbItem>
             )}
