@@ -28,12 +28,14 @@ function ProductVersionsRow(props) {
 
   const {
     id,
+    sbomId,
     name,
     active,
     description,
     updatedAt,
     vendor,
-    allProjects
+    allProjects,
+    fetchProjects
   } = props
   const textColor = useColorModeValue('gray.700', 'white')
   const [checked, setChecked] = useState(active ? true : false)
@@ -46,10 +48,6 @@ function ProductVersionsRow(props) {
   } = useDisclosure()
 
   const btnRefProduct = useRef()
-
-  const version = (Math.random() * 10).toFixed()
-
-  const url = `/vendor/products?p=${name}&v=1.${version}`
 
   const onProductDelete = async () => {
     try {
@@ -70,9 +68,17 @@ function ProductVersionsRow(props) {
           <Switch size='md' defaultChecked />
         </Td>
         <Td pl={0}>
-          <Text color={'blue.500'} minWidth='100%'>
-            <Link to={url}>{name}</Link>
-          </Text>
+          {sbomId.length > 0 ? (
+            <Link to={`/vendor/products?p=${id}&sbom=${sbomId[0].id}`}>
+              <Text color={'blue.500'} minWidth='100%'>
+                {name}
+              </Text>
+            </Link>
+          ) : (
+            <Text color={'blue.500'} minWidth='100%'>
+              {name}
+            </Text>
+          )}
         </Td>
         <Td pl={0}>{description}</Td>
         <Td pl={0}>{timeSince(updatedAt)}</Td>
@@ -100,6 +106,7 @@ function ProductVersionsRow(props) {
             id={id}
             isOpen={isOpenProduct}
             onClose={onCloseProduct}
+            fetchProjects={fetchProjects}
           />
 
           <ProductModal

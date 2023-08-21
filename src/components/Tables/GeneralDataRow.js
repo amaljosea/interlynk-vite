@@ -32,7 +32,7 @@ const GeneralDataRow = ({
           <Flex flexDirection={'column'} alignItems={'flex-start'} gap={4}>
             {tools.map((item, index) => (
               <Text pl={0} fontSize={'sm'} key={index}>
-                {item.name}-{item.version} {`(${item.vendor})`}
+                {item.name}-{item.version} {`(Interlynk Inc)`}
               </Text>
             ))}
           </Flex>
@@ -132,7 +132,7 @@ const GeneralDataRow = ({
         </Td>
         <Td pl={0}>
           <Flex flexDirection={'column'} alignItems={'flex-start'} gap={4}>
-            {license.map((item, index) => (
+            {license?.map((item, index) => (
               <Text pl={0} fontSize={'sm'} key={index}>
                 {item.name}
               </Text>

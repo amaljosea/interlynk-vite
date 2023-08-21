@@ -134,6 +134,7 @@ function SBOMs() {
 
   useEffect(() => {
     if (imageData) {
+      console.log(`imageData`, imageData)
       const clonedImageVersions = imageData.image.imageVersions.map((info) => ({
         ...info
       }))

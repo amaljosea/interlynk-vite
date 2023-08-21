@@ -76,13 +76,13 @@ function ShareLynkRow(props) {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const product = queryParams.get('p')
-  const version = queryParams.get('v')
-
-  const customerId = link.split('/')
+  const sbomId = queryParams.get('sbom')
 
   const domain = window.location.origin
 
-  const sbomLink = useClipboard(`${domain}/sharelynk?p=${product}&v=${version}`)
+  const sbomLink = useClipboard(
+    `${domain}/sharelynk?p=${product}&sbom=${sbomId}`
+  )
 
   // `https://dashboard-app.fly.dev/#/customer/sboms/${customerId[7]}`
 

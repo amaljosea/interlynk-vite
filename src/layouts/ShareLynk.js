@@ -24,6 +24,7 @@ import { setContext } from '@apollo/client/link/context'
 import Cookies from 'js-cookie'
 import { getActiveNavbar, getActiveRoute } from '../utils'
 import ShareLynkRoutes from 'shareLynkRoutes'
+import { createUploadLink } from 'apollo-upload-client'
 
 export default function ShareLynkLayout(props) {
   const { ...rest } = props
@@ -65,7 +66,7 @@ export default function ShareLynkLayout(props) {
   document.documentElement.dir = 'ltr'
   // Chakra Color Mode
 
-  const userToken = Cookies.get('userToken')
+  const authToken = Cookies.get('authToken')
 
   const graphqlAPI = process.env.REACT_APP_GRAPHQL_API
 
@@ -73,16 +74,20 @@ export default function ShareLynkLayout(props) {
     uri: `${graphqlAPI}`
   })
 
+  const uploadLink = createUploadLink({
+    uri: `${graphqlAPI}`
+  })
+
   const authLink = setContext((_, { headers }) => {
     return {
       headers: {
         ...headers,
-        authorization: userToken ? userToken : ''
+        authorization: authToken ? authToken : ''
       }
     }
   })
   const client = new ApolloClient({
-    link: authLink.concat(httpLink),
+    link: authLink.concat(uploadLink.concat(httpLink)),
     cache: new InMemoryCache()
   })
 

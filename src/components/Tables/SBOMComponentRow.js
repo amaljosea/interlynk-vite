@@ -7,23 +7,25 @@ import {
   useColorModeValue,
   Icon,
   Stack,
-  useDisclosure
+  useDisclosure,
+  Box
 } from '@chakra-ui/react'
 import { useEffect, useState, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import ComponentModal from 'views/Sbom/components/ComponentModal'
+import { timeSince } from 'utils'
 
 function SBOMComponentRow(props) {
   const {
-    logo,
     component,
     version,
-    dependsOn,
-    license,
-    updated,
-    redacted
+    purl,
+    licenses,
+    updatedAt,
+    cpes,
+    uniqueId
   } = props
   const location = useLocation()
 
@@ -51,40 +53,32 @@ function SBOMComponentRow(props) {
 
   return (
     <Tr>
-      <Td minWidth={{ sm: '250px' }} pl='0px'>
-        <Flex align='center' py='.8rem' minWidth='100%' flexWrap='nowrap'>
-          <Flex direction='row'>
-            <Icon as={logo} h={'24px'} w={'24px'} me='18px' />
-            <Flex direction='column' gap='5px'>
-              <Text fontSize='sm' color={textColor} minWidth='100%'>
-                {contains && contains.redactions && redacted
-                  ? 'Redacted-DC...gM='
-                  : component}
-              </Text>
-              {redacted ? (
-                <Tag
-                  colorScheme='red'
-                  size='sm'
-                  variant='outline'
-                  width={'fit-content'}
-                >
-                  REDACTED
-                </Tag>
-              ) : null}
+      <Td width={'350px'} pl='0px'>
+        <Box py='.8rem'>{component}</Box>
+      </Td>
+      <Td width={'300px'}>
+        <Box>{version}</Box>
+      </Td>
+      <Td width={'250px'}>{purl}</Td>
+      <Td>
+        {cpes.length > 0 &&
+          cpes.map((item, i) => (
+            <Flex gap={2} alignItems={'center'} key={i}>
+              <Text>{item}</Text>
             </Flex>
-          </Flex>
-        </Flex>
+          ))}
       </Td>
       <Td>
-        <Flex direction='column'>
-          <Text fontSize='sm' color={textColor}>
-            {version}
-          </Text>
-        </Flex>
+        {licenses.length > 0 &&
+          licenses.map((item, i) => (
+            <Flex gap={2} alignItems={'center'} key={i}>
+              <Text>{item}</Text>
+            </Flex>
+          ))}
       </Td>
-      <Td>{dependsOn}</Td>
-      <Td>{license}</Td>
-      <Td>{updated}</Td>
+      <Td>
+        <Box>{timeSince(updatedAt)}</Box>
+      </Td>
       <Td>
         {!customerView && (
           <Stack direction={'row'} spacing='24px'>
@@ -108,7 +102,7 @@ function SBOMComponentRow(props) {
           btnRef={compBtn}
           component={component}
           version={version}
-          license={license}
+          license={licenses}
         />
         <ComponentModal isOpen={isDelOpen} onClose={onDelClose} />
       </Td>

@@ -542,6 +542,35 @@ export const GetProjectData = gql`
         organizationId
         sboms {
           id
+          cpes
+          spec
+          creationAt
+          specVersion
+          project {
+            id
+          }
+          tools {
+            id
+            name
+          }
+          authors {
+            name
+            email
+          }
+          suppliers {
+            name
+            email
+          }
+          components {
+            id
+            name
+            version
+            primary
+            internal
+            purl
+            cpes
+            licenses
+          }
         }
       }
     }
@@ -555,13 +584,16 @@ export const GetSBOM = gql`
       cpes
       spec
       creationAt
+      updatedAt
       specVersion
       project {
         id
+        name
       }
       tools {
         id
         name
+        version
       }
       authors {
         name
@@ -580,6 +612,9 @@ export const GetSBOM = gql`
         purl
         cpes
         licenses
+        updatedAt
+        uniqueId
+        kind
       }
     }
   }
