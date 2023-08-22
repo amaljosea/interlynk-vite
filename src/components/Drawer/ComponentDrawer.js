@@ -275,7 +275,7 @@ function ComponentDrawer(props) {
                 </FormControl>
               )}
               <FormControl>
-                <FormLabel fontSize={'sm'}>Indentifiers</FormLabel>
+                <FormLabel fontSize={'sm'}>Identifiers</FormLabel>
                 <Stack spacing={2}>
                   <Input
                     size='sm'
