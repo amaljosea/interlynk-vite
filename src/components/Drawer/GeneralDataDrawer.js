@@ -40,7 +40,7 @@ const GeneralDataDrawer = ({
   license,
   setLicense
 }) => {
-  const { cpe, purl, swid, md5, sha } = data
+  const { cpes, purl, swid, md5, sha } = data
 
   const [toolName, setToolName] = useState('')
   const [toolVersion, setToolVersion] = useState('')
@@ -72,7 +72,9 @@ const GeneralDataDrawer = ({
     setSupplierList(suppliers)
     setAuthorList(authors)
     setLicenseList(license)
-    setCpeValue(cpe)
+    if (cpes.length > 0) {
+      setCpeValue(cpes[0])
+    }
     setPurlValue(purl)
     setSwidValue(swid)
   }, [data])
@@ -276,7 +278,7 @@ const GeneralDataDrawer = ({
                               {item.version}
                             </Td>
                             <Td pl={0} fontSize={'sm'}>
-                              {item.vendor}
+                              {item.vendor ? item.vendor : 'Interlynk Inc'}
                             </Td>
                             <Td>
                               <Icon

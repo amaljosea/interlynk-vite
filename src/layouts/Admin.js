@@ -85,11 +85,11 @@ export default function Dashboard(props) {
   const graphqlAPI = process.env.REACT_APP_GRAPHQL_API
 
   const httpLink = createHttpLink({
-    uri: `${graphqlAPI}`
+    uri: graphqlAPI
   })
 
   const uploadLink = createUploadLink({
-    uri: `${graphqlAPI}`
+    uri: graphqlAPI
   })
 
   const authLink = setContext((_, { headers }) => {
@@ -100,8 +100,9 @@ export default function Dashboard(props) {
       }
     }
   })
+
   const client = new ApolloClient({
-    link: authLink.concat(uploadLink.concat(httpLink)),
+    link: authLink.concat(uploadLink).concat(httpLink),
     cache: new InMemoryCache()
   })
 

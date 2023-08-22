@@ -40,7 +40,11 @@ const GlobalContext = React.createContext({
   advisoriesData: [],
   setAdvisoriesData: () => {},
   isConfirmed: false,
-  setIsConfirmed: () => {}
+  setIsConfirmed: () => {},
+  sbomFile: '',
+  setSbomFile: () => {},
+  projects: [],
+  setProjects: () => {}
 })
 
 export default GlobalContext

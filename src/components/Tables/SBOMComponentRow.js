@@ -19,23 +19,21 @@ import { timeSince } from 'utils'
 
 function SBOMComponentRow(props) {
   const {
+    id,
     component,
     version,
     purl,
     licenses,
     updatedAt,
     cpes,
-    uniqueId
+    type,
+    refetch
   } = props
   const location = useLocation()
 
   const customerView = location.pathname.startsWith('/sharelynk')
 
   const compBtn = useRef(null)
-
-  const textColor = useColorModeValue('gray.700', 'white')
-  const bgStatus = useColorModeValue('gray.400', '#1a202c')
-  const colorStatus = useColorModeValue('white', 'gray.400')
 
   const [contains, setcontains] = useState({})
 
@@ -96,15 +94,31 @@ function SBOMComponentRow(props) {
             />
           </Stack>
         )}
-        <ComponentDrawer
-          isOpen={isOpen}
-          onClose={onClose}
-          btnRef={compBtn}
-          component={component}
-          version={version}
-          license={licenses}
-        />
-        <ComponentModal isOpen={isDelOpen} onClose={onDelClose} />
+
+        {isOpen && (
+          <ComponentDrawer
+            id={id}
+            isOpen={isOpen}
+            onClose={onClose}
+            btnRef={compBtn}
+            component={component}
+            version={version}
+            license={licenses}
+            type={type}
+            refetch={refetch}
+            cpes={cpes}
+            purl={purl}
+          />
+        )}
+
+        {isDelOpen && (
+          <ComponentModal
+            isOpen={isDelOpen}
+            onClose={onDelClose}
+            id={id}
+            refetch={refetch}
+          />
+        )}
       </Td>
     </Tr>
   )

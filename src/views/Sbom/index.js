@@ -48,6 +48,7 @@ import GlobalContext from 'context/GlobalContext'
 import { useQuery } from '@apollo/client'
 import { GetSBOM } from 'graphQL/Queries'
 import { timeSince } from 'utils'
+import { GetProject } from 'graphQL/Queries'
 
 function SBOM() {
   const { productVersionsData } = useContext(GlobalContext)
@@ -86,18 +87,33 @@ function SBOM() {
     onClose: setSBMClose
   } = useDisclosure()
 
-  const { data: sbomData, refetch, loading } = useQuery(GetSBOM, {
+  const { data: sbomData, refetch } = useQuery(GetSBOM, {
     variables: {
       projectId: productId,
       sbomId: sbomId
     }
   })
 
+  const { data } = useQuery(GetProject, {
+    variables: {
+      id: productId
+    }
+  })
+
   useEffect(() => {
     if (sbomData) {
+      setSelectedVersion(
+        sbomData.sbom.components.find((item) => item.primary === true).version
+      )
       console.log(`SBOM Data`, sbomData)
     }
   }, [sbomData])
+
+  useEffect(() => {
+    if (data) {
+      console.log(`data`, data)
+    }
+  }, [data])
 
   const uniqProjects = []
   const uniqVersions = []
@@ -107,13 +123,15 @@ function SBOM() {
       uniqProjects.push(project.name)
     }
   })
-  productVersionsData.map((project) => {
-    project.versions.map((version) => {
-      if (uniqVersions.indexOf(version.version) === -1) {
-        uniqVersions.push(version.version)
-      }
+
+  data &&
+    data.project.sboms.map((project) => {
+      project.components.map((sbom) => {
+        if (sbom.primary === true) {
+          uniqVersions.push(sbom.version)
+        }
+      })
     })
-  })
 
   const [selectedVersion, setSelectedVersion] = useState('')
 
@@ -175,7 +193,11 @@ function SBOM() {
                             gap={3}
                           >
                             {sbomData.sbom.project.name}:
-                            {sbomData.sbom.specVersion}
+                            {
+                              sbomData.sbom.components.find(
+                                (item) => item.primary === true
+                              ).version
+                            }
                           </Flex>
                         </Heading>
                         <Text fontSize='xs' cursor={'pointer'}>
@@ -192,54 +214,56 @@ function SBOM() {
                     <Text>Loading...</Text>
                   )}
                 </GridItem>
-                <GridItem colSpan={3}>
-                  <Flex
-                    direction={'row'}
-                    gap={4}
-                    justifyContent='flex-end'
-                    ml={'auto'}
-                  >
-                    <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
-                      <FaLayerGroup size={18} color='darkgray' />
-                      <Select
-                        id='version'
-                        value={selectedVersion}
-                        onChange={(e) => setSelectedVersion(e.target.value)}
-                        size='md'
-                        width={'150px'}
-                        color='gray.500'
-                      >
-                        {imageInfo.length > 0 &&
-                          imageInfo.map((version, index) => (
-                            <option key={index} value={version.id}>
-                              {version.name}
-                            </option>
-                          ))}
-                      </Select>
+                {sbomData && (
+                  <GridItem colSpan={3}>
+                    <Flex
+                      direction={'row'}
+                      gap={4}
+                      justifyContent='flex-end'
+                      ml={'auto'}
+                    >
+                      <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
+                        <FaLayerGroup size={18} color='darkgray' />
+                        <Select
+                          id='version'
+                          value={selectedVersion}
+                          onChange={(e) => setSelectedVersion(e.target.value)}
+                          size='md'
+                          width={'150px'}
+                          color='gray.500'
+                        >
+                          {uniqVersions.length > 0 &&
+                            uniqVersions.map((item, index) => (
+                              <option key={index} value={item}>
+                                {item}
+                              </option>
+                            ))}
+                        </Select>
+                      </Flex>
+
+                      {!customerView && (
+                        <Button
+                          width={'120px'}
+                          colorScheme='blue'
+                          fontSize={'sm'}
+                          leftIcon={<AddIcon />}
+                          onClick={setSBMOpen}
+                        >
+                          Share Lynk
+                        </Button>
+                      )}
+
+                      {!customerView && (
+                        <IconButton
+                          aria-label='Download SBOM'
+                          icon={<FaFileDownload />}
+                          onClick={onOpen}
+                          colorScheme='blue'
+                        />
+                      )}
                     </Flex>
-
-                    {!customerView && (
-                      <Button
-                        width={'120px'}
-                        colorScheme='blue'
-                        fontSize={'sm'}
-                        leftIcon={<AddIcon />}
-                        onClick={setSBMOpen}
-                      >
-                        Share Lynk
-                      </Button>
-                    )}
-
-                    {!customerView && (
-                      <IconButton
-                        aria-label='Download SBOM'
-                        icon={<FaFileDownload />}
-                        onClick={onOpen}
-                        colorScheme='blue'
-                      />
-                    )}
-                  </Flex>
-                </GridItem>
+                  </GridItem>
+                )}
               </Grid>
             </CardBody>
           </CardBody>
@@ -274,6 +298,7 @@ function SBOM() {
               ''
             ]}
             data={sbomData.sbom}
+            refetch={refetch}
           />
         )}
       </Flex>

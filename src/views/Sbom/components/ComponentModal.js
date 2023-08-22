@@ -1,3 +1,4 @@
+import { useMutation } from '@apollo/client'
 import {
   Modal,
   ModalOverlay,
@@ -10,8 +11,39 @@ import {
   Text,
   Stack
 } from '@chakra-ui/react'
+import { DeleteComponent } from 'graphQL/Mutation'
+import { useLocation } from 'react-router-dom'
 
-const ComponentModal = ({ isOpen, onClose }) => {
+const ComponentModal = ({ isOpen, onClose, id, refetch }) => {
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+
+  console.log(`id`, id)
+
+  const productId = queryParams.get('p')
+  const sbomId = queryParams.get('sbom')
+
+  const [deleteComponent] = useMutation(DeleteComponent)
+
+  const handleDelete = async () => {
+    try {
+      await deleteComponent({
+        variables: {
+          id: id
+        }
+      })
+        .then(() =>
+          refetch({
+            projectId: productId,
+            sbomId: sbomId
+          })
+        )
+        .finally(() => onClose())
+    } catch (error) {
+      console.error('Mutation error:', error)
+    }
+  }
+
   return (
     <>
       <Modal isOpen={isOpen} onClose={onClose}>
@@ -32,7 +64,9 @@ const ComponentModal = ({ isOpen, onClose }) => {
             <Button colorScheme='gray' mr={3} onClick={onClose}>
               Cancel
             </Button>
-            <Button colorScheme='blue'>Submit</Button>
+            <Button colorScheme='blue' onClick={handleDelete}>
+              Submit
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

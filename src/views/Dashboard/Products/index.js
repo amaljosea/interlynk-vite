@@ -17,54 +17,73 @@ import ProductVersions from './components/ProductVersions'
 import { ChevronDownIcon, AddIcon } from '@chakra-ui/icons'
 import GlobalContext from 'context/GlobalContext'
 import ProductModal from './components/ProductModal.js'
-import { useQuery } from '@apollo/client'
+import { useLazyQuery, useQuery } from '@apollo/client'
 import { GetProjectData } from 'graphQL/Queries'
 import { useLocation } from 'react-router-dom'
 import SBOM from 'views/Sbom'
 
 function Index() {
+  const {
+    productVersionsData,
+    productVersionExploded,
+    sbomFile,
+    setProjects,
+    projects
+  } = useContext(GlobalContext)
+
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const product = queryParams.get('p')
   const version = queryParams.get('v')
 
-  const { data: allProjects, refetch } = useQuery(GetProjectData, {
-    variables: {
-      first: 10
-    }
-  })
-
-  const fetchProjects = () => {
-    refetch({
-      first: 10
-    })
-  }
+  const [getProjects, { data }] = useLazyQuery(GetProjectData)
 
   const handlePreviousPage = () => {
-    refetch({
-      first: undefined,
-      last: 10,
-      before: allProjects.projects.pageInfo.startCursor,
-      after: ''
+    getProjects({
+      variables: {
+        first: undefined,
+        last: 10,
+        before: data.projects.pageInfo.startCursor,
+        after: ''
+      }
     })
   }
 
   const handleNextPage = () => {
-    refetch({
-      first: 10,
-      last: undefined,
-      after: allProjects.projects.pageInfo.endCursor,
-      before: ''
+    getProjects({
+      variables: {
+        first: 10,
+        last: undefined,
+        after: data.projects.pageInfo.endCursor,
+        before: ''
+      }
     })
   }
 
   useEffect(() => {
-    console.log(`all projects`, allProjects)
-  }, [allProjects])
+    if (data === undefined) {
+      getProjects({
+        variables: {
+          first: 10
+        }
+      })
+    }
+  }, [data])
 
-  const { productVersionsData, productVersionExploded } = useContext(
-    GlobalContext
-  )
+  useEffect(() => {
+    if (sbomFile !== '') {
+      getProjects({
+        variables: {
+          first: 10
+        }
+      })
+    }
+  }, [sbomFile])
+
+  useEffect(() => {
+    console.log(`products`, projects)
+  }, [projects])
+
   const [filterData, setFilterData] = useState([])
   const [groupVersionData, setGroupVersionData] = useState([])
   const [showVersion, setShowVersion] = useState(true)
@@ -96,43 +115,6 @@ function Index() {
   const btnRefProduct = useRef('Product')
   const btnRefSBOMLink = useRef('SBOMLink')
 
-  // productVersionsData.map((project) => {
-  //   if (uniqProjects.indexOf(project.name) === -1) {
-  //     uniqProjects.push(project.name)
-  //   }
-  // })
-  const uniqVersions = []
-  productVersionsData.map((project) => {
-    project.versions.map((version) => {
-      if (uniqVersions.indexOf(version.version) === -1) {
-        uniqVersions.push(version.version)
-      }
-    })
-  })
-
-  // useEffect(() => {
-  //   const productExploded = []
-  //   productVersionsData.map((p) => {
-  //     p.versions.map((v) => {
-  //       productExploded.push({
-  //         name: p.name,
-  //         description: p.description,
-  //         logo: p.logo,
-  //         version: v.version,
-  //         vendor: p.vendor,
-  //         quality_score: p.quality_score,
-  //         sbom_links: v.sbom_links,
-  //         risk_score: v.risk_score,
-  //         updated_at: v.updated_at,
-  //         active: v.active,
-  //         source: p.source
-  //       })
-  //     })
-  //   })
-
-  //   setProductVersionExploded(productExploded)
-  // }, [productVersionsData])
-
   const groupByVersion = (e) => {
     setShowVersion(!showVersion)
   }
@@ -144,8 +126,6 @@ function Index() {
       setGroupVersionData([])
     }
   }, [showVersion])
-
-  productVersionExploded.sort((a, b) => (a.updated_at > b.updated_at ? -1 : 1))
 
   const filterByProduct = (p) => {
     const filterList =
@@ -282,7 +262,7 @@ function Index() {
             </Button>
           </Stack>
         </Flex>
-        {allProjects && (
+        {data && (
           <ProductVersions
             title={'Products'}
             captions={[
@@ -292,20 +272,21 @@ function Index() {
               'Updated At',
               'Action'
             ]}
-            allProjects={allProjects}
+            allProjects={data}
             handlePreviousPage={handlePreviousPage}
             handleNextPage={handleNextPage}
-            fetchProjects={fetchProjects}
           />
         )}
       </Flex>
 
-      <ProductModal
-        isOpen={isOpenProduct}
-        onClose={onCloseProduct}
-        product={''}
-        vendorName={''}
-      />
+      {isOpenProduct && (
+        <ProductModal
+          isOpen={isOpenProduct}
+          onClose={onCloseProduct}
+          product={''}
+          vendorName={''}
+        />
+      )}
     </>
   )
 }

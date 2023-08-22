@@ -61,6 +61,10 @@ const ContextWrapper = (props) => {
 
   const [isConfirmed, setIsConfirmed] = useState(false)
 
+  const [sbomFile, setSbomFile] = useState('')
+
+  const [projects, setProjects] = useState([])
+
   return (
     <GlobalContext.Provider
       value={{
@@ -101,7 +105,11 @@ const ContextWrapper = (props) => {
         advisoriesData,
         setAdvisoriesData,
         isConfirmed,
-        setIsConfirmed
+        setIsConfirmed,
+        sbomFile,
+        setSbomFile,
+        projects,
+        setProjects
       }}
     >
       {props.children}

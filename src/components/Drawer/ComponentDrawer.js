@@ -15,16 +15,38 @@ import {
   FormLabel,
   Input,
   Select,
-  Flex,
-  Text,
-  Divider,
-  Spacer,
   Checkbox
 } from '@chakra-ui/react'
+import { useMutation } from '@apollo/client'
+import { CreateComponent } from 'graphQL/Mutation'
+import { UpdateComponent } from 'graphQL/Mutation'
+import { useLocation } from 'react-router-dom'
 
 function ComponentDrawer(props) {
-  const { isOpen, onClose, btnRef, component, version, license } = props
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
 
+  const productId = queryParams.get('p')
+  const sbomId = queryParams.get('sbom')
+
+  const {
+    id,
+    isOpen,
+    onClose,
+    btnRef,
+    component,
+    version,
+    license,
+    type,
+    cpes,
+    purl,
+    refetch
+  } = props
+
+  const [createComponent] = useMutation(CreateComponent)
+  const [updateComponent] = useMutation(UpdateComponent)
+
+  const [compId, setCompId] = useState('')
   const [compName, setCompName] = useState('')
   const [compVersion, setCompVersion] = useState('')
   const [compType, setCompType] = useState('')
@@ -75,12 +97,13 @@ function ComponentDrawer(props) {
   ]
 
   useEffect(() => {
+    setCompId(id)
     setCompName(component)
     setCompVersion(version)
-    if (license) {
-      setSelectedLicense('Custom')
-      setLicenseName(license)
-    }
+    setCompType(type)
+    setSelectedLicense(license[0])
+    setCpeValue(cpes[0])
+    setPurlValue(purl)
   }, [component])
 
   useEffect(() => {
@@ -92,6 +115,59 @@ function ComponentDrawer(props) {
     }
   }, [license])
 
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (component === '') {
+      try {
+        await createComponent({
+          variables: {
+            id: sbomId,
+            kind: compType,
+            name: compName,
+            version: compVersion,
+            licenses:
+              selectedLicense === 'Custom' ? licenseName : selectedLicense,
+            cpes: cpeValue,
+            purl: purlValue
+          }
+        })
+          .then(() =>
+            refetch({
+              projectId: productId,
+              sbomId: sbomId
+            })
+          )
+          .finally(() => onClose())
+      } catch (error) {
+        console.error('Mutation error:', error)
+      }
+    } else {
+      try {
+        await updateComponent({
+          variables: {
+            id: id,
+            kind: compType,
+            name: compName,
+            version: compVersion,
+            licenses:
+              selectedLicense === 'Custom' ? licenseName : selectedLicense,
+            cpes: cpeValue,
+            purl: purlValue
+          }
+        })
+          .then(() =>
+            refetch({
+              projectId: productId,
+              sbomId: sbomId
+            })
+          )
+          .finally(() => onClose())
+      } catch (error) {
+        console.error('Mutation error:', error)
+      }
+    }
+  }
+
   return (
     <Drawer
       isOpen={isOpen}
@@ -101,7 +177,7 @@ function ComponentDrawer(props) {
       size='md'
     >
       <DrawerOverlay />
-      <form>
+      <form onSubmit={handleSubmit}>
         <DrawerContent>
           <DrawerCloseButton />
           <DrawerHeader borderBottomWidth='1px' color='gray.600'>
@@ -137,13 +213,15 @@ function ComponentDrawer(props) {
                   onChange={(e) => setCompType(e.target.value)}
                 >
                   <option value=''>-- Select --</option>
-                  <option value='Library'>Library</option>
-                  <option value='Operating system'>Operating system</option>
-                  <option value='Firmware'>Firmware</option>
-                  <option value='File'>File</option>
-                  <option value='Device'>Device</option>
-                  <option value='Container'>Container</option>
-                  <option value='Framework'>Framework</option>
+                  <option value='required'>Required</option>
+                  <option value='unknown'>Unknown</option>
+                  <option value='library'>Library</option>
+                  <option value='operating_system'>Operating system</option>
+                  <option value='firmware'>Firmware</option>
+                  <option value='file'>File</option>
+                  <option value='device'>Device</option>
+                  <option value='container'>Container</option>
+                  <option value='framework'>Framework</option>
                 </Select>
               </FormControl>
               <FormControl>
@@ -232,7 +310,7 @@ function ComponentDrawer(props) {
               Cancel
             </Button>
             <Button colorScheme='blue' type='submit'>
-              Save
+              {component === '' ? 'Save' : 'Update'}
             </Button>
           </DrawerFooter>
         </DrawerContent>

@@ -583,6 +583,7 @@ export const GetSBOM = gql`
       id
       cpes
       spec
+      purl
       creationAt
       updatedAt
       specVersion
@@ -615,6 +616,22 @@ export const GetSBOM = gql`
         updatedAt
         uniqueId
         kind
+      }
+    }
+  }
+`
+
+export const GetProject = gql`
+  query getProject($id: ID!) {
+    project(id: $id) {
+      id
+      name
+      sboms {
+        id
+        components {
+          primary
+          version
+        }
       }
     }
   }

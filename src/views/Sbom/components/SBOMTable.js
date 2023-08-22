@@ -33,7 +33,7 @@ import { AddIcon, PlusSquareIcon } from '@chakra-ui/icons'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import { timeSince } from 'utils'
 
-const SBOMTable = ({ title, captions, data, vulData }) => {
+const SBOMTable = ({ title, captions, data, refetch }) => {
   const { SBOMLinksData } = useContext(GlobalContext)
   const textColor = useColorModeValue('gray.700', 'white')
 
@@ -62,12 +62,12 @@ const SBOMTable = ({ title, captions, data, vulData }) => {
   const [license, setLicense] = useState(data.licenses)
 
   const [generalData, setGeneralData] = useState({
-    createdAt: timeSince(data.creationAt),
+    createdAt: data.creationAt,
     lastUpdatedAt: timeSince(data.updatedAt),
-    license: 'MIT',
-    cpe: 'CPEXYZ123',
-    purl: 'PURLABCDEF',
-    swid: '',
+    licenses: data.licenses,
+    cpes: data.cpes,
+    purl: data.purl ? data.purl : '',
+    swid: data.spec,
     md5: 'ABCDEFGHI',
     sha: '23434354443'
   })
@@ -180,7 +180,7 @@ const SBOMTable = ({ title, captions, data, vulData }) => {
                   </Flex>
                 </CardHeader>
               )}
-              <CardBody>
+              <CardBody overflowX={'scroll'}>
                 <Table variant='simple' color={textColor} size='sm'>
                   <Thead>
                     <Tr my='.8rem' pl='0px'>
@@ -198,6 +198,9 @@ const SBOMTable = ({ title, captions, data, vulData }) => {
                       return (
                         <SBOMComponentRow
                           key={index}
+                          id={row.id}
+                          type={row.kind}
+                          sbomId={data.id}
                           component={row.name}
                           version={row.version}
                           purl={row.purl}
@@ -205,6 +208,7 @@ const SBOMTable = ({ title, captions, data, vulData }) => {
                           cpes={row.cpes}
                           updatedAt={row.updatedAt}
                           uniqueId={row.uniqueId}
+                          refetch={refetch}
                         />
                       )
                     })}
@@ -233,14 +237,20 @@ const SBOMTable = ({ title, captions, data, vulData }) => {
         setLicense={setLicense}
       />
 
-      <ComponentDrawer
-        isOpen={isCompOpen}
-        onClose={onCompClose}
-        btnRef={compBtn}
-        component={''}
-        version={''}
-        license={''}
-      />
+      {isCompOpen && data && (
+        <ComponentDrawer
+          isOpen={isCompOpen}
+          onClose={onCompClose}
+          btnRef={compBtn}
+          component={''}
+          version={''}
+          license={''}
+          type={''}
+          cpes={[]}
+          purl={''}
+          refetch={refetch}
+        />
+      )}
     </>
   )
 }
