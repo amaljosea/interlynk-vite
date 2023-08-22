@@ -17,48 +17,33 @@ import {
   ModalBody,
   ModalCloseButton
 } from '@chakra-ui/react'
+import GlobalContext from 'context/GlobalContext'
 import { UploadSbom } from 'graphQL/Mutation'
-import { useEffect, useState } from 'react'
+import { useEffect, useContext } from 'react'
 import { FaUpload } from 'react-icons/fa'
 
 const UploadModal = ({ id, isOpen, onClose, fetchProjects }) => {
   const toast = useToast()
+  const { setSbomFile } = useContext(GlobalContext)
   const [sbomUpload, { data, loading, error }] = useMutation(UploadSbom)
 
-  const uploadData = async (e) => {
-    console.log(e)
+  const handleFileChange = async (event) => {
     try {
       await sbomUpload({
         variables: {
-          doc: e,
+          doc: event.target.files[0],
           projectId: id
         }
-      }).then((res) => {
-        if (res.data.sbomUpload.errors === '[]') {
-          toast({
-            description: 'Data uploaded successfully',
-            status: 'success',
-            duration: 9000,
-            isClosable: true,
-            position: 'top'
-          })
-        } else {
-          toast({
-            description: 'Upload failed !',
-            status: 'error',
-            duration: 9000,
-            isClosable: true,
-            position: 'top'
-          })
-        }
       })
+        .then((res) => {
+          if (res.data.sbomUpload.errors === '[]') {
+            setSbomFile(res.data.sbomUpload.errors)
+          }
+        })
+        .finally(() => onClose())
     } catch (error) {
       console.error('Mutation error:', error)
     }
-  }
-
-  const handleFileChange = (event) => {
-    uploadData(event.target.files[0])
   }
 
   useEffect(() => {

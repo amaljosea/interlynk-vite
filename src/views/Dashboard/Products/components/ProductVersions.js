@@ -41,7 +41,7 @@ const ProductVersions = ({
             </Tr>
           </Thead>
           <Tbody>
-            {allProjects.projects.nodes.length >= 1 &&
+            {allProjects.projects.nodes.length > 0 &&
               allProjects.projects.nodes.map((pv, index) => {
                 return (
                   <ProductVersionsRow

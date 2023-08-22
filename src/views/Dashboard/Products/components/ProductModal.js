@@ -93,7 +93,7 @@ const ProductModal = ({
         <ModalOverlay />
 
         <ModalContent>
-          <ModalHeader>{productName ? 'Update' : 'Add'} Product</ModalHeader>
+          <ModalHeader>{product ? 'Update' : 'Add'} Product</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <Flex width={'100%'} direction={'column'} gap={4}>

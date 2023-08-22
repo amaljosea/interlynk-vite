@@ -15,7 +15,7 @@ const GeneralDataRow = ({
 
   const customerView = location.pathname.startsWith('/sharelynk')
 
-  const { createdAt, lastUpdatedAt, cpe, purl, swid, md5, sha } = data
+  const { createdAt, lastUpdatedAt, cpes, purl, swid, md5, sha } = data
 
   const handleClick = (ref) => {
     setSelectedKey(ref)
@@ -52,7 +52,20 @@ const GeneralDataRow = ({
         <Td pl={0} fontWeight={'medium'}>
           Created At
         </Td>
-        <Td pl={0}>{createdAt}</Td>
+        <Td pl={0}>
+          {new Date(createdAt).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            timeZone: 'America/Los_Angeles'
+          })}{' '}
+          {new Date(createdAt).toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true,
+            timeZone: 'America/Los_Angeles'
+          })}
+        </Td>
         <Td pl={0}></Td>
       </Tr>
       <Tr>
@@ -156,7 +169,11 @@ const GeneralDataRow = ({
         </Td>
         <Td pl={0}>
           <Flex mt={2} flexDir={'column'} alignItems={'self-start'} gap={2}>
-            <Text>{cpe}</Text>
+            <Flex flexDirection={'row'} alignItems={'center'} gap={4}>
+              {cpes.length > 0
+                ? cpes.map((item, index) => <Text key={index}>{item}</Text>)
+                : ''}
+            </Flex>
             <Text>{purl}</Text>
             <Text>{swid}</Text>
           </Flex>

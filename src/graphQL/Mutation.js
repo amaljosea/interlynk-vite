@@ -404,8 +404,84 @@ export const DeleteProject = gql`
 `
 
 export const UploadSbom = gql`
-  mutation uploadSbom($doc: Upload!, $projectId: ID!) {
+  mutation UploadSbom($doc: Upload!, $projectId: ID!) {
     sbomUpload(input: { doc: $doc, projectId: $projectId }) {
+      errors
+    }
+  }
+`
+
+export const CreateComponent = gql`
+  mutation CreateComponent(
+    $id: Uuid!
+    $kind: String!
+    $name: String!
+    $version: String
+    $licenses: [String!]
+    $cpes: [String!]
+    $purl: String
+  ) {
+    componentCreate(
+      input: {
+        sbomId: $id
+        kind: $kind
+        name: $name
+        version: $version
+        licenses: $licenses
+        cpes: $cpes
+        purl: $purl
+      }
+    ) {
+      component {
+        id
+        name
+        version
+        primary
+        internal
+        purl
+        cpes
+      }
+      errors
+    }
+  }
+`
+
+export const UpdateComponent = gql`
+  mutation UpdateComponent(
+    $id: Uuid!
+    $kind: String
+    $name: String
+    $licenses: [String!]
+    $cpes: [String!]
+    $purl: String
+  ) {
+    componentUpdate(
+      input: {
+        id: $id
+        kind: $kind
+        name: $name
+        licenses: $licenses
+        cpes: $cpes
+        purl: $purl
+      }
+    ) {
+      component {
+        id
+        name
+        version
+        primary
+        internal
+        purl
+        cpes
+      }
+      errors
+    }
+  }
+`
+
+export const DeleteComponent = gql`
+  mutation DeleteComponent($id: Uuid!) {
+    componentDelete(input: { id: $id }) {
       errors
     }
   }

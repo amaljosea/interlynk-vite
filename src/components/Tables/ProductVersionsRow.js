@@ -61,6 +61,8 @@ function ProductVersionsRow(props) {
     }
   }
 
+  console.log(`sbomId`, sbomId)
+
   return (
     <>
       <Tr>
@@ -75,7 +77,12 @@ function ProductVersionsRow(props) {
               </Text>
             </Link>
           ) : (
-            <Text color={'blue.500'} minWidth='100%'>
+            <Text
+              color={'blue.500'}
+              minWidth='100%'
+              onClick={() => window.location.reload()}
+              cursor={'pointer'}
+            >
               {name}
             </Text>
           )}
