@@ -595,14 +595,19 @@ export const GetSBOM = gql`
         id
         name
         version
+        updatedAt
       }
       authors {
+        id
         name
         email
+        updatedAt
       }
       suppliers {
+        id
         name
         email
+        updatedAt
       }
       components {
         id

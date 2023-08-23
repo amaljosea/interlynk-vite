@@ -27,6 +27,9 @@ function SBOMComponentRow(props) {
     updatedAt,
     cpes,
     type,
+    primary,
+    internal,
+    suppliers,
     refetch
   } = props
   const location = useLocation()
@@ -51,13 +54,13 @@ function SBOMComponentRow(props) {
 
   return (
     <Tr>
-      <Td width={'350px'} pl='0px'>
+      <Td pl='0px'>
         <Box py='.8rem'>{component}</Box>
       </Td>
-      <Td width={'300px'}>
+      <Td>
         <Box>{version}</Box>
       </Td>
-      <Td width={'250px'}>{purl}</Td>
+      <Td>{purl}</Td>
       <Td>
         {cpes.length > 0 &&
           cpes.map((item, i) => (
@@ -108,6 +111,9 @@ function SBOMComponentRow(props) {
             refetch={refetch}
             cpes={cpes}
             purl={purl}
+            primary={primary}
+            internal={internal}
+            suppliers={suppliers}
           />
         )}
 

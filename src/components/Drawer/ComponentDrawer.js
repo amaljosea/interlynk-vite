@@ -21,6 +21,8 @@ import { useMutation } from '@apollo/client'
 import { CreateComponent } from 'graphQL/Mutation'
 import { UpdateComponent } from 'graphQL/Mutation'
 import { useLocation } from 'react-router-dom'
+import { supplierCreate } from 'graphQL/Mutation'
+import { supplierUpdate } from 'graphQL/Mutation'
 
 function ComponentDrawer(props) {
   const location = useLocation()
@@ -40,11 +42,19 @@ function ComponentDrawer(props) {
     type,
     cpes,
     purl,
+    primary,
+    internal,
+    suppliers,
     refetch
   } = props
 
+  // console.log(`id`, id)
+
   const [createComponent] = useMutation(CreateComponent)
   const [updateComponent] = useMutation(UpdateComponent)
+
+  const [createSupplier] = useMutation(supplierCreate)
+  const [updateSupplier] = useMutation(supplierUpdate)
 
   const [compId, setCompId] = useState('')
   const [compName, setCompName] = useState('')
@@ -54,9 +64,13 @@ function ComponentDrawer(props) {
   const [selectedLicense, setSelectedLicense] = useState('')
   const [supName, setSupName] = useState('')
   const [supEmail, setSupEmail] = useState('')
-  const [supOrg, setSupOrg] = useState('')
+
   const [cpeValue, setCpeValue] = useState('')
   const [purlValue, setPurlValue] = useState('')
+
+  const [isIncomplete, setIsIncomplete] = useState(false)
+  const [isPrimary, setIsPrimary] = useState(primary)
+  const [isInternal, setIsInternal] = useState(internal)
 
   const licensOptions = [
     {
@@ -96,6 +110,8 @@ function ComponentDrawer(props) {
     }
   ]
 
+  // console.log(`isPrimary`, isPrimary)
+
   useEffect(() => {
     setCompId(id)
     setCompName(component)
@@ -104,6 +120,10 @@ function ComponentDrawer(props) {
     setSelectedLicense(license[0])
     setCpeValue(cpes[0])
     setPurlValue(purl)
+    if (suppliers && suppliers.length > 0) {
+      setSupName(suppliers[0].name)
+      setSupEmail(suppliers[0].email)
+    }
   }, [component])
 
   useEffect(() => {
@@ -115,56 +135,83 @@ function ComponentDrawer(props) {
     }
   }, [license])
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    if (component === '') {
-      try {
-        await createComponent({
-          variables: {
-            id: sbomId,
-            kind: compType,
-            name: compName,
-            version: compVersion,
-            licenses:
-              selectedLicense === 'Custom' ? licenseName : selectedLicense,
-            cpes: cpeValue,
-            purl: purlValue
-          }
-        })
-          .then(() =>
-            refetch({
-              projectId: productId,
-              sbomId: sbomId
-            })
-          )
-          .finally(() => onClose())
-      } catch (error) {
-        console.error('Mutation error:', error)
+  const createSup = async () => {
+    if (supName || supEmail) {
+      await createSupplier({
+        variables: {
+          name: supName,
+          email: supEmail,
+          sbomId: sbomId
+        }
+      })
+    }
+  }
+
+  const updateSup = async () => {
+    await updateSupplier({
+      variables: {
+        name: supName,
+        email: supEmail,
+        supplierId: suppliers[0].id
       }
-    } else {
-      try {
-        await updateComponent({
-          variables: {
-            id: id,
-            kind: compType,
-            name: compName,
-            version: compVersion,
-            licenses:
-              selectedLicense === 'Custom' ? licenseName : selectedLicense,
-            cpes: cpeValue,
-            purl: purlValue
-          }
+    })
+  }
+
+  const handleSave = async () => {
+    try {
+      await createComponent({
+        variables: {
+          id: sbomId,
+          kind: compType,
+          name: compName,
+          version: compVersion,
+          licenses: [
+            selectedLicense === 'Custom' ? licenseName : selectedLicense
+          ],
+          cpes: [cpeValue],
+          purl: purlValue,
+          primary: isPrimary,
+          internal: isInternal
+        }
+      })
+        .then(() => createSup())
+        .finally(() => {
+          refetch({
+            projectId: productId,
+            sbomId: sbomId
+          })
+          onClose()
         })
-          .then(() =>
-            refetch({
-              projectId: productId,
-              sbomId: sbomId
-            })
-          )
-          .finally(() => onClose())
-      } catch (error) {
-        console.error('Mutation error:', error)
-      }
+    } catch (error) {
+      console.error('Mutation error:', error)
+    }
+  }
+
+  const handleUpdate = async () => {
+    try {
+      await updateComponent({
+        variables: {
+          id: id,
+          kind: compType,
+          name: compName,
+          version: compVersion,
+          licenses: [
+            selectedLicense === 'Custom' ? licenseName : selectedLicense
+          ],
+          cpes: [cpeValue],
+          purl: purlValue,
+          primary: isPrimary,
+          internal: isInternal
+        }
+      }).then(() => {
+        refetch({
+          projectId: productId,
+          sbomId: sbomId
+        })
+        onClose()
+      })
+    } catch (error) {
+      console.error('Mutation error:', error)
     }
   }
 
@@ -177,144 +224,166 @@ function ComponentDrawer(props) {
       size='md'
     >
       <DrawerOverlay />
-      <form onSubmit={handleSubmit}>
-        <DrawerContent>
-          <DrawerCloseButton />
-          <DrawerHeader borderBottomWidth='1px' color='gray.600'>
-            Component
-          </DrawerHeader>
-          <DrawerBody>
-            <Stack direction={'column'} spacing={4}>
-              <FormControl isRequired>
-                <FormLabel fontSize={'sm'}>Name</FormLabel>
+      <DrawerContent>
+        <DrawerCloseButton />
+        <DrawerHeader borderBottomWidth='1px' color='gray.600'>
+          Component
+        </DrawerHeader>
+        <DrawerBody>
+          <Stack direction={'column'} spacing={4}>
+            <FormControl isRequired>
+              <FormLabel fontSize={'sm'}>Name</FormLabel>
+              <Input
+                size='sm'
+                placeholder='Enter name'
+                value={compName}
+                onChange={(e) => setCompName(e.target.value)}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel fontSize={'sm'}>Version</FormLabel>
+              <Input
+                size='sm'
+                placeholder='Enter version'
+                value={compVersion}
+                onChange={(e) => setCompVersion(e.target.value)}
+              />
+            </FormControl>
+            <FormControl isRequired>
+              <FormLabel fontSize={'sm'}>Type</FormLabel>
+              <Select
+                id='type'
+                name='type'
+                size='sm'
+                value={compType}
+                onChange={(e) => setCompType(e.target.value)}
+              >
+                <option value=''>-- Select --</option>
+                <option value='required'>Required</option>
+                <option value='unknown'>Unknown</option>
+                <option value='library'>Library</option>
+                <option value='operating_system'>Operating system</option>
+                <option value='firmware'>Firmware</option>
+                <option value='file'>File</option>
+                <option value='device'>Device</option>
+                <option value='container'>Container</option>
+                <option value='framework'>Framework</option>
+              </Select>
+            </FormControl>
+            <FormControl>
+              <FormLabel fontSize={'sm'}>Supplier</FormLabel>
+              <Stack spacing={2}>
                 <Input
                   size='sm'
-                  placeholder='Enter name'
-                  value={compName}
-                  onChange={(e) => setCompName(e.target.value)}
+                  placeholder='Name'
+                  value={supName}
+                  onChange={(e) => setSupName(e.target.value)}
                 />
-              </FormControl>
-              <FormControl>
-                <FormLabel fontSize={'sm'}>Version</FormLabel>
                 <Input
                   size='sm'
-                  placeholder='Enter version'
-                  value={compVersion}
-                  onChange={(e) => setCompVersion(e.target.value)}
+                  placeholder='Email'
+                  value={supEmail}
+                  onChange={(e) => setSupEmail(e.target.value)}
+                />
+              </Stack>
+            </FormControl>
+            <FormControl>
+              <FormLabel fontSize={'sm'}>License</FormLabel>
+              <Select
+                size='sm'
+                // isDisabled={licenseName !== ''}
+                name='license'
+                id='license'
+                value={selectedLicense}
+                onChange={(e) => setSelectedLicense(e.target.value)}
+              >
+                {licensOptions.map((item) => (
+                  <option key={item.id} value={item.value}>
+                    {item.label}
+                  </option>
+                ))}
+              </Select>
+            </FormControl>
+            {selectedLicense === 'Custom' && (
+              <FormControl>
+                <Input
+                  size='sm'
+                  placeholder='Enter a valid SPDX license'
+                  value={licenseName}
+                  onChange={(e) => setLicenseName(e.target.value)}
                 />
               </FormControl>
-              <FormControl isRequired>
-                <FormLabel fontSize={'sm'}>Type</FormLabel>
-                <Select
-                  id='type'
-                  name='type'
+            )}
+            <FormControl>
+              <FormLabel fontSize={'sm'}>Identifiers</FormLabel>
+              <Stack spacing={2}>
+                <Input
                   size='sm'
-                  value={compType}
-                  onChange={(e) => setCompType(e.target.value)}
-                >
-                  <option value=''>-- Select --</option>
-                  <option value='required'>Required</option>
-                  <option value='unknown'>Unknown</option>
-                  <option value='library'>Library</option>
-                  <option value='operating_system'>Operating system</option>
-                  <option value='firmware'>Firmware</option>
-                  <option value='file'>File</option>
-                  <option value='device'>Device</option>
-                  <option value='container'>Container</option>
-                  <option value='framework'>Framework</option>
-                </Select>
-              </FormControl>
-              <FormControl>
-                <FormLabel fontSize={'sm'}>Supplier</FormLabel>
-                <Stack spacing={2}>
-                  <Input
-                    size='sm'
-                    placeholder='Name'
-                    value={supName}
-                    onChange={(e) => setSupName(e.target.value)}
-                  />
-                  <Input
-                    size='sm'
-                    placeholder='Email'
-                    value={supEmail}
-                    onChange={(e) => setSupEmail(e.target.value)}
-                  />
-                  <Input
-                    size='sm'
-                    placeholder='Organization'
-                    value={supOrg}
-                    onChange={(e) => setSupOrg(e.target.value)}
-                  />
-                </Stack>
-              </FormControl>
-              <FormControl>
-                <FormLabel fontSize={'sm'}>License</FormLabel>
-                <Select
+                  placeholder='CPE'
+                  value={cpeValue}
+                  onChange={(e) => setCpeValue(e.target.value)}
+                />
+                <Input
                   size='sm'
-                  // isDisabled={licenseName !== ''}
-                  name='license'
-                  id='license'
-                  value={selectedLicense}
-                  onChange={(e) => setSelectedLicense(e.target.value)}
-                >
-                  {licensOptions.map((item) => (
-                    <option key={item.id} value={item.value}>
-                      {item.label}
-                    </option>
-                  ))}
-                </Select>
-              </FormControl>
-              {selectedLicense === 'Custom' && (
-                <FormControl>
-                  <Input
-                    size='sm'
-                    placeholder='Enter a valid SPDX license'
-                    value={licenseName}
-                    onChange={(e) => setLicenseName(e.target.value)}
-                  />
-                </FormControl>
-              )}
+                  placeholder='PURL'
+                  value={purlValue}
+                  onChange={(e) => setPurlValue(e.target.value)}
+                />
+              </Stack>
+            </FormControl>
+            {(!component || !version) && (
               <FormControl>
-                <FormLabel fontSize={'sm'}>Identifiers</FormLabel>
-                <Stack spacing={2}>
-                  <Input
-                    size='sm'
-                    placeholder='CPE'
-                    value={cpeValue}
-                    onChange={(e) => setCpeValue(e.target.value)}
-                  />
-                  <Input
-                    size='sm'
-                    placeholder='PURL'
-                    value={purlValue}
-                    onChange={(e) => setPurlValue(e.target.value)}
-                  />
-                </Stack>
+                <Checkbox
+                  mt='10px'
+                  size='sm'
+                  colorScheme='blue'
+                  color='gray.500'
+                  isChecked={isIncomplete}
+                  onChange={() => setIsIncomplete(!isIncomplete)}
+                >
+                  Incomplete third party component
+                </Checkbox>
               </FormControl>
-              {(!component || !version) && (
-                <FormControl>
-                  <Checkbox
-                    mt='10px'
-                    size='sm'
-                    colorScheme='blue'
-                    color='gray.500'
-                  >
-                    Incomplete third party component
-                  </Checkbox>
-                </FormControl>
-              )}
-            </Stack>
-          </DrawerBody>
-          <DrawerFooter borderTopWidth='1px'>
-            <Button variant='outline' mr={3} onClick={onClose}>
-              Cancel
+            )}
+
+            <Checkbox
+              size='sm'
+              colorScheme='blue'
+              color='gray.500'
+              isChecked={isPrimary}
+              onChange={(prev) => setIsPrimary(!isPrimary)}
+            >
+              Primary component
+            </Checkbox>
+
+            <FormControl>
+              <Checkbox
+                size='sm'
+                colorScheme='blue'
+                color='gray.500'
+                isChecked={isInternal}
+                onChange={() => setIsInternal(!isInternal)}
+              >
+                Internal component
+              </Checkbox>
+            </FormControl>
+          </Stack>
+        </DrawerBody>
+        <DrawerFooter borderTopWidth='1px'>
+          <Button variant='outline' mr={3} onClick={onClose}>
+            Cancel
+          </Button>
+          {id === undefined ? (
+            <Button colorScheme='blue' onClick={handleSave}>
+              Save
             </Button>
-            <Button colorScheme='blue' type='submit'>
-              {component === '' ? 'Save' : 'Update'}
+          ) : (
+            <Button colorScheme='blue' onClick={handleUpdate}>
+              Update
             </Button>
-          </DrawerFooter>
-        </DrawerContent>
-      </form>
+          )}
+        </DrawerFooter>
+      </DrawerContent>
     </Drawer>
   )
 }

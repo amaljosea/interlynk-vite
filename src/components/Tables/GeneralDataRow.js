@@ -1,21 +1,24 @@
 import { EditIcon } from '@chakra-ui/icons'
 import { Flex, Icon, Td, Text, Tr } from '@chakra-ui/react'
 import { useLocation } from 'react-router-dom'
+import { timeSince } from 'utils'
 
-const GeneralDataRow = ({
-  onOpen,
-  data,
-  setSelectedKey,
-  tools,
-  authors,
-  suppliers,
-  license
-}) => {
+const GeneralDataRow = ({ onOpen, data, setSelectedKey }) => {
   const location = useLocation()
 
   const customerView = location.pathname.startsWith('/sharelynk')
 
-  const { createdAt, lastUpdatedAt, cpes, purl, swid, md5, sha } = data
+  const {
+    creationAt,
+    updatedAt,
+    cpes,
+    purl,
+    swid,
+    tools,
+    authors,
+    licenses,
+    suppliers
+  } = data
 
   const handleClick = (ref) => {
     setSelectedKey(ref)
@@ -29,12 +32,13 @@ const GeneralDataRow = ({
           Creation Tool(s)
         </Td>
         <Td pl={0}>
-          <Flex flexDirection={'column'} alignItems={'flex-start'} gap={4}>
-            {tools.map((item, index) => (
-              <Text pl={0} fontSize={'sm'} key={index}>
-                {item.name}-{item.version} {`(Interlynk Inc)`}
-              </Text>
-            ))}
+          <Flex flexDirection={'column'} alignItems={'flex-start'} gap={2.5}>
+            {tools &&
+              tools.map((item, index) => (
+                <Text pl={0} fontSize={'sm'} key={index}>
+                  {item.name} - {item.version} - {`(Interlynk Inc)`}
+                </Text>
+              ))}
           </Flex>
         </Td>
         <Td pl={0}>
@@ -53,13 +57,13 @@ const GeneralDataRow = ({
           Created At
         </Td>
         <Td pl={0}>
-          {new Date(createdAt).toLocaleDateString('en-US', {
+          {new Date(creationAt).toLocaleDateString('en-US', {
             year: 'numeric',
             month: '2-digit',
             day: '2-digit',
             timeZone: 'America/Los_Angeles'
           })}{' '}
-          {new Date(createdAt).toLocaleTimeString('en-US', {
+          {new Date(creationAt).toLocaleTimeString('en-US', {
             hour: 'numeric',
             minute: '2-digit',
             hour12: true,
@@ -72,7 +76,7 @@ const GeneralDataRow = ({
         <Td pl={0} fontWeight={'medium'}>
           Updated At
         </Td>
-        <Td pl={0}>{lastUpdatedAt}</Td>
+        <Td pl={0}>{timeSince(updatedAt)}</Td>
         <Td pl={0}></Td>
       </Tr>
       <Tr>
@@ -80,20 +84,14 @@ const GeneralDataRow = ({
           Author(s)
         </Td>
         <Td pl={0}>
-          <Flex flexDirection={'column'} alignItems={'flex-start'} gap={4}>
-            {authors.map((item, index) => (
-              <Flex key={index} flexDir={'row'} alignItems={'center'} gap={4}>
-                <Text pl={0} fontSize={'sm'}>
-                  {item.name ? item.name : ''}
+          <Flex flexDirection={'column'} alignItems={'flex-start'} gap={3}>
+            {authors &&
+              authors.length > 0 &&
+              authors.map((item, index) => (
+                <Text pl={0} fontSize={'sm'} key={index}>
+                  {item.name} - {item.email} - {`(Interlynk Inc)`}
                 </Text>
-                <Text pl={0} fontSize={'sm'}>
-                  {item.email ? item.email : ''}
-                </Text>
-                <Text pl={0} fontSize={'sm'}>
-                  {item.organization ? `(${item.organization})` : ''}
-                </Text>
-              </Flex>
-            ))}
+              ))}
           </Flex>
         </Td>
         <Td pl={0}>
@@ -113,19 +111,12 @@ const GeneralDataRow = ({
         </Td>
         <Td pl={0}>
           <Flex flexDirection={'column'} alignItems={'flex-start'} gap={4}>
-            {suppliers.map((item, index) => (
-              <Flex key={index} flexDir={'row'} alignItems={'center'} gap={4}>
-                <Text pl={0} fontSize={'sm'}>
-                  {item.name ? item.name : ''}
+            {suppliers &&
+              suppliers.map((item, index) => (
+                <Text pl={0} fontSize={'sm'} key={index}>
+                  {item.name} - {item.email}
                 </Text>
-                <Text pl={0} fontSize={'sm'}>
-                  {item.email ? item.email : ''}
-                </Text>
-                <Text pl={0} fontSize={'sm'}>
-                  {item.organization ? `(${item.organization})` : ''}
-                </Text>
-              </Flex>
-            ))}
+              ))}
           </Flex>
         </Td>
         <Td pl={0}>
@@ -145,7 +136,7 @@ const GeneralDataRow = ({
         </Td>
         <Td pl={0}>
           <Flex flexDirection={'column'} alignItems={'flex-start'} gap={4}>
-            {license?.map((item, index) => (
+            {licenses?.map((item, index) => (
               <Text pl={0} fontSize={'sm'} key={index}>
                 {item.name}
               </Text>
@@ -195,8 +186,8 @@ const GeneralDataRow = ({
         </Td>
         <Td pl={0}>
           <Flex mt={2} flexDir={'column'} alignItems={'self-start'} gap={2}>
-            <Text>MD5: {md5}</Text>
-            <Text>SHA: {sha}</Text>
+            <Text>MD5: ABCDEFGHI</Text>
+            <Text>SHA: 23434354443</Text>
           </Flex>
         </Td>
         <Td pl={0}></Td>
