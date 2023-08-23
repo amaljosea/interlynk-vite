@@ -22,7 +22,7 @@ import { UploadSbom } from 'graphQL/Mutation'
 import { useEffect, useContext } from 'react'
 import { FaUpload } from 'react-icons/fa'
 
-const UploadModal = ({ id, isOpen, onClose, fetchProjects }) => {
+const UploadModal = ({ id, isOpen, onClose }) => {
   const toast = useToast()
   const { setSbomFile } = useContext(GlobalContext)
   const [sbomUpload, { data, loading, error }] = useMutation(UploadSbom)
@@ -91,7 +91,7 @@ const UploadModal = ({ id, isOpen, onClose, fetchProjects }) => {
               </Box>
             )}
           </ModalBody>
-          <ModalFooter>
+          {/* <ModalFooter>
             <Button
               colorScheme='blue'
               borderRadius={8}
@@ -103,7 +103,7 @@ const UploadModal = ({ id, isOpen, onClose, fetchProjects }) => {
             >
               Save
             </Button>
-          </ModalFooter>
+          </ModalFooter> */}
         </ModalContent>
       </Modal>
     </>
