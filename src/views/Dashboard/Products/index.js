@@ -70,19 +70,18 @@ function Index() {
     }
   }, [data])
 
-  useEffect(() => {
-    if (sbomFile !== '') {
-      getProjects({
-        variables: {
-          first: 10
-        }
-      })
-    }
-  }, [sbomFile])
+  const handleRefresh = async () => {
+    await getProjects({
+      variables: {
+        first: undefined,
+        last: 10
+      }
+    })
+  }
 
-  useEffect(() => {
-    console.log(`products`, projects)
-  }, [projects])
+  // useEffect(() => {
+  //   console.log(`products`, projects)
+  // }, [projects])
 
   const [filterData, setFilterData] = useState([])
   const [groupVersionData, setGroupVersionData] = useState([])
@@ -248,15 +247,19 @@ function Index() {
           <Spacer />
           <Stack direction='row' spacing={2}>
             {/* upload */}
-            {/* <FileUpload /> */}
+            <Button
+              colorScheme='blue'
+              variant='outline'
+              onClick={handleRefresh}
+            >
+              Refersh
+            </Button>
             <Button
               ref={btnRefProduct}
               onClick={onOpenProduct}
               leftIcon={<AddIcon />}
-              colorScheme='green'
-              size='sm'
+              colorScheme='blue'
               variant='solid'
-              borderRadius='6px'
             >
               Product
             </Button>

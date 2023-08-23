@@ -36,10 +36,18 @@ import { useEffect } from 'react'
 
 function ShareLynkDrawer(props) {
   const { setSBOMLinksData, productVersionsData } = useContext(GlobalContext)
-  const { isOpen, onClose, btnRef, uniqProjects, uniqVersions } = props
+  const {
+    isOpen,
+    onClose,
+    btnRef,
+    uniqProjects,
+    uniqVersions,
+    productName,
+    versionName
+  } = props
 
-  const [product, setProduct] = useState('dashboard-app')
-  const [version, setVersion] = useState('')
+  const [product, setProduct] = useState(productName)
+  const [version, setVersion] = useState(versionName)
   const [hasEmail, setHasEmail] = useState(true)
   const [hasTerms, setHasTerms] = useState(true)
   const [hasRedactions, setHasRedactions] = useState(true)
@@ -180,17 +188,11 @@ function ShareLynkDrawer(props) {
                 size='sm'
                 color='gray.500'
               >
-                {selectedVersion.length > 0
-                  ? selectedVersion.map((p) => (
-                      <option key={p} value={p}>
-                        {p}
-                      </option>
-                    ))
-                  : uniqVersions.map((p) => (
-                      <option key={p} value={p}>
-                        {p}
-                      </option>
-                    ))}
+                {uniqVersions.map((item, index) => (
+                  <option key={index} value={item.id} name={item.version}>
+                    {item.version}
+                  </option>
+                ))}
               </Select>
               <Text fontSize='md' mt='20px'>
                 LINK OPTIONS

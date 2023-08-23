@@ -420,6 +420,8 @@ export const CreateComponent = gql`
     $licenses: [String!]
     $cpes: [String!]
     $purl: String
+    $primary: Boolean
+    $internal: Boolean
   ) {
     componentCreate(
       input: {
@@ -430,6 +432,8 @@ export const CreateComponent = gql`
         licenses: $licenses
         cpes: $cpes
         purl: $purl
+        primary: $primary
+        internal: $internal
       }
     ) {
       component {
@@ -454,6 +458,8 @@ export const UpdateComponent = gql`
     $licenses: [String!]
     $cpes: [String!]
     $purl: String
+    $primary: Boolean
+    $internal: Boolean
   ) {
     componentUpdate(
       input: {
@@ -463,6 +469,8 @@ export const UpdateComponent = gql`
         licenses: $licenses
         cpes: $cpes
         purl: $purl
+        primary: $primary
+        internal: $internal
       }
     ) {
       component {
@@ -482,6 +490,156 @@ export const UpdateComponent = gql`
 export const DeleteComponent = gql`
   mutation DeleteComponent($id: Uuid!) {
     componentDelete(input: { id: $id }) {
+      errors
+    }
+  }
+`
+
+export const toolCreate = gql`
+  mutation toolCreate($name: String!, $sbomId: Uuid!, $version: String!) {
+    toolCreate(input: { name: $name, sbomId: $sbomId, version: $version }) {
+      tool {
+        id
+        name
+        version
+        updatedAt
+      }
+      errors
+    }
+  }
+`
+
+export const toolUpdate = gql`
+  mutation toolUpdate($toolId: ID!, $name: String, $version: String) {
+    toolUpdate(input: { toolId: $toolId, name: $name, version: $version }) {
+      tool {
+        id
+        name
+        version
+        updatedAt
+      }
+      errors
+    }
+  }
+`
+
+export const toolDelete = gql`
+  mutation toolDelete($toolId: Uuid!, $sbomId: Uuid!) {
+    toolDelete(input: { toolId: $toolId, sbomId: $sbomId }) {
+      tool {
+        id
+        name
+        version
+        updatedAt
+      }
+      errors
+    }
+  }
+`
+
+export const authorCreate = gql`
+  mutation authorCreate($name: String!, $email: String, $sbomId: Uuid!) {
+    authorCreate(input: { name: $name, email: $email, sbomId: $sbomId }) {
+      author {
+        id
+        name
+        email
+        updatedAt
+      }
+      errors
+    }
+  }
+`
+
+export const authorUpdate = gql`
+  mutation authorUpdate($authorId: Uuid!, $name: String, $email: String) {
+    authorUpdate(input: { authorId: $authorId, name: $name, email: $email }) {
+      author {
+        id
+        name
+        email
+        updatedAt
+      }
+      errors
+    }
+  }
+`
+
+export const authorDelete = gql`
+  mutation authorDelete($authorId: ID!, $sbomId: Uuid!) {
+    authorDelete(input: { authorId: $authorId, sbomId: $sbomId }) {
+      author {
+        id
+        name
+        email
+        updatedAt
+      }
+      errors
+    }
+  }
+`
+
+export const supplierCreate = gql`
+  mutation supplierCreate(
+    $name: String!
+    $email: String
+    $sbomId: Uuid!
+    $componentId: Uuid
+  ) {
+    supplierCreate(
+      input: {
+        name: $name
+        email: $email
+        sbomId: $sbomId
+        componentId: $componentId
+      }
+    ) {
+      supplier {
+        id
+        name
+        email
+        updatedAt
+      }
+      errors
+    }
+  }
+`
+
+export const supplierUpdate = gql`
+  mutation supplierUpdate($name: String, $email: String, $supplierId: Uuid!) {
+    supplierUpdate(
+      input: { name: $name, email: $email, supplierId: $supplierId }
+    ) {
+      supplier {
+        id
+        name
+        email
+        updatedAt
+      }
+      errors
+    }
+  }
+`
+
+export const supplierDelete = gql`
+  mutation supplierDelete(
+    $supplierId: ID!
+    $sbomId: Uuid!
+    $componentId: Uuid
+  ) {
+    supplierDelete(
+      input: {
+        supplierId: $supplierId
+        sbomId: $sbomId
+        componentId: $componentId
+      }
+    ) {
+      supplier {
+        id
+        name
+        email
+        updatedAt
+      }
       errors
     }
   }

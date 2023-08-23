@@ -61,7 +61,7 @@ function ProductVersionsRow(props) {
     }
   }
 
-  console.log(`sbomId`, sbomId)
+  // console.log(`sbomId`, sbomId)
 
   return (
     <>

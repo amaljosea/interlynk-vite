@@ -38,6 +38,23 @@ const UploadModal = ({ id, isOpen, onClose }) => {
         .then((res) => {
           if (res.data.sbomUpload.errors === '[]') {
             setSbomFile(res.data.sbomUpload.errors)
+            toast({
+              title: 'Data uploaded successfully',
+              description:
+                'Kindly consider refreshing the page after sometime, in order to verify the available data',
+              duration: 6000,
+              isClosable: true,
+              position: 'top',
+              variant: 'top-accent'
+            })
+          } else {
+            toast({
+              description: 'Upload failed !',
+              status: 'error',
+              duration: 4000,
+              isClosable: true,
+              position: 'top'
+            })
           }
         })
         .finally(() => onClose())

@@ -1,3 +1,4 @@
+import { useMutation } from '@apollo/client'
 import { DeleteIcon } from '@chakra-ui/icons'
 import {
   Drawer,
@@ -11,7 +12,6 @@ import {
   Button,
   Flex,
   Text,
-  FormLabel,
   FormControl,
   Thead,
   Tr,
@@ -22,7 +22,18 @@ import {
   Icon,
   Select
 } from '@chakra-ui/react'
+import { toolDelete } from 'graphQL/Mutation'
+import { authorUpdate } from 'graphQL/Mutation'
+import { supplierCreate } from 'graphQL/Mutation'
+import { supplierDelete } from 'graphQL/Mutation'
+import { supplierUpdate } from 'graphQL/Mutation'
+import { authorDelete } from 'graphQL/Mutation'
+import { authorCreate } from 'graphQL/Mutation'
+import { toolUpdate } from 'graphQL/Mutation'
+import { toolCreate } from 'graphQL/Mutation'
 import { useState, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
+import { timeSince } from 'utils'
 
 const GeneralDataDrawer = ({
   isOpen,
@@ -30,48 +41,53 @@ const GeneralDataDrawer = ({
   btnRef,
   data,
   selectedKey,
-  setGeneralData,
-  authors,
-  setAuthors,
-  suppliers,
-  setSuppliers,
-  tools,
-  setTools,
-  license,
-  setLicense
+  refetch
 }) => {
-  const { cpes, purl, swid, md5, sha } = data
+  const { cpes, purl, swid, tools, authors, licenses, suppliers } = data
+
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const productId = queryParams.get('p')
+  const sbomId = queryParams.get('sbom')
 
   const [toolName, setToolName] = useState('')
   const [toolVersion, setToolVersion] = useState('')
-  const [toolVendor, setToolVendor] = useState('')
 
   const [authorName, setAuthorName] = useState('')
-  const [orgName, setOrgName] = useState('')
   const [authorEmail, setAuthorEmail] = useState('')
 
   const [supName, setSupName] = useState('')
   const [supEmail, setSupEmail] = useState('')
-  const [supOrg, setSupOrg] = useState('')
 
   const [licenseName, setLicenseName] = useState('')
   const [selectedLicense, setSelectedLicense] = useState('')
+
   const [cpeValue, setCpeValue] = useState('')
   const [purlValue, setPurlValue] = useState('')
   const [swidValue, setSwidValue] = useState('')
-  const [MD5Value, setMD5Value] = useState('')
-  const [shaValue, setShaValue] = useState('')
 
   const [creationTools, setCreationTools] = useState([])
   const [authorList, setAuthorList] = useState([])
   const [supplierList, setSupplierList] = useState([])
   const [licenseList, setLicenseList] = useState([])
 
+  const [createTool] = useMutation(toolCreate)
+  const [updateTool] = useMutation(toolUpdate)
+  const [deleteTool] = useMutation(toolDelete)
+
+  const [createAuthor] = useMutation(authorCreate)
+  const [updateAuthor] = useMutation(authorUpdate)
+  const [deleteAuthor] = useMutation(authorDelete)
+
+  const [createSupplier] = useMutation(supplierCreate)
+  const [updateSupplier] = useMutation(supplierUpdate)
+  const [deleteSupplier] = useMutation(supplierDelete)
+
   useEffect(() => {
     setCreationTools(tools)
     setSupplierList(suppliers)
     setAuthorList(authors)
-    setLicenseList(license)
+    setLicenseList(licenses)
     if (cpes.length > 0) {
       setCpeValue(cpes[0])
     }
@@ -79,75 +95,114 @@ const GeneralDataDrawer = ({
     setSwidValue(swid)
   }, [data])
 
-  const handleAuthorAdd = () => {
-    if (authorName || authorEmail || orgName) {
-      setAuthorList((prev) => [
-        {
+  const handleAuthorAdd = async () => {
+    if (authorName || authorEmail) {
+      await createAuthor({
+        variables: {
           name: authorName,
           email: authorEmail,
-          organization: orgName
-        },
-        ...prev
-      ])
-      setAuthorName('')
-      setAuthorEmail('')
-      setOrgName('')
+          sbomId: sbomId
+        }
+      }).then((res) => {
+        if (res) {
+          console.log(`res`, res.data.authorCreate.author)
+          setAuthorList((prev) => [res.data.authorCreate.author, ...prev])
+          setAuthorName('')
+          setAuthorEmail('')
+        }
+      })
     } else {
       alert(`Please add atleast one value`)
     }
   }
 
-  const handleAuthorRemove = (author) => {
-    const updatedList = authorList.filter((item) => item.name !== author.name)
-    setAuthorList(updatedList)
+  const handleAuthorRemove = async (id) => {
+    try {
+      await deleteAuthor({
+        variables: {
+          authorId: id,
+          sbomId: sbomId
+        }
+      }).then(() => {
+        const updatedList = authors.filter((item) => item.id !== id)
+        console.log(`updatedList`, updatedList)
+        setAuthorList(updatedList)
+      })
+    } catch (error) {
+      console.log(`Mutation error`, error)
+    }
   }
 
-  const handleSupAdd = () => {
-    if (supName || supEmail || supOrg) {
-      setSupplierList((prev) => [
-        {
+  const handleSupAdd = async () => {
+    if (supName || supEmail) {
+      await createSupplier({
+        variables: {
           name: supName,
           email: supEmail,
-          organization: supOrg
-        },
-        ...prev
-      ])
-      setSupName('')
-      setSupEmail('')
-      setSupOrg('')
+          sbomId: sbomId
+        }
+      }).then((res) => {
+        if (res) {
+          setSupplierList((prev) => [res.data.supplierCreate.supplier, ...prev])
+          setSupName('')
+          setSupEmail('')
+        }
+      })
     } else {
       alert(`Please add atleast one value`)
     }
   }
 
-  const handleSupRemove = (supplier) => {
-    const updatedList = supplierList.filter(
-      (item) => item.name !== supplier.name
-    )
-    setSupplierList(updatedList)
+  const handleSupRemove = async (id) => {
+    try {
+      await deleteSupplier({
+        variables: {
+          supplierId: id,
+          sbomId: sbomId
+        }
+      }).then((res) => {
+        const updatedList = suppliers.filter((item) => item.id !== id)
+        setSupplierList(updatedList)
+      })
+    } catch (error) {
+      console.log(`Mutation error`, error)
+    }
   }
 
-  const handleToolAdd = () => {
-    if ((toolName && toolVersion) || toolVendor) {
-      setCreationTools((prev) => [
-        {
+  const handleToolAdd = async () => {
+    if (toolName && toolVersion) {
+      await createTool({
+        variables: {
           name: toolName,
           version: toolVersion,
-          vendor: toolVendor
-        },
-        ...prev
-      ])
-      setToolName('')
-      setToolVersion('')
-      setToolVendor('')
+          sbomId: sbomId
+        }
+      }).then((res) => {
+        if (res) {
+          setCreationTools((prev) => [res.data.toolCreate.tool, ...prev])
+          setToolName('')
+          setToolVersion('')
+        }
+      })
     } else {
       alert(`Please fill up required fields`)
     }
   }
 
-  const handleToolRemove = (tool) => {
-    const updatedList = creationTools.filter((item) => item.name !== tool.name)
-    setCreationTools(updatedList)
+  const handleToolRemove = async (id) => {
+    try {
+      await deleteTool({
+        variables: {
+          toolId: id,
+          sbomId: sbomId
+        }
+      }).then((res) => {
+        const updatedList = tools.filter((item) => item.id !== id)
+        setCreationTools(updatedList)
+      })
+    } catch (error) {
+      console.log(`Mutation error`, error)
+    }
   }
 
   const onLicenselAdd = () => {
@@ -174,29 +229,10 @@ const GeneralDataDrawer = ({
   }
 
   const handleSave = () => {
-    const result = { ...data }
-    if (creationTools) {
-      setTools(creationTools)
-    }
-    if (authorList) {
-      setAuthors(authorList)
-    }
-    if (supplierList) {
-      setSuppliers(supplierList)
-    }
-    if (licenseList) {
-      setLicense(licenseList)
-    }
-    if (cpeValue) {
-      result.cpe = cpeValue
-    }
-    if (purlValue) {
-      result.purl = purlValue
-    }
-    if (swidValue) {
-      result.swid = swidValue
-    }
-    setGeneralData(result)
+    refetch({
+      productId: productId,
+      sbomId: sbomId
+    })
     onClose()
   }
 
@@ -244,12 +280,6 @@ const GeneralDataDrawer = ({
                   onChange={(e) => setToolVersion(e.target.value)}
                 />
 
-                <Input
-                  placeholder='Vendor'
-                  value={toolVendor}
-                  onChange={(e) => setToolVendor(e.target.value)}
-                />
-
                 <Button colorScheme='blue' onClick={handleToolAdd}>
                   Add
                 </Button>
@@ -264,28 +294,28 @@ const GeneralDataDrawer = ({
                         <Tr my='.8rem'>
                           <Th pl={0}>Name</Th>
                           <Th pl={0}>Version</Th>
-                          <Th pl={0}>Vendor</Th>
+                          <Th pl={0}>Updated At</Th>
                           <Th pl={0}></Th>
                         </Tr>
                       </Thead>
                       <Tbody>
                         {creationTools.map((item, index) => (
                           <Tr key={index}>
-                            <Td pl={0} fontSize={'sm'}>
+                            <Td pl={0} fontSize={'xs'}>
                               {item.name}
                             </Td>
-                            <Td pl={0} fontSize={'sm'}>
+                            <Td pl={0} fontSize={'xs'}>
                               {item.version}
                             </Td>
-                            <Td pl={0} fontSize={'sm'}>
-                              {item.vendor ? item.vendor : 'Interlynk Inc'}
+                            <Td pl={0} fontSize={'xs'}>
+                              {timeSince(item.updatedAt)}
                             </Td>
                             <Td>
                               <Icon
                                 as={DeleteIcon}
                                 color={'red'}
                                 cursor={'pointer'}
-                                onClick={() => handleToolRemove(item)}
+                                onClick={() => handleToolRemove(item.id)}
                               />
                             </Td>
                           </Tr>
@@ -315,12 +345,6 @@ const GeneralDataDrawer = ({
                   onChange={(e) => setAuthorEmail(e.target.value)}
                 />
 
-                <Input
-                  placeholder='Organization'
-                  value={orgName}
-                  onChange={(e) => setOrgName(e.target.value)}
-                />
-
                 <Button colorScheme='blue' onClick={handleAuthorAdd}>
                   Add
                 </Button>
@@ -335,28 +359,28 @@ const GeneralDataDrawer = ({
                         <Tr my='.8rem'>
                           <Th pl={0}>Name</Th>
                           <Th pl={0}>Email</Th>
-                          <Th pl={0}>Organization</Th>
+                          <Th pl={0}>Updated At</Th>
                           <Th pl={0}></Th>
                         </Tr>
                       </Thead>
                       <Tbody>
                         {authorList.map((item, index) => (
                           <Tr key={index}>
-                            <Td pl={0} fontSize={'sm'}>
+                            <Td pl={0} fontSize={'xs'}>
                               {item.name}
                             </Td>
-                            <Td pl={0} fontSize={'sm'}>
+                            <Td pl={0} fontSize={'xs'}>
                               {item.email}
                             </Td>
-                            <Td pl={0} fontSize={'sm'}>
-                              {item.organization}
+                            <Td pl={0} fontSize={'xs'}>
+                              {timeSince(item.updatedAt)}
                             </Td>
                             <Td>
                               <Icon
                                 as={DeleteIcon}
                                 color={'red'}
                                 cursor={'pointer'}
-                                onClick={() => handleAuthorRemove(item)}
+                                onClick={() => handleAuthorRemove(item.id)}
                               />
                             </Td>
                           </Tr>
@@ -388,13 +412,6 @@ const GeneralDataDrawer = ({
                     onChange={(e) => setSupEmail(e.target.value)}
                   />
                 </FormControl>
-                <FormControl>
-                  <Input
-                    placeholder='Organization'
-                    value={supOrg}
-                    onChange={(e) => setSupOrg(e.target.value)}
-                  />
-                </FormControl>
 
                 <Button colorScheme='blue' onClick={handleSupAdd}>
                   Add
@@ -410,28 +427,28 @@ const GeneralDataDrawer = ({
                         <Tr my='.8rem'>
                           <Th pl={0}>Name</Th>
                           <Th pl={0}>Email</Th>
-                          <Th pl={0}>Organization</Th>
+                          <Th pl={0}>Updated At</Th>
                           <Th pl={0}></Th>
                         </Tr>
                       </Thead>
                       <Tbody>
                         {supplierList.map((item, index) => (
                           <Tr key={index}>
-                            <Td pl={0} fontSize={'sm'}>
+                            <Td pl={0} fontSize={'xs'}>
                               {item.name}
                             </Td>
-                            <Td pl={0} fontSize={'sm'}>
+                            <Td pl={0} fontSize={'xs'}>
                               {item.email}
                             </Td>
-                            <Td pl={0} fontSize={'sm'}>
-                              {item.organization}
+                            <Td pl={0} fontSize={'xs'}>
+                              {timeSince(item.updatedAt)}
                             </Td>
                             <Td>
                               <Icon
                                 as={DeleteIcon}
                                 color={'red'}
                                 cursor={'pointer'}
-                                onClick={() => handleSupRemove(item)}
+                                onClick={() => handleSupRemove(item.id)}
                               />
                             </Td>
                           </Tr>

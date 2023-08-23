@@ -29,7 +29,12 @@ const AdvisoryLog = ({
   return (
     <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
       <CardBody>
-        <Table variant='simple' color={textColor} size='sm'>
+        <Table
+          __css={{ 'table-layout': 'fixed', width: 'full' }}
+          variant='simple'
+          color={textColor}
+          size='sm'
+        >
           <Thead>
             <Tr my='.8rem' pl='0px'>
               {captions.map((caption, idx) => {

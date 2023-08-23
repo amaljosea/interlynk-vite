@@ -121,7 +121,7 @@ const ProductModal = ({
                   placeholder='Enter product description'
                 />
               </FormControl>
-              <FormControl>
+              <FormControl display='none'>
                 <FormLabel>Vendor</FormLabel>
                 <Input
                   type='text'
@@ -130,7 +130,7 @@ const ProductModal = ({
                   placeholder='Enter vendor name'
                 />
               </FormControl>
-              <FormControl>
+              <FormControl display='none'>
                 <FormLabel>Unique Identifier</FormLabel>
                 <Input
                   type='text'

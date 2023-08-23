@@ -33,7 +33,7 @@ import { AddIcon, PlusSquareIcon } from '@chakra-ui/icons'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import { timeSince } from 'utils'
 
-const SBOMTable = ({ title, captions, data, refetch }) => {
+const SBOMTable = ({ captions, data, refetch }) => {
   const { SBOMLinksData } = useContext(GlobalContext)
   const textColor = useColorModeValue('gray.700', 'white')
 
@@ -52,25 +52,6 @@ const SBOMTable = ({ title, captions, data, refetch }) => {
 
   const btnRef = useRef(null)
   const compBtn = useRef(null)
-
-  const [tools, setTools] = useState(data.tools)
-
-  const [authors, setAuthors] = useState(data.authors)
-
-  const [suppliers, setSuppliers] = useState(data.suppliers)
-
-  const [license, setLicense] = useState(data.licenses)
-
-  const [generalData, setGeneralData] = useState({
-    createdAt: data.creationAt,
-    lastUpdatedAt: timeSince(data.updatedAt),
-    licenses: data.licenses,
-    cpes: data.cpes,
-    purl: data.purl ? data.purl : '',
-    swid: data.spec,
-    md5: 'ABCDEFGHI',
-    sha: '23434354443'
-  })
 
   const [selectedKey, setSelectedKey] = useState('')
 
@@ -136,7 +117,12 @@ const SBOMTable = ({ title, captions, data, refetch }) => {
             {/* general */}
             <TabPanel>
               <CardBody>
-                <Table variant='simple' color={textColor} size='sm'>
+                <Table
+                  __css={{ 'table-layout': 'fixed', width: 'full' }}
+                  variant='simple'
+                  color={textColor}
+                  size='sm'
+                >
                   <Thead>
                     <Tr>
                       <Th></Th>
@@ -146,12 +132,8 @@ const SBOMTable = ({ title, captions, data, refetch }) => {
                   <Tbody>
                     <GeneralDataRow
                       onOpen={onOpen}
-                      data={generalData}
                       setSelectedKey={setSelectedKey}
-                      authors={authors}
-                      suppliers={suppliers}
-                      tools={tools}
-                      licenses={license}
+                      data={data}
                     />
                   </Tbody>
                 </Table>
@@ -181,7 +163,12 @@ const SBOMTable = ({ title, captions, data, refetch }) => {
                 </CardHeader>
               )}
               <CardBody overflowX={'scroll'}>
-                <Table variant='simple' color={textColor} size='sm'>
+                <Table
+                  __css={{ 'table-layout': 'fixed', width: 'full' }}
+                  variant='simple'
+                  color={textColor}
+                  size='sm'
+                >
                   <Thead>
                     <Tr my='.8rem' pl='0px'>
                       {captions.map((caption, idx) => {
@@ -205,10 +192,13 @@ const SBOMTable = ({ title, captions, data, refetch }) => {
                           version={row.version}
                           purl={row.purl}
                           licenses={row.licenses}
+                          primary={row.primary}
+                          internal={row.internal}
                           cpes={row.cpes}
                           updatedAt={row.updatedAt}
                           uniqueId={row.uniqueId}
                           refetch={refetch}
+                          suppliers={data.suppliers}
                         />
                       )
                     })}
@@ -220,22 +210,16 @@ const SBOMTable = ({ title, captions, data, refetch }) => {
         </Tabs>
       </Card>
 
-      <GeneralDataDrawer
-        isOpen={isOpen}
-        onClose={onClose}
-        btnRef={btnRef}
-        data={generalData}
-        setGeneralData={setGeneralData}
-        selectedKey={selectedKey}
-        authors={authors}
-        setAuthors={setAuthors}
-        suppliers={suppliers}
-        setSuppliers={setSuppliers}
-        tools={tools}
-        setTools={setTools}
-        license={license}
-        setLicense={setLicense}
-      />
+      {data && isOpen && (
+        <GeneralDataDrawer
+          isOpen={isOpen}
+          onClose={onClose}
+          btnRef={btnRef}
+          data={data}
+          selectedKey={selectedKey}
+          refetch={refetch}
+        />
+      )}
 
       {isCompOpen && data && (
         <ComponentDrawer
@@ -248,7 +232,10 @@ const SBOMTable = ({ title, captions, data, refetch }) => {
           type={''}
           cpes={[]}
           purl={''}
+          primary={false}
+          internal={false}
           refetch={refetch}
+          suppliers={null}
         />
       )}
     </>
