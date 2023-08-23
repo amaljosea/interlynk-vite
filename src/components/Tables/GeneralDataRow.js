@@ -29,7 +29,7 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey }) => {
     <>
       <Tr>
         <Td pl={0} fontWeight={'medium'}>
-          Creation Tools
+          Creation Tool(s)
         </Td>
         <Td pl={0}>
           <Flex flexDirection={'column'} alignItems={'flex-start'} gap={2.5}>
@@ -54,7 +54,7 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey }) => {
       </Tr>
       <Tr>
         <Td pl={0} fontWeight={'medium'}>
-          Create At
+          Created At
         </Td>
         <Td pl={0}>
           {new Date(creationAt).toLocaleDateString('en-US', {
@@ -74,14 +74,14 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey }) => {
       </Tr>
       <Tr>
         <Td pl={0} fontWeight={'medium'}>
-          Last Modified At
+          Updated At
         </Td>
         <Td pl={0}>{timeSince(updatedAt)}</Td>
         <Td pl={0}></Td>
       </Tr>
       <Tr>
         <Td pl={0} fontWeight={'medium'}>
-          Author's
+          Author(s)
         </Td>
         <Td pl={0}>
           <Flex flexDirection={'column'} alignItems={'flex-start'} gap={3}>
@@ -107,7 +107,7 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey }) => {
       </Tr>
       <Tr>
         <Td pl={0} fontWeight={'medium'}>
-          Supplier's
+          Supplier(s)
         </Td>
         <Td pl={0}>
           <Flex flexDirection={'column'} alignItems={'flex-start'} gap={4}>
@@ -132,7 +132,7 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey }) => {
       </Tr>
       <Tr>
         <Td pl={0} fontWeight={'medium'}>
-          Product License
+          License
         </Td>
         <Td pl={0}>
           <Flex flexDirection={'column'} alignItems={'flex-start'} gap={4}>
@@ -156,7 +156,7 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey }) => {
       </Tr>
       <Tr>
         <Td pl={0} fontWeight={'medium'}>
-          Identifier's
+          Identifier(s)
         </Td>
         <Td pl={0}>
           <Flex mt={2} flexDir={'column'} alignItems={'self-start'} gap={2}>
@@ -182,7 +182,7 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey }) => {
       </Tr>
       <Tr>
         <Td pl={0} fontWeight={'medium'}>
-          Hashe's
+          Hash(es)
         </Td>
         <Td pl={0}>
           <Flex mt={2} flexDir={'column'} alignItems={'self-start'} gap={2}>
@@ -194,7 +194,7 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey }) => {
       </Tr>
       <Tr>
         <Td pl={0} fontWeight={'medium'}>
-          Copyright
+          Copyright Text
         </Td>
         <Td pl={0}>Copyright Interlynk Inc 2023</Td>
       </Tr>
