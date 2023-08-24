@@ -198,7 +198,7 @@ const SBOMTable = ({ captions, data, refetch }) => {
                           updatedAt={row.updatedAt}
                           uniqueId={row.uniqueId}
                           refetch={refetch}
-                          suppliers={data.suppliers}
+                          suppliers={row.suppliers}
                         />
                       )
                     })}

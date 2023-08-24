@@ -15,14 +15,31 @@ import {
   FormLabel,
   Input,
   Select,
-  Checkbox
+  Checkbox,
+  Table,
+  Thead,
+  Th,
+  Tr,
+  Tbody,
+  Td,
+  Text,
+  Flex,
+  ListItem,
+  UnorderedList,
+  Box,
+  IconButton,
+  TagCloseButton,
+  TagLabel,
+  Tag,
+  Code
 } from '@chakra-ui/react'
 import { useMutation } from '@apollo/client'
 import { CreateComponent } from 'graphQL/Mutation'
 import { UpdateComponent } from 'graphQL/Mutation'
 import { useLocation } from 'react-router-dom'
-import { supplierCreate } from 'graphQL/Mutation'
-import { supplierUpdate } from 'graphQL/Mutation'
+import { licenseOptions } from 'variables/licenses'
+import { CloseIcon } from '@chakra-ui/icons'
+import { timeSince } from 'utils'
 
 function ComponentDrawer(props) {
   const location = useLocation()
@@ -53,62 +70,20 @@ function ComponentDrawer(props) {
   const [createComponent] = useMutation(CreateComponent)
   const [updateComponent] = useMutation(UpdateComponent)
 
-  const [createSupplier] = useMutation(supplierCreate)
-  const [updateSupplier] = useMutation(supplierUpdate)
-
   const [compId, setCompId] = useState('')
   const [compName, setCompName] = useState('')
   const [compVersion, setCompVersion] = useState('')
   const [compType, setCompType] = useState('')
   const [licenseName, setLicenseName] = useState('')
   const [selectedLicense, setSelectedLicense] = useState('')
-  const [supName, setSupName] = useState('')
-  const [supEmail, setSupEmail] = useState('')
 
+  const [cpeList, setCpeList] = useState([])
   const [cpeValue, setCpeValue] = useState('')
   const [purlValue, setPurlValue] = useState('')
 
   const [isIncomplete, setIsIncomplete] = useState(false)
   const [isPrimary, setIsPrimary] = useState(primary)
   const [isInternal, setIsInternal] = useState(internal)
-
-  const licensOptions = [
-    {
-      id: 1,
-      value: '',
-      label: '-- Select --'
-    },
-    {
-      id: 2,
-      value: 'Custom',
-      label: 'Custom'
-    },
-    {
-      id: 3,
-      value: 'AGPL-1.0-Only',
-      label: 'AGPL-1.0-Only'
-    },
-    {
-      id: 4,
-      value: 'AGPL-2.0-Only',
-      label: 'AGPL-2.0-Only'
-    },
-    {
-      id: 5,
-      value: 'MIT',
-      label: 'MIT'
-    },
-    {
-      id: 6,
-      value: 'BSD',
-      label: 'BSD'
-    },
-    {
-      id: 7,
-      value: 'LGPL-2.0',
-      label: 'LGPL-2.0'
-    }
-  ]
 
   // console.log(`isPrimary`, isPrimary)
 
@@ -118,44 +93,18 @@ function ComponentDrawer(props) {
     setCompVersion(version)
     setCompType(type)
     setSelectedLicense(license[0])
-    setCpeValue(cpes[0])
+    setCpeList(cpes)
     setPurlValue(purl)
-    if (suppliers && suppliers.length > 0) {
-      setSupName(suppliers[0].name)
-      setSupEmail(suppliers[0].email)
-    }
   }, [component])
 
   useEffect(() => {
-    const filterData = licensOptions.find((item) => item.value === license)
+    const filterData = licenseOptions.find((item) => item.licenseId === license)
     if (filterData) {
       setSelectedLicense(license)
     } else {
       setLicenseName(license)
     }
   }, [license])
-
-  const createSup = async () => {
-    if (supName || supEmail) {
-      await createSupplier({
-        variables: {
-          name: supName,
-          email: supEmail,
-          sbomId: sbomId
-        }
-      })
-    }
-  }
-
-  const updateSup = async () => {
-    await updateSupplier({
-      variables: {
-        name: supName,
-        email: supEmail,
-        supplierId: suppliers[0].id
-      }
-    })
-  }
 
   const handleSave = async () => {
     try {
@@ -168,20 +117,18 @@ function ComponentDrawer(props) {
           licenses: [
             selectedLicense === 'Custom' ? licenseName : selectedLicense
           ],
-          cpes: [cpeValue],
+          cpes: cpeList,
           purl: purlValue,
           primary: isPrimary,
           internal: isInternal
         }
-      })
-        .then(() => createSup())
-        .finally(() => {
-          refetch({
-            projectId: productId,
-            sbomId: sbomId
-          })
-          onClose()
+      }).then(() => {
+        refetch({
+          projectId: productId,
+          sbomId: sbomId
         })
+        onClose()
+      })
     } catch (error) {
       console.error('Mutation error:', error)
     }
@@ -198,7 +145,7 @@ function ComponentDrawer(props) {
           licenses: [
             selectedLicense === 'Custom' ? licenseName : selectedLicense
           ],
-          cpes: [cpeValue],
+          cpes: cpeList,
           purl: purlValue,
           primary: isPrimary,
           internal: isInternal
@@ -214,6 +161,20 @@ function ComponentDrawer(props) {
       console.error('Mutation error:', error)
     }
   }
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      setCpeList([...cpeList, cpeValue])
+      setCpeValue('')
+    }
+  }
+
+  const deleteCpe = (index) => {
+    const updatedItems = cpeList.filter((_, i) => i !== index)
+    setCpeList(updatedItems)
+  }
+
+  // console.log('cpeList', cpeList)
 
   return (
     <Drawer
@@ -249,6 +210,7 @@ function ComponentDrawer(props) {
                 onChange={(e) => setCompVersion(e.target.value)}
               />
             </FormControl>
+            {/* Kind */}
             <FormControl isRequired>
               <FormLabel fontSize={'sm'}>Type</FormLabel>
               <Select
@@ -270,36 +232,57 @@ function ComponentDrawer(props) {
                 <option value='framework'>Framework</option>
               </Select>
             </FormControl>
-            <FormControl>
-              <FormLabel fontSize={'sm'}>Supplier</FormLabel>
-              <Stack spacing={2}>
-                <Input
-                  size='sm'
-                  placeholder='Name'
-                  value={supName}
-                  onChange={(e) => setSupName(e.target.value)}
-                />
-                <Input
-                  size='sm'
-                  placeholder='Email'
-                  value={supEmail}
-                  onChange={(e) => setSupEmail(e.target.value)}
-                />
-              </Stack>
-            </FormControl>
+            {/* Suppliers */}
+            {id !== undefined && (
+              <Flex width={'100%'} flexDir={'column'}>
+                <Text size='md' my={2}>
+                  Suppliers List
+                </Text>
+                {suppliers.length > 0 ? (
+                  <Table variant='simple' size='sm' mt={2}>
+                    <Thead>
+                      <Tr my='.8rem'>
+                        <Th pl={0}>Name</Th>
+                        <Th pl={0}>Email</Th>
+                        <Th pl={0}>Updated At</Th>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {suppliers.map((item, index) => (
+                        <Tr key={index}>
+                          <Td pl={0} fontSize={'xs'}>
+                            {item.name}
+                          </Td>
+                          <Td pl={0} fontSize={'xs'}>
+                            {item.email}
+                          </Td>
+                          <Td pl={0} fontSize={'xs'}>
+                            {timeSince(item.updatedAt)}
+                          </Td>
+                        </Tr>
+                      ))}
+                    </Tbody>
+                  </Table>
+                ) : (
+                  <Text mt={2} color={'darkgrey'}>
+                    No suppliers specified
+                  </Text>
+                )}
+              </Flex>
+            )}
+            {/* Licenses */}
             <FormControl>
               <FormLabel fontSize={'sm'}>License</FormLabel>
               <Select
                 size='sm'
-                // isDisabled={licenseName !== ''}
                 name='license'
                 id='license'
                 value={selectedLicense}
                 onChange={(e) => setSelectedLicense(e.target.value)}
               >
-                {licensOptions.map((item) => (
-                  <option key={item.id} value={item.value}>
-                    {item.label}
+                {licenseOptions.map((item) => (
+                  <option key={item.licenseId} value={item.licenseId}>
+                    {item.name}
                   </option>
                 ))}
               </Select>
@@ -314,21 +297,52 @@ function ComponentDrawer(props) {
                 />
               </FormControl>
             )}
+            {/* Identifiers */}
             <FormControl>
               <FormLabel fontSize={'sm'}>Identifiers</FormLabel>
               <Stack spacing={2}>
-                <Input
-                  size='sm'
-                  placeholder='CPE'
-                  value={cpeValue}
-                  onChange={(e) => setCpeValue(e.target.value)}
-                />
                 <Input
                   size='sm'
                   placeholder='PURL'
                   value={purlValue}
                   onChange={(e) => setPurlValue(e.target.value)}
                 />
+
+                {/* CPE List */}
+                <Box>
+                  <Box mb={4}>
+                    <Input
+                      type='text'
+                      value={cpeValue}
+                      onChange={(e) => setCpeValue(e.target.value)}
+                      placeholder='CPE'
+                      onKeyDown={handleKeyDown}
+                    />
+                    <Text fontSize={'xs'} mt={2}>
+                      Press <Code>enter</Code> to add CPE's
+                    </Text>
+                  </Box>
+                  <Flex
+                    flexDirection={'row'}
+                    flexWrap={'wrap'}
+                    spacing={2}
+                    gap={2}
+                    mt={1}
+                  >
+                    {cpeList.map((item, index) => (
+                      <Tag
+                        size='sm'
+                        key={index}
+                        borderRadius='full'
+                        variant='solid'
+                        colorScheme={'blue'}
+                      >
+                        <TagLabel>{item}</TagLabel>
+                        <TagCloseButton onClick={() => deleteCpe(index)} />
+                      </Tag>
+                    ))}
+                  </Flex>
+                </Box>
               </Stack>
             </FormControl>
             {(!component || !version) && (

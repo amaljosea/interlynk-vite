@@ -8,7 +8,13 @@ import {
   Icon,
   Stack,
   useDisclosure,
-  Box
+  Box,
+  IconButton,
+  Menu,
+  MenuButton,
+  Portal,
+  MenuList,
+  MenuItem
 } from '@chakra-ui/react'
 import { useEffect, useState, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
@@ -16,6 +22,8 @@ import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import ComponentModal from 'views/Sbom/components/ComponentModal'
 import { timeSince } from 'utils'
+import { FaEllipsisV } from 'react-icons/fa'
+import SupplierModal from 'views/Sbom/components/SupplierModal'
 
 function SBOMComponentRow(props) {
   const {
@@ -47,6 +55,12 @@ function SBOMComponentRow(props) {
     onClose: onDelClose
   } = useDisclosure()
 
+  const {
+    isOpen: isSupOpen,
+    onOpen: onSupOpen,
+    onClose: onSupClose
+  } = useDisclosure()
+
   useEffect(() => {
     const containsData = window.localStorage.getItem('contains')
     setcontains(JSON.parse(containsData))
@@ -61,14 +75,7 @@ function SBOMComponentRow(props) {
         <Box>{version}</Box>
       </Td>
       <Td>{purl}</Td>
-      <Td>
-        {cpes.length > 0 &&
-          cpes.map((item, i) => (
-            <Flex gap={2} alignItems={'center'} key={i}>
-              <Text>{item}</Text>
-            </Flex>
-          ))}
-      </Td>
+      <Td>{suppliers.length > 0 && suppliers[0].name}</Td>
       <Td>
         {licenses.length > 0 &&
           licenses.map((item, i) => (
@@ -82,20 +89,38 @@ function SBOMComponentRow(props) {
       </Td>
       <Td>
         {!customerView && (
-          <Stack direction={'row'} spacing='24px'>
-            <Icon
-              as={EditIcon}
-              color={'blue.500'}
-              cursor={'pointer'}
-              onClick={onOpen}
+          // <Stack direction={'row'} spacing='24px'>
+          //   <Icon
+          //     as={EditIcon}
+          //     color={'blue.500'}
+          //     cursor={'pointer'}
+          //     onClick={onOpen}
+          //   />
+          //   <Icon
+          //     as={DeleteIcon}
+          //     color={'red.500'}
+          //     cursor={'pointer'}
+          //     onClick={onDelOpen}
+          //   />
+          // </Stack>
+          <Menu>
+            <MenuButton
+              as={IconButton}
+              aria-label='Options'
+              icon={<FaEllipsisV />}
+              variant='none'
+              color='gray.400'
             />
-            <Icon
-              as={DeleteIcon}
-              color={'red.500'}
-              cursor={'pointer'}
-              onClick={onDelOpen}
-            />
-          </Stack>
+            <Portal>
+              <MenuList size='sm'>
+                <MenuItem onClick={onSupOpen}>
+                  {suppliers.length > 0 ? 'Update' : 'Add'} Supplier
+                </MenuItem>
+                <MenuItem onClick={onOpen}>Edit</MenuItem>
+                <MenuItem onClick={onDelOpen}>Delete</MenuItem>
+              </MenuList>
+            </Portal>
+          </Menu>
         )}
 
         {isOpen && (
@@ -123,6 +148,16 @@ function SBOMComponentRow(props) {
             onClose={onDelClose}
             id={id}
             refetch={refetch}
+          />
+        )}
+
+        {isSupOpen && (
+          <SupplierModal
+            id={id}
+            refetch={refetch}
+            isOpen={isSupOpen}
+            onClose={onSupClose}
+            suppliers={suppliers}
           />
         )}
       </Td>

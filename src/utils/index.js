@@ -370,3 +370,4 @@ export const convertDateFormat = (inputDate) => {
   const day = date.getDate()
   return `${month} ${day}`
 }
+
