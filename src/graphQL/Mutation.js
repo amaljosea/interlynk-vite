@@ -566,7 +566,7 @@ export const authorUpdate = gql`
 `
 
 export const authorDelete = gql`
-  mutation authorDelete($authorId: ID!, $sbomId: Uuid!) {
+  mutation authorDelete($authorId: Uuid!, $sbomId: Uuid!) {
     authorDelete(input: { authorId: $authorId, sbomId: $sbomId }) {
       author {
         id
@@ -606,9 +606,21 @@ export const supplierCreate = gql`
 `
 
 export const supplierUpdate = gql`
-  mutation supplierUpdate($name: String, $email: String, $supplierId: Uuid!) {
+  mutation supplierUpdate(
+    $name: String
+    $email: String
+    $supplierId: Uuid!
+    $sbomId: Uuid!
+    $componentId: Uuid
+  ) {
     supplierUpdate(
-      input: { name: $name, email: $email, supplierId: $supplierId }
+      input: {
+        name: $name
+        email: $email
+        supplierId: $supplierId
+        sbomId: $sbomId
+        componentId: $componentId
+      }
     ) {
       supplier {
         id
@@ -623,7 +635,7 @@ export const supplierUpdate = gql`
 
 export const supplierDelete = gql`
   mutation supplierDelete(
-    $supplierId: ID!
+    $supplierId: Uuid!
     $sbomId: Uuid!
     $componentId: Uuid
   ) {

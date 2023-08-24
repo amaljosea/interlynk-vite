@@ -167,7 +167,7 @@ function Index() {
     <>
       <Flex direction='column' pt={{ base: '120px', md: '0px' }}>
         <Flex direction='row' pt={{ base: '200px', md: '75px' }}>
-          <Menu>
+          {/* <Menu>
             <MenuButton
               as={Button}
               rightIcon={<ChevronDownIcon />}
@@ -242,17 +242,17 @@ function Index() {
               </MenuOptionGroup>
             </MenuList>
           </Menu>
-          <Input placeholder='Search' maxW='300px' />
+          <Input placeholder='Search' maxW='300px' /> */}
 
           <Spacer />
           <Stack direction='row' spacing={2}>
             {/* upload */}
             <Button
               colorScheme='blue'
-              variant='outline'
+              variant='solid'
               onClick={handleRefresh}
             >
-              Refersh
+              Refresh
             </Button>
             <Button
               ref={btnRefProduct}
@@ -271,6 +271,7 @@ function Index() {
             captions={[
               'Active',
               'Product',
+              'sboms',
               'Description',
               'Updated At',
               'Action'

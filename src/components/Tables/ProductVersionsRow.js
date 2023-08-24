@@ -87,6 +87,7 @@ function ProductVersionsRow(props) {
             </Text>
           )}
         </Td>
+        <Td pl={0}>{sbomId.length}</Td>
         <Td pl={0}>{description}</Td>
         <Td pl={0}>{timeSince(updatedAt)}</Td>
         <Td pl={0}>

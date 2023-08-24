@@ -124,6 +124,12 @@ function SBOM() {
 
   // console.log(`SBOM`, allSboms)
 
+  const totalLicenses =
+    sbomData &&
+    sbomData.sbom.components.filter((item) => item.licenses.length > 0)
+
+  // console.log(`totalLicenses`, totalLicenses)
+
   const validSBOMS =
     sbomData && sbomData.sbom.components.find((com) => com.primary === true)
 
@@ -198,7 +204,7 @@ function SBOM() {
                           </Code>
                         )}
                         <Text fontSize='xs' cursor={'pointer'}>
-                          Last Pushed: {timeSince(sbomData.sbom.creationAt)}
+                          Last updated at : {timeSince(sbomData.sbom.updatedAt)}
                         </Text>
                         <Flex>
                           <Tag size={'sm'} variant='outline' colorScheme='blue'>
@@ -274,7 +280,7 @@ function SBOM() {
             icon={<Icon h={'24px'} w={'24px'} color='white' as={FaCubes} />}
             title={'Components'}
             description={'Components included in SBOM'}
-            amount={31}
+            amount={sbomData ? sbomData.sbom.components.length : 'Loading...'}
           />
           <Spacer />
           <SBOMStatistics
@@ -283,7 +289,7 @@ function SBOM() {
             }
             title={'Licenses'}
             description={'Unique licenses included in SBOM'}
-            amount={19}
+            amount={totalLicenses ? totalLicenses.length : 'Loading...'}
           />
         </Flex>
         {sbomData && (
@@ -293,7 +299,7 @@ function SBOM() {
               'Component',
               'Version',
               'PURL',
-              'CPES',
+              'Supplier',
               'Licenses',
               'Updated At',
               ''

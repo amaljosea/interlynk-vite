@@ -36,7 +36,7 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey }) => {
             {tools &&
               tools.map((item, index) => (
                 <Text pl={0} fontSize={'sm'} key={index}>
-                  {item.name} - {item.version} - {`(Interlynk Inc)`}
+                  {item.name} - {item.version}
                 </Text>
               ))}
           </Flex>
@@ -89,7 +89,7 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey }) => {
               authors.length > 0 &&
               authors.map((item, index) => (
                 <Text pl={0} fontSize={'sm'} key={index}>
-                  {item.name} - {item.email} - {`(Interlynk Inc)`}
+                  {item.name} - {item.email}
                 </Text>
               ))}
           </Flex>

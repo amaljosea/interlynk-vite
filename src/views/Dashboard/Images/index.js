@@ -12,7 +12,8 @@ import {
   ModalCloseButton,
   useDisclosure,
   Input,
-  useToast
+  useToast,
+  chakra
 } from '@chakra-ui/react'
 import React, { useState, useEffect, useContext } from 'react'
 import ImagesDrawer from 'components/Drawer/ImagesDrawer'
@@ -333,15 +334,14 @@ const Index = () => {
               justifyContent={'center'}
             >
               <Text color={'gray.500'}>
-                Please connect to a container registry under
-                <Link
-                  href='/#/vendor/connections'
-                  color={'blue.500'}
-                  textDecoration={'underline'}
-                  _hover={{ textDecoration: 'underline' }}
-                  mx={2}
-                >
-                  Connections
+                Please connect to a container registry under{' '}
+                <Link to='/vendor/connections'>
+                  <chakra.span
+                    color={'blue.500'}
+                    _hover={{ textDecoration: 'underline' }}
+                  >
+                    connections{' '}
+                  </chakra.span>
                 </Link>
                 to see your images
               </Text>

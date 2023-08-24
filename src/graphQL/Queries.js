@@ -621,6 +621,12 @@ export const GetSBOM = gql`
         updatedAt
         uniqueId
         kind
+        suppliers {
+          id
+          name
+          email
+          updatedAt
+        }
       }
     }
   }
