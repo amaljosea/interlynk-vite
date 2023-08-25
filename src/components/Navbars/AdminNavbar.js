@@ -44,8 +44,9 @@ export default function AdminNavbar(props) {
     }
   })
 
-  const imageName = window.localStorage.getItem('Image')
+  const imageName = localStorage.getItem('Image')
   const signedImageName = localStorage.getItem(`signedImageName`)
+  const productName = localStorage.getItem(`product`)
 
   // Here are all the props that may change depending on navbar's type or state.(secondary, variant, scrolled)
   let mainText = useColorModeValue('gray.700', 'gray.200')
@@ -199,10 +200,10 @@ export default function AdminNavbar(props) {
               </BreadcrumbItem>
             )}
 
-            {location.pathname.startsWith('/sharelynk') && (
+            {productName && location.pathname.startsWith('/sharelynk') && (
               <BreadcrumbItem color={mainText}>
                 <BreadcrumbLink href='#' color={mainText}>
-                  {sbomData && sbomData.sbom.project.name}
+                  {productName}
                 </BreadcrumbLink>
               </BreadcrumbItem>
             )}

@@ -182,7 +182,7 @@ function ComponentDrawer(props) {
       placement='right'
       onClose={onClose}
       finalFocusRef={btnRef}
-      size='md'
+      size='sm'
     >
       <DrawerOverlay />
       <DrawerContent>

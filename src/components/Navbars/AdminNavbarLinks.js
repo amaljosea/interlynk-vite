@@ -47,6 +47,8 @@ export default function HeaderLinks(props) {
       setUsername(userName)
     } else if (location.pathname.startsWith('/customer')) {
       setUsername(userEmail)
+    } else if (location.pathname.startsWith('/sharelynk')) {
+      setUsername(userName)
     }
   }, [])
 
