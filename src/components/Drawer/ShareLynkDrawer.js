@@ -1,16 +1,10 @@
-// Chakra imports
 import {
   Flex,
   Button,
   Input,
   Spacer,
   Stack,
-  useConst,
-  filter
-} from '@chakra-ui/react'
-import React, { useState } from 'react'
-import { CopyIcon } from '@chakra-ui/icons'
-import {
+  FormControl,
   Drawer,
   DrawerBody,
   DrawerFooter,
@@ -18,10 +12,7 @@ import {
   DrawerOverlay,
   DrawerContent,
   DrawerCloseButton,
-  Box,
   FormLabel,
-  InputGroup,
-  Select,
   Checkbox,
   Divider,
   Text,
@@ -29,22 +20,13 @@ import {
   TagLabel,
   TagCloseButton
 } from '@chakra-ui/react'
-import { useContext } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import GlobalContext from 'context/GlobalContext'
 import { v4 as uuidv4 } from 'uuid'
-import { useEffect } from 'react'
 
 function ShareLynkDrawer(props) {
   const { setSBOMLinksData, productVersionsData } = useContext(GlobalContext)
-  const {
-    isOpen,
-    onClose,
-    btnRef,
-    uniqProjects,
-    uniqVersions,
-    productName,
-    versionName
-  } = props
+  const { isOpen, onClose, btnRef, productName, versionName } = props
 
   const [product, setProduct] = useState(productName)
   const [version, setVersion] = useState(versionName)
@@ -52,8 +34,6 @@ function ShareLynkDrawer(props) {
   const [hasTerms, setHasTerms] = useState(true)
   const [hasRedactions, setHasRedactions] = useState(true)
   const [hasLimitAccess, setHasLimitAccess] = useState(true)
-  //  shared_with && shared_with.length > 0 ? true : false
-  // const [hasComponents, setHasComponents] = useState(true)
   const [hasLicenses, setHasLicenses] = useState(true)
   const [hasVul, setHasVul] = useState(false)
   const [hasCyclonDx, setHasCyclonDx] = useState(true)
@@ -137,7 +117,7 @@ function ShareLynkDrawer(props) {
       placement='right'
       onClose={onClose}
       finalFocusRef={btnRef}
-      size='lg'
+      size='sm'
     >
       <DrawerOverlay />
       <DrawerContent>
@@ -146,40 +126,27 @@ function ShareLynkDrawer(props) {
           Share Lynk
         </DrawerHeader>
         <DrawerBody>
-          <Stack spacing='24px'>
-            <Box>
-              <FormLabel
-                py='4px'
-                htmlFor='product'
-                fontSize='sm'
-                color='gray.600'
-              >
+          <Stack spacing='12px'>
+            {/* product */}
+            <FormControl>
+              <FormLabel htmlFor='product' fontSize='sm' color='gray.600'>
                 Product
               </FormLabel>
-              <Select
+              <Input
+                type='text'
                 id='product'
                 value={product}
                 onChange={handleProductChange}
                 size='sm'
                 color='gray.500'
-              >
-                {uniqProjects
-                  .sort((a, b) => a.localeCompare(b))
-                  .map((p) => (
-                    <option key={p} value={p}>
-                      {p}
-                    </option>
-                  ))}
-              </Select>
-              <FormLabel
-                py='4px'
-                htmlFor='product'
-                fontSize='sm'
-                color='gray.600'
-              >
+              />
+            </FormControl>
+            {/* version */}
+            <FormControl>
+              <FormLabel htmlFor='product' fontSize='sm' color='gray.600'>
                 Version
               </FormLabel>
-              <Select
+              <Input
                 id='version'
                 value={version}
                 onChange={(e) => {
@@ -187,181 +154,157 @@ function ShareLynkDrawer(props) {
                 }}
                 size='sm'
                 color='gray.500'
+              />
+            </FormControl>
+            <Spacer />
+            <Text fontSize='md'>LINK OPTIONS</Text>
+            <Divider />
+            <Stack spacing='12px'>
+              <Text fontSize='sm'>SBOM Access</Text>
+              <Text fontSize='xs' color='gray.500'>
+                Control access of SBOM with this link
+              </Text>
+              <Checkbox
+                isChecked={hasEmail}
+                onChange={(e) => setHasEmail(e.target.checked)}
+                mt='10px'
+                size='sm'
+                colorScheme='blue'
+                color='gray.500'
               >
-                {uniqVersions.map((item, index) => (
-                  <option key={index} value={item.id} name={item.version}>
-                    {item.version}
-                  </option>
-                ))}
-              </Select>
-              <Text fontSize='md' mt='20px'>
-                LINK OPTIONS
-              </Text>
-              <Divider />
-              <Spacer />
-              <Stack spacing='12px'>
-                <Text fontSize='sm' mt='20px'>
-                  SBOM Access
-                </Text>
-                <Text fontSize='xs' color='gray.500'>
-                  Control access of SBOM with this link
-                </Text>
-                <Checkbox
-                  isChecked={hasEmail}
-                  onChange={(e) => setHasEmail(e.target.checked)}
-                  px='10px'
-                  mt='10px'
-                  size='sm'
-                  colorScheme='blue'
-                  color='gray.500'
-                >
-                  Requires email confirmation
-                </Checkbox>
-                <Checkbox
-                  isChecked={hasTerms}
-                  onChange={(e) => setHasTerms(e.target.checked)}
-                  px='10px'
-                  size='sm'
-                  colorScheme='blue'
-                  color='gray.500'
-                >
-                  Requires agreeing to terms
-                </Checkbox>
-                <Checkbox
-                  isChecked={hasRedactions}
-                  onChange={(e) => setHasRedactions(e.target.checked)}
-                  px='10px'
-                  size='sm'
-                  colorScheme='blue'
-                  color='gray.500'
-                >
-                  Apply redactions
-                </Checkbox>
-                <Checkbox
-                  isChecked={isPublic}
-                  onChange={(e) => {
-                    setIsPublic(e.target.checked)
-                    setHasLimitAccess(false)
-                  }}
-                  px='10px'
-                  size='sm'
-                  colorScheme='blue'
-                  color='gray.500'
-                >
-                  Set as public
-                </Checkbox>
-                <Checkbox
-                  isChecked={hasLimitAccess}
-                  onChange={(e) => {
-                    setHasLimitAccess(e.target.checked)
-                    setIsPublic(false)
-                  }}
-                  px='10px'
-                  size='sm'
-                  colorScheme='blue'
-                  color='gray.500'
-                >
-                  Limit access to:{' '}
-                </Checkbox>
+                Requires email confirmation
+              </Checkbox>
+              <Checkbox
+                isChecked={hasTerms}
+                onChange={(e) => setHasTerms(e.target.checked)}
+                size='sm'
+                colorScheme='blue'
+                color='gray.500'
+              >
+                Requires agreeing to terms
+              </Checkbox>
+              <Checkbox
+                isChecked={hasRedactions}
+                onChange={(e) => setHasRedactions(e.target.checked)}
+                size='sm'
+                colorScheme='blue'
+                color='gray.500'
+              >
+                Apply redactions
+              </Checkbox>
+              <Checkbox
+                isChecked={isPublic}
+                onChange={(e) => {
+                  setIsPublic(e.target.checked)
+                  setHasLimitAccess(false)
+                }}
+                size='sm'
+                colorScheme='blue'
+                color='gray.500'
+              >
+                Set as public
+              </Checkbox>
+              <Checkbox
+                isChecked={hasLimitAccess}
+                onChange={(e) => {
+                  setHasLimitAccess(e.target.checked)
+                  setIsPublic(false)
+                }}
+                size='sm'
+                colorScheme='blue'
+                color='gray.500'
+              >
+                Limit access to:{' '}
+              </Checkbox>
 
-                <Input
-                  placeholder='Enter email address'
-                  size='sm'
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                />
-                <Flex
-                  direction={'row'}
-                  alignItems={'start'}
-                  gap={3}
-                  flexWrap={'wrap'}
-                >
-                  {emailList.map((item) => (
-                    <Tag
-                      size='md'
-                      key={item}
-                      borderRadius='full'
-                      colorScheme={'blue'}
-                    >
-                      <TagLabel>{item}</TagLabel>
-                      <TagCloseButton onClick={() => handleRemove(item)} />
-                    </Tag>
-                  ))}
-                </Flex>
-                <Spacer />
-                <Text fontSize='sm' mt='30px'>
-                  SBOM Content
-                </Text>
-                <Text fontSize='xs' color='gray.500'>
-                  Select SBOM content that is required for this link
-                </Text>
-                <Checkbox
-                  defaultChecked
-                  readOnly
-                  // onChange={(e) => setHasComponents(e.target.checked)}
-                  px='10px'
-                  size='sm'
-                  colorScheme='blue'
-                  color='gray.500'
-                >
-                  Components
-                </Checkbox>
-                <Checkbox
-                  isChecked={hasLicenses}
-                  onChange={(e) => setHasLicenses(e.target.checked)}
-                  px='10px'
-                  size='sm'
-                  colorScheme='blue'
-                  color='gray.500'
-                >
-                  Licenses
-                </Checkbox>
-                <Checkbox
-                  isChecked={hasVul}
-                  onChange={(e) => setHasVul(e.target.checked)}
-                  px='10px'
-                  size='sm'
-                  colorScheme='blue'
-                  color='gray.500'
-                >
-                  Vulnerabilities
-                </Checkbox>
-              </Stack>
-              <Text fontSize='md' mt='20px'>
-                ADVANCED OPTIONS
+              <Input
+                placeholder='Enter email address'
+                size='sm'
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onKeyDown={handleKeyDown}
+              />
+              <Flex
+                direction={'row'}
+                alignItems={'start'}
+                gap={3}
+                flexWrap={'wrap'}
+              >
+                {emailList.map((item) => (
+                  <Tag
+                    size='md'
+                    key={item}
+                    borderRadius='full'
+                    colorScheme={'blue'}
+                  >
+                    <TagLabel>{item}</TagLabel>
+                    <TagCloseButton onClick={() => handleRemove(item)} />
+                  </Tag>
+                ))}
+              </Flex>
+              <Spacer />
+              <Text fontSize='sm'>SBOM Content</Text>
+              <Text fontSize='xs' color='gray.500'>
+                Select SBOM content that is required for this link
               </Text>
-              <Divider />
-              <Stack spacing='12px'>
-                <Text fontSize='sm' mt='20px'>
-                  SBOM Format
-                </Text>
-                <Text fontSize='xs' color='gray.500'>
-                  Select SBOM format supported by this link
-                </Text>
-                <Checkbox
-                  isChecked={hasCyclonDx}
-                  onChange={(e) => setHasCyclonDx(e.target.checked)}
-                  px='10px'
-                  mt='10px'
-                  size='sm'
-                  colorScheme='blue'
-                  color='gray.500'
-                >
-                  CycloneDX
-                </Checkbox>
-                <Checkbox
-                  isChecked={hasSpdx}
-                  onChange={(e) => setHasSpdx(e.target.checked)}
-                  px='10px'
-                  size='sm'
-                  colorScheme='blue'
-                  color='gray.500'
-                >
-                  SPDX
-                </Checkbox>
-              </Stack>
-            </Box>
+              <Checkbox
+                defaultChecked
+                readOnly
+                size='sm'
+                colorScheme='blue'
+                color='gray.500'
+              >
+                Components
+              </Checkbox>
+              <Checkbox
+                isChecked={hasLicenses}
+                onChange={(e) => setHasLicenses(e.target.checked)}
+                size='sm'
+                colorScheme='blue'
+                color='gray.500'
+              >
+                Licenses
+              </Checkbox>
+              <Checkbox
+                isChecked={hasVul}
+                onChange={(e) => setHasVul(e.target.checked)}
+                size='sm'
+                colorScheme='blue'
+                color='gray.500'
+              >
+                Vulnerabilities
+              </Checkbox>
+            </Stack>
+            <Spacer />
+            <Text fontSize='md' mt='20px'>
+              ADVANCED OPTIONS
+            </Text>
+            <Divider />
+            <Stack spacing='12px'>
+              <Text fontSize='sm'>SBOM Format</Text>
+              <Text fontSize='xs' color='gray.500'>
+                Select SBOM format supported by this link
+              </Text>
+              <Checkbox
+                isChecked={hasCyclonDx}
+                onChange={(e) => setHasCyclonDx(e.target.checked)}
+                mt='10px'
+                size='sm'
+                colorScheme='blue'
+                color='gray.500'
+              >
+                CycloneDX
+              </Checkbox>
+              <Checkbox
+                isChecked={hasSpdx}
+                onChange={(e) => setHasSpdx(e.target.checked)}
+                size='sm'
+                colorScheme='blue'
+                color='gray.500'
+              >
+                SPDX
+              </Checkbox>
+            </Stack>
           </Stack>
         </DrawerBody>
         <DrawerFooter borderTopWidth='1px'>

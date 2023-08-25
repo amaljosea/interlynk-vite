@@ -325,8 +325,8 @@ const SBOMTable = ({
       <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
         <Tabs variant='enclosed' defaultIndex={1}>
           <TabList mt='20px'>
-            <Tab>Share Lynks</Tab>
-            <Tab>Vulnerabilities</Tab>
+            <Tab _focus={{ outline: 'none' }}>Share Lynks</Tab>
+            <Tab _focus={{ outline: 'none' }}>Vulnerabilities</Tab>
           </TabList>
           <TabPanels>
             {/* share lynks */}

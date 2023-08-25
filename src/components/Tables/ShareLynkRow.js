@@ -40,6 +40,7 @@ import { useLocation } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
 import ProductLinkDrawer from 'components/Drawer/ProductLinkDrawer'
 import { timeSince } from 'utils'
+import ShareLynkDrawer from 'components/Drawer/ShareLynkDrawer'
 
 function ShareLynkRow(props) {
   const {
@@ -62,7 +63,8 @@ function ShareLynkRow(props) {
     shared_with,
     redactions,
     cyclonedx,
-    spdx
+    productName,
+    versionName
   } = props
   const textColor = useColorModeValue('gray.700', 'white')
   const bgStatus = useColorModeValue('gray.400', '#1a202c')
@@ -80,9 +82,7 @@ function ShareLynkRow(props) {
 
   const domain = window.location.origin
 
-  const sbomLink = useClipboard(
-    `${domain}/sharelynk?p=${product}&sbom=${sbomId}`
-  )
+  const sbomLink = useClipboard(`${domain}/login?p=${product}&sbom=${sbomId}`)
 
   // `https://dashboard-app.fly.dev/#/customer/sboms/${customerId[7]}`
 
@@ -250,26 +250,15 @@ function ShareLynkRow(props) {
           </Portal>
         </Menu>
 
-        <ProductLinkDrawer
-          key={props.id}
-          isOpen={isOpen}
-          onClose={onClose}
-          btnRef={btnRef}
-          uniqProjects={uniqProjects}
-          uniqVersions={uniqVersions}
-          project={props.project}
-          version={props.version}
-          link={props.link}
-          shared_with={props.shared_with}
-          components={props.components}
-          licenses={props.licenses}
-          vulnerability={vulnerabilities}
-          conf_email={props.conf_email}
-          conf_terms={props.conf_terms}
-          redactions={props.redactions}
-          cyclonedx={props.cyclonedx}
-          spdx={props.spdx}
-        />
+        {isOpen && (
+          <ShareLynkDrawer
+            isOpen={isOpen}
+            onClose={onClose}
+            btnRef={btnRef}
+            productName={productName}
+            versionName={versionName}
+          />
+        )}
       </Td>
     </Tr>
   )

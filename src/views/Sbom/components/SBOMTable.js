@@ -33,7 +33,7 @@ import { AddIcon, PlusSquareIcon } from '@chakra-ui/icons'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import { timeSince } from 'utils'
 
-const SBOMTable = ({ captions, data, refetch }) => {
+const SBOMTable = ({ captions, data, refetch, versionName }) => {
   const { SBOMLinksData } = useContext(GlobalContext)
   const textColor = useColorModeValue('gray.700', 'white')
 
@@ -61,10 +61,10 @@ const SBOMTable = ({ captions, data, refetch }) => {
         <Tabs variant='enclosed' defaultIndex={1}>
           <TabList mt='20px'>
             {!location.pathname.startsWith('/sharelynk') && (
-              <Tab>Share Lynks</Tab>
+              <Tab _focus={{ outline: 'none' }}>Share Lynks</Tab>
             )}
-            <Tab>General</Tab>
-            <Tab>Components</Tab>
+            <Tab _focus={{ outline: 'none' }}>General</Tab>
+            <Tab _focus={{ outline: 'none' }}>Components</Tab>
           </TabList>
           <TabPanels>
             {/* share lynks */}
@@ -73,14 +73,10 @@ const SBOMTable = ({ captions, data, refetch }) => {
                 <CardBody>
                   <Table variant='simple' color={textColor} size='sm'>
                     <Thead>
-                      <Tr my='7rem' pl='0px'>
+                      <Tr>
                         {link_captions.map((caption, idx) => {
                           return (
-                            <Th
-                              color='gray.400'
-                              key={idx}
-                              ps={idx === 0 ? '0px' : null}
-                            >
+                            <Th key={idx} ps={idx === 0 ? '0px' : null} pb={4}>
                               {caption}
                             </Th>
                           )
@@ -106,6 +102,8 @@ const SBOMTable = ({ captions, data, refetch }) => {
                             cyclonedx={row.cyclonedx}
                             spdx={row.spdx}
                             active={row.active}
+                            productName={data.project.name}
+                            versionName={versionName}
                           />
                         )
                       })}
@@ -154,7 +152,7 @@ const SBOMTable = ({ captions, data, refetch }) => {
                       leftIcon={<AddIcon />}
                       colorScheme='blue'
                       variant='solid'
-                      mb={8}
+                      mb={6}
                       fontSize={'sm'}
                     >
                       Component
@@ -173,7 +171,7 @@ const SBOMTable = ({ captions, data, refetch }) => {
                     <Tr my='.8rem' pl='0px'>
                       {captions.map((caption, idx) => {
                         return (
-                          <Th key={idx} ps={idx === 0 ? '0px' : null}>
+                          <Th key={idx} ps={idx === 0 ? '0px' : null} pb={4}>
                             <Box>{caption}</Box>
                           </Th>
                         )

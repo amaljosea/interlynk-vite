@@ -1,12 +1,9 @@
 import axios from 'axios'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 const {
   ChakraProvider,
-  ModalOverlay,
-  useDisclosure,
   Button,
   Text,
-  ModalFooter,
   FormControl,
   Input,
   FormLabel,
@@ -16,10 +13,9 @@ const {
   Alert,
   AlertIcon,
   AlertDescription,
-  Image,
-  Heading
+  Image
 } = require('@chakra-ui/react')
-import { useLocation } from 'react-router-dom'
+import { useLocation, useHistory } from 'react-router-dom'
 import Cookies from 'js-cookie'
 import theme from 'theme/theme.js'
 import Card from 'components/Card/Card'
@@ -29,37 +25,63 @@ const Login = () => {
   const userLoginURL = process.env.REACT_APP_USER_LOGIN_URL
 
   const location = useLocation()
+  const history = useHistory()
 
   const queryParams = new URLSearchParams(location.search)
+  const productId = queryParams.get('p')
+  const sbomId = queryParams.get('sbom')
   const paramId = queryParams.get('signed_url_params')
   const imageVersionId = queryParams.get('id')
 
   const [userEmail, setUserEmail] = useState('')
   const [error, setError] = useState(false)
 
+  const loginURL = process.env.REACT_APP_VENDOR_LOGIN_URL
+
   const handleSubmit = (e) => {
     e.preventDefault()
-    axios
-      .post(`${userLoginURL}`, {
-        share_user: {
-          email: userEmail,
-          signed_params: paramId
-        }
-      })
-      .then((response) => {
-        console.log(response.data)
-        const { status } = response.data
-        if (status.code === 200) {
-          localStorage.setItem('userEmail', status.data.user.email)
-          Cookies.set('userToken', response.headers.authorization)
-          window.location.href = `/customer?signed_url_params=${paramId}&id=${imageVersionId}`
-        }
-      })
-      .catch((error) => {
-        console.log(`Error: ${error}`)
-        setError(true)
-        setUserEmail('')
-      })
+    if (productId) {
+      axios
+        .post(`${loginURL}`, {
+          user: {
+            email: userEmail,
+            password: 'password'
+          }
+        })
+        .then((response) => {
+          // console.log('response', response)
+          const { status } = response.data
+          if (status.code === 200) {
+            localStorage.setItem('username', status.data.user.name)
+            Cookies.set('authToken', response.headers.authorization)
+            history.push(`/sharelynk?p=${productId}&sbom=${sbomId}`)
+          }
+        })
+    } else {
+      axios
+        .post(`${userLoginURL}`, {
+          share_user: {
+            email: userEmail,
+            signed_params: paramId
+          }
+        })
+        .then((response) => {
+          // console.log(response.data)
+          const { status } = response.data
+          if (status.code === 200) {
+            localStorage.setItem('userEmail', status.data.user.email)
+            Cookies.set('userToken', response.headers.authorization)
+            history.push(
+              `/customer?signed_url_params=${paramId}&id=${imageVersionId}`
+            )
+          }
+        })
+        .catch((error) => {
+          console.log(`Error: ${error}`)
+          setError(true)
+          setUserEmail('')
+        })
+    }
   }
 
   return (
@@ -92,7 +114,9 @@ const Login = () => {
               <Card>
                 <CardBody>
                   <form onSubmit={handleSubmit}>
-                    <Heading fontSize={'2xl'}>Customer Verification</Heading>
+                    <Text fontWeight={'medium'} fontSize={'2xl'}>
+                      Customer Verification
+                    </Text>
                     <Box mt={6}>
                       {error === true && (
                         <Box mb={5} width={'100%'}>

@@ -56,12 +56,12 @@ function SBOM() {
   const location = useLocation()
   const history = useHistory()
 
+  const customerView = location.pathname.startsWith('/sharelynk')
+
   const queryParams = new URLSearchParams(location.search)
 
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
-
-  const customerView = location.pathname.startsWith('/sharelynk')
 
   const { isOpen, onOpen, onClose } = useDisclosure()
   const {
@@ -86,14 +86,15 @@ function SBOM() {
   useEffect(() => {
     if (sbomData) {
       console.log(`SBOM Data`, sbomData)
+      window.localStorage.setItem('product', sbomData.sbom.project.name)
     }
   }, [sbomData])
 
-  useEffect(() => {
-    if (data) {
-      console.log(`data`, data)
-    }
-  }, [data])
+  // useEffect(() => {
+  //   if (data) {
+  //     console.log(`data`, data)
+  //   }
+  // }, [data])
 
   const uniqProjects = []
   const uniqVersions = []
@@ -150,7 +151,13 @@ function SBOM() {
       await refetch({
         productId: productId,
         sbomId: id
-      }).then(() => history.push(`/vendor/products?p=${productId}&sbom=${id}`))
+      }).then(() => {
+        if (customerView) {
+          history.push(`/sharelynk?p=${productId}&sbom=${id}`)
+        } else {
+          history.push(`/vendor/products?p=${productId}&sbom=${id}`)
+        }
+      })
     } catch (error) {
       console.log(`fetch error`, error)
     }
@@ -167,7 +174,11 @@ function SBOM() {
         <Card mb='6'>
           <CardBody>
             <CardBody>
-              <Grid width={'100%'} templateColumns='repeat(5, 1fr)'>
+              <Grid
+                width={'100%'}
+                templateColumns='repeat(5, 1fr)'
+                alignItems={'center'}
+              >
                 <GridItem colSpan={2}>
                   {sbomData ? (
                     <Flex
@@ -207,9 +218,15 @@ function SBOM() {
                           Last updated at : {timeSince(sbomData.sbom.updatedAt)}
                         </Text>
                         <Flex>
-                          <Tag size={'sm'} variant='outline' colorScheme='blue'>
-                            <TagLabel>Created</TagLabel>
-                          </Tag>
+                          {!customerView && (
+                            <Tag
+                              size={'sm'}
+                              variant='outline'
+                              colorScheme='blue'
+                            >
+                              <TagLabel>Created</TagLabel>
+                            </Tag>
+                          )}
                         </Flex>
                       </Flex>
                     </Flex>
@@ -260,14 +277,12 @@ function SBOM() {
                         </Button>
                       )}
 
-                      {!customerView && (
-                        <IconButton
-                          aria-label='Download SBOM'
-                          icon={<FaFileDownload />}
-                          onClick={onOpen}
-                          colorScheme='blue'
-                        />
-                      )}
+                      <IconButton
+                        aria-label='Download SBOM'
+                        icon={<FaFileDownload />}
+                        onClick={onOpen}
+                        colorScheme='blue'
+                      />
                     </Flex>
                   </GridItem>
                 )}
@@ -306,6 +321,7 @@ function SBOM() {
             ]}
             data={sbomData.sbom}
             refetch={refetch}
+            versionName={validSBOMS?.version}
           />
         )}
       </Flex>
@@ -315,10 +331,8 @@ function SBOM() {
           isOpen={isSBMOpen}
           onClose={setSBMClose}
           btnRef={btnRef}
-          uniqProjects={uniqProjects}
-          uniqVersions={uniqVersions}
-          productName={sbomData.sbom.project.name}
-          versionName={validSBOMS?.version}
+          productName={''}
+          versionName={''}
         />
       )}
 

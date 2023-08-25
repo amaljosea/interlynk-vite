@@ -32,7 +32,6 @@ function ProductLinkDrawer(props) {
     uniqProjects,
     uniqVersions,
     name,
-    version,
     shared_with,
     conf_email,
     conf_terms,
@@ -41,7 +40,8 @@ function ProductLinkDrawer(props) {
     vulnerability,
     cyclonedx,
     spdx,
-    link,
+    productName,
+    versionName,
     redactions
   } = props
   const handleChange = (event) => setValue(event.target.value)
@@ -60,7 +60,8 @@ function ProductLinkDrawer(props) {
   const [selectedVersion, setSelectedVersion] = useState([])
   const [email, setEmail] = useState('')
   const [emailList, setEmailList] = useState([])
-  const [product, setProduct] = useState('dashboard-app')
+  const [product, setProduct] = useState(productName)
+  const [version, setVersion] = useState(versionName)
 
   const handleProductChange = (e) => {
     setProduct(e.target.value)
@@ -103,7 +104,7 @@ function ProductLinkDrawer(props) {
       <DrawerContent>
         <DrawerCloseButton />
         <DrawerHeader borderBottomWidth='1px' color='gray.600'>
-          SBOM Link
+          Share Link
         </DrawerHeader>
         <DrawerBody>
           <Stack spacing='24px'>
@@ -116,19 +117,13 @@ function ProductLinkDrawer(props) {
               >
                 Product
               </FormLabel>
-              <Select
+              <Input
                 id='product'
                 size='sm'
                 color='gray.500'
                 value={product}
                 onChange={handleProductChange}
-              >
-                {uniqProjects
-                  .sort((a, b) => a.localeCompare(b))
-                  .map((p) => (
-                    <option key={p}>{p}</option>
-                  ))}
-              </Select>
+              />
               <FormLabel
                 py='4px'
                 htmlFor='product'
@@ -137,19 +132,13 @@ function ProductLinkDrawer(props) {
               >
                 Version
               </FormLabel>
-              <Select id='version' value={version} size='sm' color='gray.500'>
-                {selectedVersion.length > 0
-                  ? selectedVersion.map((p) => (
-                      <option key={p} value={p}>
-                        {p}
-                      </option>
-                    ))
-                  : uniqVersions.map((p) => (
-                      <option key={p} value={p}>
-                        {p}
-                      </option>
-                    ))}
-              </Select>
+              <Input
+                id='version'
+                size='sm'
+                color='gray.500'
+                value={version}
+                onChange={(e) => setVersion(e.target.value)}
+              />
               <Text fontSize='md' mt='20px'>
                 LINK OPTIONS
               </Text>
