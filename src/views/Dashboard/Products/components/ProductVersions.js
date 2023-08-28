@@ -21,7 +21,8 @@ const ProductVersions = ({
   allProjects,
   handlePreviousPage,
   handleNextPage,
-  fetchProjects
+  fetchProjects,
+  isLoading
 }) => {
   const textColor = useColorModeValue('gray.700', 'white')
 
@@ -53,6 +54,7 @@ const ProductVersions = ({
                     updatedAt={pv.updatedAt}
                     allProjects={allProjects}
                     fetchProjects={fetchProjects}
+                    isLoading={isLoading}
                   />
                 )
               })}

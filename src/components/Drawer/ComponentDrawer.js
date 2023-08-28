@@ -31,7 +31,8 @@ import {
   TagCloseButton,
   TagLabel,
   Tag,
-  Code
+  Code,
+  useToast
 } from '@chakra-ui/react'
 import { useMutation } from '@apollo/client'
 import { CreateComponent } from 'graphQL/Mutation'
@@ -44,7 +45,7 @@ import { timeSince } from 'utils'
 function ComponentDrawer(props) {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
-
+  const toast = useToast()
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
@@ -107,30 +108,40 @@ function ComponentDrawer(props) {
   }, [license])
 
   const handleSave = async () => {
-    try {
-      await createComponent({
-        variables: {
-          id: sbomId,
-          kind: compType,
-          name: compName,
-          version: compVersion,
-          licenses: [
-            selectedLicense === 'Custom' ? licenseName : selectedLicense
-          ],
-          cpes: cpeList,
-          purl: purlValue,
-          primary: isPrimary,
-          internal: isInternal
-        }
-      }).then(() => {
-        refetch({
-          projectId: productId,
-          sbomId: sbomId
+    if (compName && compType) {
+      try {
+        await createComponent({
+          variables: {
+            id: sbomId,
+            kind: compType,
+            name: compName,
+            version: compVersion,
+            licenses: [
+              selectedLicense === 'Custom' ? licenseName : selectedLicense
+            ],
+            cpes: cpeList,
+            purl: purlValue,
+            primary: isPrimary,
+            internal: isInternal
+          }
+        }).then(() => {
+          refetch({
+            projectId: productId,
+            sbomId: sbomId
+          })
+          onClose()
         })
-        onClose()
+      } catch (error) {
+        console.error('Mutation error:', error)
+      }
+    } else {
+      toast({
+        title: `Input fields required`,
+        status: 'error',
+        position: 'top-right',
+        isClosable: true,
+        duration: 2000
       })
-    } catch (error) {
-      console.error('Mutation error:', error)
     }
   }
 

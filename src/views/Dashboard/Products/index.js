@@ -10,11 +10,21 @@ import {
   Input,
   Spacer,
   Stack,
-  useDisclosure
+  useDisclosure,
+  Table,
+  Tr,
+  Td,
+  Skeleton,
+  Thead,
+  Tbody,
+  Box,
+  Th
 } from '@chakra-ui/react'
 import { useState, useContext, useEffect, useRef } from 'react'
 import ProductVersions from './components/ProductVersions'
 import { ChevronDownIcon, AddIcon } from '@chakra-ui/icons'
+import Card from 'components/Card/Card'
+import CardHeader from 'components/Card/CardHeader'
 import GlobalContext from 'context/GlobalContext'
 import ProductModal from './components/ProductModal.js'
 import { useLazyQuery, useQuery } from '@apollo/client'
@@ -23,13 +33,18 @@ import { useLocation } from 'react-router-dom'
 import SBOM from 'views/Sbom'
 
 function Index() {
-  const {
-    productVersionsData,
-    productVersionExploded,
-    sbomFile,
-    setProjects,
-    projects
-  } = useContext(GlobalContext)
+  const { productVersionsData, productVersionExploded } = useContext(
+    GlobalContext
+  )
+
+  const captions = [
+    'Active',
+    'Product',
+    'sboms',
+    'Description',
+    'Updated At',
+    'Action'
+  ]
 
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -37,6 +52,8 @@ function Index() {
   const version = queryParams.get('v')
 
   const [getProjects, { data }] = useLazyQuery(GetProjectData)
+
+  const [isLoading, setIsLoading] = useState(false)
 
   const handlePreviousPage = () => {
     getProjects({
@@ -71,12 +88,27 @@ function Index() {
   }, [data])
 
   const handleRefresh = async () => {
-    await getProjects({
-      variables: {
-        first: undefined,
-        last: 10
+    try {
+      setIsLoading(true)
+      await getProjects({
+        variables: {
+          first: undefined,
+          last: 10
+        }
+      }).then(() => {
+        setTimeout(() => {
+          setIsLoading(false)
+        }, 2000)
+      })
+    } catch (error) {
+      if (error.networkError && error.networkError.statusCode === 500) {
+        // Handle the specific error
+        alert('Something went wrong')
+      } else {
+        // Handle other errors
+        alert(error.message)
       }
-    })
+    }
   }
 
   // useEffect(() => {
@@ -167,7 +199,35 @@ function Index() {
     <>
       <Flex direction='column' pt={{ base: '120px', md: '0px' }}>
         <Flex direction='row' pt={{ base: '200px', md: '75px' }}>
-          {/* <Menu>
+          <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
+            <CardHeader>
+              <Flex
+                width={'100%'}
+                direction={'row'}
+                gap={4}
+                alignItems={'center'}
+                justifyContent={'flex-end'}
+              >
+                {/* upload */}
+                <Button
+                  colorScheme='blue'
+                  variant='solid'
+                  onClick={handleRefresh}
+                >
+                  Refresh
+                </Button>
+                <Button
+                  ref={btnRefProduct}
+                  onClick={onOpenProduct}
+                  leftIcon={<AddIcon />}
+                  colorScheme='blue'
+                  variant='solid'
+                >
+                  Product
+                </Button>
+              </Flex>
+            </CardHeader>
+            {/* <Menu>
             <MenuButton
               as={Button}
               rightIcon={<ChevronDownIcon />}
@@ -244,43 +304,54 @@ function Index() {
           </Menu>
           <Input placeholder='Search' maxW='300px' /> */}
 
-          <Spacer />
-          <Stack direction='row' spacing={2}>
-            {/* upload */}
-            <Button
-              colorScheme='blue'
-              variant='solid'
-              onClick={handleRefresh}
-            >
-              Refresh
-            </Button>
-            <Button
-              ref={btnRefProduct}
-              onClick={onOpenProduct}
-              leftIcon={<AddIcon />}
-              colorScheme='blue'
-              variant='solid'
-            >
-              Product
-            </Button>
-          </Stack>
+            {data ? (
+              <ProductVersions
+                title={'Products'}
+                captions={captions}
+                allProjects={data}
+                handlePreviousPage={handlePreviousPage}
+                handleNextPage={handleNextPage}
+                isLoading={isLoading}
+              />
+            ) : (
+              <Table mt={4}>
+                <Thead>
+                  <Tr my='.8rem'>
+                    {captions.map((caption, idx) => {
+                      return (
+                        <Th color='gray.800' key={idx} pl={0}>
+                          <Box>{caption}</Box>
+                        </Th>
+                      )
+                    })}
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  <Tr>
+                    <Td pl={0}>
+                      <Skeleton height='20px' />
+                    </Td>
+                    <Td pl={0}>
+                      <Skeleton height='20px' />
+                    </Td>
+                    <Td pl={0}>
+                      <Skeleton height='20px' />
+                    </Td>
+                    <Td pl={0}>
+                      <Skeleton height='20px' />
+                    </Td>
+                    <Td pl={0}>
+                      <Skeleton height='20px' />
+                    </Td>
+                    <Td pl={0}>
+                      <Skeleton height='20px' />
+                    </Td>
+                  </Tr>
+                </Tbody>
+              </Table>
+            )}
+          </Card>
         </Flex>
-        {data && (
-          <ProductVersions
-            title={'Products'}
-            captions={[
-              'Active',
-              'Product',
-              'sboms',
-              'Description',
-              'Updated At',
-              'Action'
-            ]}
-            allProjects={data}
-            handlePreviousPage={handlePreviousPage}
-            handleNextPage={handleNextPage}
-          />
-        )}
       </Flex>
 
       {isOpenProduct && (

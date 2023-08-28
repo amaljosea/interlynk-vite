@@ -15,6 +15,7 @@ import GlobalContext from 'context/GlobalContext'
 import { Link, useLocation } from 'react-router-dom'
 import { GetSBOM } from 'graphQL/Queries'
 import { useQuery } from '@apollo/client'
+import { GetSignedImage } from 'graphQL/Queries'
 
 export default function AdminNavbar(props) {
   const { minimize } = useContext(GlobalContext)
@@ -36,6 +37,7 @@ export default function AdminNavbar(props) {
   const versionId = queryParams.get('v')
   const product = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
+  const paramId = queryParams.get('signed_url_params')
 
   const { data: sbomData } = useQuery(GetSBOM, {
     variables: {
@@ -44,8 +46,12 @@ export default function AdminNavbar(props) {
     }
   })
 
+  const { data: signedImage } = useQuery(GetSignedImage, {
+    variables: { signedParams: paramId }
+  })
+
   const imageName = localStorage.getItem('Image')
-  const signedImageName = localStorage.getItem(`signedImageName`)
+
   const productName = localStorage.getItem(`product`)
 
   // Here are all the props that may change depending on navbar's type or state.(secondary, variant, scrolled)
@@ -157,11 +163,26 @@ export default function AdminNavbar(props) {
       >
         <Box mb={{ sm: '8px', md: '0px' }}>
           <Breadcrumb>
-            <BreadcrumbItem color={mainText}>
-              <Link to='#' color={secondaryText}>
-                Interlynk
-              </Link>
-            </BreadcrumbItem>
+            {location.pathname.startsWith('/sharelynk') ? (
+              <BreadcrumbItem color={mainText}>
+                <Link to={`/sharelynk?p=${product}`} color={secondaryText}>
+                  Products
+                </Link>
+              </BreadcrumbItem>
+            ) : (
+              <BreadcrumbItem color={mainText}>
+                <BreadcrumbLink
+                  href={
+                    !location.pathname.startsWith('/customer')
+                      ? '/vendor/dashboard'
+                      : ''
+                  }
+                  color={secondaryText}
+                >
+                  Interlynk
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+            )}
 
             {!location.pathname.startsWith('/customer') &&
               !location.pathname.startsWith('/sharelynk') && (
@@ -178,7 +199,7 @@ export default function AdminNavbar(props) {
 
             {imageName !== '' && versionId && brandText === 'Images' && (
               <BreadcrumbItem color={mainText}>
-                <BreadcrumbLink href='#' color={mainText}>
+                <BreadcrumbLink href='' color={mainText}>
                   {imageName}
                 </BreadcrumbLink>
               </BreadcrumbItem>
@@ -186,24 +207,24 @@ export default function AdminNavbar(props) {
 
             {brandText === 'Products' && product && (
               <BreadcrumbItem color={mainText}>
-                <BreadcrumbLink href='#' color={mainText}>
+                <BreadcrumbLink href='' color={mainText}>
                   {sbomData && sbomData.sbom.project.name}
                 </BreadcrumbLink>
               </BreadcrumbItem>
             )}
 
-            {signedImageName && location.pathname.startsWith('/customer') && (
+            {signedImage && location.pathname.startsWith('/customer') && (
               <BreadcrumbItem color={mainText}>
-                <BreadcrumbLink href='#' color={mainText}>
-                  {signedImageName}
+                <BreadcrumbLink href='' color={mainText}>
+                  {signedImage.image.name}
                 </BreadcrumbLink>
               </BreadcrumbItem>
             )}
 
-            {productName && location.pathname.startsWith('/sharelynk') && (
+            {sbomId && location.pathname.startsWith('/sharelynk') && (
               <BreadcrumbItem color={mainText}>
-                <BreadcrumbLink href='#' color={mainText}>
-                  {productName}
+                <BreadcrumbLink href='' color={mainText}>
+                  {sbomData && sbomData.sbom.project.name}
                 </BreadcrumbLink>
               </BreadcrumbItem>
             )}

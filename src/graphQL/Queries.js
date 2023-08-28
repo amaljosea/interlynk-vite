@@ -637,6 +637,8 @@ export const GetProject = gql`
     project(id: $id) {
       id
       name
+      description
+      updatedAt
       sboms {
         id
         components {

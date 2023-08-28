@@ -25,7 +25,14 @@ import {
   ModalFooter,
   IconButton,
   useDisclosure,
-  Code
+  Code,
+  Table,
+  Thead,
+  Tr,
+  Th,
+  Box,
+  Tbody,
+  Td
 } from '@chakra-ui/react'
 import React, { useState, useEffect, useRef, useContext } from 'react'
 import Card from 'components/Card/Card.js'
@@ -47,7 +54,7 @@ import { GetSBOM, GetProject } from 'graphQL/Queries'
 import { timeSince } from 'utils'
 
 function SBOM() {
-  const { productVersionsData } = useContext(GlobalContext)
+  const { productVersionsData, productStatus } = useContext(GlobalContext)
 
   const initialRef = useRef(null)
   const finalRef = useRef(null)
@@ -90,11 +97,11 @@ function SBOM() {
     }
   }, [sbomData])
 
-  // useEffect(() => {
-  //   if (data) {
-  //     console.log(`data`, data)
-  //   }
-  // }, [data])
+  useEffect(() => {
+    if (data) {
+      console.log(`data`, data)
+    }
+  }, [data])
 
   const uniqProjects = []
   const uniqVersions = []
@@ -168,11 +175,86 @@ function SBOM() {
     refetchSBOM(e.target.value)
   }
 
-  return (
-    <>
+  const captions = ['Product', 'sboms', 'Description', 'Updated At']
+
+  const sbomVersions = []
+
+  data &&
+    data.project.sboms.map((project) => {
+      project.components.map((sbom) => {
+        if (sbom.primary === true) {
+          sbomVersions.push({
+            version: sbom.version,
+            id: project.id
+          })
+        }
+      })
+    })
+
+  const handleOpen = () => {
+    setSelectedVersion(sbomVersions[0].id)
+    history.push(`/sharelynk?p=${productId}&sbom=${sbomVersions[0].id}`)
+  }
+
+  if (!sbomId) {
+    return (
       <Flex direction='column' pt={{ base: '120px', md: '75px' }}>
         <Card mb='6'>
-          <CardBody>
+          <CardBody width={'100%'}>
+            {data ? (
+              <Table mt={4} width={'100%'}>
+                <Thead>
+                  <Tr my='.8rem'>
+                    {captions.map((caption, idx) => {
+                      return (
+                        <Th color='gray.800' key={idx} pl={0}>
+                          <Box>{caption}</Box>
+                        </Th>
+                      )
+                    })}
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  <Tr>
+                    <Td pl={0}>
+                      <Text
+                        color={'blue.500'}
+                        minWidth='100%'
+                        onClick={handleOpen}
+                        cursor={'pointer'}
+                      >
+                        {data.project.name}
+                      </Text>
+                    </Td>
+                    <Td pl={0}>
+                      {uniqVersions.map((item) => (
+                        <Text key={item.id}>{item.version}</Text>
+                      ))}
+                    </Td>
+                    <Td pl={0}>{data.project.description}</Td>
+                    <Td pl={0}>{timeSince(data.project.updatedAt)}</Td>
+                  </Tr>
+                </Tbody>
+              </Table>
+            ) : (
+              <Flex
+                width={'100%'}
+                alignItems={'cener'}
+                justifyContent={'center'}
+                py={6}
+              >
+                Get a valid sharelynk from supplier
+              </Flex>
+            )}
+          </CardBody>
+        </Card>
+      </Flex>
+    )
+  } else {
+    return (
+      <>
+        <Flex direction='column' pt={{ base: '120px', md: '75px' }}>
+          <Card mb='6'>
             <CardBody>
               <Grid
                 width={'100%'}
@@ -224,7 +306,12 @@ function SBOM() {
                               variant='outline'
                               colorScheme='blue'
                             >
-                              <TagLabel>Created</TagLabel>
+                              <TagLabel>
+                                {sbomData.sbom.authors.length > 0 ||
+                                sbomData.sbom.suppliers.length > 0
+                                  ? 'Edited'
+                                  : 'Created'}
+                              </TagLabel>
                             </Tag>
                           )}
                         </Flex>
@@ -288,108 +375,108 @@ function SBOM() {
                 )}
               </Grid>
             </CardBody>
-          </CardBody>
-        </Card>
-        <Flex direction='row' gap='2'>
-          <SBOMStatistics
-            icon={<Icon h={'24px'} w={'24px'} color='white' as={FaCubes} />}
-            title={'Components'}
-            description={'Components included in SBOM'}
-            amount={sbomData ? sbomData.sbom.components.length : 'Loading...'}
-          />
-          <Spacer />
-          <SBOMStatistics
-            icon={
-              <Icon h={'24px'} w={'24px'} color='white' as={FaBalanceScale} />
-            }
-            title={'Licenses'}
-            description={'Unique licenses included in SBOM'}
-            amount={totalLicenses ? totalLicenses.length : 'Loading...'}
-          />
+          </Card>
+          <Flex direction='row' gap='2'>
+            <SBOMStatistics
+              icon={<Icon h={'24px'} w={'24px'} color='white' as={FaCubes} />}
+              title={'Components'}
+              description={'Components included in SBOM'}
+              amount={sbomData ? sbomData.sbom.components.length : 'Loading...'}
+            />
+            <Spacer />
+            <SBOMStatistics
+              icon={
+                <Icon h={'24px'} w={'24px'} color='white' as={FaBalanceScale} />
+              }
+              title={'Licenses'}
+              description={'Unique licenses included in SBOM'}
+              amount={totalLicenses ? totalLicenses.length : 'Loading...'}
+            />
+          </Flex>
+          {sbomData && (
+            <SBOMTable
+              title={'SBOM'}
+              captions={[
+                'Component',
+                'Version',
+                'PURL',
+                'Supplier',
+                'Licenses',
+                'Updated At',
+                ''
+              ]}
+              data={sbomData.sbom}
+              refetch={refetch}
+              versionName={validSBOMS?.version}
+            />
+          )}
         </Flex>
-        {sbomData && (
-          <SBOMTable
-            title={'SBOM'}
-            captions={[
-              'Component',
-              'Version',
-              'PURL',
-              'Supplier',
-              'Licenses',
-              'Updated At',
-              ''
-            ]}
-            data={sbomData.sbom}
-            refetch={refetch}
-            versionName={validSBOMS?.version}
+
+        {isSBMOpen && sbomData && (
+          <ShareLynkDrawer
+            isOpen={isSBMOpen}
+            onClose={setSBMClose}
+            btnRef={btnRef}
+            productName={''}
+            versionName={''}
           />
         )}
-      </Flex>
 
-      {isSBMOpen && sbomData && (
-        <ShareLynkDrawer
-          isOpen={isSBMOpen}
-          onClose={setSBMClose}
-          btnRef={btnRef}
-          productName={''}
-          versionName={''}
-        />
-      )}
-
-      {isOpen && (
-        <Modal
-          initialFocusRef={initialRef}
-          finalFocusRef={finalRef}
-          isOpen={isOpen}
-          onClose={onClose}
-        >
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>SBOM Download</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody pb={6}>
-              <FormLabel align='center'>SBOM Specification</FormLabel>
-              <Stack direction='column' gap='20px'>
-                <RadioGroup defaultValue='1'>
-                  <Stack spacing={4} direction='row'>
-                    <Radio value='1'>CycloneDX</Radio>
-                    <Radio value='2'>SPDX</Radio>
-                  </Stack>
-                </RadioGroup>
-              </Stack>
-
-              <FormLabel align='center' pt='30px'>
-                File Format
-              </FormLabel>
-              <Stack direction='column' gap='20px'>
-                <RadioGroup defaultValue='1'>
-                  <Stack spacing={4} direction='row'>
-                    <Radio value='1'>JSON</Radio>
-                    <Radio value='2'>XML</Radio>
-                  </Stack>
-                </RadioGroup>
-
-                <Stack direction='column' gap='5px'>
-                  <Checkbox defaultChecked>Include Vulnerabilities</Checkbox>
-                  <Checkbox defaultChecked>
-                    Include Vulnerability Status (VEX)
-                  </Checkbox>
+        {isOpen && (
+          <Modal
+            initialFocusRef={initialRef}
+            finalFocusRef={finalRef}
+            isOpen={isOpen}
+            onClose={onClose}
+          >
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>SBOM Download</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody pb={6}>
+                <FormLabel align='center'>SBOM Specification</FormLabel>
+                <Stack direction='column' gap='20px'>
+                  <RadioGroup defaultValue='1'>
+                    <Stack spacing={4} direction='row'>
+                      <Radio value='1'>CycloneDX</Radio>
+                      <Radio value='2'>SPDX</Radio>
+                    </Stack>
+                  </RadioGroup>
                 </Stack>
-              </Stack>
-            </ModalBody>
 
-            <ModalFooter>
-              <Button colorScheme='blue' mr={3}>
-                Download
-              </Button>
+                <FormLabel align='center' pt='30px'>
+                  File Format
+                </FormLabel>
+                <Stack direction='column' gap='20px'>
+                  <RadioGroup defaultValue='1'>
+                    <Stack spacing={4} direction='row'>
+                      <Radio value='1'>JSON</Radio>
+                      <Radio value='2'>XML</Radio>
+                    </Stack>
+                  </RadioGroup>
 
-              <Button onClick={onClose}>Cancel</Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-      )}
-    </>
-  )
+                  <Stack direction='column' gap='5px'>
+                    <Checkbox defaultChecked>Include Vulnerabilities</Checkbox>
+                    <Checkbox defaultChecked>
+                      Include Vulnerability Status (VEX)
+                    </Checkbox>
+                  </Stack>
+                </Stack>
+              </ModalBody>
+
+              <ModalFooter>
+                <Button colorScheme='blue' mr={3}>
+                  Download
+                </Button>
+
+                <Button onClick={onClose}>Cancel</Button>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
+        )}
+      </>
+    )
+  }
 }
 
 export default SBOM

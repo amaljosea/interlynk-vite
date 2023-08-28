@@ -82,7 +82,7 @@ function ShareLynkRow(props) {
 
   const domain = window.location.origin
 
-  const sbomLink = useClipboard(`${domain}/login?p=${product}&sbom=${sbomId}`)
+  const sbomLink = useClipboard(`${domain}/login?p=${product}`)
 
   // `https://dashboard-app.fly.dev/#/customer/sboms/${customerId[7]}`
 
