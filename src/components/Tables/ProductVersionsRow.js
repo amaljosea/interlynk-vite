@@ -1,18 +1,17 @@
 import {
   IconButton,
-  Flex,
   Td,
   Text,
   Tr,
   useColorModeValue,
-  Icon,
   Switch,
   Menu,
   MenuItem,
   MenuButton,
   MenuList,
   Portal,
-  useDisclosure
+  useDisclosure,
+  Skeleton
 } from '@chakra-ui/react'
 import { useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
@@ -35,7 +34,8 @@ function ProductVersionsRow(props) {
     updatedAt,
     vendor,
     allProjects,
-    fetchProjects
+    fetchProjects,
+    isLoading
   } = props
   const textColor = useColorModeValue('gray.700', 'white')
   const [checked, setChecked] = useState(active ? true : false)
@@ -61,16 +61,36 @@ function ProductVersionsRow(props) {
     }
   }
 
-  // console.log(`sbomId`, sbomId)
+  console.log(`sbomId`, sbomId)
+
+  const uniqVersions = []
+
+  sbomId &&
+    sbomId.map((project) => {
+      project.components.map((sbom) => {
+        if (sbom.primary === true) {
+          uniqVersions.push({
+            version: sbom.version,
+            id: project.id
+          })
+        }
+      })
+    })
 
   return (
     <>
       <Tr>
         <Td pl={0}>
-          <Switch size='md' defaultChecked />
+          {isLoading ? (
+            <Skeleton height='20px' my={2} />
+          ) : (
+            <Switch size='md' defaultChecked />
+          )}
         </Td>
         <Td pl={0}>
-          {sbomId.length > 0 ? (
+          {isLoading ? (
+            <Skeleton height='20px' />
+          ) : sbomId.length > 0 ? (
             <Link to={`/vendor/products?p=${id}&sbom=${sbomId[0].id}`}>
               <Text color={'blue.500'} minWidth='100%'>
                 {name}
@@ -87,28 +107,42 @@ function ProductVersionsRow(props) {
             </Text>
           )}
         </Td>
-        <Td pl={0}>{sbomId.length}</Td>
-        <Td pl={0}>{description}</Td>
-        <Td pl={0}>{timeSince(updatedAt)}</Td>
         <Td pl={0}>
-          <Menu>
-            <MenuButton
-              as={IconButton}
-              aria-label='Options'
-              icon={<FaEllipsisV />}
-              variant='none'
-              color='gray.400'
-            />
-            <Portal>
-              <MenuList size='sm'>
-                <MenuItem onClick={onOpen}>Edit</MenuItem>
-                <MenuItem ref={btnRefProduct} onClick={onOpenProduct}>
-                  Upload
-                </MenuItem>
-                <MenuItem onClick={onProductDelete}>Archive</MenuItem>
-              </MenuList>
-            </Portal>
-          </Menu>
+          {isLoading ? (
+            <Skeleton height='20px' />
+          ) : (
+            uniqVersions.map((item) => (
+              <Text key={item.id}>{item.version}</Text>
+            ))
+          )}
+        </Td>
+        <Td pl={0}>{isLoading ? <Skeleton height='20px' /> : description}</Td>
+        <Td pl={0}>
+          {isLoading ? <Skeleton height='20px' /> : timeSince(updatedAt)}
+        </Td>
+        <Td pl={0}>
+          {isLoading ? (
+            <Skeleton height='20px' />
+          ) : (
+            <Menu>
+              <MenuButton
+                as={IconButton}
+                aria-label='Options'
+                icon={<FaEllipsisV />}
+                variant='none'
+                color='gray.400'
+              />
+              <Portal>
+                <MenuList size='sm'>
+                  <MenuItem onClick={onOpen}>Edit</MenuItem>
+                  <MenuItem ref={btnRefProduct} onClick={onOpenProduct}>
+                    Upload
+                  </MenuItem>
+                  <MenuItem onClick={onProductDelete}>Archive</MenuItem>
+                </MenuList>
+              </Portal>
+            </Menu>
+          )}
 
           <UploadModal
             id={id}

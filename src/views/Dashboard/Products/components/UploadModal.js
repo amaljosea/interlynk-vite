@@ -1,15 +1,14 @@
 import { useMutation } from '@apollo/client'
 import {
   Box,
-  Button,
   Flex,
   FormLabel,
   Input,
-  ModalFooter,
+  Alert,
+  AlertIcon,
+  AlertTitle,
   Text,
-  useToast
-} from '@chakra-ui/react'
-import {
+  useToast,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -19,25 +18,24 @@ import {
 } from '@chakra-ui/react'
 import GlobalContext from 'context/GlobalContext'
 import { UploadSbom } from 'graphQL/Mutation'
-import { useEffect, useContext } from 'react'
+import { useEffect, useContext, useState } from 'react'
 import { FaUpload } from 'react-icons/fa'
 
 const UploadModal = ({ id, isOpen, onClose }) => {
   const toast = useToast()
-  const { setSbomFile } = useContext(GlobalContext)
   const [sbomUpload, { data, loading, error }] = useMutation(UploadSbom)
+  const [errorMessage, setErrorMessage] = useState('')
 
-  const handleFileChange = async (event) => {
+  const handleUpload = async (file) => {
     try {
       await sbomUpload({
         variables: {
-          doc: event.target.files[0],
+          doc: file,
           projectId: id
         }
       })
         .then((res) => {
           if (res.data.sbomUpload.errors === '[]') {
-            setSbomFile(res.data.sbomUpload.errors)
             toast({
               title: 'Data uploaded successfully',
               description:
@@ -63,11 +61,28 @@ const UploadModal = ({ id, isOpen, onClose }) => {
     }
   }
 
-  useEffect(() => {
-    if (data) {
-      console.log('Data', data.sbomUpload)
+  const handleFileChange = async (event) => {
+    const selectedFile = event.target.files[0]
+    if (selectedFile) {
+      const validExtensions = ['xml', 'json']
+      const fileExtension = selectedFile.name.split('.').pop().toLowerCase()
+      console.log(`fileExtension`, fileExtension)
+      if (validExtensions.includes(fileExtension)) {
+        setErrorMessage('')
+        handleUpload(selectedFile)
+      } else {
+        setErrorMessage(
+          'Invalid file type, only .xml and .json files are allowed.'
+        )
+      }
     }
-  }, [data])
+  }
+
+  // useEffect(() => {
+  //   if (data) {
+  //     console.log('Data', data.sbomUpload)
+  //   }
+  // }, [data])
 
   return (
     <>
@@ -75,14 +90,23 @@ const UploadModal = ({ id, isOpen, onClose }) => {
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Upload your SBOM</ModalHeader>
-          <ModalCloseButton />
+          <ModalCloseButton onClick={() => setErrorMessage('')} />
           <ModalBody>
+            {errorMessage !== '' && (
+              <Alert status='error' mb={4} borderRadius={5}>
+                <AlertIcon />
+                <AlertTitle fontSize={'sm'} fontWeight={'medium'}>
+                  {errorMessage}
+                </AlertTitle>
+              </Alert>
+            )}
             <Box>
-              <FormLabel htmlFor='file'>
+              <FormLabel htmlFor='file' width={'100%'}>
                 <Input
                   type='file'
                   id='file'
                   style={{ display: 'none' }}
+                  accept='.xml,.json'
                   onChange={handleFileChange}
                 />
                 <Flex

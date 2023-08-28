@@ -119,7 +119,7 @@ export default function Dashboard(props) {
         <MainPanel
           w={{
             base: '100%',
-            xl: minimize ? 'calc(100% - 110px)' : 'calc(100% - 220px)'
+            xl: minimize ? 'calc(100% - 105px)' : 'calc(100% - 220px)'
           }}
         >
           <Portal>

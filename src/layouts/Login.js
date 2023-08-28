@@ -54,7 +54,7 @@ const Login = () => {
           if (status.code === 200) {
             localStorage.setItem('username', status.data.user.name)
             Cookies.set('authToken', response.headers.authorization)
-            history.push(`/sharelynk?p=${productId}&sbom=${sbomId}`)
+            history.push(`/sharelynk?p=${productId}`)
           }
         })
     } else {

@@ -72,15 +72,12 @@ const GeneralDataDrawer = ({
   const [licenseList, setLicenseList] = useState([])
 
   const [createTool] = useMutation(toolCreate)
-  const [updateTool] = useMutation(toolUpdate)
   const [deleteTool] = useMutation(toolDelete)
 
   const [createAuthor] = useMutation(authorCreate)
-  const [updateAuthor] = useMutation(authorUpdate)
   const [deleteAuthor] = useMutation(authorDelete)
 
   const [createSupplier] = useMutation(supplierCreate)
-  const [updateSupplier] = useMutation(supplierUpdate)
   const [deleteSupplier] = useMutation(supplierDelete)
 
   useEffect(() => {
