@@ -61,7 +61,7 @@ function ProductVersionsRow(props) {
     }
   }
 
-  console.log(`sbomId`, sbomId)
+  // console.log(`sbomId`, sbomId)
 
   const uniqVersions = []
 
@@ -111,9 +111,7 @@ function ProductVersionsRow(props) {
           {isLoading ? (
             <Skeleton height='20px' />
           ) : (
-            uniqVersions.map((item) => (
-              <Text key={item.id}>{item.version}</Text>
-            ))
+            <Text>{sbomId.length}</Text>
           )}
         </Td>
         <Td pl={0}>{isLoading ? <Skeleton height='20px' /> : description}</Td>

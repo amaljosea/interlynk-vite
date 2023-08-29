@@ -32,7 +32,9 @@ import {
   TagLabel,
   Tag,
   Code,
-  useToast
+  useToast,
+  RadioGroup,
+  Radio
 } from '@chakra-ui/react'
 import { useMutation } from '@apollo/client'
 import { CreateComponent } from 'graphQL/Mutation'
@@ -83,10 +85,10 @@ function ComponentDrawer(props) {
   const [purlValue, setPurlValue] = useState('')
 
   const [isIncomplete, setIsIncomplete] = useState(false)
-  const [isPrimary, setIsPrimary] = useState(primary)
+  const [isPrimary, setIsPrimary] = useState('2')
   const [isInternal, setIsInternal] = useState(internal)
 
-  // console.log(`isPrimary`, isPrimary)
+  console.log(`isPrimary`, isPrimary)
 
   useEffect(() => {
     setCompId(id)
@@ -96,6 +98,7 @@ function ComponentDrawer(props) {
     setSelectedLicense(license[0])
     setCpeList(cpes)
     setPurlValue(purl)
+    setIsPrimary(primary === false ? '2' : '1')
   }, [component])
 
   useEffect(() => {
@@ -121,8 +124,8 @@ function ComponentDrawer(props) {
             ],
             cpes: cpeList,
             purl: purlValue,
-            primary: isPrimary,
-            internal: isInternal
+            primary: isPrimary === '1' ? true : false,
+            internal: isPrimary === '2' ? true : false
           }
         }).then(() => {
           refetch({
@@ -158,8 +161,8 @@ function ComponentDrawer(props) {
           ],
           cpes: cpeList,
           purl: purlValue,
-          primary: isPrimary,
-          internal: isInternal
+          primary: isPrimary === '1' ? true : false,
+          internal: isPrimary === '2' ? true : false
         }
       }).then(() => {
         refetch({
@@ -232,7 +235,6 @@ function ComponentDrawer(props) {
                 onChange={(e) => setCompType(e.target.value)}
               >
                 <option value=''>-- Select --</option>
-                <option value='required'>Required</option>
                 <option value='unknown'>Unknown</option>
                 <option value='library'>Library</option>
                 <option value='operating_system'>Operating system</option>
@@ -338,7 +340,7 @@ function ComponentDrawer(props) {
                     flexWrap={'wrap'}
                     spacing={2}
                     gap={2}
-                    mt={1}
+                    my={1}
                   >
                     {cpeList.map((item, index) => (
                       <Tag
@@ -362,7 +364,6 @@ function ComponentDrawer(props) {
                   mt='10px'
                   size='sm'
                   colorScheme='blue'
-                  color='gray.500'
                   isChecked={isIncomplete}
                   onChange={() => setIsIncomplete(!isIncomplete)}
                 >
@@ -371,7 +372,21 @@ function ComponentDrawer(props) {
               </FormControl>
             )}
 
-            <Checkbox
+            <RadioGroup
+              value={isPrimary}
+              onChange={(value) => setIsPrimary(value)}
+            >
+              <Stack spacing={2} direction='column'>
+                <Radio value='1' size='sm'>
+                  Primary component
+                </Radio>
+                <Radio value='2' size='sm'>
+                  Internal component
+                </Radio>
+              </Stack>
+            </RadioGroup>
+
+            {/* <Checkbox
               size='sm'
               colorScheme='blue'
               color='gray.500'
@@ -391,7 +406,7 @@ function ComponentDrawer(props) {
               >
                 Internal component
               </Checkbox>
-            </FormControl>
+            </FormControl> */}
           </Stack>
         </DrawerBody>
         <DrawerFooter borderTopWidth='1px'>

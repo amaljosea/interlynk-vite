@@ -33,17 +33,19 @@ import { useLocation } from 'react-router-dom'
 import SBOM from 'views/Sbom'
 
 function Index() {
-  const { productVersionsData, productVersionExploded } = useContext(
-    GlobalContext
-  )
+  const {
+    productVersionsData,
+    productVersionExploded,
+    setProductStatus
+  } = useContext(GlobalContext)
 
   const captions = [
-    'Active',
-    'Product',
-    'sboms',
-    'Description',
-    'Updated At',
-    'Action'
+    'active',
+    'product',
+    'versions',
+    'description',
+    'updated at',
+    'action'
   ]
 
   const location = useLocation()

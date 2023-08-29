@@ -591,6 +591,7 @@ export const GetSBOM = gql`
         id
         name
       }
+      licenses
       tools {
         id
         name
