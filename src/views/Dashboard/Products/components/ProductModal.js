@@ -51,7 +51,8 @@ const ProductModal = ({
     allProjects &&
     allProjects.projects.nodes.find((item) => item.name === `${productName}`)
 
-  const updateProduct = async () => {
+  const updateProduct = async (e) => {
+    e.preventDefault()
     try {
       await projectUpdate({
         variables: {
@@ -65,7 +66,8 @@ const ProductModal = ({
     }
   }
 
-  const handleSave = async () => {
+  const handleSave = async (e) => {
+    e.preventDefault()
     if (!productExist) {
       try {
         await projectCreate({
@@ -91,71 +93,72 @@ const ProductModal = ({
     <>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-
-        <ModalContent>
-          <ModalHeader>{product ? 'Update' : 'Add'} Product</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Flex width={'100%'} direction={'column'} gap={4}>
-              {error !== '' && (
-                <Alert status='error'>
-                  <AlertIcon />
-                  <Text fontSize={'sm'}>{error}</Text>
-                </Alert>
+        <form onSubmit={id ? updateProduct : handleSave}>
+          <ModalContent>
+            <ModalHeader>{product ? 'Update' : 'Add'} Product</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Flex width={'100%'} direction={'column'} gap={4}>
+                {error !== '' && (
+                  <Alert status='error'>
+                    <AlertIcon />
+                    <Text fontSize={'sm'}>{error}</Text>
+                  </Alert>
+                )}
+                <FormControl isRequired>
+                  <FormLabel>Name</FormLabel>
+                  <Input
+                    type='text'
+                    value={productName}
+                    onChange={(e) => setProductName(e.target.value)}
+                    placeholder='Enter name'
+                  />
+                </FormControl>
+                <FormControl isRequired>
+                  <FormLabel>Description</FormLabel>
+                  <Input
+                    type='text'
+                    value={productDesc}
+                    onChange={(e) => setProductDesc(e.target.value)}
+                    placeholder='Enter product description'
+                  />
+                </FormControl>
+                <FormControl display='none'>
+                  <FormLabel>Vendor</FormLabel>
+                  <Input
+                    type='text'
+                    value={vendor}
+                    onChange={(e) => setVendor(e.target.value)}
+                    placeholder='Enter vendor name'
+                  />
+                </FormControl>
+                <FormControl display='none'>
+                  <FormLabel>Unique Identifier</FormLabel>
+                  <Input
+                    type='text'
+                    value={uniqueId}
+                    placeholder={`Add identifier`}
+                    onChange={(e) => setUniqueId(e.target.value)}
+                  />
+                </FormControl>
+              </Flex>
+            </ModalBody>
+            <ModalFooter>
+              <Button colorScheme='gray' mr={3} onClick={onClose}>
+                Cancel
+              </Button>
+              {id ? (
+                <Button colorScheme='blue' type='submit'>
+                  Update
+                </Button>
+              ) : (
+                <Button colorScheme='blue' type='submit'>
+                  Save
+                </Button>
               )}
-              <FormControl isRequired>
-                <FormLabel>Name</FormLabel>
-                <Input
-                  type='text'
-                  value={productName}
-                  onChange={(e) => setProductName(e.target.value)}
-                  placeholder='Enter name'
-                />
-              </FormControl>
-              <FormControl isRequired>
-                <FormLabel>Description</FormLabel>
-                <Input
-                  type='text'
-                  value={productDesc}
-                  onChange={(e) => setProductDesc(e.target.value)}
-                  placeholder='Enter product description'
-                />
-              </FormControl>
-              <FormControl display='none'>
-                <FormLabel>Vendor</FormLabel>
-                <Input
-                  type='text'
-                  value={vendor}
-                  onChange={(e) => setVendor(e.target.value)}
-                  placeholder='Enter vendor name'
-                />
-              </FormControl>
-              <FormControl display='none'>
-                <FormLabel>Unique Identifier</FormLabel>
-                <Input
-                  type='text'
-                  value={uniqueId}
-                  placeholder={`Add identifier`}
-                  onChange={(e) => setUniqueId(e.target.value)}
-                />
-              </FormControl>
-            </Flex>
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme='gray' mr={3} onClick={onClose}>
-              Cancel
-            </Button>
-            {id ? (
-              <Button colorScheme='blue' onClick={updateProduct}>
-                Update
-              </Button>
-            ) : (
-              <Button colorScheme='blue' onClick={handleSave}>
-                Save
-              </Button>
-            )}
-          </ModalFooter>
-        </ModalContent>
+            </ModalFooter>
+          </ModalContent>
+        </form>
       </Modal>
     </>
   )

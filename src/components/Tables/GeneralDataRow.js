@@ -1,9 +1,11 @@
 import { EditIcon } from '@chakra-ui/icons'
-import { Flex, Icon, Td, Text, Tr } from '@chakra-ui/react'
+import { Button, Flex, Icon, Td, Text, Tr } from '@chakra-ui/react'
+import GlobalContext from 'context/GlobalContext'
+import { useContext } from 'react'
 import { useLocation } from 'react-router-dom'
 import { timeSince } from 'utils'
 
-const GeneralDataRow = ({ onOpen, data, setSelectedKey }) => {
+const GeneralDataRow = ({ onOpen, data, setSelectedKey, status }) => {
   const location = useLocation()
 
   const customerView = location.pathname.startsWith('/sharelynk')
@@ -43,12 +45,13 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey }) => {
         </Td>
         <Td pl={0}>
           {!customerView && (
-            <Icon
-              as={EditIcon}
-              color={'blue.500'}
-              cursor={'pointer'}
+            <Button
+              size='sm'
+              isDisabled={status === 'Signed'}
               onClick={() => handleClick('tools')}
-            />
+            >
+              <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
+            </Button>
           )}
         </Td>
       </Tr>
@@ -96,12 +99,13 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey }) => {
         </Td>
         <Td pl={0}>
           {!customerView && (
-            <Icon
-              as={EditIcon}
-              color={'blue.500'}
-              cursor={'pointer'}
+            <Button
+              size='sm'
+              isDisabled={status === 'Signed'}
               onClick={() => handleClick('author')}
-            />
+            >
+              <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
+            </Button>
           )}
         </Td>
       </Tr>
@@ -121,12 +125,13 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey }) => {
         </Td>
         <Td pl={0}>
           {!customerView && (
-            <Icon
-              as={EditIcon}
-              color={'blue.500'}
-              cursor={'pointer'}
+            <Button
+              size='sm'
+              isDisabled={status === 'Signed'}
               onClick={() => handleClick('supplier')}
-            />
+            >
+              <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
+            </Button>
           )}
         </Td>
       </Tr>
@@ -145,12 +150,13 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey }) => {
         </Td>
         <Td pl={0}>
           {!customerView && (
-            <Icon
-              as={EditIcon}
-              color={'blue.500'}
-              cursor={'pointer'}
+            <Button
+              size='sm'
+              isDisabled={status === 'Signed'}
               onClick={() => handleClick('license')}
-            />
+            >
+              <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
+            </Button>
           )}
         </Td>
       </Tr>
@@ -171,12 +177,13 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey }) => {
         </Td>
         <Td pl={0}>
           {!customerView && (
-            <Icon
-              as={EditIcon}
-              color={'blue.500'}
-              cursor={'pointer'}
+            <Button
+              size='sm'
+              isDisabled={status === 'Signed'}
               onClick={() => handleClick('identifier')}
-            />
+            >
+              <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
+            </Button>
           )}
         </Td>
       </Tr>

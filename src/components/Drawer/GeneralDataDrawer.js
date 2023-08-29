@@ -45,6 +45,8 @@ const GeneralDataDrawer = ({
 }) => {
   const { cpes, purl, swid, tools, authors, licenses, suppliers } = data
 
+  // console.log(`licenses`, licenses)
+
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('p')
@@ -92,7 +94,8 @@ const GeneralDataDrawer = ({
     setSwidValue(swid)
   }, [data])
 
-  const handleAuthorAdd = async () => {
+  const handleAuthorAdd = async (e) => {
+    e.preventDefault()
     if (authorName || authorEmail) {
       await createAuthor({
         variables: {
@@ -130,7 +133,8 @@ const GeneralDataDrawer = ({
     }
   }
 
-  const handleSupAdd = async () => {
+  const handleSupAdd = async (e) => {
+    e.preventDefault()
     if (supName || supEmail) {
       await createSupplier({
         variables: {
@@ -327,136 +331,143 @@ const GeneralDataDrawer = ({
             )}
 
             {selectedKey === 'author' && (
-              <Flex direction={'column'} alignItems={'flex-start'} gap={3}>
-                <Input
-                  placeholder='Author Name*'
-                  value={authorName}
-                  onChange={(e) => setAuthorName(e.target.value)}
-                />
+              <form onSubmit={handleAuthorAdd}>
+                <Flex direction={'column'} alignItems={'flex-start'} gap={3}>
+                  <Input
+                    type='text'
+                    placeholder='Author Name*'
+                    value={authorName}
+                    onChange={(e) => setAuthorName(e.target.value)}
+                  />
 
-                <Input
-                  placeholder='Author Email*'
-                  value={authorEmail}
-                  onChange={(e) => setAuthorEmail(e.target.value)}
-                />
+                  <Input
+                    type='email'
+                    placeholder='Author Email*'
+                    value={authorEmail}
+                    onChange={(e) => setAuthorEmail(e.target.value)}
+                  />
 
-                <Button colorScheme='blue' onClick={handleAuthorAdd}>
-                  Add
-                </Button>
+                  <Button colorScheme='blue' type='submit'>
+                    Add
+                  </Button>
 
-                <Flex width={'100%'} flexDir={'column'}>
-                  <Text size='md' my={2}>
-                    Author History
-                  </Text>
-                  {authorList.length > 0 ? (
-                    <Table variant='simple' size='sm' mt={4}>
-                      <Thead>
-                        <Tr my='.8rem'>
-                          <Th pl={0}>Name</Th>
-                          <Th pl={0}>Email</Th>
-                          <Th pl={0}>Updated At</Th>
-                          <Th pl={0}></Th>
-                        </Tr>
-                      </Thead>
-                      <Tbody>
-                        {authorList.map((item, index) => (
-                          <Tr key={index}>
-                            <Td pl={0} fontSize={'xs'}>
-                              {item.name}
-                            </Td>
-                            <Td pl={0} fontSize={'xs'}>
-                              {item.email}
-                            </Td>
-                            <Td pl={0} fontSize={'xs'}>
-                              {timeSince(item.updatedAt)}
-                            </Td>
-                            <Td>
-                              <Icon
-                                as={DeleteIcon}
-                                color={'red'}
-                                cursor={'pointer'}
-                                onClick={() => handleAuthorRemove(item.id)}
-                              />
-                            </Td>
-                          </Tr>
-                        ))}
-                      </Tbody>
-                    </Table>
-                  ) : (
-                    <Text mt={4} color={'darkgrey'}>
-                      No author found
+                  <Flex width={'100%'} flexDir={'column'}>
+                    <Text size='md' my={2}>
+                      Author History
                     </Text>
-                  )}
+                    {authorList.length > 0 ? (
+                      <Table variant='simple' size='sm' mt={4}>
+                        <Thead>
+                          <Tr my='.8rem'>
+                            <Th pl={0}>Name</Th>
+                            <Th pl={0}>Email</Th>
+                            <Th pl={0}>Updated At</Th>
+                            <Th pl={0}></Th>
+                          </Tr>
+                        </Thead>
+                        <Tbody>
+                          {authorList.map((item, index) => (
+                            <Tr key={index}>
+                              <Td pl={0} fontSize={'xs'}>
+                                {item.name}
+                              </Td>
+                              <Td pl={0} fontSize={'xs'}>
+                                {item.email}
+                              </Td>
+                              <Td pl={0} fontSize={'xs'}>
+                                {timeSince(item.updatedAt)}
+                              </Td>
+                              <Td>
+                                <Icon
+                                  as={DeleteIcon}
+                                  color={'red'}
+                                  cursor={'pointer'}
+                                  onClick={() => handleAuthorRemove(item.id)}
+                                />
+                              </Td>
+                            </Tr>
+                          ))}
+                        </Tbody>
+                      </Table>
+                    ) : (
+                      <Text mt={4} color={'darkgrey'}>
+                        No author found
+                      </Text>
+                    )}
+                  </Flex>
                 </Flex>
-              </Flex>
+              </form>
             )}
 
             {selectedKey === 'supplier' && (
-              <Flex direction={'column'} alignItems={'flex-start'} gap={3}>
-                <FormControl>
-                  <Input
-                    placeholder='Name'
-                    value={supName}
-                    onChange={(e) => setSupName(e.target.value)}
-                  />
-                </FormControl>
-                <FormControl>
-                  <Input
-                    placeholder='Email'
-                    value={supEmail}
-                    onChange={(e) => setSupEmail(e.target.value)}
-                  />
-                </FormControl>
+              <form onSubmit={handleSupAdd}>
+                <Flex direction={'column'} alignItems={'flex-start'} gap={3}>
+                  <FormControl>
+                    <Input
+                      placeholder='Name'
+                      value={supName}
+                      onChange={(e) => setSupName(e.target.value)}
+                    />
+                  </FormControl>
+                  <FormControl>
+                    <Input
+                      type='email'
+                      placeholder='Email'
+                      value={supEmail}
+                      onChange={(e) => setSupEmail(e.target.value)}
+                    />
+                  </FormControl>
 
-                <Button colorScheme='blue' onClick={handleSupAdd}>
-                  Add
-                </Button>
+                  <Button colorScheme='blue' type='submit'>
+                    Add
+                  </Button>
 
-                <Flex width={'100%'} flexDir={'column'}>
-                  <Text size='md' my={2}>
-                    Supplier History
-                  </Text>
-                  {supplierList.length > 0 ? (
-                    <Table variant='simple' size='sm' mt={4}>
-                      <Thead>
-                        <Tr my='.8rem'>
-                          <Th pl={0}>Name</Th>
-                          <Th pl={0}>Email</Th>
-                          <Th pl={0}>Updated At</Th>
-                          <Th pl={0}></Th>
-                        </Tr>
-                      </Thead>
-                      <Tbody>
-                        {supplierList.map((item, index) => (
-                          <Tr key={index}>
-                            <Td pl={0} fontSize={'xs'}>
-                              {item.name}
-                            </Td>
-                            <Td pl={0} fontSize={'xs'}>
-                              {item.email}
-                            </Td>
-                            <Td pl={0} fontSize={'xs'}>
-                              {timeSince(item.updatedAt)}
-                            </Td>
-                            <Td>
-                              <Icon
-                                as={DeleteIcon}
-                                color={'red'}
-                                cursor={'pointer'}
-                                onClick={() => handleSupRemove(item.id)}
-                              />
-                            </Td>
-                          </Tr>
-                        ))}
-                      </Tbody>
-                    </Table>
-                  ) : (
-                    <Text mt={4} color={'darkgrey'}>
-                      No author found
+                  <Flex width={'100%'} flexDir={'column'}>
+                    <Text size='md' my={2}>
+                      Supplier History
                     </Text>
-                  )}
+                    {supplierList.length > 0 ? (
+                      <Table variant='simple' size='sm' mt={4}>
+                        <Thead>
+                          <Tr my='.8rem'>
+                            <Th pl={0}>Name</Th>
+                            <Th pl={0}>Email</Th>
+                            <Th pl={0}>Updated At</Th>
+                            <Th pl={0}></Th>
+                          </Tr>
+                        </Thead>
+                        <Tbody>
+                          {supplierList.map((item, index) => (
+                            <Tr key={index}>
+                              <Td pl={0} fontSize={'xs'}>
+                                {item.name}
+                              </Td>
+                              <Td pl={0} fontSize={'xs'}>
+                                {item.email}
+                              </Td>
+                              <Td pl={0} fontSize={'xs'}>
+                                {timeSince(item.updatedAt)}
+                              </Td>
+                              <Td>
+                                <Icon
+                                  as={DeleteIcon}
+                                  color={'red'}
+                                  cursor={'pointer'}
+                                  onClick={() => handleSupRemove(item.id)}
+                                />
+                              </Td>
+                            </Tr>
+                          ))}
+                        </Tbody>
+                      </Table>
+                    ) : (
+                      <Text mt={4} color={'darkgrey'}>
+                        No author found
+                      </Text>
+                    )}
+                  </Flex>
                 </Flex>
-              </Flex>
+              </form>
             )}
 
             {selectedKey === 'license' && (

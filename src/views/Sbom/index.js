@@ -52,9 +52,12 @@ import GlobalContext from 'context/GlobalContext'
 import { useQuery } from '@apollo/client'
 import { GetSBOM, GetProject } from 'graphQL/Queries'
 import { timeSince } from 'utils'
+import { BsShieldExclamation } from 'react-icons/bs'
+import SigningModal from './components/SigningModal'
+import { MdVerified } from 'react-icons/md'
 
 function SBOM() {
-  const { productVersionsData, productStatus } = useContext(GlobalContext)
+  const { productVersionsData } = useContext(GlobalContext)
 
   const initialRef = useRef(null)
   const finalRef = useRef(null)
@@ -71,10 +74,18 @@ function SBOM() {
   const sbomId = queryParams.get('sbom')
 
   const { isOpen, onOpen, onClose } = useDisclosure()
+
+  const [status, setStatus] = useState('Unsigned')
+
   const {
     isOpen: isSBMOpen,
     onOpen: setSBMOpen,
     onClose: setSBMClose
+  } = useDisclosure()
+  const {
+    isOpen: isVerifyOpen,
+    onOpen: setVerifyOpen,
+    onClose: setVerifyClose
   } = useDisclosure()
 
   const { data: sbomData, refetch } = useQuery(GetSBOM, {
@@ -175,7 +186,7 @@ function SBOM() {
     refetchSBOM(e.target.value)
   }
 
-  const captions = ['Product', 'sboms', 'Description', 'Updated At']
+  const captions = ['Product', 'versions', 'Description', 'Updated At']
 
   const sbomVersions = []
 
@@ -226,11 +237,7 @@ function SBOM() {
                         {data.project.name}
                       </Text>
                     </Td>
-                    <Td pl={0}>
-                      {uniqVersions.map((item) => (
-                        <Text key={item.id}>{item.version}</Text>
-                      ))}
-                    </Td>
+                    <Td pl={0}>{data.project.sboms.length}</Td>
                     <Td pl={0}>{data.project.description}</Td>
                     <Td pl={0}>{timeSince(data.project.updatedAt)}</Td>
                   </Tr>
@@ -299,7 +306,8 @@ function SBOM() {
                         <Text fontSize='xs' cursor={'pointer'}>
                           Last updated at : {timeSince(sbomData.sbom.updatedAt)}
                         </Text>
-                        <Flex>
+
+                        <Box>
                           {!customerView && (
                             <Tag
                               size={'sm'}
@@ -307,14 +315,31 @@ function SBOM() {
                               colorScheme='blue'
                             >
                               <TagLabel>
-                                {sbomData.sbom.authors.length > 0 ||
+                                {status === 'Unsigned' ? 'Created' : 'Edited'}
+                                {/* {sbomData.sbom.authors.length > 0 ||
                                 sbomData.sbom.suppliers.length > 0
                                   ? 'Edited'
-                                  : 'Created'}
+                                  : 'Created'} */}
                               </TagLabel>
                             </Tag>
                           )}
-                        </Flex>
+                        </Box>
+                        <Box>
+                          {status === 'Unsigned' ? (
+                            <IconButton
+                              size='xs'
+                              onClick={setVerifyOpen}
+                              icon={
+                                <BsShieldExclamation size={16} color='tomato' />
+                              }
+                            />
+                          ) : (
+                            <IconButton
+                              size='xs'
+                              icon={<MdVerified size={16} color='dodgerblue' />}
+                            />
+                          )}
+                        </Box>
                       </Flex>
                     </Flex>
                   ) : (
@@ -408,6 +433,7 @@ function SBOM() {
               data={sbomData.sbom}
               refetch={refetch}
               versionName={validSBOMS?.version}
+              status={status}
             />
           )}
         </Flex>
@@ -473,6 +499,14 @@ function SBOM() {
               </ModalFooter>
             </ModalContent>
           </Modal>
+        )}
+
+        {isVerifyOpen && (
+          <SigningModal
+            isOpen={isVerifyOpen}
+            onClose={setVerifyClose}
+            setStatus={setStatus}
+          />
         )}
       </>
     )

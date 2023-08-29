@@ -33,7 +33,7 @@ import { AddIcon, PlusSquareIcon } from '@chakra-ui/icons'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import { timeSince } from 'utils'
 
-const SBOMTable = ({ captions, data, refetch, versionName }) => {
+const SBOMTable = ({ captions, data, refetch, versionName, status }) => {
   const { SBOMLinksData } = useContext(GlobalContext)
   const textColor = useColorModeValue('gray.700', 'white')
 
@@ -132,6 +132,7 @@ const SBOMTable = ({ captions, data, refetch, versionName }) => {
                       onOpen={onOpen}
                       setSelectedKey={setSelectedKey}
                       data={data}
+                      status={status}
                     />
                   </Tbody>
                 </Table>
