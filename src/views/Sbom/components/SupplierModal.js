@@ -11,7 +11,8 @@ import {
   Flex,
   FormControl,
   FormLabel,
-  Input
+  Input,
+  useToast
 } from '@chakra-ui/react'
 import { supplierUpdate } from 'graphQL/Mutation'
 import { supplierCreate } from 'graphQL/Mutation'
@@ -19,12 +20,18 @@ import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 
 const SupplierModal = ({ id, isOpen, onClose, refetch, suppliers }) => {
+  const toast = useToast()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
-  console.log('suppliers', suppliers)
+  // console.log('suppliers', suppliers)
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
+    return emailRegex.test(email)
+  }
 
   const [supName, setSupName] = useState('')
   const [supEmail, setSupEmail] = useState('')
@@ -39,8 +46,9 @@ const SupplierModal = ({ id, isOpen, onClose, refetch, suppliers }) => {
     }
   }, [suppliers])
 
-  const handleSave = async () => {
-    if (supName || supEmail) {
+  const handleSave = async (e) => {
+    e.preventDefault()
+    if (validateEmail(supEmail)) {
       await createSupplier({
         variables: {
           name: supName,
@@ -55,11 +63,19 @@ const SupplierModal = ({ id, isOpen, onClose, refetch, suppliers }) => {
         })
         onClose()
       })
+    } else {
+      toast({
+        description: 'Invalid email',
+        status: 'error',
+        position: 'top',
+        duration: 2000
+      })
     }
   }
 
-  const handleUpdate = async () => {
-    if (supName || supEmail) {
+  const handleUpdate = async (e) => {
+    e.preventDefault()
+    if (validateEmail(supEmail)) {
       await updateSupplier({
         variables: {
           name: supName,
@@ -75,6 +91,13 @@ const SupplierModal = ({ id, isOpen, onClose, refetch, suppliers }) => {
         })
         onClose()
       })
+    } else {
+      toast({
+        description: 'Invalid email',
+        status: 'error',
+        position: 'top',
+        duration: 2000
+      })
     }
   }
 
@@ -82,45 +105,46 @@ const SupplierModal = ({ id, isOpen, onClose, refetch, suppliers }) => {
     <>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Supplier</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Flex width={'100%'} direction={'column'} gap={4}>
-              <FormControl>
-                <FormLabel fontSize={'sm'}>Name</FormLabel>
-                <Input
-                  placeholder='Enter supplier name'
-                  value={supName}
-                  onChange={(e) => setSupName(e.target.value)}
-                />
-              </FormControl>
-              <FormControl>
-                <FormLabel fontSize={'sm'}>Email</FormLabel>
-                <Input
-                  placeholder='Enter supplier email'
-                  value={supEmail}
-                  onChange={(e) => setSupEmail(e.target.value)}
-                />
-              </FormControl>
-            </Flex>
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme='gray' mr={3} onClick={onClose}>
-              Cancel
-            </Button>
-
-            {suppliers.length > 0 ? (
-              <Button colorScheme='blue' onClick={handleUpdate}>
-                Update
+        <form onSubmit={suppliers.length > 0 ? handleUpdate : handleSave}>
+          <ModalContent>
+            <ModalHeader>Supplier</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Flex width={'100%'} direction={'column'} gap={4}>
+                <FormControl isRequired>
+                  <FormLabel fontSize={'sm'}>Name</FormLabel>
+                  <Input
+                    placeholder='Enter supplier name'
+                    value={supName}
+                    onChange={(e) => setSupName(e.target.value)}
+                  />
+                </FormControl>
+                <FormControl isRequired>
+                  <FormLabel fontSize={'sm'}>Email</FormLabel>
+                  <Input
+                    placeholder='Enter supplier email'
+                    value={supEmail}
+                    onChange={(e) => setSupEmail(e.target.value)}
+                  />
+                </FormControl>
+              </Flex>
+            </ModalBody>
+            <ModalFooter>
+              <Button colorScheme='gray' mr={3} onClick={onClose}>
+                Cancel
               </Button>
-            ) : (
-              <Button colorScheme='blue' onClick={handleSave}>
-                Save
-              </Button>
-            )}
-          </ModalFooter>
-        </ModalContent>
+              {suppliers.length > 0 ? (
+                <Button colorScheme='blue' type={'submit'}>
+                  Update
+                </Button>
+              ) : (
+                <Button colorScheme='blue' type={'submit'}>
+                  Save
+                </Button>
+              )}
+            </ModalFooter>
+          </ModalContent>
+        </form>
       </Modal>
     </>
   )

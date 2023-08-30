@@ -12,17 +12,6 @@ import {
   Tag,
   TagLabel,
   Select,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  FormLabel,
-  ModalBody,
-  Checkbox,
-  RadioGroup,
-  Radio,
-  ModalFooter,
   IconButton,
   useDisclosure,
   Code,
@@ -52,9 +41,10 @@ import GlobalContext from 'context/GlobalContext'
 import { useQuery } from '@apollo/client'
 import { GetSBOM, GetProject } from 'graphQL/Queries'
 import { timeSince } from 'utils'
-import { BsShieldExclamation } from 'react-icons/bs'
+import { BsFillPatchExclamationFill } from 'react-icons/bs'
 import SigningModal from './components/SigningModal'
 import { MdVerified } from 'react-icons/md'
+import DownloadModal from './components/DownloadModal'
 
 function SBOM() {
   const { productVersionsData } = useContext(GlobalContext)
@@ -306,8 +296,7 @@ function SBOM() {
                         <Text fontSize='xs' cursor={'pointer'}>
                           Last updated at : {timeSince(sbomData.sbom.updatedAt)}
                         </Text>
-
-                        <Box>
+                        <Flex gap={2} alignItems={'center'}>
                           {!customerView && (
                             <Tag
                               size={'sm'}
@@ -323,23 +312,22 @@ function SBOM() {
                               </TagLabel>
                             </Tag>
                           )}
-                        </Box>
-                        <Box>
+
                           {status === 'Unsigned' ? (
-                            <IconButton
-                              size='xs'
+                            <BsFillPatchExclamationFill
+                              size={18}
+                              color='tomato'
                               onClick={setVerifyOpen}
-                              icon={
-                                <BsShieldExclamation size={16} color='tomato' />
-                              }
+                              cursor={'pointer'}
                             />
                           ) : (
-                            <IconButton
-                              size='xs'
-                              icon={<MdVerified size={16} color='dodgerblue' />}
+                            <MdVerified
+                              size={18}
+                              color='dodgerblue'
+                              cursor={'pointer'}
                             />
                           )}
-                        </Box>
+                        </Flex>
                       </Flex>
                     </Flex>
                   ) : (
@@ -449,56 +437,14 @@ function SBOM() {
         )}
 
         {isOpen && (
-          <Modal
-            initialFocusRef={initialRef}
-            finalFocusRef={finalRef}
+          <DownloadModal
+            initialRef={initialRef}
+            finalRef={finalRef}
             isOpen={isOpen}
             onClose={onClose}
-          >
-            <ModalOverlay />
-            <ModalContent>
-              <ModalHeader>SBOM Download</ModalHeader>
-              <ModalCloseButton />
-              <ModalBody pb={6}>
-                <FormLabel align='center'>SBOM Specification</FormLabel>
-                <Stack direction='column' gap='20px'>
-                  <RadioGroup defaultValue='1'>
-                    <Stack spacing={4} direction='row'>
-                      <Radio value='1'>CycloneDX</Radio>
-                      <Radio value='2'>SPDX</Radio>
-                    </Stack>
-                  </RadioGroup>
-                </Stack>
-
-                <FormLabel align='center' pt='30px'>
-                  File Format
-                </FormLabel>
-                <Stack direction='column' gap='20px'>
-                  <RadioGroup defaultValue='1'>
-                    <Stack spacing={4} direction='row'>
-                      <Radio value='1'>JSON</Radio>
-                      <Radio value='2'>XML</Radio>
-                    </Stack>
-                  </RadioGroup>
-
-                  <Stack direction='column' gap='5px'>
-                    <Checkbox defaultChecked>Include Vulnerabilities</Checkbox>
-                    <Checkbox defaultChecked>
-                      Include Vulnerability Status (VEX)
-                    </Checkbox>
-                  </Stack>
-                </Stack>
-              </ModalBody>
-
-              <ModalFooter>
-                <Button colorScheme='blue' mr={3}>
-                  Download
-                </Button>
-
-                <Button onClick={onClose}>Cancel</Button>
-              </ModalFooter>
-            </ModalContent>
-          </Modal>
+            productId={productId}
+            sbomId={sbomId}
+          />
         )}
 
         {isVerifyOpen && (
