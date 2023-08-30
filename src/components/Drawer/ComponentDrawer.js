@@ -85,7 +85,7 @@ function ComponentDrawer(props) {
   const [purlValue, setPurlValue] = useState('')
 
   const [isIncomplete, setIsIncomplete] = useState(false)
-  const [isPrimary, setIsPrimary] = useState('2')
+  const [isPrimary, setIsPrimary] = useState(primary)
   const [isInternal, setIsInternal] = useState(internal)
 
   console.log(`isPrimary`, isPrimary)
@@ -98,7 +98,6 @@ function ComponentDrawer(props) {
     setSelectedLicense(license[0])
     setCpeList(cpes)
     setPurlValue(purl)
-    setIsPrimary(primary === false ? '2' : '1')
   }, [component])
 
   useEffect(() => {
@@ -124,8 +123,8 @@ function ComponentDrawer(props) {
             ],
             cpes: cpeList,
             purl: purlValue,
-            primary: isPrimary === '1' ? true : false,
-            internal: isPrimary === '2' ? true : false
+            primary: isPrimary,
+            internal: isInternal
           }
         }).then(() => {
           refetch({
@@ -161,8 +160,8 @@ function ComponentDrawer(props) {
           ],
           cpes: cpeList,
           purl: purlValue,
-          primary: isPrimary === '1' ? true : false,
-          internal: isPrimary === '2' ? true : false
+          primary: isPrimary,
+          internal: isInternal
         }
       }).then(() => {
         refetch({
@@ -361,7 +360,6 @@ function ComponentDrawer(props) {
             {(!component || !version) && (
               <FormControl>
                 <Checkbox
-                  mt='10px'
                   size='sm'
                   colorScheme='blue'
                   isChecked={isIncomplete}
@@ -371,42 +369,28 @@ function ComponentDrawer(props) {
                 </Checkbox>
               </FormControl>
             )}
-
-            <RadioGroup
-              value={isPrimary}
-              onChange={(value) => setIsPrimary(value)}
-            >
-              <Stack spacing={2} direction='column'>
-                <Radio value='1' size='sm'>
-                  Primary component
-                </Radio>
-                <Radio value='2' size='sm'>
-                  Internal component
-                </Radio>
-              </Stack>
-            </RadioGroup>
-
-            {/* <Checkbox
-              size='sm'
-              colorScheme='blue'
-              color='gray.500'
-              isChecked={isPrimary}
-              onChange={(prev) => setIsPrimary(!isPrimary)}
-            >
-              Primary component
-            </Checkbox>
-
             <FormControl>
               <Checkbox
                 size='sm'
                 colorScheme='blue'
-                color='gray.500'
+                isChecked={isPrimary}
+                onChange={() => setIsPrimary(!isPrimary)}
+                disabled={isInternal}
+              >
+                Primary component
+              </Checkbox>
+            </FormControl>
+            <FormControl>
+              <Checkbox
+                size='sm'
+                colorScheme='blue'
                 isChecked={isInternal}
                 onChange={() => setIsInternal(!isInternal)}
+                disabled={isPrimary}
               >
                 Internal component
               </Checkbox>
-            </FormControl> */}
+            </FormControl>
           </Stack>
         </DrawerBody>
         <DrawerFooter borderTopWidth='1px'>

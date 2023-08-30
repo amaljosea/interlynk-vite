@@ -20,7 +20,8 @@ import {
   Td,
   Table,
   Icon,
-  Select
+  Select,
+  useToast
 } from '@chakra-ui/react'
 import { toolDelete } from 'graphQL/Mutation'
 import { authorUpdate } from 'graphQL/Mutation'
@@ -34,6 +35,7 @@ import { toolCreate } from 'graphQL/Mutation'
 import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { timeSince } from 'utils'
+import { licenseOptions } from 'variables/licenses'
 
 const GeneralDataDrawer = ({
   isOpen,
@@ -45,7 +47,9 @@ const GeneralDataDrawer = ({
 }) => {
   const { cpes, purl, swid, tools, authors, licenses, suppliers } = data
 
-  // console.log(`licenses`, licenses)
+  // console.log(`suppliers`, suppliers)
+
+  const toast = useToast()
 
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -94,9 +98,14 @@ const GeneralDataDrawer = ({
     setSwidValue(swid)
   }, [data])
 
+  const validateEmail = (email) => {
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
+    return emailRegex.test(email)
+  }
+
   const handleAuthorAdd = async (e) => {
     e.preventDefault()
-    if (authorName || authorEmail) {
+    if (validateEmail(authorEmail) === true) {
       await createAuthor({
         variables: {
           name: authorName,
@@ -112,7 +121,12 @@ const GeneralDataDrawer = ({
         }
       })
     } else {
-      alert(`Please add atleast one value`)
+      toast({
+        description: 'Invalid email',
+        status: 'error',
+        position: 'top-right',
+        duration: 2000
+      })
     }
   }
 
@@ -124,7 +138,7 @@ const GeneralDataDrawer = ({
           sbomId: sbomId
         }
       }).then(() => {
-        const updatedList = authors.filter((item) => item.id !== id)
+        const updatedList = authorList.filter((item) => item.id !== id)
         console.log(`updatedList`, updatedList)
         setAuthorList(updatedList)
       })
@@ -135,7 +149,7 @@ const GeneralDataDrawer = ({
 
   const handleSupAdd = async (e) => {
     e.preventDefault()
-    if (supName || supEmail) {
+    if (validateEmail(supEmail) === true) {
       await createSupplier({
         variables: {
           name: supName,
@@ -150,7 +164,12 @@ const GeneralDataDrawer = ({
         }
       })
     } else {
-      alert(`Please add atleast one value`)
+      toast({
+        description: 'Invalid email',
+        status: 'error',
+        position: 'top-right',
+        duration: 2000
+      })
     }
   }
 
@@ -162,13 +181,15 @@ const GeneralDataDrawer = ({
           sbomId: sbomId
         }
       }).then((res) => {
-        const updatedList = suppliers.filter((item) => item.id !== id)
+        const updatedList = supplierList.filter((item) => item.id !== id)
         setSupplierList(updatedList)
       })
     } catch (error) {
       console.log(`Mutation error`, error)
     }
   }
+
+  // console.log(`supplierList`, supplierList)
 
   const handleToolAdd = async () => {
     if (toolName && toolVersion) {
@@ -220,7 +241,12 @@ const GeneralDataDrawer = ({
       setLicenseName('')
       setSelectedLicense('')
     } else {
-      alert(`Please fill up required fields`)
+      toast({
+        description: 'Please fill up required fields',
+        status: 'warning',
+        position: 'top-right',
+        duration: 2000
+      })
     }
   }
 
@@ -333,19 +359,23 @@ const GeneralDataDrawer = ({
             {selectedKey === 'author' && (
               <form onSubmit={handleAuthorAdd}>
                 <Flex direction={'column'} alignItems={'flex-start'} gap={3}>
-                  <Input
-                    type='text'
-                    placeholder='Author Name*'
-                    value={authorName}
-                    onChange={(e) => setAuthorName(e.target.value)}
-                  />
+                  <FormControl isRequired>
+                    <Input
+                      type='text'
+                      placeholder='Author Name*'
+                      value={authorName}
+                      onChange={(e) => setAuthorName(e.target.value)}
+                    />
+                  </FormControl>
 
-                  <Input
-                    type='email'
-                    placeholder='Author Email*'
-                    value={authorEmail}
-                    onChange={(e) => setAuthorEmail(e.target.value)}
-                  />
+                  <FormControl isRequired>
+                    <Input
+                      type='email'
+                      placeholder='Author Email*'
+                      value={authorEmail}
+                      onChange={(e) => setAuthorEmail(e.target.value)}
+                    />
+                  </FormControl>
 
                   <Button colorScheme='blue' type='submit'>
                     Add
@@ -402,14 +432,14 @@ const GeneralDataDrawer = ({
             {selectedKey === 'supplier' && (
               <form onSubmit={handleSupAdd}>
                 <Flex direction={'column'} alignItems={'flex-start'} gap={3}>
-                  <FormControl>
+                  <FormControl isRequired>
                     <Input
                       placeholder='Name'
                       value={supName}
                       onChange={(e) => setSupName(e.target.value)}
                     />
                   </FormControl>
-                  <FormControl>
+                  <FormControl isRequired>
                     <Input
                       type='email'
                       placeholder='Email'
@@ -480,13 +510,11 @@ const GeneralDataDrawer = ({
                     value={selectedLicense}
                     onChange={(e) => setSelectedLicense(e.target.value)}
                   >
-                    <option value={''}>-- Select --</option>
-                    <option value={'Custom'}>Custom</option>
-                    <option value='AGPL-1.0-Only'>AGPL-1.0-Only</option>
-                    <option value='AGPL-2.0-Only'>AGPL-2.0-Only</option>
-                    <option value='MIT'>MIT</option>
-                    <option value='BSD'>BSD</option>
-                    <option value='LGPL-2.0'>LGPL-2.0</option>
+                    {licenseOptions.map((item) => (
+                      <option key={item.licenseId} value={item.licenseId}>
+                        {item.name}
+                      </option>
+                    ))}
                   </Select>
                 </FormControl>
                 {selectedLicense === 'Custom' && (
