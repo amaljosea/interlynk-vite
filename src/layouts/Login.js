@@ -40,48 +40,29 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (productId) {
-      axios
-        .post(`${loginURL}`, {
-          user: {
-            email: userEmail,
-            password: 'password'
-          }
-        })
-        .then((response) => {
-          // console.log('response', response)
-          const { status } = response.data
-          if (status.code === 200) {
-            localStorage.setItem('username', status.data.user.name)
-            Cookies.set('authToken', response.headers.authorization)
-            history.push(`/sharelynk?p=${productId}`)
-          }
-        })
-    } else {
-      axios
-        .post(`${userLoginURL}`, {
-          share_user: {
-            email: userEmail,
-            signed_params: paramId
-          }
-        })
-        .then((response) => {
-          // console.log(response.data)
-          const { status } = response.data
-          if (status.code === 200) {
-            localStorage.setItem('userEmail', status.data.user.email)
-            Cookies.set('userToken', response.headers.authorization)
-            history.push(
-              `/customer?signed_url_params=${paramId}&id=${imageVersionId}`
-            )
-          }
-        })
-        .catch((error) => {
-          console.log(`Error: ${error}`)
-          setError(true)
-          setUserEmail('')
-        })
-    }
+    axios
+      .post(`${userLoginURL}`, {
+        share_user: {
+          email: userEmail,
+          signed_params: paramId
+        }
+      })
+      .then((response) => {
+        // console.log(response.data)
+        const { status } = response.data
+        if (status.code === 200) {
+          localStorage.setItem('userEmail', status.data.user.email)
+          Cookies.set('userToken', response.headers.authorization)
+          history.push(
+            `/customer/images?signed_url_params=${paramId}&id=${imageVersionId}`
+          )
+        }
+      })
+      .catch((error) => {
+        console.log(`Error: ${error}`)
+        setError(true)
+        setUserEmail('')
+      })
   }
 
   return (

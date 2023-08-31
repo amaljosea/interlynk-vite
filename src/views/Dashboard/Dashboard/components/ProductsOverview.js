@@ -23,10 +23,10 @@ import { Link } from 'react-router-dom'
 
 import { scanImage, getConImg } from 'utils'
 import { useQuery } from '@apollo/client'
-import { ImagePagination } from 'graphQL/Queries'
+import { GetImages } from 'graphQL/Queries'
 
 const ProductsOverview = ({ title }) => {
-  const { data: allImages, refetch } = useQuery(ImagePagination, {
+  const { data: allImages, refetch } = useQuery(GetImages, {
     variables: {
       first: 10
     }

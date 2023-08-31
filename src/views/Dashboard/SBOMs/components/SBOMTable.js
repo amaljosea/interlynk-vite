@@ -51,7 +51,6 @@ import { CSVLink } from 'react-csv'
 import { useMutation } from '@apollo/client'
 import { UpdateImageVersion } from 'graphQL/Mutation'
 import { ImageUpdate } from 'graphQL/Mutation'
-import { link_captions } from 'utils'
 import { vuln_captions } from 'utils'
 import { FaEllipsisV } from 'react-icons/fa'
 import MultiStatusDrawer from 'components/Drawer/MultiStatusDrawer'
@@ -323,90 +322,11 @@ const SBOMTable = ({
   return (
     <>
       <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
-        <Tabs variant='enclosed' defaultIndex={1}>
+        <Tabs variant='enclosed'>
           <TabList mt='20px'>
-            <Tab _focus={{ outline: 'none' }}>Share Lynks</Tab>
             <Tab _focus={{ outline: 'none' }}>Vulnerabilities</Tab>
           </TabList>
           <TabPanels>
-            {/* share lynks */}
-            <TabPanel>
-              <CardHeader mb={4}>
-                <Flex
-                  width={'100%'}
-                  direction={'row'}
-                  justifyContent={'flex-end'}
-                  alignItems={'center'}
-                >
-                  <Button
-                    width={'120px'}
-                    colorScheme='blue'
-                    fontSize={'sm'}
-                    leftIcon={<AddIcon />}
-                    onClick={setSBMOpen}
-                  >
-                    Share Lynk
-                  </Button>
-                </Flex>
-              </CardHeader>
-              <CardBody>
-                <Table variant='simple' color={textColor} size='sm'>
-                  <Thead>
-                    <Tr my='.8rem' pl='0px'>
-                      {link_captions.map((caption, idx) => {
-                        return (
-                          <Th
-                            color='gray.400'
-                            key={idx}
-                            ps={idx === 0 ? '0px' : null}
-                          >
-                            {caption}
-                          </Th>
-                        )
-                      })}
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {shareLynks.length > 0
-                      ? shareLynks.map((row, idx) => (
-                          <SBOMLinkRow
-                            key={idx}
-                            id={row.id}
-                            signedUrlParams={row.signedUrlParams}
-                            updatedAt={row.updatedAt}
-                            shareUsers={row.shareUsers}
-                            shareScanners={row.shareScanners}
-                            enabled={row.enabled}
-                            imageDataRefetch={imageDataRefetch}
-                            imgVersionId={imgVersionId}
-                            scanResults={scanResults}
-                            imageInfo={imageInfo}
-                            imageVersionData={imageVersionData}
-                          />
-                        ))
-                      : shareLynkLoading && (
-                          <Tr>
-                            <Td fontSize={'sm'} pl={1}>
-                              <Skeleton height='20px' />
-                            </Td>
-                            <Td fontSize={'sm'} pl={1}>
-                              <Skeleton height='20px' />
-                            </Td>
-                            <Td fontSize={'sm'} pl={1}>
-                              <Skeleton height='20px' />
-                            </Td>
-                            <Td fontSize={'sm'} pl={1}>
-                              <Skeleton height='20px' />
-                            </Td>
-                            <Td fontSize={'sm'} pl={1}>
-                              <Skeleton height='20px' />
-                            </Td>
-                          </Tr>
-                        )}
-                  </Tbody>
-                </Table>
-              </CardBody>
-            </TabPanel>
             {/* vulnerabilities */}
             <TabPanel>
               <CardHeader mb={4}>
@@ -636,16 +556,6 @@ const SBOMTable = ({
           </TabPanels>
         </Tabs>
       </Card>
-
-      <SBOMDrawer
-        isOpen={isSBMOpen}
-        onClose={setSBMClose}
-        btnRef={btnRef}
-        imgVersionId={imgVersionId}
-        imageDataRefetch={imageDataRefetch}
-        scanResults={scanResults}
-        imageInfo={imageInfo}
-      />
 
       {isStatusOpen && (
         <MultiStatusDrawer

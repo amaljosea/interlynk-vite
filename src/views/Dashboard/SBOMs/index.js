@@ -85,6 +85,12 @@ function SBOMs() {
     variables: { id: imageId }
   })
 
+  useEffect(() => {
+    if (imageData) {
+      console.log(`image data`, imageData)
+    }
+  }, [imageData])
+
   const { data: allScanners } = useQuery(getAllScanners)
 
   const scannerName = (id) => {

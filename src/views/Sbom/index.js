@@ -72,6 +72,7 @@ function SBOM() {
     onOpen: setSBMOpen,
     onClose: setSBMClose
   } = useDisclosure()
+  
   const {
     isOpen: isVerifyOpen,
     onOpen: setVerifyOpen,
@@ -365,18 +366,6 @@ function SBOM() {
                         </Select>
                       </Flex>
 
-                      {!customerView && (
-                        <Button
-                          width={'120px'}
-                          colorScheme='blue'
-                          fontSize={'sm'}
-                          leftIcon={<AddIcon />}
-                          onClick={setSBMOpen}
-                        >
-                          Share Lynk
-                        </Button>
-                      )}
-
                       <IconButton
                         aria-label='Download SBOM'
                         icon={<FaFileDownload />}
@@ -426,7 +415,7 @@ function SBOM() {
           )}
         </Flex>
 
-        {isSBMOpen && sbomData && (
+        {/* {isSBMOpen && sbomData && (
           <ShareLynkDrawer
             isOpen={isSBMOpen}
             onClose={setSBMClose}
@@ -434,7 +423,7 @@ function SBOM() {
             productName={''}
             versionName={''}
           />
-        )}
+        )} */}
 
         {isOpen && (
           <DownloadModal

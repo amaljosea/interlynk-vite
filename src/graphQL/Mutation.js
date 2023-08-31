@@ -248,28 +248,28 @@ export const VexVulnCreate = gql`
 
 export const CreateShareLynk = gql`
   mutation CreateShareLynk(
-    $imageVersionID: Uuid!
     $enabled: Boolean
     $emails: [String!]!
-    $scanners: [Uuid!]
+    $projects: [Uuid!]
+    $images: [Uuid!]
   ) {
     shareLynkCreate(
       input: {
-        imageVersionId: $imageVersionID
         enabled: $enabled
         shareUsers: $emails
-        shareScanners: $scanners
+        projectIds: $projects
+        imageIds: $images
       }
     ) {
       shareLynk {
         id
-        imageId
-        imageVersionId
         enabled
-        shareScanners {
-          scanner {
+        contents {
+          __typename
+          ... on Project {
             id
             name
+            description
           }
         }
         shareUsers {
@@ -282,29 +282,17 @@ export const CreateShareLynk = gql`
 `
 
 export const UpdateShareLynk = gql`
-  mutation UpdateShareLynk(
-    $shareLynkId: Uuid!
-    $enabled: Boolean
-    $emails: [String!]
-    $scanners: [Uuid!]
-  ) {
-    shareLynkUpdate(
-      input: {
-        shareLynkId: $shareLynkId
-        enabled: $enabled
-        shareUsers: $emails
-        shareScanners: $scanners
-      }
-    ) {
+  mutation UpdateShareLynk($shareLynkId: Uuid!, $emails: [String!]) {
+    shareLynkUpdate(input: { shareLynkId: $shareLynkId, shareUsers: $emails }) {
       shareLynk {
         id
-        imageId
-        imageVersionId
         enabled
-        shareScanners {
-          scanner {
+        contents {
+          __typename
+          ... on Project {
             id
             name
+            description
           }
         }
         shareUsers {
@@ -322,6 +310,7 @@ export const DeleteShareLynk = gql`
       shareLynk {
         id
       }
+      errors
     }
   }
 `

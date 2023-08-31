@@ -58,60 +58,12 @@ const SBOMTable = ({ captions, data, refetch, versionName, status }) => {
   return (
     <>
       <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
-        <Tabs variant='enclosed' defaultIndex={1}>
+        <Tabs variant='enclosed'>
           <TabList mt='20px'>
-            {!location.pathname.startsWith('/sharelynk') && (
-              <Tab _focus={{ outline: 'none' }}>Share Lynks</Tab>
-            )}
             <Tab _focus={{ outline: 'none' }}>General</Tab>
             <Tab _focus={{ outline: 'none' }}>Components</Tab>
           </TabList>
           <TabPanels>
-            {/* share lynks */}
-            {!location.pathname.startsWith('/sharelynk') && (
-              <TabPanel>
-                <CardBody>
-                  <Table variant='simple' color={textColor} size='sm'>
-                    <Thead>
-                      <Tr>
-                        {link_captions.map((caption, idx) => {
-                          return (
-                            <Th key={idx} ps={idx === 0 ? '0px' : null} pb={4}>
-                              {caption}
-                            </Th>
-                          )
-                        })}
-                      </Tr>
-                    </Thead>
-                    <Tbody>
-                      {SBOMLinksData.map((row, idx) => {
-                        return (
-                          <ShareLynkRow
-                            key={idx}
-                            id={'SBOMLinkRow' + idx}
-                            link={row.link}
-                            visits={row.visits}
-                            created={row.created}
-                            shared_with={row.shared_with}
-                            conf_email={row.conf_email}
-                            conf_terms={row.conf_terms}
-                            redactions={row.redactions}
-                            components={row.components}
-                            licenses={row.licenses}
-                            vulnerabilities={row.vulnerabilities}
-                            cyclonedx={row.cyclonedx}
-                            spdx={row.spdx}
-                            active={row.active}
-                            productName={data.project.name}
-                            versionName={versionName}
-                          />
-                        )
-                      })}
-                    </Tbody>
-                  </Table>
-                </CardBody>
-              </TabPanel>
-            )}
             {/* general */}
             <TabPanel>
               <CardBody>
