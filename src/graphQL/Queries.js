@@ -93,89 +93,9 @@ export const getImage = gql`
         id
         name
       }
-      shareLynks {
-        id
-        enabled
-        signedUrlParams
-        shareUsers {
-          email
-        }
-        shareScanners {
-          scanner {
-            id
-            name
-            company
-          }
-        }
-        updatedAt
-      }
     }
   }
 `
-
-// export const getImageVersion = gql`
-//   query getImageVersion($id: ID!) {
-//     imageVersion(id: $id) {
-//       id
-//       image {
-//         id
-//         name
-//         scanEnabled
-//       }
-//       imageScanners {
-//         id
-//         company
-//         name
-//         updatedAt
-//       }
-//       name
-//       updatedAt
-//       lastPushedAt
-//       imageScannerRun(id: $id) {
-//         initiatedAt
-//         completedAt
-//         status
-//         vulnDbVersion
-//         dbLastUpdatedAt
-//         scannerVersion
-//         scannerId
-//       }
-//       imageVulns(imageVersionId: $id) {
-//         cveId
-//         component {
-//           fixedInVersion
-//           name
-//           version
-//         }
-//         vexVuln {
-//           fixedByImageVersion {
-//             name
-//           }
-//           vexStatus {
-//             id
-//             name
-//           }
-//           vexJustification {
-//             id
-//             name
-//           }
-//         }
-//         cvss {
-//           v2Score
-//           v3Score
-//         }
-//         severity
-//         fixedInImage
-//         scanners {
-//           id
-//           name
-//           company
-//           updatedAt
-//         }
-//       }
-//     }
-//   }
-// `
 
 export const getVulnerabilities = gql`
   query getVulnerabilities($id: ID!) {
@@ -352,8 +272,8 @@ export const GetSignedImageVersion = gql`
   }
 `
 
-export const ImagePagination = gql`
-  query GetImagesForOrg(
+export const GetImages = gql`
+  query getImages(
     $first: Int
     $last: Int
     $after: String
@@ -670,6 +590,51 @@ export const DownloadSBOM = gql`
         includeVex: $includeVex
         original: $original
       )
+    }
+  }
+`
+
+// Get all sharelynks
+export const GetAllShareLynks = gql`
+  query getAllShareLynks {
+    shareLynks {
+      id
+      enabled
+      updatedAt
+      signedUrlParams
+      shareUsers {
+        email
+        tos
+      }
+      contents {
+        __typename
+        ... on Image {
+          id
+        }
+        ... on Project {
+          id
+          name
+        }
+      }
+    }
+  }
+`
+
+// Customer page - Get All shared products
+export const GetSignedProducts = gql`
+  query getSignedProducts($signedParams: String!) {
+    products(signedParams: $signedParams) {
+      id
+      name
+    }
+  }
+`
+
+// Get All shared images
+export const GetSignedImages = gql`
+  query getSignedImages($signedParams: String!) {
+    images(signedParams: $signedParams) {
+      id
     }
   }
 `

@@ -113,9 +113,9 @@ function Index() {
     }
   }
 
-  // useEffect(() => {
-  //   console.log(`products`, projects)
-  // }, [projects])
+  useEffect(() => {
+    console.log(`products`, data)
+  }, [data])
 
   const [filterData, setFilterData] = useState([])
   const [groupVersionData, setGroupVersionData] = useState([])

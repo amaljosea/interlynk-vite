@@ -34,6 +34,7 @@ import {
 import { Link, useLocation, useHistory } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
 import ImageTable from './ImageTable'
+import { GetImages } from 'graphQL/Queries'
 
 const Index = () => {
   const toast = useToast()
@@ -63,9 +64,7 @@ const Index = () => {
     variables: {}
   })
 
-  const [getAllImages, { data: allImages, refetch }] = useLazyQuery(
-    ImagePagination
-  )
+  const [getAllImages, { data: allImages, refetch }] = useLazyQuery(GetImages)
 
   useEffect(() => {
     if (allImages === undefined) {

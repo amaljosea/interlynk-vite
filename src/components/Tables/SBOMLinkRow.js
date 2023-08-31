@@ -1,25 +1,15 @@
 import {
-  Stack,
   Tag,
-  Badge,
   Button,
   IconButton,
   Flex,
   Td,
   Text,
   Tr,
-  useColorModeValue,
-  Skeleton,
-  TagLeftIcon,
-  TagCloseButton,
   TagLabel,
-  Icon,
   Input,
-  InputGroup,
   Switch,
   useDisclosure,
-  Tooltip,
-  FormLabel,
   Menu,
   MenuItem,
   MenuButton,
@@ -27,60 +17,36 @@ import {
   Portal,
   useClipboard
 } from '@chakra-ui/react'
-import React, { useState } from 'react'
-
+import { useState, useRef } from 'react'
 import { productVersionsData } from 'variables/general'
 import SBOMLinkDrawer from 'components/Drawer/SBOMLinkDrawer.js'
-import {
-  FaBalanceScale,
-  FaCubes,
-  FaEllipsisV,
-  FaBug,
-  FaEyeSlash
-} from 'react-icons/fa'
-import { useContext } from 'react'
-import GlobalContext from 'context/GlobalContext'
+import { FaEllipsisV } from 'react-icons/fa'
 import { timeSince } from 'utils'
 import { useMutation } from '@apollo/client'
 import { UpdateShareLynk } from 'graphQL/Mutation'
 import { DeleteShareLynk } from 'graphQL/Mutation'
+import SBOMDrawer from 'components/Drawer/SBOMDrawer'
 
 function SBOMLinkRow(props) {
-  const {
-    id,
-    signedUrlParams,
-    updatedAt,
-    shareUsers,
-    shareScanners,
-    enabled,
-    imageDataRefetch,
-    imgVersionId,
-    scanResults,
-    imageInfo,
-    imageVersionData
-  } = props
+  const { id, signedUrlParams, updatedAt, shareUsers, enabled, refetch } = props
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const uniqProjects = []
-  const btnRef = React.useRef()
+
+  const btnRef = useRef()
 
   const [emailList, setEmailList] = useState([])
 
   const domain = window.location.origin
 
-
   const sbomLink = useClipboard(
-    `${domain}/login?signed_url_params=${signedUrlParams}&id=${imgVersionId}`
+    `${domain}/login?signed_url_params=${signedUrlParams}`
   )
 
-  const [shareLynkUpdate] = useMutation(UpdateShareLynk, {
-    onCompleted: imageDataRefetch
-  })
+  const [shareLynkUpdate] = useMutation(UpdateShareLynk)
 
-  const [shareLynkDelete] = useMutation(DeleteShareLynk, {
-    onCompleted: imageDataRefetch
-  })
+  const [shareLynkDelete] = useMutation(DeleteShareLynk)
 
   const handleStatus = async () => {
     try {
@@ -89,17 +55,9 @@ function SBOMLinkRow(props) {
           shareLynkId: id,
           enabled: enabled ? false : true
         }
-      })
+      }).then(() => refetch())
     } catch (error) {
-      if (error.networkError && error.networkError.statusCode === 500) {
-        // Handle the specific error
-        alert(
-          'Duplicate connector is being created for Dockerhub with the same account ID.'
-        )
-      } else {
-        // Handle other errors
-        alert(error.message)
-      }
+      console.log(error)
     }
   }
 
@@ -111,15 +69,7 @@ function SBOMLinkRow(props) {
         }
       })
     } catch (error) {
-      if (error.networkError && error.networkError.statusCode === 500) {
-        // Handle the specific error
-        alert(
-          'Duplicate connector is being created for Dockerhub with the same account ID.'
-        )
-      } else {
-        // Handle other errors
-        alert(error.message)
-      }
+      console.log(error)
     }
   }
 
@@ -128,6 +78,7 @@ function SBOMLinkRow(props) {
       uniqProjects.push(project.name)
     }
   })
+
   const uniqVersions = []
   productVersionsData.map((project) => {
     project.versions.map((version) => {
@@ -144,10 +95,6 @@ function SBOMLinkRow(props) {
   } else {
     shared = shareUsers
     shared_col = 'blue'
-  }
-
-  const handleCopy = () => {
-    sbomLink.onCopy()
   }
 
   const handleEdit = () => {
@@ -174,37 +121,31 @@ function SBOMLinkRow(props) {
                 colorScheme={shared_col}
               >
                 <TagLabel>{user.email}</TagLabel>
-                {/* <TagCloseButton /> */}
               </Tag>
             )
           })}
         </Flex>
       </Td>
-      {/* <Td>{visits}</Td> */}
-      <Td>
-        <Text fontSize={'sm'}>{timeSince(updatedAt)}</Text>
-      </Td>
-      <Td minWidth={{ sm: '80px' }} pl='0px'>
-        {/* </Link> */}
+      <Td></Td>
+      <Td></Td>
+      <Td>{timeSince(updatedAt)}</Td>
+      <Td width={'120px'} pl='0px'>
         <Flex mb={2}>
           <Input
-            value={`${domain}/login?signed_url_params=${signedUrlParams}&id=${imgVersionId}`}
+            value={sbomLink.value}
             onChange={(e) => sbomLink.setValue(e.target.value)}
             mr={2}
             disabled
             fontSize={'sm'}
           />
-          {imageVersionData && (
-            <Button
-              onClick={handleCopy}
-              fontSize={'sm'}
-              isDisabled={imageVersionData.imageVulns.nodes.length === 0}
-            >
-              {sbomLink.hasCopied ? 'Copied!' : 'Copy'}
-            </Button>
-          )}
+          <Button
+            onClick={() => sbomLink.onCopy()}
+            fontSize={'sm'}
+            isDisabled={imageVersionData.imageVulns.nodes.length === 0}
+          >
+            {sbomLink.hasCopied ? 'Copied!' : 'Copy'}
+          </Button>
         </Flex>
-        {/* <Link to={`/admin/sboms/${customerId[7]}`}> */}
       </Td>
       <Td>
         <Menu>
@@ -225,19 +166,17 @@ function SBOMLinkRow(props) {
             </MenuList>
           </Portal>
         </Menu>
-        <SBOMLinkDrawer
-          id={id}
-          emailList={emailList}
-          setEmailList={setEmailList}
-          shareScanner={shareScanners}
-          imageDataRefetch={imageDataRefetch}
-          imgVersionId={imgVersionId}
-          isOpen={isOpen}
-          onClose={onClose}
-          btnRef={btnRef}
-          scanResults={scanResults}
-          imageInfo={imageInfo}
-        />
+
+        {isOpen && (
+          <SBOMDrawer
+            id={id}
+            isOpen={isOpen}
+            onClose={onClose}
+            btnRef={btnRef}
+            shareUsers={emailList}
+            refetch={refetch}
+          />
+        )}
       </Td>
     </Tr>
   )

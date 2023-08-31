@@ -4,19 +4,18 @@ import Profile from 'views/Dashboard/Profile'
 import Images from 'views/Dashboard/Images'
 import Feed from 'views/Dashboard/Feed'
 import Products from 'views/Dashboard/Products'
-import SBOM from 'views/Sbom'
-import { HomeIcon } from 'components/Icons/Icons'
+import Connections from 'views/Dashboard/Connections'
+import Sharelynk from 'views/Dashboard/Sharelynk'
 
 import {
   FaRegSun,
   FaImages,
   FaPlug,
   FaBullhorn,
-  FaWindowMaximize,
-  FaCode
+  FaWindowMaximize
 } from 'react-icons/fa'
-
-import Connections from 'views/Dashboard/Connections'
+import { HomeIcon } from 'components/Icons/Icons'
+import { BsFillFolderSymlinkFill } from 'react-icons/bs'
 
 var dashRoutes = [
   {
@@ -38,6 +37,13 @@ var dashRoutes = [
     name: 'Products',
     icon: <FaWindowMaximize color='inherit' />,
     component: Products,
+    layout: '/vendor'
+  },
+  {
+    path: '/sharelynk',
+    name: 'ShareLynk',
+    icon: <BsFillFolderSymlinkFill color='inherit' size={18} />,
+    component: Sharelynk,
     layout: '/vendor'
   },
   {
