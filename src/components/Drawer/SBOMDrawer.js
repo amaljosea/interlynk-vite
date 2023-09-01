@@ -68,7 +68,7 @@ function SBOMDrawer(props) {
       setEmailList(shareUsers)
     }
 
-    console.log(`contents`, contents)
+    // console.log(`contents`, contents)
 
     if (contents && contents.length > 0) {
       const imgList = contents.filter((item) => item.__typename === 'Image')
@@ -201,8 +201,8 @@ function SBOMDrawer(props) {
   }
 
   // console.log(`Email list`, emailList)
-  console.log(`product list`, productIds)
-  console.log(`images list`, imgIds)
+  // console.log(`product list`, productIds)
+  // console.log(`images list`, imgIds)
 
   return (
     <Drawer
