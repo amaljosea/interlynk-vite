@@ -4,7 +4,6 @@ import {
   IconButton,
   Flex,
   Td,
-  Text,
   Tr,
   TagLabel,
   Input,
@@ -19,7 +18,6 @@ import {
 } from '@chakra-ui/react'
 import { useState, useRef } from 'react'
 import { productVersionsData } from 'variables/general'
-import SBOMLinkDrawer from 'components/Drawer/SBOMLinkDrawer.js'
 import { FaEllipsisV } from 'react-icons/fa'
 import { timeSince } from 'utils'
 import { useMutation } from '@apollo/client'
@@ -28,7 +26,15 @@ import { DeleteShareLynk } from 'graphQL/Mutation'
 import SBOMDrawer from 'components/Drawer/SBOMDrawer'
 
 function SBOMLinkRow(props) {
-  const { id, signedUrlParams, updatedAt, shareUsers, enabled, refetch } = props
+  const {
+    id,
+    signedUrlParams,
+    updatedAt,
+    contents,
+    shareUsers,
+    enabled,
+    refetch
+  } = props
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
@@ -67,7 +73,7 @@ function SBOMLinkRow(props) {
         variables: {
           id: id
         }
-      })
+      }).then(() => refetch())
     } catch (error) {
       console.log(error)
     }
@@ -109,7 +115,7 @@ function SBOMLinkRow(props) {
       <Td pl={0}>
         <Switch isChecked={enabled} readOnly size='md' />
       </Td>
-      <Td maxW='400px'>
+      <Td>
         <Flex flexDirection={'row'} flexWrap={'wrap'} spacing={2} gap={2}>
           {shareUsers.map((user, idx) => {
             return (
@@ -126,10 +132,46 @@ function SBOMLinkRow(props) {
           })}
         </Flex>
       </Td>
-      <Td></Td>
-      <Td></Td>
+      <Td>
+        <Flex flexDirection={'row'} flexWrap={'wrap'} spacing={2} gap={2}>
+          {contents
+            .filter((item) => item.__typename === 'Image')
+            .map((image, idx) => {
+              return (
+                <Tag
+                  size='sm'
+                  key={idx}
+                  borderRadius='full'
+                  variant='solid'
+                  colorScheme={shared_col}
+                >
+                  <TagLabel>{image.name}</TagLabel>
+                </Tag>
+              )
+            })}
+        </Flex>
+      </Td>
+      <Td>
+        <Flex flexDirection={'row'} flexWrap={'wrap'} spacing={2} gap={2}>
+          {contents
+            .filter((item) => item.__typename === 'Project')
+            .map((project, idx) => {
+              return (
+                <Tag
+                  size='sm'
+                  key={idx}
+                  borderRadius='full'
+                  variant='solid'
+                  colorScheme={shared_col}
+                >
+                  <TagLabel>{project.name}</TagLabel>
+                </Tag>
+              )
+            })}
+        </Flex>
+      </Td>
       <Td>{timeSince(updatedAt)}</Td>
-      <Td width={'120px'} pl='0px'>
+      <Td width={'400px'} pl='0px'>
         <Flex mb={2}>
           <Input
             value={sbomLink.value}
@@ -138,11 +180,7 @@ function SBOMLinkRow(props) {
             disabled
             fontSize={'sm'}
           />
-          <Button
-            onClick={() => sbomLink.onCopy()}
-            fontSize={'sm'}
-            isDisabled={imageVersionData.imageVulns.nodes.length === 0}
-          >
+          <Button onClick={() => sbomLink.onCopy()} fontSize={'sm'}>
             {sbomLink.hasCopied ? 'Copied!' : 'Copy'}
           </Button>
         </Flex>
@@ -175,6 +213,7 @@ function SBOMLinkRow(props) {
             btnRef={btnRef}
             shareUsers={emailList}
             refetch={refetch}
+            contents={contents}
           />
         )}
       </Td>

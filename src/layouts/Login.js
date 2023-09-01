@@ -28,15 +28,10 @@ const Login = () => {
   const history = useHistory()
 
   const queryParams = new URLSearchParams(location.search)
-  const productId = queryParams.get('p')
-  const sbomId = queryParams.get('sbom')
   const paramId = queryParams.get('signed_url_params')
-  const imageVersionId = queryParams.get('id')
 
   const [userEmail, setUserEmail] = useState('')
   const [error, setError] = useState(false)
-
-  const loginURL = process.env.REACT_APP_VENDOR_LOGIN_URL
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -52,10 +47,9 @@ const Login = () => {
         const { status } = response.data
         if (status.code === 200) {
           localStorage.setItem('userEmail', status.data.user.email)
-          Cookies.set('userToken', response.headers.authorization)
-          history.push(
-            `/customer/images?signed_url_params=${paramId}&id=${imageVersionId}`
-          )
+          Cookies.set(`userToken`, response.headers.authorization)
+          Cookies.set(`signedParamId`, paramId)
+          history.push(`/customer/images`)
         }
       })
       .catch((error) => {

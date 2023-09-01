@@ -4,7 +4,7 @@ import SBOMLinkRow from 'components/Tables/SBOMLinkRow'
 const LynkTable = ({ captions, data, refetch }) => {
   return (
     <Table
-      __css={{ 'table-layout': 'fixed', width: 'full' }}
+      // __css={{ 'table-layout': 'fixed', width: 'full' }}
       variant='simple'
       size='sm'
     >
@@ -25,7 +25,8 @@ const LynkTable = ({ captions, data, refetch }) => {
             <SBOMLinkRow
               key={index}
               id={item.id}
-              active={item.enabled}
+              enabled={item.enabled}
+              contents={item.contents}
               updatedAt={item.updatedAt}
               shareUsers={item.shareUsers}
               signedUrlParams={item.signedUrlParams}

@@ -7,7 +7,7 @@ import AdminNavbar from 'components/Navbars/AdminNavbar.js'
 import Sidebar from 'components/Sidebar'
 import React, { useContext, useState } from 'react'
 import { Redirect, Route, Switch } from 'react-router-dom'
-import routes from 'routes.js'
+import { dashRoutes } from 'routes.js'
 import '@fontsource/roboto/400.css'
 import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
@@ -110,7 +110,7 @@ export default function Dashboard(props) {
     <ApolloProvider client={client}>
       <ChakraProvider theme={theme} resetCss={false}>
         <Sidebar
-          routes={routes}
+          routes={dashRoutes}
           logoText={'Interlynk DASHBOARD'}
           display='none'
           sidebarVariant={sidebarVariant}
@@ -126,8 +126,8 @@ export default function Dashboard(props) {
             <AdminNavbar
               onOpen={onOpen}
               logoText={'Interlynk DASHBOARD'}
-              brandText={getActiveRoute(routes)}
-              secondary={getActiveNavbar(routes)}
+              brandText={getActiveRoute(dashRoutes)}
+              secondary={getActiveNavbar(dashRoutes)}
               fixed={fixed}
               {...rest}
             />
@@ -136,7 +136,7 @@ export default function Dashboard(props) {
             <PanelContent>
               <PanelContainer>
                 <Switch>
-                  {userName && getRoutes(routes)}
+                  {userName && getRoutes(dashRoutes)}
                   {userName ? (
                     <Redirect from='/vendor' to='/vendor/dashboard' />
                   ) : (

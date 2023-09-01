@@ -21,11 +21,7 @@ import Card from 'components/Card/Card'
 import CardHeader from 'components/Card/CardHeader'
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import SBOM from 'views/Dashboard/SBOMs'
-import {
-  GetAllOrgConnectors,
-  ImagePagination,
-  getAllScanners
-} from 'graphQL/Queries'
+import { GetAllOrgConnectors, getAllScanners } from 'graphQL/Queries'
 import {
   AddScannerImage,
   RemoveScannerImage,
@@ -42,9 +38,9 @@ const Index = () => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const versionId = queryParams.get('v')
-  const imageId = queryParams.get('id')
+  const signedUrlParam = queryParams.get('signed_url_params')
 
-  const { setVulnerabilitiesData, setScannerItems } = useContext(GlobalContext)
+  const { setVulnerabilitiesData } = useContext(GlobalContext)
 
   const [searchInput, setSearchInput] = useState('')
 
@@ -319,9 +315,32 @@ const Index = () => {
               onDeleteOpen={onDeleteOpen}
               setSelectedImage={setSelectedImage}
               setActiveScanners={setActiveScanners}
-              handleNextPage={handleNextPage}
-              handlePreviousPage={handlePreviousPage}
             />
+
+            {allImages && (
+              <Flex
+                flexDir={'row'}
+                gap={4}
+                alignItems={'center'}
+                mt={6}
+                justifyContent={'flex-start'}
+              >
+                <Button
+                  colorScheme='blue'
+                  onClick={handlePreviousPage}
+                  isDisabled={!allImages.images.pageInfo.hasPreviousPage}
+                >
+                  Previous
+                </Button>
+                <Button
+                  colorScheme='blue'
+                  onClick={handleNextPage}
+                  isDisabled={!allImages.images.pageInfo.hasNextPage}
+                >
+                  Next
+                </Button>
+              </Flex>
+            )}
           </Card>
 
           {orgConnectors &&

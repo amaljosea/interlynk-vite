@@ -1,4 +1,4 @@
-// import
+// Vendor pages
 import Dashboard from 'views/Dashboard/Dashboard'
 import Profile from 'views/Dashboard/Profile'
 import Images from 'views/Dashboard/Images'
@@ -6,6 +6,10 @@ import Feed from 'views/Dashboard/Feed'
 import Products from 'views/Dashboard/Products'
 import Connections from 'views/Dashboard/Connections'
 import Sharelynk from 'views/Dashboard/Sharelynk'
+
+// Customer pages
+import CustomerImages from 'views/Customer/Images'
+import CustomerProducts from 'views/Customer/Products'
 
 import {
   FaRegSun,
@@ -17,7 +21,7 @@ import {
 import { HomeIcon } from 'components/Icons/Icons'
 import { BsFillFolderSymlinkFill } from 'react-icons/bs'
 
-var dashRoutes = [
+export const dashRoutes = [
   {
     path: '/dashboard',
     name: 'Dashboard',
@@ -69,4 +73,19 @@ var dashRoutes = [
   }
 ]
 
-export default dashRoutes
+export const customerRoutes = [
+  {
+    path: '/images',
+    name: 'Images',
+    icon: <FaImages color='inherit' />,
+    component: CustomerImages,
+    layout: '/customer'
+  },
+  {
+    path: '/products',
+    name: 'Products',
+    icon: <FaWindowMaximize color='inherit' />,
+    component: CustomerProducts,
+    layout: '/customer'
+  }
+]

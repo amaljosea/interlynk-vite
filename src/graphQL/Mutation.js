@@ -282,8 +282,22 @@ export const CreateShareLynk = gql`
 `
 
 export const UpdateShareLynk = gql`
-  mutation UpdateShareLynk($shareLynkId: Uuid!, $emails: [String!]) {
-    shareLynkUpdate(input: { shareLynkId: $shareLynkId, shareUsers: $emails }) {
+  mutation UpdateShareLynk(
+    $shareLynkId: Uuid!
+    $emails: [String!]
+    $projects: [Uuid!]
+    $images: [Uuid!]
+    $enabled: Boolean
+  ) {
+    shareLynkUpdate(
+      input: {
+        enabled: $enabled
+        shareLynkId: $shareLynkId
+        shareUsers: $emails
+        projectIds: $projects
+        imageIds: $images
+      }
+    ) {
       shareLynk {
         id
         enabled
