@@ -4,8 +4,8 @@ import Footer from 'components/Footer/Footer.js'
 // Layout components
 import AdminNavbar from 'components/Navbars/AdminNavbar.js'
 import Sidebar from 'components/Sidebar'
-import React, { useContext, useState, useEffect } from 'react'
-import { Route, Switch, Redirect } from 'react-router-dom'
+import React, { useContext, useState } from 'react'
+import { Route, Switch } from 'react-router-dom'
 // Custom Chakra theme
 import theme from 'theme/theme.js'
 // Custom components
@@ -13,7 +13,7 @@ import MainPanel from '../components/Layout/MainPanel'
 import PanelContainer from '../components/Layout/PanelContainer'
 import PanelContent from '../components/Layout/PanelContent'
 import GlobalContext from 'context/GlobalContext'
-import customerRoutes from 'customerRoutes'
+import { customerRoutes } from 'routes.js'
 import {
   ApolloClient,
   InMemoryCache,
@@ -23,6 +23,7 @@ import {
 import { setContext } from '@apollo/client/link/context'
 import Cookies from 'js-cookie'
 import { getActiveNavbar, getActiveRoute } from '../utils'
+import { createUploadLink } from 'apollo-upload-client'
 
 export default function Customer(props) {
   const { ...rest } = props
@@ -72,6 +73,10 @@ export default function Customer(props) {
     uri: `${graphqlAPI}`
   })
 
+  const uploadLink = createUploadLink({
+    uri: graphqlAPI
+  })
+
   const authLink = setContext((_, { headers }) => {
     return {
       headers: {
@@ -81,7 +86,7 @@ export default function Customer(props) {
     }
   })
   const client = new ApolloClient({
-    link: authLink.concat(httpLink),
+    link: authLink.concat(uploadLink).concat(httpLink),
     cache: new InMemoryCache()
   })
 
@@ -114,10 +119,7 @@ export default function Customer(props) {
           {getRoute() ? (
             <PanelContent>
               <PanelContainer>
-                <Switch>
-                  {getRoutes(customerRoutes)}
-                  {/* <Redirect from={`/customer`} to='/customer' /> */}
-                </Switch>
+                <Switch>{getRoutes(customerRoutes)}</Switch>
               </PanelContainer>
             </PanelContent>
           ) : null}

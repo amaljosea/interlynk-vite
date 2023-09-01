@@ -6,8 +6,6 @@ import {
   Td,
   Th,
   Skeleton,
-  Flex,
-  Button,
   Box
 } from '@chakra-ui/react'
 import CardBody from 'components/Card/CardBody'
@@ -16,14 +14,11 @@ import { img_captions } from 'utils'
 
 const ImageTable = ({
   imageList,
-  refetch,
   isLoading,
   setSelectedImage,
   setActiveScanners,
   onScanOpen,
-  onDeleteOpen,
-  handlePreviousPage,
-  handleNextPage
+  onDeleteOpen
 }) => {
   return (
     <>
@@ -80,30 +75,6 @@ const ImageTable = ({
           </Tbody>
         </Table>
       </CardBody>
-      {imageList && (
-        <Flex
-          flexDir={'row'}
-          gap={4}
-          alignItems={'center'}
-          mt={6}
-          justifyContent={'flex-start'}
-        >
-          <Button
-            colorScheme='blue'
-            onClick={handlePreviousPage}
-            isDisabled={!imageList.images.pageInfo.hasPreviousPage}
-          >
-            Previous
-          </Button>
-          <Button
-            colorScheme='blue'
-            onClick={handleNextPage}
-            isDisabled={!imageList.images.pageInfo.hasNextPage}
-          >
-            Next
-          </Button>
-        </Flex>
-      )}
     </>
   )
 }

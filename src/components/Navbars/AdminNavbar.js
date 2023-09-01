@@ -8,14 +8,11 @@ import {
   useColorModeValue
 } from '@chakra-ui/react'
 import PropTypes from 'prop-types'
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import AdminNavbarLinks from './AdminNavbarLinks'
 import { useContext } from 'react'
 import GlobalContext from 'context/GlobalContext'
 import { Link, useLocation } from 'react-router-dom'
-import { GetSBOM } from 'graphQL/Queries'
-import { useQuery } from '@apollo/client'
-import { GetSignedImage } from 'graphQL/Queries'
 
 export default function AdminNavbar(props) {
   const { minimize } = useContext(GlobalContext)
@@ -38,17 +35,6 @@ export default function AdminNavbar(props) {
   const product = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
   const paramId = queryParams.get('signed_url_params')
-
-  const { data: sbomData } = useQuery(GetSBOM, {
-    variables: {
-      projectId: product,
-      sbomId: sbomId
-    }
-  })
-
-  const { data: signedImage } = useQuery(GetSignedImage, {
-    variables: { signedParams: paramId }
-  })
 
   const imageName = localStorage.getItem('Image')
 
@@ -100,15 +86,24 @@ export default function AdminNavbar(props) {
   window.addEventListener('scroll', changeNavbar)
 
   const path = (name) => {
-    switch (name) {
-      case 'Dashboard':
-        return '/vendor/dashboard'
-      case 'Images':
-        return '/vendor/images'
-      case 'Products':
-        return '/vendor/products'
-      case 'Connections':
-        return '/vendor/connections'
+    if (!location.pathname.startsWith('/customer')) {
+      switch (name) {
+        case 'Dashboard':
+          return '/vendor/dashboard'
+        case 'Images':
+          return '/vendor/images'
+        case 'Products':
+          return '/vendor/products'
+        case 'Connections':
+          return '/vendor/connections'
+      }
+    } else {
+      switch (name) {
+        case 'Images':
+          return '/customer/images'
+        case 'Products':
+          return '/customer/products'
+      }
     }
   }
 
@@ -163,39 +158,28 @@ export default function AdminNavbar(props) {
       >
         <Box mb={{ sm: '8px', md: '0px' }}>
           <Breadcrumb>
-            {location.pathname.startsWith('/sharelynk') ? (
-              <BreadcrumbItem color={mainText}>
-                <Link to={`/sharelynk?p=${product}`} color={secondaryText}>
-                  Products
-                </Link>
-              </BreadcrumbItem>
-            ) : (
-              <BreadcrumbItem color={mainText}>
-                <BreadcrumbLink
-                  href={
-                    !location.pathname.startsWith('/customer')
-                      ? '/vendor/dashboard'
-                      : ''
-                  }
-                  color={secondaryText}
-                >
-                  Interlynk
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-            )}
+            <BreadcrumbItem color={mainText}>
+              <BreadcrumbLink
+                href={
+                  !location.pathname.startsWith('/customer')
+                    ? '/vendor/dashboard'
+                    : '/customer/images'
+                }
+                color={secondaryText}
+              >
+                Interlynk
+              </BreadcrumbLink>
+            </BreadcrumbItem>
 
-            {!location.pathname.startsWith('/customer') &&
-              !location.pathname.startsWith('/sharelynk') && (
-                <BreadcrumbItem color={mainText}>
-                  <Link
-                    to={`${path(brandText)}`}
-                    color={secondaryText}
-                    onClick={() => localStorage.removeItem('cloudScanner')}
-                  >
-                    {brandText}
-                  </Link>
-                </BreadcrumbItem>
-              )}
+            <BreadcrumbItem color={mainText}>
+              <Link
+                to={`${path(brandText)}`}
+                color={secondaryText}
+                onClick={() => localStorage.removeItem('cloudScanner')}
+              >
+                {brandText}
+              </Link>
+            </BreadcrumbItem>
 
             {imageName !== '' && versionId && brandText === 'Images' && (
               <BreadcrumbItem color={mainText}>
@@ -205,26 +189,10 @@ export default function AdminNavbar(props) {
               </BreadcrumbItem>
             )}
 
-            {brandText === 'Products' && product && (
+            {brandText === 'Products' && product && productName !== '' && (
               <BreadcrumbItem color={mainText}>
                 <BreadcrumbLink href='' color={mainText}>
-                  {sbomData && sbomData.sbom.project.name}
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-            )}
-
-            {signedImage && location.pathname.startsWith('/customer') && (
-              <BreadcrumbItem color={mainText}>
-                <BreadcrumbLink href='' color={mainText}>
-                  {signedImage.image.name}
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-            )}
-
-            {sbomId && location.pathname.startsWith('/sharelynk') && (
-              <BreadcrumbItem color={mainText}>
-                <BreadcrumbLink href='' color={mainText}>
-                  {sbomData && sbomData.sbom.project.name}
+                  {productName}
                 </BreadcrumbLink>
               </BreadcrumbItem>
             )}

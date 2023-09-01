@@ -23,19 +23,12 @@ import { ImageUpdate } from 'graphQL/Mutation'
 import GlobalContext from 'context/GlobalContext'
 import semver from 'semver'
 import { useLocation, Link } from 'react-router-dom'
+import Cookies from 'js-cookie'
 
-const ImageRow = ({
-  item,
-  isLoading,
-  setSelectedImage,
-  setActiveScanners,
-  onScanOpen,
-  onDeleteOpen,
-  filteredScanners
-}) => {
+const ImageRow = ({ item, isLoading }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
-  const signedParams = queryParams.get('signed_url_params')
+  const signedParams = Cookies.get(`signedParamId`)
 
   const { setScanEnabled } = useContext(GlobalContext)
 
@@ -128,23 +121,9 @@ const ImageRow = ({
           <Skeleton height='20px' />
         ) : item.imageVersions.length === 0 ? (
           <Text>{item.name}</Text>
-        ) : signedParams ? (
-          <Link
-            to={`/customer/image?v=${mostRecentVersion.id}&id=${item.id}&signed_url_params=${signedParams}`}
-            style={{
-              color: '#3182CE',
-              textDecoration: 'underline'
-            }}
-            onClick={() => {
-              window.localStorage.setItem('Image', item.name)
-              setScanEnabled(item.scanEnabled ? true : false)
-            }}
-          >
-            {item.name}
-          </Link>
         ) : (
           <Link
-            to={`/vendor/images?v=${mostRecentVersion.id}&id=${item.id}`}
+            to={`/customer/images?v=${mostRecentVersion.id}&id=${item.id}`}
             style={{
               color: '#3182CE',
               textDecoration: 'underline'
@@ -228,56 +207,6 @@ const ImageRow = ({
           </Flex>
         )}
       </Td>
-      {!signedParams && (
-        <Td pl={1}>
-          {isLoading || isRefreshed ? (
-            <Skeleton height='20px' />
-          ) : (
-            <Menu>
-              <MenuButton
-                as={IconButton}
-                aria-label='Options'
-                icon={<FaEllipsisV />}
-                variant='none'
-                color='gray.400'
-                onClick={() => {
-                  setSelectedImage(item.id)
-                  setActiveScanners(item.imageScanners)
-                }}
-              />
-              <Portal>
-                <MenuList style={{ width: '100px' }}>
-                  <MenuItem icon={<FaCircleNotch />} onClick={updateImage}>
-                    <Text fontSize={'sm'}>Refresh</Text>
-                  </MenuItem>
-                  <MenuItem
-                    icon={<AddIcon />}
-                    onClick={onScanOpen}
-                    isDisabled={
-                      filteredScanners && filteredScanners.length === 0
-                        ? true
-                        : false
-                    }
-                  >
-                    <Text fontSize={'sm'}>Add Scanner</Text>
-                  </MenuItem>
-                  <MenuItem
-                    icon={<DeleteIcon />}
-                    onClick={onDeleteOpen}
-                    isDisabled={
-                      filteredScanners && filteredScanners.length === 3
-                        ? true
-                        : false
-                    }
-                  >
-                    <Text fontSize={'sm'}>Delete Scanner</Text>
-                  </MenuItem>
-                </MenuList>
-              </Portal>
-            </Menu>
-          )}
-        </Td>
-      )}
     </Tr>
   )
 }

@@ -167,118 +167,92 @@ export const getVexJustifications = gql`
   }
 `
 
-export const GetSignedImage = gql`
-  query GetSignedImage($signedParams: String!) {
-    image(signedParams: $signedParams) {
-      id
-      name
-      imageScanners {
-        id
-        name
-        company
-        updatedAt
-      }
-      imageVersions {
-        id
-        name
-      }
-      lastPushedAt
-      updatedAt
-    }
-  }
-`
-
-export const GetSignedImageVersion = gql`
-  query GetSignedImageVersion(
-    $signedParams: String!
-    $imgVersionId: ID!
-    $first: Int
-    $last: Int
-    $after: String
-    $before: String
-  ) {
-    imageVersion(signedParams: $signedParams) {
-      id
-      name
-      lastPushedAt
-      tags
-      image {
-        id
-        name
-        scanEnabled
-      }
-      imageScanners {
-        id
-        company
-        name
-        updatedAt
-      }
-      imageScannerRun(id: $imgVersionId) {
-        initiatedAt
-        completedAt
-        status
-        vulnDbVersion
-        dbLastUpdatedAt
-        scannerVersion
-        scannerId
-        failedAt
-      }
-      imageVulns(
-        imageVersionId: $imgVersionId
-        first: $first
-        last: $last
-        after: $after
-        before: $before
-      ) {
-        pageInfo {
-          startCursor
-          hasPreviousPage
-          endCursor
-          hasNextPage
-        }
-        nodes {
-          cveId
-          component {
-            name
-            version
-            fixedInVersion
-          }
-          cvss {
-            v2Score
-            v3Score
-          }
-          severity
-          fixedInImage
-          scanners {
-            id
-            name
-            company
-            updatedAt
-          }
-          vexVuln {
-            fixedByImageVersion {
-              name
-            }
-            vexJustification {
-              name
-            }
-            vexStatus {
-              name
-            }
-          }
-        }
-      }
-    }
-  }
-`
+// export const GetSignedImageVersion = gql`
+//   query GetSignedImageVersion(
+//     $signedParams: String!
+//     $imgVersionId: ID!
+//     $first: Int
+//     $last: Int
+//     $after: String
+//     $before: String
+//   ) {
+//     imageVersion(signedParams: $signedParams) {
+//       id
+//       name
+//       lastPushedAt
+//       tags
+//       image {
+//         id
+//         name
+//         scanEnabled
+//       }
+//       imageScanners {
+//         id
+//         company
+//         name
+//         updatedAt
+//       }
+//       imageScannerRun(id: $imgVersionId) {
+//         initiatedAt
+//         completedAt
+//         status
+//         vulnDbVersion
+//         dbLastUpdatedAt
+//         scannerVersion
+//         scannerId
+//         failedAt
+//       }
+//       imageVulns(
+//         imageVersionId: $imgVersionId
+//         first: $first
+//         last: $last
+//         after: $after
+//         before: $before
+//       ) {
+//         pageInfo {
+//           startCursor
+//           hasPreviousPage
+//           endCursor
+//           hasNextPage
+//         }
+//         nodes {
+//           cveId
+//           component {
+//             name
+//             version
+//             fixedInVersion
+//           }
+//           cvss {
+//             v2Score
+//             v3Score
+//           }
+//           severity
+//           fixedInImage
+//           scanners {
+//             id
+//             name
+//             company
+//             updatedAt
+//           }
+//           vexVuln {
+//             fixedByImageVersion {
+//               name
+//             }
+//             vexJustification {
+//               name
+//             }
+//             vexStatus {
+//               name
+//             }
+//           }
+//         }
+//       }
+//     }
+//   }
+// `
 
 export const GetImages = gql`
-  query getImages(
-    $first: Int
-    $last: Int
-    $after: String
-    $before: String
-  ) {
+  query getImages($first: Int, $last: Int, $after: String, $before: String) {
     images(first: $first, after: $after, last: $last, before: $before) {
       pageInfo {
         hasPreviousPage
@@ -610,6 +584,7 @@ export const GetAllShareLynks = gql`
         __typename
         ... on Image {
           id
+          name
         }
         ... on Project {
           id
@@ -626,6 +601,41 @@ export const GetSignedProducts = gql`
     products(signedParams: $signedParams) {
       id
       name
+      description
+      updatedAt
+      organizationId
+      sboms {
+        id
+        cpes
+        spec
+        creationAt
+        specVersion
+        project {
+          id
+        }
+        tools {
+          id
+          name
+        }
+        authors {
+          name
+          email
+        }
+        suppliers {
+          name
+          email
+        }
+        components {
+          id
+          name
+          version
+          primary
+          internal
+          purl
+          cpes
+          licenses
+        }
+      }
     }
   }
 `
@@ -635,6 +645,63 @@ export const GetSignedImages = gql`
   query getSignedImages($signedParams: String!) {
     images(signedParams: $signedParams) {
       id
+      name
+      scanEnabled
+      organizationConnector {
+        id
+        name
+        connector {
+          id
+          name
+          kind
+          updatedAt
+        }
+      }
+      imageScanners {
+        id
+        name
+        company
+        updatedAt
+      }
+      imageVersions {
+        id
+        name
+      }
+      lastPushedAt
+      updatedAt
+    }
+  }
+`
+
+// Get signed image
+export const GetSignedImage = gql`
+  query getSignedImage($imageId: Uuid!, $signedParams: String!) {
+    image(imageId: $imageId, signedParams: $signedParams) {
+      id
+      name
+      imageScanners {
+        id
+        name
+        company
+        updatedAt
+      }
+      imageVersions {
+        id
+        name
+      }
+      lastPushedAt
+      updatedAt
+    }
+  }
+`
+
+// Get signed product
+
+export const GetProductInfo = gql`
+  query getProductInfo($signedParams: String!, $projectId: Uuid!) {
+    product(signedParams: $signedParams, projectId: $projectId) {
+      id
+      name
     }
   }
 `

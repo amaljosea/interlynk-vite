@@ -18,11 +18,9 @@ import { ProfileIcon, SettingsIcon } from 'components/Icons/Icons'
 import { ItemContent } from 'components/Menu/ItemContent'
 import SidebarResponsive from 'components/Sidebar/SidebarResponsive'
 import PropTypes from 'prop-types'
-import React, { useContext } from 'react'
 import { Link, useHistory, useLocation } from 'react-router-dom'
-import routes from 'routes.js'
+import { dashRoutes } from 'routes.js'
 import { FaSignOutAlt } from 'react-icons/fa'
-import GlobalContext from 'context/GlobalContext'
 
 import Cookies from 'js-cookie'
 import { useState, useEffect } from 'react'
@@ -32,7 +30,6 @@ export default function HeaderLinks(props) {
   const history = useHistory()
 
   const queryParams = new URLSearchParams(location.search)
-  const paramId = queryParams.get('signed_url_params')
   const imageVersionId = queryParams.get('id')
 
   const { variant, children, fixed, secondary, onOpen, ...rest } = props
@@ -47,8 +44,6 @@ export default function HeaderLinks(props) {
       setUsername(userName)
     } else if (location.pathname.startsWith('/customer')) {
       setUsername(userEmail)
-    } else if (location.pathname.startsWith('/sharelynk')) {
-      setUsername(userName)
     }
   }, [])
 
@@ -64,6 +59,8 @@ export default function HeaderLinks(props) {
     mainText = 'white'
   }
 
+  const paramId = Cookies.get('signedParamId')
+
   const handleLogout = () => {
     localStorage.removeItem('username')
     localStorage.removeItem('email')
@@ -74,7 +71,7 @@ export default function HeaderLinks(props) {
   const handleCustomerLogout = () => {
     localStorage.removeItem('userEmail')
     Cookies.remove('userToken')
-    window.location.href = `/login?signed_url_params=${paramId}&id=${imageVersionId}`
+    window.location.href = `/login?signed_url_params=${paramId}`
   }
 
   return (
@@ -146,7 +143,7 @@ export default function HeaderLinks(props) {
       <SidebarResponsive
         logoText={props.logoText}
         secondary={props.secondary}
-        routes={routes}
+        routes={dashRoutes}
         // logo={logo}
         {...rest}
       />

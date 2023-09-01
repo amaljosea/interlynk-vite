@@ -32,7 +32,7 @@ import MultiSelect from 'react-select'
 import { UpdateShareLynk } from 'graphQL/Mutation'
 
 function SBOMDrawer(props) {
-  const { isOpen, onClose, btnRef, refetch, id, shareUsers } = props
+  const { isOpen, onClose, btnRef, refetch, id, shareUsers, contents } = props
 
   const { data: allProducts } = useQuery(GetProjectData, {
     variables: {
@@ -66,6 +66,37 @@ function SBOMDrawer(props) {
   useEffect(() => {
     if (shareUsers.length > 0 && id) {
       setEmailList(shareUsers)
+    }
+
+    // console.log(`contents`, contents)
+
+    if (contents && contents.length > 0) {
+      const imgList = contents.filter((item) => item.__typename === 'Image')
+      const prodList = contents.filter((item) => item.__typename === 'Project')
+
+      if (imgList.length > 0) {
+        const data = imgList.map((item) => {
+          return {
+            value: item.id,
+            label: item.name
+          }
+        })
+        const res = imgList.map((item) => item.id)
+        setImgIds(res)
+        setSelectedImg(data)
+      }
+
+      if (prodList.length > 0) {
+        const data = prodList.map((item) => {
+          return {
+            value: item.id,
+            label: item.name
+          }
+        })
+        const res = prodList.map((item) => item.id)
+        setProductIds(res)
+        setSelectedProd(data)
+      }
     }
   }, [id])
 

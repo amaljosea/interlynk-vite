@@ -51,7 +51,7 @@ const Sharelynk = () => {
                 </Button>
               </Flex>
             </CardHeader>
-            <CardBody>
+            <CardBody mt={5}>
               {data && (
                 <LynkTable
                   captions={[
@@ -81,6 +81,7 @@ const Sharelynk = () => {
           btnRef={btnRef}
           refetch={refetch}
           shareUsers={[]}
+          contents={[]}
         />
       )}
     </>

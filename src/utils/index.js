@@ -340,6 +340,7 @@ export const getActiveRoute = (routes) => {
       }
     }
   }
+  console.log(`active`, activeRoute)
   return activeRoute
 }
 
@@ -370,4 +371,3 @@ export const convertDateFormat = (inputDate) => {
   const day = date.getDate()
   return `${month} ${day}`
 }
-
