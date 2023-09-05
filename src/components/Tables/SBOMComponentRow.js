@@ -1,12 +1,8 @@
 import {
-  Tag,
   Flex,
   Td,
   Text,
   Tr,
-  useColorModeValue,
-  Icon,
-  Stack,
   useDisclosure,
   Box,
   IconButton,
@@ -18,7 +14,6 @@ import {
 } from '@chakra-ui/react'
 import { useEffect, useState, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
-import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import ComponentModal from 'views/Sbom/components/ComponentModal'
 import { timeSince } from 'utils'
@@ -42,7 +37,7 @@ function SBOMComponentRow(props) {
   } = props
   const location = useLocation()
 
-  const customerView = location.pathname.startsWith('/sharelynk')
+  const customerView = location.pathname.startsWith('/customer')
 
   const compBtn = useRef(null)
 
@@ -89,20 +84,6 @@ function SBOMComponentRow(props) {
       </Td>
       <Td>
         {!customerView && (
-          // <Stack direction={'row'} spacing='24px'>
-          //   <Icon
-          //     as={EditIcon}
-          //     color={'blue.500'}
-          //     cursor={'pointer'}
-          //     onClick={onOpen}
-          //   />
-          //   <Icon
-          //     as={DeleteIcon}
-          //     color={'red.500'}
-          //     cursor={'pointer'}
-          //     onClick={onDelOpen}
-          //   />
-          // </Stack>
           <Menu>
             <MenuButton
               as={IconButton}

@@ -12,12 +12,12 @@ import {
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
-import { GetSignedProducts } from 'graphQL/Queries'
 import Cookies from 'js-cookie'
 import { useEffect } from 'react'
 import ProductRow from './components/ProductRow'
 import { useLocation } from 'react-router-dom'
 import ProductInfo from './components/ProductInfo'
+import { GetSignedProjects } from 'graphQL/Queries'
 
 const Products = () => {
   const signedParamId = Cookies.get('signedParamId')
@@ -34,20 +34,22 @@ const Products = () => {
     'updated at'
   ]
 
-  console.log(`productId`, productId)
-
   if (productId === null) {
-    const [getProducts, { data, loading }] = useLazyQuery(GetSignedProducts)
+    const [getAllProjects, { data, loading }] = useLazyQuery(GetSignedProjects)
 
     useEffect(() => {
-      if (!productId && data === undefined) {
-        getProducts({
+      if (data === undefined) {
+        getAllProjects({
           variables: {
             signedParams: signedParamId
           }
         })
       }
     }, [])
+
+    useEffect(() => {
+      console.log(`data`, data)
+    }, [data])
 
     return (
       <>
@@ -65,11 +67,6 @@ const Products = () => {
             mt={{ base: '200px', md: '75px' }}
           >
             <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
-              <CardHeader>
-                <Button size='sm' fontWeight={'medium'} colorScheme='blue'>
-                  Refresh
-                </Button>
-              </CardHeader>
               <CardBody mt={8}>
                 <Table
                   __css={{ 'table-layout': 'fixed', width: 'full' }}
@@ -87,8 +84,8 @@ const Products = () => {
                   </Thead>
                   <Tbody>
                     {data &&
-                      data.products.length > 0 &&
-                      data.products.map((pv, index) => (
+                      data.projects.length > 0 &&
+                      data.projects.map((pv, index) => (
                         <ProductRow
                           key={index}
                           id={pv.id}

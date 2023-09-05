@@ -2,11 +2,9 @@ import {
   Td,
   Text,
   Tr,
-  useColorModeValue,
   Switch,
   Skeleton
 } from '@chakra-ui/react'
-import { useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { timeSince } from 'utils'
 
