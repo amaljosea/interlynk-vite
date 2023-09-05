@@ -16,6 +16,7 @@ import {
 import { useLazyQuery } from '@apollo/client'
 import { DownloadSBOM } from 'graphQL/Queries'
 import { useState } from 'react'
+import { useLocation } from 'react-router-dom'
 
 const DownloadModal = ({
   finalRef,
@@ -25,6 +26,9 @@ const DownloadModal = ({
   productId,
   sbomId
 }) => {
+  const location = useLocation()
+  const customerView = location.pathname.startsWith('/customer')
+
   const [getData] = useLazyQuery(DownloadSBOM)
 
   const [spec, setSpec] = useState('cyclonedx')
@@ -85,6 +89,37 @@ const DownloadModal = ({
       console.log(`Error`, error)
     }
   }
+
+
+  const onDownload = async () => {
+    try {
+      await getData({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          spec,
+          format,
+          includeVulns,
+          includeVex,
+          original: true
+        }
+      })
+        .then((res) => {
+          console.log(`res`, res)
+          const decodedData = window.atob(res.data.sbom.download)
+          const parsedJson = JSON.parse(decodedData)
+          if (format === 'json') {
+            downloadJsonFile(parsedJson)
+          } else {
+            downloadXmlFile(decodedData)
+          }
+        })
+        .finally(() => onClose())
+    } catch (error) {
+      console.log(`Error`, error)
+    }
+  }
+
   return (
     <Modal
       initialFocusRef={initialRef}
@@ -136,7 +171,11 @@ const DownloadModal = ({
         </ModalBody>
 
         <ModalFooter>
-          <Button colorScheme='blue' mr={3} onClick={handleDownload}>
+          <Button
+            colorScheme='blue'
+            mr={3}
+            onClick={customerView ? onDownload : handleDownload}
+          >
             Download
           </Button>
 

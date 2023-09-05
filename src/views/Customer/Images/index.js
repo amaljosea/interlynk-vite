@@ -1,4 +1,4 @@
-import { useLazyQuery } from '@apollo/client'
+import { useLazyQuery, useMutation } from '@apollo/client'
 import {
   Box,
   Button,
@@ -18,6 +18,7 @@ import { useEffect } from 'react'
 import ImageRow from './components/ImageRow'
 import { useLocation } from 'react-router-dom'
 import ImageInfo from './components/ImageInfo'
+import { signedImageUpdate } from 'graphQL/Mutation'
 
 const Images = () => {
   const signedParamId = Cookies.get('signedParamId')
@@ -33,11 +34,14 @@ const Images = () => {
     'Connector',
     'Tags',
     'Last Pushed',
-    'Scanners'
+    'Scanners',
+    'Action'
   ]
 
   if (imageId === null) {
-    const [getImages, { data, loading }] = useLazyQuery(GetSignedImages)
+    const [getImages, { data, loading, refetch }] = useLazyQuery(
+      GetSignedImages
+    )
 
     useEffect(() => {
       if (!imageId && data === undefined) {
@@ -48,6 +52,10 @@ const Images = () => {
         })
       }
     }, [])
+
+    useEffect(() => {
+      console.log(`data`, data)
+    }, [data])
 
     return (
       <>
@@ -65,11 +73,6 @@ const Images = () => {
             mt={{ base: '200px', md: '75px' }}
           >
             <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
-              <CardHeader>
-                <Button size='sm' fontWeight={'medium'} colorScheme='blue'>
-                  Refresh
-                </Button>
-              </CardHeader>
               <CardBody mt={8}>
                 <Table
                   __css={{ 'table-layout': 'fixed', width: 'full' }}
@@ -89,7 +92,12 @@ const Images = () => {
                     {data &&
                       data.images.length > 0 &&
                       data.images.map((item, index) => (
-                        <ImageRow key={index} item={item} isLoading={loading} />
+                        <ImageRow
+                          key={index}
+                          item={item}
+                          isLoading={loading}
+                          refetch={refetch}
+                        />
                       ))}
                   </Tbody>
                 </Table>

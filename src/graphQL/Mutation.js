@@ -659,3 +659,5 @@ export const supplierDelete = gql`
     }
   }
 `
+
+

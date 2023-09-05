@@ -15,7 +15,6 @@ import {
   Tooltip,
   Tr
 } from '@chakra-ui/react'
-import { AddIcon, DeleteIcon } from '@chakra-ui/icons'
 import { getConImg, scanImage } from 'utils'
 import { FaCircleNotch, FaEllipsisV } from 'react-icons/fa'
 import { useMutation } from '@apollo/client'
@@ -25,9 +24,7 @@ import semver from 'semver'
 import { useLocation, Link } from 'react-router-dom'
 import Cookies from 'js-cookie'
 
-const ImageRow = ({ item, isLoading }) => {
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
+const ImageRow = ({ item, isLoading, refetch }) => {
   const signedParams = Cookies.get(`signedParamId`)
 
   const { setScanEnabled } = useContext(GlobalContext)
@@ -52,7 +49,11 @@ const ImageRow = ({ item, isLoading }) => {
           id: item.id,
           scanEnabled: e
         }
-      }).then(() => window.location.reload())
+      }).then(() =>
+        refetch({
+          signedParams: signedParams
+        })
+      )
     } catch (error) {
       console.error('Mutation error:', error)
     }
@@ -62,16 +63,20 @@ const ImageRow = ({ item, isLoading }) => {
     enableImage(e.target.checked)
   }
 
-  const updateImage = async () => {
+  const handleRefresh = async () => {
     try {
       await imageUpdate({
         variables: {
           id: item.id,
           scanRefresh: true
         }
-      }).then(() => window.location.reload())
+      }).then(() =>
+        refetch({
+          signedParams: signedParams
+        })
+      )
     } catch (error) {
-      console.error('Mutation error:', error)
+      console.log(`Error`, error)
     }
   }
 
@@ -101,6 +106,7 @@ const ImageRow = ({ item, isLoading }) => {
 
     return sortedVersions.length > 0 ? sortedVersions[0] : null
   }
+
   const mostRecentVersion = getMostRecentVersion()
 
   return (
@@ -205,6 +211,28 @@ const ImageRow = ({ item, isLoading }) => {
                 </Tooltip>
               ))}
           </Flex>
+        )}
+      </Td>
+      <Td pl={1}>
+        {isLoading || isRefreshed ? (
+          <Skeleton height='20px' />
+        ) : (
+          <Menu>
+            <MenuButton
+              as={IconButton}
+              aria-label='Options'
+              icon={<FaEllipsisV />}
+              variant='none'
+              color='gray.400'
+            />
+            <Portal>
+              <MenuList style={{ width: '100px' }}>
+                <MenuItem icon={<FaCircleNotch />} onClick={handleRefresh}>
+                  <Text fontSize={'sm'}>Refresh</Text>
+                </MenuItem>
+              </MenuList>
+            </Portal>
+          </Menu>
         )}
       </Td>
     </Tr>

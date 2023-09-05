@@ -39,7 +39,7 @@ const SBOMTable = ({ captions, data, refetch, versionName, status }) => {
 
   const location = useLocation()
 
-  const customerView = location.pathname.startsWith('/sharelynk')
+  const customerView = location.pathname.startsWith('/customer')
 
   const link_captions = ['Active', 'Contains', 'Visits', 'Created', 'Link', '']
 

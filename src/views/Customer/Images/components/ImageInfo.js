@@ -20,7 +20,6 @@ import React, { useContext, useEffect, useState } from 'react'
 import Card from 'components/Card/Card.js'
 import CardHeader from 'components/Card/CardHeader'
 import CardBody from 'components/Card/CardBody.js'
-// import SBOMTable from './components/SBOMTable'
 import { sbom } from 'variables/general'
 import {
   FaCubes,
@@ -34,14 +33,13 @@ import GlobalContext from 'context/GlobalContext'
 
 import { useQuery } from '@apollo/client'
 import { scanImage } from 'utils'
-import { getImage } from 'graphQL/Queries'
 import semver from 'semver'
-import { GetImgVersionPagination } from 'graphQL/Queries'
+import { GetSignedImage, GetSignedImageVerion } from 'graphQL/Queries'
 import { getAllScanners } from 'graphQL/Queries'
 import { timeSince } from 'utils'
 import { formattedTime } from 'utils'
 import { dateTime } from 'utils'
-import { GetSignedImage } from 'graphQL/Queries'
+import SBOMTable from 'views/Dashboard/SBOMs/components/SBOMTable'
 import Cookies from 'js-cookie'
 
 function ImageInfo() {
@@ -50,14 +48,15 @@ function ImageInfo() {
   const { setTabIndex, scanEnabled } = useContext(GlobalContext)
 
   const location = useLocation()
+  const history = useHistory()
 
   const queryParams = new URLSearchParams(location.search)
   const versionId = queryParams.get('v')
   const imageId = queryParams.get('id')
 
-  const signedParams = Cookies.get(`signedParamId`)
-
   localStorage.setItem('selectedVersion', versionId)
+
+  const signedParams = Cookies.get(`signedParamId`)
 
   useEffect(() => {
     console.log(`scanEnabled`, scanEnabled)
@@ -80,26 +79,198 @@ function ImageInfo() {
 
   const [scannerRun, setScannerRun] = useState([])
 
-  const { data, refetch, loading } = useQuery(GetSignedImage, {
-    variables: {
-      imageId: imageId,
-      signedParams: signedParams
-    }
+  const {
+    data: imageData,
+    refetch: imageDataRefetch,
+    loading: shareLynkLoading
+  } = useQuery(GetSignedImage, {
+    variables: { signedParams: signedParams, imageId: imageId }
   })
 
   useEffect(() => {
-    if (data) {
-      console.log(`signed image data`, data)
+    if (imageData) {
+      console.log(`image data`, imageData)
     }
-  }, [data])
+  }, [imageData])
+
+  const { data: allScanners } = useQuery(getAllScanners)
+
+  const scannerName = (id) => {
+    if (allScanners) {
+      const scanner = allScanners.scanners.find((item) => item.id === id)
+      return scanner.name
+    }
+  }
+
+  const { data: imageVersionData, refetch, loading } = useQuery(
+    GetSignedImageVerion,
+    {
+      variables: {
+        signedParams: signedParams,
+        imageVersionId: versionId,
+        versionId: versionId,
+        imageId: imageId,
+        first: 30
+      }
+    }
+  )
+
+  useEffect(() => {
+    if (imageVersionData) {
+      console.log('imageVersionData', imageVersionData)
+      setSelectedVersion(imageVersionData.imageVersion.id)
+      setScannerRun(imageVersionData.imageVersion.imageScannerRun)
+      setScanResults(imageVersionData.imageVersion)
+    }
+  }, [imageVersionData])
+
+  const onPreviousPage = () => {
+    refetch({
+      signedParams: signedParams,
+      imageVersionId: versionId,
+      versionId: versionId,
+      first: undefined,
+      last: 30,
+      before: imageVersionData.imageVersion.imageVulns.pageInfo.startCursor,
+      after: ''
+    })
+  }
+
+  const onNextPage = () => {
+    refetch({
+      signedParams: signedParams,
+      imageVersionId: versionId,
+      versionId: versionId,
+      first: 30,
+      last: undefined,
+      after: imageVersionData.imageVersion.imageVulns.pageInfo.endCursor,
+      before: ''
+    })
+  }
+
+  const [imageInfo, setImageInfo] = useState([])
+
+  useEffect(() => {
+    if (imageData) {
+      console.log(`imageData`, imageData)
+      const clonedImageVersions = imageData.image.imageVersions.map((info) => ({
+        ...info
+      }))
+
+      clonedImageVersions.sort((a, b) => {
+        // If either a or b is 'latest', handle the special case.
+        if (a.name === 'latest') {
+          return -1
+        } else if (b.name === 'latest') {
+          return 1
+        }
+        var coerced_a = semver.valid(semver.coerce(a.name))
+        var coerced_b = semver.valid(semver.coerce(b.name))
+        if (coerced_a === null || coerced_b === null) {
+          return b.name.localeCompare(a.name)
+        }
+        return semver.compare(coerced_b, coerced_a)
+      })
+      // console.log(`clonedImageVersions`, clonedImageVersions)
+      setImageInfo(clonedImageVersions)
+    }
+  }, [imageData])
+
+  const handleVersionUpdate = (e) => {
+    setFilteredVulItems([])
+    const { value } = e.target
+    setSelectedVersion(value)
+    localStorage.setItem('selectedVersion', versionId)
+    refetch({
+      signedParams: signedParams,
+      imageVersionId: value,
+      versionId: value,
+      first: 30
+    })
+    queryParams.set('v', value)
+    history.push(`/customer/images?v=${value}&id=${imageId}`)
+  }
+
+  const uniqProjects = []
+  const btnRef = React.useRef()
+
+  const sortSBOM = sbom.sort((a, b) => a.component.localeCompare(b.component))
+
+  const handleScanner = (e) => {
+    const { value } = e.target
+    localStorage.setItem('cloudScanner', value)
+    setSelectedScanner(value)
+  }
+
+  // Calculate the counts for each severity level
+  const totalCount = allResults.reduce((acc, item) => {
+    acc[item.severity[0].toLowerCase()] =
+      (acc[item.severity[0].toLowerCase()] || 0) + 1
+    return acc
+  }, {})
+
+  const unresolveFilter = allResults.filter(
+    (item) =>
+      item.vexVuln?.vexStatus?.name !== 'Fixed' &&
+      item.vexVuln?.vexStatus?.name !== 'False Positive' &&
+      item.vexVuln?.vexStatus?.name !== 'Not Affected'
+  )
+
+  const unresolveCount = unresolveFilter?.reduce((acc, item) => {
+    acc[item.severity[0].toLowerCase()] =
+      (acc[item.severity[0].toLowerCase()] || 0) + 1
+    return acc
+  }, {})
+
+  useEffect(() => {
+    const critical = totalCount['critical'] || 0
+    const high = totalCount['high'] || 0
+    const medium = totalCount['medium' || 'unknown'] || 0
+    const low = totalCount['low'] || 0
+    const unknown = totalCount['unknown'] || 0
+    setTotal({
+      C: critical,
+      H: high,
+      M: medium,
+      L: low,
+      U: unknown
+    })
+  }, [allResults])
+
+  useEffect(() => {
+    const critical = unresolveCount['critical'] || 0
+    const high = unresolveCount['high'] || 0
+    const medium = unresolveCount['medium'] || 0
+    const low = unresolveCount['low'] || 0
+    const unknown = unresolveCount['unknown'] || 0
+    setUnresolve({
+      C: critical,
+      H: high,
+      M: medium,
+      L: low,
+      U: unknown
+    })
+  }, [allResults])
+
+  useEffect(() => {
+    const filteredData = allResults.filter((item) =>
+      item.scanners.some((scanner) => scanner.id === selectedScanner)
+    )
+    // console.log('filteredData', filteredData)
+    setFilteredVulItems(filteredData)
+  }, [selectedScanner])
+
+  const cldScanner = localStorage.getItem('cloudScanner')
+
+  useEffect(() => {
+    setSelectedScanner(cldScanner ? cldScanner : 'All')
+  }, [])
 
   return (
     <Flex direction='column' pt={{ base: '120px', md: '75px' }}>
       {/* Image Details */}
       <Card mb='6'>
-        <Text>Image Info</Text>
-
-        {/* <CardBody>
+        <CardBody>
           <Grid width={'100%'} templateColumns='repeat(5, 1fr)'>
             <GridItem colSpan={2}>
               <Flex
@@ -113,19 +284,22 @@ function ImageInfo() {
                   <Flex direction={'column'} gap={1}>
                     <Heading as='h3' size='md' noOfLines={1}>
                       <Flex alignItems={'center'} flexDirection={'row'} gap={3}>
-                        {scanResults.image.name}:{scanResults.name}
+                        {imageVersionData.imageVersion.image.name}:
+                        {imageVersionData.imageVersion.name}
                         <Tag
                           size={'sm'}
                           variant='outline'
                           colorScheme={
-                            scanResults.image.scanEnabled === true
+                            imageVersionData.imageVersion.image.scanEnabled ===
+                            true
                               ? 'blue'
                               : 'red'
                           }
                         >
                           <TagLabel>
                             Scan{' '}
-                            {scanResults.image.scanEnabled === true
+                            {imageVersionData.imageVersion.image.scanEnabled ===
+                            true
                               ? 'Enabled'
                               : 'Disabled'}
                           </TagLabel>
@@ -133,9 +307,14 @@ function ImageInfo() {
                       </Flex>
                     </Heading>
                     <Text fontSize='sm'>linux/amd64</Text>
-                    <Tooltip label={dateTime(scanResults.lastPushedAt)}>
+                    <Tooltip
+                      label={dateTime(
+                        imageVersionData.imageVersion.lastPushedAt
+                      )}
+                    >
                       <Text fontSize='xs' cursor={'pointer'}>
-                        Last Pushed: {timeSince(scanResults.lastPushedAt)}
+                        Last Pushed:{' '}
+                        {timeSince(imageVersionData.imageVersion.lastPushedAt)}
                       </Text>
                     </Tooltip>
                     <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
@@ -206,10 +385,10 @@ function ImageInfo() {
               </Flex>
             </GridItem>
           </Grid>
-        </CardBody> */}
+        </CardBody>
       </Card>
       {/* Scanner Details */}
-      {/* {imageVersionData && (
+      {imageVersionData && (
         <Card>
           <CardHeader>
             <Heading size='md'>Scanner Summary</Heading>
@@ -310,9 +489,9 @@ function ImageInfo() {
             )}
           </CardBody>
         </Card>
-      )} */}
+      )}
       {/* Table */}
-      {/* <SBOMTable
+      <SBOMTable
         refetch={refetch}
         imgVersionId={imageVersionData ? imageVersionData.imageVersion.id : ''}
         scanResults={scanResults ? scanResults.imageScanners : []}
@@ -328,7 +507,7 @@ function ImageInfo() {
         imageId={imageId}
         handlePreviousPage={onPreviousPage}
         handleNextPage={onNextPage}
-      /> */}
+      />
     </Flex>
   )
 }

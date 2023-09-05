@@ -128,20 +128,6 @@ const ImageRow = ({
           <Skeleton height='20px' />
         ) : item.imageVersions.length === 0 ? (
           <Text>{item.name}</Text>
-        ) : signedParams ? (
-          <Link
-            to={`/customer/image?v=${mostRecentVersion.id}&id=${item.id}&signed_url_params=${signedParams}`}
-            style={{
-              color: '#3182CE',
-              textDecoration: 'underline'
-            }}
-            onClick={() => {
-              window.localStorage.setItem('Image', item.name)
-              setScanEnabled(item.scanEnabled ? true : false)
-            }}
-          >
-            {item.name}
-          </Link>
         ) : (
           <Link
             to={`/vendor/images?v=${mostRecentVersion.id}&id=${item.id}`}

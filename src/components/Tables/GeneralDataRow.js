@@ -1,14 +1,12 @@
 import { EditIcon } from '@chakra-ui/icons'
 import { Button, Flex, Icon, Td, Text, Tr } from '@chakra-ui/react'
-import GlobalContext from 'context/GlobalContext'
-import { useContext } from 'react'
 import { useLocation } from 'react-router-dom'
 import { timeSince } from 'utils'
 
 const GeneralDataRow = ({ onOpen, data, setSelectedKey, status }) => {
   const location = useLocation()
 
-  const customerView = location.pathname.startsWith('/sharelynk')
+  const customerView = location.pathname.startsWith('/customer')
 
   const {
     creationAt,

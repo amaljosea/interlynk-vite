@@ -167,89 +167,6 @@ export const getVexJustifications = gql`
   }
 `
 
-// export const GetSignedImageVersion = gql`
-//   query GetSignedImageVersion(
-//     $signedParams: String!
-//     $imgVersionId: ID!
-//     $first: Int
-//     $last: Int
-//     $after: String
-//     $before: String
-//   ) {
-//     imageVersion(signedParams: $signedParams) {
-//       id
-//       name
-//       lastPushedAt
-//       tags
-//       image {
-//         id
-//         name
-//         scanEnabled
-//       }
-//       imageScanners {
-//         id
-//         company
-//         name
-//         updatedAt
-//       }
-//       imageScannerRun(id: $imgVersionId) {
-//         initiatedAt
-//         completedAt
-//         status
-//         vulnDbVersion
-//         dbLastUpdatedAt
-//         scannerVersion
-//         scannerId
-//         failedAt
-//       }
-//       imageVulns(
-//         imageVersionId: $imgVersionId
-//         first: $first
-//         last: $last
-//         after: $after
-//         before: $before
-//       ) {
-//         pageInfo {
-//           startCursor
-//           hasPreviousPage
-//           endCursor
-//           hasNextPage
-//         }
-//         nodes {
-//           cveId
-//           component {
-//             name
-//             version
-//             fixedInVersion
-//           }
-//           cvss {
-//             v2Score
-//             v3Score
-//           }
-//           severity
-//           fixedInImage
-//           scanners {
-//             id
-//             name
-//             company
-//             updatedAt
-//           }
-//           vexVuln {
-//             fixedByImageVersion {
-//               name
-//             }
-//             vexJustification {
-//               name
-//             }
-//             vexStatus {
-//               name
-//             }
-//           }
-//         }
-//       }
-//     }
-//   }
-// `
 
 export const GetImages = gql`
   query getImages($first: Int, $last: Int, $after: String, $before: String) {
@@ -596,14 +513,13 @@ export const GetAllShareLynks = gql`
 `
 
 // Customer page - Get All shared products
-export const GetSignedProducts = gql`
-  query getSignedProducts($signedParams: String!) {
-    products(signedParams: $signedParams) {
+export const GetSignedProjects = gql`
+  query getSignedProjects($signedParams: String!) {
+    projects(signedParams: $signedParams) {
       id
-      name
       description
+      name
       updatedAt
-      organizationId
       sboms {
         id
         cpes
@@ -673,35 +589,187 @@ export const GetSignedImages = gql`
   }
 `
 
-// Get signed image
 export const GetSignedImage = gql`
   query getSignedImage($imageId: Uuid!, $signedParams: String!) {
     image(imageId: $imageId, signedParams: $signedParams) {
       id
       name
-      imageScanners {
-        id
-        name
-        company
-        updatedAt
-      }
+      updatedAt
       imageVersions {
         id
         name
       }
+    }
+  }
+`
+
+// Get signed image
+export const GetSignedImageVerion = gql`
+  query getSignedImageVersion(
+    $signedParams: String!
+    $imageId: Uuid!
+    $imageVersionId: Uuid!
+    $versionId: ID!
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+  ) {
+    imageVersion(
+      signedParams: $signedParams
+      imageId: $imageId
+      imageVersionId: $imageVersionId
+    ) {
+      id
+      name
       lastPushedAt
-      updatedAt
+      tags
+      image {
+        id
+        name
+        scanEnabled
+      }
+      imageScanners {
+        id
+        company
+        name
+        updatedAt
+      }
+      imageScannerRun(id: $versionId) {
+        initiatedAt
+        completedAt
+        status
+        vulnDbVersion
+        dbLastUpdatedAt
+        scannerVersion
+        scannerId
+        failedAt
+      }
+      imageVulns(
+        imageVersionId: $versionId
+        first: $first
+        last: $last
+        after: $after
+        before: $before
+      ) {
+        pageInfo {
+          startCursor
+          hasPreviousPage
+          endCursor
+          hasNextPage
+        }
+        nodes {
+          cveId
+          component {
+            name
+            version
+            fixedInVersion
+          }
+          cvss {
+            v2Score
+            v3Score
+          }
+          severity
+          fixedInImage
+          scanners {
+            id
+            name
+            company
+            updatedAt
+          }
+          vexVuln {
+            fixedByImageVersion {
+              name
+            }
+            vexJustification {
+              name
+            }
+            vexStatus {
+              name
+            }
+          }
+        }
+      }
     }
   }
 `
 
 // Get signed product
 
-export const GetProductInfo = gql`
-  query getProductInfo($signedParams: String!, $projectId: Uuid!) {
-    product(signedParams: $signedParams, projectId: $projectId) {
+export const GetProjectInfo = gql`
+  query getProjectInfo($signedParams: String!, $projectId: Uuid!) {
+    project(signedParams: $signedParams, projectId: $projectId) {
       id
       name
+      description
+      updatedAt
+      sboms {
+        id
+        components {
+          primary
+          version
+        }
+      }
+    }
+  }
+`
+
+export const GetSignedSBOM = gql`
+  query getSignedSBOM(
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $signedParams: String!
+  ) {
+    sbom(projectId: $projectId, sbomId: $sbomId, signedParams: $signedParams) {
+      id
+      cpes
+      spec
+      purl
+      creationAt
+      updatedAt
+      specVersion
+      project {
+        id
+        name
+      }
+      licenses
+      tools {
+        id
+        name
+        version
+        updatedAt
+      }
+      authors {
+        id
+        name
+        email
+        updatedAt
+      }
+      suppliers {
+        id
+        name
+        email
+        updatedAt
+      }
+      components {
+        id
+        name
+        version
+        primary
+        internal
+        purl
+        cpes
+        licenses
+        updatedAt
+        uniqueId
+        kind
+        suppliers {
+          id
+          name
+          email
+          updatedAt
+        }
+      }
     }
   }
 `
