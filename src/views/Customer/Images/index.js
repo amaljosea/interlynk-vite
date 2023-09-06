@@ -11,14 +11,12 @@ import {
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
-import CardHeader from 'components/Card/CardHeader'
 import { GetSignedImages } from 'graphQL/Queries'
 import Cookies from 'js-cookie'
 import { useEffect } from 'react'
 import ImageRow from './components/ImageRow'
 import { useLocation } from 'react-router-dom'
 import ImageInfo from './components/ImageInfo'
-import { signedImageUpdate } from 'graphQL/Mutation'
 
 const Images = () => {
   const signedParamId = Cookies.get('signedParamId')

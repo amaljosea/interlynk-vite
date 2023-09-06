@@ -62,11 +62,7 @@ const SBOMTable = ({
   imgVersionId,
   refetch,
   imageInfo,
-  shareLynks,
-  imageDataRefetch,
-  scanResults,
   loading,
-  shareLynkLoading,
   handlePreviousPage,
   handleNextPage
 }) => {

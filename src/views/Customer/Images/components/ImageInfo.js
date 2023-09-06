@@ -493,10 +493,7 @@ function ImageInfo() {
       {/* Table */}
       <SBOMTable
         refetch={refetch}
-        imgVersionId={imageVersionData ? imageVersionData.imageVersion.id : ''}
-        scanResults={scanResults ? scanResults.imageScanners : []}
-        imageVersionData={imageVersionData && imageVersionData.imageVersion}
-        shareLynks={imageData ? imageData.image.shareLynks : []}
+        versionData={imageVersionData}
         imageDataRefetch={imageDataRefetch}
         imageInfo={imageInfo}
         data={sortSBOM}
