@@ -14,7 +14,8 @@ import {
   TagLabel,
   Tooltip,
   Stack,
-  StackDivider
+  StackDivider,
+  Button
 } from '@chakra-ui/react'
 import React, { useContext, useEffect, useState } from 'react'
 import Card from 'components/Card/Card.js'
@@ -41,6 +42,7 @@ import { formattedTime } from 'utils'
 import { dateTime } from 'utils'
 import SBOMTable from 'views/Dashboard/SBOMs/components/SBOMTable'
 import Cookies from 'js-cookie'
+import ImageLogs from './ImageLogs'
 
 function ImageInfo() {
   const [scanResults, setScanResults] = useState(null)
@@ -110,7 +112,7 @@ function ImageInfo() {
         imageVersionId: versionId,
         versionId: versionId,
         imageId: imageId,
-        first: 30
+        first: 10
       }
     }
   )
@@ -130,7 +132,7 @@ function ImageInfo() {
       imageVersionId: versionId,
       versionId: versionId,
       first: undefined,
-      last: 30,
+      last: 10,
       before: imageVersionData.imageVersion.imageVulns.pageInfo.startCursor,
       after: ''
     })
@@ -141,7 +143,7 @@ function ImageInfo() {
       signedParams: signedParams,
       imageVersionId: versionId,
       versionId: versionId,
-      first: 30,
+      first: 10,
       last: undefined,
       after: imageVersionData.imageVersion.imageVulns.pageInfo.endCursor,
       before: ''
@@ -256,7 +258,6 @@ function ImageInfo() {
     const filteredData = allResults.filter((item) =>
       item.scanners.some((scanner) => scanner.id === selectedScanner)
     )
-    // console.log('filteredData', filteredData)
     setFilteredVulItems(filteredData)
   }, [selectedScanner])
 
@@ -490,21 +491,43 @@ function ImageInfo() {
           </CardBody>
         </Card>
       )}
-      {/* Table */}
-      <SBOMTable
-        refetch={refetch}
-        versionData={imageVersionData}
-        imageDataRefetch={imageDataRefetch}
-        imageInfo={imageInfo}
-        data={sortSBOM}
-        filteredVul={filteredVulItems}
-        loading={loading}
-        shareLynkLoading={shareLynkLoading}
-        setFilteredVulItems={setFilteredVulItems}
-        imageId={imageId}
-        handlePreviousPage={onPreviousPage}
-        handleNextPage={onNextPage}
-      />
+
+      {imageVersionData && (
+        <>
+          <ImageLogs
+            data={imageVersionData}
+            refetch={refetch}
+            imageInfo={imageInfo}
+          />
+
+          <Flex
+            flexDir={'row'}
+            gap={4}
+            alignItems={'center'}
+            justifyContent={'flex-start'}
+          >
+            <Button
+              colorScheme='blue'
+              onClick={onPreviousPage}
+              isDisabled={
+                !imageVersionData.imageVersion.imageVulns.pageInfo
+                  .hasPreviousPage
+              }
+            >
+              Previous
+            </Button>
+            <Button
+              colorScheme='blue'
+              onClick={onNextPage}
+              isDisabled={
+                !imageVersionData.imageVersion.imageVulns.pageInfo.hasNextPage
+              }
+            >
+              Next
+            </Button>
+          </Flex>
+        </>
+      )}
     </Flex>
   )
 }

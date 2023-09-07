@@ -3,11 +3,7 @@ import SBOMLinkRow from 'components/Tables/SBOMLinkRow'
 
 const LynkTable = ({ captions, data, refetch }) => {
   return (
-    <Table
-      // __css={{ 'table-layout': 'fixed', width: 'full' }}
-      variant='simple'
-      size='sm'
-    >
+    <Table variant='simple' size='sm'>
       <Thead>
         <Tr my='.8rem' pl='0px'>
           {captions.map((caption, idx) => {

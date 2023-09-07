@@ -1,9 +1,4 @@
-import {
-  DeleteIcon,
-  EditIcon,
-  TriangleDownIcon,
-  TriangleUpIcon
-} from '@chakra-ui/icons'
+import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
 import {
   Box,
   Button,
@@ -48,70 +43,15 @@ import { OrgConnectorUpdate } from 'graphQL/Mutation'
 import { OrgConnectorDelete } from 'graphQL/Mutation'
 
 import { getConImg, regions } from 'utils'
-import { timeSince } from 'utils'
-import { OrgConnectorRefresh } from 'graphQL/Mutation'
+// import { OrgConnectorRefresh } from 'graphQL/Mutation'
 import ConnectionRow from './ConnectionRow'
-import { OrgConnectorValidate } from 'graphQL/Mutation'
+// import { OrgConnectorValidate } from 'graphQL/Mutation'
 
 const Index = () => {
-  const toast = useToast()
-
   const [connectors, setConnectors] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [isValidate, setIsValidate] = useState(false)
   const [errorMsg, setErrorMsg] = useState(false)
-
-  const { data: allConnectors } = useQuery(GetAllConnectors, {
-    variables: {}
-  })
-
-  const { data: orgConnectors, refetch } = useQuery(GetAllOrgConnectors, {
-    variables: {}
-  })
-
-  const [organizationConnectorRefresh] = useMutation(OrgConnectorRefresh, {
-    onCompleted: refetch
-  })
-
-  const [organizationConnectorCreate] = useMutation(OrgConnectorCreate, {
-    onCompleted: refetch
-  })
-
-  const [organizationConnectorUpdate, { data: updatedConnector }] = useMutation(
-    OrgConnectorUpdate,
-    {
-      onCompleted: refetch
-    }
-  )
-
-  const [organizationConnectorDelete] = useMutation(OrgConnectorDelete, {
-    onCompleted: refetch
-  })
-
-  const [
-    organizationConnectorValidate,
-    { data: validateData, loading: validateLoading }
-  ] = useMutation(OrgConnectorValidate)
-
-  useEffect(() => {
-    if (allConnectors) {
-      const con = [...allConnectors.connectors]
-      const result = con.sort((a, b) => {
-        const nameA = a.name.toUpperCase()
-        const nameB = b.name.toUpperCase()
-
-        if (nameA < nameB) {
-          return -1
-        }
-        if (nameA > nameB) {
-          return 1
-        }
-        return 0
-      })
-      setConnectors(result)
-      // console.log('connectors', result)
-    }
-  }, [allConnectors])
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
@@ -131,6 +71,39 @@ const Index = () => {
   const [sortOrder, setSortOrder] = useState('')
   const [connectionData, setConnectionData] = useState([])
 
+  const { data: allConnectors } = useQuery(GetAllConnectors)
+
+  const { data: orgConnectors, refetch } = useQuery(GetAllOrgConnectors)
+
+  // const [organizationConnectorRefresh] = useMutation(OrgConnectorRefresh)
+
+  const [organizationConnectorCreate] = useMutation(OrgConnectorCreate)
+
+  const [organizationConnectorUpdate] = useMutation(OrgConnectorUpdate)
+
+  const [organizationConnectorDelete] = useMutation(OrgConnectorDelete)
+
+  // const [organizationConnectorValidate] = useMutation(OrgConnectorValidate)
+
+  useEffect(() => {
+    if (allConnectors) {
+      const con = [...allConnectors.connectors]
+      const result = con.sort((a, b) => {
+        const nameA = a.name.toUpperCase()
+        const nameB = b.name.toUpperCase()
+
+        if (nameA < nameB) {
+          return -1
+        }
+        if (nameA > nameB) {
+          return 1
+        }
+        return 0
+      })
+      setConnectors(result)
+    }
+  }, [allConnectors])
+
   useEffect(() => {
     if (orgConnectors) {
       const sortedData = [...orgConnectors.organizationConnectors].sort(
@@ -149,24 +122,28 @@ const Index = () => {
     }
   }, [orgConnectors])
 
-  const handleRefresh = async () => {
-    try {
-      setIsLoading(true)
-      await organizationConnectorRefresh().then(() => {
-        setTimeout(() => {
-          setIsLoading(false)
-        }, 2000)
-      })
-    } catch (error) {
-      if (error.networkError && error.networkError.statusCode === 500) {
-        // Handle the specific error
-        alert('Something went wrong')
-      } else {
-        // Handle other errors
-        alert(error.message)
-      }
-    }
-  }
+  // const handleRefresh = async () => {
+  //   try {
+  //     setIsLoading(true)
+  //     await organizationConnectorRefresh()
+  //       .then(() => {
+  //         refetch()
+  //       })
+  //       .finally(() => {
+  //         setTimeout(() => {
+  //           setIsLoading(false)
+  //         }, 2000)
+  //       })
+  //   } catch (error) {
+  //     if (error.networkError && error.networkError.statusCode === 500) {
+  //       // Handle the specific error
+  //       alert('Something went wrong')
+  //     } else {
+  //       // Handle other errors
+  //       alert(error.message)
+  //     }
+  //   }
+  // }
 
   const handleOpen = (item) => {
     setSelectedConnection(null)
@@ -190,17 +167,17 @@ const Index = () => {
     onOpen()
   }
 
-  const handleValidate = async (id) => {
-    try {
-      await organizationConnectorValidate({
-        variables: {
-          id: id
-        }
-      })
-    } catch (error) {
-      console.error('Mutation error:', error)
-    }
-  }
+  // const handleValidate = async (id) => {
+  //   try {
+  //     await organizationConnectorValidate({
+  //       variables: {
+  //         id: id
+  //       }
+  //     })
+  //   } catch (error) {
+  //     console.error('Mutation error:', error)
+  //   }
+  // }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -214,8 +191,7 @@ const Index = () => {
             name: connectorName,
             enabled: conStatus
           }
-        })
-        window.location.reload()
+        }).then(() => window.location.reload())
       } catch (error) {
         console.error('Mutation error:', error)
       }
@@ -236,13 +212,6 @@ const Index = () => {
           connectorName === username ||
           connectorName === accessToken
         ) {
-          // toast({
-          //   description: 'AWS connection details is not validated. ',
-          //   status: 'error',
-          //   duration: 5000,
-          //   isClosable: true,
-          //   position: 'top-right'
-          // })
           setIsValidate(true)
           setTimeout(() => {
             setIsValidate(false)
@@ -260,7 +229,8 @@ const Index = () => {
               region: region ? region : ''
             }
           })
-          window.location.reload()
+            .then(() => refetch())
+            .finally(() => window.location.reload())
         }
       } catch (error) {
         if (error.networkError && error.networkError.statusCode === 500) {
@@ -285,7 +255,8 @@ const Index = () => {
           id
         }
       })
-      window.location.reload()
+        .then(() => refetch())
+        .finally(() => window.location.reload())
     } catch (error) {
       if (error.networkError && error.networkError.statusCode === 500) {
         // Handle the specific error
@@ -392,154 +363,156 @@ const Index = () => {
                 </GridItem>
               ))}
             </Grid>
-            <Modal isOpen={isOpen} onClose={onClose}>
-              <ModalOverlay />
-              <ModalContent>
-                <form onSubmit={handleSubmit}>
-                  <ModalHeader>{registryName}</ModalHeader>
-                  <ModalCloseButton />
-                  <ModalBody>
-                    <Flex
-                      width={'100%'}
-                      direction='column'
-                      gap={6}
-                      alignItems={'flex-start'}
-                    >
+            {isOpen && (
+              <Modal isOpen={isOpen} onClose={onClose}>
+                <ModalOverlay />
+                <ModalContent>
+                  <form onSubmit={handleSubmit}>
+                    <ModalHeader>{registryName}</ModalHeader>
+                    <ModalCloseButton />
+                    <ModalBody>
                       <Flex
                         width={'100%'}
-                        alignItems={'center'}
-                        justifyContent={'center'}
-                        my={isValidate ? 4 : 0}
+                        direction='column'
+                        gap={6}
+                        alignItems={'flex-start'}
                       >
-                        {isValidate ? (
-                          <Spinner
-                            thickness='4px'
-                            speed='0.65s'
-                            emptyColor='gray.200'
-                            color='blue.500'
-                            size='xl'
-                          />
-                        ) : (
-                          ''
-                        )}
+                        <Flex
+                          width={'100%'}
+                          alignItems={'center'}
+                          justifyContent={'center'}
+                          my={isValidate ? 4 : 0}
+                        >
+                          {isValidate ? (
+                            <Spinner
+                              thickness='4px'
+                              speed='0.65s'
+                              emptyColor='gray.200'
+                              color='blue.500'
+                              size='xl'
+                            />
+                          ) : (
+                            ''
+                          )}
 
-                        {errorMsg && (
-                          <Alert status='error'>
-                            <AlertIcon />
-                            <AlertDescription>
-                              Connection in not valid
-                            </AlertDescription>
-                          </Alert>
-                        )}
-                      </Flex>
-                      <Flex width={'100%'} direction={'row'} gap={2}>
-                        <FormControl
-                          display='flex'
-                          gap={2}
-                          alignItems='flex-start'
-                        >
-                          <Switch
-                            id='connStatus'
-                            isChecked={conStatus}
-                            onChange={() => setConStatus(!conStatus)}
-                          />
-                          <FormLabel htmlFor='connStatus' mb='0'>
-                            {conStatus === true ? 'Enabled' : 'Disabled'}
-                          </FormLabel>
-                        </FormControl>
-                        <FormControl
-                          display='flex'
-                          gap={2}
-                          alignItems='flex-start'
-                        ></FormControl>
-                      </Flex>
-                      <Flex width={'100%'} direction={'column'} gap={4}>
-                        <FormControl isRequired>
-                          <FormLabel>Connector Name</FormLabel>
-                          <Input
-                            type='text'
-                            value={connectorName}
-                            onChange={(e) => setConnectorName(e.target.value)}
-                            placeholder={
-                              registryName === 'Docker Hub'
-                                ? 'e.g. Interlynk DockerHub'
-                                : 'e.g. Interlynk ECR-Prod'
-                            }
-                          />
-                        </FormControl>
-                        <FormControl
-                          isRequired
-                          isDisabled={
-                            selectedConnection === null ? false : true
-                          }
-                        >
-                          <FormLabel>
-                            {registryName === 'Amazon ECR'
-                              ? 'AWS Access Key ID'
-                              : registryName === 'Docker Hub'
-                              ? 'Docker Account ID'
-                              : 'Account ID'}
-                          </FormLabel>
-                          <Input
-                            type='text'
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            placeholder={'e.g. AKIAIOSFODNN7EXAMPLE'}
-                          />
-                        </FormControl>
-                        {selectedConnection === null && (
-                          <FormControl isRequired>
-                            <FormLabel>
-                              {registryName === 'Amazon ECR'
-                                ? 'AWS Secret Access Key'
-                                : 'Access Token'}
+                          {errorMsg && (
+                            <Alert status='error'>
+                              <AlertIcon />
+                              <AlertDescription>
+                                Connection in not valid
+                              </AlertDescription>
+                            </Alert>
+                          )}
+                        </Flex>
+                        <Flex width={'100%'} direction={'row'} gap={2}>
+                          <FormControl
+                            display='flex'
+                            gap={2}
+                            alignItems='flex-start'
+                          >
+                            <Switch
+                              id='connStatus'
+                              isChecked={conStatus}
+                              onChange={() => setConStatus(!conStatus)}
+                            />
+                            <FormLabel htmlFor='connStatus' mb='0'>
+                              {conStatus === true ? 'Enabled' : 'Disabled'}
                             </FormLabel>
+                          </FormControl>
+                          <FormControl
+                            display='flex'
+                            gap={2}
+                            alignItems='flex-start'
+                          ></FormControl>
+                        </Flex>
+                        <Flex width={'100%'} direction={'column'} gap={4}>
+                          <FormControl isRequired>
+                            <FormLabel>Connector Name</FormLabel>
                             <Input
                               type='text'
-                              value={accessToken}
-                              onChange={(e) => setAccessToken(e.target.value)}
+                              value={connectorName}
+                              onChange={(e) => setConnectorName(e.target.value)}
                               placeholder={
-                                'e.g. wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY'
+                                registryName === 'Docker Hub'
+                                  ? 'e.g. Interlynk DockerHub'
+                                  : 'e.g. Interlynk ECR-Prod'
                               }
                             />
                           </FormControl>
-                        )}
-                        {selectedConnection === null &&
-                          registryName === 'Amazon ECR' && (
+                          <FormControl
+                            isRequired
+                            isDisabled={
+                              selectedConnection === null ? false : true
+                            }
+                          >
+                            <FormLabel>
+                              {registryName === 'Amazon ECR'
+                                ? 'AWS Access Key ID'
+                                : registryName === 'Docker Hub'
+                                ? 'Docker Account ID'
+                                : 'Account ID'}
+                            </FormLabel>
+                            <Input
+                              type='text'
+                              value={username}
+                              onChange={(e) => setUsername(e.target.value)}
+                              placeholder={'e.g. AKIAIOSFODNN7EXAMPLE'}
+                            />
+                          </FormControl>
+                          {selectedConnection === null && (
                             <FormControl isRequired>
-                              <FormLabel>AWS Region</FormLabel>
-                              <Select
-                                defaultValue={'us-east-1'}
-                                value={region}
-                                onChange={(e) => setRegion(e.target.value)}
-                              >
-                                {regions.map((item, index) => (
-                                  <option key={index} value={item.id}>
-                                    {item.name}
-                                  </option>
-                                ))}
-                              </Select>
+                              <FormLabel>
+                                {registryName === 'Amazon ECR'
+                                  ? 'AWS Secret Access Key'
+                                  : 'Access Token'}
+                              </FormLabel>
+                              <Input
+                                type='text'
+                                value={accessToken}
+                                onChange={(e) => setAccessToken(e.target.value)}
+                                placeholder={
+                                  'e.g. wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY'
+                                }
+                              />
                             </FormControl>
                           )}
+                          {selectedConnection === null &&
+                            registryName === 'Amazon ECR' && (
+                              <FormControl isRequired>
+                                <FormLabel>AWS Region</FormLabel>
+                                <Select
+                                  defaultValue={'us-east-1'}
+                                  value={region}
+                                  onChange={(e) => setRegion(e.target.value)}
+                                >
+                                  {regions.map((item, index) => (
+                                    <option key={index} value={item.id}>
+                                      {item.name}
+                                    </option>
+                                  ))}
+                                </Select>
+                              </FormControl>
+                            )}
+                        </Flex>
                       </Flex>
-                    </Flex>
-                  </ModalBody>
-                  <ModalFooter>
-                    <Button
-                      colorScheme='blue'
-                      variant='outline'
-                      onClick={onClose}
-                      mr={4}
-                    >
-                      Cancel
-                    </Button>
-                    <Button colorScheme='blue' type='submit'>
-                      Save
-                    </Button>
-                  </ModalFooter>
-                </form>
-              </ModalContent>
-            </Modal>
+                    </ModalBody>
+                    <ModalFooter>
+                      <Button
+                        colorScheme='blue'
+                        variant='outline'
+                        onClick={onClose}
+                        mr={4}
+                      >
+                        Cancel
+                      </Button>
+                      <Button colorScheme='blue' type='submit'>
+                        Save
+                      </Button>
+                    </ModalFooter>
+                  </form>
+                </ModalContent>
+              </Modal>
+            )}
           </Box>
           <Flex direction={'column'} gap={4} mt={12}>
             <Flex
@@ -622,34 +595,36 @@ const Index = () => {
                       </Th>
                     </Tr>
                   </Thead>
-                  <Tbody>
-                    {connectionData.length > 0
-                      ? connectionData.map((item, index) => (
-                          <ConnectionRow
-                            key={index}
-                            item={item}
-                            isLoading={isLoading}
-                            handleEdit={handleEdit}
-                            handleDelete={handleDelete}
-                            organizationConnectorUpdate={
-                              organizationConnectorUpdate
-                            }
-                          />
-                        ))
-                      : connectorResults &&
-                        connectorResults.map((item, index) => (
-                          <ConnectionRow
-                            key={index}
-                            item={item}
-                            isLoading={isLoading}
-                            handleEdit={handleEdit}
-                            handleDelete={handleDelete}
-                            organizationConnectorUpdate={
-                              organizationConnectorUpdate
-                            }
-                          />
-                        ))}
-                  </Tbody>
+                  {connectionData && (
+                    <Tbody>
+                      {connectionData.length > 0
+                        ? connectionData.map((item, index) => (
+                            <ConnectionRow
+                              key={index}
+                              item={item}
+                              isLoading={isLoading}
+                              handleEdit={handleEdit}
+                              handleDelete={handleDelete}
+                              organizationConnectorUpdate={
+                                organizationConnectorUpdate
+                              }
+                            />
+                          ))
+                        : connectorResults &&
+                          connectorResults.map((item, index) => (
+                            <ConnectionRow
+                              key={index}
+                              item={item}
+                              isLoading={isLoading}
+                              handleEdit={handleEdit}
+                              handleDelete={handleDelete}
+                              organizationConnectorUpdate={
+                                organizationConnectorUpdate
+                              }
+                            />
+                          ))}
+                    </Tbody>
+                  )}
                 </Table>
               </CardBody>
             </Card>

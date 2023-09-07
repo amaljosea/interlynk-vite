@@ -103,7 +103,7 @@ function SBOMs() {
   const { data: imageVersionData, refetch, loading } = useQuery(
     GetImgVersionPagination,
     {
-      variables: { imageVersionId: versionId, first: 30 }
+      variables: { imageVersionId: versionId, first: 10 }
     }
   )
 
@@ -120,7 +120,7 @@ function SBOMs() {
     refetch({
       imageVersionId: versionId,
       first: undefined,
-      last: 30,
+      last: 10,
       before: imageVersionData.imageVersion.imageVulns.pageInfo.startCursor,
       after: ''
     })
@@ -129,7 +129,7 @@ function SBOMs() {
   const onNextPage = () => {
     refetch({
       imageVersionId: versionId,
-      first: 30,
+      first: 10,
       last: undefined,
       after: imageVersionData.imageVersion.imageVulns.pageInfo.endCursor,
       before: ''

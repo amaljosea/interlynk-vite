@@ -167,7 +167,6 @@ export const getVexJustifications = gql`
   }
 `
 
-
 export const GetImages = gql`
   query getImages($first: Int, $last: Int, $after: String, $before: String) {
     images(first: $first, after: $after, last: $last, before: $before) {
@@ -403,6 +402,7 @@ export const GetSBOM = gql`
         name
       }
       licenses
+      lifecycle
       tools {
         id
         name

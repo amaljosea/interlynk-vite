@@ -30,7 +30,7 @@ const AdvisoryLog = ({
     <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
       <CardBody>
         <Table
-          __css={{ 'table-layout': 'fixed', width: 'full' }}
+          __css={{ 'tableLayout': 'fixed', width: 'full' }}
           variant='simple'
           color={textColor}
           size='sm'

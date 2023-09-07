@@ -115,7 +115,7 @@ function SBOMLinkRow(props) {
       <Td pl={0}>
         <Switch isChecked={enabled} readOnly size='md' />
       </Td>
-      <Td>
+      <Td width={'200px'}>
         <Flex flexDirection={'row'} flexWrap={'wrap'} spacing={2} gap={2}>
           {shareUsers.map((user, idx) => {
             return (
@@ -185,7 +185,7 @@ function SBOMLinkRow(props) {
           </Button>
         </Flex>
       </Td>
-      <Td>
+      <Td pl={0}>
         <Menu>
           <MenuButton
             as={IconButton}

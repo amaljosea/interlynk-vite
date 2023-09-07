@@ -12,7 +12,6 @@ import {
 // Custom components
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
-import CardHeader from 'components/Card/CardHeader.js'
 import ActivityLogRow from 'components/Tables/ActivityLogRow.js'
 import React from 'react'
 

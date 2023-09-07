@@ -68,7 +68,7 @@ const SBOMTable = ({ captions, data, refetch, versionName, status }) => {
             <TabPanel>
               <CardBody>
                 <Table
-                  __css={{ 'table-layout': 'fixed', width: 'full' }}
+                  __css={{ 'tableLayout': 'fixed', width: 'full' }}
                   variant='simple'
                   color={textColor}
                   size='sm'
@@ -115,7 +115,7 @@ const SBOMTable = ({ captions, data, refetch, versionName, status }) => {
               )}
               <CardBody overflowX={'scroll'}>
                 <Table
-                  __css={{ 'table-layout': 'fixed', width: 'full' }}
+                  __css={{ 'tableLayout': 'fixed', width: 'full' }}
                   variant='simple'
                   color={textColor}
                   size='sm'

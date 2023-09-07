@@ -92,12 +92,6 @@ const ConnectionRow = ({
     handleValidate(item.id)
   }, [item])
 
-  // useEffect(() => {
-  //   if (data) {
-  //     console.log(data)
-  //   }
-  // }, [data])
-
   return (
     <>
       {isLoading ? (
