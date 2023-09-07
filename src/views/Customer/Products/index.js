@@ -69,7 +69,7 @@ const Products = () => {
             <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
               <CardBody mt={8}>
                 <Table
-                  __css={{ 'table-layout': 'fixed', width: 'full' }}
+                  __css={{ 'tableLayout': 'fixed', width: 'full' }}
                   variant='simple'
                   size='sm'
                 >

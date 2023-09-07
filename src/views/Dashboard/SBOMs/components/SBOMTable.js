@@ -414,22 +414,7 @@ const SBOMTable = ({
               {imageVersionData && (
                 <>
                   <CardBody>
-                    {imageVersionData.imageScannerRun.length > 0 &&
-                    (imageVersionData.imageScannerRun[0].status === 'failed' ||
-                      imageVersionData.image.scanEnabled === false) ? (
-                      <Flex
-                        width={'100%'}
-                        flexDirection={'row'}
-                        alignItems={'center'}
-                        justifyContent={'center'}
-                        mt={14}
-                      >
-                        <Text>
-                          No scan result found, click on "Refresh" to lanch a
-                          new scan
-                        </Text>
-                      </Flex>
-                    ) : imageVersionData.imageVulns.nodes.length > 0 ? (
+                    {imageVersionData.imageVulns.nodes.length > 0 ? (
                       <Table variant='simple' color={textColor} size='sm'>
                         <Thead>
                           <Tr my='.8rem' pl='0px'>
@@ -565,33 +550,35 @@ const SBOMTable = ({
         />
       )}
 
-      <Modal isOpen={isRefreshOpen} onClose={setRefreshClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Scan</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Text fontSize='lg'>
-              Refreshing this will enable scan for this image
-            </Text>
-            {/* <Text mt={5}>This image is disabled.</Text> */}
-            <Text fontSize='sm' mt={5}>
-              Are you sure you want to continue refresh this page ?
-            </Text>
-            {/* <Text fontSize='sm' mt={4}>
+      {isRefreshOpen && (
+        <Modal isOpen={isRefreshOpen} onClose={setRefreshClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Scan</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Text fontSize='lg'>
+                Refreshing this will enable scan for this image
+              </Text>
+              {/* <Text mt={5}>This image is disabled.</Text> */}
+              <Text fontSize='sm' mt={5}>
+                Are you sure you want to continue refresh this page ?
+              </Text>
+              {/* <Text fontSize='sm' mt={4}>
               ** Please enable it from image page
             </Text> */}
-          </ModalBody>
-          <ModalFooter>
-            <Button variant='outline' mr={3} onClick={setRefreshClose}>
-              No
-            </Button>
-            <Button colorScheme='blue' onClick={handleYes}>
-              Yes
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+            </ModalBody>
+            <ModalFooter>
+              <Button variant='outline' mr={3} onClick={setRefreshClose}>
+                No
+              </Button>
+              <Button colorScheme='blue' onClick={handleYes}>
+                Yes
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      )}
     </>
   )
 }

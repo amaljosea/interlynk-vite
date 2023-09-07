@@ -32,9 +32,7 @@ function Advisories() {
   const [severityValue, setSeverityValue] = useState('')
   const [sourceValue, setSourceValue] = useState('')
 
-  const [GetFeed, { data: feedData, loading, error }] = useLazyQuery(
-    GetFeedLogs
-  )
+  const [GetFeed, { data: feedData, loading }] = useLazyQuery(GetFeedLogs)
 
   useEffect(() => {
     if (feedData === undefined) {
@@ -47,63 +45,39 @@ function Advisories() {
     }
   }, [])
 
-  useEffect(() => {
-    GetFeed({
-      variables: {
-        date: formattedDate,
-        source: sourceValue === 'all' ? '' : sourceValue,
-        first: 10
-      }
-    })
-  }, [sourceValue])
-
-  useEffect(() => {
-    GetFeed({
-      variables: {
-        date: formattedDate,
-        severity: severityValue === 'all' ? '' : severityValue,
-        first: 10
-      }
-    })
-  }, [severityValue])
-
   const onPreviousPage = () => {
-    if (feedData) {
-      GetFeed({
-        variables: {
-          date: formattedDate,
-          first: undefined,
-          last: 10,
-          before: feedData.feedLogs.pageInfo.startCursor,
-          after: '',
-          severity: severityValue === 'all' ? '' : severityValue,
-          source: sourceValue === 'all' ? '' : sourceValue
-        }
-      })
-    }
+    GetFeed({
+      variables: {
+        date: formattedDate,
+        first: undefined,
+        last: 10,
+        before: feedData.feedLogs.pageInfo.startCursor,
+        after: '',
+        severity: severityValue === 'all' ? '' : severityValue,
+        source: sourceValue === 'all' ? '' : sourceValue
+      }
+    })
   }
 
   const onNextPage = () => {
-    if (feedData) {
-      GetFeed({
-        variables: {
-          date: formattedDate,
-          first: 10,
-          last: undefined,
-          after: feedData.feedLogs.pageInfo.endCursor,
-          before: '',
-          severity: severityValue === 'all' ? '' : severityValue,
-          source: sourceValue === 'all' ? '' : sourceValue
-        }
-      })
-    }
+    GetFeed({
+      variables: {
+        date: formattedDate,
+        first: 10,
+        last: undefined,
+        after: feedData.feedLogs.pageInfo.endCursor,
+        before: '',
+        severity: severityValue === 'all' ? '' : severityValue,
+        source: sourceValue === 'all' ? '' : sourceValue
+      }
+    })
   }
 
-  useEffect(() => {
-    if (feedData) {
-      console.log(`feedLogs`, feedData.feedLogs)
-    }
-  }, [feedData])
+  // useEffect(() => {
+  //   if (feedData) {
+  //     console.log(`feedLogs`, feedData.feedLogs)
+  //   }
+  // }, [feedData])
 
   return (
     <Flex direction='column' pt={{ base: '120px', md: '75px' }}>
@@ -135,7 +109,16 @@ function Advisories() {
                 <MenuItemOption
                   value={p}
                   key={p}
-                  onClick={() => setSourceValue(p)}
+                  onClick={() => {
+                    setSourceValue(p)
+                    GetFeed({
+                      variables: {
+                        date: formattedDate,
+                        source: p === 'all' ? '' : p,
+                        first: 10
+                      }
+                    })
+                  }}
                   textTransform={'uppercase'}
                 >
                   {p}
@@ -166,7 +149,16 @@ function Advisories() {
                 <MenuItemOption
                   value={p}
                   key={p}
-                  onClick={() => setSeverityValue(p)}
+                  onClick={() => {
+                    setSeverityValue(p)
+                    GetFeed({
+                      variables: {
+                        date: formattedDate,
+                        severity: p === 'all' ? '' : p,
+                        first: 10
+                      }
+                    })
+                  }}
                   textTransform={'capitalize'}
                 >
                   {p}

@@ -21,10 +21,10 @@ import { useMutation } from '@apollo/client'
 import { ImageUpdate } from 'graphQL/Mutation'
 import GlobalContext from 'context/GlobalContext'
 import semver from 'semver'
-import { useLocation, Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import Cookies from 'js-cookie'
 
-const ImageRow = ({ item, isLoading, refetch }) => {
+const ImageRow = ({ item, refetch }) => {
   const signedParams = Cookies.get(`signedParamId`)
 
   const { setScanEnabled } = useContext(GlobalContext)
@@ -33,14 +33,11 @@ const ImageRow = ({ item, isLoading, refetch }) => {
     a.company.localeCompare(b.company)
   )
 
-  const [isRefreshed, setIsRefreshed] = useState(false)
-  // console.log('filteredScanners', filteredScanners)
-
   useEffect(() => {
     setScanEnabled(item.scanEnabled)
   }, [item.scanEnabled])
 
-  const [imageUpdate, { data }] = useMutation(ImageUpdate)
+  const [imageUpdate, { loading }] = useMutation(ImageUpdate)
 
   const enableImage = async (e) => {
     try {
@@ -80,14 +77,6 @@ const ImageRow = ({ item, isLoading, refetch }) => {
     }
   }
 
-  useEffect(() => {
-    if (data?.imageUpdate?.image?.id === item.id) {
-      setTimeout(() => {
-        setIsRefreshed(false)
-      }, 2000)
-    }
-  }, [data])
-
   const getMostRecentVersion = () => {
     const sortedVersions = item.imageVersions.slice().sort((a, b) => {
       // If either a or b is 'latest', handle the special case.
@@ -112,7 +101,7 @@ const ImageRow = ({ item, isLoading, refetch }) => {
   return (
     <Tr key={item.id}>
       <Td pl={1} width={'160px'}>
-        {isLoading || isRefreshed ? (
+        {loading ? (
           <Skeleton height='20px' />
         ) : (
           <Switch
@@ -123,7 +112,7 @@ const ImageRow = ({ item, isLoading, refetch }) => {
         )}
       </Td>
       <Td fontSize={'sm'} pl={1}>
-        {isLoading || isRefreshed ? (
+        {loading ? (
           <Skeleton height='20px' />
         ) : item.imageVersions.length === 0 ? (
           <Text>{item.name}</Text>
@@ -144,7 +133,7 @@ const ImageRow = ({ item, isLoading, refetch }) => {
         )}
       </Td>
       <Td fontSize={'sm'} pl={1}>
-        {isLoading || isRefreshed ? (
+        {loading ? (
           <Skeleton height='20px' />
         ) : (
           <Flex
@@ -164,14 +153,14 @@ const ImageRow = ({ item, isLoading, refetch }) => {
         )}
       </Td>
       <Td fontSize={'sm'} pl={1}>
-        {isLoading || isRefreshed ? (
+        {loading ? (
           <Skeleton height='20px' />
         ) : (
           <Text>{item.imageVersions.length}</Text>
         )}
       </Td>
       <Td fontSize={'sm'} pl={1}>
-        {isLoading || isRefreshed ? (
+        {loading ? (
           <Skeleton height='20px' />
         ) : (
           <Text>
@@ -190,8 +179,8 @@ const ImageRow = ({ item, isLoading, refetch }) => {
           </Text>
         )}
       </Td>
-      <Td pl={1}>
-        {isLoading || isRefreshed ? (
+      <Td pl={0}>
+        {loading ? (
           <Skeleton height='20px' />
         ) : (
           <Flex direction={'row'} gap={3} alignItems={'center'}>
@@ -213,8 +202,8 @@ const ImageRow = ({ item, isLoading, refetch }) => {
           </Flex>
         )}
       </Td>
-      <Td pl={1}>
-        {isLoading || isRefreshed ? (
+      <Td pl={0}>
+        {loading ? (
           <Skeleton height='20px' />
         ) : (
           <Menu>

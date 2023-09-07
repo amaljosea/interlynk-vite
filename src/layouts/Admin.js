@@ -26,7 +26,7 @@ import {
   ApolloClient,
   InMemoryCache,
   ApolloProvider,
-  createHttpLink
+  ApolloLink
 } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
 import Cookies from 'js-cookie'
@@ -84,9 +84,9 @@ export default function Dashboard(props) {
 
   const graphqlAPI = process.env.REACT_APP_GRAPHQL_API
 
-  const httpLink = createHttpLink({
-    uri: graphqlAPI
-  })
+  // const httpLink = createHttpLink({
+  //   uri: graphqlAPI
+  // })
 
   const uploadLink = createUploadLink({
     uri: graphqlAPI
@@ -102,8 +102,9 @@ export default function Dashboard(props) {
   })
 
   const client = new ApolloClient({
-    link: authLink.concat(uploadLink).concat(httpLink),
-    cache: new InMemoryCache()
+    link: ApolloLink.from([authLink, uploadLink]),
+    cache: new InMemoryCache(),
+    queryDeduplication: false
   })
 
   return (

@@ -1,4 +1,4 @@
-import { useLazyQuery, useMutation } from '@apollo/client'
+import { useLazyQuery } from '@apollo/client'
 import {
   Box,
   Button,
@@ -51,10 +51,6 @@ const Images = () => {
       }
     }, [])
 
-    useEffect(() => {
-      console.log(`data`, data)
-    }, [data])
-
     return (
       <>
         <Flex
@@ -72,11 +68,7 @@ const Images = () => {
           >
             <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
               <CardBody mt={8}>
-                <Table
-                  __css={{ 'table-layout': 'fixed', width: 'full' }}
-                  variant='simple'
-                  size='sm'
-                >
+                <Table variant='simple' size='sm'>
                   <Thead>
                     <Tr>
                       {img_captions.map((item, index) => (
@@ -90,12 +82,7 @@ const Images = () => {
                     {data &&
                       data.images.length > 0 &&
                       data.images.map((item, index) => (
-                        <ImageRow
-                          key={index}
-                          item={item}
-                          isLoading={loading}
-                          refetch={refetch}
-                        />
+                        <ImageRow key={index} item={item} refetch={refetch} />
                       ))}
                   </Tbody>
                 </Table>

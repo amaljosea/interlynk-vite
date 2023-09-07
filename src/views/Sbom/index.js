@@ -72,7 +72,7 @@ function SBOM() {
     onOpen: setSBMOpen,
     onClose: setSBMClose
   } = useDisclosure()
-  
+
   const {
     isOpen: isVerifyOpen,
     onOpen: setVerifyOpen,
@@ -304,13 +304,7 @@ function SBOM() {
                               variant='outline'
                               colorScheme='blue'
                             >
-                              <TagLabel>
-                                {status === 'Unsigned' ? 'Created' : 'Edited'}
-                                {/* {sbomData.sbom.authors.length > 0 ||
-                                sbomData.sbom.suppliers.length > 0
-                                  ? 'Edited'
-                                  : 'Created'} */}
-                              </TagLabel>
+                              <TagLabel>{sbomData.sbom.lifecycle}</TagLabel>
                             </Tag>
                           )}
 
