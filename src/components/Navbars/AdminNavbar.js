@@ -181,7 +181,7 @@ export default function AdminNavbar(props) {
               </Link>
             </BreadcrumbItem>
 
-            {imageName !== '' && versionId && brandText === 'Images' && (
+            {imageName !== null && versionId && brandText === 'Images' && (
               <BreadcrumbItem color={mainText}>
                 <BreadcrumbLink href='' color={mainText}>
                   {imageName}
@@ -189,7 +189,7 @@ export default function AdminNavbar(props) {
               </BreadcrumbItem>
             )}
 
-            {brandText === 'Products' && product && productName !== '' && (
+            {productName !== null && product && brandText === 'Products' && (
               <BreadcrumbItem color={mainText}>
                 <BreadcrumbLink href='' color={mainText}>
                   {productName}

@@ -91,7 +91,12 @@ function ProductVersionsRow(props) {
           {isLoading ? (
             <Skeleton height='20px' />
           ) : sbomId.length > 0 ? (
-            <Link to={`/vendor/products?p=${id}&sbom=${sbomId[0].id}`}>
+            <Link
+              to={`/vendor/products?p=${id}&sbom=${sbomId[0].id}`}
+              onClick={() => {
+                window.localStorage.setItem('product', name)
+              }}
+            >
               <Text color={'blue.500'} minWidth='100%'>
                 {name}
               </Text>
