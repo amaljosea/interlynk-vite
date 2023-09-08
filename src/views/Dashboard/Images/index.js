@@ -61,194 +61,194 @@ const Index = () => {
     }
   }, [path])
 
-  if (!versionId) {
-    const { data: orgConnectors } = useQuery(GetAllOrgConnectors)
+  const { data: orgConnectors } = useQuery(GetAllOrgConnectors)
 
-    const { data: allScanners } = useQuery(getAllScanners)
+  const { data: allScanners } = useQuery(getAllScanners)
 
-    const [getAllImages, { data: allImages, refetch }] = useLazyQuery(GetImages)
+  const [getAllImages, { data: allImages, refetch }] = useLazyQuery(GetImages)
 
-    useEffect(() => {
-      if (allImages === undefined) {
+  useEffect(() => {
+    if (allImages === undefined) {
+      getAllImages({
+        variables: {
+          first: 10
+        }
+      })
+    }
+  }, [])
+
+  const handlePreviousPage = () => {
+    getAllImages({
+      variables: {
+        first: undefined,
+        last: 10,
+        before: allImages.images.pageInfo.startCursor,
+        after: ''
+      }
+    })
+  }
+
+  const handleNextPage = () => {
+    getAllImages({
+      variables: {
+        first: 10,
+        last: undefined,
+        after: allImages.images.pageInfo.endCursor,
+        before: ''
+      }
+    })
+  }
+
+  const [imageScannerAdd] = useMutation(AddScannerImage, {
+    onCompleted: refetch
+  })
+  const [imageScannerRemove] = useMutation(RemoveScannerImage, {
+    onCompleted: refetch
+  })
+
+  const [organizationConnectorRefresh] = useMutation(OrgConnectorRefresh, {
+    onCompleted: refetch
+  })
+
+  const { isOpen, onOpen, onClose } = useDisclosure()
+
+  const {
+    isOpen: isScanOpen,
+    onOpen: onScanOpen,
+    onClose: onScanClose
+  } = useDisclosure()
+
+  const {
+    isOpen: isDeleteOpen,
+    onOpen: onDeleteOpen,
+    onClose: onDeleteClose
+  } = useDisclosure()
+
+  const btnRef = React.useRef()
+
+  const [selectedImage, setSelectedImage] = useState('')
+  const [selectedScanner, setSelectedScanner] = useState('')
+  const [activeImageId, setActiveImageId] = useState(null)
+
+  const [activeScanners, setActiveScanners] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
+
+  const [sortField, setSortField] = useState('lastPushedAt')
+  const [sortOrder, setSortOrder] = useState('asc')
+  const [imageData, setImageData] = useState([])
+
+  const handleScanAdd = async (e) => {
+    e.preventDefault()
+    try {
+      await imageScannerAdd({
+        variables: {
+          imageID: selectedImage,
+          scannerID: selectedScanner
+        }
+      }).then(() => {
         getAllImages({
           variables: {
             first: 10
           }
         })
+        history.push('/vendor/images')
+        onScanClose()
+      })
+    } catch (error) {
+      if (error.networkError && error.networkError.statusCode === 500) {
+        // Handle the specific error
+        alert('Invalid entry')
+        onScanClose()
+      } else {
+        // Handle other errors
+        alert('Invalid entry')
+        onScanClose()
       }
-    }, [])
+    }
 
-    const handlePreviousPage = () => {
-      getAllImages({
+    setSelectedScanner('')
+  }
+
+  const handleDelete = async (e) => {
+    e.preventDefault()
+    try {
+      await imageScannerRemove({
         variables: {
-          first: undefined,
-          last: 10,
-          before: allImages.images.pageInfo.startCursor,
-          after: ''
+          imageID: `${selectedImage}`,
+          scannerID: `${selectedScanner}`
         }
+      }).then(() => {
+        getAllImages({
+          variables: {
+            first: 10
+          }
+        })
+        history.push('/vendor/images')
+        onDeleteClose()
+      })
+    } catch (error) {
+      if (error.networkError && error.networkError.statusCode === 500) {
+        // Handle the specific error
+        alert('Invalid request')
+        onDeleteClose()
+      } else {
+        // Handle other errors
+        alert('Invalid request')
+        onDeleteClose()
+      }
+    }
+
+    setSelectedScanner('')
+  }
+
+  const existingScanners =
+    activeScanners && activeScanners.map((item) => item.id)
+
+  const filteredScanners =
+    allScanners &&
+    allScanners.scanners.filter(
+      (scanner) => !existingScanners.includes(scanner.id)
+    )
+
+  // const filteredScanners =
+  //   existingScanners && !existingScanners.includes(selectedScanner)
+
+  // console.log('filteredScanners', filteredScanners)
+
+  const handleScannerChange = (e) => {
+    const { value } = e.target
+    setSelectedScanner(value)
+    if (existingScanners.includes(value)) {
+      toast({
+        description: 'This scanner is already being used on the image',
+        status: 'error',
+        duration: 4000,
+        isClosable: true,
+        position: 'top-right'
       })
     }
+  }
 
-    const handleNextPage = () => {
-      getAllImages({
-        variables: {
-          first: 10,
-          last: undefined,
-          after: allImages.images.pageInfo.endCursor,
-          before: ''
-        }
+  const onImageRefresh = async () => {
+    try {
+      setIsLoading(true)
+      await organizationConnectorRefresh().then(() => {
+        setTimeout(() => {
+          setIsLoading(false)
+        }, 2000)
       })
-    }
-
-    const [imageScannerAdd] = useMutation(AddScannerImage, {
-      onCompleted: refetch
-    })
-    const [imageScannerRemove] = useMutation(RemoveScannerImage, {
-      onCompleted: refetch
-    })
-
-    const [organizationConnectorRefresh] = useMutation(OrgConnectorRefresh, {
-      onCompleted: refetch
-    })
-
-    const { isOpen, onOpen, onClose } = useDisclosure()
-
-    const {
-      isOpen: isScanOpen,
-      onOpen: onScanOpen,
-      onClose: onScanClose
-    } = useDisclosure()
-
-    const {
-      isOpen: isDeleteOpen,
-      onOpen: onDeleteOpen,
-      onClose: onDeleteClose
-    } = useDisclosure()
-
-    const btnRef = React.useRef()
-
-    const [selectedImage, setSelectedImage] = useState('')
-    const [selectedScanner, setSelectedScanner] = useState('')
-    const [activeImageId, setActiveImageId] = useState(null)
-
-    const [activeScanners, setActiveScanners] = useState([])
-    const [isLoading, setIsLoading] = useState(false)
-
-    const [sortField, setSortField] = useState('lastPushedAt')
-    const [sortOrder, setSortOrder] = useState('asc')
-    const [imageData, setImageData] = useState([])
-
-    const handleScanAdd = async (e) => {
-      e.preventDefault()
-      try {
-        await imageScannerAdd({
-          variables: {
-            imageID: selectedImage,
-            scannerID: selectedScanner
-          }
-        }).then(() => {
-          getAllImages({
-            variables: {
-              first: 10
-            }
-          })
-          history.push('/vendor/images')
-          onScanClose()
-        })
-      } catch (error) {
-        if (error.networkError && error.networkError.statusCode === 500) {
-          // Handle the specific error
-          alert('Invalid entry')
-          onScanClose()
-        } else {
-          // Handle other errors
-          alert('Invalid entry')
-          onScanClose()
-        }
-      }
-
-      setSelectedScanner('')
-    }
-
-    const handleDelete = async (e) => {
-      e.preventDefault()
-      try {
-        await imageScannerRemove({
-          variables: {
-            imageID: `${selectedImage}`,
-            scannerID: `${selectedScanner}`
-          }
-        }).then(() => {
-          getAllImages({
-            variables: {
-              first: 10
-            }
-          })
-          history.push('/vendor/images')
-          onDeleteClose()
-        })
-      } catch (error) {
-        if (error.networkError && error.networkError.statusCode === 500) {
-          // Handle the specific error
-          alert('Invalid request')
-          onDeleteClose()
-        } else {
-          // Handle other errors
-          alert('Invalid request')
-          onDeleteClose()
-        }
-      }
-
-      setSelectedScanner('')
-    }
-
-    const existingScanners =
-      activeScanners && activeScanners.map((item) => item.id)
-
-    const filteredScanners =
-      allScanners &&
-      allScanners.scanners.filter(
-        (scanner) => !existingScanners.includes(scanner.id)
-      )
-
-    // const filteredScanners =
-    //   existingScanners && !existingScanners.includes(selectedScanner)
-
-    // console.log('filteredScanners', filteredScanners)
-
-    const handleScannerChange = (e) => {
-      const { value } = e.target
-      setSelectedScanner(value)
-      if (existingScanners.includes(value)) {
-        toast({
-          description: 'This scanner is already being used on the image',
-          status: 'error',
-          duration: 4000,
-          isClosable: true,
-          position: 'top-right'
-        })
+    } catch (error) {
+      if (error.networkError && error.networkError.statusCode === 500) {
+        // Handle the specific error
+        alert('Something went wrong')
+      } else {
+        // Handle other errors
+        alert(error.message)
       }
     }
+  }
 
-    const onImageRefresh = async () => {
-      try {
-        setIsLoading(true)
-        await organizationConnectorRefresh().then(() => {
-          setTimeout(() => {
-            setIsLoading(false)
-          }, 2000)
-        })
-      } catch (error) {
-        if (error.networkError && error.networkError.statusCode === 500) {
-          // Handle the specific error
-          alert('Something went wrong')
-        } else {
-          // Handle other errors
-          alert(error.message)
-        }
-      }
-    }
-
+  if (!versionId) {
     return (
       <>
         <Flex

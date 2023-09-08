@@ -1,10 +1,4 @@
-import {
-  Td,
-  Text,
-  Tr,
-  Switch,
-  Skeleton
-} from '@chakra-ui/react'
+import { Td, Text, Tr, Switch, Skeleton } from '@chakra-ui/react'
 import { Link } from 'react-router-dom'
 import { timeSince } from 'utils'
 
