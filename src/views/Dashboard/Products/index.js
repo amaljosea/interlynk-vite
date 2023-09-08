@@ -231,6 +231,7 @@ function Index() {
                   handlePreviousPage={handlePreviousPage}
                   handleNextPage={handleNextPage}
                   isLoading={isLoading}
+                  refetch={refetch}
                 />
               ) : (
                 <Table mt={4}>

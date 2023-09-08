@@ -103,17 +103,13 @@ function ProductInfo() {
 
   data &&
     data.project.sboms.map((project) => {
-      project.components.map((sbom) => {
-        if (sbom.primary === true) {
-          uniqVersions.push({
-            version: sbom.version,
-            id: project.id
-          })
-        }
+      uniqVersions.push({
+        version: project.spec,
+        id: project.id
       })
     })
 
-  console.log(`uniqVersions`, uniqVersions)
+  // console.log(`uniqVersions`, uniqVersions)
 
   const allSboms = []
 
@@ -197,7 +193,7 @@ function ProductInfo() {
                   >
                     <Icon as={FaCubes} h={'64px'} w={'64px'} color='blue.300' />
                     <Flex direction={'column'} gap={1}>
-                      <Heading as='h3' size='md' noOfLines={1}>
+                      <Text fontWeight={'semibold'} fontSize={18}>
                         <Flex
                           alignItems={'center'}
                           flexDirection={'row'}
@@ -210,11 +206,11 @@ function ProductInfo() {
                               invalidSBOMS.length > 0 &&
                               invalidSBOMS[0].version}
                         </Flex>
-                      </Heading>
+                      </Text>
                       {validSBOMS === undefined && (
                         <Code color={'red.400'} fontSize={'xs'}>
-                          Primary component not exists. <br /> Please update any
-                          component as primary before proceed
+                          Primary component not exists. <br /> Please create or
+                          update any component as primary before proceed
                         </Code>
                       )}
                       <Text fontSize='xs' cursor={'pointer'}>
@@ -241,7 +237,6 @@ function ProductInfo() {
                         value={selectedVersion}
                         onChange={handleSBOMChange}
                         size='md'
-                        width={'150px'}
                         color='gray.500'
                       >
                         {uniqVersions.length > 0 &&

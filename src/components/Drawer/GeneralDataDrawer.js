@@ -45,7 +45,7 @@ const GeneralDataDrawer = ({
   selectedKey,
   refetch
 }) => {
-  const { cpes, purl, swid, tools, authors, licenses, suppliers } = data
+  const { cpes, purl, tools, authors, licenses, suppliers } = data
 
   // console.log(`suppliers`, suppliers)
 
@@ -70,7 +70,6 @@ const GeneralDataDrawer = ({
 
   const [cpeValue, setCpeValue] = useState('')
   const [purlValue, setPurlValue] = useState('')
-  const [swidValue, setSwidValue] = useState('')
 
   const [creationTools, setCreationTools] = useState([])
   const [authorList, setAuthorList] = useState([])
@@ -90,13 +89,21 @@ const GeneralDataDrawer = ({
     setCreationTools(tools)
     setSupplierList(suppliers)
     setAuthorList(authors)
-    setLicenseList(licenses)
     if (cpes.length > 0) {
       setCpeValue(cpes[0])
     }
     setPurlValue(purl)
-    setSwidValue(swid)
   }, [data])
+
+  useEffect(() => {
+    const filterData = licenseOptions.find(
+      (item) => item.licenseId === licenses[0]
+    )
+    console.log(`filterData`, filterData)
+    if (filterData) {
+      setLicenseList(filterData)
+    }
+  }, [licenses])
 
   const validateEmail = (email) => {
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
@@ -585,14 +592,6 @@ const GeneralDataDrawer = ({
                     placeholder='PURL'
                     value={purlValue}
                     onChange={(e) => setPurlValue(e.target.value)}
-                  />
-                </FormControl>
-                <FormControl>
-                  <Input
-                    size='sm'
-                    placeholder='SWID'
-                    value={swidValue}
-                    onChange={(e) => setSwidValue(e.target.value)}
                   />
                 </FormControl>
               </Flex>

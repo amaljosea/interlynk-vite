@@ -394,6 +394,7 @@ export const GetSBOM = gql`
       cpes
       spec
       purl
+      format
       creationAt
       updatedAt
       specVersion
@@ -453,6 +454,8 @@ export const GetProject = gql`
       updatedAt
       sboms {
         id
+        spec
+        specVersion
         components {
           primary
           version
@@ -705,6 +708,8 @@ export const GetProjectInfo = gql`
       updatedAt
       sboms {
         id
+        spec
+        specVersion
         components {
           primary
           version
@@ -725,6 +730,7 @@ export const GetSignedSBOM = gql`
       cpes
       spec
       purl
+      format
       creationAt
       updatedAt
       specVersion

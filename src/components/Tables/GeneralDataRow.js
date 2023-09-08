@@ -13,7 +13,6 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey, status }) => {
     updatedAt,
     cpes,
     purl,
-    swid,
     tools,
     authors,
     licenses,
@@ -139,24 +138,10 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey, status }) => {
         </Td>
         <Td pl={0}>
           <Flex flexDirection={'column'} alignItems={'flex-start'} gap={4}>
-            {licenses?.map((item, index) => (
-              <Text pl={0} fontSize={'sm'} key={index}>
-                {item.name}
-              </Text>
-            ))}
+            {licenses.length > 0 ? licenses.join(', ') : ''}
           </Flex>
         </Td>
-        <Td pl={0}>
-          {!customerView && (
-            <Button
-              size='sm'
-              isDisabled={status === 'Signed'}
-              onClick={() => handleClick('license')}
-            >
-              <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
-            </Button>
-          )}
-        </Td>
+        <Td pl={0}></Td>
       </Tr>
       <Tr>
         <Td pl={0} fontWeight={'medium'}>
@@ -165,25 +150,12 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey, status }) => {
         <Td pl={0}>
           <Flex mt={2} flexDir={'column'} alignItems={'self-start'} gap={2}>
             <Flex flexDirection={'row'} alignItems={'center'} gap={4}>
-              {cpes.length > 0
-                ? cpes.map((item, index) => <Text key={index}>{item}</Text>)
-                : ''}
+              {cpes.length > 0 ? cpes.join(', ') : ''}
             </Flex>
             <Text>{purl}</Text>
-            <Text>{swid}</Text>
           </Flex>
         </Td>
-        <Td pl={0}>
-          {!customerView && (
-            <Button
-              size='sm'
-              isDisabled={status === 'Signed'}
-              onClick={() => handleClick('identifier')}
-            >
-              <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
-            </Button>
-          )}
-        </Td>
+        <Td pl={0}></Td>
       </Tr>
       <Tr>
         <Td pl={0} fontWeight={'medium'}>

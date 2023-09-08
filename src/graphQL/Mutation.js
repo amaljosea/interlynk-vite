@@ -660,4 +660,118 @@ export const supplierDelete = gql`
   }
 `
 
+export const sbomCreate = gql`
+  mutation sbomCreate(
+    $projectId: Uuid!
+    $spec: String!
+    $specVersion: String
+    $format: String
+    $cpes: [String!]
+    $purl: String
+    $licenses: [String!]
+  ) {
+    sbomCreate(
+      input: {
+        projectId: $projectId
+        spec: $spec
+        specVersion: $specVersion
+        format: $format
+        cpes: $cpes
+        purl: $purl
+        licenses: $licenses
+      }
+    ) {
+      errors
+      sbom {
+        id
+        authors {
+          name
+          email
+        }
+        cpes
+        creationAt
+        licenses
+        lifecycle
+        project {
+          name
+        }
+        purl
+        spec
+        specVersion
+        suppliers {
+          name
+          email
+        }
+        tools {
+          name
+          version
+        }
+        updatedAt
+      }
+    }
+  }
+`
 
+export const sbomUpdate = gql`
+  mutation sbomUpdate(
+    $id: Uuid!
+    $spec: String!
+    $specVersion: String
+    $format: String
+    $cpes: [String!]
+    $purl: String
+    $licenses: [String!]
+  ) {
+    sbomUpdate(
+      input: {
+        id: $id
+        spec: $spec
+        specVersion: $specVersion
+        format: $format
+        cpes: $cpes
+        purl: $purl
+        licenses: $licenses
+      }
+    ) {
+      errors
+      sbom {
+        id
+        authors {
+          name
+          email
+        }
+        cpes
+        creationAt
+        licenses
+        lifecycle
+        project {
+          name
+        }
+        purl
+        spec
+        specVersion
+        suppliers {
+          name
+          email
+        }
+        tools {
+          name
+          version
+        }
+        updatedAt
+      }
+    }
+  }
+`
+
+export const sbomDelete = gql`
+  mutation sbomDelete($id: Uuid!) {
+    sbomDelete(input: { id: $id }) {
+      errors
+      sbom {
+        id
+        updatedAt
+      }
+    }
+  }
+`
