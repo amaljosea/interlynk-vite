@@ -68,11 +68,7 @@ const Products = () => {
           >
             <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
               <CardBody mt={8}>
-                <Table
-                  __css={{ 'tableLayout': 'fixed', width: 'full' }}
-                  variant='simple'
-                  size='sm'
-                >
+                <Table variant='simple' size='sm'>
                   <Thead>
                     <Tr>
                       {captions.map((item, index) => (

@@ -35,16 +35,18 @@ import {
   FaFileDownload
 } from 'react-icons/fa'
 import { useLocation, useHistory } from 'react-router-dom'
-import { AddIcon } from '@chakra-ui/icons'
+import { AddIcon, DeleteIcon, EditIcon } from '@chakra-ui/icons'
 import ShareLynkDrawer from 'components/Drawer/ShareLynkDrawer'
 import GlobalContext from 'context/GlobalContext'
-import { useQuery } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import { GetSBOM, GetProject } from 'graphQL/Queries'
 import { timeSince } from 'utils'
 import { BsFillPatchExclamationFill } from 'react-icons/bs'
 import SigningModal from './components/SigningModal'
 import { MdVerified } from 'react-icons/md'
 import DownloadModal from './components/DownloadModal'
+import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
+import { sbomDelete } from 'graphQL/Mutation'
 
 function SBOM() {
   const { productVersionsData } = useContext(GlobalContext)
@@ -92,18 +94,20 @@ function SBOM() {
     }
   })
 
-  useEffect(() => {
-    if (sbomData) {
-      console.log(`SBOM Data`, sbomData)
-      window.localStorage.setItem('product', sbomData.sbom.project.name)
-    }
-  }, [sbomData])
+  const [deleteSbom] = useMutation(sbomDelete)
 
-  useEffect(() => {
-    if (data) {
-      console.log(`data`, data)
-    }
-  }, [data])
+  // useEffect(() => {
+  //   if (sbomData) {
+  //     console.log(`SBOM Data`, sbomData)
+  //     window.localStorage.setItem('product', sbomData.sbom.project.name)
+  //   }
+  // }, [sbomData])
+
+  // useEffect(() => {
+  //   if (data) {
+  //     console.log(`data`, data)
+  //   }
+  // }, [data])
 
   const uniqProjects = []
   const uniqVersions = []
@@ -116,13 +120,9 @@ function SBOM() {
 
   data &&
     data.project.sboms.map((project) => {
-      project.components.map((sbom) => {
-        if (sbom.primary === true) {
-          uniqVersions.push({
-            version: sbom.version,
-            id: project.id
-          })
-        }
+      uniqVersions.push({
+        version: project.spec,
+        id: project.id
       })
     })
 
@@ -154,6 +154,20 @@ function SBOM() {
   // console.log(`invalidSBOMS`, invalidSBOMS)
 
   const [selectedVersion, setSelectedVersion] = useState('')
+
+  const handleDelete = async () => {
+    try {
+      await deleteSbom({
+        variables: {
+          id: sbomId
+        }
+      })
+        .then(() => history.push(`/vendor/products`))
+        .finally(() => window.location.reload())
+    } catch (error) {
+      console.error('Mutation error:', error)
+    }
+  }
 
   const refetchSBOM = async (id) => {
     try {
@@ -274,24 +288,18 @@ function SBOM() {
                         color='blue.300'
                       />
                       <Flex direction={'column'} gap={1}>
-                        <Heading as='h3' size='md' noOfLines={1}>
-                          <Flex
-                            alignItems={'center'}
-                            flexDirection={'row'}
-                            gap={3}
-                          >
-                            {sbomData.sbom.project.name} :{' '}
-                            {validSBOMS
-                              ? validSBOMS.version
-                              : invalidSBOMS &&
-                                invalidSBOMS.length > 0 &&
-                                invalidSBOMS[0].version}
-                          </Flex>
-                        </Heading>
+                        <Text fontWeight={'semibold'} fontSize={18}>
+                          {sbomData.sbom.project.name} :{' '}
+                          {validSBOMS
+                            ? validSBOMS.version
+                            : invalidSBOMS &&
+                              invalidSBOMS.length > 0 &&
+                              invalidSBOMS[0].version}
+                        </Text>
                         {validSBOMS === undefined && (
                           <Code color={'red.400'} fontSize={'xs'}>
-                            Primary component not exists. <br /> Please update
-                            any component as primary before proceed
+                            Primary component not exists. <br /> Please create
+                            or update any component as primary before proceed
                           </Code>
                         )}
                         <Text fontSize='xs' cursor={'pointer'}>
@@ -344,8 +352,8 @@ function SBOM() {
                           value={selectedVersion}
                           onChange={handleSBOMChange}
                           size='md'
-                          width={'150px'}
                           color='gray.500'
+                          textTransform={'lowercase'}
                         >
                           {uniqVersions.length > 0 &&
                             uniqVersions.map((item, index) => (
@@ -364,8 +372,30 @@ function SBOM() {
                         aria-label='Download SBOM'
                         icon={<FaFileDownload />}
                         onClick={onOpen}
+                        size='md'
                         colorScheme='blue'
                       />
+
+                      <Stack direction='row' spacing={4}>
+                        <Button
+                          leftIcon={<EditIcon />}
+                          colorScheme='blue'
+                          variant='solid'
+                          size='md'
+                          onClick={setSBMOpen}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          leftIcon={<DeleteIcon />}
+                          colorScheme='red'
+                          size='md'
+                          variant='outline'
+                          onClick={handleDelete}
+                        >
+                          Delete
+                        </Button>
+                      </Stack>
                     </Flex>
                   </GridItem>
                 )}
@@ -409,15 +439,17 @@ function SBOM() {
           )}
         </Flex>
 
-        {/* {isSBMOpen && sbomData && (
-          <ShareLynkDrawer
+        {isSBMOpen && sbomData && (
+          <ProductSbomDrawer
             isOpen={isSBMOpen}
             onClose={setSBMClose}
             btnRef={btnRef}
-            productName={''}
-            versionName={''}
+            projectId={productId}
+            name={sbomData.sbom.project.name}
+            refetch={refetch}
+            sbomData={sbomData}
           />
-        )} */}
+        )}
 
         {isOpen && (
           <DownloadModal

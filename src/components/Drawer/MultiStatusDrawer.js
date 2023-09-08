@@ -110,16 +110,15 @@ const MultiStatusDrawer = ({
         </DrawerHeader>
         <DrawerBody>
           <Box mb={6}>
-            <Text fontSize={'sm'}>
-              Apply status for -{' '}
+            <Flex gap={2} alignItems={'center'} fontSize={'sm'}>
+              <Text>Apply status for - </Text>
               {checkedRows.map((item, index) => (
-                <chakra.span key={index} fontSize={'xs'}>
+                <Text key={index} fontSize={'xs'}>
                   {item.cve}
                   {checkedRows.length > 1 ? ',' : ''}
-                  {'  '}
-                </chakra.span>
+                </Text>
               ))}
-            </Text>
+            </Flex>
           </Box>
           <Stack spacing='24px'>
             <Box>

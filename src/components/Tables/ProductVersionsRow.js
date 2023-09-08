@@ -21,6 +21,7 @@ import UploadModal from 'views/Dashboard/Products/components/UploadModal'
 import { useMutation } from '@apollo/client'
 import { DeleteProject } from 'graphQL/Mutation'
 import { timeSince } from 'utils'
+import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 
 function ProductVersionsRow(props) {
   const [projectDelete] = useMutation(DeleteProject)
@@ -35,7 +36,8 @@ function ProductVersionsRow(props) {
     vendor,
     allProjects,
     fetchProjects,
-    isLoading
+    isLoading,
+    refetch
   } = props
   const textColor = useColorModeValue('gray.700', 'white')
   const [checked, setChecked] = useState(active ? true : false)
@@ -46,8 +48,14 @@ function ProductVersionsRow(props) {
     onOpen: onOpenProduct,
     onClose: onCloseProduct
   } = useDisclosure()
+  const {
+    isOpen: isSbomOpen,
+    onOpen: onSbomOpen,
+    onClose: onSbomClose
+  } = useDisclosure()
 
   const btnRefProduct = useRef()
+  const sbomBtn = useRef()
 
   const onProductDelete = async () => {
     try {
@@ -137,32 +145,49 @@ function ProductVersionsRow(props) {
               />
               <Portal>
                 <MenuList size='sm'>
-                  <MenuItem onClick={onOpen}>Edit</MenuItem>
+                  <MenuItem onClick={onOpen}>Edit Product</MenuItem>
+                  <MenuItem onClick={onSbomOpen}>Create SBOM</MenuItem>
                   <MenuItem ref={btnRefProduct} onClick={onOpenProduct}>
-                    Upload
+                    Upload SBOM
                   </MenuItem>
-                  <MenuItem onClick={onProductDelete}>Archive</MenuItem>
+                  <MenuItem onClick={onProductDelete}>Archive Product</MenuItem>
                 </MenuList>
               </Portal>
             </Menu>
           )}
 
-          <UploadModal
-            id={id}
-            isOpen={isOpenProduct}
-            onClose={onCloseProduct}
-            fetchProjects={fetchProjects}
-          />
+          {isOpenProduct && (
+            <UploadModal
+              id={id}
+              isOpen={isOpenProduct}
+              onClose={onCloseProduct}
+              fetchProjects={fetchProjects}
+            />
+          )}
 
-          <ProductModal
-            id={id}
-            isOpen={isOpen}
-            onClose={onClose}
-            product={name}
-            description={description}
-            vendorName={vendor}
-            allProjects={allProjects}
-          />
+          {isOpen && (
+            <ProductModal
+              id={id}
+              isOpen={isOpen}
+              onClose={onClose}
+              product={name}
+              description={description}
+              vendorName={vendor}
+              allProjects={allProjects}
+            />
+          )}
+
+          {isSbomOpen && (
+            <ProductSbomDrawer
+              isOpen={isSbomOpen}
+              onClose={onSbomClose}
+              btnRef={sbomBtn}
+              projectId={id}
+              name={name}
+              refetch={refetch}
+              sbomData={null}
+            />
+          )}
         </Td>
       </Tr>
     </>
