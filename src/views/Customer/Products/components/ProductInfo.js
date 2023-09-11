@@ -92,14 +92,7 @@ function ProductInfo() {
     }
   }, [data])
 
-  const uniqProjects = []
   const uniqVersions = []
-
-  productVersionsData.map((project) => {
-    if (uniqProjects.indexOf(project.name) === -1) {
-      uniqProjects.push(project.name)
-    }
-  })
 
   data &&
     data.project.sboms.map((project) => {

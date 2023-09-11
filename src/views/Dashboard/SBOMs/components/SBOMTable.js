@@ -69,7 +69,6 @@ const SBOMTable = ({
   const {
     vulnerabilitiesData,
     setVulnerabilitiesData,
-    selectedRows,
     setScanEnabled,
     scanEnabled
   } = useContext(GlobalContext)
@@ -283,35 +282,15 @@ const SBOMTable = ({
     // console.log('filter', filterObjectsByScanner(selectedScanner))
   }, [selectedScanner])
 
-  useEffect(() => {
-    setVulnerabilitiesData([])
-    const data = vulnData.filter(
-      (item) =>
-        item.cveId &&
-        item.cveId.toLowerCase().includes(searchInput.toLowerCase())
-    )
-    setFilteredRow(data)
-  }, [searchInput])
-
-  const handleUpdateClick = () => {
-    const updatedData = vulnerabilitiesData.map((row) => {
-      if (selectedRows.includes(row.id)) {
-        return {
-          ...row,
-          status: selectStatus,
-          version: selectVersion !== '' ? selectVersion : row.version
-        } // Change the value of "Column 1"
-      }
-      return row
-    })
-
-    // Perform any other necessary logic with the updated data
-
-    console.log('Updated data:', updatedData)
-    setVulnerabilitiesData(updatedData)
-  }
-
-  const btnRef = useRef()
+  // useEffect(() => {
+  //   setVulnerabilitiesData([])
+  //   const data = vulnData.filter(
+  //     (item) =>
+  //       item.cveId &&
+  //       item.cveId.toLowerCase().includes(searchInput.toLowerCase())
+  //   )
+  //   setFilteredRow(data)
+  // }, [searchInput])
 
   const [checkedRows, setCheckedRows] = useState([])
 

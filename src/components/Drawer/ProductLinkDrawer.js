@@ -1,7 +1,6 @@
 // Chakra imports
 import { Flex, Button, Input, Spacer, Stack } from '@chakra-ui/react'
 import React, { useState } from 'react'
-import { CopyIcon } from '@chakra-ui/icons'
 import {
   Drawer,
   DrawerBody,
@@ -57,7 +56,6 @@ function ProductLinkDrawer(props) {
   const [hasCyclonDx, setHasCyclonDx] = useState(cyclonedx)
   const [hasSpdx, setHasSpdx] = useState(spdx)
   const [isPublic, setIsPublic] = useState(false)
-  const [selectedVersion, setSelectedVersion] = useState([])
   const [email, setEmail] = useState('')
   const [emailList, setEmailList] = useState([])
   const [product, setProduct] = useState(productName)
@@ -74,23 +72,7 @@ function ProductLinkDrawer(props) {
     }
   }
 
-  useEffect(() => {
-    const filterProduct = productVersionsData.filter(
-      (project) => project.name === product
-    )
 
-    // console.log('filterProduct', filterProduct)
-
-    const uniqVersion = []
-    filterProduct.map((project) => {
-      project.versions.map((version) => {
-        uniqVersion.push(version.version)
-      })
-    })
-
-    // console.log('uniqVersion', uniqVersion)
-    setSelectedVersion(uniqVersion)
-  }, [product])
 
   return (
     <Drawer

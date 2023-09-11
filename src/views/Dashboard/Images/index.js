@@ -49,23 +49,14 @@ const Index = () => {
   const queryParams = new URLSearchParams(location.search)
   const versionId = queryParams.get('v')
 
-  const { setVulnerabilitiesData } = useContext(GlobalContext)
 
   const [searchInput, setSearchInput] = useState('')
-
-  const path = location.pathname
-
-  useEffect(() => {
-    if (path === '/vendor/images') {
-      setVulnerabilitiesData([])
-    }
-  }, [path])
 
   const { data: orgConnectors } = useQuery(GetAllOrgConnectors)
 
   const { data: allScanners } = useQuery(getAllScanners)
 
-  const [getAllImages, { data: allImages, refetch }] = useLazyQuery(GetImages)
+  const [getAllImages, { data: allImages }] = useLazyQuery(GetImages)
 
   useEffect(() => {
     if (allImages === undefined) {
@@ -99,16 +90,11 @@ const Index = () => {
     })
   }
 
-  const [imageScannerAdd] = useMutation(AddScannerImage, {
-    onCompleted: refetch
-  })
-  const [imageScannerRemove] = useMutation(RemoveScannerImage, {
-    onCompleted: refetch
-  })
+  const [imageScannerAdd] = useMutation(AddScannerImage)
 
-  const [organizationConnectorRefresh] = useMutation(OrgConnectorRefresh, {
-    onCompleted: refetch
-  })
+  const [imageScannerRemove] = useMutation(RemoveScannerImage)
+
+  const [organizationConnectorRefresh] = useMutation(OrgConnectorRefresh)
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
@@ -132,10 +118,6 @@ const Index = () => {
 
   const [activeScanners, setActiveScanners] = useState([])
   const [isLoading, setIsLoading] = useState(false)
-
-  const [sortField, setSortField] = useState('lastPushedAt')
-  const [sortOrder, setSortOrder] = useState('asc')
-  const [imageData, setImageData] = useState([])
 
   const handleScanAdd = async (e) => {
     e.preventDefault()
@@ -187,15 +169,7 @@ const Index = () => {
         onDeleteClose()
       })
     } catch (error) {
-      if (error.networkError && error.networkError.statusCode === 500) {
-        // Handle the specific error
-        alert('Invalid request')
-        onDeleteClose()
-      } else {
-        // Handle other errors
-        alert('Invalid request')
-        onDeleteClose()
-      }
+      console.log(`Something went wrong`, error)
     }
 
     setSelectedScanner('')
@@ -233,22 +207,21 @@ const Index = () => {
     try {
       setIsLoading(true)
       await organizationConnectorRefresh().then(() => {
+        getAllImages({
+          variables: {
+            first: 10
+          }
+        })
         setTimeout(() => {
           setIsLoading(false)
         }, 2000)
       })
     } catch (error) {
-      if (error.networkError && error.networkError.statusCode === 500) {
-        // Handle the specific error
-        alert('Something went wrong')
-      } else {
-        // Handle other errors
-        alert(error.message)
-      }
+      console.log(`Something went wrong`, error)
     }
   }
 
-  if (!versionId) {
+  if (versionId === null) {
     return (
       <>
         <Flex

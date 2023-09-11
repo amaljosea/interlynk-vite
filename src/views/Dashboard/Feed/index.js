@@ -22,6 +22,9 @@ import AdvisoryLog from './components/AdvisoryLog'
 import { useLazyQuery, useQuery } from '@apollo/client'
 import { GetFeedLogs } from 'graphQL/Queries'
 import { getDateFormat } from 'utils'
+import Card from 'components/Card/Card'
+import CardHeader from 'components/Card/CardHeader'
+import CardBody from 'components/Card/CardBody'
 
 function Advisories() {
   const source = ['all', 'nvd', 'ghsa', 'usn', 'pyadvisory', 'goadvisory']
@@ -86,133 +89,137 @@ function Advisories() {
         formattedDate={formattedDate}
         getFeed={GetFeed}
       />
-      <Flex direction='row' pt={{ base: '120px', md: '0px' }}>
-        <Menu>
-          <MenuButton
-            as={Button}
-            rightIcon={<ChevronDownIcon />}
-            maxW='150px'
-            px={4}
-            py={2}
-            me={2}
-            transition='all 0.2s'
-            borderRadius='md'
-            borderWidth='1px'
-            fontSize='sm'
-            fontWeight='none'
-          >
-            Source
-          </MenuButton>
-          <MenuList fontWeight='none' fontSize='sm'>
-            <MenuOptionGroup title='Products'>
-              {source.map((p) => (
-                <MenuItemOption
-                  value={p}
-                  key={p}
-                  onClick={() => {
-                    setSourceValue(p)
-                    GetFeed({
-                      variables: {
-                        date: formattedDate,
-                        source: p === 'all' ? '' : p,
-                        first: 10
-                      }
-                    })
-                  }}
-                  textTransform={'uppercase'}
-                >
-                  {p}
-                </MenuItemOption>
-              ))}
-            </MenuOptionGroup>
-          </MenuList>
-        </Menu>
-        <Menu>
-          <MenuButton
-            as={Button}
-            rightIcon={<ChevronDownIcon />}
-            maxW='150px'
-            px={4}
-            py={2}
-            me={2}
-            transition='all 0.2s'
-            borderRadius='md'
-            borderWidth='1px'
-            fontSize='sm'
-            fontWeight='none'
-          >
-            Severity
-          </MenuButton>
-          <MenuList fontWeight='none' fontSize='sm'>
-            <MenuOptionGroup title='Version'>
-              {severity.map((p) => (
-                <MenuItemOption
-                  value={p}
-                  key={p}
-                  onClick={() => {
-                    setSeverityValue(p)
-                    GetFeed({
-                      variables: {
-                        date: formattedDate,
-                        severity: p === 'all' ? '' : p,
-                        first: 10
-                      }
-                    })
-                  }}
-                  textTransform={'capitalize'}
-                >
-                  {p}
-                </MenuItemOption>
-              ))}
-            </MenuOptionGroup>
-          </MenuList>
-        </Menu>
-        <Input placeholder='Search' maxW='300px' />
-        <Spacer></Spacer>
-        <Flex gap={2} direction={'row'}>
-          <Box as={Flex} direction={'row'} gap={2}>
-            <Tooltip label='Dowload'>
-              <IconButton
-                colorScheme='blue'
-                size='md'
-                icon={<FaDownload />}
-              ></IconButton>
-            </Tooltip>
-            <Tooltip label='Send to Slack'>
-              <IconButton
-                colorScheme='blue'
-                size='md'
-                icon={<FaSlack />}
-              ></IconButton>
-            </Tooltip>
-            <Tooltip label='Refresh'>
-              <IconButton
-                colorScheme='blue'
-                size='md'
-                icon={<RepeatIcon />}
-              ></IconButton>
-            </Tooltip>
-          </Box>
-        </Flex>
-      </Flex>
-      {feedData && (
-        <AdvisoryLog
-          title={'Feed'}
-          captions={[
-            'ID',
-            'Description',
-            'Published at',
-            'Updated at',
-            'Severity',
-            'Affected',
-            'Aliases'
-          ]}
-          data={feedData.feedLogs}
-          loading={loading}
-          onPreviousPage={onPreviousPage}
-          onNextPage={onNextPage}
-        />
-      )}
+      <Card __css={{ marginTop: '2rem' }}>
+        <CardHeader __css={{ padding: '0 1rem' }}>
+          <Flex direction='row' width={'100%'}>
+            <Menu>
+              <MenuButton
+                as={Button}
+                rightIcon={<ChevronDownIcon />}
+                maxW='150px'
+                px={4}
+                py={2}
+                me={2}
+                transition='all 0.2s'
+                borderRadius='md'
+                borderWidth='1px'
+                fontSize='sm'
+                fontWeight='none'
+              >
+                Source
+              </MenuButton>
+              <MenuList fontWeight='none' fontSize='sm'>
+                <MenuOptionGroup title='Products'>
+                  {source.map((p) => (
+                    <MenuItemOption
+                      value={p}
+                      key={p}
+                      onClick={() => {
+                        setSourceValue(p)
+                        GetFeed({
+                          variables: {
+                            date: formattedDate,
+                            source: p === 'all' ? '' : p,
+                            first: 10
+                          }
+                        })
+                      }}
+                      textTransform={'uppercase'}
+                    >
+                      {p}
+                    </MenuItemOption>
+                  ))}
+                </MenuOptionGroup>
+              </MenuList>
+            </Menu>
+            <Menu>
+              <MenuButton
+                as={Button}
+                rightIcon={<ChevronDownIcon />}
+                maxW='150px'
+                px={4}
+                py={2}
+                me={2}
+                transition='all 0.2s'
+                borderRadius='md'
+                borderWidth='1px'
+                fontSize='sm'
+                fontWeight='none'
+              >
+                Severity
+              </MenuButton>
+              <MenuList fontWeight='none' fontSize='sm'>
+                <MenuOptionGroup title='Version'>
+                  {severity.map((p) => (
+                    <MenuItemOption
+                      value={p}
+                      key={p}
+                      onClick={() => {
+                        setSeverityValue(p)
+                        GetFeed({
+                          variables: {
+                            date: formattedDate,
+                            severity: p === 'all' ? '' : p,
+                            first: 10
+                          }
+                        })
+                      }}
+                      textTransform={'capitalize'}
+                    >
+                      {p}
+                    </MenuItemOption>
+                  ))}
+                </MenuOptionGroup>
+              </MenuList>
+            </Menu>
+            <Input placeholder='Search' maxW='300px' />
+            <Spacer></Spacer>
+            <Flex gap={2} direction={'row'}>
+              <Box as={Flex} direction={'row'} gap={2}>
+                <Tooltip label='Dowload'>
+                  <IconButton
+                    colorScheme='blue'
+                    size='md'
+                    icon={<FaDownload />}
+                  ></IconButton>
+                </Tooltip>
+                <Tooltip label='Send to Slack'>
+                  <IconButton
+                    colorScheme='blue'
+                    size='md'
+                    icon={<FaSlack />}
+                  ></IconButton>
+                </Tooltip>
+                <Tooltip label='Refresh'>
+                  <IconButton
+                    colorScheme='blue'
+                    size='md'
+                    icon={<RepeatIcon />}
+                  ></IconButton>
+                </Tooltip>
+              </Box>
+            </Flex>
+          </Flex>
+        </CardHeader>
+        {feedData && (
+          <AdvisoryLog
+            title={'Feed'}
+            captions={[
+              'ID',
+              'Description',
+              'Published at',
+              'Updated at',
+              'Severity',
+              'Affected',
+              'Aliases'
+            ]}
+            data={feedData.feedLogs}
+            loading={loading}
+            onPreviousPage={onPreviousPage}
+            onNextPage={onNextPage}
+          />
+        )}
+      </Card>
     </Flex>
   )
 }

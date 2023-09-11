@@ -24,10 +24,7 @@ import {
   Tr,
   Tbody,
   Th,
-  Td,
   Select,
-  Text,
-  useToast,
   Spinner,
   Alert,
   AlertIcon,
@@ -38,16 +35,16 @@ import CardBody from 'components/Card/CardBody'
 import { GetAllConnectors, GetAllOrgConnectors } from 'graphQL/Queries'
 import React, { useEffect, useState } from 'react'
 import { useMutation, useQuery } from '@apollo/client'
-import { OrgConnectorCreate } from 'graphQL/Mutation'
-import { OrgConnectorUpdate } from 'graphQL/Mutation'
-import { OrgConnectorDelete } from 'graphQL/Mutation'
+import {
+  OrgConnectorCreate,
+  OrgConnectorUpdate,
+  OrgConnectorDelete
+} from 'graphQL/Mutation'
 
 import { getConImg, regions } from 'utils'
-// import { OrgConnectorRefresh } from 'graphQL/Mutation'
 import ConnectionRow from './ConnectionRow'
-// import { OrgConnectorValidate } from 'graphQL/Mutation'
 
-const Index = () => {
+const Connections = () => {
   const [connectors, setConnectors] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [isValidate, setIsValidate] = useState(false)
@@ -75,15 +72,11 @@ const Index = () => {
 
   const { data: orgConnectors, refetch } = useQuery(GetAllOrgConnectors)
 
-  // const [organizationConnectorRefresh] = useMutation(OrgConnectorRefresh)
-
   const [organizationConnectorCreate] = useMutation(OrgConnectorCreate)
 
   const [organizationConnectorUpdate] = useMutation(OrgConnectorUpdate)
 
   const [organizationConnectorDelete] = useMutation(OrgConnectorDelete)
-
-  // const [organizationConnectorValidate] = useMutation(OrgConnectorValidate)
 
   useEffect(() => {
     if (allConnectors) {
@@ -157,8 +150,8 @@ const Index = () => {
   }
 
   const handleEdit = async (item) => {
-    console.log('connector result', connectorResults)
-    console.log('item', item)
+    // console.log('connector result', connectorResults)
+    // console.log('item', item)
     setRegistryName(item.connector.name)
     setSelectedConnection(item)
     setConnectorName(item.name)
@@ -635,4 +628,4 @@ const Index = () => {
   )
 }
 
-export default Index
+export default Connections

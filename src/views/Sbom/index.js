@@ -2,7 +2,6 @@
 import {
   Flex,
   Stack,
-  Heading,
   Spacer,
   Icon,
   Button,
@@ -23,7 +22,7 @@ import {
   Tbody,
   Td
 } from '@chakra-ui/react'
-import React, { useState, useEffect, useRef, useContext } from 'react'
+import React, { useState, useRef, useContext } from 'react'
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 import SBOMTable from './components/SBOMTable'
@@ -35,8 +34,7 @@ import {
   FaFileDownload
 } from 'react-icons/fa'
 import { useLocation, useHistory } from 'react-router-dom'
-import { AddIcon, DeleteIcon, EditIcon } from '@chakra-ui/icons'
-import ShareLynkDrawer from 'components/Drawer/ShareLynkDrawer'
+import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 import GlobalContext from 'context/GlobalContext'
 import { useMutation, useQuery } from '@apollo/client'
 import { GetSBOM, GetProject } from 'graphQL/Queries'
@@ -49,8 +47,6 @@ import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import { sbomDelete } from 'graphQL/Mutation'
 
 function SBOM() {
-  const { productVersionsData } = useContext(GlobalContext)
-
   const initialRef = useRef(null)
   const finalRef = useRef(null)
   const btnRef = useRef()
@@ -58,7 +54,7 @@ function SBOM() {
   const location = useLocation()
   const history = useHistory()
 
-  const customerView = location.pathname.startsWith('/sharelynk')
+  const customerView = location.pathname.startsWith('/customer')
 
   const queryParams = new URLSearchParams(location.search)
 
@@ -109,14 +105,7 @@ function SBOM() {
   //   }
   // }, [data])
 
-  const uniqProjects = []
   const uniqVersions = []
-
-  productVersionsData.map((project) => {
-    if (uniqProjects.indexOf(project.name) === -1) {
-      uniqProjects.push(project.name)
-    }
-  })
 
   data &&
     data.project.sboms.map((project) => {
