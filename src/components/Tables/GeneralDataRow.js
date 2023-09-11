@@ -157,7 +157,7 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey, status }) => {
         </Td>
         <Td pl={0}></Td>
       </Tr>
-      <Tr>
+      {/* <Tr>
         <Td pl={0} fontWeight={'medium'}>
           Hash(es)
         </Td>
@@ -174,7 +174,7 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey, status }) => {
           Copyright Text
         </Td>
         <Td pl={0}>Copyright Interlynk Inc 2023</Td>
-      </Tr>
+      </Tr> */}
     </>
   )
 }

@@ -16,12 +16,9 @@ import {
   AlertIcon,
   Text
 } from '@chakra-ui/react'
-import GlobalContext from 'context/GlobalContext'
-import { useState, useContext } from 'react'
+import { useState } from 'react'
 
 const SigningModal = ({ isOpen, onClose, setStatus }) => {
-  const { setProductStatus } = useContext(GlobalContext)
-
   const [algorithm, setAlgorithm] = useState('')
   const [certificate, setCertificate] = useState('')
   const [signature, setSignature] = useState('')
@@ -36,7 +33,6 @@ const SigningModal = ({ isOpen, onClose, setStatus }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    setProductStatus('Edited')
     setStatus('Signed')
     onClose()
   }

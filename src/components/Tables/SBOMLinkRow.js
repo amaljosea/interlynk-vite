@@ -17,7 +17,6 @@ import {
   useClipboard
 } from '@chakra-ui/react'
 import { useState, useRef } from 'react'
-import { productVersionsData } from 'variables/general'
 import { FaEllipsisV } from 'react-icons/fa'
 import { timeSince } from 'utils'
 import { useMutation } from '@apollo/client'
@@ -37,8 +36,6 @@ function SBOMLinkRow(props) {
   } = props
 
   const { isOpen, onOpen, onClose } = useDisclosure()
-
-  const uniqProjects = []
 
   const btnRef = useRef()
 
@@ -79,20 +76,6 @@ function SBOMLinkRow(props) {
     }
   }
 
-  productVersionsData.map((project) => {
-    if (uniqProjects.indexOf(project.name) === -1) {
-      uniqProjects.push(project.name)
-    }
-  })
-
-  const uniqVersions = []
-  productVersionsData.map((project) => {
-    project.versions.map((version) => {
-      if (uniqVersions.indexOf(version.version) === -1) {
-        uniqVersions.push(version.version)
-      }
-    })
-  })
   let shared, shared_col
 
   if (shareUsers.length === 0) {

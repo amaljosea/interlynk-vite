@@ -15,11 +15,11 @@ const Sharelynk = () => {
 
   const { data, refetch, loading } = useQuery(GetAllShareLynks)
 
-  useEffect(() => {
-    if (data) {
-      console.log(`Data`, data)
-    }
-  }, [data])
+  // useEffect(() => {
+  //   if (data) {
+  //     console.log(`Data`, data)
+  //   }
+  // }, [data])
 
   return (
     <>

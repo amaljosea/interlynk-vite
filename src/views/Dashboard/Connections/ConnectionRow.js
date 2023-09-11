@@ -16,16 +16,15 @@ import {
   ModalCloseButton,
   useDisclosure,
   Button,
-  Skeleton,
-  useToast
+  Skeleton
 } from '@chakra-ui/react'
 import { timeSince, getConImg } from 'utils'
 import { useState } from 'react'
 import { FaEdit, FaLink, FaTrash, FaUnlink } from 'react-icons/fa'
 import { useMutation } from '@apollo/client'
 import { OrgConnectorValidate } from 'graphQL/Mutation'
-import { useEffect } from 'react'
 import Tooltip from 'components/Tooltip'
+import { useEffect } from 'react'
 
 const ConnectionRow = ({
   item,
@@ -34,7 +33,6 @@ const ConnectionRow = ({
   handleDelete,
   organizationConnectorUpdate
 }) => {
-  const toast = useToast()
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const {
@@ -55,7 +53,7 @@ const ConnectionRow = ({
     }
   }
 
-  const [organizationConnectorValidate, { data, loading }] = useMutation(
+  const [organizationConnectorValidate, { data }] = useMutation(
     OrgConnectorValidate
   )
 

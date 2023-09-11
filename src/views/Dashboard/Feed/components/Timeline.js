@@ -1,6 +1,7 @@
 import React from 'react'
 import { Flex, Tag } from '@chakra-ui/react'
 import { getDateFormat, convertDateFormat } from 'utils'
+import Card from 'components/Card/Card'
 
 const Timeline = ({ formattedDate, setFormattedDate, getFeed }) => {
   const currentDate = new Date()
@@ -39,17 +40,18 @@ const Timeline = ({ formattedDate, setFormattedDate, getFeed }) => {
   })
 
   return (
-    <Flex
-      gap={2}
-      mb={10}
-      align='center'
-      position='relative'
-      flexDirection={'row'}
-      cursor={'pointer'}
-      flexWrap={'wrap'}
-    >
-      {days}
-    </Flex>
+    <Card>
+      <Flex
+        gap={2}
+        align='center'
+        position='relative'
+        flexDirection={'row'}
+        cursor={'pointer'}
+        flexWrap={'wrap'}
+      >
+        {days}
+      </Flex>
+    </Card>
   )
 }
 

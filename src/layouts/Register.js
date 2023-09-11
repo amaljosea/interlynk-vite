@@ -15,9 +15,6 @@ import {
 // core components
 
 import { Route } from 'react-router-dom'
-import '@fontsource/roboto/400.css'
-import '@fontsource/roboto/500.css'
-import '@fontsource/roboto/700.css'
 import theme from 'theme/theme.js'
 import { InterlynkLogo } from 'components/Icons/Icons'
 import { useState } from 'react'

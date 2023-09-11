@@ -11,37 +11,29 @@ import {
   Tab,
   TabPanel,
   TabPanels,
-  Input,
-  Td,
   useDisclosure,
   Button,
   Flex,
   Box
 } from '@chakra-ui/react'
-
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 import SBOMComponentRow from 'components/Tables/SBOMComponentRow.js'
 import React, { useRef, useState, useContext } from 'react'
 import { useLocation } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
-import ShareLynkRow from 'components/Tables/ShareLynkRow'
 import GeneralDataRow from 'components/Tables/GeneralDataRow'
 import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
 import CardHeader from 'components/Card/CardHeader'
-import { AddIcon, PlusSquareIcon } from '@chakra-ui/icons'
+import { AddIcon } from '@chakra-ui/icons'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
-import { timeSince } from 'utils'
 
 const SBOMTable = ({ captions, data, refetch, versionName, status }) => {
-  const { SBOMLinksData } = useContext(GlobalContext)
   const textColor = useColorModeValue('gray.700', 'white')
 
   const location = useLocation()
 
   const customerView = location.pathname.startsWith('/customer')
-
-  const link_captions = ['Active', 'Contains', 'Visits', 'Created', 'Link', '']
 
   const { isOpen, onOpen, onClose } = useDisclosure()
   const {
@@ -68,7 +60,7 @@ const SBOMTable = ({ captions, data, refetch, versionName, status }) => {
             <TabPanel>
               <CardBody>
                 <Table
-                  __css={{ 'tableLayout': 'fixed', width: 'full' }}
+                  __css={{ tableLayout: 'fixed', width: 'full' }}
                   variant='simple'
                   color={textColor}
                   size='sm'
@@ -115,7 +107,7 @@ const SBOMTable = ({ captions, data, refetch, versionName, status }) => {
               )}
               <CardBody overflowX={'scroll'}>
                 <Table
-                  __css={{ 'tableLayout': 'fixed', width: 'full' }}
+                  __css={{ tableLayout: 'fixed', width: 'full' }}
                   variant='simple'
                   color={textColor}
                   size='sm'

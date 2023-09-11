@@ -30,7 +30,6 @@ import { licenseOptions } from 'variables/licenses'
 import MultiSelect from 'react-select'
 import { sbomCreate, sbomUpdate } from 'graphQL/Mutation'
 
-
 function ProductSbomDrawer(props) {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -185,21 +184,47 @@ function ProductSbomDrawer(props) {
           <Stack direction={'column'} spacing={4}>
             <FormControl isRequired>
               <FormLabel fontSize={'sm'}>SPEC</FormLabel>
-              <Input
+              <Select
+                id='type'
+                name='type'
                 size='sm'
-                placeholder='Enter spec'
                 value={spec}
                 onChange={(e) => setSpec(e.target.value)}
-              />
+              >
+                <option value=''>-- Select --</option>
+                <option value='cyclonedx'>CycloneDX</option>
+                <option value='spdx'>SPDX </option>
+              </Select>
             </FormControl>
             <FormControl>
               <FormLabel fontSize={'sm'}>SPEC Version</FormLabel>
-              <Input
+              <Select
+                id='type'
+                name='type'
+                size='sm'
+                value={specVesion}
+                onChange={(e) => setSpecVersion(e.target.value)}
+              >
+                <option value=''>-- Select --</option>
+                {spec === 'cyclonedx' && (
+                  <>
+                    <option value='1.4'>1.4</option>
+                    <option value='1.5'>1.5</option>
+                  </>
+                )}
+                {spec === 'spdx' && (
+                  <>
+                    <option value='2.3'>2.3</option>
+                    <option value='3.0'>3.0</option>
+                  </>
+                )}
+              </Select>
+              {/* <Input
                 size='sm'
                 placeholder='Enter spec version'
                 value={specVesion}
                 onChange={(e) => setSpecVersion(e.target.value)}
-              />
+              /> */}
             </FormControl>
             {/* Format */}
             <FormControl>

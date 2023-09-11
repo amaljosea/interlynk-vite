@@ -64,7 +64,7 @@ const Login = () => {
       <ChakraProvider theme={theme} resetCss={false} w='100%'>
         <Box w='100%' position={'relative'}>
           <Image
-            src='https://i.ibb.co/Xzn16F3/dashboard.png'
+            src='https://i.ibb.co/7pfhmJr/customer-view.png'
             width={'100%'}
             pos={'absolute'}
           />
@@ -83,7 +83,7 @@ const Login = () => {
               rounded={'lg'}
               bg={'white'}
               gap={5}
-              boxShadow={'2xl'}
+              boxShadow={'xl'}
               direction={'column'}
             >
               <Card>

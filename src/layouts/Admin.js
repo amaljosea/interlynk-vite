@@ -1,6 +1,5 @@
 // Chakra imports
 import { ChakraProvider, Portal, useDisclosure } from '@chakra-ui/react'
-import Configurator from 'components/Configurator/Configurator'
 import Footer from 'components/Footer/Footer.js'
 // Layout components
 import AdminNavbar from 'components/Navbars/AdminNavbar.js'
@@ -8,9 +7,6 @@ import Sidebar from 'components/Sidebar'
 import React, { useContext, useState } from 'react'
 import { Redirect, Route, Switch } from 'react-router-dom'
 import { dashRoutes } from 'routes.js'
-import '@fontsource/roboto/400.css'
-import '@fontsource/roboto/500.css'
-import '@fontsource/roboto/700.css'
 // Custom Chakra theme
 import theme from 'theme/theme.js'
 // Custom components
@@ -18,7 +14,6 @@ import MainPanel from '../components/Layout/MainPanel'
 import PanelContainer from '../components/Layout/PanelContainer'
 import PanelContent from '../components/Layout/PanelContent'
 
-import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
 
@@ -34,7 +29,7 @@ import { createUploadLink } from 'apollo-upload-client'
 import { getActiveNavbar, getActiveRoute } from '../utils'
 
 export default function Dashboard(props) {
-  const { setCustomerView, minimize } = useContext(GlobalContext)
+  const { minimize } = useContext(GlobalContext)
 
   const authToken = Cookies.get('authToken')
 
@@ -72,15 +67,12 @@ export default function Dashboard(props) {
 
     return route
   }
+  
   const { isOpen, onOpen, onClose } = useDisclosure()
   document.documentElement.dir = 'ltr'
   // Chakra Color Mode
 
   const userName = localStorage.getItem('username')
-
-  useEffect(() => {
-    setCustomerView(location.pathname)
-  }, [location])
 
   const graphqlAPI = process.env.REACT_APP_GRAPHQL_API
 

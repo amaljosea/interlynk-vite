@@ -27,10 +27,10 @@ const AdvisoryLog = ({
   const textColor = useColorModeValue('gray.700', 'white')
 
   return (
-    <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
+    <Card my='14px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
       <CardBody>
         <Table
-          __css={{ 'tableLayout': 'fixed', width: 'full' }}
+          __css={{ tableLayout: 'fixed', width: 'full' }}
           variant='simple'
           color={textColor}
           size='sm'
@@ -39,7 +39,7 @@ const AdvisoryLog = ({
             <Tr my='.8rem' pl='0px'>
               {captions.map((caption, idx) => {
                 return (
-                  <Th key={idx} ps={idx === 0 ? '0px' : null}>
+                  <Th key={idx} ps={idx === 0 ? '0px' : null} pb={4}>
                     <Box>{caption}</Box>
                   </Th>
                 )

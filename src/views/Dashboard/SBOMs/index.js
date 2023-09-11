@@ -22,13 +22,7 @@ import CardHeader from 'components/Card/CardHeader'
 import CardBody from 'components/Card/CardBody.js'
 import SBOMTable from './components/SBOMTable'
 import { sbom } from 'variables/general'
-import {
-  FaCubes,
-  FaBug,
-  FaLayerGroup,
-  FaMicroscope,
-  FaExclamationTriangle
-} from 'react-icons/fa'
+import { FaCubes, FaLayerGroup, FaMicroscope } from 'react-icons/fa'
 import { useLocation, useHistory } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
 
@@ -45,8 +39,6 @@ import { dateTime } from 'utils'
 function SBOMs() {
   const [scanResults, setScanResults] = useState(null)
 
-  const { setTabIndex, scanEnabled } = useContext(GlobalContext)
-
   const location = useLocation()
   const history = useHistory()
 
@@ -55,10 +47,6 @@ function SBOMs() {
   const imageId = queryParams.get('id')
 
   localStorage.setItem('selectedVersion', versionId)
-
-  useEffect(() => {
-    console.log(`scanEnabled`, scanEnabled)
-  }, [scanEnabled])
 
   const [selectedVersion, setSelectedVersion] = useState('')
   const [selectedScanner, setSelectedScanner] = useState('')
@@ -173,9 +161,6 @@ function SBOMs() {
     queryParams.set('v', value)
     history.push(`/vendor/images?v=${value}&id=${imageId}`)
   }
-
-  const uniqProjects = []
-  const btnRef = React.useRef()
 
   const sortSBOM = sbom.sort((a, b) => a.component.localeCompare(b.component))
 
