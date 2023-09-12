@@ -51,6 +51,8 @@ function ComponentDrawer(props) {
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
+  const customerView = location.pathname.startsWith('/customer')
+
   const {
     id,
     isOpen,
@@ -205,7 +207,7 @@ function ComponentDrawer(props) {
         </DrawerHeader>
         <DrawerBody>
           <Stack direction={'column'} spacing={4}>
-            <FormControl isRequired>
+            <FormControl isRequired isReadOnly={customerView}>
               <FormLabel fontSize={'sm'}>Name</FormLabel>
               <Input
                 size='sm'
@@ -214,7 +216,7 @@ function ComponentDrawer(props) {
                 onChange={(e) => setCompName(e.target.value)}
               />
             </FormControl>
-            <FormControl>
+            <FormControl isReadOnly={customerView}>
               <FormLabel fontSize={'sm'}>Version</FormLabel>
               <Input
                 size='sm'
@@ -232,6 +234,7 @@ function ComponentDrawer(props) {
                 size='sm'
                 value={compType}
                 onChange={(e) => setCompType(e.target.value)}
+                pointerEvents={customerView ? 'none' : 'auto'}
               >
                 <option value=''>-- Select --</option>
                 <option value='unknown'>Unknown</option>
@@ -291,6 +294,7 @@ function ComponentDrawer(props) {
                 id='license'
                 value={selectedLicense}
                 onChange={(e) => setSelectedLicense(e.target.value)}
+                pointerEvents={customerView ? 'none' : 'auto'}
               >
                 {licenseOptions.map((item) => (
                   <option key={item.licenseId} value={item.licenseId}>
@@ -300,7 +304,7 @@ function ComponentDrawer(props) {
               </Select>
             </FormControl>
             {selectedLicense === 'Custom' && (
-              <FormControl>
+              <FormControl isReadOnly={customerView}>
                 <Input
                   size='sm'
                   placeholder='Enter a valid SPDX license'
@@ -310,7 +314,7 @@ function ComponentDrawer(props) {
               </FormControl>
             )}
             {/* Identifiers */}
-            <FormControl>
+            <FormControl isReadOnly={customerView}>
               <FormLabel fontSize={'sm'}>Identifiers</FormLabel>
               <Stack spacing={2}>
                 <Input
@@ -358,7 +362,7 @@ function ComponentDrawer(props) {
               </Stack>
             </FormControl>
             {(!component || !version) && (
-              <FormControl>
+              <FormControl isReadOnly={customerView}>
                 <Checkbox
                   size='sm'
                   colorScheme='blue'
@@ -369,7 +373,7 @@ function ComponentDrawer(props) {
                 </Checkbox>
               </FormControl>
             )}
-            <FormControl>
+            <FormControl isReadOnly={customerView}>
               <Checkbox
                 size='sm'
                 colorScheme='blue'
@@ -380,7 +384,7 @@ function ComponentDrawer(props) {
                 Primary component
               </Checkbox>
             </FormControl>
-            <FormControl>
+            <FormControl isReadOnly={customerView}>
               <Checkbox
                 size='sm'
                 colorScheme='blue'

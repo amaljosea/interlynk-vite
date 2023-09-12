@@ -202,28 +202,6 @@ const ImageRow = ({ item, refetch }) => {
           </Flex>
         )}
       </Td>
-      <Td pl={0}>
-        {loading ? (
-          <Skeleton height='20px' />
-        ) : (
-          <Menu>
-            <MenuButton
-              as={IconButton}
-              aria-label='Options'
-              icon={<FaEllipsisV />}
-              variant='none'
-              color='gray.400'
-            />
-            <Portal>
-              <MenuList style={{ width: '100px' }}>
-                <MenuItem icon={<FaCircleNotch />} onClick={handleRefresh}>
-                  <Text fontSize={'sm'}>Refresh</Text>
-                </MenuItem>
-              </MenuList>
-            </Portal>
-          </Menu>
-        )}
-      </Td>
     </Tr>
   )
 }

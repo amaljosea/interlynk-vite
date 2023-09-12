@@ -1,3 +1,4 @@
+import { useMutation } from '@apollo/client'
 import {
   Modal,
   ModalOverlay,
@@ -16,13 +17,23 @@ import {
   AlertIcon,
   Text
 } from '@chakra-ui/react'
+import { signSbom } from 'graphQL/Mutation'
 import { useState } from 'react'
 
-const SigningModal = ({ isOpen, onClose, setStatus }) => {
+const SigningModal = ({
+  isOpen,
+  onClose,
+  setStatus,
+  sbomId,
+  projectId,
+  refetch
+}) => {
   const [algorithm, setAlgorithm] = useState('')
   const [certificate, setCertificate] = useState('')
   const [signature, setSignature] = useState('')
   const [message, setMessage] = useState('')
+
+  const [sbomSign] = useMutation(signSbom)
 
   const handleSave = (e) => {
     e.preventDefault()
@@ -31,10 +42,27 @@ const SigningModal = ({ isOpen, onClose, setStatus }) => {
     )
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    setStatus('Signed')
-    onClose()
+    try {
+      await sbomSign({
+        variables: {
+          sbomID: sbomId,
+          sig: signature,
+          sigType: algorithm,
+          pubKey: certificate
+        }
+      })
+        .then(() => {
+          refetch({
+            projectId: projectId,
+            sbomId: sbomId
+          })
+        })
+        .finally(() => onClose())
+    } catch (error) {
+      console.log(`Something went wrong `, error)
+    }
   }
 
   return (

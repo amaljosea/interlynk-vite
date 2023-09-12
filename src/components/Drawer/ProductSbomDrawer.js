@@ -22,13 +22,15 @@ import {
   TagLabel,
   Tag,
   Code,
-  useToast
+  useToast,
+  Checkbox
 } from '@chakra-ui/react'
 import { useMutation } from '@apollo/client'
 import { useLocation } from 'react-router-dom'
 import { licenseOptions } from 'variables/licenses'
 import MultiSelect from 'react-select'
 import { sbomCreate, sbomUpdate } from 'graphQL/Mutation'
+import { CreateComponent } from 'graphQL/Mutation'
 
 function ProductSbomDrawer(props) {
   const location = useLocation()
@@ -41,6 +43,11 @@ function ProductSbomDrawer(props) {
   const [createSbom] = useMutation(sbomCreate)
   const [updateSbom] = useMutation(sbomUpdate)
 
+  const [createComponent] = useMutation(CreateComponent)
+
+  // console.log(`sbom Data`, sbomData)
+
+  const [version, setVersion] = useState('')
   const [spec, setSpec] = useState('')
   const [specVesion, setSpecVersion] = useState('')
   const [compType, setCompType] = useState('')
@@ -95,6 +102,25 @@ function ProductSbomDrawer(props) {
     setImgIds(selectedIds)
   }
 
+  const handleCreateComp = (id) => {
+    try {
+      createComponent({
+        variables: {
+          id: id,
+          kind: compType,
+          name: name,
+          version: version,
+          licenses: imgIds,
+          cpes: cpeList,
+          purl: purlValue,
+          primary: true
+        }
+      })
+    } catch (error) {
+      console.log(`Something went wrong `, error)
+    }
+  }
+
   const handleSave = async () => {
     if (spec) {
       try {
@@ -108,12 +134,17 @@ function ProductSbomDrawer(props) {
             cpes: cpeList,
             purl: purlValue
           }
-        }).then(() => {
-          refetch({
-            first: 10
-          })
-          onClose()
         })
+          .then((res) => {
+            console.log(`res`, res)
+            handleCreateComp(res.data.sbomCreate.sbom.id)
+          })
+          .finally(() => {
+            refetch({
+              first: 10
+            })
+            onClose()
+          })
       } catch (error) {
         console.error('Mutation error:', error)
       }
@@ -178,10 +209,28 @@ function ProductSbomDrawer(props) {
       <DrawerContent>
         <DrawerCloseButton />
         <DrawerHeader borderBottomWidth='1px' color='gray.600'>
-          {name}
+          {sbomData ? 'Update' : 'Create'} SBOM
         </DrawerHeader>
         <DrawerBody>
           <Stack direction={'column'} spacing={4}>
+            {!sbomData && (
+              <>
+                <FormControl>
+                  <FormLabel fontSize={'sm'}>Name</FormLabel>
+                  <Input size='sm' type='text' defaultValue={name} />
+                </FormControl>
+                <FormControl>
+                  <FormLabel fontSize={'sm'}>Version</FormLabel>
+                  <Input
+                    size='sm'
+                    type='text'
+                    vaue={version}
+                    onChange={(e) => setVersion(e.target.value)}
+                    placeholder='Enter version'
+                  />
+                </FormControl>
+              </>
+            )}
             <FormControl isRequired>
               <FormLabel fontSize={'sm'}>SPEC</FormLabel>
               <Select
@@ -293,6 +342,7 @@ function ProductSbomDrawer(props) {
                   <Box mb={4}>
                     <Input
                       type='text'
+                      size='sm'
                       value={cpeValue}
                       onChange={(e) => setCpeValue(e.target.value)}
                       placeholder='CPES'
@@ -325,6 +375,13 @@ function ProductSbomDrawer(props) {
                 </Box>
               </Stack>
             </FormControl>
+            {!sbomData && (
+              <FormControl isReadOnly={true}>
+                <Checkbox size='sm' colorScheme='blue' defaultChecked={true}>
+                  Primary component
+                </Checkbox>
+              </FormControl>
+            )}
           </Stack>
         </DrawerBody>
         <DrawerFooter borderTopWidth='1px'>

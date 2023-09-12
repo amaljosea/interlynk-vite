@@ -110,14 +110,7 @@ function ProductVersionsRow(props) {
               </Text>
             </Link>
           ) : (
-            <Text
-              color={'blue.500'}
-              minWidth='100%'
-              onClick={() => window.location.reload()}
-              cursor={'pointer'}
-            >
-              {name}
-            </Text>
+            <Text minWidth='100%'>{name}</Text>
           )}
         </Td>
         <Td pl={0}>

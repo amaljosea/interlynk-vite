@@ -32,12 +32,11 @@ const Images = () => {
     'Connector',
     'Tags',
     'Last Pushed',
-    'Scanners',
-    'Action'
+    'Scanners'
   ]
 
   if (imageId === null) {
-    const [getImages, { data, loading, refetch }] = useLazyQuery(
+    const [getImages, { data, refetch }] = useLazyQuery(
       GetSignedImages
     )
 
