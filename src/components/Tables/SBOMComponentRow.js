@@ -19,6 +19,7 @@ import ComponentModal from 'views/Sbom/components/ComponentModal'
 import { timeSince } from 'utils'
 import { FaEllipsisV } from 'react-icons/fa'
 import SupplierModal from 'views/Sbom/components/SupplierModal'
+import { ViewIcon } from '@chakra-ui/icons'
 
 function SBOMComponentRow(props) {
   const {
@@ -33,7 +34,8 @@ function SBOMComponentRow(props) {
     primary,
     internal,
     suppliers,
-    refetch
+    refetch,
+    lifecycle
   } = props
   const location = useLocation()
 
@@ -83,7 +85,7 @@ function SBOMComponentRow(props) {
         <Box>{timeSince(updatedAt)}</Box>
       </Td>
       <Td>
-        {!customerView && (
+        {!customerView ? (
           <Menu>
             <MenuButton
               as={IconButton}
@@ -94,14 +96,26 @@ function SBOMComponentRow(props) {
             />
             <Portal>
               <MenuList size='sm'>
-                <MenuItem onClick={onSupOpen}>
+                <MenuItem
+                  onClick={onSupOpen}
+                  isDisabled={lifecycle === 'signed'}
+                >
                   {suppliers.length > 0 ? 'Update' : 'Add'} Supplier
                 </MenuItem>
-                <MenuItem onClick={onOpen}>Edit</MenuItem>
-                <MenuItem onClick={onDelOpen}>Delete</MenuItem>
+                <MenuItem onClick={onOpen} isDisabled={lifecycle === 'signed'}>
+                  Edit
+                </MenuItem>
+                <MenuItem
+                  onClick={onDelOpen}
+                  isDisabled={lifecycle === 'signed'}
+                >
+                  Delete
+                </MenuItem>
               </MenuList>
             </Portal>
           </Menu>
+        ) : (
+          <IconButton size='sm' icon={<ViewIcon />} onClick={onOpen} />
         )}
 
         {isOpen && (

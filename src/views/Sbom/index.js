@@ -107,11 +107,23 @@ function SBOM() {
 
   const uniqVersions = []
 
+  // data &&
+  //   data.project.sboms.map((project) => {
+  //     uniqVersions.push({
+  //       version: project.spec,
+  //       id: project.id
+  //     })
+  //   })
+
   data &&
     data.project.sboms.map((project) => {
-      uniqVersions.push({
-        version: project.spec,
-        id: project.id
+      project.components.map((sbom) => {
+        if (sbom.primary === true) {
+          uniqVersions.push({
+            version: sbom.version,
+            id: project.id
+          })
+        }
       })
     })
 
@@ -305,7 +317,7 @@ function SBOM() {
                             </Tag>
                           )}
 
-                          {status === 'Unsigned' ? (
+                          {sbomData.sbom.lifecycle !== 'signed' ? (
                             <BsFillPatchExclamationFill
                               size={18}
                               color='tomato'
@@ -418,7 +430,7 @@ function SBOM() {
                 'Supplier',
                 'Licenses',
                 'Updated At',
-                ''
+                'Actions'
               ]}
               data={sbomData.sbom}
               refetch={refetch}
@@ -451,8 +463,11 @@ function SBOM() {
           />
         )}
 
-        {isVerifyOpen && (
+        {isVerifyOpen && sbomData && (
           <SigningModal
+            projectId={productId}
+            sbomId={sbomId}
+            refetch={refetch}
             isOpen={isVerifyOpen}
             onClose={setVerifyClose}
             setStatus={setStatus}

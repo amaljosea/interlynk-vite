@@ -99,6 +99,7 @@ const SBOMTable = ({ captions, data, refetch, versionName, status }) => {
                       variant='solid'
                       mb={6}
                       fontSize={'sm'}
+                      isDisabled={data.lifecycle === 'signed'}
                     >
                       Component
                     </Button>
@@ -130,6 +131,7 @@ const SBOMTable = ({ captions, data, refetch, versionName, status }) => {
                           key={index}
                           id={row.id}
                           type={row.kind}
+                          lifecycle={data.lifecycle}
                           sbomId={data.id}
                           component={row.name}
                           version={row.version}

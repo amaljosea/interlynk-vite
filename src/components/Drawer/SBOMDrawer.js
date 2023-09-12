@@ -155,43 +155,59 @@ function SBOMDrawer(props) {
             projects: productIds,
             images: imgIds
           }
-        })
-          .then((res) => {
-            console.log(`Res`, res)
+        }).then((res) => {
+          console.log(`Res`, res)
+          if (res.data.shareLynkCreate.errors.length > 0) {
+            toast({
+              description: res.data.shareLynkCreate.errors[0],
+              status: 'warning',
+              duration: 2000,
+              isClosable: true,
+              position: 'top'
+            })
+          } else {
             refetch()
             setEmailList([])
             setSelectedImg([])
             setSelectedProd([])
-          })
-          .finally(() => onClose())
+            onClose()
+          }
+        })
       }
     } catch (error) {
       console.log(`Error `, error)
-      onClose()
     }
   }
 
   const handleUpdate = async () => {
     try {
-      await shareLynkUpdate({
-        variables: {
-          shareLynkId: id,
-          emails: emailList,
-          projects: productIds,
-          images: imgIds
-        }
-      })
-        .then((res) => {
+      if (imgIds.length === 0 || productIds.length === 0) {
+        toast({
+          description: 'Missing required project and images',
+          status: 'warning',
+          duration: 2000,
+          isClosable: true,
+          position: 'top'
+        })
+      } else {
+        await shareLynkUpdate({
+          variables: {
+            shareLynkId: id,
+            emails: emailList,
+            projects: productIds,
+            images: imgIds
+          }
+        }).then((res) => {
           console.log(`Res`, res)
           refetch()
           setEmailList([])
           setSelectedImg([])
           setSelectedProd([])
+          onClose()
         })
-        .finally(() => onClose())
+      }
     } catch (error) {
       console.log(`Error `, error)
-      onClose()
     }
   }
 

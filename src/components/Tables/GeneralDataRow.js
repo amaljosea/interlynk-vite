@@ -44,7 +44,7 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey, status }) => {
           {!customerView && (
             <Button
               size='sm'
-              isDisabled={status === 'Signed'}
+              isDisabled={data.lifecycle === 'signed'}
               onClick={() => handleClick('tools')}
             >
               <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
@@ -98,7 +98,7 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey, status }) => {
           {!customerView && (
             <Button
               size='sm'
-              isDisabled={status === 'Signed'}
+              isDisabled={data.lifecycle === 'signed'}
               onClick={() => handleClick('author')}
             >
               <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
@@ -124,7 +124,7 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey, status }) => {
           {!customerView && (
             <Button
               size='sm'
-              isDisabled={status === 'Signed'}
+              isDisabled={data.lifecycle === 'signed'}
               onClick={() => handleClick('supplier')}
             >
               <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />

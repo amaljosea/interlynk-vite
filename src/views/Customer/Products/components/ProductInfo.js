@@ -96,12 +96,15 @@ function ProductInfo() {
 
   data &&
     data.project.sboms.map((project) => {
-      uniqVersions.push({
-        version: project.spec,
-        id: project.id
+      project.components.map((sbom) => {
+        if (sbom.primary === true) {
+          uniqVersions.push({
+            version: sbom.version,
+            id: project.id
+          })
+        }
       })
     })
-
   // console.log(`uniqVersions`, uniqVersions)
 
   const allSboms = []
@@ -284,7 +287,7 @@ function ProductInfo() {
               'Supplier',
               'Licenses',
               'Updated At',
-              ''
+              'Actions'
             ]}
             data={sbomData.sbom}
             refetch={refetch}

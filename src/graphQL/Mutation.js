@@ -775,3 +775,27 @@ export const sbomDelete = gql`
     }
   }
 `
+
+export const signSbom = gql`
+  mutation signSbom(
+    $sbomID: Uuid!
+    $sig: String!
+    $sigType: String!
+    $pubKey: String!
+  ) {
+    sbomSign(
+      input: {
+        sbomId: $sbomID
+        signature: $sig
+        signatureType: $sigType
+        publicKey: $pubKey
+      }
+    ) {
+      sbom {
+        id
+        lifecycle
+      }
+      errors
+    }
+  }
+`
