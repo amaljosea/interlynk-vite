@@ -20,7 +20,15 @@ import {
   Th,
   Box,
   Tbody,
-  Td
+  Td,
+  Tooltip,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter
 } from '@chakra-ui/react'
 import React, { useState, useRef, useContext } from 'react'
 import Card from 'components/Card/Card.js'
@@ -35,7 +43,6 @@ import {
 } from 'react-icons/fa'
 import { useLocation, useHistory } from 'react-router-dom'
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
-import GlobalContext from 'context/GlobalContext'
 import { useMutation, useQuery } from '@apollo/client'
 import { GetSBOM, GetProject } from 'graphQL/Queries'
 import { timeSince } from 'utils'
@@ -45,6 +52,8 @@ import { MdVerified } from 'react-icons/md'
 import DownloadModal from './components/DownloadModal'
 import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import { sbomDelete } from 'graphQL/Mutation'
+
+import { TbSignature, TbSignatureOff } from 'react-icons/tb'
 
 function SBOM() {
   const initialRef = useRef(null)
@@ -75,6 +84,12 @@ function SBOM() {
     isOpen: isVerifyOpen,
     onOpen: setVerifyOpen,
     onClose: setVerifyClose
+  } = useDisclosure()
+
+  const {
+    isOpen: isDelete,
+    onOpen: setDeleteOpen,
+    onClose: setDeleteClose
   } = useDisclosure()
 
   const { data: sbomData, refetch } = useQuery(GetSBOM, {
@@ -162,9 +177,8 @@ function SBOM() {
         variables: {
           id: sbomId
         }
-      })
-        .then(() => history.push(`/vendor/products`))
-        .finally(() => window.location.reload())
+      }).then(() => history.push(`/vendor/products`))
+      // .finally(() => window.location.reload())
     } catch (error) {
       console.error('Mutation error:', error)
     }
@@ -267,6 +281,7 @@ function SBOM() {
     return (
       <>
         <Flex direction='column' pt={{ base: '120px', md: '75px' }}>
+          {/* product info */}
           <Card mb='6'>
             <CardBody>
               <Grid
@@ -321,7 +336,6 @@ function SBOM() {
                             <BsFillPatchExclamationFill
                               size={18}
                               color='tomato'
-                              onClick={setVerifyOpen}
                               cursor={'pointer'}
                             />
                           ) : (
@@ -342,7 +356,7 @@ function SBOM() {
                   <GridItem colSpan={3}>
                     <Flex
                       direction={'row'}
-                      gap={4}
+                      gap={2}
                       justifyContent='flex-end'
                       ml={'auto'}
                     >
@@ -369,40 +383,54 @@ function SBOM() {
                         </Select>
                       </Flex>
 
-                      <IconButton
-                        aria-label='Download SBOM'
-                        icon={<FaFileDownload />}
-                        onClick={onOpen}
-                        size='md'
-                        colorScheme='blue'
-                      />
-
-                      <Stack direction='row' spacing={4}>
-                        <Button
-                          leftIcon={<EditIcon />}
+                      <Tooltip label='Download'>
+                        <IconButton
+                          icon={<FaFileDownload />}
+                          onClick={onOpen}
+                          size='md'
                           colorScheme='blue'
-                          variant='solid'
-                          size='md'
+                        />
+                      </Tooltip>
+
+                      {sbomData.sbom.lifecycle === 'signed' ? (
+                        <Tooltip label='Signature'>
+                          <IconButton
+                            colorScheme='blue'
+                            icon={<TbSignature size={22} />}
+                          ></IconButton>
+                        </Tooltip>
+                      ) : (
+                        <Tooltip label='Signature'>
+                          <IconButton
+                            colorScheme='blue'
+                            icon={<TbSignatureOff size={22} />}
+                            onClick={setVerifyOpen}
+                          ></IconButton>
+                        </Tooltip>
+                      )}
+
+                      <Tooltip label='Edit'>
+                        <IconButton
+                          colorScheme='blue'
+                          icon={<EditIcon />}
                           onClick={setSBMOpen}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          leftIcon={<DeleteIcon />}
+                        ></IconButton>
+                      </Tooltip>
+
+                      <Tooltip label='Delete'>
+                        <IconButton
                           colorScheme='red'
-                          size='md'
-                          variant='outline'
-                          onClick={handleDelete}
-                        >
-                          Delete
-                        </Button>
-                      </Stack>
+                          icon={<DeleteIcon />}
+                          onClick={setDeleteOpen}
+                        ></IconButton>
+                      </Tooltip>
                     </Flex>
                   </GridItem>
                 )}
               </Grid>
             </CardBody>
           </Card>
+          {/* stats */}
           <Flex direction='row' gap='2'>
             <SBOMStatistics
               icon={<Icon h={'24px'} w={'24px'} color='white' as={FaCubes} />}
@@ -420,6 +448,7 @@ function SBOM() {
               amount={totalLicenses ? totalLicenses.length : 'Loading...'}
             />
           </Flex>
+          {/* sbom details */}
           {sbomData && (
             <SBOMTable
               title={'SBOM'}
@@ -435,7 +464,6 @@ function SBOM() {
               data={sbomData.sbom}
               refetch={refetch}
               versionName={validSBOMS?.version}
-              status={status}
             />
           )}
         </Flex>
@@ -470,9 +498,43 @@ function SBOM() {
             refetch={refetch}
             isOpen={isVerifyOpen}
             onClose={setVerifyClose}
-            setStatus={setStatus}
           />
         )}
+
+        {/* delete */}
+        <Modal isOpen={isDelete} onClose={setDeleteClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Delete ?</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Text fontSize={'lg'}>Deleting this version will : </Text>
+              <Flex flexDir={'column'} gap={1} mt={4}>
+                {[
+                  'Remove this version and its SBOMs from the product list',
+                  'Remove access to this version on connected Share Lynks'
+                ].map((item, index) => (
+                  <Text key={index} fontSize={'sm'}>
+                    {item}
+                  </Text>
+                ))}
+              </Flex>
+              <br />
+              <Text mt={4} fontSize={'sm'}>
+                Are you sure you want to continue with the deletion of this
+                version?
+              </Text>
+            </ModalBody>
+            <ModalFooter>
+              <Button mr={3} onClick={setDeleteClose}>
+                No
+              </Button>
+              <Button colorScheme='red' onClick={handleDelete}>
+                Yes
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       </>
     )
   }

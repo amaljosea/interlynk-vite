@@ -16,9 +16,8 @@ import {
   ModalBody,
   ModalCloseButton
 } from '@chakra-ui/react'
-import GlobalContext from 'context/GlobalContext'
 import { UploadSbom } from 'graphQL/Mutation'
-import { useEffect, useContext, useState } from 'react'
+import { useState } from 'react'
 import { FaUpload } from 'react-icons/fa'
 
 const UploadModal = ({ id, isOpen, onClose }) => {
@@ -37,9 +36,9 @@ const UploadModal = ({ id, isOpen, onClose }) => {
         .then((res) => {
           if (res.data.sbomUpload.errors === '[]') {
             toast({
-              title: 'Data uploaded successfully',
+              title: 'SBOM uploaded successfully and is now processing',
               description:
-                'Kindly consider refreshing the page after sometime, in order to verify the available data',
+                'The validated SBOM data will be available in the product shortly',
               duration: 6000,
               isClosable: true,
               position: 'top',

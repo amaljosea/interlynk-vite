@@ -11,7 +11,16 @@ import {
   MenuList,
   Portal,
   useDisclosure,
-  Skeleton
+  Skeleton,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+  Flex,
+  Button
 } from '@chakra-ui/react'
 import { useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
@@ -39,8 +48,6 @@ function ProductVersionsRow(props) {
     isLoading,
     refetch
   } = props
-  const textColor = useColorModeValue('gray.700', 'white')
-  const [checked, setChecked] = useState(active ? true : false)
 
   const { isOpen, onOpen, onClose } = useDisclosure()
   const {
@@ -52,6 +59,11 @@ function ProductVersionsRow(props) {
     isOpen: isSbomOpen,
     onOpen: onSbomOpen,
     onClose: onSbomClose
+  } = useDisclosure()
+  const {
+    isOpen: isDeleteOpen,
+    onOpen: onDeleteOpen,
+    onClose: onDeleteClose
   } = useDisclosure()
 
   const btnRefProduct = useRef()
@@ -143,7 +155,7 @@ function ProductVersionsRow(props) {
                   <MenuItem ref={btnRefProduct} onClick={onOpenProduct}>
                     Upload SBOM
                   </MenuItem>
-                  <MenuItem onClick={onProductDelete}>Archive Product</MenuItem>
+                  <MenuItem onClick={onDeleteOpen}>Archive Product</MenuItem>
                 </MenuList>
               </Portal>
             </Menu>
@@ -180,6 +192,42 @@ function ProductVersionsRow(props) {
               refetch={refetch}
               sbomData={null}
             />
+          )}
+
+          {/* delete */}
+          {isDeleteOpen && (
+            <Modal isOpen={isDeleteOpen} onClose={onDeleteClose}>
+              <ModalOverlay />
+              <ModalContent>
+                <ModalHeader>Archive ?</ModalHeader>
+                <ModalCloseButton />
+                <ModalBody>
+                  <Text fontSize={'lg'}>Archiving this product will : </Text>
+                  <Flex flexDir={'column'} gap={1} mt={4}>
+                    {[
+                      'Remove this product, associated versions and their SBOMs',
+                      "Remove access to this product's details on connected Share Lynk's"
+                    ].map((item, index) => (
+                      <Text key={index} fontSize={'sm'}>
+                        {item}
+                      </Text>
+                    ))}
+                  </Flex>
+                  <br />
+                  <Text mt={4} fontSize={'sm'}>
+                    Are you sure you want to continue with the deletion ?
+                  </Text>
+                </ModalBody>
+                <ModalFooter>
+                  <Button mr={3} onClick={onDeleteClose}>
+                    No
+                  </Button>
+                  <Button colorScheme='red' onClick={onProductDelete}>
+                    Yes
+                  </Button>
+                </ModalFooter>
+              </ModalContent>
+            </Modal>
           )}
         </Td>
       </Tr>

@@ -1,15 +1,7 @@
 // Chakra imports
 import {
   Flex,
-  Menu,
-  MenuList,
-  MenuButton,
-  MenuOptionGroup,
-  MenuItemOption,
   Button,
-  Input,
-  Spacer,
-  Stack,
   useDisclosure,
   Table,
   Tr,
@@ -18,16 +10,19 @@ import {
   Thead,
   Tbody,
   Box,
-  Th
+  Th,
+  Tooltip,
+  IconButton,
+  Text
 } from '@chakra-ui/react'
 import { useState, useContext, useEffect, useRef } from 'react'
 import ProductVersions from './components/ProductVersions'
-import { ChevronDownIcon, AddIcon } from '@chakra-ui/icons'
+import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
 import Card from 'components/Card/Card'
 import CardHeader from 'components/Card/CardHeader'
 import GlobalContext from 'context/GlobalContext'
 import ProductModal from './components/ProductModal.js'
-import { useLazyQuery, useQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 import { GetProjectData } from 'graphQL/Queries'
 import { useLocation } from 'react-router-dom'
 import SBOM from 'views/Sbom'
@@ -50,11 +45,15 @@ function Index() {
 
   const [isLoading, setIsLoading] = useState(false)
 
-  const { data, refetch } = useQuery(GetProjectData, {
+  const { data, refetch, error, loading } = useQuery(GetProjectData, {
     variables: {
       first: 10
     }
   })
+
+  useEffect(() => {
+    if (data) console.log(`Products`, data)
+  }, [data])
 
   const handlePreviousPage = () => {
     refetch({
@@ -112,7 +111,7 @@ function Index() {
       setGroupVersionData([])
     }
   }, [showVersion])
-  
+
   if (product === null) {
     return (
       <>
@@ -123,18 +122,19 @@ function Index() {
                 <Flex
                   width={'100%'}
                   direction={'row'}
-                  gap={4}
+                  gap={2}
                   alignItems={'center'}
                   justifyContent={'flex-end'}
                 >
-                  {/* upload */}
-                  <Button
-                    colorScheme='blue'
-                    variant='solid'
-                    onClick={handleRefresh}
-                  >
-                    Refresh
-                  </Button>
+                  {/* refresh */}
+                  <Tooltip label='Refresh'>
+                    <IconButton
+                      colorScheme='blue'
+                      icon={<RepeatIcon />}
+                      onClick={handleRefresh}
+                    ></IconButton>
+                  </Tooltip>
+                  {/* add product */}
                   <Button
                     ref={btnRefProduct}
                     onClick={onOpenProduct}
@@ -223,17 +223,15 @@ function Index() {
             </Menu>
             <Input placeholder='Search' maxW='300px' /> */}
 
-              {data ? (
-                <ProductVersions
-                  title={'Products'}
-                  captions={captions}
-                  allProjects={data}
-                  handlePreviousPage={handlePreviousPage}
-                  handleNextPage={handleNextPage}
-                  isLoading={isLoading}
-                  refetch={refetch}
-                />
-              ) : (
+              {error && (
+                <Flex my={10} alignItems={'center'} justifyContent={'center'}>
+                  <Text textAlign={'center'} fontSize={14}>
+                    {error.message}
+                  </Text>
+                </Flex>
+              )}
+
+              {loading && (
                 <Table mt={4}>
                   <Thead>
                     <Tr my='.8rem'>
@@ -269,6 +267,18 @@ function Index() {
                     </Tr>
                   </Tbody>
                 </Table>
+              )}
+
+              {data && (
+                <ProductVersions
+                  title={'Products'}
+                  captions={captions}
+                  allProjects={data}
+                  handlePreviousPage={handlePreviousPage}
+                  handleNextPage={handleNextPage}
+                  isLoading={isLoading}
+                  refetch={refetch}
+                />
               )}
             </Card>
           </Flex>

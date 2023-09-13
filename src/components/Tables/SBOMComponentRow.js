@@ -39,6 +39,8 @@ function SBOMComponentRow(props) {
   } = props
   const location = useLocation()
 
+  
+
   const customerView = location.pathname.startsWith('/customer')
 
   const compBtn = useRef(null)
@@ -105,12 +107,14 @@ function SBOMComponentRow(props) {
                 <MenuItem onClick={onOpen} isDisabled={lifecycle === 'signed'}>
                   Edit
                 </MenuItem>
-                <MenuItem
-                  onClick={onDelOpen}
-                  isDisabled={lifecycle === 'signed'}
-                >
-                  Delete
-                </MenuItem>
+                {primary === false && (
+                  <MenuItem
+                    onClick={onDelOpen}
+                    isDisabled={lifecycle === 'signed'}
+                  >
+                    Delete
+                  </MenuItem>
+                )}
               </MenuList>
             </Portal>
           </Menu>
