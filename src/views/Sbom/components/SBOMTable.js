@@ -19,16 +19,15 @@ import {
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 import SBOMComponentRow from 'components/Tables/SBOMComponentRow.js'
-import React, { useRef, useState, useContext } from 'react'
+import React, { useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import GlobalContext from 'context/GlobalContext'
 import GeneralDataRow from 'components/Tables/GeneralDataRow'
 import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
 import CardHeader from 'components/Card/CardHeader'
 import { AddIcon } from '@chakra-ui/icons'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 
-const SBOMTable = ({ captions, data, refetch, versionName, status }) => {
+const SBOMTable = ({ captions, data, refetch }) => {
   const textColor = useColorModeValue('gray.700', 'white')
 
   const location = useLocation()
@@ -50,7 +49,7 @@ const SBOMTable = ({ captions, data, refetch, versionName, status }) => {
   return (
     <>
       <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
-        <Tabs variant='enclosed'>
+        <Tabs variant='enclosed' defaultIndex={1}>
           <TabList mt='20px'>
             <Tab _focus={{ outline: 'none' }}>General</Tab>
             <Tab _focus={{ outline: 'none' }}>Components</Tab>
@@ -69,6 +68,7 @@ const SBOMTable = ({ captions, data, refetch, versionName, status }) => {
                     <Tr>
                       <Th></Th>
                       <Th></Th>
+                      <Th></Th>
                     </Tr>
                   </Thead>
                   <Tbody>
@@ -76,7 +76,6 @@ const SBOMTable = ({ captions, data, refetch, versionName, status }) => {
                       onOpen={onOpen}
                       setSelectedKey={setSelectedKey}
                       data={data}
-                      status={status}
                     />
                   </Tbody>
                 </Table>

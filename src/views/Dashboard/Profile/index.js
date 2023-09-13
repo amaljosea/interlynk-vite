@@ -1,7 +1,5 @@
 // Chakra imports
 import { Flex, Grid, useColorModeValue } from '@chakra-ui/react'
-import ProfileBgImage from 'assets/img/ProfileBackground.png'
-import React from 'react'
 import { FaSlackHash, FaUserCircle, FaBuilding } from 'react-icons/fa'
 import Header from './components/Header'
 import { useState } from 'react'
@@ -10,7 +8,6 @@ import ExploitFeeds from './components/ExploitFeeds'
 import { useQuery } from '@apollo/client'
 import { GetSettings } from 'graphQL/Queries'
 import { GetOrgInfo } from 'graphQL/Queries'
-import { useEffect } from 'react'
 
 function Profile() {
   const username = localStorage.getItem(`username`)
@@ -57,7 +54,7 @@ function Profile() {
   return (
     <Flex direction='column'>
       <Header
-        backgroundHeader={ProfileBgImage}
+        // backgroundHeader={ProfileBgImage}
         backgroundProfile={bgProfile}
         name={username ? username : 'Surendra Pathak'}
         email={email ? email : 'surendra.pathak@interlynk.io'}

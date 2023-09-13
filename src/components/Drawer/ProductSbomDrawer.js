@@ -127,8 +127,8 @@ function ProductSbomDrawer(props) {
         await createSbom({
           variables: {
             projectId: projectId,
-            spec: spec,
-            specVersion: specVesion,
+            spec: 'cyclonedx',
+            specVersion: '1.4',
             format: compType,
             licenses: imgIds,
             cpes: cpeList,
@@ -164,8 +164,8 @@ function ProductSbomDrawer(props) {
       await updateSbom({
         variables: {
           id: sbomData.sbom.id,
-          spec: spec,
-          specVersion: specVesion,
+          spec: 'cyclonedx',
+          specVersion: '1.4',
           format: compType,
           licenses: imgIds,
           cpes: cpeList,
@@ -231,50 +231,6 @@ function ProductSbomDrawer(props) {
                 </FormControl>
               </>
             )}
-            <FormControl isRequired>
-              <FormLabel fontSize={'sm'}>SPEC</FormLabel>
-              <Select
-                id='type'
-                name='type'
-                size='sm'
-                value={spec}
-                onChange={(e) => setSpec(e.target.value)}
-              >
-                <option value=''>-- Select --</option>
-                <option value='cyclonedx'>CycloneDX</option>
-                <option value='spdx'>SPDX </option>
-              </Select>
-            </FormControl>
-            <FormControl>
-              <FormLabel fontSize={'sm'}>SPEC Version</FormLabel>
-              <Select
-                id='type'
-                name='type'
-                size='sm'
-                value={specVesion}
-                onChange={(e) => setSpecVersion(e.target.value)}
-              >
-                <option value=''>-- Select --</option>
-                {spec === 'cyclonedx' && (
-                  <>
-                    <option value='1.4'>1.4</option>
-                    <option value='1.5'>1.5</option>
-                  </>
-                )}
-                {spec === 'spdx' && (
-                  <>
-                    <option value='2.3'>2.3</option>
-                    <option value='3.0'>3.0</option>
-                  </>
-                )}
-              </Select>
-              {/* <Input
-                size='sm'
-                placeholder='Enter spec version'
-                value={specVesion}
-                onChange={(e) => setSpecVersion(e.target.value)}
-              /> */}
-            </FormControl>
             {/* Format */}
             <FormControl>
               <FormLabel fontSize={'sm'}>Type</FormLabel>

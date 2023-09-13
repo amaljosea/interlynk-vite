@@ -20,17 +20,11 @@ import {
 import { signSbom } from 'graphQL/Mutation'
 import { useState } from 'react'
 
-const SigningModal = ({
-  isOpen,
-  onClose,
-  setStatus,
-  sbomId,
-  projectId,
-  refetch
-}) => {
+const SigningModal = ({ isOpen, onClose, sbomId, projectId, refetch }) => {
   const [algorithm, setAlgorithm] = useState('')
   const [certificate, setCertificate] = useState('')
-  const [signature, setSignature] = useState('')
+  const [spdxSign, setSpdxSign] = useState('')
+  const [cycloneDxSign, setCycloneDxSign] = useState('')
   const [message, setMessage] = useState('')
 
   const [sbomSign] = useMutation(signSbom)
@@ -48,7 +42,7 @@ const SigningModal = ({
       await sbomSign({
         variables: {
           sbomID: sbomId,
-          sig: signature,
+          sig: cycloneDxSign,
           sigType: algorithm,
           pubKey: certificate
         }
@@ -77,7 +71,7 @@ const SigningModal = ({
               <Flex width={'100%'} direction={'column'} gap={4}>
                 {/* Algorithm */}
                 <FormControl isRequired>
-                  <FormLabel>Algorithm</FormLabel>
+                  <FormLabel fontSize={14}>Algorithm</FormLabel>
                   <Select
                     id='algorithm'
                     name='algorithm'
@@ -93,7 +87,7 @@ const SigningModal = ({
                   <>
                     {/* Cerificate */}
                     <FormControl isRequired>
-                      <FormLabel>Cerificate</FormLabel>
+                      <FormLabel fontSize={14}>Cerificate</FormLabel>
                       <Textarea
                         value={certificate}
                         onChange={(e) => setCertificate(e.target.value)}
@@ -101,12 +95,22 @@ const SigningModal = ({
                         rows={8}
                       />
                     </FormControl>
-                    {/* Signature */}
+                    {/* CycloneDX Signature */}
                     <FormControl isRequired>
-                      <FormLabel>Signature</FormLabel>
+                      <FormLabel fontSize={14}>CycloneDX Signature</FormLabel>
                       <Textarea
-                        value={signature}
-                        onChange={(e) => setSignature(e.target.value)}
+                        value={cycloneDxSign}
+                        onChange={(e) => setCycloneDxSign(e.target.value)}
+                        fontSize={'sm'}
+                        rows={2}
+                      />
+                    </FormControl>
+                    {/* SPDX Signature */}
+                    <FormControl isRequired>
+                      <FormLabel fontSize={14}>SPDX Signature</FormLabel>
+                      <Textarea
+                        value={spdxSign}
+                        onChange={(e) => setSpdxSign(e.target.value)}
                         fontSize={'sm'}
                         rows={2}
                       />

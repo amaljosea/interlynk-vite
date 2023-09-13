@@ -32,6 +32,8 @@ import MultiSelect from 'react-select'
 import { UpdateShareLynk } from 'graphQL/Mutation'
 
 function SBOMDrawer(props) {
+  const toast = useToast()
+
   const { isOpen, onClose, btnRef, refetch, id, shareUsers, contents } = props
 
   const { data: allProducts } = useQuery(GetProjectData, {
@@ -60,8 +62,6 @@ function SBOMDrawer(props) {
   const [selectedProd, setSelectedProd] = useState([])
   const [imgIds, setImgIds] = useState([])
   const [productIds, setProductIds] = useState([])
-
-  const toast = useToast()
 
   useEffect(() => {
     if (shareUsers.length > 0 && id) {
@@ -100,10 +100,24 @@ function SBOMDrawer(props) {
     }
   }, [id])
 
+  const validateEmail = (email) => {
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
+    return emailRegex.test(email)
+  }
+
   const handleKeyDown = (event) => {
     if (event.key === 'Enter') {
-      setEmailList((prev) => [email, ...prev])
-      setEmail('')
+      if (validateEmail(email) === true) {
+        setEmailList((prev) => [email, ...prev])
+        setEmail('')
+      } else {
+        toast({
+          description: 'Invalid email !',
+          status: 'error',
+          position: 'top-right',
+          duration: 2000
+        })
+      }
     }
   }
 
@@ -147,6 +161,14 @@ function SBOMDrawer(props) {
           isClosable: true,
           position: 'top'
         })
+      } else if (imgIds.length === 0 && productIds.length === 0) {
+        toast({
+          description: 'Missing required products and images',
+          status: 'warning',
+          duration: 2000,
+          isClosable: true,
+          position: 'top'
+        })
       } else {
         await shareLynkCreate({
           variables: {
@@ -157,21 +179,11 @@ function SBOMDrawer(props) {
           }
         }).then((res) => {
           console.log(`Res`, res)
-          if (res.data.shareLynkCreate.errors.length > 0) {
-            toast({
-              description: res.data.shareLynkCreate.errors[0],
-              status: 'warning',
-              duration: 2000,
-              isClosable: true,
-              position: 'top'
-            })
-          } else {
-            refetch()
-            setEmailList([])
-            setSelectedImg([])
-            setSelectedProd([])
-            onClose()
-          }
+          refetch()
+          setEmailList([])
+          setSelectedImg([])
+          setSelectedProd([])
+          onClose()
         })
       }
     } catch (error) {
@@ -181,9 +193,17 @@ function SBOMDrawer(props) {
 
   const handleUpdate = async () => {
     try {
-      if (imgIds.length === 0 || productIds.length === 0) {
+      if (emailList.length === 0) {
         toast({
-          description: 'Missing required project and images',
+          description: 'Email is required !',
+          status: 'warning',
+          duration: 2000,
+          isClosable: true,
+          position: 'top'
+        })
+      } else if (imgIds.length === 0 && productIds.length === 0) {
+        toast({
+          description: 'Missing required products and images',
           status: 'warning',
           duration: 2000,
           isClosable: true,
@@ -215,10 +235,6 @@ function SBOMDrawer(props) {
     const updatedList = emailList.filter((email) => email !== item)
     setEmailList(updatedList)
   }
-
-  // console.log(`Email list`, emailList)
-  // console.log(`product list`, productIds)
-  // console.log(`images list`, imgIds)
 
   return (
     <Drawer

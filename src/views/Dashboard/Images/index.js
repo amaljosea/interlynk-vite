@@ -21,7 +21,9 @@ import {
   Td,
   Skeleton,
   Th,
-  Box
+  Box,
+  Tooltip,
+  IconButton
 } from '@chakra-ui/react'
 import React, { useState, useEffect, useContext } from 'react'
 import ImagesDrawer from 'components/Drawer/ImagesDrawer'
@@ -41,6 +43,7 @@ import ImageTable from './ImageTable'
 import { GetImages } from 'graphQL/Queries'
 import CardBody from 'components/Card/CardBody'
 import { img_captions } from 'utils'
+import { RepeatIcon } from '@chakra-ui/icons'
 
 const Index = () => {
   const toast = useToast()
@@ -48,7 +51,6 @@ const Index = () => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const versionId = queryParams.get('v')
-
 
   const [searchInput, setSearchInput] = useState('')
 
@@ -254,9 +256,13 @@ const Index = () => {
                     fontSize={'sm'}
                     display={'none'}
                   />
-                  <Button colorScheme='blue' onClick={onImageRefresh}>
-                    Refresh
-                  </Button>
+                  <Tooltip label='Refresh'>
+                    <IconButton
+                      colorScheme='blue'
+                      size='md'
+                      icon={<RepeatIcon />}
+                    ></IconButton>
+                  </Tooltip>
                 </Flex>
               </CardHeader>
 
