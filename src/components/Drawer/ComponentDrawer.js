@@ -24,24 +24,19 @@ import {
   Td,
   Text,
   Flex,
-  ListItem,
-  UnorderedList,
   Box,
-  IconButton,
   TagCloseButton,
   TagLabel,
   Tag,
   Code,
-  useToast,
-  RadioGroup,
-  Radio
+  useToast
 } from '@chakra-ui/react'
 import { useMutation } from '@apollo/client'
 import { CreateComponent } from 'graphQL/Mutation'
 import { UpdateComponent } from 'graphQL/Mutation'
 import { useLocation } from 'react-router-dom'
 import { licenseOptions } from 'variables/licenses'
-import { CloseIcon } from '@chakra-ui/icons'
+import MultiSelect from 'react-select'
 import { timeSince } from 'utils'
 
 function ComponentDrawer(props) {
@@ -80,7 +75,6 @@ function ComponentDrawer(props) {
   const [compVersion, setCompVersion] = useState('')
   const [compType, setCompType] = useState('')
   const [licenseName, setLicenseName] = useState('')
-  const [selectedLicense, setSelectedLicense] = useState('')
 
   const [cpeList, setCpeList] = useState([])
   const [cpeValue, setCpeValue] = useState('')
@@ -90,26 +84,43 @@ function ComponentDrawer(props) {
   const [isPrimary, setIsPrimary] = useState(primary)
   const [isInternal, setIsInternal] = useState(internal)
 
-  console.log(`isPrimary`, isPrimary)
+  const [licenseList, setLicenseList] = useState([])
+  const [selectedLicenses, setSelectedLicenses] = useState([])
+
+  const licenses = licenseOptions.map((option) => ({
+    value: option.licenseId,
+    label: option.name
+  }))
 
   useEffect(() => {
     setCompId(id)
     setCompName(component)
     setCompVersion(version)
     setCompType(type)
-    setSelectedLicense(license[0])
     setCpeList(cpes)
     setPurlValue(purl)
   }, [component])
 
   useEffect(() => {
-    const filterData = licenseOptions.find((item) => item.licenseId === license)
-    if (filterData) {
-      setSelectedLicense(license)
-    } else {
-      setLicenseName(license)
+    if (license.length > 0) {
+      const commonValues = licenseOptions.filter((item1) =>
+        license.includes(item1.licenseId)
+      )
+      const data = commonValues.map((item) => {
+        return {
+          value: item.licenseId,
+          label: item.name
+        }
+      })
+      setLicenseList(data)
     }
   }, [license])
+
+  const onLicenseChange = (selected) => {
+    setLicenseList(selected)
+    const selectedIds = selected.map((option) => option.value) // Extracting IDs
+    setSelectedLicenses(selectedIds)
+  }
 
   const handleSave = async () => {
     if (compName && compType) {
@@ -120,9 +131,7 @@ function ComponentDrawer(props) {
             kind: compType,
             name: compName,
             version: compVersion,
-            licenses: [
-              selectedLicense === 'Custom' ? licenseName : selectedLicense
-            ],
+            licenses: selectedLicenses,
             cpes: cpeList,
             purl: purlValue,
             primary: isPrimary,
@@ -157,9 +166,7 @@ function ComponentDrawer(props) {
           kind: compType,
           name: compName,
           version: compVersion,
-          licenses: [
-            selectedLicense === 'Custom' ? licenseName : selectedLicense
-          ],
+          licenses: selectedLicenses,
           cpes: cpeList,
           purl: purlValue,
           primary: isPrimary,
@@ -286,33 +293,25 @@ function ComponentDrawer(props) {
               </Flex>
             )}
             {/* Licenses */}
-            <FormControl>
-              <FormLabel fontSize={'sm'}>License</FormLabel>
-              <Select
-                size='sm'
-                name='license'
-                id='license'
-                value={selectedLicense}
-                onChange={(e) => setSelectedLicense(e.target.value)}
-                pointerEvents={customerView ? 'none' : 'auto'}
-              >
-                {licenseOptions.map((item) => (
-                  <option key={item.licenseId} value={item.licenseId}>
-                    {item.name}
-                  </option>
-                ))}
-              </Select>
+            <FormControl fontSize={'sm'}>
+              <FormLabel fontSize={'sm'}>Licenses</FormLabel>
+              <MultiSelect
+                styles={{
+                  control: (baseStyles, state) => ({
+                    ...baseStyles,
+                    borderColor: state.isFocused ? 'inherit' : 'inherit',
+                    '&:hover': {
+                      borderColor: '#CBD5E0'
+                    }
+                  })
+                }}
+                isMulti
+                value={licenseList}
+                options={licenses}
+                onChange={onLicenseChange}
+              />
             </FormControl>
-            {selectedLicense === 'Custom' && (
-              <FormControl isReadOnly={customerView}>
-                <Input
-                  size='sm'
-                  placeholder='Enter a valid SPDX license'
-                  value={licenseName}
-                  onChange={(e) => setLicenseName(e.target.value)}
-                />
-              </FormControl>
-            )}
+
             {/* Identifiers */}
             <FormControl isReadOnly={customerView}>
               <FormLabel fontSize={'sm'}>Identifiers</FormLabel>

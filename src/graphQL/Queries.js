@@ -352,35 +352,6 @@ export const GetProjectData = gql`
         organizationId
         sboms {
           id
-          cpes
-          spec
-          creationAt
-          specVersion
-          project {
-            id
-          }
-          tools {
-            id
-            name
-          }
-          authors {
-            name
-            email
-          }
-          suppliers {
-            name
-            email
-          }
-          components {
-            id
-            name
-            version
-            primary
-            internal
-            purl
-            cpes
-            licenses
-          }
         }
       }
     }
@@ -388,7 +359,14 @@ export const GetProjectData = gql`
 `
 
 export const GetSBOM = gql`
-  query GetSbom($projectId: Uuid!, $sbomId: Uuid!) {
+  query GetSbom(
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+  ) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
       id
       cpes
@@ -422,23 +400,31 @@ export const GetSBOM = gql`
         email
         updatedAt
       }
-      components {
-        id
-        name
-        version
-        primary
-        internal
-        purl
-        cpes
-        licenses
-        updatedAt
-        uniqueId
-        kind
-        suppliers {
+      components(after: $after, before: $before, first: $first, last: $last) {
+        pageInfo {
+          endCursor
+          hasNextPage
+          startCursor
+          hasPreviousPage
+        }
+        nodes {
           id
           name
-          email
+          version
+          primary
+          internal
+          purl
+          cpes
+          licenses
           updatedAt
+          uniqueId
+          kind
+          suppliers {
+            id
+            name
+            email
+            updatedAt
+          }
         }
       }
     }
@@ -446,7 +432,13 @@ export const GetSBOM = gql`
 `
 
 export const GetProject = gql`
-  query getProject($id: ID!) {
+  query getProject(
+    $id: ID!
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+  ) {
     project(id: $id) {
       id
       name
@@ -456,9 +448,11 @@ export const GetProject = gql`
         id
         spec
         specVersion
-        components {
-          primary
-          version
+        components(after: $after, before: $before, first: $first, last: $last) {
+          nodes {
+            primary
+            version
+          }
         }
       }
     }
@@ -543,16 +537,6 @@ export const GetSignedProjects = gql`
         suppliers {
           name
           email
-        }
-        components {
-          id
-          name
-          version
-          primary
-          internal
-          purl
-          cpes
-          licenses
         }
       }
     }
@@ -700,7 +684,14 @@ export const GetSignedImageVerion = gql`
 // Get signed product
 
 export const GetProjectInfo = gql`
-  query getProjectInfo($signedParams: String!, $projectId: Uuid!) {
+  query getProjectInfo(
+    $signedParams: String!
+    $projectId: Uuid!
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+  ) {
     project(signedParams: $signedParams, projectId: $projectId) {
       id
       name
@@ -710,9 +701,11 @@ export const GetProjectInfo = gql`
         id
         spec
         specVersion
-        components {
-          primary
-          version
+        components(after: $after, before: $before, first: $first, last: $last) {
+          nodes {
+            primary
+            version
+          }
         }
       }
     }
@@ -724,6 +717,10 @@ export const GetSignedSBOM = gql`
     $projectId: Uuid!
     $sbomId: Uuid!
     $signedParams: String!
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
   ) {
     sbom(projectId: $projectId, sbomId: $sbomId, signedParams: $signedParams) {
       id
@@ -757,23 +754,31 @@ export const GetSignedSBOM = gql`
         email
         updatedAt
       }
-      components {
-        id
-        name
-        version
-        primary
-        internal
-        purl
-        cpes
-        licenses
-        updatedAt
-        uniqueId
-        kind
-        suppliers {
+      components(after: $after, before: $before, first: $first, last: $last) {
+        pageInfo {
+          endCursor
+          hasNextPage
+          startCursor
+          hasPreviousPage
+        }
+        nodes {
           id
           name
-          email
+          version
+          primary
+          internal
+          purl
+          cpes
+          licenses
           updatedAt
+          uniqueId
+          kind
+          suppliers {
+            id
+            name
+            email
+            updatedAt
+          }
         }
       }
     }

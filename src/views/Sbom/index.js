@@ -30,7 +30,7 @@ import {
   ModalBody,
   ModalFooter
 } from '@chakra-ui/react'
-import React, { useState, useRef, useContext } from 'react'
+import React, { useState, useRef, useContext, useEffect } from 'react'
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 import SBOMTable from './components/SBOMTable'
@@ -72,8 +72,6 @@ function SBOM() {
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const [status, setStatus] = useState('Unsigned')
-
   const {
     isOpen: isSBMOpen,
     onOpen: setSBMOpen,
@@ -95,13 +93,37 @@ function SBOM() {
   const { data: sbomData, refetch } = useQuery(GetSBOM, {
     variables: {
       projectId: productId,
-      sbomId: sbomId
+      sbomId: sbomId,
+      first: 10
     }
   })
 
+  const handlePreviousPage = () => {
+    refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      first: undefined,
+      last: 10,
+      before: sbomData.sbom.components.pageInfo.startCursor,
+      after: ''
+    })
+  }
+
+  const handleNextPage = () => {
+    refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      first: 10,
+      last: undefined,
+      after: sbomData.sbom.components.pageInfo.endCursor,
+      before: ''
+    })
+  }
+
   const { data } = useQuery(GetProject, {
     variables: {
-      id: productId
+      id: productId,
+      first: 10
     }
   })
 
@@ -114,25 +136,24 @@ function SBOM() {
   //   }
   // }, [sbomData])
 
-  // useEffect(() => {
-  //   if (data) {
-  //     console.log(`data`, data)
-  //   }
-  // }, [data])
+  const [primaryData, setPrimaryData] = useState(null)
+
+  useEffect(() => {
+    if (data && data.project.sboms.length > 0) {
+      console.log(`data`, data)
+      const sbomV = data.project.sboms.find((sbom) => sbom.id === sbomId)
+      const validData = sbomV.components.nodes.find(
+        (item) => item.primary === true
+      )
+      setPrimaryData(validData)
+    }
+  }, [data])
 
   const uniqVersions = []
 
-  // data &&
-  //   data.project.sboms.map((project) => {
-  //     uniqVersions.push({
-  //       version: project.spec,
-  //       id: project.id
-  //     })
-  //   })
-
   data &&
     data.project.sboms.map((project) => {
-      project.components.map((sbom) => {
+      project.components.nodes.map((sbom) => {
         if (sbom.primary === true) {
           uniqVersions.push({
             version: sbom.version,
@@ -142,32 +163,13 @@ function SBOM() {
       })
     })
 
-  // console.log(`uniqVersions`, uniqVersions)
-
   const allSboms = []
 
   data && data.project.sboms.map((sbom) => allSboms.push(sbom))
 
-  // console.log(`SBOM`, allSboms)
-
   const totalLicenses =
     sbomData &&
-    sbomData.sbom.components.filter((item) => item.licenses.length > 0)
-
-  // console.log(`totalLicenses`, totalLicenses)
-
-  const validSBOMS =
-    sbomData && sbomData.sbom.components.find((com) => com.primary === true)
-
-  // const validSbom = validSBOMS
-
-  // console.log(`validSBOMS`, validSBOMS)
-
-  const invalidSBOMS =
-    sbomData &&
-    sbomData.sbom.components.filter((item) => item.primary === false)
-
-  // console.log(`invalidSBOMS`, invalidSBOMS)
+    sbomData.sbom.components.nodes.filter((item) => item.licenses.length > 0)
 
   const [selectedVersion, setSelectedVersion] = useState('')
 
@@ -212,7 +214,7 @@ function SBOM() {
 
   data &&
     data.project.sboms.map((project) => {
-      project.components.map((sbom) => {
+      project.components.nodes.map((sbom) => {
         if (sbom.primary === true) {
           sbomVersions.push({
             version: sbom.version,
@@ -305,19 +307,8 @@ function SBOM() {
                       />
                       <Flex direction={'column'} gap={1}>
                         <Text fontWeight={'semibold'} fontSize={18}>
-                          {sbomData.sbom.project.name} :{' '}
-                          {validSBOMS
-                            ? validSBOMS.version
-                            : invalidSBOMS &&
-                              invalidSBOMS.length > 0 &&
-                              invalidSBOMS[0].version}
+                          {sbomData.sbom.project.name} : {primaryData?.version}
                         </Text>
-                        {validSBOMS === undefined && (
-                          <Code color={'red.400'} fontSize={'xs'}>
-                            Primary component not exists. <br /> Please create
-                            or update any component as primary before proceed
-                          </Code>
-                        )}
                         <Text fontSize='xs' cursor={'pointer'}>
                           Last updated at : {timeSince(sbomData.sbom.updatedAt)}
                         </Text>
@@ -328,11 +319,13 @@ function SBOM() {
                               variant='outline'
                               colorScheme='blue'
                             >
-                              <TagLabel>{sbomData.sbom.lifecycle}</TagLabel>
+                              <TagLabel textTransform={'capitalize'}>
+                                {sbomData.sbom.lifecycle}
+                              </TagLabel>
                             </Tag>
                           )}
 
-                          {sbomData.sbom.lifecycle !== 'signed' ? (
+                          {/* {sbomData.sbom.lifecycle !== 'signed' ? (
                             <BsFillPatchExclamationFill
                               size={18}
                               color='tomato'
@@ -344,7 +337,7 @@ function SBOM() {
                               color='dodgerblue'
                               cursor={'pointer'}
                             />
-                          )}
+                          )} */}
                         </Flex>
                       </Flex>
                     </Flex>
@@ -393,14 +386,15 @@ function SBOM() {
                       </Tooltip>
 
                       {sbomData.sbom.lifecycle === 'signed' ? (
-                        <Tooltip label='Signature'>
+                        <Tooltip label='Signed'>
                           <IconButton
                             colorScheme='blue'
                             icon={<TbSignature size={22} />}
+                            onClick={setVerifyOpen}
                           ></IconButton>
                         </Tooltip>
                       ) : (
-                        <Tooltip label='Signature'>
+                        <Tooltip label='Unsigned'>
                           <IconButton
                             colorScheme='blue'
                             icon={<TbSignatureOff size={22} />}
@@ -411,6 +405,7 @@ function SBOM() {
 
                       <Tooltip label='Edit'>
                         <IconButton
+                          isDisabled={sbomData.sbom.lifecycle === 'signed'}
                           colorScheme='blue'
                           icon={<EditIcon />}
                           onClick={setSBMOpen}
@@ -463,7 +458,9 @@ function SBOM() {
               ]}
               data={sbomData.sbom}
               refetch={refetch}
-              versionName={validSBOMS?.version}
+              versionName={primaryData?.version}
+              handlePreviousPage={handlePreviousPage}
+              handleNextPage={handleNextPage}
             />
           )}
         </Flex>
@@ -498,6 +495,7 @@ function SBOM() {
             refetch={refetch}
             isOpen={isVerifyOpen}
             onClose={setVerifyClose}
+            sbomData={sbomData}
           />
         )}
 

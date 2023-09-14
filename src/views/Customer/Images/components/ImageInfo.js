@@ -22,13 +22,7 @@ import Card from 'components/Card/Card.js'
 import CardHeader from 'components/Card/CardHeader'
 import CardBody from 'components/Card/CardBody.js'
 import { sbom } from 'variables/general'
-import {
-  FaCubes,
-  FaBug,
-  FaLayerGroup,
-  FaMicroscope,
-  FaExclamationTriangle
-} from 'react-icons/fa'
+import { FaCubes, FaLayerGroup, FaMicroscope } from 'react-icons/fa'
 import { useLocation, useHistory } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
 
@@ -40,14 +34,13 @@ import { getAllScanners } from 'graphQL/Queries'
 import { timeSince } from 'utils'
 import { formattedTime } from 'utils'
 import { dateTime } from 'utils'
-import SBOMTable from 'views/Dashboard/SBOMs/components/SBOMTable'
 import Cookies from 'js-cookie'
 import ImageLogs from './ImageLogs'
 
 function ImageInfo() {
   const [scanResults, setScanResults] = useState(null)
 
-  const { setTabIndex, scanEnabled } = useContext(GlobalContext)
+  const { scanEnabled } = useContext(GlobalContext)
 
   const location = useLocation()
   const history = useHistory()
@@ -89,11 +82,11 @@ function ImageInfo() {
     variables: { signedParams: signedParams, imageId: imageId }
   })
 
-  useEffect(() => {
-    if (imageData) {
-      console.log(`image data`, imageData)
-    }
-  }, [imageData])
+  // useEffect(() => {
+  //   if (imageData) {
+  //     console.log(`image data`, imageData)
+  //   }
+  // }, [imageData])
 
   const { data: allScanners } = useQuery(getAllScanners)
 
@@ -119,7 +112,7 @@ function ImageInfo() {
 
   useEffect(() => {
     if (imageVersionData) {
-      console.log('imageVersionData', imageVersionData)
+      // console.log('imageVersionData', imageVersionData)
       setSelectedVersion(imageVersionData.imageVersion.id)
       setScannerRun(imageVersionData.imageVersion.imageScannerRun)
       setScanResults(imageVersionData.imageVersion)
@@ -154,7 +147,7 @@ function ImageInfo() {
 
   useEffect(() => {
     if (imageData) {
-      console.log(`imageData`, imageData)
+      // console.log(`imageData`, imageData)
       const clonedImageVersions = imageData.image.imageVersions.map((info) => ({
         ...info
       }))
@@ -192,9 +185,6 @@ function ImageInfo() {
     queryParams.set('v', value)
     history.push(`/customer/images?v=${value}&id=${imageId}`)
   }
-
-  const uniqProjects = []
-  const btnRef = React.useRef()
 
   const sortSBOM = sbom.sort((a, b) => a.component.localeCompare(b.component))
 

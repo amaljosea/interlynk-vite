@@ -83,19 +83,19 @@ function ProductVersionsRow(props) {
 
   // console.log(`sbomId`, sbomId)
 
-  const uniqVersions = []
+  // const uniqVersions = []
 
-  sbomId &&
-    sbomId.map((project) => {
-      project.components.map((sbom) => {
-        if (sbom.primary === true) {
-          uniqVersions.push({
-            version: sbom.version,
-            id: project.id
-          })
-        }
-      })
-    })
+  // sbomId &&
+  //   sbomId.map((project) => {
+  //     project.components.nodes.map((sbom) => {
+  //       if (sbom.primary === true) {
+  //         uniqVersions.push({
+  //           version: sbom.version,
+  //           id: project.id
+  //         })
+  //       }
+  //     })
+  //   })
 
   return (
     <>

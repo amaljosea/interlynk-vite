@@ -20,7 +20,14 @@ import {
 import { signSbom } from 'graphQL/Mutation'
 import { useState } from 'react'
 
-const SigningModal = ({ isOpen, onClose, sbomId, projectId, refetch }) => {
+const SigningModal = ({
+  isOpen,
+  onClose,
+  sbomId,
+  projectId,
+  refetch,
+  sbomData
+}) => {
   const [algorithm, setAlgorithm] = useState('')
   const [certificate, setCertificate] = useState('')
   const [spdxSign, setSpdxSign] = useState('')
@@ -65,7 +72,9 @@ const SigningModal = ({ isOpen, onClose, sbomId, projectId, refetch }) => {
         <ModalOverlay />
         <form onSubmit={message === '' ? handleSave : handleSubmit}>
           <ModalContent>
-            <ModalHeader>SBOM Signing</ModalHeader>
+            <ModalHeader>
+              {sbomData.sbom.lifecycle === 'signed' ? 'Unsign' : 'Sign'} SBOM
+            </ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               <Flex width={'100%'} direction={'column'} gap={4}>
@@ -132,7 +141,9 @@ const SigningModal = ({ isOpen, onClose, sbomId, projectId, refetch }) => {
               </Button>
               {message === '' ? (
                 <Button colorScheme='blue' type='submit'>
-                  Validate and Sign
+                  {sbomData.sbom.lifecycle === 'signed'
+                    ? 'Unsign'
+                    : 'Validate and Sign'}
                 </Button>
               ) : (
                 <Button colorScheme='blue' type={'submit'}>
