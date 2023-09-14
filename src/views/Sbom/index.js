@@ -325,7 +325,7 @@ function SBOM() {
                             </Tag>
                           )}
 
-                          {sbomData.sbom.lifecycle !== 'signed' ? (
+                          {/* {sbomData.sbom.lifecycle !== 'signed' ? (
                             <BsFillPatchExclamationFill
                               size={18}
                               color='tomato'
@@ -337,7 +337,7 @@ function SBOM() {
                               color='dodgerblue'
                               cursor={'pointer'}
                             />
-                          )}
+                          )} */}
                         </Flex>
                       </Flex>
                     </Flex>
