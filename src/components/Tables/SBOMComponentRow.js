@@ -39,8 +39,6 @@ function SBOMComponentRow(props) {
   } = props
   const location = useLocation()
 
-  
-
   const customerView = location.pathname.startsWith('/customer')
 
   const compBtn = useRef(null)
@@ -75,14 +73,7 @@ function SBOMComponentRow(props) {
       </Td>
       <Td>{purl}</Td>
       <Td>{suppliers.length > 0 && suppliers[0].name}</Td>
-      <Td>
-        {licenses.length > 0 &&
-          licenses.map((item, i) => (
-            <Flex gap={2} alignItems={'center'} key={i}>
-              <Text>{item}</Text>
-            </Flex>
-          ))}
-      </Td>
+      <Td>{licenses.join(', ')}</Td>
       <Td>
         <Box>{timeSince(updatedAt)}</Box>
       </Td>

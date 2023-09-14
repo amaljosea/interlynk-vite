@@ -122,40 +122,36 @@ function ProductSbomDrawer(props) {
   }
 
   const handleSave = async () => {
-    if (spec) {
-      try {
-        await createSbom({
-          variables: {
-            projectId: projectId,
-            spec: 'cyclonedx',
-            specVersion: '1.4',
-            format: compType,
-            licenses: imgIds,
-            cpes: cpeList,
-            purl: purlValue
-          }
-        })
-          .then((res) => {
-            console.log(`res`, res)
-            handleCreateComp(res.data.sbomCreate.sbom.id)
-          })
-          .finally(() => {
-            refetch({
-              first: 10
-            })
-            onClose()
-          })
-      } catch (error) {
-        console.error('Mutation error:', error)
-      }
-    } else {
-      toast({
-        title: `Input fields required`,
-        status: 'error',
-        position: 'top-right',
-        isClosable: true,
-        duration: 2000
+    try {
+      await createSbom({
+        variables: {
+          projectId: projectId,
+          spec: 'cyclonedx',
+          specVersion: '1.4',
+          format: compType,
+          licenses: imgIds,
+          cpes: cpeList,
+          purl: purlValue
+        }
       })
+        .then((res) => {
+          console.log(`res`, res)
+          handleCreateComp(res.data.sbomCreate.sbom.id)
+        })
+        .finally(() => {
+          refetch({
+            first: 10
+          })
+          onClose()
+          toast({
+            description: 'SBOM added successfully',
+            status: 'success',
+            position: 'top',
+            duration: 3000
+          })
+        })
+    } catch (error) {
+      console.error('Mutation error:', error)
     }
   }
 
@@ -177,6 +173,12 @@ function ProductSbomDrawer(props) {
           sbomId: sbomId
         })
         onClose()
+        toast({
+          description: 'SBOM updated successfully',
+          status: 'success',
+          position: 'top',
+          duration: 3000
+        })
       })
     } catch (error) {
       console.error('Mutation error:', error)

@@ -18,7 +18,8 @@ import {
   ApolloClient,
   InMemoryCache,
   ApolloProvider,
-  createHttpLink
+  createHttpLink,
+  ApolloLink
 } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
 import Cookies from 'js-cookie'
@@ -86,7 +87,7 @@ export default function Customer(props) {
     }
   })
   const client = new ApolloClient({
-    link: authLink.concat(uploadLink).concat(httpLink),
+    link: ApolloLink.from([authLink, uploadLink]),
     cache: new InMemoryCache()
   })
 

@@ -1,40 +1,21 @@
 // Chakra imports
 import {
   Flex,
-  Heading,
   Spacer,
   Icon,
   Grid,
   GridItem,
   Text,
-  Tag,
-  TagLabel,
   Select,
-  IconButton,
-  useDisclosure,
-  Code,
-  Table,
-  Thead,
-  Tr,
-  Th,
-  Box,
-  Tbody,
-  Td
+  useDisclosure
 } from '@chakra-ui/react'
 import React, { useState, useEffect, useRef, useContext } from 'react'
-import {
-  FaBalanceScale,
-  FaCubes,
-  FaLayerGroup,
-  FaFileDownload
-} from 'react-icons/fa'
+import { FaBalanceScale, FaCubes, FaLayerGroup } from 'react-icons/fa'
 import { useLocation, useHistory } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
 import { useQuery } from '@apollo/client'
 import { GetSignedSBOM, GetProjectInfo } from 'graphQL/Queries'
 import { timeSince } from 'utils'
-import { BsFillPatchExclamationFill } from 'react-icons/bs'
-import { MdVerified } from 'react-icons/md'
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import SBOMStatistics from 'views/Sbom/components/SBOMStatistics'
@@ -43,11 +24,8 @@ import DownloadModal from 'views/Sbom/components/DownloadModal'
 import Cookies from 'js-cookie'
 
 function ProductInfo() {
-  const { productVersionsData } = useContext(GlobalContext)
-
   const initialRef = useRef(null)
   const finalRef = useRef(null)
-  const btnRef = useRef()
 
   const location = useLocation()
   const history = useHistory()
@@ -61,15 +39,38 @@ function ProductInfo() {
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const [status, setStatus] = useState('Unsigned')
-
   const { data: sbomData, refetch } = useQuery(GetSignedSBOM, {
     variables: {
       projectId: productId,
       sbomId: sbomId,
-      signedParams: signedParams
+      signedParams: signedParams,
+      first: 10
     }
   })
+
+  const handlePreviousPage = () => {
+    refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      signedParams: signedParams,
+      first: undefined,
+      last: 10,
+      before: sbomData.sbom.components.pageInfo.startCursor,
+      after: ''
+    })
+  }
+
+  const handleNextPage = () => {
+    refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      signedParams: signedParams,
+      first: 10,
+      last: undefined,
+      after: sbomData.sbom.components.pageInfo.endCursor,
+      before: ''
+    })
+  }
 
   const { data } = useQuery(GetProjectInfo, {
     variables: {
@@ -85,10 +86,15 @@ function ProductInfo() {
     }
   }, [sbomData])
 
+  const [primaryData, setPrimaryData] = useState(null)
+
   useEffect(() => {
-    if (data) {
-      // console.log(`data`, data)
-      data.project.sboms.map((sbom) => console.log(`SBOM`, sbom))
+    if (data && data.project.sboms.length > 0) {
+      const sbomV = data.project.sboms.find((sbom) => sbom.id === sbomId)
+      const validData = sbomV.components.nodes.find(
+        (item) => item.primary === true
+      )
+      setPrimaryData(validData)
     }
   }, [data])
 
@@ -96,7 +102,7 @@ function ProductInfo() {
 
   data &&
     data.project.sboms.map((project) => {
-      project.components.map((sbom) => {
+      project.components.nodes.map((sbom) => {
         if (sbom.primary === true) {
           uniqVersions.push({
             version: sbom.version,
@@ -115,22 +121,7 @@ function ProductInfo() {
 
   const totalLicenses =
     sbomData &&
-    sbomData.sbom.components.filter((item) => item.licenses.length > 0)
-
-  // console.log(`totalLicenses`, totalLicenses)
-
-  const validSBOMS =
-    sbomData && sbomData.sbom.components.find((com) => com.primary === true)
-
-  // const validSbom = validSBOMS
-
-  // console.log(`validSBOMS`, validSBOMS)
-
-  const invalidSBOMS =
-    sbomData &&
-    sbomData.sbom.components.filter((item) => item.primary === false)
-
-  // console.log(`invalidSBOMS`, invalidSBOMS)
+    sbomData.sbom.components.nodes.filter((item) => item.licenses.length > 0)
 
   const [selectedVersion, setSelectedVersion] = useState('')
 
@@ -159,7 +150,7 @@ function ProductInfo() {
 
   data &&
     data.project.sboms.map((project) => {
-      project.components.map((sbom) => {
+      project.components.nodes.map((sbom) => {
         if (sbom.primary === true) {
           sbomVersions.push({
             version: sbom.version,
@@ -195,20 +186,9 @@ function ProductInfo() {
                           flexDirection={'row'}
                           gap={3}
                         >
-                          {sbomData.sbom.project.name} :{' '}
-                          {validSBOMS
-                            ? validSBOMS.version
-                            : invalidSBOMS &&
-                              invalidSBOMS.length > 0 &&
-                              invalidSBOMS[0].version}
+                          {sbomData.sbom.project.name} : {primaryData?.version}
                         </Flex>
                       </Text>
-                      {validSBOMS === undefined && (
-                        <Code color={'red.400'} fontSize={'xs'}>
-                          Primary component not exists. <br /> Please create or
-                          update any component as primary before proceed
-                        </Code>
-                      )}
                       <Text fontSize='xs' cursor={'pointer'}>
                         Last updated at : {timeSince(sbomData.sbom.updatedAt)}
                       </Text>
@@ -291,8 +271,9 @@ function ProductInfo() {
             ]}
             data={sbomData.sbom}
             refetch={refetch}
-            versionName={validSBOMS?.version}
-            status={status}
+            versionName={primaryData?.version}
+            handlePreviousPage={handlePreviousPage}
+            handleNextPage={handleNextPage}
           />
         )}
       </Flex>

@@ -5,20 +5,6 @@ import { timeSince } from 'utils'
 function ProductRow(props) {
   const { id, sbomId, name, active, description, updatedAt, isLoading } = props
 
-  const uniqVersions = []
-
-  sbomId &&
-    sbomId.map((project) => {
-      project.components.map((sbom) => {
-        if (sbom.primary === true) {
-          uniqVersions.push({
-            version: sbom.version,
-            id: project.id
-          })
-        }
-      })
-    })
-
   return (
     <>
       <Tr>

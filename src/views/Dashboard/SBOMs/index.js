@@ -73,11 +73,11 @@ function SBOMs() {
     variables: { id: imageId }
   })
 
-  useEffect(() => {
-    if (imageData) {
-      console.log(`image data`, imageData)
-    }
-  }, [imageData])
+  // useEffect(() => {
+  //   if (imageData) {
+  //     console.log(`image data`, imageData)
+  //   }
+  // }, [imageData])
 
   const { data: allScanners } = useQuery(getAllScanners)
 
@@ -97,7 +97,7 @@ function SBOMs() {
 
   useEffect(() => {
     if (imageVersionData) {
-      console.log('imageVersionData', imageVersionData)
+      // console.log('imageVersionData', imageVersionData)
       setSelectedVersion(imageVersionData.imageVersion.id)
       setScannerRun(imageVersionData.imageVersion.imageScannerRun)
       setScanResults(imageVersionData.imageVersion)
@@ -128,7 +128,7 @@ function SBOMs() {
 
   useEffect(() => {
     if (imageData) {
-      console.log(`imageData`, imageData)
+      // console.log(`imageData`, imageData)
       const clonedImageVersions = imageData.image.imageVersions.map((info) => ({
         ...info
       }))

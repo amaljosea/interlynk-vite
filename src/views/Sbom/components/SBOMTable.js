@@ -27,7 +27,13 @@ import CardHeader from 'components/Card/CardHeader'
 import { AddIcon } from '@chakra-ui/icons'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 
-const SBOMTable = ({ captions, data, refetch }) => {
+const SBOMTable = ({
+  captions,
+  data,
+  refetch,
+  handlePreviousPage,
+  handleNextPage
+}) => {
   const textColor = useColorModeValue('gray.700', 'white')
 
   const location = useLocation()
@@ -124,7 +130,7 @@ const SBOMTable = ({ captions, data, refetch }) => {
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {data.components.map((row, index) => {
+                    {data.components.nodes.map((row, index) => {
                       return (
                         <SBOMComponentRow
                           key={index}
@@ -149,6 +155,31 @@ const SBOMTable = ({ captions, data, refetch }) => {
                   </Tbody>
                 </Table>
               </CardBody>
+
+              {data && (
+                <Flex
+                  flexDir={'row'}
+                  gap={4}
+                  alignItems={'center'}
+                  mt={6}
+                  justifyContent={'flex-start'}
+                >
+                  <Button
+                    colorScheme='blue'
+                    onClick={handlePreviousPage}
+                    isDisabled={!data.components.pageInfo.hasPreviousPage}
+                  >
+                    Previous
+                  </Button>
+                  <Button
+                    colorScheme='blue'
+                    onClick={handleNextPage}
+                    isDisabled={!data.components.pageInfo.hasNextPage}
+                  >
+                    Next
+                  </Button>
+                </Flex>
+              )}
             </TabPanel>
           </TabPanels>
         </Tabs>

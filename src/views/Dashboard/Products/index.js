@@ -226,7 +226,7 @@ function Index() {
               {error && (
                 <Flex my={10} alignItems={'center'} justifyContent={'center'}>
                   <Text textAlign={'center'} fontSize={14}>
-                    {error.message}
+                    Internal error occured. Please retry in few minutes.
                   </Text>
                 </Flex>
               )}
