@@ -106,18 +106,33 @@ function ProductInfo() {
         if (sbom.primary === true) {
           uniqVersions.push({
             version: sbom.version,
-            id: project.id
+            id: project.id,
+            updatedAt: project.updatedAt
           })
         }
       })
     })
-  // console.log(`uniqVersions`, uniqVersions)
 
-  const allSboms = []
+  // remove duplicates
+  const removeDuplicatesAndLatest = (arr) => {
+    const uniqueVersions = {}
 
-  data && data.project.sboms.map((sbom) => allSboms.push(sbom))
+    for (const item of arr) {
+      if (
+        !uniqueVersions[item.version] ||
+        item.updatedAt > uniqueVersions[item.version].updatedAt
+      ) {
+        uniqueVersions[item.version] = item
+      }
+    }
 
-  // console.log(`SBOM`, allSboms)
+    return Object.values(uniqueVersions)
+  }
+
+  const filteredData =
+    uniqVersions.length > 0 ? removeDuplicatesAndLatest(uniqVersions) : []
+
+  // console.log(`filteredData`, filteredData)
 
   const totalLicenses =
     sbomData &&
@@ -215,8 +230,9 @@ function ProductInfo() {
                         size='md'
                         color='gray.500'
                       >
-                        {uniqVersions.length > 0 &&
-                          uniqVersions.map((item, index) => (
+                        {filteredData &&
+                          filteredData.length > 0 &&
+                          filteredData.map((item, index) => (
                             <option
                               key={index}
                               value={item.id}

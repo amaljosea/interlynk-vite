@@ -3,7 +3,40 @@ import { Link } from 'react-router-dom'
 import { timeSince } from 'utils'
 
 function ProductRow(props) {
-  const { id, sbomId, name, active, description, updatedAt, isLoading } = props
+  const { id, sbomId, name, description, updatedAt, isLoading } = props
+
+  const uniqVersions = []
+
+  sbomId &&
+    sbomId.map((project) => {
+      project.components.nodes.map((sbom) => {
+        if (sbom.primary === true) {
+          uniqVersions.push({
+            version: sbom.version,
+            id: project.id,
+            updatedAt: project.updatedAt
+          })
+        }
+      })
+    })
+
+  const removeDuplicatesAndLatest = (arr) => {
+    const uniqueVersions = {}
+
+    for (const item of arr) {
+      if (
+        !uniqueVersions[item.version] ||
+        item.updatedAt > uniqueVersions[item.version].updatedAt
+      ) {
+        uniqueVersions[item.version] = item
+      }
+    }
+
+    return Object.values(uniqueVersions)
+  }
+
+  const filteredData =
+    uniqVersions.length > 0 ? removeDuplicatesAndLatest(uniqVersions) : []
 
   return (
     <>
@@ -20,7 +53,9 @@ function ProductRow(props) {
             <Skeleton height='20px' />
           ) : sbomId.length > 0 ? (
             <Link
-              to={`/customer/products?p=${id}&sbom=${sbomId[0].id}`}
+              to={`/customer/products?p=${id}&sbom=${
+                filteredData.length > 0 ? filteredData[0].id : sbomId[0].id
+              }`}
               onClick={() => {
                 window.localStorage.setItem('product', name)
               }}
@@ -44,7 +79,7 @@ function ProductRow(props) {
           {isLoading ? (
             <Skeleton height='20px' />
           ) : (
-            <Text>{sbomId.length}</Text>
+            <Text>{filteredData?.length}</Text>
           )}
         </Td>
         <Td pl={0}>{isLoading ? <Skeleton height='20px' /> : description}</Td>

@@ -10,7 +10,10 @@ import {
   MenuButton,
   Portal,
   MenuList,
-  MenuItem
+  MenuItem,
+  Stack,
+  Tag,
+  TagLabel
 } from '@chakra-ui/react'
 import { useEffect, useState, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
@@ -66,7 +69,18 @@ function SBOMComponentRow(props) {
   return (
     <Tr>
       <Td pl='0px'>
-        <Box py='.8rem'>{component}</Box>
+        <Stack py='.8rem'>
+          <Text>{component}</Text>
+          {primary ? (
+            <Tag width={'fit-content'} size={'sm'} variant='subtle' colorScheme='blue'>
+              <TagLabel textTransform={'capitalize'}>Primary</TagLabel>
+            </Tag>
+          ) : (
+            <Tag width={'fit-content'} size={'sm'} variant='outline' colorScheme='blue'>
+              <TagLabel textTransform={'capitalize'}>Internal</TagLabel>
+            </Tag>
+          )}
+        </Stack>
       </Td>
       <Td>
         <Box>{version}</Box>

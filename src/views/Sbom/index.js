@@ -98,6 +98,12 @@ function SBOM() {
     }
   })
 
+  useEffect(() => {
+    if (sbomData) {
+      console.log(`sbomData`, sbomData.sbom)
+    }
+  }, [sbomData])
+
   const handlePreviousPage = () => {
     refetch({
       projectId: productId,
@@ -129,13 +135,6 @@ function SBOM() {
 
   const [deleteSbom] = useMutation(sbomDelete)
 
-  // useEffect(() => {
-  //   if (sbomData) {
-  //     console.log(`SBOM Data`, sbomData)
-  //     window.localStorage.setItem('product', sbomData.sbom.project.name)
-  //   }
-  // }, [sbomData])
-
   const [primaryData, setPrimaryData] = useState(null)
 
   useEffect(() => {
@@ -157,15 +156,34 @@ function SBOM() {
         if (sbom.primary === true) {
           uniqVersions.push({
             version: sbom.version,
-            id: project.id
+            id: project.id,
+            updatedAt: project.updatedAt
           })
         }
       })
     })
 
-  const allSboms = []
+  // remove duplicates
+  const removeDuplicatesAndLatest = (arr) => {
+    const uniqueVersions = {}
 
-  data && data.project.sboms.map((sbom) => allSboms.push(sbom))
+    for (const item of arr) {
+      if (
+        !uniqueVersions[item.version] ||
+        item.updatedAt > uniqueVersions[item.version].updatedAt
+      ) {
+        uniqueVersions[item.version] = item
+      }
+    }
+
+    return Object.values(uniqueVersions)
+  }
+
+  const filteredData = uniqVersions
+    ? removeDuplicatesAndLatest(uniqVersions)
+    : []
+
+  // console.log(`filteredData`, filteredData)
 
   const totalLicenses =
     sbomData &&
@@ -309,6 +327,12 @@ function SBOM() {
                         <Text fontWeight={'semibold'} fontSize={18}>
                           {sbomData.sbom.project.name} : {primaryData?.version}
                         </Text>
+                        {/* {!primaryData && (
+                          <Code color={'red.400'} fontSize={'xs'}>
+                            Primary component not exists. <br /> Please create
+                            or update any component as primary before proceed
+                          </Code>
+                        )} */}
                         <Text fontSize='xs' cursor={'pointer'}>
                           Last updated at : {timeSince(sbomData.sbom.updatedAt)}
                         </Text>
@@ -361,10 +385,9 @@ function SBOM() {
                           onChange={handleSBOMChange}
                           size='md'
                           color='gray.500'
-                          textTransform={'lowercase'}
                         >
-                          {uniqVersions.length > 0 &&
-                            uniqVersions.map((item, index) => (
+                          {filteredData && filteredData.length > 0 ? (
+                            filteredData.map((item, index) => (
                               <option
                                 key={index}
                                 value={item.id}
@@ -372,17 +395,20 @@ function SBOM() {
                               >
                                 {item.version}
                               </option>
-                            ))}
+                            ))
+                          ) : (
+                            <option value=''>-- --</option>
+                          )}
                         </Select>
                       </Flex>
 
-                      <Tooltip label='Download'>
+                      <Tooltip label='Edit'>
                         <IconButton
-                          icon={<FaFileDownload />}
-                          onClick={onOpen}
-                          size='md'
+                          isDisabled={sbomData.sbom.lifecycle === 'signed'}
                           colorScheme='blue'
-                        />
+                          icon={<EditIcon />}
+                          onClick={setSBMOpen}
+                        ></IconButton>
                       </Tooltip>
 
                       {sbomData.sbom.lifecycle === 'signed' ? (
@@ -403,13 +429,13 @@ function SBOM() {
                         </Tooltip>
                       )}
 
-                      <Tooltip label='Edit'>
+                      <Tooltip label='Download'>
                         <IconButton
-                          isDisabled={sbomData.sbom.lifecycle === 'signed'}
+                          icon={<FaFileDownload />}
+                          onClick={onOpen}
+                          size='md'
                           colorScheme='blue'
-                          icon={<EditIcon />}
-                          onClick={setSBMOpen}
-                        ></IconButton>
+                        />
                       </Tooltip>
 
                       <Tooltip label='Delete'>

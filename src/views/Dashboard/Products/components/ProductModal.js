@@ -26,6 +26,7 @@ const ProductModal = ({
   isOpen,
   onClose,
   product,
+  type,
   vendorName,
   description,
   allProjects
@@ -43,7 +44,8 @@ const ProductModal = ({
     setProductName(product)
     setProductDesc(description)
     setVendor(vendorName)
-  }, [isOpen])
+    setKind(type)
+  }, [id])
 
   const [error, setError] = useState('')
 
@@ -125,25 +127,28 @@ const ProductModal = ({
                     placeholder='Enter product description'
                   />
                 </FormControl>
-                <FormControl>
-                  <FormLabel>Type</FormLabel>
-                  <Select
-                    id='type'
-                    name='type'
-                    value={kind}
-                    onChange={(e) => setKind(e.target.value)}
-                  >
-                    <option value=''>-- Select --</option>
-                    <option value='unknown'>Unknown</option>
-                    <option value='library'>Library</option>
-                    <option value='operating_system'>Operating system</option>
-                    <option value='firmware'>Firmware</option>
-                    <option value='file'>File</option>
-                    <option value='device'>Device</option>
-                    <option value='container'>Container</option>
-                    <option value='framework'>Framework</option>
-                  </Select>
-                </FormControl>
+                {id && (
+                  <FormControl pointerEvents={'none'}>
+                    <FormLabel>Type</FormLabel>
+                    <Select
+                      id='type'
+                      name='type'
+                      value={kind}
+                      onChange={(e) => setKind(e.target.value)}
+                    >
+                      <option value=''>-- Select --</option>
+                      <option value='unknown'>Unknown</option>
+                      {/* <option value='json'>JSON</option> */}
+                      <option value='library'>Library</option>
+                      <option value='operating_system'>Operating system</option>
+                      <option value='firmware'>Firmware</option>
+                      <option value='file'>File</option>
+                      <option value='device'>Device</option>
+                      <option value='container'>Container</option>
+                      <option value='framework'>Framework</option>
+                    </Select>
+                  </FormControl>
+                )}
                 <FormControl display='none'>
                   <FormLabel>Vendor</FormLabel>
                   <Input
