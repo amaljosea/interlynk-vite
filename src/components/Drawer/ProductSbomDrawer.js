@@ -23,7 +23,8 @@ import {
   Tag,
   Code,
   useToast,
-  Checkbox
+  Checkbox,
+  Textarea
 } from '@chakra-ui/react'
 import { useMutation } from '@apollo/client'
 import { useLocation } from 'react-router-dom'
@@ -32,13 +33,24 @@ import MultiSelect from 'react-select'
 import { sbomCreate, sbomUpdate } from 'graphQL/Mutation'
 import { CreateComponent } from 'graphQL/Mutation'
 
+import { PackageURL } from 'packageurl-js'
+
 function ProductSbomDrawer(props) {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const toast = useToast()
   const sbomId = queryParams.get('sbom')
 
-  const { projectId, name, isOpen, onClose, btnRef, refetch, sbomData } = props
+  const {
+    projectId,
+    name,
+    isOpen,
+    onClose,
+    btnRef,
+    refetch,
+    sbomData,
+    type
+  } = props
 
   const [createSbom] = useMutation(sbomCreate)
   const [updateSbom] = useMutation(sbomUpdate)
@@ -50,7 +62,7 @@ function ProductSbomDrawer(props) {
   const [version, setVersion] = useState('')
   const [spec, setSpec] = useState('')
   const [specVesion, setSpecVersion] = useState('')
-  const [compType, setCompType] = useState('')
+  const [compType, setCompType] = useState(type)
   const [licenseName, setLicenseName] = useState('')
   const [selectedLicense, setSelectedLicense] = useState('')
 
@@ -121,7 +133,7 @@ function ProductSbomDrawer(props) {
     }
   }
 
-  const handleSave = async () => {
+  const handleCreateSBOM = async () => {
     try {
       await createSbom({
         variables: {
@@ -151,11 +163,11 @@ function ProductSbomDrawer(props) {
           })
         })
     } catch (error) {
-      console.error('Mutation error:', error)
+      console.log(`Mutation error `, error)
     }
   }
 
-  const handleUpdate = async () => {
+  const handleUpdateSBOM = async () => {
     try {
       await updateSbom({
         variables: {
@@ -181,7 +193,61 @@ function ProductSbomDrawer(props) {
         })
       })
     } catch (error) {
-      console.error('Mutation error:', error)
+      console.log(`Mutation error `, error)
+    }
+  }
+
+  const handleSave = () => {
+    if (purlValue !== '') {
+      try {
+        const pkg = PackageURL.fromString(purlValue)
+        if (version !== '') {
+          handleCreateSBOM()
+        } else {
+          toast({
+            description: 'Version required',
+            status: 'error',
+            position: 'top',
+            duration: 3000
+          })
+        }
+      } catch (error) {
+        toast({
+          description: error.message,
+          status: 'error',
+          position: 'top',
+          duration: 3000
+        })
+      }
+    } else {
+      if (version !== '') {
+        handleCreateSBOM()
+      } else {
+        toast({
+          description: 'Version required',
+          status: 'error',
+          position: 'top',
+          duration: 3000
+        })
+      }
+    }
+  }
+
+  const handleUpdate = () => {
+    if (purlValue !== '') {
+      try {
+        const pkg = PackageURL.fromString(purlValue)
+        handleUpdateSBOM()
+      } catch (error) {
+        toast({
+          description: error.message,
+          status: 'error',
+          position: 'top',
+          duration: 3000
+        })
+      }
+    } else {
+      handleUpdateSBOM()
     }
   }
 
@@ -208,6 +274,7 @@ function ProductSbomDrawer(props) {
       size='sm'
     >
       <DrawerOverlay />
+
       <DrawerContent>
         <DrawerCloseButton />
         <DrawerHeader borderBottomWidth='1px' color='gray.600'>
@@ -234,7 +301,7 @@ function ProductSbomDrawer(props) {
               </>
             )}
             {/* Format */}
-            <FormControl>
+            <FormControl pointerEvents={'none'}>
               <FormLabel fontSize={'sm'}>Type</FormLabel>
               <Select
                 id='type'
@@ -245,7 +312,7 @@ function ProductSbomDrawer(props) {
               >
                 <option value=''>-- Select --</option>
                 <option value='unknown'>Unknown</option>
-                <option value='json'>JSON</option>
+                {/* <option value='json'>JSON</option> */}
                 <option value='library'>Library</option>
                 <option value='operating_system'>Operating system</option>
                 <option value='firmware'>Firmware</option>
@@ -288,8 +355,9 @@ function ProductSbomDrawer(props) {
             <FormControl>
               <FormLabel fontSize={'sm'}>Identifiers</FormLabel>
               <Stack spacing={2}>
-                <Input
+                <Textarea
                   size='sm'
+                  rows={2}
                   placeholder='PURL'
                   value={purlValue}
                   onChange={(e) => setPurlValue(e.target.value)}

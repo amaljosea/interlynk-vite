@@ -29,7 +29,8 @@ import {
   TagLabel,
   Tag,
   Code,
-  useToast
+  useToast,
+  Textarea
 } from '@chakra-ui/react'
 import { useMutation } from '@apollo/client'
 import { CreateComponent } from 'graphQL/Mutation'
@@ -38,6 +39,8 @@ import { useLocation } from 'react-router-dom'
 import { licenseOptions } from 'variables/licenses'
 import MultiSelect from 'react-select'
 import { timeSince } from 'utils'
+
+import { PackageURL } from 'packageurl-js'
 
 function ComponentDrawer(props) {
   const location = useLocation()
@@ -113,6 +116,8 @@ function ComponentDrawer(props) {
         }
       })
       setLicenseList(data)
+      const selectedIds = data.map((option) => option.value) // Extracting IDs
+      setSelectedLicenses(selectedIds)
     }
   }, [license])
 
@@ -122,7 +127,7 @@ function ComponentDrawer(props) {
     setSelectedLicenses(selectedIds)
   }
 
-  const handleSave = async () => {
+  const handleCreateCom = async () => {
     if (compName && compType) {
       try {
         await createComponent({
@@ -158,7 +163,7 @@ function ComponentDrawer(props) {
     }
   }
 
-  const handleUpdate = async () => {
+  const handleUpdateCom = async () => {
     try {
       await updateComponent({
         variables: {
@@ -181,6 +186,42 @@ function ComponentDrawer(props) {
       })
     } catch (error) {
       console.error('Mutation error:', error)
+    }
+  }
+
+  const handleSave = async () => {
+    if (purlValue !== '') {
+      try {
+        const pkg = PackageURL.fromString(purlValue)
+        handleCreateCom()
+      } catch (error) {
+        toast({
+          description: error.message,
+          status: 'error',
+          position: 'top',
+          duration: 3000
+        })
+      }
+    } else {
+      handleCreateCom()
+    }
+  }
+
+  const handleUpdate = async () => {
+    if (purlValue !== '') {
+      try {
+        const pkg = PackageURL.fromString(purlValue)
+        handleUpdateCom()
+      } catch (error) {
+        toast({
+          description: error.message,
+          status: 'error',
+          position: 'top',
+          duration: 3000
+        })
+      }
+    } else {
+      handleUpdateCom()
     }
   }
 
@@ -245,6 +286,7 @@ function ComponentDrawer(props) {
               >
                 <option value=''>-- Select --</option>
                 <option value='unknown'>Unknown</option>
+                {/* <option value='json'>JSON</option> */}
                 <option value='library'>Library</option>
                 <option value='operating_system'>Operating system</option>
                 <option value='firmware'>Firmware</option>
@@ -316,7 +358,8 @@ function ComponentDrawer(props) {
             <FormControl isReadOnly={customerView}>
               <FormLabel fontSize={'sm'}>Identifiers</FormLabel>
               <Stack spacing={2}>
-                <Input
+                <Textarea
+                  rows={4}
                   size='sm'
                   placeholder='PURL'
                   value={purlValue}

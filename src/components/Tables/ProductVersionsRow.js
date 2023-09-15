@@ -31,6 +31,7 @@ import { useMutation } from '@apollo/client'
 import { DeleteProject } from 'graphQL/Mutation'
 import { timeSince } from 'utils'
 import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
+import { useEffect } from 'react'
 
 function ProductVersionsRow(props) {
   const [projectDelete] = useMutation(DeleteProject)
@@ -39,7 +40,6 @@ function ProductVersionsRow(props) {
     id,
     sbomId,
     name,
-    active,
     description,
     updatedAt,
     vendor,
@@ -81,21 +81,45 @@ function ProductVersionsRow(props) {
     }
   }
 
-  // console.log(`sbomId`, sbomId)
+  const uniqVersions = []
 
-  // const uniqVersions = []
+  sbomId &&
+    sbomId.map((project) => {
+      project.components.nodes.map((sbom) => {
+        if (sbom.primary === true) {
+          uniqVersions.push({
+            version: sbom.version,
+            id: project.id,
+            updatedAt: project.updatedAt
+          })
+        }
+      })
+    })
 
-  // sbomId &&
-  //   sbomId.map((project) => {
-  //     project.components.nodes.map((sbom) => {
-  //       if (sbom.primary === true) {
-  //         uniqVersions.push({
-  //           version: sbom.version,
-  //           id: project.id
-  //         })
-  //       }
-  //     })
-  //   })
+  const removeDuplicatesAndLatest = (arr) => {
+    const uniqueVersions = {}
+
+    for (const item of arr) {
+      if (
+        !uniqueVersions[item.version] ||
+        item.updatedAt > uniqueVersions[item.version].updatedAt
+      ) {
+        uniqueVersions[item.version] = item
+      }
+    }
+
+    return Object.values(uniqueVersions)
+  }
+
+  const filteredData = uniqVersions
+    ? removeDuplicatesAndLatest(uniqVersions)
+    : []
+
+  // useEffect(() => {
+  //   if (filteredData.length > 0) {
+  //     console.log(`filteredData`, filteredData)
+  //   }
+  // }, [filteredData])
 
   return (
     <>
@@ -112,7 +136,9 @@ function ProductVersionsRow(props) {
             <Skeleton height='20px' />
           ) : sbomId.length > 0 ? (
             <Link
-              to={`/vendor/products?p=${id}&sbom=${sbomId[0].id}`}
+              to={`/vendor/products?p=${id}&sbom=${
+                filteredData.length > 0 ? filteredData[0].id : sbomId[0].id
+              }`}
               onClick={() => {
                 window.localStorage.setItem('product', name)
               }}
@@ -129,7 +155,7 @@ function ProductVersionsRow(props) {
           {isLoading ? (
             <Skeleton height='20px' />
           ) : (
-            <Text>{sbomId.length}</Text>
+            <Text>{filteredData?.length}</Text>
           )}
         </Td>
         <Td pl={0}>{isLoading ? <Skeleton height='20px' /> : description}</Td>
@@ -179,6 +205,7 @@ function ProductVersionsRow(props) {
               description={description}
               vendorName={vendor}
               allProjects={allProjects}
+              type={sbomId.length > 0 && sbomId[0].format}
             />
           )}
 
@@ -191,6 +218,7 @@ function ProductVersionsRow(props) {
               name={name}
               refetch={refetch}
               sbomData={null}
+              type={sbomId.length > 0 && sbomId[0].format}
             />
           )}
 

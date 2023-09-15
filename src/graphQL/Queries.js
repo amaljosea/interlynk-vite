@@ -352,6 +352,19 @@ export const GetProjectData = gql`
         organizationId
         sboms {
           id
+          format
+          updatedAt
+          components(
+            after: $after
+            before: $before
+            first: $first
+            last: $last
+          ) {
+            nodes {
+              primary
+              version
+            }
+          }
         }
       }
     }
@@ -448,6 +461,7 @@ export const GetProject = gql`
         id
         spec
         specVersion
+        updatedAt
         components(after: $after, before: $before, first: $first, last: $last) {
           nodes {
             primary
@@ -511,7 +525,13 @@ export const GetAllShareLynks = gql`
 
 // Customer page - Get All shared products
 export const GetSignedProjects = gql`
-  query getSignedProjects($signedParams: String!) {
+  query getSignedProjects(
+    $signedParams: String!
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+  ) {
     projects(signedParams: $signedParams) {
       id
       description
@@ -519,24 +539,13 @@ export const GetSignedProjects = gql`
       updatedAt
       sboms {
         id
-        cpes
-        spec
-        creationAt
-        specVersion
-        project {
-          id
-        }
-        tools {
-          id
-          name
-        }
-        authors {
-          name
-          email
-        }
-        suppliers {
-          name
-          email
+        format
+        updatedAt
+        components(after: $after, before: $before, first: $first, last: $last) {
+          nodes {
+            primary
+            version
+          }
         }
       }
     }
