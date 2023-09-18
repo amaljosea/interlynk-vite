@@ -69,6 +69,7 @@ const AdvisoryFeeds = ({ data, orgInfo }) => {
                 <Link href='https://nvd.nist.gov/' isExternal key={index}>
                   <Flex align='center' mb='20px'>
                     <Switch
+                      size='md'
                       colorScheme='blue'
                       me='10px'
                       isChecked={activeFeed && activeFeed.value}
@@ -83,7 +84,7 @@ const AdvisoryFeeds = ({ data, orgInfo }) => {
                     />
                     <Text
                       noOfLines={1}
-                      fontSize='md'
+                      fontSize='sm'
                       color='gray.500'
                       fontWeight='400'
                       htmlFor={feed.friendlyName}
