@@ -1,9 +1,9 @@
-import { EditIcon } from '@chakra-ui/icons'
-import { Button, Flex, Icon, Td, Text, Tr } from '@chakra-ui/react'
+import { EditIcon, QuestionIcon } from '@chakra-ui/icons'
+import { Button, Flex, Icon, Td, Text, Tooltip, Tr } from '@chakra-ui/react'
 import { useLocation } from 'react-router-dom'
 import { timeSince } from 'utils'
 
-const GeneralDataRow = ({ onOpen, data, setSelectedKey }) => {
+const GeneralDataRow = ({ onOpen, data, setSelectedKey, status }) => {
   const location = useLocation()
 
   const customerView = location.pathname.startsWith('/customer')
@@ -28,7 +28,12 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey }) => {
     <>
       <Tr>
         <Td pl={0} fontWeight={'medium'}>
-          Creation Tool(s)
+          <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
+            <Text>Creation Tool(s)</Text>
+            <Tooltip label='Creation tools'>
+              <Icon as={QuestionIcon} color={'blue.500'} />
+            </Tooltip>
+          </Flex>
         </Td>
         <Td pl={0}>
           <Flex flexDirection={'column'} alignItems={'flex-start'} gap={2.5}>
@@ -44,7 +49,7 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey }) => {
           {!customerView && (
             <Button
               size='sm'
-              isDisabled={data.lifecycle === 'signed'}
+              isDisabled={status === 'signed'}
               onClick={() => handleClick('tools')}
             >
               <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
@@ -81,7 +86,12 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey }) => {
       </Tr>
       <Tr>
         <Td pl={0} fontWeight={'medium'}>
-          Author(s)
+          <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
+            <Text>Author(s)</Text>
+            <Tooltip label='Authors'>
+              <Icon as={QuestionIcon} color={'blue.500'} />
+            </Tooltip>
+          </Flex>
         </Td>
         <Td pl={0}>
           <Flex flexDirection={'column'} alignItems={'flex-start'} gap={3}>
@@ -98,7 +108,7 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey }) => {
           {!customerView && (
             <Button
               size='sm'
-              isDisabled={data.lifecycle === 'signed'}
+              isDisabled={status === 'signed'}
               onClick={() => handleClick('author')}
             >
               <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
@@ -108,7 +118,12 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey }) => {
       </Tr>
       <Tr>
         <Td pl={0} fontWeight={'medium'}>
-          Supplier(s)
+          <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
+            <Text>Supplier(s)</Text>
+            <Tooltip label='Suppliers'>
+              <Icon as={QuestionIcon} color={'blue.500'} />
+            </Tooltip>
+          </Flex>
         </Td>
         <Td pl={0}>
           <Flex flexDirection={'column'} alignItems={'flex-start'} gap={4}>
@@ -124,7 +139,7 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey }) => {
           {!customerView && (
             <Button
               size='sm'
-              isDisabled={data.lifecycle === 'signed'}
+              isDisabled={status === 'signed'}
               onClick={() => handleClick('supplier')}
             >
               <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />

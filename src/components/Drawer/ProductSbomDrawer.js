@@ -24,7 +24,8 @@ import {
   Code,
   useToast,
   Checkbox,
-  Textarea
+  Textarea,
+  useDisclosure
 } from '@chakra-ui/react'
 import { useMutation } from '@apollo/client'
 import { useLocation } from 'react-router-dom'
@@ -34,6 +35,10 @@ import { sbomCreate, sbomUpdate } from 'graphQL/Mutation'
 import { CreateComponent } from 'graphQL/Mutation'
 
 import { PackageURL } from 'packageurl-js'
+import PurlModal from 'views/Dashboard/Products/components/PurlModal'
+import CpeModal from 'views/Dashboard/Products/components/CpeModal'
+
+const regexPattern = /^cpe:2\.3:[aho]:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+$/
 
 function ProductSbomDrawer(props) {
   const location = useLocation()
@@ -68,7 +73,10 @@ function ProductSbomDrawer(props) {
 
   const [cpeList, setCpeList] = useState([])
   const [cpeValue, setCpeValue] = useState('')
+  const [cpeData, setCpeData] = useState(null)
+  const [selectedCpe, setSelectedCpe] = useState(null)
   const [purlValue, setPurlValue] = useState('')
+  const [purlData, setPurlData] = useState(null)
 
   const [imgIds, setImgIds] = useState([])
   const [licenseList, setLicenseList] = useState([])
@@ -112,6 +120,58 @@ function ProductSbomDrawer(props) {
     setLicenseList(selected)
     const selectedIds = selected.map((option) => option.value) // Extracting IDs
     setImgIds(selectedIds)
+  }
+
+  const {
+    isOpen: isPurlOpen,
+    onOpen: onPurlOpen,
+    onClose: onPurlClose
+  } = useDisclosure()
+
+  const {
+    isOpen: isCpeOpen,
+    onOpen: onCpeOpen,
+    onClose: onCpeClose
+  } = useDisclosure()
+
+  const handlePurlModal = () => {
+    if (purlValue) {
+      const pkg = PackageURL.fromString(purlValue)
+      setPurlData(pkg)
+      onPurlOpen()
+    } else {
+      toast({
+        description: 'Purl value is required!!',
+        status: 'error',
+        duration: 3000,
+        position: 'top'
+      })
+    }
+  }
+
+  const matches = cpeValue.match(regexPattern)
+
+  const handleCpeModal = () => {
+    if (cpeValue !== '' && matches) {
+      // console.log('matches :', matches)
+      const [input] = matches
+      const components = input.split(':')
+      console.log(`components`, components)
+      setCpeData({
+        vendor: components[3],
+        product: components[4],
+        version: components[5],
+        targetHardware: '*'
+      })
+      onCpeOpen()
+    } else {
+      toast({
+        description: 'CPE value is required!!',
+        status: 'error',
+        duration: 3000,
+        position: 'top'
+      })
+    }
   }
 
   const handleCreateComp = (id) => {
@@ -258,114 +318,164 @@ function ProductSbomDrawer(props) {
     }
   }
 
+  const handleCreateCpe = (string) => {
+    const cpeItem = cpeList.find((item) => item === string)
+    if (cpeItem) {
+      toast({
+        description: 'CPE already exists',
+        status: 'error',
+        position: 'top',
+        duration: 3000
+      })
+    } else {
+      setCpeList([...cpeList, string])
+      setCpeValue('')
+      setSelectedCpe(null)
+    }
+  }
+
+  const handleUpdateCpe = (string, id) => {
+    const cpeItem = cpeList.find((item) => item === string)
+    if (cpeItem) {
+      toast({
+        description: 'CPE already exists',
+        status: 'error',
+        position: 'top',
+        duration: 3000
+      })
+    } else if (cpeList.find((item, index) => index === id)) {
+      const updatedData = cpeList.map((item, index) => {
+        if (index === id) {
+          return string
+        }
+        return item
+      })
+      setCpeList(updatedData)
+      setCpeValue('')
+      setSelectedCpe(null)
+    }
+  }
+
   const deleteCpe = (index) => {
-    const updatedItems = cpeList.filter((_, i) => i !== index)
+    const updatedItems = cpeList.filter((_, i) => i.id !== index)
     setCpeList(updatedItems)
   }
 
   // console.log('cpeList', cpeList)
 
   return (
-    <Drawer
-      isOpen={isOpen}
-      placement='right'
-      onClose={onClose}
-      finalFocusRef={btnRef}
-      size='sm'
-    >
-      <DrawerOverlay />
+    <>
+      <Drawer
+        isOpen={isOpen}
+        placement='right'
+        onClose={onClose}
+        finalFocusRef={btnRef}
+        size='sm'
+      >
+        <DrawerOverlay />
 
-      <DrawerContent>
-        <DrawerCloseButton />
-        <DrawerHeader borderBottomWidth='1px' color='gray.600'>
-          {sbomData ? 'Update' : 'Create'} SBOM
-        </DrawerHeader>
-        <DrawerBody>
-          <Stack direction={'column'} spacing={4}>
-            {!sbomData && (
-              <>
-                <FormControl>
-                  <FormLabel fontSize={'sm'}>Name</FormLabel>
-                  <Input size='sm' type='text' defaultValue={name} />
-                </FormControl>
-                <FormControl>
-                  <FormLabel fontSize={'sm'}>Version</FormLabel>
-                  <Input
-                    size='sm'
-                    type='text'
-                    vaue={version}
-                    onChange={(e) => setVersion(e.target.value)}
-                    placeholder='Enter version'
-                  />
-                </FormControl>
-              </>
-            )}
-            {/* Format */}
-            <FormControl pointerEvents={'none'}>
-              <FormLabel fontSize={'sm'}>Type</FormLabel>
-              <Select
-                id='type'
-                name='type'
-                size='sm'
-                value={compType}
-                onChange={(e) => setCompType(e.target.value)}
-              >
-                <option value=''>-- Select --</option>
-                <option value='unknown'>Unknown</option>
-                {/* <option value='json'>JSON</option> */}
-                <option value='library'>Library</option>
-                <option value='operating_system'>Operating system</option>
-                <option value='firmware'>Firmware</option>
-                <option value='file'>File</option>
-                <option value='device'>Device</option>
-                <option value='container'>Container</option>
-                <option value='framework'>Framework</option>
-              </Select>
-            </FormControl>
-            {/* Licenses */}
-            <FormControl fontSize={'sm'}>
-              <FormLabel fontSize={'sm'}>Licenses</FormLabel>
-              <MultiSelect
-                styles={{
-                  control: (baseStyles, state) => ({
-                    ...baseStyles,
-                    borderColor: state.isFocused ? 'inherit' : 'inherit',
-                    '&:hover': {
-                      borderColor: '#CBD5E0'
-                    }
-                  })
-                }}
-                isMulti
-                value={licenseList}
-                options={licenses}
-                onChange={onLicenseChange}
-              />
-            </FormControl>
-            {selectedLicense === 'Custom' && (
+        <DrawerContent>
+          <DrawerCloseButton />
+          <DrawerHeader borderBottomWidth='1px' color='gray.600'>
+            {sbomData ? 'Update' : 'Create'} SBOM
+          </DrawerHeader>
+          <DrawerBody>
+            <Stack direction={'column'} spacing={4}>
+              {!sbomData && (
+                <>
+                  <FormControl>
+                    <FormLabel fontSize={'sm'}>Name</FormLabel>
+                    <Input size='sm' type='text' defaultValue={name} />
+                  </FormControl>
+                  <FormControl>
+                    <FormLabel fontSize={'sm'}>Version</FormLabel>
+                    <Input
+                      size='sm'
+                      type='text'
+                      vaue={version}
+                      onChange={(e) => setVersion(e.target.value)}
+                      placeholder='Enter version'
+                    />
+                  </FormControl>
+                </>
+              )}
+              {/* Format */}
               <FormControl>
-                <Input
+                <FormLabel fontSize={'sm'}>Type</FormLabel>
+                <Select
+                  id='type'
+                  name='type'
                   size='sm'
-                  placeholder='Enter a valid SPDX license'
-                  value={licenseName}
-                  onChange={(e) => setLicenseName(e.target.value)}
+                  value={compType}
+                  onChange={(e) => setCompType(e.target.value)}
+                >
+                  <option value=''>-- Select --</option>
+                  <option value='unknown'>Unknown</option>
+                  <option value='json'>JSON</option>
+                  <option value='library'>Library</option>
+                  <option value='operating_system'>Operating system</option>
+                  <option value='firmware'>Firmware</option>
+                  <option value='file'>File</option>
+                  <option value='device'>Device</option>
+                  <option value='container'>Container</option>
+                  <option value='framework'>Framework</option>
+                </Select>
+              </FormControl>
+              {/* Licenses */}
+              <FormControl fontSize={'sm'}>
+                <FormLabel fontSize={'sm'}>Licenses</FormLabel>
+                <MultiSelect
+                  styles={{
+                    control: (baseStyles, state) => ({
+                      ...baseStyles,
+                      borderColor: state.isFocused ? 'inherit' : 'inherit',
+                      '&:hover': {
+                        borderColor: '#CBD5E0'
+                      }
+                    })
+                  }}
+                  isMulti
+                  value={licenseList}
+                  options={licenses}
+                  onChange={onLicenseChange}
                 />
               </FormControl>
-            )}
-            {/* Identifiers */}
-            <FormControl>
-              <FormLabel fontSize={'sm'}>Identifiers</FormLabel>
-              <Stack spacing={2}>
-                <Textarea
-                  size='sm'
-                  rows={2}
-                  placeholder='PURL'
-                  value={purlValue}
-                  onChange={(e) => setPurlValue(e.target.value)}
-                />
-
-                {/* CPE List */}
-                <Box>
-                  <Box mb={4}>
+              {selectedLicense === 'Custom' && (
+                <FormControl>
+                  <Input
+                    size='sm'
+                    placeholder='Enter a valid SPDX license'
+                    value={licenseName}
+                    onChange={(e) => setLicenseName(e.target.value)}
+                  />
+                </FormControl>
+              )}
+              {/* Identifiers */}
+              <FormControl>
+                <FormLabel fontSize={'sm'}>Identifiers</FormLabel>
+                <Stack spacing={3}>
+                  <Box>
+                    <Textarea
+                      size='sm'
+                      rows={2}
+                      placeholder='PURL'
+                      value={purlValue}
+                      onChange={(e) => setPurlValue(e.target.value)}
+                    />
+                    <Button
+                      mt={2}
+                      size='sm'
+                      fontWeight={'normal'}
+                      variant='solid'
+                      colorScheme='blue'
+                      width={'fit-content'}
+                      onClick={handlePurlModal}
+                    >
+                      Details
+                    </Button>
+                  </Box>
+                  {/* CPE List */}
+                  <Box>
                     <Input
                       type='text'
                       size='sm'
@@ -374,9 +484,20 @@ function ProductSbomDrawer(props) {
                       placeholder='CPES'
                       onKeyDown={handleKeyDown}
                     />
-                    <Text fontSize={'xs'} mt={2}>
-                      Press <Code>enter</Code> to add CPE's
-                    </Text>
+                    <Button
+                      mt={2}
+                      size='sm'
+                      fontWeight={'normal'}
+                      variant='solid'
+                      colorScheme='blue'
+                      width={'fit-content'}
+                      onClick={handleCpeModal}
+                    >
+                      Details
+                    </Button>
+                    {/* <Text fontSize={'xs'} mt={2}>
+                        Press <Code>enter</Code> to add CPE's
+                      </Text> */}
                   </Box>
                   <Flex
                     flexDirection={'row'}
@@ -393,39 +514,69 @@ function ProductSbomDrawer(props) {
                         variant='solid'
                         colorScheme={'blue'}
                       >
-                        <TagLabel>{item}</TagLabel>
+                        <TagLabel
+                          cursor={'pointer'}
+                          onClick={() => {
+                            setCpeValue(item)
+                            setSelectedCpe({ id: index, name: item })
+                          }}
+                        >
+                          {item}
+                        </TagLabel>
                         <TagCloseButton onClick={() => deleteCpe(index)} />
                       </Tag>
                     ))}
                   </Flex>
-                </Box>
-              </Stack>
-            </FormControl>
-            {!sbomData && (
-              <FormControl isReadOnly={true}>
-                <Checkbox size='sm' colorScheme='blue' defaultChecked={true}>
-                  Primary component
-                </Checkbox>
+                </Stack>
               </FormControl>
+              {!sbomData && (
+                <FormControl isReadOnly={true}>
+                  <Checkbox size='sm' colorScheme='blue' defaultChecked={true}>
+                    Primary component
+                  </Checkbox>
+                </FormControl>
+              )}
+            </Stack>
+          </DrawerBody>
+          <DrawerFooter borderTopWidth='1px'>
+            <Button variant='outline' mr={3} onClick={onClose}>
+              Cancel
+            </Button>
+            {sbomData ? (
+              <Button colorScheme='blue' onClick={handleUpdate}>
+                Update
+              </Button>
+            ) : (
+              <Button colorScheme='blue' onClick={handleSave}>
+                Save
+              </Button>
             )}
-          </Stack>
-        </DrawerBody>
-        <DrawerFooter borderTopWidth='1px'>
-          <Button variant='outline' mr={3} onClick={onClose}>
-            Cancel
-          </Button>
-          {sbomData ? (
-            <Button colorScheme='blue' onClick={handleUpdate}>
-              Update
-            </Button>
-          ) : (
-            <Button colorScheme='blue' onClick={handleSave}>
-              Save
-            </Button>
-          )}
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+
+      {isPurlOpen && (
+        <PurlModal
+          data={purlData}
+          isOpen={isPurlOpen}
+          onClose={onPurlClose}
+          setPurlValue={setPurlValue}
+          purlValue={purlValue}
+        />
+      )}
+
+      {isCpeOpen && (
+        <CpeModal
+          data={cpeData}
+          isOpen={isCpeOpen}
+          onClose={onCpeClose}
+          cpeValue={cpeValue}
+          onCreateCpe={handleCreateCpe}
+          onUpdateCpe={handleUpdateCpe}
+          selectedCpe={selectedCpe}
+        />
+      )}
+    </>
   )
 }
 

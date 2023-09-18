@@ -38,7 +38,8 @@ function SBOMComponentRow(props) {
     internal,
     suppliers,
     refetch,
-    lifecycle
+    lifecycle,
+    status
   } = props
   const location = useLocation()
 
@@ -71,12 +72,24 @@ function SBOMComponentRow(props) {
       <Td pl='0px'>
         <Stack py='.8rem'>
           <Text>{component}</Text>
-          {primary ? (
-            <Tag width={'fit-content'} size={'sm'} variant='subtle' colorScheme='blue'>
+          {primary && (
+            <Tag
+              width={'fit-content'}
+              size={'sm'}
+              variant='subtle'
+              colorScheme='blue'
+            >
               <TagLabel textTransform={'capitalize'}>Primary</TagLabel>
             </Tag>
-          ) : (
-            <Tag width={'fit-content'} size={'sm'} variant='outline' colorScheme='blue'>
+          )}
+
+          {internal && (
+            <Tag
+              width={'fit-content'}
+              size={'sm'}
+              variant='outline'
+              colorScheme='blue'
+            >
               <TagLabel textTransform={'capitalize'}>Internal</TagLabel>
             </Tag>
           )}
@@ -103,19 +116,16 @@ function SBOMComponentRow(props) {
             />
             <Portal>
               <MenuList size='sm'>
-                <MenuItem
-                  onClick={onSupOpen}
-                  isDisabled={lifecycle === 'signed'}
-                >
+                <MenuItem onClick={onSupOpen} isDisabled={status === 'signed'}>
                   {suppliers.length > 0 ? 'Update' : 'Add'} Supplier
                 </MenuItem>
-                <MenuItem onClick={onOpen} isDisabled={lifecycle === 'signed'}>
+                <MenuItem onClick={onOpen} isDisabled={status === 'signed'}>
                   Edit
                 </MenuItem>
                 {primary === false && (
                   <MenuItem
                     onClick={onDelOpen}
-                    isDisabled={lifecycle === 'signed'}
+                    isDisabled={status === 'signed'}
                   >
                     Delete
                   </MenuItem>

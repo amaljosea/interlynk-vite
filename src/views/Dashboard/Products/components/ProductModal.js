@@ -27,7 +27,6 @@ const ProductModal = ({
   onClose,
   product,
   type,
-  vendorName,
   description,
   allProjects
 }) => {
@@ -37,13 +36,12 @@ const ProductModal = ({
   const [productName, setProductName] = useState('')
   const [productDesc, setProductDesc] = useState('')
   const [kind, setKind] = useState('')
-  const [vendor, setVendor] = useState('')
-  const [uniqueId, setUniqueId] = useState('')
+  const [supplierName, setSupplierName] = useState('')
+  const [supplierEmail, setSupplierEmail] = useState('')
 
   useEffect(() => {
     setProductName(product)
     setProductDesc(description)
-    setVendor(vendorName)
     setKind(type)
   }, [id])
 
@@ -89,7 +87,6 @@ const ProductModal = ({
       )
       setProductName('')
       setProductDesc('')
-      setUniqueId('')
     }
   }
 
@@ -115,7 +112,7 @@ const ProductModal = ({
                     type='text'
                     value={productName}
                     onChange={(e) => setProductName(e.target.value)}
-                    placeholder='Enter name'
+                    placeholder='Enter product name'
                   />
                 </FormControl>
                 <FormControl isRequired>
@@ -138,7 +135,7 @@ const ProductModal = ({
                     >
                       <option value=''>-- Select --</option>
                       <option value='unknown'>Unknown</option>
-                      {/* <option value='json'>JSON</option> */}
+                      <option value='json'>JSON</option>
                       <option value='library'>Library</option>
                       <option value='operating_system'>Operating system</option>
                       <option value='firmware'>Firmware</option>
@@ -149,22 +146,22 @@ const ProductModal = ({
                     </Select>
                   </FormControl>
                 )}
-                <FormControl display='none'>
-                  <FormLabel>Vendor</FormLabel>
+                <FormControl>
+                  <FormLabel>Supplier Name</FormLabel>
                   <Input
                     type='text'
-                    value={vendor}
-                    onChange={(e) => setVendor(e.target.value)}
-                    placeholder='Enter vendor name'
+                    value={supplierName}
+                    onChange={(e) => setSupplierName(e.target.value)}
+                    placeholder='Enter name'
                   />
                 </FormControl>
-                <FormControl display='none'>
-                  <FormLabel>Unique Identifier</FormLabel>
+                <FormControl>
+                  <FormLabel>Supplier Email</FormLabel>
                   <Input
-                    type='text'
-                    value={uniqueId}
-                    placeholder={`Add identifier`}
-                    onChange={(e) => setUniqueId(e.target.value)}
+                    type='email'
+                    value={supplierEmail}
+                    placeholder={`Enter email`}
+                    onChange={(e) => setSupplierEmail(e.target.value)}
                   />
                 </FormControl>
               </Flex>

@@ -18,7 +18,7 @@ import {
   Text
 } from '@chakra-ui/react'
 import { signSbom } from 'graphQL/Mutation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 const SigningModal = ({
   isOpen,
@@ -26,7 +26,11 @@ const SigningModal = ({
   sbomId,
   projectId,
   refetch,
-  sbomData
+  sbomData,
+  status,
+  setStatus,
+  signedData,
+  setSignedData
 }) => {
   const [algorithm, setAlgorithm] = useState('')
   const [certificate, setCertificate] = useState('')
@@ -34,36 +38,66 @@ const SigningModal = ({
   const [cycloneDxSign, setCycloneDxSign] = useState('')
   const [message, setMessage] = useState('')
 
-  const [sbomSign] = useMutation(signSbom)
+  useEffect(() => {
+    if (signedData) {
+      setAlgorithm(signedData.algorithm)
+      setCertificate(signedData.certificate)
+      setSpdxSign(signedData.spdxSign)
+      setCycloneDxSign(signedData.cycloneDxSign)
+    }
+  }, [])
+
+  // const [sbomSign] = useMutation(signSbom)
 
   const handleSave = (e) => {
     e.preventDefault()
-    setMessage(
-      `This action will sign the SBOM and make it read-only. You’ll need to unsign the SBOM to edit it again. Do you wish to continue with signing the SBOM?`
-    )
+    if (status === 'signed') {
+      setMessage(
+        `This action will unsign the SBOM. You’ll need to sign the SBOM to disable edit. Do you wish to continue with unsigning the SBOM?`
+      )
+    } else {
+      setMessage(
+        `This action will sign the SBOM and make it read-only. You’ll need to unsign the SBOM to edit it again. Do you wish to continue with signing the SBOM?`
+      )
+    }
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    try {
-      await sbomSign({
-        variables: {
-          sbomID: sbomId,
-          sig: cycloneDxSign,
-          sigType: algorithm,
-          pubKey: certificate
-        }
+    if (status === 'signed') {
+      setStatus('created')
+      setSignedData(null)
+      onClose()
+    } else {
+      setStatus('signed')
+      setSignedData({
+        algorithm,
+        certificate,
+        spdxSign,
+        cycloneDxSign
       })
-        .then(() => {
-          refetch({
-            projectId: projectId,
-            sbomId: sbomId
-          })
-        })
-        .finally(() => onClose())
-    } catch (error) {
-      console.log(`Something went wrong `, error)
+      onClose()
     }
+
+    // try {
+    //   await sbomSign({
+    //     variables: {
+    //       sbomID: sbomId,
+    //       sig: cycloneDxSign,
+    //       sigType: algorithm,
+    //       pubKey: certificate
+    //     }
+    //   })
+    //     .then(() => {
+    //       refetch({
+    //         projectId: projectId,
+    //         sbomId: sbomId
+    //       })
+    //     })
+    //     .finally(() => onClose())
+    // } catch (error) {
+    //   console.log(`Something went wrong `, error)
+    // }
   }
 
   return (
@@ -141,9 +175,7 @@ const SigningModal = ({
               </Button>
               {message === '' ? (
                 <Button colorScheme='blue' type='submit'>
-                  {sbomData.sbom.lifecycle === 'signed'
-                    ? 'Unsign'
-                    : 'Validate and Sign'}
+                  {status === 'signed' ? 'Unsign' : 'Validate and Sign'}
                 </Button>
               ) : (
                 <Button colorScheme='blue' type={'submit'}>
