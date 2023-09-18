@@ -42,7 +42,6 @@ function ProductVersionsRow(props) {
     name,
     description,
     updatedAt,
-    vendor,
     allProjects,
     fetchProjects,
     isLoading,
@@ -116,10 +115,10 @@ function ProductVersionsRow(props) {
     : []
 
   // useEffect(() => {
-  //   if (filteredData.length > 0) {
-  //     console.log(`filteredData`, filteredData)
-  //   }
-  // }, [filteredData])
+  // if (filteredData.length > 0) {
+  //   console.log(`filteredData`, filteredData)
+  // }
+  // }, [])
 
   return (
     <>
@@ -203,7 +202,6 @@ function ProductVersionsRow(props) {
               onClose={onClose}
               product={name}
               description={description}
-              vendorName={vendor}
               allProjects={allProjects}
               type={sbomId.length > 0 && sbomId[0].format}
             />

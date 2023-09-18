@@ -32,7 +32,8 @@ const SBOMTable = ({
   data,
   refetch,
   handlePreviousPage,
-  handleNextPage
+  handleNextPage,
+  status
 }) => {
   const textColor = useColorModeValue('gray.700', 'white')
 
@@ -82,6 +83,7 @@ const SBOMTable = ({
                       onOpen={onOpen}
                       setSelectedKey={setSelectedKey}
                       data={data}
+                      status={status}
                     />
                   </Tbody>
                 </Table>
@@ -149,6 +151,7 @@ const SBOMTable = ({
                           uniqueId={row.uniqueId}
                           refetch={refetch}
                           suppliers={row.suppliers}
+                          status={status}
                         />
                       )
                     })}

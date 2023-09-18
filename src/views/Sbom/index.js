@@ -72,6 +72,9 @@ function SBOM() {
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
+  const [status, setStatus] = useState('created')
+  const [signedData, setSignedData] = useState(null)
+
   const {
     isOpen: isSBMOpen,
     onOpen: setSBMOpen,
@@ -344,24 +347,11 @@ function SBOM() {
                               colorScheme='blue'
                             >
                               <TagLabel textTransform={'capitalize'}>
-                                {sbomData.sbom.lifecycle}
+                                {/* {sbomData.sbom.lifecycle} */}
+                                {status}
                               </TagLabel>
                             </Tag>
                           )}
-
-                          {/* {sbomData.sbom.lifecycle !== 'signed' ? (
-                            <BsFillPatchExclamationFill
-                              size={18}
-                              color='tomato'
-                              cursor={'pointer'}
-                            />
-                          ) : (
-                            <MdVerified
-                              size={18}
-                              color='dodgerblue'
-                              cursor={'pointer'}
-                            />
-                          )} */}
                         </Flex>
                       </Flex>
                     </Flex>
@@ -404,14 +394,14 @@ function SBOM() {
 
                       <Tooltip label='Edit'>
                         <IconButton
-                          isDisabled={sbomData.sbom.lifecycle === 'signed'}
+                          isDisabled={status === 'signed'}
                           colorScheme='blue'
                           icon={<EditIcon />}
                           onClick={setSBMOpen}
                         ></IconButton>
                       </Tooltip>
 
-                      {sbomData.sbom.lifecycle === 'signed' ? (
+                      {status === 'signed' ? (
                         <Tooltip label='Signed'>
                           <IconButton
                             colorScheme='blue'
@@ -487,6 +477,7 @@ function SBOM() {
               versionName={primaryData?.version}
               handlePreviousPage={handlePreviousPage}
               handleNextPage={handleNextPage}
+              status={status}
             />
           )}
         </Flex>
@@ -518,6 +509,10 @@ function SBOM() {
           <SigningModal
             projectId={productId}
             sbomId={sbomId}
+            status={status}
+            setStatus={setStatus}
+            signedData={signedData}
+            setSignedData={setSignedData}
             refetch={refetch}
             isOpen={isVerifyOpen}
             onClose={setVerifyClose}

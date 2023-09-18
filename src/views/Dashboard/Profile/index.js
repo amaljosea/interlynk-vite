@@ -8,6 +8,7 @@ import ExploitFeeds from './components/ExploitFeeds'
 import { useQuery } from '@apollo/client'
 import { GetSettings } from 'graphQL/Queries'
 import { GetOrgInfo } from 'graphQL/Queries'
+import GeneralFeed from './components/GeneralFeed'
 
 function Profile() {
   const username = localStorage.getItem(`username`)
@@ -68,6 +69,7 @@ function Profile() {
             <>
               <AdvisoryFeeds data={data} orgInfo={orgInfo} />
               <ExploitFeeds data={data} orgInfo={orgInfo} />
+              <GeneralFeed />
             </>
           )}
         </Grid>
