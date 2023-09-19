@@ -108,6 +108,18 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
                   <option value='github'>github</option>
                   <option value='golang'>golang</option>
                   <option value='hex'>hex</option>
+                  <option value='huggingface'>huggingface</option>
+                  <option value='maven'>maven</option>
+                  <option value='mlflow'>mlflow</option>
+                  <option value='npm'>npm</option>
+                  <option value='nuget'>nuget</option>
+                  <option value='qpkg'>qpkg</option>
+                  <option value='oci'>oci</option>
+                  <option value='pub'>pub</option>
+                  <option value='pypi'>pypi</option>
+                  <option value='rpm'>rpm</option>
+                  <option value='swid'>swid</option>
+                  <option value='swift'>swift</option>
                 </Select>
               </FormControl>
               {/* Namespace */}
