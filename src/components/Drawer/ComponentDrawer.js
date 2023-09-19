@@ -51,7 +51,8 @@ import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import { QuestionIcon, CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import { FaExpandAlt } from 'react-icons/fa'
 
-const regexPattern = /^cpe:2\.3:[aho]:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+$/
+// const regexPattern = /^cpe:2\.3:[aho]:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+$/
+const regexPattern = /cpe:2\.3:[aho\*\-](:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,\/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){5}(:(([a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))?)|[\*\-]))(:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,\/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){4}/
 
 function ComponentDrawer(props) {
   const location = useLocation()
@@ -125,6 +126,7 @@ function ComponentDrawer(props) {
     } catch (ex) {
       setPURLInputValid(false)
     }
+    console.log(`purl`, purlValue)
   }, [component])
 
   useEffect(() => {
@@ -159,10 +161,12 @@ function ComponentDrawer(props) {
   const handlePURLInputChange = (e) => {
     const inputValue = e.target.value;
     setPurlValue(inputValue);
+    console.log("invoking handle change " + inputValue)
     try {
-      PackageURL.fromString(purlValue)
+      PackageURL.fromString(inputValue)
       setPURLInputValid(true)
     } catch (ex) {
+      console.error('ex', ex)
       setPURLInputValid(false)
     }
   };
@@ -189,7 +193,7 @@ function ComponentDrawer(props) {
   const handleCPEInputChange = (e) => {
     const inputValue = e.target.value;
     setCpeValue(inputValue);
-    const matches = cpeValue.match(regexPattern)
+    const matches = inputValue.match(regexPattern)
     if (matches) {
       const [input] = matches
       const components = input.split(':')
@@ -207,6 +211,7 @@ function ComponentDrawer(props) {
 
   const handleCpeModal = () => {
     const matches = cpeValue.match(regexPattern)
+    console.log('matches :', matches)
     if (cpeValue !== '' && matches) {
       // console.log('matches :', matches)
       const [input] = matches
@@ -298,7 +303,7 @@ function ComponentDrawer(props) {
   }
 
   const handleSave = async () => {
-    if (purlValue !== '') {
+    if (purlValue != null && purlValue !== '') {
       try {
         const pkg = PackageURL.fromString(purlValue)
         handleCreateCom()
@@ -316,7 +321,7 @@ function ComponentDrawer(props) {
   }
 
   const handleUpdate = async () => {
-    if (purlValue !== '') {
+    if (purlValue != null && purlValue !== '') {
       try {
         const pkg = PackageURL.fromString(purlValue)
         handleUpdateCom()
@@ -547,10 +552,13 @@ function ComponentDrawer(props) {
                       size='sm'
                       placeholder='PURL'
                       value={purlValue}
+                      key = 'purl'
                       onChange={handlePURLInputChange}
                     />
                     <InputRightElement align="center">
-                      {isPURLInputValid ? <CheckIcon color="green" /> : <WarningTwoIcon color="red" />}
+                    {purlValue != null && purlValue !== '' ? (
+                      isPURLInputValid ? <CheckIcon color="green" /> : <WarningTwoIcon color="red" />
+                    ) : null}
                     </InputRightElement>
                   </InputGroup>
                   <IconButton
@@ -573,10 +581,13 @@ function ComponentDrawer(props) {
                         size='sm'
                         placeholder='CPE'
                         value={cpeValue}
+                        key = 'CPE'
                         onChange={handleCPEInputChange}
                       />
                       <InputRightElement align="center">
-                        {isCPEInputValid ? <CheckIcon color="green" /> : <WarningTwoIcon color="red" />}
+                        {cpeValue != null && cpeValue  !== '' ? (
+                          isCPEInputValid ? <CheckIcon color="green" /> : <WarningTwoIcon color="red" />
+                        ) : null}
                       </InputRightElement>
                     </InputGroup>
                     <IconButton
