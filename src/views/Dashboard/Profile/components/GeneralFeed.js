@@ -42,29 +42,13 @@ const GeneralFeed = () => {
     <Card p='16px'>
       <CardHeader p='12px 5px' mb='8px'>
         <Text fontSize='lg' color={textColor} fontWeight='bold'>
-          General
+          Component Identification
         </Text>
       </CardHeader>
       <CardBody px='5px'>
         <Flex flexDirection={'column'} alignItems={'flex-start'} gap={6}>
-          <Text fontSize={'sm'}>
-            Internal components will be excluded from vulnerability scans and
-            version checks that rely on external systems. Note that the regular
-            expressions below must be compliant with Java's regex syntax. The
-            regex must match the whole string. To match all namespaces with
-            'example' in it, write '.*example.*'.
-          </Text>
           <FormControl>
-            <FormLabel fontSize={'sm'}>Component namespace regex</FormLabel>
-            <Input
-              size='sm'
-              placeholder='.*example*.'
-              value={namespace}
-              onChange={(e) => setNamespace(e.target.value)}
-            />
-          </FormControl>
-          <FormControl>
-            <FormLabel fontSize={'sm'}>Component name regex</FormLabel>
+            <FormLabel fontSize={'sm'}>Regular Expressions identifying Internal Components</FormLabel>
             <Input
               size='sm'
               placeholder='*mystring*'
@@ -103,15 +87,7 @@ const GeneralFeed = () => {
               variant='outline'
               colorScheme='blue'
             >
-              Update
-            </Button>
-            <Button
-              size='sm'
-              fontWeight={'medium'}
-              variant='outline'
-              colorScheme='blue'
-            >
-              Perform Identification
+              Apply
             </Button>
           </Stack>
         </Flex>

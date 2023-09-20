@@ -30,7 +30,7 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey, status }) => {
         <Td pl={0} fontWeight={'medium'}>
           <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
             <Text>Creation Tool(s)</Text>
-            <Tooltip label='Creation tools'>
+            <Tooltip label='Creator Tool(s) identify all the software tools and their versions used in building the SBOM. Interlynk is automatically added as one of the tools'>
               <Icon as={QuestionIcon} color={'blue.500'} />
             </Tooltip>
           </Flex>
@@ -88,7 +88,7 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey, status }) => {
         <Td pl={0} fontWeight={'medium'}>
           <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
             <Text>Author(s)</Text>
-            <Tooltip label='Authors'>
+            <Tooltip label='In case of non-automated SBOM generation, Author(s) identifies the name and email of persons invovlved in building the SBOM.'>
               <Icon as={QuestionIcon} color={'blue.500'} />
             </Tooltip>
           </Flex>
@@ -120,7 +120,7 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey, status }) => {
         <Td pl={0} fontWeight={'medium'}>
           <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
             <Text>Supplier(s)</Text>
-            <Tooltip label='Suppliers'>
+            <Tooltip label='Supplier(s) identify the name and email of the organization that built, distributed or package the application. For Open-source components, it can refer to the name of the project or entity distributing the project.'>
               <Icon as={QuestionIcon} color={'blue.500'} />
             </Tooltip>
           </Flex>

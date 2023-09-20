@@ -14,9 +14,12 @@ import {
   FormControl,
   FormLabel,
   Input,
+  InputRightElement,
+  InputGroup,
   Select,
   Checkbox,
   Table,
+  Tag,
   Thead,
   Th,
   Tr,
@@ -27,13 +30,13 @@ import {
   Box,
   TagCloseButton,
   TagLabel,
-  Tag,
   Code,
   useToast,
   Textarea,
   useDisclosure,
   Tooltip,
-  Icon
+  Icon,
+  IconButton
 } from '@chakra-ui/react'
 import { useMutation } from '@apollo/client'
 import { CreateComponent } from 'graphQL/Mutation'
@@ -46,9 +49,11 @@ import { timeSince } from 'utils'
 import { PackageURL } from 'packageurl-js'
 import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
-import { QuestionIcon } from '@chakra-ui/icons'
+import { QuestionIcon, CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
+import { FaExpandAlt } from 'react-icons/fa'
 
-const regexPattern = /^cpe:2\.3:[aho]:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+$/
+// const regexPattern = /^cpe:2\.3:[aho]:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+$/
+const regexPattern = /cpe:2\.3:[aho\*\-](:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,\/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){5}(:(([a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))?)|[\*\-]))(:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,\/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){4}/
 
 function ComponentDrawer(props) {
   const location = useLocation()
@@ -90,9 +95,12 @@ function ComponentDrawer(props) {
   const [cpeList, setCpeList] = useState([])
   const [cpeValue, setCpeValue] = useState('')
   const [cpeData, setCpeData] = useState(null)
+  const [isCPEInputValid, setCPEInputValid] = useState(true);
+
   const [selectedCpe, setSelectedCpe] = useState(null)
   const [purlValue, setPurlValue] = useState('')
   const [purlData, setPurlData] = useState(null)
+  const [isPURLInputValid, setPURLInputValid] = useState(true);
 
   const [isIncomplete, setIsIncomplete] = useState(false)
   const [isPrimary, setIsPrimary] = useState(primary)
@@ -113,6 +121,15 @@ function ComponentDrawer(props) {
     setCompType(type)
     setCpeList(cpes)
     setPurlValue(purl)
+    try {
+      PackageURL.fromString(purlValue)
+      setPURLInputValid(true)
+    } catch (ex) {
+      if (purlValue != '' && purlValue != null) {
+        setPURLInputValid(false)
+      }
+    }
+    console.log(`purl`, purlValue)
   }, [component])
 
   useEffect(() => {
@@ -144,24 +161,68 @@ function ComponentDrawer(props) {
     onClose: onCpeClose
   } = useDisclosure()
 
+  const handlePURLInputChange = (e) => {
+    const inputValue = e.target.value;
+    setPurlValue(inputValue);
+    if (inputValue == null || inputValue === '') {
+      return
+    }
+    console.log("invoking handle change " + inputValue)
+    try {
+      PackageURL.fromString(inputValue)
+      setPURLInputValid(true)
+    } catch (ex) {
+      console.error('ex', ex)
+      setPURLInputValid(false)
+    }
+  };
+
   const handlePurlModal = () => {
-    if (purlValue) {
+    try {
+      console.log(purlValue)
       const pkg = PackageURL.fromString(purlValue)
+      console.info('pkg', pkg)
       setPurlData(pkg)
       onPurlOpen()
-    } else {
-      toast({
-        description: 'Purl value is required!!',
-        status: 'error',
-        duration: 3000,
-        position: 'top'
-      })
+    } catch (ex) {
+      console.error('ex', ex)
+      if (purlValue != null && purlValue !== '') {
+        toast({
+          description: 'PURL is invalid. Resetting to defaults',
+          status: 'error',
+          duration: 3000,
+          position: 'top'
+        })
+      }
+      const pkg = PackageURL.fromString('pkg:generic/unknown@1.0')
+      setPurlValue('pkg:generic/unknown@1.0')
+      setPurlData(pkg)
+      onPurlOpen()
     }
   }
 
-  const matches = cpeValue.match(regexPattern)
+  const handleCPEInputChange = (e) => {
+    const inputValue = e.target.value;
+    setCpeValue(inputValue);
+    const matches = inputValue.match(regexPattern)
+    if (matches) {
+      const [input] = matches
+      const components = input.split(':')
+      setCpeData({
+        vendor: components[3],
+        product: components[4],
+        version: components[5],
+        targetHardware: '*'
+      })
+      setCPEInputValid(true)
+    } else {
+      setCPEInputValid(false)
+    }
+  };
 
   const handleCpeModal = () => {
+    const matches = cpeValue.match(regexPattern)
+    console.log('matches :', matches)
     if (cpeValue !== '' && matches) {
       // console.log('matches :', matches)
       const [input] = matches
@@ -175,12 +236,22 @@ function ComponentDrawer(props) {
       })
       onCpeOpen()
     } else {
-      toast({
-        description: 'CPE value is required!!',
-        status: 'error',
-        duration: 3000,
-        position: 'top'
+      if (cpeValue != null && cpeValue !== '') {
+        toast({
+          description: 'CPE value is invalid. Resetting to defaults',
+          status: 'error',
+          duration: 3000,
+          position: 'top'
+        })
+      }
+      setCpeData({
+        vendor: 'vendor',
+        product: 'product',
+        version: '1.0',
+        targetHardware: '*'
       })
+      setCpeValue('cpe:2.3:a:vendor:product:1.0:*:*:*:*:*:*:*')
+      onCpeOpen()
     }
   }
 
@@ -253,7 +324,7 @@ function ComponentDrawer(props) {
   }
 
   const handleSave = async () => {
-    if (purlValue !== '') {
+    if (purlValue != null && purlValue !== '') {
       try {
         const pkg = PackageURL.fromString(purlValue)
         handleCreateCom()
@@ -271,7 +342,7 @@ function ComponentDrawer(props) {
   }
 
   const handleUpdate = async () => {
-    if (purlValue !== '') {
+    if (purlValue != null && purlValue !== '') {
       try {
         const pkg = PackageURL.fromString(purlValue)
         handleUpdateCom()
@@ -353,15 +424,15 @@ function ComponentDrawer(props) {
         <DrawerContent>
           <DrawerCloseButton />
           <DrawerHeader borderBottomWidth='1px' color='gray.600'>
-            Component
+            Edit Component
           </DrawerHeader>
           <DrawerBody>
             <Stack direction={'column'} spacing={4}>
               <FormControl isReadOnly={customerView}>
                 <FormLabel fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-                    <Text>Name</Text>
-                    <Tooltip label='Name'>
+                    <Text>Name *</Text>
+                    <Tooltip label='Component Name'>
                       <Icon as={QuestionIcon} color={'blue.500'} />
                     </Tooltip>
                   </Flex>
@@ -374,7 +445,14 @@ function ComponentDrawer(props) {
                 />
               </FormControl>
               <FormControl isReadOnly={customerView}>
-                <FormLabel fontSize={'sm'}>Version</FormLabel>
+                <FormLabel fontSize={'sm'}>
+                  <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
+                    <Text>Version</Text>
+                    <Tooltip label='Component Version'>
+                      <Icon as={QuestionIcon} color={'blue.500'} />
+                    </Tooltip>
+                  </Flex>
+                </FormLabel>
                 <Input
                   size='sm'
                   placeholder='Enter version'
@@ -387,7 +465,7 @@ function ComponentDrawer(props) {
                 <FormLabel fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>Type</Text>
-                    <Tooltip label='Type'>
+                    <Tooltip label='Component Type'>
                       <Icon as={QuestionIcon} color={'blue.500'} />
                     </Tooltip>
                   </Flex>
@@ -455,7 +533,7 @@ function ComponentDrawer(props) {
                 <FormLabel fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>Licenses</Text>
-                    <Tooltip label='Licenses'>
+                    <Tooltip label='List of licenses applicable to the component'>
                       <Icon as={QuestionIcon} color={'blue.500'} />
                     </Tooltip>
                   </Flex>
@@ -482,20 +560,30 @@ function ComponentDrawer(props) {
                 <FormLabel fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>Identifiers</Text>
-                    <Tooltip label='Identifiers'>
+                    <Tooltip label='Component identifiers such as package URL (PURL) or Common Platform Enumeration (CPE) are used for consistent naming of the component. Both CycloneDX and SPDX supports identifying component names with CPE and PURL'>
                       <Icon as={QuestionIcon} color={'blue.500'} />
                     </Tooltip>
                   </Flex>
                 </FormLabel>
                 <Stack spacing={2}>
-                  <Textarea
-                    rows={2}
-                    size='sm'
-                    placeholder='PURL'
-                    value={purlValue}
-                    onChange={(e) => setPurlValue(e.target.value)}
-                  />
-                  <Button
+                  <Stack direction={'row'} spacing={2}>
+                  <InputGroup>
+                    <Input
+                      type='text'
+                      size='sm'
+                      placeholder='PURL'
+                      value={purlValue}
+                      key = 'purl'
+                      onChange={handlePURLInputChange}
+                    />
+                    <InputRightElement align="center">
+                    {purlValue != null && purlValue !== '' ? (
+                      isPURLInputValid ? <CheckIcon color="green" /> : <WarningTwoIcon color="red" />
+                    ) : null}
+                    </InputRightElement>
+                  </InputGroup>
+                  <IconButton
+                    icon={<FaExpandAlt />}
                     size='sm'
                     fontWeight={'normal'}
                     variant='solid'
@@ -504,17 +592,27 @@ function ComponentDrawer(props) {
                     onClick={handlePurlModal}
                   >
                     Details
-                  </Button>
+                  </IconButton>
+                  </Stack>
                   {/* CPE List */}
-                  <Box mb={4}>
-                    <Input
-                      type='text'
-                      value={cpeValue}
-                      onChange={(e) => setCpeValue(e.target.value)}
-                      placeholder='CPE'
-                      onKeyDown={handleKeyDown}
-                    />
-                    <Button
+                  <Stack direction={'row'} spacing={2}>
+                    <InputGroup>
+                      <Input
+                        type='text'
+                        size='sm'
+                        placeholder='CPE'
+                        value={cpeValue}
+                        key = 'CPE'
+                        onChange={handleCPEInputChange}
+                      />
+                      <InputRightElement align="center">
+                        {cpeValue != null && cpeValue  !== '' ? (
+                          isCPEInputValid ? <CheckIcon color="green" /> : <WarningTwoIcon color="red" />
+                        ) : null}
+                      </InputRightElement>
+                    </InputGroup>
+                    <IconButton
+                      icon={<FaExpandAlt />}
                       mt={2}
                       size='sm'
                       fontWeight={'normal'}
@@ -524,12 +622,8 @@ function ComponentDrawer(props) {
                       onClick={handleCpeModal}
                     >
                       Details
-                    </Button>
-                    {/* <Text fontSize={'xs'} mt={2}>
-                        Press <Code>enter</Code> to add CPE's
-                      </Text> */}
-                  </Box>
-
+                    </IconButton>
+                  </Stack>
                   <Flex
                     flexDirection={'row'}
                     flexWrap={'wrap'}
