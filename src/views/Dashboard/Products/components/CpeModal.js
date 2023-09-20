@@ -10,9 +10,12 @@ import {
   FormControl,
   FormLabel,
   Select,
+  Stack,
   Checkbox,
   Flex,
-  Input
+  Input,
+  Progress,
+  calc
 } from '@chakra-ui/react'
 import { useState, useEffect } from 'react'
 
@@ -29,6 +32,9 @@ const CpeModal = ({
   const [product, setProduct] = useState('')
   const [version, setVersion] = useState('')
   const [hardware, setHardware] = useState('')
+  const [vendorProgressValue, setVendorProgressValue] = useState(0);
+  const [prodProgressValue, setProdProgressValue] = useState(0);
+  const [verProgressValue, setVerProgressValue] = useState(0);
 
   const [updatedString, setUpdatedString] = useState(cpeValue)
 
@@ -38,6 +44,9 @@ const CpeModal = ({
       setProduct(data.product)
       setVersion(data.version)
       setHardware(data.targetHardware)
+      setVendorProgressValue(calculateProgress(data.vendor, '', ''));
+      setProdProgressValue(calculateProgress(data.vendor, data.product, ''));
+      setVerProgressValue(calculateProgress(data.vendor, data.product, data.version));
     }
   }, [data])
 
@@ -50,27 +59,158 @@ const CpeModal = ({
     onClose()
   }
 
+
+  const calculateProgress = (vendor, prod, version) => {
+    const vendorMap = {};
+    vendorMap[['cisco', '', ''].join(',')] = 100;
+    vendorMap[['microsoft', '', ''].join(',')] = 90;
+    vendorMap[['hp', '', ''].join(',')] = 100;
+    vendorMap[['ibm', '', ''].join(',')] = 100;
+    vendorMap[['intel', '', ''].join(',')] = 100;
+    vendorMap[['jenkins', '', ''].join(',')] = 100;
+    vendorMap[['apache', '', ''].join(',')] = 100;
+    vendorMap[['google', '', ''].join(',')] = 100;
+    vendorMap[['microsoft', '', ''].join(',')] = 100;
+    vendorMap[['vim', '', ''].join(',')] = 100;
+    vendorMap[['redhat', '', ''].join(',')] = 100;
+    vendorMap[['oracle', '', ''].join(',')] = 100;
+    vendorMap[['debian', '', ''].join(',')] = 100;
+    vendorMap[['kernel', '', ''].join(',')] = 80;
+    vendorMap[['sony', '', ''].join(',')] = 80;
+    vendorMap[['nutanix', '', ''].join(',')] = 10;
+    vendorMap[['simpleproxy', '', ''].join(',')] = 10;
+    vendorMap[['microware', '', ''].join(',')] = 50;
+    vendorMap[['microsftv', '', ''].join(',')] = 10;
+    vendorMap[['orange', '', ''].join(',')] = 20;
+    vendorMap[['orangelab', '', ''].join(',')] = 10;
+
+    vendorMap[['cisco', '', ''].join(',')] = 100;
+    vendorMap[['hp', '', ''].join(',')]= 100;
+    vendorMap[['ibm', '', ''].join(',')] = 100;
+    vendorMap[['intel', '', ''].join(',')] = 100;
+    vendorMap[['jenkins', '', ''].join(',')] = 100;
+    vendorMap[['apache', '', ''].join(',')] = 100;
+    vendorMap[['google', '', ''].join(',')] = 100;
+
+    vendorMap[['', 'windows_xp', ''].join(',')] = 100;
+    vendorMap[['microsoft', 'windows_xp', ''].join(',')] = 100;
+    vendorMap[['microsoft', 'windows_xp', 'sp2'].join(',')] = 10;
+    vendorMap[['microsoft', 'windows_xp', 'sp3'].join(',')] = 10;
+    vendorMap[['microsoft', 'windows_xp', '1.0'].join(',')] = 100;
+    vendorMap[['microsoft', 'windows_7', ''].join(',')] = 100;
+    vendorMap[['microsoft', 'office', ''].join(',')] = 100;
+
+    vendorMap[['microsoft', 'internet_explorer', ''].join(',')] = 100;
+
+    vendorMap[['microsoft', 'windows_7', ''].join(',')] = 100;
+    vendorMap[['', 'office', ''].join(',')] = 100;
+    vendorMap[['', 'internet_explorer', ''].join(',')] = 100;
+
+    vendorMap[['debian', '', ''].join(',')] = 100;
+    vendorMap[['debian', 'cron', ''].join(',')] = 100;
+    vendorMap[['', 'cron', ''].join(',')] = 100;
+
+    vendorMap[['vim', '', ''].join(',')] = 100;
+    vendorMap[['redhat', '', ''].join(',')] = 100;
+    vendorMap[['oracle', '', ''].join(',')] = 100;
+    vendorMap[['debian', '', ''].join(',')] = 100;
+    vendorMap[['kernel', '', ''].join(',')] = 80;
+    vendorMap[['sony', '', ''].join(',')] = 80;
+    vendorMap[['nutanix', '', ''].join(',')] = 10;
+    vendorMap[['simpleproxy', '', ''].join(',')] = 10;
+    vendorMap[['microware', '', ''].join(',')] = 50;
+    vendorMap[['microsftv', '', ''].join(',')] = 10;
+    vendorMap[['orange', '', ''].join(',')] = 20;
+    vendorMap[['orangelab', '', ''].join(',')] = 10;
+
+    vendorMap[['vim', '', ''].join(',')] = 100;
+    vendorMap[['chrome', '', ''].join(',')] = 100;
+    vendorMap[['ios', '', ''].join(',')] = 100;
+    vendorMap[['linux_kernel', '', ''].join(',')] = 100;
+    vendorMap[['node.js', '', ''].join(',')] = 100;
+    vendorMap[['php', '', ''].join(',')] = 100;
+
+    vendorMap[['ruby', '', ''].join(',')] = 80;
+    vendorMap[['http', '', ''].join(',')] = 20;
+    vendorMap[['log4js', '', ''].join(',')] = 20;
+    vendorMap[['pods', '', ''].join(',')] = 10;
+
+    vendorMap[['NA', '', ''].join(',')] = 100;
+    vendorMap[['ANY', '', ''].join(',')] = 100;
+    vendorMap[['1.0.0', '', ''].join(',')] = 100;
+    vendorMap[['7.1.2', '', ''].join(',')] = 10;
+
+    var newValue = vendorMap[[vendor.toLowerCase(), prod.toLowerCase(), version.toLowerCase()].join(',')];
+    console.log('Vendor:' + vendor, 'Prod:' + prod, 'Version:' + version, newValue)
+    if (isNaN(newValue)) {
+      newValue = 0;
+    }
+    return newValue;
+  };
+
+  const getProgressColor = (value) => {
+    if (value >= 90) {
+      return 'green'; // Change color to green if progress is 90% or higher
+    } else if (value >= 50) {
+      return 'yellow'; // Change color to yellow if progress is 50% or higher
+    } else {
+      return 'red'; // Change color to red for lower progress values
+    }
+  };
+
+    // setCpeData({
+    //  vendor: components[3],
+    //  product: components[4],
+    //  version: components[5],
+    //  targetHardware: '*'
+    //})
+
   const handleVendorChange = (e) => {
     setVendor(e.target.value)
-    const cpeString = cpeValue.replace(data.vendor, e.target.value)
+    const cpeParts = updatedString.split(':')
+    cpeParts[3] = e.target.value
+    const cpeString = cpeParts.join(':')
+    console.log('CPE String: ' + cpeString)
     setUpdatedString(cpeString)
+
+    const vendorProgressValue = calculateProgress(cpeParts[3], '', '');
+    setVendorProgressValue(vendorProgressValue);
+
+    const prodProgressValue = calculateProgress(cpeParts[3], cpeParts[4], '');
+    setProdProgressValue(prodProgressValue);
+
+    const verProgressValue = calculateProgress(cpeParts[3], cpeParts[4], cpeParts[5]);
+    setVerProgressValue(verProgressValue);
   }
 
   const handleProductChange = (e) => {
     setProduct(e.target.value)
-    const cpeString = cpeValue.replace(data.product, e.target.value)
+    const cpeParts = updatedString.split(':')
+    cpeParts[4] = e.target.value
+    const cpeString = cpeParts.join(':')
+    console.log('CPE String: ' + cpeString)
     setUpdatedString(cpeString)
+
+    const prodProgressValue = calculateProgress(cpeParts[3], e.target.value, '');
+    setProdProgressValue(prodProgressValue);
   }
 
   const handleVersionChange = (e) => {
     setVersion(e.target.value)
-    const cpeString = cpeValue.replace(data.version, e.target.value)
+    const cpeParts = updatedString.split(':')
+    cpeParts[5] = e.target.value
+    const cpeString = cpeParts.join(':')
+    console.log('CPE String: ' + cpeString)
     setUpdatedString(cpeString)
+
+    const verProgressValue = calculateProgress(cpeParts[3], cpeParts[4], e.target.value);
+    setVerProgressValue(verProgressValue);
   }
 
   const handleHardwareChange = (e) => {
     setHardware(e.target.value)
     const cpeString = cpeValue.replace(data.targetHardware, e.target.value)
+    console.log('CPE String: ' + cpeString)
     setUpdatedString(cpeString)
   }
 
@@ -83,72 +223,68 @@ const CpeModal = ({
           <ModalCloseButton />
           <ModalBody>
             <Flex width={'100%'} direction={'column'} gap={4}>
+            <FormControl>
+              <FormLabel>
+                CPE String
+              </FormLabel>
+              <Input
+                  type='text'
+                  variant='filled'
+                  mt={1.5}
+                  value={updatedString}
+                  size='md'
+                  onChange={handleVersionChange}
+                  disabled
+                />
+            </FormControl>
               {/* Vendor */}
               <FormControl>
-                <Checkbox
-                  size='md'
-                  colorScheme='green'
-                  defaultChecked={true}
-                  readOnly
-                >
                   Vendor
-                </Checkbox>
-                <Input
-                  type='text'
-                  mt={1.5}
-                  value={vendor}
-                  size='md'
-                  onChange={handleVendorChange}
-                />
+                <Stack direction='column' spacing={1}>
+                  <Input
+                    type='text'
+                    mt={1.5}
+                    value={vendor}
+                    size='md'
+                    onChange={handleVendorChange}
+                  />
+                  <Progress value={vendorProgressValue} colorScheme={getProgressColor(vendorProgressValue)} />
+                </Stack>
               </FormControl>
               {/* Product */}
               <FormControl>
-                <Checkbox
-                  size='md'
-                  colorScheme='green'
-                  defaultChecked={true}
-                  readOnly
-                >
                   Product
-                </Checkbox>
-                <Input
-                  type='text'
-                  mt={1.5}
-                  value={product}
-                  size='md'
-                  onChange={handleProductChange}
-                />
+                <Stack direction='column' spacing={1}>
+                  <Input
+                    type='text'
+                    mt={1.5}
+                    value={product}
+                    size='md'
+                    onChange={handleProductChange}
+                  />
+                  <Progress value={prodProgressValue} colorScheme={getProgressColor(prodProgressValue)} />
+                </Stack>
               </FormControl>
               {/* Version */}
               <FormControl>
-                <Checkbox
-                  size='md'
-                  colorScheme='green'
-                  defaultChecked={true}
-                  readOnly
-                >
                   Version
-                </Checkbox>
-                <Input
-                  type='text'
-                  mt={1.5}
-                  value={version}
-                  size='md'
-                  onChange={handleVersionChange}
-                />
+                <Stack direction='column' spacing={1}>
+                  <Input
+                    type='text'
+                    mt={1.5}
+                    value={version}
+                    size='md'
+                    onChange={handleVersionChange}
+                  />
+                  <Progress value={verProgressValue} colorScheme={getProgressColor(verProgressValue)} />
+                </Stack>
               </FormControl>
               {/* Hardware */}
               <FormControl>
                 <FormLabel>
-                  <Checkbox
-                    size='md'
-                    colorScheme='green'
-                    defaultChecked={true}
-                    readOnly
-                  >
                     Target Hardware
-                  </Checkbox>
                 </FormLabel>
+                <Stack direction='column' spacing={1}>
                 <Select
                   size='md'
                   id='hardware'
@@ -157,11 +293,19 @@ const CpeModal = ({
                   onChange={handleHardwareChange}
                 >
                   <option value=''>-- Select --</option>
-                  <option value='x84'>x84</option>
                   <option value='x64'>x64</option>
-                  <option value='solaris'>solaris</option>
+                  <option value='x86'>x86</option>
+                  <option value='x32'>x32</option>
+                  <option value='arm64'>arm64</option>
+                  <option value='amd64'>amd64</option>
+                  <option value='itanium'>itanium</option>
+                  <option value='arm'>arm</option>
+                  <option value='rj45'>rj45</option>
+                  <option value='iphone'>iphone</option>
+                  <option value='android'>android</option>
                   <option value='*'>*</option>
                 </Select>
+                </Stack>
               </FormControl>
             </Flex>
           </ModalBody>

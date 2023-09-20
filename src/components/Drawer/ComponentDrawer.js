@@ -19,6 +19,7 @@ import {
   Select,
   Checkbox,
   Table,
+  Tag,
   Thead,
   Th,
   Tr,
@@ -124,7 +125,9 @@ function ComponentDrawer(props) {
       PackageURL.fromString(purlValue)
       setPURLInputValid(true)
     } catch (ex) {
-      setPURLInputValid(false)
+      if (purlValue != '' && purlValue != null) {
+        setPURLInputValid(false)
+      }
     }
     console.log(`purl`, purlValue)
   }, [component])
@@ -161,6 +164,9 @@ function ComponentDrawer(props) {
   const handlePURLInputChange = (e) => {
     const inputValue = e.target.value;
     setPurlValue(inputValue);
+    if (inputValue == null || inputValue === '') {
+      return
+    }
     console.log("invoking handle change " + inputValue)
     try {
       PackageURL.fromString(inputValue)
@@ -180,12 +186,17 @@ function ComponentDrawer(props) {
       onPurlOpen()
     } catch (ex) {
       console.error('ex', ex)
-      toast({
-        description: 'PURL is invalid. Resetting to defaults',
-        status: 'error',
-        duration: 3000,
-        position: 'top'
-      })
+      if (purlValue != null && purlValue !== '') {
+        toast({
+          description: 'PURL is invalid. Resetting to defaults',
+          status: 'error',
+          duration: 3000,
+          position: 'top'
+        })
+      }
+      const pkg = PackageURL.fromString('pkg:generic/unknown@1.0')
+      setPurlValue('pkg:generic/unknown@1.0')
+      setPurlData(pkg)
       onPurlOpen()
     }
   }
@@ -225,12 +236,22 @@ function ComponentDrawer(props) {
       })
       onCpeOpen()
     } else {
-      toast({
-        description: 'CPE value is required!!',
-        status: 'error',
-        duration: 3000,
-        position: 'top'
+      if (cpeValue != null && cpeValue !== '') {
+        toast({
+          description: 'CPE value is invalid. Resetting to defaults',
+          status: 'error',
+          duration: 3000,
+          position: 'top'
+        })
+      }
+      setCpeData({
+        vendor: 'vendor',
+        product: 'product',
+        version: '1.0',
+        targetHardware: '*'
       })
+      setCpeValue('cpe:2.3:a:vendor:product:1.0:*:*:*:*:*:*:*')
+      onCpeOpen()
     }
   }
 
