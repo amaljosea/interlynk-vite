@@ -25,6 +25,7 @@ import { FaEllipsisV } from 'react-icons/fa'
 import SupplierModal from 'views/Sbom/components/SupplierModal'
 import { ViewIcon } from '@chakra-ui/icons'
 import { getConImg } from 'utils'
+import { BsPatchQuestion } from 'react-icons/bs'
 
 function SBOMComponentRow(props) {
   const {
@@ -73,13 +74,15 @@ function SBOMComponentRow(props) {
     <Tr>
       <Td pl='0px'>
         <Stack py='.8rem' direction={'row'} alignItems={'flex-start'} gap={1}>
-          {purl !== null && purl !== '' && (
+          {purl !== null && purl !== '' ? (
             <Image
               width={'8'}
               height={'8'}
               src={getConImg(purl.split('/')[0])}
               alt={purl.split('/')[0]}
             />
+          ) : (
+            <BsPatchQuestion fontSize={22} />
           )}
           <Stack direction={'column'} gap={0.5}>
             <Text wordBreak={'break-all'}>{component}</Text>
