@@ -25,7 +25,10 @@ import {
   useToast,
   Checkbox,
   Textarea,
-  useDisclosure
+  useDisclosure,
+  InputGroup,
+  InputRightElement,
+  IconButton
 } from '@chakra-ui/react'
 import { useMutation } from '@apollo/client'
 import { useLocation } from 'react-router-dom'
@@ -37,6 +40,8 @@ import { CreateComponent } from 'graphQL/Mutation'
 import { PackageURL } from 'packageurl-js'
 import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
+import { FaExpandAlt } from 'react-icons/fa'
+import { CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
 
 const regexPattern = /^cpe:2\.3:[aho]:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+$/
 
@@ -80,6 +85,9 @@ function ProductSbomDrawer(props) {
 
   const [imgIds, setImgIds] = useState([])
   const [licenseList, setLicenseList] = useState([])
+
+  const [isPURLInputValid, setPURLInputValid] = useState(true)
+  const [isCPEInputValid, setCPEInputValid] = useState(true)
 
   useEffect(() => {
     if (sbomData) {
@@ -134,24 +142,71 @@ function ProductSbomDrawer(props) {
     onClose: onCpeClose
   } = useDisclosure()
 
-  const handlePurlModal = () => {
-    if (purlValue) {
-      const pkg = PackageURL.fromString(purlValue)
-      setPurlData(pkg)
-      onPurlOpen()
-    } else {
-      toast({
-        description: 'Purl value is required!!',
-        status: 'error',
-        duration: 3000,
-        position: 'top'
-      })
+  const matches = cpeValue.match(regexPattern)
+
+  const handlePURLInputChange = (e) => {
+    const inputValue = e.target.value
+    setPurlValue(inputValue)
+    if (inputValue == null || inputValue === '') {
+      return
+    }
+    console.log('invoking handle change ' + inputValue)
+    try {
+      PackageURL.fromString(inputValue)
+      setPURLInputValid(true)
+    } catch (ex) {
+      console.error('ex', ex)
+      setPURLInputValid(false)
     }
   }
 
-  const matches = cpeValue.match(regexPattern)
+  const handlePurlModal = () => {
+    try {
+      console.log(purlValue)
+      const pkg = PackageURL.fromString(purlValue)
+      console.info('pkg', pkg)
+      setPurlData(pkg)
+      onPurlOpen()
+    } catch (ex) {
+      console.error('ex', ex)
+      if (purlValue != null && purlValue !== '') {
+        toast({
+          description: 'PURL is invalid. Resetting to defaults',
+          status: 'error',
+          duration: 3000,
+          position: 'top'
+        })
+      }
+      const pkg = PackageURL.fromString('pkg:generic/unknown@1.0')
+      setPurlValue('pkg:generic/unknown@1.0')
+      setPURLInputValid(true)
+      setPurlData(pkg)
+      onPurlOpen()
+    }
+  }
+
+  const handleCPEInputChange = (e) => {
+    const inputValue = e.target.value
+    setCpeValue(inputValue)
+    const matches = inputValue.match(regexPattern)
+    if (matches) {
+      const [input] = matches
+      const components = input.split(':')
+      setCpeData({
+        vendor: components[3],
+        product: components[4],
+        version: components[5],
+        targetHardware: '*'
+      })
+      setCPEInputValid(true)
+    } else {
+      setCPEInputValid(false)
+    }
+  }
 
   const handleCpeModal = () => {
+    const matches = cpeValue.match(regexPattern)
+    console.log('matches :', matches)
     if (cpeValue !== '' && matches) {
       // console.log('matches :', matches)
       const [input] = matches
@@ -165,12 +220,23 @@ function ProductSbomDrawer(props) {
       })
       onCpeOpen()
     } else {
-      toast({
-        description: 'CPE value is required!!',
-        status: 'error',
-        duration: 3000,
-        position: 'top'
+      if (cpeValue != null && cpeValue !== '') {
+        toast({
+          description: 'CPE value is invalid. Resetting to defaults',
+          status: 'error',
+          duration: 3000,
+          position: 'top'
+        })
+      }
+      setCpeData({
+        vendor: 'vendor',
+        product: 'product',
+        version: '1.0',
+        targetHardware: '*'
       })
+      setCpeValue('cpe:2.3:a:vendor:product:1.0:*:*:*:*:*:*:*')
+      setCPEInputValid(true)
+      onCpeOpen()
     }
   }
 
@@ -410,7 +476,6 @@ function ProductSbomDrawer(props) {
                   onChange={(e) => setCompType(e.target.value)}
                 >
                   <option value=''>-- Select --</option>
-                  <option value='unknown'>Unknown</option>
                   <option value='application'>Application</option>
                   <option value='library'>Library</option>
                   <option value='operating_system'>Operating system</option>
@@ -419,6 +484,11 @@ function ProductSbomDrawer(props) {
                   <option value='device'>Device</option>
                   <option value='container'>Container</option>
                   <option value='framework'>Framework</option>
+                  <option value='source'>Source</option>
+                  <option value='archive'>Archive</option>
+                  <option value='install'>Install</option>
+                  <option value='other'>Other</option>
+                  <option value='unspecified'>Unspecified</option>
                 </Select>
               </FormControl>
               {/* Licenses */}
@@ -454,37 +524,59 @@ function ProductSbomDrawer(props) {
               <FormControl>
                 <FormLabel fontSize={'sm'}>Identifiers</FormLabel>
                 <Stack spacing={3}>
-                  <Box>
-                    <Textarea
-                      size='sm'
-                      rows={2}
-                      placeholder='PURL'
-                      value={purlValue}
-                      onChange={(e) => setPurlValue(e.target.value)}
-                    />
-                    <Button
-                      mt={2}
+                  <Stack direction={'row'} spacing={2}>
+                    <InputGroup>
+                      <Input
+                        type='text'
+                        size='sm'
+                        placeholder='PURL'
+                        value={purlValue}
+                        key='purl'
+                        onChange={handlePURLInputChange}
+                      />
+                      <InputRightElement align='center' zIndex={-1}>
+                        {purlValue != null && purlValue !== '' ? (
+                          isPURLInputValid ? (
+                            <CheckIcon color='green' />
+                          ) : (
+                            <WarningTwoIcon color='red' />
+                          )
+                        ) : null}
+                      </InputRightElement>
+                    </InputGroup>
+                    <IconButton
+                      icon={<FaExpandAlt />}
                       size='sm'
                       fontWeight={'normal'}
                       variant='solid'
                       colorScheme='blue'
                       width={'fit-content'}
                       onClick={handlePurlModal}
-                    >
-                      Details
-                    </Button>
-                  </Box>
-                  {/* CPE List */}
-                  <Box>
-                    <Input
-                      type='text'
-                      size='sm'
-                      value={cpeValue}
-                      onChange={(e) => setCpeValue(e.target.value)}
-                      placeholder='CPES'
-                      onKeyDown={handleKeyDown}
                     />
-                    <Button
+                  </Stack>
+                  {/* CPE List */}
+                  <Stack direction={'row'} spacing={2}>
+                    <InputGroup>
+                      <Input
+                        type='text'
+                        size='sm'
+                        placeholder='CPE'
+                        value={cpeValue}
+                        key='CPE'
+                        onChange={handleCPEInputChange}
+                      />
+                      <InputRightElement align='center' zIndex={-1}>
+                        {cpeValue != null && cpeValue !== '' ? (
+                          isCPEInputValid ? (
+                            <CheckIcon color='green' />
+                          ) : (
+                            <WarningTwoIcon color='red' />
+                          )
+                        ) : null}
+                      </InputRightElement>
+                    </InputGroup>
+                    <IconButton
+                      icon={<FaExpandAlt />}
                       mt={2}
                       size='sm'
                       fontWeight={'normal'}
@@ -492,13 +584,8 @@ function ProductSbomDrawer(props) {
                       colorScheme='blue'
                       width={'fit-content'}
                       onClick={handleCpeModal}
-                    >
-                      Details
-                    </Button>
-                    {/* <Text fontSize={'xs'} mt={2}>
-                        Press <Code>enter</Code> to add CPE's
-                      </Text> */}
-                  </Box>
+                    />
+                  </Stack>
                   <Flex
                     flexDirection={'row'}
                     flexWrap={'wrap'}

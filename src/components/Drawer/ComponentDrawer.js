@@ -95,12 +95,12 @@ function ComponentDrawer(props) {
   const [cpeList, setCpeList] = useState([])
   const [cpeValue, setCpeValue] = useState('')
   const [cpeData, setCpeData] = useState(null)
-  const [isCPEInputValid, setCPEInputValid] = useState(true);
+  const [isCPEInputValid, setCPEInputValid] = useState(true)
 
   const [selectedCpe, setSelectedCpe] = useState(null)
   const [purlValue, setPurlValue] = useState('')
   const [purlData, setPurlData] = useState(null)
-  const [isPURLInputValid, setPURLInputValid] = useState(true);
+  const [isPURLInputValid, setPURLInputValid] = useState(true)
 
   const [isIncomplete, setIsIncomplete] = useState(false)
   const [isPrimary, setIsPrimary] = useState(primary)
@@ -162,12 +162,12 @@ function ComponentDrawer(props) {
   } = useDisclosure()
 
   const handlePURLInputChange = (e) => {
-    const inputValue = e.target.value;
-    setPurlValue(inputValue);
+    const inputValue = e.target.value
+    setPurlValue(inputValue)
     if (inputValue == null || inputValue === '') {
       return
     }
-    console.log("invoking handle change " + inputValue)
+    console.log('invoking handle change ' + inputValue)
     try {
       PackageURL.fromString(inputValue)
       setPURLInputValid(true)
@@ -175,7 +175,7 @@ function ComponentDrawer(props) {
       console.error('ex', ex)
       setPURLInputValid(false)
     }
-  };
+  }
 
   const handlePurlModal = () => {
     try {
@@ -196,14 +196,15 @@ function ComponentDrawer(props) {
       }
       const pkg = PackageURL.fromString('pkg:generic/unknown@1.0')
       setPurlValue('pkg:generic/unknown@1.0')
+      setPURLInputValid(true)
       setPurlData(pkg)
       onPurlOpen()
     }
   }
 
   const handleCPEInputChange = (e) => {
-    const inputValue = e.target.value;
-    setCpeValue(inputValue);
+    const inputValue = e.target.value
+    setCpeValue(inputValue)
     const matches = inputValue.match(regexPattern)
     if (matches) {
       const [input] = matches
@@ -218,7 +219,7 @@ function ComponentDrawer(props) {
     } else {
       setCPEInputValid(false)
     }
-  };
+  }
 
   const handleCpeModal = () => {
     const matches = cpeValue.match(regexPattern)
@@ -251,6 +252,7 @@ function ComponentDrawer(props) {
         targetHardware: '*'
       })
       setCpeValue('cpe:2.3:a:vendor:product:1.0:*:*:*:*:*:*:*')
+      setCPEInputValid(true)
       onCpeOpen()
     }
   }
@@ -428,7 +430,7 @@ function ComponentDrawer(props) {
           </DrawerHeader>
           <DrawerBody>
             <Stack direction={'column'} spacing={4}>
-              <FormControl isReadOnly={customerView}>
+              <FormControl isReadOnly={component}>
                 <FormLabel fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>Name *</Text>
@@ -444,7 +446,7 @@ function ComponentDrawer(props) {
                   onChange={(e) => setCompName(e.target.value)}
                 />
               </FormControl>
-              <FormControl isReadOnly={customerView}>
+              <FormControl isReadOnly={component}>
                 <FormLabel fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>Version</Text>
@@ -479,8 +481,6 @@ function ComponentDrawer(props) {
                   pointerEvents={customerView ? 'none' : 'auto'}
                 >
                   <option value=''>-- Select --</option>
-                  <option value='unknown'>Unknown</option>
-                  {/* <option value='json'>JSON</option> */}
                   <option value='application'>Application</option>
                   <option value='library'>Library</option>
                   <option value='operating_system'>Operating system</option>
@@ -489,6 +489,11 @@ function ComponentDrawer(props) {
                   <option value='device'>Device</option>
                   <option value='container'>Container</option>
                   <option value='framework'>Framework</option>
+                  <option value='source'>Source</option>
+                  <option value='archive'>Archive</option>
+                  <option value='install'>Install</option>
+                  <option value='other'>Other</option>
+                  <option value='unspecified'>Unspecified</option>
                 </Select>
               </FormControl>
               {/* Suppliers */}
@@ -568,32 +573,36 @@ function ComponentDrawer(props) {
                 </FormLabel>
                 <Stack spacing={2}>
                   <Stack direction={'row'} spacing={2}>
-                  <InputGroup>
-                    <Input
-                      type='text'
+                    <InputGroup>
+                      <Input
+                        type='text'
+                        size='sm'
+                        placeholder='PURL'
+                        value={purlValue}
+                        key='purl'
+                        onChange={handlePURLInputChange}
+                      />
+                      <InputRightElement align='center' zIndex={-1}>
+                        {purlValue != null && purlValue !== '' ? (
+                          isPURLInputValid ? (
+                            <CheckIcon color='green' />
+                          ) : (
+                            <WarningTwoIcon color='red' />
+                          )
+                        ) : null}
+                      </InputRightElement>
+                    </InputGroup>
+                    <IconButton
+                      icon={<FaExpandAlt />}
                       size='sm'
-                      placeholder='PURL'
-                      value={purlValue}
-                      key = 'purl'
-                      onChange={handlePURLInputChange}
-                    />
-                    <InputRightElement align="center">
-                    {purlValue != null && purlValue !== '' ? (
-                      isPURLInputValid ? <CheckIcon color="green" /> : <WarningTwoIcon color="red" />
-                    ) : null}
-                    </InputRightElement>
-                  </InputGroup>
-                  <IconButton
-                    icon={<FaExpandAlt />}
-                    size='sm'
-                    fontWeight={'normal'}
-                    variant='solid'
-                    colorScheme='blue'
-                    width={'fit-content'}
-                    onClick={handlePurlModal}
-                  >
-                    Details
-                  </IconButton>
+                      fontWeight={'normal'}
+                      variant='solid'
+                      colorScheme='blue'
+                      width={'fit-content'}
+                      onClick={handlePurlModal}
+                    >
+                      Details
+                    </IconButton>
                   </Stack>
                   {/* CPE List */}
                   <Stack direction={'row'} spacing={2}>
@@ -603,12 +612,16 @@ function ComponentDrawer(props) {
                         size='sm'
                         placeholder='CPE'
                         value={cpeValue}
-                        key = 'CPE'
+                        key='CPE'
                         onChange={handleCPEInputChange}
                       />
-                      <InputRightElement align="center">
-                        {cpeValue != null && cpeValue  !== '' ? (
-                          isCPEInputValid ? <CheckIcon color="green" /> : <WarningTwoIcon color="red" />
+                      <InputRightElement align='center' zIndex={-1}>
+                        {cpeValue != null && cpeValue !== '' ? (
+                          isCPEInputValid ? (
+                            <CheckIcon color='green' />
+                          ) : (
+                            <WarningTwoIcon color='red' />
+                          )
                         ) : null}
                       </InputRightElement>
                     </InputGroup>

@@ -17,7 +17,10 @@ import {
   Progress,
   UnorderedList,
   ListItem,
-  Textarea
+  Textarea,
+  List,
+  Text,
+  Box
 } from '@chakra-ui/react'
 import { useState, useEffect } from 'react'
 import { PackageURL } from 'packageurl-js'
@@ -66,7 +69,7 @@ const typeOptions = [
 
   { value: 'swid', label: 'swid' },
   { value: 'swift', label: 'swift' }
-];
+]
 
 const namespaceOptions = {
   alpm: [
@@ -75,12 +78,12 @@ const namespaceOptions = {
     { value: 'arch32', label: 'arch32' },
     { value: 'archarm', label: 'archarm' },
     { value: 'manjaro', label: 'manjaro' },
-    { value: 'msys', label: 'msys' },
+    { value: 'msys', label: 'msys' }
   ],
   apk: [
     { value: '', label: '-- Select --' },
     { value: 'alpine', label: 'alpine' },
-    { value: 'openwrt', label: 'openwrt' },
+    { value: 'openwrt', label: 'openwrt' }
   ],
   bitnami: [],
   cocoapods: [],
@@ -90,7 +93,7 @@ const namespaceOptions = {
   deb: [
     { value: '', label: '-- Select --' },
     { value: 'debian', label: 'debian' },
-    { value: 'ubuntu', label: 'ubuntu' },
+    { value: 'ubuntu', label: 'ubuntu' }
   ],
   gem: [],
   generic: [],
@@ -100,94 +103,107 @@ const namespaceOptions = {
   oci: [],
   pub: [],
   pypi: []
-};
+}
 
 const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
   const [purlType, setPurlType] = useState('')
   const [namespace, setNamespace] = useState('')
   const [purlName, setPurlName] = useState('')
   const [purlVersion, setPurlVersion] = useState('')
-  const [nameProgressValue, setNameProgressValue] = useState(0);
-  const [verProgressValue, setVerProgressValue] = useState(0);
-  const [suggestions, setSuggestions] = useState([]);
-  const [verSuggestions , setVerSuggestions] = useState([]);
+  const [nameProgressValue, setNameProgressValue] = useState(0)
+  const [verProgressValue, setVerProgressValue] = useState(0)
+  const [suggestions, setSuggestions] = useState([])
+  const [verSuggestions, setVerSuggestions] = useState([])
 
   const [updatedString, setUpdatedString] = useState(purlValue)
 
   useEffect(() => {
     if (data) {
-      setPurlType(data.type)
-      setNamespace(data.namespace)
-      setPurlName(data.name)
-      setPurlVersion(data.version)
-      setNameProgressValue(calculateProgress(data.type, data.name, ''));
-      setVerProgressValue(calculateProgress(data.type, data.name, data.version));
+      setPurlType(data.type === null ? '' : data.type)
+      setNamespace(data.namespace === null ? '' : data.namespace)
+      setPurlName(data.name === null ? '' : data.name)
+      setPurlVersion(data.version === null ? '' : data.version)
+      setNameProgressValue(calculateProgress(data.type, data.name, ''))
+      setVerProgressValue(calculateProgress(data.type, data.name, data.version))
     }
   }, [data])
 
   const calculateProgress = (type, name, version) => {
-    const vendorMap = {};
-    vendorMap[['deb', 'adduser', ''].join(',')] = 40;
-    vendorMap[['deb', 'bash', ''].join(',')] = 100;
-    vendorMap[['deb', 'base-files', ''].join(',')] = 20;
-    vendorMap[['deb', 'base-passwd', ''].join(',')] = 20;
-    vendorMap[['deb', 'bash', '5.1-6ubuntu1'].join(',')] = 100;
-    vendorMap[['deb', 'binutils-common', ''].join(',')] = 100;
-    vendorMap[['deb', 'binutils-common', '2.38-4ubuntu2.3'].join(',')] = 100;
-    vendorMap[['deb', 'binutils-x86-64-linux-gnu', ''].join(',')] = 100;
-    vendorMap[['deb', 'binutils-x86-64-linux-gnu', '2.38-4ubuntu2.3'].join(',')] = 100;
-    vendorMap[['deb', 'binutils', ''].join(',')] = 100;
-    vendorMap[['deb', 'binutils', '2.38-4ubuntu2.3'].join(',')] = 100;
-    vendorMap[['deb', 'bsdutils', ''].join(',')] = 100;
-    vendorMap[['deb', 'bzip2', ''].join(',')] = 100;
-    vendorMap[['deb', 'bzip2', '1.0.8-4'].join(',')] = 100;
-    vendorMap[['deb', 'ca-certificates', ''].join(',')] = 100;
-    vendorMap[['deb', 'ca-certificates', '20210119~20.04.1'].join(',')] = 100;
-    vendorMap[['deb', 'coreutils', ''].join(',')] = 100;
-    vendorMap[['deb', 'coreutils', '8.30-3ubuntu2'].join(',')] = 100;
+    const vendorMap = {}
+    vendorMap[['deb', 'adduser', ''].join(',')] = 40
+    vendorMap[['deb', 'bash', ''].join(',')] = 100
+    vendorMap[['deb', 'base-files', ''].join(',')] = 20
+    vendorMap[['deb', 'base-passwd', ''].join(',')] = 20
+    vendorMap[['deb', 'bash', '5.1-6ubuntu1'].join(',')] = 100
+    vendorMap[['deb', 'binutils-common', ''].join(',')] = 100
+    vendorMap[['deb', 'binutils-common', '2.38-4ubuntu2.3'].join(',')] = 100
+    vendorMap[['deb', 'binutils-x86-64-linux-gnu', ''].join(',')] = 100
+    vendorMap[
+      ['deb', 'binutils-x86-64-linux-gnu', '2.38-4ubuntu2.3'].join(',')
+    ] = 100
+    vendorMap[['deb', 'binutils', ''].join(',')] = 100
+    vendorMap[['deb', 'binutils', '2.38-4ubuntu2.3'].join(',')] = 100
+    vendorMap[['deb', 'bsdutils', ''].join(',')] = 100
+    vendorMap[['deb', 'bzip2', ''].join(',')] = 100
+    vendorMap[['deb', 'bzip2', '1.0.8-4'].join(',')] = 100
+    vendorMap[['deb', 'ca-certificates', ''].join(',')] = 100
+    vendorMap[['deb', 'ca-certificates', '20210119~20.04.1'].join(',')] = 100
+    vendorMap[['deb', 'coreutils', ''].join(',')] = 100
+    vendorMap[['deb', 'coreutils', '8.30-3ubuntu2'].join(',')] = 100
 
-    var newValue = vendorMap[[type.toLowerCase(), name.toLowerCase(), version.toLowerCase()].join(',')];
+    var newValue =
+      vendorMap[
+        [type.toLowerCase(), name.toLowerCase(), version.toLowerCase()].join(
+          ','
+        )
+      ]
     console.log('Type:' + type, 'Name:' + name, 'Version:' + version, newValue)
     if (isNaN(newValue)) {
-      newValue = 0;
+      newValue = 0
     }
-    return newValue;
-  };
+    return newValue
+  }
 
   const getProgressColor = (value) => {
     if (value >= 90) {
-      return 'green'; // Change color to green if progress is 90% or higher
+      return 'green' // Change color to green if progress is 90% or higher
     } else if (value >= 50) {
-      return 'yellow'; // Change color to yellow if progress is 50% or higher
+      return 'yellow' // Change color to yellow if progress is 50% or higher
     } else {
-      return 'red'; // Change color to red for lower progress values
+      return 'red' // Change color to red for lower progress values
     }
-  };
+  }
 
   const handleTypeChange = (e) => {
     console.log('handleTypeChange', e.target.value, updatedString)
     setPurlType(e.target.value)
-    const pkg = PackageURL.fromString(updatedString);
-    pkg.type = e.target.value;
-    pkg.namespace = '';
+    const pkg = PackageURL.fromString(updatedString)
+    pkg.type = e.target.value
+    pkg.namespace = ''
     setUpdatedString(pkg.toString())
-    const nameProgressValue = calculateProgress(pkg.type, pkg.name, '');
+    const nameProgressValue = calculateProgress(pkg.type, pkg.name, '')
     console.log('nameProgressValue', nameProgressValue)
-    setNameProgressValue(nameProgressValue);
+    setNameProgressValue(nameProgressValue)
 
-    const verProgressValue = calculateProgress(pkg.type, pkg.name, pkg.version);
+    const verProgressValue = calculateProgress(pkg.type, pkg.name, pkg.version)
     console.log('verProgressValue', verProgressValue)
-    setVerProgressValue(verProgressValue);
+    setVerProgressValue(verProgressValue)
 
-    console.log('Done handleTypeChange', e.target.value, pkg.toString(), updatedString, namespaceOptions[pkg.type], namespaceOptions.hasOwnProperty(type))
-
+    console.log(
+      'Done handleTypeChange',
+      e.target.value,
+      pkg.toString(),
+      updatedString,
+      namespaceOptions[pkg.type],
+      namespaceOptions.hasOwnProperty(type)
+    )
   }
 
   const handleNamespaceChange = (e) => {
     console.log('handleNamespaceChange', e.target.value, updatedString)
     setNamespace(e.target.value)
-    const pkg = PackageURL.fromString(updatedString);
-    pkg.namespace = e.target.value;
+    const pkg = PackageURL.fromString(updatedString)
+    pkg.namespace = e.target.value
     setUpdatedString(pkg.toString())
   }
 
@@ -195,68 +211,105 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
     console.log('handleNameChange', e.target.value, updatedString)
     setPurlName(e.target.value)
     if (e.target.value === '') {
-      setSuggestions([]);
-      return;
+      setSuggestions([])
+      return
     }
-    const pkg = PackageURL.fromString(updatedString);
-    pkg.name = e.target.value;
+    const pkg = PackageURL.fromString(updatedString)
+    pkg.name = e.target.value
     setUpdatedString(pkg.toString())
 
-    const nameProgressValue = calculateProgress(pkg.type, e.target.value, '');
+    const nameProgressValue = calculateProgress(pkg.type, e.target.value, '')
     console.log('nameProgressValue', nameProgressValue)
-    setNameProgressValue(nameProgressValue);
+    setNameProgressValue(nameProgressValue)
 
-    if (pkg.type != 'nuget') {
-      return;
+    if (purlType === 'nuget') {
+      // Fetch autocomplete suggestions from NuGet.org API
+      fetch(
+        `https://azuresearch-ussc.nuget.org/autocomplete?q=${e.target.value}&take=10`
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          console.error('Setting suggestions:', data.data)
+          setSuggestions(data.data) // Set the autocomplete suggestions
+        })
+        .catch((error) => {
+          console.error('Error fetching suggestions:', error)
+        })
     }
 
-    // Fetch autocomplete suggestions from NuGet.org API
-    fetch(`https://azuresearch-ussc.nuget.org/autocomplete?q=${e.target.value}&take=5`)
-      .then((response) => response.json())
-      .then((data) => {
-        console.error('Setting suggestions:', data.data);
-        setSuggestions(data.data); // Set the autocomplete suggestions
-      })
-      .catch((error) => {
-        console.error('Error fetching suggestions:', error);
-      });
-
-    // Fetch autocomplete suggestions from NuGet.org API
-    fetch(`https://azuresearch-ussc.nuget.org/autocomplete?id=${pkg.name}&prerelease=false&take=5`)
-    .then((response) => response.json())
-    .then((data) => {
-      console.error('Setting Version suggestions:', data.data);
-      setVerSuggestions(data.data.slice(0, 10)); // Set the autocomplete suggestions
-    })
-    .catch((error) => {
-      console.error('Error fetching suggestions:', error);
-    });
+    if (purlType === 'maven') {
+      fetch(
+        ` https://search.maven.org/solrsearch/select?q=${e.target.value}&rows=20&wt=json`
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          console.error('Setting suggestions:', data)
+        })
+        .catch((error) => {
+          console.error('Error fetching suggestions:', error)
+        })
+    }
   }
 
   const handleNameBlur = () => {
     // Clear the suggestions when the input loses focus
     console.log('Clearing blur')
-    setSuggestions([]);
-  };
+    setSuggestions([])
+  }
 
   const handleVersionChange = (e) => {
     setPurlVersion(e.target.value)
     if (e.target.value === '') {
-      setVerSuggestions([]);
-      return;
+      setVerSuggestions([])
+      return
     }
-    const pkg = PackageURL.fromString(updatedString);
-    pkg.version = e.target.value;
+    const pkg = PackageURL.fromString(updatedString)
+    pkg.version = e.target.value
     setUpdatedString(pkg.toString())
 
-    const verProgressValue = calculateProgress(pkg.type, pkg.name, e.target.value);
+    const verProgressValue = calculateProgress(
+      pkg.type,
+      pkg.name,
+      e.target.value
+    )
     console.log('verProgressValue', verProgressValue)
-    setVerProgressValue(verProgressValue);
+    setVerProgressValue(verProgressValue)
+
+    if (purlType === 'nuget') {
+      // Fetch autocomplete suggestions from NuGet.org API
+      fetch(
+        `https://azuresearch-ussc.nuget.org/autocomplete?id=${purlName}&prerelease=false&take=10`
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          console.error('Setting Version suggestions:', data.data)
+          setVerSuggestions(data.data.slice(0, 10)) // Set the autocomplete suggestions
+        })
+        .catch((error) => {
+          console.error('Error fetching suggestions:', error)
+        })
+    }
   }
 
   const handleSave = () => {
     setPurlValue(updatedString)
     onClose()
+  }
+
+  const handleNameClick = (suggestion) => {
+    setPurlName(suggestion)
+    const pkg = PackageURL.fromString(updatedString)
+    pkg.name = suggestion
+    setUpdatedString(pkg.toString())
+    setSuggestions([])
+  }
+
+  const handleVersionClick = (version) => {
+    setPurlVersion(version)
+    const pkg = PackageURL.fromString(updatedString)
+    pkg.version = version
+    setUpdatedString(pkg.toString())
+    setVerSuggestions([])
   }
 
   return (
@@ -268,11 +321,9 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
           <ModalCloseButton />
           <ModalBody>
             <Flex width={'100%'} direction={'column'} gap={4}>
-            <FormControl>
-              <FormLabel>
-                Package URL
-              </FormLabel>
-              <Textarea
+              <FormControl>
+                <FormLabel>Package URL</FormLabel>
+                <Textarea
                   type='text'
                   variant='filled'
                   mt={1.5}
@@ -285,12 +336,10 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
                   onChange={handleVersionChange}
                   disabled
                 />
-            </FormControl>
+              </FormControl>
               {/* Type */}
               <FormControl>
-                <FormLabel>
-                    Package Type
-                </FormLabel>
+                <FormLabel>Package Type</FormLabel>
                 <Select
                   size='md'
                   id='type'
@@ -306,8 +355,8 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
                 </Select>
               </FormControl>
               {/* Namespace */}
-                {!namespaceOptions.hasOwnProperty(purlType) ? (
-                  <FormControl>
+              {!namespaceOptions.hasOwnProperty(purlType) ? (
+                <FormControl>
                   <FormLabel>Namespace</FormLabel>
                   <Input
                     type='text'
@@ -316,51 +365,74 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
                     value={namespace}
                     onChange={handleNamespaceChange}
                   />
-                  </FormControl>
-                ) : (
-                  namespaceOptions[purlType] && namespaceOptions[purlType].length > 0 ? (
-                    <FormControl>
+                </FormControl>
+              ) : namespaceOptions[purlType] &&
+                namespaceOptions[purlType].length > 0 ? (
+                <FormControl>
                   <FormLabel>Namespace</FormLabel>
-                    <Select
-                      size='md'
-                      id='namespace'
-                      name='namespace'
-                      value={namespace}
-                      onChange={handleNamespaceChange}
-                    >
-                      {namespaceOptions[purlType].map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </Select>
-                    </FormControl>
-                  ) : null
-                )}
+                  <Select
+                    size='md'
+                    id='namespace'
+                    name='namespace'
+                    value={namespace}
+                    onChange={handleNamespaceChange}
+                  >
+                    {namespaceOptions[purlType].map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </Select>
+                </FormControl>
+              ) : null}
               {/* Name */}
               <FormControl>
-                  Package Name
-                <Stack direction='column' spacing={1}>
+                <FormLabel>Package Name</FormLabel>
+                <Stack direction='column' spacing={1} position={'relative'}>
                   <Input
                     type='text'
                     mt={1.5}
                     value={purlName}
                     size='md'
                     onChange={handleNameChange}
-                    onBlur={handleNameBlur}
                   />
-                  <Progress value={nameProgressValue} colorScheme={getProgressColor(nameProgressValue)} />
-                  <UnorderedList>
-              {suggestions.map((suggestion, index) => (
-                <ListItem fontSize='xs' key={index}>{suggestion}</ListItem>
-            ))}
-            </UnorderedList>
+                  {/* <Progress
+                    value={nameProgressValue}
+                    colorScheme={getProgressColor(nameProgressValue)}
+                  /> */}
+                  {suggestions && suggestions.length > 0 && (
+                    <Box
+                      position='absolute'
+                      zIndex='1'
+                      width='100%'
+                      top={12}
+                      mt='2'
+                      bg='white'
+                      border='1px solid #ccc'
+                      height={'300px'}
+                      overflowY={'scroll'}
+                    >
+                      <List>
+                        {suggestions.map((suggestion, index) => (
+                          <ListItem
+                            key={index}
+                            cursor='pointer'
+                            onClick={() => handleNameClick(suggestion)}
+                            p='2'
+                            _hover={{ background: 'gray.100' }}
+                          >
+                            <Text>{suggestion}</Text>
+                          </ListItem>
+                        ))}
+                      </List>
+                    </Box>
+                  )}
                 </Stack>
               </FormControl>
               {/* Version */}
               <FormControl>
-                  Version
-                <Stack direction='column' spacing={1}>
+                <FormLabel> Version</FormLabel>
+                <Stack direction='column' spacing={1} position={'relative'}>
                   <Input
                     size='md'
                     mt={1.5}
@@ -368,12 +440,37 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
                     value={purlVersion}
                     onChange={handleVersionChange}
                   />
-                  <Progress value={verProgressValue} colorScheme={getProgressColor(verProgressValue)} />
-                  <UnorderedList>
-              {verSuggestions.map((suggestion, index) => (
-                <ListItem fontSize='xs' key={index}>{suggestion}</ListItem>
-            ))}
-            </UnorderedList>
+                  {/* <Progress
+                    value={verProgressValue}
+                    colorScheme={getProgressColor(verProgressValue)}
+                  /> */}
+                  {verSuggestions && verSuggestions.length > 0 && (
+                    <Box
+                      position='absolute'
+                      zIndex='1'
+                      width='100%'
+                      top={12}
+                      mt='2'
+                      bg='white'
+                      border='1px solid #ccc'
+                      height={'300px'}
+                      overflowY={'scroll'}
+                    >
+                      <List>
+                        {verSuggestions.map((version, index) => (
+                          <ListItem
+                            key={index}
+                            cursor='pointer'
+                            onClick={() => handleVersionClick(version)}
+                            p='2'
+                            _hover={{ background: 'gray.100' }}
+                          >
+                            <Text>{version}</Text>
+                          </ListItem>
+                        ))}
+                      </List>
+                    </Box>
+                  )}
                 </Stack>
               </FormControl>
             </Flex>
