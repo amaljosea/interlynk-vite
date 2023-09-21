@@ -73,7 +73,7 @@ function SBOMComponentRow(props) {
     <Tr>
       <Td pl='0px'>
         <Stack py='.8rem' direction={'row'} alignItems={'flex-start'} gap={1}>
-          {purl !== '' && (
+          {purl !== null && purl !== '' && (
             <Image
               width={'8'}
               height={'8'}
