@@ -13,7 +13,8 @@ import {
   MenuItem,
   Stack,
   Tag,
-  TagLabel
+  TagLabel,
+  Image
 } from '@chakra-ui/react'
 import { useEffect, useState, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
@@ -23,6 +24,7 @@ import { timeSince } from 'utils'
 import { FaEllipsisV } from 'react-icons/fa'
 import SupplierModal from 'views/Sbom/components/SupplierModal'
 import { ViewIcon } from '@chakra-ui/icons'
+import { getConImg } from 'utils'
 
 function SBOMComponentRow(props) {
   const {
@@ -70,36 +72,48 @@ function SBOMComponentRow(props) {
   return (
     <Tr>
       <Td pl='0px'>
-        <Stack py='.8rem'>
-          <Text>{component}</Text>
-          {primary && (
-            <Tag
-              width={'fit-content'}
-              size={'sm'}
-              variant='subtle'
-              colorScheme='blue'
-            >
-              <TagLabel textTransform={'capitalize'}>Primary</TagLabel>
-            </Tag>
+        <Stack py='.8rem' direction={'row'} alignItems={'flex-start'} gap={1}>
+          {purl !== '' && (
+            <Image
+              width={'8'}
+              height={'8'}
+              src={getConImg(purl.split('/')[0])}
+              alt={purl.split('/')[0]}
+            />
           )}
+          <Stack direction={'column'} gap={0.5}>
+            <Text wordBreak={'break-all'}>{component}</Text>
+            {primary && (
+              <Tag
+                width={'fit-content'}
+                size={'sm'}
+                variant='subtle'
+                colorScheme='blue'
+              >
+                <TagLabel textTransform={'capitalize'}>Primary</TagLabel>
+              </Tag>
+            )}
 
-          {internal && (
-            <Tag
-              width={'fit-content'}
-              size={'sm'}
-              variant='outline'
-              colorScheme='blue'
-            >
-              <TagLabel textTransform={'capitalize'}>Internal</TagLabel>
-            </Tag>
-          )}
+            {internal && (
+              <Tag
+                width={'fit-content'}
+                size={'sm'}
+                variant='outline'
+                colorScheme='blue'
+              >
+                <TagLabel textTransform={'capitalize'}>Internal</TagLabel>
+              </Tag>
+            )}
+          </Stack>
         </Stack>
       </Td>
       <Td>
         <Box>{version}</Box>
       </Td>
       <Td>{purl}</Td>
-      <Td>{suppliers.length > 0 && suppliers[0].name}</Td>
+      <Td>
+        {suppliers.length > 0 && `${suppliers[0].name} - ${suppliers[0].email}`}
+      </Td>
       <Td>{licenses.join(', ')}</Td>
       <Td>
         <Box>{timeSince(updatedAt)}</Box>

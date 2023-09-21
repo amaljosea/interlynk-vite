@@ -13,7 +13,18 @@ import DockerIcon from 'assets/svg/docker.svg'
 import AWSIcon from 'assets/svg/aws.svg'
 import AzureIcon from 'assets/svg/azure.svg'
 import GitHubIcon from 'assets/svg/github.svg'
-import GitlabIcon from 'assets/svg/gitlab.svg'
+import BitbucketIcon from 'assets/svg/bitbucket.svg'
+import GemIcon from 'assets/svg/rubygems.svg'
+import NpmIcon from 'assets/svg/npm.svg'
+import AlpmIcon from 'assets/svg/alpm.svg'
+import BitnamiIcon from 'assets/svg/bitnami.svg'
+import PypiIcon from 'assets/svg/pypi.svg'
+import MavenIcon from 'assets/svg/apachemaven.svg'
+import GolongIcon from 'assets/svg/go.svg'
+// import GitlabIcon from 'assets/svg/gitlab.svg'
+// import GitlabIcon from 'assets/svg/gitlab.svg'
+// import GitlabIcon from 'assets/svg/gitlab.svg'
+// import GitlabIcon from 'assets/svg/gitlab.svg'
 
 export const getConImg = (name) => {
   switch (name) {
@@ -25,8 +36,26 @@ export const getConImg = (name) => {
       return AzureIcon
     case 'Github Container Registry':
       return GitHubIcon
-    case 'Gitlab':
-      return GitlabIcon
+    case 'pkg:npm':
+      return NpmIcon
+    case 'pkg:alpm':
+      return AlpmIcon
+    case 'pkg:nuget':
+      return NugetIcont
+    case 'pkg:github':
+      return GitHubIcon
+    case 'pkg:gem':
+      return GemIcon
+    case 'pkg:bitbucket':
+      return BitbucketIcon
+    case 'pkg:bitnami':
+      return BitnamiIcon
+    case 'pkg:maven':
+      return MavenIcon
+    case 'pkg:pypi':
+      return PypiIcon
+    case 'pkg:golang':
+      return GolongIcon
     default:
       break
   }
