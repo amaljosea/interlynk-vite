@@ -534,7 +534,7 @@ function ProductSbomDrawer(props) {
                         key='purl'
                         onChange={handlePURLInputChange}
                       />
-                      <InputRightElement align='center'>
+                      <InputRightElement align='center' zIndex={-1}>
                         {purlValue != null && purlValue !== '' ? (
                           isPURLInputValid ? (
                             <CheckIcon color='green' />
@@ -565,7 +565,7 @@ function ProductSbomDrawer(props) {
                         key='CPE'
                         onChange={handleCPEInputChange}
                       />
-                      <InputRightElement align='center'>
+                      <InputRightElement align='center' zIndex={-1}>
                         {cpeValue != null && cpeValue !== '' ? (
                           isCPEInputValid ? (
                             <CheckIcon color='green' />
