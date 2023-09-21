@@ -15,6 +15,7 @@ import {
   Flex,
   Input,
   Progress,
+  Textarea,
   calc
 } from '@chakra-ui/react'
 import { useState, useEffect } from 'react'
@@ -93,6 +94,7 @@ const CpeModal = ({
     vendorMap[['google', '', ''].join(',')] = 100;
 
     vendorMap[['', 'windows_xp', ''].join(',')] = 100;
+    vendorMap[['', 'apt', ''].join(',')] = 100;
     vendorMap[['microsoft', 'windows_xp', ''].join(',')] = 100;
     vendorMap[['microsoft', 'windows_xp', 'sp2'].join(',')] = 10;
     vendorMap[['microsoft', 'windows_xp', 'sp3'].join(',')] = 10;
@@ -109,6 +111,11 @@ const CpeModal = ({
     vendorMap[['debian', '', ''].join(',')] = 100;
     vendorMap[['debian', 'cron', ''].join(',')] = 100;
     vendorMap[['', 'cron', ''].join(',')] = 100;
+    vendorMap[['', 'bash', ''].join(',')] = 100;
+    vendorMap[['', 'base_files', ''].join(',')] = 100;
+    vendorMap[['debian', 'bash', ''].join(',')] = 100;
+    vendorMap[['debian', 'bsdutils', ''].join(',')] = 100;
+
 
     vendorMap[['vim', '', ''].join(',')] = 100;
     vendorMap[['redhat', '', ''].join(',')] = 100;
@@ -176,8 +183,12 @@ const CpeModal = ({
     const vendorProgressValue = calculateProgress(cpeParts[3], '', '');
     setVendorProgressValue(vendorProgressValue);
 
-    const prodProgressValue = calculateProgress(cpeParts[3], cpeParts[4], '');
-    setProdProgressValue(prodProgressValue);
+    if (cpeParts[4] === '') {
+      setProdProgressValue(0);
+    } else {
+      const prodProgressValue = calculateProgress(cpeParts[3], cpeParts[4], '');
+      setProdProgressValue(prodProgressValue);
+    }
 
     const verProgressValue = calculateProgress(cpeParts[3], cpeParts[4], cpeParts[5]);
     setVerProgressValue(verProgressValue);
@@ -191,8 +202,13 @@ const CpeModal = ({
     console.log('CPE String: ' + cpeString)
     setUpdatedString(cpeString)
 
-    const prodProgressValue = calculateProgress(cpeParts[3], e.target.value, '');
-    setProdProgressValue(prodProgressValue);
+    if (e.target.value === '') {
+      setProdProgressValue(0);
+    }
+    else {
+       const prodProgressValue = calculateProgress(cpeParts[3], e.target.value, '');
+       setProdProgressValue(prodProgressValue);
+    }
   }
 
   const handleVersionChange = (e) => {
@@ -203,8 +219,12 @@ const CpeModal = ({
     console.log('CPE String: ' + cpeString)
     setUpdatedString(cpeString)
 
-    const verProgressValue = calculateProgress(cpeParts[3], cpeParts[4], e.target.value);
-    setVerProgressValue(verProgressValue);
+    if (e.target.value === '') {
+      setVerProgressValue(0);
+    } else {
+      const verProgressValue = calculateProgress(cpeParts[3], cpeParts[4], e.target.value);
+      setVerProgressValue(verProgressValue);
+    }
   }
 
   const handleHardwareChange = (e) => {
@@ -219,7 +239,7 @@ const CpeModal = ({
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Details</ModalHeader>
+          <ModalHeader>CPE Details</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <Flex width={'100%'} direction={'column'} gap={4}>
@@ -227,12 +247,16 @@ const CpeModal = ({
               <FormLabel>
                 CPE String
               </FormLabel>
-              <Input
+              <Textarea
                   type='text'
-                  variant='filled'
+                  variant='outline'
                   mt={1.5}
                   value={updatedString}
-                  size='md'
+                  fontSize='16px'
+                  fontStyle={'bold'}
+                  color='black'
+                  isInvalid
+                  errorBorderColor='blue.600'
                   onChange={handleVersionChange}
                   disabled
                 />

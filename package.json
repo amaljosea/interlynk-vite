@@ -33,6 +33,7 @@
     "react-select": "^5.7.4",
     "semver": "^7.5.4",
     "serve": "^14.2.0",
+    "simple-icons": "^9.15.0",
     "stylis": "^4.0.13",
     "stylis-plugin-rtl": "^2.1.1"
   },

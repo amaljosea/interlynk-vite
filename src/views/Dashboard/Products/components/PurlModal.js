@@ -14,7 +14,10 @@ import {
   Flex,
   Input,
   Stack,
-  Progress
+  Progress,
+  UnorderedList,
+  ListItem,
+  Textarea
 } from '@chakra-ui/react'
 import { useState, useEffect } from 'react'
 import { PackageURL } from 'packageurl-js'
@@ -106,6 +109,8 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
   const [purlVersion, setPurlVersion] = useState('')
   const [nameProgressValue, setNameProgressValue] = useState(0);
   const [verProgressValue, setVerProgressValue] = useState(0);
+  const [suggestions, setSuggestions] = useState([]);
+  const [verSuggestions , setVerSuggestions] = useState([]);
 
   const [updatedString, setUpdatedString] = useState(purlValue)
 
@@ -122,7 +127,10 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
 
   const calculateProgress = (type, name, version) => {
     const vendorMap = {};
+    vendorMap[['deb', 'adduser', ''].join(',')] = 40;
     vendorMap[['deb', 'bash', ''].join(',')] = 100;
+    vendorMap[['deb', 'base-files', ''].join(',')] = 20;
+    vendorMap[['deb', 'base-passwd', ''].join(',')] = 20;
     vendorMap[['deb', 'bash', '5.1-6ubuntu1'].join(',')] = 100;
     vendorMap[['deb', 'binutils-common', ''].join(',')] = 100;
     vendorMap[['deb', 'binutils-common', '2.38-4ubuntu2.3'].join(',')] = 100;
@@ -171,8 +179,7 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
     console.log('verProgressValue', verProgressValue)
     setVerProgressValue(verProgressValue);
 
-
-    console.log('Done handleTypeChange', e.target.value, pkg.toString(), updatedString)
+    console.log('Done handleTypeChange', e.target.value, pkg.toString(), updatedString, namespaceOptions[pkg.type], namespaceOptions.hasOwnProperty(type))
 
   }
 
@@ -188,6 +195,7 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
     console.log('handleNameChange', e.target.value, updatedString)
     setPurlName(e.target.value)
     if (e.target.value === '') {
+      setSuggestions([]);
       return;
     }
     const pkg = PackageURL.fromString(updatedString);
@@ -197,10 +205,46 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
     const nameProgressValue = calculateProgress(pkg.type, e.target.value, '');
     console.log('nameProgressValue', nameProgressValue)
     setNameProgressValue(nameProgressValue);
+
+    if (pkg.type != 'nuget') {
+      return;
+    }
+
+    // Fetch autocomplete suggestions from NuGet.org API
+    fetch(`https://azuresearch-ussc.nuget.org/autocomplete?q=${e.target.value}&take=5`)
+      .then((response) => response.json())
+      .then((data) => {
+        console.error('Setting suggestions:', data.data);
+        setSuggestions(data.data); // Set the autocomplete suggestions
+      })
+      .catch((error) => {
+        console.error('Error fetching suggestions:', error);
+      });
+
+    // Fetch autocomplete suggestions from NuGet.org API
+    fetch(`https://azuresearch-ussc.nuget.org/autocomplete?id=${pkg.name}&prerelease=false&take=5`)
+    .then((response) => response.json())
+    .then((data) => {
+      console.error('Setting Version suggestions:', data.data);
+      setVerSuggestions(data.data.slice(0, 10)); // Set the autocomplete suggestions
+    })
+    .catch((error) => {
+      console.error('Error fetching suggestions:', error);
+    });
   }
+
+  const handleNameBlur = () => {
+    // Clear the suggestions when the input loses focus
+    console.log('Clearing blur')
+    setSuggestions([]);
+  };
 
   const handleVersionChange = (e) => {
     setPurlVersion(e.target.value)
+    if (e.target.value === '') {
+      setVerSuggestions([]);
+      return;
+    }
     const pkg = PackageURL.fromString(updatedString);
     pkg.version = e.target.value;
     setUpdatedString(pkg.toString())
@@ -228,12 +272,16 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
               <FormLabel>
                 Package URL
               </FormLabel>
-              <Input
+              <Textarea
                   type='text'
                   variant='filled'
                   mt={1.5}
                   value={updatedString}
-                  size='md'
+                  fontSize='16px'
+                  fontStyle={'bold'}
+                  color='black'
+                  isInvalid
+                  errorBorderColor='blue.600'
                   onChange={handleVersionChange}
                   disabled
                 />
@@ -258,7 +306,7 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
                 </Select>
               </FormControl>
               {/* Namespace */}
-                {!namespaceOptions.hasOwnProperty(type) ? (
+                {!namespaceOptions.hasOwnProperty(purlType) ? (
                   <FormControl>
                   <FormLabel>Namespace</FormLabel>
                   <Input
@@ -270,7 +318,7 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
                   />
                   </FormControl>
                 ) : (
-                  namespaceOptions[type] && namespaceOptions[type].length > 0 ? (
+                  namespaceOptions[purlType] && namespaceOptions[purlType].length > 0 ? (
                     <FormControl>
                   <FormLabel>Namespace</FormLabel>
                     <Select
@@ -280,7 +328,7 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
                       value={namespace}
                       onChange={handleNamespaceChange}
                     >
-                      {namespaceOptions[type].map((option) => (
+                      {namespaceOptions[purlType].map((option) => (
                         <option key={option.value} value={option.value}>
                           {option.label}
                         </option>
@@ -299,8 +347,14 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
                     value={purlName}
                     size='md'
                     onChange={handleNameChange}
+                    onBlur={handleNameBlur}
                   />
                   <Progress value={nameProgressValue} colorScheme={getProgressColor(nameProgressValue)} />
+                  <UnorderedList>
+              {suggestions.map((suggestion, index) => (
+                <ListItem fontSize='xs' key={index}>{suggestion}</ListItem>
+            ))}
+            </UnorderedList>
                 </Stack>
               </FormControl>
               {/* Version */}
@@ -315,6 +369,11 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
                     onChange={handleVersionChange}
                   />
                   <Progress value={verProgressValue} colorScheme={getProgressColor(verProgressValue)} />
+                  <UnorderedList>
+              {verSuggestions.map((suggestion, index) => (
+                <ListItem fontSize='xs' key={index}>{suggestion}</ListItem>
+            ))}
+            </UnorderedList>
                 </Stack>
               </FormControl>
             </Flex>
