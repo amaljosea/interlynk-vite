@@ -413,6 +413,10 @@ function ComponentDrawer(props) {
 
   // console.log('cpeList', cpeList)
 
+  const containesOther =
+    licenseList.length > 0 &&
+    licenseList.some((item) => item.value === 'Other' && item.label === 'Other')
+
   return (
     <>
       <Drawer
@@ -430,7 +434,7 @@ function ComponentDrawer(props) {
           </DrawerHeader>
           <DrawerBody>
             <Stack direction={'column'} spacing={4}>
-              <FormControl isReadOnly={component}>
+              <FormControl>
                 <FormLabel fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>Name *</Text>
@@ -444,9 +448,12 @@ function ComponentDrawer(props) {
                   placeholder='Enter name'
                   value={compName}
                   onChange={(e) => setCompName(e.target.value)}
+                  isDisabled={component}
+                  isInvalid={component}
+                  errorBorderColor='blue.600'
                 />
               </FormControl>
-              <FormControl isReadOnly={component}>
+              <FormControl>
                 <FormLabel fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>Version</Text>
@@ -460,6 +467,9 @@ function ComponentDrawer(props) {
                   placeholder='Enter version'
                   value={compVersion}
                   onChange={(e) => setCompVersion(e.target.value)}
+                  isDisabled={component}
+                  isInvalid={component}
+                  errorBorderColor='blue.600'
                 />
               </FormControl>
               {/* Kind */}
@@ -560,7 +570,16 @@ function ComponentDrawer(props) {
                   onChange={onLicenseChange}
                 />
               </FormControl>
-
+              {containesOther && (
+                <FormControl>
+                  <Input
+                    size='sm'
+                    placeholder='Enter a valid SPDX license'
+                    value={licenseName}
+                    onChange={(e) => setLicenseName(e.target.value)}
+                  />
+                </FormControl>
+              )}
               {/* Identifiers */}
               <FormControl isReadOnly={customerView}>
                 <FormLabel fontSize={'sm'}>

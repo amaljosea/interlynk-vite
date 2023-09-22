@@ -115,7 +115,7 @@ const SBOMTable = ({
               )}
               <CardBody overflowX={'scroll'}>
                 <Table
-                  __css={{ tableLayout: 'fixed', width: 'full' }}
+                  // __css={{ tableLayout: 'fixed', width: 'full' }}
                   variant='simple'
                   color={textColor}
                   size='sm'

@@ -1,7 +1,9 @@
 import { EditIcon, QuestionIcon } from '@chakra-ui/icons'
-import { Button, Flex, Icon, Td, Text, Tooltip, Tr } from '@chakra-ui/react'
+import { Badge, Button, Flex, Icon, Link, Td, Text, Tooltip, Tr } from '@chakra-ui/react'
+import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { timeSince } from 'utils'
+import { licenseOptions } from 'variables/licenses'
 
 const GeneralDataRow = ({ onOpen, data, setSelectedKey, status }) => {
   const location = useLocation()
@@ -18,6 +20,19 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey, status }) => {
     licenses,
     suppliers
   } = data
+
+  const [filteredLicense, setFilteredLicense] = useState([])
+
+  useEffect(() => {
+    if (licenses !== null && licenses.length > 0) {
+      // console.log(`license item`, licenses)
+      const filtered = licenseOptions.filter((item) =>
+        licenses.includes(item.licenseId)
+      )
+      // console.log(`filtered item`, filtered)
+      setFilteredLicense(filtered)
+    }
+  }, [licenses])
 
   const handleClick = (ref) => {
     setSelectedKey(ref)
@@ -152,8 +167,17 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey, status }) => {
           License
         </Td>
         <Td pl={0}>
-          <Flex flexDirection={'column'} alignItems={'flex-start'} gap={4}>
-            {licenses.length > 0 ? licenses.join(', ') : ''}
+          <Flex alignItems={'center'} gap={2} flexWrap={'wrap'}>
+            {filteredLicense.length > 0 &&
+              filteredLicense.map((item, index) => (
+                <Tooltip key={index} label={item.name} placement={'top'}>
+                  <Link href={item.reference} target='_blank' isExternal>
+                    <Badge variant='subtle' colorScheme='green'>
+                      {item.licenseId}
+                    </Badge>
+                  </Link>
+                </Tooltip>
+              ))}
           </Flex>
         </Td>
         <Td pl={0}></Td>

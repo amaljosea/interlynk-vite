@@ -13,18 +13,35 @@ import DockerIcon from 'assets/svg/docker.svg'
 import AWSIcon from 'assets/svg/aws.svg'
 import AzureIcon from 'assets/svg/azure.svg'
 import GitHubIcon from 'assets/svg/github.svg'
-import BitbucketIcon from 'assets/svg/bitbucket.svg'
-import GemIcon from 'assets/svg/rubygems.svg'
-import NpmIcon from 'assets/svg/npm.svg'
-import AlpmIcon from 'assets/svg/alpm.svg'
+import CranIcon from 'assets/svg/cran.svg'
 import BitnamiIcon from 'assets/svg/bitnami.svg'
-import PypiIcon from 'assets/svg/pypi.svg'
-import MavenIcon from 'assets/svg/apachemaven.svg'
-import GolongIcon from 'assets/svg/go.svg'
-import NugetIcont from 'assets/svg/nuget.svg'
-// import GitlabIcon from 'assets/svg/gitlab.svg'
-// import GitlabIcon from 'assets/svg/gitlab.svg'
-// import GitlabIcon from 'assets/svg/gitlab.svg'
+import CondaIcon from 'assets/svg/anaconda.png'
+import GolangIcon from 'assets/svg/go.svg'
+import MavenIcon from 'assets/svg/maven.png'
+import BitbucketIcon from 'assets/svg/bitbucket.png'
+import AlpmIcon from 'assets/svg/alpm.png'
+import ApkIcon from 'assets/svg/apk.png'
+import CocoapodsIcon from 'assets/svg/cocoapods.png'
+import CargoIcon from 'assets/svg/cargo.png'
+import ComposerIcon from 'assets/svg/composer.png'
+import ConanIcon from 'assets/svg/conan.png'
+import DebIcon from 'assets/svg/debian.png'
+import DocIcon from 'assets/svg/docker.png'
+import GemIcon from 'assets/svg/gem.png'
+import GenericIcon from 'assets/svg/generic.png'
+import HackageIcon from 'assets/svg/haskell.png'
+import HexIcon from 'assets/svg/hex.png'
+import HuggingFaceIcon from 'assets/svg/huggingface.png'
+import MlflowIcon from 'assets/svg/mflow.png'
+import NpmIcon from 'assets/svg/npm.png'
+import NugetIcon from 'assets/svg/nuget.png'
+import QpkgIcon from 'assets/svg/qpkg.png'
+import OciIcon from 'assets/svg/oci.png'
+import PypiIcon from 'assets/svg/pypi.png'
+import PubIcon from 'assets/svg/pub.png'
+import RpmIcon from 'assets/svg/rpm.png'
+import SwidIcon from 'assets/svg/swid.png'
+import SwiftIcon from 'assets/svg/swift.png'
 
 export const getConImg = (name) => {
   switch (name) {
@@ -36,28 +53,73 @@ export const getConImg = (name) => {
       return AzureIcon
     case 'Github Container Registry':
       return GitHubIcon
-    case 'pkg:npm':
-      return NpmIcon
-    case 'pkg:alpm':
-      return AlpmIcon
-    case 'pkg:nuget':
-      return NugetIcont
-    case 'pkg:github':
-      return GitHubIcon
-    case 'pkg:gem':
-      return GemIcon
-    case 'pkg:bitbucket':
-      return BitbucketIcon
-    case 'pkg:bitnami':
-      return BitnamiIcon
-    case 'pkg:maven':
-      return MavenIcon
-    case 'pkg:pypi':
-      return PypiIcon
+  }
+}
+
+export const GetIcon = (name) => {
+  switch (name) {
     case 'pkg:golang':
-      return GolongIcon
-    default:
-      break
+      return <img width={'36px'} src={GolangIcon} alt='golang' />
+    case 'pkg:maven':
+      return <img width={'24px'} src={MavenIcon} alt='maven' />
+    case 'pkg:apache':
+      return <img width={'24px'} src={MavenIcon} alt='apache' />
+    case 'pkg:bitbucket':
+      return <img width={'22px'} src={BitbucketIcon} alt='bitbucket' />
+    case 'pkg:alpm':
+      return <img width={'26px'} src={AlpmIcon} alt='alpm' />
+    case 'pkg:apk':
+      return <img width={'30px'} src={ApkIcon} alt='apk' />
+    case 'pkg:cocoapods':
+      return <img width={'26px'} src={CocoapodsIcon} alt='cocoapods' />
+    case 'pkg:conda':
+      return <img width={'30px'} src={CondaIcon} alt='anaconda' />
+    case 'pkg:cargo':
+      return <img width={'30px'} src={CargoIcon} alt='cargo' />
+    case 'pkg:composer':
+      return <img width={'26px'} src={ComposerIcon} alt='composer' />
+    case 'pkg:conan':
+      return <img width={'26px'} src={ConanIcon} alt='conan' />
+    case 'pkg:deb':
+      return <img width={'32px'} src={DebIcon} alt='deb' />
+    case 'pkg:cran':
+      return <img src={CranIcon} width={'28px'} alt='cran' />
+    case 'pkg:bitnami':
+      return <img src={BitnamiIcon} width={'28px'} alt='bitnami' />
+    case 'pkg:docker':
+      return <img src={DocIcon} width={'26px'} alt='docker' />
+    case 'pkg:gem':
+      return <img src={GemIcon} width={'26px'} alt='gem' />
+    case 'pkg:generic':
+      return <img src={GenericIcon} width={'26px'} alt='generic' />
+    case 'pkg:github':
+      return <img src={GitHubIcon} width={'26px'} alt='github' />
+    case 'pkg:hackage':
+      return <img src={HackageIcon} width={'26px'} alt='hackage' />
+    case 'pkg:hex':
+      return <img src={HexIcon} width={'26px'} alt='hex' />
+    case 'pkg:huggingface':
+      return <img src={HuggingFaceIcon} width={'26px'} alt='huggingface' />
+    case 'pkg:mlflow':
+      return <img src={MlflowIcon} width={'26px'} alt='mlflow' />
+    case 'pkg:npm':
+      return <img src={NpmIcon} width={'26px'} alt='npm' />
+    case 'pkg:nuget':
+      return <img src={NugetIcon} width={'28px'} alt='nuget' />
+    case 'pkg:qpkg':
+      return <img src={QpkgIcon} width={'28px'} alt='qpkg' />
+    case 'pkg:oci':
+      return <img src={OciIcon} width={'22px'} alt='oci' />
+    case 'pkg:pypi':
+      return <img src={PypiIcon} width={'26px'} alt='pypi' />
+    case 'pkg:pub':
+      return <img src={PubIcon} width={'26px'} alt='pub' />
+    case 'pkg:rpm':
+      return <img src={RpmIcon} width={'26px'} alt='rpm' />
+    case 'pkg:swid':
+      return <img src={SwidIcon} width={'20px'} alt='swid' />
+    case 'pkg:swift':
+      return <img src={SwiftIcon} width={'24px'} alt='swift' />
   }
 }
 

@@ -51,9 +51,9 @@ function Index() {
     }
   })
 
-  useEffect(() => {
-    if (data) console.log(`Products`, data)
-  }, [data])
+  // useEffect(() => {
+  //   if (data) console.log(`Products`, data)
+  // }, [data])
 
   const handlePreviousPage = () => {
     refetch({
