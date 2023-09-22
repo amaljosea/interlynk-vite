@@ -32,7 +32,8 @@ import {
   ModalBody,
   ModalFooter,
   Text,
-  Icon
+  Icon,
+  Badge
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card.js'
@@ -52,7 +53,7 @@ import { useMutation } from '@apollo/client'
 import { UpdateImageVersion } from 'graphQL/Mutation'
 import { ImageUpdate } from 'graphQL/Mutation'
 import { vuln_captions } from 'utils'
-import { FaEllipsisV } from 'react-icons/fa'
+import { FaEllipsisV, FaFilter } from 'react-icons/fa'
 import MultiStatusDrawer from 'components/Drawer/MultiStatusDrawer'
 
 const SBOMTable = ({
@@ -205,6 +206,14 @@ const SBOMTable = ({
     }
   }
 
+  const [filterPurl, setFilterPurl] = useState('')
+  const [filterCpe, setFilterCpe] = useState('')
+  const [filterResolution, setFilterResolution] = useState('')
+
+  const activeFiltersCount = [filterPurl, filterCpe, filterResolution].filter(
+    Boolean
+  ).length
+
   const onVulnFilter = (item) => {
     setFilteredRow([])
     if (item === 'Unresolved') {
@@ -294,6 +303,10 @@ const SBOMTable = ({
 
   const [checkedRows, setCheckedRows] = useState([])
 
+  const onPurlFilter = (p) => {
+    setPurlFilterBy(p)
+  }
+
   return (
     <>
       <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
@@ -321,33 +334,92 @@ const SBOMTable = ({
                       value={searchInput}
                       onChange={(e) => setSearchInput(e.target.value)}
                     />
-                    <Menu closeOnSelect={true}>
-                      <MenuButton
-                        as={Button}
-                        colorScheme='blue'
-                        leftIcon={<BsFilterRight size={24} />}
-                      >
-                        Filter
-                      </MenuButton>
-                      <MenuList minWidth='240px'>
-                        <MenuOptionGroup
-                          defaultValue='Total'
-                          title='Resolution'
-                          type='radio'
+                    <Box position={'relative'}>
+                      <Menu closeOnSelect={true}>
+                        {activeFiltersCount > 0 && (
+                          <Badge
+                            variant='solid'
+                            colorScheme='teal'
+                            position={'absolute'}
+                            right={-2}
+                            top={-1.5}
+                            zIndex={11}
+                          >
+                            {activeFiltersCount}
+                          </Badge>
+                        )}
+                        <MenuButton
+                          as={Button}
+                          colorScheme='blue'
+                          fontWeight='normal'
+                          leftIcon={<FaFilter size={18} />}
                         >
-                          {['Unresolved', 'Total'].map((p, index) => (
-                            <MenuItemOption
-                              value={p}
-                              key={index}
-                              fontSize={'sm'}
-                              onClick={() => onVulnFilter(p)}
-                            >
-                              {p}
-                            </MenuItemOption>
-                          ))}
-                        </MenuOptionGroup>
-                      </MenuList>
-                    </Menu>
+                          Filter
+                        </MenuButton>
+                        <MenuList minWidth='240px'>
+                          <MenuOptionGroup
+                            title='PURL Status'
+                            type='radio'
+                            value={filterPurl}
+                            onChange={(value) => setFilterPurl(value)}
+                          >
+                            {[
+                              'All',
+                              'Missing',
+                              'Invalid',
+                              'Unmatched',
+                              'Valid'
+                            ].map((p, index) => (
+                              <MenuItemOption
+                                value={p}
+                                key={index}
+                                fontSize={'sm'}
+                              >
+                                {p}
+                              </MenuItemOption>
+                            ))}
+                          </MenuOptionGroup>
+                          <MenuOptionGroup
+                            title='CPE Status'
+                            type='radio'
+                            value={filterCpe}
+                            onChange={(value) => setFilterCpe(value)}
+                          >
+                            {[
+                              'All',
+                              'Missing',
+                              'Invalid',
+                              'Unmatched',
+                              'Valid'
+                            ].map((p, index) => (
+                              <MenuItemOption
+                                value={p}
+                                key={index}
+                                fontSize={'sm'}
+                              >
+                                {p}
+                              </MenuItemOption>
+                            ))}
+                          </MenuOptionGroup>
+                          <MenuOptionGroup
+                            title='Resolution'
+                            type='radio'
+                            value={filterResolution}
+                            onChange={(value) => setFilterResolution(value)}
+                          >
+                            {['Unresolved', 'Total'].map((p, index) => (
+                              <MenuItemOption
+                                value={p}
+                                key={index}
+                                fontSize={'sm'}
+                              >
+                                {p}
+                              </MenuItemOption>
+                            ))}
+                          </MenuOptionGroup>
+                        </MenuList>
+                      </Menu>
+                    </Box>
                   </Flex>
                   <Flex gap={2} direction={'row'}>
                     <Box as={Flex} direction={'row'} gap={2}>

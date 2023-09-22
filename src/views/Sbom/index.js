@@ -39,7 +39,8 @@ import {
   FaBalanceScale,
   FaCubes,
   FaLayerGroup,
-  FaFileDownload
+  FaFileDownload,
+  FaCopy
 } from 'react-icons/fa'
 import { useLocation, useHistory } from 'react-router-dom'
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
@@ -54,6 +55,7 @@ import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import { sbomDelete } from 'graphQL/Mutation'
 
 import { TbSignature, TbSignatureOff } from 'react-icons/tb'
+import CopyModal from './components/CopyModal'
 
 function SBOM() {
   const initialRef = useRef(null)
@@ -91,6 +93,12 @@ function SBOM() {
     isOpen: isDelete,
     onOpen: setDeleteOpen,
     onClose: setDeleteClose
+  } = useDisclosure()
+
+  const {
+    isOpen: isCopied,
+    onOpen: onCopiedOpen,
+    onClose: onCopiedClose
   } = useDisclosure()
 
   const { data: sbomData, refetch } = useQuery(GetSBOM, {
@@ -428,6 +436,15 @@ function SBOM() {
                         />
                       </Tooltip>
 
+                      <Tooltip label='Copy'>
+                        <IconButton
+                          icon={<FaCopy />}
+                          onClick={onCopiedOpen}
+                          size='md'
+                          colorScheme='blue'
+                        />
+                      </Tooltip>
+
                       <Tooltip label='Delete'>
                         <IconButton
                           colorScheme='red'
@@ -447,7 +464,9 @@ function SBOM() {
               icon={<Icon h={'24px'} w={'24px'} color='white' as={FaCubes} />}
               title={'Components'}
               description={'Components included in SBOM'}
-              amount={sbomData ? sbomData.sbom.components.nodes.length : 'Loading...'}
+              amount={
+                sbomData ? sbomData.sbom.components.nodes.length : 'Loading...'
+              }
             />
             <Spacer />
             <SBOMStatistics
@@ -517,6 +536,15 @@ function SBOM() {
             isOpen={isVerifyOpen}
             onClose={setVerifyClose}
             sbomData={sbomData}
+          />
+        )}
+
+        {isCopied && sbomData && (
+          <CopyModal
+            isOpen={isCopied}
+            onClose={onCopiedClose}
+            product={sbomData.sbom.project.name}
+            version={primaryData?.version}
           />
         )}
 

@@ -4,8 +4,8 @@ export const licenseOptions = [
     isDeprecatedLicenseId: false,
     detailsUrl: 'https://spdx.org/licenses/0BSD.json',
     referenceNumber: 126,
-    name: '-- Select --',
-    licenseId: '',
+    name: 'Other',
+    licenseId: 'Other',
     seeAlso: [
       'http://landley.net/toybox/license.html',
       'https://opensource.org/licenses/0BSD'

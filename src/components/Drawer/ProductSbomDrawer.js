@@ -427,7 +427,9 @@ function ProductSbomDrawer(props) {
     setCpeList(updatedItems)
   }
 
-  // console.log('cpeList', cpeList)
+  const containesOther =
+    licenseList.length > 0 &&
+    licenseList.some((item) => item.value === 'Other' && item.label === 'Other')
 
   return (
     <>
@@ -510,7 +512,7 @@ function ProductSbomDrawer(props) {
                   onChange={onLicenseChange}
                 />
               </FormControl>
-              {selectedLicense === 'Custom' && (
+              {containesOther && (
                 <FormControl>
                   <Input
                     size='sm'
