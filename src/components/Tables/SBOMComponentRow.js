@@ -126,7 +126,8 @@ function SBOMComponentRow(props) {
             flexWrap={'wrap'}
             flexDirection={'column'}
             gap={2}
-            width={'300px'}
+            width={'250px'}
+            wordBreak={'break-all'}
           >
             {/* COMPONENT NAME */}
             <Text fontSize={'14px'}>{component}</Text>
@@ -211,7 +212,7 @@ function SBOMComponentRow(props) {
           ''
         )}
       </Td>
-      <Td width={'200px'}>
+      <Td width={'250px'}>
         {suppliers.length > 0 && `${suppliers[0].name} - ${suppliers[0].email}`}
       </Td>
       <Td>
@@ -228,7 +229,7 @@ function SBOMComponentRow(props) {
             ))}
         </Flex>
       </Td>
-      <Td width={'160px'}>
+      <Td width={'300px'}>
         <Box>{timeSince(updatedAt)}</Box>
       </Td>
       <Td>
