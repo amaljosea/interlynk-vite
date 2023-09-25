@@ -49,7 +49,12 @@ import { timeSince } from 'utils'
 import { PackageURL } from 'packageurl-js'
 import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
-import { QuestionIcon, CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
+import {
+  QuestionIcon,
+  CheckIcon,
+  WarningTwoIcon,
+  ArrowForwardIcon
+} from '@chakra-ui/icons'
 import { FaExpandAlt } from 'react-icons/fa'
 
 // const regexPattern = /^cpe:2\.3:[aho]:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+$/
@@ -78,15 +83,18 @@ function ComponentDrawer(props) {
     primary,
     internal,
     suppliers,
-    refetch
+    refetch,
+    group,
+    shortDesc
   } = props
 
-  // console.log(`id`, id)
+  console.log(`shortDesc`, shortDesc)
 
   const [createComponent] = useMutation(CreateComponent)
   const [updateComponent] = useMutation(UpdateComponent)
 
   const [compId, setCompId] = useState('')
+  const [groupInfo, setGroupInfo] = useState('')
   const [compName, setCompName] = useState('')
   const [compVersion, setCompVersion] = useState('')
   const [compType, setCompType] = useState('')
@@ -116,6 +124,7 @@ function ComponentDrawer(props) {
 
   useEffect(() => {
     setCompId(id)
+    setGroupInfo(group)
     setCompName(component)
     setCompVersion(version)
     setCompType(type)
@@ -434,10 +443,14 @@ function ComponentDrawer(props) {
           </DrawerHeader>
           <DrawerBody>
             <Stack direction={'column'} spacing={4}>
+              {/* Name */}
               <FormControl>
-                <FormLabel fontSize={'sm'}>
+                <FormLabel fontSize={'sm'} dis>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-                    <Text>Name *</Text>
+                    {shortDesc === 'Component Name' && compName === '' && (
+                      <WarningTwoIcon w={4} h={4} color='red.500' />
+                    )}
+                    <Text>Name</Text>
                     <Tooltip label='Component Name'>
                       <Icon as={QuestionIcon} color={'blue.500'} />
                     </Tooltip>
@@ -453,9 +466,15 @@ function ComponentDrawer(props) {
                   errorBorderColor='blue.600'
                 />
               </FormControl>
+              {/* Version */}
               <FormControl>
                 <FormLabel fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
+                    {(shortDesc === 'Primary Component Version' ||
+                      shortDesc === 'Component Version') &&
+                      compVersion === '' && (
+                        <WarningTwoIcon w={4} h={4} color='red.500' />
+                      )}
                     <Text>Version</Text>
                     <Tooltip label='Component Version'>
                       <Icon as={QuestionIcon} color={'blue.500'} />
@@ -470,6 +489,19 @@ function ComponentDrawer(props) {
                   isDisabled={component}
                   isInvalid={component}
                   errorBorderColor='blue.600'
+                />
+              </FormControl>
+              {/* group */}
+              <FormControl>
+                <FormLabel fontSize={'sm'}>Group</FormLabel>
+                <Input
+                  size='sm'
+                  placeholder='Add group'
+                  value={groupInfo}
+                  onChange={(e) => setGroupInfo(e.target.value)}
+                  isDisabled
+                  isInvalid
+                  errorBorderColor='gray.300'
                 />
               </FormControl>
               {/* Kind */}
@@ -584,6 +616,9 @@ function ComponentDrawer(props) {
               <FormControl isReadOnly={customerView}>
                 <FormLabel fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
+                    {shortDesc === 'Unique Identifier' && purlValue === '' && (
+                      <WarningTwoIcon w={4} h={4} color='red.500' />
+                    )}
                     <Text>Identifiers</Text>
                     <Tooltip label='Component identifiers such as package URL (PURL) or Common Platform Enumeration (CPE) are used for consistent naming of the component. Both CycloneDX and SPDX supports identifying component names with CPE and PURL'>
                       <Icon as={QuestionIcon} color={'blue.500'} />
@@ -700,15 +735,20 @@ function ComponentDrawer(props) {
                 </FormControl>
               )}
               <FormControl isReadOnly={customerView}>
-                <Checkbox
-                  size='sm'
-                  colorScheme='blue'
-                  isChecked={isPrimary}
-                  onChange={() => setIsPrimary(!isPrimary)}
-                  disabled={isInternal}
-                >
-                  Primary component
-                </Checkbox>
+                <Flex alignItems={'center'} gap={2}>
+                  {shortDesc === 'Primary Component' && !isPrimary && (
+                    <WarningTwoIcon w={4} h={4} color='red.500' />
+                  )}
+                  <Checkbox
+                    size='sm'
+                    colorScheme='blue'
+                    isChecked={isPrimary}
+                    onChange={() => setIsPrimary(!isPrimary)}
+                    disabled={isInternal}
+                  >
+                    Primary component
+                  </Checkbox>
+                </Flex>
               </FormControl>
               <FormControl isReadOnly={customerView}>
                 <Checkbox

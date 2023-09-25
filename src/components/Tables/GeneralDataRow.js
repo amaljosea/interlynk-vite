@@ -1,5 +1,15 @@
 import { EditIcon, QuestionIcon } from '@chakra-ui/icons'
-import { Badge, Button, Flex, Icon, Link, Td, Text, Tooltip, Tr } from '@chakra-ui/react'
+import {
+  Badge,
+  Button,
+  Flex,
+  Icon,
+  Link,
+  Td,
+  Text,
+  Tooltip,
+  Tr
+} from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { timeSince } from 'utils'
@@ -18,7 +28,8 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey, status }) => {
     tools,
     authors,
     licenses,
-    suppliers
+    suppliers,
+    copyright
   } = data
 
   const [filteredLicense, setFilteredLicense] = useState([])
@@ -207,13 +218,13 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey, status }) => {
           </Flex>
         </Td>
         <Td pl={0}></Td>
-      </Tr>
+      </Tr> */}
       <Tr>
         <Td pl={0} fontWeight={'medium'}>
           Copyright Text
         </Td>
-        <Td pl={0}>Copyright Interlynk Inc 2023</Td>
-      </Tr> */}
+        <Td pl={0}>{copyright !== null ? copyright : ''}</Td>
+      </Tr>
     </>
   )
 }

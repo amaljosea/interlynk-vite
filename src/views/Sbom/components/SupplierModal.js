@@ -1,4 +1,5 @@
 import { useMutation } from '@apollo/client'
+import { ArrowForwardIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import {
   Modal,
   ModalOverlay,
@@ -12,21 +13,29 @@ import {
   FormControl,
   FormLabel,
   Input,
-  useToast
+  useToast,
+  chakra
 } from '@chakra-ui/react'
 import { supplierUpdate } from 'graphQL/Mutation'
 import { supplierCreate } from 'graphQL/Mutation'
 import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 
-const SupplierModal = ({ id, isOpen, onClose, refetch, suppliers }) => {
+const SupplierModal = ({
+  id,
+  isOpen,
+  onClose,
+  refetch,
+  suppliers,
+  shortDesc
+}) => {
   const toast = useToast()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
-  // console.log('suppliers', suppliers)
+  console.log('shortDesc', shortDesc)
 
   const validateEmail = (email) => {
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
@@ -112,7 +121,14 @@ const SupplierModal = ({ id, isOpen, onClose, refetch, suppliers }) => {
             <ModalBody>
               <Flex width={'100%'} direction={'column'} gap={4}>
                 <FormControl isRequired>
-                  <FormLabel fontSize={'sm'}>Name</FormLabel>
+                  <FormLabel fontSize={'sm'}>
+                    <chakra.span>
+                      {shortDesc === 'Supplier Name' && supName === '' && (
+                        <WarningTwoIcon w={4} h={4} color='red.500' mr={2} />
+                      )}
+                    </chakra.span>
+                    Name
+                  </FormLabel>
                   <Input
                     placeholder='Enter supplier name'
                     value={supName}

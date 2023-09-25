@@ -14,7 +14,13 @@ import {
   useDisclosure,
   Button,
   Flex,
-  Box
+  Box,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuOptionGroup,
+  MenuItemOption,
+  Badge
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
@@ -26,6 +32,10 @@ import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
 import CardHeader from 'components/Card/CardHeader'
 import { AddIcon } from '@chakra-ui/icons'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
+import { FaFilter } from 'react-icons/fa'
+import { useContext } from 'react'
+import GlobalContext from 'context/GlobalContext'
+import HealthCheckRow from 'components/Tables/HealthCheckRow'
 
 const SBOMTable = ({
   captions,
@@ -35,6 +45,8 @@ const SBOMTable = ({
   handleNextPage,
   status
 }) => {
+  const { healthCheckData } = useContext(GlobalContext)
+
   const textColor = useColorModeValue('gray.700', 'white')
 
   const location = useLocation()
@@ -52,6 +64,13 @@ const SBOMTable = ({
   const compBtn = useRef(null)
 
   const [selectedKey, setSelectedKey] = useState('')
+  const [filterPurl, setFilterPurl] = useState('')
+  const [filterCpe, setFilterCpe] = useState('')
+  const [filterResolution, setFilterResolution] = useState('')
+
+  const activeFiltersCount = [filterPurl, filterCpe, filterResolution].filter(
+    Boolean
+  ).length
 
   return (
     <>
@@ -60,6 +79,7 @@ const SBOMTable = ({
           <TabList mt='20px'>
             <Tab _focus={{ outline: 'none' }}>General</Tab>
             <Tab _focus={{ outline: 'none' }}>Components</Tab>
+            <Tab _focus={{ outline: 'none' }}>Health Checks</Tab>
           </TabList>
           <TabPanels>
             {/* general */}
@@ -143,6 +163,7 @@ const SBOMTable = ({
                           component={row.name}
                           version={row.version}
                           purl={row.purl}
+                          group={row.group}
                           licenses={row.licenses}
                           primary={row.primary}
                           internal={row.internal}
@@ -184,6 +205,119 @@ const SBOMTable = ({
                 </Flex>
               )}
             </TabPanel>
+            {/* health check */}
+            <TabPanel>
+              <CardHeader>
+                <Flex
+                  width={'100%'}
+                  alignItems={'flex-end'}
+                  justifyContent={'flex-end'}
+                  pos={'relative'}
+                >
+                  <Menu closeOnSelect={true}>
+                    {activeFiltersCount > 0 && (
+                      <Badge
+                        variant='solid'
+                        colorScheme='teal'
+                        position={'absolute'}
+                        right={-2}
+                        top={-1.5}
+                        zIndex={11}
+                      >
+                        {activeFiltersCount}
+                      </Badge>
+                    )}
+                    <MenuButton
+                      as={Button}
+                      colorScheme='blue'
+                      fontWeight='normal'
+                      leftIcon={<FaFilter size={18} />}
+                    >
+                      Filter
+                    </MenuButton>
+                    <MenuList minWidth='240px'>
+                      <MenuOptionGroup
+                        title='Severity'
+                        type='radio'
+                        value={filterPurl}
+                        onChange={(value) => setFilterPurl(value)}
+                      >
+                        {['Critical', 'High', 'Medium', 'Low'].map(
+                          (p, index) => (
+                            <MenuItemOption
+                              value={p}
+                              key={index}
+                              fontSize={'sm'}
+                            >
+                              {p}
+                            </MenuItemOption>
+                          )
+                        )}
+                      </MenuOptionGroup>
+                      <MenuOptionGroup
+                        title='Short Desc'
+                        type='radio'
+                        value={filterResolution}
+                        onChange={(value) => setFilterResolution(value)}
+                      >
+                        {[
+                          'Primary Component',
+                          'Component Name',
+                          'Supplier Name',
+                          'Unique Identifier',
+                          'Author Name',
+                          'Timestamp'
+                        ].map((p, index) => (
+                          <MenuItemOption value={p} key={index} fontSize={'sm'}>
+                            {p}
+                          </MenuItemOption>
+                        ))}
+                      </MenuOptionGroup>
+                    </MenuList>
+                  </Menu>
+                </Flex>
+              </CardHeader>
+              <CardBody overflowX={'scroll'}>
+                <Table
+                  // __css={{ tableLayout: 'fixed', width: 'full' }}
+                  variant='simple'
+                  color={textColor}
+                  size='sm'
+                  mt={6}
+                >
+                  <Thead>
+                    <Tr my='.8rem' pl='0px'>
+                      {[
+                        'Health Check Id',
+                        'Severity',
+                        'Short Description',
+                        'Long Description',
+                        'Status'
+                      ].map((caption, idx) => {
+                        return (
+                          <Th key={idx} ps={idx === 0 ? '0px' : null} pb={4}>
+                            <Box>{caption}</Box>
+                          </Th>
+                        )
+                      })}
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {healthCheckData.length > 0 &&
+                      healthCheckData.map((item, index) => (
+                        <HealthCheckRow
+                          key={index}
+                          id={item.id}
+                          severity={item.severity}
+                          shortDesc={item.shortDesc}
+                          longDesc={item.longDesc}
+                          status={item.status}
+                        />
+                      ))}
+                  </Tbody>
+                </Table>
+              </CardBody>
+            </TabPanel>
           </TabPanels>
         </Tabs>
       </Card>
@@ -214,6 +348,7 @@ const SBOMTable = ({
           internal={false}
           refetch={refetch}
           suppliers={null}
+          shortDesc={null}
         />
       )}
     </>

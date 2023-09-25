@@ -99,7 +99,7 @@ const GeneralDataDrawer = ({
     const filterData = licenseOptions.find(
       (item) => item.licenseId === licenses[0]
     )
-    console.log(`filterData`, filterData)
+    // console.log(`filterData`, filterData)
     if (filterData) {
       setLicenseList(filterData)
     }

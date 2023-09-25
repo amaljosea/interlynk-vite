@@ -53,7 +53,8 @@ function SBOMComponentRow(props) {
     suppliers,
     refetch,
     lifecycle,
-    status
+    status,
+    group
   } = props
   const location = useLocation()
 
@@ -281,6 +282,8 @@ function SBOMComponentRow(props) {
             primary={primary}
             internal={internal}
             suppliers={suppliers}
+            shortDesc={null}
+            group={group}
           />
         )}
 
@@ -300,6 +303,7 @@ function SBOMComponentRow(props) {
             isOpen={isSupOpen}
             onClose={onSupClose}
             suppliers={suppliers}
+            shortDesc={null}
           />
         )}
       </Td>
