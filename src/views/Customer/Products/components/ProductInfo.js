@@ -261,7 +261,9 @@ function ProductInfo() {
             icon={<Icon h={'24px'} w={'24px'} color='white' as={FaCubes} />}
             title={'Components'}
             description={'Components included in SBOM'}
-            amount={sbomData ? sbomData.sbom.components.length : 'Loading...'}
+            amount={
+              sbomData ? sbomData.sbom.components.nodes.length : 'Loading...'
+            }
           />
           <Spacer />
           <SBOMStatistics

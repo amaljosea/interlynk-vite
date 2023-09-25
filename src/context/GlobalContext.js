@@ -18,7 +18,9 @@ const GlobalContext = React.createContext({
   isAuthenticate: false,
   setIsAuthenticate: () => {},
   scanEnabled: false,
-  setScanEnabled: () => {}
+  setScanEnabled: () => {},
+  healthCheckData: [],
+  setHealthCheckData: () => {}
 })
 
 export default GlobalContext

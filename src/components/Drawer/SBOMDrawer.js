@@ -257,6 +257,15 @@ function SBOMDrawer(props) {
                 Image
               </FormLabel>
               <MultiSelect
+                styles={{
+                  control: (baseStyles, state) => ({
+                    ...baseStyles,
+                    borderColor: state.isFocused ? 'inherit' : 'inherit',
+                    '&:hover': {
+                      borderColor: '#CBD5E0'
+                    }
+                  })
+                }}
                 isMulti
                 value={selectedImg}
                 options={imgList}
@@ -268,6 +277,15 @@ function SBOMDrawer(props) {
                 Product
               </FormLabel>
               <MultiSelect
+                styles={{
+                  control: (baseStyles, state) => ({
+                    ...baseStyles,
+                    borderColor: state.isFocused ? 'inherit' : 'inherit',
+                    '&:hover': {
+                      borderColor: '#CBD5E0'
+                    }
+                  })
+                }}
                 isMulti
                 value={selectedProd}
                 options={productList}

@@ -20,7 +20,8 @@ import {
   Textarea,
   List,
   Text,
-  Box
+  Box,
+  Heading
 } from '@chakra-ui/react'
 import { useState, useEffect } from 'react'
 import { PackageURL } from 'packageurl-js'
@@ -208,12 +209,14 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
   }
 
   const handleNameChange = (e) => {
-    console.log('handleNameChange', e.target.value, updatedString)
+    // console.log('handleNameChange', e.target.value, updatedString)
     setPurlName(e.target.value)
+
     if (e.target.value === '') {
       setSuggestions([])
       return
     }
+
     const pkg = PackageURL.fromString(updatedString)
     pkg.name = e.target.value
     setUpdatedString(pkg.toString())
@@ -229,8 +232,23 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
       )
         .then((response) => response.json())
         .then((data) => {
-          console.error('Setting suggestions:', data.data)
+          console.log('Nuget suggestions:', data.data)
           setSuggestions(data.data) // Set the autocomplete suggestions
+        })
+        .catch((error) => {
+          console.error('Error fetching suggestions:', error)
+        })
+    }
+
+    if (purlType === 'npm') {
+      fetch(`https://registry.npmjs.org/-/v1/search?text=${e.target.value}`)
+        .then((response) => response.json())
+        .then((data) => {
+          console.log('NPM suggestions:', data)
+          const packages =
+            data.objects.length > 0 &&
+            data.objects.map((item) => item.package.name)
+          setSuggestions(packages) // Set the autocomplete suggestions
         })
         .catch((error) => {
           console.error('Error fetching suggestions:', error)
@@ -239,11 +257,11 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
 
     if (purlType === 'maven') {
       fetch(
-        ` https://search.maven.org/solrsearch/select?q=${e.target.value}&rows=20&wt=json`
+        `https://search.maven.org/solrsearch/select?q=${e.target.value}&rows=20&wt=json`
       )
         .then((response) => response.json())
         .then((data) => {
-          console.error('Setting suggestions:', data)
+          console.log('Maven suggestions:', data)
         })
         .catch((error) => {
           console.error('Error fetching suggestions:', error)
@@ -257,12 +275,31 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
     setSuggestions([])
   }
 
+  const fetchVersions = async () => {
+    if (purlType === 'nuget') {
+      const endpoint = `https://azuresearch-ussc.nuget.org/autocomplete?id=${purlName}&prerelease=false&take=10`
+      const res = await fetch(endpoint)
+      const data = await res.json()
+      setVerSuggestions(data.data.slice(0, 10))
+    }
+
+    if (purlType === 'npm') {
+      const endpoint = `https://registry.npmjs.org/${purlName}`
+      const res = await fetch(endpoint)
+      const data = await res.json()
+      const allVersions = Object.keys(data.versions)
+      setVerSuggestions(allVersions)
+    }
+  }
+
   const handleVersionChange = (e) => {
     setPurlVersion(e.target.value)
+
     if (e.target.value === '') {
       setVerSuggestions([])
       return
     }
+
     const pkg = PackageURL.fromString(updatedString)
     pkg.version = e.target.value
     setUpdatedString(pkg.toString())
@@ -272,23 +309,11 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
       pkg.name,
       e.target.value
     )
-    console.log('verProgressValue', verProgressValue)
+
+    // console.log('verProgressValue', verProgressValue)
     setVerProgressValue(verProgressValue)
 
-    if (purlType === 'nuget') {
-      // Fetch autocomplete suggestions from NuGet.org API
-      fetch(
-        `https://azuresearch-ussc.nuget.org/autocomplete?id=${purlName}&prerelease=false&take=10`
-      )
-        .then((response) => response.json())
-        .then((data) => {
-          console.error('Setting Version suggestions:', data.data)
-          setVerSuggestions(data.data.slice(0, 10)) // Set the autocomplete suggestions
-        })
-        .catch((error) => {
-          console.error('Error fetching suggestions:', error)
-        })
-    }
+    fetchVersions()
   }
 
   const handleSave = () => {
@@ -457,17 +482,19 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
                       overflowY={'scroll'}
                     >
                       <List>
-                        {verSuggestions.map((version, index) => (
-                          <ListItem
-                            key={index}
-                            cursor='pointer'
-                            onClick={() => handleVersionClick(version)}
-                            p='2'
-                            _hover={{ background: 'gray.100' }}
-                          >
-                            <Text>{version}</Text>
-                          </ListItem>
-                        ))}
+                        {verSuggestions
+                          .filter((item) => item.includes(purlVersion))
+                          .map((version, index) => (
+                            <ListItem
+                              key={index}
+                              cursor='pointer'
+                              onClick={() => handleVersionClick(version)}
+                              p='2'
+                              _hover={{ background: 'gray.100' }}
+                            >
+                              <Text>{version}</Text>
+                            </ListItem>
+                          ))}
                       </List>
                     </Box>
                   )}

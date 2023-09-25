@@ -432,6 +432,10 @@ export const GetSBOM = gql`
           updatedAt
           uniqueId
           kind
+          copyright
+          publisher
+          licenseExp
+          group
           suppliers {
             id
             name
