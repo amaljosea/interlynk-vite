@@ -275,12 +275,12 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
     setSuggestions([])
   }
 
-  const fetchVersions = async () => {
+  const fetchVersions = async (v) => {
     if (purlType === 'nuget') {
-      const endpoint = `https://azuresearch-ussc.nuget.org/autocomplete?id=${purlName}&prerelease=false&take=10`
+      const endpoint = `https://azuresearch-ussc.nuget.org/autocomplete?id=${purlName}&prerelease=false`
       const res = await fetch(endpoint)
       const data = await res.json()
-      setVerSuggestions(data.data.slice(0, 10))
+      setVerSuggestions(data.data.filter(str => str.startsWith(v)))
     }
 
     if (purlType === 'npm') {
@@ -313,7 +313,7 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
     // console.log('verProgressValue', verProgressValue)
     setVerProgressValue(verProgressValue)
 
-    fetchVersions()
+    fetchVersions(e.target.value)
   }
 
   const handleSave = () => {
