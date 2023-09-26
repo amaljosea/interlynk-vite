@@ -88,8 +88,6 @@ function ComponentDrawer(props) {
     shortDesc
   } = props
 
-  console.log(`shortDesc`, shortDesc)
-
   const [createComponent] = useMutation(CreateComponent)
   const [updateComponent] = useMutation(UpdateComponent)
 
@@ -445,7 +443,7 @@ function ComponentDrawer(props) {
             <Stack direction={'column'} spacing={4}>
               {/* Name */}
               <FormControl>
-                <FormLabel fontSize={'sm'} dis>
+                <FormLabel fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     {shortDesc === 'Component Name' && compName === '' && (
                       <WarningTwoIcon w={4} h={4} color='red.500' />

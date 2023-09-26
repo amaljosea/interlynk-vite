@@ -20,12 +20,14 @@ import {
   MenuList,
   MenuOptionGroup,
   MenuItemOption,
-  Badge
+  Badge,
+  useToast,
+  Text
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 import SBOMComponentRow from 'components/Tables/SBOMComponentRow.js'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import GeneralDataRow from 'components/Tables/GeneralDataRow'
 import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
@@ -45,9 +47,11 @@ const SBOMTable = ({
   handleNextPage,
   status
 }) => {
-  const { healthCheckData } = useContext(GlobalContext)
+  const { healthCheckData, setHealthCheckData } = useContext(GlobalContext)
 
   const textColor = useColorModeValue('gray.700', 'white')
+
+  const toast = useToast()
 
   const location = useLocation()
 
@@ -64,18 +68,35 @@ const SBOMTable = ({
   const compBtn = useRef(null)
 
   const [selectedKey, setSelectedKey] = useState('')
-  const [filterPurl, setFilterPurl] = useState('')
-  const [filterCpe, setFilterCpe] = useState('')
-  const [filterResolution, setFilterResolution] = useState('')
+  const [filterSeverity, setFilterSeverity] = useState('')
+  const [filterDesc, setFilterDesc] = useState('')
 
-  const activeFiltersCount = [filterPurl, filterCpe, filterResolution].filter(
-    Boolean
-  ).length
+  const activeFiltersCount = [filterSeverity, filterDesc].filter(Boolean).length
+
+  const filteredData = healthCheckData.filter((item) => {
+    return (
+      item.severity.includes(filterSeverity) &&
+      item.shortDesc.includes(filterDesc)
+    )
+  })
+
+  const updateIdenifier = () => {
+    toast({
+      description: 'A unique identifier has been added to the component',
+      status: 'success',
+      duration: 3000,
+      position: 'top'
+    })
+  }
+
+  useEffect(() => {
+    console.log(`filteredData`, filteredData)
+  }, [filteredData])
 
   return (
     <>
-      <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
-        <Tabs variant='enclosed' defaultIndex={1}>
+      <Card my='22px'>
+        <Tabs variant='enclosed' defaultIndex={2}>
           <TabList mt='20px'>
             <Tab _focus={{ outline: 'none' }}>General</Tab>
             <Tab _focus={{ outline: 'none' }}>Components</Tab>
@@ -160,6 +181,7 @@ const SBOMTable = ({
                           type={row.kind}
                           lifecycle={data.lifecycle}
                           sbomId={data.id}
+                          description={row.description}
                           component={row.name}
                           version={row.version}
                           purl={row.purl}
@@ -213,62 +235,88 @@ const SBOMTable = ({
                   alignItems={'flex-end'}
                   justifyContent={'flex-end'}
                   pos={'relative'}
+                  gap={3}
                 >
+                  {/* severity */}
                   <Menu closeOnSelect={true}>
-                    {activeFiltersCount > 0 && (
-                      <Badge
-                        variant='solid'
-                        colorScheme='teal'
-                        position={'absolute'}
-                        right={-2}
-                        top={-1.5}
-                        zIndex={11}
-                      >
-                        {activeFiltersCount}
-                      </Badge>
-                    )}
                     <MenuButton
                       as={Button}
                       colorScheme='blue'
                       fontWeight='normal'
-                      leftIcon={<FaFilter size={18} />}
+                      fontSize={'sm'}
+                      leftIcon={<FaFilter size={14} />}
                     >
-                      Filter
+                      Severity
                     </MenuButton>
                     <MenuList minWidth='240px'>
                       <MenuOptionGroup
-                        title='Severity'
                         type='radio'
-                        value={filterPurl}
-                        onChange={(value) => setFilterPurl(value)}
+                        value={filterSeverity}
+                        onChange={(value) => setFilterSeverity(value)}
                       >
-                        {['Critical', 'High', 'Medium', 'Low'].map(
+                        <MenuItemOption
+                          value={'All'}
+                          fontSize={'sm'}
+                          textTransform={'capitalize'}
+                          onClick={() => setFilterSeverity('')}
+                        >
+                          All
+                        </MenuItemOption>
+                        {['critical', 'high', 'medium', 'low'].map(
                           (p, index) => (
                             <MenuItemOption
                               value={p}
                               key={index}
                               fontSize={'sm'}
+                              textTransform={'capitalize'}
                             >
                               {p}
                             </MenuItemOption>
                           )
                         )}
                       </MenuOptionGroup>
+                    </MenuList>
+                  </Menu>
+                  {/* short desc */}
+                  <Menu closeOnSelect={true}>
+                    <MenuButton
+                      as={Button}
+                      colorScheme='blue'
+                      fontWeight='normal'
+                      fontSize={'sm'}
+                      leftIcon={<FaFilter size={14} />}
+                    >
+                      Short Desc
+                    </MenuButton>
+                    <MenuList minWidth='240px'>
                       <MenuOptionGroup
-                        title='Short Desc'
                         type='radio'
-                        value={filterResolution}
-                        onChange={(value) => setFilterResolution(value)}
+                        value={filterDesc}
+                        onChange={(value) => setFilterDesc(value)}
                       >
+                        <MenuItemOption
+                          value={'All'}
+                          fontSize={'sm'}
+                          textTransform={'capitalize'}
+                          onClick={() => setFilterDesc('')}
+                        >
+                          All
+                        </MenuItemOption>
                         {[
                           'Primary Component',
                           'Component Name',
                           'Supplier Name',
                           'Unique Identifier',
                           'Author Name',
-                          'Timestamp'
+                          'Timestamp',
+                          'Component Relationships'
                         ].map((p, index) => (
-                          <MenuItemOption value={p} key={index} fontSize={'sm'}>
+                          <MenuItemOption
+                            value={p}
+                            key={index}
+                            fontSize={'sm'}
+                            textTransform={'capitalize'}
+                          >
                             {p}
                           </MenuItemOption>
                         ))}
@@ -303,20 +351,32 @@ const SBOMTable = ({
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {healthCheckData.length > 0 &&
-                      healthCheckData.map((item, index) => (
+                    {filteredData.length > 0 &&
+                      filteredData.map((item, index) => (
                         <HealthCheckRow
                           key={index}
                           id={item.id}
+                          healthId={item.healthCheckId}
                           severity={item.severity}
                           shortDesc={item.shortDesc}
                           longDesc={item.longDesc}
                           status={item.status}
+                          updateIdenifier={updateIdenifier}
                         />
                       ))}
                   </Tbody>
                 </Table>
               </CardBody>
+              {filteredData.length === 0 && (
+                <Flex
+                  width={'100%'}
+                  alignItems={'center'}
+                  justifyContent={'center'}
+                  pt={10}
+                >
+                  <Text>No data found</Text>
+                </Flex>
+              )}
             </TabPanel>
           </TabPanels>
         </Tabs>

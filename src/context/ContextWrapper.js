@@ -13,65 +13,74 @@ const ContextWrapper = (props) => {
 
   const [healthCheckData, setHealthCheckData] = useState([
     {
-      id: 'qs-1',
-      severity: 'Critical',
+      id: 1,
+      healthCheckId: 'qs-1',
+      severity: 'critical',
       shortDesc: 'Primary Component',
       longDesc: 'SBOM does not indicate a primary component',
       status: 'fix'
     },
     {
-      id: 'qs-3',
-      severity: 'Critical',
+      id: 2,
+      healthCheckId: 'qs-3',
+      severity: 'critical',
       shortDesc: 'Primary Component Version',
       longDesc: 'SBOM does not include a primary component version',
       status: 'fix'
     },
     {
-      id: 'qs-4',
-      severity: 'Critical',
+      id: 3,
+      healthCheckId: 'qs-4',
+      severity: 'critical',
       shortDesc: 'Component Name',
       longDesc: 'Component identified with <XXXX> does not have a name',
       status: 'fix'
     },
     {
-      id: 'qs-5',
-      severity: 'Medium',
+      id: 4,
+      healthCheckId: 'qs-5',
+      severity: 'medium',
       shortDesc: 'Supplier Name',
       longDesc: 'Component identified with <XXXX> does not have a supplier',
       status: 'fix'
     },
     {
-      id: 'qs-6',
-      severity: 'Critical',
+      id: 5,
+      healthCheckId: 'qs-6',
+      severity: 'critical',
       shortDesc: 'Unique Identifier',
       longDesc:
         'Component identifeid with <XXXX> does not have a unique identifier',
       status: 'fix'
     },
     {
-      id: 'qs-7',
-      severity: 'High',
+      id: 6,
+      healthCheckId: 'qs-7',
+      severity: 'high',
       shortDesc: 'Component Version',
       longDesc: 'Component identifeid with <XXXX> does not have a version',
       status: 'fix'
     },
     {
-      id: 'qs-8',
-      severity: 'Low',
+      id: 7,
+      healthCheckId: 'qs-8',
+      severity: 'low',
       shortDesc: 'Author Name',
       longDesc: 'Component identifeid with <XXXX> does not have an author',
       status: 'fix'
     },
     {
-      id: 'qs-9',
-      severity: 'High',
+      id: 8,
+      healthCheckId: 'qs-9',
+      severity: 'high',
       shortDesc: 'Timestamp',
       longDesc: 'SBOM does not include a timestamp',
       status: 'fix'
     },
     {
-      id: 'qs-10',
-      severity: 'High',
+      id: 9,
+      healthCheckId: 'qs-10',
+      severity: 'high',
       shortDesc: 'Component Relationships',
       longDesc:
         'Component identified with <XXXX> is not related to any component connected to the primary component',
