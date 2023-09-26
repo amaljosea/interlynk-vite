@@ -116,7 +116,7 @@ const SupplierModal = ({
         <ModalOverlay />
         <form onSubmit={suppliers.length > 0 ? handleUpdate : handleSave}>
           <ModalContent>
-            <ModalHeader>Supplier</ModalHeader>
+            <ModalHeader>Add Supplier</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               <Flex width={'100%'} direction={'column'} gap={4}>

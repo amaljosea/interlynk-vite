@@ -143,12 +143,11 @@ const CheckModal = ({ isOpen, onClose, id, shortDesc }) => {
 
             {shortDesc === 'Timestamp' && (
               <FormControl isRequired>
-                <FormLabel>Create At</FormLabel>
-
+                <FormLabel>Created At</FormLabel>
                 <Input
                   placeholder='Select Time'
                   size='md'
-                  type='time'
+                  type='datetime-local'
                   value={timestamp}
                   onChange={(e) => setTimestamp(e.target.value)}
                 />
