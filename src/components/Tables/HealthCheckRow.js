@@ -1,15 +1,36 @@
-import { useRef } from 'react'
-import { Badge, Button, Td, Tr, useDisclosure } from '@chakra-ui/react'
-import ComponentDrawer from 'components/Drawer/ComponentDrawer'
+import { useRef, useContext } from 'react'
+import {
+  Td,
+  Tr,
+  Badge,
+  Button,
+  useDisclosure,
+  Tag,
+  TagLabel
+} from '@chakra-ui/react'
 import SupplierModal from 'views/Sbom/components/SupplierModal'
+import CheckModal from 'views/Sbom/components/CheckModal'
+import GlobalContext from 'context/GlobalContext'
+import { sevColor } from 'utils'
 
 function HealthCheckRow(props) {
-  const { id, severity, shortDesc, longDesc, status } = props
+  const {
+    id,
+    healthId,
+    severity,
+    shortDesc,
+    longDesc,
+    status,
+    updateIdenifier
+  } = props
 
   const customerView = location.pathname.startsWith('/customer')
 
+  const { healthCheckData, setHealthCheckData } = useContext(GlobalContext)
+
   const supplierBtn = useRef(null)
-  const compBtn = useRef(null)
+
+  const { isOpen, onOpen, onClose } = useDisclosure()
 
   const {
     isOpen: isCompOpen,
@@ -23,23 +44,63 @@ function HealthCheckRow(props) {
     onClose: onSupplierClose
   } = useDisclosure()
 
+  const {
+    isOpen: isIdentiferOpen,
+    onOpen: onIdentiferOpen,
+    onClose: onIdentiferClose
+  } = useDisclosure()
+
+  const handleOpen = () => {
+    if (shortDesc === 'Primary Component') {
+      return onCompOpen()
+    }
+
+    if (shortDesc === 'Supplier Name') {
+      return onSupplierOpen()
+    }
+
+    if (shortDesc === 'Timestamp') {
+      return onOpen()
+    }
+
+    if (shortDesc === 'Unique Identifier') {
+      const newArray = [...healthCheckData]
+
+      const updatedObjectIndex = newArray.findIndex((obj) => obj.id === id)
+
+      if (updatedObjectIndex !== -1) {
+        newArray[updatedObjectIndex].status = 'active'
+      }
+
+      setHealthCheckData(newArray)
+
+      setTimeout(() => {
+        updateIdenifier()
+      }, 1000)
+    }
+  }
+
   return (
     <Tr>
       <Td pl={0} textTransform={'uppercase'}>
-        {id}
+        {healthId}
       </Td>
-      <Td>{severity}</Td>
+      <Td>
+        <Tag
+          size='md'
+          key='md'
+          variant='subtle'
+          colorScheme={sevColor(severity)}
+          textTransform={'capitalize'}
+        >
+          <TagLabel>{severity}</TagLabel>
+        </Tag>
+      </Td>
       <Td>{shortDesc}</Td>
       <Td>{longDesc}</Td>
       <Td>
         {status === 'fix' ? (
-          <Button
-            size='sm'
-            onClick={
-              shortDesc === 'Supplier Name' ? onSupplierOpen : onCompOpen
-            }
-            disabled={customerView}
-          >
+          <Button size='sm' onClick={handleOpen} disabled={customerView}>
             Fix
           </Button>
         ) : (
@@ -54,21 +115,11 @@ function HealthCheckRow(props) {
         )}
 
         {isCompOpen && (
-          <ComponentDrawer
+          <CheckModal
+            id={id}
+            shortDesc={shortDesc}
             isOpen={isCompOpen}
             onClose={onCompClose}
-            btnRef={compBtn}
-            component={''}
-            version={''}
-            license={''}
-            type={''}
-            cpes={[]}
-            purl={''}
-            primary={false}
-            internal={false}
-            refetch={null}
-            suppliers={null}
-            shortDesc={shortDesc}
           />
         )}
 
@@ -81,6 +132,24 @@ function HealthCheckRow(props) {
             onClose={onSupplierClose}
             suppliers={[]}
             shortDesc={shortDesc}
+          />
+        )}
+
+        {isOpen && (
+          <CheckModal
+            id={id}
+            shortDesc={shortDesc}
+            isOpen={isOpen}
+            onClose={onClose}
+          />
+        )}
+
+        {isIdentiferOpen && (
+          <CheckModal
+            id={id}
+            shortDesc={shortDesc}
+            isOpen={isIdentiferOpen}
+            onClose={onIdentiferClose}
           />
         )}
       </Td>

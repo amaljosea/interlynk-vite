@@ -486,7 +486,6 @@ function SBOM() {
                 'Component',
                 'Version',
                 'PURL',
-                'Supplier',
                 'Licenses',
                 'Updated At',
                 'Actions'

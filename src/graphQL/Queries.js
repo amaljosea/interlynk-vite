@@ -434,6 +434,7 @@ export const GetSBOM = gql`
           kind
           copyright
           publisher
+          description
           licenseExp
           group
           suppliers {

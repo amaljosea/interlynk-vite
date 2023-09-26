@@ -45,8 +45,8 @@ const SidebarContent = ({ logoText, routes }) => {
     // Chakra Color Mode
     const activeBg = useColorModeValue('white', 'gray.700')
     const inactiveBg = useColorModeValue('white', 'gray.700')
-    const activeColor = useColorModeValue('gray.700', 'white')
-    const inactiveColor = useColorModeValue('gray.400', 'gray.400')
+    const activeColor = useColorModeValue('gray.900', 'white')
+    const inactiveColor = useColorModeValue('gray.500', 'gray.500')
 
     return routes.map((prop, index) => {
       if (prop.redirect) {
@@ -100,7 +100,7 @@ const SidebarContent = ({ logoText, routes }) => {
                 }}
                 py='4px'
                 borderRadius='15px'
-                _hover='none'
+                _hover={{ bg: 'none' }}
                 w='100%'
                 _active={{
                   bg: 'inherit',
@@ -110,6 +110,7 @@ const SidebarContent = ({ logoText, routes }) => {
                 _focus={{
                   boxShadow: 'none'
                 }}
+                title={prop.name}
               >
                 <Flex>
                   {typeof prop.icon === 'string' ? (
@@ -154,7 +155,7 @@ const SidebarContent = ({ logoText, routes }) => {
                   xl: '16px'
                 }}
                 borderRadius='15px'
-                _hover='none'
+                _hover={{ bg: 'none' }}
                 w='100%'
                 _active={{
                   bg: 'inherit',
@@ -164,6 +165,7 @@ const SidebarContent = ({ logoText, routes }) => {
                 _focus={{
                   boxShadow: 'none'
                 }}
+                title={prop.name}
               >
                 <Flex>
                   {typeof prop.icon === 'string' ? (

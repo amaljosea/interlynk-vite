@@ -158,7 +158,7 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
           ','
         )
       ]
-    console.log('Type:' + type, 'Name:' + name, 'Version:' + version, newValue)
+    // console.log('Type:' + type, 'Name:' + name, 'Version:' + version, newValue)
     if (isNaN(newValue)) {
       newValue = 0
     }
@@ -176,18 +176,18 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
   }
 
   const handleTypeChange = (e) => {
-    console.log('handleTypeChange', e.target.value, updatedString)
+    // console.log('handleTypeChange', e.target.value, updatedString)
     setPurlType(e.target.value)
     const pkg = PackageURL.fromString(updatedString)
     pkg.type = e.target.value
     pkg.namespace = ''
     setUpdatedString(pkg.toString())
     const nameProgressValue = calculateProgress(pkg.type, pkg.name, '')
-    console.log('nameProgressValue', nameProgressValue)
+    // console.log('nameProgressValue', nameProgressValue)
     setNameProgressValue(nameProgressValue)
 
     const verProgressValue = calculateProgress(pkg.type, pkg.name, pkg.version)
-    console.log('verProgressValue', verProgressValue)
+    // console.log('verProgressValue', verProgressValue)
     setVerProgressValue(verProgressValue)
 
     console.log(
@@ -201,7 +201,7 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
   }
 
   const handleNamespaceChange = (e) => {
-    console.log('handleNamespaceChange', e.target.value, updatedString)
+    // console.log('handleNamespaceChange', e.target.value, updatedString)
     setNamespace(e.target.value)
     const pkg = PackageURL.fromString(updatedString)
     pkg.namespace = e.target.value
@@ -222,7 +222,7 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
     setUpdatedString(pkg.toString())
 
     const nameProgressValue = calculateProgress(pkg.type, e.target.value, '')
-    console.log('nameProgressValue', nameProgressValue)
+    // console.log('nameProgressValue', nameProgressValue)
     setNameProgressValue(nameProgressValue)
 
     if (purlType === 'nuget') {
@@ -232,7 +232,7 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
       )
         .then((response) => response.json())
         .then((data) => {
-          console.log('Nuget suggestions:', data.data)
+          // console.log('Nuget suggestions:', data.data)
           setSuggestions(data.data) // Set the autocomplete suggestions
         })
         .catch((error) => {
@@ -244,7 +244,7 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
       fetch(`https://registry.npmjs.org/-/v1/search?text=${e.target.value}`)
         .then((response) => response.json())
         .then((data) => {
-          console.log('NPM suggestions:', data)
+          // console.log('NPM suggestions:', data)
           const packages =
             data.objects.length > 0 &&
             data.objects.map((item) => item.package.name)
@@ -271,16 +271,16 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
 
   const handleNameBlur = () => {
     // Clear the suggestions when the input loses focus
-    console.log('Clearing blur')
+    // console.log('Clearing blur')
     setSuggestions([])
   }
 
-  const fetchVersions = async (v) => {
+  const fetchVersions = async () => {
     if (purlType === 'nuget') {
       const endpoint = `https://azuresearch-ussc.nuget.org/autocomplete?id=${purlName}&prerelease=false`
       const res = await fetch(endpoint)
       const data = await res.json()
-      setVerSuggestions(data.data.filter(str => str.startsWith(v)))
+      setVerSuggestions(data.data)
     }
 
     if (purlType === 'npm') {
@@ -313,7 +313,7 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
     // console.log('verProgressValue', verProgressValue)
     setVerProgressValue(verProgressValue)
 
-    fetchVersions(e.target.value)
+    fetchVersions()
   }
 
   const handleSave = () => {
@@ -434,7 +434,7 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
                       mt='2'
                       bg='white'
                       border='1px solid #ccc'
-                      height={'300px'}
+                      height={'200px'}
                       overflowY={'scroll'}
                     >
                       <List>
@@ -478,7 +478,7 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
                       mt='2'
                       bg='white'
                       border='1px solid #ccc'
-                      height={'300px'}
+                      // height={'300px'}
                       overflowY={'scroll'}
                     >
                       <List>
