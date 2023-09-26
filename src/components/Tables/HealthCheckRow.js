@@ -108,9 +108,9 @@ function HealthCheckRow(props) {
             variant='solid'
             fontWeight={'medium'}
             colorScheme='green'
-            p={1}
+            p={2}
           >
-            Active
+            Fixed
           </Badge>
         )}
 

@@ -74,8 +74,8 @@ const LinksDrawer = ({ isOpen, onClose, btnRef, component }) => {
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
-          <DrawerHeader fontSize={16} fontWeight={'medium'}>
-            Link
+          <DrawerHeader borderBottomWidth='1px' color='gray.600'>
+             Edit Links
           </DrawerHeader>
           <DrawerBody>
             <form onSubmit={handleLinkAdd}>
@@ -127,7 +127,7 @@ const LinksDrawer = ({ isOpen, onClose, btnRef, component }) => {
 
                 <Flex width={'100%'} flexDir={'column'}>
                   <Text size='md' my={2}>
-                    Link History
+                    Existing Links
                   </Text>
                   {linksData.length > 0 ? (
                     <Table variant='simple' size='sm' mt={4}>
@@ -161,7 +161,7 @@ const LinksDrawer = ({ isOpen, onClose, btnRef, component }) => {
                     </Table>
                   ) : (
                     <Text mt={4} color={'darkgrey'}>
-                      No links specified
+                      No existing links
                     </Text>
                   )}
                 </Flex>
