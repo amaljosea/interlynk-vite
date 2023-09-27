@@ -15,22 +15,19 @@ import { useLocation } from 'react-router-dom'
 import { timeSince } from 'utils'
 import { licenseOptions } from 'variables/licenses'
 
-const GeneralDataRow = ({ onOpen, data, setSelectedKey, status }) => {
+const GeneralDataRow = ({
+  onOpen,
+  data,
+  setSelectedKey,
+  status,
+  licenseBtn,
+  onSbomOpen
+}) => {
   const location = useLocation()
 
   const customerView = location.pathname.startsWith('/customer')
 
-  const {
-    creationAt,
-    updatedAt,
-    cpes,
-    purl,
-    tools,
-    authors,
-    licenses,
-    suppliers,
-    copyright
-  } = data
+  const { creationAt, updatedAt, tools, authors, licenses, suppliers } = data
 
   const [filteredLicense, setFilteredLicense] = useState([])
 
@@ -182,7 +179,7 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey, status }) => {
             {filteredLicense.length > 0 &&
               filteredLicense.map((item, index) => (
                 <Tooltip key={index} label={item.name} placement={'top'}>
-                  <Link href={item.reference} target='_blank' isExternal>
+                  <Link href={item.reference} target='_blank' isexternal>
                     <Badge variant='subtle' colorScheme='green'>
                       {item.licenseId}
                     </Badge>
@@ -191,9 +188,20 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey, status }) => {
               ))}
           </Flex>
         </Td>
-        <Td pl={0}></Td>
+        <Td pl={0}>
+          {!customerView && (
+            <Button
+              size='sm'
+              ref={licenseBtn}
+              isDisabled={status === 'signed'}
+              onClick={onSbomOpen}
+            >
+              <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
+            </Button>
+          )}
+        </Td>
       </Tr>
-      <Tr>
+      {/* <Tr>
         <Td pl={0} fontWeight={'medium'}>
           Identifier(s)
         </Td>
@@ -206,7 +214,7 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey, status }) => {
           </Flex>
         </Td>
         <Td pl={0}></Td>
-      </Tr>
+      </Tr> */}
       {/* <Tr>
         <Td pl={0} fontWeight={'medium'}>
           Hash(es)
@@ -219,12 +227,12 @@ const GeneralDataRow = ({ onOpen, data, setSelectedKey, status }) => {
         </Td>
         <Td pl={0}></Td>
       </Tr> */}
-      <Tr>
+      {/* <Tr>
         <Td pl={0} fontWeight={'medium'}>
           Copyright Text
         </Td>
         <Td pl={0}>{copyright !== null ? copyright : ''}</Td>
-      </Tr>
+      </Tr> */}
     </>
   )
 }

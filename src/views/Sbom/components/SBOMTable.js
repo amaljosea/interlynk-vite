@@ -38,6 +38,9 @@ import { FaFilter } from 'react-icons/fa'
 import { useContext } from 'react'
 import GlobalContext from 'context/GlobalContext'
 import HealthCheckRow from 'components/Tables/HealthCheckRow'
+import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
+import ChangelogRow from 'components/Tables/ChangelogRow'
+import ComponentTable from 'components/Tables/ComponentTable'
 
 const SBOMTable = ({
   captions,
@@ -45,9 +48,11 @@ const SBOMTable = ({
   refetch,
   handlePreviousPage,
   handleNextPage,
-  status
+  status,
+  productId,
+  type
 }) => {
-  const { healthCheckData, setHealthCheckData } = useContext(GlobalContext)
+  const { healthCheckData, changelogData } = useContext(GlobalContext)
 
   const textColor = useColorModeValue('gray.700', 'white')
 
@@ -64,20 +69,34 @@ const SBOMTable = ({
     onClose: onCompClose
   } = useDisclosure()
 
+  const {
+    isOpen: isSBMOpen,
+    onOpen: setSBMOpen,
+    onClose: setSBMClose
+  } = useDisclosure()
+
   const btnRef = useRef(null)
   const compBtn = useRef(null)
+  const licenseBtn = useRef(null)
 
   const [selectedKey, setSelectedKey] = useState('')
   const [filterSeverity, setFilterSeverity] = useState('')
   const [filterDesc, setFilterDesc] = useState('')
 
-  const activeFiltersCount = [filterSeverity, filterDesc].filter(Boolean).length
+  const [filterType, setFilterType] = useState('')
+  const [filterUser, setFilterUser] = useState('')
+
+  // const activeFiltersCount = [filterSeverity, filterDesc].filter(Boolean).length
 
   const filteredData = healthCheckData.filter((item) => {
     return (
       item.severity.includes(filterSeverity) &&
       item.shortDesc.includes(filterDesc)
     )
+  })
+
+  const filterChangelog = changelogData.filter((item) => {
+    return item.type.includes(filterType) && item.changedBy.includes(filterUser)
   })
 
   const updateIdenifier = () => {
@@ -89,18 +108,15 @@ const SBOMTable = ({
     })
   }
 
-  useEffect(() => {
-    console.log(`filteredData`, filteredData)
-  }, [filteredData])
-
   return (
     <>
       <Card my='22px'>
-        <Tabs variant='enclosed' defaultIndex={2}>
+        <Tabs variant='enclosed'>
           <TabList mt='20px'>
             <Tab _focus={{ outline: 'none' }}>General</Tab>
             <Tab _focus={{ outline: 'none' }}>Components</Tab>
             <Tab _focus={{ outline: 'none' }}>Health Checks</Tab>
+            <Tab _focus={{ outline: 'none' }}>Changelog</Tab>
           </TabList>
           <TabPanels>
             {/* general */}
@@ -125,6 +141,8 @@ const SBOMTable = ({
                       setSelectedKey={setSelectedKey}
                       data={data}
                       status={status}
+                      btnRef={licenseBtn}
+                      onSbomOpen={setSBMOpen}
                     />
                   </Tbody>
                 </Table>
@@ -155,7 +173,7 @@ const SBOMTable = ({
                 </CardHeader>
               )}
               <CardBody overflowX={'scroll'}>
-                <Table
+                {/* <Table
                   // __css={{ tableLayout: 'fixed', width: 'full' }}
                   variant='simple'
                   color={textColor}
@@ -178,7 +196,7 @@ const SBOMTable = ({
                         <SBOMComponentRow
                           key={index}
                           id={row.id}
-                          type={row.kind}
+                          type={type}
                           lifecycle={data.lifecycle}
                           sbomId={data.id}
                           description={row.description}
@@ -199,9 +217,16 @@ const SBOMTable = ({
                       )
                     })}
                   </Tbody>
-                </Table>
+                </Table> */}
+
+                <ComponentTable
+                  data={data.components.nodes}
+                  refetch={refetch}
+                  type={type}
+                />
               </CardBody>
 
+              {/* pagination */}
               {data && (
                 <Flex
                   flexDir={'row'}
@@ -378,9 +403,170 @@ const SBOMTable = ({
                 </Flex>
               )}
             </TabPanel>
+            {/* changelog */}
+            <TabPanel>
+              <CardHeader>
+                <Flex
+                  width={'100%'}
+                  alignItems={'flex-end'}
+                  justifyContent={'flex-end'}
+                  pos={'relative'}
+                  gap={3}
+                >
+                  {/* type */}
+                  <Menu closeOnSelect={true}>
+                    <MenuButton
+                      as={Button}
+                      colorScheme='blue'
+                      fontWeight='normal'
+                      fontSize={'sm'}
+                      leftIcon={<FaFilter size={14} />}
+                    >
+                      Type
+                    </MenuButton>
+                    <MenuList minWidth='240px'>
+                      <MenuOptionGroup
+                        type='radio'
+                        value={filterType}
+                        onChange={(value) => setFilterType(value)}
+                      >
+                        <MenuItemOption
+                          value={'All'}
+                          fontSize={'sm'}
+                          textTransform={'capitalize'}
+                          onClick={() => setFilterType('')}
+                        >
+                          All
+                        </MenuItemOption>
+                        {['added', 'modified', 'deleted'].map((p, index) => (
+                          <MenuItemOption
+                            value={p}
+                            key={index}
+                            fontSize={'sm'}
+                            textTransform={'capitalize'}
+                          >
+                            {p}
+                          </MenuItemOption>
+                        ))}
+                      </MenuOptionGroup>
+                    </MenuList>
+                  </Menu>
+                  {/* short desc */}
+                  <Menu closeOnSelect={true}>
+                    <MenuButton
+                      as={Button}
+                      colorScheme='blue'
+                      fontWeight='normal'
+                      fontSize={'sm'}
+                      leftIcon={<FaFilter size={14} />}
+                    >
+                      User
+                    </MenuButton>
+                    <MenuList minWidth='240px'>
+                      <MenuOptionGroup
+                        type='radio'
+                        value={filterUser}
+                        onChange={(value) => setFilterUser(value)}
+                      >
+                        <MenuItemOption
+                          value={'All'}
+                          fontSize={'sm'}
+                          textTransform={'capitalize'}
+                          onClick={() => setFilterUser('')}
+                        >
+                          All
+                        </MenuItemOption>
+                        {[
+                          'Abhisek Paul',
+                          'Brian B.',
+                          'Ritesh Noronha',
+                          'Shubham Shete',
+                          'Surandra Pathak'
+                        ].map((p, index) => (
+                          <MenuItemOption
+                            value={p}
+                            key={index}
+                            fontSize={'sm'}
+                            textTransform={'capitalize'}
+                          >
+                            {p}
+                          </MenuItemOption>
+                        ))}
+                      </MenuOptionGroup>
+                    </MenuList>
+                  </Menu>
+                </Flex>
+              </CardHeader>
+              <CardBody overflowX={'scroll'}>
+                <Table
+                  __css={{ tableLayout: 'fixed', width: 'full' }}
+                  variant='simple'
+                  color={textColor}
+                  size='sm'
+                  mt={6}
+                >
+                  <Thead>
+                    <Tr my='.8rem' pl='0px'>
+                      {[
+                        'Type',
+                        'Object',
+                        'Previous Value',
+                        'New Value',
+                        'Changed By',
+                        'Time'
+                      ].map((caption, idx) => {
+                        return (
+                          <Th key={idx} ps={idx === 0 ? '0px' : null} pb={4}>
+                            <Box>{caption}</Box>
+                          </Th>
+                        )
+                      })}
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {filterChangelog.length > 0 &&
+                      filterChangelog.map((item, index) => (
+                        <ChangelogRow
+                          key={index}
+                          id={item.id}
+                          type={item.type}
+                          object={item.object}
+                          prevValue={item.prevValue}
+                          newValue={item.newValue}
+                          changedBy={item.changedBy}
+                          time={item.time}
+                        />
+                      ))}
+                  </Tbody>
+                </Table>
+              </CardBody>
+              {filterChangelog.length === 0 && (
+                <Flex
+                  width={'100%'}
+                  alignItems={'center'}
+                  justifyContent={'center'}
+                  pt={10}
+                >
+                  <Text>No data found</Text>
+                </Flex>
+              )}
+            </TabPanel>
           </TabPanels>
         </Tabs>
       </Card>
+
+      {isSBMOpen && data && (
+        <ProductSbomDrawer
+          isOpen={isSBMOpen}
+          onClose={setSBMClose}
+          btnRef={licenseBtn}
+          projectId={productId}
+          name={data.project.name}
+          refetch={refetch}
+          sbomData={data}
+          type={type}
+        />
+      )}
 
       {data && isOpen && (
         <GeneralDataDrawer
@@ -401,7 +587,7 @@ const SBOMTable = ({
           component={''}
           version={''}
           license={''}
-          type={''}
+          type={type}
           cpes={[]}
           purl={''}
           primary={false}

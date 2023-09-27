@@ -122,12 +122,12 @@ function ComponentDrawer(props) {
 
   useEffect(() => {
     setCompId(id)
-    setGroupInfo(group)
+    setGroupInfo(group == null ? '' : group)
     setCompName(component)
     setCompVersion(version)
-    setCompType(type)
     setCpeList(cpes)
     setPurlValue(purl)
+
     try {
       PackageURL.fromString(purlValue)
       setPURLInputValid(true)
@@ -136,11 +136,11 @@ function ComponentDrawer(props) {
         setPURLInputValid(false)
       }
     }
-    console.log(`purl`, purlValue)
   }, [component])
 
   useEffect(() => {
     if (license.length > 0) {
+      // console.log(`license`, license)
       const commonValues = licenseOptions.filter((item1) =>
         license.includes(item1.licenseId)
       )
@@ -155,6 +155,26 @@ function ComponentDrawer(props) {
       setSelectedLicenses(selectedIds)
     }
   }, [license])
+
+  useEffect(() => {
+    setCompType(type)
+  }, [type])
+
+  // Health Check
+  useEffect(() => {
+    if (shortDesc === 'Component Name') {
+      setCompVersion('2.0.35')
+      setCompName('')
+    }
+
+    if (
+      shortDesc === 'Component Version' ||
+      shortDesc === 'Primary Component Version'
+    ) {
+      setCompName('dropwizard-core')
+      setCompVersion('')
+    }
+  }, [])
 
   const {
     isOpen: isPurlOpen,
@@ -285,13 +305,23 @@ function ComponentDrawer(props) {
             primary: isPrimary,
             internal: isInternal
           }
-        }).then(() => {
-          refetch({
-            projectId: productId,
-            sbomId: sbomId
-          })
-          onClose()
         })
+          .then(() => {
+            refetch({
+              projectId: productId,
+              sbomId: sbomId
+            })
+            onClose()
+          })
+          .finally(() => {
+            toast({
+              description: `Data added successfully`,
+              status: 'success',
+              position: 'top',
+              isClosable: true,
+              duration: 2000
+            })
+          })
       } catch (error) {
         console.error('Mutation error:', error)
       }
@@ -320,13 +350,23 @@ function ComponentDrawer(props) {
           primary: isPrimary,
           internal: isInternal
         }
-      }).then(() => {
-        refetch({
-          projectId: productId,
-          sbomId: sbomId
-        })
-        onClose()
       })
+        .then(() => {
+          refetch({
+            projectId: productId,
+            sbomId: sbomId
+          })
+          onClose()
+        })
+        .finally(() => {
+          toast({
+            description: `Data updated successfully`,
+            status: 'success',
+            position: 'top',
+            isClosable: true,
+            duration: 2000
+          })
+        })
     } catch (error) {
       console.error('Mutation error:', error)
     }
@@ -518,10 +558,12 @@ function ComponentDrawer(props) {
                   size='sm'
                   value={compType}
                   onChange={(e) => setCompType(e.target.value)}
-                  pointerEvents={customerView ? 'none' : 'auto'}
+                  pointerEvents={'none'}
                 >
                   <option value=''>-- Select --</option>
                   <option value='application'>Application</option>
+                  <option value='unknown'>Unknown</option>
+                  <option value='json'>JSON</option>
                   <option value='library'>Library</option>
                   <option value='operating_system'>Operating system</option>
                   <option value='firmware'>Firmware</option>

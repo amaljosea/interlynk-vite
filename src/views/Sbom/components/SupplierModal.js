@@ -35,8 +35,6 @@ const SupplierModal = ({
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
-  console.log('shortDesc', shortDesc)
-
   const validateEmail = (email) => {
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
     return emailRegex.test(email)
@@ -46,7 +44,7 @@ const SupplierModal = ({
   const [supEmail, setSupEmail] = useState('')
 
   const [createSupplier] = useMutation(supplierCreate)
-  const [updateSupplier] = useMutation(supplierUpdate)
+  const [updateSupplier, { errors }] = useMutation(supplierUpdate)
 
   useEffect(() => {
     if (suppliers.length > 0) {
@@ -93,12 +91,22 @@ const SupplierModal = ({
           sbomId: sbomId,
           componentId: id
         }
-      }).then(() => {
-        refetch({
-          projectId: productId,
-          sbomId: sbomId
-        })
-        onClose()
+      }).then((data) => {
+        if (data.data.supplierUpdate.errors.length > 0) {
+          onClose()
+          toast({
+            description: data.data.supplierUpdate.errors[0],
+            status: 'error',
+            position: 'top',
+            duration: 5000
+          })
+        } else {
+          refetch({
+            projectId: productId,
+            sbomId: sbomId
+          })
+          onClose()
+        }
       })
     } else {
       toast({

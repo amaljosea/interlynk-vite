@@ -288,8 +288,11 @@ function Index() {
           <ProductModal
             isOpen={isOpenProduct}
             onClose={onCloseProduct}
-            product={''}
-            vendorName={''}
+            id={null}
+            product={null}
+            description={null}
+            allProjects={null}
+            type={null}
           />
         )}
       </>

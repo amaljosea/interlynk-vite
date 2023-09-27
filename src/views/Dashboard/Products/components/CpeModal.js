@@ -148,7 +148,7 @@ const CpeModal = ({
     vendorMap[['7.1.2', '', ''].join(',')] = 10;
 
     var newValue = vendorMap[[vendor.toLowerCase(), prod.toLowerCase(), version.toLowerCase()].join(',')];
-    console.log('Vendor:' + vendor, 'Prod:' + prod, 'Version:' + version, newValue)
+    // console.log('Vendor:' + vendor, 'Prod:' + prod, 'Version:' + version, newValue)
     if (isNaN(newValue)) {
       newValue = 0;
     }
@@ -177,7 +177,7 @@ const CpeModal = ({
     const cpeParts = updatedString.split(':')
     cpeParts[3] = e.target.value
     const cpeString = cpeParts.join(':')
-    console.log('CPE String: ' + cpeString)
+    // console.log('CPE String: ' + cpeString)
     setUpdatedString(cpeString)
 
     const vendorProgressValue = calculateProgress(cpeParts[3], '', '');
@@ -199,7 +199,7 @@ const CpeModal = ({
     const cpeParts = updatedString.split(':')
     cpeParts[4] = e.target.value
     const cpeString = cpeParts.join(':')
-    console.log('CPE String: ' + cpeString)
+    // console.log('CPE String: ' + cpeString)
     setUpdatedString(cpeString)
 
     if (e.target.value === '') {
@@ -216,7 +216,7 @@ const CpeModal = ({
     const cpeParts = updatedString.split(':')
     cpeParts[5] = e.target.value
     const cpeString = cpeParts.join(':')
-    console.log('CPE String: ' + cpeString)
+    // console.log('CPE String: ' + cpeString)
     setUpdatedString(cpeString)
 
     if (e.target.value === '') {
@@ -230,7 +230,7 @@ const CpeModal = ({
   const handleHardwareChange = (e) => {
     setHardware(e.target.value)
     const cpeString = cpeValue.replace(data.targetHardware, e.target.value)
-    console.log('CPE String: ' + cpeString)
+    // console.log('CPE String: ' + cpeString)
     setUpdatedString(cpeString)
   }
 

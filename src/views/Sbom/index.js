@@ -47,15 +47,14 @@ import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 import { useMutation, useQuery } from '@apollo/client'
 import { GetSBOM, GetProject } from 'graphQL/Queries'
 import { timeSince } from 'utils'
-import { BsFillPatchExclamationFill } from 'react-icons/bs'
 import SigningModal from './components/SigningModal'
-import { MdVerified } from 'react-icons/md'
 import DownloadModal from './components/DownloadModal'
 import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import { sbomDelete } from 'graphQL/Mutation'
 
 import { TbSignature, TbSignatureOff } from 'react-icons/tb'
 import CopyModal from './components/CopyModal'
+import { GetProjectData } from 'graphQL/Queries'
 
 function SBOM() {
   const initialRef = useRef(null)
@@ -76,6 +75,16 @@ function SBOM() {
 
   const [status, setStatus] = useState('created')
   const [signedData, setSignedData] = useState(null)
+
+  const { data: allProjects } = useQuery(GetProjectData, {
+    variables: {
+      first: 10
+    }
+  })
+
+  const selectedProject =
+    allProjects &&
+    allProjects.projects.nodes.find((item) => item.id === productId)
 
   const {
     isOpen: isSBMOpen,
@@ -496,6 +505,11 @@ function SBOM() {
               handlePreviousPage={handlePreviousPage}
               handleNextPage={handleNextPage}
               status={status}
+              productId={productId}
+              type={
+                selectedProject?.sboms.length > 0 &&
+                selectedProject.sboms[0].format
+              }
             />
           )}
         </Flex>
@@ -508,7 +522,11 @@ function SBOM() {
             projectId={productId}
             name={sbomData.sbom.project.name}
             refetch={refetch}
-            sbomData={sbomData}
+            sbomData={sbomData.sbom}
+            type={
+              selectedProject?.sboms.length > 0 &&
+              selectedProject.sboms[0].format
+            }
           />
         )}
 

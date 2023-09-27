@@ -47,7 +47,8 @@ const CheckModal = ({ isOpen, onClose, id, shortDesc }) => {
   const now = new Date()
   const hours = String(now.getHours()).padStart(2, '0')
   const minutes = String(now.getMinutes()).padStart(2, '0')
-  const currentTime = `${hours}:${minutes}`
+  // const currentTime = `${hours}:${minutes}`
+  const currentTime = now.toISOString().slice(0, 16)
 
   const [timestamp, setTimestamp] = useState(currentTime)
   const [comp, setComp] = useState('')
@@ -149,7 +150,7 @@ const CheckModal = ({ isOpen, onClose, id, shortDesc }) => {
                   size='md'
                   type='datetime-local'
                   value={timestamp}
-                  onChange={(e) => setTimestamp(e.target.value)}
+                  onChange={(e) => console.log(e.target.value)}
                 />
               </FormControl>
             )}
