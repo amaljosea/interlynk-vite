@@ -21,6 +21,186 @@ import {
   FaFilePdf
 } from 'react-icons/fa'
 
+export const healthChecks = [
+  {
+    id: 1,
+    healthCheckId: 'qs-1',
+    severity: 'critical',
+    shortDesc: 'Primary Component',
+    longDesc: 'SBOM does not indicate a primary component',
+    status: 'fix'
+  },
+  {
+    id: 2,
+    healthCheckId: 'qs-3',
+    severity: 'critical',
+    shortDesc: 'Primary Component Version',
+    longDesc: 'SBOM does not include a primary component version',
+    status: 'fix'
+  },
+  {
+    id: 3,
+    healthCheckId: 'qs-4',
+    severity: 'critical',
+    shortDesc: 'Component Name',
+    longDesc: 'Component identified with <XXXX> does not have a name',
+    status: 'fix'
+  },
+  {
+    id: 4,
+    healthCheckId: 'qs-5',
+    severity: 'medium',
+    shortDesc: 'Supplier Name',
+    longDesc: 'Component identified with <XXXX> does not have a supplier',
+    status: 'fix'
+  },
+  {
+    id: 5,
+    healthCheckId: 'qs-6',
+    severity: 'critical',
+    shortDesc: 'Unique Identifier',
+    longDesc:
+      'Component identifeid with <XXXX> does not have a unique identifier',
+    status: 'fix'
+  },
+  {
+    id: 6,
+    healthCheckId: 'qs-7',
+    severity: 'high',
+    shortDesc: 'Component Version',
+    longDesc: 'Component identifeid with <XXXX> does not have a version',
+    status: 'fix'
+  },
+  {
+    id: 7,
+    healthCheckId: 'qs-8',
+    severity: 'low',
+    shortDesc: 'Author Name',
+    longDesc: 'Component identifeid with <XXXX> does not have an author',
+    status: 'fix'
+  },
+  {
+    id: 8,
+    healthCheckId: 'qs-9',
+    severity: 'high',
+    shortDesc: 'Timestamp',
+    longDesc: 'SBOM does not include a timestamp',
+    status: 'fix'
+  },
+  {
+    id: 9,
+    healthCheckId: 'qs-10',
+    severity: 'high',
+    shortDesc: 'Component Relationships',
+    longDesc:
+      'Component identified with <XXXX> is not related to any component connected to the primary component',
+    status: 'fix'
+  }
+]
+
+export const changeLogs = [
+  {
+    id: 1,
+    type: 'modified',
+    object:
+      'Name: microsoft.extensions.dependencyinjection.abstractions.2.0.0.nupkg',
+    prevValue: 'Primary: False',
+    newValue: 'Primary:True',
+    changedBy: 'Surendra Pathak',
+    time: '2023-09-23T19:21:00Z'
+  },
+  {
+    id: 2,
+    type: 'added',
+    object: 'Creation Time',
+    prevValue: 'N/A',
+    newValue: '09/25/2023 6:15 PM',
+    changedBy: 'Abhisek Paul',
+    time: '2023-09-24T07:11:36Z'
+  },
+  {
+    id: 3,
+    type: 'added',
+    object: 'Licenses',
+    prevValue: 'N/A',
+    newValue: 'MIT',
+    changedBy: 'Surendra Pathak',
+    time: '2023-09-24T19:20:00Z'
+  },
+  {
+    id: 4,
+    type: 'added',
+    object: 'Version',
+    prevValue: 'N/A',
+    newValue: '3.0.0',
+    changedBy: 'Abhisek Paul',
+    time: '2023-09-22T07:11:24Z'
+  },
+  {
+    id: 5,
+    type: 'modified',
+    object: 'Licenses',
+    prevValue: 'AAPL',
+    newValue: 'AAL',
+    changedBy: 'Ritesh Noronha',
+    time: '2023-09-24T05:38:00Z'
+  },
+  {
+    id: 6,
+    type: 'added',
+    object: 'Component ID: bom-ref-h17z311',
+    prevValue: 'N/A',
+    newValue: 'Component Name: microsoft.extensions.dependendencyinjections.3.1.1.nupkg',
+    changedBy: 'Ritesh Noronha',
+    time: '2023-09-11T07:15:24Z'
+  },
+  {
+    id: 7,
+    type: 'added',
+    object: 'Name: microsoft.extensions.dependencyinjection.abstractions.2.0.0.nupkg',
+    prevValue: 'N/A',
+    newValue: 'Supplier: Biotronik Inc. - hello@biontronik.com',
+    changedBy: 'Brian B.',
+    time: '2023-09-22T08:15:00Z'
+  },
+  {
+    id: 8,
+    type: 'added',
+    object: 'Name: microsoft.extensions.dependencyinjection.abstractions.2.0.0.nupkg',
+    prevValue: 'Bom-Ref: N/A',
+    newValue: 'Bom-Ref: bom-ref-h291z34a1',
+    changedBy: 'Shubham Shete',
+    time: '2023-09-15T08:11:10Z'
+  },
+  {
+    id: 9,
+    type: 'added',
+    object: 'Name: microsoft.extensions.dependencyinjection.abstractions.2.0.0.nupkg',
+    prevValue: 'Describes: None',
+    newValue: 'Describes: microsoft.extensions.signlecore.privates.11.1.9.nupkg',
+    changedBy: 'Ritesh Noronha',
+    time: '2023-09-17T17:15:00Z'
+  },
+  {
+    id: 10,
+    type: 'modified',
+    object: 'Name: microsoft.extensions.dependencyinjection.abstractions.2.0.0.nupkg',
+    prevValue: 'PURL: pkg:/nuget/abstractions@2.0.0',
+    newValue: 'PURL: pkg/nuget/microsoft.extensions.abstractions@2.0.0',
+    changedBy: 'Surendra Pathak',
+    time: '2023-09-23T17:16:00Z'
+  },
+  {
+    id: 11,
+    type: 'deleted',
+    object: 'Name: com.junkcode.com',
+    prevValue: 'N/A',
+    newValue: 'N/A',
+    changedBy: 'Ritesh Noronha',
+    time: '2023-09-17T06:14:00Z'
+  },
+]
+
 export const activitiesData = [
   {
     logo: FaShare,

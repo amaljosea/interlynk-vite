@@ -68,7 +68,7 @@ function AdvisoryLogRow(props) {
     <Tr>
       <Td width={'250px'} pl='0px'>
         <Flex align='center' py='.2rem' minWidth='100%' flexWrap='nowrap'>
-          <Link href={link} isExternal>
+          <Link href={link} isexternal>
             <Flex direction='row' gap={2} alignItems={'flex-start'}>
               <Icon as={ExternalLinkIcon} h={'16px'} w={'16px'} me='5px' />
               <Flex flexDirection={'column'} alignItems={'self-start'} gap={2}>

@@ -72,7 +72,7 @@ function ProductSbomDrawer(props) {
   const [version, setVersion] = useState('')
   const [spec, setSpec] = useState('')
   const [specVesion, setSpecVersion] = useState('')
-  const [compType, setCompType] = useState(type)
+  const [compType, setCompType] = useState('')
   const [licenseName, setLicenseName] = useState('')
   const [selectedLicense, setSelectedLicense] = useState('')
 
@@ -92,22 +92,25 @@ function ProductSbomDrawer(props) {
   useEffect(() => {
     if (sbomData) {
       // console.log(`sbom data`, sbomData)
-      setSpec(sbomData.sbom.spec)
-      setSpecVersion(sbomData.sbom.specVersion)
-      setCompType(sbomData.sbom.format)
-      setCpeList(sbomData.sbom.cpes)
-      setPurlValue(sbomData.sbom.purl === null ? '' : sbomData.sbom.purl)
-      if (sbomData.sbom.licenses.length > 0) {
-        const res = sbomData.sbom.licenses.map((item) => item)
+      setSpec(sbomData.spec)
+      setSpecVersion(sbomData.specVersion)
+      setCpeList(sbomData.cpes)
+      setPurlValue(sbomData.purl === null ? '' : sbomData.purl)
+      if (sbomData.licenses.length > 0) {
+        const res = sbomData.licenses.map((item) => item)
         setImgIds(res)
       }
     }
   }, [sbomData])
 
   useEffect(() => {
-    if (sbomData && sbomData.sbom.licenses.length > 0) {
+    setCompType(type)
+  }, [type])
+
+  useEffect(() => {
+    if (sbomData && sbomData.licenses.length > 0) {
       const commonValues = licenseOptions.filter((item1) =>
-        sbomData.sbom.licenses.includes(item1.licenseId)
+        sbomData.licenses.includes(item1.licenseId)
       )
       const data = commonValues.map((item) => {
         return {
@@ -249,8 +252,6 @@ function ProductSbomDrawer(props) {
           name: name,
           version: version,
           licenses: imgIds,
-          cpes: cpeList,
-          purl: purlValue,
           primary: true
         }
       })
@@ -267,9 +268,7 @@ function ProductSbomDrawer(props) {
           spec: 'cyclonedx',
           specVersion: '1.4',
           format: compType,
-          licenses: imgIds,
-          cpes: cpeList,
-          purl: purlValue
+          licenses: imgIds
         }
       })
         .then((res) => {
@@ -297,13 +296,11 @@ function ProductSbomDrawer(props) {
     try {
       await updateSbom({
         variables: {
-          id: sbomData.sbom.id,
+          id: sbomData.id,
           spec: 'cyclonedx',
           specVersion: '1.4',
           format: compType,
-          licenses: imgIds,
-          cpes: cpeList,
-          purl: purlValue
+          licenses: imgIds
         }
       }).then(() => {
         refetch({
@@ -476,9 +473,12 @@ function ProductSbomDrawer(props) {
                   size='sm'
                   value={compType}
                   onChange={(e) => setCompType(e.target.value)}
+                  pointerEvents={'none'}
                 >
                   <option value=''>-- Select --</option>
                   <option value='application'>Application</option>
+                  <option value='json'>JSON</option>
+                  <option value='unknown'>Unknown</option>
                   <option value='library'>Library</option>
                   <option value='operating_system'>Operating system</option>
                   <option value='firmware'>Firmware</option>
@@ -523,7 +523,7 @@ function ProductSbomDrawer(props) {
                 </FormControl>
               )}
               {/* Identifiers */}
-              <FormControl>
+              {/* <FormControl>
                 <FormLabel fontSize={'sm'}>Identifiers</FormLabel>
                 <Stack spacing={3}>
                   <Stack direction={'row'} spacing={2}>
@@ -556,7 +556,6 @@ function ProductSbomDrawer(props) {
                       onClick={handlePurlModal}
                     />
                   </Stack>
-                  {/* CPE List */}
                   <Stack direction={'row'} spacing={2}>
                     <InputGroup>
                       <Input
@@ -617,7 +616,8 @@ function ProductSbomDrawer(props) {
                     ))}
                   </Flex>
                 </Stack>
-              </FormControl>
+              </FormControl> */}
+              {/* PRIMARY COMPONENT */}
               {!sbomData && (
                 <FormControl isReadOnly={true}>
                   <Checkbox size='sm' colorScheme='blue' defaultChecked={true}>

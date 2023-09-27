@@ -38,7 +38,7 @@ const CopyModal = ({ isOpen, onClose, product, version }) => {
   useEffect(() => {
     if (data) {
       const prod = data.projects.nodes.find((item) => item.name === product)
-      console.log(`filteredData`, prod)
+      // console.log(`filteredData`, prod)
       setFilteredData(prod.name)
       setSelectedProduct(prod.id)
     }

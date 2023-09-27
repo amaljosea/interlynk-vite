@@ -136,6 +136,7 @@ const ProductModal = ({
                       <option value=''>-- Select --</option>
                       <option value='unknown'>Unknown</option>
                       <option value='application'>Application</option>
+                      <option value='json'>JSON</option>
                       <option value='library'>Library</option>
                       <option value='operating_system'>Operating system</option>
                       <option value='firmware'>Firmware</option>

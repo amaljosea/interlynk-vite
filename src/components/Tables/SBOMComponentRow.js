@@ -25,7 +25,6 @@ import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import ComponentModal from 'views/Sbom/components/ComponentModal'
 import { timeSince } from 'utils'
 import {
-  FaDiceD6,
   FaEllipsisV,
   FaGlobe,
   FaHouseUser,
@@ -33,9 +32,14 @@ import {
   FaSitemap
 } from 'react-icons/fa'
 import SupplierModal from 'views/Sbom/components/SupplierModal'
-import { TriangleDownIcon, TriangleUpIcon, ViewIcon } from '@chakra-ui/icons'
+import {
+  ChevronDownIcon,
+  ChevronRightIcon,
+  TriangleDownIcon,
+  TriangleUpIcon,
+  ViewIcon
+} from '@chakra-ui/icons'
 import { BsFillPatchQuestionFill, BsPatchQuestion } from 'react-icons/bs'
-import { CgWebsite } from 'react-icons/cg'
 import { GetIcon } from 'utils'
 import { licenseOptions } from 'variables/licenses'
 import LinksDrawer from 'components/Drawer/LinksDrawer'
@@ -69,6 +73,7 @@ function SBOMComponentRow(props) {
   const [contains, setcontains] = useState({})
 
   const { isOpen, onOpen, onClose } = useDisclosure()
+
 
   const {
     isOpen: isDelOpen,
@@ -118,7 +123,7 @@ function SBOMComponentRow(props) {
 
   return (
     <>
-      <Tr>
+      <Tr boxShadow={expandedRows.length > 0 ? 'md' : 'none'}>
         <Td pl='0px' width={'400px'}>
           <Stack
             width={'100%'}
@@ -127,11 +132,16 @@ function SBOMComponentRow(props) {
             direction={'row'}
             alignItems={'flex-center'}
           >
-            <Button size='sm' onClick={() => toggleExpand(id)}>
+            <Button
+              mt={2}
+              size='xs'
+              variant='unstyled'
+              onClick={() => toggleExpand(id)}
+            >
               {expandedRows.includes(id) ? (
-                <TriangleDownIcon width={3} height={3} />
+                <ChevronDownIcon width={5} height={5} color={'gray.600'} />
               ) : (
-                <TriangleUpIcon width={3} height={3} />
+                <ChevronRightIcon width={5} height={5} color={'gray.600'} />
               )}
             </Button>
             <Box width={'50px'}>
@@ -249,7 +259,7 @@ function SBOMComponentRow(props) {
             {filteredLicense.length > 0 &&
               filteredLicense.map((item, index) => (
                 <Tooltip key={index} label={item.name} placement={'top'}>
-                  <Link href={item.reference} target='_blank' isExternal>
+                  <Link href={item.reference} target='_blank' isexternal>
                     <Badge variant='subtle' colorScheme='green'>
                       {item.licenseId}
                     </Badge>
@@ -358,54 +368,54 @@ function SBOMComponentRow(props) {
       {/* Expand rows */}
       {expandedRows.includes(id) && (
         <>
-          <Tr bg={'blackAlpha.100'} textTransform={'uppercase'}>
-            <Td
-              pl={0}
-              fontSize={13}
-              color={'gray.600'}
-              py={4}
-              fontWeight={'bold'}
-            >
-              Description
+          <Tr boxShadow='inset 0px 5px 5px rgba(0, 0, 0, 0.01)'>
+            <Td colSpan='3'>
+              <Stack py={4}>
+                <Text fontWeight={'medium'} fontSize={16} color={'gray.500'}>
+                  Description:
+                </Text>
+                <Text wordBreak={'break-all'}>
+                  {description !== null ? description : ''}
+                </Text>
+              </Stack>
             </Td>
-            <Td py={4} fontSize={13} color={'gray.600'} fontWeight={'bold'}>
-              Supplier
+            <Td colSpan='3'>
+              <Stack py={4}>
+                <Text fontWeight={'medium'} fontSize={16} color={'gray.500'}>
+                  Supplier:
+                </Text>
+                <Text>
+                  {suppliers.length > 0 &&
+                    `${suppliers[0].name} - ${suppliers[0].email}`}
+                </Text>
+              </Stack>
             </Td>
-            <Td py={4} fontSize={13} color={'gray.600'} fontWeight={'bold'}>
-              PURL
-            </Td>
-            <Td py={4} fontSize={13} color={'gray.600'} fontWeight={'bold'}>
-              CPE
-            </Td>
-            <Td></Td>
-            <Td></Td>
           </Tr>
-          <Tr>
-            <Td wordBreak={'break-all'}>
-              {description !== null ? description : ''}
+          <Tr boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08)'>
+            <Td colSpan='3'>
+              <Stack py={4} mb={2}>
+                <Text fontWeight={'medium'} fontSize={16} color={'gray.500'}>
+                  PURL:
+                </Text>
+                <Text>{purl !== null && purl !== '' ? purl : ''}</Text>
+              </Stack>
             </Td>
-            <Td wordBreak={'break-all'}>
-              {suppliers.length > 0 &&
-                `${suppliers[0].name} - ${suppliers[0].email}`}
+            <Td colSpan='3'>
+              <Stack py={4} mb={2}>
+                <Text fontWeight={'medium'} fontSize={16} color={'gray.500'}>
+                  CPE:
+                </Text>
+                <Flex
+                  flexDirection={'column'}
+                  alignItems={'flex-start'}
+                  gap={2}
+                  flexWrap={'wrap'}
+                >
+                  {cpes.length > 0 &&
+                    cpes.map((item, index) => <Text>{item}</Text>)}
+                </Flex>
+              </Stack>
             </Td>
-            <Td py={6} wordBreak={'break-all'}>
-              {purl !== null && purl !== '' ? purl : ''}
-            </Td>
-            <Td width={'200px'}>
-              <Flex
-                flexDirection={'column'}
-                alignItems={'center'}
-                gap={2}
-                flexWrap={'wrap'}
-              >
-                {cpes.length > 0 &&
-                  cpes.map((item, index) => (
-                    <Text wordBreak={'break-all'}>{item}</Text>
-                  ))}
-              </Flex>
-            </Td>
-            <Td></Td>
-            <Td></Td>
           </Tr>
         </>
       )}
