@@ -15,9 +15,10 @@ import {
   useDisclosure,
   Tag,
   TagLabel,
-  Badge,
   Grid,
-  GridItem
+  GridItem,
+  HStack,
+  TagCloseButton
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
@@ -37,70 +38,8 @@ import ComponentModal from 'views/Sbom/components/ComponentModal'
 import SupplierModal from 'views/Sbom/components/SupplierModal'
 import LinksDrawer from 'components/Drawer/LinksDrawer'
 import styled from '@emotion/styled'
-
-const ExpandedComponent = ({ data }) => {
-  const { suppliers, purl, description, cpes } = data
-
-  const CustomText = styled(Text)`
-    font-size: 13px;
-    font-weight: bold;
-    color: #718096;
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-  `
-
-  return (
-    <Box
-      width={'100%'}
-      p={5}
-      boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
-    >
-      <Grid
-        templateColumns='repeat(2, 1fr)'
-        gap={6}
-        width={'80%'}
-        margin={'0 auto'}
-      >
-        <GridItem w='100%'>
-          <CustomText>Description :</CustomText>
-          <Text mt={1} fontSize={14}>
-            {description !== null ? description : ''}
-          </Text>
-        </GridItem>
-        <GridItem w='100%'>
-          <CustomText>Supplier :</CustomText>
-          <Text mt={1} fontSize={14}>
-            {suppliers.length > 0 &&
-              `${suppliers[0].name} - ${suppliers[0].email}`}
-          </Text>
-        </GridItem>
-        <GridItem w='100%'>
-          <CustomText>PURL :</CustomText>
-          <Text mt={1} fontSize={14}>
-            {purl !== null && purl !== '' ? purl : ''}
-          </Text>
-        </GridItem>
-        <GridItem w='100%'>
-          <CustomText>CPES :</CustomText>
-          <Flex
-            mt={1}
-            flexDirection={'column'}
-            alignItems={'flex-start'}
-            gap={1}
-            flexWrap={'wrap'}
-          >
-            {cpes.length > 0 &&
-              cpes.map((item, index) => (
-                <Text key={index} fontSize={14}>
-                  {item}
-                </Text>
-              ))}
-          </Flex>
-        </GridItem>
-      </Grid>
-    </Box>
-  )
-}
+import { useMutation } from '@apollo/client'
+import { supplierDelete } from 'graphQL/Mutation'
 
 const customStyles = {
   headCells: {
@@ -142,6 +81,7 @@ const ComponentTable = ({ data, refetch, type }) => {
   } = useDisclosure()
 
   const columns = [
+    // COMPONENT
     {
       id: 'component',
       name: 'COMPONENT',
@@ -182,9 +122,9 @@ const ComponentTable = ({ data, refetch, type }) => {
             >
               {/* COMPONENT NAME */}
               <Tooltip placement='top' label={name}>
-              <Text fontSize={'14px'}>
-                {name.length > 30 ? `${name.substring(0, 30)}...` : name}
-              </Text>
+                <Text fontSize={'14px'}>
+                  {name.length > 30 ? `${name.substring(0, 30)}...` : name}
+                </Text>
               </Tooltip>
 
               {/* EXTERNAL REFERENCE */}
@@ -260,12 +200,14 @@ const ComponentTable = ({ data, refetch, type }) => {
       },
       width: '400px'
     },
+    // VERSION
     {
       id: 'version',
       name: 'VERSION',
       selector: (row) => row.version,
       width: '200px'
     },
+    // PURL
     {
       id: 'purl',
       name: 'PURL',
@@ -285,6 +227,7 @@ const ComponentTable = ({ data, refetch, type }) => {
         )
       }
     },
+    // LICENSES
     {
       id: 'licenses',
       name: 'LICENSES',
@@ -309,9 +252,15 @@ const ComponentTable = ({ data, refetch, type }) => {
               filteredLicense.map((item, index) => (
                 <Tooltip key={index} label={item.name} placement={'top'}>
                   <Link href={item.reference} target='_blank' isexternal>
-                    <Badge variant='subtle' colorScheme='green'>
-                      {item.licenseId}
-                    </Badge>
+                    <Tag
+                      size={'sm'}
+                      key={index}
+                      variant='subtle'
+                      colorScheme='green'
+                      width={'fit-content'}
+                    >
+                      <TagLabel>{item.licenseId}</TagLabel>
+                    </Tag>
                   </Link>
                 </Tooltip>
               ))}
@@ -319,11 +268,13 @@ const ComponentTable = ({ data, refetch, type }) => {
         )
       }
     },
+    // UPDATED AT
     {
       id: 'updatedAt',
       name: 'UPDATED AT',
       selector: (row) => timeSince(row.updatedAt)
     },
+    // ACTION
     {
       id: 'action',
       name: 'ACTION',
@@ -399,6 +350,110 @@ const ComponentTable = ({ data, refetch, type }) => {
       }
     }
   ]
+
+  const ExpandedComponent = ({ data }) => {
+    const { suppliers, purl, description, cpes } = data
+
+    const location = useLocation()
+    const queryParams = new URLSearchParams(location.search)
+    const productId = queryParams.get('p')
+    const sbomId = queryParams.get('sbom')
+
+    const [deleteSupplier] = useMutation(supplierDelete)
+
+    const handleSupRemove = async (id) => {
+      try {
+        await deleteSupplier({
+          variables: {
+            supplierId: suppliers[0].id,
+            sbomId: sbomId,
+            componentId: data.id
+          }
+        }).then((res) => {
+          if (res) {
+            refetch({
+              productId: productId,
+              sbomId: sbomId
+            })
+          }
+        })
+      } catch (error) {
+        console.log(`Mutation error`, error)
+      }
+    }
+
+    const CustomText = styled(Text)`
+      font-size: 13px;
+      font-weight: bold;
+      color: #718096;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    `
+
+    return (
+      <Box
+        width={'100%'}
+        p={5}
+        boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
+      >
+        <Grid
+          templateColumns='repeat(2, 1fr)'
+          gap={6}
+          width={'80%'}
+          margin={'0 auto'}
+        >
+          <GridItem w='100%'>
+            <CustomText>Description :</CustomText>
+            <Text mt={1} fontSize={14}>
+              {description !== null ? description : ''}
+            </Text>
+          </GridItem>
+          <GridItem w='100%'>
+            <CustomText>Supplier :</CustomText>
+            <HStack spacing={4} mt={1}>
+              {suppliers &&
+                suppliers.map((item, index) => (
+                  <Tag
+                    size={'md'}
+                    key={index}
+                    variant='subtle'
+                    colorScheme='orange'
+                  >
+                    <TagLabel>
+                      {item.name} - {item.email}
+                    </TagLabel>
+                    <TagCloseButton onClick={handleSupRemove} />
+                  </Tag>
+                ))}
+            </HStack>
+          </GridItem>
+          <GridItem w='100%'>
+            <CustomText>PURL :</CustomText>
+            <Text mt={1} fontSize={14}>
+              {purl !== null && purl !== '' ? purl : ''}
+            </Text>
+          </GridItem>
+          <GridItem w='100%'>
+            <CustomText>CPES :</CustomText>
+            <Flex
+              mt={1}
+              flexDirection={'column'}
+              alignItems={'flex-start'}
+              gap={1}
+              flexWrap={'wrap'}
+            >
+              {cpes.length > 0 &&
+                cpes.map((item, index) => (
+                  <Text key={index} fontSize={14}>
+                    {item}
+                  </Text>
+                ))}
+            </Flex>
+          </GridItem>
+        </Grid>
+      </Box>
+    )
+  }
 
   return (
     <>

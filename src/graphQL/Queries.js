@@ -382,13 +382,22 @@ export const GetSBOM = gql`
   ) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
       id
-      cpes
       spec
-      purl
       format
       creationAt
       updatedAt
       specVersion
+      primaryComponent {
+        id
+        name
+        version
+      }
+      stats {
+        compCount
+        compLicenseCount
+        compCpeCount
+        compPurlCount
+      }
       project {
         id
         name

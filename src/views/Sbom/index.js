@@ -30,7 +30,7 @@ import {
   ModalBody,
   ModalFooter
 } from '@chakra-ui/react'
-import React, { useState, useRef, useContext, useEffect } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 import SBOMTable from './components/SBOMTable'
@@ -71,7 +71,7 @@ function SBOM() {
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const { isOpen, onOpen, onClose, onToggle } = useDisclosure()
 
   const [status, setStatus] = useState('created')
   const [signedData, setSignedData] = useState(null)
@@ -118,11 +118,11 @@ function SBOM() {
     }
   })
 
-  useEffect(() => {
-    if (sbomData) {
-      console.log(`sbomData`, sbomData.sbom)
-    }
-  }, [sbomData])
+  // useEffect(() => {
+  //   if (sbomData) {
+  //     console.log(`sbomData`, sbomData.sbom)
+  //   }
+  // }, [sbomData])
 
   const handlePreviousPage = () => {
     refetch({
@@ -154,19 +154,6 @@ function SBOM() {
   })
 
   const [deleteSbom] = useMutation(sbomDelete)
-
-  const [primaryData, setPrimaryData] = useState(null)
-
-  useEffect(() => {
-    if (data && data.project.sboms.length > 0) {
-      console.log(`data`, data)
-      const sbomV = data.project.sboms.find((sbom) => sbom.id === sbomId)
-      const validData = sbomV.components.nodes.find(
-        (item) => item.primary === true
-      )
-      setPrimaryData(validData)
-    }
-  }, [data])
 
   const uniqVersions = []
 
@@ -267,6 +254,22 @@ function SBOM() {
     history.push(`/sharelynk?p=${productId}&sbom=${sbomVersions[0].id}`)
   }
 
+  // ADD KEYBOARD SHORTCUT FOR TOGGLE DOWNLOAD MODAL
+  const handleKeyDownload = (event) => {
+    if (event.key === 'd' || event.key === 'D') {
+      onToggle()
+    }
+  }
+
+  // KEYBOARD EVENT LISTNER FOR TOGGLE DOWNLOAD MODAL
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDownload)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDownload)
+    }
+  }, [isOpen])
+
   if (!sbomId) {
     return (
       <Flex direction='column' pt={{ base: '120px', md: '75px' }}>
@@ -329,6 +332,7 @@ function SBOM() {
                 templateColumns='repeat(5, 1fr)'
                 alignItems={'center'}
               >
+                {/* LEFT */}
                 <GridItem colSpan={2}>
                   {sbomData ? (
                     <Flex
@@ -345,14 +349,9 @@ function SBOM() {
                       />
                       <Flex direction={'column'} gap={1}>
                         <Text fontWeight={'semibold'} fontSize={18}>
-                          {sbomData.sbom.project.name} : {primaryData?.version}
+                          {sbomData.sbom.project.name} :{' '}
+                          {sbomData.sbom.primaryComponent.version}
                         </Text>
-                        {/* {!primaryData && (
-                          <Code color={'red.400'} fontSize={'xs'}>
-                            Primary component not exists. <br /> Please create
-                            or update any component as primary before proceed
-                          </Code>
-                        )} */}
                         <Text fontSize='xs' cursor={'pointer'}>
                           Last updated at : {timeSince(sbomData.sbom.updatedAt)}
                         </Text>
@@ -376,6 +375,7 @@ function SBOM() {
                     <Text>Loading...</Text>
                   )}
                 </GridItem>
+                {/* RIGHT */}
                 {sbomData && (
                   <GridItem colSpan={3}>
                     <Flex
@@ -384,6 +384,7 @@ function SBOM() {
                       justifyContent='flex-end'
                       ml={'auto'}
                     >
+                      {/* CHANGE SBOM VERSION */}
                       <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
                         <FaLayerGroup size={18} color='darkgray' />
                         <Select
@@ -409,6 +410,7 @@ function SBOM() {
                         </Select>
                       </Flex>
 
+                      {/* EDIT SBOM */}
                       <Tooltip label='Edit'>
                         <IconButton
                           isDisabled={status === 'signed'}
@@ -418,6 +420,7 @@ function SBOM() {
                         ></IconButton>
                       </Tooltip>
 
+                      {/* SIGNED SBOM */}
                       {status === 'signed' ? (
                         <Tooltip label='Signed'>
                           <IconButton
@@ -436,6 +439,7 @@ function SBOM() {
                         </Tooltip>
                       )}
 
+                      {/* DOWNLOAD SBOM */}
                       <Tooltip label='Download'>
                         <IconButton
                           icon={<FaFileDownload />}
@@ -445,6 +449,7 @@ function SBOM() {
                         />
                       </Tooltip>
 
+                      {/* COPY SBOM */}
                       <Tooltip label='Copy'>
                         <IconButton
                           icon={<FaCopy />}
@@ -454,6 +459,7 @@ function SBOM() {
                         />
                       </Tooltip>
 
+                      {/* DELETE SBOM */}
                       <Tooltip label='Delete'>
                         <IconButton
                           colorScheme='red'
@@ -473,9 +479,7 @@ function SBOM() {
               icon={<Icon h={'24px'} w={'24px'} color='white' as={FaCubes} />}
               title={'Components'}
               description={'Components included in SBOM'}
-              amount={
-                sbomData ? sbomData.sbom.components.nodes.length : 'Loading...'
-              }
+              amount={sbomData ? sbomData.sbom.stats.compCount : 'Loading...'}
             />
             <Spacer />
             <SBOMStatistics
@@ -484,7 +488,9 @@ function SBOM() {
               }
               title={'Licenses'}
               description={'Unique licenses included in SBOM'}
-              amount={totalLicenses ? totalLicenses.length : 'Loading...'}
+              amount={
+                sbomData ? sbomData.sbom.stats.compLicenseCount : 'Loading...'
+              }
             />
           </Flex>
           {/* sbom details */}
@@ -501,7 +507,7 @@ function SBOM() {
               ]}
               data={sbomData.sbom}
               refetch={refetch}
-              versionName={primaryData?.version}
+              versionName={sbomData.sbom.primaryComponent.version}
               handlePreviousPage={handlePreviousPage}
               handleNextPage={handleNextPage}
               status={status}
@@ -530,13 +536,15 @@ function SBOM() {
           />
         )}
 
-        {isOpen && (
+        {isOpen && sbomData && (
           <DownloadModal
             initialRef={initialRef}
             finalRef={finalRef}
             isOpen={isOpen}
             onClose={onClose}
             productId={productId}
+            productName={sbomData.sbom.project.name}
+            version={sbomData.sbom.primaryComponent.version}
             sbomId={sbomId}
           />
         )}
@@ -561,7 +569,7 @@ function SBOM() {
             isOpen={isCopied}
             onClose={onCopiedClose}
             product={sbomData.sbom.project.name}
-            version={primaryData?.version}
+            version={sbomData.sbom.primaryComponent.version}
           />
         )}
 

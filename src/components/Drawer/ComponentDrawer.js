@@ -477,7 +477,7 @@ function ComponentDrawer(props) {
         <DrawerContent>
           <DrawerCloseButton />
           <DrawerHeader borderBottomWidth='1px' color='gray.600'>
-            Edit Component
+            {component ? 'Edit' : 'Create'} Component
           </DrawerHeader>
           <DrawerBody>
             <Stack direction={'column'} spacing={4}>
@@ -558,12 +558,9 @@ function ComponentDrawer(props) {
                   size='sm'
                   value={compType}
                   onChange={(e) => setCompType(e.target.value)}
-                  pointerEvents={'none'}
                 >
                   <option value=''>-- Select --</option>
                   <option value='application'>Application</option>
-                  <option value='unknown'>Unknown</option>
-                  <option value='json'>JSON</option>
                   <option value='library'>Library</option>
                   <option value='operating_system'>Operating system</option>
                   <option value='firmware'>Firmware</option>
@@ -581,8 +578,8 @@ function ComponentDrawer(props) {
               {/* Suppliers */}
               {id !== undefined && (
                 <Flex width={'100%'} flexDir={'column'}>
-                  <Text size='md' my={2}>
-                    Suppliers List
+                  <Text size='md' my={2} fontWeight={'medium'}>
+                    Supplier :
                   </Text>
                   {suppliers.length > 0 ? (
                     <Table variant='simple' size='sm' mt={2}>
@@ -656,9 +653,10 @@ function ComponentDrawer(props) {
               <FormControl isReadOnly={customerView}>
                 <FormLabel fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-                    {shortDesc === 'Component Identifier' && purlValue === '' && (
-                      <WarningTwoIcon w={4} h={4} color='red.500' />
-                    )}
+                    {shortDesc === 'Component Identifier' &&
+                      purlValue === '' && (
+                        <WarningTwoIcon w={4} h={4} color='red.500' />
+                      )}
                     <Text>Identifiers</Text>
                     <Tooltip label='Component identifiers such as package URL (PURL) or Common Platform Enumeration (CPE) are used for consistent naming of the component. Both CycloneDX and SPDX supports identifying component names with CPE and PURL'>
                       <Icon as={QuestionIcon} color={'blue.500'} />

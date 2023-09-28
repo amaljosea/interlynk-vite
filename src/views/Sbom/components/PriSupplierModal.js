@@ -21,14 +21,7 @@ import { supplierCreate } from 'graphQL/Mutation'
 import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 
-const SupplierModal = ({
-  id,
-  isOpen,
-  onClose,
-  refetch,
-  suppliers,
-  shortDesc
-}) => {
+const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers }) => {
   const toast = useToast()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -55,26 +48,32 @@ const SupplierModal = ({
 
   const handleSave = async (e) => {
     e.preventDefault()
-    if (validateEmail(supEmail)) {
+    if (validateEmail(supEmail) === true) {
       await createSupplier({
         variables: {
           name: supName,
           email: supEmail,
-          sbomId: sbomId,
-          componentId: id
-        }
-      }).then(() => {
-        refetch({
-          projectId: productId,
           sbomId: sbomId
-        })
-        onClose()
+        }
       })
+        .then((res) => {
+          if (res) {
+            setSupName('')
+            setSupEmail('')
+          }
+        })
+        .finally(() => {
+          refetch({
+            productId: productId,
+            sbomId: sbomId
+          })
+          onClose()
+        })
     } else {
       toast({
         description: 'Invalid email',
         status: 'error',
-        position: 'top',
+        position: 'top-right',
         duration: 2000
       })
     }
@@ -82,37 +81,33 @@ const SupplierModal = ({
 
   const handleUpdate = async (e) => {
     e.preventDefault()
-    if (validateEmail(supEmail)) {
+    if (validateEmail(supEmail) === true) {
       await updateSupplier({
         variables: {
           name: supName,
           email: supEmail,
           supplierId: suppliers[0].id,
-          sbomId: sbomId,
-          componentId: id
+          sbomId: sbomId
         }
-      }).then((data) => {
-        if (data.data.supplierUpdate.errors.length > 0) {
-          onClose()
-          toast({
-            description: data.data.supplierUpdate.errors[0],
-            status: 'error',
-            position: 'top',
-            duration: 5000
-          })
-        } else {
+      })
+        .then((res) => {
+          if (res) {
+            setSupName('')
+            setSupEmail('')
+          }
+        })
+        .finally(() => {
           refetch({
-            projectId: productId,
+            productId: productId,
             sbomId: sbomId
           })
           onClose()
-        }
-      })
+        })
     } else {
       toast({
         description: 'Invalid email',
         status: 'error',
-        position: 'top',
+        position: 'top-right',
         duration: 2000
       })
     }
@@ -129,14 +124,7 @@ const SupplierModal = ({
             <ModalBody>
               <Flex width={'100%'} direction={'column'} gap={4}>
                 <FormControl isRequired>
-                  <FormLabel fontSize={'sm'}>
-                    <chakra.span>
-                      {shortDesc === 'Supplier Name' && supName === '' && (
-                        <WarningTwoIcon w={4} h={4} color='red.500' mr={2} />
-                      )}
-                    </chakra.span>
-                    Name
-                  </FormLabel>
+                  <FormLabel fontSize={'sm'}>Name</FormLabel>
                   <Input
                     placeholder='Enter supplier name'
                     value={supName}
@@ -174,4 +162,4 @@ const SupplierModal = ({
   )
 }
 
-export default SupplierModal
+export default PriSupplierModal

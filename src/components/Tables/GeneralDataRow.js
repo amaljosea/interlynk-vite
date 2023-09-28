@@ -1,15 +1,21 @@
+import { useMutation } from '@apollo/client'
 import { EditIcon, QuestionIcon } from '@chakra-ui/icons'
 import {
-  Badge,
   Button,
   Flex,
+  HStack,
   Icon,
   Link,
+  Stack,
+  Tag,
+  TagCloseButton,
+  TagLabel,
   Td,
   Text,
   Tooltip,
   Tr
 } from '@chakra-ui/react'
+import { supplierDelete } from 'graphQL/Mutation'
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { timeSince } from 'utils'
@@ -21,15 +27,22 @@ const GeneralDataRow = ({
   setSelectedKey,
   status,
   licenseBtn,
-  onSbomOpen
+  onSbomOpen,
+  onSupOpen,
+  refetch
 }) => {
   const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const productId = queryParams.get('p')
+  const sbomId = queryParams.get('sbom')
 
   const customerView = location.pathname.startsWith('/customer')
 
   const { creationAt, updatedAt, tools, authors, licenses, suppliers } = data
 
   const [filteredLicense, setFilteredLicense] = useState([])
+
+  const [deleteSupplier] = useMutation(supplierDelete)
 
   useEffect(() => {
     if (licenses !== null && licenses.length > 0) {
@@ -41,6 +54,26 @@ const GeneralDataRow = ({
       setFilteredLicense(filtered)
     }
   }, [licenses])
+
+  const handleSupRemove = async (id) => {
+    try {
+      await deleteSupplier({
+        variables: {
+          supplierId: suppliers[0].id,
+          sbomId: sbomId
+        }
+      }).then((res) => {
+        if (res) {
+          refetch({
+            productId: productId,
+            sbomId: sbomId
+          })
+        }
+      })
+    } catch (error) {
+      console.log(`Mutation error`, error)
+    }
+  }
 
   const handleClick = (ref) => {
     setSelectedKey(ref)
@@ -117,15 +150,23 @@ const GeneralDataRow = ({
           </Flex>
         </Td>
         <Td pl={0}>
-          <Flex flexDirection={'column'} alignItems={'flex-start'} gap={3}>
+          <Stack spacing={2} direction={'column'}>
             {authors &&
               authors.length > 0 &&
               authors.map((item, index) => (
-                <Text pl={0} fontSize={'sm'} key={index}>
-                  {item.name} - {item.email}
-                </Text>
+                <Tag
+                  size={'md'}
+                  key={index}
+                  variant='subtle'
+                  colorScheme='blue'
+                  width={'fit-content'}
+                >
+                  <TagLabel>
+                    {item.name} - {item.email}
+                  </TagLabel>
+                </Tag>
               ))}
-          </Flex>
+          </Stack>
         </Td>
         <Td pl={0}>
           {!customerView && (
@@ -149,21 +190,29 @@ const GeneralDataRow = ({
           </Flex>
         </Td>
         <Td pl={0}>
-          <Flex flexDirection={'column'} alignItems={'flex-start'} gap={4}>
+          <HStack spacing={4}>
             {suppliers &&
               suppliers.map((item, index) => (
-                <Text pl={0} fontSize={'sm'} key={index}>
-                  {item.name} - {item.email}
-                </Text>
+                <Tag
+                  size={'md'}
+                  key={index}
+                  variant='subtle'
+                  colorScheme='orange'
+                >
+                  <TagLabel>
+                    {item.name} - {item.email}
+                  </TagLabel>
+                  <TagCloseButton onClick={handleSupRemove} />
+                </Tag>
               ))}
-          </Flex>
+          </HStack>
         </Td>
         <Td pl={0}>
           {!customerView && (
             <Button
               size='sm'
               isDisabled={status === 'signed'}
-              onClick={() => handleClick('supplier')}
+              onClick={onSupOpen}
             >
               <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
             </Button>
@@ -180,9 +229,15 @@ const GeneralDataRow = ({
               filteredLicense.map((item, index) => (
                 <Tooltip key={index} label={item.name} placement={'top'}>
                   <Link href={item.reference} target='_blank' isexternal>
-                    <Badge variant='subtle' colorScheme='green'>
-                      {item.licenseId}
-                    </Badge>
+                    <Tag
+                      size={'md'}
+                      key={index}
+                      variant='subtle'
+                      colorScheme='green'
+                      width={'fit-content'}
+                    >
+                      <TagLabel>{item.licenseId}</TagLabel>
+                    </Tag>
                   </Link>
                 </Tooltip>
               ))}
@@ -201,38 +256,6 @@ const GeneralDataRow = ({
           )}
         </Td>
       </Tr>
-      {/* <Tr>
-        <Td pl={0} fontWeight={'medium'}>
-          Identifier(s)
-        </Td>
-        <Td pl={0}>
-          <Flex mt={2} flexDir={'column'} alignItems={'self-start'} gap={2}>
-            <Flex flexDirection={'row'} alignItems={'center'} gap={4}>
-              {cpes.length > 0 ? cpes.join(', ') : ''}
-            </Flex>
-            <Text>{purl}</Text>
-          </Flex>
-        </Td>
-        <Td pl={0}></Td>
-      </Tr> */}
-      {/* <Tr>
-        <Td pl={0} fontWeight={'medium'}>
-          Hash(es)
-        </Td>
-        <Td pl={0}>
-          <Flex mt={2} flexDir={'column'} alignItems={'self-start'} gap={2}>
-            <Text>MD5: ABCDEFGHI</Text>
-            <Text>SHA: 23434354443</Text>
-          </Flex>
-        </Td>
-        <Td pl={0}></Td>
-      </Tr> */}
-      {/* <Tr>
-        <Td pl={0} fontWeight={'medium'}>
-          Copyright Text
-        </Td>
-        <Td pl={0}>{copyright !== null ? copyright : ''}</Td>
-      </Tr> */}
     </>
   )
 }

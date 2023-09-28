@@ -68,9 +68,6 @@ const GeneralDataDrawer = ({
   const [licenseName, setLicenseName] = useState('')
   const [selectedLicense, setSelectedLicense] = useState('')
 
-  const [cpeValue, setCpeValue] = useState('')
-  const [purlValue, setPurlValue] = useState('')
-
   const [creationTools, setCreationTools] = useState([])
   const [authorList, setAuthorList] = useState([])
   const [supplierList, setSupplierList] = useState([])
@@ -89,10 +86,6 @@ const GeneralDataDrawer = ({
     setCreationTools(tools)
     setSupplierList(suppliers)
     setAuthorList(authors)
-    if (cpes.length > 0) {
-      setCpeValue(cpes[0])
-    }
-    setPurlValue(purl)
   }, [data])
 
   useEffect(() => {
@@ -575,50 +568,6 @@ const GeneralDataDrawer = ({
                 </Flex>
               </Flex>
             )}
-
-            {selectedKey === 'identifier' && (
-              <Flex direction={'column'} alignItems={'flex-start'} gap={3}>
-                <FormControl>
-                  <Input
-                    size='sm'
-                    placeholder='CPE'
-                    value={cpeValue}
-                    onChange={(e) => setCpeValue(e.target.value)}
-                  />
-                </FormControl>
-                <FormControl>
-                  <Input
-                    size='sm'
-                    placeholder='PURL'
-                    value={purlValue}
-                    onChange={(e) => setPurlValue(e.target.value)}
-                  />
-                </FormControl>
-              </Flex>
-            )}
-
-            {/* {selectedKey === 'hashes' && (
-              <Flex direction={'column'} alignItems={'flex-start'} gap={3}>
-                <FormControl>
-                  <FormLabel>MD5</FormLabel>
-                  <Input
-                    size='sm'
-                    placeholder='Ex. ABCDEFGHI'
-                    value={MD5Value}
-                    onChange={(e) => setMD5Value(e.target.value)}
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>SHA</FormLabel>
-                  <Input
-                    size='sm'
-                    placeholder='Ex. 23434354443'
-                    value={shaValue}
-                    onChange={(e) => setShaValue(e.target.value)}
-                  />
-                </FormControl>
-              </Flex>
-            )} */}
           </DrawerBody>
 
           <DrawerFooter>

@@ -84,7 +84,6 @@ const AdvisoryFeeds = ({ data, orgInfo }) => {
                     />
                     <Text
                       noOfLines={1}
-                      fontSize='sm'
                       color='gray.500'
                       fontWeight='400'
                       htmlFor={feed.friendlyName}

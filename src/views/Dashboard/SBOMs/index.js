@@ -250,7 +250,7 @@ function SBOMs() {
                 <Icon as={FaCubes} h={'64px'} w={'64px'} color='blue.300' />
                 {scanResults && imageVersionData ? (
                   <Flex direction={'column'} gap={1}>
-                    <Text fontWeight={'semibold'} fontSize={18}>
+                    <Box fontWeight={'semibold'} fontSize={18}>
                       <Flex alignItems={'center'} flexDirection={'row'} gap={3}>
                         {scanResults.image.name}:{scanResults.name}
                         <Tag
@@ -270,7 +270,7 @@ function SBOMs() {
                           </TagLabel>
                         </Tag>
                       </Flex>
-                    </Text>
+                    </Box>
                     <Text fontSize='sm'>linux/amd64</Text>
                     <Tooltip label={dateTime(scanResults.lastPushedAt)}>
                       <Text fontSize='xs' cursor={'pointer'}>

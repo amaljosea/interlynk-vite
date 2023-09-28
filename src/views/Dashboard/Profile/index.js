@@ -1,5 +1,14 @@
 // Chakra imports
-import { Flex, Grid, useColorModeValue } from '@chakra-ui/react'
+import {
+  Flex,
+  Grid,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+  useColorModeValue
+} from '@chakra-ui/react'
 import { FaSlackHash, FaUserCircle, FaBuilding } from 'react-icons/fa'
 import Header from './components/Header'
 import { useState } from 'react'
@@ -9,6 +18,7 @@ import { useQuery } from '@apollo/client'
 import { GetSettings } from 'graphQL/Queries'
 import { GetOrgInfo } from 'graphQL/Queries'
 import GeneralFeed from './components/GeneralFeed'
+import ApiFeed from './components/ApiFeed'
 
 function Profile() {
   const username = localStorage.getItem(`username`)
@@ -58,21 +68,47 @@ function Profile() {
         // backgroundHeader={ProfileBgImage}
         backgroundProfile={bgProfile}
         name={username ? username : 'Surendra Pathak'}
-        email={email ? email : 'surendra.pathak@interlynk.io'}
+        email={email ? email : 'sp@interlynk.io'}
         selectedTab={selectedTab}
         setSelectedTab={setSelectedTab}
         tabs={tabs}
       />
       {data && (
-        <Grid templateColumns={{ sm: '1fr', xl: 'repeat(3, 1fr)' }} gap='22px'>
+        <>
           {selectedTab === 'ORGANIZATION' && orgInfo && (
-            <>
-              <AdvisoryFeeds data={data} orgInfo={orgInfo} />
-              <ExploitFeeds data={data} orgInfo={orgInfo} />
-              <GeneralFeed />
-            </>
+            <Tabs variant='enclosed' w={'100%'} bg={'white'}>
+              <TabList>
+                <Tab _focus={{ outline: 'none' }}>Feeds</Tab>
+                <Tab _focus={{ outline: 'none' }}>Rules</Tab>
+                <Tab _focus={{ outline: 'none' }}>Lists</Tab>
+              </TabList>
+              <TabPanels>
+                <TabPanel px={0}>
+                  <Grid
+                    width={'100%'}
+                    templateColumns={{ sm: '1fr', xl: 'repeat(3, 1fr)' }}
+                    gap='22px'
+                  >
+                    <AdvisoryFeeds data={data} orgInfo={orgInfo} />
+                    <ExploitFeeds data={data} orgInfo={orgInfo} />
+                  </Grid>
+                </TabPanel>
+                <TabPanel px={0}>
+                  <ApiFeed />
+                </TabPanel>
+                <TabPanel px={0}>
+                  <Grid
+                    width={'100%'}
+                    templateColumns={{ sm: '1fr', xl: 'repeat(3, 1fr)' }}
+                    gap='22px'
+                  >
+                    <GeneralFeed />
+                  </Grid>
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
           )}
-        </Grid>
+        </>
       )}
     </Flex>
   )

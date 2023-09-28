@@ -10,7 +10,21 @@ import {
   MenuItem,
   MenuList,
   Text,
-  useColorModeValue
+  useColorModeValue,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverHeader,
+  PopoverBody,
+  PopoverFooter,
+  PopoverArrow,
+  PopoverCloseButton,
+  PopoverAnchor,
+  Button,
+  Icon,
+  Stack,
+  Code,
+  HStack
 } from '@chakra-ui/react'
 // Custom Icons
 import { ProfileIcon, SettingsIcon } from 'components/Icons/Icons'
@@ -20,7 +34,7 @@ import SidebarResponsive from 'components/Sidebar/SidebarResponsive'
 import PropTypes from 'prop-types'
 import { Link, useHistory, useLocation } from 'react-router-dom'
 import { dashRoutes } from 'routes.js'
-import { FaSignOutAlt } from 'react-icons/fa'
+import { FaRegKeyboard, FaSignOutAlt } from 'react-icons/fa'
 
 import Cookies from 'js-cookie'
 import { useState, useEffect } from 'react'
@@ -30,7 +44,7 @@ export default function HeaderLinks(props) {
   const history = useHistory()
 
   const queryParams = new URLSearchParams(location.search)
-  const imageVersionId = queryParams.get('id')
+  const productId = queryParams.get('p')
 
   const { variant, children, fixed, secondary, onOpen, ...rest } = props
 
@@ -82,6 +96,45 @@ export default function HeaderLinks(props) {
       alignItems='center'
       flexDirection='row'
     >
+      {productId && (
+        <Popover isLazy>
+          <PopoverTrigger>
+            <IconButton
+              m={0}
+              p={0}
+              variant='ghost'
+              icon={<FaRegKeyboard fontSize={24} color='darkgray' />}
+            />
+          </PopoverTrigger>
+          <PopoverContent>
+            <PopoverHeader fontWeight='medium'>
+              Keyboard Shortcuts
+            </PopoverHeader>
+            <PopoverBody>
+              <Flex gap={2} direction={'column'}>
+                <Stack direction={'row'} alignItems={'center'}>
+                  <Code bg={'#444'} color='white' px={2}>
+                    c
+                  </Code>
+                  <Text fontSize={'sm'}> - Create Component</Text>
+                </Stack>
+                <Stack direction={'row'} alignItems={'center'}>
+                  <Code bg={'#444'} color='white' px={2}>
+                    s
+                  </Code>
+                  <Text fontSize={'sm'}> - Update SBOM</Text>
+                </Stack>
+                <Stack direction={'row'} alignItems={'center'}>
+                  <Code bg={'#444'} color='white' px={2}>
+                    d
+                  </Code>
+                  <Text fontSize={'sm'}> - Download SBOM</Text>
+                </Stack>
+              </Flex>
+            </PopoverBody>
+          </PopoverContent>
+        </Popover>
+      )}
       <Menu>
         <MenuButton
           as={IconButton}
