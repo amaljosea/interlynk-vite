@@ -1,3 +1,5 @@
+import React, { useEffect, useRef, useState, useContext } from 'react'
+import { useLocation } from 'react-router-dom'
 // Chakra imports
 import {
   Table,
@@ -27,23 +29,23 @@ import {
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 import SBOMComponentRow from 'components/Tables/SBOMComponentRow.js'
-import React, { useEffect, useRef, useState } from 'react'
-import { useLocation } from 'react-router-dom'
 import GeneralDataRow from 'components/Tables/GeneralDataRow'
 import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
 import CardHeader from 'components/Card/CardHeader'
-import { AddIcon } from '@chakra-ui/icons'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
-import { FaFilter } from 'react-icons/fa'
-import { useContext } from 'react'
 import GlobalContext from 'context/GlobalContext'
 import HealthCheckRow from 'components/Tables/HealthCheckRow'
 import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import ChangelogRow from 'components/Tables/ChangelogRow'
 import ComponentTable from 'components/Tables/ComponentTable'
+import PriSupplierModal from './PriSupplierModal'
+import FilterMenu from './FilterMenu'
+
+// ICONS
+import { AddIcon } from '@chakra-ui/icons'
+import { FaFilter } from 'react-icons/fa'
 
 const SBOMTable = ({
-  captions,
   data,
   refetch,
   handlePreviousPage,
@@ -63,16 +65,25 @@ const SBOMTable = ({
   const customerView = location.pathname.startsWith('/customer')
 
   const { isOpen, onOpen, onClose } = useDisclosure()
+
   const {
     isOpen: isCompOpen,
     onOpen: onCompOpen,
-    onClose: onCompClose
+    onClose: onCompClose,
+    onToggle: onCompToggle
   } = useDisclosure()
 
   const {
     isOpen: isSBMOpen,
     onOpen: setSBMOpen,
-    onClose: setSBMClose
+    onClose: setSBMClose,
+    onToggle: onSBMToggle
+  } = useDisclosure()
+
+  const {
+    isOpen: isSupOpen,
+    onOpen: onSupOpen,
+    onClose: onSupClose
   } = useDisclosure()
 
   const btnRef = useRef(null)
@@ -80,21 +91,11 @@ const SBOMTable = ({
   const licenseBtn = useRef(null)
 
   const [selectedKey, setSelectedKey] = useState('')
-  const [filterSeverity, setFilterSeverity] = useState('')
-  const [filterDesc, setFilterDesc] = useState('')
-
   const [filterType, setFilterType] = useState('')
   const [filterUser, setFilterUser] = useState('')
+  const [filteredData, setFilteredData] = useState(healthCheckData)
 
-  // const activeFiltersCount = [filterSeverity, filterDesc].filter(Boolean).length
-
-  const filteredData = healthCheckData.filter((item) => {
-    return (
-      item.severity.includes(filterSeverity) &&
-      item.shortDesc.includes(filterDesc)
-    )
-  })
-
+  // FILTER CHANGE LOG BASED ON TYPE AND USER
   const filterChangelog = changelogData.filter((item) => {
     return item.type.includes(filterType) && item.changedBy.includes(filterUser)
   })
@@ -108,6 +109,68 @@ const SBOMTable = ({
     })
   }
 
+  const handleFilterChange = (selectedFilters) => {
+    if (
+      selectedFilters.severity.length === 0 &&
+      selectedFilters.shortDesc.length === 0
+    ) {
+      // IF NO FILTER SELECTED RETURN DEFAULT HEALTH CHECK DATA
+      setFilteredData(healthCheckData)
+    } else {
+      // IF ANY FILTER IS SELECTED RETURN SELECTED DATA
+      const filtered = healthCheckData.filter(
+        (item) =>
+          (selectedFilters.severity.length === 0 ||
+            selectedFilters.severity.includes(item.severity)) &&
+          (selectedFilters.shortDesc.length === 0 ||
+            selectedFilters.shortDesc.includes(item.shortDesc))
+      )
+      setFilteredData(filtered)
+    }
+  }
+
+  // EXTRACT ALL SEVERITY OPTIONS FROM HEALTH CHECK DATA
+  const severityOptions = [
+    ...new Set(healthCheckData.map((item) => item.severity))
+  ]
+
+  // EXTRACT ALL SHORT DESC STRING FROM HEALTH CHECK DATA
+  const shortDescOptions = [
+    ...new Set(healthCheckData.map((item) => item.shortDesc))
+  ]
+
+  // ADD KEYBOARD SHORTCUT FOR TOGGLE COMPONENT DRAWER
+  const handleCompDown = (event) => {
+    if (event.key === 'c' || event.key === 'C') {
+      onCompToggle()
+    }
+  }
+
+  // ADD KEYBOARD SHORTCUT FOR TOGGLE SBOM DRAWER
+  const handleSBMDown = (event) => {
+    if (event.key === 's' || event.key === 'S') {
+      onSBMToggle()
+    }
+  }
+
+  // KEYBOARD EVENT LISTNER FOR COMPONENT DRAWER
+  useEffect(() => {
+    window.addEventListener('keydown', handleCompDown)
+
+    return () => {
+      window.removeEventListener('keydown', handleCompDown)
+    }
+  }, [isCompOpen])
+
+  // KEYBOARD EVENT LISTNER FOR SBOM DRAWER
+  useEffect(() => {
+    window.addEventListener('keydown', handleSBMDown)
+
+    return () => {
+      window.removeEventListener('keydown', handleSBMDown)
+    }
+  }, [isSBMOpen])
+
   return (
     <>
       <Card my='22px'>
@@ -119,7 +182,7 @@ const SBOMTable = ({
             <Tab _focus={{ outline: 'none' }}>Change log</Tab>
           </TabList>
           <TabPanels>
-            {/* general */}
+            {/* GENERAL TABLE */}
             <TabPanel>
               <CardBody>
                 <Table
@@ -143,12 +206,14 @@ const SBOMTable = ({
                       status={status}
                       btnRef={licenseBtn}
                       onSbomOpen={setSBMOpen}
+                      onSupOpen={onSupOpen}
+                      refetch={refetch}
                     />
                   </Tbody>
                 </Table>
               </CardBody>
             </TabPanel>
-            {/* component */}
+            {/* COMPONENT TABLE */}
             <TabPanel>
               {!customerView && (
                 <CardHeader>
@@ -173,52 +238,6 @@ const SBOMTable = ({
                 </CardHeader>
               )}
               <CardBody overflowX={'scroll'}>
-                {/* <Table
-                  // __css={{ tableLayout: 'fixed', width: 'full' }}
-                  variant='simple'
-                  color={textColor}
-                  size='sm'
-                >
-                  <Thead>
-                    <Tr my='.8rem' pl='0px'>
-                      {captions.map((caption, idx) => {
-                        return (
-                          <Th key={idx} ps={idx === 0 ? '0px' : null} pb={4}>
-                            <Box>{caption}</Box>
-                          </Th>
-                        )
-                      })}
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {data.components.nodes.map((row, index) => {
-                      return (
-                        <SBOMComponentRow
-                          key={index}
-                          id={row.id}
-                          type={type}
-                          lifecycle={data.lifecycle}
-                          sbomId={data.id}
-                          description={row.description}
-                          component={row.name}
-                          version={row.version}
-                          purl={row.purl}
-                          group={row.group}
-                          licenses={row.licenses}
-                          primary={row.primary}
-                          internal={row.internal}
-                          cpes={row.cpes}
-                          updatedAt={row.updatedAt}
-                          uniqueId={row.uniqueId}
-                          refetch={refetch}
-                          suppliers={row.suppliers}
-                          status={status}
-                        />
-                      )
-                    })}
-                  </Tbody>
-                </Table> */}
-
                 <ComponentTable
                   data={data.components.nodes}
                   refetch={refetch}
@@ -252,112 +271,14 @@ const SBOMTable = ({
                 </Flex>
               )}
             </TabPanel>
-            {/* health check */}
+            {/* HEALTH CHECK TABLE */}
             <TabPanel>
               <CardHeader>
-                <Flex
-                  width={'100%'}
-                  alignItems={'flex-end'}
-                  justifyContent={'flex-end'}
-                  pos={'relative'}
-                  gap={3}
-                >
-                  {/* severity */}
-                  <Menu closeOnSelect={true}>
-                    <MenuButton
-                      as={Button}
-                      colorScheme='blue'
-                      fontWeight='normal'
-                      fontSize={'sm'}
-                      leftIcon={<FaFilter size={14} />}
-                    >
-                      Severity
-                    </MenuButton>
-                    <MenuList minWidth='240px'>
-                      <MenuOptionGroup
-                        type='radio'
-                        value={filterSeverity}
-                        onChange={(value) => setFilterSeverity(value)}
-                      >
-                        <MenuItemOption
-                          value={'All'}
-                          fontSize={'sm'}
-                          textTransform={'capitalize'}
-                          onClick={() => setFilterSeverity('')}
-                        >
-                          All
-                        </MenuItemOption>
-                        {['critical', 'high', 'medium', 'low'].map(
-                          (p, index) => (
-                            <MenuItemOption
-                              value={p}
-                              key={index}
-                              fontSize={'sm'}
-                              textTransform={'capitalize'}
-                            >
-                              {p}
-                            </MenuItemOption>
-                          )
-                        )}
-                      </MenuOptionGroup>
-                    </MenuList>
-                  </Menu>
-                  {/* short desc */}
-                  <Menu closeOnSelect={true}>
-                    <MenuButton
-                      as={Button}
-                      colorScheme='blue'
-                      fontWeight='normal'
-                      fontSize={'sm'}
-                      leftIcon={<FaFilter size={14} />}
-                    >
-                      Category
-                    </MenuButton>
-                    <MenuList minWidth='240px'>
-                      <MenuOptionGroup
-                        type='radio'
-                        value={filterDesc}
-                        onChange={(value) => setFilterDesc(value)}
-                      >
-                        <MenuItemOption
-                          value={'All'}
-                          fontSize={'sm'}
-                          textTransform={'capitalize'}
-                          onClick={() => setFilterDesc('')}
-                        >
-                          All
-                        </MenuItemOption>
-                        {[
-'Primary Component',
-'Creation Time',
-'Primary License',
-'Primary Author',
-'Primary Version',
-'Primary License',
-'Component Name',
-'Component Supplier',
-'Component Identifier',
-'Component Version',
-'Component Author',
-'Component Relationship',
-'Component License',
-'Component Type',
-'Component PURL/CPE',
-'Component Checksum'
-                        ].map((p, index) => (
-                          <MenuItemOption
-                            value={p}
-                            key={index}
-                            fontSize={'sm'}
-                            textTransform={'capitalize'}
-                          >
-                            {p}
-                          </MenuItemOption>
-                        ))}
-                      </MenuOptionGroup>
-                    </MenuList>
-                  </Menu>
-                </Flex>
+                <FilterMenu
+                  severityOptions={severityOptions}
+                  shortDescOptions={shortDescOptions}
+                  onFilterChange={handleFilterChange}
+                />
               </CardHeader>
               <CardBody overflowX={'scroll'}>
                 <Table
@@ -412,7 +333,7 @@ const SBOMTable = ({
                 </Flex>
               )}
             </TabPanel>
-            {/* changelog */}
+            {/* CHANGELOG TABLE */}
             <TabPanel>
               <CardHeader>
                 <Flex
@@ -422,7 +343,7 @@ const SBOMTable = ({
                   pos={'relative'}
                   gap={3}
                 >
-                  {/* type */}
+                  {/* TYPE FILTER */}
                   <Menu closeOnSelect={true}>
                     <MenuButton
                       as={Button}
@@ -460,7 +381,7 @@ const SBOMTable = ({
                       </MenuOptionGroup>
                     </MenuList>
                   </Menu>
-                  {/* short desc */}
+                  {/* USER FILTER */}
                   <Menu closeOnSelect={true}>
                     <MenuButton
                       as={Button}
@@ -508,7 +429,7 @@ const SBOMTable = ({
               </CardHeader>
               <CardBody overflowX={'scroll'}>
                 <Table
-                  __css={{ tableLayout: 'flex', width: 'auto'}}
+                  __css={{ tableLayout: 'flex', width: '100%' }}
                   variant='simple'
                   color={textColor}
                   size='sm'
@@ -564,6 +485,7 @@ const SBOMTable = ({
         </Tabs>
       </Card>
 
+      {/* SBOM DRAWER */}
       {isSBMOpen && data && (
         <ProductSbomDrawer
           isOpen={isSBMOpen}
@@ -577,6 +499,7 @@ const SBOMTable = ({
         />
       )}
 
+      {/* GENERAL DRAWER */}
       {data && isOpen && (
         <GeneralDataDrawer
           isOpen={isOpen}
@@ -588,6 +511,17 @@ const SBOMTable = ({
         />
       )}
 
+      {/* SUPPLIER MODAL */}
+      {isSupOpen && data && (
+        <PriSupplierModal
+          refetch={refetch}
+          isOpen={isSupOpen}
+          onClose={onSupClose}
+          suppliers={data.suppliers}
+        />
+      )}
+
+      {/* COMPONENT DRAWER */}
       {isCompOpen && data && (
         <ComponentDrawer
           isOpen={isCompOpen}

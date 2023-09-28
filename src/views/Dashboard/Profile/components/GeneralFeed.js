@@ -48,13 +48,15 @@ const GeneralFeed = () => {
       <CardBody px='5px'>
         <Flex flexDirection={'column'} alignItems={'flex-start'} gap={6}>
           <FormControl>
-            <FormLabel fontSize={'sm'}>Regular Expressions identifying Internal Components</FormLabel>
+            <FormLabel color='#444'>
+              Regular Expressions identifying Internal Components
+            </FormLabel>
             <Input
-              size='sm'
               placeholder='*mystring*'
               value={compName}
               onChange={(e) => setCompName(e.target.value)}
               onKeyDown={handleKeyDown}
+              bg={'white'}
             />
             <Text fontSize={'xs'} mt={2}>
               Press <Code>enter</Code> to add name regex
@@ -81,12 +83,7 @@ const GeneralFeed = () => {
             </Flex>
           </FormControl>
           <Stack direction={'row'} spacing={4} alignItems={'center'}>
-            <Button
-              size='sm'
-              fontWeight={'medium'}
-              variant='outline'
-              colorScheme='blue'
-            >
+            <Button fontWeight={'medium'} variant='solid' colorScheme='blue'>
               Apply
             </Button>
           </Stack>

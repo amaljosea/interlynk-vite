@@ -11,7 +11,8 @@ import {
   Radio,
   ModalFooter,
   Stack,
-  Button
+  Button,
+  useToast
 } from '@chakra-ui/react'
 import { useLazyQuery } from '@apollo/client'
 import { DownloadSBOM } from 'graphQL/Queries'
@@ -24,8 +25,11 @@ const DownloadModal = ({
   onClose,
   initialRef,
   productId,
+  productName,
+  version,
   sbomId
 }) => {
+  const toast = useToast()
   const location = useLocation()
   const customerView = location.pathname.startsWith('/customer')
 
@@ -33,8 +37,10 @@ const DownloadModal = ({
 
   const [spec, setSpec] = useState('cyclonedx')
   const [format, setFormat] = useState('json')
-  const [includeVulns, setIncludeVulns] = useState(false)
-  const [includeVex, setIncludeVex] = useState(false)
+  const [includeVulns, setIncludeVulns] = useState(true)
+  const [includeVex, setIncludeVex] = useState(true)
+
+  const type = spec === 'cyclonedx' ? 'cdx' : 'spdx'
 
   const downloadJsonFile = (jsonData) => {
     if (jsonData) {
@@ -43,7 +49,8 @@ const DownloadModal = ({
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = 'data.json'
+      console.log(`URL`, url)
+      a.download = `${productName}-${version}.${type}.json`
       a.click()
       URL.revokeObjectURL(url)
     }
@@ -55,7 +62,7 @@ const DownloadModal = ({
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = 'data.xml'
+      a.download = `${productName}-${version}.${type}.xml`
       a.click()
       URL.revokeObjectURL(url)
     }
@@ -87,9 +94,14 @@ const DownloadModal = ({
         .finally(() => onClose())
     } catch (error) {
       console.log(`Error`, error)
+      toast({
+        description: `${error}`,
+        duration: 3000,
+        position: 'top',
+        status: 'error'
+      })
     }
   }
-
 
   const onDownload = async () => {
     try {
@@ -155,13 +167,13 @@ const DownloadModal = ({
 
             <Stack direction='column' gap='5px'>
               <Checkbox
-                value={includeVulns}
+                isChecked={includeVulns}
                 onChange={() => setIncludeVulns(!includeVulns)}
               >
                 Include Vulnerabilities
               </Checkbox>
               <Checkbox
-                value={includeVex}
+                isChecked={includeVex}
                 onChange={() => setIncludeVex(!includeVex)}
               >
                 Include Vulnerability Status (VEX)

@@ -7,10 +7,11 @@ import {
   GridItem,
   Text,
   Select,
-  useDisclosure
+  useDisclosure,
+  IconButton
 } from '@chakra-ui/react'
 import React, { useState, useEffect, useRef, useContext } from 'react'
-import { FaBalanceScale, FaCubes, FaLayerGroup } from 'react-icons/fa'
+import { FaBalanceScale, FaCubes, FaFileDownload, FaLayerGroup } from 'react-icons/fa'
 import { useLocation, useHistory } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
 import { useQuery } from '@apollo/client'

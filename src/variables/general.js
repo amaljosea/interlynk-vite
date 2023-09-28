@@ -34,7 +34,7 @@ export const healthChecks = [
     id: 2,
     healthCheckId: 'qs-8',
     severity: 'critical',
-    shortDesc: 'Primary Component Version',
+    shortDesc: 'Creation Time',
     longDesc: 'SBOM does not include a primary component version',
     status: 'fix'
   },
@@ -42,70 +42,74 @@ export const healthChecks = [
     id: 3,
     healthCheckId: 'qs-7',
     severity: 'low',
-    shortDesc: 'Primary Author',
+    shortDesc: 'Primary License',
     longDesc: 'SBOM includes a potentially invalid value of primary author',
     status: 'fix'
   },
-
-
   // Component Biotronik.Cabo.Shared-0.0.0-UnknownVersion
   {
     id: 5,
     healthCheckId: 'qs-11',
     severity: 'critical',
-    shortDesc: 'Component Identifier',
-    longDesc: 'Component: Biotronik.Cabo.Shared-0.0.0-UnknownVersion is missing unique identifier',
+    shortDesc: 'Primary Author',
+    longDesc:
+      'Component: Biotronik.Cabo.Shared-0.0.0-UnknownVersion is missing unique identifier',
     status: 'fix'
   },
   {
     id: 6,
     healthCheckId: 'qs-14',
     severity: 'critical',
-    shortDesc: 'Component Relationship',
-    longDesc: 'Component: Biotronik.Cabo.Shared-0.0.0-UnknownVersion is not related to Primary Component',
+    shortDesc: 'Primary Version',
+    longDesc:
+      'Component: Biotronik.Cabo.Shared-0.0.0-UnknownVersion is not related to Primary Component',
     status: 'fix'
   },
   {
     id: 6,
     healthCheckId: 'qs-18.1',
     severity: 'high',
-    shortDesc: 'Component PURL/CPE',
-    longDesc: 'Component: Biotronik.Cabo.Shared-0.0.0-UnknownVersion is missing a Package URL',
+    shortDesc: 'Component Name',
+    longDesc:
+      'Component: Biotronik.Cabo.Shared-0.0.0-UnknownVersion is missing a Package URL',
     status: 'fix'
   },
   {
     id: 6,
     healthCheckId: 'qs-18.1',
     severity: 'high',
-    shortDesc: 'Component PURL/CPE',
-    longDesc: 'Component: Biotronik.Cabo.Shared-0.0.0-UnknownVersion is missing a CPE identifier',
+    shortDesc: 'Component Supplier',
+    longDesc:
+      'Component: Biotronik.Cabo.Shared-0.0.0-UnknownVersion is missing a CPE identifier',
     status: 'fix'
   },
   {
     id: 8,
     healthCheckId: 'qs-10',
     severity: 'medium',
-    shortDesc: 'Component Supplier',
-    longDesc: 'Component: Biotronik.Cabo.Shared-0.0.0-UnknownVersion is missing a supplier',
+    shortDesc: 'Component Identifier',
+    longDesc:
+      'Component: Biotronik.Cabo.Shared-0.0.0-UnknownVersion is missing a supplier',
     status: 'fix'
   },
   {
     id: 8,
     healthCheckId: 'qs-13',
     severity: 'low',
-    shortDesc: 'Component Author',
-    longDesc: 'Component: Biotronik.Cabo.Shared-0.0.0-UnknownVersion is missing an author',
+    shortDesc: 'Component Version',
+    longDesc:
+      'Component: Biotronik.Cabo.Shared-0.0.0-UnknownVersion is missing an author',
     status: 'fix'
   },
-
 
   // Component system.reactive.compatibility.5.0.0.nupkg
   {
     id: 5,
     healthCheckId: 'qs-11',
     severity: 'critical',
-    shortDesc: 'Component Identifier',
-    longDesc: 'Component: system.reactive.compatibility.5.0.0.nupkg is missing unique identifier',
+    shortDesc: 'Component Author',
+    longDesc:
+      'Component: system.reactive.compatibility.5.0.0.nupkg is missing unique identifier',
     status: 'fix'
   },
   {
@@ -113,49 +117,55 @@ export const healthChecks = [
     healthCheckId: 'qs-14',
     severity: 'critical',
     shortDesc: 'Component Relationship',
-    longDesc: 'Component: system.reactive.compatibility.5.0.0.nupkg is not related to Primary Component',
+    longDesc:
+      'Component: system.reactive.compatibility.5.0.0.nupkg is not related to Primary Component',
     status: 'fix'
   },
   {
     id: 6,
     healthCheckId: 'qs-18.1',
     severity: 'high',
-    shortDesc: 'Component PURL/CPE',
-    longDesc: 'Component: system.reactive.compatibility.5.0.0.nupkg is missing a Package URL',
+    shortDesc: 'Component License',
+    longDesc:
+      'Component: system.reactive.compatibility.5.0.0.nupkg is missing a Package URL',
     status: 'fix'
   },
   {
     id: 6,
     healthCheckId: 'qs-18.1',
     severity: 'high',
-    shortDesc: 'Component PURL/CPE',
-    longDesc: 'Component: system.reactive.compatibility.5.0.0.nupkg is missing a CPE identifier',
+    shortDesc: 'Component Type',
+    longDesc:
+      'Component: system.reactive.compatibility.5.0.0.nupkg is missing a CPE identifier',
     status: 'fix'
   },
   {
     id: 8,
     healthCheckId: 'qs-10',
     severity: 'medium',
-    shortDesc: 'Component Supplier',
-    longDesc: 'Component: system.reactive.compatibility.5.0.0.nupkg is missing a supplier',
+    shortDesc: 'Component PURL/CPE',
+    longDesc:
+      'Component: system.reactive.compatibility.5.0.0.nupkg is missing a supplier',
     status: 'fix'
   },
   {
     id: 8,
     healthCheckId: 'qs-13',
     severity: 'low',
-    shortDesc: 'Component Author',
-    longDesc: 'Component: system.reactive.compatibility.5.0.0.nupkg is missing an author',
+    shortDesc: 'Component Checksum',
+    longDesc:
+      'Component: system.reactive.compatibility.5.0.0.nupkg is missing an author',
     status: 'fix'
   },
 
-   // Component couchbase.lite.enterprise.3.0.0.nupkg
-   {
+  // Component couchbase.lite.enterprise.3.0.0.nupkg
+  {
     id: 5,
     healthCheckId: 'qs-11',
     severity: 'critical',
     shortDesc: 'Component Identifier',
-    longDesc: 'Component: system.reactive.compatibility.5.0.0.nupkg is missing unique identifier',
+    longDesc:
+      'Component: system.reactive.compatibility.5.0.0.nupkg is missing unique identifier',
     status: 'fix'
   },
   {
@@ -163,7 +173,8 @@ export const healthChecks = [
     healthCheckId: 'qs-14',
     severity: 'critical',
     shortDesc: 'Component Relationship',
-    longDesc: 'Component: system.reactive.compatibility.5.0.0.nupkg is not related to Primary Component',
+    longDesc:
+      'Component: system.reactive.compatibility.5.0.0.nupkg is not related to Primary Component',
     status: 'fix'
   },
   {
@@ -171,7 +182,8 @@ export const healthChecks = [
     healthCheckId: 'qs-18.1',
     severity: 'high',
     shortDesc: 'Component PURL/CPE',
-    longDesc: 'Component: system.reactive.compatibility.5.0.0.nupkg is missing a CPE identifier',
+    longDesc:
+      'Component: system.reactive.compatibility.5.0.0.nupkg is missing a CPE identifier',
     status: 'fix'
   },
   {
@@ -179,7 +191,8 @@ export const healthChecks = [
     healthCheckId: 'qs-10',
     severity: 'medium',
     shortDesc: 'Component Supplier',
-    longDesc: 'Component: system.reactive.compatibility.5.0.0.nupkg is missing a supplier',
+    longDesc:
+      'Component: system.reactive.compatibility.5.0.0.nupkg is missing a supplier',
     status: 'fix'
   },
   {
@@ -187,8 +200,75 @@ export const healthChecks = [
     healthCheckId: 'qs-13',
     severity: 'low',
     shortDesc: 'Component Author',
-    longDesc: 'Component: system.reactive.compatibility.5.0.0.nupkg is missing an author',
+    longDesc:
+      'Component: system.reactive.compatibility.5.0.0.nupkg is missing an author',
     status: 'fix'
+  }
+]
+
+export const apiGetwayData = [
+  {
+    id: 1,
+    title: 'SNYK-CC-AWS-419',
+    link:
+      'https://security.snyk.io/rules/cloud/SNYK-CC-AWS-419?_gl=1%2afwpgfs%2a_ga%2aMjkxODQ3MjQuMTY5MTc2MDAyMw..%2a_ga_X9SH3KP7B4%2aMTY5NTg4MjAwMy40LjEuMTY5NTg4MzMwMy4wLjAuMA..',
+    description:
+      'Open this link in a new tabAPI gateway cached responses are not encrypted',
+    status: 'medium'
+  },
+  {
+    id: 2,
+    title: 'SNYK-CC-AWS-452',
+    link:
+      'https://security.snyk.io/rules/cloud/SNYK-CC-AWS-452?_gl=1%2a1m4dkez%2a_ga%2aMjkxODQ3MjQuMTY5MTc2MDAyMw..%2a_ga_X9SH3KP7B4%2aMTY5NTg4MjAwMy40LjEuMTY5NTg4NDAwMC4wLjAuMA..',
+    description:
+      'Open this link in a new tab Wildcard action in api gateway access policy',
+    status: 'medium'
+  },
+  {
+    id: 3,
+    title: 'SNYK-CC-AWS-453',
+    link:
+      'https://security.snyk.io/rules/cloud/SNYK-CC-AWS-453?_gl=1%2a1q02vzd%2a_ga%2aMjkxODQ3MjQuMTY5MTc2MDAyMw..%2a_ga_X9SH3KP7B4%2aMTY5NTg4MjAwMy40LjEuMTY5NTg4NDAzMS4wLjAuMA..',
+    description:
+      'Open this link in a new tab Wildcard principal in rest api access policy',
+    status: 'medium'
+  },
+  {
+    id: 4,
+    title: 'SNYK-CC-TF-63',
+    link:
+      'https://security.snyk.io/rules/cloud/SNYK-CC-TF-63?_gl=1%2a1q02vzd%2a_ga%2aMjkxODQ3MjQuMTY5MTc2MDAyMw..%2a_ga_X9SH3KP7B4%2aMTY5NTg4MjAwMy40LjEuMTY5NTg4NDAzMS4wLjAuMA..',
+    description:
+      'Open this link in a new tab API Gateway does not enforce latest TLS/SSL policy',
+    status: 'low'
+  },
+  {
+    id: 5,
+    title: 'SNYK-CC-TF-99',
+    link:
+      'https://security.snyk.io/rules/cloud/SNYK-CC-TF-99?_gl=1%2a1q02vzd%2a_ga%2aMjkxODQ3MjQuMTY5MTc2MDAyMw..%2a_ga_X9SH3KP7B4%2aMTY5NTg4MjAwMy40LjEuMTY5NTg4NDAzMS4wLjAuMA..',
+    description:
+      'Open this link in a new tab API Gateway allows anonymous access',
+    status: 'high'
+  },
+  {
+    id: 6,
+    title: 'SNYK-CC-TF-129',
+    link:
+      'https://security.snyk.io/rules/cloud/SNYK-CC-TF-129?_gl=1%2ac0w1sc%2a_ga%2aMjkxODQ3MjQuMTY5MTc2MDAyMw..%2a_ga_X9SH3KP7B4%2aMTY5NTg4MjAwMy40LjEuMTY5NTg4NDA2Ny4wLjAuMA..',
+    description:
+      'Open this link in a new tab API Gateway X-Ray tracing disabled',
+    status: 'low'
+  },
+  {
+    id: 7,
+    title: 'SNYK-CC-TF-138',
+    link:
+      'https://security.snyk.io/rules/cloud/SNYK-CC-TF-138?_gl=1%2amzmq5m%2a_ga%2aMjkxODQ3MjQuMTY5MTc2MDAyMw..%2a_ga_X9SH3KP7B4%2aMTY5NTg4MjAwMy40LjEuMTY5NTg4NDA4Mi4wLjAuMA..',
+    description:
+      'Open this link in a new tab API Gateway access logging disabled',
+    status: 'low'
   }
 ]
 
@@ -196,8 +276,7 @@ export const changeLogs = [
   {
     id: 1,
     type: 'modified',
-    object:
-      'microsoft.extensions.dependencyinjection.abstractions.2.0.0.nupkg',
+    object: 'microsoft.extensions.dependencyinjection.abstractions.2.0.0.nupkg',
     prevValue: 'Primary: False',
     newValue: 'Primary:True',
     changedBy: 'Surendra Pathak',
@@ -244,7 +323,8 @@ export const changeLogs = [
     type: 'added',
     object: 'bom-ref-h17z311',
     prevValue: '',
-    newValue: 'Component Name: microsoft.extensions.dependendencyinjections.3.1.1.nupkg',
+    newValue:
+      'Component Name: microsoft.extensions.dependendencyinjections.3.1.1.nupkg',
     changedBy: 'Ritesh Noronha',
     time: '2023-09-25T17:15:24Z'
   },
@@ -271,7 +351,8 @@ export const changeLogs = [
     type: 'added',
     object: 'microsoft.extensions.dependencyinjection.abstractions.2.0.0.nupkg',
     prevValue: 'Describes: None',
-    newValue: 'Describes: microsoft.extensions.signlecore.privates.11.1.9.nupkg',
+    newValue:
+      'Describes: microsoft.extensions.signlecore.privates.11.1.9.nupkg',
     changedBy: 'Ritesh Noronha',
     time: '2023-09-24T17:15:00Z'
   },
@@ -292,7 +373,7 @@ export const changeLogs = [
     newValue: '',
     changedBy: 'Ritesh Noronha',
     time: '2023-09-24T06:14:00Z'
-  },
+  }
 ]
 
 export const activitiesData = [

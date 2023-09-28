@@ -134,9 +134,7 @@ const ProductModal = ({
                       onChange={(e) => setKind(e.target.value)}
                     >
                       <option value=''>-- Select --</option>
-                      <option value='unknown'>Unknown</option>
                       <option value='application'>Application</option>
-                      <option value='json'>JSON</option>
                       <option value='library'>Library</option>
                       <option value='operating_system'>Operating system</option>
                       <option value='firmware'>Firmware</option>
@@ -144,6 +142,11 @@ const ProductModal = ({
                       <option value='device'>Device</option>
                       <option value='container'>Container</option>
                       <option value='framework'>Framework</option>
+                      <option value='source'>Source</option>
+                      <option value='archive'>Archive</option>
+                      <option value='install'>Install</option>
+                      <option value='other'>Other</option>
+                      <option value='unspecified'>Unspecified</option>
                     </Select>
                   </FormControl>
                 )}

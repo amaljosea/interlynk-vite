@@ -17,14 +17,18 @@ function ChangelogRow(props) {
   return (
     <Tr>
       <Td pl={0} textTransform={'capitalize'}>
-        <Tag variant='subtle' colorScheme={setColor(type)}   style={{ width: '80px', textAlign: 'center' }}>
+        <Tag
+          variant='subtle'
+          colorScheme={setColor(type)}
+          style={{ width: '80px', margin: 'center' }}
+        >
           {type}
         </Tag>
       </Td>
       <Td textTransform={'capitalize'}>{object}</Td>
       <Td>{prevValue}</Td>
       <Td>{newValue}</Td>
-      <Td>{changedBy}</Td>
+      <Td width={'200px'}>{changedBy}</Td>
       <Td>
         {new Date(time).toLocaleDateString('en-US', {
           year: 'numeric',

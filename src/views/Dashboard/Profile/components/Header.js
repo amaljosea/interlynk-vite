@@ -1,21 +1,32 @@
 // Chakra imports
 import { Avatar, Button, Flex, Text, useColorModeValue } from '@chakra-ui/react'
 
+// IMAGES
+import userOne from 'assets/img/abhi.png'
+import userTwo from 'assets/img/sp.png'
+import userThree from 'assets/img/rcn.jpg'
+
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 
-const Header = ({
-  selectedTab,
-  setSelectedTab,
-  avatarImage,
-  name,
-  email,
-  tabs
-}) => {
+const Header = ({ selectedTab, setSelectedTab, name, email, tabs }) => {
   // Chakra color mode
   const textColor = useColorModeValue('gray.700', 'white')
 
-  const emailColor = useColorModeValue('gray.400', 'gray.300')
+  const emailColor = useColorModeValue('gray.500', 'gray.300')
+
+  const dp = (email) => {
+    switch (email) {
+      case 'abhisek@interlynk.io':
+        return userOne
+      case 'sp@interlynk.io':
+        return userTwo
+      case 'rcn@interlynk.io':
+        return userThree
+      default:
+        return userTwo
+    }
+  }
 
   return (
     <Flex direction='column' pt={{ base: '120px', md: '75px' }}>
@@ -29,13 +40,7 @@ const Header = ({
             w={{ sm: '100%' }}
             textAlign={{ sm: 'center', md: 'start' }}
           >
-            <Avatar
-              me={{ md: '22px' }}
-              src={avatarImage}
-              w='80px'
-              h='80px'
-              borderRadius='15px'
-            />
+            <Avatar me={{ md: '22px' }} src={dp(email)} w='80px' h='80px' />
             <Flex direction='column' maxWidth='100%' my={{ sm: '14px' }}>
               <Text
                 fontSize={{ sm: 'lg', lg: 'xl' }}
@@ -48,7 +53,7 @@ const Header = ({
               <Text
                 fontSize={{ sm: 'sm', md: 'md' }}
                 color={emailColor}
-                fontWeight='semibold'
+                fontWeight='medium'
               >
                 {email}
               </Text>

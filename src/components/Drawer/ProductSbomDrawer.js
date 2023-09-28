@@ -356,24 +356,6 @@ function ProductSbomDrawer(props) {
     }
   }
 
-  const handleUpdate = () => {
-    if (purlValue !== '') {
-      try {
-        const pkg = PackageURL.fromString(purlValue)
-        handleUpdateSBOM()
-      } catch (error) {
-        toast({
-          description: error.message,
-          status: 'error',
-          position: 'top',
-          duration: 3000
-        })
-      }
-    } else {
-      handleUpdateSBOM()
-    }
-  }
-
   const handleKeyDown = (event) => {
     if (event.key === 'Enter') {
       setCpeList([...cpeList, cpeValue])
@@ -473,12 +455,10 @@ function ProductSbomDrawer(props) {
                   size='sm'
                   value={compType}
                   onChange={(e) => setCompType(e.target.value)}
-                  pointerEvents={'none'}
+                  pointerEvents={sbomData ? 'none' : 'auto'}
                 >
                   <option value=''>-- Select --</option>
                   <option value='application'>Application</option>
-                  <option value='json'>JSON</option>
-                  <option value='unknown'>Unknown</option>
                   <option value='library'>Library</option>
                   <option value='operating_system'>Operating system</option>
                   <option value='firmware'>Firmware</option>
@@ -522,6 +502,7 @@ function ProductSbomDrawer(props) {
                   />
                 </FormControl>
               )}
+
               {/* Identifiers */}
               {/* <FormControl>
                 <FormLabel fontSize={'sm'}>Identifiers</FormLabel>
@@ -617,6 +598,7 @@ function ProductSbomDrawer(props) {
                   </Flex>
                 </Stack>
               </FormControl> */}
+
               {/* PRIMARY COMPONENT */}
               {!sbomData && (
                 <FormControl isReadOnly={true}>
@@ -632,7 +614,7 @@ function ProductSbomDrawer(props) {
               Cancel
             </Button>
             {sbomData ? (
-              <Button colorScheme='blue' onClick={handleUpdate}>
+              <Button colorScheme='blue' onClick={handleUpdateSBOM}>
                 Update
               </Button>
             ) : (

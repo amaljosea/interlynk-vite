@@ -666,8 +666,6 @@ export const sbomCreate = gql`
     $spec: String!
     $specVersion: String
     $format: String
-    $cpes: [String!]
-    $purl: String
     $licenses: [String!]
   ) {
     sbomCreate(
@@ -676,8 +674,6 @@ export const sbomCreate = gql`
         spec: $spec
         specVersion: $specVersion
         format: $format
-        cpes: $cpes
-        purl: $purl
         licenses: $licenses
       }
     ) {
@@ -718,8 +714,6 @@ export const sbomUpdate = gql`
     $spec: String!
     $specVersion: String
     $format: String
-    $cpes: [String!]
-    $purl: String
     $licenses: [String!]
   ) {
     sbomUpdate(
@@ -728,8 +722,6 @@ export const sbomUpdate = gql`
         spec: $spec
         specVersion: $specVersion
         format: $format
-        cpes: $cpes
-        purl: $purl
         licenses: $licenses
       }
     ) {
