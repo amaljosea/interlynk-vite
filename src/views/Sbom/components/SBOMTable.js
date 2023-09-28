@@ -115,8 +115,8 @@ const SBOMTable = ({
           <TabList mt='20px'>
             <Tab _focus={{ outline: 'none' }}>General</Tab>
             <Tab _focus={{ outline: 'none' }}>Components</Tab>
-            <Tab _focus={{ outline: 'none' }}>Health Checks</Tab>
-            <Tab _focus={{ outline: 'none' }}>Changelog</Tab>
+            <Tab _focus={{ outline: 'none' }}>Health checks</Tab>
+            <Tab _focus={{ outline: 'none' }}>Change log</Tab>
           </TabList>
           <TabPanels>
             {/* general */}
@@ -311,7 +311,7 @@ const SBOMTable = ({
                       fontSize={'sm'}
                       leftIcon={<FaFilter size={14} />}
                     >
-                      Short Desc
+                      Category
                     </MenuButton>
                     <MenuList minWidth='240px'>
                       <MenuOptionGroup
@@ -328,13 +328,22 @@ const SBOMTable = ({
                           All
                         </MenuItemOption>
                         {[
-                          'Primary Component',
-                          'Component Name',
-                          'Supplier Name',
-                          'Unique Identifier',
-                          'Author Name',
-                          'Timestamp',
-                          'Component Relationships'
+'Primary Component',
+'Creation Time',
+'Primary License',
+'Primary Author',
+'Primary Version',
+'Primary License',
+'Component Name',
+'Component Supplier',
+'Component Identifier',
+'Component Version',
+'Component Author',
+'Component Relationship',
+'Component License',
+'Component Type',
+'Component PURL/CPE',
+'Component Checksum'
                         ].map((p, index) => (
                           <MenuItemOption
                             value={p}
@@ -361,9 +370,9 @@ const SBOMTable = ({
                   <Thead>
                     <Tr my='.8rem' pl='0px'>
                       {[
-                        'Health Check Id',
+                        'Check Id',
                         'Severity',
-                        'Short Description',
+                        'Category',
                         'Long Description',
                         'Status'
                       ].map((caption, idx) => {
@@ -499,14 +508,14 @@ const SBOMTable = ({
               </CardHeader>
               <CardBody overflowX={'scroll'}>
                 <Table
-                  __css={{ tableLayout: 'fixed', width: 'full' }}
+                  __css={{ tableLayout: 'flex', width: 'auto'}}
                   variant='simple'
                   color={textColor}
                   size='sm'
                   mt={6}
                 >
                   <Thead>
-                    <Tr my='.8rem' pl='0px'>
+                    <Tr my='1.8rem' pl='0px'>
                       {[
                         'Type',
                         'Object',
@@ -516,7 +525,7 @@ const SBOMTable = ({
                         'Time'
                       ].map((caption, idx) => {
                         return (
-                          <Th key={idx} ps={idx === 0 ? '0px' : null} pb={4}>
+                          <Th key={idx} ps={idx === 0 ? '0px' : null} pb={1}>
                             <Box>{caption}</Box>
                           </Th>
                         )

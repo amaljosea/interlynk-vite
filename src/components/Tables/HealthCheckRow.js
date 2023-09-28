@@ -60,7 +60,11 @@ function HealthCheckRow(props) {
       return onPrimaryOpen()
     }
 
-    if (shortDesc === 'Supplier Name') {
+    if (shortDesc === 'Component Supplier' || shortDesc === 'Component Author') {
+      return onSupplierOpen()
+    }
+
+    if (shortDesc === 'Primary Author' || shortDesc === 'Primary Author') {
       return onSupplierOpen()
     }
 
@@ -72,13 +76,14 @@ function HealthCheckRow(props) {
       shortDesc === 'Primary Component Version' ||
       shortDesc === 'Component Name' ||
       shortDesc === 'Component Version' ||
-      shortDesc === 'Author Name' ||
-      shortDesc === 'Component Relationships'
+      shortDesc === 'Component Author' ||
+      shortDesc === 'Component Relationship' ||
+      shortDesc === 'Component PURL/CPE'
     ) {
       return onCompOpen()
     }
 
-    if (shortDesc === 'Unique Identifier') {
+    if (shortDesc === 'Component Identifier') {
       const newArray = [...healthCheckData]
 
       const updatedObjectIndex = newArray.findIndex((obj) => obj.id === id)
@@ -91,7 +96,7 @@ function HealthCheckRow(props) {
 
       setTimeout(() => {
         updateIdenifier()
-      }, 1000)
+      }, 300)
     }
   }
 

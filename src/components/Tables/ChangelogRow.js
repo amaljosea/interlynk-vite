@@ -17,7 +17,7 @@ function ChangelogRow(props) {
   return (
     <Tr>
       <Td pl={0} textTransform={'capitalize'}>
-        <Tag variant='subtle' colorScheme={setColor(type)}>
+        <Tag variant='subtle' colorScheme={setColor(type)}   style={{ width: '80px', textAlign: 'center' }}>
           {type}
         </Tag>
       </Td>

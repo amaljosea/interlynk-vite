@@ -181,9 +181,11 @@ const ComponentTable = ({ data, refetch, type }) => {
               gap={2}
             >
               {/* COMPONENT NAME */}
+              <Tooltip placement='top' label={name}>
               <Text fontSize={'14px'}>
                 {name.length > 30 ? `${name.substring(0, 30)}...` : name}
               </Text>
+              </Tooltip>
 
               {/* EXTERNAL REFERENCE */}
               <Stack direction={'row'} alignItems={'center'}>

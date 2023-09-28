@@ -24,7 +24,7 @@ import {
 export const healthChecks = [
   {
     id: 1,
-    healthCheckId: 'qs-1',
+    healthCheckId: 'qs-5',
     severity: 'critical',
     shortDesc: 'Primary Component',
     longDesc: 'SBOM does not indicate a primary component',
@@ -32,7 +32,7 @@ export const healthChecks = [
   },
   {
     id: 2,
-    healthCheckId: 'qs-3',
+    healthCheckId: 'qs-8',
     severity: 'critical',
     shortDesc: 'Primary Component Version',
     longDesc: 'SBOM does not include a primary component version',
@@ -40,60 +40,154 @@ export const healthChecks = [
   },
   {
     id: 3,
-    healthCheckId: 'qs-4',
-    severity: 'critical',
-    shortDesc: 'Component Name',
-    longDesc: 'Component identified with <XXXX> does not have a name',
+    healthCheckId: 'qs-7',
+    severity: 'low',
+    shortDesc: 'Primary Author',
+    longDesc: 'SBOM includes a potentially invalid value of primary author',
     status: 'fix'
   },
-  {
-    id: 4,
-    healthCheckId: 'qs-5',
-    severity: 'medium',
-    shortDesc: 'Supplier Name',
-    longDesc: 'Component identified with <XXXX> does not have a supplier',
-    status: 'fix'
-  },
+
+
+  // Component Biotronik.Cabo.Shared-0.0.0-UnknownVersion
   {
     id: 5,
-    healthCheckId: 'qs-6',
+    healthCheckId: 'qs-11',
     severity: 'critical',
-    shortDesc: 'Unique Identifier',
-    longDesc:
-      'Component identifeid with <XXXX> does not have a unique identifier',
+    shortDesc: 'Component Identifier',
+    longDesc: 'Component: Biotronik.Cabo.Shared-0.0.0-UnknownVersion is missing unique identifier',
     status: 'fix'
   },
   {
     id: 6,
-    healthCheckId: 'qs-7',
-    severity: 'high',
-    shortDesc: 'Component Version',
-    longDesc: 'Component identifeid with <XXXX> does not have a version',
+    healthCheckId: 'qs-14',
+    severity: 'critical',
+    shortDesc: 'Component Relationship',
+    longDesc: 'Component: Biotronik.Cabo.Shared-0.0.0-UnknownVersion is not related to Primary Component',
     status: 'fix'
   },
   {
-    id: 7,
-    healthCheckId: 'qs-8',
-    severity: 'low',
-    shortDesc: 'Author Name',
-    longDesc: 'Component identifeid with <XXXX> does not have an author',
+    id: 6,
+    healthCheckId: 'qs-18.1',
+    severity: 'high',
+    shortDesc: 'Component PURL/CPE',
+    longDesc: 'Component: Biotronik.Cabo.Shared-0.0.0-UnknownVersion is missing a Package URL',
+    status: 'fix'
+  },
+  {
+    id: 6,
+    healthCheckId: 'qs-18.1',
+    severity: 'high',
+    shortDesc: 'Component PURL/CPE',
+    longDesc: 'Component: Biotronik.Cabo.Shared-0.0.0-UnknownVersion is missing a CPE identifier',
     status: 'fix'
   },
   {
     id: 8,
-    healthCheckId: 'qs-9',
-    severity: 'high',
-    shortDesc: 'Timestamp',
-    longDesc: 'SBOM does not include a timestamp',
+    healthCheckId: 'qs-10',
+    severity: 'medium',
+    shortDesc: 'Component Supplier',
+    longDesc: 'Component: Biotronik.Cabo.Shared-0.0.0-UnknownVersion is missing a supplier',
     status: 'fix'
   },
   {
-    id: 9,
-    healthCheckId: 'qs-10',
+    id: 8,
+    healthCheckId: 'qs-13',
+    severity: 'low',
+    shortDesc: 'Component Author',
+    longDesc: 'Component: Biotronik.Cabo.Shared-0.0.0-UnknownVersion is missing an author',
+    status: 'fix'
+  },
+
+
+  // Component system.reactive.compatibility.5.0.0.nupkg
+  {
+    id: 5,
+    healthCheckId: 'qs-11',
+    severity: 'critical',
+    shortDesc: 'Component Identifier',
+    longDesc: 'Component: system.reactive.compatibility.5.0.0.nupkg is missing unique identifier',
+    status: 'fix'
+  },
+  {
+    id: 6,
+    healthCheckId: 'qs-14',
+    severity: 'critical',
+    shortDesc: 'Component Relationship',
+    longDesc: 'Component: system.reactive.compatibility.5.0.0.nupkg is not related to Primary Component',
+    status: 'fix'
+  },
+  {
+    id: 6,
+    healthCheckId: 'qs-18.1',
     severity: 'high',
-    shortDesc: 'Component Relationships',
-    longDesc:
-      'Component identified with <XXXX> is not related to any component connected to the primary component',
+    shortDesc: 'Component PURL/CPE',
+    longDesc: 'Component: system.reactive.compatibility.5.0.0.nupkg is missing a Package URL',
+    status: 'fix'
+  },
+  {
+    id: 6,
+    healthCheckId: 'qs-18.1',
+    severity: 'high',
+    shortDesc: 'Component PURL/CPE',
+    longDesc: 'Component: system.reactive.compatibility.5.0.0.nupkg is missing a CPE identifier',
+    status: 'fix'
+  },
+  {
+    id: 8,
+    healthCheckId: 'qs-10',
+    severity: 'medium',
+    shortDesc: 'Component Supplier',
+    longDesc: 'Component: system.reactive.compatibility.5.0.0.nupkg is missing a supplier',
+    status: 'fix'
+  },
+  {
+    id: 8,
+    healthCheckId: 'qs-13',
+    severity: 'low',
+    shortDesc: 'Component Author',
+    longDesc: 'Component: system.reactive.compatibility.5.0.0.nupkg is missing an author',
+    status: 'fix'
+  },
+
+   // Component couchbase.lite.enterprise.3.0.0.nupkg
+   {
+    id: 5,
+    healthCheckId: 'qs-11',
+    severity: 'critical',
+    shortDesc: 'Component Identifier',
+    longDesc: 'Component: system.reactive.compatibility.5.0.0.nupkg is missing unique identifier',
+    status: 'fix'
+  },
+  {
+    id: 6,
+    healthCheckId: 'qs-14',
+    severity: 'critical',
+    shortDesc: 'Component Relationship',
+    longDesc: 'Component: system.reactive.compatibility.5.0.0.nupkg is not related to Primary Component',
+    status: 'fix'
+  },
+  {
+    id: 6,
+    healthCheckId: 'qs-18.1',
+    severity: 'high',
+    shortDesc: 'Component PURL/CPE',
+    longDesc: 'Component: system.reactive.compatibility.5.0.0.nupkg is missing a CPE identifier',
+    status: 'fix'
+  },
+  {
+    id: 8,
+    healthCheckId: 'qs-10',
+    severity: 'medium',
+    shortDesc: 'Component Supplier',
+    longDesc: 'Component: system.reactive.compatibility.5.0.0.nupkg is missing a supplier',
+    status: 'fix'
+  },
+  {
+    id: 8,
+    healthCheckId: 'qs-13',
+    severity: 'low',
+    shortDesc: 'Component Author',
+    longDesc: 'Component: system.reactive.compatibility.5.0.0.nupkg is missing an author',
     status: 'fix'
   }
 ]
@@ -103,38 +197,38 @@ export const changeLogs = [
     id: 1,
     type: 'modified',
     object:
-      'Name: microsoft.extensions.dependencyinjection.abstractions.2.0.0.nupkg',
+      'microsoft.extensions.dependencyinjection.abstractions.2.0.0.nupkg',
     prevValue: 'Primary: False',
     newValue: 'Primary:True',
     changedBy: 'Surendra Pathak',
-    time: '2023-09-23T19:21:00Z'
+    time: '2023-09-27T06:21:00Z'
   },
   {
     id: 2,
     type: 'added',
     object: 'Creation Time',
-    prevValue: 'N/A',
+    prevValue: '',
     newValue: '09/25/2023 6:15 PM',
     changedBy: 'Abhisek Paul',
-    time: '2023-09-24T07:11:36Z'
+    time: '2023-09-27T02:11:36Z'
   },
   {
     id: 3,
     type: 'added',
     object: 'Licenses',
-    prevValue: 'N/A',
+    prevValue: '',
     newValue: 'MIT',
     changedBy: 'Surendra Pathak',
-    time: '2023-09-24T19:20:00Z'
+    time: '2023-09-26T19:20:00Z'
   },
   {
     id: 4,
     type: 'added',
     object: 'Version',
-    prevValue: 'N/A',
+    prevValue: '',
     newValue: '3.0.0',
     changedBy: 'Abhisek Paul',
-    time: '2023-09-22T07:11:24Z'
+    time: '2023-09-26T07:11:24Z'
   },
   {
     id: 5,
@@ -143,61 +237,61 @@ export const changeLogs = [
     prevValue: 'AAPL',
     newValue: 'AAL',
     changedBy: 'Ritesh Noronha',
-    time: '2023-09-24T05:38:00Z'
+    time: '2023-09-26T05:38:00Z'
   },
   {
     id: 6,
     type: 'added',
-    object: 'Component ID: bom-ref-h17z311',
-    prevValue: 'N/A',
+    object: 'bom-ref-h17z311',
+    prevValue: '',
     newValue: 'Component Name: microsoft.extensions.dependendencyinjections.3.1.1.nupkg',
     changedBy: 'Ritesh Noronha',
-    time: '2023-09-11T07:15:24Z'
+    time: '2023-09-25T17:15:24Z'
   },
   {
     id: 7,
     type: 'added',
-    object: 'Name: microsoft.extensions.dependencyinjection.abstractions.2.0.0.nupkg',
-    prevValue: 'N/A',
+    object: 'microsoft.extensions.dependencyinjection.abstractions.2.0.0.nupkg',
+    prevValue: '',
     newValue: 'Supplier: Biotronik Inc. - hello@biontronik.com',
     changedBy: 'Brian B.',
-    time: '2023-09-22T08:15:00Z'
+    time: '2023-09-25T17:10:00Z'
   },
   {
     id: 8,
     type: 'added',
-    object: 'Name: microsoft.extensions.dependencyinjection.abstractions.2.0.0.nupkg',
-    prevValue: 'Bom-Ref: N/A',
-    newValue: 'Bom-Ref: bom-ref-h291z34a1',
+    object: 'microsoft.extensions.dependencyinjection.abstractions.2.0.0.nupkg',
+    prevValue: '',
+    newValue: 'bom-Ref: bom-ref-h291z34a1',
     changedBy: 'Shubham Shete',
-    time: '2023-09-15T08:11:10Z'
+    time: '2023-09-25T15:11:10Z'
   },
   {
     id: 9,
     type: 'added',
-    object: 'Name: microsoft.extensions.dependencyinjection.abstractions.2.0.0.nupkg',
+    object: 'microsoft.extensions.dependencyinjection.abstractions.2.0.0.nupkg',
     prevValue: 'Describes: None',
     newValue: 'Describes: microsoft.extensions.signlecore.privates.11.1.9.nupkg',
     changedBy: 'Ritesh Noronha',
-    time: '2023-09-17T17:15:00Z'
+    time: '2023-09-24T17:15:00Z'
   },
   {
     id: 10,
     type: 'modified',
-    object: 'Name: microsoft.extensions.dependencyinjection.abstractions.2.0.0.nupkg',
+    object: 'microsoft.extensions.dependencyinjection.abstractions.2.0.0.nupkg',
     prevValue: 'PURL: pkg:/nuget/abstractions@2.0.0',
     newValue: 'PURL: pkg/nuget/microsoft.extensions.abstractions@2.0.0',
     changedBy: 'Surendra Pathak',
-    time: '2023-09-23T17:16:00Z'
+    time: '2023-09-24T17:10:00Z'
   },
   {
     id: 11,
     type: 'deleted',
     object: 'Name: com.junkcode.com',
-    prevValue: 'N/A',
-    newValue: 'N/A',
+    prevValue: '',
+    newValue: '',
     changedBy: 'Ritesh Noronha',
-    time: '2023-09-17T06:14:00Z'
+    time: '2023-09-24T06:14:00Z'
   },
 ]
 

@@ -21,6 +21,36 @@ import GlobalContext from 'context/GlobalContext'
 import { useContext, useState } from 'react'
 
 const components = [
+  'Biotronik.Cabo.Business.Communication-0.0.0-UnknownVersionBiotronik.Cabo.Business.Communication-0.0.0-UnknownVersion',
+  'Biotronik.Cabo.Business.Communication.BLECommunicationLayer.Android-0.0.0-UnknownVersion',
+  'Biotronik.Cabo.Business.Communication.CommSim-0.0.0-UnknownVersion',
+  'Biotronik.Cabo.Business.Database-0.0.0-UnknownVersion',
+  'Biotronik.Cabo.Business.Database.Android-0.0.0-UnknownVersion',
+  'Biotronik.Cabo.Business.ImplantCommunication-0.0.0-UnknownVersion',
+  'Biotronik.Cabo.Business.Interfaces-0.0.0-UnknownVersion',
+  'Biotronik.Cabo.Business.ModelEntities-0.0.0-UnknownVersion',
+  'Biotronik.Cabo.Business.PPS.Container-0.0.0-UnknownVersion',
+  'Biotronik.Cabo.Business.PPS.Container.Android-0.0.0-UnknownVersion',
+  'Biotronik.Cabo.CP.Translation.Resource-1.8.0',
+  'Biotronik.Cabo.Cpf-0.0.0-UnknownVersion',
+  'Biotronik.Cabo.Cpf.Android-0.0.0-UnknownVersion',
+  'Biotronik.Cabo.MDP.Translation.Resource-1.9.0',
+  'Biotronik.Cabo.Mdp-0.0.0-UnknownVersion',
+  'Biotronik.Cabo.Mdp.Android-0.0.0-UnknownVersion',
+  'Biotronik.Cabo.Mdp.ModelAdmin-0.0.0-UnknownVersion',
+  'Biotronik.Cabo.PR.Translation.Resource-1.8.0',
+  'Biotronik.Cabo.PrApp-0.0.0-UnknownVersion',
+  'Biotronik.Cabo.Shared-0.0.0-UnknownVersion',
+  'Biotronik.Cabo.Shared.Android-0.0.0-UnknownVersion',
+  'Biotronik.Cabo.UI-0.0.0-UnknownVersion',
+  'Biotronik.Cabo.UI.Android-0.0.0-UnknownVersion',
+  'Biotronik.ScsApp.Pr-1.0.0',
+  'Biotronik.ScsApp.Pr.ModelAdminPlugin-1.0.0',
+  'Biotronik.ScsApp.Pr.PPS.Lib.Android.ARM-1.0.0',
+  'Biotronik.ScsApp.Pr.PPS.Lib.Android.ARM64-1.0.0',
+  'Biotronik.ScsApp.Pr.PPS.Lib.Android.x64-1.0.0',
+  'Biotronik.ScsApp.Pr.PPS.Lib.Android.x86-1.0.0',
+  'Biotronik.ScsApp.Shared-1.0.0',
   'dropwizard-core',
   'dropwizard-util',
   'guava',
@@ -62,7 +92,7 @@ const CheckModal = ({ isOpen, onClose, id, shortDesc }) => {
     if (value === '') {
       setComponentData([])
     } else {
-      setComponentData(components)
+      setComponentData(components.filter(str => str.startsWith(value)))
     }
   }
 
@@ -71,7 +101,7 @@ const CheckModal = ({ isOpen, onClose, id, shortDesc }) => {
       case 'Timestamp':
         return 'Timestamp'
       case 'Primary Component':
-        return 'Primary'
+        return 'Primary Component'
     }
   }
 
@@ -103,7 +133,7 @@ const CheckModal = ({ isOpen, onClose, id, shortDesc }) => {
                 position={'relative'}
               >
                 <FormControl isRequired>
-                  <FormLabel>Component</FormLabel>
+                  <FormLabel>Select</FormLabel>
                   <Input value={comp} onChange={handleComponentChange} />
                 </FormControl>
 

@@ -656,7 +656,7 @@ function ComponentDrawer(props) {
               <FormControl isReadOnly={customerView}>
                 <FormLabel fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-                    {shortDesc === 'Unique Identifier' && purlValue === '' && (
+                    {shortDesc === 'Component Identifier' && purlValue === '' && (
                       <WarningTwoIcon w={4} h={4} color='red.500' />
                     )}
                     <Text>Identifiers</Text>
