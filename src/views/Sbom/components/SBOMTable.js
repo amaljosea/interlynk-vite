@@ -24,7 +24,8 @@ import {
   MenuItemOption,
   Badge,
   useToast,
-  Text
+  Text,
+  Input
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
@@ -44,6 +45,8 @@ import FilterMenu from './FilterMenu'
 // ICONS
 import { AddIcon } from '@chakra-ui/icons'
 import { FaFilter } from 'react-icons/fa'
+import { Vulnerabilities } from 'variables/general'
+import VulnTable from 'components/Tables/VulnTable'
 
 const SBOMTable = ({
   data,
@@ -141,14 +144,14 @@ const SBOMTable = ({
 
   // ADD KEYBOARD SHORTCUT FOR TOGGLE COMPONENT DRAWER
   const handleCompDown = (event) => {
-    if (event.key === 'c' || event.key === 'C') {
+    if (event.altKey && event.key === 'c') {
       onCompToggle()
     }
   }
 
   // ADD KEYBOARD SHORTCUT FOR TOGGLE SBOM DRAWER
   const handleSBMDown = (event) => {
-    if (event.key === 's' || event.key === 'S') {
+    if (event.altKey && event.key === 's') {
       onSBMToggle()
     }
   }
@@ -160,7 +163,7 @@ const SBOMTable = ({
     return () => {
       window.removeEventListener('keydown', handleCompDown)
     }
-  }, [isCompOpen])
+  }, [])
 
   // KEYBOARD EVENT LISTNER FOR SBOM DRAWER
   useEffect(() => {
@@ -169,7 +172,7 @@ const SBOMTable = ({
     return () => {
       window.removeEventListener('keydown', handleSBMDown)
     }
-  }, [isSBMOpen])
+  }, [])
 
   return (
     <>
@@ -178,6 +181,7 @@ const SBOMTable = ({
           <TabList mt='20px'>
             <Tab _focus={{ outline: 'none' }}>General</Tab>
             <Tab _focus={{ outline: 'none' }}>Components</Tab>
+            <Tab _focus={{ outline: 'none' }}>Vulnerabilities</Tab>
             <Tab _focus={{ outline: 'none' }}>Health checks</Tab>
             <Tab _focus={{ outline: 'none' }}>Change log</Tab>
           </TabList>
@@ -237,7 +241,7 @@ const SBOMTable = ({
                   </Flex>
                 </CardHeader>
               )}
-              <CardBody overflowX={'scroll'}>
+              <CardBody>
                 <ComponentTable
                   data={data.components.nodes}
                   refetch={refetch}
@@ -270,6 +274,12 @@ const SBOMTable = ({
                   </Button>
                 </Flex>
               )}
+            </TabPanel>
+            {/* VUNERABILITIES TABLE */}
+            <TabPanel>
+              <CardBody>
+                <VulnTable data={Vulnerabilities} />
+              </CardBody>
             </TabPanel>
             {/* HEALTH CHECK TABLE */}
             <TabPanel>
@@ -486,7 +496,7 @@ const SBOMTable = ({
       </Card>
 
       {/* SBOM DRAWER */}
-      {isSBMOpen && data && (
+      {isSBMOpen && data && !customerView && (
         <ProductSbomDrawer
           isOpen={isSBMOpen}
           onClose={setSBMClose}
@@ -522,7 +532,7 @@ const SBOMTable = ({
       )}
 
       {/* COMPONENT DRAWER */}
-      {isCompOpen && data && (
+      {isCompOpen && data && !customerView && (
         <ComponentDrawer
           isOpen={isCompOpen}
           onClose={onCompClose}

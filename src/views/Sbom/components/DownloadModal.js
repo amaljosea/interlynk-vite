@@ -37,8 +37,8 @@ const DownloadModal = ({
 
   const [spec, setSpec] = useState('cyclonedx')
   const [format, setFormat] = useState('json')
-  const [includeVulns, setIncludeVulns] = useState(true)
-  const [includeVex, setIncludeVex] = useState(true)
+  const [includeVulns, setIncludeVulns] = useState(false)
+  const [includeVex, setIncludeVex] = useState(false)
 
   const type = spec === 'cyclonedx' ? 'cdx' : 'spdx'
 
@@ -149,7 +149,7 @@ const DownloadModal = ({
             <RadioGroup value={spec} onChange={(value) => setSpec(value)}>
               <Stack spacing={4} direction='row'>
                 <Radio value='cyclonedx'>CycloneDX</Radio>
-                <Radio value='spdx'>SPDX</Radio>
+                <Radio value='spdx' disabled>SPDX</Radio>
               </Stack>
             </RadioGroup>
           </Stack>
@@ -161,7 +161,7 @@ const DownloadModal = ({
             <RadioGroup value={format} onChange={(value) => setFormat(value)}>
               <Stack spacing={4} direction='row'>
                 <Radio value='json'>JSON</Radio>
-                <Radio value='xml'>XML</Radio>
+                <Radio value='xml' disabled>XML</Radio>
               </Stack>
             </RadioGroup>
 
@@ -169,12 +169,14 @@ const DownloadModal = ({
               <Checkbox
                 isChecked={includeVulns}
                 onChange={() => setIncludeVulns(!includeVulns)}
+                disabled
               >
                 Include Vulnerabilities
               </Checkbox>
               <Checkbox
                 isChecked={includeVex}
                 onChange={() => setIncludeVex(!includeVex)}
+                disabled
               >
                 Include Vulnerability Status (VEX)
               </Checkbox>

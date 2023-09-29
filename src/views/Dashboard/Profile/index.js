@@ -17,8 +17,12 @@ import ExploitFeeds from './components/ExploitFeeds'
 import { useQuery } from '@apollo/client'
 import { GetSettings } from 'graphQL/Queries'
 import { GetOrgInfo } from 'graphQL/Queries'
-import GeneralFeed from './components/GeneralFeed'
 import ApiFeed from './components/ApiFeed'
+import Card from 'components/Card/Card'
+import ComponentFeed from './components/ComponentFeed'
+import GeneralFeed from './components/GeneralFeed'
+import TeamsLog from './components/TeamsLog'
+import PersonalInfo from './components/PersonalInfo'
 
 function Profile() {
   const username = localStorage.getItem(`username`)
@@ -44,7 +48,7 @@ function Profile() {
     }
   ]
 
-  const [selectedTab, setSelectedTab] = useState(tabs[1].name)
+  const [selectedTab, setSelectedTab] = useState(tabs[0].name)
 
   const { data } = useQuery(GetSettings)
 
@@ -55,12 +59,6 @@ function Profile() {
   // }, [data])
 
   const { data: orgInfo } = useQuery(GetOrgInfo)
-
-  // useEffect(() => {
-  //   if (orgInfo) {
-  //     console.log(`orgInfo`, orgInfo)
-  //   }
-  // }, [orgInfo])
 
   return (
     <Flex direction='column'>
@@ -76,37 +74,68 @@ function Profile() {
       {data && (
         <>
           {selectedTab === 'ORGANIZATION' && orgInfo && (
-            <Tabs variant='enclosed' w={'100%'} bg={'white'}>
-              <TabList>
-                <Tab _focus={{ outline: 'none' }}>Feeds</Tab>
-                <Tab _focus={{ outline: 'none' }}>Rules</Tab>
-                <Tab _focus={{ outline: 'none' }}>Lists</Tab>
-              </TabList>
-              <TabPanels>
-                <TabPanel px={0}>
-                  <Grid
-                    width={'100%'}
-                    templateColumns={{ sm: '1fr', xl: 'repeat(3, 1fr)' }}
-                    gap='22px'
-                  >
-                    <AdvisoryFeeds data={data} orgInfo={orgInfo} />
-                    <ExploitFeeds data={data} orgInfo={orgInfo} />
-                  </Grid>
-                </TabPanel>
-                <TabPanel px={0}>
-                  <ApiFeed />
-                </TabPanel>
-                <TabPanel px={0}>
-                  <Grid
-                    width={'100%'}
-                    templateColumns={{ sm: '1fr', xl: 'repeat(3, 1fr)' }}
-                    gap='22px'
-                  >
-                    <GeneralFeed />
-                  </Grid>
-                </TabPanel>
-              </TabPanels>
-            </Tabs>
+            <Card>
+              <Tabs variant='enclosed' w={'100%'} bg={'white'}>
+                <TabList>
+                  <Tab _focus={{ outline: 'none' }}>General</Tab>
+                  <Tab _focus={{ outline: 'none' }}>Teams</Tab>
+                  <Tab _focus={{ outline: 'none' }}>Feeds</Tab>
+                  <Tab _focus={{ outline: 'none' }}>Rules</Tab>
+                  <Tab _focus={{ outline: 'none' }}>Lists</Tab>
+                </TabList>
+                <TabPanels>
+                  {/* GEENRAL */}
+                  <TabPanel px={0}>
+                    <Grid
+                      width={'100%'}
+                      templateColumns={{ sm: '1fr', xl: 'repeat(2, 1fr)' }}
+                      gap='22px'
+                    >
+                      <GeneralFeed orgInfo={orgInfo} />
+                    </Grid>
+                  </TabPanel>
+                  {/* TEAMS */}
+                  <TabPanel>
+                    <TeamsLog />
+                  </TabPanel>
+                  {/* FEEDS */}
+                  <TabPanel px={0}>
+                    <Grid
+                      width={'100%'}
+                      templateColumns={{ sm: '1fr', xl: 'repeat(3, 1fr)' }}
+                      gap='22px'
+                    >
+                      <AdvisoryFeeds data={data} orgInfo={orgInfo} />
+                      <ExploitFeeds data={data} orgInfo={orgInfo} />
+                    </Grid>
+                  </TabPanel>
+                  {/* RULES */}
+                  <TabPanel px={0}>
+                    <ApiFeed />
+                  </TabPanel>
+                  {/* LISTS */}
+                  <TabPanel px={0}>
+                    <Grid
+                      width={'100%'}
+                      templateColumns={{ sm: '1fr', xl: 'repeat(3, 1fr)' }}
+                      gap='22px'
+                    >
+                      <ComponentFeed />
+                    </Grid>
+                  </TabPanel>
+                </TabPanels>
+              </Tabs>
+            </Card>
+          )}
+
+          {selectedTab === 'PERSONAL' && orgInfo && (
+            <Grid
+              width={'100%'}
+              templateColumns={{ sm: '1fr', xl: 'repeat(2, 1fr)' }}
+              gap='22px'
+            >
+              <PersonalInfo userName={username} userEmail={email} />
+            </Grid>
           )}
         </>
       )}

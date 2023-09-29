@@ -52,8 +52,8 @@ const AdvisoryFeeds = ({ data, orgInfo }) => {
   }
 
   return (
-    <Card p='16px'>
-      <CardHeader p='12px 5px' mb='12px'>
+    <Card p={0}>
+      <CardHeader p='12px 0' mb='12px'>
         <Text fontSize='lg' color={textColor} fontWeight='bold'>
           Advisory Feeds
         </Text>
@@ -66,7 +66,7 @@ const AdvisoryFeeds = ({ data, orgInfo }) => {
                 (org) => org.setting.id === feed.id
               )
               return (
-                <Link href='https://nvd.nist.gov/' isexternal key={index}>
+                <Link href='https://nvd.nist.gov/' target='_blank' key={index}>
                   <Flex align='center' mb='20px'>
                     <Switch
                       size='md'

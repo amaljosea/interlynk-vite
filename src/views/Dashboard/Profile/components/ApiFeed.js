@@ -37,7 +37,7 @@ const ApiFeed = () => {
   }
 
   return (
-    <Card p='16px'>
+    <Card p={0}>
       <CardHeader p='12px 0' mb='8px'>
         <Text fontSize='lg' color={textColor} fontWeight='bold'>
           API Gateway (REST APIs)
@@ -53,7 +53,6 @@ const ApiFeed = () => {
                     color={'blue.500'}
                     _hover={{ textDecoration: 'underline' }}
                     href={api.link}
-                    isexternal
                     target='_blank'
                   >
                     {api.title}

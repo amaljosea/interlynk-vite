@@ -43,6 +43,11 @@ import RpmIcon from 'assets/svg/rpm.png'
 import SwidIcon from 'assets/svg/swid.png'
 import SwiftIcon from 'assets/svg/swift.png'
 
+// USER IMAGES
+import userOne from 'assets/img/abhi.png'
+import userTwo from 'assets/img/sp.png'
+import userThree from 'assets/img/rcn.jpg'
+
 export const getConImg = (name) => {
   switch (name) {
     case 'Docker Hub':
@@ -195,6 +200,19 @@ export const statusColor = (status) => {
     return 'gray'
   } else {
     return 'cyan'
+  }
+}
+
+export const dp = (email) => {
+  switch (email) {
+    case 'abhisek@interlynk.io':
+      return userOne
+    case 'sp@interlynk.io':
+      return userTwo
+    case 'rcn@interlynk.io':
+      return userThree
+    default:
+      return userTwo
   }
 }
 

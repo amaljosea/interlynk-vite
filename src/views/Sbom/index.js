@@ -159,15 +159,13 @@ function SBOM() {
 
   data &&
     data.project.sboms.map((project) => {
-      project.components.nodes.map((sbom) => {
-        if (sbom.primary === true) {
-          uniqVersions.push({
-            version: sbom.version,
-            id: project.id,
-            updatedAt: project.updatedAt
-          })
-        }
-      })
+      if (project.primaryComponent) {
+        uniqVersions.push({
+          version: project.primaryComponent.version,
+          id: project.id,
+          updatedAt: project.updatedAt
+        })
+      }
     })
 
   // remove duplicates
@@ -256,7 +254,7 @@ function SBOM() {
 
   // ADD KEYBOARD SHORTCUT FOR TOGGLE DOWNLOAD MODAL
   const handleKeyDownload = (event) => {
-    if (event.key === 'd' || event.key === 'D') {
+    if (event.altKey && event.key === '/') {
       onToggle()
     }
   }
@@ -268,7 +266,7 @@ function SBOM() {
     return () => {
       window.removeEventListener('keydown', handleKeyDownload)
     }
-  }, [isOpen])
+  }, [])
 
   if (!sbomId) {
     return (
@@ -536,7 +534,7 @@ function SBOM() {
           />
         )}
 
-        {isOpen && sbomData && (
+        {isOpen && sbomData && !customerView && (
           <DownloadModal
             initialRef={initialRef}
             finalRef={finalRef}

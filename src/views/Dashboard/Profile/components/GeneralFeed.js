@@ -6,87 +6,77 @@ import {
   FormControl,
   FormLabel,
   Input,
-  Stack,
   Button,
-  TagLabel,
-  TagCloseButton,
-  Code,
-  Tag
+  HStack,
+  useClipboard
 } from '@chakra-ui/react'
 // Custom components
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
-const GeneralFeed = () => {
+const GeneralFeed = ({ orgInfo }) => {
   const textColor = useColorModeValue('gray.700', 'white')
 
-  const [namespace, setNamespace] = useState('')
-  const [compName, setCompName] = useState('')
-  const [compNameList, setCompNameList] = useState([])
+  const [orgName, setOrgName] = useState('')
+  const [orgId, setOrgId] = useState('')
 
-  const handleKeyDown = (event) => {
-    if (event.key === 'Enter') {
-      setCompNameList([...compNameList, compName])
-      setCompName('')
+  useEffect(() => {
+    if (orgInfo) {
+      console.log(`orgInfo`, orgInfo)
+      setOrgName(orgInfo.organization.name)
+      setOrgId(orgInfo.organization.id)
     }
-  }
+  }, [orgInfo])
 
-  const deleteComp = (index) => {
-    const updatedItems = compNameList.filter((_, i) => i !== index)
-    setCompNameList(updatedItems)
-  }
+  const id = useClipboard(orgId)
 
   return (
-    <Card p='16px'>
-      <CardHeader p='12px 5px' mb='8px'>
+    <Card p={0}>
+      <CardHeader p='12px 0' mb='12px'>
         <Text fontSize='lg' color={textColor} fontWeight='bold'>
-          Component Identification
+          Organization
         </Text>
       </CardHeader>
       <CardBody px='5px'>
-        <Flex flexDirection={'column'} alignItems={'flex-start'} gap={6}>
+        <Flex
+          width={'100%'}
+          flexDirection={'column'}
+          alignItems={'flex-start'}
+          gap={6}
+        >
+          {/* NAME */}
           <FormControl>
-            <FormLabel color='#444'>
-              Regular Expressions identifying Internal Components
-            </FormLabel>
-            <Input
-              placeholder='*mystring*'
-              value={compName}
-              onChange={(e) => setCompName(e.target.value)}
-              onKeyDown={handleKeyDown}
-              bg={'white'}
-            />
-            <Text fontSize={'xs'} mt={2}>
-              Press <Code>enter</Code> to add name regex
-            </Text>
-            <Flex
-              flexDirection={'row'}
-              flexWrap={'wrap'}
-              spacing={2}
-              gap={2}
-              mt={2}
-            >
-              {compNameList.map((item, index) => (
-                <Tag
-                  size='sm'
-                  key={index}
-                  borderRadius='full'
-                  variant='solid'
-                  colorScheme={'blue'}
-                >
-                  <TagLabel>{item}</TagLabel>
-                  <TagCloseButton onClick={() => deleteComp(index)} />
-                </Tag>
-              ))}
-            </Flex>
+            <FormLabel>Organization Name</FormLabel>
+            <HStack spacing={2}>
+              <Input
+                value={orgName}
+                onChange={(e) => setOrgName(e.target.value)}
+              />
+              <Button variant='solid' colorScheme={'blue'}>
+                Update
+              </Button>
+            </HStack>
           </FormControl>
-          <Stack direction={'row'} spacing={4} alignItems={'center'}>
-            <Button fontWeight={'medium'} variant='solid' colorScheme='blue'>
-              Apply
-            </Button>
-          </Stack>
+          {/* ID */}
+          <FormControl>
+            <FormLabel>Organization ID</FormLabel>
+            <HStack spacing={2}>
+              <Input
+                value={orgId}
+                onChange={(e) => setOrgId(e.target.value)}
+                readOnly
+              />
+              <Button
+                variant='solid'
+                colorScheme={'blue'}
+                onClick={() => id.onCopy()}
+              >
+                {id.hasCopied ? 'Copied!' : 'Copy'}
+              </Button>
+            </HStack>
+          </FormControl>
         </Flex>
       </CardBody>
     </Card>
