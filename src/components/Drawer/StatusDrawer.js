@@ -20,7 +20,8 @@ import {
   Th,
   Thead,
   Tr,
-  Flex
+  Flex,
+  useToast
 } from '@chakra-ui/react'
 import VulLinkRow from 'components/Tables/VulLinkRow'
 import { VexVulnCreate } from 'graphQL/Mutation'
@@ -48,6 +49,8 @@ const StatusDrawer = ({
   vulnRefetch,
   setVulData
 }) => {
+  const toast = useToast()
+
   const [statusTitle, setStatusTitle] = useState('')
   const [statusName, setStatusName] = useState('')
   const [justification, setJustification] = useState('')
@@ -75,6 +78,16 @@ const StatusDrawer = ({
     const { value } = e.target
     setStatusTitle(value)
     setStatusName(e.target.options[e.target.selectedIndex].text)
+  }
+
+  const getFormattedDate = (year, month, day) => {
+    // Create a new Date object with the specified year, month, and day
+    const date = new Date(year, month - 1, day)
+
+    // Use the toDateString() method to get the formatted date string
+    const formattedDate = date.toDateString()
+
+    return formattedDate
   }
 
   const handleAdd = async () => {
@@ -108,13 +121,11 @@ const StatusDrawer = ({
       setJustification('')
       setNotes('')
     } catch (error) {
-      if (error.networkError && error.networkError.statusCode === 500) {
-        // Handle the specific error
-        alert('Invalid entry')
-      } else {
-        // Handle other errors
-        alert(error.message)
-      }
+      // if (error.networkError && error.networkError.statusCode === 500) {
+      //   alert('Invalid entry')
+      // } else {
+      //   alert(error.message)
+      // }
     }
   }
 
@@ -192,7 +203,9 @@ const StatusDrawer = ({
     >
       <DrawerOverlay />
       <DrawerContent>
-        <DrawerCloseButton onClick={() => vulnRefetch()} />
+        <DrawerCloseButton
+          onClick={() => vulnRefetch !== null && vulnRefetch()}
+        />
         <DrawerHeader borderBottomWidth='1px' color='gray.600'>
           {cve} Status
         </DrawerHeader>

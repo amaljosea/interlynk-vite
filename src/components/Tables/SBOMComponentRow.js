@@ -259,7 +259,7 @@ function SBOMComponentRow(props) {
             {filteredLicense.length > 0 &&
               filteredLicense.map((item, index) => (
                 <Tooltip key={index} label={item.name} placement={'top'}>
-                  <Link href={item.reference} target='_blank' isexternal>
+                  <Link href={item.reference} target='_blank'>
                     <Badge variant='subtle' colorScheme='green'>
                       {item.licenseId}
                     </Badge>

@@ -66,7 +66,7 @@ const AdvisoryFeeds = ({ data, orgInfo }) => {
                 (org) => org.setting.id === feed.id
               )
               return (
-                <Link href='https://nvd.nist.gov/' isexternal key={index}>
+                <Link href='https://nvd.nist.gov/' target='_blank' key={index}>
                   <Flex align='center' mb='20px'>
                     <Switch
                       colorScheme='blue'

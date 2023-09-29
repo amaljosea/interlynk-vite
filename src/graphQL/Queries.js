@@ -354,6 +354,11 @@ export const GetProjectData = gql`
           id
           format
           updatedAt
+          primaryComponent {
+            id
+            name
+            version
+          }
           components(
             after: $after
             before: $before
@@ -476,6 +481,11 @@ export const GetProject = gql`
         spec
         specVersion
         updatedAt
+        primaryComponent {
+          id
+          name
+          version
+        }
         components(after: $after, before: $before, first: $first, last: $last) {
           nodes {
             primary
@@ -555,6 +565,11 @@ export const GetSignedProjects = gql`
         id
         format
         updatedAt
+        primaryComponent {
+          id
+          name
+          version
+        }
         components(after: $after, before: $before, first: $first, last: $last) {
           nodes {
             primary
@@ -724,6 +739,11 @@ export const GetProjectInfo = gql`
         id
         spec
         specVersion
+        primaryComponent {
+          id
+          name
+          version
+        }
         components(after: $after, before: $before, first: $first, last: $last) {
           nodes {
             primary

@@ -45,6 +45,7 @@ export default function HeaderLinks(props) {
 
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('p')
+  const customerView = location.pathname.startsWith('/customer')
 
   const { variant, children, fixed, secondary, onOpen, ...rest } = props
 
@@ -96,7 +97,7 @@ export default function HeaderLinks(props) {
       alignItems='center'
       flexDirection='row'
     >
-      {productId && (
+      {productId && !customerView && (
         <Popover isLazy>
           <PopoverTrigger>
             <IconButton
@@ -113,20 +114,20 @@ export default function HeaderLinks(props) {
             <PopoverBody>
               <Flex gap={2} direction={'column'}>
                 <Stack direction={'row'} alignItems={'center'}>
-                  <Code bg={'#444'} color='white' px={2}>
-                    c
+                  <Code bg={'#444'} color='white' px={1.5}>
+                    Alt + c
                   </Code>
                   <Text fontSize={'sm'}> - Create Component</Text>
                 </Stack>
                 <Stack direction={'row'} alignItems={'center'}>
-                  <Code bg={'#444'} color='white' px={2}>
-                    s
+                  <Code bg={'#444'} color='white' px={1.5}>
+                    Alt + s
                   </Code>
                   <Text fontSize={'sm'}> - Update SBOM</Text>
                 </Stack>
                 <Stack direction={'row'} alignItems={'center'}>
-                  <Code bg={'#444'} color='white' px={2}>
-                    d
+                  <Code bg={'#444'} color='white' px={1.5}>
+                    Alt + /
                   </Code>
                   <Text fontSize={'sm'}> - Download SBOM</Text>
                 </Stack>

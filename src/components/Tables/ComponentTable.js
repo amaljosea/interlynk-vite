@@ -18,7 +18,8 @@ import {
   Grid,
   GridItem,
   HStack,
-  TagCloseButton
+  TagCloseButton,
+  Link
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
@@ -32,7 +33,7 @@ import {
 import { licenseOptions } from 'variables/licenses'
 import { timeSince, GetIcon } from 'utils'
 import { useState, useEffect, useRef } from 'react'
-import { useLocation, Link } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import ComponentModal from 'views/Sbom/components/ComponentModal'
 import SupplierModal from 'views/Sbom/components/SupplierModal'
@@ -205,7 +206,8 @@ const ComponentTable = ({ data, refetch, type }) => {
       id: 'version',
       name: 'VERSION',
       selector: (row) => row.version,
-      width: '200px'
+      width: '200px',
+      sortable: true
     },
     // PURL
     {
@@ -251,7 +253,7 @@ const ComponentTable = ({ data, refetch, type }) => {
             {filteredLicense.length > 0 &&
               filteredLicense.map((item, index) => (
                 <Tooltip key={index} label={item.name} placement={'top'}>
-                  <Link href={item.reference} target='_blank' isexternal>
+                  <Link href={item.reference} target='_blank'>
                     <Tag
                       size={'sm'}
                       key={index}

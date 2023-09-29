@@ -11,7 +11,12 @@ import {
   IconButton
 } from '@chakra-ui/react'
 import React, { useState, useEffect, useRef, useContext } from 'react'
-import { FaBalanceScale, FaCubes, FaFileDownload, FaLayerGroup } from 'react-icons/fa'
+import {
+  FaBalanceScale,
+  FaCubes,
+  FaFileDownload,
+  FaLayerGroup
+} from 'react-icons/fa'
 import { useLocation, useHistory } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
 import { useQuery } from '@apollo/client'
@@ -103,15 +108,13 @@ function ProductInfo() {
 
   data &&
     data.project.sboms.map((project) => {
-      project.components.nodes.map((sbom) => {
-        if (sbom.primary === true) {
-          uniqVersions.push({
-            version: sbom.version,
-            id: project.id,
-            updatedAt: project.updatedAt
-          })
-        }
-      })
+      if (project.primaryComponent) {
+        uniqVersions.push({
+          version: project.primaryComponent.version,
+          id: project.id,
+          updatedAt: project.updatedAt
+        })
+      }
     })
 
   // remove duplicates

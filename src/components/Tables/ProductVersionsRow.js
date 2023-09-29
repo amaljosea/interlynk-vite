@@ -84,15 +84,13 @@ function ProductVersionsRow(props) {
 
   sbomId &&
     sbomId.map((project) => {
-      project.components.nodes.map((sbom) => {
-        if (sbom.primary === true) {
-          uniqVersions.push({
-            version: sbom.version,
-            id: project.id,
-            updatedAt: project.updatedAt
-          })
-        }
-      })
+      if (project.primaryComponent) {
+        uniqVersions.push({
+          version: project.primaryComponent.version,
+          id: project.id,
+          updatedAt: project.updatedAt
+        })
+      }
     })
 
   const removeDuplicatesAndLatest = (arr) => {
