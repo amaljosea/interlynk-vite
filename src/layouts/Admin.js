@@ -1,5 +1,5 @@
 // Chakra imports
-import { ChakraProvider, Portal, useDisclosure } from '@chakra-ui/react'
+import { Box, ChakraProvider, Portal, useDisclosure } from '@chakra-ui/react'
 import Footer from 'components/Footer/Footer.js'
 // Layout components
 import AdminNavbar from 'components/Navbars/AdminNavbar.js'
@@ -27,6 +27,7 @@ import { setContext } from '@apollo/client/link/context'
 import Cookies from 'js-cookie'
 import { createUploadLink } from 'apollo-upload-client'
 import { getActiveNavbar, getActiveRoute } from '../utils'
+import Automation from 'views/Dashboard/Automation'
 
 export default function Dashboard(props) {
   const { minimize } = useContext(GlobalContext)
@@ -67,7 +68,7 @@ export default function Dashboard(props) {
 
     return route
   }
-  
+
   const { isOpen, onOpen, onClose } = useDisclosure()
   document.documentElement.dir = 'ltr'
   // Chakra Color Mode
@@ -110,9 +111,10 @@ export default function Dashboard(props) {
           {...rest}
         />
         <MainPanel
+          bg='transparent'
+          minH='100vh'
           w={{
-            base: '100%',
-            xl: minimize ? 'calc(100% - 105px)' : 'calc(100% - 220px)'
+            xl: minimize ? 'calc(100% - 70px)' : 'calc(100% - 220px)'
           }}
         >
           <Portal>
@@ -125,21 +127,26 @@ export default function Dashboard(props) {
               {...rest}
             />
           </Portal>
-          {getRoute() && (
-            <PanelContent>
-              <PanelContainer>
-                <Switch>
-                  {userName && getRoutes(dashRoutes)}
-                  {userName ? (
-                    <Redirect from='/vendor' to='/vendor/dashboard' />
-                  ) : (
-                    <Redirect from='/vendor' to='/auth' />
-                  )}
-                </Switch>
-              </PanelContainer>
-            </PanelContent>
-          )}
-          <Footer />
+          <Box bg='rgba(0,0,0,0.04)' minH={'100vh'}>
+            {getRoute() && (
+              <PanelContent>
+                <PanelContainer>
+                  <Switch>
+                    {userName && getRoutes(dashRoutes)}
+                    {userName && (
+                      <Route path={`/vendor/autofix`} component={Automation} />
+                    )}
+                    {userName ? (
+                      <Redirect from='/vendor' to='/vendor/dashboard' />
+                    ) : (
+                      <Redirect from='/vendor' to='/auth' />
+                    )}
+                  </Switch>
+                </PanelContainer>
+              </PanelContent>
+            )}
+            <Footer />
+          </Box>
         </MainPanel>
       </ChakraProvider>
     </ApolloProvider>

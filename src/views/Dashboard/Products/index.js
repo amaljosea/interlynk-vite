@@ -115,38 +115,37 @@ function Index() {
   if (product === null) {
     return (
       <>
-        <Flex direction='column' pt={{ base: '120px', md: '0px' }}>
-          <Flex direction='row' pt={{ base: '200px', md: '75px' }}>
-            <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
-              <CardHeader>
-                <Flex
-                  width={'100%'}
-                  direction={'row'}
-                  gap={2}
-                  alignItems={'center'}
-                  justifyContent={'flex-end'}
-                >
-                  {/* refresh */}
-                  <Tooltip label='Refresh'>
-                    <IconButton
-                      colorScheme='blue'
-                      icon={<RepeatIcon />}
-                      onClick={handleRefresh}
-                    ></IconButton>
-                  </Tooltip>
-                  {/* add product */}
-                  <Button
-                    ref={btnRefProduct}
-                    onClick={onOpenProduct}
-                    leftIcon={<AddIcon />}
+        <Flex flexDirection='column' pt={{ base: '120px', md: '74px' }} px={2}>
+          <Card overflowX={{ sm: 'scroll', xl: 'hidden' }}>
+            <CardHeader>
+              <Flex
+                width={'100%'}
+                direction={'row'}
+                gap={2}
+                alignItems={'center'}
+                justifyContent={'flex-end'}
+              >
+                {/* refresh */}
+                <Tooltip label='Refresh'>
+                  <IconButton
                     colorScheme='blue'
-                    variant='solid'
-                  >
-                    Product
-                  </Button>
-                </Flex>
-              </CardHeader>
-              {/* <Menu>
+                    icon={<RepeatIcon />}
+                    onClick={handleRefresh}
+                  ></IconButton>
+                </Tooltip>
+                {/* add product */}
+                <Button
+                  ref={btnRefProduct}
+                  onClick={onOpenProduct}
+                  leftIcon={<AddIcon />}
+                  colorScheme='blue'
+                  variant='solid'
+                >
+                  Product
+                </Button>
+              </Flex>
+            </CardHeader>
+            {/* <Menu>
               <MenuButton
                 as={Button}
                 rightIcon={<ChevronDownIcon />}
@@ -223,65 +222,64 @@ function Index() {
             </Menu>
             <Input placeholder='Search' maxW='300px' /> */}
 
-              {error && (
-                <Flex my={10} alignItems={'center'} justifyContent={'center'}>
-                  <Text textAlign={'center'} fontSize={14}>
-                    Internal error occured. Please retry in few minutes.
-                  </Text>
-                </Flex>
-              )}
+            {error && (
+              <Flex my={10} alignItems={'center'} justifyContent={'center'}>
+                <Text textAlign={'center'} fontSize={14}>
+                  Internal error occured. Please retry in few minutes.
+                </Text>
+              </Flex>
+            )}
 
-              {loading && (
-                <Table mt={4}>
-                  <Thead>
-                    <Tr my='.8rem'>
-                      {captions.map((caption, idx) => {
-                        return (
-                          <Th color='gray.800' key={idx} pl={0}>
-                            <Box>{caption}</Box>
-                          </Th>
-                        )
-                      })}
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    <Tr>
-                      <Td pl={0}>
-                        <Skeleton height='20px' />
-                      </Td>
-                      <Td pl={0}>
-                        <Skeleton height='20px' />
-                      </Td>
-                      <Td pl={0}>
-                        <Skeleton height='20px' />
-                      </Td>
-                      <Td pl={0}>
-                        <Skeleton height='20px' />
-                      </Td>
-                      <Td pl={0}>
-                        <Skeleton height='20px' />
-                      </Td>
-                      <Td pl={0}>
-                        <Skeleton height='20px' />
-                      </Td>
-                    </Tr>
-                  </Tbody>
-                </Table>
-              )}
+            {loading && (
+              <Table mt={4}>
+                <Thead>
+                  <Tr my='.8rem'>
+                    {captions.map((caption, idx) => {
+                      return (
+                        <Th color='gray.800' key={idx} pl={0}>
+                          <Box>{caption}</Box>
+                        </Th>
+                      )
+                    })}
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  <Tr>
+                    <Td pl={0}>
+                      <Skeleton height='20px' />
+                    </Td>
+                    <Td pl={0}>
+                      <Skeleton height='20px' />
+                    </Td>
+                    <Td pl={0}>
+                      <Skeleton height='20px' />
+                    </Td>
+                    <Td pl={0}>
+                      <Skeleton height='20px' />
+                    </Td>
+                    <Td pl={0}>
+                      <Skeleton height='20px' />
+                    </Td>
+                    <Td pl={0}>
+                      <Skeleton height='20px' />
+                    </Td>
+                  </Tr>
+                </Tbody>
+              </Table>
+            )}
 
-              {data && (
-                <ProductVersions
-                  title={'Products'}
-                  captions={captions}
-                  allProjects={data}
-                  handlePreviousPage={handlePreviousPage}
-                  handleNextPage={handleNextPage}
-                  isLoading={isLoading}
-                  refetch={refetch}
-                />
-              )}
-            </Card>
-          </Flex>
+            {data && (
+              <ProductVersions
+                title={'Products'}
+                captions={captions}
+                allProjects={data}
+                handlePreviousPage={handlePreviousPage}
+                handleNextPage={handleNextPage}
+                isLoading={isLoading}
+                refetch={refetch}
+              />
+            )}
+          </Card>
         </Flex>
 
         {isOpenProduct && (

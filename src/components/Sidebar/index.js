@@ -40,20 +40,23 @@ function Sidebar(props) {
   // SIDEBAR
   return (
     <Box ref={mainPanel}>
-      <Box display={{ sm: 'none', xl: 'block' }} position='fixed'>
+      <Box
+        display={{ sm: 'none', xl: 'block' }}
+        position='fixed'
+      >
         <Box
           bg={'white'}
+          w={minimize === true ? '75px' : '210px'}
           transition={variantChange}
-          w={minimize ? '90px' : '210px'}
-          borderRight={'1px solid lightgray'}
-          maxW={minimize ? '100px' : '210px'}
-          ms={{
-            sm: '16px'
-          }}
-          my={{
-            sm: '16px'
-          }}
-          h='calc(100vh - 32px)'
+          // w={minimize === true ? '90px' : '210px'}
+          // borderRight={'1px solid lightgray'}
+          // ms={{
+          //   sm: '16px'
+          // }}
+          // my={{
+          //   sm: '16px'
+          // }}
+          h='100vh'
           // ps='20px'
           // pe='20px'
           m={sidebarMargins}

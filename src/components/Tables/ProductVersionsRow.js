@@ -179,6 +179,9 @@ function ProductVersionsRow(props) {
                     Upload SBOM
                   </MenuItem>
                   <MenuItem onClick={onDeleteOpen}>Archive Product</MenuItem>
+                  <Link to='/vendor/autofix'>
+                    <MenuItem>Settings</MenuItem>
+                  </Link>
                 </MenuList>
               </Portal>
             </Menu>

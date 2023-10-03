@@ -8,7 +8,7 @@ const LynkTable = ({ captions, data, refetch }) => {
         <Tr my='.8rem' pl='0px'>
           {captions.map((caption, idx) => {
             return (
-              <Th key={idx} ps={idx === 0 ? '0px' : null} pb={4}>
+              <Th key={idx} pb={4}>
                 <Box>{caption}</Box>
               </Th>
             )

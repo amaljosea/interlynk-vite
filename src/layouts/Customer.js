@@ -1,5 +1,5 @@
 // Chakra imports
-import { ChakraProvider, Portal, useDisclosure } from '@chakra-ui/react'
+import { Box, ChakraProvider, Portal, useDisclosure } from '@chakra-ui/react'
 import Footer from 'components/Footer/Footer.js'
 // Layout components
 import AdminNavbar from 'components/Navbars/AdminNavbar.js'
@@ -62,6 +62,7 @@ export default function Customer(props) {
       }
     })
   }
+
   const { isOpen, onOpen, onClose } = useDisclosure()
   document.documentElement.dir = 'ltr'
   // Chakra Color Mode
@@ -102,9 +103,11 @@ export default function Customer(props) {
           {...rest}
         />
         <MainPanel
+          bg='transparent'
+          minH='100vh'
           w={{
             base: '100%',
-            xl: minimize ? 'calc(100% - 110px)' : 'calc(100% - 220px)'
+            xl: minimize ? 'calc(100% - 70px)' : 'calc(100% - 220px)'
           }}
         >
           <Portal>
@@ -117,14 +120,16 @@ export default function Customer(props) {
               {...rest}
             />
           </Portal>
-          {getRoute() ? (
-            <PanelContent>
-              <PanelContainer>
-                <Switch>{getRoutes(customerRoutes)}</Switch>
-              </PanelContainer>
-            </PanelContent>
-          ) : null}
-          <Footer />
+          <Box bg='rgba(0,0,0,0.04)' minH={'100vh'}>
+            {getRoute() ? (
+              <PanelContent>
+                <PanelContainer>
+                  <Switch>{getRoutes(customerRoutes)}</Switch>
+                </PanelContainer>
+              </PanelContent>
+            ) : null}
+            <Footer />
+          </Box>
         </MainPanel>
       </ChakraProvider>
     </ApolloProvider>

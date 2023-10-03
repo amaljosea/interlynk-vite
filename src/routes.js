@@ -20,6 +20,8 @@ import {
 } from 'react-icons/fa'
 import { HomeIcon } from 'components/Icons/Icons'
 import { BsFillFolderSymlinkFill } from 'react-icons/bs'
+import Automation from 'views/Dashboard/Automation'
+import { TbSettingsAutomation } from 'react-icons/tb'
 
 export const dashRoutes = [
   {
@@ -69,6 +71,13 @@ export const dashRoutes = [
     name: 'Settings',
     icon: <FaRegSun color='inherit' />,
     component: Profile,
+    layout: '/vendor'
+  },
+  {
+    path: '/autofix',
+    name: 'Auto Fix',
+    icon: <TbSettingsAutomation color='inherit' />,
+    component: Automation,
     layout: '/vendor'
   }
 ]

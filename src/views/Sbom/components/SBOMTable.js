@@ -55,7 +55,8 @@ const SBOMTable = ({
   handleNextPage,
   status,
   productId,
-  type
+  type,
+  pageIndex
 }) => {
   const { healthCheckData, changelogData } = useContext(GlobalContext)
 
@@ -272,6 +273,10 @@ const SBOMTable = ({
                   >
                     Next
                   </Button>
+                  <Box>
+                    Page {pageIndex} of{' '}
+                    {Math.ceil(data.components.totalCount / 10)}
+                  </Box>
                 </Flex>
               )}
             </TabPanel>

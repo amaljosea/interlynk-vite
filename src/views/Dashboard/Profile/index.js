@@ -61,7 +61,7 @@ function Profile() {
   const { data: orgInfo } = useQuery(GetOrgInfo)
 
   return (
-    <Flex direction='column'>
+    <Flex direction='column' px={4}>
       <Header
         // backgroundHeader={ProfileBgImage}
         backgroundProfile={bgProfile}

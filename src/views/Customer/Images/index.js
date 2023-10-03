@@ -36,9 +36,7 @@ const Images = () => {
   ]
 
   if (imageId === null) {
-    const [getImages, { data, refetch }] = useLazyQuery(
-      GetSignedImages
-    )
+    const [getImages, { data, refetch }] = useLazyQuery(GetSignedImages)
 
     useEffect(() => {
       if (!imageId && data === undefined) {
@@ -51,45 +49,37 @@ const Images = () => {
     }, [])
 
     return (
-      <>
-        <Flex
-          width={'100%'}
-          direction='column'
-          mt={{ base: '120px', md: '0px' }}
-        >
-          <Flex
-            flexDirection='column'
-            width={'100%'}
-            alignItems={'center'}
-            px={2}
-            justifyContent={'space-between'}
-            mt={{ base: '200px', md: '75px' }}
-          >
-            <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
-              <CardBody mt={8}>
-                <Table variant='simple' size='sm'>
-                  <Thead>
-                    <Tr>
-                      {img_captions.map((item, index) => (
-                        <Th pl={1} pb={3} key={index}>
-                          <Box>{item}</Box>
-                        </Th>
-                      ))}
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {data &&
-                      data.images.length > 0 &&
-                      data.images.map((item, index) => (
-                        <ImageRow key={index} item={item} refetch={refetch} />
-                      ))}
-                  </Tbody>
-                </Table>
-              </CardBody>
-            </Card>
-          </Flex>
-        </Flex>
-      </>
+      <Flex
+        flexDirection='column'
+        width={'100%'}
+        alignItems={'center'}
+        justifyContent={'space-between'}
+        pt={{ base: '120px', md: '60px' }}
+        px={3}
+      >
+        <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
+          <CardBody mt={8}>
+            <Table variant='simple' size='sm'>
+              <Thead>
+                <Tr>
+                  {img_captions.map((item, index) => (
+                    <Th pl={1} pb={3} key={index}>
+                      <Box>{item}</Box>
+                    </Th>
+                  ))}
+                </Tr>
+              </Thead>
+              <Tbody>
+                {data &&
+                  data.images.length > 0 &&
+                  data.images.map((item, index) => (
+                    <ImageRow key={index} item={item} refetch={refetch} />
+                  ))}
+              </Tbody>
+            </Table>
+          </CardBody>
+        </Card>
+      </Flex>
     )
   } else {
     return <ImageInfo />

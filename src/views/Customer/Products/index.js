@@ -52,55 +52,47 @@ const Products = () => {
     }, [data])
 
     return (
-      <>
-        <Flex
-          width={'100%'}
-          direction='column'
-          mt={{ base: '120px', md: '0px' }}
-        >
-          <Flex
-            flexDirection='column'
-            width={'100%'}
-            alignItems={'center'}
-            px={2}
-            justifyContent={'space-between'}
-            mt={{ base: '200px', md: '75px' }}
-          >
-            <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
-              <CardBody mt={8}>
-                <Table variant='simple' size='sm'>
-                  <Thead>
-                    <Tr>
-                      {captions.map((item, index) => (
-                        <Th pl={1} pb={3} key={index}>
-                          <Box>{item}</Box>
-                        </Th>
-                      ))}
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {data &&
-                      data.projects.length > 0 &&
-                      data.projects.map((pv, index) => (
-                        <ProductRow
-                          key={index}
-                          id={pv.id}
-                          sbomId={pv.sboms}
-                          name={pv.name}
-                          description={pv.description}
-                          updatedAt={pv.updatedAt}
-                          allProjects={null}
-                          fetchProjects={null}
-                          isLoading={loading}
-                        />
-                      ))}
-                  </Tbody>
-                </Table>
-              </CardBody>
-            </Card>
-          </Flex>
-        </Flex>
-      </>
+      <Flex
+        flexDirection='column'
+        width={'100%'}
+        alignItems={'center'}
+        justifyContent={'space-between'}
+        pt={{ base: '120px', md: '60px' }}
+        px={3}
+      >
+        <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
+          <CardBody mt={8}>
+            <Table variant='simple' size='sm'>
+              <Thead>
+                <Tr>
+                  {captions.map((item, index) => (
+                    <Th pl={1} pb={3} key={index}>
+                      <Box>{item}</Box>
+                    </Th>
+                  ))}
+                </Tr>
+              </Thead>
+              <Tbody>
+                {data &&
+                  data.projects.length > 0 &&
+                  data.projects.map((pv, index) => (
+                    <ProductRow
+                      key={index}
+                      id={pv.id}
+                      sbomId={pv.sboms}
+                      name={pv.name}
+                      description={pv.description}
+                      updatedAt={pv.updatedAt}
+                      allProjects={null}
+                      fetchProjects={null}
+                      isLoading={loading}
+                    />
+                  ))}
+              </Tbody>
+            </Table>
+          </CardBody>
+        </Card>
+      </Flex>
     )
   } else {
     return <ProductInfo />

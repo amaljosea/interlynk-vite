@@ -596,7 +596,7 @@ export const licenseOptions = [
     detailsUrl: 'https://spdx.org/licenses/blessing.json',
     referenceNumber: 503,
     name: 'SQLite Blessing',
-    licenseId: 'blessing',
+    licenseId: 'Blessing',
     seeAlso: [
       'https://www.sqlite.org/src/artifact/e33a4df7e32d742a?ln\u003d4-9',
       'https://sqlite.org/src/artifact/df5091916dbb40e6'

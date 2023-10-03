@@ -55,6 +55,11 @@ const customStyles = {
 
 const ComponentTable = ({ data, refetch, type }) => {
   const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+
+  const productId = queryParams.get('p')
+  const sbomId = queryParams.get('sbom')
+
   const customerView = location.pathname.startsWith('/customer')
 
   const [activeRow, setActiveRow] = useState(null)
@@ -84,8 +89,8 @@ const ComponentTable = ({ data, refetch, type }) => {
   const columns = [
     // COMPONENT
     {
-      id: 'component',
-      name: 'COMPONENT',
+      id: 'name',
+      name: 'NAME',
       selector: (row) => {
         const { purl, name, primary, internal } = row
         return (
@@ -199,7 +204,8 @@ const ComponentTable = ({ data, refetch, type }) => {
           </Stack>
         )
       },
-      width: '400px'
+      width: '400px',
+      sortable: true
     },
     // VERSION
     {
@@ -235,40 +241,47 @@ const ComponentTable = ({ data, refetch, type }) => {
       name: 'LICENSES',
       selector: (row) => {
         const { licenses } = row
-        const [filteredLicense, setFilteredLicense] = useState([])
+        // const [filteredLicense, setFilteredLicense] = useState([])
 
-        useEffect(() => {
-          if (licenses !== null && licenses.length > 0) {
-            // console.log(`license item`, licenses)
-            const filtered = licenseOptions.filter((item) =>
-              licenses.includes(item.licenseId)
-            )
-            // console.log(`filtered item`, filtered)
-            setFilteredLicense(filtered)
-          }
-        }, [licenses])
+        // useEffect(() => {
+        //   if (licenses !== null && licenses.length > 0) {
+        //     // console.log(`license item`, licenses)
+        //     const filtered = licenseOptions.filter((item) =>
+        //       licenses.includes(item.licenseId)
+        //     )
+        //     // console.log(`filtered item`, filtered)
+        //     setFilteredLicense(filtered)
+        //   }
+        // }, [licenses])
 
         return (
           <Flex alignItems={'center'} gap={2} flexWrap={'wrap'}>
-            {filteredLicense.length > 0 &&
-              filteredLicense.map((item, index) => (
-                <Tooltip key={index} label={item.name} placement={'top'}>
-                  <Link href={item.reference} target='_blank'>
+            {licenses.length > 0 &&
+              licenses.map((item, index) => (
+                <Tooltip
+                  key={index}
+                  label={item}
+                  placement={'top'}
+                  textTransform={'capitalize'}
+                >
+                  <Link href={'#'} target='_blank'>
                     <Tag
                       size={'sm'}
                       key={index}
                       variant='subtle'
                       colorScheme='green'
                       width={'fit-content'}
+                      textTransform={'capitalize'}
                     >
-                      <TagLabel>{item.licenseId}</TagLabel>
+                      <TagLabel>{item}</TagLabel>
                     </Tag>
                   </Link>
                 </Tooltip>
               ))}
           </Flex>
         )
-      }
+      },
+      sortable: true
     },
     // UPDATED AT
     {
@@ -457,6 +470,17 @@ const ComponentTable = ({ data, refetch, type }) => {
     )
   }
 
+  const handleSort = (column, sortDirection) => {
+    console.log(`column`, column)
+    console.log(`sortDirection`, sortDirection)
+    refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      field: column.name,
+      direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+    })
+  }
+
   return (
     <>
       {data.length > 0 ? (
@@ -464,7 +488,10 @@ const ComponentTable = ({ data, refetch, type }) => {
           <DataTable
             columns={columns}
             data={data}
+            onSort={handleSort}
             customStyles={customStyles}
+            defaultSortAsc
+            defaultSortFieldId={'name'}
             progressPending={data.length === 0}
             expandableRows
             expandableRowsComponent={ExpandedComponent}

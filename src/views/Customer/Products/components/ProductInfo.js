@@ -44,17 +44,21 @@ function ProductInfo() {
   const signedParams = Cookies.get(`signedParamId`)
 
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const [pageIndex, setPageIndex] = useState(1)
 
   const { data: sbomData, refetch } = useQuery(GetSignedSBOM, {
     variables: {
       projectId: productId,
       sbomId: sbomId,
       signedParams: signedParams,
-      first: 10
+      first: 10,
+      field: 'NAME',
+      direction: 'ASC'
     }
   })
 
   const handlePreviousPage = () => {
+    setPageIndex((prev) => prev !== 0 && prev - 1)
     refetch({
       projectId: productId,
       sbomId: sbomId,
@@ -67,6 +71,10 @@ function ProductInfo() {
   }
 
   const handleNextPage = () => {
+    setPageIndex(
+      (prev) =>
+        prev < Math.ceil(sbomData?.sbom.components.totalCount) && prev + 1
+    )
     refetch({
       projectId: productId,
       sbomId: sbomId,
@@ -91,18 +99,6 @@ function ProductInfo() {
       window.localStorage.setItem('product', sbomData.sbom.project.name)
     }
   }, [sbomData])
-
-  const [primaryData, setPrimaryData] = useState(null)
-
-  useEffect(() => {
-    if (data && data.project.sboms.length > 0) {
-      const sbomV = data.project.sboms.find((sbom) => sbom.id === sbomId)
-      const validData = sbomV.components.nodes.find(
-        (item) => item.primary === true
-      )
-      setPrimaryData(validData)
-    }
-  }, [data])
 
   const uniqVersions = []
 
@@ -165,23 +161,9 @@ function ProductInfo() {
 
   const captions = ['Product', 'versions', 'Description', 'Updated At']
 
-  const sbomVersions = []
-
-  data &&
-    data.project.sboms.map((project) => {
-      project.components.nodes.map((sbom) => {
-        if (sbom.primary === true) {
-          sbomVersions.push({
-            version: sbom.version,
-            id: project.id
-          })
-        }
-      })
-    })
-
   return (
     <>
-      <Flex direction='column' pt={{ base: '120px', md: '75px' }}>
+      <Flex direction='column' pt={{ base: '120px', md: '70px' }} px={3}>
         <Card mb='6'>
           <CardBody>
             <Grid
@@ -205,7 +187,8 @@ function ProductInfo() {
                           flexDirection={'row'}
                           gap={3}
                         >
-                          {sbomData.sbom.project.name} : {primaryData?.version}
+                          {sbomData.sbom.project.name} :{' '}
+                          {sbomData.sbom.primaryComponent.version}
                         </Flex>
                       </Text>
                       <Text fontSize='xs' cursor={'pointer'}>
@@ -265,9 +248,7 @@ function ProductInfo() {
             icon={<Icon h={'24px'} w={'24px'} color='white' as={FaCubes} />}
             title={'Components'}
             description={'Components included in SBOM'}
-            amount={
-              sbomData ? sbomData.sbom.components.nodes.length : 'Loading...'
-            }
+            amount={sbomData ? sbomData.sbom.stats.compCount : 'Loading...'}
           />
           <Spacer />
           <SBOMStatistics
@@ -276,7 +257,9 @@ function ProductInfo() {
             }
             title={'Licenses'}
             description={'Unique licenses included in SBOM'}
-            amount={totalLicenses ? totalLicenses.length : 'Loading...'}
+            amount={
+              sbomData ? sbomData.sbom.stats.compLicenseCount : 'Loading...'
+            }
           />
         </Flex>
         {sbomData && (
@@ -292,7 +275,8 @@ function ProductInfo() {
             ]}
             data={sbomData.sbom}
             refetch={refetch}
-            versionName={primaryData?.version}
+            pageIndex={pageIndex}
+            versionName={sbomData.sbom.primaryComponent.version}
             handlePreviousPage={handlePreviousPage}
             handleNextPage={handleNextPage}
           />
