@@ -5,7 +5,10 @@ import {
   Tbody,
   Td,
   Tr,
-  Button,
+  Th,
+  Thead,
+  Flex,
+  Switch,
   useColorModeValue,
   Select,
   Link
@@ -15,39 +18,60 @@ import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
 import { useState } from 'react'
-import { apiGetwayData } from 'variables/general'
+import { orgHealthChecks as orgHealthChecks } from 'variables/general'
 
 const ApiFeed = () => {
   const textColor = useColorModeValue('gray.700', 'white')
 
-  const [apiList, setApiList] = useState(apiGetwayData)
+  const [orgHealthCheck, setOrgHealthCheck] = useState(orgHealthChecks)
 
   const options = [
-    { value: 'high', label: 'High' },
-    { value: 'medium', label: 'Medium' },
-    { value: 'low', label: 'Low' },
-    { value: 'none', label: 'None' }
+    { value: 'Critical', label: 'Critical', bg:'red'},
+    { value: 'High', label: 'High', bg:'orange' },
+    { value: 'Medium', label: 'Medium', bg:'yellow' },
+    { value: 'Low', label: 'Low', bg:'green' },
+    { value: 'None', label: 'None', bg:'gray' }
   ]
 
+  // Define a mapping of status values to background colors
+  const statusColors = {
+    Critical: 'red.300',
+    High: 'orange.300',
+    Medium: 'blue.300',
+    Low: 'green.300',
+    None: 'gray.300'
+  };
+
   const handleStatusChange = (id, value) => {
-    const updatedData = apiList.map((item) =>
+    const updatedData = orgHealthCheck.map((item) =>
       item.id === id ? { ...item, status: value } : item
     )
-    setApiList(updatedData)
+    setOrgHealthCheck(updatedData)
   }
 
   return (
     <Card p={0}>
       <CardHeader p='12px 0' mb='8px'>
         <Text fontSize='lg' color={textColor} fontWeight='bold'>
-          API Gateway (REST APIs)
+          SBOM Health Checks
         </Text>
       </CardHeader>
       <CardBody>
         <Table variant='simple' size='sm'>
+        <Thead>
+                        <Tr my='.8rem'>
+                          <Th pl={0}>Active</Th>
+                          <Th pl={0}>Check ID</Th>
+                          <Th pl={0}>Description</Th>
+                          <Th pl={0}>Severity</Th>
+                        </Tr>
+                      </Thead>
           <Tbody>
-            {apiList.map((api, index) => (
+            {orgHealthCheck.map((api, index) => (
               <Tr key={index}>
+                <Td pl={0}>
+                  <Switch defaultChecked></Switch>
+                </Td>
                 <Td pl={0}>
                   <Link
                     color={'blue.500'}
@@ -58,12 +82,18 @@ const ApiFeed = () => {
                     {api.title}
                   </Link>
                 </Td>
-                <Td pl={0}>{api.description}</Td>
+                <Td pl={0}>
+                  <Flex direction='column' rowGap={1} maxWidth={800}>
+                    <Text fontSize={'sm'}>{api.description}</Text>
+                    <Text fontSize={'10px'}>{api.long_desc}</Text>
+                  </Flex>
+                </Td>
                 <Td pl={0}>
                   <Select
                     width={'130px'}
                     value={api.status}
                     onChange={(e) => handleStatusChange(api.id, e.target.value)}
+                    bg={statusColors[api.status] || 'gray.200'}
                   >
                     {options.map((item, index) => (
                       <option key={index} value={item.value}>
