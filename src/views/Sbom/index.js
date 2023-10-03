@@ -75,6 +75,7 @@ function SBOM() {
 
   const [status, setStatus] = useState('created')
   const [signedData, setSignedData] = useState(null)
+  const [pageIndex, setPageIndex] = useState(1)
 
   const { data: allProjects } = useQuery(GetProjectData, {
     variables: {
@@ -114,7 +115,9 @@ function SBOM() {
     variables: {
       projectId: productId,
       sbomId: sbomId,
-      first: 10
+      first: 10,
+      field: 'NAME',
+      direction: 'ASC'
     }
   })
 
@@ -125,6 +128,7 @@ function SBOM() {
   // }, [sbomData])
 
   const handlePreviousPage = () => {
+    setPageIndex((prev) => prev !== 0 && prev - 1)
     refetch({
       projectId: productId,
       sbomId: sbomId,
@@ -136,6 +140,10 @@ function SBOM() {
   }
 
   const handleNextPage = () => {
+    setPageIndex(
+      (prev) =>
+        prev < Math.ceil(sbomData?.sbom.components.totalCount) && prev + 1
+    )
     refetch({
       projectId: productId,
       sbomId: sbomId,
@@ -148,8 +156,7 @@ function SBOM() {
 
   const { data } = useQuery(GetProject, {
     variables: {
-      id: productId,
-      first: 10
+      id: productId
     }
   })
 
@@ -237,14 +244,12 @@ function SBOM() {
 
   data &&
     data.project.sboms.map((project) => {
-      project.components.nodes.map((sbom) => {
-        if (sbom.primary === true) {
-          sbomVersions.push({
-            version: sbom.version,
-            id: project.id
-          })
-        }
-      })
+      if (project.primaryComponent === true) {
+        sbomVersions.push({
+          version: project.primaryComponent.version,
+          id: project.primaryComponent.id
+        })
+      }
     })
 
   const handleOpen = () => {
@@ -270,7 +275,7 @@ function SBOM() {
 
   if (!sbomId) {
     return (
-      <Flex direction='column' pt={{ base: '120px', md: '75px' }}>
+      <Flex direction='column' pt={{ base: '120px', md: '74px' }} px={2}>
         <Card mb='6'>
           <CardBody width={'100%'}>
             {data ? (
@@ -321,7 +326,7 @@ function SBOM() {
   } else {
     return (
       <>
-        <Flex direction='column' pt={{ base: '120px', md: '75px' }}>
+        <Flex direction='column' pt={{ base: '120px', md: '74px' }} px={2}>
           {/* product info */}
           <Card mb='6'>
             <CardBody>
@@ -505,6 +510,7 @@ function SBOM() {
               ]}
               data={sbomData.sbom}
               refetch={refetch}
+              pageIndex={pageIndex}
               versionName={sbomData.sbom.primaryComponent.version}
               handlePreviousPage={handlePreviousPage}
               handleNextPage={handleNextPage}

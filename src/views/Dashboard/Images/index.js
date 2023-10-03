@@ -227,126 +227,142 @@ const Index = () => {
     return (
       <>
         <Flex
-          width={'100%'}
-          direction='column'
-          mt={{ base: '120px', md: '0px' }}
+          flexDirection='column'
+          pt={{ base: '120px', md: '74px' }}
+          justifyContent={'space-between'}
+          alignItems={'center'}
+          px={2}
         >
-          <Flex
-            flexDirection='column'
-            width={'100%'}
-            alignItems={'center'}
-            px={2}
-            justifyContent={'space-between'}
-            mt={{ base: '200px', md: '75px' }}
-          >
-            <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
-              <CardHeader>
+          <Card overflowX={{ sm: 'scroll', xl: 'hidden' }}>
+            <CardHeader>
+              <Flex
+                width={'100%'}
+                direction={'row'}
+                alignItems={'center'}
+                justifyContent={'flex-end'}
+              >
+                <Input
+                  placeholder='Search'
+                  maxW='300px'
+                  mb={4}
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  fontSize={'sm'}
+                  display={'none'}
+                />
+                <Tooltip label='Refresh'>
+                  <IconButton
+                    colorScheme='blue'
+                    size='md'
+                    icon={<RepeatIcon />}
+                  ></IconButton>
+                </Tooltip>
+              </Flex>
+            </CardHeader>
+
+            {allImages ? (
+              <>
+                <ImageTable
+                  refetch={getAllImages}
+                  imageList={allImages}
+                  isLoading={isLoading}
+                  onScanOpen={onScanOpen}
+                  onDeleteOpen={onDeleteOpen}
+                  setSelectedImage={setSelectedImage}
+                  setActiveScanners={setActiveScanners}
+                />
+
                 <Flex
-                  width={'100%'}
-                  direction={'row'}
+                  flexDir={'row'}
+                  gap={4}
                   alignItems={'center'}
-                  justifyContent={'flex-end'}
+                  mt={6}
+                  justifyContent={'flex-start'}
                 >
-                  <Input
-                    placeholder='Search'
-                    maxW='300px'
-                    mb={4}
-                    value={searchInput}
-                    onChange={(e) => setSearchInput(e.target.value)}
-                    fontSize={'sm'}
-                    display={'none'}
-                  />
-                  <Tooltip label='Refresh'>
-                    <IconButton
-                      colorScheme='blue'
-                      size='md'
-                      icon={<RepeatIcon />}
-                    ></IconButton>
-                  </Tooltip>
-                </Flex>
-              </CardHeader>
-
-              {allImages ? (
-                <>
-                  <ImageTable
-                    refetch={getAllImages}
-                    imageList={allImages}
-                    isLoading={isLoading}
-                    onScanOpen={onScanOpen}
-                    onDeleteOpen={onDeleteOpen}
-                    setSelectedImage={setSelectedImage}
-                    setActiveScanners={setActiveScanners}
-                  />
-
-                  <Flex
-                    flexDir={'row'}
-                    gap={4}
-                    alignItems={'center'}
-                    mt={6}
-                    justifyContent={'flex-start'}
+                  <Button
+                    colorScheme='blue'
+                    onClick={handlePreviousPage}
+                    isDisabled={!allImages.images.pageInfo.hasPreviousPage}
                   >
-                    <Button
-                      colorScheme='blue'
-                      onClick={handlePreviousPage}
-                      isDisabled={!allImages.images.pageInfo.hasPreviousPage}
-                    >
-                      Previous
-                    </Button>
-                    <Button
-                      colorScheme='blue'
-                      onClick={handleNextPage}
-                      isDisabled={!allImages.images.pageInfo.hasNextPage}
-                    >
-                      Next
-                    </Button>
-                  </Flex>
-                </>
-              ) : (
-                <CardBody>
-                  <Table mt={4}>
-                    <Thead>
-                      <Tr my='.8rem'>
-                        {img_captions.map((caption, idx) => {
-                          return (
-                            <Th color='gray.800' key={idx} pl={0}>
-                              <Box>{caption}</Box>
-                            </Th>
-                          )
-                        })}
-                      </Tr>
-                    </Thead>
-                    <Tbody>
-                      <Tr>
-                        <Td pl={0}>
-                          <Skeleton height='20px' />
-                        </Td>
-                        <Td pl={0}>
-                          <Skeleton height='20px' />
-                        </Td>
-                        <Td pl={0}>
-                          <Skeleton height='20px' />
-                        </Td>
-                        <Td pl={0}>
-                          <Skeleton height='20px' />
-                        </Td>
-                        <Td pl={0}>
-                          <Skeleton height='20px' />
-                        </Td>
-                        <Td pl={0}>
-                          <Skeleton height='20px' />
-                        </Td>
-                        <Td pl={0}>
-                          <Skeleton height='20px' />
-                        </Td>
-                      </Tr>
-                    </Tbody>
-                  </Table>
-                </CardBody>
-              )}
-            </Card>
+                    Previous
+                  </Button>
+                  <Button
+                    colorScheme='blue'
+                    onClick={handleNextPage}
+                    isDisabled={!allImages.images.pageInfo.hasNextPage}
+                  >
+                    Next
+                  </Button>
+                </Flex>
+              </>
+            ) : (
+              <CardBody>
+                <Table mt={4}>
+                  <Thead>
+                    <Tr my='.8rem'>
+                      {img_captions.map((caption, idx) => {
+                        return (
+                          <Th color='gray.800' key={idx} pl={0}>
+                            <Box>{caption}</Box>
+                          </Th>
+                        )
+                      })}
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    <Tr>
+                      <Td pl={0}>
+                        <Skeleton height='20px' />
+                      </Td>
+                      <Td pl={0}>
+                        <Skeleton height='20px' />
+                      </Td>
+                      <Td pl={0}>
+                        <Skeleton height='20px' />
+                      </Td>
+                      <Td pl={0}>
+                        <Skeleton height='20px' />
+                      </Td>
+                      <Td pl={0}>
+                        <Skeleton height='20px' />
+                      </Td>
+                      <Td pl={0}>
+                        <Skeleton height='20px' />
+                      </Td>
+                      <Td pl={0}>
+                        <Skeleton height='20px' />
+                      </Td>
+                    </Tr>
+                  </Tbody>
+                </Table>
+              </CardBody>
+            )}
+          </Card>
 
-            {orgConnectors &&
-            orgConnectors.organizationConnectors.length === 0 ? (
+          {orgConnectors &&
+          orgConnectors.organizationConnectors.length === 0 ? (
+            <Flex
+              mx={'auto'}
+              p={24}
+              alignItems={'center'}
+              justifyContent={'center'}
+            >
+              <Text color={'gray.500'}>
+                Please connect to a container registry under{' '}
+                <Link to='/vendor/connections'>
+                  <chakra.span
+                    color={'blue.500'}
+                    _hover={{ textDecoration: 'underline' }}
+                  >
+                    connections{' '}
+                  </chakra.span>
+                </Link>
+                to see your images
+              </Text>
+            </Flex>
+          ) : (
+            allImages &&
+            allImages.images.nodes.length === 0 && (
               <Flex
                 mx={'auto'}
                 p={24}
@@ -354,35 +370,12 @@ const Index = () => {
                 justifyContent={'center'}
               >
                 <Text color={'gray.500'}>
-                  Please connect to a container registry under{' '}
-                  <Link to='/vendor/connections'>
-                    <chakra.span
-                      color={'blue.500'}
-                      _hover={{ textDecoration: 'underline' }}
-                    >
-                      connections{' '}
-                    </chakra.span>
-                  </Link>
-                  to see your images
+                  No image found in connected registries. Refresh or edit
+                  connections
                 </Text>
               </Flex>
-            ) : (
-              allImages &&
-              allImages.images.nodes.length === 0 && (
-                <Flex
-                  mx={'auto'}
-                  p={24}
-                  alignItems={'center'}
-                  justifyContent={'center'}
-                >
-                  <Text color={'gray.500'}>
-                    No image found in connected registries. Refresh or edit
-                    connections
-                  </Text>
-                </Flex>
-              )
-            )}
-          </Flex>
+            )
+          )}
         </Flex>
 
         {/* add scanners */}

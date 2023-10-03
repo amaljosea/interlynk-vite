@@ -83,14 +83,19 @@ function Advisories() {
   // }, [feedData])
 
   return (
-    <Flex direction='column' pt={{ base: '120px', md: '75px' }}>
+    <Flex
+      direction='column'
+      flexDirection='column'
+      pt={{ base: '120px', md: '74px' }}
+      px={2}
+    >
       <Timeline
         setFormattedDate={setFormattedDate}
         formattedDate={formattedDate}
         getFeed={GetFeed}
       />
-      <Card __css={{ marginTop: '2rem' }}>
-        <CardHeader __css={{ padding: '0 1rem' }}>
+      <Card mt={4} bg='white'>
+      <CardHeader py={2}>
           <Flex direction='row' width={'100%'}>
             <Menu>
               <MenuButton

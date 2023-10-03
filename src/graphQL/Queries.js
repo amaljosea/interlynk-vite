@@ -359,17 +359,6 @@ export const GetProjectData = gql`
             name
             version
           }
-          components(
-            after: $after
-            before: $before
-            first: $first
-            last: $last
-          ) {
-            nodes {
-              primary
-              version
-            }
-          }
         }
       }
     }
@@ -384,6 +373,8 @@ export const GetSBOM = gql`
     $last: Int
     $after: String
     $before: String
+    $field: ComponentOrderByFields!
+    $direction: OrderByDirection!
   ) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
       id
@@ -427,7 +418,15 @@ export const GetSBOM = gql`
         email
         updatedAt
       }
-      components(after: $after, before: $before, first: $first, last: $last) {
+      components(
+        sbomId: $sbomId
+        after: $after
+        before: $before
+        first: $first
+        last: $last
+        orderBy: { field: $field, direction: $direction }
+      ) {
+        totalCount
         pageInfo {
           endCursor
           hasNextPage
@@ -464,13 +463,7 @@ export const GetSBOM = gql`
 `
 
 export const GetProject = gql`
-  query getProject(
-    $id: ID!
-    $first: Int
-    $last: Int
-    $after: String
-    $before: String
-  ) {
+  query getProject($id: ID!) {
     project(id: $id) {
       id
       name
@@ -485,12 +478,6 @@ export const GetProject = gql`
           id
           name
           version
-        }
-        components(after: $after, before: $before, first: $first, last: $last) {
-          nodes {
-            primary
-            version
-          }
         }
       }
     }
@@ -549,13 +536,7 @@ export const GetAllShareLynks = gql`
 
 // Customer page - Get All shared products
 export const GetSignedProjects = gql`
-  query getSignedProjects(
-    $signedParams: String!
-    $first: Int
-    $last: Int
-    $after: String
-    $before: String
-  ) {
+  query getSignedProjects($signedParams: String!) {
     projects(signedParams: $signedParams) {
       id
       description
@@ -569,12 +550,6 @@ export const GetSignedProjects = gql`
           id
           name
           version
-        }
-        components(after: $after, before: $before, first: $first, last: $last) {
-          nodes {
-            primary
-            version
-          }
         }
       }
     }
@@ -722,14 +697,7 @@ export const GetSignedImageVerion = gql`
 // Get signed product
 
 export const GetProjectInfo = gql`
-  query getProjectInfo(
-    $signedParams: String!
-    $projectId: Uuid!
-    $first: Int
-    $last: Int
-    $after: String
-    $before: String
-  ) {
+  query getProjectInfo($signedParams: String!, $projectId: Uuid!) {
     project(signedParams: $signedParams, projectId: $projectId) {
       id
       name
@@ -743,12 +711,6 @@ export const GetProjectInfo = gql`
           id
           name
           version
-        }
-        components(after: $after, before: $before, first: $first, last: $last) {
-          nodes {
-            primary
-            version
-          }
         }
       }
     }
@@ -764,6 +726,8 @@ export const GetSignedSBOM = gql`
     $last: Int
     $after: String
     $before: String
+    $field: ComponentOrderByFields!
+    $direction: OrderByDirection!
   ) {
     sbom(projectId: $projectId, sbomId: $sbomId, signedParams: $signedParams) {
       id
@@ -774,6 +738,17 @@ export const GetSignedSBOM = gql`
       creationAt
       updatedAt
       specVersion
+      primaryComponent {
+        id
+        name
+        version
+      }
+      stats {
+        compCount
+        compLicenseCount
+        compCpeCount
+        compPurlCount
+      }
       project {
         id
         name
@@ -797,7 +772,15 @@ export const GetSignedSBOM = gql`
         email
         updatedAt
       }
-      components(after: $after, before: $before, first: $first, last: $last) {
+      components(
+        sbomId: $sbomId
+        after: $after
+        before: $before
+        first: $first
+        last: $last
+        orderBy: { field: $field, direction: $direction }
+      ) {
+        totalCount
         pageInfo {
           endCursor
           hasNextPage

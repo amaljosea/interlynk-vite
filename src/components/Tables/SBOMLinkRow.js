@@ -95,7 +95,7 @@ function SBOMLinkRow(props) {
 
   return (
     <Tr>
-      <Td pl={0}>
+      <Td>
         <Switch isChecked={enabled} readOnly size='md' />
       </Td>
       <Td width={'200px'}>

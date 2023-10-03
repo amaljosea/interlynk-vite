@@ -121,31 +121,32 @@ export default function AdminNavbar(props) {
       transitionDuration=' 0.25s, 0.25s, 0.25s, 0s'
       transition-property='box-shadow, background-color, filter, border'
       transitionTimingFunction='linear, linear, linear, linear'
-      alignItems={{ xl: 'center' }}
+      // alignItems={{ xl: 'center' }}
       borderRadius='16px'
       display='flex'
       minH='75px'
-      justifyContent={{ xl: 'center' }}
+      // justifyContent={{ xl: 'center' }}
       lineHeight='25.6px'
       mx='auto'
       mt={secondaryMargin}
-      pb='8px'
-      // left={document.documentElement.dir === 'rtl' ? '30px' : ''}
-      right={document.documentElement.dir === 'rtl' ? '' : '30px'}
+      // pb='8px'
+      // left={document.documentElement.dir === 'rtl' ? '0' : '30px'}
+      // right={document.documentElement.dir === 'rtl' ? '' : '42px'}
+      right={minimize === true ? 10 : 6}
       px={{
         sm: paddingX,
-        md: '24px'
+        md: '10px'
       }}
-      ps={{
-        xl: '12px'
-      }}
-      pt='8px'
-      top='18px'
+      // ps={{
+      //   xl: '12px'
+      // }}
+      top='12px'
       w={{
         sm: 'calc(100vw - 30px)',
-        xl: minimize
-          ? 'calc(100vw - 75px - 100px)'
-          : 'calc(100vw - 75px - 210px)'
+        xl:
+          minimize === true
+            ? 'calc(100vw - 75px - 80px)'
+            : 'calc(100vw - 75px - 210px)'
       }}
     >
       <Flex
@@ -170,6 +171,14 @@ export default function AdminNavbar(props) {
                 Interlynk
               </BreadcrumbLink>
             </BreadcrumbItem>
+
+            {location.pathname.startsWith('/vendor/autofix') && (
+              <BreadcrumbItem color={mainText}>
+                <BreadcrumbLink href={'/vendor/profiles'} color={secondaryText}>
+                  Settings
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+            )}
 
             <BreadcrumbItem color={mainText}>
               <Link
