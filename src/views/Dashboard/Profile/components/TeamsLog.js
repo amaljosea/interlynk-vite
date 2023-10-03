@@ -11,7 +11,7 @@ const TeamsLog = () => {
       id: 1,
       name: 'Surendra Pathak',
       email: 'sp@interlynk.io',
-      auth: 'Github',
+      auth: 'GitHub',
       role: 'Org Admin',
       joinedDate: '2023-07-20T12:30:00Z'
     },
@@ -19,7 +19,7 @@ const TeamsLog = () => {
       id: 2,
       name: 'Ritesh Noronha',
       email: 'rcn@interlynk.io',
-      auth: 'Amazon ECR',
+      auth: 'Google',
       role: 'Org Admin',
       joinedDate: '2023-06-27T09:44:00Z'
     },
@@ -27,8 +27,8 @@ const TeamsLog = () => {
       id: 3,
       name: 'Abhisek Paul',
       email: 'abhisek@interlynk.io',
-      auth: 'Docker Hub',
-      role: 'Vendor',
+      auth: 'GitLab',
+      role: 'Vulnerability Manager',
       joinedDate: '2023-05-19T18:24:00Z'
     }
   ]

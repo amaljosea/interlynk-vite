@@ -313,7 +313,7 @@ export const orgHealthChecks = [
     link:
       'https://www.interlynk.io/',
     description:
-      'Component has a VALID type',
+      'Component has a valid type',
     long_desc: 'The type of each component is a valid type as defined by the specification.',
     status: 'Low'
   },
@@ -343,7 +343,7 @@ export const orgHealthChecks = [
     link:
       'https://www.interlynk.io/',
     description:
-      'Component has a Package URL',
+      'Component has a Package URL (PURL)',
     long_desc: 'Component has a purl, which can be used to lookup vulns.',
     status: 'High'
   },
@@ -353,7 +353,7 @@ export const orgHealthChecks = [
     link:
       'https://www.interlynk.io/',
     description:
-      'Component has a valid purl',
+      'Component has a valid Package URL (PURL)',
     long_desc: 'Component has a valid purl, which can be used to lookup vulns.',
     status: 'High'
   },
@@ -363,7 +363,7 @@ export const orgHealthChecks = [
     link:
       'https://www.interlynk.io/',
     description:
-      'Component has a CPE (Common Platform Enumeration)',
+      'Component has a Common Platform Enumeration (CPE)',
     long_desc: 'Component has a cpe, which can be used to lookup vulns from nvd.',
     status: 'High'
   },
@@ -373,7 +373,7 @@ export const orgHealthChecks = [
     link:
       'https://www.interlynk.io/',
     description:
-      'Component has a valid CPE (Common Platform Enumeration)',
+      'Component has a valid Common Platform Enumeration (CPE)',
     long_desc: 'Component has a valid cpe, which can be used to lookup vulns from nvd.',
     status: 'High'
   },
@@ -1310,102 +1310,32 @@ export const olderTransactions = [
 export const Vulnerabilities = [
   {
     id: 1,
-    cve: 'CVE-2023-28322',
-    cvss: '6.1',
-    severity: 'super critical',
-    component: 'viva',
-    version: '6.9.7',
+    cve: 'CVE-2023-4863',
+    cvss: '8.8',
+    severity: 'high',
+    component: 'skiasharp.2.88.0-preview.178.nupkg',
+    version: '2.88.0-preview.178',
     status: 'In Triage',
     source: 'NVD',
   },
   {
     id: 2,
-    cve: 'CVE-2019-8457',
-    cvss: '5.4',
-    severity: 'low',
-    component: 'daltfresh',
-    version: '5.3.28',
-    status: 'Not Affected',
-    source: 'GHSA',
+    cve: 'CVE-2023-21538',
+    cvss: '7.5',
+    severity: 'High',
+    component: 'system.private.datacontractserialization.4.3.0.nupkg',
+    version: '4.3.0',
+    status: 'In Triage',
+    source: 'NVD',
   },
   {
     id: 3,
-    cve: 'GHSA-r9hx-vwmv-q579',
-    cvss: '3.3',
-    severity: 'critical',
-    component: 'setuptools',
-    version: '58.1.0',
+    cve: 'CVE-2017-11770',
+    cvss: '7.5',
+    severity: 'High',
+    component: 'system.security.cryptography.x509certificates.4.3.0.nupkg',
+    version: '4.3.0',
     status: 'Fixed',
-    source: 'GHSA',
-  },
-  {
-    id: 4,
-    cve: 'CVE-2023-31484',
-    cvss: '7.7',
-    severity: 'high',
-    component: 'otcom',
-    version: '8.7.3',
-    status: 'Not Affected',
-    source: 'GHSA',
-  },
-  {
-    id: 5,
-    cve: 'CVE-2023-2953',
-    cvss: '0.8',
-    severity: 'low',
-    component: 'konklux',
-    version: '9.0.1',
-    status: 'False Positive',
-    source: 'GHSA',
-  },
-  {
-    id: 6,
-    cve: 'CVE-2023-29491',
-    cvss: '0.5',
-    severity: 'super critical',
-    component: 'voltsillam',
-    version: '5.5.0',
-    status: 'False Positive',
     source: 'NVD',
-  },
-  {
-    id: 7,
-    cve: 'CVE-2023-29007',
-    cvss: '8.4',
-    severity: 'low',
-    component: 'bamity',
-    version: '0.7.8',
-    status: 'Not Affected',
-    source: 'GHSA',
-  },
-  {
-    id: 8,
-    cve: 'CVE-2023-28321',
-    cvss: '9.9',
-    severity: 'medium',
-    component: 'holdlamis',
-    version: '7.64.0',
-    status: 'Affected',
-    source: 'NVD',
-  },
-  {
-    id: 9,
-    cve: 'CVE-2023-27534',
-    cvss: '2.1',
-    severity: 'super high',
-    component: 'matsoft',
-    version: '8.3.7',
-    status: 'In Triage',
-    source: 'NVD',
-  },
-  {
-    id: 10,
-    cve: 'CVE-2023-2650',
-    cvss: '9.9',
-    severity: 'negligible',
-    component: 'bitwolf',
-    version: '4.5.3',
-    status: 'In Triage',
-    source: 'GHSA',
   }
 ]

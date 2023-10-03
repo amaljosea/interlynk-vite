@@ -42,15 +42,12 @@ const ComponentFeed = () => {
     <Card p={0}>
       <CardHeader p='12px 0' mb='8px'>
         <Text fontSize='lg' color={textColor} fontWeight='bold'>
-          Component Identification
+          Internal Components
         </Text>
       </CardHeader>
       <CardBody px='5px'>
         <Flex flexDirection={'column'} alignItems={'flex-start'} gap={6}>
           <FormControl>
-            <FormLabel color='#444'>
-              Regular Expressions identifying Internal Components
-            </FormLabel>
             <Input
               placeholder='*mystring*'
               value={compName}
