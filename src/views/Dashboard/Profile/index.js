@@ -78,9 +78,9 @@ function Profile() {
               <Tabs variant='enclosed' w={'100%'} bg={'white'}>
                 <TabList>
                   <Tab _focus={{ outline: 'none' }}>General</Tab>
-                  <Tab _focus={{ outline: 'none' }}>Teams</Tab>
+                  <Tab _focus={{ outline: 'none' }}>Team</Tab>
                   <Tab _focus={{ outline: 'none' }}>Feeds</Tab>
-                  <Tab _focus={{ outline: 'none' }}>Rules</Tab>
+                  <Tab _focus={{ outline: 'none' }}>Checks</Tab>
                   <Tab _focus={{ outline: 'none' }}>Lists</Tab>
                 </TabList>
                 <TabPanels>

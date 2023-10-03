@@ -48,7 +48,7 @@ const GeneralFeed = ({ orgInfo }) => {
         >
           {/* NAME */}
           <FormControl>
-            <FormLabel>Organization Name</FormLabel>
+            <FormLabel>Name</FormLabel>
             <HStack spacing={2}>
               <Input
                 value={orgName}
@@ -61,7 +61,7 @@ const GeneralFeed = ({ orgInfo }) => {
           </FormControl>
           {/* ID */}
           <FormControl>
-            <FormLabel>Organization ID</FormLabel>
+            <FormLabel>Interlynk ID</FormLabel>
             <HStack spacing={2}>
               <Input
                 value={orgId}

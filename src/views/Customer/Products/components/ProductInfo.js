@@ -188,7 +188,7 @@ function ProductInfo() {
                           gap={3}
                         >
                           {sbomData.sbom.project.name} :{' '}
-                          {sbomData.sbom.primaryComponent.version}
+                          {sbomData.sbom.primaryComponent.version}:{' '}
                         </Flex>
                       </Text>
                       <Text fontSize='xs' cursor={'pointer'}>

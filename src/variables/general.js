@@ -206,69 +206,196 @@ export const healthChecks = [
   }
 ]
 
-export const apiGetwayData = [
+export const orgHealthChecks = [
   {
     id: 1,
-    title: 'SNYK-CC-AWS-419',
+    title: 'SB-HC-4',
     link:
-      'https://security.snyk.io/rules/cloud/SNYK-CC-AWS-419?_gl=1%2afwpgfs%2a_ga%2aMjkxODQ3MjQuMTY5MTc2MDAyMw..%2a_ga_X9SH3KP7B4%2aMTY5NTg4MjAwMy40LjEuMTY5NTg4MzMwMy4wLjAuMA..',
+      'https://www.interlynk.io/',
     description:
-      'Open this link in a new tabAPI gateway cached responses are not encrypted',
-    status: 'medium'
+      'SBOM Document has a unique identifier',
+    long_desc: 'SBOM document has a unique identifier field i.e serialNumber for CDX and SPDXID + namespace for SPDX.',
+    status: 'High'
   },
   {
     id: 2,
-    title: 'SNYK-CC-AWS-452',
+    title: 'SB-HC-5',
     link:
-      'https://security.snyk.io/rules/cloud/SNYK-CC-AWS-452?_gl=1%2a1m4dkez%2a_ga%2aMjkxODQ3MjQuMTY5MTc2MDAyMw..%2a_ga_X9SH3KP7B4%2aMTY5NTg4MjAwMy40LjEuMTY5NTg4NDAwMC4wLjAuMA..',
+      'https://www.interlynk.io/',
     description:
-      'Open this link in a new tab Wildcard action in api gateway access policy',
-    status: 'medium'
+      'Document creation timestamp',
+    long_desc: 'SBOM document contains a creation timestamp',
+    status: 'High'
   },
   {
     id: 3,
-    title: 'SNYK-CC-AWS-453',
+    title: 'SB-HC-6',
     link:
-      'https://security.snyk.io/rules/cloud/SNYK-CC-AWS-453?_gl=1%2a1q02vzd%2a_ga%2aMjkxODQ3MjQuMTY5MTc2MDAyMw..%2a_ga_X9SH3KP7B4%2aMTY5NTg4MjAwMy40LjEuMTY5NTg4NDAzMS4wLjAuMA..',
+      'https://www.interlynk.io/',
     description:
-      'Open this link in a new tab Wildcard principal in rest api access policy',
-    status: 'medium'
+      'Document has creation tools present',
+    long_desc: 'SBOM lists tools used to create the document.',
+    status: 'High'
   },
   {
     id: 4,
-    title: 'SNYK-CC-TF-63',
+    title: 'SB-HC-7',
     link:
-      'https://security.snyk.io/rules/cloud/SNYK-CC-TF-63?_gl=1%2a1q02vzd%2a_ga%2aMjkxODQ3MjQuMTY5MTc2MDAyMw..%2a_ga_X9SH3KP7B4%2aMTY5NTg4MjAwMy40LjEuMTY5NTg4NDAzMS4wLjAuMA..',
+      'https://www.interlynk.io/',
     description:
-      'Open this link in a new tab API Gateway does not enforce latest TLS/SSL policy',
-    status: 'low'
+      'Document has authors present',
+    long_desc: 'SBOM lists authors who created this document.',
+    status: 'High'
   },
   {
     id: 5,
-    title: 'SNYK-CC-TF-99',
+    title: 'SB-HC-8',
     link:
-      'https://security.snyk.io/rules/cloud/SNYK-CC-TF-99?_gl=1%2a1q02vzd%2a_ga%2aMjkxODQ3MjQuMTY5MTc2MDAyMw..%2a_ga_X9SH3KP7B4%2aMTY5NTg4MjAwMy40LjEuMTY5NTg4NDAzMS4wLjAuMA..',
+      'https://www.interlynk.io/',
     description:
-      'Open this link in a new tab API Gateway allows anonymous access',
-    status: 'high'
+      'Document has suppliers present',
+    long_desc: 'SBOM lists the organization that supplied the component that the bom describes. The supplier may often be the manufacturer, but may also be a distributor or repackager.SBOM lists the organization that supplied the component that the bom describes. The supplier may often be the manufacturer, but may also be a distributor or repackager.',
+    status: 'High'
   },
   {
     id: 6,
-    title: 'SNYK-CC-TF-129',
+    title: 'SBOM-HC-9',
     link:
-      'https://security.snyk.io/rules/cloud/SNYK-CC-TF-129?_gl=1%2ac0w1sc%2a_ga%2aMjkxODQ3MjQuMTY5MTc2MDAyMw..%2a_ga_X9SH3KP7B4%2aMTY5NTg4MjAwMy40LjEuMTY5NTg4NDA2Ny4wLjAuMA..',
+      'https://www.interlynk.io/',
     description:
-      'Open this link in a new tab API Gateway X-Ray tracing disabled',
-    status: 'low'
+      'Document has data license specified',
+    long_desc: 'This is to alleviate any concern that content in the sbom document is subject to any form of intellectual property right that could restrict the re-use of the information or the creation of another SBOM document for the same project(s).',
+    status: 'High'
   },
   {
     id: 7,
-    title: 'SNYK-CC-TF-138',
+    title: 'SBOM-HC-10',
     link:
-      'https://security.snyk.io/rules/cloud/SNYK-CC-TF-138?_gl=1%2amzmq5m%2a_ga%2aMjkxODQ3MjQuMTY5MTc2MDAyMw..%2a_ga_X9SH3KP7B4%2aMTY5NTg4MjAwMy40LjEuMTY5NTg4NDA4Mi4wLjAuMA..',
+      'https://www.interlynk.io/',
     description:
-      'Open this link in a new tab API Gateway access logging disabled',
-    status: 'low'
+      'Document has a primary component',
+    long_desc: 'SBOM is used to describe a primary component or package. A primary component is a component that is directly included in a product or service.',
+    status: 'Critical'
+  },
+  {
+    id: 8,
+    title: 'SBOM-HC-11',
+    link:
+      'https://www.interlynk.io/',
+    description:
+      'Component has a name',
+    long_desc: 'The name of each component is a short, essential identifier to be maintained.',
+    status: 'High'
+  },
+  {
+    id: 9,
+    title: 'SBOM-HC-12',
+    link:
+      'https://www.interlynk.io/',
+    description:
+      'Component has a version',
+    long_desc: 'The versioning of a component is a useful for identification purposes and for indicating later changes of the component version.',
+    status: 'High'
+  },
+  {
+    id: 10,
+    title: 'SBOM-HC-13',
+    link:
+      'https://www.interlynk.io/',
+    description:
+      'Component has a type',
+    long_desc: 'This is a reasonable estimate of the most likely component usage from the producer and consumer perspective from which both parties can draw conclusions about the context in which the component exists.',
+    status: 'Low'
+  },
+  {
+    id: 11,
+    title: 'SBOM-HC-14',
+    link:
+      'https://www.interlynk.io/',
+    description:
+      'Component has a VALID type',
+    long_desc: 'The type of each component is a valid type as defined by the specification.',
+    status: 'Low'
+  },
+  {
+    id: 12,
+    title: 'SBOM-HC-15',
+    link:
+      'https://www.interlynk.io/',
+    description:
+      'Component has a supplier',
+    long_desc: 'Component has a supplier that is a valid organization as defined by the specification.',
+    status: 'Low'
+  },
+  {
+    id: 13,
+    title: 'SBOM-HC-16',
+    link:
+      'https://www.interlynk.io/',
+    description:
+      'Component has a unique identifier',
+    long_desc: 'Component has a unique identifier that is a valid based on sbom spec. Can be used for lookups in other db e.g vulns db.',
+    status: 'High'
+  },
+  {
+    id: 14,
+    title: 'SBOM-HC-17',
+    link:
+      'https://www.interlynk.io/',
+    description:
+      'Component has a Package URL',
+    long_desc: 'Component has a purl, which can be used to lookup vulns.',
+    status: 'High'
+  },
+  {
+    id: 15,
+    title: 'SBOM-HC-18',
+    link:
+      'https://www.interlynk.io/',
+    description:
+      'Component has a valid purl',
+    long_desc: 'Component has a valid purl, which can be used to lookup vulns.',
+    status: 'High'
+  },
+  {
+    id: 16,
+    title: 'SBOM-HC-19',
+    link:
+      'https://www.interlynk.io/',
+    description:
+      'Component has a CPE (Common Platform Enumeration)',
+    long_desc: 'Component has a cpe, which can be used to lookup vulns from nvd.',
+    status: 'High'
+  },
+  {
+    id: 17,
+    title: 'SBOM-HC-20',
+    link:
+      'https://www.interlynk.io/',
+    description:
+      'Component has a valid CPE (Common Platform Enumeration)',
+    long_desc: 'Component has a valid cpe, which can be used to lookup vulns from nvd.',
+    status: 'High'
+  },
+  {
+    id: 18,
+    title: 'SBOM-HC-21',
+    link:
+      'https://www.interlynk.io/',
+    description:
+      'Component has license/s specified',
+    long_desc: 'Component has license/s specified.',
+    status: 'Medium'
+  },
+  {
+    id: 19,
+    title: 'SBOM-HC-22',
+    link:
+      'https://www.interlynk.io/',
+    description:
+      'Componet has deprecated license/s',
+    long_desc: 'Component has deprecated license/s.',
+    status: 'Medium'
   }
 ]
 
