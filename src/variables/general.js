@@ -259,7 +259,7 @@ export const orgHealthChecks = [
   },
   {
     id: 6,
-    title: 'SBOM-HC-9',
+    title: 'SB-HC-9',
     link:
       'https://www.interlynk.io/',
     description:
@@ -269,7 +269,7 @@ export const orgHealthChecks = [
   },
   {
     id: 7,
-    title: 'SBOM-HC-10',
+    title: 'SB-HC-10',
     link:
       'https://www.interlynk.io/',
     description:
@@ -279,7 +279,7 @@ export const orgHealthChecks = [
   },
   {
     id: 8,
-    title: 'SBOM-HC-11',
+    title: 'SB-HC-11',
     link:
       'https://www.interlynk.io/',
     description:
@@ -289,7 +289,7 @@ export const orgHealthChecks = [
   },
   {
     id: 9,
-    title: 'SBOM-HC-12',
+    title: 'SB-HC-12',
     link:
       'https://www.interlynk.io/',
     description:
@@ -299,7 +299,7 @@ export const orgHealthChecks = [
   },
   {
     id: 10,
-    title: 'SBOM-HC-13',
+    title: 'SB-HC-13',
     link:
       'https://www.interlynk.io/',
     description:
@@ -309,7 +309,7 @@ export const orgHealthChecks = [
   },
   {
     id: 11,
-    title: 'SBOM-HC-14',
+    title: 'SB-HC-14',
     link:
       'https://www.interlynk.io/',
     description:
@@ -319,7 +319,7 @@ export const orgHealthChecks = [
   },
   {
     id: 12,
-    title: 'SBOM-HC-15',
+    title: 'SB-HC-15',
     link:
       'https://www.interlynk.io/',
     description:
@@ -329,7 +329,7 @@ export const orgHealthChecks = [
   },
   {
     id: 13,
-    title: 'SBOM-HC-16',
+    title: 'SB-HC-16',
     link:
       'https://www.interlynk.io/',
     description:
@@ -339,7 +339,7 @@ export const orgHealthChecks = [
   },
   {
     id: 14,
-    title: 'SBOM-HC-17',
+    title: 'SB-HC-17',
     link:
       'https://www.interlynk.io/',
     description:
@@ -349,7 +349,7 @@ export const orgHealthChecks = [
   },
   {
     id: 15,
-    title: 'SBOM-HC-18',
+    title: 'SB-HC-18',
     link:
       'https://www.interlynk.io/',
     description:
@@ -359,7 +359,7 @@ export const orgHealthChecks = [
   },
   {
     id: 16,
-    title: 'SBOM-HC-19',
+    title: 'SB-HC-19',
     link:
       'https://www.interlynk.io/',
     description:
@@ -369,7 +369,7 @@ export const orgHealthChecks = [
   },
   {
     id: 17,
-    title: 'SBOM-HC-20',
+    title: 'SB-HC-20',
     link:
       'https://www.interlynk.io/',
     description:
@@ -379,7 +379,7 @@ export const orgHealthChecks = [
   },
   {
     id: 18,
-    title: 'SBOM-HC-21',
+    title: 'SB-HC-21',
     link:
       'https://www.interlynk.io/',
     description:
@@ -389,7 +389,7 @@ export const orgHealthChecks = [
   },
   {
     id: 19,
-    title: 'SBOM-HC-22',
+    title: 'SB-HC-22',
     link:
       'https://www.interlynk.io/',
     description:

@@ -353,7 +353,7 @@ function SBOM() {
                       <Flex direction={'column'} gap={1}>
                         <Text fontWeight={'semibold'} fontSize={18}>
                           {sbomData.sbom.project.name} :{' '}
-                          {sbomData.sbom.primaryComponent.version}
+                          {sbomData.sbom.primaryComponent?.version}:{' '}
                         </Text>
                         <Text fontSize='xs' cursor={'pointer'}>
                           Last updated at : {timeSince(sbomData.sbom.updatedAt)}
@@ -511,7 +511,7 @@ function SBOM() {
               data={sbomData.sbom}
               refetch={refetch}
               pageIndex={pageIndex}
-              versionName={sbomData.sbom.primaryComponent.version}
+              versionName={sbomData.sbom.primaryComponent?.version}
               handlePreviousPage={handlePreviousPage}
               handleNextPage={handleNextPage}
               status={status}
@@ -548,7 +548,7 @@ function SBOM() {
             onClose={onClose}
             productId={productId}
             productName={sbomData.sbom.project.name}
-            version={sbomData.sbom.primaryComponent.version}
+            version={sbomData.sbom.primaryComponent?.version}
             sbomId={sbomId}
           />
         )}
@@ -573,7 +573,7 @@ function SBOM() {
             isOpen={isCopied}
             onClose={onCopiedClose}
             product={sbomData.sbom.project.name}
-            version={sbomData.sbom.primaryComponent.version}
+            version={sbomData.sbom.primaryComponent?.version}
           />
         )}
 

@@ -183,7 +183,7 @@ const SBOMTable = ({
             <Tab _focus={{ outline: 'none' }}>General</Tab>
             <Tab _focus={{ outline: 'none' }}>Components</Tab>
             <Tab _focus={{ outline: 'none' }}>Vulnerabilities</Tab>
-            <Tab _focus={{ outline: 'none' }}>Health checks</Tab>
+            <Tab _focus={{ outline: 'none' }}>Checks</Tab>
             <Tab _focus={{ outline: 'none' }}>Change log</Tab>
           </TabList>
           <TabPanels>
