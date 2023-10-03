@@ -74,7 +74,7 @@ const FilterMenu = ({ severityOptions, shortDescOptions, onFilterChange }) => {
           fontSize={'sm'}
           leftIcon={<FaFilter size={14} />}
         >
-          Short Desc
+          Category
         </MenuButton>
         <MenuList height={'300px'} overflowY={'scroll'} overflow={'hiddens'}>
           <MenuOptionGroup

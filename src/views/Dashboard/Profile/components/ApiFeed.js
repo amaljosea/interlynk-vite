@@ -19,6 +19,7 @@ import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
 import { useState } from 'react'
 import { orgHealthChecks as orgHealthChecks } from 'variables/general'
+import { sevColor } from 'utils'
 
 const ApiFeed = () => {
   const textColor = useColorModeValue('gray.700', 'white')
@@ -53,7 +54,7 @@ const ApiFeed = () => {
     <Card p={0}>
       <CardHeader p='12px 0' mb='8px'>
         <Text fontSize='lg' color={textColor} fontWeight='bold'>
-          SBOM Health Checks
+          SBOM Checks
         </Text>
       </CardHeader>
       <CardBody>
@@ -93,7 +94,8 @@ const ApiFeed = () => {
                     width={'130px'}
                     value={api.status}
                     onChange={(e) => handleStatusChange(api.id, e.target.value)}
-                    bg={statusColors[api.status] || 'gray.200'}
+                    bg={sevColor(api.status.toLowerCase()) + '.200'}
+                    variant={'outline'}
                   >
                     {options.map((item, index) => (
                       <option key={index} value={item.value}>

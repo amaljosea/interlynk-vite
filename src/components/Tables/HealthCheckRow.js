@@ -125,6 +125,9 @@ function HealthCheckRow(props) {
           variant='subtle'
           colorScheme={sevColor(severity)}
           textTransform={'capitalize'}
+          width={'100%'}
+          alignItems={'center'}
+          justifyContent={'center'}
         >
           <TagLabel>{severity}</TagLabel>
         </Tag>
