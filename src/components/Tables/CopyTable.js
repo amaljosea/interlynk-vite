@@ -1,4 +1,4 @@
-import { Flex, Text } from '@chakra-ui/react'
+import { Flex, Text, Select, Switch, Tag} from '@chakra-ui/react'
 import React from 'react'
 import DataTable from 'react-data-table-component'
 
@@ -14,7 +14,7 @@ const customStyles = {
 }
 
 const CopyTable = ({ data }) => {
-  
+
   // COLUMNS
   const columns = [
     // CVE
@@ -25,27 +25,37 @@ const CopyTable = ({ data }) => {
     },
     // COMPONENT ONE
     {
-      id: 'componentOne',
-      name: 'COMPONENT ONE',
-      selector: (row) => <Text>{row.componentOne}</Text>
+      id: 'component',
+      name: 'COMPONENT',
+      selector: (row) => <Text>{row.component}</Text>
     },
-    // VERSION  ONW
     {
-      id: 'versionOne',
-      name: 'VERSION ONE',
-      selector: (row) => <Text>{row.versionOne}</Text>
+      id: 'version',
+      name: 'VERSION',
+      selector: (row) => <Text>{row.version}</Text>
     },
-    // COMPONENT TWO
     {
-      id: 'componentTwo',
-      name: 'COMPONENT TWO',
-      selector: (row) => <Text>{row.componentTwo}</Text>
+      id: 'status',
+      name: 'CURRENT STATUS',
+      selector: (row) => <Tag colorScheme='gray'>{row.status}</Tag>
     },
     // VERSION TWO
     {
-      id: 'versionTwo',
-      name: 'VERSION TWO',
-      selector: (row) => <Text>{row.versionTwo}</Text>
+      id: 'newStatus',
+      name: 'NEW STATUS',
+      selector: (row) => <Tag colorScheme='green'>{row.newStatus}</Tag>
+    },
+    {
+      id: 'history',
+      name: 'KEEP HISTORY',
+      selector: (row) => <Switch id='history' defaultChecked/>
+    },
+    {
+      id: 'resolution',
+      name: 'RESOLUTION',
+      selector: (row) => <Select size='sm'> <option value='option1'>Accept</option>
+      <option value='option2'>Keep Current</option>
+      </Select>
     }
   ]
 

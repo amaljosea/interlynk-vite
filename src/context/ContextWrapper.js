@@ -35,7 +35,7 @@ const ContextWrapper = (props) => {
       active: true,
       selectorOne: 'component',
       conditionOne: 'fizzler.1.2.0.nupkg',
-      selectorTwo: 'PURL',
+      selectorTwo: 'Package URL (PURL)',
       conditionTwo: 'Missing',
       fixAction: ''
     }

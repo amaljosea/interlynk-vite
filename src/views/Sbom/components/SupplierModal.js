@@ -157,13 +157,16 @@ const SupplierModal = ({
               <Button colorScheme='gray' mr={3} onClick={onClose}>
                 Cancel
               </Button>
+              <Button colorScheme='green' mr={3} onClick={onClose}>
+                Save Rule
+              </Button>
               {suppliers.length > 0 ? (
                 <Button colorScheme='blue' type={'submit'}>
                   Update
                 </Button>
               ) : (
                 <Button colorScheme='blue' type={'submit'}>
-                  Save
+                  Save Value
                 </Button>
               )}
             </ModalFooter>

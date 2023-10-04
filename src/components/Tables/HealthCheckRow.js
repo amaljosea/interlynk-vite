@@ -69,7 +69,7 @@ function HealthCheckRow(props) {
       return onSupplierOpen()
     }
 
-    if (shortDesc === 'Timestamp') {
+    if (shortDesc === 'Creation Time') {
       return onOpen()
     }
 
@@ -78,8 +78,10 @@ function HealthCheckRow(props) {
       shortDesc === 'Component Name' ||
       shortDesc === 'Component Version' ||
       shortDesc === 'Component Author' ||
+      shortDesc === 'Primary Relationship' ||
       shortDesc === 'Component Relationship' ||
-      shortDesc === 'Component PURL/CPE'
+      shortDesc === 'Component Type' ||
+      shortDesc === 'Component Identifier'
     ) {
       return onCompOpen()
     }
@@ -138,11 +140,11 @@ function HealthCheckRow(props) {
       <Td>
         {status === 'fix' && (
           <Stack direction={'row'} alignItems={'center'} spacing={2}>
-            <Button size='sm' onClick={handleOpen} disabled={customerView}>
+            <Button size='sm' colorScheme='blue' onClick={handleOpen} disabled={customerView}>
               Fix
             </Button>
-            <Button size='sm' onClick={updateIssue} disabled={customerView}>
-              Ignore
+            <Button size='sm' colorScheme='gray' onClick={updateIssue} disabled={customerView}>
+              Skip
             </Button>
           </Stack>
         )}

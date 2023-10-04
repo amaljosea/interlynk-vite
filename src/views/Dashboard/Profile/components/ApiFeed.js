@@ -32,7 +32,6 @@ const ApiFeed = () => {
     { value: 'High', label: 'High', bg: 'orange' },
     { value: 'Medium', label: 'Medium', bg: 'yellow' },
     { value: 'Low', label: 'Low', bg: 'green' },
-    { value: 'None', label: 'None', bg: 'gray' }
   ]
 
   // Define a mapping of status values to background colors

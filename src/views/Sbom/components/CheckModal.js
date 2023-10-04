@@ -192,7 +192,7 @@ const CheckModal = ({ isOpen, onClose, id, shortDesc }) => {
               </Flex>
             )}
 
-            {shortDesc === 'Timestamp' && (
+            {shortDesc === 'Creation Time' && (
               <FormControl isRequired>
                 <FormLabel>Created At</FormLabel>
                 <Input
@@ -210,8 +210,11 @@ const CheckModal = ({ isOpen, onClose, id, shortDesc }) => {
             <Button variant='ghost' mr={3} onClick={onClose}>
               Close
             </Button>
+            <Button colorScheme='green' mr={3} type='submit'>
+              Save Rule
+            </Button>
             <Button colorScheme='blue' type='submit'>
-              Save
+              Save Value
             </Button>
           </ModalFooter>
         </ModalContent>

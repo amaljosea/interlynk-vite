@@ -419,7 +419,7 @@ const VulnTable = ({ data }) => {
             fontSize={'sm'}
             onClick={onCopyOpen}
           >
-            Copy
+            Import Statuses
           </Button>
         </Stack>
       </Flex>
@@ -449,7 +449,9 @@ const VulnTable = ({ data }) => {
         >
           <GridItem w='100%'>
             <CustomText>Description :</CustomText>
-            <Text mt={1} fontSize={14}></Text>
+            <Text mt={1} fontSize={14}>
+              {'Heap buffer overflow in libwebp in Google Chrome prior to 116.0.5845.187 and libwebp 1.3.2 allowed a remote attacker to perform an out of bounds memory write via a crafted HTML page. (Chromium security severity: Critical)'}
+            </Text>
           </GridItem>
           <GridItem w='100%'></GridItem>
         </Grid>
@@ -490,19 +492,19 @@ const VulnTable = ({ data }) => {
           <ModalOverlay />
           <ModalContent>
             <ModalCloseButton />
-            <ModalHeader>Copy</ModalHeader>
+            <ModalHeader>Import Vulnerability Statuses</ModalHeader>
             <ModalBody mt={2}>
               <FormControl>
-                <FormLabel>Status Copy From</FormLabel>
+                <FormLabel>Import From:</FormLabel>
                 <Select
                   value={version}
                   onChange={(e) => setVersion(e.target.value)}
                 >
                   <option value=''>-- Select --</option>
-                  <option value='v1.0'>v1.0</option>
-                  <option value='v2.0'>v2.0</option>
-                  <option value='v3.0'>v3.0</option>
-                  <option value='v4.0'>v4.0</option>
+                  <option value='v.1'>v0.1.0</option>
+                  <option value='v1.0'>v1.0.0</option>
+                  <option value='v2.0'>v2.0.0</option>
+                  <option value='v3.0'>v3.0.0</option>
                 </Select>
               </FormControl>
             </ModalBody>
@@ -535,10 +537,27 @@ const VulnTable = ({ data }) => {
                 data={[
                   {
                     cve: 'CVE-2023-24532',
-                    componentOne: 'dropwizard-core',
-                    versionOne: '1.2.4',
-                    componentTwo: 'dropwizard-core2',
-                    versionTwo: '1.2.6'
+                    component: 'dropwizard-core',
+                    version: '1.2.4',
+                    status: 'In Triage',
+                    newStatus: 'False Positive',
+                    notes: 'In Triage',
+                  },
+                  {
+                    cve: 'CVE-2017-16921',
+                    component: 'samza-pre',
+                    version: '0.7.3',
+                    status: 'In Triage',
+                    newStatus: 'Fixed',
+                    notes: 'In Triage',
+                  },
+                  {
+                    cve: 'CVE-2021-14922',
+                    component: 'samza-core',
+                    version: '0.7.3',
+                    status: 'Fixed',
+                    newStatus: 'Affected',
+                    notes: 'In Triage',
                   }
                 ]}
               />
@@ -549,7 +568,7 @@ const VulnTable = ({ data }) => {
                 Cancel
               </Button>
               <Button variant='solid' colorScheme='blue'>
-                Save
+                Import Selected
               </Button>
             </DrawerFooter>
           </DrawerContent>

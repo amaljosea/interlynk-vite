@@ -24,97 +24,80 @@ import {
 export const healthChecks = [
   {
     id: 1,
-    healthCheckId: 'qs-5',
+    healthCheckId: 'SB-HC-10',
     severity: 'critical',
     shortDesc: 'Primary Component',
-    longDesc: 'SBOM does not indicate a primary component',
+    longDesc: 'Document is missing a primary component',
     status: 'fix'
   },
   {
     id: 2,
-    healthCheckId: 'qs-8',
-    severity: 'critical',
+    healthCheckId: 'SB-HC-5',
+    severity: 'high',
     shortDesc: 'Creation Time',
-    longDesc: 'SBOM does not include a primary component version',
-    status: 'fix'
-  },
-  {
-    id: 3,
-    healthCheckId: 'qs-7',
-    severity: 'low',
-    shortDesc: 'Primary License',
-    longDesc: 'SBOM includes a potentially invalid value of primary author',
+    longDesc: 'Document is missing a creation timestamp',
     status: 'fix'
   },
   // Component Biotronik.Cabo.Shared-0.0.0-UnknownVersion
   {
     id: 5,
-    healthCheckId: 'qs-11',
-    severity: 'critical',
+    healthCheckId: 'SB-HC-7',
+    severity: 'high',
     shortDesc: 'Primary Author',
     longDesc:
-      'Component: Biotronik.Cabo.Shared-0.0.0-UnknownVersion is missing unique identifier',
+      'Document is missing authors',
     status: 'fix'
   },
   {
     id: 6,
-    healthCheckId: 'qs-14',
-    severity: 'critical',
-    shortDesc: 'Primary Version',
+    healthCheckId: 'SB-HC-23',
+    severity: 'high',
+    shortDesc: 'Primary Relationship',
     longDesc:
       'Component: Biotronik.Cabo.Shared-0.0.0-UnknownVersion is not related to Primary Component',
     status: 'fix'
   },
   {
     id: 6,
-    healthCheckId: 'qs-18.1',
+    healthCheckId: 'SB-HC-17',
     severity: 'high',
-    shortDesc: 'Component Name',
+    shortDesc: 'Component Identifier',
     longDesc:
-      'Component: Biotronik.Cabo.Shared-0.0.0-UnknownVersion is missing a Package URL',
+      'Component: Biotronik.Cabo.Shared-0.0.0-UnknownVersion: is mssing a Package URL (PURL)',
     status: 'fix'
   },
   {
     id: 6,
-    healthCheckId: 'qs-18.1',
+    healthCheckId: 'SB-HC-19',
     severity: 'high',
-    shortDesc: 'Component Supplier',
-    longDesc:
-      'Component: Biotronik.Cabo.Shared-0.0.0-UnknownVersion is missing a CPE identifier',
-    status: 'fix'
-  },
-  {
-    id: 8,
-    healthCheckId: 'qs-10',
-    severity: 'medium',
     shortDesc: 'Component Identifier',
     longDesc:
-      'Component: Biotronik.Cabo.Shared-0.0.0-UnknownVersion is missing a supplier',
+      'Component: Biotronik.Cabo.Shared-0.0.0-UnknownVersion is Common Platform Enumeration (CPE)',
     status: 'fix'
   },
   {
     id: 8,
-    healthCheckId: 'qs-13',
+    healthCheckId: 'SB-HC-15',
     severity: 'low',
+    shortDesc: 'Component Supplier',
+    longDesc:
+      'Component: Biotronik.Cabo.Shared-0.0.0-UnknownVersion is missing s a supplier',
+    status: 'fix'
+  },
+  {
+    id: 8,
+    healthCheckId: 'SB-HC-12',
+    severity: 'high',
     shortDesc: 'Component Version',
     longDesc:
-      'Component: Biotronik.Cabo.Shared-0.0.0-UnknownVersion is missing an author',
+      'Component: Biotronik.Cabo.Shared-0.0.0-UnknownVersion is missing a version',
     status: 'fix'
   },
 
   // Component system.reactive.compatibility.5.0.0.nupkg
   {
-    id: 5,
-    healthCheckId: 'qs-11',
-    severity: 'critical',
-    shortDesc: 'Component Author',
-    longDesc:
-      'Component: system.reactive.compatibility.5.0.0.nupkg is missing unique identifier',
-    status: 'fix'
-  },
-  {
     id: 6,
-    healthCheckId: 'qs-14',
+    healthCheckId: 'SB-HC-23',
     severity: 'critical',
     shortDesc: 'Component Relationship',
     longDesc:
@@ -123,54 +106,45 @@ export const healthChecks = [
   },
   {
     id: 6,
-    healthCheckId: 'qs-18.1',
+    healthCheckId: 'SB-HC-17',
     severity: 'high',
-    shortDesc: 'Component License',
+    shortDesc: 'Component Identifier',
     longDesc:
-      'Component: system.reactive.compatibility.5.0.0.nupkg is missing a Package URL',
+      'Component: system.reactive.compatibility.5.0.0.nupkg is missing a Package URL (PURL)',
     status: 'fix'
   },
   {
     id: 6,
-    healthCheckId: 'qs-18.1',
+    healthCheckId: 'SB-HC-13',
     severity: 'high',
     shortDesc: 'Component Type',
     longDesc:
-      'Component: system.reactive.compatibility.5.0.0.nupkg is missing a CPE identifier',
+      'Component: system.reactive.compatibility.5.0.0.nupkg is missing a type',
     status: 'fix'
   },
   {
     id: 8,
-    healthCheckId: 'qs-10',
-    severity: 'medium',
-    shortDesc: 'Component PURL/CPE',
+    healthCheckId: 'SB-HC-15',
+    severity: 'low',
+    shortDesc: 'Component Supplier',
     longDesc:
       'Component: system.reactive.compatibility.5.0.0.nupkg is missing a supplier',
-    status: 'fix'
-  },
-  {
-    id: 8,
-    healthCheckId: 'qs-13',
-    severity: 'low',
-    shortDesc: 'Component Checksum',
-    longDesc:
-      'Component: system.reactive.compatibility.5.0.0.nupkg is missing an author',
     status: 'fix'
   },
 
   // Component couchbase.lite.enterprise.3.0.0.nupkg
   {
     id: 5,
-    healthCheckId: 'qs-11',
-    severity: 'critical',
+    healthCheckId: 'SB-HC-24',
+    severity: 'medium',
     shortDesc: 'Component Identifier',
     longDesc:
-      'Component: system.reactive.compatibility.5.0.0.nupkg is missing unique identifier',
+      'Component: system.reactive.compatibility.5.0.0.nupkg is missing a unique identifier',
     status: 'fix'
   },
   {
     id: 6,
-    healthCheckId: 'qs-14',
+    healthCheckId: 'SB-HC-23',
     severity: 'critical',
     shortDesc: 'Component Relationship',
     longDesc:
@@ -179,29 +153,20 @@ export const healthChecks = [
   },
   {
     id: 6,
-    healthCheckId: 'qs-18.1',
+    healthCheckId: 'SB-HC-19',
     severity: 'high',
-    shortDesc: 'Component PURL/CPE',
+    shortDesc: 'Component Identifier',
     longDesc:
-      'Component: system.reactive.compatibility.5.0.0.nupkg is missing a CPE identifier',
+      'Component: system.reactive.compatibility.5.0.0.nupkg is missing a Common Platform Enumeration (CPE)',
     status: 'fix'
   },
   {
     id: 8,
-    healthCheckId: 'qs-10',
-    severity: 'medium',
+    healthCheckId: 'SB-HC-15',
+    severity: 'low',
     shortDesc: 'Component Supplier',
     longDesc:
       'Component: system.reactive.compatibility.5.0.0.nupkg is missing a supplier',
-    status: 'fix'
-  },
-  {
-    id: 8,
-    healthCheckId: 'qs-13',
-    severity: 'low',
-    shortDesc: 'Component Author',
-    longDesc:
-      'Component: system.reactive.compatibility.5.0.0.nupkg is missing an author',
     status: 'fix'
   }
 ]
@@ -1286,7 +1251,7 @@ export const Vulnerabilities = [
     id: 1,
     cve: 'CVE-2023-4863',
     cvss: '8.8',
-    severity: 'low',
+    severity: 'high',
     component: 'skiasharp.2.88.0-preview.178.nupkg',
     version: '2.88.0-preview.178',
     status: 'In Triage',
@@ -1310,6 +1275,6 @@ export const Vulnerabilities = [
     component: 'system.security.cryptography.x509certificates.4.3.0.nupkg',
     version: '4.3.0',
     status: 'Fixed',
-    source: 'NVD'
+    source: 'SBOM'
   }
 ]

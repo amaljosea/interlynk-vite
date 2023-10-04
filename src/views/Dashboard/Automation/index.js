@@ -1,4 +1,4 @@
-import { AddIcon, DeleteIcon } from '@chakra-ui/icons'
+import { AddIcon, DeleteIcon, SearchIcon } from '@chakra-ui/icons'
 import {
   Flex,
   Text,
@@ -13,8 +13,11 @@ import {
   Button,
   Input,
   Switch,
-  Select
+  Select,
+  Tag
 } from '@chakra-ui/react'
+import { SettingsIcon } from "components/Icons/Icons";
+
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
@@ -27,8 +30,8 @@ const Automation = () => {
     'Active',
     'Rule Applies To',
     'Name',
+    'Condition',
     'Attribute',
-    'Status',
     'Fix'
   ]
 
@@ -74,7 +77,7 @@ const Automation = () => {
             justifyContent={'space-between'}
             width={'100%'}
           >
-            <Text fontSize={18}>Automation Rules</Text>
+            <Text fontSize={18}>Rule Automation Settings</Text>
             <Button
               size='sm'
               variant='solid'
@@ -138,53 +141,6 @@ const Automation = () => {
                     />
                   </Td>
                   <Td>
-                    {row.selectorOne === 'document' ? (
-                      <Select
-                        size='sm'
-                        value={row.selectorTwo}
-                        onChange={(e) =>
-                          handleInputChange(
-                            row.id,
-                            'selectorTwo',
-                            e.target.value
-                          )
-                        }
-                      >
-                        <option value=''>-- Select --</option>
-                        <option value='PURL'>PURL</option>
-                        <option value='CPE'>CPE</option>
-                        <option value='Type'>Type</option>
-                        <option value='Version'>Version</option>
-                        <option value='Creation Time'>Creation Time</option>
-                        <option value='Creation Tools'>Creation Tools</option>
-                        <option value='Author'>Author</option>
-                        <option value='Primary Component'>
-                          Primary Component
-                        </option>
-                        <option value='Supplier'>Supplier</option>
-                      </Select>
-                    ) : (
-                      <Select
-                        size='sm'
-                        value={row.selectorTwo}
-                        onChange={(e) =>
-                          handleInputChange(
-                            row.id,
-                            'selectorTwo',
-                            e.target.value
-                          )
-                        }
-                      >
-                        <option value=''>-- Select --</option>
-                        <option value='PURL'>PURL</option>
-                        <option value='CPE'>CPE</option>
-                        <option value='Type'>Type</option>
-                        <option value='Version'>Version</option>
-                        <option value='Name'>Name</option>
-                      </Select>
-                    )}
-                  </Td>
-                  <Td>
                     <Select
                       size='sm'
                       value={row.conditionTwo}
@@ -199,17 +155,66 @@ const Automation = () => {
                       <option value=''>-- Select --</option>
                       <option value='Missing'>Missing</option>
                       <option value='Invalid'>Invalid</option>
+                      <option value='Invalid'>Missing or Invalid</option>
+                      <option value='Always'>Always</option>
                     </Select>
+                  </Td>
+                  <Td>
+                    {row.selectorOne === 'document' ? (
+                      <Select
+                        size='sm'
+                        value={row.selectorTwo}
+                        onChange={(e) =>
+                          handleInputChange(
+                            row.id,
+                            'selectorTwo',
+                            e.target.value
+                          )
+                        }
+                      >
+                        <option value=''>-- Select --</option>
+                        <option value='Supplier'>Supplier</option>
+                        <option value='Author'>Author</option>
+                        <option value='Creation Time'>Creation Time</option>
+                        <option value='Creation Tools'>Creation Tools</option>
+                        <option value='Product Type'>Product Type</option>
+                        <option value='Product Version'>Product Version</option>
+                        <option value='Package URL (PURL)'>Package URL (PURL)</option>
+                        <option value='Common Platform Enumeration (CPE)'>Common Platform Enumeration (CPE)</option>
+                        <option value='Primary Component'>
+                          Primary Component
+                        </option>
+                      </Select>
+                    ) : (
+                      <Select
+                        size='sm'
+                        value={row.selectorTwo}
+                        onChange={(e) =>
+                          handleInputChange(
+                            row.id,
+                            'selectorTwo',
+                            e.target.value
+                          )
+                        }
+                      >
+                        <option value=''>-- Select --</option>
+                        <option value='Component Version'>Component Version</option>
+                        <option value='Component Type'>Component Type</option>
+                        <option value='Package URL (PURL)'>Package URL (PURL)</option>
+                        <option value='Common Platform Enumeration (CPE)'>Common Platform Enumeration (CPE)</option>
+                      </Select>
+                    )}
                   </Td>
                   <Td>
                     {row.selectorTwo !== '' ? (
                       <Flex alignItems={'center'} gap={2}>
-                        <Text fontSize={'sm'}>Set {row.selectorTwo}</Text>
+                        <Text fontSize={'sm'}>Set:</Text>
                         {row.selectorOne === 'component' ? (
-                          <Button size='sm'>Launch</Button>
+                          <Tag minW='250px' >pkg:nuget/Fizzler@1.2.0</Tag>
                         ) : (
-                          <Button size='sm'>Fix</Button>
+                          <Tag minW='250px'>Biotronik.ScsApp.Pr-1.0.0</Tag>
                         )}
+                        <IconButton size='sm' colorScheme='blue' icon={<SettingsIcon />} />
                       </Flex>
                     ) : (
                       ''
