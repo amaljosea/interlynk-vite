@@ -65,7 +65,7 @@ export default function Dashboard() {
       <Grid
         templateColumns={{ sm: '1fr', md: '1fr 1fr', lg: '2fr 1fr' }}
         templateRows={{ sm: '1fr auto', md: '1fr', lg: '1fr' }}
-        my='26px'
+        my='10px'
         gap='24px'
       >
         <ProductsOverview

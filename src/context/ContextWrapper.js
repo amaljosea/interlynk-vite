@@ -2,6 +2,7 @@ import { useState } from 'react'
 import GlobalContext from './GlobalContext'
 import { healthChecks } from 'variables/general'
 import { changeLogs } from 'variables/general'
+import { Vulnerabilities } from 'variables/general'
 
 const ContextWrapper = (props) => {
   const [vulnerabilitiesData, setVulnerabilitiesData] = useState([])
@@ -16,6 +17,29 @@ const ContextWrapper = (props) => {
   const [healthCheckData, setHealthCheckData] = useState(healthChecks)
 
   const [changelogData, setChangelogData] = useState(changeLogs)
+
+  const [productVulData, setProductVulData] = useState(Vulnerabilities)
+
+  const [automationRules, setAutomationRules] = useState([
+    {
+      id: 1,
+      active: true,
+      selectorOne: 'document',
+      conditionOne: '',
+      selectorTwo: 'Supplier',
+      conditionTwo: 'Missing',
+      fixAction: ''
+    },
+    {
+      id: 2,
+      active: true,
+      selectorOne: 'component',
+      conditionOne: 'fizzler.1.2.0.nupkg',
+      selectorTwo: 'PURL',
+      conditionTwo: 'Missing',
+      fixAction: ''
+    }
+  ])
 
   return (
     <GlobalContext.Provider
@@ -39,7 +63,11 @@ const ContextWrapper = (props) => {
         healthCheckData,
         setHealthCheckData,
         changelogData,
-        setChangelogData
+        setChangelogData,
+        productVulData,
+        setProductVulData,
+        automationRules,
+        setAutomationRules
       }}
     >
       {props.children}

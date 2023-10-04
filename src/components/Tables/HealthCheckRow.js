@@ -30,8 +30,6 @@ function HealthCheckRow(props) {
 
   const { healthCheckData, setHealthCheckData } = useContext(GlobalContext)
 
-  const [isIgnored, setIsIgnored] = useState(false)
-
   const supplierBtn = useRef(null)
   const compBtn = useRef(null)
 
@@ -60,7 +58,10 @@ function HealthCheckRow(props) {
       return onPrimaryOpen()
     }
 
-    if (shortDesc === 'Component Supplier' || shortDesc === 'Component Author') {
+    if (
+      shortDesc === 'Component Supplier' ||
+      shortDesc === 'Component Author'
+    ) {
       return onSupplierOpen()
     }
 

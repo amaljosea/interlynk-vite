@@ -48,8 +48,6 @@ const SidebarContent = ({ logoText, routes }) => {
     const activeColor = useColorModeValue('gray.900', 'white')
     const inactiveColor = useColorModeValue('gray.500', 'gray.500')
 
-    console.log(`routes`, routes)
-
     return routes
       .filter((item) => item.path !== '/autofix')
       .map((prop, index) => {

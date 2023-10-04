@@ -22,7 +22,11 @@ const GlobalContext = React.createContext({
   healthCheckData: [],
   setHealthCheckData: () => {},
   changelogData: [],
-  setChangelogData: () => {}
+  setChangelogData: () => {},
+  productVulData: [],
+  setProductVulData: () => {},
+  automationRules: [],
+  setAutomationRules: () => {}
 })
 
 export default GlobalContext

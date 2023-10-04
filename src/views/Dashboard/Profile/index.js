@@ -85,7 +85,7 @@ function Profile() {
                 </TabList>
                 <TabPanels>
                   {/* GEENRAL */}
-                  <TabPanel px={0}>
+                  <TabPanel>
                     <Grid
                       width={'100%'}
                       templateColumns={{ sm: '1fr', xl: 'repeat(2, 1fr)' }}
@@ -99,7 +99,7 @@ function Profile() {
                     <TeamsLog />
                   </TabPanel>
                   {/* FEEDS */}
-                  <TabPanel px={0}>
+                  <TabPanel>
                     <Grid
                       width={'100%'}
                       templateColumns={{ sm: '1fr', xl: 'repeat(3, 1fr)' }}
@@ -110,11 +110,11 @@ function Profile() {
                     </Grid>
                   </TabPanel>
                   {/* RULES */}
-                  <TabPanel px={0}>
+                  <TabPanel>
                     <ApiFeed />
                   </TabPanel>
                   {/* LISTS */}
-                  <TabPanel px={0}>
+                  <TabPanel>
                     <Grid
                       width={'100%'}
                       templateColumns={{ sm: '1fr', xl: 'repeat(3, 1fr)' }}

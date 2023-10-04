@@ -45,7 +45,6 @@ import FilterMenu from './FilterMenu'
 // ICONS
 import { AddIcon } from '@chakra-ui/icons'
 import { FaFilter } from 'react-icons/fa'
-import { Vulnerabilities } from 'variables/general'
 import VulnTable from 'components/Tables/VulnTable'
 
 const SBOMTable = ({
@@ -58,7 +57,9 @@ const SBOMTable = ({
   type,
   pageIndex
 }) => {
-  const { healthCheckData, changelogData } = useContext(GlobalContext)
+  const { healthCheckData, changelogData, productVulData } = useContext(
+    GlobalContext
+  )
 
   const textColor = useColorModeValue('gray.700', 'white')
 
@@ -184,7 +185,7 @@ const SBOMTable = ({
             <Tab _focus={{ outline: 'none' }}>Components</Tab>
             <Tab _focus={{ outline: 'none' }}>Vulnerabilities</Tab>
             <Tab _focus={{ outline: 'none' }}>Checks</Tab>
-            <Tab _focus={{ outline: 'none' }}>Change log</Tab>
+            <Tab _focus={{ outline: 'none' }}>Change Log</Tab>
           </TabList>
           <TabPanels>
             {/* GENERAL TABLE */}
@@ -195,6 +196,7 @@ const SBOMTable = ({
                   variant='simple'
                   color={textColor}
                   size='sm'
+                  mt={10}
                 >
                   <Thead>
                     <Tr>
@@ -220,28 +222,6 @@ const SBOMTable = ({
             </TabPanel>
             {/* COMPONENT TABLE */}
             <TabPanel>
-              {!customerView && (
-                <CardHeader>
-                  <Flex
-                    width={'100%'}
-                    alignItems={'flex-end'}
-                    justifyContent={'flex-end'}
-                  >
-                    <Button
-                      ref={compBtn}
-                      onClick={onCompOpen}
-                      leftIcon={<AddIcon />}
-                      colorScheme='blue'
-                      variant='solid'
-                      mb={6}
-                      fontSize={'sm'}
-                      isDisabled={data.lifecycle === 'signed'}
-                    >
-                      Component
-                    </Button>
-                  </Flex>
-                </CardHeader>
-              )}
               <CardBody>
                 <ComponentTable
                   data={data.components.nodes}
@@ -249,7 +229,6 @@ const SBOMTable = ({
                   type={type}
                 />
               </CardBody>
-
               {/* pagination */}
               {data && (
                 <Flex
@@ -283,7 +262,7 @@ const SBOMTable = ({
             {/* VUNERABILITIES TABLE */}
             <TabPanel>
               <CardBody>
-                <VulnTable data={Vulnerabilities} />
+                <VulnTable data={productVulData} />
               </CardBody>
             </TabPanel>
             {/* HEALTH CHECK TABLE */}
@@ -444,7 +423,7 @@ const SBOMTable = ({
               </CardHeader>
               <CardBody overflowX={'scroll'}>
                 <Table
-                  __css={{ tableLayout: 'flex', width: '100%' }}
+                  // __css={{ tableLayout: 'flex', width: '100%' }}
                   variant='simple'
                   color={textColor}
                   size='sm'
@@ -533,26 +512,6 @@ const SBOMTable = ({
           isOpen={isSupOpen}
           onClose={onSupClose}
           suppliers={data.suppliers}
-        />
-      )}
-
-      {/* COMPONENT DRAWER */}
-      {isCompOpen && data && !customerView && (
-        <ComponentDrawer
-          isOpen={isCompOpen}
-          onClose={onCompClose}
-          btnRef={compBtn}
-          component={''}
-          version={''}
-          license={''}
-          type={type}
-          cpes={[]}
-          purl={''}
-          primary={false}
-          internal={false}
-          refetch={refetch}
-          suppliers={null}
-          shortDesc={null}
         />
       )}
     </>

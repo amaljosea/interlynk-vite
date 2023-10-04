@@ -75,7 +75,7 @@ export const dashRoutes = [
   },
   {
     path: '/autofix',
-    name: 'Auto Fix',
+    name: 'Settings',
     icon: <TbSettingsAutomation color='inherit' />,
     component: Automation,
     layout: '/vendor'

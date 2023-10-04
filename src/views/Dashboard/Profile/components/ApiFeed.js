@@ -11,7 +11,8 @@ import {
   Switch,
   useColorModeValue,
   Select,
-  Link
+  Link,
+  Box
 } from '@chakra-ui/react'
 // Custom components
 import Card from 'components/Card/Card'
@@ -27,11 +28,11 @@ const ApiFeed = () => {
   const [orgHealthCheck, setOrgHealthCheck] = useState(orgHealthChecks)
 
   const options = [
-    { value: 'Critical', label: 'Critical', bg:'red'},
-    { value: 'High', label: 'High', bg:'orange' },
-    { value: 'Medium', label: 'Medium', bg:'yellow' },
-    { value: 'Low', label: 'Low', bg:'green' },
-    { value: 'None', label: 'None', bg:'gray' }
+    { value: 'Critical', label: 'Critical', bg: 'red' },
+    { value: 'High', label: 'High', bg: 'orange' },
+    { value: 'Medium', label: 'Medium', bg: 'yellow' },
+    { value: 'Low', label: 'Low', bg: 'green' },
+    { value: 'None', label: 'None', bg: 'gray' }
   ]
 
   // Define a mapping of status values to background colors
@@ -41,7 +42,7 @@ const ApiFeed = () => {
     Medium: 'blue.300',
     Low: 'green.300',
     None: 'gray.300'
-  };
+  }
 
   const handleStatusChange = (id, value) => {
     const updatedData = orgHealthCheck.map((item) =>
@@ -59,14 +60,22 @@ const ApiFeed = () => {
       </CardHeader>
       <CardBody>
         <Table variant='simple' size='sm'>
-        <Thead>
-                        <Tr my='.8rem'>
-                          <Th pl={0}>Active</Th>
-                          <Th pl={0}>Check ID</Th>
-                          <Th pl={0}>Description</Th>
-                          <Th pl={0}>Severity</Th>
-                        </Tr>
-                      </Thead>
+          <Thead mb={2}>
+            <Tr my='.8rem'>
+              <Th pl={0}>
+                <Box>Active</Box>
+              </Th>
+              <Th pl={0}>
+                <Box>Check ID</Box>
+              </Th>
+              <Th pl={0}>
+                <Box>Description</Box>
+              </Th>
+              <Th pl={0}>
+                <Box>Severity</Box>
+              </Th>
+            </Tr>
+          </Thead>
           <Tbody>
             {orgHealthCheck.map((api, index) => (
               <Tr key={index}>
@@ -92,6 +101,7 @@ const ApiFeed = () => {
                 <Td pl={0}>
                   <Select
                     width={'130px'}
+                    size='sm'
                     value={api.status}
                     onChange={(e) => handleStatusChange(api.id, e.target.value)}
                     bg={sevColor(api.status.toLowerCase()) + '.200'}

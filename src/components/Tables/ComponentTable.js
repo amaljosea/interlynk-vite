@@ -1,5 +1,5 @@
 // Chakra imports
-import { ViewIcon } from '@chakra-ui/icons'
+import { AddIcon, ViewIcon } from '@chakra-ui/icons'
 import {
   Flex,
   Text,
@@ -19,7 +19,9 @@ import {
   GridItem,
   HStack,
   TagCloseButton,
-  Link
+  Link,
+  Button,
+  Input
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
@@ -32,7 +34,7 @@ import {
 } from 'react-icons/fa'
 import { licenseOptions } from 'variables/licenses'
 import { timeSince, GetIcon } from 'utils'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useMemo, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import ComponentModal from 'views/Sbom/components/ComponentModal'
@@ -53,6 +55,21 @@ const customStyles = {
   }
 }
 
+const FilterComponent = ({ filterText, onFilter, onClear }) => (
+  <>
+    <Input
+      width={'300px'}
+      marginRight={'auto'}
+      id='search'
+      type='text'
+      placeholder='Search'
+      aria-label='Search Input'
+      value={filterText}
+      onChange={onFilter}
+    />
+  </>
+)
+
 const ComponentTable = ({ data, refetch, type }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -63,6 +80,14 @@ const ComponentTable = ({ data, refetch, type }) => {
   const customerView = location.pathname.startsWith('/customer')
 
   const [activeRow, setActiveRow] = useState(null)
+
+  const [filterText, setFilterText] = useState('')
+  const [resetPaginationToggle, setResetPaginationToggle] = useState(false)
+
+  const filteredItems = data.filter(
+    (item) =>
+      item.name && item.name.toLowerCase().includes(filterText.toLowerCase())
+  )
 
   const compBtn = useRef(null)
   const linkRef = useRef(null)
@@ -84,6 +109,13 @@ const ComponentTable = ({ data, refetch, type }) => {
     isOpen: isLinkOpen,
     onOpen: onLinkOpen,
     onClose: onLinkClose
+  } = useDisclosure()
+
+  const {
+    isOpen: isCompOpen,
+    onOpen: onCompOpen,
+    onClose: onCompClose,
+    onToggle: onCompToggle
   } = useDisclosure()
 
   const columns = [
@@ -470,6 +502,42 @@ const ComponentTable = ({ data, refetch, type }) => {
     )
   }
 
+  const subHeaderComponentMemo = useMemo(() => {
+    const handleClear = () => {
+      if (filterText) {
+        setResetPaginationToggle(!resetPaginationToggle)
+        setFilterText('')
+      }
+    }
+
+    return (
+      <Flex
+        width={'100%'}
+        alignItems={'center'}
+        justifyContent={'space-between'}
+      >
+        <FilterComponent
+          onFilter={(e) => setFilterText(e.target.value)}
+          onClear={handleClear}
+          filterText={filterText}
+        />
+
+        <Button
+          ref={compBtn}
+          onClick={onCompOpen}
+          leftIcon={<AddIcon />}
+          colorScheme='blue'
+          variant='solid'
+          mb={6}
+          fontSize={'sm'}
+          isDisabled={data.lifecycle === 'signed'}
+        >
+          Component
+        </Button>
+      </Flex>
+    )
+  }, [filterText, resetPaginationToggle])
+
   const handleSort = (column, sortDirection) => {
     console.log(`column`, column)
     console.log(`sortDirection`, sortDirection)
@@ -487,12 +555,14 @@ const ComponentTable = ({ data, refetch, type }) => {
         <Flex flexDir={'column'} width={'100%'}>
           <DataTable
             columns={columns}
-            data={data}
+            data={filteredItems}
             onSort={handleSort}
             customStyles={customStyles}
             defaultSortAsc
             defaultSortFieldId={'name'}
             progressPending={data.length === 0}
+            subHeader
+            subHeaderComponent={subHeaderComponentMemo}
             expandableRows
             expandableRowsComponent={ExpandedComponent}
             responsive={true}
@@ -562,6 +632,26 @@ const ComponentTable = ({ data, refetch, type }) => {
             />
           )}
         </>
+      )}
+
+      {/* COMPONENT DRAWER */}
+      {isCompOpen && data && !customerView && (
+        <ComponentDrawer
+          isOpen={isCompOpen}
+          onClose={onCompClose}
+          btnRef={compBtn}
+          component={''}
+          version={''}
+          license={''}
+          type={type}
+          cpes={[]}
+          purl={''}
+          primary={false}
+          internal={false}
+          refetch={refetch}
+          suppliers={null}
+          shortDesc={null}
+        />
       )}
     </>
   )

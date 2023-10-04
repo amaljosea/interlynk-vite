@@ -84,7 +84,12 @@ const CheckModal = ({ isOpen, onClose, id, shortDesc }) => {
   const [comp, setComp] = useState('')
   const [componentData, setComponentData] = useState([])
 
-  const { healthCheckData, setHealthCheckData } = useContext(GlobalContext)
+  const {
+    healthCheckData,
+    setHealthCheckData,
+    automationRules,
+    setAutomationRules
+  } = useContext(GlobalContext)
 
   const handleComponentChange = (e) => {
     const value = e.target.value
@@ -92,7 +97,7 @@ const CheckModal = ({ isOpen, onClose, id, shortDesc }) => {
     if (value === '') {
       setComponentData([])
     } else {
-      setComponentData(components.filter(str => str.startsWith(value)))
+      setComponentData(components.filter((str) => str.startsWith(value)))
     }
   }
 
@@ -107,12 +112,27 @@ const CheckModal = ({ isOpen, onClose, id, shortDesc }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
+
     const updatedItems = healthCheckData.map((item) => {
       if (item.id === id) {
         return { ...item, status: 'active' }
       }
       return item
     })
+
+    if (shortDesc === 'Primary Component') {
+      const newRow = {
+        id: Date.now(),
+        active: true,
+        selectorOne: 'document',
+        conditionOne: '',
+        selectorTwo: 'Primary Component',
+        conditionTwo: 'Missing',
+        fixAction: ''
+      }
+      setAutomationRules([newRow, ...automationRules])
+    }
+
     setHealthCheckData(updatedItems)
     onClose()
   }

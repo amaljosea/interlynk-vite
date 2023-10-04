@@ -1,4 +1,4 @@
-import { Td, Tr, Tag } from '@chakra-ui/react'
+import { Td, Tr, Tag, Tooltip, Text } from '@chakra-ui/react'
 
 function ChangelogRow(props) {
   const { type, object, prevValue, newValue, changedBy, time } = props
@@ -25,9 +25,25 @@ function ChangelogRow(props) {
           {type}
         </Tag>
       </Td>
-      <Td textTransform={'capitalize'}>{object}</Td>
+      <Td textTransform={'capitalize'}>
+        <Tooltip label={object} placement='top'>
+          <Text>
+            {object !== null
+              ? `${object?.substring(0, 15)}${object.length > 15 ? '...': ''}`
+              : ''}
+          </Text>
+        </Tooltip>
+      </Td>
       <Td>{prevValue}</Td>
-      <Td>{newValue}</Td>
+      <Td>
+        <Tooltip label={newValue} placement='top'>
+          <Text>
+            {newValue !== ''
+              ? `${newValue?.substring(0, 15)}${newValue.length > 15 ? '...' : ''}`
+              : ''}
+          </Text>
+        </Tooltip>
+      </Td>
       <Td width={'200px'}>{changedBy}</Td>
       <Td>
         {new Date(time).toLocaleDateString('en-US', {
