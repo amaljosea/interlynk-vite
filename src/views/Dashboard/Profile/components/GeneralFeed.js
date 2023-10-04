@@ -54,7 +54,8 @@ const GeneralFeed = ({ orgInfo }) => {
                 value={orgName}
                 onChange={(e) => setOrgName(e.target.value)}
               />
-              <Button variant='solid' colorScheme={'blue'}>
+              <Button
+              width={'100px'} variant='solid' colorScheme={'blue'}>
                 Update
               </Button>
             </HStack>
@@ -69,6 +70,7 @@ const GeneralFeed = ({ orgInfo }) => {
                 readOnly
               />
               <Button
+              width={'100px'}
                 variant='solid'
                 colorScheme={'blue'}
                 onClick={() => id.onCopy()}

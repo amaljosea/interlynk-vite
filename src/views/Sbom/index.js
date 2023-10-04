@@ -353,7 +353,7 @@ function SBOM() {
                       <Flex direction={'column'} gap={1}>
                         <Text fontWeight={'semibold'} fontSize={18}>
                           {sbomData.sbom.project.name} :{' '}
-                          {sbomData.sbom.primaryComponent?.version}:{' '}
+                          {sbomData.sbom.primaryComponent?.version}
                         </Text>
                         <Text fontSize='xs' cursor={'pointer'}>
                           Last updated at : {timeSince(sbomData.sbom.updatedAt)}

@@ -18,29 +18,21 @@ import {
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
+import GlobalContext from 'context/GlobalContext'
 import React, { useState } from 'react'
+import { useContext } from 'react'
 
 const Automation = () => {
   const captions = [
     'Active',
-    'Selector',
-    'Condition',
-    'Selector',
-    'Condition Two',
-    'Fix Action'
+    'Rule Applies To',
+    'Name',
+    'Attribute',
+    'Status',
+    'Fix'
   ]
 
-  const [data, setData] = useState([
-    {
-      id: 1,
-      active: true,
-      selectorOne: '',
-      conditionOne: '',
-      selectorTwo: '',
-      conditionTwo: '',
-      fixAction: ''
-    }
-  ])
+  const { automationRules, setAutomationRules } = useContext(GlobalContext)
 
   const addRow = () => {
     const newRow = {
@@ -52,16 +44,16 @@ const Automation = () => {
       conditionTwo: '',
       fixAction: ''
     }
-    setData([...data, newRow])
+    setAutomationRules([...automationRules, newRow])
   }
 
   const deleteRow = (id) => {
-    const updatedData = data.filter((item) => item.id !== id)
-    setData(updatedData)
+    const updatedData = automationRules.filter((item) => item.id !== id)
+    setAutomationRules(updatedData)
   }
 
   const handleInputChange = (id, column, value) => {
-    const updatedData = data.map((item) => {
+    const updatedData = automationRules.map((item) => {
       if (item.id === id && column === 'selectorOne') {
         return { ...item, [column]: value, selectorTwo: '' }
       }
@@ -70,7 +62,7 @@ const Automation = () => {
       }
       return item
     })
-    setData(updatedData)
+    setAutomationRules(updatedData)
   }
 
   return (
@@ -107,7 +99,7 @@ const Automation = () => {
               </Tr>
             </Thead>
             <Tbody>
-              {data.map((row) => (
+              {automationRules.map((row) => (
                 <Tr key={row.id}>
                   <Td>
                     <Switch
@@ -133,6 +125,8 @@ const Automation = () => {
                   <Td>
                     <Input
                       size='sm'
+                      disabled={row.selectorOne === 'document'}
+                      placeholder='Add name'
                       value={row.conditionOne}
                       onChange={(e) =>
                         handleInputChange(
@@ -167,6 +161,7 @@ const Automation = () => {
                         <option value='Primary Component'>
                           Primary Component
                         </option>
+                        <option value='Supplier'>Supplier</option>
                       </Select>
                     ) : (
                       <Select
@@ -202,8 +197,8 @@ const Automation = () => {
                       }
                     >
                       <option value=''>-- Select --</option>
-                      <option value='missing'>Missing</option>
-                      <option value='invalid'>Invalid</option>
+                      <option value='Missing'>Missing</option>
+                      <option value='Invalid'>Invalid</option>
                     </Select>
                   </Td>
                   <Td>

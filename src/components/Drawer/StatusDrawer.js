@@ -24,13 +24,14 @@ import {
   useToast
 } from '@chakra-ui/react'
 import VulLinkRow from 'components/Tables/VulLinkRow'
+import GlobalContext from 'context/GlobalContext'
 import { VexVulnCreate } from 'graphQL/Mutation'
 import {
   getVexStatuses,
   getVexJustifications,
   getVexLogs
 } from 'graphQL/Queries'
-import React from 'react'
+import React, { useContext } from 'react'
 import { useEffect } from 'react'
 import { useState } from 'react'
 
@@ -45,11 +46,13 @@ const StatusDrawer = ({
   imgVersionId,
   imageInfo,
   textColor,
-  setSelectVersion,
+  id,
   vulnRefetch,
   setVulData
 }) => {
   const toast = useToast()
+
+  const { productVulData, setProductVulData } = useContext(GlobalContext)
 
   const [statusTitle, setStatusTitle] = useState('')
   const [statusName, setStatusName] = useState('')
@@ -91,41 +94,23 @@ const StatusDrawer = ({
   }
 
   const handleAdd = async () => {
-    try {
-      if (statusName === 'Not Affected') {
-        await vexVulnCreate({
-          variables: {
-            imageVersionID: imgVersionId,
-            cveID: cve,
-            compName: component,
-            compVersion: version,
-            notes: notes,
-            vexJustificationID: justification,
-            vexStatusID: statusTitle
-          }
-        }).then(() => refetch())
-      } else {
-        await vexVulnCreate({
-          variables: {
-            imageVersionID: imgVersionId,
-            cveID: cve,
-            compName: component,
-            compVersion: version,
-            notes: notes,
-            vexStatusID: statusTitle,
-            fixedVersionID: selectedTag
-          }
-        }).then(() => refetch())
-      }
-      setSelectVersion('')
-      setJustification('')
-      setNotes('')
-    } catch (error) {
-      // if (error.networkError && error.networkError.statusCode === 500) {
-      //   alert('Invalid entry')
-      // } else {
-      //   alert(error.message)
-      // }
+    // console.log(`Status title`, statusTitle)
+    if (statusTitle !== '') {
+      const updatedItems = productVulData.map((item) => {
+        if (item.id === id) {
+          return { ...item, status: statusTitle }
+        }
+        return item
+      })
+      setProductVulData(updatedItems)
+      onClose()
+    } else {
+      toast({
+        description: 'Please select status',
+        status: 'error',
+        duration: 3000,
+        position: 'top'
+      })
     }
   }
 
@@ -192,14 +177,18 @@ const StatusDrawer = ({
     }
   }, [cve, status])
 
+  useEffect(() => {
+    setStatusTitle(status)
+  }, [status])
+
   return (
     <Drawer
       isOpen={isOpen}
       placement='right'
       onClose={onClose}
       finalFocusRef={btnRef}
-      closeOnOverlayClick={false}
-      size={location.pathname.startsWith('/customer') ? 'sm' : 'lg'}
+      // closeOnOverlayClick={false}
+      size={location.pathname.startsWith('/customer') ? 'sm' : 'md'}
     >
       <DrawerOverlay />
       <DrawerContent>
@@ -235,7 +224,7 @@ const StatusDrawer = ({
                         <option value=''>-- Select Status --</option>
                         {allVexStatus ? (
                           allVexStatus.vexStatuses.map((st, idx) => (
-                            <option key={idx} value={st.id}>
+                            <option key={idx} value={st.name}>
                               {st.name}
                             </option>
                           ))
@@ -295,7 +284,11 @@ const StatusDrawer = ({
                           color='gray.500'
                         >
                           <option value={'select'}>--Select--</option>
-                          {imageInfo && imageInfo.length > 0 ? (
+                          <option value='v1.0'>v1.0</option>
+                          <option value='v2.0'>v2.0</option>
+                          <option value='v3.0'>v3.0</option>
+                          <option value='v4.0'>v4.0</option>
+                          {/* {imageInfo && imageInfo.length > 0 ? (
                             imageInfo.map((img, index) => (
                               <option key={index} value={img.id}>
                                 {img.name}
@@ -303,7 +296,7 @@ const StatusDrawer = ({
                             ))
                           ) : (
                             <option value={''}>No data found</option>
-                          )}
+                          )} */}
                         </Select>
                       </Box>
                     ) : (
@@ -333,7 +326,7 @@ const StatusDrawer = ({
                     Add
                   </Button>
                 )}
-                <Flex flexDir={'column'}>
+                <Flex flexDir={'column'} display={'none'}>
                   <Text size='md' my={2}>
                     Status History
                   </Text>

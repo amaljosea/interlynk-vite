@@ -210,190 +210,164 @@ export const orgHealthChecks = [
   {
     id: 1,
     title: 'SB-HC-4',
-    link:
-      'https://www.interlynk.io/',
-    description:
-      'SBOM Document has a unique identifier',
-    long_desc: 'SBOM document has a unique identifier field i.e serialNumber for CDX and SPDXID + namespace for SPDX.',
+    link: 'https://www.interlynk.io/',
+    description: 'SBOM Document has a unique identifier',
+    long_desc:
+      'SBOM document has a unique identifier field i.e serialNumber for CDX and SPDXID + namespace for SPDX.',
     status: 'High'
   },
   {
     id: 2,
     title: 'SB-HC-5',
-    link:
-      'https://www.interlynk.io/',
-    description:
-      'Document creation timestamp',
+    link: 'https://www.interlynk.io/',
+    description: 'Document creation timestamp',
     long_desc: 'SBOM document contains a creation timestamp',
     status: 'High'
   },
   {
     id: 3,
     title: 'SB-HC-6',
-    link:
-      'https://www.interlynk.io/',
-    description:
-      'Document has creation tools present',
+    link: 'https://www.interlynk.io/',
+    description: 'Document has creation tools present',
     long_desc: 'SBOM lists tools used to create the document.',
     status: 'High'
   },
   {
     id: 4,
     title: 'SB-HC-7',
-    link:
-      'https://www.interlynk.io/',
-    description:
-      'Document has authors present',
+    link: 'https://www.interlynk.io/',
+    description: 'Document has authors present',
     long_desc: 'SBOM lists authors who created this document.',
     status: 'High'
   },
   {
     id: 5,
     title: 'SB-HC-8',
-    link:
-      'https://www.interlynk.io/',
-    description:
-      'Document has suppliers present',
-    long_desc: 'SBOM lists the organization that supplied the component that the bom describes. The supplier may often be the manufacturer, but may also be a distributor or repackager.SBOM lists the organization that supplied the component that the bom describes. The supplier may often be the manufacturer, but may also be a distributor or repackager.',
+    link: 'https://www.interlynk.io/',
+    description: 'Document has suppliers present',
+    long_desc:
+      'SBOM lists the organization that supplied the component that the bom describes. The supplier may often be the manufacturer, but may also be a distributor or repackager.SBOM lists the organization that supplied the component that the bom describes. The supplier may often be the manufacturer, but may also be a distributor or repackager.',
     status: 'High'
   },
   {
     id: 6,
     title: 'SB-HC-9',
-    link:
-      'https://www.interlynk.io/',
-    description:
-      'Document has data license specified',
-    long_desc: 'This is to alleviate any concern that content in the sbom document is subject to any form of intellectual property right that could restrict the re-use of the information or the creation of another SBOM document for the same project(s).',
+    link: 'https://www.interlynk.io/',
+    description: 'Document has data license specified',
+    long_desc:
+      'This is to alleviate any concern that content in the sbom document is subject to any form of intellectual property right that could restrict the re-use of the information or the creation of another SBOM document for the same project(s).',
     status: 'High'
   },
   {
     id: 7,
     title: 'SB-HC-10',
-    link:
-      'https://www.interlynk.io/',
-    description:
-      'Document has a primary component',
-    long_desc: 'SBOM is used to describe a primary component or package. A primary component is a component that is directly included in a product or service.',
+    link: 'https://www.interlynk.io/',
+    description: 'Document has a primary component',
+    long_desc:
+      'SBOM is used to describe a primary component or package. A primary component is a component that is directly included in a product or service.',
     status: 'Critical'
   },
   {
     id: 8,
     title: 'SB-HC-11',
-    link:
-      'https://www.interlynk.io/',
-    description:
-      'Component has a name',
-    long_desc: 'The name of each component is a short, essential identifier to be maintained.',
+    link: 'https://www.interlynk.io/',
+    description: 'Component has a name',
+    long_desc:
+      'The name of each component is a short, essential identifier to be maintained.',
     status: 'High'
   },
   {
     id: 9,
     title: 'SB-HC-12',
-    link:
-      'https://www.interlynk.io/',
-    description:
-      'Component has a version',
-    long_desc: 'The versioning of a component is a useful for identification purposes and for indicating later changes of the component version.',
+    link: 'https://www.interlynk.io/',
+    description: 'Component has a version',
+    long_desc:
+      'The versioning of a component is a useful for identification purposes and for indicating later changes of the component version.',
     status: 'High'
   },
   {
     id: 10,
     title: 'SB-HC-13',
-    link:
-      'https://www.interlynk.io/',
-    description:
-      'Component has a type',
-    long_desc: 'This is a reasonable estimate of the most likely component usage from the producer and consumer perspective from which both parties can draw conclusions about the context in which the component exists.',
+    link: 'https://www.interlynk.io/',
+    description: 'Component has a type',
+    long_desc:
+      'This is a reasonable estimate of the most likely component usage from the producer and consumer perspective from which both parties can draw conclusions about the context in which the component exists.',
     status: 'Low'
   },
   {
     id: 11,
     title: 'SB-HC-14',
-    link:
-      'https://www.interlynk.io/',
-    description:
-      'Component has a valid type',
-    long_desc: 'The type of each component is a valid type as defined by the specification.',
+    link: 'https://www.interlynk.io/',
+    description: 'Component has a valid type',
+    long_desc:
+      'The type of each component is a valid type as defined by the specification.',
     status: 'Low'
   },
   {
     id: 12,
     title: 'SB-HC-15',
-    link:
-      'https://www.interlynk.io/',
-    description:
-      'Component has a supplier',
-    long_desc: 'Component has a supplier that is a valid organization as defined by the specification.',
+    link: 'https://www.interlynk.io/',
+    description: 'Component has a supplier',
+    long_desc:
+      'Component has a supplier that is a valid organization as defined by the specification.',
     status: 'Low'
   },
   {
     id: 13,
     title: 'SB-HC-16',
-    link:
-      'https://www.interlynk.io/',
-    description:
-      'Component has a unique identifier',
-    long_desc: 'Component has a unique identifier that is a valid based on sbom spec. Can be used for lookups in other db e.g vulns db.',
+    link: 'https://www.interlynk.io/',
+    description: 'Component has a unique identifier',
+    long_desc:
+      'Component has a unique identifier that is a valid based on sbom spec. Can be used for lookups in other db e.g vulns db.',
     status: 'High'
   },
   {
     id: 14,
     title: 'SB-HC-17',
-    link:
-      'https://www.interlynk.io/',
-    description:
-      'Component has a Package URL (PURL)',
+    link: 'https://www.interlynk.io/',
+    description: 'Component has a Package URL (PURL)',
     long_desc: 'Component has a purl, which can be used to lookup vulns.',
     status: 'High'
   },
   {
     id: 15,
     title: 'SB-HC-18',
-    link:
-      'https://www.interlynk.io/',
-    description:
-      'Component has a valid Package URL (PURL)',
+    link: 'https://www.interlynk.io/',
+    description: 'Component has a valid Package URL (PURL)',
     long_desc: 'Component has a valid purl, which can be used to lookup vulns.',
     status: 'High'
   },
   {
     id: 16,
     title: 'SB-HC-19',
-    link:
-      'https://www.interlynk.io/',
-    description:
-      'Component has a Common Platform Enumeration (CPE)',
-    long_desc: 'Component has a cpe, which can be used to lookup vulns from nvd.',
+    link: 'https://www.interlynk.io/',
+    description: 'Component has a Common Platform Enumeration (CPE)',
+    long_desc:
+      'Component has a cpe, which can be used to lookup vulns from nvd.',
     status: 'High'
   },
   {
     id: 17,
     title: 'SB-HC-20',
-    link:
-      'https://www.interlynk.io/',
-    description:
-      'Component has a valid Common Platform Enumeration (CPE)',
-    long_desc: 'Component has a valid cpe, which can be used to lookup vulns from nvd.',
+    link: 'https://www.interlynk.io/',
+    description: 'Component has a valid Common Platform Enumeration (CPE)',
+    long_desc:
+      'Component has a valid cpe, which can be used to lookup vulns from nvd.',
     status: 'High'
   },
   {
     id: 18,
     title: 'SB-HC-21',
-    link:
-      'https://www.interlynk.io/',
-    description:
-      'Component has license/s specified',
+    link: 'https://www.interlynk.io/',
+    description: 'Component has license/s specified',
     long_desc: 'Component has license/s specified.',
     status: 'Medium'
   },
   {
     id: 19,
     title: 'SB-HC-22',
-    link:
-      'https://www.interlynk.io/',
-    description:
-      'Componet has deprecated license/s',
+    link: 'https://www.interlynk.io/',
+    description: 'Componet has deprecated license/s',
     long_desc: 'Component has deprecated license/s.',
     status: 'Medium'
   }
@@ -1312,30 +1286,30 @@ export const Vulnerabilities = [
     id: 1,
     cve: 'CVE-2023-4863',
     cvss: '8.8',
-    severity: 'high',
+    severity: 'low',
     component: 'skiasharp.2.88.0-preview.178.nupkg',
     version: '2.88.0-preview.178',
     status: 'In Triage',
-    source: 'NVD',
+    source: 'NVD'
   },
   {
     id: 2,
     cve: 'CVE-2023-21538',
     cvss: '7.5',
-    severity: 'High',
+    severity: 'high',
     component: 'system.private.datacontractserialization.4.3.0.nupkg',
     version: '4.3.0',
     status: 'In Triage',
-    source: 'NVD',
+    source: 'NVD'
   },
   {
     id: 3,
     cve: 'CVE-2017-11770',
     cvss: '7.5',
-    severity: 'High',
+    severity: 'high',
     component: 'system.security.cryptography.x509certificates.4.3.0.nupkg',
     version: '4.3.0',
     status: 'Fixed',
-    source: 'NVD',
+    source: 'NVD'
   }
 ]

@@ -11,14 +11,49 @@ import {
   Button,
   Link,
   Input,
-  Box
+  Box,
+  Grid,
+  GridItem,
+  Tooltip,
+  Stack,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItemOption,
+  MenuOptionGroup,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  ButtonGroup,
+  Select,
+  FormControl,
+  FormLabel,
+  Drawer,
+  DrawerBody,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerOverlay,
+  DrawerContent,
+  DrawerCloseButton,
+  Table,
+  Thead,
+  Tr,
+  Th,
+  useToast
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
-import { FaEllipsisV } from 'react-icons/fa'
+import { FaEllipsisV, FaFilter } from 'react-icons/fa'
 import { useState, useRef, useMemo } from 'react'
 import { useLocation } from 'react-router-dom'
 import { sevColor } from 'utils'
 import StatusDrawer from 'components/Drawer/StatusDrawer'
+import styled from '@emotion/styled'
+import CopyTable from './CopyTable'
+import { useEffect } from 'react'
 
 const customStyles = {
   headCells: {
@@ -62,26 +97,51 @@ const FilterComponent = ({ filterText, onFilter, onClear }) => (
 
 const VulnTable = ({ data }) => {
   const location = useLocation()
+  const toast = useToast()
   const customerView = location.pathname.startsWith('/customer')
 
   const textColor = useColorModeValue('gray.700', 'white')
 
   const [activeRow, setActiveRow] = useState(null)
   const [vulData, setVulData] = useState([])
+  const [version, setVersion] = useState('')
+
+  const [filterBySev, setFilterBySev] = useState('')
+  const [filterByStatus, setFilterByStatus] = useState('')
 
   const [filterText, setFilterText] = useState('')
   const [resetPaginationToggle, setResetPaginationToggle] = useState(false)
 
-  const filteredItems = data.filter(
-    (item) =>
-      (item.cve && item.cve.toLowerCase().includes(filterText.toLowerCase())) ||
-      (item.component &&
-        item.component.toLowerCase().includes(filterText.toLowerCase()))
-  )
+  const [filteredItems, setFilteredItems] = useState([])
+
+  useEffect(() => {
+    const filterData = data.filter(
+      (item) =>
+        (item.cve &&
+          item.cve.toLowerCase().includes(filterText.toLowerCase())) ||
+        (item.component &&
+          item.component.toLowerCase().includes(filterText.toLowerCase()))
+    )
+
+    setFilteredItems(filterData)
+  }, [filterText])
 
   const btnRef = useRef(null)
+  const tableRef = useRef()
 
   const { isOpen, onOpen, onClose } = useDisclosure()
+
+  const {
+    isOpen: isCopyOpen,
+    onOpen: onCopyOpen,
+    onClose: onCopyClose
+  } = useDisclosure()
+
+  const {
+    isOpen: isTableOpen,
+    onOpen: onTableOpen,
+    onClose: onTableClose
+  } = useDisclosure()
 
   const columns = [
     // CVE ID
@@ -104,15 +164,27 @@ const VulnTable = ({ data }) => {
           </Link>
         )
       },
-      width: '300px'
+      width: '200px'
     },
     // SEVERITY
     {
       id: 'serverity',
       name: 'SEVERITY',
       selector: (row) => (
-        <Text textTransform={'capitalize'}>{row.severity}</Text>
-      )
+        <Tag
+          size='md'
+          key='md'
+          variant='subtle'
+          colorScheme={sevColor(row.severity)}
+          textTransform={'capitalize'}
+          width={'100%'}
+          alignItems={'center'}
+          justifyContent={'center'}
+        >
+          <TagLabel>{row.severity}</TagLabel>
+        </Tag>
+      ),
+      width: '150px'
     },
     // CVSS
     {
@@ -132,21 +204,35 @@ const VulnTable = ({ data }) => {
             </Tag>
           </Flex>
         )
-      }
+      },
+      width: '100px'
     },
     // COMPONENT
     {
       id: 'component',
       name: 'COMPONENT',
-      selector: (row) => (
-        <Text textTransform={'capitalize'}>{row.component}</Text>
-      )
+      selector: (row) => {
+        const { component } = row
+        return (
+          <Tooltip label={component} placement='top'>
+            <Text textTransform={'capitalize'}>
+              {component !== null
+                ? `${component?.substring(0, 20)}${
+                    component.length > 20 ? '...' : ''
+                  }`
+                : ''}
+            </Text>
+          </Tooltip>
+        )
+      },
+      width: '200px'
     },
     // VERSION
     {
       id: 'version',
       name: 'VERSION',
-      selector: (row) => row.version
+      selector: (row) => row.version,
+      width: '200px'
     },
     {
       id: 'source',
@@ -201,6 +287,20 @@ const VulnTable = ({ data }) => {
     }
   ]
 
+  const handleCopy = () => {
+    if (version !== '') {
+      onCopyClose()
+      onTableOpen()
+    } else {
+      toast({
+        description: 'Please select any version',
+        position: 'top',
+        duration: 2000,
+        status: 'error'
+      })
+    }
+  }
+
   const subHeaderComponentMemo = useMemo(() => {
     const handleClear = () => {
       if (filterText) {
@@ -210,13 +310,152 @@ const VulnTable = ({ data }) => {
     }
 
     return (
-      <FilterComponent
-        onFilter={(e) => setFilterText(e.target.value)}
-        onClear={handleClear}
-        filterText={filterText}
-      />
+      <Flex
+        width={'100%'}
+        alignItems={'center'}
+        justifyContent={'space-between'}
+      >
+        <FilterComponent
+          onFilter={(e) => setFilterText(e.target.value)}
+          onClear={handleClear}
+          filterText={filterText}
+        />
+
+        <Stack direction={'row'} spacing={2}>
+          {/* Severity */}
+          <Menu>
+            <MenuButton
+              as={Button}
+              colorScheme='blue'
+              fontWeight='normal'
+              fontSize={'sm'}
+              leftIcon={<FaFilter size={14} />}
+            >
+              Severity
+            </MenuButton>
+            <MenuList>
+              <MenuOptionGroup
+                type='radio'
+                value={filterBySev}
+                onChange={(value) =>
+                  setFilteredItems(
+                    data.filter((item) => item.severity === value)
+                  )
+                }
+              >
+                <MenuItemOption
+                  value={'All'}
+                  fontSize={'sm'}
+                  textTransform={'capitalize'}
+                  onClick={() => setFilteredItems(data)}
+                >
+                  All
+                </MenuItemOption>
+                {['critical', 'high', 'medium', 'low'].map((option, index) => (
+                  <MenuItemOption
+                    key={index}
+                    value={option}
+                    textTransform='capitalize'
+                    fontSize={'sm'}
+                  >
+                    {option}
+                  </MenuItemOption>
+                ))}
+              </MenuOptionGroup>
+            </MenuList>
+          </Menu>
+          {/* Status */}
+          <Menu>
+            <MenuButton
+              as={Button}
+              colorScheme='blue'
+              fontWeight='normal'
+              fontSize={'sm'}
+              leftIcon={<FaFilter size={14} />}
+            >
+              Status
+            </MenuButton>
+            <MenuList>
+              <MenuOptionGroup
+                type='radio'
+                value={filterByStatus}
+                onChange={(value) =>
+                  setFilteredItems(data.filter((item) => item.status === value))
+                }
+              >
+                <MenuItemOption
+                  value={'All'}
+                  fontSize={'sm'}
+                  textTransform={'capitalize'}
+                  onClick={() => setFilteredItems(data)}
+                >
+                  All
+                </MenuItemOption>
+                {[
+                  'In Triage',
+                  'False Positive',
+                  'Affected',
+                  'Not Affected',
+                  'Fixed'
+                ].map((option, index) => (
+                  <MenuItemOption
+                    key={index}
+                    value={option}
+                    textTransform='capitalize'
+                    fontSize={'sm'}
+                  >
+                    {option}
+                  </MenuItemOption>
+                ))}
+              </MenuOptionGroup>
+            </MenuList>
+          </Menu>
+          {/* Copy */}
+
+          <Button
+            variant='solid'
+            colorScheme='blue'
+            fontWeight='normal'
+            fontSize={'sm'}
+            onClick={onCopyOpen}
+          >
+            Copy
+          </Button>
+        </Stack>
+      </Flex>
     )
   }, [filterText, resetPaginationToggle])
+
+  const ExpandedComponent = () => {
+    const CustomText = styled(Text)`
+      font-size: 13px;
+      font-weight: bold;
+      color: #718096;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    `
+
+    return (
+      <Box
+        width={'100%'}
+        p={5}
+        boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
+      >
+        <Grid
+          templateColumns='repeat(2, 1fr)'
+          gap={6}
+          width={'80%'}
+          margin={'0 auto'}
+        >
+          <GridItem w='100%'>
+            <CustomText>Description :</CustomText>
+            <Text mt={1} fontSize={14}></Text>
+          </GridItem>
+          <GridItem w='100%'></GridItem>
+        </Grid>
+      </Box>
+    )
+  }
 
   return (
     <>
@@ -230,7 +469,8 @@ const VulnTable = ({ data }) => {
             subHeader
             subHeaderComponent={subHeaderComponentMemo}
             responsive={true}
-            selectableRows={true}
+            expandableRows
+            expandableRowsComponent={ExpandedComponent}
           />
         </Flex>
       ) : (
@@ -244,6 +484,78 @@ const VulnTable = ({ data }) => {
         </Flex>
       )}
 
+      {/* COPY MODAL */}
+      {isCopyOpen && (
+        <Modal isOpen={isCopyOpen} onClose={onCopyClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalCloseButton />
+            <ModalHeader>Copy</ModalHeader>
+            <ModalBody mt={2}>
+              <FormControl>
+                <FormLabel>Status Copy From</FormLabel>
+                <Select
+                  value={version}
+                  onChange={(e) => setVersion(e.target.value)}
+                >
+                  <option value=''>-- Select --</option>
+                  <option value='v1.0'>v1.0</option>
+                  <option value='v2.0'>v2.0</option>
+                  <option value='v3.0'>v3.0</option>
+                  <option value='v4.0'>v4.0</option>
+                </Select>
+              </FormControl>
+            </ModalBody>
+
+            <ModalFooter>
+              <Button variant='solid' colorScheme='blue' onClick={handleCopy}>
+                Apply
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      )}
+
+      {/* COPY DATA TABLE */}
+      {isTableOpen && (
+        <Drawer
+          isOpen={isTableOpen}
+          placement='right'
+          size='2xl'
+          onClose={onTableClose}
+          finalFocusRef={tableRef}
+        >
+          <DrawerOverlay />
+          <DrawerContent>
+            <DrawerCloseButton />
+            <DrawerHeader></DrawerHeader>
+
+            <DrawerBody mt={4}>
+              <CopyTable
+                data={[
+                  {
+                    cve: 'CVE-2023-24532',
+                    componentOne: 'dropwizard-core',
+                    versionOne: '1.2.4',
+                    componentTwo: 'dropwizard-core2',
+                    versionTwo: '1.2.6'
+                  }
+                ]}
+              />
+            </DrawerBody>
+
+            <DrawerFooter>
+              <Button variant='outline' mr={3} onClick={onTableClose}>
+                Cancel
+              </Button>
+              <Button variant='solid' colorScheme='blue'>
+                Save
+              </Button>
+            </DrawerFooter>
+          </DrawerContent>
+        </Drawer>
+      )}
+
       {/* ACTIONS */}
       {activeRow !== null && (
         <>
@@ -252,6 +564,7 @@ const VulnTable = ({ data }) => {
               isOpen={isOpen}
               onClose={onClose}
               btnRef={btnRef}
+              id={activeRow.id}
               component={activeRow.component}
               version={activeRow.version}
               imageInfo={null}
