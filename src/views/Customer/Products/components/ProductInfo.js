@@ -8,14 +8,17 @@ import {
   Text,
   Select,
   useDisclosure,
-  IconButton
+  IconButton,
+  Stack,
+  Box
 } from '@chakra-ui/react'
 import React, { useState, useEffect, useRef, useContext } from 'react'
 import {
   FaBalanceScale,
   FaCubes,
   FaFileDownload,
-  FaLayerGroup
+  FaLayerGroup,
+  FaProjectDiagram
 } from 'react-icons/fa'
 import { useLocation, useHistory } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
@@ -28,6 +31,7 @@ import SBOMStatistics from 'views/Sbom/components/SBOMStatistics'
 import SBOMTable from 'views/Sbom/components/SBOMTable'
 import DownloadModal from 'views/Sbom/components/DownloadModal'
 import Cookies from 'js-cookie'
+import { CalendarIcon, LockIcon } from '@chakra-ui/icons'
 
 function ProductInfo() {
   const initialRef = useRef(null)
@@ -37,6 +41,8 @@ function ProductInfo() {
   const history = useHistory()
 
   const queryParams = new URLSearchParams(location.search)
+
+  const customerView = location.pathname.startsWith('/customer')
 
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
@@ -180,20 +186,87 @@ function ProductInfo() {
                     width={'100%'}
                   >
                     <Icon as={FaCubes} h={'64px'} w={'64px'} color='blue.300' />
-                    <Flex direction={'column'} gap={1}>
-                      <Text fontWeight={'semibold'} fontSize={18}>
-                        <Flex
-                          alignItems={'center'}
-                          flexDirection={'row'}
-                          gap={3}
-                        >
-                          { sbomData.sbom.project.name } : {' '}
-                          { sbomData.sbom.primaryComponent?.version }
-                        </Flex>
+                    <Flex direction={'column'} gap={0.5}>
+                      {/* PRODUCT TITLE */}
+                      <Text fontWeight={'semibold'} fontSize={20}>
+                        {sbomData.sbom.project.name} :{' '}
+                        {sbomData.sbom.primaryComponent?.version}
+                      </Text>
+                      <Text fontSize={'sm'}>
+                        A common specification for continous delivery events
                       </Text>
                       <Text fontSize='xs' cursor={'pointer'}>
                         Last updated at : {timeSince(sbomData.sbom.updatedAt)}
                       </Text>
+                      {/* STATS */}
+                      <Flex
+                        mt={3}
+                        flexDir={'row'}
+                        alignItems={'center'}
+                        gap={4}
+                      >
+                        {/* components */}
+                        <Stack
+                          direction={'row'}
+                          alignItems={'flex-start'}
+                          spacing={3}
+                        >
+                          <Icon
+                            h={6}
+                            w={6}
+                            color='#777'
+                            as={FaProjectDiagram}
+                          />
+                          <Box>
+                            <Text fontWeight={'medium'} fontSize={'sm'}>
+                              {sbomData.sbom.stats.compCount}
+                            </Text>
+                            <Text fontSize={'xs'}>Components</Text>
+                          </Box>
+                        </Stack>
+                        {/* license */}
+                        <Stack
+                          direction={'row'}
+                          alignItems={'flex-start'}
+                          spacing={3}
+                        >
+                          <Icon h={6} w={6} color='#777' as={FaBalanceScale} />
+                          <Box>
+                            <Text fontWeight={'medium'} fontSize={'sm'}>
+                              {sbomData.sbom.stats.compLicenseCount}
+                            </Text>
+                            <Text fontSize={'xs'}>Licenses</Text>
+                          </Box>
+                        </Stack>
+                        {/* PURL */}
+                        <Stack
+                          direction={'row'}
+                          alignItems={'flex-start'}
+                          spacing={3}
+                        >
+                          <Icon h={5} w={5} color='#777' as={CalendarIcon} />
+                          <Box>
+                            <Text fontWeight={'medium'} fontSize={'sm'}>
+                              {sbomData.sbom.stats.compPurlCount}
+                            </Text>
+                            <Text fontSize={'xs'}>PURL</Text>
+                          </Box>
+                        </Stack>
+                        {/* CPE */}
+                        <Stack
+                          direction={'row'}
+                          alignItems={'flex-start'}
+                          spacing={3}
+                        >
+                          <Icon h={5} w={5} color='#777' as={LockIcon} />
+                          <Box>
+                            <Text fontWeight={'medium'} fontSize={'sm'}>
+                              {sbomData.sbom.stats.compCpeCount}
+                            </Text>
+                            <Text fontSize={'xs'}>CPE</Text>
+                          </Box>
+                        </Stack>
+                      </Flex>
                     </Flex>
                   </Flex>
                 ) : (
@@ -243,25 +316,7 @@ function ProductInfo() {
             </Grid>
           </CardBody>
         </Card>
-        <Flex direction='row' gap='2'>
-          <SBOMStatistics
-            icon={<Icon h={'24px'} w={'24px'} color='white' as={FaCubes} />}
-            title={'Components'}
-            description={'Components included in SBOM'}
-            amount={sbomData ? sbomData.sbom.stats.compCount : 'Loading...'}
-          />
-          <Spacer />
-          <SBOMStatistics
-            icon={
-              <Icon h={'24px'} w={'24px'} color='white' as={FaBalanceScale} />
-            }
-            title={'Licenses'}
-            description={'Unique licenses included in SBOM'}
-            amount={
-              sbomData ? sbomData.sbom.stats.compLicenseCount : 'Loading...'
-            }
-          />
-        </Flex>
+
         {sbomData && (
           <SBOMTable
             title={'SBOM'}

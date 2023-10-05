@@ -9,6 +9,8 @@ import {
   Tooltip,
   MenuButton,
   Menu,
+  MenuOptionGroup,
+  MenuItemOption,
   Portal,
   MenuList,
   MenuItem,
@@ -21,12 +23,14 @@ import {
   TagCloseButton,
   Link,
   Button,
-  Input
+  Input,
+  Badge
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
 import {
   FaEllipsisV,
+  FaFilter,
   FaGlobe,
   FaHouseUser,
   FaLightbulb,
@@ -58,14 +62,11 @@ const customStyles = {
 const FilterComponent = ({ filterText, onFilter, onClear }) => (
   <>
     <Input
-      width={'300px'}
-      marginRight={'auto'}
+      width={'400px'}
       id='search'
       type='text'
       placeholder='Search'
       aria-label='Search Input'
-      value={filterText}
-      onChange={onFilter}
     />
   </>
 )
@@ -80,6 +81,10 @@ const ComponentTable = ({ data, refetch, type }) => {
   const customerView = location.pathname.startsWith('/customer')
 
   const [activeRow, setActiveRow] = useState(null)
+
+  const [filterNpm, setFilterNpm] = useState([])
+  const [filterNuget, setFilterNuget] = useState([])
+  const [filterRuby, setFilterRuby] = useState([])
 
   const [filterText, setFilterText] = useState('')
   const [resetPaginationToggle, setResetPaginationToggle] = useState(false)
@@ -502,6 +507,9 @@ const ComponentTable = ({ data, refetch, type }) => {
     )
   }
 
+  const activeFiltersCount =
+    filterNpm.length + filterNuget.length + filterRuby.length
+
   const subHeaderComponentMemo = useMemo(() => {
     const handleClear = () => {
       if (filterText) {
@@ -516,19 +524,89 @@ const ComponentTable = ({ data, refetch, type }) => {
         alignItems={'center'}
         justifyContent={'space-between'}
       >
-        <FilterComponent
-          onFilter={(e) => setFilterText(e.target.value)}
-          onClear={handleClear}
-          filterText={filterText}
-        />
+        <Stack
+          width={'100%'}
+          direction={'row'}
+          spacing={4}
+          alignItems={'center'}
+        >
+          {/* SEARCH COMPONENTS */}
+          <FilterComponent
+            onFilter={(e) => setFilterText(e.target.value)}
+            onClear={handleClear}
+            filterText={filterText}
+          />
+          {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
 
+          <Box width={'fit-content'} position={'relative'}>
+            <Menu closeOnSelect={true}>
+              {activeFiltersCount > 0 && (
+                <Badge
+                  variant='solid'
+                  colorScheme='teal'
+                  position={'absolute'}
+                  right={-2}
+                  top={-1.5}
+                  zIndex={11}
+                >
+                  {activeFiltersCount}
+                </Badge>
+              )}
+              <MenuButton
+                as={Button}
+                colorScheme='blue'
+                fontWeight='normal'
+                fontSize={'sm'}
+                leftIcon={<FaFilter size={14} />}
+              >
+                Ecosystem
+              </MenuButton>
+              <MenuList>
+                <MenuOptionGroup
+                  type='radio'
+                  onChange={() => window.location.reload()}
+                >
+                  <MenuItemOption value={'All'} fontSize={'sm'}>
+                    All
+                  </MenuItemOption>
+                </MenuOptionGroup>
+                <MenuOptionGroup
+                  type='checkbox'
+                  onChange={(value) => setFilterNpm(value)}
+                >
+                  <MenuItemOption value={'NPM'} fontSize={'sm'}>
+                    NPM
+                  </MenuItemOption>
+                </MenuOptionGroup>
+                <MenuOptionGroup
+                  type='checkbox'
+                  onChange={(value) => setFilterNuget(value)}
+                >
+                  <MenuItemOption value={'NuGet'} fontSize={'sm'}>
+                    NuGet
+                  </MenuItemOption>
+                </MenuOptionGroup>
+                <MenuOptionGroup
+                  type='checkbox'
+                  onChange={(value) => setFilterRuby(value)}
+                >
+                  <MenuItemOption value={'RubyGems'} fontSize={'sm'}>
+                    RubyGems
+                  </MenuItemOption>
+                </MenuOptionGroup>
+              </MenuList>
+            </Menu>
+          </Box>
+        </Stack>
+
+        {/* CREATE COMPONENT */}
         <Button
           ref={compBtn}
           onClick={onCompOpen}
           leftIcon={<AddIcon />}
           colorScheme='blue'
           variant='solid'
-          mb={6}
+          fontWeight='normal'
           fontSize={'sm'}
           isDisabled={data.lifecycle === 'signed'}
         >
@@ -536,7 +614,14 @@ const ComponentTable = ({ data, refetch, type }) => {
         </Button>
       </Flex>
     )
-  }, [filterText, resetPaginationToggle])
+  }, [
+    filterText,
+    resetPaginationToggle,
+    activeFiltersCount,
+    filterNpm,
+    filterNuget,
+    filterRuby
+  ])
 
   const handleSort = (column, sortDirection) => {
     console.log(`column`, column)

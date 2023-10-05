@@ -13,7 +13,7 @@ import {
   Select,
   IconButton,
   useDisclosure,
-  Code,
+  chakra,
   Table,
   Thead,
   Tr,
@@ -40,10 +40,11 @@ import {
   FaCubes,
   FaLayerGroup,
   FaFileDownload,
-  FaCopy
+  FaCopy,
+  FaProjectDiagram
 } from 'react-icons/fa'
 import { useLocation, useHistory } from 'react-router-dom'
-import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
+import { CalendarIcon, DeleteIcon, EditIcon, LockIcon } from '@chakra-ui/icons'
 import { useMutation, useQuery } from '@apollo/client'
 import { GetSBOM, GetProject } from 'graphQL/Queries'
 import { timeSince } from 'utils'
@@ -55,6 +56,7 @@ import { sbomDelete } from 'graphQL/Mutation'
 import { TbSignature, TbSignatureOff } from 'react-icons/tb'
 import CopyModal from './components/CopyModal'
 import { GetProjectData } from 'graphQL/Queries'
+import { BiPurchaseTagAlt } from 'react-icons/bi'
 
 function SBOM() {
   const initialRef = useRef(null)
@@ -128,7 +130,7 @@ function SBOM() {
   // }, [sbomData])
 
   const handlePreviousPage = () => {
-    setPageIndex((prev) => prev !== 0 && prev - 1)
+    setPageIndex((prev) => pageIndex !== 0 && prev - 1)
     refetch({
       projectId: productId,
       sbomId: sbomId,
@@ -350,15 +352,18 @@ function SBOM() {
                         w={'64px'}
                         color='blue.300'
                       />
-                      <Flex direction={'column'} gap={1}>
-                        <Text fontWeight={'semibold'} fontSize={18}>
-                          {sbomData.sbom.project.name} :{' '}
-                          {sbomData.sbom.primaryComponent?.version}
-                        </Text>
-                        <Text fontSize='xs' cursor={'pointer'}>
-                          Last updated at : {timeSince(sbomData.sbom.updatedAt)}
-                        </Text>
-                        <Flex gap={2} alignItems={'center'}>
+                      <Flex direction={'column'} gap={0.5}>
+                        {/* PRODUCT TITLE */}
+                        <Stack
+                          direction={'row'}
+                          spacing={2}
+                          alignItems={'center'}
+                        >
+                          <Text fontWeight={'semibold'} fontSize={20}>
+                            {sbomData.sbom.project.name} :{' '}
+                            {sbomData.sbom.primaryComponent?.version}
+                          </Text>
+
                           {!customerView && (
                             <Tag
                               size={'sm'}
@@ -366,11 +371,105 @@ function SBOM() {
                               colorScheme='blue'
                             >
                               <TagLabel textTransform={'capitalize'}>
-                                {/* {sbomData.sbom.lifecycle} */}
+                                {sbomData.sbom.lifecycle}
+                              </TagLabel>
+                            </Tag>
+                          )}
+                        </Stack>
+
+                        <Text fontSize={'sm'}>
+                          A common specification for continous delivery events
+                        </Text>
+                        <Text fontSize='sm' cursor={'pointer'}>
+                          Last updated at : {timeSince(sbomData.sbom.updatedAt)}
+                        </Text>
+                        {/* <Flex gap={2} alignItems={'center'} mt={0.5}>
+                          {!customerView && (
+                            <Tag
+                              size={'sm'}
+                              variant='outline'
+                              colorScheme='blue'
+                            >
+                              <TagLabel textTransform={'capitalize'}>
+                                {sbomData.sbom.lifecycle}
                                 {status}
                               </TagLabel>
                             </Tag>
                           )}
+                        </Flex> */}
+                        {/* STATS */}
+                        <Flex
+                          mt={3}
+                          flexDir={'row'}
+                          alignItems={'center'}
+                          gap={4}
+                        >
+                          {/* components */}
+                          <Stack
+                            direction={'row'}
+                            alignItems={'flex-start'}
+                            spacing={3}
+                          >
+                            <Icon
+                              h={6}
+                              w={6}
+                              color='#777'
+                              as={FaProjectDiagram}
+                            />
+                            <Box>
+                              <Text fontWeight={'medium'} fontSize={'sm'}>
+                                {sbomData.sbom.stats.compCount}
+                              </Text>
+                              <Text fontSize={'xs'}>Components</Text>
+                            </Box>
+                          </Stack>
+                          {/* license */}
+                          <Stack
+                            direction={'row'}
+                            alignItems={'flex-start'}
+                            spacing={3}
+                          >
+                            <Icon
+                              h={6}
+                              w={6}
+                              color='#777'
+                              as={FaBalanceScale}
+                            />
+                            <Box>
+                              <Text fontWeight={'medium'} fontSize={'sm'}>
+                                {sbomData.sbom.stats.compLicenseCount}
+                              </Text>
+                              <Text fontSize={'xs'}>Licenses</Text>
+                            </Box>
+                          </Stack>
+                          {/* PURL */}
+                          <Stack
+                            direction={'row'}
+                            alignItems={'flex-start'}
+                            spacing={3}
+                          >
+                            <Icon h={5} w={5} color='#777' as={CalendarIcon} />
+                            <Box>
+                              <Text fontWeight={'medium'} fontSize={'sm'}>
+                                {sbomData.sbom.stats.compPurlCount}
+                              </Text>
+                              <Text fontSize={'xs'}>PURL</Text>
+                            </Box>
+                          </Stack>
+                          {/* CPE */}
+                          <Stack
+                            direction={'row'}
+                            alignItems={'flex-start'}
+                            spacing={3}
+                          >
+                            <Icon h={5} w={5} color='#777' as={LockIcon} />
+                            <Box>
+                              <Text fontWeight={'medium'} fontSize={'sm'}>
+                                {sbomData.sbom.stats.compCpeCount}
+                              </Text>
+                              <Text fontSize={'xs'}>CPE</Text>
+                            </Box>
+                          </Stack>
                         </Flex>
                       </Flex>
                     </Flex>
@@ -476,26 +575,6 @@ function SBOM() {
               </Grid>
             </CardBody>
           </Card>
-          {/* stats */}
-          <Flex direction='row' gap='2'>
-            <SBOMStatistics
-              icon={<Icon h={'24px'} w={'24px'} color='white' as={FaCubes} />}
-              title={'Components'}
-              description={'Components included in SBOM'}
-              amount={sbomData ? sbomData.sbom.stats.compCount : 'Loading...'}
-            />
-            <Spacer />
-            <SBOMStatistics
-              icon={
-                <Icon h={'24px'} w={'24px'} color='white' as={FaBalanceScale} />
-              }
-              title={'Licenses'}
-              description={'Unique licenses included in SBOM'}
-              amount={
-                sbomData ? sbomData.sbom.stats.compLicenseCount : 'Loading...'
-              }
-            />
-          </Flex>
           {/* sbom details */}
           {sbomData && (
             <SBOMTable

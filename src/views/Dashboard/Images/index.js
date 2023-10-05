@@ -403,12 +403,7 @@ const Index = () => {
                   </Select>
                 </ModalBody>
                 <ModalFooter>
-                  <Button
-                    colorScheme='blue'
-                    variant='outline'
-                    mr={3}
-                    onClick={() => onScanClose()}
-                  >
+                  <Button mr={3} onClick={() => onScanClose()}>
                     Cancel
                   </Button>
                   <Button
@@ -455,13 +450,7 @@ const Index = () => {
                   )}
                 </ModalBody>
                 <ModalFooter>
-                  <Button
-                    colorScheme='blue'
-                    variant='outline'
-                    mr={3}
-                    onClick={() => onDeleteClose()}
-                    size='md'
-                  >
+                  <Button mr={3} onClick={() => onDeleteClose()} size='md'>
                     {selectedScanner !== '' ? 'No' : 'Cancel'}
                   </Button>
                   <Button type='submit' size='md' colorScheme='red'>

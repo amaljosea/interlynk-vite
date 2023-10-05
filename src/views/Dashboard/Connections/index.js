@@ -494,12 +494,7 @@ const Connections = () => {
                     </Flex>
                   </ModalBody>
                   <ModalFooter>
-                    <Button
-                      colorScheme='blue'
-                      variant='outline'
-                      onClick={onClose}
-                      mr={4}
-                    >
+                    <Button onClick={onClose} mr={4}>
                       Cancel
                     </Button>
                     <Button colorScheme='blue' type='submit'>

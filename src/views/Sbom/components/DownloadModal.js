@@ -149,7 +149,7 @@ const DownloadModal = ({
             <RadioGroup value={spec} onChange={(value) => setSpec(value)}>
               <Stack spacing={4} direction='row'>
                 <Radio value='cyclonedx'>CycloneDX</Radio>
-                <Radio value='spdx' disabled>SPDX</Radio>
+                {/* <Radio value='spdx' disabled>SPDX</Radio> */}
               </Stack>
             </RadioGroup>
           </Stack>
@@ -161,7 +161,7 @@ const DownloadModal = ({
             <RadioGroup value={format} onChange={(value) => setFormat(value)}>
               <Stack spacing={4} direction='row'>
                 <Radio value='json'>JSON</Radio>
-                <Radio value='xml' disabled>XML</Radio>
+                {/* <Radio value='xml' disabled>XML</Radio> */}
               </Stack>
             </RadioGroup>
 
@@ -185,6 +185,8 @@ const DownloadModal = ({
         </ModalBody>
 
         <ModalFooter>
+          <Button onClick={onClose}>Cancel</Button>
+
           <Button
             colorScheme='blue'
             mr={3}
@@ -192,8 +194,6 @@ const DownloadModal = ({
           >
             Download
           </Button>
-
-          <Button onClick={onClose}>Cancel</Button>
         </ModalFooter>
       </ModalContent>
     </Modal>

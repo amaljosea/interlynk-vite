@@ -274,7 +274,7 @@ const StatusDrawer = ({
                           fontSize='sm'
                           color='gray.600'
                         >
-                          Tag
+                          Version
                         </FormLabel>
                         <Select
                           id='tag'

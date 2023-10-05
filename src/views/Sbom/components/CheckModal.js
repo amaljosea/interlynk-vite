@@ -207,13 +207,13 @@ const CheckModal = ({ isOpen, onClose, id, shortDesc }) => {
           </ModalBody>
 
           <ModalFooter>
-            <Button variant='ghost' mr={3} onClick={onClose}>
+            <Button fontSize={'sm'} mr={3} onClick={onClose}>
               Close
             </Button>
-            <Button colorScheme='green' mr={3} type='submit'>
+            <Button fontSize={'sm'} colorScheme='green' mr={3} type='submit'>
               Save Rule
             </Button>
-            <Button colorScheme='blue' type='submit'>
+            <Button fontSize={'sm'} colorScheme='blue' type='submit'>
               Save Value
             </Button>
           </ModalFooter>
