@@ -1,4 +1,3 @@
-import React, { useState } from 'react'
 import {
   Menu,
   MenuButton,
@@ -10,37 +9,38 @@ import {
   Box,
   Badge
 } from '@chakra-ui/react'
+import React, { useState } from 'react'
 import { FaFilter } from 'react-icons/fa'
 
-const FilterMenu = ({ severityOptions, shortDescOptions, onFilterChange }) => {
-  const [selectedSeverityFilters, setSelectedSeverityFilters] = useState([])
-  const [selectedShortDescFilters, setSelectedShortDescFilters] = useState([])
+const FilterChangelog = ({ onFilterChange }) => {
+  const [selectedTypeFilters, setSelectedTypeFilters] = useState([])
+  const [selectedUserFilters, setSelectedUserFilters] = useState([])
 
-  const handleSeverityFilterChange = (newFilters) => {
-    setSelectedSeverityFilters(newFilters)
+  const handleTypeFilterChange = (newFilters) => {
+    setSelectedTypeFilters(newFilters)
     onFilterChange({
-      severity: newFilters,
-      shortDesc: selectedShortDescFilters
+      type: newFilters,
+      user: selectedUserFilters
     })
   }
 
-  const handleShortDescFilterChange = (newFilters) => {
-    setSelectedShortDescFilters(newFilters)
+  const handleUserFilterChange = (newFilters) => {
+    setSelectedUserFilters(newFilters)
     onFilterChange({
-      severity: selectedSeverityFilters,
-      shortDesc: newFilters
+      type: selectedTypeFilters,
+      user: newFilters
     })
   }
 
-  const activeSevCount = selectedSeverityFilters.length
-  const activeCategoryCount = selectedShortDescFilters.length
+  const activeTypeCount = selectedTypeFilters.length
+  const activeUserCount = selectedUserFilters.length
 
   return (
     <Flex alignItems={'center'} gap={4}>
-      {/* SEVERITY */}
+      {/* TYPE FILTER */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu  closeOnSelect={true}>
-          {activeSevCount > 0 && (
+        <Menu closeOnSelect={true}>
+          {activeTypeCount > 0 && (
             <Badge
               variant='solid'
               colorScheme='teal'
@@ -49,7 +49,7 @@ const FilterMenu = ({ severityOptions, shortDescOptions, onFilterChange }) => {
               top={-1.5}
               zIndex={11}
             >
-              {activeSevCount}
+              {activeTypeCount}
             </Badge>
           )}
           <MenuButton
@@ -59,9 +59,9 @@ const FilterMenu = ({ severityOptions, shortDescOptions, onFilterChange }) => {
             fontSize={'sm'}
             leftIcon={<FaFilter size={14} />}
           >
-            Severity
+            Type
           </MenuButton>
-          <MenuList>
+          <MenuList minWidth='240px'>
             <MenuOptionGroup
               type='radio'
               onChange={() => window.location.reload()}
@@ -70,30 +70,25 @@ const FilterMenu = ({ severityOptions, shortDescOptions, onFilterChange }) => {
                 All
               </MenuItemOption>
             </MenuOptionGroup>
-            <MenuOptionGroup
-              type='checkbox'
-              value={selectedSeverityFilters}
-              onChange={handleSeverityFilterChange}
-            >
-              {severityOptions.map((option) => (
+            <MenuOptionGroup type='checkbox' onChange={handleTypeFilterChange}>
+              {['added', 'modified', 'deleted'].map((p, index) => (
                 <MenuItemOption
-                  key={option}
-                  value={option}
+                  value={p}
+                  key={index}
                   fontSize={'sm'}
-                  textTransform='capitalize'
+                  textTransform={'capitalize'}
                 >
-                  {option}
+                  {p}
                 </MenuItemOption>
               ))}
             </MenuOptionGroup>
           </MenuList>
         </Menu>
       </Box>
-
-      {/* CATEGORY   */}
+      {/* USER FILTER */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu  closeOnSelect={true}>
-          {activeCategoryCount > 0 && (
+        <Menu closeOnSelect={true}>
+          {activeUserCount > 0 && (
             <Badge
               variant='solid'
               colorScheme='teal'
@@ -102,7 +97,7 @@ const FilterMenu = ({ severityOptions, shortDescOptions, onFilterChange }) => {
               top={-1.5}
               zIndex={11}
             >
-              {activeCategoryCount}
+              {activeUserCount}
             </Badge>
           )}
           <MenuButton
@@ -112,9 +107,9 @@ const FilterMenu = ({ severityOptions, shortDescOptions, onFilterChange }) => {
             fontSize={'sm'}
             leftIcon={<FaFilter size={14} />}
           >
-            Category
+            User
           </MenuButton>
-          <MenuList height={'300px'} overflowY={'scroll'} overflow={'hiddens'}>
+          <MenuList minWidth='240px'>
             <MenuOptionGroup
               type='radio'
               onChange={() => window.location.reload()}
@@ -123,19 +118,21 @@ const FilterMenu = ({ severityOptions, shortDescOptions, onFilterChange }) => {
                 All
               </MenuItemOption>
             </MenuOptionGroup>
-            <MenuOptionGroup
-              type='checkbox'
-              value={selectedShortDescFilters}
-              onChange={handleShortDescFilterChange}
-            >
-              {shortDescOptions.map((option) => (
+            <MenuOptionGroup type='checkbox' onChange={handleUserFilterChange}>
+              {[
+                'Abhisek Paul',
+                'Brian B.',
+                'Ritesh Noronha',
+                'Shubham Shete',
+                'Surandra Pathak'
+              ].map((p, index) => (
                 <MenuItemOption
-                  key={option}
-                  value={option}
-                  textTransform='capitalize'
+                  value={p}
+                  key={index}
                   fontSize={'sm'}
+                  textTransform={'capitalize'}
                 >
-                  {option}
+                  {p}
                 </MenuItemOption>
               ))}
             </MenuOptionGroup>
@@ -146,4 +143,4 @@ const FilterMenu = ({ severityOptions, shortDescOptions, onFilterChange }) => {
   )
 }
 
-export default FilterMenu
+export default FilterChangelog

@@ -610,7 +610,7 @@ function ProductSbomDrawer(props) {
             </Stack>
           </DrawerBody>
           <DrawerFooter borderTopWidth='1px'>
-            <Button variant='outline' mr={3} onClick={onClose}>
+            <Button  mr={3} onClick={onClose}>
               Cancel
             </Button>
             {sbomData ? (

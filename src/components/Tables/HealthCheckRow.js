@@ -118,7 +118,7 @@ function HealthCheckRow(props) {
 
   return (
     <Tr>
-      <Td pl={0} textTransform={'uppercase'}>
+      <Td width='120px' pl={0} textTransform={'uppercase'}>
         {healthId}
       </Td>
       <Td>

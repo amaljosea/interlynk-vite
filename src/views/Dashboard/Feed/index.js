@@ -17,7 +17,7 @@ import React, { useState, useEffect } from 'react'
 import { ChevronDownIcon, RepeatIcon } from '@chakra-ui/icons'
 import Timeline from './components/Timeline'
 
-import { FaDownload, FaSlack } from 'react-icons/fa'
+import { FaDownload, FaFilter, FaSlack } from 'react-icons/fa'
 import AdvisoryLog from './components/AdvisoryLog'
 import { useLazyQuery, useQuery } from '@apollo/client'
 import { GetFeedLogs } from 'graphQL/Queries'
@@ -95,26 +95,21 @@ function Advisories() {
         getFeed={GetFeed}
       />
       <Card mt={4} bg='white'>
-      <CardHeader py={2}>
-          <Flex direction='row' width={'100%'}>
+        <CardHeader py={2}>
+          <Flex direction='row' width={'100%'} gap={2}>
+            <Input placeholder='Search' maxW='400px' />
             <Menu>
               <MenuButton
                 as={Button}
-                rightIcon={<ChevronDownIcon />}
-                maxW='150px'
-                px={4}
-                py={2}
-                me={2}
-                transition='all 0.2s'
-                borderRadius='md'
-                borderWidth='1px'
-                fontSize='sm'
-                fontWeight='none'
+                colorScheme='blue'
+                fontWeight='normal'
+                fontSize={'sm'}
+                leftIcon={<FaFilter size={14} />}
               >
                 Source
               </MenuButton>
               <MenuList fontWeight='none' fontSize='sm'>
-                <MenuOptionGroup title='Products'>
+                <MenuOptionGroup>
                   {source.map((p) => (
                     <MenuItemOption
                       value={p}
@@ -140,21 +135,15 @@ function Advisories() {
             <Menu>
               <MenuButton
                 as={Button}
-                rightIcon={<ChevronDownIcon />}
-                maxW='150px'
-                px={4}
-                py={2}
-                me={2}
-                transition='all 0.2s'
-                borderRadius='md'
-                borderWidth='1px'
-                fontSize='sm'
-                fontWeight='none'
+                colorScheme='blue'
+                fontWeight='normal'
+                fontSize={'sm'}
+                leftIcon={<FaFilter size={14} />}
               >
                 Severity
               </MenuButton>
               <MenuList fontWeight='none' fontSize='sm'>
-                <MenuOptionGroup title='Version'>
+                <MenuOptionGroup>
                   {severity.map((p) => (
                     <MenuItemOption
                       value={p}
@@ -177,7 +166,6 @@ function Advisories() {
                 </MenuOptionGroup>
               </MenuList>
             </Menu>
-            <Input placeholder='Search' maxW='300px' />
             <Spacer></Spacer>
             <Flex gap={2} direction={'row'}>
               <Box as={Flex} direction={'row'} gap={2}>

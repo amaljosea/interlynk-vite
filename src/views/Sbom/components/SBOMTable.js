@@ -25,7 +25,8 @@ import {
   Badge,
   useToast,
   Text,
-  Input
+  Input,
+  Stack
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
@@ -46,6 +47,7 @@ import FilterMenu from './FilterMenu'
 import { AddIcon } from '@chakra-ui/icons'
 import { FaFilter } from 'react-icons/fa'
 import VulnTable from 'components/Tables/VulnTable'
+import FilterChangelog from './FilterChangelog'
 
 const SBOMTable = ({
   data,
@@ -96,14 +98,9 @@ const SBOMTable = ({
   const licenseBtn = useRef(null)
 
   const [selectedKey, setSelectedKey] = useState('')
-  const [filterType, setFilterType] = useState('')
-  const [filterUser, setFilterUser] = useState('')
-  const [filteredData, setFilteredData] = useState(healthCheckData)
 
-  // FILTER CHANGE LOG BASED ON TYPE AND USER
-  const filterChangelog = changelogData.filter((item) => {
-    return item.type.includes(filterType) && item.changedBy.includes(filterUser)
-  })
+  const [filteredData, setFilteredData] = useState(healthCheckData)
+  const [filteredChangelog, setFilteredChangelog] = useState(changelogData)
 
   const updateIdenifier = () => {
     toast({
@@ -131,6 +128,26 @@ const SBOMTable = ({
             selectedFilters.shortDesc.includes(item.shortDesc))
       )
       setFilteredData(filtered)
+    }
+  }
+
+  const handleChangelogChange = (selectedFilters) => {
+    if (
+      selectedFilters.type.length === 0 &&
+      selectedFilters.user.length === 0
+    ) {
+      // IF NO FILTER SELECTED RETURN DEFAULT HEALTH CHECK DATA
+      setFilteredChangelog(changelogData)
+    } else {
+      // IF ANY FILTER IS SELECTED RETURN SELECTED DATA
+      const filtered = changelogData.filter(
+        (item) =>
+          (selectedFilters.type.length === 0 ||
+            selectedFilters.type.includes(item.type)) &&
+          (selectedFilters.user.length === 0 ||
+            selectedFilters.user.includes(item.changedBy))
+      )
+      setFilteredChangelog(filtered)
     }
   }
 
@@ -178,7 +195,7 @@ const SBOMTable = ({
 
   return (
     <>
-      <Card my='22px'>
+      <Card>
         <Tabs variant='enclosed'>
           <TabList mt='20px'>
             <Tab _focus={{ outline: 'none' }}>General</Tab>
@@ -267,12 +284,33 @@ const SBOMTable = ({
             </TabPanel>
             {/* HEALTH CHECK TABLE */}
             <TabPanel>
-              <CardHeader>
-                <FilterMenu
-                  severityOptions={severityOptions}
-                  shortDescOptions={shortDescOptions}
-                  onFilterChange={handleFilterChange}
-                />
+              <CardHeader width='100%' mt={1.5}>
+                <Flex
+                  width={'100%'}
+                  alignItems={'center'}
+                  justifyContent={'space-between'}
+                >
+                  <Stack
+                    width={'100%'}
+                    direction={'row'}
+                    spacing={4}
+                    alignItems={'flex-start'}
+                  >
+                    <Input
+                      width={'400px'}
+                      id='search'
+                      type='text'
+                      placeholder='Search'
+                      aria-label='Search Input'
+                    />
+
+                    <FilterMenu
+                      severityOptions={severityOptions}
+                      shortDescOptions={shortDescOptions}
+                      onFilterChange={handleFilterChange}
+                    />
+                  </Stack>
+                </Flex>
               </CardHeader>
               <CardBody overflowX={'scroll'}>
                 <Table
@@ -329,96 +367,29 @@ const SBOMTable = ({
             </TabPanel>
             {/* CHANGELOG TABLE */}
             <TabPanel>
-              <CardHeader>
+              <CardHeader mt={1.5}>
                 <Flex
                   width={'100%'}
-                  alignItems={'flex-end'}
-                  justifyContent={'flex-end'}
-                  pos={'relative'}
-                  gap={3}
+                  alignItems={'center'}
+                  justifyContent={'space-between'}
                 >
-                  {/* TYPE FILTER */}
-                  <Menu closeOnSelect={true}>
-                    <MenuButton
-                      as={Button}
-                      colorScheme='blue'
-                      fontWeight='normal'
-                      fontSize={'sm'}
-                      leftIcon={<FaFilter size={14} />}
-                    >
-                      Type
-                    </MenuButton>
-                    <MenuList minWidth='240px'>
-                      <MenuOptionGroup
-                        type='radio'
-                        value={filterType}
-                        onChange={(value) => setFilterType(value)}
-                      >
-                        <MenuItemOption
-                          value={'All'}
-                          fontSize={'sm'}
-                          textTransform={'capitalize'}
-                          onClick={() => setFilterType('')}
-                        >
-                          All
-                        </MenuItemOption>
-                        {['added', 'modified', 'deleted'].map((p, index) => (
-                          <MenuItemOption
-                            value={p}
-                            key={index}
-                            fontSize={'sm'}
-                            textTransform={'capitalize'}
-                          >
-                            {p}
-                          </MenuItemOption>
-                        ))}
-                      </MenuOptionGroup>
-                    </MenuList>
-                  </Menu>
-                  {/* USER FILTER */}
-                  <Menu closeOnSelect={true}>
-                    <MenuButton
-                      as={Button}
-                      colorScheme='blue'
-                      fontWeight='normal'
-                      fontSize={'sm'}
-                      leftIcon={<FaFilter size={14} />}
-                    >
-                      User
-                    </MenuButton>
-                    <MenuList minWidth='240px'>
-                      <MenuOptionGroup
-                        type='radio'
-                        value={filterUser}
-                        onChange={(value) => setFilterUser(value)}
-                      >
-                        <MenuItemOption
-                          value={'All'}
-                          fontSize={'sm'}
-                          textTransform={'capitalize'}
-                          onClick={() => setFilterUser('')}
-                        >
-                          All
-                        </MenuItemOption>
-                        {[
-                          'Abhisek Paul',
-                          'Brian B.',
-                          'Ritesh Noronha',
-                          'Shubham Shete',
-                          'Surandra Pathak'
-                        ].map((p, index) => (
-                          <MenuItemOption
-                            value={p}
-                            key={index}
-                            fontSize={'sm'}
-                            textTransform={'capitalize'}
-                          >
-                            {p}
-                          </MenuItemOption>
-                        ))}
-                      </MenuOptionGroup>
-                    </MenuList>
-                  </Menu>
+                  <Stack
+                    width={'100%'}
+                    direction={'row'}
+                    spacing={4}
+                    alignItems={'flex-start'}
+                  >
+                    <Input
+                      width={'400px'}
+                      id='search'
+                      type='text'
+                      placeholder='Search'
+                      aria-label='Search Input'
+                    />
+
+                    {/* FILTER TYPE AND USERS */}
+                    <FilterChangelog onFilterChange={handleChangelogChange} />
+                  </Stack>
                 </Flex>
               </CardHeader>
               <CardBody overflowX={'scroll'}>
@@ -448,8 +419,8 @@ const SBOMTable = ({
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {filterChangelog.length > 0 &&
-                      filterChangelog.map((item, index) => (
+                    {filteredChangelog.length > 0 &&
+                      filteredChangelog.map((item, index) => (
                         <ChangelogRow
                           key={index}
                           id={item.id}
@@ -464,7 +435,7 @@ const SBOMTable = ({
                   </Tbody>
                 </Table>
               </CardBody>
-              {filterChangelog.length === 0 && (
+              {filteredChangelog.length === 0 && (
                 <Flex
                   width={'100%'}
                   alignItems={'center'}

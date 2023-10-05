@@ -28,7 +28,7 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
-  ButtonGroup,
+  Badge,
   Select,
   FormControl,
   FormLabel,
@@ -83,14 +83,11 @@ const statusColor = (status) => {
 const FilterComponent = ({ filterText, onFilter, onClear }) => (
   <>
     <Input
-      width={'300px'}
-      marginRight={'auto'}
+      width={'400px'}
       id='search'
       type='text'
       placeholder='Search'
       aria-label='Search Input'
-      value={filterText}
-      onChange={onFilter}
     />
   </>
 )
@@ -106,8 +103,11 @@ const VulnTable = ({ data }) => {
   const [vulData, setVulData] = useState([])
   const [version, setVersion] = useState('')
 
-  const [filterBySev, setFilterBySev] = useState('')
-  const [filterByStatus, setFilterByStatus] = useState('')
+  const [filterBySev, setFilterBySev] = useState([])
+  const [filterByStatus, setFilterByStatus] = useState([])
+
+  const activeSevCount = filterBySev.length
+  const activeStatusCount = filterByStatus.length
 
   const [filterText, setFilterText] = useState('')
   const [resetPaginationToggle, setResetPaginationToggle] = useState(false)
@@ -315,116 +315,150 @@ const VulnTable = ({ data }) => {
         alignItems={'center'}
         justifyContent={'space-between'}
       >
-        <FilterComponent
-          onFilter={(e) => setFilterText(e.target.value)}
-          onClear={handleClear}
-          filterText={filterText}
-        />
+        <Stack
+          width={'100%'}
+          direction={'row'}
+          spacing={4}
+          alignItems={'flex-start'}
+        >
+          <FilterComponent
+            onFilter={(e) => setFilterText(e.target.value)}
+            onClear={handleClear}
+            filterText={filterText}
+          />
 
-        <Stack direction={'row'} spacing={2}>
-          {/* Severity */}
-          <Menu>
-            <MenuButton
-              as={Button}
-              colorScheme='blue'
-              fontWeight='normal'
-              fontSize={'sm'}
-              leftIcon={<FaFilter size={14} />}
-            >
-              Severity
-            </MenuButton>
-            <MenuList>
-              <MenuOptionGroup
-                type='radio'
-                value={filterBySev}
-                onChange={(value) =>
-                  setFilteredItems(
-                    data.filter((item) => item.severity === value)
-                  )
-                }
-              >
-                <MenuItemOption
-                  value={'All'}
-                  fontSize={'sm'}
-                  textTransform={'capitalize'}
-                  onClick={() => setFilteredItems(data)}
+          <Box width={'fit-content'} position={'relative'}>
+            {/* Severity */}
+            <Menu closeOnSelect={true}>
+              {activeSevCount > 0 && (
+                <Badge
+                  variant='solid'
+                  colorScheme='teal'
+                  position={'absolute'}
+                  right={-2}
+                  top={-1.5}
+                  zIndex={11}
                 >
-                  All
-                </MenuItemOption>
-                {['critical', 'high', 'medium', 'low'].map((option, index) => (
-                  <MenuItemOption
-                    key={index}
-                    value={option}
-                    textTransform='capitalize'
-                    fontSize={'sm'}
-                  >
-                    {option}
-                  </MenuItemOption>
-                ))}
-              </MenuOptionGroup>
-            </MenuList>
-          </Menu>
-          {/* Status */}
-          <Menu>
-            <MenuButton
-              as={Button}
-              colorScheme='blue'
-              fontWeight='normal'
-              fontSize={'sm'}
-              leftIcon={<FaFilter size={14} />}
-            >
-              Status
-            </MenuButton>
-            <MenuList>
-              <MenuOptionGroup
-                type='radio'
-                value={filterByStatus}
-                onChange={(value) =>
-                  setFilteredItems(data.filter((item) => item.status === value))
-                }
+                  {activeSevCount}
+                </Badge>
+              )}
+              <MenuButton
+                as={Button}
+                colorScheme='blue'
+                fontWeight='normal'
+                fontSize={'sm'}
+                leftIcon={<FaFilter size={14} />}
               >
-                <MenuItemOption
-                  value={'All'}
-                  fontSize={'sm'}
-                  textTransform={'capitalize'}
-                  onClick={() => setFilteredItems(data)}
+                Severity
+              </MenuButton>
+              <MenuList>
+                <MenuOptionGroup
+                  type='radio'
+                  onChange={() => window.location.reload()}
                 >
-                  All
-                </MenuItemOption>
-                {[
-                  'In Triage',
-                  'False Positive',
-                  'Affected',
-                  'Not Affected',
-                  'Fixed'
-                ].map((option, index) => (
-                  <MenuItemOption
-                    key={index}
-                    value={option}
-                    textTransform='capitalize'
-                    fontSize={'sm'}
-                  >
-                    {option}
+                  <MenuItemOption value={'All'} fontSize={'sm'}>
+                    All
                   </MenuItemOption>
-                ))}
-              </MenuOptionGroup>
-            </MenuList>
-          </Menu>
-          {/* Copy */}
+                </MenuOptionGroup>
+                <MenuOptionGroup
+                  type='checkbox'
+                  onChange={(value) => setFilterBySev(value)}
+                >
+                  <MenuItemOption value={'Critical'} fontSize={'sm'}>
+                    Critical
+                  </MenuItemOption>
+                  <MenuItemOption value={'High'} fontSize={'sm'}>
+                    High
+                  </MenuItemOption>
+                  <MenuItemOption value={'Medium'} fontSize={'sm'}>
+                    Medium
+                  </MenuItemOption>
+                  <MenuItemOption value={'Low'} fontSize={'sm'}>
+                    Low
+                  </MenuItemOption>
+                </MenuOptionGroup>
+              </MenuList>
+            </Menu>
+          </Box>
 
-          <Button
-            variant='solid'
-            colorScheme='blue'
-            fontWeight='normal'
-            fontSize={'sm'}
-            onClick={onCopyOpen}
-          >
-            Import Statuses
-          </Button>
+          <Box width={'fit-content'} position={'relative'}>
+            {/* Status */}
+            <Menu closeOnSelect={true}>
+              {activeStatusCount > 0 && (
+                <Badge
+                  variant='solid'
+                  colorScheme='teal'
+                  position={'absolute'}
+                  right={-2}
+                  top={-1.5}
+                  zIndex={11}
+                >
+                  {activeStatusCount}
+                </Badge>
+              )}
+              <MenuButton
+                as={Button}
+                colorScheme='blue'
+                fontWeight='normal'
+                fontSize={'sm'}
+                leftIcon={<FaFilter size={14} />}
+              >
+                Status
+              </MenuButton>
+              <MenuList>
+                <MenuOptionGroup
+                  type='radio'
+                  onChange={() => window.location.reload()}
+                >
+                  <MenuItemOption value={'All'} fontSize={'sm'}>
+                    All
+                  </MenuItemOption>
+                </MenuOptionGroup>
+                <MenuOptionGroup
+                  type='checkbox'
+                  onChange={(value) => setFilterByStatus(value)}
+                >
+                  {[
+                    'In Triage',
+                    'False Positive',
+                    'Affected',
+                    'Not Affected',
+                    'Fixed'
+                  ].map((option, index) => (
+                    <MenuItemOption
+                      key={index}
+                      value={option}
+                      textTransform='capitalize'
+                      fontSize={'sm'}
+                    >
+                      {option}
+                    </MenuItemOption>
+                  ))}
+                </MenuOptionGroup>
+              </MenuList>
+            </Menu>
+          </Box>
         </Stack>
+
+        <Button
+          variant='solid'
+          colorScheme='blue'
+          fontWeight='normal'
+          fontSize={'sm'}
+          onClick={onCopyOpen}
+        >
+          Import Statuses
+        </Button>
       </Flex>
     )
-  }, [filterText, resetPaginationToggle])
+  }, [
+    filterText,
+    resetPaginationToggle,
+    filterBySev,
+    filterByStatus,
+    activeSevCount,
+    activeStatusCount
+  ])
 
   const ExpandedComponent = () => {
     const CustomText = styled(Text)`
@@ -450,7 +484,9 @@ const VulnTable = ({ data }) => {
           <GridItem w='100%'>
             <CustomText>Description :</CustomText>
             <Text mt={1} fontSize={14}>
-              {'Heap buffer overflow in libwebp in Google Chrome prior to 116.0.5845.187 and libwebp 1.3.2 allowed a remote attacker to perform an out of bounds memory write via a crafted HTML page. (Chromium security severity: Critical)'}
+              {
+                'Heap buffer overflow in libwebp in Google Chrome prior to 116.0.5845.187 and libwebp 1.3.2 allowed a remote attacker to perform an out of bounds memory write via a crafted HTML page. (Chromium security severity: Critical)'
+              }
             </Text>
           </GridItem>
           <GridItem w='100%'></GridItem>
@@ -510,6 +546,9 @@ const VulnTable = ({ data }) => {
             </ModalBody>
 
             <ModalFooter>
+              <Button mr={3} onClick={onCopyClose}>
+                Cancel
+              </Button>
               <Button variant='solid' colorScheme='blue' onClick={handleCopy}>
                 Apply
               </Button>
@@ -541,7 +580,7 @@ const VulnTable = ({ data }) => {
                     version: '1.2.4',
                     status: 'In Triage',
                     newStatus: 'False Positive',
-                    notes: 'In Triage',
+                    notes: 'In Triage'
                   },
                   {
                     cve: 'CVE-2017-16921',
@@ -549,7 +588,7 @@ const VulnTable = ({ data }) => {
                     version: '0.7.3',
                     status: 'In Triage',
                     newStatus: 'Fixed',
-                    notes: 'In Triage',
+                    notes: 'In Triage'
                   },
                   {
                     cve: 'CVE-2021-14922',
@@ -557,14 +596,14 @@ const VulnTable = ({ data }) => {
                     version: '0.7.3',
                     status: 'Fixed',
                     newStatus: 'Affected',
-                    notes: 'In Triage',
+                    notes: 'In Triage'
                   }
                 ]}
               />
             </DrawerBody>
 
             <DrawerFooter>
-              <Button variant='outline' mr={3} onClick={onTableClose}>
+              <Button mr={3} onClick={onTableClose}>
                 Cancel
               </Button>
               <Button variant='solid' colorScheme='blue'>

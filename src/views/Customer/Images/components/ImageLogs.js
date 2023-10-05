@@ -28,12 +28,25 @@ import { useState } from 'react'
 import { CSVLink } from 'react-csv'
 import { BiExport } from 'react-icons/bi'
 import { BsFilterRight } from 'react-icons/bs'
-import { vuln_captions } from 'utils'
 import VulnerabilityRow from 'components/Tables/VulnerabilityRow.js'
 import { useMutation } from '@apollo/client'
 import { ImageUpdate } from 'graphQL/Mutation'
 import Cookies from 'js-cookie'
 import { FaFilter } from 'react-icons/fa'
+import FilterMenu from 'views/Dashboard/SBOMs/components/FilterMenu'
+
+const vuln_captions = [
+  'CVE ID',
+  'Severity',
+  'CVSS',
+  'Component',
+  'Version',
+  'Fixed (Component)',
+  'Fixed (Product)',
+  'Scanner',
+  'Status',
+  ''
+]
 
 const ImageLogs = ({ data, refetch, imageInfo }) => {
   const signedParams = Cookies.get(`signedParamId`)
@@ -105,104 +118,20 @@ const ImageLogs = ({ data, refetch, imageInfo }) => {
                 alignItems={'center'}
                 justifyContent={'space-between'}
               >
-                <Flex gap={2} direction={'row'} alignItems={'center'}>
+                <Flex gap={4} direction={'row'} alignItems={'center'}>
                   <Input
                     placeholder='Search'
-                    width={'300px'}
+                    width={'400px'}
                     size='md'
                     id='vulnerabilities'
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
                   />
-                  <Box position={'relative'}>
-                    <Menu closeOnSelect={true}>
-                      {activeFiltersCount > 0 && (
-                        <Badge
-                          variant='solid'
-                          colorScheme='teal'
-                          position={'absolute'}
-                          right={-2}
-                          top={-1.5}
-                          zIndex={11}
-                        >
-                          {activeFiltersCount}
-                        </Badge>
-                      )}
-                      <MenuButton
-                        as={Button}
-                        colorScheme='blue'
-                        fontWeight='normal'
-                        leftIcon={<FaFilter size={18} />}
-                      >
-                        Filter
-                      </MenuButton>
-                      <MenuList minWidth='240px'>
-                        <MenuOptionGroup
-                          title='PURL Status'
-                          type='radio'
-                          value={filterPurl}
-                          onChange={(value) => setFilterPurl(value)}
-                        >
-                          {[
-                            'All',
-                            'Missing',
-                            'Invalid',
-                            'Unmatched',
-                            'Valid'
-                          ].map((p, index) => (
-                            <MenuItemOption
-                              value={p}
-                              key={index}
-                              fontSize={'sm'}
-                            >
-                              {p}
-                            </MenuItemOption>
-                          ))}
-                        </MenuOptionGroup>
-                        <MenuOptionGroup
-                          title='CPE Status'
-                          type='radio'
-                          value={filterCpe}
-                          onChange={(value) => setFilterCpe(value)}
-                        >
-                          {[
-                            'All',
-                            'Missing',
-                            'Invalid',
-                            'Unmatched',
-                            'Valid'
-                          ].map((p, index) => (
-                            <MenuItemOption
-                              value={p}
-                              key={index}
-                              fontSize={'sm'}
-                            >
-                              {p}
-                            </MenuItemOption>
-                          ))}
-                        </MenuOptionGroup>
-                        <MenuOptionGroup
-                          title='Resolution'
-                          type='radio'
-                          value={filterResolution}
-                          onChange={(value) => setFilterResolution(value)}
-                        >
-                          {['Unresolved', 'Total'].map((p, index) => (
-                            <MenuItemOption
-                              value={p}
-                              key={index}
-                              fontSize={'sm'}
-                            >
-                              {p}
-                            </MenuItemOption>
-                          ))}
-                        </MenuOptionGroup>
-                      </MenuList>
-                    </Menu>
-                  </Box>
+
+                  <FilterMenu />
                 </Flex>
                 <Flex gap={2} direction={'row'}>
-                  <Box as={Flex} direction={'row'} gap={2}>
+                  <Box as={Flex} direction={'row'} gap={3}>
                     <Tooltip label='Export'>
                       <Button colorScheme='blue' size='md'>
                         <CSVLink
@@ -213,7 +142,7 @@ const ImageLogs = ({ data, refetch, imageInfo }) => {
                         </CSVLink>
                       </Button>
                     </Tooltip>
-                    <Button colorScheme='blue' size='md' onClick={refreshImage}>
+                    <Button colorScheme='blue' fontWeight='normal' fontSize='sm' onClick={refreshImage}>
                       Refresh
                     </Button>
                   </Box>

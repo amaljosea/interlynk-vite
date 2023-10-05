@@ -55,6 +55,7 @@ import { ImageUpdate } from 'graphQL/Mutation'
 import { vuln_captions } from 'utils'
 import { FaEllipsisV, FaFilter } from 'react-icons/fa'
 import MultiStatusDrawer from 'components/Drawer/MultiStatusDrawer'
+import FilterMenu from './FilterMenu'
 
 const SBOMTable = ({
   imageId,
@@ -206,14 +207,6 @@ const SBOMTable = ({
     }
   }
 
-  const [filterPurl, setFilterPurl] = useState('')
-  const [filterCpe, setFilterCpe] = useState('')
-  const [filterResolution, setFilterResolution] = useState('')
-
-  const activeFiltersCount = [filterPurl, filterCpe, filterResolution].filter(
-    Boolean
-  ).length
-
   const onVulnFilter = (item) => {
     setFilteredRow([])
     if (item === 'Unresolved') {
@@ -325,101 +318,17 @@ const SBOMTable = ({
                   alignItems={'center'}
                   justifyContent={'space-between'}
                 >
-                  <Flex gap={2} direction={'row'} alignItems={'center'}>
+                  <Flex gap={4} direction={'row'} alignItems={'center'}>
                     <Input
                       placeholder='Search'
-                      width={'300px'}
+                      width={'400px'}
                       size='md'
                       id='vulnerabilities'
                       value={searchInput}
                       onChange={(e) => setSearchInput(e.target.value)}
                     />
-                    <Box position={'relative'}>
-                      <Menu closeOnSelect={true}>
-                        {activeFiltersCount > 0 && (
-                          <Badge
-                            variant='solid'
-                            colorScheme='teal'
-                            position={'absolute'}
-                            right={-2}
-                            top={-1.5}
-                            zIndex={11}
-                          >
-                            {activeFiltersCount}
-                          </Badge>
-                        )}
-                        <MenuButton
-                          as={Button}
-                          colorScheme='blue'
-                          fontWeight='normal'
-                          leftIcon={<FaFilter size={18} />}
-                        >
-                          Filter
-                        </MenuButton>
-                        <MenuList minWidth='240px'>
-                          <MenuOptionGroup
-                            title='PURL Status'
-                            type='radio'
-                            value={filterPurl}
-                            onChange={(value) => setFilterPurl(value)}
-                          >
-                            {[
-                              'All',
-                              'Missing',
-                              'Invalid',
-                              'Unmatched',
-                              'Valid'
-                            ].map((p, index) => (
-                              <MenuItemOption
-                                value={p}
-                                key={index}
-                                fontSize={'sm'}
-                              >
-                                {p}
-                              </MenuItemOption>
-                            ))}
-                          </MenuOptionGroup>
-                          <MenuOptionGroup
-                            title='CPE Status'
-                            type='radio'
-                            value={filterCpe}
-                            onChange={(value) => setFilterCpe(value)}
-                          >
-                            {[
-                              'All',
-                              'Missing',
-                              'Invalid',
-                              'Unmatched',
-                              'Valid'
-                            ].map((p, index) => (
-                              <MenuItemOption
-                                value={p}
-                                key={index}
-                                fontSize={'sm'}
-                              >
-                                {p}
-                              </MenuItemOption>
-                            ))}
-                          </MenuOptionGroup>
-                          <MenuOptionGroup
-                            title='Resolution'
-                            type='radio'
-                            value={filterResolution}
-                            onChange={(value) => setFilterResolution(value)}
-                          >
-                            {['Unresolved', 'Total'].map((p, index) => (
-                              <MenuItemOption
-                                value={p}
-                                key={index}
-                                fontSize={'sm'}
-                              >
-                                {p}
-                              </MenuItemOption>
-                            ))}
-                          </MenuOptionGroup>
-                        </MenuList>
-                      </Menu>
-                    </Box>
+                    {/* FILTER MENU */}
+                    <FilterMenu />
                   </Flex>
                   <Flex gap={2} direction={'row'}>
                     <Box as={Flex} direction={'row'} gap={2}>
@@ -441,6 +350,8 @@ const SBOMTable = ({
                       <Button
                         colorScheme='blue'
                         size='md'
+                        fontSize='sm'
+                        fontWeight='normal'
                         onClick={scanEnabled ? refreshImage : setRefreshOpen}
                       >
                         Refresh
@@ -620,7 +531,7 @@ const SBOMTable = ({
             </Text> */}
             </ModalBody>
             <ModalFooter>
-              <Button variant='outline' mr={3} onClick={setRefreshClose}>
+              <Button mr={3} onClick={setRefreshClose}>
                 No
               </Button>
               <Button colorScheme='blue' onClick={handleYes}>

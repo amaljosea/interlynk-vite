@@ -35,15 +35,15 @@ const TeamsLog = () => {
 
   return (
     <Card p={0}>
-      <CardHeader p='12px 0' mb='12px'>
+      <CardHeader>
         <Input
           placeholder='Search'
-          width={'300px'}
+          width={'400px'}
           size='md'
           id='vulnerabilities'
         />
       </CardHeader>
-      <CardBody px='5px'>
+      <CardBody py={4}>
         <TeamTable data={teamMemebers} />
       </CardBody>
     </Card>
