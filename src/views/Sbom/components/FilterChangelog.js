@@ -124,7 +124,7 @@ const FilterChangelog = ({ onFilterChange }) => {
                 'Brian B.',
                 'Ritesh Noronha',
                 'Shubham Shete',
-                'Surandra Pathak'
+                'Surendra Pathak'
               ].map((p, index) => (
                 <MenuItemOption
                   value={p}

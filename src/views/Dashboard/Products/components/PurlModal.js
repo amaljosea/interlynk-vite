@@ -190,14 +190,14 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
     // console.log('verProgressValue', verProgressValue)
     setVerProgressValue(verProgressValue)
 
-    console.log(
-      'Done handleTypeChange',
-      e.target.value,
-      pkg.toString(),
-      updatedString,
-      namespaceOptions[pkg.type],
-      namespaceOptions.hasOwnProperty(type)
-    )
+    // console.log(
+    //   'Done handleTypeChange',
+    //   e.target.value,
+    //   pkg.toString(),
+    //   updatedString,
+    //   namespaceOptions[pkg.type],
+    //   namespaceOptions.hasOwnProperty(type)
+    // )
   }
 
   const handleNamespaceChange = (e) => {

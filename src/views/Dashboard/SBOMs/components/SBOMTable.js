@@ -14,11 +14,6 @@ import {
   Input,
   Flex,
   Button,
-  Menu,
-  MenuList,
-  MenuItemOption,
-  MenuOptionGroup,
-  MenuButton,
   Box,
   Tooltip,
   useDisclosure,
@@ -32,8 +27,7 @@ import {
   ModalBody,
   ModalFooter,
   Text,
-  Icon,
-  Badge
+  Icon
 } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card.js'

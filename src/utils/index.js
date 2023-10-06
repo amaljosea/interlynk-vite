@@ -480,3 +480,22 @@ export const convertDateFormat = (inputDate) => {
   const day = date.getDate()
   return `${month} ${day}`
 }
+
+export const getFullDateAndTime = (
+  dateString,
+  timeZone = 'America/Los_Angeles'
+) => {
+  const options = {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: 'numeric',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true,
+    timeZone
+  }
+
+  const date = new Date(dateString)
+  return date.toLocaleDateString('en-US', options)
+}

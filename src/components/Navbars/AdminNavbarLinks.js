@@ -16,15 +16,9 @@ import {
   PopoverContent,
   PopoverHeader,
   PopoverBody,
-  PopoverFooter,
-  PopoverArrow,
-  PopoverCloseButton,
-  PopoverAnchor,
-  Button,
   Icon,
   Stack,
-  Code,
-  HStack
+  Code
 } from '@chakra-ui/react'
 // Custom Icons
 import { ProfileIcon, SettingsIcon } from 'components/Icons/Icons'
@@ -89,6 +83,25 @@ export default function HeaderLinks(props) {
     window.location.href = `/login?signed_url_params=${paramId}`
   }
 
+  const shortcuts = [
+    {
+      key: 'Alt + 1',
+      title: 'Create Component'
+    },
+    {
+      key: 'Alt + 2',
+      title: 'Create SBOM'
+    },
+    {
+      key: 'Alt + 3',
+      title: 'Download SBOM'
+    },
+    {
+      key: 'Ctrl + /',
+      title: 'Search'
+    }
+  ]
+
   return (
     <Flex
       pe={{ sm: '0px', md: '0px' }}
@@ -113,24 +126,14 @@ export default function HeaderLinks(props) {
             </PopoverHeader>
             <PopoverBody>
               <Flex gap={2} direction={'column'}>
-                <Stack direction={'row'} alignItems={'center'}>
-                  <Code bg={'#444'} color='white' px={1.5}>
-                    Alt + c
-                  </Code>
-                  <Text fontSize={'sm'}> - Create Component</Text>
-                </Stack>
-                <Stack direction={'row'} alignItems={'center'}>
-                  <Code bg={'#444'} color='white' px={1.5}>
-                    Alt + s
-                  </Code>
-                  <Text fontSize={'sm'}> - Update SBOM</Text>
-                </Stack>
-                <Stack direction={'row'} alignItems={'center'}>
-                  <Code bg={'#444'} color='white' px={1.5}>
-                    Alt + /
-                  </Code>
-                  <Text fontSize={'sm'}> - Download SBOM</Text>
-                </Stack>
+                {shortcuts.map((item, index) => (
+                  <Stack key={index} direction={'row'} alignItems={'center'}>
+                    <Code bg={'#444'} color='white' px={1.5}>
+                      {item.key}
+                    </Code>
+                    <Text fontSize={'sm'}> - {item.title}</Text>
+                  </Stack>
+                ))}
               </Flex>
             </PopoverBody>
           </PopoverContent>
@@ -169,7 +172,7 @@ export default function HeaderLinks(props) {
         {location.pathname.startsWith('/vendor') && (
           <MenuList size='sm'>
             <MenuGroup title=''>
-              <Link to='/vendor/connections'>
+              <Link to='/vendor/profiles?tab=person'>
                 <MenuItem icon={<SettingsIcon />}>Settings</MenuItem>
               </Link>
               {userName ? (

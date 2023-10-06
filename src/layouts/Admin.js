@@ -113,11 +113,9 @@ export default function Dashboard(props) {
         <MainPanel
           bg='transparent'
           minH='100vh'
-          w={{
-            xl: minimize ? 'calc(100% - 70px)' : 'calc(100% - 220px)'
-          }}
+          w={minimize ? 'calc(100% - 70px)' : 'calc(100% - 220px)'}
         >
-          <Portal>
+          <Box>
             <AdminNavbar
               onOpen={onOpen}
               logoText={'Interlynk DASHBOARD'}
@@ -126,7 +124,7 @@ export default function Dashboard(props) {
               fixed={fixed}
               {...rest}
             />
-          </Portal>
+          </Box>
           <Box bg='rgba(0,0,0,0.04)' minH={'100vh'}>
             {getRoute() && (
               <PanelContent>

@@ -12,9 +12,12 @@ import {
 } from '@chakra-ui/react'
 import { FaFilter } from 'react-icons/fa'
 
+const res = ['Auto Fixed', 'Fixed', 'Ignored', 'Unresolved']
+
 const FilterMenu = ({ severityOptions, shortDescOptions, onFilterChange }) => {
   const [selectedSeverityFilters, setSelectedSeverityFilters] = useState([])
   const [selectedShortDescFilters, setSelectedShortDescFilters] = useState([])
+  const [selectedResFilters, setSelectedResFilters] = useState(['Unresolved'])
 
   const handleSeverityFilterChange = (newFilters) => {
     setSelectedSeverityFilters(newFilters)
@@ -27,19 +30,28 @@ const FilterMenu = ({ severityOptions, shortDescOptions, onFilterChange }) => {
   const handleShortDescFilterChange = (newFilters) => {
     setSelectedShortDescFilters(newFilters)
     onFilterChange({
+      shortDesc: newFilters,
+      severity: selectedSeverityFilters
+    })
+  }
+
+  const handleResFilterChange = (newFilters) => {
+    setSelectedResFilters(newFilters)
+    onFilterChange({
       severity: selectedSeverityFilters,
-      shortDesc: newFilters
+      shortDesc: selectedShortDescFilters
     })
   }
 
   const activeSevCount = selectedSeverityFilters.length
   const activeCategoryCount = selectedShortDescFilters.length
+  const activeResCount = selectedResFilters.length
 
   return (
     <Flex alignItems={'center'} gap={4}>
       {/* SEVERITY */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu  closeOnSelect={true}>
+        <Menu closeOnSelect={true}>
           {activeSevCount > 0 && (
             <Badge
               variant='solid'
@@ -92,7 +104,7 @@ const FilterMenu = ({ severityOptions, shortDescOptions, onFilterChange }) => {
 
       {/* CATEGORY   */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu  closeOnSelect={true}>
+        <Menu closeOnSelect={true}>
           {activeCategoryCount > 0 && (
             <Badge
               variant='solid'
@@ -129,6 +141,59 @@ const FilterMenu = ({ severityOptions, shortDescOptions, onFilterChange }) => {
               onChange={handleShortDescFilterChange}
             >
               {shortDescOptions.map((option) => (
+                <MenuItemOption
+                  key={option}
+                  value={option}
+                  textTransform='capitalize'
+                  fontSize={'sm'}
+                >
+                  {option}
+                </MenuItemOption>
+              ))}
+            </MenuOptionGroup>
+          </MenuList>
+        </Menu>
+      </Box>
+
+      {/* RESOLUTION */}
+      <Box width={'fit-content'} position={'relative'}>
+        <Menu closeOnSelect={true}>
+          {activeResCount > 0 && (
+            <Badge
+              variant='solid'
+              colorScheme='teal'
+              position={'absolute'}
+              right={-2}
+              top={-1.5}
+              zIndex={11}
+            >
+              {activeResCount}
+            </Badge>
+          )}
+          <MenuButton
+            as={Button}
+            colorScheme='blue'
+            fontWeight='normal'
+            fontSize={'sm'}
+            leftIcon={<FaFilter size={14} />}
+          >
+            Resolution
+          </MenuButton>
+          <MenuList>
+            <MenuOptionGroup
+              type='radio'
+              onChange={() => window.location.reload()}
+            >
+              <MenuItemOption value={'All'} fontSize={'sm'}>
+                All
+              </MenuItemOption>
+            </MenuOptionGroup>
+            <MenuOptionGroup
+              type='checkbox'
+              value={selectedResFilters}
+              onChange={handleResFilterChange}
+            >
+              {res.map((option) => (
                 <MenuItemOption
                   key={option}
                   value={option}

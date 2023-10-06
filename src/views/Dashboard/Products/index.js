@@ -134,93 +134,17 @@ function Index() {
                   ></IconButton>
                 </Tooltip>
                 {/* add product */}
-                <Button
-                  ref={btnRefProduct}
-                  onClick={onOpenProduct}
-                  leftIcon={<AddIcon />}
-                  colorScheme='blue'
-                  variant='solid'
-                >
-                  Product
-                </Button>
+                <Tooltip label='Add Product'>
+                  <IconButton
+                    ref={btnRefProduct}
+                    onClick={onOpenProduct}
+                    icon={<AddIcon />}
+                    colorScheme='blue'
+                    variant='solid'
+                  />
+                </Tooltip>
               </Flex>
             </CardHeader>
-            {/* <Menu>
-              <MenuButton
-                as={Button}
-                rightIcon={<ChevronDownIcon />}
-                maxW='150px'
-                px={4}
-                py={2}
-                me={2}
-                transition='all 0.2s'
-                borderRadius='md'
-                borderWidth='1px'
-                fontSize='sm'
-                fontWeight='none'
-              >
-                Product
-              </MenuButton>
-              <MenuList fontWeight='none' fontSize='sm'>
-                <MenuOptionGroup>
-                  {uniqProjects.map((p) => (
-                    <MenuItemOption
-                      key={p}
-                      value={p}
-                      onClick={() => filterByProduct(p)}
-                    >
-                      {p}
-                    </MenuItemOption>
-                  ))}
-                </MenuOptionGroup>
-              </MenuList>
-            </Menu>
-            <Menu>
-              <MenuButton
-                as={Button}
-                rightIcon={<ChevronDownIcon />}
-                maxW='150px'
-                px={4}
-                py={2}
-                me={2}
-                transition='all 0.2s'
-                borderRadius='md'
-                borderWidth='1px'
-                fontSize='sm'
-                fontWeight='none'
-              >
-                Vendor
-              </MenuButton>
-              <MenuList fontWeight='none' fontSize='sm'>
-                <MenuOptionGroup>
-                  <MenuItemOption
-                    value={'All'}
-                    onClick={(e) => filterBySource('All')}
-                  >
-                    All
-                  </MenuItemOption>
-                  <MenuItemOption
-                    value={'GitHub'}
-                    onClick={(e) => filterBySource('GitHub')}
-                  >
-                    GitHub
-                  </MenuItemOption>
-                  <MenuItemOption
-                    value={'SBOM'}
-                    onClick={(e) => filterBySource('SBOM')}
-                  >
-                    SBOM
-                  </MenuItemOption>
-                  <MenuItemOption
-                    value={'Assembled'}
-                    onClick={(e) => filterBySource('Assembled')}
-                  >
-                    Assembled
-                  </MenuItemOption>
-                </MenuOptionGroup>
-              </MenuList>
-            </Menu>
-            <Input placeholder='Search' maxW='300px' /> */}
 
             {error && (
               <Flex my={10} alignItems={'center'} justifyContent={'center'}>

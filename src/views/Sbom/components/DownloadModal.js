@@ -185,7 +185,9 @@ const DownloadModal = ({
         </ModalBody>
 
         <ModalFooter>
-          <Button onClick={onClose}>Cancel</Button>
+          <Button mr={3} onClick={onClose}>
+            Cancel
+          </Button>
 
           <Button
             colorScheme='blue'
