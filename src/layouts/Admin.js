@@ -115,16 +115,18 @@ export default function Dashboard(props) {
           minH='100vh'
           w={minimize ? 'calc(100% - 70px)' : 'calc(100% - 220px)'}
         >
-          <Box>
-            <AdminNavbar
-              onOpen={onOpen}
-              logoText={'Interlynk DASHBOARD'}
-              brandText={getActiveRoute(dashRoutes)}
-              secondary={getActiveNavbar(dashRoutes)}
-              fixed={fixed}
-              {...rest}
-            />
-          </Box>
+          <Portal>
+            <Box>
+              <AdminNavbar
+                onOpen={onOpen}
+                logoText={'Interlynk DASHBOARD'}
+                brandText={getActiveRoute(dashRoutes)}
+                secondary={getActiveNavbar(dashRoutes)}
+                fixed={fixed}
+                {...rest}
+              />
+            </Box>
+          </Portal>
           <Box bg='rgba(0,0,0,0.04)' minH={'100vh'}>
             {getRoute() && (
               <PanelContent>

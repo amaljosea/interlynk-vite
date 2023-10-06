@@ -71,7 +71,7 @@ const Automation = () => {
 
   return (
     <Flex direction='column' pt={{ base: '120px', md: '74px' }} px={4}>
-      <Card zIndex={'-1'} bg='white'>
+      <Card bg='white'>
         <CardHeader px={5}>
           <Flex
             alignItems={'center'}
