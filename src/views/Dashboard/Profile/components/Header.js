@@ -14,7 +14,7 @@ const Header = ({ selectedTab, setSelectedTab, name, email, tabs }) => {
   return (
     <Flex direction='column' pt={{ base: '120px', md: '75px' }}>
       <Card mb='6'>
-        <CardBody>
+        <CardBody >
           {/* user info */}
           <Flex
             align='center'
@@ -47,6 +47,7 @@ const Header = ({ selectedTab, setSelectedTab, name, email, tabs }) => {
             direction={{ sm: 'column', lg: 'row' }}
             w={{ sm: '100%', md: '50%', lg: 'auto' }}
             gap={2}
+            alignItems={'center'}
           >
             {tabs.map((tab, index) => (
               <Button

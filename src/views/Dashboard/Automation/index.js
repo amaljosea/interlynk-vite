@@ -14,9 +14,10 @@ import {
   Input,
   Switch,
   Select,
-  Tag
+  Tag,
+  Tooltip
 } from '@chakra-ui/react'
-import { SettingsIcon } from "components/Icons/Icons";
+import { SettingsIcon } from 'components/Icons/Icons'
 
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
@@ -70,7 +71,7 @@ const Automation = () => {
 
   return (
     <Flex direction='column' pt={{ base: '120px', md: '74px' }} px={4}>
-      <Card>
+      <Card zIndex={'-1'} bg='white'>
         <CardHeader px={5}>
           <Flex
             alignItems={'center'}
@@ -78,16 +79,14 @@ const Automation = () => {
             width={'100%'}
           >
             <Text fontSize={18}>Rule Automation Settings</Text>
-            <Button
-              size='sm'
-              variant='solid'
-              colorScheme='blue'
-              mt={4}
-              leftIcon={<AddIcon />}
-              onClick={addRow}
-            >
-              Add Row
-            </Button>
+            <Tooltip label='Add Rule'>
+              <IconButton
+                variant='solid'
+                colorScheme='blue'
+                fontWeight='normal'
+                icon={<AddIcon />}
+              />
+            </Tooltip>
           </Flex>
         </CardHeader>
         <CardBody mt={6}>
@@ -179,8 +178,12 @@ const Automation = () => {
                         <option value='Creation Tools'>Creation Tools</option>
                         <option value='Product Type'>Product Type</option>
                         <option value='Product Version'>Product Version</option>
-                        <option value='Package URL (PURL)'>Package URL (PURL)</option>
-                        <option value='Common Platform Enumeration (CPE)'>Common Platform Enumeration (CPE)</option>
+                        <option value='Package URL (PURL)'>
+                          Package URL (PURL)
+                        </option>
+                        <option value='Common Platform Enumeration (CPE)'>
+                          Common Platform Enumeration (CPE)
+                        </option>
                         <option value='Primary Component'>
                           Primary Component
                         </option>
@@ -198,10 +201,16 @@ const Automation = () => {
                         }
                       >
                         <option value=''>-- Select --</option>
-                        <option value='Component Version'>Component Version</option>
+                        <option value='Component Version'>
+                          Component Version
+                        </option>
                         <option value='Component Type'>Component Type</option>
-                        <option value='Package URL (PURL)'>Package URL (PURL)</option>
-                        <option value='Common Platform Enumeration (CPE)'>Common Platform Enumeration (CPE)</option>
+                        <option value='Package URL (PURL)'>
+                          Package URL (PURL)
+                        </option>
+                        <option value='Common Platform Enumeration (CPE)'>
+                          Common Platform Enumeration (CPE)
+                        </option>
                       </Select>
                     )}
                   </Td>
@@ -210,11 +219,15 @@ const Automation = () => {
                       <Flex alignItems={'center'} gap={2}>
                         <Text fontSize={'sm'}>Set:</Text>
                         {row.selectorOne === 'component' ? (
-                          <Tag minW='250px' >pkg:nuget/Fizzler@1.2.0</Tag>
+                          <Tag minW='250px'>pkg:nuget/Fizzler@1.2.0</Tag>
                         ) : (
                           <Tag minW='250px'>Biotronik.ScsApp.Pr-1.0.0</Tag>
                         )}
-                        <IconButton size='sm' colorScheme='blue' icon={<SettingsIcon />} />
+                        <IconButton
+                          size='sm'
+                          colorScheme='blue'
+                          icon={<SettingsIcon />}
+                        />
                       </Flex>
                     ) : (
                       ''

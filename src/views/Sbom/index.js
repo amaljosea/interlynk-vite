@@ -28,7 +28,8 @@ import {
   ModalHeader,
   ModalCloseButton,
   ModalBody,
-  ModalFooter
+  ModalFooter,
+  Skeleton
 } from '@chakra-ui/react'
 import React, { useState, useRef, useEffect } from 'react'
 import Card from 'components/Card/Card.js'
@@ -57,6 +58,7 @@ import { TbSignature, TbSignatureOff } from 'react-icons/tb'
 import CopyModal from './components/CopyModal'
 import { GetProjectData } from 'graphQL/Queries'
 import { BiPurchaseTagAlt } from 'react-icons/bi'
+import { getFullDateAndTime } from 'utils'
 
 function SBOM() {
   const initialRef = useRef(null)
@@ -261,7 +263,7 @@ function SBOM() {
 
   // ADD KEYBOARD SHORTCUT FOR TOGGLE DOWNLOAD MODAL
   const handleKeyDownload = (event) => {
-    if (event.altKey && event.key === '/') {
+    if (event.altKey && event.key === '3') {
       onToggle()
     }
   }
@@ -330,19 +332,20 @@ function SBOM() {
       <>
         <Flex direction='column' pt={{ base: '120px', md: '74px' }} px={2}>
           {/* product info */}
-          <Card mb='6'>
-            <CardBody>
-              <Grid
-                width={'100%'}
-                templateColumns='repeat(5, 1fr)'
-                alignItems={'center'}
-              >
-                {/* LEFT */}
-                <GridItem colSpan={2}>
-                  {sbomData ? (
+          {sbomData ? (
+            <Card mb='6'>
+              <CardBody>
+                <Grid
+                  width={'100%'}
+                  templateColumns='repeat(5, 1fr)'
+                  alignItems={'center'}
+                >
+                  {/* LEFT */}
+
+                  <GridItem colSpan={2}>
                     <Flex
                       direction={'row'}
-                      alignItems={'center'}
+                      alignItems={'flex-start'}
                       gap={5}
                       width={'100%'}
                     >
@@ -377,47 +380,39 @@ function SBOM() {
                           )}
                         </Stack>
 
-                        <Text fontSize={'sm'}>
+                        <Text fontSize={'sm'} my={0.5}>
                           A common specification for continous delivery events
                         </Text>
-                        <Text fontSize='sm' cursor={'pointer'}>
-                          Last updated at : {timeSince(sbomData.sbom.updatedAt)}
-                        </Text>
-                        {/* <Flex gap={2} alignItems={'center'} mt={0.5}>
-                          {!customerView && (
-                            <Tag
-                              size={'sm'}
-                              variant='outline'
-                              colorScheme='blue'
-                            >
-                              <TagLabel textTransform={'capitalize'}>
-                                {sbomData.sbom.lifecycle}
-                                {status}
-                              </TagLabel>
-                            </Tag>
-                          )}
-                        </Flex> */}
-                        {/* STATS */}
+                        <Tooltip
+                          placement='top'
+                          label={getFullDateAndTime(sbomData.sbom.updatedAt)}
+                        >
+                          <Text fontSize='sm' cursor={'pointer'}>
+                            Last updated at :{' '}
+                            {timeSince(sbomData.sbom.updatedAt)}
+                          </Text>
+                        </Tooltip>
+                        {/* --------------- STATS ------------------- */}
                         <Flex
-                          mt={3}
                           flexDir={'row'}
                           alignItems={'center'}
                           gap={4}
+                          mt={12}
                         >
                           {/* components */}
                           <Stack
                             direction={'row'}
                             alignItems={'flex-start'}
-                            spacing={3}
+                            spacing={2}
                           >
                             <Icon
-                              h={6}
-                              w={6}
+                              h={4}
+                              w={4}
                               color='#777'
                               as={FaProjectDiagram}
                             />
                             <Box>
-                              <Text fontWeight={'medium'} fontSize={'sm'}>
+                              <Text fontWeight={'medium'} fontSize={'md'}>
                                 {sbomData.sbom.stats.compCount}
                               </Text>
                               <Text fontSize={'xs'}>Components</Text>
@@ -427,16 +422,16 @@ function SBOM() {
                           <Stack
                             direction={'row'}
                             alignItems={'flex-start'}
-                            spacing={3}
+                            spacing={2}
                           >
                             <Icon
-                              h={6}
-                              w={6}
+                              h={'20px'}
+                              w={'20px'}
                               color='#777'
                               as={FaBalanceScale}
                             />
                             <Box>
-                              <Text fontWeight={'medium'} fontSize={'sm'}>
+                              <Text fontWeight={'medium'} fontSize={'md'}>
                                 {sbomData.sbom.stats.compLicenseCount}
                               </Text>
                               <Text fontSize={'xs'}>Licenses</Text>
@@ -446,11 +441,11 @@ function SBOM() {
                           <Stack
                             direction={'row'}
                             alignItems={'flex-start'}
-                            spacing={3}
+                            spacing={2}
                           >
-                            <Icon h={5} w={5} color='#777' as={CalendarIcon} />
+                            <Icon h={4} w={4} color='#777' as={CalendarIcon} />
                             <Box>
-                              <Text fontWeight={'medium'} fontSize={'sm'}>
+                              <Text fontWeight={'medium'} fontSize={'md'}>
                                 {sbomData.sbom.stats.compPurlCount}
                               </Text>
                               <Text fontSize={'xs'}>PURL</Text>
@@ -460,11 +455,11 @@ function SBOM() {
                           <Stack
                             direction={'row'}
                             alignItems={'flex-start'}
-                            spacing={3}
+                            spacing={2}
                           >
-                            <Icon h={5} w={5} color='#777' as={LockIcon} />
+                            <Icon h={4} w={4} color='#777' as={LockIcon} />
                             <Box>
-                              <Text fontWeight={'medium'} fontSize={'sm'}>
+                              <Text fontWeight={'medium'} fontSize={'md'}>
                                 {sbomData.sbom.stats.compCpeCount}
                               </Text>
                               <Text fontSize={'xs'}>CPE</Text>
@@ -473,110 +468,120 @@ function SBOM() {
                         </Flex>
                       </Flex>
                     </Flex>
-                  ) : (
-                    <Text>Loading...</Text>
-                  )}
-                </GridItem>
-                {/* RIGHT */}
-                {sbomData && (
-                  <GridItem colSpan={3}>
-                    <Flex
-                      direction={'row'}
-                      gap={2}
-                      justifyContent='flex-end'
-                      ml={'auto'}
-                    >
-                      {/* CHANGE SBOM VERSION */}
-                      <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
-                        <FaLayerGroup size={18} color='darkgray' />
-                        <Select
-                          id='version'
-                          value={selectedVersion}
-                          onChange={handleSBOMChange}
-                          size='md'
-                          color='gray.500'
-                        >
-                          {filteredData && filteredData.length > 0 ? (
-                            filteredData.map((item, index) => (
-                              <option
-                                key={index}
-                                value={item.id}
-                                name={item.version}
-                              >
-                                {item.version}
-                              </option>
-                            ))
-                          ) : (
-                            <option value=''>-- --</option>
-                          )}
-                        </Select>
-                      </Flex>
-
-                      {/* EDIT SBOM */}
-                      <Tooltip label='Edit'>
-                        <IconButton
-                          isDisabled={status === 'signed'}
-                          colorScheme='blue'
-                          icon={<EditIcon />}
-                          onClick={setSBMOpen}
-                        ></IconButton>
-                      </Tooltip>
-
-                      {/* SIGNED SBOM */}
-                      {status === 'signed' ? (
-                        <Tooltip label='Signed'>
-                          <IconButton
-                            colorScheme='blue'
-                            icon={<TbSignature size={22} />}
-                            onClick={setVerifyOpen}
-                          ></IconButton>
-                        </Tooltip>
-                      ) : (
-                        <Tooltip label='Unsigned'>
-                          <IconButton
-                            colorScheme='blue'
-                            icon={<TbSignatureOff size={22} />}
-                            onClick={setVerifyOpen}
-                          ></IconButton>
-                        </Tooltip>
-                      )}
-
-                      {/* DOWNLOAD SBOM */}
-                      <Tooltip label='Download'>
-                        <IconButton
-                          icon={<FaFileDownload />}
-                          onClick={onOpen}
-                          size='md'
-                          colorScheme='blue'
-                        />
-                      </Tooltip>
-
-                      {/* COPY SBOM */}
-                      <Tooltip label='Copy'>
-                        <IconButton
-                          icon={<FaCopy />}
-                          onClick={onCopiedOpen}
-                          size='md'
-                          colorScheme='blue'
-                        />
-                      </Tooltip>
-
-                      {/* DELETE SBOM */}
-                      <Tooltip label='Delete'>
-                        <IconButton
-                          colorScheme='red'
-                          icon={<DeleteIcon />}
-                          onClick={setDeleteOpen}
-                        ></IconButton>
-                      </Tooltip>
-                    </Flex>
                   </GridItem>
-                )}
-              </Grid>
-            </CardBody>
-          </Card>
+
+                  {/* RIGHT */}
+                  {sbomData && (
+                    <GridItem colSpan={3}>
+                      <Flex
+                        direction={'row'}
+                        gap={2}
+                        justifyContent='flex-end'
+                        ml={'auto'}
+                      >
+                        {/* CHANGE SBOM VERSION */}
+                        <Flex
+                          flexDirection={'row'}
+                          alignItems={'center'}
+                          gap={2}
+                        >
+                          <FaLayerGroup size={18} color='darkgray' />
+                          <Select
+                            id='version'
+                            value={selectedVersion}
+                            onChange={handleSBOMChange}
+                            size='md'
+                            color='gray.500'
+                          >
+                            {filteredData && filteredData.length > 0 ? (
+                              filteredData.map((item, index) => (
+                                <option
+                                  key={index}
+                                  value={item.id}
+                                  name={item.version}
+                                >
+                                  {item.version}
+                                </option>
+                              ))
+                            ) : (
+                              <option value=''>-- --</option>
+                            )}
+                          </Select>
+                        </Flex>
+
+                        {/* EDIT SBOM */}
+                        <Tooltip label='Edit'>
+                          <IconButton
+                            isDisabled={status === 'signed'}
+                            colorScheme='blue'
+                            icon={<EditIcon />}
+                            onClick={setSBMOpen}
+                          ></IconButton>
+                        </Tooltip>
+
+                        {/* SIGNED SBOM */}
+                        {status === 'signed' ? (
+                          <Tooltip label='Signed'>
+                            <IconButton
+                              colorScheme='blue'
+                              icon={<TbSignature size={22} />}
+                              onClick={setVerifyOpen}
+                            ></IconButton>
+                          </Tooltip>
+                        ) : (
+                          <Tooltip label='Unsigned'>
+                            <IconButton
+                              colorScheme='blue'
+                              icon={<TbSignatureOff size={22} />}
+                              onClick={setVerifyOpen}
+                            ></IconButton>
+                          </Tooltip>
+                        )}
+
+                        {/* DOWNLOAD SBOM */}
+                        <Tooltip label='Download'>
+                          <IconButton
+                            icon={<FaFileDownload />}
+                            onClick={onOpen}
+                            size='md'
+                            colorScheme='blue'
+                          />
+                        </Tooltip>
+
+                        {/* COPY SBOM */}
+                        <Tooltip label='Copy'>
+                          <IconButton
+                            icon={<FaCopy />}
+                            onClick={onCopiedOpen}
+                            size='md'
+                            colorScheme='blue'
+                          />
+                        </Tooltip>
+
+                        {/* DELETE SBOM */}
+                        <Tooltip label='Delete'>
+                          <IconButton
+                            colorScheme='red'
+                            icon={<DeleteIcon />}
+                            onClick={setDeleteOpen}
+                          ></IconButton>
+                        </Tooltip>
+                      </Flex>
+                    </GridItem>
+                  )}
+                </Grid>
+              </CardBody>
+            </Card>
+          ) : (
+            <Card mb={6}>
+              <Flex width={'100%'} gap={4} direction={'row'}>
+                <Skeleton width={'100%'} height='30px' />
+                <Skeleton width={'100%'} height='30px' />
+              </Flex>
+            </Card>
+          )}
           {/* sbom details */}
-          {sbomData && (
+          {sbomData ? (
             <SBOMTable
               title={'SBOM'}
               captions={[
@@ -600,6 +605,16 @@ function SBOM() {
                 selectedProject.sboms[0].format
               }
             />
+          ) : (
+            <Card>
+              <Flex width={'100%'} gap={4} direction={'row'}>
+                <Skeleton width={'100%'} height='20px' />
+                <Skeleton width={'100%'} height='20px' />
+                <Skeleton width={'100%'} height='20px' />
+                <Skeleton width={'100%'} height='20px' />
+                <Skeleton width={'100%'} height='20px' />
+              </Flex>
+            </Card>
           )}
         </Flex>
 

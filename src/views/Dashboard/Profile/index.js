@@ -11,7 +11,7 @@ import {
 } from '@chakra-ui/react'
 import { FaSlackHash, FaUserCircle, FaBuilding } from 'react-icons/fa'
 import Header from './components/Header'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import AdvisoryFeeds from './components/AdvisoryFeeds'
 import ExploitFeeds from './components/ExploitFeeds'
 import { useQuery } from '@apollo/client'
@@ -23,8 +23,15 @@ import ComponentFeed from './components/ComponentFeed'
 import GeneralFeed from './components/GeneralFeed'
 import TeamsLog from './components/TeamsLog'
 import PersonalInfo from './components/PersonalInfo'
+import { useLocation } from 'react-router-dom'
 
 function Profile() {
+  const location = useLocation()
+
+  const queryParams = new URLSearchParams(location.search)
+
+  const tab = queryParams.get('tab')
+
   const username = localStorage.getItem(`username`)
   const email = localStorage.getItem(`email`)
 
@@ -41,22 +48,22 @@ function Profile() {
     {
       name: 'ORGANIZATION',
       icon: FaBuilding
-    },
-    {
-      name: 'NOTIFICATIONS',
-      icon: FaSlackHash
     }
+    // {
+    //   name: 'NOTIFICATIONS',
+    //   icon: FaSlackHash
+    // }
   ]
 
   const [selectedTab, setSelectedTab] = useState(tabs[1].name)
 
   const { data } = useQuery(GetSettings)
 
-  // useEffect(() => {
-  //   if (data) {
-  //     console.log(`allSetting`, data)
-  //   }
-  // }, [data])
+  useEffect(() => {
+    if (tab === 'person') {
+      setSelectedTab('PERSONAL')
+    }
+  }, [data])
 
   const { data: orgInfo } = useQuery(GetOrgInfo)
 

@@ -9,11 +9,11 @@ import GlobalContext from 'context/GlobalContext'
 // FUNCTIONS
 
 function Sidebar(props) {
-  const { minimize, activeDockerHub } = useContext(GlobalContext)
+  const { minimize, activeDockerHub, setMinimize } = useContext(GlobalContext)
   const [filterRoutes, setFilterRoutes] = useState([])
   // to check for active links and opened collapses
   const mainPanel = useRef()
-  let variantChange = '0.2s linear'
+  let variantChange = '0.1s linear'
 
   const { logoText, routes, sidebarVariant } = props
 
@@ -43,11 +43,11 @@ function Sidebar(props) {
       <Box
         display={{ sm: 'none', xl: 'block' }}
         position='fixed'
+        onMouseEnter={() => setMinimize(false)}
+        onMouseLeave={() => setMinimize(true)}
       >
         <Box
-          bg={'white'}
           w={minimize === true ? '75px' : '210px'}
-          transition={variantChange}
           // w={minimize === true ? '90px' : '210px'}
           // borderRight={'1px solid lightgray'}
           // ms={{

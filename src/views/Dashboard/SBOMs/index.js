@@ -16,7 +16,7 @@ import {
   Stack,
   StackDivider
 } from '@chakra-ui/react'
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Card from 'components/Card/Card.js'
 import CardHeader from 'components/Card/CardHeader'
 import CardBody from 'components/Card/CardBody.js'
@@ -24,7 +24,6 @@ import SBOMTable from './components/SBOMTable'
 import { sbom } from 'variables/general'
 import { FaCubes, FaLayerGroup, FaMicroscope } from 'react-icons/fa'
 import { useLocation, useHistory } from 'react-router-dom'
-import GlobalContext from 'context/GlobalContext'
 
 import { useQuery } from '@apollo/client'
 import { scanImage } from 'utils'

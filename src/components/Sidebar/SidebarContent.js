@@ -89,30 +89,25 @@ const SidebarContent = ({ logoText, routes }) => {
                   boxSize='initial'
                   justifyContent='flex-start'
                   alignItems='center'
-                  bg={activeBg}
+                  title={prop.name}
                   mb={{
                     xl: '12px'
                   }}
                   mx={{
                     xl: 'auto'
                   }}
+                  py='4px'
                   ps={{
                     sm: '10px',
                     xl: '16px'
                   }}
-                  py='4px'
-                  borderRadius='15px'
-                  _hover={{ bg: 'none' }}
-                  w='100%'
+                  bg='none'
                   _active={{
-                    bg: 'inherit',
-                    transform: 'none',
-                    borderColor: 'transparent'
+                    bg: 'none'
                   }}
-                  _focus={{
-                    boxShadow: 'none'
+                  _hover={{
+                    bg: 'none'
                   }}
-                  title={prop.name}
                 >
                   <Flex>
                     {typeof prop.icon === 'string' ? (
@@ -129,7 +124,13 @@ const SidebarContent = ({ logoText, routes }) => {
                       </IconBox>
                     )}
                     {!minimize && (
-                      <Text color={activeColor} my='auto' fontSize='sm'>
+                      <Text
+                        color={activeColor}
+                        my='auto'
+                        fontSize='sm'
+                        transition='transform 0.1s ease-in-out'
+                        opacity={minimize ? 0 : 100}
+                      >
                         {document.documentElement.dir === 'rtl'
                           ? prop.rtlName
                           : prop.name}
@@ -144,7 +145,6 @@ const SidebarContent = ({ logoText, routes }) => {
                   boxSize='initial'
                   justifyContent='flex-start'
                   alignItems='center'
-                  bg='transparent'
                   mb={{
                     xl: '12px'
                   }}
@@ -156,16 +156,12 @@ const SidebarContent = ({ logoText, routes }) => {
                     sm: '10px',
                     xl: '16px'
                   }}
-                  borderRadius='15px'
-                  _hover={{ bg: 'none' }}
-                  w='100%'
+                  bg='none'
                   _active={{
-                    bg: 'inherit',
-                    transform: 'none',
-                    borderColor: 'transparent'
+                    bg: 'none'
                   }}
-                  _focus={{
-                    boxShadow: 'none'
+                  _hover={{
+                    bg: 'none'
                   }}
                   title={prop.name}
                 >
@@ -186,7 +182,13 @@ const SidebarContent = ({ logoText, routes }) => {
                     {minimize ? (
                       ''
                     ) : (
-                      <Text color={inactiveColor} my='auto' fontSize='sm'>
+                      <Text
+                        color={inactiveColor}
+                        my='auto'
+                        fontSize='sm'
+                        transition='transform 0.1s ease-in-out'
+                        opacity={minimize ? 0 : 100}
+                      >
                         {document.documentElement.dir === 'rtl'
                           ? prop.rtlName
                           : prop.name}
@@ -232,7 +234,7 @@ const SidebarContent = ({ logoText, routes }) => {
       <Stack direction='column' mb='40px'>
         <Box>{links}</Box>
       </Stack>
-      <Center
+      {/* <Center
         pos={'absolute'}
         bottom={'64px'}
         right={minimize === true ? '-14px' : '-26px'}
@@ -250,7 +252,7 @@ const SidebarContent = ({ logoText, routes }) => {
         ) : (
           <ChevronLeftIcon w={7} h={7} />
         )}
-      </Center>
+      </Center> */}
       <SidebarHelp />
     </>
   )

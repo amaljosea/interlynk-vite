@@ -10,7 +10,8 @@ import {
   useDisclosure,
   IconButton,
   Stack,
-  Box
+  Box,
+  Tooltip
 } from '@chakra-ui/react'
 import React, { useState, useEffect, useRef, useContext } from 'react'
 import {
@@ -32,6 +33,7 @@ import SBOMTable from 'views/Sbom/components/SBOMTable'
 import DownloadModal from 'views/Sbom/components/DownloadModal'
 import Cookies from 'js-cookie'
 import { CalendarIcon, LockIcon } from '@chakra-ui/icons'
+import { getFullDateAndTime } from 'utils'
 
 function ProductInfo() {
   const initialRef = useRef(null)
@@ -181,7 +183,7 @@ function ProductInfo() {
                 {sbomData ? (
                   <Flex
                     direction={'row'}
-                    alignItems={'center'}
+                    alignItems={'flex-start'}
                     gap={5}
                     width={'100%'}
                   >
@@ -195,30 +197,34 @@ function ProductInfo() {
                       <Text fontSize={'sm'}>
                         A common specification for continous delivery events
                       </Text>
-                      <Text fontSize='xs' cursor={'pointer'}>
-                        Last updated at : {timeSince(sbomData.sbom.updatedAt)}
-                      </Text>
-                      {/* STATS */}
+                      <Tooltip
+                        placement='top'
+                        label={getFullDateAndTime(sbomData.sbom.updatedAt)}
+                      >
+                        <Text fontSize='sm' cursor={'pointer'}>
+                          Last updated at : {timeSince(sbomData.sbom.updatedAt)}
+                        </Text>
+                      </Tooltip>
                       <Flex
-                        mt={3}
                         flexDir={'row'}
                         alignItems={'center'}
                         gap={4}
+                        mt={12}
                       >
                         {/* components */}
                         <Stack
                           direction={'row'}
                           alignItems={'flex-start'}
-                          spacing={3}
+                          spacing={2}
                         >
                           <Icon
-                            h={6}
-                            w={6}
+                            h={4}
+                            w={4}
                             color='#777'
                             as={FaProjectDiagram}
                           />
                           <Box>
-                            <Text fontWeight={'medium'} fontSize={'sm'}>
+                            <Text fontWeight={'medium'} fontSize={'md'}>
                               {sbomData.sbom.stats.compCount}
                             </Text>
                             <Text fontSize={'xs'}>Components</Text>
@@ -228,11 +234,16 @@ function ProductInfo() {
                         <Stack
                           direction={'row'}
                           alignItems={'flex-start'}
-                          spacing={3}
+                          spacing={2}
                         >
-                          <Icon h={6} w={6} color='#777' as={FaBalanceScale} />
+                          <Icon
+                            h={'20px'}
+                            w={'20px'}
+                            color='#777'
+                            as={FaBalanceScale}
+                          />
                           <Box>
-                            <Text fontWeight={'medium'} fontSize={'sm'}>
+                            <Text fontWeight={'medium'} fontSize={'md'}>
                               {sbomData.sbom.stats.compLicenseCount}
                             </Text>
                             <Text fontSize={'xs'}>Licenses</Text>
@@ -242,11 +253,11 @@ function ProductInfo() {
                         <Stack
                           direction={'row'}
                           alignItems={'flex-start'}
-                          spacing={3}
+                          spacing={2}
                         >
-                          <Icon h={5} w={5} color='#777' as={CalendarIcon} />
+                          <Icon h={4} w={4} color='#777' as={CalendarIcon} />
                           <Box>
-                            <Text fontWeight={'medium'} fontSize={'sm'}>
+                            <Text fontWeight={'medium'} fontSize={'md'}>
                               {sbomData.sbom.stats.compPurlCount}
                             </Text>
                             <Text fontSize={'xs'}>PURL</Text>
@@ -256,11 +267,11 @@ function ProductInfo() {
                         <Stack
                           direction={'row'}
                           alignItems={'flex-start'}
-                          spacing={3}
+                          spacing={2}
                         >
-                          <Icon h={5} w={5} color='#777' as={LockIcon} />
+                          <Icon h={4} w={4} color='#777' as={LockIcon} />
                           <Box>
-                            <Text fontWeight={'medium'} fontSize={'sm'}>
+                            <Text fontWeight={'medium'} fontSize={'md'}>
                               {sbomData.sbom.stats.compCpeCount}
                             </Text>
                             <Text fontSize={'xs'}>CPE</Text>

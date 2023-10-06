@@ -1,5 +1,10 @@
 // Chakra imports
-import { ExternalLinkIcon } from '@chakra-ui/icons'
+import {
+  ArrowRightIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ExternalLinkIcon
+} from '@chakra-ui/icons'
 import {
   Flex,
   Text,
@@ -39,21 +44,20 @@ import {
   DrawerOverlay,
   DrawerContent,
   DrawerCloseButton,
-  Table,
-  Thead,
-  Tr,
-  Th,
-  useToast
+  useToast,
+  IconButton,
+  ButtonGroup
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV, FaFilter } from 'react-icons/fa'
-import { useState, useRef, useMemo } from 'react'
+import { FaCopy } from 'react-icons/fa6'
+import { useState, useRef, useMemo, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { sevColor } from 'utils'
 import StatusDrawer from 'components/Drawer/StatusDrawer'
 import styled from '@emotion/styled'
 import CopyTable from './CopyTable'
-import { useEffect } from 'react'
+import Multistep from 'views/Sbom/components/Multistep'
 
 const customStyles = {
   headCells: {
@@ -62,6 +66,12 @@ const customStyles = {
       color: '#2D3748',
       fontSize: '12px',
       letterSpacing: '1px'
+    }
+  },
+  subHeader: {
+    style: {
+      padding: 0,
+      margin: 0
     }
   }
 }
@@ -80,17 +90,42 @@ const statusColor = (status) => {
   }
 }
 
-const FilterComponent = ({ filterText, onFilter, onClear }) => (
-  <>
-    <Input
-      width={'400px'}
-      id='search'
-      type='text'
-      placeholder='Search'
-      aria-label='Search Input'
-    />
-  </>
-)
+const FilterComponent = ({ filterText, onFilter, onClear }) => {
+  const searchInputRef = useRef()
+
+  const focusSearchInput = () => {
+    if (searchInputRef?.current) {
+      searchInputRef?.current.focus()
+    }
+  }
+
+  const handleKeyPress = (e) => {
+    if (e.ctrlKey && e.key === '/') {
+      focusSearchInput()
+    }
+  }
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyPress)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress)
+    }
+  }, [])
+
+  return (
+    <>
+      <Input
+        width={'400px'}
+        id='search'
+        type='text'
+        placeholder='Search'
+        aria-label='Search Input'
+        ref={searchInputRef}
+      />
+    </>
+  )
+}
 
 const VulnTable = ({ data }) => {
   const location = useLocation()
@@ -102,6 +137,12 @@ const VulnTable = ({ data }) => {
   const [activeRow, setActiveRow] = useState(null)
   const [vulData, setVulData] = useState([])
   const [version, setVersion] = useState('')
+
+  // STEPS
+  const [step, setStep] = useState(1)
+  const [progress, setProgress] = useState(20)
+
+  const [stepTitle, setStepTitle] = useState('')
 
   const [filterBySev, setFilterBySev] = useState([])
   const [filterByStatus, setFilterByStatus] = useState([])
@@ -440,15 +481,16 @@ const VulnTable = ({ data }) => {
           </Box>
         </Stack>
 
-        <Button
-          variant='solid'
-          colorScheme='blue'
-          fontWeight='normal'
-          fontSize={'sm'}
-          onClick={onCopyOpen}
-        >
-          Import Statuses
-        </Button>
+        <Tooltip label='Import Statuses'>
+          <IconButton
+            variant='solid'
+            colorScheme='blue'
+            fontWeight='normal'
+            fontSize={'sm'}
+            onClick={onCopyOpen}
+            icon={<FaCopy size={18} />}
+          />
+        </Tooltip>
       </Flex>
     )
   }, [
@@ -494,6 +536,33 @@ const VulnTable = ({ data }) => {
       </Box>
     )
   }
+
+  const handleSubmit = () => {
+    setStep(1)
+    setProgress(20)
+    onTableClose()
+    toast({
+      description: 'Data Imported successsfully',
+      status: 'success',
+      duration: 3000,
+      isClosable: true,
+      position: 'top'
+    })
+  }
+
+  useEffect(() => {
+    if (step === 1) {
+      setStepTitle('Import from page')
+    } else if (step === 2) {
+      setStepTitle('Import sources')
+    } else if (step === 3) {
+      setStepTitle('Components view')
+    } else if (step === 4) {
+      setStepTitle('Vulnerability view')
+    } else if (step === 5) {
+      setStepTitle('Status history')
+    }
+  }, [step])
 
   return (
     <>
@@ -562,17 +631,21 @@ const VulnTable = ({ data }) => {
         <Drawer
           isOpen={isTableOpen}
           placement='right'
-          size='2xl'
+          size='full'
           onClose={onTableClose}
           finalFocusRef={tableRef}
         >
           <DrawerOverlay />
           <DrawerContent>
             <DrawerCloseButton />
-            <DrawerHeader></DrawerHeader>
+            <DrawerHeader>
+              <Text fontSize={20} fontWeight={'medium'}>
+                {stepTitle}
+              </Text>
+            </DrawerHeader>
 
-            <DrawerBody mt={4}>
-              <CopyTable
+            <DrawerBody mt={2}>
+              {/* <CopyTable
                 data={[
                   {
                     cve: 'CVE-2023-24532',
@@ -599,16 +672,64 @@ const VulnTable = ({ data }) => {
                     notes: 'In Triage'
                   }
                 ]}
-              />
+              /> */}
+
+              {/* IMPORT WIZARD */}
+              <Multistep step={step} progress={progress} />
             </DrawerBody>
 
             <DrawerFooter>
-              <Button mr={3} onClick={onTableClose}>
-                Cancel
-              </Button>
-              <Button variant='solid' colorScheme='blue'>
-                Import Selected
-              </Button>
+              <Stack
+                width={'100%'}
+                justifyContent={'space-between'}
+                direction={'row'}
+                spacing={4}
+              >
+                <ButtonGroup>
+                  {step > 1 && (
+                    <Button
+                      leftIcon={<ChevronLeftIcon w={6} h={6} />}
+                      onClick={() => {
+                        setStep(step - 1)
+                        setProgress(progress - 20)
+                      }}
+                      isDisabled={step === 1}
+                      colorScheme='blue'
+                      variant='solid'
+                    >
+                      Back
+                    </Button>
+                  )}
+
+                  <Button onClick={onTableClose}>Cancel</Button>
+                </ButtonGroup>
+                {step === 5 ? (
+                  <Button
+                    colorScheme='red'
+                    variant='solid'
+                    onClick={handleSubmit}
+                  >
+                    Submit
+                  </Button>
+                ) : (
+                  <Button
+                    isDisabled={step === 5}
+                    rightIcon={<ChevronRightIcon w={6} h={6} />}
+                    onClick={() => {
+                      setStep(step + 1)
+                      if (step === 5) {
+                        setProgress(100)
+                      } else {
+                        setProgress(progress + 20)
+                      }
+                    }}
+                    colorScheme='blue'
+                    variant='solid'
+                  >
+                    Next
+                  </Button>
+                )}
+              </Stack>
             </DrawerFooter>
           </DrawerContent>
         </Drawer>

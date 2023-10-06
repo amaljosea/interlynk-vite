@@ -38,7 +38,7 @@ import {
 } from 'react-icons/fa'
 import { licenseOptions } from 'variables/licenses'
 import { timeSince, GetIcon } from 'utils'
-import { useState, useMemo, useRef } from 'react'
+import { useState, useMemo, useRef, createRef, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import ComponentModal from 'views/Sbom/components/ComponentModal'
@@ -56,20 +56,51 @@ const customStyles = {
       fontSize: '12px',
       letterSpacing: '1px'
     }
+  },
+  subHeader: {
+    style: {
+      padding: 0,
+      margin: 0
+    }
   }
 }
 
-const FilterComponent = ({ filterText, onFilter, onClear }) => (
-  <>
-    <Input
-      width={'400px'}
-      id='search'
-      type='text'
-      placeholder='Search'
-      aria-label='Search Input'
-    />
-  </>
-)
+const FilterComponent = ({ filterText, onFilter, onClear }) => {
+  const searchInputRef = useRef()
+
+  const focusSearchInput = () => {
+    if (searchInputRef?.current) {
+      searchInputRef?.current.focus()
+    }
+  }
+
+  const handleKeyPress = (e) => {
+    if (e.ctrlKey && e.key === '/') {
+      focusSearchInput()
+    }
+  }
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyPress)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress)
+    }
+  }, [])
+
+  return (
+    <>
+      <Input
+        width={'400px'}
+        id='search'
+        type='text'
+        placeholder='Search'
+        aria-label='Search Input'
+        ref={searchInputRef}
+      />
+    </>
+  )
+}
 
 const ComponentTable = ({ data, refetch, type }) => {
   const location = useLocation()
@@ -122,6 +153,22 @@ const ComponentTable = ({ data, refetch, type }) => {
     onClose: onCompClose,
     onToggle: onCompToggle
   } = useDisclosure()
+
+  // ADD KEYBOARD SHORTCUT FOR TOGGLE COMPONENT DRAWER
+  const handleCompDown = (event) => {
+    if (event.altKey && event.key === '1') {
+      onCompToggle()
+    }
+  }
+
+  // KEYBOARD EVENT LISTNER FOR COMPONENT DRAWER
+  useEffect(() => {
+    window.addEventListener('keydown', handleCompDown)
+
+    return () => {
+      window.removeEventListener('keydown', handleCompDown)
+    }
+  }, [])
 
   const columns = [
     // COMPONENT
@@ -600,18 +647,18 @@ const ComponentTable = ({ data, refetch, type }) => {
         </Stack>
 
         {/* CREATE COMPONENT */}
-        <Button
-          ref={compBtn}
-          onClick={onCompOpen}
-          leftIcon={<AddIcon />}
-          colorScheme='blue'
-          variant='solid'
-          fontWeight='normal'
-          fontSize={'sm'}
-          isDisabled={data.lifecycle === 'signed'}
-        >
-          Component
-        </Button>
+        <Tooltip label='Add Component'>
+          <IconButton
+            ref={compBtn}
+            onClick={onCompOpen}
+            icon={<AddIcon />}
+            colorScheme='blue'
+            variant='solid'
+            fontWeight='normal'
+            fontSize={'sm'}
+            isDisabled={data.lifecycle === 'signed'}
+          />
+        </Tooltip>
       </Flex>
     )
   }, [

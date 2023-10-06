@@ -17,37 +17,20 @@ import {
   Button,
   Flex,
   Box,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuOptionGroup,
-  MenuItemOption,
-  Badge,
-  useToast,
-  Text,
-  Input,
-  Stack
+  useToast
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
-import SBOMComponentRow from 'components/Tables/SBOMComponentRow.js'
 import GeneralDataRow from 'components/Tables/GeneralDataRow'
 import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
-import CardHeader from 'components/Card/CardHeader'
-import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import GlobalContext from 'context/GlobalContext'
-import HealthCheckRow from 'components/Tables/HealthCheckRow'
 import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
-import ChangelogRow from 'components/Tables/ChangelogRow'
 import ComponentTable from 'components/Tables/ComponentTable'
 import PriSupplierModal from './PriSupplierModal'
-import FilterMenu from './FilterMenu'
 
-// ICONS
-import { AddIcon } from '@chakra-ui/icons'
-import { FaFilter } from 'react-icons/fa'
 import VulnTable from 'components/Tables/VulnTable'
-import FilterChangelog from './FilterChangelog'
+import HealthCheckTable from 'components/Tables/HealthCheckTable'
+import ChangelogTable from 'components/Tables/ChangelogTable'
 
 const SBOMTable = ({
   data,
@@ -74,13 +57,6 @@ const SBOMTable = ({
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const {
-    isOpen: isCompOpen,
-    onOpen: onCompOpen,
-    onClose: onCompClose,
-    onToggle: onCompToggle
-  } = useDisclosure()
-
-  const {
     isOpen: isSBMOpen,
     onOpen: setSBMOpen,
     onClose: setSBMClose,
@@ -94,7 +70,6 @@ const SBOMTable = ({
   } = useDisclosure()
 
   const btnRef = useRef(null)
-  const compBtn = useRef(null)
   const licenseBtn = useRef(null)
 
   const [selectedKey, setSelectedKey] = useState('')
@@ -111,78 +86,12 @@ const SBOMTable = ({
     })
   }
 
-  const handleFilterChange = (selectedFilters) => {
-    if (
-      selectedFilters.severity.length === 0 &&
-      selectedFilters.shortDesc.length === 0
-    ) {
-      // IF NO FILTER SELECTED RETURN DEFAULT HEALTH CHECK DATA
-      setFilteredData(healthCheckData)
-    } else {
-      // IF ANY FILTER IS SELECTED RETURN SELECTED DATA
-      const filtered = healthCheckData.filter(
-        (item) =>
-          (selectedFilters.severity.length === 0 ||
-            selectedFilters.severity.includes(item.severity)) &&
-          (selectedFilters.shortDesc.length === 0 ||
-            selectedFilters.shortDesc.includes(item.shortDesc))
-      )
-      setFilteredData(filtered)
-    }
-  }
-
-  const handleChangelogChange = (selectedFilters) => {
-    if (
-      selectedFilters.type.length === 0 &&
-      selectedFilters.user.length === 0
-    ) {
-      // IF NO FILTER SELECTED RETURN DEFAULT HEALTH CHECK DATA
-      setFilteredChangelog(changelogData)
-    } else {
-      // IF ANY FILTER IS SELECTED RETURN SELECTED DATA
-      const filtered = changelogData.filter(
-        (item) =>
-          (selectedFilters.type.length === 0 ||
-            selectedFilters.type.includes(item.type)) &&
-          (selectedFilters.user.length === 0 ||
-            selectedFilters.user.includes(item.changedBy))
-      )
-      setFilteredChangelog(filtered)
-    }
-  }
-
-  // EXTRACT ALL SEVERITY OPTIONS FROM HEALTH CHECK DATA
-  const severityOptions = [
-    ...new Set(healthCheckData.map((item) => item.severity))
-  ]
-
-  // EXTRACT ALL SHORT DESC STRING FROM HEALTH CHECK DATA
-  const shortDescOptions = [
-    ...new Set(healthCheckData.map((item) => item.shortDesc))
-  ]
-
-  // ADD KEYBOARD SHORTCUT FOR TOGGLE COMPONENT DRAWER
-  const handleCompDown = (event) => {
-    if (event.altKey && event.key === 'c') {
-      onCompToggle()
-    }
-  }
-
   // ADD KEYBOARD SHORTCUT FOR TOGGLE SBOM DRAWER
   const handleSBMDown = (event) => {
-    if (event.altKey && event.key === 's') {
+    if (event.altKey && event.key === '2') {
       onSBMToggle()
     }
   }
-
-  // KEYBOARD EVENT LISTNER FOR COMPONENT DRAWER
-  useEffect(() => {
-    window.addEventListener('keydown', handleCompDown)
-
-    return () => {
-      window.removeEventListener('keydown', handleCompDown)
-    }
-  }, [])
 
   // KEYBOARD EVENT LISTNER FOR SBOM DRAWER
   useEffect(() => {
@@ -206,7 +115,7 @@ const SBOMTable = ({
           </TabList>
           <TabPanels>
             {/* GENERAL TABLE */}
-            <TabPanel>
+            <TabPanel px={1}>
               <CardBody>
                 <Table
                   __css={{ tableLayout: 'fixed', width: 'full' }}
@@ -238,7 +147,7 @@ const SBOMTable = ({
               </CardBody>
             </TabPanel>
             {/* COMPONENT TABLE */}
-            <TabPanel>
+            <TabPanel px={0}>
               <CardBody>
                 <ComponentTable
                   data={data.components.nodes}
@@ -277,172 +186,68 @@ const SBOMTable = ({
               )}
             </TabPanel>
             {/* VUNERABILITIES TABLE */}
-            <TabPanel>
+            <TabPanel px={0}>
               <CardBody>
                 <VulnTable data={productVulData} />
               </CardBody>
+              {/* pagination */}
+              {productVulData && (
+                <Flex
+                  flexDir={'row'}
+                  gap={4}
+                  alignItems={'center'}
+                  mt={6}
+                  justifyContent={'flex-start'}
+                >
+                  <Button colorScheme='blue'>Previous</Button>
+                  <Button colorScheme='blue'>Next</Button>
+                  <Box>Page 1 of 1</Box>
+                </Flex>
+              )}
             </TabPanel>
             {/* HEALTH CHECK TABLE */}
-            <TabPanel>
-              <CardHeader width='100%' mt={1.5}>
-                <Flex
-                  width={'100%'}
-                  alignItems={'center'}
-                  justifyContent={'space-between'}
-                >
-                  <Stack
-                    width={'100%'}
-                    direction={'row'}
-                    spacing={4}
-                    alignItems={'flex-start'}
-                  >
-                    <Input
-                      width={'400px'}
-                      id='search'
-                      type='text'
-                      placeholder='Search'
-                      aria-label='Search Input'
-                    />
-
-                    <FilterMenu
-                      severityOptions={severityOptions}
-                      shortDescOptions={shortDescOptions}
-                      onFilterChange={handleFilterChange}
-                    />
-                  </Stack>
-                </Flex>
-              </CardHeader>
-              <CardBody overflowX={'scroll'}>
-                <Table
-                  // __css={{ tableLayout: 'fixed', width: 'full' }}
-                  variant='simple'
-                  color={textColor}
-                  size='sm'
-                  mt={6}
-                >
-                  <Thead>
-                    <Tr my='.8rem' pl='0px'>
-                      {[
-                        'Check Id',
-                        'Severity',
-                        'Category',
-                        'Long Description',
-                        'Status'
-                      ].map((caption, idx) => {
-                        return (
-                          <Th key={idx} ps={idx === 0 ? '0px' : null} pb={4}>
-                            <Box>{caption}</Box>
-                          </Th>
-                        )
-                      })}
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {filteredData.length > 0 &&
-                      filteredData.map((item, index) => (
-                        <HealthCheckRow
-                          key={index}
-                          id={item.id}
-                          healthId={item.healthCheckId}
-                          severity={item.severity}
-                          shortDesc={item.shortDesc}
-                          longDesc={item.longDesc}
-                          status={item.status}
-                          updateIdenifier={updateIdenifier}
-                        />
-                      ))}
-                  </Tbody>
-                </Table>
+            <TabPanel px={0}>
+              <CardBody>
+                <HealthCheckTable
+                  data={filteredData}
+                  setFilteredData={setFilteredData}
+                />
               </CardBody>
-              {filteredData.length === 0 && (
+              {/* pagination */}
+              {filteredData && (
                 <Flex
-                  width={'100%'}
+                  flexDir={'row'}
+                  gap={4}
                   alignItems={'center'}
-                  justifyContent={'center'}
-                  pt={10}
+                  mt={6}
+                  justifyContent={'flex-start'}
                 >
-                  <Text>No data found</Text>
+                  <Button colorScheme='blue'>Previous</Button>
+                  <Button colorScheme='blue'>Next</Button>
+                  <Box>Page 1 of 1</Box>
                 </Flex>
               )}
             </TabPanel>
             {/* CHANGELOG TABLE */}
-            <TabPanel>
-              <CardHeader mt={1.5}>
-                <Flex
-                  width={'100%'}
-                  alignItems={'center'}
-                  justifyContent={'space-between'}
-                >
-                  <Stack
-                    width={'100%'}
-                    direction={'row'}
-                    spacing={4}
-                    alignItems={'flex-start'}
-                  >
-                    <Input
-                      width={'400px'}
-                      id='search'
-                      type='text'
-                      placeholder='Search'
-                      aria-label='Search Input'
-                    />
-
-                    {/* FILTER TYPE AND USERS */}
-                    <FilterChangelog onFilterChange={handleChangelogChange} />
-                  </Stack>
-                </Flex>
-              </CardHeader>
-              <CardBody overflowX={'scroll'}>
-                <Table
-                  // __css={{ tableLayout: 'flex', width: '100%' }}
-                  variant='simple'
-                  color={textColor}
-                  size='sm'
-                  mt={6}
-                >
-                  <Thead>
-                    <Tr my='1.8rem' pl='0px'>
-                      {[
-                        'Type',
-                        'Object',
-                        'Previous Value',
-                        'New Value',
-                        'Changed By',
-                        'Time'
-                      ].map((caption, idx) => {
-                        return (
-                          <Th key={idx} ps={idx === 0 ? '0px' : null} pb={1}>
-                            <Box>{caption}</Box>
-                          </Th>
-                        )
-                      })}
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {filteredChangelog.length > 0 &&
-                      filteredChangelog.map((item, index) => (
-                        <ChangelogRow
-                          key={index}
-                          id={item.id}
-                          type={item.type}
-                          object={item.object}
-                          prevValue={item.prevValue}
-                          newValue={item.newValue}
-                          changedBy={item.changedBy}
-                          time={item.time}
-                        />
-                      ))}
-                  </Tbody>
-                </Table>
+            <TabPanel px={0}>
+              <CardBody>
+                <ChangelogTable
+                  data={filteredChangelog}
+                  setFilteredChangelog={setFilteredChangelog}
+                />
               </CardBody>
-              {filteredChangelog.length === 0 && (
+              {/* pagination */}
+              {filteredChangelog && (
                 <Flex
-                  width={'100%'}
+                  flexDir={'row'}
+                  gap={4}
                   alignItems={'center'}
-                  justifyContent={'center'}
-                  pt={10}
+                  mt={6}
+                  justifyContent={'flex-start'}
                 >
-                  <Text>No data found</Text>
+                  <Button colorScheme='blue'>Previous</Button>
+                  <Button colorScheme='blue'>Next</Button>
+                  <Box>Page 1 of 1</Box>
                 </Flex>
               )}
             </TabPanel>
