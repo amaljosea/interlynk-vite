@@ -24,7 +24,7 @@ const GeneralFeed = ({ orgInfo }) => {
 
   useEffect(() => {
     if (orgInfo) {
-      console.log(`orgInfo`, orgInfo)
+      // console.log(`orgInfo`, orgInfo)
       setOrgName(orgInfo.organization.name)
       setOrgId(orgInfo.organization.id)
     }

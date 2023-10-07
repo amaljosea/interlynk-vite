@@ -12,7 +12,8 @@ import {
   useColorModeValue,
   Select,
   Link,
-  Box
+  Box,
+  useToast
 } from '@chakra-ui/react'
 // Custom components
 import Card from 'components/Card/Card'
@@ -21,33 +22,47 @@ import CardHeader from 'components/Card/CardHeader'
 import { useState } from 'react'
 import { orgHealthChecks as orgHealthChecks } from 'variables/general'
 import { sevColor } from 'utils'
+import { useMutation } from '@apollo/client'
+import { orgRuleUpdate } from 'graphQL/Mutation'
 
-const ApiFeed = () => {
+const ApiFeed = ({ data }) => {
   const textColor = useColorModeValue('gray.700', 'white')
 
-  const [orgHealthCheck, setOrgHealthCheck] = useState(orgHealthChecks)
+  const toast = useToast()
+
+  const [updateRule] = useMutation(orgRuleUpdate)
 
   const options = [
-    { value: 'Critical', label: 'Critical', bg: 'red' },
-    { value: 'High', label: 'High', bg: 'orange' },
-    { value: 'Medium', label: 'Medium', bg: 'yellow' },
-    { value: 'Low', label: 'Low', bg: 'green' },
+    { value: 'critical', label: 'Critical', bg: 'red' },
+    { value: 'high', label: 'High', bg: 'orange' },
+    { value: 'medium', label: 'Medium', bg: 'yellow' },
+    { value: 'low', label: 'Low', bg: 'green' }
   ]
 
-  // Define a mapping of status values to background colors
-  const statusColors = {
-    Critical: 'red.300',
-    High: 'orange.300',
-    Medium: 'blue.300',
-    Low: 'green.300',
-    None: 'gray.300'
+  const handleChange = async (value, id) => {
+    try {
+      await updateRule({
+        variables: {
+          id: id,
+          enabled: value === true ? true : false
+        }
+      }).then(() => window.location.reload())
+    } catch (error) {
+      console.error('Mutation error:', error)
+    }
   }
 
-  const handleStatusChange = (id, value) => {
-    const updatedData = orgHealthCheck.map((item) =>
-      item.id === id ? { ...item, status: value } : item
-    )
-    setOrgHealthCheck(updatedData)
+  const handleStatusChange = async (id, value) => {
+    try {
+      await updateRule({
+        variables: {
+          id: id,
+          severity: value
+        }
+      }).then(() => window.location.reload())
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   return (
@@ -76,39 +91,35 @@ const ApiFeed = () => {
             </Tr>
           </Thead>
           <Tbody>
-            {orgHealthCheck.map((api, index) => (
+            {data.map((item, index) => (
               <Tr key={index}>
                 <Td pl={0}>
-                  <Switch defaultChecked></Switch>
+                  <Switch
+                    isChecked={item.enabled}
+                    onChange={(e) => handleChange(e.target.checked, item.id)}
+                  ></Switch>
                 </Td>
-                <Td pl={0}>
-                  <Link
-                    color={'blue.500'}
-                    _hover={{ textDecoration: 'underline' }}
-                    href={api.link}
-                    target='_blank'
-                  >
-                    {api.title}
-                  </Link>
-                </Td>
+                <Td pl={0}>{item.rule.friendlyId}</Td>
                 <Td pl={0}>
                   <Flex direction='column' rowGap={1} maxWidth={800}>
-                    <Text fontSize={'sm'}>{api.description}</Text>
-                    <Text fontSize={'10px'}>{api.long_desc}</Text>
+                    <Text fontSize={'sm'}>{item.rule.shortDesc}</Text>
+                    <Text fontSize={'10px'}>{item.rule.longDesc}</Text>
                   </Flex>
                 </Td>
                 <Td pl={0}>
                   <Select
                     width={'130px'}
                     size='sm'
-                    value={api.status}
-                    onChange={(e) => handleStatusChange(api.id, e.target.value)}
-                    bg={sevColor(api.status.toLowerCase()) + '.200'}
+                    value={item.severity}
+                    onChange={(e) =>
+                      handleStatusChange(item.id, e.target.value)
+                    }
+                    bg={sevColor(item.severity.toLowerCase()) + '.200'}
                     variant={'outline'}
                   >
-                    {options.map((item, index) => (
-                      <option key={index} value={item.value}>
-                        {item.label}
+                    {options.map((itm, index) => (
+                      <option key={index} value={itm.value}>
+                        {itm.label}
                       </option>
                     ))}
                   </Select>

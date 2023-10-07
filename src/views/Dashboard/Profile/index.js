@@ -24,6 +24,8 @@ import GeneralFeed from './components/GeneralFeed'
 import TeamsLog from './components/TeamsLog'
 import PersonalInfo from './components/PersonalInfo'
 import { useLocation } from 'react-router-dom'
+import { GetOrg } from 'graphQL/Queries'
+import { Link } from 'react-router-dom'
 
 function Profile() {
   const location = useLocation()
@@ -56,6 +58,7 @@ function Profile() {
   ]
 
   const [selectedTab, setSelectedTab] = useState(tabs[1].name)
+  const [tabIndex, setTabIndex] = useState(0)
 
   const { data } = useQuery(GetSettings)
 
@@ -63,12 +66,33 @@ function Profile() {
     if (tab === 'person') {
       setSelectedTab('PERSONAL')
     }
-  }, [data])
+  }, [tab])
 
-  const { data: orgInfo } = useQuery(GetOrgInfo)
+  const { data: orgInfo, refetch } = useQuery(GetOrg)
+
+  const handleTabClick = (value) => {
+    window.history.pushState(null, null, `/vendor/profiles?tab=${value}`)
+  }
+
+  useEffect(() => {
+    if (tab === 'general') {
+      setTabIndex(0)
+    } else if (tab === 'team') {
+      setTabIndex(1)
+    } else if (tab === 'feeds') {
+      setTabIndex(2)
+    } else if (tab === 'checks') {
+      setTabIndex(3)
+    } else if (tab === 'lists') {
+      setTabIndex(4)
+    } else if (tab === null) {
+      window.history.pushState(null, null, `/vendor/profiles?tab=general`)
+    }
+  }, [tabIndex, tab])
 
   return (
     <Flex direction='column' px={4}>
+      {/*  HEADER */}
       <Header
         // backgroundHeader={ProfileBgImage}
         backgroundProfile={bgProfile}
@@ -78,73 +102,106 @@ function Profile() {
         setSelectedTab={setSelectedTab}
         tabs={tabs}
       />
-      {data && (
-        <>
-          {selectedTab === 'ORGANIZATION' && orgInfo && (
-            <Card>
-              <Tabs variant='enclosed' w={'100%'} bg={'white'}>
-                <TabList>
-                  <Tab _focus={{ outline: 'none' }}>General</Tab>
-                  <Tab _focus={{ outline: 'none' }}>Team</Tab>
-                  <Tab _focus={{ outline: 'none' }}>Feeds</Tab>
-                  <Tab _focus={{ outline: 'none' }}>Checks</Tab>
-                  <Tab _focus={{ outline: 'none' }}>Lists</Tab>
-                </TabList>
-                <TabPanels>
-                  {/* GEENRAL */}
-                  <TabPanel>
-                    <Grid
-                      width={'100%'}
-                      templateColumns={{ sm: '1fr', xl: 'repeat(2, 1fr)' }}
-                      gap='22px'
-                    >
-                      <GeneralFeed orgInfo={orgInfo} />
-                    </Grid>
-                  </TabPanel>
-                  {/* TEAMS */}
-                  <TabPanel>
-                    <TeamsLog />
-                  </TabPanel>
-                  {/* FEEDS */}
-                  <TabPanel>
-                    <Grid
-                      width={'100%'}
-                      templateColumns={{ sm: '1fr', xl: 'repeat(3, 1fr)' }}
-                      gap='22px'
-                    >
-                      <AdvisoryFeeds data={data} orgInfo={orgInfo} />
-                      <ExploitFeeds data={data} orgInfo={orgInfo} />
-                    </Grid>
-                  </TabPanel>
-                  {/* RULES */}
-                  <TabPanel>
-                    <ApiFeed />
-                  </TabPanel>
-                  {/* LISTS */}
-                  <TabPanel>
-                    <Grid
-                      width={'100%'}
-                      templateColumns={{ sm: '1fr', xl: 'repeat(3, 1fr)' }}
-                      gap='22px'
-                    >
-                      <ComponentFeed />
-                    </Grid>
-                  </TabPanel>
-                </TabPanels>
-              </Tabs>
-            </Card>
-          )}
 
-          {selectedTab === 'PERSONAL' && orgInfo && (
-            <Grid
-              width={'100%'}
-              templateColumns={{ sm: '1fr', xl: 'repeat(2, 1fr)' }}
-              gap='22px'
-            >
-              <PersonalInfo userName={username} userEmail={email} />
-            </Grid>
-          )}
-        </>
+      {/*  ORGANIZATION */}
+      {selectedTab === 'ORGANIZATION' && orgInfo && (
+        <Card>
+          <Tabs
+            variant='enclosed'
+            w={'100%'}
+            bg={'white'}
+            defaultIndex={tabIndex}
+          >
+            <TabList>
+              <Tab
+                _focus={{ outline: 'none' }}
+                onClick={() => handleTabClick('general')}
+              >
+                General
+              </Tab>
+              <Tab
+                _focus={{ outline: 'none' }}
+                onClick={() => handleTabClick('team')}
+              >
+                Team
+              </Tab>
+              <Tab
+                _focus={{ outline: 'none' }}
+                onClick={() => handleTabClick('feeds')}
+              >
+                Feeds
+              </Tab>
+              <Tab
+                _focus={{ outline: 'none' }}
+                onClick={() => handleTabClick('checks')}
+              >
+                Checks
+              </Tab>
+              <Tab
+                _focus={{ outline: 'none' }}
+                onClick={() => handleTabClick('list')}
+              >
+                Lists
+              </Tab>
+            </TabList>
+            <TabPanels>
+              {/* GEENRAL */}
+              <TabPanel>
+                <Grid
+                  width={'100%'}
+                  templateColumns={{ sm: '1fr', xl: 'repeat(2, 1fr)' }}
+                  gap='22px'
+                >
+                  <GeneralFeed orgInfo={orgInfo} />
+                </Grid>
+              </TabPanel>
+              {/* TEAMS */}
+              <TabPanel>
+                <TeamsLog data={orgInfo.organization.users} />
+              </TabPanel>
+              {/* FEEDS */}
+              <TabPanel>
+                <Grid
+                  width={'100%'}
+                  templateColumns={{ sm: '1fr', xl: 'repeat(3, 1fr)' }}
+                  gap='22px'
+                >
+                  <AdvisoryFeeds orgInfo={orgInfo} />
+                  <ExploitFeeds orgInfo={orgInfo} />
+                </Grid>
+              </TabPanel>
+              {/* RULES */}
+              <TabPanel>
+                <ApiFeed data={orgInfo.organization.organizationRules} />
+              </TabPanel>
+              {/* LISTS */}
+              <TabPanel>
+                <Grid
+                  width={'100%'}
+                  templateColumns={{ sm: '1fr', xl: 'repeat(3, 1fr)' }}
+                  gap='22px'
+                >
+                  <ComponentFeed />
+                </Grid>
+              </TabPanel>
+            </TabPanels>
+          </Tabs>
+        </Card>
+      )}
+
+      {/* PERSONAL  */}
+      {selectedTab === 'PERSONAL' && orgInfo && (
+        <Grid
+          width={'100%'}
+          templateColumns={{ sm: '1fr', xl: 'repeat(2, 1fr)' }}
+          gap='22px'
+        >
+          <PersonalInfo
+            userName={orgInfo.organization.name}
+            userEmail={orgInfo.organization.email}
+            refetch={refetch}
+          />
+        </Grid>
       )}
     </Flex>
   )

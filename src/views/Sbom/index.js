@@ -366,18 +366,6 @@ function SBOM() {
                             {sbomData.sbom.project.name} :{' '}
                             {sbomData.sbom.primaryComponent?.version}
                           </Text>
-
-                          {!customerView && (
-                            <Tag
-                              size={'sm'}
-                              variant='outline'
-                              colorScheme='blue'
-                            >
-                              <TagLabel textTransform={'capitalize'}>
-                                {sbomData.sbom.lifecycle}
-                              </TagLabel>
-                            </Tag>
-                          )}
                         </Stack>
 
                         <Text fontSize={'sm'} my={0.5}>
@@ -392,6 +380,20 @@ function SBOM() {
                             {timeSince(sbomData.sbom.updatedAt)}
                           </Text>
                         </Tooltip>
+
+                        {!customerView && (
+                          <Tag
+                            mt={1}
+                            w={'fit-content'}
+                            size={'sm'}
+                            variant='outline'
+                            colorScheme='blue'
+                          >
+                            <TagLabel textTransform={'capitalize'}>
+                              {sbomData.sbom.lifecycle}
+                            </TagLabel>
+                          </Tag>
+                        )}
                         {/* --------------- STATS ------------------- */}
                         <Flex
                           flexDir={'row'}
@@ -599,6 +601,7 @@ function SBOM() {
               handlePreviousPage={handlePreviousPage}
               handleNextPage={handleNextPage}
               status={status}
+              sbomId={sbomId}
               productId={productId}
               type={
                 selectedProject?.sboms.length > 0 &&

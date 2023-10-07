@@ -1,5 +1,35 @@
 import { gql } from '@apollo/client'
 
+// ORGANIZATION UPDATE
+export const orgUpdate = gql`
+  mutation orgUpdate($name: String, $email: String, $url: String) {
+    organizationUpdate(input: { name: $name, email: $email, url: $url }) {
+      errors
+    }
+  }
+`
+
+// ORGANIZATION RULE UPDATE
+export const orgRuleUpdate = gql`
+  mutation orgRuleUpdate(
+    $action: String
+    $enabled: Boolean
+    $id: ID!
+    $severity: String
+  ) {
+    organizationRuleUpdate(
+      input: {
+        action: $action
+        enabled: $enabled
+        id: $id
+        severity: $severity
+      }
+    ) {
+      errors
+    }
+  }
+`
+
 export const OrgConnectorRefresh = gql`
   mutation OrgConnectorRefresh {
     organizationConnectorRefresh(input: {}) {
@@ -368,7 +398,6 @@ export const OrgSettingUpdate = gql`
     organizationSettingUpdate(input: { id: $id, value: $value }) {
       organizationSetting {
         id
-        value
         setting {
           name
         }
@@ -581,79 +610,149 @@ export const authorDelete = gql`
     }
   }
 `
-
+// SBOM SUPPLIER CREATE
 export const supplierCreate = gql`
   mutation supplierCreate(
-    $name: String!
-    $email: String
     $sbomId: Uuid!
-    $componentId: Uuid
+    $name: String
+    $url: String
+    $contactName: String
+    $contactEmail: String
   ) {
-    supplierCreate(
+    sbomSupplierCreate(
       input: {
-        name: $name
-        email: $email
         sbomId: $sbomId
-        componentId: $componentId
+        name: $name
+        url: $url
+        contactName: $contactName
+        contactEmail: $contactEmail
       }
     ) {
-      supplier {
+      sbomSupplier {
         id
         name
-        email
-        updatedAt
+        contactEmail
+        contactName
       }
       errors
     }
   }
 `
 
+// SBOM SUPPLIER UPDATE
 export const supplierUpdate = gql`
   mutation supplierUpdate(
+    $id: ID!
     $name: String
-    $email: String
-    $supplierId: Uuid!
-    $sbomId: Uuid!
-    $componentId: Uuid
+    $url: String
+    $contactName: String
+    $contactEmail: String
   ) {
-    supplierUpdate(
+    sbomSupplierUpdate(
       input: {
+        id: $id
         name: $name
-        email: $email
-        supplierId: $supplierId
-        sbomId: $sbomId
-        componentId: $componentId
+        url: $url
+        contactName: $contactName
+        contactEmail: $contactEmail
       }
     ) {
-      supplier {
+      sbomSupplier {
         id
         name
-        email
-        updatedAt
+        contactEmail
+        contactName
       }
       errors
     }
   }
 `
 
+// SBOM SUPPLIER UPDATE
 export const supplierDelete = gql`
-  mutation supplierDelete(
-    $supplierId: Uuid!
-    $sbomId: Uuid!
-    $componentId: Uuid
-  ) {
-    supplierDelete(
-      input: {
-        supplierId: $supplierId
-        sbomId: $sbomId
-        componentId: $componentId
-      }
-    ) {
-      supplier {
+  mutation supplierDelete($id: ID!) {
+    sbomSupplierDelete(input: { id: $id }) {
+      sbomSupplier {
         id
         name
-        email
-        updatedAt
+        contactEmail
+        contactName
+      }
+      errors
+    }
+  }
+`
+
+// COMPONENT SUPPLIER CREARTE
+export const addComSupplier = gql`
+  mutation addCompSupplier(
+    $componentId: Uuid!
+    $name: String!
+    $url: String
+    $contactName: String
+    $contactEmail: String
+  ) {
+    compSupplierCreate(
+      input: {
+        componentId: $componentId
+        name: $name
+        url: $url
+        contactName: $contactName
+        contactEmail: $contactEmail
+      }
+    ) {
+      compSupplier {
+        id
+        name
+        url
+        contactEmail
+        contactName
+      }
+      errors
+    }
+  }
+`
+
+// COMPONENT SUPPLIER UPDATE
+export const updateComSupplier = gql`
+  mutation updateComSupplier(
+    $id: ID!
+    $name: String!
+    $url: String
+    $contactName: String
+    $contactEmail: String
+  ) {
+    compSupplierUpdate(
+      input: {
+        id: $id
+        name: $name
+        url: $url
+        contactName: $contactName
+        contactEmail: $contactEmail
+      }
+    ) {
+      compSupplier {
+        id
+        name
+        url
+        contactEmail
+        contactName
+      }
+      errors
+    }
+  }
+`
+
+// COMPONENT SUPPLIER DELETE
+export const deleteComSupplier = gql`
+  mutation deleteCompSupplier($id: ID!) {
+    compSupplierDelete(input: { id: $id }) {
+      compSupplier {
+        id
+        name
+        url
+        contactEmail
+        contactName
       }
       errors
     }
@@ -742,10 +841,6 @@ export const sbomUpdate = gql`
         purl
         spec
         specVersion
-        suppliers {
-          name
-          email
-        }
         tools {
           name
           version
@@ -787,6 +882,21 @@ export const signSbom = gql`
         id
         lifecycle
       }
+      errors
+    }
+  }
+`
+
+// HEALTH RECHECK
+export const recheckHealth = gql`
+  mutation recheckHealth($sbomId: ID!, $checkId: String, $compId: ID) {
+    checkRerun(
+      input: {
+        sbomId: $sbomId
+        friendlyCheckId: $checkId
+        componentId: $compId
+      }
+    ) {
       errors
     }
   }

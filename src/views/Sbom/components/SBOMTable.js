@@ -31,6 +31,8 @@ import PriSupplierModal from './PriSupplierModal'
 import VulnTable from 'components/Tables/VulnTable'
 import HealthCheckTable from 'components/Tables/HealthCheckTable'
 import ChangelogTable from 'components/Tables/ChangelogTable'
+import { GetCheckResults } from 'graphQL/Queries'
+import { useQuery } from '@apollo/client'
 
 const SBOMTable = ({
   data,
@@ -39,20 +41,56 @@ const SBOMTable = ({
   handleNextPage,
   status,
   productId,
+  sbomId,
   type,
   pageIndex
 }) => {
   const { healthCheckData, changelogData, productVulData } = useContext(
     GlobalContext
   )
-
   const textColor = useColorModeValue('gray.700', 'white')
-
   const toast = useToast()
-
   const location = useLocation()
-
   const customerView = location.pathname.startsWith('/customer')
+
+  const [pageIdx, setPageIdx] = useState(1)
+
+  const { data: results, refetch: refetchResults } = useQuery(GetCheckResults, {
+    variables: {
+      projectId: productId,
+      sbomId: sbomId,
+      first: 10,
+      field: 'STATUS',
+      direction: 'ASC'
+    }
+  })
+
+  const onPreviousPage = () => {
+    setPageIdx((prev) => pageIndex !== 0 && prev - 1)
+    refetchResults({
+      projectId: productId,
+      sbomId: sbomId,
+      first: undefined,
+      last: 10,
+      before: results.sbom.checkResults.pageInfo.startCursor,
+      after: ''
+    })
+  }
+
+  const onNextPage = () => {
+    setPageIdx(
+      (prev) =>
+        prev < Math.ceil(results?.sbom.checkResults.totalCount) && prev + 1
+    )
+    refetchResults({
+      projectId: productId,
+      sbomId: sbomId,
+      first: 10,
+      last: undefined,
+      after: results.sbom.checkResults.pageInfo.endCursor,
+      before: ''
+    })
+  }
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
@@ -207,25 +245,51 @@ const SBOMTable = ({
             </TabPanel>
             {/* HEALTH CHECK TABLE */}
             <TabPanel px={0}>
-              <CardBody>
-                <HealthCheckTable
-                  data={filteredData}
-                  setFilteredData={setFilteredData}
-                />
-              </CardBody>
-              {/* pagination */}
-              {filteredData && (
-                <Flex
-                  flexDir={'row'}
-                  gap={4}
-                  alignItems={'center'}
-                  mt={6}
-                  justifyContent={'flex-start'}
-                >
-                  <Button colorScheme='blue'>Previous</Button>
-                  <Button colorScheme='blue'>Next</Button>
-                  <Box>Page 1 of 1</Box>
-                </Flex>
+              {results && (
+                <>
+                  <CardBody>
+                    <HealthCheckTable
+                      data={results.sbom.checkResults.nodes}
+                      setFilteredData={setFilteredData}
+                      refetch={refetchResults}
+                      productId={productId}
+                      sbomId={sbomId}
+                    />
+                  </CardBody>
+                  {/* pagination */}
+                  {filteredData && (
+                    <Flex
+                      flexDir={'row'}
+                      gap={4}
+                      alignItems={'center'}
+                      mt={6}
+                      justifyContent={'flex-start'}
+                    >
+                      <Button
+                        colorScheme='blue'
+                        onClick={onPreviousPage}
+                        isDisabled={
+                          !results.sbom.checkResults.pageInfo.hasPreviousPage
+                        }
+                      >
+                        Previous
+                      </Button>
+                      <Button
+                        colorScheme='blue'
+                        onClick={onNextPage}
+                        isDisabled={
+                          !results.sbom.checkResults.pageInfo.hasNextPage
+                        }
+                      >
+                        Next
+                      </Button>
+                      <Box>
+                        Page {pageIdx} of{' '}
+                        {Math.ceil(results.sbom.checkResults.totalCount / 10)}
+                      </Box>
+                    </Flex>
+                  )}
+                </>
               )}
             </TabPanel>
             {/* CHANGELOG TABLE */}

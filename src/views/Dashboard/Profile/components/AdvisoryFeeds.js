@@ -22,8 +22,9 @@ const AdvisoryFeeds = ({ data, orgInfo }) => {
   const [organizationSettingCreate] = useMutation(OrgSettingCreate)
   const [organizationSettingUpdate] = useMutation(OrgSettingUpdate)
 
-  const filteredFeed =
-    data && data.settings.filter((item) => item.kind === `advisory_feed`)
+  const filteredFeed = orgInfo.organization.organizationSettings.filter(
+    (item) => item.setting.kind === `advisory_feed`
+  )
 
   const handleChange = async (e, id, feed) => {
     try {
@@ -63,7 +64,7 @@ const AdvisoryFeeds = ({ data, orgInfo }) => {
           {filteredFeed &&
             filteredFeed.map((feed, index) => {
               const activeFeed = orgInfo.organization.organizationSettings.find(
-                (org) => org.setting.id === feed.id
+                (org) => org.id === feed.id
               )
               return (
                 <Link href='https://nvd.nist.gov/' target='_blank' key={index}>
@@ -88,7 +89,7 @@ const AdvisoryFeeds = ({ data, orgInfo }) => {
                       fontWeight='400'
                       htmlFor={feed.friendlyName}
                     >
-                      {feed.friendlyName}
+                      {feed.setting.friendlyName}
                     </Text>
                   </Flex>
                 </Link>

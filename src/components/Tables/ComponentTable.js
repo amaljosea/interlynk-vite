@@ -47,6 +47,7 @@ import LinksDrawer from 'components/Drawer/LinksDrawer'
 import styled from '@emotion/styled'
 import { useMutation } from '@apollo/client'
 import { supplierDelete } from 'graphQL/Mutation'
+import { deleteComSupplier } from 'graphQL/Mutation'
 
 const customStyles = {
   headCells: {
@@ -458,15 +459,13 @@ const ComponentTable = ({ data, refetch, type }) => {
     const productId = queryParams.get('p')
     const sbomId = queryParams.get('sbom')
 
-    const [deleteSupplier] = useMutation(supplierDelete)
+    const [deleteSupplier] = useMutation(deleteComSupplier)
 
     const handleSupRemove = async (id) => {
       try {
         await deleteSupplier({
           variables: {
-            supplierId: suppliers[0].id,
-            sbomId: sbomId,
-            componentId: data.id
+            id: suppliers[0].id
           }
         }).then((res) => {
           if (res) {
@@ -519,7 +518,7 @@ const ComponentTable = ({ data, refetch, type }) => {
                     colorScheme='orange'
                   >
                     <TagLabel>
-                      {item.name} - {item.email}
+                      {item.name} - {item.contactEmail}
                     </TagLabel>
                     <TagCloseButton onClick={handleSupRemove} />
                   </Tag>
