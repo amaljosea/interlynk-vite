@@ -16,6 +16,8 @@ import {
   useToast,
   chakra
 } from '@chakra-ui/react'
+import { updateComSupplier } from 'graphQL/Mutation'
+import { addComSupplier } from 'graphQL/Mutation'
 import { supplierUpdate } from 'graphQL/Mutation'
 import { supplierCreate } from 'graphQL/Mutation'
 import { useState, useEffect } from 'react'
@@ -43,13 +45,13 @@ const SupplierModal = ({
   const [supName, setSupName] = useState('')
   const [supEmail, setSupEmail] = useState('')
 
-  const [createSupplier] = useMutation(supplierCreate)
-  const [updateSupplier] = useMutation(supplierUpdate)
+  const [createSupplier] = useMutation(addComSupplier)
+  const [updateSupplier] = useMutation(updateComSupplier)
 
   useEffect(() => {
     if (suppliers.length > 0) {
       setSupName(suppliers[0].name)
-      setSupEmail(suppliers[0].email)
+      setSupEmail(suppliers[0].contactEmail)
     }
   }, [suppliers])
 
@@ -59,8 +61,7 @@ const SupplierModal = ({
       await createSupplier({
         variables: {
           name: supName,
-          email: supEmail,
-          sbomId: sbomId,
+          contactEmail: supEmail,
           componentId: id
         }
       }).then(() => {
@@ -86,21 +87,11 @@ const SupplierModal = ({
       await updateSupplier({
         variables: {
           name: supName,
-          email: supEmail,
-          supplierId: suppliers[0].id,
-          sbomId: sbomId,
-          componentId: id
+          contactEmail: supEmail,
+          id: suppliers[0].id
         }
       }).then((data) => {
-        if (data.data.supplierUpdate.errors.length > 0) {
-          onClose()
-          toast({
-            description: data.data.supplierUpdate.errors[0],
-            status: 'error',
-            position: 'top',
-            duration: 5000
-          })
-        } else {
+        if (data) {
           refetch({
             projectId: productId,
             sbomId: sbomId
@@ -157,16 +148,13 @@ const SupplierModal = ({
               <Button colorScheme='gray' mr={3} onClick={onClose}>
                 Cancel
               </Button>
-              <Button colorScheme='green' mr={3} onClick={onClose}>
-                Save Rule
-              </Button>
               {suppliers.length > 0 ? (
                 <Button colorScheme='blue' type={'submit'}>
                   Update
                 </Button>
               ) : (
                 <Button colorScheme='blue' type={'submit'}>
-                  Save Value
+                  Save
                 </Button>
               )}
             </ModalFooter>

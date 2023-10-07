@@ -18,6 +18,7 @@ import {
 import { supplierDelete } from 'graphQL/Mutation'
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
+import { getFullDateAndTime } from 'utils'
 import { timeSince } from 'utils'
 import { licenseOptions } from 'variables/licenses'
 
@@ -55,12 +56,11 @@ const GeneralDataRow = ({
     }
   }, [licenses])
 
-  const handleSupRemove = async (id) => {
+  const handleSupRemove = async () => {
     try {
       await deleteSupplier({
         variables: {
-          supplierId: suppliers[0].id,
-          sbomId: sbomId
+          id: suppliers[0].id
         }
       }).then((res) => {
         if (res) {
@@ -117,20 +117,7 @@ const GeneralDataRow = ({
         <Td pl={0} fontWeight={'medium'}>
           Created At
         </Td>
-        <Td pl={0}>
-          {new Date(creationAt).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            timeZone: 'America/Los_Angeles'
-          })}{' '}
-          {new Date(creationAt).toLocaleTimeString('en-US', {
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true,
-            timeZone: 'America/Los_Angeles'
-          })}
-        </Td>
+        <Td pl={0}>{getFullDateAndTime(creationAt)}</Td>
         <Td pl={0}></Td>
       </Tr>
       <Tr>
@@ -200,7 +187,7 @@ const GeneralDataRow = ({
                   colorScheme='orange'
                 >
                   <TagLabel>
-                    {item.name} - {item.email}
+                    {item.contactName} - {item.contactEmail}
                   </TagLabel>
                   <TagCloseButton onClick={handleSupRemove} />
                 </Tag>

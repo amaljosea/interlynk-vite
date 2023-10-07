@@ -1,6 +1,7 @@
 import { Avatar, Box, Flex, Stack, Text } from '@chakra-ui/react'
 import React from 'react'
 import DataTable from 'react-data-table-component'
+import { getFullDateAndTime } from 'utils'
 import { dp } from 'utils'
 
 const customStyles = {
@@ -49,9 +50,9 @@ const TeamTable = ({ data }) => {
     },
     // AUTH
     {
-      id: 'auth',
-      name: 'AUTH',
-      selector: (row) => row.auth
+      id: 'email',
+      name: 'EMAIL',
+      selector: (row) => row.email
     },
     // ROLE
     {
@@ -64,21 +65,10 @@ const TeamTable = ({ data }) => {
       id: 'joinedDate',
       name: 'DATE JOINED',
       selector: (row) => {
-        const { joinedDate } = row
+        const { createdAt } = row
         return (
           <Text textTransform={'capitalize'}>
-            {new Date(joinedDate).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit',
-              timeZone: 'America/Los_Angeles'
-            })}{' '}
-            {new Date(joinedDate).toLocaleTimeString('en-US', {
-              hour: 'numeric',
-              minute: '2-digit',
-              hour12: true,
-              timeZone: 'America/Los_Angeles'
-            })}
+            {getFullDateAndTime(createdAt)}
           </Text>
         )
       }

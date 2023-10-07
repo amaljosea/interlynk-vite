@@ -1,3 +1,4 @@
+import { useMutation } from '@apollo/client'
 import {
   Text,
   FormControl,
@@ -10,14 +11,32 @@ import { useColorModeValue } from '@chakra-ui/system'
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
+import { orgUpdate } from 'graphQL/Mutation'
 import React, { useState, useEffect } from 'react'
 
 const PersonalInfo = ({ userName, userEmail }) => {
   const textColor = useColorModeValue('gray.700', 'white')
 
+  const [updateOrg] = useMutation(orgUpdate)
+
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [jobTitle, setJobTitle] = useState('')
+
+  const handleUpdate = async () => {
+    if (name !== '' && email !== '') {
+      try {
+        await updateOrg({
+          variables: {
+            name: name,
+            email: email
+          }
+        }).then(() => window.location.reload())
+      } catch (error) {
+        console.log(`Error`, error)
+      }
+    }
+  }
 
   useEffect(() => {
     setName(userName)
@@ -46,11 +65,7 @@ const PersonalInfo = ({ userName, userEmail }) => {
           {/* EMAIL */}
           <FormControl>
             <FormLabel>Email</FormLabel>
-            <Input
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              readOnly
-            />
+            <Input value={email} onChange={(e) => setEmail(e.target.value)} />
           </FormControl>
           {/* JOB TITLE */}
           <FormControl>
@@ -62,7 +77,7 @@ const PersonalInfo = ({ userName, userEmail }) => {
             />
           </FormControl>
           {/* ACTION */}
-          <Button variant='solid' colorScheme='blue'>
+          <Button variant='solid' colorScheme='blue' onClick={handleUpdate}>
             Update
           </Button>
         </Flex>

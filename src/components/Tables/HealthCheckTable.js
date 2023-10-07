@@ -1,3 +1,4 @@
+import { useMutation } from '@apollo/client'
 import {
   Button,
   Flex,
@@ -12,19 +13,15 @@ import {
 } from '@chakra-ui/react'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import GlobalContext from 'context/GlobalContext'
+import { recheckHealth } from 'graphQL/Mutation'
+import { reCheckHealth } from 'graphQL/Mutation'
 import { PackageURL } from 'packageurl-js'
-import React, {
-  createRef,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState
-} from 'react'
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { BiSolidWrench } from 'react-icons/bi'
 import { FaCheckDouble } from 'react-icons/fa'
 import { GoSkip } from 'react-icons/go'
+import { timeSince } from 'utils'
 import { sevColor } from 'utils'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import PurlModal from 'views/Dashboard/Products/components/PurlModal'
@@ -86,7 +83,13 @@ const FilterComponent = ({ filterText, onFilter, onClear }) => {
   )
 }
 
-const HealthCheckTable = ({ data, setFilteredData }) => {
+const HealthCheckTable = ({
+  data,
+  setFilteredData,
+  productId,
+  sbomId,
+  refetch
+}) => {
   const customerView = location.pathname.startsWith('/customer')
 
   const { healthCheckData, setHealthCheckData } = useContext(GlobalContext)
@@ -104,6 +107,8 @@ const HealthCheckTable = ({ data, setFilteredData }) => {
   const [resetPaginationToggle, setResetPaginationToggle] = useState(false)
 
   const [filteredItems, setFilteredItems] = useState([])
+
+  const [healthRecheck] = useMutation(recheckHealth)
 
   useEffect(() => {
     const filterData = data.filter(
@@ -238,18 +243,18 @@ const HealthCheckTable = ({ data, setFilteredData }) => {
   ])
 
   const handleOpen = (row) => {
-    const { shortDesc, healthCheckId } = row
+    const { shortDesc, organizationRule } = row
 
     setActiveRow(row)
 
-    if (healthCheckId === 'SB-HC-17') {
+    if (organizationRule.rule.friendlyId === 'SB-HC-17') {
       const pkg = PackageURL.fromString('pkg:generic/unknown@1.0')
       setPurlValue('pkg:generic/unknown@1.0')
       setPurlData(pkg)
       return onPurlOpen()
     }
 
-    if (healthCheckId === 'SB-HC-19') {
+    if (organizationRule.rule.friendlyId === 'SB-HC-20') {
       setCpeData({
         vendor: 'vendor',
         product: 'product',
@@ -366,34 +371,53 @@ const HealthCheckTable = ({ data, setFilteredData }) => {
     {
       id: 'checkId',
       name: 'CHECK ID',
-      selector: (row) => row.healthCheckId,
-      width: '200px'
+      selector: (row) => {
+        const { organizationRule } = row
+        return <Text>{organizationRule.rule.friendlyId}</Text>
+      },
+      width: '150px'
     },
     // SEVERITY
     {
       id: 'serverity',
       name: 'SEVERITY',
-      selector: (row) => (
-        <Tag
-          size='md'
-          key='md'
-          variant='subtle'
-          colorScheme={sevColor(row.severity)}
-          textTransform={'capitalize'}
-          width={'100%'}
-          alignItems={'center'}
-          justifyContent={'center'}
-        >
-          <TagLabel>{row.severity}</TagLabel>
-        </Tag>
-      ),
-      width: '200px'
+      selector: (row) => {
+        const { organizationRule } = row
+        return (
+          <Tag
+            size='md'
+            key='md'
+            variant='subtle'
+            colorScheme={sevColor(organizationRule.severity)}
+            textTransform={'capitalize'}
+            width={'100%'}
+            alignItems={'center'}
+            justifyContent={'center'}
+          >
+            <TagLabel>{organizationRule.severity}</TagLabel>
+          </Tag>
+        )
+      },
+      width: '160px'
     },
     // CATEGORY
     {
       id: 'category',
       name: 'CATEGORY',
-      selector: (row) => row.shortDesc,
+      selector: (row) => {
+        const { organizationRule } = row
+        return (
+          <Tooltip label={organizationRule.rule.shortDesc} placement='top'>
+            <Text>
+              {organizationRule.rule.shortDesc !== null
+                ? `${organizationRule.rule.shortDesc?.substring(0, 30)}${
+                    organizationRule.rule.shortDesc.length > 30 ? '...' : ''
+                  }`
+                : ''}
+            </Text>
+          </Tooltip>
+        )
+      },
       width: '260px'
     },
     // LONG DESCRIPTION
@@ -401,30 +425,46 @@ const HealthCheckTable = ({ data, setFilteredData }) => {
       id: 'longDesc',
       name: 'LONG DESCRIPTION',
       selector: (row) => {
-        const { longDesc } = row
+        const { organizationRule } = row
         return (
-          <Tooltip label={longDesc} placement='top'>
+          <Tooltip label={organizationRule.rule.longDesc} placement='top'>
             <Text>
-              {longDesc !== null
-                ? `${longDesc?.substring(0, 50)}${
-                    longDesc.length > 50 ? '...' : ''
+              {organizationRule.rule.longDesc !== null
+                ? `${organizationRule.rule.longDesc?.substring(0, 30)}${
+                    organizationRule.rule.longDesc.length > 30 ? '...' : ''
                   }`
                 : ''}
             </Text>
           </Tooltip>
         )
       },
-      width: '400px'
+      width: '250px'
     },
     // STATUS
     {
       id: 'status',
       name: 'STATUS',
+      selector: (row) => row.status,
+      sortable: true,
+      width: '150px'
+    },
+    // UPDATED AT
+    {
+      id: 'updatedAt',
+      name: 'UPDATED_AT',
+      selector: (row) => timeSince(row.updatedAt),
+      sortable: true,
+      width: '150px'
+    },
+    // ACTION
+    {
+      id: 'action',
+      name: 'ACTION',
       selector: (row) => {
         const { status } = row
         return (
           <>
-            {status === 'fix' && (
+            {status === 'unresolved' && (
               <Stack direction={'row'} alignItems={'center'} spacing={2}>
                 <Tooltip label='Fix'>
                   <IconButton
@@ -467,6 +507,15 @@ const HealthCheckTable = ({ data, setFilteredData }) => {
     }
   ]
 
+  const handleSort = (column, sortDirection) => {
+    refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      field: column.name,
+      direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+    })
+  }
+
   return (
     <>
       {data.length > 0 ? (
@@ -474,6 +523,9 @@ const HealthCheckTable = ({ data, setFilteredData }) => {
           <DataTable
             columns={columns}
             data={data}
+            onSort={handleSort}
+            defaultSortAsc
+            defaultSortFieldId={'status'}
             customStyles={customStyles}
             progressPending={data.length === 0}
             subHeader

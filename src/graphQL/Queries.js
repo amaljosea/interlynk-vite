@@ -1,5 +1,50 @@
 import { gql } from '@apollo/client'
 
+export const GetOrg = gql`
+  query GetOrganization {
+    organization {
+      email
+      id
+      name
+      updatedAt
+      url
+      users {
+        name
+        email
+        role
+        timezone
+        createdAt
+      }
+      organizationConnectors {
+        enabled
+        name
+      }
+      organizationRules {
+        id
+        action
+        enabled
+        severity
+        updatedAt
+        rule {
+          shortDesc
+          longDesc
+          friendlyId
+          category
+        }
+      }
+      organizationSettings {
+        id
+        value
+        setting {
+          name
+          friendlyName
+          kind
+        }
+      }
+    }
+  }
+`
+
 export const GetOrgInfo = gql`
   query GetOrganization {
     organization {
@@ -404,7 +449,7 @@ export const GetSBOM = gql`
         id
         name
         version
-        updatedAt
+        vendor
       }
       authors {
         id
@@ -415,8 +460,32 @@ export const GetSBOM = gql`
       suppliers {
         id
         name
-        email
-        updatedAt
+        url
+        contactEmail
+        contactName
+      }
+      checkResults(
+        sbomId: $sbomId
+        first: 10
+        orderBy: { field: UPDATED_AT, direction: DESC }
+      ) {
+        totalCount
+        nodes {
+          id
+          sbomId
+          componentId
+          primary
+          status
+          organizationRule {
+            severity
+            action
+            rule {
+              shortDesc
+              longDesc
+              friendlyId
+            }
+          }
+        }
       }
       components(
         sbomId: $sbomId
@@ -453,7 +522,8 @@ export const GetSBOM = gql`
           suppliers {
             id
             name
-            email
+            contactEmail
+            contactName
             updatedAt
           }
         }
@@ -804,6 +874,56 @@ export const GetSignedSBOM = gql`
             name
             email
             updatedAt
+          }
+        }
+      }
+    }
+  }
+`
+
+// HEALTH CHECK RESULTES
+export const GetCheckResults = gql`
+  query GetHealthCheckResults(
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+    $field: CheckResultOrderByFields!
+    $direction: OrderByDirection!
+  ) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      checkResults(
+        sbomId: $sbomId
+        after: $after
+        before: $before
+        first: $first
+        last: $last
+        orderBy: { field: $field, direction: $direction }
+      ) {
+        totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          startCursor
+          hasPreviousPage
+        }
+        nodes {
+          id
+          sbomId
+          componentId
+          primary
+          status
+          updatedAt
+          organizationRule {
+            severity
+            action
+            rule {
+              shortDesc
+              longDesc
+              friendlyId
+            }
           }
         }
       }

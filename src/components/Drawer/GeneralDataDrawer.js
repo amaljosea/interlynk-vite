@@ -199,13 +199,15 @@ const GeneralDataDrawer = ({
           version: toolVersion,
           sbomId: sbomId
         }
-      }).then((res) => {
-        if (res) {
-          setCreationTools((prev) => [res.data.toolCreate.tool, ...prev])
-          setToolName('')
-          setToolVersion('')
-        }
       })
+        .then((res) => {
+          if (res) {
+            setCreationTools((prev) => [res.data.toolCreate.tool, ...prev])
+            setToolName('')
+            setToolVersion('')
+          }
+        })
+        .catch((error) => console.log(error))
     } else {
       alert(`Tool Name and Tool Version are required`)
     }

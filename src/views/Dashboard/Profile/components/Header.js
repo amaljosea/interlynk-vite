@@ -11,10 +11,19 @@ const Header = ({ selectedTab, setSelectedTab, name, email, tabs }) => {
 
   const emailColor = useColorModeValue('gray.500', 'gray.300')
 
+  const handleClick = (name) => {
+    setSelectedTab(name)
+    if (name === 'PERSONAL') {
+      window.history.pushState(null, null, '/vendor/profiles?tab=person')
+    } else {
+      window.history.pushState(null, null, '/vendor/profiles?tab=general')
+    }
+  }
+
   return (
     <Flex direction='column' pt={{ base: '120px', md: '75px' }}>
       <Card mb='6'>
-        <CardBody >
+        <CardBody>
           {/* user info */}
           <Flex
             align='center'
@@ -52,7 +61,7 @@ const Header = ({ selectedTab, setSelectedTab, name, email, tabs }) => {
             {tabs.map((tab, index) => (
               <Button
                 key={index}
-                onClick={() => setSelectedTab(tab.name)}
+                onClick={() => handleClick(tab.name)}
                 variant={`${selectedTab == tab.name ? 'solid' : 'outline'}`}
                 colorScheme='blue'
               >
