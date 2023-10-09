@@ -44,7 +44,7 @@
     "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm start"
   },
   "optionalDependencies": {
-    "@babel/core": "7.23.0",
+    "@babel/core": "7.14.0",
     "typescript": "5.2.2"
   },
   "devDependencies": {
