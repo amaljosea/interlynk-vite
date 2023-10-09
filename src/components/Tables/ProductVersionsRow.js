@@ -133,10 +133,11 @@ function ProductVersionsRow(props) {
             <Skeleton height='20px' />
           ) : sbomId.length > 0 ? (
             <Link
-              to={`/vendor/products?p=${id}&sbom=${
+              to={`/vendor/products?tab=0&p=${id}&sbom=${
                 filteredData.length > 0 ? filteredData[0].id : sbomId[0].id
               }`}
               onClick={() => {
+                window.localStorage.setItem('activeProdTab', 0)
                 window.localStorage.setItem('product', name)
               }}
             >

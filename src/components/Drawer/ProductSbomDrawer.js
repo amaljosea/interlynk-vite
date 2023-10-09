@@ -308,12 +308,6 @@ function ProductSbomDrawer(props) {
           sbomId: sbomId
         })
         onClose()
-        toast({
-          description: 'SBOM updated successfully',
-          status: 'success',
-          position: 'top',
-          duration: 3000
-        })
       })
     } catch (error) {
       console.log(`Mutation error `, error)
@@ -610,7 +604,7 @@ function ProductSbomDrawer(props) {
             </Stack>
           </DrawerBody>
           <DrawerFooter borderTopWidth='1px'>
-            <Button  mr={3} onClick={onClose}>
+            <Button mr={3} onClick={onClose}>
               Cancel
             </Button>
             {sbomData ? (

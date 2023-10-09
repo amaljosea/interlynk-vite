@@ -45,7 +45,7 @@ const GeneralDataDrawer = ({
   selectedKey,
   refetch
 }) => {
-  const { cpes, purl, tools, authors, licenses, suppliers } = data
+  const { tools, authors, licenses, suppliers } = data
 
   // console.log(`suppliers`, suppliers)
 
@@ -197,7 +197,7 @@ const GeneralDataDrawer = ({
         variables: {
           name: toolName,
           version: toolVersion,
-          sbomId: sbomId
+          sbomID: sbomId
         }
       })
         .then((res) => {
@@ -217,11 +217,11 @@ const GeneralDataDrawer = ({
     try {
       await deleteTool({
         variables: {
-          toolId: id,
-          sbomId: sbomId
+          toolID: id,
+          sbomID: sbomId
         }
       }).then((res) => {
-        const updatedList = tools.filter((item) => item.id !== id)
+        const updatedList = creationTools.filter((item) => item.id !== id)
         setCreationTools(updatedList)
       })
     } catch (error) {

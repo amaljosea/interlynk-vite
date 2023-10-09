@@ -41,7 +41,7 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers }) => {
 
   useEffect(() => {
     if (suppliers.length > 0) {
-      setSupName(suppliers[0].contactName)
+      setSupName(suppliers[0].name)
       setSupEmail(suppliers[0].contactEmail)
     }
   }, [suppliers])
@@ -51,7 +51,7 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers }) => {
     if (validateEmail(supEmail) === true) {
       await createSupplier({
         variables: {
-          contactName: supName,
+          name: supName,
           contactEmail: supEmail,
           sbomId: sbomId
         }
@@ -84,7 +84,7 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers }) => {
     if (validateEmail(supEmail) === true) {
       await updateSupplier({
         variables: {
-          contactName: supName,
+          name: supName,
           contactEmail: supEmail,
           id: suppliers[0].id
         }

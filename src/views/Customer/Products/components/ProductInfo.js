@@ -1,34 +1,29 @@
 // Chakra imports
 import {
   Flex,
-  Spacer,
   Icon,
   Grid,
   GridItem,
   Text,
   Select,
   useDisclosure,
-  IconButton,
   Stack,
   Box,
   Tooltip
 } from '@chakra-ui/react'
-import React, { useState, useEffect, useRef, useContext } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {
   FaBalanceScale,
   FaCubes,
-  FaFileDownload,
   FaLayerGroup,
   FaProjectDiagram
 } from 'react-icons/fa'
 import { useLocation, useHistory } from 'react-router-dom'
-import GlobalContext from 'context/GlobalContext'
 import { useQuery } from '@apollo/client'
 import { GetSignedSBOM, GetProjectInfo } from 'graphQL/Queries'
 import { timeSince } from 'utils'
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
-import SBOMStatistics from 'views/Sbom/components/SBOMStatistics'
 import SBOMTable from 'views/Sbom/components/SBOMTable'
 import DownloadModal from 'views/Sbom/components/DownloadModal'
 import Cookies from 'js-cookie'

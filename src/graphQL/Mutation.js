@@ -526,14 +526,27 @@ export const DeleteComponent = gql`
     }
   }
 `
-
+// CREATE SBOM TOOL
 export const toolCreate = gql`
-  mutation toolCreate($name: String!, $sbomId: Uuid!, $version: String!) {
-    toolCreate(input: { name: $name, sbomId: $sbomId, version: $version }) {
+  mutation toolCreate(
+    $sbomID: Uuid!
+    $name: String!
+    $version: String
+    $vendor: String
+  ) {
+    toolCreate(
+      input: {
+        sbomId: $sbomID
+        name: $name
+        version: $version
+        vendor: $vendor
+      }
+    ) {
       tool {
         id
         name
         version
+        vendor
         updatedAt
       }
       errors
@@ -541,13 +554,29 @@ export const toolCreate = gql`
   }
 `
 
+// UPDATE SBOM TOOL
 export const toolUpdate = gql`
-  mutation toolUpdate($toolId: ID!, $name: String, $version: String) {
-    toolUpdate(input: { toolId: $toolId, name: $name, version: $version }) {
+  mutation UpdateTools(
+    $toolID: Uuid!
+    $sbomID: Uuid!
+    $name: String
+    $version: String
+    $vendor: String
+  ) {
+    toolUpdate(
+      input: {
+        toolId: $toolID
+        sbomId: $sbomID
+        name: $name
+        version: $version
+        vendor: $vendor
+      }
+    ) {
       tool {
         id
         name
         version
+        vendor
         updatedAt
       }
       errors
@@ -555,13 +584,15 @@ export const toolUpdate = gql`
   }
 `
 
+// DELETE SBOM TOOL
 export const toolDelete = gql`
-  mutation toolDelete($toolId: Uuid!, $sbomId: Uuid!) {
-    toolDelete(input: { toolId: $toolId, sbomId: $sbomId }) {
+  mutation DeletTools($toolID: Uuid!, $sbomID: Uuid!) {
+    toolDelete(input: { toolId: $toolID, sbomId: $sbomID }) {
       tool {
         id
         name
         version
+        vendor
         updatedAt
       }
       errors
@@ -614,7 +645,7 @@ export const authorDelete = gql`
 export const supplierCreate = gql`
   mutation supplierCreate(
     $sbomId: Uuid!
-    $name: String
+    $name: String!
     $url: String
     $contactName: String
     $contactEmail: String
@@ -643,7 +674,7 @@ export const supplierCreate = gql`
 export const supplierUpdate = gql`
   mutation supplierUpdate(
     $id: ID!
-    $name: String
+    $name: String!
     $url: String
     $contactName: String
     $contactEmail: String
@@ -779,10 +810,6 @@ export const sbomCreate = gql`
       errors
       sbom {
         id
-        authors {
-          name
-          email
-        }
         cpes
         creationAt
         licenses
@@ -793,14 +820,6 @@ export const sbomCreate = gql`
         purl
         spec
         specVersion
-        suppliers {
-          name
-          email
-        }
-        tools {
-          name
-          version
-        }
         updatedAt
       }
     }

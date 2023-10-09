@@ -2,6 +2,7 @@
 import {
   Flex,
   Grid,
+  Skeleton,
   Tab,
   TabList,
   TabPanel,
@@ -14,9 +15,7 @@ import Header from './components/Header'
 import { useEffect, useState } from 'react'
 import AdvisoryFeeds from './components/AdvisoryFeeds'
 import ExploitFeeds from './components/ExploitFeeds'
-import { useQuery } from '@apollo/client'
-import { GetSettings } from 'graphQL/Queries'
-import { GetOrgInfo } from 'graphQL/Queries'
+import { useLazyQuery, useQuery } from '@apollo/client'
 import ApiFeed from './components/ApiFeed'
 import Card from 'components/Card/Card'
 import ComponentFeed from './components/ComponentFeed'
@@ -25,14 +24,15 @@ import TeamsLog from './components/TeamsLog'
 import PersonalInfo from './components/PersonalInfo'
 import { useLocation } from 'react-router-dom'
 import { GetOrg } from 'graphQL/Queries'
-import { Link } from 'react-router-dom'
+import { GetOrgRules } from 'graphQL/Queries'
+import { GetOrgSettings } from 'graphQL/Queries'
 
 function Profile() {
   const location = useLocation()
-
   const queryParams = new URLSearchParams(location.search)
+  const activetab = queryParams.get('tab')
 
-  const tab = queryParams.get('tab')
+  const tab = window.localStorage.getItem('activeSetTab')
 
   const username = localStorage.getItem(`username`)
   const email = localStorage.getItem(`email`)
@@ -58,37 +58,19 @@ function Profile() {
   ]
 
   const [selectedTab, setSelectedTab] = useState(tabs[1].name)
-  const [tabIndex, setTabIndex] = useState(0)
-
-  const { data } = useQuery(GetSettings)
 
   useEffect(() => {
-    if (tab === 'person') {
+    if (activetab === 'person') {
       setSelectedTab('PERSONAL')
     }
-  }, [tab])
+  }, [activetab])
 
   const { data: orgInfo, refetch } = useQuery(GetOrg)
 
   const handleTabClick = (value) => {
     window.history.pushState(null, null, `/vendor/profiles?tab=${value}`)
+    window.localStorage.setItem('activeSetTab', value)
   }
-
-  useEffect(() => {
-    if (tab === 'general') {
-      setTabIndex(0)
-    } else if (tab === 'team') {
-      setTabIndex(1)
-    } else if (tab === 'feeds') {
-      setTabIndex(2)
-    } else if (tab === 'checks') {
-      setTabIndex(3)
-    } else if (tab === 'lists') {
-      setTabIndex(4)
-    } else if (tab === null) {
-      window.history.pushState(null, null, `/vendor/profiles?tab=general`)
-    }
-  }, [tabIndex, tab])
 
   return (
     <Flex direction='column' px={4}>
@@ -104,42 +86,42 @@ function Profile() {
       />
 
       {/*  ORGANIZATION */}
-      {selectedTab === 'ORGANIZATION' && orgInfo && (
+      {selectedTab === 'ORGANIZATION' && (
         <Card>
           <Tabs
             variant='enclosed'
             w={'100%'}
             bg={'white'}
-            defaultIndex={tabIndex}
+            defaultIndex={tab ? Number(tab) : 0}
           >
             <TabList>
               <Tab
                 _focus={{ outline: 'none' }}
-                onClick={() => handleTabClick('general')}
+                onClick={() => handleTabClick(0)}
               >
                 General
               </Tab>
               <Tab
                 _focus={{ outline: 'none' }}
-                onClick={() => handleTabClick('team')}
+                onClick={() => handleTabClick(1)}
               >
                 Team
               </Tab>
               <Tab
                 _focus={{ outline: 'none' }}
-                onClick={() => handleTabClick('feeds')}
+                onClick={() => handleTabClick(2)}
               >
                 Feeds
               </Tab>
               <Tab
                 _focus={{ outline: 'none' }}
-                onClick={() => handleTabClick('checks')}
+                onClick={() => handleTabClick(3)}
               >
                 Checks
               </Tab>
               <Tab
                 _focus={{ outline: 'none' }}
-                onClick={() => handleTabClick('list')}
+                onClick={() => handleTabClick(4)}
               >
                 Lists
               </Tab>
@@ -152,12 +134,12 @@ function Profile() {
                   templateColumns={{ sm: '1fr', xl: 'repeat(2, 1fr)' }}
                   gap='22px'
                 >
-                  <GeneralFeed orgInfo={orgInfo} />
+                  {orgInfo && <GeneralFeed orgInfo={orgInfo} />}
                 </Grid>
               </TabPanel>
               {/* TEAMS */}
               <TabPanel>
-                <TeamsLog data={orgInfo.organization.users} />
+                {orgInfo && <TeamsLog data={orgInfo.organization.users} />}
               </TabPanel>
               {/* FEEDS */}
               <TabPanel>
@@ -166,13 +148,13 @@ function Profile() {
                   templateColumns={{ sm: '1fr', xl: 'repeat(3, 1fr)' }}
                   gap='22px'
                 >
-                  <AdvisoryFeeds orgInfo={orgInfo} />
-                  <ExploitFeeds orgInfo={orgInfo} />
+                  <AdvisoryFeeds />
+                  <ExploitFeeds />
                 </Grid>
               </TabPanel>
               {/* RULES */}
               <TabPanel>
-                <ApiFeed data={orgInfo.organization.organizationRules} />
+                <ApiFeed />
               </TabPanel>
               {/* LISTS */}
               <TabPanel>
