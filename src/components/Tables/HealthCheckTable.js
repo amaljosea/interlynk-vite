@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client'
+import { useLazyQuery, useMutation } from '@apollo/client'
 import {
   Button,
   Flex,
@@ -9,12 +9,14 @@ import {
   Input,
   Tooltip,
   Text,
-  IconButton
+  IconButton,
+  Box,
+  Skeleton
 } from '@chakra-ui/react'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import GlobalContext from 'context/GlobalContext'
 import { recheckHealth } from 'graphQL/Mutation'
-import { reCheckHealth } from 'graphQL/Mutation'
+import { GetCheckResults } from 'graphQL/Queries'
 import { PackageURL } from 'packageurl-js'
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
@@ -83,13 +85,7 @@ const FilterComponent = ({ filterText, onFilter, onClear }) => {
   )
 }
 
-const HealthCheckTable = ({
-  data,
-  setFilteredData,
-  productId,
-  sbomId,
-  refetch
-}) => {
+const HealthCheckTable = ({ productId, sbomId }) => {
   const customerView = location.pathname.startsWith('/customer')
 
   const { healthCheckData, setHealthCheckData } = useContext(GlobalContext)
@@ -108,18 +104,36 @@ const HealthCheckTable = ({
 
   const [filteredItems, setFilteredItems] = useState([])
 
+  const [GetCheckData, { data, refetch }] = useLazyQuery(GetCheckResults)
+
   const [healthRecheck] = useMutation(recheckHealth)
 
   useEffect(() => {
-    const filterData = data.filter(
-      (item) =>
-        (item.healthCheckId &&
-          item.healthCheckId
-            .toLowerCase()
-            .includes(filterText.toLowerCase())) ||
-        (item.shortDesc &&
-          item.shortDesc.toLowerCase().includes(filterText.toLowerCase()))
-    )
+    if (data === undefined) {
+      GetCheckData({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          first: 10,
+          field: 'STATUS',
+          direction: 'ASC'
+        }
+      })
+    }
+  }, [])
+
+  useEffect(() => {
+    const filterData =
+      data &&
+      data.sbom.checkResults.nodes.filter(
+        (item) =>
+          (item.healthCheckId &&
+            item.healthCheckId
+              .toLowerCase()
+              .includes(filterText.toLowerCase())) ||
+          (item.shortDesc &&
+            item.shortDesc.toLowerCase().includes(filterText.toLowerCase()))
+      )
 
     setFilteredItems(filterData)
   }, [filterText])
@@ -175,7 +189,8 @@ const HealthCheckTable = ({
       selectedFilters.shortDesc.length === 0
     ) {
       // IF NO FILTER SELECTED RETURN DEFAULT HEALTH CHECK DATA
-      setFilteredData(healthCheckData)
+      console.log(selectedFilters)
+      // setFilteredData(healthCheckData)
     } else {
       // IF ANY FILTER IS SELECTED RETURN SELECTED DATA
       const filtered = healthCheckData.filter(
@@ -185,7 +200,7 @@ const HealthCheckTable = ({
           (selectedFilters.shortDesc.length === 0 ||
             selectedFilters.shortDesc.includes(item.shortDesc))
       )
-      setFilteredData(filtered)
+      console.log(selectedFilters)
     }
   }
 
@@ -234,13 +249,7 @@ const HealthCheckTable = ({
         </Tooltip>
       </Flex>
     )
-  }, [
-    filterText,
-    resetPaginationToggle,
-    handleFilterChange,
-    data,
-    setFilteredData
-  ])
+  }, [filterText, resetPaginationToggle, handleFilterChange, data])
 
   const handleOpen = (row) => {
     const { shortDesc, organizationRule } = row
@@ -516,24 +525,90 @@ const HealthCheckTable = ({
     })
   }
 
+  const [pageIndex, setPageIndex] = useState(1)
+
+  const onPreviousPage = () => {
+    setPageIndex((prev) => pageIndex !== 0 && prev - 1)
+    refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      first: undefined,
+      last: 10,
+      before: data.sbom.checkResults.pageInfo.startCursor,
+      after: ''
+    })
+  }
+
+  const onNextPage = () => {
+    setPageIndex(
+      (prev) => prev < Math.ceil(data.sbom.checkResults.totalCount) && prev + 1
+    )
+    refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      first: 10,
+      last: undefined,
+      after: data.sbom.checkResults.pageInfo.endCursor,
+      before: ''
+    })
+  }
+
   return (
     <>
-      {data.length > 0 ? (
-        <Flex flexDir={'column'} width={'100%'}>
-          <DataTable
-            columns={columns}
-            data={data}
-            onSort={handleSort}
-            defaultSortAsc
-            defaultSortFieldId={'status'}
-            customStyles={customStyles}
-            progressPending={data.length === 0}
-            subHeader
-            subHeaderComponent={subHeaderComponentMemo}
-            responsive={true}
-          />
-        </Flex>
+      {data ? (
+        <>
+          <Flex flexDir={'column'} width={'100%'}>
+            <DataTable
+              columns={columns}
+              data={data.sbom.checkResults.nodes}
+              onSort={handleSort}
+              defaultSortAsc
+              defaultSortFieldId={'status'}
+              customStyles={customStyles}
+              subHeader
+              subHeaderComponent={subHeaderComponentMemo}
+              responsive={true}
+            />
+          </Flex>
+
+          {/* PAGINATION */}
+          <Flex
+            flexDir={'row'}
+            gap={4}
+            alignItems={'center'}
+            mt={6}
+            justifyContent={'flex-start'}
+          >
+            <Button
+              colorScheme='blue'
+              onClick={onPreviousPage}
+              isDisabled={!data.sbom.checkResults.pageInfo.hasPreviousPage}
+            >
+              Previous
+            </Button>
+            <Button
+              colorScheme='blue'
+              onClick={onNextPage}
+              isDisabled={!data.sbom.checkResults.pageInfo.hasNextPage}
+            >
+              Next
+            </Button>
+            <Box>
+              Page {pageIndex} of{' '}
+              {Math.ceil(data.sbom.checkResults.totalCount / 10)}
+            </Box>
+          </Flex>
+        </>
       ) : (
+        <Flex alignItems={'flex-start'} flexDir={'column'} gap={5}>
+          <Skeleton width={'100%'} height={'20px'} />
+          <Skeleton width={'100%'} height={'20px'} />
+          <Skeleton width={'100%'} height={'20px'} />
+          <Skeleton width={'100%'} height={'20px'} />
+        </Flex>
+      )}
+
+      {data && data.sbom.checkResults.nodes.length === 0 && (
         <Flex
           width={'100%'}
           mt={4}

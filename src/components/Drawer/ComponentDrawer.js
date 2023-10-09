@@ -351,10 +351,14 @@ function ComponentDrawer(props) {
           internal: isInternal
         }
       })
-        .then(() => {
+        .then((res) => {
+          console.log(res)
           refetch({
             projectId: productId,
-            sbomId: sbomId
+            sbomId: sbomId,
+            first: 10,
+            field: 'NAME',
+            direction: 'ASC'
           })
           onClose()
         })

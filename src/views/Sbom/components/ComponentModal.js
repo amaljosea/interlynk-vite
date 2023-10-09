@@ -35,7 +35,10 @@ const ComponentModal = ({ isOpen, onClose, id, refetch }) => {
         .then(() =>
           refetch({
             projectId: productId,
-            sbomId: sbomId
+            sbomId: sbomId,
+            first: 10,
+            field: 'NAME',
+            direction: 'ASC'
           })
         )
         .finally(() => onClose())

@@ -24,7 +24,8 @@ import {
   Link,
   Button,
   Input,
-  Badge
+  Badge,
+  Skeleton
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
@@ -45,9 +46,11 @@ import ComponentModal from 'views/Sbom/components/ComponentModal'
 import SupplierModal from 'views/Sbom/components/SupplierModal'
 import LinksDrawer from 'components/Drawer/LinksDrawer'
 import styled from '@emotion/styled'
-import { useMutation } from '@apollo/client'
+import { useLazyQuery, useMutation } from '@apollo/client'
 import { supplierDelete } from 'graphQL/Mutation'
 import { deleteComSupplier } from 'graphQL/Mutation'
+import CardBody from 'components/Card/CardBody'
+import { GetComponentData } from 'graphQL/Queries'
 
 const customStyles = {
   headCells: {
@@ -103,7 +106,7 @@ const FilterComponent = ({ filterText, onFilter, onClear }) => {
   )
 }
 
-const ComponentTable = ({ data, refetch, type }) => {
+const ComponentTable = ({ type, lifecycle }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
 
@@ -113,6 +116,7 @@ const ComponentTable = ({ data, refetch, type }) => {
   const customerView = location.pathname.startsWith('/customer')
 
   const [activeRow, setActiveRow] = useState(null)
+  const [pageIndex, setPageIndex] = useState(1)
 
   const [filterNpm, setFilterNpm] = useState([])
   const [filterNuget, setFilterNuget] = useState([])
@@ -121,10 +125,28 @@ const ComponentTable = ({ data, refetch, type }) => {
   const [filterText, setFilterText] = useState('')
   const [resetPaginationToggle, setResetPaginationToggle] = useState(false)
 
-  const filteredItems = data.filter(
-    (item) =>
-      item.name && item.name.toLowerCase().includes(filterText.toLowerCase())
-  )
+  const [GetComponents, { data, refetch }] = useLazyQuery(GetComponentData)
+
+  useEffect(() => {
+    if (data === undefined) {
+      GetComponents({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          first: 10,
+          field: 'NAME',
+          direction: 'ASC'
+        }
+      })
+    }
+  }, [])
+
+  const filteredItems =
+    data &&
+    data.sbom.components.nodes.filter(
+      (item) =>
+        item.name && item.name.toLowerCase().includes(filterText.toLowerCase())
+    )
 
   const compBtn = useRef(null)
   const linkRef = useRef(null)
@@ -655,7 +677,7 @@ const ComponentTable = ({ data, refetch, type }) => {
             variant='solid'
             fontWeight='normal'
             fontSize={'sm'}
-            isDisabled={data.lifecycle === 'signed'}
+            isDisabled={lifecycle === 'signed'}
           />
         </Tooltip>
       </Flex>
@@ -680,33 +702,97 @@ const ComponentTable = ({ data, refetch, type }) => {
     })
   }
 
+  const handlePreviousPage = () => {
+    setPageIndex((prev) => pageIndex !== 0 && prev - 1)
+    refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      first: undefined,
+      last: 10,
+      before: data.sbom.components.pageInfo.startCursor,
+      after: ''
+    })
+  }
+
+  const handleNextPage = () => {
+    setPageIndex(
+      (prev) => prev < Math.ceil(data.sbom.components.totalCount) && prev + 1
+    )
+    refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      first: 10,
+      last: undefined,
+      after: data.sbom.components.pageInfo.endCursor,
+      before: ''
+    })
+  }
+
   return (
     <>
-      {data.length > 0 ? (
-        <Flex flexDir={'column'} width={'100%'}>
-          <DataTable
-            columns={columns}
-            data={filteredItems}
-            onSort={handleSort}
-            customStyles={customStyles}
-            defaultSortAsc
-            defaultSortFieldId={'name'}
-            progressPending={data.length === 0}
-            subHeader
-            subHeaderComponent={subHeaderComponentMemo}
-            expandableRows
-            expandableRowsComponent={ExpandedComponent}
-            responsive={true}
-          />
-        </Flex>
+      {data ? (
+        <>
+          <Flex flexDir={'column'} width={'100%'}>
+            <DataTable
+              columns={columns}
+              data={filteredItems}
+              onSort={handleSort}
+              customStyles={customStyles}
+              defaultSortAsc
+              defaultSortFieldId={'name'}
+              subHeader
+              subHeaderComponent={subHeaderComponentMemo}
+              expandableRows
+              expandableRowsComponent={ExpandedComponent}
+              responsive={true}
+            />
+          </Flex>
+
+          {/* PAGINATION */}
+          <Flex
+            flexDir={'row'}
+            gap={4}
+            alignItems={'center'}
+            mt={6}
+            justifyContent={'flex-start'}
+          >
+            <Button
+              colorScheme='blue'
+              onClick={handlePreviousPage}
+              isDisabled={!data.sbom.components.pageInfo.hasPreviousPage}
+            >
+              Previous
+            </Button>
+            <Button
+              colorScheme='blue'
+              onClick={handleNextPage}
+              isDisabled={!data.sbom.components.pageInfo.hasNextPage}
+            >
+              Next
+            </Button>
+            <Box>
+              Page {pageIndex} of{' '}
+              {Math.ceil(data.sbom.components.totalCount / 10)}
+            </Box>
+          </Flex>
+        </>
       ) : (
+        <Flex alignItems={'flex-start'} flexDir={'column'} gap={5}>
+          <Skeleton width={'100%'} height={'20px'} />
+          <Skeleton width={'100%'} height={'20px'} />
+          <Skeleton width={'100%'} height={'20px'} />
+          <Skeleton width={'100%'} height={'20px'} />
+        </Flex>
+      )}
+
+      {data && data.sbom.components.nodes.length === 0 && (
         <Flex
           width={'100%'}
           mt={4}
           alignItems={'center'}
           justifyContent={'center'}
         >
-          <Text>No component data found</Text>
+          <Text>No component found...</Text>
         </Flex>
       )}
 

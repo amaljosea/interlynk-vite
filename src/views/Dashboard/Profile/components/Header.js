@@ -16,7 +16,7 @@ const Header = ({ selectedTab, setSelectedTab, name, email, tabs }) => {
     if (name === 'PERSONAL') {
       window.history.pushState(null, null, '/vendor/profiles?tab=person')
     } else {
-      window.history.pushState(null, null, '/vendor/profiles?tab=general')
+      window.history.pushState(null, null, '/vendor/profiles?tab=0')
     }
   }
 

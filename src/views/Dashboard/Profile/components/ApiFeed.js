@@ -11,24 +11,22 @@ import {
   Switch,
   useColorModeValue,
   Select,
-  Link,
   Box,
-  useToast
+  Skeleton
 } from '@chakra-ui/react'
 // Custom components
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
-import { useState } from 'react'
-import { orgHealthChecks as orgHealthChecks } from 'variables/general'
 import { sevColor } from 'utils'
-import { useMutation } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import { orgRuleUpdate } from 'graphQL/Mutation'
+import { GetOrgRules } from 'graphQL/Queries'
 
-const ApiFeed = ({ data }) => {
+const ApiFeed = () => {
   const textColor = useColorModeValue('gray.700', 'white')
 
-  const toast = useToast()
+  const { data, refetch } = useQuery(GetOrgRules)
 
   const [updateRule] = useMutation(orgRuleUpdate)
 
@@ -46,7 +44,7 @@ const ApiFeed = ({ data }) => {
           id: id,
           enabled: value === true ? true : false
         }
-      }).then(() => window.location.reload())
+      }).then(() => refetch())
     } catch (error) {
       console.error('Mutation error:', error)
     }
@@ -59,7 +57,7 @@ const ApiFeed = ({ data }) => {
           id: id,
           severity: value
         }
-      }).then(() => window.location.reload())
+      }).then(() => refetch())
     } catch (error) {
       console.log(error)
     }
@@ -90,43 +88,64 @@ const ApiFeed = ({ data }) => {
               </Th>
             </Tr>
           </Thead>
-          <Tbody>
-            {data.map((item, index) => (
-              <Tr key={index}>
-                <Td pl={0}>
-                  <Switch
-                    isChecked={item.enabled}
-                    onChange={(e) => handleChange(e.target.checked, item.id)}
-                  ></Switch>
-                </Td>
-                <Td pl={0}>{item.rule.friendlyId}</Td>
-                <Td pl={0}>
-                  <Flex direction='column' rowGap={1} maxWidth={800}>
-                    <Text fontSize={'sm'}>{item.rule.shortDesc}</Text>
-                    <Text fontSize={'10px'}>{item.rule.longDesc}</Text>
-                  </Flex>
-                </Td>
-                <Td pl={0}>
-                  <Select
-                    width={'130px'}
-                    size='sm'
-                    value={item.severity}
-                    onChange={(e) =>
-                      handleStatusChange(item.id, e.target.value)
-                    }
-                    bg={sevColor(item.severity.toLowerCase()) + '.200'}
-                    variant={'outline'}
-                  >
-                    {options.map((itm, index) => (
-                      <option key={index} value={itm.value}>
-                        {itm.label}
-                      </option>
-                    ))}
-                  </Select>
-                </Td>
-              </Tr>
-            ))}
-          </Tbody>
+          {data ? (
+            <Tbody>
+              {data.organization.organizationRules.map((item, index) => (
+                <Tr key={index}>
+                  <Td pl={0}>
+                    <Switch
+                      isChecked={item.enabled ? true : false}
+                      onChange={(e) => handleChange(e.target.checked, item.id)}
+                    ></Switch>
+                  </Td>
+                  <Td pl={0}>{item.rule.friendlyId}</Td>
+                  <Td pl={0}>
+                    <Flex direction='column' rowGap={1} maxWidth={800}>
+                      <Text fontSize={'sm'}>{item.rule.shortDesc}</Text>
+                      <Text fontSize={'10px'}>{item.rule.longDesc}</Text>
+                    </Flex>
+                  </Td>
+                  <Td pl={0}>
+                    <Select
+                      width={'130px'}
+                      size='sm'
+                      value={item.severity}
+                      onChange={(e) =>
+                        handleStatusChange(item.id, e.target.value)
+                      }
+                      bg={sevColor(item.severity.toLowerCase()) + '.200'}
+                      variant={'outline'}
+                    >
+                      {options.map((itm, index) => (
+                        <option key={index} value={itm.value}>
+                          {itm.label}
+                        </option>
+                      ))}
+                    </Select>
+                  </Td>
+                </Tr>
+              ))}
+            </Tbody>
+          ) : (
+            <Tbody>
+              {[1, 2, 3, 4].map((item, index) => (
+                <Tr key={index}>
+                  <Td pl={0}>
+                    <Skeleton width={'100%'} height={'20px'} />
+                  </Td>
+                  <Td pl={0}>
+                    <Skeleton width={'100%'} height={'20px'} />
+                  </Td>
+                  <Td pl={0}>
+                    <Skeleton width={'100%'} height={'20px'} />
+                  </Td>
+                  <Td pl={0}>
+                    <Skeleton width={'100%'} height={'20px'} />
+                  </Td>
+                </Tr>
+              ))}
+            </Tbody>
+          )}
         </Table>
       </CardBody>
     </Card>

@@ -1,5 +1,6 @@
 import { gql } from '@apollo/client'
 
+// GET ORG INFO
 export const GetOrg = gql`
   query GetOrganization {
     organization {
@@ -19,6 +20,14 @@ export const GetOrg = gql`
         enabled
         name
       }
+    }
+  }
+`
+
+// GET ORGANIZATION RULES
+export const GetOrgRules = gql`
+  query GetOrgRules {
+    organization {
       organizationRules {
         id
         action
@@ -32,6 +41,14 @@ export const GetOrg = gql`
           category
         }
       }
+    }
+  }
+`
+
+// GET ORGANIZATION SETTINGS
+export const GetOrgSettings = gql`
+  query GetOrgRules {
+    organization {
       organizationSettings {
         id
         value
@@ -410,24 +427,14 @@ export const GetProjectData = gql`
   }
 `
 
-export const GetSBOM = gql`
-  query GetSbom(
-    $projectId: Uuid!
-    $sbomId: Uuid!
-    $first: Int
-    $last: Int
-    $after: String
-    $before: String
-    $field: ComponentOrderByFields!
-    $direction: OrderByDirection!
-  ) {
+// ----------------------- PRODUCT DETAILS PAGE ---------------------------
+
+// GET PRODUCT INFO
+export const GetProductData = gql`
+  query GetProductData($projectId: Uuid!, $sbomId: Uuid!) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
       id
-      spec
-      format
-      creationAt
       updatedAt
-      specVersion
       primaryComponent {
         id
         name
@@ -443,13 +450,19 @@ export const GetSBOM = gql`
         id
         name
       }
-      licenses
       lifecycle
+      creationAt
+      updatedAt
+      licenses
       tools {
         id
         name
         version
         vendor
+        updatedAt
+      }
+      project {
+        name
       }
       authors {
         id
@@ -464,29 +477,24 @@ export const GetSBOM = gql`
         contactEmail
         contactName
       }
-      checkResults(
-        sbomId: $sbomId
-        first: 10
-        orderBy: { field: UPDATED_AT, direction: DESC }
-      ) {
-        totalCount
-        nodes {
-          id
-          sbomId
-          componentId
-          primary
-          status
-          organizationRule {
-            severity
-            action
-            rule {
-              shortDesc
-              longDesc
-              friendlyId
-            }
-          }
-        }
-      }
+    }
+  }
+`
+
+// GET COMPONENT DATA
+export const GetComponentData = gql`
+  query GetComponentData(
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+    $field: ComponentOrderByFields!
+    $direction: OrderByDirection!
+  ) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      id
       components(
         sbomId: $sbomId
         after: $after
@@ -525,6 +533,56 @@ export const GetSBOM = gql`
             contactEmail
             contactName
             updatedAt
+          }
+        }
+      }
+    }
+  }
+`
+
+// HEALTH CHECK RESULTES
+export const GetCheckResults = gql`
+  query GetCheckResults(
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+    $field: CheckResultOrderByFields!
+    $direction: OrderByDirection!
+  ) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      checkResults(
+        sbomId: $sbomId
+        after: $after
+        before: $before
+        first: $first
+        last: $last
+        orderBy: { field: $field, direction: $direction }
+      ) {
+        totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          startCursor
+          hasPreviousPage
+        }
+        nodes {
+          id
+          sbomId
+          componentId
+          primary
+          status
+          updatedAt
+          organizationRule {
+            severity
+            action
+            rule {
+              shortDesc
+              longDesc
+              friendlyId
+            }
           }
         }
       }
@@ -874,56 +932,6 @@ export const GetSignedSBOM = gql`
             name
             email
             updatedAt
-          }
-        }
-      }
-    }
-  }
-`
-
-// HEALTH CHECK RESULTES
-export const GetCheckResults = gql`
-  query GetHealthCheckResults(
-    $projectId: Uuid!
-    $sbomId: Uuid!
-    $first: Int
-    $last: Int
-    $after: String
-    $before: String
-    $field: CheckResultOrderByFields!
-    $direction: OrderByDirection!
-  ) {
-    sbom(projectId: $projectId, sbomId: $sbomId) {
-      checkResults(
-        sbomId: $sbomId
-        after: $after
-        before: $before
-        first: $first
-        last: $last
-        orderBy: { field: $field, direction: $direction }
-      ) {
-        totalCount
-        pageInfo {
-          endCursor
-          hasNextPage
-          startCursor
-          hasPreviousPage
-        }
-        nodes {
-          id
-          sbomId
-          componentId
-          primary
-          status
-          updatedAt
-          organizationRule {
-            severity
-            action
-            rule {
-              shortDesc
-              longDesc
-              friendlyId
-            }
           }
         }
       }
