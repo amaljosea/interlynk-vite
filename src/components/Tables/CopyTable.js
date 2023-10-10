@@ -11,7 +11,9 @@ import {
   MenuItem,
   Button
 } from '@chakra-ui/react'
+import Card from 'components/Card/Card'
 import React, { useMemo } from 'react'
+import { useState } from 'react'
 import DataTable from 'react-data-table-component'
 
 const customStyles = {
@@ -26,6 +28,8 @@ const customStyles = {
 }
 
 const CopyTable = ({ data }) => {
+  const [selectedRows, setSelectedRows] = useState([])
+
   // COLUMNS
   const columns = [
     // CVE
@@ -66,9 +70,10 @@ const CopyTable = ({ data }) => {
       name: 'RESOLUTION',
       selector: (row) => (
         <Select size='sm'>
-          {' '}
-          <option value='option1'>Accept</option>
-          <option value='option2'>Keep Current</option>
+          <option value=''>-- Select --</option>
+          <option value='Keep existing'>Keep existing</option>
+          <option value='Replace from import'>Replace from import</option>
+          <option value='Not applicable'>Not applicable</option>
         </Select>
       )
     }
@@ -88,33 +93,12 @@ const CopyTable = ({ data }) => {
           placeholder='Search'
           aria-label='Search Input'
         />
-
-        <Menu>
-          <MenuButton
-            as={Button}
-            colorScheme='blue'
-            fontWeight='normal'
-            fontSize='sm'
-          >
-            Resolution
-          </MenuButton>
-          <MenuList>
-            <MenuItem fontSize='sm'>Accept</MenuItem>
-            <MenuItem fontSize='sm'>Keep Current</MenuItem>
-          </MenuList>
-        </Menu>
-
-        {/* <Select width={'fit-content'}>
-          <option value=''>-- Select --</option>
-          <option value='Accept'>Accept</option>
-          <option value='Keep Current'>Keep Current</option>
-        </Select> */}
       </Flex>
     )
   }, [])
 
   return (
-    <>
+    <Card py={6}>
       {data.length > 0 ? (
         <Flex flexDir={'column'} width={'100%'} mt={2}>
           <DataTable
@@ -126,6 +110,7 @@ const CopyTable = ({ data }) => {
             subHeaderComponent={subHeaderComponentMemo}
             responsive={true}
             selectableRows={true}
+            selectableRowSelected={(row) => row}
           />
         </Flex>
       ) : (
@@ -138,7 +123,7 @@ const CopyTable = ({ data }) => {
           <Text>No data found</Text>
         </Flex>
       )}
-    </>
+    </Card>
   )
 }
 

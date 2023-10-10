@@ -1,9 +1,11 @@
+import { QuestionIcon } from '@chakra-ui/icons'
 import {
   Box,
   Button,
   Flex,
   FormControl,
   FormLabel,
+  Icon,
   Input,
   List,
   ListItem,
@@ -15,10 +17,12 @@ import {
   ModalHeader,
   ModalOverlay,
   Select,
-  Text
+  Text,
+  Tooltip
 } from '@chakra-ui/react'
-import GlobalContext from 'context/GlobalContext'
-import { useContext, useState } from 'react'
+import { useState } from 'react'
+import MultiSelect from 'react-select'
+import { licenseOptions } from 'variables/licenses'
 
 const components = [
   'Biotronik.Cabo.Business.Communication-0.0.0-UnknownVersionBiotronik.Cabo.Business.Communication-0.0.0-UnknownVersion',
@@ -82,14 +86,10 @@ const CheckModal = ({ isOpen, onClose, id, shortDesc }) => {
 
   const [timestamp, setTimestamp] = useState(currentTime)
   const [comp, setComp] = useState('')
+  const [compType, setCompType] = useState('')
+  const [licenseList, setLicenseList] = useState([])
+  const [selectedLicenses, setSelectedLicenses] = useState([])
   const [componentData, setComponentData] = useState([])
-
-  const {
-    healthCheckData,
-    setHealthCheckData,
-    automationRules,
-    setAutomationRules
-  } = useContext(GlobalContext)
 
   const handleComponentChange = (e) => {
     const value = e.target.value
@@ -101,40 +101,39 @@ const CheckModal = ({ isOpen, onClose, id, shortDesc }) => {
     }
   }
 
+  const licenses = licenseOptions.map((option) => ({
+    value: option.licenseId,
+    label: option.name
+  }))
+
   const heading = (name) => {
     switch (name) {
-      case 'Timestamp':
+      case 'Document creation timestamp':
         return 'Timestamp'
-      case 'Primary Component':
+      case 'Document has a primary component':
         return 'Primary Component'
+      case 'Component has a type':
+        return 'Component Type'
+      case 'Component has a valid type':
+        return 'Component Type'
+      case 'Component has license/s specified':
+        return 'Component License'
+      case 'Componet has deprecated license/s':
+        return 'Component License'
+      case 'Component has restrictive licenses specified':
+        return 'Component License'
     }
   }
 
   const handleSubmit = (e) => {
     e.preventDefault()
-
-    const updatedItems = healthCheckData.map((item) => {
-      if (item.id === id) {
-        return { ...item, status: 'active' }
-      }
-      return item
-    })
-
-    if (shortDesc === 'Primary Component') {
-      const newRow = {
-        id: Date.now(),
-        active: true,
-        selectorOne: 'document',
-        conditionOne: '',
-        selectorTwo: 'Primary Component',
-        conditionTwo: 'Missing',
-        fixAction: ''
-      }
-      setAutomationRules([newRow, ...automationRules])
-    }
-
-    setHealthCheckData(updatedItems)
     onClose()
+  }
+
+  const onLicenseChange = (selected) => {
+    setLicenseList(selected)
+    const selectedIds = selected.map((option) => option.value) // Extracting IDs
+    setSelectedLicenses(selectedIds)
   }
 
   return (
@@ -145,7 +144,7 @@ const CheckModal = ({ isOpen, onClose, id, shortDesc }) => {
           <ModalHeader>{heading(shortDesc)}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            {shortDesc === 'Primary Component' && (
+            {shortDesc === 'Document has a primary component' && (
               <Flex
                 flexDirection={'column'}
                 alignItems={'flex-start'}
@@ -192,7 +191,7 @@ const CheckModal = ({ isOpen, onClose, id, shortDesc }) => {
               </Flex>
             )}
 
-            {shortDesc === 'Creation Time' && (
+            {shortDesc === 'Document creation timestamp' && (
               <FormControl isRequired>
                 <FormLabel>Created At</FormLabel>
                 <Input
@@ -204,17 +203,85 @@ const CheckModal = ({ isOpen, onClose, id, shortDesc }) => {
                 />
               </FormControl>
             )}
+
+            {(shortDesc === 'Component has a type' ||
+              shortDesc === 'Component has a valid type') && (
+              <FormControl>
+                <FormLabel fontSize={'sm'}>
+                  <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
+                    <Text>Type</Text>
+                    <Tooltip label='Component Type'>
+                      <Icon as={QuestionIcon} color={'blue.500'} />
+                    </Tooltip>
+                  </Flex>
+                </FormLabel>
+                <Select
+                  id='type'
+                  name='type'
+                  size='sm'
+                  value={compType}
+                  onChange={(e) => setCompType(e.target.value)}
+                >
+                  <option value=''>-- Select --</option>
+                  <option value='application'>Application</option>
+                  <option value='library'>Library</option>
+                  <option value='operating_system'>Operating system</option>
+                  <option value='firmware'>Firmware</option>
+                  <option value='file'>File</option>
+                  <option value='device'>Device</option>
+                  <option value='container'>Container</option>
+                  <option value='framework'>Framework</option>
+                  <option value='source'>Source</option>
+                  <option value='archive'>Archive</option>
+                  <option value='install'>Install</option>
+                  <option value='other'>Other</option>
+                  <option value='unspecified'>Unspecified</option>
+                </Select>
+              </FormControl>
+            )}
+
+            {(shortDesc === 'Component has license/s specified' ||
+              shortDesc === 'Componet has deprecated license/s' ||
+              shortDesc === 'Component has restrictive licenses specified') && (
+              <FormControl>
+                <FormLabel fontSize={'sm'}>
+                  <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
+                    <Text>Licenses</Text>
+                    <Tooltip label='List of licenses applicable to the component'>
+                      <Icon as={QuestionIcon} color={'blue.500'} />
+                    </Tooltip>
+                  </Flex>
+                </FormLabel>
+                <MultiSelect
+                  styles={{
+                    control: (baseStyles, state) => ({
+                      ...baseStyles,
+                      borderColor: state.isFocused ? 'inherit' : 'inherit',
+                      '&:hover': {
+                        borderColor: '#CBD5E0'
+                      }
+                    })
+                  }}
+                  isMulti
+                  value={licenseList}
+                  options={licenses}
+                  onChange={onLicenseChange}
+                />
+              </FormControl>
+            )}
           </ModalBody>
 
           <ModalFooter>
             <Button fontSize={'sm'} mr={3} onClick={onClose}>
               Close
             </Button>
-            <Button fontSize={'sm'} colorScheme='green' mr={3} type='submit'>
-              Save Rule
-            </Button>
+            {shortDesc === 'Primary Component' && (
+              <Button fontSize={'sm'} colorScheme='green' mr={3} type='submit'>
+                Save Rule
+              </Button>
+            )}
             <Button fontSize={'sm'} colorScheme='blue' type='submit'>
-              Save Value
+              Save
             </Button>
           </ModalFooter>
         </ModalContent>

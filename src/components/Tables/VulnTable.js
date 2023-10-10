@@ -140,7 +140,7 @@ const VulnTable = ({ data }) => {
 
   // STEPS
   const [step, setStep] = useState(1)
-  const [progress, setProgress] = useState(20)
+  const [progress, setProgress] = useState(25)
 
   const [stepTitle, setStepTitle] = useState('')
 
@@ -487,7 +487,7 @@ const VulnTable = ({ data }) => {
             colorScheme='blue'
             fontWeight='normal'
             fontSize={'sm'}
-            onClick={onCopyOpen}
+            onClick={onTableOpen}
             icon={<FaCopy size={18} />}
           />
         </Tooltip>
@@ -539,7 +539,7 @@ const VulnTable = ({ data }) => {
 
   const handleSubmit = () => {
     setStep(1)
-    setProgress(20)
+    setProgress(25)
     onTableClose()
     toast({
       description: 'Data Imported successsfully',
@@ -552,15 +552,13 @@ const VulnTable = ({ data }) => {
 
   useEffect(() => {
     if (step === 1) {
-      setStepTitle('Import from page')
+      setStepTitle('Select source of data')
     } else if (step === 2) {
-      setStepTitle('Import sources')
+      setStepTitle('Select fields to be imported')
     } else if (step === 3) {
-      setStepTitle('Components view')
+      setStepTitle('Choose import defaults')
     } else if (step === 4) {
-      setStepTitle('Vulnerability view')
-    } else if (step === 5) {
-      setStepTitle('Status history')
+      setStepTitle('Review vulnerability import')
     }
   }, [step])
 
@@ -645,35 +643,6 @@ const VulnTable = ({ data }) => {
             </DrawerHeader>
 
             <DrawerBody mt={2}>
-              {/* <CopyTable
-                data={[
-                  {
-                    cve: 'CVE-2023-24532',
-                    component: 'dropwizard-core',
-                    version: '1.2.4',
-                    status: 'In Triage',
-                    newStatus: 'False Positive',
-                    notes: 'In Triage'
-                  },
-                  {
-                    cve: 'CVE-2017-16921',
-                    component: 'samza-pre',
-                    version: '0.7.3',
-                    status: 'In Triage',
-                    newStatus: 'Fixed',
-                    notes: 'In Triage'
-                  },
-                  {
-                    cve: 'CVE-2021-14922',
-                    component: 'samza-core',
-                    version: '0.7.3',
-                    status: 'Fixed',
-                    newStatus: 'Affected',
-                    notes: 'In Triage'
-                  }
-                ]}
-              /> */}
-
               {/* IMPORT WIZARD */}
               <Multistep step={step} progress={progress} />
             </DrawerBody>
@@ -691,7 +660,7 @@ const VulnTable = ({ data }) => {
                       leftIcon={<ChevronLeftIcon w={6} h={6} />}
                       onClick={() => {
                         setStep(step - 1)
-                        setProgress(progress - 20)
+                        setProgress(progress - 25)
                       }}
                       isDisabled={step === 1}
                       colorScheme='blue'
@@ -703,7 +672,7 @@ const VulnTable = ({ data }) => {
 
                   <Button onClick={onTableClose}>Cancel</Button>
                 </ButtonGroup>
-                {step === 5 ? (
+                {step === 4 ? (
                   <Button
                     colorScheme='red'
                     variant='solid'
@@ -713,14 +682,14 @@ const VulnTable = ({ data }) => {
                   </Button>
                 ) : (
                   <Button
-                    isDisabled={step === 5}
+                    isDisabled={step === 4}
                     rightIcon={<ChevronRightIcon w={6} h={6} />}
                     onClick={() => {
                       setStep(step + 1)
-                      if (step === 5) {
+                      if (step === 4) {
                         setProgress(100)
                       } else {
-                        setProgress(progress + 20)
+                        setProgress(progress + 25)
                       }
                     }}
                     colorScheme='blue'

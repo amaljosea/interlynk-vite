@@ -10,6 +10,7 @@ export const GetOrg = gql`
       updatedAt
       url
       users {
+        id
         name
         email
         role
@@ -575,6 +576,10 @@ export const GetCheckResults = gql`
           primary
           status
           updatedAt
+          component {
+            id
+            name
+          }
           organizationRule {
             severity
             action
@@ -584,6 +589,49 @@ export const GetCheckResults = gql`
               friendlyId
             }
           }
+        }
+      }
+    }
+  }
+`
+
+// CHANGE LOG DATA
+export const GetChangeLogs = gql`
+  query GetChangeLogs(
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+    $field: ActivityLogOrderByFields!
+    $direction: OrderByDirection!
+  ) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      id
+      activityLogs(
+        sbomId: $sbomId
+        after: $after
+        before: $before
+        first: $first
+        last: $last
+        orderBy: { field: $field, direction: $direction }
+      ) {
+        totalCount
+        totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          startCursor
+          hasPreviousPage
+        }
+        nodes {
+          event
+          action
+          orig
+          updated
+          createdAt
+          updatedAt
         }
       }
     }

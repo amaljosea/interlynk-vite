@@ -49,12 +49,7 @@ import { timeSince } from 'utils'
 import { PackageURL } from 'packageurl-js'
 import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
-import {
-  QuestionIcon,
-  CheckIcon,
-  WarningTwoIcon,
-  ArrowForwardIcon
-} from '@chakra-ui/icons'
+import { QuestionIcon, CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import { FaExpandAlt } from 'react-icons/fa'
 
 // const regexPattern = /^cpe:2\.3:[aho]:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+$/
@@ -295,7 +290,7 @@ function ComponentDrawer(props) {
       try {
         await createComponent({
           variables: {
-            id: sbomId,
+            sbomId: sbomId,
             kind: compType,
             name: compName,
             version: compVersion,
@@ -341,6 +336,7 @@ function ComponentDrawer(props) {
       await updateComponent({
         variables: {
           id: id,
+          sbomId: sbomId,
           kind: compType,
           name: compName,
           version: compVersion,
@@ -579,44 +575,6 @@ function ComponentDrawer(props) {
                   <option value='unspecified'>Unspecified</option>
                 </Select>
               </FormControl>
-              {/* Suppliers */}
-              {id !== undefined && (
-                <Flex width={'100%'} flexDir={'column'}>
-                  <Text size='md' my={2} fontWeight={'medium'}>
-                    Supplier :
-                  </Text>
-                  {suppliers.length > 0 ? (
-                    <Table variant='simple' size='sm' mt={2}>
-                      <Thead>
-                        <Tr my='.8rem'>
-                          <Th pl={0}>Name</Th>
-                          <Th pl={0}>Email</Th>
-                          <Th pl={0}>Updated At</Th>
-                        </Tr>
-                      </Thead>
-                      <Tbody>
-                        {suppliers.map((item, index) => (
-                          <Tr key={index}>
-                            <Td pl={0} fontSize={'xs'}>
-                              {item.name}
-                            </Td>
-                            <Td pl={0} fontSize={'xs'}>
-                              {item.email}
-                            </Td>
-                            <Td pl={0} fontSize={'xs'}>
-                              {timeSince(item.updatedAt)}
-                            </Td>
-                          </Tr>
-                        ))}
-                      </Tbody>
-                    </Table>
-                  ) : (
-                    <Text mt={2} color={'darkgrey'}>
-                      No suppliers specified
-                    </Text>
-                  )}
-                </Flex>
-              )}
               {/* Licenses */}
               <FormControl>
                 <FormLabel fontSize={'sm'}>

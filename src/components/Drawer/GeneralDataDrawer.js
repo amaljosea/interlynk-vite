@@ -43,10 +43,10 @@ const GeneralDataDrawer = ({
   btnRef,
   data,
   selectedKey,
-  refetch
+  refetch,
+  checkId,
+  shortDesc
 }) => {
-  const { tools, authors, licenses, suppliers } = data
-
   // console.log(`suppliers`, suppliers)
 
   const toast = useToast()
@@ -83,20 +83,24 @@ const GeneralDataDrawer = ({
   const [deleteSupplier] = useMutation(supplierDelete)
 
   useEffect(() => {
-    setCreationTools(tools)
-    setSupplierList(suppliers)
-    setAuthorList(authors)
+    if (data) {
+      setCreationTools(data.tools)
+      setSupplierList(data.suppliers)
+      setAuthorList(data.authors)
+    }
   }, [data])
 
   useEffect(() => {
-    const filterData = licenseOptions.find(
-      (item) => item.licenseId === licenses[0]
-    )
-    // console.log(`filterData`, filterData)
-    if (filterData) {
-      setLicenseList(filterData)
+    if (data) {
+      const filterData = licenseOptions.find(
+        (item) => item.licenseId === data.licenses[0]
+      )
+      // console.log(`filterData`, filterData)
+      if (filterData) {
+        setLicenseList(filterData)
+      }
     }
-  }, [licenses])
+  }, [data])
 
   const validateEmail = (email) => {
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
@@ -307,6 +311,7 @@ const GeneralDataDrawer = ({
                   value={toolVersion}
                   onChange={(e) => setToolVersion(e.target.value)}
                 />
+
                 <Button colorScheme='blue' onClick={handleToolAdd}>
                   Add
                 </Button>
@@ -450,9 +455,7 @@ const GeneralDataDrawer = ({
                     />
                   </FormControl>
 
-                  <Button colorScheme='blue' type='submit'>
-                    Add
-                  </Button>
+                  <Button colorScheme='blue'>Add</Button>
 
                   <Flex width={'100%'} flexDir={'column'}>
                     <Text size='md' my={2}>

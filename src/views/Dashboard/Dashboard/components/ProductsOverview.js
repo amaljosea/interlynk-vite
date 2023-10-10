@@ -24,18 +24,30 @@ import { Link } from 'react-router-dom'
 import { scanImage, getConImg } from 'utils'
 import { useQuery } from '@apollo/client'
 import { GetImages } from 'graphQL/Queries'
+import { useEffect } from 'react'
+import { useState } from 'react'
 
 const ProductsOverview = ({ title }) => {
-  const { data: allImages, refetch } = useQuery(GetImages, {
+  const [dataFetched, setDataFetched] = useState(false)
+
+  const { data, refetch, loading, error } = useQuery(GetImages, {
     variables: {
       first: 10
-    }
+    },
+    skip: dataFetched
   })
+
+  useEffect(() => {
+    if (!loading && !error && data && !dataFetched) {
+      console.log('Data:', data)
+      setDataFetched(true)
+    }
+  }, [loading, error, data, dataFetched])
 
   const handlePreviousPage = () => {
     refetch({
       last: 10,
-      before: allImages.images.pageInfo.startCursor,
+      before: data && data.images.pageInfo.startCursor,
       after: ''
     })
   }
@@ -43,7 +55,7 @@ const ProductsOverview = ({ title }) => {
   const handleNextPage = () => {
     refetch({
       first: 10,
-      after: allImages.images.pageInfo.endCursor,
+      after: data && data.images.pageInfo.endCursor,
       before: ''
     })
   }
@@ -73,8 +85,8 @@ const ProductsOverview = ({ title }) => {
                 </Tr>
               </Thead>
               <Tbody>
-                {allImages ? (
-                  allImages.images.nodes.map((item) => (
+                {data &&
+                  data.images.nodes.map((item) => (
                     <Tr key={item.id}>
                       <Td fontSize={'sm'} pl={1}>
                         {item.imageVersions && item.imageVersions.length > 0 ? (
@@ -136,30 +148,11 @@ const ProductsOverview = ({ title }) => {
                         </Flex>
                       </Td>
                     </Tr>
-                  ))
-                ) : (
-                  <Tr>
-                    <Td fontSize={'sm'} pl={1}>
-                      <Skeleton height='20px' />
-                    </Td>
-                    <Td fontSize={'sm'} pl={1}>
-                      <Skeleton height='20px' />
-                    </Td>
-                    <Td fontSize={'sm'} pl={1}>
-                      <Skeleton height='20px' />
-                    </Td>
-                    <Td fontSize={'sm'} pl={1}>
-                      <Skeleton height='20px' />
-                    </Td>
-                    <Td fontSize={'sm'} pl={1}>
-                      <Skeleton height='20px' />
-                    </Td>
-                  </Tr>
-                )}
+                  ))}
               </Tbody>
             </Table>
           </CardBody>
-          {allImages && (
+          {data && (
             <Flex
               flexDir={'row'}
               gap={4}
@@ -170,14 +163,14 @@ const ProductsOverview = ({ title }) => {
               <Button
                 colorScheme='blue'
                 onClick={handlePreviousPage}
-                isDisabled={!allImages.images.pageInfo.hasPreviousPage}
+                isDisabled={!data.images.pageInfo.hasPreviousPage}
               >
                 Previous
               </Button>
               <Button
                 colorScheme='blue'
                 onClick={handleNextPage}
-                isDisabled={!allImages.images.pageInfo.hasNextPage}
+                isDisabled={!data.images.pageInfo.hasNextPage}
               >
                 Next
               </Button>

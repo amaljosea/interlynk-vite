@@ -29,7 +29,8 @@ const ComponentModal = ({ isOpen, onClose, id, refetch }) => {
     try {
       await deleteComponent({
         variables: {
-          id: id
+          id: id,
+          sbomId: sbomId
         }
       })
         .then(() =>

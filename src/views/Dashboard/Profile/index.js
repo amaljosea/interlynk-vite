@@ -72,6 +72,13 @@ function Profile() {
     window.localStorage.setItem('activeSetTab', value)
   }
 
+  // useEffect(() => {
+  //   console.log('orgInfo', orgInfo)
+  // }, [orgInfo])
+
+  const loggedInUser =
+    orgInfo && orgInfo.organization.users.find((item) => item.email === email)
+
   return (
     <Flex direction='column' px={4}>
       {/*  HEADER */}
@@ -134,7 +141,9 @@ function Profile() {
                   templateColumns={{ sm: '1fr', xl: 'repeat(2, 1fr)' }}
                   gap='22px'
                 >
-                  {orgInfo && <GeneralFeed orgInfo={orgInfo} />}
+                  {orgInfo && (
+                    <GeneralFeed orgInfo={orgInfo} refetch={refetch} />
+                  )}
                 </Grid>
               </TabPanel>
               {/* TEAMS */}
@@ -178,11 +187,7 @@ function Profile() {
           templateColumns={{ sm: '1fr', xl: 'repeat(2, 1fr)' }}
           gap='22px'
         >
-          <PersonalInfo
-            userName={orgInfo.organization.name}
-            userEmail={orgInfo.organization.email}
-            refetch={refetch}
-          />
+          <PersonalInfo user={loggedInUser} refetch={refetch} />
         </Grid>
       )}
     </Flex>

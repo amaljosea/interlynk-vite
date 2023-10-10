@@ -72,6 +72,7 @@ export default function Pages(props) {
         if (status.code === 200) {
           setEmail('')
           setPassword('')
+          console.log('status', status)
           localStorage.setItem('username', status.data.user.name)
           localStorage.setItem('email', status.data.user.email)
           Cookies.set('authToken', response.headers.authorization)

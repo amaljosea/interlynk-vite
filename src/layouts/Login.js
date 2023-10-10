@@ -46,6 +46,7 @@ const Login = () => {
         // console.log(response.data)
         const { status } = response.data
         if (status.code === 200) {
+          console.log('status', status)
           localStorage.setItem('userEmail', status.data.user.email)
           Cookies.set(`userToken`, response.headers.authorization)
           Cookies.set(`signedParamId`, paramId)

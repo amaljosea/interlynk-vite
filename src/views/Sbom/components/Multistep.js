@@ -1,33 +1,38 @@
-'use client'
-
 import { useState } from 'react'
 import {
   Progress,
   Box,
-  ButtonGroup,
-  Button,
-  Heading,
-  Flex,
-  FormControl,
   GridItem,
-  FormLabel,
-  Input,
-  Select,
-  SimpleGrid,
-  InputLeftAddon,
-  InputGroup,
-  Textarea,
-  FormHelperText,
-  InputRightElement,
   Text,
-  Grid
+  Grid,
+  Stack,
+  FormLabel,
+  FormControl,
+  Select,
+  Checkbox
 } from '@chakra-ui/react'
+import { useQuery } from '@apollo/client'
+import { GetProjectData } from 'graphQL/Queries'
+import CopyTable from 'components/Tables/CopyTable'
 
-import { useToast } from '@chakra-ui/react'
-
+// FORM ONE
 const Form1 = () => {
-  const [show, setShow] = useState(false)
-  const handleClick = () => setShow(!show)
+  const [selectedProd, setSelectedProd] = useState('')
+  const [selectedVersion, setSelectedVersion] = useState('')
+
+  const { data: allProducts } = useQuery(GetProjectData, {
+    variables: {
+      first: 10
+    }
+  })
+
+  const productList =
+    allProducts &&
+    allProducts.projects.nodes.map((option) => ({
+      value: option.id,
+      label: option.name
+    }))
+
   return (
     <>
       <Text
@@ -37,42 +42,68 @@ const Form1 = () => {
         fontWeight='medium'
         mb={10}
       >
-        Import or sync your data to Interlynk
+        Existing Projects
       </Text>
-      <Box width={'50%'} margin={'0 auto'}>
-        <Grid templateColumns='repeat(2, 1fr)' gap={6}>
-          <GridItem w='100%' h={'32rem'} bg='blue.500' />
-          <GridItem w='100%' h={'32rem'} bg='blue.500' />
-        </Grid>
+      <Box width={'400px'} margin={'0 auto'}>
+        <Stack spacing={4} direction={'column'} gap={2}>
+          {/* Project */}
+          <FormControl fontSize={'sm'}>
+            <FormLabel htmlFor='product' fontSize='md' color='gray.600'>
+              Project
+            </FormLabel>
+            <Select
+              name='projects'
+              value={selectedProd}
+              onChange={(e) => setSelectedProd(e.target.value)}
+            >
+              <option value={''}>-- Select --</option>
+              {productList.map((item, index) => (
+                <option key={index} value={item.value}>
+                  {item.label}
+                </option>
+              ))}
+            </Select>
+          </FormControl>
+          {/* Version */}
+          <FormControl fontSize={'sm'}>
+            <FormLabel htmlFor='product' fontSize='md' color='gray.600'>
+              Version
+            </FormLabel>
+            <Select
+              name='projects'
+              value={selectedVersion}
+              onChange={(e) => setSelectedVersion(e.target.value)}
+            >
+              <option value={''}>-- Select --</option>
+              {['2.3.4', '3.4.5'].map((item, index) => (
+                <option key={index} value={item}>
+                  {item}
+                </option>
+              ))}
+            </Select>
+          </FormControl>
+        </Stack>
       </Box>
     </>
   )
 }
 
+// FORM TWO
 const Form2 = () => {
   return (
     <>
-      <Text
-        w='100%'
-        fontSize={24}
-        textAlign={'center'}
-        fontWeight='medium'
-        mb={10}
-      >
-        Select an object you want to import
-      </Text>
-      <Box width={'90%'} margin={'0 auto'}>
-        <Grid templateColumns='repeat(4, 1fr)' gap={6}>
-          <GridItem w='100%' h={'32rem'} bg='blue.500' />
-          <GridItem w='100%' h={'32rem'} bg='blue.500' />
-          <GridItem w='100%' h={'32rem'} bg='blue.500' />
-          <GridItem w='100%' h={'32rem'} bg='blue.500' />
-        </Grid>
+      <Box width={'400px'} margin={'0 auto'}>
+        <FormControl mt={24}>
+          <Checkbox colorScheme='blue'>
+            Import status of vulnerabilities
+          </Checkbox>
+        </FormControl>
       </Box>
     </>
   )
 }
 
+// FORM THREE
 const Form3 = () => {
   return (
     <>
@@ -85,23 +116,37 @@ const Form3 = () => {
       >
         Component view resolved by
       </Text>
-      <Box width={'70%'} margin={'0 auto'}>
-        <Grid
-          h='32rem'
-          templateRows='repeat(2, 1fr)'
-          templateColumns='repeat(5, 1fr)'
-          gap={4}
-        >
-          <GridItem rowSpan={2} colSpan={1} bg='red.400' />
-          <GridItem colSpan={2} bg='red.100' />
-          <GridItem colSpan={2} bg='red.100' />
-          <GridItem colSpan={4} bg='red.400' />
-        </Grid>
+      <Box width={'300px'} margin={'0 auto'}>
+        <Stack spacing={4} direction={'column'} gap={2}>
+          {/* import from */}
+          <FormControl fontSize={'sm'}>
+            <FormLabel htmlFor='importFrom' fontSize='md' color='gray.600'>
+              Prefer vulnerability status from
+            </FormLabel>
+            <Select name='importFrom'>
+              <option value={''}>-- Select --</option>
+              <option value={'Keep existing'}>Keep existing</option>
+              <option value={'Replace from import'}>Replace from import</option>
+            </Select>
+          </FormControl>
+          {/* status history */}
+          <FormControl fontSize={'sm'}>
+            <FormLabel htmlFor='statusHistory' fontSize='md' color='gray.600'>
+              Import vulnerability status history
+            </FormLabel>
+            <Select name='statusHistory'>
+              <option value={''}>-- Select --</option>
+              <option value={'Yes'}>Yes</option>
+              <option value={'No'}>No</option>
+            </Select>
+          </FormControl>
+        </Stack>
       </Box>
     </>
   )
 }
 
+// FORM FOUR
 const Form4 = () => {
   return (
     <>
@@ -114,47 +159,38 @@ const Form4 = () => {
       >
         Vunlerability view resolved by
       </Text>
-      <Box width={'70%'} margin={'0 auto'}>
-        <Grid
-          h='32rem'
-          templateRows='repeat(2, 1fr)'
-          templateColumns='repeat(5, 1fr)'
-          gap={4}
-        >
-          <GridItem rowSpan={2} colSpan={1} bg='green.400' />
-          <GridItem colSpan={2} bg='green.100' />
-          <GridItem colSpan={2} bg='green.100' />
-          <GridItem colSpan={4} bg='green.400' />
-        </Grid>
-      </Box>
-    </>
-  )
-}
-
-const Form5 = () => {
-  return (
-    <>
-      <Text
-        w='100%'
-        fontSize={24}
-        textAlign={'center'}
-        fontWeight='medium'
-        mb={10}
-      >
-        Status history resolved by
-      </Text>
-      <Box width={'70%'} margin={'0 auto'}>
-        <Grid
-          h='32rem'
-          templateRows='repeat(2, 1fr)'
-          templateColumns='repeat(5, 1fr)'
-          gap={4}
-        >
-          <GridItem rowSpan={2} colSpan={1} bg='cyan.400' />
-          <GridItem colSpan={2} bg='cyan.100' />
-          <GridItem colSpan={2} bg='cyan.100' />
-          <GridItem colSpan={4} bg='cyan.400' />
-        </Grid>
+      <Box width={'90%'} margin={'0 auto'}>
+        <CopyTable
+          data={[
+            {
+              id: 1,
+              cve: 'CVE-2023-24532',
+              component: 'dropwizard-core',
+              version: '1.2.4',
+              status: 'In Triage',
+              newStatus: 'False Positive',
+              notes: 'In Triage'
+            },
+            {
+              id: 2,
+              cve: 'CVE-2017-16921',
+              component: 'samza-pre',
+              version: '0.7.3',
+              status: 'In Triage',
+              newStatus: 'Fixed',
+              notes: 'In Triage'
+            },
+            {
+              id: 3,
+              cve: 'CVE-2021-14922',
+              component: 'samza-core',
+              version: '0.7.3',
+              status: 'Fixed',
+              newStatus: 'Affected',
+              notes: 'In Triage'
+            }
+          ]}
+        />
       </Box>
     </>
   )
@@ -177,10 +213,8 @@ const Multistep = ({ step, progress }) => {
           <Form2 />
         ) : step === 3 ? (
           <Form3 />
-        ) : step === 4 ? (
-          <Form4 />
         ) : (
-          step === 5 && <Form5 />
+          step === 4 && <Form4 />
         )}
       </Box>
     </>

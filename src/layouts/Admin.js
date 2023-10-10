@@ -89,7 +89,7 @@ export default function Dashboard(props) {
     return {
       headers: {
         ...headers,
-        authorization: authToken ? authToken : ''
+        authorization: authToken
       }
     }
   })

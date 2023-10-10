@@ -1,4 +1,3 @@
-import { useLazyQuery, useMutation } from '@apollo/client'
 import {
   Button,
   Flex,
@@ -11,12 +10,12 @@ import {
   Text,
   IconButton,
   Box,
-  Skeleton
+  Skeleton,
+  Badge
 } from '@chakra-ui/react'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
+import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
 import GlobalContext from 'context/GlobalContext'
-import { recheckHealth } from 'graphQL/Mutation'
-import { GetCheckResults } from 'graphQL/Queries'
 import { PackageURL } from 'packageurl-js'
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
@@ -85,7 +84,7 @@ const FilterComponent = ({ filterText, onFilter, onClear }) => {
   )
 }
 
-const HealthCheckTable = ({ productId, sbomId }) => {
+const HealthCheckTable = ({ productId, sbomId, data, refetch }) => {
   const customerView = location.pathname.startsWith('/customer')
 
   const { healthCheckData, setHealthCheckData } = useContext(GlobalContext)
@@ -102,51 +101,49 @@ const HealthCheckTable = ({ productId, sbomId }) => {
   const [filterText, setFilterText] = useState('')
   const [resetPaginationToggle, setResetPaginationToggle] = useState(false)
 
-  const [filteredItems, setFilteredItems] = useState([])
-
-  const [GetCheckData, { data, refetch }] = useLazyQuery(GetCheckResults)
-
-  const [healthRecheck] = useMutation(recheckHealth)
-
-  useEffect(() => {
-    if (data === undefined) {
-      GetCheckData({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          first: 10,
-          field: 'STATUS',
-          direction: 'ASC'
-        }
-      })
-    }
-  }, [])
-
-  useEffect(() => {
-    const filterData =
-      data &&
-      data.sbom.checkResults.nodes.filter(
-        (item) =>
-          (item.healthCheckId &&
-            item.healthCheckId
-              .toLowerCase()
-              .includes(filterText.toLowerCase())) ||
-          (item.shortDesc &&
-            item.shortDesc.toLowerCase().includes(filterText.toLowerCase()))
-      )
-
-    setFilteredItems(filterData)
-  }, [filterText])
+  const filteredItems = data.nodes.filter(
+    (item) =>
+      (item.healthCheckId &&
+        item.healthCheckId.toLowerCase().includes(filterText.toLowerCase())) ||
+      (item.shortDesc &&
+        item.shortDesc.toLowerCase().includes(filterText.toLowerCase()))
+  )
 
   const supplierBtn = useRef(null)
-  const compBtn = useRef(null)
+  const creationToolBtn = useRef(null)
+  const authorBtn = useRef(null)
+  const docSupBtn = useRef(null)
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const {
-    isOpen: isCompOpen,
-    onOpen: onCompOpen,
-    onClose: onCompClose
+    isOpen: isLicenseOpen,
+    onOpen: onLicenseOpen,
+    onClose: onLicenseClose
+  } = useDisclosure()
+
+  const {
+    isOpen: isCreationOpen,
+    onOpen: onCreationOpen,
+    onClose: onCreationClose
+  } = useDisclosure()
+
+  const {
+    isOpen: isDocSupOpen,
+    onOpen: onDocSupOpen,
+    onClose: onDocSupClose
+  } = useDisclosure()
+
+  const {
+    isOpen: isTypeOpen,
+    onOpen: onTypeOpen,
+    onClose: onTypeClose
+  } = useDisclosure()
+
+  const {
+    isOpen: isAuthorOpen,
+    onOpen: onAuthorOpen,
+    onClose: onAuthorClose
   } = useDisclosure()
 
   const {
@@ -256,14 +253,64 @@ const HealthCheckTable = ({ productId, sbomId }) => {
 
     setActiveRow(row)
 
-    if (organizationRule.rule.friendlyId === 'SB-HC-17') {
+    // TIMESTAMP SELECTOR UI
+    if (organizationRule.rule.shortDesc === 'Document creation timestamp') {
+      return onOpen()
+    }
+
+    // CREATION TOOL SIDE DRAWER
+    if (
+      organizationRule.rule.shortDesc === 'Document has creation tools present'
+    ) {
+      return onCreationOpen()
+    }
+
+    // AUTHOR SIDE DRAWER
+    if (organizationRule.rule.shortDesc === 'Document has authors present') {
+      return onAuthorOpen()
+    }
+
+    // SUPPLIER SIDE DRAWER
+    if (organizationRule.rule.shortDesc === 'Document has suppliers present') {
+      return onDocSupOpen()
+    }
+
+    // PRIMARY COMPONENT SELECTOR MODAL
+    if (
+      organizationRule.rule.shortDesc === 'Document has a primary component'
+    ) {
+      return onPrimaryOpen()
+    }
+
+    // COMPONENT TYPE SELECTOR MODAL
+    if (
+      organizationRule.rule.shortDesc === 'Component has a valid type' ||
+      organizationRule.rule.shortDesc === 'Component has a type'
+    ) {
+      return onTypeOpen()
+    }
+
+    // COMPONENT ADD SUPPLIER MODAL
+    if (organizationRule.rule.shortDesc === 'Component has a supplier') {
+      return onSupplierOpen()
+    }
+
+    // PURL MODAL
+    if (
+      organizationRule.rule.shortDesc === 'Component has a purl' ||
+      organizationRule.rule.shortDesc === 'Component has a valid purl'
+    ) {
       const pkg = PackageURL.fromString('pkg:generic/unknown@1.0')
       setPurlValue('pkg:generic/unknown@1.0')
       setPurlData(pkg)
       return onPurlOpen()
     }
 
-    if (organizationRule.rule.friendlyId === 'SB-HC-20') {
+    // CPE MODAL
+    if (
+      organizationRule.rule.shortDesc === 'Component has a valid cpe' ||
+      organizationRule.rule.shortDesc === 'Component has a cpe'
+    ) {
       setCpeData({
         vendor: 'vendor',
         product: 'product',
@@ -274,52 +321,14 @@ const HealthCheckTable = ({ productId, sbomId }) => {
       return onCpeOpen()
     }
 
-    if (shortDesc === 'Primary Component') {
-      return onPrimaryOpen()
-    }
-
+    // COMPONENT LICENSE SELECTOR MODAL
     if (
-      shortDesc === 'Component Supplier' ||
-      shortDesc === 'Component Author'
+      organizationRule.rule.shortDesc === 'Component has license/s specified' ||
+      organizationRule.rule.shortDesc === 'Componet has deprecated license/s' ||
+      organizationRule.rule.shortDesc ===
+        'Component has restrictive licenses specified'
     ) {
-      return onSupplierOpen()
-    }
-
-    if (shortDesc === 'Primary Author' || shortDesc === 'Primary Author') {
-      return onSupplierOpen()
-    }
-
-    if (shortDesc === 'Creation Time') {
-      return onOpen()
-    }
-
-    if (
-      shortDesc === 'Primary Component Version' ||
-      shortDesc === 'Component Name' ||
-      shortDesc === 'Component Version' ||
-      shortDesc === 'Component Author' ||
-      shortDesc === 'Primary Relationship' ||
-      shortDesc === 'Component Relationship' ||
-      shortDesc === 'Component Type' ||
-      shortDesc === 'Component Identifier'
-    ) {
-      return onCompOpen()
-    }
-
-    if (shortDesc === 'Component Identifier') {
-      const newArray = [...healthCheckData]
-
-      const updatedObjectIndex = newArray.findIndex((obj) => obj.id === id)
-
-      if (updatedObjectIndex !== -1) {
-        newArray[updatedObjectIndex].status = 'active'
-      }
-
-      setHealthCheckData(newArray)
-
-      setTimeout(() => {
-        updateIdenifier()
-      }, 300)
+      return onLicenseOpen()
     }
   }
 
@@ -384,7 +393,7 @@ const HealthCheckTable = ({ productId, sbomId }) => {
         const { organizationRule } = row
         return <Text>{organizationRule.rule.friendlyId}</Text>
       },
-      width: '150px'
+      width: '120px'
     },
     // SEVERITY
     {
@@ -407,7 +416,7 @@ const HealthCheckTable = ({ productId, sbomId }) => {
           </Tag>
         )
       },
-      width: '160px'
+      width: '120px'
     },
     // CATEGORY
     {
@@ -427,27 +436,39 @@ const HealthCheckTable = ({ productId, sbomId }) => {
           </Tooltip>
         )
       },
-      width: '260px'
+      width: '250px'
     },
     // LONG DESCRIPTION
     {
       id: 'longDesc',
       name: 'LONG DESCRIPTION',
       selector: (row) => {
-        const { organizationRule } = row
+        const { organizationRule, component } = row
         return (
           <Tooltip label={organizationRule.rule.longDesc} placement='top'>
-            <Text>
-              {organizationRule.rule.longDesc !== null
-                ? `${organizationRule.rule.longDesc?.substring(0, 30)}${
-                    organizationRule.rule.longDesc.length > 30 ? '...' : ''
-                  }`
-                : ''}
-            </Text>
+            <Stack spacing={2} my={3}>
+              {component !== null && (
+                <Badge
+                  fontWeight={'medium'}
+                  width={'fit-content'}
+                  colorScheme='blue'
+                  variant='subtle'
+                >
+                  {component.name}
+                </Badge>
+              )}
+              <Text>
+                {organizationRule.rule.longDesc !== null
+                  ? `${organizationRule.rule.longDesc?.substring(0, 30)}${
+                      organizationRule.rule.longDesc.length > 30 ? '...' : ''
+                    }`
+                  : ''}
+              </Text>
+            </Stack>
           </Tooltip>
         )
       },
-      width: '250px'
+      width: '320px'
     },
     // STATUS
     {
@@ -455,7 +476,7 @@ const HealthCheckTable = ({ productId, sbomId }) => {
       name: 'STATUS',
       selector: (row) => row.status,
       sortable: true,
-      width: '150px'
+      width: '140px'
     },
     // UPDATED AT
     {
@@ -463,7 +484,7 @@ const HealthCheckTable = ({ productId, sbomId }) => {
       name: 'UPDATED_AT',
       selector: (row) => timeSince(row.updatedAt),
       sortable: true,
-      width: '150px'
+      width: '180px'
     },
     // ACTION
     {
@@ -534,81 +555,67 @@ const HealthCheckTable = ({ productId, sbomId }) => {
       sbomId: sbomId,
       first: undefined,
       last: 10,
-      before: data.sbom.checkResults.pageInfo.startCursor,
+      before: data.pageInfo.startCursor,
       after: ''
     })
   }
 
   const onNextPage = () => {
-    setPageIndex(
-      (prev) => prev < Math.ceil(data.sbom.checkResults.totalCount) && prev + 1
-    )
+    setPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
     refetch({
       projectId: productId,
       sbomId: sbomId,
       first: 10,
       last: undefined,
-      after: data.sbom.checkResults.pageInfo.endCursor,
+      after: data.pageInfo.endCursor,
       before: ''
     })
   }
 
   return (
     <>
-      {data ? (
-        <>
-          <Flex flexDir={'column'} width={'100%'}>
-            <DataTable
-              columns={columns}
-              data={data.sbom.checkResults.nodes}
-              onSort={handleSort}
-              defaultSortAsc
-              defaultSortFieldId={'status'}
-              customStyles={customStyles}
-              subHeader
-              subHeaderComponent={subHeaderComponentMemo}
-              responsive={true}
-            />
-          </Flex>
+      <Flex flexDir={'column'} width={'100%'}>
+        <DataTable
+          columns={columns}
+          data={data.nodes}
+          onSort={handleSort}
+          defaultSortAsc
+          defaultSortFieldId={'status'}
+          customStyles={customStyles}
+          subHeader
+          subHeaderComponent={subHeaderComponentMemo}
+          responsive={true}
+        />
+      </Flex>
 
-          {/* PAGINATION */}
-          <Flex
-            flexDir={'row'}
-            gap={4}
-            alignItems={'center'}
-            mt={6}
-            justifyContent={'flex-start'}
-          >
-            <Button
-              colorScheme='blue'
-              onClick={onPreviousPage}
-              isDisabled={!data.sbom.checkResults.pageInfo.hasPreviousPage}
-            >
-              Previous
-            </Button>
-            <Button
-              colorScheme='blue'
-              onClick={onNextPage}
-              isDisabled={!data.sbom.checkResults.pageInfo.hasNextPage}
-            >
-              Next
-            </Button>
-            <Box>
-              Page {pageIndex} of{' '}
-              {Math.ceil(data.sbom.checkResults.totalCount / 10)}
-            </Box>
-          </Flex>
-        </>
-      ) : (
-        <Flex alignItems={'flex-start'} flexDir={'column'} gap={5}>
-          <Skeleton width={'100%'} height={'20px'} />
-          <Skeleton width={'100%'} height={'20px'} />
-          <Skeleton width={'100%'} height={'20px'} />
-          <Skeleton width={'100%'} height={'20px'} />
-        </Flex>
-      )}
+      {/* PAGINATION */}
+      <Flex
+        flexDir={'row'}
+        gap={4}
+        alignItems={'center'}
+        mt={6}
+        justifyContent={'flex-start'}
+      >
+        <Button
+          colorScheme='blue'
+          onClick={onPreviousPage}
+          isDisabled={!data.pageInfo.hasPreviousPage}
+        >
+          Previous
+        </Button>
+        <Button
+          colorScheme='blue'
+          onClick={onNextPage}
+          isDisabled={!data.pageInfo.hasNextPage}
+        >
+          Next
+        </Button>
+        <Box>
+          Page {pageIndex} of {Math.ceil(data.totalCount / 10)}
+        </Box>
+      </Flex>
 
-      {data && data.sbom.checkResults.nodes.length === 0 && (
+      {data.nodes.length === 0 && (
         <Flex
           width={'100%'}
           mt={4}
@@ -622,55 +629,63 @@ const HealthCheckTable = ({ productId, sbomId }) => {
       {/* ACTIONS */}
       {activeRow !== null && (
         <>
+          {/*  COMPONENT PRIMARY MODAL */}
           {isPrimaryOpen && (
             <CheckModal
               id={activeRow.id}
-              shortDesc={activeRow.shortDesc}
+              shortDesc={activeRow.organizationRule.rule.shortDesc}
+              checkId={activeRow.organizationRule.rule.friendlyId}
               isOpen={isPrimaryOpen}
               onClose={onPrimaryClose}
             />
           )}
 
-          {isCompOpen && (
-            <ComponentDrawer
-              isOpen={isCompOpen}
-              onClose={onCompClose}
-              btnRef={compBtn}
-              component={''}
-              version={''}
-              license={['0BSD']}
-              type={'application'}
-              cpes={['cpe:2.3:a:vendor:product:1.0:*:*:*:*:*:*:*']}
-              purl={''}
-              primary={false}
-              internal={false}
-              refetch={null}
-              suppliers={null}
-              shortDesc={activeRow.shortDesc}
+          {/*  COMPONENT LICENSE MODAL */}
+          {isLicenseOpen && (
+            <CheckModal
+              id={activeRow.id}
+              shortDesc={activeRow.organizationRule.rule.shortDesc}
+              checkId={activeRow.organizationRule.rule.friendlyId}
+              isOpen={isLicenseOpen}
+              onClose={onLicenseClose}
             />
           )}
 
+          {/*  COMPONENT TYPE MODAL */}
+          {isTypeOpen && (
+            <CheckModal
+              id={activeRow.id}
+              shortDesc={activeRow.organizationRule.rule.shortDesc}
+              checkId={activeRow.organizationRule.rule.friendlyId}
+              isOpen={isTypeOpen}
+              onClose={onTypeClose}
+            />
+          )}
+
+          {/* SUPPLIER MODAL */}
           {isSupplierOpen && (
             <SupplierModal
-              id={activeRow.id}
+              id={activeRow.component.id}
               btnRef={supplierBtn}
-              refetch={null}
+              refetch={refetch}
               isOpen={onSupplierOpen}
               onClose={onSupplierClose}
               suppliers={[]}
-              shortDesc={activeRow.shortDesc}
+              checkId={activeRow.organizationRule.rule.friendlyId}
             />
           )}
 
           {isOpen && (
             <CheckModal
               id={activeRow.id}
-              shortDesc={activeRow.shortDesc}
+              checkId={activeRow.organizationRule.rule.friendlyId}
+              shortDesc={activeRow.organizationRule.rule.shortDesc}
               isOpen={isOpen}
               onClose={onClose}
             />
           )}
 
+          {/* PURL MODAL */}
           {isPurlOpen && (
             <PurlModal
               data={purlData}
@@ -681,6 +696,7 @@ const HealthCheckTable = ({ productId, sbomId }) => {
             />
           )}
 
+          {/* CPE MODAL */}
           {isCpeOpen && (
             <CpeModal
               data={cpeData}
@@ -690,6 +706,48 @@ const HealthCheckTable = ({ productId, sbomId }) => {
               onCreateCpe={handleCreateCpe}
               onUpdateCpe={handleUpdateCpe}
               selectedCpe={selectedCpe}
+            />
+          )}
+
+          {/* CREATION TOOLS DRAWER */}
+          {isCreationOpen && (
+            <GeneralDataDrawer
+              isOpen={isCreationOpen}
+              onClose={onCreationClose}
+              btnRef={creationToolBtn}
+              data={null}
+              selectedKey={'tools'}
+              refetch={refetch}
+              checkId={activeRow.organizationRule.rule.friendlyId}
+              shortDesc={activeRow.organizationRule.rule.shortDesc}
+            />
+          )}
+
+          {/* AUTHOR DRAWER */}
+          {isAuthorOpen && (
+            <GeneralDataDrawer
+              isOpen={isAuthorOpen}
+              onClose={onAuthorClose}
+              btnRef={authorBtn}
+              data={null}
+              selectedKey={'author'}
+              refetch={refetch}
+              checkId={activeRow.organizationRule.rule.friendlyId}
+              shortDesc={activeRow.organizationRule.rule.shortDesc}
+            />
+          )}
+
+          {/* DOCUMENT SUPPLIER DRAWER */}
+          {isDocSupOpen && (
+            <GeneralDataDrawer
+              isOpen={isDocSupOpen}
+              onClose={onDocSupClose}
+              btnRef={docSupBtn}
+              data={null}
+              selectedKey={'supplier'}
+              refetch={refetch}
+              checkId={activeRow.organizationRule.rule.friendlyId}
+              shortDesc={activeRow.organizationRule.rule.shortDesc}
             />
           )}
         </>
