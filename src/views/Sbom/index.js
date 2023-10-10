@@ -53,6 +53,9 @@ import { GetProjectData } from 'graphQL/Queries'
 
 import { getFullDateAndTime } from 'utils'
 import { GetProductData } from 'graphQL/Queries'
+import { GetComponentData } from 'graphQL/Queries'
+import { GetCheckResults } from 'graphQL/Queries'
+import { GetChangeLogs } from 'graphQL/Queries'
 
 function SBOM() {
   const initialRef = useRef(null)
@@ -115,11 +118,35 @@ function SBOM() {
     }
   })
 
-  // useEffect(() => {
-  //   if (sbomData) {
-  //     console.log(`sbomData`, sbomData.sbom)
-  //   }
-  // }, [sbomData])
+  const { data: compData, refetch: compRefetch } = useQuery(GetComponentData, {
+    variables: {
+      projectId: productId,
+      sbomId: sbomId,
+      first: 10,
+      field: 'NAME',
+      direction: 'ASC'
+    }
+  })
+
+  const { data: checkData, refetch: checkRefetch } = useQuery(GetCheckResults, {
+    variables: {
+      projectId: productId,
+      sbomId: sbomId,
+      first: 10,
+      field: 'STATUS',
+      direction: 'ASC'
+    }
+  })
+
+  const { data: logsData, refetch: logsRefetch } = useQuery(GetChangeLogs, {
+    variables: {
+      projectId: productId,
+      sbomId: sbomId,
+      first: 10,
+      field: 'CREATED_AT',
+      direction: 'ASC'
+    }
+  })
 
   const { data } = useQuery(GetProject, {
     variables: {
@@ -182,13 +209,39 @@ function SBOM() {
       await refetch({
         projectId: productId,
         sbomId: id
-      }).then(() => {
-        if (customerView) {
-          history.push(`/sharelynk?p=${productId}&sbom=${id}`)
-        } else {
-          history.push(`/vendor/products?tab=general&p=${productId}&sbom=${id}`)
-        }
       })
+        .then(() => {
+          if (customerView) {
+            history.push(`/sharelynk?p=${productId}&sbom=${id}`)
+          } else {
+            history.push(
+              `/vendor/products?tab=general&p=${productId}&sbom=${id}`
+            )
+          }
+        })
+        .finally(() => {
+          compRefetch({
+            projectId: productId,
+            sbomId: id,
+            first: 10,
+            field: 'NAME',
+            direction: 'ASC'
+          })
+          checkRefetch({
+            projectId: productId,
+            sbomId: id,
+            first: 10,
+            field: 'STATUS',
+            direction: 'ASC'
+          })
+          logsRefetch({
+            projectId: productId,
+            sbomId: id,
+            first: 10,
+            field: 'CREATED_AT',
+            direction: 'ASC'
+          })
+        })
     } catch (error) {
       console.log(`fetch error`, error)
     }
@@ -479,12 +532,18 @@ function SBOM() {
 
         {/* SBOM DETAILS */}
         <SBOMTable
-          status={status}
           sbomId={sbomId}
           productId={productId}
-          data={sbomData && sbomData}
-          lifecycle={sbomData && sbomData.sbom.lifecycle}
+          data={sbomData ? sbomData.sbom : undefined}
           refetch={refetch}
+          compData={compData ? compData : undefined}
+          compRefetch={compRefetch}
+          checkData={checkData ? checkData.sbom.checkResults : undefined}
+          checkRefetch={checkRefetch}
+          logsData={logsData ? logsData.sbom.activityLogs : undefined}
+          logsRefetch={logsRefetch}
+          status={status}
+          lifecycle={sbomData && sbomData.sbom.lifecycle}
           type={
             selectedProject?.sboms.length > 0 && selectedProject.sboms[0].format
           }

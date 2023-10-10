@@ -10,6 +10,7 @@ import GlobalContext from 'context/GlobalContext'
 
 function Sidebar(props) {
   const { minimize, activeDockerHub, setMinimize } = useContext(GlobalContext)
+
   const [filterRoutes, setFilterRoutes] = useState([])
   // to check for active links and opened collapses
   const mainPanel = useRef()

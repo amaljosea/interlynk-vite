@@ -1,4 +1,5 @@
 // Chakra imports
+import { useMutation } from '@apollo/client'
 import {
   Flex,
   Text,
@@ -14,13 +15,17 @@ import {
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
+import { orgUpdate } from 'graphQL/Mutation'
 import { useEffect, useState } from 'react'
 
-const GeneralFeed = ({ orgInfo }) => {
+const GeneralFeed = ({ orgInfo, refetch }) => {
   const textColor = useColorModeValue('gray.700', 'white')
 
   const [orgName, setOrgName] = useState('')
   const [orgId, setOrgId] = useState('')
+  const [message, setMessage] = useState('Update')
+
+  const [updateOrg] = useMutation(orgUpdate)
 
   useEffect(() => {
     if (orgInfo) {
@@ -31,6 +36,33 @@ const GeneralFeed = ({ orgInfo }) => {
   }, [orgInfo])
 
   const id = useClipboard(orgId)
+
+  const handleUpdate = async () => {
+    if (orgName !== '') {
+      try {
+        await updateOrg({
+          variables: {
+            name: orgName
+          }
+        })
+          .then((res) => {
+            if (res) {
+              setMessage('Saving....')
+              setTimeout(() => {
+                setMessage('Saved')
+              }, 2000)
+            }
+          })
+          .finally(() => {
+            refetch()
+          })
+      } catch (error) {
+        console.log(`Error`, error)
+      }
+    } else {
+      alert('Fields are required')
+    }
+  }
 
   return (
     <Card p={0}>
@@ -55,8 +87,13 @@ const GeneralFeed = ({ orgInfo }) => {
                 onChange={(e) => setOrgName(e.target.value)}
               />
               <Button
-              width={'100px'} variant='solid' colorScheme={'blue'}>
-                Update
+                width={'120px'}
+                variant='solid'
+                colorScheme={'blue'}
+                onClick={handleUpdate}
+                disabled={message === 'Saving....'}
+              >
+                {message}
               </Button>
             </HStack>
           </FormControl>
@@ -70,7 +107,7 @@ const GeneralFeed = ({ orgInfo }) => {
                 readOnly
               />
               <Button
-              width={'100px'}
+                width={'120px'}
                 variant='solid'
                 colorScheme={'blue'}
                 onClick={() => id.onCopy()}

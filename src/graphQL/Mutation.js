@@ -30,6 +30,21 @@ export const orgRuleUpdate = gql`
   }
 `
 
+// UPDATE ORG USER
+export const updateOrgUser = gql`
+  mutation updateOrgUser($id: ID!, $name: String!, $email: String!) {
+    userUpdate(input: { id: $id, name: $name, email: $email }) {
+      errors
+      user {
+        id
+        name
+        email
+        role
+      }
+    }
+  }
+`
+
 export const OrgConnectorRefresh = gql`
   mutation OrgConnectorRefresh {
     organizationConnectorRefresh(input: {}) {
@@ -442,10 +457,10 @@ export const UploadSbom = gql`
     }
   }
 `
-
+// CREATE PRODUCT COMPONENT
 export const CreateComponent = gql`
   mutation CreateComponent(
-    $id: Uuid!
+    $sbomId: Uuid!
     $kind: String!
     $name: String!
     $version: String
@@ -457,7 +472,7 @@ export const CreateComponent = gql`
   ) {
     componentCreate(
       input: {
-        sbomId: $id
+        sbomId: $sbomId
         kind: $kind
         name: $name
         version: $version
@@ -481,10 +496,11 @@ export const CreateComponent = gql`
     }
   }
 `
-
+// UPDATE PRODUCT COMPONENT
 export const UpdateComponent = gql`
   mutation UpdateComponent(
     $id: Uuid!
+    $sbomId: Uuid!
     $kind: String
     $name: String
     $licenses: [String!]
@@ -496,6 +512,7 @@ export const UpdateComponent = gql`
     componentUpdate(
       input: {
         id: $id
+        sbomId: $sbomId
         kind: $kind
         name: $name
         licenses: $licenses
@@ -519,13 +536,15 @@ export const UpdateComponent = gql`
   }
 `
 
+// DELETE PRODUCT COMPONENT
 export const DeleteComponent = gql`
-  mutation DeleteComponent($id: Uuid!) {
-    componentDelete(input: { id: $id }) {
+  mutation DeleteComponent($id: Uuid!, $sbomId: Uuid!) {
+    componentDelete(input: { id: $id, sbomId: $sbomId }) {
       errors
     }
   }
 `
+
 // CREATE SBOM TOOL
 export const toolCreate = gql`
   mutation toolCreate(

@@ -1,5 +1,4 @@
 import { useMutation } from '@apollo/client'
-import { ArrowForwardIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import {
   Modal,
   ModalOverlay,
@@ -17,9 +16,8 @@ import {
   chakra
 } from '@chakra-ui/react'
 import { updateComSupplier } from 'graphQL/Mutation'
+import { recheckHealth } from 'graphQL/Mutation'
 import { addComSupplier } from 'graphQL/Mutation'
-import { supplierUpdate } from 'graphQL/Mutation'
-import { supplierCreate } from 'graphQL/Mutation'
 import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 
@@ -29,7 +27,7 @@ const SupplierModal = ({
   onClose,
   refetch,
   suppliers,
-  shortDesc
+  checkId
 }) => {
   const toast = useToast()
   const location = useLocation()
@@ -48,12 +46,32 @@ const SupplierModal = ({
   const [createSupplier] = useMutation(addComSupplier)
   const [updateSupplier] = useMutation(updateComSupplier)
 
+  const [healthRecheck] = useMutation(recheckHealth)
+
   useEffect(() => {
     if (suppliers.length > 0) {
       setSupName(suppliers[0].name)
       setSupEmail(suppliers[0].contactEmail)
     }
   }, [suppliers])
+
+  const handleReCheck = async () => {
+    await healthRecheck({
+      variables: {
+        sbomId: sbomId,
+        checkId: checkId,
+        compId: id
+      }
+    }).then(() =>
+      refetch({
+        projectId: productId,
+        sbomId: sbomId,
+        first: 10,
+        field: 'STATUS',
+        direction: 'ASC'
+      })
+    )
+  }
 
   const handleSave = async (e) => {
     e.preventDefault()
@@ -64,13 +82,18 @@ const SupplierModal = ({
           contactEmail: supEmail,
           componentId: id
         }
-      }).then(() => {
-        refetch({
-          projectId: productId,
-          sbomId: sbomId
-        })
-        onClose()
       })
+        .then(() => {
+          if (checkId) {
+            handleReCheck()
+          } else {
+            refetch({
+              projectId: productId,
+              sbomId: sbomId
+            })
+          }
+        })
+        .then(() => onClose())
     } else {
       toast({
         description: 'Invalid email',
@@ -120,14 +143,7 @@ const SupplierModal = ({
             <ModalBody>
               <Flex width={'100%'} direction={'column'} gap={4}>
                 <FormControl isRequired>
-                  <FormLabel fontSize={'sm'}>
-                    <chakra.span>
-                      {shortDesc === 'Supplier Name' && supName === '' && (
-                        <WarningTwoIcon w={4} h={4} color='red.500' mr={2} />
-                      )}
-                    </chakra.span>
-                    Name
-                  </FormLabel>
+                  <FormLabel fontSize={'sm'}>Name</FormLabel>
                   <Input
                     placeholder='Enter supplier name'
                     value={supName}

@@ -3,22 +3,16 @@ import {
   Flex,
   Stack,
   Tag,
-  TagLabel,
-  useDisclosure,
   Input,
   Tooltip,
-  Text
+  Text,
+  Skeleton,
+  Box
 } from '@chakra-ui/react'
 import GlobalContext from 'context/GlobalContext'
-import React, {
-  createRef,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState
-} from 'react'
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
+import { useLocation } from 'react-router-dom'
 import { getFullDateAndTime } from 'utils'
 import FilterChangelog from 'views/Sbom/components/FilterChangelog'
 
@@ -41,11 +35,13 @@ const customStyles = {
 
 const setColor = (type) => {
   switch (type) {
-    case 'added':
+    case 'create':
+      return 'green'
+    case 'created':
       return 'green'
     case 'modified':
       return 'pink'
-    case 'deleted':
+    case 'destroyed':
       return 'red'
   }
 }
@@ -87,25 +83,52 @@ const FilterComponent = ({ filterText, onFilter, onClear }) => {
   )
 }
 
-const ChangelogTable = ({ data, setFilteredChangelog }) => {
+const ChangelogTable = ({ data, refetch }) => {
   const { changelogData } = useContext(GlobalContext)
 
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+
+  const productId = queryParams.get('p')
+  const sbomId = queryParams.get('sbom')
+
   const [filterText, setFilterText] = useState('')
+  const [pageIndex, setPageIndex] = useState(1)
   const [resetPaginationToggle, setResetPaginationToggle] = useState(false)
 
-  const [filteredItems, setFilteredItems] = useState([])
-
-  useEffect(() => {
-    const filterData = data.filter(
+  const filterItems =
+    data &&
+    data.nodes.filter(
       (item) =>
-        (item.type &&
-          item.type.toLowerCase().includes(filterText.toLowerCase())) ||
+        (item.event &&
+          item.event.toLowerCase().includes(filterText.toLowerCase())) ||
         (item.changedBy &&
           item.changedBy.toLowerCase().includes(filterText.toLowerCase()))
     )
 
-    setFilteredItems(filterData)
-  }, [filterText])
+  const onPreviousPage = () => {
+    setPageIndex((prev) => pageIndex !== 0 && prev - 1)
+    refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      first: undefined,
+      last: 10,
+      before: data.pageInfo.startCursor,
+      after: ''
+    })
+  }
+
+  const onNextPage = () => {
+    setPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
+    refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      first: 10,
+      last: undefined,
+      after: data.pageInfo.endCursor,
+      before: ''
+    })
+  }
 
   const handleChangelogChange = (selectedFilters) => {
     if (
@@ -161,104 +184,120 @@ const ChangelogTable = ({ data, setFilteredChangelog }) => {
 
   // COLUMNS
   const columns = [
-    // TYPE
+    // CHANGE TYPE
     {
-      id: 'type',
-      name: 'TYPE',
+      id: 'changeType',
+      name: 'CHANGE TYPE',
       selector: (row) => {
-        const { type } = row
+        const { action } = row
         return (
-          <Tag
-            variant='subtle'
-            colorScheme={setColor(type)}
-            style={{ width: '80px', margin: 'center' }}
-          >
-            {type}
+          <Tag variant='subtle' colorScheme={setColor(action)}>
+            {action}
           </Tag>
         )
-      },
-      width: '200px'
+      }
     },
-    // OBJECT
+    // CHANGED OBJECT
     {
-      id: 'object',
-      name: 'OBJECT',
+      id: 'changedObject',
+      name: 'CHANGED OBJECT',
       selector: (row) => {
-        const { object } = row
+        const { event } = row
+        return <Text>{event}</Text>
+      }
+    },
+    // PRIOR VALUE
+    {
+      id: 'priorValue',
+      name: 'PRIOR VALUE',
+      selector: (row) => {
+        const { orig } = row
         return (
-          <Tooltip label={object} placement='top'>
+          <Tooltip label={orig} placement='top'>
             <Text>
-              {object !== null
-                ? `${object?.substring(0, 20)}${
-                    object.length > 20 ? '...' : ''
+              {orig !== null
+                ? `${orig?.substring(0, 20)}${orig.length > 20 ? '...' : ''}`
+                : ''}
+            </Text>
+          </Tooltip>
+        )
+      }
+    },
+    // UPDATED VALUE
+    {
+      id: 'updatedValue',
+      name: 'UPDATED VALUE',
+      selector: (row) => {
+        const { updated } = row
+        return (
+          <Tooltip label={updated} placement='top'>
+            <Text>
+              {updated !== null
+                ? `${updated?.substring(0, 15)}${
+                    updated.length > 15 ? '...' : ''
                   }`
                 : ''}
             </Text>
           </Tooltip>
         )
-      },
-      width: '250px'
+      }
     },
-    // PREV VALUE
-    {
-      id: 'prevValue',
-      name: 'PREVIOUS VALUE',
-      selector: (row) => (
-        <Tooltip label={row.prevValue} placement='top'>
-          <Text>
-            {row.prevValue !== ''
-              ? `${row.prevValue?.substring(0, 15)}${
-                  row.prevValue.length > 15 ? '...' : ''
-                }`
-              : ''}
-          </Text>
-        </Tooltip>
-      )
-    },
-    // LONG DESCRIPTION
-    {
-      id: 'newValue',
-      name: 'NEW VALUE',
-      selector: (row) => (
-        <Tooltip label={row.newValue} placement='top'>
-          <Text>
-            {row.newValue !== ''
-              ? `${row.newValue?.substring(0, 15)}${
-                  row.newValue.length > 15 ? '...' : ''
-                }`
-              : ''}
-          </Text>
-        </Tooltip>
-      )
-    },
-    // STATUS
+    // CHANGED BY
     {
       id: 'changedBy',
       name: 'CHANGED BY',
-      selector: (row) => row.changedBy
+      selector: (row) => row.changedBy,
+      width: '200px'
     },
+    // CHANGED ON
     {
-      id: 'time',
-      name: 'TIME',
-      selector: (row) => <Text>{getFullDateAndTime(row.time)}</Text>
+      id: 'changedOn',
+      name: 'CHANGED ON',
+      selector: (row) => <Text>{getFullDateAndTime(row.updatedAt)}</Text>
     }
   ]
 
   return (
     <>
-      {data.length > 0 ? (
-        <Flex flexDir={'column'} width={'100%'}>
-          <DataTable
-            columns={columns}
-            data={data}
-            customStyles={customStyles}
-            progressPending={data.length === 0}
-            subHeader
-            subHeaderComponent={subHeaderComponentMemo}
-            responsive={true}
-          />
-        </Flex>
-      ) : (
+      <Flex flexDir={'column'} width={'100%'}>
+        <DataTable
+          columns={columns}
+          data={filterItems}
+          customStyles={customStyles}
+          subHeader
+          subHeaderComponent={subHeaderComponentMemo}
+          responsive={true}
+        />
+      </Flex>
+
+      {/* PAGINATION */}
+      <Flex
+        flexDir={'row'}
+        gap={4}
+        alignItems={'center'}
+        mt={6}
+        justifyContent={'flex-start'}
+      >
+        <Button
+          colorScheme='blue'
+          onClick={onPreviousPage}
+          isDisabled={!data.pageInfo.hasPreviousPage}
+        >
+          Previous
+        </Button>
+        <Button
+          colorScheme='blue'
+          onClick={onNextPage}
+          isDisabled={!data.pageInfo.hasNextPage}
+        >
+          Next
+        </Button>
+        <Box>
+          Page {pageIndex} of {Math.ceil(data.totalCount / 10)}
+        </Box>
+      </Flex>
+
+      {data.nodes.length === 0 && (
         <Flex
           width={'100%'}
           mt={4}
