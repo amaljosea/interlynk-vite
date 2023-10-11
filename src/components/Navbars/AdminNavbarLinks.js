@@ -77,11 +77,12 @@ export default function HeaderLinks(props) {
   }
 
   const paramId = Cookies.get('signedParamId')
+  const logoutURL = process.env.REACT_APP_VENDOR_LOGOUT_URL
 
   const handleLogout = async () => {
     try {
       await axios
-        .delete('http://localhost:3000/logout', {
+        .delete(`${logoutURL}`, {
           headers: {
             Authorization: authToken
           }
