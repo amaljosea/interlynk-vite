@@ -46,6 +46,41 @@ const SBOMTable = ({
       `/vendor/products?tab=${value}&p=${productId}&sbom=${sbomId}`
     )
     window.localStorage.setItem('activeProdTab', value)
+
+    if (value === 0) {
+    }
+
+    switch (value) {
+      case 0:
+        return refetch({
+          projectId: productId,
+          sbomId: sbomId
+        })
+      case 1:
+        return compRefetch({
+          projectId: productId,
+          sbomId: sbomId,
+          first: 10,
+          field: 'NAME',
+          direction: 'ASC'
+        })
+      case 3:
+        return checkRefetch({
+          projectId: productId,
+          sbomId: sbomId,
+          first: 10,
+          field: 'STATUS',
+          direction: 'DESC'
+        })
+      case 4:
+        return logsRefetch({
+          projectId: productId,
+          sbomId: sbomId,
+          first: 10,
+          field: 'CREATED_AT',
+          direction: 'ASC'
+        })
+    }
   }
 
   return (

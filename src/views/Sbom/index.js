@@ -134,7 +134,7 @@ function SBOM() {
       sbomId: sbomId,
       first: 10,
       field: 'STATUS',
-      direction: 'ASC'
+      direction: 'DESC'
     }
   })
 

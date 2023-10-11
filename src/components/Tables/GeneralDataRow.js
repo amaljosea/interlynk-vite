@@ -356,6 +356,8 @@ const GeneralDataRow = ({ status, type, data, refetch }) => {
           isOpen={isSupOpen}
           onClose={onSupClose}
           suppliers={data.suppliers}
+          checkId={null}
+          shortDesc={null}
         />
       )}
     </>

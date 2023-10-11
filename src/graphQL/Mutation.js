@@ -526,6 +526,7 @@ export const UpdateComponent = gql`
         id
         name
         version
+        kind
         primary
         internal
         purl
@@ -683,6 +684,7 @@ export const supplierCreate = gql`
         name
         contactEmail
         contactName
+        updatedAt
       }
       errors
     }
@@ -935,6 +937,40 @@ export const recheckHealth = gql`
         componentId: $compId
       }
     ) {
+      errors
+    }
+  }
+`
+
+// CHECK RESULT UPDATE
+export const checkResultUpdate = gql`
+  mutation checkResultUpdate($id: ID!, $status: String!) {
+    checkResultUpdate(input: { id: $id, status: $status }) {
+      errors
+      checkResult {
+        id
+        status
+        componentId
+      }
+    }
+  }
+`
+
+// Mutation to create a api-token for CI/CD
+//  Everytime u call this function it generates a new token.
+export const GenApiToken = gql`
+  mutation GenApiToken {
+    apiTokenCreate(input: {}) {
+      apiToken
+      errors
+    }
+  }
+`
+
+// Revoke Token
+export const RevokeApiToken = gql`
+  mutation RevokeApiToken($token: String!) {
+    apiTokenDelete(input: { token: $token }) {
       errors
     }
   }

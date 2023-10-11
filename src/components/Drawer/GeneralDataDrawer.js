@@ -27,6 +27,7 @@ import { toolDelete } from 'graphQL/Mutation'
 import { authorUpdate } from 'graphQL/Mutation'
 import { supplierCreate } from 'graphQL/Mutation'
 import { supplierDelete } from 'graphQL/Mutation'
+import { recheckHealth } from 'graphQL/Mutation'
 import { supplierUpdate } from 'graphQL/Mutation'
 import { authorDelete } from 'graphQL/Mutation'
 import { authorCreate } from 'graphQL/Mutation'
@@ -44,8 +45,7 @@ const GeneralDataDrawer = ({
   data,
   selectedKey,
   refetch,
-  checkId,
-  shortDesc
+  checkId
 }) => {
   // console.log(`suppliers`, suppliers)
 
@@ -81,6 +81,25 @@ const GeneralDataDrawer = ({
 
   const [createSupplier] = useMutation(supplierCreate)
   const [deleteSupplier] = useMutation(supplierDelete)
+
+  const [healthRecheck] = useMutation(recheckHealth)
+
+  const handleReCheck = async () => {
+    await healthRecheck({
+      variables: {
+        checkId: checkId,
+        sbomId: sbomId
+      }
+    }).then(() =>
+      refetch({
+        projectId: productId,
+        sbomId: sbomId,
+        first: 10,
+        field: 'STATUS',
+        direction: 'ASC'
+      })
+    )
+  }
 
   useEffect(() => {
     if (data) {
@@ -157,12 +176,15 @@ const GeneralDataDrawer = ({
       await createSupplier({
         variables: {
           name: supName,
-          email: supEmail,
+          contactEmail: supEmail,
           sbomId: sbomId
         }
       }).then((res) => {
         if (res) {
-          setSupplierList((prev) => [res.data.supplierCreate.supplier, ...prev])
+          setSupplierList((prev) => [
+            res.data.sbomSupplierCreate.sbomSupplier,
+            ...prev
+          ])
           setSupName('')
           setSupEmail('')
         }
@@ -262,10 +284,14 @@ const GeneralDataDrawer = ({
   }
 
   const handleSave = () => {
-    refetch({
-      productId: productId,
-      sbomId: sbomId
-    })
+    if (checkId) {
+      handleReCheck()
+    } else {
+      refetch({
+        productId: productId,
+        sbomId: sbomId
+      })
+    }
     onClose()
   }
 
@@ -455,7 +481,9 @@ const GeneralDataDrawer = ({
                     />
                   </FormControl>
 
-                  <Button colorScheme='blue'>Add</Button>
+                  <Button colorScheme='blue' type='submit'>
+                    Add
+                  </Button>
 
                   <Flex width={'100%'} flexDir={'column'}>
                     <Text size='md' my={2}>
@@ -478,7 +506,7 @@ const GeneralDataDrawer = ({
                                 {item.name}
                               </Td>
                               <Td pl={0} fontSize={'xs'}>
-                                {item.email}
+                                {item.contactEmail}
                               </Td>
                               <Td pl={0} fontSize={'xs'}>
                                 {timeSince(item.updatedAt)}

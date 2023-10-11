@@ -25,6 +25,10 @@ import {
 } from '@chakra-ui/react'
 import { useState, useEffect } from 'react'
 import { PackageURL } from 'packageurl-js'
+import { useLocation } from 'react-router-dom'
+import { UpdateComponent } from 'graphQL/Mutation'
+import { recheckHealth } from 'graphQL/Mutation'
+import { useMutation } from '@apollo/client'
 
 const typeOptions = [
   { value: '', label: '-- Select --' },
@@ -106,7 +110,21 @@ const namespaceOptions = {
   pypi: []
 }
 
-const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
+const PurlModal = ({
+  data,
+  isOpen,
+  onClose,
+  purlValue,
+  setPurlValue,
+  id,
+  refetch,
+  checkId
+}) => {
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const productId = queryParams.get('p')
+  const sbomId = queryParams.get('sbom')
+
   const [purlType, setPurlType] = useState('')
   const [namespace, setNamespace] = useState('')
   const [purlName, setPurlName] = useState('')
@@ -117,6 +135,47 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
   const [verSuggestions, setVerSuggestions] = useState([])
 
   const [updatedString, setUpdatedString] = useState(purlValue)
+
+  const [healthRecheck] = useMutation(recheckHealth)
+  const [updateComponent] = useMutation(UpdateComponent)
+
+  const handleReCheck = async () => {
+    await healthRecheck({
+      variables: {
+        checkId: checkId,
+        compId: id,
+        sbomId: sbomId
+      }
+    }).then(() =>
+      refetch({
+        projectId: productId,
+        sbomId: sbomId,
+        first: 10,
+        field: 'STATUS',
+        direction: 'ASC'
+      })
+    )
+  }
+
+  const handleComUpdate = async () => {
+    try {
+      await updateComponent({
+        variables: {
+          id: id,
+          sbomId: sbomId,
+          purl: updatedString
+        }
+      })
+        .then(() => {
+          if (checkId) {
+            handleReCheck()
+          }
+        })
+        .finally(() => onClose())
+    } catch (error) {
+      console.log('Mutation error', error)
+    }
+  }
 
   useEffect(() => {
     if (data) {
@@ -511,7 +570,7 @@ const PurlModal = ({ data, isOpen, onClose, purlValue, setPurlValue }) => {
               fontSize={'sm'}
               variant='solid'
               colorScheme={'blue'}
-              onClick={handleSave}
+              onClick={checkId ? handleComUpdate : handleSave}
             >
               Save
             </Button>

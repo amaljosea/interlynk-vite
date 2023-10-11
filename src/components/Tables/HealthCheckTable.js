@@ -1,3 +1,4 @@
+import { useMutation } from '@apollo/client'
 import {
   Button,
   Flex,
@@ -11,11 +12,14 @@ import {
   IconButton,
   Box,
   Skeleton,
-  Badge
+  Badge,
+  useToast
 } from '@chakra-ui/react'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
 import GlobalContext from 'context/GlobalContext'
+import { recheckHealth } from 'graphQL/Mutation'
+import { checkResultUpdate } from 'graphQL/Mutation'
 import { PackageURL } from 'packageurl-js'
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
@@ -28,6 +32,7 @@ import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 import CheckModal from 'views/Sbom/components/CheckModal'
 import FilterMenu from 'views/Sbom/components/FilterMenu'
+import PriSupplierModal from 'views/Sbom/components/PriSupplierModal'
 import SupplierModal from 'views/Sbom/components/SupplierModal'
 
 const customStyles = {
@@ -86,7 +91,7 @@ const FilterComponent = ({ filterText, onFilter, onClear }) => {
 
 const HealthCheckTable = ({ productId, sbomId, data, refetch }) => {
   const customerView = location.pathname.startsWith('/customer')
-
+  const toast = useToast()
   const { healthCheckData, setHealthCheckData } = useContext(GlobalContext)
 
   const [purlValue, setPurlValue] = useState('')
@@ -100,6 +105,10 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch }) => {
   const [activeRow, setActiveRow] = useState(null)
   const [filterText, setFilterText] = useState('')
   const [resetPaginationToggle, setResetPaginationToggle] = useState(false)
+
+  const [filteredData, setFilteredData] = useState(data.nodes)
+
+  const [updateResult] = useMutation(checkResultUpdate)
 
   const filteredItems = data.nodes.filter(
     (item) =>
@@ -181,23 +190,37 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch }) => {
   ]
 
   const handleFilterChange = (selectedFilters) => {
-    if (
-      selectedFilters.severity.length === 0 &&
-      selectedFilters.shortDesc.length === 0
-    ) {
-      // IF NO FILTER SELECTED RETURN DEFAULT HEALTH CHECK DATA
-      console.log(selectedFilters)
-      // setFilteredData(healthCheckData)
-    } else {
-      // IF ANY FILTER IS SELECTED RETURN SELECTED DATA
-      const filtered = healthCheckData.filter(
-        (item) =>
-          (selectedFilters.severity.length === 0 ||
-            selectedFilters.severity.includes(item.severity)) &&
-          (selectedFilters.shortDesc.length === 0 ||
-            selectedFilters.shortDesc.includes(item.shortDesc))
-      )
-      console.log(selectedFilters)
+    console.log(selectedFilters)
+  }
+
+  const [healthRecheck] = useMutation(recheckHealth)
+
+  const handleReCheck = async () => {
+    try {
+      await healthRecheck({
+        variables: {
+          sbomId: sbomId
+        }
+      })
+        .then(() =>
+          refetch({
+            projectId: productId,
+            sbomId: sbomId,
+            first: 10,
+            field: 'STATUS',
+            direction: 'ASC'
+          })
+        )
+        .finally(() => {
+          toast({
+            description: 'Health re-check successfully',
+            status: 'success',
+            duration: 2000,
+            position: 'top'
+          })
+        })
+    } catch (error) {
+      console.log('Mutation error', error)
     }
   }
 
@@ -241,6 +264,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch }) => {
             colorScheme='blue'
             fontWeight='normal'
             fontSize={'sm'}
+            onClick={handleReCheck}
             icon={<FaCheckDouble size={16} />}
           />
         </Tooltip>
@@ -332,17 +356,31 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch }) => {
     }
   }
 
-  const updateIssue = () => {
-    const updatedItems = healthCheckData.map((item) => {
-      if (item.id === id) {
-        return { ...item, status: 'ignored' }
-      }
-      return item
-    })
-
-    const selectedRow = updatedItems.find((row) => row.id === id)
-    const filteredData = healthCheckData.filter((row) => row.id !== id)
-    setHealthCheckData([...filteredData, selectedRow])
+  const updateIssue = async (id) => {
+    try {
+      await updateResult({
+        variables: {
+          id: id,
+          status: 'ignored'
+        }
+      }).then(() =>
+        refetch({
+          projectId: productId,
+          sbomId: sbomId,
+          first: 10,
+          field: 'STATUS',
+          direction: 'ASC'
+        })
+      )
+    } catch (error) {
+      console.log('Mutation error', error)
+      toast({
+        description: error,
+        status: 'error',
+        position: 'bottom',
+        duration: 3000
+      })
+    }
   }
 
   const handleCreateCpe = (string) => {
@@ -476,7 +514,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch }) => {
       name: 'STATUS',
       selector: (row) => row.status,
       sortable: true,
-      width: '140px'
+      width: '160px'
     },
     // UPDATED AT
     {
@@ -484,14 +522,14 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch }) => {
       name: 'UPDATED_AT',
       selector: (row) => timeSince(row.updatedAt),
       sortable: true,
-      width: '180px'
+      width: '150px'
     },
     // ACTION
     {
       id: 'action',
       name: 'ACTION',
       selector: (row) => {
-        const { status } = row
+        const { status, id } = row
         return (
           <>
             {status === 'unresolved' && (
@@ -513,14 +551,14 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch }) => {
                     colorScheme='blue'
                     fontWeight='normal'
                     icon={<GoSkip size={18} />}
-                    onClick={() => updateIssue(row)}
+                    onClick={() => updateIssue(id)}
                     disabled={customerView}
                   />
                 </Tooltip>
               </Stack>
             )}
 
-            {status === 'active' && (
+            {status === 'manually-resolved' && (
               <Button size='sm' variant='solid' colorScheme='whatsapp'>
                 Fixed
               </Button>
@@ -579,8 +617,8 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch }) => {
           columns={columns}
           data={data.nodes}
           onSort={handleSort}
-          defaultSortAsc
-          defaultSortFieldId={'status'}
+          // defaultSortAsc
+          // defaultSortFieldId={'status'}
           customStyles={customStyles}
           subHeader
           subHeaderComponent={subHeaderComponentMemo}
@@ -693,6 +731,9 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch }) => {
               onClose={onPurlClose}
               setPurlValue={setPurlValue}
               purlValue={purlValue}
+              id={activeRow.component.id}
+              refetch={refetch}
+              checkId={activeRow.organizationRule.rule.friendlyId}
             />
           )}
 
@@ -706,6 +747,9 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch }) => {
               onCreateCpe={handleCreateCpe}
               onUpdateCpe={handleUpdateCpe}
               selectedCpe={selectedCpe}
+              id={activeRow.component.id}
+              refetch={refetch}
+              checkId={activeRow.organizationRule.rule.friendlyId}
             />
           )}
 
@@ -739,13 +783,11 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch }) => {
 
           {/* DOCUMENT SUPPLIER DRAWER */}
           {isDocSupOpen && (
-            <GeneralDataDrawer
+            <PriSupplierModal
+              refetch={refetch}
               isOpen={isDocSupOpen}
               onClose={onDocSupClose}
-              btnRef={docSupBtn}
-              data={null}
-              selectedKey={'supplier'}
-              refetch={refetch}
+              suppliers={null}
               checkId={activeRow.organizationRule.rule.friendlyId}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
             />
