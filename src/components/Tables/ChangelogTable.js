@@ -7,11 +7,13 @@ import {
   Tooltip,
   Text,
   Skeleton,
-  Box
+  Box,
+  IconButton
 } from '@chakra-ui/react'
 import GlobalContext from 'context/GlobalContext'
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
+import { MdRefresh } from 'react-icons/md'
 import { useLocation } from 'react-router-dom'
 import { getFullDateAndTime } from 'utils'
 import FilterChangelog from 'views/Sbom/components/FilterChangelog'
@@ -39,10 +41,16 @@ const setColor = (type) => {
       return 'green'
     case 'created':
       return 'green'
+    case 'update':
+      return 'blue'
+    case 'updated':
+      return 'blue'
     case 'modified':
       return 'pink'
     case 'destroyed':
       return 'red'
+    case 'rerun':
+      return 'purple'
   }
 }
 
@@ -95,6 +103,9 @@ const ChangelogTable = ({ data, refetch }) => {
   const [filterText, setFilterText] = useState('')
   const [pageIndex, setPageIndex] = useState(1)
   const [resetPaginationToggle, setResetPaginationToggle] = useState(false)
+
+  const users = data && data.nodes.map((item) => item.changedBy)
+  const actions = data && data.nodes.map((item) => item.action)
 
   const filterItems =
     data &&
@@ -176,7 +187,11 @@ const ChangelogTable = ({ data, refetch }) => {
             filterText={filterText}
           />
 
-          <FilterChangelog onFilterChange={handleChangelogChange} />
+          <FilterChangelog
+            onFilterChange={handleChangelogChange}
+            users={users ? users : ['system']}
+            actions={actions ? actions : ['created', 'updated']}
+          />
         </Stack>
       </Flex>
     )

@@ -29,7 +29,6 @@ const GeneralFeed = ({ orgInfo, refetch }) => {
 
   useEffect(() => {
     if (orgInfo) {
-      // console.log(`orgInfo`, orgInfo)
       setOrgName(orgInfo.organization.name)
       setOrgId(orgInfo.organization.id)
     }
@@ -49,7 +48,7 @@ const GeneralFeed = ({ orgInfo, refetch }) => {
             if (res) {
               setMessage('Saving....')
               setTimeout(() => {
-                setMessage('Saved')
+                setMessage('Update')
               }, 2000)
             }
           })

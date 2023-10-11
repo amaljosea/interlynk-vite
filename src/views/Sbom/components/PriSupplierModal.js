@@ -16,12 +16,13 @@ import {
   useToast,
   chakra
 } from '@chakra-ui/react'
+import { recheckHealth } from 'graphQL/Mutation'
 import { supplierUpdate } from 'graphQL/Mutation'
 import { supplierCreate } from 'graphQL/Mutation'
 import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 
-const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers }) => {
+const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
   const toast = useToast()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -39,8 +40,27 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers }) => {
   const [createSupplier] = useMutation(supplierCreate)
   const [updateSupplier] = useMutation(supplierUpdate)
 
+  const [healthRecheck] = useMutation(recheckHealth)
+
+  const handleReCheck = async () => {
+    await healthRecheck({
+      variables: {
+        sbomId: sbomId,
+        checkId: checkId
+      }
+    }).then(() =>
+      refetch({
+        projectId: productId,
+        sbomId: sbomId,
+        first: 10,
+        field: 'STATUS',
+        direction: 'ASC'
+      })
+    )
+  }
+
   useEffect(() => {
-    if (suppliers.length > 0) {
+    if (suppliers && suppliers.length > 0) {
       setSupName(suppliers[0].name)
       setSupEmail(suppliers[0].contactEmail)
     }
@@ -57,18 +77,16 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers }) => {
         }
       })
         .then((res) => {
-          if (res) {
-            setSupName('')
-            setSupEmail('')
+          if (checkId) {
+            handleReCheck()
+          } else if (res) {
+            refetch({
+              productId: productId,
+              sbomId: sbomId
+            })
           }
         })
-        .finally(() => {
-          refetch({
-            productId: productId,
-            sbomId: sbomId
-          })
-          onClose()
-        })
+        .finally(() => onClose())
     } else {
       toast({
         description: 'Invalid email',
@@ -116,9 +134,13 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers }) => {
     <>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-        <form onSubmit={suppliers.length > 0 ? handleUpdate : handleSave}>
+        <form
+          onSubmit={
+            suppliers && suppliers.length > 0 ? handleUpdate : handleSave
+          }
+        >
           <ModalContent>
-            <ModalHeader>Add Supplier</ModalHeader>
+            <ModalHeader>Add {checkId ? 'SBOM' : ''} Supplier</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               <Flex width={'100%'} direction={'column'} gap={4}>
@@ -144,7 +166,7 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers }) => {
               <Button colorScheme='gray' mr={3} onClick={onClose}>
                 Cancel
               </Button>
-              {suppliers.length > 0 ? (
+              {suppliers && suppliers.length > 0 ? (
                 <Button colorScheme='blue' type={'submit'}>
                   Update
                 </Button>

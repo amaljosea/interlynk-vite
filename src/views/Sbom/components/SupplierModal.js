@@ -93,7 +93,7 @@ const SupplierModal = ({
             })
           }
         })
-        .then(() => onClose())
+        .finally(() => onClose())
     } else {
       toast({
         description: 'Invalid email',

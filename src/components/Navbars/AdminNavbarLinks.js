@@ -18,7 +18,8 @@ import {
   PopoverBody,
   Icon,
   Stack,
-  Code
+  Code,
+  Select
 } from '@chakra-ui/react'
 // Custom Icons
 import { ProfileIcon, SettingsIcon } from 'components/Icons/Icons'
@@ -32,10 +33,15 @@ import { FaRegKeyboard, FaSignOutAlt } from 'react-icons/fa'
 
 import Cookies from 'js-cookie'
 import { useState, useEffect } from 'react'
+import axios from 'axios'
+import { useQuery } from '@apollo/client'
+import { GetOrg } from 'graphQL/Queries'
 
 export default function HeaderLinks(props) {
   const location = useLocation()
   const history = useHistory()
+
+  const { data } = useQuery(GetOrg)
 
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('p')
@@ -44,6 +50,8 @@ export default function HeaderLinks(props) {
   const { variant, children, fixed, secondary, onOpen, ...rest } = props
 
   const [username, setUsername] = useState('')
+
+  const authToken = Cookies.get('authToken')
 
   const userName = localStorage.getItem('username')
   const userEmail = localStorage.getItem('userEmail')
@@ -70,11 +78,23 @@ export default function HeaderLinks(props) {
 
   const paramId = Cookies.get('signedParamId')
 
-  const handleLogout = () => {
-    localStorage.removeItem('username')
-    localStorage.removeItem('email')
-    Cookies.remove('authToken')
-    history.push('/auth')
+  const handleLogout = async () => {
+    try {
+      await axios
+        .delete('http://localhost:3000/logout', {
+          headers: {
+            Authorization: authToken
+          }
+        })
+        .then((res) => {
+          if (res.data.status === 200) {
+            localStorage.removeItem('username')
+            localStorage.removeItem('email')
+            Cookies.remove('authToken')
+            history.push('/auth')
+          }
+        })
+    } catch (error) {}
   }
 
   const handleCustomerLogout = () => {
@@ -110,6 +130,13 @@ export default function HeaderLinks(props) {
       alignItems='center'
       flexDirection='row'
     >
+      <Select bg={'white'} size='sm'>
+        <option value='Today'>Today</option>
+        <option value='1 weeks'>1 weeks</option>
+        <option value='2 weeks'>2 weeks</option>
+        <option value='3 weeks'>3 weeks</option>
+        <option value='1 month'>1 month</option>
+      </Select>
       {productId && !customerView && (
         <Popover isLazy>
           <PopoverTrigger>
@@ -166,7 +193,7 @@ export default function HeaderLinks(props) {
           }
         >
           <Text display={{ sm: 'none', md: 'flex' }} fontSize={'sm'}>
-            {username ? username : 'Surendra Pathak'}
+            {data ? data.organization.currentUser.name : 'Surendra Pathak'}
           </Text>
         </MenuButton>
         {location.pathname.startsWith('/vendor') && (

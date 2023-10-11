@@ -9,6 +9,11 @@ export const GetOrg = gql`
       name
       updatedAt
       url
+      currentUser {
+        id
+        name
+        email
+      }
       users {
         id
         name
@@ -632,6 +637,7 @@ export const GetChangeLogs = gql`
           updated
           createdAt
           updatedAt
+          changedBy
         }
       }
     }

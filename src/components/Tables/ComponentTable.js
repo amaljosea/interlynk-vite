@@ -774,7 +774,7 @@ const ComponentTable = ({ type, lifecycle, data, refetch }) => {
               component={activeRow.name}
               version={activeRow.version}
               license={activeRow.licenses}
-              type={type}
+              type={activeRow.kind}
               refetch={refetch}
               cpes={activeRow.cpes}
               purl={activeRow.purl}

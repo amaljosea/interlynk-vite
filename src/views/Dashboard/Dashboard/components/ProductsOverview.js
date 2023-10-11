@@ -28,21 +28,11 @@ import { useEffect } from 'react'
 import { useState } from 'react'
 
 const ProductsOverview = ({ title }) => {
-  const [dataFetched, setDataFetched] = useState(false)
-
   const { data, refetch, loading, error } = useQuery(GetImages, {
     variables: {
       first: 10
-    },
-    skip: dataFetched
-  })
-
-  useEffect(() => {
-    if (!loading && !error && data && !dataFetched) {
-      console.log('Data:', data)
-      setDataFetched(true)
     }
-  }, [loading, error, data, dataFetched])
+  })
 
   const handlePreviousPage = () => {
     refetch({

@@ -5,7 +5,7 @@ import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 import { dp } from 'utils'
 
-const Header = ({ selectedTab, setSelectedTab, name, email, tabs }) => {
+const Header = ({ selectedTab, setSelectedTab, user, tabs }) => {
   // Chakra color mode
   const textColor = useColorModeValue('gray.700', 'white')
 
@@ -32,7 +32,12 @@ const Header = ({ selectedTab, setSelectedTab, name, email, tabs }) => {
             w={{ sm: '100%' }}
             textAlign={{ sm: 'center', md: 'start' }}
           >
-            <Avatar me={{ md: '22px' }} src={dp(email)} w='80px' h='80px' />
+            <Avatar
+              me={{ md: '22px' }}
+              src={dp(user.email)}
+              w='80px'
+              h='80px'
+            />
             <Flex direction='column' maxWidth='100%' my={{ sm: '14px' }}>
               <Text
                 fontSize={{ sm: 'lg', lg: 'xl' }}
@@ -40,14 +45,14 @@ const Header = ({ selectedTab, setSelectedTab, name, email, tabs }) => {
                 fontWeight='bold'
                 ms={{ sm: '8px', md: '0px' }}
               >
-                {name}
+                {user.name}
               </Text>
               <Text
                 fontSize={{ sm: 'sm', md: 'md' }}
                 color={emailColor}
                 fontWeight='medium'
               >
-                {email}
+                {user.email}
               </Text>
             </Flex>
           </Flex>

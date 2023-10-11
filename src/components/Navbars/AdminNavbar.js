@@ -132,7 +132,7 @@ export default function AdminNavbar(props) {
       // pb='8px'
       // left={document.documentElement.dir === 'rtl' ? '0' : '30px'}
       // right={document.documentElement.dir === 'rtl' ? '' : '42px'}
-      right={minimize === true ? 10 : 6}
+      right={minimize === true ? 24 : 6}
       px={{
         sm: paddingX,
         md: '10px'
@@ -145,7 +145,7 @@ export default function AdminNavbar(props) {
         sm: 'calc(100vw - 30px)',
         xl:
           minimize === true
-            ? 'calc(100vw - 75px - 80px)'
+            ? 'calc(100vw - 75px - 132px)'
             : 'calc(100vw - 75px - 210px)'
       }}
     >

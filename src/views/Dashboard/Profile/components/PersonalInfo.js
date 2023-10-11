@@ -1,3 +1,4 @@
+import { useMutation } from '@apollo/client'
 import {
   Text,
   FormControl,
@@ -10,6 +11,7 @@ import { useColorModeValue } from '@chakra-ui/system'
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
+import { updateOrgUser } from 'graphQL/Mutation'
 import React, { useState, useEffect } from 'react'
 
 const PersonalInfo = ({ user, refetch }) => {
@@ -17,14 +19,42 @@ const PersonalInfo = ({ user, refetch }) => {
 
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
+  const [message, setMessage] = useState('Update')
 
   useEffect(() => {
     setName(user.name)
     setEmail(user.email)
   }, [user])
 
+  const [updateUser] = useMutation(updateOrgUser)
+
   const handleUpdate = async () => {
-    console.log('Data updated')
+    if (name !== '' && email !== '') {
+      try {
+        await updateUser({
+          variables: {
+            id: user.id,
+            name: name,
+            email: email
+          }
+        })
+          .then((res) => {
+            if (res) {
+              setMessage('Saving....')
+              setTimeout(() => {
+                setMessage('Update')
+              }, 2000)
+            }
+          })
+          .finally(() => {
+            refetch()
+          })
+      } catch (error) {
+        console.log(`Error`, error)
+      }
+    } else {
+      alert('Fields are required')
+    }
   }
 
   return (
@@ -52,8 +82,13 @@ const PersonalInfo = ({ user, refetch }) => {
             <Input value={email} onChange={(e) => setEmail(e.target.value)} />
           </FormControl>
           {/* ACTION */}
-          <Button variant='solid' colorScheme='blue' onClick={handleUpdate}>
-            Update
+          <Button
+            variant='solid'
+            colorScheme='blue'
+            onClick={handleUpdate}
+            disabled={message === 'Saving....'}
+          >
+            {message}
           </Button>
         </Flex>
       </CardBody>

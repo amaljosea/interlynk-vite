@@ -12,7 +12,7 @@ import {
 import React, { useState } from 'react'
 import { FaFilter } from 'react-icons/fa'
 
-const FilterChangelog = ({ onFilterChange }) => {
+const FilterChangelog = ({ onFilterChange, users, actions }) => {
   const [selectedTypeFilters, setSelectedTypeFilters] = useState([])
   const [selectedUserFilters, setSelectedUserFilters] = useState([])
 
@@ -67,20 +67,16 @@ const FilterChangelog = ({ onFilterChange }) => {
               onChange={() => window.location.reload()}
             >
               <MenuItemOption value={'All'} fontSize={'sm'}>
-                All
+                all
               </MenuItemOption>
             </MenuOptionGroup>
             <MenuOptionGroup type='checkbox' onChange={handleTypeFilterChange}>
-              {['added', 'modified', 'deleted'].map((p, index) => (
-                <MenuItemOption
-                  value={p}
-                  key={index}
-                  fontSize={'sm'}
-                  textTransform={'capitalize'}
-                >
-                  {p}
-                </MenuItemOption>
-              ))}
+              {actions.length > 0 &&
+                [...new Set(actions)].map((p, index) => (
+                  <MenuItemOption value={p} key={index} fontSize={'sm'}>
+                    {p}
+                  </MenuItemOption>
+                ))}
             </MenuOptionGroup>
           </MenuList>
         </Menu>
@@ -115,26 +111,16 @@ const FilterChangelog = ({ onFilterChange }) => {
               onChange={() => window.location.reload()}
             >
               <MenuItemOption value={'All'} fontSize={'sm'}>
-                All
+                all
               </MenuItemOption>
             </MenuOptionGroup>
             <MenuOptionGroup type='checkbox' onChange={handleUserFilterChange}>
-              {[
-                'Abhisek Paul',
-                'Brian B.',
-                'Ritesh Noronha',
-                'Shubham Shete',
-                'Surendra Pathak'
-              ].map((p, index) => (
-                <MenuItemOption
-                  value={p}
-                  key={index}
-                  fontSize={'sm'}
-                  textTransform={'capitalize'}
-                >
-                  {p}
-                </MenuItemOption>
-              ))}
+              {users.length > 0 &&
+                [...new Set(users)].map((p, index) => (
+                  <MenuItemOption value={p} key={index} fontSize={'sm'}>
+                    {p}
+                  </MenuItemOption>
+                ))}
             </MenuOptionGroup>
           </MenuList>
         </Menu>
