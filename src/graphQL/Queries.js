@@ -546,6 +546,59 @@ export const GetComponentData = gql`
   }
 `
 
+// PRODUCT VULNERABILITIES DATA
+export const GetVulnData = gql`
+  query GetVulnData(
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+    $field: ComponentVulnOrderByFields!
+    $direction: OrderByDirection!
+  ) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      vulns(
+        sbomId: $sbomId
+        after: $after
+        before: $before
+        first: $first
+        last: $last
+        orderBy: { field: $field, direction: $direction }
+      ) {
+        totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          startCursor
+          hasPreviousPage
+        }
+        nodes {
+          id
+          vuln {
+            vulnId
+            desc
+            status
+            cvssScore
+            updatedAt
+          }
+          component {
+            name
+            version
+          }
+          vexStatus {
+            name
+          }
+          vexJustification {
+            name
+          }
+        }
+      }
+    }
+  }
+`
+
 // HEALTH CHECK RESULTES
 export const GetCheckResults = gql`
   query GetCheckResults(

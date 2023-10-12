@@ -768,7 +768,7 @@ export const addComSupplier = gql`
 // COMPONENT SUPPLIER UPDATE
 export const updateComSupplier = gql`
   mutation updateComSupplier(
-    $id: ID!
+    $id: Uuid!
     $name: String!
     $url: String
     $contactName: String
@@ -797,7 +797,7 @@ export const updateComSupplier = gql`
 
 // COMPONENT SUPPLIER DELETE
 export const deleteComSupplier = gql`
-  mutation deleteCompSupplier($id: ID!) {
+  mutation deleteCompSupplier($id: Uuid!) {
     compSupplierDelete(input: { id: $id }) {
       compSupplier {
         id
@@ -971,6 +971,39 @@ export const GenApiToken = gql`
 export const RevokeApiToken = gql`
   mutation RevokeApiToken($token: String!) {
     apiTokenDelete(input: { token: $token }) {
+      errors
+    }
+  }
+`
+
+// UPDATE PRODUCT COMPONENT VULN VEX
+export const updateCompVulnVex = gql`
+  mutation UpdateCompVulnVex(
+    $compVulnId: Uuid!
+    $notes: String
+    $vexStatusId: Uuid!
+    $vexJustificationId: Uuid
+    $sbomId: Uuid
+  ) {
+    componentVexUpdate(
+      input: {
+        componentVulnId: $compVulnId
+        sbomId: $sbomId
+        notes: $notes
+        vexJustificationId: $vexJustificationId
+        vexStatusId: $vexStatusId
+      }
+    ) {
+      componentVuln {
+        vulnId
+        componentId
+        componentVulnLogs {
+          changedBy
+          status
+          justification
+          updatedAt
+        }
+      }
       errors
     }
   }

@@ -56,6 +56,7 @@ import { GetProductData } from 'graphQL/Queries'
 import { GetComponentData } from 'graphQL/Queries'
 import { GetCheckResults } from 'graphQL/Queries'
 import { GetChangeLogs } from 'graphQL/Queries'
+import { GetVulnData } from 'graphQL/Queries'
 
 function SBOM() {
   const initialRef = useRef(null)
@@ -124,6 +125,16 @@ function SBOM() {
       sbomId: sbomId,
       first: 10,
       field: 'NAME',
+      direction: 'ASC'
+    }
+  })
+
+  const { data: vulnData, refetch: vulnRefetch } = useQuery(GetVulnData, {
+    variables: {
+      projectId: productId,
+      sbomId: sbomId,
+      first: 10,
+      field: 'UPDATED_AT',
       direction: 'ASC'
     }
   })
@@ -204,6 +215,8 @@ function SBOM() {
     }
   }
 
+  const tab = window.localStorage.getItem('activeProdTab')
+
   const refetchSBOM = async (id) => {
     try {
       await refetch({
@@ -212,36 +225,20 @@ function SBOM() {
       })
         .then(() => {
           if (customerView) {
-            history.push(`/sharelynk?p=${productId}&sbom=${id}`)
+            window.history.pushState(
+              null,
+              null,
+              `/sharelynk?p=${productId}&sbom=${id}`
+            )
           } else {
-            history.push(
-              `/vendor/products?tab=general&p=${productId}&sbom=${id}`
+            window.history.pushState(
+              null,
+              null,
+              `/vendor/products?tab=${Number(tab)}&p=${productId}&sbom=${id}`
             )
           }
         })
-        .finally(() => {
-          compRefetch({
-            projectId: productId,
-            sbomId: id,
-            first: 10,
-            field: 'NAME',
-            direction: 'ASC'
-          })
-          checkRefetch({
-            projectId: productId,
-            sbomId: id,
-            first: 10,
-            field: 'STATUS',
-            direction: 'ASC'
-          })
-          logsRefetch({
-            projectId: productId,
-            sbomId: id,
-            first: 10,
-            field: 'CREATED_AT',
-            direction: 'ASC'
-          })
-        })
+        .finally(() => window.location.reload())
     } catch (error) {
       console.log(`fetch error`, error)
     }
@@ -532,6 +529,7 @@ function SBOM() {
 
         {/* SBOM DETAILS */}
         <SBOMTable
+          filteredData={filteredData}
           sbomId={sbomId}
           productId={productId}
           data={sbomData ? sbomData.sbom : undefined}
@@ -542,6 +540,8 @@ function SBOM() {
           checkRefetch={checkRefetch}
           logsData={logsData ? logsData.sbom.activityLogs : undefined}
           logsRefetch={logsRefetch}
+          vulnData={vulnData ? vulnData.sbom.vulns : undefined}
+          vulnRefetch={vulnRefetch}
           status={status}
           lifecycle={sbomData && sbomData.sbom.lifecycle}
           type={

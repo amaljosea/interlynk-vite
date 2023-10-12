@@ -45,7 +45,8 @@ const GeneralDataDrawer = ({
   data,
   selectedKey,
   refetch,
-  checkId
+  checkId,
+  shortDesc
 }) => {
   // console.log(`suppliers`, suppliers)
 

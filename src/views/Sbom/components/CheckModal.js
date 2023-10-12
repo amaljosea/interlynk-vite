@@ -1,3 +1,4 @@
+import { useMutation } from '@apollo/client'
 import { QuestionIcon } from '@chakra-ui/icons'
 import {
   Box,
@@ -20,64 +21,26 @@ import {
   Text,
   Tooltip
 } from '@chakra-ui/react'
+import { UpdateComponent } from 'graphQL/Mutation'
+import { recheckHealth } from 'graphQL/Mutation'
 import { useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import MultiSelect from 'react-select'
 import { licenseOptions } from 'variables/licenses'
 
-const components = [
-  'Biotronik.Cabo.Business.Communication-0.0.0-UnknownVersionBiotronik.Cabo.Business.Communication-0.0.0-UnknownVersion',
-  'Biotronik.Cabo.Business.Communication.BLECommunicationLayer.Android-0.0.0-UnknownVersion',
-  'Biotronik.Cabo.Business.Communication.CommSim-0.0.0-UnknownVersion',
-  'Biotronik.Cabo.Business.Database-0.0.0-UnknownVersion',
-  'Biotronik.Cabo.Business.Database.Android-0.0.0-UnknownVersion',
-  'Biotronik.Cabo.Business.ImplantCommunication-0.0.0-UnknownVersion',
-  'Biotronik.Cabo.Business.Interfaces-0.0.0-UnknownVersion',
-  'Biotronik.Cabo.Business.ModelEntities-0.0.0-UnknownVersion',
-  'Biotronik.Cabo.Business.PPS.Container-0.0.0-UnknownVersion',
-  'Biotronik.Cabo.Business.PPS.Container.Android-0.0.0-UnknownVersion',
-  'Biotronik.Cabo.CP.Translation.Resource-1.8.0',
-  'Biotronik.Cabo.Cpf-0.0.0-UnknownVersion',
-  'Biotronik.Cabo.Cpf.Android-0.0.0-UnknownVersion',
-  'Biotronik.Cabo.MDP.Translation.Resource-1.9.0',
-  'Biotronik.Cabo.Mdp-0.0.0-UnknownVersion',
-  'Biotronik.Cabo.Mdp.Android-0.0.0-UnknownVersion',
-  'Biotronik.Cabo.Mdp.ModelAdmin-0.0.0-UnknownVersion',
-  'Biotronik.Cabo.PR.Translation.Resource-1.8.0',
-  'Biotronik.Cabo.PrApp-0.0.0-UnknownVersion',
-  'Biotronik.Cabo.Shared-0.0.0-UnknownVersion',
-  'Biotronik.Cabo.Shared.Android-0.0.0-UnknownVersion',
-  'Biotronik.Cabo.UI-0.0.0-UnknownVersion',
-  'Biotronik.Cabo.UI.Android-0.0.0-UnknownVersion',
-  'Biotronik.ScsApp.Pr-1.0.0',
-  'Biotronik.ScsApp.Pr.ModelAdminPlugin-1.0.0',
-  'Biotronik.ScsApp.Pr.PPS.Lib.Android.ARM-1.0.0',
-  'Biotronik.ScsApp.Pr.PPS.Lib.Android.ARM64-1.0.0',
-  'Biotronik.ScsApp.Pr.PPS.Lib.Android.x64-1.0.0',
-  'Biotronik.ScsApp.Pr.PPS.Lib.Android.x86-1.0.0',
-  'Biotronik.ScsApp.Shared-1.0.0',
-  'dropwizard-core',
-  'dropwizard-util',
-  'guava',
-  'failureaccess',
-  'listenablefuture',
-  'checker-qual',
-  'error_prone_annotations',
-  'j2objc-annotations',
-  'dropwizard-jackson',
-  'caffeine',
-  'jackson-core',
-  'jackson-datatype-guava',
-  'jackson-datatype-jsr310',
-  'jackson-datatype-jdk8',
-  'jackson-module-parameter-names',
-  'jackson-module-afterburner',
-  'jackson-datatype-joda',
-  'dropwizard-validation',
-  'classmate',
-  'jakarta.el'
-]
+const CheckModal = ({
+  isOpen,
+  onClose,
+  refetch,
+  shortDesc,
+  components,
+  checkId
+}) => {
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const productId = queryParams.get('p')
+  const sbomId = queryParams.get('sbom')
 
-const CheckModal = ({ isOpen, onClose, id, shortDesc }) => {
   const now = new Date()
   const hours = String(now.getHours()).padStart(2, '0')
   const minutes = String(now.getMinutes()).padStart(2, '0')
@@ -86,10 +49,51 @@ const CheckModal = ({ isOpen, onClose, id, shortDesc }) => {
 
   const [timestamp, setTimestamp] = useState(currentTime)
   const [comp, setComp] = useState('')
+  const [compId, setCompId] = useState('')
   const [compType, setCompType] = useState('')
   const [licenseList, setLicenseList] = useState([])
   const [selectedLicenses, setSelectedLicenses] = useState([])
   const [componentData, setComponentData] = useState([])
+
+  const [healthRecheck] = useMutation(recheckHealth)
+  const [updateComponent] = useMutation(UpdateComponent)
+
+  const handleReCheck = async () => {
+    await healthRecheck({
+      variables: {
+        checkId: checkId,
+        sbomId: sbomId
+      }
+    }).then(() =>
+      refetch({
+        projectId: productId,
+        sbomId: sbomId,
+        first: 10,
+        field: 'STATUS',
+        direction: 'ASC'
+      })
+    )
+  }
+
+  const handleComUpdate = async () => {
+    try {
+      await updateComponent({
+        variables: {
+          id: compId,
+          sbomId: sbomId,
+          primary: true
+        }
+      })
+        .then(() => {
+          if (checkId) {
+            handleReCheck()
+          }
+        })
+        .finally(() => onClose())
+    } catch (error) {
+      console.log('Mutation error', error)
+    }
+  }
 
   const handleComponentChange = (e) => {
     const value = e.target.value
@@ -97,7 +101,7 @@ const CheckModal = ({ isOpen, onClose, id, shortDesc }) => {
     if (value === '') {
       setComponentData([])
     } else {
-      setComponentData(components.filter((str) => str.startsWith(value)))
+      setComponentData(components.filter((str) => str.value.startsWith(value)))
     }
   }
 
@@ -127,7 +131,11 @@ const CheckModal = ({ isOpen, onClose, id, shortDesc }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    onClose()
+    if (shortDesc === 'Document has a primary component') {
+      handleComUpdate()
+    } else {
+      onClose()
+    }
   }
 
   const onLicenseChange = (selected) => {
@@ -170,19 +178,20 @@ const CheckModal = ({ isOpen, onClose, id, shortDesc }) => {
                   >
                     <List>
                       {componentData
-                        .filter((item) => item.includes(comp))
+                        .filter((item) => item.value.includes(comp))
                         .map((item, index) => (
                           <ListItem
                             key={index}
                             cursor='pointer'
                             onClick={() => {
-                              setComp(item)
+                              setCompId(item.id)
+                              setComp(item.value)
                               setComponentData([])
                             }}
                             p='2'
                             _hover={{ background: 'gray.100' }}
                           >
-                            <Text>{item}</Text>
+                            <Text>{item.value}</Text>
                           </ListItem>
                         ))}
                     </List>

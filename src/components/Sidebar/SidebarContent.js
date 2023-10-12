@@ -8,9 +8,7 @@ import {
   Flex,
   Stack,
   Text,
-  useColorModeValue,
-  Link,
-  Tooltip
+  useColorModeValue
 } from '@chakra-ui/react'
 import IconBox from 'components/Icons/IconBox'
 import { InterlynkLogo } from 'components/Icons/Icons'
@@ -18,7 +16,7 @@ import { Separator } from 'components/Separator/Separator'
 import { SidebarHelp } from 'components/Sidebar/SidebarHelp'
 import GlobalContext from 'context/GlobalContext'
 import { useContext, useState } from 'react'
-import { NavLink, useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 
 // this function creates the links and collapses that appear in the sidebar (left menu)
 
@@ -41,6 +39,7 @@ const SidebarContent = ({ logoText, routes }) => {
       return ''
     }
   }
+
   const createLinks = (routes) => {
     // Chakra Color Mode
     const activeBg = useColorModeValue('white', 'gray.700')
@@ -66,10 +65,6 @@ const SidebarContent = ({ logoText, routes }) => {
                   xl: '12px'
                 }}
                 mx='auto'
-                ps={{
-                  sm: '10px',
-                  xl: '16px'
-                }}
                 py='12px'
               >
                 {document.documentElement.dir === 'rtl'
@@ -82,123 +77,119 @@ const SidebarContent = ({ logoText, routes }) => {
         }
 
         return (
-          <NavLink to={prop.layout + prop.path} key={prop.name}>
+          <Link to={prop.layout + prop.path} key={prop.name}>
             {activeRoute(prop.layout + prop.path) === 'active' ? (
-              <Tooltip label={prop.name} display={minimize ? 'block' : 'none'}>
-                <Button
-                  boxSize='initial'
-                  justifyContent='flex-start'
-                  alignItems='center'
-                  title={prop.name}
-                  mb={{
-                    xl: '12px'
-                  }}
-                  mx={{
-                    xl: 'auto'
-                  }}
-                  py='4px'
-                  ps={{
-                    sm: '10px',
-                    xl: '16px'
-                  }}
-                  bg='none'
-                  _active={{
-                    bg: 'none'
-                  }}
-                  _hover={{
-                    bg: 'none'
-                  }}
-                >
-                  <Flex>
-                    {typeof prop.icon === 'string' ? (
-                      <Icon>{prop.icon}</Icon>
-                    ) : (
-                      <IconBox
-                        bg='blue.300'
-                        color='white'
-                        h='36px'
-                        w='36px'
-                        me='12px'
-                      >
-                        {prop.icon}
-                      </IconBox>
-                    )}
-                    {!minimize && (
-                      <Text
-                        color={activeColor}
-                        my='auto'
-                        fontSize='sm'
-                        transition='transform 0.1s ease-in-out'
-                        opacity={minimize ? 0 : 100}
-                      >
-                        {document.documentElement.dir === 'rtl'
-                          ? prop.rtlName
-                          : prop.name}
-                      </Text>
-                    )}
-                  </Flex>
-                </Button>
-              </Tooltip>
+              <Button
+                boxSize='initial'
+                justifyContent='flex-start'
+                alignItems='center'
+                title={prop.name}
+                mb={{
+                  xl: '12px'
+                }}
+                mx={{
+                  xl: 'auto'
+                }}
+                py='4px'
+                ps={{
+                  sm: '10px',
+                  xl: '16px'
+                }}
+                bg='none'
+                _active={{
+                  bg: 'none'
+                }}
+                _hover={{
+                  bg: 'none'
+                }}
+              >
+                <Flex>
+                  {typeof prop.icon === 'string' ? (
+                    <Icon>{prop.icon}</Icon>
+                  ) : (
+                    <IconBox
+                      bg='blue.300'
+                      color='white'
+                      h='36px'
+                      w='36px'
+                      me='12px'
+                    >
+                      {prop.icon}
+                    </IconBox>
+                  )}
+                  {!minimize && (
+                    <Text
+                      color={activeColor}
+                      my='auto'
+                      fontSize='sm'
+                      transition='transform 0.1s ease-in-out'
+                      opacity={minimize ? 0 : 100}
+                    >
+                      {document.documentElement.dir === 'rtl'
+                        ? prop.rtlName
+                        : prop.name}
+                    </Text>
+                  )}
+                </Flex>
+              </Button>
             ) : (
-              <Tooltip label={prop.name} display={minimize ? 'block' : 'none'}>
-                <Button
-                  boxSize='initial'
-                  justifyContent='flex-start'
-                  alignItems='center'
-                  mb={{
-                    xl: '12px'
-                  }}
-                  mx={{
-                    xl: 'auto'
-                  }}
-                  py='4px'
-                  ps={{
-                    sm: '10px',
-                    xl: '16px'
-                  }}
-                  bg='none'
-                  _active={{
-                    bg: 'none'
-                  }}
-                  _hover={{
-                    bg: 'none'
-                  }}
-                  title={prop.name}
-                >
-                  <Flex>
-                    {typeof prop.icon === 'string' ? (
-                      <Icon>{prop.icon}</Icon>
-                    ) : (
-                      <IconBox
-                        bg={inactiveBg}
-                        color='blue.300'
-                        h='36px'
-                        w='36px'
-                        me='12px'
-                      >
-                        {prop.icon}
-                      </IconBox>
-                    )}
-                    {minimize ? (
-                      ''
-                    ) : (
-                      <Text
-                        color={inactiveColor}
-                        my='auto'
-                        fontSize='sm'
-                        transition='transform 0.1s ease-in-out'
-                        opacity={minimize ? 0 : 100}
-                      >
-                        {document.documentElement.dir === 'rtl'
-                          ? prop.rtlName
-                          : prop.name}
-                      </Text>
-                    )}
-                  </Flex>
-                </Button>
-              </Tooltip>
+              <Button
+                boxSize='initial'
+                justifyContent='flex-start'
+                alignItems='center'
+                mb={{
+                  xl: '12px'
+                }}
+                mx={{
+                  xl: 'auto'
+                }}
+                py='4px'
+                ps={{
+                  sm: '10px',
+                  xl: '16px'
+                }}
+                bg='none'
+                _active={{
+                  bg: 'none'
+                }}
+                _hover={{
+                  bg: 'none'
+                }}
+                title={prop.name}
+              >
+                <Flex>
+                  {typeof prop.icon === 'string' ? (
+                    <Icon>{prop.icon}</Icon>
+                  ) : (
+                    <IconBox
+                      bg={inactiveBg}
+                      color='blue.300'
+                      h='36px'
+                      w='36px'
+                      me='12px'
+                    >
+                      {prop.icon}
+                    </IconBox>
+                  )}
+                  {minimize ? (
+                    ''
+                  ) : (
+                    <Text
+                      color={inactiveColor}
+                      my='auto'
+                      fontSize='sm'
+                      transition='transform 0.1s ease-in-out'
+                      opacity={minimize ? 0 : 100}
+                    >
+                      {document.documentElement.dir === 'rtl'
+                        ? prop.rtlName
+                        : prop.name}
+                    </Text>
+                  )}
+                </Flex>
+              </Button>
             )}
-          </NavLink>
+          </Link>
         )
       })
   }

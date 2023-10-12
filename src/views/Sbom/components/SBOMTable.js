@@ -33,7 +33,10 @@ const SBOMTable = ({
   checkData,
   checkRefetch,
   logsData,
-  logsRefetch
+  logsRefetch,
+  vulnData,
+  vulnRefetch,
+  filteredData
 }) => {
   const { productVulData } = useContext(GlobalContext)
 
@@ -64,6 +67,14 @@ const SBOMTable = ({
           field: 'NAME',
           direction: 'ASC'
         })
+      case 2:
+        vulnRefetch({
+          projectId: productId,
+          sbomId: sbomId,
+          first: 10,
+          field: 'UPDATED_AT',
+          direction: 'ASC'
+        })
       case 3:
         return checkRefetch({
           projectId: productId,
@@ -82,6 +93,15 @@ const SBOMTable = ({
         })
     }
   }
+
+  const components =
+    compData &&
+    compData.sbom.components.nodes.map((item) => {
+      return {
+        value: item.name,
+        id: item.id
+      }
+    })
 
   return (
     <>
@@ -147,21 +167,22 @@ const SBOMTable = ({
             </TabPanel>
             {/* VUNERABILITIES TABLE */}
             <TabPanel px={0}>
-              <CardBody>
-                <VulnTable data={productVulData} />
-              </CardBody>
               {/* pagination */}
-              {productVulData && (
-                <Flex
-                  flexDir={'row'}
-                  gap={4}
-                  alignItems={'center'}
-                  mt={6}
-                  justifyContent={'flex-start'}
-                >
-                  <Button colorScheme='blue'>Previous</Button>
-                  <Button colorScheme='blue'>Next</Button>
-                  <Box>Page 1 of 1</Box>
+              {vulnData ? (
+                <VulnTable
+                  data={vulnData}
+                  refetch={vulnRefetch}
+                  productId={productId}
+                  sbomId={sbomId}
+                  filteredData={filteredData}
+                />
+              ) : (
+                <Flex width={'100%'} gap={4} direction={'column'}>
+                  <Skeleton width={'100%'} height='20px' />
+                  <Skeleton width={'100%'} height='20px' />
+                  <Skeleton width={'100%'} height='20px' />
+                  <Skeleton width={'100%'} height='20px' />
+                  <Skeleton width={'100%'} height='20px' />
                 </Flex>
               )}
             </TabPanel>
@@ -173,6 +194,7 @@ const SBOMTable = ({
                   sbomId={sbomId}
                   data={checkData}
                   refetch={checkRefetch}
+                  components={components}
                 />
               ) : (
                 <Flex width={'100%'} gap={4} direction={'column'}>

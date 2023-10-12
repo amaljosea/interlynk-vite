@@ -32,7 +32,7 @@ import { dashRoutes } from 'routes.js'
 import { FaRegKeyboard, FaSignOutAlt } from 'react-icons/fa'
 
 import Cookies from 'js-cookie'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import axios from 'axios'
 import { useQuery } from '@apollo/client'
 import { GetOrg } from 'graphQL/Queries'
@@ -124,14 +124,8 @@ export default function HeaderLinks(props) {
   ]
 
   return (
-    <Flex
-      pe={{ sm: '0px', md: '0px' }}
-      w={{ sm: '100%', md: 'auto' }}
-      gap={4}
-      alignItems='center'
-      flexDirection='row'
-    >
-      <Select bg={'white'} size='sm'>
+    <Flex gap={4} alignItems='center' flexDirection='row'>
+      <Select width={'fit-content'} bg={'white'} size='sm'>
         <option value='Today'>Today</option>
         <option value='1 weeks'>1 weeks</option>
         <option value='2 weeks'>2 weeks</option>
