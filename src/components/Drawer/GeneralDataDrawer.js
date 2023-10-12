@@ -299,15 +299,15 @@ const GeneralDataDrawer = ({
   const heading = (name) => {
     switch (name) {
       case 'tools':
-        return 'Creation Tool(s)'
+        return 'Creation Tools'
       case 'author':
-        return 'Author(s)'
+        return 'Authors'
       case 'supplier':
-        return 'Supplier(s)'
+        return 'Supplier'
       case 'license':
         return 'License'
       case 'identifier':
-        return 'Identifier(s)'
+        return 'Identifiers'
     }
   }
 
@@ -345,7 +345,7 @@ const GeneralDataDrawer = ({
 
                 <Flex width={'100%'} flexDir={'column'}>
                   <Text size='md' my={2}>
-                    Tool History
+                    Existing Tools
                   </Text>
                   {creationTools.length > 0 ? (
                     <Table variant='simple' size='sm' mt={4}>

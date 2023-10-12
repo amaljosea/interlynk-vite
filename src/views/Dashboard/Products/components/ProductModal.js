@@ -110,7 +110,7 @@ const ProductModal = ({
                   <FormLabel>Name</FormLabel>
                   <Input
                     type='text'
-                    value={productName}
+                    value={productName || ''}
                     onChange={(e) => setProductName(e.target.value)}
                     placeholder='Enter product name'
                   />
@@ -119,7 +119,7 @@ const ProductModal = ({
                   <FormLabel>Description</FormLabel>
                   <Input
                     type='text'
-                    value={productDesc}
+                    value={productDesc || ''}
                     onChange={(e) => setProductDesc(e.target.value)}
                     placeholder='Enter product description'
                   />

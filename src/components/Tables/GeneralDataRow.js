@@ -140,7 +140,7 @@ const GeneralDataRow = ({ status, type, data, refetch }) => {
             <Tr>
               <Td pl={0} fontWeight={'medium'}>
                 <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-                  <Text>Creation Tool(s)</Text>
+                  <Text>Creation Tools</Text>
                   <Tooltip label='Creator Tool(s) identify all the software tools and their versions used in building the SBOM. Interlynk is automatically added as one of the tools'>
                     <Icon as={QuestionIcon} color={'blue.500'} />
                   </Tooltip>
@@ -241,8 +241,8 @@ const GeneralDataRow = ({ status, type, data, refetch }) => {
             <Tr>
               <Td pl={0} fontWeight={'medium'}>
                 <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-                  <Text>Supplier(s)</Text>
-                  <Tooltip label='Supplier(s) identify the name and email of the organization that built, distributed or package the application. For Open-source components, it can refer to the name of the project or entity distributing the project.'>
+                  <Text>Supplier</Text>
+                  <Tooltip label='Supplier identify the name and email of the organization that built, distributed or package the application. For Open-source components, it can refer to the name of the project or entity distributing the project.'>
                     <Icon as={QuestionIcon} color={'blue.500'} />
                   </Tooltip>
                 </Flex>
