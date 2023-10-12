@@ -30,7 +30,7 @@ jobs:
       - name: Upload SBOM
         run: |
           curl -v "https://api.interlynk.io/lynkapi" \
-            -H "Bearer eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI3MGNjZDQ5ZS00NDg4LTRhMTYtYWQyZS1kMWM1ZjdiNTQyMDQiLCJzdWIiOiJmMGJmMTg0NC0yMmZiLTQ1ZjEtOTM1OS0zZjY1NzlkY2IwZjAiLCJzY3AiOiJ1c2VyIiwiYXVkIjpudWxsLCJpYXQiOjE2OTcxMjU0MzcsImV4cCI6MTY5NzIxMTgzN30.SzSt5Y3M9vgKrocRIUu9ukoas9JLWS_L4nN-lMvRG-I" \
+            -H "Bearer eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI1MzcyZmQxOS1hMWVkLTQ5NWMtYTZiZS02MTM2NGUwMTRlZmYiLCJzdWIiOiIyMjZlNjU0Mi05MTcxLTRkMjYtOTA2Yy1iOWJlZWM3NDY0ZDciLCJzY3AiOiJ1c2VyIiwiYXVkIjpudWxsLCJpYXQiOjE2OTcxNTE4MDksImV4cCI6MTY5NzIzODIwOX0.gVieV6dL84oJWQNAVH739JbheOcLQSkeLIgUqjfGmUo" \
             -F 'operations={"query":"mutation uploadSbom($doc: Upload!, $projectId: ID!) { sbomUpload(input: { doc: $doc, projectId: $projectId }) { errors } }","variables":{"doc":null,"projectId":"93d17533-34cd-454a-bfae-8e7aea92f8a6"}}' \
             -F 'map={"0":["variables.doc"]}' \
             -F '0=@"lynk-app-dash.cdx.json";type=application/json'
