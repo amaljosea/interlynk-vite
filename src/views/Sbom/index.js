@@ -238,7 +238,36 @@ function SBOM() {
             )
           }
         })
-        .finally(() => window.location.reload())
+        .finally(() => {
+          compRefetch({
+            projectId: productId,
+            sbomId: id,
+            first: 10,
+            field: 'NAME',
+            direction: 'ASC'
+          })
+          vulnRefetch({
+            projectId: productId,
+            sbomId: id,
+            first: 10,
+            field: 'UPDATED_AT',
+            direction: 'ASC'
+          })
+          checkRefetch({
+            projectId: productId,
+            sbomId: id,
+            first: 10,
+            field: 'STATUS',
+            direction: 'ASC'
+          })
+          logsRefetch({
+            projectId: productId,
+            sbomId: id,
+            first: 10,
+            field: 'CREATED_AT',
+            direction: 'ASC'
+          })
+        })
     } catch (error) {
       console.log(`fetch error`, error)
     }
