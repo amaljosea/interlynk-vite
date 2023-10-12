@@ -1,5 +1,11 @@
 // Chakra imports
-import { Box, ChakraProvider, Portal, useDisclosure } from '@chakra-ui/react'
+import {
+  Box,
+  ChakraProvider,
+  Portal,
+  Stack,
+  useDisclosure
+} from '@chakra-ui/react'
 import Footer from 'components/Footer/Footer.js'
 // Layout components
 import AdminNavbar from 'components/Navbars/AdminNavbar.js'
@@ -28,6 +34,7 @@ import Cookies from 'js-cookie'
 import { createUploadLink } from 'apollo-upload-client'
 import { getActiveNavbar, getActiveRoute } from '../utils'
 import Automation from 'views/Dashboard/Automation'
+import ContextWrapper from 'context/ContextWrapper'
 
 export default function Dashboard(props) {
   const { minimize } = useContext(GlobalContext)
@@ -102,53 +109,61 @@ export default function Dashboard(props) {
 
   return (
     <ApolloProvider client={client}>
-      <ChakraProvider theme={theme} resetCss={false}>
-        <Sidebar
-          routes={dashRoutes}
-          logoText={'Interlynk DASHBOARD'}
-          display='none'
-          sidebarVariant={sidebarVariant}
-          {...rest}
-        />
-        <MainPanel
-          bg='transparent'
-          minH='100vh'
-          w={minimize ? 'calc(100% - 70px)' : 'calc(100% - 220px)'}
-        >
-          <Portal>
-            <Box>
-              <AdminNavbar
-                onOpen={onOpen}
-                logoText={'Interlynk DASHBOARD'}
-                brandText={getActiveRoute(dashRoutes)}
-                secondary={getActiveNavbar(dashRoutes)}
-                fixed={fixed}
-                {...rest}
-              />
+      <ContextWrapper>
+        <ChakraProvider theme={theme} resetCss={false}>
+          <Stack width={'100%'} direction={'row'} alignItems={'flex-start'}>
+            <Sidebar
+              routes={dashRoutes}
+              logoText={'Interlynk DASHBOARD'}
+              display='none'
+              sidebarVariant={sidebarVariant}
+              {...rest}
+            />
+            <Box
+              minH='100vh'
+              w={minimize ? 'calc(100% - 220px)' : 'calc(100% - 74px)'}
+              // pos={'absolute'}
+              // right={0}
+            >
+              <Portal>
+                <Box>
+                  <AdminNavbar
+                    onOpen={onOpen}
+                    logoText={'Interlynk DASHBOARD'}
+                    brandText={getActiveRoute(dashRoutes)}
+                    secondary={getActiveNavbar(dashRoutes)}
+                    fixed={fixed}
+                    {...rest}
+                  />
+                </Box>
+              </Portal>
+              <Box bg='rgba(0,0,0,0.04)' minH={'100vh'}>
+                {getRoute() && (
+                  <PanelContent>
+                    <PanelContainer>
+                      <Switch>
+                        {userName && getRoutes(dashRoutes)}
+                        {userName && (
+                          <Route
+                            path={`/vendor/autofix`}
+                            component={Automation}
+                          />
+                        )}
+                        {userName ? (
+                          <Redirect from='/vendor' to='/vendor/dashboard' />
+                        ) : (
+                          <Redirect from='/vendor' to='/auth' />
+                        )}
+                      </Switch>
+                    </PanelContainer>
+                  </PanelContent>
+                )}
+                <Footer />
+              </Box>
             </Box>
-          </Portal>
-          <Box bg='rgba(0,0,0,0.04)' minH={'100vh'}>
-            {getRoute() && (
-              <PanelContent>
-                <PanelContainer>
-                  <Switch>
-                    {userName && getRoutes(dashRoutes)}
-                    {userName && (
-                      <Route path={`/vendor/autofix`} component={Automation} />
-                    )}
-                    {userName ? (
-                      <Redirect from='/vendor' to='/vendor/dashboard' />
-                    ) : (
-                      <Redirect from='/vendor' to='/auth' />
-                    )}
-                  </Switch>
-                </PanelContainer>
-              </PanelContent>
-            )}
-            <Footer />
-          </Box>
-        </MainPanel>
-      </ChakraProvider>
+          </Stack>
+        </ChakraProvider>
+      </ContextWrapper>
     </ApolloProvider>
   )
 }

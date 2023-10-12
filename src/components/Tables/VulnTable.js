@@ -127,7 +127,7 @@ const FilterComponent = ({ filterText, onFilter, onClear }) => {
   )
 }
 
-const VulnTable = ({ data }) => {
+const VulnTable = ({ data, refetch, productId, sbomId, filteredData }) => {
   const location = useLocation()
   const toast = useToast()
   const customerView = location.pathname.startsWith('/customer')
@@ -156,12 +156,10 @@ const VulnTable = ({ data }) => {
   const [filteredItems, setFilteredItems] = useState([])
 
   useEffect(() => {
-    const filterData = data.filter(
+    const filterData = data.nodes.filter(
       (item) =>
-        (item.cve &&
-          item.cve.toLowerCase().includes(filterText.toLowerCase())) ||
-        (item.component &&
-          item.component.toLowerCase().includes(filterText.toLowerCase()))
+        item.component &&
+        item.component.name.toLowerCase().includes(filterText.toLowerCase())
     )
 
     setFilteredItems(filterData)
@@ -184,22 +182,23 @@ const VulnTable = ({ data }) => {
     onClose: onTableClose
   } = useDisclosure()
 
+  // COLUMNS
   const columns = [
     // CVE ID
     {
       id: 'cve',
       name: 'CVE ID',
       selector: (row) => {
-        const { cve } = row
+        const { vuln } = row
         return (
           <Link
-            href={`https://nvd.nist.gov/vuln/detail/${cve}`}
+            href={`https://nvd.nist.gov/vuln/detail/${vulnId}`}
             target={'_blank'}
           >
             <Flex direction='row' alignItems={'center'} gap={2}>
               <Icon as={ExternalLinkIcon} h={'16px'} w={'16px'} />
               <Text fontSize='sm' color={textColor}>
-                {cve}
+                {vuln.vulnId}
               </Text>
             </Flex>
           </Link>
@@ -211,20 +210,23 @@ const VulnTable = ({ data }) => {
     {
       id: 'serverity',
       name: 'SEVERITY',
-      selector: (row) => (
-        <Tag
-          size='md'
-          key='md'
-          variant='subtle'
-          colorScheme={sevColor(row.severity)}
-          textTransform={'capitalize'}
-          width={'100%'}
-          alignItems={'center'}
-          justifyContent={'center'}
-        >
-          <TagLabel>{row.severity}</TagLabel>
-        </Tag>
-      ),
+      selector: (row) => {
+        const { vuln } = row
+        return (
+          <Tag
+            size='md'
+            key='md'
+            variant='subtle'
+            // colorScheme={sevColor(row.severity)}
+            textTransform={'capitalize'}
+            width={'100%'}
+            alignItems={'center'}
+            justifyContent={'center'}
+          >
+            <TagLabel>{vuln.desc}</TagLabel>
+          </Tag>
+        )
+      },
       width: '150px'
     },
     // CVSS
@@ -232,16 +234,16 @@ const VulnTable = ({ data }) => {
       id: 'cvss',
       name: 'CVSS',
       selector: (row) => {
-        const { cvss, severity } = row
+        const { vuln } = row
         return (
           <Flex minWidth='max-content' alignItems='center' gap='2'>
             <Tag
               size='md'
               key='md'
               variant='subtle'
-              colorScheme={sevColor(`${severity}`)}
+              // colorScheme={sevColor(`${severity}`)}
             >
-              <TagLabel>{cvss}</TagLabel>
+              <TagLabel>{vuln.cvssScore}</TagLabel>
             </Tag>
           </Flex>
         )
@@ -255,14 +257,8 @@ const VulnTable = ({ data }) => {
       selector: (row) => {
         const { component } = row
         return (
-          <Tooltip label={component} placement='top'>
-            <Text textTransform={'capitalize'}>
-              {component !== null
-                ? `${component?.substring(0, 20)}${
-                    component.length > 20 ? '...' : ''
-                  }`
-                : ''}
-            </Text>
+          <Tooltip label={component.name} placement='top'>
+            <Text textTransform={'capitalize'}>{component.name}</Text>
           </Tooltip>
         )
       },
@@ -272,34 +268,30 @@ const VulnTable = ({ data }) => {
     {
       id: 'version',
       name: 'VERSION',
-      selector: (row) => row.version,
+      selector: (row) => row.component.version,
       width: '200px'
-    },
-    {
-      id: 'source',
-      name: 'SOURCE',
-      selector: (row) => (
-        <Tag size='sm' variant='outline' colorScheme='blue'>
-          {row.source}
-        </Tag>
-      )
     },
     {
       id: 'status',
       name: 'STATUS',
       selector: (row) => {
-        const { status } = row
+        const { vuln } = row
         return (
           <Tag
             fontWeight={'normal'}
             variant='solid'
             size='sm'
-            colorScheme={statusColor(status)}
+            // colorScheme={statusColor(status)}
           >
-            {status}
+            {vuln.status}
           </Tag>
         )
       }
+    },
+    {
+      id: 'updatedAt',
+      name: 'UPDATED AT',
+      selector: (row) => row.vuln.updatedAt
     },
     // ACTION
     {
@@ -550,6 +542,32 @@ const VulnTable = ({ data }) => {
     })
   }
 
+  const [pageIndex, setPageIndex] = useState(1)
+
+  const onPreviousPage = () => {
+    setPageIndex((prev) => pageIndex !== 0 && prev - 1)
+    refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      first: undefined,
+      last: 10,
+      before: data.pageInfo.startCursor,
+      after: ''
+    })
+  }
+
+  const onNextPage = () => {
+    setPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
+    refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      first: 10,
+      last: undefined,
+      after: data.pageInfo.endCursor,
+      before: ''
+    })
+  }
+
   useEffect(() => {
     if (step === 1) {
       setStepTitle('Select source of data')
@@ -564,30 +582,46 @@ const VulnTable = ({ data }) => {
 
   return (
     <>
-      {data.length > 0 ? (
-        <Flex flexDir={'column'} width={'100%'}>
-          <DataTable
-            columns={columns}
-            data={filteredItems}
-            customStyles={customStyles}
-            progressPending={data.length === 0}
-            subHeader
-            subHeaderComponent={subHeaderComponentMemo}
-            responsive={true}
-            expandableRows
-            expandableRowsComponent={ExpandedComponent}
-          />
-        </Flex>
-      ) : (
-        <Flex
-          width={'100%'}
-          mt={4}
-          alignItems={'center'}
-          justifyContent={'center'}
+      {/* TABLE */}
+      <Flex flexDir={'column'} width={'100%'}>
+        <DataTable
+          columns={columns}
+          data={data.nodes}
+          customStyles={customStyles}
+          subHeader
+          subHeaderComponent={subHeaderComponentMemo}
+          responsive={true}
+          expandableRows
+          expandableRowsComponent={ExpandedComponent}
+        />
+      </Flex>
+
+      {/* PAGINATION */}
+      <Flex
+        flexDir={'row'}
+        gap={4}
+        alignItems={'center'}
+        mt={6}
+        justifyContent={'flex-start'}
+      >
+        <Button
+          colorScheme='blue'
+          onClick={onPreviousPage}
+          isDisabled={!data.pageInfo.hasPreviousPage}
         >
-          <Text>No vulnerabilities data found</Text>
-        </Flex>
-      )}
+          Previous
+        </Button>
+        <Button
+          colorScheme='blue'
+          onClick={onNextPage}
+          isDisabled={!data.pageInfo.hasNextPage}
+        >
+          Next
+        </Button>
+        <Box>
+          Page {pageIndex} of {Math.ceil(data.totalCount / 10)}
+        </Box>
+      </Flex>
 
       {/* COPY MODAL */}
       {isCopyOpen && (
@@ -603,11 +637,15 @@ const VulnTable = ({ data }) => {
                   value={version}
                   onChange={(e) => setVersion(e.target.value)}
                 >
-                  <option value=''>-- Select --</option>
-                  <option value='v.1'>v0.1.0</option>
-                  <option value='v1.0'>v1.0.0</option>
-                  <option value='v2.0'>v2.0.0</option>
-                  <option value='v3.0'>v3.0.0</option>
+                  {filteredData && filteredData.length > 0 ? (
+                    filteredData.map((item, index) => (
+                      <option key={index} value={item.id} name={item.version}>
+                        {item.version}
+                      </option>
+                    ))
+                  ) : (
+                    <option value=''>-- --</option>
+                  )}
                 </Select>
               </FormControl>
             </ModalBody>
@@ -723,6 +761,7 @@ const VulnTable = ({ data }) => {
               vulnRefetch={null}
               status={activeRow.status}
               setVulData={setVulData}
+              filteredData={filteredData}
             />
           )}
         </>

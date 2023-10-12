@@ -89,7 +89,7 @@ const FilterComponent = ({ filterText, onFilter, onClear }) => {
   )
 }
 
-const HealthCheckTable = ({ productId, sbomId, data, refetch }) => {
+const HealthCheckTable = ({ productId, sbomId, data, refetch, components }) => {
   const customerView = location.pathname.startsWith('/customer')
   const toast = useToast()
   const { healthCheckData, setHealthCheckData } = useContext(GlobalContext)
@@ -179,16 +179,6 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch }) => {
     onClose: onCpeClose
   } = useDisclosure()
 
-  // EXTRACT ALL SEVERITY OPTIONS FROM HEALTH CHECK DATA
-  const severityOptions = [
-    ...new Set(healthCheckData.map((item) => item.severity))
-  ]
-
-  // EXTRACT ALL SHORT DESC STRING FROM HEALTH CHECK DATA
-  const shortDescOptions = [
-    ...new Set(healthCheckData.map((item) => item.shortDesc))
-  ]
-
   const handleFilterChange = (selectedFilters) => {
     console.log(selectedFilters)
   }
@@ -224,6 +214,15 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch }) => {
     }
   }
 
+  // EXTRACT ALL SEVERITY OPTIONS FROM HEALTH CHECK DATA
+  const severity =
+    data && data.nodes.map((item) => item.organizationRule.severity)
+  // EXTRACT ALL SHORT DESC STRING FROM HEALTH CHECK DATA
+  const category =
+    data && data.nodes.map((item) => item.organizationRule.rule.shortDesc)
+  // EXTRACT RESOLUTION STRING FROM HEALTH CHECK DATA
+  const resolution = data && data.nodes.map((item) => item.status)
+
   // SUB HEADER
   const subHeaderComponentMemo = useMemo(() => {
     const handleClear = () => {
@@ -252,9 +251,10 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch }) => {
           />
 
           <FilterMenu
-            severityOptions={severityOptions}
-            shortDescOptions={shortDescOptions}
             onFilterChange={handleFilterChange}
+            severity={severity}
+            category={category}
+            resolution={resolution}
           />
         </Stack>
 
@@ -653,17 +653,6 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch }) => {
         </Box>
       </Flex>
 
-      {data.nodes.length === 0 && (
-        <Flex
-          width={'100%'}
-          mt={4}
-          alignItems={'center'}
-          justifyContent={'center'}
-        >
-          <Text>No health check data found</Text>
-        </Flex>
-      )}
-
       {/* ACTIONS */}
       {activeRow !== null && (
         <>
@@ -671,9 +660,11 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch }) => {
           {isPrimaryOpen && (
             <CheckModal
               id={activeRow.id}
+              refetch={refetch}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
               checkId={activeRow.organizationRule.rule.friendlyId}
               isOpen={isPrimaryOpen}
+              components={components}
               onClose={onPrimaryClose}
             />
           )}

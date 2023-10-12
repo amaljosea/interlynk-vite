@@ -43,7 +43,8 @@ import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import { FaExpandAlt } from 'react-icons/fa'
 import { CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
 
-const regexPattern = /^cpe:2\.3:[aho]:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+$/
+const regexPattern =
+  /^cpe:2\.3:[aho]:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+$/
 
 function ProductSbomDrawer(props) {
   const location = useLocation()
@@ -51,16 +52,8 @@ function ProductSbomDrawer(props) {
   const toast = useToast()
   const sbomId = queryParams.get('sbom')
 
-  const {
-    projectId,
-    name,
-    isOpen,
-    onClose,
-    btnRef,
-    refetch,
-    sbomData,
-    type
-  } = props
+  const { projectId, name, isOpen, onClose, btnRef, refetch, sbomData, type } =
+    props
 
   const [createSbom] = useMutation(sbomCreate)
   const [updateSbom] = useMutation(sbomUpdate)
@@ -247,7 +240,7 @@ function ProductSbomDrawer(props) {
     try {
       createComponent({
         variables: {
-          id: id,
+          sbomId: id,
           kind: compType,
           name: name,
           version: version,

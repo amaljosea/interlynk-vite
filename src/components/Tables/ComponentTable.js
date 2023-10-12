@@ -751,16 +751,6 @@ const ComponentTable = ({ type, lifecycle, data, refetch }) => {
         </Box>
       </Flex>
 
-      {data.nodes.length === 0 && (
-        <Flex
-          width={'100%'}
-          mt={4}
-          alignItems={'center'}
-          justifyContent={'center'}
-        >
-          <Text>No component found...</Text>
-        </Flex>
-      )}
 
       {/* ACTIONS */}
       {activeRow !== null && (

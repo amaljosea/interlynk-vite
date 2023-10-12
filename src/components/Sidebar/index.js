@@ -40,36 +40,35 @@ function Sidebar(props) {
 
   // SIDEBAR
   return (
-    <Box ref={mainPanel}>
+    <Box
+      display={{ sm: 'none', xl: 'block' }}
+      // position='fixed'
+      onMouseEnter={() => setMinimize(false)}
+      onMouseLeave={() => setMinimize(true)}
+      w={minimize === true ? '68px' : '210px'}
+      bg={'transparent'}
+      zIndex={111}
+    >
       <Box
-        display={{ sm: 'none', xl: 'block' }}
-        position='fixed'
-        onMouseEnter={() => setMinimize(false)}
-        onMouseLeave={() => setMinimize(true)}
+        // borderRight={'1px solid lightgray'}
+        // ms={{
+        //   sm: '16px'
+        // }}
+        // my={{
+        //   sm: '16px'
+        // }}
+        h='100vh'
+        // ps='20px'
+        // pe='20px'
+        m={sidebarMargins}
+        borderRadius={sidebarRadius}
       >
-        <Box
-          w={minimize === true ? '75px' : '210px'}
-          // w={minimize === true ? '90px' : '210px'}
-          // borderRight={'1px solid lightgray'}
-          // ms={{
-          //   sm: '16px'
-          // }}
-          // my={{
-          //   sm: '16px'
-          // }}
-          h='100vh'
-          // ps='20px'
-          // pe='20px'
-          m={sidebarMargins}
-          borderRadius={sidebarRadius}
-        >
-          <SidebarContent
-            routes={filterRoutes}
-            logoText={'Interlynk'}
-            display='none'
-            sidebarVariant={sidebarVariant}
-          />
-        </Box>
+        <SidebarContent
+          routes={filterRoutes}
+          logoText={'Interlynk'}
+          display='none'
+          sidebarVariant={sidebarVariant}
+        />
       </Box>
     </Box>
   )

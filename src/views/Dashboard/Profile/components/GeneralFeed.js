@@ -18,7 +18,7 @@ import CardHeader from 'components/Card/CardHeader'
 import { orgUpdate } from 'graphQL/Mutation'
 import { useEffect, useState } from 'react'
 
-const GeneralFeed = ({ orgInfo, refetch }) => {
+const GeneralFeed = ({ orgInfo, refetch, getOrgInfo }) => {
   const textColor = useColorModeValue('gray.700', 'white')
 
   const [orgName, setOrgName] = useState('')
@@ -80,40 +80,36 @@ const GeneralFeed = ({ orgInfo, refetch }) => {
           {/* NAME */}
           <FormControl>
             <FormLabel>Name</FormLabel>
-            <HStack spacing={2}>
-              <Input
-                value={orgName}
-                onChange={(e) => setOrgName(e.target.value)}
-              />
-              <Button
-                width={'120px'}
-                variant='solid'
-                colorScheme={'blue'}
-                onClick={handleUpdate}
-                disabled={message === 'Saving....'}
-              >
-                {message}
-              </Button>
-            </HStack>
+            <Input
+              value={orgName}
+              onChange={(e) => setOrgName(e.target.value)}
+            />
+            <Button
+              mt={3}
+              variant='solid'
+              colorScheme={'blue'}
+              onClick={handleUpdate}
+              disabled={message === 'Saving....'}
+            >
+              {message}
+            </Button>
           </FormControl>
           {/* ID */}
           <FormControl>
             <FormLabel>Interlynk ID</FormLabel>
-            <HStack spacing={2}>
-              <Input
-                value={orgId}
-                onChange={(e) => setOrgId(e.target.value)}
-                readOnly
-              />
-              <Button
-                width={'120px'}
-                variant='solid'
-                colorScheme={'blue'}
-                onClick={() => id.onCopy()}
-              >
-                {id.hasCopied ? 'Copied!' : 'Copy'}
-              </Button>
-            </HStack>
+            <Input
+              value={orgId}
+              onChange={(e) => setOrgId(e.target.value)}
+              readOnly
+            />
+            <Button
+              mt={3}
+              variant='solid'
+              colorScheme={'blue'}
+              onClick={() => id.onCopy()}
+            >
+              {id.hasCopied ? 'Copied!' : 'Copy'}
+            </Button>
           </FormControl>
         </Flex>
       </CardBody>

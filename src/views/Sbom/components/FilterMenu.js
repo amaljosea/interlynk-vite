@@ -12,9 +12,7 @@ import {
 } from '@chakra-ui/react'
 import { FaFilter } from 'react-icons/fa'
 
-const res = ['Auto Fixed', 'Fixed', 'Ignored', 'Unresolved']
-
-const FilterMenu = ({ severityOptions, shortDescOptions, onFilterChange }) => {
+const FilterMenu = ({ onFilterChange, severity, category, resolution }) => {
   const [selectedSeverityFilters, setSelectedSeverityFilters] = useState([])
   const [selectedShortDescFilters, setSelectedShortDescFilters] = useState([])
   const [selectedResFilters, setSelectedResFilters] = useState(['Unresolved'])
@@ -87,7 +85,7 @@ const FilterMenu = ({ severityOptions, shortDescOptions, onFilterChange }) => {
               value={selectedSeverityFilters}
               onChange={handleSeverityFilterChange}
             >
-              {severityOptions.map((option) => (
+              {[...new Set(severity)].map((option) => (
                 <MenuItemOption
                   key={option}
                   value={option}
@@ -140,7 +138,7 @@ const FilterMenu = ({ severityOptions, shortDescOptions, onFilterChange }) => {
               value={selectedShortDescFilters}
               onChange={handleShortDescFilterChange}
             >
-              {shortDescOptions.map((option) => (
+              {[...new Set(category)].map((option) => (
                 <MenuItemOption
                   key={option}
                   value={option}
@@ -193,7 +191,7 @@ const FilterMenu = ({ severityOptions, shortDescOptions, onFilterChange }) => {
               value={selectedResFilters}
               onChange={handleResFilterChange}
             >
-              {res.map((option) => (
+              {[...new Set(resolution)].map((option) => (
                 <MenuItemOption
                   key={option}
                   value={option}

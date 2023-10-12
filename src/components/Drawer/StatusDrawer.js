@@ -48,7 +48,8 @@ const StatusDrawer = ({
   textColor,
   id,
   vulnRefetch,
-  setVulData
+  setVulData,
+  filteredData
 }) => {
   const toast = useToast()
 
@@ -283,20 +284,19 @@ const StatusDrawer = ({
                           size='sm'
                           color='gray.500'
                         >
-                          <option value={'select'}>--Select--</option>
-                          <option value='v1.0'>v1.0</option>
-                          <option value='v2.0'>v2.0</option>
-                          <option value='v3.0'>v3.0</option>
-                          <option value='v4.0'>v4.0</option>
-                          {/* {imageInfo && imageInfo.length > 0 ? (
-                            imageInfo.map((img, index) => (
-                              <option key={index} value={img.id}>
-                                {img.name}
+                          {filteredData && filteredData.length > 0 ? (
+                            filteredData.map((item, index) => (
+                              <option
+                                key={index}
+                                value={item.id}
+                                name={item.version}
+                              >
+                                {item.version}
                               </option>
                             ))
                           ) : (
-                            <option value={''}>No data found</option>
-                          )} */}
+                            <option value=''>-- --</option>
+                          )}
                         </Select>
                       </Box>
                     ) : (

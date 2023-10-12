@@ -311,17 +311,6 @@ const ChangelogTable = ({ data, refetch }) => {
           Page {pageIndex} of {Math.ceil(data.totalCount / 10)}
         </Box>
       </Flex>
-
-      {data.nodes.length === 0 && (
-        <Flex
-          width={'100%'}
-          mt={4}
-          alignItems={'center'}
-          justifyContent={'center'}
-        >
-          <Text>No change log data found</Text>
-        </Flex>
-      )}
     </>
   )
 }

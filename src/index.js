@@ -37,19 +37,17 @@ import ScrollToTop from 'components/ScrollToTop.js'
 
 ReactDOM.render(
   <React.StrictMode>
-    <ContextWrapper>
-      <BrowserRouter>
-        <ScrollToTop />
-        <Switch>
-          <Route path={`/auth`} component={AuthLayout} />
-          <Route path={`/vendor`} component={AdminLayout} />
-          <Route path={`/login`} component={LoginLayout} />
-          <Route path={`/customer`} component={CustomerLayout} />
-          <Route path={`/register`} component={Register} />
-          <Redirect from={`/`} to='/auth' />
-        </Switch>
-      </BrowserRouter>
-    </ContextWrapper>
+    <BrowserRouter>
+      <ScrollToTop />
+      <Switch>
+        <Route path={`/auth`} component={AuthLayout} />
+        <Route path={`/vendor`} component={AdminLayout} />
+        <Route path={`/login`} component={LoginLayout} />
+        <Route path={`/customer`} component={CustomerLayout} />
+        <Route path={`/register`} component={Register} />
+        <Redirect from={`/`} to='/auth' />
+      </Switch>
+    </BrowserRouter>
   </React.StrictMode>,
   document.getElementById('root')
 )
