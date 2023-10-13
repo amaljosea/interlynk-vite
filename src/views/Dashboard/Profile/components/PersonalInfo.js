@@ -61,7 +61,7 @@ const PersonalInfo = ({ user, refetch }) => {
     <Card>
       <CardHeader p='12px 0' mb='12px'>
         <Text fontSize='lg' color={textColor} fontWeight='bold'>
-          Personal Info
+          Personal Details
         </Text>
       </CardHeader>
       <CardBody px='5px'>
