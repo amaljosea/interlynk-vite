@@ -95,7 +95,7 @@ const GeneralFeed = ({ orgInfo, refetch, getOrgInfo }) => {
             </Button>
           </FormControl>
           {/* ID */}
-          <FormControl>
+{/*           <FormControl>
             <FormLabel>Interlynk ID</FormLabel>
             <Input
               value={orgId}
@@ -110,7 +110,7 @@ const GeneralFeed = ({ orgInfo, refetch, getOrgInfo }) => {
             >
               {id.hasCopied ? 'Copied!' : 'Copy'}
             </Button>
-          </FormControl>
+          </FormControl> */}
         </Flex>
       </CardBody>
     </Card>
