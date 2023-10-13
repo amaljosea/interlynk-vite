@@ -32,7 +32,7 @@ import { dashRoutes } from 'routes.js'
 import { FaRegKeyboard, FaSignOutAlt } from 'react-icons/fa'
 
 import Cookies from 'js-cookie'
-import { useState, useEffect, useContext } from 'react'
+import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { useQuery } from '@apollo/client'
 import { GetOrg } from 'graphQL/Queries'

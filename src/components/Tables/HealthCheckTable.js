@@ -11,23 +11,18 @@ import {
   Text,
   IconButton,
   Box,
-  Skeleton,
   Badge,
   useToast
 } from '@chakra-ui/react'
-import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
-import GlobalContext from 'context/GlobalContext'
-import { recheckHealth } from 'graphQL/Mutation'
-import { checkResultUpdate } from 'graphQL/Mutation'
+import { recheckHealth, checkResultUpdate } from 'graphQL/Mutation'
 import { PackageURL } from 'packageurl-js'
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { BiSolidWrench } from 'react-icons/bi'
 import { FaCheckDouble } from 'react-icons/fa'
 import { GoSkip } from 'react-icons/go'
-import { timeSince } from 'utils'
-import { sevColor } from 'utils'
+import { timeSince, sevColor } from 'utils'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 import CheckModal from 'views/Sbom/components/CheckModal'
@@ -89,10 +84,17 @@ const FilterComponent = ({ filterText, onFilter, onClear }) => {
   )
 }
 
-const HealthCheckTable = ({ productId, sbomId, data, refetch, components }) => {
+const HealthCheckTable = ({
+  productId,
+  sbomId,
+  data,
+  getResults,
+  components,
+  pageIndex,
+  setPageIndex
+}) => {
   const customerView = location.pathname.startsWith('/customer')
   const toast = useToast()
-  const { healthCheckData, setHealthCheckData } = useContext(GlobalContext)
 
   const [purlValue, setPurlValue] = useState('')
   const [purlData, setPurlData] = useState(null)
@@ -105,7 +107,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, components }) => {
   const [activeRow, setActiveRow] = useState(null)
   const [filterText, setFilterText] = useState('')
   const [resetPaginationToggle, setResetPaginationToggle] = useState(false)
-
+  const [isLoading, setIsLoading] = useState(false)
   const [filteredData, setFilteredData] = useState(data.nodes)
 
   const [updateResult] = useMutation(checkResultUpdate)
@@ -121,7 +123,6 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, components }) => {
   const supplierBtn = useRef(null)
   const creationToolBtn = useRef(null)
   const authorBtn = useRef(null)
-  const docSupBtn = useRef(null)
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
@@ -192,20 +193,27 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, components }) => {
           sbomId: sbomId
         }
       })
-        .then(() =>
-          refetch({
-            projectId: productId,
-            sbomId: sbomId,
-            first: 10,
-            field: 'STATUS',
-            direction: 'ASC'
+        .then((res) => {
+          setIsLoading(true)
+          getResults({
+            variables: {
+              projectId: productId,
+              sbomId: sbomId,
+              first: 10,
+              last: undefined,
+              field: 'STATUS',
+              direction: 'ASC'
+            }
           })
-        )
+          setTimeout(() => {
+            setIsLoading(false)
+          }, 2000)
+        })
         .finally(() => {
           toast({
             description: 'Health re-check successfully',
             status: 'success',
-            duration: 2000,
+            duration: 3000,
             position: 'top'
           })
         })
@@ -536,6 +544,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, components }) => {
               <Stack direction={'row'} alignItems={'center'} spacing={2}>
                 <Tooltip label='Fix'>
                   <IconButton
+                    size='sm'
                     variant='solid'
                     colorScheme='blue'
                     fontWeight='normal'
@@ -547,6 +556,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, components }) => {
 
                 <Tooltip label='Ignore'>
                   <IconButton
+                    size='sm'
                     variant='solid'
                     colorScheme='blue'
                     fontWeight='normal'
@@ -559,13 +569,25 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, components }) => {
             )}
 
             {status === 'manually-resolved' && (
-              <Button size='sm' variant='solid' colorScheme='whatsapp'>
+              <Button
+                size='sm'
+                width={'70px'}
+                fontSize={'xs'}
+                variant='solid'
+                colorScheme='whatsapp'
+              >
                 Fixed
               </Button>
             )}
 
             {status === 'ignored' && (
-              <Button size='sm' variant='solid' colorScheme='blackAlpha'>
+              <Button
+                width={'70px'}
+                size='sm'
+                fontSize={'xs'}
+                variant='solid'
+                colorScheme='blackAlpha'
+              >
                 Ignored
               </Button>
             )}
@@ -576,37 +598,47 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, components }) => {
   ]
 
   const handleSort = (column, sortDirection) => {
-    refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      field: column.name,
-      direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+    getResults({
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        first: 10,
+        last: undefined,
+        field: column.name,
+        direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+      }
     })
   }
 
-  const [pageIndex, setPageIndex] = useState(1)
-
   const onPreviousPage = () => {
     setPageIndex((prev) => pageIndex !== 0 && prev - 1)
-    refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      first: undefined,
-      last: 10,
-      before: data.pageInfo.startCursor,
-      after: ''
+    getResults({
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        first: undefined,
+        last: 10,
+        before: data.pageInfo.startCursor,
+        after: '',
+        field: 'STATUS',
+        direction: 'DESC'
+      }
     })
   }
 
   const onNextPage = () => {
     setPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
-    refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      first: 10,
-      last: undefined,
-      after: data.pageInfo.endCursor,
-      before: ''
+    getResults({
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        first: 10,
+        last: undefined,
+        after: data.pageInfo.endCursor,
+        before: '',
+        field: 'STATUS',
+        direction: 'DESC'
+      }
     })
   }
 
@@ -617,6 +649,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, components }) => {
           columns={columns}
           data={data.nodes}
           onSort={handleSort}
+          progressPending={isLoading}
           // defaultSortAsc
           // defaultSortFieldId={'status'}
           customStyles={customStyles}
@@ -660,7 +693,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, components }) => {
           {isPrimaryOpen && (
             <CheckModal
               id={activeRow.id}
-              refetch={refetch}
+              refetch={getResults}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
               checkId={activeRow.organizationRule.rule.friendlyId}
               isOpen={isPrimaryOpen}
@@ -673,6 +706,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, components }) => {
           {isLicenseOpen && (
             <CheckModal
               id={activeRow.id}
+              refetch={getResults}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
               checkId={activeRow.organizationRule.rule.friendlyId}
               isOpen={isLicenseOpen}
@@ -684,6 +718,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, components }) => {
           {isTypeOpen && (
             <CheckModal
               id={activeRow.id}
+              refetch={getResults}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
               checkId={activeRow.organizationRule.rule.friendlyId}
               isOpen={isTypeOpen}
@@ -696,7 +731,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, components }) => {
             <SupplierModal
               id={activeRow.component.id}
               btnRef={supplierBtn}
-              refetch={refetch}
+              refetch={getResults}
               isOpen={onSupplierOpen}
               onClose={onSupplierClose}
               suppliers={[]}
@@ -707,6 +742,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, components }) => {
           {isOpen && (
             <CheckModal
               id={activeRow.id}
+              refetch={getResults}
               checkId={activeRow.organizationRule.rule.friendlyId}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
               isOpen={isOpen}
@@ -723,7 +759,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, components }) => {
               setPurlValue={setPurlValue}
               purlValue={purlValue}
               id={activeRow.component.id}
-              refetch={refetch}
+              refetch={getResults}
               checkId={activeRow.organizationRule.rule.friendlyId}
             />
           )}
@@ -739,7 +775,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, components }) => {
               onUpdateCpe={handleUpdateCpe}
               selectedCpe={selectedCpe}
               id={activeRow.component.id}
-              refetch={refetch}
+              refetch={getResults}
               checkId={activeRow.organizationRule.rule.friendlyId}
             />
           )}
@@ -752,7 +788,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, components }) => {
               btnRef={creationToolBtn}
               data={null}
               selectedKey={'tools'}
-              refetch={refetch}
+              refetch={getResults}
               checkId={activeRow.organizationRule.rule.friendlyId}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
             />
@@ -766,7 +802,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, components }) => {
               btnRef={authorBtn}
               data={null}
               selectedKey={'author'}
-              refetch={refetch}
+              refetch={getResults}
               checkId={activeRow.organizationRule.rule.friendlyId}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
             />
@@ -775,7 +811,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, components }) => {
           {/* DOCUMENT SUPPLIER DRAWER */}
           {isDocSupOpen && (
             <PriSupplierModal
-              refetch={refetch}
+              refetch={getResults}
               isOpen={isDocSupOpen}
               onClose={onDocSupClose}
               suppliers={null}

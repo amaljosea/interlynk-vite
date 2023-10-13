@@ -148,11 +148,14 @@ const PurlModal = ({
       }
     }).then(() =>
       refetch({
-        projectId: productId,
-        sbomId: sbomId,
-        first: 10,
-        field: 'STATUS',
-        direction: 'ASC'
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          first: 10,
+          last: undefined,
+          field: 'STATUS',
+          direction: 'ASC'
+        }
       })
     )
   }

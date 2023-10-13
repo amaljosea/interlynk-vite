@@ -24,8 +24,7 @@ import {
   Link,
   Button,
   Input,
-  Badge,
-  Skeleton
+  Badge
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
@@ -102,7 +101,14 @@ const FilterComponent = ({ filterText, onFilter, onClear }) => {
   )
 }
 
-const ComponentTable = ({ type, lifecycle, data, refetch }) => {
+const ComponentTable = ({
+  type,
+  lifecycle,
+  data,
+  getComponents,
+  pageIndex,
+  setPageIndex
+}) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
 
@@ -112,7 +118,6 @@ const ComponentTable = ({ type, lifecycle, data, refetch }) => {
   const customerView = location.pathname.startsWith('/customer')
 
   const [activeRow, setActiveRow] = useState(null)
-  const [pageIndex, setPageIndex] = useState(1)
 
   const [filterNpm, setFilterNpm] = useState([])
   const [filterNuget, setFilterNuget] = useState([])
@@ -343,7 +348,7 @@ const ComponentTable = ({ type, lifecycle, data, refetch }) => {
 
         return (
           <Flex alignItems={'center'} gap={2} flexWrap={'wrap'}>
-            {licenses.length > 0 &&
+            {licenses &&
               licenses.map((item, index) => (
                 <Tooltip
                   key={index}
@@ -674,35 +679,45 @@ const ComponentTable = ({ type, lifecycle, data, refetch }) => {
   const handleSort = (column, sortDirection) => {
     console.log(`column`, column)
     console.log(`sortDirection`, sortDirection)
-    refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      field: column.name,
-      direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+    getComponents({
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        field: column.name,
+        direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+      }
     })
   }
 
   const handlePreviousPage = () => {
     setPageIndex((prev) => pageIndex !== 0 && prev - 1)
-    refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      first: undefined,
-      last: 10,
-      before: data.pageInfo.startCursor,
-      after: ''
+    getComponents({
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        last: 10,
+        before: data.pageInfo.startCursor,
+        field: 'NAME',
+        direction: 'ASC'
+      }
     })
   }
 
   const handleNextPage = () => {
     setPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
-    refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      first: 10,
-      last: undefined,
-      after: data.pageInfo.endCursor,
-      before: ''
+    getComponents({
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        first: 10,
+        after: data.pageInfo.endCursor,
+        field: 'NAME',
+        direction: 'ASC'
+      }
+    }).then((res) => {
+      if (res.error) {
+        alert(res.error)
+      }
     })
   }
 
@@ -751,7 +766,6 @@ const ComponentTable = ({ type, lifecycle, data, refetch }) => {
         </Box>
       </Flex>
 
-
       {/* ACTIONS */}
       {activeRow !== null && (
         <>
@@ -763,7 +777,7 @@ const ComponentTable = ({ type, lifecycle, data, refetch }) => {
               btnRef={compBtn}
               component={activeRow.name}
               version={activeRow.version}
-              license={activeRow.licenses}
+              license={activeRow.licenses !== null ? activeRow.licenses : []}
               type={activeRow.kind}
               refetch={refetch}
               cpes={activeRow.cpes}

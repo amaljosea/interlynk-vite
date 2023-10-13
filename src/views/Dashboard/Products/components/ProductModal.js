@@ -28,7 +28,8 @@ const ProductModal = ({
   product,
   type,
   description,
-  allProjects
+  allProjects,
+  refetch
 }) => {
   const [projectCreate] = useMutation(CreateProject)
   const [projectUpdate] = useMutation(UpdateProject)
@@ -62,7 +63,13 @@ const ProductModal = ({
           name: productName,
           desc: productDesc
         }
-      }).then((res) => window.location.reload())
+      })
+        .then(() =>
+          refetch({
+            first: 10
+          })
+        )
+        .finally(() => onClose())
     } catch (error) {
       console.error('Mutation error:', error)
     }
@@ -77,7 +84,13 @@ const ProductModal = ({
             name: productName,
             desc: productDesc
           }
-        }).then(() => window.location.reload())
+        })
+          .then(() =>
+            refetch({
+              first: 10
+            })
+          )
+          .finally(() => onClose())
       } catch (error) {
         console.error('Mutation error:', error)
       }

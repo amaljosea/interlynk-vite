@@ -64,16 +64,16 @@ const AdvisoryFeeds = () => {
         {data && (
           <Flex direction='column'>
             {filteredFeed &&
-              filteredFeed.map((feed, index) => {
-                const activeFeed = data.organization.organizationSettings.find(
-                  (org) => org.id === feed.id
+              filteredFeed
+                .sort((a, b) =>
+                  a.setting.friendlyName.localeCompare(b.setting.friendlyName)
                 )
-                return (
-                  <Link
-                    href='https://nvd.nist.gov/'
-                    target='_blank'
-                    key={index}
-                  >
+                .map((feed, index) => {
+                  const activeFeed =
+                    data.organization.organizationSettings.find(
+                      (org) => org.id === feed.id
+                    )
+                  return (
                     <Flex align='center' mb='20px'>
                       <Switch
                         size='md'
@@ -84,12 +84,6 @@ const AdvisoryFeeds = () => {
                         onChange={(e) => handleChange(e, feed.id, activeFeed)}
                         id={feed.id}
                       />
-                      <Icon
-                        as={ExternalLinkIcon}
-                        h={'16px'}
-                        w={'16px'}
-                        me='5px'
-                      />
                       <Text
                         noOfLines={1}
                         color='gray.500'
@@ -99,9 +93,8 @@ const AdvisoryFeeds = () => {
                         {feed.setting.friendlyName}
                       </Text>
                     </Flex>
-                  </Link>
-                )
-              })}
+                  )
+                })}
           </Flex>
         )}
       </CardBody>

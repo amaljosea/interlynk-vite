@@ -16,12 +16,14 @@ import {
   FaImages,
   FaPlug,
   FaBullhorn,
-  FaWindowMaximize
+  FaWindowMaximize,
+  FaExchangeAlt
 } from 'react-icons/fa'
 import { HomeIcon } from 'components/Icons/Icons'
 import { BsFillFolderSymlinkFill } from 'react-icons/bs'
 import Automation from 'views/Dashboard/Automation'
 import { TbSettingsAutomation } from 'react-icons/tb'
+import ChangeLog from 'views/Dashboard/Changelog'
 
 export const dashRoutes = [
   {
@@ -78,6 +80,13 @@ export const dashRoutes = [
     name: 'Settings',
     icon: <TbSettingsAutomation color='inherit' />,
     component: Automation,
+    layout: '/vendor'
+  },
+  {
+    path: '/changelog',
+    name: 'Change Log',
+    icon: <FaExchangeAlt color='inherit' />,
+    component: ChangeLog,
     layout: '/vendor'
   }
 ]

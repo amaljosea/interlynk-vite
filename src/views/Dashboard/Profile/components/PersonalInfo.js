@@ -5,7 +5,8 @@ import {
   FormLabel,
   Flex,
   Input,
-  Button
+  Button,
+  useToast
 } from '@chakra-ui/react'
 import { useColorModeValue } from '@chakra-ui/system'
 import Card from 'components/Card/Card'
@@ -16,6 +17,12 @@ import React, { useState, useEffect } from 'react'
 
 const PersonalInfo = ({ user, refetch }) => {
   const textColor = useColorModeValue('gray.700', 'white')
+  const toast = useToast()
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
+    return emailRegex.test(email)
+  }
 
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -29,7 +36,7 @@ const PersonalInfo = ({ user, refetch }) => {
   const [updateUser] = useMutation(updateOrgUser)
 
   const handleUpdate = async () => {
-    if (name !== '' && email !== '') {
+    if (name !== '' && validateEmail(email)) {
       try {
         await updateUser({
           variables: {
@@ -53,7 +60,12 @@ const PersonalInfo = ({ user, refetch }) => {
         console.log(`Error`, error)
       }
     } else {
-      alert('Fields are required')
+      toast({
+        description: 'Invalid email',
+        status: 'error',
+        position: 'top',
+        duration: 2000
+      })
     }
   }
 

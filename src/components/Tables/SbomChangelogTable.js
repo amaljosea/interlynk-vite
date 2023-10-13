@@ -13,6 +13,7 @@ import {
 import GlobalContext from 'context/GlobalContext'
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
+import { MdRefresh } from 'react-icons/md'
 import { useLocation } from 'react-router-dom'
 import { getFullDateAndTime } from 'utils'
 import FilterChangelog from 'views/Sbom/components/FilterChangelog'
@@ -90,7 +91,7 @@ const FilterComponent = ({ filterText, onFilter, onClear }) => {
   )
 }
 
-const ChangelogTable = ({ data, refetch, type }) => {
+const SbomChangelogTable = ({ data, getLogs, pageIndex, setPageIndex }) => {
   const { changelogData } = useContext(GlobalContext)
 
   const location = useLocation()
@@ -100,41 +101,50 @@ const ChangelogTable = ({ data, refetch, type }) => {
   const sbomId = queryParams.get('sbom')
 
   const [filterText, setFilterText] = useState('')
-  const [pageIndex, setPageIndex] = useState(1)
   const [resetPaginationToggle, setResetPaginationToggle] = useState(false)
 
-  const users = data.map((item) => item.changedBy)
-  const actions = data.map((item) => item.action)
+  const users = data && data.nodes.map((item) => item.changedBy)
+  const actions = data && data.nodes.map((item) => item.action)
 
-  const filterItems = data.filter(
-    (item) =>
-      (item.event &&
-        item.event.toLowerCase().includes(filterText.toLowerCase())) ||
-      (item.changedBy &&
-        item.changedBy.toLowerCase().includes(filterText.toLowerCase()))
-  )
+  const filterItems =
+    data &&
+    data.nodes.filter(
+      (item) =>
+        (item.event &&
+          item.event.toLowerCase().includes(filterText.toLowerCase())) ||
+        (item.changedBy &&
+          item.changedBy.toLowerCase().includes(filterText.toLowerCase()))
+    )
 
   const onPreviousPage = () => {
     setPageIndex((prev) => pageIndex !== 0 && prev - 1)
-    refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      first: undefined,
-      last: 10,
-      before: data.pageInfo.startCursor,
-      after: ''
+    getLogs({
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        first: undefined,
+        last: 10,
+        before: data.pageInfo.startCursor,
+        after: '',
+        field: 'CREATED_AT',
+        direction: 'ASC'
+      }
     })
   }
 
   const onNextPage = () => {
     setPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
-    refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      first: 10,
-      last: undefined,
-      after: data.pageInfo.endCursor,
-      before: ''
+    getLogs({
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        first: 10,
+        last: undefined,
+        after: data.pageInfo.endCursor,
+        before: '',
+        field: 'CREATED_AT',
+        direction: 'ASC'
+      }
     })
   }
 
@@ -171,7 +181,6 @@ const ChangelogTable = ({ data, refetch, type }) => {
         width={'100%'}
         alignItems={'center'}
         justifyContent={'space-between'}
-        mb={4}
       >
         <Stack
           width={'100%'}
@@ -284,7 +293,7 @@ const ChangelogTable = ({ data, refetch, type }) => {
       </Flex>
 
       {/* PAGINATION */}
-      {/* <Flex
+      <Flex
         flexDir={'row'}
         gap={4}
         alignItems={'center'}
@@ -308,9 +317,9 @@ const ChangelogTable = ({ data, refetch, type }) => {
         <Box>
           Page {pageIndex} of {Math.ceil(data.totalCount / 10)}
         </Box>
-      </Flex> */}
+      </Flex>
     </>
   )
 }
 
-export default ChangelogTable
+export default SbomChangelogTable
