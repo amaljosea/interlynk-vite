@@ -79,6 +79,7 @@ const AdvisoryFeeds = () => {
                         size='md'
                         colorScheme='blue'
                         me='10px'
+                        disabled={true}
                         isChecked={activeFeed && activeFeed.value}
                         onChange={(e) => handleChange(e, feed.id, activeFeed)}
                         id={feed.id}

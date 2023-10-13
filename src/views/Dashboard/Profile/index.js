@@ -122,12 +122,12 @@ function Profile() {
                   >
                     Checks
                   </Tab>
-                  <Tab
+{/*                   <Tab
                     _focus={{ outline: 'none' }}
                     onClick={() => handleTabClick(4)}
                   >
                     Lists
-                  </Tab>
+                  </Tab> */}
                 </TabList>
                 <TabPanels>
                   {/* GEENRAL */}
