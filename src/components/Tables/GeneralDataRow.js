@@ -189,13 +189,13 @@ const GeneralDataRow = ({ status, type, data, refetch }) => {
               <Td pl={0}></Td>
             </Tr>
             {/* UPDATED AT */}
-            <Tr>
+{/*             <Tr>
               <Td pl={0} fontWeight={'medium'}>
                 Updated At
               </Td>
               <Td pl={0}>{timeSince(data.updatedAt)}</Td>
               <Td pl={0}></Td>
-            </Tr>
+            </Tr> */}
             {/* AUTHORS */}
             <Tr>
               <Td pl={0} fontWeight={'medium'}>

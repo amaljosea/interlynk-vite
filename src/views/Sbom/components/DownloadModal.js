@@ -141,10 +141,10 @@ const DownloadModal = ({
     >
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>SBOM Download</ModalHeader>
+        <ModalHeader>Download SBOM</ModalHeader>
         <ModalCloseButton />
         <ModalBody pb={6}>
-          <FormLabel align='center'>SBOM Specification</FormLabel>
+          <FormLabel align='center'>Specification</FormLabel>
           <Stack direction='column' gap='20px'>
             <RadioGroup value={spec} onChange={(value) => setSpec(value)}>
               <Stack spacing={4} direction='row'>

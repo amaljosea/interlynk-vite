@@ -111,7 +111,7 @@ export default function HeaderLinks(props) {
     },
     {
       key: 'Alt + 2',
-      title: 'Create SBOM'
+      title: 'Build SBOM'
     },
     {
       key: 'Alt + 3',

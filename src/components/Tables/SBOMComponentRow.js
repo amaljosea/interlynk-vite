@@ -17,7 +17,8 @@ import {
   Link,
   Tooltip,
   Badge,
-  Button
+  Button,
+  Divider
 } from '@chakra-ui/react'
 import { useEffect, useState, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
@@ -298,8 +299,10 @@ function SBOMComponentRow(props) {
                   >
                     Edit Links
                   </MenuItem>
+                  <Divider />
                   {primary === false && (
                     <MenuItem
+                      color='red'
                       onClick={onDelOpen}
                       isDisabled={status === 'signed'}
                     >

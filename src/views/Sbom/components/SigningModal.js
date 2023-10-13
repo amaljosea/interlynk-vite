@@ -15,7 +15,8 @@ import {
   Select,
   Alert,
   AlertIcon,
-  Text
+  Text,
+  Tag
 } from '@chakra-ui/react'
 import { signSbom } from 'graphQL/Mutation'
 import { useEffect, useState } from 'react'
@@ -112,6 +113,7 @@ const SigningModal = ({
             <ModalCloseButton />
             <ModalBody>
               <Flex width={'100%'} direction={'column'} gap={4}>
+                <Tag>Coming soon</Tag>
                 {/* Algorithm */}
                 <FormControl isRequired>
                   <FormLabel fontSize={14}>Algorithm</FormLabel>
@@ -120,6 +122,7 @@ const SigningModal = ({
                     name='algorithm'
                     size='sm'
                     value={algorithm}
+                    disabled={true}
                     onChange={(e) => setAlgorithm(e.target.value)}
                   >
                     <option value=''>-- Select --</option>
@@ -173,7 +176,7 @@ const SigningModal = ({
               <Button colorScheme='gray' mr={3} onClick={onClose}>
                 Cancel
               </Button>
-              {message === '' ? (
+{/*               {message === '' ? (
                 <Button colorScheme='blue' type='submit'>
                   {status === 'signed' ? 'Unsign' : 'Validate and Sign'}
                 </Button>
@@ -181,7 +184,7 @@ const SigningModal = ({
                 <Button colorScheme='blue' type={'submit'}>
                   Yes
                 </Button>
-              )}
+              )} */}
             </ModalFooter>
           </ModalContent>
         </form>

@@ -82,7 +82,7 @@ const FileUpload = () => {
       <Modal isOpen={isUploadOpen} onClose={onUploadClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Upload your SBOM</ModalHeader>
+          <ModalHeader>Upload SBOM</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <Box>

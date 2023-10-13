@@ -20,7 +20,10 @@ import {
   ModalBody,
   ModalFooter,
   Flex,
-  Button
+  Button,
+  UnorderedList,
+  ListItem,
+  Divider
 } from '@chakra-ui/react'
 import { useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
@@ -174,17 +177,19 @@ function ProductVersionsRow(props) {
               <Portal>
                 <MenuList size='sm'>
                   <MenuItem onClick={onOpen}>Edit Product</MenuItem>
-                  <MenuItem onClick={onSbomOpen}>Create SBOM</MenuItem>
+                  <Link to={`/vendor/autofix?p=${name}`}>
+                    <MenuItem>Edit Automation</MenuItem>
+                  </Link>
+                  <Link to={`/vendor/changelog?p=${name}&id=${id}`}>
+                    <MenuItem>View Change Log</MenuItem>
+                  </Link>
+                  <Divider />
+                  <MenuItem onClick={onSbomOpen}>Build SBOM</MenuItem>
                   <MenuItem ref={btnRefProduct} onClick={onOpenProduct}>
                     Upload SBOM
                   </MenuItem>
-                  <MenuItem onClick={onDeleteOpen}>Archive Product</MenuItem>
-                  <Link to={`/vendor/changelog?p=${name}&id=${id}`}>
-                    <MenuItem>Change Log</MenuItem>
-                  </Link>
-                  <Link to={`/vendor/autofix?p=${name}`}>
-                    <MenuItem>Settings</MenuItem>
-                  </Link>
+                  <Divider />
+                  <MenuItem color='red' onClick={onDeleteOpen}>Archive Product</MenuItem>
                 </MenuList>
               </Portal>
             </Menu>
@@ -229,23 +234,24 @@ function ProductVersionsRow(props) {
             <Modal isOpen={isDeleteOpen} onClose={onDeleteClose}>
               <ModalOverlay />
               <ModalContent>
-                <ModalHeader>Archive ?</ModalHeader>
+                <ModalHeader>Archive Product</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
-                  <Text fontSize={'lg'}>Archiving this product will : </Text>
+                  <Text>Archiving this product will: </Text>
+                  <UnorderedList>
                   <Flex flexDir={'column'} gap={1} mt={4}>
                     {[
-                      'Remove this product, associated versions and their SBOMs',
-                      "Remove access to this product's details on connected Share Lynk's"
+                      'remove this product, its versions and SBOMs',
+                      "remove access to the product for all users",
+                      "disable uploads of SBOMs to this product"
                     ].map((item, index) => (
-                      <Text key={index} fontSize={'sm'}>
-                        {item}
-                      </Text>
+                      <ListItem>{item}</ListItem>
                     ))}
                   </Flex>
+                  </UnorderedList>
                   <br />
-                  <Text mt={4} fontSize={'sm'}>
-                    Are you sure you want to continue with the deletion ?
+                  <Text mt={10}>
+                    Are you sure you wish to continue?
                   </Text>
                 </ModalBody>
                 <ModalFooter>

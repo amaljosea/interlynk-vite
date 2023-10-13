@@ -23,7 +23,9 @@ import {
   ModalBody,
   ModalFooter,
   Skeleton,
-  Spinner
+  Spinner,
+  UnorderedList,
+  ListItem
 } from '@chakra-ui/react'
 import React, { useState, useRef, useEffect } from 'react'
 import Card from 'components/Card/Card.js'
@@ -478,8 +480,7 @@ function SBOM() {
                               colorScheme='blue'
                             />
                           </Tooltip>
-
-                          {/* COPY SBOM */}
+{/*
                           <Tooltip label='Copy'>
                             <IconButton
                               icon={<FaCopy />}
@@ -488,7 +489,7 @@ function SBOM() {
                               colorScheme='blue'
                             />
                           </Tooltip>
-
+ */}
                           {/* DELETE SBOM */}
                           <Tooltip label='Delete'>
                             <IconButton
@@ -585,26 +586,25 @@ function SBOM() {
           <Modal isOpen={isDelete} onClose={setDeleteClose}>
             <ModalOverlay />
             <ModalContent>
-              <ModalHeader>Delete ?</ModalHeader>
+              <ModalHeader>Delete Version</ModalHeader>
               <ModalCloseButton />
               <ModalBody>
-                <Text fontSize={'lg'}>Deleting this version will : </Text>
-                <Flex flexDir={'column'} gap={1} mt={4}>
-                  {[
-                    'Remove this version and its SBOMs from the product list',
-                    'Remove access to this version on connected Share Lynks'
-                  ].map((item, index) => (
-                    <Text key={index} fontSize={'sm'}>
-                      {item}
-                    </Text>
-                  ))}
-                </Flex>
-                <br />
-                <Text mt={4} fontSize={'sm'}>
-                  Are you sure you want to continue with the deletion of this
-                  version?
-                </Text>
-              </ModalBody>
+                  <Text>Deleting this version will: </Text>
+                  <UnorderedList>
+                  <Flex flexDir={'column'} gap={1} mt={4}>
+                    {[
+                      'remove this versions and its SBOM',
+                      "remove access to this version for all users",
+                    ].map((item, index) => (
+                      <ListItem>{item}</ListItem>
+                    ))}
+                  </Flex>
+                  </UnorderedList>
+                  <br />
+                  <Text mt={10}>
+                    Are you sure you wish to continue?
+                  </Text>
+                </ModalBody>
               <ModalFooter>
                 <Flex
                   width={'100%'}
