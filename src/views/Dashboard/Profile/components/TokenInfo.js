@@ -142,7 +142,7 @@ const TokenInfo = () => {
             <ModalCloseButton />
             <ModalBody>
               <Text>
-                Generating a new token makes all previously generated tokens
+                Generating a new token makes previously generated tokens
                 invalid.
               </Text>
               <Text mt={10}>Are you sure you wish to continue ?</Text>
@@ -150,7 +150,7 @@ const TokenInfo = () => {
 
             <ModalFooter>
               <Button mr={3} onClick={onClose}>
-                Close
+                No
               </Button>
               <Button
                 variant='solid'

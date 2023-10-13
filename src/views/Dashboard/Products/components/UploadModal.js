@@ -88,7 +88,7 @@ const UploadModal = ({ id, isOpen, onClose }) => {
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Upload your SBOM</ModalHeader>
+          <ModalHeader>Upload SBOM</ModalHeader>
           <ModalCloseButton onClick={() => setErrorMessage('')} />
           <ModalBody>
             {errorMessage !== '' && (

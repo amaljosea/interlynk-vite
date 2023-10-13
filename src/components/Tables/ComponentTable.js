@@ -24,7 +24,8 @@ import {
   Link,
   Button,
   Input,
-  Badge
+  Badge,
+  Divider
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
@@ -404,20 +405,20 @@ const ComponentTable = ({
                     <MenuItem
                       onClick={() => {
                         setActiveRow(row)
-                        onSupOpen()
-                      }}
-                      isDisabled={status === 'signed'}
-                    >
-                      {suppliers.length > 0 ? 'Update' : 'Add'} Supplier
-                    </MenuItem>
-                    <MenuItem
-                      onClick={() => {
-                        setActiveRow(row)
                         onOpen()
                       }}
                       isDisabled={status === 'signed'}
                     >
                       Edit Component
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        setActiveRow(row)
+                        onSupOpen()
+                      }}
+                      isDisabled={status === 'signed'}
+                    >
+                      {suppliers.length > 0 ? 'Edit' : 'Edit'} Supplier
                     </MenuItem>
                     <MenuItem
                       onClick={() => {
@@ -428,8 +429,10 @@ const ComponentTable = ({
                     >
                       Edit Links
                     </MenuItem>
+                    <Divider />
                     {primary === false && (
                       <MenuItem
+                        color='red'
                         onClick={() => {
                           setActiveRow(row)
                           onDelOpen()
