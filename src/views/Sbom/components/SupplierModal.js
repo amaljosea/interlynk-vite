@@ -90,10 +90,7 @@ const SupplierModal = ({
           if (checkId) {
             handleReCheck()
           } else {
-            refetch({
-              projectId: productId,
-              sbomId: sbomId
-            })
+            window.location.reload()
           }
         })
         .finally(() => onClose())
@@ -118,11 +115,7 @@ const SupplierModal = ({
         }
       }).then((data) => {
         if (data) {
-          refetch({
-            projectId: productId,
-            sbomId: sbomId
-          })
-          onClose()
+          window.location.reload()
         }
       })
     } else {

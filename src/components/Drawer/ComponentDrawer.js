@@ -53,7 +53,8 @@ import { QuestionIcon, CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import { FaExpandAlt } from 'react-icons/fa'
 
 // const regexPattern = /^cpe:2\.3:[aho]:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+$/
-const regexPattern = /cpe:2\.3:[aho\*\-](:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,\/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){5}(:(([a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))?)|[\*\-]))(:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,\/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){4}/
+const regexPattern =
+  /cpe:2\.3:[aho\*\-](:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,\/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){5}(:(([a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))?)|[\*\-]))(:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,\/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){4}/
 
 function ComponentDrawer(props) {
   const location = useLocation()
@@ -301,12 +302,10 @@ function ComponentDrawer(props) {
             internal: isInternal
           }
         })
-          .then(() => {
-            refetch({
-              projectId: productId,
-              sbomId: sbomId
-            })
-            onClose()
+          .then((res) => {
+            if (res.data) {
+              window.location.reload()
+            }
           })
           .finally(() => {
             toast({
@@ -348,15 +347,9 @@ function ComponentDrawer(props) {
         }
       })
         .then((res) => {
-          console.log(res)
-          refetch({
-            projectId: productId,
-            sbomId: sbomId,
-            first: 10,
-            field: 'NAME',
-            direction: 'ASC'
-          })
-          onClose()
+          if (res.data) {
+            window.location.reload()
+          }
         })
         .finally(() => {
           toast({
