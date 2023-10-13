@@ -5,6 +5,7 @@ import {
   Flex,
   FormControl,
   FormLabel,
+  Tag,
   IconButton,
   Input,
   InputGroup,
@@ -18,6 +19,7 @@ import {
   ModalOverlay,
   Stack,
   Text,
+  Textarea,
   useClipboard,
   useDisclosure
 } from '@chakra-ui/react'
@@ -67,9 +69,14 @@ const TokenInfo = () => {
     <>
       <Card>
         <CardHeader p='12px 0' mb='12px'>
+          <Flex direction='column'>
           <Text fontSize='lg' color={textColor} fontWeight='bold'>
-            API Token
+            Security Token
           </Text>
+          <Text fontSize='sm' mt='10px' color={textColor}>
+            Security token is required to connect through the Interlynk API or Command Line Interface (CLI).
+          </Text>
+          </Flex>
         </CardHeader>
         <CardBody px='5px'>
           <Flex
@@ -79,12 +86,22 @@ const TokenInfo = () => {
             gap={6}
           >
             {/* NAME */}
+            <Button variant='solid' colorScheme='green' onClick={onOpen}>
+                Generate New Token
+              </Button>
             <FormControl>
-              <FormLabel>Key</FormLabel>
-              <Input type={'text'} defaultValue={token} readOnly />
-              <Text mt={1} fontSize={'sm'}>
-                This is the only time toke will be shown, make sure to copy it
-                for your use
+              <FormLabel>Token</FormLabel>
+              <Textarea
+                  type={'text'}
+                  defaultValue={token}
+                  readOnly
+                  style={{ width: '100%', height: 'auto', minHeight: '150px' }}
+              />
+              <Tag mt={5} fontSize={'sm'} colorScheme='red'>
+                Warning
+              </Tag>
+              <Text fontSize={'sm'}>
+                For account's security, this token is not stored anywhere and will not be visible once you navigate away from this page. Please copy it and store it in a safe place for future reference.
               </Text>
             </FormControl>
             {/* ACTION */}
@@ -96,9 +113,6 @@ const TokenInfo = () => {
               >
                 {key.hasCopied ? 'Copied!' : 'Copy'}
               </Button>
-              <Button variant='solid' colorScheme='red' onClick={onOpen}>
-                Regenerate
-              </Button>
             </Stack>
           </Flex>
         </CardBody>
@@ -108,20 +122,20 @@ const TokenInfo = () => {
         <Modal finalFocusRef={finalRef} isOpen={isOpen} onClose={onClose}>
           <ModalOverlay />
           <ModalContent>
-            <ModalHeader>Regenerate Token</ModalHeader>
+            <ModalHeader>Security Token</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               <Text>
-                Regenerating a new token will make any previous token invalid.
+                Generating a new token makes all previously generated tokens invalid.
               </Text>
-              <Text mt={2}>Are you sure you wish to continue ?</Text>
+              <Text mt={10}>Are you sure you wish to continue ?</Text>
             </ModalBody>
 
             <ModalFooter>
               <Button mr={3} onClick={onClose}>
                 Close
               </Button>
-              <Button variant='solid' colorScheme='blue' onClick={handleCreate}>
+              <Button variant='solid' colorScheme='red' onClick={handleCreate}>
                 Yes
               </Button>
             </ModalFooter>
