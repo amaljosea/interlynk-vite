@@ -21,7 +21,6 @@ const ProductVersions = ({
   allProjects,
   handlePreviousPage,
   handleNextPage,
-  fetchProjects,
   isLoading,
   refetch
 }) => {
@@ -54,7 +53,6 @@ const ProductVersions = ({
                     description={pv.description}
                     updatedAt={pv.updatedAt}
                     allProjects={allProjects}
-                    fetchProjects={fetchProjects}
                     isLoading={isLoading}
                     refetch={refetch}
                   />

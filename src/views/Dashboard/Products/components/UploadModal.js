@@ -41,8 +41,8 @@ const UploadModal = ({ id, isOpen, onClose }) => {
                 'The validated SBOM data will be available in the product shortly',
               duration: 6000,
               isClosable: true,
-              position: 'top',
-              variant: 'top-accent'
+              position: 'bottom',
+              variant: 'left-accent'
             })
           } else {
             toast({
@@ -50,7 +50,7 @@ const UploadModal = ({ id, isOpen, onClose }) => {
               status: 'error',
               duration: 4000,
               isClosable: true,
-              position: 'top'
+              position: 'bottom'
             })
           }
         })

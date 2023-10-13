@@ -165,7 +165,8 @@ export default function AdminNavbar(props) {
               </BreadcrumbLink>
             </BreadcrumbItem>
 
-            {location.pathname.startsWith('/vendor/autofix') && (
+            {(location.pathname.startsWith('/vendor/autofix') ||
+              location.pathname.startsWith('/vendor/changelog')) && (
               <BreadcrumbItem color={mainText}>
                 <Link to={'/vendor/products'} color={secondaryText}>
                   {product}

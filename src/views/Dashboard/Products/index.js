@@ -116,7 +116,7 @@ function Index() {
     return (
       <>
         <Flex flexDirection='column' pt={{ base: '120px', md: '74px' }} px={2}>
-          <Card overflowX={{ sm: 'scroll', xl: 'hidden' }}>
+          <Card overflowX={{ sm: 'scroll', xl: 'hidden' }} pb={0}>
             <CardHeader>
               <Flex
                 width={'100%'}
@@ -209,6 +209,7 @@ function Index() {
         {isOpenProduct && (
           <ProductModal
             isOpen={isOpenProduct}
+            refetch={refetch}
             onClose={onCloseProduct}
             id={null}
             product={null}

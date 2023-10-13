@@ -127,7 +127,14 @@ const FilterComponent = ({ filterText, onFilter, onClear }) => {
   )
 }
 
-const VulnTable = ({ data, refetch, productId, sbomId, filteredData }) => {
+const VulnTable = ({
+  data,
+  getVulns,
+  productId,
+  sbomId,
+  pageIndex,
+  setPageIndex
+}) => {
   const location = useLocation()
   const toast = useToast()
   const customerView = location.pathname.startsWith('/customer')
@@ -542,29 +549,35 @@ const VulnTable = ({ data, refetch, productId, sbomId, filteredData }) => {
     })
   }
 
-  const [pageIndex, setPageIndex] = useState(1)
-
   const onPreviousPage = () => {
     setPageIndex((prev) => pageIndex !== 0 && prev - 1)
-    refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      first: undefined,
-      last: 10,
-      before: data.pageInfo.startCursor,
-      after: ''
+    getVulns({
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        first: undefined,
+        last: 10,
+        before: data.pageInfo.startCursor,
+        after: '',
+        field: 'UPDATED_AT',
+        direction: 'ASC'
+      }
     })
   }
 
   const onNextPage = () => {
     setPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
-    refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      first: 10,
-      last: undefined,
-      after: data.pageInfo.endCursor,
-      before: ''
+    getVulns({
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        first: 10,
+        last: undefined,
+        after: data.pageInfo.endCursor,
+        before: '',
+        field: 'UPDATED_AT',
+        direction: 'ASC'
+      }
     })
   }
 

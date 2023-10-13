@@ -35,6 +35,7 @@ import { createUploadLink } from 'apollo-upload-client'
 import { getActiveNavbar, getActiveRoute } from '../utils'
 import Automation from 'views/Dashboard/Automation'
 import ContextWrapper from 'context/ContextWrapper'
+import ChangeLog from 'views/Dashboard/Changelog'
 
 export default function Dashboard(props) {
   const { minimize } = useContext(GlobalContext)
@@ -133,7 +134,7 @@ export default function Dashboard(props) {
                     brandText={getActiveRoute(dashRoutes)}
                     secondary={getActiveNavbar(dashRoutes)}
                     fixed={fixed}
-                    {...rest}
+                    // {...rest}
                   />
                 </Box>
               </Portal>
@@ -141,20 +142,24 @@ export default function Dashboard(props) {
                 {getRoute() && (
                   <PanelContent>
                     <PanelContainer>
-                      <Switch>
-                        {userName && getRoutes(dashRoutes)}
-                        {userName && (
+                      {userName ? (
+                        <Switch>
+                          {getRoutes(dashRoutes)}
                           <Route
                             path={`/vendor/autofix`}
                             component={Automation}
                           />
-                        )}
-                        {userName ? (
+                          <Route
+                            path={`/vendor/changelog`}
+                            component={ChangeLog}
+                          />
                           <Redirect from='/vendor' to='/vendor/dashboard' />
-                        ) : (
+                        </Switch>
+                      ) : (
+                        <Switch>
                           <Redirect from='/vendor' to='/auth' />
-                        )}
-                      </Switch>
+                        </Switch>
+                      )}
                     </PanelContainer>
                   </PanelContent>
                 )}

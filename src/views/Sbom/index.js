@@ -22,7 +22,8 @@ import {
   ModalCloseButton,
   ModalBody,
   ModalFooter,
-  Skeleton
+  Skeleton,
+  Spinner
 } from '@chakra-ui/react'
 import React, { useState, useRef, useEffect } from 'react'
 import Card from 'components/Card/Card.js'
@@ -39,7 +40,7 @@ import {
 } from 'react-icons/fa'
 import { useLocation, useHistory } from 'react-router-dom'
 import { CalendarIcon, DeleteIcon, EditIcon, LockIcon } from '@chakra-ui/icons'
-import { useMutation, useQuery } from '@apollo/client'
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { GetProject } from 'graphQL/Queries'
 import { timeSince } from 'utils'
 import SigningModal from './components/SigningModal'
@@ -55,8 +56,11 @@ import { getFullDateAndTime } from 'utils'
 import { GetProductData } from 'graphQL/Queries'
 import { GetComponentData } from 'graphQL/Queries'
 import { GetCheckResults } from 'graphQL/Queries'
-import { GetChangeLogs } from 'graphQL/Queries'
 import { GetVulnData } from 'graphQL/Queries'
+import { GetChangeLogs } from 'graphQL/Queries'
+
+const idRegex =
+  /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
 
 function SBOM() {
   const initialRef = useRef(null)
@@ -77,6 +81,12 @@ function SBOM() {
 
   const [status, setStatus] = useState('created')
   const [signedData, setSignedData] = useState(null)
+
+  useEffect(() => {
+    if (!idRegex.test(productId) || !idRegex.test(sbomId)) {
+      window.location.href = `/vendor/products`
+    }
+  }, [productId, sbomId])
 
   const { data: allProjects } = useQuery(GetProjectData, {
     variables: {
@@ -116,46 +126,6 @@ function SBOM() {
     variables: {
       projectId: productId,
       sbomId: sbomId
-    }
-  })
-
-  const { data: compData, refetch: compRefetch } = useQuery(GetComponentData, {
-    variables: {
-      projectId: productId,
-      sbomId: sbomId,
-      first: 10,
-      field: 'NAME',
-      direction: 'ASC'
-    }
-  })
-
-  const { data: vulnData, refetch: vulnRefetch } = useQuery(GetVulnData, {
-    variables: {
-      projectId: productId,
-      sbomId: sbomId,
-      first: 10,
-      field: 'UPDATED_AT',
-      direction: 'ASC'
-    }
-  })
-
-  const { data: checkData, refetch: checkRefetch } = useQuery(GetCheckResults, {
-    variables: {
-      projectId: productId,
-      sbomId: sbomId,
-      first: 10,
-      field: 'STATUS',
-      direction: 'DESC'
-    }
-  })
-
-  const { data: logsData, refetch: logsRefetch } = useQuery(GetChangeLogs, {
-    variables: {
-      projectId: productId,
-      sbomId: sbomId,
-      first: 10,
-      field: 'CREATED_AT',
-      direction: 'ASC'
     }
   })
 
@@ -201,15 +171,21 @@ function SBOM() {
     : []
 
   const [selectedVersion, setSelectedVersion] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleDelete = async () => {
+    setIsLoading(true)
     try {
       await deleteSbom({
         variables: {
           id: sbomId
         }
-      }).then(() => history.push(`/vendor/products`))
-      // .finally(() => window.location.reload())
+      }).then((res) => {
+        if (res.data.sbomDelete.errors === null) {
+          setIsLoading(false)
+          history.push(`/vendor/products`)
+        }
+      })
     } catch (error) {
       console.error('Mutation error:', error)
     }
@@ -222,52 +198,15 @@ function SBOM() {
       await refetch({
         projectId: productId,
         sbomId: id
+      }).then(() => {
+        if (customerView) {
+          history.push(`/sharelynk?p=${productId}&sbom=${id}`)
+        } else {
+          history.push(
+            `/vendor/products?tab=${Number(tab)}&p=${productId}&sbom=${id}`
+          )
+        }
       })
-        .then(() => {
-          if (customerView) {
-            window.history.pushState(
-              null,
-              null,
-              `/sharelynk?p=${productId}&sbom=${id}`
-            )
-          } else {
-            window.history.pushState(
-              null,
-              null,
-              `/vendor/products?tab=${Number(tab)}&p=${productId}&sbom=${id}`
-            )
-          }
-        })
-        .finally(() => {
-          compRefetch({
-            projectId: productId,
-            sbomId: id,
-            first: 10,
-            field: 'NAME',
-            direction: 'ASC'
-          })
-          vulnRefetch({
-            projectId: productId,
-            sbomId: id,
-            first: 10,
-            field: 'UPDATED_AT',
-            direction: 'ASC'
-          })
-          checkRefetch({
-            projectId: productId,
-            sbomId: id,
-            first: 10,
-            field: 'STATUS',
-            direction: 'ASC'
-          })
-          logsRefetch({
-            projectId: productId,
-            sbomId: id,
-            first: 10,
-            field: 'CREATED_AT',
-            direction: 'ASC'
-          })
-        })
     } catch (error) {
       console.log(`fetch error`, error)
     }
@@ -313,358 +252,383 @@ function SBOM() {
 
   return (
     <>
-      <Flex direction='column' pt={{ base: '120px', md: '74px' }} px={2}>
-        {/* product info */}
-        {sbomData ? (
-          <Card mb='6'>
-            <CardBody>
-              <Grid
-                width={'100%'}
-                templateColumns='repeat(5, 1fr)'
-                alignItems={'center'}
-              >
-                {/* LEFT */}
-
-                <GridItem colSpan={2}>
-                  <Flex
-                    direction={'row'}
-                    alignItems={'flex-start'}
-                    gap={5}
+      {productId && sbomId && (
+        <>
+          <Flex direction='column' pt={{ base: '120px', md: '74px' }} px={2}>
+            {/* product info */}
+            {sbomData ? (
+              <Card mb='6'>
+                <CardBody>
+                  <Grid
                     width={'100%'}
+                    templateColumns='repeat(5, 1fr)'
+                    alignItems={'center'}
                   >
-                    <Icon as={FaCubes} h={'64px'} w={'64px'} color='blue.300' />
-                    <Flex direction={'column'} gap={0.5}>
-                      {/* PRODUCT TITLE */}
-                      <Stack
-                        direction={'row'}
-                        spacing={2}
-                        alignItems={'center'}
-                      >
-                        <Text fontWeight={'semibold'} fontSize={20}>
-                          {sbomData.sbom.project.name} :{' '}
-                          {sbomData.sbom.primaryComponent?.version}
-                        </Text>
-                      </Stack>
+                    {/* LEFT */}
 
-                      <Text fontSize={'sm'} my={0.5}>
-                        A common specification for continous delivery events
-                      </Text>
-                      <Tooltip
-                        placement='top'
-                        label={getFullDateAndTime(sbomData.sbom.updatedAt)}
-                      >
-                        <Text fontSize='sm' cursor={'pointer'}>
-                          Last updated at : {timeSince(sbomData.sbom.updatedAt)}
-                        </Text>
-                      </Tooltip>
-
-                      {!customerView && (
-                        <Tag
-                          mt={1}
-                          w={'fit-content'}
-                          size={'sm'}
-                          variant='outline'
-                          colorScheme='blue'
-                        >
-                          <TagLabel textTransform={'capitalize'}>
-                            {sbomData.sbom.lifecycle}
-                          </TagLabel>
-                        </Tag>
-                      )}
-                      {/* --------------- STATS ------------------- */}
+                    <GridItem colSpan={2}>
                       <Flex
-                        flexDir={'row'}
-                        alignItems={'center'}
-                        gap={4}
-                        mt={12}
+                        direction={'row'}
+                        alignItems={'flex-start'}
+                        gap={5}
+                        width={'100%'}
                       >
-                        {/* components */}
-                        <Stack
-                          direction={'row'}
-                          alignItems={'flex-start'}
-                          spacing={2}
-                        >
-                          <Icon
-                            h={4}
-                            w={4}
-                            color='#777'
-                            as={FaProjectDiagram}
-                          />
-                          <Box>
-                            <Text fontWeight={'medium'} fontSize={'md'}>
-                              {sbomData.sbom.stats.compCount}
+                        <Icon
+                          as={FaCubes}
+                          h={'64px'}
+                          w={'64px'}
+                          color='blue.300'
+                        />
+                        <Flex direction={'column'} gap={0.5}>
+                          {/* PRODUCT TITLE */}
+                          <Stack
+                            direction={'row'}
+                            spacing={2}
+                            alignItems={'center'}
+                          >
+                            <Text fontWeight={'semibold'} fontSize={20}>
+                              {sbomData.sbom.project.name} :{' '}
+                              {sbomData.sbom.primaryComponent?.version}
                             </Text>
-                            <Text fontSize={'xs'}>Components</Text>
-                          </Box>
-                        </Stack>
-                        {/* license */}
-                        <Stack
-                          direction={'row'}
-                          alignItems={'flex-start'}
-                          spacing={2}
-                        >
-                          <Icon
-                            h={'20px'}
-                            w={'20px'}
-                            color='#777'
-                            as={FaBalanceScale}
-                          />
-                          <Box>
-                            <Text fontWeight={'medium'} fontSize={'md'}>
-                              {sbomData.sbom.stats.compLicenseCount}
-                            </Text>
-                            <Text fontSize={'xs'}>Licenses</Text>
-                          </Box>
-                        </Stack>
-                        {/* PURL */}
-                        <Stack
-                          direction={'row'}
-                          alignItems={'flex-start'}
-                          spacing={2}
-                        >
-                          <Icon h={4} w={4} color='#777' as={CalendarIcon} />
-                          <Box>
-                            <Text fontWeight={'medium'} fontSize={'md'}>
-                              {sbomData.sbom.stats.compPurlCount}
-                            </Text>
-                            <Text fontSize={'xs'}>PURL</Text>
-                          </Box>
-                        </Stack>
-                        {/* CPE */}
-                        <Stack
-                          direction={'row'}
-                          alignItems={'flex-start'}
-                          spacing={2}
-                        >
-                          <Icon h={4} w={4} color='#777' as={LockIcon} />
-                          <Box>
-                            <Text fontWeight={'medium'} fontSize={'md'}>
-                              {sbomData.sbom.stats.compCpeCount}
-                            </Text>
-                            <Text fontSize={'xs'}>CPE</Text>
-                          </Box>
-                        </Stack>
-                      </Flex>
-                    </Flex>
-                  </Flex>
-                </GridItem>
+                          </Stack>
 
-                {/* RIGHT */}
-                {sbomData && (
-                  <GridItem colSpan={3}>
-                    <Flex
-                      direction={'row'}
-                      gap={2}
-                      justifyContent='flex-end'
-                      ml={'auto'}
-                    >
-                      {/* CHANGE SBOM VERSION */}
-                      <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
-                        <FaLayerGroup size={18} color='darkgray' />
-                        <Select
-                          id='version'
-                          value={selectedVersion}
-                          onChange={handleSBOMChange}
-                          size='md'
-                          color='gray.500'
-                        >
-                          {filteredData && filteredData.length > 0 ? (
-                            filteredData.map((item, index) => (
-                              <option
-                                key={index}
-                                value={item.id}
-                                name={item.version}
-                              >
-                                {item.version}
-                              </option>
-                            ))
-                          ) : (
-                            <option value=''>-- --</option>
+                          <Text fontSize={'sm'} my={0.5}>
+                            A common specification for continous delivery events
+                          </Text>
+                          <Tooltip
+                            placement='top'
+                            label={getFullDateAndTime(sbomData.sbom.updatedAt)}
+                          >
+                            <Text fontSize='sm' cursor={'pointer'}>
+                              Last updated at :{' '}
+                              {timeSince(sbomData.sbom.updatedAt)}
+                            </Text>
+                          </Tooltip>
+
+                          {!customerView && (
+                            <Tag
+                              mt={1}
+                              w={'fit-content'}
+                              size={'sm'}
+                              variant='outline'
+                              colorScheme='blue'
+                            >
+                              <TagLabel textTransform={'capitalize'}>
+                                {sbomData.sbom.lifecycle}
+                              </TagLabel>
+                            </Tag>
                           )}
-                        </Select>
+                          {/* --------------- STATS ------------------- */}
+                          <Flex
+                            flexDir={'row'}
+                            alignItems={'center'}
+                            gap={4}
+                            mt={12}
+                          >
+                            {/* components */}
+                            <Stack
+                              direction={'row'}
+                              alignItems={'flex-start'}
+                              spacing={2}
+                            >
+                              <Icon
+                                h={4}
+                                w={4}
+                                color='#777'
+                                as={FaProjectDiagram}
+                              />
+                              <Box>
+                                <Text fontWeight={'medium'} fontSize={'md'}>
+                                  {sbomData.sbom.stats.compCount}
+                                </Text>
+                                <Text fontSize={'xs'}>Components</Text>
+                              </Box>
+                            </Stack>
+                            {/* license */}
+                            <Stack
+                              direction={'row'}
+                              alignItems={'flex-start'}
+                              spacing={2}
+                            >
+                              <Icon
+                                h={'20px'}
+                                w={'20px'}
+                                color='#777'
+                                as={FaBalanceScale}
+                              />
+                              <Box>
+                                <Text fontWeight={'medium'} fontSize={'md'}>
+                                  {sbomData.sbom.stats.compLicenseCount}
+                                </Text>
+                                <Text fontSize={'xs'}>Licenses</Text>
+                              </Box>
+                            </Stack>
+                            {/* PURL */}
+                            <Stack
+                              direction={'row'}
+                              alignItems={'flex-start'}
+                              spacing={2}
+                            >
+                              <Icon
+                                h={4}
+                                w={4}
+                                color='#777'
+                                as={CalendarIcon}
+                              />
+                              <Box>
+                                <Text fontWeight={'medium'} fontSize={'md'}>
+                                  {sbomData.sbom.stats.compPurlCount}
+                                </Text>
+                                <Text fontSize={'xs'}>PURL</Text>
+                              </Box>
+                            </Stack>
+                            {/* CPE */}
+                            <Stack
+                              direction={'row'}
+                              alignItems={'flex-start'}
+                              spacing={2}
+                            >
+                              <Icon h={4} w={4} color='#777' as={LockIcon} />
+                              <Box>
+                                <Text fontWeight={'medium'} fontSize={'md'}>
+                                  {sbomData.sbom.stats.compCpeCount}
+                                </Text>
+                                <Text fontSize={'xs'}>CPE</Text>
+                              </Box>
+                            </Stack>
+                          </Flex>
+                        </Flex>
                       </Flex>
+                    </GridItem>
 
-                      {/* EDIT SBOM */}
-                      <Tooltip label='Edit'>
-                        <IconButton
-                          isDisabled={status === 'signed'}
-                          colorScheme='blue'
-                          icon={<EditIcon />}
-                          onClick={setSBMOpen}
-                        ></IconButton>
-                      </Tooltip>
+                    {/* RIGHT */}
+                    {sbomData && (
+                      <GridItem colSpan={3}>
+                        <Flex
+                          direction={'row'}
+                          gap={2}
+                          justifyContent='flex-end'
+                          ml={'auto'}
+                        >
+                          {/* CHANGE SBOM VERSION */}
+                          <Flex
+                            flexDirection={'row'}
+                            alignItems={'center'}
+                            gap={2}
+                          >
+                            <FaLayerGroup size={18} color='darkgray' />
+                            <Select
+                              id='version'
+                              value={selectedVersion}
+                              onChange={handleSBOMChange}
+                              size='md'
+                              color='gray.500'
+                            >
+                              {filteredData && filteredData.length > 0 ? (
+                                filteredData.map((item, index) => (
+                                  <option
+                                    key={index}
+                                    value={item.id}
+                                    name={item.version}
+                                  >
+                                    {item.version}
+                                  </option>
+                                ))
+                              ) : (
+                                <option value=''>-- --</option>
+                              )}
+                            </Select>
+                          </Flex>
 
-                      {/* SIGNED SBOM */}
-                      {status === 'signed' ? (
-                        <Tooltip label='Signed'>
-                          <IconButton
-                            colorScheme='blue'
-                            icon={<TbSignature size={22} />}
-                            onClick={setVerifyOpen}
-                          ></IconButton>
-                        </Tooltip>
-                      ) : (
-                        <Tooltip label='Unsigned'>
-                          <IconButton
-                            colorScheme='blue'
-                            icon={<TbSignatureOff size={22} />}
-                            onClick={setVerifyOpen}
-                          ></IconButton>
-                        </Tooltip>
-                      )}
+                          {/* EDIT SBOM */}
+                          <Tooltip label='Edit'>
+                            <IconButton
+                              isDisabled={status === 'signed'}
+                              colorScheme='blue'
+                              icon={<EditIcon />}
+                              onClick={setSBMOpen}
+                            ></IconButton>
+                          </Tooltip>
 
-                      {/* DOWNLOAD SBOM */}
-                      <Tooltip label='Download'>
-                        <IconButton
-                          icon={<FaFileDownload />}
-                          onClick={onOpen}
-                          size='md'
-                          colorScheme='blue'
-                        />
-                      </Tooltip>
+                          {/* SIGNED SBOM */}
+                          {status === 'signed' ? (
+                            <Tooltip label='Signed'>
+                              <IconButton
+                                colorScheme='blue'
+                                icon={<TbSignature size={22} />}
+                                onClick={setVerifyOpen}
+                              ></IconButton>
+                            </Tooltip>
+                          ) : (
+                            <Tooltip label='Unsigned'>
+                              <IconButton
+                                colorScheme='blue'
+                                icon={<TbSignatureOff size={22} />}
+                                onClick={setVerifyOpen}
+                              ></IconButton>
+                            </Tooltip>
+                          )}
 
-                      {/* COPY SBOM */}
-                      <Tooltip label='Copy'>
-                        <IconButton
-                          icon={<FaCopy />}
-                          onClick={onCopiedOpen}
-                          size='md'
-                          colorScheme='blue'
-                        />
-                      </Tooltip>
+                          {/* DOWNLOAD SBOM */}
+                          <Tooltip label='Download'>
+                            <IconButton
+                              icon={<FaFileDownload />}
+                              onClick={onOpen}
+                              size='md'
+                              colorScheme='blue'
+                            />
+                          </Tooltip>
 
-                      {/* DELETE SBOM */}
-                      <Tooltip label='Delete'>
-                        <IconButton
-                          colorScheme='red'
-                          icon={<DeleteIcon />}
-                          onClick={setDeleteOpen}
-                        ></IconButton>
-                      </Tooltip>
-                    </Flex>
-                  </GridItem>
-                )}
-              </Grid>
-            </CardBody>
-          </Card>
-        ) : (
-          <Card mb={6}>
-            <Flex width={'100%'} gap={4} direction={'row'}>
-              <Skeleton width={'100%'} height='30px' />
-              <Skeleton width={'100%'} height='30px' />
-            </Flex>
-          </Card>
-        )}
+                          {/* COPY SBOM */}
+                          <Tooltip label='Copy'>
+                            <IconButton
+                              icon={<FaCopy />}
+                              onClick={onCopiedOpen}
+                              size='md'
+                              colorScheme='blue'
+                            />
+                          </Tooltip>
 
-        {/* SBOM DETAILS */}
-        <SBOMTable
-          filteredData={filteredData}
-          sbomId={sbomId}
-          productId={productId}
-          data={sbomData ? sbomData.sbom : undefined}
-          refetch={refetch}
-          compData={compData ? compData : undefined}
-          compRefetch={compRefetch}
-          checkData={checkData ? checkData.sbom.checkResults : undefined}
-          checkRefetch={checkRefetch}
-          logsData={logsData ? logsData.sbom.activityLogs : undefined}
-          logsRefetch={logsRefetch}
-          vulnData={vulnData ? vulnData.sbom.vulns : undefined}
-          vulnRefetch={vulnRefetch}
-          status={status}
-          lifecycle={sbomData && sbomData.sbom.lifecycle}
-          type={
-            selectedProject?.sboms.length > 0 && selectedProject.sboms[0].format
-          }
-        />
-      </Flex>
+                          {/* DELETE SBOM */}
+                          <Tooltip label='Delete'>
+                            <IconButton
+                              colorScheme='red'
+                              icon={<DeleteIcon />}
+                              onClick={setDeleteOpen}
+                            ></IconButton>
+                          </Tooltip>
+                        </Flex>
+                      </GridItem>
+                    )}
+                  </Grid>
+                </CardBody>
+              </Card>
+            ) : (
+              <Card mb={6}>
+                <Flex width={'100%'} gap={4} direction={'row'}>
+                  <Skeleton width={'100%'} height='30px' />
+                  <Skeleton width={'100%'} height='30px' />
+                </Flex>
+              </Card>
+            )}
 
-      {isSBMOpen && sbomData && (
-        <ProductSbomDrawer
-          isOpen={isSBMOpen}
-          onClose={setSBMClose}
-          btnRef={btnRef}
-          projectId={productId}
-          name={sbomData.sbom.project.name}
-          refetch={refetch}
-          sbomData={sbomData.sbom}
-          type={
-            selectedProject?.sboms.length > 0 && selectedProject.sboms[0].format
-          }
-        />
-      )}
+            {/* SBOM DETAILS */}
+            <SBOMTable
+              filteredData={filteredData}
+              sbomId={sbomId}
+              productId={productId}
+              data={sbomData ? sbomData.sbom : undefined}
+              refetch={refetch}
+              status={status}
+              lifecycle={sbomData && sbomData.sbom.lifecycle}
+              type={
+                selectedProject?.sboms.length > 0 &&
+                selectedProject.sboms[0].format
+              }
+            />
+          </Flex>
 
-      {isOpen && sbomData && !customerView && (
-        <DownloadModal
-          initialRef={initialRef}
-          finalRef={finalRef}
-          isOpen={isOpen}
-          onClose={onClose}
-          productId={productId}
-          productName={sbomData.sbom.project.name}
-          version={sbomData.sbom.primaryComponent?.version}
-          sbomId={sbomId}
-        />
-      )}
+          {isSBMOpen && sbomData && (
+            <ProductSbomDrawer
+              isOpen={isSBMOpen}
+              onClose={setSBMClose}
+              btnRef={btnRef}
+              projectId={productId}
+              name={sbomData.sbom.project.name}
+              refetch={refetch}
+              sbomData={sbomData.sbom}
+              type={
+                selectedProject?.sboms.length > 0 &&
+                selectedProject.sboms[0].format
+              }
+            />
+          )}
 
-      {isVerifyOpen && sbomData && (
-        <SigningModal
-          projectId={productId}
-          sbomId={sbomId}
-          status={status}
-          setStatus={setStatus}
-          signedData={signedData}
-          setSignedData={setSignedData}
-          refetch={refetch}
-          isOpen={isVerifyOpen}
-          onClose={setVerifyClose}
-          sbomData={sbomData}
-        />
-      )}
+          {isOpen && sbomData && !customerView && (
+            <DownloadModal
+              initialRef={initialRef}
+              finalRef={finalRef}
+              isOpen={isOpen}
+              onClose={onClose}
+              productId={productId}
+              productName={sbomData.sbom.project.name}
+              version={sbomData.sbom.primaryComponent?.version}
+              sbomId={sbomId}
+            />
+          )}
 
-      {isCopied && sbomData && (
-        <CopyModal
-          isOpen={isCopied}
-          onClose={onCopiedClose}
-          product={sbomData.sbom.project.name}
-          version={sbomData.sbom.primaryComponent?.version}
-        />
-      )}
+          {isVerifyOpen && sbomData && (
+            <SigningModal
+              projectId={productId}
+              sbomId={sbomId}
+              status={status}
+              setStatus={setStatus}
+              signedData={signedData}
+              setSignedData={setSignedData}
+              refetch={refetch}
+              isOpen={isVerifyOpen}
+              onClose={setVerifyClose}
+              sbomData={sbomData}
+            />
+          )}
 
-      {/* delete */}
-      <Modal isOpen={isDelete} onClose={setDeleteClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Delete ?</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Text fontSize={'lg'}>Deleting this version will : </Text>
-            <Flex flexDir={'column'} gap={1} mt={4}>
-              {[
-                'Remove this version and its SBOMs from the product list',
-                'Remove access to this version on connected Share Lynks'
-              ].map((item, index) => (
-                <Text key={index} fontSize={'sm'}>
-                  {item}
+          {isCopied && sbomData && (
+            <CopyModal
+              isOpen={isCopied}
+              onClose={onCopiedClose}
+              product={sbomData.sbom.project.name}
+              version={sbomData.sbom.primaryComponent?.version}
+            />
+          )}
+
+          {/* delete */}
+          <Modal isOpen={isDelete} onClose={setDeleteClose}>
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>Delete ?</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                <Text fontSize={'lg'}>Deleting this version will : </Text>
+                <Flex flexDir={'column'} gap={1} mt={4}>
+                  {[
+                    'Remove this version and its SBOMs from the product list',
+                    'Remove access to this version on connected Share Lynks'
+                  ].map((item, index) => (
+                    <Text key={index} fontSize={'sm'}>
+                      {item}
+                    </Text>
+                  ))}
+                </Flex>
+                <br />
+                <Text mt={4} fontSize={'sm'}>
+                  Are you sure you want to continue with the deletion of this
+                  version?
                 </Text>
-              ))}
-            </Flex>
-            <br />
-            <Text mt={4} fontSize={'sm'}>
-              Are you sure you want to continue with the deletion of this
-              version?
-            </Text>
-          </ModalBody>
-          <ModalFooter>
-            <Button mr={3} onClick={setDeleteClose}>
-              No
-            </Button>
-            <Button colorScheme='red' onClick={handleDelete}>
-              Yes
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+              </ModalBody>
+              <ModalFooter>
+                <Flex
+                  width={'100%'}
+                  alignItems={'center'}
+                  justifyContent={'space-between'}
+                  gap={4}
+                >
+                  <Stack>{isLoading && <Spinner color='red.500' />}</Stack>
+                  <Stack direction='row' alignItems='center' gap={1}>
+                    <Button onClick={setDeleteClose}>No</Button>
+                    <Button
+                      colorScheme='red'
+                      onClick={handleDelete}
+                      disabled={isLoading}
+                    >
+                      {isLoading ? 'Deleting...' : 'Yes'}
+                    </Button>
+                  </Stack>
+                </Flex>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
+        </>
+      )}
     </>
   )
 }

@@ -612,6 +612,7 @@ export const GetCheckResults = gql`
     $direction: OrderByDirection!
   ) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
+      id
       checkResults(
         sbomId: $sbomId
         after: $after
@@ -704,6 +705,15 @@ export const GetProject = gql`
       name
       description
       updatedAt
+      activityLogs {
+        event
+        action
+        orig
+        updated
+        createdAt
+        updatedAt
+        changedBy
+      }
       sboms {
         id
         spec

@@ -39,6 +39,7 @@ const TokenInfo = () => {
   const finalRef = useRef(null)
 
   const [token, setToken] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
   const [showKey, setShowKey] = useState(false)
 
@@ -52,14 +53,17 @@ const TokenInfo = () => {
   const [remokeToken] = useMutation(RevokeApiToken)
 
   const handleCreate = async () => {
+    setIsLoading(true)
     try {
-      await generateToken()
-        .then((res) => {
-          if (res) {
+      await generateToken().then((res) => {
+        if (res) {
+          setTimeout(() => {
             setToken(res.data.apiTokenCreate.apiToken)
-          }
-        })
-        .then(() => onClose())
+            setIsLoading(false)
+            onClose()
+          }, 3000)
+        }
+      })
     } catch (error) {
       console.log('Mutation error', error)
     }
@@ -70,12 +74,13 @@ const TokenInfo = () => {
       <Card>
         <CardHeader p='12px 0' mb='12px'>
           <Flex direction='column'>
-          <Text fontSize='lg' color={textColor} fontWeight='bold'>
-            Security Token
-          </Text>
-          <Text fontSize='sm' mt='10px' color={textColor}>
-            Security token is required to connect through the Interlynk API or Command Line Interface (CLI).
-          </Text>
+            <Text fontSize='lg' color={textColor} fontWeight='bold'>
+              Security Token
+            </Text>
+            <Text fontSize='sm' mt='10px' color={textColor}>
+              Security token is required to connect through the Interlynk API or
+              Command Line Interface (CLI).
+            </Text>
           </Flex>
         </CardHeader>
         <CardBody px='5px'>
@@ -87,33 +92,44 @@ const TokenInfo = () => {
           >
             {/* NAME */}
             <Button variant='solid' colorScheme='green' onClick={onOpen}>
-                Generate New Token
-              </Button>
-            <FormControl>
-              <FormLabel>Token</FormLabel>
-              <Textarea
-                  type={'text'}
-                  defaultValue={token}
-                  readOnly
-                  style={{ width: '100%', height: 'auto', minHeight: '150px' }}
-              />
-              <Tag mt={5} fontSize={'sm'} colorScheme='red'>
-                Warning
-              </Tag>
-              <Text fontSize={'sm'}>
-                For account's security, this token is not stored anywhere and will not be visible once you navigate away from this page. Please copy it and store it in a safe place for future reference.
-              </Text>
-            </FormControl>
-            {/* ACTION */}
-            <Stack direction={'row'} alignItems={'center'}>
-              <Button
-                variant='solid'
-                colorScheme={'blue'}
-                onClick={() => key.onCopy()}
-              >
-                {key.hasCopied ? 'Copied!' : 'Copy'}
-              </Button>
-            </Stack>
+              Generate New Token
+            </Button>
+            {token !== '' && (
+              <>
+                <FormControl>
+                  <FormLabel>Token</FormLabel>
+                  <Textarea
+                    type={'text'}
+                    defaultValue={token}
+                    readOnly
+                    style={{
+                      width: '100%',
+                      height: 'auto',
+                      minHeight: '150px'
+                    }}
+                  />
+                  <Tag mt={5} fontSize={'sm'} colorScheme='red'>
+                    Warning
+                  </Tag>
+                  <Text fontSize={'sm'}>
+                    For account's security, this token is not stored anywhere
+                    and will not be visible once you navigate away from this
+                    page. Please copy it and store it in a safe place for future
+                    reference.
+                  </Text>
+                </FormControl>
+                {/* ACTION */}
+                <Stack direction={'row'} alignItems={'center'}>
+                  <Button
+                    variant='solid'
+                    colorScheme={'blue'}
+                    onClick={() => key.onCopy()}
+                  >
+                    {key.hasCopied ? 'Copied!' : 'Copy'}
+                  </Button>
+                </Stack>
+              </>
+            )}
           </Flex>
         </CardBody>
       </Card>
@@ -126,7 +142,8 @@ const TokenInfo = () => {
             <ModalCloseButton />
             <ModalBody>
               <Text>
-                Generating a new token makes all previously generated tokens invalid.
+                Generating a new token makes all previously generated tokens
+                invalid.
               </Text>
               <Text mt={10}>Are you sure you wish to continue ?</Text>
             </ModalBody>
@@ -135,8 +152,13 @@ const TokenInfo = () => {
               <Button mr={3} onClick={onClose}>
                 Close
               </Button>
-              <Button variant='solid' colorScheme='red' onClick={handleCreate}>
-                Yes
+              <Button
+                variant='solid'
+                colorScheme='red'
+                onClick={handleCreate}
+                disabled={isLoading}
+              >
+                {isLoading ? 'Generating...' : 'Yes'}
               </Button>
             </ModalFooter>
           </ModalContent>

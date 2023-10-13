@@ -66,11 +66,14 @@ const CheckModal = ({
       }
     }).then(() =>
       refetch({
-        projectId: productId,
-        sbomId: sbomId,
-        first: 10,
-        field: 'STATUS',
-        direction: 'ASC'
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          first: 10,
+          last: undefined,
+          field: 'STATUS',
+          direction: 'ASC'
+        }
       })
     )
   }
@@ -84,11 +87,7 @@ const CheckModal = ({
           primary: true
         }
       })
-        .then(() => {
-          if (checkId) {
-            handleReCheck()
-          }
-        })
+        .then(() => handleReCheck())
         .finally(() => onClose())
     } catch (error) {
       console.log('Mutation error', error)
@@ -100,7 +99,7 @@ const CheckModal = ({
     setComp(value)
     if (value === '') {
       setComponentData([])
-    } else {
+    } else if (components && components.length > 0) {
       setComponentData(components.filter((str) => str.value.startsWith(value)))
     }
   }
@@ -162,6 +161,9 @@ const CheckModal = ({
                 <FormControl isRequired>
                   <FormLabel>Select</FormLabel>
                   <Input value={comp} onChange={handleComponentChange} />
+                  <Text fontSize={'sm'} mt={2} color={'red.400'}>
+                    {!components && 'No components found'}
+                  </Text>
                 </FormControl>
 
                 {componentData && componentData.length > 0 && (

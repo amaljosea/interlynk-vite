@@ -43,7 +43,6 @@ function ProductVersionsRow(props) {
     description,
     updatedAt,
     allProjects,
-    fetchProjects,
     isLoading,
     refetch
   } = props
@@ -180,6 +179,9 @@ function ProductVersionsRow(props) {
                     Upload SBOM
                   </MenuItem>
                   <MenuItem onClick={onDeleteOpen}>Archive Product</MenuItem>
+                  <Link to={`/vendor/changelog?p=${name}&id=${id}`}>
+                    <MenuItem>Change Log</MenuItem>
+                  </Link>
                   <Link to={`/vendor/autofix?p=${name}`}>
                     <MenuItem>Settings</MenuItem>
                   </Link>
@@ -193,7 +195,6 @@ function ProductVersionsRow(props) {
               id={id}
               isOpen={isOpenProduct}
               onClose={onCloseProduct}
-              fetchProjects={fetchProjects}
             />
           )}
 
@@ -203,6 +204,7 @@ function ProductVersionsRow(props) {
               isOpen={isOpen}
               onClose={onClose}
               product={name}
+              refetch={refetch}
               description={description}
               allProjects={allProjects}
               type={sbomId.length > 0 && sbomId[0].format}

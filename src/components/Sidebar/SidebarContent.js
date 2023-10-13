@@ -48,7 +48,7 @@ const SidebarContent = ({ logoText, routes }) => {
     const inactiveColor = useColorModeValue('gray.500', 'gray.500')
 
     return routes
-      .filter((item) => item.path !== '/autofix')
+      .filter((item) => item.path !== '/autofix' && item.path !== '/changelog')
       .map((prop, index) => {
         if (prop.redirect) {
           return null
