@@ -476,10 +476,7 @@ const ComponentTable = ({
           }
         }).then((res) => {
           if (res) {
-            refetch({
-              productId: productId,
-              sbomId: sbomId
-            })
+            window.location.reload()
           }
         })
       } catch (error) {
@@ -779,7 +776,7 @@ const ComponentTable = ({
               version={activeRow.version}
               license={activeRow.licenses !== null ? activeRow.licenses : []}
               type={activeRow.kind}
-              refetch={refetch}
+              refetch={getComponents}
               cpes={activeRow.cpes}
               purl={activeRow.purl}
               primary={activeRow.primary}
@@ -795,14 +792,14 @@ const ComponentTable = ({
               isOpen={isDelOpen}
               onClose={onDelClose}
               id={activeRow.id}
-              refetch={refetch}
+              refetch={getComponents}
             />
           )}
 
           {isSupOpen && (
             <SupplierModal
               id={activeRow.id}
-              refetch={refetch}
+              refetch={getComponents}
               isOpen={isSupOpen}
               onClose={onSupClose}
               suppliers={activeRow.suppliers}
@@ -835,7 +832,7 @@ const ComponentTable = ({
           purl={''}
           primary={false}
           internal={false}
-          refetch={refetch}
+          refetch={getComponents}
           suppliers={null}
           shortDesc={null}
         />
