@@ -142,23 +142,22 @@ const TokenInfo = () => {
             <ModalCloseButton />
             <ModalBody>
               <Text>
-                Generating a new token makes previously generated tokens
-                invalid.
+                You can only copy the security token once, so please be sure to copy it before leaving the window.
               </Text>
-              <Text mt={10}>Are you sure you wish to continue ?</Text>
+              <Text mt={10}>Click continue when you are ready.</Text>
             </ModalBody>
 
             <ModalFooter>
               <Button mr={3} onClick={onClose}>
-                No
+                Cancel
               </Button>
               <Button
                 variant='solid'
-                colorScheme='red'
+                colorScheme='blue'
                 onClick={handleCreate}
                 disabled={isLoading}
               >
-                {isLoading ? 'Generating...' : 'Yes'}
+                {isLoading ? 'Generating...' : 'Continue'}
               </Button>
             </ModalFooter>
           </ModalContent>

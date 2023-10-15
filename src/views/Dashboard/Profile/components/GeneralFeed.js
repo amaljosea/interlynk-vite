@@ -8,7 +8,8 @@ import {
   FormLabel,
   Input,
   Button,
-  HStack,
+  FormErrorMessage,
+  FormHelperText,
   useClipboard
 } from '@chakra-ui/react'
 // Custom components
@@ -35,8 +36,10 @@ const GeneralFeed = ({ orgInfo, refetch, getOrgInfo }) => {
   }, [orgInfo])
 
   const id = useClipboard(orgId)
+  var isError = orgName === ''
 
   const handleUpdate = async () => {
+    isError = orgName === ''
     if (orgName !== '') {
       try {
         await updateOrg({
@@ -59,7 +62,7 @@ const GeneralFeed = ({ orgInfo, refetch, getOrgInfo }) => {
         console.log(`Error`, error)
       }
     } else {
-      alert('Fields are required')
+      console.error('Empty organization name provideed')
     }
   }
 
@@ -78,12 +81,13 @@ const GeneralFeed = ({ orgInfo, refetch, getOrgInfo }) => {
           gap={6}
         >
           {/* NAME */}
-          <FormControl>
+          <FormControl isRequired isInvalid={isError}>
             <FormLabel>Name</FormLabel>
             <Input
               value={orgName}
               onChange={(e) => setOrgName(e.target.value)}
             />
+            <FormErrorMessage>An organization name is required.</FormErrorMessage>
             <Button
               mt={3}
               variant='solid'
