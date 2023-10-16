@@ -150,7 +150,7 @@ export default function AdminNavbar(props) {
       >
         <Box
           pos={'relative'}
-          left={minimize === true ? '40' : '72'}
+          left={'40'}
           mb={{ sm: '8px', md: '0px' }}
         >
           <Breadcrumb>

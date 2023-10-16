@@ -42,34 +42,20 @@ function Sidebar(props) {
   return (
     <Box
       display={{ sm: 'none', xl: 'block' }}
-      // position='fixed'
+      position='fixed'
       onMouseEnter={() => setMinimize(false)}
       onMouseLeave={() => setMinimize(true)}
-      w={minimize === true ? '68px' : '210px'}
-      bg={'transparent'}
+      w={minimize === true ? '75px' : '210px'}
+      bg={'white'}
+      height={'100vh'}
       zIndex={111}
     >
-      <Box
-        // borderRight={'1px solid lightgray'}
-        // ms={{
-        //   sm: '16px'
-        // }}
-        // my={{
-        //   sm: '16px'
-        // }}
-        h='100vh'
-        // ps='20px'
-        // pe='20px'
-        m={sidebarMargins}
-        borderRadius={sidebarRadius}
-      >
-        <SidebarContent
-          routes={filterRoutes}
-          logoText={'Interlynk'}
-          display='none'
-          sidebarVariant={sidebarVariant}
-        />
-      </Box>
+      <SidebarContent
+        routes={filterRoutes}
+        logoText={'Interlynk'}
+        display='none'
+        sidebarVariant={sidebarVariant}
+      />
     </Box>
   )
 }

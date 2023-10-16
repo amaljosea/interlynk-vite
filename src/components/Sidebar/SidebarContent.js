@@ -91,10 +91,7 @@ const SidebarContent = ({ logoText, routes }) => {
                   xl: 'auto'
                 }}
                 py='4px'
-                ps={{
-                  sm: '10px',
-                  xl: '16px'
-                }}
+                pl={'18px'}
                 bg='none'
                 _active={{
                   bg: 'none'
@@ -144,10 +141,7 @@ const SidebarContent = ({ logoText, routes }) => {
                   xl: 'auto'
                 }}
                 py='4px'
-                ps={{
-                  sm: '10px',
-                  xl: '16px'
-                }}
+                pl={'18px'}
                 bg='none'
                 _active={{
                   bg: 'none'
