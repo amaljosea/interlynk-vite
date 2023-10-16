@@ -120,12 +120,7 @@ export default function Dashboard(props) {
               sidebarVariant={sidebarVariant}
               {...rest}
             />
-            <Box
-              minH='100vh'
-              w={minimize ? 'calc(100% - 220px)' : 'calc(100% - 74px)'}
-              // pos={'absolute'}
-              // right={0}
-            >
+            <Box minH='100vh' w={'96%'} pos={'absolute'} right={0}>
               <Portal>
                 <Box>
                   <AdminNavbar
