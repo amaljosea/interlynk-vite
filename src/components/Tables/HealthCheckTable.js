@@ -88,10 +88,11 @@ const HealthCheckTable = ({
   productId,
   sbomId,
   data,
-  getResults,
   components,
   pageIndex,
-  setPageIndex
+  setPageIndex,
+  refetch,
+  setIsLoading
 }) => {
   const customerView = location.pathname.startsWith('/customer')
   const toast = useToast()
@@ -107,7 +108,7 @@ const HealthCheckTable = ({
   const [activeRow, setActiveRow] = useState(null)
   const [filterText, setFilterText] = useState('')
   const [resetPaginationToggle, setResetPaginationToggle] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+
   const [filteredData, setFilteredData] = useState(data.nodes)
 
   const [updateResult] = useMutation(checkResultUpdate)
@@ -195,19 +196,19 @@ const HealthCheckTable = ({
       })
         .then((res) => {
           setIsLoading(true)
-          getResults({
-            variables: {
+          if (res.data) {
+            refetch({
               projectId: productId,
               sbomId: sbomId,
               first: 10,
               last: undefined,
               field: 'STATUS',
               direction: 'ASC'
-            }
-          })
-          setTimeout(() => {
-            setIsLoading(false)
-          }, 2000)
+            })
+            setTimeout(() => {
+              setIsLoading(false)
+            }, 2000)
+          }
         })
         .finally(() => {
           toast({
@@ -376,6 +377,7 @@ const HealthCheckTable = ({
           projectId: productId,
           sbomId: sbomId,
           first: 10,
+          last: undefined,
           field: 'STATUS',
           direction: 'ASC'
         })
@@ -598,47 +600,41 @@ const HealthCheckTable = ({
   ]
 
   const handleSort = (column, sortDirection) => {
-    getResults({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        first: 10,
-        last: undefined,
-        field: column.name,
-        direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
-      }
+    refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      first: 10,
+      last: undefined,
+      field: column.name,
+      direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
     })
   }
 
   const onPreviousPage = () => {
     setPageIndex((prev) => pageIndex !== 0 && prev - 1)
-    getResults({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        first: undefined,
-        last: 10,
-        before: data.pageInfo.startCursor,
-        after: '',
-        field: 'STATUS',
-        direction: 'DESC'
-      }
+    refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      first: undefined,
+      last: 10,
+      before: data.pageInfo.startCursor,
+      after: '',
+      field: 'STATUS',
+      direction: 'DESC'
     })
   }
 
   const onNextPage = () => {
     setPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
-    getResults({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        first: 10,
-        last: undefined,
-        after: data.pageInfo.endCursor,
-        before: '',
-        field: 'STATUS',
-        direction: 'DESC'
-      }
+    refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      first: 10,
+      last: undefined,
+      after: data.pageInfo.endCursor,
+      before: '',
+      field: 'STATUS',
+      direction: 'DESC'
     })
   }
 
@@ -649,7 +645,6 @@ const HealthCheckTable = ({
           columns={columns}
           data={data.nodes}
           onSort={handleSort}
-          progressPending={isLoading}
           // defaultSortAsc
           // defaultSortFieldId={'status'}
           customStyles={customStyles}
@@ -693,7 +688,7 @@ const HealthCheckTable = ({
           {isPrimaryOpen && (
             <CheckModal
               id={activeRow.id}
-              refetch={getResults}
+              refetch={refetch}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
               checkId={activeRow.organizationRule.rule.friendlyId}
               isOpen={isPrimaryOpen}
@@ -706,7 +701,7 @@ const HealthCheckTable = ({
           {isLicenseOpen && (
             <CheckModal
               id={activeRow.id}
-              refetch={getResults}
+              refetch={refetch}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
               checkId={activeRow.organizationRule.rule.friendlyId}
               isOpen={isLicenseOpen}
@@ -718,7 +713,7 @@ const HealthCheckTable = ({
           {isTypeOpen && (
             <CheckModal
               id={activeRow.id}
-              refetch={getResults}
+              refetch={refetch}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
               checkId={activeRow.organizationRule.rule.friendlyId}
               isOpen={isTypeOpen}
@@ -731,7 +726,7 @@ const HealthCheckTable = ({
             <SupplierModal
               id={activeRow.component.id}
               btnRef={supplierBtn}
-              refetch={getResults}
+              refetch={refetch}
               isOpen={onSupplierOpen}
               onClose={onSupplierClose}
               suppliers={[]}
@@ -742,7 +737,7 @@ const HealthCheckTable = ({
           {isOpen && (
             <CheckModal
               id={activeRow.id}
-              refetch={getResults}
+              refetch={refetch}
               checkId={activeRow.organizationRule.rule.friendlyId}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
               isOpen={isOpen}
@@ -759,7 +754,7 @@ const HealthCheckTable = ({
               setPurlValue={setPurlValue}
               purlValue={purlValue}
               id={activeRow.component.id}
-              refetch={getResults}
+              refetch={refetch}
               checkId={activeRow.organizationRule.rule.friendlyId}
             />
           )}
@@ -775,7 +770,7 @@ const HealthCheckTable = ({
               onUpdateCpe={handleUpdateCpe}
               selectedCpe={selectedCpe}
               id={activeRow.component.id}
-              refetch={getResults}
+              refetch={refetch}
               checkId={activeRow.organizationRule.rule.friendlyId}
             />
           )}
@@ -788,7 +783,7 @@ const HealthCheckTable = ({
               btnRef={creationToolBtn}
               data={null}
               selectedKey={'tools'}
-              refetch={getResults}
+              refetch={refetch}
               checkId={activeRow.organizationRule.rule.friendlyId}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
             />
@@ -802,7 +797,7 @@ const HealthCheckTable = ({
               btnRef={authorBtn}
               data={null}
               selectedKey={'author'}
-              refetch={getResults}
+              refetch={refetch}
               checkId={activeRow.organizationRule.rule.friendlyId}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
             />
@@ -811,7 +806,7 @@ const HealthCheckTable = ({
           {/* DOCUMENT SUPPLIER DRAWER */}
           {isDocSupOpen && (
             <PriSupplierModal
-              refetch={getResults}
+              refetch={refetch}
               isOpen={isDocSupOpen}
               onClose={onDocSupClose}
               suppliers={null}

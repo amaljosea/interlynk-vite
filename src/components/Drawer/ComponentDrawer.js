@@ -32,11 +32,18 @@ import {
   TagLabel,
   Code,
   useToast,
-  Textarea,
+  chakra,
   useDisclosure,
   Tooltip,
   Icon,
-  IconButton
+  IconButton,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter
 } from '@chakra-ui/react'
 import { useMutation } from '@apollo/client'
 import { CreateComponent } from 'graphQL/Mutation'
@@ -78,7 +85,7 @@ function ComponentDrawer(props) {
     purl,
     primary,
     internal,
-    suppliers,
+    primaryComp,
     refetch,
     group,
     shortDesc
@@ -182,6 +189,12 @@ function ComponentDrawer(props) {
     isOpen: isCpeOpen,
     onOpen: onCpeOpen,
     onClose: onCpeClose
+  } = useDisclosure()
+
+  const {
+    isOpen: isWarningOpen,
+    onOpen: onWarningOpen,
+    onClose: onWarningClose
   } = useDisclosure()
 
   const handlePURLInputChange = (e) => {
@@ -304,7 +317,14 @@ function ComponentDrawer(props) {
         })
           .then((res) => {
             if (res.data) {
-              window.location.reload()
+              refetch({
+                projectId: productId,
+                sbomId: sbomId,
+                first: 10,
+                field: 'NAME',
+                direction: 'ASC'
+              })
+              onClose()
             }
           })
           .finally(() => {
@@ -348,7 +368,14 @@ function ComponentDrawer(props) {
       })
         .then((res) => {
           if (res.data) {
-            window.location.reload()
+            refetch({
+              projectId: productId,
+              sbomId: sbomId,
+              first: 10,
+              field: 'NAME',
+              direction: 'ASC'
+            })
+            onClose()
           }
         })
         .finally(() => {
@@ -736,7 +763,7 @@ function ComponentDrawer(props) {
                     size='sm'
                     colorScheme='blue'
                     isChecked={isPrimary}
-                    onChange={() => setIsPrimary(!isPrimary)}
+                    onChange={onWarningOpen}
                     disabled={isInternal}
                   >
                     Primary component
@@ -793,6 +820,54 @@ function ComponentDrawer(props) {
           onUpdateCpe={handleUpdateCpe}
           selectedCpe={selectedCpe}
         />
+      )}
+
+      {/* disable */}
+      {isWarningOpen && (
+        <Modal isOpen={isWarningOpen} onClose={onWarningClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Primary Component</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Text>
+                You are about to change primary component from
+                <br />
+                <chakra.span
+                  bg={'blackAlpha.700'}
+                  fontSize={'sm'}
+                  color={'white'}
+                >
+                  {primaryComp.name}
+                </chakra.span>{' '}
+                to{' '}
+                <chakra.span
+                  bg={'blackAlpha.700'}
+                  fontSize={'sm'}
+                  color={'white'}
+                >
+                  {component}
+                </chakra.span>
+              </Text>
+              <br />
+              <Text mt={10}>Are you sure you wish to continue ?</Text>
+            </ModalBody>
+            <ModalFooter>
+              <Button mr={3} onClick={onWarningClose}>
+                No
+              </Button>
+              <Button
+                colorScheme={'red'}
+                onClick={() => {
+                  setIsPrimary(!isPrimary)
+                  onWarningClose()
+                }}
+              >
+                Yes
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       )}
     </>
   )

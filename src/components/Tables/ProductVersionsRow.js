@@ -25,8 +25,8 @@ import {
   ListItem,
   Divider
 } from '@chakra-ui/react'
-import { useState, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useRef, useContext, useEffect } from 'react'
+import { Link, useHistory } from 'react-router-dom'
 import { FaEllipsisV } from 'react-icons/fa'
 import ProductModal from 'views/Dashboard/Products/components/ProductModal'
 import UploadModal from 'views/Dashboard/Products/components/UploadModal'
@@ -34,9 +34,11 @@ import { useMutation } from '@apollo/client'
 import { DeleteProject } from 'graphQL/Mutation'
 import { timeSince } from 'utils'
 import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
-import { useEffect } from 'react'
+import GlobalContext from 'context/GlobalContext'
 
 function ProductVersionsRow(props) {
+  const history = useHistory()
+  const { setActiveProduct } = useContext(GlobalContext)
   const [projectDelete] = useMutation(DeleteProject)
 
   const {
@@ -51,6 +53,8 @@ function ProductVersionsRow(props) {
   } = props
 
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const [isActive, setIsActive] = useState(true)
+
   const {
     isOpen: isOpenProduct,
     onOpen: onOpenProduct,
@@ -65,6 +69,12 @@ function ProductVersionsRow(props) {
     isOpen: isDeleteOpen,
     onOpen: onDeleteOpen,
     onClose: onDeleteClose
+  } = useDisclosure()
+
+  const {
+    isOpen: isWarning,
+    onOpen: onWarningOpen,
+    onClose: onWarningClose
   } = useDisclosure()
 
   const btnRefProduct = useRef()
@@ -114,6 +124,10 @@ function ProductVersionsRow(props) {
     ? removeDuplicatesAndLatest(uniqVersions)
     : []
 
+  const handleChange = () => {
+    onWarningOpen()
+  }
+
   // useEffect(() => {
   // if (filteredData.length > 0) {
   //   console.log(`filteredData`, filteredData)
@@ -127,7 +141,7 @@ function ProductVersionsRow(props) {
           {isLoading ? (
             <Skeleton height='20px' my={2} />
           ) : (
-            <Switch size='md' defaultChecked />
+            <Switch size='md' isChecked={isActive} onChange={handleChange} />
           )}
         </Td>
         <Td pl={0}>
@@ -176,20 +190,42 @@ function ProductVersionsRow(props) {
               />
               <Portal>
                 <MenuList size='sm'>
-                  <MenuItem onClick={onOpen}>Edit Product</MenuItem>
-                  <Link to={`/vendor/autofix?p=${name}`}>
-                    <MenuItem>Edit Automation</MenuItem>
-                  </Link>
-                  <Link to={`/vendor/changelog?p=${name}&id=${id}`}>
-                    <MenuItem>View Change Log</MenuItem>
-                  </Link>
+                  <MenuItem onClick={onOpen} isDisabled={!isActive}>
+                    Edit Product
+                  </MenuItem>
+                  <MenuItem
+                    isDisabled={!isActive}
+                    onClick={() => {
+                      window.localStorage.setItem('activeProduct', name)
+                      history.push(`/vendor/autofix?id=${id}`)
+                    }}
+                  >
+                    Edit Automation
+                  </MenuItem>
+                  <MenuItem
+                    isDisabled={!isActive}
+                    onClick={() => {
+                      window.localStorage.setItem('activeProduct', name)
+                      history.push(`/vendor/changelog?id=${id}`)
+                    }}
+                  >
+                    View Change Log
+                  </MenuItem>
                   <Divider />
-                  <MenuItem onClick={onSbomOpen}>Build SBOM</MenuItem>
-                  <MenuItem ref={btnRefProduct} onClick={onOpenProduct}>
+                  <MenuItem onClick={onSbomOpen} isDisabled={!isActive}>
+                    Build SBOM
+                  </MenuItem>
+                  <MenuItem
+                    ref={btnRefProduct}
+                    onClick={onOpenProduct}
+                    isDisabled={!isActive}
+                  >
                     Upload SBOM
                   </MenuItem>
                   <Divider />
-                  <MenuItem color='red' onClick={onDeleteOpen}>Archive Product</MenuItem>
+                  <MenuItem color='red' onClick={onDeleteOpen}>
+                    Archive Product
+                  </MenuItem>
                 </MenuList>
               </Portal>
             </Menu>
@@ -239,26 +275,75 @@ function ProductVersionsRow(props) {
                 <ModalBody>
                   <Text>Archiving this product will: </Text>
                   <UnorderedList>
-                  <Flex flexDir={'column'} gap={1} mt={4}>
-                    {[
-                      'remove this product, its versions and SBOMs',
-                      "remove access to the product for all users",
-                      "disable uploads of SBOMs to this product"
-                    ].map((item, index) => (
-                      <ListItem>{item}</ListItem>
-                    ))}
-                  </Flex>
+                    <Flex flexDir={'column'} gap={1} mt={4}>
+                      {[
+                        'remove this product, its versions and SBOMs',
+                        'remove access to the product for all users',
+                        'disable uploads of SBOMs to this product'
+                      ].map((item, index) => (
+                        <ListItem>{item}</ListItem>
+                      ))}
+                    </Flex>
                   </UnorderedList>
                   <br />
-                  <Text mt={10}>
-                    Are you sure you wish to continue?
-                  </Text>
+                  <Text mt={10}>Are you sure you wish to continue?</Text>
                 </ModalBody>
                 <ModalFooter>
                   <Button mr={3} onClick={onDeleteClose}>
                     No
                   </Button>
                   <Button colorScheme='red' onClick={onProductDelete}>
+                    Yes
+                  </Button>
+                </ModalFooter>
+              </ModalContent>
+            </Modal>
+          )}
+
+          {/* disable */}
+          {isWarning && (
+            <Modal isOpen={isWarning} onClose={onWarningClose}>
+              <ModalOverlay />
+              <ModalContent>
+                <ModalHeader>
+                  {isActive ? 'Disable' : 'Enable'} Product
+                </ModalHeader>
+                <ModalCloseButton />
+                <ModalBody>
+                  <Text>
+                    {isActive ? 'Disable' : 'Enable'} this product will:{' '}
+                  </Text>
+                  <UnorderedList>
+                    <Flex flexDir={'column'} gap={1} mt={4}>
+                      {[
+                        `${
+                          isActive ? 'Disable' : 'Enable'
+                        } this product, its versions and SBOMs`,
+                        `${
+                          isActive ? 'Disable' : 'Enable'
+                        } access to the product for all users`,
+                        `${
+                          isActive ? 'Disable' : 'Enable'
+                        } uploads of SBOMs to this product`
+                      ].map((item, index) => (
+                        <ListItem>{item}</ListItem>
+                      ))}
+                    </Flex>
+                  </UnorderedList>
+                  <br />
+                  <Text mt={10}>Are you sure you wish to continue?</Text>
+                </ModalBody>
+                <ModalFooter>
+                  <Button mr={3} onClick={onWarningClose}>
+                    No
+                  </Button>
+                  <Button
+                    colorScheme={isActive ? 'red' : 'green'}
+                    onClick={() => {
+                      setIsActive(!isActive)
+                      onWarningClose()
+                    }}
+                  >
                     Yes
                   </Button>
                 </ModalFooter>

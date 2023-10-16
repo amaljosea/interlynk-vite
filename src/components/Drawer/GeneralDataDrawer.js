@@ -12,7 +12,6 @@ import {
   Button,
   Flex,
   Text,
-  FormControl,
   Thead,
   Tr,
   Th,
@@ -21,17 +20,16 @@ import {
   Table,
   Icon,
   Select,
-  useToast
+  useToast,
+  FormControl,
+  FormErrorMessage
 } from '@chakra-ui/react'
 import { toolDelete } from 'graphQL/Mutation'
-import { authorUpdate } from 'graphQL/Mutation'
 import { supplierCreate } from 'graphQL/Mutation'
 import { supplierDelete } from 'graphQL/Mutation'
 import { recheckHealth } from 'graphQL/Mutation'
-import { supplierUpdate } from 'graphQL/Mutation'
 import { authorDelete } from 'graphQL/Mutation'
 import { authorCreate } from 'graphQL/Mutation'
-import { toolUpdate } from 'graphQL/Mutation'
 import { toolCreate } from 'graphQL/Mutation'
 import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
@@ -69,7 +67,9 @@ const GeneralDataDrawer = ({
   const [licenseName, setLicenseName] = useState('')
   const [selectedLicense, setSelectedLicense] = useState('')
 
+  const [existingTools, setExistingTools] = useState([])
   const [creationTools, setCreationTools] = useState([])
+  const [existingAuthors, setExistingAuthors] = useState([])
   const [authorList, setAuthorList] = useState([])
   const [supplierList, setSupplierList] = useState([])
   const [licenseList, setLicenseList] = useState([])
@@ -78,7 +78,6 @@ const GeneralDataDrawer = ({
   const [deleteTool] = useMutation(toolDelete)
 
   const [createAuthor] = useMutation(authorCreate)
-  const [deleteAuthor] = useMutation(authorDelete)
 
   const [createSupplier] = useMutation(supplierCreate)
   const [deleteSupplier] = useMutation(supplierDelete)
@@ -93,25 +92,26 @@ const GeneralDataDrawer = ({
       }
     }).then(() =>
       refetch({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          first: 10,
-          last: undefined,
-          field: 'STATUS',
-          direction: 'ASC'
-        }
+        projectId: productId,
+        sbomId: sbomId,
+        first: 10,
+        last: undefined,
+        field: 'STATUS',
+        direction: 'ASC'
       })
     )
   }
 
   useEffect(() => {
     if (data) {
-      setCreationTools(data.tools)
+      setExistingTools(data.tools)
       setSupplierList(data.suppliers)
-      setAuthorList(data.authors)
+      setExistingAuthors(data.authors)
     }
   }, [data])
+
+  // console.log('existingAuthors', existingAuthors)
+  console.log('authorList', authorList)
 
   useEffect(() => {
     if (data) {
@@ -132,46 +132,16 @@ const GeneralDataDrawer = ({
 
   const handleAuthorAdd = async (e) => {
     e.preventDefault()
-    if (validateEmail(authorEmail) === true) {
-      await createAuthor({
-        variables: {
-          name: authorName,
-          email: authorEmail,
-          sbomId: sbomId
-        }
-      }).then((res) => {
-        if (res) {
-          console.log(`res`, res.data.authorCreate.author)
-          setAuthorList((prev) => [res.data.authorCreate.author, ...prev])
-          setAuthorName('')
-          setAuthorEmail('')
-        }
-      })
-    } else {
-      toast({
-        description: 'Invalid email',
-        status: 'error',
-        position: 'top-right',
-        duration: 2000
-      })
-    }
-  }
-
-  const handleAuthorRemove = async (id) => {
-    try {
-      await deleteAuthor({
-        variables: {
-          authorId: id,
-          sbomId: sbomId
-        }
-      }).then(() => {
-        const updatedList = authorList.filter((item) => item.id !== id)
-        console.log(`updatedList`, updatedList)
-        setAuthorList(updatedList)
-      })
-    } catch (error) {
-      console.log(`Mutation error`, error)
-    }
+    setAuthorList((prev) => [
+      {
+        name: authorName,
+        email: authorEmail,
+        updatedAt: new Date().toISOString()
+      },
+      ...prev
+    ])
+    setAuthorName('')
+    setAuthorEmail('')
   }
 
   const handleSupAdd = async (e) => {
@@ -219,44 +189,17 @@ const GeneralDataDrawer = ({
     }
   }
 
-  // console.log(`supplierList`, supplierList)
-
   const handleToolAdd = async () => {
-    if (toolName && toolVersion) {
-      await createTool({
-        variables: {
-          name: toolName,
-          version: toolVersion,
-          sbomID: sbomId
-        }
-      })
-        .then((res) => {
-          if (res) {
-            setCreationTools((prev) => [res.data.toolCreate.tool, ...prev])
-            setToolName('')
-            setToolVersion('')
-          }
-        })
-        .catch((error) => console.log(error))
-    } else {
-      alert(`Tool Name and Tool Version are required`)
-    }
-  }
-
-  const handleToolRemove = async (id) => {
-    try {
-      await deleteTool({
-        variables: {
-          toolID: id,
-          sbomID: sbomId
-        }
-      }).then((res) => {
-        const updatedList = creationTools.filter((item) => item.id !== id)
-        setCreationTools(updatedList)
-      })
-    } catch (error) {
-      console.log(`Mutation error`, error)
-    }
+    setCreationTools((prev) => [
+      {
+        name: toolName,
+        version: toolVersion,
+        updatedAt: new Date().toISOString()
+      },
+      ...prev
+    ])
+    setToolName('')
+    setToolVersion('')
   }
 
   const onLicenselAdd = () => {
@@ -290,12 +233,50 @@ const GeneralDataDrawer = ({
   const handleSave = () => {
     if (checkId) {
       handleReCheck()
-    } else {
-      refetch({
-        productId: productId,
-        sbomId: sbomId
+    }
+
+    if (creationTools.length > 0) {
+      creationTools.map((item) => {
+        createTool({
+          variables: {
+            name: item.name,
+            version: item.version,
+            sbomID: sbomId
+          }
+        })
+          .then((res) => {
+            if (res) {
+              refetch({
+                productId: productId,
+                sbomId: sbomId
+              })
+            }
+          })
+          .catch((error) => console.log(error))
       })
     }
+
+    if (authorList.length > 0) {
+      authorList.map((item) => {
+        createAuthor({
+          variables: {
+            name: item.name,
+            email: item.email,
+            sbomId: sbomId
+          }
+        })
+          .then((res) => {
+            if (res) {
+              refetch({
+                productId: productId,
+                sbomId: sbomId
+              })
+            }
+          })
+          .catch((error) => console.log(error))
+      })
+    }
+
     onClose()
   }
 
@@ -321,6 +302,7 @@ const GeneralDataDrawer = ({
         placement='right'
         onClose={onClose}
         finalFocusRef={btnRef}
+        closeOnOverlayClick={false}
         size='md'
       >
         <DrawerOverlay />
@@ -330,19 +312,25 @@ const GeneralDataDrawer = ({
           <DrawerBody>
             {selectedKey === 'tools' && (
               <Flex direction={'column'} alignItems={'flex-start'} gap={3}>
-                <Input
-                  placeholder='Tool Name*'
-                  value={toolName}
-                  onChange={(e) => setToolName(e.target.value)}
-                />
-
-                <Input
-                  placeholder='Tool Version*'
-                  value={toolVersion}
-                  onChange={(e) => setToolVersion(e.target.value)}
-                />
-
-                <Button colorScheme='blue' onClick={handleToolAdd}>
+                <FormControl>
+                  <Input
+                    placeholder='Tool Name*'
+                    value={toolName}
+                    onChange={(e) => setToolName(e.target.value)}
+                  />
+                </FormControl>
+                <FormControl>
+                  <Input
+                    placeholder='Tool Version*'
+                    value={toolVersion}
+                    onChange={(e) => setToolVersion(e.target.value)}
+                  />
+                </FormControl>
+                <Button
+                  colorScheme='blue'
+                  onClick={handleToolAdd}
+                  disabled={!toolName || !toolVersion}
+                >
                   Add
                 </Button>
 
@@ -350,41 +338,51 @@ const GeneralDataDrawer = ({
                   <Text size='md' my={2}>
                     Existing Tools
                   </Text>
-                  {creationTools.length > 0 ? (
+
+                  {(creationTools.length > 0 || existingTools.length > 0) && (
                     <Table variant='simple' size='sm' mt={4}>
                       <Thead>
                         <Tr my='.8rem'>
                           <Th pl={0}>Name</Th>
                           <Th pl={0}>Version</Th>
                           <Th pl={0}>Updated At</Th>
-                          <Th pl={0}></Th>
                         </Tr>
                       </Thead>
                       <Tbody>
-                        {creationTools.map((item, index) => (
-                          <Tr key={index}>
-                            <Td pl={0} fontSize={'xs'}>
-                              {item.name}
-                            </Td>
-                            <Td pl={0} fontSize={'xs'}>
-                              {item.version}
-                            </Td>
-                            <Td pl={0} fontSize={'xs'}>
-                              {timeSince(item.updatedAt)}
-                            </Td>
-                            <Td>
-                              <Icon
-                                as={DeleteIcon}
-                                color={'red'}
-                                cursor={'pointer'}
-                                onClick={() => handleToolRemove(item.id)}
-                              />
-                            </Td>
-                          </Tr>
-                        ))}
+                        {existingTools.length > 0 &&
+                          existingTools.map((item, index) => (
+                            <Tr key={index}>
+                              <Td pl={0} fontSize={'xs'}>
+                                {item.name}
+                              </Td>
+                              <Td pl={0} fontSize={'xs'}>
+                                {item.version}
+                              </Td>
+                              <Td pl={0} fontSize={'xs'}>
+                                {timeSince(item.updatedAt)}
+                              </Td>
+                            </Tr>
+                          ))}
+
+                        {creationTools.length > 0 &&
+                          creationTools.map((item, index) => (
+                            <Tr key={index}>
+                              <Td pl={0} fontSize={'xs'}>
+                                {item.name}
+                              </Td>
+                              <Td pl={0} fontSize={'xs'}>
+                                {item.version}
+                              </Td>
+                              <Td pl={0} fontSize={'xs'}>
+                                {timeSince(item.updatedAt)}
+                              </Td>
+                            </Tr>
+                          ))}
                       </Tbody>
                     </Table>
-                  ) : (
+                  )}
+
+                  {existingTools.length === 0 && creationTools.length === 0 && (
                     <Text mt={4} color={'darkgrey'}>
                       No creation tool specified
                     </Text>
@@ -405,16 +403,30 @@ const GeneralDataDrawer = ({
                     />
                   </FormControl>
 
-                  <FormControl isRequired>
+                  <FormControl
+                    isInvalid={
+                      !validateEmail(authorEmail) && authorEmail !== ''
+                    }
+                  >
                     <Input
                       type='email'
                       placeholder='Author Email*'
                       value={authorEmail}
                       onChange={(e) => setAuthorEmail(e.target.value)}
                     />
+
+                    {authorEmail !== '' && !validateEmail(authorEmail) && (
+                      <FormErrorMessage>Email is invalid</FormErrorMessage>
+                    )}
                   </FormControl>
 
-                  <Button colorScheme='blue' type='submit'>
+                  <Button
+                    colorScheme='blue'
+                    type='submit'
+                    disabled={
+                      !authorName || !authorEmail || !validateEmail(authorEmail)
+                    }
+                  >
                     Add
                   </Button>
 
@@ -422,45 +434,52 @@ const GeneralDataDrawer = ({
                     <Text size='md' my={2}>
                       Author History
                     </Text>
-                    {authorList.length > 0 ? (
+                    {(existingAuthors.length > 0 || authorList.length > 0) && (
                       <Table variant='simple' size='sm' mt={4}>
                         <Thead>
                           <Tr my='.8rem'>
                             <Th pl={0}>Name</Th>
-                            <Th pl={0}>Email</Th>
-                            <Th pl={0}>Updated At</Th>
-                            <Th pl={0}></Th>
+                            <Th pl={0} width={'120px'}>
+                              Updated At
+                            </Th>
                           </Tr>
                         </Thead>
                         <Tbody>
-                          {authorList.map((item, index) => (
-                            <Tr key={index}>
-                              <Td pl={0} fontSize={'xs'}>
-                                {item.name}
-                              </Td>
-                              <Td pl={0} fontSize={'xs'}>
-                                {item.email}
-                              </Td>
-                              <Td pl={0} fontSize={'xs'}>
-                                {timeSince(item.updatedAt)}
-                              </Td>
-                              <Td>
-                                <Icon
-                                  as={DeleteIcon}
-                                  color={'red'}
-                                  cursor={'pointer'}
-                                  onClick={() => handleAuthorRemove(item.id)}
-                                />
-                              </Td>
-                            </Tr>
-                          ))}
+                          {existingAuthors.length > 0 &&
+                            existingAuthors.map((item, index) => (
+                              <Tr key={index}>
+                                <Td pl={0} fontSize={'xs'}>
+                                  {item.name} - {item.email}
+                                </Td>
+                                <Td pl={0} fontSize={'xs'}>
+                                  {timeSince(item.updatedAt)}
+                                </Td>
+                              </Tr>
+                            ))}
+
+                          {authorList.length > 0 &&
+                            authorList.map((item, index) => (
+                              <Tr key={index}>
+                                <Td pl={0} fontSize={'xs'}>
+                                  {item.name}
+                                  <br />
+                                  {item.email}
+                                </Td>
+                                <Td pl={0} fontSize={'xs'}>
+                                  {timeSince(item.updatedAt)}
+                                </Td>
+                              </Tr>
+                            ))}
                         </Tbody>
                       </Table>
-                    ) : (
-                      <Text mt={4} color={'darkgrey'}>
-                        No author found
-                      </Text>
                     )}
+
+                    {existingAuthors.length === 0 &&
+                      authorList.length === 0 && (
+                        <Text mt={4} color={'darkgrey'}>
+                          No author found
+                        </Text>
+                      )}
                   </Flex>
                 </Flex>
               </form>
@@ -608,7 +627,7 @@ const GeneralDataDrawer = ({
           </DrawerBody>
 
           <DrawerFooter>
-            <Button variant='outline' mr={3} onClick={onClose}>
+            <Button mr={3} onClick={onClose}>
               Cancel
             </Button>
             <Button colorScheme='blue' onClick={handleSave}>

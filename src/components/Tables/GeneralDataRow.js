@@ -24,6 +24,8 @@ import {
 import CardBody from 'components/Card/CardBody'
 import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
 import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
+import { authorDelete } from 'graphQL/Mutation'
+import { toolDelete } from 'graphQL/Mutation'
 import { supplierDelete } from 'graphQL/Mutation'
 import { useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
@@ -65,6 +67,8 @@ const GeneralDataRow = ({ status, type, data, refetch }) => {
   const [filteredLicense, setFilteredLicense] = useState([])
 
   const [deleteSupplier] = useMutation(supplierDelete)
+  const [deleteTool] = useMutation(toolDelete)
+  const [deleteAuthor] = useMutation(authorDelete)
 
   useEffect(() => {
     if (data.licenses !== null && data.licenses.length > 0) {
@@ -82,6 +86,46 @@ const GeneralDataRow = ({ status, type, data, refetch }) => {
       await deleteSupplier({
         variables: {
           id: id
+        }
+      }).then((res) => {
+        if (res) {
+          refetch({
+            productId: productId,
+            sbomId: sbomId
+          })
+        }
+      })
+    } catch (error) {
+      console.log(`Mutation error`, error)
+    }
+  }
+
+  const handleToolRemove = async (id) => {
+    try {
+      await deleteTool({
+        variables: {
+          toolID: id,
+          sbomID: sbomId
+        }
+      }).then((res) => {
+        if (res) {
+          refetch({
+            productId: productId,
+            sbomId: sbomId
+          })
+        }
+      })
+    } catch (error) {
+      console.log(`Mutation error`, error)
+    }
+  }
+
+  const handleAuthorRemove = async (id) => {
+    try {
+      await deleteAuthor({
+        variables: {
+          authorId: id,
+          sbomId: sbomId
         }
       }).then((res) => {
         if (res) {
@@ -164,6 +208,9 @@ const GeneralDataRow = ({ status, type, data, refetch }) => {
                         <TagLabel>
                           {item.name} - {item.version}
                         </TagLabel>
+                        <TagCloseButton
+                          onClick={() => handleToolRemove(item.id)}
+                        />
                       </Tag>
                     ))}
                 </Flex>
@@ -189,7 +236,7 @@ const GeneralDataRow = ({ status, type, data, refetch }) => {
               <Td pl={0}></Td>
             </Tr>
             {/* UPDATED AT */}
-{/*             <Tr>
+            {/*             <Tr>
               <Td pl={0} fontWeight={'medium'}>
                 Updated At
               </Td>
@@ -221,6 +268,9 @@ const GeneralDataRow = ({ status, type, data, refetch }) => {
                         <TagLabel>
                           {item.name} - {item.email}
                         </TagLabel>
+                        <TagCloseButton
+                          onClick={() => handleAuthorRemove(item.id)}
+                        />
                       </Tag>
                     ))}
                 </Stack>

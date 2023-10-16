@@ -480,7 +480,7 @@ function SBOM() {
                               colorScheme='blue'
                             />
                           </Tooltip>
-{/*
+                          {/*
                           <Tooltip label='Copy'>
                             <IconButton
                               icon={<FaCopy />}
@@ -589,22 +589,20 @@ function SBOM() {
               <ModalHeader>Delete Version</ModalHeader>
               <ModalCloseButton />
               <ModalBody>
-                  <Text>Deleting this version will: </Text>
-                  <UnorderedList>
+                <Text>Deleting this version will: </Text>
+                <UnorderedList>
                   <Flex flexDir={'column'} gap={1} mt={4}>
                     {[
                       'remove this versions and its SBOM',
-                      "remove access to this version for all users",
+                      'remove access to this version for all users'
                     ].map((item, index) => (
-                      <ListItem>{item}</ListItem>
+                      <ListItem key={index}>{item}</ListItem>
                     ))}
                   </Flex>
-                  </UnorderedList>
-                  <br />
-                  <Text mt={10}>
-                    Are you sure you wish to continue?
-                  </Text>
-                </ModalBody>
+                </UnorderedList>
+                <br />
+                <Text mt={10}>Are you sure you wish to continue?</Text>
+              </ModalBody>
               <ModalFooter>
                 <Flex
                   width={'100%'}

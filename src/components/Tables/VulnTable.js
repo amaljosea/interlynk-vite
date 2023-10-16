@@ -129,7 +129,7 @@ const FilterComponent = ({ filterText, onFilter, onClear }) => {
 
 const VulnTable = ({
   data,
-  getVulns,
+  refetch,
   productId,
   sbomId,
   pageIndex,
@@ -551,33 +551,29 @@ const VulnTable = ({
 
   const onPreviousPage = () => {
     setPageIndex((prev) => pageIndex !== 0 && prev - 1)
-    getVulns({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        first: undefined,
-        last: 10,
-        before: data.pageInfo.startCursor,
-        after: '',
-        field: 'UPDATED_AT',
-        direction: 'ASC'
-      }
+    refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      first: undefined,
+      last: 10,
+      before: data.pageInfo.startCursor,
+      after: '',
+      field: 'UPDATED_AT',
+      direction: 'ASC'
     })
   }
 
   const onNextPage = () => {
     setPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
-    getVulns({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        first: 10,
-        last: undefined,
-        after: data.pageInfo.endCursor,
-        before: '',
-        field: 'UPDATED_AT',
-        direction: 'ASC'
-      }
+    refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      first: 10,
+      last: undefined,
+      after: data.pageInfo.endCursor,
+      before: '',
+      field: 'UPDATED_AT',
+      direction: 'ASC'
     })
   }
 
