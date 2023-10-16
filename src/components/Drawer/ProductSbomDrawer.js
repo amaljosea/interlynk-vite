@@ -285,6 +285,8 @@ function ProductSbomDrawer(props) {
     }
   }
 
+  console.log('imgIds', imgIds)
+
   const handleUpdateSBOM = async () => {
     try {
       await updateSbom({
@@ -442,7 +444,6 @@ function ProductSbomDrawer(props) {
                   size='sm'
                   value={compType}
                   onChange={(e) => setCompType(e.target.value)}
-                  pointerEvents={sbomData ? 'none' : 'auto'}
                 >
                   <option value=''>-- Select --</option>
                   <option value='application'>Application</option>

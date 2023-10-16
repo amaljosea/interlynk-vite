@@ -87,34 +87,19 @@ const GeneralFeed = ({ orgInfo, refetch, getOrgInfo }) => {
               value={orgName}
               onChange={(e) => setOrgName(e.target.value)}
             />
-            <FormErrorMessage>An organization name is required.</FormErrorMessage>
+            <FormErrorMessage>
+              An organization name is required.
+            </FormErrorMessage>
             <Button
               mt={3}
               variant='solid'
               colorScheme={'blue'}
               onClick={handleUpdate}
-              disabled={message === 'Saving....'}
+              disabled={message === 'Saving....' || !orgName}
             >
               {message}
             </Button>
           </FormControl>
-          {/* ID */}
-{/*           <FormControl>
-            <FormLabel>Interlynk ID</FormLabel>
-            <Input
-              value={orgId}
-              onChange={(e) => setOrgId(e.target.value)}
-              readOnly
-            />
-            <Button
-              mt={3}
-              variant='solid'
-              colorScheme={'blue'}
-              onClick={() => id.onCopy()}
-            >
-              {id.hasCopied ? 'Copied!' : 'Copy'}
-            </Button>
-          </FormControl> */}
         </Flex>
       </CardBody>
     </Card>

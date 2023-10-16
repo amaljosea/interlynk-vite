@@ -13,7 +13,8 @@ import {
   FormLabel,
   Input,
   useToast,
-  chakra
+  chakra,
+  FormErrorMessage
 } from '@chakra-ui/react'
 import { updateComSupplier } from 'graphQL/Mutation'
 import { recheckHealth } from 'graphQL/Mutation'
@@ -64,14 +65,12 @@ const SupplierModal = ({
       }
     }).then(() =>
       refetch({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          first: 10,
-          last: undefined,
-          field: 'STATUS',
-          direction: 'ASC'
-        }
+        projectId: productId,
+        sbomId: sbomId,
+        first: 10,
+        last: undefined,
+        field: 'STATUS',
+        direction: 'ASC'
       })
     )
   }
@@ -90,7 +89,13 @@ const SupplierModal = ({
           if (checkId) {
             handleReCheck()
           } else {
-            window.location.reload()
+            refetch({
+              projectId: productId,
+              sbomId: sbomId,
+              first: 10,
+              field: 'NAME',
+              direction: 'ASC'
+            })
           }
         })
         .finally(() => onClose())
@@ -134,7 +139,9 @@ const SupplierModal = ({
         <ModalOverlay />
         <form onSubmit={suppliers.length > 0 ? handleUpdate : handleSave}>
           <ModalContent>
-            <ModalHeader>Add Supplier</ModalHeader>
+            <ModalHeader>
+              {suppliers.length > 0 ? 'Edit' : 'Add'} Supplier
+            </ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               <Flex width={'100%'} direction={'column'} gap={4}>
@@ -146,13 +153,19 @@ const SupplierModal = ({
                     onChange={(e) => setSupName(e.target.value)}
                   />
                 </FormControl>
-                <FormControl isRequired>
+                <FormControl
+                  isRequired
+                  isInvalid={!validateEmail(supEmail) && supEmail !== ''}
+                >
                   <FormLabel fontSize={'sm'}>Email</FormLabel>
                   <Input
                     placeholder='Enter supplier email'
                     value={supEmail}
                     onChange={(e) => setSupEmail(e.target.value)}
                   />
+                  {supEmail !== '' && !validateEmail(supEmail) && (
+                    <FormErrorMessage>Email is invalid</FormErrorMessage>
+                  )}
                 </FormControl>
               </Flex>
             </ModalBody>
@@ -161,11 +174,19 @@ const SupplierModal = ({
                 Cancel
               </Button>
               {suppliers.length > 0 ? (
-                <Button colorScheme='blue' type={'submit'}>
+                <Button
+                  colorScheme='blue'
+                  type={'submit'}
+                  disabled={!supName || !supEmail || !validateEmail(supEmail)}
+                >
                   Update
                 </Button>
               ) : (
-                <Button colorScheme='blue' type={'submit'}>
+                <Button
+                  colorScheme='blue'
+                  type={'submit'}
+                  disabled={!supName || !supEmail || !validateEmail(supEmail)}
+                >
                   Save
                 </Button>
               )}

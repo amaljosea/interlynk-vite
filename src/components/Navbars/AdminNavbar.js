@@ -33,6 +33,8 @@ export default function AdminNavbar(props) {
 
   const productName = localStorage.getItem(`product`)
 
+  const activeProd = localStorage.getItem('activeProduct')
+
   // Here are all the props that may change depending on navbar's type or state.(secondary, variant, scrolled)
   let mainText = useColorModeValue('gray.700', 'gray.200')
   let secondaryText = useColorModeValue('gray.400', 'gray.200')
@@ -153,8 +155,8 @@ export default function AdminNavbar(props) {
         >
           <Breadcrumb>
             <BreadcrumbItem color={mainText}>
-              <BreadcrumbLink
-                href={
+              <Link
+                to={
                   !location.pathname.startsWith('/customer')
                     ? '/vendor/dashboard'
                     : '/customer/images'
@@ -162,14 +164,14 @@ export default function AdminNavbar(props) {
                 color={secondaryText}
               >
                 Interlynk
-              </BreadcrumbLink>
+              </Link>
             </BreadcrumbItem>
 
             {(location.pathname.startsWith('/vendor/autofix') ||
               location.pathname.startsWith('/vendor/changelog')) && (
               <BreadcrumbItem color={mainText}>
                 <Link to={'/vendor/products'} color={secondaryText}>
-                  {product}
+                  {activeProd}
                 </Link>
               </BreadcrumbItem>
             )}

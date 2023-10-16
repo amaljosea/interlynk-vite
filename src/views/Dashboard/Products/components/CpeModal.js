@@ -63,14 +63,12 @@ const CpeModal = ({
       }
     }).then(() =>
       refetch({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          first: 10,
-          last: undefined,
-          field: 'STATUS',
-          direction: 'ASC'
-        }
+        projectId: productId,
+        sbomId: sbomId,
+        first: 10,
+        last: undefined,
+        field: 'STATUS',
+        direction: 'ASC'
       })
     )
   }

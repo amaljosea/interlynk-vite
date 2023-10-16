@@ -6,7 +6,8 @@ import {
   Flex,
   Input,
   Button,
-  useToast
+  useToast,
+  FormErrorMessage
 } from '@chakra-ui/react'
 import { useColorModeValue } from '@chakra-ui/system'
 import Card from 'components/Card/Card'
@@ -36,36 +37,27 @@ const PersonalInfo = ({ user, refetch }) => {
   const [updateUser] = useMutation(updateOrgUser)
 
   const handleUpdate = async () => {
-    if (name !== '' && validateEmail(email)) {
-      try {
-        await updateUser({
-          variables: {
-            id: user.id,
-            name: name,
-            email: email
+    try {
+      await updateUser({
+        variables: {
+          id: user.id,
+          name: name,
+          email: email
+        }
+      })
+        .then((res) => {
+          if (res) {
+            setMessage('Saving....')
+            setTimeout(() => {
+              setMessage('Update')
+            }, 2000)
           }
         })
-          .then((res) => {
-            if (res) {
-              setMessage('Saving....')
-              setTimeout(() => {
-                setMessage('Update')
-              }, 2000)
-            }
-          })
-          .finally(() => {
-            refetch()
-          })
-      } catch (error) {
-        console.log(`Error`, error)
-      }
-    } else {
-      toast({
-        description: 'Invalid email',
-        status: 'error',
-        position: 'top',
-        duration: 2000
-      })
+        .finally(() => {
+          refetch()
+        })
+    } catch (error) {
+      console.log(`Error`, error)
     }
   }
 
@@ -84,21 +76,31 @@ const PersonalInfo = ({ user, refetch }) => {
           gap={6}
         >
           {/* NAME */}
-          <FormControl>
+          <FormControl isInvalid={!name}>
             <FormLabel>Name</FormLabel>
             <Input value={name} onChange={(e) => setName(e.target.value)} />
+            <FormErrorMessage>Name is required</FormErrorMessage>
           </FormControl>
           {/* EMAIL */}
-          <FormControl>
+          <FormControl isInvalid={!validateEmail(email)}>
             <FormLabel>Email</FormLabel>
             <Input value={email} onChange={(e) => setEmail(e.target.value)} />
+            {email === '' ? (
+              <FormErrorMessage>Email is required</FormErrorMessage>
+            ) : (
+              !validateEmail(email) && (
+                <FormErrorMessage>Email is invalid</FormErrorMessage>
+              )
+            )}
           </FormControl>
           {/* ACTION */}
           <Button
             variant='solid'
             colorScheme='blue'
             onClick={handleUpdate}
-            disabled={message === 'Saving....'}
+            disabled={
+              message === 'Saving....' || !name || !validateEmail(email)
+            }
           >
             {message}
           </Button>

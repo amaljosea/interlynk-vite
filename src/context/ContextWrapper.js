@@ -13,7 +13,6 @@ const ContextWrapper = (props) => {
   const [riskScoreVal, setRiskScoreVal] = useState('')
   const [isAuthenticate, setIsAuthenticate] = useState(false)
   const [scanEnabled, setScanEnabled] = useState(false)
-
   const [healthCheckData, setHealthCheckData] = useState(healthChecks)
 
   const [changelogData, setChangelogData] = useState(changeLogs)

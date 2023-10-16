@@ -25,7 +25,8 @@ import {
   Button,
   Input,
   Badge,
-  Divider
+  Divider,
+  chakra
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
@@ -106,9 +107,11 @@ const ComponentTable = ({
   type,
   lifecycle,
   data,
-  getComponents,
+  error,
+  refetch,
   pageIndex,
-  setPageIndex
+  setPageIndex,
+  primaryComp
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -349,7 +352,7 @@ const ComponentTable = ({
 
         return (
           <Flex alignItems={'center'} gap={2} flexWrap={'wrap'}>
-            {licenses &&
+            {licenses !== null &&
               licenses.map((item, index) => (
                 <Tooltip
                   key={index}
@@ -418,7 +421,7 @@ const ComponentTable = ({
                       }}
                       isDisabled={status === 'signed'}
                     >
-                      {suppliers.length > 0 ? 'Edit' : 'Edit'} Supplier
+                      {suppliers.length > 0 ? 'Edit' : 'Add'} Supplier
                     </MenuItem>
                     <MenuItem
                       onClick={() => {
@@ -679,64 +682,84 @@ const ComponentTable = ({
   const handleSort = (column, sortDirection) => {
     console.log(`column`, column)
     console.log(`sortDirection`, sortDirection)
-    getComponents({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        field: column.name,
-        direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
-      }
+    refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      first: 10,
+      field: column.name,
+      direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
     })
   }
 
   const handlePreviousPage = () => {
     setPageIndex((prev) => pageIndex !== 0 && prev - 1)
-    getComponents({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        last: 10,
-        before: data.pageInfo.startCursor,
-        field: 'NAME',
-        direction: 'ASC'
-      }
+    refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      first: undefined,
+      last: 10,
+      after: '',
+      before: data.pageInfo.startCursor,
+      field: 'NAME',
+      direction: 'ASC'
     })
   }
 
   const handleNextPage = () => {
     setPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
-    getComponents({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        first: 10,
-        after: data.pageInfo.endCursor,
-        field: 'NAME',
-        direction: 'ASC'
-      }
-    }).then((res) => {
-      if (res.error) {
-        alert(res.error)
-      }
+    refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      first: 10,
+      last: undefined,
+      before: '',
+      after: data.pageInfo.endCursor,
+      field: 'NAME',
+      direction: 'ASC'
     })
   }
 
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
-          columns={columns}
-          data={filteredItems}
-          onSort={handleSort}
-          customStyles={customStyles}
-          defaultSortAsc
-          defaultSortFieldId={'name'}
-          subHeader
-          subHeaderComponent={subHeaderComponentMemo}
-          expandableRows
-          expandableRowsComponent={ExpandedComponent}
-          responsive={true}
-        />
+        {!error ? (
+          <DataTable
+            columns={columns}
+            data={filteredItems}
+            onSort={handleSort}
+            customStyles={customStyles}
+            defaultSortAsc
+            defaultSortFieldId={'name'}
+            subHeader
+            subHeaderComponent={subHeaderComponentMemo}
+            expandableRows
+            expandableRowsComponent={ExpandedComponent}
+            responsive={true}
+          />
+        ) : (
+          <Flex
+            py={10}
+            flexDirection={'column'}
+            gap={2}
+            width={'100%'}
+            alignItems={'center'}
+            justifyContent={'center'}
+          >
+            <Text color={'red.500'} textAlign={'center'}>
+              {error.message}
+            </Text>
+            <Text>Something went wrong. Please refresh this page</Text>
+            <Button
+              mt={2}
+              variant='solid'
+              colorScheme='blue'
+              fontWeight={'normal'}
+              onClick={() => window.location.reload()}
+            >
+              Refresh
+            </Button>
+          </Flex>
+        )}
       </Flex>
 
       {/* PAGINATION */}
@@ -750,14 +773,14 @@ const ComponentTable = ({
         <Button
           colorScheme='blue'
           onClick={handlePreviousPage}
-          isDisabled={!data.pageInfo.hasPreviousPage}
+          isDisabled={!data.pageInfo.hasPreviousPage || error}
         >
           Previous
         </Button>
         <Button
           colorScheme='blue'
           onClick={handleNextPage}
-          isDisabled={!data.pageInfo.hasNextPage}
+          isDisabled={!data.pageInfo.hasNextPage || error}
         >
           Next
         </Button>
@@ -779,14 +802,14 @@ const ComponentTable = ({
               version={activeRow.version}
               license={activeRow.licenses !== null ? activeRow.licenses : []}
               type={activeRow.kind}
-              refetch={getComponents}
+              refetch={refetch}
               cpes={activeRow.cpes}
               purl={activeRow.purl}
               primary={activeRow.primary}
               internal={activeRow.internal}
-              suppliers={activeRow.suppliers}
               shortDesc={null}
               group={activeRow.group}
+              primaryComp={primaryComp}
             />
           )}
 
@@ -795,14 +818,14 @@ const ComponentTable = ({
               isOpen={isDelOpen}
               onClose={onDelClose}
               id={activeRow.id}
-              refetch={getComponents}
+              refetch={refetch}
             />
           )}
 
           {isSupOpen && (
             <SupplierModal
               id={activeRow.id}
-              refetch={getComponents}
+              refetch={refetch}
               isOpen={isSupOpen}
               onClose={onSupClose}
               suppliers={activeRow.suppliers}
@@ -835,8 +858,7 @@ const ComponentTable = ({
           purl={''}
           primary={false}
           internal={false}
-          refetch={getComponents}
-          suppliers={null}
+          refetch={refetch}
           shortDesc={null}
         />
       )}

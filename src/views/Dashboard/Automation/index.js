@@ -1,4 +1,4 @@
-import { AddIcon, DeleteIcon, SearchIcon } from '@chakra-ui/icons'
+import { AddIcon, DeleteIcon } from '@chakra-ui/icons'
 import {
   Flex,
   Text,
@@ -10,7 +10,6 @@ import {
   Th,
   Td,
   IconButton,
-  Button,
   Input,
   Switch,
   Select,
@@ -23,10 +22,18 @@ import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
 import GlobalContext from 'context/GlobalContext'
-import React, { useState } from 'react'
-import { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
+import { useLocation, useHistory } from 'react-router-dom'
+
+const idRegex =
+  /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
 
 const Automation = () => {
+  const location = useLocation()
+  const history = useHistory()
+  const queryParams = new URLSearchParams(location.search)
+  const productId = queryParams.get('id')
+
   const captions = [
     'Active',
     'Rule Applies To',
@@ -35,6 +42,12 @@ const Automation = () => {
     'Attribute',
     'Fix'
   ]
+
+  useEffect(() => {
+    if (!idRegex.test(productId)) {
+      history.push(`/vendor/products`)
+    }
+  }, [productId])
 
   const { automationRules, setAutomationRules } = useContext(GlobalContext)
 

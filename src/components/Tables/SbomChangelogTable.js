@@ -91,7 +91,7 @@ const FilterComponent = ({ filterText, onFilter, onClear }) => {
   )
 }
 
-const SbomChangelogTable = ({ data, getLogs, pageIndex, setPageIndex }) => {
+const SbomChangelogTable = ({ data, refetch, pageIndex, setPageIndex }) => {
   const { changelogData } = useContext(GlobalContext)
 
   const location = useLocation()
@@ -118,33 +118,29 @@ const SbomChangelogTable = ({ data, getLogs, pageIndex, setPageIndex }) => {
 
   const onPreviousPage = () => {
     setPageIndex((prev) => pageIndex !== 0 && prev - 1)
-    getLogs({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        first: undefined,
-        last: 10,
-        before: data.pageInfo.startCursor,
-        after: '',
-        field: 'CREATED_AT',
-        direction: 'ASC'
-      }
+    refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      first: undefined,
+      last: 10,
+      before: data.pageInfo.startCursor,
+      after: '',
+      field: 'CREATED_AT',
+      direction: 'ASC'
     })
   }
 
   const onNextPage = () => {
     setPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
-    getLogs({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        first: 10,
-        last: undefined,
-        after: data.pageInfo.endCursor,
-        before: '',
-        field: 'CREATED_AT',
-        direction: 'ASC'
-      }
+    refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      first: 10,
+      last: undefined,
+      after: data.pageInfo.endCursor,
+      before: '',
+      field: 'CREATED_AT',
+      direction: 'ASC'
     })
   }
 

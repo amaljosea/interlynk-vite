@@ -19,7 +19,7 @@ import HealthCheckTable from 'components/Tables/HealthCheckTable'
 import SbomChangelogTable from 'components/Tables/SbomChangelogTable'
 
 // API QUERIES
-import { useLazyQuery } from '@apollo/client'
+import { useLazyQuery, useQuery } from '@apollo/client'
 import {
   GetCheckResults,
   GetComponentData,
@@ -39,7 +39,7 @@ const SBOMTable = ({
   const tab = window.localStorage.getItem('activeProdTab')
 
   const [tabIndex, setTabIndex] = useState(Number(tab))
-
+  const [isLoading, setIsLoading] = useState(false)
   // PAGINATION STATS FOR DIFFERENT TABS
   const [componentIndex, setComponentIndex] = useState(1)
   const [vulnIndex, setVulnIndex] = useState(1)
@@ -47,16 +47,55 @@ const SBOMTable = ({
   const [changelogIndex, setChangelogIndex] = useState(1)
 
   // GET COMPONENT DATA
-  const [getComponents, { data: compData }] = useLazyQuery(GetComponentData)
+  const {
+    data: compData,
+    refetch: compRefetch,
+    error
+  } = useQuery(GetComponentData, {
+    variables: {
+      projectId: productId,
+      sbomId: sbomId,
+      first: 10,
+      field: 'NAME',
+      direction: 'ASC'
+    }
+  })
 
   // GET VULN DATA
-  const [getVulns, { data: vulnData }] = useLazyQuery(GetVulnData)
+  const { data: vulnData, refetch: vulnRefetch } = useQuery(GetVulnData, {
+    variables: {
+      projectId: productId,
+      sbomId: sbomId,
+      first: 10,
+      field: 'UPDATED_AT',
+      direction: 'ASC'
+    }
+  })
 
   // GET HEALTH CHECK DATA
-  const [getResults, { data: checkData }] = useLazyQuery(GetCheckResults)
+  const { data: checkData, refetch: healthRefetch } = useQuery(
+    GetCheckResults,
+    {
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        first: 10,
+        field: 'STATUS',
+        direction: 'DESC'
+      }
+    }
+  )
 
   // GET CHANGE LOG DATA
-  const [getLogs, { data: logsData }] = useLazyQuery(GetChangeLogs)
+  const { data: logsData, refetch: logsRefetch } = useQuery(GetChangeLogs, {
+    variables: {
+      projectId: productId,
+      sbomId: sbomId,
+      first: 10,
+      field: 'CREATED_AT',
+      direction: 'DESC'
+    }
+  })
 
   // ON TAB CHANGE
   const onTabChange = (value) => {
@@ -72,48 +111,37 @@ const SBOMTable = ({
         sbomId: sbomId
       })
     } else if (tabIndex === 1) {
-      getComponents({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          first: 10,
-          last: undefined,
-          field: 'NAME',
-          direction: 'ASC'
-        }
+      compRefetch({
+        projectId: productId,
+        sbomId: sbomId,
+        first: 10,
+        field: 'NAME',
+        direction: 'ASC'
       }).then(() => setComponentIndex(1))
     } else if (tabIndex === 2) {
-      getVulns({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          first: 10,
-          last: undefined,
-          field: 'UPDATED_AT',
-          direction: 'ASC'
-        }
+      vulnRefetch({
+        projectId: productId,
+        sbomId: sbomId,
+        first: 10,
+        field: 'UPDATED_AT',
+        direction: 'ASC'
       }).then(() => setVulnIndex(1))
     } else if (tabIndex === 3) {
-      getResults({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          first: 10,
-          last: undefined,
-          field: 'STATUS',
-          direction: 'DESC'
-        }
+      healthRefetch({
+        projectId: productId,
+        sbomId: sbomId,
+        first: 10,
+        last: undefined,
+        field: 'STATUS',
+        direction: 'DESC'
       }).then(() => setResultIndex(1))
     } else {
-      getLogs({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          first: 10,
-          last: undefined,
-          field: 'CREATED_AT',
-          direction: 'ASC'
-        }
+      logsRefetch({
+        projectId: productId,
+        sbomId: sbomId,
+        first: 10,
+        field: 'CREATED_AT',
+        direction: 'DESC'
       }).then(() => setChangelogIndex(1))
     }
   }, [tabIndex])
@@ -127,6 +155,12 @@ const SBOMTable = ({
         id: item.id
       }
     })
+
+  // useEffect(() => {
+  //   if (error) {
+  //     console.log(error.graphQLErrors)
+  //   }
+  // }, [error])
 
   return (
     <>
@@ -145,7 +179,7 @@ const SBOMTable = ({
               'Checks',
               'Change Log'
             ].map((item, index) => (
-              <Tab key={index} _focus={{ outline: 'none' }}>
+              <Tab key={index} _focus={{ outline: 'none' }} isDisabled={error}>
                 {item}
               </Tab>
             ))}
@@ -173,14 +207,16 @@ const SBOMTable = ({
             </TabPanel>
             {/* COMPONENT TABLE */}
             <TabPanel px={0}>
-              {compData ? (
+              {compData && data ? (
                 <ComponentTable
                   type={type}
                   lifecycle={lifecycle}
                   data={compData.sbom.components}
-                  getComponents={getComponents}
+                  error={error}
+                  refetch={compRefetch}
                   pageIndex={componentIndex}
                   setPageIndex={setComponentIndex}
+                  primaryComp={data.primaryComponent}
                 />
               ) : (
                 <Flex width={'100%'} gap={4} direction={'column'}>
@@ -197,7 +233,7 @@ const SBOMTable = ({
               {vulnData ? (
                 <VulnTable
                   data={vulnData.sbom.vulns}
-                  getVulns={getVulns}
+                  refetch={vulnRefetch}
                   productId={productId}
                   sbomId={sbomId}
                   pageIndex={vulnIndex}
@@ -215,15 +251,16 @@ const SBOMTable = ({
             </TabPanel>
             {/* HEALTH CHECK TABLE */}
             <TabPanel px={0}>
-              {checkData ? (
+              {checkData && isLoading === false ? (
                 <HealthCheckTable
                   productId={productId}
                   sbomId={sbomId}
                   data={checkData.sbom.checkResults}
-                  getResults={getResults}
+                  refetch={healthRefetch}
                   components={components}
                   pageIndex={resultIndex}
                   setPageIndex={setResultIndex}
+                  setIsLoading={setIsLoading}
                 />
               ) : (
                 <Flex width={'100%'} gap={4} direction={'column'}>
@@ -240,7 +277,7 @@ const SBOMTable = ({
               {logsData ? (
                 <SbomChangelogTable
                   data={logsData.sbom.activityLogs}
-                  getLogs={getLogs}
+                  refetch={logsRefetch}
                   pageIndex={changelogIndex}
                   setPageIndex={setChangelogIndex}
                 />
