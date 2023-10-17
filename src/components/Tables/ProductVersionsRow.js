@@ -86,7 +86,14 @@ function ProductVersionsRow(props) {
         variables: {
           id
         }
-      }).then((res) => window.location.reload())
+      }).then((res) => {
+        if (res) {
+          refetch({
+            first: 10
+          })
+          onDeleteClose()
+        }
+      })
     } catch (error) {
       console.error('Mutation error:', error)
     }
@@ -149,7 +156,7 @@ function ProductVersionsRow(props) {
             <Skeleton height='20px' />
           ) : sbomId.length > 0 ? (
             <Link
-              to={`/vendor/products?tab=0&p=${id}&sbom=${
+              to={`/vendor/products?p=${id}&sbom=${
                 filteredData.length > 0 ? filteredData[0].id : sbomId[0].id
               }`}
               onClick={() => {

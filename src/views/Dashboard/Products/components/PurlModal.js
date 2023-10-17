@@ -10,24 +10,20 @@ import {
   FormControl,
   FormLabel,
   Select,
-  Checkbox,
   Flex,
   Input,
   Stack,
   Progress,
-  UnorderedList,
   ListItem,
   Textarea,
   List,
   Text,
-  Box,
-  Heading
+  Box
 } from '@chakra-ui/react'
 import { useState, useEffect } from 'react'
 import { PackageURL } from 'packageurl-js'
 import { useLocation } from 'react-router-dom'
-import { UpdateComponent } from 'graphQL/Mutation'
-import { recheckHealth } from 'graphQL/Mutation'
+import { UpdateComponent, recheckHealth } from 'graphQL/Mutation'
 import { useMutation } from '@apollo/client'
 
 const typeOptions = [
@@ -136,17 +132,8 @@ const PurlModal = ({
 
   const [updatedString, setUpdatedString] = useState(purlValue)
 
-  const [healthRecheck] = useMutation(recheckHealth)
-  const [updateComponent] = useMutation(UpdateComponent)
-
-  const handleReCheck = async () => {
-    await healthRecheck({
-      variables: {
-        checkId: checkId,
-        compId: id,
-        sbomId: sbomId
-      }
-    }).then(() =>
+  const [healthRecheck] = useMutation(recheckHealth, {
+    onCompleted: () => {
       refetch({
         projectId: productId,
         sbomId: sbomId,
@@ -155,8 +142,9 @@ const PurlModal = ({
         field: 'STATUS',
         direction: 'ASC'
       })
-    )
-  }
+    }
+  })
+  const [updateComponent] = useMutation(UpdateComponent)
 
   const handleComUpdate = async () => {
     try {
@@ -169,7 +157,13 @@ const PurlModal = ({
       })
         .then(() => {
           if (checkId) {
-            handleReCheck()
+            healthRecheck({
+              variables: {
+                checkId: checkId,
+                compId: id,
+                sbomId: sbomId
+              }
+            })
           }
         })
         .finally(() => onClose())

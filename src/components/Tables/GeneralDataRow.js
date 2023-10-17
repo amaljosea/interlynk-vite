@@ -381,7 +381,6 @@ const GeneralDataRow = ({ status, type, data, refetch }) => {
           selectedKey={selectedKey}
           refetch={refetch}
           checkId={null}
-          shortDesc={null}
         />
       )}
 

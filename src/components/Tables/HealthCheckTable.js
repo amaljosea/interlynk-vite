@@ -785,7 +785,6 @@ const HealthCheckTable = ({
               selectedKey={'tools'}
               refetch={refetch}
               checkId={activeRow.organizationRule.rule.friendlyId}
-              shortDesc={activeRow.organizationRule.rule.shortDesc}
             />
           )}
 
@@ -799,7 +798,6 @@ const HealthCheckTable = ({
               selectedKey={'author'}
               refetch={refetch}
               checkId={activeRow.organizationRule.rule.friendlyId}
-              shortDesc={activeRow.organizationRule.rule.shortDesc}
             />
           )}
 

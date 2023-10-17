@@ -1,5 +1,4 @@
 import { useMutation } from '@apollo/client'
-import { ArrowForwardIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import {
   Modal,
   ModalOverlay,
@@ -14,12 +13,9 @@ import {
   FormLabel,
   Input,
   useToast,
-  chakra,
   FormErrorMessage
 } from '@chakra-ui/react'
-import { recheckHealth } from 'graphQL/Mutation'
-import { supplierUpdate } from 'graphQL/Mutation'
-import { supplierCreate } from 'graphQL/Mutation'
+import { recheckHealth, supplierUpdate, supplierCreate } from 'graphQL/Mutation'
 import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 
@@ -41,15 +37,8 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
   const [createSupplier] = useMutation(supplierCreate)
   const [updateSupplier] = useMutation(supplierUpdate)
 
-  const [healthRecheck] = useMutation(recheckHealth)
-
-  const handleReCheck = async () => {
-    await healthRecheck({
-      variables: {
-        sbomId: sbomId,
-        checkId: checkId
-      }
-    }).then(() =>
+  const [healthRecheck] = useMutation(recheckHealth, {
+    onCompleted: () => {
       refetch({
         projectId: productId,
         sbomId: sbomId,
@@ -58,8 +47,8 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
         field: 'STATUS',
         direction: 'ASC'
       })
-    )
-  }
+    }
+  })
 
   useEffect(() => {
     if (suppliers && suppliers.length > 0) {
@@ -80,7 +69,12 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
       })
         .then((res) => {
           if (checkId) {
-            handleReCheck()
+            healthRecheck({
+              variables: {
+                sbomId: sbomId,
+                checkId: checkId
+              }
+            })
           } else if (res) {
             refetch({
               productId: productId,
