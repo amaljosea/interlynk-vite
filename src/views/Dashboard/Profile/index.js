@@ -2,7 +2,6 @@
 import {
   Flex,
   Grid,
-  Skeleton,
   Tab,
   TabList,
   TabPanel,
@@ -15,7 +14,7 @@ import Header from './components/Header'
 import { useEffect, useState } from 'react'
 import AdvisoryFeeds from './components/AdvisoryFeeds'
 import ExploitFeeds from './components/ExploitFeeds'
-import { useLazyQuery, useQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 import ApiFeed from './components/ApiFeed'
 import Card from 'components/Card/Card'
 import ComponentFeed from './components/ComponentFeed'
@@ -24,16 +23,12 @@ import TeamsLog from './components/TeamsLog'
 import PersonalInfo from './components/PersonalInfo'
 import { useLocation } from 'react-router-dom'
 import { GetOrg } from 'graphQL/Queries'
-import { GetOrgRules } from 'graphQL/Queries'
-import { GetOrgSettings } from 'graphQL/Queries'
 import TokenInfo from './components/TokenInfo'
 
 function Profile() {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const activetab = queryParams.get('tab')
-
-  const tab = window.localStorage.getItem('activeSetTab')
 
   const bgProfile = useColorModeValue(
     'hsla(0,0%,100%,.8)',
@@ -55,7 +50,15 @@ function Profile() {
     // }
   ]
 
+  const tab = window.localStorage.getItem('activeSetTab')
+
+  const [tabIndex, setTabIndex] = useState(Number(tab))
   const [selectedTab, setSelectedTab] = useState(tabs[1].name)
+
+  const onTabChange = (value) => {
+    setTabIndex(value)
+    window.localStorage.setItem('activeSetTab', value)
+  }
 
   useEffect(() => {
     if (activetab === 'person') {
@@ -64,15 +67,6 @@ function Profile() {
   }, [activetab])
 
   const { data: orgInfo, refetch } = useQuery(GetOrg)
-
-  const handleTabClick = (value) => {
-    window.history.pushState(null, null, `/vendor/profiles?tab=${value}`)
-    window.localStorage.setItem('activeSetTab', value)
-  }
-
-  // useEffect(() => {
-  //   console.log('orgInfo', orgInfo)
-  // }, [orgInfo])
 
   return (
     <>
@@ -95,39 +89,14 @@ function Profile() {
                 variant='enclosed'
                 w={'100%'}
                 bg={'white'}
-                defaultIndex={tab ? Number(tab) : 0}
+                defaultIndex={tabIndex}
+                onChange={(e) => onTabChange(e)}
               >
                 <TabList>
-                  <Tab
-                    _focus={{ outline: 'none' }}
-                    onClick={() => handleTabClick(0)}
-                  >
-                    General
-                  </Tab>
-                  <Tab
-                    _focus={{ outline: 'none' }}
-                    onClick={() => handleTabClick(1)}
-                  >
-                    Team
-                  </Tab>
-                  <Tab
-                    _focus={{ outline: 'none' }}
-                    onClick={() => handleTabClick(2)}
-                  >
-                    Feeds
-                  </Tab>
-                  <Tab
-                    _focus={{ outline: 'none' }}
-                    onClick={() => handleTabClick(3)}
-                  >
-                    Checks
-                  </Tab>
-{/*                   <Tab
-                    _focus={{ outline: 'none' }}
-                    onClick={() => handleTabClick(4)}
-                  >
-                    Lists
-                  </Tab> */}
+                  <Tab _focus={{ outline: 'none' }}>General</Tab>
+                  <Tab _focus={{ outline: 'none' }}>Team</Tab>
+                  <Tab _focus={{ outline: 'none' }}>Feeds</Tab>
+                  <Tab _focus={{ outline: 'none' }}>Checks</Tab>
                 </TabList>
                 <TabPanels>
                   {/* GEENRAL */}

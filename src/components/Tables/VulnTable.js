@@ -53,11 +53,11 @@ import { FaEllipsisV, FaFilter } from 'react-icons/fa'
 import { FaCopy } from 'react-icons/fa6'
 import { useState, useRef, useMemo, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
-import { sevColor } from 'utils'
 import StatusDrawer from 'components/Drawer/StatusDrawer'
 import styled from '@emotion/styled'
 import CopyTable from './CopyTable'
 import Multistep from 'views/Sbom/components/Multistep'
+import { getFullDateAndTime } from 'utils'
 
 const customStyles = {
   headCells: {
@@ -133,7 +133,8 @@ const VulnTable = ({
   productId,
   sbomId,
   pageIndex,
-  setPageIndex
+  setPageIndex,
+  filteredData
 }) => {
   const location = useLocation()
   const toast = useToast()
@@ -189,6 +190,26 @@ const VulnTable = ({
     onClose: onTableClose
   } = useDisclosure()
 
+  const sevColor = (cvss) => {
+    if (cvss >= 9.0) {
+      return 'red'
+    } else if (cvss >= 7.0) {
+      return 'orange'
+    } else if (cvss >= 6.0) {
+      return 'yellow'
+    } else {
+      return 'green'
+    }
+  }
+
+  const linkURl = (type, id) => {
+    if (type === 'osv') {
+      return `https://osv.dev/vulnerability/${id}`
+    } else {
+      return `https://nvd.nist.gov/vuln/detail/${id}`
+    }
+  }
+
   // COLUMNS
   const columns = [
     // CVE ID
@@ -198,15 +219,23 @@ const VulnTable = ({
       selector: (row) => {
         const { vuln } = row
         return (
-          <Link
-            href={`https://nvd.nist.gov/vuln/detail/${vulnId}`}
-            target={'_blank'}
-          >
+          <Link href={linkURl(vuln.source, vuln.vulnId)} target={'_blank'}>
             <Flex direction='row' alignItems={'center'} gap={2}>
-              <Icon as={ExternalLinkIcon} h={'16px'} w={'16px'} />
-              <Text fontSize='sm' color={textColor}>
-                {vuln.vulnId}
-              </Text>
+              <Icon
+                as={ExternalLinkIcon}
+                h={'16px'}
+                w={'16px'}
+                color={'blue.500'}
+              />
+              <Tooltip label={vuln.vulnId} placement={'top'}>
+                <Text fontSize='sm' color={textColor}>
+                  {vuln.vulnId !== null
+                    ? `${vuln.vulnId?.substring(0, 15)}${
+                        vuln.vulnId.length > 15 ? '...' : ''
+                      }`
+                    : ''}
+                </Text>
+              </Tooltip>
             </Flex>
           </Link>
         )
@@ -217,20 +246,27 @@ const VulnTable = ({
     {
       id: 'serverity',
       name: 'SEVERITY',
+      selector: (row) => '',
+      width: '150px'
+    },
+    // SOURCE
+    {
+      id: 'source',
+      name: 'SOURCE',
       selector: (row) => {
         const { vuln } = row
         return (
           <Tag
-            size='md'
+            size='sm'
             key='md'
-            variant='subtle'
-            // colorScheme={sevColor(row.severity)}
-            textTransform={'capitalize'}
+            variant='solid'
+            colorScheme={vuln.source === 'osv' ? 'red' : 'blue'}
+            textTransform={'uppercase'}
             width={'100%'}
             alignItems={'center'}
             justifyContent={'center'}
           >
-            <TagLabel>{vuln.desc}</TagLabel>
+            <TagLabel>{vuln.source}</TagLabel>
           </Tag>
         )
       },
@@ -248,9 +284,9 @@ const VulnTable = ({
               size='md'
               key='md'
               variant='subtle'
-              // colorScheme={sevColor(`${severity}`)}
+              colorScheme={sevColor(vuln.cvssScore)}
             >
-              <TagLabel>{vuln.cvssScore}</TagLabel>
+              <TagLabel>{vuln.cvssScore ? vuln.cvssScore : 0}</TagLabel>
             </Tag>
           </Flex>
         )
@@ -265,41 +301,50 @@ const VulnTable = ({
         const { component } = row
         return (
           <Tooltip label={component.name} placement='top'>
-            <Text textTransform={'capitalize'}>{component.name}</Text>
+            <Text textTransform={'capitalize'}>
+              {component.name !== null
+                ? `${component.name?.substring(0, 30)}${
+                    component.name.length > 30 ? '...' : ''
+                  }`
+                : ''}
+            </Text>
           </Tooltip>
         )
       },
-      width: '200px'
+      width: '250px'
     },
     // VERSION
     {
       id: 'version',
       name: 'VERSION',
       selector: (row) => row.component.version,
-      width: '200px'
+      width: '150px'
     },
+    // STATUS
     {
       id: 'status',
       name: 'STATUS',
       selector: (row) => {
-        const { vuln } = row
+        const { vexStatus } = row
         return (
           <Tag
             fontWeight={'normal'}
             variant='solid'
             size='sm'
-            // colorScheme={statusColor(status)}
+            colorScheme={statusColor(vexStatus ? vexStatus.name : 'In Triage')}
           >
-            {vuln.status}
+            {vexStatus !== null ? vexStatus.name : 'In Triage'}
           </Tag>
         )
       }
     },
-    {
-      id: 'updatedAt',
-      name: 'UPDATED AT',
-      selector: (row) => row.vuln.updatedAt
-    },
+    // // UPDATED AT
+    // {
+    //   id: 'updatedAt',
+    //   name: 'UPDATED AT',
+    //   selector: (row) => getFullDateAndTime(row.vuln.updatedAt),
+    //   sortable: true
+    // },
     // ACTION
     {
       id: 'action',
@@ -501,7 +546,9 @@ const VulnTable = ({
     activeStatusCount
   ])
 
-  const ExpandedComponent = () => {
+  const ExpandedComponent = ({ data }) => {
+    const { vuln } = data
+
     const CustomText = styled(Text)`
       font-size: 13px;
       font-weight: bold;
@@ -525,12 +572,27 @@ const VulnTable = ({
           <GridItem w='100%'>
             <CustomText>Description :</CustomText>
             <Text mt={1} fontSize={14}>
-              {
-                'Heap buffer overflow in libwebp in Google Chrome prior to 116.0.5845.187 and libwebp 1.3.2 allowed a remote attacker to perform an out of bounds memory write via a crafted HTML page. (Chromium security severity: Critical)'
-              }
+              {vuln.desc}
             </Text>
           </GridItem>
-          <GridItem w='100%'></GridItem>
+          <GridItem w='100%'>
+            <CustomText>Last Modified At :</CustomText>
+            <Text mt={1} fontSize={14}>
+              {getFullDateAndTime(vuln.lastModifiedAt)}
+            </Text>
+          </GridItem>
+          <GridItem w='100%'>
+            <CustomText>Published At :</CustomText>
+            <Text mt={1} fontSize={14}>
+              {getFullDateAndTime(vuln.publishedAt)}
+            </Text>
+          </GridItem>
+          <GridItem w='100%'>
+            <CustomText>NVD Alias ID :</CustomText>
+            <Text mt={1} fontSize={14}>
+              {vuln.nvdAliasId}
+            </Text>
+          </GridItem>
         </Grid>
       </Box>
     )
@@ -559,7 +621,7 @@ const VulnTable = ({
       before: data.pageInfo.startCursor,
       after: '',
       field: 'UPDATED_AT',
-      direction: 'ASC'
+      direction: 'DESC'
     })
   }
 
@@ -573,7 +635,18 @@ const VulnTable = ({
       after: data.pageInfo.endCursor,
       before: '',
       field: 'UPDATED_AT',
-      direction: 'ASC'
+      direction: 'DESC'
+    })
+  }
+
+  const handleSort = (column, sortDirection) => {
+    refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      first: 10,
+      last: undefined,
+      field: column.name,
+      direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
     })
   }
 
@@ -597,6 +670,7 @@ const VulnTable = ({
           columns={columns}
           data={data.nodes}
           customStyles={customStyles}
+          onSort={handleSort}
           subHeader
           subHeaderComponent={subHeaderComponentMemo}
           responsive={true}
@@ -760,15 +834,15 @@ const VulnTable = ({
               onClose={onClose}
               btnRef={btnRef}
               id={activeRow.id}
-              component={activeRow.component}
-              version={activeRow.version}
+              component={activeRow.component.name}
+              version={activeRow.component.version}
               imageInfo={null}
               imgVersionId={null}
               cve={activeRow.cve}
               textColor={textColor}
               setSelectVersion={null}
-              vulnRefetch={null}
-              status={activeRow.status}
+              refetch={refetch}
+              status={activeRow.vexStatus}
               setVulData={setVulData}
               filteredData={filteredData}
             />

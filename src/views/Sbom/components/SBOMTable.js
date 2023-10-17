@@ -19,7 +19,7 @@ import HealthCheckTable from 'components/Tables/HealthCheckTable'
 import SbomChangelogTable from 'components/Tables/SbomChangelogTable'
 
 // API QUERIES
-import { useLazyQuery, useQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 import {
   GetCheckResults,
   GetComponentData,
@@ -34,7 +34,8 @@ const SBOMTable = ({
   type,
   data,
   refetch,
-  lifecycle
+  lifecycle,
+  filteredData
 }) => {
   const tab = window.localStorage.getItem('activeProdTab')
 
@@ -115,17 +116,19 @@ const SBOMTable = ({
         projectId: productId,
         sbomId: sbomId,
         first: 10,
+        last: undefined,
         field: 'NAME',
         direction: 'ASC'
-      }).then(() => setComponentIndex(1))
+      })
     } else if (tabIndex === 2) {
       vulnRefetch({
         projectId: productId,
         sbomId: sbomId,
         first: 10,
+        last: undefined,
         field: 'UPDATED_AT',
-        direction: 'ASC'
-      }).then(() => setVulnIndex(1))
+        direction: 'DESC'
+      })
     } else if (tabIndex === 3) {
       healthRefetch({
         projectId: productId,
@@ -134,15 +137,16 @@ const SBOMTable = ({
         last: undefined,
         field: 'STATUS',
         direction: 'DESC'
-      }).then(() => setResultIndex(1))
+      })
     } else {
       logsRefetch({
         projectId: productId,
         sbomId: sbomId,
         first: 10,
+        last: undefined,
         field: 'CREATED_AT',
         direction: 'DESC'
-      }).then(() => setChangelogIndex(1))
+      })
     }
   }, [tabIndex])
 
@@ -155,12 +159,6 @@ const SBOMTable = ({
         id: item.id
       }
     })
-
-  // useEffect(() => {
-  //   if (error) {
-  //     console.log(error.graphQLErrors)
-  //   }
-  // }, [error])
 
   return (
     <>
@@ -233,6 +231,7 @@ const SBOMTable = ({
               {vulnData ? (
                 <VulnTable
                   data={vulnData.sbom.vulns}
+                  filteredData={filteredData}
                   refetch={vulnRefetch}
                   productId={productId}
                   sbomId={sbomId}

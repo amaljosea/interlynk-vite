@@ -40,6 +40,8 @@ const ContextWrapper = (props) => {
     }
   ])
 
+  const [allVersions, setAllVersions] = useState([])
+
   return (
     <GlobalContext.Provider
       value={{
@@ -66,7 +68,9 @@ const ContextWrapper = (props) => {
         productVulData,
         setProductVulData,
         automationRules,
-        setAutomationRules
+        setAutomationRules,
+        allVersions,
+        setAllVersions
       }}
     >
       {props.children}

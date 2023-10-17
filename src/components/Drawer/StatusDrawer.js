@@ -24,16 +24,17 @@ import {
   useToast
 } from '@chakra-ui/react'
 import VulLinkRow from 'components/Tables/VulLinkRow'
-import GlobalContext from 'context/GlobalContext'
+import { updateCompVulnVex } from 'graphQL/Mutation'
 import { VexVulnCreate } from 'graphQL/Mutation'
 import {
   getVexStatuses,
   getVexJustifications,
   getVexLogs
 } from 'graphQL/Queries'
-import React, { useContext } from 'react'
+import React from 'react'
 import { useEffect } from 'react'
 import { useState } from 'react'
+import { useLocation } from 'react-router-dom'
 
 const StatusDrawer = ({
   isOpen,
@@ -47,13 +48,14 @@ const StatusDrawer = ({
   imageInfo,
   textColor,
   id,
-  vulnRefetch,
+  refetch,
   setVulData,
   filteredData
 }) => {
-  const toast = useToast()
-
-  const { productVulData, setProductVulData } = useContext(GlobalContext)
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const productId = queryParams.get('p')
+  const sbomId = queryParams.get('sbom')
 
   const [statusTitle, setStatusTitle] = useState('')
   const [statusName, setStatusName] = useState('')
@@ -63,9 +65,9 @@ const StatusDrawer = ({
 
   const [statusResults, setStatusResults] = useState([])
 
-  const { data: allVexStatus } = useQuery(getVexStatuses, {})
-  const { data: allVexJustify } = useQuery(getVexJustifications, {})
-  const { data: allVexLogs, refetch } = useQuery(getVexLogs, {
+  const { data: allVexStatus } = useQuery(getVexStatuses)
+  const { data: allVexJustify } = useQuery(getVexJustifications)
+  const { data: allVexLogs, refetch: vexLogsRefetch } = useQuery(getVexLogs, {
     variables: {
       imageVersionId: imgVersionId,
       cveId: cve,
@@ -74,9 +76,9 @@ const StatusDrawer = ({
     }
   })
 
-  const [vexVulnCreate] = useMutation(VexVulnCreate, {
-    onCompleted: refetch
-  })
+  const [vexVulnCreate] = useMutation(VexVulnCreate)
+
+  const [compVexCreate] = useMutation(updateCompVulnVex)
 
   const handleStatusChange = (e) => {
     const { value } = e.target
@@ -95,23 +97,30 @@ const StatusDrawer = ({
   }
 
   const handleAdd = async () => {
-    // console.log(`Status title`, statusTitle)
-    if (statusTitle !== '') {
-      const updatedItems = productVulData.map((item) => {
-        if (item.id === id) {
-          return { ...item, status: statusTitle }
+    try {
+      await compVexCreate({
+        variables: {
+          compVulnId: id,
+          notes: notes,
+          sbomId: sbomId,
+          vexStatusId: statusTitle,
+          vexJustificationId: justification
         }
-        return item
+      }).then((res) => {
+        if (res.data) {
+          refetch({
+            projectId: productId,
+            sbomId: sbomId,
+            first: 10,
+            last: undefined,
+            field: 'UPDATED_AT',
+            direction: 'DESC'
+          })
+          onClose()
+        }
       })
-      setProductVulData(updatedItems)
-      onClose()
-    } else {
-      toast({
-        description: 'Please select status',
-        status: 'error',
-        duration: 3000,
-        position: 'top'
-      })
+    } catch (error) {
+      console.log('Mutation error', error)
     }
   }
 
@@ -129,57 +138,9 @@ const StatusDrawer = ({
   }, [allVexLogs])
 
   useEffect(() => {
-    if (cve === 'CVE-2019-8457') {
-      setVulData((prev) => [
-        {
-          username: 'surendra',
-          justification,
-          status: status,
-          timestamp: new Date().toDateString(),
-          notes: notes
-        }
-      ])
+    if (status) {
+      setStatusTitle(status.id)
     }
-
-    if (cve === 'CVE-2023-27534') {
-      location.pathname.startsWith('/customer')
-        ? setVulData((prev) => [
-            {
-              username: 'IBM',
-              justification: '',
-              status: 'Must-Address',
-              timestamp: getFormattedDate('2023', '6', '20'),
-              notes: notes
-            }
-          ])
-        : setVulData((prev) => [
-            {
-              username: 'Uber',
-              justification: '',
-              status: 'Accepted',
-              timestamp: getFormattedDate('2023', '6', '21'),
-              notes: notes
-            },
-            {
-              username: 'IBM',
-              justification: '',
-              status: 'Must-Address',
-              timestamp: getFormattedDate('2023', '6', '20'),
-              notes: notes
-            },
-            {
-              username: 'Oracle',
-              justification: '',
-              status: 'Must-Address',
-              timestamp: getFormattedDate('2023', '6', '19'),
-              notes: notes
-            }
-          ])
-    }
-  }, [cve, status])
-
-  useEffect(() => {
-    setStatusTitle(status)
   }, [status])
 
   return (
@@ -194,7 +155,7 @@ const StatusDrawer = ({
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton
-          onClick={() => vulnRefetch !== null && vulnRefetch()}
+        //  onClick={() => refetch !== null && refetch()}
         />
         <DrawerHeader borderBottomWidth='1px' color='gray.600'>
           {cve} Status
@@ -225,7 +186,7 @@ const StatusDrawer = ({
                         <option value=''>-- Select Status --</option>
                         {allVexStatus ? (
                           allVexStatus.vexStatuses.map((st, idx) => (
-                            <option key={idx} value={st.name}>
+                            <option key={idx} value={st.id}>
                               {st.name}
                             </option>
                           ))
@@ -322,7 +283,11 @@ const StatusDrawer = ({
                     </Button>
                   </Flex>
                 ) : (
-                  <Button colorScheme='blue' onClick={handleAdd}>
+                  <Button
+                    colorScheme='blue'
+                    onClick={handleAdd}
+                    disabled={statusTitle === ''}
+                  >
                     Add
                   </Button>
                 )}

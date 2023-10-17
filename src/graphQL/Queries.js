@@ -579,8 +579,12 @@ export const GetVulnData = gql`
           vuln {
             vulnId
             desc
-            status
             cvssScore
+            cvssVector
+            source
+            publishedAt
+            lastModifiedAt
+            nvdAliasId
             updatedAt
           }
           component {
@@ -588,9 +592,12 @@ export const GetVulnData = gql`
             version
           }
           vexStatus {
+            id
             name
           }
+
           vexJustification {
+            id
             name
           }
         }
