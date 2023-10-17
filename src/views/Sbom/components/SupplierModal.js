@@ -47,23 +47,8 @@ const SupplierModal = ({
   const [createSupplier] = useMutation(addComSupplier)
   const [updateSupplier] = useMutation(updateComSupplier)
 
-  const [healthRecheck] = useMutation(recheckHealth)
-
-  useEffect(() => {
-    if (suppliers.length > 0) {
-      setSupName(suppliers[0].name)
-      setSupEmail(suppliers[0].contactEmail)
-    }
-  }, [suppliers])
-
-  const handleReCheck = async () => {
-    await healthRecheck({
-      variables: {
-        sbomId: sbomId,
-        checkId: checkId,
-        compId: id
-      }
-    }).then(() =>
+  const [healthRecheck] = useMutation(recheckHealth, {
+    onCompleted: () => {
       refetch({
         projectId: productId,
         sbomId: sbomId,
@@ -72,8 +57,15 @@ const SupplierModal = ({
         field: 'STATUS',
         direction: 'ASC'
       })
-    )
-  }
+    }
+  })
+
+  useEffect(() => {
+    if (suppliers.length > 0) {
+      setSupName(suppliers[0].name)
+      setSupEmail(suppliers[0].contactEmail)
+    }
+  }, [suppliers])
 
   const handleSave = async (e) => {
     e.preventDefault()
@@ -87,7 +79,13 @@ const SupplierModal = ({
       })
         .then(() => {
           if (checkId) {
-            handleReCheck()
+            healthRecheck({
+              variables: {
+                sbomId: sbomId,
+                checkId: checkId,
+                compId: id
+              }
+            })
           } else {
             refetch({
               projectId: productId,

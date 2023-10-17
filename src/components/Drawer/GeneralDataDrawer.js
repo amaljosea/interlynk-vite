@@ -24,13 +24,14 @@ import {
   FormControl,
   FormErrorMessage
 } from '@chakra-ui/react'
-import { toolDelete } from 'graphQL/Mutation'
-import { supplierCreate } from 'graphQL/Mutation'
-import { supplierDelete } from 'graphQL/Mutation'
-import { recheckHealth } from 'graphQL/Mutation'
-import { authorDelete } from 'graphQL/Mutation'
-import { authorCreate } from 'graphQL/Mutation'
-import { toolCreate } from 'graphQL/Mutation'
+import {
+  toolDelete,
+  supplierCreate,
+  supplierDelete,
+  recheckHealth,
+  authorCreate,
+  toolCreate
+} from 'graphQL/Mutation'
 import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { timeSince } from 'utils'
@@ -43,8 +44,7 @@ const GeneralDataDrawer = ({
   data,
   selectedKey,
   refetch,
-  checkId,
-  shortDesc
+  checkId
 }) => {
   // console.log(`suppliers`, suppliers)
 
@@ -82,15 +82,8 @@ const GeneralDataDrawer = ({
   const [createSupplier] = useMutation(supplierCreate)
   const [deleteSupplier] = useMutation(supplierDelete)
 
-  const [healthRecheck] = useMutation(recheckHealth)
-
-  const handleReCheck = async () => {
-    await healthRecheck({
-      variables: {
-        checkId: checkId,
-        sbomId: sbomId
-      }
-    }).then(() =>
+  const [healthRecheck] = useMutation(recheckHealth, {
+    onCompleted: () => {
       refetch({
         projectId: productId,
         sbomId: sbomId,
@@ -99,8 +92,8 @@ const GeneralDataDrawer = ({
         field: 'STATUS',
         direction: 'ASC'
       })
-    )
-  }
+    }
+  })
 
   useEffect(() => {
     if (data) {
@@ -109,9 +102,6 @@ const GeneralDataDrawer = ({
       setExistingAuthors(data.authors)
     }
   }, [data])
-
-  // console.log('existingAuthors', existingAuthors)
-  console.log('authorList', authorList)
 
   useEffect(() => {
     if (data) {
@@ -232,7 +222,12 @@ const GeneralDataDrawer = ({
 
   const handleSave = () => {
     if (checkId) {
-      handleReCheck()
+      healthRecheck({
+        variables: {
+          checkId: checkId,
+          sbomId: sbomId
+        }
+      })
     }
 
     if (creationTools.length > 0) {

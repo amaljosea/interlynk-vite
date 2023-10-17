@@ -51,17 +51,8 @@ const CpeModal = ({
 
   const [updatedString, setUpdatedString] = useState(cpeValue)
 
-  const [healthRecheck] = useMutation(recheckHealth)
-  const [updateComponent] = useMutation(UpdateComponent)
-
-  const handleReCheck = async () => {
-    await healthRecheck({
-      variables: {
-        checkId: checkId,
-        compId: id,
-        sbomId: sbomId
-      }
-    }).then(() =>
+  const [healthRecheck] = useMutation(recheckHealth, {
+    onCompleted: () => {
       refetch({
         projectId: productId,
         sbomId: sbomId,
@@ -70,8 +61,9 @@ const CpeModal = ({
         field: 'STATUS',
         direction: 'ASC'
       })
-    )
-  }
+    }
+  })
+  const [updateComponent] = useMutation(UpdateComponent)
 
   useEffect(() => {
     if (data) {
@@ -107,7 +99,13 @@ const CpeModal = ({
       })
         .then(() => {
           if (checkId) {
-            handleReCheck()
+            healthRecheck({
+              variables: {
+                checkId: checkId,
+                compId: id,
+                sbomId: sbomId
+              }
+            })
           }
         })
         .finally(() => onClose())

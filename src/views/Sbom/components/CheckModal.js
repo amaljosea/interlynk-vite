@@ -21,8 +21,7 @@ import {
   Text,
   Tooltip
 } from '@chakra-ui/react'
-import { UpdateComponent } from 'graphQL/Mutation'
-import { recheckHealth } from 'graphQL/Mutation'
+import { UpdateComponent, recheckHealth } from 'graphQL/Mutation'
 import { useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import MultiSelect from 'react-select'
@@ -55,16 +54,8 @@ const CheckModal = ({
   const [selectedLicenses, setSelectedLicenses] = useState([])
   const [componentData, setComponentData] = useState([])
 
-  const [healthRecheck] = useMutation(recheckHealth)
-  const [updateComponent] = useMutation(UpdateComponent)
-
-  const handleReCheck = async () => {
-    await healthRecheck({
-      variables: {
-        checkId: checkId,
-        sbomId: sbomId
-      }
-    }).then(() =>
+  const [healthRecheck] = useMutation(recheckHealth, {
+    onCompleted: () => {
       refetch({
         projectId: productId,
         sbomId: sbomId,
@@ -73,8 +64,9 @@ const CheckModal = ({
         field: 'STATUS',
         direction: 'ASC'
       })
-    )
-  }
+    }
+  })
+  const [updateComponent] = useMutation(UpdateComponent)
 
   const handleComUpdate = async () => {
     try {
@@ -85,7 +77,14 @@ const CheckModal = ({
           primary: true
         }
       })
-        .then(() => handleReCheck())
+        .then(() =>
+          healthRecheck({
+            variables: {
+              checkId: checkId,
+              sbomId: sbomId
+            }
+          })
+        )
         .finally(() => onClose())
     } catch (error) {
       console.log('Mutation error', error)
