@@ -13,20 +13,12 @@ const VulLinkRow = ({
 }) => {
   return (
     <Tr>
-      <Td fontSize={'xs'} textTransform={'capitalize'}>
-        {username}
-      </Td>
-      <Td fontSize={'xs'} textTransform={'capitalize'}>
-        {status}
-      </Td>
-      <Td fontSize={'xs'} textTransform={'capitalize'}>
-        {justification}
-      </Td>
-      <Td fontSize={'xs'} textTransform={'capitalize'}>
-        {timeSince(timestamp)}
-      </Td>
+      <Td fontSize={'xs'} pl={0}>{username}</Td>
+      <Td fontSize={'xs'}>{status}</Td>
+      <Td fontSize={'xs'}>{justification}</Td>
+      <Td fontSize={'xs'}>{timeSince(timestamp)}</Td>
       <Tooltip label={notes}>
-        <Td fontSize={'xs'} textTransform={'capitalize'}>
+        <Td fontSize={'xs'}>
           <BiNote />
         </Td>
       </Tooltip>

@@ -1,5 +1,5 @@
 // Chakra imports
-import { AddIcon, ViewIcon } from '@chakra-ui/icons'
+import { AddIcon, CloseIcon, ViewIcon } from '@chakra-ui/icons'
 import {
   Flex,
   Text,
@@ -26,13 +26,13 @@ import {
   Input,
   Badge,
   Divider,
-  chakra
+  chakra,
+  Select
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
 import {
   FaEllipsisV,
-  FaFilter,
   FaGlobe,
   FaHouseUser,
   FaLightbulb,
@@ -46,8 +46,11 @@ import ComponentModal from 'views/Sbom/components/ComponentModal'
 import SupplierModal from 'views/Sbom/components/SupplierModal'
 import LinksDrawer from 'components/Drawer/LinksDrawer'
 import styled from '@emotion/styled'
-import { useMutation } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import { deleteComSupplier } from 'graphQL/Mutation'
+import { licenseOptions } from 'variables/licenses'
+import { GetCompFilterData } from 'graphQL/Queries'
+import CompFilterMenu from 'views/Sbom/components/CompFilterMenu'
 
 const customStyles = {
   headCells: {
@@ -66,43 +69,6 @@ const customStyles = {
   }
 }
 
-const FilterComponent = ({ filterText, onFilter, onClear }) => {
-  const searchInputRef = useRef()
-
-  const focusSearchInput = () => {
-    if (searchInputRef?.current) {
-      searchInputRef?.current.focus()
-    }
-  }
-
-  const handleKeyPress = (e) => {
-    if (e.ctrlKey && e.key === '/') {
-      focusSearchInput()
-    }
-  }
-
-  useEffect(() => {
-    window.addEventListener('keydown', handleKeyPress)
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyPress)
-    }
-  }, [])
-
-  return (
-    <>
-      <Input
-        width={'400px'}
-        id='search'
-        type='text'
-        placeholder='Search'
-        aria-label='Search Input'
-        ref={searchInputRef}
-      />
-    </>
-  )
-}
-
 const ComponentTable = ({
   type,
   lifecycle,
@@ -111,7 +77,9 @@ const ComponentTable = ({
   refetch,
   pageIndex,
   setPageIndex,
-  primaryComp
+  primaryComp,
+  totalRows,
+  setTotalRows
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -123,19 +91,14 @@ const ComponentTable = ({
 
   const [activeRow, setActiveRow] = useState(null)
 
-  const [filterNpm, setFilterNpm] = useState([])
-  const [filterNuget, setFilterNuget] = useState([])
-  const [filterRuby, setFilterRuby] = useState([])
-
   const [filterText, setFilterText] = useState('')
-  const [resetPaginationToggle, setResetPaginationToggle] = useState(false)
 
-  const filteredItems =
-    data &&
-    data.nodes.filter(
-      (item) =>
-        item.name && item.name.toLowerCase().includes(filterText.toLowerCase())
-    )
+  const { data: filterHeads } = useQuery(GetCompFilterData, {
+    variables: {
+      projectId: productId,
+      sbomId: sbomId
+    }
+  })
 
   const compBtn = useRef(null)
   const linkRef = useRef(null)
@@ -182,6 +145,7 @@ const ComponentTable = ({
     }
   }, [])
 
+  // COLUMNS
   const columns = [
     // COMPONENT
     {
@@ -329,7 +293,8 @@ const ComponentTable = ({
             )}
           </>
         )
-      }
+      },
+      sortable: true
     },
     // LICENSES
     {
@@ -337,30 +302,22 @@ const ComponentTable = ({
       name: 'LICENSES',
       selector: (row) => {
         const { licenses } = row
-        // const [filteredLicense, setFilteredLicense] = useState([])
 
-        // useEffect(() => {
-        //   if (licenses !== null && licenses.length > 0) {
-        //     // console.log(`license item`, licenses)
-        //     const filtered = licenseOptions.filter((item) =>
-        //       licenses.includes(item.licenseId)
-        //     )
-        //     // console.log(`filtered item`, filtered)
-        //     setFilteredLicense(filtered)
-        //   }
-        // }, [licenses])
+        const filtered =
+          licenses &&
+          licenseOptions.filter((item) => licenses.includes(item.licenseId))
 
         return (
           <Flex alignItems={'center'} gap={2} flexWrap={'wrap'}>
-            {licenses !== null &&
-              licenses.map((item, index) => (
+            {filtered.length > 0 &&
+              filtered.map((item, index) => (
                 <Tooltip
                   key={index}
-                  label={item}
+                  label={item.name}
                   placement={'top'}
                   textTransform={'capitalize'}
                 >
-                  <Link href={'#'} target='_blank'>
+                  <Link href={item.reference} target='_blank'>
                     <Tag
                       size={'sm'}
                       key={index}
@@ -369,7 +326,7 @@ const ComponentTable = ({
                       width={'fit-content'}
                       textTransform={'capitalize'}
                     >
-                      <TagLabel>{item}</TagLabel>
+                      <TagLabel>{item.licenseId}</TagLabel>
                     </Tag>
                   </Link>
                 </Tooltip>
@@ -382,8 +339,9 @@ const ComponentTable = ({
     // UPDATED AT
     {
       id: 'updatedAt',
-      name: 'UPDATED AT',
-      selector: (row) => timeSince(row.updatedAt)
+      name: 'UPDATED_AT',
+      selector: (row) => timeSince(row.updatedAt),
+      sortable: true
     },
     // ACTION
     {
@@ -464,13 +422,9 @@ const ComponentTable = ({
     }
   ]
 
+  // EXPAND SECTION
   const ExpandedComponent = ({ data }) => {
     const { suppliers, purl, description, cpes } = data
-
-    const location = useLocation()
-    const queryParams = new URLSearchParams(location.search)
-    const productId = queryParams.get('p')
-    const sbomId = queryParams.get('sbom')
 
     const [deleteSupplier] = useMutation(deleteComSupplier)
 
@@ -563,16 +517,80 @@ const ComponentTable = ({
     )
   }
 
-  const activeFiltersCount =
-    filterNpm.length + filterNuget.length + filterRuby.length
+  // SEARCH COMPONENT
+  const handleSearch = async () => {
+    await refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      search: filterText,
+      first: totalRows,
+      last: undefined,
+      after: undefined,
+      last: undefined,
+      field: 'UPDATED_AT',
+      direction: 'DESC'
+    })
+    setPageIndex(1)
+  }
 
+  // CLEAR SERACH
+  const handleClear = async () => {
+    await refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      first: totalRows,
+      last: undefined,
+      after: undefined,
+      last: undefined,
+      search: undefined,
+      field: 'UPDATED_AT',
+      direction: 'DESC'
+    })
+    setFilterText('')
+    setPageIndex(1)
+  }
+
+  // SET ROW LENGTH
+  const handleSetRow = async (e) => {
+    setTotalRows(Number(e.target.value))
+    await refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      first: Number(e.target.value),
+      last: undefined,
+      after: undefined,
+      last: undefined,
+      search: undefined,
+      field: 'UPDATED_AT',
+      direction: 'DESC'
+    })
+    setFilterText('')
+    setPageIndex(1)
+  }
+
+  // HEADER SECTION
   const subHeaderComponentMemo = useMemo(() => {
-    const handleClear = () => {
-      if (filterText) {
-        setResetPaginationToggle(!resetPaginationToggle)
-        setFilterText('')
+    const searchInputRef = useRef()
+
+    const focusSearchInput = () => {
+      if (searchInputRef?.current) {
+        searchInputRef?.current.focus()
       }
     }
+
+    const handleKeyPress = (e) => {
+      if (e.ctrlKey && e.key === '/') {
+        focusSearchInput()
+      }
+    }
+
+    useEffect(() => {
+      window.addEventListener('keydown', handleKeyPress)
+
+      return () => {
+        window.removeEventListener('keydown', handleKeyPress)
+      }
+    }, [])
 
     return (
       <Flex
@@ -587,105 +605,92 @@ const ComponentTable = ({
           alignItems={'center'}
         >
           {/* SEARCH COMPONENTS */}
-          <FilterComponent
-            onFilter={(e) => setFilterText(e.target.value)}
-            onClear={handleClear}
-            filterText={filterText}
-          />
+          <Flex alignItems={'center'} gap={4}>
+            <Box position='relative' width={'300px'}>
+              <Input
+                value={filterText}
+                onChange={(e) => setFilterText(e.target.value)}
+                placeholder='Search components'
+                ref={searchInputRef}
+              />
+              {filterText !== '' && (
+                <CloseIcon
+                  w={'18px'}
+                  h={'18px'}
+                  bg={'blue.500'}
+                  color={'white'}
+                  p={1}
+                  rounded={'full'}
+                  position={'absolute'}
+                  right={3}
+                  top={'11px'}
+                  onClick={handleClear}
+                  cursor={'pointer'}
+                />
+              )}
+            </Box>
+            <Button
+              variant='solid'
+              colorScheme='blue'
+              px={4}
+              onClick={handleSearch}
+              disabled={filterText === ''}
+            >
+              Search
+            </Button>
+          </Flex>
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
 
-          <Box width={'fit-content'} position={'relative'}>
-            <Menu closeOnSelect={true}>
-              {activeFiltersCount > 0 && (
-                <Badge
-                  variant='solid'
-                  colorScheme='teal'
-                  position={'absolute'}
-                  right={-2}
-                  top={-1.5}
-                  zIndex={11}
-                >
-                  {activeFiltersCount}
-                </Badge>
-              )}
-              <MenuButton
-                as={Button}
-                colorScheme='blue'
-                fontWeight='normal'
-                fontSize={'sm'}
-                leftIcon={<FaFilter size={14} />}
-              >
-                Ecosystem
-              </MenuButton>
-              <MenuList>
-                <MenuOptionGroup
-                  type='radio'
-                  onChange={() => window.location.reload()}
-                >
-                  <MenuItemOption value={'All'} fontSize={'sm'}>
-                    All
-                  </MenuItemOption>
-                </MenuOptionGroup>
-                <MenuOptionGroup
-                  type='checkbox'
-                  onChange={(value) => setFilterNpm(value)}
-                >
-                  <MenuItemOption value={'NPM'} fontSize={'sm'}>
-                    NPM
-                  </MenuItemOption>
-                </MenuOptionGroup>
-                <MenuOptionGroup
-                  type='checkbox'
-                  onChange={(value) => setFilterNuget(value)}
-                >
-                  <MenuItemOption value={'NuGet'} fontSize={'sm'}>
-                    NuGet
-                  </MenuItemOption>
-                </MenuOptionGroup>
-                <MenuOptionGroup
-                  type='checkbox'
-                  onChange={(value) => setFilterRuby(value)}
-                >
-                  <MenuItemOption value={'RubyGems'} fontSize={'sm'}>
-                    RubyGems
-                  </MenuItemOption>
-                </MenuOptionGroup>
-              </MenuList>
-            </Menu>
-          </Box>
+          {filterHeads && (
+            <CompFilterMenu
+              refetch={refetch}
+              productId={productId}
+              sbomId={sbomId}
+              ecosystems={filterHeads.sbom.filters.ecosystems}
+              kinds={filterHeads.sbom.filters.kinds}
+              licenses={filterHeads.sbom.filters.licenses}
+              suppliers={filterHeads.sbom.filters.supplierNames}
+              setPageIndex={setPageIndex}
+              totalRows={totalRows}
+            />
+          )}
         </Stack>
 
-        {/* CREATE COMPONENT */}
-        <Tooltip label='Add Component'>
-          <IconButton
-            ref={compBtn}
-            onClick={onCompOpen}
-            icon={<AddIcon />}
-            colorScheme='blue'
-            variant='solid'
-            fontWeight='normal'
-            fontSize={'sm'}
-            isDisabled={lifecycle === 'signed'}
-          />
-        </Tooltip>
+        <Stack alignItems={'center'} direction={'row'} spacing={4}>
+          <Text>Show</Text>
+
+          <Select width={20} value={totalRows} onChange={handleSetRow}>
+            <option value={10}>10</option>
+            <option value={25}>25</option>
+            <option value={35}>35</option>
+          </Select>
+
+          {/* CREATE COMPONENT */}
+          <Tooltip label='Add Component'>
+            <IconButton
+              ref={compBtn}
+              onClick={onCompOpen}
+              icon={<AddIcon />}
+              colorScheme='blue'
+              variant='solid'
+              fontWeight='normal'
+              fontSize={'sm'}
+              isDisabled={lifecycle === 'signed'}
+            />
+          </Tooltip>
+        </Stack>
       </Flex>
     )
-  }, [
-    filterText,
-    resetPaginationToggle,
-    activeFiltersCount,
-    filterNpm,
-    filterNuget,
-    filterRuby
-  ])
+  }, [filterText, filterHeads, handleSetRow])
 
   const handleSort = (column, sortDirection) => {
-    console.log(`column`, column)
-    console.log(`sortDirection`, sortDirection)
+    // console.log(`column`, column)
+    // console.log(`sortDirection`, sortDirection)
     refetch({
       projectId: productId,
       sbomId: sbomId,
-      first: 10,
+      first: totalRows,
+      last: undefined,
       field: column.name,
       direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
     })
@@ -697,11 +702,11 @@ const ComponentTable = ({
       projectId: productId,
       sbomId: sbomId,
       first: undefined,
-      last: 10,
+      last: totalRows,
       after: '',
       before: data.pageInfo.startCursor,
-      field: 'NAME',
-      direction: 'ASC'
+      field: 'UPDATED_AT',
+      direction: 'DESC'
     })
   }
 
@@ -710,66 +715,35 @@ const ComponentTable = ({
     refetch({
       projectId: productId,
       sbomId: sbomId,
-      first: 10,
+      first: totalRows,
       last: undefined,
       before: '',
       after: data.pageInfo.endCursor,
-      field: 'NAME',
-      direction: 'ASC'
+      field: 'UPDATED_AT',
+      direction: 'DESC'
     })
   }
 
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
-        {!error ? (
-          <DataTable
-            columns={columns}
-            data={filteredItems}
-            onSort={handleSort}
-            customStyles={customStyles}
-            defaultSortAsc
-            defaultSortFieldId={'name'}
-            subHeader
-            subHeaderComponent={subHeaderComponentMemo}
-            expandableRows
-            expandableRowsComponent={ExpandedComponent}
-            responsive={true}
-          />
-        ) : (
-          <Flex
-            py={10}
-            flexDirection={'column'}
-            gap={2}
-            width={'100%'}
-            alignItems={'center'}
-            justifyContent={'center'}
-          >
-            <Text color={'red.500'} textAlign={'center'}>
-              {error.message}
-            </Text>
-            <Text>Something went wrong. Please refresh this page</Text>
-            <Button
-              mt={2}
-              variant='solid'
-              colorScheme='blue'
-              fontWeight={'normal'}
-              onClick={() => window.location.reload()}
-            >
-              Refresh
-            </Button>
-          </Flex>
-        )}
+        <DataTable
+          columns={columns}
+          data={data.nodes}
+          onSort={handleSort}
+          customStyles={customStyles}
+          defaultSortAsc={false}
+          defaultSortFieldId={'updatedAt'}
+          subHeader
+          subHeaderComponent={subHeaderComponentMemo}
+          expandableRows
+          expandableRowsComponent={ExpandedComponent}
+          responsive={true}
+        />
       </Flex>
 
       {/* PAGINATION */}
-      <Flex
-        flexDir={'row'}
-        gap={4}
-        alignItems={'center'}
-        mt={6}
-        justifyContent={'flex-start'}
-      >
+      <Flex width={'100%'} flexDir={'row'} gap={4} alignItems={'center'} mt={6}>
         <Button
           colorScheme='blue'
           onClick={handlePreviousPage}
@@ -785,7 +759,7 @@ const ComponentTable = ({
           Next
         </Button>
         <Box>
-          Page {pageIndex} of {Math.ceil(data.totalCount / 10)}
+          Page {pageIndex} of {Math.ceil(data.totalCount / totalRows)}
         </Box>
       </Flex>
 
@@ -810,6 +784,7 @@ const ComponentTable = ({
               shortDesc={null}
               group={activeRow.group}
               primaryComp={primaryComp}
+              totalRows={totalRows}
             />
           )}
 
@@ -830,6 +805,7 @@ const ComponentTable = ({
               onClose={onSupClose}
               suppliers={activeRow.suppliers}
               shortDesc={null}
+              totalRows={totalRows}
             />
           )}
 
@@ -860,6 +836,7 @@ const ComponentTable = ({
           internal={false}
           refetch={refetch}
           shortDesc={null}
+          totalRows={totalRows}
         />
       )}
     </>

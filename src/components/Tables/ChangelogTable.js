@@ -90,7 +90,7 @@ const FilterComponent = ({ filterText, onFilter, onClear }) => {
   )
 }
 
-const ChangelogTable = ({ data, refetch, type }) => {
+const ChangelogTable = ({ data, refetch, type, totalRows, setTotalRows }) => {
   const { changelogData } = useContext(GlobalContext)
 
   const location = useLocation()
@@ -120,7 +120,7 @@ const ChangelogTable = ({ data, refetch, type }) => {
       projectId: productId,
       sbomId: sbomId,
       first: undefined,
-      last: 10,
+      last: totalRows,
       before: data.pageInfo.startCursor,
       after: ''
     })
@@ -131,7 +131,7 @@ const ChangelogTable = ({ data, refetch, type }) => {
     refetch({
       projectId: productId,
       sbomId: sbomId,
-      first: 10,
+      first: totalRows,
       last: undefined,
       after: data.pageInfo.endCursor,
       before: ''
@@ -306,7 +306,7 @@ const ChangelogTable = ({ data, refetch, type }) => {
           Next
         </Button>
         <Box>
-          Page {pageIndex} of {Math.ceil(data.totalCount / 10)}
+          Page {pageIndex} of {Math.ceil(data.totalCount / totalRows)}
         </Box>
       </Flex> */}
     </>

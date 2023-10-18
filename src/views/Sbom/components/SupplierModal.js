@@ -28,7 +28,8 @@ const SupplierModal = ({
   onClose,
   refetch,
   suppliers,
-  checkId
+  checkId,
+  totalRows
 }) => {
   const toast = useToast()
   const location = useLocation()
@@ -52,7 +53,7 @@ const SupplierModal = ({
       refetch({
         projectId: productId,
         sbomId: sbomId,
-        first: 10,
+        first: totalRows,
         last: undefined,
         field: 'STATUS',
         direction: 'ASC'
@@ -90,7 +91,7 @@ const SupplierModal = ({
             refetch({
               projectId: productId,
               sbomId: sbomId,
-              first: 10,
+              first: totalRows,
               field: 'NAME',
               direction: 'ASC'
             })

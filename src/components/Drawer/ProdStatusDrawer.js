@@ -21,58 +21,46 @@ import {
   Thead,
   Tr,
   Flex,
-  useToast
+  DrawerFooter
 } from '@chakra-ui/react'
 import VulLinkRow from 'components/Tables/VulLinkRow'
-import { VexVulnCreate } from 'graphQL/Mutation'
-import {
-  getVexStatuses,
-  getVexJustifications,
-  getVexLogs
-} from 'graphQL/Queries'
-import React from 'react'
-import { useEffect } from 'react'
-import { useState } from 'react'
+import { updateCompVulnVex } from 'graphQL/Mutation'
+import { getVexStatuses, getVexJustifications } from 'graphQL/Queries'
+import { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 
-const StatusDrawer = ({
+const ProdStatusDrawer = ({
   isOpen,
   onClose,
   btnRef,
-  cve,
-  status,
-  component,
-  version,
-  imgVersionId,
-  imageInfo,
+  data,
   textColor,
-  setSelectVersion,
-  vulnRefetch,
-  setVulData
+  refetch,
+  filteredData
 }) => {
-  const toast = useToast()
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const productId = queryParams.get('p')
+  const sbomId = queryParams.get('sbom')
+
+  const email = window.localStorage.getItem('email')
+
+  const { vuln, vexStatus, id, componentVulnLogs, vexJustification } = data
 
   const [statusTitle, setStatusTitle] = useState('')
   const [statusName, setStatusName] = useState('')
   const [justification, setJustification] = useState('')
+  const [justificationName, setJustificationName] = useState('')
   const [selectedTag, setSelectedTag] = useState('')
   const [notes, setNotes] = useState('')
 
   const [statusResults, setStatusResults] = useState([])
+  const [newVulnLogs, setNewVulnLogs] = useState([])
 
-  const { data: allVexStatus } = useQuery(getVexStatuses, {})
-  const { data: allVexJustify } = useQuery(getVexJustifications, {})
-  const { data: allVexLogs, refetch } = useQuery(getVexLogs, {
-    variables: {
-      imageVersionId: imgVersionId,
-      cveId: cve,
-      compName: component,
-      version: version
-    }
-  })
+  const { data: allVexStatus } = useQuery(getVexStatuses)
+  const { data: allVexJustify } = useQuery(getVexJustifications)
 
-  const [vexVulnCreate] = useMutation(VexVulnCreate, {
-    onCompleted: refetch
-  })
+  const [compVexCreate] = useMutation(updateCompVulnVex)
 
   const handleStatusChange = (e) => {
     const { value } = e.target
@@ -80,117 +68,75 @@ const StatusDrawer = ({
     setStatusName(e.target.options[e.target.selectedIndex].text)
   }
 
-  const getFormattedDate = (year, month, day) => {
-    // Create a new Date object with the specified year, month, and day
-    const date = new Date(year, month - 1, day)
-
-    // Use the toDateString() method to get the formatted date string
-    const formattedDate = date.toDateString()
-
-    return formattedDate
+  const handleJustifyChange = (e) => {
+    const { value } = e.target
+    setJustification(value)
+    setJustificationName(e.target.options[e.target.selectedIndex].text)
   }
 
-  const handleAdd = async () => {
+  const handleAdd = () => {
+    setNewVulnLogs([
+      {
+        changedBy: email,
+        id: id,
+        justification: justificationName,
+        notes: notes,
+        status: statusName,
+        updatedAt: new Date().toISOString()
+      },
+      ...newVulnLogs
+    ])
+  }
+
+  const handleSave = async () => {
     try {
-      if (statusName === 'Not Affected') {
-        await vexVulnCreate({
-          variables: {
-            imageVersionID: imgVersionId,
-            cveID: cve,
-            compName: component,
-            compVersion: version,
-            notes: notes,
-            vexJustificationID: justification,
-            vexStatusID: statusTitle
-          }
-        }).then(() => refetch())
-      } else {
-        await vexVulnCreate({
-          variables: {
-            imageVersionID: imgVersionId,
-            cveID: cve,
-            compName: component,
-            compVersion: version,
-            notes: notes,
-            vexStatusID: statusTitle,
-            fixedVersionID: selectedTag
-          }
-        }).then(() => refetch())
-      }
-      setSelectVersion('')
-      setJustification('')
-      setNotes('')
+      await compVexCreate({
+        variables: {
+          compVulnId: id,
+          notes: notes,
+          sbomId: sbomId,
+          vexStatusId: statusTitle,
+          vexJustificationId: justification
+        }
+      }).then((res) => {
+        if (res.data) {
+          refetch({
+            projectId: productId,
+            sbomId: sbomId,
+            first: 10,
+            last: undefined,
+            field: 'UPDATED_AT',
+            direction: 'DESC'
+          })
+          onClose()
+        }
+      })
     } catch (error) {
-      // if (error.networkError && error.networkError.statusCode === 500) {
-      //   alert('Invalid entry')
-      // } else {
-      //   alert(error.message)
-      // }
+      console.log('Mutation error', error)
     }
   }
 
   useEffect(() => {
-    if (allVexLogs) {
+    if (vexStatus) {
+      setStatusTitle(vexStatus.id)
+      setStatusName(vexStatus.name)
+    }
+
+    if (componentVulnLogs) {
       const sortedData =
-        allVexLogs.vexLogs &&
-        [...allVexLogs.vexLogs].sort((a, b) => {
+        componentVulnLogs &&
+        [...componentVulnLogs].sort((a, b) => {
           const dateA = new Date(a.updatedAt).getTime()
           const dateB = new Date(b.updatedAt).getTime()
           return dateB - dateA
         })
       setStatusResults(sortedData)
     }
-  }, [allVexLogs])
 
-  useEffect(() => {
-    if (cve === 'CVE-2019-8457') {
-      setVulData((prev) => [
-        {
-          username: 'surendra',
-          justification,
-          status: status,
-          timestamp: new Date().toDateString(),
-          notes: notes
-        }
-      ])
+    if (vexJustification) {
+      setJustification(vexJustification.id)
     }
-
-    if (cve === 'CVE-2023-27534') {
-      location.pathname.startsWith('/customer')
-        ? setVulData((prev) => [
-            {
-              username: 'IBM',
-              justification: '',
-              status: 'Must-Address',
-              timestamp: getFormattedDate('2023', '6', '20'),
-              notes: notes
-            }
-          ])
-        : setVulData((prev) => [
-            {
-              username: 'Uber',
-              justification: '',
-              status: 'Accepted',
-              timestamp: getFormattedDate('2023', '6', '21'),
-              notes: notes
-            },
-            {
-              username: 'IBM',
-              justification: '',
-              status: 'Must-Address',
-              timestamp: getFormattedDate('2023', '6', '20'),
-              notes: notes
-            },
-            {
-              username: 'Oracle',
-              justification: '',
-              status: 'Must-Address',
-              timestamp: getFormattedDate('2023', '6', '19'),
-              notes: notes
-            }
-          ])
-    }
-  }, [cve, status])
+  }, [data])
 
   return (
     <Drawer
@@ -198,16 +144,16 @@ const StatusDrawer = ({
       placement='right'
       onClose={onClose}
       finalFocusRef={btnRef}
-      closeOnOverlayClick={false}
-      size={location.pathname.startsWith('/customer') ? 'sm' : 'lg'}
+      // closeOnOverlayClick={false}
+      size={location.pathname.startsWith('/customer') ? 'sm' : 'xl'}
     >
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton
-          onClick={() => vulnRefetch !== null && vulnRefetch()}
+        //  onClick={() => refetch !== null && refetch()}
         />
         <DrawerHeader borderBottomWidth='1px' color='gray.600'>
-          {cve} Status
+          {vuln.vulnId} Status
         </DrawerHeader>
         <DrawerBody>
           <Stack spacing='24px'>
@@ -257,7 +203,7 @@ const StatusDrawer = ({
                         <Select
                           id='justification'
                           value={justification}
-                          onChange={(e) => setJustification(e.target.value)}
+                          onChange={handleJustifyChange}
                           size='sm'
                           color='gray.500'
                         >
@@ -285,7 +231,7 @@ const StatusDrawer = ({
                           fontSize='sm'
                           color='gray.600'
                         >
-                          Tag
+                          Version
                         </FormLabel>
                         <Select
                           id='tag'
@@ -294,15 +240,18 @@ const StatusDrawer = ({
                           size='sm'
                           color='gray.500'
                         >
-                          <option value={'select'}>--Select--</option>
-                          {imageInfo && imageInfo.length > 0 ? (
-                            imageInfo.map((img, index) => (
-                              <option key={index} value={img.id}>
-                                {img.name}
+                          {filteredData && filteredData.length > 0 ? (
+                            filteredData.map((item, index) => (
+                              <option
+                                key={index}
+                                value={item.id}
+                                name={item.version}
+                              >
+                                {item.version}
                               </option>
                             ))
                           ) : (
-                            <option value={''}>No data found</option>
+                            <option value=''>-- --</option>
                           )}
                         </Select>
                       </Box>
@@ -329,7 +278,12 @@ const StatusDrawer = ({
                     </Button>
                   </Flex>
                 ) : (
-                  <Button colorScheme='blue' onClick={handleAdd}>
+                  <Button
+                    width={'fit-content'}
+                    colorScheme='blue'
+                    onClick={handleAdd}
+                    disabled={statusTitle === ''}
+                  >
                     Add
                   </Button>
                 )}
@@ -337,13 +291,13 @@ const StatusDrawer = ({
                   <Text size='md' my={2}>
                     Status History
                   </Text>
-                  {allVexLogs &&
-                  allVexLogs.vexLogs &&
-                  allVexLogs.vexLogs.length > 0 ? (
+                  {(componentVulnLogs.length > 0 || newVulnLogs.length > 0) && (
                     <Table variant='simple' color={textColor} size='sm' mt={4}>
                       <Thead>
-                        <Tr my='.8rem' pl='0px'>
-                          <Th color='gray.400'>Username</Th>
+                        <Tr my='.8rem'>
+                          <Th color='gray.400' pl={0}>
+                            Username
+                          </Th>
                           <Th color='gray.400'>Status</Th>
                           <Th color='gray.400'>Justification</Th>
                           <Th color='gray.400'>Timestamp</Th>
@@ -351,34 +305,62 @@ const StatusDrawer = ({
                         </Tr>
                       </Thead>
                       <Tbody>
-                        {statusResults &&
+                        {newVulnLogs.length > 0 &&
+                          newVulnLogs.map((item) => (
+                            <VulLinkRow
+                              key={item.id}
+                              id={item.id}
+                              username={item.changedBy}
+                              justification={item.justification}
+                              status={item.status}
+                              timestamp={item.updatedAt}
+                              notes={item.note}
+                            />
+                          ))}
+
+                        {statusResults.length > 0 &&
                           statusResults.map((item) => (
                             <VulLinkRow
                               key={item.id}
                               id={item.id}
-                              username={item.user.name}
-                              justification={item.vexJustification?.name}
-                              status={item.vexStatus.name}
+                              username={item.changedBy}
+                              justification={item.justification}
+                              status={item.status}
                               timestamp={item.updatedAt}
                               notes={item.note}
                             />
                           ))}
                       </Tbody>
                     </Table>
-                  ) : (
-                    <Text mt={4} color={'darkgrey'}>
-                      No status history found
-                    </Text>
                   )}
+
+                  {componentVulnLogs.length === 0 &&
+                    newVulnLogs.length === 0 && (
+                      <Text mt={4} color={'darkgrey'}>
+                        No status history found
+                      </Text>
+                    )}
                 </Flex>
               </SimpleGrid>
               <Divider />
             </Box>
           </Stack>
         </DrawerBody>
+        <DrawerFooter>
+          <Button mr={3} onClick={onClose}>
+            Cancel
+          </Button>
+          <Button
+            colorScheme='blue'
+            onClick={handleSave}
+            disabled={newVulnLogs.length === 0}
+          >
+            Save
+          </Button>
+        </DrawerFooter>
       </DrawerContent>
     </Drawer>
   )
 }
 
-export default StatusDrawer
+export default ProdStatusDrawer

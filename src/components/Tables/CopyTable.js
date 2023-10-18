@@ -1,20 +1,20 @@
+import { ExternalLinkIcon } from '@chakra-ui/icons'
 import {
   Flex,
   Text,
-  Select,
-  Switch,
   Tag,
+  TagLabel,
+  Icon,
+  Button,
+  Link,
   Input,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  Button
+  Tooltip,
+  useColorModeValue
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
-import React, { useMemo } from 'react'
-import { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
+import { statusColor } from 'utils'
 
 const customStyles = {
   headCells: {
@@ -28,55 +28,160 @@ const customStyles = {
 }
 
 const CopyTable = ({ data }) => {
+  const customerView = location.pathname.startsWith('/customer')
+
   const [selectedRows, setSelectedRows] = useState([])
+
+  const textColor = useColorModeValue('gray.700', 'white')
+
+  const sevColor = (cvss) => {
+    if (cvss >= 9.0) {
+      return 'red'
+    } else if (cvss >= 7.0) {
+      return 'orange'
+    } else if (cvss >= 6.0) {
+      return 'yellow'
+    } else {
+      return 'green'
+    }
+  }
 
   // COLUMNS
   const columns = [
-    // CVE
+    // CVE ID
     {
       id: 'cve',
-      name: 'CVE',
-      selector: (row) => <Text>{row.cve}</Text>
+      name: 'CVE ID',
+      selector: (row) => {
+        const { vuln } = row
+        return (
+          <Link href={linkURl(vuln.source, vuln.vulnId)} target={'_blank'}>
+            <Flex direction='row' alignItems={'center'} gap={2}>
+              <Icon
+                as={ExternalLinkIcon}
+                h={'16px'}
+                w={'16px'}
+                color={'blue.500'}
+              />
+              <Tooltip label={vuln.vulnId} placement={'top'}>
+                <Text fontSize='sm' color={textColor}>
+                  {vuln.vulnId !== null
+                    ? `${vuln.vulnId?.substring(0, 15)}${
+                        vuln.vulnId.length > 15 ? '...' : ''
+                      }`
+                    : ''}
+                </Text>
+              </Tooltip>
+            </Flex>
+          </Link>
+        )
+      },
+      width: '200px'
     },
-    // COMPONENT ONE
+    // SEVERITY
+    {
+      id: 'serverity',
+      name: 'SEVERITY',
+      selector: (row) => '',
+      width: '150px'
+    },
+    // SOURCE
+    {
+      id: 'source',
+      name: 'SOURCE',
+      selector: (row) => {
+        const { vuln } = row
+        return (
+          <Tag
+            size='sm'
+            key='md'
+            variant='solid'
+            colorScheme={vuln.source === 'osv' ? 'red' : 'blue'}
+            textTransform={'uppercase'}
+            width={'100%'}
+            alignItems={'center'}
+            justifyContent={'center'}
+          >
+            <TagLabel>{vuln.source}</TagLabel>
+          </Tag>
+        )
+      },
+      width: '110px'
+    },
+    // CVSS
+    {
+      id: 'cvss',
+      name: 'CVSS',
+      selector: (row) => {
+        const { vuln } = row
+        return (
+          <Flex minWidth='max-content' alignItems='center' gap='2'>
+            <Tag
+              size='md'
+              key='md'
+              variant='subtle'
+              colorScheme={sevColor(vuln.cvssScore)}
+            >
+              <TagLabel>{vuln.cvssScore ? vuln.cvssScore : 0}</TagLabel>
+            </Tag>
+          </Flex>
+        )
+      },
+      width: '100px'
+    },
+    // COMPONENT
     {
       id: 'component',
       name: 'COMPONENT',
-      selector: (row) => <Text>{row.component}</Text>
+      selector: (row) => {
+        const { component } = row
+        return (
+          <Tooltip label={component.name} placement='top'>
+            <Text textTransform={'capitalize'}>
+              {component.name !== null
+                ? `${component.name?.substring(0, 30)}${
+                    component.name.length > 30 ? '...' : ''
+                  }`
+                : ''}
+            </Text>
+          </Tooltip>
+        )
+      },
+      width: '250px'
     },
+    // VERSION
     {
       id: 'version',
       name: 'VERSION',
-      selector: (row) => <Text>{row.version}</Text>
+      selector: (row) => row.component.version,
+      width: '130px'
     },
+    // STATUS
     {
       id: 'status',
-      name: 'CURRENT STATUS',
-      selector: (row) => <Tag colorScheme='gray'>{row.status}</Tag>
-    },
-    // VERSION TWO
-    {
-      id: 'newStatus',
-      name: 'NEW STATUS',
-      selector: (row) => <Tag colorScheme='green'>{row.newStatus}</Tag>
-    },
-    {
-      id: 'history',
-      name: 'KEEP HISTORY',
-      selector: (row) => <Switch id='history' defaultChecked />
-    },
-    {
-      id: 'resolution',
-      name: 'RESOLUTION',
-      selector: (row) => (
-        <Select size='sm'>
-          <option value=''>-- Select --</option>
-          <option value='Keep existing'>Keep existing</option>
-          <option value='Replace from import'>Replace from import</option>
-          <option value='Not applicable'>Not applicable</option>
-        </Select>
-      )
+      name: 'STATUS',
+      selector: (row) => {
+        const { vexStatus } = row
+        return (
+          <Tag
+            fontWeight={'normal'}
+            variant='solid'
+            size='sm'
+            colorScheme={statusColor(vexStatus ? vexStatus.name : 'In Triage')}
+          >
+            {vexStatus !== null ? vexStatus.name : 'In Triage'}
+          </Tag>
+        )
+      }
     }
+    // // UPDATED AT
+    // {
+    //   id: 'updatedAt',
+    //   name: 'UPDATED AT',
+    //   selector: (row) => getFullDateAndTime(row.vuln.updatedAt),
+    //   sortable: true
+    // },
+    // ACTION
   ]
 
   const subHeaderComponentMemo = useMemo(() => {
@@ -97,13 +202,21 @@ const CopyTable = ({ data }) => {
     )
   }, [])
 
+  const linkURl = (type, id) => {
+    if (type === 'osv') {
+      return `https://osv.dev/vulnerability/${id}`
+    } else {
+      return `https://nvd.nist.gov/vuln/detail/${id}`
+    }
+  }
+
   return (
     <Card py={6}>
-      {data.length > 0 ? (
+      {data.nodes.length > 0 ? (
         <Flex flexDir={'column'} width={'100%'} mt={2}>
           <DataTable
             columns={columns}
-            data={data}
+            data={data.nodes}
             customStyles={customStyles}
             progressPending={data.length === 0}
             subHeader

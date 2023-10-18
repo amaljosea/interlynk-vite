@@ -2,18 +2,22 @@ import { useState } from 'react'
 import {
   Progress,
   Box,
-  GridItem,
   Text,
-  Grid,
   Stack,
   FormLabel,
   FormControl,
   Select,
-  Checkbox
+  Checkbox,
+  Flex,
+  Skeleton
 } from '@chakra-ui/react'
-import { useQuery } from '@apollo/client'
-import { GetProjectData } from 'graphQL/Queries'
+import { useLazyQuery, useQuery } from '@apollo/client'
+import { GetProjectData, GetProject, GetVulnData } from 'graphQL/Queries'
 import CopyTable from 'components/Tables/CopyTable'
+
+let productId
+let sbomId
+const uniqVersions = []
 
 // FORM ONE
 const Form1 = () => {
@@ -32,6 +36,51 @@ const Form1 = () => {
       value: option.id,
       label: option.name
     }))
+
+  const [getProduct, { data }] = useLazyQuery(GetProject)
+
+  const handleSelectProduct = (e) => {
+    setSelectedProd(e.target.value)
+    productId = e.target.value
+    getProduct({
+      variables: {
+        id: e.target.value
+      }
+    }).then((res) => {
+      console.log(res.data.project.sboms)
+    })
+  }
+
+  data &&
+    data.project.sboms.map((project) => {
+      if (project.primaryComponent) {
+        uniqVersions.push({
+          version: project.primaryComponent.version,
+          id: project.id,
+          updatedAt: project.updatedAt
+        })
+      }
+    })
+
+  // remove duplicates
+  const removeDuplicatesAndLatest = (arr) => {
+    const uniqueVersions = {}
+
+    for (const item of arr) {
+      if (
+        !uniqueVersions[item.version] ||
+        item.updatedAt > uniqueVersions[item.version].updatedAt
+      ) {
+        uniqueVersions[item.version] = item
+      }
+    }
+
+    return Object.values(uniqueVersions)
+  }
+
+  const filteredData = uniqVersions
+    ? removeDuplicatesAndLatest(uniqVersions)
+    : []
 
   return (
     <>
@@ -54,7 +103,7 @@ const Form1 = () => {
             <Select
               name='projects'
               value={selectedProd}
-              onChange={(e) => setSelectedProd(e.target.value)}
+              onChange={handleSelectProduct}
             >
               <option value={''}>-- Select --</option>
               {productList.map((item, index) => (
@@ -72,14 +121,18 @@ const Form1 = () => {
             <Select
               name='projects'
               value={selectedVersion}
-              onChange={(e) => setSelectedVersion(e.target.value)}
+              onChange={(e) => {
+                setSelectedVersion(e.target.value)
+                sbomId = e.target.value
+              }}
             >
               <option value={''}>-- Select --</option>
-              {['2.3.4', '3.4.5'].map((item, index) => (
-                <option key={index} value={item}>
-                  {item}
-                </option>
-              ))}
+              {filteredData.length > 0 &&
+                filteredData.map((item, index) => (
+                  <option key={index} value={item.id}>
+                    {item.version}
+                  </option>
+                ))}
             </Select>
           </FormControl>
         </Stack>
@@ -148,6 +201,17 @@ const Form3 = () => {
 
 // FORM FOUR
 const Form4 = () => {
+  // GET VULN DATA
+  const { data: vulnData } = useQuery(GetVulnData, {
+    variables: {
+      projectId: productId,
+      sbomId: sbomId,
+      first: 10,
+      field: 'UPDATED_AT',
+      direction: 'ASC'
+    }
+  })
+
   return (
     <>
       <Text
@@ -160,37 +224,7 @@ const Form4 = () => {
         Vunlerability view resolved by
       </Text>
       <Box width={'90%'} margin={'0 auto'}>
-        <CopyTable
-          data={[
-            {
-              id: 1,
-              cve: 'CVE-2023-24532',
-              component: 'dropwizard-core',
-              version: '1.2.4',
-              status: 'In Triage',
-              newStatus: 'False Positive',
-              notes: 'In Triage'
-            },
-            {
-              id: 2,
-              cve: 'CVE-2017-16921',
-              component: 'samza-pre',
-              version: '0.7.3',
-              status: 'In Triage',
-              newStatus: 'Fixed',
-              notes: 'In Triage'
-            },
-            {
-              id: 3,
-              cve: 'CVE-2021-14922',
-              component: 'samza-core',
-              version: '0.7.3',
-              status: 'Fixed',
-              newStatus: 'Affected',
-              notes: 'In Triage'
-            }
-          ]}
-        />
+        {vulnData && <CopyTable data={vulnData.sbom.vulns} />}
       </Box>
     </>
   )

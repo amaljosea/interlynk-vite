@@ -88,7 +88,8 @@ function ComponentDrawer(props) {
     primaryComp,
     refetch,
     group,
-    shortDesc
+    shortDesc,
+    totalRows
   } = props
 
   const [createComponent] = useMutation(CreateComponent)
@@ -320,7 +321,7 @@ function ComponentDrawer(props) {
               refetch({
                 projectId: productId,
                 sbomId: sbomId,
-                first: 10,
+                first: totalRows,
                 field: 'NAME',
                 direction: 'ASC'
               })
@@ -371,7 +372,7 @@ function ComponentDrawer(props) {
             refetch({
               projectId: productId,
               sbomId: sbomId,
-              first: 10,
+              first: totalRows,
               field: 'NAME',
               direction: 'ASC'
             })

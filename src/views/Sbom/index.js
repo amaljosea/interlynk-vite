@@ -2,7 +2,6 @@
 import {
   Flex,
   Stack,
-  Spacer,
   Icon,
   Button,
   Grid,
@@ -31,35 +30,25 @@ import React, { useState, useRef, useEffect } from 'react'
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 import SBOMTable from './components/SBOMTable'
-import SBOMStatistics from './components/SBOMStatistics'
 import {
   FaBalanceScale,
   FaCubes,
   FaLayerGroup,
   FaFileDownload,
-  FaCopy,
   FaProjectDiagram
 } from 'react-icons/fa'
+import { TbSignature, TbSignatureOff } from 'react-icons/tb'
 import { useLocation, useHistory } from 'react-router-dom'
 import { CalendarIcon, DeleteIcon, EditIcon, LockIcon } from '@chakra-ui/icons'
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import { GetProject } from 'graphQL/Queries'
-import { timeSince } from 'utils'
+import { timeSince, getFullDateAndTime } from 'utils'
 import SigningModal from './components/SigningModal'
 import DownloadModal from './components/DownloadModal'
 import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
-import { sbomDelete } from 'graphQL/Mutation'
-
-import { TbSignature, TbSignatureOff } from 'react-icons/tb'
 import CopyModal from './components/CopyModal'
-import { GetProjectData } from 'graphQL/Queries'
 
-import { getFullDateAndTime } from 'utils'
-import { GetProductData } from 'graphQL/Queries'
-import { GetComponentData } from 'graphQL/Queries'
-import { GetCheckResults } from 'graphQL/Queries'
-import { GetVulnData } from 'graphQL/Queries'
-import { GetChangeLogs } from 'graphQL/Queries'
+import { useMutation, useQuery } from '@apollo/client'
+import { GetProductData, GetProject, GetProjectData } from 'graphQL/Queries'
+import { sbomDelete } from 'graphQL/Mutation'
 
 const idRegex =
   /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
