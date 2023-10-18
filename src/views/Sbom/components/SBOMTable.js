@@ -177,7 +177,7 @@ const SBOMTable = ({
               'Checks',
               'Change Log'
             ].map((item, index) => (
-              <Tab key={index} _focus={{ outline: 'none' }} isDisabled={error}>
+              <Tab key={index} _focus={{ outline: 'none' }}>
                 {item}
               </Tab>
             ))}
