@@ -92,7 +92,9 @@ const HealthCheckTable = ({
   pageIndex,
   setPageIndex,
   refetch,
-  setIsLoading
+  setIsLoading,
+  totalRows,
+  setTotalRows
 }) => {
   const customerView = location.pathname.startsWith('/customer')
   const toast = useToast()
@@ -603,7 +605,7 @@ const HealthCheckTable = ({
     refetch({
       projectId: productId,
       sbomId: sbomId,
-      first: 10,
+      first: totalRows,
       last: undefined,
       field: column.name,
       direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
@@ -616,9 +618,9 @@ const HealthCheckTable = ({
       projectId: productId,
       sbomId: sbomId,
       first: undefined,
-      last: 10,
+      last: totalRows,
       before: data.pageInfo.startCursor,
-      after: '',
+      after: undefined,
       field: 'STATUS',
       direction: 'DESC'
     })
@@ -629,10 +631,10 @@ const HealthCheckTable = ({
     refetch({
       projectId: productId,
       sbomId: sbomId,
-      first: 10,
+      first: totalRows,
       last: undefined,
       after: data.pageInfo.endCursor,
-      before: '',
+      before: undefined,
       field: 'STATUS',
       direction: 'DESC'
     })
@@ -677,7 +679,7 @@ const HealthCheckTable = ({
           Next
         </Button>
         <Box>
-          Page {pageIndex} of {Math.ceil(data.totalCount / 10)}
+          Page {pageIndex} of {Math.ceil(data.totalCount / totalRows)}
         </Box>
       </Flex>
 
@@ -731,6 +733,7 @@ const HealthCheckTable = ({
               onClose={onSupplierClose}
               suppliers={[]}
               checkId={activeRow.organizationRule.rule.friendlyId}
+              totalRows={10}
             />
           )}
 

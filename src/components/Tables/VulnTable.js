@@ -58,6 +58,7 @@ import styled from '@emotion/styled'
 import CopyTable from './CopyTable'
 import Multistep from 'views/Sbom/components/Multistep'
 import { getFullDateAndTime } from 'utils'
+import ProdStatusDrawer from 'components/Drawer/ProdStatusDrawer'
 
 const customStyles = {
   headCells: {
@@ -134,7 +135,9 @@ const VulnTable = ({
   sbomId,
   pageIndex,
   setPageIndex,
-  filteredData
+  filteredData,
+  totalRows,
+  setTotalRows
 }) => {
   const location = useLocation()
   const toast = useToast()
@@ -210,6 +213,8 @@ const VulnTable = ({
     }
   }
 
+  // console.log(activeRow)
+
   // COLUMNS
   const columns = [
     // CVE ID
@@ -270,7 +275,7 @@ const VulnTable = ({
           </Tag>
         )
       },
-      width: '150px'
+      width: '110px'
     },
     // CVSS
     {
@@ -318,7 +323,7 @@ const VulnTable = ({
       id: 'version',
       name: 'VERSION',
       selector: (row) => row.component.version,
-      width: '150px'
+      width: '130px'
     },
     // STATUS
     {
@@ -617,9 +622,9 @@ const VulnTable = ({
       projectId: productId,
       sbomId: sbomId,
       first: undefined,
-      last: 10,
+      last: totalRows,
       before: data.pageInfo.startCursor,
-      after: '',
+      after: undefined,
       field: 'UPDATED_AT',
       direction: 'DESC'
     })
@@ -630,10 +635,10 @@ const VulnTable = ({
     refetch({
       projectId: productId,
       sbomId: sbomId,
-      first: 10,
+      first: totalRows,
       last: undefined,
       after: data.pageInfo.endCursor,
-      before: '',
+      before: undefined,
       field: 'UPDATED_AT',
       direction: 'DESC'
     })
@@ -643,7 +648,7 @@ const VulnTable = ({
     refetch({
       projectId: productId,
       sbomId: sbomId,
-      first: 10,
+      first: totalRows,
       last: undefined,
       field: column.name,
       direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
@@ -702,7 +707,7 @@ const VulnTable = ({
           Next
         </Button>
         <Box>
-          Page {pageIndex} of {Math.ceil(data.totalCount / 10)}
+          Page {pageIndex} of {Math.ceil(data.totalCount / totalRows)}
         </Box>
       </Flex>
 
@@ -791,7 +796,15 @@ const VulnTable = ({
                     </Button>
                   )}
 
-                  <Button onClick={onTableClose}>Cancel</Button>
+                  <Button
+                    onClick={() => {
+                      setStep(1)
+                      setProgress(25)
+                      onTableClose()
+                    }}
+                  >
+                    Cancel
+                  </Button>
                 </ButtonGroup>
                 {step === 4 ? (
                   <Button
@@ -829,21 +842,13 @@ const VulnTable = ({
       {activeRow !== null && (
         <>
           {isOpen && (
-            <StatusDrawer
+            <ProdStatusDrawer
               isOpen={isOpen}
               onClose={onClose}
               btnRef={btnRef}
-              id={activeRow.id}
-              component={activeRow.component.name}
-              version={activeRow.component.version}
-              imageInfo={null}
-              imgVersionId={null}
-              cve={activeRow.cve}
+              data={activeRow}
               textColor={textColor}
-              setSelectVersion={null}
               refetch={refetch}
-              status={activeRow.vexStatus}
-              setVulData={setVulData}
               filteredData={filteredData}
             />
           )}

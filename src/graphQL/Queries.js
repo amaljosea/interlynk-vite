@@ -496,8 +496,15 @@ export const GetComponentData = gql`
     $last: Int
     $after: String
     $before: String
-    $field: ComponentOrderByFields!
-    $direction: OrderByDirection!
+    $search: String
+    $licenses: String
+    $supplierName: String
+    $ecosystem: String
+    $kind: String
+    $internal: Boolean
+    $primary: Boolean
+    $field: ComponentOrderByFields
+    $direction: CompOrderByDirection
   ) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
       id
@@ -507,6 +514,13 @@ export const GetComponentData = gql`
         before: $before
         first: $first
         last: $last
+        search: $search
+        licenses: $licenses
+        supplierName: $supplierName
+        ecosystem: $ecosystem
+        kind: $kind
+        internal: $internal
+        primary: $primary
         orderBy: { field: $field, direction: $direction }
       ) {
         totalCount
@@ -541,6 +555,20 @@ export const GetComponentData = gql`
             updatedAt
           }
         }
+      }
+    }
+  }
+`
+// GET COMPONENT FILTER DATA
+export const GetCompFilterData = gql`
+  query GetCompFilterData($projectId: Uuid!, $sbomId: Uuid!) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      id
+      filters {
+        ecosystems
+        supplierNames
+        kinds
+        licenses
       }
     }
   }
@@ -587,6 +615,14 @@ export const GetVulnData = gql`
             nvdAliasId
             updatedAt
           }
+          componentVulnLogs {
+            id
+            changedBy
+            status
+            justification
+            note
+            updatedAt
+          }
           component {
             name
             version
@@ -595,7 +631,6 @@ export const GetVulnData = gql`
             id
             name
           }
-
           vexJustification {
             id
             name

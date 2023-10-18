@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 // CHAKRA IMPORTS
 import {
   Tabs,
@@ -7,7 +7,9 @@ import {
   TabPanel,
   TabPanels,
   Flex,
-  Skeleton
+  Skeleton,
+  Button,
+  Text
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card.js'
 
@@ -47,18 +49,21 @@ const SBOMTable = ({
   const [resultIndex, setResultIndex] = useState(1)
   const [changelogIndex, setChangelogIndex] = useState(1)
 
+  const [totalRows, setTotalRows] = useState(10)
+
   // GET COMPONENT DATA
   const {
     data: compData,
     refetch: compRefetch,
-    error
+    error,
+    loading
   } = useQuery(GetComponentData, {
     variables: {
       projectId: productId,
       sbomId: sbomId,
-      first: 10,
-      field: 'NAME',
-      direction: 'ASC'
+      first: totalRows,
+      field: 'UPDATED_AT',
+      direction: 'DESC'
     }
   })
 
@@ -67,7 +72,7 @@ const SBOMTable = ({
     variables: {
       projectId: productId,
       sbomId: sbomId,
-      first: 10,
+      first: totalRows,
       field: 'UPDATED_AT',
       direction: 'ASC'
     }
@@ -80,7 +85,7 @@ const SBOMTable = ({
       variables: {
         projectId: productId,
         sbomId: sbomId,
-        first: 10,
+        first: totalRows,
         field: 'STATUS',
         direction: 'DESC'
       }
@@ -92,7 +97,7 @@ const SBOMTable = ({
     variables: {
       projectId: productId,
       sbomId: sbomId,
-      first: 10,
+      first: totalRows,
       field: 'CREATED_AT',
       direction: 'DESC'
     }
@@ -102,53 +107,58 @@ const SBOMTable = ({
   const onTabChange = (value) => {
     setTabIndex(value)
     window.localStorage.setItem('activeProdTab', value)
-  }
 
-  // ONLY FETCH SPECIFIC DATA BASED ON SELECTED TAB
-  useEffect(() => {
-    if (tabIndex === 0) {
+    if (value === 0) {
       refetch({
         projectId: productId,
         sbomId: sbomId
       })
-    } else if (tabIndex === 1) {
+    } else if (value === 1) {
       compRefetch({
         projectId: productId,
         sbomId: sbomId,
-        first: 10,
+        first: totalRows,
         last: undefined,
-        field: 'NAME',
-        direction: 'ASC'
-      })
-    } else if (tabIndex === 2) {
-      vulnRefetch({
-        projectId: productId,
-        sbomId: sbomId,
-        first: 10,
+        after: undefined,
         last: undefined,
         field: 'UPDATED_AT',
         direction: 'DESC'
-      })
-    } else if (tabIndex === 3) {
+      }).then((res) => res.data && setComponentIndex(1))
+    } else if (value === 2) {
+      vulnRefetch({
+        projectId: productId,
+        sbomId: sbomId,
+        first: totalRows,
+        last: undefined,
+        after: undefined,
+        last: undefined,
+        field: 'UPDATED_AT',
+        direction: 'DESC'
+      }).then((res) => res.data && setVulnIndex(1))
+    } else if (value === 3) {
       healthRefetch({
         projectId: productId,
         sbomId: sbomId,
-        first: 10,
+        first: totalRows,
+        last: undefined,
+        after: undefined,
         last: undefined,
         field: 'STATUS',
         direction: 'DESC'
-      })
+      }).then((res) => res.data && setResultIndex(1))
     } else {
       logsRefetch({
         projectId: productId,
         sbomId: sbomId,
-        first: 10,
+        first: totalRows,
+        last: undefined,
+        after: undefined,
         last: undefined,
         field: 'CREATED_AT',
         direction: 'DESC'
-      })
+      }).then((res) => res.data && setChangelogIndex(1))
     }
-  }, [tabIndex])
+  }
 
   // EXTRACT ALL THE COMPONENT NAME AND ID'S FROM SELECTED SBOM VERSION
   const components =
@@ -177,7 +187,7 @@ const SBOMTable = ({
               'Checks',
               'Change Log'
             ].map((item, index) => (
-              <Tab key={index} _focus={{ outline: 'none' }} isDisabled={error}>
+              <Tab key={index} _focus={{ outline: 'none' }}>
                 {item}
               </Tab>
             ))}
@@ -205,7 +215,7 @@ const SBOMTable = ({
             </TabPanel>
             {/* COMPONENT TABLE */}
             <TabPanel px={0}>
-              {compData && data ? (
+              {compData && data && (
                 <ComponentTable
                   type={type}
                   lifecycle={lifecycle}
@@ -215,14 +225,44 @@ const SBOMTable = ({
                   pageIndex={componentIndex}
                   setPageIndex={setComponentIndex}
                   primaryComp={data.primaryComponent}
+                  totalRows={totalRows}
+                  setTotalRows={setTotalRows}
                 />
-              ) : (
+              )}
+
+              {loading && (
                 <Flex width={'100%'} gap={4} direction={'column'}>
                   <Skeleton width={'100%'} height='20px' />
                   <Skeleton width={'100%'} height='20px' />
                   <Skeleton width={'100%'} height='20px' />
                   <Skeleton width={'100%'} height='20px' />
                   <Skeleton width={'100%'} height='20px' />
+                </Flex>
+              )}
+
+              {error && (
+                <Flex
+                  py={10}
+                  flexDirection={'column'}
+                  gap={2}
+                  width={'70%'}
+                  mx={'auto'}
+                  alignItems={'center'}
+                  justifyContent={'center'}
+                >
+                  <Text color={'red.500'} textAlign={'center'}>
+                    {error.message}
+                  </Text>
+                  <Text>Something went wrong. Please refresh this page</Text>
+                  <Button
+                    mt={2}
+                    variant='solid'
+                    colorScheme='blue'
+                    fontWeight={'normal'}
+                    onClick={() => window.location.reload()}
+                  >
+                    Refresh
+                  </Button>
                 </Flex>
               )}
             </TabPanel>
@@ -237,6 +277,8 @@ const SBOMTable = ({
                   sbomId={sbomId}
                   pageIndex={vulnIndex}
                   setPageIndex={setVulnIndex}
+                  totalRows={totalRows}
+                  setTotalRows={setTotalRows}
                 />
               ) : (
                 <Flex width={'100%'} gap={4} direction={'column'}>
@@ -260,6 +302,8 @@ const SBOMTable = ({
                   pageIndex={resultIndex}
                   setPageIndex={setResultIndex}
                   setIsLoading={setIsLoading}
+                  totalRows={totalRows}
+                  setTotalRows={setTotalRows}
                 />
               ) : (
                 <Flex width={'100%'} gap={4} direction={'column'}>
@@ -279,6 +323,8 @@ const SBOMTable = ({
                   refetch={logsRefetch}
                   pageIndex={changelogIndex}
                   setPageIndex={setChangelogIndex}
+                  totalRows={totalRows}
+                  setTotalRows={setTotalRows}
                 />
               ) : (
                 <Flex width={'100%'} gap={4} direction={'column'}>
