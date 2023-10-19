@@ -26,9 +26,7 @@ const GlobalContext = React.createContext({
   productVulData: [],
   setProductVulData: () => {},
   automationRules: [],
-  setAutomationRules: () => {},
-  allVersion: [],
-  setFiletedVersion: {}
+  setAutomationRules: () => {}
 })
 
 export default GlobalContext

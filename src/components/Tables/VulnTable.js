@@ -1,8 +1,8 @@
 // Chakra imports
 import {
-  ArrowRightIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  CloseIcon,
   ExternalLinkIcon
 } from '@chakra-ui/icons'
 import {
@@ -21,11 +21,6 @@ import {
   GridItem,
   Tooltip,
   Stack,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItemOption,
-  MenuOptionGroup,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -33,7 +28,6 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
-  Badge,
   Select,
   FormControl,
   FormLabel,
@@ -49,16 +43,17 @@ import {
   ButtonGroup
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
-import { FaEllipsisV, FaFilter } from 'react-icons/fa'
+import { FaEllipsisV } from 'react-icons/fa'
 import { FaCopy } from 'react-icons/fa6'
 import { useState, useRef, useMemo, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
-import StatusDrawer from 'components/Drawer/StatusDrawer'
 import styled from '@emotion/styled'
 import CopyTable from './CopyTable'
 import Multistep from 'views/Sbom/components/Multistep'
 import { getFullDateAndTime } from 'utils'
 import ProdStatusDrawer from 'components/Drawer/ProdStatusDrawer'
+import VulnFilterMenu from 'views/Sbom/components/VulnFilterMenu'
+import { sevColor } from 'utils'
 
 const customStyles = {
   headCells: {
@@ -91,43 +86,6 @@ const statusColor = (status) => {
   }
 }
 
-const FilterComponent = ({ filterText, onFilter, onClear }) => {
-  const searchInputRef = useRef()
-
-  const focusSearchInput = () => {
-    if (searchInputRef?.current) {
-      searchInputRef?.current.focus()
-    }
-  }
-
-  const handleKeyPress = (e) => {
-    if (e.ctrlKey && e.key === '/') {
-      focusSearchInput()
-    }
-  }
-
-  useEffect(() => {
-    window.addEventListener('keydown', handleKeyPress)
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyPress)
-    }
-  }, [])
-
-  return (
-    <>
-      <Input
-        width={'400px'}
-        id='search'
-        type='text'
-        placeholder='Search'
-        aria-label='Search Input'
-        ref={searchInputRef}
-      />
-    </>
-  )
-}
-
 const VulnTable = ({
   data,
   refetch,
@@ -137,7 +95,8 @@ const VulnTable = ({
   setPageIndex,
   filteredData,
   totalRows,
-  setTotalRows
+  setTotalRows,
+  filterHeads
 }) => {
   const location = useLocation()
   const toast = useToast()
@@ -193,7 +152,7 @@ const VulnTable = ({
     onClose: onTableClose
   } = useDisclosure()
 
-  const sevColor = (cvss) => {
+  const cvssColor = (cvss) => {
     if (cvss >= 9.0) {
       return 'red'
     } else if (cvss >= 7.0) {
@@ -212,8 +171,6 @@ const VulnTable = ({
       return `https://nvd.nist.gov/vuln/detail/${id}`
     }
   }
-
-  // console.log(activeRow)
 
   // COLUMNS
   const columns = [
@@ -251,7 +208,19 @@ const VulnTable = ({
     {
       id: 'serverity',
       name: 'SEVERITY',
-      selector: (row) => '',
+      selector: (row) => {
+        const { vuln } = row
+        return (
+          <Tag
+            size='md'
+            key='md'
+            variant='subtle'
+            colorScheme={sevColor(`${vuln.sev}`)}
+          >
+            <TagLabel>{vuln.sev}</TagLabel>
+          </Tag>
+        )
+      },
       width: '150px'
     },
     // SOURCE
@@ -289,7 +258,7 @@ const VulnTable = ({
               size='md'
               key='md'
               variant='subtle'
-              colorScheme={sevColor(vuln.cvssScore)}
+              colorScheme={cvssColor(vuln.cvssScore)}
             >
               <TagLabel>{vuln.cvssScore ? vuln.cvssScore : 0}</TagLabel>
             </Tag>
@@ -391,14 +360,64 @@ const VulnTable = ({
     }
   }
 
-  const subHeaderComponentMemo = useMemo(() => {
-    const handleClear = () => {
-      if (filterText) {
-        setResetPaginationToggle(!resetPaginationToggle)
-        setFilterText('')
-      }
+  // SEARCH COMPONENT
+  const handleSearch = async (event) => {
+    if (event.key === 'Enter') {
+      await refetch({
+        projectId: productId,
+        sbomId: sbomId,
+        search: filterText,
+        first: totalRows,
+        last: undefined,
+        after: undefined,
+        last: undefined,
+        field: 'UPDATED_AT',
+        direction: 'DESC'
+      })
+      setPageIndex(1)
     }
+  }
 
+  // CLEAR SERACH
+  const handleClear = async () => {
+    await refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      first: totalRows,
+      last: undefined,
+      after: undefined,
+      last: undefined,
+      search: undefined,
+      field: 'UPDATED_AT',
+      direction: 'DESC'
+    })
+    setFilterText('')
+    setPageIndex(1)
+  }
+
+  const searchInputRef = useRef()
+
+  const focusSearchInput = () => {
+    if (searchInputRef?.current) {
+      searchInputRef?.current.focus()
+    }
+  }
+
+  const handleKeyPress = (e) => {
+    if (e.ctrlKey && e.key === '/') {
+      focusSearchInput()
+    }
+  }
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyPress)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress)
+    }
+  }, [])
+
+  const subHeaderComponentMemo = useMemo(() => {
     return (
       <Flex
         width={'100%'}
@@ -411,123 +430,48 @@ const VulnTable = ({
           spacing={4}
           alignItems={'flex-start'}
         >
-          <FilterComponent
-            onFilter={(e) => setFilterText(e.target.value)}
-            onClear={handleClear}
-            filterText={filterText}
-          />
-
-          <Box width={'fit-content'} position={'relative'}>
-            {/* Severity */}
-            <Menu closeOnSelect={true}>
-              {activeSevCount > 0 && (
-                <Badge
-                  variant='solid'
-                  colorScheme='teal'
+          {/* SEARCH COMPONENTS */}
+          <Flex alignItems={'center'} gap={4}>
+            <Box position='relative' width={'300px'}>
+              <Input
+                value={filterText}
+                onChange={(e) => setFilterText(e.target.value)}
+                onKeyDown={handleSearch}
+                placeholder='Search vulnerabilities'
+                ref={searchInputRef}
+              />
+              {filterText !== '' && (
+                <CloseIcon
+                  w={'18px'}
+                  h={'18px'}
+                  bg={'blue.500'}
+                  color={'white'}
+                  p={1}
+                  rounded={'full'}
                   position={'absolute'}
-                  right={-2}
-                  top={-1.5}
-                  zIndex={11}
-                >
-                  {activeSevCount}
-                </Badge>
+                  zIndex={9999}
+                  right={3}
+                  top={'11px'}
+                  onClick={handleClear}
+                  cursor={'pointer'}
+                />
               )}
-              <MenuButton
-                as={Button}
-                colorScheme='blue'
-                fontWeight='normal'
-                fontSize={'sm'}
-                leftIcon={<FaFilter size={14} />}
-              >
-                Severity
-              </MenuButton>
-              <MenuList>
-                <MenuOptionGroup
-                  type='radio'
-                  onChange={() => window.location.reload()}
-                >
-                  <MenuItemOption value={'All'} fontSize={'sm'}>
-                    All
-                  </MenuItemOption>
-                </MenuOptionGroup>
-                <MenuOptionGroup
-                  type='checkbox'
-                  onChange={(value) => setFilterBySev(value)}
-                >
-                  <MenuItemOption value={'Critical'} fontSize={'sm'}>
-                    Critical
-                  </MenuItemOption>
-                  <MenuItemOption value={'High'} fontSize={'sm'}>
-                    High
-                  </MenuItemOption>
-                  <MenuItemOption value={'Medium'} fontSize={'sm'}>
-                    Medium
-                  </MenuItemOption>
-                  <MenuItemOption value={'Low'} fontSize={'sm'}>
-                    Low
-                  </MenuItemOption>
-                </MenuOptionGroup>
-              </MenuList>
-            </Menu>
-          </Box>
+            </Box>
+          </Flex>
 
-          <Box width={'fit-content'} position={'relative'}>
-            {/* Status */}
-            <Menu closeOnSelect={true}>
-              {activeStatusCount > 0 && (
-                <Badge
-                  variant='solid'
-                  colorScheme='teal'
-                  position={'absolute'}
-                  right={-2}
-                  top={-1.5}
-                  zIndex={11}
-                >
-                  {activeStatusCount}
-                </Badge>
-              )}
-              <MenuButton
-                as={Button}
-                colorScheme='blue'
-                fontWeight='normal'
-                fontSize={'sm'}
-                leftIcon={<FaFilter size={14} />}
-              >
-                Status
-              </MenuButton>
-              <MenuList>
-                <MenuOptionGroup
-                  type='radio'
-                  onChange={() => window.location.reload()}
-                >
-                  <MenuItemOption value={'All'} fontSize={'sm'}>
-                    All
-                  </MenuItemOption>
-                </MenuOptionGroup>
-                <MenuOptionGroup
-                  type='checkbox'
-                  onChange={(value) => setFilterByStatus(value)}
-                >
-                  {[
-                    'In Triage',
-                    'False Positive',
-                    'Affected',
-                    'Not Affected',
-                    'Fixed'
-                  ].map((option, index) => (
-                    <MenuItemOption
-                      key={index}
-                      value={option}
-                      textTransform='capitalize'
-                      fontSize={'sm'}
-                    >
-                      {option}
-                    </MenuItemOption>
-                  ))}
-                </MenuOptionGroup>
-              </MenuList>
-            </Menu>
-          </Box>
+          {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
+          {filterHeads && (
+            <VulnFilterMenu
+              refetch={refetch}
+              productId={productId}
+              sbomId={sbomId}
+              compNames={filterHeads.sbom.filters.vulnCompNames}
+              statuses={filterHeads.sbom.filters.vulnStatuses}
+              severities={filterHeads.sbom.filters.vulnSeverities}
+              setPageIndex={setPageIndex}
+              totalRows={totalRows}
+            />
+          )}
         </Stack>
 
         <Tooltip label='Import Statuses'>
@@ -542,14 +486,7 @@ const VulnTable = ({
         </Tooltip>
       </Flex>
     )
-  }, [
-    filterText,
-    resetPaginationToggle,
-    filterBySev,
-    filterByStatus,
-    activeSevCount,
-    activeStatusCount
-  ])
+  }, [filterText, filterHeads, handleKeyPress, handleSearch, handleClear])
 
   const ExpandedComponent = ({ data }) => {
     const { vuln } = data
@@ -655,6 +592,24 @@ const VulnTable = ({
     })
   }
 
+  // SET ROW LENGTH
+  const handleSetRow = async (e) => {
+    setTotalRows(Number(e.target.value))
+    await refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      first: Number(e.target.value),
+      last: undefined,
+      after: undefined,
+      last: undefined,
+      search: undefined,
+      field: 'UPDATED_AT',
+      direction: 'DESC'
+    })
+    setFilterText('')
+    setPageIndex(1)
+  }
+
   useEffect(() => {
     if (step === 1) {
       setStepTitle('Select source of data')
@@ -690,25 +645,36 @@ const VulnTable = ({
         gap={4}
         alignItems={'center'}
         mt={6}
-        justifyContent={'flex-start'}
+        justifyContent={'space-between'}
       >
-        <Button
-          colorScheme='blue'
-          onClick={onPreviousPage}
-          isDisabled={!data.pageInfo.hasPreviousPage}
-        >
-          Previous
-        </Button>
-        <Button
-          colorScheme='blue'
-          onClick={onNextPage}
-          isDisabled={!data.pageInfo.hasNextPage}
-        >
-          Next
-        </Button>
-        <Box>
-          Page {pageIndex} of {Math.ceil(data.totalCount / totalRows)}
-        </Box>
+        <Stack alignItems={'center'} direction={'row'} spacing={4}>
+          <Button
+            colorScheme='blue'
+            onClick={onPreviousPage}
+            isDisabled={!data.pageInfo.hasPreviousPage}
+          >
+            Previous
+          </Button>
+          <Button
+            colorScheme='blue'
+            onClick={onNextPage}
+            isDisabled={!data.pageInfo.hasNextPage}
+          >
+            Next
+          </Button>
+          <Box>
+            Page {pageIndex} of {Math.ceil(data.totalCount / totalRows)}
+          </Box>
+        </Stack>
+
+        <Stack alignItems={'center'} direction={'row'} spacing={4}>
+          <Text>Show</Text>
+          <Select width={20} value={totalRows} onChange={handleSetRow}>
+            <option value={25}>25</option>
+            <option value={50}>50</option>
+            <option value={100}>100</option>
+          </Select>
+        </Stack>
       </Flex>
 
       {/* COPY MODAL */}

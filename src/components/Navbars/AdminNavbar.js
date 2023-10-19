@@ -10,12 +10,9 @@ import {
 import PropTypes from 'prop-types'
 import React, { useState } from 'react'
 import AdminNavbarLinks from './AdminNavbarLinks'
-import { useContext } from 'react'
-import GlobalContext from 'context/GlobalContext'
 import { Link, useLocation } from 'react-router-dom'
 
 export default function AdminNavbar(props) {
-  const { minimize } = useContext(GlobalContext)
   const [scrolled, setScrolled] = useState(false)
   const { variant, children, fixed, secondary, brandText, onOpen, ...rest } =
     props
@@ -39,13 +36,9 @@ export default function AdminNavbar(props) {
   let mainText = useColorModeValue('gray.700', 'gray.200')
   let secondaryText = useColorModeValue('gray.400', 'gray.200')
   let navbarPosition = 'absolute'
-  let navbarFilter = 'none'
-  let navbarBackdrop = 'blur(21px)'
-  let navbarShadow = 'none'
   let navbarBg = 'none'
   let navbarBorder = 'transparent'
   let secondaryMargin = '0px'
-  let paddingX = '15px'
   if (props.fixed === true)
     if (scrolled === true) {
       navbarPosition = 'fixed'
@@ -105,42 +98,25 @@ export default function AdminNavbar(props) {
   return (
     <Flex
       position={navbarPosition}
-      // boxShadow={navbarShadow}
       bg={navbarBg}
       borderColor={navbarBorder}
-      // filter={navbarFilter}
-      // backdropFilter={navbarBackdrop}
       borderWidth='1.5px'
       borderStyle='solid'
       transitionDelay='0s, 0s, 0s, 0s'
       transitionDuration=' 0.25s, 0.25s, 0.25s, 0s'
       transition-property='box-shadow, background-color, filter, border'
       transitionTimingFunction='linear, linear, linear, linear'
-      // alignItems={{ xl: 'center' }}
       borderRadius='16px'
       display='flex'
       minH='75px'
-      // justifyContent={{ xl: 'center' }}
       lineHeight='25.6px'
       mt={secondaryMargin}
-      // pb='8px'
-      // left={document.documentElement.dir === 'rtl' ? '0' : '30px'}
-      // right={document.documentElement.dir === 'rtl' ? '' : '42px'}
-      // right={minimize === true ? 24 : 12}
       right={12}
-      // px={{
-      //   sm: paddingX,
-      //   md: '10px'
-      // }}
-      // ps={{
-      //   xl: '12px'
-      // }}
       top='12px'
       width={'100%'}
     >
       <Flex
         width={'100%'}
-        // w={minimize === false ? '95%' : '90%'}
         flexDirection={{
           sm: 'column',
           md: 'row'
@@ -148,11 +124,7 @@ export default function AdminNavbar(props) {
         alignItems={{ xl: 'center' }}
         justifyContent={'space-between'}
       >
-        <Box
-          pos={'relative'}
-          left={'40'}
-          mb={{ sm: '8px', md: '0px' }}
-        >
+        <Box pos={'relative'} left={'40'} mb={{ sm: '8px', md: '0px' }}>
           <Breadcrumb>
             <BreadcrumbItem color={mainText}>
               <Link

@@ -65,15 +65,10 @@ export default function HeaderLinks(props) {
   }, [])
 
   // Chakra Color Mode
-  let mainTeal = useColorModeValue('teal.300', 'teal.300')
-  let inputBg = useColorModeValue('white', 'gray.800')
-  let mainText = useColorModeValue('gray.700', 'gray.200')
   let navbarIcon = useColorModeValue('gray.500', 'gray.200')
-  let searchIcon = useColorModeValue('gray.700', 'gray.200')
 
   if (secondary) {
     navbarIcon = 'white'
-    mainText = 'white'
   }
 
   const paramId = Cookies.get('signedParamId')
@@ -169,9 +164,6 @@ export default function HeaderLinks(props) {
           color='gray.400'
           ms='0px'
           px='0px'
-          // me={{ sm: '2px', md: '16px' }}
-          // color={navbarIcon}
-          // variant='transparent-with-icon'
           rightIcon={
             document.documentElement.dir ? (
               ''
@@ -188,7 +180,7 @@ export default function HeaderLinks(props) {
           }
         >
           <Text display={{ sm: 'none', md: 'flex' }} fontSize={'sm'}>
-            {data ? data.organization.currentUser.name : 'Surendra Pathak'}
+            {data ? data.organization.currentUser.name : ''}
           </Text>
         </MenuButton>
         {location.pathname.startsWith('/vendor') && (

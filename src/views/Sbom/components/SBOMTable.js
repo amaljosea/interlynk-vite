@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 // CHAKRA IMPORTS
 import {
   Tabs,
@@ -21,13 +21,17 @@ import HealthCheckTable from 'components/Tables/HealthCheckTable'
 import SbomChangelogTable from 'components/Tables/SbomChangelogTable'
 
 // API QUERIES
-import { useQuery } from '@apollo/client'
+import { useLazyQuery, useQuery } from '@apollo/client'
 import {
   GetCheckResults,
   GetComponentData,
   GetVulnData,
   GetChangeLogs
 } from 'graphQL/Queries'
+import { GetCompFilterData } from 'graphQL/Queries'
+import { GetVulnFilterData } from 'graphQL/Queries'
+import { GetCheckFilterData } from 'graphQL/Queries'
+import { GetLogsFilterData } from 'graphQL/Queries'
 
 const SBOMTable = ({
   status,
@@ -37,7 +41,8 @@ const SBOMTable = ({
   data,
   refetch,
   lifecycle,
-  filteredData
+  filteredData,
+  setComponents
 }) => {
   const tab = window.localStorage.getItem('activeProdTab')
 
@@ -49,59 +54,65 @@ const SBOMTable = ({
   const [resultIndex, setResultIndex] = useState(1)
   const [changelogIndex, setChangelogIndex] = useState(1)
 
-  const [totalRows, setTotalRows] = useState(10)
+  const [totalRows, setTotalRows] = useState(25)
 
   // GET COMPONENT DATA
-  const {
-    data: compData,
-    refetch: compRefetch,
-    error,
-    loading
-  } = useQuery(GetComponentData, {
-    variables: {
-      projectId: productId,
-      sbomId: sbomId,
-      first: totalRows,
-      field: 'UPDATED_AT',
-      direction: 'DESC'
-    }
+  const [
+    getCompData,
+    { data: compData, refetch: compRefetch, error, loading }
+  ] = useLazyQuery(GetComponentData, {
+    fetchPolicy: 'network-only'
   })
 
   // GET VULN DATA
-  const { data: vulnData, refetch: vulnRefetch } = useQuery(GetVulnData, {
-    variables: {
-      projectId: productId,
-      sbomId: sbomId,
-      first: totalRows,
-      field: 'UPDATED_AT',
-      direction: 'ASC'
-    }
-  })
-
-  // GET HEALTH CHECK DATA
-  const { data: checkData, refetch: healthRefetch } = useQuery(
-    GetCheckResults,
+  const [getVulnData, { data: vulnData, refetch: vulnRefetch }] = useLazyQuery(
+    GetVulnData,
     {
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        first: totalRows,
-        field: 'STATUS',
-        direction: 'DESC'
-      }
+      fetchPolicy: 'network-only'
     }
   )
 
+  // GET HEALTH CHECK DATA
+  const [getCheckData, { data: checkData, refetch: healthRefetch }] =
+    useLazyQuery(GetCheckResults, { fetchPolicy: 'network-only' })
+
   // GET CHANGE LOG DATA
-  const { data: logsData, refetch: logsRefetch } = useQuery(GetChangeLogs, {
-    variables: {
-      projectId: productId,
-      sbomId: sbomId,
-      first: totalRows,
-      field: 'CREATED_AT',
-      direction: 'DESC'
+  const [getLogData, { data: logsData, refetch: logsRefetch }] = useLazyQuery(
+    GetChangeLogs,
+    { fetchPolicy: 'network-only' }
+  )
+
+  // GET COMPONENT FILTER HEADS
+  const [getCompFilters, { data: compFilers }] = useLazyQuery(
+    GetCompFilterData,
+    {
+      fetchPolicy: 'network-only'
     }
-  })
+  )
+
+  // GET VULN FILTER HEADS
+  const [getVulnFilters, { data: vulnFilers }] = useLazyQuery(
+    GetVulnFilterData,
+    {
+      fetchPolicy: 'network-only'
+    }
+  )
+
+  // GET HEALTH CHECK FILTER HEADS
+  const [getCheckFilters, { data: checkFilers }] = useLazyQuery(
+    GetCheckFilterData,
+    {
+      fetchPolicy: 'network-only'
+    }
+  )
+
+  // GET LOGS FILTER HEADS
+  const [getLogsFilters, { data: logsFilers }] = useLazyQuery(
+    GetLogsFilterData,
+    {
+      fetchPolicy: 'network-only'
+    }
+  )
 
   // ON TAB CHANGE
   const onTabChange = (value) => {
@@ -114,48 +125,49 @@ const SBOMTable = ({
         sbomId: sbomId
       })
     } else if (value === 1) {
-      compRefetch({
-        projectId: productId,
-        sbomId: sbomId,
-        first: totalRows,
-        last: undefined,
-        after: undefined,
-        last: undefined,
-        field: 'UPDATED_AT',
-        direction: 'DESC'
-      }).then((res) => res.data && setComponentIndex(1))
+      getCompData({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          first: totalRows,
+          field: 'UPDATED_AT',
+          direction: 'DESC'
+        }
+      }).then((res) => {
+        if (res.data) {
+          setComponentIndex(1)
+          setComponents(res.data.sbom.components.nodes)
+        }
+      })
     } else if (value === 2) {
-      vulnRefetch({
-        projectId: productId,
-        sbomId: sbomId,
-        first: totalRows,
-        last: undefined,
-        after: undefined,
-        last: undefined,
-        field: 'UPDATED_AT',
-        direction: 'DESC'
+      getVulnData({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          first: totalRows,
+          field: 'UPDATED_AT',
+          direction: 'ASC'
+        }
       }).then((res) => res.data && setVulnIndex(1))
     } else if (value === 3) {
-      healthRefetch({
-        projectId: productId,
-        sbomId: sbomId,
-        first: totalRows,
-        last: undefined,
-        after: undefined,
-        last: undefined,
-        field: 'STATUS',
-        direction: 'DESC'
+      getCheckData({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          first: totalRows,
+          field: 'STATUS',
+          direction: 'DESC'
+        }
       }).then((res) => res.data && setResultIndex(1))
-    } else {
-      logsRefetch({
-        projectId: productId,
-        sbomId: sbomId,
-        first: totalRows,
-        last: undefined,
-        after: undefined,
-        last: undefined,
-        field: 'CREATED_AT',
-        direction: 'DESC'
+    } else if (value === 4) {
+      getLogData({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          first: totalRows,
+          field: 'CREATED_AT',
+          direction: 'DESC'
+        }
       }).then((res) => res.data && setChangelogIndex(1))
     }
   }
@@ -169,6 +181,38 @@ const SBOMTable = ({
         id: item.id
       }
     })
+
+  useEffect(() => {
+    if (tabIndex === 1) {
+      getCompFilters({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId
+        }
+      })
+    } else if (tabIndex === 2) {
+      getVulnFilters({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId
+        }
+      })
+    } else if (tabIndex === 3) {
+      getCheckFilters({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId
+        }
+      })
+    } else {
+      getLogsFilters({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId
+        }
+      })
+    }
+  }, [tabIndex])
 
   return (
     <>
@@ -222,6 +266,7 @@ const SBOMTable = ({
                   data={compData.sbom.components}
                   error={error}
                   refetch={compRefetch}
+                  filterHeads={compFilers}
                   pageIndex={componentIndex}
                   setPageIndex={setComponentIndex}
                   primaryComp={data.primaryComponent}
@@ -271,10 +316,11 @@ const SBOMTable = ({
               {vulnData ? (
                 <VulnTable
                   data={vulnData.sbom.vulns}
-                  filteredData={filteredData}
+                  // filteredData={filteredData}
                   refetch={vulnRefetch}
                   productId={productId}
                   sbomId={sbomId}
+                  filterHeads={vulnFilers}
                   pageIndex={vulnIndex}
                   setPageIndex={setVulnIndex}
                   totalRows={totalRows}
@@ -297,6 +343,7 @@ const SBOMTable = ({
                   productId={productId}
                   sbomId={sbomId}
                   data={checkData.sbom.checkResults}
+                  filterHeads={checkFilers}
                   refetch={healthRefetch}
                   components={components}
                   pageIndex={resultIndex}
@@ -322,6 +369,7 @@ const SBOMTable = ({
                   data={logsData.sbom.activityLogs}
                   refetch={logsRefetch}
                   pageIndex={changelogIndex}
+                  filterHeads={logsFilers}
                   setPageIndex={setChangelogIndex}
                   totalRows={totalRows}
                   setTotalRows={setTotalRows}

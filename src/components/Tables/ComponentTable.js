@@ -27,7 +27,8 @@ import {
   Badge,
   Divider,
   chakra,
-  Select
+  Select,
+  Skeleton
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
@@ -46,10 +47,9 @@ import ComponentModal from 'views/Sbom/components/ComponentModal'
 import SupplierModal from 'views/Sbom/components/SupplierModal'
 import LinksDrawer from 'components/Drawer/LinksDrawer'
 import styled from '@emotion/styled'
-import { useMutation, useQuery } from '@apollo/client'
+import { useMutation } from '@apollo/client'
 import { deleteComSupplier } from 'graphQL/Mutation'
 import { licenseOptions } from 'variables/licenses'
-import { GetCompFilterData } from 'graphQL/Queries'
 import CompFilterMenu from 'views/Sbom/components/CompFilterMenu'
 
 const customStyles = {
@@ -79,7 +79,8 @@ const ComponentTable = ({
   setPageIndex,
   primaryComp,
   totalRows,
-  setTotalRows
+  setTotalRows,
+  filterHeads
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -92,13 +93,6 @@ const ComponentTable = ({
   const [activeRow, setActiveRow] = useState(null)
 
   const [filterText, setFilterText] = useState('')
-
-  const { data: filterHeads } = useQuery(GetCompFilterData, {
-    variables: {
-      projectId: productId,
-      sbomId: sbomId
-    }
-  })
 
   const compBtn = useRef(null)
   const linkRef = useRef(null)
@@ -518,19 +512,21 @@ const ComponentTable = ({
   }
 
   // SEARCH COMPONENT
-  const handleSearch = async () => {
-    await refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      search: filterText,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      last: undefined,
-      field: 'UPDATED_AT',
-      direction: 'DESC'
-    })
-    setPageIndex(1)
+  const handleSearch = async (event) => {
+    if (event.key === 'Enter') {
+      await refetch({
+        projectId: productId,
+        sbomId: sbomId,
+        search: filterText,
+        first: totalRows,
+        last: undefined,
+        after: undefined,
+        last: undefined,
+        field: 'UPDATED_AT',
+        direction: 'DESC'
+      })
+      setPageIndex(1)
+    }
   }
 
   // CLEAR SERACH
@@ -568,30 +564,30 @@ const ComponentTable = ({
     setPageIndex(1)
   }
 
+  const searchInputRef = useRef()
+
+  const focusSearchInput = () => {
+    if (searchInputRef?.current) {
+      searchInputRef?.current.focus()
+    }
+  }
+
+  const handleKeyPress = (e) => {
+    if (e.ctrlKey && e.key === '/') {
+      focusSearchInput()
+    }
+  }
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyPress)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress)
+    }
+  }, [])
+
   // HEADER SECTION
   const subHeaderComponentMemo = useMemo(() => {
-    const searchInputRef = useRef()
-
-    const focusSearchInput = () => {
-      if (searchInputRef?.current) {
-        searchInputRef?.current.focus()
-      }
-    }
-
-    const handleKeyPress = (e) => {
-      if (e.ctrlKey && e.key === '/') {
-        focusSearchInput()
-      }
-    }
-
-    useEffect(() => {
-      window.addEventListener('keydown', handleKeyPress)
-
-      return () => {
-        window.removeEventListener('keydown', handleKeyPress)
-      }
-    }, [])
-
     return (
       <Flex
         width={'100%'}
@@ -610,6 +606,7 @@ const ComponentTable = ({
               <Input
                 value={filterText}
                 onChange={(e) => setFilterText(e.target.value)}
+                onKeyDown={handleSearch}
                 placeholder='Search components'
                 ref={searchInputRef}
               />
@@ -622,6 +619,7 @@ const ComponentTable = ({
                   p={1}
                   rounded={'full'}
                   position={'absolute'}
+                  zIndex={9999}
                   right={3}
                   top={'11px'}
                   onClick={handleClear}
@@ -629,18 +627,9 @@ const ComponentTable = ({
                 />
               )}
             </Box>
-            <Button
-              variant='solid'
-              colorScheme='blue'
-              px={4}
-              onClick={handleSearch}
-              disabled={filterText === ''}
-            >
-              Search
-            </Button>
           </Flex>
-          {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
 
+          {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
           {filterHeads && (
             <CompFilterMenu
               refetch={refetch}
@@ -656,32 +645,22 @@ const ComponentTable = ({
           )}
         </Stack>
 
-        <Stack alignItems={'center'} direction={'row'} spacing={4}>
-          <Text>Show</Text>
-
-          <Select width={20} value={totalRows} onChange={handleSetRow}>
-            <option value={10}>10</option>
-            <option value={25}>25</option>
-            <option value={35}>35</option>
-          </Select>
-
-          {/* CREATE COMPONENT */}
-          <Tooltip label='Add Component'>
-            <IconButton
-              ref={compBtn}
-              onClick={onCompOpen}
-              icon={<AddIcon />}
-              colorScheme='blue'
-              variant='solid'
-              fontWeight='normal'
-              fontSize={'sm'}
-              isDisabled={lifecycle === 'signed'}
-            />
-          </Tooltip>
-        </Stack>
+        {/* CREATE COMPONENT */}
+        <Tooltip label='Add Component'>
+          <IconButton
+            ref={compBtn}
+            onClick={onCompOpen}
+            icon={<AddIcon />}
+            colorScheme='blue'
+            variant='solid'
+            fontWeight='normal'
+            fontSize={'sm'}
+            isDisabled={lifecycle === 'signed'}
+          />
+        </Tooltip>
       </Flex>
     )
-  }, [filterText, filterHeads, handleSetRow])
+  }, [filterText, handleKeyPress, filterHeads])
 
   const handleSort = (column, sortDirection) => {
     // console.log(`column`, column)
@@ -691,6 +670,8 @@ const ComponentTable = ({
       sbomId: sbomId,
       first: totalRows,
       last: undefined,
+      after: undefined,
+      before: undefined,
       field: column.name,
       direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
     })
@@ -703,7 +684,7 @@ const ComponentTable = ({
       sbomId: sbomId,
       first: undefined,
       last: totalRows,
-      after: '',
+      after: undefined,
       before: data.pageInfo.startCursor,
       field: 'UPDATED_AT',
       direction: 'DESC'
@@ -717,7 +698,7 @@ const ComponentTable = ({
       sbomId: sbomId,
       first: totalRows,
       last: undefined,
-      before: '',
+      before: undefined,
       after: data.pageInfo.endCursor,
       field: 'UPDATED_AT',
       direction: 'DESC'
@@ -743,24 +724,42 @@ const ComponentTable = ({
       </Flex>
 
       {/* PAGINATION */}
-      <Flex width={'100%'} flexDir={'row'} gap={4} alignItems={'center'} mt={6}>
-        <Button
-          colorScheme='blue'
-          onClick={handlePreviousPage}
-          isDisabled={!data.pageInfo.hasPreviousPage || error}
-        >
-          Previous
-        </Button>
-        <Button
-          colorScheme='blue'
-          onClick={handleNextPage}
-          isDisabled={!data.pageInfo.hasNextPage || error}
-        >
-          Next
-        </Button>
-        <Box>
-          Page {pageIndex} of {Math.ceil(data.totalCount / totalRows)}
-        </Box>
+      <Flex
+        width={'100%'}
+        flexDir={'row'}
+        gap={4}
+        alignItems={'center'}
+        justifyContent={'space-between'}
+        mt={6}
+      >
+        <Stack alignItems={'center'} direction={'row'} spacing={4}>
+          <Button
+            colorScheme='blue'
+            onClick={handlePreviousPage}
+            isDisabled={!data.pageInfo.hasPreviousPage || error}
+          >
+            Previous
+          </Button>
+          <Button
+            colorScheme='blue'
+            onClick={handleNextPage}
+            isDisabled={!data.pageInfo.hasNextPage || error}
+          >
+            Next
+          </Button>
+          <Box>
+            Page {pageIndex} of {Math.ceil(data.totalCount / totalRows)}
+          </Box>
+        </Stack>
+
+        <Stack alignItems={'center'} direction={'row'} spacing={4}>
+          <Text>Show</Text>
+          <Select width={20} value={totalRows} onChange={handleSetRow}>
+            <option value={25}>25</option>
+            <option value={50}>50</option>
+            <option value={100}>100</option>
+          </Select>
+        </Stack>
       </Flex>
 
       {/* ACTIONS */}

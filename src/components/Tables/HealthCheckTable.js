@@ -6,13 +6,13 @@ import {
   Tag,
   TagLabel,
   useDisclosure,
-  Input,
   Tooltip,
   Text,
   IconButton,
   Box,
   Badge,
-  useToast
+  useToast,
+  Select
 } from '@chakra-ui/react'
 import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
 import { recheckHealth, checkResultUpdate } from 'graphQL/Mutation'
@@ -25,8 +25,8 @@ import { GoSkip } from 'react-icons/go'
 import { timeSince, sevColor } from 'utils'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import PurlModal from 'views/Dashboard/Products/components/PurlModal'
+import CheckFilterMenu from 'views/Sbom/components/CheckFilterMenu'
 import CheckModal from 'views/Sbom/components/CheckModal'
-import FilterMenu from 'views/Sbom/components/FilterMenu'
 import PriSupplierModal from 'views/Sbom/components/PriSupplierModal'
 import SupplierModal from 'views/Sbom/components/SupplierModal'
 
@@ -47,43 +47,6 @@ const customStyles = {
   }
 }
 
-const FilterComponent = ({ filterText, onFilter, onClear }) => {
-  const searchInputRef = useRef()
-
-  const focusSearchInput = () => {
-    if (searchInputRef?.current) {
-      searchInputRef?.current.focus()
-    }
-  }
-
-  const handleKeyPress = (e) => {
-    if (e.ctrlKey && e.key === '/') {
-      focusSearchInput()
-    }
-  }
-
-  useEffect(() => {
-    window.addEventListener('keydown', handleKeyPress)
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyPress)
-    }
-  }, [])
-
-  return (
-    <>
-      <Input
-        width={'400px'}
-        id='search'
-        type='text'
-        placeholder='Search'
-        aria-label='Search Input'
-        ref={searchInputRef}
-      />
-    </>
-  )
-}
-
 const HealthCheckTable = ({
   productId,
   sbomId,
@@ -94,7 +57,8 @@ const HealthCheckTable = ({
   refetch,
   setIsLoading,
   totalRows,
-  setTotalRows
+  setTotalRows,
+  filterHeads
 }) => {
   const customerView = location.pathname.startsWith('/customer')
   const toast = useToast()
@@ -109,19 +73,8 @@ const HealthCheckTable = ({
 
   const [activeRow, setActiveRow] = useState(null)
   const [filterText, setFilterText] = useState('')
-  const [resetPaginationToggle, setResetPaginationToggle] = useState(false)
-
-  const [filteredData, setFilteredData] = useState(data.nodes)
 
   const [updateResult] = useMutation(checkResultUpdate)
-
-  const filteredItems = data.nodes.filter(
-    (item) =>
-      (item.healthCheckId &&
-        item.healthCheckId.toLowerCase().includes(filterText.toLowerCase())) ||
-      (item.shortDesc &&
-        item.shortDesc.toLowerCase().includes(filterText.toLowerCase()))
-  )
 
   const supplierBtn = useRef(null)
   const creationToolBtn = useRef(null)
@@ -183,13 +136,24 @@ const HealthCheckTable = ({
     onClose: onCpeClose
   } = useDisclosure()
 
-  const handleFilterChange = (selectedFilters) => {
-    console.log(selectedFilters)
-  }
-
-  const [healthRecheck] = useMutation(recheckHealth)
+  const [healthRecheck] = useMutation(recheckHealth, {
+    onCompleted: () => {
+      refetch({
+        projectId: productId,
+        sbomId: sbomId,
+        first: totalRows,
+        last: undefined,
+        category: undefined,
+        severity: undefined,
+        status: undefined,
+        field: 'UPDATED_AT',
+        direction: 'DESC'
+      })
+    }
+  })
 
   const handleReCheck = async () => {
+    setIsLoading(true)
     try {
       await healthRecheck({
         variables: {
@@ -197,16 +161,7 @@ const HealthCheckTable = ({
         }
       })
         .then((res) => {
-          setIsLoading(true)
           if (res.data) {
-            refetch({
-              projectId: productId,
-              sbomId: sbomId,
-              first: 10,
-              last: undefined,
-              field: 'STATUS',
-              direction: 'ASC'
-            })
             setTimeout(() => {
               setIsLoading(false)
             }, 2000)
@@ -225,24 +180,48 @@ const HealthCheckTable = ({
     }
   }
 
-  // EXTRACT ALL SEVERITY OPTIONS FROM HEALTH CHECK DATA
-  const severity =
-    data && data.nodes.map((item) => item.organizationRule.severity)
-  // EXTRACT ALL SHORT DESC STRING FROM HEALTH CHECK DATA
-  const category =
-    data && data.nodes.map((item) => item.organizationRule.rule.shortDesc)
-  // EXTRACT RESOLUTION STRING FROM HEALTH CHECK DATA
-  const resolution = data && data.nodes.map((item) => item.status)
+  // SET ROW LENGTH
+  const handleSetRow = async (e) => {
+    setTotalRows(Number(e.target.value))
+    await refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      first: Number(e.target.value),
+      last: undefined,
+      after: undefined,
+      last: undefined,
+      search: undefined,
+      field: 'UPDATED_AT',
+      direction: 'DESC'
+    })
+    setFilterText('')
+    setPageIndex(1)
+  }
+
+  const searchInputRef = useRef()
+
+  const focusSearchInput = () => {
+    if (searchInputRef?.current) {
+      searchInputRef?.current.focus()
+    }
+  }
+
+  const handleKeyPress = (e) => {
+    if (e.ctrlKey && e.key === '/') {
+      focusSearchInput()
+    }
+  }
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyPress)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress)
+    }
+  }, [])
 
   // SUB HEADER
   const subHeaderComponentMemo = useMemo(() => {
-    const handleClear = () => {
-      if (filterText) {
-        setResetPaginationToggle(!resetPaginationToggle)
-        setFilterText('')
-      }
-    }
-
     return (
       <Flex
         width={'100%'}
@@ -255,18 +234,19 @@ const HealthCheckTable = ({
           spacing={4}
           alignItems={'flex-start'}
         >
-          <FilterComponent
-            onFilter={(e) => setFilterText(e.target.value)}
-            onClear={handleClear}
-            filterText={filterText}
-          />
-
-          <FilterMenu
-            onFilterChange={handleFilterChange}
-            severity={severity}
-            category={category}
-            resolution={resolution}
-          />
+          {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
+          {filterHeads && (
+            <CheckFilterMenu
+              refetch={refetch}
+              productId={productId}
+              sbomId={sbomId}
+              categories={filterHeads.sbom.filters.checkCategories}
+              severities={filterHeads.sbom.filters.checkSeverities}
+              statuses={filterHeads.sbom.filters.checkStatuses}
+              setPageIndex={setPageIndex}
+              totalRows={totalRows}
+            />
+          )}
         </Stack>
 
         <Tooltip label='Re-Check'>
@@ -281,7 +261,7 @@ const HealthCheckTable = ({
         </Tooltip>
       </Flex>
     )
-  }, [filterText, resetPaginationToggle, handleFilterChange, data])
+  }, [filterText, data, filterHeads])
 
   const handleOpen = (row) => {
     const { shortDesc, organizationRule } = row
@@ -647,8 +627,8 @@ const HealthCheckTable = ({
           columns={columns}
           data={data.nodes}
           onSort={handleSort}
-          // defaultSortAsc
-          // defaultSortFieldId={'status'}
+          defaultSortAsc={false}
+          defaultSortFieldId={'updatedAt'}
           customStyles={customStyles}
           subHeader
           subHeaderComponent={subHeaderComponentMemo}
@@ -658,29 +638,41 @@ const HealthCheckTable = ({
 
       {/* PAGINATION */}
       <Flex
+        width={'100%'}
         flexDir={'row'}
         gap={4}
         alignItems={'center'}
         mt={6}
-        justifyContent={'flex-start'}
+        justifyContent={'space-between'}
       >
-        <Button
-          colorScheme='blue'
-          onClick={onPreviousPage}
-          isDisabled={!data.pageInfo.hasPreviousPage}
-        >
-          Previous
-        </Button>
-        <Button
-          colorScheme='blue'
-          onClick={onNextPage}
-          isDisabled={!data.pageInfo.hasNextPage}
-        >
-          Next
-        </Button>
-        <Box>
-          Page {pageIndex} of {Math.ceil(data.totalCount / totalRows)}
-        </Box>
+        <Stack alignItems={'center'} direction={'row'} spacing={4}>
+          <Button
+            colorScheme='blue'
+            onClick={onPreviousPage}
+            isDisabled={!data.pageInfo.hasPreviousPage}
+          >
+            Previous
+          </Button>
+          <Button
+            colorScheme='blue'
+            onClick={onNextPage}
+            isDisabled={!data.pageInfo.hasNextPage}
+          >
+            Next
+          </Button>
+          <Box>
+            Page {pageIndex} of {Math.ceil(data.totalCount / totalRows)}
+          </Box>
+        </Stack>
+
+        <Stack alignItems={'center'} direction={'row'} spacing={4}>
+          <Text>Show</Text>
+          <Select width={20} value={totalRows} onChange={handleSetRow}>
+            <option value={25}>25</option>
+            <option value={50}>50</option>
+            <option value={100}>100</option>
+          </Select>
+        </Stack>
       </Flex>
 
       {/* ACTIONS */}
@@ -690,6 +682,7 @@ const HealthCheckTable = ({
           {isPrimaryOpen && (
             <CheckModal
               id={activeRow.id}
+              totalRows={totalRows}
               refetch={refetch}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
               checkId={activeRow.organizationRule.rule.friendlyId}
@@ -703,6 +696,7 @@ const HealthCheckTable = ({
           {isLicenseOpen && (
             <CheckModal
               id={activeRow.id}
+              totalRows={totalRows}
               refetch={refetch}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
               checkId={activeRow.organizationRule.rule.friendlyId}
@@ -715,6 +709,7 @@ const HealthCheckTable = ({
           {isTypeOpen && (
             <CheckModal
               id={activeRow.id}
+              totalRows={totalRows}
               refetch={refetch}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
               checkId={activeRow.organizationRule.rule.friendlyId}
@@ -733,13 +728,14 @@ const HealthCheckTable = ({
               onClose={onSupplierClose}
               suppliers={[]}
               checkId={activeRow.organizationRule.rule.friendlyId}
-              totalRows={10}
+              totalRows={totalRows}
             />
           )}
 
           {isOpen && (
             <CheckModal
               id={activeRow.id}
+              totalRows={totalRows}
               refetch={refetch}
               checkId={activeRow.organizationRule.rule.friendlyId}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
@@ -757,6 +753,7 @@ const HealthCheckTable = ({
               setPurlValue={setPurlValue}
               purlValue={purlValue}
               id={activeRow.component.id}
+              totalRows={totalRows}
               refetch={refetch}
               checkId={activeRow.organizationRule.rule.friendlyId}
             />
@@ -774,6 +771,7 @@ const HealthCheckTable = ({
               selectedCpe={selectedCpe}
               id={activeRow.component.id}
               refetch={refetch}
+              totalRows={totalRows}
               checkId={activeRow.organizationRule.rule.friendlyId}
             />
           )}
@@ -787,6 +785,7 @@ const HealthCheckTable = ({
               data={null}
               selectedKey={'tools'}
               refetch={refetch}
+              totalRows={totalRows}
               checkId={activeRow.organizationRule.rule.friendlyId}
             />
           )}
@@ -800,6 +799,7 @@ const HealthCheckTable = ({
               data={null}
               selectedKey={'author'}
               refetch={refetch}
+              totalRows={totalRows}
               checkId={activeRow.organizationRule.rule.friendlyId}
             />
           )}
@@ -811,6 +811,7 @@ const HealthCheckTable = ({
               isOpen={isDocSupOpen}
               onClose={onDocSupClose}
               suppliers={null}
+              totalRows={totalRows}
               checkId={activeRow.organizationRule.rule.friendlyId}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
             />

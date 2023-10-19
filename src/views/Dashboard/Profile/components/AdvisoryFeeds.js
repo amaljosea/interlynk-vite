@@ -74,7 +74,7 @@ const AdvisoryFeeds = () => {
                       (org) => org.id === feed.id
                     )
                   return (
-                    <Flex align='center' mb='20px'>
+                    <Flex align='center' mb='20px' key={index}>
                       <Switch
                         size='md'
                         colorScheme='blue'

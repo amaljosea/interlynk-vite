@@ -1,8 +1,6 @@
 import { useState } from 'react'
 import GlobalContext from './GlobalContext'
-import { healthChecks } from 'variables/general'
 import { changeLogs } from 'variables/general'
-import { Vulnerabilities } from 'variables/general'
 
 const ContextWrapper = (props) => {
   const [vulnerabilitiesData, setVulnerabilitiesData] = useState([])
@@ -13,11 +11,8 @@ const ContextWrapper = (props) => {
   const [riskScoreVal, setRiskScoreVal] = useState('')
   const [isAuthenticate, setIsAuthenticate] = useState(false)
   const [scanEnabled, setScanEnabled] = useState(false)
-  const [healthCheckData, setHealthCheckData] = useState(healthChecks)
 
   const [changelogData, setChangelogData] = useState(changeLogs)
-
-  const [productVulData, setProductVulData] = useState(Vulnerabilities)
 
   const [automationRules, setAutomationRules] = useState([
     {
@@ -40,8 +35,6 @@ const ContextWrapper = (props) => {
     }
   ])
 
-  const [allVersions, setAllVersions] = useState([])
-
   return (
     <GlobalContext.Provider
       value={{
@@ -61,16 +54,10 @@ const ContextWrapper = (props) => {
         setIsAuthenticate,
         scanEnabled,
         setScanEnabled,
-        healthCheckData,
-        setHealthCheckData,
         changelogData,
         setChangelogData,
-        productVulData,
-        setProductVulData,
         automationRules,
-        setAutomationRules,
-        allVersions,
-        setAllVersions
+        setAutomationRules
       }}
     >
       {props.children}

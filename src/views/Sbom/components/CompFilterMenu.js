@@ -1,6 +1,5 @@
 import { CheckIcon } from '@chakra-ui/icons'
 import {
-  Badge,
   Box,
   Button,
   Menu,
@@ -130,7 +129,7 @@ const CompFilterMenu = ({
   }
 
   return (
-    <Stack direction={'row'} alignItems={'center'} gap={2}>
+    <Stack direction={'row'} alignItems={'center'} gap={1}>
       {/* ECOSYSTEM */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnBlur={true}>
@@ -153,20 +152,14 @@ const CompFilterMenu = ({
               onChange={onFilterEcosystem}
             >
               <MenuItemOption value={'all'} fontSize={'sm'}>
-                all
+                All
               </MenuItemOption>
-            </MenuOptionGroup>
-            {ecosystems.map((item, index) => (
-              <MenuOptionGroup
-                type='radio'
-                value={selectedEcosystem}
-                onChange={onFilterEcosystem}
-              >
+              {ecosystems.map((item, index) => (
                 <MenuItemOption key={index} value={item} fontSize={'sm'}>
                   {item}
                 </MenuItemOption>
-              </MenuOptionGroup>
-            ))}
+              ))}
+            </MenuOptionGroup>
           </MenuList>
         </Menu>
       </Box>
@@ -190,20 +183,14 @@ const CompFilterMenu = ({
               onChange={onFilterKind}
             >
               <MenuItemOption value={'all'} fontSize={'sm'}>
-                all
+                All
               </MenuItemOption>
-            </MenuOptionGroup>
-            {kinds.map((item, index) => (
-              <MenuOptionGroup
-                type='radio'
-                value={selectedKind}
-                onChange={onFilterKind}
-              >
+              {kinds.map((item, index) => (
                 <MenuItemOption key={index} value={item} fontSize={'sm'}>
                   {item}
                 </MenuItemOption>
-              </MenuOptionGroup>
-            ))}
+              ))}
+            </MenuOptionGroup>
           </MenuList>
         </Menu>
       </Box>
@@ -227,20 +214,14 @@ const CompFilterMenu = ({
               onChange={onFilterLicense}
             >
               <MenuItemOption value={'all'} fontSize={'sm'}>
-                all
+                All
               </MenuItemOption>
-            </MenuOptionGroup>
-            {licenses.map((item, index) => (
-              <MenuOptionGroup
-                type='radio'
-                value={selectedLicense}
-                onChange={onFilterLicense}
-              >
+              {licenses.map((item, index) => (
                 <MenuItemOption key={index} value={item} fontSize={'sm'}>
                   {item}
                 </MenuItemOption>
-              </MenuOptionGroup>
-            ))}
+              ))}
+            </MenuOptionGroup>
           </MenuList>
         </Menu>
       </Box>
@@ -266,20 +247,14 @@ const CompFilterMenu = ({
               onChange={onFilterSupplier}
             >
               <MenuItemOption value={'all'} fontSize={'sm'}>
-                all
+                All
               </MenuItemOption>
-            </MenuOptionGroup>
-            {suppliers.map((item, index) => (
-              <MenuOptionGroup
-                type='radio'
-                value={selectedSupplier}
-                onChange={onFilterSupplier}
-              >
+              {suppliers.map((item, index) => (
                 <MenuItemOption key={index} value={item} fontSize={'sm'}>
                   {item}
                 </MenuItemOption>
-              </MenuOptionGroup>
-            ))}
+              ))}
+            </MenuOptionGroup>
           </MenuList>
         </Menu>
       </Box>
@@ -303,7 +278,7 @@ const CompFilterMenu = ({
               onChange={onFilterType}
             >
               <MenuItemOption value={'all'} fontSize={'sm'}>
-                all
+                All
               </MenuItemOption>
               <MenuItemOption value='primary' fontSize={'sm'}>
                 primary

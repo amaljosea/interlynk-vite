@@ -1,3 +1,4 @@
+import { CloseIcon } from '@chakra-ui/icons'
 import {
   Button,
   Flex,
@@ -6,17 +7,14 @@ import {
   Input,
   Tooltip,
   Text,
-  Skeleton,
   Box,
-  IconButton
+  Select
 } from '@chakra-ui/react'
-import GlobalContext from 'context/GlobalContext'
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { MdRefresh } from 'react-icons/md'
 import { useLocation } from 'react-router-dom'
 import { getFullDateAndTime } from 'utils'
-import FilterChangelog from 'views/Sbom/components/FilterChangelog'
+import LogFilterMenu from 'views/Sbom/components/LogFilterMenu'
 
 const customStyles = {
   headCells: {
@@ -54,12 +52,108 @@ const setColor = (type) => {
   }
 }
 
-const FilterComponent = ({ filterText, onFilter, onClear }) => {
-  const searchRef = useRef()
+const SbomChangelogTable = ({
+  data,
+  refetch,
+  totalRows,
+  setTotalRows,
+  filterHeads
+}) => {
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+
+  const productId = queryParams.get('p')
+  const sbomId = queryParams.get('sbom')
+
+  const [filterText, setFilterText] = useState('')
+  const [pageIndex, setPageIndex] = useState(1)
+
+  const onPreviousPage = () => {
+    setPageIndex((prev) => pageIndex !== 0 && prev - 1)
+    refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      last: totalRows,
+      before: data.pageInfo.startCursor,
+      first: undefined,
+      after: undefined,
+      field: 'CREATED_AT',
+      direction: 'DESC'
+    })
+  }
+
+  const onNextPage = () => {
+    setPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
+    refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      first: totalRows,
+      after: data.pageInfo.endCursor,
+      last: undefined,
+      before: undefined,
+      field: 'CREATED_AT',
+      direction: 'DESC'
+    })
+  }
+
+  // SEARCH COMPONENT
+  const handleSearch = async (event) => {
+    if (event.key === 'Enter') {
+      await refetch({
+        projectId: productId,
+        sbomId: sbomId,
+        search: filterText,
+        first: totalRows,
+        last: undefined,
+        after: undefined,
+        last: undefined,
+        field: 'CREATED_AT',
+        direction: 'DESC'
+      })
+      setPageIndex(1)
+    }
+  }
+
+  // CLEAR SERACH
+  const handleClear = async () => {
+    await refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      first: totalRows,
+      last: undefined,
+      after: undefined,
+      last: undefined,
+      search: undefined,
+      field: 'CREATED_AT',
+      direction: 'DESC'
+    })
+    setFilterText('')
+    setPageIndex(1)
+  }
+
+  // SET ROW LENGTH
+  const handleSetRow = async (e) => {
+    setTotalRows(Number(e.target.value))
+    await refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      first: Number(e.target.value),
+      last: undefined,
+      after: undefined,
+      last: undefined,
+      search: undefined,
+      field: 'CREATED_AT',
+      direction: 'DESC'
+    })
+    setFilterText('')
+    setPageIndex(1)
+  }
+
+  const searchInputRef = useRef()
 
   const focusSearchInput = () => {
-    if (searchRef?.current) {
-      searchRef?.current.focus()
+    if (searchInputRef?.current) {
+      searchInputRef?.current.focus()
     }
   }
 
@@ -77,106 +171,13 @@ const FilterComponent = ({ filterText, onFilter, onClear }) => {
     }
   }, [])
 
-  return (
-    <>
-      <Input
-        width={'400px'}
-        id='search'
-        type='text'
-        placeholder='Search'
-        aria-label='Search Input'
-        ref={searchRef}
-      />
-    </>
-  )
-}
-
-const SbomChangelogTable = ({ data, refetch, pageIndex, setPageIndex }) => {
-  const { changelogData } = useContext(GlobalContext)
-
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-
-  const productId = queryParams.get('p')
-  const sbomId = queryParams.get('sbom')
-
-  const [filterText, setFilterText] = useState('')
-  const [resetPaginationToggle, setResetPaginationToggle] = useState(false)
-
-  const users = data && data.nodes.map((item) => item.changedBy)
-  const actions = data && data.nodes.map((item) => item.action)
-
-  const filterItems =
-    data &&
-    data.nodes.filter(
-      (item) =>
-        (item.event &&
-          item.event.toLowerCase().includes(filterText.toLowerCase())) ||
-        (item.changedBy &&
-          item.changedBy.toLowerCase().includes(filterText.toLowerCase()))
-    )
-
-  const onPreviousPage = () => {
-    setPageIndex((prev) => pageIndex !== 0 && prev - 1)
-    refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      first: undefined,
-      last: 10,
-      before: data.pageInfo.startCursor,
-      after: '',
-      field: 'CREATED_AT',
-      direction: 'ASC'
-    })
-  }
-
-  const onNextPage = () => {
-    setPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
-    refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      first: 10,
-      last: undefined,
-      after: data.pageInfo.endCursor,
-      before: '',
-      field: 'CREATED_AT',
-      direction: 'ASC'
-    })
-  }
-
-  const handleChangelogChange = (selectedFilters) => {
-    if (
-      selectedFilters.type.length === 0 &&
-      selectedFilters.user.length === 0
-    ) {
-      // IF NO FILTER SELECTED RETURN DEFAULT HEALTH CHECK DATA
-      setFilteredChangelog(changelogData)
-    } else {
-      // IF ANY FILTER IS SELECTED RETURN SELECTED DATA
-      const filtered = changelogData.filter(
-        (item) =>
-          (selectedFilters.type.length === 0 ||
-            selectedFilters.type.includes(item.type)) &&
-          (selectedFilters.user.length === 0 ||
-            selectedFilters.user.includes(item.changedBy))
-      )
-      setFilteredChangelog(filtered)
-    }
-  }
-
   const subHeaderComponentMemo = useMemo(() => {
-    const handleClear = () => {
-      if (filterText) {
-        setResetPaginationToggle(!resetPaginationToggle)
-        setFilterText('')
-      }
-    }
-
     return (
       <Flex
         width={'100%'}
         alignItems={'center'}
         justifyContent={'space-between'}
+        mb={4}
       >
         <Stack
           width={'100%'}
@@ -184,21 +185,51 @@ const SbomChangelogTable = ({ data, refetch, pageIndex, setPageIndex }) => {
           spacing={4}
           alignItems={'flex-start'}
         >
-          <FilterComponent
-            onFilter={(e) => setFilterText(e.target.value)}
-            onClear={handleClear}
-            filterText={filterText}
-          />
+          <Flex alignItems={'center'} gap={4}>
+            <Box position='relative' width={'300px'}>
+              <Input
+                value={filterText}
+                onChange={(e) => setFilterText(e.target.value)}
+                onKeyDown={handleSearch}
+                placeholder='Search components'
+                ref={searchInputRef}
+              />
+              {filterText !== '' && (
+                <CloseIcon
+                  w={'18px'}
+                  h={'18px'}
+                  bg={'blue.500'}
+                  color={'white'}
+                  p={1}
+                  rounded={'full'}
+                  position={'absolute'}
+                  zIndex={9999}
+                  right={3}
+                  top={'11px'}
+                  onClick={handleClear}
+                  cursor={'pointer'}
+                />
+              )}
+            </Box>
+          </Flex>
 
-          <FilterChangelog
-            onFilterChange={handleChangelogChange}
-            users={users ? users : ['system']}
-            actions={actions ? actions : ['created', 'updated']}
-          />
+          {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
+          {filterHeads && (
+            <LogFilterMenu
+              refetch={refetch}
+              productId={productId}
+              sbomId={sbomId}
+              changeBys={filterHeads.sbom.filters.logChangeBys}
+              changeObjects={filterHeads.sbom.filters.logChangeObjects}
+              changeTypes={filterHeads.sbom.filters.logChangeTypes}
+              setPageIndex={setPageIndex}
+              totalRows={totalRows}
+            />
+          )}
         </Stack>
       </Flex>
     )
-  }, [filterText, resetPaginationToggle, handleChangelogChange])
+  }, [filterText, filterHeads, handleKeyPress])
 
   // COLUMNS
   const columns = [
@@ -269,9 +300,10 @@ const SbomChangelogTable = ({ data, refetch, pageIndex, setPageIndex }) => {
     },
     // CHANGED ON
     {
-      id: 'changedOn',
-      name: 'CHANGED ON',
-      selector: (row) => <Text>{getFullDateAndTime(row.updatedAt)}</Text>
+      id: 'createdAt',
+      name: 'CREATED_AT',
+      selector: (row) => <Text>{getFullDateAndTime(row.updatedAt)}</Text>,
+      sortable: true
     }
   ]
 
@@ -280,7 +312,9 @@ const SbomChangelogTable = ({ data, refetch, pageIndex, setPageIndex }) => {
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
           columns={columns}
-          data={filterItems}
+          data={data.nodes}
+          defaultSortAsc={false}
+          defaultSortFieldId={'createdAt'}
           customStyles={customStyles}
           subHeader
           subHeaderComponent={subHeaderComponentMemo}
@@ -290,29 +324,41 @@ const SbomChangelogTable = ({ data, refetch, pageIndex, setPageIndex }) => {
 
       {/* PAGINATION */}
       <Flex
+        width={'100%'}
         flexDir={'row'}
         gap={4}
         alignItems={'center'}
         mt={6}
-        justifyContent={'flex-start'}
+        justifyContent={'space-between'}
       >
-        <Button
-          colorScheme='blue'
-          onClick={onPreviousPage}
-          isDisabled={!data.pageInfo.hasPreviousPage}
-        >
-          Previous
-        </Button>
-        <Button
-          colorScheme='blue'
-          onClick={onNextPage}
-          isDisabled={!data.pageInfo.hasNextPage}
-        >
-          Next
-        </Button>
-        <Box>
-          Page {pageIndex} of {Math.ceil(data.totalCount / 10)}
-        </Box>
+        <Stack alignItems={'center'} direction={'row'} spacing={4}>
+          <Button
+            colorScheme='blue'
+            onClick={onPreviousPage}
+            isDisabled={!data.pageInfo.hasPreviousPage}
+          >
+            Previous
+          </Button>
+          <Button
+            colorScheme='blue'
+            onClick={onNextPage}
+            isDisabled={!data.pageInfo.hasNextPage}
+          >
+            Next
+          </Button>
+          <Box>
+            Page {pageIndex} of {Math.ceil(data.totalCount / totalRows)}
+          </Box>
+        </Stack>
+
+        <Stack alignItems={'center'} direction={'row'} spacing={4}>
+          <Text>Show</Text>
+          <Select width={20} value={totalRows} onChange={handleSetRow}>
+            <option value={25}>25</option>
+            <option value={50}>50</option>
+            <option value={100}>100</option>
+          </Select>
+        </Stack>
       </Flex>
     </>
   )

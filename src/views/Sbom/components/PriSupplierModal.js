@@ -19,7 +19,14 @@ import { recheckHealth, supplierUpdate, supplierCreate } from 'graphQL/Mutation'
 import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 
-const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
+const PriSupplierModal = ({
+  isOpen,
+  onClose,
+  refetch,
+  suppliers,
+  checkId,
+  totalRows
+}) => {
   const toast = useToast()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -42,10 +49,13 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
       refetch({
         projectId: productId,
         sbomId: sbomId,
-        first: 10,
+        first: totalRows,
         last: undefined,
-        field: 'STATUS',
-        direction: 'ASC'
+        category: undefined,
+        severity: undefined,
+        status: undefined,
+        field: 'UPDATED_AT',
+        direction: 'DESC'
       })
     }
   })
