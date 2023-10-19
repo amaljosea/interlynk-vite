@@ -46,7 +46,7 @@ const SBOMTable = ({
 }) => {
   const tab = window.localStorage.getItem('activeProdTab')
 
-  const [tabIndex, setTabIndex] = useState(Number(tab))
+  const [tabIndex, setTabIndex] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
   // PAGINATION STATS FOR DIFFERENT TABS
   const [componentIndex, setComponentIndex] = useState(1)
@@ -316,7 +316,7 @@ const SBOMTable = ({
               {vulnData ? (
                 <VulnTable
                   data={vulnData.sbom.vulns}
-                  // filteredData={filteredData}
+                  filteredData={filteredData}
                   refetch={vulnRefetch}
                   productId={productId}
                   sbomId={sbomId}
