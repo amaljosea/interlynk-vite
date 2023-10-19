@@ -114,7 +114,8 @@ const PurlModal = ({
   setPurlValue,
   id,
   refetch,
-  checkId
+  checkId,
+  totalRows
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -137,10 +138,13 @@ const PurlModal = ({
       refetch({
         projectId: productId,
         sbomId: sbomId,
-        first: 10,
+        first: totalRows,
         last: undefined,
-        field: 'STATUS',
-        direction: 'ASC'
+        category: undefined,
+        severity: undefined,
+        status: undefined,
+        field: 'UPDATED_AT',
+        direction: 'DESC'
       })
     }
   })

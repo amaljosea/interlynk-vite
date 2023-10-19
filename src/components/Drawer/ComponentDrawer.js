@@ -18,19 +18,11 @@ import {
   InputGroup,
   Select,
   Checkbox,
-  Table,
   Tag,
-  Thead,
-  Th,
-  Tr,
-  Tbody,
-  Td,
   Text,
   Flex,
-  Box,
   TagCloseButton,
   TagLabel,
-  Code,
   useToast,
   chakra,
   useDisclosure,
@@ -51,7 +43,6 @@ import { UpdateComponent } from 'graphQL/Mutation'
 import { useLocation } from 'react-router-dom'
 import { licenseOptions } from 'variables/licenses'
 import MultiSelect from 'react-select'
-import { timeSince } from 'utils'
 
 import { PackageURL } from 'packageurl-js'
 import PurlModal from 'views/Dashboard/Products/components/PurlModal'
@@ -322,8 +313,9 @@ function ComponentDrawer(props) {
                 projectId: productId,
                 sbomId: sbomId,
                 first: totalRows,
-                field: 'NAME',
-                direction: 'ASC'
+                last: undefined,
+                field: 'UPDATED_AT',
+                direction: 'DESC'
               })
               onClose()
             }
@@ -373,8 +365,9 @@ function ComponentDrawer(props) {
               projectId: productId,
               sbomId: sbomId,
               first: totalRows,
-              field: 'NAME',
-              direction: 'ASC'
+              last: undefined,
+              field: 'UPDATED_AT',
+              direction: 'DESC'
             })
             onClose()
           }
@@ -653,7 +646,7 @@ function ComponentDrawer(props) {
                         type='text'
                         size='sm'
                         placeholder='PURL'
-                        value={purlValue}
+                        value={purlValue ? purlValue : ''}
                         key='purl'
                         onChange={handlePURLInputChange}
                       />
@@ -686,7 +679,7 @@ function ComponentDrawer(props) {
                         type='text'
                         size='sm'
                         placeholder='CPE'
-                        value={cpeValue}
+                        value={cpeValue ? cpeValue : ''}
                         key='CPE'
                         onChange={handleCPEInputChange}
                       />
@@ -722,7 +715,6 @@ function ComponentDrawer(props) {
                   >
                     {cpeList.map((item, index) => (
                       <Tag
-                        size='sm'
                         key={index}
                         borderRadius='full'
                         variant='solid'

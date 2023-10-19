@@ -503,8 +503,8 @@ export const GetComponentData = gql`
     $kind: String
     $internal: Boolean
     $primary: Boolean
-    $field: ComponentOrderByFields
-    $direction: CompOrderByDirection
+    $field: ComponentOrderByFields!
+    $direction: OrderByDirection!
   ) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
       id
@@ -579,6 +579,10 @@ export const GetVulnData = gql`
   query GetVulnData(
     $projectId: Uuid!
     $sbomId: Uuid!
+    $search: String
+    $severity: String
+    $status: String
+    $componentName: String
     $first: Int
     $last: Int
     $after: String
@@ -589,6 +593,10 @@ export const GetVulnData = gql`
     sbom(projectId: $projectId, sbomId: $sbomId) {
       vulns(
         sbomId: $sbomId
+        search: $search
+        severity: $severity
+        status: $status
+        componentName: $componentName
         after: $after
         before: $before
         first: $first
@@ -607,6 +615,7 @@ export const GetVulnData = gql`
           vuln {
             vulnId
             desc
+            sev
             cvssScore
             cvssVector
             source
@@ -641,11 +650,28 @@ export const GetVulnData = gql`
   }
 `
 
+// GET VULNERABILITIES FILTER DATA
+export const GetVulnFilterData = gql`
+  query GetVulnFilterData($projectId: Uuid!, $sbomId: Uuid!) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      id
+      filters {
+        vulnCompNames
+        vulnSeverities
+        vulnStatuses
+      }
+    }
+  }
+`
+
 // HEALTH CHECK RESULTES
 export const GetCheckResults = gql`
   query GetCheckResults(
     $projectId: Uuid!
     $sbomId: Uuid!
+    $category: String
+    $status: String
+    $severity: String
     $first: Int
     $last: Int
     $after: String
@@ -657,6 +683,9 @@ export const GetCheckResults = gql`
       id
       checkResults(
         sbomId: $sbomId
+        category: $category
+        status: $status
+        severity: $severity
         after: $after
         before: $before
         first: $first
@@ -696,11 +725,29 @@ export const GetCheckResults = gql`
   }
 `
 
+// GET HEALTH CHECK FILTER DATA
+export const GetCheckFilterData = gql`
+  query GetCheckFilterData($projectId: Uuid!, $sbomId: Uuid!) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      id
+      filters {
+        checkCategories
+        checkSeverities
+        checkStatuses
+      }
+    }
+  }
+`
+
 // CHANGE LOG DATA
 export const GetChangeLogs = gql`
   query GetChangeLogs(
     $projectId: Uuid!
     $sbomId: Uuid!
+    $search: String
+    $changedBy: String
+    $changeObject: String
+    $changeType: String
     $first: Int
     $last: Int
     $after: String
@@ -712,6 +759,10 @@ export const GetChangeLogs = gql`
       id
       activityLogs(
         sbomId: $sbomId
+        search: $search
+        changedBy: $changedBy
+        changeObject: $changeObject
+        changeType: $changeType
         after: $after
         before: $before
         first: $first
@@ -735,6 +786,20 @@ export const GetChangeLogs = gql`
           updatedAt
           changedBy
         }
+      }
+    }
+  }
+`
+
+// GET LOGS FILTER DATA
+export const GetLogsFilterData = gql`
+  query GetLogsFilterData($projectId: Uuid!, $sbomId: Uuid!) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      id
+      filters {
+        logChangeBys
+        logChangeObjects
+        logChangeTypes
       }
     }
   }

@@ -13,7 +13,6 @@ import {
   FormLabel,
   Input,
   useToast,
-  chakra,
   FormErrorMessage
 } from '@chakra-ui/react'
 import { updateComSupplier } from 'graphQL/Mutation'
@@ -55,8 +54,11 @@ const SupplierModal = ({
         sbomId: sbomId,
         first: totalRows,
         last: undefined,
-        field: 'STATUS',
-        direction: 'ASC'
+        category: undefined,
+        severity: undefined,
+        status: undefined,
+        field: 'UPDATED_AT',
+        direction: 'DESC'
       })
     }
   })

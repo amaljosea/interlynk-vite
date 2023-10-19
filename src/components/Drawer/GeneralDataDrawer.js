@@ -44,7 +44,8 @@ const GeneralDataDrawer = ({
   data,
   selectedKey,
   refetch,
-  checkId
+  checkId,
+  totalRows
 }) => {
   // console.log(`suppliers`, suppliers)
 
@@ -87,10 +88,13 @@ const GeneralDataDrawer = ({
       refetch({
         projectId: productId,
         sbomId: sbomId,
-        first: 10,
+        first: totalRows,
         last: undefined,
-        field: 'STATUS',
-        direction: 'ASC'
+        category: undefined,
+        severity: undefined,
+        status: undefined,
+        field: 'UPDATED_AT',
+        direction: 'DESC'
       })
     }
   })

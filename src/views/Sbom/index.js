@@ -49,6 +49,8 @@ import CopyModal from './components/CopyModal'
 import { useMutation, useQuery } from '@apollo/client'
 import { GetProductData, GetProject, GetProjectData } from 'graphQL/Queries'
 import { sbomDelete } from 'graphQL/Mutation'
+import ComponentDrawer from 'components/Drawer/ComponentDrawer'
+import CheckModal from './components/CheckModal'
 
 const idRegex =
   /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
@@ -71,6 +73,7 @@ function SBOM() {
   const { isOpen, onOpen, onClose, onToggle } = useDisclosure()
 
   const [status, setStatus] = useState('created')
+  const [components, setComponents] = useState([])
   const [signedData, setSignedData] = useState(null)
 
   useEffect(() => {
@@ -111,6 +114,12 @@ function SBOM() {
     isOpen: isCopied,
     onOpen: onCopiedOpen,
     onClose: onCopiedClose
+  } = useDisclosure()
+
+  const {
+    isOpen: isPrimaryOpen,
+    onOpen: onPrimaryOpen,
+    onClose: onPrimaryClose
   } = useDisclosure()
 
   const { data: sbomData, refetch } = useQuery(GetProductData, {
@@ -240,6 +249,9 @@ function SBOM() {
       window.removeEventListener('keydown', handleKeyDownload)
     }
   }, [])
+
+  const primaryComp =
+    components && components.find((comp) => comp.primary === true)
 
   return (
     <>
@@ -434,10 +446,14 @@ function SBOM() {
                           {/* EDIT SBOM */}
                           <Tooltip label='Edit'>
                             <IconButton
-                              isDisabled={status === 'signed'}
+                              isDisabled={status === 'signed' || !primaryComp}
                               colorScheme='blue'
                               icon={<EditIcon />}
-                              onClick={setSBMOpen}
+                              onClick={
+                                !sbomData.sbom.primaryComponent
+                                  ? onPrimaryOpen
+                                  : setSBMOpen
+                              }
                             ></IconButton>
                           </Tooltip>
 
@@ -510,6 +526,7 @@ function SBOM() {
               data={sbomData ? sbomData.sbom : undefined}
               refetch={refetch}
               status={status}
+              setComponents={setComponents}
               lifecycle={sbomData && sbomData.sbom.lifecycle}
               type={
                 selectedProject?.sboms.length > 0 &&
@@ -518,19 +535,35 @@ function SBOM() {
             />
           </Flex>
 
-          {isSBMOpen && sbomData && (
-            <ProductSbomDrawer
+          {/*  COMPONENT PRIMARY MODAL */}
+          {isPrimaryOpen && (
+            <CheckModal
+              refetch={refetch}
+              shortDesc={'Document has a primary component'}
+              checkId={null}
+              isOpen={isPrimaryOpen}
+              components={components}
+              onClose={onPrimaryClose}
+            />
+          )}
+
+          {isSBMOpen && sbomData && !customerView && (
+            <ComponentDrawer
               isOpen={isSBMOpen}
               onClose={setSBMClose}
               btnRef={btnRef}
-              projectId={productId}
-              name={sbomData.sbom.project.name}
+              component={sbomData.sbom.primaryComponent.name}
+              version={sbomData.sbom.primaryComponent.version}
+              license={primaryComp.licenses}
+              group={primaryComp.group}
+              type={primaryComp.kind}
+              cpes={primaryComp.cpes}
+              purl={primaryComp.purl}
+              primary={primaryComp.primary}
+              internal={primaryComp.internal}
               refetch={refetch}
-              sbomData={sbomData.sbom}
-              type={
-                selectedProject?.sboms.length > 0 &&
-                selectedProject.sboms[0].format
-              }
+              shortDesc={null}
+              totalRows={null}
             />
           )}
 

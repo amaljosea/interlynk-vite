@@ -33,7 +33,8 @@ const CheckModal = ({
   refetch,
   shortDesc,
   components,
-  checkId
+  checkId,
+  totalRows
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -59,10 +60,13 @@ const CheckModal = ({
       refetch({
         projectId: productId,
         sbomId: sbomId,
-        first: 10,
+        first: totalRows,
         last: undefined,
-        field: 'STATUS',
-        direction: 'ASC'
+        category: undefined,
+        severity: undefined,
+        status: undefined,
+        field: 'UPDATED_AT',
+        direction: 'DESC'
       })
     }
   })
@@ -80,7 +84,7 @@ const CheckModal = ({
         .then(() =>
           healthRecheck({
             variables: {
-              checkId: checkId,
+              checkId: checkId ? checkId : undefined,
               sbomId: sbomId
             }
           })
