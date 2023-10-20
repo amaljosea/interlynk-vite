@@ -381,13 +381,13 @@ export const dateTime = (updatedAt) => {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
-    timeZone: 'America/Los_Angeles'
+    timeZone: 'UTC'
   })
   const time = new Date(updatedAt).toLocaleTimeString('en-US', {
     hour: 'numeric',
     minute: '2-digit',
     hour12: true,
-    timeZone: 'America/Los_Angeles'
+    timeZone: 'UTC'
   })
 
   return `${date} ${time}`
@@ -481,10 +481,7 @@ export const convertDateFormat = (inputDate) => {
   return `${month} ${day}`
 }
 
-export const getFullDateAndTime = (
-  dateString,
-  timeZone = 'America/Los_Angeles'
-) => {
+export const getFullDateAndTime = (dateString, timeZone = 'UTC') => {
   const options = {
     year: 'numeric',
     month: '2-digit',

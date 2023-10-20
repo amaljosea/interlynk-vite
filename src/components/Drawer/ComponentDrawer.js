@@ -80,7 +80,8 @@ function ComponentDrawer(props) {
     refetch,
     group,
     shortDesc,
-    totalRows
+    totalRows,
+    filterRefetch
   } = props
 
   const [createComponent] = useMutation(CreateComponent)
@@ -287,6 +288,7 @@ function ComponentDrawer(props) {
 
   const onLicenseChange = (selected) => {
     setLicenseList(selected)
+    console.log('selected', selected)
     const selectedIds = selected.map((option) => option.value) // Extracting IDs
     setSelectedLicenses(selectedIds)
   }
@@ -321,6 +323,10 @@ function ComponentDrawer(props) {
             }
           })
           .finally(() => {
+            filterRefetch({
+              projectId: productId,
+              sbomId: id
+            })
             toast({
               description: `Data added successfully`,
               status: 'success',
@@ -373,12 +379,9 @@ function ComponentDrawer(props) {
           }
         })
         .finally(() => {
-          toast({
-            description: `Data updated successfully`,
-            status: 'success',
-            position: 'top',
-            isClosable: true,
-            duration: 2000
+          filterRefetch({
+            projectId: productId,
+            sbomId: sbomId
           })
         })
     } catch (error) {
@@ -616,7 +619,7 @@ function ComponentDrawer(props) {
                 />
               </FormControl>
               {containesOther && (
-                <FormControl>
+                <FormControl isRequired>
                   <Input
                     size='sm'
                     placeholder='Enter a valid SPDX license'
@@ -781,11 +784,19 @@ function ComponentDrawer(props) {
               Cancel
             </Button>
             {id === undefined ? (
-              <Button colorScheme='blue' onClick={handleSave}>
+              <Button
+                colorScheme='blue'
+                onClick={handleSave}
+                disabled={containesOther && licenseName === ''}
+              >
                 Save
               </Button>
             ) : (
-              <Button colorScheme='blue' onClick={handleUpdate}>
+              <Button
+                colorScheme='blue'
+                onClick={handleUpdate}
+                disabled={containesOther && licenseName === ''}
+              >
                 Update
               </Button>
             )}

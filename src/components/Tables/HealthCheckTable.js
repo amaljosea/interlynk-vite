@@ -58,7 +58,8 @@ const HealthCheckTable = ({
   setIsLoading,
   totalRows,
   setTotalRows,
-  filterHeads
+  filterHeads,
+  filterRefetch
 }) => {
   const customerView = location.pathname.startsWith('/customer')
   const toast = useToast()
@@ -514,6 +515,11 @@ const HealthCheckTable = ({
       name: 'UPDATED_AT',
       selector: (row) => timeSince(row.updatedAt),
       sortable: true,
+      sortFunction: (a, b) => {
+        const dateA = new Date(a.updatedAt)
+        const dateB = new Date(b.updatedAt)
+        return dateA - dateB // Sort in descending order
+      },
       width: '150px'
     },
     // ACTION
@@ -601,7 +607,7 @@ const HealthCheckTable = ({
       last: totalRows,
       before: data.pageInfo.startCursor,
       after: undefined,
-      field: 'STATUS',
+      field: 'UPDATED_AT',
       direction: 'DESC'
     })
   }
@@ -615,7 +621,7 @@ const HealthCheckTable = ({
       last: undefined,
       after: data.pageInfo.endCursor,
       before: undefined,
-      field: 'STATUS',
+      field: 'UPDATED_AT',
       direction: 'DESC'
     })
   }
@@ -637,6 +643,7 @@ const HealthCheckTable = ({
       </Flex>
 
       {/* PAGINATION */}
+
       <Flex
         width={'100%'}
         flexDir={'row'}
@@ -661,7 +668,8 @@ const HealthCheckTable = ({
             Next
           </Button>
           <Box>
-            Page {pageIndex} of {Math.ceil(data.totalCount / totalRows)}
+            Page {pageIndex} of{' '}
+            {data.totalCount === 0 ? 1 : Math.ceil(data.totalCount / totalRows)}
           </Box>
         </Stack>
 
@@ -684,6 +692,7 @@ const HealthCheckTable = ({
               id={activeRow.id}
               totalRows={totalRows}
               refetch={refetch}
+              filterRefetch={filterRefetch}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
               checkId={activeRow.organizationRule.rule.friendlyId}
               isOpen={isPrimaryOpen}
@@ -698,6 +707,7 @@ const HealthCheckTable = ({
               id={activeRow.id}
               totalRows={totalRows}
               refetch={refetch}
+              filterRefetch={filterRefetch}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
               checkId={activeRow.organizationRule.rule.friendlyId}
               isOpen={isLicenseOpen}
@@ -711,6 +721,7 @@ const HealthCheckTable = ({
               id={activeRow.id}
               totalRows={totalRows}
               refetch={refetch}
+              filterRefetch={filterRefetch}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
               checkId={activeRow.organizationRule.rule.friendlyId}
               isOpen={isTypeOpen}
@@ -724,6 +735,7 @@ const HealthCheckTable = ({
               id={activeRow.component.id}
               btnRef={supplierBtn}
               refetch={refetch}
+              filterRefetch={filterRefetch}
               isOpen={onSupplierOpen}
               onClose={onSupplierClose}
               suppliers={[]}
@@ -737,6 +749,7 @@ const HealthCheckTable = ({
               id={activeRow.id}
               totalRows={totalRows}
               refetch={refetch}
+              filterRefetch={filterRefetch}
               checkId={activeRow.organizationRule.rule.friendlyId}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
               isOpen={isOpen}
@@ -755,6 +768,7 @@ const HealthCheckTable = ({
               id={activeRow.component.id}
               totalRows={totalRows}
               refetch={refetch}
+              filterRefetch={filterRefetch}
               checkId={activeRow.organizationRule.rule.friendlyId}
             />
           )}
@@ -771,6 +785,7 @@ const HealthCheckTable = ({
               selectedCpe={selectedCpe}
               id={activeRow.component.id}
               refetch={refetch}
+              filterRefetch={filterRefetch}
               totalRows={totalRows}
               checkId={activeRow.organizationRule.rule.friendlyId}
             />
@@ -785,6 +800,7 @@ const HealthCheckTable = ({
               data={null}
               selectedKey={'tools'}
               refetch={refetch}
+              filterRefetch={filterRefetch}
               totalRows={totalRows}
               checkId={activeRow.organizationRule.rule.friendlyId}
             />
@@ -799,6 +815,7 @@ const HealthCheckTable = ({
               data={null}
               selectedKey={'author'}
               refetch={refetch}
+              filterRefetch={filterRefetch}
               totalRows={totalRows}
               checkId={activeRow.organizationRule.rule.friendlyId}
             />
@@ -808,6 +825,7 @@ const HealthCheckTable = ({
           {isDocSupOpen && (
             <PriSupplierModal
               refetch={refetch}
+              filterRefetch={filterRefetch}
               isOpen={isDocSupOpen}
               onClose={onDocSupClose}
               suppliers={null}

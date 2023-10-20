@@ -34,7 +34,8 @@ const CheckModal = ({
   shortDesc,
   components,
   checkId,
-  totalRows
+  totalRows,
+  filterRefetch
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -62,6 +63,8 @@ const CheckModal = ({
         sbomId: sbomId,
         first: totalRows,
         last: undefined,
+        after: undefined,
+        before: undefined,
         category: undefined,
         severity: undefined,
         status: undefined,
@@ -89,7 +92,13 @@ const CheckModal = ({
             }
           })
         )
-        .finally(() => onClose())
+        .finally(() => {
+          filterRefetch({
+            projectId: productId,
+            sbomId: sbomId
+          })
+          onClose()
+        })
     } catch (error) {
       console.log('Mutation error', error)
     }
@@ -101,7 +110,7 @@ const CheckModal = ({
     if (value === '') {
       setComponentData([])
     } else if (components && components.length > 0) {
-      setComponentData(components.filter((str) => str.value.startsWith(value)))
+      setComponentData(components.filter((str) => str.name.startsWith(value)))
     }
   }
 
@@ -181,20 +190,20 @@ const CheckModal = ({
                   >
                     <List>
                       {componentData
-                        .filter((item) => item.value.includes(comp))
+                        .filter((item) => item.name.includes(comp))
                         .map((item, index) => (
                           <ListItem
                             key={index}
                             cursor='pointer'
                             onClick={() => {
                               setCompId(item.id)
-                              setComp(item.value)
+                              setComp(item.name)
                               setComponentData([])
                             }}
                             p='2'
                             _hover={{ background: 'gray.100' }}
                           >
-                            <Text>{item.value}</Text>
+                            <Text>{item.name}</Text>
                           </ListItem>
                         ))}
                     </List>

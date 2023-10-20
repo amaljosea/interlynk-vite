@@ -43,11 +43,18 @@ import { CalendarIcon, DeleteIcon, EditIcon, LockIcon } from '@chakra-ui/icons'
 import { timeSince, getFullDateAndTime } from 'utils'
 import SigningModal from './components/SigningModal'
 import DownloadModal from './components/DownloadModal'
-import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import CopyModal from './components/CopyModal'
 
 import { useMutation, useQuery } from '@apollo/client'
-import { GetProductData, GetProject, GetProjectData } from 'graphQL/Queries'
+import {
+  GetProductData,
+  GetProject,
+  GetProjectData,
+  GetCompFilterData,
+  GetVulnFilterData,
+  GetCheckFilterData,
+  GetLogsFilterData
+} from 'graphQL/Queries'
 import { sbomDelete } from 'graphQL/Mutation'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import CheckModal from './components/CheckModal'
@@ -135,6 +142,50 @@ function SBOM() {
     }
   })
 
+  // GET COMPONENT FILTER HEADS
+  const { data: compFilters, refetch: compFilterRefetch } = useQuery(
+    GetCompFilterData,
+    {
+      variables: {
+        projectId: productId,
+        sbomId: sbomId
+      }
+    }
+  )
+
+  // GET VULN FILTER HEADS
+  const { data: vulnFilters, refetch: vulnFilterRefetch } = useQuery(
+    GetVulnFilterData,
+    {
+      variables: {
+        projectId: productId,
+        sbomId: sbomId
+      }
+    }
+  )
+
+  // GET HEALTH CHECK FILTER HEADS
+  const { data: checkFilters, refetch: checkFilterRefetch } = useQuery(
+    GetCheckFilterData,
+    {
+      variables: {
+        projectId: productId,
+        sbomId: sbomId
+      }
+    }
+  )
+
+  // GET LOGS FILTER HEADS
+  const { data: logsFilters, refetch: logsFilterRefetch } = useQuery(
+    GetLogsFilterData,
+    {
+      variables: {
+        projectId: productId,
+        sbomId: sbomId
+      }
+    }
+  )
+
   const [deleteSbom] = useMutation(sbomDelete)
 
   const uniqVersions = []
@@ -198,15 +249,32 @@ function SBOM() {
       await refetch({
         projectId: productId,
         sbomId: id
-      }).then(() => {
-        if (customerView) {
-          history.push(`/sharelynk?p=${productId}&sbom=${id}`)
-        } else {
-          history.push(
-            `/vendor/products?tab=${Number(tab)}&p=${productId}&sbom=${id}`
-          )
-        }
       })
+        .then(() => {
+          if (customerView) {
+            history.push(`/sharelynk?p=${productId}&sbom=${id}`)
+          } else {
+            history.push(`/vendor/products?p=${productId}&sbom=${id}`)
+          }
+        })
+        .finally(() => {
+          compFilterRefetch({
+            projectId: productId,
+            sbomId: id
+          })
+          vulnFilterRefetch({
+            projectId: productId,
+            sbomId: id
+          })
+          checkFilterRefetch({
+            projectId: productId,
+            sbomId: id
+          })
+          logsFilterRefetch({
+            projectId: productId,
+            sbomId: id
+          })
+        })
     } catch (error) {
       console.log(`fetch error`, error)
     }
@@ -252,6 +320,9 @@ function SBOM() {
 
   const primaryComp =
     components && components.find((comp) => comp.primary === true)
+
+  // console.log('primaryComp', primaryComp)
+  // console.log('components', components)
 
   return (
     <>
@@ -446,13 +517,11 @@ function SBOM() {
                           {/* EDIT SBOM */}
                           <Tooltip label='Edit'>
                             <IconButton
-                              isDisabled={status === 'signed' || !primaryComp}
+                              isDisabled={status === 'signed'}
                               colorScheme='blue'
                               icon={<EditIcon />}
                               onClick={
-                                !sbomData.sbom.primaryComponent
-                                  ? onPrimaryOpen
-                                  : setSBMOpen
+                                !primaryComp ? onPrimaryOpen : setSBMOpen
                               }
                             ></IconButton>
                           </Tooltip>
@@ -527,6 +596,14 @@ function SBOM() {
               refetch={refetch}
               status={status}
               setComponents={setComponents}
+              compFilters={compFilters}
+              compFilterRefetch={compFilterRefetch}
+              vulnFilters={vulnFilters}
+              vulnFilterRefetch={vulnFilterRefetch}
+              checkFilters={checkFilters}
+              checkFilterRefetch={checkFilterRefetch}
+              logsFilters={logsFilters}
+              logsFilterRefetch={logsFilterRefetch}
               lifecycle={sbomData && sbomData.sbom.lifecycle}
               type={
                 selectedProject?.sboms.length > 0 &&
@@ -554,13 +631,13 @@ function SBOM() {
               btnRef={btnRef}
               component={sbomData.sbom.primaryComponent.name}
               version={sbomData.sbom.primaryComponent.version}
-              license={primaryComp.licenses}
-              group={primaryComp.group}
-              type={primaryComp.kind}
-              cpes={primaryComp.cpes}
-              purl={primaryComp.purl}
-              primary={primaryComp.primary}
-              internal={primaryComp.internal}
+              license={primaryComp ? primaryComp.licenses : []}
+              group={primaryComp ? primaryComp.group : ''}
+              type={primaryComp ? primaryComp.kind : ''}
+              cpes={primaryComp ? primaryComp.cpes : []}
+              purl={primaryComp ? primaryComp.purl : ''}
+              primary={primaryComp ? primaryComp.primary : false}
+              internal={primaryComp ? primaryComp.internal : false}
               refetch={refetch}
               shortDesc={null}
               totalRows={null}

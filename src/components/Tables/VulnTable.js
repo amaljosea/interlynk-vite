@@ -2,7 +2,6 @@
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
-  CloseIcon,
   ExternalLinkIcon
 } from '@chakra-ui/icons'
 import {
@@ -15,7 +14,6 @@ import {
   useColorModeValue,
   Button,
   Link,
-  Input,
   Box,
   Grid,
   GridItem,
@@ -54,6 +52,7 @@ import { getFullDateAndTime } from 'utils'
 import ProdStatusDrawer from 'components/Drawer/ProdStatusDrawer'
 import VulnFilterMenu from 'views/Sbom/components/VulnFilterMenu'
 import { sevColor } from 'utils'
+import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 const customStyles = {
   headCells: {
@@ -96,7 +95,8 @@ const VulnTable = ({
   filteredData,
   totalRows,
   setTotalRows,
-  filterHeads
+  filterHeads,
+  filterRefetch
 }) => {
   const location = useLocation()
   const toast = useToast()
@@ -105,7 +105,6 @@ const VulnTable = ({
   const textColor = useColorModeValue('gray.700', 'white')
 
   const [activeRow, setActiveRow] = useState(null)
-  const [vulData, setVulData] = useState([])
   const [version, setVersion] = useState('')
 
   // STEPS
@@ -114,26 +113,7 @@ const VulnTable = ({
 
   const [stepTitle, setStepTitle] = useState('')
 
-  const [filterBySev, setFilterBySev] = useState([])
-  const [filterByStatus, setFilterByStatus] = useState([])
-
-  const activeSevCount = filterBySev.length
-  const activeStatusCount = filterByStatus.length
-
   const [filterText, setFilterText] = useState('')
-  const [resetPaginationToggle, setResetPaginationToggle] = useState(false)
-
-  const [filteredItems, setFilteredItems] = useState([])
-
-  useEffect(() => {
-    const filterData = data.nodes.filter(
-      (item) =>
-        item.component &&
-        item.component.name.toLowerCase().includes(filterText.toLowerCase())
-    )
-
-    setFilteredItems(filterData)
-  }, [filterText])
 
   const btnRef = useRef(null)
   const tableRef = useRef()
@@ -361,22 +341,22 @@ const VulnTable = ({
   }
 
   // SEARCH COMPONENT
-  const handleSearch = async (event) => {
-    if (event.key === 'Enter') {
-      await refetch({
-        projectId: productId,
-        sbomId: sbomId,
-        search: filterText,
-        first: totalRows,
-        last: undefined,
-        after: undefined,
-        last: undefined,
-        field: 'UPDATED_AT',
-        direction: 'DESC'
-      })
-      setPageIndex(1)
-    }
-  }
+  // const handleSearch = async (event) => {
+  //   if (event.key === 'Enter') {
+  //     await refetch({
+  //       projectId: productId,
+  //       sbomId: sbomId,
+  //       search: filterText,
+  //       first: totalRows,
+  //       last: undefined,
+  //       after: undefined,
+  //       last: undefined,
+  //       field: 'UPDATED_AT',
+  //       direction: 'DESC'
+  //     })
+  //     setPageIndex(1)
+  //   }
+  // }
 
   // CLEAR SERACH
   const handleClear = async () => {
@@ -395,27 +375,15 @@ const VulnTable = ({
     setPageIndex(1)
   }
 
-  const searchInputRef = useRef()
-
-  const focusSearchInput = () => {
-    if (searchInputRef?.current) {
-      searchInputRef?.current.focus()
-    }
-  }
-
-  const handleKeyPress = (e) => {
-    if (e.ctrlKey && e.key === '/') {
-      focusSearchInput()
-    }
-  }
-
-  useEffect(() => {
-    window.addEventListener('keydown', handleKeyPress)
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyPress)
-    }
-  }, [])
+  const filteredItems =
+    data &&
+    data.nodes.filter(
+      (item) =>
+        (item.vuln.vulnId &&
+          item.vuln.vulnId.toLowerCase().includes(filterText.toLowerCase())) ||
+        (item.vuln.desc &&
+          item.vuln.desc.toLowerCase().includes(filterText.toLowerCase()))
+    )
 
   const subHeaderComponentMemo = useMemo(() => {
     return (
@@ -431,7 +399,7 @@ const VulnTable = ({
           alignItems={'flex-start'}
         >
           {/* SEARCH COMPONENTS */}
-          <Flex alignItems={'center'} gap={4}>
+          {/* <Flex alignItems={'center'} gap={4}>
             <Box position='relative' width={'300px'}>
               <Input
                 value={filterText}
@@ -457,7 +425,12 @@ const VulnTable = ({
                 />
               )}
             </Box>
-          </Flex>
+          </Flex> */}
+          <SearchFilter
+            onFilter={(e) => setFilterText(e.target.value)}
+            onClear={handleClear}
+            filterText={filterText}
+          />
 
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
           {filterHeads && (
@@ -486,7 +459,7 @@ const VulnTable = ({
         </Tooltip>
       </Flex>
     )
-  }, [filterText, filterHeads, handleKeyPress, handleSearch, handleClear])
+  }, [filterText, filterHeads, handleClear, filteredItems, filterText])
 
   const ExpandedComponent = ({ data }) => {
     const { vuln } = data
@@ -506,12 +479,12 @@ const VulnTable = ({
         boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
       >
         <Grid
-          templateColumns='repeat(2, 1fr)'
+          templateColumns='repeat(3, 1fr)'
           gap={6}
           width={'80%'}
           margin={'0 auto'}
         >
-          <GridItem w='100%'>
+          <GridItem w='100%' colSpan={3}>
             <CustomText>Description :</CustomText>
             <Text mt={1} fontSize={14}>
               {vuln.desc}
@@ -531,9 +504,23 @@ const VulnTable = ({
           </GridItem>
           <GridItem w='100%'>
             <CustomText>NVD Alias ID :</CustomText>
-            <Text mt={1} fontSize={14}>
-              {vuln.nvdAliasId}
-            </Text>
+            {vuln.nvdAliasId && (
+              <Link href={linkURl('nvd', vuln.nvdAliasId)} target={'_blank'}>
+                <Flex mt={1} direction='row' alignItems={'center'} gap={2}>
+                  <Icon
+                    as={ExternalLinkIcon}
+                    h={'16px'}
+                    w={'16px'}
+                    color={'blue.500'}
+                  />
+                  <Tooltip label={vuln.nvdAliasId} placement={'top'}>
+                    <Text fontSize='sm' color={textColor}>
+                      {vuln.nvdAliasId}
+                    </Text>
+                  </Tooltip>
+                </Flex>
+              </Link>
+            )}
           </GridItem>
         </Grid>
       </Box>
@@ -628,7 +615,7 @@ const VulnTable = ({
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
           columns={columns}
-          data={data.nodes}
+          data={filteredItems.length > 0 ? filteredItems : data.nodes}
           customStyles={customStyles}
           onSort={handleSort}
           subHeader
@@ -640,42 +627,47 @@ const VulnTable = ({
       </Flex>
 
       {/* PAGINATION */}
-      <Flex
-        flexDir={'row'}
-        gap={4}
-        alignItems={'center'}
-        mt={6}
-        justifyContent={'space-between'}
-      >
-        <Stack alignItems={'center'} direction={'row'} spacing={4}>
-          <Button
-            colorScheme='blue'
-            onClick={onPreviousPage}
-            isDisabled={!data.pageInfo.hasPreviousPage}
-          >
-            Previous
-          </Button>
-          <Button
-            colorScheme='blue'
-            onClick={onNextPage}
-            isDisabled={!data.pageInfo.hasNextPage}
-          >
-            Next
-          </Button>
-          <Box>
-            Page {pageIndex} of {Math.ceil(data.totalCount / totalRows)}
-          </Box>
-        </Stack>
+      {!filteredItems && (
+        <Flex
+          flexDir={'row'}
+          gap={4}
+          alignItems={'center'}
+          mt={6}
+          justifyContent={'space-between'}
+        >
+          <Stack alignItems={'center'} direction={'row'} spacing={4}>
+            <Button
+              colorScheme='blue'
+              onClick={onPreviousPage}
+              isDisabled={!data.pageInfo.hasPreviousPage}
+            >
+              Previous
+            </Button>
+            <Button
+              colorScheme='blue'
+              onClick={onNextPage}
+              isDisabled={!data.pageInfo.hasNextPage}
+            >
+              Next
+            </Button>
+            <Box>
+              Page {pageIndex} of{' '}
+              {data.totalCount === 0
+                ? 1
+                : Math.ceil(data.totalCount / totalRows)}
+            </Box>
+          </Stack>
 
-        <Stack alignItems={'center'} direction={'row'} spacing={4}>
-          <Text>Show</Text>
-          <Select width={20} value={totalRows} onChange={handleSetRow}>
-            <option value={25}>25</option>
-            <option value={50}>50</option>
-            <option value={100}>100</option>
-          </Select>
-        </Stack>
-      </Flex>
+          <Stack alignItems={'center'} direction={'row'} spacing={4}>
+            <Text>Show</Text>
+            <Select width={20} value={totalRows} onChange={handleSetRow}>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </Select>
+          </Stack>
+        </Flex>
+      )}
 
       {/* COPY MODAL */}
       {isCopyOpen && (
@@ -815,7 +807,9 @@ const VulnTable = ({
               data={activeRow}
               textColor={textColor}
               refetch={refetch}
+              totalRows={totalRows}
               filteredData={filteredData}
+              filterRefetch={filterRefetch}
             />
           )}
         </>
