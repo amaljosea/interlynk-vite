@@ -627,47 +627,43 @@ const VulnTable = ({
       </Flex>
 
       {/* PAGINATION */}
-      {!filteredItems && (
-        <Flex
-          flexDir={'row'}
-          gap={4}
-          alignItems={'center'}
-          mt={6}
-          justifyContent={'space-between'}
-        >
-          <Stack alignItems={'center'} direction={'row'} spacing={4}>
-            <Button
-              colorScheme='blue'
-              onClick={onPreviousPage}
-              isDisabled={!data.pageInfo.hasPreviousPage}
-            >
-              Previous
-            </Button>
-            <Button
-              colorScheme='blue'
-              onClick={onNextPage}
-              isDisabled={!data.pageInfo.hasNextPage}
-            >
-              Next
-            </Button>
-            <Box>
-              Page {pageIndex} of{' '}
-              {data.totalCount === 0
-                ? 1
-                : Math.ceil(data.totalCount / totalRows)}
-            </Box>
-          </Stack>
+      <Flex
+        flexDir={'row'}
+        gap={4}
+        alignItems={'center'}
+        mt={6}
+        justifyContent={'space-between'}
+      >
+        <Stack alignItems={'center'} direction={'row'} spacing={4}>
+          <Button
+            colorScheme='blue'
+            onClick={onPreviousPage}
+            isDisabled={!data.pageInfo.hasPreviousPage}
+          >
+            Previous
+          </Button>
+          <Button
+            colorScheme='blue'
+            onClick={onNextPage}
+            isDisabled={!data.pageInfo.hasNextPage}
+          >
+            Next
+          </Button>
+          <Box>
+            Page {pageIndex} of{' '}
+            {data.totalCount === 0 ? 1 : Math.ceil(data.totalCount / totalRows)}
+          </Box>
+        </Stack>
 
-          <Stack alignItems={'center'} direction={'row'} spacing={4}>
-            <Text>Show</Text>
-            <Select width={20} value={totalRows} onChange={handleSetRow}>
-              <option value={25}>25</option>
-              <option value={50}>50</option>
-              <option value={100}>100</option>
-            </Select>
-          </Stack>
-        </Flex>
-      )}
+        <Stack alignItems={'center'} direction={'row'} spacing={4}>
+          <Text>Show</Text>
+          <Select width={20} value={totalRows} onChange={handleSetRow}>
+            <option value={25}>25</option>
+            <option value={50}>50</option>
+            <option value={100}>100</option>
+          </Select>
+        </Stack>
+      </Flex>
 
       {/* COPY MODAL */}
       {isCopyOpen && (
@@ -707,7 +703,6 @@ const VulnTable = ({
           </ModalContent>
         </Modal>
       )}
-
       {/* COPY DATA TABLE */}
       {isTableOpen && (
         <Drawer
@@ -795,7 +790,6 @@ const VulnTable = ({
           </DrawerContent>
         </Drawer>
       )}
-
       {/* ACTIONS */}
       {activeRow !== null && (
         <>
