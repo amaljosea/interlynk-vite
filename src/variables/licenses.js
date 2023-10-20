@@ -1,6 +1,6 @@
 export const licenseOptions = [
   {
-    reference: 'https://spdx.org/licenses/0BSD.html',
+    reference: '#',
     isDeprecatedLicenseId: false,
     detailsUrl: 'https://spdx.org/licenses/0BSD.json',
     referenceNumber: 126,
@@ -1237,8 +1237,7 @@ export const licenseOptions = [
     isDeprecatedLicenseId: false,
     detailsUrl: 'https://spdx.org/licenses/CC-BY-NC-ND-1.0.json',
     referenceNumber: 422,
-    name:
-      'Creative Commons Attribution Non Commercial No Derivatives 1.0 Generic',
+    name: 'Creative Commons Attribution Non Commercial No Derivatives 1.0 Generic',
     licenseId: 'CC-BY-NC-ND-1.0',
     seeAlso: ['https://creativecommons.org/licenses/by-nd-nc/1.0/legalcode'],
     isOsiApproved: false
@@ -1248,8 +1247,7 @@ export const licenseOptions = [
     isDeprecatedLicenseId: false,
     detailsUrl: 'https://spdx.org/licenses/CC-BY-NC-ND-2.0.json',
     referenceNumber: 161,
-    name:
-      'Creative Commons Attribution Non Commercial No Derivatives 2.0 Generic',
+    name: 'Creative Commons Attribution Non Commercial No Derivatives 2.0 Generic',
     licenseId: 'CC-BY-NC-ND-2.0',
     seeAlso: ['https://creativecommons.org/licenses/by-nc-nd/2.0/legalcode'],
     isOsiApproved: false
@@ -1259,8 +1257,7 @@ export const licenseOptions = [
     isDeprecatedLicenseId: false,
     detailsUrl: 'https://spdx.org/licenses/CC-BY-NC-ND-2.5.json',
     referenceNumber: 288,
-    name:
-      'Creative Commons Attribution Non Commercial No Derivatives 2.5 Generic',
+    name: 'Creative Commons Attribution Non Commercial No Derivatives 2.5 Generic',
     licenseId: 'CC-BY-NC-ND-2.5',
     seeAlso: ['https://creativecommons.org/licenses/by-nc-nd/2.5/legalcode'],
     isOsiApproved: false
@@ -1270,8 +1267,7 @@ export const licenseOptions = [
     isDeprecatedLicenseId: false,
     detailsUrl: 'https://spdx.org/licenses/CC-BY-NC-ND-3.0.json',
     referenceNumber: 234,
-    name:
-      'Creative Commons Attribution Non Commercial No Derivatives 3.0 Unported',
+    name: 'Creative Commons Attribution Non Commercial No Derivatives 3.0 Unported',
     licenseId: 'CC-BY-NC-ND-3.0',
     seeAlso: ['https://creativecommons.org/licenses/by-nc-nd/3.0/legalcode'],
     isOsiApproved: false
@@ -1281,8 +1277,7 @@ export const licenseOptions = [
     isDeprecatedLicenseId: false,
     detailsUrl: 'https://spdx.org/licenses/CC-BY-NC-ND-3.0-DE.json',
     referenceNumber: 15,
-    name:
-      'Creative Commons Attribution Non Commercial No Derivatives 3.0 Germany',
+    name: 'Creative Commons Attribution Non Commercial No Derivatives 3.0 Germany',
     licenseId: 'CC-BY-NC-ND-3.0-DE',
     seeAlso: ['https://creativecommons.org/licenses/by-nc-nd/3.0/de/legalcode'],
     isOsiApproved: false
@@ -1304,8 +1299,7 @@ export const licenseOptions = [
     isDeprecatedLicenseId: false,
     detailsUrl: 'https://spdx.org/licenses/CC-BY-NC-ND-4.0.json',
     referenceNumber: 213,
-    name:
-      'Creative Commons Attribution Non Commercial No Derivatives 4.0 International',
+    name: 'Creative Commons Attribution Non Commercial No Derivatives 4.0 International',
     licenseId: 'CC-BY-NC-ND-4.0',
     seeAlso: ['https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode'],
     isOsiApproved: false
@@ -1355,8 +1349,7 @@ export const licenseOptions = [
     isDeprecatedLicenseId: false,
     detailsUrl: 'https://spdx.org/licenses/CC-BY-NC-SA-2.0-UK.json',
     referenceNumber: 280,
-    name:
-      'Creative Commons Attribution Non Commercial Share Alike 2.0 England and Wales',
+    name: 'Creative Commons Attribution Non Commercial Share Alike 2.0 England and Wales',
     licenseId: 'CC-BY-NC-SA-2.0-UK',
     seeAlso: ['https://creativecommons.org/licenses/by-nc-sa/2.0/uk/legalcode'],
     isOsiApproved: false
@@ -1376,8 +1369,7 @@ export const licenseOptions = [
     isDeprecatedLicenseId: false,
     detailsUrl: 'https://spdx.org/licenses/CC-BY-NC-SA-3.0.json',
     referenceNumber: 224,
-    name:
-      'Creative Commons Attribution Non Commercial Share Alike 3.0 Unported',
+    name: 'Creative Commons Attribution Non Commercial Share Alike 3.0 Unported',
     licenseId: 'CC-BY-NC-SA-3.0',
     seeAlso: ['https://creativecommons.org/licenses/by-nc-sa/3.0/legalcode'],
     isOsiApproved: false
@@ -1409,8 +1401,7 @@ export const licenseOptions = [
     isDeprecatedLicenseId: false,
     detailsUrl: 'https://spdx.org/licenses/CC-BY-NC-SA-4.0.json',
     referenceNumber: 85,
-    name:
-      'Creative Commons Attribution Non Commercial Share Alike 4.0 International',
+    name: 'Creative Commons Attribution Non Commercial Share Alike 4.0 International',
     licenseId: 'CC-BY-NC-SA-4.0',
     seeAlso: ['https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode'],
     isOsiApproved: false
@@ -2476,8 +2467,7 @@ export const licenseOptions = [
     isDeprecatedLicenseId: false,
     detailsUrl: 'https://spdx.org/licenses/FSFULLRWD.json',
     referenceNumber: 45,
-    name:
-      'FSF Unlimited License (With License Retention and Warranty Disclaimer)',
+    name: 'FSF Unlimited License (With License Retention and Warranty Disclaimer)',
     licenseId: 'FSFULLRWD',
     seeAlso: [
       'https://lists.gnu.org/archive/html/autoconf/2012-04/msg00061.html'

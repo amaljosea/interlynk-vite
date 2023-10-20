@@ -44,6 +44,8 @@ function Index() {
   const product = queryParams.get('p')
 
   const [isLoading, setIsLoading] = useState(false)
+  const [pageIndex, setPageIndex] = useState(1)
+  const [totalRows, setTotalRows] = useState(25)
 
   const { data, refetch, error, loading } = useQuery(GetProjectData, {
     variables: {
@@ -56,20 +58,22 @@ function Index() {
   // }, [data])
 
   const handlePreviousPage = () => {
+    setPageIndex((prev) => pageIndex !== 0 && prev - 1)
     refetch({
-      first: undefined,
       last: 10,
       before: data.projects.pageInfo.startCursor,
-      after: ''
+      after: undefined,
+      first: undefined
     })
   }
 
   const handleNextPage = () => {
+    setPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
     refetch({
       first: 10,
-      last: undefined,
       after: data.projects.pageInfo.endCursor,
-      before: ''
+      before: undefined,
+      last: undefined
     })
   }
 
@@ -201,6 +205,10 @@ function Index() {
                 handleNextPage={handleNextPage}
                 isLoading={isLoading}
                 refetch={refetch}
+                totalRows={totalRows}
+                setTotalRows={setTotalRows}
+                pageIndex={pageIndex}
+                setPageIndex={setPageIndex}
               />
             )}
           </Card>

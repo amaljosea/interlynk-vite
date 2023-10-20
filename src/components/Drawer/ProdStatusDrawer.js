@@ -21,7 +21,9 @@ import {
   Thead,
   Tr,
   Flex,
-  DrawerFooter
+  DrawerFooter,
+  Input,
+  FormControl
 } from '@chakra-ui/react'
 import VulLinkRow from 'components/Tables/VulLinkRow'
 import { updateCompVulnVex } from 'graphQL/Mutation'
@@ -36,7 +38,9 @@ const ProdStatusDrawer = ({
   data,
   textColor,
   refetch,
-  filteredData
+  filteredData,
+  totalRows,
+  filterRefetch
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -49,6 +53,7 @@ const ProdStatusDrawer = ({
 
   const [statusTitle, setStatusTitle] = useState('')
   const [statusName, setStatusName] = useState('')
+  const [otherVersion, setOtherVersion] = useState('')
   const [justification, setJustification] = useState('')
   const [justificationName, setJustificationName] = useState('')
   const [selectedTag, setSelectedTag] = useState('')
@@ -79,7 +84,11 @@ const ProdStatusDrawer = ({
       {
         changedBy: email,
         id: id,
-        justification: justificationName,
+        justification: justificationName
+          ? justificationName
+          : statusName === 'Not Affected'
+          ? 'Code not reachable'
+          : '',
         notes: notes,
         status: statusName,
         updatedAt: new Date().toISOString()
@@ -98,19 +107,26 @@ const ProdStatusDrawer = ({
           vexStatusId: statusTitle,
           vexJustificationId: justification
         }
-      }).then((res) => {
-        if (res.data) {
-          refetch({
+      })
+        .then((res) => {
+          if (res.data) {
+            refetch({
+              projectId: productId,
+              sbomId: sbomId,
+              first: totalRows,
+              last: undefined,
+              field: 'UPDATED_AT',
+              direction: 'DESC'
+            })
+          }
+        })
+        .finally(() => {
+          filterRefetch({
             projectId: productId,
-            sbomId: sbomId,
-            first: 10,
-            last: undefined,
-            field: 'UPDATED_AT',
-            direction: 'DESC'
+            sbomId: sbomId
           })
           onClose()
-        }
-      })
+        })
     } catch (error) {
       console.log('Mutation error', error)
     }
@@ -164,13 +180,9 @@ const ProdStatusDrawer = ({
                 ) : (
                   <>
                     <Box>
-                      <FormLabel
-                        htmlFor='product'
-                        fontSize='sm'
-                        color='gray.600'
-                      >
+                      <Text mb={1} fontSize='sm' color='gray.600'>
                         Status
-                      </FormLabel>
+                      </Text>
                       <Select
                         id='product'
                         size='sm'
@@ -224,45 +236,60 @@ const ProdStatusDrawer = ({
                       ''
                     )}
                     {statusName === 'Fixed' ? (
-                      <Box>
-                        <FormLabel
-                          py='4px'
-                          htmlFor='product'
-                          fontSize='sm'
-                          color='gray.600'
-                        >
-                          Version
-                        </FormLabel>
-                        <Select
-                          id='tag'
-                          value={selectedTag}
-                          onChange={(e) => setSelectedTag(e.target.value)}
-                          size='sm'
-                          color='gray.500'
-                        >
-                          {filteredData && filteredData.length > 0 ? (
-                            filteredData.map((item, index) => (
-                              <option
-                                key={index}
-                                value={item.id}
-                                name={item.version}
-                              >
-                                {item.version}
-                              </option>
-                            ))
-                          ) : (
-                            <option value=''>-- --</option>
-                          )}
-                        </Select>
-                      </Box>
+                      <Stack
+                        width={'100%'}
+                        direction={'column'}
+                        spacing={4}
+                        alignItems={'flex-start'}
+                      >
+                        <Box width={'100%'}>
+                          <Text mb={1} fontSize='sm' color='gray.600'>
+                            Version
+                          </Text>
+                          <Select
+                            id='tag'
+                            value={selectedTag}
+                            onChange={(e) => setSelectedTag(e.target.value)}
+                            size='sm'
+                            color='gray.500'
+                          >
+                            {filteredData && filteredData.length > 0 ? (
+                              filteredData.map((item, index) => (
+                                <option
+                                  key={index}
+                                  value={item.id}
+                                  name={item.version}
+                                >
+                                  {item.version}
+                                </option>
+                              ))
+                            ) : (
+                              <option value=''>-- --</option>
+                            )}
+                          </Select>
+                        </Box>
+                        <Box width={'100%'}>
+                          <Text mb={1} fontSize='sm' color='gray.600'>
+                            Other Version
+                          </Text>
+                          <Input
+                            size='sm'
+                            value={otherVersion}
+                            onChange={(e) => setOtherVersion(e.target.value)}
+                          />
+                        </Box>
+                      </Stack>
                     ) : (
                       ''
                     )}
                   </>
                 )}
                 <Box>
+                  <Text mb={1} fontSize='sm' color='gray.600'>
+                    Notes
+                  </Text>
                   <Textarea
-                    placeholder='Notes'
+                    placeholder='Add notes'
                     size='sm'
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}

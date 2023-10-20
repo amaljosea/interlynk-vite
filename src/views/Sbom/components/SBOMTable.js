@@ -21,17 +21,13 @@ import HealthCheckTable from 'components/Tables/HealthCheckTable'
 import SbomChangelogTable from 'components/Tables/SbomChangelogTable'
 
 // API QUERIES
-import { useLazyQuery, useQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 import {
   GetCheckResults,
   GetComponentData,
   GetVulnData,
   GetChangeLogs
 } from 'graphQL/Queries'
-import { GetCompFilterData } from 'graphQL/Queries'
-import { GetVulnFilterData } from 'graphQL/Queries'
-import { GetCheckFilterData } from 'graphQL/Queries'
-import { GetLogsFilterData } from 'graphQL/Queries'
 
 const SBOMTable = ({
   status,
@@ -42,7 +38,14 @@ const SBOMTable = ({
   refetch,
   lifecycle,
   filteredData,
-  setComponents
+  setComponents,
+  compFilters,
+  compFilterRefetch,
+  vulnFilters,
+  vulnFilterRefetch,
+  checkFilters,
+  checkFilterRefetch,
+  logsFilters
 }) => {
   const tab = window.localStorage.getItem('activeProdTab')
 
@@ -57,119 +60,120 @@ const SBOMTable = ({
   const [totalRows, setTotalRows] = useState(25)
 
   // GET COMPONENT DATA
-  const [
-    getCompData,
-    { data: compData, refetch: compRefetch, error, loading }
-  ] = useLazyQuery(GetComponentData, {
-    fetchPolicy: 'network-only'
+  const {
+    data: compData,
+    refetch: compRefetch,
+    error,
+    loading
+  } = useQuery(GetComponentData, {
+    variables: {
+      projectId: productId,
+      sbomId: sbomId,
+      first: totalRows,
+      field: 'UPDATED_AT',
+      direction: 'DESC'
+    }
   })
 
-  // GET VULN DATA
-  const [getVulnData, { data: vulnData, refetch: vulnRefetch }] = useLazyQuery(
-    GetVulnData,
-    {
-      fetchPolicy: 'network-only'
+  useEffect(() => {
+    if (compData) {
+      setComponents(compData.sbom.components.nodes)
     }
-  )
+  }, [compData])
+
+  // GET VULN DATA
+  const { data: vulnData, refetch: vulnRefetch } = useQuery(GetVulnData, {
+    variables: {
+      projectId: productId,
+      sbomId: sbomId,
+      first: totalRows,
+      field: 'UPDATED_AT',
+      direction: 'ASC'
+    }
+  })
 
   // GET HEALTH CHECK DATA
-  const [getCheckData, { data: checkData, refetch: healthRefetch }] =
-    useLazyQuery(GetCheckResults, { fetchPolicy: 'network-only' })
+  const { data: checkData, refetch: healthRefetch } = useQuery(
+    GetCheckResults,
+    {
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        first: totalRows,
+        field: 'UPDATED_AT',
+        direction: 'DESC'
+      }
+    }
+  )
 
   // GET CHANGE LOG DATA
-  const [getLogData, { data: logsData, refetch: logsRefetch }] = useLazyQuery(
-    GetChangeLogs,
-    { fetchPolicy: 'network-only' }
-  )
-
-  // GET COMPONENT FILTER HEADS
-  const [getCompFilters, { data: compFilers }] = useLazyQuery(
-    GetCompFilterData,
-    {
-      fetchPolicy: 'network-only'
+  const { data: logsData, refetch: logsRefetch } = useQuery(GetChangeLogs, {
+    variables: {
+      projectId: productId,
+      sbomId: sbomId,
+      first: totalRows,
+      field: 'CREATED_AT',
+      direction: 'DESC'
     }
-  )
-
-  // GET VULN FILTER HEADS
-  const [getVulnFilters, { data: vulnFilers }] = useLazyQuery(
-    GetVulnFilterData,
-    {
-      fetchPolicy: 'network-only'
-    }
-  )
-
-  // GET HEALTH CHECK FILTER HEADS
-  const [getCheckFilters, { data: checkFilers }] = useLazyQuery(
-    GetCheckFilterData,
-    {
-      fetchPolicy: 'network-only'
-    }
-  )
-
-  // GET LOGS FILTER HEADS
-  const [getLogsFilters, { data: logsFilers }] = useLazyQuery(
-    GetLogsFilterData,
-    {
-      fetchPolicy: 'network-only'
-    }
-  )
+  })
 
   // ON TAB CHANGE
   const onTabChange = (value) => {
     setTabIndex(value)
     window.localStorage.setItem('activeProdTab', value)
 
-    if (value === 0) {
-      refetch({
+    if (value === 4) {
+      logsRefetch({
         projectId: productId,
-        sbomId: sbomId
-      })
-    } else if (value === 1) {
-      getCompData({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          first: totalRows,
-          field: 'UPDATED_AT',
-          direction: 'DESC'
-        }
-      }).then((res) => {
-        if (res.data) {
-          setComponentIndex(1)
-          setComponents(res.data.sbom.components.nodes)
-        }
-      })
-    } else if (value === 2) {
-      getVulnData({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          first: totalRows,
-          field: 'UPDATED_AT',
-          direction: 'ASC'
-        }
-      }).then((res) => res.data && setVulnIndex(1))
-    } else if (value === 3) {
-      getCheckData({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          first: totalRows,
-          field: 'STATUS',
-          direction: 'DESC'
-        }
-      }).then((res) => res.data && setResultIndex(1))
-    } else if (value === 4) {
-      getLogData({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          first: totalRows,
-          field: 'CREATED_AT',
-          direction: 'DESC'
-        }
+        sbomId: sbomId,
+        first: totalRows,
+        field: 'CREATED_AT',
+        direction: 'DESC'
       }).then((res) => res.data && setChangelogIndex(1))
     }
+
+    // if (value === 0) {
+    //   refetch({
+    //     projectId: productId,
+    //     sbomId: sbomId
+    //   })
+    // } else if (value === 1) {
+    //   compRefetch({
+    //     projectId: productId,
+    //     sbomId: sbomId,
+    //     first: totalRows,
+    //     field: 'UPDATED_AT',
+    //     direction: 'DESC'
+    //   }).then((res) => {
+    //     if (res.data) {
+    //       setComponentIndex(1)
+    //     }
+    //   })
+    // } else if (value === 2) {
+    //   vulnRefetch({
+    //     projectId: productId,
+    //     sbomId: sbomId,
+    //     first: totalRows,
+    //     field: 'UPDATED_AT',
+    //     direction: 'ASC'
+    //   }).then((res) => res.data && setVulnIndex(1))
+    // } else if (value === 3) {
+    //   healthRefetch({
+    //     projectId: productId,
+    //     sbomId: sbomId,
+    //     first: totalRows,
+    //     field: 'STATUS',
+    //     direction: 'DESC'
+    //   }).then((res) => res.data && setResultIndex(1))
+    // } else if (value === 4) {
+    //   logsRefetch({
+    //     projectId: productId,
+    //     sbomId: sbomId,
+    //     first: totalRows,
+    //     field: 'CREATED_AT',
+    //     direction: 'DESC'
+    //   }).then((res) => res.data && setChangelogIndex(1))
+    // }
   }
 
   // EXTRACT ALL THE COMPONENT NAME AND ID'S FROM SELECTED SBOM VERSION
@@ -182,37 +186,37 @@ const SBOMTable = ({
       }
     })
 
-  useEffect(() => {
-    if (tabIndex === 1) {
-      getCompFilters({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId
-        }
-      })
-    } else if (tabIndex === 2) {
-      getVulnFilters({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId
-        }
-      })
-    } else if (tabIndex === 3) {
-      getCheckFilters({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId
-        }
-      })
-    } else {
-      getLogsFilters({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId
-        }
-      })
-    }
-  }, [tabIndex])
+  // useEffect(() => {
+  //   if (tabIndex === 1) {
+  //     getCompFilters({
+  //       variables: {
+  //         projectId: productId,
+  //         sbomId: sbomId
+  //       }
+  //     })
+  //   } else if (tabIndex === 2) {
+  //     getVulnFilters({
+  //       variables: {
+  //         projectId: productId,
+  //         sbomId: sbomId
+  //       }
+  //     })
+  //   } else if (tabIndex === 3) {
+  //     getCheckFilters({
+  //       variables: {
+  //         projectId: productId,
+  //         sbomId: sbomId
+  //       }
+  //     })
+  //   } else {
+  //     getLogsFilters({
+  //       variables: {
+  //         projectId: productId,
+  //         sbomId: sbomId
+  //       }
+  //     })
+  //   }
+  // }, [tabIndex])
 
   return (
     <>
@@ -259,14 +263,15 @@ const SBOMTable = ({
             </TabPanel>
             {/* COMPONENT TABLE */}
             <TabPanel px={0}>
-              {compData && data && (
+              {compData && data && compFilters && (
                 <ComponentTable
                   type={type}
                   lifecycle={lifecycle}
                   data={compData.sbom.components}
                   error={error}
                   refetch={compRefetch}
-                  filterHeads={compFilers}
+                  filterHeads={compFilters}
+                  filterRefetch={compFilterRefetch}
                   pageIndex={componentIndex}
                   setPageIndex={setComponentIndex}
                   primaryComp={data.primaryComponent}
@@ -313,14 +318,15 @@ const SBOMTable = ({
             </TabPanel>
             {/* VUNERABILITIES TABLE */}
             <TabPanel px={0}>
-              {vulnData ? (
+              {vulnData && vulnFilters ? (
                 <VulnTable
                   data={vulnData.sbom.vulns}
                   filteredData={filteredData}
                   refetch={vulnRefetch}
                   productId={productId}
                   sbomId={sbomId}
-                  filterHeads={vulnFilers}
+                  filterHeads={vulnFilters}
+                  filterRefetch={vulnFilterRefetch}
                   pageIndex={vulnIndex}
                   setPageIndex={setVulnIndex}
                   totalRows={totalRows}
@@ -338,13 +344,14 @@ const SBOMTable = ({
             </TabPanel>
             {/* HEALTH CHECK TABLE */}
             <TabPanel px={0}>
-              {checkData && isLoading === false ? (
+              {checkData && isLoading === false && checkFilters ? (
                 <HealthCheckTable
                   productId={productId}
                   sbomId={sbomId}
                   data={checkData.sbom.checkResults}
-                  filterHeads={checkFilers}
                   refetch={healthRefetch}
+                  filterHeads={checkFilters}
+                  filterRefetch={checkFilterRefetch}
                   components={components}
                   pageIndex={resultIndex}
                   setPageIndex={setResultIndex}
@@ -364,12 +371,12 @@ const SBOMTable = ({
             </TabPanel>
             {/* CHANGELOG TABLE */}
             <TabPanel px={0}>
-              {logsData ? (
+              {logsData && logsFilters ? (
                 <SbomChangelogTable
                   data={logsData.sbom.activityLogs}
                   refetch={logsRefetch}
                   pageIndex={changelogIndex}
-                  filterHeads={logsFilers}
+                  filterHeads={logsFilters}
                   setPageIndex={setChangelogIndex}
                   totalRows={totalRows}
                   setTotalRows={setTotalRows}

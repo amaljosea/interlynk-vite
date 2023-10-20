@@ -28,7 +28,8 @@ const SupplierModal = ({
   refetch,
   suppliers,
   checkId,
-  totalRows
+  totalRows,
+  filterRefetch
 }) => {
   const toast = useToast()
   const location = useLocation()
@@ -54,6 +55,8 @@ const SupplierModal = ({
         sbomId: sbomId,
         first: totalRows,
         last: undefined,
+        after: undefined,
+        before: undefined,
         category: undefined,
         severity: undefined,
         status: undefined,
@@ -72,128 +75,123 @@ const SupplierModal = ({
 
   const handleSave = async (e) => {
     e.preventDefault()
-    if (validateEmail(supEmail)) {
-      await createSupplier({
-        variables: {
-          name: supName,
-          contactEmail: supEmail,
-          componentId: id
+    await createSupplier({
+      variables: {
+        name: supName,
+        contactEmail: supEmail,
+        componentId: id
+      }
+    })
+      .then((res) => {
+        if (res.data) {
+          refetch({
+            projectId: productId,
+            sbomId: sbomId,
+            first: totalRows,
+            last: undefined,
+            field: 'UPDATED_AT',
+            direction: 'DESC'
+          })
+        }
+        if (checkId) {
+          healthRecheck({
+            variables: {
+              sbomId: sbomId,
+              checkId: checkId,
+              compId: id
+            }
+          })
         }
       })
-        .then(() => {
-          if (checkId) {
-            healthRecheck({
-              variables: {
-                sbomId: sbomId,
-                checkId: checkId,
-                compId: id
-              }
-            })
-          } else {
-            refetch({
-              projectId: productId,
-              sbomId: sbomId,
-              first: totalRows,
-              field: 'NAME',
-              direction: 'ASC'
-            })
-          }
+      .finally(() => {
+        filterRefetch({
+          projectId: productId,
+          sbomId: sbomId
         })
-        .finally(() => onClose())
-    } else {
-      toast({
-        description: 'Invalid email',
-        status: 'error',
-        position: 'top',
-        duration: 2000
+        onClose()
       })
-    }
   }
 
   const handleUpdate = async (e) => {
     e.preventDefault()
-    if (validateEmail(supEmail)) {
-      await updateSupplier({
-        variables: {
-          name: supName,
-          contactEmail: supEmail,
-          id: suppliers[0].id
-        }
-      }).then((data) => {
-        if (data) {
-          window.location.reload()
-        }
-      })
-    } else {
-      toast({
-        description: 'Invalid email',
-        status: 'error',
-        position: 'top',
-        duration: 2000
-      })
-    }
+    await updateSupplier({
+      variables: {
+        name: supName,
+        contactEmail: supEmail,
+        id: suppliers[0].id
+      }
+    }).then((data) => {
+      if (data) {
+        refetch({
+          projectId: productId,
+          sbomId: sbomId,
+          first: totalRows,
+          field: 'UPDATED_AT',
+          direction: 'DESC'
+        })
+      }
+    })
   }
 
   return (
     <>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-        <form onSubmit={suppliers.length > 0 ? handleUpdate : handleSave}>
-          <ModalContent>
-            <ModalHeader>
-              {suppliers.length > 0 ? 'Edit' : 'Add'} Supplier
-            </ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Flex width={'100%'} direction={'column'} gap={4}>
-                <FormControl isRequired>
-                  <FormLabel fontSize={'sm'}>Name</FormLabel>
-                  <Input
-                    placeholder='Enter supplier name'
-                    value={supName}
-                    onChange={(e) => setSupName(e.target.value)}
-                  />
-                </FormControl>
-                <FormControl
-                  isRequired
-                  isInvalid={!validateEmail(supEmail) && supEmail !== ''}
-                >
-                  <FormLabel fontSize={'sm'}>Email</FormLabel>
-                  <Input
-                    placeholder='Enter supplier email'
-                    value={supEmail}
-                    onChange={(e) => setSupEmail(e.target.value)}
-                  />
-                  {supEmail !== '' && !validateEmail(supEmail) && (
-                    <FormErrorMessage>Email is invalid</FormErrorMessage>
-                  )}
-                </FormControl>
-              </Flex>
-            </ModalBody>
-            <ModalFooter>
-              <Button colorScheme='gray' mr={3} onClick={onClose}>
-                Cancel
+
+        <ModalContent>
+          <ModalHeader>
+            {suppliers.length > 0 ? 'Edit' : 'Add'} Supplier
+          </ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Flex width={'100%'} direction={'column'} gap={4}>
+              <FormControl isRequired>
+                <FormLabel fontSize={'sm'}>Name</FormLabel>
+                <Input
+                  placeholder='Enter supplier name'
+                  value={supName}
+                  onChange={(e) => setSupName(e.target.value)}
+                />
+              </FormControl>
+              <FormControl
+                isRequired
+                isInvalid={!validateEmail(supEmail) && supEmail !== ''}
+              >
+                <FormLabel fontSize={'sm'}>Email</FormLabel>
+                <Input
+                  placeholder='Enter supplier email'
+                  value={supEmail}
+                  onChange={(e) => setSupEmail(e.target.value)}
+                />
+                {supEmail !== '' && !validateEmail(supEmail) && (
+                  <FormErrorMessage>Email is invalid</FormErrorMessage>
+                )}
+              </FormControl>
+            </Flex>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme='gray' mr={3} onClick={onClose}>
+              Cancel
+            </Button>
+            {suppliers.length > 0 ? (
+              <Button
+                colorScheme='blue'
+                onClick={handleUpdate}
+                disabled={!supName || !supEmail || !validateEmail(supEmail)}
+              >
+                Update
               </Button>
-              {suppliers.length > 0 ? (
-                <Button
-                  colorScheme='blue'
-                  type={'submit'}
-                  disabled={!supName || !supEmail || !validateEmail(supEmail)}
-                >
-                  Update
-                </Button>
-              ) : (
-                <Button
-                  colorScheme='blue'
-                  type={'submit'}
-                  disabled={!supName || !supEmail || !validateEmail(supEmail)}
-                >
-                  Save
-                </Button>
-              )}
-            </ModalFooter>
-          </ModalContent>
-        </form>
+            ) : (
+              <Button
+                colorScheme='blue'
+                onClick={handleSave}
+                disabled={!supName || !supEmail || !validateEmail(supEmail)}
+              >
+                Save
+              </Button>
+            )}
+          </ModalFooter>
+        </ModalContent>
       </Modal>
     </>
   )

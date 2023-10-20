@@ -59,6 +59,8 @@ const CpeModal = ({
         sbomId: sbomId,
         first: totalRows,
         last: undefined,
+        after: undefined,
+        before: undefined,
         category: undefined,
         severity: undefined,
         status: undefined,

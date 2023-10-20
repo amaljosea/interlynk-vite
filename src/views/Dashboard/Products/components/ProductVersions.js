@@ -3,8 +3,11 @@ import {
   Box,
   Button,
   Flex,
+  Select,
+  Stack,
   Table,
   Tbody,
+  Text,
   Th,
   Thead,
   Tr,
@@ -22,9 +25,25 @@ const ProductVersions = ({
   handlePreviousPage,
   handleNextPage,
   isLoading,
-  refetch
+  refetch,
+  totalRows,
+  setTotalRows,
+  pageIndex,
+  setPageIndex
 }) => {
   const textColor = useColorModeValue('gray.700', 'white')
+
+  // SET ROW LENGTH
+  const handleSetRow = async (e) => {
+    setTotalRows(Number(e.target.value))
+    await refetch({
+      first: Number(e.target.value),
+      last: undefined,
+      after: undefined,
+      last: undefined
+    })
+    setPageIndex(1)
+  }
 
   return (
     <Card my='22px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
@@ -64,26 +83,44 @@ const ProductVersions = ({
 
       {allProjects && (
         <Flex
+          width={'100%'}
           flexDir={'row'}
           gap={4}
           alignItems={'center'}
           mt={6}
-          justifyContent={'flex-start'}
+          justifyContent={'space-between'}
         >
-          <Button
-            colorScheme='blue'
-            onClick={handlePreviousPage}
-            isDisabled={!allProjects.projects.pageInfo.hasPreviousPage}
-          >
-            Previous
-          </Button>
-          <Button
-            colorScheme='blue'
-            onClick={handleNextPage}
-            isDisabled={!allProjects.projects.pageInfo.hasNextPage}
-          >
-            Next
-          </Button>
+          <Stack alignItems={'center'} direction={'row'} spacing={4}>
+            <Button
+              colorScheme='blue'
+              onClick={handlePreviousPage}
+              isDisabled={!allProjects.projects.pageInfo.hasPreviousPage}
+            >
+              Previous
+            </Button>
+            <Button
+              colorScheme='blue'
+              onClick={handleNextPage}
+              isDisabled={!allProjects.projects.pageInfo.hasNextPage}
+            >
+              Next
+            </Button>
+            <Box>
+              Page {pageIndex} of{' '}
+              {allProjects.projects.totalCount === 0
+                ? 1
+                : Math.ceil(allProjects.projects.totalCount / totalRows)}
+            </Box>
+          </Stack>
+
+          <Stack alignItems={'center'} direction={'row'} spacing={4}>
+            <Text>Show</Text>
+            <Select width={20} value={totalRows} onChange={handleSetRow}>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </Select>
+          </Stack>
         </Flex>
       )}
     </Card>

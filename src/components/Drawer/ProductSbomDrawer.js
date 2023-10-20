@@ -285,7 +285,7 @@ function ProductSbomDrawer(props) {
     }
   }
 
-  console.log('imgIds', imgIds)
+  // console.log('imgIds', imgIds)
 
   const handleUpdateSBOM = async () => {
     try {

@@ -51,6 +51,7 @@ import { useMutation } from '@apollo/client'
 import { deleteComSupplier } from 'graphQL/Mutation'
 import { licenseOptions } from 'variables/licenses'
 import CompFilterMenu from 'views/Sbom/components/CompFilterMenu'
+import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 const customStyles = {
   headCells: {
@@ -80,7 +81,8 @@ const ComponentTable = ({
   primaryComp,
   totalRows,
   setTotalRows,
-  filterHeads
+  filterHeads,
+  filterRefetch
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -311,7 +313,11 @@ const ComponentTable = ({
                   placement={'top'}
                   textTransform={'capitalize'}
                 >
-                  <Link href={item.reference} target='_blank'>
+                  <Link
+                    href={item.reference}
+                    target='_blank'
+                    pointerEvents={item.reference === '#' ? 'none' : 'auto'}
+                  >
                     <Tag
                       size={'sm'}
                       key={index}
@@ -335,7 +341,12 @@ const ComponentTable = ({
       id: 'updatedAt',
       name: 'UPDATED_AT',
       selector: (row) => timeSince(row.updatedAt),
-      sortable: true
+      sortable: true,
+      sortFunction: (a, b) => {
+        const dateA = new Date(a.updatedAt)
+        const dateB = new Date(b.updatedAt)
+        return dateA - dateB // Sort in descending order
+      }
     },
     // ACTION
     {
@@ -453,12 +464,12 @@ const ComponentTable = ({
         boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
       >
         <Grid
-          templateColumns='repeat(2, 1fr)'
+          templateColumns='repeat(3, 1fr)'
           gap={6}
           width={'80%'}
           margin={'0 auto'}
         >
-          <GridItem w='100%'>
+          <GridItem w='100%' colSpan={3}>
             <CustomText>Description :</CustomText>
             <Text mt={1} fontSize={14}>
               {description !== null ? description : ''}
@@ -512,22 +523,22 @@ const ComponentTable = ({
   }
 
   // SEARCH COMPONENT
-  const handleSearch = async (event) => {
-    if (event.key === 'Enter') {
-      await refetch({
-        projectId: productId,
-        sbomId: sbomId,
-        search: filterText,
-        first: totalRows,
-        last: undefined,
-        after: undefined,
-        last: undefined,
-        field: 'UPDATED_AT',
-        direction: 'DESC'
-      })
-      setPageIndex(1)
-    }
-  }
+  // const handleSearch = async (event) => {
+  //   if (event.key === 'Enter') {
+  //     await refetch({
+  //       projectId: productId,
+  //       sbomId: sbomId,
+  //       search: filterText,
+  //       first: totalRows,
+  //       last: undefined,
+  //       after: undefined,
+  //       last: undefined,
+  //       field: 'UPDATED_AT',
+  //       direction: 'DESC'
+  //     })
+  //     setPageIndex(1)
+  //   }
+  // }
 
   // CLEAR SERACH
   const handleClear = async () => {
@@ -564,27 +575,18 @@ const ComponentTable = ({
     setPageIndex(1)
   }
 
-  const searchInputRef = useRef()
-
-  const focusSearchInput = () => {
-    if (searchInputRef?.current) {
-      searchInputRef?.current.focus()
-    }
-  }
-
-  const handleKeyPress = (e) => {
-    if (e.ctrlKey && e.key === '/') {
-      focusSearchInput()
-    }
-  }
-
-  useEffect(() => {
-    window.addEventListener('keydown', handleKeyPress)
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyPress)
-    }
-  }, [])
+  const filteredItems =
+    data &&
+    data.nodes.filter(
+      (item) =>
+        (item.name &&
+          item.name.toLowerCase().includes(filterText.toLowerCase())) ||
+        (item.version &&
+          item.version.toLowerCase().includes(filterText.toLowerCase())) ||
+        (item.purl &&
+          item.purl.toLowerCase().includes(filterText.toLowerCase())) ||
+        (item.licenses && item.licenses.includes(filterText))
+    )
 
   // HEADER SECTION
   const subHeaderComponentMemo = useMemo(() => {
@@ -601,7 +603,7 @@ const ComponentTable = ({
           alignItems={'center'}
         >
           {/* SEARCH COMPONENTS */}
-          <Flex alignItems={'center'} gap={4}>
+          {/* <Flex alignItems={'center'} gap={4}>
             <Box position='relative' width={'300px'}>
               <Input
                 value={filterText}
@@ -627,7 +629,13 @@ const ComponentTable = ({
                 />
               )}
             </Box>
-          </Flex>
+          </Flex> */}
+
+          <SearchFilter
+            onFilter={(e) => setFilterText(e.target.value)}
+            onClear={handleClear}
+            filterText={filterText}
+          />
 
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
           {filterHeads && (
@@ -660,7 +668,7 @@ const ComponentTable = ({
         </Tooltip>
       </Flex>
     )
-  }, [filterText, handleKeyPress, filterHeads])
+  }, [filterText, filteredItems, handleClear])
 
   const handleSort = (column, sortDirection) => {
     // console.log(`column`, column)
@@ -710,7 +718,7 @@ const ComponentTable = ({
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
           columns={columns}
-          data={data.nodes}
+          data={filteredItems.length > 0 ? filteredItems : data.nodes}
           onSort={handleSort}
           customStyles={customStyles}
           defaultSortAsc={false}
@@ -748,7 +756,8 @@ const ComponentTable = ({
             Next
           </Button>
           <Box>
-            Page {pageIndex} of {Math.ceil(data.totalCount / totalRows)}
+            Page {pageIndex} of{' '}
+            {data.totalCount === 0 ? 1 : Math.ceil(data.totalCount / totalRows)}
           </Box>
         </Stack>
 
@@ -776,11 +785,13 @@ const ComponentTable = ({
               license={activeRow.licenses !== null ? activeRow.licenses : []}
               type={activeRow.kind}
               refetch={refetch}
+              filterRefetch={filterRefetch}
               cpes={activeRow.cpes}
               purl={activeRow.purl}
               primary={activeRow.primary}
               internal={activeRow.internal}
               shortDesc={null}
+              checkId={null}
               group={activeRow.group}
               primaryComp={primaryComp}
               totalRows={totalRows}
@@ -800,10 +811,12 @@ const ComponentTable = ({
             <SupplierModal
               id={activeRow.id}
               refetch={refetch}
+              filterRefetch={filterRefetch}
               isOpen={isSupOpen}
               onClose={onSupClose}
               suppliers={activeRow.suppliers}
               shortDesc={null}
+              checkId={null}
               totalRows={totalRows}
             />
           )}
@@ -834,7 +847,9 @@ const ComponentTable = ({
           primary={false}
           internal={false}
           refetch={refetch}
+          filterRefetch={filterRefetch}
           shortDesc={null}
+          checkId={null}
           totalRows={totalRows}
         />
       )}

@@ -94,7 +94,7 @@ const GeneralDataDrawer = ({
         severity: undefined,
         status: undefined,
         field: 'UPDATED_AT',
-        direction: 'DESC'
+        direction: 'ASC'
       })
     }
   })

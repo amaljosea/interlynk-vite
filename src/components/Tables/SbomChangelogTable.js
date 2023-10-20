@@ -1,20 +1,19 @@
-import { CloseIcon } from '@chakra-ui/icons'
 import {
   Button,
   Flex,
   Stack,
   Tag,
-  Input,
-  Tooltip,
   Text,
   Box,
-  Select
+  Select,
+  TagLabel
 } from '@chakra-ui/react'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation } from 'react-router-dom'
 import { getFullDateAndTime } from 'utils'
 import LogFilterMenu from 'views/Sbom/components/LogFilterMenu'
+import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 const customStyles = {
   headCells: {
@@ -68,6 +67,121 @@ const SbomChangelogTable = ({
   const [filterText, setFilterText] = useState('')
   const [pageIndex, setPageIndex] = useState(1)
 
+  // COLUMNS
+  const columns = [
+    // CHANGE TYPE
+    {
+      id: 'changeType',
+      name: 'CHANGE TYPE',
+      selector: (row) => {
+        const { action } = row
+        return (
+          <Tag variant='solid' colorScheme={setColor(action)}>
+            {action}
+          </Tag>
+        )
+      },
+      width: '150px'
+    },
+    // CHANGED OBJECT
+    {
+      id: 'changedObject',
+      name: 'CHANGED OBJECT',
+      selector: (row) => {
+        const { event } = row
+        return <Text>{event}</Text>
+      },
+      width: '200px'
+    },
+    // PRIOR VALUE
+    {
+      id: 'priorValue',
+      name: 'PRIOR VALUE',
+      selector: (row) => {
+        const { orig, event } = row
+        const license =
+          (event === 'licenses' || event === 'cpes') && JSON.parse(orig)
+
+        return (
+          <Text>
+            {orig === 'f'
+              ? 'False'
+              : orig === 't'
+              ? 'True'
+              : license.length > 0
+              ? license.map((item, index) => (
+                  <Tag
+                    size={'sm'}
+                    mr={2}
+                    key={index}
+                    variant='subtle'
+                    colorScheme='red'
+                    width={'fit-content'}
+                    textTransform={'capitalize'}
+                  >
+                    <TagLabel pt={1}>{item}</TagLabel>
+                  </Tag>
+                ))
+              : license.length === 0
+              ? ''
+              : orig}
+          </Text>
+        )
+      },
+      width: '250px'
+    },
+    // UPDATED VALUE
+    {
+      id: 'updatedValue',
+      name: 'UPDATED VALUE',
+      selector: (row) => {
+        const { updated, event } = row
+        const updatedValue =
+          (event === 'licenses' || event === 'cpes') && JSON.parse(updated)
+
+        return (
+          <Text>
+            {updated === 'f'
+              ? 'False'
+              : updated === 't'
+              ? 'True'
+              : updatedValue.length > 0
+              ? updatedValue.map((item, index) => (
+                  <Tag
+                    size={'sm'}
+                    mr={2}
+                    key={index}
+                    variant='subtle'
+                    colorScheme='green'
+                    width={'fit-content'}
+                    textTransform={'capitalize'}
+                  >
+                    <TagLabel pt={1}>{item}</TagLabel>
+                  </Tag>
+                ))
+              : updatedValue.length === 0
+              ? ''
+              : updated}
+          </Text>
+        )
+      }
+    },
+    // CHANGED BY
+    {
+      id: 'changedBy',
+      name: 'CHANGED BY',
+      selector: (row) => row.changedBy,
+      width: '200px'
+    },
+    // CHANGED ON
+    {
+      id: 'createdAt',
+      name: 'CREATED_AT',
+      selector: (row) => <Text>{getFullDateAndTime(row.updatedAt)}</Text>,
+      sortable: true
+    }
+  ]
+
   const onPreviousPage = () => {
     setPageIndex((prev) => pageIndex !== 0 && prev - 1)
     refetch({
@@ -97,22 +211,22 @@ const SbomChangelogTable = ({
   }
 
   // SEARCH COMPONENT
-  const handleSearch = async (event) => {
-    if (event.key === 'Enter') {
-      await refetch({
-        projectId: productId,
-        sbomId: sbomId,
-        search: filterText,
-        first: totalRows,
-        last: undefined,
-        after: undefined,
-        last: undefined,
-        field: 'CREATED_AT',
-        direction: 'DESC'
-      })
-      setPageIndex(1)
-    }
-  }
+  // const handleSearch = async (event) => {
+  //   if (event.key === 'Enter') {
+  //     await refetch({
+  //       projectId: productId,
+  //       sbomId: sbomId,
+  //       search: filterText,
+  //       first: totalRows,
+  //       last: undefined,
+  //       after: undefined,
+  //       last: undefined,
+  //       field: 'CREATED_AT',
+  //       direction: 'DESC'
+  //     })
+  //     setPageIndex(1)
+  //   }
+  // }
 
   // CLEAR SERACH
   const handleClear = async () => {
@@ -149,27 +263,21 @@ const SbomChangelogTable = ({
     setPageIndex(1)
   }
 
-  const searchInputRef = useRef()
-
-  const focusSearchInput = () => {
-    if (searchInputRef?.current) {
-      searchInputRef?.current.focus()
-    }
-  }
-
-  const handleKeyPress = (e) => {
-    if (e.ctrlKey && e.key === '/') {
-      focusSearchInput()
-    }
-  }
-
-  useEffect(() => {
-    window.addEventListener('keydown', handleKeyPress)
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyPress)
-    }
-  }, [])
+  const filteredItems =
+    data &&
+    data.nodes.filter(
+      (item) =>
+        (item.action &&
+          item.action.toLowerCase().includes(filterText.toLowerCase())) ||
+        (item.changedBy &&
+          item.changedBy.toLowerCase().includes(filterText.toLowerCase())) ||
+        (item.event &&
+          item.event.toLowerCase().includes(filterText.toLowerCase())) ||
+        (item.orig &&
+          item.orig.toLowerCase().includes(filterText.toLowerCase())) ||
+        (item.updated &&
+          item.updated.toLowerCase().includes(filterText.toLowerCase()))
+    )
 
   const subHeaderComponentMemo = useMemo(() => {
     return (
@@ -185,7 +293,7 @@ const SbomChangelogTable = ({
           spacing={4}
           alignItems={'flex-start'}
         >
-          <Flex alignItems={'center'} gap={4}>
+          {/* <Flex alignItems={'center'} gap={4}>
             <Box position='relative' width={'300px'}>
               <Input
                 value={filterText}
@@ -211,7 +319,12 @@ const SbomChangelogTable = ({
                 />
               )}
             </Box>
-          </Flex>
+          </Flex> */}
+          <SearchFilter
+            onFilter={(e) => setFilterText(e.target.value)}
+            onClear={handleClear}
+            filterText={filterText}
+          />
 
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
           {filterHeads && (
@@ -229,90 +342,14 @@ const SbomChangelogTable = ({
         </Stack>
       </Flex>
     )
-  }, [filterText, filterHeads, handleKeyPress])
-
-  // COLUMNS
-  const columns = [
-    // CHANGE TYPE
-    {
-      id: 'changeType',
-      name: 'CHANGE TYPE',
-      selector: (row) => {
-        const { action } = row
-        return (
-          <Tag variant='subtle' colorScheme={setColor(action)}>
-            {action}
-          </Tag>
-        )
-      }
-    },
-    // CHANGED OBJECT
-    {
-      id: 'changedObject',
-      name: 'CHANGED OBJECT',
-      selector: (row) => {
-        const { event } = row
-        return <Text>{event}</Text>
-      }
-    },
-    // PRIOR VALUE
-    {
-      id: 'priorValue',
-      name: 'PRIOR VALUE',
-      selector: (row) => {
-        const { orig } = row
-        return (
-          <Tooltip label={orig} placement='top'>
-            <Text>
-              {orig !== null
-                ? `${orig?.substring(0, 20)}${orig.length > 20 ? '...' : ''}`
-                : ''}
-            </Text>
-          </Tooltip>
-        )
-      }
-    },
-    // UPDATED VALUE
-    {
-      id: 'updatedValue',
-      name: 'UPDATED VALUE',
-      selector: (row) => {
-        const { updated } = row
-        return (
-          <Tooltip label={updated} placement='top'>
-            <Text>
-              {updated !== null
-                ? `${updated?.substring(0, 15)}${
-                    updated.length > 15 ? '...' : ''
-                  }`
-                : ''}
-            </Text>
-          </Tooltip>
-        )
-      }
-    },
-    // CHANGED BY
-    {
-      id: 'changedBy',
-      name: 'CHANGED BY',
-      selector: (row) => row.changedBy,
-      width: '200px'
-    },
-    // CHANGED ON
-    {
-      id: 'createdAt',
-      name: 'CREATED_AT',
-      selector: (row) => <Text>{getFullDateAndTime(row.updatedAt)}</Text>,
-      sortable: true
-    }
-  ]
+  }, [filterText, filterHeads, handleClear, filteredItems])
 
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
           columns={columns}
-          data={data.nodes}
+          data={filteredItems.length > 0 ? filteredItems : data.nodes}
           defaultSortAsc={false}
           defaultSortFieldId={'createdAt'}
           customStyles={customStyles}
@@ -347,7 +384,8 @@ const SbomChangelogTable = ({
             Next
           </Button>
           <Box>
-            Page {pageIndex} of {Math.ceil(data.totalCount / totalRows)}
+            Page {pageIndex} of{' '}
+            {data.totalCount === 0 ? 1 : Math.ceil(data.totalCount / totalRows)}
           </Box>
         </Stack>
 
