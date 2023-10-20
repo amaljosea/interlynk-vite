@@ -643,6 +643,7 @@ const HealthCheckTable = ({
       </Flex>
 
       {/* PAGINATION */}
+
       <Flex
         width={'100%'}
         flexDir={'row'}
