@@ -45,7 +45,7 @@ import SigningModal from './components/SigningModal'
 import DownloadModal from './components/DownloadModal'
 import CopyModal from './components/CopyModal'
 
-import { useMutation, useQuery } from '@apollo/client'
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import {
   GetProductData,
   GetProject,
@@ -58,6 +58,7 @@ import {
 import { sbomDelete } from 'graphQL/Mutation'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import CheckModal from './components/CheckModal'
+import { GetAllComponents } from 'graphQL/Queries'
 
 const idRegex =
   /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
@@ -318,11 +319,27 @@ function SBOM() {
     }
   }, [])
 
-  const primaryComp =
-    components && components.find((comp) => comp.primary === true)
+  const [totalComp, setTotalComp] = useState(0)
 
-  // console.log('primaryComp', primaryComp)
-  // console.log('components', components)
+  const primaryComp = sbomData && sbomData.sbom.primaryComponent
+
+  const [getAllComps, { data: allComponents }] = useLazyQuery(GetAllComponents)
+
+  const handleEditSbom = () => {
+    if (sbomData.sbom.primaryComponent) {
+      setSBMOpen()
+    } else {
+      getAllComps({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          first: totalComp,
+          field: 'UPDATED_AT',
+          direction: 'DESC'
+        }
+      }).then(() => onPrimaryOpen())
+    }
+  }
 
   return (
     <>
@@ -520,9 +537,7 @@ function SBOM() {
                               isDisabled={status === 'signed'}
                               colorScheme='blue'
                               icon={<EditIcon />}
-                              onClick={
-                                !primaryComp ? onPrimaryOpen : setSBMOpen
-                              }
+                              onClick={handleEditSbom}
                             ></IconButton>
                           </Tooltip>
 
@@ -596,6 +611,7 @@ function SBOM() {
               refetch={refetch}
               status={status}
               setComponents={setComponents}
+              setTotalComp={setTotalComp}
               compFilters={compFilters}
               compFilterRefetch={compFilterRefetch}
               vulnFilters={vulnFilters}
@@ -613,13 +629,13 @@ function SBOM() {
           </Flex>
 
           {/*  COMPONENT PRIMARY MODAL */}
-          {isPrimaryOpen && (
+          {isPrimaryOpen && allComponents && (
             <CheckModal
               refetch={refetch}
               shortDesc={'Document has a primary component'}
               checkId={null}
               isOpen={isPrimaryOpen}
-              components={components}
+              components={allComponents.sbom.components.nodes}
               onClose={onPrimaryClose}
             />
           )}
@@ -629,15 +645,15 @@ function SBOM() {
               isOpen={isSBMOpen}
               onClose={setSBMClose}
               btnRef={btnRef}
-              component={sbomData.sbom.primaryComponent.name}
-              version={sbomData.sbom.primaryComponent.version}
-              license={primaryComp ? primaryComp.licenses : []}
-              group={primaryComp ? primaryComp.group : ''}
-              type={primaryComp ? primaryComp.kind : ''}
-              cpes={primaryComp ? primaryComp.cpes : []}
-              purl={primaryComp ? primaryComp.purl : ''}
-              primary={primaryComp ? primaryComp.primary : false}
-              internal={primaryComp ? primaryComp.internal : false}
+              component={primaryComp.name}
+              version={primaryComp.version}
+              license={primaryComp.licenses}
+              group={primaryComp.group}
+              type={primaryComp.kind}
+              cpes={primaryComp.cpes}
+              purl={primaryComp.purl}
+              primary={primaryComp.primary}
+              internal={primaryComp.internal}
               refetch={refetch}
               shortDesc={null}
               totalRows={null}

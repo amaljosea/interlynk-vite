@@ -50,10 +50,10 @@ function ProductSbomDrawer(props) {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const toast = useToast()
+  const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
-  const { projectId, name, isOpen, onClose, btnRef, refetch, sbomData, type } =
-    props
+  const { name, isOpen, onClose, btnRef, refetch, sbomData, type } = props
 
   const [createSbom] = useMutation(sbomCreate)
   const [updateSbom] = useMutation(sbomUpdate)
@@ -297,13 +297,14 @@ function ProductSbomDrawer(props) {
           format: compType,
           licenses: imgIds
         }
-      }).then(() => {
-        refetch({
-          projectId: projectId,
-          sbomId: sbomId
-        })
-        onClose()
       })
+        .then(() => {
+          refetch({
+            projectId: productId,
+            sbomId: sbomId
+          })
+        })
+        .finally(() => onClose())
     } catch (error) {
       console.log(`Mutation error `, error)
     }

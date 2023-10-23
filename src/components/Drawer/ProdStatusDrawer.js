@@ -84,11 +84,7 @@ const ProdStatusDrawer = ({
       {
         changedBy: email,
         id: id,
-        justification: justificationName
-          ? justificationName
-          : statusName === 'Not Affected'
-          ? 'Code not reachable'
-          : '',
+        justification: justificationName,
         notes: notes,
         status: statusName,
         updatedAt: new Date().toISOString()
@@ -219,6 +215,7 @@ const ProdStatusDrawer = ({
                           size='sm'
                           color='gray.500'
                         >
+                          <option value=''>-- Select --</option>
                           {allVexJustify ? (
                             allVexJustify.vexJustifications.map(
                               (justify, idx) => (
@@ -309,7 +306,10 @@ const ProdStatusDrawer = ({
                     width={'fit-content'}
                     colorScheme='blue'
                     onClick={handleAdd}
-                    disabled={statusTitle === ''}
+                    disabled={
+                      statusTitle === '' ||
+                      (statusName === 'Not Affected' && justification === '')
+                    }
                   >
                     Add
                   </Button>

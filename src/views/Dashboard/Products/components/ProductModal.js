@@ -15,7 +15,8 @@ import {
   Alert,
   AlertIcon,
   Text,
-  Select
+  Select,
+  useToast
 } from '@chakra-ui/react'
 import { UpdateProject } from 'graphQL/Mutation'
 import { CreateProject } from 'graphQL/Mutation'
@@ -31,6 +32,7 @@ const ProductModal = ({
   allProjects,
   refetch
 }) => {
+  const toast = useToast()
   const [projectCreate] = useMutation(CreateProject)
   const [projectUpdate] = useMutation(UpdateProject)
 
@@ -77,29 +79,31 @@ const ProductModal = ({
 
   const handleSave = async (e) => {
     e.preventDefault()
-    if (!productExist) {
-      try {
-        await projectCreate({
-          variables: {
-            name: productName,
-            desc: productDesc
-          }
-        })
-          .then(() =>
-            refetch({
-              first: 10
-            })
-          )
-          .finally(() => onClose())
-      } catch (error) {
-        console.error('Mutation error:', error)
-      }
-    } else {
-      setError(
-        `A project with same name already exists. Please choose a unique name`
-      )
-      setProductName('')
-      setProductDesc('')
+    try {
+      await projectCreate({
+        variables: {
+          name: productName,
+          desc: productDesc
+        }
+      }).then((res) => {
+        const error = res.data.projectCreate.errors
+        if (error.length > 0) {
+          toast({
+            description:
+              'A project with same name already exists. Please choose a unique name',
+            position: 'top',
+            status: 'error',
+            duration: 5000
+          })
+        } else {
+          refetch({
+            first: 10
+          })
+          onClose()
+        }
+      })
+    } catch (error) {
+      console.error('Mutation error:', error)
     }
   }
 

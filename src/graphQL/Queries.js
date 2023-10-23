@@ -446,6 +446,19 @@ export const GetProductData = gql`
         id
         name
         version
+        primary
+        internal
+        purl
+        cpes
+        licenses
+        updatedAt
+        uniqueId
+        kind
+        copyright
+        publisher
+        description
+        licenseExp
+        group
       }
       stats {
         compCount
@@ -560,6 +573,45 @@ export const GetComponentData = gql`
     }
   }
 `
+
+// GET ALL COMPONENT DATA
+export const GetAllComponents = gql`
+  query GetSbom(
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+    $field: ComponentOrderByFields!
+    $direction: OrderByDirection!
+  ) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      id
+      components(
+        sbomId: $sbomId
+        after: $after
+        before: $before
+        first: $first
+        last: $last
+        orderBy: { field: $field, direction: $direction }
+      ) {
+        totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          startCursor
+          hasPreviousPage
+        }
+        nodes {
+          id
+          name
+        }
+      }
+    }
+  }
+`
+
 // GET COMPONENT FILTER DATA
 export const GetCompFilterData = gql`
   query GetCompFilterData($projectId: Uuid!, $sbomId: Uuid!) {
@@ -670,6 +722,7 @@ export const GetCheckResults = gql`
   query GetCheckResults(
     $projectId: Uuid!
     $sbomId: Uuid!
+    $componentName: String
     $category: String
     $status: String
     $severity: String
@@ -684,6 +737,7 @@ export const GetCheckResults = gql`
       id
       checkResults(
         sbomId: $sbomId
+        componentName: $componentName
         category: $category
         status: $status
         severity: $severity
@@ -732,6 +786,7 @@ export const GetCheckFilterData = gql`
     sbom(projectId: $projectId, sbomId: $sbomId) {
       id
       filters {
+        checkCompNames
         checkCategories
         checkSeverities
         checkStatuses
@@ -786,6 +841,8 @@ export const GetChangeLogs = gql`
           createdAt
           updatedAt
           changedBy
+          loggablePrefix
+          loggableType
         }
       }
     }

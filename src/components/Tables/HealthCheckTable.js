@@ -22,6 +22,7 @@ import DataTable from 'react-data-table-component'
 import { BiSolidWrench } from 'react-icons/bi'
 import { FaCheckDouble } from 'react-icons/fa'
 import { GoSkip } from 'react-icons/go'
+import { getFullDateAndTime } from 'utils'
 import { timeSince, sevColor } from 'utils'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import PurlModal from 'views/Dashboard/Products/components/PurlModal'
@@ -241,6 +242,7 @@ const HealthCheckTable = ({
               refetch={refetch}
               productId={productId}
               sbomId={sbomId}
+              compNames={filterHeads.sbom.filters.checkCompNames}
               categories={filterHeads.sbom.filters.checkCategories}
               severities={filterHeads.sbom.filters.checkSeverities}
               statuses={filterHeads.sbom.filters.checkStatuses}
@@ -513,7 +515,11 @@ const HealthCheckTable = ({
     {
       id: 'updatedAt',
       name: 'UPDATED_AT',
-      selector: (row) => timeSince(row.updatedAt),
+      selector: (row) => (
+        <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
+          {timeSince(row.updatedAt)}
+        </Tooltip>
+      ),
       sortable: true,
       sortFunction: (a, b) => {
         const dateA = new Date(a.updatedAt)
@@ -587,6 +593,7 @@ const HealthCheckTable = ({
     }
   ]
 
+  // SORT FUNCTION
   const handleSort = (column, sortDirection) => {
     refetch({
       projectId: productId,
@@ -787,6 +794,7 @@ const HealthCheckTable = ({
               refetch={refetch}
               filterRefetch={filterRefetch}
               totalRows={totalRows}
+              setPageIndex={setPageIndex}
               checkId={activeRow.organizationRule.rule.friendlyId}
             />
           )}

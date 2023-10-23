@@ -6,11 +6,13 @@ import {
   Text,
   Box,
   Select,
-  TagLabel
+  TagLabel,
+  Tooltip
 } from '@chakra-ui/react'
 import React, { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation } from 'react-router-dom'
+import { timeSince } from 'utils'
 import { getFullDateAndTime } from 'utils'
 import LogFilterMenu from 'views/Sbom/components/LogFilterMenu'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
@@ -83,6 +85,16 @@ const SbomChangelogTable = ({
       },
       width: '150px'
     },
+    // OBJECT TYPE
+    {
+      id: 'objectType',
+      name: 'OBJECT TYPE',
+      selector: (row) => {
+        const { loggableType } = row
+        return <Tag>{loggableType}</Tag>
+      },
+      width: '150px'
+    },
     // CHANGED OBJECT
     {
       id: 'changedObject',
@@ -92,6 +104,20 @@ const SbomChangelogTable = ({
         return <Text>{event}</Text>
       },
       width: '200px'
+    },
+    // OBJECT NAME
+    {
+      id: 'objectName',
+      name: 'OBJECT NAME',
+      selector: (row) => {
+        const { loggablePrefix } = row
+        return (
+          <Tooltip placement='top' label={loggablePrefix}>
+            <Text>{loggablePrefix}</Text>
+          </Tooltip>
+        )
+      },
+      width: '250px'
     },
     // PRIOR VALUE
     {
@@ -177,8 +203,17 @@ const SbomChangelogTable = ({
     {
       id: 'createdAt',
       name: 'CREATED_AT',
-      selector: (row) => <Text>{getFullDateAndTime(row.updatedAt)}</Text>,
-      sortable: true
+      selector: (row) => (
+        <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
+          <Text>{timeSince(row.updatedAt)}</Text>
+        </Tooltip>
+      ),
+      sortable: true,
+      sortFunction: (a, b) => {
+        const dateA = new Date(a.updatedAt)
+        const dateB = new Date(b.updatedAt)
+        return dateA - dateB // Sort in descending order
+      }
     }
   ]
 
@@ -261,6 +296,21 @@ const SbomChangelogTable = ({
     })
     setFilterText('')
     setPageIndex(1)
+  }
+
+  const handleSort = (column, sortDirection) => {
+    // console.log(`column`, column)
+    // console.log(`sortDirection`, sortDirection)
+    refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      first: totalRows,
+      last: undefined,
+      after: undefined,
+      before: undefined,
+      field: column.name,
+      direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+    })
   }
 
   const filteredItems =
@@ -349,7 +399,12 @@ const SbomChangelogTable = ({
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
           columns={columns}
-          data={filteredItems.length > 0 ? filteredItems : data.nodes}
+          data={
+            filterText !== '' || filteredItems.length > 0
+              ? filteredItems
+              : filterText === '' && data.nodes
+          }
+          onSort={handleSort}
           defaultSortAsc={false}
           defaultSortFieldId={'createdAt'}
           customStyles={customStyles}
@@ -358,7 +413,7 @@ const SbomChangelogTable = ({
           responsive={true}
         />
       </Flex>
-      
+
       {/* PAGINATION */}
       <Flex
         width={'100%'}

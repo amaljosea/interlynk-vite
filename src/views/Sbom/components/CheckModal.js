@@ -84,21 +84,19 @@ const CheckModal = ({
           primary: true
         }
       })
-        .then(() =>
+        .then(() => {
           healthRecheck({
             variables: {
               checkId: checkId ? checkId : undefined,
               sbomId: sbomId
             }
           })
-        )
-        .finally(() => {
           filterRefetch({
             projectId: productId,
             sbomId: sbomId
           })
-          onClose()
         })
+        .finally(() => onClose())
     } catch (error) {
       console.log('Mutation error', error)
     }
@@ -185,7 +183,7 @@ const CheckModal = ({
                     mt='8'
                     bg='white'
                     border='1px solid #ccc'
-                    // height={'300px'}
+                    height={'300px'}
                     overflowY={'scroll'}
                   >
                     <List>

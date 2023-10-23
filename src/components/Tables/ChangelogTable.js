@@ -14,6 +14,7 @@ import GlobalContext from 'context/GlobalContext'
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation } from 'react-router-dom'
+import { timeSince } from 'utils'
 import { getFullDateAndTime } from 'utils'
 import FilterChangelog from 'views/Sbom/components/FilterChangelog'
 
@@ -266,7 +267,11 @@ const ChangelogTable = ({ data, refetch, type, totalRows, setTotalRows }) => {
     {
       id: 'changedOn',
       name: 'CHANGED ON',
-      selector: (row) => <Text>{getFullDateAndTime(row.updatedAt)}</Text>
+      selector: (row) => (
+        <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
+          <Text>{timeSince(row.updatedAt)}</Text>
+        </Tooltip>
+      )
     }
   ]
 
