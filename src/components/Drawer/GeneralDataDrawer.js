@@ -22,7 +22,8 @@ import {
   Select,
   useToast,
   FormControl,
-  FormErrorMessage
+  FormErrorMessage,
+  Tooltip
 } from '@chakra-ui/react'
 import {
   toolDelete,
@@ -34,6 +35,7 @@ import {
 } from 'graphQL/Mutation'
 import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
+import { getFullDateAndTime } from 'utils'
 import { timeSince } from 'utils'
 import { licenseOptions } from 'variables/licenses'
 
@@ -358,7 +360,12 @@ const GeneralDataDrawer = ({
                                 {item.version}
                               </Td>
                               <Td pl={0} fontSize={'xs'}>
-                                {timeSince(item.updatedAt)}
+                                <Tooltip
+                                  label={getFullDateAndTime(item.updatedAt)}
+                                  placement='top'
+                                >
+                                  {timeSince(item.updatedAt)}
+                                </Tooltip>
                               </Td>
                             </Tr>
                           ))}
@@ -451,7 +458,12 @@ const GeneralDataDrawer = ({
                                   {item.name} - {item.email}
                                 </Td>
                                 <Td pl={0} fontSize={'xs'}>
-                                  {timeSince(item.updatedAt)}
+                                  <Tooltip
+                                    label={getFullDateAndTime(item.updatedAt)}
+                                    placement={'top'}
+                                  >
+                                    {timeSince(item.updatedAt)}
+                                  </Tooltip>
                                 </Td>
                               </Tr>
                             ))}

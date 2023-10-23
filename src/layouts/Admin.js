@@ -110,7 +110,7 @@ export default function Dashboard(props) {
 
   return (
     <ApolloProvider client={client}>
-      <ContextWrapper>
+      <ContextWrapper>  
         <ChakraProvider theme={theme} resetCss={false}>
           <Stack width={'100%'} direction={'row'} alignItems={'flex-start'}>
             <Sidebar
@@ -133,7 +133,7 @@ export default function Dashboard(props) {
                   />
                 </Box>
               </Portal>
-              <Box bg='rgba(0,0,0,0.04)' minH={'100vh'}>
+              <Box bg='rgba(0,0,0,0.04)' minH={'100vh'} maxH={'100%'}>
                 {getRoute() && (
                   <PanelContent>
                     <PanelContainer>

@@ -120,17 +120,19 @@ const SupplierModal = ({
         contactEmail: supEmail,
         id: suppliers[0].id
       }
-    }).then((data) => {
-      if (data) {
-        refetch({
-          projectId: productId,
-          sbomId: sbomId,
-          first: totalRows,
-          field: 'UPDATED_AT',
-          direction: 'DESC'
-        })
-      }
     })
+      .then((data) => {
+        if (data) {
+          refetch({
+            projectId: productId,
+            sbomId: sbomId,
+            first: totalRows,
+            field: 'UPDATED_AT',
+            direction: 'DESC'
+          })
+        }
+      })
+      .finally(() => onClose())
   }
 
   return (

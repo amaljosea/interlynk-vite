@@ -23,7 +23,8 @@ import {
   Button,
   UnorderedList,
   ListItem,
-  Divider
+  Divider,
+  Tooltip
 } from '@chakra-ui/react'
 import { useState, useRef, useContext, useEffect } from 'react'
 import { Link, useHistory } from 'react-router-dom'
@@ -35,6 +36,7 @@ import { DeleteProject } from 'graphQL/Mutation'
 import { timeSince } from 'utils'
 import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import GlobalContext from 'context/GlobalContext'
+import { getFullDateAndTime } from 'utils'
 
 function ProductVersionsRow(props) {
   const history = useHistory()
@@ -181,7 +183,13 @@ function ProductVersionsRow(props) {
         </Td>
         <Td pl={0}>{isLoading ? <Skeleton height='20px' /> : description}</Td>
         <Td pl={0}>
-          {isLoading ? <Skeleton height='20px' /> : timeSince(updatedAt)}
+          {isLoading ? (
+            <Skeleton height='20px' />
+          ) : (
+            <Tooltip label={getFullDateAndTime(updatedAt)} placement={'top'}>
+              {timeSince(updatedAt)}
+            </Tooltip>
+          )}
         </Td>
         <Td pl={0}>
           {isLoading ? (

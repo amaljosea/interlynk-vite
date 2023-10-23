@@ -35,7 +35,8 @@ const CpeModal = ({
   cpeValue,
   checkId,
   refetch,
-  totalRows
+  totalRows,
+  setPageIndex
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -105,6 +106,7 @@ const CpeModal = ({
       })
         .then(() => {
           if (checkId) {
+            setPageIndex(1)
             healthRecheck({
               variables: {
                 checkId: checkId,

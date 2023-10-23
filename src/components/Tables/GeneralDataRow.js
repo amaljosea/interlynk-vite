@@ -64,22 +64,9 @@ const GeneralDataRow = ({ status, type, data, refetch }) => {
     onClose: onSupClose
   } = useDisclosure()
 
-  const [filteredLicense, setFilteredLicense] = useState([])
-
   const [deleteSupplier] = useMutation(supplierDelete)
   const [deleteTool] = useMutation(toolDelete)
   const [deleteAuthor] = useMutation(authorDelete)
-
-  useEffect(() => {
-    if (data.licenses !== null && data.licenses.length > 0) {
-      // console.log(`license item`, licenses)
-      const filtered = licenseOptions.filter((item) =>
-        data.licenses.includes(item.licenseId)
-      )
-      // console.log(`filtered item`, filtered)
-      setFilteredLicense(filtered)
-    }
-  }, [data])
 
   const handleSupRemove = async (id) => {
     try {
@@ -336,10 +323,13 @@ const GeneralDataRow = ({ status, type, data, refetch }) => {
               </Td>
               <Td pl={0}>
                 <Flex alignItems={'center'} gap={2} flexWrap={'wrap'}>
-                  {filteredLicense.length > 0 &&
-                    filteredLicense.map((item, index) => (
-                      <Tooltip key={index} label={item.name} placement={'top'}>
-                        <Link href={item.reference} target='_blank'>
+                  {data.licenses.length > 0 &&
+                    data.licenses.map((item, index) => (
+                      <Tooltip key={index} label={item} placement={'top'}>
+                        <Link
+                          href={`https://spdx.org/licenses/${item}`}
+                          target='_blank'
+                        >
                           <Tag
                             size={'md'}
                             key={index}
@@ -347,7 +337,7 @@ const GeneralDataRow = ({ status, type, data, refetch }) => {
                             colorScheme='green'
                             width={'fit-content'}
                           >
-                            <TagLabel>{item.licenseId}</TagLabel>
+                            <TagLabel>{item}</TagLabel>
                           </Tag>
                         </Link>
                       </Tooltip>

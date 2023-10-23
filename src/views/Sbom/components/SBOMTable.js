@@ -45,7 +45,8 @@ const SBOMTable = ({
   vulnFilterRefetch,
   checkFilters,
   checkFilterRefetch,
-  logsFilters
+  logsFilters,
+  setTotalComp
 }) => {
   const tab = window.localStorage.getItem('activeProdTab')
 
@@ -78,6 +79,7 @@ const SBOMTable = ({
   useEffect(() => {
     if (compData) {
       setComponents(compData.sbom.components.nodes)
+      setTotalComp(compData.sbom.components.totalCount)
     }
   }, [compData])
 

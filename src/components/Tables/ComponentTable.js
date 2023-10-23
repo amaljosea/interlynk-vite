@@ -52,6 +52,7 @@ import { deleteComSupplier } from 'graphQL/Mutation'
 import { licenseOptions } from 'variables/licenses'
 import CompFilterMenu from 'views/Sbom/components/CompFilterMenu'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
+import { getFullDateAndTime } from 'utils'
 
 const customStyles = {
   headCells: {
@@ -340,7 +341,11 @@ const ComponentTable = ({
     {
       id: 'updatedAt',
       name: 'UPDATED_AT',
-      selector: (row) => timeSince(row.updatedAt),
+      selector: (row) => (
+        <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
+          {timeSince(row.updatedAt)}
+        </Tooltip>
+      ),
       sortable: true,
       sortFunction: (a, b) => {
         const dateA = new Date(a.updatedAt)
@@ -588,6 +593,10 @@ const ComponentTable = ({
         (item.licenses && item.licenses.includes(filterText))
     )
 
+  // useEffect(() => {
+  //   console.log('filteredItems', filteredItems)
+  // }, [filterText])
+
   // HEADER SECTION
   const subHeaderComponentMemo = useMemo(() => {
     return (
@@ -718,7 +727,11 @@ const ComponentTable = ({
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
           columns={columns}
-          data={filteredItems.length > 0 ? filteredItems : data.nodes}
+          data={
+            filterText !== '' || filteredItems.length > 0
+              ? filteredItems
+              : filterText === '' && data.nodes
+          }
           onSort={handleSort}
           customStyles={customStyles}
           defaultSortAsc={false}

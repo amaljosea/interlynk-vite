@@ -615,7 +615,11 @@ const VulnTable = ({
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
           columns={columns}
-          data={filteredItems.length > 0 ? filteredItems : data.nodes}
+          data={
+            filterText !== '' || filteredItems.length > 0
+              ? filteredItems
+              : filterText === '' && data.nodes
+          }
           customStyles={customStyles}
           onSort={handleSort}
           subHeader
