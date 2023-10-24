@@ -5,6 +5,7 @@ import {
   Tag,
   Text,
   Box,
+  Badge,
   Select,
   TagLabel,
   Tooltip
@@ -74,61 +75,61 @@ const SbomChangelogTable = ({
     // CHANGE TYPE
     {
       id: 'changeType',
-      name: 'CHANGE TYPE',
+      name: 'TYPE',
       selector: (row) => {
         const { action } = row
         return (
-          <Tag variant='solid' colorScheme={setColor(action)}>
-            {action}
+          <Tooltip placement='top' label={action} textTransform={'capitalize'}>
+          <Tag variant='solid' colorScheme={setColor(action)} textTransform={'capitalize'}>
+            {action.slice(0,1)}
           </Tag>
+          </Tooltip>
         )
       },
-      width: '150px'
-    },
-    // OBJECT TYPE
-    {
-      id: 'objectType',
-      name: 'OBJECT TYPE',
-      selector: (row) => {
-        const { loggableType } = row
-        return <Tag>{loggableType}</Tag>
-      },
-      width: '150px'
-    },
-    // CHANGED OBJECT
-    {
-      id: 'changedObject',
-      name: 'CHANGED OBJECT',
-      selector: (row) => {
-        const { event } = row
-        return <Text>{event}</Text>
-      },
-      width: '200px'
+      width: '80px'
     },
     // OBJECT NAME
     {
       id: 'objectName',
-      name: 'OBJECT NAME',
+      name: 'CHANGED',
       selector: (row) => {
         const { loggablePrefix } = row
+        const { loggableType } = row
+        const { event } = row
         return (
           <Tooltip placement='top' label={loggablePrefix}>
-            <Text>{loggablePrefix}</Text>
+            <Stack direction={'column'} spacing={0}>
+                <Badge
+                  fontSize={'sm'}
+                  fontWeight={'medium'}
+                  width={'fit-content'}
+                  colorScheme='blue'
+                  style={{
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+              >
+            <Text>{loggableType === 'Sbom' ? 'SBOM' : loggablePrefix}</Text>
+            </Badge>
+            <Text>{event}</Text>
+            </Stack>
           </Tooltip>
         )
       },
-      width: '250px'
+      width: '300px'
     },
     // PRIOR VALUE
     {
       id: 'priorValue',
-      name: 'PRIOR VALUE',
+      name: 'PREVIOUS VALUE',
       selector: (row) => {
         const { orig, event } = row
         const license =
           (event === 'licenses' || event === 'cpes') && JSON.parse(orig)
 
         return (
+          <Tooltip placement='top' label={license.length === 0 ? '' : orig} textTransform={'capitalize'}>
           <Text>
             {orig === 'f'
               ? 'False'
@@ -152,9 +153,10 @@ const SbomChangelogTable = ({
               ? ''
               : orig}
           </Text>
+          </Tooltip>
         )
       },
-      width: '250px'
+      width: '400px'
     },
     // UPDATED VALUE
     {
@@ -166,7 +168,8 @@ const SbomChangelogTable = ({
           (event === 'licenses' || event === 'cpes') && JSON.parse(updated)
 
         return (
-          <Text>
+          <Tooltip placement='top' label={updatedValue.length === 0 ? '' : updated} textTransform={'capitalize'}>
+          <Text textOverflow={'wrap'}>
             {updated === 'f'
               ? 'False'
               : updated === 't'
@@ -189,20 +192,22 @@ const SbomChangelogTable = ({
               ? ''
               : updated}
           </Text>
+          </Tooltip>
         )
-      }
+      },
+      width: '400px'
     },
     // CHANGED BY
     {
       id: 'changedBy',
-      name: 'CHANGED BY',
+      name: 'BY',
       selector: (row) => row.changedBy,
-      width: '200px'
+      width: '150px'
     },
     // CHANGED ON
     {
       id: 'createdAt',
-      name: 'CREATED_AT',
+      name: 'CHANGED ON',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
           <Text>{timeSince(row.updatedAt)}</Text>
