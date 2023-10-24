@@ -452,7 +452,7 @@ const HealthCheckTable = ({
       width: '120px'
     },
     // CATEGORY
-    {
+/*     {
       id: 'category',
       name: 'CATEGORY',
       selector: (row) => {
@@ -470,11 +470,11 @@ const HealthCheckTable = ({
         )
       },
       width: '250px'
-    },
+    }, */
     // LONG DESCRIPTION
     {
       id: 'longDesc',
-      name: 'LONG DESCRIPTION',
+      name: 'DESCRIPTION',
       selector: (row) => {
         const { organizationRule, component } = row
         return (
@@ -482,6 +482,7 @@ const HealthCheckTable = ({
             <Stack spacing={2} my={3}>
               {component !== null && (
                 <Badge
+                  fontSize={'sm'}
                   fontWeight={'medium'}
                   width={'fit-content'}
                   colorScheme='blue'
@@ -492,8 +493,8 @@ const HealthCheckTable = ({
               )}
               <Text>
                 {organizationRule.rule.longDesc !== null
-                  ? `${organizationRule.rule.longDesc?.substring(0, 30)}${
-                      organizationRule.rule.longDesc.length > 30 ? '...' : ''
+                  ? `${organizationRule.rule.shortDesc?.substring(0, 300)}${
+                      organizationRule.rule.shortDesc.length > 300 ? '...' : ''
                     }`
                   : ''}
               </Text>
@@ -501,20 +502,20 @@ const HealthCheckTable = ({
           </Tooltip>
         )
       },
-      width: '320px'
+      width: '900px'
     },
-    // STATUS
+/*     // STATUS
     {
       id: 'status',
       name: 'STATUS',
       selector: (row) => row.status,
       sortable: true,
       width: '160px'
-    },
+    }, */
     // UPDATED AT
     {
       id: 'updatedAt',
-      name: 'UPDATED_AT',
+      name: 'UPDATED AT',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
           {timeSince(row.updatedAt)}
@@ -531,7 +532,7 @@ const HealthCheckTable = ({
     // ACTION
     {
       id: 'action',
-      name: 'ACTION',
+      name: 'RESOLUTION',
       selector: (row) => {
         const { status, id } = row
         return (
