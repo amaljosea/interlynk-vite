@@ -34,10 +34,11 @@ import CardBody from 'components/Card/CardBody.js'
 import SBOMTable from './components/SBOMTable'
 import {
   FaBalanceScale,
+  FaCube,
   FaCubes,
   FaLayerGroup,
   FaFileDownload,
-  FaProjectDiagram,
+  FaBug,
   FaRadiation
 } from 'react-icons/fa'
 import { TbSignature, TbSignatureOff } from 'react-icons/tb'
@@ -311,7 +312,7 @@ function SBOM() {
                             spacing={2}
                             alignItems={'center'}
                           >
-                            <Text fontWeight={'semibold'} fontSize={20}>
+                            <Text fontWeight={'semibold'} fontSize={25}>
                               {sbomData.sbom.project.name} :{' '}
                               {sbomData.sbom.primaryComponent?.version}
                             </Text>
@@ -324,8 +325,8 @@ function SBOM() {
                             placement='top'
                             label={getFullDateAndTime(sbomData.sbom.updatedAt)}
                           >
-                            <Text fontSize='sm' cursor={'pointer'}>
-                              Last updated at :{' '}
+                            <Text fontSize='xs' cursor={'pointer'}>
+                              Updated {' '}
                               {timeSince(sbomData.sbom.updatedAt)}
                             </Text>
                           </Tooltip>
@@ -360,74 +361,18 @@ function SBOM() {
                                 h={4}
                                 w={4}
                                 color='#777'
-                                as={FaProjectDiagram}
+                                as={FaCube}
                               />
                               <Box>
                                 <Badge
                                   mr={1}
-                                  fontSize={'md'}
+                                  fontSize={'xl'}
                                   fontWeight={'medium'}
+                                  bg={'none'}
                                 >
                                   {sbomData.sbom.stats.compCount}
                                 </Badge>
                                 <Text fontSize={'xs'}>Components</Text>
-                              </Box>
-                            </Stack>
-                            {/* vulnerabilities */}
-                            <Stack
-                              direction={'row'}
-                              alignItems={'flex-start'}
-                              spacing={2}
-                            >
-                              <Icon h={4} w={4} color='#777' as={FaRadiation} />
-                              <Box>
-                                <Stack fontWeight={'medium'} direction={'row'}>
-                                  <Badge
-                                    mr={1}
-                                    fontSize={'md'}
-                                    fontWeight={'medium'}
-                                    variant='subtle'
-                                    colorScheme='red'
-                                  >
-                                    {sbomData.sbom.stats.vulnStats.critical
-                                      ? sbomData.sbom.stats.vulnStats.critical
-                                      : 0}
-                                  </Badge>
-                                  <Badge
-                                    mr={1}
-                                    fontSize={'md'}
-                                    fontWeight={'medium'}
-                                    variant='subtle'
-                                    colorScheme='orange'
-                                  >
-                                    {sbomData.sbom.stats.vulnStats.high
-                                      ? sbomData.sbom.stats.vulnStats.high
-                                      : 0}
-                                  </Badge>
-                                  <Badge
-                                    mr={1}
-                                    fontSize={'md'}
-                                    fontWeight={'medium'}
-                                    variant='subtle'
-                                    colorScheme='yellow'
-                                  >
-                                    {sbomData.sbom.stats.vulnStats.medium
-                                      ? sbomData.sbom.stats.vulnStats.medium
-                                      : 0}
-                                  </Badge>
-                                  <Badge
-                                    mr={1}
-                                    fontSize={'md'}
-                                    fontWeight={'medium'}
-                                    variant='subtle'
-                                    colorScheme='green'
-                                  >
-                                    {sbomData.sbom.stats.vulnStats.low
-                                      ? sbomData.sbom.stats.vulnStats.low
-                                      : 0}
-                                  </Badge>
-                                </Stack>
-                                <Text fontSize={'xs'}>Vulnerabilities</Text>
                               </Box>
                             </Stack>
                             {/* license */}
@@ -445,16 +390,78 @@ function SBOM() {
                               <Box>
                                 <Badge
                                   mr={1}
-                                  fontSize={'md'}
+                                  fontSize={'xl'}
                                   fontWeight={'medium'}
+                                  bg={'none'}
                                 >
                                   {sbomData.sbom.stats.compLicenseCount}
                                 </Badge>
                                 <Text fontSize={'xs'}>Licenses</Text>
                               </Box>
                             </Stack>
-                            {/* PURL */}
+                            {/* vulnerabilities */}
                             <Stack
+                              direction={'row'}
+                              alignItems={'flex-start'}
+                              spacing={2}
+                            >
+                              <Icon h={4} w={4} color='#777' as={FaBug} />
+                              <Box>
+                                <Stack fontWeight={'medium'} direction={'row'}>
+                                <Badge
+                                    mr={1}
+                                    fontSize={'xl'}
+                                    fontWeight={'medium'}
+                                    variant='subtle'
+                                    colorScheme='red'
+                                    borderRadius='md'
+                                  >
+                                    {sbomData.sbom.stats.vulnStats.critical
+                                      ? sbomData.sbom.stats.vulnStats.critical
+                                      : 0}
+                                  </Badge>
+                                  <Badge
+                                    mr={1}
+                                    fontSize={'xl'}
+                                    fontWeight={'medium'}
+                                    variant='subtle'
+                                    colorScheme='orange'
+                                    borderRadius='md'
+                                  >
+                                    {sbomData.sbom.stats.vulnStats.high
+                                      ? sbomData.sbom.stats.vulnStats.high
+                                      : 0}
+                                  </Badge>
+                                  <Badge
+                                    mr={1}
+                                    fontSize={'xl'}
+                                    fontWeight={'medium'}
+                                    variant='subtle'
+                                    colorScheme='yellow'
+                                    borderRadius='md'
+                                  >
+                                    {sbomData.sbom.stats.vulnStats.medium
+                                      ? sbomData.sbom.stats.vulnStats.medium
+                                      : 0}
+                                  </Badge>
+                                  <Badge
+                                    mr={1}
+                                    fontSize={'xl'}
+                                    fontWeight={'medium'}
+                                    variant='subtle'
+                                    colorScheme='green'
+                                    borderRadius='md'
+                                  >
+                                    {sbomData.sbom.stats.vulnStats.low
+                                      ? sbomData.sbom.stats.vulnStats.low
+                                      : 0}
+                                  </Badge>
+                                </Stack>
+                                <Text fontSize={'xs'}>Vulnerabilities</Text>
+                              </Box>
+                            </Stack>
+                            {/* PURL */}
+{/*                             <Stack
                               direction={'row'}
                               alignItems={'flex-start'}
                               spacing={2}
@@ -475,9 +482,9 @@ function SBOM() {
                                 </Badge>
                                 <Text fontSize={'xs'}>PURL</Text>
                               </Box>
-                            </Stack>
+                            </Stack> */}
                             {/* CPE */}
-                            <Stack
+{/*                             <Stack
                               direction={'row'}
                               alignItems={'flex-start'}
                               spacing={2}
@@ -493,7 +500,7 @@ function SBOM() {
                                 </Badge>
                                 <Text fontSize={'xs'}>CPE</Text>
                               </Box>
-                            </Stack>
+                            </Stack> */}
                           </Flex>
                         </Flex>
                       </Flex>
