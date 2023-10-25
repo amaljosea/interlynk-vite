@@ -91,9 +91,10 @@ const Form1 = () => {
         fontWeight='medium'
         mb={10}
       >
-        Existing Projects
+        {/* Existing Projects */}
+        Coming Soon
       </Text>
-      <Box width={'400px'} margin={'0 auto'}>
+      <Box width={'400px'} margin={'0 auto'} display={'none'}>
         <Stack spacing={4} direction={'column'} gap={2}>
           {/* Project */}
           <FormControl fontSize={'sm'}>

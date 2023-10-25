@@ -12,6 +12,9 @@ import CustomerLayout from './layouts/Customer.js'
 import Register from './layouts/Register.js'
 import LoginLayout from './layouts/Login.js'
 import ScrollToTop from 'components/ScrollToTop.js'
+import Cookies from 'js-cookie'
+
+const authToken = Cookies.get('authToken')
 
 // Sentry.init({
 //   dsn: 'https://a54aeaf934a655793d8b33ac62b1db8d@o4505997805682688.ingest.sentry.io/4505997807976448',
@@ -50,7 +53,7 @@ ReactDOM.render(
         <Route path={`/login`} component={LoginLayout} />
         <Route path={`/customer`} component={CustomerLayout} />
         <Route path={`/register`} component={Register} />
-        <Redirect from={`/`} to='/auth' />
+        <Redirect from={`/`} to={authToken ? '/vendor/dashboard' : '/auth'} />
       </Switch>
     </BrowserRouter>
   </React.StrictMode>,

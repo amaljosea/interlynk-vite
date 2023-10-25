@@ -475,6 +475,7 @@ export const GetProductData = gql`
       creationAt
       updatedAt
       licenses
+      format
       tools {
         id
         name
@@ -562,6 +563,10 @@ export const GetComponentData = gql`
           description
           licenseExp
           group
+          externalUrls {
+            name
+            url
+          }
           suppliers {
             id
             name

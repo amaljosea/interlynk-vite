@@ -38,9 +38,9 @@ const CheckFilterMenu = ({
   setPageIndex,
   totalRows
 }) => {
-  const { compFilters } = useContext(GlobalContext)
+  const { checkFilters } = useContext(GlobalContext)
 
-  const { checkCategories, checkSeverities, checkStatuses } = compFilters
+  const { checkCategories, checkSeverities, checkStatuses } = checkFilters
 
   const [selectCategory, setSelectCategory] = useState('')
   const [selectSeverity, setSelectSeverity] = useState('')
@@ -198,7 +198,7 @@ const CheckFilterMenu = ({
               <MenuItemOption value={'all'} fontSize={'sm'}>
                 All
               </MenuItemOption>
-              {checkSeverities?.map((item, index) => (
+              {['critical', 'high', 'medium', 'low'].map((item, index) => (
                 <MenuItemOption key={index} value={item} fontSize={'sm'}>
                   {item}
                 </MenuItemOption>

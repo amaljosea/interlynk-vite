@@ -319,7 +319,7 @@ const GeneralDataRow = ({ status, type, data, refetch }) => {
             {/* LICENSES */}
             <Tr>
               <Td pl={0} fontWeight={'medium'}>
-                License
+                Data License
               </Td>
               <Td pl={0}>
                 <Flex alignItems={'center'} gap={2} flexWrap={'wrap'}>

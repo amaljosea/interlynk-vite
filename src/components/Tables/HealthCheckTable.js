@@ -12,9 +12,11 @@ import {
   Box,
   Badge,
   useToast,
-  Select
+  Select,
+  Skeleton
 } from '@chakra-ui/react'
 import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
+import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import GlobalContext from 'context/GlobalContext'
 import { recheckHealth, checkResultUpdate } from 'graphQL/Mutation'
 import { PackageURL } from 'packageurl-js'
@@ -57,11 +59,10 @@ const HealthCheckTable = ({
   pageIndex,
   setPageIndex,
   refetch,
-  setIsLoading,
   totalRows,
   setTotalRows,
-  filterHeads,
-  filterRefetch
+  filterRefetch,
+  sbomData
 }) => {
   const customerView = location.pathname.startsWith('/customer')
   const toast = useToast()
@@ -77,13 +78,13 @@ const HealthCheckTable = ({
   const [selectedCpe, setSelectedCpe] = useState(null)
 
   const [activeRow, setActiveRow] = useState(null)
-  const [filterText, setFilterText] = useState('')
-
+  const [sortField, setSortField] = useState('UPDATED_AT')
   const [updateResult] = useMutation(checkResultUpdate)
 
   const supplierBtn = useRef(null)
   const creationToolBtn = useRef(null)
   const authorBtn = useRef(null)
+  const licenseBtn = useRef(null)
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
@@ -91,6 +92,12 @@ const HealthCheckTable = ({
     isOpen: isLicenseOpen,
     onOpen: onLicenseOpen,
     onClose: onLicenseClose
+  } = useDisclosure()
+
+  const {
+    isOpen: isDataLicenseOpen,
+    onOpen: onDataLicenseOpen,
+    onClose: onDataLicenseClose
   } = useDisclosure()
 
   const {
@@ -151,35 +158,28 @@ const HealthCheckTable = ({
         category: undefined,
         severity: undefined,
         status: undefined,
-        field: 'UPDATED_AT',
+        field: sortField,
         direction: 'DESC'
       })
     }
   })
 
   const handleReCheck = async () => {
-    setIsLoading(true)
     try {
       await healthRecheck({
         variables: {
           sbomId: sbomId
         }
-      })
-        .then((res) => {
-          if (res.data) {
-            setTimeout(() => {
-              setIsLoading(false)
-            }, 2000)
-          }
-        })
-        .finally(() => {
+      }).then((res) => {
+        if (res.data) {
           toast({
             description: 'Health re-check successfully',
             status: 'success',
             duration: 3000,
             position: 'top'
           })
-        })
+        }
+      })
     } catch (error) {
       console.log('Mutation error', error)
     }
@@ -196,10 +196,9 @@ const HealthCheckTable = ({
       after: undefined,
       last: undefined,
       search: undefined,
-      field: 'UPDATED_AT',
+      field: sortField,
       direction: 'DESC'
     })
-    setFilterText('')
     setPageIndex(1)
   }
 
@@ -263,7 +262,7 @@ const HealthCheckTable = ({
         </Tooltip>
       </Flex>
     )
-  }, [filterText, data, checkFilters])
+  }, [checkFilters])
 
   const handleOpen = (row) => {
     const { shortDesc, organizationRule } = row
@@ -290,6 +289,13 @@ const HealthCheckTable = ({
     // SUPPLIER SIDE DRAWER
     if (organizationRule.rule.shortDesc === 'Document has suppliers present') {
       return onDocSupOpen()
+    }
+
+    // SUPPLIER SIDE DRAWER
+    if (
+      organizationRule.rule.shortDesc === 'Document has data license specified'
+    ) {
+      return onDataLicenseOpen()
     }
 
     // PRIMARY COMPONENT SELECTOR MODAL
@@ -514,7 +520,7 @@ const HealthCheckTable = ({
     // UPDATED AT
     {
       id: 'updatedAt',
-      name: 'UPDATED AT',
+      name: 'UPDATED_AT',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
           {timeSince(row.updatedAt)}
@@ -595,6 +601,7 @@ const HealthCheckTable = ({
 
   // SORT FUNCTION
   const handleSort = (column, sortDirection) => {
+    setSortField(column.name)
     refetch({
       projectId: productId,
       sbomId: sbomId,
@@ -605,94 +612,135 @@ const HealthCheckTable = ({
     })
   }
 
-  const onPreviousPage = () => {
+  const [loading, setLoading] = useState(false)
+
+  const onPreviousPage = async () => {
+    setLoading(true)
     setPageIndex((prev) => pageIndex !== 0 && prev - 1)
-    refetch({
+    await refetch({
       projectId: productId,
       sbomId: sbomId,
       first: undefined,
       last: totalRows,
       before: data.pageInfo.startCursor,
       after: undefined,
-      field: 'UPDATED_AT',
+      field: sortField,
       direction: 'DESC'
+    }).then(() => {
+      setTimeout(() => {
+        setLoading(false)
+      }, 2000)
     })
   }
 
-  const onNextPage = () => {
+  const onNextPage = async () => {
+    setLoading(true)
     setPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
-    refetch({
+    await refetch({
       projectId: productId,
       sbomId: sbomId,
       first: totalRows,
       last: undefined,
       after: data.pageInfo.endCursor,
       before: undefined,
-      field: 'UPDATED_AT',
+      field: sortField,
       direction: 'DESC'
+    }).then(() => {
+      setTimeout(() => {
+        setLoading(false)
+      }, 2000)
     })
   }
 
   return (
     <>
-      <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
-          columns={columns}
-          data={data.nodes}
-          onSort={handleSort}
-          defaultSortAsc={false}
-          defaultSortFieldId={'updatedAt'}
-          customStyles={customStyles}
-          subHeader
-          subHeaderComponent={subHeaderComponentMemo}
-          responsive={true}
-        />
-      </Flex>
+      {loading ? (
+        <Flex width={'100%'} gap={4} direction={'column'}>
+          <Skeleton width={'100%'} height='20px' />
+          <Skeleton width={'100%'} height='20px' />
+          <Skeleton width={'100%'} height='20px' />
+          <Skeleton width={'100%'} height='20px' />
+          <Skeleton width={'100%'} height='20px' />
+        </Flex>
+      ) : (
+        <Flex flexDir={'column'} width={'100%'}>
+          <DataTable
+            columns={columns}
+            data={data.nodes}
+            onSort={handleSort}
+            defaultSortAsc={false}
+            defaultSortFieldId={'updatedAt'}
+            customStyles={customStyles}
+            subHeader
+            subHeaderComponent={subHeaderComponentMemo}
+            responsive={true}
+          />
+        </Flex>
+      )}
 
       {/* PAGINATION */}
+      {!loading && (
+        <Flex
+          width={'100%'}
+          flexDir={'row'}
+          gap={4}
+          alignItems={'center'}
+          mt={6}
+          justifyContent={'space-between'}
+        >
+          <Stack alignItems={'center'} direction={'row'} spacing={4}>
+            <Button
+              colorScheme='blue'
+              onClick={onPreviousPage}
+              isDisabled={!data.pageInfo.hasPreviousPage}
+            >
+              Previous
+            </Button>
+            <Button
+              colorScheme='blue'
+              onClick={onNextPage}
+              isDisabled={!data.pageInfo.hasNextPage}
+            >
+              Next
+            </Button>
+            <Box>
+              Page {pageIndex} of{' '}
+              {data.totalCount === 0
+                ? 1
+                : Math.ceil(data.totalCount / totalRows)}
+            </Box>
+          </Stack>
 
-      <Flex
-        width={'100%'}
-        flexDir={'row'}
-        gap={4}
-        alignItems={'center'}
-        mt={6}
-        justifyContent={'space-between'}
-      >
-        <Stack alignItems={'center'} direction={'row'} spacing={4}>
-          <Button
-            colorScheme='blue'
-            onClick={onPreviousPage}
-            isDisabled={!data.pageInfo.hasPreviousPage}
-          >
-            Previous
-          </Button>
-          <Button
-            colorScheme='blue'
-            onClick={onNextPage}
-            isDisabled={!data.pageInfo.hasNextPage}
-          >
-            Next
-          </Button>
-          <Box>
-            Page {pageIndex} of{' '}
-            {data.totalCount === 0 ? 1 : Math.ceil(data.totalCount / totalRows)}
-          </Box>
-        </Stack>
-
-        <Stack alignItems={'center'} direction={'row'} spacing={4}>
-          <Text>Show</Text>
-          <Select width={20} value={totalRows} onChange={handleSetRow}>
-            <option value={25}>25</option>
-            <option value={50}>50</option>
-            <option value={100}>100</option>
-          </Select>
-        </Stack>
-      </Flex>
+          <Stack alignItems={'center'} direction={'row'} spacing={4}>
+            <Text>Show</Text>
+            <Select width={20} value={totalRows} onChange={handleSetRow}>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </Select>
+          </Stack>
+        </Flex>
+      )}
 
       {/* ACTIONS */}
       {activeRow !== null && (
         <>
+          {/* SBOM DATA LICENSES DRAWER */}
+          {isDataLicenseOpen && (
+            <ProductSbomDrawer
+              totalRows={totalRows}
+              checkId={activeRow.organizationRule.rule.friendlyId}
+              filterRefetch={filterRefetch}
+              isOpen={isDataLicenseOpen}
+              onClose={onDataLicenseClose}
+              btnRef={licenseBtn}
+              name={sbomData.project.name}
+              refetch={refetch}
+              sbomData={sbomData}
+              type={sbomData.format}
+            />
+          )}
+
           {/*  COMPONENT PRIMARY MODAL */}
           {isPrimaryOpen && (
             <CheckModal

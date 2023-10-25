@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Drawer,
   DrawerBody,
@@ -21,14 +21,41 @@ import {
   Select,
   useToast,
   FormLabel,
-  Input
+  Input,
+  FormErrorMessage
 } from '@chakra-ui/react'
 import { DeleteIcon } from '@chakra-ui/icons'
+import { useMutation } from '@apollo/client'
+import { UpdateCompLinks } from 'graphQL/Mutation'
 
-const LinksDrawer = ({ isOpen, onClose, btnRef, component }) => {
+const LinksDrawer = ({
+  isOpen,
+  onClose,
+  btnRef,
+  component,
+  sbomId,
+  productId,
+  refetch
+}) => {
   const [type, setType] = useState('')
   const [link, setLink] = useState('')
   const [linksData, setLinksData] = useState([])
+
+  const { id, externalUrls } = component
+
+  const [updateLinks] = useMutation(UpdateCompLinks)
+
+  const urls = []
+
+  useEffect(() => {
+    externalUrls?.map((item) => {
+      urls.push({
+        name: item.name,
+        url: item.url
+      })
+    })
+    setLinksData(urls)
+  }, [externalUrls])
 
   const urlPattern = new RegExp(
     '(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w .-]*/?'
@@ -36,20 +63,13 @@ const LinksDrawer = ({ isOpen, onClose, btnRef, component }) => {
 
   const toast = useToast()
 
-  const handleLinkAdd = (e) => {
+  console.log('linksData', linksData)
+
+  const handleLinkAdd = async (e) => {
     e.preventDefault()
-    if (urlPattern.test(link)) {
-      setLinksData((prev) => [{ link, type }, ...prev])
-      setType('')
-      setLink('')
-    } else {
-      toast({
-        description: `Invalid URL`,
-        duration: 2000,
-        position: 'top',
-        status: 'error'
-      })
-    }
+    setLinksData((prev) => [{ url: link, name: type }, ...prev])
+    setType('')
+    setLink('')
   }
 
   const handleLinkRemove = (id) => {
@@ -57,9 +77,23 @@ const LinksDrawer = ({ isOpen, onClose, btnRef, component }) => {
     setLinksData(updatedList)
   }
 
-  const handleSave = () => {
-    console.log('Form submitted')
-    onClose()
+  const handleSave = async () => {
+    await updateLinks({
+      variables: {
+        id: id,
+        sbomId: sbomId,
+        urls: linksData
+      }
+    })
+      .then((res) => {
+        if (res.data) {
+          refetch({
+            projectId: productId,
+            sbomId: sbomId
+          })
+        }
+      })
+      .finally(() => onClose())
   }
 
   return (
@@ -75,11 +109,12 @@ const LinksDrawer = ({ isOpen, onClose, btnRef, component }) => {
         <DrawerContent>
           <DrawerCloseButton />
           <DrawerHeader borderBottomWidth='1px' color='gray.600'>
-             Edit Links
+            Edit Links
           </DrawerHeader>
           <DrawerBody>
             <form onSubmit={handleLinkAdd}>
               <Flex direction={'column'} alignItems={'flex-start'} gap={3}>
+                {/* NAME */}
                 <FormControl isRequired>
                   <FormLabel>Type</FormLabel>
                   <Select
@@ -111,7 +146,7 @@ const LinksDrawer = ({ isOpen, onClose, btnRef, component }) => {
                     ))}
                   </Select>
                 </FormControl>
-
+                {/* URL */}
                 <FormControl isRequired>
                   <FormLabel>Link</FormLabel>
                   <Input
@@ -119,12 +154,19 @@ const LinksDrawer = ({ isOpen, onClose, btnRef, component }) => {
                     value={link}
                     onChange={(e) => setLink(e.target.value)}
                   />
+                  {link !== '' && !urlPattern.test(link) && (
+                    <FormErrorMessage>URL is invalid</FormErrorMessage>
+                  )}
                 </FormControl>
-
-                <Button colorScheme='blue' type='submit'>
+                {/* ACTIONS */}
+                <Button
+                  colorScheme='blue'
+                  type='submit'
+                  isDisabled={!urlPattern.test(link)}
+                >
                   Add
                 </Button>
-
+                {/* TABLE */}
                 <Flex width={'100%'} flexDir={'column'}>
                   <Text size='md' my={2}>
                     Existing Links
@@ -142,12 +184,12 @@ const LinksDrawer = ({ isOpen, onClose, btnRef, component }) => {
                         {linksData.map((item, index) => (
                           <Tr key={index}>
                             <Td pl={0} fontSize={'xs'}>
-                              {item.link}
+                              {item.url}
                             </Td>
                             <Td pl={0} fontSize={'xs'}>
-                              {item.type}
+                              {item.name}
                             </Td>
-                            <Td>
+                            <Td pl={0}>
                               <Icon
                                 as={DeleteIcon}
                                 color={'red'}

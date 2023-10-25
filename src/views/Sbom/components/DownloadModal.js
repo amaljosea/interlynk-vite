@@ -12,7 +12,10 @@ import {
   ModalFooter,
   Stack,
   Button,
-  useToast
+  useToast,
+  Text,
+  Flex,
+  Spinner
 } from '@chakra-ui/react'
 import { useLazyQuery } from '@apollo/client'
 import { DownloadSBOM } from 'graphQL/Queries'
@@ -68,7 +71,10 @@ const DownloadModal = ({
     }
   }
 
+  const [isLoading, setIsLoading] = useState(false)
+
   const handleDownload = async () => {
+    setIsLoading(true)
     try {
       await getData({
         variables: {
@@ -83,12 +89,15 @@ const DownloadModal = ({
       })
         .then((res) => {
           console.log(`res`, res)
-          const decodedData = window.atob(res.data.sbom.download)
-          const parsedJson = JSON.parse(decodedData)
-          if (format === 'json') {
-            downloadJsonFile(parsedJson)
-          } else {
-            downloadXmlFile(decodedData)
+          if (res.called) {
+            setIsLoading(false)
+            const decodedData = window.atob(res.data.sbom.download)
+            const parsedJson = JSON.parse(decodedData)
+            if (format === 'json') {
+              downloadJsonFile(parsedJson)
+            } else {
+              downloadXmlFile(decodedData)
+            }
           }
         })
         .finally(() => onClose())
@@ -166,6 +175,7 @@ const DownloadModal = ({
             </RadioGroup>
 
             <Stack direction='column' gap='5px'>
+              <Text fontWeight={'medium'}>Coming soon</Text>
               <Checkbox
                 isChecked={includeVulns}
                 onChange={() => setIncludeVulns(!includeVulns)}
@@ -185,17 +195,27 @@ const DownloadModal = ({
         </ModalBody>
 
         <ModalFooter>
-          <Button mr={3} onClick={onClose}>
-            Cancel
-          </Button>
-
-          <Button
-            colorScheme='blue'
-            mr={3}
-            onClick={customerView ? onDownload : handleDownload}
+          <Flex
+            width={'100%'}
+            alignItems={'center'}
+            justifyContent={'space-between'}
+            gap={4}
           >
-            Download
-          </Button>
+            <Stack>{isLoading && <Spinner color='blue.500' />}</Stack>
+            <Stack direction='row' alignItems='center' gap={1}>
+              <Button mr={3} onClick={onClose}>
+                Cancel
+              </Button>
+
+              <Button
+                colorScheme='blue'
+                mr={3}
+                onClick={customerView ? onDownload : handleDownload}
+              >
+                Download
+              </Button>
+            </Stack>
+          </Flex>
         </ModalFooter>
       </ModalContent>
     </Modal>

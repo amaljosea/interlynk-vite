@@ -24,7 +24,9 @@ import {
   Skeleton,
   Spinner,
   UnorderedList,
-  ListItem
+  ListItem,
+  chakra,
+  Badge
 } from '@chakra-ui/react'
 import React, { useState, useRef, useEffect } from 'react'
 import Card from 'components/Card/Card.js'
@@ -35,7 +37,8 @@ import {
   FaCubes,
   FaLayerGroup,
   FaFileDownload,
-  FaProjectDiagram
+  FaProjectDiagram,
+  FaRadiation
 } from 'react-icons/fa'
 import { TbSignature, TbSignatureOff } from 'react-icons/tb'
 import { useLocation, useHistory } from 'react-router-dom'
@@ -46,15 +49,7 @@ import DownloadModal from './components/DownloadModal'
 import CopyModal from './components/CopyModal'
 
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import {
-  GetProductData,
-  GetProject,
-  GetProjectData,
-  GetCompFilterData,
-  GetVulnFilterData,
-  GetCheckFilterData,
-  GetLogsFilterData
-} from 'graphQL/Queries'
+import { GetProductData, GetProject, GetProjectData } from 'graphQL/Queries'
 import { sbomDelete } from 'graphQL/Mutation'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import CheckModal from './components/CheckModal'
@@ -145,22 +140,6 @@ function SBOM() {
     }
   })
 
-  // GET COMPONENT FILTER HEADS
-  const [getCompFilters, { data: compFilters, refetch: compFilterRefetch }] =
-    useLazyQuery(GetCompFilterData)
-
-  // GET VULN FILTER HEADS
-  const [getVulnFilters, { data: vulnFilters, refetch: vulnFilterRefetch }] =
-    useLazyQuery(GetVulnFilterData)
-
-  // GET HEALTH CHECK FILTER HEADS
-  const [getCheckFilters, { data: checkFilters, refetch: checkFilterRefetch }] =
-    useLazyQuery(GetCheckFilterData)
-
-  // GET LOGS FILTER HEADS
-  const [getLogsFilters, { data: logsFilters, refetch: logsFilterRefetch }] =
-    useLazyQuery(GetLogsFilterData)
-
   const [deleteSbom] = useMutation(sbomDelete)
 
   const uniqVersions = []
@@ -231,24 +210,6 @@ function SBOM() {
           history.push(`/vendor/products?p=${productId}&sbom=${id}`)
         }
       })
-      // .finally(() => {
-      //   compFilterRefetch({
-      //     projectId: productId,
-      //     sbomId: id
-      //   })
-      //   vulnFilterRefetch({
-      //     projectId: productId,
-      //     sbomId: id
-      //   })
-      //   checkFilterRefetch({
-      //     projectId: productId,
-      //     sbomId: id
-      //   })
-      //   logsFilterRefetch({
-      //     projectId: productId,
-      //     sbomId: id
-      //   })
-      // })
     } catch (error) {
       console.log(`fetch error`, error)
     }
@@ -402,10 +363,71 @@ function SBOM() {
                                 as={FaProjectDiagram}
                               />
                               <Box>
-                                <Text fontWeight={'medium'} fontSize={'md'}>
+                                <Badge
+                                  mr={1}
+                                  fontSize={'md'}
+                                  fontWeight={'medium'}
+                                >
                                   {sbomData.sbom.stats.compCount}
-                                </Text>
+                                </Badge>
                                 <Text fontSize={'xs'}>Components</Text>
+                              </Box>
+                            </Stack>
+                            {/* vulnerabilities */}
+                            <Stack
+                              direction={'row'}
+                              alignItems={'flex-start'}
+                              spacing={2}
+                            >
+                              <Icon h={4} w={4} color='#777' as={FaRadiation} />
+                              <Box>
+                                <Stack fontWeight={'medium'} direction={'row'}>
+                                  <Badge
+                                    mr={1}
+                                    fontSize={'md'}
+                                    fontWeight={'medium'}
+                                    variant='subtle'
+                                    colorScheme='red'
+                                  >
+                                    {sbomData.sbom.stats.vulnStats.critical
+                                      ? sbomData.sbom.stats.vulnStats.critical
+                                      : 0}
+                                  </Badge>
+                                  <Badge
+                                    mr={1}
+                                    fontSize={'md'}
+                                    fontWeight={'medium'}
+                                    variant='subtle'
+                                    colorScheme='orange'
+                                  >
+                                    {sbomData.sbom.stats.vulnStats.high
+                                      ? sbomData.sbom.stats.vulnStats.high
+                                      : 0}
+                                  </Badge>
+                                  <Badge
+                                    mr={1}
+                                    fontSize={'md'}
+                                    fontWeight={'medium'}
+                                    variant='subtle'
+                                    colorScheme='yellow'
+                                  >
+                                    {sbomData.sbom.stats.vulnStats.medium
+                                      ? sbomData.sbom.stats.vulnStats.medium
+                                      : 0}
+                                  </Badge>
+                                  <Badge
+                                    mr={1}
+                                    fontSize={'md'}
+                                    fontWeight={'medium'}
+                                    variant='subtle'
+                                    colorScheme='green'
+                                  >
+                                    {sbomData.sbom.stats.vulnStats.low
+                                      ? sbomData.sbom.stats.vulnStats.low
+                                      : 0}
+                                  </Badge>
+                                </Stack>
+                                <Text fontSize={'xs'}>Vulnerabilities</Text>
                               </Box>
                             </Stack>
                             {/* license */}
@@ -421,9 +443,13 @@ function SBOM() {
                                 as={FaBalanceScale}
                               />
                               <Box>
-                                <Text fontWeight={'medium'} fontSize={'md'}>
+                                <Badge
+                                  mr={1}
+                                  fontSize={'md'}
+                                  fontWeight={'medium'}
+                                >
                                   {sbomData.sbom.stats.compLicenseCount}
-                                </Text>
+                                </Badge>
                                 <Text fontSize={'xs'}>Licenses</Text>
                               </Box>
                             </Stack>
@@ -440,9 +466,13 @@ function SBOM() {
                                 as={CalendarIcon}
                               />
                               <Box>
-                                <Text fontWeight={'medium'} fontSize={'md'}>
+                                <Badge
+                                  mr={1}
+                                  fontSize={'md'}
+                                  fontWeight={'medium'}
+                                >
                                   {sbomData.sbom.stats.compPurlCount}
-                                </Text>
+                                </Badge>
                                 <Text fontSize={'xs'}>PURL</Text>
                               </Box>
                             </Stack>
@@ -454,9 +484,13 @@ function SBOM() {
                             >
                               <Icon h={4} w={4} color='#777' as={LockIcon} />
                               <Box>
-                                <Text fontWeight={'medium'} fontSize={'md'}>
+                                <Badge
+                                  mr={1}
+                                  fontSize={'md'}
+                                  fontWeight={'medium'}
+                                >
                                   {sbomData.sbom.stats.compCpeCount}
-                                </Text>
+                                </Badge>
                                 <Text fontSize={'xs'}>CPE</Text>
                               </Box>
                             </Stack>

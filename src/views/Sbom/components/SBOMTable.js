@@ -58,7 +58,7 @@ const SBOMTable = ({
   const { lifecycle } = data
 
   const [tabIndex, setTabIndex] = useState(0)
-  const [isLoading, setIsLoading] = useState(false)
+
   // PAGINATION STATS FOR DIFFERENT TABS
   const [componentIndex, setComponentIndex] = useState(1)
   const [vulnIndex, setVulnIndex] = useState(1)
@@ -68,20 +68,10 @@ const SBOMTable = ({
   const [totalRows, setTotalRows] = useState(25)
 
   // GET COMPONENT DATA
-  const {
-    data: compData,
-    refetch: compRefetch,
-    error,
-    loading
-  } = useQuery(GetComponentData, {
-    variables: {
-      projectId: productId,
-      sbomId: sbomId,
-      first: totalRows,
-      field: 'UPDATED_AT',
-      direction: 'DESC'
-    }
-  })
+  const [
+    getCompData,
+    { data: compData, refetch: compRefetch, error, loading }
+  ] = useLazyQuery(GetComponentData)
 
   useEffect(() => {
     if (compData) {
@@ -91,40 +81,16 @@ const SBOMTable = ({
   }, [compData])
 
   // GET VULN DATA
-  const { data: vulnData, refetch: vulnRefetch } = useQuery(GetVulnData, {
-    variables: {
-      projectId: productId,
-      sbomId: sbomId,
-      first: totalRows,
-      field: 'UPDATED_AT',
-      direction: 'ASC'
-    }
-  })
+  const [getVulnData, { data: vulnData, refetch: vulnRefetch }] =
+    useLazyQuery(GetVulnData)
 
   // GET HEALTH CHECK DATA
-  const { data: checkData, refetch: healthRefetch } = useQuery(
-    GetCheckResults,
-    {
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        first: totalRows,
-        field: 'UPDATED_AT',
-        direction: 'DESC'
-      }
-    }
-  )
+  const [getCheckData, { data: checkData, refetch: healthRefetch }] =
+    useLazyQuery(GetCheckResults)
 
   // GET CHANGE LOG DATA
-  const { data: logsData, refetch: logsRefetch } = useQuery(GetChangeLogs, {
-    variables: {
-      projectId: productId,
-      sbomId: sbomId,
-      first: totalRows,
-      field: 'CREATED_AT',
-      direction: 'DESC'
-    }
-  })
+  const [getLogData, { data: logsData, refetch: logsRefetch }] =
+    useLazyQuery(GetChangeLogs)
 
   // GET COMPONENT FILTER HEADS
   const [getCompFilters, { refetch: compFilterRefetch }] =
@@ -141,11 +107,6 @@ const SBOMTable = ({
   // GET LOGS FILTER HEADS
   const [getLogsFilters] = useLazyQuery(GetLogsFilterData)
 
-  // ON TAB CHANGE
-  const onTabChange = (value) => {
-    setTabIndex(value)
-  }
-
   useEffect(() => {
     if (tabIndex === 0) {
       refetch({
@@ -153,6 +114,15 @@ const SBOMTable = ({
         sbomId: sbomId
       })
     } else if (tabIndex === 1) {
+      getCompData({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          first: totalRows,
+          field: 'UPDATED_AT',
+          direction: 'DESC'
+        }
+      })
       getCompFilters({
         variables: {
           projectId: productId,
@@ -164,6 +134,15 @@ const SBOMTable = ({
         }
       })
     } else if (tabIndex === 2) {
+      getVulnData({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          first: totalRows,
+          field: 'UPDATED_AT',
+          direction: 'DESC'
+        }
+      })
       getVulnFilters({
         variables: {
           projectId: productId,
@@ -175,6 +154,15 @@ const SBOMTable = ({
         }
       })
     } else if (tabIndex === 3) {
+      getCheckData({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          first: totalRows,
+          field: 'UPDATED_AT',
+          direction: 'DESC'
+        }
+      })
       getCheckFilters({
         variables: {
           projectId: productId,
@@ -186,6 +174,15 @@ const SBOMTable = ({
         }
       })
     } else if (tabIndex === 4) {
+      getLogData({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          first: totalRows,
+          field: 'CREATED_AT',
+          direction: 'DESC'
+        }
+      })
       getLogsFilters({
         variables: {
           projectId: productId,
@@ -209,14 +206,18 @@ const SBOMTable = ({
       }
     })
 
-  useEffect(() => {
-    console.log(tabIndex)
-  }, [tabIndex])
+  // useEffect(() => {
+  //   console.log(tabIndex)
+  // }, [tabIndex])
 
   return (
     <>
       <Card>
-        <Tabs variant='enclosed'>
+        <Tabs
+          variant='enclosed'
+          defaultIndex={tabIndex}
+          onChange={(value) => setTabIndex(value)}
+        >
           {/* TAB LIST */}
           <TabList mt='20px'>
             {[
@@ -226,11 +227,7 @@ const SBOMTable = ({
               'Checks',
               'Change Log'
             ].map((item, index) => (
-              <Tab
-                key={index}
-                _focus={{ outline: 'none' }}
-                onClick={() => setTabIndex(index)}
-              >
+              <Tab key={index} _focus={{ outline: 'none' }}>
                 {item}
               </Tab>
             ))}
@@ -263,6 +260,7 @@ const SBOMTable = ({
                   type={type}
                   lifecycle={lifecycle}
                   data={compData.sbom.components}
+                  loading={loading}
                   error={error}
                   refetch={compRefetch}
                   filterRefetch={compFilterRefetch}
@@ -337,17 +335,17 @@ const SBOMTable = ({
             </TabPanel>
             {/* HEALTH CHECK TABLE */}
             <TabPanel px={0}>
-              {checkData && isLoading === false ? (
+              {checkData && data ? (
                 <HealthCheckTable
                   productId={productId}
                   sbomId={sbomId}
+                  sbomData={data}
                   data={checkData.sbom.checkResults}
                   refetch={healthRefetch}
                   filterRefetch={checkFilterRefetch}
                   components={components}
                   pageIndex={resultIndex}
                   setPageIndex={setResultIndex}
-                  setIsLoading={setIsLoading}
                   totalRows={totalRows}
                   setTotalRows={setTotalRows}
                 />

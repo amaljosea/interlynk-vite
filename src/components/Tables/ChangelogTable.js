@@ -206,12 +206,16 @@ const ChangelogTable = ({ data, refetch, type, totalRows, setTotalRows }) => {
       selector: (row) => {
         const { action } = row
         return (
-        <Tooltip placement='top' label={action} textTransform={'capitalize'}>
-          <Tag variant='solid' colorScheme={setColor(action)} textTransform={'capitalize'}>
-            {action.slice(0,1)}
-          </Tag>
-        </Tooltip>
-      )
+          <Tooltip placement='top' label={action} textTransform={'capitalize'}>
+            <Tag
+              variant='solid'
+              colorScheme={setColor(action)}
+              textTransform={'capitalize'}
+            >
+              {action.slice(0, 1)}
+            </Tag>
+          </Tooltip>
+        )
       },
       width: '150px'
     },
@@ -268,7 +272,13 @@ const ChangelogTable = ({ data, refetch, type, totalRows, setTotalRows }) => {
         <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
           <Text>{timeSince(row.updatedAt)}</Text>
         </Tooltip>
-      )
+      ),
+      sortable: true,
+      sortFunction: (a, b) => {
+        const dateA = new Date(a.updatedAt)
+        const dateB = new Date(b.updatedAt)
+        return dateA - dateB // Sort in descending order
+      }
     }
   ]
 
@@ -281,6 +291,8 @@ const ChangelogTable = ({ data, refetch, type, totalRows, setTotalRows }) => {
           customStyles={customStyles}
           subHeader
           subHeaderComponent={subHeaderComponentMemo}
+          defaultSortAsc={false}
+          defaultSortFieldId={'changedOn'}
           responsive={true}
         />
       </Flex>
