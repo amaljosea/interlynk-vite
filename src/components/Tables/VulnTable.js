@@ -202,7 +202,7 @@ const VulnTable = ({
             variant='subtle'
             colorScheme={sevColor(`${vuln.sev}`)}
           >
-            <TagLabel>{vuln.sev}</TagLabel>
+            <TagLabel style={{ textTransform: 'capitalize' }}>{vuln.sev}</TagLabel>
           </Tag>
         )
       },
