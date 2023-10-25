@@ -268,7 +268,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
 
   // SEARCH COMPONENT
   const handleSearch = async (event) => {
-    if (event.key === 'Enter') {
+    if (event.key === 'Enter' && filterText !== '') {
       await refetch({
         projectId: productId,
         sbomId: sbomId,
