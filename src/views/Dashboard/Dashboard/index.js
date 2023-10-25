@@ -1,5 +1,5 @@
 // Chakra imports
-import { Flex, Grid, SimpleGrid, useColorModeValue } from '@chakra-ui/react'
+import { Flex, Grid, SimpleGrid, useColorModeValue, Box } from '@chakra-ui/react'
 
 import BarChart from 'components/Charts/BarChart'
 import LineChart from 'components/Charts/LineChart'
@@ -18,6 +18,28 @@ export default function Dashboard() {
 
   return (
     <Flex flexDirection='column' pt={{ base: '120px', md: '75px' }} px={2}>
+      <Grid
+        templateColumns={{ sm: '1fr', lg: '1fr' }}
+        templateRows={{ sm: '1fr', lg: '1fr' }}
+        my='26px'
+        gap='24px'
+        mb={{ lg: '26px' }}
+      >
+      <Box
+        bg='blue.600'
+        w='100%'
+        p={4}
+        color='white'
+        fontWeight='medium'
+        fontSize='20px'
+        align='center'
+        borderRadius='xl'
+        boxShadow='md'
+      >
+        Metrics dashboard coming soon...<br />
+        (Samples)
+      </Box>
+      </Grid>
       <SimpleGrid columns={{ sm: 1, md: 2, xl: 4 }} spacing='24px'>
         <MiniStatistics
           title={'Images'}

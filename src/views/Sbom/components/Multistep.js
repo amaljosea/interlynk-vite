@@ -84,16 +84,19 @@ const Form1 = () => {
 
   return (
     <>
-      <Text
+      <Box
+        bg='blue.600'
         w='100%'
-        fontSize={24}
-        textAlign={'center'}
+        p={4}
+        color='white'
         fontWeight='medium'
-        mb={10}
+        fontSize='20px'
+        align='center'
+        borderRadius='xl'
+        boxShadow='md'
       >
-        {/* Existing Projects */}
-        Coming Soon
-      </Text>
+        Status Import coming soon...
+      </Box>
       <Box width={'400px'} margin={'0 auto'} display={'none'}>
         <Stack spacing={4} direction={'column'} gap={2}>
           {/* Project */}

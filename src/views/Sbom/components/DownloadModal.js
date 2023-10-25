@@ -13,7 +13,7 @@ import {
   Stack,
   Button,
   useToast,
-  Text,
+  Box,
   Flex,
   Spinner
 } from '@chakra-ui/react'
@@ -175,7 +175,19 @@ const DownloadModal = ({
             </RadioGroup>
 
             <Stack direction='column' gap='5px'>
-              <Text fontWeight={'medium'}>Coming soon</Text>
+              <Box
+                bg='blue.600'
+                w='100%'
+                p={2}
+                color='white'
+                fontWeight='medium'
+                fontSize='16px'
+                align='center'
+                borderRadius='lg'
+                boxShadow='md'
+              >
+                Download Options coming soon...
+              </Box>
               <Checkbox
                 isChecked={includeVulns}
                 onChange={() => setIncludeVulns(!includeVulns)}

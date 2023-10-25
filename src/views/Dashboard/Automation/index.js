@@ -85,14 +85,27 @@ const Automation = () => {
   return (
     <Flex direction='column' pt={{ base: '120px', md: '74px' }} px={4}>
       <Card bg='white'>
+      <Box
+        bg='blue.600'
+        w='100%'
+        p={4}
+        my={5}
+        color='white'
+        fontWeight='medium'
+        fontSize='20px'
+        align='center'
+        borderRadius='xl'
+        boxShadow='md'
+      >
+        Rule Automations coming soon...
+      </Box>
         <CardHeader px={5}>
           <Flex
             alignItems={'center'}
             justifyContent={'space-between'}
             width={'100%'}
           >
-            {/* <Text fontSize={18}>Rule Automation Settings</Text> */}
-            <Text fontSize={18}>Coming Soon</Text>
+            <Text fontSize={18}>Rule Automation Settings</Text>
             <Tooltip label='Add Rule'>
               <IconButton
                 variant='solid'
