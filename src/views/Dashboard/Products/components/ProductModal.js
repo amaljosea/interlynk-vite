@@ -141,7 +141,7 @@ const ProductModal = ({
                     placeholder='Enter product description'
                   />
                 </FormControl>
-                {id && (
+{/*                 {id && (
                   <FormControl pointerEvents={'none'}>
                     <FormLabel>Type</FormLabel>
                     <Select
@@ -177,14 +177,14 @@ const ProductModal = ({
                   />
                 </FormControl>
                 <FormControl>
-                  <FormLabel>Supplier Email</FormLabel>
+                  <FormLabel>Supplier EmailXX</FormLabel>
                   <Input
                     type='email'
                     value={supplierEmail}
                     placeholder={`Enter email`}
                     onChange={(e) => setSupplierEmail(e.target.value)}
                   />
-                </FormControl>
+                </FormControl> */}
               </Flex>
             </ModalBody>
             <ModalFooter>

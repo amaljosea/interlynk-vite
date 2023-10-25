@@ -16,7 +16,7 @@ import {
   Alert,
   AlertIcon,
   Text,
-  Tag
+  Box
 } from '@chakra-ui/react'
 import { signSbom } from 'graphQL/Mutation'
 import { useEffect, useState } from 'react'
@@ -113,8 +113,20 @@ const SigningModal = ({
             <ModalCloseButton />
             <ModalBody>
               <Flex width={'100%'} direction={'column'} gap={4}>
-                <Tag>Coming soon</Tag>
-                {/* Algorithm */}
+                <Box
+                  bg='blue.600'
+                  w='100%'
+                  p={2}
+                  color='white'
+                  fontWeight='medium'
+                  fontSize='16px'
+                  align='center'
+                  borderRadius='lg'
+                  boxShadow='md'
+                >
+                  SBOM Signing coming soon...
+                </Box>
+              {/* Algorithm */}
                 <FormControl isRequired>
                   <FormLabel fontSize={14}>Algorithm</FormLabel>
                   <Select
