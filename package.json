@@ -4,7 +4,7 @@
   "private": true,
   "homepage": "https://app.interlynk.io",
   "dependencies": {
-    "@apollo/client": "^3.8.5",
+    "@apollo/client": "^3.8.6",
     "@chakra-ui/icons": "^1.1.5",
     "@chakra-ui/react": "1.8.8",
     "@chakra-ui/system": "^1.12.1",
@@ -15,7 +15,7 @@
     "@sentry/react": "^7.73.0",
     "@testing-library/react": "^12.1.5",
     "@testing-library/react-hooks": "^8.0.1",
-    "apexcharts": "^3.43.0",
+    "apexcharts": "^3.44.0",
     "apollo-upload-client": "^17.0.0",
     "axios": "^1.4.0",
     "framer-motion": "^4.1.17",

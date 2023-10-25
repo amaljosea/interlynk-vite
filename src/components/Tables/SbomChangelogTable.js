@@ -5,6 +5,7 @@ import {
   Tag,
   Text,
   Box,
+  Badge,
   Select,
   TagLabel,
   Tooltip,
@@ -122,6 +123,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
       },
       width: '300px',
       sortable: true
+      width: '300px'
     },
     // PRIOR VALUE
     {
@@ -134,6 +136,8 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
 
         return (
           <Flex flexWrap={'wrap'} gap={2} my={2}>
+          <Tooltip placement='top' label={license.length === 0 ? '' : orig} textTransform={'capitalize'}>
+          <Text>
             {orig === 'f'
               ? 'False'
               : orig === 't'
@@ -155,6 +159,8 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
               ? ''
               : orig}
           </Flex>
+          </Text>
+          </Tooltip>
         )
       },
       width: '400px'
@@ -170,6 +176,8 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
 
         return (
           <Flex flexWrap={'wrap'} gap={2} my={2}>
+          <Tooltip placement='top' label={updatedValue.length === 0 ? '' : updated} textTransform={'capitalize'}>
+          <Text textOverflow={'wrap'}>
             {updated === 'f'
               ? 'False'
               : updated === 't'
@@ -191,6 +199,8 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
               ? ''
               : updated}
           </Flex>
+          </Text>
+          </Tooltip>
         )
       },
       width: '400px'
