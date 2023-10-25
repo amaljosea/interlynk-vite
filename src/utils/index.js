@@ -47,6 +47,7 @@ import SwiftIcon from 'assets/svg/swift.png'
 import userOne from 'assets/img/abhi.png'
 import userTwo from 'assets/img/sp.png'
 import userThree from 'assets/img/rcn.jpg'
+import userNone from 'assets/img/user.png'
 
 export const getConImg = (name) => {
   switch (name) {
@@ -203,7 +204,7 @@ export const statusColor = (status) => {
   }
 }
 
-export const dp = (email) => {
+export const displayPic = (email) => {
   switch (email) {
     case 'abhisek@interlynk.io':
       return userOne
@@ -212,7 +213,7 @@ export const dp = (email) => {
     case 'rcn@interlynk.io':
       return userThree
     default:
-      return userTwo
+      return userNone
   }
 }
 
