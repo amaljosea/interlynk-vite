@@ -1,9 +1,13 @@
 import { CloseIcon } from '@chakra-ui/icons'
 import { Box, Input } from '@chakra-ui/react'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
-const SearchFilter = ({ filterText, onFilter, onClear }) => {
+const SearchFilter = ({ filterText, setFilterText, onFilter, onClear }) => {
   const searchInputRef = useRef()
+
+  const [focused, setFocused] = useState(false)
+  const onFocus = () => setFocused(true)
+  const onBlur = () => setFocused(false)
 
   const focusSearchInput = () => {
     if (searchInputRef?.current) {
@@ -25,6 +29,12 @@ const SearchFilter = ({ filterText, onFilter, onClear }) => {
     }
   }, [])
 
+  useEffect(() => {
+    if (filterText === '' && focused === true) {
+      onClear()
+    }
+  }, [filterText, focused])
+
   return (
     <>
       <Box pos={'relative'} width={'300px'}>
@@ -35,7 +45,10 @@ const SearchFilter = ({ filterText, onFilter, onClear }) => {
           aria-label='Search Input'
           ref={searchInputRef}
           value={filterText}
-          onChange={onFilter}
+          onChange={(e) => setFilterText(e.target.value)}
+          onKeyDown={onFilter}
+          onFocus={onFocus}
+          onBlur={onBlur}
         />
         {filterText !== '' && (
           <CloseIcon

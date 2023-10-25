@@ -15,9 +15,10 @@ import {
   Select
 } from '@chakra-ui/react'
 import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
+import GlobalContext from 'context/GlobalContext'
 import { recheckHealth, checkResultUpdate } from 'graphQL/Mutation'
 import { PackageURL } from 'packageurl-js'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { BiSolidWrench } from 'react-icons/bi'
 import { FaCheckDouble } from 'react-icons/fa'
@@ -64,6 +65,8 @@ const HealthCheckTable = ({
 }) => {
   const customerView = location.pathname.startsWith('/customer')
   const toast = useToast()
+
+  const { checkFilters } = useContext(GlobalContext)
 
   const [purlValue, setPurlValue] = useState('')
   const [purlData, setPurlData] = useState(null)
@@ -237,15 +240,11 @@ const HealthCheckTable = ({
           alignItems={'flex-start'}
         >
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
-          {filterHeads && (
+          {checkFilters && (
             <CheckFilterMenu
               refetch={refetch}
               productId={productId}
               sbomId={sbomId}
-              compNames={filterHeads.sbom.filters.checkCompNames}
-              categories={filterHeads.sbom.filters.checkCategories}
-              severities={filterHeads.sbom.filters.checkSeverities}
-              statuses={filterHeads.sbom.filters.checkStatuses}
               setPageIndex={setPageIndex}
               totalRows={totalRows}
             />
@@ -264,7 +263,7 @@ const HealthCheckTable = ({
         </Tooltip>
       </Flex>
     )
-  }, [filterText, data, filterHeads])
+  }, [filterText, data, checkFilters])
 
   const handleOpen = (row) => {
     const { shortDesc, organizationRule } = row
@@ -452,7 +451,7 @@ const HealthCheckTable = ({
       width: '120px'
     },
     // CATEGORY
-/*     {
+    /*     {
       id: 'category',
       name: 'CATEGORY',
       selector: (row) => {
@@ -504,7 +503,7 @@ const HealthCheckTable = ({
       },
       width: '900px'
     },
-/*     // STATUS
+    /*     // STATUS
     {
       id: 'status',
       name: 'STATUS',

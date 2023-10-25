@@ -10,7 +10,8 @@ import {
   TagLabel,
   Tooltip
 } from '@chakra-ui/react'
-import React, { useMemo, useState } from 'react'
+import GlobalContext from 'context/GlobalContext'
+import React, { useMemo, useState, useContext } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation } from 'react-router-dom'
 import { timeSince } from 'utils'
@@ -63,6 +64,8 @@ const SbomChangelogTable = ({
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
+
+  const { logFilters } = useContext(GlobalContext)
 
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
@@ -251,22 +254,22 @@ const SbomChangelogTable = ({
   }
 
   // SEARCH COMPONENT
-  // const handleSearch = async (event) => {
-  //   if (event.key === 'Enter') {
-  //     await refetch({
-  //       projectId: productId,
-  //       sbomId: sbomId,
-  //       search: filterText,
-  //       first: totalRows,
-  //       last: undefined,
-  //       after: undefined,
-  //       last: undefined,
-  //       field: 'CREATED_AT',
-  //       direction: 'DESC'
-  //     })
-  //     setPageIndex(1)
-  //   }
-  // }
+  const handleSearch = async (event) => {
+    if (event.key === 'Enter') {
+      await refetch({
+        projectId: productId,
+        sbomId: sbomId,
+        search: filterText,
+        first: totalRows,
+        last: undefined,
+        after: undefined,
+        last: undefined,
+        field: 'CREATED_AT',
+        direction: 'DESC'
+      })
+      setPageIndex(1)
+    }
+  }
 
   // CLEAR SERACH
   const handleClear = async () => {
@@ -318,22 +321,6 @@ const SbomChangelogTable = ({
     })
   }
 
-  const filteredItems =
-    data &&
-    data.nodes.filter(
-      (item) =>
-        (item.action &&
-          item.action.toLowerCase().includes(filterText.toLowerCase())) ||
-        (item.changedBy &&
-          item.changedBy.toLowerCase().includes(filterText.toLowerCase())) ||
-        (item.event &&
-          item.event.toLowerCase().includes(filterText.toLowerCase())) ||
-        (item.orig &&
-          item.orig.toLowerCase().includes(filterText.toLowerCase())) ||
-        (item.updated &&
-          item.updated.toLowerCase().includes(filterText.toLowerCase()))
-    )
-
   const subHeaderComponentMemo = useMemo(() => {
     return (
       <Flex
@@ -348,48 +335,20 @@ const SbomChangelogTable = ({
           spacing={4}
           alignItems={'flex-start'}
         >
-          {/* <Flex alignItems={'center'} gap={4}>
-            <Box position='relative' width={'300px'}>
-              <Input
-                value={filterText}
-                onChange={(e) => setFilterText(e.target.value)}
-                onKeyDown={handleSearch}
-                placeholder='Search components'
-                ref={searchInputRef}
-              />
-              {filterText !== '' && (
-                <CloseIcon
-                  w={'18px'}
-                  h={'18px'}
-                  bg={'blue.500'}
-                  color={'white'}
-                  p={1}
-                  rounded={'full'}
-                  position={'absolute'}
-                  zIndex={9999}
-                  right={3}
-                  top={'11px'}
-                  onClick={handleClear}
-                  cursor={'pointer'}
-                />
-              )}
-            </Box>
-          </Flex> */}
           <SearchFilter
-            onFilter={(e) => setFilterText(e.target.value)}
-            onClear={handleClear}
             filterText={filterText}
+            setFilterText={setFilterText}
+            onFilter={handleSearch}
+            onClear={handleClear}
           />
 
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
-          {filterHeads && (
+          {logFilters && (
             <LogFilterMenu
               refetch={refetch}
               productId={productId}
               sbomId={sbomId}
-              changeBys={filterHeads.sbom.filters.logChangeBys}
-              changeObjects={filterHeads.sbom.filters.logChangeObjects}
-              changeTypes={filterHeads.sbom.filters.logChangeTypes}
+              logFilters={logFilters}
               setPageIndex={setPageIndex}
               totalRows={totalRows}
             />
@@ -397,18 +356,14 @@ const SbomChangelogTable = ({
         </Stack>
       </Flex>
     )
-  }, [filterText, filterHeads, handleClear, filteredItems])
+  }, [filterText, logFilters, handleClear, handleSearch])
 
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
           columns={columns}
-          data={
-            filterText !== '' || filteredItems.length > 0
-              ? filteredItems
-              : filterText === '' && data.nodes
-          }
+          data={data.nodes}
           onSort={handleSort}
           defaultSortAsc={false}
           defaultSortFieldId={'createdAt'}

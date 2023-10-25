@@ -84,6 +84,8 @@ function SBOM() {
   const [components, setComponents] = useState([])
   const [signedData, setSignedData] = useState(null)
 
+  const [tabIndex, setTabIndex] = useState(0)
+
   useEffect(() => {
     if (!idRegex.test(productId) || !idRegex.test(sbomId)) {
       window.location.href = `/vendor/products`
@@ -144,48 +146,20 @@ function SBOM() {
   })
 
   // GET COMPONENT FILTER HEADS
-  const { data: compFilters, refetch: compFilterRefetch } = useQuery(
-    GetCompFilterData,
-    {
-      variables: {
-        projectId: productId,
-        sbomId: sbomId
-      }
-    }
-  )
+  const [getCompFilters, { data: compFilters, refetch: compFilterRefetch }] =
+    useLazyQuery(GetCompFilterData)
 
   // GET VULN FILTER HEADS
-  const { data: vulnFilters, refetch: vulnFilterRefetch } = useQuery(
-    GetVulnFilterData,
-    {
-      variables: {
-        projectId: productId,
-        sbomId: sbomId
-      }
-    }
-  )
+  const [getVulnFilters, { data: vulnFilters, refetch: vulnFilterRefetch }] =
+    useLazyQuery(GetVulnFilterData)
 
   // GET HEALTH CHECK FILTER HEADS
-  const { data: checkFilters, refetch: checkFilterRefetch } = useQuery(
-    GetCheckFilterData,
-    {
-      variables: {
-        projectId: productId,
-        sbomId: sbomId
-      }
-    }
-  )
+  const [getCheckFilters, { data: checkFilters, refetch: checkFilterRefetch }] =
+    useLazyQuery(GetCheckFilterData)
 
   // GET LOGS FILTER HEADS
-  const { data: logsFilters, refetch: logsFilterRefetch } = useQuery(
-    GetLogsFilterData,
-    {
-      variables: {
-        projectId: productId,
-        sbomId: sbomId
-      }
-    }
-  )
+  const [getLogsFilters, { data: logsFilters, refetch: logsFilterRefetch }] =
+    useLazyQuery(GetLogsFilterData)
 
   const [deleteSbom] = useMutation(sbomDelete)
 
@@ -250,32 +224,31 @@ function SBOM() {
       await refetch({
         projectId: productId,
         sbomId: id
+      }).then(() => {
+        if (customerView) {
+          history.push(`/sharelynk?p=${productId}&sbom=${id}`)
+        } else {
+          history.push(`/vendor/products?p=${productId}&sbom=${id}`)
+        }
       })
-        .then(() => {
-          if (customerView) {
-            history.push(`/sharelynk?p=${productId}&sbom=${id}`)
-          } else {
-            history.push(`/vendor/products?p=${productId}&sbom=${id}`)
-          }
-        })
-        .finally(() => {
-          compFilterRefetch({
-            projectId: productId,
-            sbomId: id
-          })
-          vulnFilterRefetch({
-            projectId: productId,
-            sbomId: id
-          })
-          checkFilterRefetch({
-            projectId: productId,
-            sbomId: id
-          })
-          logsFilterRefetch({
-            projectId: productId,
-            sbomId: id
-          })
-        })
+      // .finally(() => {
+      //   compFilterRefetch({
+      //     projectId: productId,
+      //     sbomId: id
+      //   })
+      //   vulnFilterRefetch({
+      //     projectId: productId,
+      //     sbomId: id
+      //   })
+      //   checkFilterRefetch({
+      //     projectId: productId,
+      //     sbomId: id
+      //   })
+      //   logsFilterRefetch({
+      //     projectId: productId,
+      //     sbomId: id
+      //   })
+      // })
     } catch (error) {
       console.log(`fetch error`, error)
     }
@@ -603,29 +576,20 @@ function SBOM() {
             )}
 
             {/* SBOM DETAILS */}
-            <SBOMTable
-              filteredData={filteredData}
-              sbomId={sbomId}
-              productId={productId}
-              data={sbomData ? sbomData.sbom : undefined}
-              refetch={refetch}
-              status={status}
-              setComponents={setComponents}
-              setTotalComp={setTotalComp}
-              compFilters={compFilters}
-              compFilterRefetch={compFilterRefetch}
-              vulnFilters={vulnFilters}
-              vulnFilterRefetch={vulnFilterRefetch}
-              checkFilters={checkFilters}
-              checkFilterRefetch={checkFilterRefetch}
-              logsFilters={logsFilters}
-              logsFilterRefetch={logsFilterRefetch}
-              lifecycle={sbomData && sbomData.sbom.lifecycle}
-              type={
-                selectedProject?.sboms.length > 0 &&
-                selectedProject.sboms[0].format
-              }
-            />
+            {sbomData && (
+              <SBOMTable
+                filteredData={filteredData}
+                data={sbomData.sbom}
+                refetch={refetch}
+                status={status}
+                setComponents={setComponents}
+                setTotalComp={setTotalComp}
+                type={
+                  selectedProject?.sboms.length > 0 &&
+                  selectedProject.sboms[0].format
+                }
+              />
+            )}
           </Flex>
 
           {/*  COMPONENT PRIMARY MODAL */}

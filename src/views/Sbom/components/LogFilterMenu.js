@@ -32,15 +32,15 @@ const CheckMark = () => {
 }
 
 const LogFilterMenu = ({
-  changeBys,
-  changeObjects,
-  changeTypes,
+  logFilters,
   refetch,
   productId,
   sbomId,
   setPageIndex,
   totalRows
 }) => {
+  const { logChangeBys, logChangeObjects, logChangeTypes } = logFilters
+
   const [selectChangeBy, setSelectChangeBy] = useState('')
   const [selectChangeObj, setSelectChangeObj] = useState('')
   const [selectChangeType, setSelectChangeType] = useState('')
@@ -117,12 +117,11 @@ const LogFilterMenu = ({
               <MenuItemOption value={'all'} fontSize={'sm'}>
                 All
               </MenuItemOption>
-              {changeBys.length > 0 &&
-                changeBys.map((item, index) => (
-                  <MenuItemOption key={index} value={item} fontSize={'sm'}>
-                    {item}
-                  </MenuItemOption>
-                ))}
+              {logChangeBys?.map((item, index) => (
+                <MenuItemOption key={index} value={item} fontSize={'sm'}>
+                  {item}
+                </MenuItemOption>
+              ))}
             </MenuOptionGroup>
           </MenuList>
         </Menu>
@@ -149,12 +148,11 @@ const LogFilterMenu = ({
               <MenuItemOption value={'all'} fontSize={'sm'}>
                 All
               </MenuItemOption>
-              {changeObjects.length > 0 &&
-                changeObjects.map((item, index) => (
-                  <MenuItemOption key={index} value={item} fontSize={'sm'}>
-                    {item}
-                  </MenuItemOption>
-                ))}
+              {logChangeObjects?.map((item, index) => (
+                <MenuItemOption key={index} value={item} fontSize={'sm'}>
+                  {item}
+                </MenuItemOption>
+              ))}
             </MenuOptionGroup>
           </MenuList>
         </Menu>
@@ -183,12 +181,11 @@ const LogFilterMenu = ({
               <MenuItemOption value={'all'} fontSize={'sm'}>
                 All
               </MenuItemOption>
-              {changeTypes.length > 0 &&
-                changeTypes.map((item, index) => (
-                  <MenuItemOption key={index} value={item} fontSize={'sm'}>
-                    {item}
-                  </MenuItemOption>
-                ))}
+              {logChangeTypes?.map((item, index) => (
+                <MenuItemOption key={index} value={item} fontSize={'sm'}>
+                  {item}
+                </MenuItemOption>
+              ))}
             </MenuOptionGroup>
           </MenuList>
         </Menu>

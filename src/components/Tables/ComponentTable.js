@@ -40,7 +40,7 @@ import {
   FaSitemap
 } from 'react-icons/fa'
 import { timeSince, GetIcon } from 'utils'
-import { useState, useMemo, useRef, useEffect } from 'react'
+import { useState, useMemo, useRef, useEffect, useContext } from 'react'
 import { useLocation } from 'react-router-dom'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import ComponentModal from 'views/Sbom/components/ComponentModal'
@@ -53,6 +53,7 @@ import { licenseOptions } from 'variables/licenses'
 import CompFilterMenu from 'views/Sbom/components/CompFilterMenu'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import { getFullDateAndTime } from 'utils'
+import GlobalContext from 'context/GlobalContext'
 
 const customStyles = {
   headCells: {
@@ -90,6 +91,8 @@ const ComponentTable = ({
 
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
+
+  const { compFilters } = useContext(GlobalContext)
 
   const customerView = location.pathname.startsWith('/customer')
 
@@ -528,33 +531,27 @@ const ComponentTable = ({
   }
 
   // SEARCH COMPONENT
-  // const handleSearch = async (event) => {
-  //   if (event.key === 'Enter') {
-  //     await refetch({
-  //       projectId: productId,
-  //       sbomId: sbomId,
-  //       search: filterText,
-  //       first: totalRows,
-  //       last: undefined,
-  //       after: undefined,
-  //       last: undefined,
-  //       field: 'UPDATED_AT',
-  //       direction: 'DESC'
-  //     })
-  //     setPageIndex(1)
-  //   }
-  // }
+  const handleSearch = async (event) => {
+    if (event.key === 'Enter') {
+      await refetch({
+        projectId: productId,
+        sbomId: sbomId,
+        search: filterText,
+        first: totalRows,
+        field: 'UPDATED_AT',
+        direction: 'DESC'
+      })
+      setPageIndex(1)
+    }
+  }
 
   // CLEAR SERACH
   const handleClear = async () => {
     await refetch({
       projectId: productId,
       sbomId: sbomId,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      last: undefined,
       search: undefined,
+      first: totalRows,
       field: 'UPDATED_AT',
       direction: 'DESC'
     })
@@ -569,33 +566,12 @@ const ComponentTable = ({
       projectId: productId,
       sbomId: sbomId,
       first: Number(e.target.value),
-      last: undefined,
-      after: undefined,
-      last: undefined,
-      search: undefined,
       field: 'UPDATED_AT',
       direction: 'DESC'
     })
     setFilterText('')
     setPageIndex(1)
   }
-
-  const filteredItems =
-    data &&
-    data.nodes.filter(
-      (item) =>
-        (item.name &&
-          item.name.toLowerCase().includes(filterText.toLowerCase())) ||
-        (item.version &&
-          item.version.toLowerCase().includes(filterText.toLowerCase())) ||
-        (item.purl &&
-          item.purl.toLowerCase().includes(filterText.toLowerCase())) ||
-        (item.licenses && item.licenses.includes(filterText))
-    )
-
-  // useEffect(() => {
-  //   console.log('filteredItems', filteredItems)
-  // }, [filterText])
 
   // HEADER SECTION
   const subHeaderComponentMemo = useMemo(() => {
@@ -612,50 +588,19 @@ const ComponentTable = ({
           alignItems={'center'}
         >
           {/* SEARCH COMPONENTS */}
-          {/* <Flex alignItems={'center'} gap={4}>
-            <Box position='relative' width={'300px'}>
-              <Input
-                value={filterText}
-                onChange={(e) => setFilterText(e.target.value)}
-                onKeyDown={handleSearch}
-                placeholder='Search components'
-                ref={searchInputRef}
-              />
-              {filterText !== '' && (
-                <CloseIcon
-                  w={'18px'}
-                  h={'18px'}
-                  bg={'blue.500'}
-                  color={'white'}
-                  p={1}
-                  rounded={'full'}
-                  position={'absolute'}
-                  zIndex={9999}
-                  right={3}
-                  top={'11px'}
-                  onClick={handleClear}
-                  cursor={'pointer'}
-                />
-              )}
-            </Box>
-          </Flex> */}
-
           <SearchFilter
-            onFilter={(e) => setFilterText(e.target.value)}
-            onClear={handleClear}
             filterText={filterText}
+            setFilterText={setFilterText}
+            onFilter={handleSearch}
+            onClear={handleClear}
           />
 
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
-          {filterHeads && (
+          {compFilters && (
             <CompFilterMenu
               refetch={refetch}
               productId={productId}
               sbomId={sbomId}
-              ecosystems={filterHeads.sbom.filters.ecosystems}
-              kinds={filterHeads.sbom.filters.kinds}
-              licenses={filterHeads.sbom.filters.licenses}
-              suppliers={filterHeads.sbom.filters.supplierNames}
               setPageIndex={setPageIndex}
               totalRows={totalRows}
             />
@@ -677,7 +622,7 @@ const ComponentTable = ({
         </Tooltip>
       </Flex>
     )
-  }, [filterText, filteredItems, handleClear])
+  }, [filterText, handleClear, handleSearch, compFilters])
 
   const handleSort = (column, sortDirection) => {
     // console.log(`column`, column)
@@ -727,11 +672,7 @@ const ComponentTable = ({
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
           columns={columns}
-          data={
-            filterText !== '' || filteredItems.length > 0
-              ? filteredItems
-              : filterText === '' && data.nodes
-          }
+          data={data.nodes}
           onSort={handleSort}
           customStyles={customStyles}
           defaultSortAsc={false}

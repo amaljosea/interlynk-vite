@@ -1,6 +1,5 @@
 import { CheckIcon } from '@chakra-ui/icons'
 import {
-  Badge,
   Box,
   Button,
   Menu,
@@ -10,7 +9,8 @@ import {
   MenuOptionGroup,
   Stack
 } from '@chakra-ui/react'
-import { useState } from 'react'
+import GlobalContext from 'context/GlobalContext'
+import { useContext, useState } from 'react'
 import { FaFilter } from 'react-icons/fa'
 
 const CheckMark = () => {
@@ -32,20 +32,20 @@ const CheckMark = () => {
 }
 
 const CheckFilterMenu = ({
-  compNames,
-  categories,
-  severities,
-  statuses,
   refetch,
   productId,
   sbomId,
   setPageIndex,
   totalRows
 }) => {
+  const { compFilters } = useContext(GlobalContext)
+
+  const { checkCategories, checkSeverities, checkStatuses } = compFilters
+
   const [selectCategory, setSelectCategory] = useState('')
   const [selectSeverity, setSelectSeverity] = useState('')
   const [selectStatus, setSelectStatus] = useState('')
-  const [selectCompName, setSelectCompName] = useState('')
+  // const [selectCompName, setSelectCompName] = useState('')
 
   const onFilterCategory = (value) => {
     setSelectCategory(value)
@@ -95,21 +95,21 @@ const CheckFilterMenu = ({
     setPageIndex(1)
   }
 
-  const onFilterCompName = (value) => {
-    setSelectCompName(value)
-    refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      componentName: value === 'all' ? undefined : value,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      last: undefined,
-      field: 'UPDATED_AT',
-      direction: 'DESC'
-    })
-    setPageIndex(1)
-  }
+  // const onFilterCompName = (value) => {
+  //   setSelectCompName(value)
+  //   refetch({
+  //     projectId: productId,
+  //     sbomId: sbomId,
+  //     componentName: value === 'all' ? undefined : value,
+  //     first: totalRows,
+  //     last: undefined,
+  //     after: undefined,
+  //     last: undefined,
+  //     field: 'UPDATED_AT',
+  //     direction: 'DESC'
+  //   })
+  //   setPageIndex(1)
+  // }
 
   return (
     <Stack direction={'row'} alignItems={'center'} gap={1}>
@@ -135,18 +135,17 @@ const CheckFilterMenu = ({
               <MenuItemOption value={'all'} fontSize={'sm'}>
                 All
               </MenuItemOption>
-              {categories.length > 0 &&
-                categories.map((item, index) => (
-                  <MenuItemOption key={index} value={item} fontSize={'sm'}>
-                    {item}
-                  </MenuItemOption>
-                ))}
+              {checkCategories?.map((item, index) => (
+                <MenuItemOption key={index} value={item} fontSize={'sm'}>
+                  {item}
+                </MenuItemOption>
+              ))}
             </MenuOptionGroup>
           </MenuList>
         </Menu>
       </Box>
       {/* COMPONENT NAME */}
-      <Box width={'fit-content'} position={'relative'}>
+      {/* <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnBlur={true}>
           {selectCompName !== '' && selectCompName !== 'all' && <CheckMark />}
           <MenuButton
@@ -167,8 +166,8 @@ const CheckFilterMenu = ({
               <MenuItemOption value={'all'} fontSize={'sm'}>
                 All
               </MenuItemOption>
-              {compNames.length > 0 &&
-                compNames.map((item, index) => (
+              {checkCompNames &&
+                checkCompNames.map((item, index) => (
                   <MenuItemOption key={index} value={item} fontSize={'sm'}>
                     {item}
                   </MenuItemOption>
@@ -176,7 +175,7 @@ const CheckFilterMenu = ({
             </MenuOptionGroup>
           </MenuList>
         </Menu>
-      </Box>
+      </Box> */}
       {/* SEVERITY */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
@@ -199,12 +198,11 @@ const CheckFilterMenu = ({
               <MenuItemOption value={'all'} fontSize={'sm'}>
                 All
               </MenuItemOption>
-              {severities.length > 0 &&
-                severities.map((item, index) => (
-                  <MenuItemOption key={index} value={item} fontSize={'sm'}>
-                    {item}
-                  </MenuItemOption>
-                ))}
+              {checkSeverities?.map((item, index) => (
+                <MenuItemOption key={index} value={item} fontSize={'sm'}>
+                  {item}
+                </MenuItemOption>
+              ))}
             </MenuOptionGroup>
           </MenuList>
         </Menu>
@@ -231,12 +229,11 @@ const CheckFilterMenu = ({
               <MenuItemOption value={'all'} fontSize={'sm'}>
                 All
               </MenuItemOption>
-              {statuses.length > 0 &&
-                statuses.map((item, index) => (
-                  <MenuItemOption key={index} value={item} fontSize={'sm'}>
-                    {item}
-                  </MenuItemOption>
-                ))}
+              {checkStatuses?.map((item, index) => (
+                <MenuItemOption key={index} value={item} fontSize={'sm'}>
+                  {item}
+                </MenuItemOption>
+              ))}
             </MenuOptionGroup>
           </MenuList>
         </Menu>
