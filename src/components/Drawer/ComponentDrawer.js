@@ -842,15 +842,15 @@ function ComponentDrawer(props) {
                 <br />
                 <chakra.span
                   bg={'blackAlpha.700'}
-                  fontSize={'sm'}
+                  fontSize={'md'}
                   color={'white'}
                 >
-                  {primaryComp.name}
+                  {primaryComp?.name}
                 </chakra.span>{' '}
                 to{' '}
                 <chakra.span
                   bg={'blackAlpha.700'}
-                  fontSize={'sm'}
+                  fontSize={'md'}
                   color={'white'}
                 >
                   {component}
