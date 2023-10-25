@@ -120,7 +120,7 @@ const VulnFilterMenu = ({
                 All
               </MenuItemOption>
               {['critical', 'high', 'medium', 'low'].map((item, index) => (
-                <MenuItemOption key={index} value={item} fontSize={'sm'}>
+                <MenuItemOption key={index} value={item} fontSize={'sm'} textTransform={'capitalize'}>
                   {item}
                 </MenuItemOption>
               ))}
