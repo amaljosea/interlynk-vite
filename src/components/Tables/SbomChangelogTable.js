@@ -5,7 +5,6 @@ import {
   Tag,
   Text,
   Box,
-  Badge,
   Select,
   TagLabel,
   Tooltip,
@@ -122,7 +121,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
         )
       },
       width: '300px',
-      sortable: true
+      sortable: true,
       width: '300px'
     },
     // PRIOR VALUE
@@ -158,9 +157,9 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
               : license.length === 0
               ? ''
               : orig}
-          </Flex>
           </Text>
           </Tooltip>
+          </Flex>
         )
       },
       width: '400px'
@@ -198,9 +197,9 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
               : updatedValue.length === 0
               ? ''
               : updated}
-          </Flex>
           </Text>
           </Tooltip>
+          </Flex>
         )
       },
       width: '400px'
