@@ -7,7 +7,9 @@ import {
   Box,
   Select,
   TagLabel,
-  Tooltip
+  Tooltip,
+  Skeleton,
+  Badge
 } from '@chakra-ui/react'
 import GlobalContext from 'context/GlobalContext'
 import React, { useMemo, useState, useContext } from 'react'
@@ -54,13 +56,7 @@ const setColor = (type) => {
   }
 }
 
-const SbomChangelogTable = ({
-  data,
-  refetch,
-  totalRows,
-  setTotalRows,
-  filterHeads
-}) => {
+const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
 
@@ -71,68 +67,73 @@ const SbomChangelogTable = ({
 
   const [filterText, setFilterText] = useState('')
   const [pageIndex, setPageIndex] = useState(1)
+  const [sortField, setSortField] = useState('CREATED_AT')
+  const [direction, setDirection] = useState('DESC')
 
   // COLUMNS
   const columns = [
     // CHANGE TYPE
     {
-      id: 'changeType',
-      name: 'CHANGE TYPE',
+      id: 'ACTION',
+      name: 'TYPE',
       selector: (row) => {
         const { action } = row
         return (
-          <Tag variant='solid' colorScheme={setColor(action)}>
-            {action}
-          </Tag>
-        )
-      },
-      width: '150px'
-    },
-    // OBJECT TYPE
-    {
-      id: 'objectType',
-      name: 'OBJECT TYPE',
-      selector: (row) => {
-        const { loggableType } = row
-        return <Tag>{loggableType}</Tag>
-      },
-      width: '150px'
-    },
-    // CHANGED OBJECT
-    {
-      id: 'changedObject',
-      name: 'CHANGED OBJECT',
-      selector: (row) => {
-        const { event } = row
-        return <Text>{event}</Text>
-      },
-      width: '200px'
-    },
-    // OBJECT NAME
-    {
-      id: 'objectName',
-      name: 'OBJECT NAME',
-      selector: (row) => {
-        const { loggablePrefix } = row
-        return (
-          <Tooltip placement='top' label={loggablePrefix}>
-            <Text>{loggablePrefix}</Text>
+          <Tooltip placement='top' label={action} textTransform={'capitalize'}>
+            <Tag
+              variant='solid'
+              colorScheme={setColor(action)}
+              textTransform={'capitalize'}
+            >
+              {action.slice(0, 1)}
+            </Tag>
           </Tooltip>
         )
       },
-      width: '250px'
+      sortable: true,
+      width: '90px'
+    },
+    // CHANGED OBJECT
+    {
+      id: 'EVENT',
+      name: 'CHANGED',
+      selector: (row) => {
+        const { event, loggablePrefix, loggableType } = row
+        return (
+          <Tooltip placement='top' label={loggablePrefix}>
+            <Stack direction={'column'} spacing={0}>
+              <Badge
+                fontSize={'sm'}
+                fontWeight={'medium'}
+                width={'fit-content'}
+                colorScheme='blue'
+                style={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                <Text>{loggableType === 'Sbom' ? 'SBOM' : loggablePrefix}</Text>
+              </Badge>
+              <Text>{event}</Text>
+            </Stack>
+          </Tooltip>
+        )
+      },
+      width: '300px',
+      sortable: true
     },
     // PRIOR VALUE
     {
       id: 'priorValue',
-      name: 'PRIOR VALUE',
+      name: 'PREVIOUS VALUE',
       selector: (row) => {
         const { orig, event } = row
         const license =
           (event === 'licenses' || event === 'cpes') && JSON.parse(orig)
 
         return (
-          <Text>
+          <Flex flexWrap={'wrap'} gap={2} my={2}>
             {orig === 'f'
               ? 'False'
               : orig === 't'
@@ -141,7 +142,6 @@ const SbomChangelogTable = ({
               ? license.map((item, index) => (
                   <Tag
                     size={'sm'}
-                    mr={2}
                     key={index}
                     variant='subtle'
                     colorScheme='red'
@@ -154,10 +154,10 @@ const SbomChangelogTable = ({
               : license.length === 0
               ? ''
               : orig}
-          </Text>
+          </Flex>
         )
       },
-      width: '250px'
+      width: '400px'
     },
     // UPDATED VALUE
     {
@@ -169,7 +169,7 @@ const SbomChangelogTable = ({
           (event === 'licenses' || event === 'cpes') && JSON.parse(updated)
 
         return (
-          <Text>
+          <Flex flexWrap={'wrap'} gap={2} my={2}>
             {updated === 'f'
               ? 'False'
               : updated === 't'
@@ -178,7 +178,6 @@ const SbomChangelogTable = ({
               ? updatedValue.map((item, index) => (
                   <Tag
                     size={'sm'}
-                    mr={2}
                     key={index}
                     variant='subtle'
                     colorScheme='green'
@@ -191,21 +190,23 @@ const SbomChangelogTable = ({
               : updatedValue.length === 0
               ? ''
               : updated}
-          </Text>
+          </Flex>
         )
-      }
+      },
+      width: '400px'
     },
     // CHANGED BY
     {
-      id: 'changedBy',
-      name: 'CHANGED BY',
+      id: 'CHANGED_BY',
+      name: 'BY',
       selector: (row) => row.changedBy,
-      width: '200px'
+      width: '150px',
+      sortable: true
     },
     // CHANGED ON
     {
-      id: 'createdAt',
-      name: 'CREATED_AT',
+      id: 'CREATED_AT',
+      name: 'CHANGED ON',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
           <Text>{timeSince(row.updatedAt)}</Text>
@@ -220,31 +221,39 @@ const SbomChangelogTable = ({
     }
   ]
 
-  const onPreviousPage = () => {
+  const [loading, setLoading] = useState(false)
+
+  const onPreviousPage = async () => {
+    setLoading(true)
     setPageIndex((prev) => pageIndex !== 0 && prev - 1)
-    refetch({
+    await refetch({
       projectId: productId,
       sbomId: sbomId,
       last: totalRows,
       before: data.pageInfo.startCursor,
-      first: undefined,
-      after: undefined,
-      field: 'CREATED_AT',
-      direction: 'DESC'
+      field: sortField,
+      direction: direction
+    }).then(() => {
+      setTimeout(() => {
+        setLoading(false)
+      }, 1000)
     })
   }
 
-  const onNextPage = () => {
+  const onNextPage = async () => {
+    setLoading(true)
     setPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
     refetch({
       projectId: productId,
       sbomId: sbomId,
       first: totalRows,
       after: data.pageInfo.endCursor,
-      last: undefined,
-      before: undefined,
-      field: 'CREATED_AT',
-      direction: 'DESC'
+      field: sortField,
+      direction: direction
+    }).then(() => {
+      setTimeout(() => {
+        setLoading(false)
+      }, 1000)
     })
   }
 
@@ -259,7 +268,7 @@ const SbomChangelogTable = ({
         last: undefined,
         after: undefined,
         last: undefined,
-        field: 'CREATED_AT',
+        field: sortField,
         direction: 'DESC'
       })
       setPageIndex(1)
@@ -276,7 +285,7 @@ const SbomChangelogTable = ({
       after: undefined,
       last: undefined,
       search: undefined,
-      field: 'CREATED_AT',
+      field: sortField,
       direction: 'DESC'
     })
     setFilterText('')
@@ -294,7 +303,7 @@ const SbomChangelogTable = ({
       after: undefined,
       last: undefined,
       search: undefined,
-      field: 'CREATED_AT',
+      field: sortField,
       direction: 'DESC'
     })
     setFilterText('')
@@ -304,14 +313,14 @@ const SbomChangelogTable = ({
   const handleSort = (column, sortDirection) => {
     // console.log(`column`, column)
     // console.log(`sortDirection`, sortDirection)
+    setSortField(column.id)
+    setDirection(sortDirection === 'asc' ? 'ASC' : 'DESC')
     refetch({
       projectId: productId,
       sbomId: sbomId,
       first: totalRows,
       last: undefined,
-      after: undefined,
-      before: undefined,
-      field: column.name,
+      field: column.id,
       direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
     })
   }
@@ -355,59 +364,73 @@ const SbomChangelogTable = ({
 
   return (
     <>
-      <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
-          columns={columns}
-          data={data.nodes}
-          onSort={handleSort}
-          defaultSortAsc={false}
-          defaultSortFieldId={'createdAt'}
-          customStyles={customStyles}
-          subHeader
-          subHeaderComponent={subHeaderComponentMemo}
-          responsive={true}
-        />
-      </Flex>
+      {loading ? (
+        <Flex width={'100%'} gap={4} direction={'column'}>
+          <Skeleton width={'100%'} height='20px' />
+          <Skeleton width={'100%'} height='20px' />
+          <Skeleton width={'100%'} height='20px' />
+          <Skeleton width={'100%'} height='20px' />
+          <Skeleton width={'100%'} height='20px' />
+        </Flex>
+      ) : (
+        <Flex flexDir={'column'} width={'100%'}>
+          <DataTable
+            columns={columns}
+            data={data.nodes}
+            onSort={handleSort}
+            defaultSortAsc={false}
+            defaultSortFieldId={'CREATED_AT'}
+            customStyles={customStyles}
+            subHeader
+            subHeaderComponent={subHeaderComponentMemo}
+            responsive={true}
+          />
+        </Flex>
+      )}
 
       {/* PAGINATION */}
-      <Flex
-        width={'100%'}
-        flexDir={'row'}
-        gap={4}
-        alignItems={'center'}
-        mt={6}
-        justifyContent={'space-between'}
-      >
-        <Stack alignItems={'center'} direction={'row'} spacing={4}>
-          <Button
-            colorScheme='blue'
-            onClick={onPreviousPage}
-            isDisabled={!data.pageInfo.hasPreviousPage}
-          >
-            Previous
-          </Button>
-          <Button
-            colorScheme='blue'
-            onClick={onNextPage}
-            isDisabled={!data.pageInfo.hasNextPage}
-          >
-            Next
-          </Button>
-          <Box>
-            Page {pageIndex} of{' '}
-            {data.totalCount === 0 ? 1 : Math.ceil(data.totalCount / totalRows)}
-          </Box>
-        </Stack>
+      {!loading && (
+        <Flex
+          width={'100%'}
+          flexDir={'row'}
+          gap={4}
+          alignItems={'center'}
+          mt={6}
+          justifyContent={'space-between'}
+        >
+          <Stack alignItems={'center'} direction={'row'} spacing={4}>
+            <Button
+              colorScheme='blue'
+              onClick={onPreviousPage}
+              isDisabled={!data.pageInfo.hasPreviousPage}
+            >
+              Previous
+            </Button>
+            <Button
+              colorScheme='blue'
+              onClick={onNextPage}
+              isDisabled={!data.pageInfo.hasNextPage}
+            >
+              Next
+            </Button>
+            <Box>
+              Page {pageIndex} of{' '}
+              {data.totalCount === 0
+                ? 1
+                : Math.ceil(data.totalCount / totalRows)}
+            </Box>
+          </Stack>
 
-        <Stack alignItems={'center'} direction={'row'} spacing={4}>
-          <Text>Show</Text>
-          <Select width={20} value={totalRows} onChange={handleSetRow}>
-            <option value={25}>25</option>
-            <option value={50}>50</option>
-            <option value={100}>100</option>
-          </Select>
-        </Stack>
-      </Flex>
+          <Stack alignItems={'center'} direction={'row'} spacing={4}>
+            <Text>Show</Text>
+            <Select width={20} value={totalRows} onChange={handleSetRow}>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </Select>
+          </Stack>
+        </Flex>
+      )}
     </>
   )
 }

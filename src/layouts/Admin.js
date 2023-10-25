@@ -16,7 +16,6 @@ import { dashRoutes } from 'routes.js'
 // Custom Chakra theme
 import theme from 'theme/theme.js'
 // Custom components
-import MainPanel from '../components/Layout/MainPanel'
 import PanelContainer from '../components/Layout/PanelContainer'
 import PanelContent from '../components/Layout/PanelContent'
 
@@ -38,12 +37,9 @@ import ContextWrapper from 'context/ContextWrapper'
 import ChangeLog from 'views/Dashboard/Changelog'
 
 export default function Dashboard(props) {
-  const { minimize } = useContext(GlobalContext)
-
   const authToken = Cookies.get('authToken')
 
   const { ...rest } = props
-  const location = useLocation()
   // states and functions
   const [sidebarVariant, setSidebarVariant] = useState('transparent')
   const [fixed, setFixed] = useState(false)
@@ -110,7 +106,7 @@ export default function Dashboard(props) {
 
   return (
     <ApolloProvider client={client}>
-      <ContextWrapper>  
+      <ContextWrapper>
         <ChakraProvider theme={theme} resetCss={false}>
           <Stack width={'100%'} direction={'row'} alignItems={'flex-start'}>
             <Sidebar

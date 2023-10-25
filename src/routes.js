@@ -33,13 +33,13 @@ export const dashRoutes = [
     component: Dashboard,
     layout: '/vendor'
   },
-  {
-    path: '/images',
-    name: 'Images',
-    icon: <FaImages color='inherit' />,
-    component: Images,
-    layout: '/vendor'
-  },
+  // {
+  //   path: '/images',
+  //   name: 'Images',
+  //   icon: <FaImages color='inherit' />,
+  //   component: Images,
+  //   layout: '/vendor'
+  // },
   {
     path: '/products',
     name: 'Products',
@@ -47,27 +47,27 @@ export const dashRoutes = [
     component: Products,
     layout: '/vendor'
   },
-  {
-    path: '/sharelynk',
-    name: 'ShareLynk',
-    icon: <BsFillFolderSymlinkFill color='inherit' size={18} />,
-    component: Sharelynk,
-    layout: '/vendor'
-  },
-  {
-    path: '/feed',
-    name: 'Feed',
-    icon: <FaBullhorn color='inherit' />,
-    component: Feed,
-    layout: '/vendor'
-  },
-  {
-    path: '/connections',
-    name: 'Connections',
-    icon: <FaPlug color='inherit' />,
-    component: Connections,
-    layout: '/vendor'
-  },
+  // {
+  //   path: '/sharelynk',
+  //   name: 'ShareLynk',
+  //   icon: <BsFillFolderSymlinkFill color='inherit' size={18} />,
+  //   component: Sharelynk,
+  //   layout: '/vendor'
+  // },
+  // {
+  //   path: '/feed',
+  //   name: 'Feed',
+  //   icon: <FaBullhorn color='inherit' />,
+  //   component: Feed,
+  //   layout: '/vendor'
+  // },
+  // {
+  //   path: '/connections',
+  //   name: 'Connections',
+  //   icon: <FaPlug color='inherit' />,
+  //   component: Connections,
+  //   layout: '/vendor'
+  // },
   {
     path: '/profiles',
     name: 'Settings',

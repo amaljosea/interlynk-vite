@@ -91,7 +91,8 @@ const Automation = () => {
             justifyContent={'space-between'}
             width={'100%'}
           >
-            <Text fontSize={18}>Rule Automation Settings</Text>
+            {/* <Text fontSize={18}>Rule Automation Settings</Text> */}
+            <Text fontSize={18}>Coming Soon</Text>
             <Tooltip label='Add Rule'>
               <IconButton
                 variant='solid'
@@ -118,6 +119,7 @@ const Automation = () => {
                 <Tr key={row.id}>
                   <Td>
                     <Switch
+                      isDisabled={true}
                       isChecked={row.active}
                       onChange={(e) =>
                         handleInputChange(row.id, 'active', e.target.checked)
@@ -126,6 +128,7 @@ const Automation = () => {
                   </Td>
                   <Td>
                     <Select
+                      isDisabled={true}
                       size='sm'
                       value={row.selectorOne}
                       onChange={(e) =>
@@ -139,8 +142,9 @@ const Automation = () => {
                   </Td>
                   <Td>
                     <Input
+                      isDisabled={true}
                       size='sm'
-                      disabled={row.selectorOne === 'document'}
+                      // disabled={row.selectorOne === 'document'}
                       placeholder='Add name'
                       value={row.conditionOne}
                       onChange={(e) =>
@@ -154,6 +158,7 @@ const Automation = () => {
                   </Td>
                   <Td>
                     <Select
+                      isDisabled={true}
                       size='sm'
                       value={row.conditionTwo}
                       onChange={(e) =>
@@ -174,6 +179,7 @@ const Automation = () => {
                   <Td>
                     {row.selectorOne === 'document' ? (
                       <Select
+                        isDisabled={true}
                         size='sm'
                         value={row.selectorTwo}
                         onChange={(e) =>
@@ -203,6 +209,7 @@ const Automation = () => {
                       </Select>
                     ) : (
                       <Select
+                        isDisabled={true}
                         size='sm'
                         value={row.selectorTwo}
                         onChange={(e) =>
@@ -238,6 +245,7 @@ const Automation = () => {
                         )}
                         <IconButton
                           size='sm'
+                          isDisabled={true}
                           colorScheme='blue'
                           icon={<SettingsIcon />}
                         />
@@ -249,6 +257,7 @@ const Automation = () => {
                   <Td>
                     <IconButton
                       size='sm'
+                      isDisabled={true}
                       icon={<DeleteIcon />}
                       onClick={() => deleteRow(row.id)}
                       colorScheme='red'

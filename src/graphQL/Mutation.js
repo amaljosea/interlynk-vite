@@ -537,6 +537,26 @@ export const UpdateComponent = gql`
   }
 `
 
+// UPDATE PRODUCT COMPONENT LINKS
+export const UpdateCompLinks = gql`
+  mutation UpdateCompLinks(
+    $id: Uuid!
+    $sbomId: Uuid!
+    $urls: [ExternalUrlInput!]
+  ) {
+    componentUpdate(input: { id: $id, sbomId: $sbomId, externalUrls: $urls }) {
+      component {
+        id
+        externalUrls {
+          name
+          url
+        }
+      }
+      errors
+    }
+  }
+`
+
 // DELETE PRODUCT COMPONENT
 export const DeleteComponent = gql`
   mutation DeleteComponent($id: Uuid!, $sbomId: Uuid!) {

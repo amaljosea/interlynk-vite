@@ -77,13 +77,13 @@ const ComponentTable = ({
   lifecycle,
   data,
   error,
+  loading,
   refetch,
   pageIndex,
   setPageIndex,
   primaryComp,
   totalRows,
   setTotalRows,
-  filterHeads,
   filterRefetch
 }) => {
   const location = useLocation()
@@ -97,6 +97,7 @@ const ComponentTable = ({
   const customerView = location.pathname.startsWith('/customer')
 
   const [activeRow, setActiveRow] = useState(null)
+  const [sortField, setSortField] = useState('UPDATED_AT')
 
   const [filterText, setFilterText] = useState('')
 
@@ -538,7 +539,7 @@ const ComponentTable = ({
         sbomId: sbomId,
         search: filterText,
         first: totalRows,
-        field: 'UPDATED_AT',
+        field: sortField,
         direction: 'DESC'
       })
       setPageIndex(1)
@@ -552,7 +553,7 @@ const ComponentTable = ({
       sbomId: sbomId,
       search: undefined,
       first: totalRows,
-      field: 'UPDATED_AT',
+      field: sortField,
       direction: 'DESC'
     })
     setFilterText('')
@@ -566,7 +567,7 @@ const ComponentTable = ({
       projectId: productId,
       sbomId: sbomId,
       first: Number(e.target.value),
-      field: 'UPDATED_AT',
+      field: sortField,
       direction: 'DESC'
     })
     setFilterText('')
@@ -627,6 +628,7 @@ const ComponentTable = ({
   const handleSort = (column, sortDirection) => {
     // console.log(`column`, column)
     // console.log(`sortDirection`, sortDirection)
+    setSortField(column.name)
     refetch({
       projectId: productId,
       sbomId: sbomId,
@@ -639,91 +641,117 @@ const ComponentTable = ({
     })
   }
 
-  const handlePreviousPage = () => {
+  const [isLoading, setIsLoading] = useState(false)
+
+  const handlePreviousPage = async () => {
+    setIsLoading(true)
     setPageIndex((prev) => pageIndex !== 0 && prev - 1)
-    refetch({
+    await refetch({
       projectId: productId,
       sbomId: sbomId,
       first: undefined,
       last: totalRows,
       after: undefined,
       before: data.pageInfo.startCursor,
-      field: 'UPDATED_AT',
+      field: sortField,
       direction: 'DESC'
+    }).then(() => {
+      setTimeout(() => {
+        setIsLoading(false)
+      }, 2000)
     })
   }
 
-  const handleNextPage = () => {
+  const handleNextPage = async () => {
+    setIsLoading(true)
     setPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
-    refetch({
+    await refetch({
       projectId: productId,
       sbomId: sbomId,
       first: totalRows,
       last: undefined,
       before: undefined,
       after: data.pageInfo.endCursor,
-      field: 'UPDATED_AT',
+      field: sortField,
       direction: 'DESC'
+    }).then(() => {
+      setTimeout(() => {
+        setIsLoading(false)
+      }, 2000)
     })
   }
 
   return (
     <>
-      <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
-          columns={columns}
-          data={data.nodes}
-          onSort={handleSort}
-          customStyles={customStyles}
-          defaultSortAsc={false}
-          defaultSortFieldId={'updatedAt'}
-          subHeader
-          subHeaderComponent={subHeaderComponentMemo}
-          expandableRows
-          expandableRowsComponent={ExpandedComponent}
-          responsive={true}
-        />
-      </Flex>
+      {isLoading ? (
+        <Flex width={'100%'} gap={4} direction={'column'}>
+          <Skeleton width={'100%'} height='20px' />
+          <Skeleton width={'100%'} height='20px' />
+          <Skeleton width={'100%'} height='20px' />
+          <Skeleton width={'100%'} height='20px' />
+          <Skeleton width={'100%'} height='20px' />
+        </Flex>
+      ) : (
+        <Flex flexDir={'column'} width={'100%'}>
+          <DataTable
+            columns={columns}
+            data={data.nodes}
+            onSort={handleSort}
+            customStyles={customStyles}
+            defaultSortAsc={false}
+            defaultSortFieldId={'updatedAt'}
+            subHeader
+            subHeaderComponent={subHeaderComponentMemo}
+            expandableRows
+            expandableRowsComponent={ExpandedComponent}
+            responsive={true}
+          />
+        </Flex>
+      )}
 
       {/* PAGINATION */}
-      <Flex
-        width={'100%'}
-        flexDir={'row'}
-        gap={4}
-        alignItems={'center'}
-        justifyContent={'space-between'}
-        mt={6}
-      >
-        <Stack alignItems={'center'} direction={'row'} spacing={4}>
-          <Button
-            colorScheme='blue'
-            onClick={handlePreviousPage}
-            isDisabled={!data.pageInfo.hasPreviousPage || error}
-          >
-            Previous
-          </Button>
-          <Button
-            colorScheme='blue'
-            onClick={handleNextPage}
-            isDisabled={!data.pageInfo.hasNextPage || error}
-          >
-            Next
-          </Button>
-          <Box>
-            Page {pageIndex} of{' '}
-            {data.totalCount === 0 ? 1 : Math.ceil(data.totalCount / totalRows)}
-          </Box>
-        </Stack>
+      {!isLoading && (
+        <Flex
+          width={'100%'}
+          flexDir={'row'}
+          gap={4}
+          alignItems={'center'}
+          justifyContent={'space-between'}
+          mt={6}
+        >
+          <Stack alignItems={'center'} direction={'row'} spacing={4}>
+            <Button
+              colorScheme='blue'
+              onClick={handlePreviousPage}
+              isDisabled={!data.pageInfo.hasPreviousPage || error}
+            >
+              Previous
+            </Button>
+            <Button
+              colorScheme='blue'
+              onClick={handleNextPage}
+              isDisabled={!data.pageInfo.hasNextPage || error}
+            >
+              Next
+            </Button>
+            <Box>
+              Page {pageIndex} of{' '}
+              {data.totalCount === 0
+                ? 1
+                : Math.ceil(data.totalCount / totalRows)}
+            </Box>
+          </Stack>
 
-        <Stack alignItems={'center'} direction={'row'} spacing={4}>
-          <Text>Show</Text>
-          <Select width={20} value={totalRows} onChange={handleSetRow}>
-            <option value={25}>25</option>
-            <option value={50}>50</option>
-            <option value={100}>100</option>
-          </Select>
-        </Stack>
-      </Flex>
+          <Stack alignItems={'center'} direction={'row'} spacing={4}>
+            <Text>Show</Text>
+            <Select width={20} value={totalRows} onChange={handleSetRow}>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </Select>
+          </Stack>
+        </Flex>
+      )}
 
       {/* ACTIONS */}
       {activeRow !== null && (
@@ -777,14 +805,18 @@ const ComponentTable = ({
 
           {isLinkOpen && (
             <LinksDrawer
-              component={activeRow.name}
+              component={activeRow}
               btnRef={linkRef}
               isOpen={isLinkOpen}
               onClose={onLinkClose}
+              refetch={refetch}
+              productId={productId}
+              sbomId={sbomId}
             />
           )}
         </>
       )}
+
       {/* COMPONENT DRAWER */}
       {isCompOpen && data && !customerView && (
         <ComponentDrawer
@@ -794,7 +826,7 @@ const ComponentTable = ({
           component={''}
           version={''}
           license={''}
-          type={type}
+          type={''}
           cpes={[]}
           purl={''}
           primary={false}
@@ -803,6 +835,7 @@ const ComponentTable = ({
           filterRefetch={filterRefetch}
           shortDesc={null}
           checkId={null}
+          primaryComp={primaryComp}
           totalRows={totalRows}
         />
       )}

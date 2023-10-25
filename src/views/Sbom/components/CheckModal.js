@@ -73,6 +73,7 @@ const CheckModal = ({
       })
     }
   })
+  
   const [updateComponent] = useMutation(UpdateComponent)
 
   const handleComUpdate = async () => {

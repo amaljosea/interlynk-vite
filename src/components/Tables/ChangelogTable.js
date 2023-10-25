@@ -6,6 +6,7 @@ import {
   Input,
   Tooltip,
   Text,
+  Badge,
   Skeleton,
   Box,
   IconButton
@@ -201,41 +202,40 @@ const ChangelogTable = ({ data, refetch, type, totalRows, setTotalRows }) => {
     // CHANGE TYPE
     {
       id: 'changeType',
-      name: 'CHANGE TYPE',
+      name: 'TYPE',
       selector: (row) => {
         const { action } = row
         return (
-          <Tag variant='subtle' colorScheme={setColor(action)}>
-            {action}
-          </Tag>
+          <Tooltip placement='top' label={action} textTransform={'capitalize'}>
+            <Tag
+              variant='solid'
+              colorScheme={setColor(action)}
+              textTransform={'capitalize'}
+            >
+              {action.slice(0, 1)}
+            </Tag>
+          </Tooltip>
         )
-      }
-    },
-    // CHANGED OBJECT
-    {
-      id: 'changedObject',
-      name: 'CHANGED OBJECT',
-      selector: (row) => {
-        const { event } = row
-        return <Text>{event}</Text>
-      }
+      },
+      width: '150px'
     },
     // PRIOR VALUE
     {
       id: 'priorValue',
-      name: 'PRIOR VALUE',
+      name: 'PREVIOUS VALUE',
       selector: (row) => {
         const { orig } = row
         return (
           <Tooltip label={orig} placement='top'>
             <Text>
               {orig !== null
-                ? `${orig?.substring(0, 20)}${orig.length > 20 ? '...' : ''}`
+                ? `${orig?.substring(0, 400)}${orig.length > 400 ? '...' : ''}`
                 : ''}
             </Text>
           </Tooltip>
         )
-      }
+      },
+      width: '400px'
     },
     // UPDATED VALUE
     {
@@ -247,21 +247,22 @@ const ChangelogTable = ({ data, refetch, type, totalRows, setTotalRows }) => {
           <Tooltip label={updated} placement='top'>
             <Text>
               {updated !== null
-                ? `${updated?.substring(0, 15)}${
-                    updated.length > 15 ? '...' : ''
+                ? `${updated?.substring(0, 400)}${
+                    updated.length > 400 ? '...' : ''
                   }`
                 : ''}
             </Text>
           </Tooltip>
         )
-      }
+      },
+      width: '400px'
     },
     // CHANGED BY
     {
       id: 'changedBy',
-      name: 'CHANGED BY',
+      name: 'BY',
       selector: (row) => row.changedBy,
-      width: '200px'
+      width: '150px'
     },
     // CHANGED ON
     {
@@ -271,7 +272,13 @@ const ChangelogTable = ({ data, refetch, type, totalRows, setTotalRows }) => {
         <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
           <Text>{timeSince(row.updatedAt)}</Text>
         </Tooltip>
-      )
+      ),
+      sortable: true,
+      sortFunction: (a, b) => {
+        const dateA = new Date(a.updatedAt)
+        const dateB = new Date(b.updatedAt)
+        return dateA - dateB // Sort in descending order
+      }
     }
   ]
 
@@ -284,6 +291,8 @@ const ChangelogTable = ({ data, refetch, type, totalRows, setTotalRows }) => {
           customStyles={customStyles}
           subHeader
           subHeaderComponent={subHeaderComponentMemo}
+          defaultSortAsc={false}
+          defaultSortFieldId={'changedOn'}
           responsive={true}
         />
       </Flex>

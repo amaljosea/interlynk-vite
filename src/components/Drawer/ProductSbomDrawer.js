@@ -42,6 +42,7 @@ import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import { FaExpandAlt } from 'react-icons/fa'
 import { CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
+import { recheckHealth } from 'graphQL/Mutation'
 
 const regexPattern =
   /^cpe:2\.3:[aho]:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+$/
@@ -53,7 +54,17 @@ function ProductSbomDrawer(props) {
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
-  const { name, isOpen, onClose, btnRef, refetch, sbomData, type } = props
+  const {
+    name,
+    isOpen,
+    onClose,
+    btnRef,
+    refetch,
+    sbomData,
+    type,
+    checkId,
+    totalRows
+  } = props
 
   const [createSbom] = useMutation(sbomCreate)
   const [updateSbom] = useMutation(sbomUpdate)
@@ -82,6 +93,24 @@ function ProductSbomDrawer(props) {
   const [isPURLInputValid, setPURLInputValid] = useState(true)
   const [isCPEInputValid, setCPEInputValid] = useState(true)
 
+  const [healthRecheck] = useMutation(recheckHealth, {
+    onCompleted: () => {
+      refetch({
+        projectId: productId,
+        sbomId: sbomId,
+        first: totalRows,
+        last: undefined,
+        after: undefined,
+        before: undefined,
+        category: undefined,
+        severity: undefined,
+        status: undefined,
+        field: 'UPDATED_AT',
+        direction: 'DESC'
+      })
+    }
+  })
+
   useEffect(() => {
     if (sbomData) {
       // console.log(`sbom data`, sbomData)
@@ -89,16 +118,27 @@ function ProductSbomDrawer(props) {
       setSpecVersion(sbomData.specVersion)
       setCpeList(sbomData.cpes)
       setPurlValue(sbomData.purl === null ? '' : sbomData.purl)
-      if (sbomData.licenses.length > 0) {
-        const res = sbomData.licenses.map((item) => item)
-        setImgIds(res)
-      }
+      // if (sbomData.licenses) {
+      //   const res = sbomData.licenses.map((item) => item)
+      //   setImgIds(res)
+      // }
     }
   }, [sbomData])
 
   useEffect(() => {
     setCompType(type)
   }, [type])
+
+  useEffect(() => {
+    if (sbomData && sbomData.licenses.length === 0) {
+      setLicenseList([
+        {
+          value: 'CC0-1.0',
+          label: 'Creative Commons Zero v1.0 Universal'
+        }
+      ])
+    }
+  }, [sbomData])
 
   useEffect(() => {
     if (sbomData && sbomData.licenses.length > 0) {
@@ -295,14 +335,27 @@ function ProductSbomDrawer(props) {
           spec: 'cyclonedx',
           specVersion: '1.4',
           format: compType,
-          licenses: imgIds
+          licenses: sbomData.licenses.length === 0 ? ['CC0-1.0'] : imgIds
         }
       })
         .then(() => {
-          refetch({
-            projectId: productId,
-            sbomId: sbomId
-          })
+          if (checkId) {
+            healthRecheck({
+              variables: {
+                checkId: checkId ? checkId : undefined,
+                sbomId: sbomId
+              }
+            })
+            filterRefetch({
+              projectId: productId,
+              sbomId: sbomId
+            })
+          } else {
+            refetch({
+              projectId: productId,
+              sbomId: sbomId
+            })
+          }
         })
         .finally(() => onClose())
     } catch (error) {
@@ -437,31 +490,34 @@ function ProductSbomDrawer(props) {
                 </>
               )}
               {/* Format */}
-              <FormControl>
-                <FormLabel fontSize={'sm'}>Type</FormLabel>
-                <Select
-                  id='type'
-                  name='type'
-                  size='sm'
-                  value={compType}
-                  onChange={(e) => setCompType(e.target.value)}
-                >
-                  <option value=''>-- Select --</option>
-                  <option value='application'>Application</option>
-                  <option value='library'>Library</option>
-                  <option value='operating-system'>Operating System</option>
-                  <option value='firmware'>Firmware</option>
-                  <option value='file'>File</option>
-                  <option value='device'>Device</option>
-                  <option value='container'>Container</option>
-                  <option value='framework'>Framework</option>
-                  <option value='source'>Source</option>
-                  <option value='archive'>Archive</option>
-                  <option value='install'>Install</option>
-                  <option value='other'>Other</option>
-                  <option value='unspecified'>Unspecified</option>
-                </Select>
-              </FormControl>
+              {!checkId && (
+                <FormControl>
+                  <FormLabel fontSize={'sm'}>Type</FormLabel>
+                  <Select
+                    id='type'
+                    name='type'
+                    size='sm'
+                    value={compType}
+                    onChange={(e) => setCompType(e.target.value)}
+                  >
+                    <option value=''>-- Select --</option>
+                    <option value='application'>Application</option>
+                    <option value='library'>Library</option>
+                    <option value='operating-system'>Operating System</option>
+                    <option value='firmware'>Firmware</option>
+                    <option value='file'>File</option>
+                    <option value='device'>Device</option>
+                    <option value='container'>Container</option>
+                    <option value='framework'>Framework</option>
+                    <option value='source'>Source</option>
+                    <option value='archive'>Archive</option>
+                    <option value='install'>Install</option>
+                    <option value='other'>Other</option>
+                    <option value='unspecified'>Unspecified</option>
+                  </Select>
+                </FormControl>
+              )}
+
               {/* Licenses */}
               <FormControl fontSize={'sm'}>
                 <FormLabel fontSize={'sm'}>Licenses</FormLabel>

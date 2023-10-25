@@ -119,7 +119,7 @@ const VulnFilterMenu = ({
               <MenuItemOption value={'all'} fontSize={'sm'}>
                 All
               </MenuItemOption>
-              {vulnSeverities?.map((item, index) => (
+              {['critical', 'high', 'medium', 'low'].map((item, index) => (
                 <MenuItemOption key={index} value={item} fontSize={'sm'}>
                   {item}
                 </MenuItemOption>

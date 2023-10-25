@@ -38,7 +38,8 @@ import {
   DrawerCloseButton,
   useToast,
   IconButton,
-  ButtonGroup
+  ButtonGroup,
+  Skeleton
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV } from 'react-icons/fa'
@@ -54,6 +55,7 @@ import VulnFilterMenu from 'views/Sbom/components/VulnFilterMenu'
 import { sevColor } from 'utils'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import GlobalContext from 'context/GlobalContext'
+import { timeSince } from 'utils'
 
 const customStyles = {
   headCells: {
@@ -81,8 +83,10 @@ const statusColor = (status) => {
     return 'red'
   } else if (status && status === 'False Positive') {
     return 'gray'
-  } else {
+  } else if (status && status === 'In Triage') {
     return 'cyan'
+  } else {
+    return 'gray'
   }
 }
 
@@ -96,7 +100,6 @@ const VulnTable = ({
   filteredData,
   totalRows,
   setTotalRows,
-  filterHeads,
   filterRefetch
 }) => {
   const location = useLocation()
@@ -113,10 +116,9 @@ const VulnTable = ({
   // STEPS
   const [step, setStep] = useState(1)
   const [progress, setProgress] = useState(25)
-
   const [stepTitle, setStepTitle] = useState('')
-
   const [filterText, setFilterText] = useState('')
+  const [sortField, setSortField] = useState('UPDATED_AT')
 
   const btnRef = useRef(null)
   const tableRef = useRef()
@@ -274,7 +276,11 @@ const VulnTable = ({
     {
       id: 'version',
       name: 'VERSION',
-      selector: (row) => row.component.version,
+      selector: (row) => (
+        <Tooltip label={row.component.version} placement='top'>
+          {row.component.version}
+        </Tooltip>
+      ),
       width: '130px'
     },
     // STATUS
@@ -288,20 +294,34 @@ const VulnTable = ({
             fontWeight={'normal'}
             variant='solid'
             size='sm'
-            colorScheme={statusColor(vexStatus ? vexStatus.name : 'In Triage')}
+            colorScheme={statusColor(
+              vexStatus ? vexStatus.name : 'Unspecified'
+            )}
           >
-            {vexStatus !== null ? vexStatus.name : 'In Triage'}
+            {vexStatus !== null ? vexStatus.name : 'Unspecified'}
           </Tag>
         )
       }
     },
-    // // UPDATED AT
-    // {
-    //   id: 'updatedAt',
-    //   name: 'UPDATED AT',
-    //   selector: (row) => getFullDateAndTime(row.vuln.updatedAt),
-    //   sortable: true
-    // },
+    // UPDATED AT
+    {
+      id: 'updatedAt',
+      name: 'UPDATED AT',
+      selector: (row) => (
+        <Tooltip
+          label={getFullDateAndTime(row.vuln.updatedAt)}
+          placement={'top'}
+        >
+          {timeSince(row.vuln.updatedAt)}
+        </Tooltip>
+      ),
+      sortable: true,
+      sortFunction: (a, b) => {
+        const dateA = new Date(a.vuln.updatedAt)
+        const dateB = new Date(b.vuln.updatedAt)
+        return dateA - dateB // Sort in descending order
+      }
+    },
     // ACTION
     {
       id: 'action',
@@ -354,7 +374,7 @@ const VulnTable = ({
         last: undefined,
         after: undefined,
         last: undefined,
-        field: 'UPDATED_AT',
+        field: sortField,
         direction: 'DESC'
       })
       setPageIndex(1)
@@ -371,7 +391,7 @@ const VulnTable = ({
       after: undefined,
       last: undefined,
       search: undefined,
-      field: 'UPDATED_AT',
+      field: sortField,
       direction: 'DESC'
     })
     setFilterText('')
@@ -443,12 +463,12 @@ const VulnTable = ({
         boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
       >
         <Grid
-          templateColumns='repeat(3, 1fr)'
+          templateColumns='repeat(4, 1fr)'
           gap={6}
-          width={'80%'}
+          width={'90%'}
           margin={'0 auto'}
         >
-          <GridItem w='100%' colSpan={3}>
+          <GridItem w='100%' colSpan={4}>
             <CustomText>Description :</CustomText>
             <Text mt={1} fontSize={14}>
               {vuln.desc}
@@ -464,6 +484,12 @@ const VulnTable = ({
             <CustomText>Published At :</CustomText>
             <Text mt={1} fontSize={14}>
               {getFullDateAndTime(vuln.publishedAt)}
+            </Text>
+          </GridItem>
+          <GridItem w='100%'>
+            <CustomText>CVSS Vector :</CustomText>
+            <Text mt={1} fontSize={14}>
+              {vuln.cvssVector}
             </Text>
           </GridItem>
           <GridItem w='100%'>
@@ -504,35 +530,48 @@ const VulnTable = ({
     })
   }
 
-  const onPreviousPage = () => {
+  const [isLoading, setIsLoading] = useState(false)
+
+  const onPreviousPage = async () => {
+    setIsLoading(true)
     setPageIndex((prev) => pageIndex !== 0 && prev - 1)
-    refetch({
+    await refetch({
       projectId: productId,
       sbomId: sbomId,
       first: undefined,
       last: totalRows,
       before: data.pageInfo.startCursor,
       after: undefined,
-      field: 'UPDATED_AT',
+      field: sortField,
       direction: 'DESC'
+    }).then(() => {
+      setTimeout(() => {
+        setIsLoading(false)
+      }, 2000)
     })
   }
 
-  const onNextPage = () => {
+  const onNextPage = async () => {
+    setIsLoading(true)
     setPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
-    refetch({
+    await refetch({
       projectId: productId,
       sbomId: sbomId,
       first: totalRows,
       last: undefined,
       after: data.pageInfo.endCursor,
       before: undefined,
-      field: 'UPDATED_AT',
+      field: sortField,
       direction: 'DESC'
+    }).then(() => {
+      setTimeout(() => {
+        setIsLoading(false)
+      }, 2000)
     })
   }
 
   const handleSort = (column, sortDirection) => {
+    setSortField(column.name)
     refetch({
       projectId: productId,
       sbomId: sbomId,
@@ -554,7 +593,7 @@ const VulnTable = ({
       after: undefined,
       last: undefined,
       search: undefined,
-      field: 'UPDATED_AT',
+      field: sortField,
       direction: 'DESC'
     })
     setFilterText('')
@@ -576,58 +615,74 @@ const VulnTable = ({
   return (
     <>
       {/* TABLE */}
-      <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
-          columns={columns}
-          data={data.nodes}
-          customStyles={customStyles}
-          onSort={handleSort}
-          subHeader
-          subHeaderComponent={subHeaderComponentMemo}
-          responsive={true}
-          expandableRows
-          expandableRowsComponent={ExpandedComponent}
-        />
-      </Flex>
+      {isLoading ? (
+        <Flex width={'100%'} gap={4} direction={'column'}>
+          <Skeleton width={'100%'} height='20px' />
+          <Skeleton width={'100%'} height='20px' />
+          <Skeleton width={'100%'} height='20px' />
+          <Skeleton width={'100%'} height='20px' />
+          <Skeleton width={'100%'} height='20px' />
+        </Flex>
+      ) : (
+        <Flex flexDir={'column'} width={'100%'}>
+          <DataTable
+            columns={columns}
+            data={data.nodes}
+            customStyles={customStyles}
+            onSort={handleSort}
+            defaultSortAsc={false}
+            defaultSortFieldId={'updatedAt'}
+            subHeader
+            subHeaderComponent={subHeaderComponentMemo}
+            responsive={true}
+            expandableRows
+            expandableRowsComponent={ExpandedComponent}
+          />
+        </Flex>
+      )}
 
       {/* PAGINATION */}
-      <Flex
-        flexDir={'row'}
-        gap={4}
-        alignItems={'center'}
-        mt={6}
-        justifyContent={'space-between'}
-      >
-        <Stack alignItems={'center'} direction={'row'} spacing={4}>
-          <Button
-            colorScheme='blue'
-            onClick={onPreviousPage}
-            isDisabled={!data.pageInfo.hasPreviousPage}
-          >
-            Previous
-          </Button>
-          <Button
-            colorScheme='blue'
-            onClick={onNextPage}
-            isDisabled={!data.pageInfo.hasNextPage}
-          >
-            Next
-          </Button>
-          <Box>
-            Page {pageIndex} of{' '}
-            {data.totalCount === 0 ? 1 : Math.ceil(data.totalCount / totalRows)}
-          </Box>
-        </Stack>
+      {!isLoading && (
+        <Flex
+          flexDir={'row'}
+          gap={4}
+          alignItems={'center'}
+          mt={6}
+          justifyContent={'space-between'}
+        >
+          <Stack alignItems={'center'} direction={'row'} spacing={4}>
+            <Button
+              colorScheme='blue'
+              onClick={onPreviousPage}
+              isDisabled={!data.pageInfo.hasPreviousPage}
+            >
+              Previous
+            </Button>
+            <Button
+              colorScheme='blue'
+              onClick={onNextPage}
+              isDisabled={!data.pageInfo.hasNextPage}
+            >
+              Next
+            </Button>
+            <Box>
+              Page {pageIndex} of{' '}
+              {data.totalCount === 0
+                ? 1
+                : Math.ceil(data.totalCount / totalRows)}
+            </Box>
+          </Stack>
 
-        <Stack alignItems={'center'} direction={'row'} spacing={4}>
-          <Text>Show</Text>
-          <Select width={20} value={totalRows} onChange={handleSetRow}>
-            <option value={25}>25</option>
-            <option value={50}>50</option>
-            <option value={100}>100</option>
-          </Select>
-        </Stack>
-      </Flex>
+          <Stack alignItems={'center'} direction={'row'} spacing={4}>
+            <Text>Show</Text>
+            <Select width={20} value={totalRows} onChange={handleSetRow}>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </Select>
+          </Stack>
+        </Flex>
+      )}
 
       {/* COPY MODAL */}
       {isCopyOpen && (
@@ -667,6 +722,7 @@ const VulnTable = ({
           </ModalContent>
         </Modal>
       )}
+
       {/* COPY DATA TABLE */}
       {isTableOpen && (
         <Drawer
@@ -680,7 +736,7 @@ const VulnTable = ({
           <DrawerContent>
             <DrawerCloseButton />
             <DrawerHeader>
-              <Text fontSize={20} fontWeight={'medium'}>
+              <Text fontSize={20} fontWeight={'medium'} visibility={'hidden'}>
                 {stepTitle}
               </Text>
             </DrawerHeader>
@@ -728,12 +784,14 @@ const VulnTable = ({
                     colorScheme='red'
                     variant='solid'
                     onClick={handleSubmit}
+                    display={'none'}
                   >
                     Submit
                   </Button>
                 ) : (
                   <Button
                     isDisabled={step === 4}
+                    display={'none'}
                     rightIcon={<ChevronRightIcon w={6} h={6} />}
                     onClick={() => {
                       setStep(step + 1)
@@ -754,6 +812,7 @@ const VulnTable = ({
           </DrawerContent>
         </Drawer>
       )}
+
       {/* ACTIONS */}
       {activeRow !== null && (
         <>

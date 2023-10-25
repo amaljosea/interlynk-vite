@@ -10,7 +10,8 @@ import {
   MenuOptionGroup,
   Stack
 } from '@chakra-ui/react'
-import { useState } from 'react'
+import GlobalContext from 'context/GlobalContext'
+import { useState, useContext } from 'react'
 import { FaFilter } from 'react-icons/fa'
 
 const CheckMark = () => {
@@ -32,13 +33,13 @@ const CheckMark = () => {
 }
 
 const LogFilterMenu = ({
-  logFilters,
   refetch,
   productId,
   sbomId,
   setPageIndex,
   totalRows
 }) => {
+  const { logFilters } = useContext(GlobalContext)
   const { logChangeBys, logChangeObjects, logChangeTypes } = logFilters
 
   const [selectChangeBy, setSelectChangeBy] = useState('')

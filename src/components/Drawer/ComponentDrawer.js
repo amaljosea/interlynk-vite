@@ -738,7 +738,8 @@ function ComponentDrawer(props) {
                   </Flex>
                 </Stack>
               </FormControl>
-              {(!component || !version) && (
+
+              {/* {(!component || !version) && (
                 <FormControl isReadOnly={customerView}>
                   <Checkbox
                     size='sm'
@@ -749,7 +750,7 @@ function ComponentDrawer(props) {
                     Incomplete third party component
                   </Checkbox>
                 </FormControl>
-              )}
+              )} */}
               <FormControl isReadOnly={customerView}>
                 <Flex alignItems={'center'} gap={2}>
                   {shortDesc === 'Primary Component' && !isPrimary && (
@@ -787,7 +788,9 @@ function ComponentDrawer(props) {
               <Button
                 colorScheme='blue'
                 onClick={handleSave}
-                disabled={containesOther && licenseName === ''}
+                isDisabled={
+                  (containesOther && licenseName === '') || compType === ''
+                }
               >
                 Save
               </Button>
@@ -795,7 +798,7 @@ function ComponentDrawer(props) {
               <Button
                 colorScheme='blue'
                 onClick={handleUpdate}
-                disabled={containesOther && licenseName === ''}
+                isDisabled={containesOther && licenseName === ''}
               >
                 Update
               </Button>
