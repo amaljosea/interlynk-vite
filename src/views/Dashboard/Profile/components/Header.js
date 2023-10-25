@@ -3,7 +3,7 @@ import { Avatar, Button, Flex, Text, useColorModeValue } from '@chakra-ui/react'
 
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
-import { dp } from 'utils'
+import { displayPic } from 'utils'
 
 const Header = ({ selectedTab, setSelectedTab, user, tabs }) => {
   // Chakra color mode
@@ -34,9 +34,10 @@ const Header = ({ selectedTab, setSelectedTab, user, tabs }) => {
           >
             <Avatar
               me={{ md: '22px' }}
-              src={dp(user.email)}
+              src={displayPic(user.email)}
               w='80px'
               h='80px'
+              bg='none'
             />
             <Flex direction='column' maxWidth='100%' my={{ sm: '14px' }}>
               <Text

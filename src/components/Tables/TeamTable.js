@@ -2,7 +2,7 @@ import { Avatar, Box, Flex, Stack, Text } from '@chakra-ui/react'
 import React from 'react'
 import DataTable from 'react-data-table-component'
 import { getFullDateAndTime } from 'utils'
-import { dp } from 'utils'
+import { displayPic } from 'utils'
 
 const customStyles = {
   headCells: {
@@ -32,7 +32,7 @@ const TeamTable = ({ data }) => {
             alignItems={'flex-center'}
           >
             <Box width={'30px'}>
-              <Avatar me={{ md: '22px' }} src={dp(email)} w='30px' h='30px' />
+              <Avatar me={{ md: '22px' }} src={displayPic(email)} w='30px' h='30px' />
             </Box>
             <Box
               display={'flex'}
