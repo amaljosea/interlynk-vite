@@ -10,7 +10,8 @@ import {
   MenuOptionGroup,
   Stack
 } from '@chakra-ui/react'
-import { useState } from 'react'
+import GlobalContext from 'context/GlobalContext'
+import { useContext, useState } from 'react'
 import { FaFilter } from 'react-icons/fa'
 
 const CheckMark = () => {
@@ -32,15 +33,16 @@ const CheckMark = () => {
 }
 
 const VulnFilterMenu = ({
-  compNames,
-  severities,
-  statuses,
   refetch,
   productId,
   sbomId,
   setPageIndex,
   totalRows
 }) => {
+  const { vulnFilters } = useContext(GlobalContext)
+
+  const { vulnCompNames, vulnSeverities, vulnStatuses } = vulnFilters
+
   const [selectCompName, setSelectCompName] = useState('')
   const [selectSeverity, setSelectSeverity] = useState('')
   const [selectedStatus, setSelectedStatus] = useState('')
@@ -117,12 +119,11 @@ const VulnFilterMenu = ({
               <MenuItemOption value={'all'} fontSize={'sm'}>
                 All
               </MenuItemOption>
-              {severities.length > 0 &&
-                severities.map((item, index) => (
-                  <MenuItemOption key={index} value={item} fontSize={'sm'}>
-                    {item}
-                  </MenuItemOption>
-                ))}
+              {vulnSeverities?.map((item, index) => (
+                <MenuItemOption key={index} value={item} fontSize={'sm'}>
+                  {item}
+                </MenuItemOption>
+              ))}
             </MenuOptionGroup>
           </MenuList>
         </Menu>
@@ -149,12 +150,11 @@ const VulnFilterMenu = ({
               <MenuItemOption value={'all'} fontSize={'sm'}>
                 All
               </MenuItemOption>
-              {compNames.length > 0 &&
-                compNames.map((item, index) => (
-                  <MenuItemOption key={index} value={item} fontSize={'sm'}>
-                    {item}
-                  </MenuItemOption>
-                ))}
+              {vulnCompNames?.map((item, index) => (
+                <MenuItemOption key={index} value={item} fontSize={'sm'}>
+                  {item}
+                </MenuItemOption>
+              ))}
             </MenuOptionGroup>
           </MenuList>
         </Menu>
@@ -181,12 +181,11 @@ const VulnFilterMenu = ({
               <MenuItemOption value={'all'} fontSize={'sm'}>
                 All
               </MenuItemOption>
-              {statuses.length > 0 &&
-                statuses.map((item, index) => (
-                  <MenuItemOption key={index} value={item} fontSize={'sm'}>
-                    {item}
-                  </MenuItemOption>
-                ))}
+              {vulnStatuses?.map((item, index) => (
+                <MenuItemOption key={index} value={item} fontSize={'sm'}>
+                  {item}
+                </MenuItemOption>
+              ))}
             </MenuOptionGroup>
           </MenuList>
         </Menu>

@@ -19,7 +19,8 @@ import {
   Icon,
   Stack,
   Code,
-  Select
+  Select,
+  Kbd
 } from '@chakra-ui/react'
 // Custom Icons
 import { ProfileIcon, SettingsIcon } from 'components/Icons/Icons'
@@ -145,9 +146,7 @@ export default function HeaderLinks(props) {
               <Flex gap={2} direction={'column'}>
                 {shortcuts.map((item, index) => (
                   <Stack key={index} direction={'row'} alignItems={'center'}>
-                    <Code bg={'#444'} color='white' px={1.5}>
-                      {item.key}
-                    </Code>
+                    <Kbd>{item.key}</Kbd>
                     <Text fontSize={'sm'}> - {item.title}</Text>
                   </Stack>
                 ))}

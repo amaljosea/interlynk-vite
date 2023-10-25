@@ -35,6 +35,12 @@ const ContextWrapper = (props) => {
     }
   ])
 
+  const [orgInfo, setOrgInfo] = useState({})
+  const [compFilters, setCompFilters] = useState({})
+  const [vulnFilters, setVulnFilters] = useState({})
+  const [checkFilters, setCheckFilters] = useState({})
+  const [logFilters, setLogFilters] = useState({})
+
   return (
     <GlobalContext.Provider
       value={{
@@ -57,7 +63,17 @@ const ContextWrapper = (props) => {
         changelogData,
         setChangelogData,
         automationRules,
-        setAutomationRules
+        setAutomationRules,
+        orgInfo,
+        setOrgInfo,
+        compFilters,
+        setCompFilters,
+        vulnFilters,
+        setVulnFilters,
+        checkFilters,
+        setCheckFilters,
+        logFilters,
+        setLogFilters
       }}
     >
       {props.children}

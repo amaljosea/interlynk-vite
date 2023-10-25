@@ -26,7 +26,17 @@ const GlobalContext = React.createContext({
   productVulData: [],
   setProductVulData: () => {},
   automationRules: [],
-  setAutomationRules: () => {}
+  setAutomationRules: () => {},
+  orgInfo: {},
+  setOrgInfo: () => {},
+  compFilters: {},
+  setCompFiltes: () => {},
+  vulnFilters: {},
+  setVulnFilters: () => {},
+  checkFilters: {},
+  setCheckFilters: () => {},
+  logFilters: {},
+  setLogFilters: () => {}
 })
 
 export default GlobalContext

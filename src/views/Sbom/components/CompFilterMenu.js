@@ -9,7 +9,8 @@ import {
   MenuOptionGroup,
   Stack
 } from '@chakra-ui/react'
-import { useState } from 'react'
+import GlobalContext from 'context/GlobalContext'
+import { useContext, useState } from 'react'
 import { FaFilter } from 'react-icons/fa'
 
 const CheckMark = () => {
@@ -31,16 +32,16 @@ const CheckMark = () => {
 }
 
 const CompFilterMenu = ({
-  ecosystems,
-  kinds,
-  suppliers,
-  licenses,
   refetch,
   productId,
   sbomId,
   setPageIndex,
   totalRows
 }) => {
+  const { compFilters } = useContext(GlobalContext)
+
+  const { ecosystems, kinds, suppliers, licenses } = compFilters
+
   const [selectedEcosystem, setSelectedEcosystem] = useState('')
   const [selectedKind, setSelectedKind] = useState('')
   const [selectedLicense, setSelectedLicense] = useState('')
@@ -154,7 +155,7 @@ const CompFilterMenu = ({
               <MenuItemOption value={'all'} fontSize={'sm'}>
                 All
               </MenuItemOption>
-              {ecosystems.map((item, index) => (
+              {ecosystems?.map((item, index) => (
                 <MenuItemOption key={index} value={item} fontSize={'sm'}>
                   {item}
                 </MenuItemOption>
@@ -185,7 +186,7 @@ const CompFilterMenu = ({
               <MenuItemOption value={'all'} fontSize={'sm'}>
                 All
               </MenuItemOption>
-              {kinds.map((item, index) => (
+              {kinds?.map((item, index) => (
                 <MenuItemOption key={index} value={item} fontSize={'sm'}>
                   {item}
                 </MenuItemOption>
@@ -216,7 +217,7 @@ const CompFilterMenu = ({
               <MenuItemOption value={'all'} fontSize={'sm'}>
                 All
               </MenuItemOption>
-              {licenses.map((item, index) => (
+              {licenses?.map((item, index) => (
                 <MenuItemOption key={index} value={item} fontSize={'sm'}>
                   {item}
                 </MenuItemOption>
@@ -249,7 +250,7 @@ const CompFilterMenu = ({
               <MenuItemOption value={'all'} fontSize={'sm'}>
                 All
               </MenuItemOption>
-              {suppliers.map((item, index) => (
+              {suppliers?.map((item, index) => (
                 <MenuItemOption key={index} value={item} fontSize={'sm'}>
                   {item}
                 </MenuItemOption>

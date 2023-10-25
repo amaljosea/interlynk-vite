@@ -67,11 +67,8 @@ export default function Pages(props) {
         }
       })
       .then((response) => {
-        // console.log('response', response)
         const { status } = response.data
         if (status.code === 200) {
-          setEmail('')
-          setPassword('')
           console.log('status', status)
           localStorage.setItem('username', status.data.user.name)
           localStorage.setItem('email', status.data.user.email)

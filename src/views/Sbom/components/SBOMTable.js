@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 // CHAKRA IMPORTS
 import {
   Tabs,
@@ -21,34 +21,41 @@ import HealthCheckTable from 'components/Tables/HealthCheckTable'
 import SbomChangelogTable from 'components/Tables/SbomChangelogTable'
 
 // API QUERIES
-import { useQuery } from '@apollo/client'
+import { useLazyQuery, useQuery } from '@apollo/client'
 import {
   GetCheckResults,
   GetComponentData,
   GetVulnData,
-  GetChangeLogs
+  GetChangeLogs,
+  GetCompFilterData,
+  GetVulnFilterData,
+  GetCheckFilterData,
+  GetLogsFilterData
 } from 'graphQL/Queries'
+import { useLocation } from 'react-router-dom'
+import GlobalContext from 'context/GlobalContext'
 
 const SBOMTable = ({
   status,
-  productId,
-  sbomId,
   type,
   data,
   refetch,
-  lifecycle,
   filteredData,
   setComponents,
-  compFilters,
-  compFilterRefetch,
-  vulnFilters,
-  vulnFilterRefetch,
-  checkFilters,
-  checkFilterRefetch,
-  logsFilters,
   setTotalComp
 }) => {
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+
+  const productId = queryParams.get('p')
+  const sbomId = queryParams.get('sbom')
+
+  const { setCompFilters, setVulnFilters, setCheckFilters, setLogFilters } =
+    useContext(GlobalContext)
+
   const tab = window.localStorage.getItem('activeProdTab')
+
+  const { lifecycle } = data
 
   const [tabIndex, setTabIndex] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
@@ -119,64 +126,78 @@ const SBOMTable = ({
     }
   })
 
+  // GET COMPONENT FILTER HEADS
+  const [getCompFilters, { refetch: compFilterRefetch }] =
+    useLazyQuery(GetCompFilterData)
+
+  // GET VULN FILTER HEADS
+  const [getVulnFilters, { refetch: vulnFilterRefetch }] =
+    useLazyQuery(GetVulnFilterData)
+
+  // GET HEALTH CHECK FILTER HEADS
+  const [getCheckFilters, { refetch: checkFilterRefetch }] =
+    useLazyQuery(GetCheckFilterData)
+
+  // GET LOGS FILTER HEADS
+  const [getLogsFilters] = useLazyQuery(GetLogsFilterData)
+
   // ON TAB CHANGE
   const onTabChange = (value) => {
     setTabIndex(value)
-    window.localStorage.setItem('activeProdTab', value)
-
-    if (value === 4) {
-      logsRefetch({
-        projectId: productId,
-        sbomId: sbomId,
-        first: totalRows,
-        field: 'CREATED_AT',
-        direction: 'DESC'
-      }).then((res) => res.data && setChangelogIndex(1))
-    }
-
-    // if (value === 0) {
-    //   refetch({
-    //     projectId: productId,
-    //     sbomId: sbomId
-    //   })
-    // } else if (value === 1) {
-    //   compRefetch({
-    //     projectId: productId,
-    //     sbomId: sbomId,
-    //     first: totalRows,
-    //     field: 'UPDATED_AT',
-    //     direction: 'DESC'
-    //   }).then((res) => {
-    //     if (res.data) {
-    //       setComponentIndex(1)
-    //     }
-    //   })
-    // } else if (value === 2) {
-    //   vulnRefetch({
-    //     projectId: productId,
-    //     sbomId: sbomId,
-    //     first: totalRows,
-    //     field: 'UPDATED_AT',
-    //     direction: 'ASC'
-    //   }).then((res) => res.data && setVulnIndex(1))
-    // } else if (value === 3) {
-    //   healthRefetch({
-    //     projectId: productId,
-    //     sbomId: sbomId,
-    //     first: totalRows,
-    //     field: 'STATUS',
-    //     direction: 'DESC'
-    //   }).then((res) => res.data && setResultIndex(1))
-    // } else if (value === 4) {
-    //   logsRefetch({
-    //     projectId: productId,
-    //     sbomId: sbomId,
-    //     first: totalRows,
-    //     field: 'CREATED_AT',
-    //     direction: 'DESC'
-    //   }).then((res) => res.data && setChangelogIndex(1))
-    // }
   }
+
+  useEffect(() => {
+    if (tabIndex === 0) {
+      refetch({
+        projectId: productId,
+        sbomId: sbomId
+      })
+    } else if (tabIndex === 1) {
+      getCompFilters({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId
+        }
+      }).then((res) => {
+        if (res.data) {
+          setCompFilters(res.data.sbom.filters)
+        }
+      })
+    } else if (tabIndex === 2) {
+      getVulnFilters({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId
+        }
+      }).then((res) => {
+        if (res.data) {
+          setVulnFilters(res.data.sbom.filters)
+        }
+      })
+    } else if (tabIndex === 3) {
+      getCheckFilters({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId
+        }
+      }).then((res) => {
+        if (res.data) {
+          setCheckFilters(res.data.sbom.filters)
+        }
+      })
+    } else if (tabIndex === 4) {
+      getLogsFilters({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId
+        }
+      }).then((res) => {
+        if (res.data) {
+          setLogFilters(res.data.sbom.filters)
+        }
+      })
+    }
+  }, [tabIndex])
 
   // EXTRACT ALL THE COMPONENT NAME AND ID'S FROM SELECTED SBOM VERSION
   const components =
@@ -188,46 +209,14 @@ const SBOMTable = ({
       }
     })
 
-  // useEffect(() => {
-  //   if (tabIndex === 1) {
-  //     getCompFilters({
-  //       variables: {
-  //         projectId: productId,
-  //         sbomId: sbomId
-  //       }
-  //     })
-  //   } else if (tabIndex === 2) {
-  //     getVulnFilters({
-  //       variables: {
-  //         projectId: productId,
-  //         sbomId: sbomId
-  //       }
-  //     })
-  //   } else if (tabIndex === 3) {
-  //     getCheckFilters({
-  //       variables: {
-  //         projectId: productId,
-  //         sbomId: sbomId
-  //       }
-  //     })
-  //   } else {
-  //     getLogsFilters({
-  //       variables: {
-  //         projectId: productId,
-  //         sbomId: sbomId
-  //       }
-  //     })
-  //   }
-  // }, [tabIndex])
+  useEffect(() => {
+    console.log(tabIndex)
+  }, [tabIndex])
 
   return (
     <>
       <Card>
-        <Tabs
-          variant='enclosed'
-          defaultIndex={tabIndex}
-          onChange={(e) => onTabChange(e)}
-        >
+        <Tabs variant='enclosed'>
           {/* TAB LIST */}
           <TabList mt='20px'>
             {[
@@ -237,7 +226,11 @@ const SBOMTable = ({
               'Checks',
               'Change Log'
             ].map((item, index) => (
-              <Tab key={index} _focus={{ outline: 'none' }}>
+              <Tab
+                key={index}
+                _focus={{ outline: 'none' }}
+                onClick={() => setTabIndex(index)}
+              >
                 {item}
               </Tab>
             ))}
@@ -265,14 +258,13 @@ const SBOMTable = ({
             </TabPanel>
             {/* COMPONENT TABLE */}
             <TabPanel px={0}>
-              {compData && data && compFilters && (
+              {compData && data && (
                 <ComponentTable
                   type={type}
                   lifecycle={lifecycle}
                   data={compData.sbom.components}
                   error={error}
                   refetch={compRefetch}
-                  filterHeads={compFilters}
                   filterRefetch={compFilterRefetch}
                   pageIndex={componentIndex}
                   setPageIndex={setComponentIndex}
@@ -320,14 +312,13 @@ const SBOMTable = ({
             </TabPanel>
             {/* VUNERABILITIES TABLE */}
             <TabPanel px={0}>
-              {vulnData && vulnFilters ? (
+              {vulnData ? (
                 <VulnTable
                   data={vulnData.sbom.vulns}
                   filteredData={filteredData}
                   refetch={vulnRefetch}
                   productId={productId}
                   sbomId={sbomId}
-                  filterHeads={vulnFilters}
                   filterRefetch={vulnFilterRefetch}
                   pageIndex={vulnIndex}
                   setPageIndex={setVulnIndex}
@@ -346,13 +337,12 @@ const SBOMTable = ({
             </TabPanel>
             {/* HEALTH CHECK TABLE */}
             <TabPanel px={0}>
-              {checkData && isLoading === false && checkFilters ? (
+              {checkData && isLoading === false ? (
                 <HealthCheckTable
                   productId={productId}
                   sbomId={sbomId}
                   data={checkData.sbom.checkResults}
                   refetch={healthRefetch}
-                  filterHeads={checkFilters}
                   filterRefetch={checkFilterRefetch}
                   components={components}
                   pageIndex={resultIndex}
@@ -373,12 +363,11 @@ const SBOMTable = ({
             </TabPanel>
             {/* CHANGELOG TABLE */}
             <TabPanel px={0}>
-              {logsData && logsFilters ? (
+              {logsData ? (
                 <SbomChangelogTable
                   data={logsData.sbom.activityLogs}
                   refetch={logsRefetch}
                   pageIndex={changelogIndex}
-                  filterHeads={logsFilters}
                   setPageIndex={setChangelogIndex}
                   totalRows={totalRows}
                   setTotalRows={setTotalRows}

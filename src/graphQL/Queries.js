@@ -465,6 +465,7 @@ export const GetProductData = gql`
         compLicenseCount
         compCpeCount
         compPurlCount
+        vulnStats
       }
       project {
         id
@@ -786,7 +787,6 @@ export const GetCheckFilterData = gql`
     sbom(projectId: $projectId, sbomId: $sbomId) {
       id
       filters {
-        checkCompNames
         checkCategories
         checkSeverities
         checkStatuses
