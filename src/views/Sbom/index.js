@@ -326,8 +326,7 @@ function SBOM() {
                             label={getFullDateAndTime(sbomData.sbom.updatedAt)}
                           >
                             <Text fontSize='xs' cursor={'pointer'}>
-                              Updated {' '}
-                              {timeSince(sbomData.sbom.updatedAt)}
+                              Updated {timeSince(sbomData.sbom.updatedAt)}
                             </Text>
                           </Tooltip>
 
@@ -357,12 +356,7 @@ function SBOM() {
                               alignItems={'flex-start'}
                               spacing={2}
                             >
-                              <Icon
-                                h={4}
-                                w={4}
-                                color='#777'
-                                as={FaCube}
-                              />
+                              <Icon h={4} w={4} color='#777' as={FaCube} />
                               <Box>
                                 <Badge
                                   mr={1}
@@ -408,8 +402,7 @@ function SBOM() {
                               <Icon h={4} w={4} color='#777' as={FaBug} />
                               <Box>
                                 <Stack fontWeight={'medium'} direction={'row'}>
-                                <Badge
-                                    mr={1}
+                                  <Badge
                                     fontSize={'xl'}
                                     fontWeight={'medium'}
                                     variant='subtle'
@@ -421,7 +414,6 @@ function SBOM() {
                                       : 0}
                                   </Badge>
                                   <Badge
-                                    mr={1}
                                     fontSize={'xl'}
                                     fontWeight={'medium'}
                                     variant='subtle'
@@ -433,7 +425,6 @@ function SBOM() {
                                       : 0}
                                   </Badge>
                                   <Badge
-                                    mr={1}
                                     fontSize={'xl'}
                                     fontWeight={'medium'}
                                     variant='subtle'
@@ -445,7 +436,6 @@ function SBOM() {
                                       : 0}
                                   </Badge>
                                   <Badge
-                                    mr={1}
                                     fontSize={'xl'}
                                     fontWeight={'medium'}
                                     variant='subtle'
@@ -461,7 +451,7 @@ function SBOM() {
                               </Box>
                             </Stack>
                             {/* PURL */}
-{/*                             <Stack
+                            {/*                             <Stack
                               direction={'row'}
                               alignItems={'flex-start'}
                               spacing={2}
@@ -484,7 +474,7 @@ function SBOM() {
                               </Box>
                             </Stack> */}
                             {/* CPE */}
-{/*                             <Stack
+                            {/*                             <Stack
                               direction={'row'}
                               alignItems={'flex-start'}
                               spacing={2}
