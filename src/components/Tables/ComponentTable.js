@@ -152,14 +152,14 @@ const ComponentTable = ({
       name: 'NAME',
       selector: (row) => {
         const { purl, name, primary, internal, externalUrls } = row
-        const website = externalUrls.find((item) => item.name === 'website')
-        const distribution = externalUrls.find(
+        const website = externalUrls?.find((item) => item.name === 'website')
+        const distribution = externalUrls?.find(
           (item) => item.name === 'distribution'
         )
-        const issueTracker = externalUrls.find(
+        const issueTracker = externalUrls?.find(
           (item) => item.name === 'issue-tracker'
         )
-        const vcs = externalUrls.find((item) => item.name === 'vcs')
+        const vcs = externalUrls?.find((item) => item.name === 'vcs')
         return (
           <Stack
             width={'100%'}
