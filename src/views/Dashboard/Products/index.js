@@ -86,7 +86,7 @@ function Index() {
     try {
       setIsLoading(true)
       await refetch({
-        first: 10
+        first: totalRows
       }).then(() => {
         setTimeout(() => {
           setIsLoading(false)
