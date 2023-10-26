@@ -435,8 +435,15 @@ export const CreateProject = gql`
 `
 
 export const UpdateProject = gql`
-  mutation UpdateProject($id: Uuid!, $name: String, $desc: String) {
-    projectUpdate(input: { id: $id, name: $name, description: $desc }) {
+  mutation UpdateProject(
+    $id: Uuid!
+    $name: String
+    $desc: String
+    $enabled: Boolean
+  ) {
+    projectUpdate(
+      input: { id: $id, name: $name, description: $desc, enabled: $enabled }
+    ) {
       errors
     }
   }

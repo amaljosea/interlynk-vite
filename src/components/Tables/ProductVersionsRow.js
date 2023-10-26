@@ -3,7 +3,6 @@ import {
   Td,
   Text,
   Tr,
-  useColorModeValue,
   Switch,
   Menu,
   MenuItem,
@@ -26,7 +25,7 @@ import {
   Divider,
   Tooltip
 } from '@chakra-ui/react'
-import { useState, useRef, useContext, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Link, useHistory } from 'react-router-dom'
 import { FaEllipsisV } from 'react-icons/fa'
 import ProductModal from 'views/Dashboard/Products/components/ProductModal'
@@ -35,18 +34,17 @@ import { useMutation } from '@apollo/client'
 import { DeleteProject } from 'graphQL/Mutation'
 import { timeSince } from 'utils'
 import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
-import GlobalContext from 'context/GlobalContext'
 import { getFullDateAndTime } from 'utils'
+import { UpdateProject } from 'graphQL/Mutation'
 
 function ProductVersionsRow(props) {
   const history = useHistory()
-  const { setActiveProduct } = useContext(GlobalContext)
-  const [projectDelete] = useMutation(DeleteProject)
 
   const {
     id,
     sbomId,
     name,
+    enabled,
     description,
     updatedAt,
     allProjects,
@@ -83,20 +81,30 @@ function ProductVersionsRow(props) {
   const btnRefProduct = useRef()
   const sbomBtn = useRef()
 
+  useEffect(() => {
+    setIsActive(enabled)
+  }, [enabled])
+
+  const handleRefetch = () => {
+    refetch({
+      first: totalRows
+    })
+  }
+
+  const [projectDelete] = useMutation(DeleteProject, {
+    onCompleted: () => handleRefetch()
+  })
+  const [projectUpdate] = useMutation(UpdateProject, {
+    onCompleted: () => handleRefetch()
+  })
+
   const onProductDelete = async () => {
     try {
       await projectDelete({
         variables: {
           id
         }
-      }).then((res) => {
-        if (res) {
-          refetch({
-            first: totalRows
-          })
-          onDeleteClose()
-        }
-      })
+      }).then((res) => res.data && onDeleteClose())
     } catch (error) {
       console.error('Mutation error:', error)
     }
@@ -136,6 +144,19 @@ function ProductVersionsRow(props) {
 
   const handleChange = () => {
     onWarningOpen()
+  }
+
+  const toggleStatus = async () => {
+    try {
+      await projectUpdate({
+        variables: {
+          id: id,
+          enabled: isActive === true ? false : true
+        }
+      }).then((res) => res.data && onWarningClose())
+    } catch (error) {
+      console.error('Mutation error:', error)
+    }
   }
 
   // useEffect(() => {
@@ -297,7 +318,7 @@ function ProductVersionsRow(props) {
                         'remove access to the product for all users',
                         'disable uploads of SBOMs to this product'
                       ].map((item, index) => (
-                        <ListItem>{item}</ListItem>
+                        <ListItem key={index}>{item}</ListItem>
                       ))}
                     </Flex>
                   </UnorderedList>
@@ -342,7 +363,7 @@ function ProductVersionsRow(props) {
                           isActive ? 'Disable' : 'Enable'
                         } uploads of SBOMs to this product`
                       ].map((item, index) => (
-                        <ListItem>{item}</ListItem>
+                        <ListItem key={index}>{item}</ListItem>
                       ))}
                     </Flex>
                   </UnorderedList>
@@ -355,10 +376,7 @@ function ProductVersionsRow(props) {
                   </Button>
                   <Button
                     colorScheme={isActive ? 'red' : 'green'}
-                    onClick={() => {
-                      setIsActive(!isActive)
-                      onWarningClose()
-                    }}
+                    onClick={toggleStatus}
                   >
                     Yes
                   </Button>

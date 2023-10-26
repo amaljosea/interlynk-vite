@@ -419,6 +419,7 @@ export const GetProjectData = gql`
         description
         updatedAt
         organizationId
+        enabled
         sboms {
           id
           format
