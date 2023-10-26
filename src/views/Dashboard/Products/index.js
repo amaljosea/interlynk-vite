@@ -49,7 +49,7 @@ function Index() {
 
   const { data, refetch, error, loading } = useQuery(GetProjectData, {
     variables: {
-      first: 10
+      first: totalRows
     }
   })
 
@@ -60,20 +60,22 @@ function Index() {
   const handlePreviousPage = () => {
     setPageIndex((prev) => pageIndex !== 0 && prev - 1)
     refetch({
-      last: 10,
+      last: totalRows,
       before: data.projects.pageInfo.startCursor,
-      after: undefined,
-      first: undefined
+      first: undefined,
+      after: undefined
     })
   }
 
   const handleNextPage = () => {
-    setPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
+    setPageIndex(
+      (prev) => prev < Math.ceil(data.projects.totalCount) && prev + 1
+    )
     refetch({
-      first: 10,
+      first: totalRows,
       after: data.projects.pageInfo.endCursor,
-      before: undefined,
-      last: undefined
+      last: undefined,
+      before: undefined
     })
   }
 
@@ -218,6 +220,7 @@ function Index() {
           <ProductModal
             isOpen={isOpenProduct}
             refetch={refetch}
+            totalRows={totalRows}
             onClose={onCloseProduct}
             id={null}
             product={null}
