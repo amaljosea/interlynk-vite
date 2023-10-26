@@ -1,12 +1,9 @@
 name: Build and Push SBOM to Interlynk
 
 on:
-  push:
-    branches:
-      - main # Adjust to your main branch name
-  pull_request:
-    branches:
-      - main # Adjust to your main branch name
+  release:
+    types:
+      - created
 
 jobs:
   build-sbom:
@@ -23,7 +20,7 @@ jobs:
       - name: Download syft binary
         run: curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
       - name: Run syft
-        run: echo "${{ vars.INTERLYNK_PRODUCT_ID }}"
+        run: syft version
       - name: Get Tag
         id: get_tag
         run: echo "tag=$(git describe --tags HEAD)" > $GITHUB_ENV
