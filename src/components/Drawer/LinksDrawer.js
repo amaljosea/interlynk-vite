@@ -19,7 +19,6 @@ import {
   Table,
   Icon,
   Select,
-  useToast,
   FormLabel,
   Input,
   FormErrorMessage
@@ -60,8 +59,6 @@ const LinksDrawer = ({
   const urlPattern = new RegExp(
     '(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w .-]*/?'
   )
-
-  const toast = useToast()
 
   console.log('linksData', linksData)
 
@@ -175,7 +172,9 @@ const LinksDrawer = ({
                     <Table variant='simple' size='sm' mt={4}>
                       <Thead>
                         <Tr my='.8rem'>
-                          <Th pl={0}>Link</Th>
+                          <Th pl={0} width={'300px'}>
+                            Link
+                          </Th>
                           <Th pl={0}>Type</Th>
                           <Th pl={0}></Th>
                         </Tr>
@@ -183,7 +182,12 @@ const LinksDrawer = ({
                       <Tbody>
                         {linksData.map((item, index) => (
                           <Tr key={index}>
-                            <Td pl={0} fontSize={'xs'}>
+                            <Td
+                              pl={0}
+                              fontSize={'xs'}
+                              width={'300px'}
+                              wordBreak={'break-all'}
+                            >
                               {item.url}
                             </Td>
                             <Td pl={0} fontSize={'xs'}>
