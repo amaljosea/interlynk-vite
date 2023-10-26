@@ -69,6 +69,7 @@ const ProductVersions = ({
                     id={pv.id}
                     sbomId={pv.sboms}
                     name={pv.name}
+                    enabled={pv.enabled}
                     description={pv.description}
                     updatedAt={pv.updatedAt}
                     allProjects={allProjects}
@@ -107,7 +108,7 @@ const ProductVersions = ({
               Next
             </Button>
             <Box>
-              Page {pageIndex} of {' '}
+              Page {pageIndex} of{' '}
               {allProjects.projects.totalCount === 0
                 ? 1
                 : Math.ceil(allProjects.projects.totalCount / totalRows)}
