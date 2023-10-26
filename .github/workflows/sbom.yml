@@ -23,7 +23,7 @@ jobs:
       - name: Download syft binary
         run: curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
       - name: Run syft
-        run: syft version
+        run: echo "${{ env.INTERLYNK_PRODUCT_ID }}"
       - name: Get Tag
         id: get_tag
         run: echo "tag=$(git describe --tags HEAD)" > $GITHUB_ENV
