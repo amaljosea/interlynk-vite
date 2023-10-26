@@ -49,13 +49,16 @@ function Index() {
 
   const { data, refetch, error, loading } = useQuery(GetProjectData, {
     variables: {
-      first: totalRows
+      first: totalRows,
+      last: undefined,
+      after: undefined,
+      before: undefined
     }
   })
 
-  // useEffect(() => {
-  //   if (data) console.log(`Products`, data)
-  // }, [data])
+  useEffect(() => {
+    if (data) setPageIndex(1)
+  }, [data])
 
   const handlePreviousPage = () => {
     setPageIndex((prev) => pageIndex !== 0 && prev - 1)
