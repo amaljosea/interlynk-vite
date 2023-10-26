@@ -41,7 +41,7 @@ const VulnFilterMenu = ({
 }) => {
   const { vulnFilters } = useContext(GlobalContext)
 
-  const { vulnCompNames, vulnSeverities, vulnStatuses } = vulnFilters
+  const { vulnCompNames, vulnStatuses } = vulnFilters
 
   const [selectCompName, setSelectCompName] = useState('')
   const [selectSeverity, setSelectSeverity] = useState('')
