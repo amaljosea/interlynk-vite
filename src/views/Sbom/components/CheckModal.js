@@ -42,6 +42,8 @@ const CheckModal = ({
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
+  console.log('components', components)
+
   const now = new Date()
   const hours = String(now.getHours()).padStart(2, '0')
   const minutes = String(now.getMinutes()).padStart(2, '0')
@@ -73,7 +75,7 @@ const CheckModal = ({
       })
     }
   })
-  
+
   const [updateComponent] = useMutation(UpdateComponent)
 
   const handleComUpdate = async () => {
@@ -97,7 +99,7 @@ const CheckModal = ({
             sbomId: sbomId
           })
         })
-        .finally(() => onClose())
+        .finally(() => window.location.reload())
     } catch (error) {
       console.log('Mutation error', error)
     }
@@ -109,7 +111,7 @@ const CheckModal = ({
     if (value === '') {
       setComponentData([])
     } else if (components && components.length > 0) {
-      setComponentData(components.filter((str) => str.name.startsWith(value)))
+      setComponentData(components.filter((str) => str.value.startsWith(value)))
     }
   }
 
@@ -189,20 +191,20 @@ const CheckModal = ({
                   >
                     <List>
                       {componentData
-                        .filter((item) => item.name.includes(comp))
+                        .filter((item) => item.value.includes(comp))
                         .map((item, index) => (
                           <ListItem
                             key={index}
                             cursor='pointer'
                             onClick={() => {
                               setCompId(item.id)
-                              setComp(item.name)
+                              setComp(item.value)
                               setComponentData([])
                             }}
                             p='2'
                             _hover={{ background: 'gray.100' }}
                           >
-                            <Text>{item.name}</Text>
+                            <Text>{item.value}</Text>
                           </ListItem>
                         ))}
                     </List>
