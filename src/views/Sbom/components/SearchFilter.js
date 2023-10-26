@@ -59,7 +59,7 @@ const SearchFilter = ({ filterText, setFilterText, onFilter, onClear }) => {
             p={1}
             rounded={'full'}
             position={'absolute'}
-            zIndex={9999}
+            zIndex={11}
             right={3}
             top={'11px'}
             onClick={onClear}

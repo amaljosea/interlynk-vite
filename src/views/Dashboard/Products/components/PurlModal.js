@@ -25,6 +25,8 @@ import { PackageURL } from 'packageurl-js'
 import { useLocation } from 'react-router-dom'
 import { UpdateComponent, recheckHealth } from 'graphQL/Mutation'
 import { useMutation } from '@apollo/client'
+import GlobalContext from 'context/GlobalContext'
+import { useContext } from 'react'
 
 const typeOptions = [
   { value: '', label: '-- Select --' },
@@ -122,6 +124,8 @@ const PurlModal = ({
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
+  const { checkField, checkDirection } = useContext(GlobalContext)
+
   const [purlType, setPurlType] = useState('')
   const [namespace, setNamespace] = useState('')
   const [purlName, setPurlName] = useState('')
@@ -145,8 +149,8 @@ const PurlModal = ({
         category: undefined,
         severity: undefined,
         status: undefined,
-        field: 'UPDATED_AT',
-        direction: 'DESC'
+        field: checkField,
+        direction: checkDirection
       })
     }
   })

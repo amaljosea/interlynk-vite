@@ -11,6 +11,7 @@ import {
   Skeleton,
   Badge
 } from '@chakra-ui/react'
+import CustomLoader from 'components/CustomLoader'
 import GlobalContext from 'context/GlobalContext'
 import React, { useMemo, useState, useContext } from 'react'
 import DataTable from 'react-data-table-component'
@@ -60,15 +61,14 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
 
-  const { logFilters } = useContext(GlobalContext)
+  const { logFilters, logField, setLogField, logDirection, setLogDirection } =
+    useContext(GlobalContext)
 
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
   const [filterText, setFilterText] = useState('')
   const [pageIndex, setPageIndex] = useState(1)
-  const [sortField, setSortField] = useState('CREATED_AT')
-  const [direction, setDirection] = useState('DESC')
 
   // COLUMNS
   const columns = [
@@ -135,30 +135,34 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
 
         return (
           <Flex flexWrap={'wrap'} gap={2} my={2}>
-          <Tooltip placement='top' label={license.length === 0 ? '' : orig} textTransform={'capitalize'}>
-          <Text>
-            {orig === 'f'
-              ? 'False'
-              : orig === 't'
-              ? 'True'
-              : license.length > 0
-              ? license.map((item, index) => (
-                  <Tag
-                    size={'sm'}
-                    key={index}
-                    variant='subtle'
-                    colorScheme='red'
-                    width={'fit-content'}
-                    textTransform={'capitalize'}
-                  >
-                    <TagLabel pt={1}>{item}</TagLabel>
-                  </Tag>
-                ))
-              : license.length === 0
-              ? ''
-              : orig}
-          </Text>
-          </Tooltip>
+            <Tooltip
+              placement='top'
+              label={license.length === 0 ? '' : orig}
+              textTransform={'capitalize'}
+            >
+              <Text>
+                {orig === 'f'
+                  ? 'False'
+                  : orig === 't'
+                  ? 'True'
+                  : license.length > 0
+                  ? license.map((item, index) => (
+                      <Tag
+                        size={'sm'}
+                        key={index}
+                        variant='subtle'
+                        colorScheme='red'
+                        width={'fit-content'}
+                        textTransform={'capitalize'}
+                      >
+                        <TagLabel pt={1}>{item}</TagLabel>
+                      </Tag>
+                    ))
+                  : license.length === 0
+                  ? ''
+                  : orig}
+              </Text>
+            </Tooltip>
           </Flex>
         )
       },
@@ -175,30 +179,34 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
 
         return (
           <Flex flexWrap={'wrap'} gap={2} my={2}>
-          <Tooltip placement='top' label={updatedValue.length === 0 ? '' : updated} textTransform={'capitalize'}>
-          <Text textOverflow={'wrap'}>
-            {updated === 'f'
-              ? 'False'
-              : updated === 't'
-              ? 'True'
-              : updatedValue.length > 0
-              ? updatedValue.map((item, index) => (
-                  <Tag
-                    size={'sm'}
-                    key={index}
-                    variant='subtle'
-                    colorScheme='green'
-                    width={'fit-content'}
-                    textTransform={'capitalize'}
-                  >
-                    <TagLabel pt={1}>{item}</TagLabel>
-                  </Tag>
-                ))
-              : updatedValue.length === 0
-              ? ''
-              : updated}
-          </Text>
-          </Tooltip>
+            <Tooltip
+              placement='top'
+              label={updatedValue.length === 0 ? '' : updated}
+              textTransform={'capitalize'}
+            >
+              <Text textOverflow={'wrap'}>
+                {updated === 'f'
+                  ? 'False'
+                  : updated === 't'
+                  ? 'True'
+                  : updatedValue.length > 0
+                  ? updatedValue.map((item, index) => (
+                      <Tag
+                        size={'sm'}
+                        key={index}
+                        variant='subtle'
+                        colorScheme='green'
+                        width={'fit-content'}
+                        textTransform={'capitalize'}
+                      >
+                        <TagLabel pt={1}>{item}</TagLabel>
+                      </Tag>
+                    ))
+                  : updatedValue.length === 0
+                  ? ''
+                  : updated}
+              </Text>
+            </Tooltip>
           </Flex>
         )
       },
@@ -240,8 +248,8 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
       sbomId: sbomId,
       last: totalRows,
       before: data.pageInfo.startCursor,
-      field: sortField,
-      direction: direction
+      field: logField,
+      direction: logDirection
     }).then(() => {
       setTimeout(() => {
         setLoading(false)
@@ -257,8 +265,8 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
       sbomId: sbomId,
       first: totalRows,
       after: data.pageInfo.endCursor,
-      field: sortField,
-      direction: direction
+      field: logField,
+      direction: logDirection
     }).then(() => {
       setTimeout(() => {
         setLoading(false)
@@ -273,12 +281,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
         projectId: productId,
         sbomId: sbomId,
         search: filterText,
-        first: totalRows,
-        last: undefined,
-        after: undefined,
-        last: undefined,
-        field: sortField,
-        direction: 'DESC'
+        first: totalRows
       })
       setPageIndex(1)
     }
@@ -289,13 +292,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
     await refetch({
       projectId: productId,
       sbomId: sbomId,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      last: undefined,
-      search: undefined,
-      field: sortField,
-      direction: 'DESC'
+      first: totalRows
     })
     setFilterText('')
     setPageIndex(1)
@@ -308,12 +305,8 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
       projectId: productId,
       sbomId: sbomId,
       first: Number(e.target.value),
-      last: undefined,
-      after: undefined,
-      last: undefined,
-      search: undefined,
-      field: sortField,
-      direction: 'DESC'
+      field: logField,
+      direction: logDirection
     })
     setFilterText('')
     setPageIndex(1)
@@ -322,8 +315,8 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
   const handleSort = (column, sortDirection) => {
     // console.log(`column`, column)
     // console.log(`sortDirection`, sortDirection)
-    setSortField(column.id)
-    setDirection(sortDirection === 'asc' ? 'ASC' : 'DESC')
+    setLogField(column.id)
+    setLogDirection(sortDirection === 'asc' ? 'ASC' : 'DESC')
     refetch({
       projectId: productId,
       sbomId: sbomId,
@@ -373,29 +366,22 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
 
   return (
     <>
-      {loading ? (
-        <Flex width={'100%'} gap={4} direction={'column'}>
-          <Skeleton width={'100%'} height='20px' />
-          <Skeleton width={'100%'} height='20px' />
-          <Skeleton width={'100%'} height='20px' />
-          <Skeleton width={'100%'} height='20px' />
-          <Skeleton width={'100%'} height='20px' />
-        </Flex>
-      ) : (
-        <Flex flexDir={'column'} width={'100%'}>
-          <DataTable
-            columns={columns}
-            data={data.nodes}
-            onSort={handleSort}
-            defaultSortAsc={false}
-            defaultSortFieldId={'CREATED_AT'}
-            customStyles={customStyles}
-            subHeader
-            subHeaderComponent={subHeaderComponentMemo}
-            responsive={true}
-          />
-        </Flex>
-      )}
+      <Flex flexDir={'column'} width={'100%'}>
+        <DataTable
+          columns={columns}
+          data={data.nodes}
+          onSort={handleSort}
+          defaultSortAsc={false}
+          defaultSortFieldId={logField}
+          customStyles={customStyles}
+          progressPending={loading}
+          progressComponent={<CustomLoader />}
+          subHeader
+          persistTableHead
+          subHeaderComponent={subHeaderComponentMemo}
+          responsive={true}
+        />
+      </Flex>
 
       {/* PAGINATION */}
       {!loading && (

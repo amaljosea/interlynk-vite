@@ -19,8 +19,10 @@ import {
   Textarea,
   calc
 } from '@chakra-ui/react'
+import GlobalContext from 'context/GlobalContext'
 import { UpdateComponent } from 'graphQL/Mutation'
 import { recheckHealth } from 'graphQL/Mutation'
+import { useContext } from 'react'
 import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 
@@ -42,6 +44,8 @@ const CpeModal = ({
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
+
+  const { checkField, checkDirection } = useContext(GlobalContext)
 
   const [vendor, setVendor] = useState('')
   const [product, setProduct] = useState('')
@@ -65,8 +69,8 @@ const CpeModal = ({
         category: undefined,
         severity: undefined,
         status: undefined,
-        field: 'UPDATED_AT',
-        direction: 'DESC'
+        field: checkField,
+        direction: checkDirection
       })
     }
   })

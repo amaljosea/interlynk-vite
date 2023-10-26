@@ -43,6 +43,8 @@ import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import { FaExpandAlt } from 'react-icons/fa'
 import { CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import { recheckHealth } from 'graphQL/Mutation'
+import { useContext } from 'react'
+import GlobalContext from 'context/GlobalContext'
 
 const regexPattern =
   /^cpe:2\.3:[aho]:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+$/
@@ -54,6 +56,9 @@ function ProductSbomDrawer(props) {
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
+  const { checkField, checkDirection, setCheckFilters } =
+    useContext(GlobalContext)
+
   const {
     name,
     isOpen,
@@ -63,15 +68,32 @@ function ProductSbomDrawer(props) {
     sbomData,
     type,
     checkId,
-    totalRows
+    totalRows,
+    filterRefetch
   } = props
 
-  const [createSbom] = useMutation(sbomCreate)
-  const [updateSbom] = useMutation(sbomUpdate)
+  const handleRefetch = () => {
+    refetch({
+      projectId: productId,
+      sbomId: sbomId
+    })
+  }
+
+  const onFilterRefetch = () => {
+    filterRefetch({
+      projectId: productId,
+      sbomId: sbomId
+    }).then((res) => setCheckFilters(res.data.sbom.filters))
+  }
+
+  const [createSbom] = useMutation(sbomCreate, {
+    onCompleted: () => handleRefetch()
+  })
+  const [updateSbom] = useMutation(sbomUpdate, {
+    onCompleted: () => handleRefetch()
+  })
 
   const [createComponent] = useMutation(CreateComponent)
-
-  // console.log(`sbom Data`, sbomData)
 
   const [version, setVersion] = useState('')
   const [spec, setSpec] = useState('')
@@ -105,8 +127,8 @@ function ProductSbomDrawer(props) {
         category: undefined,
         severity: undefined,
         status: undefined,
-        field: 'UPDATED_AT',
-        direction: 'DESC'
+        field: checkField,
+        direction: checkDirection
       })
     }
   })
@@ -338,22 +360,17 @@ function ProductSbomDrawer(props) {
           licenses: sbomData.licenses.length === 0 ? ['CC0-1.0'] : imgIds
         }
       })
-        .then(() => {
+        .then((res) => {
+          if (res.data) {
+            onFilterRefetch()
+          }
+
           if (checkId) {
             healthRecheck({
               variables: {
-                checkId: checkId ? checkId : undefined,
+                checkId: checkId,
                 sbomId: sbomId
               }
-            })
-            filterRefetch({
-              projectId: productId,
-              sbomId: sbomId
-            })
-          } else {
-            refetch({
-              projectId: productId,
-              sbomId: sbomId
             })
           }
         })

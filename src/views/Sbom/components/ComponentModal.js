@@ -11,19 +11,30 @@ import {
   Text,
   Stack
 } from '@chakra-ui/react'
+import GlobalContext from 'context/GlobalContext'
 import { DeleteComponent } from 'graphQL/Mutation'
+import { useContext } from 'react'
 import { useLocation } from 'react-router-dom'
 
-const ComponentModal = ({ isOpen, onClose, id, refetch }) => {
+const ComponentModal = ({ isOpen, onClose, id, refetch, totalRows }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
-
-  console.log(`id`, id)
 
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
-  const [deleteComponent] = useMutation(DeleteComponent)
+  const { compDirection, compField } = useContext(GlobalContext)
+
+  const [deleteComponent] = useMutation(DeleteComponent, {
+    onCompleted: () =>
+      refetch({
+        projectId: productId,
+        sbomId: sbomId,
+        first: totalRows,
+        field: compField,
+        direction: compDirection
+      })
+  })
 
   const handleDelete = async () => {
     try {
@@ -32,17 +43,7 @@ const ComponentModal = ({ isOpen, onClose, id, refetch }) => {
           id: id,
           sbomId: sbomId
         }
-      })
-        .then(() =>
-          refetch({
-            projectId: productId,
-            sbomId: sbomId,
-            first: 10,
-            field: 'NAME',
-            direction: 'ASC'
-          })
-        )
-        .finally(() => onClose())
+      }).then(() => onClose())
     } catch (error) {
       console.error('Mutation error:', error)
     }

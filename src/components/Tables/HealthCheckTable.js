@@ -15,6 +15,7 @@ import {
   Select,
   Skeleton
 } from '@chakra-ui/react'
+import CustomLoader from 'components/CustomLoader'
 import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
 import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import GlobalContext from 'context/GlobalContext'
@@ -67,7 +68,13 @@ const HealthCheckTable = ({
   const customerView = location.pathname.startsWith('/customer')
   const toast = useToast()
 
-  const { checkFilters } = useContext(GlobalContext)
+  const {
+    checkFilters,
+    checkField,
+    setCheckField,
+    checkDirection,
+    setCheckDirection
+  } = useContext(GlobalContext)
 
   const [purlValue, setPurlValue] = useState('')
   const [purlData, setPurlData] = useState(null)
@@ -78,8 +85,18 @@ const HealthCheckTable = ({
   const [selectedCpe, setSelectedCpe] = useState(null)
 
   const [activeRow, setActiveRow] = useState(null)
-  const [sortField, setSortField] = useState('UPDATED_AT')
-  const [updateResult] = useMutation(checkResultUpdate)
+
+  const [updateResult] = useMutation(checkResultUpdate, {
+    onCompleted: () =>
+      refetch({
+        projectId: productId,
+        sbomId: sbomId,
+        first: totalRows,
+        last: undefined,
+        field: checkField,
+        direction: checkDirection
+      })
+  })
 
   const supplierBtn = useRef(null)
   const creationToolBtn = useRef(null)
@@ -149,15 +166,14 @@ const HealthCheckTable = ({
   } = useDisclosure()
 
   const [healthRecheck] = useMutation(recheckHealth, {
-    onCompleted: () => {
+    onCompleted: () =>
       refetch({
         projectId: productId,
         sbomId: sbomId,
         first: totalRows,
-        field: 'UPDATED_AT',
-        direction: 'DESC'
+        field: checkField,
+        direction: checkDirection
       })
-    }
   })
 
   const handleReCheck = () => {
@@ -188,12 +204,8 @@ const HealthCheckTable = ({
       projectId: productId,
       sbomId: sbomId,
       first: Number(e.target.value),
-      last: undefined,
-      after: undefined,
-      last: undefined,
-      search: undefined,
-      field: sortField,
-      direction: 'DESC'
+      field: checkField,
+      direction: checkDirection
     })
     setPageIndex(1)
   }
@@ -360,16 +372,7 @@ const HealthCheckTable = ({
           id: id,
           status: 'ignored'
         }
-      }).then(() =>
-        refetch({
-          projectId: productId,
-          sbomId: sbomId,
-          first: 10,
-          last: undefined,
-          field: 'STATUS',
-          direction: 'ASC'
-        })
-      )
+      })
     } catch (error) {
       console.log('Mutation error', error)
       toast({
@@ -423,7 +426,7 @@ const HealthCheckTable = ({
   const columns = [
     // HEALTH CHECK ID
     {
-      id: 'checkId',
+      id: 'CHECK_ID',
       name: 'CHECK ID',
       selector: (row) => {
         const { organizationRule } = row
@@ -433,7 +436,7 @@ const HealthCheckTable = ({
     },
     // SEVERITY
     {
-      id: 'serverity',
+      id: 'SEVERITY',
       name: 'SEVERITY',
       selector: (row) => {
         const { organizationRule } = row
@@ -476,7 +479,7 @@ const HealthCheckTable = ({
     }, */
     // LONG DESCRIPTION
     {
-      id: 'longDesc',
+      id: 'DESCRIPTION',
       name: 'DESCRIPTION',
       selector: (row) => {
         const { organizationRule, component } = row
@@ -517,8 +520,8 @@ const HealthCheckTable = ({
     }, */
     // UPDATED AT
     {
-      id: 'updatedAt',
-      name: 'UPDATED_AT',
+      id: 'UPDATED_AT',
+      name: 'UPDATED AT',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
           {timeSince(row.updatedAt)}
@@ -534,7 +537,7 @@ const HealthCheckTable = ({
     },
     // ACTION
     {
-      id: 'action',
+      id: 'RESOLUTION',
       name: 'RESOLUTION',
       selector: (row) => {
         const { status, id } = row
@@ -599,13 +602,14 @@ const HealthCheckTable = ({
 
   // SORT FUNCTION
   const handleSort = (column, sortDirection) => {
-    setSortField(column.name)
+    setCheckField(column.id)
+    setCheckDirection(sortDirection === 'asc' ? 'ASC' : 'DESC')
     refetch({
       projectId: productId,
       sbomId: sbomId,
       first: totalRows,
       last: undefined,
-      field: column.name,
+      field: column.id,
       direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
     })
   }
@@ -622,8 +626,8 @@ const HealthCheckTable = ({
       last: totalRows,
       before: data.pageInfo.startCursor,
       after: undefined,
-      field: sortField,
-      direction: 'DESC'
+      field: checkField,
+      direction: checkDirection
     }).then(() => {
       setTimeout(() => {
         setLoading(false)
@@ -641,8 +645,8 @@ const HealthCheckTable = ({
       last: undefined,
       after: data.pageInfo.endCursor,
       before: undefined,
-      field: sortField,
-      direction: 'DESC'
+      field: checkField,
+      direction: checkDirection
     }).then(() => {
       setTimeout(() => {
         setLoading(false)
@@ -652,29 +656,22 @@ const HealthCheckTable = ({
 
   return (
     <>
-      {loading ? (
-        <Flex width={'100%'} gap={4} direction={'column'}>
-          <Skeleton width={'100%'} height='20px' />
-          <Skeleton width={'100%'} height='20px' />
-          <Skeleton width={'100%'} height='20px' />
-          <Skeleton width={'100%'} height='20px' />
-          <Skeleton width={'100%'} height='20px' />
-        </Flex>
-      ) : (
-        <Flex flexDir={'column'} width={'100%'}>
-          <DataTable
-            columns={columns}
-            data={data.nodes}
-            onSort={handleSort}
-            defaultSortAsc={false}
-            defaultSortFieldId={'updatedAt'}
-            customStyles={customStyles}
-            subHeader
-            subHeaderComponent={subHeaderComponentMemo}
-            responsive={true}
-          />
-        </Flex>
-      )}
+      <Flex flexDir={'column'} width={'100%'}>
+        <DataTable
+          columns={columns}
+          data={data.nodes}
+          onSort={handleSort}
+          defaultSortAsc={false}
+          defaultSortFieldId={checkField}
+          customStyles={customStyles}
+          progressPending={loading}
+          progressComponent={<CustomLoader />}
+          persistTableHead
+          subHeader
+          subHeaderComponent={subHeaderComponentMemo}
+          responsive={true}
+        />
+      </Flex>
 
       {/* PAGINATION */}
       {!loading && (
@@ -742,7 +739,8 @@ const HealthCheckTable = ({
           {/*  COMPONENT PRIMARY MODAL */}
           {isPrimaryOpen && (
             <CheckModal
-              id={activeRow.component.id}
+              id={activeRow.id}
+              componentId={null}
               totalRows={totalRows}
               refetch={refetch}
               filterRefetch={filterRefetch}
@@ -758,6 +756,7 @@ const HealthCheckTable = ({
           {isLicenseOpen && (
             <CheckModal
               id={activeRow.component.id}
+              componentId={activeRow.component.id}
               totalRows={totalRows}
               refetch={refetch}
               filterRefetch={filterRefetch}

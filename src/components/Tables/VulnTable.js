@@ -107,7 +107,13 @@ const VulnTable = ({
   const toast = useToast()
   const customerView = location.pathname.startsWith('/customer')
 
-  const { vulnFilters } = useContext(GlobalContext)
+  const {
+    vulnFilters,
+    vulnField,
+    setVulnField,
+    vulnDirection,
+    setVulnDirection
+  } = useContext(GlobalContext)
 
   const textColor = useColorModeValue('gray.700', 'white')
 
@@ -162,7 +168,7 @@ const VulnTable = ({
   const columns = [
     // CVE ID
     {
-      id: 'cve',
+      id: 'CVE_ID',
       name: 'CVE ID',
       selector: (row) => {
         const { vuln } = row
@@ -192,7 +198,7 @@ const VulnTable = ({
     },
     // SEVERITY
     {
-      id: 'serverity',
+      id: 'SEVERITY',
       name: 'SEVERITY',
       selector: (row) => {
         const { vuln } = row
@@ -213,7 +219,7 @@ const VulnTable = ({
     },
     // SOURCE
     {
-      id: 'source',
+      id: 'SOURCE',
       name: 'SOURCE',
       selector: (row) => {
         const { vuln } = row
@@ -236,7 +242,7 @@ const VulnTable = ({
     },
     // CVSS
     {
-      id: 'cvss',
+      id: 'CVSS',
       name: 'CVSS',
       selector: (row) => {
         const { vuln } = row
@@ -257,7 +263,7 @@ const VulnTable = ({
     },
     // COMPONENT
     {
-      id: 'component',
+      id: 'COMPONENT',
       name: 'COMPONENT',
       selector: (row) => {
         const { component } = row
@@ -277,7 +283,7 @@ const VulnTable = ({
     },
     // VERSION
     {
-      id: 'version',
+      id: 'VERSION',
       name: 'VERSION',
       selector: (row) => (
         <Tooltip label={row.component.version} placement='top'>
@@ -288,7 +294,7 @@ const VulnTable = ({
     },
     // STATUS
     {
-      id: 'status',
+      id: 'STATUS',
       name: 'STATUS',
       selector: (row) => {
         const { vexStatus } = row
@@ -308,7 +314,7 @@ const VulnTable = ({
     },
     // UPDATED AT
     {
-      id: 'updatedAt',
+      id: 'UPDATED_AT',
       name: 'UPDATED AT',
       selector: (row) => (
         <Tooltip
@@ -373,12 +379,7 @@ const VulnTable = ({
         projectId: productId,
         sbomId: sbomId,
         search: filterText,
-        first: totalRows,
-        last: undefined,
-        after: undefined,
-        last: undefined,
-        field: sortField,
-        direction: 'DESC'
+        first: totalRows
       })
       setPageIndex(1)
     }
@@ -390,12 +391,7 @@ const VulnTable = ({
       projectId: productId,
       sbomId: sbomId,
       first: totalRows,
-      last: undefined,
-      after: undefined,
-      last: undefined,
-      search: undefined,
-      field: sortField,
-      direction: 'DESC'
+      search: undefined
     })
     setFilterText('')
     setPageIndex(1)
@@ -545,8 +541,8 @@ const VulnTable = ({
       last: totalRows,
       before: data.pageInfo.startCursor,
       after: undefined,
-      field: sortField,
-      direction: 'DESC'
+      field: vulnField,
+      direction: vulnDirection
     }).then(() => {
       setTimeout(() => {
         setIsLoading(false)
@@ -564,8 +560,8 @@ const VulnTable = ({
       last: undefined,
       after: data.pageInfo.endCursor,
       before: undefined,
-      field: sortField,
-      direction: 'DESC'
+      field: vulnField,
+      direction: vulnDirection
     }).then(() => {
       setTimeout(() => {
         setIsLoading(false)
@@ -574,13 +570,14 @@ const VulnTable = ({
   }
 
   const handleSort = (column, sortDirection) => {
-    setSortField(column.name)
+    setVulnField(column.id)
+    setVulnDirection(sortDirection === 'asc' ? 'ASC' : 'DESC')
     refetch({
       projectId: productId,
       sbomId: sbomId,
       first: totalRows,
       last: undefined,
-      field: column.name,
+      field: column.id,
       direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
     })
   }
@@ -592,12 +589,8 @@ const VulnTable = ({
       projectId: productId,
       sbomId: sbomId,
       first: Number(e.target.value),
-      last: undefined,
-      after: undefined,
-      last: undefined,
-      search: undefined,
-      field: sortField,
-      direction: 'DESC'
+      field: vulnField,
+      direction: vulnDirection
     })
     setFilterText('')
     setPageIndex(1)
@@ -625,7 +618,7 @@ const VulnTable = ({
           customStyles={customStyles}
           onSort={handleSort}
           defaultSortAsc={false}
-          defaultSortFieldId={'updatedAt'}
+          defaultSortFieldId={vulnField}
           progressPending={isLoading}
           progressComponent={<CustomLoader />}
           subHeader

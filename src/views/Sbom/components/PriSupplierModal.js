@@ -12,10 +12,11 @@ import {
   FormControl,
   FormLabel,
   Input,
-  useToast,
   FormErrorMessage
 } from '@chakra-ui/react'
+import GlobalContext from 'context/GlobalContext'
 import { recheckHealth, supplierUpdate, supplierCreate } from 'graphQL/Mutation'
+import { useContext } from 'react'
 import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 
@@ -25,9 +26,9 @@ const PriSupplierModal = ({
   refetch,
   suppliers,
   checkId,
-  totalRows
+  totalRows,
+  filterRefetch
 }) => {
-  const toast = useToast()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('p')
@@ -38,11 +39,32 @@ const PriSupplierModal = ({
     return emailRegex.test(email)
   }
 
+  const { setCheckFilters, checkField, checkDirection } =
+    useContext(GlobalContext)
+
   const [supName, setSupName] = useState('')
   const [supEmail, setSupEmail] = useState('')
 
-  const [createSupplier] = useMutation(supplierCreate)
-  const [updateSupplier] = useMutation(supplierUpdate)
+  const handleRefetch = () => {
+    refetch({
+      productId: productId,
+      sbomId: sbomId
+    })
+  }
+
+  const onFilterRefetch = () => {
+    filterRefetch({
+      projectId: productId,
+      sbomId: sbomId
+    }).then((res) => setCheckFilters(res.data.sbom.filters))
+  }
+
+  const [createSupplier] = useMutation(supplierCreate, {
+    onCompleted: () => handleRefetch()
+  })
+  const [updateSupplier] = useMutation(supplierUpdate, {
+    onCompleted: () => handleRefetch()
+  })
 
   const [healthRecheck] = useMutation(recheckHealth, {
     onCompleted: () => {
@@ -51,11 +73,13 @@ const PriSupplierModal = ({
         sbomId: sbomId,
         first: totalRows,
         last: undefined,
+        after: undefined,
+        before: undefined,
         category: undefined,
         severity: undefined,
         status: undefined,
-        field: 'UPDATED_AT',
-        direction: 'DESC'
+        field: checkField,
+        direction: checkDirection
       })
     }
   })
@@ -69,71 +93,39 @@ const PriSupplierModal = ({
 
   const handleSave = async (e) => {
     e.preventDefault()
-    if (validateEmail(supEmail) === true) {
-      await createSupplier({
-        variables: {
-          name: supName,
-          contactEmail: supEmail,
-          sbomId: sbomId
+    await createSupplier({
+      variables: {
+        name: supName,
+        contactEmail: supEmail,
+        sbomId: sbomId
+      }
+    })
+      .then((res) => {
+        if (res.data) {
+          onFilterRefetch()
+        }
+
+        if (checkId) {
+          healthRecheck({
+            variables: {
+              sbomId: sbomId,
+              checkId: checkId
+            }
+          })
         }
       })
-        .then((res) => {
-          if (checkId) {
-            healthRecheck({
-              variables: {
-                sbomId: sbomId,
-                checkId: checkId
-              }
-            })
-          } else if (res) {
-            refetch({
-              productId: productId,
-              sbomId: sbomId
-            })
-          }
-        })
-        .finally(() => onClose())
-    } else {
-      toast({
-        description: 'Invalid email',
-        status: 'error',
-        position: 'top-right',
-        duration: 2000
-      })
-    }
+      .finally(() => onClose())
   }
 
   const handleUpdate = async (e) => {
     e.preventDefault()
-    if (validateEmail(supEmail) === true) {
-      await updateSupplier({
-        variables: {
-          name: supName,
-          contactEmail: supEmail,
-          id: suppliers[0].id
-        }
-      })
-        .then((res) => {
-          if (res) {
-            setSupName('')
-            setSupEmail('')
-          }
-        })
-        .finally(() => {
-          refetch({
-            productId: productId,
-            sbomId: sbomId
-          })
-          onClose()
-        })
-    } else {
-      toast({
-        description: 'Invalid email',
-        status: 'error',
-        position: 'top-right',
-        duration: 2000
-      })
-    }
+    await updateSupplier({
+      variables: {
+        name: supName,
+        contactEmail: supEmail,
+        id: suppliers[0].id
+      }
+    }).then((res) => res.data && onClose())
   }
 
   return (
