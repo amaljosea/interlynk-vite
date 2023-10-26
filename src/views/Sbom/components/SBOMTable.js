@@ -108,6 +108,20 @@ const SBOMTable = ({
   const [getLogsFilters] = useLazyQuery(GetLogsFilterData)
 
   useEffect(() => {
+    if (vulnData === undefined) {
+      getVulnData({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          first: totalRows,
+          field: 'UPDATED_AT',
+          direction: 'DESC'
+        }
+      })
+    }
+  }, [])
+
+  useEffect(() => {
     if (tabIndex === 0) {
       refetch({
         projectId: productId,
@@ -134,15 +148,6 @@ const SBOMTable = ({
         }
       })
     } else if (tabIndex === 2) {
-      getVulnData({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          first: totalRows,
-          field: 'UPDATED_AT',
-          direction: 'DESC'
-        }
-      })
       getVulnFilters({
         variables: {
           projectId: productId,

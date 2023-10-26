@@ -56,6 +56,7 @@ import { sevColor } from 'utils'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import GlobalContext from 'context/GlobalContext'
 import { timeSince } from 'utils'
+import CustomLoader from 'components/CustomLoader'
 
 const customStyles = {
   headCells: {
@@ -202,7 +203,9 @@ const VulnTable = ({
             variant='subtle'
             colorScheme={sevColor(`${vuln.sev}`)}
           >
-            <TagLabel style={{ textTransform: 'capitalize' }}>{vuln.sev}</TagLabel>
+            <TagLabel style={{ textTransform: 'capitalize' }}>
+              {vuln.sev}
+            </TagLabel>
           </Tag>
         )
       },
@@ -615,31 +618,24 @@ const VulnTable = ({
   return (
     <>
       {/* TABLE */}
-      {isLoading ? (
-        <Flex width={'100%'} gap={4} direction={'column'}>
-          <Skeleton width={'100%'} height='20px' />
-          <Skeleton width={'100%'} height='20px' />
-          <Skeleton width={'100%'} height='20px' />
-          <Skeleton width={'100%'} height='20px' />
-          <Skeleton width={'100%'} height='20px' />
-        </Flex>
-      ) : (
-        <Flex flexDir={'column'} width={'100%'}>
-          <DataTable
-            columns={columns}
-            data={data.nodes}
-            customStyles={customStyles}
-            onSort={handleSort}
-            defaultSortAsc={false}
-            defaultSortFieldId={'updatedAt'}
-            subHeader
-            subHeaderComponent={subHeaderComponentMemo}
-            responsive={true}
-            expandableRows
-            expandableRowsComponent={ExpandedComponent}
-          />
-        </Flex>
-      )}
+      <Flex flexDir={'column'} width={'100%'}>
+        <DataTable
+          columns={columns}
+          data={data.nodes}
+          customStyles={customStyles}
+          onSort={handleSort}
+          defaultSortAsc={false}
+          defaultSortFieldId={'updatedAt'}
+          progressPending={isLoading}
+          progressComponent={<CustomLoader />}
+          subHeader
+          subHeaderComponent={subHeaderComponentMemo}
+          responsive={true}
+          expandableRows
+          persistTableHead
+          expandableRowsComponent={ExpandedComponent}
+        />
+      </Flex>
 
       {/* PAGINATION */}
       {!isLoading && (
