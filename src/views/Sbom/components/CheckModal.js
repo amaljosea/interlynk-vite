@@ -28,6 +28,7 @@ import MultiSelect from 'react-select'
 import { licenseOptions } from 'variables/licenses'
 
 const CheckModal = ({
+  id,
   isOpen,
   onClose,
   refetch,
@@ -64,12 +65,6 @@ const CheckModal = ({
         projectId: productId,
         sbomId: sbomId,
         first: totalRows,
-        last: undefined,
-        after: undefined,
-        before: undefined,
-        category: undefined,
-        severity: undefined,
-        status: undefined,
         field: 'UPDATED_AT',
         direction: 'DESC'
       })
@@ -82,7 +77,7 @@ const CheckModal = ({
     try {
       await updateComponent({
         variables: {
-          id: compId,
+          id: id,
           sbomId: sbomId,
           primary: true
         }
@@ -90,7 +85,7 @@ const CheckModal = ({
         .then(() => {
           healthRecheck({
             variables: {
-              checkId: checkId ? checkId : undefined,
+              checkId: checkId,
               sbomId: sbomId
             }
           })
@@ -100,6 +95,34 @@ const CheckModal = ({
           })
         })
         .finally(() => window.location.reload())
+    } catch (error) {
+      console.log('Mutation error', error)
+    }
+  }
+
+  const onLicenseUpdate = async () => {
+    try {
+      await updateComponent({
+        variables: {
+          id: id,
+          sbomId: sbomId,
+          licenses: selectedLicenses
+        }
+      })
+        .then((res) => {
+          healthRecheck({
+            variables: {
+              componentId: id,
+              checkId: checkId,
+              sbomId: sbomId
+            }
+          })
+          filterRefetch({
+            projectId: productId,
+            sbomId: sbomId
+          })
+        })
+        .finally(() => onClose())
     } catch (error) {
       console.log('Mutation error', error)
     }
@@ -143,6 +166,12 @@ const CheckModal = ({
     e.preventDefault()
     if (shortDesc === 'Document has a primary component') {
       handleComUpdate()
+    } else if (
+      shortDesc === 'Component has license/s specified' ||
+      shortDesc === 'Componet has deprecated license/s' ||
+      shortDesc === 'Component has restrictive licenses specified'
+    ) {
+      onLicenseUpdate()
     } else {
       onClose()
     }

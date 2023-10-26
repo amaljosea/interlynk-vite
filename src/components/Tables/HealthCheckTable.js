@@ -154,19 +154,15 @@ const HealthCheckTable = ({
         projectId: productId,
         sbomId: sbomId,
         first: totalRows,
-        last: undefined,
-        category: undefined,
-        severity: undefined,
-        status: undefined,
-        field: sortField,
+        field: 'UPDATED_AT',
         direction: 'DESC'
       })
     }
   })
 
-  const handleReCheck = async () => {
+  const handleReCheck = () => {
     try {
-      await healthRecheck({
+      healthRecheck({
         variables: {
           sbomId: sbomId
         }
@@ -262,12 +258,14 @@ const HealthCheckTable = ({
         </Tooltip>
       </Flex>
     )
-  }, [checkFilters])
+  }, [checkFilters, handleReCheck])
 
   const handleOpen = (row) => {
-    const { shortDesc, organizationRule } = row
+    const { organizationRule } = row
 
     setActiveRow(row)
+
+    console.log('row', row)
 
     // TIMESTAMP SELECTOR UI
     if (organizationRule.rule.shortDesc === 'Document creation timestamp') {
@@ -744,7 +742,7 @@ const HealthCheckTable = ({
           {/*  COMPONENT PRIMARY MODAL */}
           {isPrimaryOpen && (
             <CheckModal
-              id={activeRow.id}
+              id={activeRow.component.id}
               totalRows={totalRows}
               refetch={refetch}
               filterRefetch={filterRefetch}
@@ -759,7 +757,7 @@ const HealthCheckTable = ({
           {/*  COMPONENT LICENSE MODAL */}
           {isLicenseOpen && (
             <CheckModal
-              id={activeRow.id}
+              id={activeRow.component.id}
               totalRows={totalRows}
               refetch={refetch}
               filterRefetch={filterRefetch}
@@ -773,7 +771,7 @@ const HealthCheckTable = ({
           {/*  COMPONENT TYPE MODAL */}
           {isTypeOpen && (
             <CheckModal
-              id={activeRow.id}
+              id={activeRow.component.id}
               totalRows={totalRows}
               refetch={refetch}
               filterRefetch={filterRefetch}
