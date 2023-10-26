@@ -153,7 +153,15 @@ const ComponentTable = ({
       id: 'name',
       name: 'NAME',
       selector: (row) => {
-        const { purl, name, primary, internal } = row
+        const { purl, name, primary, internal, externalUrls } = row
+        const website = externalUrls.find((item) => item.name === 'website')
+        const distribution = externalUrls.find(
+          (item) => item.name === 'distribution'
+        )
+        const issueTracker = externalUrls.find(
+          (item) => item.name === 'issue-tracker'
+        )
+        const vcs = externalUrls.find((item) => item.name === 'vcs')
         return (
           <Stack
             width={'100%'}
@@ -197,44 +205,56 @@ const ComponentTable = ({
               {/* EXTERNAL REFERENCE */}
               <Stack direction={'row'} alignItems={'center'}>
                 {/* WEBSITE */}
-                <Tooltip placement='top' label='github.com/mypackage'>
-                  <IconButton
-                    type='button'
-                    size='xs'
-                    variant='solid'
-                    colorScheme='gray'
-                    icon={<FaGlobe fontSize={16} />}
-                  />
+                <Tooltip placement='top' label={website?.url}>
+                  <Link href={website?.url} isExternal>
+                    <IconButton
+                      type='button'
+                      size='xs'
+                      variant='solid'
+                      isDisabled={!website}
+                      colorScheme='gray'
+                      icon={<FaGlobe fontSize={16} />}
+                    />
+                  </Link>
                 </Tooltip>
                 {/* DISTRIBUTION */}
-                <Tooltip placement='top' label='github.com/distribution'>
-                  <IconButton
-                    type='button'
-                    size='xs'
-                    variant='solid'
-                    colorScheme='gray'
-                    icon={<FaSitemap fontSize={16} />}
-                  />
+                <Tooltip placement='top' label={vcs?.url}>
+                  <Link href={vcs?.url} isExternal>
+                    <IconButton
+                      type='button'
+                      size='xs'
+                      variant='solid'
+                      colorScheme='gray'
+                      isDisabled={!vcs}
+                      icon={<FaSitemap fontSize={16} />}
+                    />
+                  </Link>
                 </Tooltip>
                 {/* ADVISORIES */}
-                <Tooltip placement='top' label='ghcr.io/advisory'>
-                  <IconButton
-                    type='button'
-                    size='xs'
-                    variant='solid'
-                    colorScheme='gray'
-                    icon={<FaHouseUser fontSize={16} />}
-                  />
+                <Tooltip placement='top' label={issueTracker?.url}>
+                  <Link href={issueTracker?.url} isExternal>
+                    <IconButton
+                      type='button'
+                      size='xs'
+                      variant='solid'
+                      colorScheme='gray'
+                      isDisabled={!issueTracker}
+                      icon={<FaHouseUser fontSize={16} />}
+                    />
+                  </Link>
                 </Tooltip>
                 {/* SUPPORT */}
-                <Tooltip placement='top' label='github.com/support-url'>
-                  <IconButton
-                    type='button'
-                    size='xs'
-                    variant='solid'
-                    colorScheme='gray'
-                    icon={<FaLightbulb fontSize={16} />}
-                  />
+                <Tooltip placement='top' label={distribution?.url}>
+                  <Link href={distribution?.url} isExternal>
+                    <IconButton
+                      type='button'
+                      size='xs'
+                      variant='solid'
+                      isDisabled={!distribution}
+                      colorScheme='gray'
+                      icon={<FaLightbulb fontSize={16} />}
+                    />
+                  </Link>
                 </Tooltip>
               </Stack>
 
@@ -538,9 +558,7 @@ const ComponentTable = ({
         projectId: productId,
         sbomId: sbomId,
         search: filterText,
-        first: totalRows,
-        field: sortField,
-        direction: 'DESC'
+        first: totalRows
       })
       setPageIndex(1)
     }
@@ -552,9 +570,7 @@ const ComponentTable = ({
       projectId: productId,
       sbomId: sbomId,
       search: undefined,
-      first: totalRows,
-      field: sortField,
-      direction: 'DESC'
+      first: totalRows
     })
     setFilterText('')
     setPageIndex(1)
