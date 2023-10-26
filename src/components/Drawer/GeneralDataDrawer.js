@@ -25,6 +25,7 @@ import {
   FormErrorMessage,
   Tooltip
 } from '@chakra-ui/react'
+import GlobalContext from 'context/GlobalContext'
 import {
   toolDelete,
   supplierCreate,
@@ -33,6 +34,7 @@ import {
   authorCreate,
   toolCreate
 } from 'graphQL/Mutation'
+import { useContext } from 'react'
 import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { getFullDateAndTime } from 'utils'
@@ -47,7 +49,8 @@ const GeneralDataDrawer = ({
   selectedKey,
   refetch,
   checkId,
-  totalRows
+  totalRows,
+  filterRefetch
 }) => {
   // console.log(`suppliers`, suppliers)
 
@@ -57,6 +60,9 @@ const GeneralDataDrawer = ({
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
+
+  const { setCheckFilters, checkField, checkDirection } =
+    useContext(GlobalContext)
 
   const [toolName, setToolName] = useState('')
   const [toolVersion, setToolVersion] = useState('')
@@ -95,11 +101,18 @@ const GeneralDataDrawer = ({
         category: undefined,
         severity: undefined,
         status: undefined,
-        field: 'UPDATED_AT',
-        direction: 'ASC'
+        field: checkField,
+        direction: checkDirection
       })
     }
   })
+
+  const onFilterRefetch = () => {
+    filterRefetch({
+      projectId: productId,
+      sbomId: sbomId
+    }).then((res) => setCheckFilters(res.data.sbom.filters))
+  }
 
   useEffect(() => {
     if (data) {
@@ -233,7 +246,7 @@ const GeneralDataDrawer = ({
           checkId: checkId,
           sbomId: sbomId
         }
-      })
+      }).then(() => onFilterRefetch())
     }
 
     if (creationTools.length > 0) {

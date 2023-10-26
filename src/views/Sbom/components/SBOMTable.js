@@ -21,7 +21,7 @@ import HealthCheckTable from 'components/Tables/HealthCheckTable'
 import SbomChangelogTable from 'components/Tables/SbomChangelogTable'
 
 // API QUERIES
-import { useLazyQuery, useQuery } from '@apollo/client'
+import { useLazyQuery } from '@apollo/client'
 import {
   GetCheckResults,
   GetComponentData,
@@ -50,8 +50,20 @@ const SBOMTable = ({
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
-  const { setCompFilters, setVulnFilters, setCheckFilters, setLogFilters } =
-    useContext(GlobalContext)
+  const {
+    setCompFilters,
+    setVulnFilters,
+    setCheckFilters,
+    setLogFilters,
+    compField,
+    compDirection,
+    vulnField,
+    vulnDirection,
+    checkField,
+    checkDirection,
+    logField,
+    logDirection
+  } = useContext(GlobalContext)
 
   const tab = window.localStorage.getItem('activeProdTab')
 
@@ -107,6 +119,7 @@ const SBOMTable = ({
   // GET LOGS FILTER HEADS
   const [getLogsFilters] = useLazyQuery(GetLogsFilterData)
 
+  // FETCH COMPONENT DATA
   useEffect(() => {
     if (compData === undefined) {
       getCompData({
@@ -114,13 +127,14 @@ const SBOMTable = ({
           projectId: productId,
           sbomId: sbomId,
           first: totalRows,
-          field: 'UPDATED_AT',
-          direction: 'DESC'
+          field: compField,
+          direction: compDirection
         }
       })
     }
   }, [])
 
+  // FETCH VULN DATA
   useEffect(() => {
     if (vulnData === undefined) {
       getVulnData({
@@ -128,13 +142,44 @@ const SBOMTable = ({
           projectId: productId,
           sbomId: sbomId,
           first: totalRows,
-          field: 'UPDATED_AT',
-          direction: 'DESC'
+          field: vulnField,
+          direction: vulnDirection
         }
       })
     }
   }, [])
 
+  // FETCH HEALTH CHECK DATA
+  useEffect(() => {
+    if (checkData === undefined) {
+      getCheckData({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          first: totalRows,
+          field: checkField,
+          direction: checkDirection
+        }
+      })
+    }
+  }, [])
+
+  // FETCH ACTIVITY LOGS DATA
+  useEffect(() => {
+    if (logsData === undefined) {
+      getLogData({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          first: totalRows,
+          field: logField,
+          direction: logDirection
+        }
+      })
+    }
+  }, [])
+
+  // FETCH FILTER DATA BASE ON SELECTED TAB
   useEffect(() => {
     if (tabIndex === 0) {
       refetch({
@@ -164,15 +209,6 @@ const SBOMTable = ({
         }
       })
     } else if (tabIndex === 3) {
-      getCheckData({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          first: totalRows,
-          field: 'UPDATED_AT',
-          direction: 'DESC'
-        }
-      })
       getCheckFilters({
         variables: {
           projectId: productId,
@@ -184,14 +220,12 @@ const SBOMTable = ({
         }
       })
     } else if (tabIndex === 4) {
-      getLogData({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          first: totalRows,
-          field: 'CREATED_AT',
-          direction: 'DESC'
-        }
+      logsRefetch({
+        projectId: productId,
+        sbomId: sbomId,
+        first: totalRows,
+        field: logField,
+        direction: logDirection
       })
       getLogsFilters({
         variables: {
@@ -215,10 +249,6 @@ const SBOMTable = ({
         id: item.id
       }
     })
-
-  // useEffect(() => {
-  //   console.log(tabIndex)
-  // }, [tabIndex])
 
   return (
     <>

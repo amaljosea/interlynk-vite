@@ -41,6 +41,16 @@ const ContextWrapper = (props) => {
   const [checkFilters, setCheckFilters] = useState({})
   const [logFilters, setLogFilters] = useState({})
 
+  // SORT ORDER AND DIRECTIONS
+  const [compField, setCompField] = useState('UPDATED_AT')
+  const [compDirection, setCompDirection] = useState('DESC')
+  const [vulnField, setVulnField] = useState('UPDATED_AT')
+  const [vulnDirection, setVulnDirection] = useState('DESC')
+  const [checkField, setCheckField] = useState('UPDATED_AT')
+  const [checkDirection, setCheckDirection] = useState('DESC')
+  const [logField, setLogField] = useState('CREATED_AT')
+  const [logDirection, setLogDirection] = useState('DESC')
+
   return (
     <GlobalContext.Provider
       value={{
@@ -73,7 +83,23 @@ const ContextWrapper = (props) => {
         checkFilters,
         setCheckFilters,
         logFilters,
-        setLogFilters
+        setLogFilters,
+        compField,
+        setCompField,
+        compDirection,
+        setCompDirection,
+        vulnField,
+        setVulnField,
+        vulnDirection,
+        setVulnDirection,
+        checkField,
+        setCheckField,
+        checkDirection,
+        setCheckDirection,
+        logField,
+        setLogField,
+        logDirection,
+        setLogDirection
       }}
     >
       {props.children}

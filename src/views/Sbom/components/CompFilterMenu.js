@@ -38,9 +38,9 @@ const CompFilterMenu = ({
   setPageIndex,
   totalRows
 }) => {
-  const { compFilters } = useContext(GlobalContext)
+  const { compFilters, compField, compDirection } = useContext(GlobalContext)
 
-  const { ecosystems, kinds, suppliers, licenses } = compFilters
+  const { ecosystems, kinds, supplierNames, licenses } = compFilters
 
   const [selectedEcosystem, setSelectedEcosystem] = useState('')
   const [selectedKind, setSelectedKind] = useState('')
@@ -58,8 +58,8 @@ const CompFilterMenu = ({
       last: undefined,
       after: undefined,
       last: undefined,
-      field: 'UPDATED_AT',
-      direction: 'DESC'
+      field: compField,
+      direction: compDirection
     })
     setPageIndex(1)
   }
@@ -74,8 +74,8 @@ const CompFilterMenu = ({
       last: undefined,
       after: undefined,
       last: undefined,
-      field: 'UPDATED_AT',
-      direction: 'DESC'
+      field: compField,
+      direction: compDirection
     })
     setPageIndex(1)
   }
@@ -90,8 +90,8 @@ const CompFilterMenu = ({
       last: undefined,
       after: undefined,
       last: undefined,
-      field: 'UPDATED_AT',
-      direction: 'DESC'
+      field: compField,
+      direction: compDirection
     })
     setPageIndex(1)
   }
@@ -106,8 +106,8 @@ const CompFilterMenu = ({
       last: undefined,
       after: undefined,
       last: undefined,
-      field: 'UPDATED_AT',
-      direction: 'DESC'
+      field: compField,
+      direction: compDirection
     })
     setPageIndex(1)
   }
@@ -123,8 +123,8 @@ const CompFilterMenu = ({
       last: undefined,
       after: undefined,
       last: undefined,
-      field: 'UPDATED_AT',
-      direction: 'DESC'
+      field: compField,
+      direction: compDirection
     })
     setPageIndex(1)
   }
@@ -250,7 +250,7 @@ const CompFilterMenu = ({
               <MenuItemOption value={'all'} fontSize={'sm'}>
                 All
               </MenuItemOption>
-              {suppliers?.map((item, index) => (
+              {supplierNames?.map((item, index) => (
                 <MenuItemOption key={index} value={item} fontSize={'sm'}>
                   {item}
                 </MenuItemOption>

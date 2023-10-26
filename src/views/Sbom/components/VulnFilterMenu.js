@@ -39,7 +39,7 @@ const VulnFilterMenu = ({
   setPageIndex,
   totalRows
 }) => {
-  const { vulnFilters } = useContext(GlobalContext)
+  const { vulnFilters, vulnField, vulnDirection } = useContext(GlobalContext)
 
   const { vulnCompNames, vulnStatuses } = vulnFilters
 
@@ -57,8 +57,8 @@ const VulnFilterMenu = ({
       last: undefined,
       after: undefined,
       last: undefined,
-      field: 'UPDATED_AT',
-      direction: 'DESC'
+      field: vulnField,
+      direction: vulnDirection
     })
     setPageIndex(1)
   }
@@ -73,8 +73,8 @@ const VulnFilterMenu = ({
       last: undefined,
       after: undefined,
       last: undefined,
-      field: 'UPDATED_AT',
-      direction: 'DESC'
+      field: vulnField,
+      direction: vulnDirection
     })
     setPageIndex(1)
   }
@@ -89,8 +89,8 @@ const VulnFilterMenu = ({
       last: undefined,
       after: undefined,
       last: undefined,
-      field: 'UPDATED_AT',
-      direction: 'DESC'
+      field: vulnField,
+      direction: vulnDirection
     })
     setPageIndex(1)
   }
@@ -120,7 +120,12 @@ const VulnFilterMenu = ({
                 All
               </MenuItemOption>
               {['critical', 'high', 'medium', 'low'].map((item, index) => (
-                <MenuItemOption key={index} value={item} fontSize={'sm'} textTransform={'capitalize'}>
+                <MenuItemOption
+                  key={index}
+                  value={item}
+                  fontSize={'sm'}
+                  textTransform={'capitalize'}
+                >
                   {item}
                 </MenuItemOption>
               ))}

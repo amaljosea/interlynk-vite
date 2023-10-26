@@ -49,6 +49,8 @@ import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import { QuestionIcon, CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import { FaExpandAlt } from 'react-icons/fa'
+import { useContext } from 'react'
+import GlobalContext from 'context/GlobalContext'
 
 // const regexPattern = /^cpe:2\.3:[aho]:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+$/
 const regexPattern =
@@ -62,6 +64,8 @@ function ComponentDrawer(props) {
   const sbomId = queryParams.get('sbom')
 
   const customerView = location.pathname.startsWith('/customer')
+
+  const { compField, compDirection, setCompFilters } = useContext(GlobalContext)
 
   const {
     id,
@@ -84,8 +88,31 @@ function ComponentDrawer(props) {
     filterRefetch
   } = props
 
-  const [createComponent] = useMutation(CreateComponent)
-  const [updateComponent] = useMutation(UpdateComponent)
+  const handleRefetch = () => {
+    refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      first: totalRows,
+      last: undefined,
+      field: compField,
+      direction: compDirection
+    })
+  }
+
+  const onFilterRefetch = () => {
+    filterRefetch({
+      projectId: productId,
+      sbomId: sbomId
+    }).then((res) => setCompFilters(res.data.sbom.filters))
+  }
+
+  const [createComponent] = useMutation(CreateComponent, {
+    onCompleted: () => handleRefetch()
+  })
+
+  const [updateComponent] = useMutation(UpdateComponent, {
+    onCompleted: () => handleRefetch()
+  })
 
   const [compId, setCompId] = useState('')
   const [groupInfo, setGroupInfo] = useState('')
@@ -294,58 +321,37 @@ function ComponentDrawer(props) {
   }
 
   const handleCreateCom = async () => {
-    if (compName && compType) {
-      try {
-        await createComponent({
-          variables: {
-            sbomId: sbomId,
-            kind: compType,
-            name: compName,
-            version: compVersion,
-            licenses: selectedLicenses,
-            cpes: cpeList,
-            purl: purlValue,
-            primary: isPrimary,
-            internal: isInternal
+    try {
+      await createComponent({
+        variables: {
+          sbomId: sbomId,
+          kind: compType,
+          name: compName,
+          version: compVersion,
+          licenses: selectedLicenses,
+          cpes: cpeList,
+          purl: purlValue,
+          primary: isPrimary,
+          internal: isInternal
+        }
+      })
+        .then((res) => {
+          if (res.data) {
+            onFilterRefetch()
           }
         })
-          .then((res) => {
-            if (res.data) {
-              refetch({
-                projectId: productId,
-                sbomId: sbomId,
-                first: totalRows,
-                last: undefined,
-                field: 'UPDATED_AT',
-                direction: 'DESC'
-              })
-              onClose()
-            }
+        .finally(() => {
+          onClose()
+          toast({
+            description: `Data added successfully`,
+            status: 'success',
+            position: 'top',
+            isClosable: true,
+            duration: 2000
           })
-          .finally(() => {
-            filterRefetch({
-              projectId: productId,
-              sbomId: id
-            })
-            toast({
-              description: `Data added successfully`,
-              status: 'success',
-              position: 'top',
-              isClosable: true,
-              duration: 2000
-            })
-          })
-      } catch (error) {
-        console.error('Mutation error:', error)
-      }
-    } else {
-      toast({
-        title: `Input fields required`,
-        status: 'error',
-        position: 'top-right',
-        isClosable: true,
-        duration: 2000
-      })
+        })
+    } catch (error) {
+      console.error('Mutation error:', error)
     }
   }
 
@@ -367,23 +373,10 @@ function ComponentDrawer(props) {
       })
         .then((res) => {
           if (res.data) {
-            refetch({
-              projectId: productId,
-              sbomId: sbomId,
-              first: totalRows,
-              last: undefined,
-              field: 'UPDATED_AT',
-              direction: 'DESC'
-            })
-            onClose()
+            onFilterRefetch()
           }
         })
-        .finally(() => {
-          filterRefetch({
-            projectId: productId,
-            sbomId: sbomId
-          })
-        })
+        .finally(() => onClose())
     } catch (error) {
       console.error('Mutation error:', error)
     }
@@ -502,10 +495,12 @@ function ComponentDrawer(props) {
               <FormControl>
                 <FormLabel fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-                    {shortDesc === 'Component Name' && compName === '' && (
-                      <WarningTwoIcon w={4} h={4} color='red.500' />
-                    )}
-                    <Text>Name</Text>
+                    <Text>
+                      Name
+                      <chakra.span color={'red.500'} ml={1}>
+                        *
+                      </chakra.span>
+                    </Text>
                     <Tooltip label='Component Name'>
                       <Icon as={QuestionIcon} color={'blue.500'} />
                     </Tooltip>
@@ -525,12 +520,12 @@ function ComponentDrawer(props) {
               <FormControl>
                 <FormLabel fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-                    {(shortDesc === 'Primary Component Version' ||
-                      shortDesc === 'Component Version') &&
-                      compVersion === '' && (
-                        <WarningTwoIcon w={4} h={4} color='red.500' />
-                      )}
-                    <Text>Version</Text>
+                    <Text>
+                      Version{' '}
+                      <chakra.span color={'red.500'} ml={1}>
+                        *
+                      </chakra.span>
+                    </Text>
                     <Tooltip label='Component Version'>
                       <Icon as={QuestionIcon} color={'blue.500'} />
                     </Tooltip>
@@ -563,7 +558,12 @@ function ComponentDrawer(props) {
               <FormControl>
                 <FormLabel fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-                    <Text>Type</Text>
+                    <Text>
+                      Type
+                      <chakra.span color={'red.500'} ml={1}>
+                        *
+                      </chakra.span>
+                    </Text>
                     <Tooltip label='Component Type'>
                       <Icon as={QuestionIcon} color={'blue.500'} />
                     </Tooltip>
@@ -789,7 +789,10 @@ function ComponentDrawer(props) {
                 colorScheme='blue'
                 onClick={handleSave}
                 isDisabled={
-                  (containesOther && licenseName === '') || compType === ''
+                  (containesOther && licenseName === '') ||
+                  compType === '' ||
+                  compName === '' ||
+                  compVersion === ''
                 }
               >
                 Save

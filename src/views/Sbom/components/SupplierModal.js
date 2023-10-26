@@ -12,13 +12,13 @@ import {
   FormControl,
   FormLabel,
   Input,
-  useToast,
   FormErrorMessage
 } from '@chakra-ui/react'
+import GlobalContext from 'context/GlobalContext'
 import { updateComSupplier } from 'graphQL/Mutation'
 import { recheckHealth } from 'graphQL/Mutation'
 import { addComSupplier } from 'graphQL/Mutation'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { useLocation } from 'react-router-dom'
 
 const SupplierModal = ({
@@ -31,11 +31,18 @@ const SupplierModal = ({
   totalRows,
   filterRefetch
 }) => {
-  const toast = useToast()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
+
+  const {
+    compDirection,
+    compField,
+    setCheckFilters,
+    checkField,
+    checkDirection
+  } = useContext(GlobalContext)
 
   const validateEmail = (email) => {
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
@@ -45,8 +52,30 @@ const SupplierModal = ({
   const [supName, setSupName] = useState('')
   const [supEmail, setSupEmail] = useState('')
 
-  const [createSupplier] = useMutation(addComSupplier)
-  const [updateSupplier] = useMutation(updateComSupplier)
+  const handleRefetch = () => {
+    refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      first: totalRows,
+      last: undefined,
+      field: compField,
+      direction: compDirection
+    })
+  }
+
+  const onFilterRefetch = () => {
+    filterRefetch({
+      projectId: productId,
+      sbomId: sbomId
+    }).then((res) => setCheckFilters(res.data.sbom.filters))
+  }
+
+  const [createSupplier] = useMutation(addComSupplier, {
+    onCompleted: () => handleRefetch()
+  })
+  const [updateSupplier] = useMutation(updateComSupplier, {
+    onCompleted: () => handleRefetch()
+  })
 
   const [healthRecheck] = useMutation(recheckHealth, {
     onCompleted: () => {
@@ -60,8 +89,8 @@ const SupplierModal = ({
         category: undefined,
         severity: undefined,
         status: undefined,
-        field: 'UPDATED_AT',
-        direction: 'DESC'
+        field: checkField,
+        direction: checkDirection
       })
     }
   })
@@ -74,7 +103,6 @@ const SupplierModal = ({
   }, [suppliers])
 
   const handleSave = async (e) => {
-    e.preventDefault()
     await createSupplier({
       variables: {
         name: supName,
@@ -84,14 +112,7 @@ const SupplierModal = ({
     })
       .then((res) => {
         if (res.data) {
-          refetch({
-            projectId: productId,
-            sbomId: sbomId,
-            first: totalRows,
-            last: undefined,
-            field: 'UPDATED_AT',
-            direction: 'DESC'
-          })
+          onFilterRefetch()
         }
         if (checkId) {
           healthRecheck({
@@ -103,36 +124,21 @@ const SupplierModal = ({
           })
         }
       })
-      .finally(() => {
-        filterRefetch({
-          projectId: productId,
-          sbomId: sbomId
-        })
-        onClose()
-      })
+      .finally(() => onClose())
   }
 
   const handleUpdate = async (e) => {
-    e.preventDefault()
     await updateSupplier({
       variables: {
         name: supName,
         contactEmail: supEmail,
         id: suppliers[0].id
       }
+    }).then((data) => {
+      if (data) {
+        onClose()
+      }
     })
-      .then((data) => {
-        if (data) {
-          refetch({
-            projectId: productId,
-            sbomId: sbomId,
-            first: totalRows,
-            field: 'UPDATED_AT',
-            direction: 'DESC'
-          })
-        }
-      })
-      .finally(() => onClose())
   }
 
   return (

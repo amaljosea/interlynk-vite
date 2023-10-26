@@ -38,9 +38,9 @@ const CheckFilterMenu = ({
   setPageIndex,
   totalRows
 }) => {
-  const { checkFilters } = useContext(GlobalContext)
+  const { checkFilters, checkField, checkDirection } = useContext(GlobalContext)
 
-  const { checkCategories, checkSeverities, checkStatuses } = checkFilters
+  const { checkCategories, checkStatuses } = checkFilters
 
   const [selectCategory, setSelectCategory] = useState('')
   const [selectSeverity, setSelectSeverity] = useState('')
@@ -57,8 +57,8 @@ const CheckFilterMenu = ({
       last: undefined,
       after: undefined,
       last: undefined,
-      field: 'UPDATED_AT',
-      direction: 'DESC'
+      field: checkField,
+      direction: checkDirection
     })
     setPageIndex(1)
   }
@@ -73,8 +73,8 @@ const CheckFilterMenu = ({
       last: undefined,
       after: undefined,
       last: undefined,
-      field: 'UPDATED_AT',
-      direction: 'DESC'
+      field: checkField,
+      direction: checkDirection
     })
     setPageIndex(1)
   }
@@ -89,8 +89,8 @@ const CheckFilterMenu = ({
       last: undefined,
       after: undefined,
       last: undefined,
-      field: 'UPDATED_AT',
-      direction: 'DESC'
+      field: checkField,
+      direction: checkDirection
     })
     setPageIndex(1)
   }
@@ -105,8 +105,8 @@ const CheckFilterMenu = ({
   //     last: undefined,
   //     after: undefined,
   //     last: undefined,
-  //     field: 'UPDATED_AT',
-  //     direction: 'DESC'
+  //     field: checkField,
+  //     direction: checkDirection
   //   })
   //   setPageIndex(1)
   // }
@@ -199,7 +199,12 @@ const CheckFilterMenu = ({
                 All
               </MenuItemOption>
               {['critical', 'high', 'medium', 'low'].map((item, index) => (
-                <MenuItemOption key={index} value={item} fontSize={'sm'} textTransform={'capitalize'}>
+                <MenuItemOption
+                  key={index}
+                  value={item}
+                  fontSize={'sm'}
+                  textTransform={'capitalize'}
+                >
                   {item}
                 </MenuItemOption>
               ))}

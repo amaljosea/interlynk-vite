@@ -26,6 +26,8 @@ import {
 import { DeleteIcon } from '@chakra-ui/icons'
 import { useMutation } from '@apollo/client'
 import { UpdateCompLinks } from 'graphQL/Mutation'
+import { useContext } from 'react'
+import GlobalContext from 'context/GlobalContext'
 
 const LinksDrawer = ({
   isOpen,
@@ -34,13 +36,16 @@ const LinksDrawer = ({
   component,
   sbomId,
   productId,
-  refetch
+  refetch,
+  totalRows
 }) => {
   const [type, setType] = useState('')
   const [link, setLink] = useState('')
   const [linksData, setLinksData] = useState([])
 
   const { id, externalUrls } = component
+
+  const { compDirection, compField } = useContext(GlobalContext)
 
   const [updateLinks] = useMutation(UpdateCompLinks)
 
@@ -86,7 +91,11 @@ const LinksDrawer = ({
         if (res.data) {
           refetch({
             projectId: productId,
-            sbomId: sbomId
+            sbomId: sbomId,
+            first: totalRows,
+            last: undefined,
+            field: compField,
+            direction: compDirection
           })
         }
       })

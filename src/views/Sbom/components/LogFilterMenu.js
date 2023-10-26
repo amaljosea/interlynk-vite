@@ -39,7 +39,7 @@ const LogFilterMenu = ({
   setPageIndex,
   totalRows
 }) => {
-  const { logFilters } = useContext(GlobalContext)
+  const { logFilters, logField, logDirection } = useContext(GlobalContext)
   const { logChangeBys, logChangeObjects, logChangeTypes } = logFilters
 
   const [selectChangeBy, setSelectChangeBy] = useState('')
@@ -56,8 +56,8 @@ const LogFilterMenu = ({
       last: undefined,
       after: undefined,
       last: undefined,
-      field: 'CREATED_AT',
-      direction: 'DESC'
+      field: logField,
+      direction: logDirection
     })
     setPageIndex(1)
   }
@@ -72,8 +72,8 @@ const LogFilterMenu = ({
       last: undefined,
       after: undefined,
       last: undefined,
-      field: 'CREATED_AT',
-      direction: 'DESC'
+      field: logField,
+      direction: logDirection
     })
     setPageIndex(1)
   }
@@ -88,8 +88,8 @@ const LogFilterMenu = ({
       last: undefined,
       after: undefined,
       last: undefined,
-      field: 'CREATED_AT',
-      direction: 'DESC'
+      field: logField,
+      direction: logDirection
     })
     setPageIndex(1)
   }

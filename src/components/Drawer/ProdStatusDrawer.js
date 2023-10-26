@@ -26,8 +26,10 @@ import {
   FormControl
 } from '@chakra-ui/react'
 import VulLinkRow from 'components/Tables/VulLinkRow'
+import GlobalContext from 'context/GlobalContext'
 import { updateCompVulnVex } from 'graphQL/Mutation'
 import { getVexStatuses, getVexJustifications } from 'graphQL/Queries'
+import { useContext } from 'react'
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 
@@ -49,6 +51,8 @@ const ProdStatusDrawer = ({
 
   const email = window.localStorage.getItem('email')
 
+  const { setVulnFilters, vulnField, vulnDirection } = useContext(GlobalContext)
+
   const { vuln, vexStatus, id, componentVulnLogs, vexJustification } = data
 
   const [statusTitle, setStatusTitle] = useState('')
@@ -65,7 +69,17 @@ const ProdStatusDrawer = ({
   const { data: allVexStatus } = useQuery(getVexStatuses)
   const { data: allVexJustify } = useQuery(getVexJustifications)
 
-  const [compVexCreate] = useMutation(updateCompVulnVex)
+  const [compVexCreate] = useMutation(updateCompVulnVex, {
+    onCompleted: () =>
+      refetch({
+        projectId: productId,
+        sbomId: sbomId,
+        first: totalRows,
+        last: undefined,
+        field: vulnField,
+        direction: vulnDirection
+      })
+  })
 
   const handleStatusChange = (e) => {
     const { value } = e.target
@@ -93,6 +107,13 @@ const ProdStatusDrawer = ({
     ])
   }
 
+  const onFilterRefetch = () => {
+    filterRefetch({
+      projectId: productId,
+      sbomId: sbomId
+    }).then((res) => setVulnFilters(res.data.sbom.filters))
+  }
+
   const handleSave = async () => {
     try {
       await compVexCreate({
@@ -106,23 +127,10 @@ const ProdStatusDrawer = ({
       })
         .then((res) => {
           if (res.data) {
-            refetch({
-              projectId: productId,
-              sbomId: sbomId,
-              first: totalRows,
-              last: undefined,
-              field: 'UPDATED_AT',
-              direction: 'DESC'
-            })
+            onFilterRefetch()
           }
         })
-        .finally(() => {
-          filterRefetch({
-            projectId: productId,
-            sbomId: sbomId
-          })
-          onClose()
-        })
+        .finally(() => onClose())
     } catch (error) {
       console.log('Mutation error', error)
     }

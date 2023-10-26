@@ -9,8 +9,6 @@ import {
   Tooltip,
   MenuButton,
   Menu,
-  MenuOptionGroup,
-  MenuItemOption,
   Portal,
   MenuList,
   MenuItem,
@@ -23,12 +21,8 @@ import {
   TagCloseButton,
   Link,
   Button,
-  Input,
-  Badge,
   Divider,
-  chakra,
-  Select,
-  Skeleton
+  Select
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
@@ -54,6 +48,7 @@ import CompFilterMenu from 'views/Sbom/components/CompFilterMenu'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import { getFullDateAndTime } from 'utils'
 import GlobalContext from 'context/GlobalContext'
+import CustomLoader from 'components/CustomLoader'
 
 const customStyles = {
   headCells: {
@@ -73,11 +68,9 @@ const customStyles = {
 }
 
 const ComponentTable = ({
-  type,
   lifecycle,
   data,
   error,
-  loading,
   refetch,
   pageIndex,
   setPageIndex,
@@ -92,12 +85,17 @@ const ComponentTable = ({
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
-  const { compFilters } = useContext(GlobalContext)
+  const {
+    compFilters,
+    compField,
+    setCompField,
+    compDirection,
+    setCompDirection
+  } = useContext(GlobalContext)
 
   const customerView = location.pathname.startsWith('/customer')
 
   const [activeRow, setActiveRow] = useState(null)
-  const [sortField, setSortField] = useState('UPDATED_AT')
 
   const [filterText, setFilterText] = useState('')
 
@@ -150,7 +148,7 @@ const ComponentTable = ({
   const columns = [
     // COMPONENT
     {
-      id: 'name',
+      id: 'NAME',
       name: 'NAME',
       selector: (row) => {
         const { purl, name, primary, internal, externalUrls } = row
@@ -290,7 +288,7 @@ const ComponentTable = ({
     },
     // VERSION
     {
-      id: 'version',
+      id: 'VERSION',
       name: 'VERSION',
       selector: (row) => row.version,
       width: '200px',
@@ -298,7 +296,7 @@ const ComponentTable = ({
     },
     // PURL
     {
-      id: 'purl',
+      id: 'PURL',
       name: 'PURL',
       selector: (row) => {
         const { purl } = row
@@ -319,7 +317,7 @@ const ComponentTable = ({
     },
     // LICENSES
     {
-      id: 'licenses',
+      id: 'LICENSES',
       name: 'LICENSES',
       selector: (row) => {
         const { licenses } = row
@@ -363,8 +361,8 @@ const ComponentTable = ({
     },
     // UPDATED AT
     {
-      id: 'updatedAt',
-      name: 'UPDATED_AT',
+      id: 'UPDATED_AT',
+      name: 'UPDATED AT',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
           {timeSince(row.updatedAt)}
@@ -583,8 +581,8 @@ const ComponentTable = ({
       projectId: productId,
       sbomId: sbomId,
       first: Number(e.target.value),
-      field: sortField,
-      direction: 'DESC'
+      field: compField,
+      direction: compDirection
     })
     setFilterText('')
     setPageIndex(1)
@@ -644,7 +642,8 @@ const ComponentTable = ({
   const handleSort = (column, sortDirection) => {
     // console.log(`column`, column)
     // console.log(`sortDirection`, sortDirection)
-    setSortField(column.name)
+    setCompField(column.id)
+    setCompDirection(sortDirection === 'asc' ? 'ASC' : 'DESC')
     refetch({
       projectId: productId,
       sbomId: sbomId,
@@ -652,7 +651,7 @@ const ComponentTable = ({
       last: undefined,
       after: undefined,
       before: undefined,
-      field: column.name,
+      field: column.id,
       direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
     })
   }
@@ -669,8 +668,8 @@ const ComponentTable = ({
       last: totalRows,
       after: undefined,
       before: data.pageInfo.startCursor,
-      field: sortField,
-      direction: 'DESC'
+      field: compField,
+      direction: compDirection
     }).then(() => {
       setTimeout(() => {
         setIsLoading(false)
@@ -688,8 +687,8 @@ const ComponentTable = ({
       last: undefined,
       before: undefined,
       after: data.pageInfo.endCursor,
-      field: sortField,
-      direction: 'DESC'
+      field: compField,
+      direction: compDirection
     }).then(() => {
       setTimeout(() => {
         setIsLoading(false)
@@ -699,31 +698,24 @@ const ComponentTable = ({
 
   return (
     <>
-      {isLoading ? (
-        <Flex width={'100%'} gap={4} direction={'column'}>
-          <Skeleton width={'100%'} height='20px' />
-          <Skeleton width={'100%'} height='20px' />
-          <Skeleton width={'100%'} height='20px' />
-          <Skeleton width={'100%'} height='20px' />
-          <Skeleton width={'100%'} height='20px' />
-        </Flex>
-      ) : (
-        <Flex flexDir={'column'} width={'100%'}>
-          <DataTable
-            columns={columns}
-            data={data.nodes}
-            onSort={handleSort}
-            customStyles={customStyles}
-            defaultSortAsc={false}
-            defaultSortFieldId={'updatedAt'}
-            subHeader
-            subHeaderComponent={subHeaderComponentMemo}
-            expandableRows
-            expandableRowsComponent={ExpandedComponent}
-            responsive={true}
-          />
-        </Flex>
-      )}
+      <Flex flexDir={'column'} width={'100%'}>
+        <DataTable
+          columns={columns}
+          data={data.nodes}
+          onSort={handleSort}
+          customStyles={customStyles}
+          defaultSortAsc={false}
+          defaultSortFieldId={compField}
+          progressPending={isLoading}
+          progressComponent={<CustomLoader />}
+          subHeader
+          subHeaderComponent={subHeaderComponentMemo}
+          expandableRows
+          persistTableHead
+          expandableRowsComponent={ExpandedComponent}
+          responsive={true}
+        />
+      </Flex>
 
       {/* PAGINATION */}
       {!isLoading && (
@@ -801,6 +793,7 @@ const ComponentTable = ({
               isOpen={isDelOpen}
               onClose={onDelClose}
               id={activeRow.id}
+              totalRows={totalRows}
               refetch={refetch}
             />
           )}
@@ -827,6 +820,7 @@ const ComponentTable = ({
               onClose={onLinkClose}
               refetch={refetch}
               productId={productId}
+              totalRows={totalRows}
               sbomId={sbomId}
             />
           )}

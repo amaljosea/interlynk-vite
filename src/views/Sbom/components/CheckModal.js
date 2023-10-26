@@ -21,7 +21,9 @@ import {
   Text,
   Tooltip
 } from '@chakra-ui/react'
+import GlobalContext from 'context/GlobalContext'
 import { UpdateComponent, recheckHealth } from 'graphQL/Mutation'
+import { useContext } from 'react'
 import { useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import MultiSelect from 'react-select'
@@ -36,14 +38,19 @@ const CheckModal = ({
   components,
   checkId,
   totalRows,
-  filterRefetch
+  filterRefetch,
+  componentId
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
+  console.log('id', id)
   console.log('components', components)
+
+  const { setCheckFilters, checkField, checkDirection } =
+    useContext(GlobalContext)
 
   const now = new Date()
   const hours = String(now.getHours()).padStart(2, '0')
@@ -65,34 +72,49 @@ const CheckModal = ({
         projectId: productId,
         sbomId: sbomId,
         first: totalRows,
-        field: 'UPDATED_AT',
-        direction: 'DESC'
+        last: undefined,
+        after: undefined,
+        before: undefined,
+        category: undefined,
+        severity: undefined,
+        status: undefined,
+        field: checkField,
+        direction: checkDirection
       })
     }
   })
 
   const [updateComponent] = useMutation(UpdateComponent)
 
+  const onFilterRefetch = () => {
+    filterRefetch({
+      projectId: productId,
+      sbomId: sbomId
+    }).then((res) => setCheckFilters(res.data.sbom.filters))
+  }
+
   const handleComUpdate = async () => {
     try {
       await updateComponent({
         variables: {
-          id: id,
+          id: compId,
           sbomId: sbomId,
           primary: true
         }
       })
-        .then(() => {
-          healthRecheck({
-            variables: {
-              checkId: checkId,
-              sbomId: sbomId
-            }
-          })
-          filterRefetch({
-            projectId: productId,
-            sbomId: sbomId
-          })
+        .then((res) => {
+          if (res.data) {
+            onFilterRefetch()
+          }
+
+          if (checkId) {
+            healthRecheck({
+              variables: {
+                checkId: checkId,
+                sbomId: sbomId
+              }
+            })
+          }
         })
         .finally(() => window.location.reload())
     } catch (error) {
@@ -104,23 +126,25 @@ const CheckModal = ({
     try {
       await updateComponent({
         variables: {
-          id: id,
+          id: componentId,
           sbomId: sbomId,
           licenses: selectedLicenses
         }
       })
         .then((res) => {
-          healthRecheck({
-            variables: {
-              componentId: id,
-              checkId: checkId,
-              sbomId: sbomId
-            }
-          })
-          filterRefetch({
-            projectId: productId,
-            sbomId: sbomId
-          })
+          if (res.data) {
+            onFilterRefetch()
+          }
+
+          if (checkId) {
+            healthRecheck({
+              variables: {
+                compId: componentId,
+                checkId: checkId,
+                sbomId: sbomId
+              }
+            })
+          }
         })
         .finally(() => onClose())
     } catch (error) {

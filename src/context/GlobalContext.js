@@ -36,7 +36,23 @@ const GlobalContext = React.createContext({
   checkFilters: {},
   setCheckFilters: () => {},
   logFilters: {},
-  setLogFilters: () => {}
+  setLogFilters: () => {},
+  compField: '',
+  setCompField: () => {},
+  compDirection: '',
+  setCompDirection: () => {},
+  vulnField: '',
+  setVulnField: () => {},
+  vulnDirection: '',
+  setVulnDirection: () => {},
+  checkField: '',
+  setCheckField: () => {},
+  checkDirection: '',
+  setCheckDirection: () => {},
+  logField: '',
+  setLogField: () => {},
+  logDirection: '',
+  setLogDirection: () => {}
 })
 
 export default GlobalContext
