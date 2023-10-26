@@ -30,7 +30,7 @@ jobs:
       - name: Upload SBOM
         run: |
           curl -v "https://api.interlynk.io/lynkapi" \
-            -H "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJiODk5OTcyYy01ZDNjLTRhYjktOGVjNy1jNWQ3YjAwNWZmYmYiLCJzdWIiOiIyMjZlNjU0Mi05MTcxLTRkMjYtOTA2Yy1iOWJlZWM3NDY0ZDciLCJzY3AiOiJ1c2VyIiwiYXVkIjp7ImV4cCI6MTcwMDMyMTU2OX0sImlhdCI6MTY5NzcyOTU2OSwiZXhwIjoxNjk3ODE1OTY5fQ.Ec6okiTXvMVuF9Pvq_DRmPd29yrpjXsMcXWh0LAkIPE" \
-            -F 'operations={"query":"mutation uploadSbom($doc: Upload!, $projectId: ID!) { sbomUpload(input: { doc: $doc, projectId: $projectId }) { errors } }","variables":{"doc":null,"projectId":"93d17533-34cd-454a-bfae-8e7aea92f8a6"}}' \
+            -H "Authorization: Bearer ${{ secrets.INTERLYNK_SECURITY_TOKEN }}" \
+            -F 'operations={"query":"mutation uploadSbom($doc: Upload!, $projectId: ID!) { sbomUpload(input: { doc: $doc, projectId: $projectId }) { errors } }","variables":{"doc":null,"projectId": "${{ vars.INTERLYNK_PRODUCT_ID }}" }}' \
             -F 'map={"0":["variables.doc"]}' \
             -F '0=@"lynk-app-dash.cdx.json";type=application/json'
