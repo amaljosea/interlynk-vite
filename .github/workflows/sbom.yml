@@ -1,9 +1,12 @@
 name: Build and Push SBOM to Interlynk
 
 on:
-  release:
-    types:
-      - created
+  push:
+    branches:
+      - main # Adjust to your main branch name
+  pull_request:
+    branches:
+      - main # Adjust to your main branch name
 
 jobs:
   build-sbom:
@@ -31,6 +34,6 @@ jobs:
         run: |
           curl -v "https://api.interlynk.io/lynkapi" \
             -H "Authorization: Bearer ${{ secrets.INTERLYNK_SECURITY_TOKEN }}" \
-            -F 'operations={"query":"mutation uploadSbom($doc: Upload!, $projectId: ID!) { sbomUpload(input: { doc: $doc, projectId: $projectId }) { errors } }","variables":{"doc":null,"projectId": `${{ env.INTERLYNK_PRODUCT_ID }}`}}' \
+            -F 'operations={"query":"mutation uploadSbom($doc: Upload!, $projectId: ID!) { sbomUpload(input: { doc: $doc, projectId: $projectId }) { errors } }","variables":{"doc":null,"projectId": "${{ env.INTERLYNK_PRODUCT_ID }}" }}' \
             -F 'map={"0":["variables.doc"]}' \
             -F '0=@"lynk-app-dash.cdx.json";type=application/json'
