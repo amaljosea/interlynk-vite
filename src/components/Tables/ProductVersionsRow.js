@@ -51,7 +51,8 @@ function ProductVersionsRow(props) {
     updatedAt,
     allProjects,
     isLoading,
-    refetch
+    refetch,
+    totalRows
   } = props
 
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -91,7 +92,7 @@ function ProductVersionsRow(props) {
       }).then((res) => {
         if (res) {
           refetch({
-            first: 10
+            first: totalRows
           })
           onDeleteClose()
         }

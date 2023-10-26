@@ -74,6 +74,7 @@ const ProductVersions = ({
                     allProjects={allProjects}
                     isLoading={isLoading}
                     refetch={refetch}
+                    totalRows={totalRows}
                   />
                 )
               })}
