@@ -30,7 +30,8 @@ const ProductModal = ({
   type,
   description,
   allProjects,
-  refetch
+  refetch,
+  totalRows
 }) => {
   const toast = useToast()
   const [projectCreate] = useMutation(CreateProject)
@@ -68,7 +69,7 @@ const ProductModal = ({
       })
         .then(() =>
           refetch({
-            first: 10
+            first: totalRows
           })
         )
         .finally(() => onClose())
@@ -97,7 +98,7 @@ const ProductModal = ({
           })
         } else {
           refetch({
-            first: 10
+            first: totalRows
           })
           onClose()
         }
@@ -141,7 +142,7 @@ const ProductModal = ({
                     placeholder='Enter product description'
                   />
                 </FormControl>
-{/*                 {id && (
+                {/*                 {id && (
                   <FormControl pointerEvents={'none'}>
                     <FormLabel>Type</FormLabel>
                     <Select

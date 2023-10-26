@@ -106,7 +106,7 @@ const ProductVersions = ({
               Next
             </Button>
             <Box>
-              Page {pageIndex} of{' '}
+              Page {pageIndex} of {' '}
               {allProjects.projects.totalCount === 0
                 ? 1
                 : Math.ceil(allProjects.projects.totalCount / totalRows)}
