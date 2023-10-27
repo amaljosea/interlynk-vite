@@ -7,7 +7,8 @@ import {
   Input,
   Button,
   useToast,
-  FormErrorMessage
+  FormErrorMessage,
+  Box
 } from '@chakra-ui/react'
 import { useColorModeValue } from '@chakra-ui/system'
 import Card from 'components/Card/Card'
@@ -62,7 +63,7 @@ const PersonalInfo = ({ user, refetch }) => {
   }
 
   return (
-    <Card>
+    <Box px={0} mx={0}>
       <CardHeader p='12px 0' mb='12px'>
         <Text fontSize='lg' color={textColor} fontWeight='bold'>
           Personal Details
@@ -70,7 +71,7 @@ const PersonalInfo = ({ user, refetch }) => {
       </CardHeader>
       <CardBody px='5px'>
         <Flex
-          width={'100%'}
+          width={'40%'}
           flexDirection={'column'}
           alignItems={'flex-start'}
           gap={6}
@@ -106,7 +107,7 @@ const PersonalInfo = ({ user, refetch }) => {
           </Button>
         </Flex>
       </CardBody>
-    </Card>
+    </Box>
   )
 }
 

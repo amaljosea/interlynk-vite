@@ -86,3 +86,17 @@
   white-space: nowrap;
 }
 
+.form-control {
+  padding: 8px 15px;
+  border: 1px solid;
+  border-color: inherit;
+  border-radius: 5px;
+  width: 100%;
+}
+
+.rdtOpen .rdtPicker {
+  width: 80%;
+  border: 1px solid;
+  border-color: inherit;
+  border-radius: 5px;
+}

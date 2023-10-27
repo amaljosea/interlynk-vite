@@ -145,17 +145,30 @@ function Profile() {
 
           {/* PERSONAL  */}
           {selectedTab === 'PERSONAL' && (
-            <Grid
-              width={'100%'}
-              templateColumns={{ sm: '1fr', xl: 'repeat(2, 1fr)' }}
-              gap='22px'
-            >
-              <PersonalInfo
-                user={orgInfo.organization.currentUser}
-                refetch={refetch}
-              />
-              <TokenInfo />
-            </Grid>
+            <Card>
+              <Tabs variant='enclosed' w={'100%'} bg={'white'}>
+                <TabList>
+                  <Tab _focus={{ outline: 'none' }}>Personal Details</Tab>
+                  <Tab _focus={{ outline: 'none' }}>Security Token</Tab>
+                </TabList>
+                <TabPanels>
+                  {/* PERSONA DETAILS */}
+                  <TabPanel>
+                    <PersonalInfo
+                      user={orgInfo.organization.currentUser}
+                      refetch={refetch}
+                    />
+                  </TabPanel>
+                  {/* SECURITY TOKEN */}
+                  <TabPanel>
+                    <TokenInfo
+                      data={orgInfo.organization.currentUser.apiKeys}
+                      refetch={refetch}
+                    />
+                  </TabPanel>
+                </TabPanels>
+              </Tabs>
+            </Card>
           )}
         </Flex>
       )}
