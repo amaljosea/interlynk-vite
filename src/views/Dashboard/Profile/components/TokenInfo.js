@@ -1,5 +1,5 @@
 import { useMutation } from '@apollo/client'
-import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
+import { AddIcon } from '@chakra-ui/icons'
 import {
   Button,
   Flex,
@@ -8,8 +8,6 @@ import {
   Tag,
   IconButton,
   Input,
-  InputGroup,
-  InputRightElement,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -17,50 +15,92 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Stack,
-  Text,
-  Textarea,
   useClipboard,
-  useDisclosure
+  useDisclosure,
+  TagLabel,
+  MenuButton,
+  Menu,
+  Portal,
+  MenuList,
+  MenuItem,
+  Tooltip,
+  Checkbox,
+  Text,
+  Stack,
+  Textarea,
+  FormErrorMessage
 } from '@chakra-ui/react'
 import { useColorModeValue } from '@chakra-ui/system'
-import Card from 'components/Card/Card'
-import CardBody from 'components/Card/CardBody'
-import CardHeader from 'components/Card/CardHeader'
-import { RevokeApiToken } from 'graphQL/Mutation'
-import { GenApiToken } from 'graphQL/Mutation'
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, useMemo, useEffect } from 'react'
+import DataTable from 'react-data-table-component'
+import { FaEllipsisV } from 'react-icons/fa'
+import Datetime from 'react-datetime'
+import 'react-datetime/css/react-datetime.css' // CSS styling for the date-time picker
+import {
+  createApiToken,
+  deleteApiToken,
+  updateApiToken
+} from 'graphQL/Mutation'
+import { getFullDateAndTime } from 'utils'
+import { isValid } from 'date-fns'
 
-const TokenInfo = () => {
-  const textColor = useColorModeValue('gray.700', 'white')
+const customStyles = {
+  headCells: {
+    style: {
+      fontWeight: 'bold',
+      color: '#2D3748',
+      fontSize: '12px',
+      letterSpacing: '1px'
+    }
+  },
+  subHeader: {
+    style: {
+      padding: 0,
+      margin: 0
+    }
+  }
+}
 
+const TokenInfo = ({ data, refetch }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const finalRef = useRef(null)
+  const tokenRef = useRef(null)
 
   const [token, setToken] = useState('')
+  const [keyName, setKeyName] = useState('')
+  const [selectedDate, setSelectedDate] = useState('')
+  const [noExpire, setNoExpire] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [activeRow, setActiveRow] = useState(null)
 
   const [showKey, setShowKey] = useState(false)
 
   const key = useClipboard(token)
 
-  const handleKeyVisibility = () => {
-    setShowKey(!showKey)
-  }
-
-  const [generateToken] = useMutation(GenApiToken)
-  const [remokeToken] = useMutation(RevokeApiToken)
+  const [generateToken] = useMutation(createApiToken)
+  const [deleteToken] = useMutation(deleteApiToken, {
+    onCompleted: () => refetch()
+  })
+  const [updateToken] = useMutation(updateApiToken, {
+    onCompleted: () => refetch()
+  })
 
   const handleCreate = async () => {
     setIsLoading(true)
     try {
-      await generateToken().then((res) => {
-        if (res) {
+      await generateToken({
+        variables: {
+          notes: keyName,
+          expiresAt: selectedDate
+            ? selectedDate.toISOString().replace(/\.\d{3}Z$/, 'Z')
+            : undefined
+        }
+      }).then((res) => {
+        if (res.data) {
+          console.log(res.data)
           setTimeout(() => {
-            setToken(res.data.apiTokenCreate.apiToken)
+            setToken(res.data.apiTokenCreate.apiKey.rawToken)
             setIsLoading(false)
-            onClose()
           }, 3000)
         }
       })
@@ -69,96 +109,309 @@ const TokenInfo = () => {
     }
   }
 
+  const handleDelete = async (id) => {
+    try {
+      await deleteToken({
+        variables: {
+          apiKeyId: id
+        }
+      }).then((res) => res && onClose())
+    } catch (error) {
+      console.log('Mutation error', error)
+    }
+  }
+
+  const handleUpdate = async () => {
+    try {
+      await updateToken({
+        variables: {
+          id: activeRow.id,
+          expires: selectedDate && !noExpire ? selectedDate : undefined
+        }
+      }).then((res) => onClose())
+    } catch (error) {
+      console.log('Mutation error', error)
+    }
+  }
+
+  const handleRevoked = async (id) => {
+    try {
+      await updateToken({
+        variables: {
+          id: id,
+          revoked: new Date().toISOString()
+        }
+      }).then((res) => onClose())
+    } catch (error) {
+      console.log('Mutation error', error)
+    }
+  }
+
+  const handleSubmit = () => {
+    refetch()
+    onClose()
+  }
+
+  const handleDateChange = (newDate) => {
+    console.log('newDate', newDate)
+    setSelectedDate(newDate._d)
+  }
+
+  // HEADER SECTION
+  const subHeaderComponent = useMemo(() => {
+    return (
+      <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
+        {/* CREATE COMPONENT */}
+        <Tooltip label='New Token'>
+          <IconButton
+            ref={tokenRef}
+            onClick={() => {
+              setKeyName('')
+              setSelectedDate('')
+              setToken('')
+              setNoExpire(false)
+              setActiveRow(null)
+              onOpen()
+            }}
+            icon={<AddIcon />}
+            colorScheme='blue'
+            variant='solid'
+            fontWeight='normal'
+            fontSize={'sm'}
+          />
+        </Tooltip>
+      </Flex>
+    )
+  }, [])
+
+  useEffect(() => {
+    if (activeRow) {
+      setKeyName(activeRow.notes)
+      setSelectedDate(new Date(activeRow.expiresAt))
+      setNoExpire(activeRow.expiresAt === null ? true : false)
+    }
+  }, [activeRow])
+
+  // COLUMNS
+  const columns = [
+    // NAME
+    {
+      id: 'name',
+      name: 'NAME',
+      selector: (row) => row.notes
+    },
+    // TOKEN MASK
+    {
+      id: 'tokenMask',
+      name: 'TOKEN MASK',
+      selector: (row) => row.tokenMask
+    },
+    // CREATED
+    {
+      id: 'created',
+      name: 'CREATED',
+      selector: (row) => <Text>{getFullDateAndTime(row.createdAt)}</Text>
+    },
+    // EXPIRES
+    {
+      id: 'expires',
+      name: 'EXPIRES',
+      selector: (row) => <Text>{getFullDateAndTime(row.expiresAt)}</Text>
+    },
+    // STATUS
+    {
+      id: 'status',
+      name: 'STATUS',
+      selector: (row) => {
+        const { revoked, expired } = row
+
+        const color = () => {
+          if (!revoked && !expired) {
+            return 'green'
+          } else if (revoked) {
+            return 'blue'
+          } else {
+            return 'red'
+          }
+        }
+
+        return (
+          <Tag
+            size='md'
+            key='md'
+            variant='subtle'
+            colorScheme={color()}
+            textTransform={'capitalize'}
+            width={'100%'}
+            borderRadius='full'
+            alignItems={'center'}
+            justifyContent={'center'}
+          >
+            <TagLabel px={1}>
+              {!revoked && !expired
+                ? 'Active'
+                : revoked
+                ? 'Revoked'
+                : 'Expired'}
+            </TagLabel>
+          </Tag>
+        )
+      }
+    },
+    // ACTIONS
+    {
+      id: 'actions',
+      name: 'ACTIONS',
+      selector: (row) => {
+        return (
+          <Menu>
+            <MenuButton
+              as={IconButton}
+              icon={<FaEllipsisV />}
+              variant='none'
+              color='gray.400'
+            />
+            <Portal>
+              <MenuList size='sm'>
+                {row.revoked === false && (
+                  <MenuItem onClick={() => handleRevoked(row.id)}>
+                    Revoke Token
+                  </MenuItem>
+                )}
+                <MenuItem
+                  onClick={() => {
+                    console.log(row)
+                    setToken('')
+                    setActiveRow(row)
+                    onOpen()
+                  }}
+                >
+                  Edit Expiration
+                </MenuItem>
+                <MenuItem onClick={() => handleDelete(row.id)}>Delete</MenuItem>
+              </MenuList>
+            </Portal>
+          </Menu>
+        )
+      }
+    }
+  ]
+
   return (
     <>
-      <Card>
-        <CardHeader p='12px 0' mb='12px'>
-          <Flex direction='column'>
-            <Text fontSize='lg' color={textColor} fontWeight='bold'>
-              Security Token
-            </Text>
-            <Text fontSize='sm' mt='10px' color={textColor}>
-              Security token is required to connect through the Interlynk API or
-              Command Line Interface (CLI).
-            </Text>
-          </Flex>
-        </CardHeader>
-        <CardBody px='5px'>
-          <Flex
-            width={'100%'}
-            flexDirection={'column'}
-            alignItems={'flex-start'}
-            gap={6}
-          >
-            {/* NAME */}
-            <Button variant='solid' colorScheme='green' onClick={onOpen}>
-              Generate New Token
-            </Button>
-            {token !== '' && (
-              <>
-                <FormControl>
-                  <FormLabel>Token</FormLabel>
-                  <Textarea
-                    type={'text'}
-                    defaultValue={token}
-                    readOnly
-                    style={{
-                      width: '100%',
-                      height: 'auto',
-                      minHeight: '150px'
-                    }}
-                  />
-                  <Tag mt={5} fontSize={'sm'} colorScheme='red'>
-                    Warning
-                  </Tag>
-                  <Text fontSize={'sm'}>
-                    For account's security, this token is not stored anywhere
-                    and will not be visible once you navigate away from this
-                    page. Please copy it and store it in a safe place for future
-                    reference.
-                  </Text>
-                </FormControl>
-                {/* ACTION */}
-                <Stack direction={'row'} alignItems={'center'}>
-                  <Button
-                    variant='solid'
-                    colorScheme={'blue'}
-                    onClick={() => key.onCopy()}
-                  >
-                    {key.hasCopied ? 'Copied!' : 'Copy'}
-                  </Button>
-                </Stack>
-              </>
-            )}
-          </Flex>
-        </CardBody>
-      </Card>
+      <Flex flexDir={'column'} width={'100%'}>
+        <DataTable
+          subHeader
+          columns={columns}
+          data={data}
+          persistTableHead
+          responsive={true}
+          customStyles={customStyles}
+          subHeaderComponent={subHeaderComponent}
+        />
+      </Flex>
 
       {isOpen && (
-        <Modal finalFocusRef={finalRef} isOpen={isOpen} onClose={onClose}>
+        <Modal finalFocusRef={tokenRef} isOpen={isOpen} onClose={onClose}>
           <ModalOverlay />
           <ModalContent>
-            <ModalHeader>Security Token</ModalHeader>
+            <ModalHeader>
+              {activeRow ? activeRow.notes : 'Create API Key'}
+            </ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              <Text>
-                You can only copy the security token once, so please be sure to copy it before leaving the window.
-              </Text>
-              <Text mt={10}>Click continue when you are ready.</Text>
+              {!activeRow && (
+                <FormControl mb={5} isRequired>
+                  <FormLabel mb={1} htmlFor='keyName'>
+                    API Key Name
+                  </FormLabel>
+                  <Input
+                    type='text'
+                    id='keyName'
+                    name='keyName'
+                    value={keyName}
+                    onChange={(e) => setKeyName(e.target.value)}
+                  />
+                </FormControl>
+              )}
+              {!noExpire && (
+                <FormControl mb={5} isRequired>
+                  <FormLabel mb={1} htmlFor='expire'>
+                    Expiration Date
+                  </FormLabel>
+                  <Datetime
+                    value={selectedDate}
+                    onChange={handleDateChange}
+                    utc={true}
+                    inputProps={{ placeholder: 'Select Date and Time' }}
+                  />
+                </FormControl>
+              )}
+              <FormControl mb={5}>
+                <Checkbox
+                  display={activeRow && activeRow.expiresAt ? 'none' : 'block'}
+                  isChecked={noExpire}
+                  onChange={() => setNoExpire(!noExpire)}
+                >
+                  No Expiration
+                </Checkbox>
+              </FormControl>
+              {token !== '' ? (
+                <>
+                  <FormControl my={5}>
+                    <Input type={'text'} defaultValue={token} readOnly />
+                  </FormControl>
+                  {/* ACTION */}
+                  <Stack direction={'row'} alignItems={'center'}>
+                    <Button
+                      variant='solid'
+                      colorScheme={'blue'}
+                      onClick={() => key.onCopy()}
+                    >
+                      {key.hasCopied ? 'Copied!' : 'Copy'}
+                    </Button>
+                  </Stack>
+                </>
+              ) : (
+                !activeRow && (
+                  <Button
+                    variant='solid'
+                    colorScheme='blue'
+                    isDisabled={
+                      !keyName ||
+                      (selectedDate !== '' && !isValid(selectedDate)) ||
+                      isLoading
+                    }
+                    onClick={handleCreate}
+                  >
+                    {isLoading ? 'Creating...' : 'Create'}
+                  </Button>
+                )
+              )}
             </ModalBody>
 
             <ModalFooter>
               <Button mr={3} onClick={onClose}>
                 Cancel
               </Button>
-              <Button
-                variant='solid'
-                colorScheme='blue'
-                onClick={handleCreate}
-                disabled={isLoading}
-              >
-                {isLoading ? 'Generating...' : 'Continue'}
-              </Button>
+              {activeRow ? (
+                <Button
+                  variant='solid'
+                  colorScheme='blue'
+                  onClick={handleUpdate}
+                >
+                  Update
+                </Button>
+              ) : (
+                <Button
+                  variant='solid'
+                  colorScheme='blue'
+                  disabled={token === ''}
+                  onClick={handleSubmit}
+                >
+                  Done
+                </Button>
+              )}
             </ModalFooter>
           </ModalContent>
         </Modal>

@@ -13,6 +13,18 @@ export const GetOrg = gql`
         id
         name
         email
+        apiKeys {
+          id
+          rawToken
+          tokenMask
+          revoked
+          expired
+          createdAt
+          updatedAt
+          revokedAt
+          expiresAt
+          notes
+        }
       }
       users {
         id
