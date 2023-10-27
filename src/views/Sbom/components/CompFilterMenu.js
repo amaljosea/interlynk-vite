@@ -146,7 +146,7 @@ const CompFilterMenu = ({
           >
             Ecosystem
           </MenuButton>
-          <MenuList>
+          <MenuList minHeight={'auto'} maxHeight={'300px'} overflow={'hidden'} overflowY={'scroll'}>
             <MenuOptionGroup
               type='radio'
               value={selectedEcosystem}
@@ -177,7 +177,7 @@ const CompFilterMenu = ({
           >
             Kind
           </MenuButton>
-          <MenuList>
+          <MenuList minHeight={'auto'} maxHeight={'300px'} overflow={'hidden'} overflowY={'scroll'}>
             <MenuOptionGroup
               type='radio'
               value={selectedKind}
@@ -208,7 +208,7 @@ const CompFilterMenu = ({
           >
             Licenses
           </MenuButton>
-          <MenuList>
+          <MenuList minHeight={'auto'} maxHeight={'300px'} overflow={'hidden'} overflowY={'scroll'}>
             <MenuOptionGroup
               type='radio'
               value={selectedLicense}
@@ -241,7 +241,7 @@ const CompFilterMenu = ({
           >
             Suppliers
           </MenuButton>
-          <MenuList>
+          <MenuList minHeight={'auto'} maxHeight={'300px'} overflow={'hidden'} overflowY={'scroll'}>
             <MenuOptionGroup
               type='radio'
               value={selectedSupplier}

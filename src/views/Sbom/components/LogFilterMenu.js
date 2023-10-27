@@ -109,7 +109,12 @@ const LogFilterMenu = ({
           >
             User
           </MenuButton>
-          <MenuList>
+          <MenuList
+            minHeight={'auto'}
+            maxHeight={'300px'}
+            overflow={'hidden'}
+            overflowY={'scroll'}
+          >
             <MenuOptionGroup
               type='radio'
               value={selectChangeBy}
@@ -140,7 +145,12 @@ const LogFilterMenu = ({
           >
             Object
           </MenuButton>
-          <MenuList>
+          <MenuList
+            minHeight={'auto'}
+            maxHeight={'300px'}
+            overflow={'hidden'}
+            overflowY={'scroll'}
+          >
             <MenuOptionGroup
               type='radio'
               value={selectChangeObj}
@@ -173,7 +183,12 @@ const LogFilterMenu = ({
           >
             Type
           </MenuButton>
-          <MenuList>
+          <MenuList
+            minHeight={'auto'}
+            maxHeight={'300px'}
+            overflow={'hidden'}
+            overflowY={'scroll'}
+          >
             <MenuOptionGroup
               type='radio'
               value={selectChangeType}
