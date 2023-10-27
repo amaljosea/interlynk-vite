@@ -126,8 +126,7 @@ const TokenInfo = ({ data, refetch }) => {
       await updateToken({
         variables: {
           id: activeRow.id,
-          notes: keyName,
-          expires: selectedDate ? selectedDate : undefined
+          expires: selectedDate && !noExpire ? selectedDate : undefined
         }
       }).then((res) => onClose())
     } catch (error) {
@@ -163,7 +162,7 @@ const TokenInfo = ({ data, refetch }) => {
     return (
       <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
         {/* CREATE COMPONENT */}
-        <Tooltip label='Add Token'>
+        <Tooltip label='New Token'>
           <IconButton
             ref={tokenRef}
             onClick={() => {
@@ -188,7 +187,7 @@ const TokenInfo = ({ data, refetch }) => {
   useEffect(() => {
     if (activeRow) {
       setKeyName(activeRow.notes)
-      setSelectedDate(activeRow.expiresAt)
+      setSelectedDate(new Date(activeRow.expiresAt))
       setNoExpire(activeRow.expiresAt === null ? true : false)
     }
   }, [activeRow])
@@ -281,6 +280,7 @@ const TokenInfo = ({ data, refetch }) => {
                 )}
                 <MenuItem
                   onClick={() => {
+                    console.log(row)
                     setToken('')
                     setActiveRow(row)
                     onOpen()
@@ -315,21 +315,25 @@ const TokenInfo = ({ data, refetch }) => {
         <Modal finalFocusRef={tokenRef} isOpen={isOpen} onClose={onClose}>
           <ModalOverlay />
           <ModalContent>
-            <ModalHeader>{activeRow ? 'Update' : 'Create API Key'}</ModalHeader>
+            <ModalHeader>
+              {activeRow ? activeRow.notes : 'Create API Key'}
+            </ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              <FormControl mb={5} isRequired>
-                <FormLabel mb={1} htmlFor='keyName'>
-                  API Key Name
-                </FormLabel>
-                <Input
-                  type='text'
-                  id='keyName'
-                  name='keyName'
-                  value={keyName}
-                  onChange={(e) => setKeyName(e.target.value)}
-                />
-              </FormControl>
+              {!activeRow && (
+                <FormControl mb={5} isRequired>
+                  <FormLabel mb={1} htmlFor='keyName'>
+                    API Key Name
+                  </FormLabel>
+                  <Input
+                    type='text'
+                    id='keyName'
+                    name='keyName'
+                    value={keyName}
+                    onChange={(e) => setKeyName(e.target.value)}
+                  />
+                </FormControl>
+              )}
               {!noExpire && (
                 <FormControl mb={5} isRequired>
                   <FormLabel mb={1} htmlFor='expire'>
@@ -345,6 +349,7 @@ const TokenInfo = ({ data, refetch }) => {
               )}
               <FormControl mb={5}>
                 <Checkbox
+                  isDisabled={activeRow && activeRow.expiresAt}
                   isChecked={noExpire}
                   onChange={() => setNoExpire(!noExpire)}
                 >
@@ -372,7 +377,11 @@ const TokenInfo = ({ data, refetch }) => {
                   <Button
                     variant='solid'
                     colorScheme='blue'
-                    isDisabled={!keyName || !isValid(selectedDate) || isLoading}
+                    isDisabled={
+                      !keyName ||
+                      (selectedDate !== '' && !isValid(selectedDate)) ||
+                      isLoading
+                    }
                     onClick={handleCreate}
                   >
                     {isLoading ? 'Creating...' : 'Create'}
