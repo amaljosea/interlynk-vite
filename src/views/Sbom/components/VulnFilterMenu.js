@@ -146,7 +146,12 @@ const VulnFilterMenu = ({
           >
             Component
           </MenuButton>
-          <MenuList>
+          <MenuList
+            minHeight={'auto'}
+            maxHeight={'300px'}
+            overflow={'hidden'}
+            overflowY={'scroll'}
+          >
             <MenuOptionGroup
               type='radio'
               value={selectCompName}
@@ -177,7 +182,12 @@ const VulnFilterMenu = ({
           >
             Status
           </MenuButton>
-          <MenuList>
+          <MenuList
+            minHeight={'auto'}
+            maxHeight={'300px'}
+            overflow={'hidden'}
+            overflowY={'scroll'}
+          >
             <MenuOptionGroup
               type='radio'
               value={selectedStatus}
