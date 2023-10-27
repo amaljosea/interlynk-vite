@@ -349,7 +349,7 @@ const TokenInfo = ({ data, refetch }) => {
               )}
               <FormControl mb={5}>
                 <Checkbox
-                  isDisabled={activeRow && activeRow.expiresAt}
+                  display={activeRow && activeRow.expiresAt ? 'none' : 'block'}
                   isChecked={noExpire}
                   onChange={() => setNoExpire(!noExpire)}
                 >
