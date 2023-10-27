@@ -27,7 +27,8 @@ import {
   Checkbox,
   Text,
   Stack,
-  Textarea
+  Textarea,
+  FormErrorMessage
 } from '@chakra-ui/react'
 import { useColorModeValue } from '@chakra-ui/system'
 import React, { useRef, useState, useMemo, useEffect } from 'react'
@@ -41,6 +42,7 @@ import {
   updateApiToken
 } from 'graphQL/Mutation'
 import { getFullDateAndTime } from 'utils'
+import { isValid } from 'date-fns'
 
 const customStyles = {
   headCells: {
@@ -127,7 +129,7 @@ const TokenInfo = ({ data, refetch }) => {
           notes: keyName,
           expires: selectedDate ? selectedDate : undefined
         }
-      }).then((res) => res.data && onClose())
+      }).then((res) => onClose())
     } catch (error) {
       console.log('Mutation error', error)
     }
@@ -140,7 +142,7 @@ const TokenInfo = ({ data, refetch }) => {
           id: id,
           revoked: new Date().toISOString()
         }
-      }).then((res) => res.data && onClose())
+      }).then((res) => onClose())
     } catch (error) {
       console.log('Mutation error', error)
     }
@@ -149,9 +151,6 @@ const TokenInfo = ({ data, refetch }) => {
   const handleSubmit = () => {
     refetch()
     onClose()
-    setKeyName('')
-    setSelectedDate('')
-    setToken('')
   }
 
   const handleDateChange = (newDate) => {
@@ -167,7 +166,14 @@ const TokenInfo = ({ data, refetch }) => {
         <Tooltip label='Add Token'>
           <IconButton
             ref={tokenRef}
-            onClick={onOpen}
+            onClick={() => {
+              setKeyName('')
+              setSelectedDate('')
+              setToken('')
+              setNoExpire(false)
+              setActiveRow(null)
+              onOpen()
+            }}
             icon={<AddIcon />}
             colorScheme='blue'
             variant='solid'
@@ -275,7 +281,7 @@ const TokenInfo = ({ data, refetch }) => {
                 )}
                 <MenuItem
                   onClick={() => {
-                    console.log(row)
+                    setToken('')
                     setActiveRow(row)
                     onOpen()
                   }}
@@ -366,7 +372,7 @@ const TokenInfo = ({ data, refetch }) => {
                   <Button
                     variant='solid'
                     colorScheme='blue'
-                    isDisabled={!keyName || isLoading}
+                    isDisabled={!keyName || !isValid(selectedDate) || isLoading}
                     onClick={handleCreate}
                   >
                     {isLoading ? 'Creating...' : 'Create'}
