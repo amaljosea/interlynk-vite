@@ -17,6 +17,7 @@ import React, { useMemo, useState, useContext } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation } from 'react-router-dom'
 import { timeSince } from 'utils'
+import { convertStringToArray } from 'utils'
 import { getFullDateAndTime } from 'utils'
 import LogFilterMenu from 'views/Sbom/components/LogFilterMenu'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
@@ -132,6 +133,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
         const { orig, event } = row
         const license =
           (event === 'licenses' || event === 'cpes') && JSON.parse(orig)
+        const urls = event === 'external_urls' && JSON.stringify(orig)
 
         return (
           <Flex flexWrap={'wrap'} gap={2} my={2}>
@@ -140,28 +142,34 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
               label={license.length === 0 ? '' : orig}
               textTransform={'capitalize'}
             >
-              <Text>
+              <Box textOverflow={'wrap'}>
                 {orig === 'f'
                   ? 'False'
                   : orig === 't'
                   ? 'True'
                   : license.length > 0
                   ? license.map((item, index) => (
-                      <Tag
-                        size={'sm'}
-                        key={index}
-                        variant='subtle'
-                        colorScheme='red'
-                        width={'fit-content'}
-                        textTransform={'capitalize'}
+                      <Flex
+                        flexWrap={'wrap'}
+                        gap={2}
+                        my={2}
+                        direction={'column'}
                       >
-                        <TagLabel pt={1}>{item}</TagLabel>
-                      </Tag>
+                        <Tag
+                          size={'sm'}
+                          key={index}
+                          variant='subtle'
+                          colorScheme='red'
+                          width={'fit-content'}
+                        >
+                          <TagLabel pt={1}>{item}</TagLabel>
+                        </Tag>
+                      </Flex>
                     ))
                   : license.length === 0
                   ? ''
                   : orig}
-              </Text>
+              </Box>
             </Tooltip>
           </Flex>
         )
@@ -176,6 +184,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
         const { updated, event } = row
         const updatedValue =
           (event === 'licenses' || event === 'cpes') && JSON.parse(updated)
+        const urls = event === 'external_urls' && JSON.parse(updated)
 
         return (
           <Flex flexWrap={'wrap'} gap={2} my={2}>
@@ -184,28 +193,55 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
               label={updatedValue.length === 0 ? '' : updated}
               textTransform={'capitalize'}
             >
-              <Text textOverflow={'wrap'}>
+              <Box textOverflow={'wrap'}>
                 {updated === 'f'
                   ? 'False'
                   : updated === 't'
                   ? 'True'
                   : updatedValue.length > 0
                   ? updatedValue.map((item, index) => (
-                      <Tag
-                        size={'sm'}
-                        key={index}
-                        variant='subtle'
-                        colorScheme='green'
-                        width={'fit-content'}
-                        textTransform={'capitalize'}
+                      <Flex
+                        flexWrap={'wrap'}
+                        gap={2}
+                        my={2}
+                        direction={'column'}
                       >
-                        <TagLabel pt={1}>{item}</TagLabel>
-                      </Tag>
+                        <Tag
+                          size={'sm'}
+                          key={index}
+                          variant='subtle'
+                          colorScheme='green'
+                          width={'fit-content'}
+                        >
+                          <TagLabel pt={1}>{item}</TagLabel>
+                        </Tag>
+                      </Flex>
                     ))
                   : updatedValue.length === 0
                   ? ''
+                  : urls && urls.length > 0
+                  ? urls.map((item, index) => (
+                      <Flex
+                        flexWrap={'wrap'}
+                        gap={2}
+                        my={2}
+                        direction={'column'}
+                      >
+                        <Tag
+                          size={'sm'}
+                          key={index}
+                          variant='subtle'
+                          colorScheme='green'
+                          width={'fit-content'}
+                        >
+                          <TagLabel pt={1}>
+                            {item.name} - {item.url}
+                          </TagLabel>
+                        </Tag>
+                      </Flex>
+                    ))
                   : updated}
-              </Text>
+              </Box>
             </Tooltip>
           </Flex>
         )
