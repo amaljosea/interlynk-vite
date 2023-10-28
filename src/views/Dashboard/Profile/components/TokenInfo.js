@@ -97,7 +97,6 @@ const TokenInfo = ({ data, refetch }) => {
         }
       }).then((res) => {
         if (res.data) {
-          console.log(res.data)
           setTimeout(() => {
             setToken(res.data.apiTokenCreate.apiKey.rawToken)
             setIsLoading(false)
@@ -280,7 +279,6 @@ const TokenInfo = ({ data, refetch }) => {
                 )}
                 <MenuItem
                   onClick={() => {
-                    console.log(row)
                     setToken('')
                     setActiveRow(row)
                     onOpen()

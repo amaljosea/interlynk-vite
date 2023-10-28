@@ -84,14 +84,14 @@ export default function HeaderLinks(props) {
           }
         })
         .then((res) => {
-          if (res.data.status === 200) {
-            localStorage.removeItem('username')
-            localStorage.removeItem('email')
-            Cookies.remove('authToken')
-            history.push('/auth')
-          }
         })
-    } catch (error) {}
+    } catch (error) {
+      console.log('handleLogout error : ', error)
+    }
+    localStorage.removeItem('username')
+    localStorage.removeItem('email')
+    Cookies.remove('authToken')
+    history.push('/auth')
   }
 
   const handleCustomerLogout = () => {
