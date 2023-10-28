@@ -526,10 +526,10 @@ export const GetComponentData = gql`
     $after: String
     $before: String
     $search: String
-    $licenses: String
-    $supplierName: String
-    $ecosystem: String
-    $kind: String
+    $licenses: [String!]
+    $supplierName: [String!]
+    $ecosystem: [String!]
+    $kind: [String!]
     $internal: Boolean
     $primary: Boolean
     $field: ComponentOrderByFields!
@@ -652,9 +652,8 @@ export const GetVulnData = gql`
     $projectId: Uuid!
     $sbomId: Uuid!
     $search: String
-    $severity: String
-    $status: String
-    $componentName: String
+    $severity: [String!]
+    $status: [String!]
     $first: Int
     $last: Int
     $after: String
@@ -668,7 +667,6 @@ export const GetVulnData = gql`
         search: $search
         severity: $severity
         status: $status
-        componentName: $componentName
         after: $after
         before: $before
         first: $first
@@ -741,10 +739,9 @@ export const GetCheckResults = gql`
   query GetCheckResults(
     $projectId: Uuid!
     $sbomId: Uuid!
-    $componentName: String
-    $category: String
-    $status: String
-    $severity: String
+    $category: [String!]
+    $status: [String!]
+    $severity: [String!]
     $first: Int
     $last: Int
     $after: String
@@ -756,7 +753,6 @@ export const GetCheckResults = gql`
       id
       checkResults(
         sbomId: $sbomId
-        componentName: $componentName
         category: $category
         status: $status
         severity: $severity
@@ -819,9 +815,9 @@ export const GetChangeLogs = gql`
     $projectId: Uuid!
     $sbomId: Uuid!
     $search: String
-    $changedBy: String
-    $changeObject: String
-    $changeType: String
+    $changedBy: [String!]
+    $changeObject: [String!]
+    $changeType: [String!]
     $first: Int
     $last: Int
     $after: String
