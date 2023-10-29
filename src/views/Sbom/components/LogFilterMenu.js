@@ -42,16 +42,16 @@ const LogFilterMenu = ({
   const { logFilters, logField, logDirection } = useContext(GlobalContext)
   const { logChangeBys, logChangeObjects, logChangeTypes } = logFilters
 
-  const [selectChangeBy, setSelectChangeBy] = useState('')
-  const [selectChangeObj, setSelectChangeObj] = useState('')
-  const [selectChangeType, setSelectChangeType] = useState('')
+  const [selectChangeBy, setSelectChangeBy] = useState([])
+  const [selectChangeObj, setSelectChangeObj] = useState([])
+  const [selectChangeType, setSelectChangeType] = useState([])
 
   const onFilterChangeBy = (value) => {
-    setSelectChangeBy(value)
+    setSelectChangeBy(value.includes('all') ? [] : value)
     refetch({
       projectId: productId,
       sbomId: sbomId,
-      changedBy: value === 'all' ? undefined : value,
+      changedBy: value.includes('all') ? undefined : value,
       first: totalRows,
       last: undefined,
       after: undefined,
@@ -63,11 +63,11 @@ const LogFilterMenu = ({
   }
 
   const onFilterChangeObj = (value) => {
-    setSelectChangeObj(value)
+    setSelectChangeObj(value.includes('all') ? [] : value)
     refetch({
       projectId: productId,
       sbomId: sbomId,
-      changeObject: value === 'all' ? undefined : value,
+      changeObject: value.includes('all') ? undefined : value,
       first: totalRows,
       last: undefined,
       after: undefined,
@@ -79,11 +79,11 @@ const LogFilterMenu = ({
   }
 
   const onFilterChangeType = (value) => {
-    setSelectChangeType(value)
+    setSelectChangeType(value.includes('all') ? [] : value)
     refetch({
       projectId: productId,
       sbomId: sbomId,
-      changeType: value === 'all' ? undefined : value,
+      changeType: value.includes('all') ? undefined : value,
       first: totalRows,
       last: undefined,
       after: undefined,
@@ -99,7 +99,7 @@ const LogFilterMenu = ({
       {/* USER */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnBlur={true}>
-          {selectChangeBy !== '' && selectChangeBy !== 'all' && <CheckMark />}
+          {selectChangeBy.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -116,7 +116,7 @@ const LogFilterMenu = ({
             overflowY={'scroll'}
           >
             <MenuOptionGroup
-              type='radio'
+              type='checkbox'
               value={selectChangeBy}
               onChange={onFilterChangeBy}
             >
@@ -135,7 +135,7 @@ const LogFilterMenu = ({
       {/* OBJECT */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {selectChangeObj !== '' && selectChangeObj !== 'all' && <CheckMark />}
+          {selectChangeObj.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -152,7 +152,7 @@ const LogFilterMenu = ({
             overflowY={'scroll'}
           >
             <MenuOptionGroup
-              type='radio'
+              type='checkbox'
               value={selectChangeObj}
               onChange={onFilterChangeObj}
             >
@@ -171,7 +171,7 @@ const LogFilterMenu = ({
       {/* TYPE */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {selectChangeType !== '' && selectChangeType !== 'all' && (
+          {selectChangeType.length !== 0 && (
             <CheckMark />
           )}
           <MenuButton
@@ -190,7 +190,7 @@ const LogFilterMenu = ({
             overflowY={'scroll'}
           >
             <MenuOptionGroup
-              type='radio'
+              type='checkbox'
               value={selectChangeType}
               onChange={onFilterChangeType}
             >
