@@ -42,18 +42,18 @@ const CompFilterMenu = ({
 
   const { ecosystems, kinds, supplierNames, licenses } = compFilters
 
-  const [selectedEcosystem, setSelectedEcosystem] = useState('')
-  const [selectedKind, setSelectedKind] = useState('')
-  const [selectedLicense, setSelectedLicense] = useState('')
-  const [selectedSupplier, setSelectedSupplier] = useState('')
-  const [selectedType, setSelectedType] = useState('')
+  const [selectedEcosystem, setSelectedEcosystem] = useState([])
+  const [selectedKind, setSelectedKind] = useState([])
+  const [selectedLicense, setSelectedLicense] = useState([])
+  const [selectedSupplier, setSelectedSupplier] = useState([])
+  const [selectedType, setSelectedType] = useState([])
 
   const onFilterEcosystem = (value) => {
-    setSelectedEcosystem(value)
+    setSelectedEcosystem(value.includes('all') ? [] : value)
     refetch({
       projectId: productId,
       sbomId: sbomId,
-      ecosystem: value === 'all' ? undefined : value,
+      ecosystem: value.includes('all') ? undefined : value,
       first: totalRows,
       last: undefined,
       after: undefined,
@@ -65,11 +65,11 @@ const CompFilterMenu = ({
   }
 
   const onFilterKind = (value) => {
-    setSelectedKind(value)
+    setSelectedKind(value.includes('all') ? [] : value)
     refetch({
       projectId: productId,
       sbomId: sbomId,
-      kind: value === 'all' ? undefined : value,
+      kind: value.includes('all') ? undefined : value,
       first: totalRows,
       last: undefined,
       after: undefined,
@@ -81,11 +81,11 @@ const CompFilterMenu = ({
   }
 
   const onFilterLicense = (value) => {
-    setSelectedLicense(value)
+    setSelectedLicense(value.includes('all') ? [] : value)
     refetch({
       projectId: productId,
       sbomId: sbomId,
-      licenses: value === 'all' ? undefined : value,
+      licenses: value.includes('all') ? undefined : value,
       first: totalRows,
       last: undefined,
       after: undefined,
@@ -97,11 +97,11 @@ const CompFilterMenu = ({
   }
 
   const onFilterSupplier = (value) => {
-    setSelectedSupplier(value)
+    setSelectedSupplier(value.includes('all') ? [] : value)
     refetch({
       projectId: productId,
       sbomId: sbomId,
-      supplierName: value === 'all' ? undefined : value,
+      supplierName: value.includes('all') ? undefined : value,
       first: totalRows,
       last: undefined,
       after: undefined,
@@ -113,12 +113,12 @@ const CompFilterMenu = ({
   }
 
   const onFilterType = (value) => {
-    setSelectedType(value)
+    setSelectedType(value.includes('all') ? [] : value)
     refetch({
       projectId: productId,
       sbomId: sbomId,
-      primary: value === 'primary' && value !== 'all' ? true : false,
-      internal: value === 'internal' && value !== 'all' ? true : false,
+      primary: value === 'primary' && !value.includes('all') ? true : false,
+      internal: value === 'internal' && !value.includes('all') ? true : false,
       first: totalRows,
       last: undefined,
       after: undefined,
@@ -134,7 +134,7 @@ const CompFilterMenu = ({
       {/* ECOSYSTEM */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnBlur={true}>
-          {selectedEcosystem !== '' && selectedEcosystem !== 'all' && (
+          {selectedEcosystem.length !== 0 && (
             <CheckMark />
           )}
           <MenuButton
@@ -148,7 +148,7 @@ const CompFilterMenu = ({
           </MenuButton>
           <MenuList minHeight={'auto'} maxHeight={'300px'} overflow={'hidden'} overflowY={'scroll'}>
             <MenuOptionGroup
-              type='radio'
+              type='checkbox'
               value={selectedEcosystem}
               onChange={onFilterEcosystem}
             >
@@ -167,7 +167,7 @@ const CompFilterMenu = ({
       {/* KIND */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {selectedKind !== '' && selectedKind !== 'all' && <CheckMark />}
+          {selectedKind.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -179,7 +179,7 @@ const CompFilterMenu = ({
           </MenuButton>
           <MenuList minHeight={'auto'} maxHeight={'300px'} overflow={'hidden'} overflowY={'scroll'}>
             <MenuOptionGroup
-              type='radio'
+              type='checkbox'
               value={selectedKind}
               onChange={onFilterKind}
             >
@@ -198,7 +198,7 @@ const CompFilterMenu = ({
       {/* LICENSES */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {selectedLicense !== '' && selectedLicense !== 'all' && <CheckMark />}
+          {selectedLicense.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -210,7 +210,7 @@ const CompFilterMenu = ({
           </MenuButton>
           <MenuList minHeight={'auto'} maxHeight={'300px'} overflow={'hidden'} overflowY={'scroll'}>
             <MenuOptionGroup
-              type='radio'
+              type='checkbox'
               value={selectedLicense}
               onChange={onFilterLicense}
             >
@@ -229,7 +229,7 @@ const CompFilterMenu = ({
       {/* SUPPLIER */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {selectedSupplier !== '' && selectedSupplier !== 'all' && (
+          {selectedSupplier.length !== 0 && (
             <CheckMark />
           )}
           <MenuButton
@@ -243,7 +243,7 @@ const CompFilterMenu = ({
           </MenuButton>
           <MenuList minHeight={'auto'} maxHeight={'300px'} overflow={'hidden'} overflowY={'scroll'}>
             <MenuOptionGroup
-              type='radio'
+              type='checkbox'
               value={selectedSupplier}
               onChange={onFilterSupplier}
             >
@@ -262,7 +262,7 @@ const CompFilterMenu = ({
       {/* TYPE */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {selectedType !== '' && selectedType !== 'all' && <CheckMark />}
+          {selectedType.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -274,7 +274,7 @@ const CompFilterMenu = ({
           </MenuButton>
           <MenuList>
             <MenuOptionGroup
-              type='radio'
+              type='checkbox'
               value={selectedType}
               onChange={onFilterType}
             >
