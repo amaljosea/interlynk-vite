@@ -43,16 +43,16 @@ const VulnFilterMenu = ({
 
   const { vulnCompNames, vulnStatuses } = vulnFilters
 
-  const [selectCompName, setSelectCompName] = useState('')
-  const [selectSeverity, setSelectSeverity] = useState('')
-  const [selectedStatus, setSelectedStatus] = useState('')
+  const [selectCompName, setSelectCompName] = useState([])
+  const [selectSeverity, setSelectSeverity] = useState([])
+  const [selectedStatus, setSelectedStatus] = useState([])
 
   const onFilterCompName = (value) => {
-    setSelectCompName(value)
+    setSelectCompName(value.includes('all') ? [] : value)
     refetch({
       projectId: productId,
       sbomId: sbomId,
-      componentName: value === 'all' ? undefined : value,
+      componentName: value.includes('all') ? undefined : value,
       first: totalRows,
       last: undefined,
       after: undefined,
@@ -64,11 +64,11 @@ const VulnFilterMenu = ({
   }
 
   const onFilterSeverity = (value) => {
-    setSelectSeverity(value)
+    setSelectSeverity(value.includes('all') ? [] : value)
     refetch({
       projectId: productId,
       sbomId: sbomId,
-      severity: value === 'all' ? undefined : value,
+      severity: value.includes('all') ? undefined : value,
       first: totalRows,
       last: undefined,
       after: undefined,
@@ -80,11 +80,11 @@ const VulnFilterMenu = ({
   }
 
   const onFilterStatus = (value) => {
-    setSelectedStatus(value)
+    setSelectedStatus(value.includes('all') ? [] : value)
     refetch({
       projectId: productId,
       sbomId: sbomId,
-      status: value === 'all' ? undefined : value,
+      status: value.includes('all') ? undefined : value,
       first: totalRows,
       last: undefined,
       after: undefined,
@@ -100,7 +100,7 @@ const VulnFilterMenu = ({
       {/* SEVERITY */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnBlur={true}>
-          {selectSeverity !== '' && selectSeverity !== 'all' && <CheckMark />}
+          {selectSeverity.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -112,7 +112,7 @@ const VulnFilterMenu = ({
           </MenuButton>
           <MenuList>
             <MenuOptionGroup
-              type='radio'
+              type='checkbox'
               value={selectSeverity}
               onChange={onFilterSeverity}
             >
@@ -136,7 +136,7 @@ const VulnFilterMenu = ({
       {/* COMPONENT NAME */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {selectCompName !== '' && selectCompName !== 'all' && <CheckMark />}
+          {selectCompName.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -153,7 +153,7 @@ const VulnFilterMenu = ({
             overflowY={'scroll'}
           >
             <MenuOptionGroup
-              type='radio'
+              type='checkbox'
               value={selectCompName}
               onChange={onFilterCompName}
             >
@@ -172,7 +172,7 @@ const VulnFilterMenu = ({
       {/* STATUS */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {selectedStatus !== '' && selectedStatus !== 'all' && <CheckMark />}
+          {selectedStatus.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -189,7 +189,7 @@ const VulnFilterMenu = ({
             overflowY={'scroll'}
           >
             <MenuOptionGroup
-              type='radio'
+              type='checkbox'
               value={selectedStatus}
               onChange={onFilterStatus}
             >

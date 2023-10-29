@@ -42,17 +42,17 @@ const CheckFilterMenu = ({
 
   const { checkCategories, checkStatuses } = checkFilters
 
-  const [selectCategory, setSelectCategory] = useState('')
-  const [selectSeverity, setSelectSeverity] = useState('')
-  const [selectStatus, setSelectStatus] = useState('')
+  const [selectCategory, setSelectCategory] = useState([])
+  const [selectSeverity, setSelectSeverity] = useState([])
+  const [selectStatus, setSelectStatus] = useState([])
   // const [selectCompName, setSelectCompName] = useState('')
 
   const onFilterCategory = (value) => {
-    setSelectCategory(value)
+    setSelectCategory(value.includes('all') ? [] : value)
     refetch({
       projectId: productId,
       sbomId: sbomId,
-      category: value === 'all' ? undefined : value,
+      category: value.includes('all') ? undefined : value,
       first: totalRows,
       last: undefined,
       after: undefined,
@@ -64,11 +64,11 @@ const CheckFilterMenu = ({
   }
 
   const onFilterSeverity = (value) => {
-    setSelectSeverity(value)
+    setSelectSeverity(value.includes('all') ? [] : value)
     refetch({
       projectId: productId,
       sbomId: sbomId,
-      severity: value === 'all' ? undefined : value,
+      severity: value.includes('all') ? undefined : value,
       first: totalRows,
       last: undefined,
       after: undefined,
@@ -80,11 +80,11 @@ const CheckFilterMenu = ({
   }
 
   const onFilterStatus = (value) => {
-    setSelectStatus(value)
+    setSelectStatus(value.includes('all') ? [] : value)
     refetch({
       projectId: productId,
       sbomId: sbomId,
-      status: value === 'all' ? undefined : value,
+      status: value.includes('all') ? undefined : value,
       first: totalRows,
       last: undefined,
       after: undefined,
@@ -96,11 +96,11 @@ const CheckFilterMenu = ({
   }
 
   // const onFilterCompName = (value) => {
-  //   setSelectCompName(value)
+  //   setSelectCompName(value.includes('all') ? [] : value)
   //   refetch({
   //     projectId: productId,
   //     sbomId: sbomId,
-  //     componentName: value === 'all' ? undefined : value,
+  //     componentName: value.includes('all') ? undefined : value,
   //     first: totalRows,
   //     last: undefined,
   //     after: undefined,
@@ -116,7 +116,7 @@ const CheckFilterMenu = ({
       {/* CATEGORY */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnBlur={true}>
-          {selectCategory !== '' && selectCategory !== 'all' && <CheckMark />}
+          {selectCategory.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -128,7 +128,7 @@ const CheckFilterMenu = ({
           </MenuButton>
           <MenuList>
             <MenuOptionGroup
-              type='radio'
+              type='checkbox'
               value={selectCategory}
               onChange={onFilterCategory}
             >
@@ -147,7 +147,7 @@ const CheckFilterMenu = ({
       {/* COMPONENT NAME */}
       {/* <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnBlur={true}>
-          {selectCompName !== '' && selectCompName !== 'all' && <CheckMark />}
+          {selectCompName.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -159,7 +159,7 @@ const CheckFilterMenu = ({
           </MenuButton>
           <MenuList height={'300px'} overflow={'hidden'} overflowY={'scroll'}>
             <MenuOptionGroup
-              type='radio'
+              type='checkbox'
               value={selectCompName}
               onChange={onFilterCompName}
             >
@@ -179,7 +179,7 @@ const CheckFilterMenu = ({
       {/* SEVERITY */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {selectSeverity !== '' && selectSeverity !== 'all' && <CheckMark />}
+          {selectSeverity.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -191,7 +191,7 @@ const CheckFilterMenu = ({
           </MenuButton>
           <MenuList>
             <MenuOptionGroup
-              type='radio'
+              type='checkbox'
               value={selectSeverity}
               onChange={onFilterSeverity}
             >
@@ -215,7 +215,7 @@ const CheckFilterMenu = ({
       {/* STATUS */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {selectStatus !== '' && selectStatus !== 'all' && <CheckMark />}
+          {selectStatus.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -227,7 +227,7 @@ const CheckFilterMenu = ({
           </MenuButton>
           <MenuList>
             <MenuOptionGroup
-              type='radio'
+              type='checkbox'
               value={selectStatus}
               onChange={onFilterStatus}
             >
