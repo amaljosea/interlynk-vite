@@ -117,8 +117,8 @@ const CompFilterMenu = ({
     refetch({
       projectId: productId,
       sbomId: sbomId,
-      primary: value === 'primary' && !value.includes('all') ? true : false,
-      internal: value === 'internal' && !value.includes('all') ? true : false,
+      primary: value.includes('primary') && !value.includes('all') ? true : false,
+      internal: value.includes('internal') && !value.includes('all') ? true : false,
       first: totalRows,
       last: undefined,
       after: undefined,
