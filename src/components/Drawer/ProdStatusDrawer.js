@@ -163,7 +163,7 @@ const ProdStatusDrawer = ({
       isOpen={isOpen}
       placement='right'
       onClose={onClose}
-      finalFocusRef={btnRef}
+      // finalFocusRef={btnRef}
       // closeOnOverlayClick={false}
       size={location.pathname.startsWith('/customer') ? 'sm' : 'xl'}
     >
