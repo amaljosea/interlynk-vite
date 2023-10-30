@@ -16,9 +16,13 @@ const VulLinkRow = ({
       <Td fontSize={'xs'} pl={0}>
         {username}
       </Td>
-      <Td fontSize={'xs'}>{status}</Td>
-      <Td fontSize={'xs'}>{justification}</Td>
-      <Td fontSize={'xs'}>
+      <Td fontSize={'xs'} pl={0}>
+        {status}
+      </Td>
+      <Td fontSize={'xs'} pl={0}>
+        {justification}
+      </Td>
+      <Td fontSize={'xs'} pl={0}>
         <Tooltip label={getFullDateAndTime(timestamp)} placement={'top'}>
           {timeSince(timestamp)}
         </Tooltip>

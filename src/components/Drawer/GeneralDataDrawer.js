@@ -315,7 +315,6 @@ const GeneralDataDrawer = ({
         isOpen={isOpen}
         placement='right'
         onClose={onClose}
-        finalFocusRef={btnRef}
         closeOnOverlayClick={false}
         size='md'
       >

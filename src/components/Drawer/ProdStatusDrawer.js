@@ -3,12 +3,6 @@ import {
   Box,
   Button,
   Divider,
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerHeader,
-  DrawerOverlay,
   FormLabel,
   Select,
   SimpleGrid,
@@ -21,22 +15,16 @@ import {
   Thead,
   Tr,
   Flex,
-  DrawerFooter,
-  Input,
-  FormControl
+  Input
 } from '@chakra-ui/react'
 import VulLinkRow from 'components/Tables/VulLinkRow'
 import GlobalContext from 'context/GlobalContext'
 import { updateCompVulnVex } from 'graphQL/Mutation'
 import { getVexStatuses, getVexJustifications } from 'graphQL/Queries'
-import { useContext } from 'react'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useContext } from 'react'
 import { useLocation } from 'react-router-dom'
 
 const ProdStatusDrawer = ({
-  isOpen,
-  onClose,
-  btnRef,
   data,
   textColor,
   refetch,
@@ -49,17 +37,14 @@ const ProdStatusDrawer = ({
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
-  const email = window.localStorage.getItem('email')
-
   const { setVulnFilters, vulnField, vulnDirection } = useContext(GlobalContext)
 
-  const { vuln, vexStatus, id, componentVulnLogs, vexJustification } = data
+  const { vexStatus, id, componentVulnLogs, vexJustification } = data
 
   const [statusTitle, setStatusTitle] = useState('')
   const [statusName, setStatusName] = useState('')
   const [otherVersion, setOtherVersion] = useState('')
   const [justification, setJustification] = useState('')
-  const [justificationName, setJustificationName] = useState('')
   const [selectedTag, setSelectedTag] = useState('')
   const [notes, setNotes] = useState('')
 
@@ -90,21 +75,6 @@ const ProdStatusDrawer = ({
   const handleJustifyChange = (e) => {
     const { value } = e.target
     setJustification(value)
-    setJustificationName(e.target.options[e.target.selectedIndex].text)
-  }
-
-  const handleAdd = () => {
-    setNewVulnLogs([
-      {
-        changedBy: email,
-        id: id,
-        justification: justificationName,
-        notes: notes,
-        status: statusName,
-        updatedAt: new Date().toISOString()
-      },
-      ...newVulnLogs
-    ])
   }
 
   const onFilterRefetch = () => {
@@ -124,13 +94,11 @@ const ProdStatusDrawer = ({
           vexStatusId: statusTitle,
           vexJustificationId: justification
         }
+      }).then((res) => {
+        if (res.data) {
+          onFilterRefetch()
+        }
       })
-        .then((res) => {
-          if (res.data) {
-            onFilterRefetch()
-          }
-        })
-        .finally(() => onClose())
     } catch (error) {
       console.log('Mutation error', error)
     }
@@ -159,242 +127,196 @@ const ProdStatusDrawer = ({
   }, [data])
 
   return (
-    <Drawer
-      isOpen={isOpen}
-      placement='right'
-      onClose={onClose}
-      // finalFocusRef={btnRef}
-      // closeOnOverlayClick={false}
-      size={location.pathname.startsWith('/customer') ? 'sm' : 'xl'}
-    >
-      <DrawerOverlay />
-      <DrawerContent>
-        <DrawerCloseButton
-        //  onClick={() => refetch !== null && refetch()}
-        />
-        <DrawerHeader borderBottomWidth='1px' color='gray.600'>
-          {vuln.vulnId} Status
-        </DrawerHeader>
-        <DrawerBody>
-          <Stack spacing='24px'>
-            <Box>
-              <SimpleGrid row={5} spacing={4}>
-                {location.pathname.startsWith('/customer') ? (
-                  ''
-                ) : (
-                  <>
-                    <Box>
-                      <Text mb={1} fontSize='sm' color='gray.600'>
-                        Status
-                      </Text>
-                      <Select
-                        id='product'
-                        size='sm'
-                        color='gray.500'
-                        value={statusTitle}
-                        onChange={handleStatusChange}
-                      >
-                        <option value=''>-- Select Status --</option>
-                        {allVexStatus ? (
-                          allVexStatus.vexStatuses.map((st, idx) => (
-                            <option key={idx} value={st.id}>
-                              {st.name}
-                            </option>
-                          ))
-                        ) : (
-                          <option value={''}>No data found</option>
-                        )}
-                      </Select>
-                    </Box>
-                    {statusName === 'Not Affected' ? (
-                      <Box>
-                        <FormLabel
-                          py='4px'
-                          htmlFor='product'
-                          fontSize='sm'
-                          color='gray.600'
-                        >
-                          Justification
-                        </FormLabel>
-                        <Select
-                          id='justification'
-                          value={justification}
-                          onChange={handleJustifyChange}
-                          size='sm'
-                          color='gray.500'
-                        >
-                          <option value=''>-- Select --</option>
-                          {allVexJustify ? (
-                            allVexJustify.vexJustifications.map(
-                              (justify, idx) => (
-                                <option key={idx} value={justify.id}>
-                                  {justify.name}
-                                </option>
-                              )
-                            )
-                          ) : (
-                            <option value={''}>No data found</option>
-                          )}
-                        </Select>
-                      </Box>
-                    ) : (
-                      ''
-                    )}
-                    {statusName === 'Fixed' ? (
-                      <Stack
-                        width={'100%'}
-                        direction={'column'}
-                        spacing={4}
-                        alignItems={'flex-start'}
-                      >
-                        <Box width={'100%'}>
-                          <Text mb={1} fontSize='sm' color='gray.600'>
-                            Version
-                          </Text>
-                          <Select
-                            id='tag'
-                            value={selectedTag}
-                            onChange={(e) => setSelectedTag(e.target.value)}
-                            size='sm'
-                            color='gray.500'
-                          >
-                            {filteredData && filteredData.length > 0 ? (
-                              filteredData.map((item, index) => (
-                                <option
-                                  key={index}
-                                  value={item.id}
-                                  name={item.version}
-                                >
-                                  {item.version}
-                                </option>
-                              ))
-                            ) : (
-                              <option value=''>-- --</option>
-                            )}
-                          </Select>
-                        </Box>
-                        <Box width={'100%'}>
-                          <Text mb={1} fontSize='sm' color='gray.600'>
-                            Other Version
-                          </Text>
-                          <Input
-                            size='sm'
-                            value={otherVersion}
-                            onChange={(e) => setOtherVersion(e.target.value)}
-                          />
-                        </Box>
-                      </Stack>
-                    ) : (
-                      ''
-                    )}
-                  </>
-                )}
-                <Box>
-                  <Text mb={1} fontSize='sm' color='gray.600'>
-                    Notes
-                  </Text>
-                  <Textarea
-                    placeholder='Add notes'
-                    size='sm'
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                  />
-                </Box>
-                {location.pathname.startsWith('/customer') ? (
-                  <Flex dir='row' gap={2} width={'100%'}>
-                    <Button colorScheme='red' width={'100%'}>
-                      Request Status
-                    </Button>
-                    <Button colorScheme='green' width={'100%'}>
-                      Accept Status
-                    </Button>
-                  </Flex>
-                ) : (
-                  <Button
-                    width={'fit-content'}
-                    colorScheme='blue'
-                    onClick={handleAdd}
-                    disabled={
-                      statusTitle === '' ||
-                      (statusName === 'Not Affected' && justification === '')
-                    }
-                  >
-                    Add
-                  </Button>
-                )}
-                <Flex flexDir={'column'}>
-                  <Text size='md' my={2}>
-                    Status History
-                  </Text>
-                  {(componentVulnLogs.length > 0 || newVulnLogs.length > 0) && (
-                    <Table variant='simple' color={textColor} size='sm' mt={4}>
-                      <Thead>
-                        <Tr my='.8rem'>
-                          <Th color='gray.400' pl={0}>
-                            Username
-                          </Th>
-                          <Th color='gray.400'>Status</Th>
-                          <Th color='gray.400'>Justification</Th>
-                          <Th color='gray.400'>Timestamp</Th>
-                          <Th color='gray.400'>Note</Th>
-                        </Tr>
-                      </Thead>
-                      <Tbody>
-                        {newVulnLogs.length > 0 &&
-                          newVulnLogs.map((item) => (
-                            <VulLinkRow
-                              key={item.id}
-                              id={item.id}
-                              username={item.changedBy}
-                              justification={item.justification}
-                              status={item.status}
-                              timestamp={item.updatedAt}
-                              notes={item.note}
-                            />
-                          ))}
-
-                        {statusResults.length > 0 &&
-                          statusResults.map((item) => (
-                            <VulLinkRow
-                              key={item.id}
-                              id={item.id}
-                              username={item.changedBy}
-                              justification={item.justification}
-                              status={item.status}
-                              timestamp={item.updatedAt}
-                              notes={item.note}
-                            />
-                          ))}
-                      </Tbody>
-                    </Table>
+    <Stack spacing='24px'>
+      <Box>
+        <SimpleGrid row={5} spacing={4}>
+          {location.pathname.startsWith('/customer') ? (
+            ''
+          ) : (
+            <>
+              <Box>
+                <Text mb={1} fontSize='sm' color='gray.600'>
+                  Status
+                </Text>
+                <Select
+                  id='product'
+                  size='sm'
+                  color='gray.500'
+                  value={statusTitle}
+                  onChange={handleStatusChange}
+                >
+                  <option value=''>-- Select Status --</option>
+                  {allVexStatus ? (
+                    allVexStatus.vexStatuses.map((st, idx) => (
+                      <option key={idx} value={st.id}>
+                        {st.name}
+                      </option>
+                    ))
+                  ) : (
+                    <option value={''}>No data found</option>
                   )}
-
-                  {componentVulnLogs.length === 0 &&
-                    newVulnLogs.length === 0 && (
-                      <Text mt={4} color={'darkgrey'}>
-                        No status history found
-                      </Text>
+                </Select>
+              </Box>
+              {statusName === 'Not Affected' ? (
+                <Box>
+                  <FormLabel
+                    py='4px'
+                    htmlFor='product'
+                    fontSize='sm'
+                    color='gray.600'
+                  >
+                    Justification
+                  </FormLabel>
+                  <Select
+                    id='justification'
+                    value={justification}
+                    onChange={handleJustifyChange}
+                    size='sm'
+                    color='gray.500'
+                  >
+                    <option value=''>-- Select --</option>
+                    {allVexJustify ? (
+                      allVexJustify.vexJustifications.map((justify, idx) => (
+                        <option key={idx} value={justify.id}>
+                          {justify.name}
+                        </option>
+                      ))
+                    ) : (
+                      <option value={''}>No data found</option>
                     )}
-                </Flex>
-              </SimpleGrid>
-              <Divider />
-            </Box>
-          </Stack>
-        </DrawerBody>
-        <DrawerFooter>
-          <Button mr={3} onClick={onClose}>
-            Cancel
-          </Button>
-          <Button
-            colorScheme='blue'
-            onClick={handleSave}
-            disabled={newVulnLogs.length === 0}
-          >
-            Save
-          </Button>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+                  </Select>
+                </Box>
+              ) : (
+                ''
+              )}
+              {statusName === 'Fixed' ? (
+                <Stack
+                  width={'100%'}
+                  direction={'column'}
+                  spacing={4}
+                  alignItems={'flex-start'}
+                >
+                  <Box width={'100%'}>
+                    <Text mb={1} fontSize='sm' color='gray.600'>
+                      Version
+                    </Text>
+                    <Select
+                      id='tag'
+                      value={selectedTag}
+                      onChange={(e) => setSelectedTag(e.target.value)}
+                      size='sm'
+                      color='gray.500'
+                    >
+                      {filteredData && filteredData.length > 0 ? (
+                        filteredData.map((item, index) => (
+                          <option
+                            key={index}
+                            value={item.id}
+                            name={item.version}
+                          >
+                            {item.version}
+                          </option>
+                        ))
+                      ) : (
+                        <option value=''>-- --</option>
+                      )}
+                    </Select>
+                  </Box>
+                  <Box width={'100%'}>
+                    <Text mb={1} fontSize='sm' color='gray.600'>
+                      Other Version
+                    </Text>
+                    <Input
+                      size='sm'
+                      value={otherVersion}
+                      onChange={(e) => setOtherVersion(e.target.value)}
+                    />
+                  </Box>
+                </Stack>
+              ) : (
+                ''
+              )}
+            </>
+          )}
+          <Box>
+            <Text mb={1} fontSize='sm' color='gray.600'>
+              Notes
+            </Text>
+            <Textarea
+              placeholder='Add notes'
+              size='sm'
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+            />
+          </Box>
+          {location.pathname.startsWith('/customer') ? (
+            <Flex dir='row' gap={2} width={'100%'}>
+              <Button colorScheme='red' width={'100%'}>
+                Request Status
+              </Button>
+              <Button colorScheme='green' width={'100%'}>
+                Accept Status
+              </Button>
+            </Flex>
+          ) : (
+            <Button
+              width={'fit-content'}
+              colorScheme='blue'
+              onClick={handleSave}
+              disabled={
+                statusTitle === '' ||
+                (statusName === 'Not Affected' && justification === '')
+              }
+            >
+              Add
+            </Button>
+          )}
+          <Flex flexDir={'column'}>
+            <Text size='md' my={2}>
+              Status History
+            </Text>
+            {(componentVulnLogs.length > 0 || newVulnLogs.length > 0) && (
+              <Table variant='simple' color={textColor} size='sm' my={2}>
+                <Thead>
+                  <Tr my='.8rem'>
+                    {[
+                      'Username',
+                      'Status',
+                      'Justification',
+                      'Timestamp',
+                      'Note'
+                    ].map((item, index) => (
+                      <Th key={index} color='gray.400' pl={0}>
+                        <Box>{item}</Box>
+                      </Th>
+                    ))}
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {statusResults.length > 0 &&
+                    statusResults.map((item) => (
+                      <VulLinkRow
+                        key={item.id}
+                        id={item.id}
+                        username={item.changedBy}
+                        justification={item.justification}
+                        status={item.status}
+                        timestamp={item.updatedAt}
+                        notes={item.note}
+                      />
+                    ))}
+                </Tbody>
+              </Table>
+            )}
+
+            {componentVulnLogs.length === 0 && newVulnLogs.length === 0 && (
+              <Text color={'darkgrey'}>No status history found</Text>
+            )}
+          </Flex>
+        </SimpleGrid>
+        <Divider />
+      </Box>
+    </Stack>
   )
 }
 

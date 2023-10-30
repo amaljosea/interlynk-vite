@@ -1,7 +1,9 @@
 // Chakra imports
 import {
+  ChevronDownIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  ChevronUpIcon,
   ExternalLinkIcon
 } from '@chakra-ui/icons'
 import {
@@ -19,16 +21,7 @@ import {
   GridItem,
   Tooltip,
   Stack,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
   Select,
-  FormControl,
-  FormLabel,
   Drawer,
   DrawerBody,
   DrawerFooter,
@@ -39,15 +32,13 @@ import {
   useToast,
   IconButton,
   ButtonGroup,
-  Skeleton
+  Badge
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
-import { FaEllipsisV } from 'react-icons/fa'
 import { FaCopy } from 'react-icons/fa6'
 import { useState, useRef, useMemo, useEffect, useContext } from 'react'
 import { useLocation } from 'react-router-dom'
 import styled from '@emotion/styled'
-import CopyTable from './CopyTable'
 import Multistep from 'views/Sbom/components/Multistep'
 import { getFullDateAndTime } from 'utils'
 import ProdStatusDrawer from 'components/Drawer/ProdStatusDrawer'
@@ -83,7 +74,7 @@ const statusColor = (status) => {
   } else if (status && status === 'Affected') {
     return 'red'
   } else if (status && status === 'False Positive') {
-    return 'gray'
+    return 'purple'
   } else if (status && status === 'In Triage') {
     return 'cyan'
   } else {
@@ -103,9 +94,7 @@ const VulnTable = ({
   setTotalRows,
   filterRefetch
 }) => {
-  const location = useLocation()
   const toast = useToast()
-  const customerView = location.pathname.startsWith('/customer')
 
   const {
     vulnFilters,
@@ -117,26 +106,13 @@ const VulnTable = ({
 
   const textColor = useColorModeValue('gray.700', 'white')
 
-  const [activeRow, setActiveRow] = useState(null)
-  const [version, setVersion] = useState('')
-
   // STEPS
   const [step, setStep] = useState(1)
   const [progress, setProgress] = useState(25)
   const [stepTitle, setStepTitle] = useState('')
   const [filterText, setFilterText] = useState('')
-  const [sortField, setSortField] = useState('UPDATED_AT')
 
-  const btnRef = useRef(null)
   const tableRef = useRef()
-
-  const { isOpen, onOpen, onClose } = useDisclosure()
-
-  const {
-    isOpen: isCopyOpen,
-    onOpen: onCopyOpen,
-    onClose: onCopyClose
-  } = useDisclosure()
 
   const {
     isOpen: isTableOpen,
@@ -169,7 +145,7 @@ const VulnTable = ({
     // CVE ID
     {
       id: 'CVE_ID',
-      name: 'CVE ID',
+      name: 'ID',
       selector: (row) => {
         const { vuln } = row
         return (
@@ -190,11 +166,14 @@ const VulnTable = ({
                     : ''}
                 </Text>
               </Tooltip>
+              <Badge variant='subtle' colorScheme='red'>
+                KEV
+              </Badge>
             </Flex>
           </Link>
         )
       },
-      width: '200px'
+      width: '250px'
     },
     // SEVERITY
     {
@@ -260,6 +239,40 @@ const VulnTable = ({
         )
       },
       width: '100px'
+    },
+    // EPSS
+    {
+      id: 'EPSS',
+      name: 'EPSS',
+      selector: (row) => {
+        const { vuln } = row
+
+        const epss = Array.from(
+          { length: Math.floor(Math.random() * 2) + 1 },
+          () => Math.random()
+        )
+
+        return (
+          <Flex minWidth='max-content' alignItems='center' gap='2'>
+            <Tag size='md' key='md' variant='subtle' colorScheme={'blue'}>
+              <TagLabel>
+                {epss[0].toFixed(2)}{' '}
+                {/* {epss.length > 1 && `- ${epss[1].toFixed(2)}`} */}
+              </TagLabel>
+            </Tag>
+            {epss.length > 1 && epss[0] > epss[epss.length - 1] ? (
+              <Tag variant='subtle' colorScheme='green'>
+                <ChevronUpIcon w={5} h={5} />
+              </Tag>
+            ) : (
+              <Tag variant='subtle' colorScheme='red'>
+                <ChevronDownIcon w={5} h={5} />
+              </Tag>
+            )}
+          </Flex>
+        )
+      },
+      width: '200px'
     },
     // COMPONENT
     {
@@ -330,47 +343,8 @@ const VulnTable = ({
         const dateB = new Date(b.vuln.updatedAt)
         return dateA - dateB // Sort in descending order
       }
-    },
-    // ACTION
-    {
-      id: 'action',
-      name: 'ACTION',
-      selector: (row) => {
-        return (
-          <>
-            {!customerView && (
-              <Button
-                p='0px'
-                bg='transparent'
-                ref={btnRef}
-                onClick={() => {
-                  setActiveRow(row)
-                  onOpen()
-                }}
-              >
-                <Icon as={FaEllipsisV} color='gray.400' cursor='pointer' />
-              </Button>
-            )}
-          </>
-        )
-      },
-      omit: customerView
     }
   ]
-
-  const handleCopy = () => {
-    if (version !== '') {
-      onCopyClose()
-      onTableOpen()
-    } else {
-      toast({
-        description: 'Please select any version',
-        position: 'top',
-        duration: 2000,
-        status: 'error'
-      })
-    }
-  }
 
   // SEARCH COMPONENT
   const handleSearch = async (event) => {
@@ -462,54 +436,73 @@ const VulnTable = ({
         boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
       >
         <Grid
-          templateColumns='repeat(4, 1fr)'
+          templateColumns='repeat(2, 1fr)'
           gap={6}
           width={'90%'}
           margin={'0 auto'}
         >
-          <GridItem w='100%' colSpan={4}>
-            <CustomText>Description :</CustomText>
-            <Text mt={1} fontSize={14}>
-              {vuln.desc}
-            </Text>
+          {/* VULN DATA */}
+          <GridItem w='100%' display={'flex'} flexDirection={'column'} gap={4}>
+            {/* Description */}
+            <Box>
+              <CustomText>Description :</CustomText>
+              <Text mt={1} fontSize={14}>
+                {vuln.desc}
+              </Text>
+            </Box>
+            {/* Last Modified At */}
+            <Box>
+              <CustomText>Last Modified At :</CustomText>
+              <Text mt={1} fontSize={14}>
+                {getFullDateAndTime(vuln.lastModifiedAt)}
+              </Text>
+            </Box>
+            {/* Published At  */}
+            <Box>
+              <CustomText>Published At :</CustomText>
+              <Text mt={1} fontSize={14}>
+                {getFullDateAndTime(vuln.publishedAt)}
+              </Text>
+            </Box>
+            {/* CVSS Vector */}
+            <Box>
+              <CustomText>CVSS Vector :</CustomText>
+              <Text mt={1} fontSize={14}>
+                {vuln.cvssVector}
+              </Text>
+            </Box>
+            {/* NVD Alias ID */}
+            <Box>
+              <CustomText>NVD Alias ID :</CustomText>
+              {vuln.nvdAliasId && (
+                <Link href={linkURl('nvd', vuln.nvdAliasId)} target={'_blank'}>
+                  <Flex mt={1} direction='row' alignItems={'center'} gap={2}>
+                    <Icon
+                      as={ExternalLinkIcon}
+                      h={'16px'}
+                      w={'16px'}
+                      color={'blue.500'}
+                    />
+                    <Tooltip label={vuln.nvdAliasId} placement={'top'}>
+                      <Text fontSize='sm' color={textColor}>
+                        {vuln.nvdAliasId}
+                      </Text>
+                    </Tooltip>
+                  </Flex>
+                </Link>
+              )}
+            </Box>
           </GridItem>
+          {/* STATUS UPDATE */}
           <GridItem w='100%'>
-            <CustomText>Last Modified At :</CustomText>
-            <Text mt={1} fontSize={14}>
-              {getFullDateAndTime(vuln.lastModifiedAt)}
-            </Text>
-          </GridItem>
-          <GridItem w='100%'>
-            <CustomText>Published At :</CustomText>
-            <Text mt={1} fontSize={14}>
-              {getFullDateAndTime(vuln.publishedAt)}
-            </Text>
-          </GridItem>
-          <GridItem w='100%'>
-            <CustomText>CVSS Vector :</CustomText>
-            <Text mt={1} fontSize={14}>
-              {vuln.cvssVector}
-            </Text>
-          </GridItem>
-          <GridItem w='100%'>
-            <CustomText>NVD Alias ID :</CustomText>
-            {vuln.nvdAliasId && (
-              <Link href={linkURl('nvd', vuln.nvdAliasId)} target={'_blank'}>
-                <Flex mt={1} direction='row' alignItems={'center'} gap={2}>
-                  <Icon
-                    as={ExternalLinkIcon}
-                    h={'16px'}
-                    w={'16px'}
-                    color={'blue.500'}
-                  />
-                  <Tooltip label={vuln.nvdAliasId} placement={'top'}>
-                    <Text fontSize='sm' color={textColor}>
-                      {vuln.nvdAliasId}
-                    </Text>
-                  </Tooltip>
-                </Flex>
-              </Link>
-            )}
+            <ProdStatusDrawer
+              data={data}
+              textColor={textColor}
+              refetch={refetch}
+              totalRows={totalRows}
+              filteredData={filteredData}
+              filterRefetch={filterRefetch}
+            />
           </GridItem>
         </Grid>
       </Box>
@@ -673,45 +666,6 @@ const VulnTable = ({
         </Flex>
       )}
 
-      {/* COPY MODAL */}
-      {isCopyOpen && (
-        <Modal isOpen={isCopyOpen} onClose={onCopyClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalCloseButton />
-            <ModalHeader>Import Vulnerability Statuses</ModalHeader>
-            <ModalBody mt={2}>
-              <FormControl>
-                <FormLabel>Import From:</FormLabel>
-                <Select
-                  value={version}
-                  onChange={(e) => setVersion(e.target.value)}
-                >
-                  {filteredData && filteredData.length > 0 ? (
-                    filteredData.map((item, index) => (
-                      <option key={index} value={item.id} name={item.version}>
-                        {item.version}
-                      </option>
-                    ))
-                  ) : (
-                    <option value=''>-- --</option>
-                  )}
-                </Select>
-              </FormControl>
-            </ModalBody>
-
-            <ModalFooter>
-              <Button mr={3} onClick={onCopyClose}>
-                Cancel
-              </Button>
-              <Button variant='solid' colorScheme='blue' onClick={handleCopy}>
-                Apply
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-      )}
-
       {/* COPY DATA TABLE */}
       {isTableOpen && (
         <Drawer
@@ -719,7 +673,6 @@ const VulnTable = ({
           placement='right'
           size='full'
           onClose={onTableClose}
-          finalFocusRef={tableRef}
         >
           <DrawerOverlay />
           <DrawerContent>
@@ -800,25 +753,6 @@ const VulnTable = ({
             </DrawerFooter>
           </DrawerContent>
         </Drawer>
-      )}
-
-      {/* ACTIONS */}
-      {activeRow !== null && (
-        <>
-          {isOpen && (
-            <ProdStatusDrawer
-              isOpen={isOpen}
-              onClose={onClose}
-              btnRef={btnRef}
-              data={activeRow}
-              textColor={textColor}
-              refetch={refetch}
-              totalRows={totalRows}
-              filteredData={filteredData}
-              filterRefetch={filterRefetch}
-            />
-          )}
-        </>
       )}
     </>
   )

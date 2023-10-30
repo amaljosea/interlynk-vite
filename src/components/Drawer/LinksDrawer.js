@@ -104,13 +104,7 @@ const LinksDrawer = ({
 
   return (
     <>
-      <Drawer
-        isOpen={isOpen}
-        placement='right'
-        onClose={onClose}
-        finalFocusRef={btnRef}
-        size='md'
-      >
+      <Drawer isOpen={isOpen} placement='right' onClose={onClose} size='md'>
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />

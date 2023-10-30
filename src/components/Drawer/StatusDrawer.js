@@ -197,7 +197,6 @@ const StatusDrawer = ({
       isOpen={isOpen}
       placement='right'
       onClose={onClose}
-      finalFocusRef={btnRef}
       closeOnOverlayClick={false}
       size={location.pathname.startsWith('/customer') ? 'sm' : 'lg'}
     >
