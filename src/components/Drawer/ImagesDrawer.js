@@ -28,7 +28,6 @@ import {
   AccordionIcon
 } from '@chakra-ui/react'
 
-
 function ImagesDrawer({ isOpen, onClose, btnRef, activeImageId }) {
   const [product, setProduct] = useState('dashboard-app')
   const [version, setVersion] = useState('')
@@ -69,13 +68,7 @@ function ImagesDrawer({ isOpen, onClose, btnRef, activeImageId }) {
   const sbomgrVersion = ['v0.1', 'v0.2', 'v0.3']
 
   return (
-    <Drawer
-      isOpen={isOpen}
-      placement='right'
-      onClose={onClose}
-      finalFocusRef={btnRef}
-      size='md'
-    >
+    <Drawer isOpen={isOpen} placement='right' onClose={onClose} size='md'>
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />

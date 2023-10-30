@@ -123,13 +123,7 @@ function SBOMLinkDrawer(props) {
   }
 
   return (
-    <Drawer
-      isOpen={isOpen}
-      placement='right'
-      onClose={onClose}
-      finalFocusRef={btnRef}
-      size='sm'
-    >
+    <Drawer isOpen={isOpen} placement='right' onClose={onClose} size='sm'>
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />

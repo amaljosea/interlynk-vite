@@ -327,7 +327,7 @@ const TokenInfo = ({ data, refetch }) => {
       </Flex>
 
       {isOpen && (
-        <Modal finalFocusRef={tokenRef} isOpen={isOpen} onClose={onClose}>
+        <Modal isOpen={isOpen} onClose={onClose}>
           <ModalOverlay />
           <ModalContent>
             <ModalHeader>

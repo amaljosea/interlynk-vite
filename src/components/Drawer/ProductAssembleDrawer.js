@@ -89,13 +89,7 @@ function ProductAssembleDrawer(props) {
   }
 
   return (
-    <Drawer
-      isOpen={isOpen}
-      placement='right'
-      onClose={onClose}
-      finalFocusRef={btnRef}
-      size='lg'
-    >
+    <Drawer isOpen={isOpen} placement='right' onClose={onClose} size='lg'>
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />

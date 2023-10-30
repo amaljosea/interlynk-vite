@@ -673,7 +673,6 @@ const VulnTable = ({
           placement='right'
           size='full'
           onClose={onTableClose}
-          finalFocusRef={tableRef}
         >
           <DrawerOverlay />
           <DrawerContent>
