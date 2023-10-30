@@ -317,6 +317,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
     await refetch({
       projectId: productId,
       sbomId: sbomId,
+      search: undefined,
       first: totalRows
     })
     setFilterText('')
