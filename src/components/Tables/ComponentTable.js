@@ -1,5 +1,5 @@
 // Chakra imports
-import { AddIcon, CloseIcon, ViewIcon } from '@chakra-ui/icons'
+import { AddIcon, ViewIcon } from '@chakra-ui/icons'
 import {
   Flex,
   Text,
@@ -456,7 +456,16 @@ const ComponentTable = ({
 
   // EXPAND SECTION
   const ExpandedComponent = ({ data }) => {
-    const { suppliers, purl, description, cpes } = data
+    const {
+      suppliers,
+      purl,
+      description,
+      cpes,
+      name,
+      kind,
+      internal,
+      primary
+    } = data
 
     const [deleteSupplier] = useMutation(deleteComSupplier)
 
@@ -500,6 +509,24 @@ const ComponentTable = ({
             <CustomText>Description :</CustomText>
             <Text mt={1} fontSize={14}>
               {description !== null ? description : ''}
+            </Text>
+          </GridItem>
+          <GridItem w='100%'>
+            <CustomText>Component :</CustomText>
+            <Text mt={1} fontSize={14}>
+              {name}
+            </Text>
+          </GridItem>
+          <GridItem w='100%'>
+            <CustomText>Type :</CustomText>
+            <Text mt={1} fontSize={14} textTransform={'capitalize'}>
+              {kind}
+            </Text>
+          </GridItem>
+          <GridItem w='100%'>
+            <CustomText>Internal :</CustomText>
+            <Text mt={1} fontSize={14}>
+              {internal ? 'True' : 'False'}
             </Text>
           </GridItem>
           <GridItem w='100%'>
