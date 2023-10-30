@@ -66,14 +66,15 @@ const TokenInfo = ({ data, refetch }) => {
 
   const tokenRef = useRef(null)
 
+  const defaultDate = new Date()
+  defaultDate.setDate(defaultDate.getDate() + 90)
+
   const [token, setToken] = useState('')
   const [keyName, setKeyName] = useState('')
   const [selectedDate, setSelectedDate] = useState('')
   const [noExpire, setNoExpire] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [activeRow, setActiveRow] = useState(null)
-
-  const [showKey, setShowKey] = useState(false)
 
   const key = useClipboard(token)
 
@@ -125,7 +126,7 @@ const TokenInfo = ({ data, refetch }) => {
       await updateToken({
         variables: {
           id: activeRow.id,
-          expires: selectedDate && !noExpire ? selectedDate : undefined
+          expires: noExpire ? undefined : selectedDate
         }
       }).then((res) => onClose())
     } catch (error) {
@@ -166,7 +167,7 @@ const TokenInfo = ({ data, refetch }) => {
             ref={tokenRef}
             onClick={() => {
               setKeyName('')
-              setSelectedDate('')
+              setSelectedDate(defaultDate)
               setToken('')
               setNoExpire(false)
               setActiveRow(null)
@@ -182,6 +183,17 @@ const TokenInfo = ({ data, refetch }) => {
       </Flex>
     )
   }, [])
+
+  const handleExpireChange = (e) => {
+    const { checked } = e.target
+    setNoExpire(checked)
+
+    if (checked === true) {
+      setSelectedDate('')
+    } else {
+      setSelectedDate(defaultDate)
+    }
+  }
 
   useEffect(() => {
     if (activeRow) {
@@ -215,7 +227,12 @@ const TokenInfo = ({ data, refetch }) => {
     {
       id: 'expires',
       name: 'EXPIRES',
-      selector: (row) => <Text>{getFullDateAndTime(row.expiresAt)}</Text>
+      selector: (row) => (
+        <Text>
+          {' '}
+          {row.expiresAt ? getFullDateAndTime(row.expiresAt) : 'No Expiration'}
+        </Text>
+      )
     },
     // STATUS
     {
@@ -349,12 +366,12 @@ const TokenInfo = ({ data, refetch }) => {
                 <Checkbox
                   display={activeRow && activeRow.expiresAt ? 'none' : 'block'}
                   isChecked={noExpire}
-                  onChange={() => setNoExpire(!noExpire)}
+                  onChange={handleExpireChange}
                 >
                   No Expiration
                 </Checkbox>
               </FormControl>
-              {token !== '' ? (
+              {token !== '' && (
                 <>
                   <FormControl my={5}>
                     <Input type={'text'} defaultValue={token} readOnly />
@@ -370,6 +387,29 @@ const TokenInfo = ({ data, refetch }) => {
                     </Button>
                   </Stack>
                 </>
+              )}
+            </ModalBody>
+
+            <ModalFooter>
+              {activeRow && (
+                <Button
+                  variant='solid'
+                  colorScheme='blue'
+                  onClick={handleUpdate}
+                >
+                  Update
+                </Button>
+              )}
+
+              {token !== '' ? (
+                <Button
+                  variant='solid'
+                  colorScheme='blue'
+                  disabled={token === ''}
+                  onClick={handleSubmit}
+                >
+                  Done
+                </Button>
               ) : (
                 !activeRow && (
                   <Button
@@ -385,30 +425,6 @@ const TokenInfo = ({ data, refetch }) => {
                     {isLoading ? 'Creating...' : 'Create'}
                   </Button>
                 )
-              )}
-            </ModalBody>
-
-            <ModalFooter>
-              <Button mr={3} onClick={onClose}>
-                Cancel
-              </Button>
-              {activeRow ? (
-                <Button
-                  variant='solid'
-                  colorScheme='blue'
-                  onClick={handleUpdate}
-                >
-                  Update
-                </Button>
-              ) : (
-                <Button
-                  variant='solid'
-                  colorScheme='blue'
-                  disabled={token === ''}
-                  onClick={handleSubmit}
-                >
-                  Done
-                </Button>
               )}
             </ModalFooter>
           </ModalContent>
