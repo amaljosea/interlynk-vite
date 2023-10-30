@@ -83,7 +83,7 @@ const statusColor = (status) => {
   } else if (status && status === 'Affected') {
     return 'red'
   } else if (status && status === 'False Positive') {
-    return 'gray'
+    return 'purple'
   } else if (status && status === 'In Triage') {
     return 'cyan'
   } else {
@@ -117,7 +117,6 @@ const VulnTable = ({
 
   const textColor = useColorModeValue('gray.700', 'white')
 
-  const [activeRow, setActiveRow] = useState(null)
   const [version, setVersion] = useState('')
 
   // STEPS
@@ -125,12 +124,8 @@ const VulnTable = ({
   const [progress, setProgress] = useState(25)
   const [stepTitle, setStepTitle] = useState('')
   const [filterText, setFilterText] = useState('')
-  const [sortField, setSortField] = useState('UPDATED_AT')
 
-  const btnRef = useRef(null)
   const tableRef = useRef()
-
-  const { isOpen, onOpen, onClose } = useDisclosure()
 
   const {
     isOpen: isCopyOpen,
@@ -169,7 +164,7 @@ const VulnTable = ({
     // CVE ID
     {
       id: 'CVE_ID',
-      name: 'CVE ID',
+      name: 'ID',
       selector: (row) => {
         const { vuln } = row
         return (
@@ -330,31 +325,6 @@ const VulnTable = ({
         const dateB = new Date(b.vuln.updatedAt)
         return dateA - dateB // Sort in descending order
       }
-    },
-    // ACTION
-    {
-      id: 'action',
-      name: 'ACTION',
-      selector: (row) => {
-        return (
-          <>
-            {!customerView && (
-              <Button
-                p='0px'
-                bg='transparent'
-                ref={btnRef}
-                onClick={() => {
-                  setActiveRow(row)
-                  onOpen()
-                }}
-              >
-                <Icon as={FaEllipsisV} color='gray.400' cursor='pointer' />
-              </Button>
-            )}
-          </>
-        )
-      },
-      omit: customerView
     }
   ]
 
@@ -462,54 +432,73 @@ const VulnTable = ({
         boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
       >
         <Grid
-          templateColumns='repeat(4, 1fr)'
+          templateColumns='repeat(2, 1fr)'
           gap={6}
           width={'90%'}
           margin={'0 auto'}
         >
-          <GridItem w='100%' colSpan={4}>
-            <CustomText>Description :</CustomText>
-            <Text mt={1} fontSize={14}>
-              {vuln.desc}
-            </Text>
+          {/* VULN DATA */}
+          <GridItem w='100%' display={'flex'} flexDirection={'column'} gap={4}>
+            {/* Description */}
+            <Box>
+              <CustomText>Description :</CustomText>
+              <Text mt={1} fontSize={14}>
+                {vuln.desc}
+              </Text>
+            </Box>
+            {/* Last Modified At */}
+            <Box>
+              <CustomText>Last Modified At :</CustomText>
+              <Text mt={1} fontSize={14}>
+                {getFullDateAndTime(vuln.lastModifiedAt)}
+              </Text>
+            </Box>
+            {/* Published At  */}
+            <Box>
+              <CustomText>Published At :</CustomText>
+              <Text mt={1} fontSize={14}>
+                {getFullDateAndTime(vuln.publishedAt)}
+              </Text>
+            </Box>
+            {/* CVSS Vector */}
+            <Box>
+              <CustomText>CVSS Vector :</CustomText>
+              <Text mt={1} fontSize={14}>
+                {vuln.cvssVector}
+              </Text>
+            </Box>
+            {/* NVD Alias ID */}
+            <Box>
+              <CustomText>NVD Alias ID :</CustomText>
+              {vuln.nvdAliasId && (
+                <Link href={linkURl('nvd', vuln.nvdAliasId)} target={'_blank'}>
+                  <Flex mt={1} direction='row' alignItems={'center'} gap={2}>
+                    <Icon
+                      as={ExternalLinkIcon}
+                      h={'16px'}
+                      w={'16px'}
+                      color={'blue.500'}
+                    />
+                    <Tooltip label={vuln.nvdAliasId} placement={'top'}>
+                      <Text fontSize='sm' color={textColor}>
+                        {vuln.nvdAliasId}
+                      </Text>
+                    </Tooltip>
+                  </Flex>
+                </Link>
+              )}
+            </Box>
           </GridItem>
+          {/* STATUS UPDATE */}
           <GridItem w='100%'>
-            <CustomText>Last Modified At :</CustomText>
-            <Text mt={1} fontSize={14}>
-              {getFullDateAndTime(vuln.lastModifiedAt)}
-            </Text>
-          </GridItem>
-          <GridItem w='100%'>
-            <CustomText>Published At :</CustomText>
-            <Text mt={1} fontSize={14}>
-              {getFullDateAndTime(vuln.publishedAt)}
-            </Text>
-          </GridItem>
-          <GridItem w='100%'>
-            <CustomText>CVSS Vector :</CustomText>
-            <Text mt={1} fontSize={14}>
-              {vuln.cvssVector}
-            </Text>
-          </GridItem>
-          <GridItem w='100%'>
-            <CustomText>NVD Alias ID :</CustomText>
-            {vuln.nvdAliasId && (
-              <Link href={linkURl('nvd', vuln.nvdAliasId)} target={'_blank'}>
-                <Flex mt={1} direction='row' alignItems={'center'} gap={2}>
-                  <Icon
-                    as={ExternalLinkIcon}
-                    h={'16px'}
-                    w={'16px'}
-                    color={'blue.500'}
-                  />
-                  <Tooltip label={vuln.nvdAliasId} placement={'top'}>
-                    <Text fontSize='sm' color={textColor}>
-                      {vuln.nvdAliasId}
-                    </Text>
-                  </Tooltip>
-                </Flex>
-              </Link>
-            )}
+            <ProdStatusDrawer
+              data={data}
+              textColor={textColor}
+              refetch={refetch}
+              totalRows={totalRows}
+              filteredData={filteredData}
+              filterRefetch={filterRefetch}
+            />
           </GridItem>
         </Grid>
       </Box>
@@ -800,25 +789,6 @@ const VulnTable = ({
             </DrawerFooter>
           </DrawerContent>
         </Drawer>
-      )}
-
-      {/* ACTIONS */}
-      {activeRow !== null && (
-        <>
-          {isOpen && (
-            <ProdStatusDrawer
-              isOpen={isOpen}
-              onClose={onClose}
-              btnRef={btnRef}
-              data={activeRow}
-              textColor={textColor}
-              refetch={refetch}
-              totalRows={totalRows}
-              filteredData={filteredData}
-              filterRefetch={filterRefetch}
-            />
-          )}
-        </>
       )}
     </>
   )
