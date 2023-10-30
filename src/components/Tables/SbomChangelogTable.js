@@ -135,39 +135,36 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
         const urls = event === 'external_urls' && JSON.stringify(orig)
 
         return (
-          <Flex flexWrap={'wrap'} gap={2} my={2}>
+          <Flex flexWrap={'wrap'} gap={2} my={2} whiteSpace={'break-spaces'}>
             <Tooltip
               placement='top'
               label={license.length === 0 ? '' : orig}
               textTransform={'capitalize'}
             >
               <Box textOverflow={'wrap'}>
-                {orig === 'f'
-                  ? 'False'
-                  : orig === 't'
-                  ? 'True'
-                  : license.length > 0
-                  ? license.map((item, index) => (
-                      <Flex
-                        flexWrap={'wrap'}
-                        gap={2}
-                        my={2}
-                        direction={'column'}
+                {orig === 'f' ? (
+                  'False'
+                ) : orig === 't' ? (
+                  'True'
+                ) : license.length > 0 ? (
+                  license.map((item, index) => (
+                    <Flex flexWrap={'wrap'} gap={2} my={2} direction={'column'}>
+                      <Tag
+                        size={'sm'}
+                        key={index}
+                        variant='subtle'
+                        colorScheme='red'
+                        width={'fit-content'}
                       >
-                        <Tag
-                          size={'sm'}
-                          key={index}
-                          variant='subtle'
-                          colorScheme='red'
-                          width={'fit-content'}
-                        >
-                          <TagLabel pt={1}>{item}</TagLabel>
-                        </Tag>
-                      </Flex>
-                    ))
-                  : license.length === 0
-                  ? ''
-                  : orig}
+                        <TagLabel pt={1}>{item}</TagLabel>
+                      </Tag>
+                    </Flex>
+                  ))
+                ) : license.length === 0 ? (
+                  ''
+                ) : (
+                  <Text whiteSpace={'wrap'}>{orig}</Text>
+                )}
               </Box>
             </Tooltip>
           </Flex>
@@ -191,55 +188,48 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
               placement='top'
               label={updatedValue.length === 0 ? '' : updated}
               textTransform={'capitalize'}
+              whiteSpace={'wrap'}
             >
-              <Box textOverflow={'wrap'}>
-                {updated === 'f'
-                  ? 'False'
-                  : updated === 't'
-                  ? 'True'
-                  : updatedValue.length > 0
-                  ? updatedValue.map((item, index) => (
-                      <Flex
-                        flexWrap={'wrap'}
-                        gap={2}
-                        my={2}
-                        direction={'column'}
+              <Box>
+                {updated === 'f' ? (
+                  'False'
+                ) : updated === 't' ? (
+                  'True'
+                ) : updatedValue.length > 0 ? (
+                  updatedValue.map((item, index) => (
+                    <Flex flexWrap={'wrap'} gap={2} my={2} direction={'column'}>
+                      <Tag
+                        size={'sm'}
+                        key={index}
+                        variant='subtle'
+                        colorScheme='green'
+                        width={'fit-content'}
                       >
-                        <Tag
-                          size={'sm'}
-                          key={index}
-                          variant='subtle'
-                          colorScheme='green'
-                          width={'fit-content'}
-                        >
-                          <TagLabel pt={1}>{item}</TagLabel>
-                        </Tag>
-                      </Flex>
-                    ))
-                  : updatedValue.length === 0
-                  ? ''
-                  : urls && urls.length > 0
-                  ? urls.map((item, index) => (
-                      <Flex
-                        flexWrap={'wrap'}
-                        gap={2}
-                        my={2}
-                        direction={'column'}
+                        <TagLabel pt={1}>{item}</TagLabel>
+                      </Tag>
+                    </Flex>
+                  ))
+                ) : updatedValue.length === 0 ? (
+                  ''
+                ) : urls && urls.length > 0 ? (
+                  urls.map((item, index) => (
+                    <Flex flexWrap={'wrap'} gap={2} my={2} direction={'column'}>
+                      <Tag
+                        size={'sm'}
+                        key={index}
+                        variant='subtle'
+                        colorScheme='green'
+                        width={'fit-content'}
                       >
-                        <Tag
-                          size={'sm'}
-                          key={index}
-                          variant='subtle'
-                          colorScheme='green'
-                          width={'fit-content'}
-                        >
-                          <TagLabel pt={1}>
-                            {item.name} - {item.url}
-                          </TagLabel>
-                        </Tag>
-                      </Flex>
-                    ))
-                  : updated}
+                        <TagLabel pt={1}>
+                          {item.name} - {item.url}
+                        </TagLabel>
+                      </Tag>
+                    </Flex>
+                  ))
+                ) : (
+                  <Text whiteSpace={'wrap'}>{updated}</Text>
+                )}
               </Box>
             </Tooltip>
           </Flex>
