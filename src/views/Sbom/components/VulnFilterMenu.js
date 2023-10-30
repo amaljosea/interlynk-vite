@@ -3,8 +3,11 @@ import {
   Badge,
   Box,
   Button,
+  Flex,
+  Input,
   Menu,
   MenuButton,
+  MenuDivider,
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
@@ -46,6 +49,8 @@ const VulnFilterMenu = ({
   const [selectCompName, setSelectCompName] = useState([])
   const [selectSeverity, setSelectSeverity] = useState([])
   const [selectedStatus, setSelectedStatus] = useState([])
+  const [selectedKev, setSelectedKev] = useState([])
+  const [selectedEpss, setSelectedEpss] = useState([])
 
   const onFilterCompName = (value) => {
     setSelectCompName(value.includes('all') ? [] : value)
@@ -93,6 +98,14 @@ const VulnFilterMenu = ({
       direction: vulnDirection
     })
     setPageIndex(1)
+  }
+
+  const onFilterKev = (value) => {
+    setSelectedKev(value.includes('all') ? [] : value)
+  }
+
+  const onFilterEpss = (value) => {
+    setSelectedEpss(value.includes('all') ? [] : value)
   }
 
   return (
@@ -202,6 +215,77 @@ const VulnFilterMenu = ({
                 </MenuItemOption>
               ))}
             </MenuOptionGroup>
+          </MenuList>
+        </Menu>
+      </Box>
+      {/* KEV */}
+      <Box width={'fit-content'} position={'relative'}>
+        <Menu closeOnSelect={true}>
+          {selectedKev.length !== 0 && <CheckMark />}
+          <MenuButton
+            as={Button}
+            colorScheme='blue'
+            fontWeight='normal'
+            fontSize={'sm'}
+            leftIcon={<FaFilter size={14} />}
+          >
+            KEV
+          </MenuButton>
+          <MenuList>
+            <MenuOptionGroup
+              type='checkbox'
+              value={selectedKev}
+              onChange={onFilterKev}
+            >
+              <MenuItemOption value={'all'} fontSize={'sm'}>
+                All
+              </MenuItemOption>
+              {['Yes', 'No'].map((item, index) => (
+                <MenuItemOption key={index} value={item} fontSize={'sm'}>
+                  {item}
+                </MenuItemOption>
+              ))}
+            </MenuOptionGroup>
+          </MenuList>
+        </Menu>
+      </Box>
+      {/* EPSS */}
+      <Box width={'fit-content'} position={'relative'}>
+        <Menu closeOnSelect={true}>
+          {selectedEpss.length !== 0 && <CheckMark />}
+          <MenuButton
+            as={Button}
+            colorScheme='blue'
+            fontWeight='normal'
+            fontSize={'sm'}
+            leftIcon={<FaFilter size={14} />}
+          >
+            EPSS
+          </MenuButton>
+          <MenuList>
+            <MenuOptionGroup
+              type='checkbox'
+              value={selectedEpss}
+              onChange={onFilterEpss}
+            >
+              <MenuItemOption value={'all'} fontSize={'sm'}>
+                All
+              </MenuItemOption>
+              {['0.1-0.25', '0.25-0.5', '0.5-1.0'].map((item, index) => (
+                <MenuItemOption key={index} value={item} fontSize={'sm'}>
+                  {item}
+                </MenuItemOption>
+              ))}
+            </MenuOptionGroup>
+            <MenuDivider />
+            <Flex flexDirection={'column'} alignItems={'flex-start'}>
+              <Stack direction={'row'} alignItems={'center'} pl={8}>
+                <Input type='number' width={'60px'} size='sm' placeholder={'Min'} />
+                <Box>-</Box>
+                <Input type='number' width={'60px'} size='sm' placeholder={'Max'} />
+              </Stack>
+              <Button ml={8} mt={2} size='sm'>Submit</Button>
+            </Flex>
           </MenuList>
         </Menu>
       </Box>

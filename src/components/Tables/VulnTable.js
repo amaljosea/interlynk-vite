@@ -1,7 +1,9 @@
 // Chakra imports
 import {
+  ChevronDownIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  ChevronUpIcon,
   ExternalLinkIcon
 } from '@chakra-ui/icons'
 import {
@@ -19,16 +21,7 @@ import {
   GridItem,
   Tooltip,
   Stack,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
   Select,
-  FormControl,
-  FormLabel,
   Drawer,
   DrawerBody,
   DrawerFooter,
@@ -39,15 +32,13 @@ import {
   useToast,
   IconButton,
   ButtonGroup,
-  Skeleton
+  Badge
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
-import { FaEllipsisV } from 'react-icons/fa'
 import { FaCopy } from 'react-icons/fa6'
 import { useState, useRef, useMemo, useEffect, useContext } from 'react'
 import { useLocation } from 'react-router-dom'
 import styled from '@emotion/styled'
-import CopyTable from './CopyTable'
 import Multistep from 'views/Sbom/components/Multistep'
 import { getFullDateAndTime } from 'utils'
 import ProdStatusDrawer from 'components/Drawer/ProdStatusDrawer'
@@ -103,9 +94,7 @@ const VulnTable = ({
   setTotalRows,
   filterRefetch
 }) => {
-  const location = useLocation()
   const toast = useToast()
-  const customerView = location.pathname.startsWith('/customer')
 
   const {
     vulnFilters,
@@ -117,8 +106,6 @@ const VulnTable = ({
 
   const textColor = useColorModeValue('gray.700', 'white')
 
-  const [version, setVersion] = useState('')
-
   // STEPS
   const [step, setStep] = useState(1)
   const [progress, setProgress] = useState(25)
@@ -126,12 +113,6 @@ const VulnTable = ({
   const [filterText, setFilterText] = useState('')
 
   const tableRef = useRef()
-
-  const {
-    isOpen: isCopyOpen,
-    onOpen: onCopyOpen,
-    onClose: onCopyClose
-  } = useDisclosure()
 
   const {
     isOpen: isTableOpen,
@@ -185,11 +166,14 @@ const VulnTable = ({
                     : ''}
                 </Text>
               </Tooltip>
+              <Badge variant='subtle' colorScheme='red'>
+                KEV
+              </Badge>
             </Flex>
           </Link>
         )
       },
-      width: '200px'
+      width: '250px'
     },
     // SEVERITY
     {
@@ -255,6 +239,40 @@ const VulnTable = ({
         )
       },
       width: '100px'
+    },
+    // EPSS
+    {
+      id: 'EPSS',
+      name: 'EPSS',
+      selector: (row) => {
+        const { vuln } = row
+
+        const epss = Array.from(
+          { length: Math.floor(Math.random() * 2) + 1 },
+          () => Math.random()
+        )
+
+        return (
+          <Flex minWidth='max-content' alignItems='center' gap='2'>
+            <Tag size='md' key='md' variant='subtle' colorScheme={'blue'}>
+              <TagLabel>
+                {epss[0].toFixed(2)}{' '}
+                {/* {epss.length > 1 && `- ${epss[1].toFixed(2)}`} */}
+              </TagLabel>
+            </Tag>
+            {epss.length > 1 && epss[0] > epss[epss.length - 1] ? (
+              <Tag variant='subtle' colorScheme='green'>
+                <ChevronUpIcon w={5} h={5} />
+              </Tag>
+            ) : (
+              <Tag variant='subtle' colorScheme='red'>
+                <ChevronDownIcon w={5} h={5} />
+              </Tag>
+            )}
+          </Flex>
+        )
+      },
+      width: '200px'
     },
     // COMPONENT
     {
@@ -327,20 +345,6 @@ const VulnTable = ({
       }
     }
   ]
-
-  const handleCopy = () => {
-    if (version !== '') {
-      onCopyClose()
-      onTableOpen()
-    } else {
-      toast({
-        description: 'Please select any version',
-        position: 'top',
-        duration: 2000,
-        status: 'error'
-      })
-    }
-  }
 
   // SEARCH COMPONENT
   const handleSearch = async (event) => {
@@ -660,45 +664,6 @@ const VulnTable = ({
             </Select>
           </Stack>
         </Flex>
-      )}
-
-      {/* COPY MODAL */}
-      {isCopyOpen && (
-        <Modal isOpen={isCopyOpen} onClose={onCopyClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalCloseButton />
-            <ModalHeader>Import Vulnerability Statuses</ModalHeader>
-            <ModalBody mt={2}>
-              <FormControl>
-                <FormLabel>Import From:</FormLabel>
-                <Select
-                  value={version}
-                  onChange={(e) => setVersion(e.target.value)}
-                >
-                  {filteredData && filteredData.length > 0 ? (
-                    filteredData.map((item, index) => (
-                      <option key={index} value={item.id} name={item.version}>
-                        {item.version}
-                      </option>
-                    ))
-                  ) : (
-                    <option value=''>-- --</option>
-                  )}
-                </Select>
-              </FormControl>
-            </ModalBody>
-
-            <ModalFooter>
-              <Button mr={3} onClick={onCopyClose}>
-                Cancel
-              </Button>
-              <Button variant='solid' colorScheme='blue' onClick={handleCopy}>
-                Apply
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
       )}
 
       {/* COPY DATA TABLE */}
