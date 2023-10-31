@@ -92,7 +92,8 @@ const ProdStatusDrawer = ({
           notes: notes,
           sbomId: sbomId,
           vexStatusId: statusTitle,
-          vexJustificationId: justification
+          vexJustificationId:
+            statusName === 'Not Affected' ? justification : undefined
         }
       }).then((res) => {
         if (res.data) {
