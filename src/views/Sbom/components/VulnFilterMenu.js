@@ -11,7 +11,8 @@ import {
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
-  Stack
+  Stack,
+  useDisclosure
 } from '@chakra-ui/react'
 import GlobalContext from 'context/GlobalContext'
 import { useContext, useState } from 'react'
@@ -51,6 +52,8 @@ const VulnFilterMenu = ({
   const [selectedStatus, setSelectedStatus] = useState([])
   const [selectedKev, setSelectedKev] = useState('')
   const [selectedEpss, setSelectedEpss] = useState('')
+  const [minVal, setMinVal] = useState()
+  const [maxVal, setMaxVal] = useState()
 
   const onFilterCompName = (value) => {
     setSelectCompName(value.includes('all') ? [] : value)
@@ -117,6 +120,8 @@ const VulnFilterMenu = ({
   }
 
   const onFilterEpss = (value) => {
+    setMinVal(0)
+    setMaxVal(0)
     setSelectedEpss(value)
 
     const epss = value !== 'all' && value.split('-')
@@ -140,7 +145,27 @@ const VulnFilterMenu = ({
     setPageIndex(1)
   }
 
-  console.log('selectedEpss', selectedEpss)
+  const { isOpen, onOpen, onClose } = useDisclosure()
+
+  const handleSubmit = () => {
+    const range = {
+      min: parseFloat(minVal),
+      max: parseFloat(maxVal)
+    }
+    refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      epss: range,
+      first: totalRows,
+      last: undefined,
+      after: undefined,
+      last: undefined,
+      field: vulnField,
+      direction: vulnDirection
+    })
+    setPageIndex(1)
+    onClose()
+  }
 
   return (
     <Stack direction={'row'} alignItems={'center'} gap={1}>
@@ -287,7 +312,7 @@ const VulnFilterMenu = ({
       </Box>
       {/* EPSS */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={true}>
+        <Menu closeOnSelect={true} isOpen={isOpen} onClose={onClose}>
           {selectedEpss !== 'all' && selectedEpss !== '' && <CheckMark />}
           <MenuButton
             as={Button}
@@ -295,6 +320,7 @@ const VulnFilterMenu = ({
             fontWeight='normal'
             fontSize={'sm'}
             leftIcon={<FaFilter size={14} />}
+            onClick={onOpen}
           >
             EPSS
           </MenuButton>
@@ -313,27 +339,31 @@ const VulnFilterMenu = ({
                 </MenuItemOption>
               ))}
             </MenuOptionGroup>
-            {/* <MenuDivider />
+            <MenuDivider />
             <Flex flexDirection={'column'} alignItems={'flex-start'}>
               <Stack direction={'row'} alignItems={'center'} pl={8}>
                 <Input
                   type='number'
                   width={'60px'}
                   size='sm'
-                  placeholder={'Min'}
+                  placeholder={'min'}
+                  value={minVal}
+                  onChange={(e) => setMinVal(e.target.value)}
                 />
                 <Box>-</Box>
                 <Input
                   type='number'
                   width={'60px'}
                   size='sm'
-                  placeholder={'Max'}
+                  placeholder={'max'}
+                  value={maxVal}
+                  onChange={(e) => setMaxVal(e.target.value)}
                 />
               </Stack>
-              <Button ml={8} mt={2} size='sm'>
+              <Button ml={8} my={2} size='sm' onClick={handleSubmit}>
                 Submit
               </Button>
-            </Flex> */}
+            </Flex>
           </MenuList>
         </Menu>
       </Box>
