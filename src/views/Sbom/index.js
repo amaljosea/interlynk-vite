@@ -25,8 +25,8 @@ import {
   Spinner,
   UnorderedList,
   ListItem,
-  chakra,
-  Badge
+  Badge,
+  useToast
 } from '@chakra-ui/react'
 import React, { useState, useRef, useEffect } from 'react'
 import Card from 'components/Card/Card.js'
@@ -38,12 +38,11 @@ import {
   FaCubes,
   FaLayerGroup,
   FaFileDownload,
-  FaBug,
-  FaRadiation
+  FaBug
 } from 'react-icons/fa'
 import { TbSignature, TbSignatureOff } from 'react-icons/tb'
 import { useLocation, useHistory } from 'react-router-dom'
-import { CalendarIcon, DeleteIcon, EditIcon, LockIcon } from '@chakra-ui/icons'
+import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 import { timeSince, getFullDateAndTime } from 'utils'
 import SigningModal from './components/SigningModal'
 import DownloadModal from './components/DownloadModal'
@@ -66,6 +65,7 @@ function SBOM() {
 
   const location = useLocation()
   const history = useHistory()
+  const toast = useToast()
 
   const customerView = location.pathname.startsWith('/customer')
 
@@ -79,8 +79,6 @@ function SBOM() {
   const [status, setStatus] = useState('created')
   const [components, setComponents] = useState([])
   const [signedData, setSignedData] = useState(null)
-
-  const [tabIndex, setTabIndex] = useState(0)
 
   useEffect(() => {
     if (!idRegex.test(productId) || !idRegex.test(sbomId)) {
@@ -128,12 +126,28 @@ function SBOM() {
     onClose: onPrimaryClose
   } = useDisclosure()
 
-  const { data: sbomData, refetch } = useQuery(GetProductData, {
+  const {
+    data: sbomData,
+    refetch,
+    error
+  } = useQuery(GetProductData, {
     variables: {
       projectId: productId,
       sbomId: sbomId
     }
   })
+
+  useEffect(() => {
+    if (error) {
+      toast({
+        description: error.message,
+        status: 'error',
+        duration: 2000,
+        position: 'top'
+      })
+      history.push('/vendor/products')
+    }
+  }, [error])
 
   const { data } = useQuery(GetProject, {
     variables: {
@@ -450,47 +464,6 @@ function SBOM() {
                                 <Text fontSize={'xs'}>Vulnerabilities</Text>
                               </Box>
                             </Stack>
-                            {/* PURL */}
-                            {/*                             <Stack
-                              direction={'row'}
-                              alignItems={'flex-start'}
-                              spacing={2}
-                            >
-                              <Icon
-                                h={4}
-                                w={4}
-                                color='#777'
-                                as={CalendarIcon}
-                              />
-                              <Box>
-                                <Badge
-                                  mr={1}
-                                  fontSize={'md'}
-                                  fontWeight={'medium'}
-                                >
-                                  {sbomData.sbom.stats.compPurlCount}
-                                </Badge>
-                                <Text fontSize={'xs'}>PURL</Text>
-                              </Box>
-                            </Stack> */}
-                            {/* CPE */}
-                            {/*                             <Stack
-                              direction={'row'}
-                              alignItems={'flex-start'}
-                              spacing={2}
-                            >
-                              <Icon h={4} w={4} color='#777' as={LockIcon} />
-                              <Box>
-                                <Badge
-                                  mr={1}
-                                  fontSize={'md'}
-                                  fontWeight={'medium'}
-                                >
-                                  {sbomData.sbom.stats.compCpeCount}
-                                </Badge>
-                                <Text fontSize={'xs'}>CPE</Text>
-                              </Box>
-                            </Stack> */}
                           </Flex>
                         </Flex>
                       </Flex>
