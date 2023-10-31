@@ -183,6 +183,7 @@ function ProductVersionsRow(props) {
               to={`/vendor/products?p=${id}&sbom=${
                 filteredData.length > 0 ? filteredData[0].id : sbomId[0].id
               }`}
+              onClick={() => window.localStorage.setItem('product', name)}
             >
               <Text color={'blue.500'} minWidth='100%'>
                 {name}

@@ -14,22 +14,17 @@ import { Link, useLocation } from 'react-router-dom'
 
 export default function AdminNavbar(props) {
   const [scrolled, setScrolled] = useState(false)
-  const { variant, children, fixed, secondary, brandText, onOpen, ...rest } =
-    props
+  const { brandText } = props
 
-  // console.log(`brand text`, brandText)
+
 
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const versionId = queryParams.get('v')
   const product = queryParams.get('p')
-  const sbomId = queryParams.get('sbom')
-  const paramId = queryParams.get('signed_url_params')
 
   const imageName = localStorage.getItem('Image')
-
   const productName = localStorage.getItem(`product`)
-
   const activeProd = localStorage.getItem('activeProduct')
 
   // Here are all the props that may change depending on navbar's type or state.(secondary, variant, scrolled)
