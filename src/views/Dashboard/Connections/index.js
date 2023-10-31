@@ -226,16 +226,13 @@ const Connections = () => {
             .finally(() => window.location.reload())
         }
       } catch (error) {
-        if (error.networkError && error.networkError.statusCode === 500) {
-          // Handle the specific error
-          alert(
-            'Duplicate connector is being created for Dockerhub with the same account ID.'
-          )
-          onClose()
-        } else {
-          // Handle other errors
-          alert(error.message)
-        }
+        console.error('Add Connector error: ', error)
+        toast({
+          description: 'An error occured while adding connector. Please retry in few minutes.',
+          status: 'error',
+          duration: 2000,
+          position: 'top'
+        })
       }
       setSelectedConnection(null)
     }
@@ -251,13 +248,13 @@ const Connections = () => {
         .then(() => refetch())
         .finally(() => window.location.reload())
     } catch (error) {
-      if (error.networkError && error.networkError.statusCode === 500) {
-        // Handle the specific error
-        alert('Multiple connection not allowed from single organization.')
-      } else {
-        // Handle other errors
-        alert(error.message)
-      }
+      console.error('Delete connector error: ', error)
+      toast({
+        description: 'An error occured while deleting connector. Please retry in few minutes.',
+        status: 'error',
+        duration: 2000,
+        position: 'top'
+      })
     }
   }
 
