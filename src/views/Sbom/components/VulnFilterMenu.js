@@ -49,8 +49,8 @@ const VulnFilterMenu = ({
   const [selectCompName, setSelectCompName] = useState([])
   const [selectSeverity, setSelectSeverity] = useState([])
   const [selectedStatus, setSelectedStatus] = useState([])
-  const [selectedKev, setSelectedKev] = useState([])
-  const [selectedEpss, setSelectedEpss] = useState([])
+  const [selectedKev, setSelectedKev] = useState('')
+  const [selectedEpss, setSelectedEpss] = useState('')
 
   const onFilterCompName = (value) => {
     setSelectCompName(value.includes('all') ? [] : value)
@@ -101,12 +101,46 @@ const VulnFilterMenu = ({
   }
 
   const onFilterKev = (value) => {
-    setSelectedKev(value.includes('all') ? [] : value)
+    setSelectedKev(value)
+    refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      kev: value === 'all' ? undefined : value === 'yes' ? true : false,
+      first: totalRows,
+      last: undefined,
+      after: undefined,
+      last: undefined,
+      field: vulnField,
+      direction: vulnDirection
+    })
+    setPageIndex(1)
   }
 
   const onFilterEpss = (value) => {
-    setSelectedEpss(value.includes('all') ? [] : value)
+    setSelectedEpss(value)
+
+    const epss = value !== 'all' && value.split('-')
+
+    const range = {
+      min: parseFloat(epss[0]),
+      max: parseFloat(epss[1])
+    }
+
+    refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      epss: value === 'all' ? undefined : range,
+      first: totalRows,
+      last: undefined,
+      after: undefined,
+      last: undefined,
+      field: vulnField,
+      direction: vulnDirection
+    })
+    setPageIndex(1)
   }
+
+  console.log('selectedEpss', selectedEpss)
 
   return (
     <Stack direction={'row'} alignItems={'center'} gap={1}>
@@ -221,7 +255,7 @@ const VulnFilterMenu = ({
       {/* KEV */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {selectedKev.length !== 0 && <CheckMark />}
+          {selectedKev !== 'all' && selectedKev !== '' && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -233,15 +267,17 @@ const VulnFilterMenu = ({
           </MenuButton>
           <MenuList>
             <MenuOptionGroup
-              type='checkbox'
+              type='radio'
               value={selectedKev}
               onChange={onFilterKev}
             >
-              <MenuItemOption value={'all'} fontSize={'sm'}>
-                All
-              </MenuItemOption>
-              {['Yes', 'No'].map((item, index) => (
-                <MenuItemOption key={index} value={item} fontSize={'sm'}>
+              {['all', 'yes', 'no'].map((item, index) => (
+                <MenuItemOption
+                  key={index}
+                  value={item}
+                  fontSize={'sm'}
+                  textTransform={'capitalize'}
+                >
                   {item}
                 </MenuItemOption>
               ))}
@@ -252,7 +288,7 @@ const VulnFilterMenu = ({
       {/* EPSS */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {selectedEpss.length !== 0 && <CheckMark />}
+          {selectedEpss !== 'all' && selectedEpss !== '' && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -264,7 +300,7 @@ const VulnFilterMenu = ({
           </MenuButton>
           <MenuList>
             <MenuOptionGroup
-              type='checkbox'
+              type='radio'
               value={selectedEpss}
               onChange={onFilterEpss}
             >
@@ -277,15 +313,27 @@ const VulnFilterMenu = ({
                 </MenuItemOption>
               ))}
             </MenuOptionGroup>
-            <MenuDivider />
+            {/* <MenuDivider />
             <Flex flexDirection={'column'} alignItems={'flex-start'}>
               <Stack direction={'row'} alignItems={'center'} pl={8}>
-                <Input type='number' width={'60px'} size='sm' placeholder={'Min'} />
+                <Input
+                  type='number'
+                  width={'60px'}
+                  size='sm'
+                  placeholder={'Min'}
+                />
                 <Box>-</Box>
-                <Input type='number' width={'60px'} size='sm' placeholder={'Max'} />
+                <Input
+                  type='number'
+                  width={'60px'}
+                  size='sm'
+                  placeholder={'Max'}
+                />
               </Stack>
-              <Button ml={8} mt={2} size='sm'>Submit</Button>
-            </Flex>
+              <Button ml={8} mt={2} size='sm'>
+                Submit
+              </Button>
+            </Flex> */}
           </MenuList>
         </Menu>
       </Box>
