@@ -46,7 +46,7 @@ const CompFilterMenu = ({
   const [selectedKind, setSelectedKind] = useState([])
   const [selectedLicense, setSelectedLicense] = useState([])
   const [selectedSupplier, setSelectedSupplier] = useState([])
-  const [selectedType, setSelectedType] = useState([])
+  const [selectedType, setSelectedType] = useState('')
 
   const onFilterEcosystem = (value) => {
     setSelectedEcosystem(value.includes('all') ? [] : value)
@@ -113,12 +113,12 @@ const CompFilterMenu = ({
   }
 
   const onFilterType = (value) => {
-    setSelectedType(value.includes('all') ? [] : value)
+    setSelectedType(value)
     refetch({
       projectId: productId,
       sbomId: sbomId,
-      primary: value.includes('primary') && !value.includes('all') ? true : false,
-      internal: value.includes('internal') && !value.includes('all') ? true : false,
+      primary: (value === 'primary'),
+      internal: (value === 'internal'),
       first: totalRows,
       last: undefined,
       after: undefined,
@@ -187,7 +187,7 @@ const CompFilterMenu = ({
                 All
               </MenuItemOption>
               {kinds?.map((item, index) => (
-                <MenuItemOption key={index} value={item} fontSize={'sm'}>
+                <MenuItemOption key={index} value={item} fontSize={'sm'}  textTransform={'capitalize'}>
                   {item}
                 </MenuItemOption>
               ))}
@@ -243,7 +243,7 @@ const CompFilterMenu = ({
           </MenuButton>
           <MenuList minHeight={'auto'} maxHeight={'300px'} overflow={'hidden'} overflowY={'scroll'}>
             <MenuOptionGroup
-              type='checkbox'
+              type='radio'
               value={selectedSupplier}
               onChange={onFilterSupplier}
             >
@@ -262,7 +262,7 @@ const CompFilterMenu = ({
       {/* TYPE */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {selectedType.length !== 0 && <CheckMark />}
+          {selectedType !== '' && selectedType !== 'all' && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -274,17 +274,17 @@ const CompFilterMenu = ({
           </MenuButton>
           <MenuList>
             <MenuOptionGroup
-              type='checkbox'
+              type='radio'
               value={selectedType}
               onChange={onFilterType}
             >
-              <MenuItemOption value={'all'} fontSize={'sm'}>
+              <MenuItemOption value={'all'} fontSize={'sm'} textTransform={'capitalize'}>
                 All
               </MenuItemOption>
-              <MenuItemOption value='primary' fontSize={'sm'}>
+              <MenuItemOption value='primary' fontSize={'sm'} textTransform={'capitalize'}>
                 primary
               </MenuItemOption>
-              <MenuItemOption value='internal' fontSize={'sm'}>
+              <MenuItemOption value='internal' fontSize={'sm'} textTransform={'capitalize'}>
                 internal
               </MenuItemOption>
             </MenuOptionGroup>
