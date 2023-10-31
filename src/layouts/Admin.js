@@ -124,8 +124,6 @@ export default function Dashboard(props) {
                     logoText={'Interlynk DASHBOARD'}
                     brandText={getActiveRoute(dashRoutes)}
                     secondary={getActiveNavbar(dashRoutes)}
-                    fixed={fixed}
-                    // {...rest}
                   />
                 </Box>
               </Portal>
