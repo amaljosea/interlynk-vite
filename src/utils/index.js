@@ -49,6 +49,8 @@ import userTwo from 'assets/img/sp.png'
 import userThree from 'assets/img/rcn.jpg'
 import userNone from 'assets/img/user.png'
 
+const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+
 export const getConImg = (name) => {
   switch (name) {
     case 'Docker Hub':
@@ -382,13 +384,13 @@ export const dateTime = (updatedAt) => {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
-    timeZone: 'UTC'
+    timeZone: userTimezone
   })
   const time = new Date(updatedAt).toLocaleTimeString('en-US', {
     hour: 'numeric',
     minute: '2-digit',
     hour12: true,
-    timeZone: 'UTC'
+    timeZone: userTimezone
   })
 
   return `${date} ${time}`
@@ -482,7 +484,7 @@ export const convertDateFormat = (inputDate) => {
   return `${month} ${day}`
 }
 
-export const getFullDateAndTime = (dateString, timeZone = 'UTC') => {
+export const getFullDateAndTime = (dateString, timeZone = userTimezone) => {
   const options = {
     year: 'numeric',
     month: '2-digit',
