@@ -654,6 +654,8 @@ export const GetVulnData = gql`
     $search: String
     $severity: [String!]
     $status: [String!]
+    $kev: Boolean
+    $epss: RangeInput
     $first: Int
     $last: Int
     $after: String
@@ -667,6 +669,8 @@ export const GetVulnData = gql`
         search: $search
         severity: $severity
         status: $status
+        kev: $kev
+        epss: $epss
         after: $after
         before: $before
         first: $first
@@ -693,6 +697,12 @@ export const GetVulnData = gql`
             lastModifiedAt
             nvdAliasId
             updatedAt
+            vulnInfo {
+              cveId
+              epssScore
+              epssScores
+              kev
+            }
           }
           componentVulnLogs {
             id

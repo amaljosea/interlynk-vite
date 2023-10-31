@@ -148,6 +148,8 @@ const VulnTable = ({
       name: 'ID',
       selector: (row) => {
         const { vuln } = row
+        const { vulnInfo } = vuln
+        const { kev } = vulnInfo
         return (
           <Link href={linkURl(vuln.source, vuln.vulnId)} target={'_blank'}>
             <Flex direction='row' alignItems={'center'} gap={2}>
@@ -166,9 +168,11 @@ const VulnTable = ({
                     : ''}
                 </Text>
               </Tooltip>
-              <Badge variant='subtle' colorScheme='red'>
-                KEV
-              </Badge>
+              {kev === true && (
+                <Badge variant='subtle' colorScheme='red'>
+                  KEV
+                </Badge>
+              )}
             </Flex>
           </Link>
         )
@@ -246,28 +250,22 @@ const VulnTable = ({
       name: 'EPSS',
       selector: (row) => {
         const { vuln } = row
-
-        const epss = Array.from(
-          { length: Math.floor(Math.random() * 2) + 1 },
-          () => Math.random()
-        )
+        const { vulnInfo } = vuln
+        const { epssScores } = vulnInfo
 
         return (
           <Flex minWidth='max-content' alignItems='center' gap='2'>
-            <Tag size='md' key='md' variant='subtle' colorScheme={'blue'}>
+            <Tag size='md' key='md' variant='subtle' width={'90px'}>
               <TagLabel>
-                {epss[0].toFixed(2)}{' '}
-                {/* {epss.length > 1 && `- ${epss[1].toFixed(2)}`} */}
+                {epssScores[0]}
+                {/* {epssScores.length > 1 && `- ${epssScores[1]}`} */}
               </TagLabel>
             </Tag>
-            {epss.length > 1 && epss[0] > epss[epss.length - 1] ? (
-              <Tag variant='subtle' colorScheme='green'>
-                <ChevronUpIcon w={5} h={5} />
-              </Tag>
+            {epssScores.length > 1 &&
+            epssScores[0] > epssScores[epssScores.length - 1] ? (
+              <ChevronUpIcon w={5} h={5} color='green.500' />
             ) : (
-              <Tag variant='subtle' colorScheme='red'>
-                <ChevronDownIcon w={5} h={5} />
-              </Tag>
+              <ChevronDownIcon w={5} h={5} color='red.500' />
             )}
           </Flex>
         )
