@@ -118,14 +118,12 @@ export default function Dashboard(props) {
             />
             <Box minH='100vh' w={'96%'} pos={'absolute'} right={0}>
               <Portal>
-                <Box>
-                  <AdminNavbar
-                    onOpen={onOpen}
-                    logoText={'Interlynk DASHBOARD'}
-                    brandText={getActiveRoute(dashRoutes)}
-                    secondary={getActiveNavbar(dashRoutes)}
-                  />
-                </Box>
+                <AdminNavbar
+                  onOpen={onOpen}
+                  logoText={'Interlynk DASHBOARD'}
+                  brandText={getActiveRoute(dashRoutes)}
+                  secondary={getActiveNavbar(dashRoutes)}
+                />
               </Portal>
               <Box bg='rgba(0,0,0,0.04)' minH={'100vh'} maxH={'100%'}>
                 {getRoute() && (

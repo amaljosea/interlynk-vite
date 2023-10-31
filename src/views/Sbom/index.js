@@ -295,7 +295,7 @@ function SBOM() {
       {productId && sbomId && (
         <>
           <Flex direction='column' pt={{ base: '120px', md: '74px' }} px={2}>
-            {/* product info */}
+            {/* Product Info */}
             {sbomData ? (
               <Card mb='6'>
                 <CardBody>
@@ -343,20 +343,17 @@ function SBOM() {
                               Updated {timeSince(sbomData.sbom.updatedAt)}
                             </Text>
                           </Tooltip>
-
-                          {!customerView && (
-                            <Tag
-                              mt={1}
-                              w={'fit-content'}
-                              size={'sm'}
-                              variant='outline'
-                              colorScheme='blue'
-                            >
-                              <TagLabel textTransform={'capitalize'}>
-                                {sbomData.sbom.lifecycle}
-                              </TagLabel>
-                            </Tag>
-                          )}
+                          <Tag
+                            mt={1}
+                            w={'fit-content'}
+                            size={'sm'}
+                            variant='outline'
+                            colorScheme='blue'
+                          >
+                            <TagLabel textTransform={'capitalize'}>
+                              {sbomData.sbom.lifecycle}
+                            </TagLabel>
+                          </Tag>
                           {/* --------------- STATS ------------------- */}
                           <Flex
                             flexDir={'row'}

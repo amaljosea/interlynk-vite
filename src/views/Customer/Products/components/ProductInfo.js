@@ -9,14 +9,21 @@ import {
   useDisclosure,
   Stack,
   Box,
-  Tooltip
+  Tooltip,
+  Badge,
+  Tag,
+  TagLabel,
+  IconButton,
+  Skeleton
 } from '@chakra-ui/react'
 import React, { useState, useEffect, useRef } from 'react'
 import {
   FaBalanceScale,
+  FaBug,
+  FaCube,
   FaCubes,
-  FaLayerGroup,
-  FaProjectDiagram
+  FaFileDownload,
+  FaLayerGroup
 } from 'react-icons/fa'
 import { useLocation, useHistory } from 'react-router-dom'
 import { useQuery } from '@apollo/client'
@@ -24,11 +31,12 @@ import { GetSignedSBOM, GetProjectInfo } from 'graphQL/Queries'
 import { timeSince } from 'utils'
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
-import SBOMTable from 'views/Sbom/components/SBOMTable'
 import DownloadModal from 'views/Sbom/components/DownloadModal'
 import Cookies from 'js-cookie'
-import { CalendarIcon, LockIcon } from '@chakra-ui/icons'
 import { getFullDateAndTime } from 'utils'
+import { GetSignedProductData } from 'graphQL/Queries'
+import { GetSignedProjects } from 'graphQL/Queries'
+import SignedSbomTable from './SBOMTable'
 
 function ProductInfo() {
   const initialRef = useRef(null)
@@ -39,55 +47,22 @@ function ProductInfo() {
 
   const queryParams = new URLSearchParams(location.search)
 
-  const customerView = location.pathname.startsWith('/customer')
-
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
   const signedParams = Cookies.get(`signedParamId`)
 
   const { isOpen, onOpen, onClose } = useDisclosure()
-  const [pageIndex, setPageIndex] = useState(1)
 
-  const { data: sbomData, refetch } = useQuery(GetSignedSBOM, {
+  const { data: sbomData, refetch } = useQuery(GetSignedProductData, {
     variables: {
       projectId: productId,
       sbomId: sbomId,
-      signedParams: signedParams,
-      first: 10,
-      field: 'NAME',
-      direction: 'ASC'
+      signedParams: signedParams
     }
   })
 
-  const handlePreviousPage = () => {
-    setPageIndex((prev) => prev !== 0 && prev - 1)
-    refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      signedParams: signedParams,
-      first: undefined,
-      last: 10,
-      before: sbomData.sbom.components.pageInfo.startCursor,
-      after: ''
-    })
-  }
-
-  const handleNextPage = () => {
-    setPageIndex(
-      (prev) =>
-        prev < Math.ceil(sbomData?.sbom.components.totalCount) && prev + 1
-    )
-    refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      signedParams: signedParams,
-      first: 10,
-      last: undefined,
-      after: sbomData.sbom.components.pageInfo.endCursor,
-      before: ''
-    })
-  }
+  const { data: allProjects } = useQuery(GetSignedProjects)
 
   const { data } = useQuery(GetProjectInfo, {
     variables: {
@@ -135,12 +110,6 @@ function ProductInfo() {
   const filteredData =
     uniqVersions.length > 0 ? removeDuplicatesAndLatest(uniqVersions) : []
 
-  // console.log(`filteredData`, filteredData)
-
-  const totalLicenses =
-    sbomData &&
-    sbomData.sbom.components.nodes.filter((item) => item.licenses.length > 0)
-
   const [selectedVersion, setSelectedVersion] = useState('')
 
   const refetchSBOM = async (id) => {
@@ -162,20 +131,24 @@ function ProductInfo() {
     refetchSBOM(e.target.value)
   }
 
-  const captions = ['Product', 'versions', 'Description', 'Updated At']
+  const selectedProject =
+    allProjects &&
+    allProjects.projects.nodes.find((item) => item.id === productId)
 
   return (
     <>
       <Flex direction='column' pt={{ base: '120px', md: '70px' }} px={3}>
-        <Card mb='6'>
-          <CardBody>
-            <Grid
-              width={'100%'}
-              templateColumns='repeat(5, 1fr)'
-              alignItems={'center'}
-            >
-              <GridItem colSpan={2}>
-                {sbomData ? (
+        {/* Product Info */}
+        {sbomData ? (
+          <Card mb='6'>
+            <CardBody>
+              <Grid
+                width={'100%'}
+                templateColumns='repeat(5, 1fr)'
+                alignItems={'center'}
+              >
+                {/* LEFT */}
+                <GridItem colSpan={2}>
                   <Flex
                     direction={'row'}
                     alignItems={'flex-start'}
@@ -184,7 +157,7 @@ function ProductInfo() {
                   >
                     <Icon as={FaCubes} h={'64px'} w={'64px'} color='blue.300' />
                     <Flex direction={'column'} gap={0.5}>
-                      {/* PRODUCT TITLE */}
+                      {/* -------------- PRODUCT TITLE ------------------- */}
                       <Text fontWeight={'semibold'} fontSize={20}>
                         {sbomData.sbom.project.name} :{' '}
                         {sbomData.sbom.primaryComponent?.version}
@@ -197,9 +170,22 @@ function ProductInfo() {
                         label={getFullDateAndTime(sbomData.sbom.updatedAt)}
                       >
                         <Text fontSize='sm' cursor={'pointer'}>
-                          Last updated at : {timeSince(sbomData.sbom.updatedAt)}
+                          Updated {timeSince(sbomData.sbom.updatedAt)}
                         </Text>
                       </Tooltip>
+                      {/* ----------------- LIFECYCLE ------------------- */}
+                      <Tag
+                        mt={1}
+                        w={'fit-content'}
+                        size={'sm'}
+                        variant='outline'
+                        colorScheme='blue'
+                      >
+                        <TagLabel textTransform={'capitalize'}>
+                          {sbomData.sbom.lifecycle}
+                        </TagLabel>
+                      </Tag>
+                      {/* ----------------- STATS ------------------- */}
                       <Flex
                         flexDir={'row'}
                         alignItems={'center'}
@@ -212,16 +198,16 @@ function ProductInfo() {
                           alignItems={'flex-start'}
                           spacing={2}
                         >
-                          <Icon
-                            h={4}
-                            w={4}
-                            color='#777'
-                            as={FaProjectDiagram}
-                          />
+                          <Icon h={4} w={4} color='#777' as={FaCube} />
                           <Box>
-                            <Text fontWeight={'medium'} fontSize={'md'}>
+                            <Badge
+                              mr={1}
+                              fontSize={'xl'}
+                              fontWeight={'medium'}
+                              bg={'none'}
+                            >
                               {sbomData.sbom.stats.compCount}
-                            </Text>
+                            </Badge>
                             <Text fontSize={'xs'}>Components</Text>
                           </Box>
                         </Stack>
@@ -238,48 +224,79 @@ function ProductInfo() {
                             as={FaBalanceScale}
                           />
                           <Box>
-                            <Text fontWeight={'medium'} fontSize={'md'}>
+                            <Badge
+                              mr={1}
+                              fontSize={'xl'}
+                              fontWeight={'medium'}
+                              bg={'none'}
+                            >
                               {sbomData.sbom.stats.compLicenseCount}
-                            </Text>
+                            </Badge>
                             <Text fontSize={'xs'}>Licenses</Text>
                           </Box>
                         </Stack>
-                        {/* PURL */}
+                        {/* vulnerabilities */}
                         <Stack
                           direction={'row'}
                           alignItems={'flex-start'}
                           spacing={2}
                         >
-                          <Icon h={4} w={4} color='#777' as={CalendarIcon} />
+                          <Icon h={4} w={4} color='#777' as={FaBug} />
                           <Box>
-                            <Text fontWeight={'medium'} fontSize={'md'}>
-                              {sbomData.sbom.stats.compPurlCount}
-                            </Text>
-                            <Text fontSize={'xs'}>PURL</Text>
-                          </Box>
-                        </Stack>
-                        {/* CPE */}
-                        <Stack
-                          direction={'row'}
-                          alignItems={'flex-start'}
-                          spacing={2}
-                        >
-                          <Icon h={4} w={4} color='#777' as={LockIcon} />
-                          <Box>
-                            <Text fontWeight={'medium'} fontSize={'md'}>
-                              {sbomData.sbom.stats.compCpeCount}
-                            </Text>
-                            <Text fontSize={'xs'}>CPE</Text>
+                            <Stack fontWeight={'medium'} direction={'row'}>
+                              <Badge
+                                fontSize={'xl'}
+                                fontWeight={'medium'}
+                                variant='subtle'
+                                colorScheme='red'
+                                borderRadius='md'
+                              >
+                                {sbomData.sbom.stats.vulnStats.critical
+                                  ? sbomData.sbom.stats.vulnStats.critical
+                                  : 0}
+                              </Badge>
+                              <Badge
+                                fontSize={'xl'}
+                                fontWeight={'medium'}
+                                variant='subtle'
+                                colorScheme='orange'
+                                borderRadius='md'
+                              >
+                                {sbomData.sbom.stats.vulnStats.high
+                                  ? sbomData.sbom.stats.vulnStats.high
+                                  : 0}
+                              </Badge>
+                              <Badge
+                                fontSize={'xl'}
+                                fontWeight={'medium'}
+                                variant='subtle'
+                                colorScheme='yellow'
+                                borderRadius='md'
+                              >
+                                {sbomData.sbom.stats.vulnStats.medium
+                                  ? sbomData.sbom.stats.vulnStats.medium
+                                  : 0}
+                              </Badge>
+                              <Badge
+                                fontSize={'xl'}
+                                fontWeight={'medium'}
+                                variant='subtle'
+                                colorScheme='green'
+                                borderRadius='md'
+                              >
+                                {sbomData.sbom.stats.vulnStats.low
+                                  ? sbomData.sbom.stats.vulnStats.low
+                                  : 0}
+                              </Badge>
+                            </Stack>
+                            <Text fontSize={'xs'}>Vulnerabilities</Text>
                           </Box>
                         </Stack>
                       </Flex>
                     </Flex>
                   </Flex>
-                ) : (
-                  <Text>Loading...</Text>
-                )}
-              </GridItem>
-              {sbomData && (
+                </GridItem>
+                {/* RIGHT */}
                 <GridItem colSpan={3}>
                   <Flex
                     direction={'row'}
@@ -318,28 +335,28 @@ function ProductInfo() {
                     /> */}
                   </Flex>
                 </GridItem>
-              )}
-            </Grid>
-          </CardBody>
-        </Card>
+              </Grid>
+            </CardBody>
+          </Card>
+        ) : (
+          <Card mb={6}>
+            <Flex width={'100%'} gap={4} direction={'row'}>
+              <Skeleton width={'100%'} height='30px' />
+              <Skeleton width={'100%'} height='30px' />
+            </Flex>
+          </Card>
+        )}
 
         {sbomData && (
-          <SBOMTable
-            title={'SBOM'}
-            captions={[
-              'Component',
-              'Version',
-              'PURL',
-              'Licenses',
-              'Updated At',
-              'Actions'
-            ]}
-            data={sbomData.sbom}
+          <SignedSbomTable
             refetch={refetch}
-            pageIndex={pageIndex}
-            versionName={sbomData.sbom.primaryComponent.version}
-            handlePreviousPage={handlePreviousPage}
-            handleNextPage={handleNextPage}
+            data={sbomData.sbom}
+            filteredData={filteredData}
+            status={sbomData.sbom.lifecycle}
+            type={
+              selectedProject?.sboms.length > 0 &&
+              selectedProject.sboms[0].format
+            }
           />
         )}
       </Flex>

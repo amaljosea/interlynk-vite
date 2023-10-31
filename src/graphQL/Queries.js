@@ -1151,48 +1151,61 @@ export const GetProjectInfo = gql`
   }
 `
 
-export const GetSignedSBOM = gql`
-  query getSignedSBOM(
+// ----------------------- PRODUCT DETAILS PAGE ---------------------------
+
+// GET PRODUCT INFO
+export const GetSignedProductData = gql`
+  query GetSignedProductData(
     $projectId: Uuid!
     $sbomId: Uuid!
     $signedParams: String!
-    $first: Int
-    $last: Int
-    $after: String
-    $before: String
-    $field: ComponentOrderByFields!
-    $direction: OrderByDirection!
   ) {
     sbom(projectId: $projectId, sbomId: $sbomId, signedParams: $signedParams) {
       id
-      cpes
-      spec
-      purl
-      format
-      creationAt
       updatedAt
-      specVersion
       primaryComponent {
         id
         name
         version
+        primary
+        internal
+        purl
+        cpes
+        licenses
+        updatedAt
+        uniqueId
+        kind
+        copyright
+        publisher
+        description
+        licenseExp
+        group
       }
       stats {
         compCount
         compLicenseCount
         compCpeCount
         compPurlCount
+        vulnStats
       }
       project {
         id
         name
       }
+      lifecycle
+      creationAt
+      updatedAt
       licenses
+      format
       tools {
         id
         name
         version
+        vendor
         updatedAt
+      }
+      project {
+        name
       }
       authors {
         id
@@ -1203,15 +1216,49 @@ export const GetSignedSBOM = gql`
       suppliers {
         id
         name
-        email
-        updatedAt
+        url
+        contactEmail
+        contactName
       }
+    }
+  }
+`
+
+// GET COMPONENT DATA
+export const GetSignedComponentData = gql`
+  query GetSignedComponentData(
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $signedParams: String!
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+    $search: String
+    $licenses: [String!]
+    $supplierName: [String!]
+    $ecosystem: [String!]
+    $kind: [String!]
+    $internal: Boolean
+    $primary: Boolean
+    $field: ComponentOrderByFields!
+    $direction: OrderByDirection!
+  ) {
+    sbom(projectId: $projectId, sbomId: $sbomId, signedParams: $signedParams) {
+      id
       components(
         sbomId: $sbomId
         after: $after
         before: $before
         first: $first
         last: $last
+        search: $search
+        licenses: $licenses
+        supplierName: $supplierName
+        ecosystem: $ecosystem
+        kind: $kind
+        internal: $internal
+        primary: $primary
         orderBy: { field: $field, direction: $direction }
       ) {
         totalCount
@@ -1233,13 +1280,328 @@ export const GetSignedSBOM = gql`
           updatedAt
           uniqueId
           kind
+          copyright
+          publisher
+          description
+          licenseExp
+          group
+          externalUrls {
+            name
+            url
+          }
           suppliers {
             id
             name
-            email
+            contactEmail
+            contactName
             updatedAt
           }
         }
+      }
+    }
+  }
+`
+
+// GET ALL COMPONENT DATA
+export const GetSignedAllComponents = gql`
+  query GetSbom(
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $signedParams: String!
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+    $field: ComponentOrderByFields!
+    $direction: OrderByDirection!
+  ) {
+    sbom(projectId: $projectId, sbomId: $sbomId, signedParams: $signedParams) {
+      id
+      components(
+        sbomId: $sbomId
+        after: $after
+        before: $before
+        first: $first
+        last: $last
+        orderBy: { field: $field, direction: $direction }
+      ) {
+        totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          startCursor
+          hasPreviousPage
+        }
+        nodes {
+          id
+          name
+        }
+      }
+    }
+  }
+`
+
+// GET COMPONENT FILTER DATA
+export const GetSignedCompFilterData = gql`
+  query GetSignedCompFilterData(
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $signedParams: String!
+  ) {
+    sbom(projectId: $projectId, sbomId: $sbomId, signedParams: $signedParams) {
+      id
+      filters {
+        ecosystems
+        supplierNames
+        kinds
+        licenses
+      }
+    }
+  }
+`
+
+// PRODUCT VULNERABILITIES DATA
+export const GetSignedVulnData = gql`
+  query GetVulnData(
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $signedParams: String!
+    $search: String
+    $severity: [String!]
+    $status: [String!]
+    $kev: Boolean
+    $epss: RangeInput
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+    $field: ComponentVulnOrderByFields!
+    $direction: OrderByDirection!
+  ) {
+    sbom(projectId: $projectId, sbomId: $sbomId, signedParams: $signedParams) {
+      vulns(
+        sbomId: $sbomId
+        search: $search
+        severity: $severity
+        status: $status
+        kev: $kev
+        epss: $epss
+        after: $after
+        before: $before
+        first: $first
+        last: $last
+        orderBy: { field: $field, direction: $direction }
+      ) {
+        totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          startCursor
+          hasPreviousPage
+        }
+        nodes {
+          id
+          vuln {
+            vulnId
+            desc
+            sev
+            cvssScore
+            cvssVector
+            source
+            publishedAt
+            lastModifiedAt
+            nvdAliasId
+            updatedAt
+            vulnInfo {
+              cveId
+              epssScore
+              epssScores
+              kev
+            }
+          }
+          componentVulnLogs {
+            id
+            changedBy
+            status
+            justification
+            note
+            updatedAt
+          }
+          component {
+            name
+            version
+          }
+          vexStatus {
+            id
+            name
+          }
+          vexJustification {
+            id
+            name
+          }
+        }
+      }
+    }
+  }
+`
+
+// GET VULNERABILITIES FILTER DATA
+export const GetSignedVulnFilterData = gql`
+  query GetVulnFilterData(
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $signedParams: String!
+  ) {
+    sbom(projectId: $projectId, sbomId: $sbomId, signedParams: $signedParams) {
+      id
+      filters {
+        vulnCompNames
+        vulnSeverities
+        vulnStatuses
+      }
+    }
+  }
+`
+
+// HEALTH CHECK RESULTES
+export const GetSignedCheckResults = gql`
+  query GetCheckResults(
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $signedParams: String!
+    $category: [String!]
+    $status: [String!]
+    $severity: [String!]
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+    $field: CheckResultOrderByFields!
+    $direction: OrderByDirection!
+  ) {
+    sbom(projectId: $projectId, sbomId: $sbomId, signedParams: $signedParams) {
+      id
+      checkResults(
+        sbomId: $sbomId
+        category: $category
+        status: $status
+        severity: $severity
+        after: $after
+        before: $before
+        first: $first
+        last: $last
+        orderBy: { field: $field, direction: $direction }
+      ) {
+        totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          startCursor
+          hasPreviousPage
+        }
+        nodes {
+          id
+          sbomId
+          componentId
+          primary
+          status
+          updatedAt
+          component {
+            id
+            name
+          }
+          organizationRule {
+            severity
+            action
+            rule {
+              shortDesc
+              longDesc
+              friendlyId
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
+// GET HEALTH CHECK FILTER DATA
+export const GetSignedCheckFilterData = gql`
+  query GetCheckFilterData($projectId: Uuid!, $sbomId: Uuid!) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      id
+      filters {
+        checkCategories
+        checkSeverities
+        checkStatuses
+      }
+    }
+  }
+`
+
+// CHANGE LOG DATA
+export const GetSignedChangeLogs = gql`
+  query GetChangeLogs(
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $search: String
+    $changedBy: [String!]
+    $changeObject: [String!]
+    $changeType: [String!]
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+    $field: ActivityLogOrderByFields!
+    $direction: OrderByDirection!
+  ) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      id
+      activityLogs(
+        sbomId: $sbomId
+        search: $search
+        changedBy: $changedBy
+        changeObject: $changeObject
+        changeType: $changeType
+        after: $after
+        before: $before
+        first: $first
+        last: $last
+        orderBy: { field: $field, direction: $direction }
+      ) {
+        totalCount
+        totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          startCursor
+          hasPreviousPage
+        }
+        nodes {
+          event
+          action
+          orig
+          updated
+          createdAt
+          updatedAt
+          changedBy
+          loggablePrefix
+          loggableType
+        }
+      }
+    }
+  }
+`
+
+// GET LOGS FILTER DATA
+export const GetSignedLogsFilterData = gql`
+  query GetLogsFilterData($projectId: Uuid!, $sbomId: Uuid!) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      id
+      filters {
+        logChangeBys
+        logChangeObjects
+        logChangeTypes
       }
     }
   }

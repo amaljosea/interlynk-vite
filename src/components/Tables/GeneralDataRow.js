@@ -195,9 +195,11 @@ const GeneralDataRow = ({ status, type, data, refetch }) => {
                         <TagLabel>
                           {item.name} - {item.version}
                         </TagLabel>
-                        <TagCloseButton
-                          onClick={() => handleToolRemove(item.id)}
-                        />
+                        {!customerView && (
+                          <TagCloseButton
+                            onClick={() => handleToolRemove(item.id)}
+                          />
+                        )}
                       </Tag>
                     ))}
                 </Flex>
@@ -255,9 +257,11 @@ const GeneralDataRow = ({ status, type, data, refetch }) => {
                         <TagLabel>
                           {item.name} - {item.email}
                         </TagLabel>
-                        <TagCloseButton
-                          onClick={() => handleAuthorRemove(item.id)}
-                        />
+                        {!customerView && (
+                          <TagCloseButton
+                            onClick={() => handleAuthorRemove(item.id)}
+                          />
+                        )}
                       </Tag>
                     ))}
                 </Stack>
@@ -297,9 +301,11 @@ const GeneralDataRow = ({ status, type, data, refetch }) => {
                         <TagLabel>
                           {item.name} - {item.contactEmail}
                         </TagLabel>
-                        <TagCloseButton
-                          onClick={() => handleSupRemove(item.id)}
-                        />
+                        {!customerView && (
+                          <TagCloseButton
+                            onClick={() => handleSupRemove(item.id)}
+                          />
+                        )}
                       </Tag>
                     ))}
                 </HStack>

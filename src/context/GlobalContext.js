@@ -31,6 +31,8 @@ const GlobalContext = React.createContext({
   setOrgInfo: () => {},
   compFilters: {},
   setCompFiltes: () => {},
+  signedCompFilters: {},
+  setSignedCompFiltes: () => {},
   vulnFilters: {},
   setVulnFilters: () => {},
   checkFilters: {},

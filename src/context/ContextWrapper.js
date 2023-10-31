@@ -37,6 +37,7 @@ const ContextWrapper = (props) => {
 
   const [orgInfo, setOrgInfo] = useState({})
   const [compFilters, setCompFilters] = useState({})
+  const [signedCompFilters, setSignedCompFilters] = useState({})
   const [vulnFilters, setVulnFilters] = useState({})
   const [checkFilters, setCheckFilters] = useState({})
   const [logFilters, setLogFilters] = useState({})
@@ -44,6 +45,8 @@ const ContextWrapper = (props) => {
   // SORT ORDER AND DIRECTIONS
   const [compField, setCompField] = useState('UPDATED_AT')
   const [compDirection, setCompDirection] = useState('DESC')
+  const [signedCompField, setSignedCompField] = useState('UPDATED_AT')
+  const [signedCompDirection, setSignedCompDirection] = useState('DESC')
   const [vulnField, setVulnField] = useState('UPDATED_AT')
   const [vulnDirection, setVulnDirection] = useState('DESC')
   const [checkField, setCheckField] = useState('UPDATED_AT')
@@ -99,7 +102,13 @@ const ContextWrapper = (props) => {
         logField,
         setLogField,
         logDirection,
-        setLogDirection
+        setLogDirection,
+        signedCompFilters,
+        setSignedCompFilters,
+        signedCompField,
+        setSignedCompField,
+        signedCompDirection,
+        setSignedCompDirection
       }}
     >
       {props.children}

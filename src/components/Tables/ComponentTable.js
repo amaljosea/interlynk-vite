@@ -81,7 +81,7 @@ const ComponentTable = ({
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
-
+  const customerView = location.pathname.startsWith('/customer')
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
@@ -90,10 +90,12 @@ const ComponentTable = ({
     compField,
     setCompField,
     compDirection,
-    setCompDirection
+    setCompDirection,
+    signedCompField,
+    signedCompDirection,
+    setSignedCompField,
+    setSignedCompDirection
   } = useContext(GlobalContext)
-
-  const customerView = location.pathname.startsWith('/customer')
 
   const [activeRow, setActiveRow] = useState(null)
 
@@ -608,8 +610,8 @@ const ComponentTable = ({
       projectId: productId,
       sbomId: sbomId,
       first: Number(e.target.value),
-      field: compField,
-      direction: compDirection
+      field: customerView ? signedCompField : compField,
+      direction: customerView ? signedCompDirection : compDirection
     })
     setFilterText('')
     setPageIndex(1)
@@ -650,18 +652,20 @@ const ComponentTable = ({
         </Stack>
 
         {/* CREATE COMPONENT */}
-        <Tooltip label='Add Component'>
-          <IconButton
-            ref={compBtn}
-            onClick={onCompOpen}
-            icon={<AddIcon />}
-            colorScheme='blue'
-            variant='solid'
-            fontWeight='normal'
-            fontSize={'sm'}
-            isDisabled={lifecycle === 'signed'}
-          />
-        </Tooltip>
+        {!customerView && (
+          <Tooltip label='Add Component'>
+            <IconButton
+              ref={compBtn}
+              onClick={onCompOpen}
+              icon={<AddIcon />}
+              colorScheme='blue'
+              variant='solid'
+              fontWeight='normal'
+              fontSize={'sm'}
+              isDisabled={lifecycle === 'signed'}
+            />
+          </Tooltip>
+        )}
       </Flex>
     )
   }, [filterText, handleClear, handleSearch, compFilters])
@@ -669,8 +673,14 @@ const ComponentTable = ({
   const handleSort = (column, sortDirection) => {
     // console.log(`column`, column)
     // console.log(`sortDirection`, sortDirection)
-    setCompField(column.id)
-    setCompDirection(sortDirection === 'asc' ? 'ASC' : 'DESC')
+    if (customerView) {
+      setSignedCompField(column.id)
+      setSignedCompDirection(sortDirection === 'asc' ? 'ASC' : 'DESC')
+    } else {
+      setCompField(column.id)
+      setCompDirection(sortDirection === 'asc' ? 'ASC' : 'DESC')
+    }
+
     refetch({
       projectId: productId,
       sbomId: sbomId,
@@ -678,7 +688,7 @@ const ComponentTable = ({
       last: undefined,
       after: undefined,
       before: undefined,
-      field: column.id,
+      field: customerView ? signedCompField : compField,
       direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
     })
   }
@@ -695,8 +705,8 @@ const ComponentTable = ({
       last: totalRows,
       after: undefined,
       before: data.pageInfo.startCursor,
-      field: compField,
-      direction: compDirection
+      field: customerView ? signedCompField : compField,
+      direction: customerView ? signedCompDirection : compDirection
     }).then(() => {
       setTimeout(() => {
         setIsLoading(false)
@@ -714,8 +724,8 @@ const ComponentTable = ({
       last: undefined,
       before: undefined,
       after: data.pageInfo.endCursor,
-      field: compField,
-      direction: compDirection
+      field: customerView ? signedCompField : compField,
+      direction: customerView ? signedCompDirection : compDirection
     }).then(() => {
       setTimeout(() => {
         setIsLoading(false)
