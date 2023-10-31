@@ -83,13 +83,13 @@ const MultiStatusDrawer = ({
             })
         })
     } catch (error) {
-      if (error.networkError && error.networkError.statusCode === 500) {
-        // Handle the specific error
-        alert('Invalid entry')
-      } else {
-        // Handle other errors
-        alert(error.message)
-      }
+        console.error('Status update error: ', error)
+        toast({
+          description: 'An error occured while setting vulnerability status. Please retry in few minutes.',
+          status: 'error',
+          duration: 2000,
+          position: 'top'
+        })
     }
   }
 

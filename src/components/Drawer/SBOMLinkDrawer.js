@@ -82,15 +82,13 @@ function SBOMLinkDrawer(props) {
       })
       onClose()
     } catch (error) {
-      if (error.networkError && error.networkError.statusCode === 500) {
-        // Handle the specific error
-        alert('Please specify at least one email address.')
-        // window.location.reload()
-      } else {
-        // Handle other errors
-        alert(error.message)
-        onClose()
-      }
+      console.error('ShareLynk update error: ', error)
+      toast({
+        description: 'An error occured while updating ShareLynk. Please retry in few minutes.',
+        status: 'error',
+        duration: 2000,
+        position: 'top'
+      })
     }
   }
 
