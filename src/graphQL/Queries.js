@@ -654,6 +654,7 @@ export const GetVulnData = gql`
     $search: String
     $severity: [String!]
     $status: [String!]
+    $componentName: [String!]
     $kev: Boolean
     $epss: RangeInput
     $first: Int
@@ -669,6 +670,7 @@ export const GetVulnData = gql`
         search: $search
         severity: $severity
         status: $status
+        componentName: $componentName
         kev: $kev
         epss: $epss
         after: $after
