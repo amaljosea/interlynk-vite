@@ -193,7 +193,7 @@ const VulnTable = ({
           </Tag>
         )
       },
-      width: '130px',
+      width: '120px',
       sortable: true
     },
     // SOURCE
@@ -242,7 +242,7 @@ const VulnTable = ({
           </Flex>
         )
       },
-      width: '100px',
+      width: '90px',
       sortable: true
     },
     // EPSS
@@ -255,35 +255,34 @@ const VulnTable = ({
         const { epssScores } = vulnInfo
 
         return (
-          <Flex minWidth='max-content' alignItems='center' gap='2'>
-            <Tag size='md' key='md' variant='subtle' width={'90px'}>
-              <TagLabel>
-                {epssScores[0]}
+          <Flex minWidth='max-content' alignItems='center' gap='0'>
+            <Tag size='md' key='md' variant='subtle' width={'50px'}  justifyContent="center" alignItems="center">
+              <TagLabel style={{ textAlign: 'center' }}>
+                {Math.ceil(epssScores[0]*1000)}
                 {/* {epssScores.length > 1 && `- ${epssScores[1]}`} */}
               </TagLabel>
             </Tag>
-            {epssScores.length > 1 &&
-            epssScores[0] > epssScores[epssScores.length - 1] ? (
-              <Tooltip
-                placement='top'
-                label={`Up from ${epssScores[epssScores.length - 1]} last week`}
-              >
-                <ChevronUpIcon w={5} h={5} color='green.500' />
-              </Tooltip>
-            ) : (
-              <Tooltip
-                placement='top'
-                label={`Down from ${
-                  epssScores[epssScores.length - 1]
-                } last week`}
-              >
-                <ChevronDownIcon w={5} h={5} color='red.500' />
-              </Tooltip>
-            )}
+            {epssScores.length > 1 ? (
+                epssScores[0] > epssScores[epssScores.length - 1] ? (
+                  <Tooltip
+                    placement='top'
+                    label={`Up from ${Math.ceil(epssScores[epssScores.length - 1]*1000)} last week`}
+                  >
+                    <ChevronUpIcon w={5} h={5} color='green.500' />
+                  </Tooltip>
+                ) : epssScores[0] < epssScores[epssScores.length - 1] ? (
+                  <Tooltip
+                    placement='top'
+                    label={`Down from ${Math.ceil(epssScores[epssScores.length - 1]*1000)} last week`}
+                  >
+                    <ChevronDownIcon w={5} h={5} color='red.500' />
+                  </Tooltip>
+                ) : null
+              ) : null}
           </Flex>
         )
       },
-      width: '180px',
+      width: '120px',
       sortable: true
     },
     // COMPONENT
@@ -304,7 +303,7 @@ const VulnTable = ({
           </Tooltip>
         )
       },
-      width: '250px',
+      width: '240px',
       sortable: true
     },
     // VERSION
@@ -341,7 +340,7 @@ const VulnTable = ({
         )
       },
       sortable: true,
-      width: '200px'
+      width: '180px'
     },
     // UPDATED AT
     {
