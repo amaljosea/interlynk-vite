@@ -146,6 +146,14 @@ function ProductVersionsRow(props) {
     onWarningOpen()
   }
 
+  filteredData?.sort((a, b) => {
+    const dateA = new Date(a.updatedAt)
+    const dateB = new Date(b.updatedAt)
+
+    // Compare the dates
+    return dateB - dateA
+  })
+
   const toggleStatus = async () => {
     try {
       await projectUpdate({
@@ -158,12 +166,6 @@ function ProductVersionsRow(props) {
       console.error('Mutation error:', error)
     }
   }
-
-  // useEffect(() => {
-  // if (filteredData.length > 0) {
-  //   console.log(`filteredData`, filteredData)
-  // }
-  // }, [])
 
   return (
     <>
