@@ -208,7 +208,7 @@ const TokenInfo = ({ data, refetch }) => {
     // NAME
     {
       id: 'name',
-      name: 'NAME',
+      name: 'TOKEN NAME',
       selector: (row) => row.notes
     },
     // TOKEN MASK
@@ -331,14 +331,14 @@ const TokenInfo = ({ data, refetch }) => {
           <ModalOverlay />
           <ModalContent>
             <ModalHeader>
-              {activeRow ? activeRow.notes : 'Create API Key'}
+              {activeRow ? activeRow.notes : 'Create Security Token'}
             </ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               {!activeRow && (
                 <FormControl mb={5} isRequired>
                   <FormLabel mb={1} htmlFor='keyName'>
-                    API Key Name
+                    Token Name
                   </FormLabel>
                   <Input
                     type='text'

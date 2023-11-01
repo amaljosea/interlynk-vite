@@ -107,18 +107,6 @@ export default function HeaderLinks(props) {
 
   const shortcuts = [
     {
-      key: 'Alt + 1',
-      title: 'Create Component'
-    },
-    {
-      key: 'Alt + 2',
-      title: 'Build SBOM'
-    },
-    {
-      key: 'Alt + 3',
-      title: 'Download SBOM'
-    },
-    {
       key: 'Ctrl + /',
       title: 'Search'
     }

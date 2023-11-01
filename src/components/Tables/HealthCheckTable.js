@@ -443,15 +443,12 @@ const HealthCheckTable = ({
         return (
           <Tag
             size='md'
-            key='md'
             variant='subtle'
             colorScheme={sevColor(organizationRule.severity)}
             textTransform={'capitalize'}
-            width={'100%'}
-            alignItems={'center'}
-            justifyContent={'center'}
+            width={'80px'}
           >
-            <TagLabel>{organizationRule.severity}</TagLabel>
+            <TagLabel mx={'auto'}>{organizationRule.severity}</TagLabel>
           </Tag>
         )
       },

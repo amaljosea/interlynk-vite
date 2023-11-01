@@ -146,7 +146,7 @@ const CompFilterMenu = ({
     <Stack direction={'row'} alignItems={'center'} gap={1}>
       {/* ECOSYSTEM */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnBlur={true} closeOnSelect={false}>
+        <Menu closeOnSelect={true}>
           {selectedEcosystem.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
@@ -182,7 +182,7 @@ const CompFilterMenu = ({
       </Box>
       {/* KIND */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnBlur={true} closeOnSelect={false}>
+        <Menu closeOnSelect={true}>
           {selectedKind.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
@@ -218,7 +218,7 @@ const CompFilterMenu = ({
       </Box>
       {/* LICENSES */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnBlur={true} closeOnSelect={false}>
+        <Menu closeOnSelect={true}>
           {selectedLicense.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
@@ -254,7 +254,7 @@ const CompFilterMenu = ({
       </Box>
       {/* SUPPLIER */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnBlur={true} closeOnSelect={false}>
+        <Menu closeOnSelect={true}>
           {selectedSupplier.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
@@ -290,7 +290,7 @@ const CompFilterMenu = ({
       </Box>
       {/* TYPE */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnBlur={true} closeOnSelect={false}>
+        <Menu closeOnSelect={true}>
           {selectedType.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}

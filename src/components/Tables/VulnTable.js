@@ -159,11 +159,7 @@ const VulnTable = ({
               />
               <Tooltip label={vuln.vulnId} placement={'top'}>
                 <Text fontSize='sm' color={textColor}>
-                  {vuln.vulnId !== null
-                    ? `${vuln.vulnId?.substring(0, 15)}${
-                        vuln.vulnId.length > 15 ? '...' : ''
-                      }`
-                    : ''}
+                  {vuln.vulnId !== null ? `${vuln.vulnId}` : ''}
                 </Text>
               </Tooltip>
               {kev === true && (
@@ -175,7 +171,7 @@ const VulnTable = ({
           </Link>
         )
       },
-      width: '250px',
+      width: '270px',
       sortable: true
     },
     // SEVERITY
@@ -187,17 +183,17 @@ const VulnTable = ({
         return (
           <Tag
             size='md'
-            key='md'
             variant='subtle'
+            width={'80px'}
             colorScheme={sevColor(`${vuln.sev}`)}
           >
-            <TagLabel style={{ textTransform: 'capitalize' }}>
+            <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
               {vuln.sev}
             </TagLabel>
           </Tag>
         )
       },
-      width: '150px',
+      width: '130px',
       sortable: true
     },
     // SOURCE
@@ -236,9 +232,12 @@ const VulnTable = ({
               size='md'
               key='md'
               variant='subtle'
+              width={'50px'}
               colorScheme={cvssColor(vuln.cvssScore)}
             >
-              <TagLabel>{vuln.cvssScore ? vuln.cvssScore : 0}</TagLabel>
+              <TagLabel mx={'auto'}>
+                {vuln.cvssScore ? vuln.cvssScore : 0}
+              </TagLabel>
             </Tag>
           </Flex>
         )
@@ -265,14 +264,26 @@ const VulnTable = ({
             </Tag>
             {epssScores.length > 1 &&
             epssScores[0] > epssScores[epssScores.length - 1] ? (
-              <ChevronUpIcon w={5} h={5} color='green.500' />
+              <Tooltip
+                placement='top'
+                label={`Up from ${epssScores[epssScores.length - 1]} last week`}
+              >
+                <ChevronUpIcon w={5} h={5} color='green.500' />
+              </Tooltip>
             ) : (
-              <ChevronDownIcon w={5} h={5} color='red.500' />
+              <Tooltip
+                placement='top'
+                label={`Down from ${
+                  epssScores[epssScores.length - 1]
+                } last week`}
+              >
+                <ChevronDownIcon w={5} h={5} color='red.500' />
+              </Tooltip>
             )}
           </Flex>
         )
       },
-      width: '200px',
+      width: '180px',
       sortable: true
     },
     // COMPONENT
@@ -316,18 +327,21 @@ const VulnTable = ({
         const { vexStatus } = row
         return (
           <Tag
-            fontWeight={'normal'}
+            size='md'
             variant='solid'
-            size='sm'
+            width={'110px'}
             colorScheme={statusColor(
               vexStatus ? vexStatus.name : 'Unspecified'
             )}
           >
-            {vexStatus !== null ? vexStatus.name : 'Unspecified'}
+            <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
+              {vexStatus !== null ? vexStatus.name : 'Unspecified'}
+            </TagLabel>
           </Tag>
         )
       },
-      sortable: true
+      sortable: true,
+      width: '200px'
     },
     // UPDATED AT
     {

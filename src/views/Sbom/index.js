@@ -420,50 +420,58 @@ function SBOM() {
                               <Icon h={4} w={4} color='#777' as={FaBug} />
                               <Box>
                                 <Stack fontWeight={'medium'} direction={'row'}>
-                                  <Badge
-                                    fontSize={'xl'}
-                                    fontWeight={'medium'}
-                                    variant='subtle'
-                                    colorScheme='red'
-                                    borderRadius='md'
-                                  >
-                                    {sbomData.sbom.stats.vulnStats.critical
-                                      ? sbomData.sbom.stats.vulnStats.critical
-                                      : 0}
-                                  </Badge>
-                                  <Badge
-                                    fontSize={'xl'}
-                                    fontWeight={'medium'}
-                                    variant='subtle'
-                                    colorScheme='orange'
-                                    borderRadius='md'
-                                  >
-                                    {sbomData.sbom.stats.vulnStats.high
-                                      ? sbomData.sbom.stats.vulnStats.high
-                                      : 0}
-                                  </Badge>
-                                  <Badge
-                                    fontSize={'xl'}
-                                    fontWeight={'medium'}
-                                    variant='subtle'
-                                    colorScheme='yellow'
-                                    borderRadius='md'
-                                  >
-                                    {sbomData.sbom.stats.vulnStats.medium
-                                      ? sbomData.sbom.stats.vulnStats.medium
-                                      : 0}
-                                  </Badge>
-                                  <Badge
-                                    fontSize={'xl'}
-                                    fontWeight={'medium'}
-                                    variant='subtle'
-                                    colorScheme='green'
-                                    borderRadius='md'
-                                  >
-                                    {sbomData.sbom.stats.vulnStats.low
-                                      ? sbomData.sbom.stats.vulnStats.low
-                                      : 0}
-                                  </Badge>
+                                  <Tooltip label='Critical' placement='top'>
+                                    <Badge
+                                      fontSize={'xl'}
+                                      fontWeight={'medium'}
+                                      variant='subtle'
+                                      colorScheme='red'
+                                      borderRadius='md'
+                                    >
+                                      {sbomData.sbom.stats.vulnStats.critical
+                                        ? sbomData.sbom.stats.vulnStats.critical
+                                        : 0}
+                                    </Badge>
+                                  </Tooltip>
+                                  <Tooltip label='High' placement='top'>
+                                    <Badge
+                                      fontSize={'xl'}
+                                      fontWeight={'medium'}
+                                      variant='subtle'
+                                      colorScheme='orange'
+                                      borderRadius='md'
+                                    >
+                                      {sbomData.sbom.stats.vulnStats.high
+                                        ? sbomData.sbom.stats.vulnStats.high
+                                        : 0}
+                                    </Badge>
+                                  </Tooltip>
+                                  <Tooltip label='Medium' placement='top'>
+                                    <Badge
+                                      fontSize={'xl'}
+                                      fontWeight={'medium'}
+                                      variant='subtle'
+                                      colorScheme='yellow'
+                                      borderRadius='md'
+                                    >
+                                      {sbomData.sbom.stats.vulnStats.medium
+                                        ? sbomData.sbom.stats.vulnStats.medium
+                                        : 0}
+                                    </Badge>
+                                  </Tooltip>
+                                  <Tooltip label='Low' placement='top'>
+                                    <Badge
+                                      fontSize={'xl'}
+                                      fontWeight={'medium'}
+                                      variant='subtle'
+                                      colorScheme='green'
+                                      borderRadius='md'
+                                    >
+                                      {sbomData.sbom.stats.vulnStats.low
+                                        ? sbomData.sbom.stats.vulnStats.low
+                                        : 0}
+                                    </Badge>
+                                  </Tooltip>
                                 </Stack>
                                 <Text fontSize={'xs'}>Vulnerabilities</Text>
                               </Box>

@@ -325,7 +325,12 @@ const GeneralDataRow = ({ status, type, data, refetch }) => {
             {/* LICENSES */}
             <Tr>
               <Td pl={0} fontWeight={'medium'}>
-                Data License
+                <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
+                  <Text>Data License</Text>
+                  <Tooltip label='Data licence is a legal arrangement between the creator of the data and the end-user, or the place the data will be deposited, specifying what users can do with the data'>
+                    <Icon as={QuestionIcon} color={'blue.500'} />
+                  </Tooltip>
+                </Flex>
               </Td>
               <Td pl={0}>
                 <Flex alignItems={'center'} gap={2} flexWrap={'wrap'}>

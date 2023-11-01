@@ -160,7 +160,12 @@ const LogFilterMenu = ({
                 All
               </MenuItemOption>
               {logChangeObjects?.map((item, index) => (
-                <MenuItemOption key={index} value={item} fontSize={'sm'}>
+                <MenuItemOption
+                  key={index}
+                  value={item}
+                  fontSize={'sm'}
+                  textTransform={'capitalize'}
+                >
                   {item}
                 </MenuItemOption>
               ))}
@@ -171,9 +176,7 @@ const LogFilterMenu = ({
       {/* TYPE */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {selectChangeType.length !== 0 && (
-            <CheckMark />
-          )}
+          {selectChangeType.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -198,7 +201,12 @@ const LogFilterMenu = ({
                 All
               </MenuItemOption>
               {logChangeTypes?.map((item, index) => (
-                <MenuItemOption key={index} value={item} fontSize={'sm'}>
+                <MenuItemOption
+                  key={index}
+                  value={item}
+                  fontSize={'sm'}
+                  textTransform={'capitalize'}
+                >
                   {item}
                 </MenuItemOption>
               ))}

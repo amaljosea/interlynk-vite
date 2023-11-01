@@ -359,7 +359,6 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
         width={'100%'}
         alignItems={'center'}
         justifyContent={'space-between'}
-        mb={4}
       >
         <Stack
           width={'100%'}
