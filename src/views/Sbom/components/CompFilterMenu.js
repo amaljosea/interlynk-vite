@@ -38,9 +38,20 @@ const CompFilterMenu = ({
   setPageIndex,
   totalRows
 }) => {
-  const { compFilters, compField, compDirection } = useContext(GlobalContext)
+  const customerView = location.pathname.startsWith('/customer')
 
-  const { ecosystems, kinds, supplierNames, licenses } = compFilters
+  const {
+    compFilters,
+    signedCompFilters,
+    compField,
+    compDirection,
+    signedCompField,
+    signedCompDirection
+  } = useContext(GlobalContext)
+
+  const { ecosystems, kinds, supplierNames, licenses } = customerView
+    ? signedCompFilters
+    : compFilters
 
   const [selectedEcosystem, setSelectedEcosystem] = useState([])
   const [selectedKind, setSelectedKind] = useState([])
@@ -58,8 +69,8 @@ const CompFilterMenu = ({
       last: undefined,
       after: undefined,
       last: undefined,
-      field: compField,
-      direction: compDirection
+      field: customerView ? signedCompField : compField,
+      direction: customerView ? signedCompDirection : compDirection
     })
     setPageIndex(1)
   }
@@ -74,8 +85,8 @@ const CompFilterMenu = ({
       last: undefined,
       after: undefined,
       last: undefined,
-      field: compField,
-      direction: compDirection
+      field: customerView ? signedCompField : compField,
+      direction: customerView ? signedCompDirection : compDirection
     })
     setPageIndex(1)
   }
@@ -90,8 +101,8 @@ const CompFilterMenu = ({
       last: undefined,
       after: undefined,
       last: undefined,
-      field: compField,
-      direction: compDirection
+      field: customerView ? signedCompField : compField,
+      direction: customerView ? signedCompDirection : compDirection
     })
     setPageIndex(1)
   }
@@ -106,8 +117,8 @@ const CompFilterMenu = ({
       last: undefined,
       after: undefined,
       last: undefined,
-      field: compField,
-      direction: compDirection
+      field: customerView ? signedCompField : compField,
+      direction: customerView ? signedCompDirection : compDirection
     })
     setPageIndex(1)
   }
@@ -123,8 +134,8 @@ const CompFilterMenu = ({
       last: undefined,
       after: undefined,
       last: undefined,
-      field: compField,
-      direction: compDirection
+      field: customerView ? signedCompField : compField,
+      direction: customerView ? signedCompDirection : compDirection
     })
     setPageIndex(1)
   }
@@ -133,10 +144,8 @@ const CompFilterMenu = ({
     <Stack direction={'row'} alignItems={'center'} gap={1}>
       {/* ECOSYSTEM */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnBlur={true}>
-          {selectedEcosystem.length !== 0 && (
-            <CheckMark />
-          )}
+        <Menu closeOnBlur={true} closeOnSelect={false}>
+          {selectedEcosystem.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -146,7 +155,12 @@ const CompFilterMenu = ({
           >
             Ecosystem
           </MenuButton>
-          <MenuList minHeight={'auto'} maxHeight={'300px'} overflow={'hidden'} overflowY={'scroll'}>
+          <MenuList
+            minHeight={'auto'}
+            maxHeight={'300px'}
+            overflow={'hidden'}
+            overflowY={'scroll'}
+          >
             <MenuOptionGroup
               type='checkbox'
               value={selectedEcosystem}
@@ -166,7 +180,7 @@ const CompFilterMenu = ({
       </Box>
       {/* KIND */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={true}>
+        <Menu closeOnBlur={true} closeOnSelect={false}>
           {selectedKind.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
@@ -177,7 +191,12 @@ const CompFilterMenu = ({
           >
             Kind
           </MenuButton>
-          <MenuList minHeight={'auto'} maxHeight={'300px'} overflow={'hidden'} overflowY={'scroll'}>
+          <MenuList
+            minHeight={'auto'}
+            maxHeight={'300px'}
+            overflow={'hidden'}
+            overflowY={'scroll'}
+          >
             <MenuOptionGroup
               type='checkbox'
               value={selectedKind}
@@ -197,7 +216,7 @@ const CompFilterMenu = ({
       </Box>
       {/* LICENSES */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={true}>
+        <Menu closeOnBlur={true} closeOnSelect={false}>
           {selectedLicense.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
@@ -208,7 +227,12 @@ const CompFilterMenu = ({
           >
             Licenses
           </MenuButton>
-          <MenuList minHeight={'auto'} maxHeight={'300px'} overflow={'hidden'} overflowY={'scroll'}>
+          <MenuList
+            minHeight={'auto'}
+            maxHeight={'300px'}
+            overflow={'hidden'}
+            overflowY={'scroll'}
+          >
             <MenuOptionGroup
               type='checkbox'
               value={selectedLicense}
@@ -228,10 +252,8 @@ const CompFilterMenu = ({
       </Box>
       {/* SUPPLIER */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={true}>
-          {selectedSupplier.length !== 0 && (
-            <CheckMark />
-          )}
+        <Menu closeOnBlur={true} closeOnSelect={false}>
+          {selectedSupplier.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -241,7 +263,12 @@ const CompFilterMenu = ({
           >
             Suppliers
           </MenuButton>
-          <MenuList minHeight={'auto'} maxHeight={'300px'} overflow={'hidden'} overflowY={'scroll'}>
+          <MenuList
+            minHeight={'auto'}
+            maxHeight={'300px'}
+            overflow={'hidden'}
+            overflowY={'scroll'}
+          >
             <MenuOptionGroup
               type='radio'
               value={selectedSupplier}

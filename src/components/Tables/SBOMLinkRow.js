@@ -14,7 +14,8 @@ import {
   MenuButton,
   MenuList,
   Portal,
-  useClipboard
+  useClipboard,
+  Tooltip
 } from '@chakra-ui/react'
 import { useState, useRef } from 'react'
 import { FaEllipsisV } from 'react-icons/fa'
@@ -23,6 +24,7 @@ import { useMutation } from '@apollo/client'
 import { UpdateShareLynk } from 'graphQL/Mutation'
 import { DeleteShareLynk } from 'graphQL/Mutation'
 import SBOMDrawer from 'components/Drawer/SBOMDrawer'
+import { getFullDateAndTime } from 'utils'
 
 function SBOMLinkRow(props) {
   const {
@@ -153,7 +155,11 @@ function SBOMLinkRow(props) {
             })}
         </Flex>
       </Td>
-      <Td>{timeSince(updatedAt)}</Td>
+      <Td>
+        <Tooltip label={getFullDateAndTime(updatedAt)} placement='top'>
+          {timeSince(updatedAt)}
+        </Tooltip>
+      </Td>
       <Td width={'400px'} pl='0px'>
         <Flex mb={2}>
           <Input

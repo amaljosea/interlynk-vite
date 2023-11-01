@@ -35,14 +35,20 @@ import { FaRegKeyboard, FaSignOutAlt } from 'react-icons/fa'
 import Cookies from 'js-cookie'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
-import { useQuery } from '@apollo/client'
+import { useLazyQuery } from '@apollo/client'
 import { GetOrg } from 'graphQL/Queries'
 
 export default function HeaderLinks(props) {
   const location = useLocation()
   const history = useHistory()
 
-  const { data } = useQuery(GetOrg)
+  const [getOrgInfo, { data }] = useLazyQuery(GetOrg)
+
+  useEffect(() => {
+    if (!customerView && data === undefined) {
+      getOrgInfo()
+    }
+  }, [])
 
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('p')
@@ -83,8 +89,7 @@ export default function HeaderLinks(props) {
             Authorization: authToken
           }
         })
-        .then((res) => {
-        })
+        .then((res) => {})
     } catch (error) {
       console.log('handleLogout error : ', error)
     }
@@ -179,7 +184,7 @@ export default function HeaderLinks(props) {
           }
         >
           <Text display={{ sm: 'none', md: 'flex' }} fontSize={'sm'}>
-            {data ? data.organization.currentUser.name : ''}
+            {data ? data.organization.currentUser.name : userEmail}
           </Text>
         </MenuButton>
         {location.pathname.startsWith('/vendor') && (
