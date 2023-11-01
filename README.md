@@ -1,20 +1,18 @@
-# Interlynk Demo App
+# Interlynk Dashboard
 
 # API Testing - Locally
 
-1. So first you need to create a organization cause previous orgs are already have connections
+1. Create an organization
 2. Next you need copy the ORG ID and paste it inside the .env file
 3. name REACT_APP_ORGID, just remove the existing id and paste the new ID
 4. After that run the project 
 5. Now you can test the new api integration for updating and creating connections
-<<<<<<< HEAD
-
 
 # Important point
 
 The main API URL - 'http://localhost:3000/lynkapi' 
 
-Incase if you have a different URL then you need to change the URL inside 
+In case if you have a different URL, then you need to change the URL inside 
 
 ## /src/index.js --> ApolloClient object
 
@@ -43,7 +41,7 @@ npm -v
 
 ```
 
-4. After the installation got to your project directory
+4. After the installation, go to your project directory
 
 ```
 cd lynk-dash-app
