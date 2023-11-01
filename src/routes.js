@@ -47,13 +47,13 @@ export const dashRoutes = [
     component: Products,
     layout: '/vendor'
   },
-  {
-    path: '/sharelynk',
-    name: 'ShareLynk',
-    icon: <BsFillFolderSymlinkFill color='inherit' size={18} />,
-    component: Sharelynk,
-    layout: '/vendor'
-  },
+  // {
+  //   path: '/sharelynk',
+  //   name: 'ShareLynk',
+  //   icon: <BsFillFolderSymlinkFill color='inherit' size={18} />,
+  //   component: Sharelynk,
+  //   layout: '/vendor'
+  // },
   // {
   //   path: '/feed',
   //   name: 'Feed',

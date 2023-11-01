@@ -150,7 +150,7 @@ const ComponentTable = ({
   const columns = [
     // COMPONENT
     {
-      id: 'NAME',
+      id: 'COMPONENTS_NAME',
       name: 'NAME',
       selector: (row) => {
         const { purl, name, primary, internal, externalUrls } = row
@@ -290,7 +290,7 @@ const ComponentTable = ({
     },
     // VERSION
     {
-      id: 'VERSION',
+      id: 'COMPONENTS_VERSION',
       name: 'VERSION',
       selector: (row) => row.version,
       width: '200px',
@@ -298,7 +298,7 @@ const ComponentTable = ({
     },
     // PURL
     {
-      id: 'PURL',
+      id: 'COMPONENTS_PURL',
       name: 'PURL',
       selector: (row) => {
         const { purl } = row
@@ -319,7 +319,7 @@ const ComponentTable = ({
     },
     // LICENSES
     {
-      id: 'LICENSES',
+      id: 'COMPONENTS_LICENSES',
       name: 'LICENSES',
       selector: (row) => {
         const { licenses } = row
@@ -363,7 +363,7 @@ const ComponentTable = ({
     },
     // UPDATED AT
     {
-      id: 'UPDATED_AT',
+      id: 'COMPONENTS_UPDATED_AT',
       name: 'UPDATED AT',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
@@ -688,7 +688,7 @@ const ComponentTable = ({
       last: undefined,
       after: undefined,
       before: undefined,
-      field: customerView ? signedCompField : compField,
+      field: column.id,
       direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
     })
   }

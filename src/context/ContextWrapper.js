@@ -43,7 +43,7 @@ const ContextWrapper = (props) => {
   const [logFilters, setLogFilters] = useState({})
 
   // SORT ORDER AND DIRECTIONS
-  const [compField, setCompField] = useState('UPDATED_AT')
+  const [compField, setCompField] = useState('COMPONENTS_UPDATED_AT')
   const [compDirection, setCompDirection] = useState('DESC')
   const [signedCompField, setSignedCompField] = useState('UPDATED_AT')
   const [signedCompDirection, setSignedCompDirection] = useState('DESC')
