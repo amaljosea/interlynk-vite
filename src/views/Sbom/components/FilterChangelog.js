@@ -67,13 +67,13 @@ const FilterChangelog = ({ onFilterChange, users, actions }) => {
               onChange={() => window.location.reload()}
             >
               <MenuItemOption value={'All'} fontSize={'sm'}>
-                all
+                All
               </MenuItemOption>
             </MenuOptionGroup>
             <MenuOptionGroup type='checkbox' onChange={handleTypeFilterChange}>
               {actions.length > 0 &&
                 [...new Set(actions)].map((p, index) => (
-                  <MenuItemOption value={p} key={index} fontSize={'sm'}>
+                  <MenuItemOption value={p} key={index} fontSize={'sm'} textTransform={'capitalize'}>
                     {p}
                   </MenuItemOption>
                 ))}
@@ -111,7 +111,7 @@ const FilterChangelog = ({ onFilterChange, users, actions }) => {
               onChange={() => window.location.reload()}
             >
               <MenuItemOption value={'All'} fontSize={'sm'}>
-                all
+                All
               </MenuItemOption>
             </MenuOptionGroup>
             <MenuOptionGroup type='checkbox' onChange={handleUserFilterChange}>

@@ -198,7 +198,7 @@ const LogFilterMenu = ({
                 All
               </MenuItemOption>
               {logChangeTypes?.map((item, index) => (
-                <MenuItemOption key={index} value={item} fontSize={'sm'}>
+                <MenuItemOption key={index} value={item} fontSize={'sm'} textTransform={'capitalize'}>
                   {item}
                 </MenuItemOption>
               ))}
