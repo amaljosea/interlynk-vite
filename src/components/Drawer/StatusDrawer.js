@@ -121,11 +121,13 @@ const StatusDrawer = ({
       setJustification('')
       setNotes('')
     } catch (error) {
-      // if (error.networkError && error.networkError.statusCode === 500) {
-      //   alert('Invalid entry')
-      // } else {
-      //   alert(error.message)
-      // }
+      console.error('Status update error: ', error)
+      toast({
+        description: 'An error occured while setting vulnerability status. Please retry in few minutes.',
+        status: 'error',
+        duration: 2000,
+        position: 'top'
+      })
     }
   }
 

@@ -136,7 +136,7 @@ const CheckFilterMenu = ({
                 All
               </MenuItemOption>
               {checkCategories?.map((item, index) => (
-                <MenuItemOption key={index} value={item} fontSize={'sm'}>
+                <MenuItemOption key={index} value={item} fontSize={'sm'} textTransform={'capitalize'}>
                   {item}
                 </MenuItemOption>
               ))}
@@ -235,7 +235,7 @@ const CheckFilterMenu = ({
                 All
               </MenuItemOption>
               {checkStatuses?.map((item, index) => (
-                <MenuItemOption key={index} value={item} fontSize={'sm'}>
+                <MenuItemOption key={index} value={item} fontSize={'sm'} textTransform={'capitalize'}>
                   {item}
                 </MenuItemOption>
               ))}
