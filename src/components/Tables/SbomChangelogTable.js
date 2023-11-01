@@ -74,7 +74,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
   const columns = [
     // CHANGE TYPE
     {
-      id: 'ACTION',
+      id: 'ACTIVITY_LOGS_ACTION',
       name: 'TYPE',
       selector: (row) => {
         const { action } = row
@@ -95,7 +95,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
     },
     // CHANGED OBJECT
     {
-      id: 'EVENT',
+      id: 'ACTIVITY_LOGS_EVENT',
       name: 'CHANGED',
       selector: (row) => {
         const { event, loggablePrefix, loggableType } = row
@@ -239,7 +239,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
     },
     // CHANGED BY
     {
-      id: 'CHANGED_BY',
+      id: 'ACTIVITY_LOGS_CHANGED_BY',
       name: 'BY',
       selector: (row) => row.changedBy,
       width: '150px',
@@ -247,7 +247,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
     },
     // CHANGED ON
     {
-      id: 'CREATED_AT',
+      id: 'ACTIVITY_LOGS_CREATED_AT',
       name: 'CHANGED ON',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
