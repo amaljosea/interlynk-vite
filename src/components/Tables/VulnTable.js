@@ -316,7 +316,7 @@ const VulnTable = ({
           {row.component.version}
         </Tooltip>
       ),
-      width: '130px',
+      width: '180px',
       sortable: true
     },
     // STATUS
