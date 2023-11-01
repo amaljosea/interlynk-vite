@@ -49,6 +49,7 @@ import SearchFilter from 'views/Sbom/components/SearchFilter'
 import { getFullDateAndTime } from 'utils'
 import GlobalContext from 'context/GlobalContext'
 import CustomLoader from 'components/CustomLoader'
+import RelationshipDrawer from 'components/Drawer/RelationshipDrawer'
 
 const customStyles = {
   headCells: {
@@ -105,6 +106,7 @@ const ComponentTable = ({
   const linkRef = useRef(null)
 
   const { isOpen, onOpen, onClose } = useDisclosure()
+
   const {
     isOpen: isDelOpen,
     onOpen: onDelOpen,
@@ -121,6 +123,12 @@ const ComponentTable = ({
     isOpen: isLinkOpen,
     onOpen: onLinkOpen,
     onClose: onLinkClose
+  } = useDisclosure()
+
+  const {
+    isOpen: isRelationOpen,
+    onOpen: onRelationOpen,
+    onClose: onRelationClose
   } = useDisclosure()
 
   const {
@@ -382,7 +390,7 @@ const ComponentTable = ({
       id: 'action',
       name: 'ACTION',
       selector: (row) => {
-        const { suppliers, status, primary } = row
+        const { suppliers, status, primary, name } = row
 
         return (
           <>
@@ -406,6 +414,16 @@ const ComponentTable = ({
                     >
                       Edit Component
                     </MenuItem>
+                    {name === 'Azure.Core' && (
+                      <MenuItem
+                        onClick={() => {
+                          setActiveRow(row)
+                          onRelationOpen()
+                        }}
+                      >
+                        Edit Relationship
+                      </MenuItem>
+                    )}
                     <MenuItem
                       onClick={() => {
                         setActiveRow(row)
@@ -859,6 +877,14 @@ const ComponentTable = ({
               productId={productId}
               totalRows={totalRows}
               sbomId={sbomId}
+            />
+          )}
+
+          {isRelationOpen && (
+            <RelationshipDrawer
+              isOpen={isRelationOpen}
+              onClose={onRelationClose}
+              data={activeRow}
             />
           )}
         </>
