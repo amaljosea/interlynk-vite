@@ -149,7 +149,7 @@ function Profile() {
               <Tabs variant='enclosed' w={'100%'} bg={'white'}>
                 <TabList>
                   <Tab _focus={{ outline: 'none' }}>Personal Details</Tab>
-                  <Tab _focus={{ outline: 'none' }}>Security Token</Tab>
+                  <Tab _focus={{ outline: 'none' }}>Security Tokens</Tab>
                 </TabList>
                 <TabPanels>
                   {/* PERSONA DETAILS */}

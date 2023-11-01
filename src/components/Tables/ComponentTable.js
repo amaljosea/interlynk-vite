@@ -293,7 +293,7 @@ const ComponentTable = ({
           </Stack>
         )
       },
-      width: '400px',
+      width: '320px',
       sortable: true
     },
     // VERSION
@@ -301,7 +301,7 @@ const ComponentTable = ({
       id: 'COMPONENTS_VERSION',
       name: 'VERSION',
       selector: (row) => row.version,
-      width: '200px',
+      width: '160px',
       sortable: true
     },
     // PURL
@@ -313,17 +313,17 @@ const ComponentTable = ({
         return (
           <>
             {purl !== null && purl !== '' ? (
-              <Tooltip placement='top' label={purl}>{`${purl.substring(
-                0,
-                25
-              )}...`}</Tooltip>
+              <Tooltip placement='top' label={purl}>
+                {purl}
+              </Tooltip>
             ) : (
               ''
             )}
           </>
         )
       },
-      sortable: true
+      sortable: true,
+      width: '400px'
     },
     // LICENSES
     {
@@ -337,7 +337,7 @@ const ComponentTable = ({
           licenseOptions.filter((item) => licenses.includes(item.licenseId))
 
         return (
-          <Flex alignItems={'center'} gap={2} flexWrap={'wrap'}>
+          <Flex alignItems={'flex-start'} gap={2} flexWrap={'wrap'} my={2}>
             {filtered.length > 0 &&
               filtered.map((item, index) => (
                 <Tooltip
@@ -350,6 +350,7 @@ const ComponentTable = ({
                     href={item.reference}
                     target='_blank'
                     pointerEvents={item.reference === '#' ? 'none' : 'auto'}
+                    overflow={'auto'}
                   >
                     <Tag
                       size={'sm'}
@@ -379,6 +380,7 @@ const ComponentTable = ({
         </Tooltip>
       ),
       sortable: true,
+      width: '160px',
       sortFunction: (a, b) => {
         const dateA = new Date(a.updatedAt)
         const dateB = new Date(b.updatedAt)

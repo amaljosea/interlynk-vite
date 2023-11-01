@@ -235,7 +235,7 @@ const ChangelogTable = ({ data, refetch, type, totalRows, setTotalRows }) => {
           </Tooltip>
         )
       },
-      width: '400px'
+      width: '350px'
     },
     // UPDATED VALUE
     {
@@ -245,10 +245,10 @@ const ChangelogTable = ({ data, refetch, type, totalRows, setTotalRows }) => {
         const { updated } = row
         return (
           <Tooltip label={updated} placement='top'>
-            <Text>
+            <Text overflow={'auto'}>
               {updated !== null
-                ? `${updated?.substring(0, 400)}${
-                    updated.length > 400 ? '...' : ''
+                ? `${updated?.substring(0, 50)}${
+                    updated.length > 50 ? '...' : ''
                   }`
                 : ''}
             </Text>
@@ -262,7 +262,7 @@ const ChangelogTable = ({ data, refetch, type, totalRows, setTotalRows }) => {
       id: 'changedBy',
       name: 'BY',
       selector: (row) => row.changedBy,
-      width: '150px'
+      width: '200px'
     },
     // CHANGED ON
     {
