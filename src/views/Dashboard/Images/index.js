@@ -139,15 +139,13 @@ const Index = () => {
         onScanClose()
       })
     } catch (error) {
-      if (error.networkError && error.networkError.statusCode === 500) {
-        // Handle the specific error
-        alert('Invalid entry')
-        onScanClose()
-      } else {
-        // Handle other errors
-        alert('Invalid entry')
-        onScanClose()
-      }
+      console.error('Add Scanner error: ', error)
+      toast({
+        description: 'An error occured while adding scanner. Please retry in few minutes.',
+        status: 'error',
+        duration: 2000,
+        position: 'top'
+      })
     }
 
     setSelectedScanner('')

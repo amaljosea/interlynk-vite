@@ -1,7 +1,6 @@
 // Chakra imports
 import {
   Flex,
-  Button,
   useDisclosure,
   Table,
   Tr,
@@ -13,7 +12,8 @@ import {
   Th,
   Tooltip,
   IconButton,
-  Text
+  Text,
+  useToast
 } from '@chakra-ui/react'
 import { useState, useContext, useEffect, useRef } from 'react'
 import ProductVersions from './components/ProductVersions'
@@ -46,6 +46,7 @@ function Index() {
   const [isLoading, setIsLoading] = useState(false)
   const [pageIndex, setPageIndex] = useState(1)
   const [totalRows, setTotalRows] = useState(25)
+  const toast = useToast()
 
   const { data, refetch, error, loading } = useQuery(GetProjectData, {
     variables: {
@@ -88,18 +89,21 @@ function Index() {
       await refetch({
         first: totalRows
       }).then(() => {
+        console.error('Refresh error', error)
+        setIsLoading(false)
         setTimeout(() => {
           setIsLoading(false)
         }, 2000)
       })
     } catch (error) {
-      if (error.networkError && error.networkError.statusCode === 500) {
-        // Handle the specific error
-        alert('Something went wrong')
-      } else {
-        // Handle other errors
-        alert(error.message)
-      }
+      console.error('Refresh error', error)
+      toast({
+        description: 'An error occured while refreshing products. Please retry in few minutes.',
+        status: 'error',
+        duration: 2000,
+        position: 'top'
+      })
+      setIsLoading(false)
     }
   }
 
