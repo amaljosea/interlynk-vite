@@ -51,7 +51,7 @@ const ContextWrapper = (props) => {
   const [vulnDirection, setVulnDirection] = useState('DESC')
   const [checkField, setCheckField] = useState('CHECK_RESULTS_UPDATED_AT')
   const [checkDirection, setCheckDirection] = useState('DESC')
-  const [logField, setLogField] = useState('CREATED_AT')
+  const [logField, setLogField] = useState('ACTIVITY_LOGS_CREATED_AT')
   const [logDirection, setLogDirection] = useState('DESC')
 
   return (
