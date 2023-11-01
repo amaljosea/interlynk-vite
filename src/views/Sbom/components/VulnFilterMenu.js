@@ -127,8 +127,8 @@ const VulnFilterMenu = ({
     const epss = value !== 'all' && value.split('-')
 
     const range = {
-      min: parseFloat(epss[0]),
-      max: parseFloat(epss[1])
+      min: parseFloat(epss[0])/10000,
+      max: parseFloat(epss[1])/10000
     }
 
     refetch({
@@ -149,8 +149,8 @@ const VulnFilterMenu = ({
 
   const handleSubmit = () => {
     const range = {
-      min: parseFloat(minVal),
-      max: parseFloat(maxVal)
+      min: parseInt(minVal)/10000,
+      max: parseInt(maxVal)/10000
     }
     refetch({
       projectId: productId,
@@ -332,7 +332,7 @@ const VulnFilterMenu = ({
             leftIcon={<FaFilter size={14} />}
             onClick={onOpen}
           >
-            EPSS
+            EPSS*
           </MenuButton>
           <MenuList>
             <MenuOptionGroup
@@ -343,7 +343,7 @@ const VulnFilterMenu = ({
               <MenuItemOption value={'all'} fontSize={'sm'}>
                 All
               </MenuItemOption>
-              {['0.1-0.25', '0.25-0.5', '0.5-1.0'].map((item, index) => (
+              {['0-100', '100-500', '500-1,000', '1,000-10,000'].map((item, index) => (
                 <MenuItemOption key={index} value={item} fontSize={'sm'}>
                   {item}
                 </MenuItemOption>
@@ -354,7 +354,7 @@ const VulnFilterMenu = ({
               <Stack direction={'row'} alignItems={'center'} pl={8}>
                 <Input
                   type='number'
-                  width={'60px'}
+                  width={'75px'}
                   size='sm'
                   placeholder={'min'}
                   value={minVal}
@@ -363,7 +363,7 @@ const VulnFilterMenu = ({
                 <Box>-</Box>
                 <Input
                   type='number'
-                  width={'60px'}
+                  width={'75px'}
                   size='sm'
                   placeholder={'max'}
                   value={maxVal}
