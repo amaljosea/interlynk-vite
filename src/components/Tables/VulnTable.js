@@ -112,8 +112,6 @@ const VulnTable = ({
   const [stepTitle, setStepTitle] = useState('')
   const [filterText, setFilterText] = useState('')
 
-  const tableRef = useRef()
-
   const {
     isOpen: isTableOpen,
     onOpen: onTableOpen,
@@ -144,7 +142,7 @@ const VulnTable = ({
   const columns = [
     // CVE ID
     {
-      id: 'CVE_ID',
+      id: 'VULNS_VULN_ID',
       name: 'ID',
       selector: (row) => {
         const { vuln } = row
@@ -177,11 +175,12 @@ const VulnTable = ({
           </Link>
         )
       },
-      width: '250px'
+      width: '250px',
+      sortable: true
     },
     // SEVERITY
     {
-      id: 'SEVERITY',
+      id: 'VULNS_SEV',
       name: 'SEVERITY',
       selector: (row) => {
         const { vuln } = row
@@ -198,11 +197,12 @@ const VulnTable = ({
           </Tag>
         )
       },
-      width: '150px'
+      width: '150px',
+      sortable: true
     },
     // SOURCE
     {
-      id: 'SOURCE',
+      id: 'VULNS_SOURCE',
       name: 'SOURCE',
       selector: (row) => {
         const { vuln } = row
@@ -221,11 +221,12 @@ const VulnTable = ({
           </Tag>
         )
       },
-      width: '110px'
+      width: '110px',
+      sortable: true
     },
     // CVSS
     {
-      id: 'CVSS',
+      id: 'VULNS_CVSS_SCORE',
       name: 'CVSS',
       selector: (row) => {
         const { vuln } = row
@@ -242,11 +243,12 @@ const VulnTable = ({
           </Flex>
         )
       },
-      width: '100px'
+      width: '100px',
+      sortable: true
     },
     // EPSS
     {
-      id: 'EPSS',
+      id: 'VULN_INFOS_EPSS_SCORES',
       name: 'EPSS',
       selector: (row) => {
         const { vuln } = row
@@ -270,11 +272,12 @@ const VulnTable = ({
           </Flex>
         )
       },
-      width: '200px'
+      width: '200px',
+      sortable: true
     },
     // COMPONENT
     {
-      id: 'COMPONENT',
+      id: 'COMPONENTS_NAME',
       name: 'COMPONENT',
       selector: (row) => {
         const { component } = row
@@ -290,22 +293,24 @@ const VulnTable = ({
           </Tooltip>
         )
       },
-      width: '250px'
+      width: '250px',
+      sortable: true
     },
     // VERSION
     {
-      id: 'VERSION',
+      id: 'COMPONENTS_VERSION',
       name: 'VERSION',
       selector: (row) => (
         <Tooltip label={row.component.version} placement='top'>
           {row.component.version}
         </Tooltip>
       ),
-      width: '130px'
+      width: '130px',
+      sortable: true
     },
     // STATUS
     {
-      id: 'STATUS',
+      id: 'VEX_STATUSES_NAME',
       name: 'STATUS',
       selector: (row) => {
         const { vexStatus } = row
@@ -321,11 +326,12 @@ const VulnTable = ({
             {vexStatus !== null ? vexStatus.name : 'Unspecified'}
           </Tag>
         )
-      }
+      },
+      sortable: true
     },
     // UPDATED AT
     {
-      id: 'UPDATED_AT',
+      id: 'COMPONENT_VULNS_UPDATED_AT',
       name: 'UPDATED AT',
       selector: (row) => (
         <Tooltip
