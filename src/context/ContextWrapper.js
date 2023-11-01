@@ -49,7 +49,7 @@ const ContextWrapper = (props) => {
   const [signedCompDirection, setSignedCompDirection] = useState('DESC')
   const [vulnField, setVulnField] = useState('COMPONENT_VULNS_UPDATED_AT')
   const [vulnDirection, setVulnDirection] = useState('DESC')
-  const [checkField, setCheckField] = useState('UPDATED_AT')
+  const [checkField, setCheckField] = useState('CHECK_RESULTS_UPDATED_AT')
   const [checkDirection, setCheckDirection] = useState('DESC')
   const [logField, setLogField] = useState('CREATED_AT')
   const [logDirection, setLogDirection] = useState('DESC')

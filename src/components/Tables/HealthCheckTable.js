@@ -520,7 +520,7 @@ const HealthCheckTable = ({
     }, */
     // UPDATED AT
     {
-      id: 'UPDATED_AT',
+      id: 'CHECK_RESULTS_UPDATED_AT',
       name: 'UPDATED AT',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
