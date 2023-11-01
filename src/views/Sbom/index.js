@@ -190,6 +190,16 @@ function SBOM() {
     ? removeDuplicatesAndLatest(uniqVersions)
     : []
 
+  filteredData?.sort((a, b) => {
+    const dateA = new Date(a.updatedAt)
+    const dateB = new Date(b.updatedAt)
+
+    // Compare the dates
+    return dateB - dateA
+  })
+
+  // console.log('filteredData', filteredData)
+
   const [selectedVersion, setSelectedVersion] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
@@ -210,8 +220,6 @@ function SBOM() {
       console.error('Mutation error:', error)
     }
   }
-
-  const tab = window.localStorage.getItem('activeProdTab')
 
   const refetchSBOM = async (id) => {
     try {
@@ -247,10 +255,9 @@ function SBOM() {
       }
     })
 
-  const handleOpen = () => {
-    setSelectedVersion(sbomVersions[0].id)
-    history.push(`/sharelynk?p=${productId}&sbom=${sbomVersions[0].id}`)
-  }
+  useEffect(() => {
+    setSelectedVersion(sbomId)
+  }, [sbomId])
 
   // ADD KEYBOARD SHORTCUT FOR TOGGLE DOWNLOAD MODAL
   const handleKeyDownload = (event) => {
