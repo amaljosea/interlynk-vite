@@ -189,7 +189,7 @@ const CompFilterMenu = ({
             fontSize={'sm'}
             leftIcon={<FaFilter size={14} />}
           >
-            Kind
+            Type
           </MenuButton>
           <MenuList
             minHeight={'auto'}
@@ -297,7 +297,7 @@ const CompFilterMenu = ({
             fontSize={'sm'}
             leftIcon={<FaFilter size={14} />}
           >
-            Type
+            Scope
           </MenuButton>
           <MenuList>
             <MenuOptionGroup
