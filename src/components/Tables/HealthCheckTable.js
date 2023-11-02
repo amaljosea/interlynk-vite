@@ -593,7 +593,8 @@ const HealthCheckTable = ({
             )}
           </>
         )
-      }
+      },
+      right: true
     }
   ]
 
