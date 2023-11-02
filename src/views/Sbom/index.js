@@ -28,7 +28,7 @@ import {
   Badge,
   useToast
 } from '@chakra-ui/react'
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useContext } from 'react'
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 import SBOMTable from './components/SBOMTable'
@@ -54,6 +54,8 @@ import { sbomDelete } from 'graphQL/Mutation'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import CheckModal from './components/CheckModal'
 import { GetAllComponents } from 'graphQL/Queries'
+import GlobalContext from 'context/GlobalContext'
+import { GetVulnData } from 'graphQL/Queries'
 
 const idRegex =
   /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
@@ -66,6 +68,14 @@ function SBOM() {
   const location = useLocation()
   const history = useHistory()
   const toast = useToast()
+
+  const {
+    setVulnSeverity,
+    setActiveProdTab,
+    totalRows,
+    vulnField,
+    vulnDirection
+  } = useContext(GlobalContext)
 
   const customerView = location.pathname.startsWith('/customer')
 
@@ -91,6 +101,29 @@ function SBOM() {
       first: 10
     }
   })
+
+  // GET VULN DATA
+  const [getVulnData, { data: vulnData, refetch: vulnRefetch }] = useLazyQuery(
+    GetVulnData,
+    {
+      fetchPolicy: 'cache-and-network'
+    }
+  )
+
+  // FETCH VULN DATA
+  useEffect(() => {
+    if (vulnData === undefined) {
+      getVulnData({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          first: totalRows,
+          field: vulnField,
+          direction: vulnDirection
+        }
+      })
+    }
+  }, [])
 
   const selectedProject =
     allProjects &&
@@ -221,24 +254,36 @@ function SBOM() {
     }
   }
 
+  const refetchVuln = (id) => {
+    getVulnData({
+      variables: {
+        projectId: productId,
+        sbomId: id,
+        first: totalRows,
+        field: vulnField,
+        direction: vulnDirection
+      }
+    })
+  }
+
   const refetchSBOM = async (id) => {
     try {
       await refetch({
         projectId: productId,
         sbomId: id
-      }).then(() => {
-        if (customerView) {
-          history.push(`/sharelynk?p=${productId}&sbom=${id}`)
-        } else {
-          history.push(`/vendor/products?p=${productId}&sbom=${id}`)
-        }
       })
+        .then(() => refetchVuln(id))
+        .finally(() =>
+          history.push(`/vendor/products?p=${productId}&sbom=${id}`)
+        )
     } catch (error) {
       console.log(`fetch error`, error)
     }
   }
 
-  const handleSBOMChange = async (e) => {
+  const handleSBOMChange = (e) => {
+    setActiveProdTab(0)
+    setVulnSeverity([])
     setSelectedVersion(e.target.value)
     refetchSBOM(e.target.value)
   }
@@ -295,6 +340,21 @@ function SBOM() {
         }
       }).then(() => onPrimaryOpen())
     }
+  }
+
+  const onFilterSev = (value) => {
+    setActiveProdTab(2)
+    setVulnSeverity(value)
+    getVulnData({
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        severity: value,
+        first: totalRows,
+        field: vulnField,
+        direction: vulnDirection
+      }
+    })
   }
 
   return (
@@ -427,6 +487,8 @@ function SBOM() {
                                       variant='subtle'
                                       colorScheme='red'
                                       borderRadius='md'
+                                      cursor={'pointer'}
+                                      onClick={() => onFilterSev(['critical'])}
                                     >
                                       {sbomData.sbom.stats.vulnStats.critical
                                         ? sbomData.sbom.stats.vulnStats.critical
@@ -440,6 +502,8 @@ function SBOM() {
                                       variant='subtle'
                                       colorScheme='orange'
                                       borderRadius='md'
+                                      cursor={'pointer'}
+                                      onClick={() => onFilterSev(['high'])}
                                     >
                                       {sbomData.sbom.stats.vulnStats.high
                                         ? sbomData.sbom.stats.vulnStats.high
@@ -453,6 +517,8 @@ function SBOM() {
                                       variant='subtle'
                                       colorScheme='yellow'
                                       borderRadius='md'
+                                      cursor={'pointer'}
+                                      onClick={() => onFilterSev(['medium'])}
                                     >
                                       {sbomData.sbom.stats.vulnStats.medium
                                         ? sbomData.sbom.stats.vulnStats.medium
@@ -466,6 +532,8 @@ function SBOM() {
                                       variant='subtle'
                                       colorScheme='green'
                                       borderRadius='md'
+                                      cursor={'pointer'}
+                                      onClick={() => onFilterSev(['low'])}
                                     >
                                       {sbomData.sbom.stats.vulnStats.low
                                         ? sbomData.sbom.stats.vulnStats.low
@@ -600,6 +668,9 @@ function SBOM() {
                 status={status}
                 setComponents={setComponents}
                 setTotalComp={setTotalComp}
+                getVulnData={getVulnData}
+                vulnData={vulnData}
+                vulnRefetch={vulnRefetch}
                 type={
                   selectedProject?.sboms.length > 0 &&
                   selectedProject.sboms[0].format
