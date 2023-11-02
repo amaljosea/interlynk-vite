@@ -323,7 +323,8 @@ const ComponentTable = ({
         )
       },
       sortable: true,
-      width: '400px'
+      // width: '450px',
+      grow: 2
     },
     // LICENSES
     {
@@ -472,7 +473,9 @@ const ComponentTable = ({
             )}
           </>
         )
-      }
+      },
+      width: '100px',
+      right: true
     }
   ]
 
