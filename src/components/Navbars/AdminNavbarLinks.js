@@ -114,7 +114,7 @@ export default function HeaderLinks(props) {
 
   return (
     <Flex gap={4} alignItems='center' flexDirection='row'>
-      <Select width={'fit-content'} bg={'white'} size='sm'>
+      <Select width={'fit-content'} bg={'white'} size='sm' name='duration' id='duration'>
         <option value='Today'>Today</option>
         <option value='1 weeks'>1 weeks</option>
         <option value='2 weeks'>2 weeks</option>

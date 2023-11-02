@@ -117,7 +117,13 @@ const ProductVersions = ({
 
           <Stack alignItems={'center'} direction={'row'} spacing={4}>
             <Text>Show</Text>
-            <Select width={20} value={totalRows} onChange={handleSetRow}>
+            <Select
+              width={20}
+              value={totalRows}
+              onChange={handleSetRow}
+              id='rowlimit'
+              name='rowlimit'
+            >
               <option value={25}>25</option>
               <option value={50}>50</option>
               <option value={100}>100</option>

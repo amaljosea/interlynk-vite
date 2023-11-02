@@ -94,6 +94,8 @@ const ApiFeed = () => {
                 <Tr key={index}>
                   <Td pl={0}>
                     <Switch
+                      name={item.rule.friendlyId}
+                      id={item.rule.friendlyId}
                       isChecked={item.enabled ? true : false}
                       onChange={(e) => handleChange(e.target.checked, item.id)}
                     ></Switch>
@@ -107,8 +109,10 @@ const ApiFeed = () => {
                   </Td>
                   <Td pl={0}>
                     <Select
-                      width={'130px'}
                       size='sm'
+                      name={index}
+                      id={index}
+                      width={'130px'}
                       value={item.severity}
                       onChange={(e) =>
                         handleStatusChange(item.id, e.target.value)

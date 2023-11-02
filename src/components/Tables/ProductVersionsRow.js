@@ -177,7 +177,13 @@ function ProductVersionsRow(props) {
           {isLoading ? (
             <Skeleton height='20px' my={2} />
           ) : (
-            <Switch size='md' isChecked={isActive} onChange={handleChange} />
+            <Switch
+              name={name}
+              id={name}
+              size='md'
+              isChecked={isActive}
+              onChange={handleChange}
+            />
           )}
         </Td>
         <Td pl={0}>
