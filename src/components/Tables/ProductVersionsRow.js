@@ -25,7 +25,7 @@ import {
   Divider,
   Tooltip
 } from '@chakra-ui/react'
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useContext } from 'react'
 import { Link, useHistory } from 'react-router-dom'
 import { FaEllipsisV } from 'react-icons/fa'
 import ProductModal from 'views/Dashboard/Products/components/ProductModal'
@@ -36,9 +36,12 @@ import { timeSince } from 'utils'
 import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import { getFullDateAndTime } from 'utils'
 import { UpdateProject } from 'graphQL/Mutation'
+import GlobalContext from 'context/GlobalContext'
 
 function ProductVersionsRow(props) {
   const history = useHistory()
+
+  const { setActiveProdTab } = useContext(GlobalContext)
 
   const {
     id,
@@ -182,10 +185,13 @@ function ProductVersionsRow(props) {
             <Skeleton height='20px' />
           ) : sbomId.length > 0 && enabled ? (
             <Link
-              to={`/vendor/products?p=${id}&sbom=${
+              to={`/vendor/products?&p=${id}&sbom=${
                 filteredData.length > 0 ? filteredData[0].id : sbomId[0].id
               }`}
-              onClick={() => window.localStorage.setItem('product', name)}
+              onClick={() => {
+                window.localStorage.setItem('product', name)
+                setActiveProdTab(0)
+              }}
             >
               <Text color={'blue.500'} minWidth='100%'>
                 {name}

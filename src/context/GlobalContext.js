@@ -54,7 +54,28 @@ const GlobalContext = React.createContext({
   logField: '',
   setLogField: () => {},
   logDirection: '',
-  setLogDirection: () => {}
+  setLogDirection: () => {},
+  activeProdTab: 0,
+  setActiveProdTab: () => {},
+  totalRows: 25,
+  setTotalRows: () => {},
+  // VULN FILTER
+  vulnSearchInput: '',
+  setVulnSearchInput: () => {},
+  vulnSeverity: [],
+  setVulnSeverity: () => {},
+  vulnComponent: [],
+  setVulnComponent: () => {},
+  vulnStatus: [],
+  setVulnStatus: () => {},
+  vulnKev: '',
+  setVulnKev: () => {},
+  vulnEpss: '',
+  setVulnEpss: [],
+  minVal: 0,
+  setMinVal: () => {},
+  maxVal: 0,
+  setMaxVal: () => {}
 })
 
 export default GlobalContext

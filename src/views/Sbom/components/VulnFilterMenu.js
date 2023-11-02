@@ -43,78 +43,84 @@ const VulnFilterMenu = ({
   setPageIndex,
   totalRows
 }) => {
-  const { vulnFilters, vulnField, vulnDirection } = useContext(GlobalContext)
+  const {
+    vulnFilters,
+    vulnField,
+    vulnDirection,
+    vulnSeverity,
+    setVulnSeverity,
+    vulnComponent,
+    setVulnComponent,
+    vulnStatus,
+    setVulnStatus,
+    vulnKev,
+    setVulnKev,
+    vulnEpss,
+    setVulnEpss,
+    minVal,
+    setMinVal,
+    maxVal,
+    setMaxVal
+  } = useContext(GlobalContext)
 
   const { vulnCompNames, vulnStatuses } = vulnFilters
 
-  const [selectCompName, setSelectCompName] = useState([])
-  const [selectSeverity, setSelectSeverity] = useState([])
-  const [selectedStatus, setSelectedStatus] = useState([])
-  const [selectedKev, setSelectedKev] = useState('')
-  const [selectedEpss, setSelectedEpss] = useState('')
-  const [minVal, setMinVal] = useState()
-  const [maxVal, setMaxVal] = useState()
-
   const onFilterCompName = (value) => {
-    setSelectCompName(value.includes('all') ? [] : value)
+    setVulnComponent(value.includes('all') ? [] : value)
     refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      componentName: value.includes('all') ? undefined : value,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      last: undefined,
-      field: vulnField,
-      direction: vulnDirection
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        componentName: value.includes('all') ? undefined : value,
+        first: totalRows,
+        field: vulnField,
+        direction: vulnDirection
+      }
     })
     setPageIndex(1)
   }
 
   const onFilterSeverity = (value) => {
-    setSelectSeverity(value.includes('all') ? [] : value)
+    setVulnSeverity(value.includes('all') ? [] : value)
     refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      severity: value.includes('all') ? undefined : value,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      last: undefined,
-      field: vulnField,
-      direction: vulnDirection
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        severity: value.includes('all') ? undefined : value,
+        first: totalRows,
+        field: vulnField,
+        direction: vulnDirection
+      }
     })
     setPageIndex(1)
   }
 
   const onFilterStatus = (value) => {
-    setSelectedStatus(value.includes('all') ? [] : value)
+    setVulnStatus(value.includes('all') ? [] : value)
     refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      status: value.includes('all') ? undefined : value,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      last: undefined,
-      field: vulnField,
-      direction: vulnDirection
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        status: value.includes('all') ? undefined : value,
+        first: totalRows,
+        field: vulnField,
+        direction: vulnDirection
+      }
     })
     setPageIndex(1)
   }
 
   const onFilterKev = (value) => {
-    setSelectedKev(value)
+    setVulnKev(value)
     refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      kev: value === 'all' ? undefined : value === 'yes' ? true : false,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      last: undefined,
-      field: vulnField,
-      direction: vulnDirection
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        kev: value === 'all' ? undefined : value === 'yes' ? true : false,
+        first: totalRows,
+        field: vulnField,
+        direction: vulnDirection
+      }
     })
     setPageIndex(1)
   }
@@ -122,7 +128,7 @@ const VulnFilterMenu = ({
   const onFilterEpss = (value) => {
     setMinVal(0)
     setMaxVal(0)
-    setSelectedEpss(value)
+    setVulnEpss(value)
 
     const epss = value !== 'all' && value.split('-')
 
@@ -132,15 +138,14 @@ const VulnFilterMenu = ({
     }
 
     refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      epss: value === 'all' ? undefined : range,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      last: undefined,
-      field: vulnField,
-      direction: vulnDirection
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        epss: value === 'all' ? undefined : range,
+        first: totalRows,
+        field: vulnField,
+        direction: vulnDirection
+      }
     })
     setPageIndex(1)
   }
@@ -153,15 +158,14 @@ const VulnFilterMenu = ({
       max: parseInt(maxVal)/10000
     }
     refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      epss: range,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      last: undefined,
-      field: vulnField,
-      direction: vulnDirection
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        epss: range,
+        first: totalRows,
+        field: vulnField,
+        direction: vulnDirection
+      }
     })
     setPageIndex(1)
     onClose()
@@ -172,7 +176,7 @@ const VulnFilterMenu = ({
       {/* SEVERITY */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnBlur={true}>
-          {selectSeverity.length !== 0 && <CheckMark />}
+          {vulnSeverity.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -185,7 +189,7 @@ const VulnFilterMenu = ({
           <MenuList>
             <MenuOptionGroup
               type='checkbox'
-              value={selectSeverity}
+              value={vulnSeverity}
               onChange={onFilterSeverity}
             >
               <MenuItemOption value={'all'} fontSize={'sm'}>
@@ -208,7 +212,7 @@ const VulnFilterMenu = ({
       {/* COMPONENT NAME */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {selectCompName.length !== 0 && <CheckMark />}
+          {vulnComponent.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -226,7 +230,7 @@ const VulnFilterMenu = ({
           >
             <MenuOptionGroup
               type='checkbox'
-              value={selectCompName}
+              value={vulnComponent}
               onChange={onFilterCompName}
             >
               <MenuItemOption value={'all'} fontSize={'sm'}>
@@ -249,7 +253,7 @@ const VulnFilterMenu = ({
       {/* STATUS */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {selectedStatus.length !== 0 && <CheckMark />}
+          {vulnStatus.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -267,7 +271,7 @@ const VulnFilterMenu = ({
           >
             <MenuOptionGroup
               type='checkbox'
-              value={selectedStatus}
+              value={vulnStatus}
               onChange={onFilterStatus}
             >
               <MenuItemOption value={'all'} fontSize={'sm'}>
@@ -290,7 +294,7 @@ const VulnFilterMenu = ({
       {/* KEV */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {selectedKev !== 'all' && selectedKev !== '' && <CheckMark />}
+          {vulnKev !== 'all' && vulnKev !== '' && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -303,7 +307,7 @@ const VulnFilterMenu = ({
           <MenuList>
             <MenuOptionGroup
               type='radio'
-              value={selectedKev}
+              value={vulnKev}
               onChange={onFilterKev}
             >
               {['all', 'yes', 'no'].map((item, index) => (
@@ -323,7 +327,7 @@ const VulnFilterMenu = ({
       {/* EPSS */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true} isOpen={isOpen} onClose={onClose}>
-          {selectedEpss !== 'all' && selectedEpss !== '' && <CheckMark />}
+          {vulnEpss !== 'all' && vulnEpss !== '' && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -337,7 +341,7 @@ const VulnFilterMenu = ({
           <MenuList>
             <MenuOptionGroup
               type='radio'
-              value={selectedEpss}
+              value={vulnEpss}
               onChange={onFilterEpss}
             >
               <MenuItemOption value={'all'} fontSize={'sm'}>

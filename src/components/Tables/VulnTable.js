@@ -36,8 +36,7 @@ import {
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
 import { FaCopy } from 'react-icons/fa6'
-import { useState, useRef, useMemo, useEffect, useContext } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useState, useMemo, useEffect, useContext } from 'react'
 import styled from '@emotion/styled'
 import Multistep from 'views/Sbom/components/Multistep'
 import { getFullDateAndTime } from 'utils'
@@ -101,7 +100,14 @@ const VulnTable = ({
     vulnField,
     setVulnField,
     vulnDirection,
-    setVulnDirection
+    setVulnDirection,
+    vulnSearchInput,
+    setVulnSearchInput,
+    vulnSeverity,
+    vulnComponent,
+    vulnStatus,
+    vulnKev,
+    vulnEpss
   } = useContext(GlobalContext)
 
   const textColor = useColorModeValue('gray.700', 'white')
@@ -365,12 +371,16 @@ const VulnTable = ({
 
   // SEARCH COMPONENT
   const handleSearch = async (event) => {
-    if (event.key === 'Enter' && filterText !== '') {
+    if (event.key === 'Enter') {
       await refetch({
-        projectId: productId,
-        sbomId: sbomId,
-        search: filterText,
-        first: totalRows
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          search: vulnSearchInput,
+          first: totalRows,
+          field: vulnField,
+          direction: vulnDirection
+        }
       })
       setPageIndex(1)
     }
@@ -379,12 +389,16 @@ const VulnTable = ({
   // CLEAR SERACH
   const handleClear = async () => {
     await refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      first: totalRows,
-      search: undefined
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        first: totalRows,
+        search: undefined,
+        field: vulnField,
+        direction: vulnDirection
+      }
     })
-    setFilterText('')
+    setVulnSearchInput('')
     setPageIndex(1)
   }
 
@@ -402,12 +416,7 @@ const VulnTable = ({
           alignItems={'flex-start'}
         >
           {/* SEARCH COMPONENTS */}
-          <SearchFilter
-            filterText={filterText}
-            setFilterText={setFilterText}
-            onFilter={handleSearch}
-            onClear={handleClear}
-          />
+          <SearchFilter onFilter={handleSearch} onClear={handleClear} />
 
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
           {vulnFilters && (
@@ -433,7 +442,7 @@ const VulnTable = ({
         </Tooltip>
       </Flex>
     )
-  }, [filterText, vulnFilters, handleClear, handleSearch])
+  }, [vulnSearchInput, vulnFilters, handleClear, handleSearch])
 
   const ExpandedComponent = ({ data }) => {
     const { vuln } = data
@@ -539,43 +548,48 @@ const VulnTable = ({
     })
   }
 
-  const [isLoading, setIsLoading] = useState(false)
+  const epss = vulnEpss !== 'all' && vulnEpss.split('-')
+
+  const range = {
+    min: parseFloat(epss[0]),
+    max: parseFloat(epss[1])
+  }
 
   const onPreviousPage = async () => {
-    setIsLoading(true)
     setPageIndex((prev) => pageIndex !== 0 && prev - 1)
     await refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      first: undefined,
-      last: totalRows,
-      before: data.pageInfo.startCursor,
-      after: undefined,
-      field: vulnField,
-      direction: vulnDirection
-    }).then(() => {
-      setTimeout(() => {
-        setIsLoading(false)
-      }, 2000)
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        severity: vulnSeverity.length > 0 ? vulnSeverity : undefined,
+        componentName: vulnComponent.length > 0 ? vulnComponent : undefined,
+        status: vulnStatus.length > 0 ? vulnStatus : undefined,
+        kev: vulnKev === 'all' ? undefined : vulnKev === 'yes' ? true : false,
+        epss: vulnEpss !== '' ? range : undefined,
+        last: totalRows,
+        before: data.pageInfo.startCursor,
+        field: vulnField,
+        direction: vulnDirection
+      }
     })
   }
 
   const onNextPage = async () => {
-    setIsLoading(true)
     setPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
     await refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      first: totalRows,
-      last: undefined,
-      after: data.pageInfo.endCursor,
-      before: undefined,
-      field: vulnField,
-      direction: vulnDirection
-    }).then(() => {
-      setTimeout(() => {
-        setIsLoading(false)
-      }, 2000)
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        severity: vulnSeverity.length > 0 ? vulnSeverity : undefined,
+        componentName: vulnComponent.length > 0 ? vulnComponent : undefined,
+        status: vulnStatus.length > 0 ? vulnStatus : undefined,
+        kev: vulnKev === 'all' ? undefined : vulnKev === 'yes' ? true : false,
+        epss: vulnEpss !== '' ? range : undefined,
+        first: totalRows,
+        after: data.pageInfo.endCursor,
+        field: vulnField,
+        direction: vulnDirection
+      }
     })
   }
 
@@ -583,12 +597,13 @@ const VulnTable = ({
     setVulnField(column.id)
     setVulnDirection(sortDirection === 'asc' ? 'ASC' : 'DESC')
     refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      first: totalRows,
-      last: undefined,
-      field: column.id,
-      direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        first: totalRows,
+        field: column.id,
+        direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+      }
     })
   }
 
@@ -596,11 +611,13 @@ const VulnTable = ({
   const handleSetRow = async (e) => {
     setTotalRows(Number(e.target.value))
     await refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      first: Number(e.target.value),
-      field: vulnField,
-      direction: vulnDirection
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        first: Number(e.target.value),
+        field: vulnField,
+        direction: vulnDirection
+      }
     })
     setFilterText('')
     setPageIndex(1)
@@ -624,12 +641,12 @@ const VulnTable = ({
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
           columns={columns}
-          data={data.nodes}
+          data={data && data.nodes}
           customStyles={customStyles}
           onSort={handleSort}
           defaultSortAsc={false}
           defaultSortFieldId={vulnField}
-          progressPending={isLoading}
+          progressPending={data ? false : true}
           progressComponent={<CustomLoader />}
           subHeader
           subHeaderComponent={subHeaderComponentMemo}
@@ -641,7 +658,7 @@ const VulnTable = ({
       </Flex>
 
       {/* PAGINATION */}
-      {!isLoading && (
+      {data && (
         <Flex
           flexDir={'row'}
           gap={4}

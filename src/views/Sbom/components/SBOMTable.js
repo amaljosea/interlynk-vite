@@ -42,7 +42,9 @@ const SBOMTable = ({
   refetch,
   filteredData,
   setComponents,
-  setTotalComp
+  setTotalComp,
+  vulnData,
+  getVulnData
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -57,27 +59,25 @@ const SBOMTable = ({
     setLogFilters,
     compField,
     compDirection,
-    vulnField,
-    vulnDirection,
     checkField,
     checkDirection,
     logField,
-    logDirection
+    logDirection,
+    totalRows,
+    setTotalRows,
+    activeProdTab,
+    setActiveProdTab
   } = useContext(GlobalContext)
 
   const tab = window.localStorage.getItem('activeProdTab')
 
   const { lifecycle } = data
 
-  const [tabIndex, setTabIndex] = useState(0)
-
   // PAGINATION STATS FOR DIFFERENT TABS
   const [componentIndex, setComponentIndex] = useState(1)
   const [vulnIndex, setVulnIndex] = useState(1)
   const [resultIndex, setResultIndex] = useState(1)
   const [changelogIndex, setChangelogIndex] = useState(1)
-
-  const [totalRows, setTotalRows] = useState(25)
 
   // GET COMPONENT DATA
   const [
@@ -91,10 +91,6 @@ const SBOMTable = ({
       setTotalComp(compData.sbom.components.totalCount)
     }
   }, [compData])
-
-  // GET VULN DATA
-  const [getVulnData, { data: vulnData, refetch: vulnRefetch }] =
-    useLazyQuery(GetVulnData)
 
   // GET HEALTH CHECK DATA
   const [getCheckData, { data: checkData, refetch: healthRefetch }] =
@@ -134,21 +130,6 @@ const SBOMTable = ({
     }
   }, [])
 
-  // FETCH VULN DATA
-  useEffect(() => {
-    if (vulnData === undefined) {
-      getVulnData({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          first: totalRows,
-          field: vulnField,
-          direction: vulnDirection
-        }
-      })
-    }
-  }, [])
-
   // FETCH HEALTH CHECK DATA
   useEffect(() => {
     if (checkData === undefined) {
@@ -181,12 +162,12 @@ const SBOMTable = ({
 
   // FETCH FILTER DATA BASE ON SELECTED TAB
   useEffect(() => {
-    if (tabIndex === 0) {
+    if (activeProdTab === 0) {
       refetch({
         projectId: productId,
         sbomId: sbomId
       })
-    } else if (tabIndex === 1) {
+    } else if (activeProdTab === 1) {
       getCompFilters({
         variables: {
           projectId: productId,
@@ -197,7 +178,7 @@ const SBOMTable = ({
           setCompFilters(res.data.sbom.filters)
         }
       })
-    } else if (tabIndex === 2) {
+    } else if (activeProdTab === 2) {
       getVulnFilters({
         variables: {
           projectId: productId,
@@ -208,7 +189,7 @@ const SBOMTable = ({
           setVulnFilters(res.data.sbom.filters)
         }
       })
-    } else if (tabIndex === 3) {
+    } else if (activeProdTab === 3) {
       getCheckFilters({
         variables: {
           projectId: productId,
@@ -219,7 +200,7 @@ const SBOMTable = ({
           setCheckFilters(res.data.sbom.filters)
         }
       })
-    } else if (tabIndex === 4) {
+    } else if (activeProdTab === 4) {
       logsRefetch({
         projectId: productId,
         sbomId: sbomId,
@@ -238,7 +219,7 @@ const SBOMTable = ({
         }
       })
     }
-  }, [tabIndex])
+  }, [activeProdTab])
 
   // EXTRACT ALL THE COMPONENT NAME AND ID'S FROM SELECTED SBOM VERSION
   const components =
@@ -255,8 +236,8 @@ const SBOMTable = ({
       <Card>
         <Tabs
           variant='enclosed'
-          defaultIndex={tabIndex}
-          onChange={(value) => setTabIndex(value)}
+          index={activeProdTab}
+          onChange={(value) => setActiveProdTab(Number(value))}
         >
           {/* TAB LIST */}
           <TabList mt='20px'>
@@ -350,28 +331,18 @@ const SBOMTable = ({
             </TabPanel>
             {/* VUNERABILITIES TABLE */}
             <TabPanel px={0}>
-              {vulnData ? (
-                <VulnTable
-                  data={vulnData.sbom.vulns}
-                  filteredData={filteredData}
-                  refetch={vulnRefetch}
-                  productId={productId}
-                  sbomId={sbomId}
-                  filterRefetch={vulnFilterRefetch}
-                  pageIndex={vulnIndex}
-                  setPageIndex={setVulnIndex}
-                  totalRows={totalRows}
-                  setTotalRows={setTotalRows}
-                />
-              ) : (
-                <Flex width={'100%'} gap={4} direction={'column'}>
-                  <Skeleton width={'100%'} height='20px' />
-                  <Skeleton width={'100%'} height='20px' />
-                  <Skeleton width={'100%'} height='20px' />
-                  <Skeleton width={'100%'} height='20px' />
-                  <Skeleton width={'100%'} height='20px' />
-                </Flex>
-              )}
+              <VulnTable
+                data={vulnData?.sbom?.vulns}
+                filteredData={filteredData}
+                refetch={getVulnData}
+                productId={productId}
+                sbomId={sbomId}
+                filterRefetch={vulnFilterRefetch}
+                pageIndex={vulnIndex}
+                setPageIndex={setVulnIndex}
+                totalRows={totalRows}
+                setTotalRows={setTotalRows}
+              />
             </TabPanel>
             {/* HEALTH CHECK TABLE */}
             <TabPanel px={0}>

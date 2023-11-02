@@ -1,9 +1,11 @@
 import { CloseIcon } from '@chakra-ui/icons'
 import { Box, Input } from '@chakra-ui/react'
-import { useEffect, useRef, useState } from 'react'
+import GlobalContext from 'context/GlobalContext'
+import { useContext, useEffect, useRef, useState } from 'react'
 
-const SearchFilter = ({ filterText, setFilterText, onFilter, onClear }) => {
+const SearchFilter = ({ onFilter, onClear }) => {
   const searchInputRef = useRef()
+  const { vulnSearchInput, setVulnSearchInput } = useContext(GlobalContext)
 
   const [focused, setFocused] = useState(false)
   const onFocus = () => setFocused(true)
@@ -30,10 +32,10 @@ const SearchFilter = ({ filterText, setFilterText, onFilter, onClear }) => {
   }, [])
 
   useEffect(() => {
-    if (filterText === '' && focused === true) {
+    if (vulnSearchInput === '' && focused === true) {
       onClear()
     }
-  }, [filterText, focused])
+  }, [vulnSearchInput, focused])
 
   return (
     <>
@@ -44,13 +46,14 @@ const SearchFilter = ({ filterText, setFilterText, onFilter, onClear }) => {
           placeholder='Search'
           aria-label='Search Input'
           ref={searchInputRef}
-          value={filterText}
-          onChange={(e) => setFilterText(e.target.value)}
+          value={vulnSearchInput}
+          autoComplete='search'
+          onChange={(e) => setVulnSearchInput(e.target.value)}
           onKeyDown={onFilter}
           onFocus={onFocus}
           onBlur={onBlur}
         />
-        {filterText !== '' && (
+        {vulnSearchInput !== '' && (
           <CloseIcon
             w={'18px'}
             h={'18px'}

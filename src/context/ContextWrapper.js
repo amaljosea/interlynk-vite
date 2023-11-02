@@ -54,6 +54,19 @@ const ContextWrapper = (props) => {
   const [logField, setLogField] = useState('ACTIVITY_LOGS_CREATED_AT')
   const [logDirection, setLogDirection] = useState('DESC')
 
+  const [activeProdTab, setActiveProdTab] = useState(0)
+  const [totalRows, setTotalRows] = useState(25)
+
+  // VULN FILTER
+  const [vulnSearchInput, setVulnSearchInput] = useState('')
+  const [vulnSeverity, setVulnSeverity] = useState([])
+  const [vulnComponent, setVulnComponent] = useState([])
+  const [vulnStatus, setVulnStatus] = useState([])
+  const [vulnKev, setVulnKev] = useState('')
+  const [vulnEpss, setVulnEpss] = useState('')
+  const [minVal, setMinVal] = useState()
+  const [maxVal, setMaxVal] = useState()
+
   return (
     <GlobalContext.Provider
       value={{
@@ -108,7 +121,27 @@ const ContextWrapper = (props) => {
         signedCompField,
         setSignedCompField,
         signedCompDirection,
-        setSignedCompDirection
+        setSignedCompDirection,
+        activeProdTab,
+        setActiveProdTab,
+        totalRows,
+        setTotalRows,
+        vulnSearchInput,
+        setVulnSearchInput,
+        vulnSeverity,
+        setVulnSeverity,
+        vulnComponent,
+        setVulnComponent,
+        vulnStatus,
+        setVulnStatus,
+        vulnKev,
+        setVulnKev,
+        vulnEpss,
+        setVulnEpss,
+        minVal,
+        setMinVal,
+        maxVal,
+        setMaxVal
       }}
     >
       {props.children}
