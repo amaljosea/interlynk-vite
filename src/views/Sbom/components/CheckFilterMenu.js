@@ -40,12 +40,12 @@ const CheckFilterMenu = ({
 }) => {
   const { checkFilters, checkField, checkDirection } = useContext(GlobalContext)
 
-  const { checkCategories, checkStatuses } = checkFilters
+  const { checkCategories, checkCompNames, checkStatuses } = checkFilters
 
   const [selectCategory, setSelectCategory] = useState([])
   const [selectSeverity, setSelectSeverity] = useState([])
   const [selectStatus, setSelectStatus] = useState([])
-  // const [selectCompName, setSelectCompName] = useState('')
+  const [selectCompName, setSelectCompName] = useState([])
 
   const onFilterCategory = (value) => {
     setSelectCategory(value.includes('all') ? [] : value)
@@ -95,21 +95,21 @@ const CheckFilterMenu = ({
     setPageIndex(1)
   }
 
-  // const onFilterCompName = (value) => {
-  //   setSelectCompName(value.includes('all') ? [] : value)
-  //   refetch({
-  //     projectId: productId,
-  //     sbomId: sbomId,
-  //     componentName: value.includes('all') ? undefined : value,
-  //     first: totalRows,
-  //     last: undefined,
-  //     after: undefined,
-  //     last: undefined,
-  //     field: checkField,
-  //     direction: checkDirection
-  //   })
-  //   setPageIndex(1)
-  // }
+  const onFilterCompName = (value) => {
+    setSelectCompName(value.includes('all') ? [] : value)
+    refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      componentName: value.includes('all') ? undefined : value,
+      first: totalRows,
+      last: undefined,
+      after: undefined,
+      last: undefined,
+      field: checkField,
+      direction: checkDirection
+    })
+    setPageIndex(1)
+  }
 
   return (
     <Stack direction={'row'} alignItems={'center'} gap={1}>
@@ -150,7 +150,7 @@ const CheckFilterMenu = ({
         </Menu>
       </Box>
       {/* COMPONENT NAME */}
-      {/* <Box width={'fit-content'} position={'relative'}>
+      <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnBlur={true}>
           {selectCompName.length !== 0 && <CheckMark />}
           <MenuButton
@@ -180,7 +180,7 @@ const CheckFilterMenu = ({
             </MenuOptionGroup>
           </MenuList>
         </Menu>
-      </Box> */}
+      </Box>
       {/* SEVERITY */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>

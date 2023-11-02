@@ -814,6 +814,7 @@ export const GetCheckFilterData = gql`
       id
       filters {
         checkCategories
+        checkCompNames
         checkSeverities
         checkStatuses
       }
