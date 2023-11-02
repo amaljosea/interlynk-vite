@@ -100,3 +100,8 @@
   border-color: inherit;
   border-radius: 5px;
 }
+
+.demo-node > circle {
+  fill: #2d3748;
+  stroke: #2d3748;
+}
