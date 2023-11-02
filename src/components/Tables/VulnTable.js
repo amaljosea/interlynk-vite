@@ -416,7 +416,12 @@ const VulnTable = ({
           alignItems={'flex-start'}
         >
           {/* SEARCH COMPONENTS */}
-          <SearchFilter onFilter={handleSearch} onClear={handleClear} />
+          <SearchFilter
+            filterText={vulnSearchInput}
+            setFilterText={setVulnSearchInput}
+            onFilter={handleSearch}
+            onClear={handleClear}
+          />
 
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
           {vulnFilters && (

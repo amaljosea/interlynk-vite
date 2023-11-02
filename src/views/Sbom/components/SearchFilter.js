@@ -3,9 +3,8 @@ import { Box, Input } from '@chakra-ui/react'
 import GlobalContext from 'context/GlobalContext'
 import { useContext, useEffect, useRef, useState } from 'react'
 
-const SearchFilter = ({ onFilter, onClear }) => {
+const SearchFilter = ({ filterText, setFilterText, onFilter, onClear }) => {
   const searchInputRef = useRef()
-  const { vulnSearchInput, setVulnSearchInput } = useContext(GlobalContext)
 
   const [focused, setFocused] = useState(false)
   const onFocus = () => setFocused(true)
@@ -32,10 +31,10 @@ const SearchFilter = ({ onFilter, onClear }) => {
   }, [])
 
   useEffect(() => {
-    if (vulnSearchInput === '' && focused === true) {
+    if (filterText === '' && focused === true) {
       onClear()
     }
-  }, [vulnSearchInput, focused])
+  }, [filterText, focused])
 
   return (
     <>
@@ -46,14 +45,14 @@ const SearchFilter = ({ onFilter, onClear }) => {
           placeholder='Search'
           aria-label='Search Input'
           ref={searchInputRef}
-          value={vulnSearchInput}
+          value={filterText}
           autoComplete='search'
-          onChange={(e) => setVulnSearchInput(e.target.value)}
+          onChange={(e) => setFilterText(e.target.value)}
           onKeyDown={onFilter}
           onFocus={onFocus}
           onBlur={onBlur}
         />
-        {vulnSearchInput !== '' && (
+        {filterText !== '' && (
           <CloseIcon
             w={'18px'}
             h={'18px'}
