@@ -612,10 +612,7 @@ const HealthCheckTable = ({
     })
   }
 
-  const [loading, setLoading] = useState(false)
-
   const onPreviousPage = async () => {
-    setLoading(true)
     setPageIndex((prev) => pageIndex !== 0 && prev - 1)
     await refetch({
       projectId: productId,
@@ -626,15 +623,10 @@ const HealthCheckTable = ({
       after: undefined,
       field: checkField,
       direction: checkDirection
-    }).then(() => {
-      setTimeout(() => {
-        setLoading(false)
-      }, 2000)
     })
   }
 
   const onNextPage = async () => {
-    setLoading(true)
     setPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
     await refetch({
       projectId: productId,
@@ -645,10 +637,6 @@ const HealthCheckTable = ({
       before: undefined,
       field: checkField,
       direction: checkDirection
-    }).then(() => {
-      setTimeout(() => {
-        setLoading(false)
-      }, 2000)
     })
   }
 
@@ -657,12 +645,12 @@ const HealthCheckTable = ({
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
           columns={columns}
-          data={data.nodes}
+          data={data && data.nodes}
           onSort={handleSort}
           defaultSortAsc={false}
           defaultSortFieldId={checkField}
           customStyles={customStyles}
-          progressPending={loading}
+          progressPending={data ? false : true}
           progressComponent={<CustomLoader />}
           persistTableHead
           subHeader
@@ -672,7 +660,7 @@ const HealthCheckTable = ({
       </Flex>
 
       {/* PAGINATION */}
-      {!loading && (
+      {data && (
         <Flex
           width={'100%'}
           flexDir={'row'}

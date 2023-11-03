@@ -263,10 +263,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
     }
   ]
 
-  const [loading, setLoading] = useState(false)
-
   const onPreviousPage = async () => {
-    setLoading(true)
     setPageIndex((prev) => pageIndex !== 0 && prev - 1)
     await refetch({
       projectId: productId,
@@ -275,15 +272,10 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
       before: data.pageInfo.startCursor,
       field: logField,
       direction: logDirection
-    }).then(() => {
-      setTimeout(() => {
-        setLoading(false)
-      }, 1000)
     })
   }
 
   const onNextPage = async () => {
-    setLoading(true)
     setPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
     refetch({
       projectId: productId,
@@ -292,10 +284,6 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
       after: data.pageInfo.endCursor,
       field: logField,
       direction: logDirection
-    }).then(() => {
-      setTimeout(() => {
-        setLoading(false)
-      }, 1000)
     })
   }
 
@@ -394,12 +382,12 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
           columns={columns}
-          data={data.nodes}
+          data={data && data.nodes}
           onSort={handleSort}
           defaultSortAsc={false}
           defaultSortFieldId={logField}
           customStyles={customStyles}
-          progressPending={loading}
+          progressPending={data ? false : true}
           progressComponent={<CustomLoader />}
           subHeader
           persistTableHead
@@ -409,7 +397,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
       </Flex>
 
       {/* PAGINATION */}
-      {!loading && (
+      {data && (
         <Flex
           width={'100%'}
           flexDir={'row'}

@@ -103,27 +103,8 @@ function SBOM() {
   })
 
   // GET VULN DATA
-  const [getVulnData, { data: vulnData, refetch: vulnRefetch }] = useLazyQuery(
-    GetVulnData,
-    {
-      fetchPolicy: 'cache-and-network'
-    }
-  )
-
-  // FETCH VULN DATA
-  useEffect(() => {
-    if (vulnData === undefined) {
-      getVulnData({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          first: totalRows,
-          field: vulnField,
-          direction: vulnDirection
-        }
-      })
-    }
-  }, [])
+  const [getVulnData, { data: vulnData, refetch: vulnRefetch }] =
+    useLazyQuery(GetVulnData)
 
   const selectedProject =
     allProjects &&
@@ -254,28 +235,14 @@ function SBOM() {
     }
   }
 
-  const refetchVuln = (id) => {
-    getVulnData({
-      variables: {
-        projectId: productId,
-        sbomId: id,
-        first: totalRows,
-        field: vulnField,
-        direction: vulnDirection
-      }
-    })
-  }
-
   const refetchSBOM = async (id) => {
     try {
       await refetch({
         projectId: productId,
         sbomId: id
-      })
-        .then(() => refetchVuln(id))
-        .finally(() =>
-          history.push(`/vendor/products?p=${productId}&sbom=${id}`)
-        )
+      }).finally(() =>
+        history.push(`/vendor/products?p=${productId}&sbom=${id}`)
+      )
     } catch (error) {
       console.log(`fetch error`, error)
     }

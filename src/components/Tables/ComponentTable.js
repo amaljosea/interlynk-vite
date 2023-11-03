@@ -716,10 +716,8 @@ const ComponentTable = ({
     })
   }
 
-  const [isLoading, setIsLoading] = useState(false)
 
   const handlePreviousPage = async () => {
-    setIsLoading(true)
     setPageIndex((prev) => pageIndex !== 0 && prev - 1)
     await refetch({
       projectId: productId,
@@ -730,15 +728,10 @@ const ComponentTable = ({
       before: data.pageInfo.startCursor,
       field: customerView ? signedCompField : compField,
       direction: customerView ? signedCompDirection : compDirection
-    }).then(() => {
-      setTimeout(() => {
-        setIsLoading(false)
-      }, 2000)
     })
   }
 
   const handleNextPage = async () => {
-    setIsLoading(true)
     setPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
     await refetch({
       projectId: productId,
@@ -749,10 +742,6 @@ const ComponentTable = ({
       after: data.pageInfo.endCursor,
       field: customerView ? signedCompField : compField,
       direction: customerView ? signedCompDirection : compDirection
-    }).then(() => {
-      setTimeout(() => {
-        setIsLoading(false)
-      }, 2000)
     })
   }
 
@@ -761,12 +750,12 @@ const ComponentTable = ({
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
           columns={columns}
-          data={data.nodes}
+          data={data && data.nodes}
           onSort={handleSort}
           customStyles={customStyles}
           defaultSortAsc={false}
           defaultSortFieldId={compField}
-          progressPending={isLoading}
+          progressPending={data ? false : true}
           progressComponent={<CustomLoader />}
           subHeader
           subHeaderComponent={subHeaderComponentMemo}
@@ -778,7 +767,7 @@ const ComponentTable = ({
       </Flex>
 
       {/* PAGINATION */}
-      {!isLoading && (
+      {data && (
         <Flex
           width={'100%'}
           flexDir={'row'}

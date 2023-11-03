@@ -39,7 +39,7 @@ const ProdStatusDrawer = ({
 
   const { setVulnFilters, vulnField, vulnDirection } = useContext(GlobalContext)
 
-  const { vexStatus, id, componentVulnLogs, vexJustification } = data
+  const { vexStatus, id, componentVulnLogs, vexJustification, vuln } = data
 
   const [statusTitle, setStatusTitle] = useState('')
   const [statusName, setStatusName] = useState('')
@@ -55,17 +55,17 @@ const ProdStatusDrawer = ({
   const { data: allVexJustify } = useQuery(getVexJustifications)
 
   const [compVexCreate] = useMutation(updateCompVulnVex, {
-    onCompleted: () =>
+    onCompleted: () => {
       refetch({
         variables: {
           projectId: productId,
           sbomId: sbomId,
           first: totalRows,
-          last: undefined,
           field: vulnField,
           direction: vulnDirection
         }
       })
+    }
   })
 
   const handleStatusChange = (e) => {
