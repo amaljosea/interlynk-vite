@@ -57,12 +57,14 @@ const ProdStatusDrawer = ({
   const [compVexCreate] = useMutation(updateCompVulnVex, {
     onCompleted: () =>
       refetch({
-        projectId: productId,
-        sbomId: sbomId,
-        first: totalRows,
-        last: undefined,
-        field: vulnField,
-        direction: vulnDirection
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          first: totalRows,
+          last: undefined,
+          field: vulnField,
+          direction: vulnDirection
+        }
       })
   })
 
