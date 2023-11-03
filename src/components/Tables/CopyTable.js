@@ -1,20 +1,29 @@
-import { ExternalLinkIcon } from '@chakra-ui/icons'
+import { useMutation } from '@apollo/client'
+import { ChevronDownIcon, ExternalLinkIcon } from '@chakra-ui/icons'
 import {
   Flex,
   Text,
   Tag,
   TagLabel,
   Icon,
-  Button,
   Link,
   Input,
   Tooltip,
-  useColorModeValue
+  useColorModeValue,
+  Menu,
+  Button,
+  MenuList,
+  MenuItem,
+  MenuButton
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
-import React, { useMemo, useState } from 'react'
+import CustomLoader from 'components/CustomLoader'
+import GlobalContext from 'context/GlobalContext'
+import { updateCompVulnVex } from 'graphQL/Mutation'
+import React, { useContext, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { statusColor } from 'utils'
+import { useLocation } from 'react-router-dom'
+import { mergeData, sevColor } from 'utils'
 
 const customStyles = {
   headCells: {
@@ -24,25 +33,101 @@ const customStyles = {
       fontSize: '12px',
       letterSpacing: '1px'
     }
+  },
+  subHeader: {
+    style: {
+      padding: 0,
+      margin: 0
+    }
   }
 }
 
-const CopyTable = ({ data }) => {
-  const customerView = location.pathname.startsWith('/customer')
+const statusColor = (status) => {
+  if (status && status === 'Fixed') {
+    return 'blue'
+  } else if (status && status === 'Not Affected') {
+    return 'green'
+  } else if (status && status === 'Affected') {
+    return 'red'
+  } else if (status && status === 'False Positive') {
+    return 'purple'
+  } else if (status && status === 'In Triage') {
+    return 'cyan'
+  } else {
+    return 'gray'
+  }
+}
+
+const CopyTable = ({
+  data,
+  productId,
+  sbomId,
+  getVulns,
+  refetch,
+  setFinalData
+}) => {
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const currentSbomId = queryParams.get('sbom')
 
   const [selectedRows, setSelectedRows] = useState([])
 
   const textColor = useColorModeValue('gray.700', 'white')
 
-  const sevColor = (cvss) => {
-    if (cvss >= 9.0) {
-      return 'red'
-    } else if (cvss >= 7.0) {
-      return 'orange'
-    } else if (cvss >= 6.0) {
-      return 'yellow'
-    } else {
-      return 'green'
+  const { vulnField, vulnDirection, totalRows } = useContext(GlobalContext)
+
+  const [compVexCreate] = useMutation(updateCompVulnVex)
+
+  const fetchMergeList = async (currentData) => {
+    await getVulns({
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        field: vulnField,
+        direction: vulnDirection
+      }
+    }).then((res) => {
+      const data = mergeData(currentData, res.data.sbom.vulns.nodes)
+      setFinalData(data)
+    })
+  }
+
+  const refetchCurrentVuln = async () => {
+    try {
+      await refetch({
+        variables: {
+          projectId: productId,
+          sbomId: currentSbomId,
+          first: totalRows,
+          field: vulnField,
+          direction: vulnDirection
+        }
+      }).then((res) => {
+        if (res.data) {
+          fetchMergeList(res.data.sbom.vulns.nodes)
+        }
+      })
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const handleUpdate = (row) => {
+    const { importJustification, importStatus, id } = row
+    try {
+      compVexCreate({
+        variables: {
+          compVulnId: id,
+          notes: 'testing',
+          sbomId: sbomId,
+          vexStatusId: importStatus.id,
+          vexJustificationId: importJustification
+            ? importJustification.id
+            : undefined
+        }
+      }).then(() => refetchCurrentVuln())
+    } catch (error) {
+      console.log('Mutation error', error)
     }
   }
 
@@ -65,69 +150,41 @@ const CopyTable = ({ data }) => {
               />
               <Tooltip label={vuln.vulnId} placement={'top'}>
                 <Text fontSize='sm' color={textColor}>
-                  {vuln.vulnId !== null
-                    ? `${vuln.vulnId?.substring(0, 15)}${
-                        vuln.vulnId.length > 15 ? '...' : ''
-                      }`
-                    : ''}
+                  {vuln.vulnId !== null ? vuln.vulnId : ''}
                 </Text>
               </Tooltip>
             </Flex>
           </Link>
         )
-      },
-      width: '200px'
+      }
     },
     // SEVERITY
     {
       id: 'serverity',
       name: 'SEVERITY',
-      selector: (row) => '',
+      selector: (row) => {
+        const { vuln } = row
+        return (
+          <>
+            {vuln.sev !== null ? (
+              <Tag
+                size='md'
+                variant='subtle'
+                width={'80px'}
+                colorScheme={sevColor(`${vuln.sev}`)}
+              >
+                <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
+                  {vuln.sev}
+                </TagLabel>
+              </Tag>
+            ) : (
+              ''
+            )}
+          </>
+        )
+      },
+      width: '130px',
       width: '150px'
-    },
-    // SOURCE
-    {
-      id: 'source',
-      name: 'SOURCE',
-      selector: (row) => {
-        const { vuln } = row
-        return (
-          <Tag
-            size='sm'
-            key='md'
-            variant='solid'
-            colorScheme={vuln.source === 'osv' ? 'red' : 'blue'}
-            textTransform={'uppercase'}
-            width={'100%'}
-            alignItems={'center'}
-            justifyContent={'center'}
-          >
-            <TagLabel>{vuln.source}</TagLabel>
-          </Tag>
-        )
-      },
-      width: '110px'
-    },
-    // CVSS
-    {
-      id: 'cvss',
-      name: 'CVSS',
-      selector: (row) => {
-        const { vuln } = row
-        return (
-          <Flex minWidth='max-content' alignItems='center' gap='2'>
-            <Tag
-              size='md'
-              key='md'
-              variant='subtle'
-              colorScheme={sevColor(vuln.cvssScore)}
-            >
-              <TagLabel>{vuln.cvssScore ? vuln.cvssScore : 0}</TagLabel>
-            </Tag>
-          </Flex>
-        )
-      },
-      width: '100px'
     },
     // COMPONENT
     {
@@ -154,34 +211,75 @@ const CopyTable = ({ data }) => {
       id: 'version',
       name: 'VERSION',
       selector: (row) => row.component.version,
-      width: '130px'
+      width: '300px'
     },
-    // STATUS
+    // CURRENT STATUS
     {
-      id: 'status',
-      name: 'STATUS',
+      id: 'currentStatus',
+      name: 'CURRENT STATUS',
       selector: (row) => {
         const { vexStatus } = row
         return (
           <Tag
-            fontWeight={'normal'}
+            size='md'
             variant='solid'
-            size='sm'
-            colorScheme={statusColor(vexStatus ? vexStatus.name : 'In Triage')}
+            width={'130px'}
+            colorScheme={statusColor(
+              vexStatus ? vexStatus.name : 'Unspecified'
+            )}
           >
-            {vexStatus !== null ? vexStatus.name : 'In Triage'}
+            <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
+              {vexStatus !== null ? vexStatus.name : 'Unspecified'}
+            </TagLabel>
           </Tag>
         )
-      }
+      },
+      sortable: true,
+      width: '200px'
+    },
+    // SELECTED STATUS
+    {
+      id: 'selectedStatus',
+      name: 'IMPORT STATUS',
+      selector: (row) => {
+        const { importStatus } = row
+        return (
+          <Tag
+            size='md'
+            variant='solid'
+            width={'130px'}
+            colorScheme={statusColor(
+              importStatus ? importStatus.name : 'Unspecified'
+            )}
+          >
+            <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
+              {importStatus ? importStatus.name : 'Unspecified'}
+            </TagLabel>
+          </Tag>
+        )
+      },
+      width: '200px'
+    },
+    // UPDATED AT
+    {
+      id: 'action',
+      name: 'ACTI0N',
+      selector: (row) => (
+        <Menu>
+          <MenuButton size='sm' as={Button} rightIcon={<ChevronDownIcon />}>
+            Update
+          </MenuButton>
+          <MenuList>
+            <MenuItem fontSize={'14px'}>Keep existing</MenuItem>
+            {row.importStatus !== null && (
+              <MenuItem fontSize={'14px'} onClick={() => handleUpdate(row)}>
+                Replace from Import
+              </MenuItem>
+            )}
+          </MenuList>
+        </Menu>
+      )
     }
-    // // UPDATED AT
-    // {
-    //   id: 'updatedAt',
-    //   name: 'UPDATED AT',
-    //   selector: (row) => getFullDateAndTime(row.vuln.updatedAt),
-    //   sortable: true
-    // },
-    // ACTION
   ]
 
   const subHeaderComponentMemo = useMemo(() => {
@@ -191,16 +289,10 @@ const CopyTable = ({ data }) => {
         alignItems={'center'}
         justifyContent={'space-between'}
       >
-        <Input
-          width={'400px'}
-          id='search'
-          type='text'
-          placeholder='Search'
-          aria-label='Search Input'
-        />
+        <Text>Total : {data && data.length}</Text>
       </Flex>
     )
-  }, [])
+  }, [data])
 
   const linkURl = (type, id) => {
     if (type === 'osv') {
@@ -211,31 +303,21 @@ const CopyTable = ({ data }) => {
   }
 
   return (
-    <Card py={6}>
-      {data.nodes.length > 0 ? (
-        <Flex flexDir={'column'} width={'100%'} mt={2}>
-          <DataTable
-            columns={columns}
-            data={data.nodes}
-            customStyles={customStyles}
-            progressPending={data.length === 0}
-            subHeader
-            subHeaderComponent={subHeaderComponentMemo}
-            responsive={true}
-            selectableRows={true}
-            selectableRowSelected={(row) => row}
-          />
-        </Flex>
-      ) : (
-        <Flex
-          width={'100%'}
-          mt={4}
-          alignItems={'center'}
-          justifyContent={'center'}
-        >
-          <Text>No data found</Text>
-        </Flex>
-      )}
+    <Card p={0}>
+      <Flex flexDir={'column'} width={'100%'} mb={6}>
+        <DataTable
+          columns={columns}
+          data={data && data}
+          customStyles={customStyles}
+          progressPending={data.length === 0 ? true : false}
+          progressComponent={<CustomLoader />}
+          subHeader
+          subHeaderComponent={subHeaderComponentMemo}
+          responsive={true}
+          selectableRows={true}
+          // selectableRowSelected={(row) => row}
+        />
+      </Flex>
     </Card>
   )
 }

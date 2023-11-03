@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import {
   Progress,
   Box,
@@ -14,15 +14,22 @@ import {
 import { useLazyQuery, useQuery } from '@apollo/client'
 import { GetProjectData, GetProject, GetVulnData } from 'graphQL/Queries'
 import CopyTable from 'components/Tables/CopyTable'
+import GlobalContext from 'context/GlobalContext'
+import { useLocation } from 'react-router-dom'
+import { mergeData } from 'utils'
 
 let productId
 let sbomId
-const uniqVersions = []
 
 // FORM ONE
 const Form1 = () => {
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const sbomVersionId = queryParams.get('sbom')
+
   const [selectedProd, setSelectedProd] = useState('')
   const [selectedVersion, setSelectedVersion] = useState('')
+  const [uniqVersions, setUniqVersions] = useState([])
 
   const { data: allProducts } = useQuery(GetProjectData, {
     variables: {
@@ -47,20 +54,27 @@ const Form1 = () => {
         id: e.target.value
       }
     }).then((res) => {
-      console.log(res.data.project.sboms)
+      if (res.data) {
+        let versions = []
+        res.data.project.sboms.map((project) => {
+          if (project.primaryComponent) {
+            versions.push({
+              version: project.primaryComponent.version,
+              id: project.id,
+              updatedAt: project.updatedAt
+            })
+          }
+        })
+        setUniqVersions(versions)
+      }
     })
   }
 
-  data &&
-    data.project.sboms.map((project) => {
-      if (project.primaryComponent) {
-        uniqVersions.push({
-          version: project.primaryComponent.version,
-          id: project.id,
-          updatedAt: project.updatedAt
-        })
-      }
-    })
+  const filterVersions =
+    uniqVersions.length > 0 &&
+    uniqVersions.filter((version) => version.id !== `${sbomVersionId}`)
+
+  // console.log('uniqVersions', uniqVersions)
 
   // remove duplicates
   const removeDuplicatesAndLatest = (arr) => {
@@ -78,26 +92,16 @@ const Form1 = () => {
     return Object.values(uniqueVersions)
   }
 
-  const filteredData = uniqVersions
-    ? removeDuplicatesAndLatest(uniqVersions)
+  const filteredData = filterVersions
+    ? removeDuplicatesAndLatest(filterVersions)
     : []
+
+  // console.log('selectedProd', selectedProd)
+  // console.log('selectedVersion', selectedVersion)
 
   return (
     <>
-      <Box
-        bg='blue.600'
-        w='100%'
-        p={4}
-        color='white'
-        fontWeight='medium'
-        fontSize='20px'
-        align='center'
-        borderRadius='xl'
-        boxShadow='md'
-      >
-        Status Import coming soon...
-      </Box>
-      <Box width={'400px'} margin={'0 auto'} display={'none'}>
+      <Box width={'400px'} margin={'0 auto'}>
         <Stack spacing={4} direction={'column'} gap={2}>
           {/* Project */}
           <FormControl fontSize={'sm'}>
@@ -131,8 +135,8 @@ const Form1 = () => {
               }}
             >
               <option value={''}>-- Select --</option>
-              {filteredData.length > 0 &&
-                filteredData.map((item, index) => (
+              {filterVersions.length > 0 &&
+                filterVersions.map((item, index) => (
                   <option key={index} value={item.id}>
                     {item.version}
                   </option>
@@ -204,17 +208,32 @@ const Form3 = () => {
 }
 
 // FORM FOUR
-const Form4 = () => {
+const Form4 = ({ currentData, refetch }) => {
+  const { vulnField, vulnDirection } = useContext(GlobalContext)
+
   // GET VULN DATA
-  const { data: vulnData } = useQuery(GetVulnData, {
-    variables: {
-      projectId: productId,
-      sbomId: sbomId,
-      first: 10,
-      field: 'UPDATED_AT',
-      direction: 'ASC'
+  const [getVulns, { data: vulnData }] = useLazyQuery(GetVulnData)
+  const [finalData, setFinalData] = useState([])
+
+  useEffect(() => {
+    if (productId && sbomId) {
+      getVulns({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          field: vulnField,
+          direction: vulnDirection
+        }
+      })
     }
-  })
+  }, [])
+
+  useEffect(() => {
+    if (vulnData) {
+      const data = mergeData(currentData, vulnData.sbom.vulns.nodes)
+      setFinalData(data)
+    }
+  }, [vulnData])
 
   return (
     <>
@@ -228,13 +247,20 @@ const Form4 = () => {
         Vunlerability view resolved by
       </Text>
       <Box width={'90%'} margin={'0 auto'}>
-        {vulnData && <CopyTable data={vulnData.sbom.vulns} />}
+        <CopyTable
+          data={finalData}
+          productId={productId}
+          sbomId={sbomId}
+          getVulns={getVulns}
+          refetch={refetch}
+          setFinalData={setFinalData}
+        />
       </Box>
     </>
   )
 }
 
-const Multistep = ({ step, progress }) => {
+const Multistep = ({ step, progress, currentData, refetch }) => {
   return (
     <>
       <Box as='form'>
@@ -252,7 +278,7 @@ const Multistep = ({ step, progress }) => {
         ) : step === 3 ? (
           <Form3 />
         ) : (
-          step === 4 && <Form4 />
+          step === 4 && <Form4 currentData={currentData} refetch={refetch} />
         )}
       </Box>
     </>
