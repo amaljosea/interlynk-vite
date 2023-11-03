@@ -153,6 +153,7 @@ const VulnFilterMenu = ({
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const handleSubmit = () => {
+    setVulnEpss('')
     const range = {
       min: parseInt(minVal)/10000,
       max: parseInt(maxVal)/10000
