@@ -65,6 +65,13 @@ const VulnFilterMenu = ({
 
   const { vulnCompNames, vulnStatuses } = vulnFilters
 
+  const epss = vulnEpss !== 'all' && vulnEpss.split('-')
+
+  const range = {
+    min: parseFloat(epss[0]),
+    max: parseFloat(epss[1])
+  }
+
   const onFilterCompName = (value) => {
     setVulnComponent(value.includes('all') ? [] : value)
     refetch({
@@ -72,6 +79,10 @@ const VulnFilterMenu = ({
         projectId: productId,
         sbomId: sbomId,
         componentName: value.includes('all') ? undefined : value,
+        severity: vulnSeverity.length > 0 ? vulnSeverity : undefined,
+        status: vulnStatus.length > 0 ? vulnStatus : undefined,
+        kev: vulnKev === 'all' ? undefined : vulnKev === 'yes' ? true : false,
+        epss: vulnEpss !== '' ? range : undefined,
         first: totalRows,
         field: vulnField,
         direction: vulnDirection
@@ -87,6 +98,10 @@ const VulnFilterMenu = ({
         projectId: productId,
         sbomId: sbomId,
         severity: value.includes('all') ? undefined : value,
+        componentName: vulnComponent.length > 0 ? vulnComponent : undefined,
+        status: vulnStatus.length > 0 ? vulnStatus : undefined,
+        kev: vulnKev === 'all' ? undefined : vulnKev === 'yes' ? true : false,
+        epss: vulnEpss !== '' ? range : undefined,
         first: totalRows,
         field: vulnField,
         direction: vulnDirection
@@ -102,6 +117,10 @@ const VulnFilterMenu = ({
         projectId: productId,
         sbomId: sbomId,
         status: value.includes('all') ? undefined : value,
+        severity: vulnSeverity.length > 0 ? vulnSeverity : undefined,
+        componentName: vulnComponent.length > 0 ? vulnComponent : undefined,
+        kev: vulnKev === 'all' ? undefined : vulnKev === 'yes' ? true : false,
+        epss: vulnEpss !== '' ? range : undefined,
         first: totalRows,
         field: vulnField,
         direction: vulnDirection
@@ -117,6 +136,10 @@ const VulnFilterMenu = ({
         projectId: productId,
         sbomId: sbomId,
         kev: value === 'all' ? undefined : value === 'yes' ? true : false,
+        severity: vulnSeverity.length > 0 ? vulnSeverity : undefined,
+        componentName: vulnComponent.length > 0 ? vulnComponent : undefined,
+        status: vulnStatus.length > 0 ? vulnStatus : undefined,
+        epss: vulnEpss !== '' ? range : undefined,
         first: totalRows,
         field: vulnField,
         direction: vulnDirection
@@ -142,6 +165,10 @@ const VulnFilterMenu = ({
         projectId: productId,
         sbomId: sbomId,
         epss: value === 'all' ? undefined : range,
+        severity: vulnSeverity.length > 0 ? vulnSeverity : undefined,
+        componentName: vulnComponent.length > 0 ? vulnComponent : undefined,
+        status: vulnStatus.length > 0 ? vulnStatus : undefined,
+        kev: vulnKev === 'all' ? undefined : vulnKev === 'yes' ? true : false,
         first: totalRows,
         field: vulnField,
         direction: vulnDirection
@@ -162,6 +189,10 @@ const VulnFilterMenu = ({
       variables: {
         projectId: productId,
         sbomId: sbomId,
+        severity: vulnSeverity.length > 0 ? vulnSeverity : undefined,
+        componentName: vulnComponent.length > 0 ? vulnComponent : undefined,
+        status: vulnStatus.length > 0 ? vulnStatus : undefined,
+        kev: vulnKev === 'all' ? undefined : vulnKev === 'yes' ? true : false,
         epss: range,
         first: totalRows,
         field: vulnField,
