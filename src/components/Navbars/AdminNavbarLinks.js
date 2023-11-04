@@ -42,7 +42,12 @@ export default function HeaderLinks(props) {
   const location = useLocation()
   const history = useHistory()
 
-  const [getOrgInfo, { data }] = useLazyQuery(GetOrg)
+  const [getOrgInfo, { data, loading, error }] = useLazyQuery(GetOrg)
+
+  if (error) {
+    console.error('error : ', error)
+    history.push('/auth')
+  }
 
   useEffect(() => {
     if (!customerView && data === undefined) {
