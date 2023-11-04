@@ -66,7 +66,7 @@ function Profile() {
     }
   }, [activetab])
 
-  const { data: orgInfo, refetch } = useQuery(GetOrg)
+  const { data: orgInfo, refetch, error } = useQuery(GetOrg)
 
   return (
     <>
