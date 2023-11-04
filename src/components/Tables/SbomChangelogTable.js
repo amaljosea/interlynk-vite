@@ -8,7 +8,6 @@ import {
   Select,
   TagLabel,
   Tooltip,
-  Skeleton,
   Badge
 } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
@@ -268,6 +267,8 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
     await refetch({
       projectId: productId,
       sbomId: sbomId,
+      first: undefined,
+      after: undefined,
       last: totalRows,
       before: data.pageInfo.startCursor,
       field: logField,
@@ -282,6 +283,8 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
       sbomId: sbomId,
       first: totalRows,
       after: data.pageInfo.endCursor,
+      last: undefined,
+      before: undefined,
       field: logField,
       direction: logDirection
     })
