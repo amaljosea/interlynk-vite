@@ -66,7 +66,14 @@ const SBOMTable = ({
     totalRows,
     setTotalRows,
     activeProdTab,
-    setActiveProdTab
+    setActiveProdTab,
+    vulnField,
+    vulnDirection,
+    vulnSeverity,
+    vulnComponent,
+    vulnStatus,
+    vulnKev,
+    vulnEpss
   } = useContext(GlobalContext)
 
   const tab = window.localStorage.getItem('activeProdTab')
@@ -115,50 +122,12 @@ const SBOMTable = ({
   // GET LOGS FILTER HEADS
   const [getLogsFilters] = useLazyQuery(GetLogsFilterData)
 
-  // FETCH COMPONENT DATA
-  useEffect(() => {
-    if (compData === undefined) {
-      getCompData({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          first: totalRows,
-          field: compField,
-          direction: compDirection
-        }
-      })
-    }
-  }, [])
+  const epss = vulnEpss !== 'all' && vulnEpss.split('-')
 
-  // FETCH HEALTH CHECK DATA
-  useEffect(() => {
-    if (checkData === undefined) {
-      getCheckData({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          first: totalRows,
-          field: checkField,
-          direction: checkDirection
-        }
-      })
-    }
-  }, [])
-
-  // FETCH ACTIVITY LOGS DATA
-  useEffect(() => {
-    if (logsData === undefined) {
-      getLogData({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          first: totalRows,
-          field: logField,
-          direction: logDirection
-        }
-      })
-    }
-  }, [])
+  const range = {
+    min: parseFloat(epss[0]),
+    max: parseFloat(epss[1])
+  }
 
   // FETCH FILTER DATA BASE ON SELECTED TAB
   useEffect(() => {
@@ -168,6 +137,16 @@ const SBOMTable = ({
         sbomId: sbomId
       })
     } else if (activeProdTab === 1) {
+      // FETCH COMPONENT DATA
+      getCompData({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          first: totalRows,
+          field: compField,
+          direction: compDirection
+        }
+      })
       getCompFilters({
         variables: {
           projectId: productId,
@@ -179,6 +158,20 @@ const SBOMTable = ({
         }
       })
     } else if (activeProdTab === 2) {
+      getVulnData({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          first: totalRows,
+          severity: vulnSeverity.length > 0 ? vulnSeverity : undefined,
+          componentName: vulnComponent.length > 0 ? vulnComponent : undefined,
+          status: vulnStatus.length > 0 ? vulnStatus : undefined,
+          kev: vulnKev === 'all' ? undefined : vulnKev === 'yes' ? true : false,
+          epss: vulnEpss !== '' ? range : undefined,
+          field: vulnField,
+          direction: vulnDirection
+        }
+      })
       getVulnFilters({
         variables: {
           projectId: productId,
@@ -190,6 +183,16 @@ const SBOMTable = ({
         }
       })
     } else if (activeProdTab === 3) {
+      // FETCH HEALTH CHECK DATA
+      getCheckData({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          first: totalRows,
+          field: checkField,
+          direction: checkDirection
+        }
+      })
       getCheckFilters({
         variables: {
           projectId: productId,
@@ -201,12 +204,15 @@ const SBOMTable = ({
         }
       })
     } else if (activeProdTab === 4) {
-      logsRefetch({
-        projectId: productId,
-        sbomId: sbomId,
-        first: totalRows,
-        field: logField,
-        direction: logDirection
+      // FETCH ACTIVITY LOGS DATA
+      getLogData({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          first: totalRows,
+          field: logField,
+          direction: logDirection
+        }
       })
       getLogsFilters({
         variables: {
@@ -276,11 +282,11 @@ const SBOMTable = ({
             </TabPanel>
             {/* COMPONENT TABLE */}
             <TabPanel px={0}>
-              {compData && data && (
+              {data && (
                 <ComponentTable
                   type={type}
                   lifecycle={lifecycle}
-                  data={compData.sbom.components}
+                  data={compData?.sbom?.components}
                   loading={loading}
                   error={error}
                   refetch={compRefetch}
@@ -291,16 +297,6 @@ const SBOMTable = ({
                   totalRows={totalRows}
                   setTotalRows={setTotalRows}
                 />
-              )}
-
-              {loading && (
-                <Flex width={'100%'} gap={4} direction={'column'}>
-                  <Skeleton width={'100%'} height='20px' />
-                  <Skeleton width={'100%'} height='20px' />
-                  <Skeleton width={'100%'} height='20px' />
-                  <Skeleton width={'100%'} height='20px' />
-                  <Skeleton width={'100%'} height='20px' />
-                </Flex>
               )}
 
               {error && (
@@ -346,12 +342,12 @@ const SBOMTable = ({
             </TabPanel>
             {/* HEALTH CHECK TABLE */}
             <TabPanel px={0}>
-              {checkData && data ? (
+              {data && (
                 <HealthCheckTable
                   productId={productId}
                   sbomId={sbomId}
                   sbomData={data}
-                  data={checkData.sbom.checkResults}
+                  data={checkData?.sbom?.checkResults}
                   refetch={healthRefetch}
                   filterRefetch={checkFilterRefetch}
                   components={components}
@@ -360,36 +356,18 @@ const SBOMTable = ({
                   totalRows={totalRows}
                   setTotalRows={setTotalRows}
                 />
-              ) : (
-                <Flex width={'100%'} gap={4} direction={'column'}>
-                  <Skeleton width={'100%'} height='20px' />
-                  <Skeleton width={'100%'} height='20px' />
-                  <Skeleton width={'100%'} height='20px' />
-                  <Skeleton width={'100%'} height='20px' />
-                  <Skeleton width={'100%'} height='20px' />
-                </Flex>
               )}
             </TabPanel>
             {/* CHANGELOG TABLE */}
             <TabPanel px={0}>
-              {logsData ? (
-                <SbomChangelogTable
-                  data={logsData.sbom.activityLogs}
-                  refetch={logsRefetch}
-                  pageIndex={changelogIndex}
-                  setPageIndex={setChangelogIndex}
-                  totalRows={totalRows}
-                  setTotalRows={setTotalRows}
-                />
-              ) : (
-                <Flex width={'100%'} gap={4} direction={'column'}>
-                  <Skeleton width={'100%'} height='20px' />
-                  <Skeleton width={'100%'} height='20px' />
-                  <Skeleton width={'100%'} height='20px' />
-                  <Skeleton width={'100%'} height='20px' />
-                  <Skeleton width={'100%'} height='20px' />
-                </Flex>
-              )}
+              <SbomChangelogTable
+                data={logsData?.sbom?.activityLogs}
+                refetch={logsRefetch}
+                pageIndex={changelogIndex}
+                setPageIndex={setChangelogIndex}
+                totalRows={totalRows}
+                setTotalRows={setTotalRows}
+              />
             </TabPanel>
           </TabPanels>
         </Tabs>

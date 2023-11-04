@@ -512,3 +512,27 @@ export const getFullDate = (dateString) => {
 
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
 }
+
+export const mergeData = (currentData, selectedData) => {
+  const mergedData = currentData.map((currentItem) => {
+    const matchingSelected = selectedData.find(
+      (selectedItem) =>
+        selectedItem.vuln.vulnId === currentItem.vuln.vulnId &&
+        selectedItem.component.name === currentItem.component.name &&
+        selectedItem.component.version === currentItem.component.version
+    )
+
+    if (matchingSelected) {
+      return {
+        ...currentItem,
+        importStatus: matchingSelected.vexStatus,
+        importJustification: matchingSelected.vexJustification
+      }
+    }
+  })
+
+  const data = [...mergedData]
+  const filterList = data.filter((item) => item !== undefined)
+
+  return filterList
+}

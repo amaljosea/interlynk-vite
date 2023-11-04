@@ -19,9 +19,6 @@ import theme from 'theme/theme.js'
 import PanelContainer from '../components/Layout/PanelContainer'
 import PanelContent from '../components/Layout/PanelContent'
 
-import { useLocation } from 'react-router-dom'
-import GlobalContext from 'context/GlobalContext'
-
 import {
   ApolloClient,
   InMemoryCache,
@@ -129,7 +126,7 @@ export default function Dashboard(props) {
                 {getRoute() && (
                   <PanelContent>
                     <PanelContainer>
-                      {userName ? (
+                      {authToken ? (
                         <Switch>
                           {getRoutes(dashRoutes)}
                           <Route

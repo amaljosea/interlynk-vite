@@ -187,16 +187,22 @@ const VulnTable = ({
       selector: (row) => {
         const { vuln } = row
         return (
-          <Tag
-            size='md'
-            variant='subtle'
-            width={'80px'}
-            colorScheme={sevColor(`${vuln.sev}`)}
-          >
-            <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
-              {vuln.sev}
-            </TagLabel>
-          </Tag>
+          <>
+            {vuln.sev !== null ? (
+              <Tag
+                size='md'
+                variant='subtle'
+                width={'80px'}
+                colorScheme={sevColor(`${vuln.sev}`)}
+              >
+                <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
+                  {vuln.sev}
+                </TagLabel>
+              </Tag>
+            ) : (
+              ''
+            )}
+          </>
         )
       },
       width: '120px',
@@ -334,7 +340,7 @@ const VulnTable = ({
           <Tag
             size='md'
             variant='solid'
-            width={'110px'}
+            width={'130px'}
             colorScheme={statusColor(
               vexStatus ? vexStatus.name : 'Unspecified'
             )}
@@ -540,17 +546,33 @@ const VulnTable = ({
     )
   }
 
-  const handleSubmit = () => {
-    setStep(1)
-    setProgress(25)
-    onTableClose()
-    toast({
-      description: 'Data Imported successsfully',
-      status: 'success',
-      duration: 3000,
-      isClosable: true,
-      position: 'top'
-    })
+  const handleSubmit = async () => {
+    try {
+      await refetch({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          first: totalRows,
+          field: vulnField,
+          direction: vulnDirection
+        }
+      }).then((res) => {
+        if (res.data) {
+          setStep(1)
+          setProgress(25)
+          onTableClose()
+          toast({
+            description: 'Data Imported successsfully',
+            status: 'success',
+            duration: 3000,
+            isClosable: true,
+            position: 'top'
+          })
+        }
+      })
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   const epss = vulnEpss !== 'all' && vulnEpss.split('-')
@@ -706,7 +728,7 @@ const VulnTable = ({
       )}
 
       {/* COPY DATA TABLE */}
-      {isTableOpen && (
+      {isTableOpen && data.nodes.length > 0 && (
         <Drawer
           isOpen={isTableOpen}
           placement='right'
@@ -724,7 +746,12 @@ const VulnTable = ({
 
             <DrawerBody mt={2}>
               {/* IMPORT WIZARD */}
-              <Multistep step={step} progress={progress} />
+              <Multistep
+                currentData={data.nodes}
+                step={step}
+                progress={progress}
+                refetch={refetch}
+              />
             </DrawerBody>
 
             <DrawerFooter>
@@ -762,17 +789,15 @@ const VulnTable = ({
                 </ButtonGroup>
                 {step === 4 ? (
                   <Button
-                    colorScheme='red'
+                    colorScheme='green'
                     variant='solid'
                     onClick={handleSubmit}
-                    display={'none'}
                   >
                     Submit
                   </Button>
                 ) : (
                   <Button
                     isDisabled={step === 4}
-                    display={'none'}
                     rightIcon={<ChevronRightIcon w={6} h={6} />}
                     onClick={() => {
                       setStep(step + 1)
