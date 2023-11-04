@@ -16,8 +16,7 @@ import {
 } from '@chakra-ui/react'
 import GlobalContext from 'context/GlobalContext'
 import { recheckHealth, supplierUpdate, supplierCreate } from 'graphQL/Mutation'
-import { useContext } from 'react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { useLocation } from 'react-router-dom'
 
 const PriSupplierModal = ({
@@ -26,8 +25,7 @@ const PriSupplierModal = ({
   refetch,
   suppliers,
   checkId,
-  totalRows,
-  filterRefetch
+  totalRows
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -50,13 +48,6 @@ const PriSupplierModal = ({
       productId: productId,
       sbomId: sbomId
     })
-  }
-
-  const onFilterRefetch = () => {
-    filterRefetch({
-      projectId: productId,
-      sbomId: sbomId
-    }).then((res) => setCheckFilters(res.data.sbom.filters))
   }
 
   const [createSupplier] = useMutation(supplierCreate, {
@@ -101,10 +92,6 @@ const PriSupplierModal = ({
       }
     })
       .then((res) => {
-        if (res.data) {
-          onFilterRefetch()
-        }
-
         if (checkId) {
           healthRecheck({
             variables: {
