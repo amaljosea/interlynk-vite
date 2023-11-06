@@ -8,8 +8,7 @@ import {
   FormControl,
   Select,
   Checkbox,
-  Flex,
-  Skeleton
+  Flex
 } from '@chakra-ui/react'
 import { useLazyQuery, useQuery } from '@apollo/client'
 import { GetProjectData, GetProject, GetVulnData } from 'graphQL/Queries'
@@ -33,7 +32,7 @@ const Form1 = () => {
 
   const { data: allProducts } = useQuery(GetProjectData, {
     variables: {
-      first: 10
+      first: 50
     }
   })
 
@@ -44,7 +43,7 @@ const Form1 = () => {
       label: option.name
     }))
 
-  const [getProduct, { data }] = useLazyQuery(GetProject)
+  const [getProduct] = useLazyQuery(GetProject)
 
   const handleSelectProduct = (e) => {
     setSelectedProd(e.target.value)
