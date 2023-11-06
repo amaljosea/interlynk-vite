@@ -204,6 +204,9 @@ const HealthCheckTable = ({
       projectId: productId,
       sbomId: sbomId,
       first: Number(e.target.value),
+      last: undefined,
+      after: undefined,
+      before: undefined,
       field: checkField,
       direction: checkDirection
     })
