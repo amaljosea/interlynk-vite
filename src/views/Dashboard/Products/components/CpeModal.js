@@ -49,6 +49,7 @@ const CpeModal = ({
 
   const [vendor, setVendor] = useState('')
   const [product, setProduct] = useState('')
+  const [type, setType] = useState('')
   const [version, setVersion] = useState('')
   const [hardware, setHardware] = useState('')
   const [vendorProgressValue, setVendorProgressValue] = useState(0)
@@ -267,6 +268,15 @@ const CpeModal = ({
     setVerProgressValue(verProgressValue)
   }
 
+  const handleTypeChange = (e) => {
+    setType(e.target.value)
+    const cpeParts = updatedString.split(':')
+    cpeParts[2] = e.target.value
+    const cpeString = cpeParts.join(':')
+    // console.log('CPE String: ' + cpeString)
+    setUpdatedString(cpeString)
+  }
+
   const handleProductChange = (e) => {
     setProduct(e.target.value)
     const cpeParts = updatedString.split(':')
@@ -355,6 +365,21 @@ const CpeModal = ({
                     colorScheme={getProgressColor(vendorProgressValue)}
                   />
                 </Stack>
+              </FormControl>
+              {/* Type */}
+              <FormControl>
+                <FormLabel htmlFor='type'>Type</FormLabel>
+                <Select
+                  size='md'
+                  id='type'
+                  name='type'
+                  value={type}
+                  onChange={handleTypeChange}
+                >
+                  <option value='a'>application</option>
+                  <option value='o'>operating system</option>
+                  <option value='h'>hardware</option>
+                </Select>
               </FormControl>
               {/* Product */}
               <FormControl>

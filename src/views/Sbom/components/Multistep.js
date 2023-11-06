@@ -8,8 +8,7 @@ import {
   FormControl,
   Select,
   Checkbox,
-  Flex,
-  Skeleton
+  Flex
 } from '@chakra-ui/react'
 import { useLazyQuery, useQuery } from '@apollo/client'
 import { GetProjectData, GetProject, GetVulnData } from 'graphQL/Queries'
@@ -33,7 +32,7 @@ const Form1 = () => {
 
   const { data: allProducts } = useQuery(GetProjectData, {
     variables: {
-      first: 10
+      first: 25
     }
   })
 
@@ -44,7 +43,7 @@ const Form1 = () => {
       label: option.name
     }))
 
-  const [getProduct, { data }] = useLazyQuery(GetProject)
+  const [getProduct] = useLazyQuery(GetProject)
 
   const handleSelectProduct = (e) => {
     setSelectedProd(e.target.value)
@@ -247,14 +246,24 @@ const Form4 = ({ currentData, refetch }) => {
         Vunlerability view resolved by
       </Text>
       <Box width={'90%'} margin={'0 auto'}>
-        <CopyTable
-          data={finalData}
-          productId={productId}
-          sbomId={sbomId}
-          getVulns={getVulns}
-          refetch={refetch}
-          setFinalData={setFinalData}
-        />
+        {finalData.length > 0 ? (
+          <CopyTable
+            data={finalData}
+            productId={productId}
+            sbomId={sbomId}
+            getVulns={getVulns}
+            refetch={refetch}
+            setFinalData={setFinalData}
+          />
+        ) : (
+          <Flex
+            width={'100%'}
+            alignItems={'center'}
+            justifyContent={'space-between'}
+          >
+            <Text>Total : {finalData.length}</Text>
+          </Flex>
+        )}
       </Box>
     </>
   )
