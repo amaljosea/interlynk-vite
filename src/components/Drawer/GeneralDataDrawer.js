@@ -518,7 +518,7 @@ const GeneralDataDrawer = ({
                       onChange={(e) => setSupName(e.target.value)}
                     />
                   </FormControl>
-                  <FormControl isRequired>
+                  <FormControl>
                     <Input
                       type='email'
                       placeholder='Email'

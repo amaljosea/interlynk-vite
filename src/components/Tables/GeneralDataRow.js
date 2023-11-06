@@ -299,7 +299,13 @@ const GeneralDataRow = ({ status, type, data, refetch }) => {
                         colorScheme='orange'
                       >
                         <TagLabel>
-                          {item.name} - {item.contactEmail}
+                          {item.name}
+                          {item.contactEmail && (
+                            <>
+                              {' - '}
+                              {item.contactEmail}
+                            </>
+                          )}
                         </TagLabel>
                         {!customerView && (
                           <TagCloseButton

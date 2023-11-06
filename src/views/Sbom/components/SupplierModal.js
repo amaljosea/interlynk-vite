@@ -162,8 +162,7 @@ const SupplierModal = ({
                 />
               </FormControl>
               <FormControl
-                isRequired
-                isInvalid={!validateEmail(supEmail) && supEmail !== ''}
+                isInvalid={!validateEmail(supEmail)}
               >
                 <FormLabel fontSize={'sm'}>Email</FormLabel>
                 <Input
