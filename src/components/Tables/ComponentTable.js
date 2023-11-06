@@ -633,6 +633,9 @@ const ComponentTable = ({
       projectId: productId,
       sbomId: sbomId,
       first: Number(e.target.value),
+      last: undefined,
+      after: undefined,
+      before: undefined,
       field: customerView ? signedCompField : compField,
       direction: customerView ? signedCompDirection : compDirection
     })
@@ -715,7 +718,6 @@ const ComponentTable = ({
       direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
     })
   }
-
 
   const handlePreviousPage = async () => {
     setPageIndex((prev) => pageIndex !== 0 && prev - 1)
