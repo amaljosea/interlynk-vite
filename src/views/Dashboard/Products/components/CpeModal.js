@@ -376,9 +376,9 @@ const CpeModal = ({
                   value={type}
                   onChange={handleTypeChange}
                 >
-                  <option value='a'>application</option>
-                  <option value='o'>operating system</option>
-                  <option value='h'>hardware</option>
+                  <option value='a'>Application</option>
+                  <option value='o'>Operating System</option>
+                  <option value='h'>Hardware</option>
                 </Select>
               </FormControl>
               {/* Product */}
