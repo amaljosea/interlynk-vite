@@ -155,7 +155,7 @@ const SignedSbomTable = ({
         }
       })
     }
-  }, [tabIndex])
+  }, [signedActiveTab])
 
   return (
     <Card>
