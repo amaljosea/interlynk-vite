@@ -161,7 +161,7 @@ const PriSupplierModal = ({
                 <Button
                   colorScheme='blue'
                   type={'submit'}
-                  disabled={!supName || !supEmail || !validateEmail(supEmail)}
+                  disabled={!supName || (supEmail!='' &&  !validateEmail(supEmail))}
                 >
                   Update
                 </Button>
@@ -169,7 +169,7 @@ const PriSupplierModal = ({
                 <Button
                   colorScheme='blue'
                   type={'submit'}
-                  disabled={!supName || !supEmail || !validateEmail(supEmail)}
+                  disabled={!supName || (supEmail!='' &&  !validateEmail(supEmail))}
                 >
                   Save
                 </Button>

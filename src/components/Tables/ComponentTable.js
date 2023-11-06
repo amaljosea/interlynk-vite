@@ -566,9 +566,9 @@ const ComponentTable = ({
                     variant='subtle'
                     colorScheme='orange'
                   >
-                    <TagLabel>
-                      {item.name} - {item.contactEmail}
-                    </TagLabel>
+                  <TagLabel>
+                    {item.name}{item.contactEmail && ` - ${item.contactEmail}`}
+                  </TagLabel>
                     <TagCloseButton onClick={handleSupRemove} />
                   </Tag>
                 ))}
