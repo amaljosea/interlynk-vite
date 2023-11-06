@@ -26,7 +26,8 @@ import {
   UnorderedList,
   ListItem,
   Badge,
-  useToast
+  useToast,
+  HStack
 } from '@chakra-ui/react'
 import React, { useState, useRef, useEffect, useContext } from 'react'
 import Card from 'components/Card/Card.js'
@@ -377,17 +378,26 @@ function SBOM() {
                               Updated {timeSince(sbomData.sbom.updatedAt)}
                             </Text>
                           </Tooltip>
-                          <Tag
-                            mt={1}
-                            w={'fit-content'}
-                            size={'sm'}
-                            variant='outline'
-                            colorScheme='blue'
-                          >
-                            <TagLabel textTransform={'capitalize'}>
-                              {sbomData.sbom.lifecycle}
-                            </TagLabel>
-                          </Tag>
+                          <HStack mt={1} spacing={2} alignItems={'center'}>
+                            <Tag
+                              w={'fit-content'}
+                              size={'sm'}
+                              variant='solid'
+                              colorScheme='blue'
+                            >
+                              <TagLabel>{sbomData.sbom.lifecycle}</TagLabel>
+                            </Tag>
+                            {sbomData.sbom.vulnRunStatus === 'IN_PROGRESS' && (
+                              <Tag
+                                w={'fit-content'}
+                                size={'sm'}
+                                variant='solid'
+                                colorScheme='blue'
+                              >
+                                <TagLabel>scanning</TagLabel>
+                              </Tag>
+                            )}
+                          </HStack>
                           {/* --------------- STATS ------------------- */}
                           <Flex
                             flexDir={'row'}

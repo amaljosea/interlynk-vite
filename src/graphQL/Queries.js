@@ -455,6 +455,7 @@ export const GetProductData = gql`
     sbom(projectId: $projectId, sbomId: $sbomId) {
       id
       updatedAt
+      vulnRunStatus
       primaryComponent {
         id
         name
