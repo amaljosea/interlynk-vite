@@ -146,7 +146,7 @@ const SBOMTable = ({
           field: compField,
           direction: compDirection
         }
-      })
+      }).then((res) => res.data && setComponentIndex(1))
       getCompFilters({
         variables: {
           projectId: productId,
@@ -171,7 +171,7 @@ const SBOMTable = ({
           field: vulnField,
           direction: vulnDirection
         }
-      })
+      }).then((res) => res.data && setVulnIndex(1))
       getVulnFilters({
         variables: {
           projectId: productId,
@@ -192,7 +192,7 @@ const SBOMTable = ({
           field: checkField,
           direction: checkDirection
         }
-      })
+      }).then((res) => res.data && setResultIndex(1))
       getCheckFilters({
         variables: {
           projectId: productId,
@@ -213,7 +213,7 @@ const SBOMTable = ({
           field: logField,
           direction: logDirection
         }
-      })
+      }).then((res) => res.data && setChangelogIndex(1))
       getLogsFilters({
         variables: {
           projectId: productId,

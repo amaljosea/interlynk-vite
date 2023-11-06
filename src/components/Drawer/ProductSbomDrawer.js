@@ -20,7 +20,8 @@ import {
   useDisclosure,
   InputGroup,
   InputRightElement,
-  IconButton
+  IconButton,
+  Text
 } from '@chakra-ui/react'
 import { useMutation } from '@apollo/client'
 import { useLocation } from 'react-router-dom'
@@ -477,12 +478,24 @@ function ProductSbomDrawer(props) {
               {!sbomData && (
                 <>
                   <FormControl>
-                    <FormLabel fontSize={'sm'}>Name</FormLabel>
-                    <Input size='sm' type='text' defaultValue={name} />
+                    <FormLabel htmlFor='sbomName' fontSize={'sm'}>
+                      Name
+                    </FormLabel>
+                    <Input
+                      id='sbomName'
+                      name='sbomName'
+                      size='sm'
+                      type='text'
+                      defaultValue={name}
+                    />
                   </FormControl>
                   <FormControl>
-                    <FormLabel fontSize={'sm'}>Version</FormLabel>
+                    <FormLabel htmlFor='sbomVersion' fontSize={'sm'}>
+                      Version
+                    </FormLabel>
                     <Input
+                      id='sbomVersion'
+                      name='sbomVersion'
                       size='sm'
                       type='text'
                       vaue={version}
@@ -495,7 +508,9 @@ function ProductSbomDrawer(props) {
               {/* Format */}
               {!checkId && (
                 <FormControl>
-                  <FormLabel fontSize={'sm'}>Type</FormLabel>
+                  <FormLabel htmlFor='type' fontSize={'sm'}>
+                    Type
+                  </FormLabel>
                   <Select
                     id='type'
                     name='type'
@@ -522,8 +537,8 @@ function ProductSbomDrawer(props) {
               )}
 
               {/* Licenses */}
-              <FormControl fontSize={'sm'}>
-                <FormLabel fontSize={'sm'}>Licenses</FormLabel>
+              <Stack spacing={2} fontSize={'sm'}>
+                <Text fontSize={'sm'} color={'#222'}>Licenses</Text>
                 <MultiSelect
                   styles={{
                     control: (baseStyles, state) => ({
@@ -535,15 +550,19 @@ function ProductSbomDrawer(props) {
                     })
                   }}
                   isMulti
+                  id='licenses'
+                  name='licenses'
                   value={licenseList}
                   options={licenses}
                   onChange={onLicenseChange}
                 />
-              </FormControl>
+              </Stack>
               {containesOther && (
                 <FormControl>
                   <Input
                     size='sm'
+                    id='other'
+                    name='other'
                     placeholder='Enter a valid SPDX license'
                     value={licenseName}
                     onChange={(e) => setLicenseName(e.target.value)}
@@ -551,106 +570,16 @@ function ProductSbomDrawer(props) {
                 </FormControl>
               )}
 
-              {/* Identifiers */}
-              {/* <FormControl>
-                <FormLabel fontSize={'sm'}>Identifiers</FormLabel>
-                <Stack spacing={3}>
-                  <Stack direction={'row'} spacing={2}>
-                    <InputGroup>
-                      <Input
-                        type='text'
-                        size='sm'
-                        placeholder='PURL'
-                        value={purlValue}
-                        key='purl'
-                        onChange={handlePURLInputChange}
-                      />
-                      <InputRightElement align='center' zIndex={-1}>
-                        {purlValue != null && purlValue !== '' ? (
-                          isPURLInputValid ? (
-                            <CheckIcon color='green' />
-                          ) : (
-                            <WarningTwoIcon color='red' />
-                          )
-                        ) : null}
-                      </InputRightElement>
-                    </InputGroup>
-                    <IconButton
-                      icon={<FaExpandAlt />}
-                      size='sm'
-                      fontWeight={'normal'}
-                      variant='solid'
-                      colorScheme='blue'
-                      width={'fit-content'}
-                      onClick={handlePurlModal}
-                    />
-                  </Stack>
-                  <Stack direction={'row'} spacing={2}>
-                    <InputGroup>
-                      <Input
-                        type='text'
-                        size='sm'
-                        placeholder='CPE'
-                        value={cpeValue}
-                        key='CPE'
-                        onChange={handleCPEInputChange}
-                      />
-                      <InputRightElement align='center' zIndex={-1}>
-                        {cpeValue != null && cpeValue !== '' ? (
-                          isCPEInputValid ? (
-                            <CheckIcon color='green' />
-                          ) : (
-                            <WarningTwoIcon color='red' />
-                          )
-                        ) : null}
-                      </InputRightElement>
-                    </InputGroup>
-                    <IconButton
-                      icon={<FaExpandAlt />}
-                      mt={2}
-                      size='sm'
-                      fontWeight={'normal'}
-                      variant='solid'
-                      colorScheme='blue'
-                      width={'fit-content'}
-                      onClick={handleCpeModal}
-                    />
-                  </Stack>
-                  <Flex
-                    flexDirection={'row'}
-                    flexWrap={'wrap'}
-                    spacing={2}
-                    gap={2}
-                    my={1}
-                  >
-                    {cpeList.map((item, index) => (
-                      <Tag
-                        size='sm'
-                        key={index}
-                        borderRadius='full'
-                        variant='solid'
-                        colorScheme={'blue'}
-                      >
-                        <TagLabel
-                          cursor={'pointer'}
-                          onClick={() => {
-                            setCpeValue(item)
-                            setSelectedCpe({ id: index, name: item })
-                          }}
-                        >
-                          {item}
-                        </TagLabel>
-                        <TagCloseButton onClick={() => deleteCpe(index)} />
-                      </Tag>
-                    ))}
-                  </Flex>
-                </Stack>
-              </FormControl> */}
-
               {/* PRIMARY COMPONENT */}
               {!sbomData && (
-                <FormControl isReadOnly={true}>
-                  <Checkbox size='sm' colorScheme='blue' defaultChecked={true}>
+                <FormControl htmlFor={'isPrimary'} isReadOnly={true}>
+                  <Checkbox
+                    id='isPrimary'
+                    name='isPrimary'
+                    size='sm'
+                    colorScheme='blue'
+                    defaultChecked={true}
+                  >
                     Primary component
                   </Checkbox>
                 </FormControl>

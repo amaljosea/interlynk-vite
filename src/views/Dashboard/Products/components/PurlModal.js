@@ -428,11 +428,11 @@ const PurlModal = ({
               </FormControl>
               {/* Type */}
               <FormControl>
-                <FormLabel>Package Type</FormLabel>
+                <FormLabel htmlFor='packageType'>Package Type</FormLabel>
                 <Select
                   size='md'
-                  id='type'
-                  name='type'
+                  id='packageType'
+                  name='packageType'
                   value={purlType}
                   onChange={handleTypeChange}
                 >
@@ -446,11 +446,13 @@ const PurlModal = ({
               {/* Namespace */}
               {!namespaceOptions.hasOwnProperty(purlType) ? (
                 <FormControl>
-                  <FormLabel>Namespace</FormLabel>
+                  <FormLabel htmlFor='namespace'>Namespace</FormLabel>
                   <Input
                     type='text'
                     mt={1.5}
                     size='md'
+                    id='namespace'
+                    name='namespace'
                     value={namespace}
                     onChange={handleNamespaceChange}
                   />

@@ -50,6 +50,7 @@ import { getFullDateAndTime } from 'utils'
 import GlobalContext from 'context/GlobalContext'
 import CustomLoader from 'components/CustomLoader'
 import RelationshipDrawer from 'components/Drawer/RelationshipDrawer'
+import RowLimit from 'views/Sbom/components/RowLimit'
 
 const customStyles = {
   headCells: {
@@ -385,7 +386,7 @@ const ComponentTable = ({
       sortFunction: (a, b) => {
         const dateA = new Date(a.updatedAt)
         const dateB = new Date(b.updatedAt)
-        return dateA - dateB // Sort in descending order
+        return dateB - dateA // Sort in descending order
       }
     },
     // ACTION
@@ -659,6 +660,7 @@ const ComponentTable = ({
         >
           {/* SEARCH COMPONENTS */}
           <SearchFilter
+            id='component'
             filterText={filterText}
             setFilterText={setFilterText}
             onFilter={handleSearch}
@@ -756,7 +758,7 @@ const ComponentTable = ({
           onSort={handleSort}
           customStyles={customStyles}
           defaultSortAsc={false}
-          defaultSortFieldId={compField}
+          defaultSortFieldId={customerView ? signedCompField : compField}
           progressPending={data ? false : true}
           progressComponent={<CustomLoader />}
           subHeader
@@ -801,14 +803,8 @@ const ComponentTable = ({
             </Box>
           </Stack>
 
-          <Stack alignItems={'center'} direction={'row'} spacing={4}>
-            <Text>Show</Text>
-            <Select width={20} value={totalRows} onChange={handleSetRow}>
-              <option value={25}>25</option>
-              <option value={50}>50</option>
-              <option value={100}>100</option>
-            </Select>
-          </Stack>
+          {/* ROW LIMIT */}
+          <RowLimit onChange={handleSetRow} name='component' />
         </Flex>
       )}
 

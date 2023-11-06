@@ -417,12 +417,12 @@ const CpeModal = ({
               </FormControl>
               {/* Hardware */}
               <FormControl>
-                <FormLabel>Target Hardware</FormLabel>
+                <FormLabel htmlFor='targetHardware'>Target Hardware</FormLabel>
                 <Stack direction='column' spacing={1}>
                   <Select
                     size='md'
-                    id='hardware'
-                    name='hardware'
+                    id='targetHardware'
+                    name='targetHardware'
                     value={hardware}
                     onChange={handleHardwareChange}
                   >

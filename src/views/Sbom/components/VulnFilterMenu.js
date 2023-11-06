@@ -114,6 +114,7 @@ const VulnFilterMenu = ({
         kev: kev === 'all' ? undefined : kev === 'yes' ? true : false,
         epss: epss !== '' && epss !== 'all' ? range : undefined,
         first: totalRows,
+        last: undefined,
         field: customerView ? signedVulnField : vulnField,
         direction: customerView ? signedVulnDirection : vulnDirection
       }
@@ -431,6 +432,8 @@ const VulnFilterMenu = ({
                   width={'75px'}
                   size='sm'
                   placeholder={'min'}
+                  id='minValue'
+                  name='minValue'
                   value={customerView ? signedMinVal : minVal}
                   onChange={(e) =>
                     customerView
@@ -444,6 +447,8 @@ const VulnFilterMenu = ({
                   width={'75px'}
                   size='sm'
                   placeholder={'max'}
+                  id='maxValue'
+                  name='maxValue'
                   value={customerView ? signedMaxVal : maxVal}
                   onChange={(e) =>
                     customerView

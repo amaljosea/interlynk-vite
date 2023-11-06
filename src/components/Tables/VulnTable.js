@@ -48,6 +48,7 @@ import GlobalContext from 'context/GlobalContext'
 import { timeSince } from 'utils'
 import CustomLoader from 'components/CustomLoader'
 import Cookies from 'js-cookie'
+import RowLimit from 'views/Sbom/components/RowLimit'
 
 const customStyles = {
   headCells: {
@@ -394,7 +395,7 @@ const VulnTable = ({
       sortFunction: (a, b) => {
         const dateA = new Date(a.vuln.updatedAt)
         const dateB = new Date(b.vuln.updatedAt)
-        return dateA - dateB // Sort in descending order
+        return dateB - dateA // Sort in descending order
       }
     }
   ]
@@ -454,6 +455,7 @@ const VulnTable = ({
           {/* SEARCH COMPONENTS */}
           {customerView ? (
             <SearchFilter
+              id='vuln'
               filterText={signedVulnSearchInput}
               setFilterText={setSignedVulnSearchInput}
               onFilter={handleSearch}
@@ -461,6 +463,7 @@ const VulnTable = ({
             />
           ) : (
             <SearchFilter
+              id='vuln'
               filterText={vulnSearchInput}
               setFilterText={setVulnSearchInput}
               onFilter={handleSearch}
@@ -800,7 +803,7 @@ const VulnTable = ({
           customStyles={customStyles}
           onSort={handleSort}
           defaultSortAsc={false}
-          defaultSortFieldId={vulnField}
+          defaultSortFieldId={customerView ? signedVulnField : vulnField}
           progressPending={data ? false : true}
           progressComponent={<CustomLoader />}
           subHeader
@@ -844,14 +847,7 @@ const VulnTable = ({
             </Box>
           </Stack>
 
-          <Stack alignItems={'center'} direction={'row'} spacing={4}>
-            <Text>Show</Text>
-            <Select width={20} value={totalRows} onChange={handleSetRow}>
-              <option value={25}>25</option>
-              <option value={50}>50</option>
-              <option value={100}>100</option>
-            </Select>
-          </Stack>
+          <RowLimit onChange={handleSetRow} name='vulnerabilities' />
         </Flex>
       )}
 
