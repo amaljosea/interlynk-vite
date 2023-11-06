@@ -23,7 +23,15 @@ import Cookies from 'js-cookie'
 import { useContext, useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 
-const SignedSbomTable = ({ refetch, data, status, type, filteredData }) => {
+const SignedSbomTable = ({
+  refetch,
+  data,
+  status,
+  type,
+  filteredData,
+  getVulnData,
+  vulnData
+}) => {
   const location = useLocation()
 
   const queryParams = new URLSearchParams(location.search)
@@ -49,7 +57,9 @@ const SignedSbomTable = ({ refetch, data, status, type, filteredData }) => {
     signedVulnComponent,
     signedVulnStatus,
     signedVulnKev,
-    signedVulnEpss
+    signedVulnEpss,
+    signedActiveTab,
+    setSignedActiveTab
   } = useContext(GlobalContext)
 
   const { lifecycle } = data
@@ -59,10 +69,6 @@ const SignedSbomTable = ({ refetch, data, status, type, filteredData }) => {
     getCompData,
     { data: compData, refetch: compRefetch, error, loading }
   ] = useLazyQuery(GetSignedComponentData)
-
-  // GET VULN DATA
-  const [getVulnData, { data: vulnData, refetch: vulnRefetch }] =
-    useLazyQuery(GetSignedVulnData)
 
   // GET COMPONENT FILTER HEADS
   const [getCompFilters, { refetch: compFilterRefetch }] = useLazyQuery(
@@ -83,13 +89,13 @@ const SignedSbomTable = ({ refetch, data, status, type, filteredData }) => {
 
   // FETCH FILTER DATA BASE ON SELECTED TAB
   useEffect(() => {
-    if (tabIndex === 0) {
+    if (signedActiveTab === 0) {
       refetch({
         projectId: productId,
         sbomId: sbomId,
         signedParams: signedParams
       })
-    } else if (tabIndex === 1) {
+    } else if (signedActiveTab === 1) {
       getCompData({
         variables: {
           projectId: productId,
@@ -111,7 +117,7 @@ const SignedSbomTable = ({ refetch, data, status, type, filteredData }) => {
           setSignedCompFilters(res.data.sbom.filters)
         }
       })
-    } else if (tabIndex === 2) {
+    } else if (signedActiveTab === 2) {
       getVulnData({
         variables: {
           projectId: productId,
@@ -155,8 +161,8 @@ const SignedSbomTable = ({ refetch, data, status, type, filteredData }) => {
     <Card>
       <Tabs
         variant='enclosed'
-        defaultIndex={tabIndex}
-        onChange={(value) => setTabIndex(value)}
+        index={signedActiveTab}
+        onChange={(value) => setSignedActiveTab(Number(value))}
       >
         {/* TAB LIST */}
         <TabList mt='20px'>

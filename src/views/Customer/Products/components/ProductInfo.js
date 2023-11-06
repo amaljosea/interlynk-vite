@@ -16,7 +16,7 @@ import {
   IconButton,
   Skeleton
 } from '@chakra-ui/react'
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useContext } from 'react'
 import {
   FaBalanceScale,
   FaBug,
@@ -26,7 +26,7 @@ import {
   FaLayerGroup
 } from 'react-icons/fa'
 import { useLocation, useHistory } from 'react-router-dom'
-import { useQuery } from '@apollo/client'
+import { useLazyQuery, useQuery } from '@apollo/client'
 import { GetSignedSBOM, GetProjectInfo } from 'graphQL/Queries'
 import { timeSince } from 'utils'
 import Card from 'components/Card/Card'
@@ -37,6 +37,8 @@ import { getFullDateAndTime } from 'utils'
 import { GetSignedProductData } from 'graphQL/Queries'
 import { GetSignedProjects } from 'graphQL/Queries'
 import SignedSbomTable from './SBOMTable'
+import { GetSignedVulnData } from 'graphQL/Queries'
+import GlobalContext from 'context/GlobalContext'
 
 function ProductInfo() {
   const initialRef = useRef(null)
@@ -46,6 +48,13 @@ function ProductInfo() {
   const history = useHistory()
 
   const queryParams = new URLSearchParams(location.search)
+  const {
+    setSignedVulnSeverity,
+    setSignedActiveTab,
+    totalRows,
+    signedVulnField,
+    signedVulnDirection
+  } = useContext(GlobalContext)
 
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
@@ -70,6 +79,9 @@ function ProductInfo() {
       signedParams: signedParams
     }
   })
+
+  // GET VULN DATA
+  const [getVulnData, { data: vulnData }] = useLazyQuery(GetSignedVulnData)
 
   useEffect(() => {
     if (sbomData) {
@@ -138,6 +150,22 @@ function ProductInfo() {
   const selectedProject =
     allProjects &&
     allProjects.projects.nodes.find((item) => item.id === productId)
+
+  const onFilterSev = (value) => {
+    setSignedActiveTab(2)
+    setSignedVulnSeverity(value)
+    getVulnData({
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        signedParams: signedParams,
+        severity: value,
+        first: totalRows,
+        field: signedVulnField,
+        direction: signedVulnDirection
+      }
+    })
+  }
 
   return (
     <>
@@ -254,6 +282,8 @@ function ProductInfo() {
                                 variant='subtle'
                                 colorScheme='red'
                                 borderRadius='md'
+                                cursor={'pointer'}
+                                onClick={() => onFilterSev(['critical'])}
                               >
                                 {sbomData.sbom.stats.vulnStats.critical
                                   ? sbomData.sbom.stats.vulnStats.critical
@@ -265,6 +295,8 @@ function ProductInfo() {
                                 variant='subtle'
                                 colorScheme='orange'
                                 borderRadius='md'
+                                cursor={'pointer'}
+                                onClick={() => onFilterSev(['high'])}
                               >
                                 {sbomData.sbom.stats.vulnStats.high
                                   ? sbomData.sbom.stats.vulnStats.high
@@ -276,6 +308,8 @@ function ProductInfo() {
                                 variant='subtle'
                                 colorScheme='yellow'
                                 borderRadius='md'
+                                cursor={'pointer'}
+                                onClick={() => onFilterSev(['medium'])}
                               >
                                 {sbomData.sbom.stats.vulnStats.medium
                                   ? sbomData.sbom.stats.vulnStats.medium
@@ -287,6 +321,8 @@ function ProductInfo() {
                                 variant='subtle'
                                 colorScheme='green'
                                 borderRadius='md'
+                                cursor={'pointer'}
+                                onClick={() => onFilterSev(['low'])}
                               >
                                 {sbomData.sbom.stats.vulnStats.low
                                   ? sbomData.sbom.stats.vulnStats.low
@@ -357,6 +393,8 @@ function ProductInfo() {
             data={sbomData.sbom}
             filteredData={filteredData}
             status={sbomData.sbom.lifecycle}
+            getVulnData={getVulnData}
+            vulnData={vulnData}
             type={
               selectedProject?.sboms.length > 0 &&
               selectedProject.sboms[0].format
