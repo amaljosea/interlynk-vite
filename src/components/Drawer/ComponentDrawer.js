@@ -549,23 +549,21 @@ function ComponentDrawer(props) {
                 />
               </FormControl>
               {/* Kind */}
-              <FormControl>
-                <FormLabel fontSize={'sm'}>
-                  <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-                    <Text>
-                      Type
-                      <chakra.span color={'red.500'} ml={1}>
-                        *
-                      </chakra.span>
-                    </Text>
-                    <Tooltip label='Component Type'>
-                      <Icon as={QuestionIcon} color={'blue.500'} />
-                    </Tooltip>
-                  </Flex>
-                </FormLabel>
+              <Stack spacing={2} fontSize={'sm'}>
+                <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
+                  <Text>
+                    Type
+                    <chakra.span color={'red.500'} ml={1}>
+                      *
+                    </chakra.span>
+                  </Text>
+                  <Tooltip label='Component Type'>
+                    <Icon as={QuestionIcon} color={'blue.500'} />
+                  </Tooltip>
+                </Flex>
                 <Select
-                  id='type'
-                  name='type'
+                  id='kind'
+                  name='kind'
                   size='sm'
                   value={compType}
                   onChange={(e) => setCompType(e.target.value)}
@@ -585,17 +583,15 @@ function ComponentDrawer(props) {
                   <option value='other'>Other</option>
                   <option value='unspecified'>Unspecified</option>
                 </Select>
-              </FormControl>
+              </Stack>
               {/* Licenses */}
-              <FormControl>
-                <FormLabel fontSize={'sm'}>
-                  <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-                    <Text>Licenses</Text>
-                    <Tooltip label='List of licenses applicable to the component'>
-                      <Icon as={QuestionIcon} color={'blue.500'} />
-                    </Tooltip>
-                  </Flex>
-                </FormLabel>
+              <Stack spacing={2} fontSize={'sm'}>
+                <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
+                  <Text>Licenses</Text>
+                  <Tooltip label='List of licenses applicable to the component'>
+                    <Icon as={QuestionIcon} color={'blue.500'} />
+                  </Tooltip>
+                </Flex>
                 <MultiSelect
                   styles={{
                     control: (baseStyles, state) => ({
@@ -611,7 +607,7 @@ function ComponentDrawer(props) {
                   options={licenses}
                   onChange={onLicenseChange}
                 />
-              </FormControl>
+              </Stack>
               {containesOther && (
                 <FormControl isRequired>
                   <Input
@@ -624,7 +620,7 @@ function ComponentDrawer(props) {
               )}
               {/* Identifiers */}
               <FormControl isReadOnly={customerView}>
-                <FormLabel fontSize={'sm'}>
+                <FormLabel htmlFor='purl' fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     {shortDesc === 'Component Identifier' &&
                       purlValue === '' && (
@@ -636,115 +632,105 @@ function ComponentDrawer(props) {
                     </Tooltip>
                   </Flex>
                 </FormLabel>
-                <Stack spacing={2}>
-                  <Stack direction={'row'} spacing={2}>
-                    <InputGroup>
-                      <Input
-                        type='text'
-                        size='sm'
-                        placeholder='PURL'
-                        value={purlValue ? purlValue : ''}
-                        key='purl'
-                        onChange={handlePURLInputChange}
-                      />
-                      <InputRightElement align='center' zIndex={-1}>
-                        {purlValue != null && purlValue !== '' ? (
-                          isPURLInputValid ? (
-                            <CheckIcon color='green' />
-                          ) : (
-                            <WarningTwoIcon color='red' />
-                          )
-                        ) : null}
-                      </InputRightElement>
-                    </InputGroup>
-                    <IconButton
-                      icon={<FaExpandAlt />}
+                <Stack direction={'row'} spacing={2}>
+                  <InputGroup>
+                    <Input
+                      type='text'
                       size='sm'
-                      fontWeight={'normal'}
-                      variant='solid'
-                      colorScheme='blue'
-                      width={'fit-content'}
-                      onClick={handlePurlModal}
-                    >
-                      Details
-                    </IconButton>
-                  </Stack>
-                  {/* CPE List */}
-                  <Stack direction={'row'} spacing={2}>
-                    <InputGroup>
-                      <Input
-                        type='text'
-                        size='sm'
-                        placeholder='CPE'
-                        value={cpeValue ? cpeValue : ''}
-                        key='CPE'
-                        onChange={handleCPEInputChange}
-                      />
-                      <InputRightElement align='center' zIndex={-1}>
-                        {cpeValue != null && cpeValue !== '' ? (
-                          isCPEInputValid ? (
-                            <CheckIcon color='green' />
-                          ) : (
-                            <WarningTwoIcon color='red' />
-                          )
-                        ) : null}
-                      </InputRightElement>
-                    </InputGroup>
-                    <IconButton
-                      icon={<FaExpandAlt />}
-                      mt={2}
-                      size='sm'
-                      fontWeight={'normal'}
-                      variant='solid'
-                      colorScheme='blue'
-                      width={'fit-content'}
-                      onClick={handleCpeModal}
-                    >
-                      Details
-                    </IconButton>
-                  </Stack>
-                  <Flex
-                    flexDirection={'row'}
-                    flexWrap={'wrap'}
-                    spacing={2}
-                    gap={2}
-                    my={1}
+                      placeholder='PURL'
+                      value={purlValue ? purlValue : ''}
+                      id='purl'
+                      name='purl'
+                      onChange={handlePURLInputChange}
+                    />
+                    <InputRightElement align='center' zIndex={-1}>
+                      {purlValue != null && purlValue !== '' ? (
+                        isPURLInputValid ? (
+                          <CheckIcon color='green' />
+                        ) : (
+                          <WarningTwoIcon color='red' />
+                        )
+                      ) : null}
+                    </InputRightElement>
+                  </InputGroup>
+                  <IconButton
+                    icon={<FaExpandAlt />}
+                    size='sm'
+                    fontWeight={'normal'}
+                    variant='solid'
+                    colorScheme='blue'
+                    width={'fit-content'}
+                    onClick={handlePurlModal}
                   >
-                    {cpeList.map((item, index) => (
-                      <Tag
-                        key={index}
-                        borderRadius='full'
-                        variant='solid'
-                        colorScheme={'blue'}
-                      >
-                        <TagLabel
-                          cursor={'pointer'}
-                          onClick={() => {
-                            setCpeValue(item)
-                            setSelectedCpe({ id: index, name: item })
-                          }}
-                        >
-                          {item}
-                        </TagLabel>
-                        <TagCloseButton onClick={() => deleteCpe(index)} />
-                      </Tag>
-                    ))}
-                  </Flex>
+                    Details
+                  </IconButton>
                 </Stack>
               </FormControl>
-
-              {/* {(!component || !version) && (
-                <FormControl isReadOnly={customerView}>
-                  <Checkbox
+              <FormControl>
+                {/* CPE INPUT */}
+                <Stack direction={'row'} spacing={2}>
+                  <InputGroup>
+                    <Input
+                      type='text'
+                      size='sm'
+                      placeholder='CPE'
+                      value={cpeValue ? cpeValue : ''}
+                      id='cpe'
+                      name='cpe'
+                      onChange={handleCPEInputChange}
+                    />
+                    <InputRightElement align='center' zIndex={-1}>
+                      {cpeValue != null && cpeValue !== '' ? (
+                        isCPEInputValid ? (
+                          <CheckIcon color='green' />
+                        ) : (
+                          <WarningTwoIcon color='red' />
+                        )
+                      ) : null}
+                    </InputRightElement>
+                  </InputGroup>
+                  <IconButton
+                    icon={<FaExpandAlt />}
+                    mt={2}
                     size='sm'
+                    fontWeight={'normal'}
+                    variant='solid'
                     colorScheme='blue'
-                    isChecked={isIncomplete}
-                    onChange={() => setIsIncomplete(!isIncomplete)}
+                    width={'fit-content'}
+                    onClick={handleCpeModal}
                   >
-                    Incomplete third party component
-                  </Checkbox>
-                </FormControl>
-              )} */}
+                    Details
+                  </IconButton>
+                </Stack>
+                {/* CPE LIST  */}
+                <Flex
+                  flexDirection={'row'}
+                  flexWrap={'wrap'}
+                  spacing={2}
+                  gap={2}
+                  my={1}
+                >
+                  {cpeList.map((item, index) => (
+                    <Tag
+                      key={index}
+                      borderRadius='full'
+                      variant='solid'
+                      colorScheme={'blue'}
+                    >
+                      <TagLabel
+                        cursor={'pointer'}
+                        onClick={() => {
+                          setCpeValue(item)
+                          setSelectedCpe({ id: index, name: item })
+                        }}
+                      >
+                        {item}
+                      </TagLabel>
+                      <TagCloseButton onClick={() => deleteCpe(index)} />
+                    </Tag>
+                  ))}
+                </Flex>
+              </FormControl>
               <FormControl isReadOnly={customerView}>
                 <Flex alignItems={'center'} gap={2}>
                   {shortDesc === 'Primary Component' && !isPrimary && (

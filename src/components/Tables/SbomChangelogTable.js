@@ -18,6 +18,7 @@ import { useLocation } from 'react-router-dom'
 import { timeSince } from 'utils'
 import { getFullDateAndTime } from 'utils'
 import LogFilterMenu from 'views/Sbom/components/LogFilterMenu'
+import RowLimit from 'views/Sbom/components/RowLimit'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 const customStyles = {
@@ -361,6 +362,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
           alignItems={'flex-start'}
         >
           <SearchFilter
+            id='changelog'
             filterText={filterText}
             setFilterText={setFilterText}
             onFilter={handleSearch}
@@ -435,14 +437,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
             </Box>
           </Stack>
 
-          <Stack alignItems={'center'} direction={'row'} spacing={4}>
-            <Text>Show</Text>
-            <Select width={20} value={totalRows} onChange={handleSetRow}>
-              <option value={25}>25</option>
-              <option value={50}>50</option>
-              <option value={100}>100</option>
-            </Select>
-          </Stack>
+          <RowLimit onChange={handleSetRow} name='changelog' />
         </Flex>
       )}
     </>

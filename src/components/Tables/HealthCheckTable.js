@@ -33,6 +33,7 @@ import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 import CheckFilterMenu from 'views/Sbom/components/CheckFilterMenu'
 import CheckModal from 'views/Sbom/components/CheckModal'
 import PriSupplierModal from 'views/Sbom/components/PriSupplierModal'
+import RowLimit from 'views/Sbom/components/RowLimit'
 import SupplierModal from 'views/Sbom/components/SupplierModal'
 
 const customStyles = {
@@ -695,14 +696,7 @@ const HealthCheckTable = ({
             </Box>
           </Stack>
 
-          <Stack alignItems={'center'} direction={'row'} spacing={4}>
-            <Text>Show</Text>
-            <Select width={20} value={totalRows} onChange={handleSetRow}>
-              <option value={25}>25</option>
-              <option value={50}>50</option>
-              <option value={100}>100</option>
-            </Select>
-          </Stack>
+          <RowLimit onChange={handleSetRow} name='healthCheck' />
         </Flex>
       )}
 
