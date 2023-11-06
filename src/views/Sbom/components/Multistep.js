@@ -32,7 +32,7 @@ const Form1 = () => {
 
   const { data: allProducts } = useQuery(GetProjectData, {
     variables: {
-      first: 50
+      first: 25
     }
   })
 
