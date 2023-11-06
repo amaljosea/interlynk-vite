@@ -16,8 +16,6 @@ export default function AdminNavbar(props) {
   const [scrolled, setScrolled] = useState(false)
   const { brandText } = props
 
-
-
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const versionId = queryParams.get('v')
@@ -126,7 +124,7 @@ export default function AdminNavbar(props) {
                 to={
                   !location.pathname.startsWith('/customer')
                     ? '/vendor/dashboard'
-                    : '/customer/images'
+                    : '/customer/products'
                 }
                 color={secondaryText}
               >

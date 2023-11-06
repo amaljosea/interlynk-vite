@@ -56,7 +56,6 @@ const Sharelynk = () => {
                 captions={[
                   'Active',
                   'Users',
-                  'Images',
                   'Products',
                   'Updated At',
                   'Link',

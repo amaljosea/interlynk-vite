@@ -50,7 +50,7 @@ const Login = () => {
           localStorage.setItem('userEmail', status.data.user.email)
           Cookies.set(`userToken`, response.headers.authorization)
           Cookies.set(`signedParamId`, paramId)
-          history.push(`/customer/images`)
+          history.push(`/customer/products`)
         }
       })
       .catch((error) => {
