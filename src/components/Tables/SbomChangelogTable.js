@@ -322,6 +322,9 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
       projectId: productId,
       sbomId: sbomId,
       first: Number(e.target.value),
+      last: undefined,
+      after: undefined,
+      before: undefined,
       field: logField,
       direction: logDirection
     })
