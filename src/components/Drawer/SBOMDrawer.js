@@ -22,7 +22,8 @@ import {
   TagLabel,
   TagCloseButton,
   Code,
-  FormControl
+  FormControl,
+  FormErrorMessage
 } from '@chakra-ui/react'
 import { useMutation, useQuery } from '@apollo/client'
 import { CreateShareLynk } from 'graphQL/Mutation'
@@ -34,7 +35,7 @@ import { UpdateShareLynk } from 'graphQL/Mutation'
 function SBOMDrawer(props) {
   const toast = useToast()
 
-  const { isOpen, onClose, btnRef, refetch, id, shareUsers, contents } = props
+  const { isOpen, onClose, refetch, id, shareUsers, contents } = props
 
   const { data: allProducts } = useQuery(GetProjectData, {
     variables: {
@@ -58,33 +59,21 @@ function SBOMDrawer(props) {
   const [email, setEmail] = useState('')
   const [emailList, setEmailList] = useState([])
 
-  const [selectedImg, setSelectedImg] = useState([])
   const [selectedProd, setSelectedProd] = useState([])
-  const [imgIds, setImgIds] = useState([])
   const [productIds, setProductIds] = useState([])
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
+    return emailRegex.test(email)
+  }
 
   useEffect(() => {
     if (shareUsers.length > 0 && id) {
       setEmailList(shareUsers)
     }
 
-    // console.log(`contents`, contents)
-
     if (contents && contents.length > 0) {
-      const imgList = contents.filter((item) => item.__typename === 'Image')
       const prodList = contents.filter((item) => item.__typename === 'Project')
-
-      if (imgList.length > 0) {
-        const data = imgList.map((item) => {
-          return {
-            value: item.id,
-            label: item.name
-          }
-        })
-        const res = imgList.map((item) => item.id)
-        setImgIds(res)
-        setSelectedImg(data)
-      }
 
       if (prodList.length > 0) {
         const data = prodList.map((item) => {
@@ -99,11 +88,6 @@ function SBOMDrawer(props) {
       }
     }
   }, [id])
-
-  const validateEmail = (email) => {
-    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
-    return emailRegex.test(email)
-  }
 
   const handleKeyDown = (event) => {
     if (event.key === 'Enter') {
@@ -121,15 +105,6 @@ function SBOMDrawer(props) {
     }
   }
 
-  // Image List
-
-  const imgList =
-    allImages &&
-    allImages.images.nodes.map((option) => ({
-      value: option.id,
-      label: option.name
-    }))
-
   // Product List
 
   const productList =
@@ -139,12 +114,6 @@ function SBOMDrawer(props) {
       label: option.name
     }))
 
-  const handleImgChange = (selected) => {
-    setSelectedImg(selected)
-    const selectedIds = selected.map((option) => option.value) // Extracting IDs
-    setImgIds(selectedIds)
-  }
-
   const handleProductChange = (selected) => {
     setSelectedProd(selected)
     const selectedIds = selected.map((option) => option.value) // Extracting IDs
@@ -153,18 +122,10 @@ function SBOMDrawer(props) {
 
   const handleSave = async () => {
     try {
-      if (emailList.length === 0) {
+      if (productIds.length === 0) {
         toast({
-          description: 'Email is required !',
-          status: 'warning',
-          duration: 2000,
-          isClosable: true,
-          position: 'top'
-        })
-      } else if (imgIds.length === 0 && productIds.length === 0) {
-        toast({
-          description: 'Missing required products and images',
-          status: 'warning',
+          description: 'Missing required products',
+          status: 'error',
           duration: 2000,
           isClosable: true,
           position: 'top'
@@ -174,14 +135,12 @@ function SBOMDrawer(props) {
           variables: {
             enabled: true,
             emails: emailList,
-            projects: productIds,
-            images: imgIds
+            projects: productIds
           }
         }).then((res) => {
           console.log(`Res`, res)
           refetch()
           setEmailList([])
-          setSelectedImg([])
           setSelectedProd([])
           onClose()
         })
@@ -193,18 +152,10 @@ function SBOMDrawer(props) {
 
   const handleUpdate = async () => {
     try {
-      if (emailList.length === 0) {
-        toast({
-          description: 'Email is required !',
-          status: 'warning',
-          duration: 2000,
-          isClosable: true,
-          position: 'top'
-        })
-      } else if (imgIds.length === 0 && productIds.length === 0) {
+      if (productIds.length === 0) {
         toast({
           description: 'Missing required products and images',
-          status: 'warning',
+          status: 'error',
           duration: 2000,
           isClosable: true,
           position: 'top'
@@ -214,14 +165,12 @@ function SBOMDrawer(props) {
           variables: {
             shareLynkId: id,
             emails: emailList,
-            projects: productIds,
-            images: imgIds
+            projects: productIds
           }
         }).then((res) => {
           console.log(`Res`, res)
           refetch()
           setEmailList([])
-          setSelectedImg([])
           setSelectedProd([])
           onClose()
         })
@@ -245,48 +194,26 @@ function SBOMDrawer(props) {
           Share Lynk
         </DrawerHeader>
         <DrawerBody>
-          <Stack spacing={5}>
-            <FormControl fontSize={'sm'}>
-              <FormLabel htmlFor='product' fontSize='base' color='gray.600'>
-                Image
-              </FormLabel>
-              <MultiSelect
-                styles={{
-                  control: (baseStyles, state) => ({
-                    ...baseStyles,
-                    borderColor: state.isFocused ? 'inherit' : 'inherit',
-                    '&:hover': {
-                      borderColor: '#CBD5E0'
-                    }
-                  })
-                }}
-                isMulti
-                value={selectedImg}
-                options={imgList}
-                onChange={handleImgChange}
-              />
-            </FormControl>
-            <FormControl fontSize={'sm'}>
-              <FormLabel htmlFor='product' fontSize='sm' color='gray.600'>
-                Product
-              </FormLabel>
-              <MultiSelect
-                styles={{
-                  control: (baseStyles, state) => ({
-                    ...baseStyles,
-                    borderColor: state.isFocused ? 'inherit' : 'inherit',
-                    '&:hover': {
-                      borderColor: '#CBD5E0'
-                    }
-                  })
-                }}
-                isMulti
-                value={selectedProd}
-                options={productList}
-                onChange={handleProductChange}
-              />
-            </FormControl>
-          </Stack>
+          <FormControl fontSize={'sm'}>
+            <FormLabel htmlFor='product' fontSize='sm' color='gray.600'>
+              Product
+            </FormLabel>
+            <MultiSelect
+              styles={{
+                control: (baseStyles, state) => ({
+                  ...baseStyles,
+                  borderColor: state.isFocused ? 'inherit' : 'inherit',
+                  '&:hover': {
+                    borderColor: '#CBD5E0'
+                  }
+                })
+              }}
+              isMulti
+              value={selectedProd}
+              options={productList}
+              onChange={handleProductChange}
+            />
+          </FormControl>
           <Box my={6}>
             <Text fontSize='md'>LINK OPTIONS</Text>
             <Divider />
@@ -324,16 +251,20 @@ function SBOMDrawer(props) {
             >
               Limit access to:{' '}
             </Checkbox>
-
-            <Input
-              placeholder='Enter email address'
-              size='md'
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              onKeyDown={handleKeyDown}
-              fontSize={'sm'}
-              borderColor={'hsl(0, 0%, 80%)'}
-            />
+            <FormControl isInvalid={!validateEmail(email) && email !== ''}>
+              <Input
+                placeholder='Enter email address'
+                size='md'
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onKeyDown={handleKeyDown}
+                fontSize={'sm'}
+                borderColor={'hsl(0, 0%, 80%)'}
+              />
+              {email !== '' && !validateEmail(email) && (
+                <FormErrorMessage>Email is invalid</FormErrorMessage>
+              )}
+            </FormControl>
             <Text fontSize={'xs'}>
               Press <Code colorScheme={'blue'}>enter</Code> to add emails
             </Text>
@@ -363,11 +294,19 @@ function SBOMDrawer(props) {
             Cancel
           </Button>
           {id ? (
-            <Button colorScheme='blue' onClick={handleUpdate}>
+            <Button
+              colorScheme='blue'
+              onClick={handleUpdate}
+              isDisabled={emailList.length === 0}
+            >
               Update
             </Button>
           ) : (
-            <Button colorScheme='blue' onClick={handleSave}>
+            <Button
+              colorScheme='blue'
+              onClick={handleSave}
+              isDisabled={emailList.length === 0}
+            >
               Save
             </Button>
           )}

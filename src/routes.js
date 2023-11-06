@@ -92,13 +92,13 @@ export const dashRoutes = [
 ]
 
 export const customerRoutes = [
-  {
-    path: '/images',
-    name: 'Images',
-    icon: <FaImages color='inherit' />,
-    component: CustomerImages,
-    layout: '/customer'
-  },
+  // {
+  //   path: '/images',
+  //   name: 'Images',
+  //   icon: <FaImages color='inherit' />,
+  //   component: CustomerImages,
+  //   layout: '/customer'
+  // },
   {
     path: '/products',
     name: 'Products',

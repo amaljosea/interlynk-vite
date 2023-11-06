@@ -120,25 +120,6 @@ function SBOMLinkRow(props) {
       <Td>
         <Flex flexDirection={'row'} flexWrap={'wrap'} spacing={2} gap={2}>
           {contents
-            .filter((item) => item.__typename === 'Image')
-            .map((image, idx) => {
-              return (
-                <Tag
-                  size='sm'
-                  key={idx}
-                  borderRadius='full'
-                  variant='solid'
-                  colorScheme={shared_col}
-                >
-                  <TagLabel>{image.name}</TagLabel>
-                </Tag>
-              )
-            })}
-        </Flex>
-      </Td>
-      <Td>
-        <Flex flexDirection={'row'} flexWrap={'wrap'} spacing={2} gap={2}>
-          {contents
             .filter((item) => item.__typename === 'Project')
             .map((project, idx) => {
               return (
@@ -155,7 +136,7 @@ function SBOMLinkRow(props) {
             })}
         </Flex>
       </Td>
-      <Td>
+      <Td width={'200px'}>
         <Tooltip label={getFullDateAndTime(updatedAt)} placement='top'>
           {timeSince(updatedAt)}
         </Tooltip>
