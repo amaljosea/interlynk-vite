@@ -138,7 +138,6 @@ const PriSupplierModal = ({
                   />
                 </FormControl>
                 <FormControl
-                  isRequired
                   isInvalid={!validateEmail(supEmail) && supEmail !== ''}
                 >
                   <FormLabel fontSize={'sm'}>Email</FormLabel>
