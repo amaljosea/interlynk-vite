@@ -599,18 +599,9 @@ const VulnTable = ({
           signedParams: customerView ? signedParams : undefined
         }
       }).then((res) => {
-        if (res.data) {
-          setStep(1)
-          setProgress(25)
-          onTableClose()
-          toast({
-            description: 'Data Imported successsfully',
-            status: 'success',
-            duration: 3000,
-            isClosable: true,
-            position: 'top'
-          })
-        }
+        setStep(1)
+        setProgress(25)
+        onTableClose()
       })
     } catch (error) {
       console.log(error)
@@ -865,7 +856,7 @@ const VulnTable = ({
       )}
 
       {/* COPY DATA TABLE */}
-      {isTableOpen && data.nodes.length > 0 && (
+      {isTableOpen && data && (
         <Drawer
           isOpen={isTableOpen}
           placement='right'
@@ -874,7 +865,13 @@ const VulnTable = ({
         >
           <DrawerOverlay />
           <DrawerContent>
-            <DrawerCloseButton />
+            <DrawerCloseButton
+              onClick={() => {
+                setStep(1)
+                setProgress(25)
+                onTableClose()
+              }}
+            />
             <DrawerHeader>
               <Text fontSize={20} fontWeight={'medium'} visibility={'hidden'}>
                 {stepTitle}

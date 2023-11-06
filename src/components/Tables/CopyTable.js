@@ -305,18 +305,18 @@ const CopyTable = ({
   return (
     <Card p={0}>
       <Flex flexDir={'column'} width={'100%'} mb={6}>
-        <DataTable
-          columns={columns}
-          data={data && data}
-          customStyles={customStyles}
-          progressPending={data.length === 0 ? true : false}
-          progressComponent={<CustomLoader />}
-          subHeader
-          subHeaderComponent={subHeaderComponentMemo}
-          responsive={true}
-          selectableRows={true}
-          // selectableRowSelected={(row) => row}
-        />
+        {data && (
+          <DataTable
+            columns={columns}
+            data={data}
+            customStyles={customStyles}
+            subHeader
+            subHeaderComponent={subHeaderComponentMemo}
+            responsive={true}
+            selectableRows={true}
+            // selectableRowSelected={(row) => row}
+          />
+        )}
       </Flex>
     </Card>
   )

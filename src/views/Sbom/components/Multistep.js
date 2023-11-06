@@ -247,14 +247,24 @@ const Form4 = ({ currentData, refetch }) => {
         Vunlerability view resolved by
       </Text>
       <Box width={'90%'} margin={'0 auto'}>
-        <CopyTable
-          data={finalData}
-          productId={productId}
-          sbomId={sbomId}
-          getVulns={getVulns}
-          refetch={refetch}
-          setFinalData={setFinalData}
-        />
+        {finalData.length > 0 ? (
+          <CopyTable
+            data={finalData}
+            productId={productId}
+            sbomId={sbomId}
+            getVulns={getVulns}
+            refetch={refetch}
+            setFinalData={setFinalData}
+          />
+        ) : (
+          <Flex
+            width={'100%'}
+            alignItems={'center'}
+            justifyContent={'space-between'}
+          >
+            <Text>Total : {finalData.length}</Text>
+          </Flex>
+        )}
       </Box>
     </>
   )
