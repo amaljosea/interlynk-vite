@@ -162,7 +162,7 @@ const SupplierModal = ({
                 />
               </FormControl>
               <FormControl
-                isInvalid={!validateEmail(supEmail)}
+                isInvalid={supEmail !== '' && !validateEmail(supEmail)}
               >
                 <FormLabel fontSize={'sm'}>Email</FormLabel>
                 <Input
@@ -184,7 +184,7 @@ const SupplierModal = ({
               <Button
                 colorScheme='blue'
                 onClick={handleUpdate}
-                disabled={!supName || !supEmail || !validateEmail(supEmail)}
+                disabled={!supName || (supEmail !== '' && !validateEmail(supEmail))}
               >
                 Update
               </Button>
@@ -192,7 +192,7 @@ const SupplierModal = ({
               <Button
                 colorScheme='blue'
                 onClick={handleSave}
-                disabled={!supName || !supEmail || !validateEmail(supEmail)}
+                disabled={!supName || (supEmail !== '' && !validateEmail(supEmail))}
               >
                 Save
               </Button>
