@@ -1371,6 +1371,7 @@ export const GetSignedVulnData = gql`
     $signedParams: String!
     $search: String
     $severity: [String!]
+    $componentName: [String!]
     $status: [String!]
     $kev: Boolean
     $epss: RangeInput
@@ -1386,6 +1387,7 @@ export const GetSignedVulnData = gql`
         sbomId: $sbomId
         search: $search
         severity: $severity
+        componentName: $componentName
         status: $status
         kev: $kev
         epss: $epss

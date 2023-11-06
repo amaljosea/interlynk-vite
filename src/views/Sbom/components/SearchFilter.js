@@ -1,7 +1,7 @@
 import { CloseIcon } from '@chakra-ui/icons'
 import { Box, Input } from '@chakra-ui/react'
 import GlobalContext from 'context/GlobalContext'
-import { useContext, useEffect, useRef, useState } from 'react'
+import {  useEffect, useRef, useState } from 'react'
 
 const SearchFilter = ({ filterText, setFilterText, onFilter, onClear }) => {
   const searchInputRef = useRef()

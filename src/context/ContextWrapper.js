@@ -39,21 +39,27 @@ const ContextWrapper = (props) => {
   const [compFilters, setCompFilters] = useState({})
   const [signedCompFilters, setSignedCompFilters] = useState({})
   const [vulnFilters, setVulnFilters] = useState({})
+  const [signedVulnFilters, setSignedVulnFilters] = useState({})
   const [checkFilters, setCheckFilters] = useState({})
   const [logFilters, setLogFilters] = useState({})
 
   // SORT ORDER AND DIRECTIONS
   const [compField, setCompField] = useState('COMPONENTS_UPDATED_AT')
   const [compDirection, setCompDirection] = useState('DESC')
-  const [signedCompField, setSignedCompField] = useState('UPDATED_AT')
+  const [signedCompField, setSignedCompField] = useState(
+    'COMPONENTS_UPDATED_AT'
+  )
   const [signedCompDirection, setSignedCompDirection] = useState('DESC')
   const [vulnField, setVulnField] = useState('COMPONENT_VULNS_UPDATED_AT')
   const [vulnDirection, setVulnDirection] = useState('DESC')
+  const [signedVulnField, setSignedVulnField] = useState(
+    'COMPONENT_VULNS_UPDATED_AT'
+  )
+  const [signedVulnDirection, setSignedVulnDirection] = useState('DESC')
   const [checkField, setCheckField] = useState('CHECK_RESULTS_UPDATED_AT')
   const [checkDirection, setCheckDirection] = useState('DESC')
   const [logField, setLogField] = useState('ACTIVITY_LOGS_CREATED_AT')
   const [logDirection, setLogDirection] = useState('DESC')
-
   const [activeProdTab, setActiveProdTab] = useState(0)
   const [totalRows, setTotalRows] = useState(25)
 
@@ -66,6 +72,16 @@ const ContextWrapper = (props) => {
   const [vulnEpss, setVulnEpss] = useState('')
   const [minVal, setMinVal] = useState()
   const [maxVal, setMaxVal] = useState()
+
+  // SIGNED VULN FILTER
+  const [signedVulnSearchInput, setSignedVulnSearchInput] = useState('')
+  const [signedVulnSeverity, setSignedVulnSeverity] = useState([])
+  const [signedVulnComponent, setSignedVulnComponent] = useState([])
+  const [signedVulnStatus, setSignedVulnStatus] = useState([])
+  const [signedVulnKev, setSignedVulnKev] = useState('')
+  const [signedVulnEpss, setSignedVulnEpss] = useState('')
+  const [signedMinVal, setSignedMinVal] = useState()
+  const [signedMaxVal, setSignedMaxVal] = useState()
 
   return (
     <GlobalContext.Provider
@@ -118,10 +134,16 @@ const ContextWrapper = (props) => {
         setLogDirection,
         signedCompFilters,
         setSignedCompFilters,
+        signedVulnFilters,
+        setSignedVulnFilters,
         signedCompField,
         setSignedCompField,
         signedCompDirection,
         setSignedCompDirection,
+        signedVulnField,
+        setSignedVulnField,
+        signedVulnDirection,
+        setSignedVulnDirection,
         activeProdTab,
         setActiveProdTab,
         totalRows,
@@ -141,7 +163,24 @@ const ContextWrapper = (props) => {
         minVal,
         setMinVal,
         maxVal,
-        setMaxVal
+        setMaxVal,
+        // SIGNED VULN FILTER DATA
+        signedVulnSearchInput,
+        setSignedVulnSearchInput,
+        signedVulnSeverity,
+        setSignedVulnSeverity,
+        signedVulnComponent,
+        setSignedVulnComponent,
+        signedVulnStatus,
+        setSignedVulnStatus,
+        signedVulnKev,
+        setSignedVulnKev,
+        signedVulnEpss,
+        setSignedVulnEpss,
+        signedMinVal,
+        setSignedMinVal,
+        signedMaxVal,
+        setSignedMaxVal
       }}
     >
       {props.children}

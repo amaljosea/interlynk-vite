@@ -47,6 +47,7 @@ import SearchFilter from 'views/Sbom/components/SearchFilter'
 import GlobalContext from 'context/GlobalContext'
 import { timeSince } from 'utils'
 import CustomLoader from 'components/CustomLoader'
+import Cookies from 'js-cookie'
 
 const customStyles = {
   headCells: {
@@ -94,6 +95,8 @@ const VulnTable = ({
   filterRefetch
 }) => {
   const toast = useToast()
+  const customerView = location.pathname.startsWith('/customer')
+  const signedParams = Cookies.get(`signedParamId`)
 
   const {
     vulnFilters,
@@ -101,13 +104,24 @@ const VulnTable = ({
     setVulnField,
     vulnDirection,
     setVulnDirection,
+    signedVulnField,
+    setSignedVulnField,
+    signedVulnDirection,
+    setSignedVulnDirection,
     vulnSearchInput,
+    setSignedVulnSearchInput,
     setVulnSearchInput,
     vulnSeverity,
     vulnComponent,
     vulnStatus,
     vulnKev,
-    vulnEpss
+    vulnEpss,
+    signedVulnSearchInput,
+    signedVulnSeverity,
+    signedVulnComponent,
+    signedVulnStatus,
+    signedVulnKev,
+    signedVulnEpss
   } = useContext(GlobalContext)
 
   const textColor = useColorModeValue('gray.700', 'white')
@@ -268,29 +282,39 @@ const VulnTable = ({
 
         return (
           <Flex minWidth='max-content' alignItems='center' gap='0'>
-            <Tag size='md' key='md' variant='subtle' width={'60px'}  justifyContent="center" alignItems="center">
+            <Tag
+              size='md'
+              key='md'
+              variant='subtle'
+              justifyContent='center'
+              alignItems='center'
+            >
               <TagLabel style={{ textAlign: 'center' }}>
-                {Math.ceil(epssScores[0]*10000)}
+                {epssScores[0]}
                 {/* {epssScores.length > 1 && `- ${epssScores[1]}`} */}
               </TagLabel>
             </Tag>
             {epssScores.length > 1 ? (
-                epssScores[0] > epssScores[epssScores.length - 1] ? (
-                  <Tooltip
-                    placement='top'
-                    label={`Up from ${Math.ceil(epssScores[epssScores.length - 1]*10000)} last week`}
-                  >
-                    <ChevronUpIcon w={5} h={5} color='green.500' />
-                  </Tooltip>
-                ) : epssScores[0] < epssScores[epssScores.length - 1] ? (
-                  <Tooltip
-                    placement='top'
-                    label={`Down from ${Math.ceil(epssScores[epssScores.length - 1]*10000)} last week`}
-                  >
-                    <ChevronDownIcon w={5} h={5} color='red.500' />
-                  </Tooltip>
-                ) : null
-              ) : null}
+              epssScores[0] > epssScores[epssScores.length - 1] ? (
+                <Tooltip
+                  placement='top'
+                  label={`Up from ${
+                    epssScores[epssScores.length - 1]
+                  } last week`}
+                >
+                  <ChevronUpIcon w={5} h={5} color='green.500' />
+                </Tooltip>
+              ) : epssScores[0] < epssScores[epssScores.length - 1] ? (
+                <Tooltip
+                  placement='top'
+                  label={`Down from ${
+                    epssScores[epssScores.length - 1]
+                  } last week`}
+                >
+                  <ChevronDownIcon w={5} h={5} color='red.500' />
+                </Tooltip>
+              ) : null
+            ) : null}
           </Flex>
         )
       },
@@ -382,10 +406,11 @@ const VulnTable = ({
         variables: {
           projectId: productId,
           sbomId: sbomId,
-          search: vulnSearchInput,
+          search: customerView ? signedVulnSearchInput : vulnSearchInput,
           first: totalRows,
-          field: vulnField,
-          direction: vulnDirection
+          field: customerView ? signedVulnField : vulnField,
+          direction: customerView ? signedVulnDirection : vulnDirection,
+          signedParams: customerView ? signedParams : undefined
         }
       })
       setPageIndex(1)
@@ -400,11 +425,16 @@ const VulnTable = ({
         sbomId: sbomId,
         first: totalRows,
         search: undefined,
-        field: vulnField,
-        direction: vulnDirection
+        field: customerView ? signedVulnField : vulnField,
+        direction: customerView ? signedVulnDirection : vulnDirection,
+        signedParams: customerView ? signedParams : undefined
       }
     })
-    setVulnSearchInput('')
+    if (customerView) {
+      setSignedVulnSearchInput('')
+    } else {
+      setVulnSearchInput('')
+    }
     setPageIndex(1)
   }
 
@@ -422,12 +452,21 @@ const VulnTable = ({
           alignItems={'flex-start'}
         >
           {/* SEARCH COMPONENTS */}
-          <SearchFilter
-            filterText={vulnSearchInput}
-            setFilterText={setVulnSearchInput}
-            onFilter={handleSearch}
-            onClear={handleClear}
-          />
+          {customerView ? (
+            <SearchFilter
+              filterText={signedVulnSearchInput}
+              setFilterText={setSignedVulnSearchInput}
+              onFilter={handleSearch}
+              onClear={handleClear}
+            />
+          ) : (
+            <SearchFilter
+              filterText={vulnSearchInput}
+              setFilterText={setVulnSearchInput}
+              onFilter={handleSearch}
+              onClear={handleClear}
+            />
+          )}
 
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
           {vulnFilters && (
@@ -441,16 +480,18 @@ const VulnTable = ({
           )}
         </Stack>
 
-        <Tooltip label='Import Statuses'>
-          <IconButton
-            variant='solid'
-            colorScheme='blue'
-            fontWeight='normal'
-            fontSize={'sm'}
-            onClick={onTableOpen}
-            icon={<FaCopy size={18} />}
-          />
-        </Tooltip>
+        {!customerView && (
+          <Tooltip label='Import Statuses'>
+            <IconButton
+              variant='solid'
+              colorScheme='blue'
+              fontWeight='normal'
+              fontSize={'sm'}
+              onClick={onTableOpen}
+              icon={<FaCopy size={18} />}
+            />
+          </Tooltip>
+        )}
       </Flex>
     )
   }, [vulnSearchInput, vulnFilters, handleClear, handleSearch])
@@ -553,8 +594,9 @@ const VulnTable = ({
           projectId: productId,
           sbomId: sbomId,
           first: totalRows,
-          field: vulnField,
-          direction: vulnDirection
+          field: customerView ? signedVulnField : vulnField,
+          direction: customerView ? signedVulnDirection : vulnDirection,
+          signedParams: customerView ? signedParams : undefined
         }
       }).then((res) => {
         if (res.data) {
@@ -575,58 +617,131 @@ const VulnTable = ({
     }
   }
 
-  const epss = vulnEpss !== 'all' && vulnEpss.split('-')
+  const handleRefetch = async (
+    search,
+    severity,
+    componentName,
+    status,
+    kev,
+    epss,
+    first,
+    after,
+    last,
+    before,
+    field,
+    direction
+  ) => {
+    const vulnEpss = epss !== 'all' && epss.split('-')
 
-  const range = {
-    min: parseFloat(epss[0]),
-    max: parseFloat(epss[1])
+    const range = {
+      min: parseFloat(vulnEpss[0]),
+      max: parseFloat(vulnEpss[1])
+    }
+
+    await refetch({
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        signedParams: customerView ? signedParams : undefined,
+        search: search !== '' ? search : undefined,
+        severity: severity.length > 0 ? severity : undefined,
+        componentName: componentName.length > 0 ? componentName : undefined,
+        status: status.length > 0 ? status : undefined,
+        kev: kev === 'all' ? undefined : kev === 'yes' ? true : false,
+        epss: epss !== '' && epss !== 'all' ? range : undefined,
+        first: first,
+        after: after,
+        last: last,
+        before: before,
+        field: field,
+        direction: direction
+      }
+    })
   }
 
   const onPreviousPage = async () => {
     setPageIndex((prev) => pageIndex !== 0 && prev - 1)
-    await refetch({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        severity: vulnSeverity.length > 0 ? vulnSeverity : undefined,
-        componentName: vulnComponent.length > 0 ? vulnComponent : undefined,
-        status: vulnStatus.length > 0 ? vulnStatus : undefined,
-        kev: vulnKev === 'all' ? undefined : vulnKev === 'yes' ? true : false,
-        epss: vulnEpss !== '' ? range : undefined,
-        last: totalRows,
-        before: data.pageInfo.startCursor,
-        field: vulnField,
-        direction: vulnDirection
-      }
-    })
+    if (customerView) {
+      handleRefetch(
+        signedVulnSearchInput,
+        signedVulnSeverity,
+        signedVulnComponent,
+        signedVulnStatus,
+        signedVulnKev,
+        signedVulnEpss,
+        undefined,
+        undefined,
+        totalRows,
+        data.pageInfo.startCursor,
+        signedVulnField,
+        signedVulnDirection
+      )
+    } else {
+      handleRefetch(
+        vulnSearchInput,
+        vulnSeverity,
+        vulnComponent,
+        vulnStatus,
+        vulnKev,
+        vulnEpss,
+        undefined,
+        undefined,
+        totalRows,
+        data.pageInfo.startCursor,
+        vulnField,
+        vulnDirection
+      )
+    }
   }
 
   const onNextPage = async () => {
     setPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
-    await refetch({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        severity: vulnSeverity.length > 0 ? vulnSeverity : undefined,
-        componentName: vulnComponent.length > 0 ? vulnComponent : undefined,
-        status: vulnStatus.length > 0 ? vulnStatus : undefined,
-        kev: vulnKev === 'all' ? undefined : vulnKev === 'yes' ? true : false,
-        epss: vulnEpss !== '' ? range : undefined,
-        first: totalRows,
-        after: data.pageInfo.endCursor,
-        field: vulnField,
-        direction: vulnDirection
-      }
-    })
+    if (customerView) {
+      handleRefetch(
+        signedVulnSearchInput,
+        signedVulnSeverity,
+        signedVulnComponent,
+        signedVulnStatus,
+        signedVulnKev,
+        signedVulnEpss,
+        totalRows,
+        data.pageInfo.endCursor,
+        undefined,
+        undefined,
+        signedVulnField,
+        signedVulnDirection
+      )
+    } else {
+      handleRefetch(
+        vulnSearchInput,
+        vulnSeverity,
+        vulnComponent,
+        vulnStatus,
+        vulnKev,
+        vulnEpss,
+        totalRows,
+        data.pageInfo.endCursor,
+        undefined,
+        undefined,
+        vulnField,
+        vulnDirection
+      )
+    }
   }
 
   const handleSort = (column, sortDirection) => {
-    setVulnField(column.id)
-    setVulnDirection(sortDirection === 'asc' ? 'ASC' : 'DESC')
+    if (customerView) {
+      setSignedVulnField(column.id)
+      setSignedVulnDirection(sortDirection === 'asc' ? 'ASC' : 'DESC')
+    } else {
+      setVulnField(column.id)
+      setVulnDirection(sortDirection === 'asc' ? 'ASC' : 'DESC')
+    }
     refetch({
       variables: {
         projectId: productId,
         sbomId: sbomId,
+        signedParams: customerView ? signedParams : undefined,
         first: totalRows,
         field: column.id,
         direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
@@ -637,15 +752,37 @@ const VulnTable = ({
   // SET ROW LENGTH
   const handleSetRow = async (e) => {
     setTotalRows(Number(e.target.value))
-    await refetch({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        first: Number(e.target.value),
-        field: vulnField,
-        direction: vulnDirection
-      }
-    })
+    if (customerView) {
+      handleRefetch(
+        signedVulnSearchInput,
+        signedVulnSeverity,
+        signedVulnComponent,
+        signedVulnStatus,
+        signedVulnKev,
+        signedVulnEpss,
+        Number(e.target.value),
+        undefined,
+        undefined,
+        undefined,
+        signedVulnField,
+        signedVulnDirection
+      )
+    } else {
+      handleRefetch(
+        vulnSearchInput,
+        vulnSeverity,
+        vulnComponent,
+        vulnStatus,
+        vulnKev,
+        vulnEpss,
+        Number(e.target.value),
+        undefined,
+        undefined,
+        undefined,
+        vulnField,
+        vulnDirection
+      )
+    }
     setFilterText('')
     setPageIndex(1)
   }
