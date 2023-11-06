@@ -47,13 +47,13 @@ export const dashRoutes = [
     component: Products,
     layout: '/vendor'
   },
-  {
-    path: '/sharelynk',
-    name: 'ShareLynk',
-    icon: <BsFillFolderSymlinkFill color='inherit' size={18} />,
-    component: Sharelynk,
-    layout: '/vendor'
-  },
+  // {
+  //   path: '/sharelynk',
+  //   name: 'ShareLynk',
+  //   icon: <BsFillFolderSymlinkFill color='inherit' size={18} />,
+  //   component: Sharelynk,
+  //   layout: '/vendor'
+  // },
   // {
   //   path: '/feed',
   //   name: 'Feed',
@@ -92,13 +92,13 @@ export const dashRoutes = [
 ]
 
 export const customerRoutes = [
-  // {
-  //   path: '/images',
-  //   name: 'Images',
-  //   icon: <FaImages color='inherit' />,
-  //   component: CustomerImages,
-  //   layout: '/customer'
-  // },
+  {
+    path: '/images',
+    name: 'Images',
+    icon: <FaImages color='inherit' />,
+    component: CustomerImages,
+    layout: '/customer'
+  },
   {
     path: '/products',
     name: 'Products',
