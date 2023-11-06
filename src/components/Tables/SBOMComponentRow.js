@@ -388,8 +388,10 @@ function SBOMComponentRow(props) {
                   Supplier:
                 </Text>
                 <Text>
-                  {suppliers.length > 0 &&
-                    `${suppliers[0].name} - ${suppliers[0].email}`}
+                  {suppliers.length > 0 && suppliers[0].name}
+                  {suppliers.length > 0 && suppliers[0].email && (
+                    ` - ${suppliers[0].email}`
+                  )}
                 </Text>
               </Stack>
             </Td>
