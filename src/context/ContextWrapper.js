@@ -61,6 +61,7 @@ const ContextWrapper = (props) => {
   const [logField, setLogField] = useState('ACTIVITY_LOGS_CREATED_AT')
   const [logDirection, setLogDirection] = useState('DESC')
   const [activeProdTab, setActiveProdTab] = useState(0)
+  const [signedActiveTab, setSignedActiveTab] = useState(0)
   const [totalRows, setTotalRows] = useState(25)
 
   // VULN FILTER
@@ -146,6 +147,8 @@ const ContextWrapper = (props) => {
         setSignedVulnDirection,
         activeProdTab,
         setActiveProdTab,
+        signedActiveTab,
+        setSignedActiveTab,
         totalRows,
         setTotalRows,
         vulnSearchInput,

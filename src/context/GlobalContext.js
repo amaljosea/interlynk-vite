@@ -59,6 +59,8 @@ const GlobalContext = React.createContext({
   setLogDirection: () => {},
   activeProdTab: 0,
   setActiveProdTab: () => {},
+  signedActiveTab: 0,
+  setSignedActiveTab: () => {},
   totalRows: 25,
   setTotalRows: () => {},
   // VULN FILTER

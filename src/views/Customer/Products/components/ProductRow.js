@@ -1,9 +1,12 @@
 import { Td, Text, Tr, Switch, Skeleton } from '@chakra-ui/react'
+import GlobalContext from 'context/GlobalContext'
+import { useContext } from 'react'
 import { Link } from 'react-router-dom'
 import { timeSince } from 'utils'
 
 function ProductRow(props) {
   const { id, sbomId, name, description, updatedAt, isLoading } = props
+  const { setSignedActiveTab } = useContext(GlobalContext)
 
   const uniqVersions = []
 
@@ -64,6 +67,7 @@ function ProductRow(props) {
               }`}
               onClick={() => {
                 window.localStorage.setItem('product', name)
+                setSignedActiveTab(0)
               }}
             >
               <Text color={'blue.500'} minWidth='100%'>
