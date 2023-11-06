@@ -6,19 +6,24 @@ import {
   TabList,
   TabPanel,
   TabPanels,
-  Tabs
+  Tabs,
+  Button,
+  Text
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import ComponentTable from 'components/Tables/ComponentTable'
 import GeneralDataRow from 'components/Tables/GeneralDataRow'
+import VulnTable from 'components/Tables/VulnTable'
 import GlobalContext from 'context/GlobalContext'
+import { GetSignedVulnData } from 'graphQL/Queries'
 import { GetSignedCompFilterData } from 'graphQL/Queries'
+import { GetSignedVulnFilterData } from 'graphQL/Queries'
 import { GetSignedComponentData } from 'graphQL/Queries'
 import Cookies from 'js-cookie'
 import { useContext, useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 
-const SignedSbomTable = ({ refetch, data, status, type }) => {
+const SignedSbomTable = ({ refetch, data, status, type, filteredData }) => {
   const location = useLocation()
 
   const queryParams = new URLSearchParams(location.search)
@@ -29,11 +34,23 @@ const SignedSbomTable = ({ refetch, data, status, type }) => {
   const [tabIndex, setTabIndex] = useState(0)
   const [totalRows, setTotalRows] = useState(25)
   const [componentIndex, setComponentIndex] = useState(1)
+  const [vulnIndex, setVulnIndex] = useState(1)
 
   const signedParams = Cookies.get(`signedParamId`)
 
-  const { signedCompField, signedCompDirection, setSignedCompFilters } =
-    useContext(GlobalContext)
+  const {
+    signedCompField,
+    signedCompDirection,
+    setSignedCompFilters,
+    signedVulnField,
+    signedVulnDirection,
+    setSignedVulnFilters,
+    signedVulnSeverity,
+    signedVulnComponent,
+    signedVulnStatus,
+    signedVulnKev,
+    signedVulnEpss
+  } = useContext(GlobalContext)
 
   const { lifecycle } = data
 
@@ -43,26 +60,26 @@ const SignedSbomTable = ({ refetch, data, status, type }) => {
     { data: compData, refetch: compRefetch, error, loading }
   ] = useLazyQuery(GetSignedComponentData)
 
+  // GET VULN DATA
+  const [getVulnData, { data: vulnData, refetch: vulnRefetch }] =
+    useLazyQuery(GetSignedVulnData)
+
   // GET COMPONENT FILTER HEADS
   const [getCompFilters, { refetch: compFilterRefetch }] = useLazyQuery(
     GetSignedCompFilterData
   )
 
-  // FETCH COMPONENT DATA
-  useEffect(() => {
-    if (compData === undefined) {
-      getCompData({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          signedParams: signedParams,
-          first: totalRows,
-          field: signedCompField,
-          direction: signedCompDirection
-        }
-      })
-    }
-  }, [])
+  // GET VULN FILTER HEADS
+  const [getVulnFilters, { refetch: vulnFilterRefetch }] = useLazyQuery(
+    GetSignedVulnFilterData
+  )
+
+  const epss = signedVulnEpss !== 'all' && signedVulnEpss.split('-')
+
+  const range = {
+    min: parseFloat(epss[0]),
+    max: parseFloat(epss[1])
+  }
 
   // FETCH FILTER DATA BASE ON SELECTED TAB
   useEffect(() => {
@@ -73,6 +90,16 @@ const SignedSbomTable = ({ refetch, data, status, type }) => {
         signedParams: signedParams
       })
     } else if (tabIndex === 1) {
+      getCompData({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          signedParams: signedParams,
+          first: totalRows,
+          field: signedCompField,
+          direction: signedCompDirection
+        }
+      })
       getCompFilters({
         variables: {
           projectId: productId,
@@ -82,6 +109,43 @@ const SignedSbomTable = ({ refetch, data, status, type }) => {
       }).then((res) => {
         if (res.data) {
           setSignedCompFilters(res.data.sbom.filters)
+        }
+      })
+    } else if (tabIndex === 2) {
+      getVulnData({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          signedParams: signedParams,
+          severity:
+            signedVulnSeverity.length > 0 ? signedVulnSeverity : undefined,
+          componentName:
+            signedVulnComponent.length > 0 ? signedVulnComponent : undefined,
+          status: signedVulnStatus.length > 0 ? signedVulnStatus : undefined,
+          kev:
+            signedVulnKev === 'all'
+              ? undefined
+              : signedVulnKev === 'yes'
+              ? true
+              : false,
+          epss:
+            signedVulnEpss !== '' && signedVulnEpss !== 'all'
+              ? range
+              : undefined,
+          first: totalRows,
+          field: signedVulnField,
+          direction: signedVulnDirection
+        }
+      })
+      getVulnFilters({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          signedParams: signedParams
+        }
+      }).then((res) => {
+        if (res.data) {
+          setSignedVulnFilters(res.data.sbom.filters)
         }
       })
     }
@@ -96,7 +160,7 @@ const SignedSbomTable = ({ refetch, data, status, type }) => {
       >
         {/* TAB LIST */}
         <TabList mt='20px'>
-          {['General', 'Components'].map((item, index) => (
+          {['General', 'Components', 'Vulnerabilities'].map((item, index) => (
             <Tab key={index} _focus={{ outline: 'none' }}>
               {item}
             </Tab>
@@ -177,6 +241,21 @@ const SignedSbomTable = ({ refetch, data, status, type }) => {
                 </Button>
               </Flex>
             )}
+          </TabPanel>
+          {/* VULN TABLE */}
+          <TabPanel px={0}>
+            <VulnTable
+              data={vulnData?.sbom?.vulns}
+              filteredData={filteredData}
+              refetch={getVulnData}
+              productId={productId}
+              sbomId={sbomId}
+              filterRefetch={vulnFilterRefetch}
+              pageIndex={vulnIndex}
+              setPageIndex={setVulnIndex}
+              totalRows={totalRows}
+              setTotalRows={setTotalRows}
+            />
           </TabPanel>
         </TabPanels>
       </Tabs>

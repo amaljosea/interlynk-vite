@@ -774,33 +774,35 @@ function ComponentDrawer(props) {
               </FormControl>
             </Stack>
           </DrawerBody>
-          <DrawerFooter borderTopWidth='1px'>
-            <Button mr={3} onClick={onClose}>
-              Cancel
-            </Button>
-            {id === undefined ? (
-              <Button
-                colorScheme='blue'
-                onClick={handleSave}
-                isDisabled={
-                  (containesOther && licenseName === '') ||
-                  compType === '' ||
-                  compName === '' ||
-                  compVersion === ''
-                }
-              >
-                Save
+          {!customerView && (
+            <DrawerFooter borderTopWidth='1px'>
+              <Button mr={3} onClick={onClose}>
+                Cancel
               </Button>
-            ) : (
-              <Button
-                colorScheme='blue'
-                onClick={handleUpdate}
-                isDisabled={containesOther && licenseName === ''}
-              >
-                Update
-              </Button>
-            )}
-          </DrawerFooter>
+              {id === undefined ? (
+                <Button
+                  colorScheme='blue'
+                  onClick={handleSave}
+                  isDisabled={
+                    (containesOther && licenseName === '') ||
+                    compType === '' ||
+                    compName === '' ||
+                    compVersion === ''
+                  }
+                >
+                  Save
+                </Button>
+              ) : (
+                <Button
+                  colorScheme='blue'
+                  onClick={handleUpdate}
+                  isDisabled={containesOther && licenseName === ''}
+                >
+                  Update
+                </Button>
+              )}
+            </DrawerFooter>
+          )}
         </DrawerContent>
       </Drawer>
 

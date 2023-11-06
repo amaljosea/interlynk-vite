@@ -110,6 +110,10 @@ function ProductInfo() {
   const filteredData =
     uniqVersions.length > 0 ? removeDuplicatesAndLatest(uniqVersions) : []
 
+  useEffect(() => {
+    setSelectedVersion(sbomId)
+  }, [sbomId])
+
   const [selectedVersion, setSelectedVersion] = useState('')
 
   const refetchSBOM = async (id) => {

@@ -133,9 +133,7 @@ const ProdStatusDrawer = ({
     <Stack spacing='24px'>
       <Box>
         <SimpleGrid row={5} spacing={4}>
-          {location.pathname.startsWith('/customer') ? (
-            ''
-          ) : (
+          {!location.pathname.startsWith('/customer') && (
             <>
               <Box>
                 <Text mb={1} fontSize='sm' color='gray.600'>
@@ -160,7 +158,7 @@ const ProdStatusDrawer = ({
                   )}
                 </Select>
               </Box>
-              {statusName === 'Not Affected' ? (
+              {statusName === 'Not Affected' && (
                 <Box>
                   <FormLabel
                     py='4px'
@@ -189,10 +187,8 @@ const ProdStatusDrawer = ({
                     )}
                   </Select>
                 </Box>
-              ) : (
-                ''
               )}
-              {statusName === 'Fixed' ? (
+              {statusName === 'Fixed' && (
                 <Stack
                   width={'100%'}
                   direction={'column'}
@@ -236,32 +232,21 @@ const ProdStatusDrawer = ({
                     />
                   </Box>
                 </Stack>
-              ) : (
-                ''
               )}
+              <Box>
+                <Text mb={1} fontSize='sm' color='gray.600'>
+                  Notes
+                </Text>
+                <Textarea
+                  placeholder='Add notes'
+                  size='sm'
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                />
+              </Box>
             </>
           )}
-          <Box>
-            <Text mb={1} fontSize='sm' color='gray.600'>
-              Notes
-            </Text>
-            <Textarea
-              placeholder='Add notes'
-              size='sm'
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-            />
-          </Box>
-          {location.pathname.startsWith('/customer') ? (
-            <Flex dir='row' gap={2} width={'100%'}>
-              <Button colorScheme='red' width={'100%'}>
-                Request Status
-              </Button>
-              <Button colorScheme='green' width={'100%'}>
-                Accept Status
-              </Button>
-            </Flex>
-          ) : (
+          {!location.pathname.startsWith('/customer') && (
             <Button
               width={'fit-content'}
               colorScheme='blue'
@@ -274,6 +259,7 @@ const ProdStatusDrawer = ({
               Add
             </Button>
           )}
+          {/* STATUS HISTORY */}
           <Flex flexDir={'column'}>
             <Text size='md' my={2}>
               Status History
