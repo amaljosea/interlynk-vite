@@ -42,6 +42,7 @@ const SBOMTable = ({
   refetch,
   filteredData,
   setComponents,
+  totalComp,
   setTotalComp,
   vulnData,
   getVulnData
@@ -95,7 +96,6 @@ const SBOMTable = ({
   useEffect(() => {
     if (compData) {
       setComponents(compData.sbom.components.nodes)
-      setTotalComp(compData.sbom.components.totalCount)
     }
   }, [compData])
 
@@ -146,7 +146,13 @@ const SBOMTable = ({
           field: compField,
           direction: compDirection
         }
-      }).then((res) => res.data && setComponentIndex(1))
+      }).then((res) => {
+        if (res.data) {
+          console.log('data', res.data)
+          setTotalComp(res.data.sbom.components.totalCount)
+          setComponentIndex(1)
+        }
+      })
       getCompFilters({
         variables: {
           projectId: productId,
@@ -287,8 +293,7 @@ const SBOMTable = ({
                   type={type}
                   lifecycle={lifecycle}
                   data={compData?.sbom?.components}
-                  loading={loading}
-                  error={error}
+                  totalComp={totalComp}
                   refetch={compRefetch}
                   filterRefetch={compFilterRefetch}
                   pageIndex={componentIndex}

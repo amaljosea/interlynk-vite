@@ -1,3 +1,4 @@
+import { useLazyQuery, useMutation } from '@apollo/client'
 import { AddIcon } from '@chakra-ui/icons'
 import {
   Box,
@@ -30,46 +31,76 @@ import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
 import NodeElement from 'components/NodeElement'
-import { useState } from 'react'
+import GlobalContext from 'context/GlobalContext'
+import { DeleteCompRelation } from 'graphQL/Mutation'
+import { UpdateCompRelation } from 'graphQL/Mutation'
+import { CreateCompRelation } from 'graphQL/Mutation'
+import { GetAllComponents } from 'graphQL/Queries'
+import { useContext, useState } from 'react'
 import Tree from 'react-d3-tree'
+import { useLocation } from 'react-router-dom'
 
-const RelationshipDrawer = ({ isOpen, onClose, data }) => {
-  const { name, version } = data
+const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const productId = queryParams.get('p')
+  const sbomId = queryParams.get('sbom')
+
+  const { name, version, id, dependencyOf, dependsOn } = data
+  const { totalRows } = useContext(GlobalContext)
+
+  console.log('data', data)
 
   const [createRelation, setCreateRelation] = useState(false)
   const [relation, setRelation] = useState('')
   const [component, setComponent] = useState('')
 
-  const [dependencyOf, setDependencyOf] = useState([
-    'Microsoft.Graph.Core 2.0.8'
-  ])
+  const [getAllComps, { data: allComponents }] = useLazyQuery(GetAllComponents)
+  const [addRelation] = useMutation(CreateCompRelation)
+  const [updateRelation] = useMutation(UpdateCompRelation)
+  const [removeRelation] = useMutation(DeleteCompRelation)
 
-  const [dependsOn, setDependsOn] = useState([
-    'Microsoft.Bcl.AsyncInterfaces 1.1.1',
-    'System.Diagnostics.DiagnosticSource 6.0.0',
-    'System.Memory.Data 1.0.2'
-  ])
+  const handleAdd = async () => {
+    await getAllComps({
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        first: total,
+        field: 'COMPONENTS_UPDATED_AT',
+        direction: 'DESC'
+      }
+    }).then((res) => {
+      if (res.data) {
+        setCreateRelation(true)
+        setRelation('')
+        setComponent('')
+      }
+    })
+  }
 
-  const handleSubmit = () => {
-    if (relation === 'Dependency Of') {
-      setDependencyOf((prevData) => [component, ...prevData])
-    }
-    if (relation === 'Depends On') {
-      setDependsOn((prevData) => [component, ...prevData])
-    }
-
-    setCreateRelation(false)
+  const handleSubmit = async () => {
+    await addRelation({
+      variables: {
+        from: id,
+        to: component,
+        relType: relation
+      }
+    })
+      .then((res) => {
+        if (res.data) {
+          console.log(res.data)
+          refetch({
+            projectId: productId,
+            sbomId: sbomId,
+            first: totalRows
+          })
+        }
+      })
+      .finally(() => setCreateRelation(false))
   }
 
   const handleRemove = (relation, comp) => {
-    if (relation === 'Dependency Of') {
-      const compData = dependencyOf.filter((_, index) => index !== comp)
-      setDependencyOf(compData)
-    }
-    if (relation === 'Depends On') {
-      const compData = dependsOn.filter((_, index) => index !== comp)
-      setDependsOn(compData)
-    }
+    console.log('hello')
   }
 
   const orgChart = {
@@ -177,11 +208,7 @@ const RelationshipDrawer = ({ isOpen, onClose, data }) => {
                     variant='solid'
                     fontWeight='normal'
                     size='md'
-                    onClick={() => {
-                      setCreateRelation(true)
-                      setRelation('')
-                      setComponent('')
-                    }}
+                    onClick={handleAdd}
                   />
                 </Tooltip>
               </Stack>
@@ -213,49 +240,53 @@ const RelationshipDrawer = ({ isOpen, onClose, data }) => {
                         onChange={(e) => setRelation(e.target.value)}
                       >
                         <option value=''>-- Select --</option>
-                        {['Dependency Of', 'Depends On'].map((item, idx) => (
-                          <option key={idx} value={item.relation}>
-                            {item}
-                          </option>
-                        ))}
+                        {[{ value: 'dependson', label: 'Depends On' }].map(
+                          (item, idx) => (
+                            <option key={idx} value={item.value}>
+                              {item.label}
+                            </option>
+                          )
+                        )}
                       </Select>
                     </FormControl>
-                    <FormControl>
-                      <FormLabel htmlFor='component' color='gray.600'>
-                        Component
-                      </FormLabel>
-                      <Select
-                        id='component'
-                        size='sm'
-                        value={component}
-                        onChange={(e) => setComponent(e.target.value)}
-                      >
-                        <option value=''>-- Select --</option>
-                        {[
-                          'System.Xml.XDocument',
-                          'System.Xml.ReaderWriter',
-                          'System.Windows.Extensions',
-                          'System.Text.Encoding',
-                          'System.Text.Encodings.Web'
-                        ].map((item, idx) => (
-                          <option key={idx} value={item}>
-                            {item}
-                          </option>
-                        ))}
-                      </Select>
-                    </FormControl>
+                    {allComponents && (
+                      <FormControl>
+                        <FormLabel htmlFor='component' color='gray.600'>
+                          Component
+                        </FormLabel>
+                        <Select
+                          id='component'
+                          size='sm'
+                          value={component}
+                          onChange={(e) => setComponent(e.target.value)}
+                        >
+                          <option value=''>-- Select --</option>
+                          {[...allComponents.sbom.components.nodes]
+                            .filter((com) => com.name !== name)
+                            .sort((a, b) => a.name.localeCompare(b.name))
+                            .map((item, idx) => (
+                              <option key={idx} value={item.id}>
+                                {item.name}-{item.version}
+                              </option>
+                            ))}
+                        </Select>
+                      </FormControl>
+                    )}
+
                     <Button
                       size='md'
                       mt={2}
                       width={'fit-content'}
                       colorScheme='blue'
                       onClick={handleSubmit}
+                      isDisabled={relation === '' || component === ''}
                     >
                       Add
                     </Button>
                   </Stack>
                 )}
-                <Box
+                {/* Graph */}
+                {/* <Box
                   width={'100%'}
                   height={'100vh'}
                   display={'flex'}
@@ -299,9 +330,9 @@ const RelationshipDrawer = ({ isOpen, onClose, data }) => {
                       />
                     )}
                   />
-                </Box>
+                </Box> */}
                 {/* COMONENT RELATIONSIP DATA */}
-                {/* <Table mt={6} width={'100%'}>
+                <Table mt={6} width={'100%'}>
                   <Thead>
                     <Tr>
                       {['Relation', 'Component'].map((item, index) => (
@@ -367,7 +398,7 @@ const RelationshipDrawer = ({ isOpen, onClose, data }) => {
                       </Td>
                     </Tr>
                   </Tbody>
-                </Table> */}
+                </Table>
               </Flex>
             </CardBody>
           </Card>

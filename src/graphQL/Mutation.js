@@ -1077,3 +1077,80 @@ export const updateCompVulnVex = gql`
     }
   }
 `
+
+// CREATE COMPONENT RELATION
+export const CreateCompRelation = gql`
+  mutation CreateCompRelation($from: Uuid!, $to: Uuid!, $relType: String!) {
+    componentRelationCreate(
+      input: { fromCompId: $from, toCompId: $to, relationType: $relType }
+    ) {
+      compRelation {
+        id
+        fromComp {
+          id
+          name
+        }
+        toComp {
+          id
+          name
+        }
+        relType
+      }
+      errors
+    }
+  }
+`
+
+// UPDATE COMPONENT RELATION
+export const UpdateCompRelation = gql`
+  mutation UpdateCompRelation(
+    $relId: Uuid!
+    $from: Uuid
+    $to: Uuid
+    $relType: String
+  ) {
+    componentRelationCreate(
+      input: {
+        compRelationId: $relId
+        fromCompId: $from
+        toCompId: $to
+        relationType: $relType
+      }
+    ) {
+      compRelation {
+        id
+        fromComp {
+          id
+          name
+        }
+        toComp {
+          id
+          name
+        }
+        relType
+      }
+      errors
+    }
+  }
+`
+
+// DELETE COMPONENT RELATION
+export const DeleteCompRelation = gql`
+  mutation DeleteCompRelation($relId: Uuid!) {
+    componentRelationCreate(input: { compRelationId: $relId }) {
+      compRelation {
+        id
+        fromComp {
+          id
+          name
+        }
+        toComp {
+          id
+          name
+        }
+        relType
+      }
+      errors
+    }
+  }
+`
