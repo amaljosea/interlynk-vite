@@ -415,7 +415,7 @@ const VulnFilterMenu = ({
               value={customerView ? signedVulnEpss : vulnEpss}
               onChange={onFilterEpss}
             >
-              <MenuItemOption value={'all'} fontSize={'sm'}>
+              <MenuItemOption value={''} fontSize={'sm'}>
                 All
               </MenuItemOption>
               {['0-100', '100-500', '500-1,000', '1,000-10,000'].map(
