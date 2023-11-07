@@ -385,7 +385,9 @@ function SBOM() {
                               variant='solid'
                               colorScheme='blue'
                             >
-                              <TagLabel>{sbomData.sbom.lifecycle}</TagLabel>
+                            <Tooltip label="Lifecycle stage" fontSize="md">
+                              <TagLabel textTransform={'capitalize'} >{sbomData.sbom.lifecycle}</TagLabel>
+                            </Tooltip>
                             </Tag>
                             {sbomData.sbom.vulnRunStatus === 'IN_PROGRESS' && (
                               <Tag
@@ -394,7 +396,9 @@ function SBOM() {
                                 variant='solid'
                                 colorScheme='blue'
                               >
-                                <TagLabel>scanning</TagLabel>
+                              <Tooltip label="Vulnerability scan in progress" fontSize="md">
+                                <TagLabel textTransform={'capitalize'}>scanning</TagLabel>
+                              </Tooltip>
                               </Tag>
                             )}
                           </HStack>
