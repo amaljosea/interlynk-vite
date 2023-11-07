@@ -176,14 +176,12 @@ function SBOM() {
 
   data &&
     data.project.sboms.map((project) => {
-      if (project.primaryComponent) {
         uniqVersions.push({
-          version: project.primaryComponent.version,
+          version: project.primaryComponent?.version,
           id: project.id,
           updatedAt: project.updatedAt,
           creationAt: project.creationAt
         })
-      }
     })
 
   // remove duplicates
@@ -213,8 +211,6 @@ function SBOM() {
     // Compare the dates
     return dateB - dateA
   })
-
-  // console.log('filteredData', filteredData)
 
   const [selectedVersion, setSelectedVersion] = useState('')
   const [isLoading, setIsLoading] = useState(false)
