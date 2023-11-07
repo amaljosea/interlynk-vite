@@ -598,7 +598,7 @@ const HealthCheckTable = ({
           </>
         )
       },
-      right: true
+      right: 'true'
     }
   ]
 

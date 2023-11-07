@@ -474,8 +474,7 @@ const ComponentTable = ({
           </>
         )
       },
-      width: '100px',
-      right: true
+      right: 'true'
     }
   ]
 
