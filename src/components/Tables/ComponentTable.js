@@ -72,7 +72,7 @@ const customStyles = {
 const ComponentTable = ({
   lifecycle,
   data,
-  error,
+  totalComp,
   refetch,
   pageIndex,
   setPageIndex,
@@ -501,7 +501,11 @@ const ComponentTable = ({
           }
         }).then((res) => {
           if (res) {
-            window.location.reload()
+            refetch({
+              projectId: productId,
+              sbomId: sbomId,
+              first: totalRows
+            })
           }
         })
       } catch (error) {
@@ -783,14 +787,14 @@ const ComponentTable = ({
             <Button
               colorScheme='blue'
               onClick={handlePreviousPage}
-              isDisabled={!data.pageInfo.hasPreviousPage || error}
+              isDisabled={!data.pageInfo.hasPreviousPage}
             >
               Previous
             </Button>
             <Button
               colorScheme='blue'
               onClick={handleNextPage}
-              isDisabled={!data.pageInfo.hasNextPage || error}
+              isDisabled={!data.pageInfo.hasNextPage}
             >
               Next
             </Button>
@@ -803,7 +807,7 @@ const ComponentTable = ({
           </Stack>
 
           {/* ROW LIMIT */}
-          <RowLimit onChange={handleSetRow} name='component' />
+          <RowLimit onChange={handleSetRow} name='componentRow' />
         </Flex>
       )}
 
@@ -876,6 +880,8 @@ const ComponentTable = ({
               isOpen={isRelationOpen}
               onClose={onRelationClose}
               data={activeRow}
+              total={totalComp}
+              refetch={refetch}
             />
           )}
         </>

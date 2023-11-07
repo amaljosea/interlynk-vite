@@ -577,6 +577,18 @@ export const GetComponentData = gql`
           description
           licenseExp
           group
+          dependencyOf {
+            id
+            relType
+            fromId
+            toId
+          }
+          dependsOn {
+            id
+            relType
+            fromId
+            toId
+          }
           externalUrls {
             name
             url
@@ -626,6 +638,7 @@ export const GetAllComponents = gql`
         nodes {
           id
           name
+          version
         }
       }
     }

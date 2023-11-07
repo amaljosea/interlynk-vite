@@ -303,7 +303,7 @@ function SBOM() {
           projectId: productId,
           sbomId: sbomId,
           first: totalComp,
-          field: 'UPDATED_AT',
+          field: 'COMPONENTS_UPDATED_AT',
           direction: 'DESC'
         }
       }).then(() => onPrimaryOpen())
@@ -644,6 +644,7 @@ function SBOM() {
                 refetch={refetch}
                 status={status}
                 setComponents={setComponents}
+                totalComp={totalComp}
                 setTotalComp={setTotalComp}
                 getVulnData={getVulnData}
                 vulnData={vulnData}
