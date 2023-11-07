@@ -435,6 +435,7 @@ export const GetProjectData = gql`
         sboms {
           id
           format
+          creationAt
           updatedAt
           primaryComponent {
             id
@@ -935,6 +936,7 @@ export const GetProject = gql`
         spec
         specVersion
         updatedAt
+        creationAt
         primaryComponent {
           id
           name

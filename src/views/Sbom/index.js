@@ -180,7 +180,8 @@ function SBOM() {
         uniqVersions.push({
           version: project.primaryComponent.version,
           id: project.id,
-          updatedAt: project.updatedAt
+          updatedAt: project.updatedAt,
+          creationAt: project.creationAt
         })
       }
     })
@@ -337,7 +338,7 @@ function SBOM() {
                   <Grid
                     width={'100%'}
                     templateColumns='repeat(5, 1fr)'
-                    alignItems={'center'}
+                    alignItems={'top'}
                   >
                     {/* LEFT */}
 
@@ -560,7 +561,7 @@ function SBOM() {
                                     value={item.id}
                                     name={item.version}
                                   >
-                                    {item.version}
+                                     {item.version ? item.version : `Uploaded: ${getFullDateAndTime(item.creationAt)}`}
                                   </option>
                                 ))
                               ) : (
