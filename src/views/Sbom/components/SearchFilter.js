@@ -40,11 +40,11 @@ const SearchFilter = ({ id, filterText, setFilterText, onFilter, onClear }) => {
       <Box pos={'relative'} width={'300px'}>
         <Input
           id={id}
+          name={id}
           type='text'
           placeholder='Search'
           ref={searchInputRef}
           value={filterText}
-          autoComplete={id}
           onChange={(e) => setFilterText(e.target.value)}
           onKeyDown={onFilter}
           onFocus={onFocus}
