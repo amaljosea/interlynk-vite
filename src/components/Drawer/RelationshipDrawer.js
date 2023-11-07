@@ -359,7 +359,7 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
                               colorScheme='blue'
                               width={'fit-content'}
                             >
-                              <TagLabel>{comp.toComp.name}-{comp.toComp.version}</TagLabel>
+                              <TagLabel>{comp.fromComp.name}-{comp.fromComp.version}</TagLabel>
                               <TagCloseButton
                                 onClick={() =>
                                   handleRemove('Dependency Of', index)

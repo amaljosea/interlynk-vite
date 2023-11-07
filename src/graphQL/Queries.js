@@ -582,7 +582,7 @@ export const GetComponentData = gql`
             relType
             fromId
             toId
-            toComp{
+            fromComp{
               id
               name
               version

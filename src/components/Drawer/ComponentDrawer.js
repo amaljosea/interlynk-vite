@@ -819,27 +819,27 @@ function ComponentDrawer(props) {
         <Modal isOpen={isWarningOpen} onClose={onWarningClose}>
           <ModalOverlay />
           <ModalContent>
-            <ModalHeader>Primary Component</ModalHeader>
+            <ModalHeader>Primary Component Change</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               <Text>
-                You are about to change primary component from
+                You are about to change primary component
+                <br /><br />
+                From:
                 <br />
-                <chakra.span
-                  bg={'blackAlpha.700'}
-                  fontSize={'md'}
-                  color={'white'}
-                >
-                  {primaryComp?.name}
-                </chakra.span>{' '}
-                to{' '}
-                <chakra.span
-                  bg={'blackAlpha.700'}
-                  fontSize={'md'}
-                  color={'white'}
-                >
-                  {component}
-                </chakra.span>
+
+                <Text as='em'>
+                  {primaryComp?.name}-{primaryComp?.version}
+                  </Text>
+                <br />
+                <br />
+
+                To:
+                <br />
+
+                <Text as='em'>
+                  {compName}-{compVersion}
+                </Text>
               </Text>
               <br />
               <Text mt={10}>Are you sure you wish to continue ?</Text>
