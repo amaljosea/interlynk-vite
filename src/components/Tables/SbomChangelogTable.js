@@ -122,7 +122,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
       },
       width: '300px',
       sortable: true,
-      width: '300px'
+      wrap: true
     },
     // PRIOR VALUE
     {
@@ -170,7 +170,8 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
           </Flex>
         )
       },
-      width: '400px'
+      wrap: true,
+      width: '250px'
     },
     // UPDATED VALUE
     {
@@ -235,14 +236,16 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
           </Flex>
         )
       },
-      width: '400px'
+      wrap: true,
+      width: '250px'
     },
     // CHANGED BY
     {
       id: 'ACTIVITY_LOGS_CHANGED_BY',
       name: 'BY',
       selector: (row) => row.changedBy,
-      width: '150px',
+      wrap: true,
+      width: '200px',
       sortable: true
     },
     // CHANGED ON
@@ -259,7 +262,8 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
         const dateA = new Date(a.updatedAt)
         const dateB = new Date(b.updatedAt)
         return dateA - dateB // Sort in descending order
-      }
+      },
+      right: 'true'
     }
   ]
 

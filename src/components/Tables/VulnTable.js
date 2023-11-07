@@ -165,6 +165,7 @@ const VulnTable = ({
     {
       id: 'VULNS_VULN_ID',
       name: 'ID',
+      wrap: true,
       selector: (row) => {
         const { vuln } = row
         const { vulnInfo } = vuln
@@ -192,7 +193,7 @@ const VulnTable = ({
           </Link>
         )
       },
-      width: '270px',
+      width: '200px',
       sortable: true
     },
     // SEVERITY
@@ -341,7 +342,8 @@ const VulnTable = ({
           </Tooltip>
         )
       },
-      width: '240px',
+      wrap: true,
+      width: '150px',
       sortable: true
     },
     // VERSION
@@ -353,7 +355,8 @@ const VulnTable = ({
           {row.component.version}
         </Tooltip>
       ),
-      width: '180px',
+      wrap: true,
+      width: '120px',
       sortable: true
     },
     // STATUS
@@ -378,7 +381,7 @@ const VulnTable = ({
         )
       },
       sortable: true,
-      width: '180px'
+      width: '150px'
     },
     // UPDATED AT
     {
@@ -397,7 +400,8 @@ const VulnTable = ({
         const dateA = new Date(a.vuln.updatedAt)
         const dateB = new Date(b.vuln.updatedAt)
         return dateB - dateA // Sort in descending order
-      }
+      },
+      right: 'true'
     }
   ]
 

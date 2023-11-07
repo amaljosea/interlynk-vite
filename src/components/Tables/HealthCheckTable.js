@@ -509,16 +509,9 @@ const HealthCheckTable = ({
           </Tooltip>
         )
       },
-      width: '900px'
+      width: '600px',
+      wrap: true
     },
-    /*     // STATUS
-    {
-      id: 'status',
-      name: 'STATUS',
-      selector: (row) => row.status,
-      sortable: true,
-      width: '160px'
-    }, */
     // UPDATED AT
     {
       id: 'CHECK_RESULTS_UPDATED_AT',
