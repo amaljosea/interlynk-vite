@@ -148,7 +148,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
                   'True'
                 ) : license.length > 0 ? (
                   license.map((item, index) => (
-                    <Flex flexWrap={'wrap'} gap={2} my={2} direction={'column'}>
+                    <Flex key={index} flexWrap={'wrap'} gap={2} my={2} direction={'column'}>
                       <Tag
                         size={'sm'}
                         key={index}
@@ -198,7 +198,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
                   'True'
                 ) : updatedValue.length > 0 ? (
                   updatedValue.map((item, index) => (
-                    <Flex flexWrap={'wrap'} gap={2} my={2} direction={'column'}>
+                    <Flex key={index} flexWrap={'wrap'} gap={2} my={2} direction={'column'}>
                       <Tag
                         size={'sm'}
                         key={index}
@@ -214,7 +214,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
                   ''
                 ) : urls && urls.length > 0 ? (
                   urls.map((item, index) => (
-                    <Flex flexWrap={'wrap'} gap={2} my={2} direction={'column'}>
+                    <Flex key={index} flexWrap={'wrap'} gap={2} my={2} direction={'column'}>
                       <Tag
                         size={'sm'}
                         key={index}
@@ -441,7 +441,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
             </Box>
           </Stack>
 
-          <RowLimit onChange={handleSetRow} name='changelog' />
+          <RowLimit onChange={handleSetRow} name='changelogRow' />
         </Flex>
       )}
     </>
