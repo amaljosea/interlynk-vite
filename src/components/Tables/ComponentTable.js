@@ -417,8 +417,7 @@ const ComponentTable = ({
                     >
                       Edit Component
                     </MenuItem>
-                    {name === 'Azure.Core' && (
-                      <MenuItem
+                    <MenuItem
                         onClick={() => {
                           setActiveRow(row)
                           onRelationOpen()
@@ -426,7 +425,6 @@ const ComponentTable = ({
                       >
                         Edit Relationship
                       </MenuItem>
-                    )}
                     <MenuItem
                       onClick={() => {
                         setActiveRow(row)

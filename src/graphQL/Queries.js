@@ -582,12 +582,22 @@ export const GetComponentData = gql`
             relType
             fromId
             toId
+            toComp{
+              id
+              name
+              version
+            }
           }
           dependsOn {
             id
             relType
             fromId
             toId
+            toComp{
+              id
+              name
+              version
+            }
           }
           externalUrls {
             name
