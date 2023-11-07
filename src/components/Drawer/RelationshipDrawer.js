@@ -9,6 +9,7 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerOverlay,
+  DrawerFooter,
   Flex,
   FormControl,
   FormLabel,
@@ -187,7 +188,7 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
       <DrawerContent>
         <DrawerCloseButton />
         <DrawerHeader borderBottomWidth='1px' color='gray.600'>
-          Edit Relationship
+          Edit Relationships
         </DrawerHeader>
         <DrawerBody>
           <Card px={0} mx={0}>
@@ -231,7 +232,7 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
                   >
                     <FormControl>
                       <FormLabel htmlFor='relation' color='gray.600'>
-                        Relation
+                        Type
                       </FormLabel>
                       <Select
                         id='relation'
@@ -335,7 +336,7 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
                 <Table mt={6} width={'100%'}>
                   <Thead>
                     <Tr>
-                      {['Relation', 'Component'].map((item, index) => (
+                      {['Type', 'Component'].map((item, index) => (
                         <Th key={index} pl={0} width={'100px'}>
                           <Box>{item}</Box>
                         </Th>
@@ -403,6 +404,11 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
             </CardBody>
           </Card>
         </DrawerBody>
+        <DrawerFooter>
+            <Button variant='outline' mr={3} onClick={onClose}>
+              Done
+            </Button>
+          </DrawerFooter>
       </DrawerContent>
     </Drawer>
   )

@@ -423,7 +423,7 @@ const ComponentTable = ({
                           onRelationOpen()
                         }}
                       >
-                        Edit Relationship
+                        Edit Relationships
                       </MenuItem>
                     <MenuItem
                       onClick={() => {

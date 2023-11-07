@@ -295,7 +295,7 @@ function ProductLinkDrawer(props) {
         </DrawerBody>
 
         <DrawerFooter borderTopWidth='1px'>
-          <Button variant='outline' mr={3} onClick={onClose}>
+          <Button colorScheme='gray' variant='outline' mr={3} onClick={onClose}>
             Cancel
           </Button>
           <Button colorScheme='blue'>Save</Button>

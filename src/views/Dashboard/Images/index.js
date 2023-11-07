@@ -401,7 +401,7 @@ const Index = () => {
                   </Select>
                 </ModalBody>
                 <ModalFooter>
-                  <Button mr={3} onClick={() => onScanClose()}>
+                  <Button colorScheme='gray' mr={3} onClick={() => onScanClose()}>
                     Cancel
                   </Button>
                   <Button

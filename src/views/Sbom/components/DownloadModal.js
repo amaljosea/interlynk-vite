@@ -210,7 +210,7 @@ const DownloadModal = ({
           >
             <Stack>{isLoading && <Spinner color='blue.500' />}</Stack>
             <Stack direction='row' alignItems='center' gap={1}>
-              <Button mr={3} onClick={onClose}>
+              <Button colorScheme='gray' mr={3} onClick={onClose}>
                 Cancel
               </Button>
 
