@@ -27,11 +27,14 @@ const VulLinkRow = ({
           {timeSince(timestamp)}
         </Tooltip>
       </Td>
-      <Tooltip label={notes}>
-        <Td fontSize={'xs'}>
+      <Td fontSize={'xs'} pl={0}>
+        <BiNote />
+      </Td>
+      <Td fontSize={'xs'} pl={0}>
+        <Tooltip label={notes}>
           <BiNote />
-        </Td>
-      </Tooltip>
+        </Tooltip>
+      </Td>
     </Tr>
   )
 }
