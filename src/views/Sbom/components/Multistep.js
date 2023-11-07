@@ -30,9 +30,11 @@ const Form1 = () => {
   const [selectedVersion, setSelectedVersion] = useState('')
   const [uniqVersions, setUniqVersions] = useState([])
 
+  const { totalProducts } = useContext(GlobalContext)
+
   const { data: allProducts } = useQuery(GetProjectData, {
     variables: {
-      first: 25
+      first: totalProducts
     }
   })
 
@@ -73,8 +75,6 @@ const Form1 = () => {
     uniqVersions.length > 0 &&
     uniqVersions.filter((version) => version.id !== `${sbomVersionId}`)
 
-  // console.log('uniqVersions', uniqVersions)
-
   // remove duplicates
   const removeDuplicatesAndLatest = (arr) => {
     const uniqueVersions = {}
@@ -95,54 +95,53 @@ const Form1 = () => {
     ? removeDuplicatesAndLatest(filterVersions)
     : []
 
-  // console.log('selectedProd', selectedProd)
-  // console.log('selectedVersion', selectedVersion)
-
   return (
     <>
       <Box width={'400px'} margin={'0 auto'}>
-        <Stack spacing={4} direction={'column'} gap={2}>
-          {/* Project */}
-          <FormControl fontSize={'sm'}>
-            <FormLabel htmlFor='product' fontSize='md' color='gray.600'>
-              Project
-            </FormLabel>
-            <Select
-              name='projects'
-              value={selectedProd}
-              onChange={handleSelectProduct}
-            >
-              <option value={''}>-- Select --</option>
-              {productList.map((item, index) => (
-                <option key={index} value={item.value}>
-                  {item.label}
-                </option>
-              ))}
-            </Select>
-          </FormControl>
-          {/* Version */}
-          <FormControl fontSize={'sm'}>
-            <FormLabel htmlFor='product' fontSize='md' color='gray.600'>
-              Version
-            </FormLabel>
-            <Select
-              name='projects'
-              value={selectedVersion}
-              onChange={(e) => {
-                setSelectedVersion(e.target.value)
-                sbomId = e.target.value
-              }}
-            >
-              <option value={''}>-- Select --</option>
-              {filterVersions.length > 0 &&
-                filterVersions.map((item, index) => (
-                  <option key={index} value={item.id}>
-                    {item.version}
+        {productList && (
+          <Stack spacing={4} direction={'column'} gap={2}>
+            {/* Project */}
+            <FormControl fontSize={'sm'}>
+              <FormLabel htmlFor='product' fontSize='md' color='gray.600'>
+                Project
+              </FormLabel>
+              <Select
+                name='projects'
+                value={selectedProd}
+                onChange={handleSelectProduct}
+              >
+                <option value={''}>-- Select --</option>
+                {productList.map((item, index) => (
+                  <option key={index} value={item.value}>
+                    {item.label}
                   </option>
                 ))}
-            </Select>
-          </FormControl>
-        </Stack>
+              </Select>
+            </FormControl>
+            {/* Version */}
+            <FormControl fontSize={'sm'}>
+              <FormLabel htmlFor='product' fontSize='md' color='gray.600'>
+                Version
+              </FormLabel>
+              <Select
+                name='projects'
+                value={selectedVersion}
+                onChange={(e) => {
+                  setSelectedVersion(e.target.value)
+                  sbomId = e.target.value
+                }}
+              >
+                <option value={''}>-- Select --</option>
+                {filterVersions.length > 0 &&
+                  filterVersions.map((item, index) => (
+                    <option key={index} value={item.id}>
+                      {item.version}
+                    </option>
+                  ))}
+              </Select>
+            </FormControl>
+          </Stack>
+        )}
       </Box>
     </>
   )

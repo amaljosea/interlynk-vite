@@ -28,7 +28,7 @@ import { useLocation } from 'react-router-dom'
 import SBOM from 'views/Sbom'
 
 function Index() {
-  const { productVersionsData } = useContext(GlobalContext)
+  const { productVersionsData, setTotalProducts } = useContext(GlobalContext)
 
   const captions = [
     'active',
@@ -58,7 +58,10 @@ function Index() {
   })
 
   useEffect(() => {
-    if (data) setPageIndex(1)
+    if (data) {
+      setPageIndex(1)
+      setTotalProducts(data.projects.totalCount)
+    }
   }, [data])
 
   const handlePreviousPage = () => {
@@ -98,7 +101,8 @@ function Index() {
     } catch (error) {
       console.error('Refresh error', error)
       toast({
-        description: 'An error occured while refreshing products. Please retry in few minutes.',
+        description:
+          'An error occured while refreshing products. Please retry in few minutes.',
         status: 'error',
         duration: 2000,
         position: 'top'

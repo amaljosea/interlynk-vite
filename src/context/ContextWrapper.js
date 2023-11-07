@@ -35,6 +35,8 @@ const ContextWrapper = (props) => {
     }
   ])
 
+  const [totalProducts, setTotalProducts] = useState(0)
+
   const [orgInfo, setOrgInfo] = useState({})
   const [compFilters, setCompFilters] = useState({})
   const [signedCompFilters, setSignedCompFilters] = useState({})
@@ -89,6 +91,8 @@ const ContextWrapper = (props) => {
       value={{
         vulnerabilitiesData,
         setVulnerabilitiesData,
+        totalProducts,
+        setTotalProducts,
         minimize,
         setMinimize,
         activeDockerHub,
