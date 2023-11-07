@@ -206,9 +206,7 @@ const ComponentTable = ({
             >
               {/* COMPONENT NAME */}
               <Tooltip placement='top' label={name}>
-                <Text fontSize={'14px'}>
-                  {name.length > 30 ? `${name.substring(0, 30)}...` : name}
-                </Text>
+                <p style={{ textWrap: 'pretty' }}>{name}</p>
               </Tooltip>
 
               {/* EXTERNAL REFERENCE */}
@@ -301,8 +299,8 @@ const ComponentTable = ({
     {
       id: 'COMPONENTS_VERSION',
       name: 'VERSION',
-      selector: (row) => row.version,
-      width: '160px',
+      selector: (row) => <p style={{ textWrap: 'pretty' }}>{row.version}</p>,
+      width: '120px',
       sortable: true
     },
     // PURL
@@ -315,7 +313,7 @@ const ComponentTable = ({
           <>
             {purl !== null && purl !== '' ? (
               <Tooltip placement='top' label={purl}>
-                {purl}
+                <p style={{ textWrap: 'pretty' }}>{purl}</p>
               </Tooltip>
             ) : (
               ''
@@ -324,13 +322,14 @@ const ComponentTable = ({
         )
       },
       sortable: true,
-      // width: '450px',
+      width: '280px',
       grow: 2
     },
     // LICENSES
     {
       id: 'COMPONENTS_LICENSES',
       name: 'LICENSES',
+      width: '200px',
       selector: (row) => {
         const { licenses } = row
 
@@ -566,9 +565,10 @@ const ComponentTable = ({
                     variant='subtle'
                     colorScheme='orange'
                   >
-                  <TagLabel>
-                    {item.name}{item.contactEmail && ` - ${item.contactEmail}`}
-                  </TagLabel>
+                    <TagLabel>
+                      {item.name}
+                      {item.contactEmail && ` - ${item.contactEmail}`}
+                    </TagLabel>
                     <TagCloseButton onClick={handleSupRemove} />
                   </Tag>
                 ))}
