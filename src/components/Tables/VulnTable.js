@@ -287,11 +287,12 @@ const VulnTable = ({
               size='md'
               key='md'
               variant='subtle'
+              width={'60px'}
               justifyContent='center'
               alignItems='center'
             >
               <TagLabel style={{ textAlign: 'center' }}>
-                {epssScores[0]}
+                {Math.ceil(epssScores[0] * 10000)}
                 {/* {epssScores.length > 1 && `- ${epssScores[1]}`} */}
               </TagLabel>
             </Tag>
@@ -299,18 +300,18 @@ const VulnTable = ({
               epssScores[0] > epssScores[epssScores.length - 1] ? (
                 <Tooltip
                   placement='top'
-                  label={`Up from ${
-                    epssScores[epssScores.length - 1]
-                  } last week`}
+                  label={`Up from ${Math.ceil(
+                    epssScores[epssScores.length - 1] * 10000
+                  )} last week`}
                 >
                   <ChevronUpIcon w={5} h={5} color='green.500' />
                 </Tooltip>
               ) : epssScores[0] < epssScores[epssScores.length - 1] ? (
                 <Tooltip
                   placement='top'
-                  label={`Down from ${
-                    epssScores[epssScores.length - 1]
-                  } last week`}
+                  label={`Down from ${Math.ceil(
+                    epssScores[epssScores.length - 1] * 10000
+                  )} last week`}
                 >
                   <ChevronDownIcon w={5} h={5} color='red.500' />
                 </Tooltip>
@@ -628,10 +629,10 @@ const VulnTable = ({
     const vulnEpss = epss !== 'all' && epss.split('-')
 
     const range = {
-      min: parseFloat(vulnEpss[0]),
-      max: parseFloat(vulnEpss[1])
+      min: parseFloat(vulnEpss[0]) / 10000,
+      max: parseFloat(vulnEpss[1]) / 10000
     }
-
+    
     await refetch({
       variables: {
         projectId: productId,
