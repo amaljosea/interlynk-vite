@@ -125,8 +125,8 @@ const SBOMTable = ({
   const epss = vulnEpss !== 'all' && vulnEpss.split('-')
 
   const range = {
-    min: parseFloat(epss[0]),
-    max: parseFloat(epss[1])
+    min: parseFloat(epss[0]) / 10000,
+    max: parseFloat(epss[1]) / 10000
   }
 
   // FETCH FILTER DATA BASE ON SELECTED TAB
