@@ -92,8 +92,8 @@ const VulnFilterMenu = ({
     const vulnEpss = epss !== 'all' && epss.split('-')
 
     const range = {
-      min: parseFloat(vulnEpss[0]),
-      max: parseFloat(vulnEpss[1])
+      min: parseFloat(vulnEpss[0]) / 10000,
+      max: parseFloat(vulnEpss[1]) / 10000
     }
 
     await refetch({
@@ -202,7 +202,7 @@ const VulnFilterMenu = ({
         value
       )
     } else {
-      setVulnKev(value)
+      setVulnEpss(value)
       handleRefetch(vulnSeverity, vulnComponent, vulnStatus, vulnKev, value)
     }
     setPageIndex(1)
@@ -210,7 +210,7 @@ const VulnFilterMenu = ({
 
   const handleSubmit = () => {
     if (customerView) {
-      setSignedVulnEpss('')
+      setSignedVulnEpss(`${signedMinVal}-${signedMaxVal}`)
       handleRefetch(
         signedVulnSeverity,
         signedVulnComponent,
@@ -219,7 +219,7 @@ const VulnFilterMenu = ({
         `${signedMinVal}-${signedMaxVal}`
       )
     } else {
-      setVulnEpss('')
+      setVulnEpss(`${minVal}-${maxVal}`)
       handleRefetch(
         vulnSeverity,
         vulnComponent,
@@ -418,11 +418,13 @@ const VulnFilterMenu = ({
               <MenuItemOption value={'all'} fontSize={'sm'}>
                 All
               </MenuItemOption>
-              {['0-0.5', '0.6-0.9', '0.9-1.5'].map((item, index) => (
-                <MenuItemOption key={index} value={item} fontSize={'sm'}>
-                  {item}
-                </MenuItemOption>
-              ))}
+              {['0-100', '100-500', '500-1,000', '1,000-10,000'].map(
+                (item, index) => (
+                  <MenuItemOption key={index} value={item} fontSize={'sm'}>
+                    {item}
+                  </MenuItemOption>
+                )
+              )}
             </MenuOptionGroup>
             <MenuDivider />
             <Flex flexDirection={'column'} alignItems={'flex-start'}>
