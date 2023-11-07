@@ -518,13 +518,19 @@ const VulnTable = ({
         boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
       >
         <Grid
-          templateColumns='repeat(2, 1fr)'
+          templateColumns='repeat(5, 1fr)'
           gap={6}
           width={'90%'}
           margin={'0 auto'}
         >
           {/* VULN DATA */}
-          <GridItem w='100%' display={'flex'} flexDirection={'column'} gap={4}>
+          <GridItem
+            w='100%'
+            colSpan={2}
+            display={'flex'}
+            flexDirection={'column'}
+            gap={4}
+          >
             {/* Description */}
             <Box>
               <CustomText>Description :</CustomText>
@@ -576,7 +582,7 @@ const VulnTable = ({
             </Box>
           </GridItem>
           {/* STATUS UPDATE */}
-          <GridItem w='100%'>
+          <GridItem w='100%' colSpan={3}>
             <ProdStatusDrawer
               data={data}
               textColor={textColor}
@@ -632,7 +638,6 @@ const VulnTable = ({
       min: parseFloat(vulnEpss[0]) / 10000,
       max: parseFloat(vulnEpss[1]) / 10000
     }
-    
     await refetch({
       variables: {
         projectId: productId,

@@ -47,6 +47,7 @@ const ProdStatusDrawer = ({
   const [justification, setJustification] = useState('')
   const [selectedTag, setSelectedTag] = useState('')
   const [notes, setNotes] = useState('')
+  const [impact, setImpact] = useState('')
 
   const [statusResults, setStatusResults] = useState([])
   const [newVulnLogs, setNewVulnLogs] = useState([])
@@ -136,9 +137,9 @@ const ProdStatusDrawer = ({
           {!location.pathname.startsWith('/customer') && (
             <>
               <Box>
-                <Text mb={1} fontSize='sm' color='gray.600'>
+                <FormLabel mb={1} fontSize='sm' color='gray.600'>
                   Status
-                </Text>
+                </FormLabel>
                 <Select
                   id='product'
                   size='sm'
@@ -160,12 +161,7 @@ const ProdStatusDrawer = ({
               </Box>
               {statusName === 'Not Affected' && (
                 <Box>
-                  <FormLabel
-                    py='4px'
-                    htmlFor='product'
-                    fontSize='sm'
-                    color='gray.600'
-                  >
+                  <FormLabel htmlFor='product' fontSize='sm' color='gray.600'>
                     Justification
                   </FormLabel>
                   <Select
@@ -176,6 +172,7 @@ const ProdStatusDrawer = ({
                     color='gray.500'
                   >
                     <option value=''>-- Select --</option>
+                    <option value='other'>Other {`(Impact Statement)`}</option>
                     {allVexJustify ? (
                       allVexJustify.vexJustifications.map((justify, idx) => (
                         <option key={idx} value={justify.id}>
@@ -233,10 +230,25 @@ const ProdStatusDrawer = ({
                   </Box>
                 </Stack>
               )}
+              {(statusName === 'Affected' ||
+                (justification === 'other' &&
+                  statusName === 'Not Affected')) && (
+                <Box>
+                  <FormLabel mb={1} fontSize='sm' color='gray.600'>
+                    Impact Statement
+                  </FormLabel>
+                  <Input
+                    placeholder='Add impact statement'
+                    value={impact}
+                    onChange={(e) => setImpact(e.target.value)}
+                    size='sm'
+                  />
+                </Box>
+              )}
               <Box>
-                <Text mb={1} fontSize='sm' color='gray.600'>
+                <FormLabel mb={1} fontSize='sm' color='gray.600'>
                   Notes
-                </Text>
+                </FormLabel>
                 <Textarea
                   placeholder='Add notes'
                   size='sm'
@@ -273,6 +285,7 @@ const ProdStatusDrawer = ({
                       'Status',
                       'Justification',
                       'Timestamp',
+                      'Impact Statement',
                       'Note'
                     ].map((item, index) => (
                       <Th key={index} color='gray.400' pl={0}>
