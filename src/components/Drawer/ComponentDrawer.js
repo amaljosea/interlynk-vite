@@ -47,7 +47,7 @@ import MultiSelect from 'react-select'
 import { PackageURL } from 'packageurl-js'
 import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
-import { QuestionIcon, CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
+import { InfoIcon, CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import { FaExpandAlt } from 'react-icons/fa'
 import { useContext } from 'react'
 import GlobalContext from 'context/GlobalContext'
@@ -496,7 +496,7 @@ function ComponentDrawer(props) {
                       </chakra.span>
                     </Text>
                     <Tooltip label='Component Name'>
-                      <Icon as={QuestionIcon} color={'blue.500'} />
+                      <Icon as={InfoIcon} color={'blue.500'} />
                     </Tooltip>
                   </Flex>
                 </FormLabel>
@@ -521,7 +521,7 @@ function ComponentDrawer(props) {
                       </chakra.span>
                     </Text>
                     <Tooltip label='Component Version'>
-                      <Icon as={QuestionIcon} color={'blue.500'} />
+                      <Icon as={InfoIcon} color={'blue.500'} />
                     </Tooltip>
                   </Flex>
                 </FormLabel>
@@ -558,7 +558,7 @@ function ComponentDrawer(props) {
                     </chakra.span>
                   </Text>
                   <Tooltip label='Component Type'>
-                    <Icon as={QuestionIcon} color={'blue.500'} />
+                    <Icon as={InfoIcon} color={'blue.500'} />
                   </Tooltip>
                 </Flex>
                 <Select
@@ -589,7 +589,7 @@ function ComponentDrawer(props) {
                 <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                   <Text>Licenses</Text>
                   <Tooltip label='List of licenses applicable to the component'>
-                    <Icon as={QuestionIcon} color={'blue.500'} />
+                    <Icon as={InfoIcon} color={'blue.500'} />
                   </Tooltip>
                 </Flex>
                 <MultiSelect
@@ -628,7 +628,7 @@ function ComponentDrawer(props) {
                       )}
                     <Text>Identifiers</Text>
                     <Tooltip label='Component identifiers such as package URL (PURL) or Common Platform Enumeration (CPE) are used for consistent naming of the component. Both CycloneDX and SPDX supports identifying component names with CPE and PURL'>
-                      <Icon as={QuestionIcon} color={'blue.500'} />
+                      <Icon as={InfoIcon} color={'blue.500'} />
                     </Tooltip>
                   </Flex>
                 </FormLabel>

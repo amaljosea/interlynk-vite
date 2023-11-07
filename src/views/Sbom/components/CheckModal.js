@@ -1,5 +1,5 @@
 import { useMutation } from '@apollo/client'
-import { QuestionIcon } from '@chakra-ui/icons'
+import { InfoIcon } from '@chakra-ui/icons'
 import {
   Box,
   Button,
@@ -286,7 +286,7 @@ const CheckModal = ({
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>Type</Text>
                     <Tooltip label='Component Type'>
-                      <Icon as={QuestionIcon} color={'blue.500'} />
+                      <Icon as={InfoIcon} color={'blue.500'} />
                     </Tooltip>
                   </Flex>
                 </FormLabel>
@@ -323,7 +323,7 @@ const CheckModal = ({
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>Licenses</Text>
                     <Tooltip label='List of licenses applicable to the component'>
-                      <Icon as={QuestionIcon} color={'blue.500'} />
+                      <Icon as={InfoIcon} color={'blue.500'} />
                     </Tooltip>
                   </Flex>
                 </FormLabel>

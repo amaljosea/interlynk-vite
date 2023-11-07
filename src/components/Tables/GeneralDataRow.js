@@ -1,5 +1,5 @@
 import { useMutation } from '@apollo/client'
-import { EditIcon, QuestionIcon } from '@chakra-ui/icons'
+import { EditIcon, InfoIcon } from '@chakra-ui/icons'
 import {
   Button,
   Flex,
@@ -173,7 +173,7 @@ const GeneralDataRow = ({ status, type, data, refetch }) => {
                 <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                   <Text>Creation Tools</Text>
                   <Tooltip label='Creator Tool(s) identify all the software tools and their versions used in building the SBOM. Interlynk is automatically added as one of the tools'>
-                    <Icon as={QuestionIcon} color={'blue.500'} />
+                    <Icon as={InfoIcon} color={'blue.500'} />
                   </Tooltip>
                 </Flex>
               </Td>
@@ -238,7 +238,7 @@ const GeneralDataRow = ({ status, type, data, refetch }) => {
                 <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                   <Text>Author(s)</Text>
                   <Tooltip label='In case of non-automated SBOM generation, Author(s) identifies the name and email of persons invovlved in building the SBOM.'>
-                    <Icon as={QuestionIcon} color={'blue.500'} />
+                    <Icon as={InfoIcon} color={'blue.500'} />
                   </Tooltip>
                 </Flex>
               </Td>
@@ -284,7 +284,7 @@ const GeneralDataRow = ({ status, type, data, refetch }) => {
                 <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                   <Text>Supplier</Text>
                   <Tooltip label='Supplier identify the name and email of the organization that built, distributed or package the application. For Open-source components, it can refer to the name of the project or entity distributing the project.'>
-                    <Icon as={QuestionIcon} color={'blue.500'} />
+                    <Icon as={InfoIcon} color={'blue.500'} />
                   </Tooltip>
                 </Flex>
               </Td>
@@ -334,7 +334,7 @@ const GeneralDataRow = ({ status, type, data, refetch }) => {
                 <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                   <Text>Data License</Text>
                   <Tooltip label='Data licence is a legal arrangement between the creator of the data and the end-user, or the place the data will be deposited, specifying what users can do with the data'>
-                    <Icon as={QuestionIcon} color={'blue.500'} />
+                    <Icon as={InfoIcon} color={'blue.500'} />
                   </Tooltip>
                 </Flex>
               </Td>
