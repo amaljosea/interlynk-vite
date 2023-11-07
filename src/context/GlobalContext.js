@@ -3,6 +3,8 @@ import React from 'react'
 const GlobalContext = React.createContext({
   vulnerabilitiesData: [],
   setVulnerabilitiesData: () => {},
+  totalProducts: 0,
+  setTotalProducts: () => {},
   minimize: false,
   setMinimize: () => {},
   activeDockerHub: true,
