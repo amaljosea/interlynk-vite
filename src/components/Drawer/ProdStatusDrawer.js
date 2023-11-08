@@ -15,7 +15,8 @@ import {
   Thead,
   Tr,
   Flex,
-  Input
+  Input,
+  FormControl
 } from '@chakra-ui/react'
 import VulLinkRow from 'components/Tables/VulLinkRow'
 import GlobalContext from 'context/GlobalContext'
@@ -39,15 +40,16 @@ const ProdStatusDrawer = ({
 
   const { setVulnFilters, vulnField, vulnDirection } = useContext(GlobalContext)
 
-  const { vexStatus, id, componentVulnLogs, vexJustification, vuln } = data
+  const { vexStatus, id, componentVulnLogs, vexJustification, impact } = data
 
   const [statusTitle, setStatusTitle] = useState('')
   const [statusName, setStatusName] = useState('')
   const [otherVersion, setOtherVersion] = useState('')
   const [justification, setJustification] = useState('')
+  const [justifyName, setJustifyName] = useState('')
   const [selectedTag, setSelectedTag] = useState('')
   const [notes, setNotes] = useState('')
-  const [impact, setImpact] = useState('')
+  const [impactData, setImpactData] = useState('')
 
   const [statusResults, setStatusResults] = useState([])
   const [newVulnLogs, setNewVulnLogs] = useState([])
@@ -71,13 +73,19 @@ const ProdStatusDrawer = ({
 
   const handleStatusChange = (e) => {
     const { value } = e.target
+    const status = e.target.options[e.target.selectedIndex].text
     setStatusTitle(value)
-    setStatusName(e.target.options[e.target.selectedIndex].text)
+    setStatusName(status)
+    if (status === 'Not Affected' || status === 'Affected') {
+      setJustifyName('')
+      setImpactData('')
+    }
   }
 
   const handleJustifyChange = (e) => {
     const { value } = e.target
     setJustification(value)
+    setJustifyName(e.target.options[e.target.selectedIndex].text)
   }
 
   const onFilterRefetch = () => {
@@ -96,7 +104,8 @@ const ProdStatusDrawer = ({
           sbomId: sbomId,
           vexStatusId: statusTitle,
           vexJustificationId:
-            statusName === 'Not Affected' ? justification : undefined
+            statusName === 'Not Affected' ? justification : undefined,
+          impact: impactData
         }
       }).then((res) => {
         if (res.data) {
@@ -122,11 +131,17 @@ const ProdStatusDrawer = ({
           const dateB = new Date(b.updatedAt).getTime()
           return dateB - dateA
         })
+      console.log(sortedData)
       setStatusResults(sortedData)
     }
 
     if (vexJustification) {
       setJustification(vexJustification.id)
+    }
+
+    if (impact) {
+      setJustifyName('Other (impact statment required)')
+      setImpactData(impact)
     }
   }, [data])
 
@@ -172,7 +187,6 @@ const ProdStatusDrawer = ({
                     color='gray.500'
                   >
                     <option value=''>-- Select --</option>
-                    <option value='other'>Other {`(Impact Statement)`}</option>
                     {allVexJustify ? (
                       allVexJustify.vexJustifications.map((justify, idx) => (
                         <option key={idx} value={justify.id}>
@@ -231,19 +245,27 @@ const ProdStatusDrawer = ({
                 </Stack>
               )}
               {(statusName === 'Affected' ||
-                (justification === 'other' &&
+                (justifyName === 'Other (impact statment required)' &&
                   statusName === 'Not Affected')) && (
-                <Box>
-                  <FormLabel mb={1} fontSize='sm' color='gray.600'>
+                <FormControl>
+                  <FormLabel
+                    htmlFor='impactStatement'
+                    mb={1}
+                    fontSize='sm'
+                    color='gray.600'
+                  >
                     Impact Statement
                   </FormLabel>
                   <Input
+                    type='text'
+                    name='impactStatement'
+                    id='impactStatement'
                     placeholder='Add impact statement'
-                    value={impact}
-                    onChange={(e) => setImpact(e.target.value)}
+                    value={impactData}
+                    onChange={(e) => setImpactData(e.target.value)}
                     size='sm'
                   />
-                </Box>
+                </FormControl>
               )}
               <Box>
                 <FormLabel mb={1} fontSize='sm' color='gray.600'>
@@ -265,7 +287,10 @@ const ProdStatusDrawer = ({
               onClick={handleSave}
               disabled={
                 statusTitle === '' ||
-                (statusName === 'Not Affected' && justification === '')
+                (statusName === 'Not Affected' && justification === '') ||
+                (justifyName === 'Other (impact statment required)' &&
+                  impactData === '') ||
+                (statusName === 'Affected' && impactData === '')
               }
             >
               Add
@@ -285,7 +310,7 @@ const ProdStatusDrawer = ({
                       'Status',
                       'Justification',
                       'Timestamp',
-                      'Impact Statement',
+                      'Impact',
                       'Note'
                     ].map((item, index) => (
                       <Th key={index} color='gray.400' pl={0}>
@@ -304,7 +329,8 @@ const ProdStatusDrawer = ({
                         justification={item.justification}
                         status={item.status}
                         timestamp={item.updatedAt}
-                        notes={item.note}
+                        note={item.note}
+                        impact={item.impact}
                       />
                     ))}
                 </Tbody>

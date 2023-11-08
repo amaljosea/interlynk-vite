@@ -583,7 +583,7 @@ export const GetComponentData = gql`
             relType
             fromId
             toId
-            fromComp{
+            fromComp {
               id
               name
               version
@@ -594,7 +594,7 @@ export const GetComponentData = gql`
             relType
             fromId
             toId
-            toComp{
+            toComp {
               id
               name
               version
@@ -713,6 +713,7 @@ export const GetVulnData = gql`
         }
         nodes {
           id
+          impact
           vuln {
             vulnId
             desc
@@ -736,6 +737,7 @@ export const GetVulnData = gql`
             changedBy
             status
             justification
+            impact
             note
             updatedAt
           }
