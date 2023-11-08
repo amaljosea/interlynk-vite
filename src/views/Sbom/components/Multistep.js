@@ -21,14 +21,17 @@ let productId
 let sbomId
 
 // FORM ONE
-const Form1 = () => {
+const Form1 = ({
+  selectedProd,
+  setSelectedProd,
+  selectedVersion,
+  setSelectedVersion,
+  uniqVersions,
+  setUniqVersions
+}) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const sbomVersionId = queryParams.get('sbom')
-
-  const [selectedProd, setSelectedProd] = useState('')
-  const [selectedVersion, setSelectedVersion] = useState('')
-  const [uniqVersions, setUniqVersions] = useState([])
 
   const { totalProducts } = useContext(GlobalContext)
 
@@ -148,12 +151,16 @@ const Form1 = () => {
 }
 
 // FORM TWO
-const Form2 = () => {
+const Form2 = ({ isChecked, setIsChecked }) => {
   return (
     <>
       <Box width={'400px'} margin={'0 auto'}>
         <FormControl mt={24}>
-          <Checkbox colorScheme='blue'>
+          <Checkbox
+            colorScheme='blue'
+            isChecked={isChecked}
+            onChange={() => setIsChecked(!isChecked)}
+          >
             Import status of vulnerabilities
           </Checkbox>
         </FormControl>
@@ -163,7 +170,12 @@ const Form2 = () => {
 }
 
 // FORM THREE
-const Form3 = () => {
+const Form3 = ({
+  importFrom,
+  setImportFrom,
+  statusHistory,
+  setStatusHistory
+}) => {
   return (
     <>
       <Text
@@ -182,7 +194,11 @@ const Form3 = () => {
             <FormLabel htmlFor='importFrom' fontSize='md' color='gray.600'>
               Prefer vulnerability status from
             </FormLabel>
-            <Select name='importFrom'>
+            <Select
+              name='importFrom'
+              value={importFrom}
+              onChange={(e) => setImportFrom(e.target.value)}
+            >
               <option value={''}>-- Select --</option>
               <option value={'Keep existing'}>Keep existing</option>
               <option value={'Replace from import'}>Replace from import</option>
@@ -193,7 +209,11 @@ const Form3 = () => {
             <FormLabel htmlFor='statusHistory' fontSize='md' color='gray.600'>
               Import vulnerability status history
             </FormLabel>
-            <Select name='statusHistory'>
+            <Select
+              name='statusHistory'
+              value={statusHistory}
+              onChange={(e) => setStatusHistory(e.target.value)}
+            >
               <option value={''}>-- Select --</option>
               <option value={'Yes'}>Yes</option>
               <option value={'No'}>No</option>
@@ -206,12 +226,11 @@ const Form3 = () => {
 }
 
 // FORM FOUR
-const Form4 = ({ currentData, refetch }) => {
+const Form4 = ({ currentData, refetch, finalData, setFinalData }) => {
   const { vulnField, vulnDirection } = useContext(GlobalContext)
 
   // GET VULN DATA
   const [getVulns, { data: vulnData }] = useLazyQuery(GetVulnData)
-  const [finalData, setFinalData] = useState([])
 
   useEffect(() => {
     if (productId && sbomId) {
@@ -269,6 +288,17 @@ const Form4 = ({ currentData, refetch }) => {
 }
 
 const Multistep = ({ step, progress, currentData, refetch }) => {
+  const [selectedProd, setSelectedProd] = useState('')
+  const [selectedVersion, setSelectedVersion] = useState('')
+  const [uniqVersions, setUniqVersions] = useState([])
+
+  const [isChecked, setIsChecked] = useState(false)
+
+  const [importFrom, setImportFrom] = useState('')
+  const [statusHistory, setStatusHistory] = useState('')
+
+  const [finalData, setFinalData] = useState([])
+
   return (
     <>
       <Box as='form'>
@@ -280,13 +310,32 @@ const Multistep = ({ step, progress, currentData, refetch }) => {
           mb={8}
         ></Progress>
         {step === 1 ? (
-          <Form1 />
+          <Form1
+            selectedProd={selectedProd}
+            setSelectedProd={setSelectedProd}
+            selectedVersion={selectedVersion}
+            setSelectedVersion={setSelectedVersion}
+            uniqVersions={uniqVersions}
+            setUniqVersions={setUniqVersions}
+          />
         ) : step === 2 ? (
-          <Form2 />
+          <Form2 isChecked={isChecked} setIsChecked={setIsChecked} />
         ) : step === 3 ? (
-          <Form3 />
+          <Form3
+            importFrom={importFrom}
+            setImportFrom={setImportFrom}
+            statusHistory={statusHistory}
+            setStatusHistory={setStatusHistory}
+          />
         ) : (
-          step === 4 && <Form4 currentData={currentData} refetch={refetch} />
+          step === 4 && (
+            <Form4
+              currentData={currentData}
+              refetch={refetch}
+              finalData={finalData}
+              setFinalData={setFinalData}
+            />
+          )
         )}
       </Box>
     </>
