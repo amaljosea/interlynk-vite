@@ -45,7 +45,6 @@ const CheckFilterMenu = ({
   const [selectCategory, setSelectCategory] = useState([])
   const [selectSeverity, setSelectSeverity] = useState([])
   const [selectStatus, setSelectStatus] = useState([])
-  const [selectCompName, setSelectCompName] = useState([])
 
   const onFilterCategory = (value) => {
     setSelectCategory(value.includes('all') ? [] : value)
@@ -95,22 +94,6 @@ const CheckFilterMenu = ({
     setPageIndex(1)
   }
 
-  const onFilterCompName = (value) => {
-    setSelectCompName(value.includes('all') ? [] : value)
-    refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      componentName: value.includes('all') ? undefined : value,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      last: undefined,
-      field: checkField,
-      direction: checkDirection
-    })
-    setPageIndex(1)
-  }
-
   return (
     <Stack direction={'row'} alignItems={'center'} gap={1}>
       {/* CATEGORY */}
@@ -145,38 +128,6 @@ const CheckFilterMenu = ({
                   {item}
                 </MenuItemOption>
               ))}
-            </MenuOptionGroup>
-          </MenuList>
-        </Menu>
-      </Box>
-      {/* COMPONENT NAME */}
-      <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnBlur={true}>
-          {selectCompName.length !== 0 && <CheckMark />}
-          <MenuButton
-            as={Button}
-            colorScheme='blue'
-            fontWeight='normal'
-            fontSize={'sm'}
-            leftIcon={<FaFilter size={14} />}
-          >
-            Component
-          </MenuButton>
-          <MenuList height={'300px'} overflow={'hidden'} overflowY={'scroll'}>
-            <MenuOptionGroup
-              type='checkbox'
-              value={selectCompName}
-              onChange={onFilterCompName}
-            >
-              <MenuItemOption value={'all'} fontSize={'sm'}>
-                All
-              </MenuItemOption>
-              {checkCompNames &&
-                checkCompNames.map((item, index) => (
-                  <MenuItemOption key={index} value={item} fontSize={'sm'}>
-                    {item}
-                  </MenuItemOption>
-                ))}
             </MenuOptionGroup>
           </MenuList>
         </Menu>
