@@ -3,9 +3,18 @@ import { EditIcon, InfoIcon } from '@chakra-ui/icons'
 import {
   Button,
   Flex,
+  FormControl,
+  FormLabel,
   HStack,
   Icon,
   Link,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   Stack,
   Table,
   Tag,
@@ -23,18 +32,18 @@ import {
 } from '@chakra-ui/react'
 import CardBody from 'components/Card/CardBody'
 import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
-import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import { authorDelete } from 'graphQL/Mutation'
 import { toolDelete } from 'graphQL/Mutation'
 import { supplierDelete } from 'graphQL/Mutation'
 import { useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { getFullDateAndTime } from 'utils'
-import { timeSince } from 'utils'
+import MultiSelect from 'react-select'
 import { licenseOptions } from 'variables/licenses'
 import PriSupplierModal from 'views/Sbom/components/PriSupplierModal'
+import { sbomUpdate } from 'graphQL/Mutation'
 
-const GeneralDataRow = ({ status, type, data, refetch }) => {
+const GeneralDataRow = ({ status, data, refetch }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('p')
@@ -45,6 +54,8 @@ const GeneralDataRow = ({ status, type, data, refetch }) => {
   const customerView = location.pathname.startsWith('/customer')
 
   const [selectedKey, setSelectedKey] = useState('')
+  const [licenseList, setLicenseList] = useState([])
+  const [imgIds, setImgIds] = useState([])
 
   const btnRef = useRef(null)
   const licenseBtn = useRef(null)
@@ -64,9 +75,19 @@ const GeneralDataRow = ({ status, type, data, refetch }) => {
     onClose: onSupClose
   } = useDisclosure()
 
+  const handleRefetch = () => {
+    refetch({
+      projectId: productId,
+      sbomId: sbomId
+    })
+  }
+
   const [deleteSupplier] = useMutation(supplierDelete)
   const [deleteTool] = useMutation(toolDelete)
   const [deleteAuthor] = useMutation(authorDelete)
+  const [updateSbom] = useMutation(sbomUpdate, {
+    onCompleted: () => handleRefetch()
+  })
 
   const handleSupRemove = async (id) => {
     try {
@@ -130,6 +151,58 @@ const GeneralDataRow = ({ status, type, data, refetch }) => {
   const handleClick = (ref) => {
     setSelectedKey(ref)
     onOpen()
+  }
+
+  const handleLicenseOpen = () => {
+    if (data && data.licenses.length > 0) {
+      const commonValues = licenseOptions.filter((item1) =>
+        data.licenses.includes(item1.licenseId)
+      )
+      const finalData = commonValues.map((item) => {
+        return {
+          value: item.licenseId,
+          label: item.name
+        }
+      })
+      setLicenseList(finalData)
+    }
+    onSBMOpen()
+  }
+
+  const licenses = licenseOptions.map((option) => ({
+    value: option.licenseId,
+    label: option.name
+  }))
+
+  useEffect(() => {
+    if (data && data.licenses.length === 0) {
+      setLicenseList([
+        {
+          value: 'CC0-1.0',
+          label: 'Creative Commons Zero v1.0 Universal'
+        }
+      ])
+    }
+  }, [data])
+
+  const onLicenseChange = (selected) => {
+    setLicenseList(selected)
+    const selectedIds = selected.map((option) => option.value) // Extracting IDs
+    setImgIds(selectedIds)
+  }
+
+  const onUpdateLicense = async () => {
+    try {
+      await updateSbom({
+        variables: {
+          id: data.id,
+          spec: 'cyclonedx',
+          licenses: data && data.licenses.length === 0 ? ['CC0-1.0'] : imgIds
+        }
+      }).then((res) => res.data && onSBMClose())
+    } catch (error) {
+      console.log(`Mutation error `, error)
+    }
   }
 
   // ADD KEYBOARD SHORTCUT FOR TOGGLE SBOM DRAWER
@@ -224,14 +297,6 @@ const GeneralDataRow = ({ status, type, data, refetch }) => {
               <Td pl={0}>{getFullDateAndTime(data.creationAt)}</Td>
               <Td pl={0}></Td>
             </Tr>
-            {/* UPDATED AT */}
-            {/*             <Tr>
-              <Td pl={0} fontWeight={'medium'}>
-                Updated At
-              </Td>
-              <Td pl={0}>{timeSince(data.updatedAt)}</Td>
-              <Td pl={0}></Td>
-            </Tr> */}
             {/* AUTHORS */}
             <Tr>
               <Td pl={0} fontWeight={'medium'}>
@@ -367,7 +432,7 @@ const GeneralDataRow = ({ status, type, data, refetch }) => {
                     size='sm'
                     ref={licenseBtn}
                     isDisabled={status === 'signed'}
-                    onClick={onSBMOpen}
+                    onClick={handleLicenseOpen}
                   >
                     <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
                   </Button>
@@ -393,16 +458,58 @@ const GeneralDataRow = ({ status, type, data, refetch }) => {
 
       {/* SBOM DRAWER */}
       {isSBMOpen && data && !customerView && (
-        <ProductSbomDrawer
-          isOpen={isSBMOpen}
-          onClose={onSBMClose}
-          btnRef={licenseBtn}
-          projectId={productId}
-          name={data.project.name}
-          refetch={refetch}
-          sbomData={data}
-          type={type}
-        />
+        <Modal isOpen={isSBMOpen} onClose={onSBMClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>{data ? 'Update' : 'Save'} License</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <FormControl>
+                <FormLabel fontSize={'sm'}>
+                  <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
+                    <Text>Licenses</Text>
+                    <Tooltip label='List of licenses applicable to the component'>
+                      <Icon as={InfoIcon} color={'blue.500'} />
+                    </Tooltip>
+                  </Flex>
+                </FormLabel>
+                <MultiSelect
+                  styles={{
+                    control: (baseStyles, state) => ({
+                      ...baseStyles,
+                      borderColor: state.isFocused ? 'inherit' : 'inherit',
+                      '&:hover': {
+                        borderColor: '#CBD5E0'
+                      }
+                    })
+                  }}
+                  isMulti
+                  value={licenseList}
+                  options={licenses}
+                  onChange={onLicenseChange}
+                />
+              </FormControl>
+            </ModalBody>
+            <ModalFooter>
+              <Button fontSize={'sm'} mr={3} onClick={onSBMClose}>
+                Close
+              </Button>
+              {data ? (
+                <Button
+                  fontSize={'sm'}
+                  colorScheme='blue'
+                  onClick={onUpdateLicense}
+                >
+                  Update
+                </Button>
+              ) : (
+                <Button fontSize={'sm'} colorScheme='blue'>
+                  Save
+                </Button>
+              )}
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       )}
 
       {/* SUPPLIER MODAL */}
