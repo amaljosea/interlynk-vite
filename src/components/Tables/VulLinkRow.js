@@ -1,15 +1,16 @@
-import { Td, Tr, Tooltip } from '@chakra-ui/react'
+import { Td, Tr } from '@chakra-ui/react'
+import Tooltip from 'components/Tooltip'
 import React from 'react'
 import { BiNote } from 'react-icons/bi'
 import { getFullDateAndTime, timeSince } from 'utils'
 
 const VulLinkRow = ({
-  id,
   username,
   justification,
   status,
   timestamp,
-  notes
+  note,
+  impact
 }) => {
   return (
     <Tr>
@@ -23,17 +24,23 @@ const VulLinkRow = ({
         {justification}
       </Td>
       <Td fontSize={'xs'} pl={0}>
-        <Tooltip label={getFullDateAndTime(timestamp)} placement={'top'}>
+        <Tooltip text={getFullDateAndTime(timestamp)}>
           {timeSince(timestamp)}
         </Tooltip>
       </Td>
       <Td fontSize={'xs'} pl={0}>
-        <BiNote />
+        {impact && (
+          <Tooltip text={impact}>
+            <BiNote />
+          </Tooltip>
+        )}
       </Td>
       <Td fontSize={'xs'} pl={0}>
-        <Tooltip label={notes}>
-          <BiNote />
-        </Tooltip>
+        {note !== '' && (
+          <Tooltip text={note}>
+            <BiNote />
+          </Tooltip>
+        )}
       </Td>
     </Tr>
   )

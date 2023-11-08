@@ -1053,6 +1053,7 @@ export const updateCompVulnVex = gql`
     $vexStatusId: Uuid!
     $vexJustificationId: Uuid
     $sbomId: Uuid
+    $impact: String
   ) {
     componentVexUpdate(
       input: {
@@ -1061,6 +1062,7 @@ export const updateCompVulnVex = gql`
         notes: $notes
         vexJustificationId: $vexJustificationId
         vexStatusId: $vexStatusId
+        impact: $impact
       }
     ) {
       componentVuln {
@@ -1071,6 +1073,7 @@ export const updateCompVulnVex = gql`
           status
           justification
           updatedAt
+          impact
         }
       }
       errors
