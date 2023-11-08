@@ -26,7 +26,9 @@ import {
   Th,
   Thead,
   Tooltip,
-  Tr
+  Tr,
+  FormErrorMessage,
+  FormErrorIcon
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
@@ -37,7 +39,7 @@ import { DeleteCompRelation } from 'graphQL/Mutation'
 import { UpdateCompRelation } from 'graphQL/Mutation'
 import { CreateCompRelation } from 'graphQL/Mutation'
 import { GetAllComponents } from 'graphQL/Queries'
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import Tree from 'react-d3-tree'
 import { useLocation } from 'react-router-dom'
 
@@ -46,13 +48,14 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
-
   const { name, version, id, dependencyOf, dependsOn } = data
   const { totalRows } = useContext(GlobalContext)
 
-  console.log('data', data)
+  console.log('data', dependsOn)
 
   const [createRelation, setCreateRelation] = useState(false)
+  const [dependencyOfList, setDependencyOfList] = useState([])
+  const [dependsOnList, setDependsOnList] = useState([])
   const [relation, setRelation] = useState('')
   const [component, setComponent] = useState('')
 
@@ -61,7 +64,19 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
   const [updateRelation] = useMutation(UpdateCompRelation)
   const [removeRelation] = useMutation(DeleteCompRelation)
 
-  const handleAdd = async () => {
+  useEffect(() => {
+    if (dependencyOf) {
+      setDependencyOfList(dependencyOf)
+    }
+  }, [dependencyOf])
+
+  useEffect(() => {
+    if (dependsOn) {
+      setDependsOnList(dependsOn)
+    }
+  }, [dependsOn])
+
+  const onCreate = async () => {
     await getAllComps({
       variables: {
         projectId: productId,
@@ -79,7 +94,11 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
     })
   }
 
-  const handleSubmit = async () => {
+  const list = dependsOnList?.filter((item) => item.toComp.id === component)
+
+  // console.log('list', list)
+
+  const handleAdd = async () => {
     await addRelation({
       variables: {
         from: id,
@@ -90,18 +109,27 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
       .then((res) => {
         if (res.data) {
           console.log(res.data)
-          refetch({
-            projectId: productId,
-            sbomId: sbomId,
-            first: totalRows
-          })
+          setDependsOnList((prev) => [
+            ...prev,
+            res.data.componentRelationCreate.compRelation
+          ])
         }
       })
       .finally(() => setCreateRelation(false))
   }
 
-  const handleRemove = (relation, comp) => {
-    console.log('hello')
+  const handleRemove = async (id) => {
+    await removeRelation({
+      variables: {
+        relId: id
+      }
+    }).then((res) => {
+      if (res.data) {
+        console.log(res.data)
+        const filterData = dependsOnList.filter((item) => item.id !== id)
+        setDependsOnList(filterData)
+      }
+    })
   }
 
   const orgChart = {
@@ -176,17 +204,25 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
     }
   })
 
+  const handleSave = async () => {
+    await refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      first: totalRows
+    }).then((res) => res.data && onClose())
+  }
+
   return (
     <Drawer
-      size='xl'
+      size='lg'
       isOpen={isOpen}
       placement='right'
       onClose={onClose}
-      closeOnOverlayClick={true}
+      closeOnOverlayClick={false}
     >
       <DrawerOverlay />
       <DrawerContent>
-        <DrawerCloseButton />
+        <DrawerCloseButton onClick={handleSave} />
         <DrawerHeader borderBottomWidth='1px' color='gray.600'>
           Edit Relationships
         </DrawerHeader>
@@ -209,7 +245,7 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
                     variant='solid'
                     fontWeight='normal'
                     size='md'
-                    onClick={handleAdd}
+                    onClick={onCreate}
                   />
                 </Tooltip>
               </Stack>
@@ -241,7 +277,7 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
                         onChange={(e) => setRelation(e.target.value)}
                       >
                         <option value=''>-- Select --</option>
-                        {[{ value: 'dependson', label: 'Depends On' }].map(
+                        {[{ value: 'depends_on', label: 'Depends On' }].map(
                           (item, idx) => (
                             <option key={idx} value={item.value}>
                               {item.label}
@@ -251,7 +287,7 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
                       </Select>
                     </FormControl>
                     {allComponents && (
-                      <FormControl>
+                      <FormControl isInvalid={list.length > 0}>
                         <FormLabel htmlFor='component' color='gray.600'>
                           Component
                         </FormLabel>
@@ -271,6 +307,12 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
                               </option>
                             ))}
                         </Select>
+                        {list.length !== 0 && (
+                          <FormErrorMessage>
+                            <FormErrorIcon />
+                            Component already exist!!
+                          </FormErrorMessage>
+                        )}
                       </FormControl>
                     )}
 
@@ -279,8 +321,10 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
                       mt={2}
                       width={'fit-content'}
                       colorScheme='blue'
-                      onClick={handleSubmit}
-                      isDisabled={relation === '' || component === ''}
+                      onClick={handleAdd}
+                      isDisabled={
+                        relation === '' || component === '' || list.length > 0
+                      }
                     >
                       Add
                     </Button>
@@ -352,7 +396,7 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
                       </Td>
                       <Td pl={0}>
                         <Stack direction={'column'}>
-                          {dependencyOf.map((comp, index) => (
+                          {dependencyOfList.map((comp, index) => (
                             <Tag
                               size={'sm'}
                               key={index}
@@ -360,7 +404,9 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
                               colorScheme='blue'
                               width={'fit-content'}
                             >
-                              <TagLabel>{comp.fromComp.name}-{comp.fromComp.version}</TagLabel>
+                              <TagLabel>
+                                {comp.fromComp.name}-{comp.fromComp.version}
+                              </TagLabel>
                               <TagCloseButton
                                 onClick={() =>
                                   handleRemove('Dependency Of', index)
@@ -379,7 +425,7 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
                       </Td>
                       <Td pl={0}>
                         <Stack direction={'column'}>
-                          {dependsOn.map((comp, index) => (
+                          {dependsOnList.map((comp, index) => (
                             <Tag
                               size={'sm'}
                               key={index}
@@ -387,11 +433,11 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
                               colorScheme='blue'
                               width={'fit-content'}
                             >
-                              <TagLabel>{comp.toComp.name}-{comp.toComp.version}</TagLabel>
+                              <TagLabel>
+                                {comp.toComp.name}-{comp.toComp.version}
+                              </TagLabel>
                               <TagCloseButton
-                                onClick={() =>
-                                  handleRemove('Depends On', index)
-                                }
+                                onClick={() => handleRemove(comp.id)}
                               />
                             </Tag>
                           ))}
@@ -405,10 +451,10 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
           </Card>
         </DrawerBody>
         <DrawerFooter>
-            <Button variant='outline' mr={3} onClick={onClose}>
-              Done
-            </Button>
-          </DrawerFooter>
+          <Button variant='solid' colorScheme='blue' onClick={handleSave}>
+            Save
+          </Button>
+        </DrawerFooter>
       </DrawerContent>
     </Drawer>
   )
