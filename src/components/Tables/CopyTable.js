@@ -1,5 +1,5 @@
 import { useMutation } from '@apollo/client'
-import { ChevronDownIcon, ExternalLinkIcon } from '@chakra-ui/icons'
+import { ExternalLinkIcon } from '@chakra-ui/icons'
 import {
   Flex,
   Text,
@@ -7,20 +7,15 @@ import {
   TagLabel,
   Icon,
   Link,
-  Input,
   Tooltip,
   useColorModeValue,
-  Menu,
-  Button,
-  MenuList,
-  MenuItem,
-  MenuButton
+  Select,
+  Checkbox
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
-import CustomLoader from 'components/CustomLoader'
 import GlobalContext from 'context/GlobalContext'
 import { updateCompVulnVex } from 'graphQL/Mutation'
-import React, { useContext, useMemo, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation } from 'react-router-dom'
 import { mergeData, sevColor } from 'utils'
@@ -74,7 +69,7 @@ const CopyTable = ({
 
   const textColor = useColorModeValue('gray.700', 'white')
 
-  const { vulnField, vulnDirection, totalRows } = useContext(GlobalContext)
+  const { vulnField, vulnDirection, totalVulns } = useContext(GlobalContext)
 
   const [compVexCreate] = useMutation(updateCompVulnVex)
 
@@ -83,6 +78,7 @@ const CopyTable = ({
       variables: {
         projectId: productId,
         sbomId: sbomId,
+        first: totalVulns,
         field: vulnField,
         direction: vulnDirection
       }
@@ -98,7 +94,7 @@ const CopyTable = ({
         variables: {
           projectId: productId,
           sbomId: currentSbomId,
-          first: totalRows,
+          first: totalVulns,
           field: vulnField,
           direction: vulnDirection
         }
@@ -112,22 +108,25 @@ const CopyTable = ({
     }
   }
 
-  const handleUpdate = (row) => {
+  const handleUpdate = (e, row) => {
+    const { value } = e.target
     const { importJustification, importStatus, id } = row
-    try {
-      compVexCreate({
-        variables: {
-          compVulnId: id,
-          notes: 'testing',
-          sbomId: sbomId,
-          vexStatusId: importStatus.id,
-          vexJustificationId: importJustification
-            ? importJustification.id
-            : undefined
-        }
-      }).then(() => refetchCurrentVuln())
-    } catch (error) {
-      console.log('Mutation error', error)
+    if (value === 'Replace from import') {
+      try {
+        compVexCreate({
+          variables: {
+            compVulnId: id,
+            notes: 'testing',
+            sbomId: sbomId,
+            vexStatusId: importStatus.id,
+            vexJustificationId: importJustification
+              ? importJustification.id
+              : undefined
+          }
+        }).then(() => refetchCurrentVuln())
+      } catch (error) {
+        console.log('Mutation error', error)
+      }
     }
   }
 
@@ -204,14 +203,16 @@ const CopyTable = ({
           </Tooltip>
         )
       },
-      width: '250px'
+      wrap: true,
+      width: '200px'
     },
     // VERSION
     {
       id: 'version',
       name: 'VERSION',
       selector: (row) => row.component.version,
-      width: '300px'
+      wrap: true,
+      width: '200px'
     },
     // CURRENT STATUS
     {
@@ -264,21 +265,33 @@ const CopyTable = ({
     {
       id: 'action',
       name: 'ACTI0N',
-      selector: (row) => (
-        <Menu>
-          <MenuButton size='sm' as={Button} rightIcon={<ChevronDownIcon />}>
-            Update
-          </MenuButton>
-          <MenuList>
-            <MenuItem fontSize={'14px'}>Keep existing</MenuItem>
-            {row.importStatus !== null && (
-              <MenuItem fontSize={'14px'} onClick={() => handleUpdate(row)}>
-                Replace from Import
-              </MenuItem>
-            )}
-          </MenuList>
-        </Menu>
-      )
+      selector: (row) => {
+        return (
+          <Select
+            name='import'
+            defaultValue={row.importFrom}
+            size='sm'
+            width={'fit-content'}
+            onChange={(e) => handleUpdate(e, row)}
+          >
+            <option value={'Keep existing'}>Keep existing</option>
+            <option value={'Replace from import'}>Replace from import</option>
+          </Select>
+        )
+      }
+    },
+    {
+      id: 'statusHistory',
+      name: 'STATUS HISTORY',
+      selector: (row) => {
+        return (
+          <Checkbox
+            name='status'
+            defaultChecked={row.statusHistory}
+            // onChange={() => setUpdateHistory(!updateHistory)}
+          />
+        )
+      }
     }
   ]
 
@@ -305,18 +318,17 @@ const CopyTable = ({
   return (
     <Card p={0}>
       <Flex flexDir={'column'} width={'100%'} mb={6}>
-        {data && (
-          <DataTable
-            columns={columns}
-            data={data}
-            customStyles={customStyles}
-            subHeader
-            subHeaderComponent={subHeaderComponentMemo}
-            responsive={true}
-            selectableRows={true}
-            // selectableRowSelected={(row) => row}
-          />
-        )}
+        <DataTable
+          columns={columns}
+          data={data}
+          customStyles={customStyles}
+          subHeader
+          progressPending={data ? false : true}
+          subHeaderComponent={subHeaderComponentMemo}
+          responsive={true}
+          selectableRows={true}
+          // selectableRowSelected={(row) => row}
+        />
       </Flex>
     </Card>
   )

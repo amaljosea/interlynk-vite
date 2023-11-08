@@ -226,11 +226,34 @@ const Form3 = ({
 }
 
 // FORM FOUR
-const Form4 = ({ currentData, refetch, finalData, setFinalData }) => {
-  const { vulnField, vulnDirection } = useContext(GlobalContext)
+const Form4 = ({
+  finalData,
+  setFinalData,
+  importFrom,
+  statusHistory,
+  currentSbomId,
+  currentProductId
+}) => {
+  const { vulnField, vulnDirection, totalVulns } = useContext(GlobalContext)
+  const [currentSbom, setCurrentSbom] = useState([])
+  const [importSbom, setImportSbom] = useState([])
 
   // GET VULN DATA
-  const [getVulns, { data: vulnData }] = useLazyQuery(GetVulnData)
+  const [getVulns, { refetch }] = useLazyQuery(GetVulnData)
+
+  useEffect(() => {
+    if (currentSbomId && currentProductId) {
+      getVulns({
+        variables: {
+          projectId: currentProductId,
+          sbomId: currentSbomId,
+          first: totalVulns,
+          field: vulnField,
+          direction: vulnDirection
+        }
+      }).then((res) => setCurrentSbom(res.data.sbom.vulns.nodes))
+    }
+  }, [])
 
   useEffect(() => {
     if (productId && sbomId) {
@@ -238,19 +261,22 @@ const Form4 = ({ currentData, refetch, finalData, setFinalData }) => {
         variables: {
           projectId: productId,
           sbomId: sbomId,
+          first: totalVulns,
           field: vulnField,
           direction: vulnDirection
         }
-      })
+      }).then((res) => setImportSbom(res.data.sbom.vulns.nodes))
     }
   }, [])
 
+  // console.log('current data', currentData)
+
   useEffect(() => {
-    if (vulnData) {
-      const data = mergeData(currentData, vulnData.sbom.vulns.nodes)
+    if (currentSbom && importSbom) {
+      const data = mergeData(currentSbom, importSbom, importFrom, statusHistory)
       setFinalData(data)
     }
-  }, [vulnData])
+  }, [currentSbom, importSbom])
 
   return (
     <>
@@ -272,6 +298,8 @@ const Form4 = ({ currentData, refetch, finalData, setFinalData }) => {
             getVulns={getVulns}
             refetch={refetch}
             setFinalData={setFinalData}
+            importFrom={importFrom}
+            statusHistory={statusHistory}
           />
         ) : (
           <Flex
@@ -287,7 +315,7 @@ const Form4 = ({ currentData, refetch, finalData, setFinalData }) => {
   )
 }
 
-const Multistep = ({ step, progress, currentData, refetch }) => {
+const Multistep = ({ step, progress, currentSbomId, currentProductId }) => {
   const [selectedProd, setSelectedProd] = useState('')
   const [selectedVersion, setSelectedVersion] = useState('')
   const [uniqVersions, setUniqVersions] = useState([])
@@ -330,10 +358,12 @@ const Multistep = ({ step, progress, currentData, refetch }) => {
         ) : (
           step === 4 && (
             <Form4
-              currentData={currentData}
-              refetch={refetch}
+              currentSbomId={currentSbomId}
+              currentProductId={currentProductId}
               finalData={finalData}
               setFinalData={setFinalData}
+              importFrom={importFrom}
+              statusHistory={statusHistory}
             />
           )
         )}

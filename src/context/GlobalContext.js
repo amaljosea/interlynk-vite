@@ -5,6 +5,8 @@ const GlobalContext = React.createContext({
   setVulnerabilitiesData: () => {},
   totalProducts: 0,
   setTotalProducts: () => {},
+  totalVulns: 0,
+  setTotalVulns: () => {},
   minimize: false,
   setMinimize: () => {},
   activeDockerHub: true,
