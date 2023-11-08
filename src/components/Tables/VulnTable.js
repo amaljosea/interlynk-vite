@@ -887,10 +887,11 @@ const VulnTable = ({
             <DrawerBody mt={2}>
               {/* IMPORT WIZARD */}
               <Multistep
-                currentData={data.nodes}
                 step={step}
                 progress={progress}
                 refetch={refetch}
+                currentSbomId={sbomId}
+                currentProductId={productId}
               />
             </DrawerBody>
 

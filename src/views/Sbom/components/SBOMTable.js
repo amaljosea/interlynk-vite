@@ -66,6 +66,7 @@ const SBOMTable = ({
     logDirection,
     totalRows,
     setTotalRows,
+    setTotalVulns,
     activeProdTab,
     setActiveProdTab,
     vulnField,
@@ -184,7 +185,12 @@ const SBOMTable = ({
           field: vulnField,
           direction: vulnDirection
         }
-      }).then((res) => res.data && setVulnIndex(1))
+      }).then((res) => {
+        if (res.data) {
+          setTotalVulns(res.data.sbom.vulns.totalCount)
+          setVulnIndex(1)
+        }
+      })
       getVulnFilters({
         variables: {
           projectId: productId,
