@@ -104,8 +104,12 @@ const SBOMTable = ({
     useLazyQuery(GetCheckResults)
 
   // GET CHANGE LOG DATA
-  const [getLogData, { data: logsData, refetch: logsRefetch }] =
-    useLazyQuery(GetChangeLogs)
+  const [getLogData, { data: logsData, refetch: logsRefetch }] = useLazyQuery(
+    GetChangeLogs,
+    {
+      fetchPolicy: 'network-only'
+    }
+  )
 
   // GET COMPONENT FILTER HEADS
   const [getCompFilters, { refetch: compFilterRefetch }] =
@@ -130,13 +134,16 @@ const SBOMTable = ({
   }
 
   // FETCH FILTER DATA BASE ON SELECTED TAB
-  useEffect(() => {
-    if (activeProdTab === 0) {
+  // useEffect(() => {}, [activeProdTab])
+
+  const handleTabChange = (value) => {
+    setActiveProdTab(Number(value))
+    if (value === 0) {
       refetch({
         projectId: productId,
         sbomId: sbomId
       })
-    } else if (activeProdTab === 1) {
+    } else if (value === 1) {
       // FETCH COMPONENT DATA
       getCompData({
         variables: {
@@ -163,7 +170,7 @@ const SBOMTable = ({
           setCompFilters(res.data.sbom.filters)
         }
       })
-    } else if (activeProdTab === 2) {
+    } else if (value === 2) {
       getVulnData({
         variables: {
           projectId: productId,
@@ -188,7 +195,7 @@ const SBOMTable = ({
           setVulnFilters(res.data.sbom.filters)
         }
       })
-    } else if (activeProdTab === 3) {
+    } else if (value === 3) {
       // FETCH HEALTH CHECK DATA
       getCheckData({
         variables: {
@@ -209,7 +216,7 @@ const SBOMTable = ({
           setCheckFilters(res.data.sbom.filters)
         }
       })
-    } else if (activeProdTab === 4) {
+    } else if (value === 4) {
       // FETCH ACTIVITY LOGS DATA
       getLogData({
         variables: {
@@ -231,7 +238,7 @@ const SBOMTable = ({
         }
       })
     }
-  }, [activeProdTab])
+  }
 
   // EXTRACT ALL THE COMPONENT NAME AND ID'S FROM SELECTED SBOM VERSION
   const components =
@@ -249,7 +256,7 @@ const SBOMTable = ({
         <Tabs
           variant='enclosed'
           index={activeProdTab}
-          onChange={(value) => setActiveProdTab(Number(value))}
+          onChange={(value) => handleTabChange(value)}
         >
           {/* TAB LIST */}
           <TabList mt='20px'>
