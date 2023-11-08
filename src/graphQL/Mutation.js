@@ -1089,10 +1089,12 @@ export const CreateCompRelation = gql`
         fromComp {
           id
           name
+          version
         }
         toComp {
           id
           name
+          version
         }
         relType
       }
@@ -1109,7 +1111,7 @@ export const UpdateCompRelation = gql`
     $to: Uuid
     $relType: String
   ) {
-    componentRelationCreate(
+    componentRelationUpdate(
       input: {
         compRelationId: $relId
         fromCompId: $from
@@ -1137,18 +1139,9 @@ export const UpdateCompRelation = gql`
 // DELETE COMPONENT RELATION
 export const DeleteCompRelation = gql`
   mutation DeleteCompRelation($relId: Uuid!) {
-    componentRelationCreate(input: { compRelationId: $relId }) {
+    componentRelationDelete(input: { compRelationId: $relId }) {
       compRelation {
         id
-        fromComp {
-          id
-          name
-        }
-        toComp {
-          id
-          name
-        }
-        relType
       }
       errors
     }
