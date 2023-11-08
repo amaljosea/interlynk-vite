@@ -779,6 +779,7 @@ export const GetCheckResults = gql`
     $category: [String!]
     $status: [String!]
     $severity: [String!]
+    $componentName: [String!]
     $first: Int
     $last: Int
     $after: String
@@ -793,6 +794,7 @@ export const GetCheckResults = gql`
         category: $category
         status: $status
         severity: $severity
+        componentName: $componentName
         after: $after
         before: $before
         first: $first
@@ -1503,6 +1505,7 @@ export const GetSignedCheckResults = gql`
     $category: [String!]
     $status: [String!]
     $severity: [String!]
+    $componentName: [String!]
     $first: Int
     $last: Int
     $after: String
@@ -1517,6 +1520,7 @@ export const GetSignedCheckResults = gql`
         category: $category
         status: $status
         severity: $severity
+        componentName: $componentName
         after: $after
         before: $before
         first: $first
