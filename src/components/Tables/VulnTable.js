@@ -127,6 +127,9 @@ const VulnTable = ({
 
   const textColor = useColorModeValue('gray.700', 'white')
 
+  const x = window.matchMedia('(min-width: 2500px)')
+  const y = window.matchMedia('(max-width: 1440px)')
+
   // STEPS
   const [step, setStep] = useState(1)
   const [progress, setProgress] = useState(25)
@@ -193,7 +196,7 @@ const VulnTable = ({
           </Link>
         )
       },
-      width: '200px',
+      width: y.matches ? '15%' : '20%',
       sortable: true
     },
     // SEVERITY
@@ -343,7 +346,7 @@ const VulnTable = ({
         )
       },
       wrap: true,
-      width: '150px',
+      width: y.matches ? '10%' : x.matches ? '18%' : '15%',
       sortable: true
     },
     // VERSION
@@ -356,7 +359,7 @@ const VulnTable = ({
         </Tooltip>
       ),
       wrap: true,
-      width: '120px',
+      width: y.matches ? '10%' : x.matches ? '18%' : '15%',
       sortable: true
     },
     // STATUS
