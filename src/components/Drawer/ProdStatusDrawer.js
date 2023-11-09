@@ -244,9 +244,7 @@ const ProdStatusDrawer = ({
                   </Box>
                 </Stack>
               )}
-              {(statusName === 'Affected' ||
-                (justifyName === 'Other (impact statment required)' &&
-                  statusName === 'Not Affected')) && (
+              {(statusName === 'Affected' || statusName === 'Not Affected') && (
                 <FormControl>
                   <FormLabel
                     htmlFor='impactStatement'
@@ -256,9 +254,10 @@ const ProdStatusDrawer = ({
                   >
                     Impact Statement
                   </FormLabel>
-                  <Input
+                  <Textarea
                     type='text'
                     name='impactStatement'
+                    rows={2}
                     id='impactStatement'
                     placeholder='Add impact statement'
                     value={impactData}
