@@ -513,7 +513,12 @@ export const getFullDate = (dateString) => {
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
 }
 
-export const mergeData = (currentData, selectedData) => {
+export const findSimilarItems = (
+  currentData,
+  selectedData,
+  importFrom,
+  statusHistory
+) => {
   const mergedData = currentData.map((currentItem) => {
     const matchingSelected = selectedData.find(
       (selectedItem) =>
@@ -526,7 +531,10 @@ export const mergeData = (currentData, selectedData) => {
       return {
         ...currentItem,
         importStatus: matchingSelected.vexStatus,
-        importJustification: matchingSelected.vexJustification
+        importJustification: matchingSelected.vexJustification,
+        importStatement: matchingSelected.impact,
+        importFrom,
+        statusHistory
       }
     }
   })
@@ -536,3 +544,23 @@ export const mergeData = (currentData, selectedData) => {
 
   return filterList
 }
+
+export const findUniqueItems = (currentArray, importArray) => {
+  const uniqueItems = []
+
+  for (const currentItem of currentArray) {
+    const matchingImportItem = importArray.find(
+      (importItem) =>
+        importItem.vuln.vulnId === currentItem.vuln.vulnId &&
+        importItem.component.name === currentItem.component.name &&
+        importItem.component.version === currentItem.component.version
+    )
+
+    if (!matchingImportItem) {
+      uniqueItems.push(currentItem)
+    }
+  }
+
+  return uniqueItems
+}
+

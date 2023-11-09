@@ -109,7 +109,13 @@ const GlobalContext = React.createContext({
   signedVulnField: '',
   setSignedVulnField: () => {},
   signedVulnDirection: '',
-  setSignedVulnDirection: () => {}
+  setSignedVulnDirection: () => {},
+  mergeData: [],
+  setMergeData: () => {},
+  currentSbom: [],
+  setCurrentSbom: () => {},
+  importSbom: [],
+  setImportSbom: () => {}
 })
 
 export default GlobalContext

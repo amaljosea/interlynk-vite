@@ -15,10 +15,10 @@ import {
 import Card from 'components/Card/Card'
 import GlobalContext from 'context/GlobalContext'
 import { updateCompVulnVex } from 'graphQL/Mutation'
-import React, { useContext, useEffect, useMemo, useState } from 'react'
+import React, { useContext, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation } from 'react-router-dom'
-import { mergeData, sevColor } from 'utils'
+import { findSimilarItems, sevColor } from 'utils'
 
 const customStyles = {
   headCells: {
@@ -53,14 +53,7 @@ const statusColor = (status) => {
   }
 }
 
-const CopyTable = ({
-  data,
-  productId,
-  sbomId,
-  getVulns,
-  refetch,
-  setFinalData
-}) => {
+const CopyTable = ({ productId, sbomId, getVulns, refetch, setFinalData }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const currentSbomId = queryParams.get('sbom')
@@ -69,65 +62,38 @@ const CopyTable = ({
 
   const textColor = useColorModeValue('gray.700', 'white')
 
-  const { vulnField, vulnDirection, totalVulns } = useContext(GlobalContext)
+  const { vulnField, vulnDirection, totalVulns, mergeData, setMergeData } =
+    useContext(GlobalContext)
 
-  const [compVexCreate] = useMutation(updateCompVulnVex)
+  const handleUpdate = (id, value) => {
+    console.log(value)
 
-  const fetchMergeList = async (currentData) => {
-    await getVulns({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        first: totalVulns,
-        field: vulnField,
-        direction: vulnDirection
+    const updatedData = mergeData.map((item) => {
+      if (item.id === id) {
+        return {
+          ...item,
+          importFrom: value
+        }
       }
-    }).then((res) => {
-      const data = mergeData(currentData, res.data.sbom.vulns.nodes)
-      setFinalData(data)
+      return item
     })
+
+    setMergeData(updatedData)
   }
 
-  const refetchCurrentVuln = async () => {
-    try {
-      await refetch({
-        variables: {
-          projectId: productId,
-          sbomId: currentSbomId,
-          first: totalVulns,
-          field: vulnField,
-          direction: vulnDirection
+  const handleStatusHistory = (id, value) => {
+    console.log(value)
+    const updatedData = mergeData.map((item) => {
+      if (item.id === id) {
+        return {
+          ...item,
+          statusHistory: value ? false : true
         }
-      }).then((res) => {
-        if (res.data) {
-          fetchMergeList(res.data.sbom.vulns.nodes)
-        }
-      })
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  const handleUpdate = (e, row) => {
-    const { value } = e.target
-    const { importJustification, importStatus, id } = row
-    if (value === 'Replace from import') {
-      try {
-        compVexCreate({
-          variables: {
-            compVulnId: id,
-            notes: 'testing',
-            sbomId: sbomId,
-            vexStatusId: importStatus.id,
-            vexJustificationId: importJustification
-              ? importJustification.id
-              : undefined
-          }
-        }).then(() => refetchCurrentVuln())
-      } catch (error) {
-        console.log('Mutation error', error)
       }
-    }
+      return item
+    })
+
+    setMergeData(updatedData)
   }
 
   // COLUMNS
@@ -155,7 +121,8 @@ const CopyTable = ({
             </Flex>
           </Link>
         )
-      }
+      },
+      wrap: true
     },
     // SEVERITY
     {
@@ -269,10 +236,10 @@ const CopyTable = ({
         return (
           <Select
             name='import'
-            defaultValue={row.importFrom}
             size='sm'
             width={'fit-content'}
-            onChange={(e) => handleUpdate(e, row)}
+            value={row.importFrom || 'Keep existing'}
+            onChange={(e) => handleUpdate(row.id, e.target.value)}
           >
             <option value={'Keep existing'}>Keep existing</option>
             <option value={'Replace from import'}>Replace from import</option>
@@ -280,6 +247,7 @@ const CopyTable = ({
         )
       }
     },
+    // STATUS HISTORY
     {
       id: 'statusHistory',
       name: 'STATUS HISTORY',
@@ -287,8 +255,8 @@ const CopyTable = ({
         return (
           <Checkbox
             name='status'
-            defaultChecked={row.statusHistory}
-            // onChange={() => setUpdateHistory(!updateHistory)}
+            isChecked={row.statusHistory}
+            onChange={() => handleStatusHistory(row.id, row.statusHistory)}
           />
         )
       }
@@ -302,10 +270,10 @@ const CopyTable = ({
         alignItems={'center'}
         justifyContent={'space-between'}
       >
-        <Text>Total : {data && data.length}</Text>
+        <Text>Total : {mergeData && mergeData.length}</Text>
       </Flex>
     )
-  }, [data])
+  }, [mergeData])
 
   const linkURl = (type, id) => {
     if (type === 'osv') {
@@ -320,10 +288,10 @@ const CopyTable = ({
       <Flex flexDir={'column'} width={'100%'} mb={6}>
         <DataTable
           columns={columns}
-          data={data}
+          data={mergeData}
           customStyles={customStyles}
           subHeader
-          progressPending={data ? false : true}
+          progressPending={mergeData ? false : true}
           subHeaderComponent={subHeaderComponentMemo}
           responsive={true}
           selectableRows={true}
