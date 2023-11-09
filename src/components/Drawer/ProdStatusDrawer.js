@@ -118,11 +118,6 @@ const ProdStatusDrawer = ({
   }
 
   useEffect(() => {
-    if (vexStatus) {
-      setStatusTitle(vexStatus.id)
-      setStatusName(vexStatus.name)
-    }
-
     if (componentVulnLogs) {
       const sortedData =
         componentVulnLogs &&
@@ -131,17 +126,7 @@ const ProdStatusDrawer = ({
           const dateB = new Date(b.updatedAt).getTime()
           return dateB - dateA
         })
-      console.log(sortedData)
       setStatusResults(sortedData)
-    }
-
-    if (vexJustification) {
-      setJustification(vexJustification.id)
-    }
-
-    if (impact) {
-      setJustifyName('Other (impact statment required)')
-      setImpactData(impact)
     }
   }, [data])
 
