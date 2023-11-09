@@ -87,6 +87,11 @@ const ContextWrapper = (props) => {
   const [signedMinVal, setSignedMinVal] = useState()
   const [signedMaxVal, setSignedMaxVal] = useState()
 
+  // IMPORT DATA
+  const [mergeData, setMergeData] = useState([])
+  const [currentSbom, setCurrentSbom] = useState([])
+  const [importSbom, setImportSbom] = useState([])
+
   return (
     <GlobalContext.Provider
       value={{
@@ -190,7 +195,13 @@ const ContextWrapper = (props) => {
         signedMinVal,
         setSignedMinVal,
         signedMaxVal,
-        setSignedMaxVal
+        setSignedMaxVal,
+        mergeData,
+        setMergeData,
+        currentSbom,
+        setCurrentSbom,
+        importSbom,
+        setImportSbom
       }}
     >
       {props.children}

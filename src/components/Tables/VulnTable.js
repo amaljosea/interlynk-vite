@@ -49,6 +49,10 @@ import { timeSince } from 'utils'
 import CustomLoader from 'components/CustomLoader'
 import Cookies from 'js-cookie'
 import RowLimit from 'views/Sbom/components/RowLimit'
+import { useLazyQuery, useMutation } from '@apollo/client'
+import { updateCompVulnVex } from 'graphQL/Mutation'
+import { findSimilarItems } from 'utils'
+import { GetVulnData } from 'graphQL/Queries'
 
 const customStyles = {
   headCells: {
@@ -122,7 +126,14 @@ const VulnTable = ({
     signedVulnComponent,
     signedVulnStatus,
     signedVulnKev,
-    signedVulnEpss
+    signedVulnEpss,
+    mergeData,
+    setMergeData,
+    totalVulns,
+    currentSbom,
+    setCurrentSbom,
+    importSbom,
+    setImportSbom
   } = useContext(GlobalContext)
 
   const textColor = useColorModeValue('gray.700', 'white')
@@ -604,7 +615,7 @@ const VulnTable = ({
     )
   }
 
-  const handleSubmit = async () => {
+  const handleUpdate = async () => {
     try {
       await refetch({
         variables: {
@@ -622,6 +633,68 @@ const VulnTable = ({
       })
     } catch (error) {
       console.log(error)
+    }
+  }
+
+  const [compVexCreate] = useMutation(updateCompVulnVex)
+
+  const [getVulns] = useLazyQuery(GetVulnData)
+
+  const refetchCurrentVuln = async (item) => {
+    try {
+      await getVulns({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          first: totalVulns,
+          field: vulnField,
+          direction: vulnDirection
+        }
+      }).then((res) => {
+        if (res.data) {
+          const data = findSimilarItems(
+            res.data.sbom.vulns.nodes,
+            importSbom,
+            'Keep existing',
+            true
+          )
+          const filterData = data.filter((item) => item.importStatus !== null)
+          setMergeData(filterData)
+        }
+      })
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const handleSubmit = () => {
+    const updatedList = mergeData.filter(
+      (item) => item.importFrom === 'Replace from import'
+    )
+    console.log(updatedList)
+    if (updatedList.length > 0) {
+      updatedList.map((item) => {
+        try {
+          compVexCreate({
+            variables: {
+              compVulnId: item.id,
+              notes: 'testing',
+              sbomId: sbomId,
+              vexStatusId: item.importStatus.id,
+              vexJustificationId: item.importJustification
+                ? item.importJustification.id
+                : undefined,
+              impact: item.importStatement ? item.importStatement : undefined
+            }
+          }).then(() => refetchCurrentVuln(item))
+        } catch (error) {
+          console.log('Mutation error', error)
+        }
+      })
+    } else {
+      setStep(1)
+      setProgress(25)
+      onTableClose()
     }
   }
 
@@ -892,7 +965,7 @@ const VulnTable = ({
               <Multistep
                 step={step}
                 progress={progress}
-                refetch={refetch}
+                getVulns={getVulns}
                 currentSbomId={sbomId}
                 currentProductId={productId}
               />

@@ -15,7 +15,7 @@ import { GetProjectData, GetProject, GetVulnData } from 'graphQL/Queries'
 import CopyTable from 'components/Tables/CopyTable'
 import GlobalContext from 'context/GlobalContext'
 import { useLocation } from 'react-router-dom'
-import { mergeData } from 'utils'
+import { findSimilarItems } from 'utils'
 
 let productId
 let sbomId
@@ -216,11 +216,11 @@ const Form3 = ({
               name='statusHistory'
               id='statusHistoryp'
               value={statusHistory}
-              onChange={(e) => setStatusHistory(e.target.value)}
+              onChange={(e) => setStatusHistory(Boolean(e.target.value))}
             >
-              <option value={''}>-- Select --</option>
-              <option value={'Yes'}>Yes</option>
-              <option value={'No'}>No</option>
+              <option value={false}>-- Select --</option>
+              <option value={true}>Yes</option>
+              <option value={false}>No</option>
             </Select>
           </FormControl>
         </Stack>
@@ -231,19 +231,23 @@ const Form3 = ({
 
 // FORM FOUR
 const Form4 = ({
-  finalData,
-  setFinalData,
+  getVulns,
   importFrom,
   statusHistory,
   currentSbomId,
   currentProductId
 }) => {
-  const { vulnField, vulnDirection, totalVulns } = useContext(GlobalContext)
-  const [currentSbom, setCurrentSbom] = useState([])
-  const [importSbom, setImportSbom] = useState([])
-
-  // GET VULN DATA
-  const [getVulns, { refetch }] = useLazyQuery(GetVulnData)
+  const {
+    vulnField,
+    vulnDirection,
+    totalVulns,
+    mergeData,
+    setMergeData,
+    currentSbom,
+    setCurrentSbom,
+    importSbom,
+    setImportSbom
+  } = useContext(GlobalContext)
 
   useEffect(() => {
     if (currentSbomId && currentProductId) {
@@ -273,14 +277,23 @@ const Form4 = ({
     }
   }, [])
 
-  // console.log('current data', currentData)
-
   useEffect(() => {
     if (currentSbom && importSbom) {
-      const data = mergeData(currentSbom, importSbom)
-      setFinalData(data)
+      const data = findSimilarItems(
+        currentSbom,
+        importSbom,
+        importFrom,
+        statusHistory
+      )
+      const filterData = data.filter((item) => item.importStatus !== null)
+      console.log('filterData', filterData)
+      setMergeData(filterData)
     }
   }, [currentSbom, importSbom])
+
+  useEffect(() => {
+    console.log('Final data', mergeData)
+  }, [mergeData])
 
   return (
     <>
@@ -294,14 +307,11 @@ const Form4 = ({
         Vunlerability view resolved by
       </Text>
       <Box width={'90%'} margin={'0 auto'}>
-        {finalData.length > 0 ? (
+        {mergeData.length > 0 ? (
           <CopyTable
-            data={finalData}
             productId={productId}
             sbomId={sbomId}
             getVulns={getVulns}
-            refetch={refetch}
-            setFinalData={setFinalData}
             importFrom={importFrom}
             statusHistory={statusHistory}
           />
@@ -311,7 +321,7 @@ const Form4 = ({
             alignItems={'center'}
             justifyContent={'space-between'}
           >
-            <Text>Total : {finalData.length}</Text>
+            <Text>Total : {mergeData.length}</Text>
           </Flex>
         )}
       </Box>
@@ -319,7 +329,13 @@ const Form4 = ({
   )
 }
 
-const Multistep = ({ step, progress, currentSbomId, currentProductId }) => {
+const Multistep = ({
+  step,
+  progress,
+  currentSbomId,
+  currentProductId,
+  getVulns
+}) => {
   const [selectedProd, setSelectedProd] = useState('')
   const [selectedVersion, setSelectedVersion] = useState('')
   const [uniqVersions, setUniqVersions] = useState([])
@@ -328,8 +344,6 @@ const Multistep = ({ step, progress, currentSbomId, currentProductId }) => {
 
   const [importFrom, setImportFrom] = useState('')
   const [statusHistory, setStatusHistory] = useState('')
-
-  const [finalData, setFinalData] = useState([])
 
   return (
     <>
@@ -364,10 +378,9 @@ const Multistep = ({ step, progress, currentSbomId, currentProductId }) => {
             <Form4
               currentSbomId={currentSbomId}
               currentProductId={currentProductId}
-              finalData={finalData}
-              setFinalData={setFinalData}
               importFrom={importFrom}
               statusHistory={statusHistory}
+              getVulns={getVulns}
             />
           )
         )}
