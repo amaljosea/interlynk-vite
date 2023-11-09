@@ -34,6 +34,7 @@ import CheckFilterMenu from 'views/Sbom/components/CheckFilterMenu'
 import CheckModal from 'views/Sbom/components/CheckModal'
 import PriSupplierModal from 'views/Sbom/components/PriSupplierModal'
 import RowLimit from 'views/Sbom/components/RowLimit'
+import SearchFilter from 'views/Sbom/components/SearchFilter'
 import SupplierModal from 'views/Sbom/components/SupplierModal'
 
 const customStyles = {
@@ -79,7 +80,7 @@ const HealthCheckTable = ({
 
   const [purlValue, setPurlValue] = useState('')
   const [purlData, setPurlData] = useState(null)
-
+  const [filterText, setFilterText] = useState('')
   const [cpeList, setCpeList] = useState([])
   const [cpeValue, setCpeValue] = useState('')
   const [cpeData, setCpeData] = useState(null)
@@ -198,6 +199,31 @@ const HealthCheckTable = ({
     }
   }
 
+  // SEARCH COMPONENT
+  const handleSearch = async (event) => {
+    if (event.key === 'Enter' && filterText !== '') {
+      await refetch({
+        projectId: productId,
+        sbomId: sbomId,
+        search: filterText,
+        first: totalRows
+      })
+      setPageIndex(1)
+    }
+  }
+
+  // CLEAR SERACH
+  const handleClear = async () => {
+    await refetch({
+      projectId: productId,
+      sbomId: sbomId,
+      search: undefined,
+      first: totalRows
+    })
+    setFilterText('')
+    setPageIndex(1)
+  }
+
   // SET ROW LENGTH
   const handleSetRow = async (e) => {
     setTotalRows(Number(e.target.value))
@@ -250,6 +276,15 @@ const HealthCheckTable = ({
           spacing={4}
           alignItems={'flex-start'}
         >
+          {/* SEARCH COMPONENTS */}
+          <SearchFilter
+            id='healthcheck'
+            filterText={filterText}
+            setFilterText={setFilterText}
+            onFilter={handleSearch}
+            onClear={handleClear}
+          />
+
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
           {checkFilters && (
             <CheckFilterMenu
@@ -430,17 +465,18 @@ const HealthCheckTable = ({
   const columns = [
     // HEALTH CHECK ID
     {
-      id: 'CHECK_ID',
+      id: 'RULES_FRIENDLY_ID',
       name: 'CHECK ID',
       selector: (row) => {
         const { organizationRule } = row
         return <Text>{organizationRule.rule.friendlyId}</Text>
       },
+      sortable: true,
       width: '120px'
     },
     // SEVERITY
     {
-      id: 'SEVERITY',
+      id: 'ORGANIZATION_RULES_SEVERITY',
       name: 'SEVERITY',
       selector: (row) => {
         const { organizationRule } = row
@@ -456,6 +492,7 @@ const HealthCheckTable = ({
           </Tag>
         )
       },
+      sortable: true,
       width: '120px'
     },
     // CATEGORY
@@ -480,7 +517,7 @@ const HealthCheckTable = ({
     }, */
     // LONG DESCRIPTION
     {
-      id: 'DESCRIPTION',
+      id: 'COMPONENTS_NAME',
       name: 'DESCRIPTION',
       selector: (row) => {
         const { organizationRule, component } = row
@@ -509,6 +546,7 @@ const HealthCheckTable = ({
           </Tooltip>
         )
       },
+      sortable: true,
       width: '600px',
       wrap: true
     },
