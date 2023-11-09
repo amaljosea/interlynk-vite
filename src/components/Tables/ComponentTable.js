@@ -55,6 +55,7 @@ import RowLimit from 'views/Sbom/components/RowLimit'
 const customStyles = {
   headCells: {
     style: {
+      width: '100%',
       fontWeight: 'bold',
       color: '#2D3748',
       fontSize: '12px',
@@ -86,6 +87,9 @@ const ComponentTable = ({
   const customerView = location.pathname.startsWith('/customer')
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
+
+  const x = window.matchMedia('(min-width: 2500px)')
+  const y = window.matchMedia('(max-width: 1440px)')
 
   const {
     compFilters,
@@ -292,7 +296,7 @@ const ComponentTable = ({
           </Stack>
         )
       },
-      width: '320px',
+      width: '20%',
       sortable: true
     },
     // VERSION
@@ -300,7 +304,7 @@ const ComponentTable = ({
       id: 'COMPONENTS_VERSION',
       name: 'VERSION',
       selector: (row) => <p style={{ textWrap: 'pretty' }}>{row.version}</p>,
-      width: '120px',
+      width: '16%',
       sortable: true
     },
     // PURL
@@ -322,14 +326,14 @@ const ComponentTable = ({
         )
       },
       sortable: true,
-      width: '280px',
+      width: x.matches ? '30%' : '20%',
       grow: 2
     },
     // LICENSES
     {
       id: 'COMPONENTS_LICENSES',
       name: 'LICENSES',
-      width: '200px',
+      width: y.matches ? '16%' : '12%',
       selector: (row) => {
         const { licenses } = row
 
@@ -338,7 +342,13 @@ const ComponentTable = ({
           licenseOptions.filter((item) => licenses.includes(item.licenseId))
 
         return (
-          <Flex alignItems={'flex-start'} gap={2} flexWrap={'wrap'} my={2}>
+          <Flex
+            alignItems={'flex-end'}
+            justifyContent={'flex-end'}
+            gap={2}
+            flexWrap={'wrap'}
+            my={2}
+          >
             {filtered.length > 0 &&
               filtered.map((item, index) => (
                 <Tooltip
@@ -369,6 +379,7 @@ const ComponentTable = ({
           </Flex>
         )
       },
+      right: 'true',
       sortable: true
     },
     // UPDATED AT
@@ -381,12 +392,13 @@ const ComponentTable = ({
         </Tooltip>
       ),
       sortable: true,
-      width: '160px',
+      width: '12%',
       sortFunction: (a, b) => {
         const dateA = new Date(a.updatedAt)
         const dateB = new Date(b.updatedAt)
         return dateB - dateA // Sort in descending order
-      }
+      },
+      right: 'true'
     },
     // ACTION
     {
@@ -418,13 +430,13 @@ const ComponentTable = ({
                       Edit Component
                     </MenuItem>
                     <MenuItem
-                        onClick={() => {
-                          setActiveRow(row)
-                          onRelationOpen()
-                        }}
-                      >
-                        Edit Relationships
-                      </MenuItem>
+                      onClick={() => {
+                        setActiveRow(row)
+                        onRelationOpen()
+                      }}
+                    >
+                      Edit Relationships
+                    </MenuItem>
                     <MenuItem
                       onClick={() => {
                         setActiveRow(row)
