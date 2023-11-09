@@ -781,7 +781,7 @@ export const GetCheckResults = gql`
     $category: [String!]
     $status: [String!]
     $severity: [String!]
-    $componentName: [String!]
+    $search: String
     $first: Int
     $last: Int
     $after: String
@@ -796,7 +796,7 @@ export const GetCheckResults = gql`
         category: $category
         status: $status
         severity: $severity
-        componentName: $componentName
+        search: $search
         after: $after
         before: $before
         first: $first
