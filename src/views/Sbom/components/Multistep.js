@@ -109,7 +109,8 @@ const Form1 = ({
                 Project
               </FormLabel>
               <Select
-                name='projects'
+                name='product'
+                id='product'
                 value={selectedProd}
                 onChange={handleSelectProduct}
               >
@@ -123,11 +124,12 @@ const Form1 = ({
             </FormControl>
             {/* Version */}
             <FormControl fontSize={'sm'}>
-              <FormLabel htmlFor='product' fontSize='md' color='gray.600'>
+              <FormLabel htmlFor='versions' fontSize='md' color='gray.600'>
                 Version
               </FormLabel>
               <Select
-                name='projects'
+                name='versions'
+                id='versions'
                 value={selectedVersion}
                 onChange={(e) => {
                   setSelectedVersion(e.target.value)
@@ -196,6 +198,7 @@ const Form3 = ({
             </FormLabel>
             <Select
               name='importFrom'
+              id='importFrom'
               value={importFrom}
               onChange={(e) => setImportFrom(e.target.value)}
             >
@@ -211,6 +214,7 @@ const Form3 = ({
             </FormLabel>
             <Select
               name='statusHistory'
+              id='statusHistoryp'
               value={statusHistory}
               onChange={(e) => setStatusHistory(e.target.value)}
             >
@@ -273,7 +277,7 @@ const Form4 = ({
 
   useEffect(() => {
     if (currentSbom && importSbom) {
-      const data = mergeData(currentSbom, importSbom, importFrom, statusHistory)
+      const data = mergeData(currentSbom, importSbom)
       setFinalData(data)
     }
   }, [currentSbom, importSbom])
