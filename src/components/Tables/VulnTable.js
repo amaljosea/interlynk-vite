@@ -556,18 +556,18 @@ const VulnTable = ({
                 {vuln.desc}
               </Text>
             </Box>
-            {/* Last Modified At */}
-            <Box>
-              <CustomText>Last Modified At :</CustomText>
-              <Text mt={1} fontSize={14}>
-                {getFullDateAndTime(vuln.lastModifiedAt)}
-              </Text>
-            </Box>
             {/* Published At  */}
             <Box>
-              <CustomText>Published At :</CustomText>
+              <CustomText>Published:</CustomText>
               <Text mt={1} fontSize={14}>
                 {getFullDateAndTime(vuln.publishedAt)}
+              </Text>
+            </Box>
+            {/* Last Modified At */}
+            <Box>
+              <CustomText>Last Modified:</CustomText>
+              <Text mt={1} fontSize={14}>
+                {getFullDateAndTime(vuln.lastModifiedAt)}
               </Text>
             </Box>
             {/* CVSS Vector */}
@@ -577,10 +577,10 @@ const VulnTable = ({
                 {vuln.cvssVector}
               </Text>
             </Box>
-            {/* NVD Alias ID */}
-            <Box>
-              <CustomText>NVD Alias ID :</CustomText>
-              {vuln.nvdAliasId && (
+            {/* NVD ALIAS ID */}
+            { vuln.nvdAliasId ? (
+              <Box>
+                <CustomText>NVD Alias ID:</CustomText>
                 <Link href={linkURl('nvd', vuln.nvdAliasId)} target={'_blank'}>
                   <Flex mt={1} direction='row' alignItems={'center'} gap={2}>
                     <Icon
@@ -596,8 +596,7 @@ const VulnTable = ({
                     </Tooltip>
                   </Flex>
                 </Link>
-              )}
-            </Box>
+              </Box> ) : null }
           </GridItem>
           {/* STATUS UPDATE */}
           <GridItem w='100%' colSpan={3}>
