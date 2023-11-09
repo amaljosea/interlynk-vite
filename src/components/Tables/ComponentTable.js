@@ -55,6 +55,7 @@ import RowLimit from 'views/Sbom/components/RowLimit'
 const customStyles = {
   headCells: {
     style: {
+      width: '100%',
       fontWeight: 'bold',
       color: '#2D3748',
       fontSize: '12px',
@@ -292,7 +293,7 @@ const ComponentTable = ({
           </Stack>
         )
       },
-      width: '320px',
+      width: '20%',
       sortable: true
     },
     // VERSION
@@ -300,7 +301,7 @@ const ComponentTable = ({
       id: 'COMPONENTS_VERSION',
       name: 'VERSION',
       selector: (row) => <p style={{ textWrap: 'pretty' }}>{row.version}</p>,
-      width: '120px',
+      width: '10%',
       sortable: true
     },
     // PURL
@@ -322,14 +323,14 @@ const ComponentTable = ({
         )
       },
       sortable: true,
-      width: '280px',
+      width: '30%',
       grow: 2
     },
     // LICENSES
     {
       id: 'COMPONENTS_LICENSES',
       name: 'LICENSES',
-      width: '200px',
+      width: '15%',
       selector: (row) => {
         const { licenses } = row
 
@@ -381,17 +382,18 @@ const ComponentTable = ({
         </Tooltip>
       ),
       sortable: true,
-      width: '160px',
+      width: '14%',
       sortFunction: (a, b) => {
         const dateA = new Date(a.updatedAt)
         const dateB = new Date(b.updatedAt)
         return dateB - dateA // Sort in descending order
-      }
+      },
+      right: 'true'
     },
     // ACTION
     {
       id: 'action',
-      name: 'ACTION',
+      name: '',
       selector: (row) => {
         const { suppliers, status, primary, name } = row
 
@@ -418,13 +420,13 @@ const ComponentTable = ({
                       Edit Component
                     </MenuItem>
                     <MenuItem
-                        onClick={() => {
-                          setActiveRow(row)
-                          onRelationOpen()
-                        }}
-                      >
-                        Edit Relationships
-                      </MenuItem>
+                      onClick={() => {
+                        setActiveRow(row)
+                        onRelationOpen()
+                      }}
+                    >
+                      Edit Relationships
+                    </MenuItem>
                     <MenuItem
                       onClick={() => {
                         setActiveRow(row)
