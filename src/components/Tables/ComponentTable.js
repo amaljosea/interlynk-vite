@@ -88,6 +88,9 @@ const ComponentTable = ({
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
+  const x = window.matchMedia('(min-width: 2500px)')
+  const y = window.matchMedia('(max-width: 1440px)')
+
   const {
     compFilters,
     compField,
@@ -301,7 +304,7 @@ const ComponentTable = ({
       id: 'COMPONENTS_VERSION',
       name: 'VERSION',
       selector: (row) => <p style={{ textWrap: 'pretty' }}>{row.version}</p>,
-      width: '10%',
+      width: '16%',
       sortable: true
     },
     // PURL
@@ -323,14 +326,14 @@ const ComponentTable = ({
         )
       },
       sortable: true,
-      width: '30%',
+      width: x.matches ? '30%' : '20%',
       grow: 2
     },
     // LICENSES
     {
       id: 'COMPONENTS_LICENSES',
       name: 'LICENSES',
-      width: '15%',
+      width: y.matches ? '16%' : '12%',
       selector: (row) => {
         const { licenses } = row
 
@@ -339,7 +342,13 @@ const ComponentTable = ({
           licenseOptions.filter((item) => licenses.includes(item.licenseId))
 
         return (
-          <Flex alignItems={'flex-start'} gap={2} flexWrap={'wrap'} my={2}>
+          <Flex
+            alignItems={'flex-end'}
+            justifyContent={'flex-end'}
+            gap={2}
+            flexWrap={'wrap'}
+            my={2}
+          >
             {filtered.length > 0 &&
               filtered.map((item, index) => (
                 <Tooltip
@@ -370,6 +379,7 @@ const ComponentTable = ({
           </Flex>
         )
       },
+      right: 'true',
       sortable: true
     },
     // UPDATED AT
@@ -382,7 +392,7 @@ const ComponentTable = ({
         </Tooltip>
       ),
       sortable: true,
-      width: '14%',
+      width: '12%',
       sortFunction: (a, b) => {
         const dateA = new Date(a.updatedAt)
         const dateB = new Date(b.updatedAt)
@@ -393,7 +403,7 @@ const ComponentTable = ({
     // ACTION
     {
       id: 'action',
-      name: '',
+      name: 'ACTION',
       selector: (row) => {
         const { suppliers, status, primary, name } = row
 
