@@ -498,7 +498,8 @@ const ComponentTable = ({
       name,
       kind,
       internal,
-      primary
+      dependencyOf,
+      dependsOn
     } = data
 
     const [deleteSupplier] = useMutation(deleteComSupplier)
@@ -607,6 +608,48 @@ const ComponentTable = ({
                   <Text key={index} fontSize={14}>
                     {item}
                   </Text>
+                ))}
+            </Flex>
+          </GridItem>
+          <GridItem w='100%'>
+            <CustomText>Depends On :</CustomText>
+            <Flex mt={2} alignItems={'flex-start'} gap={2} flexWrap={'wrap'}>
+              {dependsOn.length > 0 &&
+                dependsOn.map((comp, index) => (
+                  <Tooltip label={comp.toComp.name} placement='top'>
+                    <Tag
+                      size={'sm'}
+                      key={index}
+                      variant='subtle'
+                      colorScheme={'blue'}
+                      width={'fit-content'}
+                    >
+                      <TagLabel>
+                        {comp.toComp.name}-{comp.toComp.version}
+                      </TagLabel>
+                    </Tag>
+                  </Tooltip>
+                ))}
+            </Flex>
+          </GridItem>
+          <GridItem w='100%'>
+            <CustomText>Dependency Of :</CustomText>
+            <Flex mt={2} alignItems={'flex-start'} gap={2} flexWrap={'wrap'}>
+              {dependencyOf.length > 0 &&
+                dependencyOf.map((comp, index) => (
+                  <Tooltip label={comp.fromComp.name} placement='top'>
+                    <Tag
+                      size={'sm'}
+                      key={index}
+                      variant='subtle'
+                      colorScheme={'blue'}
+                      width={'fit-content'}
+                    >
+                      <TagLabel>
+                        {comp.fromComp.name}-{comp.fromComp.version}
+                      </TagLabel>
+                    </Tag>
+                  </Tooltip>
                 ))}
             </Flex>
           </GridItem>
