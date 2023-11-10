@@ -1,5 +1,4 @@
 import { useLazyQuery, useMutation } from '@apollo/client'
-import { AddIcon } from '@chakra-ui/icons'
 import {
   Box,
   Button,
@@ -13,7 +12,6 @@ import {
   Flex,
   FormControl,
   FormLabel,
-  IconButton,
   Select,
   Stack,
   Table,
@@ -30,7 +28,6 @@ import {
   FormErrorMessage,
   FormErrorIcon,
   useDisclosure,
-  PopoverTrigger,
   Popover,
   PopoverContent,
   PopoverHeader,
@@ -45,9 +42,7 @@ import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
 import NodeElement from 'components/NodeElement'
 import GlobalContext from 'context/GlobalContext'
-import { DeleteCompRelation } from 'graphQL/Mutation'
-import { UpdateCompRelation } from 'graphQL/Mutation'
-import { CreateCompRelation } from 'graphQL/Mutation'
+import { CreateCompRelation, DeleteCompRelation } from 'graphQL/Mutation'
 import { GetAllComponents } from 'graphQL/Queries'
 import { useContext, useEffect, useState } from 'react'
 import Tree from 'react-d3-tree'
@@ -61,7 +56,6 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
   const { name, version, id, dependencyOf, dependsOn } = data
   const { totalRows } = useContext(GlobalContext)
 
-  const [createRelation, setCreateRelation] = useState(false)
   const [dependencyOfList, setDependencyOfList] = useState([])
   const [dependsOnList, setDependsOnList] = useState([])
   const [relation, setRelation] = useState('')
@@ -69,8 +63,14 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
   const [activeComp, setActiveComp] = useState(null)
 
   const [getAllComps, { data: allComponents }] = useLazyQuery(GetAllComponents)
-  const [addRelation] = useMutation(CreateCompRelation)
-  const [updateRelation] = useMutation(UpdateCompRelation)
+  const [addRelation] = useMutation(CreateCompRelation, {
+    onCompleted: () =>
+      refetch({
+        projectId: productId,
+        sbomId: sbomId,
+        first: totalRows
+      })
+  })
   const [removeRelation] = useMutation(DeleteCompRelation)
 
   const {
@@ -81,7 +81,7 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
 
   useEffect(() => {
     if (dependencyOf) {
-      setDependencyOfList(dependencyOf)
+      setDependsOnList(dependencyOf)
     }
   }, [dependencyOf])
 
@@ -148,84 +148,14 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
       .then((res) => {
         if (res.data) {
           console.log(res.data)
-          const filterData = dependsOnList.filter((item) => item.id !== compId)
+          const filterData = dependsOnList.filter(
+            (item) => item.id !== activeComp.id
+          )
           setDependsOnList(filterData)
         }
       })
       .finally(() => onDelClose())
   }
-
-  const orgChart = {
-    name: 'Azure.Core',
-    children: [
-      {
-        name: 'Dependency Of',
-        children: [
-          {
-            name: 'Microsoft.Graph.Core 2.0.8'
-          },
-          {
-            name: 'Azure.Identity'
-          }
-        ]
-      },
-      {
-        name: 'Depends On',
-        children: [
-          {
-            name: 'Microsoft.Bcl.AsyncInterfaces 1.1.1'
-          },
-          {
-            name: 'System.Diagnostics.DiagnosticSource 6.0.0'
-          },
-          {
-            name: 'System.Memory.Data 1.0.2'
-          }
-        ]
-      }
-    ]
-  }
-
-  const [appState] = useState({
-    data: orgChart,
-    orientation: 'horizontal',
-    dimensions: undefined,
-    centeringTransitionDuration: 800,
-    translateX: 200,
-    translateY: 300,
-    collapsible: true,
-    shouldCollapseNeighborNodes: false,
-    initialDepth: 1,
-    depthFactor: undefined,
-    zoomable: true,
-    draggable: true,
-    zoom: 1,
-    scaleExtent: { min: 0.1, max: 1 },
-    separation: { siblings: 2, nonSiblings: 2 },
-    nodeSize: { x: 200, y: 100 },
-    enableLegacyTransitions: false,
-    transitionDuration: 500,
-    styles: {
-      nodes: {
-        node: {
-          circle: {
-            fill: '#52e2c5'
-          },
-          attributes: {
-            stroke: '#000'
-          }
-        },
-        leafNode: {
-          circle: {
-            fill: 'transparent'
-          },
-          attributes: {
-            stroke: '#000'
-          }
-        }
-      }
-    }
-  })
 
   const handleSave = async () => {
     await refetch({
@@ -241,7 +171,7 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
       isOpen={isOpen}
       placement='right'
       onClose={onClose}
-      closeOnOverlayClick={false}
+      closeOnOverlayClick={true}
     >
       <DrawerOverlay />
       <DrawerContent>
@@ -341,52 +271,7 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
                     Add
                   </Button>
                 </Stack>
-                {/* Graph */}
-                {/* <Box
-                  width={'100%'}
-                  height={'100vh'}
-                  display={'flex'}
-                  alignItems={'center'}
-                  justifyContent={'center'}
-                >
-                  <Tree
-                    rootNodeClassName='demo-node'
-                    branchNodeClassName='demo-node'
-                    data={appState.data}
-                    orientation={appState.orientation}
-                    dimensions={appState.dimensions}
-                    centeringTransitionDuration={
-                      appState.centeringTransitionDuration
-                    }
-                    translate={{
-                      x: appState.translateX,
-                      y: appState.translateY
-                    }}
-                    pathFunc={appState.pathFunc}
-                    collapsible={appState.collapsible}
-                    initialDepth={appState.initialDepth}
-                    zoomable={appState.zoomable}
-                    draggable={appState.draggable}
-                    zoom={appState.zoom}
-                    scaleExtent={appState.scaleExtent}
-                    nodeSize={appState.nodeSize}
-                    separation={appState.separation}
-                    enableLegacyTransitions={appState.enableLegacyTransitions}
-                    transitionDuration={appState.transitionDuration}
-                    depthFactor={appState.depthFactor}
-                    styles={appState.styles}
-                    shouldCollapseNeighborNodes={
-                      appState.shouldCollapseNeighborNodes
-                    }
-                    renderCustomNodeElement={(rd3tProps) => (
-                      <NodeElement
-                        nodeDatum={rd3tProps.nodeDatum}
-                        toggleNode={rd3tProps.toggleNode}
-                        orientation={appState.orientation}
-                      />
-                    )}
-                  />
-                </Box> */}
+
                 {/* COMONENT RELATIONSIP DATA */}
                 <Table mt={6} width={'100%'}>
                   <Thead>
@@ -399,13 +284,14 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
                     </Tr>
                   </Thead>
                   <Tbody>
+                    {/* Dependency Of */}
                     <Tr>
-                      <Td pl={0}>
+                      <Td pl={0} width={'300px'}>
                         <Text fontSize='xs' fontWeight={'medium'}>
                           Dependency Of
                         </Text>
                       </Td>
-                      <Td pl={0}>
+                      <Td pl={0} width={'400px'}>
                         <Stack direction={'column'}>
                           {dependencyOfList.map((comp, index) => (
                             <Tag
@@ -429,12 +315,12 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
                       </Td>
                     </Tr>
                     <Tr>
-                      <Td pl={0}>
+                      <Td pl={0} width={'300px'}>
                         <Text fontSize='xs' fontWeight={'medium'}>
                           Depends On
                         </Text>
                       </Td>
-                      <Td pl={0}>
+                      <Td pl={0} width={'400px'}>
                         <Stack direction={'column'} pos={'relative'}>
                           {[...dependsOnList]
                             .sort(
@@ -442,28 +328,31 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
                                 new Date(b.updatedAt) - new Date(a.updatedAt)
                             )
                             .map((comp, index) => (
-                              <Tag
-                                size={'sm'}
-                                key={index}
-                                variant='subtle'
-                                colorScheme={
-                                  new Date(comp.updatedAt).getTime() ===
-                                  recentComp
-                                    ? 'green'
-                                    : 'blue'
-                                }
-                                width={'fit-content'}
-                              >
-                                <TagLabel>
-                                  {comp.toComp.name}-{comp.toComp.version}
-                                </TagLabel>
-                                <TagCloseButton
-                                  onClick={() => {
-                                    setActiveComp(comp)
-                                    onDelOpen()
-                                  }}
-                                />
-                              </Tag>
+                              <Tooltip label={comp.toComp.name} placement='top'>
+                                <Tag
+                                  size={'sm'}
+                                  key={index}
+                                  variant='subtle'
+                                  colorScheme={
+                                    new Date(comp.updatedAt).getTime() ===
+                                    recentComp
+                                      ? 'green'
+                                      : 'blue'
+                                  }
+                                  width={'fit-content'}
+                                >
+                                  <TagLabel>
+                                    {comp.toComp.name?.substring(0, 50)}-
+                                    {comp.toComp.version}
+                                  </TagLabel>
+                                  <TagCloseButton
+                                    onClick={() => {
+                                      setActiveComp(comp)
+                                      onDelOpen()
+                                    }}
+                                  />
+                                </Tag>
+                              </Tooltip>
                             ))}
 
                           <Popover
