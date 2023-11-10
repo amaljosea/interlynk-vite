@@ -28,7 +28,17 @@ import {
   Tooltip,
   Tr,
   FormErrorMessage,
-  FormErrorIcon
+  FormErrorIcon,
+  useDisclosure,
+  PopoverTrigger,
+  Popover,
+  PopoverContent,
+  PopoverHeader,
+  PopoverArrow,
+  PopoverCloseButton,
+  PopoverBody,
+  PopoverFooter,
+  ButtonGroup
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
@@ -58,11 +68,18 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
   const [dependsOnList, setDependsOnList] = useState([])
   const [relation, setRelation] = useState('')
   const [component, setComponent] = useState('')
+  const [activeComp, setActiveComp] = useState(null)
 
   const [getAllComps, { data: allComponents }] = useLazyQuery(GetAllComponents)
   const [addRelation] = useMutation(CreateCompRelation)
   const [updateRelation] = useMutation(UpdateCompRelation)
   const [removeRelation] = useMutation(DeleteCompRelation)
+
+  const {
+    isOpen: isDelOpen,
+    onOpen: onDelOpen,
+    onClose: onDelClose
+  } = useDisclosure()
 
   useEffect(() => {
     if (dependencyOf) {
@@ -118,18 +135,20 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
       .finally(() => setCreateRelation(false))
   }
 
-  const handleRemove = async (id) => {
+  const handleRemove = async () => {
     await removeRelation({
       variables: {
-        relId: id
-      }
-    }).then((res) => {
-      if (res.data) {
-        console.log(res.data)
-        const filterData = dependsOnList.filter((item) => item.id !== id)
-        setDependsOnList(filterData)
+        relId: activeComp.id
       }
     })
+      .then((res) => {
+        if (res.data) {
+          console.log(res.data)
+          const filterData = dependsOnList.filter((item) => item.id !== compId)
+          setDependsOnList(filterData)
+        }
+      })
+      .finally(() => onDelClose())
   }
 
   const orgChart = {
@@ -424,7 +443,7 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
                         </Text>
                       </Td>
                       <Td pl={0}>
-                        <Stack direction={'column'}>
+                        <Stack direction={'column'} pos={'relative'}>
                           {dependsOnList.map((comp, index) => (
                             <Tag
                               size={'sm'}
@@ -437,10 +456,65 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
                                 {comp.toComp.name}-{comp.toComp.version}
                               </TagLabel>
                               <TagCloseButton
-                                onClick={() => handleRemove(comp.id)}
+                                onClick={() => {
+                                  setActiveComp(comp)
+                                  onDelOpen()
+                                }}
                               />
                             </Tag>
                           ))}
+
+                          <Popover
+                            returnFocusOnClose={false}
+                            isOpen={isDelOpen}
+                            onClose={onDelClose}
+                            placement='bottom'
+                            closeOnBlur={true}
+                          >
+                            <PopoverContent>
+                              <PopoverHeader fontWeight='semibold' fontSize={'sm'}>
+                                {activeComp?.toComp.name}
+                              </PopoverHeader>
+                              <PopoverArrow />
+                              <PopoverCloseButton />
+                              <PopoverBody>
+                                <Stack
+                                  direction='column'
+                                  alignItems={'flex-start'}
+                                  spacing={4}
+                                  py={2}
+                                >
+                                  <Text fontSize={'sm'}>
+                                    This will remove the relationship of this
+                                    component with other components and change
+                                    the dependency order of this version.
+                                  </Text>
+                                  <Text fontSize={'sm'}>
+                                    Are you sure you wish to continue?
+                                  </Text>
+                                </Stack>
+                              </PopoverBody>
+                              <PopoverFooter
+                                display='flex'
+                                justifyContent='flex-end'
+                              >
+                                <ButtonGroup size='sm'>
+                                  <Button
+                                    variant='outline'
+                                    onClick={onDelClose}
+                                  >
+                                    No
+                                  </Button>
+                                  <Button
+                                    colorScheme='red'
+                                    onClick={handleRemove}
+                                  >
+                                    Yes
+                                  </Button>
+                                </ButtonGroup>
+                              </PopoverFooter>
+                            </PopoverContent>
+                          </Popover>
                         </Stack>
                       </Td>
                     </Tr>
