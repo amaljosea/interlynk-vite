@@ -472,7 +472,7 @@ const HealthCheckTable = ({
         return <Text>{organizationRule.rule.friendlyId}</Text>
       },
       sortable: true,
-      width: '120px'
+      width: '10%'
     },
     // SEVERITY
     {
@@ -492,8 +492,8 @@ const HealthCheckTable = ({
           </Tag>
         )
       },
-      sortable: true,
-      width: '120px'
+      width: '10%',
+      sortable: true
     },
     // CATEGORY
     /*     {
@@ -547,7 +547,6 @@ const HealthCheckTable = ({
         )
       },
       sortable: true,
-      width: '600px',
       wrap: true
     },
     // UPDATED AT
@@ -565,7 +564,8 @@ const HealthCheckTable = ({
         const dateB = new Date(b.updatedAt)
         return dateA - dateB // Sort in descending order
       },
-      width: '150px'
+      width: '150px',
+      right: 'true'
     },
     // ACTION
     {
@@ -629,6 +629,7 @@ const HealthCheckTable = ({
           </>
         )
       },
+      width: '12%',
       right: 'true'
     }
   ]
