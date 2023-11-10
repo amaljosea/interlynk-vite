@@ -588,6 +588,7 @@ export const GetComponentData = gql`
               name
               version
             }
+            updatedAt
           }
           dependsOn {
             id
@@ -599,6 +600,7 @@ export const GetComponentData = gql`
               name
               version
             }
+            updatedAt
           }
           externalUrls {
             name

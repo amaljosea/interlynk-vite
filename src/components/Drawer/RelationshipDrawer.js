@@ -61,8 +61,6 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
   const { name, version, id, dependencyOf, dependsOn } = data
   const { totalRows } = useContext(GlobalContext)
 
-  console.log('data', dependsOn)
-
   const [createRelation, setCreateRelation] = useState(false)
   const [dependencyOfList, setDependencyOfList] = useState([])
   const [dependsOnList, setDependsOnList] = useState([])
@@ -93,8 +91,8 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
     }
   }, [dependsOn])
 
-  const onCreate = async () => {
-    await getAllComps({
+  useEffect(() => {
+    getAllComps({
       variables: {
         projectId: productId,
         sbomId: sbomId,
@@ -104,16 +102,19 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
       }
     }).then((res) => {
       if (res.data) {
-        setCreateRelation(true)
         setRelation('')
         setComponent('')
       }
     })
-  }
+  }, [])
 
   const list = dependsOnList?.filter((item) => item.toComp.id === component)
 
-  // console.log('list', list)
+  const recentComp = Math.max(
+    ...dependsOnList.map((item) => new Date(item.updatedAt).getTime())
+  )
+
+  console.log('Most Recent', recentComp)
 
   const handleAdd = async () => {
     await addRelation({
@@ -132,7 +133,10 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
           ])
         }
       })
-      .finally(() => setCreateRelation(false))
+      .finally(() => {
+        setRelation('')
+        setComponent('')
+      })
   }
 
   const handleRemove = async () => {
@@ -243,7 +247,7 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
       <DrawerContent>
         <DrawerCloseButton onClick={handleSave} />
         <DrawerHeader borderBottomWidth='1px' color='gray.600'>
-          Edit Relationships
+          Relationships
         </DrawerHeader>
         <DrawerBody>
           <Card px={0} mx={0}>
@@ -257,16 +261,6 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
                 <Text fontSize={'lg'} fontWeight={'medium'}>
                   {name} - {version}
                 </Text>
-                <Tooltip placement='left' label='Add Relationship'>
-                  <IconButton
-                    icon={<AddIcon />}
-                    colorScheme='blue'
-                    variant='solid'
-                    fontWeight='normal'
-                    size='md'
-                    onClick={onCreate}
-                  />
-                </Tooltip>
               </Stack>
             </CardHeader>
             <CardBody>
@@ -277,78 +271,76 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
                 gap={4}
               >
                 {/* CREATE RELATIONSHIP */}
-                {createRelation && (
-                  <Stack
-                    width={'100%'}
-                    direction={'column'}
-                    alignItems={'flex-start'}
-                    gap={2}
-                    mt={6}
-                  >
-                    <FormControl>
-                      <FormLabel htmlFor='relation' color='gray.600'>
-                        Type
+                <Stack
+                  width={'100%'}
+                  direction={'column'}
+                  alignItems={'flex-start'}
+                  gap={2}
+                  mt={6}
+                >
+                  <FormControl>
+                    <FormLabel htmlFor='relation' color='gray.600'>
+                      Type
+                    </FormLabel>
+                    <Select
+                      id='relation'
+                      size='sm'
+                      value={relation}
+                      onChange={(e) => setRelation(e.target.value)}
+                    >
+                      <option value=''>-- Select --</option>
+                      {[{ value: 'depends_on', label: 'Depends On' }].map(
+                        (item, idx) => (
+                          <option key={idx} value={item.value}>
+                            {item.label}
+                          </option>
+                        )
+                      )}
+                    </Select>
+                  </FormControl>
+                  {allComponents && (
+                    <FormControl isInvalid={list.length > 0}>
+                      <FormLabel htmlFor='component' color='gray.600'>
+                        Component
                       </FormLabel>
                       <Select
-                        id='relation'
+                        id='component'
                         size='sm'
-                        value={relation}
-                        onChange={(e) => setRelation(e.target.value)}
+                        value={component}
+                        onChange={(e) => setComponent(e.target.value)}
                       >
                         <option value=''>-- Select --</option>
-                        {[{ value: 'depends_on', label: 'Depends On' }].map(
-                          (item, idx) => (
-                            <option key={idx} value={item.value}>
-                              {item.label}
+                        {[...allComponents.sbom.components.nodes]
+                          .filter((com) => com.name !== name)
+                          .sort((a, b) => a.name.localeCompare(b.name))
+                          .map((item, idx) => (
+                            <option key={idx} value={item.id}>
+                              {item.name}-{item.version}
                             </option>
-                          )
-                        )}
+                          ))}
                       </Select>
+                      {list.length !== 0 && (
+                        <FormErrorMessage>
+                          <FormErrorIcon />
+                          Component already exist!!
+                        </FormErrorMessage>
+                      )}
                     </FormControl>
-                    {allComponents && (
-                      <FormControl isInvalid={list.length > 0}>
-                        <FormLabel htmlFor='component' color='gray.600'>
-                          Component
-                        </FormLabel>
-                        <Select
-                          id='component'
-                          size='sm'
-                          value={component}
-                          onChange={(e) => setComponent(e.target.value)}
-                        >
-                          <option value=''>-- Select --</option>
-                          {[...allComponents.sbom.components.nodes]
-                            .filter((com) => com.name !== name)
-                            .sort((a, b) => a.name.localeCompare(b.name))
-                            .map((item, idx) => (
-                              <option key={idx} value={item.id}>
-                                {item.name}-{item.version}
-                              </option>
-                            ))}
-                        </Select>
-                        {list.length !== 0 && (
-                          <FormErrorMessage>
-                            <FormErrorIcon />
-                            Component already exist!!
-                          </FormErrorMessage>
-                        )}
-                      </FormControl>
-                    )}
+                  )}
 
-                    <Button
-                      size='md'
-                      mt={2}
-                      width={'fit-content'}
-                      colorScheme='blue'
-                      onClick={handleAdd}
-                      isDisabled={
-                        relation === '' || component === '' || list.length > 0
-                      }
-                    >
-                      Add
-                    </Button>
-                  </Stack>
-                )}
+                  <Button
+                    size='md'
+                    mt={2}
+                    width={'fit-content'}
+                    colorScheme='blue'
+                    onClick={handleAdd}
+                    isDisabled={
+                      relation === '' || component === '' || list.length > 0
+                    }
+                  >
+                    Add
+                  </Button>
+                </Stack>
                 {/* Graph */}
                 {/* <Box
                   width={'100%'}
@@ -420,7 +412,7 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
                               size={'sm'}
                               key={index}
                               variant='subtle'
-                              colorScheme='blue'
+                              colorScheme={'blue'}
                               width={'fit-content'}
                             >
                               <TagLabel>
@@ -444,25 +436,35 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
                       </Td>
                       <Td pl={0}>
                         <Stack direction={'column'} pos={'relative'}>
-                          {dependsOnList.map((comp, index) => (
-                            <Tag
-                              size={'sm'}
-                              key={index}
-                              variant='subtle'
-                              colorScheme='blue'
-                              width={'fit-content'}
-                            >
-                              <TagLabel>
-                                {comp.toComp.name}-{comp.toComp.version}
-                              </TagLabel>
-                              <TagCloseButton
-                                onClick={() => {
-                                  setActiveComp(comp)
-                                  onDelOpen()
-                                }}
-                              />
-                            </Tag>
-                          ))}
+                          {[...dependsOnList]
+                            .sort(
+                              (a, b) =>
+                                new Date(b.updatedAt) - new Date(a.updatedAt)
+                            )
+                            .map((comp, index) => (
+                              <Tag
+                                size={'sm'}
+                                key={index}
+                                variant='subtle'
+                                colorScheme={
+                                  new Date(comp.updatedAt).getTime() ===
+                                  recentComp
+                                    ? 'green'
+                                    : 'blue'
+                                }
+                                width={'fit-content'}
+                              >
+                                <TagLabel>
+                                  {comp.toComp.name}-{comp.toComp.version}
+                                </TagLabel>
+                                <TagCloseButton
+                                  onClick={() => {
+                                    setActiveComp(comp)
+                                    onDelOpen()
+                                  }}
+                                />
+                              </Tag>
+                            ))}
 
                           <Popover
                             returnFocusOnClose={false}
@@ -472,8 +474,11 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
                             closeOnBlur={true}
                           >
                             <PopoverContent>
-                              <PopoverHeader fontWeight='semibold' fontSize={'sm'}>
-                                {activeComp?.toComp.name}
+                              <PopoverHeader
+                                fontWeight='semibold'
+                                fontSize={'sm'}
+                              >
+                                Remove
                               </PopoverHeader>
                               <PopoverArrow />
                               <PopoverCloseButton />
@@ -484,6 +489,14 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
                                   spacing={4}
                                   py={2}
                                 >
+                                  <Text
+                                    wordBreak={'break-all'}
+                                    fontWeight={'semibold'}
+                                    fontSize={'sm'}
+                                  >
+                                    {activeComp?.toComp.name}-
+                                    {activeComp?.toComp.version}
+                                  </Text>
                                   <Text fontSize={'sm'}>
                                     This will remove the relationship of this
                                     component with other components and change
