@@ -90,12 +90,14 @@ function ComponentDrawer(props) {
 
   const handleRefetch = () => {
     refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      first: totalRows,
-      last: undefined,
-      field: compField,
-      direction: compDirection
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        first: totalRows,
+        last: undefined,
+        field: compField,
+        direction: compDirection
+      }
     })
   }
 
@@ -824,19 +826,17 @@ function ComponentDrawer(props) {
             <ModalBody>
               <Text>
                 You are about to change primary component
-                <br /><br />
+                <br />
+                <br />
                 From:
                 <br />
-
                 <Text as='em'>
                   {primaryComp?.name}-{primaryComp?.version}
-                  </Text>
+                </Text>
                 <br />
                 <br />
-
                 To:
                 <br />
-
                 <Text as='em'>
                   {compName}-{compVersion}
                 </Text>

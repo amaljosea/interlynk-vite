@@ -54,7 +54,8 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
   const { name, version, id, dependencyOf, dependsOn } = data
-  const { totalRows } = useContext(GlobalContext)
+  const { totalRows, compField, compDirection, compSearchInput } =
+    useContext(GlobalContext)
 
   const [dependencyOfList, setDependencyOfList] = useState([])
   const [dependsOnList, setDependsOnList] = useState([])
@@ -63,14 +64,8 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
   const [activeComp, setActiveComp] = useState(null)
 
   const [getAllComps, { data: allComponents }] = useLazyQuery(GetAllComponents)
-  const [addRelation] = useMutation(CreateCompRelation, {
-    onCompleted: () =>
-      refetch({
-        projectId: productId,
-        sbomId: sbomId,
-        first: totalRows
-      })
-  })
+
+  const [addRelation] = useMutation(CreateCompRelation)
   const [removeRelation] = useMutation(DeleteCompRelation)
 
   const {
@@ -114,7 +109,7 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
     ...dependsOnList.map((item) => new Date(item.updatedAt).getTime())
   )
 
-  console.log('Most Recent', recentComp)
+  // console.log('Most Recent', recentComp)
 
   const handleAdd = async () => {
     await addRelation({
@@ -134,6 +129,17 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
         }
       })
       .finally(() => {
+        refetch({
+          variables: {
+            projectId: productId,
+            sbomId: sbomId,
+            search: compSearchInput !== '' ? compSearchInput : undefined,
+            first: totalRows,
+            last: undefined,
+            field: compField,
+            direction: compDirection
+          }
+        })
         setRelation('')
         setComponent('')
       })
@@ -154,15 +160,24 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
           setDependsOnList(filterData)
         }
       })
-      .finally(() => onDelClose())
+      .finally(() => {
+        onDelClose()
+      })
   }
 
-  const handleSave = async () => {
-    await refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      first: totalRows
-    }).then((res) => res.data && onClose())
+  const handleSave = () => {
+    refetch({
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        search: compSearchInput !== '' ? compSearchInput : undefined,
+        first: totalRows,
+        last: undefined,
+        field: compField,
+        direction: compDirection
+      }
+    })
+    onClose()
   }
 
   return (

@@ -28,11 +28,13 @@ const ComponentModal = ({ isOpen, onClose, id, refetch, totalRows }) => {
   const [deleteComponent] = useMutation(DeleteComponent, {
     onCompleted: () =>
       refetch({
-        projectId: productId,
-        sbomId: sbomId,
-        first: totalRows,
-        field: compField,
-        direction: compDirection
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          first: totalRows,
+          field: compField,
+          direction: compDirection
+        }
       })
   })
 

@@ -30,6 +30,18 @@ const CheckMark = () => {
     />
   )
 }
+const List = ({ children }) => {
+  return (
+    <MenuList
+      minHeight={'auto'}
+      maxHeight={'300px'}
+      overflow={'hidden'}
+      overflowY={'scroll'}
+    >
+      {children}
+    </MenuList>
+  )
+}
 
 const CompFilterMenu = ({
   refetch,
@@ -46,96 +58,112 @@ const CompFilterMenu = ({
     compField,
     compDirection,
     signedCompField,
-    signedCompDirection
+    signedCompDirection,
+    compSearchInput,
+    setCompSearchInput,
+    compEcosystem,
+    setCompEcosystem,
+    compType,
+    setCompType,
+    compLicense,
+    setCompLicense,
+    compSupplier,
+    setCompSupplier,
+    compScope,
+    setCompScope
   } = useContext(GlobalContext)
 
   const { ecosystems, kinds, supplierNames, licenses } = customerView
     ? signedCompFilters
     : compFilters
 
-  const [selectedEcosystem, setSelectedEcosystem] = useState([])
-  const [selectedKind, setSelectedKind] = useState([])
-  const [selectedLicense, setSelectedLicense] = useState([])
-  const [selectedSupplier, setSelectedSupplier] = useState([])
-  const [selectedType, setSelectedType] = useState('')
-
   const onFilterEcosystem = (value) => {
-    setSelectedEcosystem(value.includes('all') ? [] : value)
+    setCompEcosystem(value.includes('all') ? [] : value)
     refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      ecosystem: value.includes('all') ? undefined : value,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      last: undefined,
-      field: customerView ? signedCompField : compField,
-      direction: customerView ? signedCompDirection : compDirection
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        ecosystem: value.includes('all') ? undefined : value,
+        first: totalRows,
+        last: undefined,
+        after: undefined,
+        last: undefined,
+        field: customerView ? signedCompField : compField,
+        direction: customerView ? signedCompDirection : compDirection
+      }
     })
     setPageIndex(1)
   }
 
   const onFilterKind = (value) => {
-    setSelectedKind(value.includes('all') ? [] : value)
+    setCompType(value.includes('all') ? [] : value)
     refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      kind: value.includes('all') ? undefined : value,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      last: undefined,
-      field: customerView ? signedCompField : compField,
-      direction: customerView ? signedCompDirection : compDirection
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        kind: value.includes('all') ? undefined : value,
+        first: totalRows,
+        last: undefined,
+        after: undefined,
+        last: undefined,
+        field: customerView ? signedCompField : compField,
+        direction: customerView ? signedCompDirection : compDirection
+      }
     })
     setPageIndex(1)
   }
 
   const onFilterLicense = (value) => {
-    setSelectedLicense(value.includes('all') ? [] : value)
+    setCompLicense(value.includes('all') ? [] : value)
     refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      licenses: value.includes('all') ? undefined : value,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      last: undefined,
-      field: customerView ? signedCompField : compField,
-      direction: customerView ? signedCompDirection : compDirection
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        licenses: value.includes('all') ? undefined : value,
+        first: totalRows,
+        last: undefined,
+        after: undefined,
+        last: undefined,
+        field: customerView ? signedCompField : compField,
+        direction: customerView ? signedCompDirection : compDirection
+      }
     })
     setPageIndex(1)
   }
 
   const onFilterSupplier = (value) => {
-    setSelectedSupplier(value.includes('all') ? [] : value)
+    setCompSupplier(value.includes('all') ? [] : value)
     refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      supplierName: value.includes('all') ? undefined : value,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      last: undefined,
-      field: customerView ? signedCompField : compField,
-      direction: customerView ? signedCompDirection : compDirection
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        supplierName: value.includes('all') ? undefined : value,
+        first: totalRows,
+        last: undefined,
+        after: undefined,
+        last: undefined,
+        field: customerView ? signedCompField : compField,
+        direction: customerView ? signedCompDirection : compDirection
+      }
     })
     setPageIndex(1)
   }
 
   const onFilterType = (value) => {
-    setSelectedType(value)
+    setCompScope(value)
     refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      primary: (value === 'primary'),
-      internal: (value === 'internal'),
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      last: undefined,
-      field: customerView ? signedCompField : compField,
-      direction: customerView ? signedCompDirection : compDirection
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        primary: value === 'primary',
+        internal: value === 'internal',
+        first: totalRows,
+        last: undefined,
+        after: undefined,
+        last: undefined,
+        field: customerView ? signedCompField : compField,
+        direction: customerView ? signedCompDirection : compDirection
+      }
     })
     setPageIndex(1)
   }
@@ -145,7 +173,7 @@ const CompFilterMenu = ({
       {/* ECOSYSTEM */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {selectedEcosystem.length !== 0 && <CheckMark />}
+          {compEcosystem.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -155,15 +183,10 @@ const CompFilterMenu = ({
           >
             Ecosystem
           </MenuButton>
-          <MenuList
-            minHeight={'auto'}
-            maxHeight={'300px'}
-            overflow={'hidden'}
-            overflowY={'scroll'}
-          >
+          <List>
             <MenuOptionGroup
               type='checkbox'
-              value={selectedEcosystem}
+              value={compEcosystem}
               onChange={onFilterEcosystem}
             >
               <MenuItemOption value={'all'} fontSize={'sm'}>
@@ -175,13 +198,13 @@ const CompFilterMenu = ({
                 </MenuItemOption>
               ))}
             </MenuOptionGroup>
-          </MenuList>
+          </List>
         </Menu>
       </Box>
       {/* KIND */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {selectedKind.length !== 0 && <CheckMark />}
+          {compType.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -191,33 +214,33 @@ const CompFilterMenu = ({
           >
             Type
           </MenuButton>
-          <MenuList
-            minHeight={'auto'}
-            maxHeight={'300px'}
-            overflow={'hidden'}
-            overflowY={'scroll'}
-          >
+          <List>
             <MenuOptionGroup
               type='checkbox'
-              value={selectedKind}
+              value={compType}
               onChange={onFilterKind}
             >
               <MenuItemOption value={'all'} fontSize={'sm'}>
                 All
               </MenuItemOption>
               {kinds?.map((item, index) => (
-                <MenuItemOption key={index} value={item} fontSize={'sm'}  textTransform={'capitalize'}>
+                <MenuItemOption
+                  key={index}
+                  value={item}
+                  fontSize={'sm'}
+                  textTransform={'capitalize'}
+                >
                   {item}
                 </MenuItemOption>
               ))}
             </MenuOptionGroup>
-          </MenuList>
+          </List>
         </Menu>
       </Box>
       {/* LICENSES */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {selectedLicense.length !== 0 && <CheckMark />}
+          {compLicense.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -227,15 +250,10 @@ const CompFilterMenu = ({
           >
             Licenses
           </MenuButton>
-          <MenuList
-            minHeight={'auto'}
-            maxHeight={'300px'}
-            overflow={'hidden'}
-            overflowY={'scroll'}
-          >
+          <List>
             <MenuOptionGroup
               type='checkbox'
-              value={selectedLicense}
+              value={compLicense}
               onChange={onFilterLicense}
             >
               <MenuItemOption value={'all'} fontSize={'sm'}>
@@ -247,13 +265,13 @@ const CompFilterMenu = ({
                 </MenuItemOption>
               ))}
             </MenuOptionGroup>
-          </MenuList>
+          </List>
         </Menu>
       </Box>
       {/* SUPPLIER */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {selectedSupplier.length !== 0 && <CheckMark />}
+          {compSupplier.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -263,15 +281,10 @@ const CompFilterMenu = ({
           >
             Suppliers
           </MenuButton>
-          <MenuList
-            minHeight={'auto'}
-            maxHeight={'300px'}
-            overflow={'hidden'}
-            overflowY={'scroll'}
-          >
+          <List>
             <MenuOptionGroup
-              type='radio'
-              value={selectedSupplier}
+              type='checkbox'
+              value={compSupplier}
               onChange={onFilterSupplier}
             >
               <MenuItemOption value={'all'} fontSize={'sm'}>
@@ -283,13 +296,13 @@ const CompFilterMenu = ({
                 </MenuItemOption>
               ))}
             </MenuOptionGroup>
-          </MenuList>
+          </List>
         </Menu>
       </Box>
       {/* TYPE */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {selectedType !== '' && selectedType !== 'all' && <CheckMark />}
+          {compScope !== '' && compScope !== 'all' && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -302,18 +315,19 @@ const CompFilterMenu = ({
           <MenuList>
             <MenuOptionGroup
               type='radio'
-              value={selectedType}
+              value={compScope}
               onChange={onFilterType}
             >
-              <MenuItemOption value={'all'} fontSize={'sm'} textTransform={'capitalize'}>
-                All
-              </MenuItemOption>
-              <MenuItemOption value='primary' fontSize={'sm'} textTransform={'capitalize'}>
-                primary
-              </MenuItemOption>
-              <MenuItemOption value='internal' fontSize={'sm'} textTransform={'capitalize'}>
-                internal
-              </MenuItemOption>
+              {['all', 'primary', 'internal'].map((item, index) => (
+                <MenuItemOption
+                  value={item}
+                  key={index}
+                  fontSize={'sm'}
+                  textTransform={'capitalize'}
+                >
+                  {item}
+                </MenuItemOption>
+              ))}
             </MenuOptionGroup>
           </MenuList>
         </Menu>

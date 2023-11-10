@@ -60,6 +60,13 @@ const SBOMTable = ({
     setLogFilters,
     compField,
     compDirection,
+    compSearchInput,
+    setCompSearchInput,
+    compEcosystem,
+    compType,
+    compLicense,
+    compSupplier,
+    compScope,
     checkField,
     checkDirection,
     logField,
@@ -89,10 +96,12 @@ const SBOMTable = ({
   const [changelogIndex, setChangelogIndex] = useState(1)
 
   // GET COMPONENT DATA
-  const [
-    getCompData,
-    { data: compData, refetch: compRefetch, error, loading }
-  ] = useLazyQuery(GetComponentData)
+  const [getCompData, { data: compData, error }] = useLazyQuery(
+    GetComponentData,
+    {
+      fetchPolicy: 'network-only'
+    }
+  )
 
   useEffect(() => {
     if (compData) {
@@ -150,6 +159,13 @@ const SBOMTable = ({
         variables: {
           projectId: productId,
           sbomId: sbomId,
+          search: compSearchInput !== '' ? compSearchInput : undefined,
+          ecosystem: compEcosystem.includes('all') ? undefined : compEcosystem,
+          kind: compType.includes('all') ? undefined : compType,
+          licenses: compLicense.includes('all') ? undefined : compLicense,
+          supplierName: compSupplier.includes('all') ? undefined : compSupplier,
+          primary: compScope === 'primary' ? compScope : undefined,
+          internal: compScope === 'internal' ? compScope : undefined,
           first: totalRows,
           field: compField,
           direction: compDirection
@@ -157,6 +173,7 @@ const SBOMTable = ({
       }).then((res) => {
         if (res.data) {
           console.log('data', res.data)
+          setCompSearchInput('')
           setTotalComp(res.data.sbom.components.totalCount)
           setComponentIndex(1)
         }
@@ -307,7 +324,7 @@ const SBOMTable = ({
                   lifecycle={lifecycle}
                   data={compData?.sbom?.components}
                   totalComp={totalComp}
-                  refetch={compRefetch}
+                  refetch={getCompData}
                   filterRefetch={compFilterRefetch}
                   pageIndex={componentIndex}
                   setPageIndex={setComponentIndex}

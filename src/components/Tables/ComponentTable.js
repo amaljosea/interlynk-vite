@@ -92,6 +92,8 @@ const ComponentTable = ({
   const y = window.matchMedia('(max-width: 1440px)')
 
   const {
+    compSearchInput,
+    setCompSearchInput,
     compFilters,
     compField,
     setCompField,
@@ -176,14 +178,8 @@ const ComponentTable = ({
         )
         const vcs = externalUrls?.find((item) => item.name === 'vcs')
         return (
-          <Stack
-            width={'100%'}
-            px={0}
-            py='.8rem'
-            direction={'row'}
-            alignItems={'flex-center'}
-          >
-            <Box width={'50px'}>
+          <Grid templateColumns='repeat(7, 1fr)' gap={2} width={'80%'} my={2}>
+            <GridItem colSpan={1} width={'50px'}>
               {purl !== null && purl !== '' ? (
                 <IconButton
                   isRound={true}
@@ -201,8 +197,9 @@ const ComponentTable = ({
                   }
                 />
               )}
-            </Box>
-            <Box
+            </GridItem>
+            <GridItem
+              colSpan={6}
               display={'flex'}
               flexWrap={'wrap'}
               flexDirection={'column'}
@@ -292,10 +289,11 @@ const ComponentTable = ({
                   <TagLabel textTransform={'capitalize'}>Internal</TagLabel>
                 </Tag>
               )}
-            </Box>
-          </Stack>
+            </GridItem>
+          </Grid>
         )
       },
+      wrap: true,
       width: '20%',
       sortable: true
     },
@@ -333,7 +331,7 @@ const ComponentTable = ({
     {
       id: 'COMPONENTS_LICENSES',
       name: 'LICENSES',
-      width: y.matches ? '16%' : '12%',
+      width: '16%',
       selector: (row) => {
         const { licenses } = row
 
@@ -488,6 +486,32 @@ const ComponentTable = ({
     }
   ]
 
+  const [deleteSupplier] = useMutation(deleteComSupplier)
+
+  const handleSupRemove = async (id) => {
+    try {
+      await deleteSupplier({
+        variables: {
+          id: id
+        }
+      }).then((res) => {
+        if (res.data) {
+          refetch({
+            variables: {
+              projectId: productId,
+              sbomId: sbomId,
+              first: totalRows,
+              field: compField,
+              direction: compDirection
+            }
+          })
+        }
+      })
+    } catch (error) {
+      console.log(`Mutation error`, error)
+    }
+  }
+
   // EXPAND SECTION
   const ExpandedComponent = ({ data }) => {
     const {
@@ -501,28 +525,6 @@ const ComponentTable = ({
       dependencyOf,
       dependsOn
     } = data
-
-    const [deleteSupplier] = useMutation(deleteComSupplier)
-
-    const handleSupRemove = async (id) => {
-      try {
-        await deleteSupplier({
-          variables: {
-            id: suppliers[0].id
-          }
-        }).then((res) => {
-          if (res) {
-            refetch({
-              projectId: productId,
-              sbomId: sbomId,
-              first: totalRows
-            })
-          }
-        })
-      } catch (error) {
-        console.log(`Mutation error`, error)
-      }
-    }
 
     const CustomText = styled(Text)`
       font-size: 13px;
@@ -583,7 +585,7 @@ const ComponentTable = ({
                       {item.name}
                       {item.contactEmail && ` - ${item.contactEmail}`}
                     </TagLabel>
-                    <TagCloseButton onClick={handleSupRemove} />
+                    <TagCloseButton onClick={() => handleSupRemove(item.id)} />
                   </Tag>
                 ))}
             </HStack>
@@ -660,12 +662,16 @@ const ComponentTable = ({
 
   // SEARCH COMPONENT
   const handleSearch = async (event) => {
-    if (event.key === 'Enter' && filterText !== '') {
+    if (event.key === 'Enter' && compSearchInput !== '') {
       await refetch({
-        projectId: productId,
-        sbomId: sbomId,
-        search: filterText,
-        first: totalRows
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          search: compSearchInput,
+          first: totalRows,
+          field: compField,
+          direction: compDirection
+        }
       })
       setPageIndex(1)
     }
@@ -674,12 +680,16 @@ const ComponentTable = ({
   // CLEAR SERACH
   const handleClear = async () => {
     await refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      search: undefined,
-      first: totalRows
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        search: undefined,
+        first: totalRows,
+        field: compField,
+        direction: compDirection
+      }
     })
-    setFilterText('')
+    setCompSearchInput('')
     setPageIndex(1)
   }
 
@@ -717,8 +727,8 @@ const ComponentTable = ({
           {/* SEARCH COMPONENTS */}
           <SearchFilter
             id='component'
-            filterText={filterText}
-            setFilterText={setFilterText}
+            filterText={compSearchInput}
+            setFilterText={setCompSearchInput}
             onFilter={handleSearch}
             onClear={handleClear}
           />
@@ -752,7 +762,7 @@ const ComponentTable = ({
         )}
       </Flex>
     )
-  }, [filterText, handleClear, handleSearch, compFilters])
+  }, [compSearchInput, handleClear, handleSearch, compFilters])
 
   const handleSort = (column, sortDirection) => {
     // console.log(`column`, column)
@@ -766,42 +776,48 @@ const ComponentTable = ({
     }
 
     refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      before: undefined,
-      field: column.id,
-      direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        first: totalRows,
+        last: undefined,
+        field: column.id,
+        direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+      }
     })
   }
 
   const handlePreviousPage = async () => {
     setPageIndex((prev) => pageIndex !== 0 && prev - 1)
     await refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      first: undefined,
-      last: totalRows,
-      after: undefined,
-      before: data.pageInfo.startCursor,
-      field: customerView ? signedCompField : compField,
-      direction: customerView ? signedCompDirection : compDirection
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        last: totalRows,
+        before: data.pageInfo.startCursor,
+        after: undefined,
+        first: undefined,
+        search: compSearchInput !== '' ? compSearchInput : undefined,
+        field: customerView ? signedCompField : compField,
+        direction: customerView ? signedCompDirection : compDirection
+      }
     })
   }
 
   const handleNextPage = async () => {
     setPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
     await refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      first: totalRows,
-      last: undefined,
-      before: undefined,
-      after: data.pageInfo.endCursor,
-      field: customerView ? signedCompField : compField,
-      direction: customerView ? signedCompDirection : compDirection
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        first: totalRows,
+        after: data.pageInfo.endCursor,
+        last: undefined,
+        before: undefined,
+        search: compSearchInput !== '' ? compSearchInput : undefined,
+        field: customerView ? signedCompField : compField,
+        direction: customerView ? signedCompDirection : compDirection
+      }
     })
   }
 
