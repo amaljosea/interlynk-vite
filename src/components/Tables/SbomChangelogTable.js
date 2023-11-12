@@ -70,6 +70,9 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
   const [filterText, setFilterText] = useState('')
   const [pageIndex, setPageIndex] = useState(1)
 
+  const x = window.matchMedia('(min-width: 2500px)')
+  const y = window.matchMedia('(max-width: 1440px)')
+
   // COLUMNS
   const columns = [
     // CHANGE TYPE
@@ -101,28 +104,23 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
         const { event, loggablePrefix, loggableType } = row
         return (
           <Tooltip placement='top' label={loggablePrefix}>
-            <Stack direction={'column'} spacing={0}>
-              <Badge
+            <Stack direction={'column'} spacing={0} my={2}>
+              <Tag
                 fontSize={'sm'}
                 fontWeight={'medium'}
-                width={'fit-content'}
                 colorScheme='blue'
-                style={{
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap'
-                }}
+                overflow={'auto'}
               >
-                <Text>{loggableType === 'Sbom' ? 'SBOM' : loggablePrefix}</Text>
-              </Badge>
+                <TagLabel>
+                  {loggableType === 'Sbom' ? 'SBOM' : loggablePrefix}
+                </TagLabel>
+              </Tag>
               <Text>{event}</Text>
             </Stack>
           </Tooltip>
         )
       },
-      width: '300px',
-      sortable: true,
-      wrap: true
+      sortable: true
     },
     // PRIOR VALUE
     {
@@ -148,7 +146,13 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
                   'True'
                 ) : license.length > 0 ? (
                   license.map((item, index) => (
-                    <Flex key={index} flexWrap={'wrap'} gap={2} my={2} direction={'column'}>
+                    <Flex
+                      key={index}
+                      flexWrap={'wrap'}
+                      gap={2}
+                      my={2}
+                      direction={'column'}
+                    >
                       <Tag
                         size={'sm'}
                         key={index}
@@ -169,9 +173,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
             </Tooltip>
           </Flex>
         )
-      },
-      wrap: true,
-      width: '250px'
+      }
     },
     // UPDATED VALUE
     {
@@ -198,7 +200,13 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
                   'True'
                 ) : updatedValue.length > 0 ? (
                   updatedValue.map((item, index) => (
-                    <Flex key={index} flexWrap={'wrap'} gap={2} my={2} direction={'column'}>
+                    <Flex
+                      key={index}
+                      flexWrap={'wrap'}
+                      gap={2}
+                      my={2}
+                      direction={'column'}
+                    >
                       <Tag
                         size={'sm'}
                         key={index}
@@ -214,7 +222,13 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
                   ''
                 ) : urls && urls.length > 0 ? (
                   urls.map((item, index) => (
-                    <Flex key={index} flexWrap={'wrap'} gap={2} my={2} direction={'column'}>
+                    <Flex
+                      key={index}
+                      flexWrap={'wrap'}
+                      gap={2}
+                      my={2}
+                      direction={'column'}
+                    >
                       <Tag
                         size={'sm'}
                         key={index}
@@ -235,27 +249,27 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
             </Tooltip>
           </Flex>
         )
-      },
-      wrap: true,
-      width: '250px'
+      }
     },
     // CHANGED BY
     {
       id: 'ACTIVITY_LOGS_CHANGED_BY',
       name: 'BY',
-      selector: (row) => row.changedBy,
-      wrap: true,
-      width: '200px',
-      sortable: true
+      selector: (row) => <Text ml={'auto'}>{row.changedBy}</Text>,
+      sortable: true,
+      width: '12%',
+      right: 'true'
     },
     // CHANGED ON
     {
       id: 'ACTIVITY_LOGS_CREATED_AT',
       name: 'CHANGED ON',
       selector: (row) => (
-        <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
-          <Text>{timeSince(row.updatedAt)}</Text>
-        </Tooltip>
+        <Box width={'fit-content'}>
+          <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
+            <Text width={'fit-content'}>{timeSince(row.updatedAt)}</Text>
+          </Tooltip>
+        </Box>
       ),
       sortable: true,
       sortFunction: (a, b) => {
@@ -263,6 +277,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
         const dateB = new Date(b.updatedAt)
         return dateA - dateB // Sort in descending order
       },
+      width: '12%',
       right: 'true'
     }
   ]
