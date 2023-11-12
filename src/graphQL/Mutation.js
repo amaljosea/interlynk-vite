@@ -1124,6 +1124,7 @@ export const CreateCompRelation = gql`
           version
         }
         relType
+        updatedAt
       }
       errors
     }
