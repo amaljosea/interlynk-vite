@@ -1,6 +1,30 @@
-import { Avatar, Box, Flex, Stack, Text } from '@chakra-ui/react'
-import React from 'react'
+import { useMutation } from '@apollo/client'
+import {
+  Avatar,
+  Box,
+  Flex,
+  IconButton,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Portal,
+  Stack,
+  Text,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
+  Button
+} from '@chakra-ui/react'
+import { deleteOrgUser } from 'graphQL/Mutation'
+import React, { useState } from 'react'
 import DataTable from 'react-data-table-component'
+import { FaEllipsisV } from 'react-icons/fa'
 import { getFullDateAndTime } from 'utils'
 import { displayPic } from 'utils'
 
@@ -15,7 +39,12 @@ const customStyles = {
   }
 }
 
-const TeamTable = ({ data }) => {
+const TeamTable = ({ data, refetch }) => {
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const [activeRow, setActiveRow] = useState(null)
+
+  const [deleteUser] = useMutation(deleteOrgUser)
+
   const columns = [
     // NAME
     {
@@ -32,7 +61,12 @@ const TeamTable = ({ data }) => {
             alignItems={'flex-center'}
           >
             <Box width={'30px'}>
-              <Avatar me={{ md: '22px' }} src={displayPic(email)} w='30px' h='30px' />
+              <Avatar
+                me={{ md: '22px' }}
+                src={displayPic(email)}
+                w='30px'
+                h='30px'
+              />
             </Box>
             <Box
               display={'flex'}
@@ -72,18 +106,64 @@ const TeamTable = ({ data }) => {
           </Text>
         )
       }
+    },
+    // ACTION
+    {
+      id: 'action',
+      name: 'ACTION',
+      selector: (row) => {
+        return (
+          <Menu>
+            <MenuButton
+              as={IconButton}
+              icon={<FaEllipsisV />}
+              variant='none'
+              color='gray.400'
+            />
+            <Portal>
+              <MenuList size='sm'>
+                <MenuItem
+                  isDisabled={row.email === data.currentUser.email}
+                  onClick={() => {
+                    console.log(row)
+                    setActiveRow(row)
+                    onOpen()
+                  }}
+                >
+                  Remove Member
+                </MenuItem>
+              </MenuList>
+            </Portal>
+          </Menu>
+        )
+      },
+      right: 'true'
     }
   ]
 
+  const handleRemove = async () => {
+    try {
+      await deleteUser({
+        variables: {
+          id: activeRow.id
+        }
+      })
+        .then((res) => res.data && refetch())
+        .finally(() => onClose())
+    } catch (error) {
+      console.log(`Error`, error)
+    }
+  }
+
   return (
     <>
-      {data.length > 0 ? (
+      {data && data.users.length > 0 ? (
         <Flex flexDir={'column'} width={'100%'}>
           <DataTable
             columns={columns}
-            data={data}
+            data={data.users}
             customStyles={customStyles}
-            progressPending={data.length === 0}
+            progressPending={data ? false : true}
             responsive={true}
           />
         </Flex>
@@ -96,6 +176,34 @@ const TeamTable = ({ data }) => {
         >
           <Text>No team data found</Text>
         </Flex>
+      )}
+
+      {isOpen && activeRow && (
+        <Modal isOpen={isOpen} onClose={onClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Remove Member</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Stack direction={'column'} spacing={2} alignItems={'flex-start'}>
+                <Text>
+                  Are you sure you want to remove the following user from the
+                  organization ?
+                </Text>
+                <Text fontWeight={'semibold'}>{activeRow.name}</Text>
+                <Text fontWeight={'semibold'}> {activeRow.email}</Text>
+              </Stack>
+            </ModalBody>
+            <ModalFooter>
+              <Button mr={3} onClick={onClose}>
+                Cancel
+              </Button>
+              <Button variant='solid' colorScheme='red' onClick={handleRemove}>
+                Remove
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       )}
     </>
   )

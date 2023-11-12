@@ -30,6 +30,30 @@ export const orgRuleUpdate = gql`
   }
 `
 
+// CREATE USER
+export const createOrgUser = gql`
+  mutation createOrgUser($name: String!, $email: String!) {
+    userCreate(input: { name: $name, email: $email }) {
+      errors
+      user {
+        id
+        name
+        email
+        role
+      }
+    }
+  }
+`
+
+// DELETE USER
+export const deleteOrgUser = gql`
+  mutation deleteOrgUser($id: ID!) {
+    userDelete(input: { id: $id }) {
+      errors
+    }
+  }
+`
+
 // UPDATE ORG USER
 export const updateOrgUser = gql`
   mutation updateOrgUser($id: ID!, $name: String!, $email: String!) {

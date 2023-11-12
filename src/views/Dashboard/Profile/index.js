@@ -106,12 +106,15 @@ function Profile() {
                       templateColumns={{ sm: '1fr', xl: 'repeat(2, 1fr)' }}
                       gap='22px'
                     >
-                      <GeneralFeed orgInfo={orgInfo} refetch={refetch} />
+                    <GeneralFeed orgInfo={orgInfo} refetch={refetch} />
                     </Grid>
                   </TabPanel>
                   {/* TEAMS */}
                   <TabPanel>
-                    <TeamsLog data={orgInfo.organization.users} />
+                    <TeamsLog
+                      data={orgInfo.organization}
+                      refetch={refetch}
+                    />
                   </TabPanel>
                   {/* FEEDS */}
                   <TabPanel>
