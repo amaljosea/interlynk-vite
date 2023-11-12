@@ -67,6 +67,14 @@ const ContextWrapper = (props) => {
   const [signedActiveTab, setSignedActiveTab] = useState(0)
   const [totalRows, setTotalRows] = useState(25)
 
+  // COMPONENT FILTER STATES
+  const [compSearchInput, setCompSearchInput] = useState('')
+  const [compEcosystem, setCompEcosystem] = useState([])
+  const [compType, setCompType] = useState([])
+  const [compLicense, setCompLicense] = useState([])
+  const [compSupplier, setCompSupplier] = useState([])
+  const [compScope, setCompScope] = useState('')
+
   // VULN FILTER
   const [vulnSearchInput, setVulnSearchInput] = useState('')
   const [vulnSeverity, setVulnSeverity] = useState([])
@@ -163,6 +171,20 @@ const ContextWrapper = (props) => {
         setSignedActiveTab,
         totalRows,
         setTotalRows,
+        // COMP FILTER DATA
+        compSearchInput,
+        setCompSearchInput,
+        compEcosystem,
+        setCompEcosystem,
+        compType,
+        setCompType,
+        compLicense,
+        setCompLicense,
+        compSupplier,
+        setCompSupplier,
+        compScope,
+        setCompScope,
+        // VULNS FILTER DATA
         vulnSearchInput,
         setVulnSearchInput,
         vulnSeverity,

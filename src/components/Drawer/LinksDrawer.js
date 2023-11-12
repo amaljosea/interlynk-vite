@@ -90,12 +90,14 @@ const LinksDrawer = ({
       .then((res) => {
         if (res.data) {
           refetch({
-            projectId: productId,
-            sbomId: sbomId,
-            first: totalRows,
-            last: undefined,
-            field: compField,
-            direction: compDirection
+            variables: {
+              projectId: productId,
+              sbomId: sbomId,
+              first: totalRows,
+              last: undefined,
+              field: compField,
+              direction: compDirection
+            }
           })
         }
       })

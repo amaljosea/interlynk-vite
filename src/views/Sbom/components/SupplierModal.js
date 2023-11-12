@@ -54,12 +54,14 @@ const SupplierModal = ({
 
   const handleRefetch = () => {
     refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      first: totalRows,
-      last: undefined,
-      field: compField,
-      direction: compDirection
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        first: totalRows,
+        last: undefined,
+        field: compField,
+        direction: compDirection
+      }
     })
   }
 
@@ -184,7 +186,9 @@ const SupplierModal = ({
               <Button
                 colorScheme='blue'
                 onClick={handleUpdate}
-                disabled={!supName || (supEmail !== '' && !validateEmail(supEmail))}
+                disabled={
+                  !supName || (supEmail !== '' && !validateEmail(supEmail))
+                }
               >
                 Update
               </Button>
@@ -192,7 +196,9 @@ const SupplierModal = ({
               <Button
                 colorScheme='blue'
                 onClick={handleSave}
-                disabled={!supName || (supEmail !== '' && !validateEmail(supEmail))}
+                disabled={
+                  !supName || (supEmail !== '' && !validateEmail(supEmail))
+                }
               >
                 Save
               </Button>
