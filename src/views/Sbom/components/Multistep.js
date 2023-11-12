@@ -214,7 +214,7 @@ const Form3 = ({
             </FormLabel>
             <Select
               name='statusHistory'
-              id='statusHistoryp'
+              id='statusHistory'
               value={statusHistory}
               onChange={(e) => setStatusHistory(Boolean(e.target.value))}
             >
