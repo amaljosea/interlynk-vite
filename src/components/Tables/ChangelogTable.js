@@ -234,8 +234,7 @@ const ChangelogTable = ({ data, refetch, type, totalRows, setTotalRows }) => {
             </Text>
           </Tooltip>
         )
-      },
-      width: '350px'
+      }
     },
     // UPDATED VALUE
     {
@@ -254,15 +253,15 @@ const ChangelogTable = ({ data, refetch, type, totalRows, setTotalRows }) => {
             </Text>
           </Tooltip>
         )
-      },
-      width: '400px'
+      }
     },
     // CHANGED BY
     {
       id: 'changedBy',
       name: 'BY',
       selector: (row) => row.changedBy,
-      width: '200px'
+      width: '14%',
+      right: 'true'
     },
     // CHANGED ON
     {
@@ -278,7 +277,9 @@ const ChangelogTable = ({ data, refetch, type, totalRows, setTotalRows }) => {
         const dateA = new Date(a.updatedAt)
         const dateB = new Date(b.updatedAt)
         return dateA - dateB // Sort in descending order
-      }
+      },
+      width: '14%',
+      right: 'true'
     }
   ]
 
