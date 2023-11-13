@@ -76,7 +76,7 @@ const Form1 = ({
 
   const filterVersions =
     uniqVersions.length > 0 &&
-    uniqVersions.filter((version) => version.id !== `${sbomVersionId}`)
+    uniqVersions.filter((version) => version.id !== sbomVersionId)
 
   // remove duplicates
   const removeDuplicatesAndLatest = (arr) => {
@@ -137,8 +137,8 @@ const Form1 = ({
                 }}
               >
                 <option value={''}>-- Select --</option>
-                {filterVersions.length > 0 &&
-                  filterVersions.map((item, index) => (
+                {filteredData.length > 0 &&
+                  filteredData.map((item, index) => (
                     <option key={index} value={item.id}>
                       {item.version}
                     </option>
