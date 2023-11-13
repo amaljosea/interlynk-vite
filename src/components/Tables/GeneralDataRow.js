@@ -56,11 +56,17 @@ const GeneralDataRow = ({ status, data, refetch }) => {
   const [selectedKey, setSelectedKey] = useState('')
   const [licenseList, setLicenseList] = useState([])
   const [imgIds, setImgIds] = useState([])
+  const [activeTool, setActiveTool] = useState(null)
 
   const btnRef = useRef(null)
   const licenseBtn = useRef(null)
 
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const {
+    isOpen: isDelOpen,
+    onOpen: onDelOpen,
+    onClose: onDelClose
+  } = useDisclosure()
 
   const {
     isOpen: isSBMOpen,
@@ -115,14 +121,16 @@ const GeneralDataRow = ({ status, data, refetch }) => {
           toolID: id,
           sbomID: sbomId
         }
-      }).then((res) => {
-        if (res) {
-          refetch({
-            productId: productId,
-            sbomId: sbomId
-          })
-        }
       })
+        .then((res) => {
+          if (res) {
+            refetch({
+              productId: productId,
+              sbomId: sbomId
+            })
+          }
+        })
+        .finally(() => onDelClose())
     } catch (error) {
       console.log(`Mutation error`, error)
     }
@@ -270,7 +278,10 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                         </TagLabel>
                         {!customerView && (
                           <TagCloseButton
-                            onClick={() => handleToolRemove(item.id)}
+                            onClick={() => {
+                              setActiveTool(item)
+                              onDelOpen()
+                            }}
                           />
                         )}
                       </Tag>
@@ -522,6 +533,37 @@ const GeneralDataRow = ({ status, data, refetch }) => {
           checkId={null}
           shortDesc={null}
         />
+      )}
+
+      {/* TOOL DELETE MODAL */}
+      {isDelOpen && activeTool && (
+        <Modal isOpen={isDelOpen} onClose={onDelClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Remove Tool</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Text>
+                You are about to delete the creator Tool : {activeTool.name}-
+                {activeTool.version} from this version.
+              </Text>
+              <Text mt={4}>Are you sure you wish to continue?</Text>
+            </ModalBody>
+
+            <ModalFooter>
+              <Button mr={3} onClick={onDelClose}>
+                Cancel
+              </Button>
+              <Button
+                variant='solid'
+                colorScheme='red'
+                onClick={() => handleToolRemove(activeTool.id)}
+              >
+                Delete
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       )}
     </>
   )
