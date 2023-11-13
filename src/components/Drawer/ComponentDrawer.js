@@ -65,8 +65,6 @@ function ComponentDrawer(props) {
 
   const customerView = location.pathname.startsWith('/customer')
 
-  const { compField, compDirection, setCompFilters } = useContext(GlobalContext)
-
   const {
     id,
     isOpen,
@@ -84,9 +82,12 @@ function ComponentDrawer(props) {
     refetch,
     group,
     shortDesc,
-    totalRows,
-    filterRefetch
+    filterRefetch,
+    after
   } = props
+
+  const { compField, compDirection, setCompFilters, totalRows } =
+    useContext(GlobalContext)
 
   const handleRefetch = () => {
     refetch({
@@ -94,7 +95,7 @@ function ComponentDrawer(props) {
         projectId: productId,
         sbomId: sbomId,
         first: totalRows,
-        last: undefined,
+        after: after,
         field: compField,
         direction: compDirection
       }

@@ -43,13 +43,7 @@ const List = ({ children }) => {
   )
 }
 
-const CompFilterMenu = ({
-  refetch,
-  productId,
-  sbomId,
-  setPageIndex,
-  totalRows
-}) => {
+const CompFilterMenu = ({ refetch, productId, sbomId }) => {
   const customerView = location.pathname.startsWith('/customer')
 
   const {
@@ -59,8 +53,8 @@ const CompFilterMenu = ({
     compDirection,
     signedCompField,
     signedCompDirection,
-    compSearchInput,
-    setCompSearchInput,
+    setComPageIndex,
+    totalRows,
     compEcosystem,
     setCompEcosystem,
     compType,
@@ -92,7 +86,7 @@ const CompFilterMenu = ({
         direction: customerView ? signedCompDirection : compDirection
       }
     })
-    setPageIndex(1)
+    setComPageIndex(1)
   }
 
   const onFilterKind = (value) => {
@@ -110,7 +104,7 @@ const CompFilterMenu = ({
         direction: customerView ? signedCompDirection : compDirection
       }
     })
-    setPageIndex(1)
+    setComPageIndex(1)
   }
 
   const onFilterLicense = (value) => {
@@ -128,7 +122,7 @@ const CompFilterMenu = ({
         direction: customerView ? signedCompDirection : compDirection
       }
     })
-    setPageIndex(1)
+    setComPageIndex(1)
   }
 
   const onFilterSupplier = (value) => {
@@ -146,7 +140,7 @@ const CompFilterMenu = ({
         direction: customerView ? signedCompDirection : compDirection
       }
     })
-    setPageIndex(1)
+    setComPageIndex(1)
   }
 
   const onFilterType = (value) => {
@@ -165,7 +159,7 @@ const CompFilterMenu = ({
         direction: customerView ? signedCompDirection : compDirection
       }
     })
-    setPageIndex(1)
+    setComPageIndex(1)
   }
 
   return (

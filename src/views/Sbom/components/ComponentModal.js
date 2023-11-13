@@ -16,14 +16,14 @@ import { DeleteComponent } from 'graphQL/Mutation'
 import { useContext } from 'react'
 import { useLocation } from 'react-router-dom'
 
-const ComponentModal = ({ isOpen, onClose, id, refetch, totalRows }) => {
+const ComponentModal = ({ isOpen, onClose, id, refetch, after }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
 
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
-  const { compDirection, compField } = useContext(GlobalContext)
+  const { compDirection, compField, totalRows } = useContext(GlobalContext)
 
   const [deleteComponent] = useMutation(DeleteComponent, {
     onCompleted: () =>
@@ -32,6 +32,7 @@ const ComponentModal = ({ isOpen, onClose, id, refetch, totalRows }) => {
           projectId: productId,
           sbomId: sbomId,
           first: totalRows,
+          after: after,
           field: compField,
           direction: compDirection
         }

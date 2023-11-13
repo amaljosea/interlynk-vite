@@ -66,6 +66,7 @@ const ContextWrapper = (props) => {
   const [activeProdTab, setActiveProdTab] = useState(0)
   const [signedActiveTab, setSignedActiveTab] = useState(0)
   const [totalRows, setTotalRows] = useState(25)
+  const [comPageIndex, setComPageIndex] = useState(1)
 
   // COMPONENT FILTER STATES
   const [compSearchInput, setCompSearchInput] = useState('')
@@ -223,7 +224,9 @@ const ContextWrapper = (props) => {
         currentSbom,
         setCurrentSbom,
         importSbom,
-        setImportSbom
+        setImportSbom,
+        comPageIndex,
+        setComPageIndex
       }}
     >
       {props.children}

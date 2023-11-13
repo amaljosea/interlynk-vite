@@ -48,7 +48,14 @@ import { useContext, useEffect, useState } from 'react'
 import Tree from 'react-d3-tree'
 import { useLocation } from 'react-router-dom'
 
-const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
+const RelationshipDrawer = ({
+  isOpen,
+  onClose,
+  data,
+  total,
+  refetch,
+  after
+}) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('p')
@@ -161,7 +168,7 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
         sbomId: sbomId,
         search: compSearchInput !== '' ? compSearchInput : undefined,
         first: totalRows,
-        last: undefined,
+        after: after,
         field: compField,
         direction: compDirection
       }
@@ -179,7 +186,7 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
     >
       <DrawerOverlay />
       <DrawerContent>
-        <DrawerCloseButton onClick={handleSave} />
+        <DrawerCloseButton />
         <DrawerHeader borderBottomWidth='1px' color='gray.600'>
           Relationships
         </DrawerHeader>
