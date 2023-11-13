@@ -267,7 +267,7 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
                       {list.length !== 0 && (
                         <FormErrorMessage>
                           <FormErrorIcon />
-                          Component already exist!!
+                          Component dependency already exists
                         </FormErrorMessage>
                       )}
                     </FormControl>
