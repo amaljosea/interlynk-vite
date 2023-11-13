@@ -129,17 +129,6 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
         }
       })
       .finally(() => {
-        refetch({
-          variables: {
-            projectId: productId,
-            sbomId: sbomId,
-            search: compSearchInput !== '' ? compSearchInput : undefined,
-            first: totalRows,
-            last: undefined,
-            field: compField,
-            direction: compDirection
-          }
-        })
         setRelation('')
         setComponent('')
       })
@@ -443,7 +432,7 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, refetch }) => {
         </DrawerBody>
         <DrawerFooter>
           <Button variant='solid' colorScheme='blue' onClick={handleSave}>
-            Save
+            Done
           </Button>
         </DrawerFooter>
       </DrawerContent>
