@@ -128,7 +128,9 @@ const GlobalContext = React.createContext({
   currentSbom: [],
   setCurrentSbom: () => {},
   importSbom: [],
-  setImportSbom: () => {}
+  setImportSbom: () => {},
+  comPageIndex: 1,
+  setComPageIndex: () => {}
 })
 
 export default GlobalContext

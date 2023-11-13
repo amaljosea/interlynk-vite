@@ -28,8 +28,8 @@ const SupplierModal = ({
   refetch,
   suppliers,
   checkId,
-  totalRows,
-  filterRefetch
+  filterRefetch,
+  after,
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -41,7 +41,10 @@ const SupplierModal = ({
     compField,
     setCheckFilters,
     checkField,
-    checkDirection
+    checkDirection,
+    totalRows,
+    comPageIndex,
+    setComPageIndex
   } = useContext(GlobalContext)
 
   const validateEmail = (email) => {
@@ -53,12 +56,13 @@ const SupplierModal = ({
   const [supEmail, setSupEmail] = useState('')
 
   const handleRefetch = () => {
+    setComPageIndex(comPageIndex)
     refetch({
       variables: {
         projectId: productId,
         sbomId: sbomId,
         first: totalRows,
-        last: undefined,
+        after: after,
         field: compField,
         direction: compDirection
       }

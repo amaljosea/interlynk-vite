@@ -82,7 +82,9 @@ const SBOMTable = ({
     vulnComponent,
     vulnStatus,
     vulnKev,
-    vulnEpss
+    vulnEpss,
+    comPageIndex,
+    setComPageIndex
   } = useContext(GlobalContext)
 
   const tab = window.localStorage.getItem('activeProdTab')
@@ -90,7 +92,6 @@ const SBOMTable = ({
   const { lifecycle } = data
 
   // PAGINATION STATS FOR DIFFERENT TABS
-  const [componentIndex, setComponentIndex] = useState(1)
   const [vulnIndex, setVulnIndex] = useState(1)
   const [resultIndex, setResultIndex] = useState(1)
   const [changelogIndex, setChangelogIndex] = useState(1)
@@ -175,7 +176,7 @@ const SBOMTable = ({
           console.log('data', res.data)
           setCompSearchInput('')
           setTotalComp(res.data.sbom.components.totalCount)
-          setComponentIndex(1)
+          setComPageIndex(1)
         }
       })
       getCompFilters({
@@ -326,8 +327,6 @@ const SBOMTable = ({
                   totalComp={totalComp}
                   refetch={getCompData}
                   filterRefetch={compFilterRefetch}
-                  pageIndex={componentIndex}
-                  setPageIndex={setComponentIndex}
                   primaryComp={data.primaryComponent}
                   totalRows={totalRows}
                   setTotalRows={setTotalRows}

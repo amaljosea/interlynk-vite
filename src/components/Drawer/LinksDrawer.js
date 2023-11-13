@@ -37,7 +37,7 @@ const LinksDrawer = ({
   sbomId,
   productId,
   refetch,
-  totalRows
+  after
 }) => {
   const [type, setType] = useState('')
   const [link, setLink] = useState('')
@@ -45,7 +45,7 @@ const LinksDrawer = ({
 
   const { id, externalUrls } = component
 
-  const { compDirection, compField } = useContext(GlobalContext)
+  const { compDirection, compField, totalRows } = useContext(GlobalContext)
 
   const [updateLinks] = useMutation(UpdateCompLinks)
 
@@ -94,7 +94,7 @@ const LinksDrawer = ({
               projectId: productId,
               sbomId: sbomId,
               first: totalRows,
-              last: undefined,
+              after: after,
               field: compField,
               direction: compDirection
             }

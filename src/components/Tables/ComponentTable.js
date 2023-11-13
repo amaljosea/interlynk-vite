@@ -75,8 +75,6 @@ const ComponentTable = ({
   data,
   totalComp,
   refetch,
-  pageIndex,
-  setPageIndex,
   primaryComp,
   totalRows,
   setTotalRows,
@@ -102,7 +100,9 @@ const ComponentTable = ({
     signedCompField,
     signedCompDirection,
     setSignedCompField,
-    setSignedCompDirection
+    setSignedCompDirection,
+    comPageIndex,
+    setComPageIndex
   } = useContext(GlobalContext)
 
   const [activeRow, setActiveRow] = useState(null)
@@ -673,7 +673,7 @@ const ComponentTable = ({
           direction: compDirection
         }
       })
-      setPageIndex(1)
+      setComPageIndex(1)
     }
   }
 
@@ -690,7 +690,7 @@ const ComponentTable = ({
       }
     })
     setCompSearchInput('')
-    setPageIndex(1)
+    setComPageIndex(1)
   }
 
   // SET ROW LENGTH
@@ -707,7 +707,7 @@ const ComponentTable = ({
       direction: customerView ? signedCompDirection : compDirection
     })
     setFilterText('')
-    setPageIndex(1)
+    setComPageIndex(1)
   }
 
   // HEADER SECTION
@@ -739,8 +739,6 @@ const ComponentTable = ({
               refetch={refetch}
               productId={productId}
               sbomId={sbomId}
-              setPageIndex={setPageIndex}
-              totalRows={totalRows}
             />
           )}
         </Stack>
@@ -787,8 +785,10 @@ const ComponentTable = ({
     })
   }
 
+  const [pageAfter, setPageAfter] = useState('')
+
   const handlePreviousPage = async () => {
-    setPageIndex((prev) => pageIndex !== 0 && prev - 1)
+    setComPageIndex((prev) => comPageIndex !== 0 && prev - 1)
     await refetch({
       variables: {
         projectId: productId,
@@ -805,7 +805,8 @@ const ComponentTable = ({
   }
 
   const handleNextPage = async () => {
-    setPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
+    setComPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
+    setPageAfter(data.pageInfo.endCursor)
     await refetch({
       variables: {
         projectId: productId,
@@ -868,7 +869,7 @@ const ComponentTable = ({
               Next
             </Button>
             <Box>
-              Page {pageIndex} of{' '}
+              Page {comPageIndex} of{' '}
               {data.totalCount === 0
                 ? 1
                 : Math.ceil(data.totalCount / totalRows)}
@@ -903,7 +904,7 @@ const ComponentTable = ({
               checkId={null}
               group={activeRow.group}
               primaryComp={primaryComp}
-              totalRows={totalRows}
+              after={pageAfter}
             />
           )}
 
@@ -912,8 +913,8 @@ const ComponentTable = ({
               isOpen={isDelOpen}
               onClose={onDelClose}
               id={activeRow.id}
-              totalRows={totalRows}
               refetch={refetch}
+              after={pageAfter}
             />
           )}
 
@@ -927,7 +928,7 @@ const ComponentTable = ({
               suppliers={activeRow.suppliers}
               shortDesc={null}
               checkId={null}
-              totalRows={totalRows}
+              after={pageAfter}
             />
           )}
 
@@ -939,8 +940,8 @@ const ComponentTable = ({
               onClose={onLinkClose}
               refetch={refetch}
               productId={productId}
-              totalRows={totalRows}
               sbomId={sbomId}
+              after={pageAfter}
             />
           )}
 
@@ -951,13 +952,14 @@ const ComponentTable = ({
               data={activeRow}
               total={totalComp}
               refetch={refetch}
+              after={pageAfter}
             />
           )}
         </>
       )}
 
       {/* COMPONENT DRAWER */}
-      {isCompOpen && data && !customerView && (
+      {isCompOpen && !customerView && (
         <ComponentDrawer
           isOpen={isCompOpen}
           onClose={onCompClose}
@@ -975,7 +977,7 @@ const ComponentTable = ({
           shortDesc={null}
           checkId={null}
           primaryComp={primaryComp}
-          totalRows={totalRows}
+          after={pageAfter}
         />
       )}
     </>
