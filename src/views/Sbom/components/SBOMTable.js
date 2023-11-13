@@ -197,7 +197,7 @@ const SBOMTable = ({
           severity: vulnSeverity.length > 0 ? vulnSeverity : undefined,
           componentName: vulnComponent.length > 0 ? vulnComponent : undefined,
           status: vulnStatus.length > 0 ? vulnStatus : undefined,
-          kev: vulnKev === 'all' ? undefined : vulnKev === 'yes' ? true : false,
+          kev: vulnKev === 'yes' ? true : undefined,
           epss: vulnEpss !== '' ? range : undefined,
           field: vulnField,
           direction: vulnDirection
