@@ -146,6 +146,8 @@ const VulnTable = ({
   const [progress, setProgress] = useState(25)
   const [stepTitle, setStepTitle] = useState('')
   const [filterText, setFilterText] = useState('')
+  const [vulnAfter, setVulnAfter] = useState('')
+  const [vulnBefore, setVulnBefore] = useState('')
 
   const {
     isOpen: isTableOpen,
@@ -578,7 +580,7 @@ const VulnTable = ({
               </Text>
             </Box>
             {/* NVD ALIAS ID */}
-            { vuln.nvdAliasId ? (
+            {vuln.nvdAliasId ? (
               <Box>
                 <CustomText>NVD Alias ID:</CustomText>
                 <Link href={linkURl('nvd', vuln.nvdAliasId)} target={'_blank'}>
@@ -596,7 +598,8 @@ const VulnTable = ({
                     </Tooltip>
                   </Flex>
                 </Link>
-              </Box> ) : null }
+              </Box>
+            ) : null}
           </GridItem>
           {/* STATUS UPDATE */}
           <GridItem w='100%' colSpan={3}>
@@ -607,6 +610,8 @@ const VulnTable = ({
               totalRows={totalRows}
               filteredData={filteredData}
               filterRefetch={filterRefetch}
+              after={vulnAfter}
+              before={vulnBefore}
             />
           </GridItem>
         </Grid>
@@ -740,6 +745,8 @@ const VulnTable = ({
 
   const onPreviousPage = async () => {
     setPageIndex((prev) => pageIndex !== 0 && prev - 1)
+    setVulnBefore(data.pageInfo.startCursor)
+    setVulnAfter('')
     if (customerView) {
       handleRefetch(
         signedVulnSearchInput,
@@ -775,6 +782,8 @@ const VulnTable = ({
 
   const onNextPage = async () => {
     setPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
+    setVulnAfter(data.pageInfo.endCursor)
+    setVulnBefore('')
     if (customerView) {
       handleRefetch(
         signedVulnSearchInput,
