@@ -216,9 +216,9 @@ const Form3 = ({
               name='statusHistory'
               id='statusHistory'
               value={statusHistory}
-              onChange={(e) => setStatusHistory(Boolean(e.target.value))}
+              onChange={(e) => setStatusHistory(e.target.value)}
             >
-              <option value={false}>-- Select --</option>
+              <option>-- Select --</option>
               <option value={true}>Yes</option>
               <option value={false}>No</option>
             </Select>
@@ -343,7 +343,7 @@ const Multistep = ({
   const [isChecked, setIsChecked] = useState(false)
 
   const [importFrom, setImportFrom] = useState('')
-  const [statusHistory, setStatusHistory] = useState('')
+  const [statusHistory, setStatusHistory] = useState()
 
   return (
     <>
