@@ -41,7 +41,7 @@ import GlobalContext from 'context/GlobalContext'
 function ProductVersionsRow(props) {
   const history = useHistory()
 
-  const { setActiveProdTab } = useContext(GlobalContext)
+  const { setActiveProdTab, setCurrentProduct } = useContext(GlobalContext)
 
   const {
     id,
@@ -196,6 +196,11 @@ function ProductVersionsRow(props) {
               }`}
               onClick={() => {
                 window.localStorage.setItem('product', name)
+                setCurrentProduct({
+                  id: id,
+                  sbomId:
+                    filteredData.length > 0 ? filteredData[0].id : sbomId[0].id
+                })
                 setActiveProdTab(0)
               }}
             >

@@ -130,7 +130,9 @@ const GlobalContext = React.createContext({
   importSbom: [],
   setImportSbom: () => {},
   comPageIndex: 1,
-  setComPageIndex: () => {}
+  setComPageIndex: () => {},
+  currentProduct: null,
+  setCurrentProduct: () => {}
 })
 
 export default GlobalContext

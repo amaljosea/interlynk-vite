@@ -8,9 +8,10 @@ import {
   useColorModeValue
 } from '@chakra-ui/react'
 import PropTypes from 'prop-types'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import AdminNavbarLinks from './AdminNavbarLinks'
 import { Link, useLocation } from 'react-router-dom'
+import GlobalContext from 'context/GlobalContext'
 
 export default function AdminNavbar(props) {
   const [scrolled, setScrolled] = useState(false)
@@ -20,10 +21,14 @@ export default function AdminNavbar(props) {
   const queryParams = new URLSearchParams(location.search)
   const versionId = queryParams.get('v')
   const product = queryParams.get('p')
+  const sbomId = queryParams.get('sbom')
 
   const imageName = localStorage.getItem('Image')
   const productName = localStorage.getItem(`product`)
   const activeProd = localStorage.getItem('activeProduct')
+  const subProduct = localStorage.getItem('subProduct')
+
+  const { currentProduct, setActiveProdTab } = useContext(GlobalContext)
 
   // Here are all the props that may change depending on navbar's type or state.(secondary, variant, scrolled)
   let mainText = useColorModeValue('gray.700', 'gray.200')
@@ -145,7 +150,10 @@ export default function AdminNavbar(props) {
               <Link
                 to={`${path(brandText)}`}
                 color={secondaryText}
-                onClick={() => localStorage.removeItem('cloudScanner')}
+                onClick={() => {
+                  localStorage.removeItem('cloudScanner')
+                  window.localStorage.removeItem('subProduct')
+                }}
               >
                 {brandText}
               </Link>
@@ -153,7 +161,11 @@ export default function AdminNavbar(props) {
 
             {imageName !== null && versionId && brandText === 'Images' && (
               <BreadcrumbItem color={mainText}>
-                <BreadcrumbLink href='' color={mainText}>
+                <BreadcrumbLink
+                  href=''
+                  color={mainText}
+                  onClick={() => window.localStorage.removeItem('subProduct')}
+                >
                   {imageName}
                 </BreadcrumbLink>
               </BreadcrumbItem>
@@ -161,9 +173,21 @@ export default function AdminNavbar(props) {
 
             {productName !== null && product && brandText === 'Products' && (
               <BreadcrumbItem color={mainText}>
-                <BreadcrumbLink href='' color={mainText}>
+                <Link
+                  to={`/vendor/products?&p=${currentProduct.id}&sbom=${currentProduct.sbomId}`}
+                  onClick={() => {
+                    window.localStorage.removeItem('subProduct')
+                    setActiveProdTab(0)
+                  }}
+                >
                   {productName}
-                </BreadcrumbLink>
+                </Link>
+              </BreadcrumbItem>
+            )}
+
+            {subProduct && (
+              <BreadcrumbItem color={mainText}>
+                <BreadcrumbLink color={mainText}>{subProduct}</BreadcrumbLink>
               </BreadcrumbItem>
             )}
           </Breadcrumb>
