@@ -532,6 +532,12 @@ export const findSimilarItems = (
         ...currentItem,
         importStatus: matchingSelected.vexStatus,
         importJustification: matchingSelected.vexJustification,
+        importNotes:
+          matchingSelected.componentVulnLogs.length > 0
+            ? matchingSelected.componentVulnLogs[
+                matchingSelected.componentVulnLogs.length - 1
+              ].notes
+            : '',
         importStatement: matchingSelected.impact,
         importFrom,
         statusHistory
@@ -563,4 +569,3 @@ export const findUniqueItems = (currentArray, importArray) => {
 
   return uniqueItems
 }
-

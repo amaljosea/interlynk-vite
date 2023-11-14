@@ -216,7 +216,7 @@ const Form3 = ({
               name='statusHistory'
               id='statusHistory'
               value={statusHistory}
-              onChange={(e) => setStatusHistory(e.target.value)}
+              onChange={(e) => setStatusHistory(Boolean(e.target.value))}
             >
               <option>-- Select --</option>
               <option value={true}>Yes</option>

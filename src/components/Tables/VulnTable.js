@@ -682,7 +682,7 @@ const VulnTable = ({
           compVexCreate({
             variables: {
               compVulnId: item.id,
-              notes: 'testing',
+              notes: item.importNotes,
               sbomId: sbomId,
               vexStatusId: item.importStatus.id,
               vexJustificationId: item.importJustification
