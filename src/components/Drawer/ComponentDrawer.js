@@ -83,7 +83,8 @@ function ComponentDrawer(props) {
     group,
     shortDesc,
     filterRefetch,
-    after
+    after,
+    before
   } = props
 
   const { compField, compDirection, setCompFilters, totalRows } =
@@ -94,8 +95,10 @@ function ComponentDrawer(props) {
       variables: {
         projectId: productId,
         sbomId: sbomId,
-        first: totalRows,
-        after: after,
+        first: after !== '' ? totalRows : undefined,
+        after: after !== '' ? after : undefined,
+        last: before !== '' ? totalRows : undefined,
+        before: before !== '' ? before : undefined,
         field: compField,
         direction: compDirection
       }

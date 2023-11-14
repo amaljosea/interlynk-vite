@@ -54,7 +54,8 @@ const RelationshipDrawer = ({
   data,
   total,
   refetch,
-  after
+  after,
+  before
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -167,8 +168,10 @@ const RelationshipDrawer = ({
         projectId: productId,
         sbomId: sbomId,
         search: compSearchInput !== '' ? compSearchInput : undefined,
-        first: totalRows,
-        after: after,
+        first: after !== '' ? totalRows : undefined,
+        after: after !== '' ? after : undefined,
+        last: before !== '' ? totalRows : undefined,
+        before: before !== '' ? before : undefined,
         field: compField,
         direction: compDirection
       }

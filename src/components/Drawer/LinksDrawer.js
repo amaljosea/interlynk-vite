@@ -37,7 +37,8 @@ const LinksDrawer = ({
   sbomId,
   productId,
   refetch,
-  after
+  after,
+  before
 }) => {
   const [type, setType] = useState('')
   const [link, setLink] = useState('')
@@ -93,8 +94,10 @@ const LinksDrawer = ({
             variables: {
               projectId: productId,
               sbomId: sbomId,
-              first: totalRows,
-              after: after,
+              first: after !== '' ? totalRows : undefined,
+              after: after !== '' ? after : undefined,
+              last: before !== '' ? totalRows : undefined,
+              before: before !== '' ? before : undefined,
               field: compField,
               direction: compDirection
             }

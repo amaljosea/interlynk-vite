@@ -785,10 +785,13 @@ const ComponentTable = ({
     })
   }
 
-  const [pageAfter, setPageAfter] = useState('')
+  const [compAfter, setCompAfter] = useState('')
+  const [compBefore, setCompBefore] = useState('')
 
   const handlePreviousPage = async () => {
     setComPageIndex((prev) => comPageIndex !== 0 && prev - 1)
+    setCompBefore(data.pageInfo.startCursor)
+    setCompAfter('')
     await refetch({
       variables: {
         projectId: productId,
@@ -806,7 +809,8 @@ const ComponentTable = ({
 
   const handleNextPage = async () => {
     setComPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
-    setPageAfter(data.pageInfo.endCursor)
+    setCompAfter(data.pageInfo.endCursor)
+    setCompBefore('')
     await refetch({
       variables: {
         projectId: productId,
@@ -904,7 +908,8 @@ const ComponentTable = ({
               checkId={null}
               group={activeRow.group}
               primaryComp={primaryComp}
-              after={pageAfter}
+              after={compAfter}
+              before={compBefore}
             />
           )}
 
@@ -914,7 +919,8 @@ const ComponentTable = ({
               onClose={onDelClose}
               id={activeRow.id}
               refetch={refetch}
-              after={pageAfter}
+              after={compAfter}
+              before={compBefore}
             />
           )}
 
@@ -928,7 +934,8 @@ const ComponentTable = ({
               suppliers={activeRow.suppliers}
               shortDesc={null}
               checkId={null}
-              after={pageAfter}
+              after={compAfter}
+              before={compBefore}
             />
           )}
 
@@ -941,7 +948,8 @@ const ComponentTable = ({
               refetch={refetch}
               productId={productId}
               sbomId={sbomId}
-              after={pageAfter}
+              after={compAfter}
+              before={compBefore}
             />
           )}
 
@@ -952,7 +960,8 @@ const ComponentTable = ({
               data={activeRow}
               total={totalComp}
               refetch={refetch}
-              after={pageAfter}
+              after={compAfter}
+              before={compBefore}
             />
           )}
         </>
@@ -977,7 +986,8 @@ const ComponentTable = ({
           shortDesc={null}
           checkId={null}
           primaryComp={primaryComp}
-          after={pageAfter}
+          after={compAfter}
+          before={compBefore}
         />
       )}
     </>
