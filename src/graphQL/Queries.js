@@ -578,30 +578,6 @@ export const GetComponentData = gql`
           description
           licenseExp
           group
-          dependencyOf {
-            id
-            relType
-            fromId
-            toId
-            fromComp {
-              id
-              name
-              version
-            }
-            updatedAt
-          }
-          dependsOn {
-            id
-            relType
-            fromId
-            toId
-            toComp {
-              id
-              name
-              version
-            }
-            updatedAt
-          }
           externalUrls {
             name
             url
@@ -614,6 +590,53 @@ export const GetComponentData = gql`
             updatedAt
           }
         }
+      }
+    }
+  }
+`
+
+// GET COMPONENT DEPENDENCY
+export const GetCompDependency = gql`
+  query GetCompDependency($compId: Uuid!, $sbomId: Uuid!) {
+    component(id: $compId, sbomId: $sbomId) {
+      id
+      dependencyOf {
+        id
+        relType
+        fromId
+        toId
+        fromComp {
+          id
+          name
+          version
+        }
+        updatedAt
+      }
+      dependsOn {
+        id
+        relType
+        fromId
+        toId
+        toComp {
+          id
+          name
+          version
+        }
+        updatedAt
+      }
+    }
+  }
+`
+
+// GET COMPONENT PATH TO ROOT
+export const GetComponentPath = gql`
+  query GetComponentPath($compId: Uuid!, $sbomId: Uuid!) {
+    component(id: $compId, sbomId: $sbomId) {
+      id
+      pathToPrimary {
+        id
+        name
+        version
       }
     }
   }

@@ -174,7 +174,11 @@ export default function AdminNavbar(props) {
             {productName !== null && product && brandText === 'Products' && (
               <BreadcrumbItem color={mainText}>
                 <Link
-                  to={`/vendor/products?&p=${currentProduct.id}&sbom=${currentProduct.sbomId}`}
+                  to={
+                    currentProduct
+                      ? `/vendor/products?&p=${currentProduct.id}&sbom=${currentProduct.sbomId}`
+                      : '/vendor/products'
+                  }
                   onClick={() => {
                     window.localStorage.removeItem('subProduct')
                     setActiveProdTab(0)

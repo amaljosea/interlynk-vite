@@ -41,7 +41,7 @@ import ComponentModal from 'views/Sbom/components/ComponentModal'
 import SupplierModal from 'views/Sbom/components/SupplierModal'
 import LinksDrawer from 'components/Drawer/LinksDrawer'
 import styled from '@emotion/styled'
-import { useMutation } from '@apollo/client'
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { deleteComSupplier } from 'graphQL/Mutation'
 import { licenseOptions } from 'variables/licenses'
 import CompFilterMenu from 'views/Sbom/components/CompFilterMenu'
@@ -51,6 +51,8 @@ import GlobalContext from 'context/GlobalContext'
 import CustomLoader from 'components/CustomLoader'
 import RelationshipDrawer from 'components/Drawer/RelationshipDrawer'
 import RowLimit from 'views/Sbom/components/RowLimit'
+import { GetComponentPath } from 'graphQL/Queries'
+import { GetCompDependency } from 'graphQL/Queries'
 
 const customStyles = {
   headCells: {
@@ -113,6 +115,14 @@ const ComponentTable = ({
   const linkRef = useRef(null)
 
   const { isOpen, onOpen, onClose } = useDisclosure()
+
+  const [getComPath, { data: comPath }] = useLazyQuery(GetComponentPath)
+  const [getDependency, { data: compDependency }] = useLazyQuery(
+    GetCompDependency,
+    {
+      fetchPolicy: 'network-only'
+    }
+  )
 
   const {
     isOpen: isDelOpen,
@@ -403,7 +413,21 @@ const ComponentTable = ({
       id: 'action',
       name: 'ACTION',
       selector: (row) => {
-        const { suppliers, status, primary, name } = row
+        const { suppliers, status, primary, id } = row
+
+        const handleOpen = () => {
+          getComPath({
+            variables: {
+              compId: id,
+              sbomId: sbomId
+            }
+          }).then((res) => {
+            if (res.data) {
+              setActiveRow(row)
+              onRelationOpen()
+            }
+          })
+        }
 
         return (
           <>
@@ -427,14 +451,7 @@ const ComponentTable = ({
                     >
                       Edit Component
                     </MenuItem>
-                    <MenuItem
-                      onClick={() => {
-                        setActiveRow(row)
-                        onRelationOpen()
-                      }}
-                    >
-                      Edit Relationships
-                    </MenuItem>
+                    <MenuItem onClick={handleOpen}>Edit Relationships</MenuItem>
                     <MenuItem
                       onClick={() => {
                         setActiveRow(row)
@@ -488,6 +505,18 @@ const ComponentTable = ({
 
   const [deleteSupplier] = useMutation(deleteComSupplier)
 
+  const handleRowClicked = (state, data) => {
+    const { id } = data
+    if (state === true) {
+      getDependency({
+        variables: {
+          compId: id,
+          sbomId: sbomId
+        }
+      })
+    }
+  }
+
   const handleSupRemove = async (id) => {
     try {
       await deleteSupplier({
@@ -514,17 +543,8 @@ const ComponentTable = ({
 
   // EXPAND SECTION
   const ExpandedComponent = ({ data }) => {
-    const {
-      suppliers,
-      purl,
-      description,
-      cpes,
-      name,
-      kind,
-      internal,
-      dependencyOf,
-      dependsOn
-    } = data
+    const { id, suppliers, purl, description, cpes, name, kind, internal } =
+      data
 
     const CustomText = styled(Text)`
       font-size: 13px;
@@ -616,12 +636,12 @@ const ComponentTable = ({
           <GridItem w='100%'>
             <CustomText>Depends On :</CustomText>
             <Flex mt={2} alignItems={'flex-start'} gap={2} flexWrap={'wrap'}>
-              {dependsOn.length > 0 &&
-                dependsOn.map((comp, index) => (
-                  <Tooltip label={comp.toComp.name} placement='top'>
+              {compDependency &&
+                compDependency.component.dependsOn.length > 0 &&
+                compDependency.component.dependsOn.map((comp, index) => (
+                  <Tooltip key={index} label={comp.toComp.name} placement='top'>
                     <Tag
                       size={'sm'}
-                      key={index}
                       variant='subtle'
                       colorScheme={'blue'}
                       width={'fit-content'}
@@ -637,12 +657,16 @@ const ComponentTable = ({
           <GridItem w='100%'>
             <CustomText>Dependency Of :</CustomText>
             <Flex mt={2} alignItems={'flex-start'} gap={2} flexWrap={'wrap'}>
-              {dependencyOf.length > 0 &&
-                dependencyOf.map((comp, index) => (
-                  <Tooltip label={comp.fromComp.name} placement='top'>
+              {compDependency &&
+                compDependency.component.dependencyOf.length > 0 &&
+                compDependency.component.dependencyOf.map((comp, index) => (
+                  <Tooltip
+                    key={index}
+                    label={comp.fromComp.name}
+                    placement='top'
+                  >
                     <Tag
                       size={'sm'}
-                      key={index}
                       variant='subtle'
                       colorScheme={'blue'}
                       width={'fit-content'}
@@ -842,6 +866,7 @@ const ComponentTable = ({
           subHeaderComponent={subHeaderComponentMemo}
           expandableRows
           persistTableHead
+          onRowExpandToggled={handleRowClicked}
           expandableRowsComponent={ExpandedComponent}
           responsive={true}
         />
@@ -958,6 +983,7 @@ const ComponentTable = ({
               isOpen={isRelationOpen}
               onClose={onRelationClose}
               data={activeRow}
+              path={comPath.component.pathToPrimary}
               total={totalComp}
               refetch={refetch}
               after={compAfter}

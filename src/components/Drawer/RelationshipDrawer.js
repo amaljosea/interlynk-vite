@@ -1,4 +1,5 @@
 import { useLazyQuery, useMutation } from '@apollo/client'
+import { ArrowDownIcon } from '@chakra-ui/icons'
 import {
   Box,
   Button,
@@ -35,7 +36,8 @@ import {
   PopoverCloseButton,
   PopoverBody,
   PopoverFooter,
-  ButtonGroup
+  ButtonGroup,
+  useLatestRef
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
@@ -43,9 +45,9 @@ import CardHeader from 'components/Card/CardHeader'
 import NodeElement from 'components/NodeElement'
 import GlobalContext from 'context/GlobalContext'
 import { CreateCompRelation, DeleteCompRelation } from 'graphQL/Mutation'
+import { GetCompDependency } from 'graphQL/Queries'
 import { GetAllComponents } from 'graphQL/Queries'
 import { useContext, useEffect, useState } from 'react'
-import Tree from 'react-d3-tree'
 import { useLocation } from 'react-router-dom'
 
 const RelationshipDrawer = ({
@@ -55,13 +57,14 @@ const RelationshipDrawer = ({
   total,
   refetch,
   after,
-  before
+  before,
+  path
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
-  const { name, version, id, dependencyOf, dependsOn } = data
+  const { name, version, id } = data
   const { totalRows, compField, compDirection, compSearchInput } =
     useContext(GlobalContext)
 
@@ -75,6 +78,19 @@ const RelationshipDrawer = ({
 
   const [addRelation] = useMutation(CreateCompRelation)
   const [removeRelation] = useMutation(DeleteCompRelation)
+  const [getDependency, { data: compDependency }] =
+    useLazyQuery(GetCompDependency)
+
+  useEffect(() => {
+    if (compDependency === undefined) {
+      getDependency({
+        variables: {
+          compId: id,
+          sbomId: sbomId
+        }
+      })
+    }
+  }, [])
 
   const {
     isOpen: isDelOpen,
@@ -83,16 +99,11 @@ const RelationshipDrawer = ({
   } = useDisclosure()
 
   useEffect(() => {
-    if (dependencyOf) {
-      setDependsOnList(dependencyOf)
+    if (compDependency) {
+      setDependencyOfList(compDependency.component.dependencyOf)
+      setDependsOnList(compDependency.component.dependsOn)
     }
-  }, [dependencyOf])
-
-  useEffect(() => {
-    if (dependsOn) {
-      setDependsOnList(dependsOn)
-    }
-  }, [dependsOn])
+  }, [compDependency])
 
   useEffect(() => {
     getAllComps({
@@ -436,6 +447,44 @@ const RelationshipDrawer = ({
                     </Tr>
                   </Tbody>
                 </Table>
+
+                {/* PATHS */}
+                <Stack
+                  width={'100%'}
+                  mt={10}
+                  dir='column'
+                  spacing={2}
+                  alignItems={'center'}
+                  justifyContent={'center'}
+                >
+                  {path.length > 0 ? (
+                    path.map((item, index) => (
+                      <>
+                        <Tag
+                          key={item.id}
+                          fontSize={'sm'}
+                          colorScheme={
+                            index !== path.length - 1 ? 'blue' : 'green'
+                          }
+                        >
+                          {item.name} - {item.version}
+                        </Tag>
+
+                        {index !== path.length - 1 && (
+                          <ArrowDownIcon
+                            width={4}
+                            height={4}
+                            color={'blue.500'}
+                          />
+                        )}
+                      </>
+                    ))
+                  ) : (
+                    <Text fontSize={'sm'}>
+                      Component is not connected to Primary component
+                    </Text>
+                  )}
+                </Stack>
               </Flex>
             </CardBody>
           </Card>
