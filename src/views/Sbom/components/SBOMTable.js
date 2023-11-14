@@ -34,6 +34,7 @@ import {
 } from 'graphQL/Queries'
 import { useLocation } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
+import PartsTable from 'components/Tables/PartsTable'
 
 const SBOMTable = ({
   status,
@@ -154,7 +155,7 @@ const SBOMTable = ({
         projectId: productId,
         sbomId: sbomId
       })
-    } else if (value === 1) {
+    } else if (value === 2) {
       // FETCH COMPONENT DATA
       getCompData({
         variables: {
@@ -189,7 +190,7 @@ const SBOMTable = ({
           setCompFilters(res.data.sbom.filters)
         }
       })
-    } else if (value === 2) {
+    } else if (value === 3) {
       getVulnData({
         variables: {
           projectId: productId,
@@ -219,7 +220,7 @@ const SBOMTable = ({
           setVulnFilters(res.data.sbom.filters)
         }
       })
-    } else if (value === 3) {
+    } else if (value === 4) {
       // FETCH HEALTH CHECK DATA
       getCheckData({
         variables: {
@@ -240,7 +241,7 @@ const SBOMTable = ({
           setCheckFilters(res.data.sbom.filters)
         }
       })
-    } else if (value === 4) {
+    } else if (value === 5) {
       // FETCH ACTIVITY LOGS DATA
       getLogData({
         variables: {
@@ -286,6 +287,7 @@ const SBOMTable = ({
           <TabList mt='20px'>
             {[
               'General',
+              'Parts',
               'Components',
               'Vulnerabilities',
               'Checks',
@@ -316,6 +318,10 @@ const SBOMTable = ({
                   <Skeleton width={'100%'} height='20px' />
                 </Flex>
               )}
+            </TabPanel>
+            {/* PARTS TABLE */}
+            <TabPanel px={0}>
+              <PartsTable />
             </TabPanel>
             {/* COMPONENT TABLE */}
             <TabPanel px={0}>
