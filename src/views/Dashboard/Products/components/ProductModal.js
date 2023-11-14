@@ -16,7 +16,8 @@ import {
   AlertIcon,
   Text,
   Select,
-  useToast
+  useToast,
+  Textarea
 } from '@chakra-ui/react'
 import { UpdateProject } from 'graphQL/Mutation'
 import { CreateProject } from 'graphQL/Mutation'
@@ -135,11 +136,11 @@ const ProductModal = ({
                 </FormControl>
                 <FormControl isRequired>
                   <FormLabel>Description</FormLabel>
-                  <Input
-                    type='text'
+                  <Textarea
                     value={productDesc || ''}
                     onChange={(e) => setProductDesc(e.target.value)}
                     placeholder='Enter product description'
+                    rows={5}
                   />
                 </FormControl>
                 {/*                 {id && (

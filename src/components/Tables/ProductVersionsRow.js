@@ -186,7 +186,7 @@ function ProductVersionsRow(props) {
             />
           )}
         </Td>
-        <Td pl={0}>
+        <Td pl={0} width={'300px'}>
           {isLoading ? (
             <Skeleton height='20px' />
           ) : sbomId.length > 0 && enabled ? (
@@ -219,7 +219,17 @@ function ProductVersionsRow(props) {
             <Text>{filteredData?.length}</Text>
           )}
         </Td>
-        <Td pl={0}>{isLoading ? <Skeleton height='20px' /> : description}</Td>
+        <Td pl={0}>
+          {isLoading ? (
+            <Skeleton height='20px' />
+          ) : (
+            <Text>
+              {description.length > 50
+                ? description.substring(0, 50) + '....'
+                : description}
+            </Text>
+          )}
+        </Td>
         <Td pl={0}>
           {isLoading ? (
             <Skeleton height='20px' />
