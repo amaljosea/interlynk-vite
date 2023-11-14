@@ -30,6 +30,7 @@ const SupplierModal = ({
   checkId,
   filterRefetch,
   after,
+  before
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -61,8 +62,10 @@ const SupplierModal = ({
       variables: {
         projectId: productId,
         sbomId: sbomId,
-        first: totalRows,
-        after: after,
+        first: after !== '' ? totalRows : undefined,
+        after: after !== '' ? after : undefined,
+        last: before !== '' ? totalRows : undefined,
+        before: before !== '' ? before : undefined,
         field: compField,
         direction: compDirection
       }

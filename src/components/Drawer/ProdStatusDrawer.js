@@ -31,7 +31,9 @@ const ProdStatusDrawer = ({
   refetch,
   filteredData,
   totalRows,
-  filterRefetch
+  filterRefetch,
+  after,
+  before
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -63,7 +65,10 @@ const ProdStatusDrawer = ({
         variables: {
           projectId: productId,
           sbomId: sbomId,
-          first: totalRows,
+          first: after !== '' ? totalRows : undefined,
+          after: after !== '' ? after : undefined,
+          last: before !== '' ? totalRows : undefined,
+          before: before !== '' ? before : undefined,
           field: vulnField,
           direction: vulnDirection
         }
