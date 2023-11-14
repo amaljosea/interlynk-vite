@@ -104,8 +104,12 @@ function SBOM() {
   })
 
   // GET VULN DATA
-  const [getVulnData, { data: vulnData, refetch: vulnRefetch }] =
-    useLazyQuery(GetVulnData)
+  const [getVulnData, { data: vulnData, refetch: vulnRefetch }] = useLazyQuery(
+    GetVulnData,
+    {
+      fetchPolicy: 'network-only'
+    }
+  )
 
   const selectedProject =
     allProjects &&

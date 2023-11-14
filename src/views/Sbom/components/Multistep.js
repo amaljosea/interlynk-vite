@@ -51,6 +51,7 @@ const Form1 = ({
   const [getProduct] = useLazyQuery(GetProject)
 
   const handleSelectProduct = (e) => {
+    setSelectedVersion('')
     setSelectedProd(e.target.value)
     productId = e.target.value
     getProduct({
@@ -216,11 +217,11 @@ const Form3 = ({
               name='statusHistory'
               id='statusHistory'
               value={statusHistory}
-              onChange={(e) => setStatusHistory(Boolean(e.target.value))}
+              onChange={(e) => setStatusHistory(e.target.value)}
             >
-              <option>-- Select --</option>
-              <option value={true}>Yes</option>
-              <option value={false}>No</option>
+              <option value={''}>-- Select --</option>
+              <option value={'yes'}>Yes</option>
+              <option value={'no'}>No</option>
             </Select>
           </FormControl>
         </Stack>
@@ -334,7 +335,8 @@ const Multistep = ({
   progress,
   currentSbomId,
   currentProductId,
-  getVulns
+  getVulns,
+  setGetData
 }) => {
   const [selectedProd, setSelectedProd] = useState('')
   const [selectedVersion, setSelectedVersion] = useState('')
@@ -344,6 +346,14 @@ const Multistep = ({
 
   const [importFrom, setImportFrom] = useState('')
   const [statusHistory, setStatusHistory] = useState()
+
+  useEffect(() => {
+    if (selectedVersion === '') {
+      setGetData(false)
+    } else {
+      setGetData(true)
+    }
+  }, [selectedVersion])
 
   return (
     <>

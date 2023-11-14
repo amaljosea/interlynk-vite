@@ -148,6 +148,7 @@ const VulnTable = ({
   const [filterText, setFilterText] = useState('')
   const [vulnAfter, setVulnAfter] = useState('')
   const [vulnBefore, setVulnBefore] = useState('')
+  const [getData, setGetData] = useState(false)
 
   const {
     isOpen: isTableOpen,
@@ -660,7 +661,7 @@ const VulnTable = ({
             res.data.sbom.vulns.nodes,
             importSbom,
             'Keep existing',
-            true
+            'yes'
           )
           const filterData = data.filter((item) => item.importStatus !== null)
           setMergeData(filterData)
@@ -976,6 +977,7 @@ const VulnTable = ({
                 getVulns={getVulns}
                 currentSbomId={sbomId}
                 currentProductId={productId}
+                setGetData={setGetData}
               />
             </DrawerBody>
 
@@ -1022,7 +1024,7 @@ const VulnTable = ({
                   </Button>
                 ) : (
                   <Button
-                    isDisabled={step === 4}
+                    isDisabled={step === 4 || getData === false}
                     rightIcon={<ChevronRightIcon w={6} h={6} />}
                     onClick={() => {
                       setStep(step + 1)

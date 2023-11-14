@@ -536,11 +536,11 @@ export const findSimilarItems = (
           matchingSelected.componentVulnLogs.length > 0
             ? matchingSelected.componentVulnLogs[
                 matchingSelected.componentVulnLogs.length - 1
-              ].notes
+              ].note
             : '',
         importStatement: matchingSelected.impact,
         importFrom,
-        statusHistory
+        statusHistory: statusHistory === 'yes' ? true : false
       }
     }
   })
