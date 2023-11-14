@@ -176,12 +176,12 @@ function SBOM() {
 
   data &&
     data.project.sboms.map((project) => {
-        uniqVersions.push({
-          version: project.primaryComponent?.version,
-          id: project.id,
-          updatedAt: project.updatedAt,
-          creationAt: project.creationAt
-        })
+      uniqVersions.push({
+        version: project.primaryComponent?.version,
+        id: project.id,
+        updatedAt: project.updatedAt,
+        creationAt: project.creationAt
+      })
     })
 
   // remove duplicates
@@ -223,10 +223,8 @@ function SBOM() {
           id: sbomId
         }
       }).then((res) => {
-        if (res.data.sbomDelete.errors === null) {
-          setIsLoading(false)
-          history.push(`/vendor/products`)
-        }
+        setIsLoading(false)
+        history.push(`/vendor/products`)
       })
     } catch (error) {
       console.error('Mutation error:', error)
@@ -382,9 +380,11 @@ function SBOM() {
                               variant='solid'
                               colorScheme='blue'
                             >
-                            <Tooltip label="Lifecycle stage" fontSize="md">
-                              <TagLabel textTransform={'capitalize'} >{sbomData.sbom.lifecycle}</TagLabel>
-                            </Tooltip>
+                              <Tooltip label='Lifecycle stage' fontSize='md'>
+                                <TagLabel textTransform={'capitalize'}>
+                                  {sbomData.sbom.lifecycle}
+                                </TagLabel>
+                              </Tooltip>
                             </Tag>
                             {sbomData.sbom.vulnRunStatus === 'IN_PROGRESS' && (
                               <Tag
@@ -393,9 +393,14 @@ function SBOM() {
                                 variant='solid'
                                 colorScheme='blue'
                               >
-                              <Tooltip label="Vulnerability scan in progress" fontSize="md">
-                                <TagLabel textTransform={'capitalize'}>scanning</TagLabel>
-                              </Tooltip>
+                                <Tooltip
+                                  label='Vulnerability scan in progress'
+                                  fontSize='md'
+                                >
+                                  <TagLabel textTransform={'capitalize'}>
+                                    scanning
+                                  </TagLabel>
+                                </Tooltip>
                               </Tag>
                             )}
                           </HStack>
@@ -557,7 +562,11 @@ function SBOM() {
                                     value={item.id}
                                     name={item.version}
                                   >
-                                     {item.version ? item.version : `Uploaded: ${getFullDateAndTime(item.creationAt)}`}
+                                    {item.version
+                                      ? item.version
+                                      : `Uploaded: ${getFullDateAndTime(
+                                          item.creationAt
+                                        )}`}
                                   </option>
                                 ))
                               ) : (
