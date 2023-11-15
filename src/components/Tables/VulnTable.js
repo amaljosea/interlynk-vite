@@ -732,7 +732,12 @@ const VulnTable = ({
         severity: severity.length > 0 ? severity : undefined,
         componentName: componentName.length > 0 ? componentName : undefined,
         status: status.length > 0 ? status : undefined,
-        kev: kev === 'all' ? undefined : kev === 'yes' ? true : false,
+        kev:
+          kev === 'all' || kev === ''
+            ? undefined
+            : kev === 'yes'
+            ? true
+            : false,
         epss: epss !== '' && epss !== 'all' ? range : undefined,
         first: first,
         after: after,
