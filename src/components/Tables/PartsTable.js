@@ -167,7 +167,7 @@ const PartsTable = () => {
       selector: (row) => {
         const { sboms } = row
         return (
-          <Text>{sboms.length > 0 && sboms[0].primaryComponent.version}</Text>
+          <Text>{sboms?.length > 0 && sboms[0]?.primaryComponent?.version}</Text>
         )
       }
     },
