@@ -70,6 +70,9 @@ function SBOM() {
   const history = useHistory()
   const toast = useToast()
 
+  const productName = localStorage.getItem(`product`)
+  const subProduct = localStorage.getItem('subProduct')
+
   const {
     setVulnSeverity,
     setActiveProdTab,
@@ -215,7 +218,6 @@ function SBOM() {
     // Compare the dates
     return dateB - dateA
   })
-
 
   const [selectedVersion, setSelectedVersion] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -365,6 +367,11 @@ function SBOM() {
                               {sbomData.sbom.project.name} :{' '}
                               {sbomData.sbom.primaryComponent?.version}
                             </Text>
+                            {subProduct && (
+                              <Text fontWeight={'semibold'} fontSize={25}>
+                                / {productName}
+                              </Text>
+                            )}
                           </Stack>
 
                           <Text fontSize={'sm'} my={0.5}>
