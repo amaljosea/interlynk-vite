@@ -18,6 +18,7 @@ import { useLocation } from 'react-router-dom'
 import { timeSince } from 'utils'
 import { getFullDateAndTime } from 'utils'
 import ChangelogFilterMenu from 'views/Sbom/components/ChangelogFilterMenu'
+import RowLimit from 'views/Sbom/components/RowLimit'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 const customStyles = {
@@ -59,7 +60,7 @@ const setColor = (type) => {
 const ChangelogTable = ({ data, refetch }) => {
   const {
     totalRows,
-    changelogData,
+    setTotalRows,
     prodLogField,
     setProdLogField,
     prodLogDirection,
@@ -231,6 +232,22 @@ const ChangelogTable = ({ data, refetch }) => {
     })
   }
 
+  // SET ROW LENGTH
+  const handleSetRow = async (e) => {
+    setTotalRows(Number(e.target.value))
+    await refetch({
+      projectId: productId,
+      first: Number(e.target.value),
+      last: undefined,
+      after: undefined,
+      before: undefined,
+      field: prodLogField,
+      direction: prodLogDirection
+    })
+    setFilterText('')
+    setPageIndex(1)
+  }
+
   const subHeaderComponentMemo = useMemo(() => {
     return (
       <Flex
@@ -283,31 +300,41 @@ const ChangelogTable = ({ data, refetch }) => {
       </Flex>
 
       {/* PAGINATION */}
-      <Flex
-        flexDir={'row'}
-        gap={4}
-        alignItems={'center'}
-        mt={6}
-        justifyContent={'flex-start'}
-      >
-        <Button
-          colorScheme='blue'
-          onClick={onPreviousPage}
-          isDisabled={!data.pageInfo.hasPreviousPage}
+      {data && (
+        <Flex
+          width={'100%'}
+          flexDir={'row'}
+          gap={4}
+          alignItems={'center'}
+          mt={6}
+          justifyContent={'space-between'}
         >
-          Previous
-        </Button>
-        <Button
-          colorScheme='blue'
-          onClick={onNextPage}
-          isDisabled={!data.pageInfo.hasNextPage}
-        >
-          Next
-        </Button>
-        <Box>
-          Page {pageIndex} of {Math.ceil(data.totalCount / totalRows)}
-        </Box>
-      </Flex>
+          <Stack alignItems={'center'} direction={'row'} spacing={4}>
+            <Button
+              colorScheme='blue'
+              onClick={onPreviousPage}
+              isDisabled={!data.pageInfo.hasPreviousPage}
+            >
+              Previous
+            </Button>
+            <Button
+              colorScheme='blue'
+              onClick={onNextPage}
+              isDisabled={!data.pageInfo.hasNextPage}
+            >
+              Next
+            </Button>
+            <Box>
+              Page {pageIndex} of{' '}
+              {data.totalCount === 0
+                ? 1
+                : Math.ceil(data.totalCount / totalRows)}
+            </Box>
+          </Stack>
+
+          <RowLimit onChange={handleSetRow} name='prodChangelogRow' />
+        </Flex>
+      )}
     </>
   )
 }

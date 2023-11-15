@@ -721,14 +721,16 @@ const ComponentTable = ({
   const handleSetRow = async (e) => {
     setTotalRows(Number(e.target.value))
     await refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      first: Number(e.target.value),
-      last: undefined,
-      after: undefined,
-      before: undefined,
-      field: customerView ? signedCompField : compField,
-      direction: customerView ? signedCompDirection : compDirection
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        first: Number(e.target.value),
+        last: undefined,
+        after: undefined,
+        before: undefined,
+        field: customerView ? signedCompField : compField,
+        direction: customerView ? signedCompDirection : compDirection
+      }
     })
     setFilterText('')
     setComPageIndex(1)
