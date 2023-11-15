@@ -2,7 +2,7 @@ import { useQuery } from '@apollo/client'
 import { Flex, Skeleton } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import ChangelogTable from 'components/Tables/ChangelogTable'
-import { GetProject } from 'graphQL/Queries'
+import { GetProjectLogs } from 'graphQL/Queries'
 import { useEffect } from 'react'
 import { useLocation, useHistory } from 'react-router-dom'
 
@@ -15,7 +15,7 @@ const ChangeLog = () => {
   const queryParams = new URLSearchParams(location.search)
   const id = queryParams.get('id')
 
-  const { data, refetch } = useQuery(GetProject, {
+  const { data, refetch } = useQuery(GetProjectLogs, {
     variables: {
       id: id,
       field: 'ACTIVITY_LOGS_CREATED_AT',

@@ -416,7 +416,12 @@ export const GetFeedLogs = gql`
 `
 
 export const GetProjectData = gql`
-  query GetProjects($first: Int, $last: Int, $after: String, $before: String) {
+  query GetProjectData(
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+  ) {
     projects(first: $first, last: $last, after: $after, before: $before) {
       totalCount
       pageInfo {
@@ -947,7 +952,30 @@ export const GetLogsFilterData = gql`
 `
 
 export const GetProject = gql`
-  query getProject(
+  query GetProject($id: Uuid!) {
+    project(id: $id) {
+      id
+      name
+      description
+      updatedAt
+      sboms {
+        id
+        spec
+        specVersion
+        updatedAt
+        creationAt
+        primaryComponent {
+          id
+          name
+          version
+        }
+      }
+    }
+  }
+`
+
+export const GetProjectLogs = gql`
+  query GetProjectLogs(
     $id: Uuid!
     $search: String
     $changedBy: [String!]
@@ -955,7 +983,6 @@ export const GetProject = gql`
     $changeObject: [String!]
     $field: ActivityLogOrderByFields!
     $direction: OrderByDirection!
-    $sbomId: Uuid
     $after: String
     $before: String
     $first: Int
@@ -963,12 +990,8 @@ export const GetProject = gql`
   ) {
     project(id: $id) {
       id
-      name
-      description
-      updatedAt
       activityLogs(
         projectId: $id
-        sbomId: $sbomId
         search: $search
         changedBy: $changedBy
         changeType: $changeType
@@ -994,18 +1017,6 @@ export const GetProject = gql`
           createdAt
           updatedAt
           changedBy
-        }
-      }
-      sboms {
-        id
-        spec
-        specVersion
-        updatedAt
-        creationAt
-        primaryComponent {
-          id
-          name
-          version
         }
       }
     }

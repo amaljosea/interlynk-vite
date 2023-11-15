@@ -216,6 +216,8 @@ function SBOM() {
     return dateB - dateA
   })
 
+  console.log('filteredData', uniqVersions)
+
   const [selectedVersion, setSelectedVersion] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
