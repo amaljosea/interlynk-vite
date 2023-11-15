@@ -336,7 +336,9 @@ const Multistep = ({
   currentSbomId,
   currentProductId,
   getVulns,
-  setGetData
+  setStepOne,
+  setStepTwo,
+  setStepThree
 }) => {
   const [selectedProd, setSelectedProd] = useState('')
   const [selectedVersion, setSelectedVersion] = useState('')
@@ -345,15 +347,31 @@ const Multistep = ({
   const [isChecked, setIsChecked] = useState(false)
 
   const [importFrom, setImportFrom] = useState('')
-  const [statusHistory, setStatusHistory] = useState()
+  const [statusHistory, setStatusHistory] = useState('')
 
   useEffect(() => {
-    if (selectedVersion === '') {
-      setGetData(false)
+    if (step === 1 && selectedVersion === '') {
+      setStepOne(false)
     } else {
-      setGetData(true)
+      setStepOne(true)
     }
-  }, [selectedVersion])
+  }, [selectedVersion, step])
+
+  useEffect(() => {
+    if (step === 2 && isChecked === false) {
+      setStepTwo(false)
+    } else {
+      setStepTwo(true)
+    }
+  }, [isChecked, step])
+
+  useEffect(() => {
+    if (step === 3 && (importFrom === '' || statusHistory === '')) {
+      setStepThree(false)
+    } else {
+      setStepThree(true)
+    }
+  }, [importFrom, statusHistory, step])
 
   return (
     <>

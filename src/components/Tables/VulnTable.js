@@ -148,7 +148,10 @@ const VulnTable = ({
   const [filterText, setFilterText] = useState('')
   const [vulnAfter, setVulnAfter] = useState('')
   const [vulnBefore, setVulnBefore] = useState('')
-  const [getData, setGetData] = useState(false)
+
+  const [stepOne, setStepOne] = useState(false)
+  const [stepTwo, setStepTwo] = useState(false)
+  const [stepThree, setStepThree] = useState(false)
 
   const {
     isOpen: isTableOpen,
@@ -982,7 +985,9 @@ const VulnTable = ({
                 getVulns={getVulns}
                 currentSbomId={sbomId}
                 currentProductId={productId}
-                setGetData={setGetData}
+                setStepOne={setStepOne}
+                setStepTwo={setStepTwo}
+                setStepThree={setStepThree}
               />
             </DrawerBody>
 
@@ -1029,7 +1034,12 @@ const VulnTable = ({
                   </Button>
                 ) : (
                   <Button
-                    isDisabled={step === 4 || getData === false}
+                    isDisabled={
+                      step === 4 ||
+                      stepOne === false ||
+                      stepTwo === false ||
+                      stepThree === false
+                    }
                     rightIcon={<ChevronRightIcon w={6} h={6} />}
                     onClick={() => {
                       setStep(step + 1)
