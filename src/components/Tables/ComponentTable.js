@@ -978,12 +978,12 @@ const ComponentTable = ({
             />
           )}
 
-          {isRelationOpen && (
+          {isRelationOpen && comPath && (
             <RelationshipDrawer
               isOpen={isRelationOpen}
               onClose={onRelationClose}
               data={activeRow}
-              path={comPath.component.pathToPrimary}
+              compPath={comPath.component.pathToPrimary}
               total={totalComp}
               refetch={refetch}
               after={compAfter}

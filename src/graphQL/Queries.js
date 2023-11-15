@@ -643,6 +643,7 @@ export const GetComponentPath = gql`
         path {
           id
           name
+          version
         }
       }
     }
