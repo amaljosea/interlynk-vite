@@ -58,13 +58,14 @@ const RelationshipDrawer = ({
   refetch,
   after,
   before,
-  path
+  compPath
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
   const { name, version, id } = data
+
   const { totalRows, compField, compDirection, compSearchInput } =
     useContext(GlobalContext)
 
@@ -353,10 +354,13 @@ const RelationshipDrawer = ({
                                 new Date(b.updatedAt) - new Date(a.updatedAt)
                             )
                             .map((comp, index) => (
-                              <Tooltip label={comp.toComp.name} placement='top'>
+                              <Tooltip
+                                key={index}
+                                label={comp.toComp.name}
+                                placement='top'
+                              >
                                 <Tag
                                   size={'sm'}
-                                  key={index}
                                   variant='subtle'
                                   colorScheme={
                                     new Date(comp.updatedAt).getTime() ===
@@ -449,42 +453,46 @@ const RelationshipDrawer = ({
                 </Table>
 
                 {/* PATHS */}
-                <Stack
-                  width={'100%'}
-                  mt={10}
-                  dir='column'
-                  spacing={2}
-                  alignItems={'center'}
-                  justifyContent={'center'}
-                >
-                  {path.length > 0 ? (
-                    path.map((item, index) => (
-                      <>
-                        <Tag
-                          key={item.id}
-                          fontSize={'sm'}
-                          colorScheme={
-                            index !== path.length - 1 ? 'blue' : 'green'
-                          }
-                        >
-                          {item.name} - {item.version}
-                        </Tag>
+                {compPath.length > 0 && (
+                  <Stack
+                    width={'100%'}
+                    mt={10}
+                    dir='column'
+                    spacing={2}
+                    alignItems={'center'}
+                    justifyContent={'center'}
+                  >
+                    {compPath[0].depth === 0 && compPath[0].path.length > 0 ? (
+                      compPath[0].path.map((item, index) => (
+                        <>
+                          <Tag
+                            key={item.id}
+                            size='sm'
+                            colorScheme={
+                              index !== compPath[0].path.length - 1
+                                ? 'blue'
+                                : 'green'
+                            }
+                          >
+                            {item.name} - {item.version}
+                          </Tag>
 
-                        {index !== path.length - 1 && (
-                          <ArrowDownIcon
-                            width={4}
-                            height={4}
-                            color={'blue.500'}
-                          />
-                        )}
-                      </>
-                    ))
-                  ) : (
-                    <Text fontSize={'sm'}>
-                      Component is not connected to Primary component
-                    </Text>
-                  )}
-                </Stack>
+                          {index !== compPath[0].path.length - 1 && (
+                            <ArrowDownIcon
+                              width={4}
+                              height={4}
+                              color={'blue.500'}
+                            />
+                          )}
+                        </>
+                      ))
+                    ) : (
+                      <Text fontSize={'sm'}>
+                        Component is not connected to Primary component
+                      </Text>
+                    )}
+                  </Stack>
+                )}
               </Flex>
             </CardBody>
           </Card>
