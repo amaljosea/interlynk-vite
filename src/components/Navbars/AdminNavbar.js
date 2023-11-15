@@ -8,7 +8,7 @@ import {
   useColorModeValue
 } from '@chakra-ui/react'
 import PropTypes from 'prop-types'
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import AdminNavbarLinks from './AdminNavbarLinks'
 import { Link, useLocation } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
@@ -21,7 +21,7 @@ export default function AdminNavbar(props) {
   const queryParams = new URLSearchParams(location.search)
   const versionId = queryParams.get('v')
   const product = queryParams.get('p')
-  const sbomId = queryParams.get('sbom')
+  const parts = queryParams.get('parts')
 
   const imageName = localStorage.getItem('Image')
   const productName = localStorage.getItem(`product`)
@@ -92,6 +92,14 @@ export default function AdminNavbar(props) {
       }
     }
   }
+
+  useEffect(() => {
+    if (!parts) {
+      window.localStorage.removeItem('subProduct')
+    }
+  }, [parts])
+
+  console.log(parts)
 
   return (
     <Flex
@@ -189,7 +197,7 @@ export default function AdminNavbar(props) {
               </BreadcrumbItem>
             )}
 
-            {subProduct && (
+            {subProduct && parts && (
               <BreadcrumbItem color={mainText}>
                 <BreadcrumbLink color={mainText}>{subProduct}</BreadcrumbLink>
               </BreadcrumbItem>

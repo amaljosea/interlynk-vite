@@ -26,7 +26,8 @@ import {
   useDisclosure,
   FormControl,
   FormLabel,
-  Select
+  Select,
+  Tag
 } from '@chakra-ui/react'
 import GlobalContext from 'context/GlobalContext'
 import { GetProject } from 'graphQL/Queries'
@@ -139,7 +140,9 @@ const PartsTable = () => {
         return (
           <>
             {sboms.length > 0 ? (
-              <Link to={`/vendor/products?&p=${id}&sbom=${sboms[0].id}`}>
+              <Link
+                to={`/vendor/products?&p=${id}&sbom=${sboms[0].id}&parts=true`}
+              >
                 <Text
                   color={'blue.500'}
                   minWidth='100%'
@@ -191,7 +194,11 @@ const PartsTable = () => {
           return statuses[Math.ceil(randomIndex)]
         }
 
-        return <Text>{getRandomStatus()}</Text>
+        return (
+          <Tag size='sm' colorScheme='blue'>
+            {getRandomStatus()}
+          </Tag>
+        )
       }
     },
     {
