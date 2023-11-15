@@ -17,7 +17,9 @@ const ChangeLog = () => {
 
   const { data, refetch } = useQuery(GetProject, {
     variables: {
-      id: id
+      id: id,
+      field: 'ACTIVITY_LOGS_CREATED_AT',
+      direction: 'DESC'
     }
   })
 
@@ -31,7 +33,10 @@ const ChangeLog = () => {
     <Flex direction='column' pt={{ base: '120px', md: '74px' }} px={4}>
       <Card>
         {data ? (
-          <ChangelogTable data={data.project.activityLogs} refetch={refetch} />
+          <ChangelogTable
+            data={data.project.activityLogs}
+            refetch={refetch}
+          />
         ) : (
           <Flex width={'100%'} gap={4} direction={'column'}>
             <Skeleton width={'100%'} height='20px' />

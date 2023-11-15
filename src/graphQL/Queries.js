@@ -634,9 +634,11 @@ export const GetComponentPath = gql`
     component(id: $compId, sbomId: $sbomId) {
       id
       pathToPrimary {
-        id
-        name
-        version
+        depth
+        path {
+          id
+          name
+        }
       }
     }
   }
@@ -945,20 +947,54 @@ export const GetLogsFilterData = gql`
 `
 
 export const GetProject = gql`
-  query getProject($id: ID!) {
+  query getProject(
+    $id: Uuid!
+    $search: String
+    $changedBy: [String!]
+    $changeType: [String!]
+    $changeObject: [String!]
+    $field: ActivityLogOrderByFields!
+    $direction: OrderByDirection!
+    $sbomId: Uuid
+    $after: String
+    $before: String
+    $first: Int
+    $last: Int
+  ) {
     project(id: $id) {
       id
       name
       description
       updatedAt
-      activityLogs {
-        event
-        action
-        orig
-        updated
-        createdAt
-        updatedAt
-        changedBy
+      activityLogs(
+        projectId: $id
+        sbomId: $sbomId
+        search: $search
+        changedBy: $changedBy
+        changeType: $changeType
+        changeObject: $changeObject
+        orderBy: { field: $field, direction: $direction }
+        after: $after
+        before: $before
+        first: $first
+        last: $last
+      ) {
+        totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          startCursor
+          hasPreviousPage
+        }
+        nodes {
+          event
+          action
+          orig
+          updated
+          createdAt
+          updatedAt
+          changedBy
+        }
       }
       sboms {
         id

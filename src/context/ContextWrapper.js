@@ -47,6 +47,8 @@ const ContextWrapper = (props) => {
   const [logFilters, setLogFilters] = useState({})
 
   // SORT ORDER AND DIRECTIONS
+  const [prodLogField, setProdLogField] = useState('ACTIVITY_LOGS_CREATED_AT')
+  const [prodLogDirection, setProdLogDirection] = useState('DESC')
   const [compField, setCompField] = useState('COMPONENTS_UPDATED_AT')
   const [compDirection, setCompDirection] = useState('DESC')
   const [signedCompField, setSignedCompField] = useState(
@@ -229,7 +231,11 @@ const ContextWrapper = (props) => {
         comPageIndex,
         setComPageIndex,
         currentProduct,
-        setCurrentProduct
+        setCurrentProduct,
+        prodLogField,
+        setProdLogField,
+        prodLogDirection,
+        setProdLogDirection
       }}
     >
       {props.children}

@@ -17,7 +17,8 @@ import DataTable from 'react-data-table-component'
 import { useLocation } from 'react-router-dom'
 import { timeSince } from 'utils'
 import { getFullDateAndTime } from 'utils'
-import FilterChangelog from 'views/Sbom/components/FilterChangelog'
+import ChangelogFilterMenu from 'views/Sbom/components/ChangelogFilterMenu'
+import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 const customStyles = {
   headCells: {
@@ -55,153 +56,40 @@ const setColor = (type) => {
   }
 }
 
-const FilterComponent = ({ filterText, onFilter, onClear }) => {
-  const searchRef = useRef()
-
-  const focusSearchInput = () => {
-    if (searchRef?.current) {
-      searchRef?.current.focus()
-    }
-  }
-
-  const handleKeyPress = (e) => {
-    if (e.ctrlKey && e.key === '/') {
-      focusSearchInput()
-    }
-  }
-
-  useEffect(() => {
-    window.addEventListener('keydown', handleKeyPress)
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyPress)
-    }
-  }, [])
-
-  return (
-    <>
-      <Input
-        width={'400px'}
-        id='search'
-        type='text'
-        placeholder='Search'
-        aria-label='Search Input'
-        ref={searchRef}
-      />
-    </>
-  )
-}
-
-const ChangelogTable = ({ data, refetch, type, totalRows, setTotalRows }) => {
-  const { changelogData } = useContext(GlobalContext)
+const ChangelogTable = ({ data, refetch }) => {
+  const {
+    totalRows,
+    changelogData,
+    prodLogField,
+    setProdLogField,
+    prodLogDirection,
+    setProdLogDirection
+  } = useContext(GlobalContext)
 
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
 
-  const productId = queryParams.get('p')
-  const sbomId = queryParams.get('sbom')
+  const productId = queryParams.get('id')
 
   const [filterText, setFilterText] = useState('')
   const [pageIndex, setPageIndex] = useState(1)
-  const [resetPaginationToggle, setResetPaginationToggle] = useState(false)
+  const [userFilters, setUserFilters] = useState([])
+  const [typeFilters, setTypeFilters] = useState([])
 
-  const users = data.map((item) => item.changedBy)
-  const actions = data.map((item) => item.action)
-
-  const filterItems = data.filter(
-    (item) =>
-      (item.event &&
-        item.event.toLowerCase().includes(filterText.toLowerCase())) ||
-      (item.changedBy &&
-        item.changedBy.toLowerCase().includes(filterText.toLowerCase()))
-  )
-
-  const onPreviousPage = () => {
-    setPageIndex((prev) => pageIndex !== 0 && prev - 1)
-    refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      first: undefined,
-      last: totalRows,
-      before: data.pageInfo.startCursor,
-      after: ''
-    })
-  }
-
-  const onNextPage = () => {
-    setPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
-    refetch({
-      projectId: productId,
-      sbomId: sbomId,
-      first: totalRows,
-      last: undefined,
-      after: data.pageInfo.endCursor,
-      before: ''
-    })
-  }
-
-  const handleChangelogChange = (selectedFilters) => {
-    if (
-      selectedFilters.type.length === 0 &&
-      selectedFilters.user.length === 0
-    ) {
-      // IF NO FILTER SELECTED RETURN DEFAULT HEALTH CHECK DATA
-      setFilteredChangelog(changelogData)
-    } else {
-      // IF ANY FILTER IS SELECTED RETURN SELECTED DATA
-      const filtered = changelogData.filter(
-        (item) =>
-          (selectedFilters.type.length === 0 ||
-            selectedFilters.type.includes(item.type)) &&
-          (selectedFilters.user.length === 0 ||
-            selectedFilters.user.includes(item.changedBy))
-      )
-      setFilteredChangelog(filtered)
+  useEffect(() => {
+    if (userFilters.length === 0 || typeFilters.length === 0) {
+      const users = data.nodes.map((item) => item.changedBy)
+      const actions = data.nodes.map((item) => item.action)
+      setUserFilters(users)
+      setTypeFilters(actions)
     }
-  }
-
-  const subHeaderComponentMemo = useMemo(() => {
-    const handleClear = () => {
-      if (filterText) {
-        setResetPaginationToggle(!resetPaginationToggle)
-        setFilterText('')
-      }
-    }
-
-    return (
-      <Flex
-        width={'100%'}
-        alignItems={'center'}
-        justifyContent={'space-between'}
-        mb={4}
-      >
-        <Stack
-          width={'100%'}
-          direction={'row'}
-          spacing={4}
-          alignItems={'flex-start'}
-        >
-          <FilterComponent
-            onFilter={(e) => setFilterText(e.target.value)}
-            onClear={handleClear}
-            filterText={filterText}
-          />
-
-          <FilterChangelog
-            onFilterChange={handleChangelogChange}
-            users={users ? users : ['system']}
-            actions={actions ? actions : ['created', 'updated']}
-          />
-        </Stack>
-      </Flex>
-    )
-  }, [filterText, resetPaginationToggle, handleChangelogChange])
+  }, [])
 
   // COLUMNS
   const columns = [
     // CHANGE TYPE
     {
-      id: 'changeType',
+      id: 'ACTIVITY_LOGS_ACTION',
       name: 'TYPE',
       selector: (row) => {
         const { action } = row
@@ -217,7 +105,8 @@ const ChangelogTable = ({ data, refetch, type, totalRows, setTotalRows }) => {
           </Tooltip>
         )
       },
-      width: '150px'
+      width: '150px',
+      sortable: true
     },
     // PRIOR VALUE
     {
@@ -257,15 +146,16 @@ const ChangelogTable = ({ data, refetch, type, totalRows, setTotalRows }) => {
     },
     // CHANGED BY
     {
-      id: 'changedBy',
+      id: 'ACTIVITY_LOGS_CHANGED_BY',
       name: 'BY',
       selector: (row) => row.changedBy,
       width: '14%',
-      right: 'true'
+      right: 'true',
+      sortable: true
     },
     // CHANGED ON
     {
-      id: 'changedOn',
+      id: 'ACTIVITY_LOGS_CREATED_AT',
       name: 'CHANGED ON',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
@@ -283,23 +173,117 @@ const ChangelogTable = ({ data, refetch, type, totalRows, setTotalRows }) => {
     }
   ]
 
+  const onPreviousPage = () => {
+    setPageIndex((prev) => pageIndex !== 0 && prev - 1)
+    refetch({
+      projectId: productId,
+      first: undefined,
+      after: undefined,
+      last: totalRows,
+      before: data.pageInfo.startCursor
+    })
+  }
+
+  const onNextPage = () => {
+    setPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
+    refetch({
+      projectId: productId,
+      first: totalRows,
+      after: data.pageInfo.endCursor,
+      last: undefined,
+      before: undefined
+    })
+  }
+
+  // SEARCH COMPONENT
+  const handleSearch = async (event) => {
+    if (event.key === 'Enter' && filterText !== '') {
+      await refetch({
+        id: productId,
+        search: filterText,
+        first: totalRows
+      })
+      setPageIndex(1)
+    }
+  }
+
+  // CLEAR SERACH
+  const handleClear = async () => {
+    await refetch({
+      projectId: productId,
+      search: undefined,
+      first: totalRows
+    })
+    setFilterText('')
+    setPageIndex(1)
+  }
+
+  // SORTING
+  const handleSort = (column, sortDirection) => {
+    setProdLogField(column.id)
+    setProdLogDirection(sortDirection === 'asc' ? 'ASC' : 'DESC')
+    refetch({
+      projectId: productId,
+      first: totalRows,
+      last: undefined,
+      field: column.id,
+      direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+    })
+  }
+
+  const subHeaderComponentMemo = useMemo(() => {
+    return (
+      <Flex
+        width={'100%'}
+        alignItems={'center'}
+        justifyContent={'space-between'}
+        mb={4}
+      >
+        <Stack
+          width={'100%'}
+          direction={'row'}
+          spacing={4}
+          alignItems={'flex-start'}
+        >
+          <SearchFilter
+            id='prodChangelog'
+            filterText={filterText}
+            setFilterText={setFilterText}
+            onFilter={handleSearch}
+            onClear={handleClear}
+          />
+
+          <ChangelogFilterMenu
+            refetch={refetch}
+            users={userFilters}
+            actions={typeFilters}
+            setPageIndex={setPageIndex}
+            totalRows={totalRows}
+            id={productId}
+          />
+        </Stack>
+      </Flex>
+    )
+  }, [filterText, handleClear, handleSearch])
+
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
           columns={columns}
-          data={filterItems}
+          data={data && data.nodes}
           customStyles={customStyles}
+          defaultSortAsc={false}
+          defaultSortFieldId={prodLogField}
           subHeader
           subHeaderComponent={subHeaderComponentMemo}
-          defaultSortAsc={false}
-          defaultSortFieldId={'changedOn'}
+          onSort={handleSort}
           responsive={true}
         />
       </Flex>
 
       {/* PAGINATION */}
-      {/* <Flex
+      <Flex
         flexDir={'row'}
         gap={4}
         alignItems={'center'}
@@ -323,7 +307,7 @@ const ChangelogTable = ({ data, refetch, type, totalRows, setTotalRows }) => {
         <Box>
           Page {pageIndex} of {Math.ceil(data.totalCount / totalRows)}
         </Box>
-      </Flex> */}
+      </Flex>
     </>
   )
 }
