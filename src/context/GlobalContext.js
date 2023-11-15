@@ -132,7 +132,11 @@ const GlobalContext = React.createContext({
   comPageIndex: 1,
   setComPageIndex: () => {},
   currentProduct: null,
-  setCurrentProduct: () => {}
+  setCurrentProduct: () => {},
+  prodLogField: '',
+  setProdLogField: () => {},
+  prodLogDirection: '',
+  setProdLogDirection: () => {}
 })
 
 export default GlobalContext
