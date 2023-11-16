@@ -101,7 +101,7 @@ const RelationshipDrawer = ({
   const [getDependency, { data: compDependency }] =
     useLazyQuery(GetCompDependency)
 
-  const shortestPath = findShortestPath(compPath)[0]
+  const shortestPath = findShortestPath(compPath)[0];
 
   useEffect(() => {
     if (compDependency === undefined) {
