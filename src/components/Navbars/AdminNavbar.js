@@ -99,8 +99,6 @@ export default function AdminNavbar(props) {
     }
   }, [parts])
 
-  console.log(parts)
-
   return (
     <Flex
       position={navbarPosition}
