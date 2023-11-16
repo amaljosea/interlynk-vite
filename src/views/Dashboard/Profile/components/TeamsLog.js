@@ -74,7 +74,11 @@ const TeamsLog = ({ data, refetch }) => {
             <Tooltip label='Add Member' placement='top'>
               <IconButton
                 ref={teamRef}
-                onClick={onOpen}
+                onClick={() => {
+                  setUser('')
+                  setEmail('')
+                  onOpen()
+                }}
                 icon={<AddIcon />}
                 colorScheme='blue'
                 variant='solid'
