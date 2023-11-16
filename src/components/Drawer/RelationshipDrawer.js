@@ -150,7 +150,6 @@ const RelationshipDrawer = ({
     ...dependsOnList.map((item) => new Date(item.updatedAt).getTime())
   )
 
-  const shortestPath = findShortestPath(compPath)[0]
   const handleAdd = async () => {
     await addRelation({
       variables: {
