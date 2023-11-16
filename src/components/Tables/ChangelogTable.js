@@ -113,6 +113,7 @@ const ChangelogTable = ({ data, refetch }) => {
     {
       id: 'priorValue',
       name: 'PREVIOUS VALUE',
+      wrap: true,
       selector: (row) => {
         const { orig } = row
         return (
@@ -130,6 +131,7 @@ const ChangelogTable = ({ data, refetch }) => {
     {
       id: 'updatedValue',
       name: 'UPDATED VALUE',
+      wrap: true,
       selector: (row) => {
         const { updated } = row
         return (
@@ -149,9 +151,13 @@ const ChangelogTable = ({ data, refetch }) => {
     {
       id: 'ACTIVITY_LOGS_CHANGED_BY',
       name: 'BY',
-      selector: (row) => row.changedBy,
-      width: '14%',
+      selector: (row) => (
+        <Tooltip placement='top' label={row.changedBy}>
+          {row.changedBy}
+        </Tooltip>
+      ),
       right: 'true',
+      wrap: true,
       sortable: true
     },
     // CHANGED ON
