@@ -53,6 +53,7 @@ import { useLocation } from 'react-router-dom'
 const findShortestPath = (pathArray, currentShortestPath = []) => {
   if (!pathArray || pathArray.length === 0) {
     return currentShortestPath
+  }
 
   const shortestPath = pathArray.reduce((minPath, currentPath) => {
     if (currentPath.depth < minPath.depth) {
@@ -91,6 +92,7 @@ const RelationshipDrawer = ({
   const [relation, setRelation] = useState('')
   const [component, setComponent] = useState('')
   const [activeComp, setActiveComp] = useState(null)
+  const [isAdded, setIsAdded] = useState(false)
 
   const [getAllComps, { data: allComponents }] = useLazyQuery(GetAllComponents)
 
@@ -148,8 +150,7 @@ const RelationshipDrawer = ({
     ...dependsOnList.map((item) => new Date(item.updatedAt).getTime())
   )
 
-  const [isEdited, setIsEdited] = useState(false)
-
+  const shortestPath = findShortestPath(compPath)[0]
   const handleAdd = async () => {
     await addRelation({
       variables: {
@@ -160,7 +161,7 @@ const RelationshipDrawer = ({
     })
       .then((res) => {
         if (res.data) {
-          setIsEdited(true)
+          setIsAdded(true)
           setDependsOnList((prev) => [
             ...prev,
             res.data.componentRelationCreate.compRelation
@@ -382,7 +383,7 @@ const RelationshipDrawer = ({
                                   size={'sm'}
                                   variant='subtle'
                                   colorScheme={
-                                    index === 0 && isEdited ? 'green' : 'blue'
+                                    index == 0 && isAdded ? 'green' : 'blue'
                                   }
                                   width={'fit-content'}
                                 >
