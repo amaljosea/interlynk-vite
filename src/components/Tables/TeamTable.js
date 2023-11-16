@@ -105,6 +105,12 @@ const TeamTable = ({ data, refetch }) => {
             {getFullDateAndTime(createdAt)}
           </Text>
         )
+      },
+      sortable: true,
+      sortFunction: (a, b) => {
+        const dateA = new Date(a.createdAt)
+        const dateB = new Date(b.createdAt)
+        return dateB - dateA // Sort in descending order
       }
     },
     // ACTION
@@ -162,6 +168,8 @@ const TeamTable = ({ data, refetch }) => {
           <DataTable
             columns={columns}
             data={data.users}
+            defaultSortAsc={true}
+            defaultSortFieldId={'joinedDate'}
             customStyles={customStyles}
             progressPending={data ? false : true}
             responsive={true}
