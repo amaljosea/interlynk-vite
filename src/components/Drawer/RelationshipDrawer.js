@@ -53,7 +53,6 @@ import { useLocation } from 'react-router-dom'
 const findShortestPath = (pathArray, currentShortestPath = []) => {
   if (!pathArray || pathArray.length === 0) {
     return currentShortestPath
-  }
 
   const shortestPath = pathArray.reduce((minPath, currentPath) => {
     if (currentPath.depth < minPath.depth) {
@@ -213,7 +212,7 @@ const RelationshipDrawer = ({
 
   return (
     <Drawer
-      size='lg'
+      size='xl'
       isOpen={isOpen}
       placement='right'
       onClose={onClose}
