@@ -60,20 +60,7 @@ const ProdStatusDrawer = ({
   const { data: allVexJustify } = useQuery(getVexJustifications)
 
   const [compVexCreate] = useMutation(updateCompVulnVex, {
-    onCompleted: () => {
-      refetch({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          first: after !== '' ? totalRows : undefined,
-          after: after !== '' ? after : undefined,
-          last: before !== '' ? totalRows : undefined,
-          before: before !== '' ? before : undefined,
-          field: vulnField,
-          direction: vulnDirection
-        }
-      })
-    }
+    fetchPolicy: 'network-only'
   })
 
   const handleStatusChange = (e) => {
@@ -110,13 +97,26 @@ const ProdStatusDrawer = ({
           vexStatusId: statusTitle,
           vexJustificationId:
             statusName === 'Not Affected' ? justification : undefined,
-          impact: impactData
-        }
-      }).then((res) => {
-        if (res.data) {
-          onFilterRefetch()
+          impact: impactData == '' ? undefined : impactData
         }
       })
+        .then(
+          (res) =>
+            res.data &&
+            refetch({
+              variables: {
+                projectId: productId,
+                sbomId: sbomId,
+                first: after !== '' ? totalRows : undefined,
+                after: after !== '' ? after : undefined,
+                last: before !== '' ? totalRows : undefined,
+                before: before !== '' ? before : undefined,
+                field: vulnField,
+                direction: vulnDirection
+              }
+            })
+        )
+        .finally(() => onFilterRefetch())
     } catch (error) {
       console.log('Mutation error', error)
     }

@@ -513,12 +513,7 @@ export const getFullDate = (dateString) => {
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
 }
 
-export const findSimilarItems = (
-  currentData,
-  selectedData,
-  importFrom,
-  statusHistory
-) => {
+export const findSimilarItems = (currentData, selectedData) => {
   const mergedData = currentData.map((currentItem) => {
     const matchingSelected = selectedData.find(
       (selectedItem) =>
@@ -538,9 +533,7 @@ export const findSimilarItems = (
                 matchingSelected.componentVulnLogs.length - 1
               ].note
             : '',
-        importStatement: matchingSelected.impact,
-        importFrom,
-        statusHistory: statusHistory === 'yes' ? true : false
+        importStatement: matchingSelected.impact
       }
     }
   })

@@ -21,7 +21,7 @@ let productId
 let sbomId
 
 // FORM ONE
-const Form1 = ({
+export const Form1 = ({
   selectedProd,
   setSelectedProd,
   selectedVersion,

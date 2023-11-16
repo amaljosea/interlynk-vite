@@ -1,8 +1,6 @@
 // Chakra imports
 import {
   ChevronDownIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
   ChevronUpIcon,
   ExternalLinkIcon
 } from '@chakra-ui/icons'
@@ -21,24 +19,19 @@ import {
   GridItem,
   Tooltip,
   Stack,
-  Select,
   Drawer,
   DrawerBody,
-  DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
   DrawerContent,
   DrawerCloseButton,
-  useToast,
   IconButton,
-  ButtonGroup,
   Badge
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
 import { FaCopy } from 'react-icons/fa6'
-import { useState, useMemo, useEffect, useContext } from 'react'
+import { useState, useMemo, useContext } from 'react'
 import styled from '@emotion/styled'
-import Multistep from 'views/Sbom/components/Multistep'
 import { getFullDateAndTime } from 'utils'
 import ProdStatusDrawer from 'components/Drawer/ProdStatusDrawer'
 import VulnFilterMenu from 'views/Sbom/components/VulnFilterMenu'
@@ -49,10 +42,7 @@ import { timeSince } from 'utils'
 import CustomLoader from 'components/CustomLoader'
 import Cookies from 'js-cookie'
 import RowLimit from 'views/Sbom/components/RowLimit'
-import { useLazyQuery, useMutation } from '@apollo/client'
-import { updateCompVulnVex } from 'graphQL/Mutation'
-import { findSimilarItems } from 'utils'
-import { GetVulnData } from 'graphQL/Queries'
+import ImportWizard from 'views/Sbom/components/ImportWizard'
 
 const customStyles = {
   headCells: {
@@ -99,7 +89,6 @@ const VulnTable = ({
   setTotalRows,
   filterRefetch
 }) => {
-  const toast = useToast()
   const customerView = location.pathname.startsWith('/customer')
   const signedParams = Cookies.get(`signedParamId`)
 
@@ -127,13 +116,7 @@ const VulnTable = ({
     signedVulnStatus,
     signedVulnKev,
     signedVulnEpss,
-    mergeData,
-    setMergeData,
-    totalVulns,
-    currentSbom,
-    setCurrentSbom,
-    importSbom,
-    setImportSbom
+    setSelectedVulns
   } = useContext(GlobalContext)
 
   const textColor = useColorModeValue('gray.700', 'white')
@@ -141,17 +124,8 @@ const VulnTable = ({
   const x = window.matchMedia('(min-width: 2500px)')
   const y = window.matchMedia('(max-width: 1440px)')
 
-  // STEPS
-  const [step, setStep] = useState(1)
-  const [progress, setProgress] = useState(25)
-  const [stepTitle, setStepTitle] = useState('')
-  const [filterText, setFilterText] = useState('')
   const [vulnAfter, setVulnAfter] = useState('')
   const [vulnBefore, setVulnBefore] = useState('')
-
-  const [stepOne, setStepOne] = useState(false)
-  const [stepTwo, setStepTwo] = useState(false)
-  const [stepThree, setStepThree] = useState(false)
 
   const {
     isOpen: isTableOpen,
@@ -419,7 +393,7 @@ const VulnTable = ({
       sortFunction: (a, b) => {
         const dateA = new Date(a.vuln.updatedAt)
         const dateB = new Date(b.vuln.updatedAt)
-        return dateB - dateA // Sort in descending order
+        return dateA - dateB // Sort in descending order
       },
       right: 'true'
     }
@@ -515,7 +489,10 @@ const VulnTable = ({
               colorScheme='blue'
               fontWeight='normal'
               fontSize={'sm'}
-              onClick={onTableOpen}
+              onClick={() => {
+                setSelectedVulns([])
+                onTableOpen()
+              }}
               icon={<FaCopy size={18} />}
             />
           </Tooltip>
@@ -628,89 +605,6 @@ const VulnTable = ({
         </Grid>
       </Box>
     )
-  }
-
-  const handleUpdate = async () => {
-    try {
-      await refetch({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          first: totalRows,
-          field: customerView ? signedVulnField : vulnField,
-          direction: customerView ? signedVulnDirection : vulnDirection,
-          signedParams: customerView ? signedParams : undefined
-        }
-      }).then((res) => {
-        setStep(1)
-        setProgress(25)
-        onTableClose()
-      })
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  const [compVexCreate] = useMutation(updateCompVulnVex)
-
-  const [getVulns] = useLazyQuery(GetVulnData)
-
-  const refetchCurrentVuln = async (item) => {
-    try {
-      await getVulns({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          first: totalVulns,
-          field: vulnField,
-          direction: vulnDirection
-        }
-      }).then((res) => {
-        if (res.data) {
-          const data = findSimilarItems(
-            res.data.sbom.vulns.nodes,
-            importSbom,
-            'Keep existing',
-            'yes'
-          )
-          const filterData = data.filter((item) => item.importStatus !== null)
-          setMergeData(filterData)
-        }
-      })
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  const handleSubmit = () => {
-    const updatedList = mergeData.filter(
-      (item) => item.importFrom === 'Replace from import'
-    )
-    console.log(updatedList)
-    if (updatedList.length > 0) {
-      updatedList.map((item) => {
-        try {
-          compVexCreate({
-            variables: {
-              compVulnId: item.id,
-              notes: item.importNotes,
-              sbomId: sbomId,
-              vexStatusId: item.importStatus.id,
-              vexJustificationId: item.importJustification
-                ? item.importJustification.id
-                : undefined,
-              impact: item.importStatement ? item.importStatement : undefined
-            }
-          }).then(() => refetchCurrentVuln(item))
-        } catch (error) {
-          console.log('Mutation error', error)
-        }
-      })
-    } else {
-      setStep(1)
-      setProgress(25)
-      onTableClose()
-    }
   }
 
   const handleRefetch = async (
@@ -887,21 +781,9 @@ const VulnTable = ({
         vulnDirection
       )
     }
-    setFilterText('')
+    setVulnSearchInput('')
     setPageIndex(1)
   }
-
-  useEffect(() => {
-    if (step === 1) {
-      setStepTitle('Select source of data')
-    } else if (step === 2) {
-      setStepTitle('Select fields to be imported')
-    } else if (step === 3) {
-      setStepTitle('Choose import defaults')
-    } else if (step === 4) {
-      setStepTitle('Review vulnerability import')
-    }
-  }, [step])
 
   return (
     <>
@@ -914,7 +796,7 @@ const VulnTable = ({
           onSort={handleSort}
           defaultSortAsc={false}
           defaultSortFieldId={customerView ? signedVulnField : vulnField}
-          progressPending={data ? false : true}
+          progressPending={data && data.nodes ? false : true}
           progressComponent={<CustomLoader />}
           subHeader
           subHeaderComponent={subHeaderComponentMemo}
@@ -971,99 +853,22 @@ const VulnTable = ({
         >
           <DrawerOverlay />
           <DrawerContent>
-            <DrawerCloseButton
-              onClick={() => {
-                setStep(1)
-                setProgress(25)
-                onTableClose()
-              }}
-            />
+            <DrawerCloseButton />
             <DrawerHeader>
-              <Text fontSize={20} fontWeight={'medium'} visibility={'hidden'}>
-                {stepTitle}
+              <Text fontSize={20} fontWeight={'medium'}>
+                Import Vulnerability Status
               </Text>
             </DrawerHeader>
 
             <DrawerBody mt={2}>
               {/* IMPORT WIZARD */}
-              <Multistep
-                step={step}
-                progress={progress}
-                getVulns={getVulns}
+              <ImportWizard
+                variant='circle'
                 currentSbomId={sbomId}
                 currentProductId={productId}
-                setStepOne={setStepOne}
-                setStepTwo={setStepTwo}
-                setStepThree={setStepThree}
+                onClose={onTableClose}
               />
             </DrawerBody>
-
-            <DrawerFooter>
-              <Stack
-                width={'100%'}
-                justifyContent={'space-between'}
-                direction={'row'}
-                spacing={4}
-              >
-                <ButtonGroup>
-                  {step > 1 && (
-                    <Button
-                      leftIcon={<ChevronLeftIcon w={6} h={6} />}
-                      onClick={() => {
-                        setStep(step - 1)
-                        setProgress(progress - 25)
-                      }}
-                      isDisabled={step === 1}
-                      colorScheme='blue'
-                      variant='solid'
-                    >
-                      Back
-                    </Button>
-                  )}
-
-                  <Button
-                    onClick={() => {
-                      setStep(1)
-                      setProgress(25)
-                      onTableClose()
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                </ButtonGroup>
-                {step === 4 ? (
-                  <Button
-                    colorScheme='green'
-                    variant='solid'
-                    onClick={handleSubmit}
-                  >
-                    Submit
-                  </Button>
-                ) : (
-                  <Button
-                    isDisabled={
-                      step === 4 ||
-                      stepOne === false ||
-                      stepTwo === false ||
-                      stepThree === false
-                    }
-                    rightIcon={<ChevronRightIcon w={6} h={6} />}
-                    onClick={() => {
-                      setStep(step + 1)
-                      if (step === 4) {
-                        setProgress(100)
-                      } else {
-                        setProgress(progress + 25)
-                      }
-                    }}
-                    colorScheme='blue'
-                    variant='solid'
-                  >
-                    Next
-                  </Button>
-                )}
-              </Stack>
-            </DrawerFooter>
           </DrawerContent>
         </Drawer>
       )}
