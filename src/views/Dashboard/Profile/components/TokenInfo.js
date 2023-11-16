@@ -279,6 +279,8 @@ const TokenInfo = ({ data, refetch }) => {
       id: 'actions',
       name: 'ACTIONS',
       selector: (row) => {
+        const { revoked } = row
+
         return (
           <Menu>
             <MenuButton
@@ -295,6 +297,7 @@ const TokenInfo = ({ data, refetch }) => {
                   </MenuItem>
                 )}
                 <MenuItem
+                  isDisabled={revoked}
                   onClick={() => {
                     setToken('')
                     setActiveRow(row)
