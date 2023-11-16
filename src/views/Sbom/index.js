@@ -71,7 +71,9 @@ function SBOM() {
   const toast = useToast()
 
   const productName = localStorage.getItem(`product`)
+  const productVersion = localStorage.getItem(`productVersion`)
   const subProduct = localStorage.getItem('subProduct')
+  const subProductVersion = localStorage.getItem('subProductVersion')
 
   const {
     setVulnSeverity,
@@ -359,19 +361,20 @@ function SBOM() {
                         <Flex direction={'column'} gap={0.5}>
                           {/* PRODUCT TITLE */}
                           <Stack
-                            direction={'row'}
+                            direction={'column'}
                             spacing={2}
-                            alignItems={'center'}
-                          >
+                            alignItems={'left'}
+                          >{subProduct && (
+                            <Text fontWeight={'semibold'} fontSize={18}>
+                              {productName} : {productVersion}
+                              <br />
+                            </Text>
+                          )}
                             <Text fontWeight={'semibold'} fontSize={25}>
-                              {sbomData.sbom.project.name} :{' '}
+                              {subProduct? '|-' : ''} {sbomData.sbom.project.name} :{' '}
                               {sbomData.sbom.primaryComponent?.version}
                             </Text>
-                            {subProduct && (
-                              <Text fontWeight={'semibold'} fontSize={25}>
-                                / {productName}
-                              </Text>
-                            )}
+
                           </Stack>
 
                           <Text fontSize={'sm'} my={0.5}>
