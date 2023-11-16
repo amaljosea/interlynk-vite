@@ -52,18 +52,20 @@ import { useLocation } from 'react-router-dom'
 
 const findShortestPath = (pathArray, currentShortestPath = []) => {
   if (!pathArray || pathArray.length === 0) {
-    return currentShortestPath;
-  }
+    return currentShortestPath
 
   const shortestPath = pathArray.reduce((minPath, currentPath) => {
     if (currentPath.depth < minPath.depth) {
-      return currentPath;
+      return currentPath
     }
-    return minPath;
-  }, pathArray[0]);
+    return minPath
+  }, pathArray[0])
 
-  return findShortestPath(shortestPath.path, [...currentShortestPath, shortestPath]);
-};
+  return findShortestPath(shortestPath.path, [
+    ...currentShortestPath,
+    shortestPath
+  ])
+}
 
 const RelationshipDrawer = ({
   isOpen,
@@ -97,7 +99,7 @@ const RelationshipDrawer = ({
   const [getDependency, { data: compDependency }] =
     useLazyQuery(GetCompDependency)
 
-  const shortestPath = findShortestPath(compPath)[0];
+  const shortestPath = findShortestPath(compPath)[0]
 
   useEffect(() => {
     if (compDependency === undefined) {
@@ -146,7 +148,7 @@ const RelationshipDrawer = ({
     ...dependsOnList.map((item) => new Date(item.updatedAt).getTime())
   )
 
-  // console.log('Most Recent', recentComp)
+  const [isEdited, setIsEdited] = useState(false)
 
   const handleAdd = async () => {
     await addRelation({
@@ -158,7 +160,7 @@ const RelationshipDrawer = ({
     })
       .then((res) => {
         if (res.data) {
-          console.log(res.data)
+          setIsEdited(true)
           setDependsOnList((prev) => [
             ...prev,
             res.data.componentRelationCreate.compRelation
@@ -380,10 +382,7 @@ const RelationshipDrawer = ({
                                   size={'sm'}
                                   variant='subtle'
                                   colorScheme={
-                                    new Date(comp.updatedAt).getTime() ===
-                                    recentComp
-                                      ? 'green'
-                                      : 'blue'
+                                    index === 0 && isEdited ? 'green' : 'blue'
                                   }
                                   width={'fit-content'}
                                 >
@@ -470,7 +469,9 @@ const RelationshipDrawer = ({
                 </Table>
 
                 {/* PATHS */}
-                <Text fontSize={'lg'} fontWeight={'medium'} mt={6}>Pedigree</Text>
+                <Text fontSize={'lg'} fontWeight={'medium'} mt={6}>
+                  Pedigree
+                </Text>
                 {compPath.length > 0 && (
                   <Stack
                     width={'100%'}
@@ -480,13 +481,18 @@ const RelationshipDrawer = ({
                     alignItems={'center'}
                     justifyContent={'center'}
                   >
-                    { shortestPath.path.length > 0 ? (
+                    {shortestPath.path.length > 0 ? (
                       shortestPath.path.map((item, index) => (
                         <>
                           <Tag
                             key={item.id}
                             size='sm'
-                            colorScheme={ (index === 0 || index === shortestPath.path.length - 1) ? 'blue' : 'green' }
+                            colorScheme={
+                              index === 0 ||
+                              index === shortestPath.path.length - 1
+                                ? 'blue'
+                                : 'green'
+                            }
                           >
                             {item.name} - {item.version}
                           </Tag>
