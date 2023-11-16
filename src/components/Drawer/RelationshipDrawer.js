@@ -53,7 +53,6 @@ import { useLocation } from 'react-router-dom'
 const findShortestPath = (pathArray, currentShortestPath = []) => {
   if (!pathArray || pathArray.length === 0) {
     return currentShortestPath
-  }
 
   const shortestPath = pathArray.reduce((minPath, currentPath) => {
     if (currentPath.depth < minPath.depth) {
