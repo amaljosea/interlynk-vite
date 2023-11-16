@@ -101,7 +101,7 @@ const RelationshipDrawer = ({
   const [getDependency, { data: compDependency }] =
     useLazyQuery(GetCompDependency)
 
-  const shortestPath = findShortestPath(compPath)[0];
+  const shortestPath = findShortestPath(compPath)[0]
 
   useEffect(() => {
     if (compDependency === undefined) {
@@ -151,7 +151,6 @@ const RelationshipDrawer = ({
   )
 
   const shortestPath = findShortestPath(compPath)[0]
-
   const handleAdd = async () => {
     await addRelation({
       variables: {
@@ -214,7 +213,7 @@ const RelationshipDrawer = ({
 
   return (
     <Drawer
-      size='lg'
+      size='xl'
       isOpen={isOpen}
       placement='right'
       onClose={onClose}
