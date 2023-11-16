@@ -84,7 +84,6 @@ const SBOMTable = ({
     vulnStatus,
     vulnKev,
     vulnEpss,
-    comPageIndex,
     setComPageIndex
   } = useContext(GlobalContext)
 
@@ -162,12 +161,12 @@ const SBOMTable = ({
           projectId: productId,
           sbomId: sbomId,
           search: compSearchInput !== '' ? compSearchInput : undefined,
-          ecosystem: compEcosystem.includes('all') ? undefined : compEcosystem,
-          kind: compType.includes('all') ? undefined : compType,
-          licenses: compLicense.includes('all') ? undefined : compLicense,
-          supplierName: compSupplier.includes('all') ? undefined : compSupplier,
-          primary: compScope === 'primary' ? compScope : undefined,
-          internal: compScope === 'internal' ? compScope : undefined,
+          ecosystem: compEcosystem.includes('all') || compEcosystem.length === 0 ? undefined : compEcosystem,
+          kind: compType.includes('all') || compType.length === 0 ? undefined : compType,
+          licenses: compLicense.includes('all') || compLicense.length === 0 ? undefined : compLicense,
+          supplierName: compSupplier.includes('all') || compSupplier.length === 0 ? undefined : compSupplier,
+          primary: compScope === 'primary' ? true : undefined,
+          internal: compScope === 'internal' ? true : undefined,
           first: totalRows,
           field: compField,
           direction: compDirection

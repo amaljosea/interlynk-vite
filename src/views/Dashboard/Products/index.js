@@ -28,7 +28,16 @@ import { useLocation } from 'react-router-dom'
 import SBOM from 'views/Sbom'
 
 function Index() {
-  const { productVersionsData, setTotalProducts } = useContext(GlobalContext)
+  const {
+    productVersionsData,
+    setTotalProducts,
+    setCompSearchInput,
+    setCompEcosystem,
+    setCompType,
+    setCompLicense,
+    setCompSupplier,
+    setCompScope
+  } = useContext(GlobalContext)
 
   const captions = [
     'active',
@@ -128,6 +137,17 @@ function Index() {
       setGroupVersionData([])
     }
   }, [showVersion])
+
+  useEffect(() => {
+    if (product === null) {
+      setCompSearchInput('')
+      setCompEcosystem([])
+      setCompType([])
+      setCompLicense([])
+      setCompSupplier([])
+      setCompScope('')
+    }
+  }, [product])
 
   if (product === null) {
     return (
