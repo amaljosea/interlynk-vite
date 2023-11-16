@@ -604,6 +604,13 @@ const VulnTable = ({
                 </Link>
               </Box>
             ) : null}
+            {/* EPSS Percentile */}
+            <Box>
+              <CustomText>EPSS Percentile :</CustomText>
+              <Text mt={1} fontSize={14}>
+                {(vuln.vulnInfo.epssPercentile * 100).toFixed()}%
+              </Text>
+            </Box>
           </GridItem>
           {/* STATUS UPDATE */}
           <GridItem w='100%' colSpan={3}>

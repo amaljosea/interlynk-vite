@@ -762,6 +762,7 @@ export const GetVulnData = gql`
               cveId
               epssScore
               epssScores
+              epssPercentile
               kev
             }
           }
