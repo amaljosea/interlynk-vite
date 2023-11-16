@@ -90,7 +90,16 @@ const ApiFeed = () => {
           </Thead>
           {data ? (
             <Tbody>
-              {data.organization.organizationRules.map((item, index) => (
+              {data.organization.organizationRules
+                .sort((a, b) => {
+                  const extractNumber = (str) => str.match(/\d+/) || [-1]; // Extracts the number from the string
+
+                  const numberA = parseInt(extractNumber(a.rule.friendlyId)[0], 10);
+                  const numberB = parseInt(extractNumber(b.rule.friendlyId)[0], 10);
+
+                  return numberA - numberB;
+                })
+                .map((item, index) => (
                 <Tr key={index}>
                   <Td pl={0}>
                     <Switch
