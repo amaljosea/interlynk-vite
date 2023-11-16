@@ -638,20 +638,26 @@ const ComponentTable = ({
             <Flex mt={2} alignItems={'flex-start'} gap={2} flexWrap={'wrap'}>
               {compDependency &&
                 compDependency.component.dependsOn.length > 0 &&
-                compDependency.component.dependsOn.map((comp, index) => (
-                  <Tooltip key={index} label={comp.toComp.name} placement='top'>
-                    <Tag
-                      size={'sm'}
-                      variant='subtle'
-                      colorScheme={'blue'}
-                      width={'fit-content'}
+                [...compDependency.component.dependsOn]
+                  .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+                  .map((comp, index) => (
+                    <Tooltip
+                      key={index}
+                      label={comp.toComp.name}
+                      placement='top'
                     >
-                      <TagLabel>
-                        {comp.toComp.name}-{comp.toComp.version}
-                      </TagLabel>
-                    </Tag>
-                  </Tooltip>
-                ))}
+                      <Tag
+                        size={'sm'}
+                        variant='subtle'
+                        colorScheme={'blue'}
+                        width={'fit-content'}
+                      >
+                        <TagLabel>
+                          {comp.toComp.name}-{comp.toComp.version}
+                        </TagLabel>
+                      </Tag>
+                    </Tooltip>
+                  ))}
             </Flex>
           </GridItem>
           <GridItem w='100%'>
