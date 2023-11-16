@@ -77,22 +77,14 @@ const PersonalInfo = ({ user, refetch }) => {
           gap={6}
         >
           {/* NAME */}
-          <FormControl isInvalid={!name}>
+          <FormControl>
             <FormLabel>Name</FormLabel>
             <Input value={name} onChange={(e) => setName(e.target.value)} />
-            <FormErrorMessage>Name is required</FormErrorMessage>
           </FormControl>
           {/* EMAIL */}
-          <FormControl isInvalid={!validateEmail(email)}>
+          <FormControl>
             <FormLabel>Email</FormLabel>
             <Input value={email} onChange={(e) => setEmail(e.target.value)} />
-            {email === '' ? (
-              <FormErrorMessage>Email is required</FormErrorMessage>
-            ) : (
-              !validateEmail(email) && (
-                <FormErrorMessage>Email is invalid</FormErrorMessage>
-              )
-            )}
           </FormControl>
           {/* ACTION */}
           <Button
