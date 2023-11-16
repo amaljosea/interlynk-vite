@@ -1,4 +1,3 @@
-import { useMutation } from '@apollo/client'
 import { ExternalLinkIcon } from '@chakra-ui/icons'
 import {
   Flex,
@@ -8,17 +7,13 @@ import {
   Icon,
   Link,
   Tooltip,
-  useColorModeValue,
-  Select,
-  Checkbox
+  useColorModeValue
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import GlobalContext from 'context/GlobalContext'
-import { updateCompVulnVex } from 'graphQL/Mutation'
 import React, { useContext, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { useLocation } from 'react-router-dom'
-import { findSimilarItems, sevColor } from 'utils'
+import { sevColor } from 'utils'
 
 const customStyles = {
   headCells: {
@@ -53,48 +48,10 @@ const statusColor = (status) => {
   }
 }
 
-const CopyTable = ({ productId, sbomId, getVulns, refetch, setFinalData }) => {
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const currentSbomId = queryParams.get('sbom')
-
-  const [selectedRows, setSelectedRows] = useState([])
-
+const CopyTable = () => {
   const textColor = useColorModeValue('gray.700', 'white')
 
-  const { vulnField, vulnDirection, totalVulns, mergeData, setMergeData } =
-    useContext(GlobalContext)
-
-  const handleUpdate = (id, value) => {
-    console.log(value)
-
-    const updatedData = mergeData.map((item) => {
-      if (item.id === id) {
-        return {
-          ...item,
-          importFrom: value
-        }
-      }
-      return item
-    })
-
-    setMergeData(updatedData)
-  }
-
-  const handleStatusHistory = (id, value) => {
-    console.log(value)
-    const updatedData = mergeData.map((item) => {
-      if (item.id === id) {
-        return {
-          ...item,
-          statusHistory: value ? false : true
-        }
-      }
-      return item
-    })
-
-    setMergeData(updatedData)
-  }
+  const { setSelectedVulns, mergeData } = useContext(GlobalContext)
 
   // COLUMNS
   const columns = [
@@ -122,7 +79,8 @@ const CopyTable = ({ productId, sbomId, getVulns, refetch, setFinalData }) => {
           </Link>
         )
       },
-      wrap: true
+      wrap: true,
+      width: '20%'
     },
     // SEVERITY
     {
@@ -148,9 +106,7 @@ const CopyTable = ({ productId, sbomId, getVulns, refetch, setFinalData }) => {
             )}
           </>
         )
-      },
-      width: '130px',
-      width: '150px'
+      }
     },
     // COMPONENT
     {
@@ -170,16 +126,14 @@ const CopyTable = ({ productId, sbomId, getVulns, refetch, setFinalData }) => {
           </Tooltip>
         )
       },
-      wrap: true,
-      width: '200px'
+      wrap: true
     },
     // VERSION
     {
       id: 'version',
       name: 'VERSION',
       selector: (row) => row.component.version,
-      wrap: true,
-      width: '200px'
+      wrap: true
     },
     // CURRENT STATUS
     {
@@ -203,7 +157,7 @@ const CopyTable = ({ productId, sbomId, getVulns, refetch, setFinalData }) => {
         )
       },
       sortable: true,
-      width: '200px'
+      right: 'true'
     },
     // SELECTED STATUS
     {
@@ -226,40 +180,7 @@ const CopyTable = ({ productId, sbomId, getVulns, refetch, setFinalData }) => {
           </Tag>
         )
       },
-      width: '200px'
-    },
-    // UPDATED AT
-    {
-      id: 'action',
-      name: 'ACTI0N',
-      selector: (row) => {
-        return (
-          <Select
-            name='import'
-            size='sm'
-            width={'fit-content'}
-            value={row.importFrom || 'Keep existing'}
-            onChange={(e) => handleUpdate(row.id, e.target.value)}
-          >
-            <option value={'Keep existing'}>Keep existing</option>
-            <option value={'Replace from import'}>Replace from import</option>
-          </Select>
-        )
-      }
-    },
-    // STATUS HISTORY
-    {
-      id: 'statusHistory',
-      name: 'STATUS HISTORY',
-      selector: (row) => {
-        return (
-          <Checkbox
-            name='status'
-            isChecked={row.statusHistory}
-            onChange={() => handleStatusHistory(row.id, row.statusHistory)}
-          />
-        )
-      }
+      right: 'true'
     }
   ]
 
@@ -283,22 +204,29 @@ const CopyTable = ({ productId, sbomId, getVulns, refetch, setFinalData }) => {
     }
   }
 
+  const handleChange = (state) => {
+    setSelectedVulns(state.selectedRows)
+    console.log(state)
+  }
+
   return (
-    <Card p={0}>
-      <Flex flexDir={'column'} width={'100%'} mb={6}>
-        <DataTable
-          columns={columns}
-          data={mergeData}
-          customStyles={customStyles}
-          subHeader
-          progressPending={mergeData ? false : true}
-          subHeaderComponent={subHeaderComponentMemo}
-          responsive={true}
-          selectableRows={true}
-          // selectableRowSelected={(row) => row}
-        />
-      </Flex>
-    </Card>
+    <Flex mt={12} flexDir={'column'} width={'100%'} mb={4}>
+      <DataTable
+        columns={columns}
+        data={mergeData}
+        customStyles={customStyles}
+        subHeader
+        progressPending={mergeData ? false : true}
+        subHeaderComponent={subHeaderComponentMemo}
+        responsive={true}
+        selectableRows={true}
+        fixedHeader
+        persistTableHead
+        fixedHeaderScrollHeight='500px'
+        onSelectedRowsChange={handleChange}
+        // selectableRowSelected={(row) => row}
+      />
+    </Flex>
   )
 }
 

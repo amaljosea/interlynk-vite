@@ -103,6 +103,7 @@ const ContextWrapper = (props) => {
   const [mergeData, setMergeData] = useState([])
   const [currentSbom, setCurrentSbom] = useState([])
   const [importSbom, setImportSbom] = useState([])
+  const [selectedVulns, setSelectedVulns] = useState([])
 
   return (
     <GlobalContext.Provider
@@ -235,7 +236,9 @@ const ContextWrapper = (props) => {
         prodLogField,
         setProdLogField,
         prodLogDirection,
-        setProdLogDirection
+        setProdLogDirection,
+        selectedVulns,
+        setSelectedVulns
       }}
     >
       {props.children}
