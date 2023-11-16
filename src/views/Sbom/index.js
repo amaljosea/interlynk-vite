@@ -39,11 +39,13 @@ import {
   FaCubes,
   FaLayerGroup,
   FaFileDownload,
-  FaBug
+  FaBug,
+  FaArrowRight,
+  FaAngleRight
 } from 'react-icons/fa'
 import { TbSignature, TbSignatureOff } from 'react-icons/tb'
 import { useLocation, useHistory } from 'react-router-dom'
-import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
+import { DeleteIcon, EditIcon, TriangleDownIcon } from '@chakra-ui/icons'
 import { timeSince, getFullDateAndTime } from 'utils'
 import SigningModal from './components/SigningModal'
 import DownloadModal from './components/DownloadModal'
@@ -315,7 +317,7 @@ function SBOM() {
   }
 
   const onFilterSev = (value) => {
-    setActiveProdTab(2)
+    setActiveProdTab(3)
     setVulnSeverity(value)
     getVulnData({
       variables: {
@@ -362,19 +364,22 @@ function SBOM() {
                           {/* PRODUCT TITLE */}
                           <Stack
                             direction={'column'}
-                            spacing={2}
+                            spacing={1}
                             alignItems={'left'}
-                          >{subProduct && (
-                            <Text fontWeight={'semibold'} fontSize={18}>
-                              {productName} : {productVersion}
-                              <br />
-                            </Text>
-                          )}
-                            <Text fontWeight={'semibold'} fontSize={25}>
-                              {subProduct? '|-' : ''} {sbomData.sbom.project.name} :{' '}
-                              {sbomData.sbom.primaryComponent?.version}
-                            </Text>
-
+                          >
+                            {subProduct && (
+                              <Text fontWeight={'semibold'} fontSize={18}>
+                                {productName} : {productVersion}
+                                <br />
+                              </Text>
+                            )}
+                            <HStack spacing={2}>
+                              {subProduct ? <FaAngleRight size={22} /> : ''}
+                              <Text fontWeight={'semibold'} fontSize={25}>
+                                {sbomData.sbom.project.name} :{' '}
+                                {sbomData.sbom.primaryComponent?.version}
+                              </Text>
+                            </HStack>
                           </Stack>
 
                           <Text fontSize={'sm'} my={0.5}>
