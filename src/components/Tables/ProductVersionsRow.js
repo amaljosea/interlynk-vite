@@ -196,6 +196,7 @@ function ProductVersionsRow(props) {
               }`}
               onClick={() => {
                 window.localStorage.setItem('product', name)
+                window.localStorage.setItem('productVersion', sbomId[0].primaryComponent?.version)
                 setCurrentProduct({
                   id: id,
                   sbomId:

@@ -153,6 +153,7 @@ const PartsTable = () => {
                   minWidth='100%'
                   onClick={() => {
                     window.localStorage.setItem('subProduct', name)
+                    window.localStorage.setItem('subProductVersion', name)
                     setActiveProdTab(0)
                   }}
                 >
