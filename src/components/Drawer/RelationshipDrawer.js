@@ -212,7 +212,7 @@ const RelationshipDrawer = ({
 
   return (
     <Drawer
-      size='lg'
+      size='xl'
       isOpen={isOpen}
       placement='right'
       onClose={onClose}

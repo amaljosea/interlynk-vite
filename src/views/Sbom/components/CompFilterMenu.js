@@ -149,8 +149,8 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
       variables: {
         projectId: productId,
         sbomId: sbomId,
-        primary: value === 'primary',
-        internal: value === 'internal',
+        primary: value === 'primary' ? true : undefined,
+        internal: value === 'internal' ? true : undefined,
         first: totalRows,
         last: undefined,
         after: undefined,
