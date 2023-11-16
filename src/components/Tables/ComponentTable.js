@@ -404,7 +404,7 @@ const ComponentTable = ({
       sortFunction: (a, b) => {
         const dateA = new Date(a.updatedAt)
         const dateB = new Date(b.updatedAt)
-        return dateB - dateA // Sort in descending order
+        return dateA - dateB // Sort in descending order
       },
       right: 'true'
     },
