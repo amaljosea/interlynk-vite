@@ -50,6 +50,21 @@ import { GetAllComponents } from 'graphQL/Queries'
 import { useContext, useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 
+const findShortestPath = (pathArray, currentShortestPath = []) => {
+  if (!pathArray || pathArray.length === 0) {
+    return currentShortestPath;
+  }
+
+  const shortestPath = pathArray.reduce((minPath, currentPath) => {
+    if (currentPath.depth < minPath.depth) {
+      return currentPath;
+    }
+    return minPath;
+  }, pathArray[0]);
+
+  return findShortestPath(shortestPath.path, [...currentShortestPath, shortestPath]);
+};
+
 const RelationshipDrawer = ({
   isOpen,
   onClose,
@@ -81,6 +96,8 @@ const RelationshipDrawer = ({
   const [removeRelation] = useMutation(DeleteCompRelation)
   const [getDependency, { data: compDependency }] =
     useLazyQuery(GetCompDependency)
+
+  const shortestPath = findShortestPath(compPath)[0];
 
   useEffect(() => {
     if (compDependency === undefined) {
@@ -453,6 +470,7 @@ const RelationshipDrawer = ({
                 </Table>
 
                 {/* PATHS */}
+                <Text fontSize={'lg'} fontWeight={'medium'} mt={6}>Pedigree</Text>
                 {compPath.length > 0 && (
                   <Stack
                     width={'100%'}
@@ -462,22 +480,18 @@ const RelationshipDrawer = ({
                     alignItems={'center'}
                     justifyContent={'center'}
                   >
-                    {compPath[0].depth === 0 && compPath[0].path.length > 0 ? (
-                      compPath[0].path.map((item, index) => (
+                    { shortestPath.path.length > 0 ? (
+                      shortestPath.path.map((item, index) => (
                         <>
                           <Tag
                             key={item.id}
                             size='sm'
-                            colorScheme={
-                              index !== compPath[0].path.length - 1
-                                ? 'blue'
-                                : 'green'
-                            }
+                            colorScheme={ (index === 0 || index === shortestPath.path.length - 1) ? 'blue' : 'green' }
                           >
                             {item.name} - {item.version}
                           </Tag>
 
-                          {index !== compPath[0].path.length - 1 && (
+                          {index !== shortestPath.path.length - 1 && (
                             <ArrowDownIcon
                               width={4}
                               height={4}
