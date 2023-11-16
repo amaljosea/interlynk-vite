@@ -36,7 +36,6 @@ import { useContext, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV, FaFilter } from 'react-icons/fa'
 import { useLocation, Link } from 'react-router-dom'
-import { useParams } from 'react-router-dom';
 
 const customStyles = {
   headCells: {
@@ -131,9 +130,8 @@ const PartsTable = () => {
     ? removeDuplicatesAndLatest(filterVersions)
     : []
 
-    const searchParams = new URLSearchParams(location.search);
-    const product_id = searchParams.get('p');
-    console.log('product:', product_id)
+  const searchParams = new URLSearchParams(location.search)
+  const product_id = searchParams.get('p')
 
   // COLUMNS
   const columns = [
@@ -173,7 +171,9 @@ const PartsTable = () => {
       selector: (row) => {
         const { sboms } = row
         return (
-          <Text>{sboms?.length > 0 && sboms[0]?.primaryComponent?.version}</Text>
+          <Text>
+            {sboms?.length > 0 && sboms[0]?.primaryComponent?.version}
+          </Text>
         )
       }
     },
@@ -296,7 +296,12 @@ const PartsTable = () => {
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
           columns={columns}
-          data={allProducts && allProducts.projects.nodes.filter(product => product.id !== product_id).slice(0, 3)}
+          data={
+            allProducts &&
+            allProducts.projects.nodes
+              .filter((product) => product.id !== product_id)
+              .slice(0, 3)
+          }
           customStyles={customStyles}
           persistTableHead
           subHeader
