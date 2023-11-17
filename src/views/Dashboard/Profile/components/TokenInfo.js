@@ -71,10 +71,33 @@ const TokenInfo = ({ data, refetch }) => {
 
   const [token, setToken] = useState('')
   const [keyName, setKeyName] = useState('')
+  const [error, setError] = useState('')
   const [selectedDate, setSelectedDate] = useState('')
   const [noExpire, setNoExpire] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [activeRow, setActiveRow] = useState(null)
+
+  const handleChange = (event) => {
+    const { value } = event.target
+    setKeyName(value)
+
+    if (value.length < 4 || value.length > 128) {
+      setError('Input must be between 4 and 128 characters')
+    } else {
+      setError('')
+    }
+  }
+
+  const handleExpireChange = (e) => {
+    const { checked } = e.target
+    setNoExpire(checked)
+
+    if (checked === true) {
+      setSelectedDate('')
+    } else {
+      setSelectedDate(defaultDate)
+    }
+  }
 
   const key = useClipboard(token)
 
@@ -126,9 +149,9 @@ const TokenInfo = ({ data, refetch }) => {
       await updateToken({
         variables: {
           id: activeRow.id,
-          expires: noExpire ? undefined : selectedDate
+          expires: noExpire === true ? undefined : selectedDate
         }
-      }).then((res) => onClose())
+      }).then((res) => res.data && onClose())
     } catch (error) {
       console.log('Mutation error', error)
     }
@@ -184,17 +207,6 @@ const TokenInfo = ({ data, refetch }) => {
     )
   }, [])
 
-  const handleExpireChange = (e) => {
-    const { checked } = e.target
-    setNoExpire(checked)
-
-    if (checked === true) {
-      setSelectedDate('')
-    } else {
-      setSelectedDate(defaultDate)
-    }
-  }
-
   useEffect(() => {
     if (activeRow) {
       setKeyName(activeRow.notes)
@@ -209,7 +221,16 @@ const TokenInfo = ({ data, refetch }) => {
     {
       id: 'name',
       name: 'TOKEN NAME',
-      selector: (row) => row.notes
+      wrap: true,
+      selector: (row) => (
+        <Tooltip label={row.notes} placement='top'>
+          <Text my={2}>
+            {row.notes.length > 30
+              ? `${row.notes.substring(0, 30)}...`
+              : row.notes}
+          </Text>
+        </Tooltip>
+      )
     },
     // TOKEN MASK
     {
@@ -221,7 +242,13 @@ const TokenInfo = ({ data, refetch }) => {
     {
       id: 'created',
       name: 'CREATED',
-      selector: (row) => <Text>{getFullDateAndTime(row.createdAt)}</Text>
+      selector: (row) => <Text>{getFullDateAndTime(row.createdAt)}</Text>,
+      sortable: true,
+      sortFunction: (a, b) => {
+        const dateA = new Date(a.createdAt)
+        const dateB = new Date(b.createdAt)
+        return dateB - dateA
+      }
     },
     // EXPIRES
     {
@@ -311,7 +338,8 @@ const TokenInfo = ({ data, refetch }) => {
             </Portal>
           </Menu>
         )
-      }
+      },
+      right: 'true'
     }
   ]
 
@@ -322,6 +350,8 @@ const TokenInfo = ({ data, refetch }) => {
           subHeader
           columns={columns}
           data={data}
+          defaultSortAsc={true}
+          defaultSortFieldId={'created'}
           persistTableHead
           responsive={true}
           customStyles={customStyles}
@@ -334,12 +364,16 @@ const TokenInfo = ({ data, refetch }) => {
           <ModalOverlay />
           <ModalContent>
             <ModalHeader>
-              {activeRow ? activeRow.notes : 'Create Security Token'}
+              {activeRow
+                ? activeRow.notes.length > 20
+                  ? `${activeRow.notes.substring(0, 20)}...`
+                  : activeRow.notes
+                : 'Create Security Token'}
             </ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               {!activeRow && (
-                <FormControl mb={5} isRequired>
+                <FormControl mb={5} isRequired isInvalid={error}>
                   <FormLabel mb={1} htmlFor='keyName'>
                     Token Name
                   </FormLabel>
@@ -348,8 +382,11 @@ const TokenInfo = ({ data, refetch }) => {
                     id='keyName'
                     name='keyName'
                     value={keyName}
-                    onChange={(e) => setKeyName(e.target.value)}
+                    minLength={4}
+                    maxLength={128}
+                    onChange={handleChange}
                   />
+                  <FormErrorMessage>{error}</FormErrorMessage>
                 </FormControl>
               )}
               {!noExpire && (
@@ -366,11 +403,7 @@ const TokenInfo = ({ data, refetch }) => {
                 </FormControl>
               )}
               <FormControl mb={5}>
-                <Checkbox
-                  display={activeRow && activeRow.expiresAt ? 'none' : 'block'}
-                  isChecked={noExpire}
-                  onChange={handleExpireChange}
-                >
+                <Checkbox isChecked={noExpire} onChange={handleExpireChange}>
                   No Expiration
                 </Checkbox>
               </FormControl>
@@ -421,7 +454,8 @@ const TokenInfo = ({ data, refetch }) => {
                     isDisabled={
                       !keyName ||
                       (selectedDate !== '' && !isValid(selectedDate)) ||
-                      isLoading
+                      isLoading ||
+                      error !== ''
                     }
                     onClick={handleCreate}
                   >
