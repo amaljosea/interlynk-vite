@@ -77,6 +77,7 @@ const ComponentTable = ({
   data,
   totalComp,
   refetch,
+  fetchCompData,
   primaryComp,
   totalRows,
   setTotalRows,
@@ -104,7 +105,9 @@ const ComponentTable = ({
     setSignedCompField,
     setSignedCompDirection,
     comPageIndex,
-    setComPageIndex
+    setComPageIndex,
+    setCompAfter,
+    setCompBefore
   } = useContext(GlobalContext)
 
   const [activeRow, setActiveRow] = useState(null)
@@ -817,8 +820,6 @@ const ComponentTable = ({
     })
   }
 
-  const [compAfter, setCompAfter] = useState('')
-  const [compBefore, setCompBefore] = useState('')
 
   const handlePreviousPage = async () => {
     setComPageIndex((prev) => comPageIndex !== 0 && prev - 1)
@@ -952,8 +953,6 @@ const ComponentTable = ({
               onClose={onDelClose}
               id={activeRow.id}
               refetch={refetch}
-              after={compAfter}
-              before={compBefore}
             />
           )}
 
@@ -993,9 +992,7 @@ const ComponentTable = ({
               data={activeRow}
               compPath={comPath.component.pathToPrimary}
               total={totalComp}
-              refetch={refetch}
-              after={compAfter}
-              before={compBefore}
+              fetchCompData={fetchCompData}
             />
           )}
         </>

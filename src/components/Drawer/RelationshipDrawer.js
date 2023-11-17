@@ -36,18 +36,14 @@ import {
   PopoverCloseButton,
   PopoverBody,
   PopoverFooter,
-  ButtonGroup,
-  useLatestRef
+  ButtonGroup
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
-import NodeElement from 'components/NodeElement'
-import GlobalContext from 'context/GlobalContext'
 import { CreateCompRelation, DeleteCompRelation } from 'graphQL/Mutation'
-import { GetCompDependency } from 'graphQL/Queries'
-import { GetAllComponents } from 'graphQL/Queries'
-import { useContext, useEffect, useState } from 'react'
+import { GetCompDependency, GetAllComponents } from 'graphQL/Queries'
+import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 
 const findShortestPath = (pathArray, currentShortestPath = []) => {
@@ -73,9 +69,7 @@ const RelationshipDrawer = ({
   onClose,
   data,
   total,
-  refetch,
-  after,
-  before,
+  fetchCompData,
   compPath
 }) => {
   const location = useLocation()
@@ -83,9 +77,6 @@ const RelationshipDrawer = ({
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
   const { name, version, id } = data
-
-  const { totalRows, compField, compDirection, compSearchInput } =
-    useContext(GlobalContext)
 
   const [dependencyOfList, setDependencyOfList] = useState([])
   const [dependsOnList, setDependsOnList] = useState([])
@@ -101,7 +92,7 @@ const RelationshipDrawer = ({
   const [getDependency, { data: compDependency }] =
     useLazyQuery(GetCompDependency)
 
-  const shortestPath = findShortestPath(compPath)[0];
+  const shortestPath = findShortestPath(compPath)[0]
 
   useEffect(() => {
     if (compDependency === undefined) {
@@ -194,19 +185,7 @@ const RelationshipDrawer = ({
   }
 
   const handleSave = () => {
-    refetch({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        search: compSearchInput !== '' ? compSearchInput : undefined,
-        first: after !== '' ? totalRows : undefined,
-        after: after !== '' ? after : undefined,
-        last: before !== '' ? totalRows : undefined,
-        before: before !== '' ? before : undefined,
-        field: compField,
-        direction: compDirection
-      }
-    })
+    fetchCompData()
     onClose()
   }
 

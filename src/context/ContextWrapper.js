@@ -105,6 +105,9 @@ const ContextWrapper = (props) => {
   const [importSbom, setImportSbom] = useState([])
   const [selectedVulns, setSelectedVulns] = useState([])
 
+  const [compAfter, setCompAfter] = useState('')
+  const [compBefore, setCompBefore] = useState('')
+
   return (
     <GlobalContext.Provider
       value={{
@@ -238,7 +241,11 @@ const ContextWrapper = (props) => {
         prodLogDirection,
         setProdLogDirection,
         selectedVulns,
-        setSelectedVulns
+        setSelectedVulns,
+        compAfter,
+        setCompAfter,
+        compBefore,
+        setCompBefore
       }}
     >
       {props.children}
