@@ -8,9 +8,7 @@ import {
   FormLabel,
   Input,
   Button,
-  FormErrorMessage,
-  FormHelperText,
-  useClipboard
+  useToast
 } from '@chakra-ui/react'
 // Custom components
 import Card from 'components/Card/Card'
@@ -19,11 +17,10 @@ import CardHeader from 'components/Card/CardHeader'
 import { orgUpdate } from 'graphQL/Mutation'
 import { useEffect, useState } from 'react'
 
-const GeneralFeed = ({ orgInfo, refetch, getOrgInfo }) => {
+const GeneralFeed = ({ orgInfo, refetch }) => {
+  const toast = useToast()
   const textColor = useColorModeValue('gray.700', 'white')
-
   const [orgName, setOrgName] = useState('')
-  const [orgId, setOrgId] = useState('')
   const [message, setMessage] = useState('Update')
 
   const [updateOrg] = useMutation(orgUpdate)
@@ -31,38 +28,35 @@ const GeneralFeed = ({ orgInfo, refetch, getOrgInfo }) => {
   useEffect(() => {
     if (orgInfo) {
       setOrgName(orgInfo.organization.name)
-      setOrgId(orgInfo.organization.id)
     }
   }, [orgInfo])
 
-  const id = useClipboard(orgId)
-  var isError = orgName === ''
-
   const handleUpdate = async () => {
-    isError = orgName === ''
-    if (orgName !== '') {
-      try {
-        await updateOrg({
-          variables: {
-            name: orgName
+    try {
+      await updateOrg({
+        variables: {
+          name: orgName
+        }
+      })
+        .then((res) => {
+          if (res.data.organizationUpdate.errors.length === 0) {
+            setMessage('Saving....')
+            setTimeout(() => {
+              setMessage('Update')
+              toast({
+                description: 'Organization name updated successfully',
+                status: 'success',
+                position: 'top',
+                duration: 2000
+              })
+            }, 2000)
           }
         })
-          .then((res) => {
-            if (res) {
-              setMessage('Saving....')
-              setTimeout(() => {
-                setMessage('Update')
-              }, 2000)
-            }
-          })
-          .finally(() => {
-            refetch()
-          })
-      } catch (error) {
-        console.log(`Error`, error)
-      }
-    } else {
-      console.error('Empty organization name provideed')
+        .finally(() => {
+          refetch()
+        })
+    } catch (error) {
+      console.log(`Error`, error)
     }
   }
 
@@ -81,21 +75,18 @@ const GeneralFeed = ({ orgInfo, refetch, getOrgInfo }) => {
           gap={6}
         >
           {/* NAME */}
-          <FormControl isRequired isInvalid={isError}>
+          <FormControl isRequired>
             <FormLabel>Name</FormLabel>
             <Input
               value={orgName}
               onChange={(e) => setOrgName(e.target.value)}
             />
-            <FormErrorMessage>
-              An organization name is required.
-            </FormErrorMessage>
             <Button
               mt={3}
               variant='solid'
               colorScheme={'blue'}
               onClick={handleUpdate}
-              disabled={message === 'Saving....' || !orgName}
+              disabled={message === 'Saving....' || orgName === ''}
             >
               {message}
             </Button>

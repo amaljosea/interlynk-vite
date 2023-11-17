@@ -7,11 +7,9 @@ import {
   Input,
   Button,
   useToast,
-  FormErrorMessage,
   Box
 } from '@chakra-ui/react'
 import { useColorModeValue } from '@chakra-ui/system'
-import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
 import { updateOrgUser } from 'graphQL/Mutation'
@@ -47,10 +45,16 @@ const PersonalInfo = ({ user, refetch }) => {
         }
       })
         .then((res) => {
-          if (res) {
+          if (res.data.userUpdate.errors.length == 0) {
             setMessage('Saving....')
             setTimeout(() => {
               setMessage('Update')
+              toast({
+                description: 'User details updated successfully',
+                status: 'success',
+                position: 'top',
+                duration: 2000
+              })
             }, 2000)
           }
         })
