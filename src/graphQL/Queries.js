@@ -44,9 +44,12 @@ export const GetOrg = gql`
 
 // GET ORGANIZATION RULES
 export const GetOrgRules = gql`
-  query GetOrgRules {
+  query GetOrgRules(
+    $field: OrganizationRuleOrderByFields!
+    $direction: OrderByDirection!
+  ) {
     organization {
-      organizationRules {
+      organizationRules(orderBy: { field: $field, direction: $direction }) {
         id
         action
         enabled
