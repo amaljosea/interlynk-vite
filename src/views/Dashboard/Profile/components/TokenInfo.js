@@ -88,6 +88,17 @@ const TokenInfo = ({ data, refetch }) => {
     }
   }
 
+  const handleExpireChange = (e) => {
+    const { checked } = e.target
+    setNoExpire(checked)
+
+    if (checked === true) {
+      setSelectedDate('')
+    } else {
+      setSelectedDate(defaultDate)
+    }
+  }
+
   const key = useClipboard(token)
 
   const [generateToken] = useMutation(createApiToken)
@@ -138,9 +149,9 @@ const TokenInfo = ({ data, refetch }) => {
       await updateToken({
         variables: {
           id: activeRow.id,
-          expires: noExpire ? undefined : selectedDate
+          expires: noExpire === true ? undefined : selectedDate
         }
-      }).then((res) => onClose())
+      }).then((res) => res.data && onClose())
     } catch (error) {
       console.log('Mutation error', error)
     }
@@ -195,17 +206,6 @@ const TokenInfo = ({ data, refetch }) => {
       </Flex>
     )
   }, [])
-
-  const handleExpireChange = (e) => {
-    const { checked } = e.target
-    setNoExpire(checked)
-
-    if (checked === true) {
-      setSelectedDate('')
-    } else {
-      setSelectedDate(defaultDate)
-    }
-  }
 
   useEffect(() => {
     if (activeRow) {
@@ -403,11 +403,7 @@ const TokenInfo = ({ data, refetch }) => {
                 </FormControl>
               )}
               <FormControl mb={5}>
-                <Checkbox
-                  display={activeRow && activeRow.expiresAt ? 'none' : 'block'}
-                  isChecked={noExpire}
-                  onChange={handleExpireChange}
-                >
+                <Checkbox isChecked={noExpire} onChange={handleExpireChange}>
                   No Expiration
                 </Checkbox>
               </FormControl>
