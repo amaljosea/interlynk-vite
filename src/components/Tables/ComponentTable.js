@@ -995,7 +995,7 @@ const ComponentTable = ({
           {isSupOpen && (
             <SupplierModal
               id={activeRow.id}
-              fetchCompData={fetchCompData}
+              refetch={fetchCompData}
               filterRefetch={filterRefetch}
               isOpen={isSupOpen}
               onClose={onSupClose}

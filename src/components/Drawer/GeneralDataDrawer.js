@@ -61,8 +61,7 @@ const GeneralDataDrawer = ({
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
-  const { setCheckFilters, checkField, checkDirection } =
-    useContext(GlobalContext)
+  const { setCheckFilters } = useContext(GlobalContext)
 
   const [toolName, setToolName] = useState('')
   const [toolVersion, setToolVersion] = useState('')
@@ -92,19 +91,7 @@ const GeneralDataDrawer = ({
   const [deleteSupplier] = useMutation(supplierDelete)
 
   const [healthRecheck] = useMutation(recheckHealth, {
-    onCompleted: () => {
-      refetch({
-        projectId: productId,
-        sbomId: sbomId,
-        first: totalRows,
-        last: undefined,
-        category: undefined,
-        severity: undefined,
-        status: undefined,
-        field: checkField,
-        direction: checkDirection
-      })
-    }
+    onCompleted: () => refetch()
   })
 
   const onFilterRefetch = () => {

@@ -142,7 +142,19 @@ const GlobalContext = React.createContext({
   compAfter: '',
   setCompAfter: () => {},
   compBefore: '',
-  setCompBefore: () => {}
+  setCompBefore: () => {},
+  checkAfter: '',
+  setCheckAfter: () => {},
+  checkBefore: '',
+  setCheckBefore: () => {},
+  checkCategory: [],
+  checkSearchInput: '',
+  setCheckSearchInput: () => {},
+  setCheckCategory: () => {},
+  checkSeverity: [],
+  setCheckSeverity: () => {},
+  checkStatus: [],
+  setCheckStatus: () => {}
 })
 
 export default GlobalContext
