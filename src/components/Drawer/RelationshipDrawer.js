@@ -28,19 +28,12 @@ import {
   Tr,
   FormErrorMessage,
   FormErrorIcon,
-  useDisclosure,
-  Popover,
-  PopoverContent,
-  PopoverHeader,
-  PopoverArrow,
-  PopoverCloseButton,
-  PopoverBody,
-  PopoverFooter,
-  ButtonGroup
+  useDisclosure
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
+import RelDeleteModal from 'components/RelDeleteModal'
 import { CreateCompRelation, DeleteCompRelation } from 'graphQL/Mutation'
 import { GetCompDependency, GetAllComponents } from 'graphQL/Queries'
 import { useEffect, useState } from 'react'
@@ -191,7 +184,7 @@ const RelationshipDrawer = ({
 
   return (
     <Drawer
-      size='xl'
+      size='lg'
       isOpen={isOpen}
       placement='right'
       onClose={onClose}
@@ -310,13 +303,13 @@ const RelationshipDrawer = ({
                   <Tbody>
                     {/* Dependency Of */}
                     <Tr>
-                      <Td pl={0} width={'300px'}>
+                      <Td pl={0} width={'120px'}>
                         <Text fontSize='xs' fontWeight={'medium'}>
                           Dependency Of
                         </Text>
                       </Td>
-                      <Td pl={0} width={'400px'}>
-                        <Stack direction={'column'}>
+                      <Td pl={0} width={'300px'}>
+                        <Flex flexDirection={'row'} flexWrap={'wrap'} gap={2}>
                           {dependencyOfList.map((comp, index) => (
                             <Tag
                               size={'sm'}
@@ -335,17 +328,17 @@ const RelationshipDrawer = ({
                               />
                             </Tag>
                           ))}
-                        </Stack>
+                        </Flex>
                       </Td>
                     </Tr>
                     <Tr>
-                      <Td pl={0} width={'300px'}>
+                      <Td pl={0} width={'120px'}>
                         <Text fontSize='xs' fontWeight={'medium'}>
                           Depends On
                         </Text>
                       </Td>
-                      <Td pl={0} width={'400px'}>
-                        <Stack direction={'column'} pos={'relative'}>
+                      <Td pl={0} width={'300px'}>
+                        <Flex flexDirection={'row'} flexWrap={'wrap'} gap={2}>
                           {[...dependsOnList]
                             .sort(
                               (a, b) =>
@@ -378,74 +371,20 @@ const RelationshipDrawer = ({
                                 </Tag>
                               </Tooltip>
                             ))}
-
-                          <Popover
-                            returnFocusOnClose={false}
-                            isOpen={isDelOpen}
-                            onClose={onDelClose}
-                            placement='bottom'
-                            closeOnBlur={true}
-                          >
-                            <PopoverContent>
-                              <PopoverHeader
-                                fontWeight='semibold'
-                                fontSize={'sm'}
-                              >
-                                Remove
-                              </PopoverHeader>
-                              <PopoverArrow />
-                              <PopoverCloseButton />
-                              <PopoverBody>
-                                <Stack
-                                  direction='column'
-                                  alignItems={'flex-start'}
-                                  spacing={4}
-                                  py={2}
-                                >
-                                  <Text
-                                    wordBreak={'break-all'}
-                                    fontWeight={'semibold'}
-                                    fontSize={'sm'}
-                                  >
-                                    {activeComp?.toComp.name}-
-                                    {activeComp?.toComp.version}
-                                  </Text>
-                                  <Text fontSize={'sm'}>
-                                    This will remove the relationship of this
-                                    component with other components and change
-                                    the dependency order of this version.
-                                  </Text>
-                                  <Text fontSize={'sm'}>
-                                    Are you sure you wish to continue?
-                                  </Text>
-                                </Stack>
-                              </PopoverBody>
-                              <PopoverFooter
-                                display='flex'
-                                justifyContent='flex-end'
-                              >
-                                <ButtonGroup size='sm'>
-                                  <Button
-                                    variant='outline'
-                                    onClick={onDelClose}
-                                  >
-                                    No
-                                  </Button>
-                                  <Button
-                                    colorScheme='red'
-                                    onClick={handleRemove}
-                                  >
-                                    Yes
-                                  </Button>
-                                </ButtonGroup>
-                              </PopoverFooter>
-                            </PopoverContent>
-                          </Popover>
-                        </Stack>
+                        </Flex>
                       </Td>
                     </Tr>
                   </Tbody>
                 </Table>
+
+                {isDelOpen && activeComp && (
+                  <RelDeleteModal
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    handleRemove={handleRemove}
+                    activeComp={activeComp}
+                  />
+                )}
 
                 {/* PATHS */}
                 <Text fontSize={'lg'} fontWeight={'medium'} mt={6}>
