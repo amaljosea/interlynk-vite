@@ -451,7 +451,7 @@ const RelationshipDrawer = ({
                 <Text fontSize={'lg'} fontWeight={'medium'} mt={6}>
                   Pedigree
                 </Text>
-                {compPath.length > 0 && (
+                {compPath.length > 0 ? (
                   <Stack
                     width={'100%'}
                     mt={10}
@@ -490,6 +490,16 @@ const RelationshipDrawer = ({
                         Component is not connected to Primary component
                       </Text>
                     )}
+                  </Stack>
+                ) : (
+                  <Stack
+                    width={'100%'}
+                    alignItems={'center'}
+                    justifyContent={'center'}
+                  >
+                    <Tag size='sm' colorScheme='green'>
+                      {name} - {version}
+                    </Tag>
                   </Stack>
                 )}
               </Flex>
