@@ -90,54 +90,62 @@ const ApiFeed = () => {
           </Thead>
           {data ? (
             <Tbody>
-              {data.organization.organizationRules
+              {[...data.organization.organizationRules]
                 .sort((a, b) => {
-                  const extractNumber = (str) => str.match(/\d+/) || [-1]; // Extracts the number from the string
+                  const extractNumber = (str) => str.match(/\d+/) || [-1] // Extracts the number from the string
 
-                  const numberA = parseInt(extractNumber(a.rule.friendlyId)[0], 10);
-                  const numberB = parseInt(extractNumber(b.rule.friendlyId)[0], 10);
+                  const numberA = parseInt(
+                    extractNumber(a.rule.friendlyId)[0],
+                    10
+                  )
+                  const numberB = parseInt(
+                    extractNumber(b.rule.friendlyId)[0],
+                    10
+                  )
 
-                  return numberA - numberB;
+                  return numberA - numberB
                 })
                 .map((item, index) => (
-                <Tr key={index}>
-                  <Td pl={0}>
-                    <Switch
-                      name={item.rule.friendlyId}
-                      id={item.rule.friendlyId}
-                      isChecked={item.enabled ? true : false}
-                      onChange={(e) => handleChange(e.target.checked, item.id)}
-                    ></Switch>
-                  </Td>
-                  <Td pl={0}>{item.rule.friendlyId}</Td>
-                  <Td pl={0}>
-                    <Flex direction='column' rowGap={1} maxWidth={800}>
-                      <Text fontSize={'sm'}>{item.rule.shortDesc}</Text>
-                      <Text fontSize={'10px'}>{item.rule.longDesc}</Text>
-                    </Flex>
-                  </Td>
-                  <Td pl={0}>
-                    <Select
-                      size='sm'
-                      name={index}
-                      id={index}
-                      width={'130px'}
-                      value={item.severity}
-                      onChange={(e) =>
-                        handleStatusChange(item.id, e.target.value)
-                      }
-                      bg={sevColor(item.severity.toLowerCase()) + '.200'}
-                      variant={'outline'}
-                    >
-                      {options.map((itm, index) => (
-                        <option key={index} value={itm.value}>
-                          {itm.label}
-                        </option>
-                      ))}
-                    </Select>
-                  </Td>
-                </Tr>
-              ))}
+                  <Tr key={index}>
+                    <Td pl={0}>
+                      <Switch
+                        name={item.rule.friendlyId}
+                        id={item.rule.friendlyId}
+                        isChecked={item.enabled ? true : false}
+                        onChange={(e) =>
+                          handleChange(e.target.checked, item.id)
+                        }
+                      ></Switch>
+                    </Td>
+                    <Td pl={0}>{item.rule.friendlyId}</Td>
+                    <Td pl={0}>
+                      <Flex direction='column' rowGap={1} maxWidth={800}>
+                        <Text fontSize={'sm'}>{item.rule.shortDesc}</Text>
+                        <Text fontSize={'10px'}>{item.rule.longDesc}</Text>
+                      </Flex>
+                    </Td>
+                    <Td pl={0}>
+                      <Select
+                        size='sm'
+                        name={index}
+                        id={index}
+                        width={'130px'}
+                        value={item.severity}
+                        onChange={(e) =>
+                          handleStatusChange(item.id, e.target.value)
+                        }
+                        bg={sevColor(item.severity.toLowerCase()) + '.200'}
+                        variant={'outline'}
+                      >
+                        {options.map((itm, index) => (
+                          <option key={index} value={itm.value}>
+                            {itm.label}
+                          </option>
+                        ))}
+                      </Select>
+                    </Td>
+                  </Tr>
+                ))}
             </Tbody>
           ) : (
             <Tbody>
