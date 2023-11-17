@@ -22,11 +22,29 @@ import { sevColor } from 'utils'
 import { useMutation, useQuery } from '@apollo/client'
 import { orgRuleUpdate } from 'graphQL/Mutation'
 import { GetOrgRules } from 'graphQL/Queries'
+import DataTable from 'react-data-table-component'
+import CustomLoader from 'components/CustomLoader'
+
+const customStyles = {
+  headCells: {
+    style: {
+      fontWeight: 'bold',
+      color: '#2D3748',
+      fontSize: '12px',
+      letterSpacing: '1px'
+    }
+  }
+}
 
 const ApiFeed = () => {
   const textColor = useColorModeValue('gray.700', 'white')
 
-  const { data, refetch } = useQuery(GetOrgRules)
+  const { data, refetch } = useQuery(GetOrgRules, {
+    variables: {
+      field: 'RULES_FRIENDLY_ID',
+      direction: 'ASC'
+    }
+  })
 
   const [updateRule] = useMutation(orgRuleUpdate)
 
@@ -36,6 +54,93 @@ const ApiFeed = () => {
     { value: 'medium', label: 'Medium', bg: 'yellow' },
     { value: 'low', label: 'Low', bg: 'green' }
   ]
+
+  const columns = [
+    // STATUS
+    {
+      id: 'ORGANIZATION_RULES_ENABLED',
+      name: 'ACTIVE',
+      width: '10%',
+      selector: (row) => {
+        const { id, rule, enabled } = row
+        return (
+          <Switch
+            name={rule.friendlyId}
+            id={rule.friendlyId}
+            isChecked={enabled ? true : false}
+            onChange={(e) => handleChange(e.target.checked, id)}
+          />
+        )
+      }
+    },
+    // CHECK ID
+    {
+      id: 'RULES_FRIENDLY_ID',
+      name: 'CHECK ID',
+      width: '10%',
+      selector: (row) => row.rule.friendlyId,
+      sortable: true,
+      sortFunction: (a, b) => {
+        const extractNumber = (str) => str.match(/\d+/) || [-1] // Extracts the number from the string
+        const numberA = parseInt(extractNumber(a.rule.friendlyId)[0], 10)
+        const numberB = parseInt(extractNumber(b.rule.friendlyId)[0], 10)
+        return numberA - numberB
+      }
+    },
+    // DESCRIPTION
+    {
+      id: 'RULES_SHORT_DESC',
+      name: 'DESCRIPTION',
+      selector: (row) => {
+        const { rule } = row
+        return (
+          <Flex direction='column' rowGap={1} my={3}>
+            <Text fontSize={'sm'}>{rule.shortDesc}</Text>
+            <Text fontSize={'12px'} color={'#666'}>
+              {rule.longDesc}
+            </Text>
+          </Flex>
+        )
+      },
+      wrap: true,
+      sortable: true
+    },
+    // SEVERITY
+    {
+      id: 'ORGANIZATION_RULES_SEVERITY',
+      name: 'SEVERITY',
+      selector: (row) => {
+        const { severity, id } = row
+        return (
+          <Select
+            size='sm'
+            name={id}
+            id={id}
+            width={'130px'}
+            value={severity}
+            onChange={(e) => handleStatusChange(id, e.target.value)}
+            bg={sevColor(severity.toLowerCase()) + '.200'}
+            variant={'outline'}
+          >
+            {options.map((itm, index) => (
+              <option key={index} value={itm.value}>
+                {itm.label}
+              </option>
+            ))}
+          </Select>
+        )
+      },
+      sortable: true,
+      right: 'true'
+    }
+  ]
+
+  const handleSort = (column, sortDirection) => {
+    refetch({
+      field: column.id,
+      direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+    })
+  }
 
   const handleChange = async (value, id) => {
     try {
@@ -71,103 +176,17 @@ const ApiFeed = () => {
         </Text>
       </CardHeader>
       <CardBody>
-        <Table variant='simple' size='sm'>
-          <Thead mb={2}>
-            <Tr my='.8rem'>
-              <Th pl={0}>
-                <Box>Active</Box>
-              </Th>
-              <Th pl={0}>
-                <Box>Check ID</Box>
-              </Th>
-              <Th pl={0}>
-                <Box>Description</Box>
-              </Th>
-              <Th pl={0}>
-                <Box>Severity</Box>
-              </Th>
-            </Tr>
-          </Thead>
-          {data ? (
-            <Tbody>
-              {[...data.organization.organizationRules]
-                .sort((a, b) => {
-                  const extractNumber = (str) => str.match(/\d+/) || [-1] // Extracts the number from the string
-
-                  const numberA = parseInt(
-                    extractNumber(a.rule.friendlyId)[0],
-                    10
-                  )
-                  const numberB = parseInt(
-                    extractNumber(b.rule.friendlyId)[0],
-                    10
-                  )
-
-                  return numberA - numberB
-                })
-                .map((item, index) => (
-                  <Tr key={index}>
-                    <Td pl={0}>
-                      <Switch
-                        name={item.rule.friendlyId}
-                        id={item.rule.friendlyId}
-                        isChecked={item.enabled ? true : false}
-                        onChange={(e) =>
-                          handleChange(e.target.checked, item.id)
-                        }
-                      ></Switch>
-                    </Td>
-                    <Td pl={0}>{item.rule.friendlyId}</Td>
-                    <Td pl={0}>
-                      <Flex direction='column' rowGap={1} maxWidth={800}>
-                        <Text fontSize={'sm'}>{item.rule.shortDesc}</Text>
-                        <Text fontSize={'10px'}>{item.rule.longDesc}</Text>
-                      </Flex>
-                    </Td>
-                    <Td pl={0}>
-                      <Select
-                        size='sm'
-                        name={index}
-                        id={index}
-                        width={'130px'}
-                        value={item.severity}
-                        onChange={(e) =>
-                          handleStatusChange(item.id, e.target.value)
-                        }
-                        bg={sevColor(item.severity.toLowerCase()) + '.200'}
-                        variant={'outline'}
-                      >
-                        {options.map((itm, index) => (
-                          <option key={index} value={itm.value}>
-                            {itm.label}
-                          </option>
-                        ))}
-                      </Select>
-                    </Td>
-                  </Tr>
-                ))}
-            </Tbody>
-          ) : (
-            <Tbody>
-              {[1, 2, 3, 4].map((item, index) => (
-                <Tr key={index}>
-                  <Td pl={0}>
-                    <Skeleton width={'100%'} height={'20px'} />
-                  </Td>
-                  <Td pl={0}>
-                    <Skeleton width={'100%'} height={'20px'} />
-                  </Td>
-                  <Td pl={0}>
-                    <Skeleton width={'100%'} height={'20px'} />
-                  </Td>
-                  <Td pl={0}>
-                    <Skeleton width={'100%'} height={'20px'} />
-                  </Td>
-                </Tr>
-              ))}
-            </Tbody>
-          )}
-        </Table>
+        <DataTable
+          columns={columns}
+          onSort={handleSort}
+          data={data && data.organization.organizationRules}
+          defaultSortAsc={true}
+          defaultSortFieldId={'RULES_FRIENDLY_ID'}
+          customStyles={customStyles}
+          progressPending={data ? false : true}
+          progressComponent={<CustomLoader />}
+          responsive={true}
+        />
       </CardBody>
     </Card>
   )
