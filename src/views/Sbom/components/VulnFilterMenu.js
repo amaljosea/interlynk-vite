@@ -41,7 +41,9 @@ const VulnFilterMenu = ({
   productId,
   sbomId,
   setPageIndex,
-  totalRows
+  totalRows,
+  setVulnAfter,
+  setVulnBefore
 }) => {
   const {
     vulnFilters,
@@ -122,6 +124,8 @@ const VulnFilterMenu = ({
   }
 
   const onFilterCompName = (value) => {
+    setVulnAfter('')
+    setVulnBefore('')
     if (customerView) {
       setSignedVulnComponent(value.includes('all') ? [] : value)
       handleRefetch(
@@ -139,6 +143,8 @@ const VulnFilterMenu = ({
   }
 
   const onFilterSeverity = (value) => {
+    setVulnAfter('')
+    setVulnBefore('')
     if (customerView) {
       setSignedVulnSeverity(value.includes('all') ? [] : value)
       handleRefetch(
@@ -156,6 +162,8 @@ const VulnFilterMenu = ({
   }
 
   const onFilterStatus = (value) => {
+    setVulnAfter('')
+    setVulnBefore('')
     if (customerView) {
       setSignedVulnStatus(value.includes('all') ? [] : value)
       handleRefetch(
@@ -173,6 +181,8 @@ const VulnFilterMenu = ({
   }
 
   const onFilterKev = (value) => {
+    setVulnAfter('')
+    setVulnBefore('')
     if (customerView) {
       setSignedVulnKev(value)
       handleRefetch(
@@ -190,6 +200,8 @@ const VulnFilterMenu = ({
   }
 
   const onFilterEpss = (value) => {
+    setVulnAfter('')
+    setVulnBefore('')
     setMinVal(0)
     setMaxVal(0)
     if (customerView) {
@@ -209,6 +221,8 @@ const VulnFilterMenu = ({
   }
 
   const handleSubmit = () => {
+    setVulnAfter('')
+    setVulnBefore('')
     if (customerView) {
       setSignedVulnEpss(`${signedMinVal}-${signedMaxVal}`)
       handleRefetch(
