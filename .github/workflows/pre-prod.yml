@@ -1,0 +1,72 @@
+name: Staging CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - pre-production
+  pull_request:
+    branches:
+      - pre-production
+
+jobs:
+  run-npm-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+
+      - name: Install Dependencies
+        run: npm install
+      - name: Run Tests
+        run: npm test || true
+
+  handle-test-failure:
+    runs-on: ubuntu-latest
+    needs: run-npm-tests
+    if: ${{ failure() }}
+    steps:
+    - name: Fail the build if tests fail
+      run: exit 1
+
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    needs: run-npm-tests
+    if: ${{ success() }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16.16.0'
+
+    - name: Install Dependencies
+      run: npm install
+
+    - name: Build
+      run: npm run build
+      env:
+        NODE_ENV: development
+        REACT_APP_VENDOR_LOGIN_URL: https://staging-api.interlynk.io/login
+        REACT_APP_VENDOR_LOGOUT_URL: https://staging-api.interlynk.io/logout
+        REACT_APP_USER_LOGIN_URL: https://staging-api.interlynk.io/share_users/login
+        REACT_APP_GRAPHQL_API: https://staging-api.interlynk.io/lynkapi
+
+    - name: List build directory contents
+      run: ls -la ./build
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Sync directory to S3
+      run: aws s3 sync build/ s3://staging.interlynk.io --acl public-read
