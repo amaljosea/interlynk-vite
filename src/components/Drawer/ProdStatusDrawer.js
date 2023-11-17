@@ -32,17 +32,24 @@ const ProdStatusDrawer = ({
   filteredData,
   totalRows,
   filterRefetch,
-  after,
-  before
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
-  const { setVulnFilters, vulnField, vulnDirection } = useContext(GlobalContext)
+  const { 
+    setVulnFilters, 
+    vulnField, 
+    vulnDirection,
+    vulnSeverity,
+    vulnComponent,
+    vulnStatus,
+    vulnKev,
+    vulnEpss
+  } = useContext(GlobalContext)
 
-  const { vexStatus, id, componentVulnLogs, vexJustification, impact } = data
+  const { id, componentVulnLogs } = data
 
   const [statusTitle, setStatusTitle] = useState('')
   const [statusName, setStatusName] = useState('')
@@ -107,6 +114,11 @@ const ProdStatusDrawer = ({
               variables: {
                 projectId: productId,
                 sbomId: sbomId,
+                severity: vulnSeverity.length > 0 ? vulnSeverity : undefined,
+                componentName: vulnComponent.length > 0 ? vulnComponent : undefined,
+                status: vulnStatus.length > 0 ? vulnStatus : undefined,
+                kev: vulnKev === 'yes' ? true : vulnKev === 'no' ? false : undefined,
+                epss: vulnEpss !== '' ? range : undefined,
                 first: after !== '' ? totalRows : undefined,
                 after: after !== '' ? after : undefined,
                 last: before !== '' ? totalRows : undefined,
