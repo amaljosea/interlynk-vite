@@ -23,7 +23,8 @@ import {
   UnorderedList,
   ListItem,
   Divider,
-  Tooltip
+  Tooltip,
+  useToast
 } from '@chakra-ui/react'
 import { useState, useRef, useEffect, useContext } from 'react'
 import { Link, useHistory } from 'react-router-dom'
@@ -40,7 +41,7 @@ import GlobalContext from 'context/GlobalContext'
 
 function ProductVersionsRow(props) {
   const history = useHistory()
-
+  const toast = useToast()
   const { setActiveProdTab, setCurrentProduct } = useContext(GlobalContext)
 
   const {
@@ -196,7 +197,10 @@ function ProductVersionsRow(props) {
               }`}
               onClick={() => {
                 window.localStorage.setItem('product', name)
-                window.localStorage.setItem('productVersion', sbomId[0].primaryComponent?.version)
+                window.localStorage.setItem(
+                  'productVersion',
+                  sbomId[0].primaryComponent?.version
+                )
                 setCurrentProduct({
                   id: id,
                   sbomId:
@@ -210,7 +214,22 @@ function ProductVersionsRow(props) {
               </Text>
             </Link>
           ) : (
-            <Text minWidth='100%'>{name}</Text>
+            <Text
+              minWidth='100%'
+              color={'blue.500'}
+              cursor='pointer'
+              onClick={() => {
+                toast({
+                  title: 'SBOM Not Found',
+                  description: 'Please upload any SBOM file',
+                  status: 'info',
+                  duration: 2000,
+                  position: 'top'
+                })
+              }}
+            >
+              {name}
+            </Text>
           )}
         </Td>
         <Td pl={0}>
