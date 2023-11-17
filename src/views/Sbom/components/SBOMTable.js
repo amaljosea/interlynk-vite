@@ -25,7 +25,6 @@ import { useLazyQuery } from '@apollo/client'
 import {
   GetCheckResults,
   GetComponentData,
-  GetVulnData,
   GetChangeLogs,
   GetCompFilterData,
   GetVulnFilterData,
@@ -84,7 +83,9 @@ const SBOMTable = ({
     vulnStatus,
     vulnKev,
     vulnEpss,
-    setComPageIndex
+    setComPageIndex,
+    compAfter,
+    compBefore
   } = useContext(GlobalContext)
 
   const tab = window.localStorage.getItem('activeProdTab')
@@ -144,8 +145,27 @@ const SBOMTable = ({
     max: parseFloat(epss[1]) / 10000
   }
 
-  // FETCH FILTER DATA BASE ON SELECTED TAB
-  // useEffect(() => {}, [activeProdTab])
+const fetchCompData = () => {
+   getCompData({
+    variables: {
+      projectId: productId,
+      sbomId: sbomId,
+      search: compSearchInput !== '' ? compSearchInput : undefined,
+      ecosystem: compEcosystem.includes('all') || compEcosystem.length === 0 ? undefined : compEcosystem,
+      kind: compType.includes('all') || compType.length === 0 ? undefined : compType,
+      licenses: compLicense.includes('all') || compLicense.length === 0 ? undefined : compLicense,
+      supplierName: compSupplier.includes('all') || compSupplier.length === 0 ? undefined : compSupplier,
+      primary: compScope === 'primary' ? true : undefined,
+      internal: compScope === 'internal' ? true : undefined,
+      first: compAfter !== '' ? totalRows : undefined,
+      after: compAfter !== '' ? compAfter : undefined,
+      last: compBefore !== '' ? totalRows : undefined,
+      before: compBefore !== '' ? compBefore : undefined,
+      field: compField,
+      direction: compDirection
+    }
+  })
+}
 
   const handleTabChange = (value) => {
     setActiveProdTab(Number(value))
@@ -331,6 +351,7 @@ const SBOMTable = ({
                   data={compData?.sbom?.components}
                   totalComp={totalComp}
                   refetch={getCompData}
+                  fetchCompData={fetchCompData}
                   filterRefetch={compFilterRefetch}
                   primaryComp={data.primaryComponent}
                   totalRows={totalRows}

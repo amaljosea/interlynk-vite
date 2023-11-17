@@ -138,7 +138,11 @@ const GlobalContext = React.createContext({
   prodLogDirection: '',
   setProdLogDirection: () => {},
   selectedVulns: [],
-  setSelectedVulns: () => {}
+  setSelectedVulns: () => {},
+  compAfter: '',
+  setCompAfter: () => {},
+  compBefore: '',
+  setCompBefore: () => {}
 })
 
 export default GlobalContext
