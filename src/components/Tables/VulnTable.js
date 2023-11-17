@@ -478,6 +478,8 @@ const VulnTable = ({
               sbomId={sbomId}
               setPageIndex={setPageIndex}
               totalRows={totalRows}
+              setVulnAfter={setVulnAfter}
+              setVulnBefore={setVulnBefore}
             />
           )}
         </Stack>
