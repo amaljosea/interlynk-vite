@@ -62,7 +62,9 @@ const ProductVersions = ({
           </Thead>
           <Tbody>
             {allProjects.projects.nodes.length > 0 &&
-              allProjects.projects.nodes.map((pv, index) => {
+              allProjects.projects.nodes
+              .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)) // Sort by updatedAt in descending order
+              .map((pv, index) => {
                 return (
                   <ProductVersionsRow
                     key={index}
