@@ -62,25 +62,25 @@ const ProductVersions = ({
           </Thead>
           <Tbody>
             {allProjects.projects.nodes.length > 0 &&
-              allProjects.projects.nodes
-              .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)) // Sort by updatedAt in descending order
-              .map((pv, index) => {
-                return (
-                  <ProductVersionsRow
-                    key={index}
-                    id={pv.id}
-                    sbomId={pv.sboms}
-                    name={pv.name}
-                    enabled={pv.enabled}
-                    description={pv.description}
-                    updatedAt={pv.updatedAt}
-                    allProjects={allProjects}
-                    isLoading={isLoading}
-                    refetch={refetch}
-                    totalRows={totalRows}
-                  />
-                )
-              })}
+              [...allProjects.projects.nodes]
+                .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)) // Sort by updatedAt in descending order
+                .map((pv, index) => {
+                  return (
+                    <ProductVersionsRow
+                      key={index}
+                      id={pv.id}
+                      sbomId={pv.sboms}
+                      name={pv.name}
+                      enabled={pv.enabled}
+                      description={pv.description}
+                      updatedAt={pv.updatedAt}
+                      allProjects={allProjects}
+                      isLoading={isLoading}
+                      refetch={refetch}
+                      totalRows={totalRows}
+                    />
+                  )
+                })}
           </Tbody>
         </Table>
       </CardBody>
