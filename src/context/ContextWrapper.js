@@ -99,6 +99,12 @@ const ContextWrapper = (props) => {
   const [signedMinVal, setSignedMinVal] = useState()
   const [signedMaxVal, setSignedMaxVal] = useState()
 
+  // HEALTH CHECK FILTER
+  const [checkSearchInput, setCheckSearchInput] = useState('')
+  const [checkCategory, setCheckCategory] = useState([])
+  const [checkSeverity, setCheckSeverity] = useState([])
+  const [checkStatus, setCheckStatus] = useState([])
+
   // IMPORT DATA
   const [mergeData, setMergeData] = useState([])
   const [currentSbom, setCurrentSbom] = useState([])
@@ -107,6 +113,8 @@ const ContextWrapper = (props) => {
 
   const [compAfter, setCompAfter] = useState('')
   const [compBefore, setCompBefore] = useState('')
+  const [checkAfter, setCheckAfter] = useState('')
+  const [checkBefore, setCheckBefore] = useState('')
 
   return (
     <GlobalContext.Provider
@@ -245,7 +253,19 @@ const ContextWrapper = (props) => {
         compAfter,
         setCompAfter,
         compBefore,
-        setCompBefore
+        setCompBefore,
+        checkSearchInput,
+        setCheckSearchInput,
+        checkCategory,
+        setCheckCategory,
+        checkSeverity,
+        setCheckSeverity,
+        checkStatus,
+        setCheckStatus,
+        checkAfter,
+        setCheckAfter,
+        checkBefore,
+        setCheckBefore
       }}
     >
       {props.children}

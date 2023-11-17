@@ -37,7 +37,6 @@ const CheckModal = ({
   shortDesc,
   components,
   checkId,
-  totalRows,
   filterRefetch,
   componentId
 }) => {
@@ -46,11 +45,10 @@ const CheckModal = ({
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
-  console.log('id', id)
-  console.log('components', components)
+  // console.log('id', id)
+  // console.log('components', components)
 
-  const { setCheckFilters, checkField, checkDirection } =
-    useContext(GlobalContext)
+  const { setCheckFilters } = useContext(GlobalContext)
 
   const now = new Date()
   const hours = String(now.getHours()).padStart(2, '0')
@@ -67,21 +65,7 @@ const CheckModal = ({
   const [componentData, setComponentData] = useState([])
 
   const [healthRecheck] = useMutation(recheckHealth, {
-    onCompleted: () => {
-      refetch({
-        projectId: productId,
-        sbomId: sbomId,
-        first: totalRows,
-        last: undefined,
-        after: undefined,
-        before: undefined,
-        category: undefined,
-        severity: undefined,
-        status: undefined,
-        field: checkField,
-        direction: checkDirection
-      })
-    }
+    onCompleted: () => refetch()
   })
 
   const [updateComponent] = useMutation(UpdateComponent)

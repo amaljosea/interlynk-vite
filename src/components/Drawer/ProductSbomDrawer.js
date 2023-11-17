@@ -109,21 +109,7 @@ function ProductSbomDrawer(props) {
   const [isCPEInputValid, setCPEInputValid] = useState(true)
 
   const [healthRecheck] = useMutation(recheckHealth, {
-    onCompleted: () => {
-      refetch({
-        projectId: productId,
-        sbomId: sbomId,
-        first: totalRows,
-        last: undefined,
-        after: undefined,
-        before: undefined,
-        category: undefined,
-        severity: undefined,
-        status: undefined,
-        field: checkField,
-        direction: checkDirection
-      })
-    }
+    onCompleted: () => refetch()
   })
 
   useEffect(() => {

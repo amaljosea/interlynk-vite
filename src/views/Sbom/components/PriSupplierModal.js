@@ -14,19 +14,11 @@ import {
   Input,
   FormErrorMessage
 } from '@chakra-ui/react'
-import GlobalContext from 'context/GlobalContext'
 import { recheckHealth, supplierUpdate, supplierCreate } from 'graphQL/Mutation'
-import { useState, useEffect, useContext } from 'react'
+import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 
-const PriSupplierModal = ({
-  isOpen,
-  onClose,
-  refetch,
-  suppliers,
-  checkId,
-  totalRows
-}) => {
+const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('p')
@@ -36,9 +28,6 @@ const PriSupplierModal = ({
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
     return emailRegex.test(email)
   }
-
-  const { setCheckFilters, checkField, checkDirection } =
-    useContext(GlobalContext)
 
   const [supName, setSupName] = useState('')
   const [supEmail, setSupEmail] = useState('')
@@ -58,21 +47,7 @@ const PriSupplierModal = ({
   })
 
   const [healthRecheck] = useMutation(recheckHealth, {
-    onCompleted: () => {
-      refetch({
-        projectId: productId,
-        sbomId: sbomId,
-        first: totalRows,
-        last: undefined,
-        after: undefined,
-        before: undefined,
-        category: undefined,
-        severity: undefined,
-        status: undefined,
-        field: checkField,
-        direction: checkDirection
-      })
-    }
+    onCompleted: () => refetch()
   })
 
   useEffect(() => {
@@ -160,7 +135,9 @@ const PriSupplierModal = ({
                 <Button
                   colorScheme='blue'
                   type={'submit'}
-                  disabled={!supName || (supEmail!='' &&  !validateEmail(supEmail))}
+                  disabled={
+                    !supName || (supEmail != '' && !validateEmail(supEmail))
+                  }
                 >
                   Update
                 </Button>
@@ -168,7 +145,9 @@ const PriSupplierModal = ({
                 <Button
                   colorScheme='blue'
                   type={'submit'}
-                  disabled={!supName || (supEmail!='' &&  !validateEmail(supEmail))}
+                  disabled={
+                    !supName || (supEmail != '' && !validateEmail(supEmail))
+                  }
                 >
                   Save
                 </Button>

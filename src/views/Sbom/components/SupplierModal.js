@@ -25,7 +25,7 @@ const SupplierModal = ({
   id,
   isOpen,
   onClose,
-  fetchCompData,
+  refetch,
   suppliers,
   checkId,
   filterRefetch
@@ -35,14 +35,8 @@ const SupplierModal = ({
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
-  const {
-    checkField,
-    checkDirection,
-    totalRows,
-    comPageIndex,
-    setComPageIndex,
-    setCompFilters
-  } = useContext(GlobalContext)
+  const { comPageIndex, setComPageIndex, setCompFilters } =
+    useContext(GlobalContext)
 
   const validateEmail = (email) => {
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
@@ -69,28 +63,14 @@ const SupplierModal = ({
   }
 
   const [createSupplier] = useMutation(addComSupplier, {
-    onCompleted: () => handleRefetch()
+    onCompleted: () => refetch()
   })
   const [updateSupplier] = useMutation(updateComSupplier, {
-    onCompleted: () => handleRefetch()
+    onCompleted: () => refetch()
   })
 
   const [healthRecheck] = useMutation(recheckHealth, {
-    onCompleted: () => {
-      refetch({
-        projectId: productId,
-        sbomId: sbomId,
-        first: totalRows,
-        last: undefined,
-        after: undefined,
-        before: undefined,
-        category: undefined,
-        severity: undefined,
-        status: undefined,
-        field: checkField,
-        direction: checkDirection
-      })
-    }
+    onCompleted: () => refetch()
   })
 
   useEffect(() => {
