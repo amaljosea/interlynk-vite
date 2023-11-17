@@ -1,6 +1,6 @@
 // Chakra imports
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import {
   Drawer,
   DrawerBody,
@@ -38,18 +38,15 @@ import {
   ModalFooter
 } from '@chakra-ui/react'
 import { useMutation } from '@apollo/client'
-import { CreateComponent } from 'graphQL/Mutation'
-import { UpdateComponent } from 'graphQL/Mutation'
+import { CreateComponent, UpdateComponent } from 'graphQL/Mutation'
 import { useLocation } from 'react-router-dom'
 import { licenseOptions } from 'variables/licenses'
 import MultiSelect from 'react-select'
-
 import { PackageURL } from 'packageurl-js'
 import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import { InfoIcon, CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import { FaExpandAlt } from 'react-icons/fa'
-import { useContext } from 'react'
 import GlobalContext from 'context/GlobalContext'
 
 // const regexPattern = /^cpe:2\.3:[aho]:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+$/
@@ -69,7 +66,6 @@ function ComponentDrawer(props) {
     id,
     isOpen,
     onClose,
-    btnRef,
     component,
     version,
     license,
@@ -79,31 +75,13 @@ function ComponentDrawer(props) {
     primary,
     internal,
     primaryComp,
-    refetch,
+    fetchCompData,
     group,
     shortDesc,
-    filterRefetch,
-    after,
-    before
+    filterRefetch
   } = props
 
-  const { compField, compDirection, setCompFilters, totalRows } =
-    useContext(GlobalContext)
-
-  const handleRefetch = () => {
-    refetch({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        first: after !== '' ? totalRows : undefined,
-        after: after !== '' ? after : undefined,
-        last: before !== '' ? totalRows : undefined,
-        before: before !== '' ? before : undefined,
-        field: compField,
-        direction: compDirection
-      }
-    })
-  }
+  const { setCompFilters } = useContext(GlobalContext)
 
   const onFilterRefetch = () => {
     filterRefetch({
@@ -113,11 +91,11 @@ function ComponentDrawer(props) {
   }
 
   const [createComponent] = useMutation(CreateComponent, {
-    onCompleted: () => handleRefetch()
+    onCompleted: () => fetchCompData()
   })
 
   const [updateComponent] = useMutation(UpdateComponent, {
-    onCompleted: () => handleRefetch()
+    onCompleted: () => fetchCompData()
   })
 
   const [compId, setCompId] = useState('')
@@ -137,7 +115,6 @@ function ComponentDrawer(props) {
   const [purlData, setPurlData] = useState(null)
   const [isPURLInputValid, setPURLInputValid] = useState(true)
 
-  const [isIncomplete, setIsIncomplete] = useState(false)
   const [isPrimary, setIsPrimary] = useState(primary)
   const [isInternal, setIsInternal] = useState(internal)
 

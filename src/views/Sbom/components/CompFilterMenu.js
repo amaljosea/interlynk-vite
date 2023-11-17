@@ -64,7 +64,9 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
     compSupplier,
     setCompSupplier,
     compScope,
-    setCompScope
+    setCompScope,
+    setCompAfter,
+    setCompBefore
   } = useContext(GlobalContext)
 
   const { ecosystems, kinds, supplierNames, licenses } = customerView
@@ -72,6 +74,8 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
     : compFilters
 
   const onFilterEcosystem = (value) => {
+    setCompAfter('')
+    setCompBefore('')
     setCompEcosystem(value.includes('all') ? [] : value)
     refetch({
       variables: {
@@ -90,6 +94,8 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
   }
 
   const onFilterKind = (value) => {
+    setCompAfter('')
+    setCompBefore('')
     setCompType(value.includes('all') ? [] : value)
     refetch({
       variables: {
@@ -108,6 +114,8 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
   }
 
   const onFilterLicense = (value) => {
+    setCompAfter('')
+    setCompBefore('')
     setCompLicense(value.includes('all') ? [] : value)
     refetch({
       variables: {
@@ -126,6 +134,8 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
   }
 
   const onFilterSupplier = (value) => {
+    setCompAfter('')
+    setCompBefore('')
     setCompSupplier(value.includes('all') ? [] : value)
     refetch({
       variables: {
@@ -144,6 +154,8 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
   }
 
   const onFilterType = (value) => {
+    setCompAfter('')
+    setCompBefore('')
     setCompScope(value)
     refetch({
       variables: {

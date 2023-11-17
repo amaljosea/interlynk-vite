@@ -77,7 +77,6 @@ const ComponentTable = ({
   data,
   totalComp,
   refetch,
-  fetchCompData,
   primaryComp,
   totalRows,
   setTotalRows,
@@ -95,6 +94,11 @@ const ComponentTable = ({
   const {
     compSearchInput,
     setCompSearchInput,
+    compEcosystem,
+    compType,
+    compLicense,
+    compSupplier,
+    compScope,
     compFilters,
     compField,
     setCompField,
@@ -106,9 +110,33 @@ const ComponentTable = ({
     setSignedCompDirection,
     comPageIndex,
     setComPageIndex,
+    compAfter,
+    compBefore,
     setCompAfter,
     setCompBefore
   } = useContext(GlobalContext)
+
+  const fetchCompData = () => {
+    refetch({
+     variables: {
+       projectId: productId,
+       sbomId: sbomId,
+       search: compSearchInput !== '' ? compSearchInput : undefined,
+       ecosystem: compEcosystem.includes('all') || compEcosystem.length === 0 ? undefined : compEcosystem,
+       kind: compType.includes('all') || compType.length === 0 ? undefined : compType,
+       licenses: compLicense.includes('all') || compLicense.length === 0 ? undefined : compLicense,
+       supplierName: compSupplier.includes('all') || compSupplier.length === 0 ? undefined : compSupplier,
+       primary: compScope === 'primary' ? true : undefined,
+       internal: compScope === 'internal' ? true : undefined,
+       first: compAfter !== '' ? totalRows : undefined,
+       after: compAfter !== '' ? compAfter : undefined,
+       last: compBefore !== '' ? totalRows : undefined,
+       before: compBefore !== '' ? compBefore : undefined,
+       field: compField,
+       direction: compDirection
+      }
+    })
+  }
 
   const [activeRow, setActiveRow] = useState(null)
 
@@ -820,7 +848,6 @@ const ComponentTable = ({
     })
   }
 
-
   const handlePreviousPage = async () => {
     setComPageIndex((prev) => comPageIndex !== 0 && prev - 1)
     setCompBefore(data.pageInfo.startCursor)
@@ -829,11 +856,17 @@ const ComponentTable = ({
       variables: {
         projectId: productId,
         sbomId: sbomId,
+        search: compSearchInput !== '' ? compSearchInput : undefined,
+        ecosystem: compEcosystem.includes('all') || compEcosystem.length === 0 ? undefined : compEcosystem,
+        kind: compType.includes('all') || compType.length === 0 ? undefined : compType,
+        licenses: compLicense.includes('all') || compLicense.length === 0 ? undefined : compLicense,
+        supplierName: compSupplier.includes('all') || compSupplier.length === 0 ? undefined : compSupplier,
+        primary: compScope === 'primary' ? true : undefined,
+        internal: compScope === 'internal' ? true : undefined,
         last: totalRows,
         before: data.pageInfo.startCursor,
         after: undefined,
         first: undefined,
-        search: compSearchInput !== '' ? compSearchInput : undefined,
         field: customerView ? signedCompField : compField,
         direction: customerView ? signedCompDirection : compDirection
       }
@@ -848,11 +881,17 @@ const ComponentTable = ({
       variables: {
         projectId: productId,
         sbomId: sbomId,
+        search: compSearchInput !== '' ? compSearchInput : undefined,
+        ecosystem: compEcosystem.includes('all') || compEcosystem.length === 0 ? undefined : compEcosystem,
+        kind: compType.includes('all') || compType.length === 0 ? undefined : compType,
+        licenses: compLicense.includes('all') || compLicense.length === 0 ? undefined : compLicense,
+        supplierName: compSupplier.includes('all') || compSupplier.length === 0 ? undefined : compSupplier,
+        primary: compScope === 'primary' ? true : undefined,
+        internal: compScope === 'internal' ? true : undefined,
         first: totalRows,
         after: data.pageInfo.endCursor,
         last: undefined,
         before: undefined,
-        search: compSearchInput !== '' ? compSearchInput : undefined,
         field: customerView ? signedCompField : compField,
         direction: customerView ? signedCompDirection : compDirection
       }
@@ -927,12 +966,11 @@ const ComponentTable = ({
               id={activeRow.id}
               isOpen={isOpen}
               onClose={onClose}
-              btnRef={compBtn}
               component={activeRow.name}
               version={activeRow.version}
               license={activeRow.licenses !== null ? activeRow.licenses : []}
               type={activeRow.kind}
-              refetch={refetch}
+              fetchCompData={fetchCompData}
               filterRefetch={filterRefetch}
               cpes={activeRow.cpes}
               purl={activeRow.purl}
@@ -942,8 +980,6 @@ const ComponentTable = ({
               checkId={null}
               group={activeRow.group}
               primaryComp={primaryComp}
-              after={compAfter}
-              before={compBefore}
             />
           )}
 
@@ -952,22 +988,20 @@ const ComponentTable = ({
               isOpen={isDelOpen}
               onClose={onDelClose}
               id={activeRow.id}
-              refetch={refetch}
+              fetchCompData={fetchCompData}
             />
           )}
 
           {isSupOpen && (
             <SupplierModal
               id={activeRow.id}
-              refetch={refetch}
+              fetchCompData={fetchCompData}
               filterRefetch={filterRefetch}
               isOpen={isSupOpen}
               onClose={onSupClose}
               suppliers={activeRow.suppliers}
               shortDesc={null}
               checkId={null}
-              after={compAfter}
-              before={compBefore}
             />
           )}
 
@@ -977,11 +1011,9 @@ const ComponentTable = ({
               btnRef={linkRef}
               isOpen={isLinkOpen}
               onClose={onLinkClose}
-              refetch={refetch}
+              fetchCompData={fetchCompData}
               productId={productId}
               sbomId={sbomId}
-              after={compAfter}
-              before={compBefore}
             />
           )}
 
@@ -1003,7 +1035,6 @@ const ComponentTable = ({
         <ComponentDrawer
           isOpen={isCompOpen}
           onClose={onCompClose}
-          btnRef={compBtn}
           component={''}
           version={''}
           license={''}
@@ -1012,13 +1043,11 @@ const ComponentTable = ({
           purl={''}
           primary={false}
           internal={false}
-          refetch={refetch}
+          fetchCompData={fetchCompData}
           filterRefetch={filterRefetch}
           shortDesc={null}
           checkId={null}
           primaryComp={primaryComp}
-          after={compAfter}
-          before={compBefore}
         />
       )}
     </>

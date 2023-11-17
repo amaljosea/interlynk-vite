@@ -83,9 +83,7 @@ const SBOMTable = ({
     vulnStatus,
     vulnKev,
     vulnEpss,
-    setComPageIndex,
-    compAfter,
-    compBefore
+    setComPageIndex
   } = useContext(GlobalContext)
 
   const tab = window.localStorage.getItem('activeProdTab')
@@ -145,27 +143,6 @@ const SBOMTable = ({
     max: parseFloat(epss[1]) / 10000
   }
 
-const fetchCompData = () => {
-   getCompData({
-    variables: {
-      projectId: productId,
-      sbomId: sbomId,
-      search: compSearchInput !== '' ? compSearchInput : undefined,
-      ecosystem: compEcosystem.includes('all') || compEcosystem.length === 0 ? undefined : compEcosystem,
-      kind: compType.includes('all') || compType.length === 0 ? undefined : compType,
-      licenses: compLicense.includes('all') || compLicense.length === 0 ? undefined : compLicense,
-      supplierName: compSupplier.includes('all') || compSupplier.length === 0 ? undefined : compSupplier,
-      primary: compScope === 'primary' ? true : undefined,
-      internal: compScope === 'internal' ? true : undefined,
-      first: compAfter !== '' ? totalRows : undefined,
-      after: compAfter !== '' ? compAfter : undefined,
-      last: compBefore !== '' ? totalRows : undefined,
-      before: compBefore !== '' ? compBefore : undefined,
-      field: compField,
-      direction: compDirection
-    }
-  })
-}
 
   const handleTabChange = (value) => {
     setActiveProdTab(Number(value))
@@ -351,8 +328,7 @@ const fetchCompData = () => {
                   data={compData?.sbom?.components}
                   totalComp={totalComp}
                   refetch={getCompData}
-                  fetchCompData={fetchCompData}
-                  filterRefetch={compFilterRefetch}
+                  filterRefetch={getCompFilters}
                   primaryComp={data.primaryComponent}
                   totalRows={totalRows}
                   setTotalRows={setTotalRows}

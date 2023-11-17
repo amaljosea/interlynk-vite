@@ -32,13 +32,10 @@ import GlobalContext from 'context/GlobalContext'
 const LinksDrawer = ({
   isOpen,
   onClose,
-  btnRef,
   component,
   sbomId,
   productId,
-  refetch,
-  after,
-  before
+  fetchCompData
 }) => {
   const [type, setType] = useState('')
   const [link, setLink] = useState('')
@@ -88,22 +85,7 @@ const LinksDrawer = ({
         urls: linksData
       }
     })
-      .then((res) => {
-        if (res.data) {
-          refetch({
-            variables: {
-              projectId: productId,
-              sbomId: sbomId,
-              first: after !== '' ? totalRows : undefined,
-              after: after !== '' ? after : undefined,
-              last: before !== '' ? totalRows : undefined,
-              before: before !== '' ? before : undefined,
-              field: compField,
-              direction: compDirection
-            }
-          })
-        }
-      })
+      .then((res) => res.data && fetchCompData())
       .finally(() => onClose())
   }
 

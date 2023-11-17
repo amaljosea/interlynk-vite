@@ -25,12 +25,10 @@ const SupplierModal = ({
   id,
   isOpen,
   onClose,
-  refetch,
+  fetchCompData,
   suppliers,
   checkId,
-  filterRefetch,
-  after,
-  before
+  filterRefetch
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -38,14 +36,12 @@ const SupplierModal = ({
   const sbomId = queryParams.get('sbom')
 
   const {
-    compDirection,
-    compField,
-    setCheckFilters,
     checkField,
     checkDirection,
     totalRows,
     comPageIndex,
-    setComPageIndex
+    setComPageIndex,
+    setCompFilters
   } = useContext(GlobalContext)
 
   const validateEmail = (email) => {
@@ -58,25 +54,18 @@ const SupplierModal = ({
 
   const handleRefetch = () => {
     setComPageIndex(comPageIndex)
-    refetch({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        first: after !== '' ? totalRows : undefined,
-        after: after !== '' ? after : undefined,
-        last: before !== '' ? totalRows : undefined,
-        before: before !== '' ? before : undefined,
-        field: compField,
-        direction: compDirection
-      }
-    })
+    fetchCompData()
   }
 
   const onFilterRefetch = () => {
     filterRefetch({
-      projectId: productId,
-      sbomId: sbomId
-    }).then((res) => setCheckFilters(res.data.sbom.filters))
+      variables: {
+        projectId: productId,
+        sbomId: sbomId
+      }
+    }).then((res) => {
+      setCompFilters(res.data.sbom.filters)
+    })
   }
 
   const [createSupplier] = useMutation(addComSupplier, {

@@ -11,34 +11,21 @@ import {
   Text,
   Stack
 } from '@chakra-ui/react'
-import GlobalContext from 'context/GlobalContext'
 import { DeleteComponent } from 'graphQL/Mutation'
-import { useContext } from 'react'
 import { useLocation } from 'react-router-dom'
 
-const ComponentModal = ({ isOpen, onClose, id, refetch, after, before }) => {
+const ComponentModal = ({
+  isOpen,
+  onClose,
+  id,
+  fetchCompData,
+}) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
-
-  const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
-  const { compDirection, compField, totalRows } = useContext(GlobalContext)
-
   const [deleteComponent] = useMutation(DeleteComponent, {
-    onCompleted: () =>
-      refetch({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          first: after !== '' ? totalRows : undefined,
-          after: after !== '' ? after : undefined,
-          last: before !== '' ? totalRows : undefined,
-          before: before !== '' ? before : undefined,
-          field: compField,
-          direction: compDirection
-        }
-      })
+    onCompleted: () => fetchCompData()
   })
 
   const handleDelete = async () => {
