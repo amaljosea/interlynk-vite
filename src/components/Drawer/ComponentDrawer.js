@@ -518,7 +518,7 @@ function ComponentDrawer(props) {
                   errorBorderColor='blue.600'
                 />
               </FormControl>
-              {/* group */}
+              {/* Group */}
               <FormControl>
                 <FormLabel fontSize={'sm'}>Group</FormLabel>
                 <Input
@@ -532,21 +532,11 @@ function ComponentDrawer(props) {
                 />
               </FormControl>
               {/* Kind */}
-              <Stack spacing={2} fontSize={'sm'}>
-                <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-                  <Text>
-                    Type
-                    <chakra.span color={'red.500'} ml={1}>
-                      *
-                    </chakra.span>
-                  </Text>
-                  <Tooltip label='Component Type'>
-                    <Icon as={InfoIcon} color={'blue.500'} />
-                  </Tooltip>
-                </Flex>
+              <FormControl spacing={2} fontSize={'sm'}>
+                <FormLabel htmlFor='componentType'>Type</FormLabel>
                 <Select
-                  id='kind'
-                  name='kind'
+                  id='componentType'
+                  name='componentType'
                   size='sm'
                   value={compType}
                   onChange={(e) => setCompType(e.target.value)}
@@ -566,15 +556,15 @@ function ComponentDrawer(props) {
                   <option value='other'>Other</option>
                   <option value='unspecified'>Unspecified</option>
                 </Select>
-              </Stack>
+              </FormControl>
               {/* Licenses */}
-              <Stack spacing={2} fontSize={'sm'}>
-                <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-                  <Text>Licenses</Text>
+              <FormControl>
+                <FormLabel htmlForm='compLicenses' as={Flex}>
+                  <chakra.span mr={2}>Licenses</chakra.span>
                   <Tooltip label='List of licenses applicable to the component'>
                     <Icon as={InfoIcon} color={'blue.500'} />
                   </Tooltip>
-                </Flex>
+                </FormLabel>
                 <MultiSelect
                   styles={{
                     control: (baseStyles, state) => ({
@@ -590,11 +580,14 @@ function ComponentDrawer(props) {
                   options={licenses}
                   onChange={onLicenseChange}
                 />
-              </Stack>
+              </FormControl>
               {containesOther && (
                 <FormControl isRequired>
+                  <FormLabel>SPDX</FormLabel>
                   <Input
                     size='sm'
+                    id='compLicenses'
+                    name='compLicenses'
                     placeholder='Enter a valid SPDX license'
                     value={licenseName}
                     onChange={(e) => setLicenseName(e.target.value)}
