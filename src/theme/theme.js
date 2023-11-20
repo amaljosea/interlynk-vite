@@ -17,7 +17,13 @@ export default extendTheme(
   {
     breakpoints,
     components: {
-      Steps
+      Steps,
+      FormLabel: {
+        baseStyle: {
+          fontSize: '14px',
+          marginBottom: '4px'
+        }
+      }
     }
   }, // Breakpoints
   globalStyles,
