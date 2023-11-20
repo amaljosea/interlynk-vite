@@ -21,7 +21,8 @@ import {
   Select,
   FormLabel,
   Input,
-  FormErrorMessage
+  FormErrorMessage,
+  Tooltip
 } from '@chakra-ui/react'
 import { DeleteIcon } from '@chakra-ui/icons'
 import { useMutation } from '@apollo/client'
@@ -33,7 +34,7 @@ const LinksDrawer = ({ isOpen, onClose, component, sbomId, fetchCompData }) => {
   const [linksData, setLinksData] = useState([])
   const [error, setError] = useState('')
   const { id, externalUrls } = component
-
+  const [linkError, setLinkError] = useState('')
   const [updateLinks] = useMutation(UpdateCompLinks)
 
   const urls = []
@@ -49,7 +50,7 @@ const LinksDrawer = ({ isOpen, onClose, component, sbomId, fetchCompData }) => {
   }, [externalUrls])
 
   const urlPattern = new RegExp(
-    '(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w .-]*/?'
+    '(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w.-]*/?'
   )
 
   const handleTypeChange = (e) => {
@@ -61,6 +62,16 @@ const LinksDrawer = ({ isOpen, onClose, component, sbomId, fetchCompData }) => {
       setError('Link type already exists!')
     } else {
       setError('')
+    }
+  }
+
+  const handleLinkChange = (e) => {
+    const { value } = e.target
+    setLink(value)
+    if (value.length > 1024) {
+      setLinkError('Input must be 1024 characters')
+    } else {
+      setLinkError('')
     }
   }
 
@@ -131,22 +142,22 @@ const LinksDrawer = ({ isOpen, onClose, component, sbomId, fetchCompData }) => {
                   <FormErrorMessage>{error}</FormErrorMessage>
                 </FormControl>
                 {/* URL */}
-                <FormControl isRequired>
+                <FormControl isRequired isInvalid={linkError}>
                   <FormLabel>Link</FormLabel>
                   <Input
                     placeholder='Add URL'
                     value={link}
-                    onChange={(e) => setLink(e.target.value)}
+                    onChange={handleLinkChange}
                   />
-                  {link !== '' && !urlPattern.test(link) && (
-                    <FormErrorMessage>URL is invalid</FormErrorMessage>
-                  )}
+                  <FormErrorMessage>{linkError}</FormErrorMessage>
                 </FormControl>
                 {/* ACTIONS */}
                 <Button
                   colorScheme='blue'
                   type='submit'
-                  isDisabled={!urlPattern.test(link) || error !== ''}
+                  isDisabled={
+                    !urlPattern.test(link) || error !== '' || linkError !== ''
+                  }
                 >
                   Add
                 </Button>
@@ -159,7 +170,7 @@ const LinksDrawer = ({ isOpen, onClose, component, sbomId, fetchCompData }) => {
                     <Table variant='simple' size='sm' mt={4}>
                       <Thead>
                         <Tr my='.8rem'>
-                          <Th pl={0} width={'300px'}>
+                          <Th pl={0} width={'260px'}>
                             Link
                           </Th>
                           <Th pl={0}>Type</Th>
@@ -172,10 +183,14 @@ const LinksDrawer = ({ isOpen, onClose, component, sbomId, fetchCompData }) => {
                             <Td
                               pl={0}
                               fontSize={'xs'}
-                              width={'300px'}
+                              width={'260px'}
                               wordBreak={'break-all'}
                             >
-                              {item.url}
+                              <Tooltip label={item.url}>
+                                {item.url.length > 35
+                                  ? `${item.url.substring(0, 35)}...`
+                                  : item.url}
+                              </Tooltip>
                             </Td>
                             <Td pl={0} fontSize={'xs'}>
                               {item.name}
