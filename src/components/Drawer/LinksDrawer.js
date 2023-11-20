@@ -26,24 +26,13 @@ import {
 import { DeleteIcon } from '@chakra-ui/icons'
 import { useMutation } from '@apollo/client'
 import { UpdateCompLinks } from 'graphQL/Mutation'
-import { useContext } from 'react'
-import GlobalContext from 'context/GlobalContext'
 
-const LinksDrawer = ({
-  isOpen,
-  onClose,
-  component,
-  sbomId,
-  productId,
-  fetchCompData
-}) => {
+const LinksDrawer = ({ isOpen, onClose, component, sbomId, fetchCompData }) => {
   const [type, setType] = useState('')
   const [link, setLink] = useState('')
   const [linksData, setLinksData] = useState([])
-
+  const [error, setError] = useState('')
   const { id, externalUrls } = component
-
-  const { compDirection, compField, totalRows } = useContext(GlobalContext)
 
   const [updateLinks] = useMutation(UpdateCompLinks)
 
@@ -63,7 +52,17 @@ const LinksDrawer = ({
     '(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w .-]*/?'
   )
 
-  console.log('linksData', linksData)
+  const handleTypeChange = (e) => {
+    const { value } = e.target
+    setType(value)
+    const isExists =
+      linksData.length > 0 && linksData.find((item) => item.name === value)
+    if (isExists) {
+      setError('Link type already exists!')
+    } else {
+      setError('')
+    }
+  }
 
   const handleLinkAdd = async (e) => {
     e.preventDefault()
@@ -102,12 +101,9 @@ const LinksDrawer = ({
             <form onSubmit={handleLinkAdd}>
               <Flex direction={'column'} alignItems={'flex-start'} gap={3}>
                 {/* NAME */}
-                <FormControl isRequired>
+                <FormControl isRequired isInvalid={error}>
                   <FormLabel>Type</FormLabel>
-                  <Select
-                    value={type}
-                    onChange={(e) => setType(e.target.value)}
-                  >
+                  <Select value={type} onChange={handleTypeChange}>
                     <option value=''>-- Select --</option>
                     {[
                       'vcs',
@@ -132,6 +128,7 @@ const LinksDrawer = ({
                       </option>
                     ))}
                   </Select>
+                  <FormErrorMessage>{error}</FormErrorMessage>
                 </FormControl>
                 {/* URL */}
                 <FormControl isRequired>
@@ -149,7 +146,7 @@ const LinksDrawer = ({
                 <Button
                   colorScheme='blue'
                   type='submit'
-                  isDisabled={!urlPattern.test(link)}
+                  isDisabled={!urlPattern.test(link) || error !== ''}
                 >
                   Add
                 </Button>
