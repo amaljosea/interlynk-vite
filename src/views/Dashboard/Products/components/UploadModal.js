@@ -22,7 +22,7 @@ import { FaUpload } from 'react-icons/fa'
 
 const UploadModal = ({ id, isOpen, onClose }) => {
   const toast = useToast()
-  const [sbomUpload, { data, loading, error }] = useMutation(UploadSbom)
+  const [sbomUpload, { loading, error }] = useMutation(UploadSbom)
   const [errorMessage, setErrorMessage] = useState('')
 
   const handleUpload = async (file) => {
@@ -41,7 +41,7 @@ const UploadModal = ({ id, isOpen, onClose }) => {
                 'The validated SBOM data will be available in the product shortly',
               duration: 6000,
               isClosable: true,
-              position: 'bottom',
+              position: 'top',
               variant: 'left-accent'
             })
           } else {
@@ -50,7 +50,7 @@ const UploadModal = ({ id, isOpen, onClose }) => {
               status: 'error',
               duration: 4000,
               isClosable: true,
-              position: 'bottom'
+              position: 'top'
             })
           }
         })
@@ -77,12 +77,6 @@ const UploadModal = ({ id, isOpen, onClose }) => {
     }
   }
 
-  // useEffect(() => {
-  //   if (data) {
-  //     console.log('Data', data.sbomUpload)
-  //   }
-  // }, [data])
-
   return (
     <>
       <Modal isOpen={isOpen} onClose={onClose}>
@@ -90,7 +84,7 @@ const UploadModal = ({ id, isOpen, onClose }) => {
         <ModalContent>
           <ModalHeader>Upload SBOM</ModalHeader>
           <ModalCloseButton onClick={() => setErrorMessage('')} />
-          <ModalBody>
+          <ModalBody pb={4}>
             {errorMessage !== '' && (
               <Alert status='error' mb={4} borderRadius={5}>
                 <AlertIcon />
@@ -131,19 +125,6 @@ const UploadModal = ({ id, isOpen, onClose }) => {
               </Box>
             )}
           </ModalBody>
-          {/* <ModalFooter>
-            <Button
-              colorScheme='blue'
-              borderRadius={8}
-              onClick={() => {
-                onClose()
-                fetchProjects()
-              }}
-              disabled={!data}
-            >
-              Save
-            </Button>
-          </ModalFooter> */}
         </ModalContent>
       </Modal>
     </>

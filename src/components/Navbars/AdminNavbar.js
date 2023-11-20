@@ -188,7 +188,7 @@ export default function AdminNavbar(props) {
                   onClick={() => {
                     window.localStorage.removeItem('subProduct')
                     window.localStorage.removeItem('subProductVersion')
-                    setActiveProdTab(1)
+                    setActiveProdTab(0)
                   }}
                 >
                   {productName}
