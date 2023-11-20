@@ -328,12 +328,20 @@ const GeneralDataDrawer = ({
           <DrawerBody>
             {selectedKey === 'tools' && (
               <Flex direction={'column'} alignItems={'flex-start'} gap={3}>
+                <FormControl>
+                  <FormLabel htmlFor='toolVendor'>Vendor Name</FormLabel>
+                  <Input
+                    id='toolVendor'
+                    name='toolVendor'
+                    value={toolVendor}
+                    onChange={(e) => setToolVendor(e.target.value)}
+                />
+                </FormControl>
                 <FormControl isRequired>
-                  <FormLabel htmlFor='toolName'>Name</FormLabel>
+                  <FormLabel htmlFor='toolName'>Tool Name</FormLabel>
                   <Input
                     id='toolName'
                     name='toolName'
-                    placeholder='Tool Name'
                     value={toolName}
                     onChange={(e) => setToolName(e.target.value)}
                   />
@@ -343,19 +351,8 @@ const GeneralDataDrawer = ({
                   <Input
                     id='toolVersion'
                     name='toolVersion'
-                    placeholder='Tool Version'
                     value={toolVersion}
                     onChange={(e) => setToolVersion(e.target.value)}
-                  />
-                </FormControl>
-                <FormControl isRequired>
-                  <FormLabel htmlFor='toolVendor'>Vendor</FormLabel>
-                  <Input
-                    id='toolVendor'
-                    name='toolVendor'
-                    placeholder='Tool Vendor'
-                    value={toolVendor}
-                    onChange={(e) => setToolVendor(e.target.value)}
                   />
                 </FormControl>
                 <Button
@@ -375,7 +372,7 @@ const GeneralDataDrawer = ({
                     <Table variant='simple' size='sm' mt={4}>
                       <Thead>
                         <Tr my='.8rem'>
-                          {['Name', 'Version', 'Vendor', 'Updated At'].map(
+                          {['Vendor Name', 'Tool Name', 'Version', 'Added'].map(
                             (item, index) => (
                               <Th key={index} pl={0}>
                                 {item}
@@ -416,14 +413,14 @@ const GeneralDataDrawer = ({
                             )
                             .map((item, index) => (
                               <Tr key={index}>
+                              <Td pl={0} fontSize={'xs'}>
+                                {item.vendor}
+                              </Td>
                                 <Td pl={0} fontSize={'xs'}>
                                   {item.name}
                                 </Td>
                                 <Td pl={0} fontSize={'xs'}>
                                   {item.version}
-                                </Td>
-                                <Td pl={0} fontSize={'xs'}>
-                                  {item.vendor}
                                 </Td>
                                 <Td pl={0} fontSize={'xs'}>
                                   <Tooltip
