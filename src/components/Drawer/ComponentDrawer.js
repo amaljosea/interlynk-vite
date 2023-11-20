@@ -87,7 +87,7 @@ function ComponentDrawer(props) {
     filterRefetch({
       projectId: productId,
       sbomId: sbomId
-    }).then((res) => setCompFilters(res.data.sbom.filters))
+    }).then((res) => res.data && setCompFilters(res.data.sbom.filters))
   }
 
   const [createComponent] = useMutation(CreateComponent, {
@@ -234,7 +234,7 @@ function ComponentDrawer(props) {
         })
       }
       const pkg = PackageURL.fromString('pkg:generic/unknown@1.0')
-      setPurlValue('pkg:generic/unknown@1.0')
+      setPurlValue(`pkg:generic/${component}@${version}`)
       setPURLInputValid(true)
       setPurlData(pkg)
       onPurlOpen()
@@ -777,6 +777,10 @@ function ComponentDrawer(props) {
 
       {isPurlOpen && (
         <PurlModal
+          component={component}
+          version={version}
+          group={group}
+          purl={purl}
           data={purlData}
           isOpen={isPurlOpen}
           onClose={onPurlClose}
