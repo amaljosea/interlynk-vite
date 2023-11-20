@@ -295,9 +295,9 @@ function ProductVersionsRow(props) {
                     View Change Log
                   </MenuItem>
                   <Divider />
-                  {/* <MenuItem onClick={onSbomOpen} isDisabled={!isActive}>
+                  <MenuItem onClick={onSbomOpen} isDisabled={!isActive}>
                     Build SBOM
-                  </MenuItem> */}
+                  </MenuItem>
                   <MenuItem
                     ref={btnRefProduct}
                     onClick={onOpenProduct}
