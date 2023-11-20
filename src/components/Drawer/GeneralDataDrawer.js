@@ -23,7 +23,8 @@ import {
   useToast,
   FormControl,
   FormErrorMessage,
-  Tooltip
+  Tooltip,
+  FormLabel
 } from '@chakra-ui/react'
 import GlobalContext from 'context/GlobalContext'
 import {
@@ -65,7 +66,7 @@ const GeneralDataDrawer = ({
 
   const [toolName, setToolName] = useState('')
   const [toolVersion, setToolVersion] = useState('')
-
+  const [toolVendor, setToolVendor] = useState('')
   const [authorName, setAuthorName] = useState('')
   const [authorEmail, setAuthorEmail] = useState('')
 
@@ -202,12 +203,14 @@ const GeneralDataDrawer = ({
       {
         name: toolName,
         version: toolVersion,
+        vendor: toolVendor,
         updatedAt: new Date().toISOString()
       },
       ...prev
     ])
     setToolName('')
     setToolVersion('')
+    setToolVendor('')
   }
 
   const onLicenselAdd = () => {
@@ -254,6 +257,7 @@ const GeneralDataDrawer = ({
           variables: {
             name: item.name,
             version: item.version,
+            vendor: item.vendor,
             sbomID: sbomId
           }
         })
@@ -315,7 +319,7 @@ const GeneralDataDrawer = ({
         placement='right'
         onClose={onClose}
         closeOnOverlayClick={true}
-        size='md'
+        size='lg'
       >
         <DrawerOverlay />
         <DrawerContent>
@@ -324,24 +328,40 @@ const GeneralDataDrawer = ({
           <DrawerBody>
             {selectedKey === 'tools' && (
               <Flex direction={'column'} alignItems={'flex-start'} gap={3}>
-                <FormControl>
+                <FormControl isRequired>
+                  <FormLabel htmlFor='toolName'>Name</FormLabel>
                   <Input
-                    placeholder='Tool Name*'
+                    id='toolName'
+                    name='toolName'
+                    placeholder='Tool Name'
                     value={toolName}
                     onChange={(e) => setToolName(e.target.value)}
                   />
                 </FormControl>
-                <FormControl>
+                <FormControl isRequired>
+                  <FormLabel htmlFor='toolVersion'>Version</FormLabel>
                   <Input
-                    placeholder='Tool Version*'
+                    id='toolVersion'
+                    name='toolVersion'
+                    placeholder='Tool Version'
                     value={toolVersion}
                     onChange={(e) => setToolVersion(e.target.value)}
+                  />
+                </FormControl>
+                <FormControl isRequired>
+                  <FormLabel htmlFor='toolVendor'>Vendor</FormLabel>
+                  <Input
+                    id='toolVendor'
+                    name='toolVendor'
+                    placeholder='Tool Vendor'
+                    value={toolVendor}
+                    onChange={(e) => setToolVendor(e.target.value)}
                   />
                 </FormControl>
                 <Button
                   colorScheme='blue'
                   onClick={handleToolAdd}
-                  disabled={!toolName || !toolVersion}
+                  disabled={!toolName || !toolVersion || !toolVendor}
                 >
                   Add
                 </Button>
@@ -355,46 +375,66 @@ const GeneralDataDrawer = ({
                     <Table variant='simple' size='sm' mt={4}>
                       <Thead>
                         <Tr my='.8rem'>
-                          <Th pl={0}>Name</Th>
-                          <Th pl={0}>Version</Th>
-                          <Th pl={0}>Updated At</Th>
+                          {['Name', 'Version', 'Vendor', 'Updated At'].map(
+                            (item, index) => (
+                              <Th key={index} pl={0}>
+                                {item}
+                              </Th>
+                            )
+                          )}
                         </Tr>
                       </Thead>
                       <Tbody>
-                        {existingTools.length > 0 &&
-                          existingTools.map((item, index) => (
-                            <Tr key={index}>
-                              <Td pl={0} fontSize={'xs'}>
-                                {item.name}
-                              </Td>
-                              <Td pl={0} fontSize={'xs'}>
-                                {item.version}
-                              </Td>
-                              <Td pl={0} fontSize={'xs'}>
-                                <Tooltip
-                                  label={getFullDateAndTime(item.updatedAt)}
-                                  placement='top'
-                                >
-                                  {timeSince(item.updatedAt)}
-                                </Tooltip>
-                              </Td>
-                            </Tr>
-                          ))}
-
                         {creationTools.length > 0 &&
-                          creationTools.map((item, index) => (
-                            <Tr key={index}>
-                              <Td pl={0} fontSize={'xs'}>
-                                {item.name}
-                              </Td>
-                              <Td pl={0} fontSize={'xs'}>
-                                {item.version}
-                              </Td>
-                              <Td pl={0} fontSize={'xs'}>
-                                {timeSince(item.updatedAt)}
-                              </Td>
-                            </Tr>
-                          ))}
+                          [...creationTools]
+                            .sort(
+                              (a, b) =>
+                                new Date(b.updatedAt) - new Date(a.updatedAt)
+                            )
+                            .map((item, index) => (
+                              <Tr key={index}>
+                                <Td pl={0} fontSize={'xs'}>
+                                  {item.name}
+                                </Td>
+                                <Td pl={0} fontSize={'xs'}>
+                                  {item.version}
+                                </Td>
+                                <Td pl={0} fontSize={'xs'}>
+                                  {item.vendor}
+                                </Td>
+                                <Td pl={0} fontSize={'xs'}>
+                                  {timeSince(item.updatedAt)}
+                                </Td>
+                              </Tr>
+                            ))}
+
+                        {existingTools.length > 0 &&
+                          [...existingTools]
+                            .sort(
+                              (a, b) =>
+                                new Date(b.updatedAt) - new Date(a.updatedAt)
+                            )
+                            .map((item, index) => (
+                              <Tr key={index}>
+                                <Td pl={0} fontSize={'xs'}>
+                                  {item.name}
+                                </Td>
+                                <Td pl={0} fontSize={'xs'}>
+                                  {item.version}
+                                </Td>
+                                <Td pl={0} fontSize={'xs'}>
+                                  {item.vendor}
+                                </Td>
+                                <Td pl={0} fontSize={'xs'}>
+                                  <Tooltip
+                                    label={getFullDateAndTime(item.updatedAt)}
+                                    placement='top'
+                                  >
+                                    {timeSince(item.updatedAt)}
+                                  </Tooltip>
+                                </Td>
+                              </Tr>
+                            ))}
                       </Tbody>
                     </Table>
                   )}

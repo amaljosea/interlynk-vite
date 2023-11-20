@@ -260,8 +260,9 @@ const GeneralDataRow = ({ status, data, refetch }) => {
               </Td>
               <Td pl={0}>
                 <Flex
-                  flexDirection={'column'}
+                  flexDirection={'row'}
                   alignItems={'flex-start'}
+                  flexWrap={'wrap'}
                   gap={2.5}
                 >
                   {data.tools &&
