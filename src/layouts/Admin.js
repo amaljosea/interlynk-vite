@@ -103,56 +103,46 @@ export default function Dashboard(props) {
 
   return (
     <ApolloProvider client={client}>
-      <ContextWrapper>
-        <ChakraProvider theme={theme} resetCss={false}>
-          <Stack width={'100%'} direction={'row'} alignItems={'flex-start'}>
-            <Sidebar
-              routes={dashRoutes}
+      <Stack width={'100%'} direction={'row'} alignItems={'flex-start'}>
+        <Sidebar
+          routes={dashRoutes}
+          logoText={'Interlynk DASHBOARD'}
+          display='none'
+          sidebarVariant={sidebarVariant}
+          {...rest}
+        />
+        <Box minH='100vh' w={'96%'} pos={'absolute'} right={0}>
+          <Portal>
+            <AdminNavbar
+              onOpen={onOpen}
               logoText={'Interlynk DASHBOARD'}
-              display='none'
-              sidebarVariant={sidebarVariant}
-              {...rest}
+              brandText={getActiveRoute(dashRoutes)}
+              secondary={getActiveNavbar(dashRoutes)}
             />
-            <Box minH='100vh' w={'96%'} pos={'absolute'} right={0}>
-              <Portal>
-                <AdminNavbar
-                  onOpen={onOpen}
-                  logoText={'Interlynk DASHBOARD'}
-                  brandText={getActiveRoute(dashRoutes)}
-                  secondary={getActiveNavbar(dashRoutes)}
-                />
-              </Portal>
-              <Box bg='rgba(0,0,0,0.04)' minH={'100vh'} maxH={'100%'}>
-                {getRoute() && (
-                  <PanelContent>
-                    <PanelContainer>
-                      {authToken ? (
-                        <Switch>
-                          {getRoutes(dashRoutes)}
-                          <Route
-                            path={`/vendor/autofix`}
-                            component={Automation}
-                          />
-                          <Route
-                            path={`/vendor/changelog`}
-                            component={ChangeLog}
-                          />
-                          <Redirect from='/vendor' to='/vendor/dashboard' />
-                        </Switch>
-                      ) : (
-                        <Switch>
-                          <Redirect from='/vendor' to='/auth' />
-                        </Switch>
-                      )}
-                    </PanelContainer>
-                  </PanelContent>
-                )}
-                <Footer />
-              </Box>
-            </Box>
-          </Stack>
-        </ChakraProvider>
-      </ContextWrapper>
+          </Portal>
+          <Box bg='rgba(0,0,0,0.04)' minH={'100vh'} maxH={'100%'}>
+            {getRoute() && (
+              <PanelContent>
+                <PanelContainer>
+                  {authToken ? (
+                    <Switch>
+                      {getRoutes(dashRoutes)}
+                      <Route path={`/vendor/autofix`} component={Automation} />
+                      <Route path={`/vendor/changelog`} component={ChangeLog} />
+                      <Redirect from='/vendor' to='/vendor/dashboard' />
+                    </Switch>
+                  ) : (
+                    <Switch>
+                      <Redirect from='/vendor' to='/auth' />
+                    </Switch>
+                  )}
+                </PanelContainer>
+              </PanelContent>
+            )}
+            <Footer />
+          </Box>
+        </Box>
+      </Stack>
     </ApolloProvider>
   )
 }

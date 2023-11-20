@@ -13,6 +13,9 @@ import Register from './layouts/Register.js'
 import LoginLayout from './layouts/Login.js'
 import ScrollToTop from 'components/ScrollToTop.js'
 import Cookies from 'js-cookie'
+import theme from 'theme/theme.js'
+import ContextWrapper from 'context/ContextWrapper'
+import { ChakraProvider } from '@chakra-ui/react'
 
 const authToken = Cookies.get('authToken')
 
@@ -46,15 +49,22 @@ TagManager.initialize(tagManagerArgs)
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
-      <ScrollToTop />
-      <Switch>
-        <Route path={`/auth`} component={AuthLayout} />
-        <Route path={`/vendor`} component={AdminLayout} />
-        <Route path={`/login`} component={LoginLayout} />
-        <Route path={`/customer`} component={CustomerLayout} />
-        <Route path={`/register`} component={Register} />
-        <Redirect from={`/`} to={authToken ? '/vendor/dashboard' : '/auth'} />
-      </Switch>
+      <ContextWrapper>
+        <ChakraProvider theme={theme} resetCSS={true}>
+          <ScrollToTop />
+          <Switch>
+            <Route path={`/auth`} component={AuthLayout} />
+            <Route path={`/vendor`} component={AdminLayout} />
+            <Route path={`/login`} component={LoginLayout} />
+            <Route path={`/customer`} component={CustomerLayout} />
+            <Route path={`/register`} component={Register} />
+            <Redirect
+              from={`/`}
+              to={authToken ? '/vendor/dashboard' : '/auth'}
+            />
+          </Switch>
+        </ChakraProvider>
+      </ContextWrapper>
     </BrowserRouter>
   </React.StrictMode>,
   document.getElementById('root')
