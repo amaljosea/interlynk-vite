@@ -7,7 +7,8 @@ import {
   Input,
   Button,
   useToast,
-  Box
+  Box,
+  FormErrorMessage
 } from '@chakra-ui/react'
 import { useColorModeValue } from '@chakra-ui/system'
 import CardBody from 'components/Card/CardBody'
@@ -27,11 +28,22 @@ const PersonalInfo = ({ user, refetch }) => {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [message, setMessage] = useState('Update')
+  const [error, setError] = useState('')
 
   useEffect(() => {
     setName(user.name)
     setEmail(user.email)
   }, [user])
+
+  const handleNameChange = (e) => {
+    const { value } = e.target
+    setName(value)
+    if (value.length < 2 || value.length > 256) {
+      setError('Input must be between 2 and 256 characters')
+    } else {
+      setError('')
+    }
+  }
 
   const [updateUser] = useMutation(updateOrgUser)
 
@@ -81,12 +93,13 @@ const PersonalInfo = ({ user, refetch }) => {
           gap={6}
         >
           {/* NAME */}
-          <FormControl>
+          <FormControl isRequired isInvalid={error}>
             <FormLabel>Name</FormLabel>
-            <Input value={name} onChange={(e) => setName(e.target.value)} />
+            <Input value={name} onChange={handleNameChange} />
+            <FormErrorMessage>{error}</FormErrorMessage>
           </FormControl>
           {/* EMAIL */}
-          <FormControl>
+          <FormControl isRequired>
             <FormLabel>Email</FormLabel>
             <Input value={email} onChange={(e) => setEmail(e.target.value)} />
           </FormControl>
@@ -96,7 +109,7 @@ const PersonalInfo = ({ user, refetch }) => {
             colorScheme='blue'
             onClick={handleUpdate}
             disabled={
-              message === 'Saving....' || !name || !validateEmail(email)
+              message === 'Saving....' || !name || !validateEmail(email) || error !== ''
             }
           >
             {message}
