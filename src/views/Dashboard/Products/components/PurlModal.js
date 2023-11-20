@@ -27,47 +27,33 @@ import { UpdateComponent, recheckHealth } from 'graphQL/Mutation'
 import { useMutation } from '@apollo/client'
 
 const typeOptions = [
-  { value: '', label: '-- Select --' },
-
   { value: 'alpm', label: 'alpm' },
   { value: 'apk', label: 'apk' },
-
   { value: 'bitbucket', label: 'bitbucket' },
   { value: 'bitnami', label: 'bitnami' },
-
   { value: 'cocoapods', label: 'cocoapods' },
   { value: 'cargo', label: 'cargo' },
   { value: 'composer', label: 'composer' },
   { value: 'conan', label: 'conan' },
   { value: 'conda', label: 'conda' },
   { value: 'cran', label: 'cran' },
-
   { value: 'deb', label: 'deb' },
   { value: 'docker', label: 'docker' },
-
   { value: 'gem', label: 'gem' },
   { value: 'generic', label: 'generic' },
   { value: 'github', label: 'github' },
   { value: 'golang', label: 'golang' },
-
   { value: 'hex', label: 'hex' },
   { value: 'huggingface', label: 'huggingface' },
-
   { value: 'maven', label: 'maven' },
   { value: 'mlflow', label: 'mlflow' },
-
   { value: 'npm', label: 'npm' },
   { value: 'nuget', label: 'nuget' },
-
   { value: 'qpkg', label: 'qpkg' },
-
   { value: 'oci', label: 'oci' },
-
   { value: 'pub', label: 'pub' },
   { value: 'pypi', label: 'pypi' },
-
   { value: 'rpm', label: 'rpm' },
-
   { value: 'swid', label: 'swid' },
   { value: 'swift', label: 'swift' }
 ]
@@ -115,7 +101,10 @@ const PurlModal = ({
   id,
   refetch,
   checkId,
-  totalRows
+  component,
+  version,
+  group,
+  purl
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -164,6 +153,8 @@ const PurlModal = ({
     }
   }
 
+  console.log('data', data)
+
   useEffect(() => {
     if (data) {
       setPurlType(data.type === null ? '' : data.type)
@@ -174,6 +165,13 @@ const PurlModal = ({
       setVerProgressValue(calculateProgress(data.type, data.name, data.version))
     }
   }, [data])
+
+  useEffect(() => {
+    if (!purl) {
+      setPurlName(component)
+      setPurlVersion(version)
+    }
+  }, [purl])
 
   const calculateProgress = (type, name, version) => {
     const vendorMap = {}
