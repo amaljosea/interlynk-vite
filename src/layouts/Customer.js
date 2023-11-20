@@ -92,38 +92,34 @@ export default function Customer(props) {
 
   return (
     <ApolloProvider client={client}>
-      <ContextWrapper>
-        <ChakraProvider theme={theme} resetCss={false}>
-          <Stack width={'100%'} direction={'row'} alignItems={'flex-start'}>
-            <Sidebar
-              routes={customerRoutes}
+      <Stack width={'100%'} direction={'row'} alignItems={'flex-start'}>
+        <Sidebar
+          routes={customerRoutes}
+          logoText={'Interlynk DASHBOARD'}
+          display='none'
+          sidebarVariant={sidebarVariant}
+          {...rest}
+        />
+        <Box minH='100vh' w={'96%'} pos={'absolute'} right={0}>
+          <Portal>
+            <AdminNavbar
+              onOpen={onOpen}
               logoText={'Interlynk DASHBOARD'}
-              display='none'
-              sidebarVariant={sidebarVariant}
-              {...rest}
+              brandText={getActiveRoute(customerRoutes)}
+              secondary={getActiveNavbar(customerRoutes)}
             />
-            <Box minH='100vh' w={'96%'} pos={'absolute'} right={0}>
-              <Portal>
-                <AdminNavbar
-                  onOpen={onOpen}
-                  logoText={'Interlynk DASHBOARD'}
-                  brandText={getActiveRoute(customerRoutes)}
-                  secondary={getActiveNavbar(customerRoutes)}
-                />
-              </Portal>
-              <Box bg='rgba(0,0,0,0.04)' minH={'100vh'} maxH={'100%'}>
-                {getRoute() && (
-                  <PanelContent>
-                    <PanelContainer>
-                      <Switch>{getRoutes(customerRoutes)}</Switch>
-                    </PanelContainer>
-                  </PanelContent>
-                )}
-              </Box>
-            </Box>
-          </Stack>
-        </ChakraProvider>
-      </ContextWrapper>
+          </Portal>
+          <Box bg='rgba(0,0,0,0.04)' minH={'100vh'} maxH={'100%'}>
+            {getRoute() && (
+              <PanelContent>
+                <PanelContainer>
+                  <Switch>{getRoutes(customerRoutes)}</Switch>
+                </PanelContainer>
+              </PanelContent>
+            )}
+          </Box>
+        </Box>
+      </Stack>
     </ApolloProvider>
   )
 }
