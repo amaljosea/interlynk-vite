@@ -50,8 +50,7 @@
     "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm start"
   },
   "optionalDependencies": {
-    "@babel/core": "7.23.2",
-    "typescript": "5.3.2"
+    "@babel/core": "7.23.2"
   },
   "devDependencies": {
     "@babel/plugin-transform-react-jsx-source": "^7.14.5",
