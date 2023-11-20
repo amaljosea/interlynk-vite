@@ -68,7 +68,6 @@ function Index() {
 
   useEffect(() => {
     if (data) {
-      setPageIndex(1)
       setTotalProducts(data.projects.totalCount)
     }
   }, [data])
