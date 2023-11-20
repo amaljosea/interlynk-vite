@@ -313,7 +313,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
               <Td pl={0} fontWeight={'medium'}>
                 <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                   <Text>Author(s)</Text>
-                  <Tooltip label='In case of non-automated SBOM generation, Author(s) identifies the name and email of persons invovlved in building the SBOM.'>
+                  <Tooltip label='In case of non-automated SBOM generation, Author(s) identifies the name and email of persons involved in building the SBOM.'>
                     <Icon as={InfoIcon} color={'blue.500'} />
                   </Tooltip>
                 </Flex>
