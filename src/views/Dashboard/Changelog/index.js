@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client'
-import { Flex, Skeleton } from '@chakra-ui/react'
+import { Flex } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import ChangelogTable from 'components/Tables/ChangelogTable'
 import { GetProjectLogs } from 'graphQL/Queries'
@@ -32,20 +32,7 @@ const ChangeLog = () => {
   return (
     <Flex direction='column' pt={{ base: '120px', md: '74px' }} px={4}>
       <Card>
-        {data ? (
-          <ChangelogTable
-            data={data.project.activityLogs}
-            refetch={refetch}
-          />
-        ) : (
-          <Flex width={'100%'} gap={4} direction={'column'}>
-            <Skeleton width={'100%'} height='20px' />
-            <Skeleton width={'100%'} height='20px' />
-            <Skeleton width={'100%'} height='20px' />
-            <Skeleton width={'100%'} height='20px' />
-            <Skeleton width={'100%'} height='20px' />
-          </Flex>
-        )}
+        <ChangelogTable data={data?.project.activityLogs} refetch={refetch} />
       </Card>
     </Flex>
   )

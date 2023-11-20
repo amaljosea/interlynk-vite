@@ -11,6 +11,7 @@ import {
   Box,
   IconButton
 } from '@chakra-ui/react'
+import CustomLoader from 'components/CustomLoader'
 import GlobalContext from 'context/GlobalContext'
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
@@ -78,13 +79,13 @@ const ChangelogTable = ({ data, refetch }) => {
   const [typeFilters, setTypeFilters] = useState([])
 
   useEffect(() => {
-    if (userFilters.length === 0 || typeFilters.length === 0) {
+    if (data && (userFilters.length === 0 || typeFilters.length === 0)) {
       const users = data.nodes.map((item) => item.changedBy)
       const actions = data.nodes.map((item) => item.action)
       setUserFilters(users)
       setTypeFilters(actions)
     }
-  }, [])
+  }, [data])
 
   // COLUMNS
   const columns = [
@@ -299,9 +300,12 @@ const ChangelogTable = ({ data, refetch }) => {
           defaultSortAsc={false}
           defaultSortFieldId={prodLogField}
           subHeader
+          progressPending={data ? false : true}
+          progressComponent={<CustomLoader />}
           subHeaderComponent={subHeaderComponentMemo}
           onSort={handleSort}
           responsive={true}
+          persistTableHead
         />
       </Flex>
 

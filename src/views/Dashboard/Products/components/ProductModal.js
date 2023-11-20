@@ -55,8 +55,7 @@ const ProductModal = ({
   // console.log(`id`, id)
 
   const productExist =
-    allProjects &&
-    allProjects.projects.nodes.find((item) => item.name === `${productName}`)
+    allProjects && allProjects.find((item) => item.name === `${productName}`)
 
   const updateProduct = async (e) => {
     e.preventDefault()
@@ -143,50 +142,6 @@ const ProductModal = ({
                     rows={5}
                   />
                 </FormControl>
-                {/*                 {id && (
-                  <FormControl pointerEvents={'none'}>
-                    <FormLabel>Type</FormLabel>
-                    <Select
-                      id='type'
-                      name='type'
-                      value={kind}
-                      onChange={(e) => setKind(e.target.value)}
-                    >
-                      <option value=''>-- Select --</option>
-                      <option value='application'>Application</option>
-                      <option value='library'>Library</option>
-                      <option value='operating-system'>Operating System</option>
-                      <option value='firmware'>Firmware</option>
-                      <option value='file'>File</option>
-                      <option value='device'>Device</option>
-                      <option value='container'>Container</option>
-                      <option value='framework'>Framework</option>
-                      <option value='source'>Source</option>
-                      <option value='archive'>Archive</option>
-                      <option value='install'>Install</option>
-                      <option value='other'>Other</option>
-                      <option value='unspecified'>Unspecified</option>
-                    </Select>
-                  </FormControl>
-                )}
-                <FormControl>
-                  <FormLabel>Supplier Name</FormLabel>
-                  <Input
-                    type='text'
-                    value={supplierName}
-                    onChange={(e) => setSupplierName(e.target.value)}
-                    placeholder='Enter name'
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Supplier EmailXX</FormLabel>
-                  <Input
-                    type='email'
-                    value={supplierEmail}
-                    placeholder={`Enter email`}
-                    onChange={(e) => setSupplierEmail(e.target.value)}
-                  />
-                </FormControl> */}
               </Flex>
             </ModalBody>
             <ModalFooter>
