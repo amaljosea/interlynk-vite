@@ -532,7 +532,7 @@ function ComponentDrawer(props) {
                 />
               </FormControl>
               {/* Kind */}
-              <FormControl spacing={2} fontSize={'sm'}>
+              <FormControl isRequired>
                 <FormLabel htmlFor='componentType'>Type</FormLabel>
                 <Select
                   id='componentType'
@@ -758,7 +758,9 @@ function ComponentDrawer(props) {
                 <Button
                   colorScheme='blue'
                   onClick={handleUpdate}
-                  isDisabled={containesOther && licenseName === ''}
+                  isDisabled={
+                    (containesOther && licenseName === '') || !compType
+                  }
                 >
                   Update
                 </Button>
