@@ -93,10 +93,13 @@ function Profile() {
                 onChange={(e) => onTabChange(e)}
               >
                 <TabList>
-                  <Tab _focus={{ outline: 'none' }}>General</Tab>
-                  <Tab _focus={{ outline: 'none' }}>Team</Tab>
-                  <Tab _focus={{ outline: 'none' }}>Feeds</Tab>
-                  <Tab _focus={{ outline: 'none' }}>Checks</Tab>
+                  {['General', 'Team', 'Feeds', 'Checks', 'Lists'].map(
+                    (item, index) => (
+                      <Tab key={index} _focus={{ outline: 'none' }}>
+                        {item}
+                      </Tab>
+                    )
+                  )}
                 </TabList>
                 <TabPanels>
                   {/* GEENRAL */}
@@ -106,15 +109,12 @@ function Profile() {
                       templateColumns={{ sm: '1fr', xl: 'repeat(2, 1fr)' }}
                       gap='22px'
                     >
-                    <GeneralFeed orgInfo={orgInfo} refetch={refetch} />
+                      <GeneralFeed orgInfo={orgInfo} refetch={refetch} />
                     </Grid>
                   </TabPanel>
                   {/* TEAMS */}
                   <TabPanel>
-                    <TeamsLog
-                      data={orgInfo.organization}
-                      refetch={refetch}
-                    />
+                    <TeamsLog data={orgInfo.organization} refetch={refetch} />
                   </TabPanel>
                   {/* FEEDS */}
                   <TabPanel>

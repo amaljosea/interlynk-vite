@@ -50,6 +50,7 @@ const ComponentFeed = () => {
           <FormControl>
             <Input
               placeholder='*mystring*'
+              width={'400px'}
               value={compName}
               onChange={(e) => setCompName(e.target.value)}
               onKeyDown={handleKeyDown}
