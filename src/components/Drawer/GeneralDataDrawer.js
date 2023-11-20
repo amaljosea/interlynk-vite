@@ -82,6 +82,18 @@ const GeneralDataDrawer = ({
   const [supplierList, setSupplierList] = useState([])
   const [licenseList, setLicenseList] = useState([])
 
+  const [authorError, setAuthorError] = useState('')
+
+  const onAuthorChange = (e) => {
+    const { value } = e.target
+    setAuthorName(value)
+    if (value.length < 4 || value.length > 256) {
+      setAuthorError('Input must be between 4 and 256 characters')
+    } else {
+      setAuthorError('')
+    }
+  }
+
   const [createTool] = useMutation(toolCreate)
   const [deleteTool] = useMutation(toolDelete)
 
@@ -399,13 +411,14 @@ const GeneralDataDrawer = ({
             {selectedKey === 'author' && (
               <form onSubmit={handleAuthorAdd}>
                 <Flex direction={'column'} alignItems={'flex-start'} gap={3}>
-                  <FormControl isRequired>
+                  <FormControl isRequired isInvalid={authorError}>
                     <Input
                       type='text'
                       placeholder='Author Name*'
                       value={authorName}
-                      onChange={(e) => setAuthorName(e.target.value)}
+                      onChange={onAuthorChange}
                     />
+                    <FormErrorMessage>{authorError}</FormErrorMessage>
                   </FormControl>
 
                   <FormControl
@@ -429,7 +442,10 @@ const GeneralDataDrawer = ({
                     colorScheme='blue'
                     type='submit'
                     disabled={
-                      !authorName || !authorEmail || !validateEmail(authorEmail)
+                      !authorName ||
+                      !authorEmail ||
+                      !validateEmail(authorEmail) ||
+                      authorError !== ''
                     }
                   >
                     Add

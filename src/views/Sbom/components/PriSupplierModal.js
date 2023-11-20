@@ -31,6 +31,17 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
 
   const [supName, setSupName] = useState('')
   const [supEmail, setSupEmail] = useState('')
+  const [supplierError, setSupplierError] = useState('')
+
+  const onSupplierChange = (e) => {
+    const { value } = e.target
+    setSupName(value)
+    if (value.length < 4 || value.length > 256) {
+      setSupplierError('Input must be between 4 and 256 characters')
+    } else {
+      setSupplierError('')
+    }
+  }
 
   const handleRefetch = () => {
     refetch({
@@ -104,13 +115,14 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
             <ModalCloseButton />
             <ModalBody>
               <Flex width={'100%'} direction={'column'} gap={4}>
-                <FormControl isRequired>
+                <FormControl isRequired isInvalid={supplierError}>
                   <FormLabel fontSize={'sm'}>Name</FormLabel>
                   <Input
                     placeholder='Enter supplier name'
                     value={supName}
-                    onChange={(e) => setSupName(e.target.value)}
+                    onChange={onSupplierChange}
                   />
+                  <FormErrorMessage>{supplierError}</FormErrorMessage>
                 </FormControl>
                 <FormControl
                   isInvalid={!validateEmail(supEmail) && supEmail !== ''}
@@ -146,7 +158,10 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
                   colorScheme='blue'
                   type={'submit'}
                   disabled={
-                    !supName || (supEmail != '' && !validateEmail(supEmail))
+                    !supName ||
+                    supEmail === '' ||
+                    !validateEmail(supEmail) ||
+                    supplierError !== ''
                   }
                 >
                   Save
