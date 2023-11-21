@@ -104,7 +104,7 @@ const DownloadModal = ({
     } catch (error) {
       console.log(`Error`, error)
       toast({
-        description: `${error}`,
+        description: `Internal error during SBOM download. Please try again in a few minutes.`,
         duration: 3000,
         position: 'top',
         status: 'error'
