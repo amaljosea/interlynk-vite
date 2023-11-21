@@ -348,7 +348,7 @@ const VulnTable = ({
         </Tooltip>
       ),
       wrap: true,
-      width: y.matches ? '10%' : x.matches ? '18%' : '15%',
+      width: y.matches ? '10%' : x.matches ? '18%' : '12%',
       sortable: true
     },
     // STATUS
