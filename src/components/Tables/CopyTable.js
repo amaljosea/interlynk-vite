@@ -156,7 +156,6 @@ const CopyTable = () => {
           </Tag>
         )
       },
-      sortable: true,
       right: 'true'
     },
     // SELECTED STATUS
@@ -191,7 +190,9 @@ const CopyTable = () => {
         alignItems={'center'}
         justifyContent={'space-between'}
       >
-        <Text>{mergeData.length} of {currentSbom.length} selected for status Import</Text>
+        <Text>
+          {mergeData.length} of {currentSbom.length} selected for status Import
+        </Text>
       </Flex>
     )
   }, [mergeData])
