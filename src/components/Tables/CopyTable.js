@@ -51,7 +51,7 @@ const statusColor = (status) => {
 const CopyTable = () => {
   const textColor = useColorModeValue('gray.700', 'white')
 
-  const { setSelectedVulns, mergeData } = useContext(GlobalContext)
+  const { setSelectedVulns, mergeData, currentSbom } = useContext(GlobalContext)
 
   // COLUMNS
   const columns = [
@@ -191,7 +191,7 @@ const CopyTable = () => {
         alignItems={'center'}
         justifyContent={'space-between'}
       >
-        <Text>Total : {mergeData && mergeData.length}</Text>
+        <Text>{mergeData.length} of {currentSbom.length} selected for status Import</Text>
       </Flex>
     )
   }, [mergeData])

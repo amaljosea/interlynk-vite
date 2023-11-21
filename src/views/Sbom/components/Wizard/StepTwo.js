@@ -53,12 +53,11 @@ const StepTwo = ({
 
   useEffect(() => {
     if (currentSbom && importSbom) {
-      console.log('currentSbom', currentSbom)
-      console.log('importSbom', importSbom)
+      // console.log('currentSbom', currentSbom)
+      // console.log('importSbom', importSbom)
       const data = findSimilarItems(currentSbom, importSbom)
-      console.log('data', data)
       const filterData = data.filter((item) => item.importStatus !== null)
-      console.log('filterData', filterData)
+      // console.log('filterData', filterData)
       setMergeData(filterData)
     }
   }, [currentSbom, importSbom])
@@ -89,7 +88,7 @@ const StepTwo = ({
           justifyContent={'space-between'}
           mt={12}
         >
-          <Text>Total : {mergeData.length}</Text>
+          <Text>{mergeData.length} of {currentSbom.length} selected for status Import</Text>
         </Flex>
       )}
     </Box>
