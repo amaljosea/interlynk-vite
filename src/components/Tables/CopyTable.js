@@ -58,7 +58,7 @@ const CopyTable = () => {
     // CVE ID
     {
       id: 'cve',
-      name: 'CVE ID',
+      name: 'ID',
       selector: (row) => {
         const { vuln } = row
         return (
