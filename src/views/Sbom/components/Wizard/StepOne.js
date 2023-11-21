@@ -46,6 +46,21 @@ const StepOne = ({
       )
       setSelectedProd(currentProd.id)
       setProductId(currentProd.id)
+      const filterVersion = [...currentProd.sboms].sort((a, b) => {
+        const dateA = new Date(a.updatedAt)
+        const dateB = new Date(b.updatedAt)
+        return dateB - dateA
+      })
+      const currentIndex = filterVersion?.findIndex(
+        (item) => item.id === currentSbomId
+      )
+      if (currentIndex > 0) {
+        setSelectedVersion(filterVersion[currentIndex - 1].id)
+        setSbomId(filterVersion[currentIndex - 1].id)
+      } else {
+        setSelectedVersion('')
+        setSbomId('')
+      }
     }
   }, [allProducts])
 
@@ -81,10 +96,6 @@ const StepOne = ({
     }
   }, [selectedProd])
 
-  const filterVersions =
-    uniqVersions.length > 0 &&
-    uniqVersions.filter((version) => version.id !== currentSbomId)
-
   // remove duplicates
   const removeDuplicatesAndLatest = (arr) => {
     const uniqueVersions = {}
@@ -101,15 +112,13 @@ const StepOne = ({
     return Object.values(uniqueVersions)
   }
 
-  const filteredData = filterVersions
-    ? removeDuplicatesAndLatest(filterVersions)
+  const filteredData = uniqVersions
+    ? removeDuplicatesAndLatest(uniqVersions)
     : []
 
   filteredData?.sort((a, b) => {
     const dateA = new Date(a.updatedAt)
     const dateB = new Date(b.updatedAt)
-
-    // Compare the dates
     return dateB - dateA
   })
 
@@ -176,11 +185,13 @@ const StepOne = ({
               >
                 <option value={''}>-- Select --</option>
                 {filteredData.length > 0 &&
-                  filteredData.map((item, index) => (
-                    <option key={index} value={item.id}>
-                      {item.version}
-                    </option>
-                  ))}
+                  [...filteredData]
+                    .filter((item) => item.id !== currentSbomId)
+                    .map((item, index) => (
+                      <option key={index} value={item.id}>
+                        {item.version}
+                      </option>
+                    ))}
               </Select>
             </FormControl>
           </Stack>
