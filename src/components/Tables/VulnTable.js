@@ -32,13 +32,11 @@ import DataTable from 'react-data-table-component'
 import { FaCopy } from 'react-icons/fa6'
 import { useState, useMemo, useContext } from 'react'
 import styled from '@emotion/styled'
-import { getFullDateAndTime } from 'utils'
 import ProdStatusDrawer from 'components/Drawer/ProdStatusDrawer'
 import VulnFilterMenu from 'views/Sbom/components/VulnFilterMenu'
-import { sevColor } from 'utils'
+import { sevColor, timeSince, getFullDateAndTime } from 'utils'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import GlobalContext from 'context/GlobalContext'
-import { timeSince } from 'utils'
 import CustomLoader from 'components/CustomLoader'
 import Cookies from 'js-cookie'
 import RowLimit from 'views/Sbom/components/RowLimit'
@@ -165,26 +163,26 @@ const VulnTable = ({
         const { vulnInfo } = vuln
         const { kev } = vulnInfo
         return (
-          <Link href={linkURl(vuln.source, vuln.vulnId)} target={'_blank'}>
-            <Flex direction='row' alignItems={'center'} gap={2}>
+          <Flex direction='row' alignItems={'center'} gap={2}>
+            <Link href={linkURl(vuln.source, vuln.vulnId)} target={'_blank'}>
               <Icon
                 as={ExternalLinkIcon}
                 h={'16px'}
                 w={'16px'}
                 color={'blue.500'}
               />
-              <Tooltip label={vuln.vulnId} placement={'top'}>
-                <Text fontSize='sm' color={textColor}>
-                  {vuln.vulnId !== null ? `${vuln.vulnId}` : ''}
-                </Text>
-              </Tooltip>
-              {kev === true && (
-                <Badge variant='subtle' colorScheme='red'>
-                  KEV
-                </Badge>
-              )}
-            </Flex>
-          </Link>
+            </Link>
+            <Tooltip label={vuln.vulnId} placement={'top'}>
+              <Text fontSize='sm' color={textColor}>
+                {vuln.vulnId !== null ? `${vuln.vulnId}` : ''}
+              </Text>
+            </Tooltip>
+            {kev === true && (
+              <Badge variant='subtle' colorScheme='red'>
+                KEV
+              </Badge>
+            )}
+          </Flex>
         )
       },
       width: y.matches ? '15%' : '20%',
@@ -802,8 +800,9 @@ const VulnTable = ({
           progressComponent={<CustomLoader />}
           subHeader
           subHeaderComponent={subHeaderComponentMemo}
-          responsive={true}
+          responsive
           expandableRows
+          expandOnRowClicked
           persistTableHead
           expandableRowsComponent={ExpandedComponent}
         />
