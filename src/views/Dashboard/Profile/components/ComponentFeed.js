@@ -33,13 +33,16 @@ const ComponentFeed = () => {
   const [compNameList, setCompNameList] = useState([])
   const [activeId, setActiveId] = useState(null)
 
+  console.log('activeId', activeId)
+
   const handleKeyDown = (event) => {
     if (event.key === 'Enter' && validateRe2(compName)) {
-      if (activeId) {
+      if (activeId !== null) {
         const data = [...compNameList]
         data[activeId] = compName
         setCompNameList(data)
         setCompName('')
+        setActiveId(null)
       } else {
         setCompNameList([...compNameList, compName])
         setCompName('')
@@ -69,7 +72,7 @@ const ComponentFeed = () => {
           <FormControl isInvalid={!validateRe2(compName) && compName !== ''}>
             <Input
               placeholder='*mystring*'
-              width={'100%'}
+              width={'500px'}
               value={compName}
               onChange={(e) => setCompName(e.target.value)}
               onKeyDown={handleKeyDown}
