@@ -105,6 +105,14 @@ const StepOne = ({
     ? removeDuplicatesAndLatest(filterVersions)
     : []
 
+  filteredData?.sort((a, b) => {
+    const dateA = new Date(a.updatedAt)
+    const dateB = new Date(b.updatedAt)
+
+    // Compare the dates
+    return dateB - dateA
+  })
+
   return (
     <>
       <Box width={'50%'} mx={'auto'}>
