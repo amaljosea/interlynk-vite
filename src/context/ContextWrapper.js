@@ -86,8 +86,8 @@ const ContextWrapper = (props) => {
   const [vulnStatus, setVulnStatus] = useState([])
   const [vulnKev, setVulnKev] = useState('')
   const [vulnEpss, setVulnEpss] = useState('')
-  const [minVal, setMinVal] = useState()
-  const [maxVal, setMaxVal] = useState()
+  const [minVal, setMinVal] = useState(0)
+  const [maxVal, setMaxVal] = useState(0)
 
   // SIGNED VULN FILTER
   const [signedVulnSearchInput, setSignedVulnSearchInput] = useState('')
@@ -96,8 +96,8 @@ const ContextWrapper = (props) => {
   const [signedVulnStatus, setSignedVulnStatus] = useState([])
   const [signedVulnKev, setSignedVulnKev] = useState('')
   const [signedVulnEpss, setSignedVulnEpss] = useState('')
-  const [signedMinVal, setSignedMinVal] = useState()
-  const [signedMaxVal, setSignedMaxVal] = useState()
+  const [signedMinVal, setSignedMinVal] = useState(0)
+  const [signedMaxVal, setSignedMaxVal] = useState(0)
 
   // HEALTH CHECK FILTER
   const [checkSearchInput, setCheckSearchInput] = useState('')
