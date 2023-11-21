@@ -5,6 +5,8 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
   Flex,
+  HStack,
+  Text,
   useColorModeValue
 } from '@chakra-ui/react'
 import PropTypes from 'prop-types'
@@ -21,6 +23,7 @@ export default function AdminNavbar(props) {
   const queryParams = new URLSearchParams(location.search)
   const versionId = queryParams.get('v')
   const product = queryParams.get('p')
+  const prodID = queryParams.get('id')
   const parts = queryParams.get('parts')
 
   const imageName = localStorage.getItem('Image')
@@ -82,6 +85,8 @@ export default function AdminNavbar(props) {
           return '/vendor/products'
         case 'Connections':
           return '/vendor/connections'
+        case 'Settings':
+          return `/vendor/autofix?id=${prodID}`
       }
     } else {
       switch (name) {
@@ -146,9 +151,15 @@ export default function AdminNavbar(props) {
             {(location.pathname.startsWith('/vendor/autofix') ||
               location.pathname.startsWith('/vendor/changelog')) && (
               <BreadcrumbItem color={mainText}>
-                <Link to={'/vendor/products'} color={secondaryText}>
-                  {activeProd}
-                </Link>
+                <HStack spacing={2}>
+                  <Link to={'/vendor/products'} color={secondaryText}>
+                    Products
+                  </Link>
+                  <Text>/</Text>
+                  <Link to={'/vendor/products'} color={secondaryText}>
+                    {activeProd}
+                  </Link>
+                </HStack>
               </BreadcrumbItem>
             )}
 
