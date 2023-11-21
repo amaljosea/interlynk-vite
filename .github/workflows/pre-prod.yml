@@ -1,12 +1,7 @@
 name: Staging CI/CD Pipeline
 
 on:
-  push:
-    branches:
-      - pre-production
-  pull_request:
-    branches:
-      - pre-production
+  workflow_dispatch
 
 jobs:
   run-npm-tests:
