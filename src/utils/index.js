@@ -516,10 +516,7 @@ export const getFullDate = (dateString) => {
 export const findSimilarItems = (currentData, selectedData) => {
   const mergedData = currentData.map((currentItem) => {
     const matchingSelected = selectedData.find(
-      (selectedItem) =>
-        selectedItem.vuln.vulnId === currentItem.vuln.vulnId &&
-        selectedItem.component.name === currentItem.component.name &&
-        selectedItem.component.version === currentItem.component.version
+      (selectedItem) => selectedItem.vuln.vulnId === currentItem.vuln.vulnId
     )
 
     if (matchingSelected) {
