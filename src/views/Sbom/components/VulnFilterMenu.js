@@ -91,12 +91,15 @@ const VulnFilterMenu = ({
     : vulnFilters
 
   const handleRefetch = async (severity, component, status, kev, epss) => {
-    const vulnEpss = epss !== 'all' && epss.split('-')
+    const epssRange = (epss !== '' || epss !== '0-0') && epss.split('-')
+    // console.log('epss', epss)
 
     const range = {
-      min: parseFloat(vulnEpss[0]) / 10000,
-      max: parseFloat(vulnEpss[1]) / 10000
+      min: parseFloat(epssRange[0]) / 10000,
+      max: parseFloat(epssRange[1]) / 10000
     }
+
+    // console.log('range', range)
 
     await refetch({
       variables: {
@@ -113,8 +116,9 @@ const VulnFilterMenu = ({
             : undefined,
         status:
           !status.includes('all') && status.length > 0 ? status : undefined,
-        kev: kev === 'all' ? undefined : kev === 'yes' ? true : false,
-        epss: epss !== '' && epss !== 'all' ? range : undefined,
+        kev: kev === 'yes' ? true : kev === 'false' ? false : undefined,
+        epss:
+          epss === 'all' || epss === '0-0' || epss === '' ? undefined : range,
         first: totalRows,
         last: undefined,
         field: customerView ? signedVulnField : vulnField,
@@ -200,6 +204,8 @@ const VulnFilterMenu = ({
   }
 
   const onFilterEpss = (value) => {
+    // console.log('vulnEpss', value)
+
     setVulnAfter('')
     setVulnBefore('')
     setMinVal(0)
@@ -409,10 +415,8 @@ const VulnFilterMenu = ({
       {/* EPSS */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true} isOpen={isOpen} onClose={onClose}>
-          {((vulnEpss !== 'all' && vulnEpss !== '') ||
-            (signedVulnEpss !== 'all' && signedVulnEpss !== '')) && (
-            <CheckMark />
-          )}
+          {((vulnEpss !== '' && vulnEpss !== 'all') ||
+            signedVulnEpss !== '') && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -429,10 +433,10 @@ const VulnFilterMenu = ({
               value={customerView ? signedVulnEpss : vulnEpss}
               onChange={onFilterEpss}
             >
-              <MenuItemOption value={''} fontSize={'sm'}>
+              <MenuItemOption value={'all'} fontSize={'sm'}>
                 All
               </MenuItemOption>
-              {['0-100', '100-500', '500-1,000', '1,000-10,000'].map(
+              {['0-100', '100-500', '500-1000', '1000-10000'].map(
                 (item, index) => (
                   <MenuItemOption key={index} value={item} fontSize={'sm'}>
                     {item}

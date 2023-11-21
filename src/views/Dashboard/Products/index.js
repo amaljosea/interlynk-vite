@@ -18,6 +18,13 @@ function Index() {
     setCompLicense,
     setCompSupplier,
     setCompScope,
+    setVulnSeverity,
+    setVulnComponent,
+    setVulnStatus,
+    setVulnKev,
+    setVulnEpss,
+    setMinVal,
+    setMaxVal,
     totalRows
   } = useContext(GlobalContext)
 
@@ -45,6 +52,13 @@ function Index() {
       setCompLicense([])
       setCompSupplier([])
       setCompScope('')
+      setVulnSeverity([])
+      setVulnComponent([])
+      setVulnStatus([])
+      setVulnKev('')
+      setVulnEpss('')
+      setMinVal(0)
+      setMaxVal(0)
     }
   }, [product])
 
