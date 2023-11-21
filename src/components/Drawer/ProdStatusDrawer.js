@@ -32,6 +32,8 @@ const ProdStatusDrawer = ({
   filteredData,
   totalRows,
   filterRefetch,
+  after, 
+  before
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -104,7 +106,7 @@ const ProdStatusDrawer = ({
           vexStatusId: statusTitle,
           vexJustificationId:
             statusName === 'Not Affected' ? justification : undefined,
-          impact: impactData == '' ? undefined : impactData
+          impact: impactData === '' ? undefined : impactData
         }
       })
         .then(
