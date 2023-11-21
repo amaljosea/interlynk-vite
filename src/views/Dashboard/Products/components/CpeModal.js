@@ -338,6 +338,7 @@ const CpeModal = ({
                     mt={1.5}
                     value={vendor}
                     size='md'
+                    placeholder='Enter vendor name'
                     onChange={handleVendorChange}
                   />
                   <Progress
@@ -370,6 +371,7 @@ const CpeModal = ({
                     mt={1.5}
                     value={product}
                     size='md'
+                    placeholder='Enter product name'
                     onChange={handleProductChange}
                   />
                   <Progress
