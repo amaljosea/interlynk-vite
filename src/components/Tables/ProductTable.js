@@ -317,7 +317,7 @@ const ProductTable = ({ data, refetch }) => {
                     history.push(`/vendor/autofix?id=${id}`)
                   }}
                 >
-                  Edit Automation
+                  Settings
                 </MenuItem>
                 <MenuItem
                   isDisabled={!enabled}
