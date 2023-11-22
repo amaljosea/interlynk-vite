@@ -173,7 +173,7 @@ const VulnTable = ({
               />
             </Link>
             <Tooltip label={vuln.vulnId} placement={'top'}>
-              <Text fontSize='sm' color={textColor}>
+              <Text fontSize='sm' color={textColor} data-tag='allowRowEvents'>
                 {vuln.vulnId !== null ? `${vuln.vulnId}` : ''}
               </Text>
             </Tooltip>
@@ -393,6 +393,7 @@ const VulnTable = ({
         const dateB = new Date(b.vuln.updatedAt)
         return dateA - dateB // Sort in descending order
       },
+      wrap: true,
       right: 'true'
     }
   ]
