@@ -68,8 +68,11 @@ const CpeModal = ({
     if (updatedString) {
       const cpeParts = updatedString.split(':')
       setVendor({ value: cpeParts[3], label: cpeParts[3] })
+      setVendorListData([{ value: cpeParts[3], label: cpeParts[3] }])
       setProduct({ value: cpeParts[4], label: cpeParts[4] })
+      setProductList([{ value: cpeParts[4], label: cpeParts[4] }])
       setVersion({ value: cpeParts[5], label: cpeParts[5] })
+      setVersionList([{ value: cpeParts[5], label: cpeParts[5] }])
     }
   }, [updatedString])
 
