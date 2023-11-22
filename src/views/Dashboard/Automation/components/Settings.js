@@ -175,7 +175,7 @@ const Settings = () => {
         return (
           <>
             {selectorTwo !== '' ? (
-              <Flex alignItems={'center'} gap={2}>
+              <Flex width={'100%'} alignItems={'center'} gap={2}>
                 <Text fontSize={'sm'}>Set:</Text>
                 {selectorOne === 'component' ? (
                   <Tag>pkg:nuget/Fizzler@1.2.0</Tag>
@@ -183,7 +183,7 @@ const Settings = () => {
                   <Tag>Biotronik.ScsApp.Pr-1.0.0</Tag>
                 )}
                 <IconButton
-                  size='sm'
+                  size='xs'
                   colorScheme='blue'
                   icon={<SettingsIcon />}
                 />
@@ -193,7 +193,9 @@ const Settings = () => {
             )}
           </>
         )
-      }
+      },
+      wrap: true,
+      width: '20%'
     },
     // ACTIONS
     {
