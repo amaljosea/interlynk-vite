@@ -26,11 +26,6 @@ import DashboardBg from 'assets/img/dashboard.png'
 import axios from 'axios'
 import { useState, useRef } from 'react'
 
-const validateEmail = (email) => {
-  const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
-  return emailRegex.test(email)
-}
-
 export default function Auth() {
   const history = useHistory()
   const navRef = useRef()
@@ -129,9 +124,7 @@ export default function Auth() {
                   width={'100%'}
                   mt={4}
                 >
-                  <FormControl
-                    isInvalid={!validateEmail(email) && email !== ''}
-                  >
+                  <FormControl>
                     <FormLabel htmlFor='email'>Email address</FormLabel>
                     <Input
                       type='email'
@@ -140,9 +133,6 @@ export default function Auth() {
                       placeholder='abc@example.com'
                       autoComplete='off'
                     />
-                    {email !== '' && !validateEmail(email) && (
-                      <FormErrorMessage>Email is invalid</FormErrorMessage>
-                    )}
                   </FormControl>
                   <FormControl>
                     <FormLabel htmlFor='password'>Password</FormLabel>
