@@ -87,6 +87,8 @@ export default function AdminNavbar(props) {
           return '/vendor/connections'
         case 'Settings':
           return `/vendor/autofix?id=${prodID}`
+        case 'Change Log':
+          return `/vendor/changelog?id=${prodID}`
       }
     } else {
       switch (name) {
@@ -156,7 +158,7 @@ export default function AdminNavbar(props) {
                     Products
                   </Link>
                   <Text>/</Text>
-                  <Link to={'/vendor/products'} color={secondaryText}>
+                  <Link to={`${path(brandText)}`} color={secondaryText}>
                     {activeProd}
                   </Link>
                 </HStack>
