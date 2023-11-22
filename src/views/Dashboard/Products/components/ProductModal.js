@@ -67,11 +67,22 @@ const ProductModal = ({
           desc: productDesc
         }
       })
-        .then(() =>
-          refetch({
-            first: totalRows
-          })
-        )
+        .then((res) => {
+          const error = res.data.projectUpdate.errors
+          if (error.length > 0) {
+            toast({
+              description:
+                'A project with same name already exists. Please choose a unique name',
+              status: 'error',
+              position: 'top',
+              duration: 5000
+            })
+          } else {
+            refetch({
+              first: totalRows
+            })
+          }
+        })
         .finally(() => onClose())
     } catch (error) {
       console.error('Mutation error:', error)

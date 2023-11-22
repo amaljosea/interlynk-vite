@@ -12,17 +12,13 @@ import {
   FormLabel,
   Select,
   Stack,
-  Checkbox,
   Flex,
-  Input,
-  Progress,
-  Textarea,
-  calc
+  Textarea
 } from '@chakra-ui/react'
-import { UpdateComponent } from 'graphQL/Mutation'
-import { recheckHealth } from 'graphQL/Mutation'
+import { UpdateComponent, recheckHealth } from 'graphQL/Mutation'
 import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
+import ReactSelect from 'react-select'
 
 const CpeModal = ({
   id,
@@ -35,42 +31,49 @@ const CpeModal = ({
   cpeValue,
   checkId,
   refetch,
-  setPageIndex
+  setPageIndex,
+  getCpe
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const sbomId = queryParams.get('sbom')
 
-  const [vendor, setVendor] = useState('')
-  const [product, setProduct] = useState('')
+  const [vendor, setVendor] = useState(null)
+  const [vendorListData, setVendorListData] = useState([])
+  const [product, setProduct] = useState(null)
+  const [productList, setProductList] = useState([])
   const [type, setType] = useState('')
-  const [version, setVersion] = useState('')
+  const [version, setVersion] = useState(null)
+  const [versionList, setVersionList] = useState([])
   const [hardware, setHardware] = useState('')
-  const [vendorProgressValue, setVendorProgressValue] = useState(0)
-  const [prodProgressValue, setProdProgressValue] = useState(0)
-  const [verProgressValue, setVerProgressValue] = useState(0)
 
-  const [updatedString, setUpdatedString] = useState(cpeValue)
+  const [updatedString, setUpdatedString] = useState(cpeValue.value)
 
   const [healthRecheck] = useMutation(recheckHealth, {
     onCompleted: () => refetch()
   })
   const [updateComponent] = useMutation(UpdateComponent)
 
+  // UPDATE FIELDS DATA FROM API
   useEffect(() => {
     if (data) {
       setVendor(data.vendor)
       setProduct(data.product)
       setVersion(data.version)
       setHardware(data.targetHardware)
-      setVendorProgressValue(calculateProgress(data.vendor, '', ''))
-      setProdProgressValue(calculateProgress(data.vendor, data.product, ''))
-      setVerProgressValue(
-        calculateProgress(data.vendor, data.product, data.version)
-      )
     }
   }, [data])
 
+  useEffect(() => {
+    if (updatedString) {
+      const cpeParts = updatedString.split(':')
+      setVendor({ value: cpeParts[3], label: cpeParts[3] })
+      setProduct({ value: cpeParts[4], label: cpeParts[4] })
+      setVersion({ value: cpeParts[5], label: cpeParts[5] })
+    }
+  }, [updatedString])
+
+  // ON CPE SAVE
   const handleSave = () => {
     if (selectedCpe) {
       onUpdateCpe(updatedString, selectedCpe.id)
@@ -80,6 +83,7 @@ const CpeModal = ({
     onClose()
   }
 
+  // ON CPE UPDATE
   const handleComUpdate = async () => {
     try {
       await updateComponent({
@@ -107,147 +111,50 @@ const CpeModal = ({
     }
   }
 
-  const calculateProgress = (vendor, prod, version) => {
-    const vendorMap = {}
-    vendorMap[['cisco', '', ''].join(',')] = 100
-    vendorMap[['microsoft', '', ''].join(',')] = 90
-    vendorMap[['hp', '', ''].join(',')] = 100
-    vendorMap[['ibm', '', ''].join(',')] = 100
-    vendorMap[['intel', '', ''].join(',')] = 100
-    vendorMap[['jenkins', '', ''].join(',')] = 100
-    vendorMap[['apache', '', ''].join(',')] = 100
-    vendorMap[['google', '', ''].join(',')] = 100
-    vendorMap[['microsoft', '', ''].join(',')] = 100
-    vendorMap[['vim', '', ''].join(',')] = 100
-    vendorMap[['redhat', '', ''].join(',')] = 100
-    vendorMap[['oracle', '', ''].join(',')] = 100
-    vendorMap[['debian', '', ''].join(',')] = 100
-    vendorMap[['kernel', '', ''].join(',')] = 80
-    vendorMap[['sony', '', ''].join(',')] = 80
-    vendorMap[['nutanix', '', ''].join(',')] = 10
-    vendorMap[['simpleproxy', '', ''].join(',')] = 10
-    vendorMap[['microware', '', ''].join(',')] = 50
-    vendorMap[['microsftv', '', ''].join(',')] = 10
-    vendorMap[['orange', '', ''].join(',')] = 20
-    vendorMap[['orangelab', '', ''].join(',')] = 10
-
-    vendorMap[['cisco', '', ''].join(',')] = 100
-    vendorMap[['hp', '', ''].join(',')] = 100
-    vendorMap[['ibm', '', ''].join(',')] = 100
-    vendorMap[['intel', '', ''].join(',')] = 100
-    vendorMap[['jenkins', '', ''].join(',')] = 100
-    vendorMap[['apache', '', ''].join(',')] = 100
-    vendorMap[['google', '', ''].join(',')] = 100
-
-    vendorMap[['', 'windows_xp', ''].join(',')] = 100
-    vendorMap[['', 'apt', ''].join(',')] = 100
-    vendorMap[['microsoft', 'windows_xp', ''].join(',')] = 100
-    vendorMap[['microsoft', 'windows_xp', 'sp2'].join(',')] = 10
-    vendorMap[['microsoft', 'windows_xp', 'sp3'].join(',')] = 10
-    vendorMap[['microsoft', 'windows_xp', '1.0'].join(',')] = 100
-    vendorMap[['microsoft', 'windows_7', ''].join(',')] = 100
-    vendorMap[['microsoft', 'office', ''].join(',')] = 100
-
-    vendorMap[['microsoft', 'internet_explorer', ''].join(',')] = 100
-
-    vendorMap[['microsoft', 'windows_7', ''].join(',')] = 100
-    vendorMap[['', 'office', ''].join(',')] = 100
-    vendorMap[['', 'internet_explorer', ''].join(',')] = 100
-
-    vendorMap[['debian', '', ''].join(',')] = 100
-    vendorMap[['debian', 'cron', ''].join(',')] = 100
-    vendorMap[['', 'cron', ''].join(',')] = 100
-    vendorMap[['', 'bash', ''].join(',')] = 100
-    vendorMap[['', 'base_files', ''].join(',')] = 100
-    vendorMap[['debian', 'bash', ''].join(',')] = 100
-    vendorMap[['debian', 'bsdutils', ''].join(',')] = 100
-
-    vendorMap[['vim', '', ''].join(',')] = 100
-    vendorMap[['redhat', '', ''].join(',')] = 100
-    vendorMap[['oracle', '', ''].join(',')] = 100
-    vendorMap[['debian', '', ''].join(',')] = 100
-    vendorMap[['kernel', '', ''].join(',')] = 80
-    vendorMap[['sony', '', ''].join(',')] = 80
-    vendorMap[['nutanix', '', ''].join(',')] = 10
-    vendorMap[['simpleproxy', '', ''].join(',')] = 10
-    vendorMap[['microware', '', ''].join(',')] = 50
-    vendorMap[['microsftv', '', ''].join(',')] = 10
-    vendorMap[['orange', '', ''].join(',')] = 20
-    vendorMap[['orangelab', '', ''].join(',')] = 10
-
-    vendorMap[['vim', '', ''].join(',')] = 100
-    vendorMap[['chrome', '', ''].join(',')] = 100
-    vendorMap[['ios', '', ''].join(',')] = 100
-    vendorMap[['linux_kernel', '', ''].join(',')] = 100
-    vendorMap[['node.js', '', ''].join(',')] = 100
-    vendorMap[['php', '', ''].join(',')] = 100
-
-    vendorMap[['ruby', '', ''].join(',')] = 80
-    vendorMap[['http', '', ''].join(',')] = 20
-    vendorMap[['log4js', '', ''].join(',')] = 20
-    vendorMap[['pods', '', ''].join(',')] = 10
-
-    vendorMap[['NA', '', ''].join(',')] = 100
-    vendorMap[['ANY', '', ''].join(',')] = 100
-    vendorMap[['1.0.0', '', ''].join(',')] = 100
-    vendorMap[['7.1.2', '', ''].join(',')] = 10
-
-    var newValue =
-      vendorMap[
-        [vendor.toLowerCase(), prod.toLowerCase(), version.toLowerCase()].join(
-          ','
-        )
-      ]
-    // console.log('Vendor:' + vendor, 'Prod:' + prod, 'Version:' + version, newValue)
-    if (isNaN(newValue)) {
-      newValue = 0
+  // ON VENDOR INPUT CHANGE
+  const onVendorInputChange = (value) => {
+    console.log('value', value)
+    if (value !== '') {
+      getCpe({
+        variables: {
+          input: {
+            idType: 'cpe',
+            ecosystem: 'cpe',
+            idUri: '',
+            search: {
+              vendor: value
+            }
+          }
+        }
+      }).then((res) => {
+        if (res.data) {
+          const vendorList = res.data.idAutoComplete.result.map((item) => ({
+            value: item,
+            label: item
+          }))
+          setVendorListData(vendorList)
+        }
+      })
     }
-    return newValue
   }
 
-  const getProgressColor = (value) => {
-    if (value >= 90) {
-      return 'green' // Change color to green if progress is 90% or higher
-    } else if (value >= 50) {
-      return 'yellow' // Change color to yellow if progress is 50% or higher
+  // ON VENDOR SELECT
+  const onVendorChange = (selectedOption, triggeredAction) => {
+    console.log('selectedOption', selectedOption)
+    console.log('triggeredAction', triggeredAction)
+    if (triggeredAction.action === 'clear') {
+      setVendor(null)
+      setVendorListData([])
     } else {
-      return 'red' // Change color to red for lower progress values
+      setVendor(selectedOption)
+      const cpeParts = updatedString.split(':')
+      cpeParts[3] = selectedOption.value
+      const cpeString = cpeParts.join(':')
+      setUpdatedString(cpeString)
     }
   }
 
-  // setCpeData({
-  //  vendor: components[3],
-  //  product: components[4],
-  //  version: components[5],
-  //  targetHardware: '*'
-  //})
-
-  const handleVendorChange = (e) => {
-    setVendor(e.target.value)
-    const cpeParts = updatedString.split(':')
-    cpeParts[3] = e.target.value
-    const cpeString = cpeParts.join(':')
-    // console.log('CPE String: ' + cpeString)
-    setUpdatedString(cpeString)
-
-    const vendorProgressValue = calculateProgress(cpeParts[3], '', '')
-    setVendorProgressValue(vendorProgressValue)
-
-    if (cpeParts[4] === '') {
-      setProdProgressValue(0)
-    } else {
-      const prodProgressValue = calculateProgress(cpeParts[3], cpeParts[4], '')
-      setProdProgressValue(prodProgressValue)
-    }
-
-    const verProgressValue = calculateProgress(
-      cpeParts[3],
-      cpeParts[4],
-      cpeParts[5]
-    )
-    setVerProgressValue(verProgressValue)
-  }
-
+  // ON TYPE CHANGE
   const handleTypeChange = (e) => {
     setType(e.target.value)
     const cpeParts = updatedString.split(':')
@@ -257,50 +164,90 @@ const CpeModal = ({
     setUpdatedString(cpeString)
   }
 
-  const handleProductChange = (e) => {
-    setProduct(e.target.value)
-    const cpeParts = updatedString.split(':')
-    cpeParts[4] = e.target.value
-    const cpeString = cpeParts.join(':')
-    // console.log('CPE String: ' + cpeString)
-    setUpdatedString(cpeString)
-
-    if (e.target.value === '') {
-      setProdProgressValue(0)
-    } else {
-      const prodProgressValue = calculateProgress(
-        cpeParts[3],
-        e.target.value,
-        ''
-      )
-      setProdProgressValue(prodProgressValue)
+  // ON PRODUCT INPUT CHANGE
+  const onProductInputChange = (value) => {
+    if (value !== '') {
+      getCpe({
+        variables: {
+          input: {
+            idType: 'cpe',
+            ecosystem: 'cpe',
+            idUri: '',
+            search: {
+              product: value
+            }
+          }
+        }
+      }).then((res) => {
+        if (res.data) {
+          const prodList = res.data.idAutoComplete.result.map((item) => ({
+            value: item,
+            label: item
+          }))
+          setProductList(prodList)
+        }
+      })
     }
   }
 
-  const handleVersionChange = (e) => {
-    setVersion(e.target.value)
-    const cpeParts = updatedString.split(':')
-    cpeParts[5] = e.target.value
-    const cpeString = cpeParts.join(':')
-    // console.log('CPE String: ' + cpeString)
-    setUpdatedString(cpeString)
-
-    if (e.target.value === '') {
-      setVerProgressValue(0)
+  // ON PRODUCT SELECT
+  const onProductChange = (selectedOption, triggeredAction) => {
+    if (triggeredAction.action === 'clear') {
+      setProduct(null)
+      setProductList([])
     } else {
-      const verProgressValue = calculateProgress(
-        cpeParts[3],
-        cpeParts[4],
-        e.target.value
-      )
-      setVerProgressValue(verProgressValue)
+      setProduct(selectedOption)
+      const cpeParts = updatedString.split(':')
+      cpeParts[4] = selectedOption.value
+      const cpeString = cpeParts.join(':')
+      setUpdatedString(cpeString)
     }
   }
 
+  // ON VERSION INPUT CHANGE
+  const onVersionInputChange = (value) => {
+    if (value !== '') {
+      getCpe({
+        variables: {
+          input: {
+            idType: 'cpe',
+            ecosystem: 'cpe',
+            idUri: '',
+            search: {
+              version: value
+            }
+          }
+        }
+      }).then((res) => {
+        if (res.data) {
+          const versionList = res.data.idAutoComplete.result.map((item) => ({
+            value: item,
+            label: item
+          }))
+          setVersionList(versionList)
+        }
+      })
+    }
+  }
+
+  // ON VERSION SELECT
+  const onVersionChange = (selectedOption, triggeredAction) => {
+    if (triggeredAction.action === 'clear') {
+      setVersion(null)
+      setVersionList([])
+    } else {
+      setVersion(selectedOption)
+      const cpeParts = updatedString.split(':')
+      cpeParts[5] = selectedOption.value
+      const cpeString = cpeParts.join(':')
+      setUpdatedString(cpeString)
+    }
+  }
+
+  // ON HARDWARE CHANGE
   const handleHardwareChange = (e) => {
     setHardware(e.target.value)
     const cpeString = cpeValue.replace(data.targetHardware, e.target.value)
-    // console.log('CPE String: ' + cpeString)
     setUpdatedString(cpeString)
   }
 
@@ -313,11 +260,14 @@ const CpeModal = ({
           <ModalCloseButton />
           <ModalBody>
             <Flex width={'100%'} direction={'column'} gap={4}>
+              {/* CPE STRING */}
               <FormControl>
-                <FormLabel>CPE String</FormLabel>
+                <FormLabel htmlFor='cpeString'>CPE String</FormLabel>
                 <Textarea
                   type='text'
                   variant='outline'
+                  name='cpeString'
+                  id='cpeString'
                   mt={1.5}
                   value={updatedString}
                   fontSize='16px'
@@ -325,35 +275,47 @@ const CpeModal = ({
                   color='black'
                   isInvalid
                   errorBorderColor='blue.600'
-                  onChange={handleVersionChange}
                   disabled
                 />
               </FormControl>
-              {/* Vendor */}
+              {/* VENDOR */}
               <FormControl>
-                Vendor
-                <Stack direction='column' spacing={1}>
-                  <Input
-                    type='text'
-                    mt={1.5}
-                    value={vendor}
-                    size='md'
-                    placeholder='Enter vendor name'
-                    onChange={handleVendorChange}
-                  />
-                  <Progress
-                    value={vendorProgressValue}
-                    colorScheme={getProgressColor(vendorProgressValue)}
-                  />
-                </Stack>
+                <FormLabel htmlFor='vendor'>Vendor</FormLabel>
+                <ReactSelect
+                  styles={{
+                    control: (baseStyles, state) => ({
+                      ...baseStyles,
+                      borderColor: state.isFocused ? 'inherit' : 'inherit',
+                      padding: '2px 5px',
+                      fontSize: '14px',
+                      '&:hover': {
+                        borderColor: '#CBD5E0'
+                      }
+                    })
+                  }}
+                  id='vendor'
+                  name='vendor'
+                  placeholder='Add vendor'
+                  value={vendor}
+                  options={vendorListData}
+                  isClearable
+                  components={{
+                    DropdownIndicator: () => null,
+                    IndicatorSeparator: () => null
+                  }}
+                  className='react-select'
+                  onChange={onVendorChange}
+                  onInputChange={onVendorInputChange}
+                />
               </FormControl>
-              {/* Type */}
+              {/* TYPE */}
               <FormControl>
                 <FormLabel htmlFor='type'>Type</FormLabel>
                 <Select
-                  size='md'
                   id='type'
                   name='type'
+                  size='md'
+                  fontSize={'sm'}
                   value={type}
                   onChange={handleTypeChange}
                 >
@@ -362,42 +324,67 @@ const CpeModal = ({
                   <option value='h'>Hardware</option>
                 </Select>
               </FormControl>
-              {/* Product */}
+              {/* PRODUCT */}
               <FormControl>
-                Product
-                <Stack direction='column' spacing={1}>
-                  <Input
-                    type='text'
-                    mt={1.5}
-                    value={product}
-                    size='md'
-                    placeholder='Enter product name'
-                    onChange={handleProductChange}
-                  />
-                  <Progress
-                    value={prodProgressValue}
-                    colorScheme={getProgressColor(prodProgressValue)}
-                  />
-                </Stack>
+                <FormLabel htmlFor='product'>Product</FormLabel>
+                <ReactSelect
+                  styles={{
+                    control: (baseStyles, state) => ({
+                      ...baseStyles,
+                      borderColor: state.isFocused ? 'inherit' : 'inherit',
+                      padding: '2px 5px',
+                      fontSize: '14px',
+                      '&:hover': {
+                        borderColor: '#CBD5E0'
+                      }
+                    })
+                  }}
+                  id='product'
+                  name='product'
+                  placeholder='Add product'
+                  value={product}
+                  options={productList}
+                  isClearable
+                  components={{
+                    DropdownIndicator: () => null,
+                    IndicatorSeparator: () => null
+                  }}
+                  className='react-select'
+                  onChange={onProductChange}
+                  onInputChange={onProductInputChange}
+                />
               </FormControl>
-              {/* Version */}
+              {/* VERSION */}
               <FormControl>
-                Version
-                <Stack direction='column' spacing={1}>
-                  <Input
-                    type='text'
-                    mt={1.5}
-                    value={version}
-                    size='md'
-                    onChange={handleVersionChange}
-                  />
-                  <Progress
-                    value={verProgressValue}
-                    colorScheme={getProgressColor(verProgressValue)}
-                  />
-                </Stack>
+                <FormLabel htmlFor='version'>Version</FormLabel>
+                <ReactSelect
+                  styles={{
+                    control: (baseStyles, state) => ({
+                      ...baseStyles,
+                      borderColor: state.isFocused ? 'inherit' : 'inherit',
+                      padding: '2px 5px',
+                      fontSize: '14px',
+                      '&:hover': {
+                        borderColor: '#CBD5E0'
+                      }
+                    })
+                  }}
+                  id='version'
+                  name='version'
+                  placeholder='Add version'
+                  value={version}
+                  options={versionList}
+                  isClearable
+                  components={{
+                    DropdownIndicator: () => null,
+                    IndicatorSeparator: () => null
+                  }}
+                  className='react-select'
+                  onChange={onVersionChange}
+                  onInputChange={onVersionInputChange}
+                />
               </FormControl>
-              {/* Hardware */}
+              {/* TARGET HARDWARE */}
               <FormControl>
                 <FormLabel htmlFor='targetHardware'>Target Hardware</FormLabel>
                 <Stack direction='column' spacing={1}>

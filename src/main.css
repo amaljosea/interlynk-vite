@@ -105,3 +105,8 @@
   fill: #2d3748;
   stroke: #2d3748;
 }
+
+.react-select {
+  font-size: 14px;
+  width: 100%;
+}

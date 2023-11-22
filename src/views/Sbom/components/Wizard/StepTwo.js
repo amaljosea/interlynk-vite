@@ -62,9 +62,9 @@ const StepTwo = ({
     }
   }, [currentSbom, importSbom])
 
-  useEffect(() => {
-    console.log('Final data', mergeData)
-  }, [mergeData])
+  // useEffect(() => {
+  //   console.log('Final data', mergeData)
+  // }, [mergeData])
 
   return (
     <Box width={'90%'} mx={'auto'}>
@@ -88,7 +88,7 @@ const StepTwo = ({
           justifyContent={'space-between'}
           mt={12}
         >
-          <Text>{mergeData.length} of {currentSbom.length} selected for status Import</Text>
+          <Text>Total: 0</Text>
         </Flex>
       )}
     </Box>

@@ -38,8 +38,8 @@ const UploadModal = ({ id, isOpen, onClose }) => {
             toast({
               title: 'SBOM uploaded successfully and is now processing',
               description:
-                'The validated SBOM data will be available in the product shortly',
-              duration: 6000,
+                'The validated SBOM data will be available in the product shortly. Please refresh to update the product.',
+              duration: 6500,
               isClosable: true,
               position: 'top',
               variant: 'left-accent'

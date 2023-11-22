@@ -190,6 +190,8 @@ const GeneralDataRow = ({ status, data, refetch }) => {
           label: 'Creative Commons Zero v1.0 Universal'
         }
       ])
+    } else {
+      setImgIds(data.licenses)
     }
   }, [data])
 

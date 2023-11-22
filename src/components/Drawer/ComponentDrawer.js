@@ -37,7 +37,7 @@ import {
   ModalBody,
   ModalFooter
 } from '@chakra-ui/react'
-import { useMutation } from '@apollo/client'
+import { useLazyQuery, useMutation } from '@apollo/client'
 import { CreateComponent, UpdateComponent } from 'graphQL/Mutation'
 import { useLocation } from 'react-router-dom'
 import { licenseOptions } from 'variables/licenses'
@@ -48,6 +48,7 @@ import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import { InfoIcon, CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import { FaExpandAlt } from 'react-icons/fa'
 import GlobalContext from 'context/GlobalContext'
+import { CpeAutoComplete } from 'graphQL/Queries'
 
 // const regexPattern = /^cpe:2\.3:[aho]:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+$/
 const regexPattern =
@@ -90,6 +91,14 @@ function ComponentDrawer(props) {
     }).then((res) => res.data && setCompFilters(res.data.sbom.filters))
   }
 
+  const [getCpe, { data: cpeInfo }] = useLazyQuery(CpeAutoComplete)
+
+  useEffect(() => {
+    if (cpeInfo) {
+      console.log('cpeInfo', cpeInfo)
+    }
+  }, [cpeInfo])
+
   const [createComponent] = useMutation(CreateComponent, {
     onCompleted: () => fetchCompData()
   })
@@ -106,7 +115,7 @@ function ComponentDrawer(props) {
   const [licenseName, setLicenseName] = useState('')
 
   const [cpeList, setCpeList] = useState([])
-  const [cpeValue, setCpeValue] = useState('')
+  const [cpeValue, setCpeValue] = useState(null)
   const [cpeData, setCpeData] = useState(null)
   const [isCPEInputValid, setCPEInputValid] = useState(true)
 
@@ -120,6 +129,7 @@ function ComponentDrawer(props) {
 
   const [licenseList, setLicenseList] = useState([])
   const [selectedLicenses, setSelectedLicenses] = useState([])
+  const [cpeListData, setCpeListData] = useState([])
 
   const licenses = licenseOptions.map((option) => ({
     value: option.licenseId,
@@ -241,30 +251,49 @@ function ComponentDrawer(props) {
     }
   }
 
-  const handleCPEInputChange = (e) => {
-    const inputValue = e.target.value
-    setCpeValue(inputValue)
-    const matches = inputValue.match(regexPattern)
-    if (matches) {
-      const [input] = matches
-      const components = input.split(':')
-      setCpeData({
-        vendor: components[3],
-        product: components[4],
-        version: components[5],
-        targetHardware: '*'
+  const handleInputChange = (value) => {
+    console.log('value', value)
+    if (value !== '') {
+      getCpe({
+        variables: {
+          input: {
+            idType: 'cpe',
+            ecosystem: 'cpe',
+            idUri: '',
+            search: {
+              idUri: value
+            }
+          }
+        }
+      }).then((res) => {
+        if (res.data) {
+          const cpeInfoList = res.data.idAutoComplete.result.map((item) => ({
+            value: item,
+            label: item
+          }))
+          setCpeListData(cpeInfoList)
+        }
       })
-      setCPEInputValid(true)
-    } else {
-      setCPEInputValid(false)
     }
   }
 
+  const handleCPEInputChange = (selectedOption, triggeredAction) => {
+    console.log('selectedOption', selectedOption)
+    console.log('triggeredAction', triggeredAction)
+    if (triggeredAction.action === 'clear') {
+      setCpeValue(null)
+      setCpeListData([])
+    } else {
+      setCpeValue(selectedOption)
+    }
+  }
+
+  // idAutoComplete
+
   const handleCpeModal = () => {
-    const matches = cpeValue.match(regexPattern)
-    console.log('matches :', matches)
-    if (cpeValue !== '' && matches) {
-      // console.log('matches :', matches)
+    if (cpeValue !== '') {
+      const matches = cpeValue.value.match(regexPattern)
+      console.log('matches :', matches)
       const [input] = matches
       const components = input.split(':')
       console.log(`components`, components)
@@ -419,7 +448,8 @@ function ComponentDrawer(props) {
       })
     } else {
       setCpeList([...cpeList, string])
-      setCpeValue('')
+      setCpeListData([])
+      setCpeValue(null)
       setSelectedCpe(null)
     }
   }
@@ -459,7 +489,7 @@ function ComponentDrawer(props) {
 
   return (
     <>
-      <Drawer isOpen={isOpen} placement='right' onClose={onClose} size='sm'>
+      <Drawer isOpen={isOpen} placement='right' onClose={onClose} size='md'>
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
@@ -484,7 +514,8 @@ function ComponentDrawer(props) {
                   </Flex>
                 </FormLabel>
                 <Input
-                  size='sm'
+                  size='md'
+                  fontSize={'sm'}
                   placeholder='Enter name'
                   value={compName}
                   onChange={(e) => setCompName(e.target.value)}
@@ -509,7 +540,8 @@ function ComponentDrawer(props) {
                   </Flex>
                 </FormLabel>
                 <Input
-                  size='sm'
+                  size='md'
+                  fontSize={'sm'}
                   placeholder='Enter version'
                   value={compVersion}
                   onChange={(e) => setCompVersion(e.target.value)}
@@ -522,7 +554,8 @@ function ComponentDrawer(props) {
               <FormControl>
                 <FormLabel fontSize={'sm'}>Group</FormLabel>
                 <Input
-                  size='sm'
+                  size='md'
+                  fontSize={'sm'}
                   placeholder='Add group'
                   value={groupInfo}
                   onChange={(e) => setGroupInfo(e.target.value)}
@@ -537,7 +570,8 @@ function ComponentDrawer(props) {
                 <Select
                   id='componentType'
                   name='componentType'
-                  size='sm'
+                  size='md'
+                  fontSize={'sm'}
                   value={compType}
                   onChange={(e) => setCompType(e.target.value)}
                 >
@@ -570,12 +604,18 @@ function ComponentDrawer(props) {
                     control: (baseStyles, state) => ({
                       ...baseStyles,
                       borderColor: state.isFocused ? 'inherit' : 'inherit',
+                      padding: '2px 5px',
                       '&:hover': {
                         borderColor: '#CBD5E0'
                       }
                     })
                   }}
                   isMulti
+                  components={{
+                    DropdownIndicator: () => null,
+                    IndicatorSeparator: () => null
+                  }}
+                  className='react-select'
                   value={licenseList}
                   options={licenses}
                   onChange={onLicenseChange}
@@ -594,7 +634,7 @@ function ComponentDrawer(props) {
                   />
                 </FormControl>
               )}
-              {/* Identifiers */}
+              {/* PURL INPUI */}
               <FormControl isReadOnly={customerView}>
                 <FormLabel htmlFor='purl' fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
@@ -612,7 +652,8 @@ function ComponentDrawer(props) {
                   <InputGroup>
                     <Input
                       type='text'
-                      size='sm'
+                      size='md'
+                      fontSize={'sm'}
                       placeholder='PURL'
                       value={purlValue ? purlValue : ''}
                       id='purl'
@@ -631,7 +672,7 @@ function ComponentDrawer(props) {
                   </InputGroup>
                   <IconButton
                     icon={<FaExpandAlt />}
-                    size='sm'
+                    size='md'
                     fontWeight={'normal'}
                     variant='solid'
                     colorScheme='blue'
@@ -642,38 +683,44 @@ function ComponentDrawer(props) {
                   </IconButton>
                 </Stack>
               </FormControl>
+              {/* CPE INPUT */}
               <FormControl>
-                {/* CPE INPUT */}
                 <Stack direction={'row'} spacing={2}>
-                  <InputGroup>
-                    <Input
-                      type='text'
-                      size='sm'
-                      placeholder='CPE'
-                      value={cpeValue ? cpeValue : ''}
-                      id='cpe'
-                      name='cpe'
-                      onChange={handleCPEInputChange}
-                    />
-                    <InputRightElement align='center' zIndex={-1}>
-                      {cpeValue != null && cpeValue !== '' ? (
-                        isCPEInputValid ? (
-                          <CheckIcon color='green' />
-                        ) : (
-                          <WarningTwoIcon color='red' />
-                        )
-                      ) : null}
-                    </InputRightElement>
-                  </InputGroup>
+                  <MultiSelect
+                    styles={{
+                      control: (baseStyles, state) => ({
+                        ...baseStyles,
+                        borderColor: state.isFocused ? 'inherit' : 'inherit',
+                        padding: '2px 5px',
+                        fontSize: '14px',
+                        '&:hover': {
+                          borderColor: '#CBD5E0'
+                        }
+                      })
+                    }}
+                    id='cpe'
+                    name='cpe'
+                    placeholder='CPE'
+                    value={cpeValue}
+                    options={cpeListData}
+                    isClearable
+                    components={{
+                      DropdownIndicator: () => null,
+                      IndicatorSeparator: () => null
+                    }}
+                    className='react-select'
+                    onChange={handleCPEInputChange}
+                    onInputChange={handleInputChange}
+                  />
                   <IconButton
                     icon={<FaExpandAlt />}
-                    mt={2}
-                    size='sm'
+                    ize='md'
                     fontWeight={'normal'}
                     variant='solid'
                     colorScheme='blue'
                     width={'fit-content'}
                     onClick={handleCpeModal}
+                    isDisabled={cpeValue === null}
                   >
                     Details
                   </IconButton>
@@ -684,15 +731,10 @@ function ComponentDrawer(props) {
                   flexWrap={'wrap'}
                   spacing={2}
                   gap={2}
-                  my={1}
+                  my={2}
                 >
                   {cpeList.map((item, index) => (
-                    <Tag
-                      key={index}
-                      borderRadius='full'
-                      variant='solid'
-                      colorScheme={'blue'}
-                    >
+                    <Tag key={index} variant='solid' colorScheme={'blue'}>
                       <TagLabel
                         cursor={'pointer'}
                         onClick={() => {
@@ -707,13 +749,14 @@ function ComponentDrawer(props) {
                   ))}
                 </Flex>
               </FormControl>
+              {/* PRIMARY COMPONENT */}
               <FormControl isReadOnly={customerView}>
                 <Flex alignItems={'center'} gap={2}>
                   {shortDesc === 'Primary Component' && !isPrimary && (
                     <WarningTwoIcon w={4} h={4} color='red.500' />
                   )}
                   <Checkbox
-                    size='sm'
+                    size='md'
                     colorScheme='blue'
                     isChecked={isPrimary}
                     onChange={onWarningOpen}
@@ -723,9 +766,10 @@ function ComponentDrawer(props) {
                   </Checkbox>
                 </Flex>
               </FormControl>
+              {/* INTERNAL COMPONENT */}
               <FormControl isReadOnly={customerView}>
                 <Checkbox
-                  size='sm'
+                  size='md'
                   colorScheme='blue'
                   isChecked={isInternal}
                   onChange={() => setIsInternal(!isInternal)}
@@ -793,6 +837,7 @@ function ComponentDrawer(props) {
           onCreateCpe={handleCreateCpe}
           onUpdateCpe={handleUpdateCpe}
           selectedCpe={selectedCpe}
+          getCpe={getCpe}
         />
       )}
 
