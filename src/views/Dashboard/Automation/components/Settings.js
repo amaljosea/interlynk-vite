@@ -195,7 +195,7 @@ const Settings = () => {
         )
       },
       wrap: true,
-      width: '20%'
+      width: '25%'
     },
     // ACTIONS
     {
