@@ -54,9 +54,9 @@ const StepOne = ({
       const currentIndex = filterVersion?.findIndex(
         (item) => item.id === currentSbomId
       )
-      if (currentIndex > 0) {
-        setSelectedVersion(filterVersion[currentIndex - 1].id)
-        setSbomId(filterVersion[currentIndex - 1].id)
+      if (currentIndex !== filterVersion.length - 1) {
+        setSelectedVersion(filterVersion[currentIndex + 1].id)
+        setSbomId(filterVersion[currentIndex + 1].id)
       } else {
         setSelectedVersion('')
         setSbomId('')
