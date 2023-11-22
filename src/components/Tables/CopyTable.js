@@ -9,7 +9,6 @@ import {
   Tooltip,
   useColorModeValue
 } from '@chakra-ui/react'
-import Card from 'components/Card/Card'
 import GlobalContext from 'context/GlobalContext'
 import React, { useContext, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
@@ -51,7 +50,8 @@ const statusColor = (status) => {
 const CopyTable = () => {
   const textColor = useColorModeValue('gray.700', 'white')
 
-  const { setSelectedVulns, mergeData, currentSbom } = useContext(GlobalContext)
+  const { selectedVulns, setSelectedVulns, mergeData, currentSbom } =
+    useContext(GlobalContext)
 
   // COLUMNS
   const columns = [
@@ -191,11 +191,12 @@ const CopyTable = () => {
         justifyContent={'space-between'}
       >
         <Text>
-          {mergeData.length} of {currentSbom.length} selected for status Import
+          {selectedVulns.length} of {mergeData.length} selected for status
+          Import
         </Text>
       </Flex>
     )
-  }, [mergeData])
+  }, [mergeData, selectedVulns])
 
   const linkURl = (type, id) => {
     if (type === 'osv') {
@@ -207,7 +208,7 @@ const CopyTable = () => {
 
   const handleChange = (state) => {
     setSelectedVulns(state.selectedRows)
-    console.log(state)
+    // console.log(state)
   }
 
   return (
