@@ -123,7 +123,6 @@ const CpeModal = ({
           input: {
             idType: 'cpe',
             ecosystem: 'cpe',
-            idUri: '',
             search: {
               vendor: value
             }
@@ -175,7 +174,6 @@ const CpeModal = ({
           input: {
             idType: 'cpe',
             ecosystem: 'cpe',
-            idUri: '',
             search: {
               product: value
             }
@@ -215,7 +213,6 @@ const CpeModal = ({
           input: {
             idType: 'cpe',
             ecosystem: 'cpe',
-            idUri: '',
             search: {
               version: value
             }
