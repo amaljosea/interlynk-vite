@@ -259,7 +259,6 @@ function ComponentDrawer(props) {
           input: {
             idType: 'cpe',
             ecosystem: 'cpe',
-            idUri: '',
             search: {
               idUri: value
             }
