@@ -1720,3 +1720,12 @@ export const GetSignedLogsFilterData = gql`
     }
   }
 `
+
+// CPE AUTOCOMPLETE
+export const CpeAutoComplete = gql`
+  query CpeAutoComplete($input: IdAutoCompletionInput!) {
+    idAutoComplete(input: $input) {
+      result
+    }
+  }
+`
