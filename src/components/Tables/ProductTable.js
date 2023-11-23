@@ -290,7 +290,23 @@ const ProductTable = ({ data, refetch }) => {
       id: 'actions',
       name: 'ACTIONS',
       selector: (row) => {
-        const { enabled, id, name } = row
+        const { enabled, id, name, sboms } = row
+        const uniqVersions = []
+        sboms &&
+          sboms.map((project) => {
+            if (project.primaryComponent) {
+              uniqVersions.push({
+                version: project.primaryComponent.version,
+                id: project.id,
+                updatedAt: project.updatedAt
+              })
+            }
+          })
+
+        const filteredData = uniqVersions
+          ? removeDuplicatesAndLatest(uniqVersions)
+          : []
+
         return (
           <Menu>
             <MenuButton
@@ -314,7 +330,13 @@ const ProductTable = ({ data, refetch }) => {
                   isDisabled={!enabled}
                   onClick={() => {
                     window.localStorage.setItem('activeProduct', name)
-                    history.push(`/vendor/autofix?id=${id}`)
+                    history.push(
+                      `/vendor/autofix?id=${id}&sbom=${
+                        filteredData.length > 0
+                          ? filteredData[0].id
+                          : sboms[0].id
+                      }`
+                    )
                   }}
                 >
                   Settings
@@ -323,7 +345,13 @@ const ProductTable = ({ data, refetch }) => {
                   isDisabled={!enabled}
                   onClick={() => {
                     window.localStorage.setItem('activeProduct', name)
-                    history.push(`/vendor/changelog?id=${id}`)
+                    history.push(
+                      `/vendor/changelog?id=${id}&sbom=${
+                        filteredData.length > 0
+                          ? filteredData[0].id
+                          : sboms[0].id
+                      }`
+                    )
                   }}
                 >
                   View Change Log
