@@ -1,19 +1,21 @@
-import { useContext, useMemo } from 'react'
-import { AddIcon, DeleteIcon, SettingsIcon } from '@chakra-ui/icons'
+import { DeleteIcon, SettingsIcon } from '@chakra-ui/icons'
 import {
   Flex,
+  HStack,
   IconButton,
-  Input,
-  Select,
   Switch,
   Tag,
   Text,
-  Tooltip
+  useDisclosure
 } from '@chakra-ui/react'
 import CardBody from 'components/Card/CardBody'
 import CustomLoader from 'components/CustomLoader'
 import DataTable from 'react-data-table-component'
-import GlobalContext from 'context/GlobalContext'
+import UpdateRule from './UpdateRule'
+import { useState } from 'react'
+import { DeleteAutomation } from 'graphQL/Mutation'
+import { useMutation } from '@apollo/client'
+import { useLocation } from 'react-router-dom'
 
 const customStyles = {
   headCells: {
@@ -32,38 +34,27 @@ const customStyles = {
   }
 }
 
-const Settings = () => {
-  const { automationRules, setAutomationRules } = useContext(GlobalContext)
+const Settings = ({ data, getData }) => {
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const productId = queryParams.get('id')
 
-  const addRow = () => {
-    const newRow = {
-      id: Date.now(),
-      active: true,
-      selectorOne: '',
-      conditionOne: '',
-      selectorTwo: '',
-      conditionTwo: '',
-      fixAction: ''
-    }
-    setAutomationRules([...automationRules, newRow])
-  }
+  // console.log('data', data?.nodes)
 
-  const deleteRow = (id) => {
-    const updatedData = automationRules.filter((item) => item.id !== id)
-    setAutomationRules(updatedData)
-  }
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const [activeRow, setActiveRow] = useState(null)
 
-  const handleInputChange = (id, column, value) => {
-    const updatedData = automationRules.map((item) => {
-      if (item.id === id && column === 'selectorOne') {
-        return { ...item, [column]: value, selectorTwo: '' }
+  const [deleteAutoCheck] = useMutation(DeleteAutomation)
+
+  const handleRemove = async (id) => {
+    await deleteAutoCheck({
+      variables: {
+        autoCheckId: id,
+        projectId: productId
       }
-      if (item.id === id) {
-        return { ...item, [column]: value }
-      }
-      return item
-    })
-    setAutomationRules(updatedData)
+    }).then(
+      (res) => res.data && getData({ variables: { id: productId, first: 24 } })
+    )
   }
 
   // COLUMNS
@@ -73,8 +64,8 @@ const Settings = () => {
       id: 'active',
       name: 'ACTIVE',
       selector: (row) => {
-        const { active } = row
-        return <Switch isChecked={active}></Switch>
+        const { enabled } = row
+        return <Switch isChecked={enabled}></Switch>
       },
       width: '8%'
     },
@@ -83,15 +74,8 @@ const Settings = () => {
       id: 'rule',
       name: 'RULE APPLIES TO',
       selector: (row) => {
-        const { selectorOne } = row
-
-        return (
-          <Select size='sm' value={selectorOne}>
-            <option value=''>-- Select --</option>
-            <option value='document'>Document</option>
-            <option value='component'>Component</option>
-          </Select>
-        )
+        const { applicability } = row
+        return <Text textTransform={'capitalize'}>{applicability}</Text>
       }
     },
     // NAME
@@ -99,33 +83,22 @@ const Settings = () => {
       id: 'name',
       name: 'NAME',
       selector: (row) => {
-        const { conditionOne } = row
-
+        const { lookup } = row
         return (
-          <Input
-            size='sm'
-            // disabled={row.selectorOne === 'document'}
-            placeholder='Add name'
-            value={conditionOne}
-          />
+          <Text textTransform={'capitalize'} my={2}>
+            {lookup?.comp_name}-{lookup?.comp_version}
+          </Text>
         )
-      }
+      },
+      wrap: true
     },
     // CONDITION
     {
       id: 'condition',
       name: 'CONDITION',
       selector: (row) => {
-        const { conditionTwo } = row
-        return (
-          <Select size='sm' value={conditionTwo}>
-            <option value=''>-- Select --</option>
-            <option value='Missing'>Missing</option>
-            <option value='Invalid'>Invalid</option>
-            <option value='Invalid'>Missing or Invalid</option>
-            <option value='Always'>Always</option>
-          </Select>
-        )
+        const { condition } = row
+        return <Text textTransform={'capitalize'}>{condition}</Text>
       }
     },
     // ATTRIBUTE
@@ -133,37 +106,8 @@ const Settings = () => {
       id: 'attribute',
       name: 'ATTRIBUTE',
       selector: (row) => {
-        const { selectorOne, selectorTwo } = row
-        return (
-          <>
-            {selectorOne === 'document' ? (
-              <Select size='sm' value={selectorTwo}>
-                <option value=''>-- Select --</option>
-                <option value='Supplier'>Supplier</option>
-                <option value='Author'>Author</option>
-                <option value='Creation Time'>Creation Time</option>
-                <option value='Creation Tools'>Creation Tools</option>
-                <option value='Product Type'>Product Type</option>
-                <option value='Product Version'>Product Version</option>
-                <option value='Package URL (PURL)'>Package URL (PURL)</option>
-                <option value='Common Platform Enumeration (CPE)'>
-                  Common Platform Enumeration (CPE)
-                </option>
-                <option value='Primary Component'>Primary Component</option>
-              </Select>
-            ) : (
-              <Select size='sm' value={selectorTwo}>
-                <option value=''>-- Select --</option>
-                <option value='Component Version'>Component Version</option>
-                <option value='Component Type'>Component Type</option>
-                <option value='Package URL (PURL)'>Package URL (PURL)</option>
-                <option value='Common Platform Enumeration (CPE)'>
-                  Common Platform Enumeration (CPE)
-                </option>
-              </Select>
-            )}
-          </>
-        )
+        const { attrName } = row
+        return <Tag colorScheme='blue'>{attrName}</Tag>
       }
     },
     // FIX
@@ -171,27 +115,20 @@ const Settings = () => {
       id: 'fix',
       name: 'FIX',
       selector: (row) => {
-        const { selectorTwo, selectorOne } = row
+        const { setTo } = row
         return (
-          <>
-            {selectorTwo !== '' ? (
-              <Flex width={'100%'} alignItems={'center'} gap={2}>
-                <Text fontSize={'sm'}>Set:</Text>
-                {selectorOne === 'component' ? (
-                  <Tag>pkg:nuget/Fizzler@1.2.0</Tag>
-                ) : (
-                  <Tag>Biotronik.ScsApp.Pr-1.0.0</Tag>
-                )}
-                <IconButton
-                  size='xs'
-                  colorScheme='blue'
-                  icon={<SettingsIcon />}
-                />
-              </Flex>
-            ) : (
-              ''
-            )}
-          </>
+          <HStack alignItems={'flex-start'} justifyContent={'flex-start'}>
+            <Tag>{JSON.stringify(setTo)}</Tag>
+            <IconButton
+              size='xs'
+              onClick={() => {
+                setActiveRow(row)
+                onOpen()
+              }}
+              colorScheme='blue'
+              icon={<SettingsIcon />}
+            />
+          </HStack>
         )
       },
       wrap: true,
@@ -202,49 +139,46 @@ const Settings = () => {
       id: 'actions',
       name: 'ACTIONS',
       selector: (row) => {
-        const { id } = row
-        return <IconButton size='sm' icon={<DeleteIcon />} colorScheme='red' />
+        return (
+          <IconButton
+            onClick={() => handleRemove(row.id)}
+            size='sm'
+            icon={<DeleteIcon />}
+            colorScheme='red'
+          />
+        )
       },
       right: 'true'
     }
   ]
 
-  const subHeaderComponent = useMemo(() => {
-    return (
-      <Flex
-        alignItems={'center'}
-        justifyContent={'space-between'}
-        width={'100%'}
-      >
-        <Text fontSize={18}>Rule Automation Settings</Text>
-        <Tooltip label='Add Rule'>
-          <IconButton
-            variant='solid'
-            colorScheme='blue'
-            fontWeight='normal'
-            icon={<AddIcon />}
-          />
-        </Tooltip>
-      </Flex>
-    )
-  }, [])
-
   return (
-    <CardBody>
-      <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
-          columns={columns}
-          data={automationRules}
-          customStyles={customStyles}
-          subHeader
-          subHeaderComponent={subHeaderComponent}
-          progressPending={automationRules ? false : true}
-          progressComponent={<CustomLoader />}
-          responsive={true}
-          persistTableHead
+    <>
+      <CardBody>
+        <Flex flexDir={'column'} width={'100%'}>
+          <DataTable
+            columns={columns}
+            title={<Text fontSize={'xl'}>Rule Automation Settings</Text>}
+            data={data && data.nodes}
+            customStyles={customStyles}
+            progressPending={data && data.nodes ? false : true}
+            progressComponent={<CustomLoader />}
+            responsive={true}
+            persistTableHead
+          />
+        </Flex>
+      </CardBody>
+
+      {activeRow && isOpen && (
+        <UpdateRule
+          isOpen={isOpen}
+          onClose={onClose}
+          data={activeRow}
+          getData={getData}
+          productId={productId}
         />
-      </Flex>
-    </CardBody>
+      )}
+    </>
   )
 }
 

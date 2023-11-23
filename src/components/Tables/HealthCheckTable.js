@@ -89,7 +89,6 @@ const HealthCheckTable = ({
 
   const [purlValue, setPurlValue] = useState('')
   const [purlData, setPurlData] = useState(null)
-  const [filterText, setFilterText] = useState('')
   const [cpeList, setCpeList] = useState([])
   const [cpeValue, setCpeValue] = useState('')
   const [cpeData, setCpeData] = useState(null)
@@ -111,7 +110,7 @@ const HealthCheckTable = ({
         last: checkBefore !== '' ? totalRows : undefined,
         before: checkBefore !== '' ? checkBefore : undefined,
         field: checkField,
-        direction: checkDirection
+        direction: 'DESC'
       }
     })
   }
@@ -238,13 +237,15 @@ const HealthCheckTable = ({
 
   // SEARCH COMPONENT
   const handleSearch = async (event) => {
-    if (event.key === 'Enter' && filterText !== '') {
+    if (event.key === 'Enter' && checkSearchInput !== '') {
       await refetch({
        variables: {
         projectId: productId,
         sbomId: sbomId,
         search: checkSearchInput,
-        first: totalRows
+        first: totalRows,
+        field: checkField,
+        direction: checkDirection
        }
       })
       setPageIndex(1)
@@ -258,10 +259,12 @@ const HealthCheckTable = ({
         projectId: productId,
         sbomId: sbomId,
         search: undefined,
-        first: totalRows
+        first: totalRows,
+        field: checkField,
+        direction: checkDirection
       }
     })
-    setFilterText('')
+    setCheckSearchInput('')
     setPageIndex(1)
   }
 
@@ -827,7 +830,7 @@ const HealthCheckTable = ({
           {/*  COMPONENT LICENSE MODAL */}
           {isLicenseOpen && (
             <CheckModal
-              id={activeRow.component.id}
+              activeCheck={activeRow}
               componentId={activeRow.component.id}
               totalRows={totalRows}
               refetch={fetchCheckData}
@@ -856,11 +859,11 @@ const HealthCheckTable = ({
           {/* SUPPLIER MODAL */}
           {isSupplierOpen && (
             <SupplierModal
-              id={activeRow.component.id}
+              activeCheck={activeRow.component}
               btnRef={supplierBtn}
               refetch={fetchCheckData}
               filterRefetch={filterRefetch}
-              isOpen={onSupplierOpen}
+              isOpen={isSupplierOpen}
               onClose={onSupplierClose}
               suppliers={[]}
               checkId={activeRow.organizationRule.rule.friendlyId}
@@ -870,7 +873,7 @@ const HealthCheckTable = ({
 
           {isOpen && (
             <CheckModal
-              id={activeRow.id}
+              activeCheck={activeRow}
               totalRows={totalRows}
               refetch={fetchCheckData}
               filterRefetch={filterRefetch}

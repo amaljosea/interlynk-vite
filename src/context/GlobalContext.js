@@ -154,7 +154,9 @@ const GlobalContext = React.createContext({
   checkSeverity: [],
   setCheckSeverity: () => {},
   checkStatus: [],
-  setCheckStatus: () => {}
+  setCheckStatus: () => {},
+  cpeString: '',
+  setCpeString: () => {}
 })
 
 export default GlobalContext

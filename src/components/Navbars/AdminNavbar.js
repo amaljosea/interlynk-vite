@@ -24,6 +24,7 @@ export default function AdminNavbar(props) {
   const versionId = queryParams.get('v')
   const product = queryParams.get('p')
   const prodID = queryParams.get('id')
+  const sbomId = queryParams.get('sbom')
   const parts = queryParams.get('parts')
 
   const imageName = localStorage.getItem('Image')
@@ -86,9 +87,9 @@ export default function AdminNavbar(props) {
         case 'Connections':
           return '/vendor/connections'
         case 'Settings':
-          return `/vendor/autofix?id=${prodID}`
+          return `/vendor/autofix?id=${prodID}&sbom=${sbomId}`
         case 'Change Log':
-          return `/vendor/changelog?id=${prodID}`
+          return `/vendor/changelog?id=${prodID}&sbom=${sbomId}`
       }
     } else {
       switch (name) {
@@ -158,7 +159,12 @@ export default function AdminNavbar(props) {
                     Products
                   </Link>
                   <Text>/</Text>
-                  <Link to={`${path(brandText)}`} color={secondaryText}>
+                  <Link
+                    to={`/vendor/products?&p=${prodID}&sbom=${sbomId}`}
+                    color={secondaryText}
+                    onClick={() => window.localStorage.setItem('product', activeProd)
+                    }
+                  >
                     {activeProd}
                   </Link>
                 </HStack>

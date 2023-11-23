@@ -477,7 +477,17 @@ const VulnFilterMenu = ({
                   }
                 />
               </Stack>
-              <Button ml={8} my={2} size='sm' onClick={handleSubmit}>
+              <Button
+                ml={8}
+                my={2}
+                size='sm'
+                onClick={handleSubmit}
+                disabled={
+                  minVal === 0 ||
+                  maxVal === 0 ||
+                  Number(maxVal) < Number(minVal)
+                }
+              >
                 Submit
               </Button>
             </Flex>

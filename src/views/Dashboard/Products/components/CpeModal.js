@@ -15,10 +15,15 @@ import {
   Flex,
   Textarea
 } from '@chakra-ui/react'
+import CpeInput from 'components/CpeInput'
+import GlobalContext from 'context/GlobalContext'
 import { UpdateComponent, recheckHealth } from 'graphQL/Mutation'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useContext } from 'react'
 import { useLocation } from 'react-router-dom'
 import ReactSelect from 'react-select'
+
+const regexPattern =
+  /cpe:2\.3:[aho\*\-](:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,\/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){5}(:(([a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))?)|[\*\-]))(:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,\/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){4}/
 
 const CpeModal = ({
   id,
@@ -39,15 +44,20 @@ const CpeModal = ({
   const sbomId = queryParams.get('sbom')
 
   const [vendor, setVendor] = useState(null)
-  const [vendorListData, setVendorListData] = useState([])
+  const [vendorList, setVendorList] = useState([])
+  const vendorRef = useRef()
   const [product, setProduct] = useState(null)
   const [productList, setProductList] = useState([])
+  const productRef = useRef()
   const [type, setType] = useState('')
   const [version, setVersion] = useState(null)
   const [versionList, setVersionList] = useState([])
+  const versionRef = useRef()
   const [hardware, setHardware] = useState('')
 
-  const [updatedString, setUpdatedString] = useState(cpeValue.value)
+  const [updatedString, setUpdatedString] = useState('')
+
+  const { cpeString, setCpeString } = useContext(GlobalContext)
 
   const [healthRecheck] = useMutation(recheckHealth, {
     onCompleted: () => refetch()
@@ -56,32 +66,28 @@ const CpeModal = ({
 
   // UPDATE FIELDS DATA FROM API
   useEffect(() => {
-    if (data) {
-      setVendor(data.vendor)
-      setProduct(data.product)
-      setVersion(data.version)
-      setHardware(data.targetHardware)
-    }
-  }, [data])
+    const matches = regexPattern.test(cpeValue)
 
-  useEffect(() => {
-    if (updatedString) {
-      const cpeParts = updatedString.split(':')
-      setVendor({ value: cpeParts[3], label: cpeParts[3] })
-      setVendorListData([{ value: cpeParts[3], label: cpeParts[3] }])
-      setProduct({ value: cpeParts[4], label: cpeParts[4] })
-      setProductList([{ value: cpeParts[4], label: cpeParts[4] }])
-      setVersion({ value: cpeParts[5], label: cpeParts[5] })
-      setVersionList([{ value: cpeParts[5], label: cpeParts[5] }])
+    if (matches) {
+      setCpeString(cpeValue)
+      const components = cpeValue.split(':')
+      setVendor(components[3])
+      setProduct(components[4])
+      setVersion(components[5])
+      setHardware('*')
     }
-  }, [updatedString])
+
+    if (cpeValue === '') {
+      setCpeString('cpe:2.3:a:calligra:calligra:2.4.1:*:*:*:*:*:*:*')
+    }
+  }, [cpeValue])
 
   // ON CPE SAVE
   const handleSave = () => {
     if (selectedCpe) {
-      onUpdateCpe(updatedString, selectedCpe.id)
+      onUpdateCpe(cpeString, selectedCpe.id)
     } else {
-      onCreateCpe(updatedString)
+      onCreateCpe(cpeString)
     }
     onClose()
   }
@@ -115,140 +121,96 @@ const CpeModal = ({
   }
 
   // ON VENDOR INPUT CHANGE
-  const onVendorInputChange = (value) => {
-    console.log('value', value)
-    if (value !== '') {
-      getCpe({
-        variables: {
-          input: {
-            idType: 'cpe',
-            ecosystem: 'cpe',
-            search: {
-              vendor: value
-            }
+  const onVendorInputChange = (event) => {
+    const { value } = event.target
+    setVendor(value)
+    getCpe({
+      variables: {
+        input: {
+          idType: 'cpe',
+          ecosystem: 'cpe',
+          search: {
+            vendor: value
           }
         }
-      }).then((res) => {
-        if (res.data) {
-          const vendorList = res.data.idAutoComplete.result.map((item) => ({
-            value: item,
-            label: item
-          }))
-          setVendorListData(vendorList)
-        }
-      })
-    }
-  }
-
-  // ON VENDOR SELECT
-  const onVendorChange = (selectedOption, triggeredAction) => {
-    console.log('selectedOption', selectedOption)
-    console.log('triggeredAction', triggeredAction)
-    if (triggeredAction.action === 'clear') {
-      setVendor(null)
-      setVendorListData([])
-    } else {
-      setVendor(selectedOption)
-      const cpeParts = updatedString.split(':')
-      cpeParts[3] = selectedOption.value
-      const cpeString = cpeParts.join(':')
-      setUpdatedString(cpeString)
-    }
+      }
+    }).then((res) => {
+      if (res.data) {
+        setVendorList(res.data.idAutoComplete.result)
+      }
+    })
   }
 
   // ON TYPE CHANGE
   const handleTypeChange = (e) => {
     setType(e.target.value)
-    const cpeParts = updatedString.split(':')
+    const cpeParts = cpeString.split(':')
     cpeParts[2] = e.target.value
-    const cpeString = cpeParts.join(':')
-    // console.log('CPE String: ' + cpeString)
-    setUpdatedString(cpeString)
+    const cpe = cpeParts.join(':')
+    setCpeString(cpe)
   }
 
   // ON PRODUCT INPUT CHANGE
-  const onProductInputChange = (value) => {
-    if (value !== '') {
-      getCpe({
-        variables: {
-          input: {
-            idType: 'cpe',
-            ecosystem: 'cpe',
-            search: {
-              product: value
+  const onProductInputChange = (event) => {
+    const { value } = event.target
+    setProduct(value)
+    getCpe({
+      variables: {
+        input: {
+          idType: 'cpe',
+          ecosystem: 'cpe',
+          search: {
+            product: value
+          },
+          hints: {
+            cpe: {
+              vendor: vendor
             }
           }
         }
-      }).then((res) => {
-        if (res.data) {
-          const prodList = res.data.idAutoComplete.result.map((item) => ({
-            value: item,
-            label: item
-          }))
-          setProductList(prodList)
-        }
-      })
-    }
-  }
-
-  // ON PRODUCT SELECT
-  const onProductChange = (selectedOption, triggeredAction) => {
-    if (triggeredAction.action === 'clear') {
-      setProduct(null)
-      setProductList([])
-    } else {
-      setProduct(selectedOption)
-      const cpeParts = updatedString.split(':')
-      cpeParts[4] = selectedOption.value
-      const cpeString = cpeParts.join(':')
-      setUpdatedString(cpeString)
-    }
+      }
+    }).then((res) => {
+      if (res.data) {
+        setProductList(res.data.idAutoComplete.result)
+      }
+    })
   }
 
   // ON VERSION INPUT CHANGE
-  const onVersionInputChange = (value) => {
-    if (value !== '') {
-      getCpe({
-        variables: {
-          input: {
-            idType: 'cpe',
-            ecosystem: 'cpe',
-            search: {
-              version: value
+  const onVersionInputChange = (event) => {
+    const { value } = event.target
+    setVersion(value)
+    getCpe({
+      variables: {
+        input: {
+          idType: 'cpe',
+          ecosystem: 'cpe',
+          search: {
+            version: value
+          },
+          hints: {
+            cpe: {
+              vendor: vendor,
+              product: product
             }
           }
         }
-      }).then((res) => {
-        if (res.data) {
-          const versionList = res.data.idAutoComplete.result.map((item) => ({
-            value: item,
-            label: item
-          }))
-          setVersionList(versionList)
-        }
-      })
-    }
-  }
-
-  // ON VERSION SELECT
-  const onVersionChange = (selectedOption, triggeredAction) => {
-    if (triggeredAction.action === 'clear') {
-      setVersion(null)
-      setVersionList([])
-    } else {
-      setVersion(selectedOption)
-      const cpeParts = updatedString.split(':')
-      cpeParts[5] = selectedOption.value
-      const cpeString = cpeParts.join(':')
-      setUpdatedString(cpeString)
-    }
+      }
+    }).then((res) => {
+      if (res.data) {
+        setVersionList(res.data.idAutoComplete.result)
+      }
+    })
   }
 
   // ON HARDWARE CHANGE
   const handleHardwareChange = (e) => {
-    setHardware(e.target.value)
-    const cpeString = cpeValue.replace(data.targetHardware, e.target.value)
-    setUpdatedString(cpeString)
+    const { value } = e.target
+    setHardware(value)
+    const cpeParts = cpeString.split(':')
+    cpeParts[6] = value
+    const cpe = cpeParts.join(':')
+    setCpeString(cpe)
   }
 
   return (
@@ -269,7 +231,7 @@ const CpeModal = ({
                   name='cpeString'
                   id='cpeString'
                   mt={1.5}
-                  value={updatedString}
+                  value={cpeString}
                   fontSize='16px'
                   fontStyle={'bold'}
                   color='black'
@@ -279,35 +241,16 @@ const CpeModal = ({
                 />
               </FormControl>
               {/* VENDOR */}
-              <FormControl>
-                <FormLabel htmlFor='vendor'>Vendor</FormLabel>
-                <ReactSelect
-                  styles={{
-                    control: (baseStyles, state) => ({
-                      ...baseStyles,
-                      borderColor: state.isFocused ? 'inherit' : 'inherit',
-                      padding: '2px 5px',
-                      fontSize: '14px',
-                      '&:hover': {
-                        borderColor: '#CBD5E0'
-                      }
-                    })
-                  }}
-                  id='vendor'
-                  name='vendor'
-                  placeholder='Add vendor'
-                  value={vendor}
-                  options={vendorListData}
-                  isClearable
-                  components={{
-                    DropdownIndicator: () => null,
-                    IndicatorSeparator: () => null
-                  }}
-                  className='react-select'
-                  onChange={onVendorChange}
-                  onInputChange={onVendorInputChange}
-                />
-              </FormControl>
+              <CpeInput
+                name='vendor'
+                inputValue={vendor}
+                setInputValue={setVendor}
+                cpeList={vendorList}
+                setCpeList={setVendorList}
+                inputRef={vendorRef}
+                validation={false}
+                onChange={onVendorInputChange}
+              />
               {/* TYPE */}
               <FormControl>
                 <FormLabel htmlFor='type'>Type</FormLabel>
@@ -325,65 +268,27 @@ const CpeModal = ({
                 </Select>
               </FormControl>
               {/* PRODUCT */}
-              <FormControl>
-                <FormLabel htmlFor='product'>Product</FormLabel>
-                <ReactSelect
-                  styles={{
-                    control: (baseStyles, state) => ({
-                      ...baseStyles,
-                      borderColor: state.isFocused ? 'inherit' : 'inherit',
-                      padding: '2px 5px',
-                      fontSize: '14px',
-                      '&:hover': {
-                        borderColor: '#CBD5E0'
-                      }
-                    })
-                  }}
-                  id='product'
-                  name='product'
-                  placeholder='Add product'
-                  value={product}
-                  options={productList}
-                  isClearable
-                  components={{
-                    DropdownIndicator: () => null,
-                    IndicatorSeparator: () => null
-                  }}
-                  className='react-select'
-                  onChange={onProductChange}
-                  onInputChange={onProductInputChange}
-                />
-              </FormControl>
+              <CpeInput
+                name='product'
+                inputValue={product}
+                setInputValue={setProduct}
+                cpeList={productList}
+                setCpeList={setProductList}
+                inputRef={productRef}
+                validation={false}
+                onChange={onProductInputChange}
+              />
               {/* VERSION */}
-              <FormControl>
-                <FormLabel htmlFor='version'>Version</FormLabel>
-                <ReactSelect
-                  styles={{
-                    control: (baseStyles, state) => ({
-                      ...baseStyles,
-                      borderColor: state.isFocused ? 'inherit' : 'inherit',
-                      padding: '2px 5px',
-                      fontSize: '14px',
-                      '&:hover': {
-                        borderColor: '#CBD5E0'
-                      }
-                    })
-                  }}
-                  id='version'
-                  name='version'
-                  placeholder='Add version'
-                  value={version}
-                  options={versionList}
-                  isClearable
-                  components={{
-                    DropdownIndicator: () => null,
-                    IndicatorSeparator: () => null
-                  }}
-                  className='react-select'
-                  onChange={onVersionChange}
-                  onInputChange={onVersionInputChange}
-                />
-              </FormControl>
+              <CpeInput
+                name='version'
+                inputValue={version}
+                setInputValue={setVersion}
+                cpeList={versionList}
+                setCpeList={setVersionList}
+                inputRef={versionRef}
+                validation={false}
+                onChange={onVersionInputChange}
+              />
               {/* TARGET HARDWARE */}
               <FormControl>
                 <FormLabel htmlFor='targetHardware'>Target Hardware</FormLabel>

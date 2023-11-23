@@ -19,13 +19,6 @@ import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
 import { useState } from 'react'
 
-const re2Regex =
-  /^(?:(?:[a-zA-Z0-9]+[._-]?)+[a-zA-Z0-9]@(?:[a-zA-Z0-9]+[.-]?)+[a-zA-Z]{2,}|(?:[a-zA-Z0-9]+[.-]?)+[a-zA-Z0-9]+\.[a-zA-Z]{2,}|(?:\d{1,3}\.){3}\d{1,3}|(?:0[1-9]|1[0-2])\/(?:0[1-9]|[12][0-9]|3[01])\/(?:19|20)\d{2}|[a-zA-Z0-9]+)$/
-
-const validateRe2 = (re2) => {
-  return re2Regex.test(re2)
-}
-
 const ComponentFeed = () => {
   const textColor = useColorModeValue('gray.700', 'white')
 
@@ -92,12 +85,11 @@ const ComponentFeed = () => {
               bg={'white'}
             />
             {compName !== '' && !isMatch && (
-              <FormErrorMessage>
-                This is not a valid name regex
-              </FormErrorMessage>
+              <FormErrorMessage>Invalid regular expression</FormErrorMessage>
             )}
             <Text fontSize={'xs'} mt={2}>
-              Press <Code colorScheme='blue'>enter</Code> to add name regex
+              Please <Code colorScheme='blue'>enter</Code> to add a name or a
+              regular expression
             </Text>
           </FormControl>
 

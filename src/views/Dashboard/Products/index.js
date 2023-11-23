@@ -25,7 +25,12 @@ function Index() {
     setVulnEpss,
     setMinVal,
     setMaxVal,
-    totalRows
+    totalRows,
+    setCheckSearchInput,
+    setCheckCategory,
+    setCheckSeverity,
+    setCheckStatus,
+    setCheckDirection
   } = useContext(GlobalContext)
 
   const location = useLocation()
@@ -59,6 +64,11 @@ function Index() {
       setVulnEpss('')
       setMinVal(0)
       setMaxVal(0)
+      setCheckSearchInput('')
+      setCheckCategory([])
+      setCheckSeverity([])
+      setCheckStatus([])
+      setCheckDirection('DESC')
     }
   }, [product])
 

@@ -1,6 +1,6 @@
 // Chakra imports
 
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect, useContext, useRef } from 'react'
 import {
   Drawer,
   DrawerBody,
@@ -41,7 +41,8 @@ import { useLazyQuery, useMutation } from '@apollo/client'
 import { CreateComponent, UpdateComponent } from 'graphQL/Mutation'
 import { useLocation } from 'react-router-dom'
 import { licenseOptions } from 'variables/licenses'
-import MultiSelect from 'react-select'
+import MultiSelect, { components } from 'react-select'
+import Creatable from 'react-select/creatable'
 import { PackageURL } from 'packageurl-js'
 import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
@@ -49,10 +50,11 @@ import { InfoIcon, CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import { FaExpandAlt } from 'react-icons/fa'
 import GlobalContext from 'context/GlobalContext'
 import { CpeAutoComplete } from 'graphQL/Queries'
+import CpeInput from 'components/CpeInput'
 
-// const regexPattern = /^cpe:2\.3:[aho]:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+$/
-const regexPattern =
-  /cpe:2\.3:[aho\*\-](:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,\/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){5}(:(([a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))?)|[\*\-]))(:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,\/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){4}/
+const SelectInput = (props) => (
+  <components.Input {...props} autoComplete='off' />
+)
 
 function ComponentDrawer(props) {
   const location = useLocation()
@@ -62,6 +64,9 @@ function ComponentDrawer(props) {
   const sbomId = queryParams.get('sbom')
 
   const customerView = location.pathname.startsWith('/customer')
+
+  const selectRef = useRef()
+  const [inputValue, setInputValue] = useState('')
 
   const {
     id,
@@ -93,11 +98,6 @@ function ComponentDrawer(props) {
 
   const [getCpe, { data: cpeInfo }] = useLazyQuery(CpeAutoComplete)
 
-  useEffect(() => {
-    if (cpeInfo) {
-      console.log('cpeInfo', cpeInfo)
-    }
-  }, [cpeInfo])
 
   const [createComponent] = useMutation(CreateComponent, {
     onCompleted: () => fetchCompData()
@@ -113,11 +113,11 @@ function ComponentDrawer(props) {
   const [compVersion, setCompVersion] = useState('')
   const [compType, setCompType] = useState('')
   const [licenseName, setLicenseName] = useState('')
-
+  const [cpeValue, setCpeValue] = useState('')
   const [cpeList, setCpeList] = useState([])
-  const [cpeValue, setCpeValue] = useState(null)
-  const [cpeData, setCpeData] = useState(null)
-  const [isCPEInputValid, setCPEInputValid] = useState(true)
+  const [cpeData, setCpeData] = useState([])
+  const [isValid, setIsValid] = useState(true)
+  const cpeRef = useRef()
 
   const [selectedCpe, setSelectedCpe] = useState(null)
   const [purlValue, setPurlValue] = useState('')
@@ -129,7 +129,6 @@ function ComponentDrawer(props) {
 
   const [licenseList, setLicenseList] = useState([])
   const [selectedLicenses, setSelectedLicenses] = useState([])
-  const [cpeListData, setCpeListData] = useState([])
 
   const licenses = licenseOptions.map((option) => ({
     value: option.licenseId,
@@ -248,79 +247,6 @@ function ComponentDrawer(props) {
       setPURLInputValid(true)
       setPurlData(pkg)
       onPurlOpen()
-    }
-  }
-
-  const handleInputChange = (value) => {
-    console.log('value', value)
-    if (value !== '') {
-      getCpe({
-        variables: {
-          input: {
-            idType: 'cpe',
-            ecosystem: 'cpe',
-            search: {
-              idUri: value
-            }
-          }
-        }
-      }).then((res) => {
-        if (res.data) {
-          const cpeInfoList = res.data.idAutoComplete.result.map((item) => ({
-            value: item,
-            label: item
-          }))
-          setCpeListData(cpeInfoList)
-        }
-      })
-    }
-  }
-
-  const handleCPEInputChange = (selectedOption, triggeredAction) => {
-    console.log('selectedOption', selectedOption)
-    console.log('triggeredAction', triggeredAction)
-    if (triggeredAction.action === 'clear') {
-      setCpeValue(null)
-      setCpeListData([])
-    } else {
-      setCpeValue(selectedOption)
-    }
-  }
-
-  // idAutoComplete
-
-  const handleCpeModal = () => {
-    if (cpeValue !== '') {
-      const matches = cpeValue.value.match(regexPattern)
-      console.log('matches :', matches)
-      const [input] = matches
-      const components = input.split(':')
-      console.log(`components`, components)
-      setCpeData({
-        vendor: components[3],
-        product: components[4],
-        version: components[5],
-        targetHardware: '*'
-      })
-      onCpeOpen()
-    } else {
-      if (cpeValue != null && cpeValue !== '') {
-        toast({
-          description: 'CPE value is invalid. Resetting to defaults',
-          status: 'error',
-          duration: 3000,
-          position: 'top'
-        })
-      }
-      setCpeData({
-        vendor: 'vendor',
-        product: 'product',
-        version: '1.0',
-        targetHardware: '*'
-      })
-      setCpeValue('cpe:2.3:a:vendor:product:1.0:*:*:*:*:*:*:*')
-      setCPEInputValid(true)
-      onCpeOpen()
     }
   }
 
@@ -447,8 +373,8 @@ function ComponentDrawer(props) {
       })
     } else {
       setCpeList([...cpeList, string])
-      setCpeListData([])
-      setCpeValue(null)
+      setCpeData([])
+      setCpeValue('')
       setSelectedCpe(null)
     }
   }
@@ -480,11 +406,29 @@ function ComponentDrawer(props) {
     setCpeList(updatedItems)
   }
 
-  // console.log('cpeList', cpeList)
-
   const containesOther =
     licenseList.length > 0 &&
     licenseList.some((item) => item.value === 'Other' && item.label === 'Other')
+
+  const handleCpeChange = (event) => {
+    const { value } = event.target
+    setCpeValue(value)
+    getCpe({
+      variables: {
+        input: {
+          idType: 'cpe',
+          ecosystem: 'cpe',
+          search: {
+            idUri: value
+          }
+        }
+      }
+    }).then((res) => {
+      if (res.data) {
+        setCpeData(res.data.idAutoComplete.result)
+      }
+    })
+  }
 
   return (
     <>
@@ -684,32 +628,16 @@ function ComponentDrawer(props) {
               </FormControl>
               {/* CPE INPUT */}
               <FormControl>
-                <Stack direction={'row'} spacing={2}>
-                  <MultiSelect
-                    styles={{
-                      control: (baseStyles, state) => ({
-                        ...baseStyles,
-                        borderColor: state.isFocused ? 'inherit' : 'inherit',
-                        padding: '2px 5px',
-                        fontSize: '14px',
-                        '&:hover': {
-                          borderColor: '#CBD5E0'
-                        }
-                      })
-                    }}
-                    id='cpe'
+                <Stack direction={'row'} width={'100%'} spacing={2}>
+                  <CpeInput
                     name='cpe'
-                    placeholder='CPE'
-                    value={cpeValue}
-                    options={cpeListData}
-                    isClearable
-                    components={{
-                      DropdownIndicator: () => null,
-                      IndicatorSeparator: () => null
-                    }}
-                    className='react-select'
-                    onChange={handleCPEInputChange}
-                    onInputChange={handleInputChange}
+                    inputValue={cpeValue}
+                    setInputValue={setCpeValue}
+                    cpeList={cpeData}
+                    setCpeList={setCpeData}
+                    onChange={handleCpeChange}
+                    inputRef={cpeRef}
+                    validation={true}
                   />
                   <IconButton
                     icon={<FaExpandAlt />}
@@ -718,8 +646,7 @@ function ComponentDrawer(props) {
                     variant='solid'
                     colorScheme='blue'
                     width={'fit-content'}
-                    onClick={handleCpeModal}
-                    isDisabled={cpeValue === null}
+                    onClick={onCpeOpen}
                   >
                     Details
                   </IconButton>
@@ -737,7 +664,6 @@ function ComponentDrawer(props) {
                       <TagLabel
                         cursor={'pointer'}
                         onClick={() => {
-                          // setCpeValue(item)
                           setSelectedCpe({ id: index, name: item })
                         }}
                       >

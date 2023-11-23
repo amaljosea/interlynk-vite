@@ -12,9 +12,12 @@ import {
   FormControl,
   FormLabel,
   Input,
-  FormErrorMessage
+  FormErrorMessage,
+  Stack,
+  Text
 } from '@chakra-ui/react'
 import GlobalContext from 'context/GlobalContext'
+import { CreateAutomation } from 'graphQL/Mutation'
 import { updateComSupplier } from 'graphQL/Mutation'
 import { recheckHealth } from 'graphQL/Mutation'
 import { addComSupplier } from 'graphQL/Mutation'
@@ -22,13 +25,13 @@ import { useState, useEffect, useContext } from 'react'
 import { useLocation } from 'react-router-dom'
 
 const SupplierModal = ({
-  id,
   isOpen,
   onClose,
   refetch,
   suppliers,
   checkId,
-  filterRefetch
+  filterRefetch,
+  activeCheck
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -80,7 +83,7 @@ const SupplierModal = ({
     }
   }, [suppliers])
 
-  const handleSave = async (e) => {
+  const handleSave = async () => {
     await createSupplier({
       variables: {
         name: supName,
@@ -97,7 +100,7 @@ const SupplierModal = ({
             variables: {
               sbomId: sbomId,
               checkId: checkId,
-              compId: id
+              compId: activeCheck?.id
             }
           })
         }
@@ -117,6 +120,34 @@ const SupplierModal = ({
         onClose()
       }
     })
+  }
+
+  const [createAutoCheck] = useMutation(CreateAutomation)
+
+  const onSaveRule = async () => {
+    try {
+      await createAutoCheck({
+        variables: {
+          projectId: productId,
+          applicable: 'component',
+          condition: 'missing',
+          attr: 'supplier',
+          enabled: true,
+          compName: activeCheck?.name,
+          compVersion: activeCheck?.version,
+          set: JSON.stringify(
+            {
+              name: supName,
+              contact_email: supEmail ? supEmail : ''
+            },
+            null,
+            2
+          )
+        }
+      }).then((res) => res.data && handleSave())
+    } catch (error) {
+      console.log('Error', error)
+    }
   }
 
   return (
@@ -155,30 +186,45 @@ const SupplierModal = ({
             </Flex>
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme='gray' mr={3} onClick={onClose}>
-              Cancel
-            </Button>
-            {suppliers.length > 0 ? (
-              <Button
-                colorScheme='blue'
-                onClick={handleUpdate}
-                disabled={
-                  !supName || (supEmail !== '' && !validateEmail(supEmail))
-                }
-              >
-                Update
-              </Button>
-            ) : (
-              <Button
-                colorScheme='blue'
-                onClick={handleSave}
-                disabled={
-                  !supName || (supEmail !== '' && !validateEmail(supEmail))
-                }
-              >
-                Save
-              </Button>
-            )}
+            <Flex
+              width={'100%'}
+              justifyContent={'space-between'}
+              alignItems={'center'}
+            >
+              {checkId ? (
+                <Button fontSize={'sm'} colorScheme='blue' onClick={onSaveRule}>
+                  Save Rule
+                </Button>
+              ) : (
+                <Text></Text>
+              )}
+              <Stack direction={'row'} spacing={2} alignItems={'center'}>
+                <Button colorScheme='gray' onClick={onClose}>
+                  Cancel
+                </Button>
+                {suppliers.length > 0 ? (
+                  <Button
+                    colorScheme='blue'
+                    onClick={handleUpdate}
+                    disabled={
+                      !supName || (supEmail !== '' && !validateEmail(supEmail))
+                    }
+                  >
+                    Update
+                  </Button>
+                ) : (
+                  <Button
+                    colorScheme='blue'
+                    onClick={handleSave}
+                    disabled={
+                      !supName || (supEmail !== '' && !validateEmail(supEmail))
+                    }
+                  >
+                    Save
+                  </Button>
+                )}
+              </Stack>
+            </Flex>
           </ModalFooter>
         </ModalContent>
       </Modal>

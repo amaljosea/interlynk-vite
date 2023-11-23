@@ -116,6 +116,8 @@ const ContextWrapper = (props) => {
   const [checkAfter, setCheckAfter] = useState('')
   const [checkBefore, setCheckBefore] = useState('')
 
+  const [cpeString, setCpeString] = useState('')
+
   return (
     <GlobalContext.Provider
       value={{
@@ -265,7 +267,9 @@ const ContextWrapper = (props) => {
         checkAfter,
         setCheckAfter,
         checkBefore,
-        setCheckBefore
+        setCheckBefore,
+        cpeString,
+        setCpeString
       }}
     >
       {props.children}
