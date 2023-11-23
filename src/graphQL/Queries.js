@@ -857,6 +857,7 @@ export const GetCheckResults = gql`
           component {
             id
             name
+            version
           }
           organizationRule {
             severity
@@ -973,6 +974,40 @@ export const GetProject = gql`
           id
           name
           version
+        }
+      }
+    }
+  }
+`
+
+export const GetProjectCheck = gql`
+  query GetProjectCheck(
+    $id: Uuid!
+    $after: String
+    $before: String
+    $first: Int
+    $last: Int
+  ) {
+    project(id: $id) {
+      id
+      autoChecks(after: $after, before: $before, first: $first, last: $last) {
+        totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          startCursor
+          hasPreviousPage
+        }
+        nodes {
+          applicability
+          attrName
+          condition
+          createdAt
+          enabled
+          lookup 
+          id
+          setTo
+          updatedAt
         }
       }
     }

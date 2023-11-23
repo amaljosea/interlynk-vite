@@ -29,7 +29,8 @@ function Index() {
     setCheckSearchInput,
     setCheckCategory,
     setCheckSeverity,
-    setCheckStatus
+    setCheckStatus,
+    setCheckDirection
   } = useContext(GlobalContext)
 
   const location = useLocation()
@@ -67,6 +68,7 @@ function Index() {
       setCheckCategory([])
       setCheckSeverity([])
       setCheckStatus([])
+      setCheckDirection('DESC')
     }
   }, [product])
 

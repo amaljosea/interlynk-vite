@@ -1175,3 +1175,93 @@ export const DeleteCompRelation = gql`
     }
   }
 `
+
+// CREATE AUTOMATION
+export const CreateAutomation = gql`
+  mutation CreateAutomation(
+    $projectId: Uuid!
+    $applicable: AutoCheckApplicability!
+    $condition: AutoCheckCondition!
+    $attr: AutoCheckAttrNames!
+    $enabled: Boolean!
+    $compName: String
+    $compVersion: String
+    $set: JSON
+  ) {
+    autoCheckCreate(
+      input: {
+        projectId: $projectId
+        applicability: $applicable
+        condition: $condition
+        attrName: $attr
+        enabled: $enabled
+        compName: $compName
+        compVersion: $compVersion
+        setTo: $set
+      }
+    ) {
+      autoCheck {
+        id
+        applicability
+        condition
+        attrName
+        enabled
+        lookup
+        setTo
+      }
+      errors
+    }
+  }
+`
+
+// UPDATE AUTOMATION
+export const UpdateAutomation = gql`
+  mutation UpdateAutomation(
+    $autoCheckId: Uuid!
+    $projectId: Uuid!
+    $applicable: AutoCheckApplicability
+    $condition: AutoCheckCondition
+    $attr: AutoCheckAttrNames
+    $enabled: Boolean
+    $compName: String
+    $compVersion: String
+    $set: JSON
+  ) {
+    autoCheckUpdate(
+      input: {
+        id: $autoCheckId
+        projectId: $projectId
+        applicability: $applicable
+        condition: $condition
+        attrName: $attr
+        enabled: $enabled
+        compName: $compName
+        compVersion: $compVersion
+        setTo: $set
+      }
+    ) {
+      autoCheck {
+        id
+        applicability
+        condition
+        attrName
+        enabled
+        lookup
+        setTo
+      }
+      errors
+    }
+  }
+`
+
+// DELETE AUTOMATION
+export const DeleteAutomation = gql`
+  mutation DeleteAutomation($autoCheckId: Uuid!, $projectId: Uuid!) {
+    autoCheckDelete(input: { id: $autoCheckId, projectId: $projectId }) {
+      autoCheck {
+        id
+      }
+      errors
+    }
+  }
+`

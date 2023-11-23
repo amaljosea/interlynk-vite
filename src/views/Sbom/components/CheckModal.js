@@ -17,11 +17,16 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Radio,
+  RadioGroup,
   Select,
+  Stack,
   Text,
-  Tooltip
+  Tooltip,
+  VStack
 } from '@chakra-ui/react'
 import GlobalContext from 'context/GlobalContext'
+import { CreateAutomation } from 'graphQL/Mutation'
 import { UpdateComponent, recheckHealth } from 'graphQL/Mutation'
 import { useContext } from 'react'
 import { useState } from 'react'
@@ -30,7 +35,7 @@ import MultiSelect from 'react-select'
 import { licenseOptions } from 'variables/licenses'
 
 const CheckModal = ({
-  id,
+  activeCheck,
   isOpen,
   onClose,
   refetch,
@@ -45,8 +50,9 @@ const CheckModal = ({
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
-  // console.log('id', id)
-  // console.log('components', components)
+  // console.log('activeCheck', activeCheck)
+
+  const { component } = activeCheck
 
   const { setCheckFilters } = useContext(GlobalContext)
 
@@ -60,6 +66,7 @@ const CheckModal = ({
   const [comp, setComp] = useState('')
   const [compId, setCompId] = useState('')
   const [compType, setCompType] = useState('')
+  const [licenseType, setLicenseType] = useState('license_spdx')
   const [licenseList, setLicenseList] = useState([])
   const [selectedLicenses, setSelectedLicenses] = useState([])
   const [componentData, setComponentData] = useState([])
@@ -187,8 +194,30 @@ const CheckModal = ({
 
   const onLicenseChange = (selected) => {
     setLicenseList(selected)
+    console.log('selected', selected)
     const selectedIds = selected.map((option) => option.value) // Extracting IDs
     setSelectedLicenses(selectedIds)
+  }
+
+  const [createAutoCheck] = useMutation(CreateAutomation)
+
+  const onSaveRule = async () => {
+    try {
+      await createAutoCheck({
+        variables: {
+          projectId: productId,
+          applicable: 'component',
+          condition: 'missing',
+          attr: licenseType,
+          enabled: true,
+          compName: component?.name,
+          compVersion: component?.version,
+          set: JSON.stringify({ value: selectedLicenses }, null, 2)
+        }
+      }).then((res) => res.data && onLicenseUpdate())
+    } catch (error) {
+      console.log('Error', error)
+    }
   }
 
   return (
@@ -302,46 +331,76 @@ const CheckModal = ({
             {(shortDesc === 'Component has license/s specified' ||
               shortDesc === 'Componet has deprecated license/s' ||
               shortDesc === 'Component has restrictive licenses specified') && (
-              <FormControl>
-                <FormLabel fontSize={'sm'}>
-                  <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-                    <Text>Licenses</Text>
-                    <Tooltip label='List of licenses applicable to the component'>
-                      <Icon as={InfoIcon} color={'blue.500'} />
-                    </Tooltip>
-                  </Flex>
-                </FormLabel>
-                <MultiSelect
-                  styles={{
-                    control: (baseStyles, state) => ({
-                      ...baseStyles,
-                      borderColor: state.isFocused ? 'inherit' : 'inherit',
-                      '&:hover': {
-                        borderColor: '#CBD5E0'
-                      }
-                    })
-                  }}
-                  isMulti
-                  value={licenseList}
-                  options={licenses}
-                  onChange={onLicenseChange}
-                />
-              </FormControl>
+              <VStack spacing={5} alignItems={'flex-start'}>
+                {/* LICENSE TYPE */}
+                <RadioGroup
+                  value={licenseType}
+                  onChange={(value) => setLicenseType(value)}
+                >
+                  <Stack direction='row'>
+                    <Radio value='license_spdx'>SPDX</Radio>
+                    <Radio value='license_custom'>Custom</Radio>
+                    <Radio value='license_exp'>Expression</Radio>
+                  </Stack>
+                </RadioGroup>
+                {/* LICENSE OPTIONS */}
+                <FormControl>
+                  <FormLabel fontSize={'sm'}>
+                    <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
+                      <Text>Licenses</Text>
+                      <Tooltip label='List of licenses applicable to the component'>
+                        <Icon as={InfoIcon} color={'blue.500'} />
+                      </Tooltip>
+                    </Flex>
+                  </FormLabel>
+                  <MultiSelect
+                    styles={{
+                      control: (baseStyles, state) => ({
+                        ...baseStyles,
+                        borderColor: state.isFocused ? 'inherit' : 'inherit',
+                        '&:hover': {
+                          borderColor: '#CBD5E0'
+                        }
+                      })
+                    }}
+                    isMulti
+                    value={licenseList}
+                    options={licenses}
+                    onChange={onLicenseChange}
+                  />
+                </FormControl>
+              </VStack>
             )}
           </ModalBody>
 
           <ModalFooter>
-            <Button fontSize={'sm'} mr={3} onClick={onClose}>
-              Close
-            </Button>
-            {shortDesc === 'Primary Component' && (
-              <Button fontSize={'sm'} colorScheme='green' mr={3} type='submit'>
+            <Flex
+              width={'100%'}
+              justifyContent={'space-between'}
+              alignItems={'center'}
+            >
+              <Button fontSize={'sm'} colorScheme='blue' onClick={onSaveRule}>
                 Save Rule
               </Button>
-            )}
-            <Button fontSize={'sm'} colorScheme='blue' type='submit'>
-              Save
-            </Button>
+              <Stack direction={'row'} spacing={2} alignItems={'center'}>
+                <Button fontSize={'sm'} onClick={onClose}>
+                  Close
+                </Button>
+                {shortDesc === 'Primary Component' && (
+                  <Button
+                    fontSize={'sm'}
+                    colorScheme='green'
+                    mr={3}
+                    type='submit'
+                  >
+                    Save Rule
+                  </Button>
+                )}
+                <Button fontSize={'sm'} colorScheme='blue' type='submit'>
+                  Save
+                </Button>
+              </Stack>
+            </Flex>
           </ModalFooter>
         </ModalContent>
       </form>
