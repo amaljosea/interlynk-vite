@@ -88,7 +88,7 @@ const SupplierModal = ({
       variables: {
         name: supName,
         contactEmail: supEmail,
-        componentId: id
+        componentId: activeCheck.id
       }
     })
       .then((res) => {
@@ -100,7 +100,7 @@ const SupplierModal = ({
             variables: {
               sbomId: sbomId,
               checkId: checkId,
-              compId: activeCheck?.id
+              compId: activeCheck.id
             }
           })
         }
@@ -133,12 +133,12 @@ const SupplierModal = ({
           condition: 'missing',
           attr: 'supplier',
           enabled: true,
-          compName: activeCheck?.name,
-          compVersion: activeCheck?.version,
+          compName: activeCheck.name,
+          compVersion: activeCheck.version,
           set: JSON.stringify(
             {
               name: supName,
-              contact_email: supEmail ? supEmail : ''
+              contact_email: supEmail
             },
             null,
             2
