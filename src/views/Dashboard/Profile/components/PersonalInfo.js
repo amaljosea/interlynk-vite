@@ -40,6 +40,8 @@ const PersonalInfo = ({ user, refetch }) => {
     setName(value)
     if (value.length < 2 || value.length > 256) {
       setError('Input must be between 2 and 256 characters')
+    } else if (value.startsWith(' ')) {
+      setError('A name must begin with a letter')
     } else {
       setError('')
     }
@@ -109,7 +111,10 @@ const PersonalInfo = ({ user, refetch }) => {
             colorScheme='blue'
             onClick={handleUpdate}
             disabled={
-              message === 'Saving....' || !name || !validateEmail(email) || error !== ''
+              message === 'Saving....' ||
+              !name ||
+              !validateEmail(email) ||
+              error !== ''
             }
           >
             {message}
