@@ -156,7 +156,9 @@ const GlobalContext = React.createContext({
   checkStatus: [],
   setCheckStatus: () => {},
   cpeString: '',
-  setCpeString: () => {}
+  setCpeString: () => {},
+  purlString: '',
+  setPurlString: () => {}
 })
 
 export default GlobalContext
