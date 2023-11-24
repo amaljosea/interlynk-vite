@@ -24,7 +24,7 @@ import Cookies from 'js-cookie'
 import { InterlynkLogo } from 'components/Icons/Icons'
 import DashboardBg from 'assets/img/dashboard.png'
 import axios from 'axios'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 export default function Auth() {
   const history = useHistory()
@@ -34,6 +34,14 @@ export default function Auth() {
   const [error, setError] = useState('')
 
   const loginURL = process.env.REACT_APP_VENDOR_LOGIN_URL
+
+  const authToken = Cookies.get('authToken')
+
+  useEffect(() => {
+    if (authToken) {
+      history.push('/vendor/dashboard')
+    }
+  }, [])
 
   const handleSubmit = (e) => {
     e.preventDefault()
