@@ -1217,23 +1217,19 @@ export const CreateAutomation = gql`
 // UPDATE AUTOMATION
 export const UpdateAutomation = gql`
   mutation UpdateAutomation(
-    $autoCheckId: Uuid!
+    $id: Uuid!
     $projectId: Uuid!
-    $applicable: AutoCheckApplicability
-    $condition: AutoCheckCondition
-    $attr: AutoCheckAttrNames
-    $enabled: Boolean
+    $condition: AutoCheckCondition!
+    $enabled: Boolean!
     $compName: String
     $compVersion: String
     $set: JSON
   ) {
     autoCheckUpdate(
       input: {
-        id: $autoCheckId
+        id: $id
         projectId: $projectId
-        applicability: $applicable
         condition: $condition
-        attrName: $attr
         enabled: $enabled
         compName: $compName
         compVersion: $compVersion
