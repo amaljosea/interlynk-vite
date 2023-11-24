@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client'
+import { useLazyQuery, useMutation } from '@apollo/client'
 import {
   Button,
   Flex,
@@ -20,6 +20,7 @@ import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
 import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import GlobalContext from 'context/GlobalContext'
 import { recheckHealth, checkResultUpdate } from 'graphQL/Mutation'
+import { CpeAutoComplete } from 'graphQL/Queries'
 import { PackageURL } from 'packageurl-js'
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
@@ -102,9 +103,18 @@ const HealthCheckTable = ({
         projectId: productId,
         sbomId: sbomId,
         search: checkSearchInput !== '' ? checkSearchInput : undefined,
-        category: checkCategory.includes('all') || checkCategory.length === 0 ? undefined : checkCategory,
-        severity: checkSeverity.includes('all') || checkSeverity.length === 0 ? undefined : checkSeverity,
-        status: checkStatus.includes('all') || checkStatus.length === 0 ? undefined : checkStatus,
+        category:
+          checkCategory.includes('all') || checkCategory.length === 0
+            ? undefined
+            : checkCategory,
+        severity:
+          checkSeverity.includes('all') || checkSeverity.length === 0
+            ? undefined
+            : checkSeverity,
+        status:
+          checkStatus.includes('all') || checkStatus.length === 0
+            ? undefined
+            : checkStatus,
         first: checkAfter !== '' ? totalRows : undefined,
         after: checkAfter !== '' ? checkAfter : undefined,
         last: checkBefore !== '' ? totalRows : undefined,
@@ -122,9 +132,18 @@ const HealthCheckTable = ({
           projectId: productId,
           sbomId: sbomId,
           search: checkSearchInput !== '' ? checkSearchInput : undefined,
-          category: checkCategory.includes('all') || checkCategory.length === 0 ? undefined : checkCategory,
-          severity: checkSeverity.includes('all') || checkSeverity.length === 0 ? undefined : checkSeverity,
-          status: checkStatus.includes('all') || checkStatus.length === 0 ? undefined : checkStatus,
+          category:
+            checkCategory.includes('all') || checkCategory.length === 0
+              ? undefined
+              : checkCategory,
+          severity:
+            checkSeverity.includes('all') || checkSeverity.length === 0
+              ? undefined
+              : checkSeverity,
+          status:
+            checkStatus.includes('all') || checkStatus.length === 0
+              ? undefined
+              : checkStatus,
           first: totalRows,
           last: undefined,
           field: checkField,
@@ -132,6 +151,8 @@ const HealthCheckTable = ({
         }
       })
   })
+
+  const [getCpe] = useLazyQuery(CpeAutoComplete)
 
   const supplierBtn = useRef(null)
   const creationToolBtn = useRef(null)
@@ -203,7 +224,7 @@ const HealthCheckTable = ({
   const [healthRecheck] = useMutation(recheckHealth, {
     onCompleted: () =>
       refetch({
-        variables : {
+        variables: {
           projectId: productId,
           sbomId: sbomId,
           first: totalRows,
@@ -239,14 +260,14 @@ const HealthCheckTable = ({
   const handleSearch = async (event) => {
     if (event.key === 'Enter' && checkSearchInput !== '') {
       await refetch({
-       variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        search: checkSearchInput,
-        first: totalRows,
-        field: checkField,
-        direction: checkDirection
-       }
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          search: checkSearchInput,
+          first: totalRows,
+          field: checkField,
+          direction: checkDirection
+        }
       })
       setPageIndex(1)
     }
@@ -435,7 +456,7 @@ const HealthCheckTable = ({
         version: '1.0',
         targetHardware: '*'
       })
-      setCpeValue('cpe:2.3:a:vendor:product:1.0:*:*:*:*:*:*:*')
+      setCpeValue('cpe:2.3:a:calligra:calligra:2.4.1:*:*:*:*:*:*:*')
       return onCpeOpen()
     }
 
@@ -482,6 +503,7 @@ const HealthCheckTable = ({
       setCpeList([...cpeList, string])
       setCpeValue('')
       setSelectedCpe(null)
+      onCpeClose()
     }
   }
 
@@ -705,9 +727,18 @@ const HealthCheckTable = ({
         projectId: productId,
         sbomId: sbomId,
         search: checkSearchInput !== '' ? checkSearchInput : undefined,
-        category: checkCategory.includes('all') || checkCategory.length === 0 ? undefined : checkCategory,
-        severity: checkSeverity.includes('all') || checkSeverity.length === 0 ? undefined : checkSeverity,
-        status: checkStatus.includes('all') || checkStatus.length === 0 ? undefined : checkStatus,
+        category:
+          checkCategory.includes('all') || checkCategory.length === 0
+            ? undefined
+            : checkCategory,
+        severity:
+          checkSeverity.includes('all') || checkSeverity.length === 0
+            ? undefined
+            : checkSeverity,
+        status:
+          checkStatus.includes('all') || checkStatus.length === 0
+            ? undefined
+            : checkStatus,
         last: totalRows,
         before: data.pageInfo.startCursor,
         field: checkField,
@@ -725,9 +756,18 @@ const HealthCheckTable = ({
         projectId: productId,
         sbomId: sbomId,
         search: checkSearchInput !== '' ? checkSearchInput : undefined,
-        category: checkCategory.includes('all') || checkCategory.length === 0 ? undefined : checkCategory,
-        severity: checkSeverity.includes('all') || checkSeverity.length === 0 ? undefined : checkSeverity,
-        status: checkStatus.includes('all') || checkStatus.length === 0 ? undefined : checkStatus,
+        category:
+          checkCategory.includes('all') || checkCategory.length === 0
+            ? undefined
+            : checkCategory,
+        severity:
+          checkSeverity.includes('all') || checkSeverity.length === 0
+            ? undefined
+            : checkSeverity,
+        status:
+          checkStatus.includes('all') || checkStatus.length === 0
+            ? undefined
+            : checkStatus,
         first: totalRows,
         after: data.pageInfo.endCursor,
         field: checkField,
@@ -892,11 +932,12 @@ const HealthCheckTable = ({
               onClose={onPurlClose}
               setPurlValue={setPurlValue}
               purlValue={purlValue}
-              id={activeRow.component.id}
+              activeCheck={activeRow.component}
               totalRows={totalRows}
               refetch={fetchCheckData}
               filterRefetch={filterRefetch}
               checkId={activeRow.organizationRule.rule.friendlyId}
+              getCpe={getCpe}
             />
           )}
 
@@ -910,12 +951,13 @@ const HealthCheckTable = ({
               onCreateCpe={handleCreateCpe}
               onUpdateCpe={handleUpdateCpe}
               selectedCpe={selectedCpe}
-              id={activeRow.component.id}
+              activeCheck={activeRow.component}
               refetch={fetchCheckData}
               filterRefetch={filterRefetch}
               totalRows={totalRows}
               setPageIndex={setPageIndex}
               checkId={activeRow.organizationRule.rule.friendlyId}
+              getCpe={getCpe}
             />
           )}
 

@@ -13,10 +13,12 @@ import {
   Select,
   Stack,
   Flex,
-  Textarea
+  Textarea,
+  Text
 } from '@chakra-ui/react'
 import CpeInput from 'components/CpeInput'
 import GlobalContext from 'context/GlobalContext'
+import { CreateAutomation } from 'graphQL/Mutation'
 import { UpdateComponent, recheckHealth } from 'graphQL/Mutation'
 import { useState, useEffect, useRef, useContext } from 'react'
 import { useLocation } from 'react-router-dom'
@@ -26,7 +28,6 @@ const regexPattern =
   /cpe:2\.3:[aho\*\-](:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,\/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){5}(:(([a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))?)|[\*\-]))(:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,\/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){4}/
 
 const CpeModal = ({
-  id,
   data,
   isOpen,
   onClose,
@@ -37,11 +38,13 @@ const CpeModal = ({
   checkId,
   refetch,
   setPageIndex,
-  getCpe
+  getCpe,
+  activeCheck
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const sbomId = queryParams.get('sbom')
+  const productId = queryParams.get('p')
 
   const [vendor, setVendor] = useState(null)
   const [vendorList, setVendorList] = useState([])
@@ -97,7 +100,7 @@ const CpeModal = ({
     try {
       await updateComponent({
         variables: {
-          id: id,
+          id: activeCheck.id,
           sbomId: sbomId,
           cpes: [updatedString]
         }
@@ -108,7 +111,7 @@ const CpeModal = ({
             healthRecheck({
               variables: {
                 checkId: checkId,
-                compId: id,
+                compId: activeCheck.id,
                 sbomId: sbomId
               }
             })
@@ -211,6 +214,33 @@ const CpeModal = ({
     cpeParts[6] = value
     const cpe = cpeParts.join(':')
     setCpeString(cpe)
+  }
+
+  const [createAutoCheck] = useMutation(CreateAutomation)
+
+  const onSaveRule = async () => {
+    try {
+      await createAutoCheck({
+        variables: {
+          projectId: productId,
+          applicable: 'component',
+          condition: 'missing',
+          attr: 'cpe',
+          enabled: true,
+          compName: activeCheck.name,
+          compVersion: activeCheck.version,
+          set: JSON.stringify(
+            {
+             value: cpeString
+            },
+            null,
+            2
+          )
+        }
+      }).then((res) => res.data && onCreateCpe(cpeString))
+    } catch (error) {
+      console.log('Error', error)
+    }
   }
 
   return (
@@ -319,17 +349,32 @@ const CpeModal = ({
           </ModalBody>
 
           <ModalFooter>
-            <Button fontSize={'sm'} colorScheme='gray' mr={3} onClick={onClose}>
-              Close
-            </Button>
-            <Button
-              fontSize={'sm'}
-              variant='solid'
-              colorScheme={'blue'}
-              onClick={checkId ? handleComUpdate : handleSave}
+            <Flex
+              width={'100%'}
+              justifyContent={'space-between'}
+              alignItems={'center'}
             >
-              Save
-            </Button>
+              {checkId ? (
+                <Button fontSize={'sm'} colorScheme='blue' onClick={onSaveRule}>
+                  Save Rule
+                </Button>
+              ) : (
+                <Text></Text>
+              )}
+              <Stack direction={'row'} spacing={2} alignItems={'center'}>
+                <Button fontSize={'sm'} colorScheme='gray' onClick={onClose}>
+                  Close
+                </Button>
+                <Button
+                  fontSize={'sm'}
+                  variant='solid'
+                  colorScheme={'blue'}
+                  onClick={checkId ? handleComUpdate : handleSave}
+                >
+                  Save
+                </Button>
+              </Stack>
+            </Flex>
           </ModalFooter>
         </ModalContent>
       </Modal>

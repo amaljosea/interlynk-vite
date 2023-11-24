@@ -11,6 +11,7 @@ import {
 } from '@chakra-ui/react'
 import { CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import GlobalContext from 'context/GlobalContext'
+import { PackageURL } from 'packageurl-js'
 
 const regexPattern =
   /cpe:2\.3:[aho\*\-](:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,\/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){5}(:(([a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))?)|[\*\-]))(:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,\/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){4}/
@@ -27,7 +28,8 @@ const CpeInput = ({
 }) => {
   const [isValid, setIsValid] = useState(true)
 
-  const { cpeString, setCpeString } = useContext(GlobalContext)
+  const { cpeString, setCpeString, purlString, setPurlString } =
+    useContext(GlobalContext)
 
   const handleSelect = (value) => {
     const cpeParts = cpeString.split(':')
@@ -43,6 +45,18 @@ const CpeInput = ({
       cpeParts[5] = value
       const cpe = cpeParts.join(':')
       setCpeString(cpe)
+    } else if (name === 'namespace') {
+      const pkg = PackageURL.fromString(purlString)
+      pkg.namespace = value
+      setPurlString(pkg.toString())
+    } else if (name === 'packageName') {
+      const pkg = PackageURL.fromString(purlString)
+      pkg.name = value
+      setPurlString(pkg.toString())
+    } else if (name === 'packageVersion') {
+      const pkg = PackageURL.fromString(purlString)
+      pkg.version = value
+      setPurlString(pkg.toString())
     }
 
     setInputValue(value)
@@ -84,7 +98,13 @@ const CpeInput = ({
     >
       <FormControl>
         {name !== 'cpe' && (
-          <FormLabel textTransform={'capitalize'}>{name}</FormLabel>
+          <FormLabel textTransform={'capitalize'}>
+            {name === 'packageName'
+              ? 'Package Name'
+              : name === 'packageVersion'
+              ? 'Version'
+              : name}
+          </FormLabel>
         )}
         <InputGroup>
           <Input
