@@ -26,7 +26,7 @@ const Automation = () => {
 
   const [activeTab, setActiveTab] = useState(0)
 
-  const [getAutomations, { data }] = useLazyQuery(GetProjectCheck)
+  const [getAutomations, { data, error }] = useLazyQuery(GetProjectCheck)
 
   const handleTabChange = (value) => {
     setActiveTab(value)
@@ -76,6 +76,7 @@ const Automation = () => {
               <Settings
                 data={data?.project.autoChecks}
                 getData={getAutomations}
+                error={error}
               />
             </TabPanel>
           </TabPanels>
