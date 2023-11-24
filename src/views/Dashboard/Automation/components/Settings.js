@@ -16,6 +16,7 @@ import { useState } from 'react'
 import { DeleteAutomation } from 'graphQL/Mutation'
 import { useMutation } from '@apollo/client'
 import { useLocation } from 'react-router-dom'
+import { UpdateAutomation } from 'graphQL/Mutation'
 
 const customStyles = {
   headCells: {
@@ -34,16 +35,15 @@ const customStyles = {
   }
 }
 
-const Settings = ({ data, getData }) => {
+const Settings = ({ data, getData, error }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
 
-  // console.log('data', data?.nodes)
-
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [activeRow, setActiveRow] = useState(null)
 
+  const [updateAutoCheck] = useMutation(UpdateAutomation)
   const [deleteAutoCheck] = useMutation(DeleteAutomation)
 
   const handleRemove = async (id) => {
@@ -57,6 +57,26 @@ const Settings = ({ data, getData }) => {
     )
   }
 
+  const handleStatus = async (row) => {
+    await updateAutoCheck({
+      variables: {
+        id: row.id,
+        projectId: productId,
+        condition: row.condition,
+        enabled: row.enabled ? false : true
+      }
+    }).then(
+      (res) =>
+        res.data &&
+        getData({
+          variables: {
+            id: productId,
+            first: 25
+          }
+        })
+    )
+  }
+
   // COLUMNS
   const columns = [
     // ACTIVE
@@ -65,7 +85,12 @@ const Settings = ({ data, getData }) => {
       name: 'ACTIVE',
       selector: (row) => {
         const { enabled } = row
-        return <Switch isChecked={enabled}></Switch>
+        return (
+          <Switch
+            isChecked={enabled}
+            onChange={() => handleStatus(row)}
+          ></Switch>
+        )
       },
       width: '8%'
     },
@@ -155,18 +180,22 @@ const Settings = ({ data, getData }) => {
   return (
     <>
       <CardBody>
-        <Flex flexDir={'column'} width={'100%'}>
-          <DataTable
-            columns={columns}
-            title={<Text fontSize={'xl'}>Rule Automation Settings</Text>}
-            data={data && data.nodes}
-            customStyles={customStyles}
-            progressPending={data && data.nodes ? false : true}
-            progressComponent={<CustomLoader />}
-            responsive={true}
-            persistTableHead
-          />
-        </Flex>
+        {error ? (
+          <Text textAlign={'center'}>{JSON.stringify(error)}</Text>
+        ) : (
+          <Flex flexDir={'column'} width={'100%'}>
+            <DataTable
+              columns={columns}
+              title={<Text fontSize={'xl'}>Rule Automation Settings</Text>}
+              data={data && data.nodes}
+              customStyles={customStyles}
+              progressPending={data && data.nodes ? false : true}
+              progressComponent={<CustomLoader />}
+              responsive={true}
+              persistTableHead
+            />
+          </Flex>
+        )}
       </CardBody>
 
       {activeRow && isOpen && (
