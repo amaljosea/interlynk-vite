@@ -87,7 +87,7 @@ const ContextWrapper = (props) => {
   const [vulnKev, setVulnKev] = useState('')
   const [vulnEpss, setVulnEpss] = useState('')
   const [minVal, setMinVal] = useState(0)
-  const [maxVal, setMaxVal] = useState(0)
+  const [maxVal, setMaxVal] = useState(10000)
 
   // SIGNED VULN FILTER
   const [signedVulnSearchInput, setSignedVulnSearchInput] = useState('')
