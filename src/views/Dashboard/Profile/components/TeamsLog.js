@@ -51,13 +51,20 @@ const TeamsLog = ({ data, refetch }) => {
           name: user,
           email: email.toLowerCase()
         }
-      }).then((res) => {
-        if (res.data.userCreate.errors.length > 0) {
-          setError(res.data.userCreate.errors[0])
-        } else {
-          onClose()
-        }
       })
+        .then((res) => {
+          if (res.data.userCreate.errors.length > 0) {
+            setError(res.data.userCreate.errors[0])
+          } else {
+            toast({
+              description: 'User added successfully',
+              status: 'success',
+              position: 'top',
+              duration: 2000
+            })
+          }
+        })
+        .finally(() => onClose())
     } catch (error) {
       console.log(`Error`, error)
     }
