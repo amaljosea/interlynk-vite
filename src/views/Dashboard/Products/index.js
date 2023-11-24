@@ -63,7 +63,7 @@ function Index() {
       setVulnKev('')
       setVulnEpss('')
       setMinVal(0)
-      setMaxVal(0)
+      setMaxVal(10000)
       setCheckSearchInput('')
       setCheckCategory([])
       setCheckSeverity([])

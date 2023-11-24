@@ -209,7 +209,7 @@ const VulnFilterMenu = ({
     setVulnAfter('')
     setVulnBefore('')
     setMinVal(0)
-    setMaxVal(0)
+    setMaxVal(10000)
     if (customerView) {
       setSignedVulnEpss(value)
       handleRefetch(
@@ -482,11 +482,7 @@ const VulnFilterMenu = ({
                 my={2}
                 size='sm'
                 onClick={handleSubmit}
-                disabled={
-                  minVal === 0 ||
-                  maxVal === 0 ||
-                  Number(maxVal) < Number(minVal)
-                }
+                disabled={Number(maxVal) < Number(minVal)}
               >
                 Submit
               </Button>
