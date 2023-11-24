@@ -96,8 +96,7 @@ function ComponentDrawer(props) {
     }).then((res) => res.data && setCompFilters(res.data.sbom.filters))
   }
 
-  const [getCpe, { data: cpeInfo }] = useLazyQuery(CpeAutoComplete)
-
+  const [getCpe] = useLazyQuery(CpeAutoComplete)
 
   const [createComponent] = useMutation(CreateComponent, {
     onCompleted: () => fetchCompData()
@@ -226,28 +225,19 @@ function ComponentDrawer(props) {
   }
 
   const handlePurlModal = () => {
-    try {
-      console.log(purlValue)
-      const pkg = PackageURL.fromString(purlValue)
-      console.info('pkg', pkg)
-      setPurlData(pkg)
-      onPurlOpen()
-    } catch (ex) {
-      console.error('ex', ex)
-      if (purlValue != null && purlValue !== '') {
-        toast({
-          description: 'PURL is invalid. Resetting to defaults',
-          status: 'error',
-          duration: 3000,
-          position: 'top'
-        })
-      }
-      const pkg = PackageURL.fromString('pkg:generic/unknown@1.0')
-      setPurlValue(`pkg:generic/${component}@${version}`)
+    if (purlValue === '') {
+      const pkg = PackageURL.fromString(
+        'pkg:generic/System.Windows.Extensions@4.7.0'
+      )
+      setPurlValue(`pkg:generic/System.Windows.Extensions@4.7.0`)
       setPURLInputValid(true)
       setPurlData(pkg)
-      onPurlOpen()
+    } else {
+      const pkg = PackageURL.fromString(purlValue)
+      setPurlData(pkg)
     }
+
+    onPurlOpen()
   }
 
   const onLicenseChange = (selected) => {
@@ -598,7 +588,7 @@ function ComponentDrawer(props) {
                       size='md'
                       fontSize={'sm'}
                       placeholder='PURL'
-                      value={purlValue ? purlValue : ''}
+                      value={purlValue}
                       id='purl'
                       name='purl'
                       onChange={handlePURLInputChange}
@@ -750,6 +740,7 @@ function ComponentDrawer(props) {
           onClose={onPurlClose}
           setPurlValue={setPurlValue}
           purlValue={purlValue}
+          getCpe={getCpe}
         />
       )}
 
