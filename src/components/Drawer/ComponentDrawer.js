@@ -433,7 +433,7 @@ function ComponentDrawer(props) {
             <Stack direction={'column'} spacing={4}>
               {/* Name */}
               <FormControl>
-                <FormLabel fontSize={'sm'}>
+                <FormLabel htmlFor='compName' fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>
                       Name
@@ -459,7 +459,7 @@ function ComponentDrawer(props) {
               </FormControl>
               {/* Version */}
               <FormControl>
-                <FormLabel fontSize={'sm'}>
+                <FormLabel htmlFor='compVersion' fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>
                       Version{' '}
@@ -485,7 +485,7 @@ function ComponentDrawer(props) {
               </FormControl>
               {/* Group */}
               <FormControl>
-                <FormLabel fontSize={'sm'}>Group</FormLabel>
+                <FormLabel htmlFor='groupInfo' fontSize={'sm'}>Group</FormLabel>
                 <Input
                   size='md'
                   fontSize={'sm'}
@@ -526,7 +526,7 @@ function ComponentDrawer(props) {
               </FormControl>
               {/* Licenses */}
               <FormControl>
-                <FormLabel htmlForm='compLicenses' as={Flex}>
+                <FormLabel htmlFor='compLicenses' as={Flex}>
                   <chakra.span mr={2}>Licenses</chakra.span>
                   <Tooltip label='List of licenses applicable to the component'>
                     <Icon as={InfoIcon} color={'blue.500'} />
@@ -556,7 +556,7 @@ function ComponentDrawer(props) {
               </FormControl>
               {containesOther && (
                 <FormControl isRequired>
-                  <FormLabel>SPDX</FormLabel>
+                  <FormLabel htmlFor='spdx'>SPDX</FormLabel>
                   <Input
                     size='sm'
                     id='compLicenses'

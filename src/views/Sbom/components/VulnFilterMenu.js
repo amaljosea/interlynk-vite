@@ -15,7 +15,7 @@ import {
 } from '@chakra-ui/react'
 import GlobalContext from 'context/GlobalContext'
 import Cookies from 'js-cookie'
-import { useContext } from 'react'
+import { useContext, useRef } from 'react'
 import { FaFilter } from 'react-icons/fa'
 
 const CheckMark = () => {
@@ -82,6 +82,9 @@ const VulnFilterMenu = ({
     setSignedMaxVal
   } = useContext(GlobalContext)
 
+  const minRef = useRef()
+  const maxRef = useRef()
+
   const customerView = location.pathname.startsWith('/customer')
   const signedParams = Cookies.get(`signedParamId`)
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -89,6 +92,20 @@ const VulnFilterMenu = ({
   const { vulnCompNames, vulnStatuses } = customerView
     ? signedVulnFilters
     : vulnFilters
+
+  const onMinKeyDown = (e) => {
+    if (e.key === 'ArrowRight') {
+      e.preventDefault()
+      maxRef.current.focus()
+    }
+  }
+
+  const onMaxKeyDown = (e) => {
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault()
+      minRef.current.focus()
+    }
+  }
 
   const handleRefetch = async (severity, component, status, kev, epss) => {
     const epssRange = (epss !== '' || epss !== '0-0') && epss.split('-')
@@ -455,6 +472,8 @@ const VulnFilterMenu = ({
                   id='minValue'
                   name='minValue'
                   value={customerView ? signedMinVal : minVal}
+                  ref={minRef}
+                  onKeyDown={onMinKeyDown}
                   onChange={(e) =>
                     customerView
                       ? setSignedMinVal(e.target.value)
@@ -470,6 +489,8 @@ const VulnFilterMenu = ({
                   id='maxValue'
                   name='maxValue'
                   value={customerView ? signedMaxVal : maxVal}
+                  ref={maxRef}
+                  onKeyDown={onMaxKeyDown}
                   onChange={(e) =>
                     customerView
                       ? setSignedMaxVal(e.target.value)
@@ -482,7 +503,7 @@ const VulnFilterMenu = ({
                 my={2}
                 size='sm'
                 onClick={handleSubmit}
-                disabled={Number(maxVal) < Number(minVal)}
+                isDisabled={Number(maxVal) <= Number(minVal) || maxVal === 0}
               >
                 Submit
               </Button>
