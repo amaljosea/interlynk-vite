@@ -18,7 +18,10 @@ import {
   FormControl,
   FormLabel,
   FormErrorMessage,
-  useToast
+  useToast,
+  Alert,
+  AlertIcon,
+  Text
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
@@ -51,20 +54,19 @@ const TeamsLog = ({ data, refetch }) => {
           name: user,
           email: email.toLowerCase()
         }
+      }).then((res) => {
+        if (res.data.userCreate.errors.length > 0) {
+          setError(res.data.userCreate.errors[0])
+        } else {
+          toast({
+            description: 'User added successfully',
+            status: 'success',
+            position: 'top',
+            duration: 2000
+          })
+          onClose()
+        }
       })
-        .then((res) => {
-          if (res.data.userCreate.errors.length > 0) {
-            setError(res.data.userCreate.errors[0])
-          } else {
-            toast({
-              description: 'User added successfully',
-              status: 'success',
-              position: 'top',
-              duration: 2000
-            })
-          }
-        })
-        .finally(() => onClose())
     } catch (error) {
       console.log(`Error`, error)
     }
@@ -118,6 +120,12 @@ const TeamsLog = ({ data, refetch }) => {
             <ModalCloseButton />
             <ModalBody>
               <Stack direction={'column'} alignItems={'flex-start'} spacing={4}>
+                {error !== '' && (
+                  <Alert status='error' borderRadius={4}>
+                    <AlertIcon />
+                    <Text fontSize={'sm'}>{error}</Text>
+                  </Alert>
+                )}
                 {/* NAME */}
                 <FormControl isRequired>
                   <FormLabel>Name</FormLabel>
@@ -130,21 +138,21 @@ const TeamsLog = ({ data, refetch }) => {
                 {/* EMAIL */}
                 <FormControl
                   isRequired
-                  isInvalid={
-                    (!validateEmail(email) && email !== '') || error !== ''
-                  }
+                  isInvalid={!validateEmail(email) && email !== ''}
                 >
                   <FormLabel>Email</FormLabel>
                   <Input
                     type='text'
                     value={email}
                     textTransform={'lowercase'}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value)
+                      setError('')
+                    }}
                   />
                   {email !== '' && !validateEmail(email) && (
                     <FormErrorMessage>Email is invalid</FormErrorMessage>
                   )}
-                  {error !== '' && <FormErrorMessage>{error}</FormErrorMessage>}
                 </FormControl>
               </Stack>
             </ModalBody>
