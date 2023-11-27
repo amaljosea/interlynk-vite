@@ -134,6 +134,12 @@ const CpeModal = ({
           ecosystem: 'cpe',
           search: {
             vendor: value
+          },
+          hints: {
+            cpe: {
+              product: product ? product : '',
+              version: version ? product : ''
+            }
           }
         }
       }
@@ -167,7 +173,8 @@ const CpeModal = ({
           },
           hints: {
             cpe: {
-              vendor: vendor
+              vendor: vendor ? vendor : '',
+              version: version ? version : ''
             }
           }
         }
@@ -193,8 +200,8 @@ const CpeModal = ({
           },
           hints: {
             cpe: {
-              vendor: vendor,
-              product: product
+              vendor: vendor ? vendor : '',
+              product: product ? product : ''
             }
           }
         }
@@ -231,7 +238,7 @@ const CpeModal = ({
           compVersion: activeCheck.version,
           set: JSON.stringify(
             {
-             value: cpeString
+              value: cpeString
             },
             null,
             2
