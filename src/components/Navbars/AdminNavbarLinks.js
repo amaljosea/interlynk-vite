@@ -35,25 +35,14 @@ import { FaRegKeyboard, FaSignOutAlt } from 'react-icons/fa'
 import Cookies from 'js-cookie'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
-import { useLazyQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 import { GetOrg } from 'graphQL/Queries'
 
 export default function HeaderLinks(props) {
   const location = useLocation()
   const history = useHistory()
 
-  const [getOrgInfo, { data, loading, error }] = useLazyQuery(GetOrg)
-
-  if (error) {
-    console.error('error : ', error)
-    history.push('/auth')
-  }
-
-  useEffect(() => {
-    if (!customerView && data === undefined) {
-      getOrgInfo()
-    }
-  }, [])
+  const { data, error } = useQuery(GetOrg)
 
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('p')
@@ -73,6 +62,17 @@ export default function HeaderLinks(props) {
       setUsername(userName)
     } else if (location.pathname.startsWith('/customer')) {
       setUsername(userEmail)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (error) {
+      if (error.networkError) {
+        console.log('Network error:', error.networkError)
+        const statusCode = error.networkError.statusCode
+        console.log('Status code:', statusCode)
+        history.push(`/auth`)
+      }
     }
   }, [])
 
@@ -185,7 +185,7 @@ export default function HeaderLinks(props) {
           }
         >
           <Text display={{ sm: 'none', md: 'flex' }} fontSize={'sm'}>
-            {data ? data.organization.currentUser.name : userEmail}
+            {data ? data.organization.currentUser.name : 'Surendra'}
           </Text>
         </MenuButton>
         {location.pathname.startsWith('/vendor') && (

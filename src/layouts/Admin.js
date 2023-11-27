@@ -1,9 +1,16 @@
 // Chakra imports
-import { Box, Portal, Stack, useDisclosure } from '@chakra-ui/react'
+import {
+  Box,
+  ChakraProvider,
+  Portal,
+  Stack,
+  useDisclosure
+} from '@chakra-ui/react'
 import Footer from 'components/Footer/Footer.js'
+// Layout components
 import AdminNavbar from 'components/Navbars/AdminNavbar.js'
 import Sidebar from 'components/Sidebar'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Redirect, Route, Switch, useHistory } from 'react-router-dom'
 import { dashRoutes } from 'routes.js'
 import PanelContainer from '../components/Layout/PanelContainer'
@@ -89,11 +96,7 @@ export default function Dashboard(props) {
     queryDeduplication: false
   })
 
-  useEffect(() => {
-    if (!authToken) {
-      history.push('/auth')
-    }
-  }, [])
+  
 
   return (
     <ApolloProvider client={client}>
