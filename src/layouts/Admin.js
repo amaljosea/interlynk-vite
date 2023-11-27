@@ -1,21 +1,11 @@
 // Chakra imports
-import {
-  Box,
-  ChakraProvider,
-  Portal,
-  Stack,
-  useDisclosure
-} from '@chakra-ui/react'
+import { Box, Portal, Stack, useDisclosure } from '@chakra-ui/react'
 import Footer from 'components/Footer/Footer.js'
-// Layout components
 import AdminNavbar from 'components/Navbars/AdminNavbar.js'
 import Sidebar from 'components/Sidebar'
-import React, { useContext, useState } from 'react'
-import { Redirect, Route, Switch } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { Redirect, Route, Switch, useHistory } from 'react-router-dom'
 import { dashRoutes } from 'routes.js'
-// Custom Chakra theme
-import theme from 'theme/theme.js'
-// Custom components
 import PanelContainer from '../components/Layout/PanelContainer'
 import PanelContent from '../components/Layout/PanelContent'
 
@@ -30,16 +20,14 @@ import Cookies from 'js-cookie'
 import { createUploadLink } from 'apollo-upload-client'
 import { getActiveNavbar, getActiveRoute } from '../utils'
 import Automation from 'views/Dashboard/Automation'
-import ContextWrapper from 'context/ContextWrapper'
 import ChangeLog from 'views/Dashboard/Changelog'
 
 export default function Dashboard(props) {
   const authToken = Cookies.get('authToken')
-
+  const history = useHistory()
   const { ...rest } = props
   // states and functions
-  const [sidebarVariant, setSidebarVariant] = useState('transparent')
-  const [fixed, setFixed] = useState(false)
+  const [sidebarVariant] = useState('transparent')
   // functions for changing the states from components
   const getRoute = () => {
     return window.location.pathname !== '/vendor/full-screen-maps'
@@ -101,6 +89,12 @@ export default function Dashboard(props) {
     queryDeduplication: false
   })
 
+  useEffect(() => {
+    if (!authToken) {
+      history.push('/auth')
+    }
+  }, [])
+
   return (
     <ApolloProvider client={client}>
       <Stack width={'100%'} direction={'row'} alignItems={'flex-start'}>
@@ -124,18 +118,12 @@ export default function Dashboard(props) {
             {getRoute() && (
               <PanelContent>
                 <PanelContainer>
-                  {authToken ? (
-                    <Switch>
-                      {getRoutes(dashRoutes)}
-                      <Route path={`/vendor/autofix`} component={Automation} />
-                      <Route path={`/vendor/changelog`} component={ChangeLog} />
-                      <Redirect from='/vendor' to='/vendor/dashboard' />
-                    </Switch>
-                  ) : (
-                    <Switch>
-                      <Redirect from='/vendor' to='/auth' />
-                    </Switch>
-                  )}
+                  <Switch>
+                    {getRoutes(dashRoutes)}
+                    <Route path={`/vendor/autofix`} component={Automation} />
+                    <Route path={`/vendor/changelog`} component={ChangeLog} />
+                    <Redirect from='/vendor' to='/vendor/dashboard' />
+                  </Switch>
                 </PanelContainer>
               </PanelContent>
             )}
