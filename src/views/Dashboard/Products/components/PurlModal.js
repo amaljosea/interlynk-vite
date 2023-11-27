@@ -173,7 +173,13 @@ const PurlModal = ({
           idType: 'purl',
           ecosystem: 'maven',
           search: {
-            namespace: namespace
+            namespace: value
+          },
+          hints: {
+            purl: {
+              name: purlName ? purlName : '',
+              version: purlVersion ? purlVersion : ''
+            }
           }
         }
       }
@@ -188,47 +194,100 @@ const PurlModal = ({
   const onNameInputChange = (event) => {
     const { value } = event.target
     setPurlName(value)
-    getCpe({
-      variables: {
-        input: {
-          idType: 'purl',
-          ecosystem: 'maven',
-          search: {
-            name: purlName
+    if (purlType === 'maven') {
+      getCpe({
+        variables: {
+          input: {
+            idType: 'purl',
+            ecosystem: 'maven',
+            search: {
+              name: value
+            },
+            hints: {
+              purl: {
+                namespace: namespace ? namespace : '',
+                version: purlVersion ? purlVersion : ''
+              }
+            }
           }
         }
-      }
-    }).then((res) => {
-      if (res.data) {
-        setPurlNameList(res.data.idAutoComplete.result)
-      }
-    })
+      }).then((res) => {
+        if (res.data) {
+          setPurlNameList(res.data.idAutoComplete.result)
+        }
+      })
+    } else if (purlType === 'nuget') {
+      getCpe({
+        variables: {
+          input: {
+            idType: 'purl',
+            ecosystem: 'nuget',
+            search: {
+              name: value
+            },
+            hints: {
+              purl: {
+                version: purlVersion ? purlVersion : ''
+              }
+            }
+          }
+        }
+      }).then((res) => {
+        if (res.data) {
+          setPurlNameList(res.data.idAutoComplete.result)
+        }
+      })
+    }
   }
 
   // ON VERSION INPUT CHANGE
   const onVersionInputChange = (event) => {
     const { value } = event.target
     setPurlVersion(value)
-    getCpe({
-      variables: {
-        input: {
-          idType: 'purl',
-          ecosystem: 'maven',
-          search: {
-            version: purlVersion
-          },
-          hints: {
-            purl: {
-              name: purlName
+    if (purlType === 'maven') {
+      getCpe({
+        variables: {
+          input: {
+            idType: 'purl',
+            ecosystem: 'maven',
+            search: {
+              version: purlVersion
+            },
+            hints: {
+              purl: {
+                namespace: namespace ? namespace : '',
+                name: purlName ? purlName : ''
+              }
             }
           }
         }
-      }
-    }).then((res) => {
-      if (res.data) {
-        setPurlVersionList(res.data.idAutoComplete.result)
-      }
-    })
+      }).then((res) => {
+        if (res.data.idAutoComplete.result !== null) {
+          setPurlVersionList(res.data.idAutoComplete.result)
+        }
+      })
+    } else if (purlType === 'nuget') {
+      getCpe({
+        variables: {
+          input: {
+            idType: 'purl',
+            ecosystem: 'nuget',
+            search: {
+              version: value
+            },
+            hints: {
+              purl: {
+                name: purlName ? purlName : ''
+              }
+            }
+          }
+        }
+      }).then((res) => {
+        if (res.data.idAutoComplete.result !== null) {
+          setPurlVersionList(res.data.idAutoComplete.result)
+        }
+      })
+    }
   }
 
   // console.log('data', data)
@@ -460,7 +519,7 @@ const PurlModal = ({
                 </FormControl>
               ) : null}
               {/* Name */}
-              {purlType === 'maven' ? (
+              {purlType === 'maven' || purlType === 'nuget' ? (
                 <CpeInput
                   name='packageName'
                   inputValue={purlName}
@@ -480,6 +539,7 @@ const PurlModal = ({
                       mt={1.5}
                       value={purlName}
                       size='md'
+                      fontSize={'sm'}
                       onChange={handleNameChange}
                     />
                     {suggestions && suggestions.length > 0 && (
@@ -513,7 +573,7 @@ const PurlModal = ({
                 </FormControl>
               )}
               {/* Version */}
-              {purlType === 'maven' ? (
+              {purlType === 'maven' || purlType === 'nuget' ? (
                 <CpeInput
                   name='packageVersion'
                   inputValue={purlVersion}
@@ -530,6 +590,7 @@ const PurlModal = ({
                   <Stack direction='column' spacing={1} position={'relative'}>
                     <Input
                       size='md'
+                      fontSize={'sm'}
                       mt={1.5}
                       type='text'
                       value={purlVersion}
