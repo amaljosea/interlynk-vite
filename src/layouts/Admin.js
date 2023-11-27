@@ -96,7 +96,11 @@ export default function Dashboard(props) {
     queryDeduplication: false
   })
 
-  
+  useEffect(() => {
+    if (!authToken) {
+      history.push('/auth')
+    }
+  }, [])
 
   return (
     <ApolloProvider client={client}>
