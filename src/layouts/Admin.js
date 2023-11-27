@@ -10,7 +10,7 @@ import Footer from 'components/Footer/Footer.js'
 // Layout components
 import AdminNavbar from 'components/Navbars/AdminNavbar.js'
 import Sidebar from 'components/Sidebar'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Redirect, Route, Switch, useHistory } from 'react-router-dom'
 import { dashRoutes } from 'routes.js'
 import PanelContainer from '../components/Layout/PanelContainer'
