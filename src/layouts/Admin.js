@@ -1,6 +1,13 @@
 // Chakra imports
-import { Box, Portal, Stack, useDisclosure } from '@chakra-ui/react'
+import {
+  Box,
+  ChakraProvider,
+  Portal,
+  Stack,
+  useDisclosure
+} from '@chakra-ui/react'
 import Footer from 'components/Footer/Footer.js'
+// Layout components
 import AdminNavbar from 'components/Navbars/AdminNavbar.js'
 import Sidebar from 'components/Sidebar'
 import React, { useEffect, useState } from 'react'
@@ -21,6 +28,7 @@ import { createUploadLink } from 'apollo-upload-client'
 import { getActiveNavbar, getActiveRoute } from '../utils'
 import Automation from 'views/Dashboard/Automation'
 import ChangeLog from 'views/Dashboard/Changelog'
+import { jwtDecode } from 'jwt-decode'
 
 export default function Dashboard(props) {
   const authToken = Cookies.get('authToken')
@@ -62,7 +70,6 @@ export default function Dashboard(props) {
   document.documentElement.dir = 'ltr'
   // Chakra Color Mode
 
-  const userName = localStorage.getItem('username')
 
   const graphqlAPI = process.env.REACT_APP_GRAPHQL_API
 
@@ -89,9 +96,22 @@ export default function Dashboard(props) {
     queryDeduplication: false
   })
 
+  const isTokenExpired = (token) => {
+    const decodedToken = jwtDecode(token)
+    if (!decodedToken) {
+      return true
+    }
+    const currentTime = Date.now() / 1000
+    return decodedToken.exp < currentTime
+  }
+
   useEffect(() => {
-    if (!authToken) {
-      history.push('/auth')
+    if (authToken) {
+      const expired = isTokenExpired(authToken)
+      if (expired === true) {
+        Cookies.remove('authToken')
+        history.push('/auth')
+      }
     }
   }, [])
 
