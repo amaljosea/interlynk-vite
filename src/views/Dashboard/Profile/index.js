@@ -6,10 +6,9 @@ import {
   TabList,
   TabPanel,
   TabPanels,
-  Tabs,
-  useColorModeValue
+  Tabs
 } from '@chakra-ui/react'
-import { FaSlackHash, FaUserCircle, FaBuilding } from 'react-icons/fa'
+import { FaUserCircle, FaBuilding } from 'react-icons/fa'
 import Header from './components/Header'
 import { useEffect, useState } from 'react'
 import AdvisoryFeeds from './components/AdvisoryFeeds'
@@ -21,19 +20,15 @@ import ComponentFeed from './components/ComponentFeed'
 import GeneralFeed from './components/GeneralFeed'
 import TeamsLog from './components/TeamsLog'
 import PersonalInfo from './components/PersonalInfo'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useHistory } from 'react-router-dom'
 import { GetOrg } from 'graphQL/Queries'
 import TokenInfo from './components/TokenInfo'
 
 function Profile() {
   const location = useLocation()
+  const history = useHistory()
   const queryParams = new URLSearchParams(location.search)
   const activetab = queryParams.get('tab')
-
-  const bgProfile = useColorModeValue(
-    'hsla(0,0%,100%,.8)',
-    'linear-gradient(112.83deg, rgba(255, 255, 255, 0.21) 0%, rgba(255, 255, 255, 0) 110.84%)'
-  )
 
   const tabs = [
     {
@@ -44,16 +39,15 @@ function Profile() {
       name: 'ORGANIZATION',
       icon: FaBuilding
     }
-    // {
-    //   name: 'NOTIFICATIONS',
-    //   icon: FaSlackHash
-    // }
   ]
 
   const tab = window.localStorage.getItem('activeSetTab')
 
   const [tabIndex, setTabIndex] = useState(Number(tab))
   const [selectedTab, setSelectedTab] = useState(tabs[1].name)
+  const [psIndex, setPsIndex] = useState(0)
+
+  const { data: orgInfo, refetch } = useQuery(GetOrg)
 
   const onTabChange = (value) => {
     setTabIndex(value)
@@ -62,11 +56,35 @@ function Profile() {
 
   useEffect(() => {
     if (activetab === 'person') {
+      window.localStorage.setItem('activePs', 0)
       setSelectedTab('PERSONAL')
     }
   }, [activetab])
 
-  const { data: orgInfo, refetch, error } = useQuery(GetOrg)
+  const handleChange = (value) => {
+    setPsIndex(value)
+    window.localStorage.setItem('activePs', value)
+    if (value === 0) {
+      history.push('/vendor/profiles?tab=person')
+    } else if (value === 1) {
+      history.push('/vendor/profiles?tab=token')
+    }
+  }
+
+  useEffect(() => {
+    const handlePopstate = (event) => {
+      const active = Number(event.srcElement.localStorage.activePs)
+      if (active === 1) {
+        history.push('/vendor/profiles?tab=person')
+        window.localStorage.setItem('activePs', 0)
+        setPsIndex(0)
+      }
+    }
+    window.addEventListener('popstate', handlePopstate)
+    return () => {
+      window.removeEventListener('popstate', handlePopstate)
+    }
+  }, [])
 
   return (
     <>
@@ -74,8 +92,6 @@ function Profile() {
         <Flex direction='column' px={4}>
           {/*  HEADER */}
           <Header
-            // backgroundHeader={ProfileBgImage}
-            backgroundProfile={bgProfile}
             user={orgInfo.organization.currentUser}
             selectedTab={selectedTab}
             setSelectedTab={setSelectedTab}
@@ -149,7 +165,13 @@ function Profile() {
           {/* PERSONAL  */}
           {selectedTab === 'PERSONAL' && (
             <Card>
-              <Tabs variant='enclosed' w={'100%'} bg={'white'}>
+              <Tabs
+                variant='enclosed'
+                w={'100%'}
+                bg={'white'}
+                index={psIndex}
+                onChange={handleChange}
+              >
                 <TabList>
                   <Tab _focus={{ outline: 'none' }}>Personal Details</Tab>
                   <Tab _focus={{ outline: 'none' }}>Security Tokens</Tab>
