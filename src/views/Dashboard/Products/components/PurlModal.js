@@ -167,76 +167,68 @@ const PurlModal = ({
   const onNamespaceInputChange = (event) => {
     const { value } = event.target
     setNamespace(value)
-    getCpe({
-      variables: {
-        input: {
-          idType: 'purl',
-          ecosystem: 'maven',
-          search: {
-            namespace: value
-          },
-          hints: {
-            purl: {
-              name: purlName ? purlName : '',
-              version: purlVersion ? purlVersion : ''
-            }
-          }
-        }
-      }
-    }).then((res) => {
-      if (res.data) {
-        setNamespaceList(res.data.idAutoComplete.result)
-      }
-    })
-  }
-
-  // ON PACKAGE NAME INPUT CHANGE
-  const onNameInputChange = (event) => {
-    const { value } = event.target
-    setPurlName(value)
-    if (purlType === 'maven') {
+    if (value !== '') {
       getCpe({
         variables: {
           input: {
             idType: 'purl',
             ecosystem: 'maven',
             search: {
-              name: value
-            },
-            hints: {
-              purl: {
-                namespace: namespace ? namespace : '',
-                version: purlVersion ? purlVersion : ''
-              }
+              namespace: value
             }
           }
         }
       }).then((res) => {
         if (res.data) {
-          setPurlNameList(res.data.idAutoComplete.result)
+          setNamespaceList(res.data.idAutoComplete.result)
         }
       })
-    } else if (purlType === 'nuget') {
-      getCpe({
-        variables: {
-          input: {
-            idType: 'purl',
-            ecosystem: 'nuget',
-            search: {
-              name: value
-            },
-            hints: {
-              purl: {
-                version: purlVersion ? purlVersion : ''
+    }
+  }
+
+  // ON PACKAGE NAME INPUT CHANGE
+  const onNameInputChange = (event) => {
+    const { value } = event.target
+    setPurlName(value)
+    if (value !== '') {
+      if (purlType === 'maven') {
+        getCpe({
+          variables: {
+            input: {
+              idType: 'purl',
+              ecosystem: 'maven',
+              search: {
+                name: value
+              },
+              hints: {
+                purl: {
+                  namespace: namespace
+                }
               }
             }
           }
-        }
-      }).then((res) => {
-        if (res.data) {
-          setPurlNameList(res.data.idAutoComplete.result)
-        }
-      })
+        }).then((res) => {
+          if (res.data) {
+            setPurlNameList(res.data.idAutoComplete.result)
+          }
+        })
+      } else if (purlType === 'nuget') {
+        getCpe({
+          variables: {
+            input: {
+              idType: 'purl',
+              ecosystem: 'nuget',
+              search: {
+                name: value
+              }
+            }
+          }
+        }).then((res) => {
+          if (res.data) {
+            setPurlNameList(res.data.idAutoComplete.result)
+          }
+        })
+      }
     }
   }
 
@@ -244,49 +236,51 @@ const PurlModal = ({
   const onVersionInputChange = (event) => {
     const { value } = event.target
     setPurlVersion(value)
-    if (purlType === 'maven') {
-      getCpe({
-        variables: {
-          input: {
-            idType: 'purl',
-            ecosystem: 'maven',
-            search: {
-              version: purlVersion
-            },
-            hints: {
-              purl: {
-                namespace: namespace ? namespace : '',
-                name: purlName ? purlName : ''
+    if (value !== '') {
+      if (purlType === 'maven') {
+        getCpe({
+          variables: {
+            input: {
+              idType: 'purl',
+              ecosystem: 'maven',
+              search: {
+                version: value
+              },
+              hints: {
+                purl: {
+                  namespace: namespace,
+                  name: purlName
+                }
               }
             }
           }
-        }
-      }).then((res) => {
-        if (res.data.idAutoComplete.result !== null) {
-          setPurlVersionList(res.data.idAutoComplete.result)
-        }
-      })
-    } else if (purlType === 'nuget') {
-      getCpe({
-        variables: {
-          input: {
-            idType: 'purl',
-            ecosystem: 'nuget',
-            search: {
-              version: value
-            },
-            hints: {
-              purl: {
-                name: purlName ? purlName : ''
+        }).then((res) => {
+          if (res.data) {
+            setPurlVersionList(res.data.idAutoComplete.result)
+          }
+        })
+      } else if (purlType === 'nuget') {
+        getCpe({
+          variables: {
+            input: {
+              idType: 'purl',
+              ecosystem: 'nuget',
+              search: {
+                version: value
+              },
+              hints: {
+                purl: {
+                  name: purlName
+                }
               }
             }
           }
-        }
-      }).then((res) => {
-        if (res.data.idAutoComplete.result !== null) {
-          setPurlVersionList(res.data.idAutoComplete.result)
-        }
-      })
+        }).then((res) => {
+          if (res.data) {
+            setPurlVersionList(res.data.idAutoComplete.result)
+          }
+        })
+      }
     }
   }
 
