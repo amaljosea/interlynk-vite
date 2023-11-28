@@ -268,7 +268,7 @@ const ProductTable = ({ data, refetch }) => {
     // UPDATEDAT
     {
       id: 'updatedAt',
-      name: 'UPDATEDAT',
+      name: 'UPDATED AT',
       selector: (row) => {
         const { updatedAt } = row
         return (
