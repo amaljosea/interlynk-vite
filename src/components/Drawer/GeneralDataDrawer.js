@@ -317,23 +317,47 @@ const GeneralDataDrawer = ({
   }
 
   const onSaveRule = async () => {
-    try {
-      await createAutoCheck({
-        variables: {
-          projectId: productId,
-          applicable: 'document',
-          condition: 'missing',
-          attr: 'author',
-          enabled: true,
-          set: JSON.stringify(
-            { name: authorList[0].name, email: authorList[0].email },
-            null,
-            2
-          )
-        }
-      }).then((res) => res.data && handleSave())
-    } catch (error) {
-      console.log('Error', error)
+    if (authorList.length > 0) {
+      try {
+        await createAutoCheck({
+          variables: {
+            projectId: productId,
+            applicable: 'document',
+            condition: 'missing',
+            attr: 'author',
+            enabled: true,
+            set: JSON.stringify(
+              { name: authorList[0].name, email: authorList[0].email },
+              null,
+              2
+            )
+          }
+        }).then((res) => res.data && handleSave())
+      } catch (error) {
+        console.log('Error', error)
+      }
+    } else if (creationTools.length > 0) {
+      try {
+        await createAutoCheck({
+          variables: {
+            projectId: productId,
+            applicable: 'document',
+            condition: 'missing',
+            attr: 'tool',
+            enabled: true,
+            set: JSON.stringify(
+              {
+                name: creationTools[0].name,
+                version: creationTools[0].version
+              },
+              null,
+              2
+            )
+          }
+        }).then((res) => res.data && handleSave())
+      } catch (error) {
+        console.log('Error', error)
+      }
     }
   }
 
@@ -723,7 +747,9 @@ const GeneralDataDrawer = ({
                   fontSize={'sm'}
                   colorScheme='blue'
                   onClick={onSaveRule}
-                  disabled={authorList.length === 0}
+                  disabled={
+                    authorList.length === 0 && creationTools.length === 0
+                  }
                 >
                   Save Rule
                 </Button>
