@@ -127,13 +127,17 @@ const ProductTable = ({ data, refetch }) => {
   const [projectDelete] = useMutation(DeleteProject, {
     onCompleted: () =>
       refetch({
-        first: totalRows
+        first: totalRows,
+        field: prodField,
+        direction: prodDirection
       })
   })
   const [projectUpdate] = useMutation(UpdateProject, {
     onCompleted: () =>
       refetch({
-        first: totalRows
+        first: totalRows,
+        field: prodField,
+        direction: prodDirection
       })
   })
 
@@ -424,7 +428,9 @@ const ProductTable = ({ data, refetch }) => {
   // REFRESH PRODUCTS
   const handleRefresh = async () => {
     await refetch({
-      first: totalRows
+      first: totalRows,
+      field: prodField,
+      direction: prodDirection
     })
   }
 
@@ -437,7 +443,15 @@ const ProductTable = ({ data, refetch }) => {
           enabled: activeRow.enabled === true ? false : true
         }
       })
-        .then((res) => res.data && refetch({ first: totalRows }))
+        .then(
+          (res) =>
+            res.data &&
+            refetch({
+              first: totalRows,
+              field: prodField,
+              direction: prodDirection
+            })
+        )
         .finally(() => onWarningClose())
     } catch (error) {
       console.error('Mutation error:', error)

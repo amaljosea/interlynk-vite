@@ -37,7 +37,7 @@ function ProductSbomDrawer(props) {
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
-  const { checkField, checkDirection, setCheckFilters } =
+  const { prodField, prodDirection, setCheckFilters } =
     useContext(GlobalContext)
 
   const {
@@ -50,7 +50,8 @@ function ProductSbomDrawer(props) {
     type,
     checkId,
     totalRows,
-    filterRefetch
+    filterRefetch,
+    projectId
   } = props
 
   const handleRefetch = () => {
@@ -159,21 +160,22 @@ function ProductSbomDrawer(props) {
           licenses: imgIds
         }
       })
-        .then((res) => {
-          console.log(`res`, res)
-          handleCreateComp(res.data.sbomCreate.sbom.id)
-        })
+        .then(
+          (res) => res.data && handleCreateComp(res.data.sbomCreate.sbom.id)
+        )
         .finally(() => {
           refetch({
-            first: 10
+            first: totalRows,
+            field: prodField,
+            direction: prodDirection
           })
-          onClose()
           toast({
             description: 'SBOM added successfully',
             status: 'success',
             position: 'top',
             duration: 3000
           })
+          onClose()
         })
     } catch (error) {
       console.log(`Mutation error `, error)
@@ -186,7 +188,7 @@ function ProductSbomDrawer(props) {
         variables: {
           id: sbomData.id,
           spec: 'cyclonedx',
-          specVersion: '1.4',
+          specVersion: version,
           format: compType,
           licenses: sbomData.licenses.length === 0 ? ['CC0-1.0'] : imgIds
         }
@@ -213,16 +215,7 @@ function ProductSbomDrawer(props) {
 
   const handleSave = () => {
     try {
-      if (version !== '') {
-        handleCreateSBOM()
-      } else {
-        toast({
-          description: 'Version required',
-          status: 'error',
-          position: 'top',
-          duration: 3000
-        })
-      }
+      handleCreateSBOM()
     } catch (error) {
       toast({
         description: error.message,
@@ -283,7 +276,7 @@ function ProductSbomDrawer(props) {
                       name='sbomName'
                       size='sm'
                       type='text'
-                      defaultValue={name}
+                      defaultValue={'cyclonedx'}
                     />
                   </FormControl>
                   <FormControl>
