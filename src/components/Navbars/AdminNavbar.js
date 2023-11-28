@@ -24,13 +24,13 @@ export default function AdminNavbar(props) {
   const versionId = queryParams.get('v')
   const product = queryParams.get('p')
   const prodID = queryParams.get('id')
-  const sbomId = queryParams.get('sbom')
   const parts = queryParams.get('parts')
 
   const imageName = localStorage.getItem('Image')
   const productName = localStorage.getItem(`product`)
   const activeProd = localStorage.getItem('activeProduct')
   const subProduct = localStorage.getItem('subProduct')
+  const activeSBOM = localStorage.getItem('activeSBOM')
 
   const { currentProduct, setActiveProdTab } = useContext(GlobalContext)
 
@@ -161,8 +161,8 @@ export default function AdminNavbar(props) {
                   <Text>/</Text>
                   <Link
                     to={
-                      currentProduct.sbomId !== null
-                        ? `/vendor/products?&p=${prodID}&sbom=${currentProduct.sbomId}`
+                      activeSBOM
+                        ? `/vendor/products?&p=${prodID}&sbom=${activeSBOM}`
                         : `/vendor/products`
                     }
                     color={secondaryText}
