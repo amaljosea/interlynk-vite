@@ -142,10 +142,10 @@ const Settings = ({ data, getData, error }) => {
       selector: (row) => {
         const { setTo } = row
         return (
-          <HStack alignItems={'flex-start'} justifyContent={'flex-start'}>
-            <Tag>{JSON.stringify(setTo)}</Tag>
+          <HStack alignItems={'center'} justifyContent={'flex-start'}>
+            <Text>{JSON.stringify(setTo)}</Text>
             <IconButton
-              size='xs'
+              size='sm'
               onClick={() => {
                 setActiveRow(row)
                 onOpen()

@@ -26,8 +26,13 @@ const UpdateRule = ({ isOpen, onClose, data, getData, productId }) => {
 
   useEffect(() => {
     if (data) {
-      setCompName(data.lookup.comp_name)
-      setCompVersion(data.lookup.comp_version)
+      console.log('data', data)
+      setCompName(
+        data.applicability === 'component' ? data.lookup.comp_name : ''
+      )
+      setCompVersion(
+        data.applicability === 'component' ? data.lookup.comp_version : ''
+      )
       setCondition(data.condition)
     }
   }, [data])
@@ -65,7 +70,9 @@ const UpdateRule = ({ isOpen, onClose, data, getData, productId }) => {
         <ModalBody>
           <VStack alignItems={'flex-start'} spacing={3}>
             {/* COMPONENT NAME */}
-            <FormControl>
+            <FormControl
+              display={data.applicability === 'component' ? 'block' : 'none'}
+            >
               <FormLabel htmlFor='compName'>Component Name</FormLabel>
               <Input
                 id='compName'
@@ -75,8 +82,11 @@ const UpdateRule = ({ isOpen, onClose, data, getData, productId }) => {
                 placeholder='Add component name'
               />
             </FormControl>
+
             {/* COMPONENT VERSION */}
-            <FormControl>
+            <FormControl
+              display={data.applicability === 'component' ? 'block' : 'none'}
+            >
               <FormLabel htmlFor='compVersion'>Component Version</FormLabel>
               <Input
                 id='compVersion'
@@ -86,6 +96,7 @@ const UpdateRule = ({ isOpen, onClose, data, getData, productId }) => {
                 placeholder='Add component version'
               />
             </FormControl>
+
             {/* CONDITION */}
             <FormControl>
               <FormLabel htmlFor='condition'>Condition</FormLabel>
