@@ -24,13 +24,13 @@ export default function AdminNavbar(props) {
   const versionId = queryParams.get('v')
   const product = queryParams.get('p')
   const prodID = queryParams.get('id')
-  const sbomId = queryParams.get('sbom')
   const parts = queryParams.get('parts')
 
   const imageName = localStorage.getItem('Image')
   const productName = localStorage.getItem(`product`)
   const activeProd = localStorage.getItem('activeProduct')
   const subProduct = localStorage.getItem('subProduct')
+  const activeSBOM = localStorage.getItem('activeSBOM')
 
   const { currentProduct, setActiveProdTab } = useContext(GlobalContext)
 
@@ -87,9 +87,9 @@ export default function AdminNavbar(props) {
         case 'Connections':
           return '/vendor/connections'
         case 'Settings':
-          return `/vendor/autofix?id=${prodID}&sbom=${sbomId}`
+          return `/vendor/autofix?id=${prodID}`
         case 'Change Log':
-          return `/vendor/changelog?id=${prodID}&sbom=${sbomId}`
+          return `/vendor/changelog?id=${prodID}`
       }
     } else {
       switch (name) {
@@ -160,10 +160,16 @@ export default function AdminNavbar(props) {
                   </Link>
                   <Text>/</Text>
                   <Link
-                    to={`/vendor/products?&p=${prodID}&sbom=${sbomId}`}
-                    color={secondaryText}
-                    onClick={() => window.localStorage.setItem('product', activeProd)
+                    to={
+                      activeSBOM
+                        ? `/vendor/products?&p=${prodID}&sbom=${activeSBOM}`
+                        : `/vendor/products`
                     }
+                    color={secondaryText}
+                    onClick={() => {
+                      window.localStorage.setItem('product', activeProd)
+                      setActiveProdTab(0)
+                    }}
                   >
                     {activeProd}
                   </Link>

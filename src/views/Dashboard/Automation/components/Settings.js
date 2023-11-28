@@ -35,7 +35,7 @@ const customStyles = {
   }
 }
 
-const Settings = ({ data, getData, error }) => {
+const Settings = ({ data, getData }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
@@ -53,7 +53,7 @@ const Settings = ({ data, getData, error }) => {
         projectId: productId
       }
     }).then(
-      (res) => res.data && getData({ variables: { id: productId, first: 24 } })
+      (res) => res.data && getData({ variables: { id: productId, first: 25 } })
     )
   }
 
@@ -142,10 +142,10 @@ const Settings = ({ data, getData, error }) => {
       selector: (row) => {
         const { setTo } = row
         return (
-          <HStack alignItems={'flex-start'} justifyContent={'flex-start'}>
-            <Tag>{JSON.stringify(setTo)}</Tag>
+          <HStack alignItems={'center'} justifyContent={'flex-start'}>
+            <Text>{JSON.stringify(setTo)}</Text>
             <IconButton
-              size='xs'
+              size='sm'
               onClick={() => {
                 setActiveRow(row)
                 onOpen()
@@ -180,22 +180,18 @@ const Settings = ({ data, getData, error }) => {
   return (
     <>
       <CardBody>
-        {error ? (
-          <Text textAlign={'center'}>{JSON.stringify(error)}</Text>
-        ) : (
-          <Flex flexDir={'column'} width={'100%'}>
-            <DataTable
-              columns={columns}
-              title={<Text fontSize={'xl'}>Rule Automation Settings</Text>}
-              data={data && data.nodes}
-              customStyles={customStyles}
-              progressPending={data && data.nodes ? false : true}
-              progressComponent={<CustomLoader />}
-              responsive={true}
-              persistTableHead
-            />
-          </Flex>
-        )}
+        <Flex flexDir={'column'} width={'100%'}>
+          <DataTable
+            columns={columns}
+            title={<Text fontSize={'xl'}>Rule Automation Settings</Text>}
+            data={data && data.nodes}
+            customStyles={customStyles}
+            progressPending={data && data.nodes ? false : true}
+            progressComponent={<CustomLoader />}
+            responsive={true}
+            persistTableHead
+          />
+        </Flex>
       </CardBody>
 
       {activeRow && isOpen && (

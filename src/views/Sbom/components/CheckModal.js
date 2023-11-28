@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client'
+import { useLazyQuery, useMutation } from '@apollo/client'
 import { InfoIcon } from '@chakra-ui/icons'
 import {
   Box,
@@ -28,7 +28,8 @@ import {
 import GlobalContext from 'context/GlobalContext'
 import { CreateAutomation } from 'graphQL/Mutation'
 import { UpdateComponent, recheckHealth } from 'graphQL/Mutation'
-import { useContext } from 'react'
+import { GetComponentData } from 'graphQL/Queries'
+import { useContext, useEffect } from 'react'
 import { useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import MultiSelect from 'react-select'
@@ -40,7 +41,6 @@ const CheckModal = ({
   onClose,
   refetch,
   shortDesc,
-  components,
   checkId,
   filterRefetch,
   componentId
@@ -50,11 +50,13 @@ const CheckModal = ({
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
-  // console.log('activeCheck', activeCheck)
+  // GET COMPONENT DATA
+  const [getCompData, { data }] = useLazyQuery(GetComponentData, {
+    fetchPolicy: 'network-only'
+  })
 
-  const { component } = activeCheck
-
-  const { setCheckFilters } = useContext(GlobalContext)
+  const { setCheckFilters, setActiveProdTab, compField, compDirection } =
+    useContext(GlobalContext)
 
   const now = new Date()
   const hours = String(now.getHours()).padStart(2, '0')
@@ -64,18 +66,37 @@ const CheckModal = ({
 
   const [timestamp, setTimestamp] = useState(currentTime)
   const [comp, setComp] = useState('')
-  const [compId, setCompId] = useState('')
   const [compType, setCompType] = useState('')
   const [licenseType, setLicenseType] = useState('license_spdx')
   const [licenseList, setLicenseList] = useState([])
   const [selectedLicenses, setSelectedLicenses] = useState([])
-  const [componentData, setComponentData] = useState([])
+  const [componentList, setComponentList] = useState([])
+  const [activeComp, setActiveComp] = useState(null)
+
+  const [customLicense, setCustomLicense] = useState('')
+  const [licenseExp, setLicenseExp] = useState('')
 
   const [healthRecheck] = useMutation(recheckHealth, {
     onCompleted: () => refetch()
   })
 
   const [updateComponent] = useMutation(UpdateComponent)
+
+  useEffect(() => {
+    if (isOpen) {
+      getCompData({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          first: 100,
+          field: compField,
+          direction: compDirection
+        }
+      }).then(
+        (res) => res.data && setComponentList(res.data.sbom.components.nodes)
+      )
+    }
+  }, [])
 
   const onFilterRefetch = () => {
     filterRefetch({
@@ -88,7 +109,7 @@ const CheckModal = ({
     try {
       await updateComponent({
         variables: {
-          id: compId,
+          id: activeComp.id,
           sbomId: sbomId,
           primary: true
         }
@@ -107,7 +128,10 @@ const CheckModal = ({
             })
           }
         })
-        .finally(() => window.location.reload())
+        .finally(() => {
+          setActiveProdTab(0)
+          window.location.reload()
+        })
     } catch (error) {
       console.log('Mutation error', error)
     }
@@ -119,7 +143,12 @@ const CheckModal = ({
         variables: {
           id: componentId,
           sbomId: sbomId,
-          licenses: selectedLicenses
+          licenses:
+            licenseType === 'license_spdx'
+              ? selectedLicenses
+              : licenseType === 'license_custom'
+              ? [customLicense]
+              : [licenseExp]
         }
       })
         .then((res) => {
@@ -147,11 +176,17 @@ const CheckModal = ({
     const value = e.target.value
     setComp(value)
     if (value === '') {
-      setComponentData([])
-    } else if (components && components.length > 0) {
-      setComponentData(components.filter((str) => str.value.startsWith(value)))
+      setComponentList([])
+    } else {
+      const filterData = data?.sbom.components.nodes.filter((str) =>
+        str.name.includes(value)
+      )
+      console.log('filterData', filterData)
+      setComponentList(filterData)
     }
   }
+
+  console.log('component list', componentList)
 
   const licenses = licenseOptions.map((option) => ({
     value: option.licenseId,
@@ -202,21 +237,51 @@ const CheckModal = ({
   const [createAutoCheck] = useMutation(CreateAutomation)
 
   const onSaveRule = async () => {
-    try {
-      await createAutoCheck({
-        variables: {
-          projectId: productId,
-          applicable: 'component',
-          condition: 'missing',
-          attr: licenseType,
-          enabled: true,
-          compName: component?.name,
-          compVersion: component?.version,
-          set: JSON.stringify({ value: selectedLicenses }, null, 2)
-        }
-      }).then((res) => res.data && onLicenseUpdate())
-    } catch (error) {
-      console.log('Error', error)
+    if (activeComp) {
+      try {
+        await createAutoCheck({
+          variables: {
+            projectId: productId,
+            applicable: 'component',
+            condition: 'missing',
+            attr: 'primary',
+            enabled: true,
+            compName: activeComp.name,
+            compVersion: activeComp.version,
+            set: JSON.stringify({ value: true }, null, 2)
+          }
+        }).then((res) => res.data && handleComUpdate())
+      } catch (error) {
+        console.log('Error', error)
+      }
+    } else {
+      try {
+        await createAutoCheck({
+          variables: {
+            projectId: productId,
+            applicable: 'component',
+            condition: 'missing',
+            attr: licenseType,
+            enabled: true,
+            compName: activeCheck?.component?.name,
+            compVersion: activeCheck?.component?.version,
+            set: JSON.stringify(
+              {
+                value:
+                  licenseType === 'license_spdx'
+                    ? selectedLicenses
+                    : licenseType === 'license_custom'
+                    ? customLicense
+                    : licenseExp
+              },
+              null,
+              2
+            )
+          }
+        }).then((res) => res.data && onLicenseUpdate())
+      } catch (error) {
+        console.log('Error', error)
+      }
     }
   }
 
@@ -238,12 +303,9 @@ const CheckModal = ({
                 <FormControl isRequired>
                   <FormLabel>Select</FormLabel>
                   <Input value={comp} onChange={handleComponentChange} />
-                  <Text fontSize={'sm'} mt={2} color={'red.400'}>
-                    {!components && 'No components found'}
-                  </Text>
                 </FormControl>
 
-                {componentData && componentData.length > 0 && (
+                {componentList.length > 0 && (
                   <Box
                     position='absolute'
                     zIndex='1'
@@ -256,23 +318,21 @@ const CheckModal = ({
                     overflowY={'scroll'}
                   >
                     <List>
-                      {componentData
-                        .filter((item) => item.value.includes(comp))
-                        .map((item, index) => (
-                          <ListItem
-                            key={index}
-                            cursor='pointer'
-                            onClick={() => {
-                              setCompId(item.id)
-                              setComp(item.value)
-                              setComponentData([])
-                            }}
-                            p='2'
-                            _hover={{ background: 'gray.100' }}
-                          >
-                            <Text>{item.value}</Text>
-                          </ListItem>
-                        ))}
+                      {componentList.map((item, index) => (
+                        <ListItem
+                          key={index}
+                          cursor='pointer'
+                          onClick={() => {
+                            setActiveComp(item)
+                            setComp(item.name)
+                            setComponentList([])
+                          }}
+                          p='2'
+                          _hover={{ background: 'gray.100' }}
+                        >
+                          <Text>{item.name}</Text>
+                        </ListItem>
+                      ))}
                     </List>
                   </Box>
                 )}
@@ -353,21 +413,44 @@ const CheckModal = ({
                       </Tooltip>
                     </Flex>
                   </FormLabel>
-                  <MultiSelect
-                    styles={{
-                      control: (baseStyles, state) => ({
-                        ...baseStyles,
-                        borderColor: state.isFocused ? 'inherit' : 'inherit',
-                        '&:hover': {
-                          borderColor: '#CBD5E0'
-                        }
-                      })
-                    }}
-                    isMulti
-                    value={licenseList}
-                    options={licenses}
-                    onChange={onLicenseChange}
-                  />
+                  {licenseType === 'license_spdx' && (
+                    <MultiSelect
+                      styles={{
+                        control: (baseStyles, state) => ({
+                          ...baseStyles,
+                          borderColor: state.isFocused ? 'inherit' : 'inherit',
+                          '&:hover': {
+                            borderColor: '#CBD5E0'
+                          }
+                        })
+                      }}
+                      isMulti
+                      value={licenseList}
+                      options={licenses}
+                      onChange={onLicenseChange}
+                    />
+                  )}
+
+                  {licenseType === 'license_custom' && (
+                    <Input
+                      type='text'
+                      id='customLicense'
+                      name='customLicense'
+                      value={customLicense}
+                      onChange={(e) => setCustomLicense(e.target.value)}
+                    />
+                  )}
+
+                  {licenseType === 'license_exp' && (
+                    <Input
+                      size='sm'
+                      id='licenseExp'
+                      name='licenseExp'
+                      placeholder='Enter a valid license exp'
+                      value={licenseExp}
+                      onChange={(e) => setLicenseExp(e.target.value)}
+                    />
+                  )}
                 </FormControl>
               </VStack>
             )}

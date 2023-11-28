@@ -58,8 +58,6 @@ const CpeModal = ({
   const versionRef = useRef()
   const [hardware, setHardware] = useState('')
 
-  const [updatedString, setUpdatedString] = useState('')
-
   const { cpeString, setCpeString } = useContext(GlobalContext)
 
   const [healthRecheck] = useMutation(recheckHealth, {
@@ -102,7 +100,7 @@ const CpeModal = ({
         variables: {
           id: activeCheck.id,
           sbomId: sbomId,
-          cpes: [updatedString]
+          cpes: [cpeString]
         }
       })
         .then(() => {
@@ -127,27 +125,23 @@ const CpeModal = ({
   const onVendorInputChange = (event) => {
     const { value } = event.target
     setVendor(value)
-    getCpe({
-      variables: {
-        input: {
-          idType: 'cpe',
-          ecosystem: 'cpe',
-          search: {
-            vendor: value
-          },
-          hints: {
-            cpe: {
-              product: product ? product : '',
-              version: version ? product : ''
+    if (value !== '') {
+      getCpe({
+        variables: {
+          input: {
+            idType: 'cpe',
+            ecosystem: 'cpe',
+            search: {
+              vendor: value
             }
           }
         }
-      }
-    }).then((res) => {
-      if (res.data) {
-        setVendorList(res.data.idAutoComplete.result)
-      }
-    })
+      }).then((res) => {
+        if (res.data) {
+          setVendorList(res.data.idAutoComplete.result)
+        }
+      })
+    }
   }
 
   // ON TYPE CHANGE
@@ -163,54 +157,57 @@ const CpeModal = ({
   const onProductInputChange = (event) => {
     const { value } = event.target
     setProduct(value)
-    getCpe({
-      variables: {
-        input: {
-          idType: 'cpe',
-          ecosystem: 'cpe',
-          search: {
-            product: value
-          },
-          hints: {
-            cpe: {
-              vendor: vendor ? vendor : '',
-              version: version ? version : ''
+    if (value !== '') {
+      getCpe({
+        variables: {
+          input: {
+            idType: 'cpe',
+            ecosystem: 'cpe',
+            search: {
+              product: value
+            },
+            hints: {
+              cpe: {
+                vendor: vendor
+              }
             }
           }
         }
-      }
-    }).then((res) => {
-      if (res.data) {
-        setProductList(res.data.idAutoComplete.result)
-      }
-    })
+      }).then((res) => {
+        if (res.data) {
+          setProductList(res.data.idAutoComplete.result)
+        }
+      })
+    }
   }
 
   // ON VERSION INPUT CHANGE
   const onVersionInputChange = (event) => {
     const { value } = event.target
     setVersion(value)
-    getCpe({
-      variables: {
-        input: {
-          idType: 'cpe',
-          ecosystem: 'cpe',
-          search: {
-            version: value
-          },
-          hints: {
-            cpe: {
-              vendor: vendor ? vendor : '',
-              product: product ? product : ''
+    if (value !== '') {
+      getCpe({
+        variables: {
+          input: {
+            idType: 'cpe',
+            ecosystem: 'cpe',
+            search: {
+              version: value
+            },
+            hints: {
+              cpe: {
+                vendor: vendor,
+                product: product
+              }
             }
           }
         }
-      }
-    }).then((res) => {
-      if (res.data) {
-        setVersionList(res.data.idAutoComplete.result)
-      }
-    })
+      }).then((res) => {
+        if (res.data) {
+          setVersionList(res.data.idAutoComplete.result)
+        }
+      })
+    }
   }
 
   // ON HARDWARE CHANGE
@@ -244,7 +241,7 @@ const CpeModal = ({
             2
           )
         }
-      }).then((res) => res.data && onCreateCpe(cpeString))
+      }).then((res) => res.data && handleComUpdate())
     } catch (error) {
       console.log('Error', error)
     }

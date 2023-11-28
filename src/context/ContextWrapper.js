@@ -47,6 +47,8 @@ const ContextWrapper = (props) => {
   const [logFilters, setLogFilters] = useState({})
 
   // SORT ORDER AND DIRECTIONS
+  const [prodField, setProdField] = useState('PROJECTS_UPDATED_AT')
+  const [prodDirection, setProdDirection] = useState('DESC')
   const [prodLogField, setProdLogField] = useState('ACTIVITY_LOGS_CREATED_AT')
   const [prodLogDirection, setProdLogDirection] = useState('DESC')
   const [compField, setCompField] = useState('COMPONENTS_UPDATED_AT')
@@ -70,6 +72,9 @@ const ContextWrapper = (props) => {
   const [totalRows, setTotalRows] = useState(25)
   const [comPageIndex, setComPageIndex] = useState(1)
   const [currentProduct, setCurrentProduct] = useState(null)
+
+  // PRODUCT FILTERS
+  const [prodSearchInput, setProdSearchInput] = useState('')
 
   // COMPONENT FILTER STATES
   const [compSearchInput, setCompSearchInput] = useState('')
@@ -126,6 +131,8 @@ const ContextWrapper = (props) => {
         setVulnerabilitiesData,
         totalProducts,
         setTotalProducts,
+        prodSearchInput,
+        setProdSearchInput,
         totalVulns,
         setTotalVulns,
         minimize,
@@ -247,6 +254,10 @@ const ContextWrapper = (props) => {
         setComPageIndex,
         currentProduct,
         setCurrentProduct,
+        prodField,
+        setProdField,
+        prodDirection,
+        setProdDirection,
         prodLogField,
         setProdLogField,
         prodLogDirection,

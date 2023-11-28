@@ -420,12 +420,22 @@ export const GetFeedLogs = gql`
 
 export const GetProjectData = gql`
   query GetProjectData(
+    $search: String
     $first: Int
     $last: Int
     $after: String
     $before: String
+    $field: ProjectOrderByFields!
+    $direction: OrderByDirection!
   ) {
-    projects(first: $first, last: $last, after: $after, before: $before) {
+    projects(
+      search: $search
+      first: $first
+      last: $last
+      after: $after
+      before: $before
+      orderBy: { field: $field, direction: $direction }
+    ) {
       totalCount
       pageInfo {
         endCursor
@@ -1004,7 +1014,7 @@ export const GetProjectCheck = gql`
           condition
           createdAt
           enabled
-          lookup 
+          lookup
           id
           setTo
           updatedAt

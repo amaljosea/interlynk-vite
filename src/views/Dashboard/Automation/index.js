@@ -1,11 +1,11 @@
 import {
   Flex,
-  Box,
   Tabs,
   TabList,
   Tab,
   TabPanels,
-  TabPanel
+  TabPanel,
+  Text
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import { useEffect, useState } from 'react'
@@ -73,11 +73,14 @@ const Automation = () => {
             </TabPanel>
             {/* AUTOMATIONS */}
             <TabPanel>
-              <Settings
-                data={data?.project.autoChecks}
-                getData={getAutomations}
-                error={error}
-              />
+              {error ? (
+                <Text textAlign={'center'} my={6}>{JSON.stringify(error)}</Text>
+              ) : (
+                <Settings
+                  data={data?.project.autoChecks}
+                  getData={getAutomations}
+                />
+              )}
             </TabPanel>
           </TabPanels>
         </Tabs>

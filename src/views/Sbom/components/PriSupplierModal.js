@@ -12,8 +12,10 @@ import {
   FormControl,
   FormLabel,
   Input,
-  FormErrorMessage
+  FormErrorMessage,
+  Stack
 } from '@chakra-ui/react'
+import { CreateAutomation } from 'graphQL/Mutation'
 import { recheckHealth, supplierUpdate, supplierCreate } from 'graphQL/Mutation'
 import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
@@ -61,6 +63,8 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
     onCompleted: () => refetch()
   })
 
+  const [createAutoCheck] = useMutation(CreateAutomation)
+
   useEffect(() => {
     if (suppliers && suppliers.length > 0) {
       setSupName(suppliers[0].name)
@@ -68,8 +72,7 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
     }
   }, [suppliers])
 
-  const handleSave = async (e) => {
-    e.preventDefault()
+  const handleSave = async () => {
     await createSupplier({
       variables: {
         name: supName,
@@ -90,8 +93,7 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
       .finally(() => onClose())
   }
 
-  const handleUpdate = async (e) => {
-    e.preventDefault()
+  const handleUpdate = async () => {
     await updateSupplier({
       variables: {
         name: supName,
@@ -101,70 +103,100 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
     }).then((res) => res.data && onClose())
   }
 
+  const onSaveRule = async () => {
+    try {
+      await createAutoCheck({
+        variables: {
+          projectId: productId,
+          applicable: 'document',
+          condition: 'missing',
+          attr: 'supplier',
+          enabled: true,
+          set: JSON.stringify(
+            { name: supName, contactEmail: supEmail },
+            null,
+            2
+          )
+        }
+      }).then((res) => res.data && handleSave())
+    } catch (error) {
+      console.log('Error', error)
+    }
+  }
+
   return (
     <>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-        <form
-          onSubmit={
-            suppliers && suppliers.length > 0 ? handleUpdate : handleSave
-          }
-        >
-          <ModalContent>
-            <ModalHeader>Add {checkId ? 'SBOM' : ''} Supplier</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Flex width={'100%'} direction={'column'} gap={4}>
-                <FormControl isRequired isInvalid={supplierError}>
-                  <FormLabel fontSize={'sm'}>Name</FormLabel>
-                  <Input
-                    placeholder='Enter supplier name'
-                    value={supName}
-                    onChange={onSupplierChange}
-                  />
-                  <FormErrorMessage>{supplierError}</FormErrorMessage>
-                </FormControl>
-                <FormControl
-                  isInvalid={!validateEmail(supEmail) && supEmail !== ''}
-                >
-                  <FormLabel fontSize={'sm'}>Email</FormLabel>
-                  <Input
-                    placeholder='Enter supplier email'
-                    value={supEmail}
-                    onChange={(e) => setSupEmail(e.target.value)}
-                  />
-                  {supEmail !== '' && !validateEmail(supEmail) && (
-                    <FormErrorMessage>Email is invalid</FormErrorMessage>
-                  )}
-                </FormControl>
-              </Flex>
-            </ModalBody>
-            <ModalFooter>
-              <Button colorScheme='gray' mr={3} onClick={onClose}>
-                Cancel
-              </Button>
-              {suppliers && suppliers.length > 0 ? (
-                <Button
-                  colorScheme='blue'
-                  type={'submit'}
-                  disabled={
-                    !supName || (supEmail != '' && !validateEmail(supEmail))
-                  }
-                >
-                  Update
+        <ModalContent>
+          <ModalHeader>Add {checkId ? 'SBOM' : ''} Supplier</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Flex width={'100%'} direction={'column'} gap={4}>
+              <FormControl isRequired isInvalid={supplierError}>
+                <FormLabel fontSize={'sm'}>Name</FormLabel>
+                <Input
+                  placeholder='Enter supplier name'
+                  value={supName}
+                  onChange={onSupplierChange}
+                />
+                <FormErrorMessage>{supplierError}</FormErrorMessage>
+              </FormControl>
+              <FormControl
+                isInvalid={!validateEmail(supEmail) && supEmail !== ''}
+              >
+                <FormLabel fontSize={'sm'}>Email</FormLabel>
+                <Input
+                  placeholder='Enter supplier email'
+                  value={supEmail}
+                  onChange={(e) => setSupEmail(e.target.value)}
+                />
+                {supEmail !== '' && !validateEmail(supEmail) && (
+                  <FormErrorMessage>Email is invalid</FormErrorMessage>
+                )}
+              </FormControl>
+            </Flex>
+          </ModalBody>
+          <ModalFooter>
+            <Flex
+              width={'100%'}
+              justifyContent={'space-between'}
+              alignItems={'center'}
+            >
+              {checkId ? (
+                <Button fontSize={'sm'} colorScheme='blue' onClick={onSaveRule}>
+                  Save Rule
                 </Button>
               ) : (
-                <Button
-                  colorScheme='blue'
-                  type={'submit'}
-                  disabled={!supName || supplierError !== ''}
-                >
-                  Save
-                </Button>
+                <Text></Text>
               )}
-            </ModalFooter>
-          </ModalContent>
-        </form>
+              <Stack direction={'row'} spacing={2} alignItems={'center'}>
+                <Button colorScheme='gray' mr={3} onClick={onClose}>
+                  Cancel
+                </Button>
+                {suppliers && suppliers.length > 0 ? (
+                  <Button
+                    colorScheme='blue'
+                    onClick={handleUpdate}
+                    disabled={
+                      !supName || (supEmail != '' && !validateEmail(supEmail))
+                    }
+                  >
+                    Update
+                  </Button>
+                ) : (
+                  <Button
+                    colorScheme='blue'
+                    onClick={handleSave}
+                    disabled={!supName || supplierError !== ''}
+                  >
+                    Save
+                  </Button>
+                )}
+              </Stack>
+            </Flex>
+          </ModalFooter>
+        </ModalContent>
       </Modal>
     </>
   )
