@@ -863,8 +863,8 @@ const HealthCheckTable = ({
               shortDesc={activeRow.organizationRule.rule.shortDesc}
               checkId={activeRow.organizationRule.rule.friendlyId}
               isOpen={isPrimaryOpen}
-              components={components}
               onClose={onPrimaryClose}
+              getCpe={getCpe}
             />
           )}
 
