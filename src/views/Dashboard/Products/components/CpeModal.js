@@ -57,9 +57,7 @@ const CpeModal = ({
   const [versionList, setVersionList] = useState([])
   const versionRef = useRef()
   const [hardware, setHardware] = useState('')
-
-  const [updatedString, setUpdatedString] = useState('')
-
+  
   const { cpeString, setCpeString } = useContext(GlobalContext)
 
   const [healthRecheck] = useMutation(recheckHealth, {
@@ -102,7 +100,7 @@ const CpeModal = ({
         variables: {
           id: activeCheck.id,
           sbomId: sbomId,
-          cpes: [updatedString]
+          cpes: [cpeString]
         }
       })
         .then(() => {
@@ -244,7 +242,7 @@ const CpeModal = ({
             2
           )
         }
-      }).then((res) => res.data && onCreateCpe(cpeString))
+      }).then((res) => res.data && handleComUpdate())
     } catch (error) {
       console.log('Error', error)
     }
