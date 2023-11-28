@@ -87,9 +87,9 @@ export default function AdminNavbar(props) {
         case 'Connections':
           return '/vendor/connections'
         case 'Settings':
-          return `/vendor/autofix?id=${prodID}&sbom=${sbomId}`
+          return `/vendor/autofix?id=${prodID}`
         case 'Change Log':
-          return `/vendor/changelog?id=${prodID}&sbom=${sbomId}`
+          return `/vendor/changelog?id=${prodID}`
       }
     } else {
       switch (name) {
@@ -160,9 +160,14 @@ export default function AdminNavbar(props) {
                   </Link>
                   <Text>/</Text>
                   <Link
-                    to={`/vendor/products?&p=${prodID}&sbom=${sbomId}`}
+                    to={
+                      currentProduct.sbomId !== null
+                        ? `/vendor/products?&p=${prodID}&sbom=${currentProduct.sbomId}`
+                        : `/vendor/products`
+                    }
                     color={secondaryText}
-                    onClick={() => window.localStorage.setItem('product', activeProd)
+                    onClick={() =>
+                      window.localStorage.setItem('product', activeProd)
                     }
                   >
                     {activeProd}

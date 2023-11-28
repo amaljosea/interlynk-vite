@@ -330,6 +330,13 @@ const ProductTable = ({ data, refetch }) => {
                   isDisabled={!enabled}
                   onClick={() => {
                     window.localStorage.setItem('activeProduct', name)
+                    setCurrentProduct({
+                      id: id,
+                      sbomId:
+                        sboms.length > 0 && filteredData.length > 0
+                          ? filteredData[0].id
+                          : null
+                    })
                     history.push(`/vendor/autofix?id=${id}`)
                   }}
                 >
@@ -339,6 +346,13 @@ const ProductTable = ({ data, refetch }) => {
                   isDisabled={!enabled}
                   onClick={() => {
                     window.localStorage.setItem('activeProduct', name)
+                    setCurrentProduct({
+                      id: id,
+                      sbomId:
+                        sboms.length > 0 && filteredData.length > 0
+                          ? filteredData[0].id
+                          : null
+                    })
                     history.push(`/vendor/changelog?id=${id}`)
                   }}
                 >
