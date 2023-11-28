@@ -141,15 +141,6 @@ function ComponentDrawer(props) {
     setCompVersion(version)
     setCpeList(cpes)
     setPurlValue(purl)
-
-    try {
-      PackageURL.fromString(purlValue)
-      setPURLInputValid(true)
-    } catch (ex) {
-      if (purlValue != '' && purlValue != null) {
-        setPURLInputValid(false)
-      }
-    }
   }, [component])
 
   useEffect(() => {
@@ -225,18 +216,16 @@ function ComponentDrawer(props) {
   }
 
   const handlePurlModal = () => {
-    if (purlValue === '') {
+    if (!purlValue) {
       const pkg = PackageURL.fromString(
         'pkg:generic/System.Windows.Extensions@4.7.0'
       )
       setPurlValue(`pkg:generic/System.Windows.Extensions@4.7.0`)
-      setPURLInputValid(true)
       setPurlData(pkg)
     } else {
       const pkg = PackageURL.fromString(purlValue)
       setPurlData(pkg)
     }
-
     onPurlOpen()
   }
 
@@ -485,7 +474,9 @@ function ComponentDrawer(props) {
               </FormControl>
               {/* Group */}
               <FormControl>
-                <FormLabel htmlFor='groupInfo' fontSize={'sm'}>Group</FormLabel>
+                <FormLabel htmlFor='groupInfo' fontSize={'sm'}>
+                  Group
+                </FormLabel>
                 <Input
                   size='md'
                   fontSize={'sm'}
