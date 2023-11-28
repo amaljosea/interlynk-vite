@@ -40,6 +40,7 @@ import UploadModal from 'views/Dashboard/Products/components/UploadModal'
 import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import { useHistory } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
+import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 const customStyles = {
   headCells: {
@@ -65,8 +66,18 @@ const ProductTable = ({ data, refetch }) => {
   const [activeRow, setActiveRow] = useState(null)
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const { totalRows, setTotalRows, setCurrentProduct, setActiveProdTab } =
-    useContext(GlobalContext)
+  const {
+    totalRows,
+    setTotalRows,
+    setCurrentProduct,
+    setActiveProdTab,
+    prodSearchInput,
+    setProdSearchInput,
+    prodField,
+    setProdField,
+    prodDirection,
+    setProdDirection
+  } = useContext(GlobalContext)
 
   const {
     isOpen: isOpenProduct,
@@ -130,7 +141,7 @@ const ProductTable = ({ data, refetch }) => {
   const columns = [
     // ACTIVE
     {
-      id: 'active',
+      id: 'PROJECTS_ENABLED',
       name: 'ACTIVE',
       selector: (row) => {
         const { enabled, name } = row
@@ -147,11 +158,12 @@ const ProductTable = ({ data, refetch }) => {
           />
         )
       },
-      width: '100px'
+      width: '150px',
+      sortable: true
     },
     // PRODUCT
     {
-      id: 'product',
+      id: 'PROJECTS_NAME',
       name: 'PRODUCT',
       selector: (row) => {
         const { enabled, sboms, name, id } = row
@@ -221,7 +233,8 @@ const ProductTable = ({ data, refetch }) => {
           </>
         )
       },
-      wrap: true
+      wrap: true,
+      sortable: true
     },
     // VERSION
     {
@@ -251,7 +264,7 @@ const ProductTable = ({ data, refetch }) => {
     },
     // DESCRIPTION
     {
-      id: 'description',
+      id: 'PROJECTS_DESCRIPTION',
       name: 'DESCRIPTION',
       selector: (row) => {
         const { description } = row
@@ -263,11 +276,12 @@ const ProductTable = ({ data, refetch }) => {
           </Text>
         )
       },
-      wrap: true
+      wrap: true,
+      sortable: true
     },
     // UPDATEDAT
     {
-      id: 'updatedAt',
+      id: 'PROJECTS_UPDATED_AT',
       name: 'UPDATED AT',
       selector: (row) => {
         const { updatedAt } = row
@@ -430,35 +444,85 @@ const ProductTable = ({ data, refetch }) => {
     }
   }
 
+  // SEARCH COMPONENT
+  const handleSearch = async (event) => {
+    if (event.key === 'Enter' && prodSearchInput !== '') {
+      await refetch({
+        search: prodSearchInput,
+        first: totalRows,
+        field: prodField,
+        direction: prodDirection
+      })
+      setPageIndex(1)
+    }
+  }
+
+  // CLEAR SERACH
+  const handleClear = async () => {
+    await refetch({
+      search: undefined,
+      first: totalRows,
+      field: prodField,
+      direction: prodDirection
+    })
+    setProdSearchInput('')
+    setPageIndex(1)
+  }
+
   const subHeaderComponent = useMemo(() => {
     return (
       <Flex
         width={'100%'}
-        direction={'row'}
-        gap={2}
         alignItems={'center'}
-        justifyContent={'flex-end'}
+        justifyContent={'space-between'}
       >
-        {/* REFRESH */}
-        <Tooltip label='Refresh'>
-          <IconButton
-            onClick={handleRefresh}
-            colorScheme='blue'
-            icon={<RepeatIcon />}
-          ></IconButton>
-        </Tooltip>
-        {/* ADD PRODUCT */}
-        <Tooltip label='Add Product'>
-          <IconButton
-            icon={<AddIcon />}
-            colorScheme='blue'
-            variant='solid'
-            onClick={onOpenProduct}
+        {/* SEARCH COMPONENTS */}
+        <Stack>
+          <SearchFilter
+            id='product'
+            filterText={prodSearchInput}
+            setFilterText={setProdSearchInput}
+            onFilter={handleSearch}
+            onClear={handleClear}
           />
-        </Tooltip>
+        </Stack>
+
+        <Stack direction={'row'} spacing={2} alignItems={'center'}>
+          {/* REFRESH */}
+          <Tooltip label='Refresh'>
+            <IconButton
+              onClick={handleRefresh}
+              colorScheme='blue'
+              icon={<RepeatIcon />}
+            ></IconButton>
+          </Tooltip>
+          {/* ADD PRODUCT */}
+          <Tooltip label='Add Product'>
+            <IconButton
+              icon={<AddIcon />}
+              colorScheme='blue'
+              variant='solid'
+              onClick={onOpenProduct}
+            />
+          </Tooltip>
+        </Stack>
       </Flex>
     )
-  }, [handleRefresh])
+  }, [prodSearchInput, handleClear, handleSearch, handleRefresh])
+
+  // SORTING
+  const handleSort = (column, sortDirection) => {
+    setProdField(column.id)
+    setProdDirection(sortDirection === 'asc' ? 'ASC' : 'DESC')
+    refetch({
+      first: totalRows,
+      search: undefined,
+      field: column.id,
+      direction: sortDirection === 'asc' ? 'ASC' : 'DESC',
+      field: prodField,
+      direction: prodDirection
+    })
+  }
 
   // PREV PAGE
   const handlePreviousPage = () => {
@@ -499,10 +563,11 @@ const ProductTable = ({ data, refetch }) => {
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
           columns={columns}
+          onSort={handleSort}
           data={data && data.nodes}
           customStyles={customStyles}
           defaultSortAsc={true}
-          defaultSortFieldId={'updatedAt'}
+          defaultSortFieldId={prodField}
           subHeader
           subHeaderComponent={subHeaderComponent}
           progressPending={data ? false : true}

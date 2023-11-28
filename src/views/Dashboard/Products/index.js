@@ -11,6 +11,8 @@ import ProductTable from 'components/Tables/ProductTable'
 
 function Index() {
   const {
+    prodField,
+    prodDirection,
     setTotalProducts,
     setCompSearchInput,
     setCompEcosystem,
@@ -39,7 +41,9 @@ function Index() {
 
   const { data, refetch, error } = useQuery(GetProjectData, {
     variables: {
-      first: totalRows
+      first: totalRows,
+      field: prodField,
+      direction: prodDirection
     }
   })
 
