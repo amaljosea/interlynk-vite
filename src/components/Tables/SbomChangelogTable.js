@@ -130,7 +130,8 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
         const { orig, event } = row
         const license =
           (event === 'licenses' || event === 'cpes') && JSON.parse(orig)
-        const urls = event === 'external_urls' && JSON.stringify(orig)
+
+        const urls = event === 'external_urls' && JSON.parse(orig)
 
         return (
           <Flex flexWrap={'wrap'} gap={2} my={2} whiteSpace={'break-spaces'}>
@@ -166,6 +167,28 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
                   ))
                 ) : license.length === 0 ? (
                   ''
+                ) : urls && urls.length > 0 ? (
+                  urls.map((item, index) => (
+                    <Flex
+                      key={index}
+                      flexWrap={'wrap'}
+                      gap={2}
+                      my={2}
+                      direction={'column'}
+                    >
+                      <Tag
+                        size={'sm'}
+                        key={index}
+                        variant='subtle'
+                        colorScheme='green'
+                        width={'fit-content'}
+                      >
+                        <TagLabel pt={1}>
+                          {item.name} - {item.url}
+                        </TagLabel>
+                      </Tag>
+                    </Flex>
+                  ))
                 ) : (
                   <Text whiteSpace={'wrap'}>{orig}</Text>
                 )}
@@ -255,7 +278,11 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
     {
       id: 'ACTIVITY_LOGS_CHANGED_BY',
       name: 'BY',
-      selector: (row) => <Text ml={'auto'}>{row.changedBy}</Text>,
+      selector: (row) => (
+        <Tooltip placement='top' label={row.changedBy}>
+          {row.changedBy}
+        </Tooltip>
+      ),
       sortable: true,
       width: '12%',
       right: 'true'
