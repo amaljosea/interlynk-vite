@@ -166,9 +166,10 @@ export default function AdminNavbar(props) {
                         : `/vendor/products`
                     }
                     color={secondaryText}
-                    onClick={() =>
+                    onClick={() => {
                       window.localStorage.setItem('product', activeProd)
-                    }
+                      setActiveProdTab(0)
+                    }}
                   >
                     {activeProd}
                   </Link>
