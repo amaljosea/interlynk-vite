@@ -35,7 +35,9 @@ import {
   ModalHeader,
   ModalCloseButton,
   ModalBody,
-  ModalFooter
+  ModalFooter,
+  RadioGroup,
+  Radio
 } from '@chakra-ui/react'
 import { useLazyQuery, useMutation } from '@apollo/client'
 import { CreateComponent, UpdateComponent } from 'graphQL/Mutation'
@@ -111,11 +113,16 @@ function ComponentDrawer(props) {
   const [compName, setCompName] = useState('')
   const [compVersion, setCompVersion] = useState('')
   const [compType, setCompType] = useState('')
+
+  const [licenseType, setLicenseType] = useState('license_spdx')
   const [licenseName, setLicenseName] = useState('')
+  const [licenseExp, setLicenseExp] = useState('')
+  const [licenseList, setLicenseList] = useState([])
+  const [selectedLicenses, setSelectedLicenses] = useState([])
+
   const [cpeValue, setCpeValue] = useState('')
   const [cpeList, setCpeList] = useState([])
   const [cpeData, setCpeData] = useState([])
-  const [isValid, setIsValid] = useState(true)
   const cpeRef = useRef()
 
   const [selectedCpe, setSelectedCpe] = useState(null)
@@ -125,9 +132,6 @@ function ComponentDrawer(props) {
 
   const [isPrimary, setIsPrimary] = useState(primary)
   const [isInternal, setIsInternal] = useState(internal)
-
-  const [licenseList, setLicenseList] = useState([])
-  const [selectedLicenses, setSelectedLicenses] = useState([])
 
   const licenses = licenseOptions.map((option) => ({
     value: option.licenseId,
@@ -298,21 +302,16 @@ function ComponentDrawer(props) {
     }
   }
 
-  const handleSave = async () => {
-    if (purlValue != null && purlValue !== '') {
-      try {
-        const pkg = PackageURL.fromString(purlValue)
-        handleCreateCom()
-      } catch (error) {
-        toast({
-          description: error.message,
-          status: 'error',
-          position: 'top',
-          duration: 3000
-        })
-      }
-    } else {
+  const handleSave = () => {
+    try {
       handleCreateCom()
+    } catch (error) {
+      toast({
+        description: error.message,
+        status: 'error',
+        position: 'top',
+        duration: 3000
+      })
     }
   }
 
@@ -515,7 +514,19 @@ function ComponentDrawer(props) {
                   <option value='unspecified'>Unspecified</option>
                 </Select>
               </FormControl>
-              {/* Licenses */}
+              {/* LICENSE TYPE */}
+              <RadioGroup
+                size='sm'
+                value={licenseType}
+                onChange={(value) => setLicenseType(value)}
+              >
+                <Stack direction='row' mt={3}>
+                  <Radio value='license_spdx'>SPDX</Radio>
+                  <Radio value='license_custom'>Custom</Radio>
+                  <Radio value='license_exp'>Expression</Radio>
+                </Stack>
+              </RadioGroup>
+              {/* LICENSE FIELD */}
               <FormControl>
                 <FormLabel htmlFor='compLicenses' as={Flex}>
                   <chakra.span mr={2}>Licenses</chakra.span>
@@ -523,31 +534,31 @@ function ComponentDrawer(props) {
                     <Icon as={InfoIcon} color={'blue.500'} />
                   </Tooltip>
                 </FormLabel>
-                <MultiSelect
-                  styles={{
-                    control: (baseStyles, state) => ({
-                      ...baseStyles,
-                      borderColor: state.isFocused ? 'inherit' : 'inherit',
-                      padding: '2px 5px',
-                      '&:hover': {
-                        borderColor: '#CBD5E0'
-                      }
-                    })
-                  }}
-                  isMulti
-                  components={{
-                    DropdownIndicator: () => null,
-                    IndicatorSeparator: () => null
-                  }}
-                  className='react-select'
-                  value={licenseList}
-                  options={licenses}
-                  onChange={onLicenseChange}
-                />
-              </FormControl>
-              {containesOther && (
-                <FormControl isRequired>
-                  <FormLabel htmlFor='spdx'>SPDX</FormLabel>
+                {licenseType === 'license_spdx' && (
+                  <MultiSelect
+                    styles={{
+                      control: (baseStyles, state) => ({
+                        ...baseStyles,
+                        borderColor: state.isFocused ? 'inherit' : 'inherit',
+                        padding: '2px 5px',
+                        '&:hover': {
+                          borderColor: '#CBD5E0'
+                        }
+                      })
+                    }}
+                    isMulti
+                    components={{
+                      DropdownIndicator: () => null,
+                      IndicatorSeparator: () => null
+                    }}
+                    className='react-select'
+                    value={licenseList}
+                    options={licenses}
+                    onChange={onLicenseChange}
+                  />
+                )}
+
+                {licenseType === 'license_custom' && (
                   <Input
                     size='sm'
                     id='compLicenses'
@@ -556,8 +567,20 @@ function ComponentDrawer(props) {
                     value={licenseName}
                     onChange={(e) => setLicenseName(e.target.value)}
                   />
-                </FormControl>
-              )}
+                )}
+
+                {licenseType === 'license_exp' && (
+                  <Input
+                    size='sm'
+                    id='licenseExp'
+                    name='licenseExp'
+                    placeholder='Enter a valid license exp'
+                    value={licenseExp}
+                    onChange={(e) => setLicenseExp(e.target.value)}
+                  />
+                )}
+              </FormControl>
+
               {/* PURL INPUI */}
               <FormControl isReadOnly={customerView}>
                 <FormLabel htmlFor='purl' fontSize={'sm'}>

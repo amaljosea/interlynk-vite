@@ -73,6 +73,9 @@ const CheckModal = ({
   const [componentList, setComponentList] = useState([])
   const [activeComp, setActiveComp] = useState(null)
 
+  const [customLicense, setCustomLicense] = useState('')
+  const [licenseExp, setLicenseExp] = useState('')
+
   const [healthRecheck] = useMutation(recheckHealth, {
     onCompleted: () => refetch()
   })
@@ -140,7 +143,12 @@ const CheckModal = ({
         variables: {
           id: componentId,
           sbomId: sbomId,
-          licenses: selectedLicenses
+          licenses:
+            licenseType === 'license_spdx'
+              ? selectedLicenses
+              : licenseType === 'license_custom'
+              ? [customLicense]
+              : [licenseExp]
         }
       })
         .then((res) => {
@@ -257,7 +265,18 @@ const CheckModal = ({
             enabled: true,
             compName: activeCheck?.component?.name,
             compVersion: activeCheck?.component?.version,
-            set: JSON.stringify({ value: selectedLicenses }, null, 2)
+            set: JSON.stringify(
+              {
+                value:
+                  licenseType === 'license_spdx'
+                    ? selectedLicenses
+                    : licenseType === 'license_custom'
+                    ? customLicense
+                    : licenseExp
+              },
+              null,
+              2
+            )
           }
         }).then((res) => res.data && onLicenseUpdate())
       } catch (error) {
@@ -394,21 +413,44 @@ const CheckModal = ({
                       </Tooltip>
                     </Flex>
                   </FormLabel>
-                  <MultiSelect
-                    styles={{
-                      control: (baseStyles, state) => ({
-                        ...baseStyles,
-                        borderColor: state.isFocused ? 'inherit' : 'inherit',
-                        '&:hover': {
-                          borderColor: '#CBD5E0'
-                        }
-                      })
-                    }}
-                    isMulti
-                    value={licenseList}
-                    options={licenses}
-                    onChange={onLicenseChange}
-                  />
+                  {licenseType === 'license_spdx' && (
+                    <MultiSelect
+                      styles={{
+                        control: (baseStyles, state) => ({
+                          ...baseStyles,
+                          borderColor: state.isFocused ? 'inherit' : 'inherit',
+                          '&:hover': {
+                            borderColor: '#CBD5E0'
+                          }
+                        })
+                      }}
+                      isMulti
+                      value={licenseList}
+                      options={licenses}
+                      onChange={onLicenseChange}
+                    />
+                  )}
+
+                  {licenseType === 'license_custom' && (
+                    <Input
+                      type='text'
+                      id='customLicense'
+                      name='customLicense'
+                      value={customLicense}
+                      onChange={(e) => setCustomLicense(e.target.value)}
+                    />
+                  )}
+
+                  {licenseType === 'license_exp' && (
+                    <Input
+                      size='sm'
+                      id='licenseExp'
+                      name='licenseExp'
+                      placeholder='Enter a valid license exp'
+                      value={licenseExp}
+                      onChange={(e) => setLicenseExp(e.target.value)}
+                    />
+                  )}
                 </FormControl>
               </VStack>
             )}
