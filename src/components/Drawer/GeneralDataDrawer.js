@@ -24,9 +24,11 @@ import {
   FormControl,
   FormErrorMessage,
   Tooltip,
-  FormLabel
+  FormLabel,
+  Stack
 } from '@chakra-ui/react'
 import GlobalContext from 'context/GlobalContext'
+import { CreateAutomation } from 'graphQL/Mutation'
 import {
   toolDelete,
   supplierCreate,
@@ -106,6 +108,8 @@ const GeneralDataDrawer = ({
   const [healthRecheck] = useMutation(recheckHealth, {
     onCompleted: () => refetch()
   })
+
+  const [createAutoCheck] = useMutation(CreateAutomation)
 
   const onFilterRefetch = () => {
     filterRefetch({
@@ -242,15 +246,6 @@ const GeneralDataDrawer = ({
   }
 
   const handleSave = () => {
-    if (checkId) {
-      healthRecheck({
-        variables: {
-          checkId: checkId,
-          sbomId: sbomId
-        }
-      }).then(() => onFilterRefetch())
-    }
-
     if (creationTools.length > 0) {
       creationTools.map((item) => {
         createTool({
@@ -294,6 +289,15 @@ const GeneralDataDrawer = ({
       })
     }
 
+    if (checkId && (creationTools.length > 0 || authorList.length > 0)) {
+      healthRecheck({
+        variables: {
+          checkId: checkId,
+          sbomId: sbomId
+        }
+      })
+    }
+
     onClose()
   }
 
@@ -309,6 +313,27 @@ const GeneralDataDrawer = ({
         return 'License'
       case 'identifier':
         return 'Identifiers'
+    }
+  }
+
+  const onSaveRule = async () => {
+    try {
+      await createAutoCheck({
+        variables: {
+          projectId: productId,
+          applicable: 'document',
+          condition: 'missing',
+          attr: 'author',
+          enabled: true,
+          set: JSON.stringify(
+            { name: authorList[0].name, email: authorList[0].email },
+            null,
+            2
+          )
+        }
+      }).then((res) => res.data && handleSave())
+    } catch (error) {
+      console.log('Error', error)
     }
   }
 
@@ -335,7 +360,7 @@ const GeneralDataDrawer = ({
                     name='toolVendor'
                     value={toolVendor}
                     onChange={(e) => setToolVendor(e.target.value)}
-                />
+                  />
                 </FormControl>
                 <FormControl isRequired>
                   <FormLabel htmlFor='toolName'>Tool Name</FormLabel>
@@ -413,9 +438,9 @@ const GeneralDataDrawer = ({
                             )
                             .map((item, index) => (
                               <Tr key={index}>
-                              <Td pl={0} fontSize={'xs'}>
-                                {item.vendor}
-                              </Td>
+                                <Td pl={0} fontSize={'xs'}>
+                                  {item.vendor}
+                                </Td>
                                 <Td pl={0} fontSize={'xs'}>
                                   {item.name}
                                 </Td>
@@ -524,9 +549,7 @@ const GeneralDataDrawer = ({
                             authorList.map((item, index) => (
                               <Tr key={index}>
                                 <Td pl={0} fontSize={'xs'}>
-                                  {item.name}
-                                  <br />
-                                  {item.email}
+                                  {item.name} - {item.email}
                                 </Td>
                                 <Td pl={0} fontSize={'xs'}>
                                   {timeSince(item.updatedAt)}
@@ -690,12 +713,32 @@ const GeneralDataDrawer = ({
           </DrawerBody>
 
           <DrawerFooter>
-            <Button mr={3} onClick={onClose}>
-              Cancel
-            </Button>
-            <Button colorScheme='blue' onClick={handleSave}>
-              Save
-            </Button>
+            <Flex
+              width={'100%'}
+              justifyContent={'space-between'}
+              alignItems={'center'}
+            >
+              {checkId ? (
+                <Button
+                  fontSize={'sm'}
+                  colorScheme='blue'
+                  onClick={onSaveRule}
+                  disabled={authorList.length === 0}
+                >
+                  Save Rule
+                </Button>
+              ) : (
+                <Text></Text>
+              )}
+              <Stack direction={'row'} spacing={2} alignItems={'center'}>
+                <Button mr={3} onClick={onClose}>
+                  Cancel
+                </Button>
+                <Button colorScheme='blue' onClick={handleSave}>
+                  Save
+                </Button>
+              </Stack>
+            </Flex>
           </DrawerFooter>
         </DrawerContent>
       </Drawer>

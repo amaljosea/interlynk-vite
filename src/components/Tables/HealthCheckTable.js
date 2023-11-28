@@ -848,6 +848,7 @@ const HealthCheckTable = ({
               refetch={fetchCheckData}
               sbomData={sbomData}
               type={sbomData.format}
+              getCpe={getCpe}
             />
           )}
 
@@ -984,10 +985,11 @@ const HealthCheckTable = ({
               btnRef={authorBtn}
               data={null}
               selectedKey={'author'}
-              refetch={refetch}
+              refetch={fetchCheckData}
               filterRefetch={fetchCheckData}
               totalRows={totalRows}
               checkId={activeRow.organizationRule.rule.friendlyId}
+              getCpe={getCpe}
             />
           )}
 
@@ -1002,6 +1004,7 @@ const HealthCheckTable = ({
               totalRows={totalRows}
               checkId={activeRow.organizationRule.rule.friendlyId}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
+              getCpe={getCpe}
             />
           )}
         </>

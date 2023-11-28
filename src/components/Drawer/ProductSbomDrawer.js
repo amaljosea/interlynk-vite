@@ -1,5 +1,4 @@
 // Chakra imports
-
 import React, { useState, useEffect } from 'react'
 import {
   Drawer,
@@ -17,11 +16,8 @@ import {
   Select,
   useToast,
   Checkbox,
-  useDisclosure,
-  InputGroup,
-  InputRightElement,
-  IconButton,
-  Text
+  Text,
+  Flex
 } from '@chakra-ui/react'
 import { useMutation } from '@apollo/client'
 import { useLocation } from 'react-router-dom'
@@ -29,18 +25,10 @@ import { licenseOptions } from 'variables/licenses'
 import MultiSelect from 'react-select'
 import { sbomCreate, sbomUpdate } from 'graphQL/Mutation'
 import { CreateComponent } from 'graphQL/Mutation'
-
-import { PackageURL } from 'packageurl-js'
-import PurlModal from 'views/Dashboard/Products/components/PurlModal'
-import CpeModal from 'views/Dashboard/Products/components/CpeModal'
-import { FaExpandAlt } from 'react-icons/fa'
-import { CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import { recheckHealth } from 'graphQL/Mutation'
 import { useContext } from 'react'
 import GlobalContext from 'context/GlobalContext'
-
-const regexPattern =
-  /^cpe:2\.3:[aho]:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+:[^:]+$/
+import { CreateAutomation } from 'graphQL/Mutation'
 
 function ProductSbomDrawer(props) {
   const location = useLocation()
@@ -89,24 +77,12 @@ function ProductSbomDrawer(props) {
   const [createComponent] = useMutation(CreateComponent)
 
   const [version, setVersion] = useState('')
-  const [spec, setSpec] = useState('')
-  const [specVesion, setSpecVersion] = useState('')
+
   const [compType, setCompType] = useState('')
   const [licenseName, setLicenseName] = useState('')
-  const [selectedLicense, setSelectedLicense] = useState('')
-
-  const [cpeList, setCpeList] = useState([])
-  const [cpeValue, setCpeValue] = useState('')
-  const [cpeData, setCpeData] = useState(null)
-  const [selectedCpe, setSelectedCpe] = useState(null)
-  const [purlValue, setPurlValue] = useState('')
-  const [purlData, setPurlData] = useState(null)
 
   const [imgIds, setImgIds] = useState([])
   const [licenseList, setLicenseList] = useState([])
-
-  const [isPURLInputValid, setPURLInputValid] = useState(true)
-  const [isCPEInputValid, setCPEInputValid] = useState(true)
 
   const [healthRecheck] = useMutation(recheckHealth, {
     onCompleted: () => refetch()
@@ -114,15 +90,7 @@ function ProductSbomDrawer(props) {
 
   useEffect(() => {
     if (sbomData) {
-      // console.log(`sbom data`, sbomData)
-      setSpec(sbomData.spec)
-      setSpecVersion(sbomData.specVersion)
-      setCpeList(sbomData.cpes)
-      setPurlValue(sbomData.purl === null ? '' : sbomData.purl)
-      // if (sbomData.licenses) {
-      //   const res = sbomData.licenses.map((item) => item)
-      //   setImgIds(res)
-      // }
+      console.log(`sbom data`, sbomData)
     }
   }, [sbomData])
 
@@ -138,11 +106,7 @@ function ProductSbomDrawer(props) {
           label: 'Creative Commons Zero v1.0 Universal'
         }
       ])
-    }
-  }, [sbomData])
-
-  useEffect(() => {
-    if (sbomData && sbomData.licenses.length > 0) {
+    } else if (sbomData && sbomData.licenses.length > 0) {
       const commonValues = licenseOptions.filter((item1) =>
         sbomData.licenses.includes(item1.licenseId)
       )
@@ -165,116 +129,6 @@ function ProductSbomDrawer(props) {
     setLicenseList(selected)
     const selectedIds = selected.map((option) => option.value) // Extracting IDs
     setImgIds(selectedIds)
-  }
-
-  const {
-    isOpen: isPurlOpen,
-    onOpen: onPurlOpen,
-    onClose: onPurlClose
-  } = useDisclosure()
-
-  const {
-    isOpen: isCpeOpen,
-    onOpen: onCpeOpen,
-    onClose: onCpeClose
-  } = useDisclosure()
-
-  const matches = cpeValue.match(regexPattern)
-
-  const handlePURLInputChange = (e) => {
-    const inputValue = e.target.value
-    setPurlValue(inputValue)
-    if (inputValue == null || inputValue === '') {
-      return
-    }
-    console.log('invoking handle change ' + inputValue)
-    try {
-      PackageURL.fromString(inputValue)
-      setPURLInputValid(true)
-    } catch (ex) {
-      console.error('ex', ex)
-      setPURLInputValid(false)
-    }
-  }
-
-  const handlePurlModal = () => {
-    try {
-      console.log(purlValue)
-      const pkg = PackageURL.fromString(purlValue)
-      console.info('pkg', pkg)
-      setPurlData(pkg)
-      onPurlOpen()
-    } catch (ex) {
-      console.error('ex', ex)
-      if (purlValue != null && purlValue !== '') {
-        toast({
-          description: 'PURL is invalid. Resetting to defaults',
-          status: 'error',
-          duration: 3000,
-          position: 'top'
-        })
-      }
-      const pkg = PackageURL.fromString('pkg:generic/unknown@1.0')
-      setPurlValue('pkg:generic/unknown@1.0')
-      setPURLInputValid(true)
-      setPurlData(pkg)
-      onPurlOpen()
-    }
-  }
-
-  const handleCPEInputChange = (e) => {
-    const inputValue = e.target.value
-    setCpeValue(inputValue)
-    const matches = inputValue.match(regexPattern)
-    if (matches) {
-      const [input] = matches
-      const components = input.split(':')
-      setCpeData({
-        vendor: components[3],
-        product: components[4],
-        version: components[5],
-        targetHardware: '*'
-      })
-      setCPEInputValid(true)
-    } else {
-      setCPEInputValid(false)
-    }
-  }
-
-  const handleCpeModal = () => {
-    const matches = cpeValue.match(regexPattern)
-    console.log('matches :', matches)
-    if (cpeValue !== '' && matches) {
-      // console.log('matches :', matches)
-      const [input] = matches
-      const components = input.split(':')
-      console.log(`components`, components)
-      setCpeData({
-        vendor: components[3],
-        product: components[4],
-        version: components[5],
-        targetHardware: '*'
-      })
-      onCpeOpen()
-    } else {
-      if (cpeValue != null && cpeValue !== '') {
-        toast({
-          description: 'CPE value is invalid. Resetting to defaults',
-          status: 'error',
-          duration: 3000,
-          position: 'top'
-        })
-      }
-      setCpeData({
-        vendor: 'vendor',
-        product: 'product',
-        version: '1.0',
-        targetHardware: '*'
-      })
-      setCpeValue('cpe:2.3:a:vendor:product:1.0:*:*:*:*:*:*:*')
-      setCPEInputValid(true)
-      onCpeOpen()
-    }
   }
 
   const handleCreateComp = (id) => {
@@ -326,8 +180,6 @@ function ProductSbomDrawer(props) {
     }
   }
 
-  // console.log('imgIds', imgIds)
-
   const handleUpdateSBOM = async () => {
     try {
       await updateSbom({
@@ -360,28 +212,7 @@ function ProductSbomDrawer(props) {
   }
 
   const handleSave = () => {
-    if (purlValue !== '') {
-      try {
-        const pkg = PackageURL.fromString(purlValue)
-        if (version !== '') {
-          handleCreateSBOM()
-        } else {
-          toast({
-            description: 'Version required',
-            status: 'error',
-            position: 'top',
-            duration: 3000
-          })
-        }
-      } catch (error) {
-        toast({
-          description: error.message,
-          status: 'error',
-          position: 'top',
-          duration: 3000
-        })
-      }
-    } else {
+    try {
       if (version !== '') {
         handleCreateSBOM()
       } else {
@@ -392,62 +223,42 @@ function ProductSbomDrawer(props) {
           duration: 3000
         })
       }
-    }
-  }
-
-  const handleKeyDown = (event) => {
-    if (event.key === 'Enter') {
-      setCpeList([...cpeList, cpeValue])
-      setCpeValue('')
-    }
-  }
-
-  const handleCreateCpe = (string) => {
-    const cpeItem = cpeList.find((item) => item === string)
-    if (cpeItem) {
+    } catch (error) {
       toast({
-        description: 'CPE already exists',
+        description: error.message,
         status: 'error',
         position: 'top',
         duration: 3000
       })
-    } else {
-      setCpeList([...cpeList, string])
-      setCpeValue('')
-      setSelectedCpe(null)
     }
-  }
-
-  const handleUpdateCpe = (string, id) => {
-    const cpeItem = cpeList.find((item) => item === string)
-    if (cpeItem) {
-      toast({
-        description: 'CPE already exists',
-        status: 'error',
-        position: 'top',
-        duration: 3000
-      })
-    } else if (cpeList.find((item, index) => index === id)) {
-      const updatedData = cpeList.map((item, index) => {
-        if (index === id) {
-          return string
-        }
-        return item
-      })
-      setCpeList(updatedData)
-      setCpeValue('')
-      setSelectedCpe(null)
-    }
-  }
-
-  const deleteCpe = (index) => {
-    const updatedItems = cpeList.filter((_, i) => i.id !== index)
-    setCpeList(updatedItems)
   }
 
   const containesOther =
     licenseList.length > 0 &&
     licenseList.some((item) => item.value === 'Other' && item.label === 'Other')
+
+  const [createAutoCheck] = useMutation(CreateAutomation)
+
+  const onSaveRule = async () => {
+    try {
+      await createAutoCheck({
+        variables: {
+          projectId: productId,
+          applicable: 'document',
+          condition: 'missing',
+          attr: 'license_spdx',
+          enabled: true,
+          set: JSON.stringify(
+            { value: sbomData.licenses.length === 0 ? ['CC0-1.0'] : imgIds },
+            null,
+            2
+          )
+        }
+      }).then((res) => res.data && handleUpdateSBOM())
+    } catch (error) {
+      console.log('Error', error)
+    }
+  }
 
   return (
     <>
@@ -524,7 +335,9 @@ function ProductSbomDrawer(props) {
 
               {/* Licenses */}
               <Stack spacing={2} fontSize={'sm'}>
-                <Text fontSize={'sm'} color={'#222'}>Licenses</Text>
+                <Text fontSize={'sm'} color={'#222'}>
+                  Licenses
+                </Text>
                 <MultiSelect
                   styles={{
                     control: (baseStyles, state) => ({
@@ -573,43 +386,36 @@ function ProductSbomDrawer(props) {
             </Stack>
           </DrawerBody>
           <DrawerFooter borderTopWidth='1px'>
-            <Button mr={3} onClick={onClose}>
-              Cancel
-            </Button>
-            {sbomData ? (
-              <Button colorScheme='blue' onClick={handleUpdateSBOM}>
-                Update
-              </Button>
-            ) : (
-              <Button colorScheme='blue' onClick={handleSave}>
-                Save
-              </Button>
-            )}
+            <Flex
+              width={'100%'}
+              justifyContent={'space-between'}
+              alignItems={'center'}
+            >
+              {checkId ? (
+                <Button fontSize={'sm'} colorScheme='blue' onClick={onSaveRule}>
+                  Save Rule
+                </Button>
+              ) : (
+                <Text></Text>
+              )}
+              <Stack direction={'row'} spacing={2} alignItems={'center'}>
+                <Button mr={3} onClick={onClose}>
+                  Cancel
+                </Button>
+                {sbomData ? (
+                  <Button colorScheme='blue' onClick={handleUpdateSBOM}>
+                    Update
+                  </Button>
+                ) : (
+                  <Button colorScheme='blue' onClick={handleSave}>
+                    Save
+                  </Button>
+                )}
+              </Stack>
+            </Flex>
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
-
-      {isPurlOpen && (
-        <PurlModal
-          data={purlData}
-          isOpen={isPurlOpen}
-          onClose={onPurlClose}
-          setPurlValue={setPurlValue}
-          purlValue={purlValue}
-        />
-      )}
-
-      {isCpeOpen && (
-        <CpeModal
-          data={cpeData}
-          isOpen={isCpeOpen}
-          onClose={onCpeClose}
-          cpeValue={cpeValue}
-          onCreateCpe={handleCreateCpe}
-          onUpdateCpe={handleUpdateCpe}
-          selectedCpe={selectedCpe}
-        />
-      )}
     </>
   )
 }
