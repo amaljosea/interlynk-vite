@@ -25,8 +25,6 @@ import LicenseField from 'components/LicenseField'
 function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
   const toast = useToast()
 
-  console.log('data', data)
-
   const {
     prodField,
     prodDirection,

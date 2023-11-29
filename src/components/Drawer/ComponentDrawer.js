@@ -80,8 +80,6 @@ function ComponentDrawer(props) {
     filterRefetch
   } = props
 
-  console.log('data', data)
-
   const { setCompFilters, licenseType, spdxLicense, licenseExp } =
     useContext(GlobalContext)
 

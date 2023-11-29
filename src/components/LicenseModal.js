@@ -46,8 +46,6 @@ const LicenseModal = ({
     (licenseType === 'license_exp' && licenseExp.length === 0) ||
     (licenseType === 'license_custom' && customLicense.length === 0)
 
-  console.log('data', data)
-
   const handleRefetch = () => {
     refetch({
       projectId: productId,

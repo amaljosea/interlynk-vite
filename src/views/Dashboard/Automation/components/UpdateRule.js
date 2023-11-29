@@ -26,7 +26,7 @@ const UpdateRule = ({ isOpen, onClose, data, getData, productId }) => {
 
   useEffect(() => {
     if (data) {
-      console.log('data', data)
+      // console.log('data', data)
       setCompName(
         data.applicability === 'component' ? data.lookup.comp_name : ''
       )
