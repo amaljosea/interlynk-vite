@@ -875,6 +875,7 @@ export const sbomCreate = gql`
     $specVersion: String
     $format: String
     $licenses: [String!]
+    $licenseExp: [String!]
   ) {
     sbomCreate(
       input: {
@@ -883,6 +884,7 @@ export const sbomCreate = gql`
         specVersion: $specVersion
         format: $format
         licenses: $licenses
+        licenseExp: $licenseExp
       }
     ) {
       errors
