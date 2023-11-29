@@ -508,7 +508,10 @@ export const GetProductData = gql`
       creationAt
       updatedAt
       licenses
+      licenseExp
       format
+      spec
+      specVersion
       tools {
         id
         name

@@ -905,6 +905,7 @@ export const sbomUpdate = gql`
     $specVersion: String
     $format: String
     $licenses: [String!]
+    $licenseExp: [String!]
   ) {
     sbomUpdate(
       input: {
@@ -913,6 +914,7 @@ export const sbomUpdate = gql`
         specVersion: $specVersion
         format: $format
         licenses: $licenses
+        licenseExp: $licenseExp
       }
     ) {
       errors

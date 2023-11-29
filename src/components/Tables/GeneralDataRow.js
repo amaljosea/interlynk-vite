@@ -35,13 +35,15 @@ import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
 import { authorDelete } from 'graphQL/Mutation'
 import { toolDelete } from 'graphQL/Mutation'
 import { supplierDelete } from 'graphQL/Mutation'
-import { useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { getFullDateAndTime } from 'utils'
 import MultiSelect from 'react-select'
 import { licenseOptions } from 'variables/licenses'
 import PriSupplierModal from 'views/Sbom/components/PriSupplierModal'
 import { sbomUpdate } from 'graphQL/Mutation'
+import LicenseModal from 'components/LicenseModal'
+import GlobalContext from 'context/GlobalContext'
 
 const GeneralDataRow = ({ status, data, refetch }) => {
   const location = useLocation()
@@ -49,19 +51,19 @@ const GeneralDataRow = ({ status, data, refetch }) => {
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
+  const { setLicenseType, licenseType, spdxLicense, licenseExp } =
+    useContext(GlobalContext)
+
   const textColor = useColorModeValue('gray.700', 'white')
-
   const customerView = location.pathname.startsWith('/customer')
-
   const [selectedKey, setSelectedKey] = useState('')
-  const [licenseList, setLicenseList] = useState([])
-  const [imgIds, setImgIds] = useState([])
   const [activeTool, setActiveTool] = useState(null)
 
   const btnRef = useRef(null)
   const licenseBtn = useRef(null)
 
   const { isOpen, onOpen, onClose } = useDisclosure()
+
   const {
     isOpen: isDelOpen,
     onOpen: onDelOpen,
@@ -161,53 +163,14 @@ const GeneralDataRow = ({ status, data, refetch }) => {
     onOpen()
   }
 
-  const handleLicenseOpen = () => {
-    if (data && data.licenses.length > 0) {
-      const commonValues = licenseOptions.filter((item1) =>
-        data.licenses.includes(item1.licenseId)
-      )
-      const finalData = commonValues.map((item) => {
-        return {
-          value: item.licenseId,
-          label: item.name
-        }
-      })
-      setLicenseList(finalData)
-    }
-    onSBMOpen()
-  }
-
-  const licenses = licenseOptions.map((option) => ({
-    value: option.licenseId,
-    label: option.name
-  }))
-
-  useEffect(() => {
-    if (data && data.licenses.length === 0) {
-      setLicenseList([
-        {
-          value: 'CC0-1.0',
-          label: 'Creative Commons Zero v1.0 Universal'
-        }
-      ])
-    } else {
-      setImgIds(data.licenses)
-    }
-  }, [data])
-
-  const onLicenseChange = (selected) => {
-    setLicenseList(selected)
-    const selectedIds = selected.map((option) => option.value) // Extracting IDs
-    setImgIds(selectedIds)
-  }
-
   const onUpdateLicense = async () => {
     try {
       await updateSbom({
         variables: {
           id: data.id,
-          spec: 'cyclonedx',
-          licenses: data && data.licenses.length === 0 ? ['CC0-1.0'] : imgIds
+          spec: data.spec,
+          licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
+          licenseExp: licenseType === 'license_exp' ? licenseExp : undefined
         }
       }).then((res) => res.data && onSBMClose())
     } catch (error) {
@@ -446,7 +409,10 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                     size='sm'
                     ref={licenseBtn}
                     isDisabled={status === 'signed'}
-                    onClick={handleLicenseOpen}
+                    onClick={() => {
+                      setLicenseType('license_spdx')
+                      onSBMOpen()
+                    }}
                   >
                     <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
                   </Button>
@@ -472,58 +438,12 @@ const GeneralDataRow = ({ status, data, refetch }) => {
 
       {/* SBOM DRAWER */}
       {isSBMOpen && data && !customerView && (
-        <Modal isOpen={isSBMOpen} onClose={onSBMClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>{data ? 'Update' : 'Save'} License</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <FormControl>
-                <FormLabel fontSize={'sm'}>
-                  <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-                    <Text>Licenses</Text>
-                    <Tooltip label='List of licenses applicable to the component'>
-                      <Icon as={InfoIcon} color={'blue.500'} />
-                    </Tooltip>
-                  </Flex>
-                </FormLabel>
-                <MultiSelect
-                  styles={{
-                    control: (baseStyles, state) => ({
-                      ...baseStyles,
-                      borderColor: state.isFocused ? 'inherit' : 'inherit',
-                      '&:hover': {
-                        borderColor: '#CBD5E0'
-                      }
-                    })
-                  }}
-                  isMulti
-                  value={licenseList}
-                  options={licenses}
-                  onChange={onLicenseChange}
-                />
-              </FormControl>
-            </ModalBody>
-            <ModalFooter>
-              <Button fontSize={'sm'} mr={3} onClick={onSBMClose}>
-                Close
-              </Button>
-              {data ? (
-                <Button
-                  fontSize={'sm'}
-                  colorScheme='blue'
-                  onClick={onUpdateLicense}
-                >
-                  Update
-                </Button>
-              ) : (
-                <Button fontSize={'sm'} colorScheme='blue'>
-                  Save
-                </Button>
-              )}
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+        <LicenseModal
+          isOpen={isSBMOpen}
+          onClose={onSBMClose}
+          data={data}
+          onSubmit={onUpdateLicense}
+        />
       )}
 
       {/* SUPPLIER MODAL */}

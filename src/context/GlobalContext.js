@@ -5,7 +5,7 @@ const GlobalContext = React.createContext({
   setVulnerabilitiesData: () => {},
   totalProducts: 0,
   setTotalProducts: () => {},
-  prodSearchInput:'',
+  prodSearchInput: '',
   setProdSearchInput: () => {},
   totalVulns: 0,
   setTotalVulns: () => {},
@@ -164,7 +164,15 @@ const GlobalContext = React.createContext({
   cpeString: '',
   setCpeString: () => {},
   purlString: '',
-  setPurlString: () => {}
+  setPurlString: () => {},
+  spdxLicense: [],
+  setSpdxLicense: () => {},
+  licenseExp: [],
+  setLicenseExp: () => {},
+  customLicense: [],
+  setCustomLicense: () => {},
+  licenseType: 'license_spdx',
+  setLicenseType: () => {}
 })
 
 export default GlobalContext

@@ -124,6 +124,12 @@ const ContextWrapper = (props) => {
   const [cpeString, setCpeString] = useState('')
   const [purlString, setPurlString] = useState('')
 
+  // LICENSE TYPES
+  const [licenseType, setLicenseType] = useState('license_spdx')
+  const [spdxLicense, setSpdxLicense] = useState([])
+  const [licenseExp, setLicenseExp] = useState([])
+  const [customLicense, setCustomLicense] = useState([])
+
   return (
     <GlobalContext.Provider
       value={{
@@ -283,7 +289,15 @@ const ContextWrapper = (props) => {
         cpeString,
         setCpeString,
         purlString,
-        setPurlString
+        setPurlString,
+        spdxLicense,
+        setSpdxLicense,
+        licenseExp,
+        setLicenseExp,
+        customLicense,
+        setCustomLicense,
+        licenseType,
+        setLicenseType
       }}
     >
       {props.children}
