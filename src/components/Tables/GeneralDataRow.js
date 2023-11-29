@@ -3,8 +3,6 @@ import { EditIcon, InfoIcon } from '@chakra-ui/icons'
 import {
   Button,
   Flex,
-  FormControl,
-  FormLabel,
   HStack,
   Icon,
   Link,
@@ -38,11 +36,9 @@ import { supplierDelete } from 'graphQL/Mutation'
 import { useContext, useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { getFullDateAndTime } from 'utils'
-import MultiSelect from 'react-select'
-import { licenseOptions } from 'variables/licenses'
 import PriSupplierModal from 'views/Sbom/components/PriSupplierModal'
 import { sbomUpdate } from 'graphQL/Mutation'
-import LicenseModal from 'components/LicenseModal'
+import LicenseField from 'components/LicenseField'
 import GlobalContext from 'context/GlobalContext'
 
 const GeneralDataRow = ({ status, data, refetch }) => {
@@ -51,8 +47,13 @@ const GeneralDataRow = ({ status, data, refetch }) => {
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
-  const { setLicenseType, licenseType, spdxLicense, licenseExp } =
-    useContext(GlobalContext)
+  const {
+    setLicenseType,
+    licenseType,
+    spdxLicense,
+    licenseExp,
+    customLicense
+  } = useContext(GlobalContext)
 
   const textColor = useColorModeValue('gray.700', 'white')
   const customerView = location.pathname.startsWith('/customer')
@@ -162,6 +163,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
     setSelectedKey(ref)
     onOpen()
   }
+
 
   const onUpdateLicense = async () => {
     try {
@@ -436,14 +438,39 @@ const GeneralDataRow = ({ status, data, refetch }) => {
         />
       )}
 
-      {/* SBOM DRAWER */}
+      {/* SBOM LICENSE DRAWER */}
       {isSBMOpen && data && !customerView && (
-        <LicenseModal
-          isOpen={isSBMOpen}
-          onClose={onSBMClose}
-          data={data}
-          onSubmit={onUpdateLicense}
-        />
+        <Modal isOpen={isSBMOpen} onClose={onSBMClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>
+              {data.licenses.length > 0 ? 'Update' : 'Add'} License
+            </ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <LicenseField data={data} />
+            </ModalBody>
+            <ModalFooter>
+              <Button fontSize={'sm'} mr={3} onClick={onSBMClose}>
+                Close
+              </Button>
+              <Button
+                fontSize={'sm'}
+                colorScheme='blue'
+                disabled={
+                  (licenseType === 'license_spdx' &&
+                    spdxLicense.length === 0) ||
+                  (licenseType === 'license_exp' && licenseExp.length === 0) ||
+                  (licenseType === 'license_custom' &&
+                    customLicense.length === 0)
+                }
+                onClick={onUpdateLicense}
+              >
+                {data.licenses.length > 0 ? 'Update' : 'Save'}
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       )}
 
       {/* SUPPLIER MODAL */}
