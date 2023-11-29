@@ -17,24 +17,21 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Radio,
-  RadioGroup,
   Select,
   Stack,
   Text,
-  Tooltip,
-  VStack
+  Tooltip
 } from '@chakra-ui/react'
 import LicenseField from 'components/LicenseField'
 import GlobalContext from 'context/GlobalContext'
-import { CreateAutomation } from 'graphQL/Mutation'
-import { UpdateComponent, recheckHealth } from 'graphQL/Mutation'
 import { GetComponentData } from 'graphQL/Queries'
-import { useContext, useEffect } from 'react'
-import { useState } from 'react'
+import {
+  UpdateComponent,
+  recheckHealth,
+  CreateAutomation
+} from 'graphQL/Mutation'
+import { useContext, useEffect, useState, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
-import MultiSelect from 'react-select'
-import { licenseOptions } from 'variables/licenses'
 
 const CheckModal = ({
   activeCheck,
@@ -51,7 +48,7 @@ const CheckModal = ({
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
-  // console.log('activeCheck', activeCheck)
+  const compRef = useRef()
 
   // GET COMPONENT DATA
   const [getCompData, { data }] = useLazyQuery(GetComponentData, {
@@ -62,7 +59,6 @@ const CheckModal = ({
     licenseType,
     spdxLicense,
     licenseExp,
-    customLicense,
     setCheckFilters,
     setActiveProdTab,
     compField,
@@ -70,15 +66,11 @@ const CheckModal = ({
   } = useContext(GlobalContext)
 
   const now = new Date()
-  const hours = String(now.getHours()).padStart(2, '0')
-  const minutes = String(now.getMinutes()).padStart(2, '0')
-  // const currentTime = `${hours}:${minutes}`
   const currentTime = now.toISOString().slice(0, 16)
 
   const [timestamp, setTimestamp] = useState(currentTime)
   const [comp, setComp] = useState('')
   const [compType, setCompType] = useState('')
-  const [selectedLicenses, setSelectedLicenses] = useState([])
   const [componentList, setComponentList] = useState([])
   const [activeComp, setActiveComp] = useState(null)
 
@@ -87,6 +79,20 @@ const CheckModal = ({
   })
 
   const [updateComponent] = useMutation(UpdateComponent)
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (compRef.current && !compRef.current.contains(event.target)) {
+        setComponentList([])
+      }
+    }
+
+    document.addEventListener('click', handleClickOutside)
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside)
+    }
+  }, [])
 
   useEffect(() => {
     if (isOpen) {
@@ -187,8 +193,6 @@ const CheckModal = ({
     }
   }
 
-  // console.log('component list', componentList)
-
   const heading = (name) => {
     switch (name) {
       case 'Document creation timestamp':
@@ -227,50 +231,42 @@ const CheckModal = ({
 
   const onSaveRule = async () => {
     if (activeComp) {
-      try {
-        await createAutoCheck({
-          variables: {
-            projectId: productId,
-            applicable: 'component',
-            condition: 'missing',
-            attr: 'primary',
-            enabled: true,
-            compName: activeComp.name,
-            compVersion: activeComp.version,
-            set: JSON.stringify({ value: true }, null, 2)
-          }
-        }).then((res) => res.data && handleComUpdate())
-      } catch (error) {
-        console.log('Error', error)
-      }
+      await createAutoCheck({
+        variables: {
+          projectId: productId,
+          applicable: 'component',
+          condition: 'missing',
+          attr: 'primary',
+          enabled: true,
+          compName: activeComp.name,
+          compVersion: activeComp.version,
+          set: JSON.stringify({ value: true }, null, 2)
+        }
+      }).then((res) => res.data && handleComUpdate())
     } else {
-      try {
-        await createAutoCheck({
-          variables: {
-            projectId: productId,
-            applicable: 'component',
-            condition: 'missing',
-            attr: licenseType,
-            enabled: true,
-            compName: activeCheck?.component?.name,
-            compVersion: activeCheck?.component?.version,
-            set: JSON.stringify(
-              {
-                value:
-                  licenseType === 'license_spdx'
-                    ? spdxLicense
-                    : licenseType === 'license_exp'
-                    ? licenseExp
-                    : ''
-              },
-              null,
-              2
-            )
-          }
-        }).then((res) => res.data && onLicenseUpdate())
-      } catch (error) {
-        console.log('Error', error)
-      }
+      await createAutoCheck({
+        variables: {
+          projectId: productId,
+          applicable: 'component',
+          condition: 'missing',
+          attr: licenseType,
+          enabled: true,
+          compName: activeCheck?.component?.name,
+          compVersion: activeCheck?.component?.version,
+          set: JSON.stringify(
+            {
+              value:
+                licenseType === 'license_spdx'
+                  ? spdxLicense
+                  : licenseType === 'license_exp'
+                  ? licenseExp
+                  : ''
+            },
+            null,
+            2
+          )
+        }
+      }).then((res) => res.data && onLicenseUpdate())
     }
   }
 
@@ -299,18 +295,21 @@ const CheckModal = ({
                     position='absolute'
                     zIndex='1'
                     width='100%'
-                    top={12}
+                    top={10}
                     mt='8'
                     bg='white'
                     border='1px solid #ccc'
                     height={'300px'}
                     overflowY={'scroll'}
+                    borderRadius={4}
+                    ref={compRef}
                   >
                     <List>
                       {componentList.map((item, index) => (
                         <ListItem
                           key={index}
                           cursor='pointer'
+                          fontSize={'sm'}
                           onClick={() => {
                             setActiveComp(item)
                             setComp(item.name)
