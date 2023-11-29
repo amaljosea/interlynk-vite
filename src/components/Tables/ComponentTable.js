@@ -92,6 +92,10 @@ const ComponentTable = ({
   const y = window.matchMedia('(max-width: 1440px)')
 
   const {
+    setSpdxList,
+    setSpdxLicense,
+    setExpList,
+    setLicenseExp,
     setLicenseType,
     compSearchInput,
     setCompSearchInput,
@@ -198,6 +202,41 @@ const ComponentTable = ({
     onClose: onCompClose,
     onToggle: onCompToggle
   } = useDisclosure()
+
+  const onLicenseOpen = (row) => {
+    setLicenseType('license_spdx')
+    setActiveRow(row)
+    if (row.licenses && row.licenses.length > 0) {
+      const commonValues = licenseOptions.filter((item) =>
+        row.licenses.includes(item.licenseId)
+      )
+      const filterData = commonValues.map((option) => ({
+        value: option.licenseId,
+        label: option.name
+      }))
+      setSpdxList(filterData)
+      const selectedIds = filterData.map((option) => option.value)
+      setSpdxLicense(selectedIds)
+    } else {
+      setSpdxList([
+        {
+          value: 'CC0-1.0',
+          label: 'Creative Commons Zero v1.0 Universal'
+        }
+      ])
+      setSpdxLicense(['CC0-1.0'])
+    }
+    onOpen()
+  }
+
+  const onCreateComponent = () => {
+    setLicenseType('license_spdx')
+    setSpdxList([])
+    setSpdxLicense([])
+    setExpList([])
+    setLicenseExp([])
+    onCompOpen()
+  }
 
   // ADD KEYBOARD SHORTCUT FOR TOGGLE COMPONENT DRAWER
   const handleCompDown = (event) => {
@@ -487,11 +526,7 @@ const ComponentTable = ({
                 <Portal>
                   <MenuList size='sm'>
                     <MenuItem
-                      onClick={() => {
-                        setLicenseType('license_spdx')
-                        setActiveRow(row)
-                        onOpen()
-                      }}
+                      onClick={() => onLicenseOpen(row)}
                       isDisabled={status === 'signed'}
                     >
                       Edit Component
@@ -825,10 +860,7 @@ const ComponentTable = ({
           <Tooltip label='Add Component'>
             <IconButton
               ref={compBtn}
-              onClick={() => {
-                setLicenseType('license_spdx')
-                onCompOpen()
-              }}
+              onClick={onCreateComponent}
               icon={<AddIcon />}
               colorScheme='blue'
               variant='solid'
@@ -1011,7 +1043,7 @@ const ComponentTable = ({
               onClose={onClose}
               component={activeRow.name}
               version={activeRow.version}
-              license={activeRow.licenses !== null ? activeRow.licenses : []}
+              exp={activeRow?.licenseExp}
               type={activeRow.kind}
               fetchCompData={fetchCompData}
               filterRefetch={filterRefetch}
@@ -1078,10 +1110,9 @@ const ComponentTable = ({
         <ComponentDrawer
           isOpen={isCompOpen}
           onClose={onCompClose}
-          data={null}
           component={''}
           version={''}
-          license={''}
+          exp={null}
           type={''}
           cpes={[]}
           purl={''}

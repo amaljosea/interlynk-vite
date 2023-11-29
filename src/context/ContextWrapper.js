@@ -125,6 +125,10 @@ const ContextWrapper = (props) => {
   const [purlString, setPurlString] = useState('')
 
   // LICENSE TYPES
+  const [spdxList, setSpdxList] = useState([])
+  const [expList, setExpList] = useState([])
+  const [customList, setCustomList] = useState([])
+
   const [licenseType, setLicenseType] = useState('license_spdx')
   const [spdxLicense, setSpdxLicense] = useState([])
   const [licenseExp, setLicenseExp] = useState([])
@@ -290,6 +294,12 @@ const ContextWrapper = (props) => {
         setCpeString,
         purlString,
         setPurlString,
+        spdxList,
+        setSpdxList,
+        expList,
+        setExpList,
+        customList,
+        setCustomList,
         spdxLicense,
         setSpdxLicense,
         licenseExp,

@@ -40,6 +40,7 @@ import PriSupplierModal from 'views/Sbom/components/PriSupplierModal'
 import { sbomUpdate } from 'graphQL/Mutation'
 import LicenseField from 'components/LicenseField'
 import GlobalContext from 'context/GlobalContext'
+import { licenseOptions } from 'variables/licenses'
 
 const GeneralDataRow = ({ status, data, refetch }) => {
   const location = useLocation()
@@ -48,9 +49,11 @@ const GeneralDataRow = ({ status, data, refetch }) => {
   const sbomId = queryParams.get('sbom')
 
   const {
+    setSpdxList,
     setLicenseType,
     licenseType,
     spdxLicense,
+    setSpdxLicense,
     licenseExp,
     customLicense
   } = useContext(GlobalContext)
@@ -164,7 +167,6 @@ const GeneralDataRow = ({ status, data, refetch }) => {
     onOpen()
   }
 
-
   const onUpdateLicense = async () => {
     try {
       await updateSbom({
@@ -178,6 +180,31 @@ const GeneralDataRow = ({ status, data, refetch }) => {
     } catch (error) {
       console.log(`Mutation error `, error)
     }
+  }
+
+  const onLicenseOpen = () => {
+    setLicenseType('license_spdx')
+    if (data && data.licenses.length > 0) {
+      const commonValues = licenseOptions.filter((item) =>
+        data.licenses.includes(item.licenseId)
+      )
+      const filterData = commonValues.map((option) => ({
+        value: option.licenseId,
+        label: option.name
+      }))
+      setSpdxList(filterData)
+      const selectedIds = filterData.map((option) => option.value)
+      setSpdxLicense(selectedIds)
+    } else {
+      setSpdxList([
+        {
+          value: 'CC0-1.0',
+          label: 'Creative Commons Zero v1.0 Universal'
+        }
+      ])
+      setSpdxLicense(['CC0-1.0'])
+    }
+    onSBMOpen()
   }
 
   // ADD KEYBOARD SHORTCUT FOR TOGGLE SBOM DRAWER
@@ -411,10 +438,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                     size='sm'
                     ref={licenseBtn}
                     isDisabled={status === 'signed'}
-                    onClick={() => {
-                      setLicenseType('license_spdx')
-                      onSBMOpen()
-                    }}
+                    onClick={onLicenseOpen}
                   >
                     <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
                   </Button>
@@ -444,11 +468,11 @@ const GeneralDataRow = ({ status, data, refetch }) => {
           <ModalOverlay />
           <ModalContent>
             <ModalHeader>
-              {data.licenses.length > 0 ? 'Update' : 'Add'} License
+              {data?.licenses.length > 0 ? 'Update' : 'Add'} License
             </ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              <LicenseField data={data} />
+              <LicenseField exp={data?.licenseExp} />
             </ModalBody>
             <ModalFooter>
               <Button fontSize={'sm'} mr={3} onClick={onSBMClose}>

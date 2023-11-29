@@ -13,18 +13,20 @@ import {
   Alert,
   AlertIcon
 } from '@chakra-ui/react'
-import { useState, useEffect, useContext } from 'react'
+import { useContext } from 'react'
 import { licenseOptions } from 'variables/licenses'
 import CreatableSelect from 'react-select/creatable'
 import ReactSelect from 'react-select'
 import GlobalContext from 'context/GlobalContext'
 
-const LicenseField = ({ data }) => {
-  const [spdxList, setSpdxList] = useState([])
-  const [expList, setExpList] = useState([])
-  const [customList, setCustomList] = useState([])
-
+const LicenseField = ({ exp }) => {
   const {
+    spdxList,
+    setSpdxList,
+    expList,
+    setExpList,
+    customList,
+    setCustomList,
     licenseType,
     setLicenseType,
     setSpdxLicense,
@@ -73,8 +75,8 @@ const LicenseField = ({ data }) => {
     setLicenseType(value)
     switch (value) {
       case 'license_exp':
-        if (data && data.licenseExp.length > 0) {
-          const filterData = data.licenseExp.map((option) => ({
+        if (exp && exp.length > 0) {
+          const filterData = exp.map((option) => ({
             value: option,
             label: option
           }))
@@ -84,29 +86,6 @@ const LicenseField = ({ data }) => {
         }
     }
   }
-
-  useEffect(() => {
-    if (data && data.licenses.length > 0 && licenseType === 'license_spdx') {
-      const commonValues = licenseOptions.filter((item) =>
-        data.licenses.includes(item.licenseId)
-      )
-      const filterData = commonValues.map((option) => ({
-        value: option.licenseId,
-        label: option.name
-      }))
-      setSpdxList(filterData)
-      const selectedIds = filterData.map((option) => option.value)
-      setSpdxLicense(selectedIds)
-    } else {
-      setSpdxList([
-        {
-          value: 'CC0-1.0',
-          label: 'Creative Commons Zero v1.0 Universal'
-        }
-      ])
-      setSpdxLicense(['CC0-1.0'])
-    }
-  }, [data])
 
   return (
     <VStack spacing={4} alignItems={'flex-start'}>
@@ -207,7 +186,6 @@ const LicenseField = ({ data }) => {
               value={customList}
               onChange={onCustomChange}
               placeholder={'Enter License Name'}
-              className='react-select'
             />
           </>
         )}
