@@ -18,6 +18,8 @@ import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
 import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import LicenseModal from 'components/LicenseModal'
 import GlobalContext from 'context/GlobalContext'
+import { CreateAutomation } from 'graphQL/Mutation'
+import { UpdateComponent } from 'graphQL/Mutation'
 import { recheckHealth, checkResultUpdate } from 'graphQL/Mutation'
 import { CpeAutoComplete } from 'graphQL/Queries'
 import { PackageURL } from 'packageurl-js'
@@ -160,6 +162,8 @@ const HealthCheckTable = ({
   })
 
   const [getCpe] = useLazyQuery(CpeAutoComplete)
+  const [updateComponent] = useMutation(UpdateComponent)
+  const [createAutoCheck] = useMutation(CreateAutomation)
 
   const supplierBtn = useRef(null)
   const creationToolBtn = useRef(null)
@@ -396,6 +400,42 @@ const HealthCheckTable = ({
     onLicenseOpen()
   }
 
+  const handleComUpdate = async (row) => {
+    await updateComponent({
+      variables: {
+        id: row.componentId,
+        sbomId: sbomId,
+        uniqueId: true
+      }
+    }).then((res) => {
+      if (res.data) {
+        healthRecheck({
+          variables: {
+            checkId: row.organizationRule.rule.friendlyId,
+            sbomId: sbomId
+          }
+        })
+      }
+    })
+  }
+
+  // CHECK UNIQUE IDENTIFIER
+  const handleUniqueID = async (row) => {
+    setActiveRow(row)
+    await createAutoCheck({
+      variables: {
+        projectId: productId,
+        applicable: 'component',
+        condition: 'missing',
+        attr: 'uniq_serial',
+        enabled: true,
+        compName: row.component.name,
+        compVersion: row.component.version,
+        set: JSON.stringify({ value: '' }, null, 2)
+      }
+    }).then((res) => res.data && handleComUpdate(row))
+  }
+
   const handleOpen = (row) => {
     const { organizationRule } = row
 
@@ -487,6 +527,13 @@ const HealthCheckTable = ({
     ) {
       return handleOpenLicense()
     }
+
+    // // COMPONENT UNIQUE IDENTIFIER
+    // if (
+    //   organizationRule.rule.shortDesc === 'Component has a unique identifier'
+    // ) {
+    //   return handleUniqueID()
+    // }
   }
 
   const updateIssue = async (id) => {
@@ -670,7 +717,12 @@ const HealthCheckTable = ({
                     colorScheme='blue'
                     fontWeight='normal'
                     icon={<BiSolidWrench size={18} />}
-                    onClick={() => handleOpen(row)}
+                    onClick={() =>
+                      row.organizationRule.rule.shortDesc ===
+                      'Component has a unique identifier'
+                        ? handleUniqueID(row)
+                        : handleOpen(row)
+                    }
                     disabled={customerView}
                   />
                 </Tooltip>
