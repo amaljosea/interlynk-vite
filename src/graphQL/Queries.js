@@ -38,6 +38,11 @@ export const GetOrg = gql`
         enabled
         name
       }
+      organizationComponents {
+        id
+        matchStr
+        updatedAt
+      }
     }
   }
 `

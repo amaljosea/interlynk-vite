@@ -9,6 +9,48 @@ export const orgUpdate = gql`
   }
 `
 
+// CREATE INTERNAL COMPONENT
+export const createOrgComp = gql`
+  mutation createOrgComp($match: String!) {
+    organizationComponentCreate(input: { matchStr: $match }) {
+      organizationComponent {
+        matchStr
+        updatedAt
+        id
+      }
+      errors
+    }
+  }
+`
+
+// UPDATE INTERNAL COMPONENT
+export const updateOrgComp = gql`
+  mutation updateOrgComp($id: ID!, $match: String!) {
+    organizationComponentUpdate(input: { id: $id, matchStr: $match }) {
+      organizationComponent {
+        matchStr
+        updatedAt
+        id
+      }
+      errors
+    }
+  }
+`
+
+// DELETE INTERNAL COMPONENT
+export const deleteOrgComp = gql`
+  mutation deleteOrgComp($id: ID!) {
+    organizationComponentDelete(input: { id: $id }) {
+      organizationComponent {
+        matchStr
+        updatedAt
+        id
+      }
+      errors
+    }
+  }
+`
+
 // ORGANIZATION RULE UPDATE
 export const orgRuleUpdate = gql`
   mutation orgRuleUpdate(
