@@ -113,7 +113,7 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
           attr: 'supplier',
           enabled: true,
           set: JSON.stringify(
-            { name: supName, contactEmail: supEmail },
+            { name: supName, contact_email: supEmail },
             null,
             2
           )
