@@ -38,6 +38,11 @@ export const GetOrg = gql`
         enabled
         name
       }
+      organizationComponents {
+        id
+        matchStr
+        updatedAt
+      }
     }
   }
 `
@@ -508,7 +513,10 @@ export const GetProductData = gql`
       creationAt
       updatedAt
       licenses
+      licenseExp
       format
+      spec
+      specVersion
       tools {
         id
         name
@@ -868,6 +876,8 @@ export const GetCheckResults = gql`
             id
             name
             version
+            licenses
+            licenseExp
           }
           organizationRule {
             severity

@@ -24,7 +24,8 @@ const CpeInput = ({
   setCpeList,
   inputRef,
   validation,
-  onChange
+  onChange,
+  onBlur
 }) => {
   const [isValid, setIsValid] = useState(true)
 
@@ -115,8 +116,9 @@ const CpeInput = ({
             placeholder={name === 'cpe' ? 'CPE' : ''}
             value={inputValue}
             onChange={onChange}
+            onBlur={onBlur}
           />
-          {validation && (
+          {validation === true && (
             <InputRightElement align='center' zIndex={-1}>
               {inputValue != null && inputValue !== '' ? (
                 isValid ? (
@@ -129,7 +131,7 @@ const CpeInput = ({
           )}
         </InputGroup>
       </FormControl>
-      {inputValue !== '' && cpeList.length > 0 && (
+      {cpeList.length > 0 && (
         <Box
           pos={'absolute'}
           width={'100%'}

@@ -1,4 +1,5 @@
 // Chakra imports
+import { useMutation } from '@apollo/client'
 import {
   Flex,
   Text,
@@ -17,51 +18,68 @@ import {
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
+import { updateOrgComp, deleteOrgComp, createOrgComp } from 'graphQL/Mutation'
 import { useState } from 'react'
 
-const ComponentFeed = () => {
+const ComponentFeed = ({ data, refetch }) => {
   const textColor = useColorModeValue('gray.700', 'white')
 
   const [compName, setCompName] = useState('')
-  const [compNameList, setCompNameList] = useState([])
   const [activeId, setActiveId] = useState(null)
   const [isMatch, setIsMatch] = useState(true)
+
+  const [createComp] = useMutation(createOrgComp)
+  const [updateComp] = useMutation(updateOrgComp)
+  const [deleteComp] = useMutation(deleteOrgComp)
 
   const handleKeyDown = (event) => {
     if (event.key === 'Enter' && isMatch) {
       if (activeId !== null) {
-        const data = [...compNameList]
-        data[activeId] = compName
-        setCompNameList(data)
-        setCompName('')
-        setActiveId(null)
+        updateComp({
+          variables: {
+            id: activeId,
+            match: compName
+          }
+        })
+          .then((res) => res.data && refetch())
+          .finally(() => {
+            setCompName('')
+            setActiveId(null)
+          })
       } else {
-        setCompNameList([...compNameList, compName])
-        setCompName('')
+        createComp({
+          variables: {
+            match: compName
+          }
+        })
+          .then((res) => res.data && refetch())
+          .finally(() => setCompName(''))
       }
     }
   }
 
-  const handleUpdate = (value, index) => {
-    setCompName(value)
-    setActiveId(index)
+  const handleUpdate = (item) => {
+    setCompName(item.matchStr)
+    setActiveId(item.id)
   }
 
-  const deleteComp = (index) => {
-    const updatedItems = compNameList.filter((_, i) => i !== index)
-    setCompNameList(updatedItems)
+  const handleDeleteComp = (id) => {
+    deleteComp({
+      variables: {
+        id: id
+      }
+    }).then((res) => res.data && refetch())
   }
 
   const handleChange = (e) => {
     const { value } = e.target
     setCompName(value)
-
     try {
       const re = new RegExp(value)
-      console.log('Valid regex', re)
+      // console.log('Valid regex', re)
       setIsMatch(true)
     } catch (error) {
-      console.error('Invalid regex:', error.message)
+      // console.error('Invalid regex:', error.message)
       setIsMatch(false)
     }
   }
@@ -93,7 +111,7 @@ const ComponentFeed = () => {
             </Text>
           </FormControl>
 
-          {compNameList.length > 0 && (
+          {data.length > 0 && (
             <Flex
               flexDirection={'row'}
               flexWrap={'wrap'}
@@ -101,12 +119,12 @@ const ComponentFeed = () => {
               gap={2}
               mt={2}
             >
-              {compNameList.map((item, index) => (
+              {data.map((item, index) => (
                 <Tag key={index} variant='solid' colorScheme={'blue'}>
-                  <TagLabel onClick={() => handleUpdate(item, index)}>
-                    {item}
+                  <TagLabel onClick={() => handleUpdate(item)}>
+                    {item.matchStr}
                   </TagLabel>
-                  <TagCloseButton onClick={() => deleteComp(index)} />
+                  <TagCloseButton onClick={() => handleDeleteComp(item.id)} />
                 </Tag>
               ))}
             </Flex>

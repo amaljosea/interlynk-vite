@@ -154,7 +154,10 @@ function Profile() {
                       templateColumns={{ sm: '1fr', xl: 'repeat(3, 1fr)' }}
                       gap='22px'
                     >
-                      <ComponentFeed />
+                      <ComponentFeed
+                        data={orgInfo.organization.organizationComponents}
+                        refetch={refetch}
+                      />
                     </Grid>
                   </TabPanel>
                 </TabPanels>

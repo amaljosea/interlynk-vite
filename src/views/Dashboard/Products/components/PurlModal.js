@@ -186,6 +186,12 @@ const PurlModal = ({
     }
   }
 
+  const onNamespaceBlur = () => {
+    const pkg = PackageURL.fromString(purlString)
+    pkg.namespace = namespace
+    setPurlString(pkg.toString())
+  }
+
   // ON PACKAGE NAME INPUT CHANGE
   const onNameInputChange = (event) => {
     const { value } = event.target
@@ -232,10 +238,17 @@ const PurlModal = ({
     }
   }
 
+  const onNameBlur = () => {
+    const pkg = PackageURL.fromString(purlString)
+    pkg.name = purlName
+    setPurlString(pkg.toString())
+  }
+
   // ON VERSION INPUT CHANGE
   const onVersionInputChange = (event) => {
     const { value } = event.target
-    setPurlVersion(value)
+    const val = value.replace(/\s/g, '')
+    setPurlVersion(val)
     if (value !== '') {
       if (purlType === 'maven') {
         getCpe({
@@ -244,7 +257,7 @@ const PurlModal = ({
               idType: 'purl',
               ecosystem: 'maven',
               search: {
-                version: value
+                version: val
               },
               hints: {
                 purl: {
@@ -266,7 +279,7 @@ const PurlModal = ({
               idType: 'purl',
               ecosystem: 'nuget',
               search: {
-                version: value
+                version: val
               },
               hints: {
                 purl: {
@@ -284,7 +297,11 @@ const PurlModal = ({
     }
   }
 
-  // console.log('data', data)
+  const onVersionBlur = () => {
+    const pkg = PackageURL.fromString(purlString)
+    pkg.version = purlVersion
+    setPurlString(pkg.toString())
+  }
 
   useEffect(() => {
     if (purlValue) {
@@ -303,8 +320,14 @@ const PurlModal = ({
 
   const handleTypeChange = (e) => {
     setPurlType(e.target.value)
+    setNamespace('')
+    setPurlName('')
+    setPurlVersion('')
+  }
+
+  const onTypeBlur = () => {
     const pkg = PackageURL.fromString(purlString)
-    pkg.type = e.target.value
+    pkg.type = purlType
     pkg.namespace = ''
     setPurlString(pkg.toString())
   }
@@ -320,75 +343,11 @@ const PurlModal = ({
     setPurlName(e.target.value)
     if (e.target.value === '') {
       setSuggestions([])
-      return
-    } else {
-      const pkg = PackageURL.fromString(purlString)
-      pkg.name = e.target.value
-      setPurlString(pkg.toString())
-    }
-
-    if (purlType === 'nuget') {
-      // Fetch autocomplete suggestions from NuGet.org API
-      fetch(
-        `https://azuresearch-ussc.nuget.org/autocomplete?q=${e.target.value}&take=10`
-      )
-        .then((response) => response.json())
-        .then((data) => {
-          // console.log('Nuget suggestions:', data.data)
-          setSuggestions(data.data) // Set the autocomplete suggestions
-        })
-        .catch((error) => {
-          console.error('Error fetching suggestions:', error)
-        })
-    }
-
-    if (purlType === 'npm') {
-      fetch(`https://registry.npmjs.org/-/v1/search?text=${e.target.value}`)
-        .then((response) => response.json())
-        .then((data) => {
-          // console.log('NPM suggestions:', data)
-          const packages =
-            data.objects.length > 0 &&
-            data.objects.map((item) => item.package.name)
-          setSuggestions(packages) // Set the autocomplete suggestions
-        })
-        .catch((error) => {
-          console.error('Error fetching suggestions:', error)
-        })
-    }
-  }
-
-  const handleNameBlur = () => {
-    setSuggestions([])
-  }
-
-  const fetchVersions = async () => {
-    if (purlType === 'nuget') {
-      const endpoint = `https://azuresearch-ussc.nuget.org/autocomplete?id=${purlName}&prerelease=false`
-      const res = await fetch(endpoint)
-      const data = await res.json()
-      setVerSuggestions(data.data)
-    }
-
-    if (purlType === 'npm') {
-      const endpoint = `https://registry.npmjs.org/${purlName}`
-      const res = await fetch(endpoint)
-      const data = await res.json()
-      const allVersions = Object.keys(data.versions)
-      setVerSuggestions(allVersions)
     }
   }
 
   const handleVersionChange = (e) => {
     setPurlVersion(e.target.value)
-    if (e.target.value === '') {
-      setVerSuggestions([])
-      return
-    }
-    const pkg = PackageURL.fromString(purlString)
-    pkg.version = e.target.value
-    setPurlString(pkg.toString())
-    fetchVersions()
   }
 
   const handleSave = () => {
@@ -473,6 +432,7 @@ const PurlModal = ({
                   name='packageType'
                   value={purlType}
                   onChange={handleTypeChange}
+                  onBlur={onTypeBlur}
                 >
                   {typeOptions.map((option) => (
                     <option key={option.value} value={option.value}>
@@ -492,6 +452,7 @@ const PurlModal = ({
                   inputRef={namespaceRef}
                   validation={false}
                   onChange={onNamespaceInputChange}
+                  onBlur={onNamespaceBlur}
                 />
               ) : namespaceOptions[purlType] &&
                 namespaceOptions[purlType].length > 0 ? (
@@ -523,6 +484,7 @@ const PurlModal = ({
                   inputRef={packageNameRef}
                   validation={false}
                   onChange={onNameInputChange}
+                  onBlur={onNameBlur}
                 />
               ) : (
                 <FormControl>
@@ -535,6 +497,7 @@ const PurlModal = ({
                       size='md'
                       fontSize={'sm'}
                       onChange={handleNameChange}
+                      onBlur={onNameBlur}
                     />
                     {suggestions && suggestions.length > 0 && (
                       <Box
@@ -577,6 +540,7 @@ const PurlModal = ({
                   inputRef={purlVersionRef}
                   validation={false}
                   onChange={onVersionInputChange}
+                  onBlur={onVersionBlur}
                 />
               ) : (
                 <FormControl>
@@ -589,6 +553,7 @@ const PurlModal = ({
                       type='text'
                       value={purlVersion}
                       onChange={handleVersionChange}
+                      onBlur={onVersionBlur}
                     />
                     {verSuggestions && verSuggestions.length > 0 && (
                       <Box

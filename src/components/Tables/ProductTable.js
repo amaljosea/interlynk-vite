@@ -76,7 +76,12 @@ const ProductTable = ({ data, refetch }) => {
     prodField,
     setProdField,
     prodDirection,
-    setProdDirection
+    setProdDirection,
+    setLicenseType,
+    setSpdxList,
+    setSpdxLicense,
+    setExpList,
+    setLicenseExp
   } = useContext(GlobalContext)
 
   const {
@@ -132,6 +137,7 @@ const ProductTable = ({ data, refetch }) => {
         direction: prodDirection
       })
   })
+
   const [projectUpdate] = useMutation(UpdateProject, {
     onCompleted: () =>
       refetch({
@@ -140,6 +146,16 @@ const ProductTable = ({ data, refetch }) => {
         direction: prodDirection
       })
   })
+
+  const handleOpenSbom = (row) => {
+    setActiveRow(row)
+    setLicenseType('license_spdx')
+    setSpdxList([])
+    setSpdxLicense([])
+    setExpList([])
+    setLicenseExp([])
+    onSbomOpen()
+  }
 
   // COLUMNS
   const columns = [
@@ -385,10 +401,7 @@ const ProductTable = ({ data, refetch }) => {
                   Upload SBOM
                 </MenuItem>
                 <MenuItem
-                  onClick={() => {
-                    setActiveRow(row)
-                    onSbomOpen()
-                  }}
+                  onClick={() => handleOpenSbom(row)}
                   isDisabled={!enabled}
                 >
                   Build SBOM
@@ -684,11 +697,8 @@ const ProductTable = ({ data, refetch }) => {
         <ProductSbomDrawer
           isOpen={isSbomOpen}
           onClose={onSbomClose}
-          projectId={activeRow.id}
-          name={activeRow.name}
+          data={activeRow}
           refetch={refetch}
-          sbomData={null}
-          type={activeRow.sboms.length > 0 && activeRow.sboms[0].format}
         />
       )}
 

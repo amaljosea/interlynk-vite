@@ -70,7 +70,6 @@ export default function Dashboard(props) {
   document.documentElement.dir = 'ltr'
   // Chakra Color Mode
 
-
   const graphqlAPI = process.env.REACT_APP_GRAPHQL_API
 
   // const httpLink = createHttpLink({
@@ -112,6 +111,12 @@ export default function Dashboard(props) {
         Cookies.remove('authToken')
         history.push('/auth')
       }
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!authToken) {
+      history.push('/auth')
     }
   }, [])
 

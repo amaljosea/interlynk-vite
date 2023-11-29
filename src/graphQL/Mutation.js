@@ -9,6 +9,48 @@ export const orgUpdate = gql`
   }
 `
 
+// CREATE INTERNAL COMPONENT
+export const createOrgComp = gql`
+  mutation createOrgComp($match: String!) {
+    organizationComponentCreate(input: { matchStr: $match }) {
+      organizationComponent {
+        matchStr
+        updatedAt
+        id
+      }
+      errors
+    }
+  }
+`
+
+// UPDATE INTERNAL COMPONENT
+export const updateOrgComp = gql`
+  mutation updateOrgComp($id: ID!, $match: String!) {
+    organizationComponentUpdate(input: { id: $id, matchStr: $match }) {
+      organizationComponent {
+        matchStr
+        updatedAt
+        id
+      }
+      errors
+    }
+  }
+`
+
+// DELETE INTERNAL COMPONENT
+export const deleteOrgComp = gql`
+  mutation deleteOrgComp($id: ID!) {
+    organizationComponentDelete(input: { id: $id }) {
+      organizationComponent {
+        matchStr
+        updatedAt
+        id
+      }
+      errors
+    }
+  }
+`
+
 // ORGANIZATION RULE UPDATE
 export const orgRuleUpdate = gql`
   mutation orgRuleUpdate(
@@ -496,6 +538,7 @@ export const CreateComponent = gql`
     $name: String!
     $version: String
     $licenses: [String!]
+    $licenseExp: [String!]
     $cpes: [String!]
     $purl: String
     $primary: Boolean
@@ -508,6 +551,7 @@ export const CreateComponent = gql`
         name: $name
         version: $version
         licenses: $licenses
+        licenseExp: $licenseExp
         cpes: $cpes
         purl: $purl
         primary: $primary
@@ -535,10 +579,12 @@ export const UpdateComponent = gql`
     $kind: String
     $name: String
     $licenses: [String!]
+    $licenseExp: [String!]
     $cpes: [String!]
     $purl: String
     $primary: Boolean
     $internal: Boolean
+    $uniqueId: Boolean
   ) {
     componentUpdate(
       input: {
@@ -547,10 +593,12 @@ export const UpdateComponent = gql`
         kind: $kind
         name: $name
         licenses: $licenses
+        licenseExp: $licenseExp
         cpes: $cpes
         purl: $purl
         primary: $primary
         internal: $internal
+        generateUniqueId: $uniqueId
       }
     ) {
       component {
@@ -869,6 +917,7 @@ export const sbomCreate = gql`
     $specVersion: String
     $format: String
     $licenses: [String!]
+    $licenseExp: [String!]
   ) {
     sbomCreate(
       input: {
@@ -877,6 +926,7 @@ export const sbomCreate = gql`
         specVersion: $specVersion
         format: $format
         licenses: $licenses
+        licenseExp: $licenseExp
       }
     ) {
       errors
@@ -905,6 +955,7 @@ export const sbomUpdate = gql`
     $specVersion: String
     $format: String
     $licenses: [String!]
+    $licenseExp: [String!]
   ) {
     sbomUpdate(
       input: {
@@ -913,6 +964,7 @@ export const sbomUpdate = gql`
         specVersion: $specVersion
         format: $format
         licenses: $licenses
+        licenseExp: $licenseExp
       }
     ) {
       errors

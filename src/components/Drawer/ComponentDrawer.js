@@ -42,9 +42,6 @@ import {
 import { useLazyQuery, useMutation } from '@apollo/client'
 import { CreateComponent, UpdateComponent } from 'graphQL/Mutation'
 import { useLocation } from 'react-router-dom'
-import { licenseOptions } from 'variables/licenses'
-import MultiSelect, { components } from 'react-select'
-import Creatable from 'react-select/creatable'
 import { PackageURL } from 'packageurl-js'
 import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
@@ -53,10 +50,7 @@ import { FaExpandAlt } from 'react-icons/fa'
 import GlobalContext from 'context/GlobalContext'
 import { CpeAutoComplete } from 'graphQL/Queries'
 import CpeInput from 'components/CpeInput'
-
-const SelectInput = (props) => (
-  <components.Input {...props} autoComplete='off' />
-)
+import LicenseField from 'components/LicenseField'
 
 function ComponentDrawer(props) {
   const location = useLocation()
@@ -67,16 +61,13 @@ function ComponentDrawer(props) {
 
   const customerView = location.pathname.startsWith('/customer')
 
-  const selectRef = useRef()
-  const [inputValue, setInputValue] = useState('')
-
   const {
     id,
     isOpen,
     onClose,
     component,
     version,
-    license,
+    data,
     type,
     cpes,
     purl,
@@ -89,7 +80,8 @@ function ComponentDrawer(props) {
     filterRefetch
   } = props
 
-  const { setCompFilters } = useContext(GlobalContext)
+  const { setCompFilters, licenseType, spdxLicense, licenseExp } =
+    useContext(GlobalContext)
 
   const onFilterRefetch = () => {
     filterRefetch({
@@ -114,12 +106,6 @@ function ComponentDrawer(props) {
   const [compVersion, setCompVersion] = useState('')
   const [compType, setCompType] = useState('')
 
-  const [licenseType, setLicenseType] = useState('license_spdx')
-  const [licenseName, setLicenseName] = useState('')
-  const [licenseExp, setLicenseExp] = useState('')
-  const [licenseList, setLicenseList] = useState([])
-  const [selectedLicenses, setSelectedLicenses] = useState([])
-
   const [cpeValue, setCpeValue] = useState('')
   const [cpeList, setCpeList] = useState([])
   const [cpeData, setCpeData] = useState([])
@@ -133,11 +119,6 @@ function ComponentDrawer(props) {
   const [isPrimary, setIsPrimary] = useState(primary)
   const [isInternal, setIsInternal] = useState(internal)
 
-  const licenses = licenseOptions.map((option) => ({
-    value: option.licenseId,
-    label: option.name
-  }))
-
   useEffect(() => {
     setCompId(id)
     setGroupInfo(group == null ? '' : group)
@@ -146,24 +127,6 @@ function ComponentDrawer(props) {
     setCpeList(cpes)
     setPurlValue(purl)
   }, [component])
-
-  useEffect(() => {
-    if (license.length > 0) {
-      // console.log(`license`, license)
-      const commonValues = licenseOptions.filter((item1) =>
-        license.includes(item1.licenseId)
-      )
-      const data = commonValues.map((item) => {
-        return {
-          value: item.licenseId,
-          label: item.name
-        }
-      })
-      setLicenseList(data)
-      const selectedIds = data.map((option) => option.value) // Extracting IDs
-      setSelectedLicenses(selectedIds)
-    }
-  }, [license])
 
   useEffect(() => {
     setCompType(type)
@@ -233,13 +196,6 @@ function ComponentDrawer(props) {
     onPurlOpen()
   }
 
-  const onLicenseChange = (selected) => {
-    setLicenseList(selected)
-    console.log('selected', selected)
-    const selectedIds = selected.map((option) => option.value) // Extracting IDs
-    setSelectedLicenses(selectedIds)
-  }
-
   const handleCreateCom = async () => {
     try {
       await createComponent({
@@ -248,7 +204,8 @@ function ComponentDrawer(props) {
           kind: compType,
           name: compName,
           version: compVersion,
-          licenses: selectedLicenses,
+          licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
+          licenseExp: licenseType === 'license_exp' ? licenseExp : undefined,
           cpes: cpeList,
           purl: purlValue,
           primary: isPrimary,
@@ -284,7 +241,8 @@ function ComponentDrawer(props) {
           kind: compType,
           name: compName,
           version: compVersion,
-          licenses: selectedLicenses,
+          licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
+          licenseExp: licenseType === 'license_exp' ? licenseExp : undefined,
           cpes: cpeList,
           purl: purlValue,
           primary: isPrimary,
@@ -383,10 +341,6 @@ function ComponentDrawer(props) {
     const updatedItems = cpeList.filter((_, i) => i !== index)
     setCpeList(updatedItems)
   }
-
-  const containesOther =
-    licenseList.length > 0 &&
-    licenseList.some((item) => item.value === 'Other' && item.label === 'Other')
 
   const handleCpeChange = (event) => {
     const { value } = event.target
@@ -487,7 +441,7 @@ function ComponentDrawer(props) {
                   errorBorderColor='gray.300'
                 />
               </FormControl>
-              {/* Kind */}
+              {/* KIND */}
               <FormControl isRequired>
                 <FormLabel htmlFor='componentType'>Type</FormLabel>
                 <Select
@@ -514,72 +468,9 @@ function ComponentDrawer(props) {
                   <option value='unspecified'>Unspecified</option>
                 </Select>
               </FormControl>
-              {/* LICENSE TYPE */}
-              <RadioGroup
-                size='sm'
-                value={licenseType}
-                onChange={(value) => setLicenseType(value)}
-              >
-                <Stack direction='row' mt={3}>
-                  <Radio value='license_spdx'>SPDX</Radio>
-                  <Radio value='license_custom'>Custom</Radio>
-                  <Radio value='license_exp'>Expression</Radio>
-                </Stack>
-              </RadioGroup>
-              {/* LICENSE FIELD */}
-              <FormControl>
-                <FormLabel htmlFor='compLicenses' as={Flex}>
-                  <chakra.span mr={2}>Licenses</chakra.span>
-                  <Tooltip label='List of licenses applicable to the component'>
-                    <Icon as={InfoIcon} color={'blue.500'} />
-                  </Tooltip>
-                </FormLabel>
-                {licenseType === 'license_spdx' && (
-                  <MultiSelect
-                    styles={{
-                      control: (baseStyles, state) => ({
-                        ...baseStyles,
-                        borderColor: state.isFocused ? 'inherit' : 'inherit',
-                        padding: '2px 5px',
-                        '&:hover': {
-                          borderColor: '#CBD5E0'
-                        }
-                      })
-                    }}
-                    isMulti
-                    components={{
-                      DropdownIndicator: () => null,
-                      IndicatorSeparator: () => null
-                    }}
-                    className='react-select'
-                    value={licenseList}
-                    options={licenses}
-                    onChange={onLicenseChange}
-                  />
-                )}
 
-                {licenseType === 'license_custom' && (
-                  <Input
-                    size='sm'
-                    id='compLicenses'
-                    name='compLicenses'
-                    placeholder='Enter a valid SPDX license'
-                    value={licenseName}
-                    onChange={(e) => setLicenseName(e.target.value)}
-                  />
-                )}
-
-                {licenseType === 'license_exp' && (
-                  <Input
-                    size='sm'
-                    id='licenseExp'
-                    name='licenseExp'
-                    placeholder='Enter a valid license exp'
-                    value={licenseExp}
-                    onChange={(e) => setLicenseExp(e.target.value)}
-                  />
-                )}
-              </FormControl>
+              {/* LICENSES */}
+              <LicenseField data={data} />
 
               {/* PURL INPUI */}
               <FormControl isReadOnly={customerView}>
@@ -630,6 +521,7 @@ function ComponentDrawer(props) {
                   </IconButton>
                 </Stack>
               </FormControl>
+
               {/* CPE INPUT */}
               <FormControl>
                 <Stack direction={'row'} width={'100%'} spacing={2}>
@@ -678,6 +570,7 @@ function ComponentDrawer(props) {
                   ))}
                 </Flex>
               </FormControl>
+
               {/* PRIMARY COMPONENT */}
               <FormControl isReadOnly={customerView}>
                 <Flex alignItems={'center'} gap={2}>
@@ -695,6 +588,7 @@ function ComponentDrawer(props) {
                   </Checkbox>
                 </Flex>
               </FormControl>
+
               {/* INTERNAL COMPONENT */}
               <FormControl isReadOnly={customerView}>
                 <Checkbox
@@ -719,10 +613,7 @@ function ComponentDrawer(props) {
                   colorScheme='blue'
                   onClick={handleSave}
                   isDisabled={
-                    (containesOther && licenseName === '') ||
-                    compType === '' ||
-                    compName === '' ||
-                    compVersion === ''
+                    compType === '' || compName === '' || compVersion === ''
                   }
                 >
                   Save
@@ -731,9 +622,7 @@ function ComponentDrawer(props) {
                 <Button
                   colorScheme='blue'
                   onClick={handleUpdate}
-                  isDisabled={
-                    (containesOther && licenseName === '') || !compType
-                  }
+                  isDisabled={!compType}
                 >
                   Update
                 </Button>

@@ -5,10 +5,6 @@ import { useEffect, useRef, useState } from 'react'
 const SearchFilter = ({ id, filterText, setFilterText, onFilter, onClear }) => {
   const searchInputRef = useRef()
 
-  const [focused, setFocused] = useState(false)
-  const onFocus = () => setFocused(true)
-  const onBlur = () => setFocused(false)
-
   const focusSearchInput = () => {
     if (searchInputRef?.current) {
       searchInputRef?.current.focus()
@@ -30,10 +26,10 @@ const SearchFilter = ({ id, filterText, setFilterText, onFilter, onClear }) => {
   }, [])
 
   useEffect(() => {
-    if (filterText === '' && focused === true) {
+    if (filterText === '') {
       onClear()
     }
-  }, [filterText, focused])
+  }, [filterText])
 
   return (
     <>
@@ -47,8 +43,6 @@ const SearchFilter = ({ id, filterText, setFilterText, onFilter, onClear }) => {
           value={filterText}
           onChange={(e) => setFilterText(e.target.value)}
           onKeyDown={onFilter}
-          onFocus={onFocus}
-          onBlur={onBlur}
         />
         {filterText !== '' && (
           <CloseIcon
