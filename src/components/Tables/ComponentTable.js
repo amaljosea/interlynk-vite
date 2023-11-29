@@ -825,7 +825,10 @@ const ComponentTable = ({
           <Tooltip label='Add Component'>
             <IconButton
               ref={compBtn}
-              onClick={onCompOpen}
+              onClick={() => {
+                setLicenseType('license_spdx')
+                onCompOpen()
+              }}
               icon={<AddIcon />}
               colorScheme='blue'
               variant='solid'
