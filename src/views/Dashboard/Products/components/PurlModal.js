@@ -321,8 +321,14 @@ const PurlModal = ({
 
   const handleTypeChange = (e) => {
     setPurlType(e.target.value)
+    setNamespace('')
+    setPurlName('')
+    setPurlVersion('')
+  }
+
+  const onTypeBlur = () => {
     const pkg = PackageURL.fromString(purlString)
-    pkg.type = e.target.value
+    pkg.type = purlType
     pkg.namespace = ''
     setPurlString(pkg.toString())
   }
@@ -427,6 +433,7 @@ const PurlModal = ({
                   name='packageType'
                   value={purlType}
                   onChange={handleTypeChange}
+                  onBlur={onTypeBlur}
                 >
                   {typeOptions.map((option) => (
                     <option key={option.value} value={option.value}>
