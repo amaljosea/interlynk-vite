@@ -118,7 +118,7 @@ const CpeInput = ({
             onChange={onChange}
             onBlur={onBlur}
           />
-          {validation && (
+          {validation === true && (
             <InputRightElement align='center' zIndex={-1}>
               {inputValue != null && inputValue !== '' ? (
                 isValid ? (
@@ -131,7 +131,7 @@ const CpeInput = ({
           )}
         </InputGroup>
       </FormControl>
-      {inputValue !== '' && cpeList.length > 0 && (
+      {cpeList.length > 0 && (
         <Box
           pos={'absolute'}
           width={'100%'}

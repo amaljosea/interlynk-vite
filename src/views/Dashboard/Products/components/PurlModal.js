@@ -247,7 +247,8 @@ const PurlModal = ({
   // ON VERSION INPUT CHANGE
   const onVersionInputChange = (event) => {
     const { value } = event.target
-    setPurlVersion(value)
+    const val = value.replace(/\s/g, '')
+    setPurlVersion(val)
     if (value !== '') {
       if (purlType === 'maven') {
         getCpe({
@@ -256,7 +257,7 @@ const PurlModal = ({
               idType: 'purl',
               ecosystem: 'maven',
               search: {
-                version: value
+                version: val
               },
               hints: {
                 purl: {
@@ -278,7 +279,7 @@ const PurlModal = ({
               idType: 'purl',
               ecosystem: 'nuget',
               search: {
-                version: value
+                version: val
               },
               hints: {
                 purl: {
@@ -301,8 +302,6 @@ const PurlModal = ({
     pkg.version = purlVersion
     setPurlString(pkg.toString())
   }
-
-  // console.log('data', data)
 
   useEffect(() => {
     if (purlValue) {
