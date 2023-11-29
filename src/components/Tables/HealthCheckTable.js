@@ -84,8 +84,11 @@ const HealthCheckTable = ({
     checkSearchInput,
     setCheckSearchInput,
     checkCategory,
+    setCheckCategory,
     checkSeverity,
+    setCheckSeverity,
     checkStatus,
+    setCheckStatus,
     checkAfter,
     setCheckAfter,
     checkBefore,
@@ -161,7 +164,6 @@ const HealthCheckTable = ({
   const supplierBtn = useRef(null)
   const creationToolBtn = useRef(null)
   const authorBtn = useRef(null)
-  const licenseBtn = useRef(null)
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
@@ -232,7 +234,6 @@ const HealthCheckTable = ({
           projectId: productId,
           sbomId: sbomId,
           first: totalRows,
-          last: undefined,
           field: checkField,
           direction: checkDirection
         }
@@ -247,6 +248,10 @@ const HealthCheckTable = ({
         }
       }).then((res) => {
         if (res.data) {
+          setCheckSearchInput('')
+          setCheckCategory([])
+          setCheckSeverity([])
+          setCheckStatus([])
           toast({
             description: 'Health re-check successfully',
             status: 'success',
