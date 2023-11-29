@@ -871,6 +871,8 @@ export const GetCheckResults = gql`
             id
             name
             version
+            licenses
+            licenseExp
           }
           organizationRule {
             severity

@@ -11,13 +11,12 @@ import {
   IconButton,
   Box,
   Badge,
-  useToast,
-  Select,
-  Skeleton
+  useToast
 } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
 import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
 import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
+import LicenseModal from 'components/LicenseModal'
 import GlobalContext from 'context/GlobalContext'
 import { recheckHealth, checkResultUpdate } from 'graphQL/Mutation'
 import { CpeAutoComplete } from 'graphQL/Queries'
@@ -72,6 +71,11 @@ const HealthCheckTable = ({
   const toast = useToast()
 
   const {
+    setLicenseType,
+    setSpdxList,
+    setSpdxLicense,
+    setExpList,
+    setLicenseExp,
     checkFilters,
     checkField,
     setCheckField,
@@ -378,6 +382,15 @@ const HealthCheckTable = ({
     )
   }, [checkFilters, handleReCheck])
 
+  const handleOpenLicense = () => {
+    setLicenseType('license_spdx')
+    setSpdxList([])
+    setSpdxLicense([])
+    setExpList([])
+    setLicenseExp([])
+    onLicenseOpen()
+  }
+
   const handleOpen = (row) => {
     const { organizationRule } = row
 
@@ -467,7 +480,7 @@ const HealthCheckTable = ({
       organizationRule.rule.shortDesc ===
         'Component has restrictive licenses specified'
     ) {
-      return onLicenseOpen()
+      return handleOpenLicense()
     }
   }
 
@@ -837,18 +850,13 @@ const HealthCheckTable = ({
         <>
           {/* SBOM DATA LICENSES DRAWER */}
           {isDataLicenseOpen && (
-            <ProductSbomDrawer
-              totalRows={totalRows}
-              checkId={activeRow.organizationRule.rule.friendlyId}
-              filterRefetch={filterRefetch}
+            <LicenseModal
               isOpen={isDataLicenseOpen}
               onClose={onDataLicenseClose}
-              btnRef={licenseBtn}
-              name={sbomData.project.name}
+              checkId={activeRow.organizationRule.rule.friendlyId}
+              filterRefetch={filterRefetch}
               refetch={fetchCheckData}
-              sbomData={sbomData}
-              type={sbomData.format}
-              getCpe={getCpe}
+              data={sbomData}
             />
           )}
 
