@@ -92,6 +92,7 @@ const ComponentTable = ({
   const y = window.matchMedia('(max-width: 1440px)')
 
   const {
+    setLicenseType,
     compSearchInput,
     setCompSearchInput,
     compEcosystem,
@@ -487,6 +488,7 @@ const ComponentTable = ({
                   <MenuList size='sm'>
                     <MenuItem
                       onClick={() => {
+                        setLicenseType('license_spdx')
                         setActiveRow(row)
                         onOpen()
                       }}
@@ -1000,6 +1002,7 @@ const ComponentTable = ({
         <>
           {isOpen && (
             <ComponentDrawer
+              data={activeRow}
               id={activeRow.id}
               isOpen={isOpen}
               onClose={onClose}
@@ -1072,6 +1075,7 @@ const ComponentTable = ({
         <ComponentDrawer
           isOpen={isCompOpen}
           onClose={onCompClose}
+          data={null}
           component={''}
           version={''}
           license={''}

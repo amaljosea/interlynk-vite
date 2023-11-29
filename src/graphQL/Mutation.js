@@ -496,6 +496,7 @@ export const CreateComponent = gql`
     $name: String!
     $version: String
     $licenses: [String!]
+    $licenseExp: [String!]
     $cpes: [String!]
     $purl: String
     $primary: Boolean
@@ -508,6 +509,7 @@ export const CreateComponent = gql`
         name: $name
         version: $version
         licenses: $licenses
+        licenseExp: $licenseExp
         cpes: $cpes
         purl: $purl
         primary: $primary
@@ -535,10 +537,12 @@ export const UpdateComponent = gql`
     $kind: String
     $name: String
     $licenses: [String!]
+    $licenseExp: [String!]
     $cpes: [String!]
     $purl: String
     $primary: Boolean
     $internal: Boolean
+    $uniqueId: Boolean
   ) {
     componentUpdate(
       input: {
@@ -547,10 +551,12 @@ export const UpdateComponent = gql`
         kind: $kind
         name: $name
         licenses: $licenses
+        licenseExp: $licenseExp
         cpes: $cpes
         purl: $purl
         primary: $primary
         internal: $internal
+        generateUniqueId: $uniqueId
       }
     ) {
       component {
