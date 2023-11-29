@@ -144,6 +144,13 @@ const CpeModal = ({
     }
   }
 
+  const onVendorBlur = () => {
+    const cpeParts = cpeString.split(':')
+    cpeParts[3] = vendor
+    const cpe = cpeParts.join(':')
+    setCpeString(cpe)
+  }
+
   // ON TYPE CHANGE
   const handleTypeChange = (e) => {
     setType(e.target.value)
@@ -181,6 +188,13 @@ const CpeModal = ({
     }
   }
 
+  const onProductBlur = () => {
+    const cpeParts = cpeString.split(':')
+    cpeParts[4] = product
+    const cpe = cpeParts.join(':')
+    setCpeString(cpe)
+  }
+
   // ON VERSION INPUT CHANGE
   const onVersionInputChange = (event) => {
     const { value } = event.target
@@ -208,6 +222,13 @@ const CpeModal = ({
         }
       })
     }
+  }
+
+  const onVersionBlur = () => {
+    const cpeParts = cpeString.split(':')
+    cpeParts[5] = version
+    const cpe = cpeParts.join(':')
+    setCpeString(cpe)
   }
 
   // ON HARDWARE CHANGE
@@ -284,6 +305,7 @@ const CpeModal = ({
                 inputRef={vendorRef}
                 validation={false}
                 onChange={onVendorInputChange}
+                onBlur={onVendorBlur}
               />
               {/* TYPE */}
               <FormControl>
@@ -311,6 +333,7 @@ const CpeModal = ({
                 inputRef={productRef}
                 validation={false}
                 onChange={onProductInputChange}
+                onBlur={onProductBlur}
               />
               {/* VERSION */}
               <CpeInput
@@ -322,6 +345,7 @@ const CpeModal = ({
                 inputRef={versionRef}
                 validation={false}
                 onChange={onVersionInputChange}
+                onBlur={onVersionBlur}
               />
               {/* TARGET HARDWARE */}
               <FormControl>

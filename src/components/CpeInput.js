@@ -24,7 +24,8 @@ const CpeInput = ({
   setCpeList,
   inputRef,
   validation,
-  onChange
+  onChange,
+  onBlur
 }) => {
   const [isValid, setIsValid] = useState(true)
 
@@ -115,6 +116,7 @@ const CpeInput = ({
             placeholder={name === 'cpe' ? 'CPE' : ''}
             value={inputValue}
             onChange={onChange}
+            onBlur={onBlur}
           />
           {validation && (
             <InputRightElement align='center' zIndex={-1}>
