@@ -145,19 +145,24 @@ const CpeModal = ({
   }
 
   const onVendorBlur = () => {
-    const cpeParts = cpeString.split(':')
-    cpeParts[3] = vendor
-    const cpe = cpeParts.join(':')
-    setCpeString(cpe)
+    if (vendor !== '') {
+      const cpeParts = cpeString.split(':')
+      cpeParts[3] = vendor
+      const cpe = cpeParts.join(':')
+      setCpeString(cpe)
+    }
   }
 
   // ON TYPE CHANGE
   const handleTypeChange = (e) => {
-    setType(e.target.value)
-    const cpeParts = cpeString.split(':')
-    cpeParts[2] = e.target.value
-    const cpe = cpeParts.join(':')
-    setCpeString(cpe)
+    const { value } = e.target
+    setType(value)
+    if (value !== '') {
+      const cpeParts = cpeString.split(':')
+      cpeParts[2] = e.target.value
+      const cpe = cpeParts.join(':')
+      setCpeString(cpe)
+    }
   }
 
   // ON PRODUCT INPUT CHANGE
@@ -189,10 +194,12 @@ const CpeModal = ({
   }
 
   const onProductBlur = () => {
-    const cpeParts = cpeString.split(':')
-    cpeParts[4] = product
-    const cpe = cpeParts.join(':')
-    setCpeString(cpe)
+    if (product !== '') {
+      const cpeParts = cpeString.split(':')
+      cpeParts[4] = product
+      const cpe = cpeParts.join(':')
+      setCpeString(cpe)
+    }
   }
 
   // ON VERSION INPUT CHANGE
@@ -225,20 +232,24 @@ const CpeModal = ({
   }
 
   const onVersionBlur = () => {
-    const cpeParts = cpeString.split(':')
-    cpeParts[5] = version
-    const cpe = cpeParts.join(':')
-    setCpeString(cpe)
+    if (version !== '') {
+      const cpeParts = cpeString.split(':')
+      cpeParts[5] = version
+      const cpe = cpeParts.join(':')
+      setCpeString(cpe)
+    }
   }
 
   // ON HARDWARE CHANGE
   const handleHardwareChange = (e) => {
     const { value } = e.target
     setHardware(value)
-    const cpeParts = cpeString.split(':')
-    cpeParts[6] = value
-    const cpe = cpeParts.join(':')
-    setCpeString(cpe)
+    if (value !== '') {
+      const cpeParts = cpeString.split(':')
+      cpeParts[6] = value
+      const cpe = cpeParts.join(':')
+      setCpeString(cpe)
+    }
   }
 
   const [createAutoCheck] = useMutation(CreateAutomation)
@@ -398,6 +409,7 @@ const CpeModal = ({
                   variant='solid'
                   colorScheme={'blue'}
                   onClick={checkId ? handleComUpdate : handleSave}
+                  disabled={!vendor || !product}
                 >
                   Save
                 </Button>
