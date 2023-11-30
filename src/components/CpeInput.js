@@ -80,7 +80,7 @@ const CpeInput = ({
           prevIndex === null
             ? 0
             : Math.min(prevIndex + 1, listItemsRef.current.length - 1)
-        listItemsRef.current &&
+        cpeList.length > 0 &&
           listItemsRef.current[newIndex].scrollIntoView({
             behavior: 'smooth',
             block: 'nearest'
@@ -91,7 +91,7 @@ const CpeInput = ({
       e.preventDefault()
       setFocusedIndex((prevIndex) => {
         const newIndex = prevIndex === null ? 0 : Math.max(prevIndex - 1, 0)
-        listItemsRef.current &&
+        cpeList.length > 0 &&
           listItemsRef.current[newIndex].scrollIntoView({
             behavior: 'smooth',
             block: 'nearest'
