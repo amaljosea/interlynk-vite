@@ -1,13 +1,14 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import {
   Box,
   Input,
   VStack,
-  Text,
   InputGroup,
   InputRightElement,
   FormControl,
-  FormLabel
+  FormLabel,
+  ListItem,
+  List
 } from '@chakra-ui/react'
 import { CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import GlobalContext from 'context/GlobalContext'
@@ -24,15 +25,16 @@ const CpeInput = ({
   setCpeList,
   inputRef,
   validation,
-  onChange,
-  onBlur
+  onChange
 }) => {
   const [isValid, setIsValid] = useState(true)
+  const [focusedIndex, setFocusedIndex] = useState(null)
+  const listItemsRef = useRef([])
 
   const { cpeString, setCpeString, purlString, setPurlString } =
     useContext(GlobalContext)
 
-  const handleSelect = (value) => {
+  const updateString = (name, value) => {
     const cpeParts = cpeString.split(':')
     if (name === 'vendor') {
       cpeParts[3] = value
@@ -59,10 +61,57 @@ const CpeInput = ({
       pkg.version = value
       setPurlString(pkg.toString())
     }
+  }
 
+  const handleSelect = () => {
+    const value = cpeList.length > 0 && cpeList[focusedIndex]
+    console.log('value', value)
+    updateString(name, String(value))
     setInputValue(value)
+    setFocusedIndex(null)
     setCpeList([])
   }
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      setFocusedIndex((prevIndex) => {
+        const newIndex =
+          prevIndex === null
+            ? 0
+            : Math.min(prevIndex + 1, listItemsRef.current.length - 1)
+        listItemsRef.current &&
+          listItemsRef.current[newIndex].scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest'
+          })
+        return newIndex
+      })
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      setFocusedIndex((prevIndex) => {
+        const newIndex = prevIndex === null ? 0 : Math.max(prevIndex - 1, 0)
+        listItemsRef.current &&
+          listItemsRef.current[newIndex].scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest'
+          })
+        return newIndex
+      })
+    } else if (e.key === 'Enter' && focusedIndex !== null) {
+      return handleSelect()
+    }
+
+    if (e.key === 'Enter' || e.key === 'Tab') {
+      inputValue !== '' && updateString(name, inputValue)
+      setCpeList([])
+    }
+  }
+
+  // Set initial focus when component mounts
+  useEffect(() => {
+    listItemsRef.current[0]?.focus()
+  }, [])
 
   useEffect(() => {
     if (validation) {
@@ -116,7 +165,8 @@ const CpeInput = ({
             placeholder={name === 'cpe' ? 'CPE' : ''}
             value={inputValue}
             onChange={onChange}
-            onBlur={onBlur}
+            autoComplete='off'
+            onKeyDown={handleKeyDown}
           />
           {validation === true && (
             <InputRightElement align='center' zIndex={-1}>
@@ -131,7 +181,7 @@ const CpeInput = ({
           )}
         </InputGroup>
       </FormControl>
-      {cpeList !== null && cpeList.length > 0 && (
+      {cpeList !== null && inputValue !== '' && cpeList.length > 0 && (
         <Box
           pos={'absolute'}
           width={'100%'}
@@ -145,23 +195,26 @@ const CpeInput = ({
           maxH={'260px'}
           overflowY={'scroll'}
         >
-          <VStack spacing={0} py={1} alignItems={'flex-start'}>
+          <List>
             {cpeList?.map((item, index) => (
-              <Text
+              <ListItem
                 key={index}
+                ref={(el) => (listItemsRef.current[index] = el)}
+                tabIndex='0'
+                bg={index === focusedIndex ? '#E2E8F0' : 'transparent'}
+                outline='none'
+                p={2}
                 fontSize={'sm'}
-                _hover={{ bg: '#f1f1f1' }}
                 width={'100%'}
                 cursor={'pointer'}
-                onClick={() => handleSelect(item)}
+                onClick={handleSelect}
                 py={1}
                 px={4}
-                borderBottom={'1px solid #E2E8F0'}
               >
                 {item}
-              </Text>
+              </ListItem>
             ))}
-          </VStack>
+          </List>
         </Box>
       )}
     </VStack>

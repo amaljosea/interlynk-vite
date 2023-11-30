@@ -207,12 +207,9 @@ const ComponentTable = ({
     setLicenseType('license_spdx')
     setActiveRow(row)
     if (row.licenses && row.licenses.length > 0) {
-      const commonValues = licenseOptions.filter((item) =>
-        row.licenses.includes(item.licenseId)
-      )
-      const filterData = commonValues.map((option) => ({
-        value: option.licenseId,
-        label: option.name
+      const filterData = row.licenses.map((value) => ({
+        value: value,
+        label: value
       }))
       setSpdxList(filterData)
       const selectedIds = filterData.map((option) => option.value)
@@ -233,9 +230,21 @@ const ComponentTable = ({
     setLicenseType('license_spdx')
     setSpdxList([])
     setSpdxLicense([])
-    setExpList([])
-    setLicenseExp([])
     onCompOpen()
+  }
+
+  const handleOpen = (row) => {
+    setActiveRow(row)
+    getComPath({
+      variables: {
+        compId: row.id,
+        sbomId: sbomId
+      }
+    }).then((res) => {
+      if (res.data) {
+        onRelationOpen()
+      }
+    })
   }
 
   // ADD KEYBOARD SHORTCUT FOR TOGGLE COMPONENT DRAWER
@@ -428,10 +437,6 @@ const ComponentTable = ({
       selector: (row) => {
         const { licenses } = row
 
-        const filtered =
-          licenses &&
-          licenseOptions.filter((item) => licenses.includes(item.licenseId))
-
         return (
           <Flex
             alignItems={'flex-end'}
@@ -440,8 +445,8 @@ const ComponentTable = ({
             flexWrap={'wrap'}
             my={2}
           >
-            {filtered.length > 0 &&
-              filtered.map((item, index) => (
+            {licenses.length > 0 &&
+              licenses.map((item, index) => (
                 <Tooltip
                   key={index}
                   label={item.name}
@@ -462,7 +467,7 @@ const ComponentTable = ({
                       width={'fit-content'}
                       textTransform={'capitalize'}
                     >
-                      <TagLabel>{item.licenseId}</TagLabel>
+                      <TagLabel>{item}</TagLabel>
                     </Tag>
                   </Link>
                 </Tooltip>
@@ -498,20 +503,6 @@ const ComponentTable = ({
       selector: (row) => {
         const { suppliers, status, primary, id } = row
 
-        const handleOpen = () => {
-          getComPath({
-            variables: {
-              compId: id,
-              sbomId: sbomId
-            }
-          }).then((res) => {
-            if (res.data) {
-              setActiveRow(row)
-              onRelationOpen()
-            }
-          })
-        }
-
         return (
           <>
             {!customerView ? (
@@ -531,7 +522,9 @@ const ComponentTable = ({
                     >
                       Edit Component
                     </MenuItem>
-                    <MenuItem onClick={handleOpen}>Edit Relationships</MenuItem>
+                    <MenuItem onClick={() => handleOpen(row)}>
+                      Edit Relationships
+                    </MenuItem>
                     <MenuItem
                       onClick={() => {
                         setActiveRow(row)
@@ -782,8 +775,13 @@ const ComponentTable = ({
           field: compField,
           direction: compDirection
         }
+      }).then((res) => {
+        if (res.data) {
+          setComPageIndex(1)
+          setCompBefore(res.data.sbom.components.pageInfo.startCursor)
+          setCompAfter(res.data.sbom.components.pageInfo.endCursor)
+        }
       })
-      setComPageIndex(1)
     }
   }
 
@@ -798,9 +796,14 @@ const ComponentTable = ({
         field: compField,
         direction: compDirection
       }
+    }).then((res) => {
+      if (res.data) {
+        setCompSearchInput('')
+        setComPageIndex(1)
+        setCompBefore(res.data.sbom.components.pageInfo.startCursor)
+        setCompAfter(res.data.sbom.components.pageInfo.endCursor)
+      }
     })
-    setCompSearchInput('')
-    setComPageIndex(1)
   }
 
   // SET ROW LENGTH
@@ -1100,6 +1103,7 @@ const ComponentTable = ({
               compPath={comPath.component.pathToPrimary}
               total={totalComp}
               fetchCompData={fetchCompData}
+              refetch={getDependency}
             />
           )}
         </>

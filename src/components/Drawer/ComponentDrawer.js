@@ -80,7 +80,7 @@ function ComponentDrawer(props) {
     filterRefetch
   } = props
 
-  const { setCompFilters, licenseType, spdxLicense, licenseExp } =
+  const { setCompFilters, licenseType, spdxLicense, setPurlString } =
     useContext(GlobalContext)
 
   const onFilterRefetch = () => {
@@ -169,10 +169,6 @@ function ComponentDrawer(props) {
   const handlePURLInputChange = (e) => {
     const inputValue = e.target.value
     setPurlValue(inputValue)
-    if (inputValue == null || inputValue === '') {
-      return
-    }
-    console.log('invoking handle change ' + inputValue)
     try {
       PackageURL.fromString(inputValue)
       setPURLInputValid(true)
@@ -183,15 +179,12 @@ function ComponentDrawer(props) {
   }
 
   const handlePurlModal = () => {
-    if (!purlValue) {
-      const pkg = PackageURL.fromString(
-        'pkg:generic/System.Windows.Extensions@4.7.0'
-      )
-      setPurlValue(`pkg:generic/System.Windows.Extensions@4.7.0`)
-      setPurlData(pkg)
-    } else {
+    if (purlValue && purlValue !== '' && isPURLInputValid) {
       const pkg = PackageURL.fromString(purlValue)
       setPurlData(pkg)
+      setPurlString(pkg.toString())
+    } else {
+      setPurlString('pkg:type/namespace/name@version')
     }
     onPurlOpen()
   }
@@ -205,7 +198,7 @@ function ComponentDrawer(props) {
           name: compName,
           version: compVersion,
           licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
-          licenseExp: licenseType === 'license_exp' ? licenseExp : undefined,
+          licenseExp: licenseType === 'license_exp' ? expLicense : undefined,
           cpes: cpeList,
           purl: purlValue,
           primary: isPrimary,
@@ -242,7 +235,7 @@ function ComponentDrawer(props) {
           name: compName,
           version: compVersion,
           licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
-          licenseExp: licenseType === 'license_exp' ? licenseExp : undefined,
+          licenseExp: licenseType === 'license_exp' ? expLicense : undefined,
           cpes: cpeList,
           purl: purlValue,
           primary: isPrimary,
@@ -362,6 +355,8 @@ function ComponentDrawer(props) {
     })
   }
 
+  const [expLicense, setExpLicense] = useState([])
+
   return (
     <>
       <Drawer isOpen={isOpen} placement='right' onClose={onClose} size='md'>
@@ -470,7 +465,11 @@ function ComponentDrawer(props) {
               </FormControl>
 
               {/* LICENSES */}
-              <LicenseField data={data} />
+              <LicenseField
+                exp={data?.licenseExp}
+                expLicense={expLicense}
+                setExpLicense={setExpLicense}
+              />
 
               {/* PURL INPUI */}
               <FormControl isReadOnly={customerView}>
@@ -491,11 +490,12 @@ function ComponentDrawer(props) {
                     <Input
                       type='text'
                       size='md'
+                      id='purl'
+                      name='purl'
                       fontSize={'sm'}
                       placeholder='PURL'
                       value={purlValue}
-                      id='purl'
-                      name='purl'
+                      autoComplete='off'
                       onChange={handlePURLInputChange}
                     />
                     <InputRightElement align='center' zIndex={-1}>
@@ -621,7 +621,7 @@ function ComponentDrawer(props) {
               ) : (
                 <Button
                   colorScheme='blue'
-                  onClick={handleUpdate}
+                  onClick={handleUpdateCom}
                   isDisabled={!compType}
                 >
                   Update

@@ -54,7 +54,6 @@ const GeneralDataRow = ({ status, data, refetch }) => {
     licenseType,
     spdxLicense,
     setSpdxLicense,
-    licenseExp,
     customLicense
   } = useContext(GlobalContext)
 
@@ -62,6 +61,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
   const customerView = location.pathname.startsWith('/customer')
   const [selectedKey, setSelectedKey] = useState('')
   const [activeTool, setActiveTool] = useState(null)
+  const [expLicense, setExpLicense] = useState([])
 
   const btnRef = useRef(null)
   const licenseBtn = useRef(null)
@@ -174,7 +174,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
           id: data.id,
           spec: data.spec,
           licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
-          licenseExp: licenseType === 'license_exp' ? licenseExp : undefined
+          licenseExp: licenseType === 'license_exp' ? expLicense : undefined
         }
       }).then((res) => res.data && onSBMClose())
     } catch (error) {
@@ -472,7 +472,11 @@ const GeneralDataRow = ({ status, data, refetch }) => {
             </ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              <LicenseField exp={data?.licenseExp} />
+              <LicenseField
+                exp={data?.licenseExp}
+                expLicense={expLicense}
+                setExpLicense={setExpLicense}
+              />
             </ModalBody>
             <ModalFooter>
               <Button fontSize={'sm'} mr={3} onClick={onSBMClose}>
@@ -484,9 +488,8 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                 disabled={
                   (licenseType === 'license_spdx' &&
                     spdxLicense.length === 0) ||
-                  (licenseType === 'license_exp' && licenseExp.length === 0) ||
-                  (licenseType === 'license_custom' &&
-                    customLicense.length === 0)
+                  (licenseType === 'license_exp' && expLicense === '') ||
+                  (licenseType === 'license_custom' && customLicense === '')
                 }
                 onClick={onUpdateLicense}
               >
