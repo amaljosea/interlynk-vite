@@ -142,7 +142,7 @@ const CpeInput = ({
           )}
         </InputGroup>
       </FormControl>
-      {cpeList !== null && cpeList.length > 0 && (
+      {cpeList !== null && inputValue !== '' && cpeList.length > 0 && (
         <Box
           pos={'absolute'}
           width={'100%'}

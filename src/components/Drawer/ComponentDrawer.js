@@ -174,10 +174,6 @@ function ComponentDrawer(props) {
   const handlePURLInputChange = (e) => {
     const inputValue = e.target.value
     setPurlValue(inputValue)
-    if (inputValue == null || inputValue === '') {
-      return
-    }
-    console.log('invoking handle change ' + inputValue)
     try {
       PackageURL.fromString(inputValue)
       setPURLInputValid(true)
@@ -188,7 +184,7 @@ function ComponentDrawer(props) {
   }
 
   const handlePurlModal = () => {
-    if (purlValue !== '') {
+    if (purlValue !== '' && isPURLInputValid) {
       const pkg = PackageURL.fromString(purlValue)
       setPurlData(pkg)
       setPurlString(pkg.toString())
@@ -519,7 +515,6 @@ function ComponentDrawer(props) {
                     colorScheme='blue'
                     width={'fit-content'}
                     onClick={handlePurlModal}
-                    disabled={!isPURLInputValid && purlValue !== ''}
                   >
                     Details
                   </IconButton>
