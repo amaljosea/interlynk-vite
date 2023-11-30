@@ -238,6 +238,20 @@ const ComponentTable = ({
     onCompOpen()
   }
 
+  const handleOpen = (row) => {
+    setActiveRow(row)
+    getComPath({
+      variables: {
+        compId: row.id,
+        sbomId: sbomId
+      }
+    }).then((res) => {
+      if (res.data) {
+        onRelationOpen()
+      }
+    })
+  }
+
   // ADD KEYBOARD SHORTCUT FOR TOGGLE COMPONENT DRAWER
   const handleCompDown = (event) => {
     if (event.altKey && event.key === '1') {
@@ -498,20 +512,6 @@ const ComponentTable = ({
       selector: (row) => {
         const { suppliers, status, primary, id } = row
 
-        const handleOpen = () => {
-          getComPath({
-            variables: {
-              compId: id,
-              sbomId: sbomId
-            }
-          }).then((res) => {
-            if (res.data) {
-              setActiveRow(row)
-              onRelationOpen()
-            }
-          })
-        }
-
         return (
           <>
             {!customerView ? (
@@ -531,7 +531,9 @@ const ComponentTable = ({
                     >
                       Edit Component
                     </MenuItem>
-                    <MenuItem onClick={handleOpen}>Edit Relationships</MenuItem>
+                    <MenuItem onClick={() => handleOpen(row)}>
+                      Edit Relationships
+                    </MenuItem>
                     <MenuItem
                       onClick={() => {
                         setActiveRow(row)
@@ -1100,6 +1102,7 @@ const ComponentTable = ({
               compPath={comPath.component.pathToPrimary}
               total={totalComp}
               fetchCompData={fetchCompData}
+              refetch={getDependency}
             />
           )}
         </>
