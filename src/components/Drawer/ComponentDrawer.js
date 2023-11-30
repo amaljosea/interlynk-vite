@@ -80,13 +80,8 @@ function ComponentDrawer(props) {
     filterRefetch
   } = props
 
-  const {
-    setCompFilters,
-    licenseType,
-    spdxLicense,
-    licenseExp,
-    setPurlString
-  } = useContext(GlobalContext)
+  const { setCompFilters, licenseType, spdxLicense, setPurlString } =
+    useContext(GlobalContext)
 
   const onFilterRefetch = () => {
     filterRefetch({
@@ -203,7 +198,7 @@ function ComponentDrawer(props) {
           name: compName,
           version: compVersion,
           licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
-          licenseExp: licenseType === 'license_exp' ? licenseExp : undefined,
+          licenseExp: licenseType === 'license_exp' ? expLicense : undefined,
           cpes: cpeList,
           purl: purlValue,
           primary: isPrimary,
@@ -240,7 +235,7 @@ function ComponentDrawer(props) {
           name: compName,
           version: compVersion,
           licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
-          licenseExp: licenseType === 'license_exp' ? licenseExp : undefined,
+          licenseExp: licenseType === 'license_exp' ? expLicense : undefined,
           cpes: cpeList,
           purl: purlValue,
           primary: isPrimary,
@@ -360,6 +355,8 @@ function ComponentDrawer(props) {
     })
   }
 
+  const [expLicense, setExpLicense] = useState([])
+
   return (
     <>
       <Drawer isOpen={isOpen} placement='right' onClose={onClose} size='md'>
@@ -468,7 +465,11 @@ function ComponentDrawer(props) {
               </FormControl>
 
               {/* LICENSES */}
-              <LicenseField data={data} />
+              <LicenseField
+                exp={data?.licenseExp}
+                expLicense={expLicense}
+                setExpLicense={setExpLicense}
+              />
 
               {/* PURL INPUI */}
               <FormControl isReadOnly={customerView}>

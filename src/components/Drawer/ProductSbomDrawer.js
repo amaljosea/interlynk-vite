@@ -24,13 +24,13 @@ import LicenseField from 'components/LicenseField'
 
 function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
   const toast = useToast()
+  const [expLicense, setExpLicense] = useState([])
 
   const {
     prodField,
     prodDirection,
     licenseType,
     spdxLicense,
-    licenseExp,
     totalRows
   } = useContext(GlobalContext)
 
@@ -60,7 +60,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
         name: sbomName,
         version: version,
         licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
-        licenseExp: licenseType === 'license_exp' ? licenseExp : undefined,
+        licenseExp: licenseType === 'license_exp' ? expLicense : undefined,
         primary: true
       }
     }).then(
@@ -83,7 +83,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
         specVersion: version,
         format: compType,
         licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
-        licenseExp: licenseType === 'license_exp' ? licenseExp : undefined
+        licenseExp: licenseType === 'license_exp' ? expLicense : undefined
       }
     })
       .then((res) => res.data && handleCreateComp(res.data.sbomCreate.sbom.id))
@@ -160,7 +160,11 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
                 </Select>
               </FormControl>
               {/* Licenses */}
-              <LicenseField exp={null} />
+              <LicenseField
+                exp={null}
+                expLicense={expLicense}
+                setExpLicense={setExpLicense}
+              />
               {/* PRIMARY COMPONENT */}
               <FormControl htmlFor={'isPrimary'} isReadOnly={true}>
                 <Checkbox

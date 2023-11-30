@@ -230,8 +230,6 @@ const ComponentTable = ({
     setLicenseType('license_spdx')
     setSpdxList([])
     setSpdxLicense([])
-    setExpList([])
-    setLicenseExp([])
     onCompOpen()
   }
 
@@ -816,6 +814,7 @@ const ComponentTable = ({
     setFilterText('')
     setComPageIndex(1)
   }
+
 
   // HEADER SECTION
   const subHeaderComponentMemo = useMemo(() => {

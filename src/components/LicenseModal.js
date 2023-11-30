@@ -43,8 +43,8 @@ const LicenseModal = ({
 
   const isDisabled =
     (licenseType === 'license_spdx' && spdxLicense.length === 0) ||
-    (licenseType === 'license_exp' && licenseExp.length === 0) ||
-    (licenseType === 'license_custom' && customLicense.length === 0)
+    (licenseType === 'license_exp' && licenseExp === '') ||
+    (licenseType === 'license_custom' && customLicense === '')
 
   const handleRefetch = () => {
     refetch({

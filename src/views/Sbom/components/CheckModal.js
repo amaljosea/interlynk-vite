@@ -58,7 +58,6 @@ const CheckModal = ({
   const {
     licenseType,
     spdxLicense,
-    licenseExp,
     setCheckFilters,
     setActiveProdTab,
     compField,
@@ -67,7 +66,7 @@ const CheckModal = ({
 
   const now = new Date()
   const currentTime = now.toISOString().slice(0, 16)
-
+  const [expLicense, setExpLicense] = useState([])
   const [timestamp, setTimestamp] = useState(currentTime)
   const [comp, setComp] = useState('')
   const [compType, setCompType] = useState('')
@@ -155,7 +154,7 @@ const CheckModal = ({
           id: componentId,
           sbomId: sbomId,
           licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
-          licenseExp: licenseType === 'license_exp' ? licenseExp : undefined
+          licenseExp: licenseType === 'license_exp' ? expLicense : undefined
         }
       })
         .then((res) => {
@@ -259,7 +258,7 @@ const CheckModal = ({
                 licenseType === 'license_spdx'
                   ? spdxLicense
                   : licenseType === 'license_exp'
-                  ? licenseExp
+                  ? expLicense
                   : ''
             },
             null,
@@ -379,7 +378,11 @@ const CheckModal = ({
             {(shortDesc === 'Component has license/s specified' ||
               shortDesc === 'Componet has deprecated license/s' ||
               shortDesc === 'Component has restrictive licenses specified') && (
-              <LicenseField exp={activeCheck.component.licenseExp} />
+              <LicenseField
+                exp={activeCheck.component.licenseExp}
+                expLicense={expLicense}
+                setExpLicense={setExpLicense}
+              />
             )}
           </ModalBody>
 
