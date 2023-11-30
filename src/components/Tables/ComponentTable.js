@@ -775,8 +775,13 @@ const ComponentTable = ({
           field: compField,
           direction: compDirection
         }
+      }).then((res) => {
+        if (res.data) {
+          setComPageIndex(1)
+          setCompBefore(res.data.sbom.components.pageInfo.startCursor)
+          setCompAfter(res.data.sbom.components.pageInfo.endCursor)
+        }
       })
-      setComPageIndex(1)
     }
   }
 
@@ -791,9 +796,14 @@ const ComponentTable = ({
         field: compField,
         direction: compDirection
       }
+    }).then((res) => {
+      if (res.data) {
+        setCompSearchInput('')
+        setComPageIndex(1)
+        setCompBefore(res.data.sbom.components.pageInfo.startCursor)
+        setCompAfter(res.data.sbom.components.pageInfo.endCursor)
+      }
     })
-    setCompSearchInput('')
-    setComPageIndex(1)
   }
 
   // SET ROW LENGTH
@@ -814,7 +824,6 @@ const ComponentTable = ({
     setFilterText('')
     setComPageIndex(1)
   }
-
 
   // HEADER SECTION
   const subHeaderComponentMemo = useMemo(() => {

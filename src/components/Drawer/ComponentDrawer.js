@@ -621,7 +621,7 @@ function ComponentDrawer(props) {
               ) : (
                 <Button
                   colorScheme='blue'
-                  onClick={handleUpdate}
+                  onClick={handleUpdateCom}
                   isDisabled={!compType}
                 >
                   Update
