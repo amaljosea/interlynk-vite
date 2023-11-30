@@ -179,7 +179,7 @@ function ComponentDrawer(props) {
   }
 
   const handlePurlModal = () => {
-    if (purlValue !== '' && isPURLInputValid) {
+    if (purlValue && purlValue !== '' && isPURLInputValid) {
       const pkg = PackageURL.fromString(purlValue)
       setPurlData(pkg)
       setPurlString(pkg.toString())
