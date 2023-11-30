@@ -11,33 +11,23 @@ import {
   RadioGroup,
   Radio,
   Alert,
-  AlertIcon
+  AlertIcon,
+  Input
 } from '@chakra-ui/react'
-import { useContext } from 'react'
-import { licenseOptions } from 'variables/licenses'
-import CreatableSelect from 'react-select/creatable'
+import { useContext, useState } from 'react'
 import ReactSelect from 'react-select'
 import GlobalContext from 'context/GlobalContext'
+import { CpeAutoComplete } from 'graphQL/Queries'
+import { useLazyQuery } from '@apollo/client'
+import spdxValidate from 'spdx-expression-validate'
 
-const LicenseField = ({ exp }) => {
-  const {
-    spdxList,
-    setSpdxList,
-    expList,
-    setExpList,
-    customList,
-    setCustomList,
-    licenseType,
-    setLicenseType,
-    setSpdxLicense,
-    setLicenseExp,
-    setCustomLicense
-  } = useContext(GlobalContext)
+const LicenseField = ({ exp, expLicense, setExpLicense }) => {
+  const { spdxList, setSpdxList, licenseType, setLicenseType, setSpdxLicense } =
+    useContext(GlobalContext)
 
-  const licenses = licenseOptions.map((option) => ({
-    value: option.licenseId,
-    label: option.name
-  }))
+  const [licenseList, setLicenseList] = useState([])
+  const [isValid, setIsValid] = useState(true)
+  const [getCpe] = useLazyQuery(CpeAutoComplete)
 
   const onLicenseChange = (selected) => {
     console.log(selected)
@@ -50,40 +40,50 @@ const LicenseField = ({ exp }) => {
     }
   }
 
-  const onExpChange = (selected) => {
-    setExpList(selected)
-
-    if (selected) {
-      const selectedIds = selected.map((option) => option.value)
-      setLicenseExp(selectedIds)
+  const handleInputChange = (value) => {
+    console.log('value', value)
+    if (value !== '') {
+      getCpe({
+        variables: {
+          input: {
+            idType: 'spdx',
+            ecosystem: 'spdx',
+            search: {
+              name: value
+            }
+          }
+        }
+      }).then((res) => {
+        if (res.data) {
+          const licenses = res.data.idAutoComplete.result.map((value) => ({
+            value: value,
+            label: value
+          }))
+          setLicenseList(licenses)
+        }
+      })
     } else {
-      setLicenseExp([])
+      setLicenseList([])
     }
   }
 
-  const onCustomChange = (selected) => {
-    setCustomList(selected)
-    if (selected) {
-      const selectedIds = selected.map((option) => option.value)
-      setCustomLicense(selectedIds)
+  const handleExpChange = (e) => {
+    const { value } = e.target
+    setExpLicense(value)
+    if (value !== '') {
+      const trimmedInput = typeof value === 'string' ? value.trim() : ''
+      const isLicenseValid = spdxValidate(trimmedInput)
+      setIsValid(isLicenseValid)
     } else {
-      setCustomLicense([])
+      setIsValid(true)
     }
   }
 
   const handleTypeChange = (value) => {
     setLicenseType(value)
-    switch (value) {
-      case 'license_exp':
-        if (exp && exp.length > 0) {
-          const filterData = exp.map((option) => ({
-            value: option,
-            label: option
-          }))
-          setExpList(filterData)
-          const selectedIds = filterData.map((option) => option.value)
-          setLicenseExp(selectedIds)
-        }
+    if (value === 'license_exp') {
+      setIsValid(true)
+      setExpLicense(exp ? exp : '')
     }
   }
 
@@ -126,36 +126,35 @@ const LicenseField = ({ exp }) => {
               IndicatorSeparator: () => null
             }}
             value={spdxList}
-            options={licenses}
+            options={licenseList}
             onChange={onLicenseChange}
+            onInputChange={handleInputChange}
             placeholder={''}
             className='react-select'
           />
         )}
         {/* LICENSE EXPRESSION */}
         {licenseType === 'license_exp' && (
-          <CreatableSelect
-            styles={{
-              control: (baseStyles, state) => ({
-                ...baseStyles,
-                borderColor: state.isFocused ? 'inherit' : 'inherit',
-                fontSize: '14px',
-                padding: '2px 0',
-                '&:hover': {
-                  borderColor: '#CBD5E0'
-                }
-              })
-            }}
-            isMulti
-            components={{
-              DropdownIndicator: () => null,
-              IndicatorSeparator: () => null
-            }}
-            value={expList}
-            onChange={onExpChange}
-            placeholder={'Enter a valid SPDX Expression'}
-            className='react-select'
-          />
+          <>
+            <Input
+              type='text'
+              value={expLicense}
+              fontSize={'sm'}
+              onChange={handleExpChange}
+            />
+            {!isValid && (
+              <Alert
+                fontSize={'sm'}
+                mt='2'
+                status='error'
+                py={2}
+                borderRadius={4}
+              >
+                <AlertIcon width={4} />
+                Invalid license expression
+              </Alert>
+            )}
+          </>
         )}
         {/* CUSTOM LICENSE */}
         {licenseType === 'license_custom' && (
@@ -164,29 +163,6 @@ const LicenseField = ({ exp }) => {
               <AlertIcon width={4} />
               Coming Soon
             </Alert>
-            <CreatableSelect
-              styles={{
-                control: (baseStyles, state) => ({
-                  ...baseStyles,
-                  borderColor: state.isFocused ? 'inherit' : 'inherit',
-                  fontSize: '14px',
-                  padding: '2px 0',
-                  display: 'none',
-                  '&:hover': {
-                    borderColor: '#CBD5E0'
-                  }
-                })
-              }}
-              isMulti
-              components={{
-                DropdownIndicator: () => null,
-                IndicatorSeparator: () => null
-              }}
-              className='react-select'
-              value={customList}
-              onChange={onCustomChange}
-              placeholder={'Enter License Name'}
-            />
           </>
         )}
       </FormControl>
