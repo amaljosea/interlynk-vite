@@ -209,7 +209,6 @@ const PurlModal = ({
       const pkg = PackageURL.fromString(purlString)
       pkg.namespace = namespace
       setPurlString(pkg.toString())
-      setNamespaceList([])
     }
   }
 
@@ -285,7 +284,6 @@ const PurlModal = ({
       const pkg = PackageURL.fromString(purlString)
       pkg.name = purlName
       setPurlString(pkg.toString())
-      setPurlNameList([])
     }
   }
 
@@ -369,7 +367,6 @@ const PurlModal = ({
       const pkg = PackageURL.fromString(purlString)
       pkg.version = purlVersion
       setPurlString(pkg.toString())
-      setPurlVersionList([])
     }
   }
 
