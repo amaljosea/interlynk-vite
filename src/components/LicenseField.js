@@ -13,11 +13,12 @@ import {
   Alert,
   AlertIcon
 } from '@chakra-ui/react'
-import { useContext } from 'react'
-import { licenseOptions } from 'variables/licenses'
+import { useContext, useState } from 'react'
 import CreatableSelect from 'react-select/creatable'
 import ReactSelect from 'react-select'
 import GlobalContext from 'context/GlobalContext'
+import { CpeAutoComplete } from 'graphQL/Queries'
+import { useLazyQuery } from '@apollo/client'
 
 const LicenseField = ({ exp }) => {
   const {
@@ -34,10 +35,9 @@ const LicenseField = ({ exp }) => {
     setCustomLicense
   } = useContext(GlobalContext)
 
-  const licenses = licenseOptions.map((option) => ({
-    value: option.licenseId,
-    label: option.name
-  }))
+  const [licenseList, setLicenseList] = useState([])
+
+  const [getCpe] = useLazyQuery(CpeAutoComplete)
 
   const onLicenseChange = (selected) => {
     console.log(selected)
@@ -47,6 +47,33 @@ const LicenseField = ({ exp }) => {
       setSpdxLicense(selectedIds)
     } else {
       setSpdxLicense([])
+    }
+  }
+
+  const handleInputChange = (value) => {
+    console.log('value', value)
+    if (value !== '') {
+      getCpe({
+        variables: {
+          input: {
+            idType: 'spdx',
+            ecosystem: 'spdx',
+            search: {
+              name: value
+            }
+          }
+        }
+      }).then((res) => {
+        if (res.data) {
+          const licenses = res.data.idAutoComplete.result.map((value) => ({
+            value: value,
+            label: value
+          }))
+          setLicenseList(licenses)
+        }
+      })
+    } else {
+      setLicenseList([])
     }
   }
 
@@ -126,8 +153,9 @@ const LicenseField = ({ exp }) => {
               IndicatorSeparator: () => null
             }}
             value={spdxList}
-            options={licenses}
+            options={licenseList}
             onChange={onLicenseChange}
+            onInputChange={handleInputChange}
             placeholder={''}
             className='react-select'
           />

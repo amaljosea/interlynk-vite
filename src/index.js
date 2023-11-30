@@ -47,25 +47,20 @@ const tagManagerArgs = {
 TagManager.initialize(tagManagerArgs)
 
 ReactDOM.render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <ContextWrapper>
-        <ChakraProvider theme={theme} resetCSS={true}>
-          <ScrollToTop />
-          <Switch>
-            <Route path={`/auth`} component={AuthLayout} />
-            <Route path={`/vendor`} component={AdminLayout} />
-            <Route path={`/login`} component={LoginLayout} />
-            <Route path={`/customer`} component={CustomerLayout} />
-            <Route path={`/register`} component={Register} />
-            <Redirect
-              from={`/`}
-              to={authToken ? '/vendor/dashboard' : '/auth'}
-            />
-          </Switch>
-        </ChakraProvider>
-      </ContextWrapper>
-    </BrowserRouter>
-  </React.StrictMode>,
+  <BrowserRouter>
+    <ContextWrapper>
+      <ChakraProvider theme={theme} resetCSS={true}>
+        <ScrollToTop />
+        <Switch>
+          <Route path={`/auth`} component={AuthLayout} />
+          <Route path={`/vendor`} component={AdminLayout} />
+          <Route path={`/login`} component={LoginLayout} />
+          <Route path={`/customer`} component={CustomerLayout} />
+          <Route path={`/register`} component={Register} />
+          <Redirect from={`/`} to={authToken ? '/vendor/dashboard' : '/auth'} />
+        </Switch>
+      </ChakraProvider>
+    </ContextWrapper>
+  </BrowserRouter>,
   document.getElementById('root')
 )
