@@ -32,7 +32,7 @@ const CpeInput = ({
   const { cpeString, setCpeString, purlString, setPurlString } =
     useContext(GlobalContext)
 
-  const handleSelect = (value) => {
+  const updateString = (name, value) => {
     const cpeParts = cpeString.split(':')
     if (name === 'vendor') {
       cpeParts[3] = value
@@ -59,9 +59,19 @@ const CpeInput = ({
       pkg.version = value
       setPurlString(pkg.toString())
     }
+  }
 
+  const handleSelect = (value) => {
+    value !== '' && updateString(name, value)
     setInputValue(value)
     setCpeList([])
+  }
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === 'Tab') {
+      inputValue !== '' && updateString(name, inputValue)
+      setCpeList([])
+    }
   }
 
   useEffect(() => {
@@ -116,7 +126,8 @@ const CpeInput = ({
             placeholder={name === 'cpe' ? 'CPE' : ''}
             value={inputValue}
             onChange={onChange}
-            onBlur={onBlur}
+            autoComplete='off'
+            onKeyDown={handleKeyDown}
           />
           {validation === true && (
             <InputRightElement align='center' zIndex={-1}>

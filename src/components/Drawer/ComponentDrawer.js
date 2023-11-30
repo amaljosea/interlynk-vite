@@ -80,8 +80,13 @@ function ComponentDrawer(props) {
     filterRefetch
   } = props
 
-  const { setCompFilters, licenseType, spdxLicense, licenseExp } =
-    useContext(GlobalContext)
+  const {
+    setCompFilters,
+    licenseType,
+    spdxLicense,
+    licenseExp,
+    setPurlString
+  } = useContext(GlobalContext)
 
   const onFilterRefetch = () => {
     filterRefetch({
@@ -183,15 +188,12 @@ function ComponentDrawer(props) {
   }
 
   const handlePurlModal = () => {
-    if (!purlValue) {
-      const pkg = PackageURL.fromString(
-        'pkg:generic/System.Windows.Extensions@4.7.0'
-      )
-      setPurlValue(`pkg:generic/System.Windows.Extensions@4.7.0`)
-      setPurlData(pkg)
-    } else {
+    if (purlValue !== '') {
       const pkg = PackageURL.fromString(purlValue)
       setPurlData(pkg)
+      setPurlString(pkg.toString())
+    } else {
+      setPurlString('pkg:type/namespace/name@version')
     }
     onPurlOpen()
   }
@@ -491,11 +493,12 @@ function ComponentDrawer(props) {
                     <Input
                       type='text'
                       size='md'
+                      id='purl'
+                      name='purl'
                       fontSize={'sm'}
                       placeholder='PURL'
                       value={purlValue}
-                      id='purl'
-                      name='purl'
+                      autoComplete='off'
                       onChange={handlePURLInputChange}
                     />
                     <InputRightElement align='center' zIndex={-1}>
@@ -516,6 +519,7 @@ function ComponentDrawer(props) {
                     colorScheme='blue'
                     width={'fit-content'}
                     onClick={handlePurlModal}
+                    disabled={!isPURLInputValid && purlValue !== ''}
                   >
                     Details
                   </IconButton>

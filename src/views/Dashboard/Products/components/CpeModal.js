@@ -68,7 +68,6 @@ const CpeModal = ({
   // UPDATE FIELDS DATA FROM API
   useEffect(() => {
     const matches = regexPattern.test(cpeValue)
-
     if (matches) {
       setCpeString(cpeValue)
       const components = cpeValue.split(':')
@@ -76,10 +75,8 @@ const CpeModal = ({
       setProduct(components[4])
       setVersion(components[5])
       setHardware('*')
-    }
-
-    if (cpeValue === '') {
-      setCpeString('cpe:2.3:a:calligra:calligra:2.4.1:*:*:*:*:*:*:*')
+    } else {
+      setCpeString('cpe:2.3:::::*:*:*:*:*:*:*')
     }
   }, [cpeValue])
 
@@ -124,15 +121,16 @@ const CpeModal = ({
   // ON VENDOR INPUT CHANGE
   const onVendorInputChange = (event) => {
     const { value } = event.target
-    setVendor(value)
-    if (value !== '') {
+    const val = value.replace(/\s/g, '')
+    setVendor(val)
+    if (val !== '') {
       getCpe({
         variables: {
           input: {
             idType: 'cpe',
             ecosystem: 'cpe',
             search: {
-              vendor: value
+              vendor: val
             }
           }
         }
@@ -141,16 +139,6 @@ const CpeModal = ({
           setVendorList(res.data.idAutoComplete.result)
         }
       })
-    }
-  }
-
-  const onVendorBlur = () => {
-    if (vendor !== '') {
-      const cpeParts = cpeString.split(':')
-      cpeParts[3] = vendor
-      const cpe = cpeParts.join(':')
-      setCpeString(cpe)
-      setVendorList([])
     }
   }
 
@@ -169,15 +157,16 @@ const CpeModal = ({
   // ON PRODUCT INPUT CHANGE
   const onProductInputChange = (event) => {
     const { value } = event.target
-    setProduct(value)
-    if (value !== '') {
+    const val = value.replace(/\s/g, '')
+    setProduct(val)
+    if (val !== '') {
       getCpe({
         variables: {
           input: {
             idType: 'cpe',
             ecosystem: 'cpe',
             search: {
-              product: value
+              product: val
             },
             hints: {
               cpe: {
@@ -194,28 +183,19 @@ const CpeModal = ({
     }
   }
 
-  const onProductBlur = () => {
-    if (product !== '') {
-      const cpeParts = cpeString.split(':')
-      cpeParts[4] = product
-      const cpe = cpeParts.join(':')
-      setCpeString(cpe)
-      setProductList([])
-    }
-  }
-
   // ON VERSION INPUT CHANGE
   const onVersionInputChange = (event) => {
     const { value } = event.target
-    setVersion(value)
-    if (value !== '') {
+    const val = value.replace(/\s/g, '')
+    setVersion(val)
+    if (val !== '') {
       getCpe({
         variables: {
           input: {
             idType: 'cpe',
             ecosystem: 'cpe',
             search: {
-              version: value
+              version: val
             },
             hints: {
               cpe: {
@@ -230,16 +210,6 @@ const CpeModal = ({
           setVersionList(res.data.idAutoComplete.result)
         }
       })
-    }
-  }
-
-  const onVersionBlur = () => {
-    if (version !== '') {
-      const cpeParts = cpeString.split(':')
-      cpeParts[5] = version
-      const cpe = cpeParts.join(':')
-      setCpeString(cpe)
-      setVendorList([])
     }
   }
 
@@ -306,6 +276,7 @@ const CpeModal = ({
                   color='black'
                   isInvalid
                   errorBorderColor='blue.600'
+                  onChange={(e) => console.log(e.target.value)}
                   disabled
                 />
               </FormControl>
@@ -319,7 +290,6 @@ const CpeModal = ({
                 inputRef={vendorRef}
                 validation={false}
                 onChange={onVendorInputChange}
-                onBlur={onVendorBlur}
               />
               {/* TYPE */}
               <FormControl>
@@ -332,6 +302,7 @@ const CpeModal = ({
                   value={type}
                   onChange={handleTypeChange}
                 >
+                  <option value=''>-- Select --</option>
                   <option value='a'>Application</option>
                   <option value='o'>Operating System</option>
                   <option value='h'>Hardware</option>
@@ -347,7 +318,6 @@ const CpeModal = ({
                 inputRef={productRef}
                 validation={false}
                 onChange={onProductInputChange}
-                onBlur={onProductBlur}
               />
               {/* VERSION */}
               <CpeInput
@@ -359,7 +329,6 @@ const CpeModal = ({
                 inputRef={versionRef}
                 validation={false}
                 onChange={onVersionInputChange}
-                onBlur={onVersionBlur}
               />
               {/* TARGET HARDWARE */}
               <FormControl>
