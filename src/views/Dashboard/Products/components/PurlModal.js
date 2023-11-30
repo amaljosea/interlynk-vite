@@ -223,7 +223,6 @@ const PurlModal = ({
       pkg.namespace = ''
       pkg.name = 'name'
       setPurlString(pkg.toString())
-      setNamespaceList([])
     }
   }
 
@@ -313,6 +312,14 @@ const PurlModal = ({
           }
         })
       }
+    }
+  }
+
+  const onNameBlur = () => {
+    if (purlName !== '') {
+      const pkg = PackageURL.fromString(purlString)
+      pkg.name = purlName
+      setPurlString(pkg.toString())
     }
   }
 
@@ -414,7 +421,6 @@ const PurlModal = ({
       const pkg = PackageURL.fromString(purlString)
       pkg.version = ''
       setPurlString(pkg.toString())
-      setPurlVersionList([])
     }
   }
 
