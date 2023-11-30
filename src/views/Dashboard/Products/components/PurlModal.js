@@ -205,9 +205,11 @@ const PurlModal = ({
   }
 
   const onNamespaceBlur = () => {
-    const pkg = PackageURL.fromString(purlString)
-    pkg.namespace = namespace
-    setPurlString(pkg.toString())
+    if (namespace !== '') {
+      const pkg = PackageURL.fromString(purlString)
+      pkg.namespace = namespace
+      setPurlString(pkg.toString())
+    }
   }
 
   // ON PACKAGE NAME INPUT CHANGE
@@ -278,9 +280,11 @@ const PurlModal = ({
   }
 
   const onNameBlur = () => {
-    const pkg = PackageURL.fromString(purlString)
-    pkg.name = purlName
-    setPurlString(pkg.toString())
+    if (purlName !== '') {
+      const pkg = PackageURL.fromString(purlString)
+      pkg.name = purlName
+      setPurlString(pkg.toString())
+    }
   }
 
   // ON VERSION INPUT CHANGE
@@ -359,9 +363,11 @@ const PurlModal = ({
   }
 
   const onVersionBlur = () => {
-    const pkg = PackageURL.fromString(purlString)
-    pkg.version = purlVersion
-    setPurlString(pkg.toString())
+    if (purlVersion !== '') {
+      const pkg = PackageURL.fromString(purlString)
+      pkg.version = purlVersion
+      setPurlString(pkg.toString())
+    }
   }
 
   useEffect(() => {
@@ -684,6 +690,7 @@ const PurlModal = ({
                   variant='solid'
                   colorScheme={'blue'}
                   onClick={checkId ? handleComUpdate : handleSave}
+                  disabled={purlName === ''}
                 >
                   Save
                 </Button>
