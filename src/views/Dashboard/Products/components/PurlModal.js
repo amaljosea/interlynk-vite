@@ -168,21 +168,39 @@ const PurlModal = ({
     const { value } = event.target
     setNamespace(value)
     if (value !== '') {
-      getCpe({
-        variables: {
-          input: {
-            idType: 'purl',
-            ecosystem: 'maven',
-            search: {
-              namespace: value
+      if (purlType === 'npm') {
+        getCpe({
+          variables: {
+            input: {
+              idType: 'purl',
+              ecosystem: 'npm',
+              search: {
+                namespace: value
+              }
             }
           }
-        }
-      }).then((res) => {
-        if (res.data) {
-          setNamespaceList(res.data.idAutoComplete.result)
-        }
-      })
+        }).then((res) => {
+          if (res.data) {
+            setNamespaceList(res.data.idAutoComplete.result)
+          }
+        })
+      } else if (purlType === 'maven') {
+        getCpe({
+          variables: {
+            input: {
+              idType: 'purl',
+              ecosystem: 'maven',
+              search: {
+                namespace: value
+              }
+            }
+          }
+        }).then((res) => {
+          if (res.data) {
+            setNamespaceList(res.data.idAutoComplete.result)
+          }
+        })
+      }
     }
   }
 
@@ -234,6 +252,27 @@ const PurlModal = ({
             setPurlNameList(res.data.idAutoComplete.result)
           }
         })
+      } else if (purlType === 'npm') {
+        getCpe({
+          variables: {
+            input: {
+              idType: 'purl',
+              ecosystem: 'npm',
+              search: {
+                name: value
+              },
+              hints: {
+                purl: {
+                  namespace: namespace
+                }
+              }
+            }
+          }
+        }).then((res) => {
+          if (res.data) {
+            setPurlNameList(res.data.idAutoComplete.result)
+          }
+        })
       }
     }
   }
@@ -249,7 +288,7 @@ const PurlModal = ({
     const { value } = event.target
     const val = value.replace(/\s/g, '')
     setPurlVersion(val)
-    if (value !== '') {
+    if (val !== '') {
       if (purlType === 'maven') {
         getCpe({
           variables: {
@@ -283,6 +322,28 @@ const PurlModal = ({
               },
               hints: {
                 purl: {
+                  name: purlName
+                }
+              }
+            }
+          }
+        }).then((res) => {
+          if (res.data) {
+            setPurlVersionList(res.data.idAutoComplete.result)
+          }
+        })
+      } else if (purlType === 'npm') {
+        getCpe({
+          variables: {
+            input: {
+              idType: 'purl',
+              ecosystem: 'npm',
+              search: {
+                version: val
+              },
+              hints: {
+                purl: {
+                  namespace: namespace,
                   name: purlName
                 }
               }
@@ -442,7 +503,9 @@ const PurlModal = ({
                 </Select>
               </FormControl>
               {/* Namespace */}
-              {!namespaceOptions.hasOwnProperty(purlType) ? (
+              {purlType === 'maven' ||
+              purlType === 'nuget' ||
+              purlType === 'npm' ? (
                 <CpeInput
                   name='namespace'
                   inputValue={namespace}
@@ -474,7 +537,9 @@ const PurlModal = ({
                 </FormControl>
               ) : null}
               {/* Name */}
-              {purlType === 'maven' || purlType === 'nuget' ? (
+              {purlType === 'maven' ||
+              purlType === 'nuget' ||
+              purlType === 'npm' ? (
                 <CpeInput
                   name='packageName'
                   inputValue={purlName}
@@ -530,7 +595,9 @@ const PurlModal = ({
                 </FormControl>
               )}
               {/* Version */}
-              {purlType === 'maven' || purlType === 'nuget' ? (
+              {purlType === 'maven' ||
+              purlType === 'nuget' ||
+              purlType === 'npm' ? (
                 <CpeInput
                   name='packageVersion'
                   inputValue={purlVersion}
