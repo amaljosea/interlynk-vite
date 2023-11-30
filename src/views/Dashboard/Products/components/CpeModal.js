@@ -150,7 +150,6 @@ const CpeModal = ({
       cpeParts[3] = vendor
       const cpe = cpeParts.join(':')
       setCpeString(cpe)
-      setVendorList([])
     }
   }
 
@@ -200,7 +199,6 @@ const CpeModal = ({
       cpeParts[4] = product
       const cpe = cpeParts.join(':')
       setCpeString(cpe)
-      setProductList([])
     }
   }
 
@@ -239,7 +237,6 @@ const CpeModal = ({
       cpeParts[5] = version
       const cpe = cpeParts.join(':')
       setCpeString(cpe)
-      setVendorList([])
     }
   }
 
