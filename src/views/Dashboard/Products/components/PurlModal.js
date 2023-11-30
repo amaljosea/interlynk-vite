@@ -157,6 +157,12 @@ const PurlModal = ({
     }
   }
 
+  const isAutoComplete =
+    purlType === 'maven' ||
+    purlType === 'nuget' ||
+    purlType === 'npm' ||
+    purlType === 'gem'
+
   // ON NAMESPACE INPUT CHANGE
   const onNamespaceInputChange = (event) => {
     const { value } = event.target
@@ -185,6 +191,22 @@ const PurlModal = ({
             input: {
               idType: 'purl',
               ecosystem: 'maven',
+              search: {
+                namespace: val
+              }
+            }
+          }
+        }).then((res) => {
+          if (res.data) {
+            setNamespaceList(res.data.idAutoComplete.result)
+          }
+        })
+      } else if (purlType === 'gem') {
+        getCpe({
+          variables: {
+            input: {
+              idType: 'purl',
+              ecosystem: 'gem',
               search: {
                 namespace: val
               }
@@ -269,6 +291,27 @@ const PurlModal = ({
             setPurlNameList(res.data.idAutoComplete.result)
           }
         })
+      } else if (purlType === 'gem') {
+        getCpe({
+          variables: {
+            input: {
+              idType: 'purl',
+              ecosystem: 'gem',
+              search: {
+                name: val
+              },
+              hints: {
+                purl: {
+                  namespace: namespace
+                }
+              }
+            }
+          }
+        }).then((res) => {
+          if (res.data) {
+            setPurlNameList(res.data.idAutoComplete.result)
+          }
+        })
       }
     }
   }
@@ -328,6 +371,28 @@ const PurlModal = ({
             input: {
               idType: 'purl',
               ecosystem: 'npm',
+              search: {
+                version: val
+              },
+              hints: {
+                purl: {
+                  namespace: namespace,
+                  name: purlName
+                }
+              }
+            }
+          }
+        }).then((res) => {
+          if (res.data) {
+            setPurlVersionList(res.data.idAutoComplete.result)
+          }
+        })
+      } else if (purlType === 'gem') {
+        getCpe({
+          variables: {
+            input: {
+              idType: 'purl',
+              ecosystem: 'gem',
               search: {
                 version: val
               },
@@ -489,9 +554,7 @@ const PurlModal = ({
                 </Select>
               </FormControl>
               {/* Namespace */}
-              {purlType === 'maven' ||
-              purlType === 'nuget' ||
-              purlType === 'npm' ? (
+              {isAutoComplete ? (
                 <CpeInput
                   name='namespace'
                   inputValue={namespace}
@@ -522,9 +585,7 @@ const PurlModal = ({
                 </FormControl>
               ) : null}
               {/* Name */}
-              {purlType === 'maven' ||
-              purlType === 'nuget' ||
-              purlType === 'npm' ? (
+              {isAutoComplete ? (
                 <CpeInput
                   name='packageName'
                   inputValue={purlName}
@@ -578,9 +639,7 @@ const PurlModal = ({
                 </FormControl>
               )}
               {/* Version */}
-              {purlType === 'maven' ||
-              purlType === 'nuget' ||
-              purlType === 'npm' ? (
+              {isAutoComplete ? (
                 <CpeInput
                   name='packageVersion'
                   inputValue={purlVersion}
