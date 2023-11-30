@@ -37,6 +37,7 @@
     "react-scripts": "^5.0.0",
     "react-select": "^5.8.0",
     "semver": "^7.5.4",
+    "spdx-expression-validate": "^2.0.0",
     "styled-components": "^6.1.1"
   },
   "resolutions": {

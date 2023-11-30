@@ -1,4 +1,4 @@
-import { useLazyQuery, useMutation } from '@apollo/client'
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { ArrowDownIcon } from '@chakra-ui/icons'
 import {
   Box,
@@ -82,21 +82,14 @@ const RelationshipDrawer = ({
 
   const [addRelation] = useMutation(CreateCompRelation)
   const [removeRelation] = useMutation(DeleteCompRelation)
-  const [getDependency, { data: compDependency }] =
-    useLazyQuery(GetCompDependency)
+  const { data: compDependency, refetch } = useQuery(GetCompDependency, {
+    variables: {
+      compId: id,
+      sbomId: sbomId
+    }
+  })
 
   const shortestPath = findShortestPath(compPath)[0]
-
-  useEffect(() => {
-    if (compDependency === undefined) {
-      getDependency({
-        variables: {
-          compId: id,
-          sbomId: sbomId
-        }
-      })
-    }
-  }, [])
 
   const {
     isOpen: isDelOpen,
@@ -179,6 +172,7 @@ const RelationshipDrawer = ({
 
   const handleSave = () => {
     fetchCompData()
+    refetch()
     onClose()
   }
 

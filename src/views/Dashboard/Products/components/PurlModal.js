@@ -29,6 +29,7 @@ import GlobalContext from 'context/GlobalContext'
 import { CreateAutomation } from 'graphQL/Mutation'
 
 const typeOptions = [
+  { value: '', label: '-- Select --' },
   { value: 'alpm', label: 'alpm' },
   { value: 'apk', label: 'apk' },
   { value: 'bitbucket', label: 'bitbucket' },
@@ -98,16 +99,11 @@ const PurlModal = ({
   data,
   isOpen,
   onClose,
-  purlValue,
   setPurlValue,
   refetch,
   checkId,
   getCpe,
-  activeCheck,
-  component,
-  version,
-  group,
-  purl
+  activeCheck
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -127,8 +123,6 @@ const PurlModal = ({
 
   const [suggestions, setSuggestions] = useState([])
   const [verSuggestions, setVerSuggestions] = useState([])
-
-  const [updatedString, setUpdatedString] = useState(purlValue)
 
   const { purlString, setPurlString } = useContext(GlobalContext)
 
@@ -163,40 +157,82 @@ const PurlModal = ({
     }
   }
 
+  const isAutoComplete =
+    purlType === 'maven' ||
+    purlType === 'nuget' ||
+    purlType === 'npm' ||
+    purlType === 'gem'
+
   // ON NAMESPACE INPUT CHANGE
   const onNamespaceInputChange = (event) => {
     const { value } = event.target
-    setNamespace(value)
-    if (value !== '') {
-      getCpe({
-        variables: {
-          input: {
-            idType: 'purl',
-            ecosystem: 'maven',
-            search: {
-              namespace: value
+    const val = value.replace(/\s/g, '')
+    setNamespace(val)
+    if (val !== '') {
+      if (purlType === 'npm') {
+        getCpe({
+          variables: {
+            input: {
+              idType: 'purl',
+              ecosystem: 'npm',
+              search: {
+                namespace: val
+              }
             }
           }
-        }
-      }).then((res) => {
-        if (res.data) {
-          setNamespaceList(res.data.idAutoComplete.result)
-        }
-      })
+        }).then((res) => {
+          if (res.data) {
+            setNamespaceList(res.data.idAutoComplete.result)
+          }
+        })
+      } else if (purlType === 'maven') {
+        getCpe({
+          variables: {
+            input: {
+              idType: 'purl',
+              ecosystem: 'maven',
+              search: {
+                namespace: val
+              }
+            }
+          }
+        }).then((res) => {
+          if (res.data) {
+            setNamespaceList(res.data.idAutoComplete.result)
+          }
+        })
+      } else if (purlType === 'gem') {
+        getCpe({
+          variables: {
+            input: {
+              idType: 'purl',
+              ecosystem: 'gem',
+              search: {
+                namespace: val
+              }
+            }
+          }
+        }).then((res) => {
+          if (res.data) {
+            setNamespaceList(res.data.idAutoComplete.result)
+          }
+        })
+      }
+    } else {
+      const pkg = PackageURL.fromString(purlString)
+      pkg.namespace = ''
+      pkg.name = 'name'
+      setPurlString(pkg.toString())
+      setNamespaceList([])
     }
-  }
-
-  const onNamespaceBlur = () => {
-    const pkg = PackageURL.fromString(purlString)
-    pkg.namespace = namespace
-    setPurlString(pkg.toString())
   }
 
   // ON PACKAGE NAME INPUT CHANGE
   const onNameInputChange = (event) => {
     const { value } = event.target
-    setPurlName(value)
-    if (value !== '') {
+    const val = value.replace(/\s/g, '')
+    setPurlName(val)
+    if (val !== '') {
       if (purlType === 'maven') {
         getCpe({
           variables: {
@@ -204,7 +240,7 @@ const PurlModal = ({
               idType: 'purl',
               ecosystem: 'maven',
               search: {
-                name: value
+                name: val
               },
               hints: {
                 purl: {
@@ -225,7 +261,49 @@ const PurlModal = ({
               idType: 'purl',
               ecosystem: 'nuget',
               search: {
-                name: value
+                name: val
+              }
+            }
+          }
+        }).then((res) => {
+          if (res.data) {
+            setPurlNameList(res.data.idAutoComplete.result)
+          }
+        })
+      } else if (purlType === 'npm') {
+        getCpe({
+          variables: {
+            input: {
+              idType: 'purl',
+              ecosystem: 'npm',
+              search: {
+                name: val
+              },
+              hints: {
+                purl: {
+                  namespace: namespace
+                }
+              }
+            }
+          }
+        }).then((res) => {
+          if (res.data) {
+            setPurlNameList(res.data.idAutoComplete.result)
+          }
+        })
+      } else if (purlType === 'gem') {
+        getCpe({
+          variables: {
+            input: {
+              idType: 'purl',
+              ecosystem: 'gem',
+              search: {
+                name: val
+              },
+              hints: {
+                purl: {
+                  namespace: namespace
+                }
               }
             }
           }
@@ -238,18 +316,12 @@ const PurlModal = ({
     }
   }
 
-  const onNameBlur = () => {
-    const pkg = PackageURL.fromString(purlString)
-    pkg.name = purlName
-    setPurlString(pkg.toString())
-  }
-
   // ON VERSION INPUT CHANGE
   const onVersionInputChange = (event) => {
     const { value } = event.target
     const val = value.replace(/\s/g, '')
     setPurlVersion(val)
-    if (value !== '') {
+    if (val !== '') {
       if (purlType === 'maven') {
         getCpe({
           variables: {
@@ -293,21 +365,58 @@ const PurlModal = ({
             setPurlVersionList(res.data.idAutoComplete.result)
           }
         })
+      } else if (purlType === 'npm') {
+        getCpe({
+          variables: {
+            input: {
+              idType: 'purl',
+              ecosystem: 'npm',
+              search: {
+                version: val
+              },
+              hints: {
+                purl: {
+                  namespace: namespace,
+                  name: purlName
+                }
+              }
+            }
+          }
+        }).then((res) => {
+          if (res.data) {
+            setPurlVersionList(res.data.idAutoComplete.result)
+          }
+        })
+      } else if (purlType === 'gem') {
+        getCpe({
+          variables: {
+            input: {
+              idType: 'purl',
+              ecosystem: 'gem',
+              search: {
+                version: val
+              },
+              hints: {
+                purl: {
+                  namespace: namespace,
+                  name: purlName
+                }
+              }
+            }
+          }
+        }).then((res) => {
+          if (res.data) {
+            setPurlVersionList(res.data.idAutoComplete.result)
+          }
+        })
       }
+    } else {
+      const pkg = PackageURL.fromString(purlString)
+      pkg.version = ''
+      setPurlString(pkg.toString())
+      setPurlVersionList([])
     }
   }
-
-  const onVersionBlur = () => {
-    const pkg = PackageURL.fromString(purlString)
-    pkg.version = purlVersion
-    setPurlString(pkg.toString())
-  }
-
-  useEffect(() => {
-    if (purlValue) {
-      setPurlString(purlValue)
-    }
-  }, [purlValue])
 
   useEffect(() => {
     if (data) {
@@ -319,24 +428,24 @@ const PurlModal = ({
   }, [data])
 
   const handleTypeChange = (e) => {
-    setPurlType(e.target.value)
+    const { value } = e.target
+    setPurlType(value)
+    const pkg = PackageURL.fromString(purlString)
+    pkg.type = value
+    pkg.namespace = ''
+    pkg.name = 'name'
+    pkg.version = ''
+    setPurlString(pkg.toString())
     setNamespace('')
     setPurlName('')
     setPurlVersion('')
-  }
-
-  const onTypeBlur = () => {
-    const pkg = PackageURL.fromString(purlString)
-    pkg.type = purlType
-    pkg.namespace = ''
-    setPurlString(pkg.toString())
   }
 
   const handleNamespaceChange = (e) => {
     setNamespace(e.target.value)
     const pkg = PackageURL.fromString(purlString)
     pkg.namespace = e.target.value
-    setUpdatedString(pkg.toString())
+    setPurlString(pkg.toString())
   }
 
   const handleNameChange = (e) => {
@@ -351,23 +460,27 @@ const PurlModal = ({
   }
 
   const handleSave = () => {
-    setPurlValue(purlString)
+    const pkg = PackageURL.fromString(purlString)
+    pkg.namespace = pkg.namespace === 'namespace' ? '' : pkg.namespace
+    pkg.version = pkg.version === 'version' ? '' : pkg.version
+    setPurlString(pkg.toString())
+    setPurlValue(pkg.toString())
     onClose()
   }
 
   const handleNameClick = (suggestion) => {
     setPurlName(suggestion)
-    const pkg = PackageURL.fromString(updatedString)
+    const pkg = PackageURL.fromString(purlString)
     pkg.name = suggestion
-    setUpdatedString(pkg.toString())
+    setPurlString(pkg.toString())
     setSuggestions([])
   }
 
   const handleVersionClick = (version) => {
     setPurlVersion(version)
-    const pkg = PackageURL.fromString(updatedString)
+    const pkg = PackageURL.fromString(purlString)
     pkg.version = version
-    setUpdatedString(pkg.toString())
+    setPurlString(pkg.toString())
     setVerSuggestions([])
   }
 
@@ -419,7 +532,7 @@ const PurlModal = ({
                   color='black'
                   isInvalid
                   errorBorderColor='blue.600'
-                  onChange={handleVersionChange}
+                  onChange={(e) => console.log(e.target.value)}
                   disabled
                 />
               </FormControl>
@@ -432,7 +545,6 @@ const PurlModal = ({
                   name='packageType'
                   value={purlType}
                   onChange={handleTypeChange}
-                  onBlur={onTypeBlur}
                 >
                   {typeOptions.map((option) => (
                     <option key={option.value} value={option.value}>
@@ -442,7 +554,7 @@ const PurlModal = ({
                 </Select>
               </FormControl>
               {/* Namespace */}
-              {!namespaceOptions.hasOwnProperty(purlType) ? (
+              {isAutoComplete ? (
                 <CpeInput
                   name='namespace'
                   inputValue={namespace}
@@ -452,7 +564,6 @@ const PurlModal = ({
                   inputRef={namespaceRef}
                   validation={false}
                   onChange={onNamespaceInputChange}
-                  onBlur={onNamespaceBlur}
                 />
               ) : namespaceOptions[purlType] &&
                 namespaceOptions[purlType].length > 0 ? (
@@ -474,7 +585,7 @@ const PurlModal = ({
                 </FormControl>
               ) : null}
               {/* Name */}
-              {purlType === 'maven' || purlType === 'nuget' ? (
+              {isAutoComplete ? (
                 <CpeInput
                   name='packageName'
                   inputValue={purlName}
@@ -484,7 +595,6 @@ const PurlModal = ({
                   inputRef={packageNameRef}
                   validation={false}
                   onChange={onNameInputChange}
-                  onBlur={onNameBlur}
                 />
               ) : (
                 <FormControl>
@@ -497,7 +607,6 @@ const PurlModal = ({
                       size='md'
                       fontSize={'sm'}
                       onChange={handleNameChange}
-                      onBlur={onNameBlur}
                     />
                     {suggestions && suggestions.length > 0 && (
                       <Box
@@ -530,7 +639,7 @@ const PurlModal = ({
                 </FormControl>
               )}
               {/* Version */}
-              {purlType === 'maven' || purlType === 'nuget' ? (
+              {isAutoComplete ? (
                 <CpeInput
                   name='packageVersion'
                   inputValue={purlVersion}
@@ -540,7 +649,6 @@ const PurlModal = ({
                   inputRef={purlVersionRef}
                   validation={false}
                   onChange={onVersionInputChange}
-                  onBlur={onVersionBlur}
                 />
               ) : (
                 <FormControl>
@@ -553,7 +661,6 @@ const PurlModal = ({
                       type='text'
                       value={purlVersion}
                       onChange={handleVersionChange}
-                      onBlur={onVersionBlur}
                     />
                     {verSuggestions && verSuggestions.length > 0 && (
                       <Box
@@ -617,6 +724,7 @@ const PurlModal = ({
                   variant='solid'
                   colorScheme={'blue'}
                   onClick={checkId ? handleComUpdate : handleSave}
+                  disabled={purlName === ''}
                 >
                   Save
                 </Button>

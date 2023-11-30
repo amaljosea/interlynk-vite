@@ -15,7 +15,6 @@ import {
 } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
 import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
-import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import LicenseModal from 'components/LicenseModal'
 import GlobalContext from 'context/GlobalContext'
 import { CreateAutomation } from 'graphQL/Mutation'
@@ -111,54 +110,20 @@ const HealthCheckTable = ({
       variables: {
         projectId: productId,
         sbomId: sbomId,
-        search: checkSearchInput !== '' ? checkSearchInput : undefined,
-        category:
-          checkCategory.includes('all') || checkCategory.length === 0
-            ? undefined
-            : checkCategory,
-        severity:
-          checkSeverity.includes('all') || checkSeverity.length === 0
-            ? undefined
-            : checkSeverity,
-        status:
-          checkStatus.includes('all') || checkStatus.length === 0
-            ? undefined
-            : checkStatus,
-        first: checkAfter !== '' ? totalRows : undefined,
-        after: checkAfter !== '' ? checkAfter : undefined,
-        last: checkBefore !== '' ? totalRows : undefined,
-        before: checkBefore !== '' ? checkBefore : undefined,
+        first: totalRows,
         field: checkField,
-        direction: 'DESC'
+        direction: checkDirection
       }
     })
+    setPageIndex(1)
+    setCheckSearchInput('')
+    setCheckCategory([])
+    setCheckSeverity([])
+    setCheckStatus([])
   }
 
   const [updateResult] = useMutation(checkResultUpdate, {
-    onCompleted: () =>
-      refetch({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          search: checkSearchInput !== '' ? checkSearchInput : undefined,
-          category:
-            checkCategory.includes('all') || checkCategory.length === 0
-              ? undefined
-              : checkCategory,
-          severity:
-            checkSeverity.includes('all') || checkSeverity.length === 0
-              ? undefined
-              : checkSeverity,
-          status:
-            checkStatus.includes('all') || checkStatus.length === 0
-              ? undefined
-              : checkStatus,
-          first: totalRows,
-          last: undefined,
-          field: checkField,
-          direction: checkDirection
-        }
-      })
+    onCompleted: () => fetchCheckData()
   })
 
   const [getCpe] = useLazyQuery(CpeAutoComplete)
@@ -232,16 +197,7 @@ const HealthCheckTable = ({
   } = useDisclosure()
 
   const [healthRecheck] = useMutation(recheckHealth, {
-    onCompleted: () =>
-      refetch({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          first: totalRows,
-          field: checkField,
-          direction: checkDirection
-        }
-      })
+    onCompleted: () => fetchCheckData()
   })
 
   const handleReCheck = () => {
@@ -252,10 +208,6 @@ const HealthCheckTable = ({
         }
       }).then((res) => {
         if (res.data) {
-          setCheckSearchInput('')
-          setCheckCategory([])
-          setCheckSeverity([])
-          setCheckStatus([])
           toast({
             description: 'Health re-check successfully',
             status: 'success',
@@ -527,13 +479,6 @@ const HealthCheckTable = ({
     ) {
       return handleOpenLicense()
     }
-
-    // // COMPONENT UNIQUE IDENTIFIER
-    // if (
-    //   organizationRule.rule.shortDesc === 'Component has a unique identifier'
-    // ) {
-    //   return handleUniqueID()
-    // }
   }
 
   const updateIssue = async (id) => {
