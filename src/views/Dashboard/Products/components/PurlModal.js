@@ -103,7 +103,8 @@ const PurlModal = ({
   refetch,
   checkId,
   getCpe,
-  activeCheck
+  activeCheck,
+  setIsValid
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -483,12 +484,17 @@ const PurlModal = ({
   }
 
   const handleSave = () => {
-    const pkg = PackageURL.fromString(purlString)
-    pkg.namespace = pkg.namespace === 'namespace' ? '' : pkg.namespace
-    pkg.version = pkg.version === 'version' ? '' : pkg.version
-    setPurlString(pkg.toString())
-    setPurlValue(pkg.toString())
-    onClose()
+    try {
+      const pkg = PackageURL.fromString(purlString)
+      pkg.namespace = pkg.namespace === 'namespace' ? '' : pkg.namespace
+      pkg.version = pkg.version === 'version' ? '' : pkg.version
+      setPurlString(pkg.toString())
+      setPurlValue(pkg.toString())
+      setIsValid(true)
+      onClose()
+    } catch (error) {
+      setIsValid(false)
+    }
   }
 
   const [createAutoCheck] = useMutation(CreateAutomation)
