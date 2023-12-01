@@ -9,8 +9,10 @@ import {
   MenuOptionGroup,
   Stack
 } from '@chakra-ui/react'
+import { GetOrgRules } from 'graphQL/Queries'
 import GlobalContext from 'context/GlobalContext'
 import { useContext, useState } from 'react'
+import { useQuery } from '@apollo/client'
 import { FaFilter } from 'react-icons/fa'
 
 const CheckMark = () => {
@@ -53,6 +55,12 @@ const CheckFilterMenu = ({
   } = useContext(GlobalContext)
 
   const { checkCategories, checkStatuses } = checkFilters
+
+  const [checkIds, setCheckIds] = useState([])
+
+  const onFilterCheckId = (value) => {
+    setCheckIds(value.includes('all') ? [] : value)
+  }
 
   const onFilterCategory = (value) => {
     setCheckAfter('')
@@ -114,8 +122,58 @@ const CheckFilterMenu = ({
     setPageIndex(1)
   }
 
+  const { data } = useQuery(GetOrgRules, {
+    variables: {
+      field: 'RULES_FRIENDLY_ID',
+      direction: 'ASC'
+    }
+  })
+
   return (
     <Stack direction={'row'} alignItems={'center'} gap={1}>
+      {/* CHECK ID */}
+      {data && (
+        <Box width={'fit-content'} position={'relative'}>
+          <Menu closeOnBlur={true}>
+            {checkIds.length !== 0 && <CheckMark />}
+            <MenuButton
+              as={Button}
+              colorScheme='blue'
+              fontWeight='normal'
+              fontSize={'sm'}
+              leftIcon={<FaFilter size={14} />}
+            >
+              Check ID
+            </MenuButton>
+            <MenuList
+              minHeight={'auto'}
+              maxHeight={'300px'}
+              overflow={'hidden'}
+              overflowY={'scroll'}
+            >
+              <MenuOptionGroup
+                type='checkbox'
+                value={checkIds}
+                onChange={onFilterCheckId}
+              >
+                <MenuItemOption value={'all'} fontSize={'sm'}>
+                  All
+                </MenuItemOption>
+                {data?.organization?.organizationRules?.map((item, index) => (
+                  <MenuItemOption
+                    key={index}
+                    value={item.rule.friendlyId}
+                    fontSize={'sm'}
+                    textTransform={'capitalize'}
+                  >
+                    {item.rule.friendlyId}
+                  </MenuItemOption>
+                ))}
+              </MenuOptionGroup>
+            </MenuList>
+          </Menu>
+        </Box>
+      )}
       {/* CATEGORY */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnBlur={true}>
