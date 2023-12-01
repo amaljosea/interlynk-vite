@@ -469,14 +469,6 @@ const PurlModal = ({
     setPurlName(value)
   }
 
-  const onNameBlur = () => {
-    if (purlName !== '') {
-      const pkg = PackageURL.fromString(purlString)
-      pkg.name = purlName
-      setPurlString(pkg.toString())
-    }
-  }
-
   const handleVersionChange = (e) => {
     setPurlVersion(e.target.value)
   }
