@@ -32,17 +32,16 @@ const ProdStatusDrawer = ({
   filteredData,
   totalRows,
   filterRefetch,
-  after, 
-  before
+  setPageIndex
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
-  const { 
-    setVulnFilters, 
-    vulnField, 
+  const {
+    setVulnFilters,
+    vulnField,
     vulnDirection,
     vulnSeverity,
     vulnComponent,
@@ -71,6 +70,24 @@ const ProdStatusDrawer = ({
   const [compVexCreate] = useMutation(updateCompVulnVex, {
     fetchPolicy: 'network-only'
   })
+
+  const handleRefetch = () => {
+    refetch({
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        severity: vulnSeverity.length > 0 ? vulnSeverity : undefined,
+        componentName: vulnComponent.length > 0 ? vulnComponent : undefined,
+        status: vulnStatus.length > 0 ? vulnStatus : undefined,
+        kev: vulnKev === 'yes' ? true : vulnKev === 'no' ? false : undefined,
+        epss: vulnEpss !== '' ? range : undefined,
+        first: totalRows,
+        field: vulnField,
+        direction: vulnDirection
+      }
+    })
+    setPageIndex(1)
+  }
 
   const handleStatusChange = (e) => {
     const { value } = e.target
@@ -109,27 +126,7 @@ const ProdStatusDrawer = ({
           impact: impactData === '' ? undefined : impactData
         }
       })
-        .then(
-          (res) =>
-            res.data &&
-            refetch({
-              variables: {
-                projectId: productId,
-                sbomId: sbomId,
-                severity: vulnSeverity.length > 0 ? vulnSeverity : undefined,
-                componentName: vulnComponent.length > 0 ? vulnComponent : undefined,
-                status: vulnStatus.length > 0 ? vulnStatus : undefined,
-                kev: vulnKev === 'yes' ? true : vulnKev === 'no' ? false : undefined,
-                epss: vulnEpss !== '' ? range : undefined,
-                first: after !== '' ? totalRows : undefined,
-                after: after !== '' ? after : undefined,
-                last: before !== '' ? totalRows : undefined,
-                before: before !== '' ? before : undefined,
-                field: vulnField,
-                direction: vulnDirection
-              }
-            })
-        )
+        .then((res) => res.data && handleRefetch())
         .finally(() => onFilterRefetch())
     } catch (error) {
       console.log('Mutation error', error)
@@ -345,7 +342,6 @@ const ProdStatusDrawer = ({
             )}
           </Flex>
         </SimpleGrid>
-        <Divider />
       </Box>
     </Stack>
   )
