@@ -18,11 +18,12 @@ import ApiFeed from './components/ApiFeed'
 import Card from 'components/Card/Card'
 import ComponentFeed from './components/ComponentFeed'
 import GeneralFeed from './components/GeneralFeed'
-import TeamsLog from './components/TeamsLog'
+import TeamsLog from './components/TeamModal'
 import PersonalInfo from './components/PersonalInfo'
 import { useLocation, useHistory } from 'react-router-dom'
 import { GetOrg } from 'graphQL/Queries'
 import TokenInfo from './components/TokenInfo'
+import TeamTable from 'components/Tables/TeamTable'
 
 function Profile() {
   const location = useLocation()
@@ -130,7 +131,7 @@ function Profile() {
                   </TabPanel>
                   {/* TEAMS */}
                   <TabPanel>
-                    <TeamsLog data={orgInfo.organization} refetch={refetch} />
+                    <TeamTable data={orgInfo.organization} refetch={refetch} />
                   </TabPanel>
                   {/* FEEDS */}
                   <TabPanel>
