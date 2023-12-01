@@ -42,6 +42,7 @@ function Index() {
   const { data, refetch, error } = useQuery(GetProjectData, {
     variables: {
       first: totalRows,
+      enabled: true,
       field: prodField,
       direction: prodDirection
     }

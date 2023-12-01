@@ -426,6 +426,7 @@ export const GetFeedLogs = gql`
 export const GetProjectData = gql`
   query GetProjectData(
     $search: String
+    $enabled: Boolean
     $first: Int
     $last: Int
     $after: String
@@ -435,6 +436,7 @@ export const GetProjectData = gql`
   ) {
     projects(
       search: $search
+      enabled: $enabled
       first: $first
       last: $last
       after: $after
