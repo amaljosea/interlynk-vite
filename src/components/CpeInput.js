@@ -202,12 +202,18 @@ const CpeInput = ({
                 ref={(el) => (listItemsRef.current[index] = el)}
                 tabIndex='0'
                 bg={index === focusedIndex ? '#E2E8F0' : 'transparent'}
+                _hover={{ bg: '#E2E8F0' }}
                 outline='none'
                 p={2}
                 fontSize={'sm'}
                 width={'100%'}
                 cursor={'pointer'}
-                onClick={handleSelect}
+                onClick={() => {
+                  setInputValue(item)
+                  updateString(name, item)
+                  setFocusedIndex(null)
+                  setCpeList([])
+                }}
                 py={1}
                 px={4}
               >
