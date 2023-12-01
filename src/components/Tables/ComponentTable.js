@@ -115,8 +115,6 @@ const ComponentTable = ({
     setSignedCompDirection,
     comPageIndex,
     setComPageIndex,
-    compAfter,
-    compBefore,
     setCompAfter,
     setCompBefore
   } = useContext(GlobalContext)
@@ -145,14 +143,12 @@ const ComponentTable = ({
             : compSupplier,
         primary: compScope === 'primary' ? true : undefined,
         internal: compScope === 'internal' ? true : undefined,
-        first: compAfter !== '' ? totalRows : undefined,
-        after: compAfter !== '' ? compAfter : undefined,
-        last: compBefore !== '' ? totalRows : undefined,
-        before: compBefore !== '' ? compBefore : undefined,
+        first: totalRows,
         field: compField,
         direction: compDirection
       }
     })
+    setComPageIndex(1)
   }
 
   const [activeRow, setActiveRow] = useState(null)
@@ -775,12 +771,6 @@ const ComponentTable = ({
           field: compField,
           direction: compDirection
         }
-      }).then((res) => {
-        if (res.data) {
-          setComPageIndex(1)
-          setCompBefore(res.data.sbom.components.pageInfo.startCursor)
-          setCompAfter(res.data.sbom.components.pageInfo.endCursor)
-        }
       })
     }
   }
@@ -795,13 +785,6 @@ const ComponentTable = ({
         first: totalRows,
         field: compField,
         direction: compDirection
-      }
-    }).then((res) => {
-      if (res.data) {
-        setCompSearchInput('')
-        setComPageIndex(1)
-        setCompBefore(res.data.sbom.components.pageInfo.startCursor)
-        setCompAfter(res.data.sbom.components.pageInfo.endCursor)
       }
     })
   }
@@ -929,8 +912,6 @@ const ComponentTable = ({
         internal: compScope === 'internal' ? true : undefined,
         last: totalRows,
         before: data.pageInfo.startCursor,
-        after: undefined,
-        first: undefined,
         field: customerView ? signedCompField : compField,
         direction: customerView ? signedCompDirection : compDirection
       }
@@ -966,8 +947,6 @@ const ComponentTable = ({
         internal: compScope === 'internal' ? true : undefined,
         first: totalRows,
         after: data.pageInfo.endCursor,
-        last: undefined,
-        before: undefined,
         field: customerView ? signedCompField : compField,
         direction: customerView ? signedCompDirection : compDirection
       }

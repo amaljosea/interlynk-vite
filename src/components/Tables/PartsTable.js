@@ -36,6 +36,7 @@ import { useContext, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV, FaFilter } from 'react-icons/fa'
 import { useLocation, Link } from 'react-router-dom'
+import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 const customStyles = {
   headCells: {
@@ -62,17 +63,23 @@ const PartsTable = () => {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const addBtn = useRef()
 
-  const { totalProducts, setActiveProdTab } = useContext(GlobalContext)
+  const { totalProducts, setActiveProdTab, prodField, prodDirection } =
+    useContext(GlobalContext)
 
   const [selectedProd, setSelectedProd] = useState('')
   const [selectedVersion, setSelectedVersion] = useState('')
   const [uniqVersions, setUniqVersions] = useState([])
+  const [searchInput, setSearchInput] = useState('')
 
   const { data: allProducts } = useQuery(GetProjectData, {
     variables: {
-      first: totalProducts
+      first: totalProducts,
+      field: prodField,
+      direction: prodDirection
     }
   })
+
+  console.log('get project data', allProducts)
 
   const productList =
     allProducts &&
@@ -184,7 +191,7 @@ const PartsTable = () => {
         const suppliers = ['Interlynk', 'Biotronik', 'Oracle']
         const getRandomSupplier = () => {
           const randomIndex = Math.floor(Math.random() * suppliers.length)
-          return suppliers[Math.ceil(randomIndex)]
+          return suppliers[Math.ceil(suppliers.length - 1)]
         }
 
         return <Text>{getRandomSupplier()}</Text>
@@ -197,7 +204,7 @@ const PartsTable = () => {
         const statuses = ['Draft', 'Released', 'Pending']
         const getRandomStatus = () => {
           const randomIndex = Math.floor(Math.random() * statuses.length)
-          return statuses[Math.ceil(randomIndex)]
+          return statuses[Math.ceil(statuses.length - 2)]
         }
 
         return (
@@ -231,6 +238,12 @@ const PartsTable = () => {
     }
   ]
 
+  // SEARCH COMPONENT
+  const handleSearch = () => console.log('hello')
+
+  // CLEAR SERACH
+  const handleClear = () => setSearchInput('')
+
   // SUB HEADER
   const subHeaderComponent = useMemo(() => {
     return (
@@ -247,12 +260,15 @@ const PartsTable = () => {
           justifyContent={'space-between'}
         >
           <HStack spacing={4}>
-            <Input
-              width={'300px'}
-              name='parts'
-              id='parts'
-              placeholder='Search'
+            {/* SEARCH COMPONENTS */}
+            <SearchFilter
+              id='team'
+              filterText={searchInput}
+              setFilterText={setSearchInput}
+              onFilter={handleSearch}
+              onClear={handleClear}
             />
+            {/* FILTER */}
             <Menu closeOnSelect={true}>
               <MenuButton
                 as={Button}
@@ -289,7 +305,7 @@ const PartsTable = () => {
         </Stack>
       </Flex>
     )
-  }, [])
+  }, [searchInput, handleSearch, handleClear])
 
   return (
     <>
@@ -298,13 +314,14 @@ const PartsTable = () => {
           columns={columns}
           data={
             allProducts &&
-            allProducts.projects.nodes
+            [...allProducts.projects.nodes]
               .filter((product) => product.id !== product_id)
               .slice(0, 3)
           }
           customStyles={customStyles}
           persistTableHead
           subHeader
+          progressPending={allProducts ? false : true}
           subHeaderComponent={subHeaderComponent}
           responsive={true}
         />

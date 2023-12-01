@@ -7,6 +7,8 @@ import {
   MenuItem,
   MenuButton,
   MenuList,
+  MenuOptionGroup,
+  MenuItemOption,
   Portal,
   useDisclosure,
   Modal,
@@ -28,7 +30,7 @@ import {
 } from '@chakra-ui/react'
 import { useContext, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { FaEllipsisV } from 'react-icons/fa'
+import { FaEllipsisV, FaFilter } from 'react-icons/fa'
 import { getFullDateAndTime, timeSince } from 'utils'
 import CustomLoader from 'components/CustomLoader'
 import DataTable from 'react-data-table-component'
@@ -65,6 +67,7 @@ const ProductTable = ({ data, refetch }) => {
   const [pageIndex, setPageIndex] = useState(1)
   const [activeRow, setActiveRow] = useState(null)
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const [activeProd, setActiveProd] = useState('yes')
 
   const {
     totalRows,
@@ -315,7 +318,7 @@ const ProductTable = ({ data, refetch }) => {
       sortFunction: (a, b) => {
         const dateA = new Date(a.updatedAt)
         const dateB = new Date(b.updatedAt)
-        return dateB - dateA
+        return dateA - dateB
       },
       wrap: true
     },
@@ -496,6 +499,21 @@ const ProductTable = ({ data, refetch }) => {
     setPageIndex(1)
   }
 
+  // FILTER PRODUCT
+  const onFilterActive = async (value) => {
+    setActiveProd(value)
+    await refetch({
+      enabled: value === 'yes' ? true : false,
+      first: totalRows,
+      last: undefined,
+      after: undefined,
+      before: undefined,
+      field: prodField,
+      direction: prodDirection
+    })
+    setPageIndex(1)
+  }
+
   const subHeaderComponent = useMemo(() => {
     return (
       <Flex
@@ -503,8 +521,8 @@ const ProductTable = ({ data, refetch }) => {
         alignItems={'center'}
         justifyContent={'space-between'}
       >
-        {/* SEARCH COMPONENTS */}
-        <Stack>
+        <Stack direction={'row'} spacing={2} alignItems={'center'}>
+          {/* SEARCH PRODUCTS */}
           <SearchFilter
             id='product'
             filterText={prodSearchInput}
@@ -512,6 +530,36 @@ const ProductTable = ({ data, refetch }) => {
             onFilter={handleSearch}
             onClear={handleClear}
           />
+          {/* FILTER PRODUCTS */}
+          <Menu closeOnSelect={true}>
+            <MenuButton
+              as={Button}
+              colorScheme='blue'
+              fontWeight='normal'
+              fontSize={'sm'}
+              leftIcon={<FaFilter size={14} />}
+            >
+              Active
+            </MenuButton>
+            <MenuList>
+              <MenuOptionGroup
+                type='radio'
+                value={activeProd}
+                onChange={onFilterActive}
+              >
+                {['yes', 'no'].map((item, index) => (
+                  <MenuItemOption
+                    key={index}
+                    value={item}
+                    fontSize={'sm'}
+                    textTransform={'capitalize'}
+                  >
+                    {item}
+                  </MenuItemOption>
+                ))}
+              </MenuOptionGroup>
+            </MenuList>
+          </Menu>
         </Stack>
 
         <Stack direction={'row'} spacing={2} alignItems={'center'}>
@@ -535,7 +583,14 @@ const ProductTable = ({ data, refetch }) => {
         </Stack>
       </Flex>
     )
-  }, [prodSearchInput, handleClear, handleSearch, handleRefresh])
+  }, [
+    prodSearchInput,
+    handleClear,
+    handleSearch,
+    handleRefresh,
+    activeProd,
+    onFilterActive
+  ])
 
   // SORTING
   const handleSort = (column, sortDirection) => {
@@ -593,7 +648,7 @@ const ProductTable = ({ data, refetch }) => {
           onSort={handleSort}
           data={data && data.nodes}
           customStyles={customStyles}
-          defaultSortAsc={true}
+          defaultSortAsc={false}
           defaultSortFieldId={prodField}
           subHeader
           subHeaderComponent={subHeaderComponent}

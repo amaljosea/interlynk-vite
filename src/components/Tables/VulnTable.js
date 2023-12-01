@@ -599,6 +599,7 @@ const VulnTable = ({
               totalRows={totalRows}
               filteredData={filteredData}
               filterRefetch={filterRefetch}
+              setPageIndex={setPageIndex}
               after={vulnAfter}
               before={vulnBefore}
             />

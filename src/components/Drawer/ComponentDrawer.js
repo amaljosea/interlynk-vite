@@ -266,31 +266,6 @@ function ComponentDrawer(props) {
     }
   }
 
-  const handleUpdate = async () => {
-    if (purlValue != null && purlValue !== '') {
-      try {
-        const pkg = PackageURL.fromString(purlValue)
-        handleUpdateCom()
-      } catch (error) {
-        toast({
-          description: error.message,
-          status: 'error',
-          position: 'top',
-          duration: 3000
-        })
-      }
-    } else {
-      handleUpdateCom()
-    }
-  }
-
-  const handleKeyDown = (event) => {
-    if (event.key === 'Enter') {
-      setCpeList([...cpeList, cpeValue])
-      setCpeValue('')
-    }
-  }
-
   const handleCreateCpe = (string) => {
     const cpeItem = cpeList.find((item) => item === string)
     if (cpeItem) {
@@ -642,6 +617,7 @@ function ComponentDrawer(props) {
           isOpen={isPurlOpen}
           onClose={onPurlClose}
           setPurlValue={setPurlValue}
+          setIsValid={setPURLInputValid}
           purlValue={purlValue}
           getCpe={getCpe}
         />

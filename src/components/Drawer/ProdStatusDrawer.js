@@ -32,17 +32,16 @@ const ProdStatusDrawer = ({
   filteredData,
   totalRows,
   filterRefetch,
-  after, 
-  before
+  setPageIndex
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
-  const { 
-    setVulnFilters, 
-    vulnField, 
+  const {
+    setVulnFilters,
+    vulnField,
     vulnDirection,
     vulnSeverity,
     vulnComponent,
@@ -59,6 +58,9 @@ const ProdStatusDrawer = ({
   const [justification, setJustification] = useState('')
   const [justifyName, setJustifyName] = useState('')
   const [selectedTag, setSelectedTag] = useState('')
+  const [actionStatement, setActionStatement] = useState('')
+  const [response, setResponse] = useState('')
+  const [details, setDetails] = useState('')
   const [notes, setNotes] = useState('')
   const [impactData, setImpactData] = useState('')
 
@@ -71,6 +73,26 @@ const ProdStatusDrawer = ({
   const [compVexCreate] = useMutation(updateCompVulnVex, {
     fetchPolicy: 'network-only'
   })
+
+  // console.log('allVexStatus', allVexStatus)
+
+  const handleRefetch = () => {
+    refetch({
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        severity: vulnSeverity.length > 0 ? vulnSeverity : undefined,
+        componentName: vulnComponent.length > 0 ? vulnComponent : undefined,
+        status: vulnStatus.length > 0 ? vulnStatus : undefined,
+        kev: vulnKev === 'yes' ? true : vulnKev === 'no' ? false : undefined,
+        epss: vulnEpss !== '' ? range : undefined,
+        first: totalRows,
+        field: vulnField,
+        direction: vulnDirection
+      }
+    })
+    setPageIndex(1)
+  }
 
   const handleStatusChange = (e) => {
     const { value } = e.target
@@ -109,27 +131,7 @@ const ProdStatusDrawer = ({
           impact: impactData === '' ? undefined : impactData
         }
       })
-        .then(
-          (res) =>
-            res.data &&
-            refetch({
-              variables: {
-                projectId: productId,
-                sbomId: sbomId,
-                severity: vulnSeverity.length > 0 ? vulnSeverity : undefined,
-                componentName: vulnComponent.length > 0 ? vulnComponent : undefined,
-                status: vulnStatus.length > 0 ? vulnStatus : undefined,
-                kev: vulnKev === 'yes' ? true : vulnKev === 'no' ? false : undefined,
-                epss: vulnEpss !== '' ? range : undefined,
-                first: after !== '' ? totalRows : undefined,
-                after: after !== '' ? after : undefined,
-                last: before !== '' ? totalRows : undefined,
-                before: before !== '' ? before : undefined,
-                field: vulnField,
-                direction: vulnDirection
-              }
-            })
-        )
+        .then((res) => res.data && handleRefetch())
         .finally(() => onFilterRefetch())
     } catch (error) {
       console.log('Mutation error', error)
@@ -155,14 +157,14 @@ const ProdStatusDrawer = ({
         <SimpleGrid row={5} spacing={4}>
           {!location.pathname.startsWith('/customer') && (
             <>
-              <Box>
-                <FormLabel mb={1} fontSize='sm' color='gray.600'>
+              <FormControl>
+                <FormLabel htmlFor='vexType' fontSize='sm' color={'gray.600'}>
                   Status
                 </FormLabel>
                 <Select
-                  id='product'
-                  size='sm'
-                  color='gray.500'
+                  id='vexType'
+                  name='vexType'
+                  fontSize='sm'
                   value={statusTitle}
                   onChange={handleStatusChange}
                 >
@@ -177,18 +179,25 @@ const ProdStatusDrawer = ({
                     <option value={''}>No data found</option>
                   )}
                 </Select>
-              </Box>
-              {statusName === 'Not Affected' && (
-                <Box>
-                  <FormLabel htmlFor='product' fontSize='sm' color='gray.600'>
+              </FormControl>
+              {/* JUSTIFICATION */}
+              {(statusName === 'Not Affected' ||
+                statusName === 'False Positive') && (
+                <FormControl>
+                  <FormLabel
+                    htmlFor='justification'
+                    fontSize='sm'
+                    color='gray.600'
+                  >
                     Justification
                   </FormLabel>
                   <Select
                     id='justification'
+                    name='justification'
                     value={justification}
                     onChange={handleJustifyChange}
-                    size='sm'
-                    color='gray.500'
+                    fontSize='sm'
+                    color='gray.600'
                   >
                     <option value=''>-- Select --</option>
                     {allVexJustify ? (
@@ -201,26 +210,62 @@ const ProdStatusDrawer = ({
                       <option value={''}>No data found</option>
                     )}
                   </Select>
-                </Box>
+                </FormControl>
               )}
-              {statusName === 'Fixed' && (
+              {/* RESPONSE */}
+              {statusName === 'Affected' && (
+                <FormControl>
+                  <FormLabel htmlFor='response' fontSize='sm' color='gray.600'>
+                    Response
+                  </FormLabel>
+                  <Select
+                    id='response'
+                    name='response'
+                    value={response}
+                    onChange={(e) => setResponse(e.target.value)}
+                    fontSize='sm'
+                    color='gray.600'
+                  >
+                    <option value=''>-- Select --</option>
+                    {[
+                      'Can not fix',
+                      'Will not fix',
+                      'Update',
+                      'Rollback',
+                      'Workaround available'
+                    ].map((item, idx) => (
+                      <option key={idx} value={item}>
+                        {item}
+                      </option>
+                    ))}
+                  </Select>
+                </FormControl>
+              )}
+              {/* FIXED VERSION */}
+              {statusName === 'Affected' && response === 'Update' && (
                 <Stack
                   width={'100%'}
                   direction={'column'}
                   spacing={4}
                   alignItems={'flex-start'}
                 >
-                  <Box width={'100%'}>
-                    <Text mb={1} fontSize='sm' color='gray.600'>
-                      Version
-                    </Text>
+                  <FormControl width={'100%'}>
+                    <FormLabel
+                      htmlFor='fixedVersion'
+                      fontSize='sm'
+                      color='gray.600'
+                    >
+                      Fixed Version
+                    </FormLabel>
                     <Select
-                      id='tag'
+                      id='fixedVersion'
+                      name='fixedVersion'
                       value={selectedTag}
                       onChange={(e) => setSelectedTag(e.target.value)}
-                      size='sm'
-                      color='gray.500'
+                      fontSize='sm'
+                      color='gray.600'
                     >
+                      <option value=''>-- Select --</option>
                       {filteredData && filteredData.length > 0 ? (
                         filteredData.map((item, index) => (
                           <option
@@ -235,24 +280,15 @@ const ProdStatusDrawer = ({
                         <option value=''>-- --</option>
                       )}
                     </Select>
-                  </Box>
-                  <Box width={'100%'}>
-                    <Text mb={1} fontSize='sm' color='gray.600'>
-                      Other Version
-                    </Text>
-                    <Input
-                      size='sm'
-                      value={otherVersion}
-                      onChange={(e) => setOtherVersion(e.target.value)}
-                    />
-                  </Box>
+                  </FormControl>
                 </Stack>
               )}
-              {(statusName === 'Affected' || statusName === 'Not Affected') && (
+              {/* IMPACT STATEMENT */}
+              {(statusName === 'Not Affected' ||
+                statusName === 'False Positive') && (
                 <FormControl>
                   <FormLabel
                     htmlFor='impactStatement'
-                    mb={1}
                     fontSize='sm'
                     color='gray.600'
                   >
@@ -266,21 +302,67 @@ const ProdStatusDrawer = ({
                     placeholder='Add impact statement'
                     value={impactData}
                     onChange={(e) => setImpactData(e.target.value)}
-                    size='sm'
+                    fontSize='sm'
                   />
                 </FormControl>
               )}
-              <Box>
-                <FormLabel mb={1} fontSize='sm' color='gray.600'>
-                  Notes
+              {/* ACTION STATEMENT */}
+              {statusName === 'Affected' && (
+                <FormControl>
+                  <FormLabel
+                    htmlFor='actionStatement'
+                    fontSize='sm'
+                    color={'gray.600'}
+                  >
+                    Action Statement
+                  </FormLabel>
+                  <Textarea
+                    rows={2}
+                    name='actionStatement'
+                    id='actionStatement'
+                    placeholder='Add statement'
+                    fontSize='sm'
+                    value={actionStatement}
+                    onChange={(e) => setActionStatement(e.target.value)}
+                  />
+                </FormControl>
+              )}
+              {/* DETAILS */}
+              {(statusName === 'In Triage' || statusName === 'Affected') && (
+                <FormControl>
+                  <FormLabel htmlFor='details' fontSize='sm' color={'gray.600'}>
+                    Details
+                  </FormLabel>
+                  <Textarea
+                    rows={2}
+                    name='details'
+                    id='details'
+                    placeholder='Add details'
+                    fontSize='sm'
+                    value={details}
+                    onChange={(e) => setDetails(e.target.value)}
+                  />
+                </FormControl>
+              )}
+              {/* INTERNAL NOTES */}
+              <FormControl>
+                <FormLabel
+                  htmlFor='internalNotes'
+                  fontSize='sm'
+                  color={'gray.600'}
+                >
+                  Internal Notes
                 </FormLabel>
                 <Textarea
+                  rows={2}
+                  name='internalNotes'
+                  id='internalNotes'
                   placeholder='Add notes'
-                  size='sm'
+                  fontSize='sm'
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                 />
-              </Box>
+              </FormControl>
             </>
           )}
           {!location.pathname.startsWith('/customer') && (
@@ -293,7 +375,11 @@ const ProdStatusDrawer = ({
                 (statusName === 'Not Affected' && justification === '') ||
                 (justifyName === 'Other (impact statment required)' &&
                   impactData === '') ||
-                (statusName === 'Affected' && impactData === '')
+                (statusName === 'Affected' &&
+                  impactData === '' &&
+                  response === '') ||
+                (statusName === 'False Positive' && impactData === '') ||
+                (response === 'Update' && selectedTag === '')
               }
             >
               Add
@@ -345,7 +431,6 @@ const ProdStatusDrawer = ({
             )}
           </Flex>
         </SimpleGrid>
-        <Divider />
       </Box>
     </Stack>
   )
