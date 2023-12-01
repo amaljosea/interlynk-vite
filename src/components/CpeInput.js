@@ -54,8 +54,13 @@ const CpeInput = ({
       setPurlString(pkg.toString())
     } else if (name === 'packageName') {
       const pkg = PackageURL.fromString(purlString)
-      pkg.name = value
-      setPurlString(pkg.toString())
+      if (value === '') {
+        pkg.name = 'name'
+        setPurlString(pkg.toString())
+      } else {
+        pkg.name = value
+        setPurlString(pkg.toString())
+      }
     } else if (name === 'packageVersion') {
       const pkg = PackageURL.fromString(purlString)
       pkg.version = value
@@ -73,6 +78,14 @@ const CpeInput = ({
   }
 
   const handleKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === 'Tab') {
+      setInputValue(inputValue)
+      setCpeList([])
+      if (inputValue === '') {
+        updateString(name, inputValue)
+      }
+    }
+
     if (e.key === 'ArrowDown') {
       e.preventDefault()
       setFocusedIndex((prevIndex) => {
@@ -100,11 +113,6 @@ const CpeInput = ({
       })
     } else if (e.key === 'Enter' && focusedIndex !== null) {
       return handleSelect()
-    }
-
-    if (e.key === 'Enter' || e.key === 'Tab') {
-      inputValue !== '' && updateString(name, inputValue)
-      setCpeList([])
     }
   }
 
@@ -166,6 +174,7 @@ const CpeInput = ({
             value={inputValue}
             onChange={onChange}
             autoComplete='off'
+            onBlur={() => updateString(name, inputValue)}
             onKeyDown={handleKeyDown}
           />
           {validation === true && (
@@ -181,7 +190,7 @@ const CpeInput = ({
           )}
         </InputGroup>
       </FormControl>
-      {cpeList !== null && inputValue !== '' && cpeList.length > 0 && (
+      {cpeList && cpeList.length > 0 && (
         <Box
           pos={'absolute'}
           width={'100%'}
@@ -196,7 +205,7 @@ const CpeInput = ({
           overflowY={'scroll'}
         >
           <List>
-            {cpeList?.map((item, index) => (
+            {cpeList.map((item, index) => (
               <ListItem
                 key={index}
                 ref={(el) => (listItemsRef.current[index] = el)}

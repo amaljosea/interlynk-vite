@@ -121,9 +121,6 @@ const PurlModal = ({
   const [purlVersionList, setPurlVersionList] = useState([])
   const purlVersionRef = useRef()
 
-  const [suggestions, setSuggestions] = useState([])
-  const [verSuggestions, setVerSuggestions] = useState([])
-
   const { purlString, setPurlString } = useContext(GlobalContext)
 
   const [healthRecheck] = useMutation(recheckHealth, {
@@ -420,6 +417,7 @@ const PurlModal = ({
 
   useEffect(() => {
     if (data) {
+      console.log('purlType', purlType)
       setPurlType(data.type === null ? '' : data.type)
       setNamespace(data.namespace === null ? '' : data.namespace)
       setPurlName(data.name === null ? '' : data.name)
@@ -430,15 +428,18 @@ const PurlModal = ({
   const handleTypeChange = (e) => {
     const { value } = e.target
     setPurlType(value)
-    const pkg = PackageURL.fromString(purlString)
-    pkg.type = value
-    pkg.namespace = ''
-    pkg.name = 'name'
-    pkg.version = ''
-    setPurlString(pkg.toString())
+    setPurlString(`pkg:type/namespace/name@version`)
     setNamespace('')
     setPurlName('')
     setPurlVersion('')
+  }
+
+  const onTypeBlur = () => {
+    if (purlType !== '') {
+      const pkg = PackageURL.fromString(purlString)
+      pkg.type = purlType
+      setPurlString(pkg.toString())
+    }
   }
 
   const handleNamespaceChange = (e) => {
@@ -448,15 +449,37 @@ const PurlModal = ({
     setPurlString(pkg.toString())
   }
 
+  const onNamespaceBlur = () => {
+    if (namespace !== '') {
+      const pkg = PackageURL.fromString(purlString)
+      pkg.namespace = namespace
+      setPurlString(pkg.toString())
+    }
+  }
+
   const handleNameChange = (e) => {
-    setPurlName(e.target.value)
-    if (e.target.value === '') {
-      setSuggestions([])
+    const { value } = e.target
+    setPurlName(value)
+  }
+
+  const onNameBlur = () => {
+    if (purlName !== '') {
+      const pkg = PackageURL.fromString(purlString)
+      pkg.name = purlName
+      setPurlString(pkg.toString())
     }
   }
 
   const handleVersionChange = (e) => {
     setPurlVersion(e.target.value)
+  }
+
+  const onVersionBlur = () => {
+    if (purlVersion !== '') {
+      const pkg = PackageURL.fromString(purlString)
+      pkg.version = purlVersion
+      setPurlString(pkg.toString())
+    }
   }
 
   const handleSave = () => {
@@ -466,22 +489,6 @@ const PurlModal = ({
     setPurlString(pkg.toString())
     setPurlValue(pkg.toString())
     onClose()
-  }
-
-  const handleNameClick = (suggestion) => {
-    setPurlName(suggestion)
-    const pkg = PackageURL.fromString(purlString)
-    pkg.name = suggestion
-    setPurlString(pkg.toString())
-    setSuggestions([])
-  }
-
-  const handleVersionClick = (version) => {
-    setPurlVersion(version)
-    const pkg = PackageURL.fromString(purlString)
-    pkg.version = version
-    setPurlString(pkg.toString())
-    setVerSuggestions([])
   }
 
   const [createAutoCheck] = useMutation(CreateAutomation)
@@ -545,6 +552,7 @@ const PurlModal = ({
                   name='packageType'
                   value={purlType}
                   onChange={handleTypeChange}
+                  onBlur={onTypeBlur}
                 >
                   {typeOptions.map((option) => (
                     <option key={option.value} value={option.value}>
@@ -575,6 +583,7 @@ const PurlModal = ({
                     name='namespace'
                     value={namespace}
                     onChange={handleNamespaceChange}
+                    onBlur={onNamespaceBlur}
                   >
                     {namespaceOptions[purlType].map((option) => (
                       <option key={option.value} value={option.value}>
@@ -599,43 +608,14 @@ const PurlModal = ({
               ) : (
                 <FormControl>
                   <FormLabel>Package Name</FormLabel>
-                  <Stack direction='column' spacing={1} position={'relative'}>
-                    <Input
-                      type='text'
-                      mt={1.5}
-                      value={purlName}
-                      size='md'
-                      fontSize={'sm'}
-                      onChange={handleNameChange}
-                    />
-                    {suggestions && suggestions.length > 0 && (
-                      <Box
-                        position='absolute'
-                        zIndex='1'
-                        width='100%'
-                        top={12}
-                        mt='2'
-                        bg='white'
-                        border='1px solid #ccc'
-                        height={'200px'}
-                        overflowY={'scroll'}
-                      >
-                        <List>
-                          {suggestions.map((suggestion, index) => (
-                            <ListItem
-                              key={index}
-                              cursor='pointer'
-                              onClick={() => handleNameClick(suggestion)}
-                              p='2'
-                              _hover={{ background: 'gray.100' }}
-                            >
-                              <Text>{suggestion}</Text>
-                            </ListItem>
-                          ))}
-                        </List>
-                      </Box>
-                    )}
-                  </Stack>
+                  <Input
+                    type='text'
+                    mt={1.5}
+                    value={purlName}
+                    fontSize={'sm'}
+                    onChange={handleNameChange}
+                    onBlur={onNameBlur}
+                  />
                 </FormControl>
               )}
               {/* Version */}
@@ -653,45 +633,15 @@ const PurlModal = ({
               ) : (
                 <FormControl>
                   <FormLabel> Version</FormLabel>
-                  <Stack direction='column' spacing={1} position={'relative'}>
-                    <Input
-                      size='md'
-                      fontSize={'sm'}
-                      mt={1.5}
-                      type='text'
-                      value={purlVersion}
-                      onChange={handleVersionChange}
-                    />
-                    {verSuggestions && verSuggestions.length > 0 && (
-                      <Box
-                        position='absolute'
-                        zIndex='1'
-                        width='100%'
-                        top={12}
-                        mt='2'
-                        bg='white'
-                        border='1px solid #ccc'
-                        // height={'300px'}
-                        overflowY={'scroll'}
-                      >
-                        <List>
-                          {verSuggestions
-                            .filter((item) => item.includes(purlVersion))
-                            .map((version, index) => (
-                              <ListItem
-                                key={index}
-                                cursor='pointer'
-                                onClick={() => handleVersionClick(version)}
-                                p='2'
-                                _hover={{ background: 'gray.100' }}
-                              >
-                                <Text>{version}</Text>
-                              </ListItem>
-                            ))}
-                        </List>
-                      </Box>
-                    )}
-                  </Stack>
+                  <Input
+                    size='md'
+                    fontSize={'sm'}
+                    mt={1.5}
+                    type='text'
+                    value={purlVersion}
+                    onChange={handleVersionChange}
+                    onBlur={onVersionBlur}
+                  />
                 </FormControl>
               )}
             </Flex>
