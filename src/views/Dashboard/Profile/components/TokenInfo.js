@@ -27,10 +27,8 @@ import {
   Checkbox,
   Text,
   Stack,
-  Textarea,
   FormErrorMessage
 } from '@chakra-ui/react'
-import { useColorModeValue } from '@chakra-ui/system'
 import React, { useRef, useState, useMemo, useEffect } from 'react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV } from 'react-icons/fa'
@@ -117,7 +115,7 @@ const TokenInfo = ({ data, refetch }) => {
           notes: keyName,
           expiresAt: selectedDate
             ? selectedDate.toISOString().replace(/\.\d{3}Z$/, 'Z')
-            : undefined
+            : null
         }
       }).then((res) => {
         if (res.data) {
@@ -149,7 +147,7 @@ const TokenInfo = ({ data, refetch }) => {
       await updateToken({
         variables: {
           id: activeRow.id,
-          expires: noExpire === true ? undefined : selectedDate
+          expires: noExpire === true ? null : selectedDate
         }
       }).then((res) => res.data && onClose())
     } catch (error) {
@@ -236,7 +234,8 @@ const TokenInfo = ({ data, refetch }) => {
     {
       id: 'tokenMask',
       name: 'TOKEN MASK',
-      selector: (row) => row.tokenMask
+      selector: (row) => <Text my={2}>{row.tokenMask}</Text>,
+      wrap: true
     },
     // CREATED
     {
@@ -247,8 +246,22 @@ const TokenInfo = ({ data, refetch }) => {
       sortFunction: (a, b) => {
         const dateA = new Date(a.createdAt)
         const dateB = new Date(b.createdAt)
-        return dateB - dateA
-      }
+        return dateA - dateB
+      },
+      wrap: true
+    },
+    // UPDATED
+    {
+      id: 'updated',
+      name: 'UPDATED AT',
+      selector: (row) => <Text>{getFullDateAndTime(row.updatedAt)}</Text>,
+      sortable: true,
+      sortFunction: (a, b) => {
+        const dateA = new Date(a.updatedAt)
+        const dateB = new Date(b.updatedAt)
+        return dateA - dateB
+      },
+      wrap: true
     },
     // EXPIRES
     {
@@ -256,10 +269,10 @@ const TokenInfo = ({ data, refetch }) => {
       name: 'EXPIRES',
       selector: (row) => (
         <Text>
-          {' '}
           {row.expiresAt ? getFullDateAndTime(row.expiresAt) : 'No Expiration'}
         </Text>
-      )
+      ),
+      wrap: true
     },
     // STATUS
     {
@@ -299,7 +312,8 @@ const TokenInfo = ({ data, refetch }) => {
             </TagLabel>
           </Tag>
         )
-      }
+      },
+      right: 'true'
     },
     // ACTIONS
     {
@@ -327,6 +341,7 @@ const TokenInfo = ({ data, refetch }) => {
                   isDisabled={revoked}
                   onClick={() => {
                     setToken('')
+                    console.log(row)
                     setActiveRow(row)
                     onOpen()
                   }}
@@ -350,8 +365,8 @@ const TokenInfo = ({ data, refetch }) => {
           subHeader
           columns={columns}
           data={data}
-          defaultSortAsc={true}
-          defaultSortFieldId={'created'}
+          defaultSortAsc={false}
+          defaultSortFieldId={'updated'}
           persistTableHead
           responsive={true}
           customStyles={customStyles}
