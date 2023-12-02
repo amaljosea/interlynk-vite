@@ -392,7 +392,7 @@ const ComponentTable = ({
         )
       },
       wrap: true,
-      width: '20%',
+      width: '24%',
       sortable: true
     },
     // VERSION
