@@ -201,7 +201,6 @@ const ProductTable = ({ data, refetch }) => {
               })
             }
           })
-
         const filteredData = uniqVersions
           ? removeDuplicatesAndLatest(uniqVersions)
           : []
@@ -433,7 +432,7 @@ const ProductTable = ({ data, refetch }) => {
     try {
       await projectDelete({
         variables: {
-          id
+          id: activeRow.id
         }
       }).then((res) => res.data && onDeleteClose())
     } catch (error) {

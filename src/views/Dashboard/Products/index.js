@@ -79,7 +79,12 @@ function Index() {
 
   if (product === null) {
     return (
-      <Flex flexDirection='column' pt={{ base: '120px', md: '74px' }} px={2}>
+      <Flex
+        flexDirection='column'
+        pt={{ base: '120px', md: '74px' }}
+        pr={2}
+        pl={5}
+      >
         <Card overflowX={{ sm: 'scroll', xl: 'hidden' }}>
           {error && (
             <Flex my={10} alignItems={'center'} justifyContent={'center'}>

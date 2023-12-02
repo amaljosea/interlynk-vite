@@ -90,7 +90,7 @@ function Profile() {
   return (
     <>
       {orgInfo && (
-        <Flex direction='column' px={4}>
+        <Flex direction='column' pr={2} pl={5}>
           {/*  HEADER */}
           <Header
             user={orgInfo.organization.currentUser}
