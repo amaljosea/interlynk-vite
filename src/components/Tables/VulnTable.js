@@ -124,6 +124,7 @@ const VulnTable = ({
 
   const [vulnAfter, setVulnAfter] = useState('')
   const [vulnBefore, setVulnBefore] = useState('')
+  const [currentRow, setCurrentRow] = useState(null)
 
   const {
     isOpen: isTableOpen,
@@ -600,6 +601,7 @@ const VulnTable = ({
               filteredData={filteredData}
               filterRefetch={filterRefetch}
               setPageIndex={setPageIndex}
+              setCurrentRow={setCurrentRow}
               after={vulnAfter}
               before={vulnBefore}
             />
@@ -787,6 +789,7 @@ const VulnTable = ({
     setPageIndex(1)
   }
 
+
   return (
     <>
       {/* TABLE */}
@@ -804,9 +807,11 @@ const VulnTable = ({
           subHeaderComponent={subHeaderComponentMemo}
           responsive
           expandableRows
+          expandableRowExpanded={(row) => row === currentRow}
           expandOnRowClicked
           persistTableHead
           expandableRowsComponent={ExpandedComponent}
+          onRowExpandToggled={(bool, row) => setCurrentRow(row)}
         />
       </Flex>
 

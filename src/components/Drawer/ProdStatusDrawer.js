@@ -32,7 +32,8 @@ const ProdStatusDrawer = ({
   filteredData,
   totalRows,
   filterRefetch,
-  setPageIndex
+  setPageIndex,
+  setCurrentRow
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -132,7 +133,10 @@ const ProdStatusDrawer = ({
         }
       })
         .then((res) => res.data && handleRefetch())
-        .finally(() => onFilterRefetch())
+        .finally(() => {
+          onFilterRefetch()
+          setCurrentRow(null)
+        })
     } catch (error) {
       console.log('Mutation error', error)
     }
