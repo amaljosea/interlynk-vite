@@ -497,7 +497,7 @@ export const GetProductData = gql`
         copyright
         publisher
         description
-        licenseExp
+        licensesExp
         group
       }
       stats {
@@ -515,7 +515,7 @@ export const GetProductData = gql`
       creationAt
       updatedAt
       licenses
-      licenseExp
+      licensesExp
       format
       spec
       specVersion
@@ -604,7 +604,7 @@ export const GetComponentData = gql`
           copyright
           publisher
           description
-          licenseExp
+          licensesExp
           group
           externalUrls {
             name
@@ -879,7 +879,7 @@ export const GetCheckResults = gql`
             name
             version
             licenses
-            licenseExp
+            licensesExp
           }
           organizationRule {
             severity
@@ -1345,7 +1345,7 @@ export const GetSignedProductData = gql`
         copyright
         publisher
         description
-        licenseExp
+        licensesExp
         group
       }
       stats {
@@ -1450,7 +1450,7 @@ export const GetSignedComponentData = gql`
           copyright
           publisher
           description
-          licenseExp
+          licensesExp
           group
           externalUrls {
             name
