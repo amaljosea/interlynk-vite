@@ -51,12 +51,11 @@ const ProductsOverview = ({ title }) => {
   }
 
   return (
-    <Flex width={'100%'} direction='column' mt={{ base: '120px', md: '0px' }}>
+    <Flex width={'100%'} direction='column'>
       <Flex
         dir='row'
         width={'100%'}
         alignItems={'center'}
-        px={2}
         justifyContent={'space-between'}
       >
         <Card overflowX={{ sm: 'scroll', xl: 'hidden' }}>

@@ -23,7 +23,7 @@ export default function Dashboard() {
   const iconBoxInside = useColorModeValue('white', 'white')
 
   return (
-    <Flex flexDirection='column' pt={{ base: '120px', md: '70px' }} px={2}>
+    <Flex flexDirection='column' pt={{ base: '120px', md: '70px' }} pr={2} pl={5}>
       <Grid
         templateColumns={{ sm: '1fr', lg: '1fr' }}
         templateRows={{ sm: '1fr', lg: '1fr' }}
@@ -94,7 +94,6 @@ export default function Dashboard() {
       <Grid
         templateColumns={{ sm: '1fr', md: '1fr 1fr', lg: '2fr 1fr' }}
         templateRows={{ sm: '1fr auto', md: '1fr', lg: '1fr' }}
-        my='10px'
         gap='24px'
       >
         <ProductsOverview

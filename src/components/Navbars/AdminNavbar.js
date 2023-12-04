@@ -14,6 +14,7 @@ import React, { useContext, useState, useEffect } from 'react'
 import AdminNavbarLinks from './AdminNavbarLinks'
 import { Link, useLocation } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
+import { vulnList } from 'variables/general'
 
 export default function AdminNavbar(props) {
   const [scrolled, setScrolled] = useState(false)
@@ -33,6 +34,8 @@ export default function AdminNavbar(props) {
   const activeSBOM = localStorage.getItem('activeSBOM')
 
   const { currentProduct, setActiveProdTab } = useContext(GlobalContext)
+
+  const vulnData = vulnList.find((item) => item.id === prodID)
 
   // Here are all the props that may change depending on navbar's type or state.(secondary, variant, scrolled)
   let mainText = useColorModeValue('gray.700', 'gray.200')
@@ -90,6 +93,8 @@ export default function AdminNavbar(props) {
           return `/vendor/autofix?id=${prodID}`
         case 'Change Log':
           return `/vendor/changelog?id=${prodID}`
+        case 'Vulnerabilities':
+          return `/vendor/vulnerabilities`
       }
     } else {
       switch (name) {
@@ -217,6 +222,14 @@ export default function AdminNavbar(props) {
                   }}
                 >
                   {productName}
+                </Link>
+              </BreadcrumbItem>
+            )}
+
+            {vulnData && (
+              <BreadcrumbItem color={mainText}>
+                <Link to={`/vendor/vulnerabilities?id=${prodID}`}>
+                  {vulnData?.vuln.vulnId}
                 </Link>
               </BreadcrumbItem>
             )}
