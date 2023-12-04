@@ -219,30 +219,43 @@ export const displayPic = (email) => {
   }
 }
 
-export const timeSince = (dateStr) => {
-  var date = new Date(dateStr)
-  var seconds = Math.floor((new Date() - date) / 1000)
-  var interval = seconds / 31536000
-  if (interval > 1) {
-    return Math.floor(interval) + ' years ago'
+const calculateTimeDifference = (inputDate) => {
+  const currentDate = new Date()
+  const inputDateObj = new Date(inputDate)
+  const timeDifference = currentDate - inputDateObj
+  return timeDifference
+}
+
+const formatTime = (timeDifference) => {
+  if (timeDifference < 0) {
+    return '0 seconds ago'
   }
-  interval = seconds / 2592000
-  if (interval > 1) {
-    return Math.floor(interval) + ' months ago'
+
+  const seconds = Math.floor(timeDifference / 1000)
+  const minutes = Math.floor(seconds / 60)
+  const hours = Math.floor(minutes / 60)
+  const days = Math.floor(hours / 24)
+  const months = Math.floor(days / 30)
+  const years = Math.floor(months / 12)
+
+  if (years > 0) {
+    return `${years} ${years === 1 ? 'year' : 'years'} ago`
+  } else if (months > 0) {
+    return `${months} ${months === 1 ? 'month' : 'months'} ago`
+  } else if (days > 0) {
+    return `${days} ${days === 1 ? 'day' : 'days'} ago`
+  } else if (hours > 0) {
+    return `${hours} ${hours === 1 ? 'hour' : 'hours'} ago`
+  } else if (minutes > 0) {
+    return `${minutes} ${minutes === 1 ? 'minute' : 'minutes'} ago`
+  } else {
+    return `${seconds} ${seconds === 1 ? 'second' : 'seconds'} ago`
   }
-  interval = seconds / 86400
-  if (interval > 1) {
-    return Math.floor(interval) + ' days ago'
-  }
-  interval = seconds / 3600
-  if (interval > 1) {
-    return Math.floor(interval) + ' hours ago'
-  }
-  interval = seconds / 60
-  if (interval > 1) {
-    return Math.floor(interval) + ' minutes ago'
-  }
-  return Math.floor(seconds) + ' seconds ago'
+}
+
+export const timeSince = (inputDate) => {
+  const timeDifference = calculateTimeDifference(inputDate)
+  return formatTime(timeDifference)
 }
 
 export const regions = [
