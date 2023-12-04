@@ -53,7 +53,7 @@ const Automation = () => {
   }, [productId])
 
   return (
-    <Flex direction='column' pt={{ base: '120px', md: '74px' }} px={4}>
+    <Flex direction='column' pt={{ base: '120px', md: '74px' }} pr={2} pl={5}>
       <Card bg='white'>
         <Tabs
           variant='enclosed'

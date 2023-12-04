@@ -221,7 +221,6 @@ const PurlModal = ({
       pkg.namespace = ''
       pkg.name = 'name'
       setPurlString(pkg.toString())
-      setNamespaceList([])
     }
   }
 
@@ -311,6 +310,14 @@ const PurlModal = ({
           }
         })
       }
+    }
+  }
+
+  const onNameBlur = () => {
+    if (purlName !== '') {
+      const pkg = PackageURL.fromString(purlString)
+      pkg.name = purlName
+      setPurlString(pkg.toString())
     }
   }
 
@@ -412,7 +419,6 @@ const PurlModal = ({
       const pkg = PackageURL.fromString(purlString)
       pkg.version = ''
       setPurlString(pkg.toString())
-      setPurlVersionList([])
     }
   }
 
@@ -429,7 +435,7 @@ const PurlModal = ({
   const handleTypeChange = (e) => {
     const { value } = e.target
     setPurlType(value)
-    setPurlString(`pkg:type/namespace/name@version`)
+    setPurlString(`pkg:type/name@version`)
     setNamespace('')
     setPurlName('')
     setPurlVersion('')
@@ -461,14 +467,6 @@ const PurlModal = ({
   const handleNameChange = (e) => {
     const { value } = e.target
     setPurlName(value)
-  }
-
-  const onNameBlur = () => {
-    if (purlName !== '') {
-      const pkg = PackageURL.fromString(purlString)
-      pkg.name = purlName
-      setPurlString(pkg.toString())
-    }
   }
 
   const handleVersionChange = (e) => {

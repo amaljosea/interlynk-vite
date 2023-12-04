@@ -142,6 +142,15 @@ const CpeModal = ({
     }
   }
 
+  const onVendorBlur = () => {
+    if (vendor !== '') {
+      const cpeParts = cpeString.split(':')
+      cpeParts[3] = vendor
+      const cpe = cpeParts.join(':')
+      setCpeString(cpe)
+    }
+  }
+
   // ON TYPE CHANGE
   const handleTypeChange = (e) => {
     const { value } = e.target
@@ -183,6 +192,15 @@ const CpeModal = ({
     }
   }
 
+  const onProductBlur = () => {
+    if (product !== '') {
+      const cpeParts = cpeString.split(':')
+      cpeParts[4] = product
+      const cpe = cpeParts.join(':')
+      setCpeString(cpe)
+    }
+  }
+
   // ON VERSION INPUT CHANGE
   const onVersionInputChange = (event) => {
     const { value } = event.target
@@ -210,6 +228,15 @@ const CpeModal = ({
           setVersionList(res.data.idAutoComplete.result)
         }
       })
+    }
+  }
+
+  const onVersionBlur = () => {
+    if (version !== '') {
+      const cpeParts = cpeString.split(':')
+      cpeParts[5] = version
+      const cpe = cpeParts.join(':')
+      setCpeString(cpe)
     }
   }
 

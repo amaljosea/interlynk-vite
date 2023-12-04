@@ -79,8 +79,6 @@ const PartsTable = () => {
     }
   })
 
-  console.log('get project data', allProducts)
-
   const productList =
     allProducts &&
     allProducts.projects.nodes.map((option) => ({

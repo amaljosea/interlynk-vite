@@ -78,6 +78,8 @@ function SBOM() {
   const subProductVersion = localStorage.getItem('subProductVersion')
 
   const {
+    prodField,
+    prodDirection,
     setVulnSeverity,
     setActiveProdTab,
     totalRows,
@@ -106,7 +108,9 @@ function SBOM() {
 
   const { data: allProjects } = useQuery(GetProjectData, {
     variables: {
-      first: 10
+      first: 10,
+      field: prodField,
+      direction: prodDirection
     }
   })
 
@@ -335,7 +339,12 @@ function SBOM() {
     <>
       {productId && sbomId && (
         <>
-          <Flex direction='column' pt={{ base: '120px', md: '74px' }} px={2}>
+          <Flex
+            direction='column'
+            pt={{ base: '120px', md: '74px' }}
+            pr={2}
+            pl={5}
+          >
             {/* Product Info */}
             {sbomData ? (
               <Card mb='6'>

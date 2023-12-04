@@ -43,6 +43,7 @@ import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import { useHistory } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
+import ProdFilterMenu from 'views/Dashboard/Products/components/ProdFilterMenu'
 
 const customStyles = {
   headCells: {
@@ -201,7 +202,6 @@ const ProductTable = ({ data, refetch }) => {
               })
             }
           })
-
         const filteredData = uniqVersions
           ? removeDuplicatesAndLatest(uniqVersions)
           : []
@@ -433,7 +433,7 @@ const ProductTable = ({ data, refetch }) => {
     try {
       await projectDelete({
         variables: {
-          id
+          id: activeRow.id
         }
       }).then((res) => res.data && onDeleteClose())
     } catch (error) {
@@ -503,7 +503,7 @@ const ProductTable = ({ data, refetch }) => {
   const onFilterActive = async (value) => {
     setActiveProd(value)
     await refetch({
-      enabled: value === 'yes' ? true : false,
+      enabled: value === 'all' ? undefined : value === 'yes' ? true : false,
       first: totalRows,
       last: undefined,
       after: undefined,
@@ -531,35 +531,11 @@ const ProductTable = ({ data, refetch }) => {
             onClear={handleClear}
           />
           {/* FILTER PRODUCTS */}
-          <Menu closeOnSelect={true}>
-            <MenuButton
-              as={Button}
-              colorScheme='blue'
-              fontWeight='normal'
-              fontSize={'sm'}
-              leftIcon={<FaFilter size={14} />}
-            >
-              Active
-            </MenuButton>
-            <MenuList>
-              <MenuOptionGroup
-                type='radio'
-                value={activeProd}
-                onChange={onFilterActive}
-              >
-                {['yes', 'no'].map((item, index) => (
-                  <MenuItemOption
-                    key={index}
-                    value={item}
-                    fontSize={'sm'}
-                    textTransform={'capitalize'}
-                  >
-                    {item}
-                  </MenuItemOption>
-                ))}
-              </MenuOptionGroup>
-            </MenuList>
-          </Menu>
+          <ProdFilterMenu
+            activeProd={activeProd}
+            setActiveProd={setActiveProd}
+            onFilter={onFilterActive}
+          />
         </Stack>
 
         <Stack direction={'row'} spacing={2} alignItems={'center'}>

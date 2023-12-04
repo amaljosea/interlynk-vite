@@ -1261,35 +1261,175 @@ export const olderTransactions = [
   }
 ]
 
-export const Vulnerabilities = [
+export const vulnList = [
   {
-    id: 1,
-    cve: 'CVE-2023-4863',
-    cvss: '8.8',
-    severity: 'high',
-    component: 'skiasharp.2.88.0-preview.178.nupkg',
-    version: '2.88.0-preview.178',
-    status: 'In Triage',
-    source: 'NVD'
+    id: '31b66fcd-469a-4f06-bd64-8c8fa3554526',
+    impact: null,
+    vuln: {
+      vulnId: 'GHSA-h376-j262-vhq6',
+      desc: 'RCE in H2 Console',
+      sev: 'critical',
+      cvssScore: 9.8,
+      cvssVector: 'CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H',
+      source: 'osv',
+      publishedAt: '2022-01-06T23:55:09Z',
+      lastModifiedAt: '2023-11-08T04:07:06Z',
+      nvdAliasId: 'CVE-2021-42392',
+      updatedAt: '2023-12-02T13:11:38Z',
+      vulnInfo: {
+        cveId: 'CVE-2021-42392',
+        epssScore: 0.46489,
+        epssScores: [0.46489, 0.46489],
+        epssPercentile: 0.9709,
+        kev: false,
+        __typename: 'VulnInfo'
+      },
+      __typename: 'GlobalVuln'
+    },
+    componentVulnLogs: [],
+    component: {
+      name: 'h2',
+      version: '1.4.200',
+      __typename: 'Component'
+    },
+    vexStatus: null,
+    vexJustification: null,
+    __typename: 'ComponentVuln'
   },
   {
-    id: 2,
-    cve: 'CVE-2023-21538',
-    cvss: '7.5',
-    severity: 'high',
-    component: 'system.private.datacontractserialization.4.3.0.nupkg',
-    version: '4.3.0',
-    status: 'In Triage',
-    source: 'NVD'
+    id: 'a9f2be62-2aea-4568-bea5-77748917220a',
+    impact: null,
+    vuln: {
+      vulnId: 'GHSA-7rpj-hg47-cx62',
+      desc: 'Improper Restriction of XML External Entity Reference in com.h2database:h2.',
+      sev: 'high',
+      cvssScore: 8.1,
+      cvssVector: 'CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:H',
+      source: 'osv',
+      publishedAt: '2021-12-16T14:29:57Z',
+      lastModifiedAt: '2023-11-08T22:13:32Z',
+      nvdAliasId: 'CVE-2021-23463',
+      updatedAt: '2023-12-02T13:11:38Z',
+      vulnInfo: {
+        cveId: 'CVE-2021-23463',
+        epssScore: 0.00473,
+        epssScores: [0.00473, 0.00473],
+        epssPercentile: 0.72881,
+        kev: false,
+        __typename: 'VulnInfo'
+      },
+      __typename: 'GlobalVuln'
+    },
+    componentVulnLogs: [],
+    component: {
+      name: 'h2',
+      version: '1.4.200',
+      __typename: 'Component'
+    },
+    vexStatus: null,
+    vexJustification: null,
+    __typename: 'ComponentVuln'
   },
   {
-    id: 3,
-    cve: 'CVE-2017-11770',
-    cvss: '7.5',
-    severity: 'high',
-    component: 'system.security.cryptography.x509certificates.4.3.0.nupkg',
-    version: '4.3.0',
-    status: 'Fixed',
-    source: 'SBOM'
+    id: '4e24bc4c-0798-4492-802a-edc1c911d0cf',
+    impact: null,
+    vuln: {
+      vulnId: 'GHSA-45hx-wfhj-473x',
+      desc: 'Arbitrary code execution in H2 Console',
+      sev: 'critical',
+      cvssScore: 9.8,
+      cvssVector: 'CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H',
+      source: 'osv',
+      publishedAt: '2022-01-21T23:07:39Z',
+      lastModifiedAt: '2023-11-08T04:08:17Z',
+      nvdAliasId: 'CVE-2022-23221',
+      updatedAt: '2023-12-02T13:11:38Z',
+      vulnInfo: {
+        cveId: 'CVE-2022-23221',
+        epssScore: 0.0677,
+        epssScores: [0.0677, 0.0677],
+        epssPercentile: 0.93112,
+        kev: false,
+        __typename: 'VulnInfo'
+      },
+      __typename: 'GlobalVuln'
+    },
+    componentVulnLogs: [],
+    component: {
+      name: 'h2',
+      version: '1.4.200',
+      __typename: 'Component'
+    },
+    vexStatus: null,
+    vexJustification: null,
+    __typename: 'ComponentVuln'
+  },
+  {
+    id: '16082b3a-ac6c-4f99-8afe-ee04d44d019f',
+    impact: null,
+    vuln: {
+      vulnId: 'GHSA-22wj-vf5f-wrvj',
+      desc: 'Password exposure in H2 Database ',
+      sev: 'high',
+      cvssScore: 7.8,
+      cvssVector: 'CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H',
+      source: 'osv',
+      publishedAt: '2022-11-23T21:30:31Z',
+      lastModifiedAt: '2023-11-08T04:10:54Z',
+      nvdAliasId: 'CVE-2022-45868',
+      updatedAt: '2023-12-02T13:11:38Z',
+      vulnInfo: {
+        cveId: 'CVE-2022-45868',
+        epssScore: 0.00042,
+        epssScores: [0.00042, 0.00042],
+        epssPercentile: 0.05735,
+        kev: false,
+        __typename: 'VulnInfo'
+      },
+      __typename: 'GlobalVuln'
+    },
+    componentVulnLogs: [],
+    component: {
+      name: 'h2',
+      version: '1.4.200',
+      __typename: 'Component'
+    },
+    vexStatus: null,
+    vexJustification: null,
+    __typename: 'ComponentVuln'
+  },
+  {
+    id: '271b31c4-4605-4b89-936d-16ab370d4bb8',
+    impact: null,
+    vuln: {
+      vulnId: 'GHSA-wgh7-54f2-x98r',
+      desc: 'HTTP/2 HPACK integer overflow and buffer allocation',
+      sev: 'high',
+      cvssScore: 7.5,
+      cvssVector: 'CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H',
+      source: 'osv',
+      publishedAt: '2023-10-10T21:16:23Z',
+      lastModifiedAt: '2023-11-16T18:46:02Z',
+      nvdAliasId: 'CVE-2023-36478',
+      updatedAt: '2023-12-02T13:11:38Z',
+      vulnInfo: {
+        cveId: 'CVE-2023-36478',
+        epssScore: 0.0025,
+        epssScores: [0.0025, 0.0025],
+        epssPercentile: 0.62647,
+        kev: false,
+        __typename: 'VulnInfo'
+      },
+      __typename: 'GlobalVuln'
+    },
+    componentVulnLogs: [],
+    component: {
+      name: 'http2-hpack',
+      version: '9.4.46.v20220331',
+      __typename: 'Component'
+    },
+    vexStatus: null,
+    vexJustification: null,
+    __typename: 'ComponentVuln'
   }
 ]

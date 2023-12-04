@@ -537,8 +537,7 @@ export const CreateComponent = gql`
     $kind: String!
     $name: String!
     $version: String
-    $licenses: [String!]
-    $licenseExp: [String!]
+    $licenses: LicenseInput!
     $cpes: [String!]
     $purl: String
     $primary: Boolean
@@ -551,7 +550,6 @@ export const CreateComponent = gql`
         name: $name
         version: $version
         licenses: $licenses
-        licenseExp: $licenseExp
         cpes: $cpes
         purl: $purl
         primary: $primary
@@ -578,8 +576,7 @@ export const UpdateComponent = gql`
     $sbomId: Uuid!
     $kind: String
     $name: String
-    $licenses: [String!]
-    $licenseExp: [String!]
+    $licenses: LicenseInput!
     $cpes: [String!]
     $purl: String
     $primary: Boolean
@@ -593,7 +590,6 @@ export const UpdateComponent = gql`
         kind: $kind
         name: $name
         licenses: $licenses
-        licenseExp: $licenseExp
         cpes: $cpes
         purl: $purl
         primary: $primary
@@ -916,8 +912,7 @@ export const sbomCreate = gql`
     $spec: String!
     $specVersion: String
     $format: String
-    $licenses: [String!]
-    $licenseExp: [String!]
+    $licenses: LicenseInput!
   ) {
     sbomCreate(
       input: {
@@ -926,7 +921,6 @@ export const sbomCreate = gql`
         specVersion: $specVersion
         format: $format
         licenses: $licenses
-        licenseExp: $licenseExp
       }
     ) {
       errors
@@ -954,8 +948,7 @@ export const sbomUpdate = gql`
     $spec: String!
     $specVersion: String
     $format: String
-    $licenses: [String!]
-    $licenseExp: [String!]
+    $licenses: LicenseInput!
   ) {
     sbomUpdate(
       input: {
@@ -964,7 +957,6 @@ export const sbomUpdate = gql`
         specVersion: $specVersion
         format: $format
         licenses: $licenses
-        licenseExp: $licenseExp
       }
     ) {
       errors

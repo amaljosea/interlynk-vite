@@ -14,7 +14,8 @@ import {
   ModalContent,
   ModalHeader,
   ModalBody,
-  ModalCloseButton
+  ModalCloseButton,
+  Progress
 } from '@chakra-ui/react'
 import { UploadSbom } from 'graphQL/Mutation'
 import { useState } from 'react'
@@ -94,7 +95,7 @@ const UploadModal = ({ id, isOpen, onClose }) => {
               </Alert>
             )}
             <Box>
-              <FormLabel htmlFor='file' width={'100%'}>
+              <FormLabel htmlFor='file' width={'100%'} cursor={'pointer'}>
                 <Input
                   type='file'
                   id='file'
@@ -115,8 +116,8 @@ const UploadModal = ({ id, isOpen, onClose }) => {
               </FormLabel>
             </Box>
             {loading && (
-              <Box my={4}>
-                <Text>Uploading...</Text>
+              <Box my={5}>
+                <Progress size='xs' isIndeterminate />
               </Box>
             )}
             {error && (
