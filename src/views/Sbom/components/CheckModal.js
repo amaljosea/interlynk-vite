@@ -66,7 +66,7 @@ const CheckModal = ({
 
   const now = new Date()
   const currentTime = now.toISOString().slice(0, 16)
-  const [expLicense, setExpLicense] = useState([])
+  const [expLicense, setExpLicense] = useState('')
   const [timestamp, setTimestamp] = useState(currentTime)
   const [comp, setComp] = useState('')
   const [compType, setCompType] = useState('')
@@ -153,8 +153,11 @@ const CheckModal = ({
         variables: {
           id: componentId,
           sbomId: sbomId,
-          licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
-          licenseExp: licenseType === 'license_exp' ? expLicense : undefined
+          licenses: {
+            licenses: spdxLicense.length > 0 ? spdxLicense : undefined,
+            licensesExp: expLicense === '' ? undefined : expLicense,
+            licensesCustom: undefined
+          }
         }
       })
         .then((res) => {

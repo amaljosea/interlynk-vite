@@ -115,7 +115,7 @@ function ComponentDrawer(props) {
   const [purlValue, setPurlValue] = useState('')
   const [purlData, setPurlData] = useState(null)
   const [isPURLInputValid, setPURLInputValid] = useState(true)
-
+  const [expLicense, setExpLicense] = useState('')
   const [isPrimary, setIsPrimary] = useState(primary)
   const [isInternal, setIsInternal] = useState(internal)
 
@@ -184,7 +184,7 @@ function ComponentDrawer(props) {
       setPurlData(pkg)
       setPurlString(pkg.toString())
     } else {
-      setPurlString('pkg:type/namespace/name@version')
+      setPurlString('pkg:type/name@version')
     }
     onPurlOpen()
   }
@@ -197,8 +197,11 @@ function ComponentDrawer(props) {
           kind: compType,
           name: compName,
           version: compVersion,
-          licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
-          licenseExp: licenseType === 'license_exp' ? expLicense : undefined,
+          licenses: {
+            licenses: spdxLicense.length > 0 ? spdxLicense : undefined,
+            licensesExp: expLicense === '' ? undefined : expLicense,
+            licensesCustom: undefined
+          },
           cpes: cpeList,
           purl: purlValue,
           primary: isPrimary,
@@ -234,8 +237,11 @@ function ComponentDrawer(props) {
           kind: compType,
           name: compName,
           version: compVersion,
-          licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
-          licenseExp: licenseType === 'license_exp' ? expLicense : undefined,
+          licenses: {
+            licenses: spdxLicense.length > 0 ? spdxLicense : undefined,
+            licensesExp: expLicense === '' ? undefined : expLicense,
+            licensesCustom: undefined
+          },
           cpes: cpeList,
           purl: purlValue,
           primary: isPrimary,
@@ -329,8 +335,6 @@ function ComponentDrawer(props) {
       }
     })
   }
-
-  const [expLicense, setExpLicense] = useState([])
 
   return (
     <>
@@ -441,7 +445,7 @@ function ComponentDrawer(props) {
 
               {/* LICENSES */}
               <LicenseField
-                exp={data?.licenseExp}
+                exp={data?.licensesExp.length > 0 ? data.licensesExp[0] : ''}
                 expLicense={expLicense}
                 setExpLicense={setExpLicense}
               />

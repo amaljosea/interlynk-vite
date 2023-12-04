@@ -17,13 +17,15 @@ import {
   FaPlug,
   FaBullhorn,
   FaWindowMaximize,
-  FaExchangeAlt
+  FaExchangeAlt,
+  FaBug
 } from 'react-icons/fa'
 import { HomeIcon } from 'components/Icons/Icons'
 import { BsFillFolderSymlinkFill } from 'react-icons/bs'
 import Automation from 'views/Dashboard/Automation'
 import { TbSettingsAutomation } from 'react-icons/tb'
 import ChangeLog from 'views/Dashboard/Changelog'
+import Vulnerabilities from 'views/Dashboard/Vulnerabilities'
 
 export const dashRoutes = [
   {
@@ -45,6 +47,13 @@ export const dashRoutes = [
     name: 'Products',
     icon: <FaWindowMaximize color='inherit' />,
     component: Products,
+    layout: '/vendor'
+  },
+  {
+    path: '/vulnerabilities',
+    name: 'Vulnerabilities',
+    icon: <FaBug color='inherit' />,
+    component: Vulnerabilities,
     layout: '/vendor'
   },
   // {

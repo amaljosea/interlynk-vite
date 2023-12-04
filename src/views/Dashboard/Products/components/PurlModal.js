@@ -435,7 +435,7 @@ const PurlModal = ({
   const handleTypeChange = (e) => {
     const { value } = e.target
     setPurlType(value)
-    setPurlString(`pkg:type/namespace/name@version`)
+    setPurlString(`pkg:type/name@version`)
     setNamespace('')
     setPurlName('')
     setPurlVersion('')

@@ -82,8 +82,12 @@ const LicenseField = ({ exp, expLicense, setExpLicense }) => {
   const handleTypeChange = (value) => {
     setLicenseType(value)
     if (value === 'license_exp') {
+      setSpdxLicense([])
+      setSpdxList([])
       setIsValid(true)
       setExpLicense(exp ? exp : '')
+    } else if (value === 'license_spdx') {
+      setExpLicense('')
     }
   }
 
