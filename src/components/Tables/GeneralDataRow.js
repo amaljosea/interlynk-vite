@@ -61,7 +61,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
   const customerView = location.pathname.startsWith('/customer')
   const [selectedKey, setSelectedKey] = useState('')
   const [activeTool, setActiveTool] = useState(null)
-  const [expLicense, setExpLicense] = useState([])
+  const [expLicense, setExpLicense] = useState('')
 
   const btnRef = useRef(null)
   const licenseBtn = useRef(null)
@@ -173,8 +173,11 @@ const GeneralDataRow = ({ status, data, refetch }) => {
         variables: {
           id: data.id,
           spec: data.spec,
-          licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
-          licenseExp: licenseType === 'license_exp' ? expLicense : undefined
+          licenses: {
+            licenses: spdxLicense.length > 0 ? spdxLicense : undefined,
+            licensesExp: expLicense === '' ? undefined : expLicense,
+            licensesCustom: undefined
+          }
         }
       }).then((res) => res.data && onSBMClose())
     } catch (error) {
@@ -489,7 +492,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                   (licenseType === 'license_spdx' &&
                     spdxLicense.length === 0) ||
                   (licenseType === 'license_exp' && expLicense === '') ||
-                  (licenseType === 'license_custom' && customLicense === '')
+                  (licenseType === 'license_custom' &&  spdxLicense.length === 0)
                 }
                 onClick={onUpdateLicense}
               >

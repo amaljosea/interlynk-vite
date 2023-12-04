@@ -76,8 +76,11 @@ const LicenseModal = ({
         variables: {
           id: data.id,
           spec: data.spec,
-          licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
-          licenseExp: licenseType === 'license_exp' ? licenseExp : undefined
+          licenses: {
+            licenses: spdxLicense.length > 0 ? spdxLicense : undefined,
+            licensesExp: licenseExp === '' ? undefined : licenseExp,
+            licensesCustom: undefined
+          }
         }
       })
         .then((res) => {

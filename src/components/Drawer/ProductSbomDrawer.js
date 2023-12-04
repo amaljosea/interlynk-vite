@@ -24,15 +24,10 @@ import LicenseField from 'components/LicenseField'
 
 function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
   const toast = useToast()
-  const [expLicense, setExpLicense] = useState([])
+  const [expLicense, setExpLicense] = useState('')
 
-  const {
-    prodField,
-    prodDirection,
-    licenseType,
-    spdxLicense,
-    totalRows
-  } = useContext(GlobalContext)
+  const { prodField, prodDirection, licenseType, spdxLicense, totalRows } =
+    useContext(GlobalContext)
 
   const handleRefetch = () => {
     refetch({
@@ -59,8 +54,11 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
         kind: compType,
         name: sbomName,
         version: version,
-        licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
-        licenseExp: licenseType === 'license_exp' ? expLicense : undefined,
+        licenses: {
+          licenses: spdxLicense.length > 0 ? spdxLicense : undefined,
+          licensesExp: expLicense === '' ? undefined : expLicense,
+          licensesCustom: undefined
+        },
         primary: true
       }
     }).then(
@@ -82,8 +80,11 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
         spec: sbomName,
         specVersion: version,
         format: compType,
-        licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
-        licenseExp: licenseType === 'license_exp' ? expLicense : undefined
+        licenses: {
+          licenses: spdxLicense.length > 0 ? spdxLicense : undefined,
+          licensesExp: expLicense === '' ? undefined : expLicense,
+          licensesCustom: undefined
+        }
       }
     })
       .then((res) => res.data && handleCreateComp(res.data.sbomCreate.sbom.id))
