@@ -1,16 +1,12 @@
 import {
   Box,
   Button,
-  Flex,
-  Input,
   Menu,
   MenuButton,
-  MenuDivider,
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
-  Stack,
-  useDisclosure
+  Stack
 } from '@chakra-ui/react'
 import { CheckIcon } from '@chakra-ui/icons'
 import { FaFilter } from 'react-icons/fa'
