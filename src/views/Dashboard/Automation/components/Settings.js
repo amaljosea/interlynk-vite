@@ -35,7 +35,7 @@ const customStyles = {
   }
 }
 
-const Settings = ({ data, getData }) => {
+const Settings = ({ data, refetch }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
@@ -52,9 +52,7 @@ const Settings = ({ data, getData }) => {
         autoCheckId: id,
         projectId: productId
       }
-    }).then(
-      (res) => res.data && getData({ variables: { id: productId, first: 25 } })
-    )
+    }).then((res) => res.data && refetch())
   }
 
   const handleStatus = async (row) => {
@@ -65,16 +63,7 @@ const Settings = ({ data, getData }) => {
         condition: row.condition,
         enabled: row.enabled ? false : true
       }
-    }).then(
-      (res) =>
-        res.data &&
-        getData({
-          variables: {
-            id: productId,
-            first: 25
-          }
-        })
-    )
+    }).then((res) => res.data && refetch())
   }
 
   // COLUMNS
@@ -199,7 +188,7 @@ const Settings = ({ data, getData }) => {
           isOpen={isOpen}
           onClose={onClose}
           data={activeRow}
-          getData={getData}
+          refetch={refetch}
           productId={productId}
         />
       )}

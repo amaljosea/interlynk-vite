@@ -12,7 +12,7 @@ import { useEffect, useState } from 'react'
 import { useLocation, useHistory } from 'react-router-dom'
 import Controls from './components/Controls'
 import Settings from './components/Settings'
-import { useLazyQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 import { GetProjectCheck } from 'graphQL/Queries'
 
 const idRegex =
@@ -26,25 +26,16 @@ const Automation = () => {
 
   const [activeTab, setActiveTab] = useState(0)
 
-  const [getAutomations, { data, error }] = useLazyQuery(GetProjectCheck)
+  const { data, error, refetch } = useQuery(GetProjectCheck, {
+    variables: {
+      id: productId,
+      first: 25
+    }
+  })
 
   const handleTabChange = (value) => {
     setActiveTab(value)
-    if (value === 1) {
-      getAutomations({
-        variables: {
-          id: productId,
-          first: 25
-        }
-      })
-    }
   }
-
-  useEffect(() => {
-    if (data) {
-      console.log(data)
-    }
-  }, [data])
 
   useEffect(() => {
     if (!idRegex.test(productId)) {
@@ -74,11 +65,13 @@ const Automation = () => {
             {/* AUTOMATIONS */}
             <TabPanel>
               {error ? (
-                <Text textAlign={'center'} my={6}>{JSON.stringify(error)}</Text>
+                <Text textAlign={'center'} my={6}>
+                  {JSON.stringify(error)}
+                </Text>
               ) : (
                 <Settings
                   data={data?.project.autoChecks}
-                  getData={getAutomations}
+                  refetch={refetch}
                 />
               )}
             </TabPanel>
