@@ -53,6 +53,7 @@ const SBOMTable = ({
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
+
   const {
     setCompFilters,
     setVulnFilters,

@@ -26,8 +26,14 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
   const toast = useToast()
   const [expLicense, setExpLicense] = useState('')
 
-  const { prodField, prodDirection, licenseType, spdxLicense, totalRows } =
-    useContext(GlobalContext)
+  const {
+    prodField,
+    prodDirection,
+    licenseType,
+    spdxLicense,
+    totalRows,
+    customLicense
+  } = useContext(GlobalContext)
 
   const handleRefetch = () => {
     refetch({
@@ -55,9 +61,10 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
         name: sbomName,
         version: version,
         licenses: {
-          licenses: spdxLicense.length > 0 ? spdxLicense : undefined,
-          licensesExp: expLicense === '' ? undefined : expLicense,
-          licensesCustom: undefined
+          licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
+          licensesExp: licenseType === 'license_exp' ? expLicense : undefined,
+          licensesCustom:
+            licenseType === 'license_custom' ? customLicense : undefined
         },
         primary: true
       }
@@ -81,9 +88,10 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
         specVersion: version,
         format: compType,
         licenses: {
-          licenses: spdxLicense.length > 0 ? spdxLicense : undefined,
-          licensesExp: expLicense === '' ? undefined : expLicense,
-          licensesCustom: undefined
+          licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
+          licensesExp: licenseType === 'license_exp' ? expLicense : undefined,
+          licensesCustom:
+            licenseType === 'license_custom' ? customLicense : undefined
         }
       }
     })

@@ -60,6 +60,7 @@ const CheckModal = ({
     spdxLicense,
     setCheckFilters,
     setActiveProdTab,
+    customLicense,
     compField,
     compDirection
   } = useContext(GlobalContext)
@@ -154,9 +155,10 @@ const CheckModal = ({
           id: componentId,
           sbomId: sbomId,
           licenses: {
-            licenses: spdxLicense.length > 0 ? spdxLicense : undefined,
-            licensesExp: expLicense === '' ? undefined : expLicense,
-            licensesCustom: undefined
+            licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
+            licensesExp: licenseType === 'license_exp' ? expLicense : undefined,
+            licensesCustom:
+              licenseType === 'license_custom' ? customLicense : undefined
           }
         }
       })
@@ -382,7 +384,7 @@ const CheckModal = ({
               shortDesc === 'Componet has deprecated license/s' ||
               shortDesc === 'Component has restrictive licenses specified') && (
               <LicenseField
-                exp={activeCheck.component.licenseExp}
+                data={activeCheck.component}
                 expLicense={expLicense}
                 setExpLicense={setExpLicense}
               />

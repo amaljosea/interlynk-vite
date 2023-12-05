@@ -169,7 +169,7 @@ const GlobalContext = React.createContext({
   setSpdxLicense: () => {},
   licenseExp: '',
   setLicenseExp: () => {},
-  customLicense: '',
+  customLicense: [],
   setCustomLicense: () => {},
   licenseType: 'license_spdx',
   setLicenseType: () => {},

@@ -124,30 +124,13 @@ const ComponentTable = ({
       variables: {
         projectId: productId,
         sbomId: sbomId,
-        search: compSearchInput !== '' ? compSearchInput : undefined,
-        ecosystem:
-          compEcosystem.includes('all') || compEcosystem.length === 0
-            ? undefined
-            : compEcosystem,
-        kind:
-          compType.includes('all') || compType.length === 0
-            ? undefined
-            : compType,
-        licenses:
-          compLicense.includes('all') || compLicense.length === 0
-            ? undefined
-            : compLicense,
-        supplierName:
-          compSupplier.includes('all') || compSupplier.length === 0
-            ? undefined
-            : compSupplier,
-        primary: compScope === 'primary' ? true : undefined,
-        internal: compScope === 'internal' ? true : undefined,
+        search: undefined,
         first: totalRows,
         field: compField,
         direction: compDirection
       }
     })
+    setCompSearchInput('')
     setComPageIndex(1)
   }
 
@@ -210,14 +193,6 @@ const ComponentTable = ({
       setSpdxList(filterData)
       const selectedIds = filterData.map((option) => option.value)
       setSpdxLicense(selectedIds)
-    } else {
-      setSpdxList([
-        {
-          value: 'CC0-1.0',
-          label: 'Creative Commons Zero v1.0 Universal'
-        }
-      ])
-      setSpdxLicense(['CC0-1.0'])
     }
     onOpen()
   }
@@ -431,7 +406,7 @@ const ComponentTable = ({
       name: 'LICENSES',
       width: '16%',
       selector: (row) => {
-        const { licenses } = row
+        const { licenses, licensesExp, licensesCustom } = row
 
         return (
           <Flex
@@ -441,27 +416,56 @@ const ComponentTable = ({
             flexWrap={'wrap'}
             my={2}
           >
+            {/* SPDX */}
             {licenses.length > 0 &&
               licenses.map((item, index) => (
-                <Tooltip
-                  key={index}
-                  label={item.name}
-                  placement={'top'}
-                  textTransform={'capitalize'}
-                >
+                <Tooltip key={index} label={item} placement={'top'}>
                   <Link
-                    href={item.reference}
+                    href={`https://spdx.org/licenses/${item}`}
                     target='_blank'
-                    pointerEvents={item.reference === '#' ? 'none' : 'auto'}
-                    overflow={'auto'}
                   >
                     <Tag
-                      size={'sm'}
-                      key={index}
+                      size={'md'}
                       variant='subtle'
                       colorScheme='green'
                       width={'fit-content'}
-                      textTransform={'capitalize'}
+                    >
+                      <TagLabel>{item}</TagLabel>
+                    </Tag>
+                  </Link>
+                </Tooltip>
+              ))}
+            {/* EXPRESSION */}
+            {licensesExp && licensesExp !== '' && (
+              <Tooltip label={licensesExp} placement={'top'}>
+                <Link
+                  href={`https://spdx.org/licenses/${licensesExp}`}
+                  target='_blank'
+                >
+                  <Tag
+                    size={'md'}
+                    variant='subtle'
+                    colorScheme='green'
+                    width={'fit-content'}
+                  >
+                    <TagLabel>{licensesExp}</TagLabel>
+                  </Tag>
+                </Link>
+              </Tooltip>
+            )}
+            {/* CUSTOM */}
+            {licensesCustom.length > 0 &&
+              licensesCustom.map((item, index) => (
+                <Tooltip key={index} label={item} placement={'top'}>
+                  <Link
+                    href={`https://spdx.org/licenses/${item}`}
+                    target='_blank'
+                  >
+                    <Tag
+                      size={'md'}
+                      variant='subtle'
+                      colorScheme='green'
+                      width={'fit-content'}
                     >
                       <TagLabel>{item}</TagLabel>
                     </Tag>
@@ -777,6 +781,7 @@ const ComponentTable = ({
 
   // CLEAR SERACH
   const handleClear = async () => {
+    setCompSearchInput('')
     await refetch({
       variables: {
         projectId: productId,
