@@ -9,11 +9,12 @@ import {
   Tooltip
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { sevColor, timeSince, getFullDateAndTime } from 'utils'
 import CustomLoader from 'components/CustomLoader'
 import { Link } from 'react-router-dom'
 import VulnsFilters from 'views/Dashboard/Vulnerabilities/components/VulnsFilter'
+import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 const customStyles = {
   headCells: {
@@ -212,22 +213,22 @@ const VulnsTable = ({ data }) => {
       sortable: true
     },
     // Products
-        {
-          id: 'VULN_INFOS_EPSS_SCORES',
-          name: 'RESOLVED',
-          selector: (row) => {
-            const { vuln } = row
-            const { resolved } = vuln
+    {
+      id: 'VULN_INFOS_EPSS_SCORES',
+      name: 'RESOLVED',
+      selector: (row) => {
+        const { vuln } = row
+        const { resolved } = vuln
 
-            return (
-              <Flex minWidth='max-content' alignItems='right' gap='0'>
-              {resolved}
-            </Flex>
-            )
-          },
-          width: '200px',
-          sortable: true
-        },
+        return (
+          <Flex minWidth='max-content' alignItems='right' gap='0'>
+            {resolved}
+          </Flex>
+        )
+      },
+      width: '200px',
+      sortable: true
+    },
     // UPDATED AT
     {
       id: 'COMPONENT_VULNS_UPDATED_AT',
@@ -251,17 +252,31 @@ const VulnsTable = ({ data }) => {
     }
   ]
 
+  const [vulnSearchInput, setVulnSearchInput] = useState('')
+
+  // SEARCH COMPONENT
+  const handleSearch = async () => {}
+
+  // CLEAR SERACH
+  const handleClear = async () => {
+    setVulnSearchInput('')
+  }
+
   const subHeaderComponentMemo = useMemo(() => {
     return (
-      <Flex
-        width={'100%'}
-        alignItems={'center'}
-        justifyContent={'space-between'}
-      >
+      <Flex width={'100%'} alignItems={'center'} gap={3}>
+        <SearchFilter
+          id='vuln'
+          filterText={vulnSearchInput}
+          setFilterText={setVulnSearchInput}
+          onFilter={handleSearch}
+          onClear={handleClear}
+        />
+
         <VulnsFilters />
       </Flex>
     )
-  }, [])
+  }, [vulnSearchInput, handleClear, handleSearch])
 
   return (
     <>

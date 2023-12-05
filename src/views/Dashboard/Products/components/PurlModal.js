@@ -450,9 +450,11 @@ const PurlModal = ({
   }
 
   const handleNamespaceChange = (e) => {
-    setNamespace(e.target.value)
+    const { value } = e.target
+    const val = value.replace(/\s/g, '')
+    setNamespace(val)
     const pkg = PackageURL.fromString(purlString)
-    pkg.namespace = e.target.value
+    pkg.namespace = val
     setPurlString(pkg.toString())
   }
 
@@ -466,11 +468,14 @@ const PurlModal = ({
 
   const handleNameChange = (e) => {
     const { value } = e.target
-    setPurlName(value)
+    const val = value.replace(/\s/g, '')
+    setPurlName(val)
   }
 
   const handleVersionChange = (e) => {
-    setPurlVersion(e.target.value)
+    const { value } = e.target
+    const val = value.replace(/\s/g, '')
+    setPurlVersion(val)
   }
 
   const onVersionBlur = () => {
@@ -678,7 +683,9 @@ const PurlModal = ({
                   variant='solid'
                   colorScheme={'blue'}
                   onClick={checkId ? handleComUpdate : handleSave}
-                  disabled={purlName === '' || purlType === '' || namespace === ''}
+                  disabled={
+                    purlName === '' || purlType === '' || namespace === ''
+                  }
                 >
                   Save
                 </Button>
