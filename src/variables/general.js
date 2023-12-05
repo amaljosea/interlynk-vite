@@ -1276,6 +1276,8 @@ export const vulnList = [
       lastModifiedAt: '2023-11-08T04:07:06Z',
       nvdAliasId: 'CVE-2021-42392',
       updatedAt: '2023-12-02T13:11:38Z',
+      prods: 4,
+      resolved: 4,
       vulnInfo: {
         cveId: 'CVE-2021-42392',
         epssScore: 0.46489,
@@ -1310,6 +1312,8 @@ export const vulnList = [
       lastModifiedAt: '2023-11-08T22:13:32Z',
       nvdAliasId: 'CVE-2021-23463',
       updatedAt: '2023-12-02T13:11:38Z',
+      prods: 9,
+      resolved: 3,
       vulnInfo: {
         cveId: 'CVE-2021-23463',
         epssScore: 0.00473,
@@ -1344,6 +1348,8 @@ export const vulnList = [
       lastModifiedAt: '2023-11-08T04:08:17Z',
       nvdAliasId: 'CVE-2022-23221',
       updatedAt: '2023-12-02T13:11:38Z',
+      prods: 1,
+      resolved: 0,
       vulnInfo: {
         cveId: 'CVE-2022-23221',
         epssScore: 0.0677,
@@ -1378,6 +1384,8 @@ export const vulnList = [
       lastModifiedAt: '2023-11-08T04:10:54Z',
       nvdAliasId: 'CVE-2022-45868',
       updatedAt: '2023-12-02T13:11:38Z',
+      prods: 6,
+      resolved: 6,
       vulnInfo: {
         cveId: 'CVE-2022-45868',
         epssScore: 0.00042,
@@ -1412,6 +1420,8 @@ export const vulnList = [
       lastModifiedAt: '2023-11-16T18:46:02Z',
       nvdAliasId: 'CVE-2023-36478',
       updatedAt: '2023-12-02T13:11:38Z',
+      prods: 7,
+      resolved: 0,
       vulnInfo: {
         cveId: 'CVE-2023-36478',
         epssScore: 0.0025,

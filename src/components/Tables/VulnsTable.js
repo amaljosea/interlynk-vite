@@ -190,9 +190,44 @@ const VulnsTable = ({ data }) => {
           </Flex>
         )
       },
-      width: '120px',
+      width: '200px',
       sortable: true
     },
+    // Products
+    {
+      id: 'VULN_INFOS_EPSS_SCORES',
+      name: 'AFFECTS',
+      selector: (row) => {
+        const { vuln } = row
+        const { vulnInfo } = vuln
+        const { prods } = vuln
+
+        return (
+          <Flex minWidth='max-content' alignItems='center' gap='10'>
+            {prods}
+          </Flex>
+        )
+      },
+      width: '200px',
+      sortable: true
+    },
+    // Products
+        {
+          id: 'VULN_INFOS_EPSS_SCORES',
+          name: 'RESOLVED',
+          selector: (row) => {
+            const { vuln } = row
+            const { resolved } = vuln
+
+            return (
+              <Flex minWidth='max-content' alignItems='right' gap='0'>
+              {resolved}
+            </Flex>
+            )
+          },
+          width: '200px',
+          sortable: true
+        },
     // UPDATED AT
     {
       id: 'COMPONENT_VULNS_UPDATED_AT',

@@ -49,7 +49,7 @@ const Filters = () => {
             fontSize={'sm'}
             leftIcon={<FaFilter size={14} />}
           >
-            Components
+            Product
           </MenuButton>
           <MenuList>
             <MenuOptionGroup
@@ -101,6 +101,47 @@ const Filters = () => {
             fontSize={'sm'}
             leftIcon={<FaFilter size={14} />}
           >
+            Component
+          </MenuButton>
+          <MenuList>
+            <MenuOptionGroup
+              type='checkbox'
+              value={statuses}
+              onChange={(value) =>
+                setStatuses(value.includes('all') ? [] : value)
+              }
+            >
+              {[
+                'lynk-api',
+                'lynk-dash-app',
+                'sbomqs',
+                'sbomgr',
+                'sbomex',
+                'sbomlc'
+              ].map((item, index) => (
+                <MenuItemOption
+                  key={index}
+                  value={item}
+                  fontSize={'sm'}
+                >
+                  {item}
+                </MenuItemOption>
+              ))}
+            </MenuOptionGroup>
+          </MenuList>
+        </Menu>
+      </Box>
+      {/* Statuses */}
+      <Box width={'fit-content'} position={'relative'}>
+        <Menu closeOnSelect={true}>
+          {statuses.length !== 0 && !statuses.includes('all') && <CheckMark />}
+          <MenuButton
+            as={Button}
+            colorScheme='blue'
+            fontWeight='normal'
+            fontSize={'sm'}
+            leftIcon={<FaFilter size={14} />}
+          >
             Status
           </MenuButton>
           <MenuList>
@@ -112,12 +153,12 @@ const Filters = () => {
               }
             >
               {[
-                'all',
-                'in-triage',
-                'false-positive',
-                'no-affected',
-                'affected',
-                'fixed'
+                'All',
+                'Under Investigation',
+                'Not Affected',
+                'False Positive',
+                'Affected',
+                'Fixed'
               ].map((item, index) => (
                 <MenuItemOption
                   key={index}

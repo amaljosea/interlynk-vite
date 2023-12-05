@@ -11,6 +11,7 @@ import {
 import { CheckIcon } from '@chakra-ui/icons'
 import { FaFilter } from 'react-icons/fa'
 import { useState } from 'react'
+import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 const CheckMark = () => {
   return (
@@ -36,6 +37,20 @@ const VulnsFilters = () => {
 
   return (
     <Stack direction={'row'} alignItems={'center'} gap={1}>
+          {/* SEARCH COMPONENTS */}
+                {true ? (
+            <SearchFilter
+              id='vuln'
+            />
+          ) : (
+            <SearchFilter
+              id='vuln'
+              filterText={vulnSearchInput}
+              setFilterText={setVulnSearchInput}
+              onFilter={handleSearch}
+              onClear={handleClear}
+            />
+          )}
       {/* SEVERITY */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
@@ -94,12 +109,80 @@ const VulnsFilters = () => {
                 setSource(value.includes('all') ? [] : value)
               }
             >
-              {['all', 'nvd', 'osv'].map((item, index) => (
+              {['All', 'NVD', 'OSV'].map((item, index) => (
                 <MenuItemOption
                   key={index}
                   value={item}
                   fontSize={'sm'}
                   textTransform={'capitalize'}
+                >
+                  {item}
+                </MenuItemOption>
+              ))}
+            </MenuOptionGroup>
+          </MenuList>
+        </Menu>
+      </Box>
+      {/* Products */}
+      <Box width={'fit-content'} position={'relative'}>
+        <Menu closeOnSelect={true}>
+          {source.length !== 0 && !source.includes('all') && <CheckMark />}
+          <MenuButton
+            as={Button}
+            colorScheme='blue'
+            fontWeight='normal'
+            fontSize={'sm'}
+            leftIcon={<FaFilter size={14} />}
+          >
+            Products
+          </MenuButton>
+          <MenuList>
+            <MenuOptionGroup
+              type='checkbox'
+              value={source}
+              onChange={(value) =>
+                setSource(value.includes('all') ? [] : value)
+              }
+            >
+              {['All', 'lynk-api', 'lynk-dash-app', 'sbomqs', 'sbomgr'].map((item, index) => (
+                <MenuItemOption
+                  key={index}
+                  value={item}
+                  fontSize={'sm'}
+                >
+                  {item}
+                </MenuItemOption>
+              ))}
+            </MenuOptionGroup>
+          </MenuList>
+        </Menu>
+      </Box>
+      {/* Archived */}
+      <Box width={'fit-content'} position={'relative'}>
+        <Menu closeOnSelect={true}>
+          {source.length !== 0 && !source.includes('all') && <CheckMark />}
+          <MenuButton
+            as={Button}
+            colorScheme='blue'
+            fontWeight='normal'
+            fontSize={'sm'}
+            leftIcon={<FaFilter size={14} />}
+          >
+            Archived
+          </MenuButton>
+          <MenuList>
+            <MenuOptionGroup
+              type='checkbox'
+              value={source}
+              onChange={(value) =>
+                setSource(value.includes('all') ? [] : value)
+              }
+            >
+              {['All', 'Yes', 'No'].map((item, index) => (
+                <MenuItemOption
+                  key={index}
+                  value={item}
+                  fontSize={'sm'}
                 >
                   {item}
                 </MenuItemOption>
