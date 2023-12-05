@@ -17,7 +17,7 @@ import {
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
-import { FaBalanceScale, FaCube, FaCubes } from 'react-icons/fa'
+import { FaBalanceScale, FaCube, FaCubes, FaBug } from 'react-icons/fa'
 import { useLocation } from 'react-router-dom'
 import { timeSince, getFullDateAndTime } from 'utils'
 import VulnProdTable from './components/ProdTable'
@@ -40,7 +40,9 @@ const VulnInfo = ({ data }) => {
         name: 'snakeyaml',
         version: '1.26'
       },
-      vexStatus: null,
+      vexStatus: {
+        name: 'In Triage'
+      },
       vexJustification: null
     },
     {
@@ -53,7 +55,9 @@ const VulnInfo = ({ data }) => {
         name: 'snakeyaml',
         version: '1.26'
       },
-      vexStatus: null,
+      vexStatus: {
+        name: 'Affected'
+      },
       vexJustification: null
     },
     {
@@ -117,7 +121,7 @@ const VulnInfo = ({ data }) => {
                   gap={5}
                   width={'100%'}
                 >
-                  <Icon as={FaCubes} h={'64px'} w={'64px'} color='blue.300' />
+                  <Icon as={FaBug} h={'64px'} w={'64px'} color='blue.300' />
                   <Flex direction={'column'} gap={0.5}>
                     {/* PRODUCT TITLE */}
                     <Text fontWeight={'semibold'} fontSize={18}>
@@ -143,7 +147,7 @@ const VulnInfo = ({ data }) => {
                         alignItems={'flex-start'}
                         spacing={2}
                       >
-                        <Icon h={4} w={4} color='#777' as={FaCube} />
+                        <Icon h={4} w={4} color='#777' as={FaCubes} />
                         <Box>
                           <Badge
                             mr={1}
@@ -151,7 +155,7 @@ const VulnInfo = ({ data }) => {
                             fontWeight={'medium'}
                             bg={'none'}
                           >
-                            12
+                            {vulnData.vuln.prods}
                           </Badge>
                           <Text fontSize={'xs'}>Products</Text>
                         </Box>
@@ -166,7 +170,7 @@ const VulnInfo = ({ data }) => {
                           h={'20px'}
                           w={'20px'}
                           color='#777'
-                          as={FaBalanceScale}
+                          as={FaCube}
                         />
                         <Box>
                           <Badge
@@ -175,7 +179,7 @@ const VulnInfo = ({ data }) => {
                             fontWeight={'medium'}
                             bg={'none'}
                           >
-                            8
+                            {vulnData.vuln.resolved}
                           </Badge>
                           <Text fontSize={'xs'}>Components</Text>
                         </Box>
