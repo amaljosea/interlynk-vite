@@ -46,6 +46,36 @@ const VulnInfo = ({ data }) => {
       vexJustification: null
     },
     {
+      id: '35004de9-4cb8-437e-a026-a23e87c15a53',
+      product: {
+        name: 'dropwizard-core',
+        version: '2.3.4'
+      },
+      component: {
+        name: 'snakeyaml',
+        version: '1.26'
+      },
+      vexStatus: {
+        name: 'In Triage'
+      },
+      vexJustification: null
+    },
+    {
+      id: '35004de9-4cb8-437e-a026-a23e87c15a53',
+      product: {
+        name: 'dropwizard-core',
+        version: '2.3.3'
+      },
+      component: {
+        name: 'snakeyaml',
+        version: '1.26'
+      },
+      vexStatus: {
+        name: 'Not Affected'
+      },
+      vexJustification: null
+    },
+    {
       id: '05d93b5e-3164-4661-859f-6296f2567260',
       product: {
         name: 'purl-mapper',
@@ -74,10 +104,10 @@ const VulnInfo = ({ data }) => {
       vexJustification: null
     },
     {
-      id: 'b134e43d-31b8-4fee-95cf-7a7b320a2ddf',
+      id: '06c5eb02-75ad-4055-894d-dccc80d165af',
       product: {
-        name: 'sbomex',
-        version: '4.3.2'
+        name: 'lynk-api',
+        version: '0.3.3'
       },
       component: {
         name: 'snakeyaml',
@@ -87,14 +117,27 @@ const VulnInfo = ({ data }) => {
       vexJustification: null
     },
     {
-      id: '2a6eb043-4f10-460b-bf38-02924c0f29f6',
+      id: 'b134e43d-31b8-4fee-95cf-7a7b320a2ddf',
       product: {
-        name: 'cyclonedx',
-        version: '4.2.1'
+        name: 'sbomex',
+        version: '0.11.0'
       },
       component: {
-        name: 'commons-text',
-        version: '1.9'
+        name: 'snakeyaml',
+        version: '1.26'
+      },
+      vexStatus: null,
+      vexJustification: null
+    },
+    {
+      id: 'b134e43d-31b8-4fee-95cf-7a7b320a2ddf',
+      product: {
+        name: 'sbomex',
+        version: '0.10.0'
+      },
+      component: {
+        name: 'snakeyaml',
+        version: '1.25'
       },
       vexStatus: null,
       vexJustification: null
@@ -129,13 +172,13 @@ const VulnInfo = ({ data }) => {
                     </Text>
 
                     <Text fontSize={'sm'} my={0.5}>
-                      A common specification for continous delivery events
+                    H2 Console in versions since 1.1.100 (2008-10-14) to 2.0.204 (2021-12-21) inclusive allows loading of custom classes from remote servers through JNDI.
                     </Text>
                     <Tooltip
                       placement='top'
                       label={getFullDateAndTime(vulnData.vuln.updatedAt)}
                     >
-                      <Text fontSize='xs' cursor={'pointer'}>
+                      <Text fontSize='xs' cursor={'pointer'} my={1.5}>
                         Updated {timeSince(vulnData.vuln.updatedAt)}
                       </Text>
                     </Tooltip>
