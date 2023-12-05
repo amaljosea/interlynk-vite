@@ -1,4 +1,4 @@
-import { InfoIcon } from '@chakra-ui/icons'
+import { ExternalLinkIcon, InfoIcon } from '@chakra-ui/icons'
 import {
   Flex,
   FormControl,
@@ -12,15 +12,17 @@ import {
   Radio,
   Alert,
   AlertIcon,
-  Input
+  Input,
+  Link
 } from '@chakra-ui/react'
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useState } from 'react'
 import ReactSelect from 'react-select'
 import CreatableSelect from 'react-select/creatable'
 import GlobalContext from 'context/GlobalContext'
 import { CpeAutoComplete } from 'graphQL/Queries'
 import { useLazyQuery } from '@apollo/client'
 import spdxValidate from 'spdx-expression-validate'
+import { MdArrowOutward } from "react-icons/md";
 
 const LicenseField = ({ data, expLicense, setExpLicense }) => {
   const {
@@ -146,10 +148,58 @@ const LicenseField = ({ data, expLicense, setExpLicense }) => {
         </FormLabel>
         {/* LICENSE TYPE */}
         <RadioGroup size='sm' value={licenseType} onChange={handleTypeChange}>
-          <Stack direction='row' my={4} spacing={3}>
-            <Radio value='license_spdx'>SPDX ID</Radio>
-            <Radio value='license_exp'>SPDX Expression</Radio>
-            <Radio value='license_custom'>Custom</Radio>
+          <Stack direction='row' my={4} spacing={3} alignItems={'center'}>
+            <Radio value='license_spdx'>
+              SPDX ID
+              <Link
+                href={
+                  'https://spdx.github.io/spdx-spec/v2.3/SPDX-license-expressions'
+                }
+                target={'_blank'}
+                ml={1}
+              >
+                <Icon
+                  as={MdArrowOutward}
+                  h={'16px'}
+                  w={'16px'}
+                  color={'blue.500'}
+                />
+              </Link>
+            </Radio>
+            <Radio value='license_exp'>
+              SPDX Expression
+              <Link
+                href={
+                  'https://spdx.github.io/spdx-spec/v2.3/SPDX-license-expressions'
+                }
+                target={'_blank'}
+                ml={1}
+              >
+                <Icon
+                  as={MdArrowOutward}
+                  h={'16px'}
+                  w={'16px'}
+                  color={'blue.500'}
+                />
+              </Link>
+            </Radio>
+            <Radio value='license_custom'>
+              Custom
+              <Link
+                href={
+                  'https://spdx.github.io/spdx-spec/v2.3/SPDX-license-expressions'
+                }
+                target={'_blank'}
+                ml={1}
+              >
+                <Icon
+                  as={MdArrowOutward}
+                  h={'16px'}
+                  w={'16px'}
+                  color={'blue.500'}
+                />
+              </Link>
+            </Radio>
           </Stack>
         </RadioGroup>
         {/* SPDX LICENSE */}
