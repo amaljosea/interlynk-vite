@@ -37,20 +37,6 @@ const VulnsFilters = () => {
 
   return (
     <Stack direction={'row'} alignItems={'center'} gap={1}>
-          {/* SEARCH COMPONENTS */}
-                {true ? (
-            <SearchFilter
-              id='vuln'
-            />
-          ) : (
-            <SearchFilter
-              id='vuln'
-              filterText={vulnSearchInput}
-              setFilterText={setVulnSearchInput}
-              onFilter={handleSearch}
-              onClear={handleClear}
-            />
-          )}
       {/* SEVERITY */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
@@ -144,15 +130,13 @@ const VulnsFilters = () => {
                 setSource(value.includes('all') ? [] : value)
               }
             >
-              {['All', 'lynk-api', 'lynk-dash-app', 'sbomqs', 'sbomgr'].map((item, index) => (
-                <MenuItemOption
-                  key={index}
-                  value={item}
-                  fontSize={'sm'}
-                >
-                  {item}
-                </MenuItemOption>
-              ))}
+              {['All', 'lynk-api', 'lynk-dash-app', 'sbomqs', 'sbomgr'].map(
+                (item, index) => (
+                  <MenuItemOption key={index} value={item} fontSize={'sm'}>
+                    {item}
+                  </MenuItemOption>
+                )
+              )}
             </MenuOptionGroup>
           </MenuList>
         </Menu>
@@ -179,11 +163,7 @@ const VulnsFilters = () => {
               }
             >
               {['All', 'Yes', 'No'].map((item, index) => (
-                <MenuItemOption
-                  key={index}
-                  value={item}
-                  fontSize={'sm'}
-                >
+                <MenuItemOption key={index} value={item} fontSize={'sm'}>
                   {item}
                 </MenuItemOption>
               ))}

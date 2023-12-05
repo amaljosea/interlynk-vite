@@ -166,12 +166,7 @@ const VulnInfo = ({ data }) => {
                         alignItems={'flex-start'}
                         spacing={2}
                       >
-                        <Icon
-                          h={'20px'}
-                          w={'20px'}
-                          color='#777'
-                          as={FaCube}
-                        />
+                        <Icon h={'20px'} w={'20px'} color='#777' as={FaCube} />
                         <Box>
                           <Badge
                             mr={1}
@@ -182,6 +177,55 @@ const VulnInfo = ({ data }) => {
                             {vulnData.vuln.resolved}
                           </Badge>
                           <Text fontSize={'xs'}>Components</Text>
+                        </Box>
+                      </Stack>
+                      {/* VULNERABILITIES */}
+                      <Stack
+                        direction={'row'}
+                        alignItems={'flex-start'}
+                        spacing={2}
+                      >
+                        <Icon h={4} w={4} color='#777' as={FaBug} />
+                        <Box>
+                          <Stack fontWeight={'medium'} direction={'row'}>
+                            <Tooltip label='CVSS' placement='top'>
+                              <Badge
+                                fontSize={'xl'}
+                                fontWeight={'medium'}
+                                variant='subtle'
+                                colorScheme='red'
+                                borderRadius='md'
+                                cursor={'pointer'}
+                              >
+                                {vulnData.vuln.cvssScore}
+                              </Badge>
+                            </Tooltip>
+                            <Tooltip label='EPSS' placement='top'>
+                              <Badge
+                                fontSize={'xl'}
+                                fontWeight={'medium'}
+                                variant='subtle'
+                                colorScheme='orange'
+                                borderRadius='md'
+                                cursor={'pointer'}
+                              >
+                                {Math.ceil(vulnData.vuln.vulnInfo.epssScore * 10000)}
+                              </Badge>
+                            </Tooltip>
+                            <Tooltip label='KEV' placement='top'>
+                              <Badge
+                                fontSize={'xl'}
+                                fontWeight={'medium'}
+                                variant='subtle'
+                                colorScheme='yellow'
+                                borderRadius='md'
+                                cursor={'pointer'}
+                              >
+                                {vulnData.vuln.vulnInfo.epssScore ? '-' : 'K'}
+                              </Badge>
+                            </Tooltip>
+                          </Stack>
+                          <Text fontSize={'xs'}>Vulnerabilities</Text>
                         </Box>
                       </Stack>
                     </Flex>
