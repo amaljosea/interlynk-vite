@@ -408,7 +408,7 @@ const CpeModal = ({
                   variant='solid'
                   colorScheme={'blue'}
                   onClick={checkId ? handleComUpdate : handleSave}
-                  disabled={!vendor || !product}
+                  disabled={!vendor || !product || type === ''}
                 >
                   Save
                 </Button>
