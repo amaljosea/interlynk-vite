@@ -167,10 +167,11 @@ function ComponentDrawer(props) {
   } = useDisclosure()
 
   const handlePURLInputChange = (e) => {
-    const inputValue = e.target.value
-    setPurlValue(inputValue)
+    const { value } = e.target
+    const val = value.replace(/\s/g, '')
+    setPurlValue(val)
     try {
-      PackageURL.fromString(inputValue)
+      PackageURL.fromString(val)
       setPURLInputValid(true)
     } catch (ex) {
       console.error('ex', ex)
@@ -317,15 +318,16 @@ function ComponentDrawer(props) {
   }
 
   const handleCpeChange = (event) => {
-    const { value } = event.target
-    setCpeValue(value)
+    const { value } = e.target
+    const val = value.replace(/\s/g, '')
+    setCpeValue(val)
     getCpe({
       variables: {
         input: {
           idType: 'cpe',
           ecosystem: 'cpe',
           search: {
-            idUri: value
+            idUri: val
           }
         }
       }
