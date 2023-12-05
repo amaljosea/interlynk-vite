@@ -17,7 +17,7 @@ import {
 import { UpdateAutomation } from 'graphQL/Mutation'
 import { useState, useEffect } from 'react'
 
-const UpdateRule = ({ isOpen, onClose, data, getData, productId }) => {
+const UpdateRule = ({ isOpen, onClose, data, refetch, productId }) => {
   const [compName, setCompName] = useState('')
   const [compVersion, setCompVersion] = useState('')
   const [condition, setCondition] = useState('')
@@ -48,16 +48,7 @@ const UpdateRule = ({ isOpen, onClose, data, getData, productId }) => {
         compVersion: compVersion
       }
     })
-      .then(
-        (res) =>
-          res.data &&
-          getData({
-            variables: {
-              id: productId,
-              first: 25
-            }
-          })
-      )
+      .then((res) => res.data && refetch())
       .finally(() => onClose())
   }
 
