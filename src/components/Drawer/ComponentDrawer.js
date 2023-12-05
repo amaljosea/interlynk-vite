@@ -445,7 +445,7 @@ function ComponentDrawer(props) {
 
               {/* LICENSES */}
               <LicenseField
-                exp={data?.licensesExp.length > 0 ? data.licensesExp[0] : ''}
+                exp={data?.licensesExp?.length > 0 ? data.licensesExp[0] : ''}
                 expLicense={expLicense}
                 setExpLicense={setExpLicense}
               />
