@@ -40,7 +40,6 @@ import PriSupplierModal from 'views/Sbom/components/PriSupplierModal'
 import { sbomUpdate } from 'graphQL/Mutation'
 import LicenseField from 'components/LicenseField'
 import GlobalContext from 'context/GlobalContext'
-import { licenseOptions } from 'variables/licenses'
 
 const GeneralDataRow = ({ status, data, refetch }) => {
   const location = useLocation()
@@ -54,7 +53,9 @@ const GeneralDataRow = ({ status, data, refetch }) => {
     licenseType,
     spdxLicense,
     setSpdxLicense,
-    customLicense
+    setCustomList,
+    customLicense,
+    setCustomLicense
   } = useContext(GlobalContext)
 
   const textColor = useColorModeValue('gray.700', 'white')
@@ -167,38 +168,13 @@ const GeneralDataRow = ({ status, data, refetch }) => {
     onOpen()
   }
 
-  const onUpdateLicense = async () => {
-    try {
-      await updateSbom({
-        variables: {
-          id: data.id,
-          spec: data.spec,
-          licenses: {
-            licenses: spdxLicense.length > 0 ? spdxLicense : undefined,
-            licensesExp: expLicense === '' ? undefined : expLicense,
-            licensesCustom: undefined
-          }
-        }
-      }).then((res) => res.data && onSBMClose())
-    } catch (error) {
-      console.log(`Mutation error `, error)
-    }
-  }
-
   const onLicenseOpen = () => {
     setLicenseType('license_spdx')
-    if (data && data.licenses.length > 0) {
-      const commonValues = licenseOptions.filter((item) =>
-        data.licenses.includes(item.licenseId)
-      )
-      const filterData = commonValues.map((option) => ({
-        value: option.licenseId,
-        label: option.name
-      }))
-      setSpdxList(filterData)
-      const selectedIds = filterData.map((option) => option.value)
-      setSpdxLicense(selectedIds)
-    } else {
+    if (
+      data.licenses.length === 0 &&
+      data.licensesExp === null &&
+      data.licensesCustom.length === 0
+    ) {
       setSpdxList([
         {
           value: 'CC0-1.0',
@@ -206,8 +182,43 @@ const GeneralDataRow = ({ status, data, refetch }) => {
         }
       ])
       setSpdxLicense(['CC0-1.0'])
+    } else if (data.licenses.length > 0) {
+      const filterData = data.licenses.map((option) => ({
+        value: option,
+        label: option
+      }))
+      setSpdxList(filterData)
+      setSpdxLicense(data.licenses)
     }
+
     onSBMOpen()
+  }
+
+  const onUpdateLicense = async () => {
+    await updateSbom({
+      variables: {
+        id: data.id,
+        spec: data.spec,
+        licenses: {
+          licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
+          licensesExp: licenseType === 'license_exp' ? expLicense : undefined,
+          licensesCustom:
+            licenseType === 'license_custom' ? customLicense : undefined
+        }
+      }
+    })
+      .then(() => {
+        if (licenseType === 'license_spdx') {
+          setSpdxList([])
+          setSpdxLicense([])
+        } else if (licenseType === 'license_exp') {
+          setExpLicense('')
+        } else if (licenseType === 'license_custom') {
+          setCustomList([])
+          setCustomLicense([])
+        }
+      })
+      .finally(() => onSBMClose())
   }
 
   // ADD KEYBOARD SHORTCUT FOR TOGGLE SBOM DRAWER
@@ -352,56 +363,6 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                 )}
               </Td>
             </Tr>
-            {/* SUPPLIERS */}
-            <Tr>
-              <Td pl={0} fontWeight={'medium'}>
-                <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-                  <Text>Supplier</Text>
-                  <Tooltip label='Supplier identify the name and email of the organization that built, distributed or package the application. For Open-source components, it can refer to the name of the project or entity distributing the project.'>
-                    <Icon as={InfoIcon} color={'blue.500'} />
-                  </Tooltip>
-                </Flex>
-              </Td>
-              <Td pl={0}>
-                <HStack spacing={4}>
-                  {data.suppliers &&
-                    data.suppliers.map((item, index) => (
-                      <Tag
-                        size={'md'}
-                        key={index}
-                        variant='subtle'
-                        colorScheme='orange'
-                      >
-                        <TagLabel>
-                          {item.name}
-                          {item.contactEmail && (
-                            <>
-                              {' - '}
-                              {item.contactEmail}
-                            </>
-                          )}
-                        </TagLabel>
-                        {!customerView && (
-                          <TagCloseButton
-                            onClick={() => handleSupRemove(item.id)}
-                          />
-                        )}
-                      </Tag>
-                    ))}
-                </HStack>
-              </Td>
-              <Td pl={0}>
-                {!customerView && (
-                  <Button
-                    size='sm'
-                    isDisabled={status === 'signed'}
-                    onClick={onSupOpen}
-                  >
-                    <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
-                  </Button>
-                )}
-              </Td>
-            </Tr>
             {/* LICENSES */}
             <Tr>
               <Td pl={0} fontWeight={'medium'}>
@@ -414,6 +375,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
               </Td>
               <Td pl={0}>
                 <Flex alignItems={'center'} gap={2} flexWrap={'wrap'}>
+                  {/* SPDX */}
                   {data.licenses.length > 0 &&
                     data.licenses.map((item, index) => (
                       <Tooltip key={index} label={item} placement={'top'}>
@@ -423,7 +385,43 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                         >
                           <Tag
                             size={'md'}
-                            key={index}
+                            variant='subtle'
+                            colorScheme='green'
+                            width={'fit-content'}
+                          >
+                            <TagLabel>{item}</TagLabel>
+                          </Tag>
+                        </Link>
+                      </Tooltip>
+                    ))}
+                  {/* EXPRESSION */}
+                  {data.licensesExp && data.licensesExp !== '' && (
+                    <Tooltip label={data.licensesExp} placement={'top'}>
+                      <Link
+                        href={`https://spdx.org/licenses/${data.licensesExp}`}
+                        target='_blank'
+                      >
+                        <Tag
+                          size={'md'}
+                          variant='subtle'
+                          colorScheme='green'
+                          width={'fit-content'}
+                        >
+                          <TagLabel>{data.licensesExp}</TagLabel>
+                        </Tag>
+                      </Link>
+                    </Tooltip>
+                  )}
+                  {/* CUSTOM */}
+                  {data.licensesCustom.length > 0 &&
+                    data.licensesCustom.map((item, index) => (
+                      <Tooltip key={index} label={item} placement={'top'}>
+                        <Link
+                          href={`https://spdx.org/licenses/${item}`}
+                          target='_blank'
+                        >
+                          <Tag
+                            size={'md'}
                             variant='subtle'
                             colorScheme='green'
                             width={'fit-content'}
@@ -476,7 +474,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
             <ModalCloseButton />
             <ModalBody>
               <LicenseField
-                exp={data?.licenseExp}
+                data={data}
                 expLicense={expLicense}
                 setExpLicense={setExpLicense}
               />
@@ -492,7 +490,8 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                   (licenseType === 'license_spdx' &&
                     spdxLicense.length === 0) ||
                   (licenseType === 'license_exp' && expLicense === '') ||
-                  (licenseType === 'license_custom' &&  spdxLicense.length === 0)
+                  (licenseType === 'license_custom' &&
+                    customLicense.length === 0)
                 }
                 onClick={onUpdateLicense}
               >

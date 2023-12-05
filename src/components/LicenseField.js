@@ -14,16 +14,26 @@ import {
   AlertIcon,
   Input
 } from '@chakra-ui/react'
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import ReactSelect from 'react-select'
+import CreatableSelect from 'react-select/creatable'
 import GlobalContext from 'context/GlobalContext'
 import { CpeAutoComplete } from 'graphQL/Queries'
 import { useLazyQuery } from '@apollo/client'
 import spdxValidate from 'spdx-expression-validate'
 
-const LicenseField = ({ exp, expLicense, setExpLicense }) => {
-  const { spdxList, setSpdxList, licenseType, setLicenseType, setSpdxLicense } =
-    useContext(GlobalContext)
+const LicenseField = ({ data, expLicense, setExpLicense }) => {
+  const {
+    spdxList,
+    setSpdxList,
+    licenseType,
+    setLicenseType,
+    setSpdxLicense,
+    customLicense,
+    setCustomLicense,
+    customList,
+    setCustomList
+  } = useContext(GlobalContext)
 
   const [licenseList, setLicenseList] = useState([])
   const [isValid, setIsValid] = useState(true)
@@ -38,6 +48,29 @@ const LicenseField = ({ exp, expLicense, setExpLicense }) => {
     } else {
       setSpdxLicense([])
     }
+  }
+
+  const onCustomChange = (selected) => {
+    console.log(selected)
+    setCustomList(selected)
+    if (selected) {
+      const selectedIds = selected.map((option) => option.value)
+      setCustomLicense(selectedIds)
+    } else {
+      setCustomLicense([])
+    }
+  }
+
+  const createOption = (label) => ({
+    label,
+    value: label.toLowerCase().replace(/\W/g, '')
+  })
+
+  const handleCreate = (inputValue) => {
+    console.log('inputValue', inputValue)
+    const newOption = createOption(inputValue)
+    setCustomList((prev) => [newOption, ...prev])
+    setCustomLicense((prev) => [inputValue, ...prev])
   }
 
   const handleInputChange = (value) => {
@@ -81,13 +114,22 @@ const LicenseField = ({ exp, expLicense, setExpLicense }) => {
 
   const handleTypeChange = (value) => {
     setLicenseType(value)
-    if (value === 'license_exp') {
-      setSpdxLicense([])
-      setSpdxList([])
-      setIsValid(true)
-      setExpLicense(exp ? exp : '')
-    } else if (value === 'license_spdx') {
-      setExpLicense('')
+    if (value === 'license_spdx') {
+      const filterData = data.licenses.map((option) => ({
+        value: option,
+        label: option
+      }))
+      setSpdxList(filterData)
+      setSpdxLicense(data.licenses)
+    } else if (value === 'license_exp') {
+      setExpLicense(data.licensesExp)
+    } else if (value === 'license_custom') {
+      const filterData = data.licensesCustom.map((option) => ({
+        value: option,
+        label: option
+      }))
+      setCustomList(filterData)
+      setCustomLicense(data.licensesCustom)
     }
   }
 
@@ -145,6 +187,7 @@ const LicenseField = ({ exp, expLicense, setExpLicense }) => {
               value={expLicense}
               fontSize={'sm'}
               onChange={handleExpChange}
+              placeholder='Enter a valid SPDX Expression'
             />
             {!isValid && (
               <Alert
@@ -162,12 +205,29 @@ const LicenseField = ({ exp, expLicense, setExpLicense }) => {
         )}
         {/* CUSTOM LICENSE */}
         {licenseType === 'license_custom' && (
-          <>
-            <Alert status='info' fontSize={'sm'} borderRadius={4} py={2}>
-              <AlertIcon width={4} />
-              Coming Soon
-            </Alert>
-          </>
+          <CreatableSelect
+            styles={{
+              control: (baseStyles, state) => ({
+                ...baseStyles,
+                borderColor: state.isFocused ? 'inherit' : 'inherit',
+                fontSize: '14px',
+                padding: '2px 0',
+                '&:hover': {
+                  borderColor: '#CBD5E0'
+                }
+              })
+            }}
+            isMulti
+            components={{
+              DropdownIndicator: () => null,
+              IndicatorSeparator: () => null
+            }}
+            value={customList}
+            onChange={onCustomChange}
+            onCreateOption={handleCreate}
+            placeholder={'Enter License Name'}
+            className='react-select'
+          />
         )}
       </FormControl>
     </VStack>

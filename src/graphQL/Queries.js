@@ -491,6 +491,8 @@ export const GetProductData = gql`
         purl
         cpes
         licenses
+        licensesExp
+        licensesCustom
         updatedAt
         uniqueId
         kind
@@ -516,6 +518,7 @@ export const GetProductData = gql`
       updatedAt
       licenses
       licensesExp
+      licensesCustom
       format
       spec
       specVersion
@@ -605,6 +608,7 @@ export const GetComponentData = gql`
           publisher
           description
           licensesExp
+          licensesCustom
           group
           externalUrls {
             name
@@ -880,6 +884,7 @@ export const GetCheckResults = gql`
             version
             licenses
             licensesExp
+            licensesCustom
           }
           organizationRule {
             severity

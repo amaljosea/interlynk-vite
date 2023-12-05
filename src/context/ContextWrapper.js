@@ -132,7 +132,7 @@ const ContextWrapper = (props) => {
   const [licenseType, setLicenseType] = useState('license_spdx')
   const [spdxLicense, setSpdxLicense] = useState([])
   const [licenseExp, setLicenseExp] = useState('')
-  const [customLicense, setCustomLicense] = useState('')
+  const [customLicense, setCustomLicense] = useState([])
 
   return (
     <GlobalContext.Provider

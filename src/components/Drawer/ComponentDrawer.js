@@ -80,8 +80,13 @@ function ComponentDrawer(props) {
     filterRefetch
   } = props
 
-  const { setCompFilters, licenseType, spdxLicense, setPurlString } =
-    useContext(GlobalContext)
+  const {
+    setCompFilters,
+    licenseType,
+    spdxLicense,
+    setPurlString,
+    customLicense
+  } = useContext(GlobalContext)
 
   const onFilterRefetch = () => {
     filterRefetch({
@@ -238,9 +243,10 @@ function ComponentDrawer(props) {
           name: compName,
           version: compVersion,
           licenses: {
-            licenses: spdxLicense.length > 0 ? spdxLicense : undefined,
-            licensesExp: expLicense === '' ? undefined : expLicense,
-            licensesCustom: undefined
+            licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
+            licensesExp: licenseType === 'license_exp' ? expLicense : undefined,
+            licensesCustom:
+              licenseType === 'license_custom' ? customLicense : undefined
           },
           cpes: cpeList,
           purl: purlValue,
@@ -251,6 +257,15 @@ function ComponentDrawer(props) {
         .then((res) => {
           if (res.data) {
             onFilterRefetch()
+            if (licenseType === 'license_spdx') {
+              setSpdxList([])
+              setSpdxLicense([])
+            } else if (licenseType === 'license_exp') {
+              setExpLicense('')
+            } else if (licenseType === 'license_custom') {
+              setCustomList([])
+              setCustomLicense([])
+            }
           }
         })
         .finally(() => onClose())
@@ -445,7 +460,7 @@ function ComponentDrawer(props) {
 
               {/* LICENSES */}
               <LicenseField
-                exp={data?.licensesExp?.length > 0 ? data.licensesExp[0] : ''}
+                data={data}
                 expLicense={expLicense}
                 setExpLicense={setExpLicense}
               />
