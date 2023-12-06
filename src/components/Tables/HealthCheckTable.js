@@ -84,6 +84,8 @@ const HealthCheckTable = ({
     setCheckDirection,
     checkSearchInput,
     setCheckSearchInput,
+    checkRules,
+    setCheckRules,
     checkCategory,
     setCheckCategory,
     checkSeverity,
@@ -229,6 +231,10 @@ const HealthCheckTable = ({
           projectId: productId,
           sbomId: sbomId,
           search: checkSearchInput !== '' ? checkSearchInput : undefined,
+          checkId:
+            checkRules.includes('all') || checkRules.length === 0
+              ? undefined
+              : checkRules,
           category:
             checkCategory.includes('all') || checkCategory.length === 0
               ? undefined
@@ -259,6 +265,10 @@ const HealthCheckTable = ({
         projectId: productId,
         sbomId: sbomId,
         search: undefined,
+        checkId:
+        checkRules.includes('all') || checkRules.length === 0
+          ? undefined
+          : checkRules,
         category:
           checkCategory.includes('all') || checkCategory.length === 0
             ? undefined
@@ -363,6 +373,11 @@ const HealthCheckTable = ({
       }
     }).then((res) => {
       if (res.data) {
+        setCheckSearchInput([])
+        setCheckRules([])
+        setCheckCategory([])
+        setCheckSeverity([])
+        setCheckStatus([])
         healthRecheck({
           variables: {
             checkId: row.organizationRule.rule.friendlyId,
@@ -575,26 +590,6 @@ const HealthCheckTable = ({
       width: '10%',
       sortable: true
     },
-    // CATEGORY
-    /*     {
-      id: 'category',
-      name: 'CATEGORY',
-      selector: (row) => {
-        const { organizationRule } = row
-        return (
-          <Tooltip label={organizationRule.rule.shortDesc} placement='top'>
-            <Text>
-              {organizationRule.rule.shortDesc !== null
-                ? `${organizationRule.rule.shortDesc?.substring(0, 30)}${
-                    organizationRule.rule.shortDesc.length > 30 ? '...' : ''
-                  }`
-                : ''}
-            </Text>
-          </Tooltip>
-        )
-      },
-      width: '250px'
-    }, */
     // LONG DESCRIPTION
     {
       id: 'COMPONENTS_NAME',
@@ -729,6 +724,10 @@ const HealthCheckTable = ({
         last: before ? totalRows : undefined,
         before: before,
         search: checkSearchInput !== '' ? checkSearchInput : undefined,
+        checkId:
+        checkRules.includes('all') || checkRules.length === 0
+          ? undefined
+          : checkRules,
         category:
           checkCategory.includes('all') || checkCategory.length === 0
             ? undefined
@@ -757,6 +756,10 @@ const HealthCheckTable = ({
         sbomId: sbomId,
         first: totalRows,
         search: checkSearchInput !== '' ? checkSearchInput : undefined,
+        checkId:
+        checkRules.includes('all') || checkRules.length === 0
+          ? undefined
+          : checkRules,
         category:
           checkCategory.includes('all') || checkCategory.length === 0
             ? undefined

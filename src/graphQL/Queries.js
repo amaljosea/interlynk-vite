@@ -839,6 +839,7 @@ export const GetCheckResults = gql`
   query GetCheckResults(
     $projectId: Uuid!
     $sbomId: Uuid!
+    $checkId: [String!]
     $category: [String!]
     $status: [String!]
     $severity: [String!]
@@ -854,6 +855,7 @@ export const GetCheckResults = gql`
       id
       checkResults(
         sbomId: $sbomId
+        checkId: $checkId
         category: $category
         status: $status
         severity: $severity

@@ -106,6 +106,7 @@ const ContextWrapper = (props) => {
 
   // HEALTH CHECK FILTER
   const [checkSearchInput, setCheckSearchInput] = useState('')
+  const [checkRules, setCheckRules] = useState([])
   const [checkCategory, setCheckCategory] = useState([])
   const [checkSeverity, setCheckSeverity] = useState([])
   const [checkStatus, setCheckStatus] = useState([])
@@ -280,6 +281,7 @@ const ContextWrapper = (props) => {
         setCompBefore,
         checkSearchInput,
         setCheckSearchInput,
+        checkRules, setCheckRules,
         checkCategory,
         setCheckCategory,
         checkSeverity,

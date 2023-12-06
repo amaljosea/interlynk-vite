@@ -42,6 +42,8 @@ const CheckFilterMenu = ({
 }) => {
   const {
     checkSearchInput,
+    checkRules,
+    setCheckRules,
     checkFilters,
     checkField,
     checkDirection,
@@ -57,14 +59,15 @@ const CheckFilterMenu = ({
 
   const { checkCategories, checkStatuses } = checkFilters
 
-  const [checkIds, setCheckIds] = useState([])
-
-  const onFilter = (category, severity, status) => {
+  const onFilter = (checkId, category, severity, status) => {
+    setCheckAfter('')
+    setCheckBefore('')
     refetch({
       variables: {
         projectId: productId,
         sbomId: sbomId,
         search: checkSearchInput !== '' ? checkSearchInput : undefined,
+        checkId: checkId.includes('all') ? undefined : checkId,
         category: category.includes('all') ? undefined : category,
         severity: severity.includes('all') ? undefined : severity,
         status: status.includes('all') ? undefined : status,
@@ -73,34 +76,27 @@ const CheckFilterMenu = ({
         direction: checkDirection
       }
     })
+    setPageIndex(1)
   }
 
   const onFilterCheckId = (value) => {
-    setCheckIds(value.includes('all') ? [] : value)
+    setCheckRules(value.includes('all') ? [] : value)
+    onFilter(value, checkCategory, checkSeverity, checkStatus)
   }
 
   const onFilterCategory = (value) => {
-    setCheckAfter('')
-    setCheckBefore('')
     setCheckCategory(value.includes('all') ? [] : value)
-    onFilter(value, checkSeverity, checkStatus)
-    setPageIndex(1)
+    onFilter(checkRules, value, checkSeverity, checkStatus)
   }
 
   const onFilterSeverity = (value) => {
-    setCheckAfter('')
-    setCheckBefore('')
     setCheckSeverity(value.includes('all') ? [] : value)
-    onFilter(checkCategories, value, checkStatus)
-    setPageIndex(1)
+    onFilter(checkRules, checkCategory, value, checkStatus)
   }
 
   const onFilterStatus = (value) => {
-    setCheckAfter('')
-    setCheckBefore('')
     setCheckStatus(value.includes('all') ? [] : value)
-    onFilter(checkCategories, checkSeverity, value)
-    setPageIndex(1)
+    onFilter(checkRules, checkCategory, checkSeverity, value)
   }
 
   const { data } = useQuery(GetOrgRules, {
@@ -116,7 +112,7 @@ const CheckFilterMenu = ({
       {data && (
         <Box width={'fit-content'} position={'relative'}>
           <Menu closeOnBlur={true}>
-            {checkIds.length !== 0 && <CheckMark />}
+            {checkRules.length !== 0 && <CheckMark />}
             <MenuButton
               as={Button}
               colorScheme='blue'
@@ -134,7 +130,7 @@ const CheckFilterMenu = ({
             >
               <MenuOptionGroup
                 type='checkbox'
-                value={checkIds}
+                value={checkRules}
                 onChange={onFilterCheckId}
               >
                 <MenuItemOption value={'all'} fontSize={'sm'}>
