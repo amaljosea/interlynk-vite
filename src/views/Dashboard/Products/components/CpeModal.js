@@ -393,7 +393,12 @@ const CpeModal = ({
               alignItems={'center'}
             >
               {checkId ? (
-                <Button fontSize={'sm'} colorScheme='blue' onClick={onSaveRule}>
+                <Button
+                  fontSize={'sm'}
+                  colorScheme='blue'
+                  onClick={onSaveRule}
+                  disabled={!vendor || !product || type === ''}
+                >
                   Save Rule
                 </Button>
               ) : (

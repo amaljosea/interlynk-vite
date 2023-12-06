@@ -702,7 +702,16 @@ const PurlModal = ({
               alignItems={'center'}
             >
               {checkId ? (
-                <Button fontSize={'sm'} colorScheme='blue' onClick={onSaveRule}>
+                <Button
+                  fontSize={'sm'}
+                  colorScheme='blue'
+                  onClick={onSaveRule}
+                  disabled={
+                    purlName === '' ||
+                    purlType === '' ||
+                    (purlType === 'swift' && namespace === '')
+                  }
+                >
                   Save Rule
                 </Button>
               ) : (

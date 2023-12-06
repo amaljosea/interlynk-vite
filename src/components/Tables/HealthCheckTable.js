@@ -92,10 +92,10 @@ const HealthCheckTable = ({
     setCheckSeverity,
     checkStatus,
     setCheckStatus,
-    checkAfter,
+    setCpeString,
     setCheckAfter,
-    checkBefore,
-    setCheckBefore
+    setCheckBefore,
+    setPurlString
   } = useContext(GlobalContext)
 
   const [purlValue, setPurlValue] = useState('')
@@ -266,9 +266,9 @@ const HealthCheckTable = ({
         sbomId: sbomId,
         search: undefined,
         checkId:
-        checkRules.includes('all') || checkRules.length === 0
-          ? undefined
-          : checkRules,
+          checkRules.includes('all') || checkRules.length === 0
+            ? undefined
+            : checkRules,
         category:
           checkCategory.includes('all') || checkCategory.length === 0
             ? undefined
@@ -466,9 +466,7 @@ const HealthCheckTable = ({
       organizationRule.rule.shortDesc === 'Component has a purl' ||
       organizationRule.rule.shortDesc === 'Component has a valid purl'
     ) {
-      const pkg = PackageURL.fromString('pkg:generic/unknown@1.0')
-      setPurlValue('pkg:generic/unknown@1.0')
-      setPurlData(pkg)
+      setPurlString('pkg:type/name@version')
       return onPurlOpen()
     }
 
@@ -477,13 +475,7 @@ const HealthCheckTable = ({
       organizationRule.rule.shortDesc === 'Component has a valid cpe' ||
       organizationRule.rule.shortDesc === 'Component has a cpe'
     ) {
-      setCpeData({
-        vendor: 'vendor',
-        product: 'product',
-        version: '1.0',
-        targetHardware: '*'
-      })
-      setCpeValue('cpe:2.3:a:calligra:calligra:2.4.1:*:*:*:*:*:*:*')
+      setCpeString('cpe:2.3:::::*:*:*:*:*:*:*')
       return onCpeOpen()
     }
 
@@ -725,9 +717,9 @@ const HealthCheckTable = ({
         before: before,
         search: checkSearchInput !== '' ? checkSearchInput : undefined,
         checkId:
-        checkRules.includes('all') || checkRules.length === 0
-          ? undefined
-          : checkRules,
+          checkRules.includes('all') || checkRules.length === 0
+            ? undefined
+            : checkRules,
         category:
           checkCategory.includes('all') || checkCategory.length === 0
             ? undefined
@@ -757,9 +749,9 @@ const HealthCheckTable = ({
         first: totalRows,
         search: checkSearchInput !== '' ? checkSearchInput : undefined,
         checkId:
-        checkRules.includes('all') || checkRules.length === 0
-          ? undefined
-          : checkRules,
+          checkRules.includes('all') || checkRules.length === 0
+            ? undefined
+            : checkRules,
         category:
           checkCategory.includes('all') || checkCategory.length === 0
             ? undefined

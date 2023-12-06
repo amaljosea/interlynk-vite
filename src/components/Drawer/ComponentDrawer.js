@@ -35,7 +35,7 @@ import {
   ModalHeader,
   ModalCloseButton,
   ModalBody,
-  ModalFooter,
+  ModalFooter
 } from '@chakra-ui/react'
 import { useLazyQuery, useMutation } from '@apollo/client'
 import { CreateComponent, UpdateComponent } from 'graphQL/Mutation'
@@ -88,11 +88,12 @@ function ComponentDrawer(props) {
     setCustomLicense,
     setCompSearchInput,
     setCompEcosystem,
-    setCompType,
+    setCustomList,
     setCompLicense,
     setCompSupplier,
     setCompScope,
-    setComPageIndex
+    setComPageIndex,
+    purlString
   } = useContext(GlobalContext)
 
   const onFilterRefetch = () => {
@@ -257,14 +258,13 @@ function ComponentDrawer(props) {
               licenseType === 'license_custom' ? customLicense : undefined
           },
           cpes: cpeList,
-          purl: purlValue,
+          purl: purlString,
           primary: isPrimary,
           internal: isInternal
         }
       })
         .then((res) => {
           if (res.data) {
-            onFilterRefetch()
             setCompSearchInput('')
             setCompEcosystem([])
             setCompKind([])
