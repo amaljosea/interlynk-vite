@@ -153,9 +153,11 @@ const GlobalContext = React.createContext({
   setCheckAfter: () => {},
   checkBefore: '',
   setCheckBefore: () => {},
-  checkCategory: [],
   checkSearchInput: '',
   setCheckSearchInput: () => {},
+  checkRules: [],
+  setCheckRules: () => {},
+  checkCategory: [],
   setCheckCategory: () => {},
   checkSeverity: [],
   setCheckSeverity: () => {},
@@ -175,10 +177,20 @@ const GlobalContext = React.createContext({
   setLicenseType: () => {},
   spdxList: [],
   setSpdxList: () => {},
-  expList: [],
-  setExpList: () => {},
   customList: [],
-  setCustomList: () => {}
+  setCustomList: () => {},
+  sbomSpdxList: [],
+  setSbomSpdxList:() => {},
+  sbomCustomList: [],
+  setSbomCustomList: () => {},
+  sbomLicenseType: 'license_spdx',
+  setSbomLicenseType: () => {},
+  sbomSpdxLicense: [],
+  setSbomSpdxLicense: () => {},
+  sbomLicenseExp: '',
+  setSbomLicenseExp: () => {},
+  sbomCustomLicense: [],
+  setSbomCustomLicense: () => {}
 })
 
 export default GlobalContext

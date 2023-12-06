@@ -1,4 +1,4 @@
-import { ExternalLinkIcon, InfoIcon } from '@chakra-ui/icons'
+import { InfoIcon } from '@chakra-ui/icons'
 import {
   Flex,
   FormControl,
@@ -24,19 +24,20 @@ import { useLazyQuery } from '@apollo/client'
 import spdxValidate from 'spdx-expression-validate'
 import { MdArrowOutward } from 'react-icons/md'
 
-const LicenseField = ({ data }) => {
+const SbomLicenseField = ({ data }) => {
   const {
-    spdxList,
-    setSpdxList,
-    licenseType,
-    setLicenseType,
-    setSpdxLicense,
-    customLicense,
-    setCustomLicense,
-    customList,
-    setCustomList,
-    licenseExp,
-    setLicenseExp
+    sbomSpdxList,
+    setSbomSpdxList,
+    sbomCustomList,
+    setSbomCustomList,
+    sbomLicenseType,
+    setSbomLicenseType,
+    sbomSpdxLicense,
+    setSbomSpdxLicense,
+    sbomLicenseExp,
+    setSbomLicenseExp,
+    sbomCustomLicense,
+    setSbomCustomLicense
   } = useContext(GlobalContext)
 
   const [licenseList, setLicenseList] = useState([])
@@ -45,23 +46,23 @@ const LicenseField = ({ data }) => {
 
   const onLicenseChange = (selected) => {
     console.log(selected)
-    setSpdxList(selected)
+    setSbomSpdxList(selected)
     if (selected) {
       const selectedIds = selected.map((option) => option.value)
-      setSpdxLicense(selectedIds)
+      setSbomSpdxLicense(selectedIds)
     } else {
-      setSpdxLicense([])
+      setSbomSpdxLicense([])
     }
   }
 
   const onCustomChange = (selected) => {
     console.log(selected)
-    setCustomList(selected)
+    setSbomCustomList(selected)
     if (selected) {
       const selectedIds = selected.map((option) => option.value)
-      setCustomLicense(selectedIds)
+      setSbomCustomLicense(selectedIds)
     } else {
-      setCustomLicense([])
+      setSbomCustomLicense([])
     }
   }
 
@@ -73,8 +74,8 @@ const LicenseField = ({ data }) => {
   const handleCreate = (inputValue) => {
     console.log('inputValue', inputValue)
     const newOption = createOption(inputValue)
-    setCustomList((prev) => [newOption, ...prev])
-    setCustomLicense((prev) => [inputValue, ...prev])
+    setSbomCustomList((prev) => [newOption, ...prev])
+    setSbomCustomLicense((prev) => [inputValue, ...prev])
   }
 
   const handleInputChange = (value) => {
@@ -106,9 +107,13 @@ const LicenseField = ({ data }) => {
 
   const handleExpChange = (e) => {
     const { value } = e.target
-    setLicenseExp(value)
-    if (value !== '') {
-      const trimmedInput = typeof value === 'string' ? value.trim() : ''
+    setSbomLicenseExp(value)
+  }
+
+  const handleKeyDown = () => {
+    if (sbomLicenseExp !== '') {
+      const trimmedInput =
+        typeof sbomLicenseExp === 'string' ? sbomLicenseExp.trim() : ''
       const isLicenseValid = spdxValidate(trimmedInput)
       setIsValid(isLicenseValid)
     } else {
@@ -117,13 +122,13 @@ const LicenseField = ({ data }) => {
   }
 
   const handleTypeChange = (value) => {
-    setLicenseType(value)
+    setSbomLicenseType(value)
   }
 
   return (
     <VStack spacing={4} alignItems={'flex-start'}>
       <FormControl>
-        <FormLabel htmlFor={licenseType}>
+        <FormLabel htmlFor={'sbomLicenseType'}>
           <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
             <Text>Licenses</Text>
             <Tooltip label='List of licenses applicable to the component'>
@@ -132,7 +137,11 @@ const LicenseField = ({ data }) => {
           </Flex>
         </FormLabel>
         {/* LICENSE TYPE */}
-        <RadioGroup size='sm' value={licenseType} onChange={handleTypeChange}>
+        <RadioGroup
+          size='sm'
+          value={sbomLicenseType}
+          onChange={handleTypeChange}
+        >
           <Stack direction='row' my={4} spacing={3} alignItems={'center'}>
             <Radio value='license_spdx'>
               SPDX ID
@@ -188,7 +197,7 @@ const LicenseField = ({ data }) => {
           </Stack>
         </RadioGroup>
         {/* SPDX LICENSE */}
-        {licenseType === 'license_spdx' && (
+        {sbomLicenseType === 'license_spdx' && (
           <ReactSelect
             styles={{
               control: (baseStyles, state) => ({
@@ -206,7 +215,7 @@ const LicenseField = ({ data }) => {
               DropdownIndicator: () => null,
               IndicatorSeparator: () => null
             }}
-            value={spdxList}
+            value={sbomSpdxList}
             options={licenseList}
             onChange={onLicenseChange}
             onInputChange={handleInputChange}
@@ -215,13 +224,14 @@ const LicenseField = ({ data }) => {
           />
         )}
         {/* LICENSE EXPRESSION */}
-        {licenseType === 'license_exp' && (
+        {sbomLicenseType === 'license_exp' && (
           <>
             <Input
               type='text'
-              value={licenseExp}
+              value={sbomLicenseExp}
               fontSize={'sm'}
               onChange={handleExpChange}
+              onKeyDown={handleKeyDown}
               placeholder='Enter a valid SPDX Expression'
             />
             {!isValid && (
@@ -239,7 +249,7 @@ const LicenseField = ({ data }) => {
           </>
         )}
         {/* CUSTOM LICENSE */}
-        {licenseType === 'license_custom' && (
+        {sbomLicenseType === 'license_custom' && (
           <CreatableSelect
             styles={{
               control: (baseStyles, state) => ({
@@ -257,7 +267,8 @@ const LicenseField = ({ data }) => {
               DropdownIndicator: () => null,
               IndicatorSeparator: () => null
             }}
-            value={customList}
+            formatCreateLabel={(value) => `${value}`}
+            value={sbomCustomList}
             onChange={onCustomChange}
             onCreateOption={handleCreate}
             placeholder={'Enter License Name'}
@@ -269,4 +280,4 @@ const LicenseField = ({ data }) => {
   )
 }
 
-export default LicenseField
+export default SbomLicenseField

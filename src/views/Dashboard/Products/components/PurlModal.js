@@ -61,39 +61,39 @@ const typeOptions = [
   { value: 'swift', label: 'swift' }
 ]
 
-const namespaceOptions = {
-  alpm: [
-    { value: '', label: '-- Select --' },
-    { value: 'arch', label: 'arch' },
-    { value: 'arch32', label: 'arch32' },
-    { value: 'archarm', label: 'archarm' },
-    { value: 'manjaro', label: 'manjaro' },
-    { value: 'msys', label: 'msys' }
-  ],
-  apk: [
-    { value: '', label: '-- Select --' },
-    { value: 'alpine', label: 'alpine' },
-    { value: 'openwrt', label: 'openwrt' }
-  ],
-  bitnami: [],
-  cocoapods: [],
-  cargo: [],
-  conda: [],
-  cran: [],
-  deb: [
-    { value: '', label: '-- Select --' },
-    { value: 'debian', label: 'debian' },
-    { value: 'ubuntu', label: 'ubuntu' }
-  ],
-  gem: [],
-  generic: [],
-  hackage: [],
-  mflow: [],
-  nuget: [],
-  oci: [],
-  pub: [],
-  pypi: []
-}
+// const namespaceOptions = {
+//   alpm: [
+//     { value: '', label: '-- Select --' },
+//     { value: 'arch', label: 'arch' },
+//     { value: 'arch32', label: 'arch32' },
+//     { value: 'archarm', label: 'archarm' },
+//     { value: 'manjaro', label: 'manjaro' },
+//     { value: 'msys', label: 'msys' }
+//   ],
+//   apk: [
+//     { value: '', label: '-- Select --' },
+//     { value: 'alpine', label: 'alpine' },
+//     { value: 'openwrt', label: 'openwrt' }
+//   ],
+//   bitnami: [],
+//   cocoapods: [],
+//   cargo: [],
+//   conda: [],
+//   cran: [],
+//   deb: [
+//     { value: '', label: '-- Select --' },
+//     { value: 'debian', label: 'debian' },
+//     { value: 'ubuntu', label: 'ubuntu' }
+//   ],
+//   gem: [],
+//   generic: [],
+//   hackage: [],
+//   mflow: [],
+//   nuget: [],
+//   oci: [],
+//   pub: [],
+//   pypi: []
+// }
 
 const PurlModal = ({
   data,
@@ -123,6 +123,58 @@ const PurlModal = ({
   const purlVersionRef = useRef()
 
   const { purlString, setPurlString } = useContext(GlobalContext)
+
+  const validPurlTypes = [
+    'bitbucket',
+    'compose',
+    'conan',
+    'docker',
+    'generic',
+    'github',
+    'golang',
+    'hex',
+    'huggingface',
+    'qpkg',
+    'rpm',
+    'swid',
+    'swift'
+  ]
+
+  const hasNamespace = validPurlTypes.includes(purlType)
+
+  const namespaceOptions = {
+    alpm: [
+      { value: '', label: '-- Select --' },
+      { value: 'arch', label: 'arch' },
+      { value: 'arch32', label: 'arch32' },
+      { value: 'archarm', label: 'archarm' },
+      { value: 'manjaro', label: 'manjaro' },
+      { value: 'msys', label: 'msys' }
+    ],
+    apk: [
+      { value: '', label: '-- Select --' },
+      { value: 'alpine', label: 'alpine' },
+      { value: 'openwrt', label: 'openwrt' }
+    ],
+    bitnami: [],
+    cocoapods: [],
+    cargo: [],
+    conda: [],
+    cran: [],
+    deb: [
+      { value: '', label: '-- Select --' },
+      { value: 'debian', label: 'debian' },
+      { value: 'ubuntu', label: 'ubuntu' }
+    ],
+    gem: [],
+    generic: [],
+    hackage: [],
+    mflow: [],
+    nuget: [],
+    oci: [],
+    pub: [],
+    pypi: []
+  }
 
   const [healthRecheck] = useMutation(recheckHealth, {
     onCompleted: () => refetch()
@@ -156,10 +208,7 @@ const PurlModal = ({
   }
 
   const isAutoComplete =
-    purlType === 'maven' ||
-    purlType === 'nuget' ||
-    purlType === 'npm' ||
-    purlType === 'gem'
+    purlType === 'maven' || purlType === 'npm' || purlType === 'gem'
 
   // ON NAMESPACE INPUT CHANGE
   const onNamespaceInputChange = (event) => {
@@ -453,9 +502,6 @@ const PurlModal = ({
     const { value } = e.target
     const val = value.replace(/\s/g, '')
     setNamespace(val)
-    const pkg = PackageURL.fromString(purlString)
-    pkg.namespace = val
-    setPurlString(pkg.toString())
   }
 
   const onNamespaceBlur = () => {
@@ -582,24 +628,17 @@ const PurlModal = ({
                   validation={false}
                   onChange={onNamespaceInputChange}
                 />
-              ) : namespaceOptions[purlType] &&
-                namespaceOptions[purlType].length > 0 ? (
+              ) : hasNamespace ? (
                 <FormControl>
                   <FormLabel>Namespace</FormLabel>
-                  <Select
+                  <Input
                     size='md'
                     id='namespace'
                     name='namespace'
                     value={namespace}
                     onChange={handleNamespaceChange}
                     onBlur={onNamespaceBlur}
-                  >
-                    {namespaceOptions[purlType].map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </Select>
+                  />
                 </FormControl>
               ) : null}
               {/* Name */}
@@ -663,19 +702,23 @@ const PurlModal = ({
               alignItems={'center'}
             >
               {checkId ? (
-                <Button fontSize={'sm'} colorScheme='blue' onClick={onSaveRule}>
+                <Button
+                  fontSize={'sm'}
+                  colorScheme='blue'
+                  onClick={onSaveRule}
+                  disabled={
+                    purlName === '' ||
+                    purlType === '' ||
+                    (purlType === 'swift' && namespace === '')
+                  }
+                >
                   Save Rule
                 </Button>
               ) : (
                 <Text></Text>
               )}
-              <Stack direction={'row'} spacing={2} alignItems={'center'}>
-                <Button
-                  fontSize={'sm'}
-                  colorScheme='gray'
-                  mr={3}
-                  onClick={onClose}
-                >
+              <Stack direction={'row'} spacing={3} alignItems={'center'}>
+                <Button fontSize={'sm'} colorScheme='gray' onClick={onClose}>
                   Close
                 </Button>
                 <Button
@@ -684,7 +727,9 @@ const PurlModal = ({
                   colorScheme={'blue'}
                   onClick={checkId ? handleComUpdate : handleSave}
                   disabled={
-                    purlName === '' || purlType === '' || namespace === ''
+                    purlName === '' ||
+                    purlType === '' ||
+                    (purlType === 'swift' && namespace === '')
                   }
                 >
                   Save

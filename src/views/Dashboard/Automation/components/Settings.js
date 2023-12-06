@@ -6,6 +6,14 @@ import {
   Switch,
   Tag,
   Text,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+  Button,
   useDisclosure
 } from '@chakra-ui/react'
 import CardBody from 'components/Card/CardBody'
@@ -41,18 +49,26 @@ const Settings = ({ data, refetch }) => {
   const productId = queryParams.get('id')
 
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const {
+    isOpen: isDeleteOpen,
+    onOpen: onDeleteOpen,
+    onClose: onDeleteClose
+  } = useDisclosure()
+
   const [activeRow, setActiveRow] = useState(null)
 
   const [updateAutoCheck] = useMutation(UpdateAutomation)
   const [deleteAutoCheck] = useMutation(DeleteAutomation)
 
-  const handleRemove = async (id) => {
+  const handleRemove = async () => {
     await deleteAutoCheck({
       variables: {
-        autoCheckId: id,
+        autoCheckId: activeRow.id,
         projectId: productId
       }
-    }).then((res) => res.data && refetch())
+    })
+      .then((res) => res.data && refetch())
+      .finally(() => onDeleteClose())
   }
 
   const handleStatus = async (row) => {
@@ -155,7 +171,10 @@ const Settings = ({ data, refetch }) => {
       selector: (row) => {
         return (
           <IconButton
-            onClick={() => handleRemove(row.id)}
+            onClick={() => {
+              setActiveRow(row)
+              onDeleteOpen()
+            }}
             size='sm'
             icon={<DeleteIcon />}
             colorScheme='red'
@@ -191,6 +210,33 @@ const Settings = ({ data, refetch }) => {
           refetch={refetch}
           productId={productId}
         />
+      )}
+
+      {/* DELETE */}
+      {activeRow && isDeleteOpen && (
+        <Modal isOpen={isDeleteOpen} onClose={onDeleteClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Delete Automation Rule</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Text>
+                Deleting this automation rule will stop applying this change for
+                future imports of SBOM. Existing SBOM where the rule is already
+                applied will not be affected.
+              </Text>
+              <Text mt={4}>Are you sure you want to continue?</Text>
+            </ModalBody>
+            <ModalFooter>
+              <Button mr={3} onClick={onDeleteClose}>
+                No
+              </Button>
+              <Button colorScheme='red' onClick={handleRemove}>
+                Yes
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       )}
     </>
   )

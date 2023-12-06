@@ -84,16 +84,18 @@ const HealthCheckTable = ({
     setCheckDirection,
     checkSearchInput,
     setCheckSearchInput,
+    checkRules,
+    setCheckRules,
     checkCategory,
     setCheckCategory,
     checkSeverity,
     setCheckSeverity,
     checkStatus,
     setCheckStatus,
-    checkAfter,
+    setCpeString,
     setCheckAfter,
-    checkBefore,
-    setCheckBefore
+    setCheckBefore,
+    setPurlString
   } = useContext(GlobalContext)
 
   const [purlValue, setPurlValue] = useState('')
@@ -228,7 +230,23 @@ const HealthCheckTable = ({
         variables: {
           projectId: productId,
           sbomId: sbomId,
-          search: checkSearchInput,
+          search: checkSearchInput !== '' ? checkSearchInput : undefined,
+          checkId:
+            checkRules.includes('all') || checkRules.length === 0
+              ? undefined
+              : checkRules,
+          category:
+            checkCategory.includes('all') || checkCategory.length === 0
+              ? undefined
+              : checkCategory,
+          severity:
+            checkSeverity.includes('all') || checkSeverity.length === 0
+              ? undefined
+              : checkSeverity,
+          status:
+            checkStatus.includes('all') || checkStatus.length === 0
+              ? undefined
+              : checkStatus,
           first: totalRows,
           field: checkField,
           direction: checkDirection
@@ -247,6 +265,22 @@ const HealthCheckTable = ({
         projectId: productId,
         sbomId: sbomId,
         search: undefined,
+        checkId:
+          checkRules.includes('all') || checkRules.length === 0
+            ? undefined
+            : checkRules,
+        category:
+          checkCategory.includes('all') || checkCategory.length === 0
+            ? undefined
+            : checkCategory,
+        severity:
+          checkSeverity.includes('all') || checkSeverity.length === 0
+            ? undefined
+            : checkSeverity,
+        status:
+          checkStatus.includes('all') || checkStatus.length === 0
+            ? undefined
+            : checkStatus,
         first: totalRows,
         field: checkField,
         direction: checkDirection
@@ -271,28 +305,6 @@ const HealthCheckTable = ({
     })
     setPageIndex(1)
   }
-
-  const searchInputRef = useRef()
-
-  const focusSearchInput = () => {
-    if (searchInputRef?.current) {
-      searchInputRef?.current.focus()
-    }
-  }
-
-  const handleKeyPress = (e) => {
-    if (e.ctrlKey && e.key === '/') {
-      focusSearchInput()
-    }
-  }
-
-  useEffect(() => {
-    window.addEventListener('keydown', handleKeyPress)
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyPress)
-    }
-  }, [])
 
   // SUB HEADER
   const subHeaderComponentMemo = useMemo(() => {
@@ -361,6 +373,11 @@ const HealthCheckTable = ({
       }
     }).then((res) => {
       if (res.data) {
+        setCheckSearchInput([])
+        setCheckRules([])
+        setCheckCategory([])
+        setCheckSeverity([])
+        setCheckStatus([])
         healthRecheck({
           variables: {
             checkId: row.organizationRule.rule.friendlyId,
@@ -449,9 +466,7 @@ const HealthCheckTable = ({
       organizationRule.rule.shortDesc === 'Component has a purl' ||
       organizationRule.rule.shortDesc === 'Component has a valid purl'
     ) {
-      const pkg = PackageURL.fromString('pkg:generic/unknown@1.0')
-      setPurlValue('pkg:generic/unknown@1.0')
-      setPurlData(pkg)
+      setPurlString('pkg:type/name@version')
       return onPurlOpen()
     }
 
@@ -460,13 +475,7 @@ const HealthCheckTable = ({
       organizationRule.rule.shortDesc === 'Component has a valid cpe' ||
       organizationRule.rule.shortDesc === 'Component has a cpe'
     ) {
-      setCpeData({
-        vendor: 'vendor',
-        product: 'product',
-        version: '1.0',
-        targetHardware: '*'
-      })
-      setCpeValue('cpe:2.3:a:calligra:calligra:2.4.1:*:*:*:*:*:*:*')
+      setCpeString('cpe:2.3:::::*:*:*:*:*:*:*')
       return onCpeOpen()
     }
 
@@ -573,26 +582,6 @@ const HealthCheckTable = ({
       width: '10%',
       sortable: true
     },
-    // CATEGORY
-    /*     {
-      id: 'category',
-      name: 'CATEGORY',
-      selector: (row) => {
-        const { organizationRule } = row
-        return (
-          <Tooltip label={organizationRule.rule.shortDesc} placement='top'>
-            <Text>
-              {organizationRule.rule.shortDesc !== null
-                ? `${organizationRule.rule.shortDesc?.substring(0, 30)}${
-                    organizationRule.rule.shortDesc.length > 30 ? '...' : ''
-                  }`
-                : ''}
-            </Text>
-          </Tooltip>
-        )
-      },
-      width: '250px'
-    }, */
     // LONG DESCRIPTION
     {
       id: 'COMPONENTS_NAME',
@@ -727,6 +716,10 @@ const HealthCheckTable = ({
         last: before ? totalRows : undefined,
         before: before,
         search: checkSearchInput !== '' ? checkSearchInput : undefined,
+        checkId:
+          checkRules.includes('all') || checkRules.length === 0
+            ? undefined
+            : checkRules,
         category:
           checkCategory.includes('all') || checkCategory.length === 0
             ? undefined
@@ -755,6 +748,10 @@ const HealthCheckTable = ({
         sbomId: sbomId,
         first: totalRows,
         search: checkSearchInput !== '' ? checkSearchInput : undefined,
+        checkId:
+          checkRules.includes('all') || checkRules.length === 0
+            ? undefined
+            : checkRules,
         category:
           checkCategory.includes('all') || checkCategory.length === 0
             ? undefined

@@ -35,9 +35,7 @@ import {
   ModalHeader,
   ModalCloseButton,
   ModalBody,
-  ModalFooter,
-  RadioGroup,
-  Radio
+  ModalFooter
 } from '@chakra-ui/react'
 import { useLazyQuery, useMutation } from '@apollo/client'
 import { CreateComponent, UpdateComponent } from 'graphQL/Mutation'
@@ -84,8 +82,23 @@ function ComponentDrawer(props) {
     setCompFilters,
     licenseType,
     spdxLicense,
+    setSpdxLicense,
+    setSpdxList,
     setPurlString,
-    customLicense
+    customLicense,
+    setCustomLicense,
+    setCompSearchInput,
+    setCompEcosystem,
+    setCustomList,
+    setCompLicense,
+    setCompSupplier,
+    setCompScope,
+    setComPageIndex,
+    purlString,
+    cpeString,
+    setCpeString,
+    licenseExp,
+    setLicenseExp
   } = useContext(GlobalContext)
 
   const onFilterRefetch = () => {
@@ -109,7 +122,7 @@ function ComponentDrawer(props) {
   const [groupInfo, setGroupInfo] = useState('')
   const [compName, setCompName] = useState('')
   const [compVersion, setCompVersion] = useState('')
-  const [compType, setCompType] = useState('')
+  const [compKind, setCompKind] = useState('')
 
   const [cpeValue, setCpeValue] = useState('')
   const [cpeList, setCpeList] = useState([])
@@ -120,7 +133,6 @@ function ComponentDrawer(props) {
   const [purlValue, setPurlValue] = useState('')
   const [purlData, setPurlData] = useState(null)
   const [isPURLInputValid, setPURLInputValid] = useState(true)
-  const [expLicense, setExpLicense] = useState('')
   const [isPrimary, setIsPrimary] = useState(primary)
   const [isInternal, setIsInternal] = useState(internal)
 
@@ -134,7 +146,7 @@ function ComponentDrawer(props) {
   }, [component])
 
   useEffect(() => {
-    setCompType(type)
+    setCompKind(type)
   }, [type])
 
   // Health Check
@@ -200,7 +212,7 @@ function ComponentDrawer(props) {
       await createComponent({
         variables: {
           sbomId: sbomId,
-          kind: compType,
+          kind: compKind,
           name: compName,
           version: compVersion,
           licenses: {
@@ -240,33 +252,41 @@ function ComponentDrawer(props) {
         variables: {
           id: id,
           sbomId: sbomId,
-          kind: compType,
+          kind: compKind,
           name: compName,
           version: compVersion,
           licenses: {
             licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
-            licensesExp: licenseType === 'license_exp' ? expLicense : undefined,
+            licensesExp: licenseType === 'license_exp' ? licenseExp : undefined,
             licensesCustom:
               licenseType === 'license_custom' ? customLicense : undefined
           },
-          cpes: cpeList,
-          purl: purlValue,
+          cpes:
+            cpeList.length > 0
+              ? cpeList
+              : cpeString !== ''
+              ? [cpeString]
+              : undefined,
+          purl: purlString,
           primary: isPrimary,
           internal: isInternal
         }
       })
         .then((res) => {
           if (res.data) {
-            onFilterRefetch()
-            if (licenseType === 'license_spdx') {
-              setSpdxList([])
-              setSpdxLicense([])
-            } else if (licenseType === 'license_exp') {
-              setExpLicense('')
-            } else if (licenseType === 'license_custom') {
-              setCustomList([])
-              setCustomLicense([])
-            }
+            setCompSearchInput('')
+            setCompEcosystem([])
+            setCompKind([])
+            setCompLicense([])
+            setCompSupplier([])
+            setCompScope('')
+            setCpeString('')
+            setSpdxLicense([])
+            setSpdxList([])
+            setLicenseExp('')
+            setCustomList([])
+            setCustomLicense([])
+            setComPageIndex(1)
           }
         })
         .finally(() => onClose())
@@ -332,10 +352,10 @@ function ComponentDrawer(props) {
     setCpeList(updatedItems)
   }
 
-  const handleCpeChange = (event) => {
+  const handleCpeChange = (e) => {
     const { value } = e.target
     const val = value.replace(/\s/g, '')
-    setCpeValue(val)
+    setCpeString(val)
     getCpe({
       variables: {
         input: {
@@ -440,8 +460,8 @@ function ComponentDrawer(props) {
                   name='componentType'
                   size='md'
                   fontSize={'sm'}
-                  value={compType}
-                  onChange={(e) => setCompType(e.target.value)}
+                  value={compKind}
+                  onChange={(e) => setCompKind(e.target.value)}
                 >
                   <option value=''>-- Select --</option>
                   <option value='application'>Application</option>
@@ -461,11 +481,7 @@ function ComponentDrawer(props) {
               </FormControl>
 
               {/* LICENSES */}
-              <LicenseField
-                data={data}
-                expLicense={expLicense}
-                setExpLicense={setExpLicense}
-              />
+              <LicenseField data={data} />
 
               {/* PURL INPUI */}
               <FormControl isReadOnly={customerView}>
@@ -523,8 +539,8 @@ function ComponentDrawer(props) {
                 <Stack direction={'row'} width={'100%'} spacing={2}>
                   <CpeInput
                     name='cpe'
-                    inputValue={cpeValue}
-                    setInputValue={setCpeValue}
+                    inputValue={cpeString}
+                    setInputValue={setCpeString}
                     cpeList={cpeData}
                     setCpeList={setCpeData}
                     onChange={handleCpeChange}
@@ -609,7 +625,7 @@ function ComponentDrawer(props) {
                   colorScheme='blue'
                   onClick={handleSave}
                   isDisabled={
-                    compType === '' || compName === '' || compVersion === ''
+                    compKind === '' || compName === '' || compVersion === ''
                   }
                 >
                   Save
@@ -618,7 +634,7 @@ function ComponentDrawer(props) {
                 <Button
                   colorScheme='blue'
                   onClick={handleUpdateCom}
-                  isDisabled={!compType}
+                  isDisabled={!compKind}
                 >
                   Update
                 </Button>
