@@ -41,6 +41,7 @@ const CheckFilterMenu = ({
   totalRows
 }) => {
   const {
+    checkSearchInput,
     checkFilters,
     checkField,
     checkDirection,
@@ -58,6 +59,22 @@ const CheckFilterMenu = ({
 
   const [checkIds, setCheckIds] = useState([])
 
+  const onFilter = (category, severity, status) => {
+    refetch({
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        search: checkSearchInput !== '' ? checkSearchInput : undefined,
+        category: category.includes('all') ? undefined : category,
+        severity: severity.includes('all') ? undefined : severity,
+        status: status.includes('all') ? undefined : status,
+        first: totalRows,
+        field: checkField,
+        direction: checkDirection
+      }
+    })
+  }
+
   const onFilterCheckId = (value) => {
     setCheckIds(value.includes('all') ? [] : value)
   }
@@ -66,19 +83,7 @@ const CheckFilterMenu = ({
     setCheckAfter('')
     setCheckBefore('')
     setCheckCategory(value.includes('all') ? [] : value)
-    refetch({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        category: value.includes('all') ? undefined : value,
-        first: totalRows,
-        last: undefined,
-        after: undefined,
-        last: undefined,
-        field: checkField,
-        direction: checkDirection
-      }
-    })
+    onFilter(value, checkSeverity, checkStatus)
     setPageIndex(1)
   }
 
@@ -86,19 +91,7 @@ const CheckFilterMenu = ({
     setCheckAfter('')
     setCheckBefore('')
     setCheckSeverity(value.includes('all') ? [] : value)
-    refetch({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        severity: value.includes('all') ? undefined : value,
-        first: totalRows,
-        last: undefined,
-        after: undefined,
-        last: undefined,
-        field: checkField,
-        direction: checkDirection
-      }
-    })
+    onFilter(checkCategories, value, checkStatus)
     setPageIndex(1)
   }
 
@@ -106,19 +99,7 @@ const CheckFilterMenu = ({
     setCheckAfter('')
     setCheckBefore('')
     setCheckStatus(value.includes('all') ? [] : value)
-    refetch({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        status: value.includes('all') ? undefined : value,
-        first: totalRows,
-        last: undefined,
-        after: undefined,
-        last: undefined,
-        field: checkField,
-        direction: checkDirection
-      }
-    })
+    onFilter(checkCategories, checkSeverity, value)
     setPageIndex(1)
   }
 

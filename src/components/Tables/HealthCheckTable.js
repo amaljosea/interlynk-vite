@@ -228,7 +228,19 @@ const HealthCheckTable = ({
         variables: {
           projectId: productId,
           sbomId: sbomId,
-          search: checkSearchInput,
+          search: checkSearchInput !== '' ? checkSearchInput : undefined,
+          category:
+            checkCategory.includes('all') || checkCategory.length === 0
+              ? undefined
+              : checkCategory,
+          severity:
+            checkSeverity.includes('all') || checkSeverity.length === 0
+              ? undefined
+              : checkSeverity,
+          status:
+            checkStatus.includes('all') || checkStatus.length === 0
+              ? undefined
+              : checkStatus,
           first: totalRows,
           field: checkField,
           direction: checkDirection
@@ -247,6 +259,18 @@ const HealthCheckTable = ({
         projectId: productId,
         sbomId: sbomId,
         search: undefined,
+        category:
+          checkCategory.includes('all') || checkCategory.length === 0
+            ? undefined
+            : checkCategory,
+        severity:
+          checkSeverity.includes('all') || checkSeverity.length === 0
+            ? undefined
+            : checkSeverity,
+        status:
+          checkStatus.includes('all') || checkStatus.length === 0
+            ? undefined
+            : checkStatus,
         first: totalRows,
         field: checkField,
         direction: checkDirection
@@ -271,28 +295,6 @@ const HealthCheckTable = ({
     })
     setPageIndex(1)
   }
-
-  const searchInputRef = useRef()
-
-  const focusSearchInput = () => {
-    if (searchInputRef?.current) {
-      searchInputRef?.current.focus()
-    }
-  }
-
-  const handleKeyPress = (e) => {
-    if (e.ctrlKey && e.key === '/') {
-      focusSearchInput()
-    }
-  }
-
-  useEffect(() => {
-    window.addEventListener('keydown', handleKeyPress)
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyPress)
-    }
-  }, [])
 
   // SUB HEADER
   const subHeaderComponentMemo = useMemo(() => {
