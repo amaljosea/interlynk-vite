@@ -56,6 +56,7 @@ const ProdStatusDrawer = ({
   const [selectedTag, setSelectedTag] = useState('')
   const [actionStatement, setActionStatement] = useState('')
   const [response, setResponse] = useState('')
+  const [responseTitle, setResponseTitle] = useState('')
   const [details, setDetails] = useState('')
   const [notes, setNotes] = useState('')
   const [impactData, setImpactData] = useState('')
@@ -100,6 +101,13 @@ const ProdStatusDrawer = ({
       setJustifyName('')
       setImpactData('')
     }
+  }
+
+  const handleResponseChange = (e) => {
+    const {value} = e.target
+    const title = e.target.options[e.target.selectedIndex].text
+    setResponse(value)
+    setResponseTitle(title)
   }
 
   const handleJustifyChange = (e) => {
@@ -216,10 +224,7 @@ const ProdStatusDrawer = ({
                       id='response'
                       name='response'
                       value={response}
-                      onChange={(e) => {
-                        console.log(e.target.value)
-                        setResponse(e.target.value)
-                      }}
+                      onChange={handleResponseChange}
                       fontSize='sm'
                       color='gray.600'
                     >
@@ -235,7 +240,7 @@ const ProdStatusDrawer = ({
                 </FormControl>
               )}
               {/* FIXED VERSION */}
-              {statusName === 'Affected' && response === 'Update' && (
+              {statusName === 'Affected' && responseTitle === 'update' && (
                 <Stack
                   width={'100%'}
                   direction={'column'}
@@ -370,9 +375,9 @@ const ProdStatusDrawer = ({
                   impactData === '') ||
                 (statusName === 'Affected' &&
                   impactData === '' &&
-                  response === '') ||
+                  responseTitle === '') ||
                 (statusName === 'False Positive' && impactData === '') ||
-                (response === 'Update' && selectedTag === '')
+                (responseTitle === 'update' && selectedTag === '')
               }
             >
               Add
