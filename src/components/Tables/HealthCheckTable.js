@@ -240,6 +240,8 @@ const HealthCheckTable = ({
 
   // CLEAR SERACH
   const handleClear = async () => {
+    setCheckSearchInput('')
+    setPageIndex(1)
     await refetch({
       variables: {
         projectId: productId,
@@ -250,8 +252,6 @@ const HealthCheckTable = ({
         direction: checkDirection
       }
     })
-    setCheckSearchInput('')
-    setPageIndex(1)
   }
 
   // SET ROW LENGTH
@@ -717,6 +717,34 @@ const HealthCheckTable = ({
     }
   ]
 
+  const handleRefetch = (after, before) => {
+    refetch({
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        first: after ? totalRows : undefined,
+        after: after,
+        last: before ? totalRows : undefined,
+        before: before,
+        search: checkSearchInput !== '' ? checkSearchInput : undefined,
+        category:
+          checkCategory.includes('all') || checkCategory.length === 0
+            ? undefined
+            : checkCategory,
+        severity:
+          checkSeverity.includes('all') || checkSeverity.length === 0
+            ? undefined
+            : checkSeverity,
+        status:
+          checkStatus.includes('all') || checkStatus.length === 0
+            ? undefined
+            : checkStatus,
+        field: checkField,
+        direction: checkDirection
+      }
+    })
+  }
+
   // SORT FUNCTION
   const handleSort = (column, sortDirection) => {
     setCheckField(column.id)
@@ -726,7 +754,19 @@ const HealthCheckTable = ({
         projectId: productId,
         sbomId: sbomId,
         first: totalRows,
-        last: undefined,
+        search: checkSearchInput !== '' ? checkSearchInput : undefined,
+        category:
+          checkCategory.includes('all') || checkCategory.length === 0
+            ? undefined
+            : checkCategory,
+        severity:
+          checkSeverity.includes('all') || checkSeverity.length === 0
+            ? undefined
+            : checkSeverity,
+        status:
+          checkStatus.includes('all') || checkStatus.length === 0
+            ? undefined
+            : checkStatus,
         field: column.id,
         direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
       }
@@ -737,58 +777,14 @@ const HealthCheckTable = ({
     setPageIndex((prev) => pageIndex !== 0 && prev - 1)
     setCheckBefore(data.pageInfo.startCursor)
     setCheckAfter('')
-    await refetch({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        search: checkSearchInput !== '' ? checkSearchInput : undefined,
-        category:
-          checkCategory.includes('all') || checkCategory.length === 0
-            ? undefined
-            : checkCategory,
-        severity:
-          checkSeverity.includes('all') || checkSeverity.length === 0
-            ? undefined
-            : checkSeverity,
-        status:
-          checkStatus.includes('all') || checkStatus.length === 0
-            ? undefined
-            : checkStatus,
-        last: totalRows,
-        before: data.pageInfo.startCursor,
-        field: checkField,
-        direction: checkDirection
-      }
-    })
+    handleRefetch(null, data.pageInfo.startCursor)
   }
 
   const onNextPage = async () => {
     setPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
     setCheckAfter(data.pageInfo.endCursor)
     setCheckBefore('')
-    await refetch({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        search: checkSearchInput !== '' ? checkSearchInput : undefined,
-        category:
-          checkCategory.includes('all') || checkCategory.length === 0
-            ? undefined
-            : checkCategory,
-        severity:
-          checkSeverity.includes('all') || checkSeverity.length === 0
-            ? undefined
-            : checkSeverity,
-        status:
-          checkStatus.includes('all') || checkStatus.length === 0
-            ? undefined
-            : checkStatus,
-        first: totalRows,
-        after: data.pageInfo.endCursor,
-        field: checkField,
-        direction: checkDirection
-      }
-    })
+    handleRefetch(data.pageInfo.endCursor, null)
   }
 
   return (
