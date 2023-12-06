@@ -22,9 +22,9 @@ import GlobalContext from 'context/GlobalContext'
 import { CpeAutoComplete } from 'graphQL/Queries'
 import { useLazyQuery } from '@apollo/client'
 import spdxValidate from 'spdx-expression-validate'
-import { MdArrowOutward } from "react-icons/md";
+import { MdArrowOutward } from 'react-icons/md'
 
-const LicenseField = ({ data, expLicense, setExpLicense }) => {
+const LicenseField = ({ data }) => {
   const {
     spdxList,
     setSpdxList,
@@ -34,7 +34,9 @@ const LicenseField = ({ data, expLicense, setExpLicense }) => {
     customLicense,
     setCustomLicense,
     customList,
-    setCustomList
+    setCustomList,
+    licenseExp,
+    setLicenseExp
   } = useContext(GlobalContext)
 
   const [licenseList, setLicenseList] = useState([])
@@ -104,7 +106,7 @@ const LicenseField = ({ data, expLicense, setExpLicense }) => {
 
   const handleExpChange = (e) => {
     const { value } = e.target
-    setExpLicense(value)
+    setLicenseExp(value)
     if (value !== '') {
       const trimmedInput = typeof value === 'string' ? value.trim() : ''
       const isLicenseValid = spdxValidate(trimmedInput)
@@ -116,23 +118,6 @@ const LicenseField = ({ data, expLicense, setExpLicense }) => {
 
   const handleTypeChange = (value) => {
     setLicenseType(value)
-    if (value === 'license_spdx') {
-      const filterData = data.licenses.map((option) => ({
-        value: option,
-        label: option
-      }))
-      setSpdxList(filterData)
-      setSpdxLicense(data.licenses)
-    } else if (value === 'license_exp') {
-      setExpLicense(data.licensesExp)
-    } else if (value === 'license_custom') {
-      const filterData = data.licensesCustom.map((option) => ({
-        value: option,
-        label: option
-      }))
-      setCustomList(filterData)
-      setCustomLicense(data.licensesCustom)
-    }
   }
 
   return (
@@ -234,7 +219,7 @@ const LicenseField = ({ data, expLicense, setExpLicense }) => {
           <>
             <Input
               type='text'
-              value={expLicense}
+              value={licenseExp}
               fontSize={'sm'}
               onChange={handleExpChange}
               placeholder='Enter a valid SPDX Expression'

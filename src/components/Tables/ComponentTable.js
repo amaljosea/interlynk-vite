@@ -41,9 +41,8 @@ import ComponentModal from 'views/Sbom/components/ComponentModal'
 import SupplierModal from 'views/Sbom/components/SupplierModal'
 import LinksDrawer from 'components/Drawer/LinksDrawer'
 import styled from '@emotion/styled'
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import { useLazyQuery, useMutation } from '@apollo/client'
 import { deleteComSupplier } from 'graphQL/Mutation'
-import { licenseOptions } from 'variables/licenses'
 import CompFilterMenu from 'views/Sbom/components/CompFilterMenu'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import { getFullDateAndTime } from 'utils'
@@ -94,7 +93,6 @@ const ComponentTable = ({
   const {
     setSpdxList,
     setSpdxLicense,
-    setExpList,
     setLicenseExp,
     setLicenseType,
     compSearchInput,
@@ -116,7 +114,9 @@ const ComponentTable = ({
     comPageIndex,
     setComPageIndex,
     setCompAfter,
-    setCompBefore
+    setCompBefore,
+    setCustomList,
+    setCustomLicense
   } = useContext(GlobalContext)
 
   const fetchCompData = () => {
@@ -181,9 +181,9 @@ const ComponentTable = ({
   } = useDisclosure()
 
   const onLicenseOpen = (row) => {
-    setLicenseType('license_spdx')
     setActiveRow(row)
     if (row.licenses && row.licenses.length > 0) {
+      setLicenseType('license_spdx')
       const filterData = row.licenses.map((value) => ({
         value: value,
         label: value
@@ -191,6 +191,17 @@ const ComponentTable = ({
       setSpdxList(filterData)
       const selectedIds = filterData.map((option) => option.value)
       setSpdxLicense(selectedIds)
+    } else if (row.licensesExp) {
+      setLicenseType('license_exp')
+      setLicenseExp(row.licensesExp)
+    } else if (row.licensesCustom && row.licensesCustom.length > 0) {
+      setLicenseType('license_custom')
+      const filterData = row.licensesCustom.map((option) => ({
+        value: option,
+        label: option
+      }))
+      setCustomList(filterData)
+      setCustomLicense(row.licensesCustom)
     }
     onOpen()
   }

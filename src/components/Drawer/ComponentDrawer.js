@@ -83,6 +83,7 @@ function ComponentDrawer(props) {
     licenseType,
     spdxLicense,
     setSpdxLicense,
+    setSpdxList,
     setPurlString,
     customLicense,
     setCustomLicense,
@@ -95,7 +96,9 @@ function ComponentDrawer(props) {
     setComPageIndex,
     purlString,
     cpeString,
-    setCpeString
+    setCpeString,
+    licenseExp,
+    setLicenseExp
   } = useContext(GlobalContext)
 
   const onFilterRefetch = () => {
@@ -130,7 +133,6 @@ function ComponentDrawer(props) {
   const [purlValue, setPurlValue] = useState('')
   const [purlData, setPurlData] = useState(null)
   const [isPURLInputValid, setPURLInputValid] = useState(true)
-  const [expLicense, setExpLicense] = useState('')
   const [isPrimary, setIsPrimary] = useState(primary)
   const [isInternal, setIsInternal] = useState(internal)
 
@@ -255,11 +257,16 @@ function ComponentDrawer(props) {
           version: compVersion,
           licenses: {
             licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
-            licensesExp: licenseType === 'license_exp' ? expLicense : undefined,
+            licensesExp: licenseType === 'license_exp' ? licenseExp : undefined,
             licensesCustom:
               licenseType === 'license_custom' ? customLicense : undefined
           },
-          cpes: cpeList.length > 0 ? cpeList : cpeString !== '' ? [cpeString] : undefined,
+          cpes:
+            cpeList.length > 0
+              ? cpeList
+              : cpeString !== ''
+              ? [cpeString]
+              : undefined,
           purl: purlString,
           primary: isPrimary,
           internal: isInternal
@@ -274,16 +281,12 @@ function ComponentDrawer(props) {
             setCompSupplier([])
             setCompScope('')
             setCpeString('')
+            setSpdxLicense([])
+            setSpdxList([])
+            setLicenseExp('')
+            setCustomList([])
+            setCustomLicense([])
             setComPageIndex(1)
-            if (licenseType === 'license_spdx') {
-              setSpdxList([])
-              setSpdxLicense([])
-            } else if (licenseType === 'license_exp') {
-              setExpLicense('')
-            } else if (licenseType === 'license_custom') {
-              setCustomList([])
-              setCustomLicense([])
-            }
           }
         })
         .finally(() => onClose())
@@ -478,11 +481,7 @@ function ComponentDrawer(props) {
               </FormControl>
 
               {/* LICENSES */}
-              <LicenseField
-                data={data}
-                expLicense={expLicense}
-                setExpLicense={setExpLicense}
-              />
+              <LicenseField data={data} />
 
               {/* PURL INPUI */}
               <FormControl isReadOnly={customerView}>
