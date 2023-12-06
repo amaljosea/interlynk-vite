@@ -718,7 +718,9 @@ const PurlModal = ({
                   colorScheme={'blue'}
                   onClick={checkId ? handleComUpdate : handleSave}
                   disabled={
-                    purlName === '' || purlType === '' || namespace === ''
+                    purlName === '' ||
+                    purlType === '' ||
+                    (purlType === 'swift' && namespace === '')
                   }
                 >
                   Save
