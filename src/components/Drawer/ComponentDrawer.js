@@ -93,7 +93,9 @@ function ComponentDrawer(props) {
     setCompSupplier,
     setCompScope,
     setComPageIndex,
-    purlString
+    purlString,
+    cpeString,
+    setCpeString
   } = useContext(GlobalContext)
 
   const onFilterRefetch = () => {
@@ -257,7 +259,7 @@ function ComponentDrawer(props) {
             licensesCustom:
               licenseType === 'license_custom' ? customLicense : undefined
           },
-          cpes: cpeList,
+          cpes: cpeList.length > 0 ? cpeList : cpeString !== '' ? [cpeString] : undefined,
           purl: purlString,
           primary: isPrimary,
           internal: isInternal
@@ -271,6 +273,7 @@ function ComponentDrawer(props) {
             setCompLicense([])
             setCompSupplier([])
             setCompScope('')
+            setCpeString('')
             setComPageIndex(1)
             if (licenseType === 'license_spdx') {
               setSpdxList([])
@@ -346,10 +349,10 @@ function ComponentDrawer(props) {
     setCpeList(updatedItems)
   }
 
-  const handleCpeChange = (event) => {
+  const handleCpeChange = (e) => {
     const { value } = e.target
     const val = value.replace(/\s/g, '')
-    setCpeValue(val)
+    setCpeString(val)
     getCpe({
       variables: {
         input: {
@@ -537,8 +540,8 @@ function ComponentDrawer(props) {
                 <Stack direction={'row'} width={'100%'} spacing={2}>
                   <CpeInput
                     name='cpe'
-                    inputValue={cpeValue}
-                    setInputValue={setCpeValue}
+                    inputValue={cpeString}
+                    setInputValue={setCpeString}
                     cpeList={cpeData}
                     setCpeList={setCpeData}
                     onChange={handleCpeChange}

@@ -14,7 +14,11 @@ import {
   Stack,
   Flex,
   Textarea,
-  Text
+  Text,
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  AlertDescription
 } from '@chakra-ui/react'
 import CpeInput from 'components/CpeInput'
 import GlobalContext from 'context/GlobalContext'
@@ -46,14 +50,14 @@ const CpeModal = ({
   const sbomId = queryParams.get('sbom')
   const productId = queryParams.get('p')
 
-  const [vendor, setVendor] = useState(null)
+  const [vendor, setVendor] = useState('')
   const [vendorList, setVendorList] = useState([])
   const vendorRef = useRef()
-  const [product, setProduct] = useState(null)
+  const [product, setProduct] = useState('')
   const [productList, setProductList] = useState([])
   const productRef = useRef()
   const [type, setType] = useState('')
-  const [version, setVersion] = useState(null)
+  const [version, setVersion] = useState('')
   const [versionList, setVersionList] = useState([])
   const versionRef = useRef()
   const [hardware, setHardware] = useState('')
@@ -318,6 +322,14 @@ const CpeModal = ({
                 validation={false}
                 onChange={onVendorInputChange}
               />
+              {vendor !== '' && vendor.includes(':') && (
+                <Alert size={'sm'} status='error'>
+                  <AlertIcon />
+                  <AlertDescription fontSize={'sm'}>
+                    Invalid entry
+                  </AlertDescription>
+                </Alert>
+              )}
               {/* TYPE */}
               <FormControl>
                 <FormLabel htmlFor='type'>Type</FormLabel>
@@ -346,6 +358,14 @@ const CpeModal = ({
                 validation={false}
                 onChange={onProductInputChange}
               />
+              {product !== '' && product.includes(':') && (
+                <Alert size={'sm'} status='error'>
+                  <AlertIcon />
+                  <AlertDescription fontSize={'sm'}>
+                    Invalid entry
+                  </AlertDescription>
+                </Alert>
+              )}
               {/* VERSION */}
               <CpeInput
                 name='version'
@@ -357,6 +377,14 @@ const CpeModal = ({
                 validation={false}
                 onChange={onVersionInputChange}
               />
+              {version !== '' && version.includes(':') && (
+                <Alert size={'sm'} status='error'>
+                  <AlertIcon />
+                  <AlertDescription fontSize={'sm'}>
+                    Invalid entry
+                  </AlertDescription>
+                </Alert>
+              )}
               {/* TARGET HARDWARE */}
               <FormControl>
                 <FormLabel htmlFor='targetHardware'>Target Hardware</FormLabel>
@@ -397,7 +425,14 @@ const CpeModal = ({
                   fontSize={'sm'}
                   colorScheme='blue'
                   onClick={onSaveRule}
-                  disabled={!vendor || !product || type === ''}
+                  disabled={
+                    vendor === '' ||
+                    product === '' ||
+                    type === '' ||
+                    vendor.includes(':') ||
+                    product.includes(':') ||
+                    version.includes(':')
+                  }
                 >
                   Save Rule
                 </Button>
@@ -413,7 +448,14 @@ const CpeModal = ({
                   variant='solid'
                   colorScheme={'blue'}
                   onClick={checkId ? handleComUpdate : handleSave}
-                  disabled={!vendor || !product || type === ''}
+                  disabled={
+                    vendor === '' ||
+                    product === '' ||
+                    type === '' ||
+                    vendor.includes(':') ||
+                    product.includes(':') ||
+                    version.includes(':')
+                  }
                 >
                   Save
                 </Button>
