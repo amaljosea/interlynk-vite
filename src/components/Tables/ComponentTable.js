@@ -782,6 +782,7 @@ const ComponentTable = ({
   // CLEAR SERACH
   const handleClear = async () => {
     setCompSearchInput('')
+    setComPageIndex(1)
     await refetch({
       variables: {
         projectId: productId,
@@ -865,9 +866,41 @@ const ComponentTable = ({
     )
   }, [compSearchInput, handleClear, handleSearch, compFilters])
 
+  const handleRefetch = (after, before) => {
+    refetch({
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        first: after ? totalRows : undefined,
+        after: after,
+        last: before ? totalRows : undefined,
+        before: before,
+        search: compSearchInput !== '' ? compSearchInput : undefined,
+        ecosystem:
+          compEcosystem.includes('all') || compEcosystem.length === 0
+            ? undefined
+            : compEcosystem,
+        kind:
+          compType.includes('all') || compType.length === 0
+            ? undefined
+            : compType,
+        licenses:
+          compLicense.includes('all') || compLicense.length === 0
+            ? undefined
+            : compLicense,
+        supplierName:
+          compSupplier.includes('all') || compSupplier.length === 0
+            ? undefined
+            : compSupplier,
+        primary: compScope === 'primary' ? true : undefined,
+        internal: compScope === 'internal' ? true : undefined,
+        field: customerView ? signedCompField : compField,
+        direction: customerView ? signedCompDirection : compDirection
+      }
+    })
+  }
+
   const handleSort = (column, sortDirection) => {
-    // console.log(`column`, column)
-    // console.log(`sortDirection`, sortDirection)
     if (customerView) {
       setSignedCompField(column.id)
       setSignedCompDirection(sortDirection === 'asc' ? 'ASC' : 'DESC')
@@ -881,7 +914,25 @@ const ComponentTable = ({
         projectId: productId,
         sbomId: sbomId,
         first: totalRows,
-        last: undefined,
+        search: compSearchInput !== '' ? compSearchInput : undefined,
+        ecosystem:
+          compEcosystem.includes('all') || compEcosystem.length === 0
+            ? undefined
+            : compEcosystem,
+        kind:
+          compType.includes('all') || compType.length === 0
+            ? undefined
+            : compType,
+        licenses:
+          compLicense.includes('all') || compLicense.length === 0
+            ? undefined
+            : compLicense,
+        supplierName:
+          compSupplier.includes('all') || compSupplier.length === 0
+            ? undefined
+            : compSupplier,
+        primary: compScope === 'primary' ? true : undefined,
+        internal: compScope === 'internal' ? true : undefined,
         field: column.id,
         direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
       }
@@ -892,70 +943,14 @@ const ComponentTable = ({
     setComPageIndex((prev) => comPageIndex !== 0 && prev - 1)
     setCompBefore(data.pageInfo.startCursor)
     setCompAfter('')
-    await refetch({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        search: compSearchInput !== '' ? compSearchInput : undefined,
-        ecosystem:
-          compEcosystem.includes('all') || compEcosystem.length === 0
-            ? undefined
-            : compEcosystem,
-        kind:
-          compType.includes('all') || compType.length === 0
-            ? undefined
-            : compType,
-        licenses:
-          compLicense.includes('all') || compLicense.length === 0
-            ? undefined
-            : compLicense,
-        supplierName:
-          compSupplier.includes('all') || compSupplier.length === 0
-            ? undefined
-            : compSupplier,
-        primary: compScope === 'primary' ? true : undefined,
-        internal: compScope === 'internal' ? true : undefined,
-        last: totalRows,
-        before: data.pageInfo.startCursor,
-        field: customerView ? signedCompField : compField,
-        direction: customerView ? signedCompDirection : compDirection
-      }
-    })
+    handleRefetch(null, data.pageInfo.startCursor)
   }
 
   const handleNextPage = async () => {
     setComPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
     setCompAfter(data.pageInfo.endCursor)
     setCompBefore('')
-    await refetch({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        search: compSearchInput !== '' ? compSearchInput : undefined,
-        ecosystem:
-          compEcosystem.includes('all') || compEcosystem.length === 0
-            ? undefined
-            : compEcosystem,
-        kind:
-          compType.includes('all') || compType.length === 0
-            ? undefined
-            : compType,
-        licenses:
-          compLicense.includes('all') || compLicense.length === 0
-            ? undefined
-            : compLicense,
-        supplierName:
-          compSupplier.includes('all') || compSupplier.length === 0
-            ? undefined
-            : compSupplier,
-        primary: compScope === 'primary' ? true : undefined,
-        internal: compScope === 'internal' ? true : undefined,
-        first: totalRows,
-        after: data.pageInfo.endCursor,
-        field: customerView ? signedCompField : compField,
-        direction: customerView ? signedCompDirection : compDirection
-      }
-    })
+    handleRefetch(data.pageInfo.endCursor, null)
   }
 
   return (
