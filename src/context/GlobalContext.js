@@ -177,10 +177,20 @@ const GlobalContext = React.createContext({
   setLicenseType: () => {},
   spdxList: [],
   setSpdxList: () => {},
-  expList: [],
-  setExpList: () => {},
   customList: [],
-  setCustomList: () => {}
+  setCustomList: () => {},
+  sbomSpdxList: [],
+  setSbomSpdxList:() => {},
+  sbomCustomList: [],
+  setSbomCustomList: () => {},
+  sbomLicenseType: 'license_spdx',
+  setSbomLicenseType: () => {},
+  sbomSpdxLicense: [],
+  setSbomSpdxLicense: () => {},
+  sbomLicenseExp: '',
+  setSbomLicenseExp: () => {},
+  sbomCustomLicense: [],
+  setSbomCustomLicense: () => {}
 })
 
 export default GlobalContext

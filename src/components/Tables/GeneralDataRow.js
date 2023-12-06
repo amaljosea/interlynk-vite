@@ -38,8 +38,8 @@ import { useLocation } from 'react-router-dom'
 import { getFullDateAndTime } from 'utils'
 import PriSupplierModal from 'views/Sbom/components/PriSupplierModal'
 import { sbomUpdate } from 'graphQL/Mutation'
-import LicenseField from 'components/LicenseField'
 import GlobalContext from 'context/GlobalContext'
+import SbomLicenseField from 'components/SbomLicenseField'
 
 const GeneralDataRow = ({ status, data, refetch }) => {
   const location = useLocation()
@@ -48,14 +48,18 @@ const GeneralDataRow = ({ status, data, refetch }) => {
   const sbomId = queryParams.get('sbom')
 
   const {
-    setSpdxList,
-    setLicenseType,
-    licenseType,
-    spdxLicense,
-    setSpdxLicense,
-    setCustomList,
-    customLicense,
-    setCustomLicense
+    sbomSpdxList,
+    setSbomSpdxList,
+    sbomCustomList,
+    setSbomCustomList,
+    sbomLicenseType,
+    setSbomLicenseType,
+    sbomSpdxLicense,
+    setSbomSpdxLicense,
+    sbomLicenseExp,
+    setSbomLicenseExp,
+    sbomCustomLicense,
+    setSbomCustomLicense
   } = useContext(GlobalContext)
 
   const textColor = useColorModeValue('gray.700', 'white')
@@ -101,25 +105,6 @@ const GeneralDataRow = ({ status, data, refetch }) => {
   const [updateSbom] = useMutation(sbomUpdate, {
     onCompleted: () => handleRefetch()
   })
-
-  const handleSupRemove = async (id) => {
-    try {
-      await deleteSupplier({
-        variables: {
-          id: id
-        }
-      }).then((res) => {
-        if (res) {
-          refetch({
-            productId: productId,
-            sbomId: sbomId
-          })
-        }
-      })
-    } catch (error) {
-      console.log(`Mutation error`, error)
-    }
-  }
 
   const handleToolRemove = async (id) => {
     try {
@@ -169,28 +154,27 @@ const GeneralDataRow = ({ status, data, refetch }) => {
   }
 
   const onLicenseOpen = () => {
-    setLicenseType('license_spdx')
-    if (
-      data.licenses.length === 0 &&
-      data.licensesExp === null &&
-      data.licensesCustom.length === 0
-    ) {
-      setSpdxList([
-        {
-          value: 'CC0-1.0',
-          label: 'Creative Commons Zero v1.0 Universal'
-        }
-      ])
-      setSpdxLicense(['CC0-1.0'])
-    } else if (data.licenses.length > 0) {
-      const filterData = data.licenses.map((option) => ({
+    if (data?.licenses && data?.licenses.length > 0) {
+      setSbomLicenseType('license_spdx')
+      const filterData = data?.licenses.map((value) => ({
+        value: value,
+        label: value
+      }))
+      setSbomSpdxList(filterData)
+      const selectedIds = filterData.map((option) => option.value)
+      setSbomSpdxLicense(selectedIds)
+    } else if (data?.licensesExp) {
+      setSbomLicenseType('license_exp')
+      setSbomLicenseExp(data?.licensesExp)
+    } else if (data?.licensesCustom && data?.licensesCustom.length > 0) {
+      setSbomLicenseType('license_custom')
+      const filterData = data?.licensesCustom.map((option) => ({
         value: option,
         label: option
       }))
-      setSpdxList(filterData)
-      setSpdxLicense(data.licenses)
+      setSbomCustomList(filterData)
+      setSbomCustomLicense(data?.licensesCustom)
     }
-
     onSBMOpen()
   }
 
@@ -200,22 +184,22 @@ const GeneralDataRow = ({ status, data, refetch }) => {
         id: data.id,
         spec: data.spec,
         licenses: {
-          licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
-          licensesExp: licenseType === 'license_exp' ? expLicense : undefined,
+          licenses:
+            sbomLicenseType === 'license_spdx' ? sbomSpdxLicense : undefined,
+          licensesExp:
+            sbomLicenseType === 'license_exp' ? sbomLicenseExp : undefined,
           licensesCustom:
-            licenseType === 'license_custom' ? customLicense : undefined
+            sbomLicenseType === 'license_custom' ? sbomCustomLicense : undefined
         }
       }
     })
-      .then(() => {
-        if (licenseType === 'license_spdx') {
-          setSpdxList([])
-          setSpdxLicense([])
-        } else if (licenseType === 'license_exp') {
-          setExpLicense('')
-        } else if (licenseType === 'license_custom') {
-          setCustomList([])
-          setCustomLicense([])
+      .then((res) => {
+        if (res.data) {
+          setSbomSpdxLicense([])
+          setSbomSpdxList([])
+          setSbomLicenseExp('')
+          setSbomCustomList([])
+          setSbomCustomLicense([])
         }
       })
       .finally(() => onSBMClose())
@@ -473,11 +457,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
             </ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              <LicenseField
-                data={data}
-                expLicense={expLicense}
-                setExpLicense={setExpLicense}
-              />
+              <SbomLicenseField data={data} />
             </ModalBody>
             <ModalFooter>
               <Button fontSize={'sm'} mr={3} onClick={onSBMClose}>
@@ -487,11 +467,11 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                 fontSize={'sm'}
                 colorScheme='blue'
                 disabled={
-                  (licenseType === 'license_spdx' &&
-                    spdxLicense.length === 0) ||
-                  (licenseType === 'license_exp' && expLicense === '') ||
-                  (licenseType === 'license_custom' &&
-                    customLicense.length === 0)
+                  (sbomLicenseType === 'license_spdx' &&
+                    sbomSpdxLicense.length === 0) ||
+                  (sbomLicenseType === 'license_exp' && sbomLicenseExp === '') ||
+                  (sbomLicenseType === 'license_custom' &&
+                    sbomCustomLicense.length === 0)
                 }
                 onClick={onUpdateLicense}
               >
