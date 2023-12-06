@@ -36,8 +36,6 @@ import {
   ModalCloseButton,
   ModalBody,
   ModalFooter,
-  RadioGroup,
-  Radio
 } from '@chakra-ui/react'
 import { useLazyQuery, useMutation } from '@apollo/client'
 import { CreateComponent, UpdateComponent } from 'graphQL/Mutation'
@@ -84,8 +82,17 @@ function ComponentDrawer(props) {
     setCompFilters,
     licenseType,
     spdxLicense,
+    setSpdxLicense,
     setPurlString,
-    customLicense
+    customLicense,
+    setCustomLicense,
+    setCompSearchInput,
+    setCompEcosystem,
+    setCompType,
+    setCompLicense,
+    setCompSupplier,
+    setCompScope,
+    setComPageIndex
   } = useContext(GlobalContext)
 
   const onFilterRefetch = () => {
@@ -109,7 +116,7 @@ function ComponentDrawer(props) {
   const [groupInfo, setGroupInfo] = useState('')
   const [compName, setCompName] = useState('')
   const [compVersion, setCompVersion] = useState('')
-  const [compType, setCompType] = useState('')
+  const [compKind, setCompKind] = useState('')
 
   const [cpeValue, setCpeValue] = useState('')
   const [cpeList, setCpeList] = useState([])
@@ -134,7 +141,7 @@ function ComponentDrawer(props) {
   }, [component])
 
   useEffect(() => {
-    setCompType(type)
+    setCompKind(type)
   }, [type])
 
   // Health Check
@@ -200,7 +207,7 @@ function ComponentDrawer(props) {
       await createComponent({
         variables: {
           sbomId: sbomId,
-          kind: compType,
+          kind: compKind,
           name: compName,
           version: compVersion,
           licenses: {
@@ -240,7 +247,7 @@ function ComponentDrawer(props) {
         variables: {
           id: id,
           sbomId: sbomId,
-          kind: compType,
+          kind: compKind,
           name: compName,
           version: compVersion,
           licenses: {
@@ -258,6 +265,13 @@ function ComponentDrawer(props) {
         .then((res) => {
           if (res.data) {
             onFilterRefetch()
+            setCompSearchInput('')
+            setCompEcosystem([])
+            setCompKind([])
+            setCompLicense([])
+            setCompSupplier([])
+            setCompScope('')
+            setComPageIndex(1)
             if (licenseType === 'license_spdx') {
               setSpdxList([])
               setSpdxLicense([])
@@ -440,8 +454,8 @@ function ComponentDrawer(props) {
                   name='componentType'
                   size='md'
                   fontSize={'sm'}
-                  value={compType}
-                  onChange={(e) => setCompType(e.target.value)}
+                  value={compKind}
+                  onChange={(e) => setCompKind(e.target.value)}
                 >
                   <option value=''>-- Select --</option>
                   <option value='application'>Application</option>
@@ -609,7 +623,7 @@ function ComponentDrawer(props) {
                   colorScheme='blue'
                   onClick={handleSave}
                   isDisabled={
-                    compType === '' || compName === '' || compVersion === ''
+                    compKind === '' || compName === '' || compVersion === ''
                   }
                 >
                   Save
@@ -618,7 +632,7 @@ function ComponentDrawer(props) {
                 <Button
                   colorScheme='blue'
                   onClick={handleUpdateCom}
-                  isDisabled={!compType}
+                  isDisabled={!compKind}
                 >
                   Update
                 </Button>

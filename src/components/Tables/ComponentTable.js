@@ -130,8 +130,6 @@ const ComponentTable = ({
         direction: compDirection
       }
     })
-    setCompSearchInput('')
-    setComPageIndex(1)
   }
 
   const [activeRow, setActiveRow] = useState(null)
@@ -417,7 +415,8 @@ const ComponentTable = ({
             my={2}
           >
             {/* SPDX */}
-            {licenses.length > 0 &&
+            {licenses &&
+              licenses.length > 0 &&
               licenses.map((item, index) => (
                 <Tooltip key={index} label={item} placement={'top'}>
                   <Link
@@ -454,7 +453,8 @@ const ComponentTable = ({
               </Tooltip>
             )}
             {/* CUSTOM */}
-            {licensesCustom.length > 0 &&
+            {licensesCustom &&
+              licensesCustom.length > 0 &&
               licensesCustom.map((item, index) => (
                 <Tooltip key={index} label={item} placement={'top'}>
                   <Link
@@ -770,7 +770,25 @@ const ComponentTable = ({
         variables: {
           projectId: productId,
           sbomId: sbomId,
-          search: compSearchInput,
+          search: compSearchInput !== '' ? compSearchInput : undefined,
+          ecosystem:
+            compEcosystem.includes('all') || compEcosystem.length === 0
+              ? undefined
+              : compEcosystem,
+          kind:
+            compType.includes('all') || compType.length === 0
+              ? undefined
+              : compType,
+          licenses:
+            compLicense.includes('all') || compLicense.length === 0
+              ? undefined
+              : compLicense,
+          supplierName:
+            compSupplier.includes('all') || compSupplier.length === 0
+              ? undefined
+              : compSupplier,
+          primary: compScope === 'primary' ? true : undefined,
+          internal: compScope === 'internal' ? true : undefined,
           first: totalRows,
           field: compField,
           direction: compDirection
@@ -788,6 +806,24 @@ const ComponentTable = ({
         projectId: productId,
         sbomId: sbomId,
         search: undefined,
+        ecosystem:
+          compEcosystem.includes('all') || compEcosystem.length === 0
+            ? undefined
+            : compEcosystem,
+        kind:
+          compType.includes('all') || compType.length === 0
+            ? undefined
+            : compType,
+        licenses:
+          compLicense.includes('all') || compLicense.length === 0
+            ? undefined
+            : compLicense,
+        supplierName:
+          compSupplier.includes('all') || compSupplier.length === 0
+            ? undefined
+            : compSupplier,
+        primary: compScope === 'primary' ? true : undefined,
+        internal: compScope === 'internal' ? true : undefined,
         first: totalRows,
         field: compField,
         direction: compDirection
@@ -803,9 +839,6 @@ const ComponentTable = ({
         projectId: productId,
         sbomId: sbomId,
         first: Number(e.target.value),
-        last: undefined,
-        after: undefined,
-        before: undefined,
         field: customerView ? signedCompField : compField,
         direction: customerView ? signedCompDirection : compDirection
       }
@@ -872,9 +905,9 @@ const ComponentTable = ({
         projectId: productId,
         sbomId: sbomId,
         first: after ? totalRows : undefined,
-        after: after,
+        after: after ? after : undefined,
         last: before ? totalRows : undefined,
-        before: before,
+        before: before ? before : undefined,
         search: compSearchInput !== '' ? compSearchInput : undefined,
         ecosystem:
           compEcosystem.includes('all') || compEcosystem.length === 0
