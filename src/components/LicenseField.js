@@ -135,10 +135,10 @@ const LicenseField = ({ data }) => {
         <RadioGroup size='sm' value={licenseType} onChange={handleTypeChange}>
           <Stack direction='row' my={4} spacing={3} alignItems={'center'}>
             <Radio value='license_spdx'>
-              SPDX ID
+              License ID
               <Link
                 href={
-                  'https://spdx.github.io/spdx-spec/v2.3/SPDX-license-expressions'
+                  'https://spdx.github.io/spdx-spec/v2.3/SPDX-license-list/'
                 }
                 target={'_blank'}
                 ml={1}
@@ -152,7 +152,7 @@ const LicenseField = ({ data }) => {
               </Link>
             </Radio>
             <Radio value='license_exp'>
-              SPDX Expression
+              License Expression
               <Link
                 href={
                   'https://spdx.github.io/spdx-spec/v2.3/SPDX-license-expressions'
@@ -170,20 +170,6 @@ const LicenseField = ({ data }) => {
             </Radio>
             <Radio value='license_custom'>
               Custom
-              <Link
-                href={
-                  'https://spdx.github.io/spdx-spec/v2.3/SPDX-license-expressions'
-                }
-                target={'_blank'}
-                ml={1}
-              >
-                <Icon
-                  as={MdArrowOutward}
-                  h={'16px'}
-                  w={'16px'}
-                  color={'blue.500'}
-                />
-              </Link>
             </Radio>
           </Stack>
         </RadioGroup>
@@ -210,7 +196,7 @@ const LicenseField = ({ data }) => {
             options={licenseList}
             onChange={onLicenseChange}
             onInputChange={handleInputChange}
-            placeholder={''}
+            placeholder={'Enter SPDX License ID'}
             className='react-select'
           />
         )}
@@ -260,7 +246,7 @@ const LicenseField = ({ data }) => {
             value={customList}
             onChange={onCustomChange}
             onCreateOption={handleCreate}
-            placeholder={'Enter License Name'}
+            placeholder={'Enter Custom License Name'}
             className='react-select'
           />
         )}

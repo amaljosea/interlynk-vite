@@ -448,10 +448,6 @@ const ComponentTable = ({
             {/* EXPRESSION */}
             {licensesExp && licensesExp !== '' && (
               <Tooltip label={licensesExp} placement={'top'}>
-                <Link
-                  href={`https://spdx.org/licenses/${licensesExp}`}
-                  target='_blank'
-                >
                   <Tag
                     size={'md'}
                     variant='subtle'
@@ -460,7 +456,6 @@ const ComponentTable = ({
                   >
                     <TagLabel>{licensesExp}</TagLabel>
                   </Tag>
-                </Link>
               </Tooltip>
             )}
             {/* CUSTOM */}
@@ -468,10 +463,6 @@ const ComponentTable = ({
               licensesCustom.length > 0 &&
               licensesCustom.map((item, index) => (
                 <Tooltip key={index} label={item} placement={'top'}>
-                  <Link
-                    href={`https://spdx.org/licenses/${item}`}
-                    target='_blank'
-                  >
                     <Tag
                       size={'md'}
                       variant='subtle'
@@ -480,7 +471,6 @@ const ComponentTable = ({
                     >
                       <TagLabel>{item}</TagLabel>
                     </Tag>
-                  </Link>
                 </Tooltip>
               ))}
           </Flex>
