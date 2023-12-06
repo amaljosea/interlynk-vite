@@ -419,6 +419,12 @@ const VulnTable = ({
 
   // CLEAR SERACH
   const handleClear = async () => {
+    if (customerView) {
+      setSignedVulnSearchInput('')
+    } else {
+      setVulnSearchInput('')
+    }
+    setPageIndex(1)
     await refetch({
       variables: {
         projectId: productId,
@@ -430,11 +436,6 @@ const VulnTable = ({
         signedParams: customerView ? signedParams : undefined
       }
     })
-    if (customerView) {
-      setSignedVulnSearchInput('')
-    } else {
-      setVulnSearchInput('')
-    }
     setPageIndex(1)
   }
 
@@ -739,11 +740,26 @@ const VulnTable = ({
       setVulnField(column.id)
       setVulnDirection(sortDirection === 'asc' ? 'ASC' : 'DESC')
     }
+    const range = {
+      min: parseFloat(vulnEpss[0]) / 10000,
+      max: parseFloat(vulnEpss[1]) / 10000
+    }
     refetch({
       variables: {
         projectId: productId,
         sbomId: sbomId,
         signedParams: customerView ? signedParams : undefined,
+        search: vulnSearchInput !== '' ? vulnSearchInput : undefined,
+        severity: vulnSeverity.length > 0 ? vulnSeverity : undefined,
+        componentName: vulnComponent.length > 0 ? vulnComponent : undefined,
+        status: vulnStatus.length > 0 ? vulnStatus : undefined,
+        kev:
+          vulnKev === 'all' || vulnKev === ''
+            ? undefined
+            : vulnKev === 'yes'
+            ? true
+            : false,
+        epss: vulnEpss !== '' && vulnEpss !== 'all' ? range : undefined,
         first: totalRows,
         field: column.id,
         direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
@@ -788,7 +804,6 @@ const VulnTable = ({
     setVulnSearchInput('')
     setPageIndex(1)
   }
-
 
   return (
     <>
