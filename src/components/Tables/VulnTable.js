@@ -152,6 +152,8 @@ const VulnTable = ({
     }
   }
 
+  
+
   // COLUMNS
   const columns = [
     // CVE ID
@@ -399,6 +401,12 @@ const VulnTable = ({
     }
   ]
 
+  const epssRange = (vulnEpss !== '' || vulnEpss !== '0-0') && vulnEpss.split('-')
+  const range = {
+    min: parseFloat(epssRange[0]) / 10000,
+    max: parseFloat(epssRange[1]) / 10000
+  }
+
   // SEARCH COMPONENT
   const handleSearch = async (event) => {
     if (event.key === 'Enter') {
@@ -406,8 +414,22 @@ const VulnTable = ({
         variables: {
           projectId: productId,
           sbomId: sbomId,
-          search: customerView ? signedVulnSearchInput : vulnSearchInput,
           first: totalRows,
+          search: customerView
+            ? signedVulnSearchInput
+            : vulnSearchInput !== ''
+            ? vulnSearchInput
+            : undefined,
+          severity: vulnSeverity.length > 0 ? vulnSeverity : undefined,
+          componentName: vulnComponent.length > 0 ? vulnComponent : undefined,
+          status: vulnStatus.length > 0 ? vulnStatus : undefined,
+          kev:
+            vulnKev === 'all' || vulnKev === ''
+              ? undefined
+              : vulnKev === 'yes'
+              ? true
+              : false,
+          epss: vulnEpss === 'all' || vulnEpss === '0-0' || vulnEpss === '' ? undefined : range,
           field: customerView ? signedVulnField : vulnField,
           direction: customerView ? signedVulnDirection : vulnDirection,
           signedParams: customerView ? signedParams : undefined
@@ -431,12 +453,21 @@ const VulnTable = ({
         sbomId: sbomId,
         first: totalRows,
         search: undefined,
+        severity: vulnSeverity.length > 0 ? vulnSeverity : undefined,
+        componentName: vulnComponent.length > 0 ? vulnComponent : undefined,
+        status: vulnStatus.length > 0 ? vulnStatus : undefined,
+        kev:
+          vulnKev === 'all' || vulnKev === ''
+            ? undefined
+            : vulnKev === 'yes'
+            ? true
+            : false,
+        epss: vulnEpss === 'all' || vulnEpss === '0-0' || vulnEpss === '' ? undefined : range,
         field: customerView ? signedVulnField : vulnField,
         direction: customerView ? signedVulnDirection : vulnDirection,
         signedParams: customerView ? signedParams : undefined
       }
     })
-    setPageIndex(1)
   }
 
   const subHeaderComponentMemo = useMemo(() => {
