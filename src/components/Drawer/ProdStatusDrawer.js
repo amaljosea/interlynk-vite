@@ -2,7 +2,6 @@ import { useMutation, useQuery } from '@apollo/client'
 import {
   Box,
   Button,
-  Divider,
   FormLabel,
   Select,
   SimpleGrid,
@@ -15,13 +14,16 @@ import {
   Thead,
   Tr,
   Flex,
-  Input,
   FormControl
 } from '@chakra-ui/react'
 import VulLinkRow from 'components/Tables/VulLinkRow'
 import GlobalContext from 'context/GlobalContext'
 import { updateCompVulnVex } from 'graphQL/Mutation'
-import { getVexStatuses, getVexJustifications } from 'graphQL/Queries'
+import {
+  getVexStatuses,
+  getVexJustifications,
+  GetCdxResponses
+} from 'graphQL/Queries'
 import { useEffect, useState, useContext } from 'react'
 import { useLocation } from 'react-router-dom'
 
@@ -40,22 +42,15 @@ const ProdStatusDrawer = ({
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
-  const {
-    setVulnFilters,
-    vulnField,
-    vulnDirection,
-    vulnSeverity,
-    vulnComponent,
-    vulnStatus,
-    vulnKev,
-    vulnEpss
-  } = useContext(GlobalContext)
+  const { data: res } = useQuery(GetCdxResponses)
+
+  const { setVulnFilters, vulnField, vulnDirection, vulnEpss } =
+    useContext(GlobalContext)
 
   const { id, componentVulnLogs } = data
 
   const [statusTitle, setStatusTitle] = useState('')
   const [statusName, setStatusName] = useState('')
-  const [otherVersion, setOtherVersion] = useState('')
   const [justification, setJustification] = useState('')
   const [justifyName, setJustifyName] = useState('')
   const [selectedTag, setSelectedTag] = useState('')
@@ -71,28 +66,29 @@ const ProdStatusDrawer = ({
   const { data: allVexStatus } = useQuery(getVexStatuses)
   const { data: allVexJustify } = useQuery(getVexJustifications)
 
-  const [compVexCreate] = useMutation(updateCompVulnVex, {
-    fetchPolicy: 'network-only'
-  })
-
-  // console.log('allVexStatus', allVexStatus)
-
   const handleRefetch = () => {
     refetch({
       variables: {
         projectId: productId,
         sbomId: sbomId,
-        severity: vulnSeverity.length > 0 ? vulnSeverity : undefined,
-        componentName: vulnComponent.length > 0 ? vulnComponent : undefined,
-        status: vulnStatus.length > 0 ? vulnStatus : undefined,
-        kev: vulnKev === 'yes' ? true : vulnKev === 'no' ? false : undefined,
-        epss: vulnEpss !== '' ? range : undefined,
         first: totalRows,
         field: vulnField,
         direction: vulnDirection
       }
     })
     setPageIndex(1)
+  }
+
+  const [compVexCreate] = useMutation(updateCompVulnVex, {
+    fetchPolicy: 'network-only',
+    onCompleted: () => handleRefetch()
+  })
+
+  const epssRange =
+    (vulnEpss !== '' || vulnEpss !== '0-0') && vulnEpss.split('-')
+  const range = {
+    min: parseFloat(epssRange[0]) / 10000,
+    max: parseFloat(epssRange[1]) / 10000
   }
 
   const handleStatusChange = (e) => {
@@ -120,26 +116,19 @@ const ProdStatusDrawer = ({
   }
 
   const handleSave = async () => {
-    try {
-      await compVexCreate({
-        variables: {
-          compVulnId: id,
-          notes: notes,
-          sbomId: sbomId,
-          vexStatusId: statusTitle,
-          vexJustificationId:
-            statusName === 'Not Affected' ? justification : undefined,
-          impact: impactData === '' ? undefined : impactData
-        }
-      })
-        .then((res) => res.data && handleRefetch())
-        .finally(() => {
-          onFilterRefetch()
-          setCurrentRow(null)
-        })
-    } catch (error) {
-      console.log('Mutation error', error)
-    }
+    await compVexCreate({
+      variables: {
+        compVulnId: id,
+        vexStatusId: statusTitle,
+        details: details !== '' ? details : undefined,
+        note: notes !== '' ? notes : undefined,
+        vexJustificationId: justification !== '' ? justification : undefined,
+        cdxResponseId: response !== '' ? response : undefined,
+        impact: impactData === '' ? undefined : impactData,
+        action: actionStatement !== '' ? actionStatement : undefined,
+        fixedIn: selectedTag !== '' ? selectedTag : undefined
+      }
+    })
   }
 
   useEffect(() => {
@@ -153,7 +142,7 @@ const ProdStatusDrawer = ({
         })
       setStatusResults(sortedData)
     }
-  }, [data])
+  }, [])
 
   return (
     <Stack spacing='24px'>
@@ -222,27 +211,27 @@ const ProdStatusDrawer = ({
                   <FormLabel htmlFor='response' fontSize='sm' color='gray.600'>
                     Response
                   </FormLabel>
-                  <Select
-                    id='response'
-                    name='response'
-                    value={response}
-                    onChange={(e) => setResponse(e.target.value)}
-                    fontSize='sm'
-                    color='gray.600'
-                  >
-                    <option value=''>-- Select --</option>
-                    {[
-                      'Can not fix',
-                      'Will not fix',
-                      'Update',
-                      'Rollback',
-                      'Workaround available'
-                    ].map((item, idx) => (
-                      <option key={idx} value={item}>
-                        {item}
-                      </option>
-                    ))}
-                  </Select>
+                  {res && (
+                    <Select
+                      id='response'
+                      name='response'
+                      value={response}
+                      onChange={(e) => {
+                        console.log(e.target.value)
+                        setResponse(e.target.value)
+                      }}
+                      fontSize='sm'
+                      color='gray.600'
+                    >
+                      <option value=''>-- Select --</option>
+                      {res.cdxResponses.length > 0 &&
+                        res.cdxResponses.map((item, idx) => (
+                          <option key={idx} value={item.id}>
+                            {item.name}
+                          </option>
+                        ))}
+                    </Select>
+                  )}
                 </FormControl>
               )}
               {/* FIXED VERSION */}

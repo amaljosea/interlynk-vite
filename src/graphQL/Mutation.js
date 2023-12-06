@@ -1113,34 +1113,49 @@ export const updateApiToken = gql`
 
 // UPDATE PRODUCT COMPONENT VULN VEX
 export const updateCompVulnVex = gql`
-  mutation UpdateCompVulnVex(
+  mutation updateCompVulnVex(
     $compVulnId: Uuid!
-    $notes: String
     $vexStatusId: Uuid!
     $vexJustificationId: Uuid
-    $sbomId: Uuid
+    $cdxResponseId: Uuid
+    $note: String
     $impact: String
+    $detail: String
+    $action: String
+    $fixedIn: String
   ) {
     componentVexUpdate(
       input: {
         componentVulnId: $compVulnId
-        sbomId: $sbomId
-        notes: $notes
-        vexJustificationId: $vexJustificationId
         vexStatusId: $vexStatusId
+        vexJustificationId: $vexJustificationId
+        cdxResponseId: $cdxResponseId
+        note: $note
         impact: $impact
+        detail: $detail
+        action: $action
+        fixedIn: $fixedIn
       }
     ) {
       componentVuln {
-        vulnId
-        componentId
-        componentVulnLogs {
-          changedBy
-          status
-          justification
-          updatedAt
-          impact
+        id
+        vexJustification {
+          id
+          name
         }
+        vexStatus {
+          id
+          name
+        }
+        cdxResponse {
+          id
+          name
+        }
+        note
+        impact
+        detail
+        actionStmt
+        fixedIn
       }
       errors
     }

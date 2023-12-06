@@ -152,8 +152,6 @@ const VulnTable = ({
     }
   }
 
-  
-
   // COLUMNS
   const columns = [
     // CVE ID
@@ -401,7 +399,8 @@ const VulnTable = ({
     }
   ]
 
-  const epssRange = (vulnEpss !== '' || vulnEpss !== '0-0') && vulnEpss.split('-')
+  const epssRange =
+    (vulnEpss !== '' || vulnEpss !== '0-0') && vulnEpss.split('-')
   const range = {
     min: parseFloat(epssRange[0]) / 10000,
     max: parseFloat(epssRange[1]) / 10000
@@ -429,7 +428,10 @@ const VulnTable = ({
               : vulnKev === 'yes'
               ? true
               : false,
-          epss: vulnEpss === 'all' || vulnEpss === '0-0' || vulnEpss === '' ? undefined : range,
+          epss:
+            vulnEpss === 'all' || vulnEpss === '0-0' || vulnEpss === ''
+              ? undefined
+              : range,
           field: customerView ? signedVulnField : vulnField,
           direction: customerView ? signedVulnDirection : vulnDirection,
           signedParams: customerView ? signedParams : undefined
@@ -462,7 +464,10 @@ const VulnTable = ({
             : vulnKev === 'yes'
             ? true
             : false,
-        epss: vulnEpss === 'all' || vulnEpss === '0-0' || vulnEpss === '' ? undefined : range,
+        epss:
+          vulnEpss === 'all' || vulnEpss === '0-0' || vulnEpss === ''
+            ? undefined
+            : range,
         field: customerView ? signedVulnField : vulnField,
         direction: customerView ? signedVulnDirection : vulnDirection,
         signedParams: customerView ? signedParams : undefined
@@ -847,7 +852,7 @@ const VulnTable = ({
           onSort={handleSort}
           defaultSortAsc={false}
           defaultSortFieldId={customerView ? signedVulnField : vulnField}
-          progressPending={data && data.nodes ? false : true}
+          progressPending={data ? false : true}
           progressComponent={<CustomLoader />}
           subHeader
           subHeaderComponent={subHeaderComponentMemo}

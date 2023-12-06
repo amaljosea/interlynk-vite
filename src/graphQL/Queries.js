@@ -1793,3 +1793,13 @@ export const CpeAutoComplete = gql`
     }
   }
 `
+
+// GET CDX RESPONSE
+export const GetCdxResponses = gql`
+  query GetCdxResponses {
+    cdxResponses {
+      id
+      name
+    }
+  }
+`
