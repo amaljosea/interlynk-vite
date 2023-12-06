@@ -267,6 +267,7 @@ const SbomLicenseField = ({ data }) => {
               DropdownIndicator: () => null,
               IndicatorSeparator: () => null
             }}
+            formatCreateLabel={(value) => `${value}`}
             value={sbomCustomList}
             onChange={onCustomChange}
             onCreateOption={handleCreate}
