@@ -84,7 +84,7 @@ const LicenseField = ({ data, expLicense, setExpLicense }) => {
             idType: 'spdx',
             ecosystem: 'spdx',
             search: {
-              name: value
+              shortId: value
             }
           }
         }
