@@ -26,7 +26,6 @@ const UpdateRule = ({ isOpen, onClose, data, refetch, productId }) => {
 
   useEffect(() => {
     if (data) {
-      // console.log('data', data)
       setCompName(
         data.applicability === 'component' ? data.lookup.comp_name : ''
       )
@@ -35,7 +34,7 @@ const UpdateRule = ({ isOpen, onClose, data, refetch, productId }) => {
       )
       setCondition(data.condition)
     }
-  }, [data])
+  }, [])
 
   const handleUpdate = async () => {
     await updateAutoCheck({
@@ -43,7 +42,7 @@ const UpdateRule = ({ isOpen, onClose, data, refetch, productId }) => {
         id: data.id,
         projectId: productId,
         condition: condition,
-        enabled: true,
+        enabled: data.enabled,
         compName: compName,
         compVersion: compVersion
       }
