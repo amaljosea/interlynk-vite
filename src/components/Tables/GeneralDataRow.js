@@ -175,6 +175,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
       setSbomCustomList(filterData)
       setSbomCustomLicense(data?.licensesCustom)
     } else {
+      setSbomLicenseType('license_spdx')
       setSbomSpdxList([])
       setSbomSpdxLicense([])
       setSbomLicenseExp('')
