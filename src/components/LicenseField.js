@@ -243,6 +243,7 @@ const LicenseField = ({ data }) => {
               DropdownIndicator: () => null,
               IndicatorSeparator: () => null
             }}
+            formatCreateLabel={(value) => `${value}`}
             value={customList}
             onChange={onCustomChange}
             onCreateOption={handleCreate}

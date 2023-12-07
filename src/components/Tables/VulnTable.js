@@ -858,11 +858,11 @@ const VulnTable = ({
           subHeaderComponent={subHeaderComponentMemo}
           responsive
           expandableRows
-          expandableRowExpanded={(row) => row === currentRow}
+          // expandableRowExpanded={(row) => row === currentRow}
           expandOnRowClicked
           persistTableHead
           expandableRowsComponent={ExpandedComponent}
-          onRowExpandToggled={(bool, row) => setCurrentRow(row)}
+          // onRowExpandToggled={(bool, row) => setCurrentRow(row)}
         />
       </Flex>
 

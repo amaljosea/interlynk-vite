@@ -202,6 +202,13 @@ const ComponentTable = ({
       }))
       setCustomList(filterData)
       setCustomLicense(row.licensesCustom)
+    } else {
+      setLicenseType('license_spdx')
+      setSpdxList([])
+      setSpdxLicense([])
+      setLicenseExp('')
+      setCustomList([])
+      setCustomLicense([])
     }
     onOpen()
   }
@@ -448,14 +455,14 @@ const ComponentTable = ({
             {/* EXPRESSION */}
             {licensesExp && licensesExp !== '' && (
               <Tooltip label={licensesExp} placement={'top'}>
-                  <Tag
-                    size={'md'}
-                    variant='subtle'
-                    colorScheme='green'
-                    width={'fit-content'}
-                  >
-                    <TagLabel>{licensesExp}</TagLabel>
-                  </Tag>
+                <Tag
+                  size={'md'}
+                  variant='subtle'
+                  colorScheme='green'
+                  width={'fit-content'}
+                >
+                  <TagLabel>{licensesExp}</TagLabel>
+                </Tag>
               </Tooltip>
             )}
             {/* CUSTOM */}
@@ -463,14 +470,14 @@ const ComponentTable = ({
               licensesCustom.length > 0 &&
               licensesCustom.map((item, index) => (
                 <Tooltip key={index} label={item} placement={'top'}>
-                    <Tag
-                      size={'md'}
-                      variant='subtle'
-                      colorScheme='green'
-                      width={'fit-content'}
-                    >
-                      <TagLabel>{item}</TagLabel>
-                    </Tag>
+                  <Tag
+                    size={'md'}
+                    variant='subtle'
+                    colorScheme='green'
+                    width={'fit-content'}
+                  >
+                    <TagLabel>{item}</TagLabel>
+                  </Tag>
                 </Tooltip>
               ))}
           </Flex>

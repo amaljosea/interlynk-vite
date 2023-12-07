@@ -58,6 +58,7 @@ const CheckModal = ({
   const {
     licenseType,
     spdxLicense,
+    licenseExp,
     setCheckFilters,
     setActiveProdTab,
     customLicense,
@@ -67,7 +68,6 @@ const CheckModal = ({
 
   const now = new Date()
   const currentTime = now.toISOString().slice(0, 16)
-  const [expLicense, setExpLicense] = useState('')
   const [timestamp, setTimestamp] = useState(currentTime)
   const [comp, setComp] = useState('')
   const [compType, setCompType] = useState('')
@@ -156,7 +156,7 @@ const CheckModal = ({
           sbomId: sbomId,
           licenses: {
             licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
-            licensesExp: licenseType === 'license_exp' ? expLicense : undefined,
+            licensesExp: licenseType === 'license_exp' ? licenseExp : undefined,
             licensesCustom:
               licenseType === 'license_custom' ? customLicense : undefined
           }
@@ -263,7 +263,9 @@ const CheckModal = ({
                 licenseType === 'license_spdx'
                   ? spdxLicense
                   : licenseType === 'license_exp'
-                  ? expLicense
+                  ? licenseExp
+                  : licenseType === 'license_custom'
+                  ? customLicense
                   : ''
             },
             null,
@@ -273,6 +275,11 @@ const CheckModal = ({
       }).then((res) => res.data && onLicenseUpdate())
     }
   }
+
+  const isInvalidLicense =
+    (licenseType === 'license_spdx' && spdxLicense.length === 0) ||
+    (licenseType === 'license_exp' && licenseExp === '') ||
+    (licenseType === 'license_custom' && customLicense.length === 0)
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -383,11 +390,7 @@ const CheckModal = ({
             {(shortDesc === 'Component has license/s specified' ||
               shortDesc === 'Componet has deprecated license/s' ||
               shortDesc === 'Component has restrictive licenses specified') && (
-              <LicenseField
-                data={activeCheck.component}
-                expLicense={expLicense}
-                setExpLicense={setExpLicense}
-              />
+              <LicenseField data={activeCheck.component} />
             )}
           </ModalBody>
 
@@ -397,14 +400,24 @@ const CheckModal = ({
               justifyContent={'space-between'}
               alignItems={'center'}
             >
-              <Button fontSize={'sm'} colorScheme='blue' onClick={onSaveRule}>
+              <Button
+                fontSize={'sm'}
+                colorScheme='blue'
+                onClick={onSaveRule}
+                disabled={isInvalidLicense}
+              >
                 Save Rule
               </Button>
               <Stack direction={'row'} spacing={2} alignItems={'center'}>
                 <Button fontSize={'sm'} onClick={onClose}>
                   Close
                 </Button>
-                <Button fontSize={'sm'} colorScheme='blue' type='submit'>
+                <Button
+                  fontSize={'sm'}
+                  colorScheme='blue'
+                  type='submit'
+                  disabled={isInvalidLicense}
+                >
                   Save
                 </Button>
               </Stack>

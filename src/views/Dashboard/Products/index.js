@@ -29,6 +29,7 @@ function Index() {
     setMaxVal,
     totalRows,
     setCheckSearchInput,
+    setCheckRules,
     setCheckCategory,
     setCheckSeverity,
     setCheckStatus,
@@ -70,6 +71,7 @@ function Index() {
       setMinVal(0)
       setMaxVal(10000)
       setCheckSearchInput('')
+      setCheckRules([])
       setCheckCategory([])
       setCheckSeverity([])
       setCheckStatus([])

@@ -104,7 +104,7 @@ const ProdStatusDrawer = ({
   }
 
   const handleResponseChange = (e) => {
-    const {value} = e.target
+    const { value } = e.target
     const title = e.target.options[e.target.selectedIndex].text
     setResponse(value)
     setResponseTitle(title)
@@ -373,9 +373,8 @@ const ProdStatusDrawer = ({
                 (statusName === 'Not Affected' && justification === '') ||
                 (justifyName === 'Other (impact statment required)' &&
                   impactData === '') ||
-                (statusName === 'Affected' &&
-                  impactData === '' &&
-                  responseTitle === '') ||
+                (statusName === 'Affected' && responseTitle === '' && actionStatement === '') ||
+                (responseTitle !== '' && actionStatement === '') ||
                 (statusName === 'False Positive' && impactData === '') ||
                 (responseTitle === 'update' && selectedTag === '')
               }

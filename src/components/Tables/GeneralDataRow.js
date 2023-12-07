@@ -174,6 +174,12 @@ const GeneralDataRow = ({ status, data, refetch }) => {
       }))
       setSbomCustomList(filterData)
       setSbomCustomLicense(data?.licensesCustom)
+    } else {
+      setSbomSpdxList([])
+      setSbomSpdxLicense([])
+      setSbomLicenseExp('')
+      setSbomCustomList([])
+      setSbomCustomLicense([])
     }
     onSBMOpen()
   }
@@ -469,7 +475,8 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                 disabled={
                   (sbomLicenseType === 'license_spdx' &&
                     sbomSpdxLicense.length === 0) ||
-                  (sbomLicenseType === 'license_exp' && sbomLicenseExp === '') ||
+                  (sbomLicenseType === 'license_exp' &&
+                    sbomLicenseExp === '') ||
                   (sbomLicenseType === 'license_custom' &&
                     sbomCustomLicense.length === 0)
                 }

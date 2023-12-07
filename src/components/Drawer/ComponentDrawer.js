@@ -356,21 +356,25 @@ function ComponentDrawer(props) {
     const { value } = e.target
     const val = value.replace(/\s/g, '')
     setCpeString(val)
-    getCpe({
-      variables: {
-        input: {
-          idType: 'cpe',
-          ecosystem: 'cpe',
-          search: {
-            idUri: val
+    if (val === '') {
+      setCpeData([])
+    } else {
+      getCpe({
+        variables: {
+          input: {
+            idType: 'cpe',
+            ecosystem: 'cpe',
+            search: {
+              idUri: val
+            }
           }
         }
-      }
-    }).then((res) => {
-      if (res.data) {
-        setCpeData(res.data.idAutoComplete.result)
-      }
-    })
+      }).then((res) => {
+        if (res.data) {
+          setCpeData(res.data.idAutoComplete.result)
+        }
+      })
+    }
   }
 
   return (
@@ -479,10 +483,8 @@ function ComponentDrawer(props) {
                   <option value='unspecified'>Unspecified</option>
                 </Select>
               </FormControl>
-
               {/* LICENSES */}
               <LicenseField data={data} />
-
               {/* PURL INPUI */}
               <FormControl isReadOnly={customerView}>
                 <FormLabel htmlFor='purl' fontSize={'sm'}>
@@ -533,7 +535,6 @@ function ComponentDrawer(props) {
                   </IconButton>
                 </Stack>
               </FormControl>
-
               {/* CPE INPUT */}
               <FormControl>
                 <Stack direction={'row'} width={'100%'} spacing={2}>
@@ -582,7 +583,6 @@ function ComponentDrawer(props) {
                   ))}
                 </Flex>
               </FormControl>
-
               {/* PRIMARY COMPONENT */}
               <FormControl isReadOnly={customerView}>
                 <Flex alignItems={'center'} gap={2}>
@@ -600,7 +600,6 @@ function ComponentDrawer(props) {
                   </Checkbox>
                 </Flex>
               </FormControl>
-
               {/* INTERNAL COMPONENT */}
               <FormControl isReadOnly={customerView}>
                 <Checkbox
