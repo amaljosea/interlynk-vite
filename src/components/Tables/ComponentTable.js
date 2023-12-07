@@ -202,6 +202,12 @@ const ComponentTable = ({
       }))
       setCustomList(filterData)
       setCustomLicense(row.licensesCustom)
+    } else {
+      setSpdxList([])
+      setSpdxLicense([])
+      setLicenseExp('')
+      setCustomList([])
+      setCustomLicense([])
     }
     onOpen()
   }
