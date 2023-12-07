@@ -108,12 +108,8 @@ const SbomLicenseField = ({ data }) => {
   const handleExpChange = (e) => {
     const { value } = e.target
     setSbomLicenseExp(value)
-  }
-
-  const handleKeyDown = () => {
-    if (sbomLicenseExp !== '') {
-      const trimmedInput =
-        typeof sbomLicenseExp === 'string' ? sbomLicenseExp.trim() : ''
+    if (value !== '') {
+      const trimmedInput = typeof value === 'string' ? value.trim() : ''
       const isLicenseValid = spdxValidate(trimmedInput)
       setIsValid(isLicenseValid)
     } else {
@@ -178,9 +174,7 @@ const SbomLicenseField = ({ data }) => {
                 />
               </Link>
             </Radio>
-            <Radio value='license_custom'>
-              Custom
-            </Radio>
+            <Radio value='license_custom'>Custom</Radio>
           </Stack>
         </RadioGroup>
         {/* SPDX LICENSE */}
@@ -218,7 +212,6 @@ const SbomLicenseField = ({ data }) => {
               value={sbomLicenseExp}
               fontSize={'sm'}
               onChange={handleExpChange}
-              onKeyDown={handleKeyDown}
               placeholder='Enter valid SPDX Expression'
             />
             {!isValid && (
