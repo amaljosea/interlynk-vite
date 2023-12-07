@@ -75,16 +75,32 @@ function SBOM() {
   const productName = localStorage.getItem(`product`)
   const productVersion = localStorage.getItem(`productVersion`)
   const subProduct = localStorage.getItem('subProduct')
-  const subProductVersion = localStorage.getItem('subProductVersion')
-
   const {
     prodField,
     prodDirection,
-    setVulnSeverity,
     setActiveProdTab,
-    totalRows,
     vulnField,
-    vulnDirection
+    vulnDirection,
+    setCompSearchInput,
+    setCompEcosystem,
+    setCompType,
+    setCompLicense,
+    setCompSupplier,
+    setCompScope,
+    setVulnSeverity,
+    setVulnComponent,
+    setVulnStatus,
+    setVulnKev,
+    setVulnEpss,
+    setMinVal,
+    setMaxVal,
+    totalRows,
+    setCheckSearchInput,
+    setCheckRules,
+    setCheckCategory,
+    setCheckSeverity,
+    setCheckStatus,
+    setCheckDirection
   } = useContext(GlobalContext)
 
   const customerView = location.pathname.startsWith('/customer')
@@ -261,7 +277,25 @@ function SBOM() {
 
   const handleSBOMChange = (e) => {
     setActiveProdTab(0)
+    setCompSearchInput('')
+    setCompEcosystem([])
+    setCompType([])
+    setCompLicense([])
+    setCompSupplier([])
+    setCompScope('')
     setVulnSeverity([])
+    setVulnComponent([])
+    setVulnStatus([])
+    setVulnKev('')
+    setVulnEpss('')
+    setMinVal(0)
+    setMaxVal(10000)
+    setCheckSearchInput('')
+    setCheckRules([])
+    setCheckCategory([])
+    setCheckSeverity([])
+    setCheckStatus([])
+    setCheckDirection('DESC')
     setSelectedVersion(e.target.value)
     refetchSBOM(e.target.value)
   }
