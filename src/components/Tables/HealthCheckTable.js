@@ -21,14 +21,12 @@ import { CreateAutomation } from 'graphQL/Mutation'
 import { UpdateComponent } from 'graphQL/Mutation'
 import { recheckHealth, checkResultUpdate } from 'graphQL/Mutation'
 import { CpeAutoComplete } from 'graphQL/Queries'
-import { PackageURL } from 'packageurl-js'
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useContext, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { BiSolidWrench } from 'react-icons/bi'
 import { FaCheckDouble } from 'react-icons/fa'
 import { GoSkip } from 'react-icons/go'
-import { getFullDateAndTime } from 'utils'
-import { timeSince, sevColor } from 'utils'
+import { timeSince, sevColor,getFullDateAndTime } from 'utils'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 import CheckFilterMenu from 'views/Sbom/components/CheckFilterMenu'
@@ -75,7 +73,6 @@ const HealthCheckTable = ({
     setLicenseType,
     setSpdxList,
     setSpdxLicense,
-    setExpList,
     setLicenseExp,
     checkFilters,
     checkField,
@@ -95,7 +92,9 @@ const HealthCheckTable = ({
     setCpeString,
     setCheckAfter,
     setCheckBefore,
-    setPurlString
+    setPurlString,
+    setCustomList,
+    setCustomLicense
   } = useContext(GlobalContext)
 
   const [purlValue, setPurlValue] = useState('')
@@ -359,8 +358,9 @@ const HealthCheckTable = ({
     setLicenseType('license_spdx')
     setSpdxList([])
     setSpdxLicense([])
-    setExpList([])
-    setLicenseExp([])
+    setLicenseExp('')
+    setCustomList([])
+    setCustomLicense([])
     onLicenseOpen()
   }
 
