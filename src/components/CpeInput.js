@@ -190,7 +190,7 @@ const CpeInput = ({
           )}
         </InputGroup>
       </FormControl>
-      {cpeList && cpeList.length > 0 && (
+      {inputValue !== '' && cpeList && cpeList.length > 0 && (
         <Box
           pos={'absolute'}
           width={'100%'}
@@ -211,7 +211,8 @@ const CpeInput = ({
                 ref={(el) => (listItemsRef.current[index] = el)}
                 tabIndex='0'
                 bg={index === focusedIndex ? '#E2E8F0' : 'transparent'}
-                _hover={{ bg: '#E2E8F0' }}
+                _hover={{ bg: focusedIndex === null ? '#E2E8F0' : 'transparent' }}
+                onMouseEnter={() => setFocusedIndex(null)}
                 outline='none'
                 p={2}
                 fontSize={'sm'}
