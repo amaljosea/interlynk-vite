@@ -5,10 +5,8 @@ import {
   Tag,
   Text,
   Box,
-  Select,
   TagLabel,
   Tooltip,
-  Badge
 } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
 import GlobalContext from 'context/GlobalContext'
@@ -137,7 +135,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
           <Flex flexWrap={'wrap'} gap={2} my={2} whiteSpace={'break-spaces'}>
             <Tooltip
               placement='top'
-              label={license.length === 0 ? '' : orig}
+              label={license ? orig : ''}
               textTransform={'capitalize'}
             >
               <Box textOverflow={'wrap'}>
@@ -145,7 +143,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
                   'False'
                 ) : orig === 't' ? (
                   'True'
-                ) : license.length > 0 ? (
+                ) : license?.length > 0 ? (
                   license.map((item, index) => (
                     <Flex
                       key={index}
@@ -165,7 +163,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
                       </Tag>
                     </Flex>
                   ))
-                ) : license.length === 0 ? (
+                ) : license?.length === 0 ? (
                   ''
                 ) : urls && urls.length > 0 ? (
                   urls.map((item, index) => (
@@ -212,7 +210,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
           <Flex flexWrap={'wrap'} gap={2} my={2}>
             <Tooltip
               placement='top'
-              label={updatedValue.length === 0 ? '' : updated}
+              label={updatedValue ? updated : ''}
               textTransform={'capitalize'}
               whiteSpace={'wrap'}
             >
@@ -221,7 +219,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
                   'False'
                 ) : updated === 't' ? (
                   'True'
-                ) : updatedValue.length > 0 ? (
+                ) : updatedValue?.length > 0 ? (
                   updatedValue.map((item, index) => (
                     <Flex
                       key={index}
@@ -241,7 +239,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
                       </Tag>
                     </Flex>
                   ))
-                ) : updatedValue.length === 0 ? (
+                ) : updatedValue?.length === 0 ? (
                   ''
                 ) : urls && urls.length > 0 ? (
                   urls.map((item, index) => (

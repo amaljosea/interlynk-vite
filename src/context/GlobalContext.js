@@ -180,7 +180,7 @@ const GlobalContext = React.createContext({
   customList: [],
   setCustomList: () => {},
   sbomSpdxList: [],
-  setSbomSpdxList:() => {},
+  setSbomSpdxList: () => {},
   sbomCustomList: [],
   setSbomCustomList: () => {},
   sbomLicenseType: 'license_spdx',
@@ -190,7 +190,11 @@ const GlobalContext = React.createContext({
   sbomLicenseExp: '',
   setSbomLicenseExp: () => {},
   sbomCustomLicense: [],
-  setSbomCustomLicense: () => {}
+  setSbomCustomLicense: () => {},
+  vulnAfter: '',
+  setVulnAfter: () => {},
+  vulnBefore: '',
+  setVulnBefore: () => {}
 })
 
 export default GlobalContext

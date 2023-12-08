@@ -86,14 +86,6 @@ function ComponentDrawer(props) {
     setSpdxList,
     setPurlString,
     customLicense,
-    setCustomLicense,
-    setCompSearchInput,
-    setCompEcosystem,
-    setCustomList,
-    setCompLicense,
-    setCompSupplier,
-    setCompScope,
-    setComPageIndex,
     purlString,
     cpeString,
     setCpeString,
@@ -137,13 +129,15 @@ function ComponentDrawer(props) {
   const [isInternal, setIsInternal] = useState(internal)
 
   useEffect(() => {
-    setCompId(id)
-    setGroupInfo(group == null ? '' : group)
-    setCompName(component)
-    setCompVersion(version)
-    setCpeList(cpes)
-    setPurlValue(purl)
-  }, [component])
+    if (component) {
+      setCompId(id)
+      setGroupInfo(group == null ? '' : group)
+      setCompName(component)
+      setCompVersion(version)
+      setCpeList(cpes)
+      setPurlString(purl)
+    }
+  }, [])
 
   useEffect(() => {
     setCompKind(type)
@@ -186,13 +180,15 @@ function ComponentDrawer(props) {
   const handlePURLInputChange = (e) => {
     const { value } = e.target
     const val = value.replace(/\s/g, '')
-    setPurlValue(val)
-    try {
-      PackageURL.fromString(val)
-      setPURLInputValid(true)
-    } catch (ex) {
-      console.error('ex', ex)
-      setPURLInputValid(false)
+    setPurlString(val)
+    if (val !== '') {
+      try {
+        PackageURL.fromString(val)
+        setPURLInputValid(true)
+      } catch (ex) {
+        console.error('ex', ex)
+        setPURLInputValid(false)
+      }
     }
   }
 
@@ -208,42 +204,39 @@ function ComponentDrawer(props) {
   }
 
   const handleCreateCom = async () => {
-    try {
-      await createComponent({
-        variables: {
-          sbomId: sbomId,
-          kind: compKind,
-          name: compName,
-          version: compVersion,
-          licenses: {
-            licenses: spdxLicense.length > 0 ? spdxLicense : undefined,
-            licensesExp: expLicense === '' ? undefined : expLicense,
-            licensesCustom: undefined
-          },
-          cpes: cpeList,
-          purl: purlValue,
-          primary: isPrimary,
-          internal: isInternal
+    await createComponent({
+      variables: {
+        sbomId: sbomId,
+        kind: compKind,
+        name: compName,
+        version: compVersion,
+        licenses: {
+          licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
+          licensesExp: licenseType === 'license_exp' ? licenseExp : undefined,
+          licensesCustom:
+            licenseType === 'license_custom' ? customLicense : undefined
+        },
+        cpes: cpeList,
+        purl: purlString,
+        primary: isPrimary,
+        internal: isInternal
+      }
+    })
+      .then((res) => {
+        if (res.data) {
+          onFilterRefetch()
+          onClose()
         }
       })
-        .then((res) => {
-          if (res.data) {
-            onFilterRefetch()
-          }
+      .finally(() => {
+        toast({
+          description: `Data added successfully`,
+          status: 'success',
+          position: 'top',
+          isClosable: true,
+          duration: 2000
         })
-        .finally(() => {
-          onClose()
-          toast({
-            description: `Data added successfully`,
-            status: 'success',
-            position: 'top',
-            isClosable: true,
-            duration: 2000
-          })
-        })
-    } catch (error) {
-      console.error('Mutation error:', error)
-    }
+      })
   }
 
   const handleUpdateCom = async () => {
@@ -271,40 +264,9 @@ function ComponentDrawer(props) {
           primary: isPrimary,
           internal: isInternal
         }
-      })
-        .then((res) => {
-          if (res.data) {
-            setCompSearchInput('')
-            setCompEcosystem([])
-            setCompKind([])
-            setCompLicense([])
-            setCompSupplier([])
-            setCompScope('')
-            setCpeString('')
-            setSpdxLicense([])
-            setSpdxList([])
-            setLicenseExp('')
-            setCustomList([])
-            setCustomLicense([])
-            setComPageIndex(1)
-          }
-        })
-        .finally(() => onClose())
+      }).then((res) => res.data && onClose())
     } catch (error) {
       console.error('Mutation error:', error)
-    }
-  }
-
-  const handleSave = () => {
-    try {
-      handleCreateCom()
-    } catch (error) {
-      toast({
-        description: error.message,
-        status: 'error',
-        position: 'top',
-        duration: 3000
-      })
     }
   }
 
@@ -320,7 +282,7 @@ function ComponentDrawer(props) {
     } else {
       setCpeList([...cpeList, string])
       setCpeData([])
-      setCpeValue('')
+      setCpeString('')
       setSelectedCpe(null)
     }
   }
@@ -342,7 +304,7 @@ function ComponentDrawer(props) {
         return item
       })
       setCpeList(updatedData)
-      setCpeValue('')
+      setCpeString('')
       setSelectedCpe(null)
     }
   }
@@ -490,7 +452,7 @@ function ComponentDrawer(props) {
                 <FormLabel htmlFor='purl' fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     {shortDesc === 'Component Identifier' &&
-                      purlValue === '' && (
+                      purlString === '' && (
                         <WarningTwoIcon w={4} h={4} color='red.500' />
                       )}
                     <Text>Identifiers</Text>
@@ -508,12 +470,12 @@ function ComponentDrawer(props) {
                       name='purl'
                       fontSize={'sm'}
                       placeholder='PURL'
-                      value={purlValue}
+                      value={purlString}
                       autoComplete='off'
                       onChange={handlePURLInputChange}
                     />
                     <InputRightElement align='center' zIndex={-1}>
-                      {purlValue != null && purlValue !== '' ? (
+                      {purlString != null && purlString !== '' ? (
                         isPURLInputValid ? (
                           <CheckIcon color='green' />
                         ) : (
@@ -622,7 +584,7 @@ function ComponentDrawer(props) {
               {id === undefined ? (
                 <Button
                   colorScheme='blue'
-                  onClick={handleSave}
+                  onClick={handleCreateCom}
                   isDisabled={
                     compKind === '' || compName === '' || compVersion === ''
                   }

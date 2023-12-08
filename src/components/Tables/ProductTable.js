@@ -26,7 +26,7 @@ import {
   Stack,
   Select
 } from '@chakra-ui/react'
-import { useContext, useMemo, useState } from 'react'
+import { useContext, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FaEllipsisV, FaFilter } from 'react-icons/fa'
 import { getFullDateAndTime, timeSince } from 'utils'
@@ -114,6 +114,11 @@ const ProductTable = ({ data, refetch }) => {
     onOpen: onWarningOpen,
     onClose: onWarningClose
   } = useDisclosure()
+
+  useEffect(() => {
+    setProdSearchInput('')
+  }, [])
+  
 
   // REMOVE DUPLICATE PRODUCTS
   const removeDuplicatesAndLatest = (arr) => {

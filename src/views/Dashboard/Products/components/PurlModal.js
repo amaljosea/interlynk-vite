@@ -61,40 +61,6 @@ const typeOptions = [
   { value: 'swift', label: 'swift' }
 ]
 
-// const namespaceOptions = {
-//   alpm: [
-//     { value: '', label: '-- Select --' },
-//     { value: 'arch', label: 'arch' },
-//     { value: 'arch32', label: 'arch32' },
-//     { value: 'archarm', label: 'archarm' },
-//     { value: 'manjaro', label: 'manjaro' },
-//     { value: 'msys', label: 'msys' }
-//   ],
-//   apk: [
-//     { value: '', label: '-- Select --' },
-//     { value: 'alpine', label: 'alpine' },
-//     { value: 'openwrt', label: 'openwrt' }
-//   ],
-//   bitnami: [],
-//   cocoapods: [],
-//   cargo: [],
-//   conda: [],
-//   cran: [],
-//   deb: [
-//     { value: '', label: '-- Select --' },
-//     { value: 'debian', label: 'debian' },
-//     { value: 'ubuntu', label: 'ubuntu' }
-//   ],
-//   gem: [],
-//   generic: [],
-//   hackage: [],
-//   mflow: [],
-//   nuget: [],
-//   oci: [],
-//   pub: [],
-//   pypi: []
-// }
-
 const PurlModal = ({
   data,
   isOpen,
@@ -104,7 +70,8 @@ const PurlModal = ({
   checkId,
   getCpe,
   activeCheck,
-  setIsValid
+  setIsValid,
+  setPageIndex
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -137,7 +104,9 @@ const PurlModal = ({
     'qpkg',
     'rpm',
     'swid',
-    'swift'
+    'swift',
+    'alpm',
+    'apk'
   ]
 
   const hasNamespace = validPurlTypes.includes(purlType)
@@ -166,7 +135,6 @@ const PurlModal = ({
       { value: 'debian', label: 'debian' },
       { value: 'ubuntu', label: 'ubuntu' }
     ],
-    gem: [],
     generic: [],
     hackage: [],
     mflow: [],
@@ -192,6 +160,7 @@ const PurlModal = ({
       })
         .then(() => {
           if (checkId) {
+            setPageIndex(1)
             healthRecheck({
               variables: {
                 checkId: checkId,
@@ -208,7 +177,7 @@ const PurlModal = ({
   }
 
   const isAutoComplete =
-    purlType === 'maven' || purlType === 'npm' || purlType === 'gem'
+    purlType === 'maven' || purlType === 'npm' || purlType === 'gem' || purlType === 'nuget'
 
   // ON NAMESPACE INPUT CHANGE
   const onNamespaceInputChange = (event) => {
@@ -617,7 +586,7 @@ const PurlModal = ({
                 </Select>
               </FormControl>
               {/* Namespace */}
-              {isAutoComplete ? (
+              {purlType === 'maven' || purlType === 'npm' || purlType === 'gem' ? (
                 <CpeInput
                   name='namespace'
                   inputValue={namespace}
@@ -628,7 +597,23 @@ const PurlModal = ({
                   validation={false}
                   onChange={onNamespaceInputChange}
                 />
-              ) : hasNamespace ? (
+              ) : namespaceOptions[purlType] &&
+                namespaceOptions[purlType].length > 0 ? (
+                <FormControl>
+                  <FormLabel>Namespace</FormLabel>
+                  <Select
+                    id='namespace'
+                    name='namespace'
+                    value={namespace}
+                    onChange={handleNamespaceChange}
+                    onBlur={onNamespaceBlur}
+                  >
+                    {namespaceOptions[purlType].map((item) => (
+                      <option value={item.value}>{item.label}</option>
+                    ))}
+                  </Select>
+                </FormControl>
+              ) : (
                 <FormControl>
                   <FormLabel>Namespace</FormLabel>
                   <Input
@@ -640,7 +625,7 @@ const PurlModal = ({
                     onBlur={onNamespaceBlur}
                   />
                 </FormControl>
-              ) : null}
+              )}
               {/* Name */}
               {isAutoComplete ? (
                 <CpeInput

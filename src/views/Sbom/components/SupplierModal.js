@@ -31,7 +31,8 @@ const SupplierModal = ({
   suppliers,
   checkId,
   filterRefetch,
-  activeCheck
+  activeCheck,
+  setPageIndex
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -96,6 +97,7 @@ const SupplierModal = ({
           onFilterRefetch()
         }
         if (checkId) {
+          setPageIndex(1)
           healthRecheck({
             variables: {
               sbomId: sbomId,

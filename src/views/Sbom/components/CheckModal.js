@@ -41,7 +41,8 @@ const CheckModal = ({
   shortDesc,
   checkId,
   filterRefetch,
-  componentId
+  componentId,
+  setPageIndex
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -166,8 +167,8 @@ const CheckModal = ({
           if (res.data) {
             onFilterRefetch()
           }
-
           if (checkId) {
+            setPageIndex(1)
             healthRecheck({
               variables: {
                 compId: componentId,

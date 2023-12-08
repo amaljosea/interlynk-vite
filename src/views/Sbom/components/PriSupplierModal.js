@@ -21,7 +21,7 @@ import { recheckHealth, supplierUpdate, supplierCreate } from 'graphQL/Mutation'
 import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 
-const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
+const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId,setPageIndex }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('p')
@@ -83,6 +83,7 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
     })
       .then((res) => {
         if (checkId) {
+          setPageIndex(1)
           healthRecheck({
             variables: {
               sbomId: sbomId,

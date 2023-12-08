@@ -24,7 +24,8 @@ const LicenseModal = ({
   onClose,
   checkId,
   filterRefetch,
-  refetch
+  refetch,
+  setPageIndex
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -90,6 +91,7 @@ const LicenseModal = ({
           if (res.data) {
             onFilterRefetch()
             if (checkId) {
+              setPageIndex(1)
               healthRecheck({
                 variables: {
                   checkId: checkId,
