@@ -30,7 +30,7 @@ import {
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
 import { FaCopy } from 'react-icons/fa6'
-import { useState, useMemo, useContext } from 'react'
+import { useState, useMemo, useContext, useEffect } from 'react'
 import styled from '@emotion/styled'
 import ProdStatusDrawer from 'components/Drawer/ProdStatusDrawer'
 import VulnFilterMenu from 'views/Sbom/components/VulnFilterMenu'
@@ -120,7 +120,7 @@ const VulnTable = ({
   } = useContext(GlobalContext)
 
   const textColor = useColorModeValue('gray.700', 'white')
-
+  const [hideColumn, setHideColumn] = useState(false)
   const x = window.matchMedia('(min-width: 2500px)')
   const y = window.matchMedia('(max-width: 1440px)')
 
@@ -150,6 +150,20 @@ const VulnTable = ({
     }
   }
 
+  useEffect(() => {
+    const handleResize = () => {
+      const scaleThreshold = 1.1
+      const currentScale = window.devicePixelRatio
+      setHideColumn(currentScale > scaleThreshold)
+    }
+    window.addEventListener('resize', handleResize)
+    handleResize()
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [])
+
   // COLUMNS
   const columns = [
     // CVE ID
@@ -172,7 +186,7 @@ const VulnTable = ({
               />
             </Link>
             <Tooltip label={vuln.vulnId} placement={'top'}>
-              <Text fontSize='sm' color={textColor} data-tag='allowRowEvents'>
+              <Text my={3} fontSize='sm' color={textColor} data-tag='allowRowEvents'>
                 {vuln.vulnId !== null ? `${vuln.vulnId}` : ''}
               </Text>
             </Tooltip>
@@ -335,7 +349,8 @@ const VulnTable = ({
       },
       wrap: true,
       width: y.matches ? '10%' : x.matches ? '18%' : '15%',
-      sortable: true
+      sortable: true,
+      omit: hideColumn,
     },
     // VERSION
     {
@@ -348,7 +363,8 @@ const VulnTable = ({
       ),
       wrap: true,
       width: y.matches ? '10%' : x.matches ? '18%' : '12%',
-      sortable: true
+      sortable: true,
+      omit: hideColumn,
     },
     // STATUS
     {
@@ -372,7 +388,6 @@ const VulnTable = ({
         )
       },
       sortable: true,
-      width: '150px'
     },
     // UPDATED AT
     {
@@ -780,10 +795,24 @@ const VulnTable = ({
         sbomId: sbomId,
         signedParams: customerView ? signedParams : undefined,
         search: vulnSearchInput !== '' ? vulnSearchInput : undefined,
-        severity: !vulnSeverity.includes('all') && vulnSeverity.length > 0 ? vulnSeverity : undefined,
-        componentName: !vulnComponent.includes('all') && vulnComponent.length > 0 ? vulnComponent : undefined,
-        status: !vulnStatus.includes('all') &&  vulnStatus.length > 0 ? vulnStatus : undefined,
-        kev: vulnKev === 'all' || vulnKev === '' ? undefined : vulnKev === 'yes' ? true : false,
+        severity:
+          !vulnSeverity.includes('all') && vulnSeverity.length > 0
+            ? vulnSeverity
+            : undefined,
+        componentName:
+          !vulnComponent.includes('all') && vulnComponent.length > 0
+            ? vulnComponent
+            : undefined,
+        status:
+          !vulnStatus.includes('all') && vulnStatus.length > 0
+            ? vulnStatus
+            : undefined,
+        kev:
+          vulnKev === 'all' || vulnKev === ''
+            ? undefined
+            : vulnKev === 'yes'
+            ? true
+            : false,
         epss: vulnEpss !== '' && vulnEpss !== 'all' ? range : undefined,
         first: totalRows,
         field: column.id,
