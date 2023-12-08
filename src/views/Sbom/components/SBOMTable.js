@@ -187,8 +187,6 @@ const SBOMTable = ({
         }
       }).then((res) => {
         if (res.data) {
-          // console.log('data', res.data)
-          setCompSearchInput('')
           setTotalComp(res.data.sbom.components.totalCount)
           setComPageIndex(1)
         }
