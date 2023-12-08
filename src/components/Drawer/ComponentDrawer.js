@@ -86,14 +86,6 @@ function ComponentDrawer(props) {
     setSpdxList,
     setPurlString,
     customLicense,
-    setCustomLicense,
-    setCompSearchInput,
-    setCompEcosystem,
-    setCustomList,
-    setCompLicense,
-    setCompSupplier,
-    setCompScope,
-    setComPageIndex,
     purlString,
     cpeString,
     setCpeString,
@@ -137,13 +129,15 @@ function ComponentDrawer(props) {
   const [isInternal, setIsInternal] = useState(internal)
 
   useEffect(() => {
-    setCompId(id)
-    setGroupInfo(group == null ? '' : group)
-    setCompName(component)
-    setCompVersion(version)
-    setCpeList(cpes)
-    setPurlValue(purl)
-  }, [component])
+    if (component) {
+      setCompId(id)
+      setGroupInfo(group == null ? '' : group)
+      setCompName(component)
+      setCompVersion(version)
+      setCpeList(cpes)
+      setPurlString(purl)
+    }
+  }, [])
 
   useEffect(() => {
     setCompKind(type)
@@ -186,13 +180,15 @@ function ComponentDrawer(props) {
   const handlePURLInputChange = (e) => {
     const { value } = e.target
     const val = value.replace(/\s/g, '')
-    setPurlValue(val)
-    try {
-      PackageURL.fromString(val)
-      setPURLInputValid(true)
-    } catch (ex) {
-      console.error('ex', ex)
-      setPURLInputValid(false)
+    setPurlString(val)
+    if (val !== '') {
+      try {
+        PackageURL.fromString(val)
+        setPURLInputValid(true)
+      } catch (ex) {
+        console.error('ex', ex)
+        setPURLInputValid(false)
+      }
     }
   }
 
@@ -221,7 +217,7 @@ function ComponentDrawer(props) {
             licenseType === 'license_custom' ? customLicense : undefined
         },
         cpes: cpeList,
-        purl: purlValue,
+        purl: purlString,
         primary: isPrimary,
         internal: isInternal
       }
@@ -456,7 +452,7 @@ function ComponentDrawer(props) {
                 <FormLabel htmlFor='purl' fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     {shortDesc === 'Component Identifier' &&
-                      purlValue === '' && (
+                      purlString === '' && (
                         <WarningTwoIcon w={4} h={4} color='red.500' />
                       )}
                     <Text>Identifiers</Text>
@@ -474,12 +470,12 @@ function ComponentDrawer(props) {
                       name='purl'
                       fontSize={'sm'}
                       placeholder='PURL'
-                      value={purlValue}
+                      value={purlString}
                       autoComplete='off'
                       onChange={handlePURLInputChange}
                     />
                     <InputRightElement align='center' zIndex={-1}>
-                      {purlValue != null && purlValue !== '' ? (
+                      {purlString != null && purlString !== '' ? (
                         isPURLInputValid ? (
                           <CheckIcon color='green' />
                         ) : (
