@@ -114,17 +114,15 @@ const VulnTable = ({
     signedVulnStatus,
     signedVulnKev,
     signedVulnEpss,
-    setSelectedVulns
+    setSelectedVulns,
+    setVulnAfter,
+    setVulnBefore
   } = useContext(GlobalContext)
 
   const textColor = useColorModeValue('gray.700', 'white')
 
   const x = window.matchMedia('(min-width: 2500px)')
   const y = window.matchMedia('(max-width: 1440px)')
-
-  const [vulnAfter, setVulnAfter] = useState('')
-  const [vulnBefore, setVulnBefore] = useState('')
-  const [currentRow, setCurrentRow] = useState(null)
 
   const {
     isOpen: isTableOpen,
@@ -634,13 +632,9 @@ const VulnTable = ({
               data={data}
               textColor={textColor}
               refetch={refetch}
-              totalRows={totalRows}
               filteredData={filteredData}
               filterRefetch={filterRefetch}
               setPageIndex={setPageIndex}
-              setCurrentRow={setCurrentRow}
-              after={vulnAfter}
-              before={vulnBefore}
             />
           </GridItem>
         </Grid>
@@ -786,15 +780,10 @@ const VulnTable = ({
         sbomId: sbomId,
         signedParams: customerView ? signedParams : undefined,
         search: vulnSearchInput !== '' ? vulnSearchInput : undefined,
-        severity: vulnSeverity.length > 0 ? vulnSeverity : undefined,
-        componentName: vulnComponent.length > 0 ? vulnComponent : undefined,
-        status: vulnStatus.length > 0 ? vulnStatus : undefined,
-        kev:
-          vulnKev === 'all' || vulnKev === ''
-            ? undefined
-            : vulnKev === 'yes'
-            ? true
-            : false,
+        severity: !vulnSeverity.includes('all') && vulnSeverity.length > 0 ? vulnSeverity : undefined,
+        componentName: !vulnComponent.includes('all') && vulnComponent.length > 0 ? vulnComponent : undefined,
+        status: !vulnStatus.includes('all') &&  vulnStatus.length > 0 ? vulnStatus : undefined,
+        kev: vulnKev === 'all' || vulnKev === '' ? undefined : vulnKev === 'yes' ? true : false,
         epss: vulnEpss !== '' && vulnEpss !== 'all' ? range : undefined,
         first: totalRows,
         field: column.id,
@@ -858,11 +847,9 @@ const VulnTable = ({
           subHeaderComponent={subHeaderComponentMemo}
           responsive
           expandableRows
-          // expandableRowExpanded={(row) => row === currentRow}
           expandOnRowClicked
           persistTableHead
           expandableRowsComponent={ExpandedComponent}
-          // onRowExpandToggled={(bool, row) => setCurrentRow(row)}
         />
       </Flex>
 

@@ -93,6 +93,8 @@ const ContextWrapper = (props) => {
   const [vulnEpss, setVulnEpss] = useState('')
   const [minVal, setMinVal] = useState(0)
   const [maxVal, setMaxVal] = useState(10000)
+  const [vulnAfter, setVulnAfter] = useState('')
+  const [vulnBefore, setVulnBefore] = useState('')
 
   // SIGNED VULN FILTER
   const [signedVulnSearchInput, setSignedVulnSearchInput] = useState('')
@@ -326,7 +328,11 @@ const ContextWrapper = (props) => {
         sbomLicenseExp,
         setSbomLicenseExp,
         sbomCustomLicense,
-        setSbomCustomLicense
+        setSbomCustomLicense,
+        vulnAfter,
+        setVulnAfter,
+        vulnBefore,
+        setVulnBefore
       }}
     >
       {props.children}

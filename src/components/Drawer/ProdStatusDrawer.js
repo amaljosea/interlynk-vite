@@ -32,10 +32,8 @@ const ProdStatusDrawer = ({
   textColor,
   refetch,
   filteredData,
-  totalRows,
   filterRefetch,
   setPageIndex,
-  setCurrentRow
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -44,8 +42,20 @@ const ProdStatusDrawer = ({
 
   const { data: res } = useQuery(GetCdxResponses)
 
-  const { setVulnFilters, vulnField, vulnDirection, vulnEpss } =
-    useContext(GlobalContext)
+  const {
+    totalRows,
+    setVulnFilters,
+    vulnField,
+    vulnDirection,
+    vulnSearchInput,
+    vulnSeverity,
+    vulnComponent,
+    vulnStatus,
+    vulnKev,
+    vulnEpss,
+    vulnAfter,
+    vulnBefore
+  } = useContext(GlobalContext)
 
   const { id, componentVulnLogs } = data
 
@@ -68,16 +78,29 @@ const ProdStatusDrawer = ({
   const { data: allVexJustify } = useQuery(getVexJustifications)
 
   const handleRefetch = () => {
+    const epssRange = (vulnEpss !== '' || vulnEpss !== '0-0') && vulnEpss.split('-')
+    const range = {
+      min: parseFloat(epssRange[0]) / 10000,
+      max: parseFloat(epssRange[1]) / 10000
+    }
     refetch({
       variables: {
         projectId: productId,
         sbomId: sbomId,
+        search: vulnSearchInput !== '' ? vulnSearchInput : undefined,
+        severity: !vulnSeverity.includes('all') && vulnSeverity.length > 0 ? vulnSeverity : undefined,
+        componentName: !vulnComponent.includes('all') && vulnComponent.length > 0 ? vulnComponent : undefined,
+        status: !vulnStatus.includes('all') && vulnStatus.length > 0 ? vulnStatus : undefined,
+        kev: vulnKev === 'all' || vulnKev === '' ? undefined : vulnKev === 'yes' ? true : false,
+        epss: vulnEpss === 'all' || vulnEpss === '0-0' || vulnEpss === '' ? undefined : range,
         first: totalRows,
+        // after: vulnAfter !== '' ? vulnAfter : undefined,
+        // last: vulnBefore !== '' ? totalRows : undefined,
+        // before: vulnBefore !== '' ? vulnBefore : undefined,
         field: vulnField,
         direction: vulnDirection
       }
     })
-    setPageIndex(1)
   }
 
   const [compVexCreate] = useMutation(updateCompVulnVex, {
@@ -85,12 +108,6 @@ const ProdStatusDrawer = ({
     onCompleted: () => handleRefetch()
   })
 
-  const epssRange =
-    (vulnEpss !== '' || vulnEpss !== '0-0') && vulnEpss.split('-')
-  const range = {
-    min: parseFloat(epssRange[0]) / 10000,
-    max: parseFloat(epssRange[1]) / 10000
-  }
 
   const handleStatusChange = (e) => {
     const { value } = e.target
@@ -136,7 +153,7 @@ const ProdStatusDrawer = ({
         action: actionStatement !== '' ? actionStatement : undefined,
         fixedIn: selectedTag !== '' ? selectedTag : undefined
       }
-    })
+    }).then((res) => res.data && setPageIndex(1))
   }
 
   useEffect(() => {
@@ -373,7 +390,9 @@ const ProdStatusDrawer = ({
                 (statusName === 'Not Affected' && justification === '') ||
                 (justifyName === 'Other (impact statment required)' &&
                   impactData === '') ||
-                (statusName === 'Affected' && responseTitle === '' && actionStatement === '') ||
+                (statusName === 'Affected' &&
+                  responseTitle === '' &&
+                  actionStatement === '') ||
                 (responseTitle !== '' && actionStatement === '') ||
                 (statusName === 'False Positive' && impactData === '') ||
                 (responseTitle === 'update' && selectedTag === '')

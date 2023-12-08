@@ -93,8 +93,6 @@ const SBOMTable = ({
     checkRules
   } = useContext(GlobalContext)
 
-  const tab = window.localStorage.getItem('activeProdTab')
-
   const { lifecycle } = data
 
   // PAGINATION STATS FOR DIFFERENT TABS
