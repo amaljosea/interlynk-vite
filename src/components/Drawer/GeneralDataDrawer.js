@@ -52,7 +52,7 @@ const GeneralDataDrawer = ({
   selectedKey,
   refetch,
   checkId,
-  totalRows,
+  setPageIndex,
   filterRefetch
 }) => {
   // console.log(`suppliers`, suppliers)
@@ -290,6 +290,7 @@ const GeneralDataDrawer = ({
     }
 
     if (checkId && (creationTools.length > 0 || authorList.length > 0)) {
+      setPageIndex(1)
       healthRecheck({
         variables: {
           checkId: checkId,

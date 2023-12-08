@@ -70,7 +70,8 @@ const PurlModal = ({
   checkId,
   getCpe,
   activeCheck,
-  setIsValid
+  setIsValid,
+  setPageIndex
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -159,6 +160,7 @@ const PurlModal = ({
       })
         .then(() => {
           if (checkId) {
+            setPageIndex(1)
             healthRecheck({
               variables: {
                 checkId: checkId,

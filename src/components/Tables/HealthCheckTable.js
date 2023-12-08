@@ -82,13 +82,9 @@ const HealthCheckTable = ({
     checkSearchInput,
     setCheckSearchInput,
     checkRules,
-    setCheckRules,
     checkCategory,
-    setCheckCategory,
     checkSeverity,
-    setCheckSeverity,
     checkStatus,
-    setCheckStatus,
     setCpeString,
     setCheckAfter,
     setCheckBefore,
@@ -118,10 +114,10 @@ const HealthCheckTable = ({
         category: checkCategory.includes('all') || checkCategory.length === 0 ? undefined : checkCategory,
         severity: checkSeverity.includes('all') || checkSeverity.length === 0 ? undefined : checkSeverity,
         status: checkStatus.includes('all') || checkStatus.length === 0 ? undefined : checkStatus,
-        first: checkAfter !== '' ? totalRows : undefined,
-        after: checkAfter !== '' ? checkAfter : undefined,
-        last: checkBefore !== '' ? totalRows : undefined,
-        before: checkBefore !== '' ? checkBefore : undefined,
+        first: totalRows,
+        // after: checkAfter !== '' ? checkAfter : undefined,
+        // last: checkBefore !== '' ? totalRows : undefined,
+        // before: checkBefore !== '' ? checkBefore : undefined,
         field: checkField,
         direction: checkDirection
       }
@@ -378,11 +374,7 @@ const HealthCheckTable = ({
       }
     }).then((res) => {
       if (res.data) {
-        setCheckSearchInput([])
-        setCheckRules([])
-        setCheckCategory([])
-        setCheckSeverity([])
-        setCheckStatus([])
+        setPageIndex(1)
         healthRecheck({
           variables: {
             checkId: row.organizationRule.rule.friendlyId,
@@ -856,6 +848,7 @@ const HealthCheckTable = ({
               checkId={activeRow.organizationRule.rule.friendlyId}
               filterRefetch={filterRefetch}
               refetch={fetchCheckData}
+              setPageIndex={setPageIndex}
               data={sbomData}
             />
           )}
@@ -870,6 +863,7 @@ const HealthCheckTable = ({
               filterRefetch={filterRefetch}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
               checkId={activeRow.organizationRule.rule.friendlyId}
+              setPageIndex={setPageIndex}
               isOpen={isPrimaryOpen}
               onClose={onPrimaryClose}
               getCpe={getCpe}
@@ -886,6 +880,7 @@ const HealthCheckTable = ({
               filterRefetch={filterRefetch}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
               checkId={activeRow.organizationRule.rule.friendlyId}
+              setPageIndex={setPageIndex}
               isOpen={isLicenseOpen}
               onClose={onLicenseClose}
             />
@@ -900,6 +895,7 @@ const HealthCheckTable = ({
               filterRefetch={filterRefetch}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
               checkId={activeRow.organizationRule.rule.friendlyId}
+              setPageIndex={setPageIndex}
               isOpen={isTypeOpen}
               onClose={onTypeClose}
             />
@@ -915,6 +911,7 @@ const HealthCheckTable = ({
               isOpen={isSupplierOpen}
               onClose={onSupplierClose}
               suppliers={[]}
+              setPageIndex={setPageIndex}
               checkId={activeRow.organizationRule.rule.friendlyId}
               totalRows={totalRows}
             />
@@ -928,6 +925,7 @@ const HealthCheckTable = ({
               filterRefetch={filterRefetch}
               checkId={activeRow.organizationRule.rule.friendlyId}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
+              setPageIndex={setPageIndex}
               isOpen={isOpen}
               onClose={onClose}
             />
@@ -945,6 +943,7 @@ const HealthCheckTable = ({
               totalRows={totalRows}
               refetch={fetchCheckData}
               filterRefetch={filterRefetch}
+              setPageIndex={setPageIndex}
               checkId={activeRow.organizationRule.rule.friendlyId}
               getCpe={getCpe}
             />
@@ -981,6 +980,7 @@ const HealthCheckTable = ({
               refetch={fetchCheckData}
               filterRefetch={filterRefetch}
               totalRows={totalRows}
+              setPageIndex={setPageIndex}
               checkId={activeRow.organizationRule.rule.friendlyId}
             />
           )}
@@ -1010,6 +1010,7 @@ const HealthCheckTable = ({
               onClose={onDocSupClose}
               suppliers={null}
               totalRows={totalRows}
+              setPageIndex={setPageIndex}
               checkId={activeRow.organizationRule.rule.friendlyId}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
               getCpe={getCpe}
