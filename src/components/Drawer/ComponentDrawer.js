@@ -272,24 +272,7 @@ function ComponentDrawer(props) {
           internal: isInternal
         }
       })
-        .then((res) => {
-          if (res.data) {
-            setCompSearchInput('')
-            setCompEcosystem([])
-            setCompKind([])
-            setCompLicense([])
-            setCompSupplier([])
-            setCompScope('')
-            setCpeString('')
-            setSpdxLicense([])
-            setSpdxList([])
-            setLicenseExp('')
-            setCustomList([])
-            setCustomLicense([])
-            setComPageIndex(1)
-          }
-        })
-        .finally(() => onClose())
+        .then((res) => res.data && onClose())
     } catch (error) {
       console.error('Mutation error:', error)
     }
@@ -320,7 +303,7 @@ function ComponentDrawer(props) {
     } else {
       setCpeList([...cpeList, string])
       setCpeData([])
-      setCpeValue('')
+      setCpeString('')
       setSelectedCpe(null)
     }
   }
@@ -342,7 +325,7 @@ function ComponentDrawer(props) {
         return item
       })
       setCpeList(updatedData)
-      setCpeValue('')
+      setCpeString('')
       setSelectedCpe(null)
     }
   }
