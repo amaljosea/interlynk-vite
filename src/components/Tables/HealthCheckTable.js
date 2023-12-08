@@ -26,7 +26,7 @@ import DataTable from 'react-data-table-component'
 import { BiSolidWrench } from 'react-icons/bi'
 import { FaCheckDouble } from 'react-icons/fa'
 import { GoSkip } from 'react-icons/go'
-import { timeSince, sevColor,getFullDateAndTime } from 'utils'
+import { timeSince, sevColor, getFullDateAndTime } from 'utils'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 import CheckFilterMenu from 'views/Sbom/components/CheckFilterMenu'
@@ -94,7 +94,9 @@ const HealthCheckTable = ({
     setCheckBefore,
     setPurlString,
     setCustomList,
-    setCustomLicense
+    setCustomLicense,
+    checkAfter,
+    checkBefore
   } = useContext(GlobalContext)
 
   const [purlValue, setPurlValue] = useState('')
@@ -111,16 +113,19 @@ const HealthCheckTable = ({
       variables: {
         projectId: productId,
         sbomId: sbomId,
-        first: totalRows,
+        search: checkSearchInput !== '' ? checkSearchInput : undefined,
+        checkId: checkRules.includes('all') || checkRules.length === 0 ? undefined : checkRules,
+        category: checkCategory.includes('all') || checkCategory.length === 0 ? undefined : checkCategory,
+        severity: checkSeverity.includes('all') || checkSeverity.length === 0 ? undefined : checkSeverity,
+        status: checkStatus.includes('all') || checkStatus.length === 0 ? undefined : checkStatus,
+        first: checkAfter !== '' ? totalRows : undefined,
+        after: checkAfter !== '' ? checkAfter : undefined,
+        last: checkBefore !== '' ? totalRows : undefined,
+        before: checkBefore !== '' ? checkBefore : undefined,
         field: checkField,
         direction: checkDirection
       }
     })
-    setPageIndex(1)
-    setCheckSearchInput('')
-    setCheckCategory([])
-    setCheckSeverity([])
-    setCheckStatus([])
   }
 
   const [updateResult] = useMutation(checkResultUpdate, {

@@ -89,7 +89,8 @@ const SBOMTable = ({
     setCheckSearchInput,
     checkCategory,
     checkSeverity,
-    checkStatus
+    checkStatus,
+    checkRules
   } = useContext(GlobalContext)
 
   const tab = window.localStorage.getItem('activeProdTab')
@@ -241,18 +242,10 @@ const SBOMTable = ({
           projectId: productId,
           sbomId: sbomId,
           search: checkSearchInput !== '' ? checkSearchInput : undefined,
-          category:
-            checkCategory.includes('all') || checkCategory.length === 0
-              ? undefined
-              : checkCategory,
-          severity:
-            checkSeverity.includes('all') || checkSeverity.length === 0
-              ? undefined
-              : checkSeverity,
-          status:
-            checkStatus.includes('all') || checkStatus.length === 0
-              ? undefined
-              : checkStatus,
+          checkId: checkRules.includes('all') || checkRules.length === 0 ? undefined : checkRules,
+          category: checkCategory.includes('all') || checkCategory.length === 0 ? undefined : checkCategory,
+          severity: checkSeverity.includes('all') || checkSeverity.length === 0 ? undefined : checkSeverity,
+          status: checkStatus.includes('all') || checkStatus.length === 0 ? undefined : checkStatus,
           first: totalRows,
           field: checkField,
           direction: checkDirection
