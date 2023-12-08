@@ -208,42 +208,39 @@ function ComponentDrawer(props) {
   }
 
   const handleCreateCom = async () => {
-    try {
-      await createComponent({
-        variables: {
-          sbomId: sbomId,
-          kind: compKind,
-          name: compName,
-          version: compVersion,
-          licenses: {
-            licenses: spdxLicense.length > 0 ? spdxLicense : undefined,
-            licensesExp: expLicense === '' ? undefined : expLicense,
-            licensesCustom: undefined
-          },
-          cpes: cpeList,
-          purl: purlValue,
-          primary: isPrimary,
-          internal: isInternal
+    await createComponent({
+      variables: {
+        sbomId: sbomId,
+        kind: compKind,
+        name: compName,
+        version: compVersion,
+        licenses: {
+          licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
+          licensesExp: licenseType === 'license_exp' ? licenseExp : undefined,
+          licensesCustom:
+            licenseType === 'license_custom' ? customLicense : undefined
+        },
+        cpes: cpeList,
+        purl: purlValue,
+        primary: isPrimary,
+        internal: isInternal
+      }
+    })
+      .then((res) => {
+        if (res.data) {
+          onFilterRefetch()
+          onClose()
         }
       })
-        .then((res) => {
-          if (res.data) {
-            onFilterRefetch()
-          }
+      .finally(() => {
+        toast({
+          description: `Data added successfully`,
+          status: 'success',
+          position: 'top',
+          isClosable: true,
+          duration: 2000
         })
-        .finally(() => {
-          onClose()
-          toast({
-            description: `Data added successfully`,
-            status: 'success',
-            position: 'top',
-            isClosable: true,
-            duration: 2000
-          })
-        })
-    } catch (error) {
-      console.error('Mutation error:', error)
-    }
+      })
   }
 
   const handleUpdateCom = async () => {
@@ -271,23 +268,9 @@ function ComponentDrawer(props) {
           primary: isPrimary,
           internal: isInternal
         }
-      })
-        .then((res) => res.data && onClose())
+      }).then((res) => res.data && onClose())
     } catch (error) {
       console.error('Mutation error:', error)
-    }
-  }
-
-  const handleSave = () => {
-    try {
-      handleCreateCom()
-    } catch (error) {
-      toast({
-        description: error.message,
-        status: 'error',
-        position: 'top',
-        duration: 3000
-      })
     }
   }
 
@@ -605,7 +588,7 @@ function ComponentDrawer(props) {
               {id === undefined ? (
                 <Button
                   colorScheme='blue'
-                  onClick={handleSave}
+                  onClick={handleCreateCom}
                   isDisabled={
                     compKind === '' || compName === '' || compVersion === ''
                   }
