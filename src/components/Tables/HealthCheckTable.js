@@ -378,6 +378,7 @@ const HealthCheckTable = ({
         healthRecheck({
           variables: {
             checkId: row.organizationRule.rule.friendlyId,
+            compId: row.componentId,
             sbomId: sbomId
           }
         })
@@ -651,7 +652,7 @@ const HealthCheckTable = ({
                     onClick={() =>
                       row.organizationRule.rule.shortDesc ===
                       'Component has a unique identifier'
-                        ? handleUniqueID(row)
+                        ? handleComUpdate(row)
                         : handleOpen(row)
                     }
                     disabled={customerView}
