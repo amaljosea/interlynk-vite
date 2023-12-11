@@ -367,8 +367,8 @@ const GeneralDataRow = ({ status, data, refetch }) => {
               <Td pl={0}>
                 <Flex alignItems={'center'} gap={2} flexWrap={'wrap'}>
                   {/* SPDX */}
-                  {data.licenses.length > 0 &&
-                    data.licenses.map((item, index) => (
+                  {data.licenses?.length > 0 &&
+                    data.licenses?.map((item, index) => (
                       <Tooltip key={index} label={item} placement={'top'}>
                         <Link
                           href={`https://spdx.org/licenses/${item}`}
@@ -460,7 +460,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
           <ModalOverlay />
           <ModalContent>
             <ModalHeader>
-              {data?.licenses.length > 0 ? 'Update' : 'Add'} License
+              {data?.licenses?.length > 0 ? 'Update' : 'Add'} License
             </ModalHeader>
             <ModalCloseButton />
             <ModalBody>
