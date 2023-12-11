@@ -199,11 +199,9 @@ function ComponentDrawer(props) {
       setPurlString(pkg.toString())
     } else {
       setPurlString('pkg:type/name@version')
-      
     }
     onPurlOpen()
   }
-
 
   const handleCreateCom = async () => {
     await createComponent({
@@ -407,7 +405,12 @@ function ComponentDrawer(props) {
               {/* Group */}
               <FormControl>
                 <FormLabel htmlFor='groupInfo' fontSize={'sm'}>
-                  Group
+                  <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
+                    <Text>Group</Text>
+                    <Tooltip label='Group Info'>
+                      <Icon as={InfoIcon} color={'blue.500'} />
+                    </Tooltip>
+                  </Flex>
                 </FormLabel>
                 <Input
                   size='md'
