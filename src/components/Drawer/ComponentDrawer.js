@@ -198,7 +198,7 @@ function ComponentDrawer(props) {
       setPurlData(pkg)
       setPurlString(pkg.toString())
     } else {
-      setPurlString('pkg:type/name@version')
+      setPurlString('pkg:type/name@version?0=a&1=b&2=c')
     }
     onPurlOpen()
   }

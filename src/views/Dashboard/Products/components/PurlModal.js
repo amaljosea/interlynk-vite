@@ -88,6 +88,7 @@ const PurlModal = ({
   const [purlVersion, setPurlVersion] = useState('')
   const [purlVersionList, setPurlVersionList] = useState([])
   const purlVersionRef = useRef()
+  const [qualifiers, setQualifiers] = useState('')
 
   const { purlString, setPurlString } = useContext(GlobalContext)
 
@@ -177,7 +178,10 @@ const PurlModal = ({
   }
 
   const isAutoComplete =
-    purlType === 'maven' || purlType === 'npm' || purlType === 'gem' || purlType === 'nuget'
+    purlType === 'maven' ||
+    purlType === 'npm' ||
+    purlType === 'gem' ||
+    purlType === 'nuget'
 
   // ON NAMESPACE INPUT CHANGE
   const onNamespaceInputChange = (event) => {
@@ -447,6 +451,7 @@ const PurlModal = ({
       setNamespace(data.namespace === null ? '' : data.namespace)
       setPurlName(data.name === null ? '' : data.name)
       setPurlVersion(data.version === null ? '' : data.version)
+      setQualifiers(data.qualifiers === null ? '' : Object.values(data.qualifiers).join(''))
     }
   }, [data])
 
@@ -504,13 +509,28 @@ const PurlModal = ({
     }
   }
 
+  const handleQualifierChange = (e) => {
+    const { value } = e.target
+    const val = value.replace(/\s/g, '')
+    setQualifiers(val)
+  }
+
+  const onQualifierBlur = () => {
+    if (qualifiers !== '') {
+      const pkg = PackageURL.fromString(purlString)
+      pkg.qualifiers = qualifiers
+      console.log('pkg', pkg)
+      setPurlString(pkg.toString())
+    }
+  }
+
   const handleSave = () => {
     try {
       const pkg = PackageURL.fromString(purlString)
       pkg.namespace = pkg.namespace === 'namespace' ? '' : pkg.namespace
       pkg.version = pkg.version === 'version' ? '' : pkg.version
+      console.log('value', pkg.toString())
       setPurlString(pkg.toString())
-      setPurlValue(pkg.toString())
       setIsValid(true)
       onClose()
     } catch (error) {
@@ -589,7 +609,9 @@ const PurlModal = ({
                 </Select>
               </FormControl>
               {/* Namespace */}
-              {purlType === 'maven' || purlType === 'npm' || purlType === 'gem' ? (
+              {purlType === 'maven' ||
+              purlType === 'npm' ||
+              purlType === 'gem' ? (
                 <CpeInput
                   name='namespace'
                   inputValue={namespace}
@@ -680,6 +702,18 @@ const PurlModal = ({
                   />
                 </FormControl>
               )}
+              {/* Qualifiers */}
+              <FormControl>
+                <FormLabel>Qualifiers</FormLabel>
+                <Input
+                  size='md'
+                  id='qualifiers'
+                  name='qualifiers'
+                  value={qualifiers}
+                  onChange={handleQualifierChange}
+                  onBlur={onQualifierBlur}
+                />
+              </FormControl>
             </Flex>
           </ModalBody>
 
