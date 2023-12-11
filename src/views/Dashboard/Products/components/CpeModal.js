@@ -71,10 +71,10 @@ const CpeModal = ({
 
   // UPDATE FIELDS DATA FROM API
   useEffect(() => {
-    const matches = regexPattern.test(cpeValue)
+    const matches = regexPattern.test(cpeString)
     if (matches) {
-      setCpeString(cpeValue)
-      const components = cpeValue.split(':')
+      setCpeString(cpeString)
+      const components = cpeString.split(':')
       setVendor(components[3])
       setProduct(components[4])
       setVersion(components[5])
@@ -82,7 +82,7 @@ const CpeModal = ({
     } else {
       setCpeString('cpe:2.3:::::*:*:*:*:*:*:*')
     }
-  }, [cpeValue])
+  }, [])
 
   // ON CPE SAVE
   const handleSave = () => {
