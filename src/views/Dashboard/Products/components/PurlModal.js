@@ -47,6 +47,7 @@ const typeOptions = [
   { value: 'github', label: 'github' },
   { value: 'golang', label: 'golang' },
   { value: 'hex', label: 'hex' },
+  { value: 'hackage', label: 'hackage' },
   { value: 'huggingface', label: 'huggingface' },
   { value: 'maven', label: 'maven' },
   { value: 'mlflow', label: 'mlflow' },
@@ -101,7 +102,9 @@ const PurlModal = ({
     'github',
     'golang',
     'hex',
+    'hackage',
     'huggingface',
+    'oci',
     'qpkg',
     'rpm',
     'swid',
@@ -451,7 +454,9 @@ const PurlModal = ({
       setNamespace(data.namespace === null ? '' : data.namespace)
       setPurlName(data.name === null ? '' : data.name)
       setPurlVersion(data.version === null ? '' : data.version)
-      setQualifiers(data.qualifiers === null ? '' : Object.values(data.qualifiers).join(''))
+      setQualifiers(
+        data.qualifiers === null ? '' : Object.values(data.qualifiers).join('')
+      )
     }
   }, [data])
 
@@ -638,8 +643,8 @@ const PurlModal = ({
                     ))}
                   </Select>
                 </FormControl>
-              ) : (
-                <FormControl>
+              ) :  (
+                <FormControl display={(purlType === 'hackage' || purlType === 'oci') ? 'none' : 'block'}>
                   <FormLabel>Namespace</FormLabel>
                   <Input
                     size='md'
