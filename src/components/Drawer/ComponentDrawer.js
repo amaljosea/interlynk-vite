@@ -193,12 +193,12 @@ function ComponentDrawer(props) {
   }
 
   const handlePurlModal = () => {
-    if (purlValue && purlValue !== '' && isPURLInputValid) {
-      const pkg = PackageURL.fromString(purlValue)
+    if (purlString && purlString !== '' && isPURLInputValid) {
+      const pkg = PackageURL.fromString(purlString)
       setPurlData(pkg)
       setPurlString(pkg.toString())
     } else {
-      setPurlString('pkg:type/name@version')
+      setPurlString('pkg:type/name@version?0=a&1=b&2=c')
     }
     onPurlOpen()
   }
@@ -405,7 +405,12 @@ function ComponentDrawer(props) {
               {/* Group */}
               <FormControl>
                 <FormLabel htmlFor='groupInfo' fontSize={'sm'}>
-                  Group
+                  <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
+                    <Text>Group</Text>
+                    <Tooltip label='Group Info'>
+                      <Icon as={InfoIcon} color={'blue.500'} />
+                    </Tooltip>
+                  </Flex>
                 </FormLabel>
                 <Input
                   size='md'
@@ -535,6 +540,7 @@ function ComponentDrawer(props) {
                       <TagLabel
                         cursor={'pointer'}
                         onClick={() => {
+                          setCpeString(item)
                           setSelectedCpe({ id: index, name: item })
                         }}
                       >

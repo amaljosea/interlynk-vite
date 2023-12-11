@@ -1,4 +1,4 @@
-import { useLazyQuery, useQuery } from '@apollo/client'
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { AddIcon } from '@chakra-ui/icons'
 import {
   Button,
@@ -27,9 +27,13 @@ import {
   FormControl,
   FormLabel,
   Select,
-  Tag
+  Tag,
+  TagLabel
 } from '@chakra-ui/react'
+import CustomLoader from 'components/CustomLoader'
 import GlobalContext from 'context/GlobalContext'
+import { SbomPartDelete } from 'graphQL/Mutation'
+import { SbomPartCreate } from 'graphQL/Mutation'
 import { GetProject } from 'graphQL/Queries'
 import { GetProjectData } from 'graphQL/Queries'
 import { useContext, useMemo, useRef, useState } from 'react'
@@ -55,10 +59,11 @@ const customStyles = {
   }
 }
 
-const PartsTable = () => {
+const PartsTable = ({ data, refetch }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const sbomId = queryParams.get('sbom')
+  const prodId = queryParams.get('p')
 
   const { isOpen, onOpen, onClose } = useDisclosure()
   const addBtn = useRef()
@@ -78,6 +83,48 @@ const PartsTable = () => {
       direction: prodDirection
     }
   })
+
+  const [createSbomPart] = useMutation(SbomPartCreate)
+  const [deleteSbomPart] = useMutation(SbomPartDelete)
+
+  const handleCreatePart = async () => {
+    await createSbomPart({
+      variables: {
+        parentSbomId: sbomId,
+        partSbomId: selectedVersion
+      }
+    })
+      .then((res) => {
+        if (res.data) {
+          refetch({
+            variables: {
+              projectId: prodId,
+              sbomId: sbomId
+            }
+          })
+          setSelectedProd('')
+          setSelectedVersion('')
+        }
+      })
+      .finally(() => onClose())
+  }
+
+  const handleRemove = async (id) => {
+    await deleteSbomPart({
+      variables: {
+        id: id
+      }
+    }).then((res) => {
+      if (res.data) {
+        refetch({
+          variables: {
+            projectId: prodId,
+            sbomId: sbomId
+          }
+        })
+      }
+    })
+  }
 
   const productList =
     allProducts &&
@@ -144,29 +191,26 @@ const PartsTable = () => {
       id: 'NAME',
       name: 'NAME',
       selector: (row) => {
-        const { sboms, name, id } = row
+        const { part } = row
         return (
-          <>
-            {sboms.length > 0 ? (
-              <Link
-                to={`/vendor/products?&p=${id}&sbom=${sboms[0].id}&parts=true`}
-              >
-                <Text
-                  color={'blue.500'}
-                  minWidth='100%'
-                  onClick={() => {
-                    window.localStorage.setItem('subProduct', name)
-                    window.localStorage.setItem('subProductVersion', name)
-                    setActiveProdTab(0)
-                  }}
-                >
-                  {name}
-                </Text>
-              </Link>
-            ) : (
-              <Text>{name}</Text>
-            )}
-          </>
+          <Link
+            to={`/vendor/products?&p=${part.project.id}&sbom=${part.id}&parts=true`}
+          >
+            <Text
+              color={'blue.500'}
+              minWidth='100%'
+              onClick={() => {
+                window.localStorage.setItem('subProduct', part.project.name)
+                window.localStorage.setItem(
+                  'subProductVersion',
+                  part.project.name
+                )
+                setActiveProdTab(0)
+              }}
+            >
+              {part.project.name}
+            </Text>
+          </Link>
         )
       }
     },
@@ -174,40 +218,44 @@ const PartsTable = () => {
       id: 'VERSION',
       name: 'VERSION',
       selector: (row) => {
-        const { sboms } = row
-        return (
-          <Text>
-            {sboms?.length > 0 && sboms[0]?.primaryComponent?.version}
-          </Text>
-        )
+        const { part } = row
+        return <Text>{part.primaryComponent.version}</Text>
       }
     },
     {
       id: 'SUPPLIER',
       name: 'SUPPLIER',
       selector: (row) => {
-        const suppliers = ['Interlynk', 'Biotronik', 'Oracle']
-        const getRandomSupplier = () => {
-          const randomIndex = Math.floor(Math.random() * suppliers.length)
-          return suppliers[Math.ceil(suppliers.length - 1)]
-        }
-
-        return <Text>{getRandomSupplier()}</Text>
+        const { part } = row
+        return (
+          <>
+            {part.suppliers.length > 0 &&
+              part.suppliers.map((item, index) => (
+                <Tag
+                  size={'md'}
+                  key={index}
+                  variant='subtle'
+                  colorScheme='orange'
+                >
+                  <TagLabel>
+                    {item.name}
+                    {item.contactEmail && ` - ${item.contactEmail}`}
+                  </TagLabel>
+                </Tag>
+              ))}
+          </>
+        )
       }
     },
     {
       id: 'STATUS',
       name: 'STATUS',
       selector: (row) => {
-        const statuses = ['Draft', 'Released', 'Pending']
-        const getRandomStatus = () => {
-          const randomIndex = Math.floor(Math.random() * statuses.length)
-          return statuses[Math.ceil(statuses.length - 2)]
-        }
+        const { part } = row
 
         return (
           <Tag size='sm' colorScheme='blue'>
-            {getRandomStatus()}
+            {part.lifecycle}
           </Tag>
         )
       }
@@ -216,6 +264,7 @@ const PartsTable = () => {
       id: 'ACTION',
       name: 'ACTION',
       selector: (row) => {
+        const { partId } = row
         return (
           <Menu>
             <MenuButton
@@ -226,7 +275,9 @@ const PartsTable = () => {
             />
             <Portal>
               <MenuList size='sm'>
-                <MenuItem>Remove</MenuItem>
+                <MenuItem onClick={() => handleRemove(partId)}>
+                  Remove
+                </MenuItem>
               </MenuList>
             </Portal>
           </Menu>
@@ -255,9 +306,9 @@ const PartsTable = () => {
           direction={'row'}
           spacing={4}
           alignItems={'flex-start'}
-          justifyContent={'space-between'}
+          justifyContent={'flex-end'}
         >
-          <HStack spacing={4}>
+          <HStack spacing={4} display={'none'}>
             {/* SEARCH COMPONENTS */}
             <SearchFilter
               id='team'
@@ -310,17 +361,13 @@ const PartsTable = () => {
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
           columns={columns}
-          data={
-            allProducts &&
-            [...allProducts.projects.nodes]
-              .filter((product) => product.id !== product_id)
-              .slice(0, 3)
-          }
+          data={data}
           customStyles={customStyles}
           persistTableHead
           subHeader
-          progressPending={allProducts ? false : true}
+          progressPending={data ? false : true}
           subHeaderComponent={subHeaderComponent}
+          progressComponent={<CustomLoader />}
           responsive={true}
         />
       </Flex>
@@ -346,11 +393,13 @@ const PartsTable = () => {
                       onChange={handleSelectProduct}
                     >
                       <option value={''}>-- Select --</option>
-                      {productList.map((item, index) => (
-                        <option key={index} value={item.value}>
-                          {item.label}
-                        </option>
-                      ))}
+                      {[...productList]
+                        .filter((item) => item.value !== prodId)
+                        .map((item, index) => (
+                          <option key={index} value={item.value}>
+                            {item.label}
+                          </option>
+                        ))}
                     </Select>
                   </FormControl>
                   {/* Version */}
@@ -385,7 +434,12 @@ const PartsTable = () => {
               <Button mr={3} onClick={onClose}>
                 Close
               </Button>
-              <Button variant='solid' colorScheme='blue'>
+              <Button
+                variant='solid'
+                colorScheme='blue'
+                onClick={handleCreatePart}
+                disabled={selectedVersion === ''}
+              >
                 Submit
               </Button>
             </ModalFooter>

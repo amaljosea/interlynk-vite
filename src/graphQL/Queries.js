@@ -1803,3 +1803,33 @@ export const GetCdxResponses = gql`
     }
   }
 `
+
+// GET SBOM PARTS
+export const GetSbomParts = gql`
+  query GetSbomParts($projectId: Uuid!, $sbomId: Uuid!) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      id
+      sbomParts {
+        id
+        partId
+        part {
+          id
+          lifecycle
+          project {
+            id
+            name
+          }
+          primaryComponent {
+            name
+            version
+          }
+          suppliers {
+            name
+            contactEmail
+            contactName
+          }
+        }
+      }
+    }
+  }
+`

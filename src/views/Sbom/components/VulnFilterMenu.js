@@ -503,7 +503,7 @@ const VulnFilterMenu = ({
                 my={2}
                 size='sm'
                 onClick={handleSubmit}
-                isDisabled={Number(maxVal) <= Number(minVal) || maxVal === 0}
+                isDisabled={Number(maxVal) <= Number(minVal) || maxVal === 0 || minVal === ''}
               >
                 Submit
               </Button>

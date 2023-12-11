@@ -1318,3 +1318,54 @@ export const DeleteAutomation = gql`
     }
   }
 `
+
+// CREATE SBOM PARTS
+export const SbomPartCreate = gql`
+  mutation SbomPartCreate($parentSbomId: Uuid!, $partSbomId: Uuid!) {
+    sbomPartCreate(
+      input: { parentSbomId: $parentSbomId, partSbomId: $partSbomId }
+    ) {
+      sbomPart {
+        id
+        sbomId
+        partId
+        createdAt
+        updatedAt
+      }
+      errors
+    }
+  }
+`
+
+// REMOVE SBOM PARTS
+export const SbomPartDelete = gql`
+  mutation SbomPartDelete($id: Uuid!) {
+    sbomPartDelete(input: { id: $id }) {
+      sbomPart {
+        id
+      }
+      errors
+    }
+  }
+`
+
+// UPLOAD PROFILE IMAGE
+export const UploadProfileImage = gql`
+  mutation UploadProfileImage($userId: ID!, $profileImage: Upload!) {
+    userUploadProfileImage(
+      input: { userId: $userId, profileImage: $profileImage }
+    ) {
+      user {
+        id
+        profileImage {
+          url
+          filename
+          contentType
+          byteSize
+          checksum
+        }
+      }
+      errors
+    }
+  }
+`

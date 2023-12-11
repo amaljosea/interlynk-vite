@@ -744,7 +744,10 @@ const HealthCheckTable = ({
       variables: {
         projectId: productId,
         sbomId: sbomId,
-        first: totalRows,
+        first: checkAfter !== '' ? totalRows : undefined,
+        after: checkAfter !== '' ? checkAfter : undefined,
+        last: checkBefore !== '' ? totalRows : undefined,
+        before: checkBefore !== '' ? checkBefore : undefined,
         search: checkSearchInput !== '' ? checkSearchInput : undefined,
         checkId:
           checkRules.includes('all') || checkRules.length === 0
@@ -766,6 +769,7 @@ const HealthCheckTable = ({
         direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
       }
     })
+    // setPageIndex(1)
   }
 
   const onPreviousPage = async () => {

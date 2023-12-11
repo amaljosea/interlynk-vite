@@ -47,6 +47,7 @@ const typeOptions = [
   { value: 'github', label: 'github' },
   { value: 'golang', label: 'golang' },
   { value: 'hex', label: 'hex' },
+  { value: 'hackage', label: 'hackage' },
   { value: 'huggingface', label: 'huggingface' },
   { value: 'maven', label: 'maven' },
   { value: 'mlflow', label: 'mlflow' },
@@ -88,6 +89,7 @@ const PurlModal = ({
   const [purlVersion, setPurlVersion] = useState('')
   const [purlVersionList, setPurlVersionList] = useState([])
   const purlVersionRef = useRef()
+  const [qualifiers, setQualifiers] = useState('')
 
   const { purlString, setPurlString } = useContext(GlobalContext)
 
@@ -100,7 +102,9 @@ const PurlModal = ({
     'github',
     'golang',
     'hex',
+    'hackage',
     'huggingface',
+    'oci',
     'qpkg',
     'rpm',
     'swid',
@@ -177,7 +181,10 @@ const PurlModal = ({
   }
 
   const isAutoComplete =
-    purlType === 'maven' || purlType === 'npm' || purlType === 'gem' || purlType === 'nuget'
+    purlType === 'maven' ||
+    purlType === 'npm' ||
+    purlType === 'gem' ||
+    purlType === 'nuget'
 
   // ON NAMESPACE INPUT CHANGE
   const onNamespaceInputChange = (event) => {
@@ -447,6 +454,9 @@ const PurlModal = ({
       setNamespace(data.namespace === null ? '' : data.namespace)
       setPurlName(data.name === null ? '' : data.name)
       setPurlVersion(data.version === null ? '' : data.version)
+      setQualifiers(
+        data.qualifiers === null ? '' : Object.values(data.qualifiers).join('')
+      )
     }
   }, [data])
 
@@ -474,9 +484,12 @@ const PurlModal = ({
   }
 
   const onNamespaceBlur = () => {
+    const pkg = PackageURL.fromString(purlString)
     if (namespace !== '') {
-      const pkg = PackageURL.fromString(purlString)
       pkg.namespace = namespace
+      setPurlString(pkg.toString())
+    } else {
+      pkg.namespace = ''
       setPurlString(pkg.toString())
     }
   }
@@ -501,13 +514,28 @@ const PurlModal = ({
     }
   }
 
+  const handleQualifierChange = (e) => {
+    const { value } = e.target
+    const val = value.replace(/\s/g, '')
+    setQualifiers(val)
+  }
+
+  const onQualifierBlur = () => {
+    if (qualifiers !== '') {
+      const pkg = PackageURL.fromString(purlString)
+      pkg.qualifiers = qualifiers
+      console.log('pkg', pkg)
+      setPurlString(pkg.toString())
+    }
+  }
+
   const handleSave = () => {
     try {
       const pkg = PackageURL.fromString(purlString)
       pkg.namespace = pkg.namespace === 'namespace' ? '' : pkg.namespace
       pkg.version = pkg.version === 'version' ? '' : pkg.version
+      console.log('value', pkg.toString())
       setPurlString(pkg.toString())
-      setPurlValue(pkg.toString())
       setIsValid(true)
       onClose()
     } catch (error) {
@@ -586,7 +614,9 @@ const PurlModal = ({
                 </Select>
               </FormControl>
               {/* Namespace */}
-              {purlType === 'maven' || purlType === 'npm' || purlType === 'gem' ? (
+              {purlType === 'maven' ||
+              purlType === 'npm' ||
+              purlType === 'gem' ? (
                 <CpeInput
                   name='namespace'
                   inputValue={namespace}
@@ -613,8 +643,8 @@ const PurlModal = ({
                     ))}
                   </Select>
                 </FormControl>
-              ) : (
-                <FormControl>
+              ) :  (
+                <FormControl display={(purlType === 'hackage' || purlType === 'oci') ? 'none' : 'block'}>
                   <FormLabel>Namespace</FormLabel>
                   <Input
                     size='md'
@@ -677,6 +707,18 @@ const PurlModal = ({
                   />
                 </FormControl>
               )}
+              {/* Qualifiers */}
+              <FormControl>
+                <FormLabel>Qualifiers</FormLabel>
+                <Input
+                  size='md'
+                  id='qualifiers'
+                  name='qualifiers'
+                  value={qualifiers}
+                  onChange={handleQualifierChange}
+                  onBlur={onQualifierBlur}
+                />
+              </FormControl>
             </Flex>
           </ModalBody>
 

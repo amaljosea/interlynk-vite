@@ -133,10 +133,10 @@ const ComponentTable = ({
         supplierName: compSupplier.includes('all') || compSupplier.length === 0 ? undefined: compSupplier,
         primary: compScope === 'primary' ? true : undefined,
         internal: compScope === 'internal' ? true : undefined,
-        first: compAfter !== '' ? totalRows : undefined,
-        after: compAfter !== '' ? compAfter : undefined,
-        last: compBefore !== '' ? totalRows : undefined,
-        before: compBefore !== '' ? compBefore : undefined,
+        first: totalRows,
+        // after: compAfter !== '' ? compAfter : undefined,
+        // last: compBefore !== '' ? totalRows : undefined,
+        // before: compBefore !== '' ? compBefore : undefined,
         field: compField,
         direction: compDirection
       }

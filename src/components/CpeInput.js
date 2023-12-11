@@ -170,7 +170,7 @@ const CpeInput = ({
             name={name}
             size='md'
             fontSize={'sm'}
-            placeholder={name === 'cpe' ? 'CPE' : ''}
+            placeholder={name === 'cpe' ? 'CPE' : `Enter ${name}`}
             value={inputValue}
             onChange={onChange}
             autoComplete='off'

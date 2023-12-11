@@ -36,7 +36,7 @@ const VulLinkRow = ({
         )}
       </Td>
       <Td fontSize={'xs'} pl={0}>
-        {note !== '' && (
+        {note && (
           <Tooltip text={note}>
             <BiNote />
           </Tooltip>
