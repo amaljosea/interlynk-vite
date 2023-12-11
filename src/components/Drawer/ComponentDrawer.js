@@ -193,15 +193,17 @@ function ComponentDrawer(props) {
   }
 
   const handlePurlModal = () => {
-    if (purlValue && purlValue !== '' && isPURLInputValid) {
-      const pkg = PackageURL.fromString(purlValue)
+    if (purlString && purlString !== '' && isPURLInputValid) {
+      const pkg = PackageURL.fromString(purlString)
       setPurlData(pkg)
       setPurlString(pkg.toString())
     } else {
       setPurlString('pkg:type/name@version')
+      
     }
     onPurlOpen()
   }
+
 
   const handleCreateCom = async () => {
     await createComponent({
