@@ -474,9 +474,12 @@ const PurlModal = ({
   }
 
   const onNamespaceBlur = () => {
+    const pkg = PackageURL.fromString(purlString)
     if (namespace !== '') {
-      const pkg = PackageURL.fromString(purlString)
       pkg.namespace = namespace
+      setPurlString(pkg.toString())
+    } else {
+      pkg.namespace = ''
       setPurlString(pkg.toString())
     }
   }
