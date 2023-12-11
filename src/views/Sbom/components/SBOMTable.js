@@ -34,6 +34,7 @@ import {
 import { useLocation } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
 import PartsTable from 'components/Tables/PartsTable'
+import { GetSbomParts } from 'graphQL/Queries'
 
 const SBOMTable = ({
   status,
@@ -108,6 +109,14 @@ const SBOMTable = ({
     }
   )
 
+    // GET SBOM PARTS
+    const [getParts, { data: parts }] = useLazyQuery(
+      GetSbomParts,
+      {
+        fetchPolicy: 'network-only'
+      }
+    )
+
   useEffect(() => {
     if (compData) {
       setComponents(compData.sbom.components.nodes)
@@ -155,6 +164,13 @@ const SBOMTable = ({
       refetch({
         projectId: productId,
         sbomId: sbomId
+      })
+    } else if(value === 1) {
+      getParts({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId
+        }
       })
     } else if (value === 2) {
       // FETCH COMPONENT DATA
@@ -337,7 +353,7 @@ const SBOMTable = ({
             </TabPanel>
             {/* PARTS TABLE */}
             <TabPanel px={0}>
-              <PartsTable />
+              <PartsTable data={parts?.sbom.sbomParts} refetch={getParts} />
             </TabPanel>
             {/* COMPONENT TABLE */}
             <TabPanel px={0}>
