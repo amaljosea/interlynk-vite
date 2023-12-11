@@ -644,7 +644,7 @@ const PurlModal = ({
                   </Select>
                 </FormControl>
               ) :  (
-                <FormControl display={(purlType === 'hackage' || purlType === 'oci') ? 'none' : 'block'}>
+                <FormControl display={(purlType === 'nuget' || purlType === 'oci') ? 'none' : 'block'}>
                   <FormLabel>Namespace</FormLabel>
                   <Input
                     size='md'
