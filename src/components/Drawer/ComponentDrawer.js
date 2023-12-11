@@ -540,6 +540,7 @@ function ComponentDrawer(props) {
                       <TagLabel
                         cursor={'pointer'}
                         onClick={() => {
+                          setCpeString(item)
                           setSelectedCpe({ id: index, name: item })
                         }}
                       >

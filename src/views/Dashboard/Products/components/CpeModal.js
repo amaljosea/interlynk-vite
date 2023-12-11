@@ -75,10 +75,11 @@ const CpeModal = ({
     if (matches) {
       setCpeString(cpeString)
       const components = cpeString.split(':')
+      setType(components[2])
       setVendor(components[3])
       setProduct(components[4])
       setVersion(components[5])
-      setHardware('*')
+      setHardware(components[6])
     } else {
       setCpeString('cpe:2.3:::::*:*:*:*:*:*:*')
     }
