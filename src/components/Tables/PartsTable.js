@@ -128,10 +128,21 @@ const PartsTable = ({ data, refetch }) => {
 
   const productList =
     allProducts &&
-    allProducts.projects.nodes.map((option) => ({
-      value: option.id,
-      label: option.name
-    }))
+    [...allProducts.projects.nodes]
+      .filter((item) => item.enabled !== false && item.id !== prodId)
+      .map((option) => ({
+        value: option.id,
+        label: option.name
+      }))
+
+  const filterProducts =
+    productList &&
+    productList.filter((project) => {
+      const existings =
+        data &&
+        [...data].some((sbomPart) => sbomPart.part.project.id === project.value)
+      return !existings
+    })
 
   const [getProduct] = useLazyQuery(GetProject)
 
@@ -275,9 +286,7 @@ const PartsTable = ({ data, refetch }) => {
             />
             <Portal>
               <MenuList size='sm'>
-                <MenuItem onClick={() => handleRemove(partId)}>
-                  Remove
-                </MenuItem>
+                <MenuItem onClick={() => handleRemove(partId)}>Remove</MenuItem>
               </MenuList>
             </Portal>
           </Menu>
@@ -387,19 +396,18 @@ const PartsTable = ({ data, refetch }) => {
                       Project
                     </FormLabel>
                     <Select
+                      fontSize={'sm'}
                       name='product'
                       id='product'
                       value={selectedProd}
                       onChange={handleSelectProduct}
                     >
                       <option value={''}>-- Select --</option>
-                      {[...productList]
-                        .filter((item) => item.value !== prodId)
-                        .map((item, index) => (
-                          <option key={index} value={item.value}>
-                            {item.label}
-                          </option>
-                        ))}
+                      {filterProducts.map((item, index) => (
+                        <option key={index} value={item.value}>
+                          {item.label}
+                        </option>
+                      ))}
                     </Select>
                   </FormControl>
                   {/* Version */}
@@ -412,6 +420,7 @@ const PartsTable = ({ data, refetch }) => {
                       Version
                     </FormLabel>
                     <Select
+                      fontSize={'sm'}
                       name='versions'
                       id='versions'
                       value={selectedVersion}
@@ -431,16 +440,17 @@ const PartsTable = ({ data, refetch }) => {
             </ModalBody>
 
             <ModalFooter>
-              <Button mr={3} onClick={onClose}>
+              <Button mr={3} fontSize={'sm'} onClick={onClose}>
                 Close
               </Button>
               <Button
+                fontSize={'sm'}
                 variant='solid'
                 colorScheme='blue'
                 onClick={handleCreatePart}
                 disabled={selectedVersion === ''}
               >
-                Submit
+                Add
               </Button>
             </ModalFooter>
           </ModalContent>
