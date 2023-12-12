@@ -29,7 +29,9 @@ import {
   Select,
   Tag,
   TagLabel,
-  Badge
+  Badge,
+  UnorderedList,
+  ListItem
 } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
 import GlobalContext from 'context/GlobalContext'
@@ -68,6 +70,12 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const prodId = queryParams.get('p')
 
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const {
+    isOpen: isDeleteOpen,
+    onOpen: onDeleteOpen,
+    onClose: onDeleteClose
+  } = useDisclosure()
+
   const addBtn = useRef()
 
   const {
@@ -87,7 +95,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const [selectedVersion, setSelectedVersion] = useState('')
   const [uniqVersions, setUniqVersions] = useState([])
   const [searchInput, setSearchInput] = useState('')
-
+  const [activeRow, setActiveRow] = useState(null)
   const { data: allProducts } = useQuery(GetProjectData, {
     variables: {
       first: 50,
@@ -121,10 +129,10 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       .finally(() => onClose())
   }
 
-  const handleRemove = async (id) => {
+  const handleRemove = async () => {
     await deleteSbomPart({
       variables: {
-        id: id
+        id: activeRow.id
       }
     }).then((res) => {
       if (res.data) {
@@ -135,7 +143,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
           }
         })
       }
-    })
+    }).finally(() => onDeleteClose())
   }
 
   const productList =
@@ -451,7 +459,14 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
             />
             <Portal>
               <MenuList size='sm'>
-                <MenuItem onClick={() => handleRemove(partId)}>Remove</MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    setActiveRow(row)
+                    onDeleteOpen()
+                  }}
+                >
+                  Remove
+                </MenuItem>
               </MenuList>
             </Portal>
           </Menu>
@@ -626,6 +641,40 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
                 disabled={selectedVersion === ''}
               >
                 Add
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      )}
+
+      {/* DISABLED */}
+      {isDeleteOpen && (
+        <Modal isOpen={isDeleteOpen} onClose={onDeleteClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Delete Part</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Text>Deleting this version will: </Text>
+              <UnorderedList>
+                <Flex flexDir={'column'} gap={1} mt={4}>
+                  {[
+                    'remove this versions and its SBOM',
+                    'remove access to this version for all users'
+                  ].map((item, index) => (
+                    <ListItem key={index}>{item}</ListItem>
+                  ))}
+                </Flex>
+              </UnorderedList>
+
+              <Text mt={6}>Are you sure you wish to continue ?</Text>
+            </ModalBody>
+            <ModalFooter>
+              <Button mr={3} onClick={onDeleteClose}>
+                No
+              </Button>
+              <Button onClick={handleRemove} colorScheme='red'>
+                Yes
               </Button>
             </ModalFooter>
           </ModalContent>
