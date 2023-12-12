@@ -127,10 +127,22 @@ const ComponentTable = ({
         projectId: productId,
         sbomId: sbomId,
         search: compSearchInput !== '' ? compSearchInput : undefined,
-        ecosystem: compEcosystem.includes('all') || compEcosystem.length === 0 ? undefined : compEcosystem,
-        kind: compType.includes('all') || compType.length === 0 ? undefined : compType,
-        licenses: compLicense.includes('all') || compLicense.length === 0 ? undefined : compLicense,
-        supplierName: compSupplier.includes('all') || compSupplier.length === 0 ? undefined: compSupplier,
+        ecosystem:
+          compEcosystem.includes('all') || compEcosystem.length === 0
+            ? undefined
+            : compEcosystem,
+        kind:
+          compType.includes('all') || compType.length === 0
+            ? undefined
+            : compType,
+        licenses:
+          compLicense.includes('all') || compLicense.length === 0
+            ? undefined
+            : compLicense,
+        supplierName:
+          compSupplier.includes('all') || compSupplier.length === 0
+            ? undefined
+            : compSupplier,
         primary: compScope === 'primary' ? true : undefined,
         internal: compScope === 'internal' ? true : undefined,
         first: totalRows,
@@ -635,7 +647,7 @@ const ComponentTable = ({
 
   // EXPAND SECTION
   const ExpandedComponent = ({ data }) => {
-    const { id, suppliers, purl, description, cpes, name, kind, internal } =
+    const { scope, suppliers, purl, description, cpes, name, kind, internal } =
       data
 
     const CustomText = styled(Text)`
@@ -776,6 +788,12 @@ const ComponentTable = ({
                   </Tooltip>
                 ))}
             </Flex>
+          </GridItem>
+          <GridItem w='100%'>
+            <CustomText>Scope :</CustomText>
+            <Text mt={1} fontSize={14} textTransform={'capitalize'}>
+              {scope}
+            </Text>
           </GridItem>
         </Grid>
       </Box>
@@ -1073,22 +1091,12 @@ const ComponentTable = ({
           {isOpen && (
             <ComponentDrawer
               data={activeRow}
-              id={activeRow.id}
               isOpen={isOpen}
               onClose={onClose}
-              component={activeRow.name}
-              version={activeRow.version}
-              exp={activeRow?.licenseExp}
-              type={activeRow.kind}
               fetchCompData={fetchCompData}
               filterRefetch={filterRefetch}
-              cpes={activeRow.cpes}
-              purl={activeRow.purl}
-              primary={activeRow.primary}
-              internal={activeRow.internal}
               shortDesc={null}
               checkId={null}
-              group={activeRow.group}
               primaryComp={primaryComp}
             />
           )}
@@ -1146,19 +1154,12 @@ const ComponentTable = ({
         <ComponentDrawer
           isOpen={isCompOpen}
           onClose={onCompClose}
-          component={''}
-          version={''}
-          exp={null}
-          type={''}
-          cpes={[]}
-          purl={''}
-          primary={false}
-          internal={false}
           fetchCompData={fetchCompData}
           filterRefetch={filterRefetch}
+          primaryComp={primaryComp}
           shortDesc={null}
           checkId={null}
-          primaryComp={primaryComp}
+          data={null}
         />
       )}
     </>

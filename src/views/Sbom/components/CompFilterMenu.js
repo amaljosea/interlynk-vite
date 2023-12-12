@@ -81,10 +81,19 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
         sbomId: sbomId,
         first: totalRows,
         search: compSearchInput !== '' ? compSearchInput : undefined,
-        ecosystem: ecosystem.includes('all') || ecosystem.length === 0 ? undefined : ecosystem,
+        ecosystem:
+          ecosystem.includes('all') || ecosystem.length === 0
+            ? undefined
+            : ecosystem,
         kind: kind.includes('all') || kind.length === 0 ? undefined : kind,
-        licenses: licenses.includes('all') || licenses.length === 0 ? undefined : licenses,
-        supplierName: suppliers.includes('all') || suppliers.length === 0 ? undefined : suppliers,
+        licenses:
+          licenses.includes('all') || licenses.length === 0
+            ? undefined
+            : licenses,
+        supplierName:
+          suppliers.includes('all') || suppliers.length === 0
+            ? undefined
+            : suppliers,
         primary: scope === 'primary' ? true : undefined,
         internal: scope === 'internal' ? true : undefined,
         field: customerView ? signedCompField : compField,
@@ -276,7 +285,7 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
             fontSize={'sm'}
             leftIcon={<FaFilter size={14} />}
           >
-            Scope
+            Visibility
           </MenuButton>
           <MenuList>
             <MenuOptionGroup

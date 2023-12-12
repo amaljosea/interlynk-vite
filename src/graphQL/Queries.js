@@ -610,6 +610,7 @@ export const GetComponentData = gql`
           licensesExp
           licensesCustom
           group
+          scope
           externalUrls {
             name
             url
