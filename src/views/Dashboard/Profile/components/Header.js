@@ -96,7 +96,7 @@ const Header = ({ selectedTab, setSelectedTab, user, tabs, refetch }) => {
   }
 
   useEffect(() => {
-    if (user) {
+    if (user.profileImage) {
       setProfileImage(`${SERVER_URL}/${user.profileImage.url}`)
     }
   }, [])

@@ -13,10 +13,6 @@ export const GetOrg = gql`
         id
         name
         email
-        profileImage {
-          filename
-          url
-        }
         apiKeys {
           id
           rawToken
