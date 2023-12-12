@@ -118,7 +118,6 @@ const ProductTable = ({ data, refetch }) => {
   useEffect(() => {
     setProdSearchInput('')
   }, [])
-  
 
   // REMOVE DUPLICATE PRODUCTS
   const removeDuplicatesAndLatest = (arr) => {
@@ -159,7 +158,6 @@ const ProductTable = ({ data, refetch }) => {
     setLicenseType('license_spdx')
     setSpdxList([])
     setSpdxLicense([])
-    setExpList([])
     setLicenseExp([])
     onSbomOpen()
   }

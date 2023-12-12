@@ -1,5 +1,5 @@
 import { useMutation } from '@apollo/client'
-import { EditIcon, InfoIcon } from '@chakra-ui/icons'
+import { CloseIcon, EditIcon, InfoIcon, SmallCloseIcon } from '@chakra-ui/icons'
 import {
   Button,
   Flex,
@@ -18,6 +18,7 @@ import {
   Tag,
   TagCloseButton,
   TagLabel,
+  TagRightIcon,
   Tbody,
   Td,
   Text,
@@ -154,7 +155,8 @@ const GeneralDataRow = ({ status, data, refetch }) => {
   }
 
   const onLicenseOpen = () => {
-    if (data?.licenses && data?.licenses.length > 0) {
+    console.log('data', data)
+    if (data.licenses && data.licenses.length > 0) {
       setSbomLicenseType('license_spdx')
       const filterData = data?.licenses.map((value) => ({
         value: value,
@@ -163,17 +165,17 @@ const GeneralDataRow = ({ status, data, refetch }) => {
       setSbomSpdxList(filterData)
       const selectedIds = filterData.map((option) => option.value)
       setSbomSpdxLicense(selectedIds)
-    } else if (data?.licensesExp) {
+    } else if (data.licensesExp) {
       setSbomLicenseType('license_exp')
       setSbomLicenseExp(data?.licensesExp)
-    } else if (data?.licensesCustom && data?.licensesCustom.length > 0) {
+    } else if (data.licensesCustom && data.licensesCustom.length > 0) {
       setSbomLicenseType('license_custom')
       const filterData = data?.licensesCustom.map((option) => ({
         value: option,
         label: option
       }))
       setSbomCustomList(filterData)
-      setSbomCustomLicense(data?.licensesCustom)
+      setSbomCustomLicense(data.licensesCustom)
     } else {
       setSbomLicenseType('license_spdx')
       setSbomSpdxList([])
@@ -184,6 +186,8 @@ const GeneralDataRow = ({ status, data, refetch }) => {
     }
     onSBMOpen()
   }
+
+  console.log('data', data)
 
   const onUpdateLicense = async () => {
     await updateSbom({
@@ -210,6 +214,48 @@ const GeneralDataRow = ({ status, data, refetch }) => {
         }
       })
       .finally(() => onSBMClose())
+  }
+
+  const handleRemoveSpdx = async (license) => {
+    const filterList =
+      data.licenses.length > 0 &&
+      data.licenses.filter((item) => item !== license)
+    await updateSbom({
+      variables: {
+        id: data.id,
+        spec: data.spec,
+        licenses: {
+          licenses: filterList ? filterList : []
+        }
+      }
+    }).then((res) => res.data && onSBMClose())
+  }
+
+  const handleRemoveExp = async () => {
+    await updateSbom({
+      variables: {
+        id: data.id,
+        spec: data.spec,
+        licenses: {
+          licensesExp: null
+        }
+      }
+    }).then((res) => res.data && onSBMClose())
+  }
+
+  const handleRemoveCustom = async (license) => {
+    const filterList =
+      data.licensesCustom.length > 0 &&
+      data.licensesCustom.filter((item) => item !== license)
+    await updateSbom({
+      variables: {
+        id: data.id,
+        spec: data.spec,
+        licenses: {
+          licensesCustom: filterList ? filterList : []
+        }
+      }
+    }).then((res) => res.data && onSBMClose())
   }
 
   // ADD KEYBOARD SHORTCUT FOR TOGGLE SBOM DRAWER
@@ -369,58 +415,65 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                   {/* SPDX */}
                   {data.licenses?.length > 0 &&
                     data.licenses?.map((item, index) => (
-                      <Tooltip key={index} label={item} placement={'top'}>
-                        <Link
-                          href={`https://spdx.org/licenses/${item}`}
-                          target='_blank'
-                        >
-                          <Tag
-                            size={'md'}
-                            variant='subtle'
-                            colorScheme='green'
-                            width={'fit-content'}
+                      <Tag
+                        size={'md'}
+                        variant='subtle'
+                        colorScheme='green'
+                        width={'fit-content'}
+                      >
+                        <Tooltip key={index} label={item} placement={'top'}>
+                          <Link
+                            href={`https://spdx.org/licenses/${item}`}
+                            target='_blank'
                           >
                             <TagLabel>{item}</TagLabel>
-                          </Tag>
-                        </Link>
-                      </Tooltip>
+                          </Link>
+                        </Tooltip>
+                        <TagCloseButton
+                          onClick={() => handleRemoveSpdx(item)}
+                        />
+                      </Tag>
                     ))}
                   {/* EXPRESSION */}
                   {data.licensesExp && data.licensesExp !== '' && (
-                    <Tooltip label={data.licensesExp} placement={'top'}>
-                      <Link
-                        href={`https://spdx.org/licenses/${data.licensesExp}`}
-                        target='_blank'
-                      >
-                        <Tag
-                          size={'md'}
-                          variant='subtle'
-                          colorScheme='green'
-                          width={'fit-content'}
-                        >
-                          <TagLabel>{data.licensesExp}</TagLabel>
-                        </Tag>
-                      </Link>
-                    </Tooltip>
-                  )}
-                  {/* CUSTOM */}
-                  {data.licensesCustom.length > 0 &&
-                    data.licensesCustom.map((item, index) => (
-                      <Tooltip key={index} label={item} placement={'top'}>
+                    <Tag
+                      size={'md'}
+                      variant='subtle'
+                      colorScheme='green'
+                      width={'fit-content'}
+                    >
+                      <Tooltip label={data.licensesExp} placement={'top'}>
                         <Link
-                          href={`https://spdx.org/licenses/${item}`}
+                          href={`https://spdx.org/licenses/${data.licensesExp}`}
                           target='_blank'
                         >
-                          <Tag
-                            size={'md'}
-                            variant='subtle'
-                            colorScheme='green'
-                            width={'fit-content'}
-                          >
-                            <TagLabel>{item}</TagLabel>
-                          </Tag>
+                          <TagLabel>{data.licensesExp}</TagLabel>
                         </Link>
                       </Tooltip>
+                      <TagCloseButton onClick={handleRemoveExp} />
+                    </Tag>
+                  )}
+                  {/* CUSTOM */}
+                  {data.licensesCustom?.length > 0 &&
+                    data.licensesCustom.map((item, index) => (
+                      <Tag
+                        size={'md'}
+                        variant='subtle'
+                        colorScheme='green'
+                        width={'fit-content'}
+                      >
+                        <Tooltip key={index} label={item} placement={'top'}>
+                          <Link
+                            href={`https://spdx.org/licenses/${item}`}
+                            target='_blank'
+                          >
+                            <TagLabel>{item}</TagLabel>
+                          </Link>
+                        </Tooltip>
+                        <TagCloseButton
+                          onClick={() => handleRemoveCustom(item)}
+                        />
+                      </Tag>
                     ))}
                 </Flex>
               </Td>
@@ -473,14 +526,14 @@ const GeneralDataRow = ({ status, data, refetch }) => {
               <Button
                 fontSize={'sm'}
                 colorScheme='blue'
-                disabled={
-                  (sbomLicenseType === 'license_spdx' &&
-                    sbomSpdxLicense.length === 0) ||
-                  (sbomLicenseType === 'license_exp' &&
-                    sbomLicenseExp === '') ||
-                  (sbomLicenseType === 'license_custom' &&
-                    sbomCustomLicense.length === 0)
-                }
+                // disabled={
+                //   (sbomLicenseType === 'license_spdx' &&
+                //     sbomSpdxLicense.length === 0) ||
+                //   (sbomLicenseType === 'license_exp' &&
+                //     sbomLicenseExp === '') ||
+                //   (sbomLicenseType === 'license_custom' &&
+                //     sbomCustomLicense.length === 0)
+                // }
                 onClick={onUpdateLicense}
               >
                 {data.licenses.length > 0 ? 'Update' : 'Save'}
