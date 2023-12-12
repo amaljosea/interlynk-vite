@@ -627,10 +627,6 @@ function ComponentDrawer(props) {
 
       {isPurlOpen && (
         <PurlModal
-          component={component}
-          version={version}
-          group={group}
-          purl={purl}
           data={purlData}
           isOpen={isPurlOpen}
           onClose={onPurlClose}
