@@ -28,7 +28,10 @@ import {
   FormLabel,
   Select,
   Tag,
-  TagLabel
+  TagLabel,
+  Badge,
+  UnorderedList,
+  ListItem
 } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
 import GlobalContext from 'context/GlobalContext'
@@ -39,7 +42,7 @@ import { GetProjectData } from 'graphQL/Queries'
 import { useContext, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV, FaFilter } from 'react-icons/fa'
-import { useLocation, Link } from 'react-router-dom'
+import { useLocation, Link, useHistory } from 'react-router-dom'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 const customStyles = {
@@ -59,26 +62,43 @@ const customStyles = {
   }
 }
 
-const PartsTable = ({ data, refetch }) => {
+const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const location = useLocation()
+  const history = useHistory()
   const queryParams = new URLSearchParams(location.search)
   const sbomId = queryParams.get('sbom')
   const prodId = queryParams.get('p')
 
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const {
+    isOpen: isDeleteOpen,
+    onOpen: onDeleteOpen,
+    onClose: onDeleteClose
+  } = useDisclosure()
+
   const addBtn = useRef()
 
-  const { totalProducts, setActiveProdTab, prodField, prodDirection } =
-    useContext(GlobalContext)
+  const {
+    totalProducts,
+    setActiveProdTab,
+    prodField,
+    prodDirection,
+    setVulnSeverity,
+    totalRows,
+    vulnField,
+    vulnDirection,
+    compField,
+    compDirection
+  } = useContext(GlobalContext)
 
   const [selectedProd, setSelectedProd] = useState('')
   const [selectedVersion, setSelectedVersion] = useState('')
   const [uniqVersions, setUniqVersions] = useState([])
   const [searchInput, setSearchInput] = useState('')
-
+  const [activeRow, setActiveRow] = useState(null)
   const { data: allProducts } = useQuery(GetProjectData, {
     variables: {
-      first: totalProducts,
+      first: 50,
       field: prodField,
       direction: prodDirection
     }
@@ -109,10 +129,10 @@ const PartsTable = ({ data, refetch }) => {
       .finally(() => onClose())
   }
 
-  const handleRemove = async (id) => {
+  const handleRemove = async () => {
     await deleteSbomPart({
       variables: {
-        id: id
+        id: activeRow.id
       }
     }).then((res) => {
       if (res.data) {
@@ -123,15 +143,26 @@ const PartsTable = ({ data, refetch }) => {
           }
         })
       }
-    })
+    }).finally(() => onDeleteClose())
   }
 
   const productList =
     allProducts &&
-    allProducts.projects.nodes.map((option) => ({
-      value: option.id,
-      label: option.name
-    }))
+    [...allProducts.projects.nodes]
+      .filter((item) => item.enabled === true)
+      .map((option) => ({
+        value: option.id,
+        label: option.name
+      }))
+
+  const filterProducts =
+    productList &&
+    productList.filter((project) => {
+      const existings =
+        data &&
+        [...data].some((sbomPart) => sbomPart.part.project.id === project.value)
+      return !existings
+    })
 
   const [getProduct] = useLazyQuery(GetProject)
 
@@ -182,8 +213,37 @@ const PartsTable = ({ data, refetch }) => {
     ? removeDuplicatesAndLatest(filterVersions)
     : []
 
-  const searchParams = new URLSearchParams(location.search)
-  const product_id = searchParams.get('p')
+  const getComponents = (part) => {
+    window.localStorage.setItem('subProduct', part.project.name)
+    window.localStorage.setItem('subProductVersion', part.project.name)
+    setActiveProdTab(2)
+    getCompData({
+      variables: {
+        projectId: prodId,
+        sbomId: sbomId,
+        first: totalRows,
+        field: compField,
+        direction: compDirection
+      }
+    })
+  }
+
+  const onFilterSev = (part, value) => {
+    window.localStorage.setItem('subProduct', part.project.name)
+    window.localStorage.setItem('subProductVersion', part.project.name)
+    setActiveProdTab(3)
+    setVulnSeverity(value)
+    getVulnData({
+      variables: {
+        projectId: prodId,
+        sbomId: sbomId,
+        severity: value,
+        first: totalRows,
+        field: vulnField,
+        direction: vulnDirection
+      }
+    })
+  }
 
   // COLUMNS
   const columns = [
@@ -248,13 +308,137 @@ const PartsTable = ({ data, refetch }) => {
       }
     },
     {
+      id: 'COMPONENTS',
+      name: 'COMPONENTS',
+      selector: (row) => {
+        const { part } = row
+        return (
+          <Link
+            to={`/vendor/products?&p=${part.project.id}&sbom=${part.id}&parts=true`}
+          >
+            <Badge
+              variant='solid'
+              borderRadius='sm'
+              colorScheme='blue'
+              fontSize={'sm'}
+              fontWeight={'medium'}
+              onClick={() => getComponents(part)}
+            >
+              {part.stats.compCount}
+            </Badge>
+          </Link>
+        )
+      }
+    },
+    {
+      id: 'LICENSES',
+      name: 'LICENSES',
+      selector: (row) => {
+        const { part } = row
+        return (
+          <Badge
+            variant='solid'
+            borderRadius='sm'
+            colorScheme='blue'
+            fontSize={'sm'}
+            fontWeight={'medium'}
+          >
+            {part.stats.compLicenseCount}
+          </Badge>
+        )
+      }
+    },
+    {
+      id: 'VULNERABILITIES',
+      name: 'VULNERABILITIES',
+      selector: (row) => {
+        const { part } = row
+        return (
+          <Stack fontWeight={'medium'} direction={'row'}>
+            <Link
+              to={`/vendor/products?&p=${part.project.id}&sbom=${part.id}&parts=true`}
+            >
+              <Tooltip label='Critical' placement='top'>
+                <Badge
+                  fontSize={'sm'}
+                  fontWeight={'medium'}
+                  variant='solid'
+                  colorScheme='red'
+                  borderRadius='sm'
+                  cursor={'pointer'}
+                  onClick={() => onFilterSev(part, ['critical'])}
+                >
+                  {part.stats.vulnStats.critical
+                    ? part.stats.vulnStats.critical
+                    : 0}
+                </Badge>
+              </Tooltip>
+            </Link>
+            <Link
+              to={`/vendor/products?&p=${part.project.id}&sbom=${part.id}&parts=true`}
+            >
+              <Tooltip label='High' placement='top'>
+                <Badge
+                  fontSize={'sm'}
+                  fontWeight={'medium'}
+                  variant='solid'
+                  colorScheme='orange'
+                  borderRadius='sm'
+                  cursor={'pointer'}
+                  onClick={() => onFilterSev(part, ['high'])}
+                >
+                  {part.stats.vulnStats.high ? part.stats.vulnStats.high : 0}
+                </Badge>
+              </Tooltip>
+            </Link>
+            <Link
+              to={`/vendor/products?&p=${part.project.id}&sbom=${part.id}&parts=true`}
+            >
+              <Tooltip label='Medium' placement='top'>
+                <Badge
+                  fontSize={'sm'}
+                  fontWeight={'medium'}
+                  variant='solid'
+                  colorScheme='yellow'
+                  borderRadius='sm'
+                  cursor={'pointer'}
+                  onClick={() => onFilterSev(part, ['medium'])}
+                >
+                  {part.stats.vulnStats.medium
+                    ? part.stats.vulnStats.medium
+                    : 0}
+                </Badge>
+              </Tooltip>
+            </Link>
+            <Link
+              to={`/vendor/products?&p=${part.project.id}&sbom=${part.id}&parts=true`}
+            >
+              <Tooltip label='Low' placement='top'>
+                <Badge
+                  fontSize={'sm'}
+                  fontWeight={'medium'}
+                  variant='solid'
+                  colorScheme='green'
+                  borderRadius='sm'
+                  cursor={'pointer'}
+                  onClick={() => onFilterSev(part, ['low'])}
+                >
+                  {part.stats.vulnStats.low ? part.stats.vulnStats.low : 0}
+                </Badge>
+              </Tooltip>
+            </Link>
+          </Stack>
+        )
+      }
+    },
+    {
       id: 'STATUS',
       name: 'STATUS',
       selector: (row) => {
         const { part } = row
 
         return (
-          <Tag size='sm' colorScheme='blue'>
+          <Tag size='sm' colorScheme='cyan' textTransform={'capitalize'}>
             {part.lifecycle}
           </Tag>
         )
@@ -275,7 +459,12 @@ const PartsTable = ({ data, refetch }) => {
             />
             <Portal>
               <MenuList size='sm'>
-                <MenuItem onClick={() => handleRemove(partId)}>
+                <MenuItem
+                  onClick={() => {
+                    setActiveRow(row)
+                    onDeleteOpen()
+                  }}
+                >
                   Remove
                 </MenuItem>
               </MenuList>
@@ -387,19 +576,28 @@ const PartsTable = ({ data, refetch }) => {
                       Project
                     </FormLabel>
                     <Select
+                      fontSize={'sm'}
                       name='product'
                       id='product'
                       value={selectedProd}
                       onChange={handleSelectProduct}
                     >
                       <option value={''}>-- Select --</option>
-                      {[...productList]
-                        .filter((item) => item.value !== prodId)
-                        .map((item, index) => (
-                          <option key={index} value={item.value}>
-                            {item.label}
-                          </option>
-                        ))}
+                      {data.length > 0
+                        ? [...filterProducts]
+                            .filter((item) => item.value !== prodId)
+                            .map((item, index) => (
+                              <option key={index} value={item.value}>
+                                {item.label}
+                              </option>
+                            ))
+                        : [...productList]
+                            .filter((item) => item.value !== prodId)
+                            .map((item, index) => (
+                              <option key={index} value={item.value}>
+                                {item.label}
+                              </option>
+                            ))}
                     </Select>
                   </FormControl>
                   {/* Version */}
@@ -412,6 +610,7 @@ const PartsTable = ({ data, refetch }) => {
                       Version
                     </FormLabel>
                     <Select
+                      fontSize={'sm'}
                       name='versions'
                       id='versions'
                       value={selectedVersion}
@@ -431,16 +630,51 @@ const PartsTable = ({ data, refetch }) => {
             </ModalBody>
 
             <ModalFooter>
-              <Button mr={3} onClick={onClose}>
+              <Button mr={3} fontSize={'sm'} onClick={onClose}>
                 Close
               </Button>
               <Button
+                fontSize={'sm'}
                 variant='solid'
                 colorScheme='blue'
                 onClick={handleCreatePart}
                 disabled={selectedVersion === ''}
               >
-                Submit
+                Add
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      )}
+
+      {/* DISABLED */}
+      {isDeleteOpen && (
+        <Modal isOpen={isDeleteOpen} onClose={onDeleteClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Delete Part</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Text>Deleting this version will: </Text>
+              <UnorderedList>
+                <Flex flexDir={'column'} gap={1} mt={4}>
+                  {[
+                    'remove this versions and its SBOM',
+                    'remove access to this version for all users'
+                  ].map((item, index) => (
+                    <ListItem key={index}>{item}</ListItem>
+                  ))}
+                </Flex>
+              </UnorderedList>
+
+              <Text mt={6}>Are you sure you wish to continue ?</Text>
+            </ModalBody>
+            <ModalFooter>
+              <Button mr={3} onClick={onDeleteClose}>
+                No
+              </Button>
+              <Button onClick={handleRemove} colorScheme='red'>
+                Yes
               </Button>
             </ModalFooter>
           </ModalContent>

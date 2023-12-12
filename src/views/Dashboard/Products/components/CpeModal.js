@@ -39,6 +39,7 @@ const CpeModal = ({
   onUpdateCpe,
   selectedCpe,
   cpeValue,
+  setCpeValue,
   checkId,
   refetch,
   setPageIndex,
@@ -71,10 +72,10 @@ const CpeModal = ({
 
   // UPDATE FIELDS DATA FROM API
   useEffect(() => {
-    const matches = regexPattern.test(cpeString)
+    const matches = regexPattern.test(cpeValue)
     if (matches) {
-      setCpeString(cpeString)
-      const components = cpeString.split(':')
+      setCpeString(cpeValue)
+      const components = cpeValue.split(':')
       setType(components[2])
       setVendor(components[3])
       setProduct(components[4])
@@ -83,7 +84,7 @@ const CpeModal = ({
     } else {
       setCpeString('cpe:2.3:::::*:*:*:*:*:*:*')
     }
-  }, [])
+  }, [cpeValue])
 
   // ON CPE SAVE
   const handleSave = () => {
@@ -442,7 +443,7 @@ const CpeModal = ({
               )}
               <Stack direction={'row'} spacing={2} alignItems={'center'}>
                 <Button fontSize={'sm'} colorScheme='gray' onClick={onClose}>
-                  Close
+                  Cancel
                 </Button>
                 <Button
                   fontSize={'sm'}

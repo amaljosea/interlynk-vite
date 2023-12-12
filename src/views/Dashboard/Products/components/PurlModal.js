@@ -339,10 +339,13 @@ const PurlModal = ({
   }
 
   const onNameBlur = () => {
+    const pkg = PackageURL.fromString(purlString)
     if (purlName !== '') {
-      const pkg = PackageURL.fromString(purlString)
       pkg.name = purlName
       setPurlString(pkg.toString())
+    } else {
+      pkg.name = 'name'
+      setPurlString(pkg.toString()) 
     }
   }
 
@@ -449,24 +452,27 @@ const PurlModal = ({
 
   useEffect(() => {
     if (data) {
-      console.log('purlType', purlType)
       setPurlType(data.type === null ? '' : data.type)
       setNamespace(data.namespace === null ? '' : data.namespace)
       setPurlName(data.name === null ? '' : data.name)
       setPurlVersion(data.version === null ? '' : data.version)
-      setQualifiers(
-        data.qualifiers === null ? '' : Object.values(data.qualifiers).join('')
-      )
+      if (data.qualifiers) {
+        const queryString = Object.entries(data.qualifiers)
+          .map(([key, value]) => `${key}=${value}`)
+          .join('&')
+        setQualifiers(queryString)
+      }
     }
   }, [data])
 
   const handleTypeChange = (e) => {
     const { value } = e.target
     setPurlType(value)
-    setPurlString(`pkg:type/name@version`)
+    setPurlString('pkg:type/name@version')
     setNamespace('')
     setPurlName('')
     setPurlVersion('')
+    setQualifiers('')
   }
 
   const onTypeBlur = () => {
@@ -507,9 +513,12 @@ const PurlModal = ({
   }
 
   const onVersionBlur = () => {
+    const pkg = PackageURL.fromString(purlString)
     if (purlVersion !== '') {
-      const pkg = PackageURL.fromString(purlString)
       pkg.version = purlVersion
+      setPurlString(pkg.toString())
+    } else {
+      pkg.version = 'version'
       setPurlString(pkg.toString())
     }
   }
@@ -521,10 +530,17 @@ const PurlModal = ({
   }
 
   const onQualifierBlur = () => {
+    const pkg = PackageURL.fromString(purlString)
+    const convertedObject = {}
     if (qualifiers !== '') {
-      const pkg = PackageURL.fromString(purlString)
-      pkg.qualifiers = qualifiers
-      console.log('pkg', pkg)
+      const params = new URLSearchParams(qualifiers)
+      for (const [key, value] of params) {
+        convertedObject[key] = value
+      }
+      pkg.qualifiers = convertedObject
+      setPurlString(pkg.toString())
+    } else {
+      pkg.qualifiers = ''
       setPurlString(pkg.toString())
     }
   }
@@ -535,7 +551,7 @@ const PurlModal = ({
       pkg.namespace = pkg.namespace === 'namespace' ? '' : pkg.namespace
       pkg.version = pkg.version === 'version' ? '' : pkg.version
       console.log('value', pkg.toString())
-      setPurlString(pkg.toString())
+      setPurlValue(pkg.toString())
       setIsValid(true)
       onClose()
     } catch (error) {
@@ -579,6 +595,7 @@ const PurlModal = ({
           <ModalCloseButton />
           <ModalBody>
             <Flex width={'100%'} direction={'column'} gap={4}>
+              {/* Package URL */}
               <FormControl>
                 <FormLabel>Package URL</FormLabel>
                 <Textarea
@@ -600,6 +617,7 @@ const PurlModal = ({
                 <FormLabel htmlFor='packageType'>Package Type</FormLabel>
                 <Select
                   size='md'
+                  fontSize={'sm'}
                   id='packageType'
                   name='packageType'
                   value={purlType}
@@ -632,6 +650,8 @@ const PurlModal = ({
                 <FormControl>
                   <FormLabel>Namespace</FormLabel>
                   <Select
+                    size='md'
+                    fontSize={'sm'}
                     id='namespace'
                     name='namespace'
                     value={namespace}
@@ -643,16 +663,24 @@ const PurlModal = ({
                     ))}
                   </Select>
                 </FormControl>
-              ) :  (
-                <FormControl display={(purlType === 'nuget' || purlType === 'oci') ? 'none' : 'block'}>
+              ) : (
+                <FormControl
+                  display={
+                    purlType === 'nuget' || purlType === 'oci'
+                      ? 'none'
+                      : 'block'
+                  }
+                >
                   <FormLabel>Namespace</FormLabel>
                   <Input
                     size='md'
+                    fontSize={'sm'}
                     id='namespace'
                     name='namespace'
                     value={namespace}
                     onChange={handleNamespaceChange}
                     onBlur={onNamespaceBlur}
+                    placeholder='Enter namespace'
                   />
                 </FormControl>
               )}
@@ -678,6 +706,7 @@ const PurlModal = ({
                     fontSize={'sm'}
                     onChange={handleNameChange}
                     onBlur={onNameBlur}
+                    placeholder='Enter packageName'
                   />
                 </FormControl>
               )}
@@ -695,7 +724,7 @@ const PurlModal = ({
                 />
               ) : (
                 <FormControl>
-                  <FormLabel> Version</FormLabel>
+                  <FormLabel>Version</FormLabel>
                   <Input
                     size='md'
                     fontSize={'sm'}
@@ -704,6 +733,7 @@ const PurlModal = ({
                     value={purlVersion}
                     onChange={handleVersionChange}
                     onBlur={onVersionBlur}
+                    placeholder='Enter version'
                   />
                 </FormControl>
               )}
@@ -712,11 +742,13 @@ const PurlModal = ({
                 <FormLabel>Qualifiers</FormLabel>
                 <Input
                   size='md'
+                  fontSize={'sm'}
                   id='qualifiers'
                   name='qualifiers'
                   value={qualifiers}
                   onChange={handleQualifierChange}
                   onBlur={onQualifierBlur}
+                  placeholder='Enter qualifiers'
                 />
               </FormControl>
             </Flex>
@@ -746,7 +778,7 @@ const PurlModal = ({
               )}
               <Stack direction={'row'} spacing={3} alignItems={'center'}>
                 <Button fontSize={'sm'} colorScheme='gray' onClick={onClose}>
-                  Close
+                  Cancel
                 </Button>
                 <Button
                   fontSize={'sm'}

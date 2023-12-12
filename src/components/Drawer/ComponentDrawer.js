@@ -52,28 +52,20 @@ import LicenseField from 'components/LicenseField'
 
 function ComponentDrawer(props) {
   const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
   const toast = useToast()
+
+  const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
   const customerView = location.pathname.startsWith('/customer')
 
   const {
-    id,
     isOpen,
     onClose,
-    component,
-    version,
     data,
-    type,
-    cpes,
-    purl,
-    primary,
-    internal,
     primaryComp,
     fetchCompData,
-    group,
     shortDesc,
     filterRefetch
   } = props
@@ -82,21 +74,19 @@ function ComponentDrawer(props) {
     setCompFilters,
     licenseType,
     spdxLicense,
-    setSpdxLicense,
-    setSpdxList,
     setPurlString,
     customLicense,
     purlString,
     cpeString,
-    setCpeString,
-    licenseExp,
-    setLicenseExp
+    licenseExp
   } = useContext(GlobalContext)
 
   const onFilterRefetch = () => {
     filterRefetch({
-      projectId: productId,
-      sbomId: sbomId
+      variables: {
+        projectId: productId,
+        sbomId: sbomId
+      }
     }).then((res) => res.data && setCompFilters(res.data.sbom.filters))
   }
 
@@ -110,38 +100,47 @@ function ComponentDrawer(props) {
     onCompleted: () => fetchCompData()
   })
 
-  const [compId, setCompId] = useState('')
+  const cpeRef = useRef()
+
   const [groupInfo, setGroupInfo] = useState('')
   const [compName, setCompName] = useState('')
   const [compVersion, setCompVersion] = useState('')
   const [compKind, setCompKind] = useState('')
-
+  const [compScope, setCompScope] = useState('')
   const [cpeValue, setCpeValue] = useState('')
   const [cpeList, setCpeList] = useState([])
   const [cpeData, setCpeData] = useState([])
-  const cpeRef = useRef()
-
   const [selectedCpe, setSelectedCpe] = useState(null)
   const [purlValue, setPurlValue] = useState('')
   const [purlData, setPurlData] = useState(null)
   const [isPURLInputValid, setPURLInputValid] = useState(true)
-  const [isPrimary, setIsPrimary] = useState(primary)
-  const [isInternal, setIsInternal] = useState(internal)
+  const [isPrimary, setIsPrimary] = useState(false)
+  const [isInternal, setIsInternal] = useState(false)
 
   useEffect(() => {
-    if (component) {
-      setCompId(id)
-      setGroupInfo(group == null ? '' : group)
-      setCompName(component)
+    if (data) {
+      const {
+        name,
+        version,
+        kind,
+        cpes,
+        purl,
+        primary,
+        internal,
+        group,
+        scope
+      } = data
+      setGroupInfo(group)
+      setCompName(name)
       setCompVersion(version)
       setCpeList(cpes)
       setPurlString(purl)
+      setCompKind(kind)
+      setCompScope(scope)
+      setIsPrimary(primary)
+      setIsInternal(internal)
     }
   }, [])
-
-  useEffect(() => {
-    setCompKind(type)
-  }, [type])
 
   // Health Check
   useEffect(() => {
@@ -180,10 +179,13 @@ function ComponentDrawer(props) {
   const handlePURLInputChange = (e) => {
     const { value } = e.target
     const val = value.replace(/\s/g, '')
-    setPurlString(val)
-    if (val !== '') {
+    setPurlValue(val)
+  }
+
+  const purlInputBlur = () => {
+    if (purlValue !== '') {
       try {
-        PackageURL.fromString(val)
+        PackageURL.fromString(purlValue)
         setPURLInputValid(true)
       } catch (ex) {
         console.error('ex', ex)
@@ -193,12 +195,12 @@ function ComponentDrawer(props) {
   }
 
   const handlePurlModal = () => {
-    if (purlString && purlString !== '' && isPURLInputValid) {
-      const pkg = PackageURL.fromString(purlString)
+    if (purlValue && purlValue !== '' && isPURLInputValid) {
+      const pkg = PackageURL.fromString(purlValue)
       setPurlData(pkg)
       setPurlString(pkg.toString())
     } else {
-      setPurlString('pkg:type/name@version?0=a&1=b&2=c')
+      setPurlString('pkg:type/name@version?key=value')
     }
     onPurlOpen()
   }
@@ -210,6 +212,7 @@ function ComponentDrawer(props) {
         kind: compKind,
         name: compName,
         version: compVersion,
+        scope: compScope,
         licenses: {
           licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
           licensesExp: licenseType === 'license_exp' ? licenseExp : undefined,
@@ -243,11 +246,12 @@ function ComponentDrawer(props) {
     try {
       await updateComponent({
         variables: {
-          id: id,
+          id: data?.id,
           sbomId: sbomId,
           kind: compKind,
           name: compName,
           version: compVersion,
+          scope: compScope,
           licenses: {
             licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
             licensesExp: licenseType === 'license_exp' ? licenseExp : undefined,
@@ -282,7 +286,7 @@ function ComponentDrawer(props) {
     } else {
       setCpeList([...cpeList, string])
       setCpeData([])
-      setCpeString('')
+      setCpeValue('')
       setSelectedCpe(null)
     }
   }
@@ -304,7 +308,7 @@ function ComponentDrawer(props) {
         return item
       })
       setCpeList(updatedData)
-      setCpeString('')
+      setCpeValue('')
       setSelectedCpe(null)
     }
   }
@@ -317,7 +321,7 @@ function ComponentDrawer(props) {
   const handleCpeChange = (e) => {
     const { value } = e.target
     const val = value.replace(/\s/g, '')
-    setCpeString(val)
+    setCpeValue(val)
     if (val === '') {
       setCpeData([])
     } else {
@@ -371,9 +375,6 @@ function ComponentDrawer(props) {
                   placeholder='Enter name'
                   value={compName}
                   onChange={(e) => setCompName(e.target.value)}
-                  isDisabled={component}
-                  isInvalid={component}
-                  errorBorderColor='blue.600'
                 />
               </FormControl>
               {/* Version */}
@@ -397,9 +398,6 @@ function ComponentDrawer(props) {
                   placeholder='Enter version'
                   value={compVersion}
                   onChange={(e) => setCompVersion(e.target.value)}
-                  isDisabled={component}
-                  isInvalid={component}
-                  errorBorderColor='blue.600'
                 />
               </FormControl>
               {/* Group */}
@@ -419,8 +417,6 @@ function ComponentDrawer(props) {
                   value={groupInfo}
                   onChange={(e) => setGroupInfo(e.target.value)}
                   isDisabled
-                  isInvalid
-                  errorBorderColor='gray.300'
                 />
               </FormControl>
               {/* KIND */}
@@ -475,12 +471,13 @@ function ComponentDrawer(props) {
                       name='purl'
                       fontSize={'sm'}
                       placeholder='PURL'
-                      value={purlString}
+                      value={purlValue}
                       autoComplete='off'
                       onChange={handlePURLInputChange}
+                      onBlur={purlInputBlur}
                     />
                     <InputRightElement align='center' zIndex={-1}>
-                      {purlString != null && purlString !== '' ? (
+                      {purlValue != null && purlValue !== '' ? (
                         isPURLInputValid ? (
                           <CheckIcon color='green' />
                         ) : (
@@ -507,8 +504,8 @@ function ComponentDrawer(props) {
                 <Stack direction={'row'} width={'100%'} spacing={2}>
                   <CpeInput
                     name='cpe'
-                    inputValue={cpeString}
-                    setInputValue={setCpeString}
+                    inputValue={cpeValue}
+                    setInputValue={setCpeValue}
                     cpeList={cpeData}
                     setCpeList={setCpeData}
                     onChange={handleCpeChange}
@@ -533,14 +530,14 @@ function ComponentDrawer(props) {
                   flexWrap={'wrap'}
                   spacing={2}
                   gap={2}
-                  my={2}
+                  mt={2}
                 >
                   {cpeList.map((item, index) => (
                     <Tag key={index} variant='solid' colorScheme={'blue'}>
                       <TagLabel
                         cursor={'pointer'}
                         onClick={() => {
-                          setCpeString(item)
+                          setCpeValue(item)
                           setSelectedCpe({ id: index, name: item })
                         }}
                       >
@@ -551,14 +548,31 @@ function ComponentDrawer(props) {
                   ))}
                 </Flex>
               </FormControl>
+              {/* SCOPE */}
+              <FormControl>
+                <FormLabel htmlFor='compScope'>Scope</FormLabel>
+                <Select
+                  id='compScope'
+                  name='compScope'
+                  size='md'
+                  fontSize={'sm'}
+                  value={compScope}
+                  onChange={(e) => setCompScope(e.target.value)}
+                >
+                  <option value=''>-- Select --</option>
+                  <option value='excluded'>Excluded</option>
+                  <option value='optional'>Optional</option>
+                  <option value='required'>Required</option>
+                </Select>
+              </FormControl>
               {/* PRIMARY COMPONENT */}
               <FormControl isReadOnly={customerView}>
-                <Flex alignItems={'center'} gap={2}>
+                <Flex alignItems={'center'} gap={2} mt={4}>
                   {shortDesc === 'Primary Component' && !isPrimary && (
                     <WarningTwoIcon w={4} h={4} color='red.500' />
                   )}
                   <Checkbox
-                    size='md'
+                    size='sm'
                     colorScheme='blue'
                     isChecked={isPrimary}
                     onChange={onWarningOpen}
@@ -571,7 +585,7 @@ function ComponentDrawer(props) {
               {/* INTERNAL COMPONENT */}
               <FormControl isReadOnly={customerView}>
                 <Checkbox
-                  size='md'
+                  size='sm'
                   colorScheme='blue'
                   isChecked={isInternal}
                   onChange={() => setIsInternal(!isInternal)}
@@ -587,7 +601,7 @@ function ComponentDrawer(props) {
               <Button mr={3} onClick={onClose}>
                 Cancel
               </Button>
-              {id === undefined ? (
+              {!data ? (
                 <Button
                   colorScheme='blue'
                   onClick={handleCreateCom}
@@ -633,6 +647,7 @@ function ComponentDrawer(props) {
           isOpen={isCpeOpen}
           onClose={onCpeClose}
           cpeValue={cpeValue}
+          setCpeValue={setCpeValue}
           onCreateCpe={handleCreateCpe}
           onUpdateCpe={handleUpdateCpe}
           selectedCpe={selectedCpe}

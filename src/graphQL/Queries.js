@@ -610,6 +610,7 @@ export const GetComponentData = gql`
           licensesExp
           licensesCustom
           group
+          scope
           externalUrls {
             name
             url
@@ -1818,6 +1819,11 @@ export const GetSbomParts = gql`
           project {
             id
             name
+          }
+          stats {
+            compCount
+            compLicenseCount
+            vulnStats
           }
           primaryComponent {
             name

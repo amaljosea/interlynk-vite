@@ -54,7 +54,6 @@ const SBOMTable = ({
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
-
   const {
     setCompFilters,
     setVulnFilters,
@@ -109,13 +108,10 @@ const SBOMTable = ({
     }
   )
 
-    // GET SBOM PARTS
-    const [getParts, { data: parts }] = useLazyQuery(
-      GetSbomParts,
-      {
-        fetchPolicy: 'network-only'
-      }
-    )
+  // GET SBOM PARTS
+  const [getParts, { data: parts }] = useLazyQuery(GetSbomParts, {
+    fetchPolicy: 'network-only'
+  })
 
   useEffect(() => {
     if (compData) {
@@ -165,7 +161,7 @@ const SBOMTable = ({
         projectId: productId,
         sbomId: sbomId
       })
-    } else if(value === 1) {
+    } else if (value === 1) {
       getParts({
         variables: {
           projectId: productId,
@@ -254,10 +250,22 @@ const SBOMTable = ({
           projectId: productId,
           sbomId: sbomId,
           search: checkSearchInput !== '' ? checkSearchInput : undefined,
-          checkId: checkRules.includes('all') || checkRules.length === 0 ? undefined : checkRules,
-          category: checkCategory.includes('all') || checkCategory.length === 0 ? undefined : checkCategory,
-          severity: checkSeverity.includes('all') || checkSeverity.length === 0 ? undefined : checkSeverity,
-          status: checkStatus.includes('all') || checkStatus.length === 0 ? undefined : checkStatus,
+          checkId:
+            checkRules.includes('all') || checkRules.length === 0
+              ? undefined
+              : checkRules,
+          category:
+            checkCategory.includes('all') || checkCategory.length === 0
+              ? undefined
+              : checkCategory,
+          severity:
+            checkSeverity.includes('all') || checkSeverity.length === 0
+              ? undefined
+              : checkSeverity,
+          status:
+            checkStatus.includes('all') || checkStatus.length === 0
+              ? undefined
+              : checkStatus,
           first: totalRows,
           field: checkField,
           direction: checkDirection
@@ -353,7 +361,12 @@ const SBOMTable = ({
             </TabPanel>
             {/* PARTS TABLE */}
             <TabPanel px={0}>
-              <PartsTable data={parts?.sbom.sbomParts} refetch={getParts} />
+              <PartsTable
+                data={parts?.sbom.sbomParts}
+                refetch={getParts}
+                getVulnData={getVulnData}
+                getCompData={getCompData}
+              />
             </TabPanel>
             {/* COMPONENT TABLE */}
             <TabPanel px={0}>
