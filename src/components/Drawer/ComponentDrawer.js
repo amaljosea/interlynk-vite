@@ -177,13 +177,18 @@ function ComponentDrawer(props) {
     onClose: onWarningClose
   } = useDisclosure()
 
+
   const handlePURLInputChange = (e) => {
     const { value } = e.target
     const val = value.replace(/\s/g, '')
-    setPurlString(val)
-    if (val !== '') {
+    setPurlValue(val)
+  }
+  
+
+  const purlInputBlur = () => {
+    if (purlValue !== '') {
       try {
-        PackageURL.fromString(val)
+        PackageURL.fromString(purlValue)
         setPURLInputValid(true)
       } catch (ex) {
         console.error('ex', ex)
@@ -193,12 +198,12 @@ function ComponentDrawer(props) {
   }
 
   const handlePurlModal = () => {
-    if (purlString && purlString !== '' && isPURLInputValid) {
-      const pkg = PackageURL.fromString(purlString)
+    if (purlValue && purlValue !== '' && isPURLInputValid) {
+      const pkg = PackageURL.fromString(purlValue)
       setPurlData(pkg)
       setPurlString(pkg.toString())
     } else {
-      setPurlString('pkg:type/name@version?0=a&1=b&2=c')
+      setPurlString('pkg:type/name@version?key=value')
     }
     onPurlOpen()
   }
@@ -475,12 +480,13 @@ function ComponentDrawer(props) {
                       name='purl'
                       fontSize={'sm'}
                       placeholder='PURL'
-                      value={purlString}
+                      value={purlValue}
                       autoComplete='off'
                       onChange={handlePURLInputChange}
+                      onBlur={purlInputBlur}
                     />
                     <InputRightElement align='center' zIndex={-1}>
-                      {purlString != null && purlString !== '' ? (
+                      {purlValue != null && purlValue !== '' ? (
                         isPURLInputValid ? (
                           <CheckIcon color='green' />
                         ) : (
