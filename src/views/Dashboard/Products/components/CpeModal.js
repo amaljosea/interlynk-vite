@@ -442,7 +442,7 @@ const CpeModal = ({
               )}
               <Stack direction={'row'} spacing={2} alignItems={'center'}>
                 <Button fontSize={'sm'} colorScheme='gray' onClick={onClose}>
-                  Close
+                  Cancel
                 </Button>
                 <Button
                   fontSize={'sm'}
