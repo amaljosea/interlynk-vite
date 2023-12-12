@@ -95,6 +95,7 @@ function Profile() {
           <Header
             user={orgInfo.organization.currentUser}
             selectedTab={selectedTab}
+            refetch={refetch}
             setSelectedTab={setSelectedTab}
             tabs={tabs}
           />

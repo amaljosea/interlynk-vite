@@ -1,14 +1,25 @@
 // Chakra imports
-import { Avatar, Button, Flex, Text, useColorModeValue } from '@chakra-ui/react'
+import { useMutation } from '@apollo/client'
+import {
+  Box,
+  Button,
+  Flex,
+  Image,
+  Input,
+  Text,
+  useColorModeValue,
+  useToast
+} from '@chakra-ui/react'
 
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
+import { UploadProfileImage } from 'graphQL/Mutation'
+import { useEffect, useRef, useState } from 'react'
 import { displayPic } from 'utils'
 
-const Header = ({ selectedTab, setSelectedTab, user, tabs }) => {
-  // Chakra color mode
+const Header = ({ selectedTab, setSelectedTab, user, tabs, refetch }) => {
+  const toast = useToast()
   const textColor = useColorModeValue('gray.700', 'white')
-
   const emailColor = useColorModeValue('gray.500', 'gray.300')
 
   const handleClick = (name) => {
@@ -19,6 +30,68 @@ const Header = ({ selectedTab, setSelectedTab, user, tabs }) => {
       window.history.pushState(null, null, '/vendor/profiles?tab=organization')
     }
   }
+
+  const [uploadProfile] = useMutation(UploadProfileImage)
+
+  console.log('user', user)
+
+  const inputRef = useRef(null)
+  const [profileImage, setProfileImage] = useState(null)
+
+  const isValidFileType = (file) => {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
+    return allowedTypes.includes(file.type)
+  }
+
+  const isValidFileSize = (file) => {
+    const maxSize = 5 * 1024 * 1024
+    return file.size <= maxSize
+  }
+
+  const onImageChange = async (file) => {
+    console.log('Selected file:', file)
+    // setProfileImage(URL.createObjectURL(file))
+    setProfileImage(file)
+    await uploadProfile({
+      variables: {
+        userId: user.id,
+        profileImage: file
+      }
+    })
+      .then((res) => res.data && refetch())
+      .finally(() => {
+        toast({
+          description: 'Profile updated successfully',
+          status: 'success',
+          duration: 3000,
+          position: 'top'
+        })
+      })
+  }
+
+  const onProfileClick = () => {
+    inputRef.current.click()
+  }
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0]
+    if (file && isValidFileType(file) && isValidFileSize(file)) {
+      onImageChange(file)
+    } else {
+      toast({
+        description: 'Invalid file format or size',
+        status: 'error',
+        duration: 3000,
+        position: 'top'
+      })
+    }
+  }
+
+  useEffect(() => {
+    if (user) {
+      setProfileImage(`http://localhost:3000/${user.profileImage.url}`)
+    }
+  }, [user])
 
   return (
     <Flex direction='column' pt={{ base: '120px', md: '75px' }}>
@@ -31,14 +104,52 @@ const Header = ({ selectedTab, setSelectedTab, user, tabs }) => {
             direction={{ sm: 'column', md: 'row' }}
             w={{ sm: '100%' }}
             textAlign={{ sm: 'center', md: 'start' }}
+            gap={4}
           >
-            <Avatar
-              me={{ md: '22px' }}
-              src={displayPic(user.email)}
-              w='80px'
-              h='80px'
-              bg='none'
-            />
+            {/* PROFILE IMAGE */}
+            <Box
+              position='relative'
+              overflow='hidden'
+              borderRadius='full'
+              width='80px'
+              height='80px'
+            >
+              <Image
+                src={profileImage || displayPic(user.email)}
+                alt=''
+                borderRadius='full'
+                width='80px'
+                height='80px'
+                objectFit='cover'
+              />
+              <Input
+                type='file'
+                ref={inputRef}
+                onChange={handleFileChange}
+                opacity='0'
+                position='absolute'
+                top='0'
+                left='0'
+                width='80px'
+                height='80px'
+                cursor='pointer'
+              />
+              <Box
+                position='absolute'
+                top='0'
+                left='0'
+                width='80px'
+                height='80px'
+                bg='rgba(0,0,0,0.2)'
+                opacity='0'
+                transition='opacity 0.3s'
+                _hover={{ opacity: 1 }}
+                onClick={onProfileClick}
+                borderRadius='full'
+                cursor='pointer'
+              />
+            </Box>
+
             <Flex direction='column' maxWidth='100%' my={{ sm: '14px' }}>
               <Text
                 fontSize={{ sm: 'lg', lg: 'xl' }}
