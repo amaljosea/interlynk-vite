@@ -48,17 +48,25 @@ const Header = ({ selectedTab, setSelectedTab, user, tabs, refetch }) => {
     return file.size <= maxSize
   }
 
+  const SERVER_URL = process.env.REACT_APP_SERVER
+
   const onImageChange = async (file) => {
     console.log('Selected file:', file)
     // setProfileImage(URL.createObjectURL(file))
-    setProfileImage(file)
     await uploadProfile({
       variables: {
         userId: user.id,
         profileImage: file
       }
     })
-      .then((res) => res.data && refetch())
+      .then((res) => {
+        if (res.data) {
+          setProfileImage(
+            `${SERVER_URL}/${res.data.userUploadProfileImage.user.profileImage.url}`
+          )
+          refetch()
+        }
+      })
       .finally(() => {
         toast({
           description: 'Profile updated successfully',
@@ -89,9 +97,9 @@ const Header = ({ selectedTab, setSelectedTab, user, tabs, refetch }) => {
 
   useEffect(() => {
     if (user) {
-      setProfileImage(`http://localhost:3000/${user.profileImage.url}`)
+      setProfileImage(`${SERVER_URL}/${user.profileImage.url}`)
     }
-  }, [user])
+  }, [])
 
   return (
     <Flex direction='column' pt={{ base: '120px', md: '75px' }}>
