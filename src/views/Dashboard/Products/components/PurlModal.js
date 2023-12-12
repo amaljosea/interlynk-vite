@@ -746,7 +746,7 @@ const PurlModal = ({
               )}
               <Stack direction={'row'} spacing={3} alignItems={'center'}>
                 <Button fontSize={'sm'} colorScheme='gray' onClick={onClose}>
-                  Close
+                  Cancel
                 </Button>
                 <Button
                   fontSize={'sm'}
