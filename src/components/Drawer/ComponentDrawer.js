@@ -287,7 +287,7 @@ function ComponentDrawer(props) {
     } else {
       setCpeList([...cpeList, string])
       setCpeData([])
-      setCpeString('')
+      setCpeValue('')
       setSelectedCpe(null)
     }
   }
@@ -309,7 +309,7 @@ function ComponentDrawer(props) {
         return item
       })
       setCpeList(updatedData)
-      setCpeString('')
+      setCpeValue('')
       setSelectedCpe(null)
     }
   }
@@ -322,7 +322,7 @@ function ComponentDrawer(props) {
   const handleCpeChange = (e) => {
     const { value } = e.target
     const val = value.replace(/\s/g, '')
-    setCpeString(val)
+    setCpeValue(val)
     if (val === '') {
       setCpeData([])
     } else {
@@ -513,8 +513,8 @@ function ComponentDrawer(props) {
                 <Stack direction={'row'} width={'100%'} spacing={2}>
                   <CpeInput
                     name='cpe'
-                    inputValue={cpeString}
-                    setInputValue={setCpeString}
+                    inputValue={cpeValue}
+                    setInputValue={setCpeValue}
                     cpeList={cpeData}
                     setCpeList={setCpeData}
                     onChange={handleCpeChange}
@@ -546,7 +546,7 @@ function ComponentDrawer(props) {
                       <TagLabel
                         cursor={'pointer'}
                         onClick={() => {
-                          setCpeString(item)
+                          setCpeValue(item)
                           setSelectedCpe({ id: index, name: item })
                         }}
                       >
@@ -639,6 +639,7 @@ function ComponentDrawer(props) {
           isOpen={isCpeOpen}
           onClose={onCpeClose}
           cpeValue={cpeValue}
+          setCpeValue={setCpeValue}
           onCreateCpe={handleCreateCpe}
           onUpdateCpe={handleUpdateCpe}
           selectedCpe={selectedCpe}
