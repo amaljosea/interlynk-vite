@@ -1819,6 +1819,11 @@ export const GetSbomParts = gql`
             id
             name
           }
+          stats {
+            compCount
+            compLicenseCount
+            vulnStats
+          }
           primaryComponent {
             name
             version
