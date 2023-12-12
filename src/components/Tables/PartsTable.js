@@ -78,7 +78,7 @@ const PartsTable = ({ data, refetch }) => {
 
   const { data: allProducts } = useQuery(GetProjectData, {
     variables: {
-      first: totalProducts,
+      first: 50,
       field: prodField,
       direction: prodDirection
     }
@@ -126,14 +126,16 @@ const PartsTable = ({ data, refetch }) => {
     })
   }
 
+
   const productList =
     allProducts &&
     [...allProducts.projects.nodes]
-      .filter((item) => item.enabled !== false && item.id !== prodId)
+      .filter((item) => item.enabled === true)
       .map((option) => ({
         value: option.id,
         label: option.name
       }))
+
 
   const filterProducts =
     productList &&
@@ -143,6 +145,7 @@ const PartsTable = ({ data, refetch }) => {
         [...data].some((sbomPart) => sbomPart.part.project.id === project.value)
       return !existings
     })
+
 
   const [getProduct] = useLazyQuery(GetProject)
 
@@ -403,11 +406,21 @@ const PartsTable = ({ data, refetch }) => {
                       onChange={handleSelectProduct}
                     >
                       <option value={''}>-- Select --</option>
-                      {filterProducts.map((item, index) => (
-                        <option key={index} value={item.value}>
-                          {item.label}
-                        </option>
-                      ))}
+                      {data.length > 0
+                        ? [...filterProducts]
+                            .filter((item) => item.value !== prodId)
+                            .map((item, index) => (
+                              <option key={index} value={item.value}>
+                                {item.label}
+                              </option>
+                            ))
+                        : [...productList]
+                            .filter((item) => item.value !== prodId)
+                            .map((item, index) => (
+                              <option key={index} value={item.value}>
+                                {item.label}
+                              </option>
+                            ))}
                     </Select>
                   </FormControl>
                   {/* Version */}
