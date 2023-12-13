@@ -327,7 +327,7 @@ const GeneralDataDrawer = ({
           <DrawerBody>
             {selectedKey === 'tools' && (
               <Flex direction={'column'} alignItems={'flex-start'} gap={3}>
-                <FormControl>
+                <FormControl isRequired>
                   <FormLabel htmlFor='toolVendor'>Vendor Name</FormLabel>
                   <Input
                     id='toolVendor'
