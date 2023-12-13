@@ -33,16 +33,9 @@ import {
   FaSitemap
 } from 'react-icons/fa'
 import SupplierModal from 'views/Sbom/components/SupplierModal'
-import {
-  ChevronDownIcon,
-  ChevronRightIcon,
-  TriangleDownIcon,
-  TriangleUpIcon,
-  ViewIcon
-} from '@chakra-ui/icons'
-import { BsFillPatchQuestionFill, BsPatchQuestion } from 'react-icons/bs'
+import { ChevronDownIcon, ChevronRightIcon, ViewIcon } from '@chakra-ui/icons'
+import { BsFillPatchQuestionFill } from 'react-icons/bs'
 import { GetIcon } from 'utils'
-import { licenseOptions } from 'variables/licenses'
 import LinksDrawer from 'components/Drawer/LinksDrawer'
 
 function SBOMComponentRow(props) {
@@ -59,13 +52,11 @@ function SBOMComponentRow(props) {
     internal,
     suppliers,
     refetch,
-    lifecycle,
     description,
     status,
     group
   } = props
   const location = useLocation()
-
   const customerView = location.pathname.startsWith('/customer')
 
   const compBtn = useRef(null)
@@ -74,7 +65,6 @@ function SBOMComponentRow(props) {
   const [contains, setcontains] = useState({})
 
   const { isOpen, onOpen, onClose } = useDisclosure()
-
 
   const {
     isOpen: isDelOpen,
@@ -110,17 +100,6 @@ function SBOMComponentRow(props) {
       setExpandedRows([...expandedRows, id])
     }
   }
-
-  useEffect(() => {
-    if (licenses !== null && licenses.length > 0) {
-      // console.log(`license item`, licenses)
-      const filtered = licenseOptions.filter((item) =>
-        licenses.includes(item.licenseId)
-      )
-      // console.log(`filtered item`, filtered)
-      setFilteredLicense(filtered)
-    }
-  }, [licenses])
 
   return (
     <>
@@ -389,9 +368,9 @@ function SBOMComponentRow(props) {
                 </Text>
                 <Text>
                   {suppliers.length > 0 && suppliers[0].name}
-                  {suppliers.length > 0 && suppliers[0].email !='' && (
-                    ` - ${suppliers[0].email}`
-                  )}
+                  {suppliers.length > 0 &&
+                    suppliers[0].email != '' &&
+                    ` - ${suppliers[0].email}`}
                 </Text>
               </Stack>
             </Td>
