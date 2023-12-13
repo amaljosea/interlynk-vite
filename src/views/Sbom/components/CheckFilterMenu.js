@@ -67,10 +67,18 @@ const CheckFilterMenu = ({
         projectId: productId,
         sbomId: sbomId,
         search: checkSearchInput !== '' ? checkSearchInput : undefined,
-        checkId: checkId.includes('all') || checkId.length === 0 ? undefined : checkId,
-        category: category.includes('all') || category.length === 0 ? undefined : category,
-        severity: severity.includes('all') || severity.length === 0 ? undefined : severity,
-        status: status.includes('all') || status.length === 0 ? undefined : status,
+        checkId:
+          checkId.includes('all') || checkId.length === 0 ? undefined : checkId,
+        category:
+          category.includes('all') || category.length === 0
+            ? undefined
+            : category,
+        severity:
+          severity.includes('all') || severity.length === 0
+            ? undefined
+            : severity,
+        status:
+          status.includes('all') || status.length === 0 ? undefined : status,
         first: totalRows,
         field: checkField,
         direction: checkDirection
@@ -156,7 +164,7 @@ const CheckFilterMenu = ({
                       fontSize={'sm'}
                       textTransform={'capitalize'}
                     >
-                      {item.rule.friendlyId}
+                      {item.rule.friendlyId}: {item.rule.shortDesc}
                     </MenuItemOption>
                   ))}
               </MenuOptionGroup>
