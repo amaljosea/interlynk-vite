@@ -84,15 +84,9 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
     await createSbom({
       variables: {
         projectId: data.id,
-        spec: sbomName,
-        specVersion: version,
-        format: compType,
-        licenses: {
-          licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
-          licensesExp: licenseType === 'license_exp' ? expLicense : undefined,
-          licensesCustom:
-            licenseType === 'license_custom' ? customLicense : undefined
-        }
+        spec: 'cyclonedx',
+        specVersion: '1.4',
+        format: 'json'
       }
     })
       .then((res) => {
