@@ -27,12 +27,17 @@ const CpeInput = ({
   validation,
   onChange
 }) => {
-  const [isValid, setIsValid] = useState(true)
   const [focusedIndex, setFocusedIndex] = useState(null)
   const listItemsRef = useRef([])
 
-  const { cpeString, setCpeString, purlString, setPurlString } =
-    useContext(GlobalContext)
+  const {
+    cpeString,
+    setCpeString,
+    purlString,
+    setPurlString,
+    isCpeValid,
+    setIsCpeValid
+  } = useContext(GlobalContext)
 
   const updateString = (name, value) => {
     const cpeParts = cpeString.split(':')
@@ -125,9 +130,9 @@ const CpeInput = ({
     if (validation) {
       const matches = regexPattern.test(inputValue)
       if (matches) {
-        setIsValid(true)
+        setIsCpeValid(true)
       } else {
-        setIsValid(false)
+        setIsCpeValid(false)
       }
     }
   }, [inputValue])
@@ -154,7 +159,7 @@ const CpeInput = ({
       pos={'relative'}
       ref={inputRef}
     >
-      <FormControl>
+      <FormControl isInvalid={name === 'cpe' && inputValue !== '' && !isCpeValid}>
         {name !== 'cpe' && (
           <FormLabel textTransform={'capitalize'}>
             {name === 'packageName'
@@ -180,7 +185,7 @@ const CpeInput = ({
           {validation === true && (
             <InputRightElement align='center' zIndex={-1}>
               {inputValue != null && inputValue !== '' ? (
-                isValid ? (
+                isCpeValid ? (
                   <CheckIcon color='green' />
                 ) : (
                   <WarningTwoIcon color='red' />
@@ -211,7 +216,9 @@ const CpeInput = ({
                 ref={(el) => (listItemsRef.current[index] = el)}
                 tabIndex='0'
                 bg={index === focusedIndex ? '#E2E8F0' : 'transparent'}
-                _hover={{ bg: focusedIndex === null ? '#E2E8F0' : 'transparent' }}
+                _hover={{
+                  bg: focusedIndex === null ? '#E2E8F0' : 'transparent'
+                }}
                 onMouseEnter={() => setFocusedIndex(null)}
                 outline='none'
                 p={2}
