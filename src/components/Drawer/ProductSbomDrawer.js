@@ -79,7 +79,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
         })
     )
   }
-
+  
   const handleCreateSBOM = async () => {
     await createSbom({
       variables: {
@@ -95,7 +95,18 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
         }
       }
     })
-      .then((res) => res.data && handleCreateComp(res.data.sbomCreate.sbom.id))
+      .then((res) => {
+        if (res.data.sbomCreate.errors.length === 0) {
+          handleCreateComp(res.data.sbomCreate.sbom.id)
+        } else {
+          toast({
+            description: res.data.sbomCreate.errors,
+            status: 'error',
+            position: 'top',
+            duration: 4000
+          })
+        }
+      })
       .finally(() => onClose())
   }
 
