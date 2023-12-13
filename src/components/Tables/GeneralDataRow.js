@@ -399,6 +399,56 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                 )}
               </Td>
             </Tr>
+            {/* SUPPLIERS */}
+            <Tr>
+              <Td pl={0} fontWeight={'medium'}>
+                <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
+                  <Text>Supplier</Text>
+                  <Tooltip label='Supplier identify the name and email of the organization that built, distributed or package the application. For Open-source components, it can refer to the name of the project or entity distributing the project.'>
+                    <Icon as={InfoIcon} color={'blue.500'} />
+                  </Tooltip>
+                </Flex>
+              </Td>
+              <Td pl={0}>
+                <HStack spacing={4}>
+                  {data.suppliers &&
+                    data.suppliers.map((item, index) => (
+                      <Tag
+                        size={'md'}
+                        key={index}
+                        variant='subtle'
+                        colorScheme='orange'
+                      >
+                        <TagLabel>
+                          {item.name}
+                          {item.contactEmail && (
+                            <>
+                              {' - '}
+                              {item.contactEmail}
+                            </>
+                          )}
+                        </TagLabel>
+                        {!customerView && (
+                          <TagCloseButton
+                            onClick={() => handleSupRemove(item.id)}
+                          />
+                        )}
+                      </Tag>
+                    ))}
+                </HStack>
+              </Td>
+              <Td pl={0}>
+                {!customerView && (
+                  <Button
+                    size='sm'
+                    isDisabled={status === 'signed'}
+                    onClick={onSupOpen}
+                  >
+                    <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
+                  </Button>
+                )}
+              </Td>
+            </Tr>
             {/* LICENSES */}
             <Tr>
               <Td pl={0} fontWeight={'medium'}>
