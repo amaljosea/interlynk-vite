@@ -589,7 +589,10 @@ function SBOM() {
                                     </Badge>
                                   </Tooltip>
                                 </Stack>
-                                <Text fontSize={'xs'}>Vulnerabilities</Text>
+                                  <Text fontSize={'xs'} onClick={() => onFilterSev([])}
+                                        style={{ cursor: 'pointer' }}>
+                                          Vulnerabilities
+                                  </Text>
                               </Box>
                             </Stack>
                           </Flex>
