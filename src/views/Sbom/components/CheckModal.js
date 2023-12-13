@@ -64,7 +64,8 @@ const CheckModal = ({
     setActiveProdTab,
     customLicense,
     compField,
-    compDirection
+    compDirection,
+    setLicenseType
   } = useContext(GlobalContext)
 
   const now = new Date()
@@ -302,7 +303,7 @@ const CheckModal = ({
                   <Input value={comp} onChange={handleComponentChange} />
                 </FormControl>
 
-                {componentList.length > 0 && (
+                {comp !== '' && componentList.length > 0 && (
                   <Box
                     position='absolute'
                     zIndex='1'
@@ -323,6 +324,7 @@ const CheckModal = ({
                           cursor='pointer'
                           fontSize={'sm'}
                           onClick={() => {
+                            setLicenseType('')
                             setActiveComp(item)
                             setComp(item.name)
                             setComponentList([])
