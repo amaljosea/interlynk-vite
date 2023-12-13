@@ -17,7 +17,8 @@ import {
   Textarea,
   List,
   Text,
-  Box
+  Box,
+  Tag
 } from '@chakra-ui/react'
 import { useState, useEffect, useRef, useContext } from 'react'
 import { PackageURL } from 'packageurl-js'
@@ -345,7 +346,7 @@ const PurlModal = ({
       setPurlString(pkg.toString())
     } else {
       pkg.name = 'name'
-      setPurlString(pkg.toString()) 
+      setPurlString(pkg.toString())
     }
   }
 
@@ -594,6 +595,20 @@ const PurlModal = ({
           <ModalHeader>PURL Details</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
+            {activeCheck && (
+              <Flex
+                width='100%'
+                direction={'row'}
+                alignItems={'center'}
+                justifyContent={'flex-start'}
+                wrap={'wrap'}
+                gap={2}
+                mb={6}
+              >
+                <Text wordBreak={'break-all'}>{activeCheck?.name}</Text>
+                <Tag colorScheme='blue'>{activeCheck?.version}</Tag>
+              </Flex>
+            )}
             <Flex width={'100%'} direction={'column'} gap={4}>
               {/* Package URL */}
               <FormControl>

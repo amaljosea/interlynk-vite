@@ -1117,7 +1117,7 @@ const ComponentTable = ({
               filterRefetch={filterRefetch}
               isOpen={isSupOpen}
               onClose={onSupClose}
-              suppliers={activeRow.suppliers}
+              data={activeRow}
               shortDesc={null}
               checkId={null}
             />

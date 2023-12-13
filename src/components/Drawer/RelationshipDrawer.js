@@ -28,7 +28,8 @@ import {
   Tr,
   FormErrorMessage,
   FormErrorIcon,
-  useDisclosure
+  useDisclosure,
+  VStack
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
@@ -193,16 +194,17 @@ const RelationshipDrawer = ({
         <DrawerBody>
           <Card px={0} mx={0}>
             <CardHeader>
-              <Stack
+              <Flex
                 width='100%'
                 direction={'row'}
                 alignItems={'center'}
-                justifyContent={'space-between'}
+                justifyContent={'flex-start'}
+                wrap={'wrap'}
+                gap={2}
               >
-                <Text fontSize={'lg'} fontWeight={'medium'}>
-                  {name} - {version}
-                </Text>
-              </Stack>
+                <Text fontWeight={'medium'}>{name}</Text>
+                <Tag colorScheme='blue'>{version}</Tag>
+              </Flex>
             </CardHeader>
             <CardBody>
               <Flex

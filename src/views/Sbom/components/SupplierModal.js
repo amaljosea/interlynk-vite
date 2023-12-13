@@ -14,7 +14,8 @@ import {
   Input,
   FormErrorMessage,
   Stack,
-  Text
+  Text,
+  Tag
 } from '@chakra-ui/react'
 import GlobalContext from 'context/GlobalContext'
 import { CreateAutomation } from 'graphQL/Mutation'
@@ -29,7 +30,7 @@ const SupplierModal = ({
   isOpen,
   onClose,
   refetch,
-  suppliers,
+  data,
   checkId,
   filterRefetch,
   activeCheck,
@@ -81,9 +82,9 @@ const SupplierModal = ({
   })
 
   useEffect(() => {
-    if (suppliers.length > 0) {
-      setSupName(suppliers[0].name)
-      setSupEmail(suppliers[0].contactEmail)
+    if (data && data.suppliers.length > 0) {
+      setSupName(data.suppliers[0].name)
+      setSupEmail(data.suppliers[0].contactEmail)
     }
   }, [])
 
@@ -115,7 +116,7 @@ const SupplierModal = ({
       variables: {
         name: supName,
         contactEmail: supEmail,
-        id: suppliers[0].id
+        id: data && data.suppliers[0].id
       }
     }).then((res) => res.data && onClose())
   }
@@ -148,6 +149,10 @@ const SupplierModal = ({
     }
   }
 
+  const isInvalid = !supName || (supEmail !== '' && !validateEmail(supEmail))
+
+  console.log('data', data)
+
   return (
     <>
       <Modal isOpen={isOpen} onClose={onClose}>
@@ -155,10 +160,38 @@ const SupplierModal = ({
 
         <ModalContent>
           <ModalHeader>
-            {suppliers.length > 0 ? 'Edit' : 'Add'} Supplier
+            {data && data.suppliers.length > 0 ? 'Edit' : 'Add'} Supplier
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody>
+            {data && (
+              <Flex
+                width='100%'
+                direction={'row'}
+                alignItems={'center'}
+                justifyContent={'flex-start'}
+                wrap={'wrap'}
+                gap={2}
+                mb={4}
+              >
+                <Text fontWeight={'medium'}>{data.name}</Text>
+                <Tag colorScheme='blue'>{data.version}</Tag>
+              </Flex>
+            )}
+            {activeCheck && (
+              <Flex
+                width='100%'
+                direction={'row'}
+                alignItems={'center'}
+                justifyContent={'flex-start'}
+                wrap={'wrap'}
+                gap={2}
+                mb={6}
+              >
+                <Text wordBreak={'break-all'}>{activeCheck?.name}</Text>
+                <Tag colorScheme='blue'>{activeCheck?.version}</Tag>
+              </Flex>
+            )}
             <Flex width={'100%'} direction={'column'} gap={4}>
               <FormControl isRequired>
                 <FormLabel fontSize={'sm'}>Name</FormLabel>
@@ -190,7 +223,12 @@ const SupplierModal = ({
               alignItems={'center'}
             >
               {checkId ? (
-                <Button fontSize={'sm'} colorScheme='blue' onClick={onSaveRule}>
+                <Button
+                  fontSize={'sm'}
+                  colorScheme='blue'
+                  onClick={onSaveRule}
+                  disabled={isInvalid}
+                >
                   Save Rule
                 </Button>
               ) : (
@@ -200,13 +238,11 @@ const SupplierModal = ({
                 <Button colorScheme='gray' onClick={onClose}>
                   Cancel
                 </Button>
-                {suppliers.length > 0 ? (
+                {data && suppliers.length > 0 ? (
                   <Button
                     colorScheme='blue'
                     onClick={handleUpdate}
-                    disabled={
-                      !supName || (supEmail !== '' && !validateEmail(supEmail))
-                    }
+                    disabled={isInvalid}
                   >
                     Update
                   </Button>
@@ -214,9 +250,7 @@ const SupplierModal = ({
                   <Button
                     colorScheme='blue'
                     onClick={handleSave}
-                    disabled={
-                      !supName || (supEmail !== '' && !validateEmail(supEmail))
-                    }
+                    disabled={isInvalid}
                   >
                     Save
                   </Button>
