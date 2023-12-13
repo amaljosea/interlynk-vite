@@ -31,7 +31,9 @@ import {
   TagLabel,
   Badge,
   UnorderedList,
-  ListItem
+  ListItem,
+  Alert,
+  AlertIcon
 } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
 import GlobalContext from 'context/GlobalContext'
@@ -39,10 +41,10 @@ import { SbomPartDelete } from 'graphQL/Mutation'
 import { SbomPartCreate } from 'graphQL/Mutation'
 import { GetProject } from 'graphQL/Queries'
 import { GetProjectData } from 'graphQL/Queries'
-import { useContext, useMemo, useRef, useState } from 'react'
+import { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV, FaFilter } from 'react-icons/fa'
-import { useLocation, Link, useHistory } from 'react-router-dom'
+import { useLocation, Link } from 'react-router-dom'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 const customStyles = {
@@ -64,7 +66,6 @@ const customStyles = {
 
 const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const location = useLocation()
-  const history = useHistory()
   const queryParams = new URLSearchParams(location.search)
   const sbomId = queryParams.get('sbom')
   const prodId = queryParams.get('p')
@@ -122,11 +123,13 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
               sbomId: sbomId
             }
           })
-          setSelectedProd('')
-          setSelectedVersion('')
         }
       })
-      .finally(() => onClose())
+      .finally(() => {
+        setSelectedProd('')
+        setSelectedVersion('')
+        onClose()
+      })
   }
 
   const handleRemove = async () => {
@@ -134,17 +137,22 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       variables: {
         id: activeRow.id
       }
-    }).then((res) => {
-      if (res.data) {
-        refetch({
-          variables: {
-            projectId: prodId,
-            sbomId: sbomId
-          }
-        })
-      }
-    }).finally(() => onDeleteClose())
+    })
+      .then((res) => {
+        if (res.data) {
+          refetch({
+            variables: {
+              projectId: prodId,
+              sbomId: sbomId
+            }
+          })
+        }
+      })
+      .finally(() => onDeleteClose())
   }
+
+  // console.log('Products', allProducts && allProducts.projects.nodes)
+  // console.log('data', data)
 
   const productList =
     allProducts &&
@@ -164,36 +172,63 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       return !existings
     })
 
+  const product =
+    allProducts &&
+    allProducts.projects.nodes.find((item) => item.id === selectedProd)
+
+  // console.log('product', product)
+
+  const filterVersion =
+    product &&
+    product.sboms.filter((sbom) => {
+      const existings =
+        data &&
+        sbom.primaryComponent &&
+        [...data].some(
+          (sbomPart) =>
+            sbomPart.part.primaryComponent.version ===
+            sbom.primaryComponent.version
+        )
+      return !existings
+    })
+
+  // console.log('filterVersion', filterVersion)
+
   const [getProduct] = useLazyQuery(GetProject)
 
   const handleSelectProduct = (e) => {
-    setSelectedProd(e.target.value)
-    getProduct({
-      variables: {
-        id: e.target.value
-      }
-    }).then((res) => {
-      if (res.data) {
-        let versions = []
-        res.data.project.sboms.map((project) => {
-          if (project.primaryComponent) {
-            versions.push({
-              version: project.primaryComponent.version,
-              id: project.id,
-              updatedAt: project.updatedAt
-            })
-          }
-        })
-        setUniqVersions(versions)
-      }
-    })
+    const { value } = e.target
+    setSelectedProd(value)
+    if (value === '') {
+      setSelectedVersion('')
+    } else {
+      getProduct({
+        variables: {
+          id: value
+        }
+      }).then((res) => {
+        if (res.data) {
+          let versions = []
+          res.data.project.sboms.map((project) => {
+            if (project.primaryComponent) {
+              versions.push({
+                version: project.primaryComponent.version,
+                id: project.id,
+                updatedAt: project.updatedAt
+              })
+            }
+          })
+          setUniqVersions(versions)
+        }
+      })
+    }
   }
 
   const filterVersions =
     uniqVersions.length > 0 &&
     uniqVersions.filter((version) => version.id !== sbomId)
 
-  // remove duplicates
+  // REMOVE DUPLICATES
   const removeDuplicatesAndLatest = (arr) => {
     const uniqueVersions = {}
 
@@ -583,21 +618,14 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
                       onChange={handleSelectProduct}
                     >
                       <option value={''}>-- Select --</option>
-                      {data.length > 0
-                        ? [...filterProducts]
-                            .filter((item) => item.value !== prodId)
-                            .map((item, index) => (
-                              <option key={index} value={item.value}>
-                                {item.label}
-                              </option>
-                            ))
-                        : [...productList]
-                            .filter((item) => item.value !== prodId)
-                            .map((item, index) => (
-                              <option key={index} value={item.value}>
-                                {item.label}
-                              </option>
-                            ))}
+                      {productList &&
+                        [...productList]
+                          .filter((item) => item.value !== prodId)
+                          .map((item, index) => (
+                            <option key={index} value={item.value}>
+                              {item.label}
+                            </option>
+                          ))}
                     </Select>
                   </FormControl>
                   {/* Version */}
@@ -609,21 +637,29 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
                     >
                       Version
                     </FormLabel>
-                    <Select
-                      fontSize={'sm'}
-                      name='versions'
-                      id='versions'
-                      value={selectedVersion}
-                      onChange={(e) => setSelectedVersion(e.target.value)}
-                    >
-                      <option value={''}>-- Select --</option>
-                      {filteredData.length > 0 &&
-                        filteredData.map((item, index) => (
-                          <option key={index} value={item.id}>
-                            {item.version}
-                          </option>
-                        ))}
-                    </Select>
+                    {filterVersion?.length === 0 ? (
+                      <Alert borderRadius={'md'} py={'8px'} status='info'>
+                        <AlertIcon />
+                        No version available
+                      </Alert>
+                    ) : (
+                      <Select
+                        fontSize={'sm'}
+                        name='versions'
+                        id='versions'
+                        value={selectedVersion}
+                        onChange={(e) => setSelectedVersion(e.target.value)}
+                      >
+                        <option value={''}>-- Select --</option>
+                        {filterVersion
+                          ?.filter((item) => item.primaryComponent !== null)
+                          .map((item, index) => (
+                            <option key={index} value={item.id}>
+                              {item.primaryComponent.version}
+                            </option>
+                          ))}
+                      </Select>
+                    )}
                   </FormControl>
                 </Stack>
               )}
