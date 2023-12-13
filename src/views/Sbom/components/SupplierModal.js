@@ -82,7 +82,7 @@ const SupplierModal = ({
   })
 
   useEffect(() => {
-    if (data && data.suppliers.length > 0) {
+    if (data && data.suppliers?.length > 0) {
       setSupName(data.suppliers[0].name)
       setSupEmail(data.suppliers[0].contactEmail)
     }
@@ -116,7 +116,7 @@ const SupplierModal = ({
       variables: {
         name: supName,
         contactEmail: supEmail,
-        id: data && data.suppliers[0].id
+        id: data && data.suppliers && data.suppliers[0].id
       }
     }).then((res) => res.data && onClose())
   }
@@ -160,7 +160,7 @@ const SupplierModal = ({
 
         <ModalContent>
           <ModalHeader>
-            {data && data.suppliers.length > 0 ? 'Edit' : 'Add'} Supplier
+            {data && data.suppliers?.length > 0 ? 'Edit' : 'Add'} Supplier
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody>
@@ -238,7 +238,7 @@ const SupplierModal = ({
                 <Button colorScheme='gray' onClick={onClose}>
                   Cancel
                 </Button>
-                {data && suppliers.length > 0 ? (
+                {data && data.suppliers?.length > 0 ? (
                   <Button
                     colorScheme='blue'
                     onClick={handleUpdate}
