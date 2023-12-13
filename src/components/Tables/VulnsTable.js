@@ -191,7 +191,7 @@ const VulnsTable = ({ data }) => {
           </Flex>
         )
       },
-      width: '200px',
+      width: '150px',
       sortable: true
     },
     // Products
@@ -209,7 +209,7 @@ const VulnsTable = ({ data }) => {
           </Flex>
         )
       },
-      width: '200px',
+      width: '150px',
       sortable: true
     },
     // Products
@@ -226,7 +226,7 @@ const VulnsTable = ({ data }) => {
           </Flex>
         )
       },
-      width: '200px',
+      width: '150px',
       sortable: true
     },
     // UPDATED AT
