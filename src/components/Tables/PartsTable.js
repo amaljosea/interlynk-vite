@@ -307,7 +307,9 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
             </Text>
           </Link>
         )
-      }
+      },
+      wrap: true,
+      width: '200px'
     },
     {
       id: 'VERSION',
@@ -464,7 +466,8 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
             </Link>
           </Stack>
         )
-      }
+      },
+      width: '200px'
     },
     {
       id: 'STATUS',
