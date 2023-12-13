@@ -424,10 +424,11 @@ function SBOM() {
                               </Text>
                             </HStack>
                           </Stack>
-
-                          <Text fontSize={'sm'} my={0.5}>
-                            A common specification for continous delivery events
-                          </Text>
+                          {sbomData.sbom.primaryComponent && (
+                            <Text fontSize={'sm'} my={0.5}>
+                              {sbomData.sbom.primaryComponent.description}
+                            </Text>
+                          )}
                           <Tooltip
                             placement='top'
                             label={getFullDateAndTime(sbomData.sbom.updatedAt)}
