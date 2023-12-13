@@ -263,7 +263,7 @@ function ComponentDrawer(props) {
               ? cpeList
               : cpeValue !== ''
               ? [cpeValue]
-              : undefined,
+              : [],
           purl: purlValue,
           primary: isPrimary,
           internal: isInternal
