@@ -191,7 +191,7 @@ export default function HeaderLinks(props) {
         {location.pathname.startsWith('/vendor') && (
           <MenuList size='sm'>
             <MenuGroup title=''>
-              <Link to='/vendor/profiles?tab=person'>
+              <Link to='/vendor/settings?tab=person'>
                 <MenuItem icon={<SettingsIcon />}>Settings</MenuItem>
               </Link>
               {userName ? (
