@@ -156,19 +156,22 @@ const SBOMTable = ({
 
   const handleTabChange = (value) => {
     setActiveProdTab(Number(value))
-    if (value === 0) {
+  }
+
+  useEffect(() => {
+    if (activeProdTab === 0) {
       refetch({
         projectId: productId,
         sbomId: sbomId
       })
-    } else if (value === 1) {
+    } else if (activeProdTab === 1) {
       getParts({
         variables: {
           projectId: productId,
           sbomId: sbomId
         }
       })
-    } else if (value === 2) {
+    } else if (activeProdTab === 2) {
       // FETCH COMPONENT DATA
       getCompData({
         variables: {
@@ -213,7 +216,7 @@ const SBOMTable = ({
           setCompFilters(res.data.sbom.filters)
         }
       })
-    } else if (value === 3) {
+    } else if (activeProdTab === 3) {
       getVulnData({
         variables: {
           projectId: productId,
@@ -243,7 +246,7 @@ const SBOMTable = ({
           setVulnFilters(res.data.sbom.filters)
         }
       })
-    } else if (value === 4) {
+    } else if (activeProdTab === 4) {
       // FETCH HEALTH CHECK DATA
       getCheckData({
         variables: {
@@ -281,7 +284,7 @@ const SBOMTable = ({
           setCheckFilters(res.data.sbom.filters)
         }
       })
-    } else if (value === 5) {
+    } else if (activeProdTab === 5) {
       // FETCH ACTIVITY LOGS DATA
       getLogData({
         variables: {
@@ -303,7 +306,7 @@ const SBOMTable = ({
         }
       })
     }
-  }
+  }, [activeProdTab])
 
   // EXTRACT ALL THE COMPONENT NAME AND ID'S FROM SELECTED SBOM VERSION
   const components =
