@@ -18,7 +18,6 @@ import ApiFeed from './components/ApiFeed'
 import Card from 'components/Card/Card'
 import ComponentFeed from './components/ComponentFeed'
 import GeneralFeed from './components/GeneralFeed'
-import TeamsLog from './components/TeamModal'
 import PersonalInfo from './components/PersonalInfo'
 import { useLocation, useHistory } from 'react-router-dom'
 import { GetOrg } from 'graphQL/Queries'
@@ -42,50 +41,60 @@ function Profile() {
     }
   ]
 
-  const tab = window.localStorage.getItem('activeSetTab')
-
-  const [tabIndex, setTabIndex] = useState(Number(tab))
-  const [selectedTab, setSelectedTab] = useState(tabs[1].name)
+  const [tabIndex, setTabIndex] = useState(0)
   const [psIndex, setPsIndex] = useState(0)
+  const [selectedTab, setSelectedTab] = useState(tabs[1].name)
 
   const { data: orgInfo, refetch } = useQuery(GetOrg)
 
   const onTabChange = (value) => {
     setTabIndex(value)
-    window.localStorage.setItem('activeSetTab', value)
+    if (value === 0) {
+      history.push('/vendor/settings?tab=general')
+    } else if (value === 1) {
+      history.push('/vendor/settings?tab=team')
+    } else if (value === 2) {
+      history.push('/vendor/settings?tab=feeds')
+    } else if (value === 3) {
+      history.push('/vendor/settings?tab=checks')
+    } else if (value === 4) {
+      history.push('/vendor/settings?tab=lists')
+    }
+  }
+
+  const handleChange = (value) => {
+    setPsIndex(value)
+    if (value === 0) {
+      history.push('/vendor/settings?tab=person')
+    } else if (value === 1) {
+      history.push('/vendor/settings?tab=token')
+    }
   }
 
   useEffect(() => {
     if (activetab === 'person') {
-      window.localStorage.setItem('activePs', 0)
       setSelectedTab('PERSONAL')
+      setPsIndex(0)
+    } else if (activetab === 'token') {
+      setSelectedTab('PERSONAL')
+      setPsIndex(1)
+    } else if (activetab === 'general') {
+      setSelectedTab('ORGANIZATION')
+      setTabIndex(0)
+    } else if (activetab === 'team') {
+      setSelectedTab('ORGANIZATION')
+      setTabIndex(1)
+    } else if (activetab === 'feeds') {
+      setSelectedTab('ORGANIZATION')
+      setTabIndex(2)
+    } else if (activetab === 'checks') {
+      setSelectedTab('ORGANIZATION')
+      setTabIndex(3)
+    } else if (activetab === 'lists') {
+      setSelectedTab('ORGANIZATION')
+      setTabIndex(4)
     }
   }, [activetab])
-
-  const handleChange = (value) => {
-    setPsIndex(value)
-    window.localStorage.setItem('activePs', value)
-    if (value === 0) {
-      history.push('/vendor/profiles?tab=person')
-    } else if (value === 1) {
-      history.push('/vendor/profiles?tab=token')
-    }
-  }
-
-  useEffect(() => {
-    const handlePopstate = (event) => {
-      const active = Number(event.srcElement.localStorage.activePs)
-      if (active === 1) {
-        history.push('/vendor/profiles?tab=person')
-        window.localStorage.setItem('activePs', 0)
-        setPsIndex(0)
-      }
-    }
-    window.addEventListener('popstate', handlePopstate)
-    return () => {
-      window.removeEventListener('popstate', handlePopstate)
-    }
-  }, [])
 
   return (
     <>
@@ -97,6 +106,8 @@ function Profile() {
             selectedTab={selectedTab}
             refetch={refetch}
             setSelectedTab={setSelectedTab}
+            setTabIndex={setTabIndex}
+            setPsIndex={setPsIndex}
             tabs={tabs}
           />
 

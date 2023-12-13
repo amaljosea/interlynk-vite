@@ -17,8 +17,8 @@ import {
   Text,
   Alert,
   AlertIcon,
-  AlertTitle,
-  AlertDescription
+  AlertDescription,
+  Tag
 } from '@chakra-ui/react'
 import CpeInput from 'components/CpeInput'
 import GlobalContext from 'context/GlobalContext'
@@ -26,7 +26,6 @@ import { CreateAutomation } from 'graphQL/Mutation'
 import { UpdateComponent, recheckHealth } from 'graphQL/Mutation'
 import { useState, useEffect, useRef, useContext } from 'react'
 import { useLocation } from 'react-router-dom'
-import ReactSelect from 'react-select'
 
 const regexPattern =
   /cpe:2\.3:[aho\*\-](:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,\/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){5}(:(([a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))?)|[\*\-]))(:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,\/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){4}/
@@ -293,6 +292,20 @@ const CpeModal = ({
           <ModalHeader>CPE Details</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
+            {activeCheck && (
+              <Flex
+                width='100%'
+                direction={'row'}
+                alignItems={'center'}
+                justifyContent={'flex-start'}
+                wrap={'wrap'}
+                gap={2}
+                mb={6}
+              >
+                <Text wordBreak={'break-all'}>{activeCheck?.name}</Text>
+                <Tag colorScheme='blue'>{activeCheck?.version}</Tag>
+              </Flex>
+            )}
             <Flex width={'100%'} direction={'column'} gap={4}>
               {/* CPE STRING */}
               <FormControl>

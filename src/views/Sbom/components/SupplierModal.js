@@ -14,7 +14,8 @@ import {
   Input,
   FormErrorMessage,
   Stack,
-  Text
+  Text,
+  Tag
 } from '@chakra-ui/react'
 import GlobalContext from 'context/GlobalContext'
 import { CreateAutomation } from 'graphQL/Mutation'
@@ -25,10 +26,11 @@ import { useState, useEffect, useContext } from 'react'
 import { useLocation } from 'react-router-dom'
 
 const SupplierModal = ({
+  id,
   isOpen,
   onClose,
   refetch,
-  suppliers,
+  data,
   checkId,
   filterRefetch,
   activeCheck,
@@ -57,20 +59,22 @@ const SupplierModal = ({
 
   const onFilterRefetch = () => {
     filterRefetch({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId
-      }
-    }).then((res) => {
-      setCompFilters(res.data.sbom.filters)
-    })
+      projectId: productId,
+      sbomId: sbomId
+    }).then((res) => res.data && setCompFilters(res.data.sbom.filters))
   }
 
   const [createSupplier] = useMutation(addComSupplier, {
-    onCompleted: () => refetch()
+    onCompleted: () => {
+      refetch()
+      onFilterRefetch()
+    }
   })
   const [updateSupplier] = useMutation(updateComSupplier, {
-    onCompleted: () => refetch()
+    onCompleted: () => {
+      refetch()
+      onFilterRefetch()
+    }
   })
 
   const [healthRecheck] = useMutation(recheckHealth, {
@@ -78,24 +82,21 @@ const SupplierModal = ({
   })
 
   useEffect(() => {
-    if (suppliers.length > 0) {
-      setSupName(suppliers[0].name)
-      setSupEmail(suppliers[0].contactEmail)
+    if (data && data.suppliers.length > 0) {
+      setSupName(data.suppliers[0].name)
+      setSupEmail(data.suppliers[0].contactEmail)
     }
-  }, [suppliers])
+  }, [])
 
   const handleSave = async () => {
     await createSupplier({
       variables: {
         name: supName,
         contactEmail: supEmail,
-        componentId: activeCheck.id
+        componentId: activeCheck ? activeCheck.id : id
       }
     })
       .then((res) => {
-        if (res.data) {
-          onFilterRefetch()
-        }
         if (checkId) {
           setPageIndex(1)
           healthRecheck({
@@ -110,18 +111,14 @@ const SupplierModal = ({
       .finally(() => onClose())
   }
 
-  const handleUpdate = async (e) => {
+  const handleUpdate = async () => {
     await updateSupplier({
       variables: {
         name: supName,
         contactEmail: supEmail,
-        id: suppliers[0].id
+        id: data && data.suppliers[0].id
       }
-    }).then((data) => {
-      if (data) {
-        onClose()
-      }
-    })
+    }).then((res) => res.data && onClose())
   }
 
   const [createAutoCheck] = useMutation(CreateAutomation)
@@ -152,6 +149,10 @@ const SupplierModal = ({
     }
   }
 
+  const isInvalid = !supName || (supEmail !== '' && !validateEmail(supEmail))
+
+  console.log('data', data)
+
   return (
     <>
       <Modal isOpen={isOpen} onClose={onClose}>
@@ -159,10 +160,38 @@ const SupplierModal = ({
 
         <ModalContent>
           <ModalHeader>
-            {suppliers.length > 0 ? 'Edit' : 'Add'} Supplier
+            {data && data.suppliers.length > 0 ? 'Edit' : 'Add'} Supplier
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody>
+            {data && (
+              <Flex
+                width='100%'
+                direction={'row'}
+                alignItems={'center'}
+                justifyContent={'flex-start'}
+                wrap={'wrap'}
+                gap={2}
+                mb={4}
+              >
+                <Text fontWeight={'medium'}>{data.name}</Text>
+                <Tag colorScheme='blue'>{data.version}</Tag>
+              </Flex>
+            )}
+            {activeCheck && (
+              <Flex
+                width='100%'
+                direction={'row'}
+                alignItems={'center'}
+                justifyContent={'flex-start'}
+                wrap={'wrap'}
+                gap={2}
+                mb={6}
+              >
+                <Text wordBreak={'break-all'}>{activeCheck?.name}</Text>
+                <Tag colorScheme='blue'>{activeCheck?.version}</Tag>
+              </Flex>
+            )}
             <Flex width={'100%'} direction={'column'} gap={4}>
               <FormControl isRequired>
                 <FormLabel fontSize={'sm'}>Name</FormLabel>
@@ -194,7 +223,12 @@ const SupplierModal = ({
               alignItems={'center'}
             >
               {checkId ? (
-                <Button fontSize={'sm'} colorScheme='blue' onClick={onSaveRule}>
+                <Button
+                  fontSize={'sm'}
+                  colorScheme='blue'
+                  onClick={onSaveRule}
+                  disabled={isInvalid}
+                >
                   Save Rule
                 </Button>
               ) : (
@@ -204,13 +238,11 @@ const SupplierModal = ({
                 <Button colorScheme='gray' onClick={onClose}>
                   Cancel
                 </Button>
-                {suppliers.length > 0 ? (
+                {data && suppliers.length > 0 ? (
                   <Button
                     colorScheme='blue'
                     onClick={handleUpdate}
-                    disabled={
-                      !supName || (supEmail !== '' && !validateEmail(supEmail))
-                    }
+                    disabled={isInvalid}
                   >
                     Update
                   </Button>
@@ -218,9 +250,7 @@ const SupplierModal = ({
                   <Button
                     colorScheme='blue'
                     onClick={handleSave}
-                    disabled={
-                      !supName || (supEmail !== '' && !validateEmail(supEmail))
-                    }
+                    disabled={isInvalid}
                   >
                     Save
                   </Button>

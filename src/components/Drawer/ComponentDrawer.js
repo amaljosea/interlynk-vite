@@ -77,8 +77,8 @@ function ComponentDrawer(props) {
     setPurlString,
     customLicense,
     purlString,
-    cpeString,
-    licenseExp
+    licenseExp,
+    isCpeValid,
   } = useContext(GlobalContext)
 
   const onFilterRefetch = () => {
@@ -134,7 +134,7 @@ function ComponentDrawer(props) {
       setCompName(name)
       setCompVersion(version)
       setCpeList(cpes)
-      setPurlString(purl)
+      setPurlValue(purl)
       setCompKind(kind)
       setCompScope(scope)
       setIsPrimary(primary)
@@ -220,7 +220,7 @@ function ComponentDrawer(props) {
             licenseType === 'license_custom' ? customLicense : undefined
         },
         cpes: cpeList,
-        purl: purlString,
+        purl: purlValue,
         primary: isPrimary,
         internal: isInternal
       }
@@ -261,10 +261,10 @@ function ComponentDrawer(props) {
           cpes:
             cpeList.length > 0
               ? cpeList
-              : cpeString !== ''
-              ? [cpeString]
-              : undefined,
-          purl: purlString,
+              : cpeValue !== ''
+              ? [cpeValue]
+              : [],
+          purl: purlValue,
           primary: isPrimary,
           internal: isInternal
         }
@@ -449,7 +449,7 @@ function ComponentDrawer(props) {
               {/* LICENSES */}
               <LicenseField data={data} />
               {/* PURL INPUI */}
-              <FormControl isReadOnly={customerView}>
+              <FormControl isReadOnly={customerView} isInvalid={purlValue !== '' && !isPURLInputValid}>
                 <FormLabel htmlFor='purl' fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     {shortDesc === 'Component Identifier' &&
@@ -606,7 +606,8 @@ function ComponentDrawer(props) {
                   colorScheme='blue'
                   onClick={handleCreateCom}
                   isDisabled={
-                    compKind === '' || compName === '' || compVersion === ''
+                    compKind === '' || compName === '' || compVersion === '' || 
+                    (purlValue !== '' && !isPURLInputValid) || (cpeValue !== '' && !isCpeValid)
                   }
                 >
                   Save
@@ -615,7 +616,8 @@ function ComponentDrawer(props) {
                 <Button
                   colorScheme='blue'
                   onClick={handleUpdateCom}
-                  isDisabled={!compKind}
+                  isDisabled={!compKind || (purlValue !== '' && !isPURLInputValid) || 
+                  (cpeValue !== '' && !isCpeValid)}
                 >
                   Update
                 </Button>

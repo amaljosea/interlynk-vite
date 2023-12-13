@@ -194,7 +194,9 @@ const GlobalContext = React.createContext({
   vulnAfter: '',
   setVulnAfter: () => {},
   vulnBefore: '',
-  setVulnBefore: () => {}
+  setVulnBefore: () => {},
+  isCpeValid: false,
+  setIsCpeValid: () => {}
 })
 
 export default GlobalContext

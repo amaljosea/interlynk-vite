@@ -19,8 +19,10 @@ import {
   ModalOverlay,
   Select,
   Stack,
+  Tag,
   Text,
-  Tooltip
+  Tooltip,
+  VStack
 } from '@chakra-ui/react'
 import LicenseField from 'components/LicenseField'
 import GlobalContext from 'context/GlobalContext'
@@ -64,7 +66,8 @@ const CheckModal = ({
     setActiveProdTab,
     customLicense,
     compField,
-    compDirection
+    compDirection,
+    setLicenseType
   } = useContext(GlobalContext)
 
   const now = new Date()
@@ -290,6 +293,22 @@ const CheckModal = ({
           <ModalHeader>{heading(shortDesc)}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
+            {activeCheck && (
+              <Flex
+                width='100%'
+                direction={'row'}
+                alignItems={'center'}
+                justifyContent={'flex-start'}
+                wrap={'wrap'}
+                gap={2}
+                mb={6}
+              >
+                <Text fontWeight={'medium'} wordBreak={'break-all'}>
+                  {activeCheck?.component?.name}
+                </Text>
+                <Tag colorScheme='blue'>{activeCheck?.component?.version}</Tag>
+              </Flex>
+            )}
             {shortDesc === 'Document has a primary component' && (
               <Flex
                 flexDirection={'column'}
@@ -302,7 +321,7 @@ const CheckModal = ({
                   <Input value={comp} onChange={handleComponentChange} />
                 </FormControl>
 
-                {componentList.length > 0 && (
+                {comp !== '' && componentList.length > 0 && (
                   <Box
                     position='absolute'
                     zIndex='1'
@@ -323,6 +342,7 @@ const CheckModal = ({
                           cursor='pointer'
                           fontSize={'sm'}
                           onClick={() => {
+                            setLicenseType('')
                             setActiveComp(item)
                             setComp(item.name)
                             setComponentList([])

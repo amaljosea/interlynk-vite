@@ -143,6 +143,9 @@ const ContextWrapper = (props) => {
   const [sbomLicenseExp, setSbomLicenseExp] = useState('')
   const [sbomCustomLicense, setSbomCustomLicense] = useState([])
 
+  const [isCpeValid, setIsCpeValid] = useState(true)
+
+
   return (
     <GlobalContext.Provider
       value={{
@@ -332,7 +335,8 @@ const ContextWrapper = (props) => {
         vulnAfter,
         setVulnAfter,
         vulnBefore,
-        setVulnBefore
+        setVulnBefore,
+        isCpeValid, setIsCpeValid
       }}
     >
       {props.children}

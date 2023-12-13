@@ -15,9 +15,19 @@ import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 import { UploadProfileImage } from 'graphQL/Mutation'
 import { useEffect, useRef, useState } from 'react'
+import { useHistory } from 'react-router-dom'
 import { displayPic } from 'utils'
 
-const Header = ({ selectedTab, setSelectedTab, user, tabs, refetch }) => {
+const Header = ({
+  selectedTab,
+  setSelectedTab,
+  user,
+  tabs,
+  refetch,
+  setTabIndex,
+  setPsIndex
+}) => {
+  const history = useHistory()
   const toast = useToast()
   const textColor = useColorModeValue('gray.700', 'white')
   const emailColor = useColorModeValue('gray.500', 'gray.300')
@@ -25,15 +35,15 @@ const Header = ({ selectedTab, setSelectedTab, user, tabs, refetch }) => {
   const handleClick = (name) => {
     setSelectedTab(name)
     if (name === 'PERSONAL') {
-      window.history.pushState(null, null, '/vendor/profiles?tab=person')
+      history.push('/vendor/settings?tab=person')
+      setPsIndex(0)
     } else {
-      window.history.pushState(null, null, '/vendor/profiles?tab=organization')
+      history.push('/vendor/settings?tab=general')
+      setTabIndex(0)
     }
   }
 
   const [uploadProfile] = useMutation(UploadProfileImage)
-
-  console.log('user', user)
 
   const inputRef = useRef(null)
   const [profileImage, setProfileImage] = useState(null)
@@ -96,7 +106,7 @@ const Header = ({ selectedTab, setSelectedTab, user, tabs, refetch }) => {
   }
 
   useEffect(() => {
-    if (user.profileImage) {
+    if (user) {
       setProfileImage(`${SERVER_URL}/${user.profileImage.url}`)
     }
   }, [])

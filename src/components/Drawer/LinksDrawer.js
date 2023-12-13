@@ -22,7 +22,9 @@ import {
   FormLabel,
   Input,
   FormErrorMessage,
-  Tooltip
+  Tooltip,
+  VStack,
+  Tag
 } from '@chakra-ui/react'
 import { DeleteIcon } from '@chakra-ui/icons'
 import { useMutation } from '@apollo/client'
@@ -109,6 +111,20 @@ const LinksDrawer = ({ isOpen, onClose, component, sbomId, fetchCompData }) => {
             Edit Links
           </DrawerHeader>
           <DrawerBody>
+            {component && (
+              <Flex
+                width='100%'
+                direction={'row'}
+                alignItems={'center'}
+                justifyContent={'flex-start'}
+                wrap={'wrap'}
+                gap={2}
+                my={4}
+              >
+                <Text fontWeight={'medium'}>{component.name}</Text>
+                <Tag colorScheme='blue'>{component.version}</Tag>
+              </Flex>
+            )}
             <form onSubmit={handleLinkAdd}>
               <Flex direction={'column'} alignItems={'flex-start'} gap={3}>
                 {/* NAME */}

@@ -372,18 +372,29 @@ const HealthCheckTable = ({
         sbomId: sbomId,
         uniqueId: true
       }
-    }).then((res) => {
-      if (res.data) {
-        setPageIndex(1)
-        healthRecheck({
-          variables: {
-            checkId: row.organizationRule.rule.friendlyId,
-            compId: row.componentId,
-            sbomId: sbomId
-          }
-        })
-      }
     })
+      .then((res) => {
+        if (res.data) {
+          setPageIndex(1)
+          healthRecheck({
+            variables: {
+              checkId: row.organizationRule.rule.friendlyId,
+              compId: row.componentId,
+              sbomId: sbomId
+            }
+          })
+        }
+      })
+      .finally(() => {
+        setTimeout(() => {
+          toast({
+            description: 'A unique identifier has been added to the component',
+            status: 'success',
+            duration: 3000,
+            position: 'top'
+          })
+        }, 1000)
+      })
   }
 
   // CHECK UNIQUE IDENTIFIER
@@ -915,7 +926,7 @@ const HealthCheckTable = ({
               filterRefetch={filterRefetch}
               isOpen={isSupplierOpen}
               onClose={onSupplierClose}
-              suppliers={[]}
+              data={null}
               setPageIndex={setPageIndex}
               checkId={activeRow.organizationRule.rule.friendlyId}
               totalRows={totalRows}
