@@ -187,7 +187,6 @@ const GeneralDataRow = ({ status, data, refetch }) => {
     onSBMOpen()
   }
 
-  console.log('data', data)
 
   const onUpdateLicense = async () => {
     await updateSbom({

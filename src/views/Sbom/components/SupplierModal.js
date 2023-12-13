@@ -25,6 +25,7 @@ import { useState, useEffect, useContext } from 'react'
 import { useLocation } from 'react-router-dom'
 
 const SupplierModal = ({
+  id,
   isOpen,
   onClose,
   refetch,
@@ -57,20 +58,22 @@ const SupplierModal = ({
 
   const onFilterRefetch = () => {
     filterRefetch({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId
-      }
-    }).then((res) => {
-      setCompFilters(res.data.sbom.filters)
-    })
+      projectId: productId,
+      sbomId: sbomId
+    }).then((res) => res.data && setCompFilters(res.data.sbom.filters))
   }
 
   const [createSupplier] = useMutation(addComSupplier, {
-    onCompleted: () => refetch()
+    onCompleted: () => {
+      refetch()
+      onFilterRefetch()
+    }
   })
   const [updateSupplier] = useMutation(updateComSupplier, {
-    onCompleted: () => refetch()
+    onCompleted: () => {
+      refetch()
+      onFilterRefetch()
+    }
   })
 
   const [healthRecheck] = useMutation(recheckHealth, {
@@ -82,20 +85,17 @@ const SupplierModal = ({
       setSupName(suppliers[0].name)
       setSupEmail(suppliers[0].contactEmail)
     }
-  }, [suppliers])
+  }, [])
 
   const handleSave = async () => {
     await createSupplier({
       variables: {
         name: supName,
         contactEmail: supEmail,
-        componentId: activeCheck.id
+        componentId: activeCheck ? activeCheck.id : id
       }
     })
       .then((res) => {
-        if (res.data) {
-          onFilterRefetch()
-        }
         if (checkId) {
           setPageIndex(1)
           healthRecheck({
@@ -110,18 +110,14 @@ const SupplierModal = ({
       .finally(() => onClose())
   }
 
-  const handleUpdate = async (e) => {
+  const handleUpdate = async () => {
     await updateSupplier({
       variables: {
         name: supName,
         contactEmail: supEmail,
         id: suppliers[0].id
       }
-    }).then((data) => {
-      if (data) {
-        onClose()
-      }
-    })
+    }).then((res) => res.data && onClose())
   }
 
   const [createAutoCheck] = useMutation(CreateAutomation)
