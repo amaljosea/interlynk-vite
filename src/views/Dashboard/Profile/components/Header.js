@@ -107,7 +107,11 @@ const Header = ({
 
   useEffect(() => {
     if (user) {
-      setProfileImage(`${SERVER_URL}/${user.profileImage.url}`)
+      if (user.profileImgae?.url) {
+        setProfileImage(`${SERVER_URL}/${user.profileImage?.url}`)
+      } else {
+        setProfileImage(null)
+      }
     }
   }, [])
 
