@@ -41,7 +41,8 @@ import {
   FaFileDownload,
   FaBug,
   FaArrowRight,
-  FaAngleRight
+  FaAngleRight,
+  FaBox
 } from 'react-icons/fa'
 import { TbSignature, TbSignatureOff } from 'react-icons/tb'
 import { useLocation, useHistory } from 'react-router-dom'
@@ -59,6 +60,7 @@ import CheckModal from './components/CheckModal'
 import { GetAllComponents } from 'graphQL/Queries'
 import GlobalContext from 'context/GlobalContext'
 import { GetVulnData } from 'graphQL/Queries'
+import { BsBoxFill } from 'react-icons/bs'
 
 const idRegex =
   /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
@@ -389,7 +391,6 @@ function SBOM() {
                     alignItems={'top'}
                   >
                     {/* LEFT */}
-
                     <GridItem colSpan={2}>
                       <Flex
                         direction={'row'}
@@ -601,23 +602,48 @@ function SBOM() {
                       <GridItem colSpan={3}>
                         <Flex
                           direction={'row'}
-                          gap={2}
+                          gap={4}
                           justifyContent='flex-end'
                           ml={'auto'}
                         >
+                          {/* CHANGE ENVIRONMENT */}
+                          <Flex
+                            flexDirection={'row'}
+                            alignItems={'center'}
+                            gap={2}
+                          >
+                            <BsBoxFill size={22} color='#718096' />
+                            <Select
+                              name='environment'
+                              id='environment'
+                              size='md'
+                            >
+                              {[
+                                'All',
+                                'Development',
+                                'Release',
+                                'Staging',
+                                'Settings'
+                              ].map((item, index) => (
+                                <option value={item} key={index}>
+                                  {item}
+                                </option>
+                              ))}
+                            </Select>
+                          </Flex>
+
                           {/* CHANGE SBOM VERSION */}
                           <Flex
                             flexDirection={'row'}
                             alignItems={'center'}
                             gap={2}
                           >
-                            <FaLayerGroup size={18} color='darkgray' />
+                            <FaLayerGroup size={21} color='#4299E1' />
                             <Select
                               id='version'
                               value={selectedVersion}
                               onChange={handleSBOMChange}
                               size='md'
-                              color='gray.500'
                             >
                               {filteredData && filteredData.length > 0 ? (
                                 filteredData.map((item, index) => (
@@ -638,7 +664,14 @@ function SBOM() {
                               )}
                             </Select>
                           </Flex>
-
+                        </Flex>
+                        <Flex
+                          direction={'row'}
+                          gap={2}
+                          justifyContent='flex-end'
+                          ml={'auto'}
+                          mt={4}
+                        >
                           {/* EDIT SBOM */}
                           <Tooltip label='Edit'>
                             <IconButton
@@ -677,16 +710,7 @@ function SBOM() {
                               colorScheme='blue'
                             />
                           </Tooltip>
-                          {/*
-                          <Tooltip label='Copy'>
-                            <IconButton
-                              icon={<FaCopy />}
-                              onClick={onCopiedOpen}
-                              size='md'
-                              colorScheme='blue'
-                            />
-                          </Tooltip>
- */}
+
                           {/* DELETE SBOM */}
                           <Tooltip label='Delete'>
                             <IconButton
