@@ -162,7 +162,6 @@ const CheckFilterMenu = ({
                       key={index}
                       value={item.rule.friendlyId}
                       fontSize={'sm'}
-                      textTransform={'capitalize'}
                     >
                       {item.rule.friendlyId}: {item.rule.shortDesc}
                     </MenuItemOption>
