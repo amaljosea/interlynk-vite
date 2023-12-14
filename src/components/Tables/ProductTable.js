@@ -203,9 +203,16 @@ const ProductTable = ({ data, refetch }) => {
               })
             }
           })
+
         const filteredData = uniqVersions
           ? removeDuplicatesAndLatest(uniqVersions)
           : []
+
+        filteredData?.sort((a, b) => {
+          const dateA = new Date(a.updatedAt)
+          const dateB = new Date(b.updatedAt)
+          return dateB - dateA
+        })
 
         const product = {
           id: id,
@@ -223,6 +230,8 @@ const ProductTable = ({ data, refetch }) => {
               ? sboms[0].id
               : ''
         }
+
+        // console.log('sboms', sboms)
 
         return (
           <>

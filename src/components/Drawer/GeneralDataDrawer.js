@@ -109,9 +109,9 @@ const GeneralDataDrawer = ({
 
   useEffect(() => {
     if (data) {
-      setExistingTools(data.tools)
-      setSupplierList(data.suppliers)
-      setExistingAuthors(data.authors)
+      setExistingTools(data.tools ? data.tools : [])
+      setSupplierList(data.suppliers ? data.suppliers : [])
+      setExistingAuthors(data.authors ? data.authors : [])
     }
   }, [data])
 

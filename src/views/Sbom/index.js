@@ -235,11 +235,10 @@ function SBOM() {
     ? removeDuplicatesAndLatest(uniqVersions)
     : []
 
+
   filteredData?.sort((a, b) => {
     const dateA = new Date(a.updatedAt)
     const dateB = new Date(b.updatedAt)
-
-    // Compare the dates
     return dateB - dateA
   })
 

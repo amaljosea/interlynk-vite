@@ -172,7 +172,6 @@ export default function AdminNavbar(props) {
                     }
                     color={secondaryText}
                     onClick={() => {
-                      window.localStorage.setItem('product', activeProd)
                       setActiveProdTab(0)
                     }}
                   >
