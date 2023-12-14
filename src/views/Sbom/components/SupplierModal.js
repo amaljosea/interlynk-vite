@@ -49,6 +49,8 @@ const SupplierModal = ({
     return emailRegex.test(email)
   }
 
+  const [orgName, setOrgName] = useState('')
+  const [orgUrl, setOrgUrl] = useState('')
   const [supName, setSupName] = useState('')
   const [supEmail, setSupEmail] = useState('')
 
@@ -82,30 +84,37 @@ const SupplierModal = ({
   })
 
   useEffect(() => {
-    if (data && data.suppliers?.length > 0) {
-      setSupName(data.suppliers[0].name)
-      setSupEmail(data.suppliers[0].contactEmail)
+    if (data && data.suppliers.length > 0) {
+      const { suppliers } = data
+      setOrgName(suppliers[0].name)
+      setOrgUrl(suppliers[0].url)
+      setSupName(suppliers[0].contactName)
+      setSupEmail(suppliers[0].contactEmail)
     }
   }, [])
 
   const handleSave = async () => {
     await createSupplier({
       variables: {
-        name: supName,
+        name: orgName,
+        url: orgUrl,
+        contactName: supName,
         contactEmail: supEmail,
         componentId: activeCheck ? activeCheck.id : id
       }
     })
       .then((res) => {
-        if (checkId) {
-          setPageIndex(1)
-          healthRecheck({
-            variables: {
-              sbomId: sbomId,
-              checkId: checkId,
-              compId: activeCheck.id
-            }
-          })
+        if (res.data) {
+          if (checkId) {
+            setPageIndex(1)
+            healthRecheck({
+              variables: {
+                sbomId: sbomId,
+                checkId: checkId,
+                compId: activeCheck.id
+              }
+            })
+          }
         }
       })
       .finally(() => onClose())
@@ -114,7 +123,9 @@ const SupplierModal = ({
   const handleUpdate = async () => {
     await updateSupplier({
       variables: {
-        name: supName,
+        name: orgName,
+        url: orgUrl,
+        contactName: supName,
         contactEmail: supEmail,
         id: data && data.suppliers && data.suppliers[0].id
       }
@@ -150,8 +161,6 @@ const SupplierModal = ({
   }
 
   const isInvalid = !supName || (supEmail !== '' && !validateEmail(supEmail))
-
-  console.log('data', data)
 
   return (
     <>
@@ -193,18 +202,38 @@ const SupplierModal = ({
               </Flex>
             )}
             <Flex width={'100%'} direction={'column'} gap={4}>
+              {/* ORG NAME */}
+              <FormControl>
+                <FormLabel fontSize={'sm'}>Organization Name</FormLabel>
+                <Input
+                  placeholder='Enter organization name'
+                  value={orgName}
+                  onChange={(e) => setOrgName(e.target.value)}
+                />
+              </FormControl>
+              {/* ORG URL */}
+              <FormControl>
+                <FormLabel fontSize={'sm'}>URL</FormLabel>
+                <Input
+                  placeholder='Enter URL'
+                  value={orgUrl}
+                  onChange={(e) => setOrgUrl(e.target.value)}
+                />
+              </FormControl>
+              {/*   SUPPLIER NAME */}
               <FormControl isRequired>
-                <FormLabel fontSize={'sm'}>Name</FormLabel>
+                <FormLabel fontSize={'sm'}>Contact Name</FormLabel>
                 <Input
                   placeholder='Enter supplier name'
                   value={supName}
                   onChange={(e) => setSupName(e.target.value)}
                 />
               </FormControl>
+              {/* SUPPLIER EMAIL */}
               <FormControl
                 isInvalid={supEmail !== '' && !validateEmail(supEmail)}
               >
-                <FormLabel fontSize={'sm'}>Email</FormLabel>
+                <FormLabel fontSize={'sm'}>Contact Email</FormLabel>
                 <Input
                   placeholder='Enter supplier email'
                   value={supEmail}

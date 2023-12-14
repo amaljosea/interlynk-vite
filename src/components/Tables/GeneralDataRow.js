@@ -154,6 +154,21 @@ const GeneralDataRow = ({ status, data, refetch }) => {
     onOpen()
   }
 
+  const handleSupRemove = async (id) => {
+    await deleteSupplier({
+      variables: {
+        id: id
+      }
+    }).then(
+      (res) =>
+        res.data &&
+        refetch({
+          productId: productId,
+          sbomId: sbomId
+        })
+    )
+  }
+
   const onLicenseOpen = () => {
     console.log('data', data)
     if (data.licenses && data.licenses.length > 0) {
@@ -186,7 +201,6 @@ const GeneralDataRow = ({ status, data, refetch }) => {
     }
     onSBMOpen()
   }
-
 
   const onUpdateLicense = async () => {
     await updateSbom({
@@ -420,12 +434,15 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                         colorScheme='orange'
                       >
                         <TagLabel>
-                          {item.name}
-                          {item.contactEmail && (
-                            <>
-                              {' - '}
-                              {item.contactEmail}
-                            </>
+                          {item.contactName}
+                          {item.contactEmail && ` (${item.contactEmail})`}
+                          {item.url ? (
+                            <Link href={item.url} isExternal>
+                              {' '}
+                              {item.name}
+                            </Link>
+                          ) : (
+                            ` ${item.name}`
                           )}
                         </TagLabel>
                         {!customerView && (

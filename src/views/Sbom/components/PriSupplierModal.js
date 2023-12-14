@@ -21,7 +21,14 @@ import { recheckHealth, supplierUpdate, supplierCreate } from 'graphQL/Mutation'
 import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 
-const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId,setPageIndex }) => {
+const PriSupplierModal = ({
+  isOpen,
+  onClose,
+  refetch,
+  suppliers,
+  checkId,
+  setPageIndex
+}) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('p')
@@ -32,6 +39,8 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId,setPage
     return emailRegex.test(email)
   }
 
+  const [orgName, setOrgName] = useState('')
+  const [orgUrl, setOrgUrl] = useState('')
   const [supName, setSupName] = useState('')
   const [supEmail, setSupEmail] = useState('')
   const [supplierError, setSupplierError] = useState('')
@@ -45,6 +54,8 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId,setPage
       setSupplierError('')
     }
   }
+
+  const isInvalid = !supName || (supEmail != '' && !validateEmail(supEmail))
 
   const handleRefetch = () => {
     refetch({
@@ -68,16 +79,20 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId,setPage
 
   useEffect(() => {
     if (suppliers && suppliers.length > 0) {
-      setSupName(suppliers[0].name)
-      setSupEmail(suppliers[0].contactEmail ? suppliers[0].contactEmail : '')
+      setOrgName(suppliers[0].name)
+      setOrgUrl(suppliers[0].url)
+      setSupName(suppliers[0].contactName)
+      setSupEmail(suppliers[0].contactEmail)
     }
   }, [suppliers])
 
   const handleSave = async () => {
     await createSupplier({
       variables: {
-        name: supName,
-        contactEmail: supEmail !== '' ? supEmail : undefined,
+        name: orgName,
+        url: orgUrl,
+        contactName: supName,
+        contactEmail: supEmail,
         sbomId: sbomId
       }
     })
@@ -98,8 +113,10 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId,setPage
   const handleUpdate = async () => {
     await updateSupplier({
       variables: {
-        name: supName,
-        contactEmail: supEmail !== '' ? supEmail : undefined,
+        name: orgName,
+        url: orgUrl,
+        contactName: supName,
+        contactEmail: supEmail,
         id: suppliers[0].id
       }
     }).then((res) => res.data && onClose())
@@ -135,8 +152,27 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId,setPage
           <ModalCloseButton />
           <ModalBody>
             <Flex width={'100%'} direction={'column'} gap={4}>
+              {/* ORG NAME */}
+              <FormControl>
+                <FormLabel fontSize={'sm'}>Organization Name</FormLabel>
+                <Input
+                  placeholder='Enter organization name'
+                  value={orgName}
+                  onChange={(e) => setOrgName(e.target.value)}
+                />
+              </FormControl>
+              {/* ORG URL */}
+              <FormControl>
+                <FormLabel fontSize={'sm'}>URL</FormLabel>
+                <Input
+                  placeholder='Enter URL'
+                  value={orgUrl}
+                  onChange={(e) => setOrgUrl(e.target.value)}
+                />
+              </FormControl>
+              {/* SUPPLIER NAME */}
               <FormControl isRequired isInvalid={supplierError}>
-                <FormLabel fontSize={'sm'}>Name</FormLabel>
+                <FormLabel fontSize={'sm'}>Contact Name</FormLabel>
                 <Input
                   placeholder='Enter supplier name'
                   value={supName}
@@ -144,10 +180,11 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId,setPage
                 />
                 <FormErrorMessage>{supplierError}</FormErrorMessage>
               </FormControl>
+              {/* SUPPLIER EMAIL */}
               <FormControl
                 isInvalid={!validateEmail(supEmail) && supEmail !== ''}
               >
-                <FormLabel fontSize={'sm'}>Email</FormLabel>
+                <FormLabel fontSize={'sm'}>Contact Email</FormLabel>
                 <Input
                   placeholder='Enter supplier email'
                   value={supEmail}
@@ -166,7 +203,12 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId,setPage
               alignItems={'center'}
             >
               {checkId ? (
-                <Button fontSize={'sm'} colorScheme='blue' onClick={onSaveRule}>
+                <Button
+                  fontSize={'sm'}
+                  colorScheme='blue'
+                  onClick={onSaveRule}
+                  disabled={isInvalid}
+                >
                   Save Rule
                 </Button>
               ) : (
@@ -180,9 +222,7 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId,setPage
                   <Button
                     colorScheme='blue'
                     onClick={handleUpdate}
-                    disabled={
-                      !supName || (supEmail != '' && !validateEmail(supEmail))
-                    }
+                    disabled={isInvalid}
                   >
                     Update
                   </Button>
@@ -190,7 +230,7 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId,setPage
                   <Button
                     colorScheme='blue'
                     onClick={handleSave}
-                    disabled={!supName || supplierError !== ''}
+                    disabled={isInvalid}
                   >
                     Save
                   </Button>

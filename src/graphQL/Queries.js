@@ -626,9 +626,9 @@ export const GetComponentData = gql`
           suppliers {
             id
             name
+            url
             contactEmail
             contactName
-            updatedAt
           }
         }
       }

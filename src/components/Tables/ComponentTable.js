@@ -22,7 +22,8 @@ import {
   Link,
   Button,
   Divider,
-  Select
+  Select,
+  VStack
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
@@ -696,7 +697,7 @@ const ComponentTable = ({
           </GridItem>
           <GridItem w='100%'>
             <CustomText>Supplier :</CustomText>
-            <HStack spacing={4} mt={1}>
+            <VStack spacing={4} mt={1} alignItems={'left'}>
               {suppliers &&
                 suppliers.map((item, index) => (
                   <Tag
@@ -704,15 +705,24 @@ const ComponentTable = ({
                     key={index}
                     variant='subtle'
                     colorScheme='orange'
+                    width={'fit-content'}
                   >
                     <TagLabel>
-                      {item.name}
-                      {item.contactEmail && ` - ${item.contactEmail}`}
+                      {item.contactName}
+                      {item.contactEmail && ` (${item.contactEmail})`}
+                      {item.url ? (
+                        <Link href={item.url} isExternal>
+                          {' '}
+                          {item.name}
+                        </Link>
+                      ) : (
+                        ` ${item.name}`
+                      )}
                     </TagLabel>
                     <TagCloseButton onClick={() => handleSupRemove(item.id)} />
                   </Tag>
                 ))}
-            </HStack>
+            </VStack>
           </GridItem>
           <GridItem w='100%'>
             <CustomText>PURL :</CustomText>
