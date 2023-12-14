@@ -33,7 +33,9 @@ import {
   UnorderedList,
   ListItem,
   Alert,
-  AlertIcon
+  AlertIcon,
+  AlertTitle,
+  AlertDescription
 } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
 import GlobalContext from 'context/GlobalContext'
@@ -69,6 +71,8 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const queryParams = new URLSearchParams(location.search)
   const sbomId = queryParams.get('sbom')
   const prodId = queryParams.get('p')
+
+  const currentProduct = JSON.parse(localStorage.getItem(`product`))
 
   const { isOpen, onOpen, onClose } = useDisclosure()
   const {
@@ -595,7 +599,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
             <ModalHeader>Add Parts</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              {productList && (
+              {productList && currentProduct.version ? (
                 <Stack spacing={4} direction={'column'} gap={2}>
                   {/* Project */}
                   <FormControl fontSize={'sm'}>
@@ -654,6 +658,30 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
                     )}
                   </FormControl>
                 </Stack>
+              ) : (
+                <Alert
+                  status='info'
+                  variant='subtle'
+                  flexDirection='column'
+                  alignItems='center'
+                  justifyContent='center'
+                  textAlign='center'
+                  height='150px'
+                  borderRadius={5}
+                >
+                  <AlertIcon boxSize='30px' mr={0} />
+                  <AlertTitle
+                    mt={4}
+                    mb={1}
+                    fontSize='lg'
+                    fontWeight={'semibold'}
+                  >
+                    There is no SBOM in this project
+                  </AlertTitle>
+                  <AlertDescription maxWidth='sm'>
+                    Please upload and try again
+                  </AlertDescription>
+                </Alert>
               )}
             </ModalBody>
 

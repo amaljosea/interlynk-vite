@@ -210,8 +210,18 @@ const ProductTable = ({ data, refetch }) => {
         const product = {
           id: id,
           name: name,
-          version: filteredData.length > 0 ? filteredData[0].version : sboms[0].primaryComponent.version,
-          sbomId: filteredData.length > 0 ? filteredData[0].id : sboms[0].id
+          version:
+            filteredData.length > 0
+              ? filteredData[0].version
+              : sboms.length > 0
+              ? sboms[0].primaryComponent?.version
+              : '',
+          sbomId:
+            filteredData.length > 0
+              ? filteredData[0].id
+              : sboms.length > 0
+              ? sboms[0].id
+              : ''
         }
 
         return (
@@ -222,7 +232,10 @@ const ProductTable = ({ data, refetch }) => {
                   filteredData.length > 0 ? filteredData[0].id : sboms[0].id
                 }`}
                 onClick={() => {
-                  window.localStorage.setItem('product', JSON.stringify(product))
+                  window.localStorage.setItem(
+                    'product',
+                    JSON.stringify(product)
+                  )
                   setCurrentProduct({
                     id: id,
                     sbomId:
