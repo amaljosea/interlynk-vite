@@ -39,8 +39,7 @@ const VulnsTable = ({ data }) => {
           </Link>
         )
       },
-      width: '25%',
-      sortable: true
+      width: '25%'
     },
     // SEVERITY
     {
@@ -67,8 +66,7 @@ const VulnsTable = ({ data }) => {
           </>
         )
       },
-      width: '120px',
-      sortable: true
+      width: '120px'
     },
     // SOURCE
     {
@@ -91,8 +89,7 @@ const VulnsTable = ({ data }) => {
           </Tag>
         )
       },
-      width: '110px',
-      sortable: true
+      width: '110px'
     },
     // CVSS
     {
@@ -116,8 +113,7 @@ const VulnsTable = ({ data }) => {
           </Flex>
         )
       },
-      width: '90px',
-      sortable: true
+      width: '90px'
     },
     // EPSS
     {
@@ -167,8 +163,7 @@ const VulnsTable = ({ data }) => {
           </Flex>
         )
       },
-      width: '150px',
-      sortable: true
+      width: '150px'
     },
     // Products
     {
@@ -185,8 +180,7 @@ const VulnsTable = ({ data }) => {
           </Flex>
         )
       },
-      width: '150px',
-      sortable: true
+      width: '150px'
     },
     // Products
     {
@@ -202,8 +196,7 @@ const VulnsTable = ({ data }) => {
           </Flex>
         )
       },
-      width: '150px',
-      sortable: true
+      width: '150px'
     },
     // UPDATED AT
     {
@@ -262,8 +255,6 @@ const VulnsTable = ({ data }) => {
           columns={columns}
           data={data}
           customStyles={customStyles}
-          defaultSortAsc={false}
-          defaultSortFieldId={'UPDATED_AT'}
           progressPending={data ? false : true}
           progressComponent={<CustomLoader />}
           subHeader
