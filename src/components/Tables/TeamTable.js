@@ -30,6 +30,7 @@ import { FaEllipsisV } from 'react-icons/fa'
 import { getFullDateAndTime, displayPic } from 'utils'
 import TeamModal from 'views/Dashboard/Profile/components/TeamModal'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
+import userNone from 'assets/img/user.png'
 
 const customStyles = {
   headCells: {
@@ -49,6 +50,7 @@ const customStyles = {
   }
 }
 const TeamTable = ({ data, refetch }) => {
+  const SERVER_URL = process.env.REACT_APP_SERVER
   const { isOpen, onOpen, onClose } = useDisclosure()
   const {
     isOpen: isTeamOpen,
@@ -67,7 +69,7 @@ const TeamTable = ({ data, refetch }) => {
       id: 'name',
       name: 'NAME',
       selector: (row) => {
-        const { name, email } = row
+        const { name, email, profileImage } = row
         return (
           <Stack
             width={'100%'}
@@ -79,7 +81,7 @@ const TeamTable = ({ data, refetch }) => {
             <Box width={'30px'}>
               <Avatar
                 me={{ md: '22px' }}
-                src={displayPic(email)}
+                src={profileImage ? `${SERVER_URL}/${profileImage?.url}` : userNone}
                 w='30px'
                 h='30px'
               />

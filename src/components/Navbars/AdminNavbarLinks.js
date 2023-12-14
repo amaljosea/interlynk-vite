@@ -66,6 +66,12 @@ export default function HeaderLinks(props) {
   }, [])
 
   useEffect(() => {
+    if (data?.organization?.currentUser) {
+      setUsername(data.organization.currentUser.name)
+    }
+  }, [data])
+
+  useEffect(() => {
     if (error) {
       if (error.networkError) {
         console.log('Network error:', error.networkError)
@@ -189,7 +195,7 @@ export default function HeaderLinks(props) {
           }
         >
           <Text display={{ sm: 'none', md: 'flex' }} fontSize={'sm'}>
-            {data ? data.organization.currentUser.name : 'Surendra'}
+            {username}
           </Text>
         </MenuButton>
         {location.pathname.startsWith('/vendor') && (

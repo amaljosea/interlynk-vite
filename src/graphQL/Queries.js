@@ -37,6 +37,10 @@ export const GetOrg = gql`
         role
         timezone
         createdAt
+        profileImage {
+          filename
+          url
+        }
       }
       organizationConnectors {
         enabled
