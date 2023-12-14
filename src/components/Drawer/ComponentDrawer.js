@@ -559,7 +559,7 @@ function ComponentDrawer(props) {
                   value={compScope}
                   onChange={(e) => setCompScope(e.target.value)}
                 >
-                  <option value='' value='' style={{background: 'lightgray'}}>-- Select --</option>
+                  <option value='' style={{background: 'lightgray'}}>-- Select --</option>
                   <option value='excluded'>Excluded</option>
                   <option value='optional'>Optional</option>
                   <option value='required'>Required</option>

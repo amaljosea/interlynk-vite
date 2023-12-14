@@ -46,31 +46,13 @@ import { useLazyQuery, useMutation } from '@apollo/client'
 import { deleteComSupplier } from 'graphQL/Mutation'
 import CompFilterMenu from 'views/Sbom/components/CompFilterMenu'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
-import { getFullDateAndTime } from 'utils'
+import { getFullDateAndTime, customStyles } from 'utils'
 import GlobalContext from 'context/GlobalContext'
 import CustomLoader from 'components/CustomLoader'
 import RelationshipDrawer from 'components/Drawer/RelationshipDrawer'
 import RowLimit from 'views/Sbom/components/RowLimit'
 import { GetComponentPath } from 'graphQL/Queries'
 import { GetCompDependency } from 'graphQL/Queries'
-
-const customStyles = {
-  headCells: {
-    style: {
-      width: '100%',
-      fontWeight: 'bold',
-      color: '#2D3748',
-      fontSize: '12px',
-      letterSpacing: '1px'
-    }
-  },
-  subHeader: {
-    style: {
-      padding: 0,
-      margin: 0
-    }
-  }
-}
 
 const ComponentTable = ({
   lifecycle,

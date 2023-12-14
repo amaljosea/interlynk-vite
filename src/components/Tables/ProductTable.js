@@ -29,7 +29,7 @@ import {
 import { useContext, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FaEllipsisV, FaFilter } from 'react-icons/fa'
-import { getFullDateAndTime, timeSince } from 'utils'
+import { getFullDateAndTime, timeSince, customStyles } from 'utils'
 import CustomLoader from 'components/CustomLoader'
 import DataTable from 'react-data-table-component'
 import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
@@ -42,23 +42,6 @@ import { useHistory } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import ProdFilterMenu from 'views/Dashboard/Products/components/ProdFilterMenu'
-
-const customStyles = {
-  headCells: {
-    style: {
-      fontWeight: 'bold',
-      color: '#2D3748',
-      fontSize: '12px',
-      letterSpacing: '1px'
-    }
-  },
-  subHeader: {
-    style: {
-      padding: 0,
-      margin: 0
-    }
-  }
-}
 
 const ProductTable = ({ data, refetch }) => {
   const toast = useToast()

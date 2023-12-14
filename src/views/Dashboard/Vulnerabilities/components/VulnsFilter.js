@@ -8,32 +8,15 @@ import {
   MenuOptionGroup,
   Stack
 } from '@chakra-ui/react'
-import { CheckIcon } from '@chakra-ui/icons'
+import CheckMark from 'components/Misc/CheckMark'
 import { FaFilter } from 'react-icons/fa'
 import { useState } from 'react'
-import SearchFilter from 'views/Sbom/components/SearchFilter'
-
-const CheckMark = () => {
-  return (
-    <CheckIcon
-      w={5}
-      h={5}
-      bg={'white'}
-      color={'blue.500'}
-      border={'1px solid #4299E1'}
-      rounded={'full'}
-      p={'4px'}
-      position={'absolute'}
-      right={-1}
-      top={-1}
-      zIndex={11}
-    />
-  )
-}
 
 const VulnsFilters = () => {
   const [severity, setSeverity] = useState([])
   const [source, setSource] = useState([])
+  const [products, setProducts] = useState([])
+  const [archived, setArchived] = useState([])
 
   return (
     <Stack direction={'row'} alignItems={'center'} gap={1}>
@@ -95,7 +78,7 @@ const VulnsFilters = () => {
                 setSource(value.includes('all') ? [] : value)
               }
             >
-              {['All', 'NVD', 'OSV'].map((item, index) => (
+              {['all', 'NVD', 'OSV'].map((item, index) => (
                 <MenuItemOption
                   key={index}
                   value={item}
@@ -112,7 +95,7 @@ const VulnsFilters = () => {
       {/* Products */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {source.length !== 0 && !source.includes('all') && <CheckMark />}
+          {products.length !== 0 && !products.includes('all') && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -125,12 +108,12 @@ const VulnsFilters = () => {
           <MenuList>
             <MenuOptionGroup
               type='checkbox'
-              value={source}
+              value={products}
               onChange={(value) =>
-                setSource(value.includes('all') ? [] : value)
+                setProducts(value.includes('all') ? [] : value)
               }
             >
-              {['All', 'lynk-api', 'lynk-dash-app', 'sbomqs', 'sbomgr'].map(
+              {['all', 'lynk-api', 'lynk-dash-app', 'sbomqs', 'sbomgr'].map(
                 (item, index) => (
                   <MenuItemOption key={index} value={item} fontSize={'sm'}>
                     {item}
@@ -144,7 +127,7 @@ const VulnsFilters = () => {
       {/* Archived */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {source.length !== 0 && !source.includes('all') && <CheckMark />}
+          {archived.length !== 0 && !archived.includes('all') && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -157,13 +140,18 @@ const VulnsFilters = () => {
           <MenuList>
             <MenuOptionGroup
               type='checkbox'
-              value={source}
+              value={archived}
               onChange={(value) =>
-                setSource(value.includes('all') ? [] : value)
+                setArchived(value.includes('all') ? [] : value)
               }
             >
-              {['All', 'Yes', 'No'].map((item, index) => (
-                <MenuItemOption key={index} value={item} fontSize={'sm'}>
+              {['all', 'yes', 'no'].map((item, index) => (
+                <MenuItemOption
+                  key={index}
+                  value={item}
+                  fontSize={'sm'}
+                  textTransform={'capitalize'}
+                >
                   {item}
                 </MenuItemOption>
               ))}

@@ -1,37 +1,13 @@
 // Chakra imports
 import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons'
-import {
-  Flex,
-  Text,
-  Tag,
-  TagLabel,
-  useColorModeValue,
-  Tooltip
-} from '@chakra-ui/react'
+import { Flex, Text, Tag, TagLabel, Tooltip } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
 import { useMemo, useState } from 'react'
-import { sevColor, timeSince, getFullDateAndTime } from 'utils'
+import { sevColor, timeSince, getFullDateAndTime, customStyles } from 'utils'
 import CustomLoader from 'components/CustomLoader'
 import { Link } from 'react-router-dom'
 import VulnsFilters from 'views/Dashboard/Vulnerabilities/components/VulnsFilter'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
-
-const customStyles = {
-  headCells: {
-    style: {
-      fontWeight: 'bold',
-      color: '#2D3748',
-      fontSize: '12px',
-      letterSpacing: '1px'
-    }
-  },
-  subHeader: {
-    style: {
-      padding: 0,
-      margin: 0
-    }
-  }
-}
 
 const VulnsTable = ({ data }) => {
   const cvssColor = (cvss) => {
