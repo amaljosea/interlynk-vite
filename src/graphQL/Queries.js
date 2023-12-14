@@ -37,6 +37,10 @@ export const GetOrg = gql`
         role
         timezone
         createdAt
+        profileImage {
+          filename
+          url
+        }
       }
       organizationConnectors {
         enabled
@@ -622,9 +626,9 @@ export const GetComponentData = gql`
           suppliers {
             id
             name
+            url
             contactEmail
             contactName
-            updatedAt
           }
         }
       }

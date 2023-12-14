@@ -21,27 +21,10 @@ import CustomLoader from 'components/CustomLoader'
 import DataTable from 'react-data-table-component'
 import UpdateRule from './UpdateRule'
 import { useState } from 'react'
-import { DeleteAutomation } from 'graphQL/Mutation'
+import { customStyles } from 'utils'
+import { DeleteAutomation, UpdateAutomation } from 'graphQL/Mutation'
 import { useMutation } from '@apollo/client'
 import { useLocation } from 'react-router-dom'
-import { UpdateAutomation } from 'graphQL/Mutation'
-
-const customStyles = {
-  headCells: {
-    style: {
-      fontWeight: 'bold',
-      color: '#2D3748',
-      fontSize: '12px',
-      letterSpacing: '1px'
-    }
-  },
-  subHeader: {
-    style: {
-      padding: 0,
-      margin: 0
-    }
-  }
-}
 
 const Settings = ({ data, refetch }) => {
   const location = useLocation()

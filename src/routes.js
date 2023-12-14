@@ -18,7 +18,8 @@ import {
   FaBullhorn,
   FaWindowMaximize,
   FaExchangeAlt,
-  FaBug
+  FaBug,
+  FaBalanceScale
 } from 'react-icons/fa'
 import { HomeIcon } from 'components/Icons/Icons'
 import { BsFillFolderSymlinkFill } from 'react-icons/bs'
@@ -26,6 +27,7 @@ import Automation from 'views/Dashboard/Automation'
 import { TbSettingsAutomation } from 'react-icons/tb'
 import ChangeLog from 'views/Dashboard/Changelog'
 import Vulnerabilities from 'views/Dashboard/Vulnerabilities'
+import Licenses from 'views/Dashboard/Linceses'
 
 export const dashRoutes = [
   {
@@ -54,6 +56,13 @@ export const dashRoutes = [
     name: 'Vulnerabilities',
     icon: <FaBug color='inherit' />,
     component: Vulnerabilities,
+    layout: '/vendor'
+  },
+  {
+    path: '/licenses',
+    name: 'Licenses',
+    icon: <FaBalanceScale color='inherit' />,
+    component: Licenses,
     layout: '/vendor'
   },
   // {

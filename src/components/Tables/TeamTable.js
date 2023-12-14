@@ -27,28 +27,13 @@ import { deleteOrgUser } from 'graphQL/Mutation'
 import React, { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV } from 'react-icons/fa'
-import { getFullDateAndTime, displayPic } from 'utils'
+import { getFullDateAndTime, customStyles } from 'utils'
 import TeamModal from 'views/Dashboard/Profile/components/TeamModal'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
+import userNone from 'assets/img/user.png'
 
-const customStyles = {
-  headCells: {
-    style: {
-      width: '100%',
-      fontWeight: 'bold',
-      color: '#2D3748',
-      fontSize: '12px',
-      letterSpacing: '1px'
-    }
-  },
-  subHeader: {
-    style: {
-      padding: 0,
-      margin: 0
-    }
-  }
-}
 const TeamTable = ({ data, refetch }) => {
+  const SERVER_URL = process.env.REACT_APP_SERVER
   const { isOpen, onOpen, onClose } = useDisclosure()
   const {
     isOpen: isTeamOpen,
@@ -67,7 +52,7 @@ const TeamTable = ({ data, refetch }) => {
       id: 'name',
       name: 'NAME',
       selector: (row) => {
-        const { name, email } = row
+        const { name, email, profileImage } = row
         return (
           <Stack
             width={'100%'}
@@ -79,7 +64,9 @@ const TeamTable = ({ data, refetch }) => {
             <Box width={'30px'}>
               <Avatar
                 me={{ md: '22px' }}
-                src={displayPic(email)}
+                src={
+                  profileImage ? `${SERVER_URL}/${profileImage?.url}` : userNone
+                }
                 w='30px'
                 h='30px'
               />

@@ -29,7 +29,7 @@ import {
 import { useContext, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FaEllipsisV, FaFilter } from 'react-icons/fa'
-import { getFullDateAndTime, timeSince } from 'utils'
+import { getFullDateAndTime, timeSince, customStyles } from 'utils'
 import CustomLoader from 'components/CustomLoader'
 import DataTable from 'react-data-table-component'
 import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
@@ -42,23 +42,6 @@ import { useHistory } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import ProdFilterMenu from 'views/Dashboard/Products/components/ProdFilterMenu'
-
-const customStyles = {
-  headCells: {
-    style: {
-      fontWeight: 'bold',
-      color: '#2D3748',
-      fontSize: '12px',
-      letterSpacing: '1px'
-    }
-  },
-  subHeader: {
-    style: {
-      padding: 0,
-      margin: 0
-    }
-  }
-}
 
 const ProductTable = ({ data, refetch }) => {
   const toast = useToast()
@@ -203,9 +186,35 @@ const ProductTable = ({ data, refetch }) => {
               })
             }
           })
+
         const filteredData = uniqVersions
           ? removeDuplicatesAndLatest(uniqVersions)
           : []
+
+        filteredData?.sort((a, b) => {
+          const dateA = new Date(a.updatedAt)
+          const dateB = new Date(b.updatedAt)
+          return dateB - dateA
+        })
+
+        const product = {
+          id: id,
+          name: name,
+          version:
+            filteredData.length > 0
+              ? filteredData[0].version
+              : sboms.length > 0
+              ? sboms[0].primaryComponent?.version
+              : '',
+          sbomId:
+            filteredData.length > 0
+              ? filteredData[0].id
+              : sboms.length > 0
+              ? sboms[0].id
+              : ''
+        }
+
+        // console.log('sboms', sboms)
 
         return (
           <>
@@ -215,10 +224,9 @@ const ProductTable = ({ data, refetch }) => {
                   filteredData.length > 0 ? filteredData[0].id : sboms[0].id
                 }`}
                 onClick={() => {
-                  window.localStorage.setItem('product', name)
                   window.localStorage.setItem(
-                    'productVersion',
-                    sboms[0].primaryComponent?.version
+                    'product',
+                    JSON.stringify(product)
                   )
                   setCurrentProduct({
                     id: id,

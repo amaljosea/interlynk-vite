@@ -27,13 +27,13 @@ export default function AdminNavbar(props) {
   const prodID = queryParams.get('id')
   const parts = queryParams.get('parts')
 
+  const { setActiveProdTab } = useContext(GlobalContext)
+
   const imageName = localStorage.getItem('Image')
-  const productName = localStorage.getItem(`product`)
+  const currentProduct = JSON.parse(localStorage.getItem(`product`))
   const activeProd = localStorage.getItem('activeProduct')
   const subProduct = localStorage.getItem('subProduct')
   const activeSBOM = localStorage.getItem('activeSBOM')
-
-  const { currentProduct, setActiveProdTab } = useContext(GlobalContext)
 
   const vulnData = vulnList.find((item) => item.id === prodID)
 
@@ -172,7 +172,6 @@ export default function AdminNavbar(props) {
                     }
                     color={secondaryText}
                     onClick={() => {
-                      window.localStorage.setItem('product', activeProd)
                       setActiveProdTab(0)
                     }}
                   >
@@ -207,7 +206,7 @@ export default function AdminNavbar(props) {
               </BreadcrumbItem>
             )}
 
-            {productName !== null && product && brandText === 'Products' && (
+            {currentProduct !== null && product && brandText === 'Products' && (
               <BreadcrumbItem color={mainText}>
                 <Link
                   to={
@@ -216,12 +215,10 @@ export default function AdminNavbar(props) {
                       : '/vendor/products'
                   }
                   onClick={() => {
-                    window.localStorage.removeItem('subProduct')
-                    window.localStorage.removeItem('subProductVersion')
                     setActiveProdTab(0)
                   }}
                 >
-                  {productName}
+                  {currentProduct.name}
                 </Link>
               </BreadcrumbItem>
             )}

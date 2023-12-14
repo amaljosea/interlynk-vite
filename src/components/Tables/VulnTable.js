@@ -39,25 +39,9 @@ import SearchFilter from 'views/Sbom/components/SearchFilter'
 import GlobalContext from 'context/GlobalContext'
 import CustomLoader from 'components/CustomLoader'
 import Cookies from 'js-cookie'
+import { customStyles } from 'utils'
 import RowLimit from 'views/Sbom/components/RowLimit'
 import ImportWizard from 'views/Sbom/components/ImportWizard'
-
-const customStyles = {
-  headCells: {
-    style: {
-      fontWeight: 'bold',
-      color: '#2D3748',
-      fontSize: '12px',
-      letterSpacing: '1px'
-    }
-  },
-  subHeader: {
-    style: {
-      padding: 0,
-      margin: 0
-    }
-  }
-}
 
 const statusColor = (status) => {
   if (status && status === 'Fixed') {
@@ -186,7 +170,12 @@ const VulnTable = ({
               />
             </Link>
             <Tooltip label={vuln.vulnId} placement={'top'}>
-              <Text my={3} fontSize='sm' color={textColor} data-tag='allowRowEvents'>
+              <Text
+                my={3}
+                fontSize='sm'
+                color={textColor}
+                data-tag='allowRowEvents'
+              >
                 {vuln.vulnId !== null ? `${vuln.vulnId}` : ''}
               </Text>
             </Tooltip>
@@ -350,7 +339,7 @@ const VulnTable = ({
       wrap: true,
       width: y.matches ? '10%' : x.matches ? '18%' : '15%',
       sortable: true,
-      omit: hideColumn,
+      omit: hideColumn
     },
     // VERSION
     {
@@ -364,7 +353,7 @@ const VulnTable = ({
       wrap: true,
       width: y.matches ? '10%' : x.matches ? '18%' : '12%',
       sortable: true,
-      omit: hideColumn,
+      omit: hideColumn
     },
     // STATUS
     {
@@ -387,7 +376,7 @@ const VulnTable = ({
           </Tag>
         )
       },
-      sortable: true,
+      sortable: true
     },
     // UPDATED AT
     {

@@ -572,3 +572,21 @@ export const findUniqueItems = (currentArray, importArray) => {
 
   return uniqueItems
 }
+
+export const customStyles = {
+  headCells: {
+    style: {
+      width: '100%',
+      fontWeight: 'bold',
+      color: '#2D3748',
+      fontSize: '12px',
+      letterSpacing: '1px'
+    }
+  },
+  subHeader: {
+    style: {
+      padding: 0,
+      margin: 0
+    }
+  }
+}

@@ -1,4 +1,3 @@
-import { CheckIcon } from '@chakra-ui/icons'
 import {
   Box,
   Button,
@@ -14,27 +13,10 @@ import {
   useDisclosure
 } from '@chakra-ui/react'
 import GlobalContext from 'context/GlobalContext'
-import Cookies from 'js-cookie'
+import CheckMark from 'components/Misc/CheckMark'
 import { useContext, useRef } from 'react'
 import { FaFilter } from 'react-icons/fa'
-
-const CheckMark = () => {
-  return (
-    <CheckIcon
-      w={5}
-      h={5}
-      bg={'white'}
-      color={'blue.500'}
-      border={'1px solid #4299E1'}
-      rounded={'full'}
-      p={'4px'}
-      position={'absolute'}
-      right={-1}
-      top={-1}
-      zIndex={11}
-    />
-  )
-}
+import Cookies from 'js-cookie'
 
 const VulnFilterMenu = ({
   refetch,
@@ -503,7 +485,11 @@ const VulnFilterMenu = ({
                 my={2}
                 size='sm'
                 onClick={handleSubmit}
-                isDisabled={Number(maxVal) <= Number(minVal) || maxVal === 0 || minVal === ''}
+                isDisabled={
+                  Number(maxVal) <= Number(minVal) ||
+                  maxVal === 0 ||
+                  minVal === ''
+                }
               >
                 Submit
               </Button>

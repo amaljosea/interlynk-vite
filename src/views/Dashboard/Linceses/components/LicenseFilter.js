@@ -8,16 +8,19 @@ import {
   MenuOptionGroup,
   Stack
 } from '@chakra-ui/react'
-import { FaFilter } from 'react-icons/fa'
 import CheckMark from 'components/Misc/CheckMark'
+import { useState } from 'react'
+import { FaFilter } from 'react-icons/fa'
 
-const ProdFilterMenu = ({ activeProd, setActiveProd, onFilter }) => {
+const LicenseFilter = () => {
+  const [status, setStatus] = useState([])
+
   return (
     <Stack direction={'row'} alignItems={'center'} gap={1}>
-      {/* ACTIVE */}
+      {/* SEVERITY */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {activeProd !== '' && activeProd !== 'all' && <CheckMark />}
+          {status.length !== 0 && !status.includes('all') && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -25,15 +28,17 @@ const ProdFilterMenu = ({ activeProd, setActiveProd, onFilter }) => {
             fontSize={'sm'}
             leftIcon={<FaFilter size={14} />}
           >
-            Active
+            Status
           </MenuButton>
           <MenuList>
             <MenuOptionGroup
-              type='radio'
-              value={activeProd}
-              onChange={onFilter}
+              type='checkbox'
+              value={status}
+              onChange={(value) =>
+                setStatus(value.includes('all') ? [] : value)
+              }
             >
-              {['all', 'yes', 'no'].map((item, index) => (
+              {['all', 'approved', 'rejected'].map((item, index) => (
                 <MenuItemOption
                   key={index}
                   value={item}
@@ -51,4 +56,4 @@ const ProdFilterMenu = ({ activeProd, setActiveProd, onFilter }) => {
   )
 }
 
-export default ProdFilterMenu
+export default LicenseFilter

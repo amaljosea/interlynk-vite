@@ -26,7 +26,7 @@ import DataTable from 'react-data-table-component'
 import { BiSolidWrench } from 'react-icons/bi'
 import { FaCheckDouble } from 'react-icons/fa'
 import { GoSkip } from 'react-icons/go'
-import { timeSince, sevColor, getFullDateAndTime } from 'utils'
+import { timeSince, sevColor, getFullDateAndTime, customStyles } from 'utils'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 import CheckFilterMenu from 'views/Sbom/components/CheckFilterMenu'
@@ -35,23 +35,6 @@ import PriSupplierModal from 'views/Sbom/components/PriSupplierModal'
 import RowLimit from 'views/Sbom/components/RowLimit'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import SupplierModal from 'views/Sbom/components/SupplierModal'
-
-const customStyles = {
-  headCells: {
-    style: {
-      fontWeight: 'bold',
-      color: '#2D3748',
-      fontSize: '12px',
-      letterSpacing: '1px'
-    }
-  },
-  subHeader: {
-    style: {
-      padding: 0,
-      margin: 0
-    }
-  }
-}
 
 const HealthCheckTable = ({
   productId,
@@ -110,10 +93,22 @@ const HealthCheckTable = ({
         projectId: productId,
         sbomId: sbomId,
         search: checkSearchInput !== '' ? checkSearchInput : undefined,
-        checkId: checkRules.includes('all') || checkRules.length === 0 ? undefined : checkRules,
-        category: checkCategory.includes('all') || checkCategory.length === 0 ? undefined : checkCategory,
-        severity: checkSeverity.includes('all') || checkSeverity.length === 0 ? undefined : checkSeverity,
-        status: checkStatus.includes('all') || checkStatus.length === 0 ? undefined : checkStatus,
+        checkId:
+          checkRules.includes('all') || checkRules.length === 0
+            ? undefined
+            : checkRules,
+        category:
+          checkCategory.includes('all') || checkCategory.length === 0
+            ? undefined
+            : checkCategory,
+        severity:
+          checkSeverity.includes('all') || checkSeverity.length === 0
+            ? undefined
+            : checkSeverity,
+        status:
+          checkStatus.includes('all') || checkStatus.length === 0
+            ? undefined
+            : checkStatus,
         first: totalRows,
         // after: checkAfter !== '' ? checkAfter : undefined,
         // last: checkBefore !== '' ? totalRows : undefined,

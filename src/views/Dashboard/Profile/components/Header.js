@@ -107,7 +107,7 @@ const Header = ({
 
   useEffect(() => {
     if (user) {
-      if (user.profileImgae?.url) {
+      if (user.profileImage?.url) {
         setProfileImage(`${SERVER_URL}/${user.profileImage?.url}`)
       } else {
         setProfileImage(null)
@@ -138,7 +138,7 @@ const Header = ({
             >
               <Image
                 src={profileImage || displayPic(user.email)}
-                alt=''
+                alt={profileImage ? profileImage.fileName : '.'}
                 borderRadius='full'
                 width='80px'
                 height='80px'
@@ -146,6 +146,7 @@ const Header = ({
               />
               <Input
                 type='file'
+                accept='.jpg,.jpeg,.png,.webp'
                 ref={inputRef}
                 onChange={handleFileChange}
                 opacity='0'

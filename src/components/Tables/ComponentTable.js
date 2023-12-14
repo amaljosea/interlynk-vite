@@ -22,7 +22,8 @@ import {
   Link,
   Button,
   Divider,
-  Select
+  Select,
+  VStack
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
@@ -45,31 +46,13 @@ import { useLazyQuery, useMutation } from '@apollo/client'
 import { deleteComSupplier } from 'graphQL/Mutation'
 import CompFilterMenu from 'views/Sbom/components/CompFilterMenu'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
-import { getFullDateAndTime } from 'utils'
+import { getFullDateAndTime, customStyles } from 'utils'
 import GlobalContext from 'context/GlobalContext'
 import CustomLoader from 'components/CustomLoader'
 import RelationshipDrawer from 'components/Drawer/RelationshipDrawer'
 import RowLimit from 'views/Sbom/components/RowLimit'
 import { GetComponentPath } from 'graphQL/Queries'
 import { GetCompDependency } from 'graphQL/Queries'
-
-const customStyles = {
-  headCells: {
-    style: {
-      width: '100%',
-      fontWeight: 'bold',
-      color: '#2D3748',
-      fontSize: '12px',
-      letterSpacing: '1px'
-    }
-  },
-  subHeader: {
-    style: {
-      padding: 0,
-      margin: 0
-    }
-  }
-}
 
 const ComponentTable = ({
   lifecycle,
@@ -696,7 +679,7 @@ const ComponentTable = ({
           </GridItem>
           <GridItem w='100%'>
             <CustomText>Supplier :</CustomText>
-            <HStack spacing={4} mt={1}>
+            <VStack spacing={4} mt={1} alignItems={'left'}>
               {suppliers &&
                 suppliers.map((item, index) => (
                   <Tag
@@ -704,15 +687,24 @@ const ComponentTable = ({
                     key={index}
                     variant='subtle'
                     colorScheme='orange'
+                    width={'fit-content'}
                   >
                     <TagLabel>
-                      {item.name}
-                      {item.contactEmail && ` - ${item.contactEmail}`}
+                      {item.contactName}
+                      {item.contactEmail && ` (${item.contactEmail})`}
+                      {item.url ? (
+                        <Link href={item.url} isExternal>
+                          {' '}
+                          {item.name}
+                        </Link>
+                      ) : (
+                        ` ${item.name}`
+                      )}
                     </TagLabel>
                     <TagCloseButton onClick={() => handleSupRemove(item.id)} />
                   </Tag>
                 ))}
-            </HStack>
+            </VStack>
           </GridItem>
           <GridItem w='100%'>
             <CustomText>PURL :</CustomText>
