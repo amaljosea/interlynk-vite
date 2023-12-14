@@ -17,6 +17,17 @@ import GlobalContext from 'context/GlobalContext'
 import { vulnList } from 'variables/general'
 
 export default function AdminNavbar(props) {
+  function parseJSONSafely(str) {
+    try {
+       return JSON.parse(str);
+    }
+    catch (e) {
+       console.err(e);
+       // Return a default object, or null based on use case.
+       return {}
+    }
+ }
+
   const [scrolled, setScrolled] = useState(false)
   const { brandText } = props
 
@@ -30,7 +41,7 @@ export default function AdminNavbar(props) {
   const { setActiveProdTab } = useContext(GlobalContext)
 
   const imageName = localStorage.getItem('Image')
-  const currentProduct = JSON.parse(localStorage.getItem(`product`))
+  const currentProduct = (() => { try { return parseJSONSafely(localStorage.getItem(`product`)); } catch (error) { console.log(error); return null; } })();
   const activeProd = localStorage.getItem('activeProduct')
   const subProduct = localStorage.getItem('subProduct')
   const activeSBOM = localStorage.getItem('activeSBOM')
