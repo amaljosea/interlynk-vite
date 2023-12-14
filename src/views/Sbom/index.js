@@ -40,26 +40,27 @@ import {
   FaLayerGroup,
   FaFileDownload,
   FaBug,
-  FaArrowRight,
-  FaAngleRight,
-  FaBox
+  FaAngleLeft
 } from 'react-icons/fa'
 import { TbSignature, TbSignatureOff } from 'react-icons/tb'
-import { useLocation, useHistory } from 'react-router-dom'
-import { DeleteIcon, EditIcon, TriangleDownIcon } from '@chakra-ui/icons'
+import { useLocation, useHistory, Link } from 'react-router-dom'
+import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 import { timeSince, getFullDateAndTime } from 'utils'
 import SigningModal from './components/SigningModal'
 import DownloadModal from './components/DownloadModal'
 import CopyModal from './components/CopyModal'
-
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import { GetProductData, GetProject, GetProjectData } from 'graphQL/Queries'
+import {
+  GetProductData,
+  GetProject,
+  GetProjectData,
+  GetAllComponents,
+  GetVulnData
+} from 'graphQL/Queries'
 import { sbomDelete } from 'graphQL/Mutation'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import CheckModal from './components/CheckModal'
-import { GetAllComponents } from 'graphQL/Queries'
 import GlobalContext from 'context/GlobalContext'
-import { GetVulnData } from 'graphQL/Queries'
 import { BsBoxFill } from 'react-icons/bs'
 
 const idRegex =
@@ -74,9 +75,6 @@ function SBOM() {
   const history = useHistory()
   const toast = useToast()
 
-  const productName = localStorage.getItem(`product`)
-  const productVersion = localStorage.getItem(`productVersion`)
-  const subProduct = localStorage.getItem('subProduct')
   const {
     prodField,
     prodDirection,
@@ -106,9 +104,9 @@ function SBOM() {
   } = useContext(GlobalContext)
 
   const customerView = location.pathname.startsWith('/customer')
-
+  const currentProduct = JSON.parse(localStorage.getItem(`product`))
   const queryParams = new URLSearchParams(location.search)
-
+  const parts = queryParams.get('parts')
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
 
@@ -411,19 +409,29 @@ function SBOM() {
                             spacing={1}
                             alignItems={'left'}
                           >
-                            {subProduct && (
-                              <Text fontWeight={'semibold'} fontSize={18}>
-                                {productName} : {productVersion}
-                                <br />
-                              </Text>
+                            {currentProduct && parts && (
+                              <Link
+                                to={`/vendor/products?&p=${currentProduct.id}&sbom=${currentProduct.sbomId}`}
+                              >
+                                <HStack onClick={() => setActiveProdTab(1)}>
+                                  <FaAngleLeft size={18} color='#3182CE' />
+                                  <Text
+                                    fontWeight={'semibold'}
+                                    fontSize={18}
+                                    color={'blue.500'}
+                                    textDecor={'underline'}
+                                  >
+                                    {currentProduct.name} :{' '}
+                                    {currentProduct.version}
+                                    <br />
+                                  </Text>
+                                </HStack>
+                              </Link>
                             )}
-                            <HStack spacing={2}>
-                              {subProduct ? <FaAngleRight size={22} /> : ''}
-                              <Text fontWeight={'semibold'} fontSize={25}>
-                                {sbomData.sbom.project.name} :{' '}
-                                {sbomData.sbom.primaryComponent?.version}
-                              </Text>
-                            </HStack>
+                            <Text fontWeight={'semibold'} fontSize={25}>
+                              {sbomData.sbom.project.name} :{' '}
+                              {sbomData.sbom.primaryComponent?.version}
+                            </Text>
                           </Stack>
                           {sbomData.sbom.primaryComponent && (
                             <Text fontSize={'sm'} my={0.5}>
@@ -589,10 +597,13 @@ function SBOM() {
                                     </Badge>
                                   </Tooltip>
                                 </Stack>
-                                  <Text fontSize={'xs'} onClick={() => onFilterSev([])}
-                                        style={{ cursor: 'pointer' }}>
-                                          Vulnerabilities
-                                  </Text>
+                                <Text
+                                  fontSize={'xs'}
+                                  onClick={() => onFilterSev([])}
+                                  style={{ cursor: 'pointer' }}
+                                >
+                                  Vulnerabilities
+                                </Text>
                               </Box>
                             </Stack>
                           </Flex>

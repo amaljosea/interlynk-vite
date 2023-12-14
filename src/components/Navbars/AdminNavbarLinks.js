@@ -94,14 +94,18 @@ export default function HeaderLinks(props) {
             Authorization: authToken
           }
         })
-        .then((res) => {})
+        .then((res) => {
+          if (res.data) {
+            localStorage.removeItem('username')
+            localStorage.removeItem('email')
+            localStorage.removeItem('product')
+            Cookies.remove('authToken')
+            history.push('/auth')
+          }
+        })
     } catch (error) {
       console.log('handleLogout error : ', error)
     }
-    localStorage.removeItem('username')
-    localStorage.removeItem('email')
-    Cookies.remove('authToken')
-    history.push('/auth')
   }
 
   const handleCustomerLogout = () => {

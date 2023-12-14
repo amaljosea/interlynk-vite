@@ -207,6 +207,13 @@ const ProductTable = ({ data, refetch }) => {
           ? removeDuplicatesAndLatest(uniqVersions)
           : []
 
+        const product = {
+          id: id,
+          name: name,
+          version: filteredData.length > 0 ? filteredData[0].version : sboms[0].primaryComponent.version,
+          sbomId: filteredData.length > 0 ? filteredData[0].id : sboms[0].id
+        }
+
         return (
           <>
             {sboms.length > 0 && enabled && (
@@ -215,11 +222,7 @@ const ProductTable = ({ data, refetch }) => {
                   filteredData.length > 0 ? filteredData[0].id : sboms[0].id
                 }`}
                 onClick={() => {
-                  window.localStorage.setItem('product', name)
-                  window.localStorage.setItem(
-                    'productVersion',
-                    sboms[0].primaryComponent?.version
-                  )
+                  window.localStorage.setItem('product', JSON.stringify(product))
                   setCurrentProduct({
                     id: id,
                     sbomId:

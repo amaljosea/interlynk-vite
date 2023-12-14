@@ -249,8 +249,6 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
     : []
 
   const getComponents = (part) => {
-    window.localStorage.setItem('subProduct', part.project.name)
-    window.localStorage.setItem('subProductVersion', part.project.name)
     setActiveProdTab(2)
     getCompData({
       variables: {
@@ -264,8 +262,6 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   }
 
   const onFilterSev = (part, value) => {
-    window.localStorage.setItem('subProduct', part.project.name)
-    window.localStorage.setItem('subProductVersion', part.project.name)
     setActiveProdTab(3)
     setVulnSeverity(value)
     getVulnData({
@@ -294,14 +290,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
             <Text
               color={'blue.500'}
               minWidth='100%'
-              onClick={() => {
-                window.localStorage.setItem('subProduct', part.project.name)
-                window.localStorage.setItem(
-                  'subProductVersion',
-                  part.project.name
-                )
-                setActiveProdTab(0)
-              }}
+              onClick={() => setActiveProdTab(0)}
             >
               {part.project.name}
             </Text>
