@@ -430,7 +430,7 @@ function ComponentDrawer(props) {
                   value={compKind}
                   onChange={(e) => setCompKind(e.target.value)}
                 >
-                  <option value=''>-- Select --</option>
+                  <option value='' style={{background: 'lightgray'}}>-- Select --</option>
                   <option value='application'>Application</option>
                   <option value='library'>Library</option>
                   <option value='operating-system'>Operating System</option>
@@ -559,7 +559,7 @@ function ComponentDrawer(props) {
                   value={compScope}
                   onChange={(e) => setCompScope(e.target.value)}
                 >
-                  <option value=''>-- Select --</option>
+                  <option value='' value='' style={{background: 'lightgray'}}>-- Select --</option>
                   <option value='excluded'>Excluded</option>
                   <option value='optional'>Optional</option>
                   <option value='required'>Required</option>
