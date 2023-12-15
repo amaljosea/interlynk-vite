@@ -78,8 +78,8 @@ const CpeModal = ({
       setType(components[2])
       setVendor(components[3])
       setProduct(components[4])
-      setVersion(components[5])
-      setHardware(components[6])
+      setVersion(components[5] === '*' ? '' : components[5])
+      setHardware(components[6] === '*' ? '' : components[6])
     } else {
       setCpeString('cpe:2.3:::::*:*:*:*:*:*:*')
     }
@@ -292,22 +292,25 @@ const CpeModal = ({
           <ModalHeader>CPE Details</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Flex
-              width='100%'
-              direction={'row'}
-              alignItems={'center'}
-              justifyContent={'flex-start'}
-              wrap={'wrap'}
-              gap={2}
-              mb={6}
-            >
-              <Text wordBreak={'break-all'}>
-                {activeCheck ? activeCheck.name : activeComp.name}
-              </Text>
-              <Tag colorScheme='blue'>
-                {activeCheck ? activeCheck.version : activeComp.version}
-              </Tag>
-            </Flex>
+            {activeCheck ||
+              (activeComp && (
+                <Flex
+                  width='100%'
+                  direction={'row'}
+                  alignItems={'center'}
+                  justifyContent={'flex-start'}
+                  wrap={'wrap'}
+                  gap={2}
+                  mb={6}
+                >
+                  <Text wordBreak={'break-all'}>
+                    {activeCheck ? activeCheck.name : activeComp.name}
+                  </Text>
+                  <Tag colorScheme='blue'>
+                    {activeCheck ? activeCheck.version : activeComp.version}
+                  </Tag>
+                </Flex>
+              ))}
             <Flex width={'100%'} direction={'column'} gap={4}>
               {/* CPE STRING */}
               <FormControl>

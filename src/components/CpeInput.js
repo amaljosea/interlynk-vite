@@ -47,10 +47,11 @@ const CpeInput = ({
       setCpeString(cpe)
     } else if (name === 'product') {
       cpeParts[4] = value
+      cpeParts[5] = '*'
       const cpe = cpeParts.join(':')
       setCpeString(cpe)
     } else if (name === 'version') {
-      cpeParts[5] = value
+      cpeParts[5] = value === '' ? '*' : value
       const cpe = cpeParts.join(':')
       setCpeString(cpe)
     } else if (name === 'namespace') {
@@ -159,7 +160,9 @@ const CpeInput = ({
       pos={'relative'}
       ref={inputRef}
     >
-      <FormControl isInvalid={name === 'cpe' && inputValue !== '' && !isCpeValid}>
+      <FormControl
+        isInvalid={name === 'cpe' && inputValue !== '' && !isCpeValid}
+      >
         {name !== 'cpe' && (
           <FormLabel textTransform={'capitalize'}>
             {name === 'packageName'
