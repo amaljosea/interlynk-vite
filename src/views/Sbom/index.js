@@ -643,6 +643,7 @@ function SBOM() {
                             flexDirection={'row'}
                             alignItems={'center'}
                             gap={2}
+                            display={'none'}
                           >
                             <BsBoxFill size={22} color='#718096' />
                             <Select
