@@ -88,15 +88,15 @@ function Index() {
         pl={5}
       >
         <Card overflowX={{ sm: 'scroll', xl: 'hidden' }}>
-          {error && (
+          {error ? (
             <Flex my={10} alignItems={'center'} justifyContent={'center'}>
               <Text textAlign={'center'} fontSize={14}>
                 Internal error occured. Please retry in few minutes.
               </Text>
             </Flex>
+          ) : (
+            <ProductTable data={data?.projects} refetch={refetch} />
           )}
-
-          <ProductTable data={data?.projects} refetch={refetch} />
         </Card>
       </Flex>
     )
