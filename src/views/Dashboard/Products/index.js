@@ -79,7 +79,7 @@ function Index() {
     }
   }, [product])
 
-  if (!data) {
+  if (!data && error) {
     return (
       <Flex my={32} alignItems={'center'} justifyContent={'center'}>
         <Text textAlign={'center'} fontSize={14}>
@@ -89,16 +89,18 @@ function Index() {
     )
   } else {
     if (product === null) {
-      ;<Flex
-        flexDirection='column'
-        pt={{ base: '120px', md: '74px' }}
-        pr={2}
-        pl={5}
-      >
-        <Card overflowX={{ sm: 'scroll', xl: 'hidden' }}>
-          <ProductTable data={data?.projects} refetch={refetch} />
-        </Card>
-      </Flex>
+      return (
+        <Flex
+          flexDirection='column'
+          pt={{ base: '120px', md: '74px' }}
+          pr={2}
+          pl={5}
+        >
+          <Card overflowX={{ sm: 'scroll', xl: 'hidden' }}>
+            <ProductTable data={data?.projects} refetch={refetch} />
+          </Card>
+        </Flex>
+      )
     } else {
       return <SBOM />
     }

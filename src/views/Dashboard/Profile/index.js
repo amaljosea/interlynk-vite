@@ -46,7 +46,7 @@ function Profile() {
   const [psIndex, setPsIndex] = useState(0)
   const [selectedTab, setSelectedTab] = useState(tabs[1].name)
 
-  const { data: orgInfo, refetch } = useQuery(GetOrg)
+  const { data: orgInfo, refetch, error } = useQuery(GetOrg)
 
   const onTabChange = (value) => {
     setTabIndex(value)
@@ -97,9 +97,7 @@ function Profile() {
     }
   }, [activetab])
 
-  
-
-  if (!orgInfo) {
+  if (!orgInfo && error) {
     return (
       <Flex my={32} alignItems={'center'} justifyContent={'center'}>
         <Text textAlign={'center'} fontSize={14}>
@@ -122,7 +120,7 @@ function Profile() {
               setPsIndex={setPsIndex}
               tabs={tabs}
             />
-  
+
             {/*  ORGANIZATION */}
             {selectedTab === 'ORGANIZATION' && (
               <Card>
@@ -155,7 +153,10 @@ function Profile() {
                     </TabPanel>
                     {/* TEAMS */}
                     <TabPanel>
-                      <TeamTable data={orgInfo.organization} refetch={refetch} />
+                      <TeamTable
+                        data={orgInfo.organization}
+                        refetch={refetch}
+                      />
                     </TabPanel>
                     {/* FEEDS */}
                     <TabPanel>
@@ -189,7 +190,7 @@ function Profile() {
                 </Tabs>
               </Card>
             )}
-  
+
             {/* PERSONAL  */}
             {selectedTab === 'PERSONAL' && (
               <Card>
@@ -228,8 +229,6 @@ function Profile() {
       </>
     )
   }
-
- 
 }
 
 export default Profile
