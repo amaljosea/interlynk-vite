@@ -24,6 +24,7 @@ import { customStyles } from 'utils'
 
 const LicenseTable = ({ data }) => {
   const [searchInput, setSearchInput] = useState('')
+  const [activeRow, setActiveRow] = useState(null)
 
   // SEARCH COMPONENT
   const handleSearch = async () => {}
@@ -33,7 +34,7 @@ const LicenseTable = ({ data }) => {
     setSearchInput('')
   }
 
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const { isOpen, onOpen, onClose, onToggle } = useDisclosure()
 
   const subHeaderComponent = useMemo(() => {
     return (
@@ -44,6 +45,7 @@ const LicenseTable = ({ data }) => {
           spacing={4}
           alignItems={'center'}
         >
+          {/* SEARCH FILTER */}
           <SearchFilter
             id='license'
             filterText={searchInput}
@@ -57,7 +59,10 @@ const LicenseTable = ({ data }) => {
         {/* ADD LICNESE */}
         <Tooltip label='Add License'>
           <IconButton
-            onClick={onOpen}
+            onClick={() => {
+              setActiveRow(null)
+              onOpen()
+            }}
             icon={<AddIcon />}
             colorScheme='blue'
             variant='solid'
@@ -79,7 +84,12 @@ const LicenseTable = ({ data }) => {
       selector: (row) => {
         const { reference, name } = row
         return (
-          <Flex direction='row' alignItems={'center'} gap={2}>
+          <Flex
+            direction='row'
+            alignItems={'center'}
+            gap={2}
+            cursor={'pointer'}
+          >
             <Link href={reference} isExternal>
               <Icon
                 as={ExternalLinkIcon}
@@ -88,7 +98,15 @@ const LicenseTable = ({ data }) => {
                 color={'blue.500'}
               />
             </Link>
-            <Text my={3} fontWeight={'medium'}>
+            <Text
+              my={3}
+              fontWeight={'medium'}
+              _hover={{ textDecoration: 'underline' }}
+              onClick={() => {
+                setActiveRow(row)
+                onToggle()
+              }}
+            >
               {name}
             </Text>
           </Flex>
@@ -203,7 +221,9 @@ const LicenseTable = ({ data }) => {
         </Flex>
       )}
 
-      {isOpen && <LicenseDrawer isOpen={isOpen} onClose={onClose} />}
+      {isOpen && (
+        <LicenseDrawer isOpen={isOpen} onClose={onClose} data={activeRow} />
+      )}
     </>
   )
 }

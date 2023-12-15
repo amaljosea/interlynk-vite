@@ -16,17 +16,28 @@ import {
   Checkbox,
   Text
 } from '@chakra-ui/react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
-const LicenseDrawer = ({ isOpen, onClose }) => {
+const LicenseDrawer = ({ isOpen, onClose, data }) => {
   const [name, setName] = useState('')
   const [spdxId, setSpdxId] = useState('')
-  const [osi, setOsi] = useState('')
-  const [fsf, setFsf] = useState('')
-  const [isCustom, setIsCustom] = useState('')
+  const [osi, setOsi] = useState(false)
+  const [fsf, setFsf] = useState(false)
+  const [isCustom, setIsCustom] = useState(false)
   const [licenseText, setLicenseText] = useState('')
   const [licenseComments, setLicenseComments] = useState('')
   const [status, setStatus] = useState('')
+
+  useEffect(() => {
+    if (data) {
+      setName(data.name)
+      setSpdxId(data.licenseId)
+      setOsi(data.isOsiApproved)
+      setFsf(data.fsf)
+      setIsCustom(data.custom)
+      setStatus(data.status)
+    }
+  }, [data])
 
   return (
     <Drawer isOpen={isOpen} placement='right' onClose={onClose} size='md'>
