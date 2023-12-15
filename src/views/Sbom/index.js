@@ -317,12 +317,11 @@ function SBOM() {
       }
     })
 
+  const filterVersion =
+    data && data.project.sboms.find((item) => item.id === sbomId)
+
   useEffect(() => {
     if (data) {
-      const filterVersion = data.project.sboms.find(
-        (item) => item.id === sbomId
-      )
-      console.log('filterVersion', filterVersion)
       setSelectedVersion({
         label: filterVersion.primaryComponent
           ? filterVersion.primaryComponent.version
@@ -404,6 +403,7 @@ function SBOM() {
                     width={'100%'}
                     templateColumns='repeat(5, 1fr)'
                     alignItems={'top'}
+                    gap={40}
                   >
                     {/* LEFT */}
                     <GridItem colSpan={2}>
@@ -633,9 +633,10 @@ function SBOM() {
                       <GridItem colSpan={3}>
                         <Flex
                           direction={'row'}
-                          gap={4}
+                          gap={3}
                           justifyContent='flex-end'
                           ml={'auto'}
+                          flexWrap={'wrap'}
                         >
                           {/* CHANGE ENVIRONMENT */}
                           <Flex
@@ -691,21 +692,17 @@ function SBOM() {
                               value={selectedVersion}
                               onChange={handleSBOMChange}
                               className='react-select'
-                              isSearchable={true}
+                              isSearchable={
+                                filterVersion && filterVersion.primaryComponent
+                                  ? true
+                                  : false
+                              }
                               name='versions'
                               options={filteredData}
+                              noOptionsMessage={() => null}
                             />
                           </Flex>
 
-                        </Flex>
-
-                        <Flex
-                          direction={'row'}
-                          gap={2}
-                          justifyContent='flex-end'
-                          ml={'auto'}
-                          mt={4}
-                        >
                           {/* EDIT SBOM */}
                           <Tooltip label='Edit'>
                             <IconButton
