@@ -178,7 +178,7 @@ export default function AdminNavbar(props) {
                   <Link
                     to={
                       activeSBOM
-                        ? `/vendor/products?&p=${prodID}&sbom=${activeSBOM}`
+                        ? `/vendor/products?p=${prodID}&sbom=${activeSBOM}`
                         : `/vendor/products`
                     }
                     color={secondaryText}

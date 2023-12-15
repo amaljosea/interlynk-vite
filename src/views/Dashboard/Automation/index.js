@@ -14,6 +14,9 @@ import Controls from './components/Controls'
 import Settings from './components/Settings'
 import { useQuery } from '@apollo/client'
 import { GetProjectCheck } from 'graphQL/Queries'
+import VulnsTable from 'components/Tables/VulnsTable'
+import { vulnList } from 'variables/general'
+import ChangeLog from '../Changelog'
 
 const idRegex =
   /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
@@ -54,13 +57,18 @@ const Automation = () => {
           onChange={(value) => handleTabChange(value)}
         >
           <TabList>
-            <Tab _focus={{ outline: 'none' }}>Controls</Tab>
-            <Tab _focus={{ outline: 'none' }}>Automation</Tab>
+            {['Vulnerabilities', 'Automation', 'Controls', 'Change Log'].map(
+              (item, index) => (
+                <Tab key={index} _focus={{ outline: 'none' }}>
+                  {item}
+                </Tab>
+              )
+            )}
           </TabList>
           <TabPanels>
-            {/* CONTROLS */}
+            {/* VULNERABILITIES */}
             <TabPanel>
-              <Controls />
+              <VulnsTable data={vulnList} />
             </TabPanel>
             {/* AUTOMATIONS */}
             <TabPanel>
@@ -69,11 +77,16 @@ const Automation = () => {
                   {JSON.stringify(error)}
                 </Text>
               ) : (
-                <Settings
-                  data={data?.project.autoChecks}
-                  refetch={refetch}
-                />
+                <Settings data={data?.project.autoChecks} refetch={refetch} />
               )}
+            </TabPanel>
+            {/* CONTROLS */}
+            <TabPanel>
+              <Controls />
+            </TabPanel>
+            {/* CHANGE LOG */}
+            <TabPanel>
+              <ChangeLog />
             </TabPanel>
           </TabPanels>
         </Tabs>
