@@ -93,18 +93,20 @@ const Header = ({
 
   const handleFileChange = (e) => {
     const file = e.target.files[0]
-    if (file && isValidFileType(file) && isValidFileSize(file)) {
-      onImageChange(file)
-    } else {
-      toast({
-        title: 'Someting went wrong 😕',
-        variant: 'left-accent',
-        description:
-          'The file is too large. Allowed maximum size is 5MB',
-        status: 'error',
-        duration: 5000,
-        position: 'top'
-      })
+    console.log('file', file)
+    if (file) {
+      if (isValidFileType(file) && isValidFileSize(file)) {
+        onImageChange(file)
+      } else {
+        toast({
+          title: 'Someting went wrong 😕',
+          variant: 'left-accent',
+          description: 'The file is too large. Allowed maximum size is 5MB',
+          status: 'error',
+          duration: 5000,
+          position: 'top'
+        })
+      }
     }
   }
 
