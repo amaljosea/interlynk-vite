@@ -97,9 +97,12 @@ const Header = ({
       onImageChange(file)
     } else {
       toast({
-        description: 'Invalid file format or size',
+        title: 'Someting went wrong 😕',
+        variant: 'left-accent',
+        description:
+          'The file is too large. Allowed maximum size is 5MB',
         status: 'error',
-        duration: 3000,
+        duration: 5000,
         position: 'top'
       })
     }

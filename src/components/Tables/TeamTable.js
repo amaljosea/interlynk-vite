@@ -65,7 +65,7 @@ const TeamTable = ({ data, refetch }) => {
               <Avatar
                 me={{ md: '22px' }}
                 src={
-                  profileImage ? `${SERVER_URL}/${profileImage?.url}` : userNone
+                  profileImage && `${SERVER_URL}/${profileImage?.url}`
                 }
                 w='30px'
                 h='30px'
