@@ -350,6 +350,24 @@ const ProductTable = ({ data, refetch }) => {
           ? removeDuplicatesAndLatest(uniqVersions)
           : []
 
+
+        const product = {
+          id: id,
+          name: name,
+          version:
+            filteredData.length > 0
+              ? filteredData[0].label
+              : sboms.length > 0
+              ? sboms[0].primaryComponent?.version
+              : '',
+          sbomId:
+            filteredData.length > 0
+              ? filteredData[0].value
+              : sboms.length > 0
+              ? sboms[0].id
+              : ''
+        }
+
         return (
           <Menu>
             <MenuButton
@@ -373,6 +391,7 @@ const ProductTable = ({ data, refetch }) => {
                   isDisabled={!enabled}
                   onClick={() => {
                     window.localStorage.setItem('activeProduct', name)
+                    window.localStorage.setItem('product', JSON.stringify(product))
                     window.localStorage.setItem(
                       'activeSBOM',
                       filteredData.length > 0 ? filteredData[0].value : sboms[0].id
