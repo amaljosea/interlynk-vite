@@ -62,6 +62,7 @@ import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import CheckModal from './components/CheckModal'
 import GlobalContext from 'context/GlobalContext'
 import { BsBoxFill } from 'react-icons/bs'
+import ReactSelect from 'react-select'
 
 const idRegex =
   /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
@@ -115,6 +116,12 @@ function SBOM() {
   const [status, setStatus] = useState('created')
   const [components, setComponents] = useState([])
   const [signedData, setSignedData] = useState(null)
+
+  const [selectedVersion, setSelectedVersion] = useState({
+    label: '',
+    value: '',
+    creationAt: ''
+  })
 
   useEffect(() => {
     if (!idRegex.test(productId) || !idRegex.test(sbomId)) {
@@ -207,12 +214,13 @@ function SBOM() {
 
   data &&
     data.project.sboms.map((project) => {
-      uniqVersions.push({
-        version: project.primaryComponent?.version,
-        id: project.id,
-        updatedAt: project.updatedAt,
-        creationAt: project.creationAt
-      })
+      if (project.primaryComponent) {
+        uniqVersions.push({
+          label: project.primaryComponent.version,
+          value: project.id,
+          creationAt: project.creationAt
+        })
+      }
     })
 
   // remove duplicates
@@ -221,10 +229,10 @@ function SBOM() {
 
     for (const item of arr) {
       if (
-        !uniqueVersions[item.version] ||
-        item.updatedAt > uniqueVersions[item.version].updatedAt
+        !uniqueVersions[item.label] ||
+        item.updatedAt > uniqueVersions[item.label].creationAt
       ) {
-        uniqueVersions[item.version] = item
+        uniqueVersions[item.label] = item
       }
     }
 
@@ -235,14 +243,12 @@ function SBOM() {
     ? removeDuplicatesAndLatest(uniqVersions)
     : []
 
-
   filteredData?.sort((a, b) => {
-    const dateA = new Date(a.updatedAt)
-    const dateB = new Date(b.updatedAt)
+    const dateA = new Date(a.creationAt)
+    const dateB = new Date(b.creationAt)
     return dateB - dateA
   })
 
-  const [selectedVersion, setSelectedVersion] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
   const handleDelete = async () => {
@@ -274,7 +280,7 @@ function SBOM() {
     }
   }
 
-  const handleSBOMChange = (e) => {
+  const handleSBOMChange = (select) => {
     setActiveProdTab(0)
     setCompSearchInput('')
     setCompEcosystem([])
@@ -295,8 +301,8 @@ function SBOM() {
     setCheckSeverity([])
     setCheckStatus([])
     setCheckDirection('DESC')
-    setSelectedVersion(e.target.value)
-    refetchSBOM(e.target.value)
+    setSelectedVersion(select)
+    refetchSBOM(select.value)
   }
 
   const sbomVersions = []
@@ -305,15 +311,27 @@ function SBOM() {
     data.project.sboms.map((project) => {
       if (project.primaryComponent === true) {
         sbomVersions.push({
-          version: project.primaryComponent.version,
-          id: project.primaryComponent.id
+          label: project.primaryComponent.version,
+          value: project.primaryComponent.id
         })
       }
     })
 
   useEffect(() => {
-    setSelectedVersion(sbomId)
-  }, [sbomId])
+    if (data) {
+      const filterVersion = data.project.sboms.find(
+        (item) => item.id === sbomId
+      )
+      console.log('filterVersion', filterVersion)
+      setSelectedVersion({
+        label: filterVersion.primaryComponent
+          ? filterVersion.primaryComponent.version
+          : 'No version available',
+        value: filterVersion.id,
+        creationAt: filterVersion.creationAt
+      })
+    }
+  }, [data])
 
   // ADD KEYBOARD SHORTCUT FOR TOGGLE DOWNLOAD MODAL
   const handleKeyDownload = (event) => {
@@ -645,39 +663,42 @@ function SBOM() {
                             </Select>
                           </Flex>
 
-                          {/* CHANGE SBOM VERSION */}
+                          {/* SBOM VERSIONS */}
                           <Flex
                             flexDirection={'row'}
                             alignItems={'center'}
                             gap={2}
                           >
                             <FaLayerGroup size={21} color='#4299E1' />
-                            <Select
-                              id='version'
+                            <ReactSelect
+                              styles={{
+                                control: (baseStyles, state) => ({
+                                  ...baseStyles,
+                                  borderColor: state.isFocused
+                                    ? 'inherit'
+                                    : 'inherit',
+                                  fontSize: '14px',
+                                  padding: '2px 0',
+                                  '&:hover': {
+                                    borderColor: '#CBD5E0'
+                                  }
+                                })
+                              }}
+                              components={{
+                                DropdownIndicator: () => null,
+                                IndicatorSeparator: () => null
+                              }}
                               value={selectedVersion}
                               onChange={handleSBOMChange}
-                              size='md'
-                            >
-                              {filteredData && filteredData.length > 0 ? (
-                                filteredData.map((item, index) => (
-                                  <option
-                                    key={index}
-                                    value={item.id}
-                                    name={item.version}
-                                  >
-                                    {item.version
-                                      ? item.version
-                                      : `Uploaded: ${getFullDateAndTime(
-                                          item.creationAt
-                                        )}`}
-                                  </option>
-                                ))
-                              ) : (
-                                <option value=''>-- --</option>
-                              )}
-                            </Select>
+                              className='react-select'
+                              isSearchable={true}
+                              name='versions'
+                              options={filteredData}
+                            />
                           </Flex>
+
                         </Flex>
+
                         <Flex
                           direction={'row'}
                           gap={2}
