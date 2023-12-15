@@ -38,7 +38,7 @@ const CpeModal = ({
   onUpdateCpe,
   selectedCpe,
   cpeValue,
-  setCpeValue,
+  activeComp,
   checkId,
   refetch,
   setPageIndex,
@@ -292,20 +292,22 @@ const CpeModal = ({
           <ModalHeader>CPE Details</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            {activeCheck && (
-              <Flex
-                width='100%'
-                direction={'row'}
-                alignItems={'center'}
-                justifyContent={'flex-start'}
-                wrap={'wrap'}
-                gap={2}
-                mb={6}
-              >
-                <Text wordBreak={'break-all'}>{activeCheck?.name}</Text>
-                <Tag colorScheme='blue'>{activeCheck?.version}</Tag>
-              </Flex>
-            )}
+            <Flex
+              width='100%'
+              direction={'row'}
+              alignItems={'center'}
+              justifyContent={'flex-start'}
+              wrap={'wrap'}
+              gap={2}
+              mb={6}
+            >
+              <Text wordBreak={'break-all'}>
+                {activeCheck ? activeCheck.name : activeComp.name}
+              </Text>
+              <Tag colorScheme='blue'>
+                {activeCheck ? activeCheck.version : activeComp.version}
+              </Tag>
+            </Flex>
             <Flex width={'100%'} direction={'column'} gap={4}>
               {/* CPE STRING */}
               <FormControl>

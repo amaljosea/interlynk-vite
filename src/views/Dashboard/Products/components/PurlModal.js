@@ -73,7 +73,8 @@ const PurlModal = ({
   getCpe,
   activeCheck,
   setIsValid,
-  setPageIndex
+  setPageIndex,
+  activeComp
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -595,20 +596,22 @@ const PurlModal = ({
           <ModalHeader>PURL Details</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            {activeCheck && (
-              <Flex
-                width='100%'
-                direction={'row'}
-                alignItems={'center'}
-                justifyContent={'flex-start'}
-                wrap={'wrap'}
-                gap={2}
-                mb={6}
-              >
-                <Text wordBreak={'break-all'}>{activeCheck?.name}</Text>
-                <Tag colorScheme='blue'>{activeCheck?.version}</Tag>
-              </Flex>
-            )}
+            <Flex
+              width='100%'
+              direction={'row'}
+              alignItems={'center'}
+              justifyContent={'flex-start'}
+              wrap={'wrap'}
+              gap={2}
+              mb={6}
+            >
+              <Text wordBreak={'break-all'}>
+                {activeCheck ? activeCheck.name : activeComp.name}
+              </Text>
+              <Tag colorScheme='blue'>
+                {activeCheck ? activeCheck.version : activeComp.version}
+              </Tag>
+            </Flex>
             <Flex width={'100%'} direction={'column'} gap={4}>
               {/* Package URL */}
               <FormControl>
