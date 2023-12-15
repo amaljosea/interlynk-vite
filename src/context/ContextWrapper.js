@@ -70,7 +70,6 @@ const ContextWrapper = (props) => {
   const [activeProdTab, setActiveProdTab] = useState(0)
   const [signedActiveTab, setSignedActiveTab] = useState(0)
   const [totalRows, setTotalRows] = useState(25)
-  const [comPageIndex, setComPageIndex] = useState(1)
   const [currentProduct, setCurrentProduct] = useState(null)
 
   // PRODUCT FILTERS
@@ -145,6 +144,11 @@ const ContextWrapper = (props) => {
 
   const [isCpeValid, setIsCpeValid] = useState(true)
 
+  // PAGINATION STATS FOR DIFFERENT TABS
+  const [comPageIndex, setComPageIndex] = useState(1)
+  const [vulnIndex, setVulnIndex] = useState(1)
+  const [resultIndex, setResultIndex] = useState(1)
+  const [changelogIndex, setChangelogIndex] = useState(1)
 
   return (
     <GlobalContext.Provider
@@ -336,7 +340,14 @@ const ContextWrapper = (props) => {
         setVulnAfter,
         vulnBefore,
         setVulnBefore,
-        isCpeValid, setIsCpeValid
+        isCpeValid,
+        setIsCpeValid,
+        vulnIndex,
+        setVulnIndex,
+        resultIndex,
+        setResultIndex,
+        changelogIndex,
+        setChangelogIndex
       }}
     >
       {props.children}

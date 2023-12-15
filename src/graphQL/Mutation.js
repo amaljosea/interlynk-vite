@@ -578,6 +578,7 @@ export const UpdateComponent = gql`
     $sbomId: Uuid!
     $kind: String
     $name: String
+    $version: String
     $licenses: LicenseInput
     $cpes: [String!]
     $purl: String
@@ -592,6 +593,7 @@ export const UpdateComponent = gql`
         sbomId: $sbomId
         kind: $kind
         name: $name
+        version: $version
         licenses: $licenses
         cpes: $cpes
         purl: $purl

@@ -29,13 +29,7 @@ const ChangeLog = () => {
     }
   }, [id])
 
-  return (
-    <Flex direction='column' pt={{ base: '120px', md: '74px' }} pr={2} pl={5}>
-      <Card>
-        <ChangelogTable data={data?.project.activityLogs} refetch={refetch} />
-      </Card>
-    </Flex>
-  )
+  return <ChangelogTable data={data?.project.activityLogs} refetch={refetch} />
 }
 
 export default ChangeLog

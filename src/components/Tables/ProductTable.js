@@ -108,10 +108,10 @@ const ProductTable = ({ data, refetch }) => {
 
     for (const item of arr) {
       if (
-        !uniqueVersions[item.version] ||
-        item.updatedAt > uniqueVersions[item.version].updatedAt
+        !uniqueVersions[item.label] ||
+        item.updatedAt > uniqueVersions[item.label].creationAt
       ) {
-        uniqueVersions[item.version] = item
+        uniqueVersions[item.label] = item
       }
     }
 
@@ -180,9 +180,9 @@ const ProductTable = ({ data, refetch }) => {
           sboms.map((project) => {
             if (project.primaryComponent) {
               uniqVersions.push({
-                version: project.primaryComponent.version,
-                id: project.id,
-                updatedAt: project.updatedAt
+                label: project.primaryComponent.version,
+                value: project.id,
+                creationAt: project.creationAt
               })
             }
           })
@@ -192,8 +192,8 @@ const ProductTable = ({ data, refetch }) => {
           : []
 
         filteredData?.sort((a, b) => {
-          const dateA = new Date(a.updatedAt)
-          const dateB = new Date(b.updatedAt)
+          const dateA = new Date(a.creationAt)
+          const dateB = new Date(b.creationAt)
           return dateB - dateA
         })
 
@@ -202,39 +202,36 @@ const ProductTable = ({ data, refetch }) => {
           name: name,
           version:
             filteredData.length > 0
-              ? filteredData[0].version
+              ? filteredData[0].label
               : sboms.length > 0
               ? sboms[0].primaryComponent?.version
               : '',
           sbomId:
             filteredData.length > 0
-              ? filteredData[0].id
+              ? filteredData[0].value
               : sboms.length > 0
               ? sboms[0].id
               : ''
         }
 
-        // console.log('sboms', sboms)
+        const handleClick = () => {
+          window.localStorage.setItem('product', JSON.stringify(product))
+          setCurrentProduct({
+            id: id,
+            sbomId:
+              filteredData.length > 0 ? filteredData[0].value : sboms[0].id
+          })
+          setActiveProdTab(0)
+        }
 
         return (
           <>
             {sboms.length > 0 && enabled && (
               <Link
-                to={`/vendor/products?&p=${id}&sbom=${
-                  filteredData.length > 0 ? filteredData[0].id : sboms[0].id
+                to={`/vendor/products?p=${id}&sbom=${
+                  filteredData.length > 0 ? filteredData[0].value : sboms[0].id
                 }`}
-                onClick={() => {
-                  window.localStorage.setItem(
-                    'product',
-                    JSON.stringify(product)
-                  )
-                  setCurrentProduct({
-                    id: id,
-                    sbomId:
-                      filteredData.length > 0 ? filteredData[0].id : sboms[0].id
-                  })
-                  setActiveProdTab(0)
-                }}
+                onClick={handleClick}
               >
                 <Text color={'blue.500'} minWidth='100%'>
                   {name}
@@ -279,9 +276,9 @@ const ProductTable = ({ data, refetch }) => {
           sboms.map((project) => {
             if (project.primaryComponent) {
               uniqVersions.push({
-                version: project.primaryComponent.version,
-                id: project.id,
-                updatedAt: project.updatedAt
+                label: project.primaryComponent.version,
+                value: project.id,
+                creationAt: project.creationAt
               })
             }
           })
@@ -342,9 +339,9 @@ const ProductTable = ({ data, refetch }) => {
           sboms.map((project) => {
             if (project.primaryComponent) {
               uniqVersions.push({
-                version: project.primaryComponent.version,
-                id: project.id,
-                updatedAt: project.updatedAt
+                label: project.primaryComponent.version,
+                value: project.id,
+                creationAt: project.creationAt
               })
             }
           })
@@ -378,9 +375,7 @@ const ProductTable = ({ data, refetch }) => {
                     window.localStorage.setItem('activeProduct', name)
                     window.localStorage.setItem(
                       'activeSBOM',
-                      sboms.length > 0 && filteredData.length > 0
-                        ? filteredData[0].id
-                        : null
+                      filteredData.length > 0 ? filteredData[0].value : sboms[0].id
                     )
                     history.push(`/vendor/autofix?id=${id}`)
                   }}
@@ -388,13 +383,14 @@ const ProductTable = ({ data, refetch }) => {
                   Settings
                 </MenuItem>
                 <MenuItem
+                  display={'none'}
                   isDisabled={!enabled}
                   onClick={() => {
                     window.localStorage.setItem('activeProduct', name)
                     window.localStorage.setItem(
                       'activeSBOM',
                       sboms.length > 0 && filteredData.length > 0
-                        ? filteredData[0].id
+                        ? filteredData[0].value
                         : null
                     )
                     history.push(`/vendor/changelog?id=${id}`)

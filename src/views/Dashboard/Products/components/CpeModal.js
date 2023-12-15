@@ -38,7 +38,7 @@ const CpeModal = ({
   onUpdateCpe,
   selectedCpe,
   cpeValue,
-  setCpeValue,
+  activeComp,
   checkId,
   refetch,
   setPageIndex,
@@ -78,8 +78,8 @@ const CpeModal = ({
       setType(components[2])
       setVendor(components[3])
       setProduct(components[4])
-      setVersion(components[5])
-      setHardware(components[6])
+      setVersion(components[5] === '*' ? '' : components[5])
+      setHardware(components[6] === '*' ? '' : components[6])
     } else {
       setCpeString('cpe:2.3:::::*:*:*:*:*:*:*')
     }
@@ -302,8 +302,30 @@ const CpeModal = ({
                 gap={2}
                 mb={6}
               >
-                <Text wordBreak={'break-all'}>{activeCheck?.name}</Text>
-                <Tag colorScheme='blue'>{activeCheck?.version}</Tag>
+                <Text wordBreak={'break-all'}>
+                  {activeCheck.name ? activeCheck.name : ''}
+                </Text>
+                {activeCheck.version && (
+                  <Tag colorScheme='blue'>{activeCheck.version}</Tag>
+                )}
+              </Flex>
+            )}
+            {activeComp && (
+              <Flex
+                width='100%'
+                direction={'row'}
+                alignItems={'center'}
+                justifyContent={'flex-start'}
+                wrap={'wrap'}
+                gap={2}
+                mb={6}
+              >
+                <Text wordBreak={'break-all'}>
+                  {activeComp.name ? activeComp.name : ''}
+                </Text>
+                {activeComp.version && (
+                  <Tag colorScheme='blue'>{activeComp.version}</Tag>
+                )}
               </Flex>
             )}
             <Flex width={'100%'} direction={'column'} gap={4}>

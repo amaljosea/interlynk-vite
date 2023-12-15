@@ -21,6 +21,10 @@ import { recheckHealth, supplierUpdate, supplierCreate } from 'graphQL/Mutation'
 import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 
+const urlPattern = new RegExp(
+  '(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w.-]*/?'
+)
+
 const PriSupplierModal = ({
   isOpen,
   onClose,
@@ -41,6 +45,7 @@ const PriSupplierModal = ({
 
   const [orgName, setOrgName] = useState('')
   const [orgUrl, setOrgUrl] = useState('')
+  const [isValidUrl, setIsValidUrl] = useState(true)
   const [supName, setSupName] = useState('')
   const [supEmail, setSupEmail] = useState('')
   const [supplierError, setSupplierError] = useState('')
@@ -55,7 +60,18 @@ const PriSupplierModal = ({
     }
   }
 
-  const isInvalid = !supName || (supEmail != '' && !validateEmail(supEmail))
+  const onUrlChange = (e) => {
+    const { value } = e.target
+    setOrgUrl(value)
+    if (urlPattern.test(value)) {
+      setIsValidUrl(true)
+    } else {
+      setIsValidUrl(false)
+    }
+  }
+
+  const isInvalid =
+    !supName || (supEmail != '' && !validateEmail(supEmail)) || !isValidUrl
 
   const handleRefetch = () => {
     refetch({
@@ -162,13 +178,14 @@ const PriSupplierModal = ({
                 />
               </FormControl>
               {/* ORG URL */}
-              <FormControl>
+              <FormControl isInvalid={!isValidUrl}>
                 <FormLabel fontSize={'sm'}>URL</FormLabel>
                 <Input
                   placeholder='Enter URL'
                   value={orgUrl}
-                  onChange={(e) => setOrgUrl(e.target.value)}
+                  onChange={onUrlChange}
                 />
+                <FormErrorMessage>Invalid URL</FormErrorMessage>
               </FormControl>
               {/* SUPPLIER NAME */}
               <FormControl isRequired isInvalid={supplierError}>

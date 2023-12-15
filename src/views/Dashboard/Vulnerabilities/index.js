@@ -10,8 +10,9 @@ const Vulnerabilities = () => {
   const queryParams = new URLSearchParams(location.search)
   const vulnId = queryParams.get('id')
 
-
-  if (vulnId === null) {
+  if (vulnId && location.pathname === '/vendor/vulnerabilities') {
+    return <VulnInfo data={vulnList} />
+  } else {
     return (
       <Flex
         flexDirection='column'
@@ -24,8 +25,6 @@ const Vulnerabilities = () => {
         </Card>
       </Flex>
     )
-  } else {
-    return <VulnInfo data={vulnList} />
   }
 }
 

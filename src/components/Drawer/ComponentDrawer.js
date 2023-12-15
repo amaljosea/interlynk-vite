@@ -78,7 +78,7 @@ function ComponentDrawer(props) {
     customLicense,
     purlString,
     licenseExp,
-    isCpeValid,
+    isCpeValid
   } = useContext(GlobalContext)
 
   const onFilterRefetch = () => {
@@ -259,11 +259,7 @@ function ComponentDrawer(props) {
               licenseType === 'license_custom' ? customLicense : undefined
           },
           cpes:
-            cpeList.length > 0
-              ? cpeList
-              : cpeValue !== ''
-              ? [cpeValue]
-              : [],
+            cpeList.length > 0 ? cpeList : cpeValue !== '' ? [cpeValue] : [],
           purl: purlValue,
           primary: isPrimary,
           internal: isInternal
@@ -430,7 +426,9 @@ function ComponentDrawer(props) {
                   value={compKind}
                   onChange={(e) => setCompKind(e.target.value)}
                 >
-                  <option value='' style={{background: 'lightgray'}}>-- Select --</option>
+                  <option value='' style={{ background: 'lightgray' }}>
+                    -- Select --
+                  </option>
                   <option value='application'>Application</option>
                   <option value='library'>Library</option>
                   <option value='operating-system'>Operating System</option>
@@ -449,7 +447,10 @@ function ComponentDrawer(props) {
               {/* LICENSES */}
               <LicenseField data={data} />
               {/* PURL INPUI */}
-              <FormControl isReadOnly={customerView} isInvalid={purlValue !== '' && !isPURLInputValid}>
+              <FormControl
+                isReadOnly={customerView}
+                isInvalid={purlValue !== '' && !isPURLInputValid}
+              >
                 <FormLabel htmlFor='purl' fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     {shortDesc === 'Component Identifier' &&
@@ -559,7 +560,9 @@ function ComponentDrawer(props) {
                   value={compScope}
                   onChange={(e) => setCompScope(e.target.value)}
                 >
-                  <option value='' style={{background: 'lightgray'}}>-- Select --</option>
+                  <option value='' style={{ background: 'lightgray' }}>
+                    -- Select --
+                  </option>
                   <option value='excluded'>Excluded</option>
                   <option value='optional'>Optional</option>
                   <option value='required'>Required</option>
@@ -606,8 +609,11 @@ function ComponentDrawer(props) {
                   colorScheme='blue'
                   onClick={handleCreateCom}
                   isDisabled={
-                    compKind === '' || compName === '' || compVersion === '' || 
-                    (purlValue !== '' && !isPURLInputValid) || (cpeValue !== '' && !isCpeValid)
+                    compKind === '' ||
+                    compName === '' ||
+                    compVersion === '' ||
+                    (purlValue !== '' && !isPURLInputValid) ||
+                    (cpeValue !== '' && !isCpeValid)
                   }
                 >
                   Save
@@ -616,8 +622,11 @@ function ComponentDrawer(props) {
                 <Button
                   colorScheme='blue'
                   onClick={handleUpdateCom}
-                  isDisabled={!compKind || (purlValue !== '' && !isPURLInputValid) || 
-                  (cpeValue !== '' && !isCpeValid)}
+                  isDisabled={
+                    !compKind ||
+                    (purlValue !== '' && !isPURLInputValid) ||
+                    (cpeValue !== '' && !isCpeValid)
+                  }
                 >
                   Update
                 </Button>
@@ -636,6 +645,7 @@ function ComponentDrawer(props) {
           setIsValid={setPURLInputValid}
           purlValue={purlValue}
           getCpe={getCpe}
+          activeComp={data}
         />
       )}
 
@@ -650,6 +660,7 @@ function ComponentDrawer(props) {
           onUpdateCpe={handleUpdateCpe}
           selectedCpe={selectedCpe}
           getCpe={getCpe}
+          activeComp={data}
         />
       )}
 
