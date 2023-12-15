@@ -25,6 +25,10 @@ import { addComSupplier } from 'graphQL/Mutation'
 import { useState, useEffect, useContext } from 'react'
 import { useLocation } from 'react-router-dom'
 
+const urlPattern = new RegExp(
+  '(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w.-]*/?'
+)
+
 const SupplierModal = ({
   id,
   isOpen,
@@ -45,12 +49,14 @@ const SupplierModal = ({
     useContext(GlobalContext)
 
   const validateEmail = (email) => {
-    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
+    const emailRegex =
+      /(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g
     return emailRegex.test(email)
   }
 
   const [orgName, setOrgName] = useState('')
   const [orgUrl, setOrgUrl] = useState('')
+  const [isValidUrl, setIsValidUrl] = useState(true)
   const [supName, setSupName] = useState('')
   const [supEmail, setSupEmail] = useState('')
 
@@ -160,7 +166,18 @@ const SupplierModal = ({
     }
   }
 
-  const isInvalid = !supName || (supEmail !== '' && !validateEmail(supEmail))
+  const onUrlChange = (e) => {
+    const { value } = e.target
+    setOrgUrl(value)
+    if (urlPattern.test(value)) {
+      setIsValidUrl(true)
+    } else {
+      setIsValidUrl(false)
+    }
+  }
+
+  const isInvalid =
+    !supName || (supEmail !== '' && !validateEmail(supEmail)) || !isValidUrl
 
   return (
     <>
@@ -212,15 +229,16 @@ const SupplierModal = ({
                 />
               </FormControl>
               {/* ORG URL */}
-              <FormControl>
+              <FormControl isInvalid={!isValidUrl}>
                 <FormLabel fontSize={'sm'}>URL</FormLabel>
                 <Input
                   placeholder='Enter URL'
                   value={orgUrl}
-                  onChange={(e) => setOrgUrl(e.target.value)}
+                  onChange={onUrlChange}
                 />
+                <FormErrorMessage>Invalid URL</FormErrorMessage>
               </FormControl>
-              {/*   SUPPLIER NAME */}
+              {/* SUPPLIER NAME */}
               <FormControl isRequired>
                 <FormLabel fontSize={'sm'}>Contact Name</FormLabel>
                 <Input
