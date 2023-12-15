@@ -79,29 +79,29 @@ function Index() {
     }
   }, [product])
 
-  if (product === null) {
+  if (!data) {
     return (
-      <Flex
+      <Flex my={32} alignItems={'center'} justifyContent={'center'}>
+        <Text textAlign={'center'} fontSize={14}>
+          Internal error occured. Please retry in few minutes.
+        </Text>
+      </Flex>
+    )
+  } else {
+    if (product === null) {
+      ;<Flex
         flexDirection='column'
         pt={{ base: '120px', md: '74px' }}
         pr={2}
         pl={5}
       >
         <Card overflowX={{ sm: 'scroll', xl: 'hidden' }}>
-          {!data && error ? (
-            <Flex my={10} alignItems={'center'} justifyContent={'center'}>
-              <Text textAlign={'center'} fontSize={14}>
-                Internal error occured. Please retry in few minutes.
-              </Text>
-            </Flex>
-          ) : (
-            <ProductTable data={data?.projects} refetch={refetch} />
-          )}
+          <ProductTable data={data?.projects} refetch={refetch} />
         </Card>
       </Flex>
-    )
-  } else {
-    return <SBOM />
+    } else {
+      return <SBOM />
+    }
   }
 }
 
