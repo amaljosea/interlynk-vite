@@ -55,7 +55,8 @@ import {
   GetProject,
   GetProjectData,
   GetAllComponents,
-  GetVulnData
+  GetVulnData,
+  GetComponentData
 } from 'graphQL/Queries'
 import { sbomDelete } from 'graphQL/Mutation'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
@@ -82,6 +83,7 @@ function SBOM() {
     setActiveProdTab,
     vulnField,
     vulnDirection,
+    setComPageIndex,
     setCompSearchInput,
     setCompEcosystem,
     setCompType,
@@ -101,7 +103,11 @@ function SBOM() {
     setCheckCategory,
     setCheckSeverity,
     setCheckStatus,
-    setCheckDirection
+    setCheckDirection,
+    setVulnIndex,
+    setVulnSearchInput,
+    compField,
+    compDirection
   } = useContext(GlobalContext)
 
   const customerView = location.pathname.startsWith('/customer')
@@ -136,6 +142,14 @@ function SBOM() {
       direction: prodDirection
     }
   })
+
+  // GET COMPONENT DATA
+  const [getCompData, { data: compData, error: compError }] = useLazyQuery(
+    GetComponentData,
+    {
+      fetchPolicy: 'network-only'
+    }
+  )
 
   // GET VULN DATA
   const [getVulnData, { data: vulnData, refetch: vulnRefetch }] = useLazyQuery(
@@ -370,19 +384,61 @@ function SBOM() {
     }
   }
 
-  const onFilterSev = (value) => {
-    setActiveProdTab(3)
-    setVulnSeverity(value)
-    getVulnData({
+  const onSelectComp = () => {
+    setActiveProdTab(2)
+    setComPageIndex(1)
+    setCompSearchInput('')
+    setCompScope('')
+    setCompEcosystem([])
+    setCompLicense([])
+    setCompSupplier([])
+    setCompType([])
+    getCompData({
       variables: {
         projectId: productId,
         sbomId: sbomId,
-        severity: value,
         first: totalRows,
-        field: vulnField,
-        direction: vulnDirection
+        field: compField,
+        direction: compDirection
       }
     })
+  }
+
+  const onFilterVuln = (value) => {
+    setActiveProdTab(3)
+    setCompPa
+    setVulnIndex(1)
+    setVulnSearchInput('')
+    setVulnComponent([])
+    setVulnStatus([])
+    setVulnKev('')
+    setVulnEpss('')
+    setMinVal(0)
+    setMaxVal(10000)
+    if (value) {
+      setVulnSeverity(value)
+      getVulnData({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          severity: value,
+          first: totalRows,
+          field: vulnField,
+          direction: vulnDirection
+        }
+      })
+    } else {
+      setVulnSeverity([])
+      getVulnData({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          first: totalRows,
+          field: vulnField,
+          direction: vulnDirection
+        }
+      })
+    }
   }
 
   return (
@@ -517,7 +573,14 @@ function SBOM() {
                                 >
                                   {sbomData.sbom.stats.compCount}
                                 </Badge>
-                                <Text fontSize={'xs'}>Components</Text>
+                                <Text
+                                  fontSize={'xs'}
+                                  onClick={onSelectComp}
+                                  cursor={'pointer'}
+                                  _hover={{ textDecoration: 'underline' }}
+                                >
+                                  Components
+                                </Text>
                               </Box>
                             </Stack>
                             {/* license */}
@@ -561,7 +624,7 @@ function SBOM() {
                                       colorScheme='red'
                                       borderRadius='md'
                                       cursor={'pointer'}
-                                      onClick={() => onFilterSev(['critical'])}
+                                      onClick={() => onFilterVuln(['critical'])}
                                     >
                                       {sbomData.sbom.stats.vulnStats.critical
                                         ? sbomData.sbom.stats.vulnStats.critical
@@ -576,7 +639,7 @@ function SBOM() {
                                       colorScheme='orange'
                                       borderRadius='md'
                                       cursor={'pointer'}
-                                      onClick={() => onFilterSev(['high'])}
+                                      onClick={() => onFilterVuln(['high'])}
                                     >
                                       {sbomData.sbom.stats.vulnStats.high
                                         ? sbomData.sbom.stats.vulnStats.high
@@ -591,7 +654,7 @@ function SBOM() {
                                       colorScheme='yellow'
                                       borderRadius='md'
                                       cursor={'pointer'}
-                                      onClick={() => onFilterSev(['medium'])}
+                                      onClick={() => onFilterVuln(['medium'])}
                                     >
                                       {sbomData.sbom.stats.vulnStats.medium
                                         ? sbomData.sbom.stats.vulnStats.medium
@@ -606,7 +669,7 @@ function SBOM() {
                                       colorScheme='green'
                                       borderRadius='md'
                                       cursor={'pointer'}
-                                      onClick={() => onFilterSev(['low'])}
+                                      onClick={() => onFilterVuln(['low'])}
                                     >
                                       {sbomData.sbom.stats.vulnStats.low
                                         ? sbomData.sbom.stats.vulnStats.low
@@ -616,8 +679,9 @@ function SBOM() {
                                 </Stack>
                                 <Text
                                   fontSize={'xs'}
-                                  onClick={() => onFilterSev([])}
+                                  onClick={() => onFilterVuln(null)}
                                   style={{ cursor: 'pointer' }}
+                                  _hover={{ textDecoration: 'underline' }}
                                 >
                                   Vulnerabilities
                                 </Text>
@@ -777,6 +841,9 @@ function SBOM() {
                 totalComp={totalComp}
                 setTotalComp={setTotalComp}
                 getVulnData={getVulnData}
+                getCompData={getCompData}
+                compData={compData}
+                error={compError}
                 vulnData={vulnData}
                 vulnRefetch={vulnRefetch}
                 type={

@@ -24,7 +24,6 @@ import SbomChangelogTable from 'components/Tables/SbomChangelogTable'
 import { useLazyQuery } from '@apollo/client'
 import {
   GetCheckResults,
-  GetComponentData,
   GetChangeLogs,
   GetCompFilterData,
   GetVulnFilterData,
@@ -46,7 +45,10 @@ const SBOMTable = ({
   totalComp,
   setTotalComp,
   vulnData,
-  getVulnData
+  getVulnData,
+  getCompData,
+  compData,
+  error
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -62,7 +64,6 @@ const SBOMTable = ({
     compField,
     compDirection,
     compSearchInput,
-    setCompSearchInput,
     compEcosystem,
     compType,
     compLicense,
@@ -86,27 +87,19 @@ const SBOMTable = ({
     vulnEpss,
     setComPageIndex,
     checkSearchInput,
-    setCheckSearchInput,
     checkCategory,
     checkSeverity,
     checkStatus,
-    checkRules
+    checkRules,
+    vulnIndex,
+    setVulnIndex,
+    resultIndex,
+    setResultIndex,
+    changelogIndex,
+    setChangelogIndex
   } = useContext(GlobalContext)
 
   const { lifecycle } = data
-
-  // PAGINATION STATS FOR DIFFERENT TABS
-  const [vulnIndex, setVulnIndex] = useState(1)
-  const [resultIndex, setResultIndex] = useState(1)
-  const [changelogIndex, setChangelogIndex] = useState(1)
-
-  // GET COMPONENT DATA
-  const [getCompData, { data: compData, error }] = useLazyQuery(
-    GetComponentData,
-    {
-      fetchPolicy: 'network-only'
-    }
-  )
 
   // GET SBOM PARTS
   const [getParts, { data: parts }] = useLazyQuery(GetSbomParts, {
