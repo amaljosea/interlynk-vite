@@ -167,7 +167,7 @@ const VulnsTable = ({ data }) => {
     },
     // Products
     {
-      id: 'VULN_INFOS_EPSS_SCORES',
+      id: 'AFFECTS',
       name: 'AFFECTS',
       selector: (row) => {
         const { vuln } = row
@@ -184,7 +184,7 @@ const VulnsTable = ({ data }) => {
     },
     // Products
     {
-      id: 'VULN_INFOS_EPSS_SCORES',
+      id: 'RESOLVED',
       name: 'RESOLVED',
       selector: (row) => {
         const { vuln } = row
