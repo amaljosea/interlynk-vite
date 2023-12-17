@@ -27,8 +27,8 @@ import {
   Select
 } from '@chakra-ui/react'
 import { useContext, useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { FaEllipsisV, FaFilter } from 'react-icons/fa'
+import { Link, useHistory } from 'react-router-dom'
+import { FaEllipsisV } from 'react-icons/fa'
 import { getFullDateAndTime, timeSince, customStyles } from 'utils'
 import CustomLoader from 'components/CustomLoader'
 import DataTable from 'react-data-table-component'
@@ -38,7 +38,6 @@ import { UpdateProject, DeleteProject } from 'graphQL/Mutation'
 import ProductModal from 'views/Dashboard/Products/components/ProductModal'
 import UploadModal from 'views/Dashboard/Products/components/UploadModal'
 import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
-import { useHistory } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import ProdFilterMenu from 'views/Dashboard/Products/components/ProdFilterMenu'
@@ -48,8 +47,9 @@ const ProductTable = ({ data, refetch }) => {
   const history = useHistory()
   const [pageIndex, setPageIndex] = useState(1)
   const [activeRow, setActiveRow] = useState(null)
-  const { isOpen, onOpen, onClose } = useDisclosure()
   const [activeProd, setActiveProd] = useState('yes')
+
+  const { isOpen, onOpen, onClose } = useDisclosure()
 
   const {
     totalRows,
@@ -65,7 +65,6 @@ const ProductTable = ({ data, refetch }) => {
     setLicenseType,
     setSpdxList,
     setSpdxLicense,
-    setExpList,
     setLicenseExp
   } = useContext(GlobalContext)
 
@@ -103,9 +102,8 @@ const ProductTable = ({ data, refetch }) => {
   }, [])
 
   // REMOVE DUPLICATE PRODUCTS
-  const removeDuplicatesAndLatest = (arr) => {
+  const removeDuplicates = (arr) => {
     const uniqueVersions = {}
-
     for (const item of arr) {
       if (
         !uniqueVersions[item.label] ||
@@ -114,8 +112,13 @@ const ProductTable = ({ data, refetch }) => {
         uniqueVersions[item.label] = item
       }
     }
+    const versions = Object.values(uniqueVersions).sort((a, b) => {
+      const dateA = new Date(a.creationAt)
+      const dateB = new Date(b.creationAt)
+      return dateB - dateA
+    })
 
-    return Object.values(uniqueVersions)
+    return versions
   }
 
   const [projectDelete] = useMutation(DeleteProject, {
@@ -187,15 +190,7 @@ const ProductTable = ({ data, refetch }) => {
             }
           })
 
-        const filteredData = uniqVersions
-          ? removeDuplicatesAndLatest(uniqVersions)
-          : []
-
-        filteredData?.sort((a, b) => {
-          const dateA = new Date(a.creationAt)
-          const dateB = new Date(b.creationAt)
-          return dateB - dateA
-        })
+        const filteredData = uniqVersions ? removeDuplicates(uniqVersions) : []
 
         const product = {
           id: id,
@@ -283,9 +278,7 @@ const ProductTable = ({ data, refetch }) => {
             }
           })
 
-        const filteredData = uniqVersions
-          ? removeDuplicatesAndLatest(uniqVersions)
-          : []
+        const filteredData = uniqVersions ? removeDuplicates(uniqVersions) : []
 
         return <Text>{filteredData?.length}</Text>
       },
@@ -346,10 +339,7 @@ const ProductTable = ({ data, refetch }) => {
             }
           })
 
-        const filteredData = uniqVersions
-          ? removeDuplicatesAndLatest(uniqVersions)
-          : []
-
+        const filteredData = uniqVersions ? removeDuplicates(uniqVersions) : []
 
         const product = {
           id: id,
@@ -391,10 +381,15 @@ const ProductTable = ({ data, refetch }) => {
                   isDisabled={!enabled}
                   onClick={() => {
                     window.localStorage.setItem('activeProduct', name)
-                    window.localStorage.setItem('product', JSON.stringify(product))
+                    window.localStorage.setItem(
+                      'product',
+                      JSON.stringify(product)
+                    )
                     window.localStorage.setItem(
                       'activeSBOM',
-                      filteredData.length > 0 ? filteredData[0].value : sboms[0].id
+                      filteredData.length > 0
+                        ? filteredData[0].value
+                        : sboms[0].id
                     )
                     history.push(`/vendor/autofix?id=${id}`)
                   }}
@@ -454,15 +449,11 @@ const ProductTable = ({ data, refetch }) => {
 
   // DELETE PRODUCT
   const onProductDelete = async () => {
-    try {
-      await projectDelete({
-        variables: {
-          id: activeRow.id
-        }
-      }).then((res) => res.data && onDeleteClose())
-    } catch (error) {
-      console.error('Mutation error:', error)
-    }
+    await projectDelete({
+      variables: {
+        id: activeRow.id
+      }
+    }).then((res) => res.data && onDeleteClose())
   }
 
   // REFRESH PRODUCTS
@@ -476,26 +467,22 @@ const ProductTable = ({ data, refetch }) => {
 
   // TOGGLE STATUS
   const toggleStatus = async () => {
-    try {
-      await projectUpdate({
-        variables: {
-          id: activeRow.id,
-          enabled: activeRow.enabled === true ? false : true
-        }
-      })
-        .then(
-          (res) =>
-            res.data &&
-            refetch({
-              first: totalRows,
-              field: prodField,
-              direction: prodDirection
-            })
-        )
-        .finally(() => onWarningClose())
-    } catch (error) {
-      console.error('Mutation error:', error)
-    }
+    await projectUpdate({
+      variables: {
+        id: activeRow.id,
+        enabled: activeRow.enabled === true ? false : true
+      }
+    })
+      .then(
+        (res) =>
+          res.data &&
+          refetch({
+            first: totalRows,
+            field: prodField,
+            direction: prodDirection
+          })
+      )
+      .finally(() => onWarningClose())
   }
 
   // SEARCH COMPONENT
