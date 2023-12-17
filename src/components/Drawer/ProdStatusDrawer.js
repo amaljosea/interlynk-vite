@@ -25,7 +25,7 @@ import {
   GetCdxResponses
 } from 'graphQL/Queries'
 import { useEffect, useState, useContext } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation,useHistory } from 'react-router-dom'
 
 const ProdStatusDrawer = ({
   data,
@@ -36,6 +36,7 @@ const ProdStatusDrawer = ({
   setPageIndex,
 }) => {
   const location = useLocation()
+  const history = useHistory()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('p')
   const sbomId = queryParams.get('sbom')
@@ -53,8 +54,7 @@ const ProdStatusDrawer = ({
     vulnStatus,
     vulnKev,
     vulnEpss,
-    vulnAfter,
-    vulnBefore
+    setActiveProdTab
   } = useContext(GlobalContext)
 
   const { id, componentVulnLogs } = data
@@ -77,13 +77,13 @@ const ProdStatusDrawer = ({
   const { data: allVexStatus } = useQuery(getVexStatuses)
   const { data: allVexJustify } = useQuery(getVexJustifications)
 
-  const handleRefetch = () => {
+  const handleRefetch = async () => {
     const epssRange = (vulnEpss !== '' || vulnEpss !== '0-0') && vulnEpss.split('-')
     const range = {
       min: parseFloat(epssRange[0]) / 10000,
       max: parseFloat(epssRange[1]) / 10000
     }
-    refetch({
+    await refetch({
       variables: {
         projectId: productId,
         sbomId: sbomId,
@@ -100,7 +100,11 @@ const ProdStatusDrawer = ({
         field: vulnField,
         direction: vulnDirection
       }
-    })
+    }).then(res => {
+      if(res.data) {
+        history.push(`/vendor/products?p=${productId}&sbom=${sbomId}`)
+      }
+    }).finally(()=> setActiveProdTab(3))
   }
 
   const [compVexCreate] = useMutation(updateCompVulnVex, {
@@ -167,7 +171,7 @@ const ProdStatusDrawer = ({
         })
       setStatusResults(sortedData)
     }
-  }, [])
+  }, [componentVulnLogs])
 
   return (
     <Stack spacing='24px'>

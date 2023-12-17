@@ -282,16 +282,10 @@ function SBOM() {
   }
 
   const refetchSBOM = async (id) => {
-    try {
-      await refetch({
-        projectId: productId,
-        sbomId: id
-      }).finally(() =>
-        history.push(`/vendor/products?p=${productId}&sbom=${id}`)
-      )
-    } catch (error) {
-      console.log(`fetch error`, error)
-    }
+    await refetch({
+      projectId: productId,
+      sbomId: id
+    }).then((res) => res.data && history.push(`/vendor/products?p=${productId}&sbom=${id}`))
   }
 
   const handleSBOMChange = (select) => {
