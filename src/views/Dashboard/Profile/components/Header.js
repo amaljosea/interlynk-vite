@@ -1,22 +1,20 @@
 // Chakra imports
 import { useMutation } from '@apollo/client'
 import {
+  Avatar,
   Box,
   Button,
   Flex,
-  Image,
   Input,
   Text,
   useColorModeValue,
   useToast
 } from '@chakra-ui/react'
-
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 import { UploadProfileImage } from 'graphQL/Mutation'
 import { useEffect, useRef, useState } from 'react'
 import { useHistory } from 'react-router-dom'
-import { displayPic } from 'utils'
 
 const Header = ({
   selectedTab,
@@ -141,9 +139,9 @@ const Header = ({
               width='80px'
               height='80px'
             >
-              <Image
-                src={profileImage || displayPic(user.email)}
-                alt={profileImage ? profileImage.fileName : '.'}
+              <Avatar
+                me={{ md: '22px' }}
+                src={profileImage && profileImage}
                 borderRadius='full'
                 width='80px'
                 height='80px'
