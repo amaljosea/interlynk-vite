@@ -26,7 +26,7 @@ export default function AdminNavbar(props) {
        // Return a default object, or null based on use case.
        return {}
     }
- }
+  }
 
   const [scrolled, setScrolled] = useState(false)
   const { brandText } = props
@@ -222,7 +222,7 @@ export default function AdminNavbar(props) {
                 <Link
                   to={
                     currentProduct
-                      ? `/vendor/products?&p=${currentProduct.id}&sbom=${currentProduct.sbomId}`
+                      ? `/vendor/products?p=${currentProduct.id}&sbom=${currentProduct.sbomId}`
                       : '/vendor/products'
                   }
                   onClick={() => {
