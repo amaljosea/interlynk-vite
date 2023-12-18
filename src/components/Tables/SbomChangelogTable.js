@@ -45,7 +45,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
   const { logFilters, logField, setLogField, logDirection, setLogDirection } =
     useContext(GlobalContext)
 
-  const productId = queryParams.get('p')
+  const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
 
   const [filterText, setFilterText] = useState('')

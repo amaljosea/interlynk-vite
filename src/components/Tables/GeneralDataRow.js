@@ -45,7 +45,7 @@ import SbomLicenseField from 'components/SbomLicenseField'
 const GeneralDataRow = ({ status, data, refetch }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
-  const productId = queryParams.get('p')
+  const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
 
   const {

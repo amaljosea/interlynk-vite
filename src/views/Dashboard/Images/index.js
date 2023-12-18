@@ -37,7 +37,7 @@ import {
   RemoveScannerImage,
   OrgConnectorRefresh
 } from 'graphQL/Mutation'
-import { Link, useLocation, useHistory } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
 import ImageTable from './ImageTable'
 import { GetImages } from 'graphQL/Queries'
@@ -47,7 +47,7 @@ import { RepeatIcon } from '@chakra-ui/icons'
 
 const Index = () => {
   const toast = useToast()
-  const history = useHistory()
+  const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const versionId = queryParams.get('v')
@@ -135,13 +135,14 @@ const Index = () => {
             first: 10
           }
         })
-        history.push('/vendor/images')
+        navigate('/vendor/images')
         onScanClose()
       })
     } catch (error) {
       console.error('Add Scanner error: ', error)
       toast({
-        description: 'An error occured while adding scanner. Please retry in few minutes.',
+        description:
+          'An error occured while adding scanner. Please retry in few minutes.',
         status: 'error',
         duration: 2000,
         position: 'top'
@@ -165,7 +166,7 @@ const Index = () => {
             first: 10
           }
         })
-        history.push('/vendor/images')
+        navigate('/vendor/images')
         onDeleteClose()
       })
     } catch (error) {
@@ -401,7 +402,11 @@ const Index = () => {
                   </Select>
                 </ModalBody>
                 <ModalFooter>
-                  <Button colorScheme='gray' mr={3} onClick={() => onScanClose()}>
+                  <Button
+                    colorScheme='gray'
+                    mr={3}
+                    onClick={() => onScanClose()}
+                  >
                     Cancel
                   </Button>
                   <Button

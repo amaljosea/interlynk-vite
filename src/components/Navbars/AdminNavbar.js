@@ -15,18 +15,19 @@ import AdminNavbarLinks from './AdminNavbarLinks'
 import { Link, useLocation } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
 import { vulnList } from 'variables/general'
+import { GetProductInfo } from 'graphQL/Queries'
+import { useLazyQuery, useQuery } from '@apollo/client'
 
 export default function AdminNavbar(props) {
   function parseJSONSafely(str) {
     try {
-       return JSON.parse(str);
+      return JSON.parse(str)
+    } catch (e) {
+      console.err(e)
+      // Return a default object, or null based on use case.
+      return {}
     }
-    catch (e) {
-       console.err(e);
-       // Return a default object, or null based on use case.
-       return {}
-    }
- }
+  }
 
   const [scrolled, setScrolled] = useState(false)
   const { brandText } = props
@@ -34,19 +35,45 @@ export default function AdminNavbar(props) {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const versionId = queryParams.get('v')
-  const product = queryParams.get('p')
+  const product = queryParams.get('id')
   const prodID = queryParams.get('id')
   const parts = queryParams.get('parts')
+  const sbomId = queryParams.get('sbom')
 
   const { setActiveProdTab } = useContext(GlobalContext)
 
   const imageName = localStorage.getItem('Image')
-  const currentProduct = (() => { try { return parseJSONSafely(localStorage.getItem(`product`)); } catch (error) { console.log(error); return null; } })();
+  const currentProduct = (() => {
+    try {
+      return parseJSONSafely(localStorage.getItem(`product`))
+    } catch (error) {
+      console.log(error)
+      return null
+    }
+  })()
   const activeProd = localStorage.getItem('activeProduct')
   const subProduct = localStorage.getItem('subProduct')
   const activeSBOM = localStorage.getItem('activeSBOM')
 
   const vulnData = vulnList.find((item) => item.id === prodID)
+
+  const urlParts = location.pathname.split('/')
+  const category = urlParts[2]
+  const productIndex = urlParts.indexOf('products')
+  const productName =
+    productIndex !== -1 ? urlParts.slice(productIndex + 1).join('/') : ''
+
+
+  const { data } = useQuery(GetProductInfo, {
+    variables: {
+      id: prodID
+    }
+  })
+
+  const activeVersion =
+    data &&
+    data.project.sboms.length > 0 &&
+    data.project.sboms.find((item) => item.id === sbomId)
 
   // Here are all the props that may change depending on navbar's type or state.(secondary, variant, scrolled)
   let mainText = useColorModeValue('gray.700', 'gray.200')
@@ -167,43 +194,26 @@ export default function AdminNavbar(props) {
               </Link>
             </BreadcrumbItem>
 
-            {(location.pathname.startsWith('/vendor/autofix') ||
-              location.pathname.startsWith('/vendor/changelog')) && (
-              <BreadcrumbItem color={mainText}>
-                <HStack spacing={2}>
-                  <Link to={'/vendor/products'} color={secondaryText}>
-                    Products
-                  </Link>
-                  <Text>/</Text>
-                  <Link
-                    to={
-                      activeSBOM
-                        ? `/vendor/products?p=${prodID}&sbom=${activeSBOM}`
-                        : `/vendor/products`
-                    }
-                    color={secondaryText}
-                    onClick={() => {
-                      setActiveProdTab(0)
-                    }}
-                  >
-                    {activeProd}
-                  </Link>
-                </HStack>
+            <BreadcrumbItem color={mainText} textTransform={'capitalize'}>
+              <Link to={`/vendor/${category}`}>{category}</Link>
+            </BreadcrumbItem>
+
+            {productName && (
+              <BreadcrumbItem
+                color={mainText}
+                isCurrentPage={sbomId ? false : true}
+              >
+                <Link to={`/vendor/products/${productName}?id=${prodID}`}>
+                  {productName}
+                </Link>
               </BreadcrumbItem>
             )}
 
-            <BreadcrumbItem color={mainText}>
-              <Link
-                to={`${path(brandText)}`}
-                color={secondaryText}
-                onClick={() => {
-                  localStorage.removeItem('cloudScanner')
-                  window.localStorage.removeItem('subProduct')
-                }}
-              >
-                {brandText}
-              </Link>
-            </BreadcrumbItem>
+            {sbomId && activeVersion && (
+              <BreadcrumbItem color={mainText} isCurrentPage>
+                <BreadcrumbLink href=''>{activeVersion.primaryComponent?.version}</BreadcrumbLink>
+              </BreadcrumbItem>
+            )}
 
             {imageName !== null && versionId && brandText === 'Images' && (
               <BreadcrumbItem color={mainText}>
@@ -214,23 +224,6 @@ export default function AdminNavbar(props) {
                 >
                   {imageName}
                 </BreadcrumbLink>
-              </BreadcrumbItem>
-            )}
-
-            {currentProduct !== null && product && brandText === 'Products' && (
-              <BreadcrumbItem color={mainText}>
-                <Link
-                  to={
-                    currentProduct
-                      ? `/vendor/products?&p=${currentProduct.id}&sbom=${currentProduct.sbomId}`
-                      : '/vendor/products'
-                  }
-                  onClick={() => {
-                    setActiveProdTab(0)
-                  }}
-                >
-                  {currentProduct.name}
-                </Link>
               </BreadcrumbItem>
             )}
 

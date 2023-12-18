@@ -483,6 +483,36 @@ export const GetProjectData = gql`
 
 // ----------------------- PRODUCT DETAILS PAGE ---------------------------
 
+// GET PROJECT INFORMATION
+export const GetProductInfo = gql`
+  query GetProjectInfo($id: Uuid!) {
+    project(id: $id) {
+      id
+      name
+      description
+      enabled
+      updatedAt
+      sboms {
+        id
+        updatedAt
+        lifecycle
+        primaryComponent {
+          id
+          name
+          version
+        }
+        stats {
+          compCount
+          compLicenseCount
+          compCpeCount
+          compPurlCount
+          vulnStats
+        }
+      }
+    }
+  }
+`
+
 // GET PRODUCT INFO
 export const GetProductData = gql`
   query GetProductData($projectId: Uuid!, $sbomId: Uuid!) {
@@ -783,6 +813,7 @@ export const GetVulnData = gql`
         nodes {
           id
           impact
+          cdxResponseId
           vuln {
             vulnId
             desc
@@ -809,6 +840,9 @@ export const GetVulnData = gql`
             justification
             impact
             note
+            detail
+            response
+            actionStmt
             updatedAt
           }
           component {

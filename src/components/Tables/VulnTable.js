@@ -931,6 +931,7 @@ const VulnTable = ({
                 currentSbomId={sbomId}
                 currentProductId={productId}
                 onClose={onTableClose}
+                refetch={refetch}
               />
             </DrawerBody>
           </DrawerContent>

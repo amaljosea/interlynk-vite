@@ -1,8 +1,8 @@
 import { CloseIcon } from '@chakra-ui/icons'
 import { Box, Input } from '@chakra-ui/react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 
-const SearchFilter = ({ id, filterText, setFilterText, onFilter, onClear }) => {
+const SearchFilter = ({ id, filterText, onChange, onFilter, onClear }) => {
   const searchInputRef = useRef()
 
   const focusSearchInput = () => {
@@ -41,7 +41,7 @@ const SearchFilter = ({ id, filterText, setFilterText, onFilter, onClear }) => {
           placeholder='Search'
           ref={searchInputRef}
           value={filterText}
-          onChange={(e) => setFilterText(e.target.value)}
+          onChange={onChange}
           onKeyDown={onFilter}
         />
         {filterText !== '' && (

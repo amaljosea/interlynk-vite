@@ -28,7 +28,7 @@ import { ProfileIcon, SettingsIcon } from 'components/Icons/Icons'
 import { ItemContent } from 'components/Menu/ItemContent'
 import SidebarResponsive from 'components/Sidebar/SidebarResponsive'
 import PropTypes from 'prop-types'
-import { Link, useHistory, useLocation } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { dashRoutes } from 'routes.js'
 import { FaRegKeyboard, FaSignOutAlt } from 'react-icons/fa'
 
@@ -40,12 +40,12 @@ import { GetOrg } from 'graphQL/Queries'
 
 export default function HeaderLinks(props) {
   const location = useLocation()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const { data, error } = useQuery(GetOrg)
 
   const queryParams = new URLSearchParams(location.search)
-  const productId = queryParams.get('p')
+  const productId = queryParams.get('id')
   const customerView = location.pathname.startsWith('/customer')
 
   const { variant, children, fixed, secondary, onOpen, ...rest } = props
@@ -77,7 +77,7 @@ export default function HeaderLinks(props) {
         console.log('Network error:', error.networkError)
         const statusCode = error.networkError.statusCode
         console.log('Status code:', statusCode)
-        history.push(`/auth`)
+        navigate(`/auth`)
       }
     }
   }, [])
@@ -106,7 +106,7 @@ export default function HeaderLinks(props) {
             localStorage.removeItem('email')
             localStorage.removeItem('product')
             Cookies.remove('authToken')
-            history.push('/auth')
+            navigate('/auth')
           }
         })
     } catch (error) {

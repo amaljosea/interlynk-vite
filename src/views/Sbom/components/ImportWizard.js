@@ -9,6 +9,7 @@ import { GetVulnData } from 'graphQL/Queries'
 import { findSimilarItems } from 'utils'
 import StepThree from './Wizard/StepThree'
 import GlobalContext from 'context/GlobalContext'
+import { useNavigate } from 'react-router-dom'
 
 const ImportWizard = ({
   variant,
@@ -29,6 +30,8 @@ const ImportWizard = ({
     setSelectedVulns
   } = useContext(GlobalContext)
 
+  const navigate = useNavigate()
+
   const { nextStep, prevStep, activeStep } = useSteps({
     initialStep: 0
   })
@@ -40,44 +43,48 @@ const ImportWizard = ({
   const [uniqVersions, setUniqVersions] = useState([])
 
   const refetchCurrentVuln = async () => {
-    try {
-      await getVulns({
-        variables: {
-          projectId: currentProductId,
-          sbomId: currentSbomId,
-          first: totalVulns,
-          field: vulnField,
-          direction: vulnDirection
-        }
-      }).then((res) => {
+    await getVulns({
+      variables: {
+        projectId: currentProductId,
+        sbomId: currentSbomId,
+        first: totalVulns,
+        field: vulnField,
+        direction: vulnDirection
+      }
+    })
+      .then((res) => {
         if (res.data) {
           const data = findSimilarItems(res.data.sbom.vulns.nodes, importSbom)
           const filterData = data.filter((item) => item.importStatus !== null)
           setMergeData(filterData)
         }
       })
-    } catch (error) {
-      console.log(error)
-    }
+      .finally(() => {
+        navigate(`/vendor/products?p=${currentProductId}&sbom=${currentSbomId}`)
+        onClose()
+      })
   }
 
   const handleSubmit = () => {
-    console.log(selectedVulns)
+    // console.log(selectedVulns)
     if (selectedVulns.length > 0) {
       selectedVulns.map((item) => {
         compVexCreate({
           variables: {
             compVulnId: item.id,
-            notes: item.importNotes,
-            sbomId: currentSbomId,
+            note: item.importNotes ? item.importNotes : undefined,
             vexStatusId: item.importStatus.id,
             vexJustificationId: item.importJustification
               ? item.importJustification.id
               : undefined,
-            impact: item.importStatement ? item.importStatement : undefined
+            impact: item.importStatement ? item.importStatement : undefined,
+            details: item.importDetail ? item.importDetail : undefined,
+            cdxResponseId: item.importResponse
+              ? item.importResponse
+              : undefined,
+            action: item.importActionStmt ? item.importActionStmt : undefined
           }
         })
-        refetchCurrentVuln(item)
       })
       nextStep()
     }
@@ -153,12 +160,16 @@ const ImportWizard = ({
         gap={4}
         pos={'absolute'}
         bottom={2}
-        right={8}
-        bg={'white'}
+        right={0}
         py={5}
+        pr={8}
       >
         {hasCompletedAllSteps ? (
-          <Button variant='solid' colorScheme='green' onClick={onClose}>
+          <Button
+            variant='solid'
+            colorScheme='green'
+            onClick={refetchCurrentVuln}
+          >
             Done
           </Button>
         ) : (

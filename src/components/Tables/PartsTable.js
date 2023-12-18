@@ -70,7 +70,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const sbomId = queryParams.get('sbom')
-  const prodId = queryParams.get('p')
+  const prodId = queryParams.get('id')
 
   const currentProduct = JSON.parse(localStorage.getItem(`product`))
 
