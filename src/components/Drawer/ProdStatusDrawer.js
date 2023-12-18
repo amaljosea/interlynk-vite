@@ -74,6 +74,7 @@ const ProdStatusDrawer = ({
   const [statusResults, setStatusResults] = useState([])
   const [newVulnLogs, setNewVulnLogs] = useState([])
 
+
   const { data: allVexStatus } = useQuery(getVexStatuses)
   const { data: allVexJustify } = useQuery(getVexJustifications)
 
@@ -122,6 +123,7 @@ const ProdStatusDrawer = ({
       setJustification(allVexJustify.vexJustifications[9].id)
     }
     if (status === 'Not Affected' || status === 'Affected') {
+      setJustification('')
       setJustifyName('')
       setImpactData('')
     }
@@ -162,6 +164,8 @@ const ProdStatusDrawer = ({
       }
     }).then((res) => res.data && setPageIndex(1))
   }
+
+  const fixedVersions = filteredData.filter((item) => item.value !== sbomId)
 
   useEffect(() => {
     if (componentVulnLogs) {
@@ -264,7 +268,7 @@ const ProdStatusDrawer = ({
                 </FormControl>
               )}
               {/* FIXED VERSION */}
-              {statusName === 'Affected' && responseTitle === 'update' && (
+              {statusName === 'Affected' && responseTitle === 'Update' && (
                 <Stack
                   width={'100%'}
                   direction={'column'}
@@ -288,14 +292,14 @@ const ProdStatusDrawer = ({
                       color='gray.600'
                     >
                       <option value=''>-- Select --</option>
-                      {filteredData && filteredData.length > 0 ? (
-                        filteredData.map((item, index) => (
+                      {fixedVersions.length > 0 ? (
+                        fixedVersions.map((item, index) => (
                           <option
                             key={index}
-                            value={item.id}
-                            name={item.version}
+                            value={item.value}
+                            name={item.label}
                           >
-                            {item.version}
+                            {item.label}
                           </option>
                         ))
                       ) : (

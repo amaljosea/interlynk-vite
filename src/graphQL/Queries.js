@@ -783,6 +783,7 @@ export const GetVulnData = gql`
         nodes {
           id
           impact
+          cdxResponseId
           vuln {
             vulnId
             desc
@@ -809,6 +810,9 @@ export const GetVulnData = gql`
             justification
             impact
             note
+            detail
+            response
+            actionStmt
             updatedAt
           }
           component {

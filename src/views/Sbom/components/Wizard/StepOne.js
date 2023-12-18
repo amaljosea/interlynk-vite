@@ -11,6 +11,7 @@ import { useContext, useEffect } from 'react'
 import GlobalContext from 'context/GlobalContext'
 import { GetProjectData, GetProject } from 'graphQL/Queries'
 import { useLazyQuery, useQuery } from '@apollo/client'
+import { useGlobalState } from 'hooks/useGlobalState'
 
 const StepOne = ({
   setProductId,
@@ -24,11 +25,15 @@ const StepOne = ({
   uniqVersions,
   setUniqVersions
 }) => {
-  const { totalProducts } = useContext(GlobalContext)
+  const { prodState } = useGlobalState()
+  const { field, direction, totalProduct } = prodState
 
   const { data: allProducts } = useQuery(GetProjectData, {
     variables: {
-      first: totalProducts
+      first: totalProduct,
+      enabled: true,
+      field: field,
+      direction: direction
     }
   })
 
@@ -47,8 +52,8 @@ const StepOne = ({
       setSelectedProd(currentProd.id)
       setProductId(currentProd.id)
       const filterVersion = [...currentProd.sboms].sort((a, b) => {
-        const dateA = new Date(a.updatedAt)
-        const dateB = new Date(b.updatedAt)
+        const dateA = new Date(a.creationAt)
+        const dateB = new Date(b.creationAt)
         return dateB - dateA
       })
       const currentIndex = filterVersion?.findIndex(
@@ -84,9 +89,9 @@ const StepOne = ({
           res.data.project.sboms.map((project) => {
             if (project.primaryComponent) {
               versions.push({
-                version: project.primaryComponent.version,
-                id: project.id,
-                updatedAt: project.updatedAt
+                label: project.primaryComponent.version,
+                value: project.id,
+                creationAt: project.creationAt
               })
             }
           })
@@ -96,31 +101,30 @@ const StepOne = ({
     }
   }, [selectedProd])
 
-  // remove duplicates
-  const removeDuplicatesAndLatest = (arr) => {
+  // REMOVE DUPLICATE PRODUCTS
+  const removeDuplicates = (arr) => {
     const uniqueVersions = {}
-
     for (const item of arr) {
       if (
-        !uniqueVersions[item.version] ||
-        item.updatedAt > uniqueVersions[item.version].updatedAt
+        !uniqueVersions[item.label] ||
+        item.updatedAt > uniqueVersions[item.label].creationAt
       ) {
-        uniqueVersions[item.version] = item
+        uniqueVersions[item.label] = item
       }
     }
+    const versions = Object.values(uniqueVersions)
+      .sort((a, b) => {
+        const dateA = new Date(a.creationAt)
+        const dateB = new Date(b.creationAt)
+        return dateB - dateA
+      })
+      .filter((item) => item.value !== currentSbomId)
 
-    return Object.values(uniqueVersions)
+    return versions
   }
 
-  const filteredData = uniqVersions
-    ? removeDuplicatesAndLatest(uniqVersions)
-    : []
 
-  filteredData?.sort((a, b) => {
-    const dateA = new Date(a.updatedAt)
-    const dateB = new Date(b.updatedAt)
-    return dateB - dateA
-  })
+  const filteredData = uniqVersions ? removeDuplicates(uniqVersions) : []
 
   return (
     <>
@@ -185,13 +189,11 @@ const StepOne = ({
               >
                 <option value={''}>-- Select --</option>
                 {filteredData.length > 0 &&
-                  [...filteredData]
-                    .filter((item) => item.id !== currentSbomId)
-                    .map((item, index) => (
-                      <option key={index} value={item.id}>
-                        {item.version}
-                      </option>
-                    ))}
+                  filteredData.map((item, index) => (
+                    <option key={index} value={item.value}>
+                      {item.label}
+                    </option>
+                  ))}
               </Select>
             </FormControl>
           </Stack>

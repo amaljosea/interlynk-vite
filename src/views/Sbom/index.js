@@ -45,7 +45,7 @@ import {
 import { TbSignature, TbSignatureOff } from 'react-icons/tb'
 import { useLocation, useHistory, Link } from 'react-router-dom'
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
-import { timeSince, getFullDateAndTime } from 'utils'
+import { timeSince, getFullDateAndTime, removeDuplicates } from 'utils'
 import SigningModal from './components/SigningModal'
 import DownloadModal from './components/DownloadModal'
 import CopyModal from './components/CopyModal'
@@ -237,31 +237,7 @@ function SBOM() {
       }
     })
 
-  // remove duplicates
-  const removeDuplicatesAndLatest = (arr) => {
-    const uniqueVersions = {}
-
-    for (const item of arr) {
-      if (
-        !uniqueVersions[item.label] ||
-        item.updatedAt > uniqueVersions[item.label].creationAt
-      ) {
-        uniqueVersions[item.label] = item
-      }
-    }
-
-    return Object.values(uniqueVersions)
-  }
-
-  const filteredData = uniqVersions
-    ? removeDuplicatesAndLatest(uniqVersions)
-    : []
-
-  filteredData?.sort((a, b) => {
-    const dateA = new Date(a.creationAt)
-    const dateB = new Date(b.creationAt)
-    return dateB - dateA
-  })
+  const filteredData = uniqVersions ? removeDuplicates(uniqVersions) : []
 
   const [isLoading, setIsLoading] = useState(false)
 
@@ -285,7 +261,10 @@ function SBOM() {
     await refetch({
       projectId: productId,
       sbomId: id
-    }).then((res) => res.data && history.push(`/vendor/products?p=${productId}&sbom=${id}`))
+    }).then(
+      (res) =>
+        res.data && history.push(`/vendor/products?p=${productId}&sbom=${id}`)
+    )
   }
 
   const handleSBOMChange = (select) => {
@@ -502,7 +481,7 @@ function SBOM() {
                           </Stack>
                           {sbomData.sbom.primaryComponent && (
                             <Text fontSize={'sm'} my={0.5}>
-                              {sbomData.sbom.primaryComponent.description === 'NONE' ? '' : sbomData.sbom.primaryComponent.description}
+                              {sbomData.sbom.primaryComponent.description}
                             </Text>
                           )}
                           <Tooltip
@@ -761,6 +740,18 @@ function SBOM() {
                               noOptionsMessage={() => null}
                             />
                           </Flex>
+
+                          {/* 
+                          <CpeInput
+                            name='cpe'
+                            inputValue={cpeValue}
+                            setInputValue={setCpeValue}
+                            cpeList={cpeData}
+                            setCpeList={setCpeData}
+                            onChange={handleCpeChange}
+                            inputRef={cpeRef}
+                            validation={true}
+                          /> */}
 
                           {/* EDIT SBOM */}
                           <Tooltip label='Edit'>
