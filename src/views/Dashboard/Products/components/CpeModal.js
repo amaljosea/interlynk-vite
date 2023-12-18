@@ -48,7 +48,7 @@ const CpeModal = ({
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const sbomId = queryParams.get('sbom')
-  const productId = queryParams.get('p')
+  const productId = queryParams.get('id')
 
   const [vendor, setVendor] = useState('')
   const [vendorList, setVendorList] = useState([])

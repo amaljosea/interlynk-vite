@@ -34,14 +34,14 @@ import {
 } from 'react-icons/fa'
 import { timeSince, GetIcon, getFullDateAndTime, customStyles } from 'utils'
 import { useState, useMemo, useRef, useEffect, useContext } from 'react'
-import { useLocation, useHistory } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import ComponentModal from 'views/Sbom/components/ComponentModal'
 import SupplierModal from 'views/Sbom/components/SupplierModal'
 import LinksDrawer from 'components/Drawer/LinksDrawer'
 import styled from '@emotion/styled'
 import { useLazyQuery, useMutation } from '@apollo/client'
-import { GetComponentPath,GetCompDependency } from 'graphQL/Queries'
+import { GetComponentPath, GetCompDependency } from 'graphQL/Queries'
 import { deleteComSupplier } from 'graphQL/Mutation'
 import CompFilterMenu from 'views/Sbom/components/CompFilterMenu'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
@@ -60,11 +60,11 @@ const ComponentTable = ({
   setTotalRows,
   filterRefetch
 }) => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const customerView = location.pathname.startsWith('/customer')
-  const productId = queryParams.get('p')
+  const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
 
   const x = window.matchMedia('(min-width: 2500px)')
@@ -97,19 +97,31 @@ const ComponentTable = ({
     setCompBefore,
     setCustomList,
     setCustomLicense,
-    setActiveProdTab 
+    setActiveProdTab
   } = useContext(GlobalContext)
 
   const fetchCompData = async () => {
-   await refetch({
+    await refetch({
       variables: {
         projectId: productId,
         sbomId: sbomId,
         search: compSearchInput !== '' ? compSearchInput : undefined,
-        ecosystem: compEcosystem.includes('all') || compEcosystem.length === 0 ? undefined : compEcosystem,
-        kind: compType.includes('all') || compType.length === 0 ? undefined : compType,
-        licenses: compLicense.includes('all') || compLicense.length === 0 ? undefined : compLicense,
-        supplierName: compSupplier.includes('all') || compSupplier.length === 0 ? undefined : compSupplier,
+        ecosystem:
+          compEcosystem.includes('all') || compEcosystem.length === 0
+            ? undefined
+            : compEcosystem,
+        kind:
+          compType.includes('all') || compType.length === 0
+            ? undefined
+            : compType,
+        licenses:
+          compLicense.includes('all') || compLicense.length === 0
+            ? undefined
+            : compLicense,
+        supplierName:
+          compSupplier.includes('all') || compSupplier.length === 0
+            ? undefined
+            : compSupplier,
         primary: compScope === 'primary' ? true : undefined,
         internal: compScope === 'internal' ? true : undefined,
         first: totalRows,
@@ -119,11 +131,13 @@ const ComponentTable = ({
         field: compField,
         direction: compDirection
       }
-    }).then(res => {
-      if(res.data) {
-        history.push(`/vendor/products?p=${productId}&sbom=${sbomId}`)
-      }
-    }).finally(()=> setActiveProdTab(2))
+    })
+      .then((res) => {
+        if (res.data) {
+          navigate(`/vendor/products?p=${productId}&sbom=${sbomId}`)
+        }
+      })
+      .finally(() => setActiveProdTab(2))
   }
 
   const [activeRow, setActiveRow] = useState(null)

@@ -25,7 +25,7 @@ import {
   GetCdxResponses
 } from 'graphQL/Queries'
 import { useEffect, useState, useContext } from 'react'
-import { useLocation,useHistory } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 const ProdStatusDrawer = ({
   data,
@@ -36,9 +36,9 @@ const ProdStatusDrawer = ({
   setPageIndex,
 }) => {
   const location = useLocation()
-  const history = useHistory()
+  const navigate = useNavigate()
   const queryParams = new URLSearchParams(location.search)
-  const productId = queryParams.get('p')
+  const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
 
   const { data: res } = useQuery(GetCdxResponses)
@@ -103,7 +103,7 @@ const ProdStatusDrawer = ({
       }
     }).then(res => {
       if(res.data) {
-        history.push(`/vendor/products?p=${productId}&sbom=${sbomId}`)
+        navigate(`/vendor/products?p=${productId}&sbom=${sbomId}`)
       }
     }).finally(()=> setActiveProdTab(3))
   }

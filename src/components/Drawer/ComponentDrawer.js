@@ -55,7 +55,7 @@ function ComponentDrawer(props) {
   const toast = useToast()
 
   const queryParams = new URLSearchParams(location.search)
-  const productId = queryParams.get('p')
+  const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
 
   const customerView = location.pathname.startsWith('/customer')

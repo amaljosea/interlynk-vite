@@ -23,7 +23,7 @@ import CardHeader from 'components/Card/CardHeader'
 import CardBody from 'components/Card/CardBody.js'
 import { sbom } from 'variables/general'
 import { FaCubes, FaLayerGroup, FaMicroscope } from 'react-icons/fa'
-import { useLocation, useHistory } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
 
 import { useQuery } from '@apollo/client'
@@ -43,7 +43,7 @@ function ImageInfo() {
   const { scanEnabled } = useContext(GlobalContext)
 
   const location = useLocation()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const queryParams = new URLSearchParams(location.search)
   const versionId = queryParams.get('v')
@@ -97,18 +97,19 @@ function ImageInfo() {
     }
   }
 
-  const { data: imageVersionData, refetch, loading } = useQuery(
-    GetSignedImageVerion,
-    {
-      variables: {
-        signedParams: signedParams,
-        imageVersionId: versionId,
-        versionId: versionId,
-        imageId: imageId,
-        first: 10
-      }
+  const {
+    data: imageVersionData,
+    refetch,
+    loading
+  } = useQuery(GetSignedImageVerion, {
+    variables: {
+      signedParams: signedParams,
+      imageVersionId: versionId,
+      versionId: versionId,
+      imageId: imageId,
+      first: 10
     }
-  )
+  })
 
   useEffect(() => {
     if (imageVersionData) {
@@ -183,7 +184,7 @@ function ImageInfo() {
       first: 30
     })
     queryParams.set('v', value)
-    history.push(`/customer/images?v=${value}&id=${imageId}`)
+    navigate(`/customer/images?v=${value}&id=${imageId}`)
   }
 
   const sortSBOM = sbom.sort((a, b) => a.component.localeCompare(b.component))

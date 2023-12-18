@@ -14,7 +14,7 @@ import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 import { UploadProfileImage } from 'graphQL/Mutation'
 import { useEffect, useRef, useState } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 const Header = ({
   selectedTab,
@@ -25,7 +25,7 @@ const Header = ({
   setTabIndex,
   setPsIndex
 }) => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const toast = useToast()
   const textColor = useColorModeValue('gray.700', 'white')
   const emailColor = useColorModeValue('gray.500', 'gray.300')
@@ -33,10 +33,10 @@ const Header = ({
   const handleClick = (name) => {
     setSelectedTab(name)
     if (name === 'PERSONAL') {
-      history.push('/vendor/settings?tab=person')
+      navigate('/vendor/settings?tab=person')
       setPsIndex(0)
     } else {
-      history.push('/vendor/settings?tab=general')
+      navigate('/vendor/settings?tab=general')
       setTabIndex(0)
     }
   }

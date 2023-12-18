@@ -19,19 +19,21 @@ import { Link, useLocation } from 'react-router-dom'
 // this function creates the links and collapses that appear in the sidebar (left menu)
 
 const SidebarContent = ({ logoText, routes }) => {
-  const { minimize, setMinimize } = useContext(GlobalContext)
-  // to check for active links and opened collapses
+  const { minimize } = useContext(GlobalContext)
+
   let location = useLocation()
-  // this is for the rest of the collapses
+  const urlParts = location.pathname.split('/')
+  const category = urlParts[2]
+
   const [state, setState] = useState({})
 
   const activeRoute = (routeName) => {
+    const parts = routeName.split('/')
+    const name = parts[2]
     if (routeName === '/customer/') {
       return 'active'
-    } else if (location.pathname === routeName) {
+    } else if (name === category) {
       return 'active'
-    } else {
-      return ''
     }
   }
 

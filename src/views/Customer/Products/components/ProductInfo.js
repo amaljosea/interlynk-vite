@@ -25,7 +25,7 @@ import {
   FaFileDownload,
   FaLayerGroup
 } from 'react-icons/fa'
-import { useLocation, useHistory } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useLazyQuery, useQuery } from '@apollo/client'
 import { GetSignedSBOM, GetProjectInfo } from 'graphQL/Queries'
 import { timeSince } from 'utils'
@@ -45,7 +45,7 @@ function ProductInfo() {
   const finalRef = useRef(null)
 
   const location = useLocation()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const queryParams = new URLSearchParams(location.search)
   const {
@@ -56,7 +56,7 @@ function ProductInfo() {
     signedVulnDirection
   } = useContext(GlobalContext)
 
-  const productId = queryParams.get('p')
+  const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
 
   const signedParams = Cookies.get(`signedParamId`)
@@ -135,7 +135,7 @@ function ProductInfo() {
         productId: productId,
         sbomId: id
       }).then(() => {
-        history.push(`/customer/products?p=${productId}&sbom=${id}`)
+        navigate(`/customer/products?p=${productId}&sbom=${id}`)
       })
     } catch (error) {
       console.log(`fetch error`, error)

@@ -23,7 +23,7 @@ import CardBody from 'components/Card/CardBody.js'
 import SBOMTable from './components/SBOMTable'
 import { sbom } from 'variables/general'
 import { FaCubes, FaLayerGroup, FaMicroscope } from 'react-icons/fa'
-import { useLocation, useHistory } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 import { useQuery } from '@apollo/client'
 import { scanImage } from 'utils'
@@ -39,7 +39,7 @@ function SBOMs() {
   const [scanResults, setScanResults] = useState(null)
 
   const location = useLocation()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const queryParams = new URLSearchParams(location.search)
   const versionId = queryParams.get('v')
@@ -87,12 +87,13 @@ function SBOMs() {
     }
   }
 
-  const { data: imageVersionData, refetch, loading } = useQuery(
-    GetImgVersionPagination,
-    {
-      variables: { imageVersionId: versionId, first: 10 }
-    }
-  )
+  const {
+    data: imageVersionData,
+    refetch,
+    loading
+  } = useQuery(GetImgVersionPagination, {
+    variables: { imageVersionId: versionId, first: 10 }
+  })
 
   useEffect(() => {
     if (imageVersionData) {
@@ -158,7 +159,7 @@ function SBOMs() {
     localStorage.setItem('selectedVersion', versionId)
     refetch({ imageVersionId: value, first: 30 })
     queryParams.set('v', value)
-    history.push(`/vendor/images?v=${value}&id=${imageId}`)
+    navigate(`/vendor/images?v=${value}&id=${imageId}`)
   }
 
   const sortSBOM = sbom.sort((a, b) => a.component.localeCompare(b.component))

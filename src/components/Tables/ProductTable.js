@@ -27,7 +27,7 @@ import {
   Select
 } from '@chakra-ui/react'
 import { useContext, useEffect, useMemo, useState } from 'react'
-import { Link, useHistory } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { FaEllipsisV } from 'react-icons/fa'
 import {
   getFullDateAndTime,
@@ -54,7 +54,7 @@ const ProductTable = ({ data, refetch }) => {
   const { prodDispatch } = dispatch
 
   const toast = useToast()
-  const history = useHistory()
+  const navigate = useNavigate()
   const [activeRow, setActiveRow] = useState(null)
   const [activeProd, setActiveProd] = useState('yes')
 
@@ -187,51 +187,23 @@ const ProductTable = ({ data, refetch }) => {
         }
 
         const handleClick = () => {
-          window.localStorage.setItem('product', JSON.stringify(product))
-          setCurrentProduct({
-            id: id,
-            sbomId:
-              filteredData.length > 0 ? filteredData[0].value : sboms[0].id
-          })
+          if (sboms.length > 0) {
+            window.localStorage.setItem('product', JSON.stringify(product))
+            setCurrentProduct({
+              id: id,
+              sbomId:
+                filteredData.length > 0 ? filteredData[0].value : sboms[0].id
+            })
+          }
           setActiveProdTab(0)
         }
 
         return (
-          <>
-            {sboms.length > 0 && enabled && (
-              <Link
-                to={`/vendor/products?p=${id}&sbom=${
-                  filteredData.length > 0 ? filteredData[0].value : sboms[0].id
-                }`}
-                onClick={handleClick}
-              >
-                <Text color={'blue.500'} minWidth='100%'>
-                  {name}
-                </Text>
-              </Link>
-            )}
-
-            {sboms.length === 0 && enabled && (
-              <Text
-                minWidth='100%'
-                color={'blue.500'}
-                cursor='pointer'
-                onClick={() => {
-                  toast({
-                    title: 'SBOM Not Found',
-                    description: 'Please upload any SBOM file',
-                    status: 'info',
-                    duration: 2000,
-                    position: 'top'
-                  })
-                }}
-              >
-                {name}
-              </Text>
-            )}
-
-            {!enabled && <Text>{name}</Text>}
-          </>
+          <Link to={`/vendor/products/${name}?id=${id}`} onClick={handleClick}>
+            <Text color={'blue.500'} minWidth='100%'>
+              {name}
+            </Text>
+          </Link>
         )
       },
       wrap: true,
@@ -368,7 +340,7 @@ const ProductTable = ({ data, refetch }) => {
                         ? filteredData[0].value
                         : sboms[0].id
                     )
-                    history.push(`/vendor/autofix?id=${id}`)
+                    navigate(`/vendor/autofix?id=${id}`)
                   }}
                 >
                   Settings
@@ -384,7 +356,7 @@ const ProductTable = ({ data, refetch }) => {
                         ? filteredData[0].value
                         : null
                     )
-                    history.push(`/vendor/changelog?id=${id}`)
+                    navigate(`/vendor/changelog?id=${id}`)
                   }}
                 >
                   View Change Log

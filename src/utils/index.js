@@ -465,7 +465,6 @@ export const getActiveRoute = (routes) => {
       }
     }
   }
-  console.log(`active`, activeRoute)
   return activeRoute
 }
 

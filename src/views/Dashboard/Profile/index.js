@@ -20,14 +20,14 @@ import Card from 'components/Card/Card'
 import ComponentFeed from './components/ComponentFeed'
 import GeneralFeed from './components/GeneralFeed'
 import PersonalInfo from './components/PersonalInfo'
-import { useLocation, useHistory } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { GetOrg } from 'graphQL/Queries'
 import TokenInfo from './components/TokenInfo'
 import TeamTable from 'components/Tables/TeamTable'
 
 function Profile() {
   const location = useLocation()
-  const history = useHistory()
+  const navigate = useNavigate()
   const queryParams = new URLSearchParams(location.search)
   const activetab = queryParams.get('tab')
 
@@ -51,24 +51,24 @@ function Profile() {
   const onTabChange = (value) => {
     setTabIndex(value)
     if (value === 0) {
-      history.push('/vendor/settings?tab=general')
+      navigate('/vendor/settings?tab=general')
     } else if (value === 1) {
-      history.push('/vendor/settings?tab=team')
+      navigate('/vendor/settings?tab=team')
     } else if (value === 2) {
-      history.push('/vendor/settings?tab=feeds')
+      navigate('/vendor/settings?tab=feeds')
     } else if (value === 3) {
-      history.push('/vendor/settings?tab=checks')
+      navigate('/vendor/settings?tab=checks')
     } else if (value === 4) {
-      history.push('/vendor/settings?tab=lists')
+      navigate('/vendor/settings?tab=lists')
     }
   }
 
   const handleChange = (value) => {
     setPsIndex(value)
     if (value === 0) {
-      history.push('/vendor/settings?tab=person')
+      navigate('/vendor/settings?tab=person')
     } else if (value === 1) {
-      history.push('/vendor/settings?tab=token')
+      navigate('/vendor/settings?tab=token')
     }
   }
 

@@ -9,7 +9,7 @@ import { GetVulnData } from 'graphQL/Queries'
 import { findSimilarItems } from 'utils'
 import StepThree from './Wizard/StepThree'
 import GlobalContext from 'context/GlobalContext'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 const ImportWizard = ({
   variant,
@@ -30,7 +30,7 @@ const ImportWizard = ({
     setSelectedVulns
   } = useContext(GlobalContext)
 
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const { nextStep, prevStep, activeStep } = useSteps({
     initialStep: 0
@@ -60,7 +60,7 @@ const ImportWizard = ({
         }
       })
       .finally(() => {
-        history.push(`/vendor/products?p=${currentProductId}&sbom=${currentSbomId}`)
+        navigate(`/vendor/products?p=${currentProductId}&sbom=${currentSbomId}`)
         onClose()
       })
   }
