@@ -25,7 +25,7 @@ import {
   GetCdxResponses
 } from 'graphQL/Queries'
 import { useEffect, useState, useContext } from 'react'
-import { useLocation,useHistory } from 'react-router-dom'
+import { useLocation, useHistory } from 'react-router-dom'
 
 const ProdStatusDrawer = ({
   data,
@@ -33,7 +33,7 @@ const ProdStatusDrawer = ({
   refetch,
   filteredData,
   filterRefetch,
-  setPageIndex,
+  setPageIndex
 }) => {
   const location = useLocation()
   const history = useHistory()
@@ -78,7 +78,8 @@ const ProdStatusDrawer = ({
   const { data: allVexJustify } = useQuery(getVexJustifications)
 
   const handleRefetch = async () => {
-    const epssRange = (vulnEpss !== '' || vulnEpss !== '0-0') && vulnEpss.split('-')
+    const epssRange =
+      (vulnEpss !== '' || vulnEpss !== '0-0') && vulnEpss.split('-')
     const range = {
       min: parseFloat(epssRange[0]) / 10000,
       max: parseFloat(epssRange[1]) / 10000
@@ -88,11 +89,28 @@ const ProdStatusDrawer = ({
         projectId: productId,
         sbomId: sbomId,
         search: vulnSearchInput !== '' ? vulnSearchInput : undefined,
-        severity: !vulnSeverity.includes('all') && vulnSeverity.length > 0 ? vulnSeverity : undefined,
-        componentName: !vulnComponent.includes('all') && vulnComponent.length > 0 ? vulnComponent : undefined,
-        status: !vulnStatus.includes('all') && vulnStatus.length > 0 ? vulnStatus : undefined,
-        kev: vulnKev === 'all' || vulnKev === '' ? undefined : vulnKev === 'yes' ? true : false,
-        epss: vulnEpss === 'all' || vulnEpss === '0-0' || vulnEpss === '' ? undefined : range,
+        severity:
+          !vulnSeverity.includes('all') && vulnSeverity.length > 0
+            ? vulnSeverity
+            : undefined,
+        componentName:
+          !vulnComponent.includes('all') && vulnComponent.length > 0
+            ? vulnComponent
+            : undefined,
+        status:
+          !vulnStatus.includes('all') && vulnStatus.length > 0
+            ? vulnStatus
+            : undefined,
+        kev:
+          vulnKev === 'all' || vulnKev === ''
+            ? undefined
+            : vulnKev === 'yes'
+            ? true
+            : false,
+        epss:
+          vulnEpss === 'all' || vulnEpss === '0-0' || vulnEpss === ''
+            ? undefined
+            : range,
         first: totalRows,
         // after: vulnAfter !== '' ? vulnAfter : undefined,
         // last: vulnBefore !== '' ? totalRows : undefined,
@@ -100,18 +118,19 @@ const ProdStatusDrawer = ({
         field: vulnField,
         direction: vulnDirection
       }
-    }).then(res => {
-      if(res.data) {
-        history.push(`/vendor/products?p=${productId}&sbom=${sbomId}`)
-      }
-    }).finally(()=> setActiveProdTab(3))
+    })
+      .then((res) => {
+        if (res.data) {
+          history.push(`/vendor/products?p=${productId}&sbom=${sbomId}`)
+        }
+      })
+      .finally(() => setActiveProdTab(3))
   }
 
   const [compVexCreate] = useMutation(updateCompVulnVex, {
     fetchPolicy: 'network-only',
     onCompleted: () => handleRefetch()
   })
-
 
   const handleStatusChange = (e) => {
     const { value } = e.target
@@ -398,7 +417,6 @@ const ProdStatusDrawer = ({
                   responseTitle === '' &&
                   actionStatement === '') ||
                 (responseTitle !== '' && actionStatement === '') ||
-                (statusName === 'False Positive' && impactData === '') ||
                 (responseTitle === 'update' && selectedTag === '')
               }
             >
