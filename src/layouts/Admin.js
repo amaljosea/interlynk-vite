@@ -29,6 +29,7 @@ import { getActiveNavbar, getActiveRoute } from '../utils'
 import Automation from 'views/Dashboard/Automation'
 import ChangeLog from 'views/Dashboard/Changelog'
 import { jwtDecode } from 'jwt-decode'
+import { GlobalStateProvider } from 'hooks/useGlobalState'
 
 export default function Dashboard(props) {
   const authToken = Cookies.get('authToken')
@@ -121,41 +122,43 @@ export default function Dashboard(props) {
   }, [])
 
   return (
-    <ApolloProvider client={client}>
-      <Stack width={'100%'} direction={'row'} alignItems={'flex-start'}>
-        <Sidebar
-          routes={dashRoutes}
-          logoText={'Interlynk DASHBOARD'}
-          display='none'
-          sidebarVariant={sidebarVariant}
-          {...rest}
-        />
-        <Box minH='100vh' w={'96%'} pos={'absolute'} right={0}>
-          <Portal>
-            <AdminNavbar
-              onOpen={onOpen}
-              logoText={'Interlynk DASHBOARD'}
-              brandText={getActiveRoute(dashRoutes)}
-              secondary={getActiveNavbar(dashRoutes)}
-            />
-          </Portal>
-          <Box bg='rgba(0,0,0,0.04)' minH={'100vh'} maxH={'100%'}>
-            {getRoute() && (
-              <PanelContent>
-                <PanelContainer>
-                  <Switch>
-                    {getRoutes(dashRoutes)}
-                    <Route path={`/vendor/autofix`} component={Automation} />
-                    <Route path={`/vendor/changelog`} component={ChangeLog} />
-                    <Redirect from='/vendor' to='/vendor/dashboard' />
-                  </Switch>
-                </PanelContainer>
-              </PanelContent>
-            )}
-            <Footer />
+    <GlobalStateProvider>
+      <ApolloProvider client={client}>
+        <Stack width={'100%'} direction={'row'} alignItems={'flex-start'}>
+          <Sidebar
+            routes={dashRoutes}
+            logoText={'Interlynk DASHBOARD'}
+            display='none'
+            sidebarVariant={sidebarVariant}
+            {...rest}
+          />
+          <Box minH='100vh' w={'96%'} pos={'absolute'} right={0}>
+            <Portal>
+              <AdminNavbar
+                onOpen={onOpen}
+                logoText={'Interlynk DASHBOARD'}
+                brandText={getActiveRoute(dashRoutes)}
+                secondary={getActiveNavbar(dashRoutes)}
+              />
+            </Portal>
+            <Box bg='rgba(0,0,0,0.04)' minH={'100vh'} maxH={'100%'}>
+              {getRoute() && (
+                <PanelContent>
+                  <PanelContainer>
+                    <Switch>
+                      {getRoutes(dashRoutes)}
+                      <Route path={`/vendor/autofix`} component={Automation} />
+                      <Route path={`/vendor/changelog`} component={ChangeLog} />
+                      <Redirect from='/vendor' to='/vendor/dashboard' />
+                    </Switch>
+                  </PanelContainer>
+                </PanelContent>
+              )}
+              <Footer />
+            </Box>
           </Box>
-        </Box>
-      </Stack>
-    </ApolloProvider>
+        </Stack>
+      </ApolloProvider>
+    </GlobalStateProvider>
   )
 }
