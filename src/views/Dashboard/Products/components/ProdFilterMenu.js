@@ -10,14 +10,18 @@ import {
 } from '@chakra-ui/react'
 import { FaFilter } from 'react-icons/fa'
 import CheckMark from 'components/Misc/CheckMark'
+import { useGlobalState } from 'hooks/useGlobalState'
 
-const ProdFilterMenu = ({ activeProd, setActiveProd, onFilter }) => {
+const ProdFilterMenu = ({ onFilter }) => {
+  const { prodState } = useGlobalState()
+  const { enabled } = prodState
+
   return (
     <Stack direction={'row'} alignItems={'center'} gap={1}>
       {/* ACTIVE */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {activeProd !== '' && activeProd !== 'all' && <CheckMark />}
+          {enabled !== '' && enabled !== 'all' && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -28,11 +32,7 @@ const ProdFilterMenu = ({ activeProd, setActiveProd, onFilter }) => {
             Active
           </MenuButton>
           <MenuList>
-            <MenuOptionGroup
-              type='radio'
-              value={activeProd}
-              onChange={onFilter}
-            >
+            <MenuOptionGroup type='radio' value={enabled} onChange={onFilter}>
               {['all', 'yes', 'no'].map((item, index) => (
                 <MenuItemOption
                   key={index}

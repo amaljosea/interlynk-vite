@@ -9,32 +9,20 @@ import { useLocation } from 'react-router-dom'
 import SBOM from 'views/Sbom'
 import ProductTable from 'components/Tables/ProductTable'
 
+import { useGlobalState } from 'hooks/useGlobalState'
+
 function Index() {
+  const { totalRows, prodState, dispatch } = useGlobalState()
+  const { field, direction, enabled } = prodState
   const {
-    prodField,
-    prodDirection,
-    setTotalProducts,
-    setCompSearchInput,
-    setCompEcosystem,
-    setCompType,
-    setCompLicense,
-    setCompSupplier,
-    setCompScope,
-    setVulnSeverity,
-    setVulnComponent,
-    setVulnStatus,
-    setVulnKev,
-    setVulnEpss,
-    setMinVal,
-    setMaxVal,
-    totalRows,
-    setCheckSearchInput,
-    setCheckRules,
-    setCheckCategory,
-    setCheckSeverity,
-    setCheckStatus,
-    setCheckDirection
-  } = useContext(GlobalContext)
+    prodDispatch,
+    prodCompDispatch,
+    prodVulnDispatch,
+    prodCheckDispatch,
+    sbomLogDispatch
+  } = dispatch
+
+  const { setTotalProducts } = useContext(GlobalContext)
 
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -43,39 +31,27 @@ function Index() {
   const { data, refetch, error } = useQuery(GetProjectData, {
     variables: {
       first: totalRows,
-      enabled: true,
-      field: prodField,
-      direction: prodDirection
+      enabled: enabled === 'yes' ? true : enabled === 'no' ? false : undefined,
+      field: field,
+      direction: direction
     }
   })
 
   useEffect(() => {
     if (data) {
-      setTotalProducts(data.projects.totalCount)
+      prodDispatch({
+        type: 'SET_TOTAL_PRODUCT',
+        payload: data.projects.totalCount
+      })
     }
   }, [data])
 
   useEffect(() => {
     if (product === null) {
-      setCompSearchInput('')
-      setCompEcosystem([])
-      setCompType([])
-      setCompLicense([])
-      setCompSupplier([])
-      setCompScope('')
-      setVulnSeverity([])
-      setVulnComponent([])
-      setVulnStatus([])
-      setVulnKev('')
-      setVulnEpss('')
-      setMinVal(0)
-      setMaxVal(10000)
-      setCheckSearchInput('')
-      setCheckRules([])
-      setCheckCategory([])
-      setCheckSeverity([])
-      setCheckStatus([])
-      setCheckDirection('DESC')
+      prodCompDispatch({ type: 'CLEAR_PROD_COMP' })
+      prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
+      prodCheckDispatch({ type: 'CLEAR_PROD_CHECK' })
+      sbomLogDispatch({ type: 'CLEAR_SBOM_LOG' })
     }
   }, [product])
 
