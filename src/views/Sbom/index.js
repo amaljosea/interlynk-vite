@@ -502,7 +502,7 @@ function SBOM() {
                           </Stack>
                           {sbomData.sbom.primaryComponent && (
                             <Text fontSize={'sm'} my={0.5}>
-                              {sbomData.sbom.primaryComponent.description}
+                              {sbomData.sbom.primaryComponent.description === 'NONE' ? '' : sbomData.sbom.primaryComponent.description}
                             </Text>
                           )}
                           <Tooltip
