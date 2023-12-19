@@ -192,7 +192,7 @@ const VersionTable = ({ data, name, productId }) => {
             />
             <Portal>
               <MenuList fontSize={'sm'}>
-                <MenuItem>Remove</MenuItem>
+                <MenuItem>Delete Version</MenuItem>
               </MenuList>
             </Portal>
           </Menu>
