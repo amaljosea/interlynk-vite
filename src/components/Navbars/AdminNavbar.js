@@ -51,6 +51,14 @@ export default function AdminNavbar(props) {
       return null
     }
   })()
+  const currentSBOM = (() => {
+    try {
+      return parseJSONSafely(localStorage.getItem(`currentSBOM`))
+    } catch (error) {
+      console.log(error)
+      return null
+    }
+  })()
   const activeProd = localStorage.getItem('activeProduct')
   const subProduct = localStorage.getItem('subProduct')
   const activeSBOM = localStorage.getItem('activeSBOM')
@@ -214,10 +222,10 @@ export default function AdminNavbar(props) {
               </BreadcrumbItem>
             )}
 
-            {sbomId && activeVersion && (
+            {sbomId && currentSBOM && (
               <BreadcrumbItem color={mainText} isCurrentPage>
                 <BreadcrumbLink href=''>
-                  {activeVersion.primaryComponent?.version}
+                  {currentSBOM?.version}
                 </BreadcrumbLink>
               </BreadcrumbItem>
             )}

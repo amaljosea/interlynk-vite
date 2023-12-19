@@ -14,12 +14,16 @@ import {
   Badge
 } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
+import GlobalContext from 'context/GlobalContext'
+import { useContext } from 'react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
 import { customStyles } from 'utils'
 
 const VersionTable = ({ data, name, productId }) => {
+  const { setActiveProdTab } = useContext(GlobalContext)
+
   // COLUMNS
   const columns = [
     {
@@ -28,7 +32,19 @@ const VersionTable = ({ data, name, productId }) => {
       selector: (row) => {
         const { primaryComponent, id } = row
         return (
-          <Link to={`/vendor/products/${name}?&id=${productId}&sbom=${id}`}>
+          <Link
+            to={`/vendor/products/${name}?id=${productId}&sbom=${id}`}
+            onClick={() => {
+              localStorage.setItem(
+                'currentSBOM',
+                JSON.stringify({
+                  version: primaryComponent?.version,
+                  id: id
+                })
+              )
+              setActiveProdTab(0)
+            }}
+          >
             <Text color={'blue.500'} minWidth='100%'>
               {primaryComponent?.version}
             </Text>

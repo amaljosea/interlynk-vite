@@ -46,7 +46,7 @@ import { GetProjectData } from 'graphQL/Queries'
 import { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV, FaFilter } from 'react-icons/fa'
-import { useLocation, Link } from 'react-router-dom'
+import { useLocation, Link, useParams } from 'react-router-dom'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 const customStyles = {
@@ -68,6 +68,7 @@ const customStyles = {
 
 const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const location = useLocation()
+  const params = useParams()
   const queryParams = new URLSearchParams(location.search)
   const sbomId = queryParams.get('sbom')
   const prodId = queryParams.get('id')
@@ -289,7 +290,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
         const { part } = row
         return (
           <Link
-            to={`/vendor/products?&p=${part.project.id}&sbom=${part.id}&parts=true`}
+            to={`/vendor/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`}
           >
             <Text
               color={'blue.500'}
@@ -344,7 +345,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
         const { part } = row
         return (
           <Link
-            to={`/vendor/products?&p=${part.project.id}&sbom=${part.id}&parts=true`}
+            to={`/vendor/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`}
           >
             <Badge
               variant='solid'
@@ -386,7 +387,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
         return (
           <Stack fontWeight={'medium'} direction={'row'}>
             <Link
-              to={`/vendor/products?&p=${part.project.id}&sbom=${part.id}&parts=true`}
+              to={`/vendor/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`}
             >
               <Tooltip label='Critical' placement='top'>
                 <Badge
@@ -405,7 +406,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
               </Tooltip>
             </Link>
             <Link
-              to={`/vendor/products?&p=${part.project.id}&sbom=${part.id}&parts=true`}
+              to={`/vendor/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`}
             >
               <Tooltip label='High' placement='top'>
                 <Badge
@@ -422,7 +423,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
               </Tooltip>
             </Link>
             <Link
-              to={`/vendor/products?&p=${part.project.id}&sbom=${part.id}&parts=true`}
+              to={`/vendor/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`}
             >
               <Tooltip label='Medium' placement='top'>
                 <Badge
@@ -441,7 +442,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
               </Tooltip>
             </Link>
             <Link
-              to={`/vendor/products?&p=${part.project.id}&sbom=${part.id}&parts=true`}
+              to={`/vendor/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`}
             >
               <Tooltip label='Low' placement='top'>
                 <Badge
@@ -479,7 +480,6 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       id: 'ACTION',
       name: 'ACTION',
       selector: (row) => {
-        const { partId } = row
         return (
           <Menu>
             <MenuButton

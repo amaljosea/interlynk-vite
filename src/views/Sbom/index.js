@@ -117,6 +117,7 @@ function SBOM() {
 
   const customerView = location.pathname.startsWith('/customer')
   const currentProduct = JSON.parse(localStorage.getItem(`product`))
+  const currentSBOM = JSON.parse(localStorage.getItem(`currentSBOM`))
   const queryParams = new URLSearchParams(location.search)
   const parts = queryParams.get('parts')
   const productId = queryParams.get('id')
@@ -453,7 +454,7 @@ function SBOM() {
                         >
                           {currentProduct && parts && (
                             <Link
-                              to={`/vendor/products?&p=${currentProduct.id}&sbom=${currentProduct.sbomId}`}
+                              to={`/vendor/products/${currentProduct.name}?&id=${currentProduct.id}&sbom=${currentSBOM.id}`}
                             >
                               <HStack onClick={() => setActiveProdTab(1)}>
                                 <FaAngleLeft size={18} color='#3182CE' />
@@ -463,8 +464,7 @@ function SBOM() {
                                   color={'blue.500'}
                                   textDecor={'underline'}
                                 >
-                                  {currentProduct.name} :{' '}
-                                  {currentProduct.version}
+                                  {currentProduct.name} : {currentSBOM.version}
                                   <br />
                                 </Text>
                               </HStack>
