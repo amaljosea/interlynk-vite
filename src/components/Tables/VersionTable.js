@@ -91,7 +91,7 @@ const VersionTable = ({ name, project, productId, refetch }) => {
         const { stats } = row
         return (
           <Badge
-            width={8}
+            width={10}
             textAlign={'center'}
             variant='subtle'
             borderRadius='sm'
@@ -111,7 +111,7 @@ const VersionTable = ({ name, project, productId, refetch }) => {
         const { stats } = row
         return (
           <Badge
-            width={8}
+            width={10}
             textAlign={'center'}
             variant='subtle'
             borderRadius='sm'
@@ -133,7 +133,7 @@ const VersionTable = ({ name, project, productId, refetch }) => {
           <Stack fontWeight={'medium'} direction={'row'}>
             <Tooltip label='Critical' placement='top'>
               <Badge
-                width={8}
+                width={10}
                 textAlign='center'
                 fontSize={'sm'}
                 fontWeight={'medium'}
@@ -147,7 +147,7 @@ const VersionTable = ({ name, project, productId, refetch }) => {
             </Tooltip>
             <Tooltip label='High' placement='top'>
               <Badge
-                width={8}
+                width={10}
                 textAlign='center'
                 fontSize={'sm'}
                 fontWeight={'medium'}
@@ -161,7 +161,7 @@ const VersionTable = ({ name, project, productId, refetch }) => {
             </Tooltip>
             <Tooltip label='Medium' placement='top'>
               <Badge
-                width={8}
+                width={10}
                 textAlign='center'
                 fontSize={'sm'}
                 fontWeight={'medium'}
@@ -175,7 +175,7 @@ const VersionTable = ({ name, project, productId, refetch }) => {
             </Tooltip>
             <Tooltip label='Low' placement='top'>
               <Badge
-                width={8}
+                width={10}
                 textAlign='center'
                 fontSize={'sm'}
                 fontWeight={'medium'}

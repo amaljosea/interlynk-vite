@@ -32,7 +32,7 @@ const VulnsTable = ({ data }) => {
       selector: (row) => {
         const { vuln, id } = row
         return (
-          <Link to={`/vendor/vulnerabilities?&id=${id}`}>
+          <Link to={`/vendor/vulnerabilities?id=${id}`}>
             <Text fontSize='sm' color={'blue.500'}>
               {vuln.vulnId !== null ? `${vuln.vulnId}` : ''}
             </Text>
