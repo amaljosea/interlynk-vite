@@ -34,6 +34,7 @@ import { useContext, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV } from 'react-icons/fa'
 import { Link, useNavigate } from 'react-router-dom'
+import { timeSince } from 'utils'
 import { getFullDateAndTime } from 'utils'
 import { customStyles } from 'utils'
 
@@ -201,6 +202,19 @@ const VersionTable = ({ name, project, productId, refetch }) => {
           <Tag size='sm' colorScheme='cyan' textTransform={'capitalize'}>
             {lifecycle}
           </Tag>
+        )
+      }
+    },
+    {
+      id: 'UPDATEDAT',
+      name: 'UPDATED AT',
+      selector: (row) => {
+        const { updatedAt } = row
+
+        return (
+          <Tooltip label={getFullDateAndTime(updatedAt)} placement='top'>
+            <Text>{timeSince(updatedAt)}</Text>
+          </Tooltip>
         )
       }
     },
