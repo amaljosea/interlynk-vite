@@ -64,7 +64,9 @@ const VersionTable = ({ data, name, productId }) => {
         const { stats } = row
         return (
           <Badge
-            variant='solid'
+            width={8}
+            textAlign={'center'}
+            variant='subtle'
             borderRadius='sm'
             colorScheme='blue'
             fontSize={'sm'}
@@ -82,7 +84,9 @@ const VersionTable = ({ data, name, productId }) => {
         const { stats } = row
         return (
           <Badge
-            variant='solid'
+            width={8}
+            textAlign={'center'}
+            variant='subtle'
             borderRadius='sm'
             colorScheme='blue'
             fontSize={'sm'}
@@ -100,66 +104,62 @@ const VersionTable = ({ data, name, productId }) => {
         const { stats } = row
         return (
           <Stack fontWeight={'medium'} direction={'row'}>
-            {stats?.vulnStats?.critical && (
-              <Tooltip label='Critical' placement='top'>
-                <Badge
-                  fontSize={'sm'}
-                  fontWeight={'medium'}
-                  variant='solid'
-                  colorScheme='red'
-                  borderRadius='sm'
-                  cursor={'pointer'}
-                  onClick={() => onFilterSev(part, ['critical'])}
-                >
-                  {stats?.vulnStats?.critical}
-                </Badge>
-              </Tooltip>
-            )}
-            {stats?.vulnStats?.high && (
-              <Tooltip label='High' placement='top'>
-                <Badge
-                  fontSize={'sm'}
-                  fontWeight={'medium'}
-                  variant='solid'
-                  colorScheme='orange'
-                  borderRadius='sm'
-                  cursor={'pointer'}
-                  onClick={() => onFilterSev(part, ['high'])}
-                >
-                  {stats?.vulnStats?.high}
-                </Badge>
-              </Tooltip>
-            )}
-            {stats?.vulnStats?.medium && (
-              <Tooltip label='Medium' placement='top'>
-                <Badge
-                  fontSize={'sm'}
-                  fontWeight={'medium'}
-                  variant='solid'
-                  colorScheme='yellow'
-                  borderRadius='sm'
-                  cursor={'pointer'}
-                  onClick={() => onFilterSev(part, ['medium'])}
-                >
-                  {stats?.vulnStats?.medium}
-                </Badge>
-              </Tooltip>
-            )}
-            {stats?.vulnStats?.low && (
-              <Tooltip label='Low' placement='top'>
-                <Badge
-                  fontSize={'sm'}
-                  fontWeight={'medium'}
-                  variant='solid'
-                  colorScheme='green'
-                  borderRadius='sm'
-                  cursor={'pointer'}
-                  onClick={() => onFilterSev(part, ['low'])}
-                >
-                  {stats?.vulnStats?.low}
-                </Badge>
-              </Tooltip>
-            )}
+            <Tooltip label='Critical' placement='top'>
+              <Badge
+                width={8}
+                textAlign='center'
+                fontSize={'sm'}
+                fontWeight={'medium'}
+                variant='subtle'
+                colorScheme='red'
+                borderRadius='sm'
+                cursor={'pointer'}
+              >
+                {stats?.vulnStats?.critical ? stats.vulnStats.critical : 0}
+              </Badge>
+            </Tooltip>
+            <Tooltip label='High' placement='top'>
+              <Badge
+                width={8}
+                textAlign='center'
+                fontSize={'sm'}
+                fontWeight={'medium'}
+                variant='subtle'
+                colorScheme='orange'
+                borderRadius='sm'
+                cursor={'pointer'}
+              >
+                {stats?.vulnStats?.high ? stats.vulnStats.high : 0}
+              </Badge>
+            </Tooltip>
+            <Tooltip label='Medium' placement='top'>
+              <Badge
+                width={8}
+                textAlign='center'
+                fontSize={'sm'}
+                fontWeight={'medium'}
+                variant='subtle'
+                colorScheme='yellow'
+                borderRadius='sm'
+                cursor={'pointer'}
+              >
+                {stats?.vulnStats?.medium ? stats.vulnStats.medium : 0}
+              </Badge>
+            </Tooltip>
+            <Tooltip label='Low' placement='top'>
+              <Badge
+                width={8}
+                textAlign='center'
+                fontSize={'sm'}
+                fontWeight={'medium'}
+                variant='subtle'
+                colorScheme='green'
+                borderRadius='sm'
+                cursor={'pointer'}
+              >
+                {stats?.vulnStats?.low ? stats.vulnStats.low : 0}
+              </Badge>
+            </Tooltip>
           </Stack>
         )
       },
