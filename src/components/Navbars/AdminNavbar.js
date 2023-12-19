@@ -12,7 +12,7 @@ import {
 import PropTypes from 'prop-types'
 import React, { useContext, useState, useEffect } from 'react'
 import AdminNavbarLinks from './AdminNavbarLinks'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
 import { vulnList } from 'variables/general'
 import { GetProductInfo } from 'graphQL/Queries'
@@ -31,7 +31,7 @@ export default function AdminNavbar(props) {
 
   const [scrolled, setScrolled] = useState(false)
   const { brandText } = props
-
+  const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const versionId = queryParams.get('v')
@@ -63,6 +63,11 @@ export default function AdminNavbar(props) {
   const productName =
     productIndex !== -1 ? urlParts.slice(productIndex + 1).join('/') : ''
 
+  useEffect(() => {
+    if (currentProduct && currentProduct.name !== decodeURI(productName)) {
+      navigate('/vendor/dashboard')
+    }
+  }, [])
 
   const { data } = useQuery(GetProductInfo, {
     variables: {
@@ -204,14 +209,16 @@ export default function AdminNavbar(props) {
                 isCurrentPage={sbomId ? false : true}
               >
                 <Link to={`/vendor/products/${productName}?id=${prodID}`}>
-                  {productName}
+                  {decodeURI(productName)}
                 </Link>
               </BreadcrumbItem>
             )}
 
             {sbomId && activeVersion && (
               <BreadcrumbItem color={mainText} isCurrentPage>
-                <BreadcrumbLink href=''>{activeVersion.primaryComponent?.version}</BreadcrumbLink>
+                <BreadcrumbLink href=''>
+                  {activeVersion.primaryComponent?.version}
+                </BreadcrumbLink>
               </BreadcrumbItem>
             )}
 
