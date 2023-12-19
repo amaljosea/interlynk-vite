@@ -1,4 +1,3 @@
-import { useQuery } from '@apollo/client'
 import {
   Badge,
   Flex,
@@ -18,13 +17,22 @@ import {
   Tabs,
   Text,
   Tooltip,
-  useDisclosure
+  useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+  UnorderedList,
+  ListItem,
+  Button
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import VersionTable from 'components/Tables/VersionTable'
-import { GetProductInfo } from 'graphQL/Queries'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import {
   FaCircleCheck,
   FaCircleExclamation,
@@ -34,20 +42,27 @@ import {
   FaTrashCan,
   FaUpload
 } from 'react-icons/fa6'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { timeSince, getFullDateAndTime } from 'utils'
 import { vulnList } from 'variables/general'
 import SBOM from 'views/Sbom'
 import Controls from '../Automation/components/Controls'
 import ChangeLog from '../Changelog'
-import { GetProjectCheck } from 'graphQL/Queries'
 import Settings from '../Automation/components/Settings'
 import VulnsTable from 'components/Tables/VulnsTable'
 import ProductModal from './components/ProductModal'
 import UploadModal from './components/UploadModal'
-import { GetProductVersions } from 'graphQL/Queries'
+import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
+import { useQuery, useMutation } from '@apollo/client'
+import {
+  GetProductInfo,
+  GetProductVersions,
+  GetProjectCheck
+} from 'graphQL/Queries'
+import { UpdateProject, DeleteProject } from 'graphQL/Mutation'
 
 const ProductDetails = () => {
+  const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
@@ -59,11 +74,14 @@ const ProductDetails = () => {
     }
   })
 
-  const { data: versions } = useQuery(GetProductVersions, {
-    variables: {
-      id: productId
+  const { data: versions, refetch: sbomRefetch } = useQuery(
+    GetProductVersions,
+    {
+      variables: {
+        id: productId
+      }
     }
-  })
+  )
 
   const {
     data: rules,
@@ -73,6 +91,14 @@ const ProductDetails = () => {
     variables: {
       id: productId
     }
+  })
+
+  const [projectUpdate] = useMutation(UpdateProject, {
+    onCompleted: () => refetch({ id: productId })
+  })
+
+  const [projectDelete] = useMutation(DeleteProject, {
+    onCompleted: () => refetch({ id: productId })
   })
 
   const [activeTab, setActiveTab] = useState(0)
@@ -89,8 +115,47 @@ const ProductDetails = () => {
     onClose: onCloseUpload
   } = useDisclosure()
 
+  const {
+    isOpen: isSbomOpen,
+    onOpen: onSbomOpen,
+    onClose: onSbomClose
+  } = useDisclosure()
+
+  const {
+    isOpen: isWarningOpen,
+    onOpen: onWarningOpen,
+    onClose: onWarningClose
+  } = useDisclosure()
+
+  const {
+    isOpen: isDeleteOpen,
+    onOpen: onDeleteOpen,
+    onClose: onDeleteClose
+  } = useDisclosure()
+
   const handleTabChange = (value) => {
     setActiveTab(value)
+  }
+
+  // TOGGLE STATUS
+  const toggleStatus = async () => {
+    await projectUpdate({
+      variables: {
+        id: data?.project?.id,
+        enabled: data.project.enabled === true ? false : true
+      }
+    }).then((res) => res.data && onWarningClose())
+  }
+
+  // DELETE PRODUCT
+  const onProductDelete = async () => {
+    await projectDelete({
+      variables: {
+        id: data?.project?.id
+      }
+    })
+      .then((res) => res.data && onDeleteClose())
+      .finally(() => navigate('/vendor/products'))
   }
 
   if (loading) {
@@ -228,14 +293,15 @@ const ProductDetails = () => {
                         <IconButton
                           isDisabled={!data.project.enabled}
                           colorScheme='blue'
+                          onClick={onSbomOpen}
                           icon={<FaScrewdriverWrench />}
                         ></IconButton>
                       </Tooltip>
                       {/* UPDATE PRODUCT STATUS */}
-                      <Tooltip label='Enabled'>
+                      <Tooltip label='Status'>
                         <IconButton
-                          isDisabled={!data.project.enabled}
-                          colorScheme='blue'
+                          colorScheme={data.project.enabled ? 'green' : 'red'}
+                          onClick={onWarningOpen}
                           icon={
                             data.project.enabled ? (
                               <FaCircleCheck />
@@ -249,6 +315,7 @@ const ProductDetails = () => {
                       <Tooltip label='Archive'>
                         <IconButton
                           colorScheme='red'
+                          onClick={onDeleteOpen}
                           icon={<FaTrashCan />}
                         ></IconButton>
                       </Tooltip>
@@ -293,6 +360,7 @@ const ProductDetails = () => {
                         name={data.project.name}
                         project={versions?.project}
                         productId={productId}
+                        refetch={sbomRefetch}
                       />
                     )}
                   </TabPanel>
@@ -346,9 +414,100 @@ const ProductDetails = () => {
           <UploadModal
             id={data.project.id}
             isOpen={isOpenUpload}
-            refetch={refetch}
             onClose={onCloseUpload}
           />
+        )}
+
+        {isSbomOpen && data && (
+          <ProductSbomDrawer
+            isOpen={isSbomOpen}
+            onClose={onSbomClose}
+            data={data.project}
+            refetch={refetch}
+          />
+        )}
+
+        {/* DISABLED */}
+        {isWarningOpen && data && (
+          <Modal isOpen={isWarningOpen} onClose={onWarningClose}>
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>
+                {data.project.enabled ? 'Disable' : 'Enable'} Product
+              </ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                <Text>
+                  {data.project.enabled ? 'Disable' : 'Enable'} this product
+                  will:{' '}
+                </Text>
+                <UnorderedList>
+                  <Flex flexDir={'column'} gap={1} mt={4}>
+                    {[
+                      `${
+                        data.project.enabled ? 'Disable' : 'Enable'
+                      } this product, its versions and SBOMs`,
+                      `${
+                        data.project.enabled ? 'Disable' : 'Enable'
+                      } access to the product for all users`,
+                      `${
+                        data.project.enabled ? 'Disable' : 'Enable'
+                      } uploads of SBOMs to this product`
+                    ].map((item, index) => (
+                      <ListItem key={index}>{item}</ListItem>
+                    ))}
+                  </Flex>
+                </UnorderedList>
+                <Text mt={10}>Are you sure you wish to continue?</Text>
+              </ModalBody>
+              <ModalFooter>
+                <Button mr={3} onClick={onWarningClose}>
+                  No
+                </Button>
+                <Button
+                  colorScheme={data.project.enabled ? 'red' : 'green'}
+                  onClick={toggleStatus}
+                >
+                  Yes
+                </Button>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
+        )}
+
+        {/* DELETE */}
+        {isDeleteOpen && (
+          <Modal isOpen={isDeleteOpen} onClose={onDeleteClose}>
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>Archive Product</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                <Text>Archiving this product will: </Text>
+                <UnorderedList>
+                  <Flex flexDir={'column'} gap={1} mt={4}>
+                    {[
+                      'remove this product, its versions and SBOMs',
+                      'remove access to the product for all users',
+                      'disable uploads of SBOMs to this product'
+                    ].map((item, index) => (
+                      <ListItem key={index}>{item}</ListItem>
+                    ))}
+                  </Flex>
+                </UnorderedList>
+                <br />
+                <Text mt={10}>Are you sure you wish to continue?</Text>
+              </ModalBody>
+              <ModalFooter>
+                <Button mr={3} onClick={onDeleteClose}>
+                  No
+                </Button>
+                <Button colorScheme='red' onClick={onProductDelete}>
+                  Yes
+                </Button>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
         )}
       </>
     )

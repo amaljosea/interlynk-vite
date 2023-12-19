@@ -15,12 +15,9 @@ import {
   Alert,
   AlertIcon,
   Text,
-  Select,
-  useToast,
   Textarea
 } from '@chakra-ui/react'
-import { UpdateProject } from 'graphQL/Mutation'
-import { CreateProject } from 'graphQL/Mutation'
+import { UpdateProject, CreateProject } from 'graphQL/Mutation'
 import { useState, useEffect } from 'react'
 
 const ProductModal = ({
@@ -28,96 +25,68 @@ const ProductModal = ({
   isOpen,
   onClose,
   product,
-  type,
   description,
-  allProjects,
-  refetch,
-  totalRows
+  refetch
 }) => {
-  const toast = useToast()
-  const [projectCreate] = useMutation(CreateProject)
-  const [projectUpdate] = useMutation(UpdateProject)
+  const [projectCreate] = useMutation(CreateProject, {
+    onCompleted: () => refetch()
+  })
+  const [projectUpdate] = useMutation(UpdateProject, {
+    onCompleted: () => refetch()
+  })
 
   const [productName, setProductName] = useState('')
   const [productDesc, setProductDesc] = useState('')
-  const [kind, setKind] = useState('')
-  const [supplierName, setSupplierName] = useState('')
-  const [supplierEmail, setSupplierEmail] = useState('')
 
   useEffect(() => {
     setProductName(product)
     setProductDesc(description)
-    setKind(type)
   }, [id])
 
   const [error, setError] = useState('')
 
-  // console.log(`id`, id)
-
-  const productExist =
-    allProjects && allProjects.find((item) => item.name === `${productName}`)
-
   const updateProduct = async (e) => {
     e.preventDefault()
-    try {
-      await projectUpdate({
-        variables: {
-          id: id,
-          name: productName,
-          desc: productDesc
+    await projectUpdate({
+      variables: {
+        id: id,
+        name: productName,
+        desc: productDesc
+      }
+    })
+      .then((res) => {
+        const error = res.data.projectUpdate.errors
+        if (error.length > 0) {
+          setError(
+            'A project with same name already exists. Please choose an unique name'
+          )
+        } else {
         }
       })
-        .then((res) => {
-          const error = res.data.projectUpdate.errors
-          if (error.length > 0) {
-            toast({
-              description:
-                'A project with same name already exists. Please choose a unique name',
-              status: 'error',
-              position: 'top',
-              duration: 5000
-            })
-          } else {
-            refetch({
-              first: totalRows
-            })
-          }
-        })
-        .finally(() => onClose())
-    } catch (error) {
-      console.error('Mutation error:', error)
-    }
+      .finally(() => onClose())
   }
 
   const handleSave = async (e) => {
     e.preventDefault()
-    try {
-      await projectCreate({
-        variables: {
-          name: productName,
-          desc: productDesc
-        }
-      }).then((res) => {
+    await projectCreate({
+      variables: {
+        name: productName,
+        desc: productDesc
+      }
+    })
+      .then((res) => {
         const error = res.data.projectCreate.errors
         if (error.length > 0) {
-          toast({
-            description:
-              'A project with same name already exists. Please choose a unique name',
-            position: 'top',
-            status: 'error',
-            duration: 5000
-          })
+          setError(
+            'A project with same name already exists. Please choose an unique name'
+          )
         } else {
-          refetch({
-            first: totalRows
-          })
-          onClose()
         }
       })
-    } catch (error) {
-      console.error('Mutation error:', error)
-    }
+      .finally(() => onClose())
   }
+
+  const isInvalid = productName === '' || productDesc === '' || error !== ''
 
   return (
     <>
@@ -140,7 +109,10 @@ const ProductModal = ({
                   <Input
                     type='text'
                     value={productName || ''}
-                    onChange={(e) => setProductName(e.target.value)}
+                    onChange={(e) => {
+                      setProductName(e.target.value)
+                      setError('')
+                    }}
                     placeholder='Enter product name'
                   />
                 </FormControl>
@@ -160,11 +132,11 @@ const ProductModal = ({
                 Cancel
               </Button>
               {id ? (
-                <Button colorScheme='blue' type='submit'>
+                <Button colorScheme='blue' type='submit' disabled={isInvalid}>
                   Update
                 </Button>
               ) : (
-                <Button colorScheme='blue' type='submit'>
+                <Button colorScheme='blue' type='submit' disabled={isInvalid}>
                   Save
                 </Button>
               )}

@@ -1,6 +1,4 @@
 import { useQuery } from '@apollo/client'
-import { Flex } from '@chakra-ui/react'
-import Card from 'components/Card/Card'
 import ChangelogTable from 'components/Tables/ChangelogTable'
 import { GetProjectLogs } from 'graphQL/Queries'
 import { useEffect } from 'react'
@@ -18,6 +16,7 @@ const ChangeLog = () => {
   const { data, refetch } = useQuery(GetProjectLogs, {
     variables: {
       id: id,
+      first: 25,
       field: 'ACTIVITY_LOGS_CREATED_AT',
       direction: 'DESC'
     }

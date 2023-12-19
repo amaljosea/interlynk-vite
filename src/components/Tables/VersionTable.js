@@ -1,4 +1,5 @@
 import { useMutation } from '@apollo/client'
+import { RepeatIcon } from '@chakra-ui/icons'
 import {
   Flex,
   IconButton,
@@ -23,19 +24,20 @@ import {
   UnorderedList,
   Button,
   ListItem,
-  Spinner
+  Spinner,
+  Box
 } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
 import GlobalContext from 'context/GlobalContext'
 import { sbomDelete } from 'graphQL/Mutation'
-import { useContext, useState } from 'react'
+import { useContext, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV } from 'react-icons/fa'
 import { Link, useNavigate } from 'react-router-dom'
 import { getFullDateAndTime } from 'utils'
 import { customStyles } from 'utils'
 
-const VersionTable = ({ name, project, productId }) => {
+const VersionTable = ({ name, project, productId, refetch }) => {
   const navigate = useNavigate()
   const { setActiveProdTab } = useContext(GlobalContext)
   const [isLoading, setIsLoading] = useState(false)
@@ -234,7 +236,7 @@ const VersionTable = ({ name, project, productId }) => {
   ]
 
   const handleDelete = async () => {
-  setIsLoading(true)
+    setIsLoading(true)
     await deleteSbom({
       variables: {
         id: activeRow.id
@@ -247,17 +249,42 @@ const VersionTable = ({ name, project, productId }) => {
     })
   }
 
+  // REFRESH PRODUCTS
+  const handleRefresh = async () => {
+    await refetch({
+      id: productId
+    })
+  }
+
+  const subHeaderComponent = useMemo(() => {
+    return (
+      <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
+        <Stack direction={'row'} spacing={2} alignItems={'center'}>
+          <Tooltip label='Refresh'>
+            <IconButton
+              onClick={handleRefresh}
+              colorScheme='blue'
+              icon={<RepeatIcon />}
+            ></IconButton>
+          </Tooltip>
+        </Stack>
+      </Flex>
+    )
+  }, [handleRefresh])
+
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
-          data={project && project.sboms}
-          columns={columns}
+          subHeader
+          persistTableHead
           responsive={true}
+          columns={columns}
           customStyles={customStyles}
+          data={project && project.sboms}
           progressComponent={<CustomLoader />}
           progressPending={project ? false : true}
-          persistTableHead
+          subHeaderComponent={subHeaderComponent}
         />
       </Flex>
 
