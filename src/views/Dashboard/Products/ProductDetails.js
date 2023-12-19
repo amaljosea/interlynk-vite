@@ -288,7 +288,7 @@ const ProductDetails = () => {
                 <TabPanels>
                   {/* VERSIONS */}
                   <TabPanel>
-                    {versions && data && (
+                    {data && (
                       <VersionTable
                         name={data.project.name}
                         project={versions?.project}
