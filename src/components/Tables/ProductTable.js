@@ -47,6 +47,7 @@ import GlobalContext from 'context/GlobalContext'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import ProdFilterMenu from 'views/Dashboard/Products/components/ProdFilterMenu'
 import { useGlobalState } from 'hooks/useGlobalState'
+import ProdSearchFilter from 'views/Sbom/components/ProdSearchFilter'
 
 const ProductTable = ({ data, refetch }) => {
   const { totalRows, setTotalRows, prodState, dispatch } = useGlobalState()
@@ -492,7 +493,7 @@ const ProductTable = ({ data, refetch }) => {
       >
         <Stack direction={'row'} spacing={2} alignItems={'center'}>
           {/* SEARCH PRODUCTS */}
-          <SearchFilter
+          <ProdSearchFilter
             id='product'
             filterText={searchInput}
             onChange={onSearchInputChange}
