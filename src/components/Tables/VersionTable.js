@@ -19,6 +19,7 @@ import { useContext } from 'react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
+import { getFullDateAndTime } from 'utils'
 import { customStyles } from 'utils'
 
 const VersionTable = ({ data, name, productId }) => {
@@ -30,7 +31,7 @@ const VersionTable = ({ data, name, productId }) => {
       id: 'VERSION',
       name: 'VERSION',
       selector: (row) => {
-        const { primaryComponent, id } = row
+        const { primaryComponent, id, creationAt } = row
         return (
           <Link
             to={`/vendor/products/${name}?id=${productId}&sbom=${id}`}
@@ -46,7 +47,9 @@ const VersionTable = ({ data, name, productId }) => {
             }}
           >
             <Text color={'blue.500'} minWidth='100%'>
-              {primaryComponent?.version}
+              {primaryComponent
+                ? primaryComponent.version
+                : `Uploaded ${getFullDateAndTime(creationAt)}`}
             </Text>
           </Link>
         )

@@ -494,6 +494,7 @@ export const GetProductInfo = gql`
       updatedAt
       sboms {
         id
+        creationAt
         updatedAt
         lifecycle
         primaryComponent {
@@ -1103,7 +1104,6 @@ export const GetProjectLogs = gql`
     project(id: $id) {
       id
       activityLogs(
-        projectId: $id
         search: $search
         changedBy: $changedBy
         changeType: $changeType

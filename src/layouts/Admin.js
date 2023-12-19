@@ -93,7 +93,6 @@ export default function Dashboard(props) {
     }
   }, [])
 
-  console.log(location);
 
   useEffect(() => {
     if (location.pathname === '/vendor') {

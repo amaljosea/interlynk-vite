@@ -214,7 +214,7 @@ export default function AdminNavbar(props) {
             {productName && (
               <BreadcrumbItem
                 color={mainText}
-                isCurrentPage={sbomId ? false : true}
+                isCurrentPage={sbomId && currentSBOM ? false : true}
               >
                 <Link to={`/vendor/products/${productName}?id=${prodID}`}>
                   {decodeURI(productName)}
