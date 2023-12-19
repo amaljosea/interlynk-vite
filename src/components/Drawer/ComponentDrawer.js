@@ -533,7 +533,7 @@ function ComponentDrawer(props) {
                   gap={2}
                   mt={2}
                 >
-                  {cpeList.map((item, index) => (
+                  {cpeList?.map((item, index) => (
                     <Tag key={index} variant='solid' colorScheme={'blue'}>
                       <TagLabel
                         cursor={'pointer'}
