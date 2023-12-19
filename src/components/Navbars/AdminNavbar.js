@@ -83,7 +83,6 @@ export default function AdminNavbar(props) {
     }
   })
 
-
   // Here are all the props that may change depending on navbar's type or state.(secondary, variant, scrolled)
   let mainText = useColorModeValue('gray.700', 'gray.200')
   let secondaryText = useColorModeValue('gray.400', 'gray.200')
@@ -210,7 +209,7 @@ export default function AdminNavbar(props) {
             {productName && (
               <BreadcrumbItem
                 color={mainText}
-                isCurrentPage={sbomId && currentSBOM ? false : true}
+                isCurrentPage={currentSBOM?.version ? false : true}
               >
                 <Link to={`/vendor/products/${productName}?id=${prodID}`}>
                   {decodeURI(productName)}
@@ -218,7 +217,7 @@ export default function AdminNavbar(props) {
               </BreadcrumbItem>
             )}
 
-            {sbomId && currentSBOM && (
+            {currentSBOM?.version && (
               <BreadcrumbItem color={mainText} isCurrentPage>
                 <BreadcrumbLink href=''>{currentSBOM?.version}</BreadcrumbLink>
               </BreadcrumbItem>
