@@ -117,6 +117,7 @@ function SBOM() {
 
   const customerView = location.pathname.startsWith('/customer')
   const currentProduct = JSON.parse(localStorage.getItem(`product`))
+  const currentSBOM = JSON.parse(localStorage.getItem(`currentSBOM`))
   const queryParams = new URLSearchParams(location.search)
   const parts = queryParams.get('parts')
   const productId = queryParams.get('id')
@@ -128,11 +129,7 @@ function SBOM() {
   const [components, setComponents] = useState([])
   const [signedData, setSignedData] = useState(null)
 
-  const [selectedVersion, setSelectedVersion] = useState({
-    label: '',
-    value: '',
-    creationAt: ''
-  })
+  const [selectedVersion, setSelectedVersion] = useState(null)
 
   useEffect(() => {
     if (!idRegex.test(productId) || !idRegex.test(sbomId)) {
@@ -209,6 +206,8 @@ function SBOM() {
     }
   })
 
+  console.log('sbomData', sbomData)
+
   useEffect(() => {
     if (error) {
       toast({
@@ -266,10 +265,21 @@ function SBOM() {
     await refetch({
       projectId: productId,
       sbomId: id
-    }).then(
-      (res) =>
-        res.data && navigate(`/vendor/products/${productName}?id=${productId}&sbom=${id}`)
-    )
+    })
+      .then((res) => {
+        if (res.data) {
+          localStorage.setItem(
+            'currentSBOM',
+            JSON.stringify({
+              version: res.data.sbom.primaryComponent.version,
+              id: res.data.sbom.id
+            })
+          )
+        }
+      })
+      .finally(() =>
+        navigate(`/vendor/products/${productName}?id=${productId}&sbom=${id}`)
+      )
   }
 
   const handleSBOMChange = (select) => {
@@ -312,17 +322,17 @@ function SBOM() {
   const filterVersion =
     data && data.project.sboms.find((item) => item.id === sbomId)
 
-  useEffect(() => {
-    if (data) {
-      setSelectedVersion({
-        label: filterVersion.primaryComponent
-          ? filterVersion.primaryComponent.version
-          : 'No version available',
-        value: filterVersion.id,
-        creationAt: filterVersion.creationAt
-      })
-    }
-  }, [data])
+  // useEffect(() => {
+  //   if (data) {
+  //     setSelectedVersion({
+  //       label: filterVersion.primaryComponent
+  //         ? filterVersion.primaryComponent.version
+  //         : 'No version available',
+  //       value: filterVersion.id,
+  //       creationAt: filterVersion.creationAt
+  //     })
+  //   }
+  // }, [data])
 
   // ADD KEYBOARD SHORTCUT FOR TOGGLE DOWNLOAD MODAL
   const handleKeyDownload = (event) => {
@@ -456,7 +466,7 @@ function SBOM() {
                         >
                           {currentProduct && parts && (
                             <Link
-                              to={`/vendor/products?&p=${currentProduct.id}&sbom=${currentProduct.sbomId}`}
+                              to={`/vendor/products/${currentProduct.name}?&id=${currentProduct.id}&sbom=${currentSBOM.id}`}
                             >
                               <HStack onClick={() => setActiveProdTab(1)}>
                                 <FaAngleLeft size={18} color='#3182CE' />
@@ -466,8 +476,7 @@ function SBOM() {
                                   color={'blue.500'}
                                   textDecor={'underline'}
                                 >
-                                  {currentProduct.name} :{' '}
-                                  {currentProduct.version}
+                                  {currentProduct.name} : {currentSBOM.version}
                                   <br />
                                 </Text>
                               </HStack>
@@ -725,12 +734,13 @@ function SBOM() {
                             value={selectedVersion}
                             onChange={handleSBOMChange}
                             className='react-select'
-                            // isSearchable={
-                            //   filterVersion && filterVersion.primaryComponent
-                            //     ? true
-                            //     : false
-                            // }
-                            isSearchable={false}
+                            isSearchable={
+                              filterVersion && filterVersion.primaryComponent
+                                ? true
+                                : false
+                            }
+                            type='text'
+                            placeholder='Search versions'
                             name='versions'
                             options={filteredData}
                             noOptionsMessage={() => null}

@@ -29,6 +29,7 @@ import ProductDetails from 'views/Dashboard/Products/ProductDetails'
 import Vulnerabilities from 'views/Dashboard/Vulnerabilities'
 import Licenses from 'views/Dashboard/Linceses'
 import Profile from 'views/Dashboard/Profile'
+import Success from 'layouts/Success'
 
 const authToken = Cookies.get('authToken')
 
@@ -77,6 +78,8 @@ ReactDOM.render(
               }
             />
             <Route path={`auth`} element={<AuthLayout />} />
+            <Route path={`register`} element={<Register />} />
+            <Route path={`success`} element={<Success />} />
             <Route path={`vendor`} element={<AdminLayout />}>
               <Route
                 path=''

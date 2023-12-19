@@ -27,38 +27,34 @@ const UploadModal = ({ id, isOpen, onClose }) => {
   const [errorMessage, setErrorMessage] = useState('')
 
   const handleUpload = async (file) => {
-    try {
-      await sbomUpload({
-        variables: {
-          doc: file,
-          projectId: id
+    await sbomUpload({
+      variables: {
+        doc: file,
+        projectId: id
+      }
+    })
+      .then((res) => {
+        if (res.data.sbomUpload.errors === '[]') {
+          toast({
+            title: 'SBOM uploaded successfully and is now processing',
+            description:
+              'The validated SBOM data will be available in the product shortly. Please refresh to update the product.',
+            duration: 6500,
+            isClosable: true,
+            position: 'top',
+            variant: 'left-accent'
+          })
+        } else {
+          toast({
+            description: 'Upload failed !',
+            status: 'error',
+            duration: 4000,
+            isClosable: true,
+            position: 'top'
+          })
         }
       })
-        .then((res) => {
-          if (res.data.sbomUpload.errors === '[]') {
-            toast({
-              title: 'SBOM uploaded successfully and is now processing',
-              description:
-                'The validated SBOM data will be available in the product shortly. Please refresh to update the product.',
-              duration: 6500,
-              isClosable: true,
-              position: 'top',
-              variant: 'left-accent'
-            })
-          } else {
-            toast({
-              description: 'Upload failed !',
-              status: 'error',
-              duration: 4000,
-              isClosable: true,
-              position: 'top'
-            })
-          }
-        })
-        .finally(() => onClose())
-    } catch (error) {
-      console.error('Mutation error:', error)
-    }
+      .finally(() => onClose())
   }
 
   const handleFileChange = async (event) => {

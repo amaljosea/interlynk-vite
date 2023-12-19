@@ -66,7 +66,7 @@ const ComponentTable = ({
   const customerView = location.pathname.startsWith('/customer')
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
-
+  const currentProduct = JSON.parse(localStorage.getItem(`product`))
   const x = window.matchMedia('(min-width: 2500px)')
   const y = window.matchMedia('(max-width: 1440px)')
 
@@ -134,7 +134,7 @@ const ComponentTable = ({
     })
       .then((res) => {
         if (res.data) {
-          navigate(`/vendor/products?p=${productId}&sbom=${sbomId}`)
+          navigate(`/vendor/products/${currentProduct.name}?id=${productId}&sbom=${sbomId}`)
         }
       })
       .finally(() => setActiveProdTab(2))

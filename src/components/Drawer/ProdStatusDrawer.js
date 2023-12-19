@@ -40,7 +40,7 @@ const ProdStatusDrawer = ({
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
-
+  const currentProduct = JSON.parse(localStorage.getItem(`product`))
   const { data: res } = useQuery(GetCdxResponses)
 
   const {
@@ -103,7 +103,7 @@ const ProdStatusDrawer = ({
       }
     }).then(res => {
       if(res.data) {
-        navigate(`/vendor/products?p=${productId}&sbom=${sbomId}`)
+        navigate(`/vendor/products/${currentProduct.name}?id=${productId}&sbom=${sbomId}`)
       }
     }).finally(()=> setActiveProdTab(3))
   }

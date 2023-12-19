@@ -1,0 +1,172 @@
+import React, { useState } from 'react'
+// chakra imports
+import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  Box,
+  Button,
+  Flex,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Input,
+  Stack,
+  Text
+} from '@chakra-ui/react'
+import { OrgRegistration } from 'graphQL/Mutation'
+import { useMutation } from '@apollo/client'
+import { Link, useNavigate } from 'react-router-dom'
+
+const RegistrationForm = () => {
+  const navigate = useNavigate()
+
+  const [orgName, setOrgName] = useState('')
+  const [email, setEmail] = useState('')
+  const [emailError, setEmailError] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [error, setError] = useState('')
+  const [passError, setPassError] = useState('')
+
+  const [orgRegister] = useMutation(OrgRegistration)
+
+  const validateEmail = (email) => {
+    const emailRegex =
+      /(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g
+    return emailRegex.test(email)
+  }
+
+  const isInvalid =
+    orgName === '' ||
+    email === '' ||
+    password === '' ||
+    confirmPassword === '' ||
+    emailError !== '' ||
+    passError !== ''
+
+  const handleCheckEmail = () => {
+    if (!validateEmail(email)) {
+      setEmailError('Email is invalid')
+    }
+  }
+
+  const handleCheckPassword = () => {
+    if (confirmPassword !== '' && confirmPassword !== password) {
+      setPassError('Please enter correct password')
+    }
+  }
+
+  const handleSubmit = () => {
+    orgRegister({
+      variables: {
+        name: orgName,
+        userEmail: email,
+        password: password,
+        passwordConfirmation: confirmPassword
+      }
+    }).then((res) => res.data && navigate('/success'))
+  }
+
+  return (
+    <Flex
+      mt={2}
+      direction={'column'}
+      alignItems={'center'}
+      justifyContent={'center'}
+    >
+      <Text fontSize={'lg'} textAlign={'center'}>
+        Welcome
+      </Text>
+      <Text fontSize={'sm'} textAlign={'center'} color={'#555'}>
+        Log in to Interlynk to continue to the dashboard.
+      </Text>
+      {error !== '' && (
+        <Box mt={4} width={'100%'}>
+          <Alert status='error' borderRadius={4}>
+            <AlertIcon />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        </Box>
+      )}
+
+      <Stack py={'1rem'} direction={'column'} gap={2} width={'100%'} mt={4}>
+        <FormControl isRequired>
+          <FormLabel htmlFor='organization'>Organization</FormLabel>
+          <Input
+            type='organization'
+            value={orgName}
+            onChange={(e) => setOrgName(e.target.value)}
+            placeholder='Interlynk'
+            autoComplete='off'
+          />
+        </FormControl>
+        <FormControl isRequired isInvalid={emailError !== ''}>
+          <FormLabel htmlFor='email'>Email address</FormLabel>
+          <Input
+            type='email'
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value)
+              setEmailError('')
+            }}
+            placeholder='abc@example.com'
+            autoComplete='off'
+            onBlur={handleCheckEmail}
+          />
+          {emailError !== '' && (
+            <FormErrorMessage>{emailError}</FormErrorMessage>
+          )}
+        </FormControl>
+        <FormControl isRequired>
+          <FormLabel htmlFor='password'>Password</FormLabel>
+          <Input
+            type='password'
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder='*******'
+          />
+        </FormControl>
+        <FormControl mt={3} isRequired isInvalid={passError !== ''}>
+          <FormLabel htmlFor='ConfirmPassword'>Confirm Password</FormLabel>
+          <Input
+            type='password'
+            value={confirmPassword}
+            onChange={(e) => {
+              setConfirmPassword(e.target.value)
+              setPassError('')
+            }}
+            placeholder='*******'
+            onBlur={handleCheckPassword}
+          />
+          {passError !== '' && <FormErrorMessage>{passError}</FormErrorMessage>}
+        </FormControl>
+        <Button
+          width='full'
+          mt={5}
+          onClick={handleSubmit}
+          colorScheme='blue'
+          disabled={isInvalid}
+        >
+          Register
+        </Button>
+        <Stack
+          mt={4}
+          alignItems={'center'}
+          justifyContent={'center'}
+          direction={'row'}
+          spacing={2}
+        >
+          <Text fontSize={'sm'}>{`Already have an account ?`}</Text>
+          <Link to={'/auth'}>
+            <Text fontSize='sm' color='blue.500' fontWeight={'medium'}>
+              Login
+            </Text>
+          </Link>
+        </Stack>
+      </Stack>
+    </Flex>
+  )
+}
+
+export default RegistrationForm

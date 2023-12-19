@@ -37,7 +37,7 @@ function ProductList() {
   })
 
   useEffect(() => {
-    if (data) {
+    if (data && !error) {
       prodDispatch({
         type: 'SET_TOTAL_PRODUCT',
         payload: data.projects.totalCount
@@ -54,21 +54,21 @@ function ProductList() {
     }
   }, [product])
 
-  if (!data && error) {
+  if (error) {
     return (
       <Flex my={32} alignItems={'center'} justifyContent={'center'}>
         <Text textAlign={'center'} fontSize={14}>
-          Internal error occured. Please retry in few minutes.
+          {error.message}
         </Text>
       </Flex>
     )
-  } else {
-    return (
-      <Card overflowX={{ sm: 'scroll', xl: 'hidden' }}>
-        <ProductTable data={data?.projects} refetch={refetch} />
-      </Card>
-    )
   }
+
+  return (
+    <Card overflowX={{ sm: 'scroll', xl: 'hidden' }}>
+      <ProductTable data={data?.projects} refetch={refetch} />
+    </Card>
+  )
 }
 
 export default ProductList

@@ -19,7 +19,7 @@ import {
   Text
 } from '@chakra-ui/react'
 // core components
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import Cookies from 'js-cookie'
 import { InterlynkLogo } from 'components/Icons/Icons'
 import DashboardBg from 'assets/img/dashboard.png'
@@ -159,6 +159,23 @@ export default function Auth() {
                   >
                     Log in
                   </Button>
+                  <Stack
+                    alignItems={'center'}
+                    justifyContent={'center'}
+                    direction={'row'}
+                    spacing={2}
+                  >
+                    <Text fontSize={'sm'}>{`Don't have an account ?`}</Text>
+                    <Link to={'/register'}>
+                      <Text
+                        fontSize='sm'
+                        color='blue.500'
+                        fontWeight={'medium'}
+                      >
+                        Register
+                      </Text>
+                    </Link>
+                  </Stack>
                 </Stack>
               </form>
             </Flex>

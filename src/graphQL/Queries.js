@@ -492,8 +492,17 @@ export const GetProductInfo = gql`
       description
       enabled
       updatedAt
+    }
+  }
+`
+
+export const GetProductVersions = gql`
+  query GetProductVersions($id: Uuid!) {
+    project(id: $id) {
+      id
       sboms {
         id
+        creationAt
         updatedAt
         lifecycle
         primaryComponent {
@@ -1103,7 +1112,6 @@ export const GetProjectLogs = gql`
     project(id: $id) {
       id
       activityLogs(
-        projectId: $id
         search: $search
         changedBy: $changedBy
         changeType: $changeType

@@ -12,7 +12,7 @@ import {
 import PropTypes from 'prop-types'
 import React, { useContext, useState, useEffect } from 'react'
 import AdminNavbarLinks from './AdminNavbarLinks'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
 import { vulnList } from 'variables/general'
 import { GetProductInfo } from 'graphQL/Queries'
@@ -31,7 +31,7 @@ export default function AdminNavbar(props) {
 
   const [scrolled, setScrolled] = useState(false)
   const { brandText } = props
-
+  const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const versionId = queryParams.get('v')
@@ -51,6 +51,14 @@ export default function AdminNavbar(props) {
       return null
     }
   })()
+  const currentSBOM = (() => {
+    try {
+      return parseJSONSafely(localStorage.getItem(`currentSBOM`))
+    } catch (error) {
+      console.log(error)
+      return null
+    }
+  })()
   const activeProd = localStorage.getItem('activeProduct')
   const subProduct = localStorage.getItem('subProduct')
   const activeSBOM = localStorage.getItem('activeSBOM')
@@ -63,6 +71,11 @@ export default function AdminNavbar(props) {
   const productName =
     productIndex !== -1 ? urlParts.slice(productIndex + 1).join('/') : ''
 
+  useEffect(() => {
+    if (currentProduct && currentProduct.name !== decodeURI(productName)) {
+      navigate('/vendor/dashboard')
+    }
+  }, [])
 
   const { data } = useQuery(GetProductInfo, {
     variables: {
@@ -70,10 +83,6 @@ export default function AdminNavbar(props) {
     }
   })
 
-  const activeVersion =
-    data &&
-    data.project.sboms.length > 0 &&
-    data.project.sboms.find((item) => item.id === sbomId)
 
   // Here are all the props that may change depending on navbar's type or state.(secondary, variant, scrolled)
   let mainText = useColorModeValue('gray.700', 'gray.200')
@@ -201,17 +210,17 @@ export default function AdminNavbar(props) {
             {productName && (
               <BreadcrumbItem
                 color={mainText}
-                isCurrentPage={sbomId ? false : true}
+                isCurrentPage={sbomId && currentSBOM ? false : true}
               >
                 <Link to={`/vendor/products/${productName}?id=${prodID}`}>
-                  {productName}
+                  {decodeURI(productName)}
                 </Link>
               </BreadcrumbItem>
             )}
 
-            {sbomId && activeVersion && (
+            {sbomId && currentSBOM && (
               <BreadcrumbItem color={mainText} isCurrentPage>
-                <BreadcrumbLink href=''>{activeVersion.primaryComponent?.version}</BreadcrumbLink>
+                <BreadcrumbLink href=''>{currentSBOM?.version}</BreadcrumbLink>
               </BreadcrumbItem>
             )}
 

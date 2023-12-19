@@ -1375,3 +1375,33 @@ export const UploadProfileImage = gql`
     }
   }
 `
+
+export const OrgRegistration = gql`
+  mutation OrgRegistration(
+    $name: String!
+    $email: String
+    $url: String
+    $userFullName: String
+    $password: String!
+    $userEmail: String!
+    $passwordConfirmation: String!
+  ) {
+    organizationRegister(
+      input: {
+        organization: { name: $name, email: $email, url: $url }
+        userRegistration: {
+          name: $userFullName
+          password: $password
+          email: $userEmail
+          passwordConfirmation: $passwordConfirmation
+        }
+      }
+    ) {
+      organization {
+        id
+        name
+      }
+      errors
+    }
+  }
+`
