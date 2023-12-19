@@ -723,7 +723,7 @@ const ComponentTable = ({
               gap={1}
               flexWrap={'wrap'}
             >
-              {cpes.length > 0 &&
+              {cpes?.length > 0 &&
                 cpes.map((item, index) => (
                   <Text key={index} fontSize={14}>
                     {item}
