@@ -128,11 +128,7 @@ function SBOM() {
   const [components, setComponents] = useState([])
   const [signedData, setSignedData] = useState(null)
 
-  const [selectedVersion, setSelectedVersion] = useState({
-    label: '',
-    value: '',
-    creationAt: ''
-  })
+  const [selectedVersion, setSelectedVersion] = useState(null)
 
   useEffect(() => {
     if (!idRegex.test(productId) || !idRegex.test(sbomId)) {
@@ -268,7 +264,8 @@ function SBOM() {
       sbomId: id
     }).then(
       (res) =>
-        res.data && navigate(`/vendor/products/${productName}?id=${productId}&sbom=${id}`)
+        res.data &&
+        navigate(`/vendor/products/${productName}?id=${productId}&sbom=${id}`)
     )
   }
 
@@ -312,17 +309,17 @@ function SBOM() {
   const filterVersion =
     data && data.project.sboms.find((item) => item.id === sbomId)
 
-  useEffect(() => {
-    if (data) {
-      setSelectedVersion({
-        label: filterVersion.primaryComponent
-          ? filterVersion.primaryComponent.version
-          : 'No version available',
-        value: filterVersion.id,
-        creationAt: filterVersion.creationAt
-      })
-    }
-  }, [data])
+  // useEffect(() => {
+  //   if (data) {
+  //     setSelectedVersion({
+  //       label: filterVersion.primaryComponent
+  //         ? filterVersion.primaryComponent.version
+  //         : 'No version available',
+  //       value: filterVersion.id,
+  //       creationAt: filterVersion.creationAt
+  //     })
+  //   }
+  // }, [data])
 
   // ADD KEYBOARD SHORTCUT FOR TOGGLE DOWNLOAD MODAL
   const handleKeyDownload = (event) => {
@@ -725,12 +722,13 @@ function SBOM() {
                             value={selectedVersion}
                             onChange={handleSBOMChange}
                             className='react-select'
-                            // isSearchable={
-                            //   filterVersion && filterVersion.primaryComponent
-                            //     ? true
-                            //     : false
-                            // }
-                            isSearchable={false}
+                            isSearchable={
+                              filterVersion && filterVersion.primaryComponent
+                                ? true
+                                : false
+                            }
+                            type='text'
+                            placeholder='Search versions'
                             name='versions'
                             options={filteredData}
                             noOptionsMessage={() => null}
