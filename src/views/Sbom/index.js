@@ -206,6 +206,8 @@ function SBOM() {
     }
   })
 
+  console.log('sbomData', sbomData)
+
   useEffect(() => {
     if (error) {
       toast({
@@ -263,11 +265,21 @@ function SBOM() {
     await refetch({
       projectId: productId,
       sbomId: id
-    }).then(
-      (res) =>
-        res.data &&
+    })
+      .then((res) => {
+        if (res.data) {
+          localStorage.setItem(
+            'currentSBOM',
+            JSON.stringify({
+              version: res.data.sbom.primaryComponent.version,
+              id: res.data.sbom.id
+            })
+          )
+        }
+      })
+      .finally(() =>
         navigate(`/vendor/products/${productName}?id=${productId}&sbom=${id}`)
-    )
+      )
   }
 
   const handleSBOMChange = (select) => {
