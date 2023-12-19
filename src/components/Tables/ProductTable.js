@@ -230,7 +230,7 @@ const ProductTable = ({ data, refetch }) => {
 
         const filteredData = uniqVersions ? removeDuplicates(uniqVersions) : []
 
-        return <Text>{filteredData?.length}</Text>
+        return <Text>{sboms.length}</Text>
       },
       wrap: true
     },

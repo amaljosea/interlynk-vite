@@ -492,6 +492,14 @@ export const GetProductInfo = gql`
       description
       enabled
       updatedAt
+    }
+  }
+`
+
+export const GetProductVersions = gql`
+  query GetProductVersions($id: Uuid!) {
+    project(id: $id) {
+      id
       sboms {
         id
         creationAt

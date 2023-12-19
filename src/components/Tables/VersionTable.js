@@ -1,7 +1,14 @@
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import { useMutation } from '@apollo/client'
 import {
   Flex,
   IconButton,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
   Menu,
   MenuButton,
   MenuItem,
@@ -11,19 +18,36 @@ import {
   Text,
   Tooltip,
   Tag,
-  Badge
+  Badge,
+  useDisclosure,
+  UnorderedList,
+  Button,
+  ListItem,
+  Spinner
 } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
 import GlobalContext from 'context/GlobalContext'
-import { useContext } from 'react'
+import { sbomDelete } from 'graphQL/Mutation'
+import { useContext, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV } from 'react-icons/fa'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { getFullDateAndTime } from 'utils'
 import { customStyles } from 'utils'
 
-const VersionTable = ({ data, name, productId }) => {
+const VersionTable = ({ name, project, productId }) => {
+  const navigate = useNavigate()
   const { setActiveProdTab } = useContext(GlobalContext)
+  const [isLoading, setIsLoading] = useState(false)
+  const [activeRow, setActiveRow] = useState(null)
+
+  const [deleteSbom] = useMutation(sbomDelete)
+
+  const {
+    isOpen: isDeleteOpen,
+    onOpen: onDeleteOpen,
+    onClose: onDeleteClose
+  } = useDisclosure()
 
   // COLUMNS
   const columns = [
@@ -46,7 +70,7 @@ const VersionTable = ({ data, name, productId }) => {
               setActiveProdTab(0)
             }}
           >
-            <Text color={'blue.500'} minWidth='100%'>
+            <Text color={'blue.500'} minWidth='100%' my={3}>
               {primaryComponent
                 ? primaryComponent.version
                 : `Uploaded ${getFullDateAndTime(creationAt)}`}
@@ -192,7 +216,14 @@ const VersionTable = ({ data, name, productId }) => {
             />
             <Portal>
               <MenuList fontSize={'sm'}>
-                <MenuItem>Delete Version</MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    setActiveRow(row)
+                    onDeleteOpen()
+                  }}
+                >
+                  Delete Version
+                </MenuItem>
               </MenuList>
             </Portal>
           </Menu>
@@ -202,18 +233,80 @@ const VersionTable = ({ data, name, productId }) => {
     }
   ]
 
+  const handleDelete = async () => {
+  setIsLoading(true)
+    await deleteSbom({
+      variables: {
+        id: activeRow.id
+      }
+    }).then((res) => {
+      if (res.data.sbomDelete?.errors?.length === 0) {
+        setIsLoading(false)
+        navigate(`/vendor/products`)
+      }
+    })
+  }
+
   return (
-    <Flex flexDir={'column'} width={'100%'}>
-      <DataTable
-        data={data && data.sboms}
-        columns={columns}
-        responsive={true}
-        customStyles={customStyles}
-        progressComponent={<CustomLoader />}
-        progressPending={data ? false : true}
-        persistTableHead
-      />
-    </Flex>
+    <>
+      <Flex flexDir={'column'} width={'100%'}>
+        <DataTable
+          data={project && project.sboms}
+          columns={columns}
+          responsive={true}
+          customStyles={customStyles}
+          progressComponent={<CustomLoader />}
+          progressPending={project ? false : true}
+          persistTableHead
+        />
+      </Flex>
+
+      {/* DELETE VERSION */}
+      {isDeleteOpen && (
+        <Modal isOpen={isDeleteOpen} onClose={onDeleteClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Delete Version</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Text>Deleting this version will: </Text>
+              <UnorderedList>
+                <Flex flexDir={'column'} gap={1} mt={4}>
+                  {[
+                    'remove this versions and its SBOM',
+                    'remove access to this version for all users'
+                  ].map((item, index) => (
+                    <ListItem key={index}>{item}</ListItem>
+                  ))}
+                </Flex>
+              </UnorderedList>
+              <br />
+              <Text mt={10}>Are you sure you wish to continue?</Text>
+            </ModalBody>
+            <ModalFooter>
+              <Flex
+                width={'100%'}
+                alignItems={'center'}
+                justifyContent={'space-between'}
+                gap={4}
+              >
+                <Stack>{isLoading && <Spinner color='red.500' />}</Stack>
+                <Stack direction='row' alignItems='center' gap={1}>
+                  <Button onClick={onDeleteClose}>No</Button>
+                  <Button
+                    colorScheme='red'
+                    onClick={handleDelete}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? 'Deleting...' : 'Yes'}
+                  </Button>
+                </Stack>
+              </Flex>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      )}
+    </>
   )
 }
 

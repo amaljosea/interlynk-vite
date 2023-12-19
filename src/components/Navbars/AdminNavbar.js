@@ -83,10 +83,6 @@ export default function AdminNavbar(props) {
     }
   })
 
-  const activeVersion =
-    data &&
-    data.project.sboms.length > 0 &&
-    data.project.sboms.find((item) => item.id === sbomId)
 
   // Here are all the props that may change depending on navbar's type or state.(secondary, variant, scrolled)
   let mainText = useColorModeValue('gray.700', 'gray.200')
@@ -224,9 +220,7 @@ export default function AdminNavbar(props) {
 
             {sbomId && currentSBOM && (
               <BreadcrumbItem color={mainText} isCurrentPage>
-                <BreadcrumbLink href=''>
-                  {currentSBOM?.version}
-                </BreadcrumbLink>
+                <BreadcrumbLink href=''>{currentSBOM?.version}</BreadcrumbLink>
               </BreadcrumbItem>
             )}
 
