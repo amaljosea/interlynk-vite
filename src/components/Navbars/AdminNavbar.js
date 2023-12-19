@@ -209,7 +209,7 @@ export default function AdminNavbar(props) {
             {productName && (
               <BreadcrumbItem
                 color={mainText}
-                isCurrentPage={currentSBOM?.version ? false : true}
+                isCurrentPage={sbomId && currentSBOM?.version ? false : true}
               >
                 <Link
                   to={`/vendor/products/${productName}?id=${prodID}`}
@@ -220,7 +220,7 @@ export default function AdminNavbar(props) {
               </BreadcrumbItem>
             )}
 
-            {currentSBOM?.version && (
+            {sbomId && currentSBOM?.version && (
               <BreadcrumbItem color={mainText} isCurrentPage>
                 <BreadcrumbLink href=''>{currentSBOM?.version}</BreadcrumbLink>
               </BreadcrumbItem>
