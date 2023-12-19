@@ -195,7 +195,7 @@ export default function HeaderLinks(props) {
           }
         >
           <Text display={{ sm: 'none', md: 'flex' }} fontSize={'sm'}>
-            {username}
+            {!error && data ? username : ''}
           </Text>
         </MenuButton>
         {location.pathname.startsWith('/vendor') && (

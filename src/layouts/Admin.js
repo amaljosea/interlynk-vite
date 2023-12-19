@@ -1,11 +1,5 @@
 // Chakra imports
-import {
-  Box,
-  ChakraProvider,
-  Portal,
-  Stack,
-  useDisclosure
-} from '@chakra-ui/react'
+import { Box, Portal, Stack, useDisclosure } from '@chakra-ui/react'
 import Footer from 'components/Footer/Footer.js'
 // Layout components
 import AdminNavbar from 'components/Navbars/AdminNavbar.js'
@@ -92,7 +86,6 @@ export default function Dashboard(props) {
       navigate('/auth')
     }
   }, [])
-
 
   useEffect(() => {
     if (location.pathname === '/vendor') {
