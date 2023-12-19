@@ -211,7 +211,10 @@ export default function AdminNavbar(props) {
                 color={mainText}
                 isCurrentPage={currentSBOM?.version ? false : true}
               >
-                <Link to={`/vendor/products/${productName}?id=${prodID}`}>
+                <Link
+                  to={`/vendor/products/${productName}?id=${prodID}`}
+                  onClick={() => localStorage.removeItem('currentSBOM')}
+                >
                   {decodeURI(productName)}
                 </Link>
               </BreadcrumbItem>
