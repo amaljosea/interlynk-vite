@@ -351,7 +351,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
           <Tag
             size='md'
             variant='subtle'
-            width={10}
+            width={16}
             colorScheme={'blue'}
             onClick={getComponents}
             cursor={'pointer'}
@@ -368,7 +368,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       selector: (row) => {
         const { part } = row
         return (
-          <Tag size='md' variant='subtle' width={10} colorScheme={'blue'}>
+          <Tag size='md' variant='subtle' width={16} colorScheme={'blue'}>
             <TagLabel mx={'auto'}> {part.stats.compLicenseCount}</TagLabel>
           </Tag>
         )
