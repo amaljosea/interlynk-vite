@@ -39,6 +39,7 @@ import {
   FaCubes,
   FaPenToSquare,
   FaScrewdriverWrench,
+  FaToggleOn,
   FaTrashCan,
   FaUpload
 } from 'react-icons/fa6'
@@ -60,6 +61,7 @@ import {
   GetProjectCheck
 } from 'graphQL/Queries'
 import { UpdateProject, DeleteProject } from 'graphQL/Mutation'
+import { FaToggleOff } from 'react-icons/fa'
 
 const ProductDetails = () => {
   const navigate = useNavigate()
@@ -298,15 +300,17 @@ const ProductDetails = () => {
                         ></IconButton>
                       </Tooltip>
                       {/* UPDATE PRODUCT STATUS */}
-                      <Tooltip label='Status'>
+                      <Tooltip
+                        label={data.project.enabled ? 'Disable' : 'Enable'}
+                      >
                         <IconButton
-                          colorScheme={data.project.enabled ? 'green' : 'red'}
+                          colorScheme={'blue'}
                           onClick={onWarningOpen}
                           icon={
                             data.project.enabled ? (
-                              <FaCircleCheck />
+                              <FaToggleOff />
                             ) : (
-                              <FaCircleExclamation />
+                              <FaToggleOn />
                             )
                           }
                         ></IconButton>
