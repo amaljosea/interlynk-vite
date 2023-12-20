@@ -206,8 +206,6 @@ function SBOM() {
     }
   })
 
-  console.log('sbomData', sbomData)
-
   useEffect(() => {
     if (error) {
       toast({
@@ -230,18 +228,24 @@ function SBOM() {
 
   const uniqVersions = []
 
-  data &&
-    data.project.sboms.map((project) => {
+  const filteredDuplicated = data ? removeDuplicates(data.project.sboms) : []
+
+  filteredDuplicated &&
+    filteredDuplicated.map((project) => {
       if (project.primaryComponent) {
         uniqVersions.push({
           label: project.primaryComponent.version,
           value: project.id,
           creationAt: project.creationAt
         })
+      } else {
+        uniqVersions.push({
+          label: `Uploaded ${getFullDateAndTime(project.creationAt)}`,
+          value: project.id,
+          creationAt: project.creationAt
+        })
       }
     })
-
-  const filteredData = uniqVersions ? removeDuplicates(uniqVersions) : []
 
   const [isLoading, setIsLoading] = useState(false)
 
@@ -271,19 +275,19 @@ function SBOM() {
           localStorage.setItem(
             'currentSBOM',
             JSON.stringify({
-              version: res.data.sbom.primaryComponent.version,
+              version: res.data.sbom.primaryComponent?.version,
               id: res.data.sbom.id
             })
           )
         }
       })
-      .finally(() =>
+      .finally(() => {
         navigate(`/vendor/products/${productName}?id=${productId}&sbom=${id}`)
-      )
+        setActiveProdTab(0)
+      })
   }
 
   const handleSBOMChange = (select) => {
-    setActiveProdTab(0)
     setCompSearchInput('')
     setCompEcosystem([])
     setCompType([])
@@ -742,7 +746,7 @@ function SBOM() {
                             type='text'
                             placeholder='Search versions'
                             name='versions'
-                            options={filteredData}
+                            options={uniqVersions}
                             noOptionsMessage={() => null}
                           />
                         </Flex>
@@ -812,7 +816,7 @@ function SBOM() {
           {/* SBOM DETAILS */}
           {sbomData && (
             <SBOMTable
-              filteredData={filteredData}
+              filteredData={uniqVersions}
               data={sbomData.sbom}
               refetch={refetch}
               status={status}
