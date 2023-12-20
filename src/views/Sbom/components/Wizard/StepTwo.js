@@ -53,8 +53,8 @@ const StepTwo = ({
 
   useEffect(() => {
     if (currentSbom && importSbom) {
-      console.log('currentSbom', currentSbom)
-      console.log('importSbom', importSbom)
+      // console.log('currentSbom', currentSbom)
+      // console.log('importSbom', importSbom)
       const data = findSimilarItems(currentSbom, importSbom)
       const filterData = data.filter((item) => item.importStatus !== null)
       setMergeData(filterData)
