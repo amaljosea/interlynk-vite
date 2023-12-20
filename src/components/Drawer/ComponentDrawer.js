@@ -214,12 +214,19 @@ function ComponentDrawer(props) {
         name: compName,
         version: compVersion,
         scope: compScope,
-        licenses: {
-          licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
-          licensesExp: licenseType === 'license_exp' ? licenseExp : undefined,
-          licensesCustom:
-            licenseType === 'license_custom' ? customLicense : undefined
-        },
+        licenses:
+          spdxLicense.length === 0 &&
+          licenseExp === '' &&
+          customLicense.length === 0
+            ? undefined
+            : {
+                licenses:
+                  licenseType === 'license_spdx' ? spdxLicense : undefined,
+                licensesExp:
+                  licenseType === 'license_exp' ? licenseExp : undefined,
+                licensesCustom:
+                  licenseType === 'license_custom' ? customLicense : undefined
+              },
         cpes: cpeList,
         purl: purlValue,
         primary: isPrimary,
