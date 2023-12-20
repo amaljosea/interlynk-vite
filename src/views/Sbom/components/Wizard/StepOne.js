@@ -12,6 +12,7 @@ import GlobalContext from 'context/GlobalContext'
 import { GetProjectData, GetProject } from 'graphQL/Queries'
 import { useLazyQuery, useQuery } from '@apollo/client'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { removeDuplicates } from 'utils'
 
 const StepOne = ({
   setProductId,
@@ -30,7 +31,7 @@ const StepOne = ({
 
   const { data: allProducts } = useQuery(GetProjectData, {
     variables: {
-      first: totalProduct,
+      first: 100,
       enabled: true,
       field: field,
       direction: direction
@@ -51,21 +52,19 @@ const StepOne = ({
       )
       setSelectedProd(currentProd.id)
       setProductId(currentProd.id)
-      const filterVersion = [...currentProd.sboms].sort((a, b) => {
-        const dateA = new Date(a.creationAt)
-        const dateB = new Date(b.creationAt)
-        return dateB - dateA
-      })
-      const currentIndex = filterVersion?.findIndex(
-        (item) => item.id === currentSbomId
-      )
-      if (currentIndex !== filterVersion.length - 1) {
-        setSelectedVersion(filterVersion[currentIndex + 1].id)
-        setSbomId(filterVersion[currentIndex + 1].id)
-      } else {
-        setSelectedVersion('')
-        setSbomId('')
-      }
+      // const filterVersion = [...currentProd.sboms].filter(
+      //   (item) => item.id !== currentSbomId
+      // )
+      // const currentIndex = filterVersion?.findIndex(
+      //   (item) => item.id === currentSbomId
+      // )
+      // if (currentIndex !== filterVersion.length - 1) {
+      //   setSelectedVersion(filterVersion[currentIndex + 1].id)
+      //   setSbomId(filterVersion[currentIndex + 1].id)
+      // } else {
+      //   setSelectedVersion('')
+      //   setSbomId('')
+      // }
     }
   }, [allProducts])
 
@@ -85,46 +84,21 @@ const StepOne = ({
         }
       }).then((res) => {
         if (res.data) {
-          let versions = []
-          res.data.project.sboms.map((project) => {
-            if (project.primaryComponent) {
-              versions.push({
-                label: project.primaryComponent.version,
-                value: project.id,
-                creationAt: project.creationAt
-              })
-            }
-          })
-          setUniqVersions(versions)
+          const data = removeDuplicates(res.data.project.sboms)
+          const filtered = [...data].filter(
+            (item) => item.id !== currentSbomId && item.primaryComponent
+          )
+          if (filtered.length > 0) {
+            setSelectedVersion(filtered[0].id)
+            setUniqVersions(filtered)
+          } else {
+            setSelectedVersion('')
+            setUniqVersions([])
+          }
         }
       })
     }
   }, [selectedProd])
-
-  // REMOVE DUPLICATE PRODUCTS
-  const removeDuplicates = (arr) => {
-    const uniqueVersions = {}
-    for (const item of arr) {
-      if (
-        !uniqueVersions[item.label] ||
-        item.updatedAt > uniqueVersions[item.label].creationAt
-      ) {
-        uniqueVersions[item.label] = item
-      }
-    }
-    const versions = Object.values(uniqueVersions)
-      .sort((a, b) => {
-        const dateA = new Date(a.creationAt)
-        const dateB = new Date(b.creationAt)
-        return dateB - dateA
-      })
-      .filter((item) => item.value !== currentSbomId)
-
-    return versions
-  }
-
-
-  const filteredData = uniqVersions ? removeDuplicates(uniqVersions) : []
 
   return (
     <>
@@ -188,10 +162,10 @@ const StepOne = ({
                 }}
               >
                 <option value={''}>-- Select --</option>
-                {filteredData.length > 0 &&
-                  filteredData.map((item, index) => (
-                    <option key={index} value={item.value}>
-                      {item.label}
+                {uniqVersions.length > 0 &&
+                  uniqVersions.map((item, index) => (
+                    <option key={index} value={item.id}>
+                      {item.primaryComponent?.version}
                     </option>
                   ))}
               </Select>

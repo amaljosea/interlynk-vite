@@ -9,7 +9,7 @@ import { GetVulnData } from 'graphQL/Queries'
 import { findSimilarItems } from 'utils'
 import StepThree from './Wizard/StepThree'
 import GlobalContext from 'context/GlobalContext'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 const ImportWizard = ({
   variant,
@@ -30,6 +30,7 @@ const ImportWizard = ({
     setSelectedVulns
   } = useContext(GlobalContext)
 
+  const params = useParams()
   const navigate = useNavigate()
 
   const { nextStep, prevStep, activeStep } = useSteps({
@@ -60,7 +61,9 @@ const ImportWizard = ({
         }
       })
       .finally(() => {
-        navigate(`/vendor/products?p=${currentProductId}&sbom=${currentSbomId}`)
+        navigate(
+          `/vendor/products/${params.name}?id=${currentProductId}&sbom=${currentSbomId}`
+        )
         onClose()
       })
   }
@@ -82,6 +85,7 @@ const ImportWizard = ({
             cdxResponseId: item.importResponse
               ? item.importResponse
               : undefined,
+            fixedIn: item.importFixedIn ? item.importFixedIn : undefined,
             action: item.importActionStmt ? item.importActionStmt : undefined
           }
         })
@@ -178,7 +182,10 @@ const ImportWizard = ({
               <Button
                 variant='solid'
                 isDisabled={activeStep === 0}
-                onClick={prevStep}
+                onClick={() => {
+                  setSelectedVulns([])
+                  prevStep()
+                }}
               >
                 Back
               </Button>

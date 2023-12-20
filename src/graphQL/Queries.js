@@ -852,6 +852,7 @@ export const GetVulnData = gql`
             detail
             response
             actionStmt
+            fixedIn
             updatedAt
           }
           component {

@@ -539,7 +539,6 @@ export const findSimilarItems = (currentData, selectedData) => {
             ? matchingSelected.componentVulnLogs.length - 1
             : 0
         ]
-      console.log('selectedVuln', selectedVuln)
       return {
         ...currentItem,
         importStatus: matchingSelected.vexStatus,
@@ -549,6 +548,7 @@ export const findSimilarItems = (currentData, selectedData) => {
         importResponse: matchingSelected.cdxResponseId
           ? matchingSelected.cdxResponseId
           : null,
+        importFixedIn: selectedVuln.fixedIn || null,
         importActionStmt: selectedVuln.actionStmt || null,
         importStatement: matchingSelected.impact
       }
