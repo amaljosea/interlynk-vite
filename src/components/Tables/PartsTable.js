@@ -47,7 +47,7 @@ import { GetProjectData } from 'graphQL/Queries'
 import { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV, FaFilter } from 'react-icons/fa'
-import { useLocation, Link, useParams } from 'react-router-dom'
+import { useLocation, Link, useParams, useNavigate } from 'react-router-dom'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 const customStyles = {
@@ -68,6 +68,7 @@ const customStyles = {
 }
 
 const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
+  const navigate = useNavigate()
   const location = useLocation()
   const params = useParams()
   const queryParams = new URLSearchParams(location.search)
@@ -254,7 +255,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
     ? removeDuplicatesAndLatest(filterVersions)
     : []
 
-  const getComponents = (part) => {
+  const getComponents = () => {
     setActiveProdTab(2)
     getCompData({
       variables: {
@@ -267,10 +268,10 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
     })
   }
 
-  const onFilterSev = (part, value) => {
+  const onFilterSev = async (value) => {
     setActiveProdTab(3)
     setVulnSeverity(value)
-    getVulnData({
+    await getVulnData({
       variables: {
         projectId: prodId,
         sbomId: sbomId,
@@ -347,21 +348,16 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       selector: (row) => {
         const { part } = row
         return (
-          <Link
-            to={`/vendor/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`}
+          <Tag
+            size='md'
+            variant='subtle'
+            width={10}
+            colorScheme={'blue'}
+            onClick={getComponents}
+            cursor={'pointer'}
           >
-            <Badge
-              width={10}
-              textAlign={'center'}
-              variant='subtle'
-              borderRadius='sm'
-              colorScheme='blue'
-              fontSize={14}
-              fontWeight={'medium'}
-            >
-              {part.stats.compCount}
-            </Badge>
-          </Link>
+            <TagLabel mx={'auto'}>{part.stats.compCount}</TagLabel>
+          </Tag>
         )
       },
       width: '150px'
@@ -372,17 +368,9 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       selector: (row) => {
         const { part } = row
         return (
-          <Badge
-            width={10}
-            textAlign={'center'}
-            variant='subtle'
-            borderRadius='sm'
-            colorScheme='blue'
-            fontSize={14}
-            fontWeight={'medium'}
-          >
-            {part.stats.compLicenseCount}
-          </Badge>
+          <Tag size='md' variant='subtle' width={10} colorScheme={'blue'}>
+            <TagLabel mx={'auto'}> {part.stats.compLicenseCount}</TagLabel>
+          </Tag>
         )
       },
       width: '150px'
@@ -392,47 +380,39 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       name: 'VULNERABILITIES',
       selector: (row) => {
         const { part } = row
-        const link = `/vendor/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`
+        // const link = `/vendor/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`
         return (
           <Stack fontWeight={'medium'} direction={'row'}>
-            <Link to={link}>
-              <VulnBadge
-                color='red'
-                label='Critical'
-                onClick={() => onFilterSev(part, ['critical'])}
-              >
-                {part.stats.vulnStats.critical
-                  ? part.stats.vulnStats.critical
-                  : 0}
-              </VulnBadge>
-            </Link>
-            <Link to={link}>
-              <VulnBadge
-                color='orange'
-                label='High'
-                onClick={() => onFilterSev(part, ['high'])}
-              >
-                {part.stats.vulnStats.high ? part.stats.vulnStats.high : 0}
-              </VulnBadge>
-            </Link>
-            <Link to={link}>
-              <VulnBadge
-                color='yellow'
-                label='Medium'
-                onClick={() => onFilterSev(part, ['medium'])}
-              >
-                {part.stats.vulnStats.medium ? part.stats.vulnStats.medium : 0}
-              </VulnBadge>
-            </Link>
-            <Link to={link}>
-              <VulnBadge
-                color='green'
-                label='Low'
-                onClick={() => onFilterSev(part, ['low'])}
-              >
-                {part.stats.vulnStats.low ? part.stats.vulnStats.low : 0}
-              </VulnBadge>
-            </Link>
+            <VulnBadge
+              color='red'
+              label='Critical'
+              onClick={() => onFilterSev(['critical'])}
+            >
+              {part.stats.vulnStats.critical
+                ? part.stats.vulnStats.critical
+                : 0}
+            </VulnBadge>
+            <VulnBadge
+              color='orange'
+              label='High'
+              onClick={() => onFilterSev(['high'])}
+            >
+              {part.stats.vulnStats.high ? part.stats.vulnStats.high : 0}
+            </VulnBadge>
+            <VulnBadge
+              color='yellow'
+              label='Medium'
+              onClick={() => onFilterSev(['medium'])}
+            >
+              {part.stats.vulnStats.medium ? part.stats.vulnStats.medium : 0}
+            </VulnBadge>
+            <VulnBadge
+              color='green'
+              label='Low'
+              onClick={() => onFilterSev(['low'])}
+            >
+              {part.stats.vulnStats.low ? part.stats.vulnStats.low : 0}
+            </VulnBadge>
           </Stack>
         )
       },
