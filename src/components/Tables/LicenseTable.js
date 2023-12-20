@@ -170,8 +170,10 @@ const LicenseTable = ({ data }) => {
             colorScheme={
               status === 'approved'
                 ? 'green'
-                : status === 'rejected'
+                : status === 'denied'
                 ? 'red'
+                : status == 'review'
+                ? 'orange'
                 : 'blue'
             }
             width={'110px'}

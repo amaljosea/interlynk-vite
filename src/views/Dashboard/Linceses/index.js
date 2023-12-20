@@ -45,7 +45,7 @@ const Licenses = () => {
       isOsiApproved: false,
       fsf: true,
       custom: false,
-      status: 'rejected'
+      status: 'denied'
     },
     {
       reference: 'https://spdx.org/licenses/AdaCore-doc.html',
@@ -62,7 +62,7 @@ const Licenses = () => {
       isOsiApproved: false,
       fsf: false,
       custom: true,
-      status: 'unspecified'
+      status: 'review'
     },
     {
       reference: 'https://spdx.org/licenses/Adobe-2006.html',

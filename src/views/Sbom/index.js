@@ -539,7 +539,7 @@ function SBOM({ vulnData, vulnRefetch, getVulnData }) {
                                   color={'blue.500'}
                                   textDecor={'underline'}
                                 >
-                                  {currentProduct.name} : {currentSBOM.version}
+                                  {currentProduct.name} : {currentSBOM?.version}
                                   <br />
                                 </Text>
                               </HStack>
