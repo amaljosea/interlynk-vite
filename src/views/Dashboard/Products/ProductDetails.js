@@ -32,13 +32,12 @@ import {
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import VersionTable from 'components/Tables/VersionTable'
-import { useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import {
-  FaCircleCheck,
-  FaCircleExclamation,
   FaCubes,
   FaPenToSquare,
   FaScrewdriverWrench,
+  FaToggleOn,
   FaTrashCan,
   FaUpload
 } from 'react-icons/fa6'
@@ -53,13 +52,16 @@ import VulnsTable from 'components/Tables/VulnsTable'
 import ProductModal from './components/ProductModal'
 import UploadModal from './components/UploadModal'
 import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
-import { useQuery, useMutation } from '@apollo/client'
+import { useQuery, useMutation, useLazyQuery } from '@apollo/client'
 import {
   GetProductInfo,
   GetProductVersions,
-  GetProjectCheck
+  GetProjectCheck,
+  GetVulnData
 } from 'graphQL/Queries'
 import { UpdateProject, DeleteProject } from 'graphQL/Mutation'
+import { FaToggleOff } from 'react-icons/fa'
+import GlobalContext from 'context/GlobalContext'
 
 const ProductDetails = () => {
   const navigate = useNavigate()
@@ -67,6 +69,16 @@ const ProductDetails = () => {
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
+
+  const {
+    setVulnSeverity,
+    setVulnComponent,
+    setVulnStatus,
+    setVulnKev,
+    setVulnEpss,
+    setMinVal,
+    setMaxVal
+  } = useContext(GlobalContext)
 
   const { data, loading, error, refetch } = useQuery(GetProductInfo, {
     variables: {
@@ -92,6 +104,14 @@ const ProductDetails = () => {
       id: productId
     }
   })
+
+  // GET VULN DATA
+  const [getVulnData, { data: vulnData, refetch: vulnRefetch }] = useLazyQuery(
+    GetVulnData,
+    {
+      fetchPolicy: 'network-only'
+    }
+  )
 
   const [projectUpdate] = useMutation(UpdateProject, {
     onCompleted: () => refetch({ id: productId })
@@ -158,6 +178,18 @@ const ProductDetails = () => {
       .finally(() => navigate('/vendor/products'))
   }
 
+  useEffect(() => {
+    if (sbomId === null) {
+      setVulnSeverity([])
+      setVulnComponent([])
+      setVulnStatus([])
+      setVulnKev('')
+      setVulnEpss('')
+      setMinVal(0)
+      setMaxVal(10000)
+    }
+  }, [sbomId])
+
   if (loading) {
     return (
       <Card>
@@ -178,7 +210,13 @@ const ProductDetails = () => {
   }
 
   if (sbomId) {
-    return <SBOM />
+    return (
+      <SBOM
+        vulnData={vulnData}
+        vulnRefetch={vulnRefetch}
+        getVulnData={getVulnData}
+      />
+    )
   } else {
     return (
       <>
@@ -249,13 +287,36 @@ const ProductDetails = () => {
                         <Flex alignItems={'center'} gap={8} mt={4}>
                           {/* ENV */}
                           <Stat>
-                            <StatNumber>234</StatNumber>
-                            <StatLabel>Environments</StatLabel>
+                            <StatNumber>3</StatNumber>
+                            <StatLabel
+                              _hover={{ color: 'blue.500' }}
+                              cursor={'pointer'}
+                              onClick={() => setActiveTab(0)}
+                            >
+                              Environments
+                            </StatLabel>
+                          </Stat>
+                          {/* VERSIONS */}
+                          <Stat>
+                            <StatNumber>20</StatNumber>
+                            <StatLabel
+                              _hover={{ color: 'blue.500' }}
+                              cursor={'pointer'}
+                              onClick={() => setActiveTab(0)}
+                            >
+                              Versions
+                            </StatLabel>
                           </Stat>
                           {/* VULN */}
                           <Stat>
-                            <StatNumber>110</StatNumber>
-                            <StatLabel>Vulnerabilities</StatLabel>
+                            <StatNumber>790</StatNumber>
+                            <StatLabel
+                              _hover={{ color: 'blue.500' }}
+                              cursor={'pointer'}
+                              onClick={() => setActiveTab(1)}
+                            >
+                              Vulnerabilities
+                            </StatLabel>
                           </Stat>
                         </Flex>
                       </Flex>
@@ -298,15 +359,17 @@ const ProductDetails = () => {
                         ></IconButton>
                       </Tooltip>
                       {/* UPDATE PRODUCT STATUS */}
-                      <Tooltip label='Status'>
+                      <Tooltip
+                        label={data.project.enabled ? 'Disable' : 'Enable'}
+                      >
                         <IconButton
-                          colorScheme={data.project.enabled ? 'green' : 'red'}
+                          colorScheme={'blue'}
                           onClick={onWarningOpen}
                           icon={
                             data.project.enabled ? (
-                              <FaCircleCheck />
+                              <FaToggleOff />
                             ) : (
-                              <FaCircleExclamation />
+                              <FaToggleOn />
                             )
                           }
                         ></IconButton>
@@ -361,6 +424,7 @@ const ProductDetails = () => {
                         project={versions?.project}
                         productId={productId}
                         refetch={sbomRefetch}
+                        getVulnData={getVulnData}
                       />
                     )}
                   </TabPanel>

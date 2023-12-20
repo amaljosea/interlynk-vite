@@ -25,24 +25,53 @@ import {
   Button,
   ListItem,
   Spinner,
-  Box
+  Box,
+  TagLabel
 } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
+import VulnBadge from 'components/Misc/VulnBadge'
 import GlobalContext from 'context/GlobalContext'
 import { sbomDelete } from 'graphQL/Mutation'
-import { useContext, useMemo, useState } from 'react'
+import { useContext, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV } from 'react-icons/fa'
-import { Link, useNavigate } from 'react-router-dom'
-import { timeSince } from 'utils'
-import { getFullDateAndTime } from 'utils'
-import { customStyles } from 'utils'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import {
+  timeSince,
+  getFullDateAndTime,
+  customStyles,
+  removeDuplicates
+} from 'utils'
+import RowLimit from 'views/Sbom/components/RowLimit'
 
-const VersionTable = ({ name, project, productId, refetch }) => {
+const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
   const navigate = useNavigate()
-  const { setActiveProdTab } = useContext(GlobalContext)
+  const params = useParams()
+  const {
+    setActiveProdTab,
+    totalRows,
+    setTotalRows,
+    setVulnSeverity,
+    vulnField,
+    vulnDirection
+  } = useContext(GlobalContext)
   const [isLoading, setIsLoading] = useState(false)
   const [activeRow, setActiveRow] = useState(null)
+
+  const [currentPage, setCurrentPage] = useState(1)
+
+  const data = project ? removeDuplicates(project.sboms) : []
+
+  const totalPages = data && Math.ceil(data.length / totalRows)
+
+  const filteredData =
+    data && data.slice((currentPage - 1) * totalRows, currentPage * totalRows)
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage)
+    }
+  }
 
   const [deleteSbom] = useMutation(sbomDelete)
 
@@ -51,6 +80,28 @@ const VersionTable = ({ name, project, productId, refetch }) => {
     onOpen: onDeleteOpen,
     onClose: onDeleteClose
   } = useDisclosure()
+
+  const onFilterSev = async (id, primaryComponent, value) => {
+    localStorage.setItem(
+      'currentSBOM',
+      JSON.stringify({
+        version: primaryComponent?.version,
+        id: id
+      })
+    )
+    setActiveProdTab(3)
+    setVulnSeverity(value)
+    await getVulnData({
+      variables: {
+        projectId: productId,
+        sbomId: id,
+        severity: value,
+        first: totalRows,
+        field: vulnField,
+        direction: vulnDirection
+      }
+    })
+  }
 
   // COLUMNS
   const columns = [
@@ -73,7 +124,7 @@ const VersionTable = ({ name, project, productId, refetch }) => {
               setActiveProdTab(0)
             }}
           >
-            <Text color={'blue.500'} minWidth='100%' my={3}>
+            <Text color={'blue.500'} minWidth='100%' my={3} fontSize={14}>
               {primaryComponent
                 ? primaryComponent.version
                 : `Uploaded ${getFullDateAndTime(creationAt)}`}
@@ -82,27 +133,39 @@ const VersionTable = ({ name, project, productId, refetch }) => {
         )
       },
       wrap: true,
-      width: '200px'
+      width: '250px'
     },
     {
       id: 'COMPONENTS',
       name: 'COMPONENTS',
       selector: (row) => {
-        const { stats } = row
+        const { stats, id, primaryComponent } = row
         return (
-          <Badge
-            width={10}
-            textAlign={'center'}
-            variant='subtle'
-            borderRadius='sm'
-            colorScheme='blue'
-            fontSize={'sm'}
-            fontWeight={'medium'}
+          <Link
+            to={`/vendor/products/${params.name}?id=${productId}&sbom=${id}`}
           >
-            {stats?.compCount}
-          </Badge>
+            <Tag
+              size='md'
+              variant='subtle'
+              width={16}
+              colorScheme={'blue'}
+              onClick={() => {
+                localStorage.setItem(
+                  'currentSBOM',
+                  JSON.stringify({
+                    version: primaryComponent?.version,
+                    id: id
+                  })
+                )
+                setActiveProdTab(2)
+              }}
+            >
+              <TagLabel mx={'auto'}>{stats?.compCount}</TagLabel>
+            </Tag>
+          </Link>
         )
-      }
+      },
+      width: '150px'
     },
     {
       id: 'LICENSES',
@@ -110,87 +173,57 @@ const VersionTable = ({ name, project, productId, refetch }) => {
       selector: (row) => {
         const { stats } = row
         return (
-          <Badge
-            width={10}
-            textAlign={'center'}
-            variant='subtle'
-            borderRadius='sm'
-            colorScheme='blue'
-            fontSize={'sm'}
-            fontWeight={'medium'}
-          >
-            {stats?.compLicenseCount}
-          </Badge>
+          <Tag size='md' variant='subtle' width={16} colorScheme={'blue'}>
+            <TagLabel mx={'auto'}>{stats?.compLicenseCount}</TagLabel>
+          </Tag>
         )
-      }
+      },
+      width: '150px'
     },
     {
       id: 'VULNERABILITIES',
       name: 'VULNERABILITIES',
       selector: (row) => {
-        const { stats } = row
+        const { stats, id, primaryComponent } = row
+        const link = `/vendor/products/${params.name}?id=${productId}&sbom=${id}`
         return (
           <Stack fontWeight={'medium'} direction={'row'}>
-            <Tooltip label='Critical' placement='top'>
-              <Badge
-                width={10}
-                textAlign='center'
-                fontSize={'sm'}
-                fontWeight={'medium'}
-                variant='subtle'
-                colorScheme='red'
-                borderRadius='sm'
-                cursor={'pointer'}
-              >
+            <Link
+              to={link}
+              onClick={() => onFilterSev(id, primaryComponent, ['critical'])}
+            >
+              <VulnBadge color='red' label='Critical'>
                 {stats?.vulnStats?.critical ? stats.vulnStats.critical : 0}
-              </Badge>
-            </Tooltip>
-            <Tooltip label='High' placement='top'>
-              <Badge
-                width={10}
-                textAlign='center'
-                fontSize={'sm'}
-                fontWeight={'medium'}
-                variant='subtle'
-                colorScheme='orange'
-                borderRadius='sm'
-                cursor={'pointer'}
-              >
+              </VulnBadge>
+            </Link>
+            <Link
+              to={link}
+              onClick={() => onFilterSev(id, primaryComponent, ['high'])}
+            >
+              <VulnBadge color='orange' label='High'>
                 {stats?.vulnStats?.high ? stats.vulnStats.high : 0}
-              </Badge>
-            </Tooltip>
-            <Tooltip label='Medium' placement='top'>
-              <Badge
-                width={10}
-                textAlign='center'
-                fontSize={'sm'}
-                fontWeight={'medium'}
-                variant='subtle'
-                colorScheme='yellow'
-                borderRadius='sm'
-                cursor={'pointer'}
-              >
+              </VulnBadge>
+            </Link>
+            <Link
+              to={link}
+              onClick={() => onFilterSev(id, primaryComponent, ['medium'])}
+            >
+              <VulnBadge color='yellow' label='Medium'>
                 {stats?.vulnStats?.medium ? stats.vulnStats.medium : 0}
-              </Badge>
-            </Tooltip>
-            <Tooltip label='Low' placement='top'>
-              <Badge
-                width={10}
-                textAlign='center'
-                fontSize={'sm'}
-                fontWeight={'medium'}
-                variant='subtle'
-                colorScheme='green'
-                borderRadius='sm'
-                cursor={'pointer'}
-              >
+              </VulnBadge>
+            </Link>
+            <Link
+              to={link}
+              onClick={() => onFilterSev(id, primaryComponent, ['low'])}
+            >
+              <VulnBadge color='green' label='Low'>
                 {stats?.vulnStats?.low ? stats.vulnStats.low : 0}
-              </Badge>
-            </Tooltip>
+              </VulnBadge>
+            </Link>
           </Stack>
         )
       },
-      width: '200px'
+      width: '300px'
     },
     {
       id: 'STATUS',
@@ -199,8 +232,8 @@ const VersionTable = ({ name, project, productId, refetch }) => {
         const { lifecycle } = row
 
         return (
-          <Tag size='sm' colorScheme='cyan' textTransform={'capitalize'}>
-            {lifecycle}
+          <Tag width={24} colorScheme='cyan' textTransform={'capitalize'}>
+            <TagLabel mx={'auto'}>{lifecycle}</TagLabel>
           </Tag>
         )
       }
@@ -216,7 +249,8 @@ const VersionTable = ({ name, project, productId, refetch }) => {
             <Text>{timeSince(updatedAt)}</Text>
           </Tooltip>
         )
-      }
+      },
+      right: 'true'
     },
     {
       id: 'ACTION',
@@ -231,7 +265,7 @@ const VersionTable = ({ name, project, productId, refetch }) => {
               color='gray.400'
             />
             <Portal>
-              <MenuList fontSize={'sm'}>
+              <MenuList fontSize={16}>
                 <MenuItem
                   onClick={() => {
                     setActiveRow(row)
@@ -286,6 +320,10 @@ const VersionTable = ({ name, project, productId, refetch }) => {
     )
   }, [handleRefresh])
 
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [project])
+
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
@@ -295,12 +333,50 @@ const VersionTable = ({ name, project, productId, refetch }) => {
           responsive={true}
           columns={columns}
           customStyles={customStyles}
-          data={project && project.sboms}
+          data={filteredData && filteredData}
           progressComponent={<CustomLoader />}
           progressPending={project ? false : true}
           subHeaderComponent={subHeaderComponent}
         />
       </Flex>
+
+      {/* PAGINATION */}
+      {project && (
+        <Flex
+          width={'100%'}
+          flexDir={'row'}
+          gap={4}
+          alignItems={'center'}
+          justifyContent={'space-between'}
+          mt={6}
+        >
+          <Stack alignItems={'center'} direction={'row'} spacing={4}>
+            <Button
+              colorScheme='blue'
+              onClick={() => handlePageChange(currentPage - 1)}
+              isDisabled={currentPage === 1}
+            >
+              Previous
+            </Button>
+            <Button
+              colorScheme='blue'
+              onClick={() => handlePageChange(currentPage + 1)}
+              isDisabled={currentPage === totalPages}
+            >
+              Next
+            </Button>
+            <Box>
+              Page {currentPage} of {totalPages}
+            </Box>
+          </Stack>
+
+          {/* ROW LIMIT */}
+          <RowLimit
+            onChange={(e) => setTotalRows(e.target.value)}
+            name='componentRow'
+          />
+        </Flex>
+      )}
 
       {/* DELETE VERSION */}
       {isDeleteOpen && (

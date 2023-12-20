@@ -38,6 +38,7 @@ import {
   AlertDescription
 } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
+import VulnBadge from 'components/Misc/VulnBadge'
 import GlobalContext from 'context/GlobalContext'
 import { SbomPartDelete } from 'graphQL/Mutation'
 import { SbomPartCreate } from 'graphQL/Mutation'
@@ -46,7 +47,7 @@ import { GetProjectData } from 'graphQL/Queries'
 import { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV, FaFilter } from 'react-icons/fa'
-import { useLocation, Link, useParams } from 'react-router-dom'
+import { useLocation, Link, useParams, useNavigate } from 'react-router-dom'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 const customStyles = {
@@ -67,6 +68,7 @@ const customStyles = {
 }
 
 const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
+  const navigate = useNavigate()
   const location = useLocation()
   const params = useParams()
   const queryParams = new URLSearchParams(location.search)
@@ -253,7 +255,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
     ? removeDuplicatesAndLatest(filterVersions)
     : []
 
-  const getComponents = (part) => {
+  const getComponents = () => {
     setActiveProdTab(2)
     getCompData({
       variables: {
@@ -266,10 +268,10 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
     })
   }
 
-  const onFilterSev = (part, value) => {
+  const onFilterSev = async (value) => {
     setActiveProdTab(3)
     setVulnSeverity(value)
-    getVulnData({
+    await getVulnData({
       variables: {
         projectId: prodId,
         sbomId: sbomId,
@@ -295,6 +297,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
             <Text
               color={'blue.500'}
               minWidth='100%'
+              fontSize={14}
               onClick={() => setActiveProdTab(0)}
             >
               {part.project.name}
@@ -310,7 +313,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       name: 'VERSION',
       selector: (row) => {
         const { part } = row
-        return <Text>{part.primaryComponent.version}</Text>
+        return <Text fontSize={14}>{part.primaryComponent.version}</Text>
       }
     },
     {
@@ -325,6 +328,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
                 <Tag
                   size={'md'}
                   key={index}
+                  fontSize={14}
                   variant='subtle'
                   colorScheme='orange'
                 >
@@ -344,22 +348,19 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       selector: (row) => {
         const { part } = row
         return (
-          <Link
-            to={`/vendor/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`}
+          <Tag
+            size='md'
+            variant='subtle'
+            width={16}
+            colorScheme={'blue'}
+            onClick={getComponents}
+            cursor={'pointer'}
           >
-            <Badge
-              variant='solid'
-              borderRadius='sm'
-              colorScheme='blue'
-              fontSize={'sm'}
-              fontWeight={'medium'}
-              onClick={() => getComponents(part)}
-            >
-              {part.stats.compCount}
-            </Badge>
-          </Link>
+            <TagLabel mx={'auto'}>{part.stats.compCount}</TagLabel>
+          </Tag>
         )
-      }
+      },
+      width: '150px'
     },
     {
       id: 'LICENSES',
@@ -367,111 +368,64 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       selector: (row) => {
         const { part } = row
         return (
-          <Badge
-            variant='solid'
-            borderRadius='sm'
-            colorScheme='blue'
-            fontSize={'sm'}
-            fontWeight={'medium'}
-          >
-            {part.stats.compLicenseCount}
-          </Badge>
+          <Tag size='md' variant='subtle' width={16} colorScheme={'blue'}>
+            <TagLabel mx={'auto'}> {part.stats.compLicenseCount}</TagLabel>
+          </Tag>
         )
-      }
+      },
+      width: '150px'
     },
     {
       id: 'VULNERABILITIES',
       name: 'VULNERABILITIES',
       selector: (row) => {
         const { part } = row
+        // const link = `/vendor/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`
         return (
           <Stack fontWeight={'medium'} direction={'row'}>
-            <Link
-              to={`/vendor/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`}
+            <VulnBadge
+              color='red'
+              label='Critical'
+              onClick={() => onFilterSev(['critical'])}
             >
-              <Tooltip label='Critical' placement='top'>
-                <Badge
-                  fontSize={'sm'}
-                  fontWeight={'medium'}
-                  variant='solid'
-                  colorScheme='red'
-                  borderRadius='sm'
-                  cursor={'pointer'}
-                  onClick={() => onFilterSev(part, ['critical'])}
-                >
-                  {part.stats.vulnStats.critical
-                    ? part.stats.vulnStats.critical
-                    : 0}
-                </Badge>
-              </Tooltip>
-            </Link>
-            <Link
-              to={`/vendor/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`}
+              {part.stats.vulnStats.critical
+                ? part.stats.vulnStats.critical
+                : 0}
+            </VulnBadge>
+            <VulnBadge
+              color='orange'
+              label='High'
+              onClick={() => onFilterSev(['high'])}
             >
-              <Tooltip label='High' placement='top'>
-                <Badge
-                  fontSize={'sm'}
-                  fontWeight={'medium'}
-                  variant='solid'
-                  colorScheme='orange'
-                  borderRadius='sm'
-                  cursor={'pointer'}
-                  onClick={() => onFilterSev(part, ['high'])}
-                >
-                  {part.stats.vulnStats.high ? part.stats.vulnStats.high : 0}
-                </Badge>
-              </Tooltip>
-            </Link>
-            <Link
-              to={`/vendor/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`}
+              {part.stats.vulnStats.high ? part.stats.vulnStats.high : 0}
+            </VulnBadge>
+            <VulnBadge
+              color='yellow'
+              label='Medium'
+              onClick={() => onFilterSev(['medium'])}
             >
-              <Tooltip label='Medium' placement='top'>
-                <Badge
-                  fontSize={'sm'}
-                  fontWeight={'medium'}
-                  variant='solid'
-                  colorScheme='yellow'
-                  borderRadius='sm'
-                  cursor={'pointer'}
-                  onClick={() => onFilterSev(part, ['medium'])}
-                >
-                  {part.stats.vulnStats.medium
-                    ? part.stats.vulnStats.medium
-                    : 0}
-                </Badge>
-              </Tooltip>
-            </Link>
-            <Link
-              to={`/vendor/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`}
+              {part.stats.vulnStats.medium ? part.stats.vulnStats.medium : 0}
+            </VulnBadge>
+            <VulnBadge
+              color='green'
+              label='Low'
+              onClick={() => onFilterSev(['low'])}
             >
-              <Tooltip label='Low' placement='top'>
-                <Badge
-                  fontSize={'sm'}
-                  fontWeight={'medium'}
-                  variant='solid'
-                  colorScheme='green'
-                  borderRadius='sm'
-                  cursor={'pointer'}
-                  onClick={() => onFilterSev(part, ['low'])}
-                >
-                  {part.stats.vulnStats.low ? part.stats.vulnStats.low : 0}
-                </Badge>
-              </Tooltip>
-            </Link>
+              {part.stats.vulnStats.low ? part.stats.vulnStats.low : 0}
+            </VulnBadge>
           </Stack>
         )
       },
-      width: '200px'
+      width: '250px'
     },
     {
       id: 'STATUS',
       name: 'STATUS',
       selector: (row) => {
         const { part } = row
-
         return (
-          <Tag size='sm' colorScheme='cyan' textTransform={'capitalize'}>
-            {part.lifecycle}
+          <Tag width={24} colorScheme='cyan' textTransform={'capitalize'}>
+            <TagLabel mx={'auto'}>{part.lifecycle}</TagLabel>
           </Tag>
         )
       }

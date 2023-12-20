@@ -68,7 +68,7 @@ import ReactSelect from 'react-select'
 const idRegex =
   /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
 
-function SBOM() {
+function SBOM({ vulnData, vulnRefetch, getVulnData }) {
   const initialRef = useRef(null)
   const finalRef = useRef(null)
   const btnRef = useRef()
@@ -112,7 +112,19 @@ function SBOM() {
     setVulnIndex,
     setVulnSearchInput,
     compField,
-    compDirection
+    compDirection,
+    setLicenseType,
+    setSpdxList,
+    setSpdxLicense,
+    setLicenseExp,
+    setCustomList,
+    setCustomLicense,
+    compSearchInput,
+    compEcosystem,
+    compType,
+    compLicense,
+    compSupplier,
+    compScope,
   } = useContext(GlobalContext)
 
   const customerView = location.pathname.startsWith('/customer')
@@ -148,14 +160,6 @@ function SBOM() {
   // GET COMPONENT DATA
   const [getCompData, { data: compData, error: compError }] = useLazyQuery(
     GetComponentData,
-    {
-      fetchPolicy: 'network-only'
-    }
-  )
-
-  // GET VULN DATA
-  const [getVulnData, { data: vulnData, refetch: vulnRefetch }] = useLazyQuery(
-    GetVulnData,
     {
       fetchPolicy: 'network-only'
     }
@@ -206,8 +210,6 @@ function SBOM() {
     }
   })
 
-  console.log('sbomData', sbomData)
-
   useEffect(() => {
     if (error) {
       toast({
@@ -230,18 +232,24 @@ function SBOM() {
 
   const uniqVersions = []
 
-  data &&
-    data.project.sboms.map((project) => {
+  const filteredDuplicated = data ? removeDuplicates(data.project.sboms) : []
+
+  filteredDuplicated &&
+    filteredDuplicated.map((project) => {
       if (project.primaryComponent) {
         uniqVersions.push({
           label: project.primaryComponent.version,
           value: project.id,
           creationAt: project.creationAt
         })
+      } else {
+        uniqVersions.push({
+          label: `Uploaded ${getFullDateAndTime(project.creationAt)}`,
+          value: project.id,
+          creationAt: project.creationAt
+        })
       }
     })
-
-  const filteredData = uniqVersions ? removeDuplicates(uniqVersions) : []
 
   const [isLoading, setIsLoading] = useState(false)
 
@@ -271,19 +279,19 @@ function SBOM() {
           localStorage.setItem(
             'currentSBOM',
             JSON.stringify({
-              version: res.data.sbom.primaryComponent.version,
+              version: res.data.sbom.primaryComponent?.version,
               id: res.data.sbom.id
             })
           )
         }
       })
-      .finally(() =>
+      .finally(() => {
         navigate(`/vendor/products/${productName}?id=${productId}&sbom=${id}`)
-      )
+        setActiveProdTab(0)
+      })
   }
 
   const handleSBOMChange = (select) => {
-    setActiveProdTab(0)
     setCompSearchInput('')
     setCompEcosystem([])
     setCompType([])
@@ -356,8 +364,64 @@ function SBOM() {
 
   const [getAllComps, { data: allComponents }] = useLazyQuery(GetAllComponents)
 
+  const fetchCompData = async () => {
+    await getCompData({
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        search: compSearchInput !== '' ? compSearchInput : undefined,
+        ecosystem: compEcosystem.includes('all') || compEcosystem.length === 0 ? undefined : compEcosystem,
+        kind: compType.includes('all') || compType.length === 0 ? undefined : compType,
+        licenses: compLicense.includes('all') || compLicense.length === 0 ? undefined : compLicense,
+        supplierName: compSupplier.includes('all') || compSupplier.length === 0 ? undefined : compSupplier,
+        primary: compScope === 'primary' ? true : undefined,
+        internal: compScope === 'internal' ? true : undefined,
+        first: totalRows,
+        field: compField,
+        direction: compDirection
+      }
+    })
+      .then((res) => {
+        if (res.data) {
+          navigate(
+            `/vendor/products/${currentProduct.name}?id=${productId}&sbom=${sbomId}`
+          )
+        }
+      })
+      .finally(() => setActiveProdTab(2))
+  }
+
   const handleEditSbom = () => {
     if (sbomData.sbom.primaryComponent) {
+      const row = sbomData.sbom.primaryComponent
+      if (row.licenses && row.licenses.length > 0) {
+        setLicenseType('license_spdx')
+        const filterData = row.licenses.map((value) => ({
+          value: value,
+          label: value
+        }))
+        setSpdxList(filterData)
+        const selectedIds = filterData.map((option) => option.value)
+        setSpdxLicense(selectedIds)
+      } else if (row.licensesExp) {
+        setLicenseType('license_exp')
+        setLicenseExp(row.licensesExp)
+      } else if (row.licensesCustom && row.licensesCustom.length > 0) {
+        setLicenseType('license_custom')
+        const filterData = row.licensesCustom.map((option) => ({
+          value: option,
+          label: option
+        }))
+        setCustomList(filterData)
+        setCustomLicense(row.licensesCustom)
+      } else {
+        setLicenseType('license_spdx')
+        setSpdxList([])
+        setSpdxLicense([])
+        setLicenseExp('')
+        setCustomList([])
+        setCustomLicense([])
+      }
       setSBMOpen()
     } else {
       getAllComps({
@@ -394,7 +458,6 @@ function SBOM() {
 
   const onFilterVuln = (value) => {
     setActiveProdTab(3)
-    setCompPa
     setVulnIndex(1)
     setVulnSearchInput('')
     setVulnComponent([])
@@ -466,7 +529,7 @@ function SBOM() {
                         >
                           {currentProduct && parts && (
                             <Link
-                              to={`/vendor/products/${currentProduct.name}?&id=${currentProduct.id}&sbom=${currentSBOM.id}`}
+                              to={`/vendor/products/${currentProduct?.name}?&id=${currentProduct?.id}&sbom=${currentSBOM?.id}`}
                             >
                               <HStack onClick={() => setActiveProdTab(1)}>
                                 <FaAngleLeft size={18} color='#3182CE' />
@@ -742,7 +805,7 @@ function SBOM() {
                             type='text'
                             placeholder='Search versions'
                             name='versions'
-                            options={filteredData}
+                            options={uniqVersions}
                             noOptionsMessage={() => null}
                           />
                         </Flex>
@@ -812,19 +875,19 @@ function SBOM() {
           {/* SBOM DETAILS */}
           {sbomData && (
             <SBOMTable
-              filteredData={filteredData}
+              filteredData={uniqVersions}
               data={sbomData.sbom}
               refetch={refetch}
               status={status}
               setComponents={setComponents}
               totalComp={totalComp}
               setTotalComp={setTotalComp}
+              vulnData={vulnData}
+              vulnRefetch={vulnRefetch}
               getVulnData={getVulnData}
               getCompData={getCompData}
               compData={compData}
               error={compError}
-              vulnData={vulnData}
-              vulnRefetch={vulnRefetch}
               type={
                 selectedProject?.sboms.length > 0 &&
                 selectedProject.sboms[0].format
@@ -849,16 +912,8 @@ function SBOM() {
               isOpen={isSBMOpen}
               onClose={setSBMClose}
               btnRef={btnRef}
-              component={primaryComp.name}
-              version={primaryComp.version}
-              license={primaryComp.licenses}
-              group={primaryComp.group}
-              type={primaryComp.kind}
-              cpes={primaryComp.cpes}
-              purl={primaryComp.purl}
-              primary={primaryComp.primary}
-              internal={primaryComp.internal}
-              refetch={refetch}
+              data={primaryComp}
+              fetchCompData={fetchCompData}
               shortDesc={null}
               totalRows={null}
             />

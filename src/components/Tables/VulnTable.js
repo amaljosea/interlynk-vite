@@ -100,7 +100,8 @@ const VulnTable = ({
     signedVulnEpss,
     setSelectedVulns,
     setVulnAfter,
-    setVulnBefore
+    setVulnBefore,
+    setImportSbom
   } = useContext(GlobalContext)
 
   const textColor = useColorModeValue('gray.700', 'white')
@@ -917,7 +918,7 @@ const VulnTable = ({
         >
           <DrawerOverlay />
           <DrawerContent>
-            <DrawerCloseButton />
+            <DrawerCloseButton onClick={() => setImportSbom([])} />
             <DrawerHeader>
               <Text fontSize={20} fontWeight={'medium'}>
                 Import Vulnerability Status

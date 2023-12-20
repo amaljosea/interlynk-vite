@@ -155,33 +155,22 @@ const ProductTable = ({ data, refetch }) => {
       id: 'PROJECTS_NAME',
       name: 'PRODUCT',
       selector: (row) => {
-        const { enabled, sboms, name, id } = row
-        const uniqVersions = []
-        sboms &&
-          sboms.map((project) => {
-            if (project.primaryComponent) {
-              uniqVersions.push({
-                label: project.primaryComponent.version,
-                value: project.id,
-                creationAt: project.creationAt
-              })
-            }
-          })
+        const { sboms, name, id } = row
 
-        const filteredData = uniqVersions ? removeDuplicates(uniqVersions) : []
+        const data = sboms ? removeDuplicates(sboms) : []
 
         const product = {
           id: id,
           name: name,
           version:
-            filteredData.length > 0
-              ? filteredData[0].label
+            data.length > 0
+              ? data[0].primaryComponent?.version
               : sboms.length > 0
               ? sboms[0].primaryComponent?.version
               : '',
           sbomId:
-            filteredData.length > 0
-              ? filteredData[0].value
+            data.length > 0
+              ? data[0].primaryComponent?.version
               : sboms.length > 0
               ? sboms[0].id
               : ''
@@ -193,7 +182,9 @@ const ProductTable = ({ data, refetch }) => {
             setCurrentProduct({
               id: id,
               sbomId:
-                filteredData.length > 0 ? filteredData[0].value : sboms[0].id
+                data.length > 0
+                  ? data[0].primaryComponent?.version
+                  : sboms[0].id
             })
           }
           setActiveProdTab(0)
@@ -216,21 +207,8 @@ const ProductTable = ({ data, refetch }) => {
       name: 'VERSION',
       selector: (row) => {
         const { sboms } = row
-        const uniqVersions = []
-        sboms &&
-          sboms.map((project) => {
-            if (project.primaryComponent) {
-              uniqVersions.push({
-                label: project.primaryComponent.version,
-                value: project.id,
-                creationAt: project.creationAt
-              })
-            }
-          })
-
-        const filteredData = uniqVersions ? removeDuplicates(uniqVersions) : []
-
-        return <Text>{sboms.length}</Text>
+        const data = sboms ? removeDuplicates(sboms) : []
+        return <Text>{data.length}</Text>
       },
       wrap: true
     },

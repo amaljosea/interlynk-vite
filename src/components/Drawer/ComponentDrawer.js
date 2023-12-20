@@ -78,7 +78,8 @@ function ComponentDrawer(props) {
     customLicense,
     purlString,
     licenseExp,
-    isCpeValid
+    isCpeValid,
+    setComPageIndex
   } = useContext(GlobalContext)
 
   const onFilterRefetch = () => {
@@ -213,12 +214,19 @@ function ComponentDrawer(props) {
         name: compName,
         version: compVersion,
         scope: compScope,
-        licenses: {
-          licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
-          licensesExp: licenseType === 'license_exp' ? licenseExp : undefined,
-          licensesCustom:
-            licenseType === 'license_custom' ? customLicense : undefined
-        },
+        licenses:
+          spdxLicense.length === 0 &&
+          licenseExp === '' &&
+          customLicense.length === 0
+            ? undefined
+            : {
+                licenses:
+                  licenseType === 'license_spdx' ? spdxLicense : undefined,
+                licensesExp:
+                  licenseType === 'license_exp' ? licenseExp : undefined,
+                licensesCustom:
+                  licenseType === 'license_custom' ? customLicense : undefined
+              },
         cpes: cpeList,
         purl: purlValue,
         primary: isPrimary,
@@ -227,6 +235,7 @@ function ComponentDrawer(props) {
     })
       .then((res) => {
         if (res.data) {
+          setComPageIndex(1)
           onFilterRefetch()
           onClose()
         }
@@ -243,35 +252,42 @@ function ComponentDrawer(props) {
   }
 
   const handleUpdateCom = async () => {
-    try {
-      await updateComponent({
-        variables: {
-          id: data?.id,
-          sbomId: sbomId,
-          kind: compKind,
-          name: compName,
-          version: compVersion,
-          scope: compScope,
-          licenses: {
-            licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
-            licensesExp: licenseType === 'license_exp' ? licenseExp : undefined,
-            licensesCustom:
-              licenseType === 'license_custom' ? customLicense : undefined
-          },
-          cpes:
-            cpeList.length > 0 ? cpeList : cpeValue !== '' ? [cpeValue] : [],
-          purl: purlValue,
-          primary: isPrimary,
-          internal: isInternal
-        }
-      }).then((res) => res.data && onClose())
-    } catch (error) {
-      console.error('Mutation error:', error)
-    }
+    await updateComponent({
+      variables: {
+        id: data?.id,
+        sbomId: sbomId,
+        kind: compKind,
+        name: compName,
+        version: compVersion,
+        scope: compScope,
+        licenses:
+          spdxLicense.length === 0 &&
+          licenseExp === '' &&
+          customLicense.length === 0
+            ? undefined
+            : {
+                licenses:
+                  licenseType === 'license_spdx' ? spdxLicense : undefined,
+                licensesExp:
+                  licenseType === 'license_exp' ? licenseExp : undefined,
+                licensesCustom:
+                  licenseType === 'license_custom' ? customLicense : undefined
+              },
+        cpes: cpeList.length > 0 ? cpeList : cpeValue !== '' ? [cpeValue] : [],
+        purl: purlValue,
+        primary: isPrimary,
+        internal: isInternal
+      }
+    }).then((res) => {
+      if (res.data) {
+        setComPageIndex(1)
+        onClose()
+      }
+    })
   }
 
   const handleCreateCpe = (string) => {
-    const cpeItem = cpeList.find((item) => item === string)
+    const cpeItem = cpeList?.find((item) => item === string)
     if (cpeItem) {
       toast({
         description: 'CPE already exists',
