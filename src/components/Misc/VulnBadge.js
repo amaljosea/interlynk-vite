@@ -1,21 +1,11 @@
-import { Badge, Tooltip } from '@chakra-ui/react'
+import { Tag, TagLabel, Tooltip } from '@chakra-ui/react'
 
 const VulnBadge = ({ color, children, label, onClick }) => {
   return (
     <Tooltip label={label} placement='top'>
-      <Badge
-        width={10}
-        textAlign='center'
-        fontSize={14}
-        fontWeight={'medium'}
-        variant='subtle'
-        colorScheme={color}
-        borderRadius='sm'
-        cursor={'pointer'}
-        onClick={onClick}
-      >
-        {children}
-      </Badge>
+      <Tag size='md' key='md' variant='subtle' width={10} colorScheme={color}>
+        <TagLabel mx={'auto'}>{children}</TagLabel>
+      </Tag>
     </Tooltip>
   )
 }

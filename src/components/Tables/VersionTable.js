@@ -92,17 +92,9 @@ const VersionTable = ({ name, project, productId, refetch }) => {
       selector: (row) => {
         const { stats } = row
         return (
-          <Badge
-            width={10}
-            textAlign={'center'}
-            variant='subtle'
-            borderRadius='sm'
-            colorScheme='blue'
-            fontSize={14}
-            fontWeight={'medium'}
-          >
-            {stats?.compCount}
-          </Badge>
+          <Tag size='md' variant='subtle' width={10} colorScheme={'blue'}>
+            <TagLabel mx={'auto'}> {stats?.compCount}</TagLabel>
+          </Tag>
         )
       },
       width: '150px'
@@ -113,17 +105,9 @@ const VersionTable = ({ name, project, productId, refetch }) => {
       selector: (row) => {
         const { stats } = row
         return (
-          <Badge
-            width={10}
-            textAlign={'center'}
-            variant='subtle'
-            borderRadius='sm'
-            colorScheme='blue'
-            fontSize={14}
-            fontWeight={'medium'}
-          >
-            {stats?.compLicenseCount}
-          </Badge>
+          <Tag size='md' variant='subtle' width={10} colorScheme={'blue'}>
+            <TagLabel mx={'auto'}>{stats?.compLicenseCount}</TagLabel>
+          </Tag>
         )
       },
       width: '150px'
@@ -159,12 +143,7 @@ const VersionTable = ({ name, project, productId, refetch }) => {
         const { lifecycle } = row
 
         return (
-          <Tag
-            width={20}
-            fontSize={14}
-            colorScheme='cyan'
-            textTransform={'capitalize'}
-          >
+          <Tag width={24} colorScheme='cyan' textTransform={'capitalize'}>
             <TagLabel mx={'auto'}>{lifecycle}</TagLabel>
           </Tag>
         )
@@ -197,7 +176,7 @@ const VersionTable = ({ name, project, productId, refetch }) => {
               color='gray.400'
             />
             <Portal>
-              <MenuList fontSize={14}>
+              <MenuList fontSize={16}>
                 <MenuItem
                   onClick={() => {
                     setActiveRow(row)
