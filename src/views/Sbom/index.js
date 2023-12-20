@@ -68,7 +68,7 @@ import ReactSelect from 'react-select'
 const idRegex =
   /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
 
-function SBOM() {
+function SBOM({ vulnData, vulnRefetch, getVulnData }) {
   const initialRef = useRef(null)
   const finalRef = useRef(null)
   const btnRef = useRef()
@@ -148,14 +148,6 @@ function SBOM() {
   // GET COMPONENT DATA
   const [getCompData, { data: compData, error: compError }] = useLazyQuery(
     GetComponentData,
-    {
-      fetchPolicy: 'network-only'
-    }
-  )
-
-  // GET VULN DATA
-  const [getVulnData, { data: vulnData, refetch: vulnRefetch }] = useLazyQuery(
-    GetVulnData,
     {
       fetchPolicy: 'network-only'
     }
@@ -398,7 +390,6 @@ function SBOM() {
 
   const onFilterVuln = (value) => {
     setActiveProdTab(3)
-    setCompPa
     setVulnIndex(1)
     setVulnSearchInput('')
     setVulnComponent([])
@@ -470,7 +461,7 @@ function SBOM() {
                         >
                           {currentProduct && parts && (
                             <Link
-                              to={`/vendor/products/${currentProduct.name}?&id=${currentProduct.id}&sbom=${currentSBOM.id}`}
+                              to={`/vendor/products/${currentProduct?.name}?&id=${currentProduct?.id}&sbom=${currentSBOM?.id}`}
                             >
                               <HStack onClick={() => setActiveProdTab(1)}>
                                 <FaAngleLeft size={18} color='#3182CE' />
@@ -823,12 +814,12 @@ function SBOM() {
               setComponents={setComponents}
               totalComp={totalComp}
               setTotalComp={setTotalComp}
+              vulnData={vulnData}
+              vulnRefetch={vulnRefetch}
               getVulnData={getVulnData}
               getCompData={getCompData}
               compData={compData}
               error={compError}
-              vulnData={vulnData}
-              vulnRefetch={vulnRefetch}
               type={
                 selectedProject?.sboms.length > 0 &&
                 selectedProject.sboms[0].format

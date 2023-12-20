@@ -35,7 +35,7 @@ import { sbomDelete } from 'graphQL/Mutation'
 import { useContext, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV } from 'react-icons/fa'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
   timeSince,
   getFullDateAndTime,
@@ -44,17 +44,24 @@ import {
 } from 'utils'
 import RowLimit from 'views/Sbom/components/RowLimit'
 
-const VersionTable = ({ name, project, productId, refetch }) => {
+const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
   const navigate = useNavigate()
-  const { setActiveProdTab, totalRows, setTotalRows } =
-    useContext(GlobalContext)
+  const params = useParams()
+  const {
+    setActiveProdTab,
+    totalRows,
+    setTotalRows,
+    setVulnSeverity,
+    vulnField,
+    vulnDirection
+  } = useContext(GlobalContext)
   const [isLoading, setIsLoading] = useState(false)
   const [activeRow, setActiveRow] = useState(null)
 
   const [currentPage, setCurrentPage] = useState(1)
 
   const data = project ? removeDuplicates(project.sboms) : []
-  
+
   const totalPages = data && Math.ceil(data.length / totalRows)
 
   const filteredData =
@@ -73,6 +80,28 @@ const VersionTable = ({ name, project, productId, refetch }) => {
     onOpen: onDeleteOpen,
     onClose: onDeleteClose
   } = useDisclosure()
+
+  const onFilterSev = async (id, primaryComponent, value) => {
+    localStorage.setItem(
+      'currentSBOM',
+      JSON.stringify({
+        version: primaryComponent?.version,
+        id: id
+      })
+    )
+    setActiveProdTab(3)
+    setVulnSeverity(value)
+    await getVulnData({
+      variables: {
+        projectId: productId,
+        sbomId: id,
+        severity: value,
+        first: totalRows,
+        field: vulnField,
+        direction: vulnDirection
+      }
+    })
+  }
 
   // COLUMNS
   const columns = [
@@ -110,11 +139,30 @@ const VersionTable = ({ name, project, productId, refetch }) => {
       id: 'COMPONENTS',
       name: 'COMPONENTS',
       selector: (row) => {
-        const { stats } = row
+        const { stats, id, primaryComponent } = row
         return (
-          <Tag size='md' variant='subtle' width={16} colorScheme={'blue'}>
-            <TagLabel mx={'auto'}> {stats?.compCount}</TagLabel>
-          </Tag>
+          <Link
+            to={`/vendor/products/${params.name}?id=${productId}&sbom=${id}`}
+          >
+            <Tag
+              size='md'
+              variant='subtle'
+              width={16}
+              colorScheme={'blue'}
+              onClick={() => {
+                localStorage.setItem(
+                  'currentSBOM',
+                  JSON.stringify({
+                    version: primaryComponent?.version,
+                    id: id
+                  })
+                )
+                setActiveProdTab(2)
+              }}
+            >
+              <TagLabel mx={'auto'}>{stats?.compCount}</TagLabel>
+            </Tag>
+          </Link>
         )
       },
       width: '150px'
@@ -136,25 +184,46 @@ const VersionTable = ({ name, project, productId, refetch }) => {
       id: 'VULNERABILITIES',
       name: 'VULNERABILITIES',
       selector: (row) => {
-        const { stats } = row
+        const { stats, id, primaryComponent } = row
+        const link = `/vendor/products/${params.name}?id=${productId}&sbom=${id}`
         return (
           <Stack fontWeight={'medium'} direction={'row'}>
-            <VulnBadge color='red' label='Critical'>
-              {stats?.vulnStats?.critical ? stats.vulnStats.critical : 0}
-            </VulnBadge>
-            <VulnBadge color='orange' label='High'>
-              {stats?.vulnStats?.high ? stats.vulnStats.high : 0}
-            </VulnBadge>
-            <VulnBadge color='yellow' label='Medium'>
-              {stats?.vulnStats?.medium ? stats.vulnStats.medium : 0}
-            </VulnBadge>
-            <VulnBadge color='green' label='Low'>
-              {stats?.vulnStats?.low ? stats.vulnStats.low : 0}
-            </VulnBadge>
+            <Link
+              to={link}
+              onClick={() => onFilterSev(id, primaryComponent, ['critical'])}
+            >
+              <VulnBadge color='red' label='Critical'>
+                {stats?.vulnStats?.critical ? stats.vulnStats.critical : 0}
+              </VulnBadge>
+            </Link>
+            <Link
+              to={link}
+              onClick={() => onFilterSev(id, primaryComponent, ['high'])}
+            >
+              <VulnBadge color='orange' label='High'>
+                {stats?.vulnStats?.high ? stats.vulnStats.high : 0}
+              </VulnBadge>
+            </Link>
+            <Link
+              to={link}
+              onClick={() => onFilterSev(id, primaryComponent, ['medium'])}
+            >
+              <VulnBadge color='yellow' label='Medium'>
+                {stats?.vulnStats?.medium ? stats.vulnStats.medium : 0}
+              </VulnBadge>
+            </Link>
+            <Link
+              to={link}
+              onClick={() => onFilterSev(id, primaryComponent, ['low'])}
+            >
+              <VulnBadge color='green' label='Low'>
+                {stats?.vulnStats?.low ? stats.vulnStats.low : 0}
+              </VulnBadge>
+            </Link>
           </Stack>
         )
       },
-      width: '250px'
+      width: '300px'
     },
     {
       id: 'STATUS',
