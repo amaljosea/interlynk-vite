@@ -26,6 +26,7 @@ const ImportWizard = ({
     vulnDirection,
     setMergeData,
     importSbom,
+    setImportSbom,
     selectedVulns,
     setSelectedVulns
   } = useContext(GlobalContext)
@@ -184,6 +185,7 @@ const ImportWizard = ({
                 isDisabled={activeStep === 0}
                 onClick={() => {
                   setSelectedVulns([])
+                  setImportSbom([])
                   prevStep()
                 }}
               >

@@ -77,7 +77,7 @@ const StepOne = ({
   }
 
   useEffect(() => {
-    if (selectedProd !== '') {
+    if (selectedProd !== '' && selectedVersion === '') {
       getProduct({
         variables: {
           id: selectedProd
@@ -99,6 +99,7 @@ const StepOne = ({
       })
     }
   }, [selectedProd])
+
 
   return (
     <>

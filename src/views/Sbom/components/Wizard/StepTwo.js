@@ -53,18 +53,13 @@ const StepTwo = ({
 
   useEffect(() => {
     if (currentSbom && importSbom) {
-      // console.log('currentSbom', currentSbom)
-      // console.log('importSbom', importSbom)
+      console.log('currentSbom', currentSbom)
+      console.log('importSbom', importSbom)
       const data = findSimilarItems(currentSbom, importSbom)
       const filterData = data.filter((item) => item.importStatus !== null)
-      // console.log('filterData', filterData)
       setMergeData(filterData)
     }
   }, [currentSbom, importSbom])
-
-  // useEffect(() => {
-  //   console.log('Final data', mergeData)
-  // }, [mergeData])
 
   return (
     <Box width={'90%'} mx={'auto'}>
@@ -85,10 +80,15 @@ const StepTwo = ({
         <Flex
           width={'100%'}
           alignItems={'center'}
-          justifyContent={'space-between'}
+          flexDirection={'column'}
+          justifyContent={'flex-start'}
+          gap={24}
           mt={12}
         >
           <Text>Total: 0</Text>
+          <Text fontSize={24} mt={12}>
+            No match found. Please select other version
+          </Text>
         </Flex>
       )}
     </Box>
