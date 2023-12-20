@@ -423,10 +423,9 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       name: 'STATUS',
       selector: (row) => {
         const { part } = row
-
         return (
-          <Tag size='sm' colorScheme='cyan' textTransform={'capitalize'}>
-            {part.lifecycle}
+          <Tag width={24} colorScheme='cyan' textTransform={'capitalize'}>
+            <TagLabel mx={'auto'}>{part.lifecycle}</TagLabel>
           </Tag>
         )
       }
