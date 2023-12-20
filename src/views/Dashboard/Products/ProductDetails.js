@@ -34,7 +34,7 @@ import CardBody from 'components/Card/CardBody'
 import VersionTable from 'components/Tables/VersionTable'
 import { useContext, useEffect, useState } from 'react'
 import {
-  FaCubes,
+  FaCube,
   FaPenToSquare,
   FaScrewdriverWrench,
   FaToggleOn,
@@ -240,7 +240,7 @@ const ProductDetails = () => {
                       width={'100%'}
                     >
                       <Icon
-                        as={FaCubes}
+                        as={FaCube}
                         h={'64px'}
                         w={'64px'}
                         color='blue.300'

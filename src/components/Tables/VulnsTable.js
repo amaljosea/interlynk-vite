@@ -9,6 +9,9 @@ import { Link } from 'react-router-dom'
 import VulnsFilters from 'views/Dashboard/Vulnerabilities/components/VulnsFilter'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
+const handleChange = (state) => {
+}
+
 const VulnsTable = ({ data }) => {
   const cvssColor = (cvss) => {
     if (cvss >= 9.0) {
@@ -261,6 +264,8 @@ const VulnsTable = ({ data }) => {
           subHeaderComponent={subHeaderComponentMemo}
           responsive
           persistTableHead
+          selectableRows
+          onSelectedRowsChange={handleChange}
         />
       </Flex>
     </>
