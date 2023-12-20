@@ -5,18 +5,13 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
   Flex,
-  HStack,
-  Text,
   useColorModeValue
 } from '@chakra-ui/react'
 import PropTypes from 'prop-types'
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import AdminNavbarLinks from './AdminNavbarLinks'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import GlobalContext from 'context/GlobalContext'
 import { vulnList } from 'variables/general'
-import { GetProductInfo } from 'graphQL/Queries'
-import { useLazyQuery, useQuery } from '@apollo/client'
 
 export default function AdminNavbar(props) {
   function parseJSONSafely(str) {
@@ -35,12 +30,9 @@ export default function AdminNavbar(props) {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const versionId = queryParams.get('v')
-  const product = queryParams.get('id')
   const prodID = queryParams.get('id')
   const parts = queryParams.get('parts')
   const sbomId = queryParams.get('sbom')
-
-  const { setActiveProdTab } = useContext(GlobalContext)
 
   const imageName = localStorage.getItem('Image')
   const currentProduct = (() => {
@@ -59,9 +51,7 @@ export default function AdminNavbar(props) {
       return null
     }
   })()
-  const activeProd = localStorage.getItem('activeProduct')
   const subProduct = localStorage.getItem('subProduct')
-  const activeSBOM = localStorage.getItem('activeSBOM')
 
   const vulnData = vulnList.find((item) => item.id === prodID)
 
@@ -72,16 +62,10 @@ export default function AdminNavbar(props) {
     productIndex !== -1 ? urlParts.slice(productIndex + 1).join('/') : ''
 
   useEffect(() => {
-    if (currentProduct && currentProduct.name !== decodeURI(productName)) {
+    if (productName && currentProduct.name !== decodeURI(productName)) {
       navigate('/vendor/dashboard')
     }
   }, [])
-
-  const { data } = useQuery(GetProductInfo, {
-    variables: {
-      id: prodID
-    }
-  })
 
   // Here are all the props that may change depending on navbar's type or state.(secondary, variant, scrolled)
   let mainText = useColorModeValue('gray.700', 'gray.200')
@@ -115,6 +99,7 @@ export default function AdminNavbar(props) {
     secondaryMargin = '22px'
     paddingX = '30px'
   }
+
   const changeNavbar = () => {
     if (window.scrollY > 1) {
       setScrolled(true)
