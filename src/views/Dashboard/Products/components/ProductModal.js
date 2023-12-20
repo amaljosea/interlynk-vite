@@ -53,17 +53,16 @@ const ProductModal = ({
         name: productName,
         desc: productDesc
       }
+    }).then((res) => {
+      const error = res.data.projectUpdate.errors
+      if (error.length > 0) {
+        setError(
+          'A project with same name already exists. Please choose an unique name'
+        )
+      } else {
+        onClose()
+      }
     })
-      .then((res) => {
-        const error = res.data.projectUpdate.errors
-        if (error.length > 0) {
-          setError(
-            'A project with same name already exists. Please choose an unique name'
-          )
-        } else {
-        }
-      })
-      .finally(() => onClose())
   }
 
   const handleSave = async (e) => {
@@ -73,17 +72,16 @@ const ProductModal = ({
         name: productName,
         desc: productDesc
       }
+    }).then((res) => {
+      const error = res.data.projectCreate.errors
+      if (error.length > 0) {
+        setError(
+          'A project with same name already exists. Please choose an unique name'
+        )
+      } else {
+        onClose()
+      }
     })
-      .then((res) => {
-        const error = res.data.projectCreate.errors
-        if (error.length > 0) {
-          setError(
-            'A project with same name already exists. Please choose an unique name'
-          )
-        } else {
-        }
-      })
-      .finally(() => onClose())
   }
 
   const isInvalid = productName === '' || productDesc === '' || error !== ''
