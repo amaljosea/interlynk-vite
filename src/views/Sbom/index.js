@@ -112,7 +112,19 @@ function SBOM({ vulnData, vulnRefetch, getVulnData }) {
     setVulnIndex,
     setVulnSearchInput,
     compField,
-    compDirection
+    compDirection,
+    setLicenseType,
+    setSpdxList,
+    setSpdxLicense,
+    setLicenseExp,
+    setCustomList,
+    setCustomLicense,
+    compSearchInput,
+    compEcosystem,
+    compType,
+    compLicense,
+    compSupplier,
+    compScope,
   } = useContext(GlobalContext)
 
   const customerView = location.pathname.startsWith('/customer')
@@ -352,8 +364,64 @@ function SBOM({ vulnData, vulnRefetch, getVulnData }) {
 
   const [getAllComps, { data: allComponents }] = useLazyQuery(GetAllComponents)
 
+  const fetchCompData = async () => {
+    await getCompData({
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        search: compSearchInput !== '' ? compSearchInput : undefined,
+        ecosystem: compEcosystem.includes('all') || compEcosystem.length === 0 ? undefined : compEcosystem,
+        kind: compType.includes('all') || compType.length === 0 ? undefined : compType,
+        licenses: compLicense.includes('all') || compLicense.length === 0 ? undefined : compLicense,
+        supplierName: compSupplier.includes('all') || compSupplier.length === 0 ? undefined : compSupplier,
+        primary: compScope === 'primary' ? true : undefined,
+        internal: compScope === 'internal' ? true : undefined,
+        first: totalRows,
+        field: compField,
+        direction: compDirection
+      }
+    })
+      .then((res) => {
+        if (res.data) {
+          navigate(
+            `/vendor/products/${currentProduct.name}?id=${productId}&sbom=${sbomId}`
+          )
+        }
+      })
+      .finally(() => setActiveProdTab(2))
+  }
+
   const handleEditSbom = () => {
     if (sbomData.sbom.primaryComponent) {
+      const row = sbomData.sbom.primaryComponent
+      if (row.licenses && row.licenses.length > 0) {
+        setLicenseType('license_spdx')
+        const filterData = row.licenses.map((value) => ({
+          value: value,
+          label: value
+        }))
+        setSpdxList(filterData)
+        const selectedIds = filterData.map((option) => option.value)
+        setSpdxLicense(selectedIds)
+      } else if (row.licensesExp) {
+        setLicenseType('license_exp')
+        setLicenseExp(row.licensesExp)
+      } else if (row.licensesCustom && row.licensesCustom.length > 0) {
+        setLicenseType('license_custom')
+        const filterData = row.licensesCustom.map((option) => ({
+          value: option,
+          label: option
+        }))
+        setCustomList(filterData)
+        setCustomLicense(row.licensesCustom)
+      } else {
+        setLicenseType('license_spdx')
+        setSpdxList([])
+        setSpdxLicense([])
+        setLicenseExp('')
+        setCustomList([])
+        setCustomLicense([])
+      }
       setSBMOpen()
     } else {
       getAllComps({
@@ -844,16 +912,8 @@ function SBOM({ vulnData, vulnRefetch, getVulnData }) {
               isOpen={isSBMOpen}
               onClose={setSBMClose}
               btnRef={btnRef}
-              component={primaryComp.name}
-              version={primaryComp.version}
-              license={primaryComp.licenses}
-              group={primaryComp.group}
-              type={primaryComp.kind}
-              cpes={primaryComp.cpes}
-              purl={primaryComp.purl}
-              primary={primaryComp.primary}
-              internal={primaryComp.internal}
-              refetch={refetch}
+              data={primaryComp}
+              fetchCompData={fetchCompData}
               shortDesc={null}
               totalRows={null}
             />

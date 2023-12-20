@@ -198,7 +198,6 @@ const CheckModal = ({
       const filterData = data?.sbom.components.nodes.filter((str) =>
         str.name.includes(value)
       )
-      console.log('filterData', filterData)
       setComponentList(filterData)
     }
   }

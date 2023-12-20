@@ -100,15 +100,6 @@ export default function AdminNavbar(props) {
     paddingX = '30px'
   }
 
-  const changeNavbar = () => {
-    if (window.scrollY > 1) {
-      setScrolled(true)
-    } else {
-      setScrolled(false)
-    }
-  }
-  window.addEventListener('scroll', changeNavbar)
-
   const path = (name) => {
     if (!location.pathname.startsWith('/customer')) {
       switch (name) {
