@@ -7,7 +7,7 @@ const VulnBadge = ({ color, children, label, onClick }) => {
         size='md'
         key='md'
         variant='subtle'
-        width={10}
+        width={14}
         colorScheme={color}
         onClick={onClick}
         cursor={'pointer'}

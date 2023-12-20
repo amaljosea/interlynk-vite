@@ -32,19 +32,39 @@ import CustomLoader from 'components/CustomLoader'
 import VulnBadge from 'components/Misc/VulnBadge'
 import GlobalContext from 'context/GlobalContext'
 import { sbomDelete } from 'graphQL/Mutation'
-import { useContext, useMemo, useState } from 'react'
+import { useContext, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV } from 'react-icons/fa'
 import { Link, useNavigate } from 'react-router-dom'
-import { timeSince } from 'utils'
-import { getFullDateAndTime } from 'utils'
-import { customStyles } from 'utils'
+import {
+  timeSince,
+  getFullDateAndTime,
+  customStyles,
+  removeDuplicates
+} from 'utils'
+import RowLimit from 'views/Sbom/components/RowLimit'
 
 const VersionTable = ({ name, project, productId, refetch }) => {
   const navigate = useNavigate()
-  const { setActiveProdTab } = useContext(GlobalContext)
+  const { setActiveProdTab, totalRows, setTotalRows } =
+    useContext(GlobalContext)
   const [isLoading, setIsLoading] = useState(false)
   const [activeRow, setActiveRow] = useState(null)
+
+  const [currentPage, setCurrentPage] = useState(1)
+
+  const data = project ? removeDuplicates(project.sboms) : []
+  
+  const totalPages = data && Math.ceil(data.length / totalRows)
+
+  const filteredData =
+    data && data.slice((currentPage - 1) * totalRows, currentPage * totalRows)
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage)
+    }
+  }
 
   const [deleteSbom] = useMutation(sbomDelete)
 
@@ -84,7 +104,7 @@ const VersionTable = ({ name, project, productId, refetch }) => {
         )
       },
       wrap: true,
-      width: '200px'
+      width: '250px'
     },
     {
       id: 'COMPONENTS',
@@ -92,7 +112,7 @@ const VersionTable = ({ name, project, productId, refetch }) => {
       selector: (row) => {
         const { stats } = row
         return (
-          <Tag size='md' variant='subtle' width={10} colorScheme={'blue'}>
+          <Tag size='md' variant='subtle' width={16} colorScheme={'blue'}>
             <TagLabel mx={'auto'}> {stats?.compCount}</TagLabel>
           </Tag>
         )
@@ -105,7 +125,7 @@ const VersionTable = ({ name, project, productId, refetch }) => {
       selector: (row) => {
         const { stats } = row
         return (
-          <Tag size='md' variant='subtle' width={10} colorScheme={'blue'}>
+          <Tag size='md' variant='subtle' width={16} colorScheme={'blue'}>
             <TagLabel mx={'auto'}>{stats?.compLicenseCount}</TagLabel>
           </Tag>
         )
@@ -231,6 +251,10 @@ const VersionTable = ({ name, project, productId, refetch }) => {
     )
   }, [handleRefresh])
 
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [project])
+
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
@@ -240,12 +264,50 @@ const VersionTable = ({ name, project, productId, refetch }) => {
           responsive={true}
           columns={columns}
           customStyles={customStyles}
-          data={project && project.sboms}
+          data={filteredData && filteredData}
           progressComponent={<CustomLoader />}
           progressPending={project ? false : true}
           subHeaderComponent={subHeaderComponent}
         />
       </Flex>
+
+      {/* PAGINATION */}
+      {project && (
+        <Flex
+          width={'100%'}
+          flexDir={'row'}
+          gap={4}
+          alignItems={'center'}
+          justifyContent={'space-between'}
+          mt={6}
+        >
+          <Stack alignItems={'center'} direction={'row'} spacing={4}>
+            <Button
+              colorScheme='blue'
+              onClick={() => handlePageChange(currentPage - 1)}
+              isDisabled={currentPage === 1}
+            >
+              Previous
+            </Button>
+            <Button
+              colorScheme='blue'
+              onClick={() => handlePageChange(currentPage + 1)}
+              isDisabled={currentPage === totalPages}
+            >
+              Next
+            </Button>
+            <Box>
+              Page {currentPage} of {totalPages}
+            </Box>
+          </Stack>
+
+          {/* ROW LIMIT */}
+          <RowLimit
+            onChange={(e) => setTotalRows(e.target.value)}
+            name='componentRow'
+          />
+        </Flex>
+      )}
 
       {/* DELETE VERSION */}
       {isDeleteOpen && (

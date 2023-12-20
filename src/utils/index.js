@@ -603,10 +603,10 @@ export const removeDuplicates = (arr) => {
   const uniqueVersions = {}
   for (const item of arr) {
     if (
-      !uniqueVersions[item.label] ||
-      item.updatedAt > uniqueVersions[item.label].creationAt
+      !uniqueVersions[item.primaryComponent?.version] ||
+      item.updatedAt > uniqueVersions[item.primaryComponent?.version].creationAt
     ) {
-      uniqueVersions[item.label] = item
+      uniqueVersions[item.primaryComponent?.version] = item
     }
   }
   const versions = Object.values(uniqueVersions).sort((a, b) => {
