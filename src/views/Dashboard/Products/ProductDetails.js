@@ -251,13 +251,36 @@ const ProductDetails = () => {
                         <Flex alignItems={'center'} gap={8} mt={4}>
                           {/* ENV */}
                           <Stat>
-                            <StatNumber>234</StatNumber>
-                            <StatLabel>Environments</StatLabel>
+                            <StatNumber>3</StatNumber>
+                            <StatLabel
+                              _hover={{ color: 'blue.500' }}
+                              cursor={'pointer'}
+                              onClick={() => setActiveTab(0)}
+                            >
+                              Environments
+                            </StatLabel>
+                          </Stat>
+                          {/* VERSIONS */}
+                          <Stat>
+                            <StatNumber>20</StatNumber>
+                            <StatLabel
+                              _hover={{ color: 'blue.500' }}
+                              cursor={'pointer'}
+                              onClick={() => setActiveTab(0)}
+                            >
+                              Versions
+                            </StatLabel>
                           </Stat>
                           {/* VULN */}
                           <Stat>
-                            <StatNumber>110</StatNumber>
-                            <StatLabel>Vulnerabilities</StatLabel>
+                            <StatNumber>790</StatNumber>
+                            <StatLabel
+                              _hover={{ color: 'blue.500' }}
+                              cursor={'pointer'}
+                              onClick={() => setActiveTab(1)}
+                            >
+                              Vulnerabilities
+                            </StatLabel>
                           </Stat>
                         </Flex>
                       </Flex>
