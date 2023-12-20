@@ -38,6 +38,7 @@ import {
   AlertDescription
 } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
+import VulnBadge from 'components/Misc/VulnBadge'
 import GlobalContext from 'context/GlobalContext'
 import { SbomPartDelete } from 'graphQL/Mutation'
 import { SbomPartCreate } from 'graphQL/Mutation'
@@ -295,6 +296,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
             <Text
               color={'blue.500'}
               minWidth='100%'
+              fontSize={14}
               onClick={() => setActiveProdTab(0)}
             >
               {part.project.name}
@@ -310,7 +312,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       name: 'VERSION',
       selector: (row) => {
         const { part } = row
-        return <Text>{part.primaryComponent.version}</Text>
+        return <Text fontSize={14}>{part.primaryComponent.version}</Text>
       }
     },
     {
@@ -325,6 +327,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
                 <Tag
                   size={'md'}
                   key={index}
+                  fontSize={14}
                   variant='subtle'
                   colorScheme='orange'
                 >
@@ -348,18 +351,20 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
             to={`/vendor/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`}
           >
             <Badge
-              variant='solid'
+              width={10}
+              textAlign={'center'}
+              variant='subtle'
               borderRadius='sm'
               colorScheme='blue'
-              fontSize={'sm'}
+              fontSize={14}
               fontWeight={'medium'}
-              onClick={() => getComponents(part)}
             >
               {part.stats.compCount}
             </Badge>
           </Link>
         )
-      }
+      },
+      width: '150px'
     },
     {
       id: 'LICENSES',
@@ -368,100 +373,70 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
         const { part } = row
         return (
           <Badge
-            variant='solid'
+            width={10}
+            textAlign={'center'}
+            variant='subtle'
             borderRadius='sm'
             colorScheme='blue'
-            fontSize={'sm'}
+            fontSize={14}
             fontWeight={'medium'}
           >
             {part.stats.compLicenseCount}
           </Badge>
         )
-      }
+      },
+      width: '150px'
     },
     {
       id: 'VULNERABILITIES',
       name: 'VULNERABILITIES',
       selector: (row) => {
         const { part } = row
+        const link = `/vendor/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`
         return (
           <Stack fontWeight={'medium'} direction={'row'}>
-            <Link
-              to={`/vendor/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`}
-            >
-              <Tooltip label='Critical' placement='top'>
-                <Badge
-                  fontSize={'sm'}
-                  fontWeight={'medium'}
-                  variant='solid'
-                  colorScheme='red'
-                  borderRadius='sm'
-                  cursor={'pointer'}
-                  onClick={() => onFilterSev(part, ['critical'])}
-                >
-                  {part.stats.vulnStats.critical
-                    ? part.stats.vulnStats.critical
-                    : 0}
-                </Badge>
-              </Tooltip>
+            <Link to={link}>
+              <VulnBadge
+                color='red'
+                label='Critical'
+                onClick={() => onFilterSev(part, ['critical'])}
+              >
+                {part.stats.vulnStats.critical
+                  ? part.stats.vulnStats.critical
+                  : 0}
+              </VulnBadge>
             </Link>
-            <Link
-              to={`/vendor/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`}
-            >
-              <Tooltip label='High' placement='top'>
-                <Badge
-                  fontSize={'sm'}
-                  fontWeight={'medium'}
-                  variant='solid'
-                  colorScheme='orange'
-                  borderRadius='sm'
-                  cursor={'pointer'}
-                  onClick={() => onFilterSev(part, ['high'])}
-                >
-                  {part.stats.vulnStats.high ? part.stats.vulnStats.high : 0}
-                </Badge>
-              </Tooltip>
+            <Link to={link}>
+              <VulnBadge
+                color='orange'
+                label='High'
+                onClick={() => onFilterSev(part, ['high'])}
+              >
+                {part.stats.vulnStats.high ? part.stats.vulnStats.high : 0}
+              </VulnBadge>
             </Link>
-            <Link
-              to={`/vendor/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`}
-            >
-              <Tooltip label='Medium' placement='top'>
-                <Badge
-                  fontSize={'sm'}
-                  fontWeight={'medium'}
-                  variant='solid'
-                  colorScheme='yellow'
-                  borderRadius='sm'
-                  cursor={'pointer'}
-                  onClick={() => onFilterSev(part, ['medium'])}
-                >
-                  {part.stats.vulnStats.medium
-                    ? part.stats.vulnStats.medium
-                    : 0}
-                </Badge>
-              </Tooltip>
+            <Link to={link}>
+              <VulnBadge
+                color='yellow'
+                label='Medium'
+                onClick={() => onFilterSev(part, ['medium'])}
+              >
+                {part.stats.vulnStats.medium ? part.stats.vulnStats.medium : 0}
+              </VulnBadge>
             </Link>
-            <Link
-              to={`/vendor/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`}
-            >
-              <Tooltip label='Low' placement='top'>
-                <Badge
-                  fontSize={'sm'}
-                  fontWeight={'medium'}
-                  variant='solid'
-                  colorScheme='green'
-                  borderRadius='sm'
-                  cursor={'pointer'}
-                  onClick={() => onFilterSev(part, ['low'])}
-                >
-                  {part.stats.vulnStats.low ? part.stats.vulnStats.low : 0}
-                </Badge>
-              </Tooltip>
+            <Link to={link}>
+              <VulnBadge
+                color='green'
+                label='Low'
+                onClick={() => onFilterSev(part, ['low'])}
+              >
+                {part.stats.vulnStats.low ? part.stats.vulnStats.low : 0}
+              </VulnBadge>
             </Link>
           </Stack>
         )
       },
-      width: '200px'
+      width: '250px'
     },
     {
       id: 'STATUS',
