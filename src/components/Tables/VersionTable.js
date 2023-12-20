@@ -25,9 +25,11 @@ import {
   Button,
   ListItem,
   Spinner,
-  Box
+  Box,
+  TagLabel
 } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
+import VulnBadge from 'components/Misc/VulnBadge'
 import GlobalContext from 'context/GlobalContext'
 import { sbomDelete } from 'graphQL/Mutation'
 import { useContext, useMemo, useState } from 'react'
@@ -73,7 +75,7 @@ const VersionTable = ({ name, project, productId, refetch }) => {
               setActiveProdTab(0)
             }}
           >
-            <Text color={'blue.500'} minWidth='100%' my={3}>
+            <Text color={'blue.500'} minWidth='100%' my={3} fontSize={14}>
               {primaryComponent
                 ? primaryComponent.version
                 : `Uploaded ${getFullDateAndTime(creationAt)}`}
@@ -96,13 +98,14 @@ const VersionTable = ({ name, project, productId, refetch }) => {
             variant='subtle'
             borderRadius='sm'
             colorScheme='blue'
-            fontSize={'sm'}
+            fontSize={14}
             fontWeight={'medium'}
           >
             {stats?.compCount}
           </Badge>
         )
-      }
+      },
+      width: '150px'
     },
     {
       id: 'LICENSES',
@@ -116,13 +119,14 @@ const VersionTable = ({ name, project, productId, refetch }) => {
             variant='subtle'
             borderRadius='sm'
             colorScheme='blue'
-            fontSize={'sm'}
+            fontSize={14}
             fontWeight={'medium'}
           >
             {stats?.compLicenseCount}
           </Badge>
         )
-      }
+      },
+      width: '150px'
     },
     {
       id: 'VULNERABILITIES',
@@ -131,66 +135,22 @@ const VersionTable = ({ name, project, productId, refetch }) => {
         const { stats } = row
         return (
           <Stack fontWeight={'medium'} direction={'row'}>
-            <Tooltip label='Critical' placement='top'>
-              <Badge
-                width={10}
-                textAlign='center'
-                fontSize={'sm'}
-                fontWeight={'medium'}
-                variant='subtle'
-                colorScheme='red'
-                borderRadius='sm'
-                cursor={'pointer'}
-              >
-                {stats?.vulnStats?.critical ? stats.vulnStats.critical : 0}
-              </Badge>
-            </Tooltip>
-            <Tooltip label='High' placement='top'>
-              <Badge
-                width={10}
-                textAlign='center'
-                fontSize={'sm'}
-                fontWeight={'medium'}
-                variant='subtle'
-                colorScheme='orange'
-                borderRadius='sm'
-                cursor={'pointer'}
-              >
-                {stats?.vulnStats?.high ? stats.vulnStats.high : 0}
-              </Badge>
-            </Tooltip>
-            <Tooltip label='Medium' placement='top'>
-              <Badge
-                width={10}
-                textAlign='center'
-                fontSize={'sm'}
-                fontWeight={'medium'}
-                variant='subtle'
-                colorScheme='yellow'
-                borderRadius='sm'
-                cursor={'pointer'}
-              >
-                {stats?.vulnStats?.medium ? stats.vulnStats.medium : 0}
-              </Badge>
-            </Tooltip>
-            <Tooltip label='Low' placement='top'>
-              <Badge
-                width={10}
-                textAlign='center'
-                fontSize={'sm'}
-                fontWeight={'medium'}
-                variant='subtle'
-                colorScheme='green'
-                borderRadius='sm'
-                cursor={'pointer'}
-              >
-                {stats?.vulnStats?.low ? stats.vulnStats.low : 0}
-              </Badge>
-            </Tooltip>
+            <VulnBadge color='red' label='Critical'>
+              {stats?.vulnStats?.critical ? stats.vulnStats.critical : 0}
+            </VulnBadge>
+            <VulnBadge color='orange' label='High'>
+              {stats?.vulnStats?.high ? stats.vulnStats.high : 0}
+            </VulnBadge>
+            <VulnBadge color='yellow' label='Medium'>
+              {stats?.vulnStats?.medium ? stats.vulnStats.medium : 0}
+            </VulnBadge>
+            <VulnBadge color='green' label='Low'>
+              {stats?.vulnStats?.low ? stats.vulnStats.low : 0}
+            </VulnBadge>
           </Stack>
         )
       },
-      width: '200px'
+      width: '250px'
     },
     {
       id: 'STATUS',
@@ -199,8 +159,13 @@ const VersionTable = ({ name, project, productId, refetch }) => {
         const { lifecycle } = row
 
         return (
-          <Tag size='sm' colorScheme='cyan' textTransform={'capitalize'}>
-            {lifecycle}
+          <Tag
+            width={20}
+            fontSize={14}
+            colorScheme='cyan'
+            textTransform={'capitalize'}
+          >
+            <TagLabel mx={'auto'}>{lifecycle}</TagLabel>
           </Tag>
         )
       }
@@ -216,7 +181,8 @@ const VersionTable = ({ name, project, productId, refetch }) => {
             <Text>{timeSince(updatedAt)}</Text>
           </Tooltip>
         )
-      }
+      },
+      right: 'true'
     },
     {
       id: 'ACTION',
@@ -231,7 +197,7 @@ const VersionTable = ({ name, project, productId, refetch }) => {
               color='gray.400'
             />
             <Portal>
-              <MenuList fontSize={'sm'}>
+              <MenuList fontSize={14}>
                 <MenuItem
                   onClick={() => {
                     setActiveRow(row)
