@@ -150,7 +150,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
   }
 
   const handleUpdateCpe = (string, id) => {
-    const cpeItem = cpeList.find((item) => item === string)
+    const cpeItem = cpeList?.find((item) => item === string)
     if (cpeItem) {
       toast({
         description: 'CPE already exists',
@@ -158,8 +158,8 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
         position: 'top',
         duration: 3000
       })
-    } else if (cpeList.find((item, index) => index === id)) {
-      const updatedData = cpeList.map((item, index) => {
+    } else if (cpeList?.find((item, index) => index === id)) {
+      const updatedData = cpeList?.map((item, index) => {
         if (index === id) {
           return string
         }
