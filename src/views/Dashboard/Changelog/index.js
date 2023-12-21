@@ -7,20 +7,12 @@ import { useLocation, useNavigate } from 'react-router-dom'
 const idRegex =
   /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
 
-const ChangeLog = () => {
+const ChangeLog = ({ data, refetch }) => {
   const location = useLocation()
   const navigate = useNavigate()
   const queryParams = new URLSearchParams(location.search)
   const id = queryParams.get('id')
 
-  const { data, refetch } = useQuery(GetProjectLogs, {
-    variables: {
-      id: id,
-      first: 25,
-      field: 'ACTIVITY_LOGS_CREATED_AT',
-      direction: 'DESC'
-    }
-  })
 
   useEffect(() => {
     if (!idRegex.test(id)) {

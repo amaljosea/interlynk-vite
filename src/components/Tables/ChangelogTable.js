@@ -167,22 +167,26 @@ const ChangelogTable = ({ data, refetch }) => {
   const onPreviousPage = () => {
     setPageIndex((prev) => pageIndex !== 0 && prev - 1)
     refetch({
-      projectId: productId,
-      first: undefined,
-      after: undefined,
-      last: totalRows,
-      before: data.pageInfo.startCursor
+      variables: {
+        id: productId,
+        last: totalRows,
+        before: data.pageInfo.startCursor,
+        field: prodLogField,
+        direction: prodLogDirection
+      }
     })
   }
 
   const onNextPage = () => {
     setPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
     refetch({
-      projectId: productId,
-      first: totalRows,
-      after: data.pageInfo.endCursor,
-      last: undefined,
-      before: undefined
+      variables: {
+        id: productId,
+        first: totalRows,
+        after: data.pageInfo.endCursor,
+        field: prodLogField,
+        direction: prodLogDirection
+      }
     })
   }
 
@@ -190,9 +194,13 @@ const ChangelogTable = ({ data, refetch }) => {
   const handleSearch = async (event) => {
     if (event.key === 'Enter' && filterText !== '') {
       await refetch({
-        id: productId,
-        search: filterText,
-        first: totalRows
+        variables: {
+          id: productId,
+          search: filterText,
+          first: totalRows,
+          field: prodLogField,
+          direction: prodLogDirection
+        }
       })
       setPageIndex(1)
     }
@@ -201,9 +209,13 @@ const ChangelogTable = ({ data, refetch }) => {
   // CLEAR SERACH
   const handleClear = async () => {
     await refetch({
-      projectId: productId,
-      search: undefined,
-      first: totalRows
+      variables: {
+        id: productId,
+        search: undefined,
+        first: totalRows,
+        field: prodLogField,
+        direction: prodLogDirection
+      }
     })
     setFilterText('')
     setPageIndex(1)
@@ -214,11 +226,12 @@ const ChangelogTable = ({ data, refetch }) => {
     setProdLogField(column.id)
     setProdLogDirection(sortDirection === 'asc' ? 'ASC' : 'DESC')
     refetch({
-      projectId: productId,
-      first: totalRows,
-      last: undefined,
-      field: column.id,
-      direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+      variables: {
+        id: productId,
+        first: totalRows,
+        field: column.id,
+        direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+      }
     })
   }
 
@@ -226,13 +239,12 @@ const ChangelogTable = ({ data, refetch }) => {
   const handleSetRow = async (e) => {
     setTotalRows(Number(e.target.value))
     await refetch({
-      projectId: productId,
-      first: Number(e.target.value),
-      last: undefined,
-      after: undefined,
-      before: undefined,
-      field: prodLogField,
-      direction: prodLogDirection
+      variables: {
+        id: productId,
+        first: Number(e.target.value),
+        field: prodLogField,
+        direction: prodLogDirection
+      }
     })
     setFilterText('')
     setPageIndex(1)

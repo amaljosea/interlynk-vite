@@ -50,7 +50,7 @@ const Settings = ({ data, refetch }) => {
         projectId: productId
       }
     })
-      .then((res) => res.data && refetch())
+      .then((res) => res.data && refetch({ variables: { id: productId } }))
       .finally(() => onDeleteClose())
   }
 
@@ -62,7 +62,7 @@ const Settings = ({ data, refetch }) => {
         condition: row.condition,
         enabled: row.enabled ? false : true
       }
-    }).then((res) => res.data && refetch())
+    }).then((res) => res.data && refetch({ variables: { id: productId } }))
   }
 
   // COLUMNS

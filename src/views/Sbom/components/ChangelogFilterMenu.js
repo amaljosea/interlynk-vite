@@ -29,14 +29,13 @@ const ChangelogFilterMenu = ({
   const onFilterType = (value) => {
     setSelectedType(value.includes('all') ? [] : value)
     refetch({
-      projectId: id,
-      changeType: value.includes('all') ? undefined : value,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      last: undefined,
-      field: prodLogField,
-      direction: prodLogDirection
+      variables: {
+        id: id,
+        changeType: value.includes('all') ? undefined : value,
+        first: totalRows,
+        field: prodLogField,
+        direction: prodLogDirection
+      }
     })
     setPageIndex(1)
   }
@@ -44,14 +43,13 @@ const ChangelogFilterMenu = ({
   const onFilterUser = (value) => {
     setSelectedUser(value.includes('all') ? [] : value)
     refetch({
-      projectId: id,
-      changedBy: value.includes('all') ? undefined : value,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      last: undefined,
-      field: prodLogField,
-      direction: prodLogDirection
+      variables: {
+        id: id,
+        changedBy: value.includes('all') ? undefined : value,
+        first: totalRows,
+        field: prodLogField,
+        direction: prodLogDirection
+      }
     })
     setPageIndex(1)
   }
