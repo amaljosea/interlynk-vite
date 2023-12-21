@@ -291,8 +291,11 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
       }
     }).then((res) => {
       if (res.data.sbomDelete?.errors?.length === 0) {
-        setIsLoading(false)
-        navigate(`/vendor/products`)
+        setTimeout(() => {
+          setIsLoading(false)
+          refetch({ id: productId })
+          onDeleteClose()
+        }, 4000)
       }
     })
   }
