@@ -29,7 +29,6 @@ import {
   Select,
   Tag,
   TagLabel,
-  Badge,
   UnorderedList,
   ListItem,
   Alert,
@@ -44,7 +43,7 @@ import { SbomPartDelete } from 'graphQL/Mutation'
 import { SbomPartCreate } from 'graphQL/Mutation'
 import { GetProject } from 'graphQL/Queries'
 import { GetProjectData } from 'graphQL/Queries'
-import { useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { useContext, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV, FaFilter } from 'react-icons/fa'
 import { useLocation, Link, useParams, useNavigate } from 'react-router-dom'
@@ -70,7 +69,6 @@ const customStyles = {
 }
 
 const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
-  const navigate = useNavigate()
   const location = useLocation()
   const params = useParams()
   const queryParams = new URLSearchParams(location.search)
@@ -89,7 +87,6 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const addBtn = useRef()
 
   const {
-    totalProducts,
     setActiveProdTab,
     prodField,
     prodDirection,
@@ -160,9 +157,6 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       .finally(() => onDeleteClose())
   }
 
-  // console.log('Products', allProducts && allProducts.projects.nodes)
-  // console.log('data', data)
-
   const productList =
     allProducts &&
     [...allProducts.projects.nodes]
@@ -171,15 +165,6 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
         value: option.id,
         label: option.name
       }))
-
-  const filterProducts =
-    productList &&
-    productList.filter((project) => {
-      const existings =
-        data &&
-        [...data].some((sbomPart) => sbomPart.part.project.id === project.value)
-      return !existings
-    })
 
   const product =
     allProducts &&
@@ -205,24 +190,6 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
         })
       }
     })
-
-  // console.log('product', product)
-
-  // const filterVersion =
-  //   product &&
-  //   product.sboms.filter((sbom) => {
-  //     const existings =
-  //       data &&
-  //       sbom.primaryComponent &&
-  //       [...data].some(
-  //         (sbomPart) =>
-  //           sbomPart.part.primaryComponent.version ===
-  //           sbom.primaryComponent.version
-  //       )
-  //     return !existings
-  //   })
-
-  // console.log('filterVersion', filterVersion)
 
   const [getProduct] = useLazyQuery(GetProject)
 
@@ -253,30 +220,6 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       })
     }
   }
-
-  // const filterVersions =
-  //   uniqVersions.length > 0 &&
-  //   uniqVersions.filter((version) => version.id !== sbomId)
-
-  // REMOVE DUPLICATES
-  const removeDuplicatesAndLatest = (arr) => {
-    const uniqueVersions = {}
-
-    for (const item of arr) {
-      if (
-        !uniqueVersions[item.version] ||
-        item.updatedAt > uniqueVersions[item.version].updatedAt
-      ) {
-        uniqueVersions[item.version] = item
-      }
-    }
-
-    return Object.values(uniqueVersions)
-  }
-
-  // const filteredData = filterVersions
-  //   ? removeDuplicatesAndLatest(filterVersions)
-  //   : []
 
   const getComponents = () => {
     setActiveProdTab(2)
