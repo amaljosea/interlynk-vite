@@ -492,6 +492,12 @@ export const GetProductInfo = gql`
       description
       enabled
       updatedAt
+      sboms {
+        id
+        primaryComponent {
+          version
+        }
+      }
     }
   }
 `
@@ -1867,6 +1873,7 @@ export const GetSbomParts = gql`
         part {
           id
           lifecycle
+          creationAt
           project {
             id
             name

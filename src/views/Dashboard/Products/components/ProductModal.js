@@ -19,6 +19,7 @@ import {
 } from '@chakra-ui/react'
 import { UpdateProject, CreateProject } from 'graphQL/Mutation'
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const ProductModal = ({
   id,
@@ -28,6 +29,8 @@ const ProductModal = ({
   description,
   refetch
 }) => {
+  const navigate = useNavigate()
+
   const [projectCreate] = useMutation(CreateProject, {
     onCompleted: () => refetch()
   })
@@ -60,6 +63,7 @@ const ProductModal = ({
           'A project with same name already exists. Please choose an unique name'
         )
       } else {
+        navigate(`/vendor/products/${productName}?id=${id}`)
         onClose()
       }
     })

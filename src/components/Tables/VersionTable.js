@@ -62,7 +62,7 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
 
   const data = project ? removeDuplicates(project.sboms) : []
 
-  const totalPages = data && Math.ceil(data.length / totalRows)
+  const totalPages = data.length > 0 ? Math.ceil(data.length / totalRows) : 1
 
   const filteredData =
     data && data.slice((currentPage - 1) * totalRows, currentPage * totalRows)
@@ -291,8 +291,11 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
       }
     }).then((res) => {
       if (res.data.sbomDelete?.errors?.length === 0) {
-        setIsLoading(false)
-        navigate(`/vendor/products`)
+        setTimeout(() => {
+          setIsLoading(false)
+          refetch({ id: productId })
+          onDeleteClose()
+        }, 4000)
       }
     })
   }

@@ -62,6 +62,7 @@ import {
 import { UpdateProject, DeleteProject } from 'graphQL/Mutation'
 import { FaToggleOff } from 'react-icons/fa'
 import GlobalContext from 'context/GlobalContext'
+import { GetProjectLogs } from 'graphQL/Queries'
 
 const ProductDetails = () => {
   const navigate = useNavigate()
@@ -77,7 +78,15 @@ const ProductDetails = () => {
     setVulnKev,
     setVulnEpss,
     setMinVal,
-    setMaxVal
+    setMaxVal,
+    setCustomLicense,
+    setSpdxLicense,
+    setLicenseExp,
+    setSpdxList,
+    setCustomList,
+    prodLogField,
+    prodLogDirection,
+    totalRows
   } = useContext(GlobalContext)
 
   const { data, loading, error, refetch } = useQuery(GetProductInfo, {
@@ -95,14 +104,15 @@ const ProductDetails = () => {
     }
   )
 
-  const {
-    data: rules,
-    error: rulesError,
-    refetcg: rulesRefetch
-  } = useQuery(GetProjectCheck, {
-    variables: {
-      id: productId
+  const [getRules, { data: rules, error: rulesError }] = useLazyQuery(
+    GetProjectCheck,
+    {
+      fetchPolicy: 'network-only'
     }
+  )
+
+  const [getLogs, { data: prodLogs }] = useLazyQuery(GetProjectLogs, {
+    fetchPolicy: 'network-only'
   })
 
   // GET VULN DATA
@@ -153,8 +163,33 @@ const ProductDetails = () => {
     onClose: onDeleteClose
   } = useDisclosure()
 
+  const onBuildSbom = () => {
+    setCustomLicense([])
+    setSpdxLicense([])
+    setSpdxList([])
+    setCustomList([])
+    setLicenseExp('')
+    onSbomOpen()
+  }
+
   const handleTabChange = (value) => {
     setActiveTab(value)
+    if (value === 2) {
+      getRules({
+        variables: {
+          id: productId
+        }
+      })
+    } else if (value === 4) {
+      getLogs({
+        variables: {
+          id: productId,
+          first: totalRows,
+          field: prodLogField,
+          direction: prodLogDirection
+        }
+      })
+    }
   }
 
   // TOGGLE STATUS
@@ -212,6 +247,7 @@ const ProductDetails = () => {
   if (sbomId) {
     return (
       <SBOM
+        prodRefetch={refetch}
         vulnData={vulnData}
         vulnRefetch={vulnRefetch}
         getVulnData={getVulnData}
@@ -354,7 +390,7 @@ const ProductDetails = () => {
                         <IconButton
                           isDisabled={!data.project.enabled}
                           colorScheme='blue'
-                          onClick={onSbomOpen}
+                          onClick={onBuildSbom}
                           icon={<FaScrewdriverWrench />}
                         ></IconButton>
                       </Tooltip>
@@ -440,12 +476,10 @@ const ProductDetails = () => {
                       </Text>
                     )}
 
-                    {rules && (
-                      <Settings
-                        data={rules?.project.autoChecks}
-                        refetch={rulesRefetch}
-                      />
-                    )}
+                    <Settings
+                      data={rules?.project.autoChecks}
+                      refetch={getRules}
+                    />
                   </TabPanel>
                   {/* SETTINGS */}
                   <TabPanel>
@@ -453,7 +487,7 @@ const ProductDetails = () => {
                   </TabPanel>
                   {/* CHANGE LOG */}
                   <TabPanel>
-                    <ChangeLog />
+                    <ChangeLog data={prodLogs} refetch={getLogs} />
                   </TabPanel>
                 </TabPanels>
               </Tabs>
