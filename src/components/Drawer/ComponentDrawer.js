@@ -696,18 +696,20 @@ function ComponentDrawer(props) {
                 From:
                 <br />
                 <Text as='em'>
-                  {primaryComp?.name}-{primaryComp?.version}
+                  {primaryComp?.name ? primaryComp?.name : 'None'}
+                  {primaryComp?.version ? `- ${primaryComp?.version}` : ''}
                 </Text>
                 <br />
                 <br />
                 To:
                 <br />
                 <Text as='em'>
-                  {compName}-{compVersion}
+                  {primaryComp?.name === compName ? 'None' : compName}
+                  {primaryComp?.name === compName ? '' : `- ${compVersion}`}
                 </Text>
               </Text>
               <br />
-              <Text mt={10}>Are you sure you wish to continue ?</Text>
+              <Text mt={6}>Are you sure you wish to continue ?</Text>
             </ModalBody>
             <ModalFooter>
               <Button mr={3} onClick={onWarningClose}>
