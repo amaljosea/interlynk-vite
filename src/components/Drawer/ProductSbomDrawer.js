@@ -60,7 +60,6 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
         kind: compType,
         name: sbomName,
         version: version,
-        group: groupInfo,
         licenses: {
           licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
           licensesExp: licenseType === 'license_exp' ? expLicense : undefined,
