@@ -77,7 +77,12 @@ const ProductDetails = () => {
     setVulnKev,
     setVulnEpss,
     setMinVal,
-    setMaxVal
+    setMaxVal,
+    setCustomLicense,
+    setSpdxLicense,
+    setLicenseExp,
+    setSpdxList,
+    setCustomList,
   } = useContext(GlobalContext)
 
   const { data, loading, error, refetch } = useQuery(GetProductInfo, {
@@ -152,6 +157,15 @@ const ProductDetails = () => {
     onOpen: onDeleteOpen,
     onClose: onDeleteClose
   } = useDisclosure()
+
+  const onBuildSbom = () => {
+    setCustomLicense([])
+    setSpdxLicense([])
+    setSpdxList([])
+    setCustomList([])
+    setLicenseExp('')
+    onSbomOpen()
+  }
 
   const handleTabChange = (value) => {
     setActiveTab(value)
@@ -354,7 +368,7 @@ const ProductDetails = () => {
                         <IconButton
                           isDisabled={!data.project.enabled}
                           colorScheme='blue'
-                          onClick={onSbomOpen}
+                          onClick={onBuildSbom}
                           icon={<FaScrewdriverWrench />}
                         ></IconButton>
                       </Tooltip>
