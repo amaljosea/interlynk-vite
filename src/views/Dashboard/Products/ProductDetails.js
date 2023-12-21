@@ -321,7 +321,8 @@ const ProductDetails = () => {
                         </Badge>
                         {/* ADDITIONAL STATS */}
                         <Flex alignItems={'center'} gap={8} mt={4}>
-                          {/* ENV */}
+                          {/*  ENV // * /}
+                          /// TODO: 1.0 Add back in when ready
                           <Stat>
                             <StatNumber>3</StatNumber>
                             <StatLabel
@@ -332,6 +333,7 @@ const ProductDetails = () => {
                               Environments
                             </StatLabel>
                           </Stat>
+                           */}
                           {/* VERSIONS */}
                           <Stat>
                             <StatNumber>20</StatNumber>
@@ -343,7 +345,8 @@ const ProductDetails = () => {
                               Versions
                             </StatLabel>
                           </Stat>
-                          {/* VULN */}
+                          {/* VULN * /}
+                          /// TODO: 1.0 Add back in when ready
                           <Stat>
                             <StatNumber>790</StatNumber>
                             <StatLabel
@@ -354,6 +357,7 @@ const ProductDetails = () => {
                               Vulnerabilities
                             </StatLabel>
                           </Stat>
+                          */}
                         </Flex>
                       </Flex>
                     </Flex>
@@ -437,7 +441,8 @@ const ProductDetails = () => {
                 <TabList>
                   {[
                     'versions',
-                    'vulnerabilities',
+                    /// TODO: 1.0 Add back in when ready
+                    /* 'vulnerabilities', */,
                     'automation',
                     'settings',
                     'change log'
@@ -464,10 +469,12 @@ const ProductDetails = () => {
                       />
                     )}
                   </TabPanel>
-                  {/* VULNERABILITIES */}
+                  {/* VULNERABILITIES * /}
+                  /// TODO: 1.0 Add back in when ready
                   <TabPanel>
                     <VulnsTable data={vulnList} />
                   </TabPanel>
+                  * /}
                   {/* AUTOMATIONS */}
                   <TabPanel>
                     {rulesError && (
