@@ -8,6 +8,13 @@ import {
   DrawerOverlay,
   DrawerContent,
   DrawerCloseButton,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
   Button,
   Stack,
   FormControl,
@@ -15,7 +22,9 @@ import {
   Input,
   Select,
   useToast,
-  Checkbox
+  Checkbox,
+  useDisclosure,
+  Text
 } from '@chakra-ui/react'
 import { useMutation } from '@apollo/client'
 import { sbomCreate, CreateComponent } from 'graphQL/Mutation'
@@ -35,6 +44,12 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
     customLicense
   } = useContext(GlobalContext)
 
+  const {
+    isOpen: isWarningOpen,
+    onOpen: onWarningOpen,
+    onClose: onWarningClose
+  } = useDisclosure()
+
   const handleRefetch = () => {
     refetch({
       first: totalRows,
@@ -52,6 +67,10 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
   const [sbomName, setSbomName] = useState('')
   const [version, setVersion] = useState('')
   const [compType, setCompType] = useState('')
+
+  const existingVersions = data?.sboms.map(
+    (item) => item?.primaryComponent?.version
+  )
 
   const handleCreateComp = async (id) => {
     await createComponent({
@@ -80,7 +99,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
     )
   }
 
-  const handleCreateSBOM = async () => {
+  const onCreateSBOM = async () => {
     await createSbom({
       variables: {
         projectId: data.id,
@@ -102,6 +121,14 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
         }
       })
       .finally(() => onClose())
+  }
+
+  const handleCreateSBOM = async () => {
+    if (existingVersions?.includes(version)) {
+      onWarningOpen()
+    } else {
+      onCreateSBOM()
+    }
   }
 
   return (
@@ -128,6 +155,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
                   name='sbomName'
                   value={sbomName}
                   onChange={(e) => setSbomName(e.target.value)}
+                  placeholder='Enter name'
                 />
               </FormControl>
               {/* VERSION */}
@@ -174,11 +202,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
                 </Select>
               </FormControl>
               {/* Licenses */}
-              <LicenseField
-                exp={null}
-                expLicense={expLicense}
-                setExpLicense={setExpLicense}
-              />
+              <LicenseField data={data} />
               {/* PRIMARY COMPONENT */}
               <FormControl htmlFor={'isPrimary'} isReadOnly={true}>
                 <Checkbox
@@ -207,6 +231,33 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
+
+      {/* WARNING */}
+      {isWarningOpen && (
+        <Modal isOpen={isWarningOpen} onClose={onWarningClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>{version}</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Text>
+                An SBOM with the same version already exists. Continuing with
+                building this SBOM will delete existing version data and replace
+                it with the SBOM being built.{' '}
+              </Text>
+              <Text mt={10}>Are you sure you wish to continue?</Text>
+            </ModalBody>
+            <ModalFooter>
+              <Button mr={3} onClick={onWarningClose}>
+                Cancel
+              </Button>
+              <Button colorScheme='red' onClick={onCreateSBOM}>
+                Ok
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      )}
     </>
   )
 }

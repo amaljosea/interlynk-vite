@@ -492,6 +492,12 @@ export const GetProductInfo = gql`
       description
       enabled
       updatedAt
+      sboms {
+        id
+        primaryComponent {
+          version
+        }
+      }
     }
   }
 `
