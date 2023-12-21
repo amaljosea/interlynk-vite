@@ -398,7 +398,7 @@ const ProdStatusDrawer = ({
               onClick={handleSave}
               disabled={
                 statusTitle === '' ||
-                (statusName === 'Not Affected' && justification === '') ||
+                (statusName === 'Not Affected' && (justification === '' || impactData === '')) ||
                 (statusName === 'False Positive' && (justification === '' || impactData === '')) ||
                 (statusName === 'Affected' &&
                   responseTitle === '' &&
