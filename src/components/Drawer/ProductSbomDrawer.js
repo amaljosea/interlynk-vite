@@ -224,7 +224,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
             <Button
               colorScheme='blue'
               onClick={handleCreateSBOM}
-              disabled={sbomName === '' || compType === ''}
+              disabled={sbomName === '' || compType === '' || version === ''}
             >
               Save
             </Button>
