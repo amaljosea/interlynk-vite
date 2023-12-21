@@ -399,8 +399,7 @@ const ProdStatusDrawer = ({
               disabled={
                 statusTitle === '' ||
                 (statusName === 'Not Affected' && justification === '') ||
-                (justifyName === 'Other (impact statment required)' &&
-                  impactData === '') ||
+                (statusName === 'False Positive' && (justification === '' || impactData === '')) ||
                 (statusName === 'Affected' &&
                   responseTitle === '' &&
                   actionStatement === '') ||
