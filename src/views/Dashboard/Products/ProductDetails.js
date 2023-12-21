@@ -247,6 +247,7 @@ const ProductDetails = () => {
   if (sbomId) {
     return (
       <SBOM
+        prodRefetch={refetch}
         vulnData={vulnData}
         vulnRefetch={vulnRefetch}
         getVulnData={getVulnData}

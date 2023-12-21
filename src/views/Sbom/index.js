@@ -43,7 +43,7 @@ import {
   FaAngleLeft
 } from 'react-icons/fa'
 import { TbSignature, TbSignatureOff } from 'react-icons/tb'
-import { useLocation, useNavigate, Link } from 'react-router-dom'
+import { useLocation, useNavigate, Link, useParams } from 'react-router-dom'
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 import { timeSince, getFullDateAndTime, removeDuplicates } from 'utils'
 import SigningModal from './components/SigningModal'
@@ -68,11 +68,12 @@ import ReactSelect from 'react-select'
 const idRegex =
   /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
 
-function SBOM({ vulnData, vulnRefetch, getVulnData }) {
+function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
   const initialRef = useRef(null)
   const finalRef = useRef(null)
   const btnRef = useRef()
 
+  const params = useParams()
   const location = useLocation()
   const navigate = useNavigate()
   const toast = useToast()
@@ -124,7 +125,7 @@ function SBOM({ vulnData, vulnRefetch, getVulnData }) {
     compType,
     compLicense,
     compSupplier,
-    compScope,
+    compScope
   } = useContext(GlobalContext)
 
   const customerView = location.pathname.startsWith('/customer')
@@ -255,18 +256,19 @@ function SBOM({ vulnData, vulnRefetch, getVulnData }) {
 
   const handleDelete = async () => {
     setIsLoading(true)
-    try {
-      await deleteSbom({
-        variables: {
-          id: sbomId
-        }
-      }).then((res) => {
-        setIsLoading(false)
-        navigate(`/vendor/products`)
-      })
-    } catch (error) {
-      console.error('Mutation error:', error)
-    }
+    await deleteSbom({
+      variables: {
+        id: sbomId
+      }
+    }).then((res) => {
+      if (res.data) {
+        setTimeout(() => {
+          setIsLoading(false)
+          prodRefetch({ id: productId })
+          navigate(`/vendor/products/${params.name}?id=${productId}`)
+        }, 3000)
+      }
+    })
   }
 
   const refetchSBOM = async (id) => {
@@ -370,10 +372,22 @@ function SBOM({ vulnData, vulnRefetch, getVulnData }) {
         projectId: productId,
         sbomId: sbomId,
         search: compSearchInput !== '' ? compSearchInput : undefined,
-        ecosystem: compEcosystem.includes('all') || compEcosystem.length === 0 ? undefined : compEcosystem,
-        kind: compType.includes('all') || compType.length === 0 ? undefined : compType,
-        licenses: compLicense.includes('all') || compLicense.length === 0 ? undefined : compLicense,
-        supplierName: compSupplier.includes('all') || compSupplier.length === 0 ? undefined : compSupplier,
+        ecosystem:
+          compEcosystem.includes('all') || compEcosystem.length === 0
+            ? undefined
+            : compEcosystem,
+        kind:
+          compType.includes('all') || compType.length === 0
+            ? undefined
+            : compType,
+        licenses:
+          compLicense.includes('all') || compLicense.length === 0
+            ? undefined
+            : compLicense,
+        supplierName:
+          compSupplier.includes('all') || compSupplier.length === 0
+            ? undefined
+            : compSupplier,
         primary: compScope === 'primary' ? true : undefined,
         internal: compScope === 'internal' ? true : undefined,
         first: totalRows,
