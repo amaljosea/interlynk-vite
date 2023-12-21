@@ -537,6 +537,7 @@ export const CreateComponent = gql`
     $kind: String!
     $name: String!
     $version: String
+    $group: String
     $licenses: LicenseInput
     $cpes: [String!]
     $purl: String
@@ -550,6 +551,7 @@ export const CreateComponent = gql`
         kind: $kind
         name: $name
         version: $version
+        group: $group
         licenses: $licenses
         cpes: $cpes
         purl: $purl
@@ -562,6 +564,7 @@ export const CreateComponent = gql`
         id
         name
         version
+        group
         primary
         internal
         purl
@@ -579,6 +582,7 @@ export const UpdateComponent = gql`
     $kind: String
     $name: String
     $version: String
+    $group: String
     $licenses: LicenseInput
     $cpes: [String!]
     $purl: String
@@ -594,6 +598,7 @@ export const UpdateComponent = gql`
         kind: $kind
         name: $name
         version: $version
+        group: $group
         licenses: $licenses
         cpes: $cpes
         purl: $purl
@@ -607,6 +612,7 @@ export const UpdateComponent = gql`
         id
         name
         version
+        group
         kind
         primary
         internal

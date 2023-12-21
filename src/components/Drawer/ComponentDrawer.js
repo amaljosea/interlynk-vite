@@ -213,6 +213,7 @@ function ComponentDrawer(props) {
         kind: compKind,
         name: compName,
         version: compVersion,
+        group: groupInfo,
         scope: compScope,
         licenses:
           spdxLicense.length === 0 &&
@@ -259,6 +260,7 @@ function ComponentDrawer(props) {
         kind: compKind,
         name: compName,
         version: compVersion,
+        group: groupInfo,
         scope: compScope,
         licenses:
           spdxLicense.length === 0 &&
@@ -428,7 +430,6 @@ function ComponentDrawer(props) {
                   placeholder='Add group'
                   value={groupInfo}
                   onChange={(e) => setGroupInfo(e.target.value)}
-                  isDisabled
                 />
               </FormControl>
               {/* KIND */}
