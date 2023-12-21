@@ -1873,6 +1873,7 @@ export const GetSbomParts = gql`
         part {
           id
           lifecycle
+          creationAt
           project {
             id
             name

@@ -48,6 +48,8 @@ import { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV, FaFilter } from 'react-icons/fa'
 import { useLocation, Link, useParams, useNavigate } from 'react-router-dom'
+import { getFullDateAndTime } from 'utils'
+import { removeDuplicates } from 'utils'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 const customStyles = {
@@ -183,21 +185,42 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
     allProducts &&
     allProducts.projects.nodes.find((item) => item.id === selectedProd)
 
+  const sbomVersions = []
+
+  const filteredDuplicated = product ? removeDuplicates(product.sboms) : []
+
+  filteredDuplicated &&
+    filteredDuplicated.map((project) => {
+      if (project.primaryComponent) {
+        sbomVersions.push({
+          label: project.primaryComponent.version,
+          value: project.id,
+          creationAt: project.creationAt
+        })
+      } else {
+        sbomVersions.push({
+          label: `Uploaded ${getFullDateAndTime(project.creationAt)}`,
+          value: project.id,
+          creationAt: project.creationAt
+        })
+      }
+    })
+
   // console.log('product', product)
 
-  const filterVersion =
-    product &&
-    product.sboms.filter((sbom) => {
-      const existings =
-        data &&
-        sbom.primaryComponent &&
-        [...data].some(
-          (sbomPart) =>
-            sbomPart.part.primaryComponent.version ===
-            sbom.primaryComponent.version
-        )
-      return !existings
-    })
+  // const filterVersion =
+  //   product &&
+  //   product.sboms.filter((sbom) => {
+  //     const existings =
+  //       data &&
+  //       sbom.primaryComponent &&
+  //       [...data].some(
+  //         (sbomPart) =>
+  //           sbomPart.part.primaryComponent.version ===
+  //           sbom.primaryComponent.version
+  //       )
+  //     return !existings
+  //   })
 
   // console.log('filterVersion', filterVersion)
 
@@ -231,9 +254,9 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
     }
   }
 
-  const filterVersions =
-    uniqVersions.length > 0 &&
-    uniqVersions.filter((version) => version.id !== sbomId)
+  // const filterVersions =
+  //   uniqVersions.length > 0 &&
+  //   uniqVersions.filter((version) => version.id !== sbomId)
 
   // REMOVE DUPLICATES
   const removeDuplicatesAndLatest = (arr) => {
@@ -251,9 +274,9 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
     return Object.values(uniqueVersions)
   }
 
-  const filteredData = filterVersions
-    ? removeDuplicatesAndLatest(filterVersions)
-    : []
+  // const filteredData = filterVersions
+  //   ? removeDuplicatesAndLatest(filterVersions)
+  //   : []
 
   const getComponents = () => {
     setActiveProdTab(2)
@@ -313,8 +336,15 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       name: 'VERSION',
       selector: (row) => {
         const { part } = row
-        return <Text fontSize={14}>{part.primaryComponent.version}</Text>
-      }
+        return (
+          <Text fontSize={14}>
+            {part.primaryComponent
+              ? part.primaryComponent.version
+              : `Uploaded at ${getFullDateAndTime(part.creationAt)}`}
+          </Text>
+        )
+      },
+      wrap: true
     },
     {
       id: 'SUPPLIER',
@@ -553,7 +583,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
             <ModalHeader>Add Parts</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              {productList && currentProduct.version ? (
+              {productList ? (
                 <Stack spacing={4} direction={'column'} gap={2}>
                   {/* Project */}
                   <FormControl fontSize={'sm'}>
@@ -587,7 +617,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
                     >
                       Version
                     </FormLabel>
-                    {filterVersion?.length === 0 ? (
+                    {sbomVersions?.length === 0 ? (
                       <Alert borderRadius={'md'} py={'8px'} status='info'>
                         <AlertIcon />
                         No version available
@@ -601,13 +631,11 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
                         onChange={(e) => setSelectedVersion(e.target.value)}
                       >
                         <option value={''}>-- Select --</option>
-                        {filterVersion
-                          ?.filter((item) => item.primaryComponent !== null)
-                          .map((item, index) => (
-                            <option key={index} value={item.id}>
-                              {item.primaryComponent.version}
-                            </option>
-                          ))}
+                        {sbomVersions.map((item, index) => (
+                          <option key={index} value={item.value}>
+                            {item.label}
+                          </option>
+                        ))}
                       </Select>
                     )}
                   </FormControl>
