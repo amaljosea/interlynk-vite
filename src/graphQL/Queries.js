@@ -1910,6 +1910,7 @@ export const GetSbomParts = gql`
             vulnStats
           }
           primaryComponent {
+            id
             name
             version
           }

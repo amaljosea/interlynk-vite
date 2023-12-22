@@ -170,21 +170,35 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
     allProducts &&
     allProducts.projects.nodes.find((item) => item.id === selectedProd)
 
+  const existingVersions = []
+
+  data?.map((item) => {
+    if (item?.part?.primaryComponent) {
+      existingVersions.push(item?.part?.primaryComponent.version)
+    } else {
+      existingVersions.push(
+        `Uploaded ${getFullDateAndTime(item?.part?.creationAt)}`
+      )
+    }
+  })
+
   const sbomVersions = []
 
   const filteredDuplicated = product ? removeDuplicates(product.sboms) : []
 
   filteredDuplicated &&
     filteredDuplicated.map((project) => {
-      if (project.primaryComponent) {
+      if (
+        !existingVersions?.includes(
+          project.primaryComponent
+            ? project.primaryComponent.version
+            : `Uploaded ${getFullDateAndTime(project.creationAt)}`
+        )
+      ) {
         sbomVersions.push({
-          label: project.primaryComponent.version,
-          value: project.id,
-          creationAt: project.creationAt
-        })
-      } else {
-        sbomVersions.push({
-          label: `Uploaded ${getFullDateAndTime(project.creationAt)}`,
+          label: project.primaryComponent
+            ? project.primaryComponent.version
+            : `Uploaded ${getFullDateAndTime(project.creationAt)}`,
           value: project.id,
           creationAt: project.creationAt
         })
