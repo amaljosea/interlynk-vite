@@ -613,15 +613,15 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
                           flexDir={'row'}
                           alignItems={'center'}
                           gap={4}
-                          mt={12}
+                          mt={5}
                         >
-                          {/* components */}
+                          {/* COMPONENTS */}
                           <Stack
                             direction={'row'}
                             alignItems={'flex-start'}
                             spacing={2}
                           >
-                            <Icon h={4} w={4} color='#777' as={FaCube} />
+                            <Icon h={4} w={4} mt={1} color='#777' as={FaCube} />
                             <Box>
                               <Badge
                                 mr={1}
@@ -641,13 +641,14 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
                               </Text>
                             </Box>
                           </Stack>
-                          {/* license */}
+                          {/* LICENSES */}
                           <Stack
                             direction={'row'}
                             alignItems={'flex-start'}
                             spacing={2}
                           >
                             <Icon
+                              mt={1}
                               h={'20px'}
                               w={'20px'}
                               color='#777'
@@ -665,13 +666,13 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
                               <Text fontSize={'xs'}>Licenses</Text>
                             </Box>
                           </Stack>
-                          {/* vulnerabilities */}
+                          {/* VULNERABILITIES */}
                           <Stack
                             direction={'row'}
                             alignItems={'flex-start'}
                             spacing={2}
                           >
-                            <Icon h={4} w={4} color='#777' as={FaBug} />
+                            <Icon mt={1} h={4} w={4} color='#777' as={FaBug} />
                             <Box>
                               <Stack fontWeight={'medium'} direction={'row'}>
                                 <Tooltip label='Critical' placement='top'>

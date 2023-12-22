@@ -27,7 +27,8 @@ import {
   ModalFooter,
   UnorderedList,
   ListItem,
-  Button
+  Button,
+  Box
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
@@ -35,6 +36,7 @@ import VersionTable from 'components/Tables/VersionTable'
 import { useContext, useEffect, useState } from 'react'
 import {
   FaCube,
+  FaLayerGroup,
   FaPenToSquare,
   FaScrewdriverWrench,
   FaToggleOn,
@@ -320,7 +322,7 @@ const ProductDetails = () => {
                           {data.project.enabled ? 'Enabled' : 'Disabled'}
                         </Badge>
                         {/* ADDITIONAL STATS */}
-                        <Flex alignItems={'center'} gap={8} mt={4}>
+                        <Flex alignItems={'center'} gap={8} mt={5}>
                           {/*  ENV // * /}
                           /// TODO: 1.0 Add back in when ready
                           <Stat>
@@ -335,16 +337,31 @@ const ProductDetails = () => {
                           </Stat>
                            */}
                           {/* VERSIONS */}
-                          <Stat>
-                            <StatNumber>20</StatNumber>
-                            <StatLabel
-                              _hover={{ color: 'blue.500' }}
-                              cursor={'pointer'}
-                              onClick={() => setActiveTab(0)}
-                            >
-                              Versions
-                            </StatLabel>
-                          </Stat>
+                          <Stack
+                            direction={'row'}
+                            alignItems={'flex-start'}
+                            spacing={1}
+                          >
+                            <Icon h={4} w={4} color='#777' mt={1} as={FaLayerGroup} />
+                            <Box>
+                              <Badge
+                                mr={1}
+                                fontSize={'xl'}
+                                fontWeight={'medium'}
+                                bg={'none'}
+                              >
+                                {versions?.project?.sboms?.length}
+                              </Badge>
+                              <Text
+                                fontSize={'xs'}
+                                cursor={'pointer'}
+                                _hover={{ textDecoration: 'underline' }}
+                                onClick={() => setActiveTab(0)}
+                              >
+                                Versions
+                              </Text>
+                            </Box>
+                          </Stack>
                           {/* VULN * /}
                           /// TODO: 1.0 Add back in when ready
                           <Stat>
@@ -441,9 +458,9 @@ const ProductDetails = () => {
                 <TabList>
                   {[
                     'versions',
+                    ,
                     /// TODO: 1.0 Add back in when ready
-                    /* 'vulnerabilities', */,
-                    'automation',
+                    /* 'vulnerabilities', */ 'automation',
                     'settings',
                     'change log'
                   ].map((item, index) => (
@@ -482,7 +499,6 @@ const ProductDetails = () => {
                         {JSON.stringify(rulesError)}
                       </Text>
                     )}
-
                     <Settings
                       data={rules?.project.autoChecks}
                       refetch={getRules}
