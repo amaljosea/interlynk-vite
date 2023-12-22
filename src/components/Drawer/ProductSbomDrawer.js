@@ -286,7 +286,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
 
   return (
     <>
-      <Drawer isOpen={isOpen} placement='right' onClose={onClose} size='sm'>
+      <Drawer isOpen={isOpen} placement='right' onClose={onClose} size='md'>
         <DrawerOverlay />
 
         <DrawerContent>
@@ -297,7 +297,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
           <DrawerBody>
             <Stack direction={'column'} spacing={4}>
               {/* NAME */}
-              <FormControl>
+              <FormControl isRequired>
                 <FormLabel htmlFor='sbomName' fontSize={'sm'}>
                   Name
                 </FormLabel>
@@ -312,7 +312,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
                 />
               </FormControl>
               {/* VERSION */}
-              <FormControl>
+              <FormControl isRequired>
                 <FormLabel htmlFor='sbomVersion' fontSize={'sm'}>
                   Version
                 </FormLabel>
@@ -326,8 +326,26 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
                   placeholder='Enter version'
                 />
               </FormControl>
-              {/* Format */}
+              {/* Group */}
               <FormControl>
+                <FormLabel htmlFor='groupInfo' fontSize={'sm'}>
+                  <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
+                    <Text>Group</Text>
+                    <Tooltip label='Group Info'>
+                      <Icon as={InfoIcon} color={'blue.500'} />
+                    </Tooltip>
+                  </Flex>
+                </FormLabel>
+                <Input
+                  size='md'
+                  fontSize={'sm'}
+                  placeholder='Add group'
+                  value={groupInfo}
+                  onChange={(e) => setGroupInfo(e.target.value)}
+                />
+              </FormControl>
+              {/* Format */}
+              <FormControl isRequired>
                 <FormLabel htmlFor='compType' fontSize={'sm'}>
                   Type
                 </FormLabel>
@@ -353,43 +371,6 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
                   <option value='other'>Other</option>
                   <option value='unspecified'>Unspecified</option>
                 </Select>
-              </FormControl>
-              {/* SCOPE */}
-              <FormControl>
-                <FormLabel htmlFor='compScope'>Scope</FormLabel>
-                <Select
-                  id='compScope'
-                  name='compScope'
-                  size='md'
-                  fontSize={'sm'}
-                  value={compScope}
-                  onChange={(e) => setCompScope(e.target.value)}
-                >
-                  <option value='' style={{ background: 'lightgray' }}>
-                    -- Select --
-                  </option>
-                  <option value='excluded'>Excluded</option>
-                  <option value='optional'>Optional</option>
-                  <option value='required'>Required</option>
-                </Select>
-              </FormControl>
-              {/* Group */}
-              <FormControl>
-                <FormLabel htmlFor='groupInfo' fontSize={'sm'}>
-                  <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
-                    <Text>Group</Text>
-                    <Tooltip label='Group Info'>
-                      <Icon as={InfoIcon} color={'blue.500'} />
-                    </Tooltip>
-                  </Flex>
-                </FormLabel>
-                <Input
-                  size='md'
-                  fontSize={'sm'}
-                  placeholder='Add group'
-                  value={groupInfo}
-                  onChange={(e) => setGroupInfo(e.target.value)}
-                />
               </FormControl>
               {/* Licenses */}
               <LicenseField data={data} />
@@ -489,6 +470,25 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
                   ))}
                 </Flex>
               </FormControl>
+              {/* SCOPE */}
+              <FormControl>
+                <FormLabel htmlFor='compScope'>Scope</FormLabel>
+                <Select
+                  id='compScope'
+                  name='compScope'
+                  size='md'
+                  fontSize={'sm'}
+                  value={compScope}
+                  onChange={(e) => setCompScope(e.target.value)}
+                >
+                  <option value='' style={{ background: 'lightgray' }}>
+                    -- Select --
+                  </option>
+                  <option value='excluded'>Excluded</option>
+                  <option value='optional'>Optional</option>
+                  <option value='required'>Required</option>
+                </Select>
+              </FormControl>
               {/* PRIMARY COMPONENT */}
               <FormControl htmlFor={'isPrimary'} isReadOnly={true}>
                 <Checkbox
@@ -497,6 +497,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
                   name='isPrimary'
                   colorScheme='blue'
                   defaultChecked={true}
+                  mt={4}
                 >
                   Primary component
                 </Checkbox>
@@ -510,12 +511,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
             <Button
               colorScheme='blue'
               onClick={handleCreateSBOM}
-              disabled={
-                sbomName === '' ||
-                compType === '' ||
-                version === '' ||
-                compScope === ''
-              }
+              disabled={sbomName === '' || compType === '' || version === ''}
             >
               Save
             </Button>
