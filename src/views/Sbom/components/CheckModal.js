@@ -19,8 +19,10 @@ import {
   ModalOverlay,
   Select,
   Stack,
+  Tag,
   Text,
-  Tooltip
+  Tooltip,
+  VStack
 } from '@chakra-ui/react'
 import LicenseField from 'components/LicenseField'
 import GlobalContext from 'context/GlobalContext'
@@ -31,7 +33,7 @@ import {
   CreateAutomation
 } from 'graphQL/Mutation'
 import { useContext, useEffect, useState, useRef } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 const CheckModal = ({
   activeCheck,
@@ -41,12 +43,15 @@ const CheckModal = ({
   shortDesc,
   checkId,
   filterRefetch,
-  componentId
+  componentId,
+  setPageIndex
 }) => {
+  const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
-  const productId = queryParams.get('p')
+  const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
+  const currentProduct = JSON.parse(localStorage.getItem(`product`))
 
   const compRef = useRef()
 
@@ -58,15 +63,17 @@ const CheckModal = ({
   const {
     licenseType,
     spdxLicense,
+    licenseExp,
     setCheckFilters,
     setActiveProdTab,
+    customLicense,
     compField,
-    compDirection
+    compDirection,
+    setLicenseType
   } = useContext(GlobalContext)
 
   const now = new Date()
   const currentTime = now.toISOString().slice(0, 16)
-  const [expLicense, setExpLicense] = useState([])
   const [timestamp, setTimestamp] = useState(currentTime)
   const [comp, setComp] = useState('')
   const [compType, setCompType] = useState('')
@@ -140,7 +147,7 @@ const CheckModal = ({
         })
         .finally(() => {
           setActiveProdTab(0)
-          window.location.reload()
+          navigate(`/vendor/products/${currentProduct.name}?id=${productId}`)
         })
     } catch (error) {
       console.log('Mutation error', error)
@@ -153,16 +160,20 @@ const CheckModal = ({
         variables: {
           id: componentId,
           sbomId: sbomId,
-          licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
-          licenseExp: licenseType === 'license_exp' ? expLicense : undefined
+          licenses: {
+            licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
+            licensesExp: licenseType === 'license_exp' ? licenseExp : undefined,
+            licensesCustom:
+              licenseType === 'license_custom' ? customLicense : undefined
+          }
         }
       })
         .then((res) => {
           if (res.data) {
             onFilterRefetch()
           }
-
           if (checkId) {
+            setPageIndex(1)
             healthRecheck({
               variables: {
                 compId: componentId,
@@ -187,7 +198,6 @@ const CheckModal = ({
       const filterData = data?.sbom.components.nodes.filter((str) =>
         str.name.includes(value)
       )
-      console.log('filterData', filterData)
       setComponentList(filterData)
     }
   }
@@ -258,7 +268,9 @@ const CheckModal = ({
                 licenseType === 'license_spdx'
                   ? spdxLicense
                   : licenseType === 'license_exp'
-                  ? expLicense
+                  ? licenseExp
+                  : licenseType === 'license_custom'
+                  ? customLicense
                   : ''
             },
             null,
@@ -269,6 +281,11 @@ const CheckModal = ({
     }
   }
 
+  const isInvalidLicense =
+    (licenseType === 'license_spdx' && spdxLicense.length === 0) ||
+    (licenseType === 'license_exp' && licenseExp === '') ||
+    (licenseType === 'license_custom' && customLicense.length === 0)
+
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
@@ -277,6 +294,22 @@ const CheckModal = ({
           <ModalHeader>{heading(shortDesc)}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
+            {activeCheck && (
+              <Flex
+                width='100%'
+                direction={'row'}
+                alignItems={'center'}
+                justifyContent={'flex-start'}
+                wrap={'wrap'}
+                gap={2}
+                mb={6}
+              >
+                <Text fontWeight={'medium'} wordBreak={'break-all'}>
+                  {activeCheck?.component?.name}
+                </Text>
+                <Tag colorScheme='blue'>{activeCheck?.component?.version}</Tag>
+              </Flex>
+            )}
             {shortDesc === 'Document has a primary component' && (
               <Flex
                 flexDirection={'column'}
@@ -289,7 +322,7 @@ const CheckModal = ({
                   <Input value={comp} onChange={handleComponentChange} />
                 </FormControl>
 
-                {componentList.length > 0 && (
+                {comp !== '' && componentList.length > 0 && (
                   <Box
                     position='absolute'
                     zIndex='1'
@@ -310,6 +343,7 @@ const CheckModal = ({
                           cursor='pointer'
                           fontSize={'sm'}
                           onClick={() => {
+                            setLicenseType('')
                             setActiveComp(item)
                             setComp(item.name)
                             setComponentList([])
@@ -378,11 +412,7 @@ const CheckModal = ({
             {(shortDesc === 'Component has license/s specified' ||
               shortDesc === 'Componet has deprecated license/s' ||
               shortDesc === 'Component has restrictive licenses specified') && (
-              <LicenseField
-                exp={activeCheck.component.licenseExp}
-                expLicense={expLicense}
-                setExpLicense={setExpLicense}
-              />
+              <LicenseField data={activeCheck.component} />
             )}
           </ModalBody>
 
@@ -392,14 +422,24 @@ const CheckModal = ({
               justifyContent={'space-between'}
               alignItems={'center'}
             >
-              <Button fontSize={'sm'} colorScheme='blue' onClick={onSaveRule}>
+              <Button
+                fontSize={'sm'}
+                colorScheme='blue'
+                onClick={onSaveRule}
+                disabled={isInvalidLicense}
+              >
                 Save Rule
               </Button>
               <Stack direction={'row'} spacing={2} alignItems={'center'}>
                 <Button fontSize={'sm'} onClick={onClose}>
                   Close
                 </Button>
-                <Button fontSize={'sm'} colorScheme='blue' type='submit'>
+                <Button
+                  fontSize={'sm'}
+                  colorScheme='blue'
+                  type='submit'
+                  disabled={isInvalidLicense}
+                >
                   Save
                 </Button>
               </Stack>

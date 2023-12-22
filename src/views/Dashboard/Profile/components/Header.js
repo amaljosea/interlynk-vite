@@ -1,27 +1,128 @@
 // Chakra imports
-import { Avatar, Button, Flex, Text, useColorModeValue } from '@chakra-ui/react'
-
+import { useMutation } from '@apollo/client'
+import {
+  Avatar,
+  Box,
+  Button,
+  Flex,
+  Input,
+  Text,
+  useColorModeValue,
+  useToast
+} from '@chakra-ui/react'
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
-import { displayPic } from 'utils'
+import { UploadProfileImage } from 'graphQL/Mutation'
+import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
-const Header = ({ selectedTab, setSelectedTab, user, tabs }) => {
-  // Chakra color mode
+const Header = ({
+  selectedTab,
+  setSelectedTab,
+  user,
+  tabs,
+  refetch,
+  setTabIndex,
+  setPsIndex
+}) => {
+  const navigate = useNavigate()
+  const toast = useToast()
   const textColor = useColorModeValue('gray.700', 'white')
-
   const emailColor = useColorModeValue('gray.500', 'gray.300')
 
   const handleClick = (name) => {
     setSelectedTab(name)
     if (name === 'PERSONAL') {
-      window.history.pushState(null, null, '/vendor/profiles?tab=person')
+      navigate('/vendor/settings?tab=person')
+      setPsIndex(0)
     } else {
-      window.history.pushState(null, null, '/vendor/profiles?tab=organization')
+      navigate('/vendor/settings?tab=general')
+      setTabIndex(0)
     }
   }
 
+  const userName = localStorage.getItem('username')
+  const userEmail = localStorage.getItem('email')
+
+  const [uploadProfile] = useMutation(UploadProfileImage)
+
+  const inputRef = useRef(null)
+  const [profileImage, setProfileImage] = useState(null)
+
+  const isValidFileType = (file) => {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
+    return allowedTypes.includes(file.type)
+  }
+
+  const isValidFileSize = (file) => {
+    const maxSize = 5 * 1024 * 1024
+    return file.size <= maxSize
+  }
+
+  const SERVER_URL = process.env.REACT_APP_SERVER
+
+  const onImageChange = async (file) => {
+    console.log('Selected file:', file)
+    // setProfileImage(URL.createObjectURL(file))
+    await uploadProfile({
+      variables: {
+        userId: user.id,
+        profileImage: file
+      }
+    })
+      .then((res) => {
+        if (res.data) {
+          setProfileImage(
+            `${SERVER_URL}/${res.data.userUploadProfileImage.user.profileImage.url}`
+          )
+          refetch()
+        }
+      })
+      .finally(() => {
+        toast({
+          description: 'Profile updated successfully',
+          status: 'success',
+          duration: 3000,
+          position: 'top'
+        })
+      })
+  }
+
+  const onProfileClick = () => {
+    inputRef.current.click()
+  }
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0]
+    console.log('file', file)
+    if (file) {
+      if (isValidFileType(file) && isValidFileSize(file)) {
+        onImageChange(file)
+      } else {
+        toast({
+          title: 'Someting went wrong 😕',
+          variant: 'left-accent',
+          description: 'The file is too large. Allowed maximum size is 5MB',
+          status: 'error',
+          duration: 5000,
+          position: 'top'
+        })
+      }
+    }
+  }
+
+  useEffect(() => {
+    if (user) {
+      if (user.profileImage?.url) {
+        setProfileImage(`${SERVER_URL}/${user.profileImage?.url}`)
+      } else {
+        setProfileImage(null)
+      }
+    }
+  }, [])
+
   return (
-    <Flex direction='column' pt={{ base: '120px', md: '75px' }}>
+    <Flex direction='column'>
       <Card mb='6'>
         <CardBody>
           {/* user info */}
@@ -31,14 +132,53 @@ const Header = ({ selectedTab, setSelectedTab, user, tabs }) => {
             direction={{ sm: 'column', md: 'row' }}
             w={{ sm: '100%' }}
             textAlign={{ sm: 'center', md: 'start' }}
+            gap={4}
           >
-            <Avatar
-              me={{ md: '22px' }}
-              src={displayPic(user.email)}
-              w='80px'
-              h='80px'
-              bg='none'
-            />
+            {/* PROFILE IMAGE */}
+            <Box
+              position='relative'
+              overflow='hidden'
+              borderRadius='full'
+              width='80px'
+              height='80px'
+            >
+              <Avatar
+                me={{ md: '22px' }}
+                src={profileImage && profileImage}
+                borderRadius='full'
+                width='80px'
+                height='80px'
+                objectFit='cover'
+              />
+              <Input
+                type='file'
+                accept='.jpg,.jpeg,.png,.webp'
+                ref={inputRef}
+                onChange={handleFileChange}
+                opacity='0'
+                position='absolute'
+                top='0'
+                left='0'
+                width='80px'
+                height='80px'
+                cursor='pointer'
+              />
+              <Box
+                position='absolute'
+                top='0'
+                left='0'
+                width='80px'
+                height='80px'
+                bg='rgba(0,0,0,0.2)'
+                opacity='0'
+                transition='opacity 0.3s'
+                _hover={{ opacity: 1 }}
+                onClick={onProfileClick}
+                borderRadius='full'
+                cursor='pointer'
+              />
+            </Box>
+
             <Flex direction='column' maxWidth='100%' my={{ sm: '14px' }}>
               <Text
                 fontSize={{ sm: 'lg', lg: 'xl' }}
@@ -46,14 +186,14 @@ const Header = ({ selectedTab, setSelectedTab, user, tabs }) => {
                 fontWeight='bold'
                 ms={{ sm: '8px', md: '0px' }}
               >
-                {user.name}
+                {user ? user.name : userName}
               </Text>
               <Text
                 fontSize={{ sm: 'sm', md: 'md' }}
                 color={emailColor}
                 fontWeight='medium'
               >
-                {user.email}
+                {user ? user.email : userEmail}
               </Text>
             </Flex>
           </Flex>

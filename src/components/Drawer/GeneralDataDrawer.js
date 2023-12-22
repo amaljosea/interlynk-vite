@@ -19,7 +19,6 @@ import {
   Td,
   Table,
   Icon,
-  Select,
   useToast,
   FormControl,
   FormErrorMessage,
@@ -28,8 +27,8 @@ import {
   Stack
 } from '@chakra-ui/react'
 import GlobalContext from 'context/GlobalContext'
-import { CreateAutomation } from 'graphQL/Mutation'
 import {
+  CreateAutomation,
   toolDelete,
   supplierCreate,
   supplierDelete,
@@ -37,12 +36,9 @@ import {
   authorCreate,
   toolCreate
 } from 'graphQL/Mutation'
-import { useContext } from 'react'
-import { useState, useEffect } from 'react'
+import { useContext, useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
-import { getFullDateAndTime } from 'utils'
-import { timeSince } from 'utils'
-import { licenseOptions } from 'variables/licenses'
+import { getFullDateAndTime, timeSince } from 'utils'
 
 const GeneralDataDrawer = ({
   isOpen,
@@ -52,16 +48,13 @@ const GeneralDataDrawer = ({
   selectedKey,
   refetch,
   checkId,
-  totalRows,
+  setPageIndex,
   filterRefetch
 }) => {
-  // console.log(`suppliers`, suppliers)
-
   const toast = useToast()
-
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
-  const productId = queryParams.get('p')
+  const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
 
   const { setCheckFilters } = useContext(GlobalContext)
@@ -75,15 +68,11 @@ const GeneralDataDrawer = ({
   const [supName, setSupName] = useState('')
   const [supEmail, setSupEmail] = useState('')
 
-  const [licenseName, setLicenseName] = useState('')
-  const [selectedLicense, setSelectedLicense] = useState('')
-
   const [existingTools, setExistingTools] = useState([])
   const [creationTools, setCreationTools] = useState([])
   const [existingAuthors, setExistingAuthors] = useState([])
   const [authorList, setAuthorList] = useState([])
   const [supplierList, setSupplierList] = useState([])
-  const [licenseList, setLicenseList] = useState([])
 
   const [authorError, setAuthorError] = useState('')
 
@@ -120,21 +109,9 @@ const GeneralDataDrawer = ({
 
   useEffect(() => {
     if (data) {
-      setExistingTools(data.tools)
-      setSupplierList(data.suppliers)
-      setExistingAuthors(data.authors)
-    }
-  }, [data])
-
-  useEffect(() => {
-    if (data) {
-      const filterData = licenseOptions.find(
-        (item) => item.licenseId === data.licenses[0]
-      )
-      // console.log(`filterData`, filterData)
-      if (filterData) {
-        setLicenseList(filterData)
-      }
+      setExistingTools(data.tools ? data.tools : [])
+      setSupplierList(data.suppliers ? data.suppliers : [])
+      setExistingAuthors(data.authors ? data.authors : [])
     }
   }, [data])
 
@@ -217,34 +194,6 @@ const GeneralDataDrawer = ({
     setToolVendor('')
   }
 
-  const onLicenselAdd = () => {
-    if (licenseName !== '' || selectedLicense !== '') {
-      setLicenseList((prev) => [
-        {
-          name:
-            selectedLicense && selectedLicense !== 'Custom'
-              ? selectedLicense
-              : licenseName
-        },
-        ...prev
-      ])
-      setLicenseName('')
-      setSelectedLicense('')
-    } else {
-      toast({
-        description: 'Please fill up required fields',
-        status: 'warning',
-        position: 'top-right',
-        duration: 2000
-      })
-    }
-  }
-
-  const onLicenselRemove = (ls) => {
-    const updatedList = licenseList.filter((item) => item.name !== ls.name)
-    setLicenseList(updatedList)
-  }
-
   const handleSave = () => {
     if (creationTools.length > 0) {
       creationTools.map((item) => {
@@ -290,6 +239,7 @@ const GeneralDataDrawer = ({
     }
 
     if (checkId && (creationTools.length > 0 || authorList.length > 0)) {
+      setPageIndex(1)
       healthRecheck({
         variables: {
           checkId: checkId,
@@ -377,7 +327,7 @@ const GeneralDataDrawer = ({
           <DrawerBody>
             {selectedKey === 'tools' && (
               <Flex direction={'column'} alignItems={'flex-start'} gap={3}>
-                <FormControl>
+                <FormControl isRequired>
                   <FormLabel htmlFor='toolVendor'>Vendor Name</FormLabel>
                   <Input
                     id='toolVendor'
@@ -664,75 +614,6 @@ const GeneralDataDrawer = ({
                   </Flex>
                 </Flex>
               </form>
-            )}
-
-            {selectedKey === 'license' && (
-              <Flex direction={'column'} alignItems={'flex-start'} gap={3}>
-                <FormControl>
-                  <Select
-                    isDisabled={licenseName !== ''}
-                    name='license'
-                    id='license'
-                    value={selectedLicense}
-                    onChange={(e) => setSelectedLicense(e.target.value)}
-                  >
-                    {licenseOptions.map((item) => (
-                      <option key={item.licenseId} value={item.licenseId}>
-                        {item.name}
-                      </option>
-                    ))}
-                  </Select>
-                </FormControl>
-                {selectedLicense === 'Custom' && (
-                  <FormControl>
-                    <Input
-                      placeholder='Enter a valid SPDX license'
-                      value={licenseName}
-                      onChange={(e) => setLicenseName(e.target.value)}
-                    />
-                  </FormControl>
-                )}
-                <Button colorScheme='blue' onClick={onLicenselAdd}>
-                  Add
-                </Button>
-
-                <Flex width={'100%'} flexDir={'column'}>
-                  <Text size='md' my={2}>
-                    License History
-                  </Text>
-                  {licenseList.length > 0 ? (
-                    <Table variant='simple' size='sm' mt={4}>
-                      <Thead>
-                        <Tr my='.8rem'>
-                          <Th pl={0}>Name</Th>
-                          <Th pl={0}></Th>
-                        </Tr>
-                      </Thead>
-                      <Tbody>
-                        {licenseList.map((item, index) => (
-                          <Tr key={index}>
-                            <Td pl={0} fontSize={'sm'}>
-                              {item.name}
-                            </Td>
-                            <Td>
-                              <Icon
-                                as={DeleteIcon}
-                                color={'red'}
-                                cursor={'pointer'}
-                                onClick={() => onLicenselRemove(item)}
-                              />
-                            </Td>
-                          </Tr>
-                        ))}
-                      </Tbody>
-                    </Table>
-                  ) : (
-                    <Text mt={4} color={'darkgrey'}>
-                      No author found
-                    </Text>
-                  )}
-                </Flex>
-              </Flex>
             )}
           </DrawerBody>
 

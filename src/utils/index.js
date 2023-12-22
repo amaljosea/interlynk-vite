@@ -219,30 +219,43 @@ export const displayPic = (email) => {
   }
 }
 
-export const timeSince = (dateStr) => {
-  var date = new Date(dateStr)
-  var seconds = Math.floor((new Date() - date) / 1000)
-  var interval = seconds / 31536000
-  if (interval > 1) {
-    return Math.floor(interval) + ' years ago'
+const calculateTimeDifference = (inputDate) => {
+  const currentDate = new Date()
+  const inputDateObj = new Date(inputDate)
+  const timeDifference = currentDate - inputDateObj
+  return timeDifference
+}
+
+const formatTime = (timeDifference) => {
+  if (timeDifference < 0) {
+    return '0 seconds ago'
   }
-  interval = seconds / 2592000
-  if (interval > 1) {
-    return Math.floor(interval) + ' months ago'
+
+  const seconds = Math.floor(timeDifference / 1000)
+  const minutes = Math.floor(seconds / 60)
+  const hours = Math.floor(minutes / 60)
+  const days = Math.floor(hours / 24)
+  const months = Math.floor(days / 30)
+  const years = Math.floor(months / 12)
+
+  if (years > 0) {
+    return `${years} ${years === 1 ? 'year' : 'years'} ago`
+  } else if (months > 0) {
+    return `${months} ${months === 1 ? 'month' : 'months'} ago`
+  } else if (days > 0) {
+    return `${days} ${days === 1 ? 'day' : 'days'} ago`
+  } else if (hours > 0) {
+    return `${hours} ${hours === 1 ? 'hour' : 'hours'} ago`
+  } else if (minutes > 0) {
+    return `${minutes} ${minutes === 1 ? 'minute' : 'minutes'} ago`
+  } else {
+    return `${seconds} ${seconds === 1 ? 'second' : 'seconds'} ago`
   }
-  interval = seconds / 86400
-  if (interval > 1) {
-    return Math.floor(interval) + ' days ago'
-  }
-  interval = seconds / 3600
-  if (interval > 1) {
-    return Math.floor(interval) + ' hours ago'
-  }
-  interval = seconds / 60
-  if (interval > 1) {
-    return Math.floor(interval) + ' minutes ago'
-  }
-  return Math.floor(seconds) + ' seconds ago'
+}
+
+export const timeSince = (inputDate) => {
+  const timeDifference = calculateTimeDifference(inputDate)
+  return formatTime(timeDifference)
 }
 
 export const regions = [
@@ -452,7 +465,6 @@ export const getActiveRoute = (routes) => {
       }
     }
   }
-  console.log(`active`, activeRoute)
   return activeRoute
 }
 
@@ -518,18 +530,26 @@ export const findSimilarItems = (currentData, selectedData) => {
     const matchingSelected = selectedData.find(
       (selectedItem) => selectedItem.vuln.vulnId === currentItem.vuln.vulnId
     )
-
     if (matchingSelected) {
+      const hasLogs = matchingSelected.componentVulnLogs.length > 0
+      const selectedVuln =
+        hasLogs &&
+        matchingSelected.componentVulnLogs[
+          matchingSelected.componentVulnLogs.length > 1
+            ? matchingSelected.componentVulnLogs.length - 1
+            : 0
+        ]
       return {
         ...currentItem,
         importStatus: matchingSelected.vexStatus,
         importJustification: matchingSelected.vexJustification,
-        importNotes:
-          matchingSelected.componentVulnLogs.length > 0
-            ? matchingSelected.componentVulnLogs[
-                matchingSelected.componentVulnLogs.length - 1
-              ].note
-            : '',
+        importNotes: selectedVuln.note || null,
+        importDetail: selectedVuln.detail || null,
+        importResponse: matchingSelected.cdxResponseId
+          ? matchingSelected.cdxResponseId
+          : null,
+        importFixedIn: selectedVuln.fixedIn || null,
+        importActionStmt: selectedVuln.actionStmt || null,
         importStatement: matchingSelected.impact
       }
     }
@@ -558,4 +578,42 @@ export const findUniqueItems = (currentArray, importArray) => {
   }
 
   return uniqueItems
+}
+
+export const customStyles = {
+  headCells: {
+    style: {
+      width: '100%',
+      fontWeight: 'bold',
+      color: '#2D3748',
+      fontSize: '12px',
+      letterSpacing: '1px'
+    }
+  },
+  subHeader: {
+    style: {
+      padding: 0,
+      margin: 0
+    }
+  }
+}
+
+// REMOVE DUPLICATE PRODUCTS VERSIONS
+export const removeDuplicates = (arr) => {
+  const uniqueVersions = {}
+  for (const item of arr) {
+    if (
+      !uniqueVersions[item.primaryComponent?.version] ||
+      item.updatedAt > uniqueVersions[item.primaryComponent?.version].creationAt
+    ) {
+      uniqueVersions[item.primaryComponent?.version] = item
+    }
+  }
+  const versions = Object.values(uniqueVersions).sort((a, b) => {
+    const dateA = new Date(a.creationAt)
+    const dateB = new Date(b.creationAt)
+    return dateB - dateA
+  })
+
+  return versions
 }

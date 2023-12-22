@@ -26,10 +26,15 @@ import {
   Stack,
   Select
 } from '@chakra-ui/react'
-import { useContext, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useContext, useEffect, useMemo, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { FaEllipsisV } from 'react-icons/fa'
-import { getFullDateAndTime, timeSince } from 'utils'
+import {
+  getFullDateAndTime,
+  timeSince,
+  customStyles,
+  removeDuplicates
+} from 'utils'
 import CustomLoader from 'components/CustomLoader'
 import DataTable from 'react-data-table-component'
 import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
@@ -38,49 +43,30 @@ import { UpdateProject, DeleteProject } from 'graphQL/Mutation'
 import ProductModal from 'views/Dashboard/Products/components/ProductModal'
 import UploadModal from 'views/Dashboard/Products/components/UploadModal'
 import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
-import { useHistory } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
-
-const customStyles = {
-  headCells: {
-    style: {
-      fontWeight: 'bold',
-      color: '#2D3748',
-      fontSize: '12px',
-      letterSpacing: '1px'
-    }
-  },
-  subHeader: {
-    style: {
-      padding: 0,
-      margin: 0
-    }
-  }
-}
+import ProdFilterMenu from 'views/Dashboard/Products/components/ProdFilterMenu'
+import { useGlobalState } from 'hooks/useGlobalState'
+import ProdSearchFilter from 'views/Sbom/components/ProdSearchFilter'
 
 const ProductTable = ({ data, refetch }) => {
+  const { totalRows, setTotalRows, prodState, dispatch } = useGlobalState()
+  const { field, direction, searchInput, pageIndex } = prodState
+  const { prodDispatch } = dispatch
+
   const toast = useToast()
-  const history = useHistory()
-  const [pageIndex, setPageIndex] = useState(1)
+  const navigate = useNavigate()
   const [activeRow, setActiveRow] = useState(null)
+  const [activeProd, setActiveProd] = useState('yes')
+
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const {
-    totalRows,
-    setTotalRows,
     setCurrentProduct,
     setActiveProdTab,
-    prodSearchInput,
-    setProdSearchInput,
-    prodField,
-    setProdField,
-    prodDirection,
-    setProdDirection,
     setLicenseType,
     setSpdxList,
     setSpdxLicense,
-    setExpList,
     setLicenseExp
   } = useContext(GlobalContext)
 
@@ -113,28 +99,12 @@ const ProductTable = ({ data, refetch }) => {
     onClose: onWarningClose
   } = useDisclosure()
 
-  // REMOVE DUPLICATE PRODUCTS
-  const removeDuplicatesAndLatest = (arr) => {
-    const uniqueVersions = {}
-
-    for (const item of arr) {
-      if (
-        !uniqueVersions[item.version] ||
-        item.updatedAt > uniqueVersions[item.version].updatedAt
-      ) {
-        uniqueVersions[item.version] = item
-      }
-    }
-
-    return Object.values(uniqueVersions)
-  }
-
   const [projectDelete] = useMutation(DeleteProject, {
     onCompleted: () =>
       refetch({
         first: totalRows,
-        field: prodField,
-        direction: prodDirection
+        field: field,
+        direction: direction
       })
   })
 
@@ -142,8 +112,8 @@ const ProductTable = ({ data, refetch }) => {
     onCompleted: () =>
       refetch({
         first: totalRows,
-        field: prodField,
-        direction: prodDirection
+        field: field,
+        direction: direction
       })
   })
 
@@ -152,7 +122,6 @@ const ProductTable = ({ data, refetch }) => {
     setLicenseType('license_spdx')
     setSpdxList([])
     setSpdxLicense([])
-    setExpList([])
     setLicenseExp([])
     onSbomOpen()
   }
@@ -186,71 +155,48 @@ const ProductTable = ({ data, refetch }) => {
       id: 'PROJECTS_NAME',
       name: 'PRODUCT',
       selector: (row) => {
-        const { enabled, sboms, name, id } = row
-        const uniqVersions = []
-        sboms &&
-          sboms.map((project) => {
-            if (project.primaryComponent) {
-              uniqVersions.push({
-                version: project.primaryComponent.version,
-                id: project.id,
-                updatedAt: project.updatedAt
-              })
-            }
-          })
+        const { sboms, name, id } = row
 
-        const filteredData = uniqVersions
-          ? removeDuplicatesAndLatest(uniqVersions)
-          : []
+        const data = sboms ? removeDuplicates(sboms) : []
+
+        const product = {
+          id: id,
+          name: name,
+          version:
+            data.length > 0
+              ? data[0].primaryComponent?.version
+              : sboms.length > 0
+              ? sboms[0].primaryComponent?.version
+              : '',
+          sbomId:
+            data.length > 0
+              ? data[0].primaryComponent?.version
+              : sboms.length > 0
+              ? sboms[0].id
+              : ''
+        }
+
+        const handleClick = () => {
+          if (sboms.length > 0) {
+            localStorage.setItem('product', JSON.stringify(product))
+            localStorage.setItem('activeProdTab', 0)
+            setCurrentProduct({
+              id: id,
+              sbomId:
+                data.length > 0
+                  ? data[0].primaryComponent?.version
+                  : sboms[0].id
+            })
+          }
+          setActiveProdTab(0)
+        }
 
         return (
-          <>
-            {sboms.length > 0 && enabled && (
-              <Link
-                to={`/vendor/products?&p=${id}&sbom=${
-                  filteredData.length > 0 ? filteredData[0].id : sboms[0].id
-                }`}
-                onClick={() => {
-                  window.localStorage.setItem('product', name)
-                  window.localStorage.setItem(
-                    'productVersion',
-                    sboms[0].primaryComponent?.version
-                  )
-                  setCurrentProduct({
-                    id: id,
-                    sbomId:
-                      filteredData.length > 0 ? filteredData[0].id : sboms[0].id
-                  })
-                  setActiveProdTab(0)
-                }}
-              >
-                <Text color={'blue.500'} minWidth='100%'>
-                  {name}
-                </Text>
-              </Link>
-            )}
-
-            {sboms.length === 0 && enabled && (
-              <Text
-                minWidth='100%'
-                color={'blue.500'}
-                cursor='pointer'
-                onClick={() => {
-                  toast({
-                    title: 'SBOM Not Found',
-                    description: 'Please upload any SBOM file',
-                    status: 'info',
-                    duration: 2000,
-                    position: 'top'
-                  })
-                }}
-              >
-                {name}
-              </Text>
-            )}
-
-            {!enabled && <Text>{name}</Text>}
-          </>
+          <Link to={`/vendor/products/${name}?id=${id}`} onClick={handleClick}>
+            <Text color={'blue.500'} minWidth='100%'>
+              {name}
+            </Text>
+          </Link>
         )
       },
       wrap: true,
@@ -262,23 +208,8 @@ const ProductTable = ({ data, refetch }) => {
       name: 'VERSION',
       selector: (row) => {
         const { sboms } = row
-        const uniqVersions = []
-        sboms &&
-          sboms.map((project) => {
-            if (project.primaryComponent) {
-              uniqVersions.push({
-                version: project.primaryComponent.version,
-                id: project.id,
-                updatedAt: project.updatedAt
-              })
-            }
-          })
-
-        const filteredData = uniqVersions
-          ? removeDuplicatesAndLatest(uniqVersions)
-          : []
-
-        return <Text>{filteredData?.length}</Text>
+        const data = sboms ? removeDuplicates(sboms) : []
+        return <Text>{data.length}</Text>
       },
       wrap: true
     },
@@ -315,7 +246,7 @@ const ProductTable = ({ data, refetch }) => {
       sortFunction: (a, b) => {
         const dateA = new Date(a.updatedAt)
         const dateB = new Date(b.updatedAt)
-        return dateB - dateA
+        return dateA - dateB
       },
       wrap: true
     },
@@ -330,16 +261,31 @@ const ProductTable = ({ data, refetch }) => {
           sboms.map((project) => {
             if (project.primaryComponent) {
               uniqVersions.push({
-                version: project.primaryComponent.version,
-                id: project.id,
-                updatedAt: project.updatedAt
+                label: project.primaryComponent.version,
+                value: project.id,
+                creationAt: project.creationAt
               })
             }
           })
 
-        const filteredData = uniqVersions
-          ? removeDuplicatesAndLatest(uniqVersions)
-          : []
+        const filteredData = uniqVersions ? removeDuplicates(uniqVersions) : []
+
+        const product = {
+          id: id,
+          name: name,
+          version:
+            filteredData.length > 0
+              ? filteredData[0].label
+              : sboms.length > 0
+              ? sboms[0].primaryComponent?.version
+              : '',
+          sbomId:
+            filteredData.length > 0
+              ? filteredData[0].value
+              : sboms.length > 0
+              ? sboms[0].id
+              : ''
+        }
 
         return (
           <Menu>
@@ -359,36 +305,6 @@ const ProductTable = ({ data, refetch }) => {
                   isDisabled={!enabled}
                 >
                   Edit Product
-                </MenuItem>
-                <MenuItem
-                  isDisabled={!enabled}
-                  onClick={() => {
-                    window.localStorage.setItem('activeProduct', name)
-                    window.localStorage.setItem(
-                      'activeSBOM',
-                      sboms.length > 0 && filteredData.length > 0
-                        ? filteredData[0].id
-                        : null
-                    )
-                    history.push(`/vendor/autofix?id=${id}`)
-                  }}
-                >
-                  Settings
-                </MenuItem>
-                <MenuItem
-                  isDisabled={!enabled}
-                  onClick={() => {
-                    window.localStorage.setItem('activeProduct', name)
-                    window.localStorage.setItem(
-                      'activeSBOM',
-                      sboms.length > 0 && filteredData.length > 0
-                        ? filteredData[0].id
-                        : null
-                    )
-                    history.push(`/vendor/changelog?id=${id}`)
-                  }}
-                >
-                  View Change Log
                 </MenuItem>
                 <Divider />
                 <MenuItem
@@ -427,60 +343,59 @@ const ProductTable = ({ data, refetch }) => {
 
   // DELETE PRODUCT
   const onProductDelete = async () => {
-    try {
-      await projectDelete({
-        variables: {
-          id
-        }
-      }).then((res) => res.data && onDeleteClose())
-    } catch (error) {
-      console.error('Mutation error:', error)
-    }
+    await projectDelete({
+      variables: {
+        id: activeRow.id
+      }
+    }).then((res) => res.data && onDeleteClose())
   }
 
   // REFRESH PRODUCTS
   const handleRefresh = async () => {
     await refetch({
       first: totalRows,
-      field: prodField,
-      direction: prodDirection
+      field: field,
+      direction: direction
     })
   }
 
   // TOGGLE STATUS
   const toggleStatus = async () => {
-    try {
-      await projectUpdate({
-        variables: {
-          id: activeRow.id,
-          enabled: activeRow.enabled === true ? false : true
-        }
-      })
-        .then(
-          (res) =>
-            res.data &&
-            refetch({
-              first: totalRows,
-              field: prodField,
-              direction: prodDirection
-            })
-        )
-        .finally(() => onWarningClose())
-    } catch (error) {
-      console.error('Mutation error:', error)
-    }
+    await projectUpdate({
+      variables: {
+        id: activeRow.id,
+        enabled: activeRow.enabled === true ? false : true
+      }
+    })
+      .then(
+        (res) =>
+          res.data &&
+          refetch({
+            first: totalRows,
+            field: field,
+            direction: direction
+          })
+      )
+      .finally(() => onWarningClose())
+  }
+
+  // ON SEARCH INPUT CHANGE
+  const onSearchInputChange = (e) => {
+    prodDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: e.target.value })
   }
 
   // SEARCH COMPONENT
-  const handleSearch = async (event) => {
-    if (event.key === 'Enter' && prodSearchInput !== '') {
-      await refetch({
-        search: prodSearchInput,
+  const handleSearch = (event) => {
+    if (event.key === 'Enter' && searchInput !== '') {
+      refetch({
+        search: searchInput,
         first: totalRows,
-        field: prodField,
-        direction: prodDirection
-      })
-      setPageIndex(1)
+        last: undefined,
+        after: undefined,
+        before: undefined,
+        field: field,
+        direction: direction
+      }).then((res) => res.data && prodDispatch({ type: 'FETCH_DATA_SUCCESS' }))
     }
   }
 
@@ -489,11 +404,28 @@ const ProductTable = ({ data, refetch }) => {
     await refetch({
       search: undefined,
       first: totalRows,
-      field: prodField,
-      direction: prodDirection
-    })
-    setProdSearchInput('')
-    setPageIndex(1)
+      last: undefined,
+      after: undefined,
+      before: undefined,
+      field: field,
+      direction: direction
+    }).then((res) => res.data && prodDispatch({ type: 'CLEAR_SEARCH_INPUT' }))
+  }
+
+  // FILTER PRODUCT
+  const onFilterActive = async (value) => {
+    await refetch({
+      enabled: value === 'all' ? undefined : value === 'yes' ? true : false,
+      first: totalRows,
+      last: undefined,
+      after: undefined,
+      before: undefined,
+      field: field,
+      direction: direction
+    }).then(
+      (res) =>
+        res.data && prodDispatch({ type: 'ON_FILTER_ACTIVE', payload: value })
+    )
   }
 
   const subHeaderComponent = useMemo(() => {
@@ -503,15 +435,17 @@ const ProductTable = ({ data, refetch }) => {
         alignItems={'center'}
         justifyContent={'space-between'}
       >
-        {/* SEARCH COMPONENTS */}
-        <Stack>
-          <SearchFilter
+        <Stack direction={'row'} spacing={2} alignItems={'center'}>
+          {/* SEARCH PRODUCTS */}
+          <ProdSearchFilter
             id='product'
-            filterText={prodSearchInput}
-            setFilterText={setProdSearchInput}
+            filterText={searchInput}
+            onChange={onSearchInputChange}
             onFilter={handleSearch}
             onClear={handleClear}
           />
+          {/* FILTER PRODUCTS */}
+          <ProdFilterMenu onFilter={onFilterActive} />
         </Stack>
 
         <Stack direction={'row'} spacing={2} alignItems={'center'}>
@@ -535,54 +469,75 @@ const ProductTable = ({ data, refetch }) => {
         </Stack>
       </Flex>
     )
-  }, [prodSearchInput, handleClear, handleSearch, handleRefresh])
+  }, [
+    searchInput,
+    activeProd,
+    handleClear,
+    handleSearch,
+    handleRefresh,
+    onFilterActive,
+    onSearchInputChange
+  ])
 
   // SORTING
-  const handleSort = (column, sortDirection) => {
-    setProdField(column.id)
-    setProdDirection(sortDirection === 'asc' ? 'ASC' : 'DESC')
-    refetch({
+  const handleSort = async (column, sortDirection) => {
+    await refetch({
       first: totalRows,
       search: undefined,
       field: column.id,
       direction: sortDirection === 'asc' ? 'ASC' : 'DESC',
-      field: prodField,
-      direction: prodDirection
-    })
+      field: field,
+      direction: direction
+    }).then(
+      (res) =>
+        res.data &&
+        prodDispatch({
+          type: 'SET_SORT_ORDER',
+          payload: {
+            field: column.id,
+            direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+          }
+        })
+    )
   }
 
   // PREV PAGE
-  const handlePreviousPage = () => {
-    setPageIndex((prev) => pageIndex !== 0 && prev - 1)
-    refetch({
+  const handlePreviousPage = async () => {
+    await refetch({
       first: undefined,
       last: totalRows,
       after: undefined,
       before: data.pageInfo.startCursor
-    })
+    }).then((res) => res.data && prodDispatch({ type: 'DECREMENT_PAGE' }))
   }
 
   // NEXT PAGE
-  const handleNextPage = () => {
-    setPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
-    refetch({
+  const handleNextPage = async () => {
+    await refetch({
       first: totalRows,
       last: undefined,
       after: data.pageInfo.endCursor,
       before: undefined
-    })
+    }).then(
+      (res) =>
+        res.data &&
+        prodDispatch({ type: 'INCREMENT_PAGE', payload: data.totalCount })
+    )
   }
 
   // SET ROW LENGTH
-  const handleSetRow = (e) => {
-    setTotalRows(Number(e.target.value))
-    refetch({
+  const handleSetRow = async (e) => {
+    await refetch({
       first: Number(e.target.value),
       last: undefined,
       after: undefined,
       before: undefined
+    }).then((res) => {
+      if (res.data) {
+        setTotalRows(Number(e.target.value))
+        prodDispatch({ type: 'FETCH_DATA_SUCCESS' })
+      }
     })
-    setPageIndex(1)
   }
 
   return (
@@ -593,8 +548,8 @@ const ProductTable = ({ data, refetch }) => {
           onSort={handleSort}
           data={data && data.nodes}
           customStyles={customStyles}
-          defaultSortAsc={true}
-          defaultSortFieldId={prodField}
+          defaultSortAsc={false}
+          defaultSortFieldId={field}
           subHeader
           subHeaderComponent={subHeaderComponent}
           progressPending={data ? false : true}

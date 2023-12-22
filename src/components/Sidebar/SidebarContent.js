@@ -1,10 +1,8 @@
 /*eslint-disable*/
 // chakra imports
-import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons'
 import {
   Box,
   Button,
-  Center,
   Flex,
   Stack,
   Text,
@@ -21,28 +19,25 @@ import { Link, useLocation } from 'react-router-dom'
 // this function creates the links and collapses that appear in the sidebar (left menu)
 
 const SidebarContent = ({ logoText, routes }) => {
-  const { minimize, setMinimize } = useContext(GlobalContext)
-  // to check for active links and opened collapses
+  const { minimize } = useContext(GlobalContext)
+
   let location = useLocation()
-  // this is for the rest of the collapses
+  const urlParts = location.pathname.split('/')
+  const category = urlParts[2]
+
   const [state, setState] = useState({})
 
-  // console.log(`location`, location)
-
-  // verifies if routeName is the one active (in browser input)
   const activeRoute = (routeName) => {
+    const parts = routeName.split('/')
+    const name = parts[2]
     if (routeName === '/customer/') {
       return 'active'
-    } else if (location.pathname === routeName) {
+    } else if (name === category) {
       return 'active'
-    } else {
-      return ''
     }
   }
 
   const createLinks = (routes) => {
-    // Chakra Color Mode
-    const activeBg = useColorModeValue('white', 'gray.700')
     const inactiveBg = useColorModeValue('white', 'gray.700')
     const activeColor = useColorModeValue('gray.900', 'white')
     const inactiveColor = useColorModeValue('gray.500', 'gray.500')
@@ -77,7 +72,14 @@ const SidebarContent = ({ logoText, routes }) => {
         }
 
         return (
-          <Link to={prop.layout + prop.path} key={prop.name}>
+          <Link
+            to={
+              prop.path === '/settings'
+                ? `${prop.layout}${prop.path}?tab=general`
+                : prop.layout + prop.path
+            }
+            key={prop.name}
+          >
             {activeRoute(prop.layout + prop.path) === 'active' ? (
               <Button
                 boxSize='initial'
@@ -219,25 +221,6 @@ const SidebarContent = ({ logoText, routes }) => {
       <Stack direction='column' mb='40px'>
         <Box>{links}</Box>
       </Stack>
-      {/* <Center
-        pos={'absolute'}
-        bottom={'64px'}
-        right={minimize === true ? '-14px' : '-26px'}
-        cursor={'pointer'}
-        bg={'#4299E1'}
-        width={'36px'}
-        color={'white'}
-        height={'36px'}
-        rounded={'full'}
-        zIndex={111}
-        onClick={() => setMinimize(!minimize)}
-      >
-        {minimize ? (
-          <ChevronRightIcon w={7} h={7} />
-        ) : (
-          <ChevronLeftIcon w={7} h={7} />
-        )}
-      </Center> */}
       <SidebarHelp />
     </>
   )

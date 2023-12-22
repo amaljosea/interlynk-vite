@@ -13,6 +13,10 @@ export const GetOrg = gql`
         id
         name
         email
+        profileImage {
+          filename
+          url
+        }
         apiKeys {
           id
           rawToken
@@ -33,6 +37,10 @@ export const GetOrg = gql`
         role
         timezone
         createdAt
+        profileImage {
+          filename
+          url
+        }
       }
       organizationConnectors {
         enabled
@@ -42,6 +50,32 @@ export const GetOrg = gql`
         id
         matchStr
         updatedAt
+      }
+    }
+  }
+`
+
+// LIST CURRENT USER'S ORGANIZATIONS
+export const MyOrganizations = gql`
+  query myOrganizations(
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+  ) {
+    myOrganizations(
+      first: $first
+      last: $last
+      after: $after
+      before: $before
+    ) {
+      nodes {
+        id
+        name
+        email
+        status
+        updatedAt
+        url
       }
     }
   }
@@ -426,6 +460,7 @@ export const GetFeedLogs = gql`
 export const GetProjectData = gql`
   query GetProjectData(
     $search: String
+    $enabled: Boolean
     $first: Int
     $last: Int
     $after: String
@@ -435,6 +470,7 @@ export const GetProjectData = gql`
   ) {
     projects(
       search: $search
+      enabled: $enabled
       first: $first
       last: $last
       after: $after
@@ -473,6 +509,51 @@ export const GetProjectData = gql`
 
 // ----------------------- PRODUCT DETAILS PAGE ---------------------------
 
+// GET PROJECT INFORMATION
+export const GetProductInfo = gql`
+  query GetProjectInfo($id: Uuid!) {
+    project(id: $id) {
+      id
+      name
+      description
+      enabled
+      updatedAt
+      sboms {
+        id
+        primaryComponent {
+          version
+        }
+      }
+    }
+  }
+`
+
+export const GetProductVersions = gql`
+  query GetProductVersions($id: Uuid!) {
+    project(id: $id) {
+      id
+      sboms {
+        id
+        creationAt
+        updatedAt
+        lifecycle
+        primaryComponent {
+          id
+          name
+          version
+        }
+        stats {
+          compCount
+          compLicenseCount
+          compCpeCount
+          compPurlCount
+          vulnStats
+        }
+      }
+    }
+  }
+`
+
 // GET PRODUCT INFO
 export const GetProductData = gql`
   query GetProductData($projectId: Uuid!, $sbomId: Uuid!) {
@@ -489,13 +570,15 @@ export const GetProductData = gql`
         purl
         cpes
         licenses
+        licensesExp
+        licensesCustom
         updatedAt
         uniqueId
         kind
         copyright
         publisher
         description
-        licenseExp
+        licensesExp
         group
       }
       stats {
@@ -513,7 +596,8 @@ export const GetProductData = gql`
       creationAt
       updatedAt
       licenses
-      licenseExp
+      licensesExp
+      licensesCustom
       format
       spec
       specVersion
@@ -602,8 +686,10 @@ export const GetComponentData = gql`
           copyright
           publisher
           description
-          licenseExp
+          licensesExp
+          licensesCustom
           group
+          scope
           externalUrls {
             name
             url
@@ -611,9 +697,9 @@ export const GetComponentData = gql`
           suppliers {
             id
             name
+            url
             contactEmail
             contactName
-            updatedAt
           }
         }
       }
@@ -768,6 +854,7 @@ export const GetVulnData = gql`
         nodes {
           id
           impact
+          cdxResponseId
           vuln {
             vulnId
             desc
@@ -794,6 +881,10 @@ export const GetVulnData = gql`
             justification
             impact
             note
+            detail
+            response
+            actionStmt
+            fixedIn
             updatedAt
           }
           component {
@@ -833,6 +924,7 @@ export const GetCheckResults = gql`
   query GetCheckResults(
     $projectId: Uuid!
     $sbomId: Uuid!
+    $checkId: [String!]
     $category: [String!]
     $status: [String!]
     $severity: [String!]
@@ -848,6 +940,7 @@ export const GetCheckResults = gql`
       id
       checkResults(
         sbomId: $sbomId
+        checkId: $checkId
         category: $category
         status: $status
         severity: $severity
@@ -877,7 +970,8 @@ export const GetCheckResults = gql`
             name
             version
             licenses
-            licenseExp
+            licensesExp
+            licensesCustom
           }
           organizationRule {
             severity
@@ -1051,7 +1145,6 @@ export const GetProjectLogs = gql`
     project(id: $id) {
       id
       activityLogs(
-        projectId: $id
         search: $search
         changedBy: $changedBy
         changeType: $changeType
@@ -1343,7 +1436,7 @@ export const GetSignedProductData = gql`
         copyright
         publisher
         description
-        licenseExp
+        licensesExp
         group
       }
       stats {
@@ -1448,7 +1541,7 @@ export const GetSignedComponentData = gql`
           copyright
           publisher
           description
-          licenseExp
+          licensesExp
           group
           externalUrls {
             name
@@ -1781,6 +1874,53 @@ export const CpeAutoComplete = gql`
   query CpeAutoComplete($input: IdAutoCompletionInput!) {
     idAutoComplete(input: $input) {
       result
+    }
+  }
+`
+
+// GET CDX RESPONSE
+export const GetCdxResponses = gql`
+  query GetCdxResponses {
+    cdxResponses {
+      id
+      name
+    }
+  }
+`
+
+// GET SBOM PARTS
+export const GetSbomParts = gql`
+  query GetSbomParts($projectId: Uuid!, $sbomId: Uuid!) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      id
+      sbomParts {
+        id
+        partId
+        part {
+          id
+          lifecycle
+          creationAt
+          project {
+            id
+            name
+          }
+          stats {
+            compCount
+            compLicenseCount
+            vulnStats
+          }
+          primaryComponent {
+            id
+            name
+            version
+          }
+          suppliers {
+            name
+            contactEmail
+            contactName
+          }
+        }
+      }
     }
   }
 `

@@ -15,7 +15,7 @@ const {
   AlertDescription,
   Image
 } = require('@chakra-ui/react')
-import { useLocation, useHistory } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import Cookies from 'js-cookie'
 import theme from 'theme/theme.js'
 import Card from 'components/Card/Card'
@@ -25,7 +25,7 @@ const Login = () => {
   const userLoginURL = process.env.REACT_APP_USER_LOGIN_URL
 
   const location = useLocation()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const queryParams = new URLSearchParams(location.search)
   const paramId = queryParams.get('signed_url_params')
@@ -50,7 +50,7 @@ const Login = () => {
           localStorage.setItem('userEmail', status.data.user.email)
           Cookies.set(`userToken`, response.headers.authorization)
           Cookies.set(`signedParamId`, paramId)
-          history.push(`/customer/products`)
+          navigate(`/customer/products`)
         }
       })
       .catch((error) => {

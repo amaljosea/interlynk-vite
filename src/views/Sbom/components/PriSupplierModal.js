@@ -21,10 +21,21 @@ import { recheckHealth, supplierUpdate, supplierCreate } from 'graphQL/Mutation'
 import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 
-const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
+const urlPattern = new RegExp(
+  '(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w.-]*/?'
+)
+
+const PriSupplierModal = ({
+  isOpen,
+  onClose,
+  refetch,
+  suppliers,
+  checkId,
+  setPageIndex
+}) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
-  const productId = queryParams.get('p')
+  const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
 
   const validateEmail = (email) => {
@@ -32,6 +43,9 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
     return emailRegex.test(email)
   }
 
+  const [orgName, setOrgName] = useState('')
+  const [orgUrl, setOrgUrl] = useState('')
+  const [isValidUrl, setIsValidUrl] = useState(true)
   const [supName, setSupName] = useState('')
   const [supEmail, setSupEmail] = useState('')
   const [supplierError, setSupplierError] = useState('')
@@ -45,6 +59,19 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
       setSupplierError('')
     }
   }
+
+  const onUrlChange = (e) => {
+    const { value } = e.target
+    setOrgUrl(value)
+    if (urlPattern.test(value)) {
+      setIsValidUrl(true)
+    } else {
+      setIsValidUrl(false)
+    }
+  }
+
+  const isInvalid =
+    !supName || (supEmail != '' && !validateEmail(supEmail)) || !isValidUrl
 
   const handleRefetch = () => {
     refetch({
@@ -68,21 +95,26 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
 
   useEffect(() => {
     if (suppliers && suppliers.length > 0) {
-      setSupName(suppliers[0].name)
-      setSupEmail(suppliers[0].contactEmail ? suppliers[0].contactEmail : '')
+      setOrgName(suppliers[0].name)
+      setOrgUrl(suppliers[0].url)
+      setSupName(suppliers[0].contactName)
+      setSupEmail(suppliers[0].contactEmail)
     }
   }, [suppliers])
 
   const handleSave = async () => {
     await createSupplier({
       variables: {
-        name: supName,
-        contactEmail: supEmail !== '' ? supEmail : undefined,
+        name: orgName,
+        url: orgUrl,
+        contactName: supName,
+        contactEmail: supEmail,
         sbomId: sbomId
       }
     })
       .then((res) => {
         if (checkId) {
+          setPageIndex(1)
           healthRecheck({
             variables: {
               sbomId: sbomId,
@@ -97,8 +129,10 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
   const handleUpdate = async () => {
     await updateSupplier({
       variables: {
-        name: supName,
-        contactEmail: supEmail !== '' ? supEmail : undefined,
+        name: orgName,
+        url: orgUrl,
+        contactName: supName,
+        contactEmail: supEmail,
         id: suppliers[0].id
       }
     }).then((res) => res.data && onClose())
@@ -134,8 +168,28 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
           <ModalCloseButton />
           <ModalBody>
             <Flex width={'100%'} direction={'column'} gap={4}>
+              {/* ORG NAME */}
+              <FormControl>
+                <FormLabel fontSize={'sm'}>Organization Name</FormLabel>
+                <Input
+                  placeholder='Enter organization name'
+                  value={orgName}
+                  onChange={(e) => setOrgName(e.target.value)}
+                />
+              </FormControl>
+              {/* ORG URL */}
+              <FormControl isInvalid={!isValidUrl}>
+                <FormLabel fontSize={'sm'}>URL</FormLabel>
+                <Input
+                  placeholder='Enter URL'
+                  value={orgUrl}
+                  onChange={onUrlChange}
+                />
+                <FormErrorMessage>Invalid URL</FormErrorMessage>
+              </FormControl>
+              {/* SUPPLIER NAME */}
               <FormControl isRequired isInvalid={supplierError}>
-                <FormLabel fontSize={'sm'}>Name</FormLabel>
+                <FormLabel fontSize={'sm'}>Contact Name</FormLabel>
                 <Input
                   placeholder='Enter supplier name'
                   value={supName}
@@ -143,10 +197,11 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
                 />
                 <FormErrorMessage>{supplierError}</FormErrorMessage>
               </FormControl>
+              {/* SUPPLIER EMAIL */}
               <FormControl
                 isInvalid={!validateEmail(supEmail) && supEmail !== ''}
               >
-                <FormLabel fontSize={'sm'}>Email</FormLabel>
+                <FormLabel fontSize={'sm'}>Contact Email</FormLabel>
                 <Input
                   placeholder='Enter supplier email'
                   value={supEmail}
@@ -165,7 +220,12 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
               alignItems={'center'}
             >
               {checkId ? (
-                <Button fontSize={'sm'} colorScheme='blue' onClick={onSaveRule}>
+                <Button
+                  fontSize={'sm'}
+                  colorScheme='blue'
+                  onClick={onSaveRule}
+                  disabled={isInvalid}
+                >
                   Save Rule
                 </Button>
               ) : (
@@ -179,9 +239,7 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
                   <Button
                     colorScheme='blue'
                     onClick={handleUpdate}
-                    disabled={
-                      !supName || (supEmail != '' && !validateEmail(supEmail))
-                    }
+                    disabled={isInvalid}
                   >
                     Update
                   </Button>
@@ -189,7 +247,7 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
                   <Button
                     colorScheme='blue'
                     onClick={handleSave}
-                    disabled={!supName || supplierError !== ''}
+                    disabled={isInvalid}
                   >
                     Save
                   </Button>

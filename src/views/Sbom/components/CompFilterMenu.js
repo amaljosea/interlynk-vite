@@ -1,4 +1,3 @@
-import { CheckIcon } from '@chakra-ui/icons'
 import {
   Box,
   Button,
@@ -9,27 +8,11 @@ import {
   MenuOptionGroup,
   Stack
 } from '@chakra-ui/react'
+import CheckMark from 'components/Misc/CheckMark'
 import GlobalContext from 'context/GlobalContext'
-import { useContext, useState } from 'react'
+import { useContext } from 'react'
 import { FaFilter } from 'react-icons/fa'
 
-const CheckMark = () => {
-  return (
-    <CheckIcon
-      w={5}
-      h={5}
-      bg={'white'}
-      color={'blue.500'}
-      border={'1px solid #4299E1'}
-      rounded={'full'}
-      p={'4px'}
-      position={'absolute'}
-      right={-1}
-      top={-1}
-      zIndex={11}
-    />
-  )
-}
 const List = ({ children }) => {
   return (
     <MenuList
@@ -55,6 +38,7 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
     signedCompDirection,
     setComPageIndex,
     totalRows,
+    compSearchInput,
     compEcosystem,
     setCompEcosystem,
     compType,
@@ -73,23 +57,39 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
     ? signedCompFilters
     : compFilters
 
-  const onFilterEcosystem = (value) => {
-    setCompAfter('')
-    setCompBefore('')
-    setCompEcosystem(value.includes('all') ? [] : value)
+  const onFilter = (ecosystem, kind, licenses, suppliers, scope) => {
     refetch({
       variables: {
         projectId: productId,
         sbomId: sbomId,
-        ecosystem: value.includes('all') ? undefined : value,
         first: totalRows,
-        last: undefined,
-        after: undefined,
-        last: undefined,
+        search: compSearchInput !== '' ? compSearchInput : undefined,
+        ecosystem:
+          ecosystem.includes('all') || ecosystem.length === 0
+            ? undefined
+            : ecosystem,
+        kind: kind.includes('all') || kind.length === 0 ? undefined : kind,
+        licenses:
+          licenses.includes('all') || licenses.length === 0
+            ? undefined
+            : licenses,
+        supplierName:
+          suppliers.includes('all') || suppliers.length === 0
+            ? undefined
+            : suppliers,
+        primary: scope === 'primary' ? true : undefined,
+        internal: scope === 'internal' ? true : undefined,
         field: customerView ? signedCompField : compField,
         direction: customerView ? signedCompDirection : compDirection
       }
     })
+  }
+
+  const onFilterEcosystem = (value) => {
+    setCompAfter('')
+    setCompBefore('')
+    setCompEcosystem(value.includes('all') ? [] : value)
+    onFilter(value, compType, compLicense, compSupplier, compScope)
     setComPageIndex(1)
   }
 
@@ -97,19 +97,7 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
     setCompAfter('')
     setCompBefore('')
     setCompType(value.includes('all') ? [] : value)
-    refetch({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        kind: value.includes('all') ? undefined : value,
-        first: totalRows,
-        last: undefined,
-        after: undefined,
-        last: undefined,
-        field: customerView ? signedCompField : compField,
-        direction: customerView ? signedCompDirection : compDirection
-      }
-    })
+    onFilter(compEcosystem, value, compLicense, compSupplier, compScope)
     setComPageIndex(1)
   }
 
@@ -117,19 +105,7 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
     setCompAfter('')
     setCompBefore('')
     setCompLicense(value.includes('all') ? [] : value)
-    refetch({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        licenses: value.includes('all') ? undefined : value,
-        first: totalRows,
-        last: undefined,
-        after: undefined,
-        last: undefined,
-        field: customerView ? signedCompField : compField,
-        direction: customerView ? signedCompDirection : compDirection
-      }
-    })
+    onFilter(compEcosystem, compType, value, compSupplier, compScope)
     setComPageIndex(1)
   }
 
@@ -137,19 +113,8 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
     setCompAfter('')
     setCompBefore('')
     setCompSupplier(value.includes('all') ? [] : value)
-    refetch({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        supplierName: value.includes('all') ? undefined : value,
-        first: totalRows,
-        last: undefined,
-        after: undefined,
-        last: undefined,
-        field: customerView ? signedCompField : compField,
-        direction: customerView ? signedCompDirection : compDirection
-      }
-    })
+    onFilter(compEcosystem, compType, compLicense, value, compScope)
+
     setComPageIndex(1)
   }
 
@@ -157,20 +122,7 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
     setCompAfter('')
     setCompBefore('')
     setCompScope(value)
-    refetch({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        primary: value === 'primary' ? true : undefined,
-        internal: value === 'internal' ? true : undefined,
-        first: totalRows,
-        last: undefined,
-        after: undefined,
-        last: undefined,
-        field: customerView ? signedCompField : compField,
-        direction: customerView ? signedCompDirection : compDirection
-      }
-    })
+    onFilter(compEcosystem, compType, compLicense, compSupplier, value)
     setComPageIndex(1)
   }
 
@@ -316,7 +268,7 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
             fontSize={'sm'}
             leftIcon={<FaFilter size={14} />}
           >
-            Scope
+            Visibility
           </MenuButton>
           <MenuList>
             <MenuOptionGroup

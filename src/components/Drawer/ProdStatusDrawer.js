@@ -2,7 +2,6 @@ import { useMutation, useQuery } from '@apollo/client'
 import {
   Box,
   Button,
-  Divider,
   FormLabel,
   Select,
   SimpleGrid,
@@ -15,72 +14,126 @@ import {
   Thead,
   Tr,
   Flex,
-  Input,
   FormControl
 } from '@chakra-ui/react'
 import VulLinkRow from 'components/Tables/VulLinkRow'
 import GlobalContext from 'context/GlobalContext'
 import { updateCompVulnVex } from 'graphQL/Mutation'
-import { getVexStatuses, getVexJustifications } from 'graphQL/Queries'
+import {
+  getVexStatuses,
+  getVexJustifications,
+  GetCdxResponses
+} from 'graphQL/Queries'
 import { useEffect, useState, useContext } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 const ProdStatusDrawer = ({
   data,
   textColor,
   refetch,
   filteredData,
-  totalRows,
   filterRefetch,
-  after, 
-  before
+  setPageIndex,
 }) => {
   const location = useLocation()
+  const navigate = useNavigate()
   const queryParams = new URLSearchParams(location.search)
-  const productId = queryParams.get('p')
+  const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
+  const currentProduct = JSON.parse(localStorage.getItem(`product`))
+  const { data: res } = useQuery(GetCdxResponses)
 
-  const { 
-    setVulnFilters, 
-    vulnField, 
+  const {
+    totalRows,
+    setVulnFilters,
+    vulnField,
     vulnDirection,
+    vulnSearchInput,
     vulnSeverity,
     vulnComponent,
     vulnStatus,
     vulnKev,
-    vulnEpss
+    vulnEpss,
+    setActiveProdTab
   } = useContext(GlobalContext)
 
   const { id, componentVulnLogs } = data
 
   const [statusTitle, setStatusTitle] = useState('')
   const [statusName, setStatusName] = useState('')
-  const [otherVersion, setOtherVersion] = useState('')
   const [justification, setJustification] = useState('')
   const [justifyName, setJustifyName] = useState('')
   const [selectedTag, setSelectedTag] = useState('')
+  const [actionStatement, setActionStatement] = useState('')
+  const [response, setResponse] = useState('')
+  const [responseTitle, setResponseTitle] = useState('')
+  const [details, setDetails] = useState('')
   const [notes, setNotes] = useState('')
   const [impactData, setImpactData] = useState('')
 
   const [statusResults, setStatusResults] = useState([])
   const [newVulnLogs, setNewVulnLogs] = useState([])
 
+
   const { data: allVexStatus } = useQuery(getVexStatuses)
   const { data: allVexJustify } = useQuery(getVexJustifications)
 
+  const handleRefetch = async () => {
+    const epssRange = (vulnEpss !== '' || vulnEpss !== '0-0') && vulnEpss.split('-')
+    const range = {
+      min: parseFloat(epssRange[0]) / 10000,
+      max: parseFloat(epssRange[1]) / 10000
+    }
+    await refetch({
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        search: vulnSearchInput !== '' ? vulnSearchInput : undefined,
+        severity: !vulnSeverity.includes('all') && vulnSeverity.length > 0 ? vulnSeverity : undefined,
+        componentName: !vulnComponent.includes('all') && vulnComponent.length > 0 ? vulnComponent : undefined,
+        status: !vulnStatus.includes('all') && vulnStatus.length > 0 ? vulnStatus : undefined,
+        kev: vulnKev === 'all' || vulnKev === '' ? undefined : vulnKev === 'yes' ? true : false,
+        epss: vulnEpss === 'all' || vulnEpss === '0-0' || vulnEpss === '' ? undefined : range,
+        first: totalRows,
+        // after: vulnAfter !== '' ? vulnAfter : undefined,
+        // last: vulnBefore !== '' ? totalRows : undefined,
+        // before: vulnBefore !== '' ? vulnBefore : undefined,
+        field: vulnField,
+        direction: vulnDirection
+      }
+    }).then(res => {
+      if(res.data) {
+        navigate(`/vendor/products/${currentProduct.name}?id=${productId}&sbom=${sbomId}`)
+      }
+    }).finally(()=> setActiveProdTab(3))
+  }
+
   const [compVexCreate] = useMutation(updateCompVulnVex, {
-    fetchPolicy: 'network-only'
+    fetchPolicy: 'network-only',
+    onCompleted: () => handleRefetch()
   })
+
 
   const handleStatusChange = (e) => {
     const { value } = e.target
     const status = e.target.options[e.target.selectedIndex].text
     setStatusTitle(value)
     setStatusName(status)
+    if(status === 'False Positive') {
+      setJustification(allVexJustify.vexJustifications[9].id)
+    }
     if (status === 'Not Affected' || status === 'Affected') {
+      setJustification('')
       setJustifyName('')
       setImpactData('')
     }
+  }
+
+  const handleResponseChange = (e) => {
+    const { value } = e.target
+    const title = e.target.options[e.target.selectedIndex].text
+    setResponse(value)
+    setResponseTitle(title)
   }
 
   const handleJustifyChange = (e) => {
@@ -97,44 +150,22 @@ const ProdStatusDrawer = ({
   }
 
   const handleSave = async () => {
-    try {
-      await compVexCreate({
-        variables: {
-          compVulnId: id,
-          notes: notes,
-          sbomId: sbomId,
-          vexStatusId: statusTitle,
-          vexJustificationId:
-            statusName === 'Not Affected' ? justification : undefined,
-          impact: impactData === '' ? undefined : impactData
-        }
-      })
-        .then(
-          (res) =>
-            res.data &&
-            refetch({
-              variables: {
-                projectId: productId,
-                sbomId: sbomId,
-                severity: vulnSeverity.length > 0 ? vulnSeverity : undefined,
-                componentName: vulnComponent.length > 0 ? vulnComponent : undefined,
-                status: vulnStatus.length > 0 ? vulnStatus : undefined,
-                kev: vulnKev === 'yes' ? true : vulnKev === 'no' ? false : undefined,
-                epss: vulnEpss !== '' ? range : undefined,
-                first: after !== '' ? totalRows : undefined,
-                after: after !== '' ? after : undefined,
-                last: before !== '' ? totalRows : undefined,
-                before: before !== '' ? before : undefined,
-                field: vulnField,
-                direction: vulnDirection
-              }
-            })
-        )
-        .finally(() => onFilterRefetch())
-    } catch (error) {
-      console.log('Mutation error', error)
-    }
+    await compVexCreate({
+      variables: {
+        compVulnId: id,
+        vexStatusId: statusTitle,
+        details: details !== '' ? details : undefined,
+        note: notes !== '' ? notes : undefined,
+        vexJustificationId: justification !== '' ? justification : undefined,
+        cdxResponseId: response !== '' ? response : undefined,
+        impact: impactData === '' ? undefined : impactData,
+        action: actionStatement !== '' ? actionStatement : undefined,
+        fixedIn: selectedTag !== '' ? selectedTag : undefined
+      }
+    }).then((res) => res.data && setPageIndex(1))
   }
+
+  const fixedVersions = filteredData.filter((item) => item.value !== sbomId)
 
   useEffect(() => {
     if (componentVulnLogs) {
@@ -147,7 +178,7 @@ const ProdStatusDrawer = ({
         })
       setStatusResults(sortedData)
     }
-  }, [data])
+  }, [componentVulnLogs])
 
   return (
     <Stack spacing='24px'>
@@ -155,14 +186,14 @@ const ProdStatusDrawer = ({
         <SimpleGrid row={5} spacing={4}>
           {!location.pathname.startsWith('/customer') && (
             <>
-              <Box>
-                <FormLabel mb={1} fontSize='sm' color='gray.600'>
+              <FormControl>
+                <FormLabel htmlFor='vexType' fontSize='sm' color={'gray.600'}>
                   Status
                 </FormLabel>
                 <Select
-                  id='product'
-                  size='sm'
-                  color='gray.500'
+                  id='vexType'
+                  name='vexType'
+                  fontSize='sm'
                   value={statusTitle}
                   onChange={handleStatusChange}
                 >
@@ -177,18 +208,25 @@ const ProdStatusDrawer = ({
                     <option value={''}>No data found</option>
                   )}
                 </Select>
-              </Box>
-              {statusName === 'Not Affected' && (
-                <Box>
-                  <FormLabel htmlFor='product' fontSize='sm' color='gray.600'>
+              </FormControl>
+              {/* JUSTIFICATION */}
+              {(statusName === 'Not Affected' ||
+                statusName === 'False Positive') && (
+                <FormControl>
+                  <FormLabel
+                    htmlFor='justification'
+                    fontSize='sm'
+                    color='gray.600'
+                  >
                     Justification
                   </FormLabel>
                   <Select
                     id='justification'
+                    name='justification'
                     value={justification}
                     onChange={handleJustifyChange}
-                    size='sm'
-                    color='gray.500'
+                    fontSize='sm'
+                    color='gray.600'
                   >
                     <option value=''>-- Select --</option>
                     {allVexJustify ? (
@@ -201,58 +239,82 @@ const ProdStatusDrawer = ({
                       <option value={''}>No data found</option>
                     )}
                   </Select>
-                </Box>
+                </FormControl>
               )}
-              {statusName === 'Fixed' && (
+              {/* RESPONSE */}
+              {statusName === 'Affected' && (
+                <FormControl>
+                  <FormLabel htmlFor='response' fontSize='sm' color='gray.600'>
+                    Response
+                  </FormLabel>
+                  {res && (
+                    <Select
+                      id='response'
+                      name='response'
+                      value={response}
+                      onChange={handleResponseChange}
+                      fontSize='sm'
+                      color='gray.600'
+                    >
+                      <option value=''>-- Select --</option>
+                      {res.cdxResponses.length > 0 &&
+                        res.cdxResponses.map((item, idx) => (
+                          <option key={idx} value={item.id}>
+                            {item.name}
+                          </option>
+                        ))}
+                    </Select>
+                  )}
+                </FormControl>
+              )}
+              {/* FIXED VERSION */}
+              {statusName === 'Affected' && responseTitle === 'Update' && (
                 <Stack
                   width={'100%'}
                   direction={'column'}
                   spacing={4}
                   alignItems={'flex-start'}
                 >
-                  <Box width={'100%'}>
-                    <Text mb={1} fontSize='sm' color='gray.600'>
-                      Version
-                    </Text>
+                  <FormControl width={'100%'}>
+                    <FormLabel
+                      htmlFor='fixedVersion'
+                      fontSize='sm'
+                      color='gray.600'
+                    >
+                      Fixed Version
+                    </FormLabel>
                     <Select
-                      id='tag'
+                      id='fixedVersion'
+                      name='fixedVersion'
                       value={selectedTag}
                       onChange={(e) => setSelectedTag(e.target.value)}
-                      size='sm'
-                      color='gray.500'
+                      fontSize='sm'
+                      color='gray.600'
                     >
-                      {filteredData && filteredData.length > 0 ? (
-                        filteredData.map((item, index) => (
+                      <option value=''>-- Select --</option>
+                      {fixedVersions.length > 0 ? (
+                        fixedVersions.map((item, index) => (
                           <option
                             key={index}
-                            value={item.id}
-                            name={item.version}
+                            value={item.value}
+                            name={item.label}
                           >
-                            {item.version}
+                            {item.label}
                           </option>
                         ))
                       ) : (
                         <option value=''>-- --</option>
                       )}
                     </Select>
-                  </Box>
-                  <Box width={'100%'}>
-                    <Text mb={1} fontSize='sm' color='gray.600'>
-                      Other Version
-                    </Text>
-                    <Input
-                      size='sm'
-                      value={otherVersion}
-                      onChange={(e) => setOtherVersion(e.target.value)}
-                    />
-                  </Box>
+                  </FormControl>
                 </Stack>
               )}
-              {(statusName === 'Affected' || statusName === 'Not Affected') && (
+              {/* IMPACT STATEMENT */}
+              {(statusName === 'Not Affected' ||
+                statusName === 'False Positive') && (
                 <FormControl>
                   <FormLabel
                     htmlFor='impactStatement'
-                    mb={1}
                     fontSize='sm'
                     color='gray.600'
                   >
@@ -266,21 +328,67 @@ const ProdStatusDrawer = ({
                     placeholder='Add impact statement'
                     value={impactData}
                     onChange={(e) => setImpactData(e.target.value)}
-                    size='sm'
+                    fontSize='sm'
                   />
                 </FormControl>
               )}
-              <Box>
-                <FormLabel mb={1} fontSize='sm' color='gray.600'>
-                  Notes
+              {/* ACTION STATEMENT */}
+              {statusName === 'Affected' && (
+                <FormControl>
+                  <FormLabel
+                    htmlFor='actionStatement'
+                    fontSize='sm'
+                    color={'gray.600'}
+                  >
+                    Action Statement
+                  </FormLabel>
+                  <Textarea
+                    rows={2}
+                    name='actionStatement'
+                    id='actionStatement'
+                    placeholder='Add statement'
+                    fontSize='sm'
+                    value={actionStatement}
+                    onChange={(e) => setActionStatement(e.target.value)}
+                  />
+                </FormControl>
+              )}
+              {/* DETAILS */}
+              {(statusName === 'In Triage' || statusName === 'Affected') && (
+                <FormControl>
+                  <FormLabel htmlFor='details' fontSize='sm' color={'gray.600'}>
+                    Details
+                  </FormLabel>
+                  <Textarea
+                    rows={2}
+                    name='details'
+                    id='details'
+                    placeholder='Add details'
+                    fontSize='sm'
+                    value={details}
+                    onChange={(e) => setDetails(e.target.value)}
+                  />
+                </FormControl>
+              )}
+              {/* INTERNAL NOTES */}
+              <FormControl>
+                <FormLabel
+                  htmlFor='internalNotes'
+                  fontSize='sm'
+                  color={'gray.600'}
+                >
+                  Internal Notes
                 </FormLabel>
                 <Textarea
+                  rows={2}
+                  name='internalNotes'
+                  id='internalNotes'
                   placeholder='Add notes'
-                  size='sm'
+                  fontSize='sm'
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                 />
-              </Box>
+              </FormControl>
             </>
           )}
           {!location.pathname.startsWith('/customer') && (
@@ -290,10 +398,13 @@ const ProdStatusDrawer = ({
               onClick={handleSave}
               disabled={
                 statusTitle === '' ||
-                (statusName === 'Not Affected' && justification === '') ||
-                (justifyName === 'Other (impact statment required)' &&
-                  impactData === '') ||
-                (statusName === 'Affected' && impactData === '')
+                (statusName === 'Not Affected' && (justification === '' || impactData === '')) ||
+                (statusName === 'False Positive' && (justification === '' || impactData === '')) ||
+                (statusName === 'Affected' &&
+                  responseTitle === '' &&
+                  actionStatement === '') ||
+                (responseTitle !== '' && actionStatement === '') ||
+                (responseTitle === 'update' && selectedTag === '')
               }
             >
               Add
@@ -345,7 +456,6 @@ const ProdStatusDrawer = ({
             )}
           </Flex>
         </SimpleGrid>
-        <Divider />
       </Box>
     </Stack>
   )

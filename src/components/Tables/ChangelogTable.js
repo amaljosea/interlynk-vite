@@ -13,31 +13,14 @@ import {
 } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
 import GlobalContext from 'context/GlobalContext'
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation } from 'react-router-dom'
 import { timeSince } from 'utils'
-import { getFullDateAndTime } from 'utils'
+import { getFullDateAndTime, customStyles } from 'utils'
 import ChangelogFilterMenu from 'views/Sbom/components/ChangelogFilterMenu'
 import RowLimit from 'views/Sbom/components/RowLimit'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
-
-const customStyles = {
-  headCells: {
-    style: {
-      fontWeight: 'bold',
-      color: '#2D3748',
-      fontSize: '12px',
-      letterSpacing: '1px'
-    }
-  },
-  subHeader: {
-    style: {
-      padding: 0,
-      margin: 0
-    }
-  }
-}
 
 const setColor = (type) => {
   switch (type) {
@@ -184,22 +167,26 @@ const ChangelogTable = ({ data, refetch }) => {
   const onPreviousPage = () => {
     setPageIndex((prev) => pageIndex !== 0 && prev - 1)
     refetch({
-      projectId: productId,
-      first: undefined,
-      after: undefined,
-      last: totalRows,
-      before: data.pageInfo.startCursor
+      variables: {
+        id: productId,
+        last: totalRows,
+        before: data.pageInfo.startCursor,
+        field: prodLogField,
+        direction: prodLogDirection
+      }
     })
   }
 
   const onNextPage = () => {
     setPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
     refetch({
-      projectId: productId,
-      first: totalRows,
-      after: data.pageInfo.endCursor,
-      last: undefined,
-      before: undefined
+      variables: {
+        id: productId,
+        first: totalRows,
+        after: data.pageInfo.endCursor,
+        field: prodLogField,
+        direction: prodLogDirection
+      }
     })
   }
 
@@ -207,9 +194,13 @@ const ChangelogTable = ({ data, refetch }) => {
   const handleSearch = async (event) => {
     if (event.key === 'Enter' && filterText !== '') {
       await refetch({
-        id: productId,
-        search: filterText,
-        first: totalRows
+        variables: {
+          id: productId,
+          search: filterText,
+          first: totalRows,
+          field: prodLogField,
+          direction: prodLogDirection
+        }
       })
       setPageIndex(1)
     }
@@ -218,9 +209,13 @@ const ChangelogTable = ({ data, refetch }) => {
   // CLEAR SERACH
   const handleClear = async () => {
     await refetch({
-      projectId: productId,
-      search: undefined,
-      first: totalRows
+      variables: {
+        id: productId,
+        search: undefined,
+        first: totalRows,
+        field: prodLogField,
+        direction: prodLogDirection
+      }
     })
     setFilterText('')
     setPageIndex(1)
@@ -231,11 +226,12 @@ const ChangelogTable = ({ data, refetch }) => {
     setProdLogField(column.id)
     setProdLogDirection(sortDirection === 'asc' ? 'ASC' : 'DESC')
     refetch({
-      projectId: productId,
-      first: totalRows,
-      last: undefined,
-      field: column.id,
-      direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+      variables: {
+        id: productId,
+        first: totalRows,
+        field: column.id,
+        direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+      }
     })
   }
 
@@ -243,13 +239,12 @@ const ChangelogTable = ({ data, refetch }) => {
   const handleSetRow = async (e) => {
     setTotalRows(Number(e.target.value))
     await refetch({
-      projectId: productId,
-      first: Number(e.target.value),
-      last: undefined,
-      after: undefined,
-      before: undefined,
-      field: prodLogField,
-      direction: prodLogDirection
+      variables: {
+        id: productId,
+        first: Number(e.target.value),
+        field: prodLogField,
+        direction: prodLogDirection
+      }
     })
     setFilterText('')
     setPageIndex(1)

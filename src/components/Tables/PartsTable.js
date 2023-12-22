@@ -1,4 +1,4 @@
-import { useLazyQuery, useQuery } from '@apollo/client'
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { AddIcon } from '@chakra-ui/icons'
 import {
   Button,
@@ -27,15 +27,29 @@ import {
   FormControl,
   FormLabel,
   Select,
-  Tag
+  Tag,
+  TagLabel,
+  UnorderedList,
+  ListItem,
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  AlertDescription
 } from '@chakra-ui/react'
+import CustomLoader from 'components/CustomLoader'
+import VulnBadge from 'components/Misc/VulnBadge'
 import GlobalContext from 'context/GlobalContext'
+import { SbomPartDelete } from 'graphQL/Mutation'
+import { SbomPartCreate } from 'graphQL/Mutation'
 import { GetProject } from 'graphQL/Queries'
 import { GetProjectData } from 'graphQL/Queries'
 import { useContext, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV, FaFilter } from 'react-icons/fa'
-import { useLocation, Link } from 'react-router-dom'
+import { useLocation, Link, useParams, useNavigate } from 'react-router-dom'
+import { getFullDateAndTime } from 'utils'
+import { removeDuplicates } from 'utils'
+import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 const customStyles = {
   headCells: {
@@ -54,84 +68,200 @@ const customStyles = {
   }
 }
 
-const PartsTable = () => {
+const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const location = useLocation()
+  const params = useParams()
   const queryParams = new URLSearchParams(location.search)
   const sbomId = queryParams.get('sbom')
+  const prodId = queryParams.get('id')
+
+  const currentProduct = JSON.parse(localStorage.getItem(`product`))
 
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const {
+    isOpen: isDeleteOpen,
+    onOpen: onDeleteOpen,
+    onClose: onDeleteClose
+  } = useDisclosure()
+
   const addBtn = useRef()
 
-  const { totalProducts, setActiveProdTab } = useContext(GlobalContext)
+  const {
+    setActiveProdTab,
+    prodField,
+    prodDirection,
+    setVulnSeverity,
+    totalRows,
+    vulnField,
+    vulnDirection,
+    compField,
+    compDirection
+  } = useContext(GlobalContext)
 
   const [selectedProd, setSelectedProd] = useState('')
   const [selectedVersion, setSelectedVersion] = useState('')
   const [uniqVersions, setUniqVersions] = useState([])
-
+  const [searchInput, setSearchInput] = useState('')
+  const [activeRow, setActiveRow] = useState(null)
   const { data: allProducts } = useQuery(GetProjectData, {
     variables: {
-      first: totalProducts
+      first: 50,
+      field: prodField,
+      direction: prodDirection
     }
   })
 
+  const [createSbomPart] = useMutation(SbomPartCreate)
+  const [deleteSbomPart] = useMutation(SbomPartDelete)
+
+  const handleCreatePart = async () => {
+    await createSbomPart({
+      variables: {
+        parentSbomId: sbomId,
+        partSbomId: selectedVersion
+      }
+    })
+      .then((res) => {
+        if (res.data) {
+          refetch({
+            variables: {
+              projectId: prodId,
+              sbomId: sbomId
+            }
+          })
+        }
+      })
+      .finally(() => {
+        setSelectedProd('')
+        setSelectedVersion('')
+        onClose()
+      })
+  }
+
+  const handleRemove = async () => {
+    await deleteSbomPart({
+      variables: {
+        id: activeRow.id
+      }
+    })
+      .then((res) => {
+        if (res.data) {
+          refetch({
+            variables: {
+              projectId: prodId,
+              sbomId: sbomId
+            }
+          })
+        }
+      })
+      .finally(() => onDeleteClose())
+  }
+
   const productList =
     allProducts &&
-    allProducts.projects.nodes.map((option) => ({
-      value: option.id,
-      label: option.name
-    }))
+    [...allProducts.projects.nodes]
+      .filter((item) => item.enabled === true)
+      .map((option) => ({
+        value: option.id,
+        label: option.name
+      }))
+
+  const product =
+    allProducts &&
+    allProducts.projects.nodes.find((item) => item.id === selectedProd)
+
+  const existingVersions = []
+
+  data?.map((item) => {
+    if (item?.part?.primaryComponent) {
+      existingVersions.push(item?.part?.primaryComponent.version)
+    } else {
+      existingVersions.push(
+        `Uploaded ${getFullDateAndTime(item?.part?.creationAt)}`
+      )
+    }
+  })
+
+  const sbomVersions = []
+
+  const filteredDuplicated = product ? removeDuplicates(product.sboms) : []
+
+  filteredDuplicated &&
+    filteredDuplicated.map((project) => {
+      if (
+        !existingVersions?.includes(
+          project.primaryComponent
+            ? project.primaryComponent.version
+            : `Uploaded ${getFullDateAndTime(project.creationAt)}`
+        )
+      ) {
+        sbomVersions.push({
+          label: project.primaryComponent
+            ? project.primaryComponent.version
+            : `Uploaded ${getFullDateAndTime(project.creationAt)}`,
+          value: project.id,
+          creationAt: project.creationAt
+        })
+      }
+    })
 
   const [getProduct] = useLazyQuery(GetProject)
 
   const handleSelectProduct = (e) => {
-    setSelectedProd(e.target.value)
-    getProduct({
+    const { value } = e.target
+    setSelectedProd(value)
+    if (value === '') {
+      setSelectedVersion('')
+    } else {
+      getProduct({
+        variables: {
+          id: value
+        }
+      }).then((res) => {
+        if (res.data) {
+          let versions = []
+          res.data.project.sboms.map((project) => {
+            if (project.primaryComponent) {
+              versions.push({
+                version: project.primaryComponent.version,
+                id: project.id,
+                updatedAt: project.updatedAt
+              })
+            }
+          })
+          setUniqVersions(versions)
+        }
+      })
+    }
+  }
+
+  const getComponents = () => {
+    setActiveProdTab(2)
+    getCompData({
       variables: {
-        id: e.target.value
-      }
-    }).then((res) => {
-      if (res.data) {
-        let versions = []
-        res.data.project.sboms.map((project) => {
-          if (project.primaryComponent) {
-            versions.push({
-              version: project.primaryComponent.version,
-              id: project.id,
-              updatedAt: project.updatedAt
-            })
-          }
-        })
-        setUniqVersions(versions)
+        projectId: prodId,
+        sbomId: sbomId,
+        first: totalRows,
+        field: compField,
+        direction: compDirection
       }
     })
   }
 
-  const filterVersions =
-    uniqVersions.length > 0 &&
-    uniqVersions.filter((version) => version.id !== sbomId)
-
-  // remove duplicates
-  const removeDuplicatesAndLatest = (arr) => {
-    const uniqueVersions = {}
-
-    for (const item of arr) {
-      if (
-        !uniqueVersions[item.version] ||
-        item.updatedAt > uniqueVersions[item.version].updatedAt
-      ) {
-        uniqueVersions[item.version] = item
+  const onFilterSev = async (value) => {
+    setActiveProdTab(3)
+    setVulnSeverity(value)
+    await getVulnData({
+      variables: {
+        projectId: prodId,
+        sbomId: sbomId,
+        severity: value,
+        first: totalRows,
+        field: vulnField,
+        direction: vulnDirection
       }
-    }
-
-    return Object.values(uniqueVersions)
+    })
   }
-
-  const filteredData = filterVersions
-    ? removeDuplicatesAndLatest(filterVersions)
-    : []
-
-  const searchParams = new URLSearchParams(location.search)
-  const product_id = searchParams.get('p')
 
   // COLUMNS
   const columns = [
@@ -139,70 +269,150 @@ const PartsTable = () => {
       id: 'NAME',
       name: 'NAME',
       selector: (row) => {
-        const { sboms, name, id } = row
+        const { part } = row
         return (
-          <>
-            {sboms.length > 0 ? (
-              <Link
-                to={`/vendor/products?&p=${id}&sbom=${sboms[0].id}&parts=true`}
-              >
-                <Text
-                  color={'blue.500'}
-                  minWidth='100%'
-                  onClick={() => {
-                    window.localStorage.setItem('subProduct', name)
-                    window.localStorage.setItem('subProductVersion', name)
-                    setActiveProdTab(0)
-                  }}
-                >
-                  {name}
-                </Text>
-              </Link>
-            ) : (
-              <Text>{name}</Text>
-            )}
-          </>
+          <Link
+            to={`/vendor/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`}
+          >
+            <Text
+              color={'blue.500'}
+              minWidth='100%'
+              fontSize={14}
+              onClick={() => setActiveProdTab(0)}
+            >
+              {part.project.name}
+            </Text>
+          </Link>
         )
-      }
+      },
+      wrap: true,
+      width: '200px'
     },
     {
       id: 'VERSION',
       name: 'VERSION',
       selector: (row) => {
-        const { sboms } = row
+        const { part } = row
         return (
-          <Text>
-            {sboms?.length > 0 && sboms[0]?.primaryComponent?.version}
+          <Text fontSize={14}>
+            {part.primaryComponent
+              ? part.primaryComponent.version
+              : `Uploaded at ${getFullDateAndTime(part.creationAt)}`}
           </Text>
         )
-      }
+      },
+      wrap: true
     },
     {
       id: 'SUPPLIER',
       name: 'SUPPLIER',
       selector: (row) => {
-        const suppliers = ['Interlynk', 'Biotronik', 'Oracle']
-        const getRandomSupplier = () => {
-          const randomIndex = Math.floor(Math.random() * suppliers.length)
-          return suppliers[Math.ceil(randomIndex)]
-        }
-
-        return <Text>{getRandomSupplier()}</Text>
+        const { part } = row
+        return (
+          <>
+            {part.suppliers.length > 0 &&
+              part.suppliers.map((item, index) => (
+                <Tag
+                  size={'md'}
+                  key={index}
+                  fontSize={14}
+                  variant='subtle'
+                  colorScheme='orange'
+                >
+                  <TagLabel>
+                    {item.name}
+                    {item.contactEmail && ` - ${item.contactEmail}`}
+                  </TagLabel>
+                </Tag>
+              ))}
+          </>
+        )
       }
+    },
+    {
+      id: 'COMPONENTS',
+      name: 'COMPONENTS',
+      selector: (row) => {
+        const { part } = row
+        return (
+          <Tag
+            size='md'
+            variant='subtle'
+            width={16}
+            colorScheme={'blue'}
+            onClick={getComponents}
+            cursor={'pointer'}
+          >
+            <TagLabel mx={'auto'}>{part.stats.compCount}</TagLabel>
+          </Tag>
+        )
+      },
+      width: '150px'
+    },
+    {
+      id: 'LICENSES',
+      name: 'LICENSES',
+      selector: (row) => {
+        const { part } = row
+        return (
+          <Tag size='md' variant='subtle' width={16} colorScheme={'blue'}>
+            <TagLabel mx={'auto'}> {part.stats.compLicenseCount}</TagLabel>
+          </Tag>
+        )
+      },
+      width: '150px'
+    },
+    {
+      id: 'VULNERABILITIES',
+      name: 'VULNERABILITIES',
+      selector: (row) => {
+        const { part } = row
+        // const link = `/vendor/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`
+        return (
+          <Stack fontWeight={'medium'} direction={'row'}>
+            <VulnBadge
+              color='red'
+              label='Critical'
+              onClick={() => onFilterSev(['critical'])}
+            >
+              {part.stats.vulnStats.critical
+                ? part.stats.vulnStats.critical
+                : 0}
+            </VulnBadge>
+            <VulnBadge
+              color='orange'
+              label='High'
+              onClick={() => onFilterSev(['high'])}
+            >
+              {part.stats.vulnStats.high ? part.stats.vulnStats.high : 0}
+            </VulnBadge>
+            <VulnBadge
+              color='yellow'
+              label='Medium'
+              onClick={() => onFilterSev(['medium'])}
+            >
+              {part.stats.vulnStats.medium ? part.stats.vulnStats.medium : 0}
+            </VulnBadge>
+            <VulnBadge
+              color='green'
+              label='Low'
+              onClick={() => onFilterSev(['low'])}
+            >
+              {part.stats.vulnStats.low ? part.stats.vulnStats.low : 0}
+            </VulnBadge>
+          </Stack>
+        )
+      },
+      width: '250px'
     },
     {
       id: 'STATUS',
       name: 'STATUS',
       selector: (row) => {
-        const statuses = ['Draft', 'Released', 'Pending']
-        const getRandomStatus = () => {
-          const randomIndex = Math.floor(Math.random() * statuses.length)
-          return statuses[Math.ceil(randomIndex)]
-        }
-
+        const { part } = row
         return (
-          <Tag size='sm' colorScheme='blue'>
-            {getRandomStatus()}
+          <Tag width={24} colorScheme='cyan' textTransform={'capitalize'}>
+            <TagLabel mx={'auto'}>{part.lifecycle}</TagLabel>
           </Tag>
         )
       }
@@ -221,7 +431,14 @@ const PartsTable = () => {
             />
             <Portal>
               <MenuList size='sm'>
-                <MenuItem>Remove</MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    setActiveRow(row)
+                    onDeleteOpen()
+                  }}
+                >
+                  Remove
+                </MenuItem>
               </MenuList>
             </Portal>
           </Menu>
@@ -230,6 +447,12 @@ const PartsTable = () => {
       right: 'true'
     }
   ]
+
+  // SEARCH COMPONENT
+  const handleSearch = () => console.log('hello')
+
+  // CLEAR SERACH
+  const handleClear = () => setSearchInput('')
 
   // SUB HEADER
   const subHeaderComponent = useMemo(() => {
@@ -244,15 +467,18 @@ const PartsTable = () => {
           direction={'row'}
           spacing={4}
           alignItems={'flex-start'}
-          justifyContent={'space-between'}
+          justifyContent={'flex-end'}
         >
-          <HStack spacing={4}>
-            <Input
-              width={'300px'}
-              name='parts'
-              id='parts'
-              placeholder='Search'
+          <HStack spacing={4} display={'none'}>
+            {/* SEARCH COMPONENTS */}
+            <SearchFilter
+              id='team'
+              filterText={searchInput}
+              setFilterText={setSearchInput}
+              onFilter={handleSearch}
+              onClear={handleClear}
             />
+            {/* FILTER */}
             <Menu closeOnSelect={true}>
               <MenuButton
                 as={Button}
@@ -289,23 +515,20 @@ const PartsTable = () => {
         </Stack>
       </Flex>
     )
-  }, [])
+  }, [searchInput, handleSearch, handleClear])
 
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
           columns={columns}
-          data={
-            allProducts &&
-            allProducts.projects.nodes
-              .filter((product) => product.id !== product_id)
-              .slice(0, 3)
-          }
+          data={data}
           customStyles={customStyles}
           persistTableHead
           subHeader
+          progressPending={data ? false : true}
           subHeaderComponent={subHeaderComponent}
+          progressComponent={<CustomLoader />}
           responsive={true}
         />
       </Flex>
@@ -317,7 +540,7 @@ const PartsTable = () => {
             <ModalHeader>Add Parts</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              {productList && (
+              {productList ? (
                 <Stack spacing={4} direction={'column'} gap={2}>
                   {/* Project */}
                   <FormControl fontSize={'sm'}>
@@ -325,17 +548,21 @@ const PartsTable = () => {
                       Project
                     </FormLabel>
                     <Select
+                      fontSize={'sm'}
                       name='product'
                       id='product'
                       value={selectedProd}
                       onChange={handleSelectProduct}
                     >
                       <option value={''}>-- Select --</option>
-                      {productList.map((item, index) => (
-                        <option key={index} value={item.value}>
-                          {item.label}
-                        </option>
-                      ))}
+                      {productList &&
+                        [...productList]
+                          .filter((item) => item.value !== prodId)
+                          .map((item, index) => (
+                            <option key={index} value={item.value}>
+                              {item.label}
+                            </option>
+                          ))}
                     </Select>
                   </FormControl>
                   {/* Version */}
@@ -347,31 +574,102 @@ const PartsTable = () => {
                     >
                       Version
                     </FormLabel>
-                    <Select
-                      name='versions'
-                      id='versions'
-                      value={selectedVersion}
-                      onChange={(e) => setSelectedVersion(e.target.value)}
-                    >
-                      <option value={''}>-- Select --</option>
-                      {filteredData.length > 0 &&
-                        filteredData.map((item, index) => (
-                          <option key={index} value={item.id}>
-                            {item.version}
+                    {sbomVersions?.length === 0 ? (
+                      <Alert borderRadius={'md'} py={'8px'} status='info'>
+                        <AlertIcon />
+                        No version available
+                      </Alert>
+                    ) : (
+                      <Select
+                        fontSize={'sm'}
+                        name='versions'
+                        id='versions'
+                        value={selectedVersion}
+                        onChange={(e) => setSelectedVersion(e.target.value)}
+                      >
+                        <option value={''}>-- Select --</option>
+                        {sbomVersions.map((item, index) => (
+                          <option key={index} value={item.value}>
+                            {item.label}
                           </option>
                         ))}
-                    </Select>
+                      </Select>
+                    )}
                   </FormControl>
                 </Stack>
+              ) : (
+                <Alert
+                  status='info'
+                  variant='subtle'
+                  flexDirection='column'
+                  alignItems='center'
+                  justifyContent='center'
+                  textAlign='center'
+                  height='150px'
+                  borderRadius={5}
+                >
+                  <AlertIcon boxSize='30px' mr={0} />
+                  <AlertTitle
+                    mt={4}
+                    mb={1}
+                    fontSize='lg'
+                    fontWeight={'semibold'}
+                  >
+                    There is no SBOM in this project
+                  </AlertTitle>
+                  <AlertDescription maxWidth='sm'>
+                    Please upload and try again
+                  </AlertDescription>
+                </Alert>
               )}
             </ModalBody>
 
             <ModalFooter>
-              <Button mr={3} onClick={onClose}>
+              <Button mr={3} fontSize={'sm'} onClick={onClose}>
                 Close
               </Button>
-              <Button variant='solid' colorScheme='blue'>
-                Submit
+              <Button
+                fontSize={'sm'}
+                variant='solid'
+                colorScheme='blue'
+                onClick={handleCreatePart}
+                disabled={selectedVersion === ''}
+              >
+                Add
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      )}
+
+      {/* DISABLED */}
+      {isDeleteOpen && (
+        <Modal isOpen={isDeleteOpen} onClose={onDeleteClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Delete Part</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Text>Deleting this version will: </Text>
+              <UnorderedList>
+                <Flex flexDir={'column'} gap={1} mt={4}>
+                  {[
+                    'remove this versions and its SBOM',
+                    'remove access to this version for all users'
+                  ].map((item, index) => (
+                    <ListItem key={index}>{item}</ListItem>
+                  ))}
+                </Flex>
+              </UnorderedList>
+
+              <Text mt={6}>Are you sure you wish to continue ?</Text>
+            </ModalBody>
+            <ModalFooter>
+              <Button mr={3} onClick={onDeleteClose}>
+                No
+              </Button>
+              <Button onClick={handleRemove} colorScheme='red'>
+                Yes
               </Button>
             </ModalFooter>
           </ModalContent>

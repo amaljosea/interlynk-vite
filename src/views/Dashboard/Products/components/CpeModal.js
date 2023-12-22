@@ -14,7 +14,11 @@ import {
   Stack,
   Flex,
   Textarea,
-  Text
+  Text,
+  Alert,
+  AlertIcon,
+  AlertDescription,
+  Tag
 } from '@chakra-ui/react'
 import CpeInput from 'components/CpeInput'
 import GlobalContext from 'context/GlobalContext'
@@ -22,7 +26,6 @@ import { CreateAutomation } from 'graphQL/Mutation'
 import { UpdateComponent, recheckHealth } from 'graphQL/Mutation'
 import { useState, useEffect, useRef, useContext } from 'react'
 import { useLocation } from 'react-router-dom'
-import ReactSelect from 'react-select'
 
 const regexPattern =
   /cpe:2\.3:[aho\*\-](:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,\/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){5}(:(([a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))?)|[\*\-]))(:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,\/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){4}/
@@ -35,6 +38,7 @@ const CpeModal = ({
   onUpdateCpe,
   selectedCpe,
   cpeValue,
+  activeComp,
   checkId,
   refetch,
   setPageIndex,
@@ -44,16 +48,16 @@ const CpeModal = ({
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const sbomId = queryParams.get('sbom')
-  const productId = queryParams.get('p')
+  const productId = queryParams.get('id')
 
-  const [vendor, setVendor] = useState(null)
+  const [vendor, setVendor] = useState('')
   const [vendorList, setVendorList] = useState([])
   const vendorRef = useRef()
-  const [product, setProduct] = useState(null)
+  const [product, setProduct] = useState('')
   const [productList, setProductList] = useState([])
   const productRef = useRef()
   const [type, setType] = useState('')
-  const [version, setVersion] = useState(null)
+  const [version, setVersion] = useState('')
   const [versionList, setVersionList] = useState([])
   const versionRef = useRef()
   const [hardware, setHardware] = useState('')
@@ -71,10 +75,11 @@ const CpeModal = ({
     if (matches) {
       setCpeString(cpeValue)
       const components = cpeValue.split(':')
+      setType(components[2])
       setVendor(components[3])
       setProduct(components[4])
-      setVersion(components[5])
-      setHardware('*')
+      setVersion(components[5] === '*' ? '' : components[5])
+      setHardware(components[6] === '*' ? '' : components[6])
     } else {
       setCpeString('cpe:2.3:::::*:*:*:*:*:*:*')
     }
@@ -243,10 +248,14 @@ const CpeModal = ({
   // ON HARDWARE CHANGE
   const handleHardwareChange = (e) => {
     const { value } = e.target
+    const cpeParts = cpeString.split(':')
     setHardware(value)
     if (value !== '') {
-      const cpeParts = cpeString.split(':')
       cpeParts[6] = value
+      const cpe = cpeParts.join(':')
+      setCpeString(cpe)
+    } else {
+      cpeParts[6] = '*'
       const cpe = cpeParts.join(':')
       setCpeString(cpe)
     }
@@ -287,6 +296,42 @@ const CpeModal = ({
           <ModalHeader>CPE Details</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
+            {activeCheck && (
+              <Flex
+                width='100%'
+                direction={'row'}
+                alignItems={'center'}
+                justifyContent={'flex-start'}
+                wrap={'wrap'}
+                gap={2}
+                mb={6}
+              >
+                <Text wordBreak={'break-all'}>
+                  {activeCheck.name ? activeCheck.name : ''}
+                </Text>
+                {activeCheck.version && (
+                  <Tag colorScheme='blue'>{activeCheck.version}</Tag>
+                )}
+              </Flex>
+            )}
+            {activeComp && (
+              <Flex
+                width='100%'
+                direction={'row'}
+                alignItems={'center'}
+                justifyContent={'flex-start'}
+                wrap={'wrap'}
+                gap={2}
+                mb={6}
+              >
+                <Text wordBreak={'break-all'}>
+                  {activeComp.name ? activeComp.name : ''}
+                </Text>
+                {activeComp.version && (
+                  <Tag colorScheme='blue'>{activeComp.version}</Tag>
+                )}
+              </Flex>
+            )}
             <Flex width={'100%'} direction={'column'} gap={4}>
               {/* CPE STRING */}
               <FormControl>
@@ -318,6 +363,14 @@ const CpeModal = ({
                 validation={false}
                 onChange={onVendorInputChange}
               />
+              {vendor !== '' && vendor.includes(':') && (
+                <Alert size={'sm'} status='error'>
+                  <AlertIcon />
+                  <AlertDescription fontSize={'sm'}>
+                    Invalid entry
+                  </AlertDescription>
+                </Alert>
+              )}
               {/* TYPE */}
               <FormControl>
                 <FormLabel htmlFor='type'>Type</FormLabel>
@@ -346,6 +399,14 @@ const CpeModal = ({
                 validation={false}
                 onChange={onProductInputChange}
               />
+              {product !== '' && product.includes(':') && (
+                <Alert size={'sm'} status='error'>
+                  <AlertIcon />
+                  <AlertDescription fontSize={'sm'}>
+                    Invalid entry
+                  </AlertDescription>
+                </Alert>
+              )}
               {/* VERSION */}
               <CpeInput
                 name='version'
@@ -357,6 +418,14 @@ const CpeModal = ({
                 validation={false}
                 onChange={onVersionInputChange}
               />
+              {version !== '' && version.includes(':') && (
+                <Alert size={'sm'} status='error'>
+                  <AlertIcon />
+                  <AlertDescription fontSize={'sm'}>
+                    Invalid entry
+                  </AlertDescription>
+                </Alert>
+              )}
               {/* TARGET HARDWARE */}
               <FormControl>
                 <FormLabel htmlFor='targetHardware'>Target Hardware</FormLabel>
@@ -393,7 +462,19 @@ const CpeModal = ({
               alignItems={'center'}
             >
               {checkId ? (
-                <Button fontSize={'sm'} colorScheme='blue' onClick={onSaveRule}>
+                <Button
+                  fontSize={'sm'}
+                  colorScheme='blue'
+                  onClick={onSaveRule}
+                  disabled={
+                    vendor === '' ||
+                    product === '' ||
+                    type === '' ||
+                    vendor.includes(':') ||
+                    product.includes(':') ||
+                    version.includes(':')
+                  }
+                >
                   Save Rule
                 </Button>
               ) : (
@@ -401,14 +482,21 @@ const CpeModal = ({
               )}
               <Stack direction={'row'} spacing={2} alignItems={'center'}>
                 <Button fontSize={'sm'} colorScheme='gray' onClick={onClose}>
-                  Close
+                  Cancel
                 </Button>
                 <Button
                   fontSize={'sm'}
                   variant='solid'
                   colorScheme={'blue'}
                   onClick={checkId ? handleComUpdate : handleSave}
-                  disabled={!vendor || !product}
+                  disabled={
+                    vendor === '' ||
+                    product === '' ||
+                    type === '' ||
+                    vendor.includes(':') ||
+                    product.includes(':') ||
+                    version.includes(':')
+                  }
                 >
                   Save
                 </Button>

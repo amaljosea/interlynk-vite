@@ -14,7 +14,8 @@ import {
   Input,
   FormErrorMessage,
   Stack,
-  Text
+  Text,
+  Tag
 } from '@chakra-ui/react'
 import GlobalContext from 'context/GlobalContext'
 import { CreateAutomation } from 'graphQL/Mutation'
@@ -24,28 +25,38 @@ import { addComSupplier } from 'graphQL/Mutation'
 import { useState, useEffect, useContext } from 'react'
 import { useLocation } from 'react-router-dom'
 
+const urlPattern = new RegExp(
+  '(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w.-]*/?'
+)
+
 const SupplierModal = ({
+  id,
   isOpen,
   onClose,
   refetch,
-  suppliers,
+  data,
   checkId,
   filterRefetch,
-  activeCheck
+  activeCheck,
+  setPageIndex
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
-  const productId = queryParams.get('p')
+  const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
 
   const { comPageIndex, setComPageIndex, setCompFilters } =
     useContext(GlobalContext)
 
   const validateEmail = (email) => {
-    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
+    const emailRegex =
+      /(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g
     return emailRegex.test(email)
   }
 
+  const [orgName, setOrgName] = useState('')
+  const [orgUrl, setOrgUrl] = useState('')
+  const [isValidUrl, setIsValidUrl] = useState(true)
   const [supName, setSupName] = useState('')
   const [supEmail, setSupEmail] = useState('')
 
@@ -56,20 +67,22 @@ const SupplierModal = ({
 
   const onFilterRefetch = () => {
     filterRefetch({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId
-      }
-    }).then((res) => {
-      setCompFilters(res.data.sbom.filters)
-    })
+      projectId: productId,
+      sbomId: sbomId
+    }).then((res) => res.data && setCompFilters(res.data.sbom.filters))
   }
 
   const [createSupplier] = useMutation(addComSupplier, {
-    onCompleted: () => refetch()
+    onCompleted: () => {
+      refetch()
+      onFilterRefetch()
+    }
   })
   const [updateSupplier] = useMutation(updateComSupplier, {
-    onCompleted: () => refetch()
+    onCompleted: () => {
+      refetch()
+      onFilterRefetch()
+    }
   })
 
   const [healthRecheck] = useMutation(recheckHealth, {
@@ -77,49 +90,52 @@ const SupplierModal = ({
   })
 
   useEffect(() => {
-    if (suppliers.length > 0) {
-      setSupName(suppliers[0].name)
+    if (data && data.suppliers.length > 0) {
+      const { suppliers } = data
+      setOrgName(suppliers[0].name)
+      setOrgUrl(suppliers[0].url)
+      setSupName(suppliers[0].contactName)
       setSupEmail(suppliers[0].contactEmail)
     }
-  }, [suppliers])
+  }, [])
 
   const handleSave = async () => {
     await createSupplier({
       variables: {
-        name: supName,
+        name: orgName,
+        url: orgUrl,
+        contactName: supName,
         contactEmail: supEmail,
-        componentId: activeCheck.id
+        componentId: activeCheck ? activeCheck.id : id
       }
     })
       .then((res) => {
         if (res.data) {
-          onFilterRefetch()
-        }
-        if (checkId) {
-          healthRecheck({
-            variables: {
-              sbomId: sbomId,
-              checkId: checkId,
-              compId: activeCheck.id
-            }
-          })
+          if (checkId) {
+            setPageIndex(1)
+            healthRecheck({
+              variables: {
+                sbomId: sbomId,
+                checkId: checkId,
+                compId: activeCheck.id
+              }
+            })
+          }
         }
       })
       .finally(() => onClose())
   }
 
-  const handleUpdate = async (e) => {
+  const handleUpdate = async () => {
     await updateSupplier({
       variables: {
-        name: supName,
+        name: orgName,
+        url: orgUrl,
+        contactName: supName,
         contactEmail: supEmail,
-        id: suppliers[0].id
+        id: data && data.suppliers && data.suppliers[0].id
       }
-    }).then((data) => {
-      if (data) {
-        onClose()
-      }
-    })
+    }).then((res) => res.data && onClose())
   }
 
   const [createAutoCheck] = useMutation(CreateAutomation)
@@ -150,6 +166,19 @@ const SupplierModal = ({
     }
   }
 
+  const onUrlChange = (e) => {
+    const { value } = e.target
+    setOrgUrl(value)
+    if (urlPattern.test(value)) {
+      setIsValidUrl(true)
+    } else {
+      setIsValidUrl(false)
+    }
+  }
+
+  const isInvalid =
+    !supName || (supEmail !== '' && !validateEmail(supEmail)) || !isValidUrl
+
   return (
     <>
       <Modal isOpen={isOpen} onClose={onClose}>
@@ -157,23 +186,72 @@ const SupplierModal = ({
 
         <ModalContent>
           <ModalHeader>
-            {suppliers.length > 0 ? 'Edit' : 'Add'} Supplier
+            {data && data.suppliers?.length > 0 ? 'Edit' : 'Add'} Supplier
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody>
+            {data && (
+              <Flex
+                width='100%'
+                direction={'row'}
+                alignItems={'center'}
+                justifyContent={'flex-start'}
+                wrap={'wrap'}
+                gap={2}
+                mb={4}
+              >
+                <Text fontWeight={'medium'}>{data.name}</Text>
+                <Tag colorScheme='blue'>{data.version}</Tag>
+              </Flex>
+            )}
+            {activeCheck && (
+              <Flex
+                width='100%'
+                direction={'row'}
+                alignItems={'center'}
+                justifyContent={'flex-start'}
+                wrap={'wrap'}
+                gap={2}
+                mb={6}
+              >
+                <Text wordBreak={'break-all'}>{activeCheck?.name}</Text>
+                <Tag colorScheme='blue'>{activeCheck?.version}</Tag>
+              </Flex>
+            )}
             <Flex width={'100%'} direction={'column'} gap={4}>
+              {/* ORG NAME */}
+              <FormControl>
+                <FormLabel fontSize={'sm'}>Organization Name</FormLabel>
+                <Input
+                  placeholder='Enter organization name'
+                  value={orgName}
+                  onChange={(e) => setOrgName(e.target.value)}
+                />
+              </FormControl>
+              {/* ORG URL */}
+              <FormControl isInvalid={!isValidUrl}>
+                <FormLabel fontSize={'sm'}>URL</FormLabel>
+                <Input
+                  placeholder='Enter URL'
+                  value={orgUrl}
+                  onChange={onUrlChange}
+                />
+                <FormErrorMessage>Invalid URL</FormErrorMessage>
+              </FormControl>
+              {/* SUPPLIER NAME */}
               <FormControl isRequired>
-                <FormLabel fontSize={'sm'}>Name</FormLabel>
+                <FormLabel fontSize={'sm'}>Contact Name</FormLabel>
                 <Input
                   placeholder='Enter supplier name'
                   value={supName}
                   onChange={(e) => setSupName(e.target.value)}
                 />
               </FormControl>
+              {/* SUPPLIER EMAIL */}
               <FormControl
                 isInvalid={supEmail !== '' && !validateEmail(supEmail)}
               >
-                <FormLabel fontSize={'sm'}>Email</FormLabel>
+                <FormLabel fontSize={'sm'}>Contact Email</FormLabel>
                 <Input
                   placeholder='Enter supplier email'
                   value={supEmail}
@@ -192,7 +270,12 @@ const SupplierModal = ({
               alignItems={'center'}
             >
               {checkId ? (
-                <Button fontSize={'sm'} colorScheme='blue' onClick={onSaveRule}>
+                <Button
+                  fontSize={'sm'}
+                  colorScheme='blue'
+                  onClick={onSaveRule}
+                  disabled={isInvalid}
+                >
                   Save Rule
                 </Button>
               ) : (
@@ -202,13 +285,11 @@ const SupplierModal = ({
                 <Button colorScheme='gray' onClick={onClose}>
                   Cancel
                 </Button>
-                {suppliers.length > 0 ? (
+                {data && data.suppliers?.length > 0 ? (
                   <Button
                     colorScheme='blue'
                     onClick={handleUpdate}
-                    disabled={
-                      !supName || (supEmail !== '' && !validateEmail(supEmail))
-                    }
+                    disabled={isInvalid}
                   >
                     Update
                   </Button>
@@ -216,9 +297,7 @@ const SupplierModal = ({
                   <Button
                     colorScheme='blue'
                     onClick={handleSave}
-                    disabled={
-                      !supName || (supEmail !== '' && !validateEmail(supEmail))
-                    }
+                    disabled={isInvalid}
                   >
                     Save
                   </Button>

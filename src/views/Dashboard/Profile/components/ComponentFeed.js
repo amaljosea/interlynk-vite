@@ -91,52 +91,54 @@ const ComponentFeed = ({ data, refetch }) => {
           Internal Components
         </Text>
       </CardHeader>
-      <CardBody px='5px'>
-        <Flex flexDirection={'column'} alignItems={'flex-start'} gap={6}>
-          <FormControl isInvalid={!isMatch && compName !== ''}>
-            <Input
-              placeholder='*mystring*'
-              width={'500px'}
-              value={compName}
-              onChange={handleChange}
-              onKeyDown={handleKeyDown}
-              bg={'white'}
-            />
-            {compName !== '' && !isMatch && (
-              <FormErrorMessage>Invalid regular expression</FormErrorMessage>
+      {data && (
+        <CardBody px='5px'>
+          <Flex flexDirection={'column'} alignItems={'flex-start'} gap={6}>
+            <FormControl isInvalid={!isMatch && compName !== ''}>
+              <Input
+                placeholder='*mystring*'
+                width={'500px'}
+                value={compName}
+                onChange={handleChange}
+                onKeyDown={handleKeyDown}
+                bg={'white'}
+              />
+              {compName !== '' && !isMatch && (
+                <FormErrorMessage>Invalid regular expression</FormErrorMessage>
+              )}
+              <Text fontSize={'xs'} mt={2}>
+                Please <Code colorScheme='blue'>enter</Code> to add a name or a
+                regular expression
+              </Text>
+            </FormControl>
+
+            {data.length > 0 && (
+              <Flex
+                flexDirection={'row'}
+                flexWrap={'wrap'}
+                spacing={2}
+                gap={2}
+                mt={2}
+              >
+                {data.map((item, index) => (
+                  <Tag key={index} variant='solid' colorScheme={'blue'}>
+                    <TagLabel onClick={() => handleUpdate(item)}>
+                      {item.matchStr}
+                    </TagLabel>
+                    <TagCloseButton onClick={() => handleDeleteComp(item.id)} />
+                  </Tag>
+                ))}
+              </Flex>
             )}
-            <Text fontSize={'xs'} mt={2}>
-              Please <Code colorScheme='blue'>enter</Code> to add a name or a
-              regular expression
-            </Text>
-          </FormControl>
 
-          {data.length > 0 && (
-            <Flex
-              flexDirection={'row'}
-              flexWrap={'wrap'}
-              spacing={2}
-              gap={2}
-              mt={2}
-            >
-              {data.map((item, index) => (
-                <Tag key={index} variant='solid' colorScheme={'blue'}>
-                  <TagLabel onClick={() => handleUpdate(item)}>
-                    {item.matchStr}
-                  </TagLabel>
-                  <TagCloseButton onClick={() => handleDeleteComp(item.id)} />
-                </Tag>
-              ))}
-            </Flex>
-          )}
-
-          <Stack direction={'row'} spacing={4} alignItems={'center'}>
-            <Button fontWeight={'medium'} variant='solid' colorScheme='blue'>
-              Apply
-            </Button>
-          </Stack>
-        </Flex>
-      </CardBody>
+            <Stack direction={'row'} spacing={4} alignItems={'center'}>
+              <Button fontWeight={'medium'} variant='solid' colorScheme='blue'>
+                Apply
+              </Button>
+            </Stack>
+          </Flex>
+        </CardBody>
+      )}
     </Card>
   )
 }

@@ -10,7 +10,7 @@ import {
 import AdminNavbar from 'components/Navbars/AdminNavbar.js'
 import Sidebar from 'components/Sidebar'
 import React, { useState } from 'react'
-import { Route, Switch } from 'react-router-dom'
+import { Route, Routes, Switch } from 'react-router-dom'
 // Custom Chakra theme
 import theme from 'theme/theme.js'
 // Custom components
@@ -113,7 +113,7 @@ export default function Customer(props) {
             {getRoute() && (
               <PanelContent>
                 <PanelContainer>
-                  <Switch>{getRoutes(customerRoutes)}</Switch>
+                  <Routes>{getRoutes(customerRoutes)}</Routes>
                 </PanelContainer>
               </PanelContent>
             )}

@@ -5,10 +5,8 @@ import {
   Tag,
   Text,
   Box,
-  Select,
   TagLabel,
-  Tooltip,
-  Badge
+  Tooltip
 } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
 import GlobalContext from 'context/GlobalContext'
@@ -16,27 +14,10 @@ import React, { useMemo, useState, useContext } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation } from 'react-router-dom'
 import { timeSince } from 'utils'
-import { getFullDateAndTime } from 'utils'
+import { getFullDateAndTime, customStyles } from 'utils'
 import LogFilterMenu from 'views/Sbom/components/LogFilterMenu'
 import RowLimit from 'views/Sbom/components/RowLimit'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
-
-const customStyles = {
-  headCells: {
-    style: {
-      fontWeight: 'bold',
-      color: '#2D3748',
-      fontSize: '12px',
-      letterSpacing: '1px'
-    }
-  },
-  subHeader: {
-    style: {
-      padding: 0,
-      margin: 0
-    }
-  }
-}
 
 const setColor = (type) => {
   switch (type) {
@@ -64,7 +45,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
   const { logFilters, logField, setLogField, logDirection, setLogDirection } =
     useContext(GlobalContext)
 
-  const productId = queryParams.get('p')
+  const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
 
   const [filterText, setFilterText] = useState('')
@@ -137,7 +118,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
           <Flex flexWrap={'wrap'} gap={2} my={2} whiteSpace={'break-spaces'}>
             <Tooltip
               placement='top'
-              label={license.length === 0 ? '' : orig}
+              label={license ? orig : ''}
               textTransform={'capitalize'}
             >
               <Box textOverflow={'wrap'}>
@@ -145,7 +126,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
                   'False'
                 ) : orig === 't' ? (
                   'True'
-                ) : license.length > 0 ? (
+                ) : license?.length > 0 ? (
                   license.map((item, index) => (
                     <Flex
                       key={index}
@@ -165,7 +146,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
                       </Tag>
                     </Flex>
                   ))
-                ) : license.length === 0 ? (
+                ) : license?.length === 0 ? (
                   ''
                 ) : urls && urls.length > 0 ? (
                   urls.map((item, index) => (
@@ -212,7 +193,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
           <Flex flexWrap={'wrap'} gap={2} my={2}>
             <Tooltip
               placement='top'
-              label={updatedValue.length === 0 ? '' : updated}
+              label={updatedValue ? updated : ''}
               textTransform={'capitalize'}
               whiteSpace={'wrap'}
             >
@@ -221,7 +202,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
                   'False'
                 ) : updated === 't' ? (
                   'True'
-                ) : updatedValue.length > 0 ? (
+                ) : updatedValue?.length > 0 ? (
                   updatedValue.map((item, index) => (
                     <Flex
                       key={index}
@@ -241,7 +222,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
                       </Tag>
                     </Flex>
                   ))
-                ) : updatedValue.length === 0 ? (
+                ) : updatedValue?.length === 0 ? (
                   ''
                 ) : urls && urls.length > 0 ? (
                   urls.map((item, index) => (

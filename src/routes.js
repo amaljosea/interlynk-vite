@@ -17,13 +17,17 @@ import {
   FaPlug,
   FaBullhorn,
   FaWindowMaximize,
-  FaExchangeAlt
+  FaExchangeAlt,
+  FaBug,
+  FaBalanceScale
 } from 'react-icons/fa'
 import { HomeIcon } from 'components/Icons/Icons'
 import { BsFillFolderSymlinkFill } from 'react-icons/bs'
 import Automation from 'views/Dashboard/Automation'
 import { TbSettingsAutomation } from 'react-icons/tb'
 import ChangeLog from 'views/Dashboard/Changelog'
+import Vulnerabilities from 'views/Dashboard/Vulnerabilities'
+import Licenses from 'views/Dashboard/Linceses'
 
 export const dashRoutes = [
   {
@@ -47,6 +51,21 @@ export const dashRoutes = [
     component: Products,
     layout: '/vendor'
   },
+  /// TODO: 1.0 Add back in when ready
+  // {
+  //   path: '/vulnerabilities',
+  //   name: 'Vulnerabilities',
+  //   icon: <FaBug color='inherit' />,
+  //   component: Vulnerabilities,
+  //   layout: '/vendor'
+  // },
+  // {
+  //   path: '/licenses',
+  //   name: 'Licenses',
+  //   icon: <FaBalanceScale color='inherit' />,
+  //   component: Licenses,
+  //   layout: '/vendor'
+  // },
   // {
   //   path: '/sharelynk',
   //   name: 'ShareLynk',
@@ -69,7 +88,7 @@ export const dashRoutes = [
   //   layout: '/vendor'
   // },
   {
-    path: '/profiles',
+    path: '/settings',
     name: 'Settings',
     icon: <FaRegSun color='inherit' />,
     component: Profile,

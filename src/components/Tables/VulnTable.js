@@ -2,7 +2,8 @@
 import {
   ChevronDownIcon,
   ChevronUpIcon,
-  ExternalLinkIcon
+  ExternalLinkIcon,
+  InfoIcon
 } from '@chakra-ui/icons'
 import {
   Flex,
@@ -30,7 +31,7 @@ import {
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
 import { FaCopy } from 'react-icons/fa6'
-import { useState, useMemo, useContext } from 'react'
+import { useState, useMemo, useContext, useEffect } from 'react'
 import styled from '@emotion/styled'
 import ProdStatusDrawer from 'components/Drawer/ProdStatusDrawer'
 import VulnFilterMenu from 'views/Sbom/components/VulnFilterMenu'
@@ -39,25 +40,9 @@ import SearchFilter from 'views/Sbom/components/SearchFilter'
 import GlobalContext from 'context/GlobalContext'
 import CustomLoader from 'components/CustomLoader'
 import Cookies from 'js-cookie'
+import { customStyles } from 'utils'
 import RowLimit from 'views/Sbom/components/RowLimit'
 import ImportWizard from 'views/Sbom/components/ImportWizard'
-
-const customStyles = {
-  headCells: {
-    style: {
-      fontWeight: 'bold',
-      color: '#2D3748',
-      fontSize: '12px',
-      letterSpacing: '1px'
-    }
-  },
-  subHeader: {
-    style: {
-      padding: 0,
-      margin: 0
-    }
-  }
-}
 
 const statusColor = (status) => {
   if (status && status === 'Fixed') {
@@ -114,16 +99,16 @@ const VulnTable = ({
     signedVulnStatus,
     signedVulnKev,
     signedVulnEpss,
-    setSelectedVulns
+    setSelectedVulns,
+    setVulnAfter,
+    setVulnBefore,
+    setImportSbom
   } = useContext(GlobalContext)
 
   const textColor = useColorModeValue('gray.700', 'white')
-
+  const [hideColumn, setHideColumn] = useState(false)
   const x = window.matchMedia('(min-width: 2500px)')
   const y = window.matchMedia('(max-width: 1440px)')
-
-  const [vulnAfter, setVulnAfter] = useState('')
-  const [vulnBefore, setVulnBefore] = useState('')
 
   const {
     isOpen: isTableOpen,
@@ -151,6 +136,20 @@ const VulnTable = ({
     }
   }
 
+  useEffect(() => {
+    const handleResize = () => {
+      const scaleThreshold = 1.1
+      const currentScale = window.devicePixelRatio
+      setHideColumn(currentScale > scaleThreshold)
+    }
+    window.addEventListener('resize', handleResize)
+    handleResize()
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [])
+
   // COLUMNS
   const columns = [
     // CVE ID
@@ -173,7 +172,12 @@ const VulnTable = ({
               />
             </Link>
             <Tooltip label={vuln.vulnId} placement={'top'}>
-              <Text fontSize='sm' color={textColor} data-tag='allowRowEvents'>
+              <Text
+                my={3}
+                fontSize='sm'
+                color={textColor}
+                data-tag='allowRowEvents'
+              >
                 {vuln.vulnId !== null ? `${vuln.vulnId}` : ''}
               </Text>
             </Tooltip>
@@ -336,7 +340,8 @@ const VulnTable = ({
       },
       wrap: true,
       width: y.matches ? '10%' : x.matches ? '18%' : '15%',
-      sortable: true
+      sortable: true,
+      omit: hideColumn
     },
     // VERSION
     {
@@ -349,7 +354,8 @@ const VulnTable = ({
       ),
       wrap: true,
       width: y.matches ? '10%' : x.matches ? '18%' : '12%',
-      sortable: true
+      sortable: true,
+      omit: hideColumn
     },
     // STATUS
     {
@@ -372,8 +378,7 @@ const VulnTable = ({
           </Tag>
         )
       },
-      sortable: true,
-      width: '150px'
+      sortable: true
     },
     // UPDATED AT
     {
@@ -398,6 +403,13 @@ const VulnTable = ({
     }
   ]
 
+  const epssRange =
+    (vulnEpss !== '' || vulnEpss !== '0-0') && vulnEpss.split('-')
+  const range = {
+    min: parseFloat(epssRange[0]) / 10000,
+    max: parseFloat(epssRange[1]) / 10000
+  }
+
   // SEARCH COMPONENT
   const handleSearch = async (event) => {
     if (event.key === 'Enter') {
@@ -405,8 +417,25 @@ const VulnTable = ({
         variables: {
           projectId: productId,
           sbomId: sbomId,
-          search: customerView ? signedVulnSearchInput : vulnSearchInput,
           first: totalRows,
+          search: customerView
+            ? signedVulnSearchInput
+            : vulnSearchInput !== ''
+            ? vulnSearchInput
+            : undefined,
+          severity: vulnSeverity.length > 0 ? vulnSeverity : undefined,
+          componentName: vulnComponent.length > 0 ? vulnComponent : undefined,
+          status: vulnStatus.length > 0 ? vulnStatus : undefined,
+          kev:
+            vulnKev === 'all' || vulnKev === ''
+              ? undefined
+              : vulnKev === 'yes'
+              ? true
+              : false,
+          epss:
+            vulnEpss === 'all' || vulnEpss === '0-0' || vulnEpss === ''
+              ? undefined
+              : range,
           field: customerView ? signedVulnField : vulnField,
           direction: customerView ? signedVulnDirection : vulnDirection,
           signedParams: customerView ? signedParams : undefined
@@ -418,23 +447,36 @@ const VulnTable = ({
 
   // CLEAR SERACH
   const handleClear = async () => {
-    await refetch({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        first: totalRows,
-        search: undefined,
-        field: customerView ? signedVulnField : vulnField,
-        direction: customerView ? signedVulnDirection : vulnDirection,
-        signedParams: customerView ? signedParams : undefined
-      }
-    })
     if (customerView) {
       setSignedVulnSearchInput('')
     } else {
       setVulnSearchInput('')
     }
     setPageIndex(1)
+    await refetch({
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        first: totalRows,
+        search: undefined,
+        severity: vulnSeverity.length > 0 ? vulnSeverity : undefined,
+        componentName: vulnComponent.length > 0 ? vulnComponent : undefined,
+        status: vulnStatus.length > 0 ? vulnStatus : undefined,
+        kev:
+          vulnKev === 'all' || vulnKev === ''
+            ? undefined
+            : vulnKev === 'yes'
+            ? true
+            : false,
+        epss:
+          vulnEpss === 'all' || vulnEpss === '0-0' || vulnEpss === ''
+            ? undefined
+            : range,
+        field: customerView ? signedVulnField : vulnField,
+        direction: customerView ? signedVulnDirection : vulnDirection,
+        signedParams: customerView ? signedParams : undefined
+      }
+    })
   }
 
   const subHeaderComponentMemo = useMemo(() => {
@@ -596,11 +638,9 @@ const VulnTable = ({
               data={data}
               textColor={textColor}
               refetch={refetch}
-              totalRows={totalRows}
               filteredData={filteredData}
               filterRefetch={filterRefetch}
-              after={vulnAfter}
-              before={vulnBefore}
+              setPageIndex={setPageIndex}
             />
           </GridItem>
         </Grid>
@@ -736,11 +776,35 @@ const VulnTable = ({
       setVulnField(column.id)
       setVulnDirection(sortDirection === 'asc' ? 'ASC' : 'DESC')
     }
+    const range = {
+      min: parseFloat(vulnEpss[0]) / 10000,
+      max: parseFloat(vulnEpss[1]) / 10000
+    }
     refetch({
       variables: {
         projectId: productId,
         sbomId: sbomId,
         signedParams: customerView ? signedParams : undefined,
+        search: vulnSearchInput !== '' ? vulnSearchInput : undefined,
+        severity:
+          !vulnSeverity.includes('all') && vulnSeverity.length > 0
+            ? vulnSeverity
+            : undefined,
+        componentName:
+          !vulnComponent.includes('all') && vulnComponent.length > 0
+            ? vulnComponent
+            : undefined,
+        status:
+          !vulnStatus.includes('all') && vulnStatus.length > 0
+            ? vulnStatus
+            : undefined,
+        kev:
+          vulnKev === 'all' || vulnKev === ''
+            ? undefined
+            : vulnKev === 'yes'
+            ? true
+            : false,
+        epss: vulnEpss !== '' && vulnEpss !== 'all' ? range : undefined,
         first: totalRows,
         field: column.id,
         direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
@@ -797,7 +861,7 @@ const VulnTable = ({
           onSort={handleSort}
           defaultSortAsc={false}
           defaultSortFieldId={customerView ? signedVulnField : vulnField}
-          progressPending={data && data.nodes ? false : true}
+          progressPending={data ? false : true}
           progressComponent={<CustomLoader />}
           subHeader
           subHeaderComponent={subHeaderComponentMemo}
@@ -845,6 +909,17 @@ const VulnTable = ({
         </Flex>
       )}
 
+      {/* EPSS INFO */}
+      <Stack mt={10} direction={'row'} spacing={2}>
+        <Icon as={InfoIcon} color={'blue.500'} />
+        <Text fontSize={'xs'}>
+          EPSS (Exploit Prediction Scoring System) measures how likely a
+          particular vulnerability is to be exploited in the wild. EPSS scores
+          range from 0% (the lowest probability of exploitation) to 100% (the
+          highest probability of exploitation).
+        </Text>
+      </Stack>
+
       {/* COPY DATA TABLE */}
       {isTableOpen && data && (
         <Drawer
@@ -855,7 +930,7 @@ const VulnTable = ({
         >
           <DrawerOverlay />
           <DrawerContent>
-            <DrawerCloseButton />
+            <DrawerCloseButton onClick={() => setImportSbom([])} />
             <DrawerHeader>
               <Text fontSize={20} fontWeight={'medium'}>
                 Import Vulnerability Status
@@ -869,6 +944,7 @@ const VulnTable = ({
                 currentSbomId={sbomId}
                 currentProductId={productId}
                 onClose={onTableClose}
+                refetch={refetch}
               />
             </DrawerBody>
           </DrawerContent>

@@ -14,7 +14,8 @@ import {
   ModalContent,
   ModalHeader,
   ModalBody,
-  ModalCloseButton
+  ModalCloseButton,
+  Progress
 } from '@chakra-ui/react'
 import { UploadSbom } from 'graphQL/Mutation'
 import { useState } from 'react'
@@ -26,38 +27,34 @@ const UploadModal = ({ id, isOpen, onClose }) => {
   const [errorMessage, setErrorMessage] = useState('')
 
   const handleUpload = async (file) => {
-    try {
-      await sbomUpload({
-        variables: {
-          doc: file,
-          projectId: id
+    await sbomUpload({
+      variables: {
+        doc: file,
+        projectId: id
+      }
+    })
+      .then((res) => {
+        if (res.data.sbomUpload.errors === '[]') {
+          toast({
+            title: 'SBOM uploaded successfully and is now processing',
+            description:
+              'The validated SBOM data will be available in the product shortly. Please refresh to update the product.',
+            duration: 6500,
+            isClosable: true,
+            position: 'top',
+            variant: 'left-accent'
+          })
+        } else {
+          toast({
+            description: 'Upload failed !',
+            status: 'error',
+            duration: 4000,
+            isClosable: true,
+            position: 'top'
+          })
         }
       })
-        .then((res) => {
-          if (res.data.sbomUpload.errors === '[]') {
-            toast({
-              title: 'SBOM uploaded successfully and is now processing',
-              description:
-                'The validated SBOM data will be available in the product shortly. Please refresh to update the product.',
-              duration: 6500,
-              isClosable: true,
-              position: 'top',
-              variant: 'left-accent'
-            })
-          } else {
-            toast({
-              description: 'Upload failed !',
-              status: 'error',
-              duration: 4000,
-              isClosable: true,
-              position: 'top'
-            })
-          }
-        })
-        .finally(() => onClose())
-    } catch (error) {
-      console.error('Mutation error:', error)
-    }
+      .finally(() => onClose())
   }
 
   const handleFileChange = async (event) => {
@@ -94,7 +91,7 @@ const UploadModal = ({ id, isOpen, onClose }) => {
               </Alert>
             )}
             <Box>
-              <FormLabel htmlFor='file' width={'100%'}>
+              <FormLabel htmlFor='file' width={'100%'} cursor={'pointer'}>
                 <Input
                   type='file'
                   id='file'
@@ -115,8 +112,8 @@ const UploadModal = ({ id, isOpen, onClose }) => {
               </FormLabel>
             </Box>
             {loading && (
-              <Box my={4}>
-                <Text>Uploading...</Text>
+              <Box my={5}>
+                <Progress size='xs' isIndeterminate />
               </Box>
             )}
             {error && (

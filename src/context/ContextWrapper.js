@@ -70,7 +70,6 @@ const ContextWrapper = (props) => {
   const [activeProdTab, setActiveProdTab] = useState(0)
   const [signedActiveTab, setSignedActiveTab] = useState(0)
   const [totalRows, setTotalRows] = useState(25)
-  const [comPageIndex, setComPageIndex] = useState(1)
   const [currentProduct, setCurrentProduct] = useState(null)
 
   // PRODUCT FILTERS
@@ -93,6 +92,8 @@ const ContextWrapper = (props) => {
   const [vulnEpss, setVulnEpss] = useState('')
   const [minVal, setMinVal] = useState(0)
   const [maxVal, setMaxVal] = useState(10000)
+  const [vulnAfter, setVulnAfter] = useState('')
+  const [vulnBefore, setVulnBefore] = useState('')
 
   // SIGNED VULN FILTER
   const [signedVulnSearchInput, setSignedVulnSearchInput] = useState('')
@@ -106,6 +107,7 @@ const ContextWrapper = (props) => {
 
   // HEALTH CHECK FILTER
   const [checkSearchInput, setCheckSearchInput] = useState('')
+  const [checkRules, setCheckRules] = useState([])
   const [checkCategory, setCheckCategory] = useState([])
   const [checkSeverity, setCheckSeverity] = useState([])
   const [checkStatus, setCheckStatus] = useState([])
@@ -124,15 +126,29 @@ const ContextWrapper = (props) => {
   const [cpeString, setCpeString] = useState('')
   const [purlString, setPurlString] = useState('')
 
-  // LICENSE TYPES
+  // COMP LICENSE TYPES
   const [spdxList, setSpdxList] = useState([])
-  const [expList, setExpList] = useState([])
   const [customList, setCustomList] = useState([])
-
   const [licenseType, setLicenseType] = useState('license_spdx')
   const [spdxLicense, setSpdxLicense] = useState([])
   const [licenseExp, setLicenseExp] = useState('')
-  const [customLicense, setCustomLicense] = useState('')
+  const [customLicense, setCustomLicense] = useState([])
+
+  // SBOM LICENSE TYPES
+  const [sbomSpdxList, setSbomSpdxList] = useState([])
+  const [sbomCustomList, setSbomCustomList] = useState([])
+  const [sbomLicenseType, setSbomLicenseType] = useState('license_spdx')
+  const [sbomSpdxLicense, setSbomSpdxLicense] = useState([])
+  const [sbomLicenseExp, setSbomLicenseExp] = useState('')
+  const [sbomCustomLicense, setSbomCustomLicense] = useState([])
+
+  const [isCpeValid, setIsCpeValid] = useState(true)
+
+  // PAGINATION STATS FOR DIFFERENT TABS
+  const [comPageIndex, setComPageIndex] = useState(1)
+  const [vulnIndex, setVulnIndex] = useState(1)
+  const [resultIndex, setResultIndex] = useState(1)
+  const [changelogIndex, setChangelogIndex] = useState(1)
 
   return (
     <GlobalContext.Provider
@@ -280,6 +296,8 @@ const ContextWrapper = (props) => {
         setCompBefore,
         checkSearchInput,
         setCheckSearchInput,
+        checkRules,
+        setCheckRules,
         checkCategory,
         setCheckCategory,
         checkSeverity,
@@ -296,8 +314,6 @@ const ContextWrapper = (props) => {
         setPurlString,
         spdxList,
         setSpdxList,
-        expList,
-        setExpList,
         customList,
         setCustomList,
         spdxLicense,
@@ -307,7 +323,31 @@ const ContextWrapper = (props) => {
         customLicense,
         setCustomLicense,
         licenseType,
-        setLicenseType
+        setLicenseType,
+        sbomSpdxList,
+        setSbomSpdxList,
+        sbomCustomList,
+        setSbomCustomList,
+        sbomLicenseType,
+        setSbomLicenseType,
+        sbomSpdxLicense,
+        setSbomSpdxLicense,
+        sbomLicenseExp,
+        setSbomLicenseExp,
+        sbomCustomLicense,
+        setSbomCustomLicense,
+        vulnAfter,
+        setVulnAfter,
+        vulnBefore,
+        setVulnBefore,
+        isCpeValid,
+        setIsCpeValid,
+        vulnIndex,
+        setVulnIndex,
+        resultIndex,
+        setResultIndex,
+        changelogIndex,
+        setChangelogIndex
       }}
     >
       {props.children}

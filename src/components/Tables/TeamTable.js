@@ -1,4 +1,5 @@
 import { useMutation } from '@apollo/client'
+import { AddIcon } from '@chakra-ui/icons'
 import {
   Avatar,
   Box,
@@ -19,39 +20,39 @@ import {
   ModalBody,
   ModalCloseButton,
   useDisclosure,
-  Button
+  Button,
+  Tooltip
 } from '@chakra-ui/react'
 import { deleteOrgUser } from 'graphQL/Mutation'
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV } from 'react-icons/fa'
-import { getFullDateAndTime } from 'utils'
-import { displayPic } from 'utils'
-
-const customStyles = {
-  headCells: {
-    style: {
-      fontWeight: 'bold',
-      color: '#2D3748',
-      fontSize: '12px',
-      letterSpacing: '1px'
-    }
-  }
-}
+import { getFullDateAndTime, customStyles } from 'utils'
+import TeamModal from 'views/Dashboard/Profile/components/TeamModal'
+import SearchFilter from 'views/Sbom/components/SearchFilter'
+import userNone from 'assets/img/user.png'
 
 const TeamTable = ({ data, refetch }) => {
+  const SERVER_URL = process.env.REACT_APP_SERVER
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const {
+    isOpen: isTeamOpen,
+    onOpen: onTeamOpen,
+    onClose: onTeamClose
+  } = useDisclosure()
   const [activeRow, setActiveRow] = useState(null)
+  const [teamSearchInput, setTeamSearchInput] = useState('')
 
   const [deleteUser] = useMutation(deleteOrgUser)
 
+  // COLUMNS
   const columns = [
     // NAME
     {
       id: 'name',
       name: 'NAME',
       selector: (row) => {
-        const { name, email } = row
+        const { name, email, profileImage } = row
         return (
           <Stack
             width={'100%'}
@@ -63,7 +64,7 @@ const TeamTable = ({ data, refetch }) => {
             <Box width={'30px'}>
               <Avatar
                 me={{ md: '22px' }}
-                src={displayPic(email)}
+                src={profileImage && `${SERVER_URL}/${profileImage?.url}`}
                 w='30px'
                 h='30px'
               />
@@ -110,7 +111,7 @@ const TeamTable = ({ data, refetch }) => {
       sortFunction: (a, b) => {
         const dateA = new Date(a.createdAt)
         const dateB = new Date(b.createdAt)
-        return dateB - dateA // Sort in descending order
+        return dateA - dateB // Sort in descending order
       }
     },
     // ACTION
@@ -147,6 +148,44 @@ const TeamTable = ({ data, refetch }) => {
     }
   ]
 
+  // SEARCH COMPONENT
+  const handleSearch = () => console.log('hello')
+
+  // CLEAR SERACH
+  const handleClear = () => setTeamSearchInput('')
+
+  // HEADER SECTION
+  const subHeaderComponent = useMemo(() => {
+    return (
+      <Flex
+        width={'100%'}
+        alignItems={'center'}
+        justifyContent={'space-between'}
+      >
+        {/* SEARCH COMPONENTS */}
+        <SearchFilter
+          id='team'
+          filterText={teamSearchInput}
+          setFilterText={setTeamSearchInput}
+          onFilter={handleSearch}
+          onClear={handleClear}
+        />
+
+        {/* ADD MEMBER */}
+        <Tooltip label='Add Member' placement='top'>
+          <IconButton
+            onClick={onTeamOpen}
+            icon={<AddIcon />}
+            colorScheme='blue'
+            variant='solid'
+            fontWeight='normal'
+            fontSize={'sm'}
+          />
+        </Tooltip>
+      </Flex>
+    )
+  }, [teamSearchInput, handleSearch, handleClear])
+
   const handleRemove = async () => {
     try {
       await deleteUser({
@@ -167,9 +206,11 @@ const TeamTable = ({ data, refetch }) => {
         <Flex flexDir={'column'} width={'100%'}>
           <DataTable
             columns={columns}
-            data={data.users}
-            defaultSortAsc={true}
+            data={data.users || []}
+            defaultSortAsc={false}
             defaultSortFieldId={'joinedDate'}
+            subHeader
+            subHeaderComponent={subHeaderComponent}
             customStyles={customStyles}
             progressPending={data ? false : true}
             responsive={true}
@@ -186,6 +227,16 @@ const TeamTable = ({ data, refetch }) => {
         </Flex>
       )}
 
+      {/* ADD / UPDATE MEMBER */}
+      {isTeamOpen && (
+        <TeamModal
+          refetch={refetch}
+          isOpen={isTeamOpen}
+          onClose={onTeamClose}
+        />
+      )}
+
+      {/* REMOVE MEMBER */}
       {isOpen && activeRow && (
         <Modal isOpen={isOpen} onClose={onClose}>
           <ModalOverlay />

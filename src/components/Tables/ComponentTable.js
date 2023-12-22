@@ -17,12 +17,11 @@ import {
   TagLabel,
   Grid,
   GridItem,
-  HStack,
   TagCloseButton,
   Link,
   Button,
   Divider,
-  Select
+  VStack
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
@@ -33,44 +32,23 @@ import {
   FaLightbulb,
   FaSitemap
 } from 'react-icons/fa'
-import { timeSince, GetIcon } from 'utils'
+import { timeSince, GetIcon, getFullDateAndTime, customStyles } from 'utils'
 import { useState, useMemo, useRef, useEffect, useContext } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import ComponentModal from 'views/Sbom/components/ComponentModal'
 import SupplierModal from 'views/Sbom/components/SupplierModal'
 import LinksDrawer from 'components/Drawer/LinksDrawer'
 import styled from '@emotion/styled'
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import { useLazyQuery, useMutation } from '@apollo/client'
+import { GetComponentPath, GetCompDependency } from 'graphQL/Queries'
 import { deleteComSupplier } from 'graphQL/Mutation'
-import { licenseOptions } from 'variables/licenses'
 import CompFilterMenu from 'views/Sbom/components/CompFilterMenu'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
-import { getFullDateAndTime } from 'utils'
 import GlobalContext from 'context/GlobalContext'
 import CustomLoader from 'components/CustomLoader'
 import RelationshipDrawer from 'components/Drawer/RelationshipDrawer'
 import RowLimit from 'views/Sbom/components/RowLimit'
-import { GetComponentPath } from 'graphQL/Queries'
-import { GetCompDependency } from 'graphQL/Queries'
-
-const customStyles = {
-  headCells: {
-    style: {
-      width: '100%',
-      fontWeight: 'bold',
-      color: '#2D3748',
-      fontSize: '12px',
-      letterSpacing: '1px'
-    }
-  },
-  subHeader: {
-    style: {
-      padding: 0,
-      margin: 0
-    }
-  }
-}
 
 const ComponentTable = ({
   lifecycle,
@@ -82,19 +60,19 @@ const ComponentTable = ({
   setTotalRows,
   filterRefetch
 }) => {
+  const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const customerView = location.pathname.startsWith('/customer')
-  const productId = queryParams.get('p')
+  const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
-
+  const currentProduct = JSON.parse(localStorage.getItem(`product`))
   const x = window.matchMedia('(min-width: 2500px)')
   const y = window.matchMedia('(max-width: 1440px)')
 
   const {
     setSpdxList,
     setSpdxLicense,
-    setExpList,
     setLicenseExp,
     setLicenseType,
     compSearchInput,
@@ -115,14 +93,15 @@ const ComponentTable = ({
     setSignedCompDirection,
     comPageIndex,
     setComPageIndex,
-    compAfter,
-    compBefore,
     setCompAfter,
-    setCompBefore
+    setCompBefore,
+    setCustomList,
+    setCustomLicense,
+    setActiveProdTab
   } = useContext(GlobalContext)
 
-  const fetchCompData = () => {
-    refetch({
+  const fetchCompData = async () => {
+    await refetch({
       variables: {
         projectId: productId,
         sbomId: sbomId,
@@ -145,14 +124,20 @@ const ComponentTable = ({
             : compSupplier,
         primary: compScope === 'primary' ? true : undefined,
         internal: compScope === 'internal' ? true : undefined,
-        first: compAfter !== '' ? totalRows : undefined,
-        after: compAfter !== '' ? compAfter : undefined,
-        last: compBefore !== '' ? totalRows : undefined,
-        before: compBefore !== '' ? compBefore : undefined,
+        first: totalRows,
+        // after: compAfter !== '' ? compAfter : undefined,
+        // last: compBefore !== '' ? totalRows : undefined,
+        // before: compBefore !== '' ? compBefore : undefined,
         field: compField,
         direction: compDirection
       }
     })
+      .then((res) => {
+        if (res.data) {
+          navigate(`/vendor/products/${currentProduct.name}?id=${productId}&sbom=${sbomId}`)
+        }
+      })
+      .finally(() => setActiveProdTab(2))
   }
 
   const [activeRow, setActiveRow] = useState(null)
@@ -204,9 +189,9 @@ const ComponentTable = ({
   } = useDisclosure()
 
   const onLicenseOpen = (row) => {
-    setLicenseType('license_spdx')
     setActiveRow(row)
     if (row.licenses && row.licenses.length > 0) {
+      setLicenseType('license_spdx')
       const filterData = row.licenses.map((value) => ({
         value: value,
         label: value
@@ -214,14 +199,24 @@ const ComponentTable = ({
       setSpdxList(filterData)
       const selectedIds = filterData.map((option) => option.value)
       setSpdxLicense(selectedIds)
+    } else if (row.licensesExp) {
+      setLicenseType('license_exp')
+      setLicenseExp(row.licensesExp)
+    } else if (row.licensesCustom && row.licensesCustom.length > 0) {
+      setLicenseType('license_custom')
+      const filterData = row.licensesCustom.map((option) => ({
+        value: option,
+        label: option
+      }))
+      setCustomList(filterData)
+      setCustomLicense(row.licensesCustom)
     } else {
-      setSpdxList([
-        {
-          value: 'CC0-1.0',
-          label: 'Creative Commons Zero v1.0 Universal'
-        }
-      ])
-      setSpdxLicense(['CC0-1.0'])
+      setLicenseType('license_spdx')
+      setSpdxList([])
+      setSpdxLicense([])
+      setLicenseExp('')
+      setCustomList([])
+      setCustomLicense([])
     }
     onOpen()
   }
@@ -396,7 +391,7 @@ const ComponentTable = ({
         )
       },
       wrap: true,
-      width: '20%',
+      width: '24%',
       sortable: true
     },
     // VERSION
@@ -435,7 +430,7 @@ const ComponentTable = ({
       name: 'LICENSES',
       width: '16%',
       selector: (row) => {
-        const { licenses } = row
+        const { licenses, licensesExp, licensesCustom } = row
 
         return (
           <Flex
@@ -445,31 +440,52 @@ const ComponentTable = ({
             flexWrap={'wrap'}
             my={2}
           >
-            {licenses.length > 0 &&
+            {/* SPDX */}
+            {licenses &&
+              licenses.length > 0 &&
               licenses.map((item, index) => (
-                <Tooltip
-                  key={index}
-                  label={item.name}
-                  placement={'top'}
-                  textTransform={'capitalize'}
-                >
+                <Tooltip key={index} label={item} placement={'top'}>
                   <Link
-                    href={item.reference}
+                    href={`https://spdx.org/licenses/${item}`}
                     target='_blank'
-                    pointerEvents={item.reference === '#' ? 'none' : 'auto'}
-                    overflow={'auto'}
                   >
                     <Tag
-                      size={'sm'}
-                      key={index}
+                      size={'md'}
                       variant='subtle'
                       colorScheme='green'
                       width={'fit-content'}
-                      textTransform={'capitalize'}
                     >
                       <TagLabel>{item}</TagLabel>
                     </Tag>
                   </Link>
+                </Tooltip>
+              ))}
+            {/* EXPRESSION */}
+            {licensesExp && licensesExp !== '' && (
+              <Tooltip label={licensesExp} placement={'top'}>
+                <Tag
+                  size={'md'}
+                  variant='subtle'
+                  colorScheme='green'
+                  width={'fit-content'}
+                >
+                  <TagLabel>{licensesExp}</TagLabel>
+                </Tag>
+              </Tooltip>
+            )}
+            {/* CUSTOM */}
+            {licensesCustom &&
+              licensesCustom.length > 0 &&
+              licensesCustom.map((item, index) => (
+                <Tooltip key={index} label={item} placement={'top'}>
+                  <Tag
+                    size={'md'}
+                    variant='subtle'
+                    colorScheme='green'
+                    width={'fit-content'}
+                  >
+                    <TagLabel>{item}</TagLabel>
+                  </Tag>
                 </Tooltip>
               ))}
           </Flex>
@@ -616,7 +632,7 @@ const ComponentTable = ({
 
   // EXPAND SECTION
   const ExpandedComponent = ({ data }) => {
-    const { id, suppliers, purl, description, cpes, name, kind, internal } =
+    const { scope, suppliers, purl, description, cpes, name, kind, internal } =
       data
 
     const CustomText = styled(Text)`
@@ -665,7 +681,7 @@ const ComponentTable = ({
           </GridItem>
           <GridItem w='100%'>
             <CustomText>Supplier :</CustomText>
-            <HStack spacing={4} mt={1}>
+            <VStack spacing={4} mt={1} alignItems={'left'}>
               {suppliers &&
                 suppliers.map((item, index) => (
                   <Tag
@@ -673,15 +689,24 @@ const ComponentTable = ({
                     key={index}
                     variant='subtle'
                     colorScheme='orange'
+                    width={'fit-content'}
                   >
                     <TagLabel>
-                      {item.name}
-                      {item.contactEmail && ` - ${item.contactEmail}`}
+                      {item.contactName}
+                      {item.contactEmail && ` (${item.contactEmail})`}
+                      {item.url ? (
+                        <Link href={item.url} isExternal>
+                          {' '}
+                          {item.name}
+                        </Link>
+                      ) : (
+                        ` ${item.name}`
+                      )}
                     </TagLabel>
                     <TagCloseButton onClick={() => handleSupRemove(item.id)} />
                   </Tag>
                 ))}
-            </HStack>
+            </VStack>
           </GridItem>
           <GridItem w='100%'>
             <CustomText>PURL :</CustomText>
@@ -698,7 +723,7 @@ const ComponentTable = ({
               gap={1}
               flexWrap={'wrap'}
             >
-              {cpes.length > 0 &&
+              {cpes?.length > 0 &&
                 cpes.map((item, index) => (
                   <Text key={index} fontSize={14}>
                     {item}
@@ -758,6 +783,12 @@ const ComponentTable = ({
                 ))}
             </Flex>
           </GridItem>
+          <GridItem w='100%'>
+            <CustomText>Scope :</CustomText>
+            <Text mt={1} fontSize={14} textTransform={'capitalize'}>
+              {scope}
+            </Text>
+          </GridItem>
         </Grid>
       </Box>
     )
@@ -770,38 +801,64 @@ const ComponentTable = ({
         variables: {
           projectId: productId,
           sbomId: sbomId,
-          search: compSearchInput,
+          search: compSearchInput !== '' ? compSearchInput : undefined,
+          ecosystem:
+            compEcosystem.includes('all') || compEcosystem.length === 0
+              ? undefined
+              : compEcosystem,
+          kind:
+            compType.includes('all') || compType.length === 0
+              ? undefined
+              : compType,
+          licenses:
+            compLicense.includes('all') || compLicense.length === 0
+              ? undefined
+              : compLicense,
+          supplierName:
+            compSupplier.includes('all') || compSupplier.length === 0
+              ? undefined
+              : compSupplier,
+          primary: compScope === 'primary' ? true : undefined,
+          internal: compScope === 'internal' ? true : undefined,
           first: totalRows,
           field: compField,
           direction: compDirection
         }
-      }).then((res) => {
-        if (res.data) {
-          setComPageIndex(1)
-          setCompBefore(res.data.sbom.components.pageInfo.startCursor)
-          setCompAfter(res.data.sbom.components.pageInfo.endCursor)
-        }
       })
+      setComPageIndex(1)
     }
   }
 
   // CLEAR SERACH
   const handleClear = async () => {
+    setCompSearchInput('')
+    setComPageIndex(1)
     await refetch({
       variables: {
         projectId: productId,
         sbomId: sbomId,
         search: undefined,
+        ecosystem:
+          compEcosystem.includes('all') || compEcosystem.length === 0
+            ? undefined
+            : compEcosystem,
+        kind:
+          compType.includes('all') || compType.length === 0
+            ? undefined
+            : compType,
+        licenses:
+          compLicense.includes('all') || compLicense.length === 0
+            ? undefined
+            : compLicense,
+        supplierName:
+          compSupplier.includes('all') || compSupplier.length === 0
+            ? undefined
+            : compSupplier,
+        primary: compScope === 'primary' ? true : undefined,
+        internal: compScope === 'internal' ? true : undefined,
         first: totalRows,
         field: compField,
         direction: compDirection
-      }
-    }).then((res) => {
-      if (res.data) {
-        setCompSearchInput('')
-        setComPageIndex(1)
-        setCompBefore(res.data.sbom.components.pageInfo.startCursor)
-        setCompAfter(res.data.sbom.components.pageInfo.endCursor)
       }
     })
   }
@@ -814,9 +871,6 @@ const ComponentTable = ({
         projectId: productId,
         sbomId: sbomId,
         first: Number(e.target.value),
-        last: undefined,
-        after: undefined,
-        before: undefined,
         field: customerView ? signedCompField : compField,
         direction: customerView ? signedCompDirection : compDirection
       }
@@ -877,9 +931,41 @@ const ComponentTable = ({
     )
   }, [compSearchInput, handleClear, handleSearch, compFilters])
 
+  const handleRefetch = (after, before) => {
+    refetch({
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        first: after ? totalRows : undefined,
+        after: after ? after : undefined,
+        last: before ? totalRows : undefined,
+        before: before ? before : undefined,
+        search: compSearchInput !== '' ? compSearchInput : undefined,
+        ecosystem:
+          compEcosystem.includes('all') || compEcosystem.length === 0
+            ? undefined
+            : compEcosystem,
+        kind:
+          compType.includes('all') || compType.length === 0
+            ? undefined
+            : compType,
+        licenses:
+          compLicense.includes('all') || compLicense.length === 0
+            ? undefined
+            : compLicense,
+        supplierName:
+          compSupplier.includes('all') || compSupplier.length === 0
+            ? undefined
+            : compSupplier,
+        primary: compScope === 'primary' ? true : undefined,
+        internal: compScope === 'internal' ? true : undefined,
+        field: customerView ? signedCompField : compField,
+        direction: customerView ? signedCompDirection : compDirection
+      }
+    })
+  }
+
   const handleSort = (column, sortDirection) => {
-    // console.log(`column`, column)
-    // console.log(`sortDirection`, sortDirection)
     if (customerView) {
       setSignedCompField(column.id)
       setSignedCompDirection(sortDirection === 'asc' ? 'ASC' : 'DESC')
@@ -893,7 +979,25 @@ const ComponentTable = ({
         projectId: productId,
         sbomId: sbomId,
         first: totalRows,
-        last: undefined,
+        search: compSearchInput !== '' ? compSearchInput : undefined,
+        ecosystem:
+          compEcosystem.includes('all') || compEcosystem.length === 0
+            ? undefined
+            : compEcosystem,
+        kind:
+          compType.includes('all') || compType.length === 0
+            ? undefined
+            : compType,
+        licenses:
+          compLicense.includes('all') || compLicense.length === 0
+            ? undefined
+            : compLicense,
+        supplierName:
+          compSupplier.includes('all') || compSupplier.length === 0
+            ? undefined
+            : compSupplier,
+        primary: compScope === 'primary' ? true : undefined,
+        internal: compScope === 'internal' ? true : undefined,
         field: column.id,
         direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
       }
@@ -904,74 +1008,14 @@ const ComponentTable = ({
     setComPageIndex((prev) => comPageIndex !== 0 && prev - 1)
     setCompBefore(data.pageInfo.startCursor)
     setCompAfter('')
-    await refetch({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        search: compSearchInput !== '' ? compSearchInput : undefined,
-        ecosystem:
-          compEcosystem.includes('all') || compEcosystem.length === 0
-            ? undefined
-            : compEcosystem,
-        kind:
-          compType.includes('all') || compType.length === 0
-            ? undefined
-            : compType,
-        licenses:
-          compLicense.includes('all') || compLicense.length === 0
-            ? undefined
-            : compLicense,
-        supplierName:
-          compSupplier.includes('all') || compSupplier.length === 0
-            ? undefined
-            : compSupplier,
-        primary: compScope === 'primary' ? true : undefined,
-        internal: compScope === 'internal' ? true : undefined,
-        last: totalRows,
-        before: data.pageInfo.startCursor,
-        after: undefined,
-        first: undefined,
-        field: customerView ? signedCompField : compField,
-        direction: customerView ? signedCompDirection : compDirection
-      }
-    })
+    handleRefetch(null, data.pageInfo.startCursor)
   }
 
   const handleNextPage = async () => {
     setComPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
     setCompAfter(data.pageInfo.endCursor)
     setCompBefore('')
-    await refetch({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        search: compSearchInput !== '' ? compSearchInput : undefined,
-        ecosystem:
-          compEcosystem.includes('all') || compEcosystem.length === 0
-            ? undefined
-            : compEcosystem,
-        kind:
-          compType.includes('all') || compType.length === 0
-            ? undefined
-            : compType,
-        licenses:
-          compLicense.includes('all') || compLicense.length === 0
-            ? undefined
-            : compLicense,
-        supplierName:
-          compSupplier.includes('all') || compSupplier.length === 0
-            ? undefined
-            : compSupplier,
-        primary: compScope === 'primary' ? true : undefined,
-        internal: compScope === 'internal' ? true : undefined,
-        first: totalRows,
-        after: data.pageInfo.endCursor,
-        last: undefined,
-        before: undefined,
-        field: customerView ? signedCompField : compField,
-        direction: customerView ? signedCompDirection : compDirection
-      }
-    })
+    handleRefetch(data.pageInfo.endCursor, null)
   }
 
   return (
@@ -1041,22 +1085,12 @@ const ComponentTable = ({
           {isOpen && (
             <ComponentDrawer
               data={activeRow}
-              id={activeRow.id}
               isOpen={isOpen}
               onClose={onClose}
-              component={activeRow.name}
-              version={activeRow.version}
-              exp={activeRow?.licenseExp}
-              type={activeRow.kind}
               fetchCompData={fetchCompData}
               filterRefetch={filterRefetch}
-              cpes={activeRow.cpes}
-              purl={activeRow.purl}
-              primary={activeRow.primary}
-              internal={activeRow.internal}
               shortDesc={null}
               checkId={null}
-              group={activeRow.group}
               primaryComp={primaryComp}
             />
           )}
@@ -1077,7 +1111,7 @@ const ComponentTable = ({
               filterRefetch={filterRefetch}
               isOpen={isSupOpen}
               onClose={onSupClose}
-              suppliers={activeRow.suppliers}
+              data={activeRow}
               shortDesc={null}
               checkId={null}
             />
@@ -1114,19 +1148,12 @@ const ComponentTable = ({
         <ComponentDrawer
           isOpen={isCompOpen}
           onClose={onCompClose}
-          component={''}
-          version={''}
-          exp={null}
-          type={''}
-          cpes={[]}
-          purl={''}
-          primary={false}
-          internal={false}
           fetchCompData={fetchCompData}
           filterRefetch={filterRefetch}
+          primaryComp={primaryComp}
           shortDesc={null}
           checkId={null}
-          primaryComp={primaryComp}
+          data={null}
         />
       )}
     </>

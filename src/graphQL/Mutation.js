@@ -9,6 +9,20 @@ export const orgUpdate = gql`
   }
 `
 
+// CREATE ORGANIZATIOPN
+export const RegisterOrganization = gql`
+  mutation RegisterOrganization($name: String!, $url: String, $email: String) {
+    organizationCreate(input: { name: $name, url: $url, email: $email }) {
+      organization {
+        id
+        name
+        url
+      }
+      errors
+    }
+  }
+`
+
 // CREATE INTERNAL COMPONENT
 export const createOrgComp = gql`
   mutation createOrgComp($match: String!) {
@@ -537,10 +551,11 @@ export const CreateComponent = gql`
     $kind: String!
     $name: String!
     $version: String
-    $licenses: [String!]
-    $licenseExp: [String!]
+    $group: String
+    $licenses: LicenseInput
     $cpes: [String!]
     $purl: String
+    $scope: String
     $primary: Boolean
     $internal: Boolean
   ) {
@@ -550,10 +565,11 @@ export const CreateComponent = gql`
         kind: $kind
         name: $name
         version: $version
+        group: $group
         licenses: $licenses
-        licenseExp: $licenseExp
         cpes: $cpes
         purl: $purl
+        scope: $scope
         primary: $primary
         internal: $internal
       }
@@ -562,6 +578,7 @@ export const CreateComponent = gql`
         id
         name
         version
+        group
         primary
         internal
         purl
@@ -578,13 +595,15 @@ export const UpdateComponent = gql`
     $sbomId: Uuid!
     $kind: String
     $name: String
-    $licenses: [String!]
-    $licenseExp: [String!]
+    $version: String
+    $group: String
+    $licenses: LicenseInput
     $cpes: [String!]
     $purl: String
     $primary: Boolean
     $internal: Boolean
     $uniqueId: Boolean
+    $scope: String
   ) {
     componentUpdate(
       input: {
@@ -592,10 +611,12 @@ export const UpdateComponent = gql`
         sbomId: $sbomId
         kind: $kind
         name: $name
+        version: $version
+        group: $group
         licenses: $licenses
-        licenseExp: $licenseExp
         cpes: $cpes
         purl: $purl
+        scope: $scope
         primary: $primary
         internal: $internal
         generateUniqueId: $uniqueId
@@ -605,6 +626,7 @@ export const UpdateComponent = gql`
         id
         name
         version
+        group
         kind
         primary
         internal
@@ -916,8 +938,7 @@ export const sbomCreate = gql`
     $spec: String!
     $specVersion: String
     $format: String
-    $licenses: [String!]
-    $licenseExp: [String!]
+    $licenses: LicenseInput
   ) {
     sbomCreate(
       input: {
@@ -926,20 +947,17 @@ export const sbomCreate = gql`
         specVersion: $specVersion
         format: $format
         licenses: $licenses
-        licenseExp: $licenseExp
       }
     ) {
       errors
       sbom {
         id
-        cpes
         creationAt
         licenses
         lifecycle
         project {
           name
         }
-        purl
         spec
         specVersion
         updatedAt
@@ -954,8 +972,7 @@ export const sbomUpdate = gql`
     $spec: String!
     $specVersion: String
     $format: String
-    $licenses: [String!]
-    $licenseExp: [String!]
+    $licenses: LicenseInput
   ) {
     sbomUpdate(
       input: {
@@ -964,7 +981,6 @@ export const sbomUpdate = gql`
         specVersion: $specVersion
         format: $format
         licenses: $licenses
-        licenseExp: $licenseExp
       }
     ) {
       errors
@@ -974,14 +990,14 @@ export const sbomUpdate = gql`
           name
           email
         }
-        cpes
         creationAt
         licenses
+        licensesExp
+        licensesCustom
         lifecycle
         project {
           name
         }
-        purl
         spec
         specVersion
         tools {
@@ -1123,34 +1139,49 @@ export const updateApiToken = gql`
 
 // UPDATE PRODUCT COMPONENT VULN VEX
 export const updateCompVulnVex = gql`
-  mutation UpdateCompVulnVex(
+  mutation updateCompVulnVex(
     $compVulnId: Uuid!
-    $notes: String
     $vexStatusId: Uuid!
     $vexJustificationId: Uuid
-    $sbomId: Uuid
+    $cdxResponseId: Uuid
+    $note: String
     $impact: String
+    $detail: String
+    $action: String
+    $fixedIn: String
   ) {
     componentVexUpdate(
       input: {
         componentVulnId: $compVulnId
-        sbomId: $sbomId
-        notes: $notes
-        vexJustificationId: $vexJustificationId
         vexStatusId: $vexStatusId
+        vexJustificationId: $vexJustificationId
+        cdxResponseId: $cdxResponseId
+        note: $note
         impact: $impact
+        detail: $detail
+        action: $action
+        fixedIn: $fixedIn
       }
     ) {
       componentVuln {
-        vulnId
-        componentId
-        componentVulnLogs {
-          changedBy
-          status
-          justification
-          updatedAt
-          impact
+        id
+        vexJustification {
+          id
+          name
         }
+        vexStatus {
+          id
+          name
+        }
+        cdxResponse {
+          id
+          name
+        }
+        note
+        impact
+        detail
+        actionStmt
+        fixedIn
       }
       errors
     }
@@ -1309,6 +1340,92 @@ export const DeleteAutomation = gql`
       autoCheck {
         id
       }
+      errors
+    }
+  }
+`
+
+// CREATE SBOM PARTS
+export const SbomPartCreate = gql`
+  mutation SbomPartCreate($parentSbomId: Uuid!, $partSbomId: Uuid!) {
+    sbomPartCreate(
+      input: { parentSbomId: $parentSbomId, partSbomId: $partSbomId }
+    ) {
+      sbomPart {
+        id
+        sbomId
+        partId
+        createdAt
+        updatedAt
+      }
+      errors
+    }
+  }
+`
+
+// REMOVE SBOM PARTS
+export const SbomPartDelete = gql`
+  mutation SbomPartDelete($id: Uuid!) {
+    sbomPartDelete(input: { id: $id }) {
+      sbomPart {
+        id
+      }
+      errors
+    }
+  }
+`
+
+// UPLOAD PROFILE IMAGE
+export const UploadProfileImage = gql`
+  mutation UploadProfileImage($userId: ID!, $profileImage: Upload!) {
+    userUploadProfileImage(
+      input: { userId: $userId, profileImage: $profileImage }
+    ) {
+      user {
+        id
+        profileImage {
+          url
+          filename
+          contentType
+          byteSize
+          checksum
+        }
+      }
+      errors
+    }
+  }
+`
+
+// REGISTER USER
+export const RegisterUser = gql`
+  mutation RegisterUser(
+    $name: String
+    $email: String!
+    $password: String!
+    $passwordConfirmation: String!
+  ) {
+    userRegistration(
+      input: {
+        name: $name
+        email: $email
+        password: $password
+        passwordConfirmation: $passwordConfirmation
+      }
+    ) {
+      user {
+        name
+        email
+      }
+      errors
+    }
+  }
+`
+
+// SWITCH ORGANIZATION
+export const SwitchOrganization = gql`
+  mutation SwitchOrganization($orgId: Uuid!) {
+    organizationSwitch(input: { organizationId: $orgId }) {
+      token
       errors
     }
   }

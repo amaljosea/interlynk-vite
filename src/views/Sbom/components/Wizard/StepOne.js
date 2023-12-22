@@ -11,6 +11,8 @@ import { useContext, useEffect } from 'react'
 import GlobalContext from 'context/GlobalContext'
 import { GetProjectData, GetProject } from 'graphQL/Queries'
 import { useLazyQuery, useQuery } from '@apollo/client'
+import { useGlobalState } from 'hooks/useGlobalState'
+import { removeDuplicates } from 'utils'
 
 const StepOne = ({
   setProductId,
@@ -24,11 +26,15 @@ const StepOne = ({
   uniqVersions,
   setUniqVersions
 }) => {
-  const { totalProducts } = useContext(GlobalContext)
+  const { prodState } = useGlobalState()
+  const { field, direction, totalProduct } = prodState
 
   const { data: allProducts } = useQuery(GetProjectData, {
     variables: {
-      first: totalProducts
+      first: 100,
+      enabled: true,
+      field: field,
+      direction: direction
     }
   })
 
@@ -46,21 +52,19 @@ const StepOne = ({
       )
       setSelectedProd(currentProd.id)
       setProductId(currentProd.id)
-      const filterVersion = [...currentProd.sboms].sort((a, b) => {
-        const dateA = new Date(a.updatedAt)
-        const dateB = new Date(b.updatedAt)
-        return dateB - dateA
-      })
-      const currentIndex = filterVersion?.findIndex(
-        (item) => item.id === currentSbomId
-      )
-      if (currentIndex !== filterVersion.length - 1) {
-        setSelectedVersion(filterVersion[currentIndex + 1].id)
-        setSbomId(filterVersion[currentIndex + 1].id)
-      } else {
-        setSelectedVersion('')
-        setSbomId('')
-      }
+      // const filterVersion = [...currentProd.sboms].filter(
+      //   (item) => item.id !== currentSbomId
+      // )
+      // const currentIndex = filterVersion?.findIndex(
+      //   (item) => item.id === currentSbomId
+      // )
+      // if (currentIndex !== filterVersion.length - 1) {
+      //   setSelectedVersion(filterVersion[currentIndex + 1].id)
+      //   setSbomId(filterVersion[currentIndex + 1].id)
+      // } else {
+      //   setSelectedVersion('')
+      //   setSbomId('')
+      // }
     }
   }, [allProducts])
 
@@ -73,54 +77,29 @@ const StepOne = ({
   }
 
   useEffect(() => {
-    if (selectedProd !== '') {
+    if (selectedProd !== '' && selectedVersion === '') {
       getProduct({
         variables: {
           id: selectedProd
         }
       }).then((res) => {
         if (res.data) {
-          let versions = []
-          res.data.project.sboms.map((project) => {
-            if (project.primaryComponent) {
-              versions.push({
-                version: project.primaryComponent.version,
-                id: project.id,
-                updatedAt: project.updatedAt
-              })
-            }
-          })
-          setUniqVersions(versions)
+          const data = removeDuplicates(res.data.project.sboms)
+          const filtered = [...data].filter(
+            (item) => item.id !== currentSbomId && item.primaryComponent
+          )
+          if (filtered.length > 0) {
+            setSelectedVersion(filtered[0].id)
+            setUniqVersions(filtered)
+          } else {
+            setSelectedVersion('')
+            setUniqVersions([])
+          }
         }
       })
     }
   }, [selectedProd])
 
-  // remove duplicates
-  const removeDuplicatesAndLatest = (arr) => {
-    const uniqueVersions = {}
-
-    for (const item of arr) {
-      if (
-        !uniqueVersions[item.version] ||
-        item.updatedAt > uniqueVersions[item.version].updatedAt
-      ) {
-        uniqueVersions[item.version] = item
-      }
-    }
-
-    return Object.values(uniqueVersions)
-  }
-
-  const filteredData = uniqVersions
-    ? removeDuplicatesAndLatest(uniqVersions)
-    : []
-
-  filteredData?.sort((a, b) => {
-    const dateA = new Date(a.updatedAt)
-    const dateB = new Date(b.updatedAt)
-    return dateB - dateA
-  })
 
   return (
     <>
@@ -184,14 +163,12 @@ const StepOne = ({
                 }}
               >
                 <option value={''}>-- Select --</option>
-                {filteredData.length > 0 &&
-                  [...filteredData]
-                    .filter((item) => item.id !== currentSbomId)
-                    .map((item, index) => (
-                      <option key={index} value={item.id}>
-                        {item.version}
-                      </option>
-                    ))}
+                {uniqVersions.length > 0 &&
+                  uniqVersions.map((item, index) => (
+                    <option key={index} value={item.id}>
+                      {item.primaryComponent?.version}
+                    </option>
+                  ))}
               </Select>
             </FormControl>
           </Stack>

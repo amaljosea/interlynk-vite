@@ -35,9 +35,7 @@ import {
   ModalHeader,
   ModalCloseButton,
   ModalBody,
-  ModalFooter,
-  RadioGroup,
-  Radio
+  ModalFooter
 } from '@chakra-ui/react'
 import { useLazyQuery, useMutation } from '@apollo/client'
 import { CreateComponent, UpdateComponent } from 'graphQL/Mutation'
@@ -54,39 +52,42 @@ import LicenseField from 'components/LicenseField'
 
 function ComponentDrawer(props) {
   const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
   const toast = useToast()
-  const productId = queryParams.get('p')
+
+  const queryParams = new URLSearchParams(location.search)
+  const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
 
   const customerView = location.pathname.startsWith('/customer')
 
   const {
-    id,
     isOpen,
     onClose,
-    component,
-    version,
     data,
-    type,
-    cpes,
-    purl,
-    primary,
-    internal,
     primaryComp,
     fetchCompData,
-    group,
     shortDesc,
     filterRefetch
   } = props
 
-  const { setCompFilters, licenseType, spdxLicense, setPurlString } =
-    useContext(GlobalContext)
+  const {
+    setCompFilters,
+    licenseType,
+    spdxLicense,
+    setPurlString,
+    customLicense,
+    purlString,
+    licenseExp,
+    isCpeValid,
+    setComPageIndex
+  } = useContext(GlobalContext)
 
   const onFilterRefetch = () => {
     filterRefetch({
-      projectId: productId,
-      sbomId: sbomId
+      variables: {
+        projectId: productId,
+        sbomId: sbomId
+      }
     }).then((res) => res.data && setCompFilters(res.data.sbom.filters))
   }
 
@@ -100,37 +101,47 @@ function ComponentDrawer(props) {
     onCompleted: () => fetchCompData()
   })
 
-  const [compId, setCompId] = useState('')
+  const cpeRef = useRef()
+
   const [groupInfo, setGroupInfo] = useState('')
   const [compName, setCompName] = useState('')
   const [compVersion, setCompVersion] = useState('')
-  const [compType, setCompType] = useState('')
-
+  const [compKind, setCompKind] = useState('')
+  const [compScope, setCompScope] = useState('')
   const [cpeValue, setCpeValue] = useState('')
   const [cpeList, setCpeList] = useState([])
   const [cpeData, setCpeData] = useState([])
-  const cpeRef = useRef()
-
   const [selectedCpe, setSelectedCpe] = useState(null)
   const [purlValue, setPurlValue] = useState('')
   const [purlData, setPurlData] = useState(null)
   const [isPURLInputValid, setPURLInputValid] = useState(true)
-
-  const [isPrimary, setIsPrimary] = useState(primary)
-  const [isInternal, setIsInternal] = useState(internal)
-
-  useEffect(() => {
-    setCompId(id)
-    setGroupInfo(group == null ? '' : group)
-    setCompName(component)
-    setCompVersion(version)
-    setCpeList(cpes)
-    setPurlValue(purl)
-  }, [component])
+  const [isPrimary, setIsPrimary] = useState(false)
+  const [isInternal, setIsInternal] = useState(false)
 
   useEffect(() => {
-    setCompType(type)
-  }, [type])
+    if (data) {
+      const {
+        name,
+        version,
+        kind,
+        cpes,
+        purl,
+        primary,
+        internal,
+        group,
+        scope
+      } = data
+      setGroupInfo(group)
+      setCompName(name)
+      setCompVersion(version)
+      setCpeList(cpes)
+      setPurlValue(purl)
+      setCompKind(kind)
+      setCompScope(scope)
+      setIsPrimary(primary)
+      setIsInternal(internal)
+    }
+  }, [])
 
   // Health Check
   useEffect(() => {
@@ -167,14 +178,20 @@ function ComponentDrawer(props) {
   } = useDisclosure()
 
   const handlePURLInputChange = (e) => {
-    const inputValue = e.target.value
-    setPurlValue(inputValue)
-    try {
-      PackageURL.fromString(inputValue)
-      setPURLInputValid(true)
-    } catch (ex) {
-      console.error('ex', ex)
-      setPURLInputValid(false)
+    const { value } = e.target
+    const val = value.replace(/\s/g, '')
+    setPurlValue(val)
+  }
+
+  const purlInputBlur = () => {
+    if (purlValue !== '') {
+      try {
+        PackageURL.fromString(purlValue)
+        setPURLInputValid(true)
+      } catch (ex) {
+        console.error('ex', ex)
+        setPURLInputValid(false)
+      }
     }
   }
 
@@ -184,115 +201,95 @@ function ComponentDrawer(props) {
       setPurlData(pkg)
       setPurlString(pkg.toString())
     } else {
-      setPurlString('pkg:type/namespace/name@version')
+      setPurlString('pkg:type/name@version?key=value')
     }
     onPurlOpen()
   }
 
   const handleCreateCom = async () => {
-    try {
-      await createComponent({
-        variables: {
-          sbomId: sbomId,
-          kind: compType,
-          name: compName,
-          version: compVersion,
-          licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
-          licenseExp: licenseType === 'license_exp' ? expLicense : undefined,
-          cpes: cpeList,
-          purl: purlValue,
-          primary: isPrimary,
-          internal: isInternal
+    await createComponent({
+      variables: {
+        sbomId: sbomId,
+        kind: compKind,
+        name: compName,
+        version: compVersion,
+        group: groupInfo,
+        scope: compScope,
+        licenses:
+          spdxLicense.length === 0 &&
+          licenseExp === '' &&
+          customLicense.length === 0
+            ? undefined
+            : {
+                licenses:
+                  licenseType === 'license_spdx' ? spdxLicense : undefined,
+                licensesExp:
+                  licenseType === 'license_exp' ? licenseExp : undefined,
+                licensesCustom:
+                  licenseType === 'license_custom' ? customLicense : undefined
+              },
+        cpes: cpeList,
+        purl: purlValue,
+        primary: isPrimary,
+        internal: isInternal
+      }
+    })
+      .then((res) => {
+        if (res.data) {
+          setComPageIndex(1)
+          onFilterRefetch()
+          onClose()
         }
       })
-        .then((res) => {
-          if (res.data) {
-            onFilterRefetch()
-          }
+      .finally(() => {
+        toast({
+          description: `Data added successfully`,
+          status: 'success',
+          position: 'top',
+          isClosable: true,
+          duration: 2000
         })
-        .finally(() => {
-          onClose()
-          toast({
-            description: `Data added successfully`,
-            status: 'success',
-            position: 'top',
-            isClosable: true,
-            duration: 2000
-          })
-        })
-    } catch (error) {
-      console.error('Mutation error:', error)
-    }
+      })
   }
 
   const handleUpdateCom = async () => {
-    try {
-      await updateComponent({
-        variables: {
-          id: id,
-          sbomId: sbomId,
-          kind: compType,
-          name: compName,
-          version: compVersion,
-          licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
-          licenseExp: licenseType === 'license_exp' ? expLicense : undefined,
-          cpes: cpeList,
-          purl: purlValue,
-          primary: isPrimary,
-          internal: isInternal
-        }
-      })
-        .then((res) => {
-          if (res.data) {
-            onFilterRefetch()
-          }
-        })
-        .finally(() => onClose())
-    } catch (error) {
-      console.error('Mutation error:', error)
-    }
-  }
-
-  const handleSave = () => {
-    try {
-      handleCreateCom()
-    } catch (error) {
-      toast({
-        description: error.message,
-        status: 'error',
-        position: 'top',
-        duration: 3000
-      })
-    }
-  }
-
-  const handleUpdate = async () => {
-    if (purlValue != null && purlValue !== '') {
-      try {
-        const pkg = PackageURL.fromString(purlValue)
-        handleUpdateCom()
-      } catch (error) {
-        toast({
-          description: error.message,
-          status: 'error',
-          position: 'top',
-          duration: 3000
-        })
+    await updateComponent({
+      variables: {
+        id: data?.id,
+        sbomId: sbomId,
+        kind: compKind,
+        name: compName,
+        version: compVersion,
+        group: groupInfo,
+        scope: compScope,
+        licenses:
+          spdxLicense.length === 0 &&
+          licenseExp === '' &&
+          customLicense.length === 0
+            ? undefined
+            : {
+                licenses:
+                  licenseType === 'license_spdx' ? spdxLicense : undefined,
+                licensesExp:
+                  licenseType === 'license_exp' ? licenseExp : undefined,
+                licensesCustom:
+                  licenseType === 'license_custom' ? customLicense : undefined
+              },
+        cpes: cpeList.length > 0 ? cpeList : cpeValue !== '' ? [cpeValue] : [],
+        purl: purlValue,
+        primary: isPrimary,
+        internal: isInternal
       }
-    } else {
-      handleUpdateCom()
-    }
-  }
-
-  const handleKeyDown = (event) => {
-    if (event.key === 'Enter') {
-      setCpeList([...cpeList, cpeValue])
-      setCpeValue('')
-    }
+    }).then((res) => {
+      if (res.data) {
+        setComPageIndex(1)
+        onClose()
+      }
+    })
   }
 
   const handleCreateCpe = (string) => {
-    const cpeItem = cpeList.find((item) => item === string)
+    const cpeItem = cpeList?.find((item) => item === string)
     if (cpeItem) {
       toast({
         description: 'CPE already exists',
@@ -309,7 +306,7 @@ function ComponentDrawer(props) {
   }
 
   const handleUpdateCpe = (string, id) => {
-    const cpeItem = cpeList.find((item) => item === string)
+    const cpeItem = cpeList?.find((item) => item === string)
     if (cpeItem) {
       toast({
         description: 'CPE already exists',
@@ -317,8 +314,8 @@ function ComponentDrawer(props) {
         position: 'top',
         duration: 3000
       })
-    } else if (cpeList.find((item, index) => index === id)) {
-      const updatedData = cpeList.map((item, index) => {
+    } else if (cpeList?.find((item, index) => index === id)) {
+      const updatedData = cpeList?.map((item, index) => {
         if (index === id) {
           return string
         }
@@ -335,27 +332,30 @@ function ComponentDrawer(props) {
     setCpeList(updatedItems)
   }
 
-  const handleCpeChange = (event) => {
-    const { value } = event.target
-    setCpeValue(value)
-    getCpe({
-      variables: {
-        input: {
-          idType: 'cpe',
-          ecosystem: 'cpe',
-          search: {
-            idUri: value
+  const handleCpeChange = (e) => {
+    const { value } = e.target
+    const val = value.replace(/\s/g, '')
+    setCpeValue(val)
+    if (val === '') {
+      setCpeData([])
+    } else {
+      getCpe({
+        variables: {
+          input: {
+            idType: 'cpe',
+            ecosystem: 'cpe',
+            search: {
+              idUri: val
+            }
           }
         }
-      }
-    }).then((res) => {
-      if (res.data) {
-        setCpeData(res.data.idAutoComplete.result)
-      }
-    })
+      }).then((res) => {
+        if (res.data) {
+          setCpeData(res.data.idAutoComplete.result)
+        }
+      })
+    }
   }
-
-  const [expLicense, setExpLicense] = useState([])
 
   return (
     <>
@@ -389,9 +389,6 @@ function ComponentDrawer(props) {
                   placeholder='Enter name'
                   value={compName}
                   onChange={(e) => setCompName(e.target.value)}
-                  isDisabled={component}
-                  isInvalid={component}
-                  errorBorderColor='blue.600'
                 />
               </FormControl>
               {/* Version */}
@@ -415,15 +412,17 @@ function ComponentDrawer(props) {
                   placeholder='Enter version'
                   value={compVersion}
                   onChange={(e) => setCompVersion(e.target.value)}
-                  isDisabled={component}
-                  isInvalid={component}
-                  errorBorderColor='blue.600'
                 />
               </FormControl>
               {/* Group */}
               <FormControl>
                 <FormLabel htmlFor='groupInfo' fontSize={'sm'}>
-                  Group
+                  <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
+                    <Text>Group</Text>
+                    <Tooltip label='Group Info'>
+                      <Icon as={InfoIcon} color={'blue.500'} />
+                    </Tooltip>
+                  </Flex>
                 </FormLabel>
                 <Input
                   size='md'
@@ -431,9 +430,6 @@ function ComponentDrawer(props) {
                   placeholder='Add group'
                   value={groupInfo}
                   onChange={(e) => setGroupInfo(e.target.value)}
-                  isDisabled
-                  isInvalid
-                  errorBorderColor='gray.300'
                 />
               </FormControl>
               {/* KIND */}
@@ -444,10 +440,12 @@ function ComponentDrawer(props) {
                   name='componentType'
                   size='md'
                   fontSize={'sm'}
-                  value={compType}
-                  onChange={(e) => setCompType(e.target.value)}
+                  value={compKind}
+                  onChange={(e) => setCompKind(e.target.value)}
                 >
-                  <option value=''>-- Select --</option>
+                  <option value='' style={{ background: 'lightgray' }}>
+                    -- Select --
+                  </option>
                   <option value='application'>Application</option>
                   <option value='library'>Library</option>
                   <option value='operating-system'>Operating System</option>
@@ -463,20 +461,17 @@ function ComponentDrawer(props) {
                   <option value='unspecified'>Unspecified</option>
                 </Select>
               </FormControl>
-
               {/* LICENSES */}
-              <LicenseField
-                exp={data?.licenseExp}
-                expLicense={expLicense}
-                setExpLicense={setExpLicense}
-              />
-
+              <LicenseField data={data} />
               {/* PURL INPUI */}
-              <FormControl isReadOnly={customerView}>
+              <FormControl
+                isReadOnly={customerView}
+                isInvalid={purlValue !== '' && !isPURLInputValid}
+              >
                 <FormLabel htmlFor='purl' fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     {shortDesc === 'Component Identifier' &&
-                      purlValue === '' && (
+                      purlString === '' && (
                         <WarningTwoIcon w={4} h={4} color='red.500' />
                       )}
                     <Text>Identifiers</Text>
@@ -497,6 +492,7 @@ function ComponentDrawer(props) {
                       value={purlValue}
                       autoComplete='off'
                       onChange={handlePURLInputChange}
+                      onBlur={purlInputBlur}
                     />
                     <InputRightElement align='center' zIndex={-1}>
                       {purlValue != null && purlValue !== '' ? (
@@ -521,7 +517,6 @@ function ComponentDrawer(props) {
                   </IconButton>
                 </Stack>
               </FormControl>
-
               {/* CPE INPUT */}
               <FormControl>
                 <Stack direction={'row'} width={'100%'} spacing={2}>
@@ -553,13 +548,14 @@ function ComponentDrawer(props) {
                   flexWrap={'wrap'}
                   spacing={2}
                   gap={2}
-                  my={2}
+                  mt={2}
                 >
-                  {cpeList.map((item, index) => (
+                  {cpeList?.map((item, index) => (
                     <Tag key={index} variant='solid' colorScheme={'blue'}>
                       <TagLabel
                         cursor={'pointer'}
                         onClick={() => {
+                          setCpeValue(item)
                           setSelectedCpe({ id: index, name: item })
                         }}
                       >
@@ -570,15 +566,33 @@ function ComponentDrawer(props) {
                   ))}
                 </Flex>
               </FormControl>
-
+              {/* SCOPE */}
+              <FormControl>
+                <FormLabel htmlFor='compScope'>Scope</FormLabel>
+                <Select
+                  id='compScope'
+                  name='compScope'
+                  size='md'
+                  fontSize={'sm'}
+                  value={compScope}
+                  onChange={(e) => setCompScope(e.target.value)}
+                >
+                  <option value='' style={{ background: 'lightgray' }}>
+                    -- Select --
+                  </option>
+                  <option value='excluded'>Excluded</option>
+                  <option value='optional'>Optional</option>
+                  <option value='required'>Required</option>
+                </Select>
+              </FormControl>
               {/* PRIMARY COMPONENT */}
               <FormControl isReadOnly={customerView}>
-                <Flex alignItems={'center'} gap={2}>
+                <Flex alignItems={'center'} gap={2} mt={4}>
                   {shortDesc === 'Primary Component' && !isPrimary && (
                     <WarningTwoIcon w={4} h={4} color='red.500' />
                   )}
                   <Checkbox
-                    size='md'
+                    size='sm'
                     colorScheme='blue'
                     isChecked={isPrimary}
                     onChange={onWarningOpen}
@@ -588,11 +602,10 @@ function ComponentDrawer(props) {
                   </Checkbox>
                 </Flex>
               </FormControl>
-
               {/* INTERNAL COMPONENT */}
               <FormControl isReadOnly={customerView}>
                 <Checkbox
-                  size='md'
+                  size='sm'
                   colorScheme='blue'
                   isChecked={isInternal}
                   onChange={() => setIsInternal(!isInternal)}
@@ -608,12 +621,16 @@ function ComponentDrawer(props) {
               <Button mr={3} onClick={onClose}>
                 Cancel
               </Button>
-              {id === undefined ? (
+              {!data ? (
                 <Button
                   colorScheme='blue'
-                  onClick={handleSave}
+                  onClick={handleCreateCom}
                   isDisabled={
-                    compType === '' || compName === '' || compVersion === ''
+                    compKind === '' ||
+                    compName === '' ||
+                    compVersion === '' ||
+                    (purlValue !== '' && !isPURLInputValid) ||
+                    (cpeValue !== '' && !isCpeValid)
                   }
                 >
                   Save
@@ -622,7 +639,11 @@ function ComponentDrawer(props) {
                 <Button
                   colorScheme='blue'
                   onClick={handleUpdateCom}
-                  isDisabled={!compType}
+                  isDisabled={
+                    !compKind ||
+                    (purlValue !== '' && !isPURLInputValid) ||
+                    (cpeValue !== '' && !isCpeValid)
+                  }
                 >
                   Update
                 </Button>
@@ -634,16 +655,14 @@ function ComponentDrawer(props) {
 
       {isPurlOpen && (
         <PurlModal
-          component={component}
-          version={version}
-          group={group}
-          purl={purl}
           data={purlData}
           isOpen={isPurlOpen}
           onClose={onPurlClose}
           setPurlValue={setPurlValue}
+          setIsValid={setPURLInputValid}
           purlValue={purlValue}
           getCpe={getCpe}
+          activeComp={data}
         />
       )}
 
@@ -653,10 +672,12 @@ function ComponentDrawer(props) {
           isOpen={isCpeOpen}
           onClose={onCpeClose}
           cpeValue={cpeValue}
+          setCpeValue={setCpeValue}
           onCreateCpe={handleCreateCpe}
           onUpdateCpe={handleUpdateCpe}
           selectedCpe={selectedCpe}
           getCpe={getCpe}
+          activeComp={data}
         />
       )}
 
@@ -675,18 +696,20 @@ function ComponentDrawer(props) {
                 From:
                 <br />
                 <Text as='em'>
-                  {primaryComp?.name}-{primaryComp?.version}
+                  {primaryComp?.name ? primaryComp?.name : 'None'}
+                  {primaryComp?.version ? `- ${primaryComp?.version}` : ''}
                 </Text>
                 <br />
                 <br />
                 To:
                 <br />
                 <Text as='em'>
-                  {compName}-{compVersion}
+                  {primaryComp?.name === compName ? 'None' : compName}
+                  {primaryComp?.name === compName ? '' : `- ${compVersion}`}
                 </Text>
               </Text>
               <br />
-              <Text mt={10}>Are you sure you wish to continue ?</Text>
+              <Text mt={6}>Are you sure you wish to continue ?</Text>
             </ModalBody>
             <ModalFooter>
               <Button mr={3} onClick={onWarningClose}>

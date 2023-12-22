@@ -51,12 +51,11 @@ const ProductsOverview = ({ title }) => {
   }
 
   return (
-    <Flex width={'100%'} direction='column' mt={{ base: '120px', md: '0px' }}>
+    <Flex width={'100%'} direction='column'>
       <Flex
         dir='row'
         width={'100%'}
         alignItems={'center'}
-        px={2}
         justifyContent={'space-between'}
       >
         <Card overflowX={{ sm: 'scroll', xl: 'hidden' }}>
@@ -75,7 +74,7 @@ const ProductsOverview = ({ title }) => {
                 </Tr>
               </Thead>
               <Tbody>
-                {data &&
+                {data && data.images &&
                   data.images.nodes.map((item) => (
                     <Tr key={item.id}>
                       <Td fontSize={'sm'} pl={1}>
@@ -142,7 +141,7 @@ const ProductsOverview = ({ title }) => {
               </Tbody>
             </Table>
           </CardBody>
-          {data && (
+          {data && data.images && (
             <Flex
               flexDir={'row'}
               gap={4}

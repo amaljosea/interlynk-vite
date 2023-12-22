@@ -6,6 +6,14 @@ import {
   Switch,
   Tag,
   Text,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+  Button,
   useDisclosure
 } from '@chakra-ui/react'
 import CardBody from 'components/Card/CardBody'
@@ -13,48 +21,37 @@ import CustomLoader from 'components/CustomLoader'
 import DataTable from 'react-data-table-component'
 import UpdateRule from './UpdateRule'
 import { useState } from 'react'
-import { DeleteAutomation } from 'graphQL/Mutation'
+import { customStyles } from 'utils'
+import { DeleteAutomation, UpdateAutomation } from 'graphQL/Mutation'
 import { useMutation } from '@apollo/client'
 import { useLocation } from 'react-router-dom'
-import { UpdateAutomation } from 'graphQL/Mutation'
 
-const customStyles = {
-  headCells: {
-    style: {
-      fontWeight: 'bold',
-      color: '#2D3748',
-      fontSize: '12px',
-      letterSpacing: '1px'
-    }
-  },
-  subHeader: {
-    style: {
-      padding: 0,
-      margin: 0
-    }
-  }
-}
-
-const Settings = ({ data, getData }) => {
+const Settings = ({ data, refetch }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
 
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const {
+    isOpen: isDeleteOpen,
+    onOpen: onDeleteOpen,
+    onClose: onDeleteClose
+  } = useDisclosure()
+
   const [activeRow, setActiveRow] = useState(null)
 
   const [updateAutoCheck] = useMutation(UpdateAutomation)
   const [deleteAutoCheck] = useMutation(DeleteAutomation)
 
-  const handleRemove = async (id) => {
+  const handleRemove = async () => {
     await deleteAutoCheck({
       variables: {
-        autoCheckId: id,
+        autoCheckId: activeRow.id,
         projectId: productId
       }
-    }).then(
-      (res) => res.data && getData({ variables: { id: productId, first: 25 } })
-    )
+    })
+      .then((res) => res.data && refetch({ variables: { id: productId } }))
+      .finally(() => onDeleteClose())
   }
 
   const handleStatus = async (row) => {
@@ -65,16 +62,7 @@ const Settings = ({ data, getData }) => {
         condition: row.condition,
         enabled: row.enabled ? false : true
       }
-    }).then(
-      (res) =>
-        res.data &&
-        getData({
-          variables: {
-            id: productId,
-            first: 25
-          }
-        })
-    )
+    }).then((res) => res.data && refetch({ variables: { id: productId } }))
   }
 
   // COLUMNS
@@ -166,7 +154,10 @@ const Settings = ({ data, getData }) => {
       selector: (row) => {
         return (
           <IconButton
-            onClick={() => handleRemove(row.id)}
+            onClick={() => {
+              setActiveRow(row)
+              onDeleteOpen()
+            }}
             size='sm'
             icon={<DeleteIcon />}
             colorScheme='red'
@@ -199,9 +190,36 @@ const Settings = ({ data, getData }) => {
           isOpen={isOpen}
           onClose={onClose}
           data={activeRow}
-          getData={getData}
+          refetch={refetch}
           productId={productId}
         />
+      )}
+
+      {/* DELETE */}
+      {activeRow && isDeleteOpen && (
+        <Modal isOpen={isDeleteOpen} onClose={onDeleteClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Delete Automation Rule</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Text>
+                Deleting this automation rule will stop applying this change for
+                future imports of SBOM. Existing SBOM where the rule is already
+                applied will not be affected.
+              </Text>
+              <Text mt={4}>Are you sure you want to continue?</Text>
+            </ModalBody>
+            <ModalFooter>
+              <Button mr={3} onClick={onDeleteClose}>
+                No
+              </Button>
+              <Button colorScheme='red' onClick={handleRemove}>
+                Yes
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       )}
     </>
   )

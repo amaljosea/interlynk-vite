@@ -9,51 +9,45 @@ import {
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import { useEffect, useState } from 'react'
-import { useLocation, useHistory } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import Controls from './components/Controls'
 import Settings from './components/Settings'
-import { useLazyQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 import { GetProjectCheck } from 'graphQL/Queries'
+import VulnsTable from 'components/Tables/VulnsTable'
+import { vulnList } from 'variables/general'
+import ChangeLog from '../Changelog'
 
 const idRegex =
   /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
 
 const Automation = () => {
   const location = useLocation()
-  const history = useHistory()
+  const navigate = useNavigate()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
 
   const [activeTab, setActiveTab] = useState(0)
 
-  const [getAutomations, { data, error }] = useLazyQuery(GetProjectCheck)
+  const { data, error, refetch } = useQuery(GetProjectCheck, {
+    variables: {
+      id: productId,
+      first: 25
+    }
+  })
 
   const handleTabChange = (value) => {
     setActiveTab(value)
-    if (value === 1) {
-      getAutomations({
-        variables: {
-          id: productId,
-          first: 25
-        }
-      })
-    }
   }
 
   useEffect(() => {
-    if (data) {
-      console.log(data)
-    }
-  }, [data])
-
-  useEffect(() => {
     if (!idRegex.test(productId)) {
-      history.push(`/vendor/products`)
+      navigate(`/vendor/products`)
     }
   }, [productId])
 
   return (
-    <Flex direction='column' pt={{ base: '120px', md: '74px' }} px={4}>
+    <Flex direction='column' pt={{ base: '120px', md: '74px' }} pr={2} pl={5}>
       <Card bg='white'>
         <Tabs
           variant='enclosed'
@@ -63,24 +57,36 @@ const Automation = () => {
           onChange={(value) => handleTabChange(value)}
         >
           <TabList>
-            <Tab _focus={{ outline: 'none' }}>Controls</Tab>
-            <Tab _focus={{ outline: 'none' }}>Automation</Tab>
+            {['Vulnerabilities', 'Automation', 'Controls', 'Change Log'].map(
+              (item, index) => (
+                <Tab key={index} _focus={{ outline: 'none' }}>
+                  {item}
+                </Tab>
+              )
+            )}
           </TabList>
           <TabPanels>
-            {/* CONTROLS */}
+            {/* VULNERABILITIES */}
             <TabPanel>
-              <Controls />
+              <VulnsTable data={vulnList} />
             </TabPanel>
             {/* AUTOMATIONS */}
             <TabPanel>
               {error ? (
-                <Text textAlign={'center'} my={6}>{JSON.stringify(error)}</Text>
+                <Text textAlign={'center'} my={6}>
+                  {JSON.stringify(error)}
+                </Text>
               ) : (
-                <Settings
-                  data={data?.project.autoChecks}
-                  getData={getAutomations}
-                />
+                <Settings data={data?.project.autoChecks} refetch={refetch} />
               )}
+            </TabPanel>
+            {/* CONTROLS */}
+            <TabPanel>
+              <Controls />
+            </TabPanel>
+            {/* CHANGE LOG */}
+            <TabPanel>
+              <ChangeLog />
             </TabPanel>
           </TabPanels>
         </Tabs>

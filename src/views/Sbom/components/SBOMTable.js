@@ -24,7 +24,6 @@ import SbomChangelogTable from 'components/Tables/SbomChangelogTable'
 import { useLazyQuery } from '@apollo/client'
 import {
   GetCheckResults,
-  GetComponentData,
   GetChangeLogs,
   GetCompFilterData,
   GetVulnFilterData,
@@ -34,6 +33,7 @@ import {
 import { useLocation } from 'react-router-dom'
 import GlobalContext from 'context/GlobalContext'
 import PartsTable from 'components/Tables/PartsTable'
+import { GetSbomParts } from 'graphQL/Queries'
 
 const SBOMTable = ({
   status,
@@ -45,13 +45,18 @@ const SBOMTable = ({
   totalComp,
   setTotalComp,
   vulnData,
-  getVulnData
+  getVulnData,
+  getCompData,
+  compData,
+  error
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
 
-  const productId = queryParams.get('p')
+  const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
+
+  const activeSbomTab = Number(localStorage.getItem('activeSbomTab'))
 
   const {
     setCompFilters,
@@ -61,7 +66,6 @@ const SBOMTable = ({
     compField,
     compDirection,
     compSearchInput,
-    setCompSearchInput,
     compEcosystem,
     compType,
     compLicense,
@@ -85,28 +89,24 @@ const SBOMTable = ({
     vulnEpss,
     setComPageIndex,
     checkSearchInput,
-    setCheckSearchInput,
     checkCategory,
     checkSeverity,
-    checkStatus
+    checkStatus,
+    checkRules,
+    vulnIndex,
+    setVulnIndex,
+    resultIndex,
+    setResultIndex,
+    changelogIndex,
+    setChangelogIndex
   } = useContext(GlobalContext)
-
-  const tab = window.localStorage.getItem('activeProdTab')
 
   const { lifecycle } = data
 
-  // PAGINATION STATS FOR DIFFERENT TABS
-  const [vulnIndex, setVulnIndex] = useState(1)
-  const [resultIndex, setResultIndex] = useState(1)
-  const [changelogIndex, setChangelogIndex] = useState(1)
-
-  // GET COMPONENT DATA
-  const [getCompData, { data: compData, error }] = useLazyQuery(
-    GetComponentData,
-    {
-      fetchPolicy: 'network-only'
-    }
-  )
+  // GET SBOM PARTS
+  const [getParts, { data: parts }] = useLazyQuery(GetSbomParts, {
+    fetchPolicy: 'network-only'
+  })
 
   useEffect(() => {
     if (compData) {
@@ -150,13 +150,27 @@ const SBOMTable = ({
   }
 
   const handleTabChange = (value) => {
-    setActiveProdTab(Number(value))
-    if (value === 0) {
+    localStorage.setItem('activeSbomTab', value)
+    setActiveProdTab(value)
+  }
+
+  useEffect(() => {
+    if (activeSbomTab === 0) {
+      setActiveProdTab(0)
       refetch({
         projectId: productId,
         sbomId: sbomId
       })
-    } else if (value === 2) {
+    } else if (activeSbomTab === 1) {
+      setActiveProdTab(1)
+      getParts({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId
+        }
+      })
+    } else if (activeSbomTab === 2) {
+      setActiveProdTab(2)
       // FETCH COMPONENT DATA
       getCompData({
         variables: {
@@ -187,8 +201,6 @@ const SBOMTable = ({
         }
       }).then((res) => {
         if (res.data) {
-          // console.log('data', res.data)
-          setCompSearchInput('')
           setTotalComp(res.data.sbom.components.totalCount)
           setComPageIndex(1)
         }
@@ -203,7 +215,8 @@ const SBOMTable = ({
           setCompFilters(res.data.sbom.filters)
         }
       })
-    } else if (value === 3) {
+    } else if (activeSbomTab === 3) {
+      setActiveProdTab(3)
       getVulnData({
         variables: {
           projectId: productId,
@@ -233,13 +246,18 @@ const SBOMTable = ({
           setVulnFilters(res.data.sbom.filters)
         }
       })
-    } else if (value === 4) {
+    } else if (activeSbomTab === 4) {
+      setActiveProdTab(4)
       // FETCH HEALTH CHECK DATA
       getCheckData({
         variables: {
           projectId: productId,
           sbomId: sbomId,
           search: checkSearchInput !== '' ? checkSearchInput : undefined,
+          checkId:
+            checkRules.includes('all') || checkRules.length === 0
+              ? undefined
+              : checkRules,
           category:
             checkCategory.includes('all') || checkCategory.length === 0
               ? undefined
@@ -267,7 +285,8 @@ const SBOMTable = ({
           setCheckFilters(res.data.sbom.filters)
         }
       })
-    } else if (value === 5) {
+    } else if (activeSbomTab === 5) {
+      setActiveProdTab(5)
       // FETCH ACTIVITY LOGS DATA
       getLogData({
         variables: {
@@ -289,7 +308,7 @@ const SBOMTable = ({
         }
       })
     }
-  }
+  }, [activeSbomTab])
 
   // EXTRACT ALL THE COMPONENT NAME AND ID'S FROM SELECTED SBOM VERSION
   const components =
@@ -347,7 +366,12 @@ const SBOMTable = ({
             </TabPanel>
             {/* PARTS TABLE */}
             <TabPanel px={0}>
-              <PartsTable />
+              <PartsTable
+                data={parts?.sbom.sbomParts}
+                refetch={getParts}
+                getVulnData={getVulnData}
+                getCompData={getCompData}
+              />
             </TabPanel>
             {/* COMPONENT TABLE */}
             <TabPanel px={0}>
@@ -358,7 +382,7 @@ const SBOMTable = ({
                   data={compData?.sbom?.components}
                   totalComp={totalComp}
                   refetch={getCompData}
-                  filterRefetch={getCompFilters}
+                  filterRefetch={compFilterRefetch}
                   primaryComp={data.primaryComponent}
                   totalRows={totalRows}
                   setTotalRows={setTotalRows}

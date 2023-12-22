@@ -1,4 +1,3 @@
-import { CheckIcon } from '@chakra-ui/icons'
 import {
   Menu,
   MenuButton,
@@ -7,30 +6,12 @@ import {
   MenuItemOption,
   Button,
   Flex,
-  Box,
-  Badge
+  Box
 } from '@chakra-ui/react'
+import CheckMark from 'components/Misc/CheckMark'
 import GlobalContext from 'context/GlobalContext'
 import React, { useContext, useState } from 'react'
 import { FaFilter } from 'react-icons/fa'
-
-const CheckMark = () => {
-  return (
-    <CheckIcon
-      w={5}
-      h={5}
-      bg={'white'}
-      color={'blue.500'}
-      border={'1px solid #4299E1'}
-      rounded={'full'}
-      p={'4px'}
-      position={'absolute'}
-      right={-1}
-      top={-1}
-      zIndex={11}
-    />
-  )
-}
 
 const ChangelogFilterMenu = ({
   id,
@@ -48,14 +29,13 @@ const ChangelogFilterMenu = ({
   const onFilterType = (value) => {
     setSelectedType(value.includes('all') ? [] : value)
     refetch({
-      projectId: id,
-      changeType: value.includes('all') ? undefined : value,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      last: undefined,
-      field: prodLogField,
-      direction: prodLogDirection
+      variables: {
+        id: id,
+        changeType: value.includes('all') ? undefined : value,
+        first: totalRows,
+        field: prodLogField,
+        direction: prodLogDirection
+      }
     })
     setPageIndex(1)
   }
@@ -63,14 +43,13 @@ const ChangelogFilterMenu = ({
   const onFilterUser = (value) => {
     setSelectedUser(value.includes('all') ? [] : value)
     refetch({
-      projectId: id,
-      changedBy: value.includes('all') ? undefined : value,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      last: undefined,
-      field: prodLogField,
-      direction: prodLogDirection
+      variables: {
+        id: id,
+        changedBy: value.includes('all') ? undefined : value,
+        first: totalRows,
+        field: prodLogField,
+        direction: prodLogDirection
+      }
     })
     setPageIndex(1)
   }
