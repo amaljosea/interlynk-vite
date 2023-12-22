@@ -305,41 +305,6 @@ const ProductTable = ({ data, refetch }) => {
                 >
                   Edit Product
                 </MenuItem>
-                <MenuItem
-                  isDisabled={!enabled}
-                  onClick={() => {
-                    window.localStorage.setItem('activeProduct', name)
-                    window.localStorage.setItem(
-                      'product',
-                      JSON.stringify(product)
-                    )
-                    window.localStorage.setItem(
-                      'activeSBOM',
-                      filteredData.length > 0
-                        ? filteredData[0].value
-                        : sboms[0].id
-                    )
-                    navigate(`/vendor/autofix?id=${id}`)
-                  }}
-                >
-                  Settings
-                </MenuItem>
-                <MenuItem
-                  display={'none'}
-                  isDisabled={!enabled}
-                  onClick={() => {
-                    window.localStorage.setItem('activeProduct', name)
-                    window.localStorage.setItem(
-                      'activeSBOM',
-                      sboms.length > 0 && filteredData.length > 0
-                        ? filteredData[0].value
-                        : null
-                    )
-                    navigate(`/vendor/changelog?id=${id}`)
-                  }}
-                >
-                  View Change Log
-                </MenuItem>
                 <Divider />
                 <MenuItem
                   onClick={() => {
