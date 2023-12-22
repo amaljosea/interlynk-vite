@@ -38,12 +38,11 @@ const RegistrationForm = () => {
   }
 
   const isInvalid =
-    name === '' ||
     email === '' ||
     password === '' ||
     confirmPassword === '' ||
     emailError !== '' ||
-    passError !== ''
+    password !== confirmPassword
 
   const handleCheckEmail = () => {
     if (!validateEmail(email)) {
@@ -123,8 +122,12 @@ const RegistrationForm = () => {
           <Input
             type='password'
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              setPassword(e.target.value)
+              setPassError('')
+            }}
             placeholder='*******'
+            onBlur={handleCheckPassword}
           />
         </FormControl>
         <FormControl mt={3} isRequired isInvalid={passError !== ''}>
