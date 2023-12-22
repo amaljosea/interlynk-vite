@@ -121,6 +121,7 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
                   id: id
                 })
               )
+              localStorage.setItem('activeSbomTab', 0)
               setActiveProdTab(0)
             }}
           >

@@ -111,15 +111,6 @@ function Profile() {
     }
   }, [activetab])
 
-  useEffect(() => {
-    if (!orgInfo && !orgInfo?.organization) {
-      setSelectedTab('PERSONAL')
-      setPsIndex(1)
-      navigate('/vendor/settings?tab=organization')
-      getMyOrgs()
-    }
-  }, [])
-
   if (error) {
     return (
       <Flex my={32} alignItems={'center'} justifyContent={'center'}>

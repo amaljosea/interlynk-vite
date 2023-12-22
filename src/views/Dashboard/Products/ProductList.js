@@ -65,7 +65,7 @@ function ProductList() {
     )
   }
 
-  if (!data || !data.projects) {
+  if (!data?.projects) {
     return <OrgRegister />
   }
 

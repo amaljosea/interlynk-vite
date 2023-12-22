@@ -178,7 +178,8 @@ const ProductTable = ({ data, refetch }) => {
 
         const handleClick = () => {
           if (sboms.length > 0) {
-            window.localStorage.setItem('product', JSON.stringify(product))
+            localStorage.setItem('product', JSON.stringify(product))
+            localStorage.setItem('activeProdTab', 0)
             setCurrentProduct({
               id: id,
               sbomId:
