@@ -110,6 +110,11 @@ export default function HeaderLinks(props) {
           }
         })
     } catch (error) {
+      // Even in case of server error, make sure user experience moves to relogin
+      localStorage.removeItem('username')
+      localStorage.removeItem('email')
+      localStorage.removeItem('product')
+      Cookies.remove('authToken')
       console.log('handleLogout error : ', error)
     }
   }
