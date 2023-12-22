@@ -53,7 +53,7 @@ const RegistrationForm = () => {
 
   const handleCheckPassword = () => {
     if (confirmPassword !== '' && confirmPassword !== password) {
-      setPassError('Please enter correct password')
+      setPassError('Confirm password does not match password')
     }
   }
 
