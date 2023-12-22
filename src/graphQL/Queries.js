@@ -55,6 +55,32 @@ export const GetOrg = gql`
   }
 `
 
+// LIST CURRENT USER'S ORGANIZATIONS
+export const MyOrganizations = gql`
+  query myOrganizations(
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+  ) {
+    myOrganizations(
+      first: $first
+      last: $last
+      after: $after
+      before: $before
+    ) {
+      nodes {
+        id
+        name
+        email
+        status
+        updatedAt
+        url
+      }
+    }
+  }
+`
+
 // GET ORGANIZATION RULES
 export const GetOrgRules = gql`
   query GetOrgRules(
@@ -1884,6 +1910,7 @@ export const GetSbomParts = gql`
             vulnStats
           }
           primaryComponent {
+            id
             name
             version
           }

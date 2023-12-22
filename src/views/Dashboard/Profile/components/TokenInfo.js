@@ -41,6 +41,7 @@ import {
 } from 'graphQL/Mutation'
 import { getFullDateAndTime } from 'utils'
 import { isValid } from 'date-fns'
+import CustomLoader from 'components/CustomLoader'
 
 const customStyles = {
   headCells: {
@@ -370,6 +371,8 @@ const TokenInfo = ({ data, refetch }) => {
           persistTableHead
           responsive={true}
           customStyles={customStyles}
+          progressComponent={<CustomLoader />}
+          progressPending={data ? false : true}
           subHeaderComponent={subHeaderComponent}
         />
       </Flex>

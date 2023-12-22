@@ -176,17 +176,19 @@ const ApiFeed = () => {
         </Text>
       </CardHeader>
       <CardBody>
-        <DataTable
-          columns={columns}
-          onSort={handleSort}
-          data={data && data.organization.organizationRules}
-          defaultSortAsc={true}
-          defaultSortFieldId={'RULES_FRIENDLY_ID'}
-          customStyles={customStyles}
-          progressPending={data ? false : true}
-          progressComponent={<CustomLoader />}
-          responsive={true}
-        />
+        {data && data.organization && (
+          <DataTable
+            columns={columns}
+            onSort={handleSort}
+            data={data && data.organization.organizationRules}
+            defaultSortAsc={true}
+            defaultSortFieldId={'RULES_FRIENDLY_ID'}
+            customStyles={customStyles}
+            progressPending={data ? false : true}
+            progressComponent={<CustomLoader />}
+            responsive={true}
+          />
+        )}
       </CardBody>
     </Card>
   )

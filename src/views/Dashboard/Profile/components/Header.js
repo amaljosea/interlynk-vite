@@ -41,6 +41,9 @@ const Header = ({
     }
   }
 
+  const userName = localStorage.getItem('username')
+  const userEmail = localStorage.getItem('email')
+
   const [uploadProfile] = useMutation(UploadProfileImage)
 
   const inputRef = useRef(null)
@@ -119,7 +122,7 @@ const Header = ({
   }, [])
 
   return (
-    <Flex direction='column' pt={{ base: '120px', md: '75px' }}>
+    <Flex direction='column'>
       <Card mb='6'>
         <CardBody>
           {/* user info */}
@@ -183,14 +186,14 @@ const Header = ({
                 fontWeight='bold'
                 ms={{ sm: '8px', md: '0px' }}
               >
-                {user.name}
+                {user ? user.name : userName}
               </Text>
               <Text
                 fontSize={{ sm: 'sm', md: 'md' }}
                 color={emailColor}
                 fontWeight='medium'
               >
-                {user.email}
+                {user ? user.email : userEmail}
               </Text>
             </Flex>
           </Flex>

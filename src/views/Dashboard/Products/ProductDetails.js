@@ -135,6 +135,8 @@ const ProductDetails = () => {
 
   const [activeTab, setActiveTab] = useState(0)
 
+  const activeProdTab = Number(localStorage.getItem('activeProdTab'))
+
   const {
     isOpen: isOpenProduct,
     onOpen: onOpenProduct,
@@ -175,23 +177,8 @@ const ProductDetails = () => {
   }
 
   const handleTabChange = (value) => {
+    localStorage.setItem('activeProdTab', value)
     setActiveTab(value)
-    if (value === 2) {
-      getRules({
-        variables: {
-          id: productId
-        }
-      })
-    } else if (value === 4) {
-      getLogs({
-        variables: {
-          id: productId,
-          first: totalRows,
-          field: prodLogField,
-          direction: prodLogDirection
-        }
-      })
-    }
   }
 
   // TOGGLE STATUS
@@ -226,6 +213,32 @@ const ProductDetails = () => {
       setMaxVal(10000)
     }
   }, [sbomId])
+
+  useEffect(() => {
+    if (activeProdTab === 0) {
+      setActiveTab(0)
+    } else if (activeProdTab === 1) {
+      setActiveTab(1)
+      getRules({
+        variables: {
+          id: productId,
+          first: totalRows
+        }
+      })
+    } else if (activeProdTab === 2) {
+      setActiveTab(2)
+    } else if (activeProdTab === 3) {
+      setActiveTab(3)
+      getLogs({
+        variables: {
+          id: productId,
+          first: totalRows,
+          field: prodLogField,
+          direction: prodLogDirection
+        }
+      })
+    }
+  }, [activeProdTab])
 
   if (loading) {
     return (
@@ -342,7 +355,13 @@ const ProductDetails = () => {
                             alignItems={'flex-start'}
                             spacing={1}
                           >
-                            <Icon h={4} w={4} color='#777' mt={1} as={FaLayerGroup} />
+                            <Icon
+                              h={4}
+                              w={4}
+                              color='#777'
+                              mt={1}
+                              as={FaLayerGroup}
+                            />
                             <Box>
                               <Badge
                                 mr={1}

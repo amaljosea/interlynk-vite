@@ -9,6 +9,20 @@ export const orgUpdate = gql`
   }
 `
 
+// CREATE ORGANIZATIOPN
+export const RegisterOrganization = gql`
+  mutation RegisterOrganization($name: String!, $url: String, $email: String) {
+    organizationCreate(input: { name: $name, url: $url, email: $email }) {
+      organization {
+        id
+        name
+        url
+      }
+      errors
+    }
+  }
+`
+
 // CREATE INTERNAL COMPONENT
 export const createOrgComp = gql`
   mutation createOrgComp($match: String!) {
@@ -1382,31 +1396,36 @@ export const UploadProfileImage = gql`
   }
 `
 
-export const OrgRegistration = gql`
-  mutation OrgRegistration(
-    $name: String!
-    $email: String
-    $url: String
-    $userFullName: String
+// REGISTER USER
+export const RegisterUser = gql`
+  mutation RegisterUser(
+    $name: String
+    $email: String!
     $password: String!
-    $userEmail: String!
     $passwordConfirmation: String!
   ) {
-    organizationRegister(
+    userRegistration(
       input: {
-        organization: { name: $name, email: $email, url: $url }
-        userRegistration: {
-          name: $userFullName
-          password: $password
-          email: $userEmail
-          passwordConfirmation: $passwordConfirmation
-        }
+        name: $name
+        email: $email
+        password: $password
+        passwordConfirmation: $passwordConfirmation
       }
     ) {
-      organization {
-        id
+      user {
         name
+        email
       }
+      errors
+    }
+  }
+`
+
+// SWITCH ORGANIZATION
+export const SwitchOrganization = gql`
+  mutation SwitchOrganization($orgId: Uuid!) {
+    organizationSwitch(input: { organizationId: $orgId }) {
+      token
       errors
     }
   }

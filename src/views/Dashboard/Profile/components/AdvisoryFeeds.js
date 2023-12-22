@@ -27,6 +27,7 @@ const AdvisoryFeeds = () => {
 
   const filteredFeed =
     data &&
+    data.organization &&
     data.organization.organizationSettings.filter(
       (item) => item.setting.kind === `advisory_feed`
     )
@@ -61,7 +62,7 @@ const AdvisoryFeeds = () => {
         </Text>
       </CardHeader>
       <CardBody px='5px'>
-        {data && (
+        {data && data.organization && (
           <Flex direction='column'>
             {filteredFeed &&
               filteredFeed
