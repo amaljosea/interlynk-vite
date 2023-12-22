@@ -55,7 +55,7 @@ function ComponentDrawer(props) {
   const toast = useToast()
 
   const queryParams = new URLSearchParams(location.search)
-  const productId = queryParams.get('p')
+  const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
 
   const customerView = location.pathname.startsWith('/customer')
@@ -78,7 +78,8 @@ function ComponentDrawer(props) {
     customLicense,
     purlString,
     licenseExp,
-    isCpeValid
+    isCpeValid,
+    setComPageIndex
   } = useContext(GlobalContext)
 
   const onFilterRefetch = () => {
@@ -212,13 +213,21 @@ function ComponentDrawer(props) {
         kind: compKind,
         name: compName,
         version: compVersion,
+        group: groupInfo,
         scope: compScope,
-        licenses: {
-          licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
-          licensesExp: licenseType === 'license_exp' ? licenseExp : undefined,
-          licensesCustom:
-            licenseType === 'license_custom' ? customLicense : undefined
-        },
+        licenses:
+          spdxLicense.length === 0 &&
+          licenseExp === '' &&
+          customLicense.length === 0
+            ? undefined
+            : {
+                licenses:
+                  licenseType === 'license_spdx' ? spdxLicense : undefined,
+                licensesExp:
+                  licenseType === 'license_exp' ? licenseExp : undefined,
+                licensesCustom:
+                  licenseType === 'license_custom' ? customLicense : undefined
+              },
         cpes: cpeList,
         purl: purlValue,
         primary: isPrimary,
@@ -227,6 +236,7 @@ function ComponentDrawer(props) {
     })
       .then((res) => {
         if (res.data) {
+          setComPageIndex(1)
           onFilterRefetch()
           onClose()
         }
@@ -243,35 +253,43 @@ function ComponentDrawer(props) {
   }
 
   const handleUpdateCom = async () => {
-    try {
-      await updateComponent({
-        variables: {
-          id: data?.id,
-          sbomId: sbomId,
-          kind: compKind,
-          name: compName,
-          version: compVersion,
-          scope: compScope,
-          licenses: {
-            licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
-            licensesExp: licenseType === 'license_exp' ? licenseExp : undefined,
-            licensesCustom:
-              licenseType === 'license_custom' ? customLicense : undefined
-          },
-          cpes:
-            cpeList.length > 0 ? cpeList : cpeValue !== '' ? [cpeValue] : [],
-          purl: purlValue,
-          primary: isPrimary,
-          internal: isInternal
-        }
-      }).then((res) => res.data && onClose())
-    } catch (error) {
-      console.error('Mutation error:', error)
-    }
+    await updateComponent({
+      variables: {
+        id: data?.id,
+        sbomId: sbomId,
+        kind: compKind,
+        name: compName,
+        version: compVersion,
+        group: groupInfo,
+        scope: compScope,
+        licenses:
+          spdxLicense.length === 0 &&
+          licenseExp === '' &&
+          customLicense.length === 0
+            ? undefined
+            : {
+                licenses:
+                  licenseType === 'license_spdx' ? spdxLicense : undefined,
+                licensesExp:
+                  licenseType === 'license_exp' ? licenseExp : undefined,
+                licensesCustom:
+                  licenseType === 'license_custom' ? customLicense : undefined
+              },
+        cpes: cpeList.length > 0 ? cpeList : cpeValue !== '' ? [cpeValue] : [],
+        purl: purlValue,
+        primary: isPrimary,
+        internal: isInternal
+      }
+    }).then((res) => {
+      if (res.data) {
+        setComPageIndex(1)
+        onClose()
+      }
+    })
   }
 
   const handleCreateCpe = (string) => {
-    const cpeItem = cpeList.find((item) => item === string)
+    const cpeItem = cpeList?.find((item) => item === string)
     if (cpeItem) {
       toast({
         description: 'CPE already exists',
@@ -288,7 +306,7 @@ function ComponentDrawer(props) {
   }
 
   const handleUpdateCpe = (string, id) => {
-    const cpeItem = cpeList.find((item) => item === string)
+    const cpeItem = cpeList?.find((item) => item === string)
     if (cpeItem) {
       toast({
         description: 'CPE already exists',
@@ -296,8 +314,8 @@ function ComponentDrawer(props) {
         position: 'top',
         duration: 3000
       })
-    } else if (cpeList.find((item, index) => index === id)) {
-      const updatedData = cpeList.map((item, index) => {
+    } else if (cpeList?.find((item, index) => index === id)) {
+      const updatedData = cpeList?.map((item, index) => {
         if (index === id) {
           return string
         }
@@ -412,7 +430,6 @@ function ComponentDrawer(props) {
                   placeholder='Add group'
                   value={groupInfo}
                   onChange={(e) => setGroupInfo(e.target.value)}
-                  isDisabled
                 />
               </FormControl>
               {/* KIND */}
@@ -533,7 +550,7 @@ function ComponentDrawer(props) {
                   gap={2}
                   mt={2}
                 >
-                  {cpeList.map((item, index) => (
+                  {cpeList?.map((item, index) => (
                     <Tag key={index} variant='solid' colorScheme={'blue'}>
                       <TagLabel
                         cursor={'pointer'}
@@ -679,18 +696,20 @@ function ComponentDrawer(props) {
                 From:
                 <br />
                 <Text as='em'>
-                  {primaryComp?.name}-{primaryComp?.version}
+                  {primaryComp?.name ? primaryComp?.name : 'None'}
+                  {primaryComp?.version ? `- ${primaryComp?.version}` : ''}
                 </Text>
                 <br />
                 <br />
                 To:
                 <br />
                 <Text as='em'>
-                  {compName}-{compVersion}
+                  {primaryComp?.name === compName ? 'None' : compName}
+                  {primaryComp?.name === compName ? '' : `- ${compVersion}`}
                 </Text>
               </Text>
               <br />
-              <Text mt={10}>Are you sure you wish to continue ?</Text>
+              <Text mt={6}>Are you sure you wish to continue ?</Text>
             </ModalBody>
             <ModalFooter>
               <Button mr={3} onClick={onWarningClose}>

@@ -55,6 +55,32 @@ export const GetOrg = gql`
   }
 `
 
+// LIST CURRENT USER'S ORGANIZATIONS
+export const MyOrganizations = gql`
+  query myOrganizations(
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+  ) {
+    myOrganizations(
+      first: $first
+      last: $last
+      after: $after
+      before: $before
+    ) {
+      nodes {
+        id
+        name
+        email
+        status
+        updatedAt
+        url
+      }
+    }
+  }
+`
+
 // GET ORGANIZATION RULES
 export const GetOrgRules = gql`
   query GetOrgRules(
@@ -483,6 +509,51 @@ export const GetProjectData = gql`
 
 // ----------------------- PRODUCT DETAILS PAGE ---------------------------
 
+// GET PROJECT INFORMATION
+export const GetProductInfo = gql`
+  query GetProjectInfo($id: Uuid!) {
+    project(id: $id) {
+      id
+      name
+      description
+      enabled
+      updatedAt
+      sboms {
+        id
+        primaryComponent {
+          version
+        }
+      }
+    }
+  }
+`
+
+export const GetProductVersions = gql`
+  query GetProductVersions($id: Uuid!) {
+    project(id: $id) {
+      id
+      sboms {
+        id
+        creationAt
+        updatedAt
+        lifecycle
+        primaryComponent {
+          id
+          name
+          version
+        }
+        stats {
+          compCount
+          compLicenseCount
+          compCpeCount
+          compPurlCount
+          vulnStats
+        }
+      }
+    }
+  }
+`
+
 // GET PRODUCT INFO
 export const GetProductData = gql`
   query GetProductData($projectId: Uuid!, $sbomId: Uuid!) {
@@ -783,6 +854,7 @@ export const GetVulnData = gql`
         nodes {
           id
           impact
+          cdxResponseId
           vuln {
             vulnId
             desc
@@ -809,6 +881,10 @@ export const GetVulnData = gql`
             justification
             impact
             note
+            detail
+            response
+            actionStmt
+            fixedIn
             updatedAt
           }
           component {
@@ -1069,7 +1145,6 @@ export const GetProjectLogs = gql`
     project(id: $id) {
       id
       activityLogs(
-        projectId: $id
         search: $search
         changedBy: $changedBy
         changeType: $changeType
@@ -1824,6 +1899,7 @@ export const GetSbomParts = gql`
         part {
           id
           lifecycle
+          creationAt
           project {
             id
             name
@@ -1834,6 +1910,7 @@ export const GetSbomParts = gql`
             vulnStats
           }
           primaryComponent {
+            id
             name
             version
           }

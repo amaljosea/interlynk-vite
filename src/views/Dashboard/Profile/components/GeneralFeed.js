@@ -26,7 +26,7 @@ const GeneralFeed = ({ orgInfo, refetch }) => {
   const [updateOrg] = useMutation(orgUpdate)
 
   useEffect(() => {
-    if (orgInfo) {
+    if (orgInfo && orgInfo.organization) {
       setOrgName(orgInfo.organization.name)
     }
   }, [orgInfo])

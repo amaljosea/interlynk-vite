@@ -111,8 +111,8 @@ const LicenseDrawer = ({ isOpen, onClose, data }) => {
                   -- Select --
                 </option>
                 <option value='approved'>Approved</option>
-                <option value='rejected'>Rejected</option>
-                <option value='unspecified'>Unspecified</option>
+                <option value='rejected'>Denied</option>
+                <option value='denied'>Review</option>
               </Select>
             </FormControl>
             {/* CHECKS */}

@@ -53,8 +53,10 @@ const SBOMTable = ({
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
 
-  const productId = queryParams.get('p')
+  const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
+
+  const activeSbomTab = Number(localStorage.getItem('activeSbomTab'))
 
   const {
     setCompFilters,
@@ -148,23 +150,27 @@ const SBOMTable = ({
   }
 
   const handleTabChange = (value) => {
-    setActiveProdTab(Number(value))
+    localStorage.setItem('activeSbomTab', value)
+    setActiveProdTab(value)
   }
 
   useEffect(() => {
-    if (activeProdTab === 0) {
+    if (activeSbomTab === 0) {
+      setActiveProdTab(0)
       refetch({
         projectId: productId,
         sbomId: sbomId
       })
-    } else if (activeProdTab === 1) {
+    } else if (activeSbomTab === 1) {
+      setActiveProdTab(1)
       getParts({
         variables: {
           projectId: productId,
           sbomId: sbomId
         }
       })
-    } else if (activeProdTab === 2) {
+    } else if (activeSbomTab === 2) {
+      setActiveProdTab(2)
       // FETCH COMPONENT DATA
       getCompData({
         variables: {
@@ -209,7 +215,8 @@ const SBOMTable = ({
           setCompFilters(res.data.sbom.filters)
         }
       })
-    } else if (activeProdTab === 3) {
+    } else if (activeSbomTab === 3) {
+      setActiveProdTab(3)
       getVulnData({
         variables: {
           projectId: productId,
@@ -239,7 +246,8 @@ const SBOMTable = ({
           setVulnFilters(res.data.sbom.filters)
         }
       })
-    } else if (activeProdTab === 4) {
+    } else if (activeSbomTab === 4) {
+      setActiveProdTab(4)
       // FETCH HEALTH CHECK DATA
       getCheckData({
         variables: {
@@ -277,7 +285,8 @@ const SBOMTable = ({
           setCheckFilters(res.data.sbom.filters)
         }
       })
-    } else if (activeProdTab === 5) {
+    } else if (activeSbomTab === 5) {
+      setActiveProdTab(5)
       // FETCH ACTIVITY LOGS DATA
       getLogData({
         variables: {
@@ -299,7 +308,7 @@ const SBOMTable = ({
         }
       })
     }
-  }, [activeProdTab])
+  }, [activeSbomTab])
 
   // EXTRACT ALL THE COMPONENT NAME AND ID'S FROM SELECTED SBOM VERSION
   const components =

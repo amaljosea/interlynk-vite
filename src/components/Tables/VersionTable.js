@@ -1,0 +1,434 @@
+import { useMutation } from '@apollo/client'
+import { RepeatIcon } from '@chakra-ui/icons'
+import {
+  Flex,
+  IconButton,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Portal,
+  Stack,
+  Text,
+  Tooltip,
+  Tag,
+  Badge,
+  useDisclosure,
+  UnorderedList,
+  Button,
+  ListItem,
+  Spinner,
+  Box,
+  TagLabel
+} from '@chakra-ui/react'
+import CustomLoader from 'components/CustomLoader'
+import VulnBadge from 'components/Misc/VulnBadge'
+import GlobalContext from 'context/GlobalContext'
+import { sbomDelete } from 'graphQL/Mutation'
+import { useContext, useEffect, useMemo, useState } from 'react'
+import DataTable from 'react-data-table-component'
+import { FaEllipsisV } from 'react-icons/fa'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import {
+  timeSince,
+  getFullDateAndTime,
+  customStyles,
+  removeDuplicates
+} from 'utils'
+import RowLimit from 'views/Sbom/components/RowLimit'
+
+const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
+  const navigate = useNavigate()
+  const params = useParams()
+  const {
+    setActiveProdTab,
+    totalRows,
+    setTotalRows,
+    setVulnSeverity,
+    vulnField,
+    vulnDirection
+  } = useContext(GlobalContext)
+  const [isLoading, setIsLoading] = useState(false)
+  const [activeRow, setActiveRow] = useState(null)
+
+  const [currentPage, setCurrentPage] = useState(1)
+
+  const data = project ? removeDuplicates(project.sboms) : []
+
+  const totalPages = data.length > 0 ? Math.ceil(data.length / totalRows) : 1
+
+  const filteredData =
+    data && data.slice((currentPage - 1) * totalRows, currentPage * totalRows)
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage)
+    }
+  }
+
+  const [deleteSbom] = useMutation(sbomDelete)
+
+  const {
+    isOpen: isDeleteOpen,
+    onOpen: onDeleteOpen,
+    onClose: onDeleteClose
+  } = useDisclosure()
+
+  const onFilterSev = async (id, primaryComponent, value) => {
+    localStorage.setItem(
+      'currentSBOM',
+      JSON.stringify({
+        version: primaryComponent?.version,
+        id: id
+      })
+    )
+    setActiveProdTab(3)
+    setVulnSeverity(value)
+    await getVulnData({
+      variables: {
+        projectId: productId,
+        sbomId: id,
+        severity: value,
+        first: totalRows,
+        field: vulnField,
+        direction: vulnDirection
+      }
+    })
+  }
+
+  // COLUMNS
+  const columns = [
+    {
+      id: 'VERSION',
+      name: 'VERSION',
+      selector: (row) => {
+        const { primaryComponent, id, creationAt } = row
+        return (
+          <Link
+            to={`/vendor/products/${name}?id=${productId}&sbom=${id}`}
+            onClick={() => {
+              localStorage.setItem(
+                'currentSBOM',
+                JSON.stringify({
+                  version: primaryComponent?.version,
+                  id: id
+                })
+              )
+              localStorage.setItem('activeSbomTab', 0)
+              setActiveProdTab(0)
+            }}
+          >
+            <Text color={'blue.500'} minWidth='100%' my={3} fontSize={14}>
+              {primaryComponent
+                ? primaryComponent.version
+                : `Uploaded ${getFullDateAndTime(creationAt)}`}
+            </Text>
+          </Link>
+        )
+      },
+      wrap: true,
+      width: '250px'
+    },
+    {
+      id: 'COMPONENTS',
+      name: 'COMPONENTS',
+      selector: (row) => {
+        const { stats, id, primaryComponent } = row
+        return (
+          <Link
+            to={`/vendor/products/${params.name}?id=${productId}&sbom=${id}`}
+          >
+            <Tag
+              size='md'
+              variant='subtle'
+              width={16}
+              colorScheme={'blue'}
+              onClick={() => {
+                localStorage.setItem(
+                  'currentSBOM',
+                  JSON.stringify({
+                    version: primaryComponent?.version,
+                    id: id
+                  })
+                )
+                setActiveProdTab(2)
+              }}
+            >
+              <TagLabel mx={'auto'}>{stats?.compCount}</TagLabel>
+            </Tag>
+          </Link>
+        )
+      },
+      width: '150px'
+    },
+    {
+      id: 'LICENSES',
+      name: 'LICENSES',
+      selector: (row) => {
+        const { stats } = row
+        return (
+          <Tag size='md' variant='subtle' width={16} colorScheme={'blue'}>
+            <TagLabel mx={'auto'}>{stats?.compLicenseCount}</TagLabel>
+          </Tag>
+        )
+      },
+      width: '150px'
+    },
+    {
+      id: 'VULNERABILITIES',
+      name: 'VULNERABILITIES',
+      selector: (row) => {
+        const { stats, id, primaryComponent } = row
+        const link = `/vendor/products/${params.name}?id=${productId}&sbom=${id}`
+        return (
+          <Stack fontWeight={'medium'} direction={'row'}>
+            <Link
+              to={link}
+              onClick={() => onFilterSev(id, primaryComponent, ['critical'])}
+            >
+              <VulnBadge color='red' label='Critical'>
+                {stats?.vulnStats?.critical ? stats.vulnStats.critical : 0}
+              </VulnBadge>
+            </Link>
+            <Link
+              to={link}
+              onClick={() => onFilterSev(id, primaryComponent, ['high'])}
+            >
+              <VulnBadge color='orange' label='High'>
+                {stats?.vulnStats?.high ? stats.vulnStats.high : 0}
+              </VulnBadge>
+            </Link>
+            <Link
+              to={link}
+              onClick={() => onFilterSev(id, primaryComponent, ['medium'])}
+            >
+              <VulnBadge color='yellow' label='Medium'>
+                {stats?.vulnStats?.medium ? stats.vulnStats.medium : 0}
+              </VulnBadge>
+            </Link>
+            <Link
+              to={link}
+              onClick={() => onFilterSev(id, primaryComponent, ['low'])}
+            >
+              <VulnBadge color='green' label='Low'>
+                {stats?.vulnStats?.low ? stats.vulnStats.low : 0}
+              </VulnBadge>
+            </Link>
+          </Stack>
+        )
+      },
+      width: '300px'
+    },
+    {
+      id: 'STATUS',
+      name: 'STATUS',
+      selector: (row) => {
+        const { lifecycle } = row
+
+        return (
+          <Tag width={24} colorScheme='cyan' textTransform={'capitalize'}>
+            <TagLabel mx={'auto'}>{lifecycle}</TagLabel>
+          </Tag>
+        )
+      }
+    },
+    {
+      id: 'UPDATEDAT',
+      name: 'UPDATED AT',
+      selector: (row) => {
+        const { updatedAt } = row
+
+        return (
+          <Tooltip label={getFullDateAndTime(updatedAt)} placement='top'>
+            <Text>{timeSince(updatedAt)}</Text>
+          </Tooltip>
+        )
+      },
+      right: 'true'
+    },
+    {
+      id: 'ACTION',
+      name: 'ACTION',
+      selector: (row) => {
+        return (
+          <Menu>
+            <MenuButton
+              as={IconButton}
+              icon={<FaEllipsisV />}
+              variant='none'
+              color='gray.400'
+            />
+            <Portal>
+              <MenuList fontSize={16}>
+                <MenuItem
+                  onClick={() => {
+                    setActiveRow(row)
+                    onDeleteOpen()
+                  }}
+                >
+                  Delete Version
+                </MenuItem>
+              </MenuList>
+            </Portal>
+          </Menu>
+        )
+      },
+      right: 'true'
+    }
+  ]
+
+  const handleDelete = async () => {
+    setIsLoading(true)
+    await deleteSbom({
+      variables: {
+        id: activeRow.id
+      }
+    }).then((res) => {
+      if (res.data.sbomDelete?.errors?.length === 0) {
+        setTimeout(() => {
+          setIsLoading(false)
+          refetch({ id: productId })
+          onDeleteClose()
+        }, 4000)
+      }
+    })
+  }
+
+  // REFRESH PRODUCTS
+  const handleRefresh = async () => {
+    await refetch({
+      id: productId
+    })
+  }
+
+  const subHeaderComponent = useMemo(() => {
+    return (
+      <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
+        <Stack direction={'row'} spacing={2} alignItems={'center'}>
+          <Tooltip label='Refresh'>
+            <IconButton
+              onClick={handleRefresh}
+              colorScheme='blue'
+              icon={<RepeatIcon />}
+            ></IconButton>
+          </Tooltip>
+        </Stack>
+      </Flex>
+    )
+  }, [handleRefresh])
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [project])
+
+  return (
+    <>
+      <Flex flexDir={'column'} width={'100%'}>
+        <DataTable
+          subHeader
+          persistTableHead
+          responsive={true}
+          columns={columns}
+          customStyles={customStyles}
+          data={filteredData && filteredData}
+          progressComponent={<CustomLoader />}
+          progressPending={project ? false : true}
+          subHeaderComponent={subHeaderComponent}
+        />
+      </Flex>
+
+      {/* PAGINATION */}
+      {project && (
+        <Flex
+          width={'100%'}
+          flexDir={'row'}
+          gap={4}
+          alignItems={'center'}
+          justifyContent={'space-between'}
+          mt={6}
+        >
+          <Stack alignItems={'center'} direction={'row'} spacing={4}>
+            <Button
+              colorScheme='blue'
+              onClick={() => handlePageChange(currentPage - 1)}
+              isDisabled={currentPage === 1}
+            >
+              Previous
+            </Button>
+            <Button
+              colorScheme='blue'
+              onClick={() => handlePageChange(currentPage + 1)}
+              isDisabled={currentPage === totalPages}
+            >
+              Next
+            </Button>
+            <Box>
+              Page {currentPage} of {totalPages}
+            </Box>
+          </Stack>
+
+          {/* ROW LIMIT */}
+          <RowLimit
+            onChange={(e) => setTotalRows(e.target.value)}
+            name='componentRow'
+          />
+        </Flex>
+      )}
+
+      {/* DELETE VERSION */}
+      {isDeleteOpen && (
+        <Modal isOpen={isDeleteOpen} onClose={onDeleteClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Delete Version</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Text>Deleting this version will: </Text>
+              <UnorderedList>
+                <Flex flexDir={'column'} gap={1} mt={4}>
+                  {[
+                    'remove this versions and its SBOM',
+                    'remove access to this version for all users'
+                  ].map((item, index) => (
+                    <ListItem key={index}>{item}</ListItem>
+                  ))}
+                </Flex>
+              </UnorderedList>
+              <br />
+              <Text mt={10}>Are you sure you wish to continue?</Text>
+            </ModalBody>
+            <ModalFooter>
+              <Flex
+                width={'100%'}
+                alignItems={'center'}
+                justifyContent={'space-between'}
+                gap={4}
+              >
+                <Stack>{isLoading && <Spinner color='red.500' />}</Stack>
+                <Stack direction='row' alignItems='center' gap={1}>
+                  <Button onClick={onDeleteClose}>No</Button>
+                  <Button
+                    colorScheme='red'
+                    onClick={handleDelete}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? 'Deleting...' : 'Yes'}
+                  </Button>
+                </Stack>
+              </Flex>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      )}
+    </>
+  )
+}
+
+export default VersionTable

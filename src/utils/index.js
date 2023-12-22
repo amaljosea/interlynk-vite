@@ -465,7 +465,6 @@ export const getActiveRoute = (routes) => {
       }
     }
   }
-  console.log(`active`, activeRoute)
   return activeRoute
 }
 
@@ -531,18 +530,26 @@ export const findSimilarItems = (currentData, selectedData) => {
     const matchingSelected = selectedData.find(
       (selectedItem) => selectedItem.vuln.vulnId === currentItem.vuln.vulnId
     )
-
     if (matchingSelected) {
+      const hasLogs = matchingSelected.componentVulnLogs.length > 0
+      const selectedVuln =
+        hasLogs &&
+        matchingSelected.componentVulnLogs[
+          matchingSelected.componentVulnLogs.length > 1
+            ? matchingSelected.componentVulnLogs.length - 1
+            : 0
+        ]
       return {
         ...currentItem,
         importStatus: matchingSelected.vexStatus,
         importJustification: matchingSelected.vexJustification,
-        importNotes:
-          matchingSelected.componentVulnLogs.length > 0
-            ? matchingSelected.componentVulnLogs[
-                matchingSelected.componentVulnLogs.length - 1
-              ].note
-            : '',
+        importNotes: selectedVuln.note || null,
+        importDetail: selectedVuln.detail || null,
+        importResponse: matchingSelected.cdxResponseId
+          ? matchingSelected.cdxResponseId
+          : null,
+        importFixedIn: selectedVuln.fixedIn || null,
+        importActionStmt: selectedVuln.actionStmt || null,
         importStatement: matchingSelected.impact
       }
     }
@@ -589,4 +596,24 @@ export const customStyles = {
       margin: 0
     }
   }
+}
+
+// REMOVE DUPLICATE PRODUCTS VERSIONS
+export const removeDuplicates = (arr) => {
+  const uniqueVersions = {}
+  for (const item of arr) {
+    if (
+      !uniqueVersions[item.primaryComponent?.version] ||
+      item.updatedAt > uniqueVersions[item.primaryComponent?.version].creationAt
+    ) {
+      uniqueVersions[item.primaryComponent?.version] = item
+    }
+  }
+  const versions = Object.values(uniqueVersions).sort((a, b) => {
+    const dateA = new Date(a.creationAt)
+    const dateB = new Date(b.creationAt)
+    return dateB - dateA
+  })
+
+  return versions
 }

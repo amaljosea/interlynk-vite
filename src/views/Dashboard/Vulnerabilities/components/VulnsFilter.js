@@ -103,7 +103,7 @@ const VulnsFilters = () => {
             fontSize={'sm'}
             leftIcon={<FaFilter size={14} />}
           >
-            Products
+            Versions
           </MenuButton>
           <MenuList>
             <MenuOptionGroup
@@ -113,7 +113,7 @@ const VulnsFilters = () => {
                 setProducts(value.includes('all') ? [] : value)
               }
             >
-              {['all', 'lynk-api', 'lynk-dash-app', 'sbomqs', 'sbomgr'].map(
+              {['1.0.0', '1.0.1', '1.0.2', '2.0.0', '2.0.1'].map(
                 (item, index) => (
                   <MenuItemOption key={index} value={item} fontSize={'sm'}>
                     {item}

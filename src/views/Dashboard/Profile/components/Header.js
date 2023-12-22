@@ -1,22 +1,20 @@
 // Chakra imports
 import { useMutation } from '@apollo/client'
 import {
+  Avatar,
   Box,
   Button,
   Flex,
-  Image,
   Input,
   Text,
   useColorModeValue,
   useToast
 } from '@chakra-ui/react'
-
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 import { UploadProfileImage } from 'graphQL/Mutation'
 import { useEffect, useRef, useState } from 'react'
-import { useHistory } from 'react-router-dom'
-import { displayPic } from 'utils'
+import { useNavigate } from 'react-router-dom'
 
 const Header = ({
   selectedTab,
@@ -27,7 +25,7 @@ const Header = ({
   setTabIndex,
   setPsIndex
 }) => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const toast = useToast()
   const textColor = useColorModeValue('gray.700', 'white')
   const emailColor = useColorModeValue('gray.500', 'gray.300')
@@ -35,13 +33,16 @@ const Header = ({
   const handleClick = (name) => {
     setSelectedTab(name)
     if (name === 'PERSONAL') {
-      history.push('/vendor/settings?tab=person')
+      navigate('/vendor/settings?tab=person')
       setPsIndex(0)
     } else {
-      history.push('/vendor/settings?tab=general')
+      navigate('/vendor/settings?tab=general')
       setTabIndex(0)
     }
   }
+
+  const userName = localStorage.getItem('username')
+  const userEmail = localStorage.getItem('email')
 
   const [uploadProfile] = useMutation(UploadProfileImage)
 
@@ -121,7 +122,7 @@ const Header = ({
   }, [])
 
   return (
-    <Flex direction='column' pt={{ base: '120px', md: '75px' }}>
+    <Flex direction='column'>
       <Card mb='6'>
         <CardBody>
           {/* user info */}
@@ -141,9 +142,9 @@ const Header = ({
               width='80px'
               height='80px'
             >
-              <Image
-                src={profileImage || displayPic(user.email)}
-                alt={profileImage ? profileImage.fileName : '.'}
+              <Avatar
+                me={{ md: '22px' }}
+                src={profileImage && profileImage}
                 borderRadius='full'
                 width='80px'
                 height='80px'
@@ -185,14 +186,14 @@ const Header = ({
                 fontWeight='bold'
                 ms={{ sm: '8px', md: '0px' }}
               >
-                {user.name}
+                {user ? user.name : userName}
               </Text>
               <Text
                 fontSize={{ sm: 'sm', md: 'md' }}
                 color={emailColor}
                 fontWeight='medium'
               >
-                {user.email}
+                {user ? user.email : userEmail}
               </Text>
             </Flex>
           </Flex>

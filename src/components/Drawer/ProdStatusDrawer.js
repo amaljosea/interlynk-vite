@@ -25,7 +25,7 @@ import {
   GetCdxResponses
 } from 'graphQL/Queries'
 import { useEffect, useState, useContext } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 const ProdStatusDrawer = ({
   data,
@@ -36,10 +36,11 @@ const ProdStatusDrawer = ({
   setPageIndex,
 }) => {
   const location = useLocation()
+  const navigate = useNavigate()
   const queryParams = new URLSearchParams(location.search)
-  const productId = queryParams.get('p')
+  const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
-
+  const currentProduct = JSON.parse(localStorage.getItem(`product`))
   const { data: res } = useQuery(GetCdxResponses)
 
   const {
@@ -53,8 +54,7 @@ const ProdStatusDrawer = ({
     vulnStatus,
     vulnKev,
     vulnEpss,
-    vulnAfter,
-    vulnBefore
+    setActiveProdTab
   } = useContext(GlobalContext)
 
   const { id, componentVulnLogs } = data
@@ -74,16 +74,17 @@ const ProdStatusDrawer = ({
   const [statusResults, setStatusResults] = useState([])
   const [newVulnLogs, setNewVulnLogs] = useState([])
 
+
   const { data: allVexStatus } = useQuery(getVexStatuses)
   const { data: allVexJustify } = useQuery(getVexJustifications)
 
-  const handleRefetch = () => {
+  const handleRefetch = async () => {
     const epssRange = (vulnEpss !== '' || vulnEpss !== '0-0') && vulnEpss.split('-')
     const range = {
       min: parseFloat(epssRange[0]) / 10000,
       max: parseFloat(epssRange[1]) / 10000
     }
-    refetch({
+    await refetch({
       variables: {
         projectId: productId,
         sbomId: sbomId,
@@ -100,7 +101,11 @@ const ProdStatusDrawer = ({
         field: vulnField,
         direction: vulnDirection
       }
-    })
+    }).then(res => {
+      if(res.data) {
+        navigate(`/vendor/products/${currentProduct.name}?id=${productId}&sbom=${sbomId}`)
+      }
+    }).finally(()=> setActiveProdTab(3))
   }
 
   const [compVexCreate] = useMutation(updateCompVulnVex, {
@@ -114,7 +119,11 @@ const ProdStatusDrawer = ({
     const status = e.target.options[e.target.selectedIndex].text
     setStatusTitle(value)
     setStatusName(status)
+    if(status === 'False Positive') {
+      setJustification(allVexJustify.vexJustifications[9].id)
+    }
     if (status === 'Not Affected' || status === 'Affected') {
+      setJustification('')
       setJustifyName('')
       setImpactData('')
     }
@@ -156,6 +165,8 @@ const ProdStatusDrawer = ({
     }).then((res) => res.data && setPageIndex(1))
   }
 
+  const fixedVersions = filteredData.filter((item) => item.value !== sbomId)
+
   useEffect(() => {
     if (componentVulnLogs) {
       const sortedData =
@@ -167,7 +178,7 @@ const ProdStatusDrawer = ({
         })
       setStatusResults(sortedData)
     }
-  }, [])
+  }, [componentVulnLogs])
 
   return (
     <Stack spacing='24px'>
@@ -257,7 +268,7 @@ const ProdStatusDrawer = ({
                 </FormControl>
               )}
               {/* FIXED VERSION */}
-              {statusName === 'Affected' && responseTitle === 'update' && (
+              {statusName === 'Affected' && responseTitle === 'Update' && (
                 <Stack
                   width={'100%'}
                   direction={'column'}
@@ -281,14 +292,14 @@ const ProdStatusDrawer = ({
                       color='gray.600'
                     >
                       <option value=''>-- Select --</option>
-                      {filteredData && filteredData.length > 0 ? (
-                        filteredData.map((item, index) => (
+                      {fixedVersions.length > 0 ? (
+                        fixedVersions.map((item, index) => (
                           <option
                             key={index}
-                            value={item.id}
-                            name={item.version}
+                            value={item.value}
+                            name={item.label}
                           >
-                            {item.version}
+                            {item.label}
                           </option>
                         ))
                       ) : (
@@ -387,14 +398,12 @@ const ProdStatusDrawer = ({
               onClick={handleSave}
               disabled={
                 statusTitle === '' ||
-                (statusName === 'Not Affected' && justification === '') ||
-                (justifyName === 'Other (impact statment required)' &&
-                  impactData === '') ||
+                (statusName === 'Not Affected' && (justification === '' || impactData === '')) ||
+                (statusName === 'False Positive' && (justification === '' || impactData === '')) ||
                 (statusName === 'Affected' &&
                   responseTitle === '' &&
                   actionStatement === '') ||
                 (responseTitle !== '' && actionStatement === '') ||
-                (statusName === 'False Positive' && impactData === '') ||
                 (responseTitle === 'update' && selectedTag === '')
               }
             >

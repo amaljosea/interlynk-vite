@@ -43,9 +43,9 @@ import {
   FaAngleLeft
 } from 'react-icons/fa'
 import { TbSignature, TbSignatureOff } from 'react-icons/tb'
-import { useLocation, useHistory, Link } from 'react-router-dom'
+import { useLocation, useNavigate, Link, useParams } from 'react-router-dom'
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
-import { timeSince, getFullDateAndTime } from 'utils'
+import { timeSince, getFullDateAndTime, removeDuplicates } from 'utils'
 import SigningModal from './components/SigningModal'
 import DownloadModal from './components/DownloadModal'
 import CopyModal from './components/CopyModal'
@@ -68,14 +68,20 @@ import ReactSelect from 'react-select'
 const idRegex =
   /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
 
-function SBOM() {
+function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
   const initialRef = useRef(null)
   const finalRef = useRef(null)
   const btnRef = useRef()
 
+  const params = useParams()
   const location = useLocation()
-  const history = useHistory()
+  const navigate = useNavigate()
   const toast = useToast()
+
+  const urlParts = location.pathname.split('/')
+  const productIndex = urlParts.indexOf('products')
+  const productName =
+    productIndex !== -1 ? urlParts.slice(productIndex + 1).join('/') : ''
 
   const {
     prodField,
@@ -107,14 +113,27 @@ function SBOM() {
     setVulnIndex,
     setVulnSearchInput,
     compField,
-    compDirection
+    compDirection,
+    setLicenseType,
+    setSpdxList,
+    setSpdxLicense,
+    setLicenseExp,
+    setCustomList,
+    setCustomLicense,
+    compSearchInput,
+    compEcosystem,
+    compType,
+    compLicense,
+    compSupplier,
+    compScope
   } = useContext(GlobalContext)
 
   const customerView = location.pathname.startsWith('/customer')
   const currentProduct = JSON.parse(localStorage.getItem(`product`))
+  const currentSBOM = JSON.parse(localStorage.getItem(`currentSBOM`))
   const queryParams = new URLSearchParams(location.search)
   const parts = queryParams.get('parts')
-  const productId = queryParams.get('p')
+  const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
 
   const { isOpen, onOpen, onClose, onToggle } = useDisclosure()
@@ -123,11 +142,7 @@ function SBOM() {
   const [components, setComponents] = useState([])
   const [signedData, setSignedData] = useState(null)
 
-  const [selectedVersion, setSelectedVersion] = useState({
-    label: '',
-    value: '',
-    creationAt: ''
-  })
+  const [selectedVersion, setSelectedVersion] = useState(null)
 
   useEffect(() => {
     if (!idRegex.test(productId) || !idRegex.test(sbomId)) {
@@ -146,14 +161,6 @@ function SBOM() {
   // GET COMPONENT DATA
   const [getCompData, { data: compData, error: compError }] = useLazyQuery(
     GetComponentData,
-    {
-      fetchPolicy: 'network-only'
-    }
-  )
-
-  // GET VULN DATA
-  const [getVulnData, { data: vulnData, refetch: vulnRefetch }] = useLazyQuery(
-    GetVulnData,
     {
       fetchPolicy: 'network-only'
     }
@@ -212,7 +219,7 @@ function SBOM() {
         duration: 2000,
         position: 'top'
       })
-      history.push('/vendor/products')
+      navigate('/vendor/products')
     }
   }, [error])
 
@@ -226,76 +233,67 @@ function SBOM() {
 
   const uniqVersions = []
 
-  data &&
-    data.project.sboms.map((project) => {
+  const filteredDuplicated = data ? removeDuplicates(data.project.sboms) : []
+
+  filteredDuplicated &&
+    filteredDuplicated.map((project) => {
       if (project.primaryComponent) {
         uniqVersions.push({
           label: project.primaryComponent.version,
           value: project.id,
           creationAt: project.creationAt
         })
+      } else {
+        uniqVersions.push({
+          label: `Uploaded ${getFullDateAndTime(project.creationAt)}`,
+          value: project.id,
+          creationAt: project.creationAt
+        })
       }
     })
-
-  // remove duplicates
-  const removeDuplicatesAndLatest = (arr) => {
-    const uniqueVersions = {}
-
-    for (const item of arr) {
-      if (
-        !uniqueVersions[item.label] ||
-        item.updatedAt > uniqueVersions[item.label].creationAt
-      ) {
-        uniqueVersions[item.label] = item
-      }
-    }
-
-    return Object.values(uniqueVersions)
-  }
-
-  const filteredData = uniqVersions
-    ? removeDuplicatesAndLatest(uniqVersions)
-    : []
-
-  filteredData?.sort((a, b) => {
-    const dateA = new Date(a.creationAt)
-    const dateB = new Date(b.creationAt)
-    return dateB - dateA
-  })
 
   const [isLoading, setIsLoading] = useState(false)
 
   const handleDelete = async () => {
     setIsLoading(true)
-    try {
-      await deleteSbom({
-        variables: {
-          id: sbomId
-        }
-      }).then((res) => {
-        setIsLoading(false)
-        history.push(`/vendor/products`)
-      })
-    } catch (error) {
-      console.error('Mutation error:', error)
-    }
+    await deleteSbom({
+      variables: {
+        id: sbomId
+      }
+    }).then((res) => {
+      if (res.data) {
+        setTimeout(() => {
+          setIsLoading(false)
+          prodRefetch({ id: productId })
+          navigate(`/vendor/products/${params.name}?id=${productId}`)
+        }, 3000)
+      }
+    })
   }
 
   const refetchSBOM = async (id) => {
-    try {
-      await refetch({
-        projectId: productId,
-        sbomId: id
-      }).finally(() =>
-        history.push(`/vendor/products?p=${productId}&sbom=${id}`)
-      )
-    } catch (error) {
-      console.log(`fetch error`, error)
-    }
+    await refetch({
+      projectId: productId,
+      sbomId: id
+    })
+      .then((res) => {
+        if (res.data) {
+          localStorage.setItem(
+            'currentSBOM',
+            JSON.stringify({
+              version: res.data.sbom.primaryComponent?.version,
+              id: res.data.sbom.id
+            })
+          )
+        }
+      })
+      .finally(() => {
+        navigate(`/vendor/products/${productName}?id=${productId}&sbom=${id}`)
+        setActiveProdTab(0)
+      })
   }
 
   const handleSBOMChange = (select) => {
-    setActiveProdTab(0)
     setCompSearchInput('')
     setCompEcosystem([])
     setCompType([])
@@ -334,17 +332,17 @@ function SBOM() {
   const filterVersion =
     data && data.project.sboms.find((item) => item.id === sbomId)
 
-  useEffect(() => {
-    if (data) {
-      setSelectedVersion({
-        label: filterVersion.primaryComponent
-          ? filterVersion.primaryComponent.version
-          : 'No version available',
-        value: filterVersion.id,
-        creationAt: filterVersion.creationAt
-      })
-    }
-  }, [data])
+  // useEffect(() => {
+  //   if (data) {
+  //     setSelectedVersion({
+  //       label: filterVersion.primaryComponent
+  //         ? filterVersion.primaryComponent.version
+  //         : 'No version available',
+  //       value: filterVersion.id,
+  //       creationAt: filterVersion.creationAt
+  //     })
+  //   }
+  // }, [data])
 
   // ADD KEYBOARD SHORTCUT FOR TOGGLE DOWNLOAD MODAL
   const handleKeyDownload = (event) => {
@@ -368,8 +366,76 @@ function SBOM() {
 
   const [getAllComps, { data: allComponents }] = useLazyQuery(GetAllComponents)
 
+  const fetchCompData = async () => {
+    await getCompData({
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        search: compSearchInput !== '' ? compSearchInput : undefined,
+        ecosystem:
+          compEcosystem.includes('all') || compEcosystem.length === 0
+            ? undefined
+            : compEcosystem,
+        kind:
+          compType.includes('all') || compType.length === 0
+            ? undefined
+            : compType,
+        licenses:
+          compLicense.includes('all') || compLicense.length === 0
+            ? undefined
+            : compLicense,
+        supplierName:
+          compSupplier.includes('all') || compSupplier.length === 0
+            ? undefined
+            : compSupplier,
+        primary: compScope === 'primary' ? true : undefined,
+        internal: compScope === 'internal' ? true : undefined,
+        first: totalRows,
+        field: compField,
+        direction: compDirection
+      }
+    })
+      .then((res) => {
+        if (res.data) {
+          navigate(
+            `/vendor/products/${currentProduct.name}?id=${productId}&sbom=${sbomId}`
+          )
+        }
+      })
+      .finally(() => setActiveProdTab(2))
+  }
+
   const handleEditSbom = () => {
     if (sbomData.sbom.primaryComponent) {
+      const row = sbomData.sbom.primaryComponent
+      if (row.licenses && row.licenses.length > 0) {
+        setLicenseType('license_spdx')
+        const filterData = row.licenses.map((value) => ({
+          value: value,
+          label: value
+        }))
+        setSpdxList(filterData)
+        const selectedIds = filterData.map((option) => option.value)
+        setSpdxLicense(selectedIds)
+      } else if (row.licensesExp) {
+        setLicenseType('license_exp')
+        setLicenseExp(row.licensesExp)
+      } else if (row.licensesCustom && row.licensesCustom.length > 0) {
+        setLicenseType('license_custom')
+        const filterData = row.licensesCustom.map((option) => ({
+          value: option,
+          label: option
+        }))
+        setCustomList(filterData)
+        setCustomLicense(row.licensesCustom)
+      } else {
+        setLicenseType('license_spdx')
+        setSpdxList([])
+        setSpdxLicense([])
+        setLicenseExp('')
+        setCustomList([])
+        setCustomLicense([])
+      }
       setSBMOpen()
     } else {
       getAllComps({
@@ -406,7 +472,6 @@ function SBOM() {
 
   const onFilterVuln = (value) => {
     setActiveProdTab(3)
-    setCompPa
     setVulnIndex(1)
     setVulnSearchInput('')
     setVulnComponent([])
@@ -445,414 +510,405 @@ function SBOM() {
     <>
       {productId && sbomId && (
         <>
-          <Flex
-            direction='column'
-            pt={{ base: '120px', md: '74px' }}
-            pr={2}
-            pl={5}
-          >
-            {/* Product Info */}
-            {sbomData ? (
-              <Card mb='6'>
-                <CardBody>
-                  <Grid
-                    width={'100%'}
-                    templateColumns='repeat(5, 1fr)'
-                    alignItems={'top'}
-                    gap={40}
-                  >
-                    {/* LEFT */}
-                    <GridItem colSpan={2}>
-                      <Flex
-                        direction={'row'}
-                        alignItems={'flex-start'}
-                        gap={5}
-                        width={'100%'}
-                      >
-                        <Icon
-                          as={FaCubes}
-                          h={'64px'}
-                          w={'64px'}
-                          color='blue.300'
-                        />
-                        <Flex direction={'column'} gap={0.5}>
-                          {/* PRODUCT TITLE */}
-                          <Stack
-                            direction={'column'}
-                            spacing={1}
-                            alignItems={'left'}
-                          >
-                            {currentProduct && parts && (
-                              <Link
-                                to={`/vendor/products?&p=${currentProduct.id}&sbom=${currentProduct.sbomId}`}
-                              >
-                                <HStack onClick={() => setActiveProdTab(1)}>
-                                  <FaAngleLeft size={18} color='#3182CE' />
-                                  <Text
-                                    fontWeight={'semibold'}
-                                    fontSize={18}
-                                    color={'blue.500'}
-                                    textDecor={'underline'}
-                                  >
-                                    {currentProduct.name} :{' '}
-                                    {currentProduct.version}
-                                    <br />
-                                  </Text>
-                                </HStack>
-                              </Link>
-                            )}
-                            <Text fontWeight={'semibold'} fontSize={25}>
-                              {sbomData.sbom.project.name} :{' '}
-                              {sbomData.sbom.primaryComponent?.version}
-                            </Text>
-                          </Stack>
-                          {sbomData.sbom.primaryComponent && (
-                            <Text fontSize={'sm'} my={0.5}>
-                              {sbomData.sbom.primaryComponent.description}
-                            </Text>
+          {/* Product Info */}
+          {sbomData ? (
+            <Card mb='6'>
+              <CardBody>
+                <Grid
+                  width={'100%'}
+                  templateColumns='repeat(5, 1fr)'
+                  alignItems={'top'}
+                  gap={40}
+                >
+                  {/* LEFT */}
+                  <GridItem colSpan={2}>
+                    <Flex
+                      direction={'row'}
+                      alignItems={'flex-start'}
+                      gap={5}
+                      width={'100%'}
+                    >
+                      <Icon
+                        as={FaCubes}
+                        h={'64px'}
+                        w={'64px'}
+                        color='blue.300'
+                      />
+                      <Flex direction={'column'} gap={0.5}>
+                        {/* PRODUCT TITLE */}
+                        <Stack
+                          direction={'column'}
+                          spacing={1}
+                          alignItems={'left'}
+                        >
+                          {currentProduct && parts && (
+                            <Link
+                              to={`/vendor/products/${currentProduct?.name}?&id=${currentProduct?.id}&sbom=${currentSBOM?.id}`}
+                            >
+                              <HStack onClick={() => setActiveProdTab(1)}>
+                                <FaAngleLeft size={18} color='#3182CE' />
+                                <Text
+                                  fontWeight={'semibold'}
+                                  fontSize={18}
+                                  color={'blue.500'}
+                                  textDecor={'underline'}
+                                >
+                                  {currentProduct.name} : {currentSBOM?.version}
+                                  <br />
+                                </Text>
+                              </HStack>
+                            </Link>
                           )}
-                          <Tooltip
-                            placement='top'
-                            label={getFullDateAndTime(sbomData.sbom.updatedAt)}
+                          <Text fontWeight={'semibold'} fontSize={25}>
+                            {sbomData.sbom.project.name} :{' '}
+                            {sbomData.sbom.primaryComponent?.version}
+                          </Text>
+                        </Stack>
+                        {sbomData.sbom.primaryComponent && (
+                          <Text fontSize={'sm'} my={0.5}>
+                            {sbomData.sbom.primaryComponent.description}
+                          </Text>
+                        )}
+                        <Tooltip
+                          placement='top'
+                          label={getFullDateAndTime(sbomData.sbom.updatedAt)}
+                        >
+                          <Text fontSize='xs' cursor={'pointer'}>
+                            Updated {timeSince(sbomData.sbom.updatedAt)}
+                          </Text>
+                        </Tooltip>
+                        <HStack mt={1} spacing={2} alignItems={'center'}>
+                          <Tag
+                            w={'fit-content'}
+                            size={'sm'}
+                            variant='solid'
+                            colorScheme='blue'
                           >
-                            <Text fontSize='xs' cursor={'pointer'}>
-                              Updated {timeSince(sbomData.sbom.updatedAt)}
-                            </Text>
-                          </Tooltip>
-                          <HStack mt={1} spacing={2} alignItems={'center'}>
+                            <Tooltip label='Lifecycle stage' fontSize='md'>
+                              <TagLabel textTransform={'capitalize'}>
+                                {sbomData.sbom.lifecycle}
+                              </TagLabel>
+                            </Tooltip>
+                          </Tag>
+                          {sbomData.sbom.vulnRunStatus === 'IN_PROGRESS' && (
                             <Tag
                               w={'fit-content'}
                               size={'sm'}
                               variant='solid'
                               colorScheme='blue'
                             >
-                              <Tooltip label='Lifecycle stage' fontSize='md'>
+                              <Tooltip
+                                label='Vulnerability scan in progress'
+                                fontSize='md'
+                              >
                                 <TagLabel textTransform={'capitalize'}>
-                                  {sbomData.sbom.lifecycle}
+                                  scanning
                                 </TagLabel>
                               </Tooltip>
                             </Tag>
-                            {sbomData.sbom.vulnRunStatus === 'IN_PROGRESS' && (
-                              <Tag
-                                w={'fit-content'}
-                                size={'sm'}
-                                variant='solid'
-                                colorScheme='blue'
-                              >
-                                <Tooltip
-                                  label='Vulnerability scan in progress'
-                                  fontSize='md'
-                                >
-                                  <TagLabel textTransform={'capitalize'}>
-                                    scanning
-                                  </TagLabel>
-                                </Tooltip>
-                              </Tag>
-                            )}
-                          </HStack>
-                          {/* --------------- STATS ------------------- */}
-                          <Flex
-                            flexDir={'row'}
-                            alignItems={'center'}
-                            gap={4}
-                            mt={12}
+                          )}
+                        </HStack>
+                        {/* --------------- STATS ------------------- */}
+                        <Flex
+                          flexDir={'row'}
+                          alignItems={'center'}
+                          gap={4}
+                          mt={5}
+                        >
+                          {/* COMPONENTS */}
+                          <Stack
+                            direction={'row'}
+                            alignItems={'flex-start'}
+                            spacing={2}
                           >
-                            {/* components */}
-                            <Stack
-                              direction={'row'}
-                              alignItems={'flex-start'}
-                              spacing={2}
-                            >
-                              <Icon h={4} w={4} color='#777' as={FaCube} />
-                              <Box>
-                                <Badge
-                                  mr={1}
-                                  fontSize={'xl'}
-                                  fontWeight={'medium'}
-                                  bg={'none'}
-                                >
-                                  {sbomData.sbom.stats.compCount}
-                                </Badge>
-                                <Text
-                                  fontSize={'xs'}
-                                  onClick={onSelectComp}
-                                  cursor={'pointer'}
-                                  _hover={{ textDecoration: 'underline' }}
-                                >
-                                  Components
-                                </Text>
-                              </Box>
-                            </Stack>
-                            {/* license */}
-                            <Stack
-                              direction={'row'}
-                              alignItems={'flex-start'}
-                              spacing={2}
-                            >
-                              <Icon
-                                h={'20px'}
-                                w={'20px'}
-                                color='#777'
-                                as={FaBalanceScale}
-                              />
-                              <Box>
-                                <Badge
-                                  mr={1}
-                                  fontSize={'xl'}
-                                  fontWeight={'medium'}
-                                  bg={'none'}
-                                >
-                                  {sbomData.sbom.stats.compLicenseCount}
-                                </Badge>
-                                <Text fontSize={'xs'}>Licenses</Text>
-                              </Box>
-                            </Stack>
-                            {/* vulnerabilities */}
-                            <Stack
-                              direction={'row'}
-                              alignItems={'flex-start'}
-                              spacing={2}
-                            >
-                              <Icon h={4} w={4} color='#777' as={FaBug} />
-                              <Box>
-                                <Stack fontWeight={'medium'} direction={'row'}>
-                                  <Tooltip label='Critical' placement='top'>
-                                    <Badge
-                                      fontSize={'xl'}
-                                      fontWeight={'medium'}
-                                      variant='subtle'
-                                      colorScheme='red'
-                                      borderRadius='md'
-                                      cursor={'pointer'}
-                                      onClick={() => onFilterVuln(['critical'])}
-                                    >
-                                      {sbomData.sbom.stats.vulnStats.critical
-                                        ? sbomData.sbom.stats.vulnStats.critical
-                                        : 0}
-                                    </Badge>
-                                  </Tooltip>
-                                  <Tooltip label='High' placement='top'>
-                                    <Badge
-                                      fontSize={'xl'}
-                                      fontWeight={'medium'}
-                                      variant='subtle'
-                                      colorScheme='orange'
-                                      borderRadius='md'
-                                      cursor={'pointer'}
-                                      onClick={() => onFilterVuln(['high'])}
-                                    >
-                                      {sbomData.sbom.stats.vulnStats.high
-                                        ? sbomData.sbom.stats.vulnStats.high
-                                        : 0}
-                                    </Badge>
-                                  </Tooltip>
-                                  <Tooltip label='Medium' placement='top'>
-                                    <Badge
-                                      fontSize={'xl'}
-                                      fontWeight={'medium'}
-                                      variant='subtle'
-                                      colorScheme='yellow'
-                                      borderRadius='md'
-                                      cursor={'pointer'}
-                                      onClick={() => onFilterVuln(['medium'])}
-                                    >
-                                      {sbomData.sbom.stats.vulnStats.medium
-                                        ? sbomData.sbom.stats.vulnStats.medium
-                                        : 0}
-                                    </Badge>
-                                  </Tooltip>
-                                  <Tooltip label='Low' placement='top'>
-                                    <Badge
-                                      fontSize={'xl'}
-                                      fontWeight={'medium'}
-                                      variant='subtle'
-                                      colorScheme='green'
-                                      borderRadius='md'
-                                      cursor={'pointer'}
-                                      onClick={() => onFilterVuln(['low'])}
-                                    >
-                                      {sbomData.sbom.stats.vulnStats.low
-                                        ? sbomData.sbom.stats.vulnStats.low
-                                        : 0}
-                                    </Badge>
-                                  </Tooltip>
-                                </Stack>
-                                <Text
-                                  fontSize={'xs'}
-                                  onClick={() => onFilterVuln(null)}
-                                  style={{ cursor: 'pointer' }}
-                                  _hover={{ textDecoration: 'underline' }}
-                                >
-                                  Vulnerabilities
-                                </Text>
-                              </Box>
-                            </Stack>
-                          </Flex>
+                            <Icon h={4} w={4} mt={1} color='#777' as={FaCube} />
+                            <Box>
+                              <Badge
+                                mr={1}
+                                fontSize={'xl'}
+                                fontWeight={'medium'}
+                                bg={'none'}
+                              >
+                                {sbomData.sbom.stats.compCount}
+                              </Badge>
+                              <Text
+                                fontSize={'xs'}
+                                onClick={onSelectComp}
+                                cursor={'pointer'}
+                                _hover={{ textDecoration: 'underline' }}
+                              >
+                                Components
+                              </Text>
+                            </Box>
+                          </Stack>
+                          {/* LICENSES */}
+                          <Stack
+                            direction={'row'}
+                            alignItems={'flex-start'}
+                            spacing={2}
+                          >
+                            <Icon
+                              mt={1}
+                              h={'20px'}
+                              w={'20px'}
+                              color='#777'
+                              as={FaBalanceScale}
+                            />
+                            <Box>
+                              <Badge
+                                mr={1}
+                                fontSize={'xl'}
+                                fontWeight={'medium'}
+                                bg={'none'}
+                              >
+                                {sbomData.sbom.stats.compLicenseCount}
+                              </Badge>
+                              <Text fontSize={'xs'}>Licenses</Text>
+                            </Box>
+                          </Stack>
+                          {/* VULNERABILITIES */}
+                          <Stack
+                            direction={'row'}
+                            alignItems={'flex-start'}
+                            spacing={2}
+                          >
+                            <Icon mt={1} h={4} w={4} color='#777' as={FaBug} />
+                            <Box>
+                              <Stack fontWeight={'medium'} direction={'row'}>
+                                <Tooltip label='Critical' placement='top'>
+                                  <Badge
+                                    fontSize={'xl'}
+                                    fontWeight={'medium'}
+                                    variant='subtle'
+                                    colorScheme='red'
+                                    borderRadius='md'
+                                    cursor={'pointer'}
+                                    onClick={() => onFilterVuln(['critical'])}
+                                  >
+                                    {sbomData.sbom.stats.vulnStats.critical
+                                      ? sbomData.sbom.stats.vulnStats.critical
+                                      : 0}
+                                  </Badge>
+                                </Tooltip>
+                                <Tooltip label='High' placement='top'>
+                                  <Badge
+                                    fontSize={'xl'}
+                                    fontWeight={'medium'}
+                                    variant='subtle'
+                                    colorScheme='orange'
+                                    borderRadius='md'
+                                    cursor={'pointer'}
+                                    onClick={() => onFilterVuln(['high'])}
+                                  >
+                                    {sbomData.sbom.stats.vulnStats.high
+                                      ? sbomData.sbom.stats.vulnStats.high
+                                      : 0}
+                                  </Badge>
+                                </Tooltip>
+                                <Tooltip label='Medium' placement='top'>
+                                  <Badge
+                                    fontSize={'xl'}
+                                    fontWeight={'medium'}
+                                    variant='subtle'
+                                    colorScheme='yellow'
+                                    borderRadius='md'
+                                    cursor={'pointer'}
+                                    onClick={() => onFilterVuln(['medium'])}
+                                  >
+                                    {sbomData.sbom.stats.vulnStats.medium
+                                      ? sbomData.sbom.stats.vulnStats.medium
+                                      : 0}
+                                  </Badge>
+                                </Tooltip>
+                                <Tooltip label='Low' placement='top'>
+                                  <Badge
+                                    fontSize={'xl'}
+                                    fontWeight={'medium'}
+                                    variant='subtle'
+                                    colorScheme='green'
+                                    borderRadius='md'
+                                    cursor={'pointer'}
+                                    onClick={() => onFilterVuln(['low'])}
+                                  >
+                                    {sbomData.sbom.stats.vulnStats.low
+                                      ? sbomData.sbom.stats.vulnStats.low
+                                      : 0}
+                                  </Badge>
+                                </Tooltip>
+                              </Stack>
+                              <Text
+                                fontSize={'xs'}
+                                onClick={() => onFilterVuln(null)}
+                                style={{ cursor: 'pointer' }}
+                                _hover={{ textDecoration: 'underline' }}
+                              >
+                                Vulnerabilities
+                              </Text>
+                            </Box>
+                          </Stack>
                         </Flex>
                       </Flex>
-                    </GridItem>
+                    </Flex>
+                  </GridItem>
 
-                    {/* RIGHT */}
-                    {sbomData && (
-                      <GridItem colSpan={3}>
+                  {/* RIGHT */}
+                  {sbomData && (
+                    <GridItem colSpan={3}>
+                      <Flex
+                        direction={'row'}
+                        gap={3}
+                        justifyContent='flex-end'
+                        ml={'auto'}
+                        flexWrap={'wrap'}
+                      >
+                        {/* CHANGE ENVIRONMENT */}
                         <Flex
-                          direction={'row'}
-                          gap={3}
-                          justifyContent='flex-end'
-                          ml={'auto'}
-                          flexWrap={'wrap'}
+                          flexDirection={'row'}
+                          alignItems={'center'}
+                          gap={2}
+                          display={'none'}
                         >
-                          {/* CHANGE ENVIRONMENT */}
-                          <Flex
-                            flexDirection={'row'}
-                            alignItems={'center'}
-                            gap={2}
-                            display={'none'}
-                          >
-                            <BsBoxFill size={22} color='#718096' />
-                            <Select
-                              name='environment'
-                              id='environment'
-                              size='md'
-                            >
-                              {[
-                                'All',
-                                'Development',
-                                'Release',
-                                'Staging',
-                                'Settings'
-                              ].map((item, index) => (
-                                <option value={item} key={index}>
-                                  {item}
-                                </option>
-                              ))}
-                            </Select>
-                          </Flex>
-
-                          {/* SBOM VERSIONS */}
-                          <Flex
-                            flexDirection={'row'}
-                            alignItems={'center'}
-                            gap={2}
-                          >
-                            <FaLayerGroup size={21} color='#4299E1' />
-                            <ReactSelect
-                              styles={{
-                                control: (baseStyles, state) => ({
-                                  ...baseStyles,
-                                  borderColor: state.isFocused
-                                    ? 'inherit'
-                                    : 'inherit',
-                                  fontSize: '14px',
-                                  padding: '2px 0',
-                                  '&:hover': {
-                                    borderColor: '#CBD5E0'
-                                  }
-                                })
-                              }}
-                              components={{
-                                DropdownIndicator: () => null,
-                                IndicatorSeparator: () => null
-                              }}
-                              value={selectedVersion}
-                              onChange={handleSBOMChange}
-                              className='react-select'
-                              isSearchable={
-                                filterVersion && filterVersion.primaryComponent
-                                  ? true
-                                  : false
-                              }
-                              name='versions'
-                              options={filteredData}
-                              noOptionsMessage={() => null}
-                            />
-                          </Flex>
-
-                          {/* EDIT SBOM */}
-                          <Tooltip label='Edit'>
-                            <IconButton
-                              isDisabled={status === 'signed'}
-                              colorScheme='blue'
-                              icon={<EditIcon />}
-                              onClick={handleEditSbom}
-                            ></IconButton>
-                          </Tooltip>
-
-                          {/* SIGNED SBOM */}
-                          {status === 'signed' ? (
-                            <Tooltip label='Signed'>
-                              <IconButton
-                                colorScheme='blue'
-                                icon={<TbSignature size={22} />}
-                                onClick={setVerifyOpen}
-                              ></IconButton>
-                            </Tooltip>
-                          ) : (
-                            <Tooltip label='Unsigned'>
-                              <IconButton
-                                colorScheme='blue'
-                                icon={<TbSignatureOff size={22} />}
-                                onClick={setVerifyOpen}
-                              ></IconButton>
-                            </Tooltip>
-                          )}
-
-                          {/* DOWNLOAD SBOM */}
-                          <Tooltip label='Download'>
-                            <IconButton
-                              icon={<FaFileDownload />}
-                              onClick={onOpen}
-                              size='md'
-                              colorScheme='blue'
-                            />
-                          </Tooltip>
-
-                          {/* DELETE SBOM */}
-                          <Tooltip label='Delete'>
-                            <IconButton
-                              colorScheme='red'
-                              icon={<DeleteIcon />}
-                              onClick={setDeleteOpen}
-                            ></IconButton>
-                          </Tooltip>
+                          <BsBoxFill size={22} color='#718096' />
+                          <Select name='environment' id='environment' size='md'>
+                            {[
+                              'All',
+                              'Development',
+                              'Release',
+                              'Staging',
+                              'Settings'
+                            ].map((item, index) => (
+                              <option value={item} key={index}>
+                                {item}
+                              </option>
+                            ))}
+                          </Select>
                         </Flex>
-                      </GridItem>
-                    )}
-                  </Grid>
-                </CardBody>
-              </Card>
-            ) : (
-              <Card mb={6}>
-                <Flex width={'100%'} gap={4} direction={'row'}>
-                  <Skeleton width={'100%'} height='30px' />
-                  <Skeleton width={'100%'} height='30px' />
-                </Flex>
-              </Card>
-            )}
 
-            {/* SBOM DETAILS */}
-            {sbomData && (
-              <SBOMTable
-                filteredData={filteredData}
-                data={sbomData.sbom}
-                refetch={refetch}
-                status={status}
-                setComponents={setComponents}
-                totalComp={totalComp}
-                setTotalComp={setTotalComp}
-                getVulnData={getVulnData}
-                getCompData={getCompData}
-                compData={compData}
-                error={compError}
-                vulnData={vulnData}
-                vulnRefetch={vulnRefetch}
-                type={
-                  selectedProject?.sboms.length > 0 &&
-                  selectedProject.sboms[0].format
-                }
-              />
-            )}
-          </Flex>
+                        {/* SBOM VERSIONS */}
+                        <Flex
+                          flexDirection={'row'}
+                          alignItems={'center'}
+                          gap={2}
+                        >
+                          <FaLayerGroup size={21} color='#4299E1' />
+                          <ReactSelect
+                            styles={{
+                              control: (baseStyles, state) => ({
+                                ...baseStyles,
+                                borderColor: state.isFocused
+                                  ? 'inherit'
+                                  : 'inherit',
+                                fontSize: '14px',
+                                padding: '2px 0',
+                                '&:hover': {
+                                  borderColor: '#CBD5E0'
+                                }
+                              })
+                            }}
+                            components={{
+                              DropdownIndicator: () => null,
+                              IndicatorSeparator: () => null
+                            }}
+                            value={selectedVersion}
+                            onChange={handleSBOMChange}
+                            className='react-select'
+                            isSearchable={
+                              filterVersion && filterVersion.primaryComponent
+                                ? true
+                                : false
+                            }
+                            type='text'
+                            placeholder='Search versions'
+                            name='versions'
+                            options={uniqVersions}
+                            noOptionsMessage={() => null}
+                          />
+                        </Flex>
+
+                        {/* EDIT SBOM */}
+                        <Tooltip label='Edit'>
+                          <IconButton
+                            isDisabled={status === 'signed'}
+                            colorScheme='blue'
+                            icon={<EditIcon />}
+                            onClick={handleEditSbom}
+                          ></IconButton>
+                        </Tooltip>
+
+                        {/* SIGNED SBOM */}
+                        {status === 'signed' ? (
+                          <Tooltip label='Signed'>
+                            <IconButton
+                              colorScheme='blue'
+                              icon={<TbSignature size={22} />}
+                              onClick={setVerifyOpen}
+                            ></IconButton>
+                          </Tooltip>
+                        ) : (
+                          <Tooltip label='Unsigned'>
+                            <IconButton
+                              colorScheme='blue'
+                              icon={<TbSignatureOff size={22} />}
+                              onClick={setVerifyOpen}
+                            ></IconButton>
+                          </Tooltip>
+                        )}
+
+                        {/* DOWNLOAD SBOM */}
+                        <Tooltip label='Download'>
+                          <IconButton
+                            icon={<FaFileDownload />}
+                            onClick={onOpen}
+                            size='md'
+                            colorScheme='blue'
+                          />
+                        </Tooltip>
+
+                        {/* DELETE SBOM */}
+                        <Tooltip label='Delete'>
+                          <IconButton
+                            colorScheme='red'
+                            icon={<DeleteIcon />}
+                            onClick={setDeleteOpen}
+                          ></IconButton>
+                        </Tooltip>
+                      </Flex>
+                    </GridItem>
+                  )}
+                </Grid>
+              </CardBody>
+            </Card>
+          ) : (
+            <Card mb={6}>
+              <Flex width={'100%'} gap={4} direction={'row'}>
+                <Skeleton width={'100%'} height='30px' />
+                <Skeleton width={'100%'} height='30px' />
+              </Flex>
+            </Card>
+          )}
+
+          {/* SBOM DETAILS */}
+          {sbomData && (
+            <SBOMTable
+              filteredData={uniqVersions}
+              data={sbomData.sbom}
+              refetch={refetch}
+              status={status}
+              setComponents={setComponents}
+              totalComp={totalComp}
+              setTotalComp={setTotalComp}
+              vulnData={vulnData}
+              vulnRefetch={vulnRefetch}
+              getVulnData={getVulnData}
+              getCompData={getCompData}
+              compData={compData}
+              error={compError}
+              type={
+                selectedProject?.sboms.length > 0 &&
+                selectedProject.sboms[0].format
+              }
+            />
+          )}
 
           {/*  COMPONENT PRIMARY MODAL */}
           {isPrimaryOpen && allComponents && (
@@ -871,16 +927,8 @@ function SBOM() {
               isOpen={isSBMOpen}
               onClose={setSBMClose}
               btnRef={btnRef}
-              component={primaryComp.name}
-              version={primaryComp.version}
-              license={primaryComp.licenses}
-              group={primaryComp.group}
-              type={primaryComp.kind}
-              cpes={primaryComp.cpes}
-              purl={primaryComp.purl}
-              primary={primaryComp.primary}
-              internal={primaryComp.internal}
-              refetch={refetch}
+              data={primaryComp}
+              fetchCompData={fetchCompData}
               shortDesc={null}
               totalRows={null}
             />

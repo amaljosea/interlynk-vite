@@ -5,48 +5,67 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
   Flex,
-  HStack,
-  Text,
   useColorModeValue
 } from '@chakra-ui/react'
 import PropTypes from 'prop-types'
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import AdminNavbarLinks from './AdminNavbarLinks'
-import { Link, useLocation } from 'react-router-dom'
-import GlobalContext from 'context/GlobalContext'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { vulnList } from 'variables/general'
 
 export default function AdminNavbar(props) {
   function parseJSONSafely(str) {
     try {
-       return JSON.parse(str);
+      return JSON.parse(str)
+    } catch (e) {
+      console.err(e)
+      // Return a default object, or null based on use case.
+      return {}
     }
-    catch (e) {
-       console.err(e);
-       // Return a default object, or null based on use case.
-       return {}
-    }
- }
+  }
 
   const [scrolled, setScrolled] = useState(false)
   const { brandText } = props
-
+  const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const versionId = queryParams.get('v')
-  const product = queryParams.get('p')
   const prodID = queryParams.get('id')
   const parts = queryParams.get('parts')
-
-  const { setActiveProdTab } = useContext(GlobalContext)
+  const sbomId = queryParams.get('sbom')
 
   const imageName = localStorage.getItem('Image')
-  const currentProduct = (() => { try { return parseJSONSafely(localStorage.getItem(`product`)); } catch (error) { console.log(error); return null; } })();
-  const activeProd = localStorage.getItem('activeProduct')
+  const currentProduct = (() => {
+    try {
+      return parseJSONSafely(localStorage.getItem(`product`))
+    } catch (error) {
+      console.log(error)
+      return null
+    }
+  })()
+  const currentSBOM = (() => {
+    try {
+      return parseJSONSafely(localStorage.getItem(`currentSBOM`))
+    } catch (error) {
+      console.log(error)
+      return null
+    }
+  })()
   const subProduct = localStorage.getItem('subProduct')
-  const activeSBOM = localStorage.getItem('activeSBOM')
 
   const vulnData = vulnList.find((item) => item.id === prodID)
+
+  const urlParts = location.pathname.split('/')
+  const category = urlParts[2]
+  const productIndex = urlParts.indexOf('products')
+  const productName =
+    productIndex !== -1 ? urlParts.slice(productIndex + 1).join('/') : ''
+
+  useEffect(() => {
+    if (productName && currentProduct.name !== decodeURI(productName)) {
+      navigate('/vendor/dashboard')
+    }
+  }, [])
 
   // Here are all the props that may change depending on navbar's type or state.(secondary, variant, scrolled)
   let mainText = useColorModeValue('gray.700', 'gray.200')
@@ -80,14 +99,6 @@ export default function AdminNavbar(props) {
     secondaryMargin = '22px'
     paddingX = '30px'
   }
-  const changeNavbar = () => {
-    if (window.scrollY > 1) {
-      setScrolled(true)
-    } else {
-      setScrolled(false)
-    }
-  }
-  window.addEventListener('scroll', changeNavbar)
 
   const path = (name) => {
     if (!location.pathname.startsWith('/customer')) {
@@ -167,43 +178,29 @@ export default function AdminNavbar(props) {
               </Link>
             </BreadcrumbItem>
 
-            {(location.pathname.startsWith('/vendor/autofix') ||
-              location.pathname.startsWith('/vendor/changelog')) && (
-              <BreadcrumbItem color={mainText}>
-                <HStack spacing={2}>
-                  <Link to={'/vendor/products'} color={secondaryText}>
-                    Products
-                  </Link>
-                  <Text>/</Text>
-                  <Link
-                    to={
-                      activeSBOM
-                        ? `/vendor/products?p=${prodID}&sbom=${activeSBOM}`
-                        : `/vendor/products`
-                    }
-                    color={secondaryText}
-                    onClick={() => {
-                      setActiveProdTab(0)
-                    }}
-                  >
-                    {activeProd}
-                  </Link>
-                </HStack>
+            <BreadcrumbItem color={mainText} textTransform={'capitalize'}>
+              <Link to={`/vendor/${category}`}>{category}</Link>
+            </BreadcrumbItem>
+
+            {productName && (
+              <BreadcrumbItem
+                color={mainText}
+                isCurrentPage={sbomId && currentSBOM?.version ? false : true}
+              >
+                <Link
+                  to={`/vendor/products/${productName}?id=${prodID}`}
+                  onClick={() => localStorage.removeItem('currentSBOM')}
+                >
+                  {decodeURI(productName)}
+                </Link>
               </BreadcrumbItem>
             )}
 
-            <BreadcrumbItem color={mainText}>
-              <Link
-                to={`${path(brandText)}`}
-                color={secondaryText}
-                onClick={() => {
-                  localStorage.removeItem('cloudScanner')
-                  window.localStorage.removeItem('subProduct')
-                }}
-              >
-                {brandText}
-              </Link>
-            </BreadcrumbItem>
+            {sbomId && currentSBOM?.version && (
+              <BreadcrumbItem color={mainText} isCurrentPage>
+                <BreadcrumbLink href=''>{currentSBOM?.version}</BreadcrumbLink>
+              </BreadcrumbItem>
+            )}
 
             {imageName !== null && versionId && brandText === 'Images' && (
               <BreadcrumbItem color={mainText}>
@@ -214,23 +211,6 @@ export default function AdminNavbar(props) {
                 >
                   {imageName}
                 </BreadcrumbLink>
-              </BreadcrumbItem>
-            )}
-
-            {currentProduct !== null && product && brandText === 'Products' && (
-              <BreadcrumbItem color={mainText}>
-                <Link
-                  to={
-                    currentProduct
-                      ? `/vendor/products?&p=${currentProduct.id}&sbom=${currentProduct.sbomId}`
-                      : '/vendor/products'
-                  }
-                  onClick={() => {
-                    setActiveProdTab(0)
-                  }}
-                >
-                  {currentProduct.name}
-                </Link>
               </BreadcrumbItem>
             )}
 

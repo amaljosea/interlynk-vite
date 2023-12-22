@@ -51,20 +51,21 @@ export const dashRoutes = [
     component: Products,
     layout: '/vendor'
   },
-  {
-    path: '/vulnerabilities',
-    name: 'Vulnerabilities',
-    icon: <FaBug color='inherit' />,
-    component: Vulnerabilities,
-    layout: '/vendor'
-  },
-  {
-    path: '/licenses',
-    name: 'Licenses',
-    icon: <FaBalanceScale color='inherit' />,
-    component: Licenses,
-    layout: '/vendor'
-  },
+  /// TODO: 1.0 Add back in when ready
+  // {
+  //   path: '/vulnerabilities',
+  //   name: 'Vulnerabilities',
+  //   icon: <FaBug color='inherit' />,
+  //   component: Vulnerabilities,
+  //   layout: '/vendor'
+  // },
+  // {
+  //   path: '/licenses',
+  //   name: 'Licenses',
+  //   icon: <FaBalanceScale color='inherit' />,
+  //   component: Licenses,
+  //   layout: '/vendor'
+  // },
   // {
   //   path: '/sharelynk',
   //   name: 'ShareLynk',

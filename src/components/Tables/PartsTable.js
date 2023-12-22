@@ -29,7 +29,6 @@ import {
   Select,
   Tag,
   TagLabel,
-  Badge,
   UnorderedList,
   ListItem,
   Alert,
@@ -38,15 +37,18 @@ import {
   AlertDescription
 } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
+import VulnBadge from 'components/Misc/VulnBadge'
 import GlobalContext from 'context/GlobalContext'
 import { SbomPartDelete } from 'graphQL/Mutation'
 import { SbomPartCreate } from 'graphQL/Mutation'
 import { GetProject } from 'graphQL/Queries'
 import { GetProjectData } from 'graphQL/Queries'
-import { useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { useContext, useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV, FaFilter } from 'react-icons/fa'
-import { useLocation, Link } from 'react-router-dom'
+import { useLocation, Link, useParams, useNavigate } from 'react-router-dom'
+import { getFullDateAndTime } from 'utils'
+import { removeDuplicates } from 'utils'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 const customStyles = {
@@ -68,9 +70,10 @@ const customStyles = {
 
 const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const location = useLocation()
+  const params = useParams()
   const queryParams = new URLSearchParams(location.search)
   const sbomId = queryParams.get('sbom')
-  const prodId = queryParams.get('p')
+  const prodId = queryParams.get('id')
 
   const currentProduct = JSON.parse(localStorage.getItem(`product`))
 
@@ -84,7 +87,6 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const addBtn = useRef()
 
   const {
-    totalProducts,
     setActiveProdTab,
     prodField,
     prodDirection,
@@ -155,9 +157,6 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       .finally(() => onDeleteClose())
   }
 
-  // console.log('Products', allProducts && allProducts.projects.nodes)
-  // console.log('data', data)
-
   const productList =
     allProducts &&
     [...allProducts.projects.nodes]
@@ -167,36 +166,44 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
         label: option.name
       }))
 
-  const filterProducts =
-    productList &&
-    productList.filter((project) => {
-      const existings =
-        data &&
-        [...data].some((sbomPart) => sbomPart.part.project.id === project.value)
-      return !existings
-    })
-
   const product =
     allProducts &&
     allProducts.projects.nodes.find((item) => item.id === selectedProd)
 
-  // console.log('product', product)
+  const existingVersions = []
 
-  const filterVersion =
-    product &&
-    product.sboms.filter((sbom) => {
-      const existings =
-        data &&
-        sbom.primaryComponent &&
-        [...data].some(
-          (sbomPart) =>
-            sbomPart.part.primaryComponent.version ===
-            sbom.primaryComponent.version
+  data?.map((item) => {
+    if (item?.part?.primaryComponent) {
+      existingVersions.push(item?.part?.primaryComponent.version)
+    } else {
+      existingVersions.push(
+        `Uploaded ${getFullDateAndTime(item?.part?.creationAt)}`
+      )
+    }
+  })
+
+  const sbomVersions = []
+
+  const filteredDuplicated = product ? removeDuplicates(product.sboms) : []
+
+  filteredDuplicated &&
+    filteredDuplicated.map((project) => {
+      if (
+        !existingVersions?.includes(
+          project.primaryComponent
+            ? project.primaryComponent.version
+            : `Uploaded ${getFullDateAndTime(project.creationAt)}`
         )
-      return !existings
+      ) {
+        sbomVersions.push({
+          label: project.primaryComponent
+            ? project.primaryComponent.version
+            : `Uploaded ${getFullDateAndTime(project.creationAt)}`,
+          value: project.id,
+          creationAt: project.creationAt
+        })
+      }
     })
-
-  // console.log('filterVersion', filterVersion)
 
   const [getProduct] = useLazyQuery(GetProject)
 
@@ -228,31 +235,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
     }
   }
 
-  const filterVersions =
-    uniqVersions.length > 0 &&
-    uniqVersions.filter((version) => version.id !== sbomId)
-
-  // REMOVE DUPLICATES
-  const removeDuplicatesAndLatest = (arr) => {
-    const uniqueVersions = {}
-
-    for (const item of arr) {
-      if (
-        !uniqueVersions[item.version] ||
-        item.updatedAt > uniqueVersions[item.version].updatedAt
-      ) {
-        uniqueVersions[item.version] = item
-      }
-    }
-
-    return Object.values(uniqueVersions)
-  }
-
-  const filteredData = filterVersions
-    ? removeDuplicatesAndLatest(filterVersions)
-    : []
-
-  const getComponents = (part) => {
+  const getComponents = () => {
     setActiveProdTab(2)
     getCompData({
       variables: {
@@ -265,10 +248,10 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
     })
   }
 
-  const onFilterSev = (part, value) => {
+  const onFilterSev = async (value) => {
     setActiveProdTab(3)
     setVulnSeverity(value)
-    getVulnData({
+    await getVulnData({
       variables: {
         projectId: prodId,
         sbomId: sbomId,
@@ -289,11 +272,12 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
         const { part } = row
         return (
           <Link
-            to={`/vendor/products?&p=${part.project.id}&sbom=${part.id}&parts=true`}
+            to={`/vendor/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`}
           >
             <Text
               color={'blue.500'}
               minWidth='100%'
+              fontSize={14}
               onClick={() => setActiveProdTab(0)}
             >
               {part.project.name}
@@ -309,8 +293,15 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       name: 'VERSION',
       selector: (row) => {
         const { part } = row
-        return <Text>{part.primaryComponent.version}</Text>
-      }
+        return (
+          <Text fontSize={14}>
+            {part.primaryComponent
+              ? part.primaryComponent.version
+              : `Uploaded at ${getFullDateAndTime(part.creationAt)}`}
+          </Text>
+        )
+      },
+      wrap: true
     },
     {
       id: 'SUPPLIER',
@@ -324,6 +315,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
                 <Tag
                   size={'md'}
                   key={index}
+                  fontSize={14}
                   variant='subtle'
                   colorScheme='orange'
                 >
@@ -343,22 +335,19 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       selector: (row) => {
         const { part } = row
         return (
-          <Link
-            to={`/vendor/products?&p=${part.project.id}&sbom=${part.id}&parts=true`}
+          <Tag
+            size='md'
+            variant='subtle'
+            width={16}
+            colorScheme={'blue'}
+            onClick={getComponents}
+            cursor={'pointer'}
           >
-            <Badge
-              variant='solid'
-              borderRadius='sm'
-              colorScheme='blue'
-              fontSize={'sm'}
-              fontWeight={'medium'}
-              onClick={() => getComponents(part)}
-            >
-              {part.stats.compCount}
-            </Badge>
-          </Link>
+            <TagLabel mx={'auto'}>{part.stats.compCount}</TagLabel>
+          </Tag>
         )
-      }
+      },
+      width: '150px'
     },
     {
       id: 'LICENSES',
@@ -366,111 +355,64 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       selector: (row) => {
         const { part } = row
         return (
-          <Badge
-            variant='solid'
-            borderRadius='sm'
-            colorScheme='blue'
-            fontSize={'sm'}
-            fontWeight={'medium'}
-          >
-            {part.stats.compLicenseCount}
-          </Badge>
+          <Tag size='md' variant='subtle' width={16} colorScheme={'blue'}>
+            <TagLabel mx={'auto'}> {part.stats.compLicenseCount}</TagLabel>
+          </Tag>
         )
-      }
+      },
+      width: '150px'
     },
     {
       id: 'VULNERABILITIES',
       name: 'VULNERABILITIES',
       selector: (row) => {
         const { part } = row
+        // const link = `/vendor/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`
         return (
           <Stack fontWeight={'medium'} direction={'row'}>
-            <Link
-              to={`/vendor/products?&p=${part.project.id}&sbom=${part.id}&parts=true`}
+            <VulnBadge
+              color='red'
+              label='Critical'
+              onClick={() => onFilterSev(['critical'])}
             >
-              <Tooltip label='Critical' placement='top'>
-                <Badge
-                  fontSize={'sm'}
-                  fontWeight={'medium'}
-                  variant='solid'
-                  colorScheme='red'
-                  borderRadius='sm'
-                  cursor={'pointer'}
-                  onClick={() => onFilterSev(part, ['critical'])}
-                >
-                  {part.stats.vulnStats.critical
-                    ? part.stats.vulnStats.critical
-                    : 0}
-                </Badge>
-              </Tooltip>
-            </Link>
-            <Link
-              to={`/vendor/products?&p=${part.project.id}&sbom=${part.id}&parts=true`}
+              {part.stats.vulnStats.critical
+                ? part.stats.vulnStats.critical
+                : 0}
+            </VulnBadge>
+            <VulnBadge
+              color='orange'
+              label='High'
+              onClick={() => onFilterSev(['high'])}
             >
-              <Tooltip label='High' placement='top'>
-                <Badge
-                  fontSize={'sm'}
-                  fontWeight={'medium'}
-                  variant='solid'
-                  colorScheme='orange'
-                  borderRadius='sm'
-                  cursor={'pointer'}
-                  onClick={() => onFilterSev(part, ['high'])}
-                >
-                  {part.stats.vulnStats.high ? part.stats.vulnStats.high : 0}
-                </Badge>
-              </Tooltip>
-            </Link>
-            <Link
-              to={`/vendor/products?&p=${part.project.id}&sbom=${part.id}&parts=true`}
+              {part.stats.vulnStats.high ? part.stats.vulnStats.high : 0}
+            </VulnBadge>
+            <VulnBadge
+              color='yellow'
+              label='Medium'
+              onClick={() => onFilterSev(['medium'])}
             >
-              <Tooltip label='Medium' placement='top'>
-                <Badge
-                  fontSize={'sm'}
-                  fontWeight={'medium'}
-                  variant='solid'
-                  colorScheme='yellow'
-                  borderRadius='sm'
-                  cursor={'pointer'}
-                  onClick={() => onFilterSev(part, ['medium'])}
-                >
-                  {part.stats.vulnStats.medium
-                    ? part.stats.vulnStats.medium
-                    : 0}
-                </Badge>
-              </Tooltip>
-            </Link>
-            <Link
-              to={`/vendor/products?&p=${part.project.id}&sbom=${part.id}&parts=true`}
+              {part.stats.vulnStats.medium ? part.stats.vulnStats.medium : 0}
+            </VulnBadge>
+            <VulnBadge
+              color='green'
+              label='Low'
+              onClick={() => onFilterSev(['low'])}
             >
-              <Tooltip label='Low' placement='top'>
-                <Badge
-                  fontSize={'sm'}
-                  fontWeight={'medium'}
-                  variant='solid'
-                  colorScheme='green'
-                  borderRadius='sm'
-                  cursor={'pointer'}
-                  onClick={() => onFilterSev(part, ['low'])}
-                >
-                  {part.stats.vulnStats.low ? part.stats.vulnStats.low : 0}
-                </Badge>
-              </Tooltip>
-            </Link>
+              {part.stats.vulnStats.low ? part.stats.vulnStats.low : 0}
+            </VulnBadge>
           </Stack>
         )
       },
-      width: '200px'
+      width: '250px'
     },
     {
       id: 'STATUS',
       name: 'STATUS',
       selector: (row) => {
         const { part } = row
-
         return (
-          <Tag size='sm' colorScheme='cyan' textTransform={'capitalize'}>
-            {part.lifecycle}
+          <Tag width={24} colorScheme='cyan' textTransform={'capitalize'}>
+            <TagLabel mx={'auto'}>{part.lifecycle}</TagLabel>
           </Tag>
         )
       }
@@ -479,7 +421,6 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       id: 'ACTION',
       name: 'ACTION',
       selector: (row) => {
-        const { partId } = row
         return (
           <Menu>
             <MenuButton
@@ -599,7 +540,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
             <ModalHeader>Add Parts</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              {productList && currentProduct.version ? (
+              {productList ? (
                 <Stack spacing={4} direction={'column'} gap={2}>
                   {/* Project */}
                   <FormControl fontSize={'sm'}>
@@ -633,7 +574,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
                     >
                       Version
                     </FormLabel>
-                    {filterVersion?.length === 0 ? (
+                    {sbomVersions?.length === 0 ? (
                       <Alert borderRadius={'md'} py={'8px'} status='info'>
                         <AlertIcon />
                         No version available
@@ -647,13 +588,11 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
                         onChange={(e) => setSelectedVersion(e.target.value)}
                       >
                         <option value={''}>-- Select --</option>
-                        {filterVersion
-                          ?.filter((item) => item.primaryComponent !== null)
-                          .map((item, index) => (
-                            <option key={index} value={item.id}>
-                              {item.primaryComponent.version}
-                            </option>
-                          ))}
+                        {sbomVersions.map((item, index) => (
+                          <option key={index} value={item.value}>
+                            {item.label}
+                          </option>
+                        ))}
                       </Select>
                     )}
                   </FormControl>

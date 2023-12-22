@@ -45,7 +45,7 @@ import SbomLicenseField from 'components/SbomLicenseField'
 const GeneralDataRow = ({ status, data, refetch }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
-  const productId = queryParams.get('p')
+  const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
 
   const {
@@ -91,6 +91,12 @@ const GeneralDataRow = ({ status, data, refetch }) => {
     isOpen: isSupOpen,
     onOpen: onSupOpen,
     onClose: onSupClose
+  } = useDisclosure()
+
+  const {
+    isOpen: isInfoOpen,
+    onOpen: onInfoOpen,
+    onClose: onInfoClose
   } = useDisclosure()
 
   const handleRefetch = () => {
@@ -471,9 +477,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
               <Td pl={0} fontWeight={'medium'}>
                 <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                   <Text>Data License</Text>
-                  <Tooltip label='Data licence is a legal arrangement between the creator of the data and the end-user, or the place the data will be deposited, specifying what users can do with the data'>
-                    <Icon as={InfoIcon} color={'blue.500'} />
-                  </Tooltip>
+                  <Icon as={InfoIcon} color={'blue.500'} onClick={onInfoOpen} cursor={'pointer'} />
                 </Flex>
               </Td>
               <Td pl={0}>
@@ -646,6 +650,43 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                 onClick={() => handleToolRemove(activeTool.id)}
               >
                 Delete
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      )}
+
+      {/* INFO MODAL */}
+      {isInfoOpen && (
+        <Modal
+          isOpen={isInfoOpen}
+          onClose={onInfoClose}
+          motionPreset='slideInBottom'
+        >
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Data Licenses</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Text>
+                Data licence is a legal arrangement between the creator of the
+                data and the end-user, or the place the data will be deposited,
+                specifying what users can do with the data
+              </Text>
+              <Link href='https://spdx.dev/about/overview' target='_blank'>
+                <Text mt={4} color='blue.500' fontWeight={'medium'}>
+                  Learn more about data licenses
+                </Text>
+              </Link>
+            </ModalBody>
+
+            <ModalFooter>
+              <Button
+                variant='unstyled'
+                colorScheme='red'
+                onClick={onInfoClose}
+              >
+                Close
               </Button>
             </ModalFooter>
           </ModalContent>

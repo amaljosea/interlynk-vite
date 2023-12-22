@@ -19,7 +19,7 @@ import {
   Text
 } from '@chakra-ui/react'
 // core components
-import { useHistory } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import Cookies from 'js-cookie'
 import { InterlynkLogo } from 'components/Icons/Icons'
 import DashboardBg from 'assets/img/dashboard.png'
@@ -27,7 +27,7 @@ import axios from 'axios'
 import { useState, useRef, useEffect } from 'react'
 
 export default function Auth() {
-  const history = useHistory()
+  const navigate = useNavigate()
   const navRef = useRef()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -39,7 +39,7 @@ export default function Auth() {
 
   useEffect(() => {
     if (authToken) {
-      history.push('/vendor/dashboard')
+      navigate('/vendor/dashboard')
     }
   }, [])
 
@@ -59,7 +59,7 @@ export default function Auth() {
           localStorage.setItem('username', status.data.user.name)
           localStorage.setItem('email', status.data.user.email)
           Cookies.set('authToken', response.headers.authorization)
-          history.push('/vendor/dashboard')
+          navigate('/vendor/dashboard')
         }
       })
       .catch((error) => {
@@ -159,6 +159,23 @@ export default function Auth() {
                   >
                     Log in
                   </Button>
+                  <Stack
+                    alignItems={'center'}
+                    justifyContent={'center'}
+                    direction={'row'}
+                    spacing={2}
+                  >
+                    <Text fontSize={'sm'}>{`Don't have an account ?`}</Text>
+                    <Link to={'/register'}>
+                      <Text
+                        fontSize='sm'
+                        color='blue.500'
+                        fontWeight={'medium'}
+                      >
+                        Register
+                      </Text>
+                    </Link>
+                  </Stack>
                 </Stack>
               </form>
             </Flex>

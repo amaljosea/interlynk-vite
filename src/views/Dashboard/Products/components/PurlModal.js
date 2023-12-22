@@ -79,7 +79,7 @@ const PurlModal = ({
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const sbomId = queryParams.get('sbom')
-  const productId = queryParams.get('p')
+  const productId = queryParams.get('id')
 
   const [purlType, setPurlType] = useState('')
   const [namespace, setNamespace] = useState('')

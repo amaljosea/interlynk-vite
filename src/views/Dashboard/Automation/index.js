@@ -9,7 +9,7 @@ import {
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import { useEffect, useState } from 'react'
-import { useLocation, useHistory } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import Controls from './components/Controls'
 import Settings from './components/Settings'
 import { useQuery } from '@apollo/client'
@@ -23,7 +23,7 @@ const idRegex =
 
 const Automation = () => {
   const location = useLocation()
-  const history = useHistory()
+  const navigate = useNavigate()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
 
@@ -42,7 +42,7 @@ const Automation = () => {
 
   useEffect(() => {
     if (!idRegex.test(productId)) {
-      history.push(`/vendor/products`)
+      navigate(`/vendor/products`)
     }
   }, [productId])
 

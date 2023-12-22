@@ -9,6 +9,20 @@ export const orgUpdate = gql`
   }
 `
 
+// CREATE ORGANIZATIOPN
+export const RegisterOrganization = gql`
+  mutation RegisterOrganization($name: String!, $url: String, $email: String) {
+    organizationCreate(input: { name: $name, url: $url, email: $email }) {
+      organization {
+        id
+        name
+        url
+      }
+      errors
+    }
+  }
+`
+
 // CREATE INTERNAL COMPONENT
 export const createOrgComp = gql`
   mutation createOrgComp($match: String!) {
@@ -537,6 +551,7 @@ export const CreateComponent = gql`
     $kind: String!
     $name: String!
     $version: String
+    $group: String
     $licenses: LicenseInput
     $cpes: [String!]
     $purl: String
@@ -550,6 +565,7 @@ export const CreateComponent = gql`
         kind: $kind
         name: $name
         version: $version
+        group: $group
         licenses: $licenses
         cpes: $cpes
         purl: $purl
@@ -562,6 +578,7 @@ export const CreateComponent = gql`
         id
         name
         version
+        group
         primary
         internal
         purl
@@ -579,6 +596,7 @@ export const UpdateComponent = gql`
     $kind: String
     $name: String
     $version: String
+    $group: String
     $licenses: LicenseInput
     $cpes: [String!]
     $purl: String
@@ -594,6 +612,7 @@ export const UpdateComponent = gql`
         kind: $kind
         name: $name
         version: $version
+        group: $group
         licenses: $licenses
         cpes: $cpes
         purl: $purl
@@ -607,6 +626,7 @@ export const UpdateComponent = gql`
         id
         name
         version
+        group
         kind
         primary
         internal
@@ -1371,6 +1391,41 @@ export const UploadProfileImage = gql`
           checksum
         }
       }
+      errors
+    }
+  }
+`
+
+// REGISTER USER
+export const RegisterUser = gql`
+  mutation RegisterUser(
+    $name: String
+    $email: String!
+    $password: String!
+    $passwordConfirmation: String!
+  ) {
+    userRegistration(
+      input: {
+        name: $name
+        email: $email
+        password: $password
+        passwordConfirmation: $passwordConfirmation
+      }
+    ) {
+      user {
+        name
+        email
+      }
+      errors
+    }
+  }
+`
+
+// SWITCH ORGANIZATION
+export const SwitchOrganization = gql`
+  mutation SwitchOrganization($orgId: Uuid!) {
+    organizationSwitch(input: { organizationId: $orgId }) {
+      token
       errors
     }
   }

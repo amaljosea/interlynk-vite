@@ -18,12 +18,32 @@ import MiniStatistics from './components/MiniStatistics'
 import ActivitiesOverview from './components/ActivitiesOverview'
 import ProductsOverview from './components/ProductsOverview'
 import RiskScoreOverview from './components/SalesOverview'
+import { GetOrg } from 'graphQL/Queries'
+import { useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
+import { useQuery } from '@apollo/client'
 
 export default function Dashboard() {
+  const navigate = useNavigate()
   const iconBoxInside = useColorModeValue('white', 'white')
 
+  const { data } = useQuery(GetOrg)
+
+  useEffect(() => {
+    if (data) {
+      if (data.organization === null) {
+        navigate('/vendor/settings?tab=organization')
+      }
+    }
+  }, [data])
+
   return (
-    <Flex flexDirection='column' pt={{ base: '120px', md: '70px' }} pr={2} pl={5}>
+    <Flex
+      flexDirection='column'
+      pt={{ base: '120px', md: '70px' }}
+      pr={2}
+      pl={5}
+    >
       <Grid
         templateColumns={{ sm: '1fr', lg: '1fr' }}
         templateRows={{ sm: '1fr', lg: '1fr' }}

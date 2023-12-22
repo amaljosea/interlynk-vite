@@ -17,12 +17,10 @@ import {
   TagLabel,
   Grid,
   GridItem,
-  HStack,
   TagCloseButton,
   Link,
   Button,
   Divider,
-  Select,
   VStack
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
@@ -34,25 +32,23 @@ import {
   FaLightbulb,
   FaSitemap
 } from 'react-icons/fa'
-import { timeSince, GetIcon } from 'utils'
+import { timeSince, GetIcon, getFullDateAndTime, customStyles } from 'utils'
 import { useState, useMemo, useRef, useEffect, useContext } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import ComponentModal from 'views/Sbom/components/ComponentModal'
 import SupplierModal from 'views/Sbom/components/SupplierModal'
 import LinksDrawer from 'components/Drawer/LinksDrawer'
 import styled from '@emotion/styled'
 import { useLazyQuery, useMutation } from '@apollo/client'
+import { GetComponentPath, GetCompDependency } from 'graphQL/Queries'
 import { deleteComSupplier } from 'graphQL/Mutation'
 import CompFilterMenu from 'views/Sbom/components/CompFilterMenu'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
-import { getFullDateAndTime, customStyles } from 'utils'
 import GlobalContext from 'context/GlobalContext'
 import CustomLoader from 'components/CustomLoader'
 import RelationshipDrawer from 'components/Drawer/RelationshipDrawer'
 import RowLimit from 'views/Sbom/components/RowLimit'
-import { GetComponentPath } from 'graphQL/Queries'
-import { GetCompDependency } from 'graphQL/Queries'
 
 const ComponentTable = ({
   lifecycle,
@@ -64,12 +60,13 @@ const ComponentTable = ({
   setTotalRows,
   filterRefetch
 }) => {
+  const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const customerView = location.pathname.startsWith('/customer')
-  const productId = queryParams.get('p')
+  const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
-
+  const currentProduct = JSON.parse(localStorage.getItem(`product`))
   const x = window.matchMedia('(min-width: 2500px)')
   const y = window.matchMedia('(max-width: 1440px)')
 
@@ -100,12 +97,11 @@ const ComponentTable = ({
     setCompBefore,
     setCustomList,
     setCustomLicense,
-    compAfter,
-    compBefore
+    setActiveProdTab
   } = useContext(GlobalContext)
 
-  const fetchCompData = () => {
-    refetch({
+  const fetchCompData = async () => {
+    await refetch({
       variables: {
         projectId: productId,
         sbomId: sbomId,
@@ -136,6 +132,12 @@ const ComponentTable = ({
         direction: compDirection
       }
     })
+      .then((res) => {
+        if (res.data) {
+          navigate(`/vendor/products/${currentProduct.name}?id=${productId}&sbom=${sbomId}`)
+        }
+      })
+      .finally(() => setActiveProdTab(2))
   }
 
   const [activeRow, setActiveRow] = useState(null)
@@ -721,7 +723,7 @@ const ComponentTable = ({
               gap={1}
               flexWrap={'wrap'}
             >
-              {cpes.length > 0 &&
+              {cpes?.length > 0 &&
                 cpes.map((item, index) => (
                   <Text key={index} fontSize={14}>
                     {item}

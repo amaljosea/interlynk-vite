@@ -9,6 +9,9 @@ import { Link } from 'react-router-dom'
 import VulnsFilters from 'views/Dashboard/Vulnerabilities/components/VulnsFilter'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
+const handleChange = (state) => {
+}
+
 const VulnsTable = ({ data }) => {
   const cvssColor = (cvss) => {
     if (cvss >= 9.0) {
@@ -32,7 +35,7 @@ const VulnsTable = ({ data }) => {
       selector: (row) => {
         const { vuln, id } = row
         return (
-          <Link to={`/vendor/vulnerabilities?&id=${id}`}>
+          <Link to={`/vendor/vulnerabilities?id=${id}`}>
             <Text fontSize='sm' color={'blue.500'}>
               {vuln.vulnId !== null ? `${vuln.vulnId}` : ''}
             </Text>
@@ -167,7 +170,7 @@ const VulnsTable = ({ data }) => {
     },
     // Products
     {
-      id: 'VULN_INFOS_EPSS_SCORES',
+      id: 'AFFECTS',
       name: 'AFFECTS',
       selector: (row) => {
         const { vuln } = row
@@ -184,7 +187,7 @@ const VulnsTable = ({ data }) => {
     },
     // Products
     {
-      id: 'VULN_INFOS_EPSS_SCORES',
+      id: 'RESOLVED',
       name: 'RESOLVED',
       selector: (row) => {
         const { vuln } = row
@@ -261,6 +264,8 @@ const VulnsTable = ({ data }) => {
           subHeaderComponent={subHeaderComponentMemo}
           responsive
           persistTableHead
+          selectableRows
+          onSelectedRowsChange={handleChange}
         />
       </Flex>
     </>

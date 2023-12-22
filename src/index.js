@@ -2,7 +2,13 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import * as Sentry from '@sentry/react'
 import TagManager from 'react-gtm-module'
-import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom'
+import {
+  BrowserRouter,
+  Route,
+  Redirect,
+  Routes,
+  Navigate
+} from 'react-router-dom'
 import './main.css'
 
 // import SBOMLayout from './layouts/SBOM.js'
@@ -16,6 +22,14 @@ import Cookies from 'js-cookie'
 import theme from 'theme/theme.js'
 import ContextWrapper from 'context/ContextWrapper'
 import { ChakraProvider } from '@chakra-ui/react'
+import Dashboard from 'views/Dashboard/Dashboard'
+import Products from 'views/Dashboard/Products'
+import ProductList from 'views/Dashboard/Products/ProductList'
+import ProductDetails from 'views/Dashboard/Products/ProductDetails'
+import Vulnerabilities from 'views/Dashboard/Vulnerabilities'
+import Licenses from 'views/Dashboard/Linceses'
+import Profile from 'views/Dashboard/Profile'
+import Success from 'layouts/Success'
 
 const authToken = Cookies.get('authToken')
 
@@ -52,17 +66,44 @@ ReactDOM.render(
       <ContextWrapper>
         <ChakraProvider theme={theme} resetCSS={true}>
           <ScrollToTop />
-          <Switch>
-            <Route path={`/auth`} component={AuthLayout} />
-            <Route path={`/vendor`} component={AdminLayout} />
-            <Route path={`/login`} component={LoginLayout} />
-            <Route path={`/customer`} component={CustomerLayout} />
-            <Route path={`/register`} component={Register} />
-            <Redirect
-              from={`/`}
-              to={authToken ? '/vendor/dashboard' : '/auth'}
+          <Routes>
+            <Route
+              path=''
+              element={
+                authToken ? (
+                  <Navigate replace to='/vendor/dashboard' />
+                ) : (
+                  <Navigate replace to='/auth' />
+                )
+              }
             />
-          </Switch>
+            <Route path={`auth`} element={<AuthLayout />} />
+            <Route path={`register`} element={<Register />} />
+            <Route path={`success`} element={<Success />} />
+            <Route path={`vendor`} element={<AdminLayout />}>
+              <Route
+                path=''
+                element={
+                  location.pathname === '/vendor' ? (
+                    <Navigate replace to='/vendor/dashboard' />
+                  ) : (
+                    <Navigate replace to={location.pathname} />
+                  )
+                }
+              />
+              <Route path={`dashboard`} element={<Dashboard />} />
+              <Route path={`products`} element={<Products />}>
+                <Route index element={<ProductList />} />
+                <Route path={`:name`} element={<ProductDetails />} />
+              </Route>
+              <Route path={`vulnerabilities`} element={<Vulnerabilities />} />
+              <Route path={`licenses`} element={<Licenses />} />
+              <Route path={`settings`} element={<Profile />} />
+            </Route>
+            <Route path={`login`} element={<LoginLayout />} />
+            <Route path={`customer`} element={<CustomerLayout />} />
+            <Route path={`register`} element={<Register />} />
+          </Routes>
         </ChakraProvider>
       </ContextWrapper>
     </BrowserRouter>

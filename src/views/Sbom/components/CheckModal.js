@@ -33,7 +33,7 @@ import {
   CreateAutomation
 } from 'graphQL/Mutation'
 import { useContext, useEffect, useState, useRef } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 const CheckModal = ({
   activeCheck,
@@ -46,10 +46,12 @@ const CheckModal = ({
   componentId,
   setPageIndex
 }) => {
+  const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
-  const productId = queryParams.get('p')
+  const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
+  const currentProduct = JSON.parse(localStorage.getItem(`product`))
 
   const compRef = useRef()
 
@@ -145,7 +147,7 @@ const CheckModal = ({
         })
         .finally(() => {
           setActiveProdTab(0)
-          window.location.reload()
+          navigate(`/vendor/products/${currentProduct.name}?id=${productId}`)
         })
     } catch (error) {
       console.log('Mutation error', error)
@@ -196,7 +198,6 @@ const CheckModal = ({
       const filterData = data?.sbom.components.nodes.filter((str) =>
         str.name.includes(value)
       )
-      console.log('filterData', filterData)
       setComponentList(filterData)
     }
   }

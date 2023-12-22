@@ -2,7 +2,8 @@
 import {
   ChevronDownIcon,
   ChevronUpIcon,
-  ExternalLinkIcon
+  ExternalLinkIcon,
+  InfoIcon
 } from '@chakra-ui/icons'
 import {
   Flex,
@@ -100,7 +101,8 @@ const VulnTable = ({
     signedVulnEpss,
     setSelectedVulns,
     setVulnAfter,
-    setVulnBefore
+    setVulnBefore,
+    setImportSbom
   } = useContext(GlobalContext)
 
   const textColor = useColorModeValue('gray.700', 'white')
@@ -907,6 +909,17 @@ const VulnTable = ({
         </Flex>
       )}
 
+      {/* EPSS INFO */}
+      <Stack mt={10} direction={'row'} spacing={2}>
+        <Icon as={InfoIcon} color={'blue.500'} />
+        <Text fontSize={'xs'}>
+          EPSS (Exploit Prediction Scoring System) measures how likely a
+          particular vulnerability is to be exploited in the wild. EPSS scores
+          range from 0% (the lowest probability of exploitation) to 100% (the
+          highest probability of exploitation).
+        </Text>
+      </Stack>
+
       {/* COPY DATA TABLE */}
       {isTableOpen && data && (
         <Drawer
@@ -917,7 +930,7 @@ const VulnTable = ({
         >
           <DrawerOverlay />
           <DrawerContent>
-            <DrawerCloseButton />
+            <DrawerCloseButton onClick={() => setImportSbom([])} />
             <DrawerHeader>
               <Text fontSize={20} fontWeight={'medium'}>
                 Import Vulnerability Status
@@ -931,6 +944,7 @@ const VulnTable = ({
                 currentSbomId={sbomId}
                 currentProductId={productId}
                 onClose={onTableClose}
+                refetch={refetch}
               />
             </DrawerBody>
           </DrawerContent>

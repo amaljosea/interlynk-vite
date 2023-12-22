@@ -48,7 +48,7 @@ const CpeModal = ({
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const sbomId = queryParams.get('sbom')
-  const productId = queryParams.get('p')
+  const productId = queryParams.get('id')
 
   const [vendor, setVendor] = useState('')
   const [vendorList, setVendorList] = useState([])
@@ -248,10 +248,14 @@ const CpeModal = ({
   // ON HARDWARE CHANGE
   const handleHardwareChange = (e) => {
     const { value } = e.target
+    const cpeParts = cpeString.split(':')
     setHardware(value)
     if (value !== '') {
-      const cpeParts = cpeString.split(':')
       cpeParts[6] = value
+      const cpe = cpeParts.join(':')
+      setCpeString(cpe)
+    } else {
+      cpeParts[6] = '*'
       const cpe = cpeParts.join(':')
       setCpeString(cpe)
     }

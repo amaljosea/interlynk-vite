@@ -47,7 +47,7 @@ const UpdateRule = ({ isOpen, onClose, data, refetch, productId }) => {
         compVersion: compVersion
       }
     })
-      .then((res) => res.data && refetch())
+      .then((res) => res.data && refetch({ variables: { id: productId } }))
       .finally(() => onClose())
   }
 
