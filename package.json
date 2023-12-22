@@ -15,7 +15,7 @@
     "@sentry/react": "^7.81.0",
     "@testing-library/react": "^12.1.5",
     "@testing-library/react-hooks": "^8.0.1",
-    "apexcharts": "^3.44.0",
+    "apexcharts": "^3.45.0",
     "apollo-upload-client": "^17.0.0",
     "axios": "^1.6.0",
     "chakra-ui-steps": "^1.1.3",
