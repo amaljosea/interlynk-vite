@@ -1,5 +1,5 @@
 // Chakra imports
-import { Flex, Text } from '@chakra-ui/react'
+import { Flex, Heading, Text } from '@chakra-ui/react'
 import { useContext, useEffect } from 'react'
 import Card from 'components/Card/Card'
 import GlobalContext from 'context/GlobalContext'
@@ -9,6 +9,7 @@ import { useLocation } from 'react-router-dom'
 import ProductTable from 'components/Tables/ProductTable'
 
 import { useGlobalState } from 'hooks/useGlobalState'
+import OrgRegister from '../Profile/components/OrgRegister'
 
 function ProductList() {
   const { totalRows, prodState, dispatch } = useGlobalState()
@@ -37,7 +38,7 @@ function ProductList() {
   })
 
   useEffect(() => {
-    if (data && !error) {
+    if (data && data.projects && !error) {
       prodDispatch({
         type: 'SET_TOTAL_PRODUCT',
         payload: data.projects.totalCount
@@ -62,6 +63,10 @@ function ProductList() {
         </Text>
       </Flex>
     )
+  }
+
+  if (!data || !data.projects) {
+    return <OrgRegister />
   }
 
   return (

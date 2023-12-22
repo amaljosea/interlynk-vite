@@ -74,7 +74,7 @@ const ProductsOverview = ({ title }) => {
                 </Tr>
               </Thead>
               <Tbody>
-                {data &&
+                {data && data.images &&
                   data.images.nodes.map((item) => (
                     <Tr key={item.id}>
                       <Td fontSize={'sm'} pl={1}>
@@ -141,7 +141,7 @@ const ProductsOverview = ({ title }) => {
               </Tbody>
             </Table>
           </CardBody>
-          {data && (
+          {data && data.images && (
             <Flex
               flexDir={'row'}
               gap={4}

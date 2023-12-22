@@ -31,8 +31,10 @@ const PersonalInfo = ({ user, refetch }) => {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    setName(user.name)
-    setEmail(user.email)
+    if (user) {
+      setName(user.name)
+      setEmail(user.email)
+    }
   }, [user])
 
   const handleNameChange = (e) => {

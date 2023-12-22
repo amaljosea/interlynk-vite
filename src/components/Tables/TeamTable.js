@@ -64,9 +64,7 @@ const TeamTable = ({ data, refetch }) => {
             <Box width={'30px'}>
               <Avatar
                 me={{ md: '22px' }}
-                src={
-                  profileImage && `${SERVER_URL}/${profileImage?.url}`
-                }
+                src={profileImage && `${SERVER_URL}/${profileImage?.url}`}
                 w='30px'
                 h='30px'
               />
@@ -208,7 +206,7 @@ const TeamTable = ({ data, refetch }) => {
         <Flex flexDir={'column'} width={'100%'}>
           <DataTable
             columns={columns}
-            data={data.users}
+            data={data.users || []}
             defaultSortAsc={false}
             defaultSortFieldId={'joinedDate'}
             subHeader

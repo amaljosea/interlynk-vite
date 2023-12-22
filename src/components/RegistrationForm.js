@@ -14,14 +14,14 @@ import {
   Stack,
   Text
 } from '@chakra-ui/react'
-import { OrgRegistration } from 'graphQL/Mutation'
+import { RegisterUser } from 'graphQL/Mutation'
 import { useMutation } from '@apollo/client'
 import { Link, useNavigate } from 'react-router-dom'
 
 const RegistrationForm = () => {
   const navigate = useNavigate()
 
-  const [orgName, setOrgName] = useState('')
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [emailError, setEmailError] = useState('')
   const [password, setPassword] = useState('')
@@ -29,7 +29,7 @@ const RegistrationForm = () => {
   const [error, setError] = useState('')
   const [passError, setPassError] = useState('')
 
-  const [orgRegister] = useMutation(OrgRegistration)
+  const [orgRegister] = useMutation(RegisterUser)
 
   const validateEmail = (email) => {
     const emailRegex =
@@ -38,7 +38,7 @@ const RegistrationForm = () => {
   }
 
   const isInvalid =
-    orgName === '' ||
+    name === '' ||
     email === '' ||
     password === '' ||
     confirmPassword === '' ||
@@ -60,12 +60,12 @@ const RegistrationForm = () => {
   const handleSubmit = () => {
     orgRegister({
       variables: {
-        name: orgName,
-        userEmail: email,
+        name: name,
+        email: email,
         password: password,
         passwordConfirmation: confirmPassword
       }
-    }).then((res) => res.data && navigate('/success'))
+    }).then((res) => res.data && navigate('/auth'))
   }
 
   return (
@@ -91,13 +91,13 @@ const RegistrationForm = () => {
       )}
 
       <Stack py={'1rem'} direction={'column'} gap={2} width={'100%'} mt={4}>
-        <FormControl isRequired>
-          <FormLabel htmlFor='organization'>Organization</FormLabel>
+        <FormControl>
+          <FormLabel htmlFor='organization'>Name</FormLabel>
           <Input
-            type='organization'
-            value={orgName}
-            onChange={(e) => setOrgName(e.target.value)}
-            placeholder='Interlynk'
+            type='text'
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder='Enter name'
             autoComplete='off'
           />
         </FormControl>
@@ -110,7 +110,7 @@ const RegistrationForm = () => {
               setEmail(e.target.value)
               setEmailError('')
             }}
-            placeholder='abc@example.com'
+            placeholder='Enter email address'
             autoComplete='off'
             onBlur={handleCheckEmail}
           />
