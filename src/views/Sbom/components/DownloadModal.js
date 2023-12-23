@@ -80,11 +80,7 @@ const DownloadModal = ({
         variables: {
           projectId: productId,
           sbomId: sbomId,
-          spec,
-          format,
-          includeVulns,
-          includeVex,
-          original: true
+          includeVulns
         }
       })
         .then((res) => {
@@ -118,11 +114,7 @@ const DownloadModal = ({
         variables: {
           projectId: productId,
           sbomId: sbomId,
-          spec,
-          format,
-          includeVulns,
-          includeVex,
-          original: true
+          includeVulns
         }
       })
         .then((res) => {

@@ -1180,20 +1180,12 @@ export const DownloadSBOM = gql`
   query downloadSbom(
     $projectId: Uuid!
     $sbomId: Uuid!
-    $spec: String
-    $format: String
     $includeVulns: Boolean
-    $includeVex: Boolean
-    $original: Boolean
   ) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
       download(
         sbomId: $sbomId
-        spec: $spec
-        format: $format
         includeVulns: $includeVulns
-        includeVex: $includeVex
-        original: $original
       )
     }
   }
