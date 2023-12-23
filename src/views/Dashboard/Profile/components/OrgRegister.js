@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 
 const OrgRegister = () => {
   return (
-    <Card p={20} alignItems={'center'} justifyContent={'center'}>
+    <Card p={20} alignItems={'center'} justifyContent={'center'} height={64}>
       <Heading
         textAlign={'center'}
         size='md'
