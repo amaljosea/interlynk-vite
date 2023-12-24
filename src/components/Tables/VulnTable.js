@@ -160,7 +160,7 @@ const VulnTable = ({
       selector: (row) => {
         const { vuln } = row
         const { vulnInfo } = vuln
-        const { kev } = vulnInfo
+        const { kev } = vulnInfo ? vulnInfo : ''
         return (
           <Flex direction='row' alignItems={'center'} gap={2}>
             <Link href={linkURl(vuln.source, vuln.vulnId)} target={'_blank'}>
@@ -276,7 +276,7 @@ const VulnTable = ({
       selector: (row) => {
         const { vuln } = row
         const { vulnInfo } = vuln
-        const { epssScores } = vulnInfo
+        const { epssScores } = vulnInfo ? vulnInfo : ''
 
         return (
           <Flex minWidth='max-content' alignItems='center' gap='0'>
@@ -289,11 +289,11 @@ const VulnTable = ({
               alignItems='center'
             >
               <TagLabel style={{ textAlign: 'center' }}>
-                {Math.ceil(epssScores[0] * 10000)}
+                {epssScores ? Math.ceil(epssScores[0] * 10000) : 0}
                 {/* {epssScores.length > 1 && `- ${epssScores[1]}`} */}
               </TagLabel>
             </Tag>
-            {epssScores.length > 1 ? (
+            {epssScores && epssScores.length > 1 ? (
               epssScores[0] > epssScores[epssScores.length - 1] ? (
                 <Tooltip
                   placement='top'

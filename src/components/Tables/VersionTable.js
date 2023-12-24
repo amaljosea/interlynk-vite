@@ -121,12 +121,11 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
                   id: id
                 })
               )
-              localStorage.setItem('activeSbomTab', 0)
               setActiveProdTab(0)
             }}
           >
             <Text color={'blue.500'} minWidth='100%' my={3} fontSize={14}>
-              {primaryComponent
+              {primaryComponent && primaryComponent.version
                 ? primaryComponent.version
                 : `Uploaded ${getFullDateAndTime(creationAt)}`}
             </Text>
