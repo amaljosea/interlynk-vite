@@ -375,7 +375,10 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
 
           {/* ROW LIMIT */}
           <RowLimit
-            onChange={(e) => setTotalRows(e.target.value)}
+            onChange={(e) => {
+              setTotalRows(e.target.value)
+              setCurrentPage(1)
+            }}
             name='componentRow'
           />
         </Flex>

@@ -1,15 +1,12 @@
 // Chakra imports
-import { Flex, Heading, Text } from '@chakra-ui/react'
-import { useContext, useEffect } from 'react'
-import Card from 'components/Card/Card'
-import GlobalContext from 'context/GlobalContext'
+import { Flex, Text } from '@chakra-ui/react'
+import { useEffect } from 'react'
 import { useQuery } from '@apollo/client'
 import { GetProjectData } from 'graphQL/Queries'
 import { useLocation } from 'react-router-dom'
 import ProductTable from 'components/Tables/ProductTable'
-
 import { useGlobalState } from 'hooks/useGlobalState'
-import OrgRegister from '../Profile/components/OrgRegister'
+import { GetOrg } from 'graphQL/Queries'
 
 function ProductList() {
   const { totalRows, prodState, dispatch } = useGlobalState()
@@ -21,8 +18,6 @@ function ProductList() {
     prodCheckDispatch,
     sbomLogDispatch
   } = dispatch
-
-  const { setTotalProducts } = useContext(GlobalContext)
 
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -36,6 +31,8 @@ function ProductList() {
       direction: direction
     }
   })
+
+  const { data: orgInfo } = useQuery(GetOrg)
 
   useEffect(() => {
     if (data && data.projects && !error) {
@@ -65,14 +62,16 @@ function ProductList() {
     )
   }
 
-  if (!data?.projects) {
-    return <OrgRegister />
-  }
-
   return (
-    <Card overflowX={{ sm: 'scroll', xl: 'hidden' }}>
-      <ProductTable data={data?.projects} refetch={refetch} />
-    </Card>
+    <>
+      {orgInfo && (
+        <ProductTable
+          data={data?.projects}
+          refetch={refetch}
+          org={orgInfo?.organization || null}
+        />
+      )}
+    </>
   )
 }
 

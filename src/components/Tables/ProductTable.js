@@ -48,8 +48,10 @@ import SearchFilter from 'views/Sbom/components/SearchFilter'
 import ProdFilterMenu from 'views/Dashboard/Products/components/ProdFilterMenu'
 import { useGlobalState } from 'hooks/useGlobalState'
 import ProdSearchFilter from 'views/Sbom/components/ProdSearchFilter'
+import OrgRegister from 'views/Dashboard/Profile/components/OrgRegister'
+import Card from 'components/Card/Card'
 
-const ProductTable = ({ data, refetch }) => {
+const ProductTable = ({ data, refetch, org }) => {
   const { totalRows, setTotalRows, prodState, dispatch } = useGlobalState()
   const { field, direction, searchInput, pageIndex } = prodState
   const { prodDispatch } = dispatch
@@ -542,72 +544,78 @@ const ProductTable = ({ data, refetch }) => {
 
   return (
     <>
-      <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
-          columns={columns}
-          onSort={handleSort}
-          data={data && data.nodes}
-          customStyles={customStyles}
-          defaultSortAsc={false}
-          defaultSortFieldId={field}
-          subHeader
-          subHeaderComponent={subHeaderComponent}
-          progressPending={data ? false : true}
-          progressComponent={<CustomLoader />}
-          responsive={true}
-          persistTableHead
-        />
+      {org ? (
+        <Card>
+          <Flex flexDir={'column'} width={'100%'}>
+            <DataTable
+              columns={columns}
+              onSort={handleSort}
+              data={data?.nodes}
+              customStyles={customStyles}
+              defaultSortAsc={false}
+              defaultSortFieldId={field}
+              subHeader
+              subHeaderComponent={subHeaderComponent}
+              progressPending={data ? false : true}
+              progressComponent={<CustomLoader />}
+              responsive={true}
+              persistTableHead
+            />
 
-        {data && (
-          <Flex
-            width={'100%'}
-            flexDir={'row'}
-            gap={4}
-            alignItems={'center'}
-            mt={6}
-            justifyContent={'space-between'}
-            flexWrap={'wrap'}
-          >
-            <Stack alignItems={'center'} direction={'row'} spacing={4}>
-              <Button
-                colorScheme='blue'
-                onClick={handlePreviousPage}
-                isDisabled={!data.pageInfo.hasPreviousPage}
+            {data && (
+              <Flex
+                width={'100%'}
+                flexDir={'row'}
+                gap={4}
+                alignItems={'center'}
+                mt={6}
+                justifyContent={'space-between'}
+                flexWrap={'wrap'}
               >
-                Prev
-              </Button>
-              <Button
-                colorScheme='blue'
-                onClick={handleNextPage}
-                isDisabled={!data.pageInfo.hasNextPage}
-              >
-                Next
-              </Button>
-              <Box>
-                Page {pageIndex} of{' '}
-                {data.totalCount === 0
-                  ? 1
-                  : Math.ceil(data.totalCount / totalRows)}
-              </Box>
-            </Stack>
+                <Stack alignItems={'center'} direction={'row'} spacing={4}>
+                  <Button
+                    colorScheme='blue'
+                    onClick={handlePreviousPage}
+                    isDisabled={!data.pageInfo.hasPreviousPage}
+                  >
+                    Prev
+                  </Button>
+                  <Button
+                    colorScheme='blue'
+                    onClick={handleNextPage}
+                    isDisabled={!data.pageInfo.hasNextPage}
+                  >
+                    Next
+                  </Button>
+                  <Box>
+                    Page {pageIndex} of{' '}
+                    {data.totalCount === 0
+                      ? 1
+                      : Math.ceil(data.totalCount / totalRows)}
+                  </Box>
+                </Stack>
 
-            <Stack alignItems={'center'} direction={'row'} spacing={4}>
-              <Text>Show</Text>
-              <Select
-                width={20}
-                value={totalRows}
-                onChange={handleSetRow}
-                id='rowlimit'
-                name='rowlimit'
-              >
-                <option value={25}>25</option>
-                <option value={50}>50</option>
-                <option value={100}>100</option>
-              </Select>
-            </Stack>
+                <Stack alignItems={'center'} direction={'row'} spacing={4}>
+                  <Text>Show</Text>
+                  <Select
+                    width={20}
+                    value={totalRows}
+                    onChange={handleSetRow}
+                    id='rowlimit'
+                    name='rowlimit'
+                  >
+                    <option value={25}>25</option>
+                    <option value={50}>50</option>
+                    <option value={100}>100</option>
+                  </Select>
+                </Stack>
+              </Flex>
+            )}
           </Flex>
-        )}
-      </Flex>
+        </Card>
+      ) : (
+        <OrgRegister />
+      )}
 
       {/* UPLOAD SBOM */}
       {isOpenUpload && (

@@ -65,6 +65,7 @@ import { UpdateProject, DeleteProject } from 'graphQL/Mutation'
 import { FaToggleOff } from 'react-icons/fa'
 import GlobalContext from 'context/GlobalContext'
 import { GetProjectLogs } from 'graphQL/Queries'
+import { removeDuplicates } from 'utils'
 
 const ProductDetails = () => {
   const navigate = useNavigate()
@@ -105,6 +106,8 @@ const ProductDetails = () => {
       }
     }
   )
+
+  const versionData = versions ? removeDuplicates(versions?.project?.sboms) : []
 
   const [getRules, { data: rules, error: rulesError }] = useLazyQuery(
     GetProjectCheck,
@@ -369,7 +372,7 @@ const ProductDetails = () => {
                                 fontWeight={'medium'}
                                 bg={'none'}
                               >
-                                {versions?.project?.sboms?.length}
+                                {versionData?.length}
                               </Badge>
                               <Text
                                 fontSize={'xs'}
