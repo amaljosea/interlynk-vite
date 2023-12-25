@@ -272,7 +272,7 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
                     onDeleteOpen()
                   }}
                 >
-                  Delete Version
+                  Delete
                 </MenuItem>
               </MenuList>
             </Portal>

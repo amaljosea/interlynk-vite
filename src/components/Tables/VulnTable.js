@@ -910,14 +910,12 @@ const VulnTable = ({
       )}
 
       {/* EPSS INFO */}
-      <Stack mt={10} direction={'row'} spacing={2}>
-        <Icon as={InfoIcon} color={'blue.500'} />
+      <Stack mt={10} direction={'row'} spacing={2} justifyContent={'flex-end'} textAlign={'right'}>
+        <Link href='https://www.first.org/epss/' target='_blank' fontSize={'xs'}>* EPSS (Exploit Prediction Scoring System) is an estimation of a vulnerability exploit.
         <Text fontSize={'xs'}>
-          EPSS (Exploit Prediction Scoring System) measures how likely a
-          particular vulnerability is to be exploited in the wild. EPSS scores
-          range from 0% (the lowest probability of exploitation) to 100% (the
-          highest probability of exploitation).
+          Interlynk scales EPSS by 10,000 for a more readable score.
         </Text>
+        </Link>
       </Stack>
 
       {/* COPY DATA TABLE */}
