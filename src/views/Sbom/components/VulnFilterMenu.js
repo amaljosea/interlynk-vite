@@ -12,68 +12,34 @@ import {
   Stack,
   useDisclosure
 } from '@chakra-ui/react'
-import GlobalContext from 'context/GlobalContext'
 import CheckMark from 'components/Misc/CheckMark'
-import { useContext, useRef } from 'react'
 import { FaFilter } from 'react-icons/fa'
 import Cookies from 'js-cookie'
+import { useGlobalState } from 'hooks/useGlobalState'
+import { useRef } from 'react'
 
-const VulnFilterMenu = ({
-  refetch,
-  productId,
-  sbomId,
-  setPageIndex,
-  totalRows,
-  setVulnAfter,
-  setVulnBefore
-}) => {
+const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
+  const { totalRows, prodVulnState, dispatch } = useGlobalState()
   const {
-    vulnFilters,
-    signedVulnFilters,
-    vulnField,
-    vulnDirection,
-    signedVulnField,
-    signedVulnDirection,
-    vulnSeverity,
-    setVulnSeverity,
-    vulnComponent,
-    setVulnComponent,
-    vulnStatus,
-    setVulnStatus,
-    vulnKev,
-    setVulnKev,
-    vulnEpss,
-    setVulnEpss,
-    minVal,
-    setMinVal,
-    maxVal,
-    setMaxVal,
-    signedVulnSeverity,
-    setSignedVulnSeverity,
-    signedVulnComponent,
-    setSignedVulnComponent,
-    signedVulnStatus,
-    setSignedVulnStatus,
-    signedVulnKev,
-    setSignedVulnKev,
-    signedVulnEpss,
-    setSignedVulnEpss,
-    signedMinVal,
-    setSignedMinVal,
-    signedMaxVal,
-    setSignedMaxVal
-  } = useContext(GlobalContext)
+    field,
+    direction,
+    severities,
+    components,
+    statues,
+    kev,
+    epss,
+    filters,
+    minEpss,
+    maxEpss
+  } = prodVulnState
+  const { prodVulnDispatch } = dispatch
 
   const minRef = useRef()
   const maxRef = useRef()
 
-  const customerView = location.pathname.startsWith('/customer')
-  const signedParams = Cookies.get(`signedParamId`)
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const { vulnCompNames, vulnStatuses } = customerView
-    ? signedVulnFilters
-    : vulnFilters
+  const { vulnCompNames, vulnStatuses, vulnSeverities } = filters
 
   const onMinKeyDown = (e) => {
     if (e.key === 'ArrowRight') {
@@ -90,21 +56,17 @@ const VulnFilterMenu = ({
   }
 
   const handleRefetch = async (severity, component, status, kev, epss) => {
-    const epssRange = (epss !== '' || epss !== '0-0') && epss.split('-')
-    // console.log('epss', epss)
+    const epssRange = epss !== 'all' && epss !== '' && epss.split('-')
 
     const range = {
       min: parseFloat(epssRange[0]) / 10000,
       max: parseFloat(epssRange[1]) / 10000
     }
 
-    // console.log('range', range)
-
     await refetch({
       variables: {
         projectId: productId,
         sbomId: sbomId,
-        signedParams: customerView ? signedParams : undefined,
         severity:
           !severity.includes('all') && severity.length > 0
             ? severity
@@ -116,138 +78,52 @@ const VulnFilterMenu = ({
         status:
           !status.includes('all') && status.length > 0 ? status : undefined,
         kev: kev === 'yes' ? true : kev === 'false' ? false : undefined,
-        epss:
-          epss === 'all' || epss === '0-0' || epss === '' ? undefined : range,
+        epss: epss === 'all' || epss === '' ? undefined : range,
         first: totalRows,
         last: undefined,
-        field: customerView ? signedVulnField : vulnField,
-        direction: customerView ? signedVulnDirection : vulnDirection
+        field: field,
+        direction: direction
       }
     })
   }
 
   const onFilterCompName = (value) => {
-    setVulnAfter('')
-    setVulnBefore('')
-    if (customerView) {
-      setSignedVulnComponent(value.includes('all') ? [] : value)
-      handleRefetch(
-        signedVulnSeverity,
-        value,
-        signedVulnStatus,
-        signedVulnKev,
-        signedVulnEpss
-      )
-    } else {
-      setVulnComponent(value.includes('all') ? [] : value)
-      handleRefetch(vulnSeverity, value, vulnStatus, vulnKev, vulnEpss)
-    }
-    setPageIndex(1)
+    handleRefetch(severities, value, statues, kev, epss)
+    prodVulnDispatch({
+      type: 'FILTER_COMPONENT',
+      payload: value
+    })
   }
 
   const onFilterSeverity = (value) => {
-    setVulnAfter('')
-    setVulnBefore('')
-    if (customerView) {
-      setSignedVulnSeverity(value.includes('all') ? [] : value)
-      handleRefetch(
-        value,
-        signedVulnComponent,
-        signedVulnStatus,
-        signedVulnKev,
-        signedVulnEpss
-      )
-    } else {
-      setVulnSeverity(value.includes('all') ? [] : value)
-      handleRefetch(value, vulnComponent, vulnStatus, vulnKev, vulnEpss)
-    }
-    setPageIndex(1)
+    handleRefetch(value, components, statues, kev, epss)
+    prodVulnDispatch({
+      type: 'FILTER_SEVERITY',
+      payload: value
+    })
   }
 
   const onFilterStatus = (value) => {
-    setVulnAfter('')
-    setVulnBefore('')
-    if (customerView) {
-      setSignedVulnStatus(value.includes('all') ? [] : value)
-      handleRefetch(
-        signedVulnSeverity,
-        signedVulnComponent,
-        value,
-        signedVulnKev,
-        signedVulnEpss
-      )
-    } else {
-      setVulnStatus(value.includes('all') ? [] : value)
-      handleRefetch(vulnSeverity, vulnComponent, value, vulnKev, vulnEpss)
-    }
-    setPageIndex(1)
+    handleRefetch(severities, components, value, kev, epss)
+    prodVulnDispatch({
+      type: 'FILTER_STATUS',
+      payload: value
+    })
   }
 
   const onFilterKev = (value) => {
-    setVulnAfter('')
-    setVulnBefore('')
-    if (customerView) {
-      setSignedVulnKev(value)
-      handleRefetch(
-        signedVulnSeverity,
-        signedVulnComponent,
-        signedVulnStatus,
-        value,
-        signedVulnEpss
-      )
-    } else {
-      setVulnKev(value)
-      handleRefetch(vulnSeverity, vulnComponent, vulnStatus, value, vulnEpss)
-    }
-    setPageIndex(1)
+    handleRefetch(severities, components, statues, value, epss)
+    prodVulnDispatch({ type: 'FILTER_KEV', payload: value })
   }
 
   const onFilterEpss = (value) => {
-    // console.log('vulnEpss', value)
-
-    setVulnAfter('')
-    setVulnBefore('')
-    setMinVal(0)
-    setMaxVal(10000)
-    if (customerView) {
-      setSignedVulnEpss(value)
-      handleRefetch(
-        signedVulnSeverity,
-        signedVulnComponent,
-        signedVulnStatus,
-        signedVulnKev,
-        value
-      )
-    } else {
-      setVulnEpss(value)
-      handleRefetch(vulnSeverity, vulnComponent, vulnStatus, vulnKev, value)
-    }
-    setPageIndex(1)
+    handleRefetch(severities, components, statues, kev, value)
+    prodVulnDispatch({ type: 'FILTER_EPSS', payload: value })
   }
 
   const handleSubmit = () => {
-    setVulnAfter('')
-    setVulnBefore('')
-    if (customerView) {
-      setSignedVulnEpss(`${signedMinVal}-${signedMaxVal}`)
-      handleRefetch(
-        signedVulnSeverity,
-        signedVulnComponent,
-        signedVulnStatus,
-        signedVulnKev,
-        `${signedMinVal}-${signedMaxVal}`
-      )
-    } else {
-      setVulnEpss(`${minVal}-${maxVal}`)
-      handleRefetch(
-        vulnSeverity,
-        vulnComponent,
-        vulnStatus,
-        vulnKev,
-        `${minVal}-${maxVal}`
-      )
-    }
-    setPageIndex(1)
+    handleRefetch(severities, components, statues, kev, `${minEpss}-${maxEpss}`)
+    prodVulnDispatch({ type: 'SET_EPSS', payload: `${minEpss}-${maxEpss}` })
     onClose()
   }
 
@@ -255,10 +131,8 @@ const VulnFilterMenu = ({
     <Stack direction={'row'} alignItems={'center'} gap={1}>
       {/* SEVERITY */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnBlur={true}>
-          {(vulnSeverity.length !== 0 || signedVulnSeverity.length !== 0) && (
-            <CheckMark />
-          )}
+        <Menu closeOnSelect={true}>
+          {severities.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -271,13 +145,13 @@ const VulnFilterMenu = ({
           <MenuList>
             <MenuOptionGroup
               type='checkbox'
-              value={customerView ? signedVulnSeverity : vulnSeverity}
+              value={severities}
               onChange={onFilterSeverity}
             >
               <MenuItemOption value={'all'} fontSize={'sm'}>
                 All
               </MenuItemOption>
-              {['critical', 'high', 'medium', 'low'].map((item, index) => (
+              {vulnSeverities?.map((item, index) => (
                 <MenuItemOption
                   key={index}
                   value={item}
@@ -294,9 +168,7 @@ const VulnFilterMenu = ({
       {/* COMPONENT NAME */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {(vulnComponent.length !== 0 || signedVulnComponent.length !== 0) && (
-            <CheckMark />
-          )}
+          {components.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -314,7 +186,7 @@ const VulnFilterMenu = ({
           >
             <MenuOptionGroup
               type='checkbox'
-              value={customerView ? signedVulnComponent : vulnComponent}
+              value={components}
               onChange={onFilterCompName}
             >
               <MenuItemOption value={'all'} fontSize={'sm'}>
@@ -337,9 +209,7 @@ const VulnFilterMenu = ({
       {/* STATUS */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {(vulnStatus.length !== 0 || signedVulnStatus.length !== 0) && (
-            <CheckMark />
-          )}
+          {statues.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -357,7 +227,7 @@ const VulnFilterMenu = ({
           >
             <MenuOptionGroup
               type='checkbox'
-              value={customerView ? signedVulnStatus : vulnStatus}
+              value={statues}
               onChange={onFilterStatus}
             >
               <MenuItemOption value={'all'} fontSize={'sm'}>
@@ -380,8 +250,7 @@ const VulnFilterMenu = ({
       {/* KEV */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {((vulnKev !== 'all' && vulnKev !== '') ||
-            (signedVulnKev !== 'all' && signedVulnKev !== '')) && <CheckMark />}
+          {kev !== 'all' && kev !== '' && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -392,11 +261,7 @@ const VulnFilterMenu = ({
             KEV
           </MenuButton>
           <MenuList>
-            <MenuOptionGroup
-              type='radio'
-              value={customerView ? signedVulnKev : vulnKev}
-              onChange={onFilterKev}
-            >
+            <MenuOptionGroup type='radio' value={kev} onChange={onFilterKev}>
               {['all', 'yes', 'no'].map((item, index) => (
                 <MenuItemOption
                   key={index}
@@ -414,8 +279,7 @@ const VulnFilterMenu = ({
       {/* EPSS */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true} isOpen={isOpen} onClose={onClose}>
-          {((vulnEpss !== '' && vulnEpss !== 'all') ||
-            signedVulnEpss !== '') && <CheckMark />}
+          {epss !== '' && epss !== 'all' && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -427,11 +291,7 @@ const VulnFilterMenu = ({
             EPSS*
           </MenuButton>
           <MenuList>
-            <MenuOptionGroup
-              type='radio'
-              value={customerView ? signedVulnEpss : vulnEpss}
-              onChange={onFilterEpss}
-            >
+            <MenuOptionGroup type='radio' value={epss} onChange={onFilterEpss}>
               <MenuItemOption value={'all'} fontSize={'sm'}>
                 All
               </MenuItemOption>
@@ -453,13 +313,14 @@ const VulnFilterMenu = ({
                   placeholder={'min'}
                   id='minValue'
                   name='minValue'
-                  value={customerView ? signedMinVal : minVal}
+                  value={minEpss}
                   ref={minRef}
                   onKeyDown={onMinKeyDown}
                   onChange={(e) =>
-                    customerView
-                      ? setSignedMinVal(e.target.value)
-                      : setMinVal(e.target.value)
+                    prodVulnDispatch({
+                      type: 'SET_MIN_EPSS',
+                      payload: e.target.value
+                    })
                   }
                 />
                 <Box>-</Box>
@@ -470,13 +331,14 @@ const VulnFilterMenu = ({
                   placeholder={'max'}
                   id='maxValue'
                   name='maxValue'
-                  value={customerView ? signedMaxVal : maxVal}
+                  value={maxEpss}
                   ref={maxRef}
                   onKeyDown={onMaxKeyDown}
                   onChange={(e) =>
-                    customerView
-                      ? setSignedMaxVal(e.target.value)
-                      : setMaxVal(e.target.value)
+                    prodVulnDispatch({
+                      type: 'SET_MAX_EPSS',
+                      payload: e.target.value
+                    })
                   }
                 />
               </Stack>
@@ -485,11 +347,7 @@ const VulnFilterMenu = ({
                 my={2}
                 size='sm'
                 onClick={handleSubmit}
-                isDisabled={
-                  Number(maxVal) <= Number(minVal) ||
-                  maxVal === 0 ||
-                  minVal === ''
-                }
+                isDisabled={Number(maxEpss) <= Number(minEpss) || maxEpss === 0}
               >
                 Submit
               </Button>

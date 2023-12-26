@@ -33,7 +33,7 @@ import {
   FaSitemap
 } from 'react-icons/fa'
 import { timeSince, GetIcon, getFullDateAndTime, customStyles } from 'utils'
-import { useState, useMemo, useRef, useEffect, useContext } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import ComponentModal from 'views/Sbom/components/ComponentModal'
@@ -44,22 +44,17 @@ import { useLazyQuery, useMutation } from '@apollo/client'
 import { GetComponentPath, GetCompDependency } from 'graphQL/Queries'
 import { deleteComSupplier } from 'graphQL/Mutation'
 import CompFilterMenu from 'views/Sbom/components/CompFilterMenu'
-import SearchFilter from 'views/Sbom/components/SearchFilter'
-import GlobalContext from 'context/GlobalContext'
 import CustomLoader from 'components/CustomLoader'
 import RelationshipDrawer from 'components/Drawer/RelationshipDrawer'
 import RowLimit from 'views/Sbom/components/RowLimit'
+import { useGlobalState } from 'hooks/useGlobalState'
+import SearchFilter from 'views/Sbom/components/SearchFilter'
+import { GetCompFilterData } from 'graphQL/Queries'
 
-const ComponentTable = ({
-  lifecycle,
-  data,
-  totalComp,
-  refetch,
-  primaryComp,
-  totalRows,
-  setTotalRows,
-  filterRefetch
-}) => {
+const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
+  // GET COMPONENT FILTER HEADS
+  const [getCompFilters] = useLazyQuery(GetCompFilterData)
+
   const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -70,78 +65,59 @@ const ComponentTable = ({
   const x = window.matchMedia('(min-width: 2500px)')
   const y = window.matchMedia('(max-width: 1440px)')
 
+  const { totalRows, setTotalRows, setActiveSbomTab, prodCompState, dispatch } =
+    useGlobalState()
   const {
-    setSpdxList,
-    setSpdxLicense,
-    setLicenseExp,
-    setLicenseType,
-    compSearchInput,
-    setCompSearchInput,
-    compEcosystem,
-    compType,
-    compLicense,
-    compSupplier,
-    compScope,
-    compFilters,
-    compField,
-    setCompField,
-    compDirection,
-    setCompDirection,
-    signedCompField,
-    signedCompDirection,
-    setSignedCompField,
-    setSignedCompDirection,
-    comPageIndex,
-    setComPageIndex,
-    setCompAfter,
-    setCompBefore,
-    setCustomList,
-    setCustomLicense,
-    setActiveProdTab
-  } = useContext(GlobalContext)
+    field,
+    direction,
+    pageIndex,
+    searchInput,
+    ecosystems,
+    kinds,
+    licenses,
+    suppliers,
+    scope,
+    filters
+  } = prodCompState
+  const { prodCompDispatch } = dispatch
 
   const fetchCompData = async () => {
     await refetch({
       variables: {
         projectId: productId,
         sbomId: sbomId,
-        search: compSearchInput !== '' ? compSearchInput : undefined,
+        search: searchInput !== '' ? searchInput : undefined,
         ecosystem:
-          compEcosystem.includes('all') || compEcosystem.length === 0
+          ecosystems.includes('all') || ecosystems.length === 0
             ? undefined
-            : compEcosystem,
-        kind:
-          compType.includes('all') || compType.length === 0
-            ? undefined
-            : compType,
+            : ecosystems,
+        kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
         licenses:
-          compLicense.includes('all') || compLicense.length === 0
+          licenses.includes('all') || licenses.length === 0
             ? undefined
-            : compLicense,
+            : licenses,
         supplierName:
-          compSupplier.includes('all') || compSupplier.length === 0
+          suppliers.includes('all') || suppliers.length === 0
             ? undefined
-            : compSupplier,
-        primary: compScope === 'primary' ? true : undefined,
-        internal: compScope === 'internal' ? true : undefined,
+            : suppliers,
+        primary: scope === 'primary' ? true : undefined,
+        internal: scope === 'internal' ? true : undefined,
         first: totalRows,
-        // after: compAfter !== '' ? compAfter : undefined,
-        // last: compBefore !== '' ? totalRows : undefined,
-        // before: compBefore !== '' ? compBefore : undefined,
-        field: compField,
-        direction: compDirection
+        field: field,
+        direction: direction
       }
     })
       .then((res) => {
         if (res.data) {
-          navigate(`/vendor/products/${currentProduct.name}?id=${productId}&sbom=${sbomId}`)
+          navigate(
+            `/vendor/products/${currentProduct.name}?id=${productId}&sbom=${sbomId}`
+          )
         }
       })
-      .finally(() => setActiveProdTab(2))
+      .finally(() => setActiveSbomTab(2))
   }
 
   const [activeRow, setActiveRow] = useState(null)
-
   const [filterText, setFilterText] = useState('')
 
   const compBtn = useRef(null)
@@ -190,41 +166,13 @@ const ComponentTable = ({
 
   const onLicenseOpen = (row) => {
     setActiveRow(row)
-    if (row.licenses && row.licenses.length > 0) {
-      setLicenseType('license_spdx')
-      const filterData = row.licenses.map((value) => ({
-        value: value,
-        label: value
-      }))
-      setSpdxList(filterData)
-      const selectedIds = filterData.map((option) => option.value)
-      setSpdxLicense(selectedIds)
-    } else if (row.licensesExp) {
-      setLicenseType('license_exp')
-      setLicenseExp(row.licensesExp)
-    } else if (row.licensesCustom && row.licensesCustom.length > 0) {
-      setLicenseType('license_custom')
-      const filterData = row.licensesCustom.map((option) => ({
-        value: option,
-        label: option
-      }))
-      setCustomList(filterData)
-      setCustomLicense(row.licensesCustom)
-    } else {
-      setLicenseType('license_spdx')
-      setSpdxList([])
-      setSpdxLicense([])
-      setLicenseExp('')
-      setCustomList([])
-      setCustomLicense([])
-    }
+    console.log('row',row);
+    prodCompDispatch({ type: 'SET_LICENSES', payload: row })
     onOpen()
   }
 
   const onCreateComponent = () => {
-    setLicenseType('license_spdx')
-    setSpdxList([])
-    setSpdxLicense([])
+    prodCompDispatch({ type: 'CLEAR_LICENSES' })
     onCompOpen()
   }
 
@@ -380,8 +328,8 @@ const ComponentTable = ({
                 <Tag
                   width={'fit-content'}
                   size={'sm'}
-                  variant='outline'
-                  colorScheme='blue'
+                  variant='subtle'
+                  colorScheme='cyan'
                 >
                   <TagLabel textTransform={'capitalize'}>Internal</TagLabel>
                 </Tag>
@@ -619,8 +567,8 @@ const ComponentTable = ({
               projectId: productId,
               sbomId: sbomId,
               first: totalRows,
-              field: compField,
-              direction: compDirection
+              field: field,
+              direction: direction
             }
           })
         }
@@ -794,73 +742,73 @@ const ComponentTable = ({
     )
   }
 
+  // ON SEARCH INPUT CHANGE
+  const onSearchInputChange = (e) => {
+    prodCompDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: e.target.value })
+  }
+
   // SEARCH COMPONENT
   const handleSearch = async (event) => {
-    if (event.key === 'Enter' && compSearchInput !== '') {
+    if (event.key === 'Enter' && searchInput !== '') {
       await refetch({
         variables: {
           projectId: productId,
           sbomId: sbomId,
-          search: compSearchInput !== '' ? compSearchInput : undefined,
+          search: searchInput !== '' ? searchInput : undefined,
           ecosystem:
-            compEcosystem.includes('all') || compEcosystem.length === 0
+            ecosystems.includes('all') || ecosystems.length === 0
               ? undefined
-              : compEcosystem,
-          kind:
-            compType.includes('all') || compType.length === 0
-              ? undefined
-              : compType,
+              : ecosystems,
+          kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
           licenses:
-            compLicense.includes('all') || compLicense.length === 0
+            licenses.includes('all') || licenses.length === 0
               ? undefined
-              : compLicense,
+              : licenses,
           supplierName:
-            compSupplier.includes('all') || compSupplier.length === 0
+            suppliers.includes('all') || suppliers.length === 0
               ? undefined
-              : compSupplier,
-          primary: compScope === 'primary' ? true : undefined,
-          internal: compScope === 'internal' ? true : undefined,
+              : suppliers,
+          primary: scope === 'primary' ? true : undefined,
+          internal: scope === 'internal' ? true : undefined,
           first: totalRows,
-          field: compField,
-          direction: compDirection
+          field: field,
+          direction: direction
         }
-      })
-      setComPageIndex(1)
+      }).then(
+        (res) => res.data && prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
+      )
     }
   }
 
   // CLEAR SERACH
   const handleClear = async () => {
-    setCompSearchInput('')
-    setComPageIndex(1)
     await refetch({
       variables: {
         projectId: productId,
         sbomId: sbomId,
         search: undefined,
         ecosystem:
-          compEcosystem.includes('all') || compEcosystem.length === 0
+          ecosystems.includes('all') || ecosystems.length === 0
             ? undefined
-            : compEcosystem,
-        kind:
-          compType.includes('all') || compType.length === 0
-            ? undefined
-            : compType,
+            : ecosystems,
+        kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
         licenses:
-          compLicense.includes('all') || compLicense.length === 0
+          licenses.includes('all') || licenses.length === 0
             ? undefined
-            : compLicense,
+            : licenses,
         supplierName:
-          compSupplier.includes('all') || compSupplier.length === 0
+          suppliers.includes('all') || suppliers.length === 0
             ? undefined
-            : compSupplier,
-        primary: compScope === 'primary' ? true : undefined,
-        internal: compScope === 'internal' ? true : undefined,
+            : suppliers,
+        primary: scope === 'primary' ? true : undefined,
+        internal: scope === 'internal' ? true : undefined,
         first: totalRows,
-        field: compField,
-        direction: compDirection
+        field: field,
+        direction: direction
       }
-    })
+    }).then(
+      (res) => res.data && prodCompDispatch({ type: 'CLEAR_SEARCH_INPUT' })
+    )
   }
 
   // SET ROW LENGTH
@@ -871,12 +819,12 @@ const ComponentTable = ({
         projectId: productId,
         sbomId: sbomId,
         first: Number(e.target.value),
-        field: customerView ? signedCompField : compField,
-        direction: customerView ? signedCompDirection : compDirection
+        field: customerView ? signedCompField : field,
+        direction: customerView ? signedCompDirection : direction
       }
-    })
-    setFilterText('')
-    setComPageIndex(1)
+    }).then(
+      (res) => res.data && prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
+    )
   }
 
   // HEADER SECTION
@@ -896,14 +844,14 @@ const ComponentTable = ({
           {/* SEARCH COMPONENTS */}
           <SearchFilter
             id='component'
-            filterText={compSearchInput}
-            setFilterText={setCompSearchInput}
+            filterText={searchInput}
             onFilter={handleSearch}
             onClear={handleClear}
+            onChange={onSearchInputChange}
           />
 
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
-          {compFilters && (
+          {filters && (
             <CompFilterMenu
               refetch={refetch}
               productId={productId}
@@ -929,7 +877,7 @@ const ComponentTable = ({
         )}
       </Flex>
     )
-  }, [compSearchInput, handleClear, handleSearch, compFilters])
+  }, [searchInput, onSearchInputChange, handleClear, handleSearch, filters])
 
   const handleRefetch = (after, before) => {
     refetch({
@@ -940,83 +888,102 @@ const ComponentTable = ({
         after: after ? after : undefined,
         last: before ? totalRows : undefined,
         before: before ? before : undefined,
-        search: compSearchInput !== '' ? compSearchInput : undefined,
+        search: searchInput !== '' ? searchInput : undefined,
         ecosystem:
-          compEcosystem.includes('all') || compEcosystem.length === 0
+          ecosystems.includes('all') || ecosystems.length === 0
             ? undefined
-            : compEcosystem,
-        kind:
-          compType.includes('all') || compType.length === 0
-            ? undefined
-            : compType,
+            : ecosystems,
+        kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
         licenses:
-          compLicense.includes('all') || compLicense.length === 0
+          licenses.includes('all') || licenses.length === 0
             ? undefined
-            : compLicense,
+            : licenses,
         supplierName:
-          compSupplier.includes('all') || compSupplier.length === 0
+          suppliers.includes('all') || suppliers.length === 0
             ? undefined
-            : compSupplier,
-        primary: compScope === 'primary' ? true : undefined,
-        internal: compScope === 'internal' ? true : undefined,
-        field: customerView ? signedCompField : compField,
-        direction: customerView ? signedCompDirection : compDirection
+            : suppliers,
+        primary: scope === 'primary' ? true : undefined,
+        internal: scope === 'internal' ? true : undefined,
+        field: customerView ? signedCompField : field,
+        direction: customerView ? signedCompDirection : direction
       }
     })
   }
 
-  const handleSort = (column, sortDirection) => {
-    if (customerView) {
-      setSignedCompField(column.id)
-      setSignedCompDirection(sortDirection === 'asc' ? 'ASC' : 'DESC')
-    } else {
-      setCompField(column.id)
-      setCompDirection(sortDirection === 'asc' ? 'ASC' : 'DESC')
-    }
-
+  const handleSort = async (column, sortDirection) => {
     refetch({
       variables: {
         projectId: productId,
         sbomId: sbomId,
         first: totalRows,
-        search: compSearchInput !== '' ? compSearchInput : undefined,
+        search: searchInput !== '' ? searchInput : undefined,
         ecosystem:
-          compEcosystem.includes('all') || compEcosystem.length === 0
+          ecosystems.includes('all') || ecosystems.length === 0
             ? undefined
-            : compEcosystem,
-        kind:
-          compType.includes('all') || compType.length === 0
-            ? undefined
-            : compType,
+            : ecosystems,
+        kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
         licenses:
-          compLicense.includes('all') || compLicense.length === 0
+          licenses.includes('all') || licenses.length === 0
             ? undefined
-            : compLicense,
+            : licenses,
         supplierName:
-          compSupplier.includes('all') || compSupplier.length === 0
+          suppliers.includes('all') || suppliers.length === 0
             ? undefined
-            : compSupplier,
-        primary: compScope === 'primary' ? true : undefined,
-        internal: compScope === 'internal' ? true : undefined,
+            : suppliers,
+        primary: scope === 'primary' ? true : undefined,
+        internal: scope === 'internal' ? true : undefined,
         field: column.id,
         direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+      }
+    }).then((res) => {
+      if (res.data) {
+        prodCompDispatch({
+          type: 'SET_SORT_ORDER',
+          payload: {
+            field: column.id,
+            direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+          }
+        })
       }
     })
   }
 
   const handlePreviousPage = async () => {
-    setComPageIndex((prev) => comPageIndex !== 0 && prev - 1)
-    setCompBefore(data.pageInfo.startCursor)
-    setCompAfter('')
+    prodCompDispatch({
+      type: 'DECREMENT_PAGE',
+      payload: data.pageInfo.startCursor
+    })
     handleRefetch(null, data.pageInfo.startCursor)
   }
 
   const handleNextPage = async () => {
-    setComPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
-    setCompAfter(data.pageInfo.endCursor)
-    setCompBefore('')
+    prodCompDispatch({
+      type: 'INCREMENT_PAGE',
+      payload: {
+        total: data.totalCount,
+        after: data.pageInfo.endCursor
+      }
+    })
     handleRefetch(data.pageInfo.endCursor, null)
   }
+
+  useEffect(() => {
+    if (data) {
+      getCompFilters({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId
+        }
+      }).then((res) => {
+        if (res.data) {
+          prodCompDispatch({
+            type: 'ADD_FILTER_HEADS',
+            payload: res.data.sbom.filters
+          })
+        }
+      })
+    }
+  }, [data])
 
   return (
     <>
@@ -1027,7 +994,7 @@ const ComponentTable = ({
           onSort={handleSort}
           customStyles={customStyles}
           defaultSortAsc={false}
-          defaultSortFieldId={customerView ? signedCompField : compField}
+          defaultSortFieldId={customerView ? signedCompField : field}
           progressPending={data ? false : true}
           progressComponent={<CustomLoader />}
           subHeader
@@ -1067,7 +1034,7 @@ const ComponentTable = ({
               Next
             </Button>
             <Box>
-              Page {comPageIndex} of{' '}
+              Page {pageIndex} of{' '}
               {data.totalCount === 0
                 ? 1
                 : Math.ceil(data.totalCount / totalRows)}
@@ -1088,7 +1055,7 @@ const ComponentTable = ({
               isOpen={isOpen}
               onClose={onClose}
               fetchCompData={fetchCompData}
-              filterRefetch={filterRefetch}
+              filterRefetch={getCompFilters}
               shortDesc={null}
               checkId={null}
               primaryComp={primaryComp}
@@ -1108,7 +1075,7 @@ const ComponentTable = ({
             <SupplierModal
               id={activeRow.id}
               refetch={fetchCompData}
-              filterRefetch={filterRefetch}
+              filterRefetch={getCompFilters}
               isOpen={isSupOpen}
               onClose={onSupClose}
               data={activeRow}
@@ -1149,7 +1116,7 @@ const ComponentTable = ({
           isOpen={isCompOpen}
           onClose={onCompClose}
           fetchCompData={fetchCompData}
-          filterRefetch={filterRefetch}
+          filterRefetch={getCompFilters}
           primaryComp={primaryComp}
           shortDesc={null}
           checkId={null}

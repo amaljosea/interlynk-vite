@@ -26,7 +26,6 @@ import {
   FormLabel,
   Stack
 } from '@chakra-ui/react'
-import GlobalContext from 'context/GlobalContext'
 import {
   CreateAutomation,
   toolDelete,
@@ -36,7 +35,8 @@ import {
   authorCreate,
   toolCreate
 } from 'graphQL/Mutation'
-import { useContext, useState, useEffect } from 'react'
+import { useGlobalState } from 'hooks/useGlobalState'
+import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { getFullDateAndTime, timeSince } from 'utils'
 
@@ -48,7 +48,6 @@ const GeneralDataDrawer = ({
   selectedKey,
   refetch,
   checkId,
-  setPageIndex,
   filterRefetch
 }) => {
   const toast = useToast()
@@ -57,7 +56,8 @@ const GeneralDataDrawer = ({
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
 
-  const { setCheckFilters } = useContext(GlobalContext)
+  const { dispatch } = useGlobalState()
+  const { prodCheckDispatch } = dispatch
 
   const [toolName, setToolName] = useState('')
   const [toolVersion, setToolVersion] = useState('')
@@ -104,7 +104,12 @@ const GeneralDataDrawer = ({
     filterRefetch({
       projectId: productId,
       sbomId: sbomId
-    }).then((res) => setCheckFilters(res.data.sbom.filters))
+    }).then((res) =>
+      prodCheckDispatch({
+        type: 'ADD_FILTER_HEADS',
+        payload: res.data.sbom.filters
+      })
+    )
   }
 
   useEffect(() => {
@@ -239,7 +244,7 @@ const GeneralDataDrawer = ({
     }
 
     if (checkId && (creationTools.length > 0 || authorList.length > 0)) {
-      setPageIndex(1)
+      prodCheckDispatch({ type: 'FETCH_DATA_SUCCESS' })
       healthRecheck({
         variables: {
           checkId: checkId,

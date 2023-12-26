@@ -1,5 +1,5 @@
 // Chakra imports
-import React, { useState, useContext, useRef } from 'react'
+import React, { useState, useRef } from 'react'
 import {
   Drawer,
   DrawerBody,
@@ -37,7 +37,6 @@ import {
 } from '@chakra-ui/react'
 import { useLazyQuery, useMutation } from '@apollo/client'
 import { sbomCreate, CreateComponent } from 'graphQL/Mutation'
-import GlobalContext from 'context/GlobalContext'
 import LicenseField from 'components/LicenseField'
 import { CheckIcon, InfoIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import CpeInput from 'components/CpeInput'
@@ -46,20 +45,16 @@ import { PackageURL } from 'packageurl-js'
 import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import { CpeAutoComplete } from 'graphQL/Queries'
+import { useGlobalState } from 'hooks/useGlobalState'
 
 function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
   const toast = useToast()
 
-  const {
-    prodField,
-    prodDirection,
-    licenseType,
-    spdxLicense,
-    totalRows,
-    customLicense,
-    setPurlString,
-    licenseExp
-  } = useContext(GlobalContext)
+  const { totalRows, prodState, prodCompState, dispatch } = useGlobalState()
+  const { field, direction } = prodState
+  const { licenseType, spdxLicenses, customLicenses, expLicense } =
+    prodCompState
+  const { prodCompDispatch } = dispatch
 
   const [sbomName, setSbomName] = useState('')
   const [version, setVersion] = useState('')
@@ -122,9 +117,12 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
     if (purlValue && purlValue !== '' && isPURLInputValid) {
       const pkg = PackageURL.fromString(purlValue)
       setPurlData(pkg)
-      setPurlString(pkg.toString())
+      prodCompDispatch({ type: 'SET_PURL_STRING', payload: pkg.toString() })
     } else {
-      setPurlString('pkg:type/name@version?key=value')
+      prodCompDispatch({
+        type: 'SET_PURL_STRING',
+        payload: 'pkg:type/name@version?key=value'
+      })
     }
     onPurlOpen()
   }
@@ -204,8 +202,8 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
   const handleRefetch = () => {
     refetch({
       first: totalRows,
-      field: prodField,
-      direction: prodDirection
+      field: field,
+      direction: direction
     })
   }
 
@@ -223,17 +221,17 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
         group: groupInfo,
         scope: compScope,
         licenses:
-          spdxLicense.length === 0 &&
-          licenseExp === '' &&
-          customLicense.length === 0
+          spdxLicenses.length === 0 &&
+          expLicense === '' &&
+          customLicenses.length === 0
             ? undefined
             : {
                 licenses:
-                  licenseType === 'license_spdx' ? spdxLicense : undefined,
+                  licenseType === 'license_spdx' ? spdxLicenses : undefined,
                 licensesExp:
-                  licenseType === 'license_exp' ? licenseExp : undefined,
+                  licenseType === 'license_exp' ? expLicense : undefined,
                 licensesCustom:
-                  licenseType === 'license_custom' ? customLicense : undefined
+                  licenseType === 'license_custom' ? customLicenses : undefined
               },
         cpes: cpeList,
         purl: purlValue,

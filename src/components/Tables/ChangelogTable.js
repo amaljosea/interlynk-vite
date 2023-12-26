@@ -3,17 +3,13 @@ import {
   Flex,
   Stack,
   Tag,
-  Input,
   Tooltip,
   Text,
-  Badge,
-  Skeleton,
   Box,
-  IconButton
 } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
-import GlobalContext from 'context/GlobalContext'
-import React, { useContext, useEffect, useMemo, useState } from 'react'
+import { useGlobalState } from 'hooks/useGlobalState'
+import React, { useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation } from 'react-router-dom'
 import { timeSince } from 'utils'
@@ -42,14 +38,9 @@ const setColor = (type) => {
 }
 
 const ChangelogTable = ({ data, refetch }) => {
-  const {
-    totalRows,
-    setTotalRows,
-    prodLogField,
-    setProdLogField,
-    prodLogDirection,
-    setProdLogDirection
-  } = useContext(GlobalContext)
+  const { prodLogState, dispatch } = useGlobalState()
+  const { totalRows, setTotalRows, field, direction, pageIndex } = prodLogState
+  const { prodLogDispatch } = dispatch
 
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -57,7 +48,6 @@ const ChangelogTable = ({ data, refetch }) => {
   const productId = queryParams.get('id')
 
   const [filterText, setFilterText] = useState('')
-  const [pageIndex, setPageIndex] = useState(1)
   const [userFilters, setUserFilters] = useState([])
   const [typeFilters, setTypeFilters] = useState([])
 
@@ -164,30 +154,41 @@ const ChangelogTable = ({ data, refetch }) => {
     }
   ]
 
-  const onPreviousPage = () => {
-    setPageIndex((prev) => pageIndex !== 0 && prev - 1)
-    refetch({
+  const onPreviousPage = async () => {
+    await refetch({
       variables: {
         id: productId,
         last: totalRows,
         before: data.pageInfo.startCursor,
-        field: prodLogField,
-        direction: prodLogDirection
+        field: field,
+        direction: direction
       }
-    })
+    }).then(
+      (res) =>
+        res.data &&
+        prodLogDispatch({
+          type: 'DECREMENT_PAGE'
+        })
+    )
   }
 
-  const onNextPage = () => {
-    setPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
-    refetch({
+  const onNextPage = async () => {
+    await refetch({
       variables: {
         id: productId,
         first: totalRows,
         after: data.pageInfo.endCursor,
-        field: prodLogField,
-        direction: prodLogDirection
+        field: field,
+        direction: direction
       }
-    })
+    }).then(
+      (res) =>
+        res.data &&
+        prodLogDispatch({
+          type: 'INCREMENT_PAGE',
+          payload: data.totalCount
+        })
+    )
   }
 
   // SEARCH COMPONENT
@@ -198,11 +199,16 @@ const ChangelogTable = ({ data, refetch }) => {
           id: productId,
           search: filterText,
           first: totalRows,
-          field: prodLogField,
-          direction: prodLogDirection
+          field: field,
+          direction: direction
         }
-      })
-      setPageIndex(1)
+      }).then(
+        (res) =>
+          res.data &&
+          prodLogDispatch({
+            type: 'FETCH_DATA_SUCCESS'
+          })
+      )
     }
   }
 
@@ -213,24 +219,36 @@ const ChangelogTable = ({ data, refetch }) => {
         id: productId,
         search: undefined,
         first: totalRows,
-        field: prodLogField,
-        direction: prodLogDirection
+        field: field,
+        direction: direction
       }
-    })
-    setFilterText('')
-    setPageIndex(1)
+    }).then(
+      (res) =>
+        res.data &&
+        prodLogDispatch({
+          type: 'FETCH_DATA_SUCCESS'
+        })
+    )
   }
 
   // SORTING
-  const handleSort = (column, sortDirection) => {
-    setProdLogField(column.id)
-    setProdLogDirection(sortDirection === 'asc' ? 'ASC' : 'DESC')
-    refetch({
+  const handleSort = async (column, sortDirection) => {
+    await refetch({
       variables: {
         id: productId,
         first: totalRows,
         field: column.id,
         direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+      }
+    }).then((res) => {
+      if (res.data) {
+        prodLogDispatch({
+          type: 'SET_SORT_ORDER',
+          payload: {
+            field: column.id,
+            direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+          }
+        })
       }
     })
   }
@@ -242,12 +260,16 @@ const ChangelogTable = ({ data, refetch }) => {
       variables: {
         id: productId,
         first: Number(e.target.value),
-        field: prodLogField,
-        direction: prodLogDirection
+        field: field,
+        direction: direction
       }
-    })
-    setFilterText('')
-    setPageIndex(1)
+    }).then(
+      (res) =>
+        res.data &&
+        prodLogDispatch({
+          type: 'FETCH_DATA_SUCCESS'
+        })
+    )
   }
 
   const subHeaderComponentMemo = useMemo(() => {
@@ -276,7 +298,6 @@ const ChangelogTable = ({ data, refetch }) => {
             refetch={refetch}
             users={userFilters}
             actions={typeFilters}
-            setPageIndex={setPageIndex}
             totalRows={totalRows}
             id={productId}
           />
@@ -293,7 +314,7 @@ const ChangelogTable = ({ data, refetch }) => {
           data={data && data.nodes}
           customStyles={customStyles}
           defaultSortAsc={false}
-          defaultSortFieldId={prodLogField}
+          defaultSortFieldId={field}
           subHeader
           progressPending={data ? false : true}
           progressComponent={<CustomLoader />}

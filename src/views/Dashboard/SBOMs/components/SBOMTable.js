@@ -32,24 +32,20 @@ import {
 
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
-import SBOMLinkRow from 'components/Tables/SBOMLinkRow.js'
 import VulnerabilityRow from 'components/Tables/VulnerabilityRow.js'
-import React, { useContext, useEffect } from 'react'
-import GlobalContext from 'context/GlobalContext'
+import React, { useEffect } from 'react'
 import CardHeader from 'components/Card/CardHeader'
-import { useState, useRef } from 'react'
-import { AddIcon } from '@chakra-ui/icons'
+import { useState } from 'react'
 import { BiImport, BiExport } from 'react-icons/bi'
-import { BsFilterRight } from 'react-icons/bs'
-import SBOMDrawer from 'components/Drawer/SBOMDrawer'
 import { CSVLink } from 'react-csv'
 import { useMutation } from '@apollo/client'
 import { UpdateImageVersion } from 'graphQL/Mutation'
 import { ImageUpdate } from 'graphQL/Mutation'
 import { vuln_captions } from 'utils'
-import { FaEllipsisV, FaFilter } from 'react-icons/fa'
+import { FaEllipsisV } from 'react-icons/fa'
 import MultiStatusDrawer from 'components/Drawer/MultiStatusDrawer'
 import FilterMenu from './FilterMenu'
+import { useGlobalState } from 'hooks/useGlobalState'
 
 const SBOMTable = ({
   imageId,
@@ -67,7 +63,7 @@ const SBOMTable = ({
     setVulnerabilitiesData,
     setScanEnabled,
     scanEnabled
-  } = useContext(GlobalContext)
+  } = useGlobalState()
 
   const [allVulResult, setAllVulResult] = useState([])
 
@@ -93,12 +89,6 @@ const SBOMTable = ({
   const [filterData, setFilterData] = useState([])
 
   const [isLoading, setIsLoading] = useState(false)
-
-  const {
-    isOpen: isSBMOpen,
-    onOpen: setSBMOpen,
-    onClose: setSBMClose
-  } = useDisclosure()
 
   const {
     isOpen: isRefreshOpen,

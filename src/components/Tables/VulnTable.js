@@ -27,22 +27,25 @@ import {
   DrawerContent,
   DrawerCloseButton,
   IconButton,
-  Badge
+  Badge,
+  Skeleton
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
 import { FaCopy } from 'react-icons/fa6'
-import { useState, useMemo, useContext, useEffect } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import styled from '@emotion/styled'
 import ProdStatusDrawer from 'components/Drawer/ProdStatusDrawer'
 import VulnFilterMenu from 'views/Sbom/components/VulnFilterMenu'
 import { sevColor, timeSince, getFullDateAndTime } from 'utils'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
-import GlobalContext from 'context/GlobalContext'
 import CustomLoader from 'components/CustomLoader'
 import Cookies from 'js-cookie'
 import { customStyles } from 'utils'
 import RowLimit from 'views/Sbom/components/RowLimit'
 import ImportWizard from 'views/Sbom/components/ImportWizard'
+import { useGlobalState } from 'hooks/useGlobalState'
+import { useLazyQuery } from '@apollo/client'
+import { GetVulnFilterData } from 'graphQL/Queries'
 
 const statusColor = (status) => {
   if (status && status === 'Fixed') {
@@ -65,45 +68,29 @@ const VulnTable = ({
   refetch,
   productId,
   sbomId,
-  pageIndex,
-  setPageIndex,
   filteredData,
-  totalRows,
-  setTotalRows,
   filterRefetch
 }) => {
+  // GET VULN FILTER HEADS
+  const [getVulnFilters] = useLazyQuery(GetVulnFilterData)
+
   const customerView = location.pathname.startsWith('/customer')
   const signedParams = Cookies.get(`signedParamId`)
 
+  const { totalRows, setTotalRows, prodVulnState, dispatch } = useGlobalState()
   const {
-    vulnFilters,
-    vulnField,
-    setVulnField,
-    vulnDirection,
-    setVulnDirection,
-    signedVulnField,
-    setSignedVulnField,
-    signedVulnDirection,
-    setSignedVulnDirection,
-    vulnSearchInput,
-    setSignedVulnSearchInput,
-    setVulnSearchInput,
-    vulnSeverity,
-    vulnComponent,
-    vulnStatus,
-    vulnKev,
-    vulnEpss,
-    signedVulnSearchInput,
-    signedVulnSeverity,
-    signedVulnComponent,
-    signedVulnStatus,
-    signedVulnKev,
-    signedVulnEpss,
-    setSelectedVulns,
-    setVulnAfter,
-    setVulnBefore,
-    setImportSbom
-  } = useContext(GlobalContext)
+    pageIndex,
+    field,
+    direction,
+    searchInput,
+    severities,
+    components,
+    statues,
+    kev,
+    epss,
+    filters
+  } = prodVulnState
+  const { prodVulnDispatch } = dispatch
 
   const textColor = useColorModeValue('gray.700', 'white')
   const [hideColumn, setHideColumn] = useState(false)
@@ -135,20 +122,6 @@ const VulnTable = ({
       return `https://nvd.nist.gov/vuln/detail/${id}`
     }
   }
-
-  useEffect(() => {
-    const handleResize = () => {
-      const scaleThreshold = 1.1
-      const currentScale = window.devicePixelRatio
-      setHideColumn(currentScale > scaleThreshold)
-    }
-    window.addEventListener('resize', handleResize)
-    handleResize()
-
-    return () => {
-      window.removeEventListener('resize', handleResize)
-    }
-  }, [])
 
   // COLUMNS
   const columns = [
@@ -403,80 +376,50 @@ const VulnTable = ({
     }
   ]
 
-  const epssRange =
-    (vulnEpss !== '' || vulnEpss !== '0-0') && vulnEpss.split('-')
+  const vulnEpss = (epss !== 'all' || epss !== '') && epss?.split('-')
+
   const range = {
-    min: parseFloat(epssRange[0]) / 10000,
-    max: parseFloat(epssRange[1]) / 10000
+    min: parseFloat(vulnEpss[0]) / 10000,
+    max: parseFloat(vulnEpss[1]) / 10000
+  }
+
+  const vulnData = {
+    projectId: productId,
+    sbomId: sbomId,
+    first: totalRows,
+    search: searchInput !== '' ? searchInput : undefined,
+    severity: severities.length > 0 ? severities : undefined,
+    componentName: components.length > 0 ? components : undefined,
+    status: statues.length > 0 ? statues : undefined,
+    kev: kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
+    epss: epss !== '' && epss !== 'all' ? range : undefined,
+    field: field,
+    direction: direction
+  }
+
+  // ON SEARCH INPUT CHANGE
+  const onSearchInputChange = (e) => {
+    prodVulnDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: e.target.value })
   }
 
   // SEARCH COMPONENT
   const handleSearch = async (event) => {
     if (event.key === 'Enter') {
       await refetch({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          first: totalRows,
-          search: customerView
-            ? signedVulnSearchInput
-            : vulnSearchInput !== ''
-            ? vulnSearchInput
-            : undefined,
-          severity: vulnSeverity.length > 0 ? vulnSeverity : undefined,
-          componentName: vulnComponent.length > 0 ? vulnComponent : undefined,
-          status: vulnStatus.length > 0 ? vulnStatus : undefined,
-          kev:
-            vulnKev === 'all' || vulnKev === ''
-              ? undefined
-              : vulnKev === 'yes'
-              ? true
-              : false,
-          epss:
-            vulnEpss === 'all' || vulnEpss === '0-0' || vulnEpss === ''
-              ? undefined
-              : range,
-          field: customerView ? signedVulnField : vulnField,
-          direction: customerView ? signedVulnDirection : vulnDirection,
-          signedParams: customerView ? signedParams : undefined
-        }
-      })
-      setPageIndex(1)
+        variables: vulnData
+      }).then(
+        (res) => res.data && prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
+      )
     }
   }
 
   // CLEAR SERACH
   const handleClear = async () => {
-    if (customerView) {
-      setSignedVulnSearchInput('')
-    } else {
-      setVulnSearchInput('')
-    }
-    setPageIndex(1)
     await refetch({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        first: totalRows,
-        search: undefined,
-        severity: vulnSeverity.length > 0 ? vulnSeverity : undefined,
-        componentName: vulnComponent.length > 0 ? vulnComponent : undefined,
-        status: vulnStatus.length > 0 ? vulnStatus : undefined,
-        kev:
-          vulnKev === 'all' || vulnKev === ''
-            ? undefined
-            : vulnKev === 'yes'
-            ? true
-            : false,
-        epss:
-          vulnEpss === 'all' || vulnEpss === '0-0' || vulnEpss === ''
-            ? undefined
-            : range,
-        field: customerView ? signedVulnField : vulnField,
-        direction: customerView ? signedVulnDirection : vulnDirection,
-        signedParams: customerView ? signedParams : undefined
-      }
-    })
+      variables: vulnData
+    }).then(
+      (res) => res.data && prodVulnDispatch({ type: 'CLEAR_SEARCH_INPUT' })
+    )
   }
 
   const subHeaderComponentMemo = useMemo(() => {
@@ -493,35 +436,24 @@ const VulnTable = ({
           alignItems={'flex-start'}
         >
           {/* SEARCH COMPONENTS */}
-          {customerView ? (
-            <SearchFilter
-              id='vuln'
-              filterText={signedVulnSearchInput}
-              setFilterText={setSignedVulnSearchInput}
-              onFilter={handleSearch}
-              onClear={handleClear}
-            />
-          ) : (
-            <SearchFilter
-              id='vuln'
-              filterText={vulnSearchInput}
-              setFilterText={setVulnSearchInput}
-              onFilter={handleSearch}
-              onClear={handleClear}
-            />
-          )}
+          <SearchFilter
+            id='vuln'
+            filterText={searchInput}
+            onFilter={handleSearch}
+            onClear={handleClear}
+          />
 
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
-          {vulnFilters && (
+          {filters ? (
             <VulnFilterMenu
               refetch={refetch}
               productId={productId}
               sbomId={sbomId}
-              setPageIndex={setPageIndex}
-              totalRows={totalRows}
-              setVulnAfter={setVulnAfter}
-              setVulnBefore={setVulnBefore}
             />
+          ) : (
+            <Stack direction='row' spacing={4}>
+              {[1,2,3,4].map((_, index) => <Skeleton key={index} width={'100px'} height={'38px'} />)}
+            </Stack>
           )}
         </Stack>
 
@@ -533,7 +465,7 @@ const VulnTable = ({
               fontWeight='normal'
               fontSize={'sm'}
               onClick={() => {
-                setSelectedVulns([])
+                prodVulnDispatch({ type: 'RESET_SELECTED_VULN' })
                 onTableOpen()
               }}
               icon={<FaCopy size={18} />}
@@ -542,7 +474,7 @@ const VulnTable = ({
         )}
       </Flex>
     )
-  }, [vulnSearchInput, vulnFilters, handleClear, handleSearch])
+  }, [searchInput, filters, onSearchInputChange, handleClear, handleSearch])
 
   const ExpandedComponent = ({ data }) => {
     const { vuln } = data
@@ -640,7 +572,6 @@ const VulnTable = ({
               refetch={refetch}
               filteredData={filteredData}
               filterRefetch={filterRefetch}
-              setPageIndex={setPageIndex}
             />
           </GridItem>
         </Grid>
@@ -648,207 +579,130 @@ const VulnTable = ({
     )
   }
 
-  const handleRefetch = async (
-    search,
-    severity,
-    componentName,
-    status,
-    kev,
-    epss,
-    first,
-    after,
-    last,
-    before,
-    field,
-    direction
-  ) => {
-    const vulnEpss = epss !== 'all' && epss.split('-')
-
-    const range = {
-      min: parseFloat(vulnEpss[0]) / 10000,
-      max: parseFloat(vulnEpss[1]) / 10000
-    }
+  const onPreviousPage = async () => {
     await refetch({
+      variables: {
+        ...vulnData,
+        last: totalRows,
+        before: data.pageInfo.startCursor
+      }
+    }).then(
+      (res) =>
+        res.data &&
+        prodVulnDispatch({
+          type: 'DECREMENT_PAGE',
+          payload: data.pageInfo.startCursor
+        })
+    )
+  }
+
+  const onNextPage = async () => {
+    await refetch({
+      variables: {
+        ...vulnData,
+        first: totalRows,
+        after: data.pageInfo.endCursor
+      }
+    }).then(
+      (res) =>
+        res.data &&
+        prodVulnDispatch({
+          type: 'INCREMENT_PAGE',
+          payload: {
+            total: data.totalCount,
+            after: data.pageInfo.endCursor
+          }
+        })
+    )
+  }
+
+  const handleSort = async (column, sortDirection) => {
+    refetch({
       variables: {
         projectId: productId,
         sbomId: sbomId,
         signedParams: customerView ? signedParams : undefined,
-        search: search !== '' ? search : undefined,
-        severity: severity.length > 0 ? severity : undefined,
-        componentName: componentName.length > 0 ? componentName : undefined,
-        status: status.length > 0 ? status : undefined,
+        search: searchInput !== '' ? searchInput : undefined,
+        severity:
+          !severities.includes('all') && severities.length > 0
+            ? severities
+            : undefined,
+        componentName:
+          !components.includes('all') && components.length > 0
+            ? components
+            : undefined,
+        status:
+          !statues.includes('all') && statues.length > 0 ? statues : undefined,
         kev:
           kev === 'all' || kev === ''
             ? undefined
             : kev === 'yes'
             ? true
             : false,
-        epss: epss !== '' && epss !== 'all' ? range : undefined,
-        first: first,
-        after: after,
-        last: last,
-        before: before,
-        field: field,
-        direction: direction
-      }
-    })
-  }
-
-  const onPreviousPage = async () => {
-    setPageIndex((prev) => pageIndex !== 0 && prev - 1)
-    setVulnBefore(data.pageInfo.startCursor)
-    setVulnAfter('')
-    if (customerView) {
-      handleRefetch(
-        signedVulnSearchInput,
-        signedVulnSeverity,
-        signedVulnComponent,
-        signedVulnStatus,
-        signedVulnKev,
-        signedVulnEpss,
-        undefined,
-        undefined,
-        totalRows,
-        data.pageInfo.startCursor,
-        signedVulnField,
-        signedVulnDirection
-      )
-    } else {
-      handleRefetch(
-        vulnSearchInput,
-        vulnSeverity,
-        vulnComponent,
-        vulnStatus,
-        vulnKev,
-        vulnEpss,
-        undefined,
-        undefined,
-        totalRows,
-        data.pageInfo.startCursor,
-        vulnField,
-        vulnDirection
-      )
-    }
-  }
-
-  const onNextPage = async () => {
-    setPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
-    setVulnAfter(data.pageInfo.endCursor)
-    setVulnBefore('')
-    if (customerView) {
-      handleRefetch(
-        signedVulnSearchInput,
-        signedVulnSeverity,
-        signedVulnComponent,
-        signedVulnStatus,
-        signedVulnKev,
-        signedVulnEpss,
-        totalRows,
-        data.pageInfo.endCursor,
-        undefined,
-        undefined,
-        signedVulnField,
-        signedVulnDirection
-      )
-    } else {
-      handleRefetch(
-        vulnSearchInput,
-        vulnSeverity,
-        vulnComponent,
-        vulnStatus,
-        vulnKev,
-        vulnEpss,
-        totalRows,
-        data.pageInfo.endCursor,
-        undefined,
-        undefined,
-        vulnField,
-        vulnDirection
-      )
-    }
-  }
-
-  const handleSort = (column, sortDirection) => {
-    if (customerView) {
-      setSignedVulnField(column.id)
-      setSignedVulnDirection(sortDirection === 'asc' ? 'ASC' : 'DESC')
-    } else {
-      setVulnField(column.id)
-      setVulnDirection(sortDirection === 'asc' ? 'ASC' : 'DESC')
-    }
-    const range = {
-      min: parseFloat(vulnEpss[0]) / 10000,
-      max: parseFloat(vulnEpss[1]) / 10000
-    }
-    refetch({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        signedParams: customerView ? signedParams : undefined,
-        search: vulnSearchInput !== '' ? vulnSearchInput : undefined,
-        severity:
-          !vulnSeverity.includes('all') && vulnSeverity.length > 0
-            ? vulnSeverity
-            : undefined,
-        componentName:
-          !vulnComponent.includes('all') && vulnComponent.length > 0
-            ? vulnComponent
-            : undefined,
-        status:
-          !vulnStatus.includes('all') && vulnStatus.length > 0
-            ? vulnStatus
-            : undefined,
-        kev:
-          vulnKev === 'all' || vulnKev === ''
-            ? undefined
-            : vulnKev === 'yes'
-            ? true
-            : false,
-        epss: vulnEpss !== '' && vulnEpss !== 'all' ? range : undefined,
+        epss: range || undefined,
         first: totalRows,
         field: column.id,
         direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+      }
+    }).then((res) => {
+      if (res.data) {
+        prodVulnDispatch({
+          type: 'SET_SORT_ORDER',
+          payload: {
+            field: column.id,
+            direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+          }
+        })
       }
     })
   }
 
   // SET ROW LENGTH
   const handleSetRow = async (e) => {
-    setTotalRows(Number(e.target.value))
-    if (customerView) {
-      handleRefetch(
-        signedVulnSearchInput,
-        signedVulnSeverity,
-        signedVulnComponent,
-        signedVulnStatus,
-        signedVulnKev,
-        signedVulnEpss,
-        Number(e.target.value),
-        undefined,
-        undefined,
-        undefined,
-        signedVulnField,
-        signedVulnDirection
-      )
-    } else {
-      handleRefetch(
-        vulnSearchInput,
-        vulnSeverity,
-        vulnComponent,
-        vulnStatus,
-        vulnKev,
-        vulnEpss,
-        Number(e.target.value),
-        undefined,
-        undefined,
-        undefined,
-        vulnField,
-        vulnDirection
-      )
-    }
-    setVulnSearchInput('')
-    setPageIndex(1)
+    await refetch({
+      variables: {
+        ...vulnData,
+        first: Number(e.target.value)
+      }
+    }).then((res) => {
+      if (res.data) {
+        setTotalRows(Number(e.target.value))
+        prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
+      }
+    })
   }
+
+  useEffect(() => {
+    const handleResize = () => {
+      const scaleThreshold = 1.1
+      const currentScale = window.devicePixelRatio
+      setHideColumn(currentScale > scaleThreshold)
+    }
+    window.addEventListener('resize', handleResize)
+    handleResize()
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (data) {
+      getVulnFilters({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId
+        }
+      }).then((res) => {
+        if (res.data) {
+          prodVulnDispatch({
+            type: 'ADD_FILTER_HEADS',
+            payload: res.data.sbom.filters
+          })
+        }
+      })
+    }
+  }, [data])
 
   return (
     <>
@@ -860,7 +714,7 @@ const VulnTable = ({
           customStyles={customStyles}
           onSort={handleSort}
           defaultSortAsc={false}
-          defaultSortFieldId={customerView ? signedVulnField : vulnField}
+          defaultSortFieldId={field}
           progressPending={data ? false : true}
           progressComponent={<CustomLoader />}
           subHeader
@@ -928,7 +782,9 @@ const VulnTable = ({
         >
           <DrawerOverlay />
           <DrawerContent>
-            <DrawerCloseButton onClick={() => setImportSbom([])} />
+            <DrawerCloseButton
+              onClick={() => prodVulnDispatch({ type: 'RESET_IMPORT_SBOMS' })}
+            />
             <DrawerHeader>
               <Text fontSize={20} fontWeight={'medium'}>
                 Import Vulnerability Status

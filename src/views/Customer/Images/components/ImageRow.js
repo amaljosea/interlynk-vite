@@ -1,13 +1,7 @@
-import { useState, useEffect, useContext } from 'react'
+import { useEffect } from 'react'
 import {
   Flex,
-  IconButton,
   Image,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Portal,
   Skeleton,
   Switch,
   Td,
@@ -16,18 +10,17 @@ import {
   Tr
 } from '@chakra-ui/react'
 import { getConImg, scanImage } from 'utils'
-import { FaCircleNotch, FaEllipsisV } from 'react-icons/fa'
 import { useMutation } from '@apollo/client'
 import { ImageUpdate } from 'graphQL/Mutation'
-import GlobalContext from 'context/GlobalContext'
 import semver from 'semver'
 import { Link } from 'react-router-dom'
 import Cookies from 'js-cookie'
+import { useGlobalState } from 'hooks/useGlobalState'
 
 const ImageRow = ({ item, refetch }) => {
   const signedParams = Cookies.get(`signedParamId`)
 
-  const { setScanEnabled } = useContext(GlobalContext)
+  const { setScanEnabled } = useGlobalState()
 
   const sortImages = [...item.imageScanners].sort((a, b) =>
     a.company.localeCompare(b.company)

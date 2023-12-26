@@ -1,6 +1,6 @@
-import { useState, useContext } from 'react'
+import { useState } from 'react'
 import { Step, Steps, useSteps } from 'chakra-ui-steps'
-import { Flex, Heading, Box, Button, useColorModeValue } from '@chakra-ui/react'
+import { Flex, Button, useColorModeValue } from '@chakra-ui/react'
 import StepOne from './Wizard/StepOne'
 import StepTwo from './Wizard/StepTwo'
 import { useLazyQuery, useMutation } from '@apollo/client'
@@ -8,8 +8,8 @@ import { updateCompVulnVex } from 'graphQL/Mutation'
 import { GetVulnData } from 'graphQL/Queries'
 import { findSimilarItems } from 'utils'
 import StepThree from './Wizard/StepThree'
-import GlobalContext from 'context/GlobalContext'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useGlobalState } from 'hooks/useGlobalState'
 
 const ImportWizard = ({
   variant,
@@ -20,16 +20,10 @@ const ImportWizard = ({
   const [compVexCreate] = useMutation(updateCompVulnVex)
   const [getVulns] = useLazyQuery(GetVulnData)
 
-  const {
-    totalVulns,
-    vulnField,
-    vulnDirection,
-    setMergeData,
-    importSbom,
-    setImportSbom,
-    selectedVulns,
-    setSelectedVulns
-  } = useContext(GlobalContext)
+  const { prodVulnState, dispatch } = useGlobalState()
+  const { totalVulns, field, direction, importSbom, selectedVulns } =
+    prodVulnState
+  const { prodVulnDispatch } = dispatch
 
   const params = useParams()
   const navigate = useNavigate()
@@ -50,15 +44,15 @@ const ImportWizard = ({
         projectId: currentProductId,
         sbomId: currentSbomId,
         first: totalVulns,
-        field: vulnField,
-        direction: vulnDirection
+        field: field,
+        direction: direction
       }
     })
       .then((res) => {
         if (res.data) {
           const data = findSimilarItems(res.data.sbom.vulns.nodes, importSbom)
           const filterData = data.filter((item) => item.importStatus !== null)
-          setMergeData(filterData)
+          prodVulnDispatch({ type: 'UPDATE_MERGE_DATA', payload: filterData })
         }
       })
       .finally(() => {
@@ -184,8 +178,8 @@ const ImportWizard = ({
                 variant='solid'
                 isDisabled={activeStep === 0}
                 onClick={() => {
-                  setSelectedVulns([])
-                  setImportSbom([])
+                  prodVulnDispatch({ type: 'RESET_SELECTED_VULN' })
+                  prodVulnDispatch({ type: 'RESET_IMPORT_SBOMS' })
                   prevStep()
                 }}
               >

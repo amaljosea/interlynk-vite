@@ -63,6 +63,8 @@ const PersonalInfo = ({ user, refetch }) => {
         .then((res) => {
           if (res.data.userUpdate.errors.length == 0) {
             setMessage('Saving....')
+            localStorage.setItem('username', name)
+            localStorage.setItem('email', email)
             setTimeout(() => {
               setMessage('Update')
               toast({

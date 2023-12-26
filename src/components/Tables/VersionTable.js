@@ -19,7 +19,6 @@ import {
   Text,
   Tooltip,
   Tag,
-  Badge,
   useDisclosure,
   UnorderedList,
   Button,
@@ -30,12 +29,12 @@ import {
 } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
 import VulnBadge from 'components/Misc/VulnBadge'
-import GlobalContext from 'context/GlobalContext'
 import { sbomDelete } from 'graphQL/Mutation'
-import { useContext, useEffect, useMemo, useState } from 'react'
+import { useGlobalState } from 'hooks/useGlobalState'
+import { useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV } from 'react-icons/fa'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import {
   timeSince,
   getFullDateAndTime,
@@ -45,16 +44,13 @@ import {
 import RowLimit from 'views/Sbom/components/RowLimit'
 
 const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
-  const navigate = useNavigate()
+  const { totalRows, setTotalRows, setActiveSbomTab, prodVulnState, dispatch } =
+    useGlobalState()
+  const { field, direction } = prodVulnState
+  const { prodVulnDispatch } = dispatch
+
   const params = useParams()
-  const {
-    setActiveProdTab,
-    totalRows,
-    setTotalRows,
-    setVulnSeverity,
-    vulnField,
-    vulnDirection
-  } = useContext(GlobalContext)
+
   const [isLoading, setIsLoading] = useState(false)
   const [activeRow, setActiveRow] = useState(null)
 
@@ -64,8 +60,9 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
 
   const totalPages = data.length > 0 ? Math.ceil(data.length / totalRows) : 1
 
-  const filteredData =
-    data && data.slice((currentPage - 1) * totalRows, currentPage * totalRows)
+  const filteredData = data
+    ? data.slice((currentPage - 1) * totalRows, currentPage * totalRows)
+    : []
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
@@ -82,23 +79,23 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
   } = useDisclosure()
 
   const onFilterSev = async (id, primaryComponent, value) => {
-    localStorage.setItem(
-      'currentSBOM',
-      JSON.stringify({
-        version: primaryComponent?.version,
-        id: id
-      })
-    )
-    setActiveProdTab(3)
-    setVulnSeverity(value)
     await getVulnData({
       variables: {
         projectId: productId,
         sbomId: id,
         severity: value,
         first: totalRows,
-        field: vulnField,
-        direction: vulnDirection
+        field: field,
+        direction: direction
+      }
+    }).then((res) => {
+      if (res.data) {
+        localStorage.setItem(
+          'currentSBOM',
+          JSON.stringify({ version: primaryComponent?.version, id: id })
+        )
+        localStorage.setItem('activeSbomTab', 3)
+        prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
       }
     })
   }
@@ -121,7 +118,8 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
                   id: id
                 })
               )
-              setActiveProdTab(0)
+              localStorage.setItem('activeSbomTab', 0)
+              setActiveSbomTab(0)
             }}
           >
             <Text color={'blue.500'} minWidth='100%' my={3} fontSize={14}>
@@ -157,7 +155,7 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
                     id: id
                   })
                 )
-                setActiveProdTab(2)
+                setActiveSbomTab(2)
               }}
             >
               <TagLabel mx={'auto'}>{stats?.compCount}</TagLabel>

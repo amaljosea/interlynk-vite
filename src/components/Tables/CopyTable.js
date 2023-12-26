@@ -9,8 +9,8 @@ import {
   Tooltip,
   useColorModeValue
 } from '@chakra-ui/react'
-import GlobalContext from 'context/GlobalContext'
-import React, { useContext, useMemo, useState } from 'react'
+import { useGlobalState } from 'hooks/useGlobalState'
+import React, { useMemo } from 'react'
 import DataTable from 'react-data-table-component'
 import { sevColor } from 'utils'
 
@@ -50,8 +50,9 @@ const statusColor = (status) => {
 const CopyTable = () => {
   const textColor = useColorModeValue('gray.700', 'white')
 
-  const { selectedVulns, setSelectedVulns, mergeData, currentSbom } =
-    useContext(GlobalContext)
+  const { prodVulnState, dispatch } = useGlobalState()
+  const { selectedVulns, mergeData } = prodVulnState
+  const { prodVulnDispatch } = dispatch
 
   // COLUMNS
   const columns = [
@@ -207,8 +208,10 @@ const CopyTable = () => {
   }
 
   const handleChange = (state) => {
-    setSelectedVulns(state.selectedRows)
-    // console.log(state)
+    prodVulnDispatch({
+      type: 'UPDATE_SELECTED_VULN',
+      payload: state.selectedRows
+    })
   }
 
   return (

@@ -18,6 +18,7 @@ import {
 } from '@chakra-ui/react'
 import { CreateAutomation } from 'graphQL/Mutation'
 import { recheckHealth, supplierUpdate, supplierCreate } from 'graphQL/Mutation'
+import { useGlobalState } from 'hooks/useGlobalState'
 import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 
@@ -25,18 +26,14 @@ const urlPattern = new RegExp(
   '(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w.-]*/?'
 )
 
-const PriSupplierModal = ({
-  isOpen,
-  onClose,
-  refetch,
-  suppliers,
-  checkId,
-  setPageIndex
-}) => {
+const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
+
+  const { dispatch } = useGlobalState()
+  const { prodCheckDispatch } = dispatch
 
   const validateEmail = (email) => {
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
@@ -114,7 +111,7 @@ const PriSupplierModal = ({
     })
       .then((res) => {
         if (checkId) {
-          setPageIndex(1)
+          prodCheckDispatch({ type: 'FETCH_DATA_SUCCESS' })
           healthRecheck({
             variables: {
               sbomId: sbomId,

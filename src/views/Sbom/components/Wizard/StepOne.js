@@ -7,8 +7,7 @@ import {
   Select,
   Text
 } from '@chakra-ui/react'
-import { useContext, useEffect } from 'react'
-import GlobalContext from 'context/GlobalContext'
+import { useEffect } from 'react'
 import { GetProjectData, GetProject } from 'graphQL/Queries'
 import { useLazyQuery, useQuery } from '@apollo/client'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -99,7 +98,6 @@ const StepOne = ({
       })
     }
   }, [selectedProd])
-
 
   return (
     <>

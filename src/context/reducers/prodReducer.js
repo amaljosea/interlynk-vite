@@ -2,6 +2,11 @@ const prodReducer = (state, action) => {
   const { pageIndex } = state
   const { type, payload } = action
   switch (type) {
+    case 'SET_CURRENT_PRODUCT':
+      return {
+        ...state,
+        currentProduct: payload
+      }
     case 'CHANGE_SEARCH_INPUT':
       return {
         ...state,

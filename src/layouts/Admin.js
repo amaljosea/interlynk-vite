@@ -20,7 +20,6 @@ import Cookies from 'js-cookie'
 import { createUploadLink } from 'apollo-upload-client'
 import { getActiveNavbar, getActiveRoute } from '../utils'
 import { jwtDecode } from 'jwt-decode'
-import { GlobalStateProvider } from 'hooks/useGlobalState'
 
 export default function Dashboard(props) {
   const authToken = Cookies.get('authToken')
@@ -94,35 +93,33 @@ export default function Dashboard(props) {
   }, [location])
 
   return (
-    <GlobalStateProvider>
-      <ApolloProvider client={client}>
-        <Stack width={'100%'} direction={'row'} alignItems={'flex-start'}>
-          <Sidebar
-            routes={dashRoutes}
-            logoText={'Interlynk DASHBOARD'}
-            display='none'
-            sidebarVariant={sidebarVariant}
-            {...rest}
-          />
-          <Box minH='100vh' w={'96%'} pos={'absolute'} right={0}>
-            <Portal>
-              <AdminNavbar
-                onOpen={onOpen}
-                logoText={'Interlynk DASHBOARD'}
-                brandText={getActiveRoute(dashRoutes)}
-                secondary={getActiveNavbar(dashRoutes)}
-              />
-            </Portal>
-            <Box bg='rgba(0,0,0,0.04)' minH={'100vh'} maxH={'100%'}>
-              <PanelContent>
-                <PanelContainer>
-                  <Outlet />
-                </PanelContainer>
-              </PanelContent>
-            </Box>
+    <ApolloProvider client={client}>
+      <Stack width={'100%'} direction={'row'} alignItems={'flex-start'}>
+        <Sidebar
+          routes={dashRoutes}
+          logoText={'Interlynk DASHBOARD'}
+          display='none'
+          sidebarVariant={sidebarVariant}
+          {...rest}
+        />
+        <Box minH='100vh' w={'96%'} pos={'absolute'} right={0}>
+          <Portal>
+            <AdminNavbar
+              onOpen={onOpen}
+              logoText={'Interlynk DASHBOARD'}
+              brandText={getActiveRoute(dashRoutes)}
+              secondary={getActiveNavbar(dashRoutes)}
+            />
+          </Portal>
+          <Box bg='rgba(0,0,0,0.04)' minH={'100vh'} maxH={'100%'}>
+            <PanelContent>
+              <PanelContainer>
+                <Outlet />
+              </PanelContainer>
+            </PanelContent>
           </Box>
-        </Stack>
-      </ApolloProvider>
-    </GlobalStateProvider>
+        </Box>
+      </Stack>
+    </ApolloProvider>
   )
 }

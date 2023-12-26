@@ -21,10 +21,9 @@ import {
   Tag
 } from '@chakra-ui/react'
 import CpeInput from 'components/CpeInput'
-import GlobalContext from 'context/GlobalContext'
 import { CreateAutomation } from 'graphQL/Mutation'
 import { UpdateComponent, recheckHealth } from 'graphQL/Mutation'
-import { useState, useEffect, useRef, useContext } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
 
 const regexPattern =
@@ -41,7 +40,6 @@ const CpeModal = ({
   activeComp,
   checkId,
   refetch,
-  setPageIndex,
   getCpe,
   activeCheck
 }) => {
@@ -62,7 +60,9 @@ const CpeModal = ({
   const versionRef = useRef()
   const [hardware, setHardware] = useState('')
 
-  const { cpeString, setCpeString } = useContext(GlobalContext)
+  const { prodCompState, dispatch } = useGlobalState()
+  const { cpeString } = prodCompState
+  const { prodCompDispatch } = dispatch
 
   const [healthRecheck] = useMutation(recheckHealth, {
     onCompleted: () => refetch()
@@ -73,7 +73,7 @@ const CpeModal = ({
   useEffect(() => {
     const matches = regexPattern.test(cpeValue)
     if (matches) {
-      setCpeString(cpeValue)
+      prodCompDispatch({ type: 'SET_CPE_STRING', payload: cpeValue })
       const components = cpeValue.split(':')
       setType(components[2])
       setVendor(components[3])
@@ -81,7 +81,10 @@ const CpeModal = ({
       setVersion(components[5] === '*' ? '' : components[5])
       setHardware(components[6] === '*' ? '' : components[6])
     } else {
-      setCpeString('cpe:2.3:::::*:*:*:*:*:*:*')
+      prodCompDispatch({
+        type: 'SET_CPE_STRING',
+        payload: 'cpe:2.3:::::*:*:*:*:*:*:*'
+      })
     }
   }, [cpeValue])
 
@@ -107,7 +110,9 @@ const CpeModal = ({
       })
         .then(() => {
           if (checkId) {
-            setPageIndex(1)
+            prodCompDispatch({
+              type: 'FETCH_DATA_SUCCESS'
+            })
             healthRecheck({
               variables: {
                 checkId: checkId,
@@ -147,15 +152,6 @@ const CpeModal = ({
     }
   }
 
-  const onVendorBlur = () => {
-    if (vendor !== '') {
-      const cpeParts = cpeString.split(':')
-      cpeParts[3] = vendor
-      const cpe = cpeParts.join(':')
-      setCpeString(cpe)
-    }
-  }
-
   // ON TYPE CHANGE
   const handleTypeChange = (e) => {
     const { value } = e.target
@@ -164,7 +160,10 @@ const CpeModal = ({
       const cpeParts = cpeString.split(':')
       cpeParts[2] = e.target.value
       const cpe = cpeParts.join(':')
-      setCpeString(cpe)
+      prodCompDispatch({
+        type: 'SET_CPE_STRING',
+        payload: cpe
+      })
     }
   }
 
@@ -194,15 +193,6 @@ const CpeModal = ({
           setProductList(res.data.idAutoComplete.result)
         }
       })
-    }
-  }
-
-  const onProductBlur = () => {
-    if (product !== '') {
-      const cpeParts = cpeString.split(':')
-      cpeParts[4] = product
-      const cpe = cpeParts.join(':')
-      setCpeString(cpe)
     }
   }
 
@@ -236,15 +226,6 @@ const CpeModal = ({
     }
   }
 
-  const onVersionBlur = () => {
-    if (version !== '') {
-      const cpeParts = cpeString.split(':')
-      cpeParts[5] = version
-      const cpe = cpeParts.join(':')
-      setCpeString(cpe)
-    }
-  }
-
   // ON HARDWARE CHANGE
   const handleHardwareChange = (e) => {
     const { value } = e.target
@@ -253,11 +234,17 @@ const CpeModal = ({
     if (value !== '') {
       cpeParts[6] = value
       const cpe = cpeParts.join(':')
-      setCpeString(cpe)
+      prodCompDispatch({
+        type: 'SET_CPE_STRING',
+        payload: cpe
+      })
     } else {
       cpeParts[6] = '*'
       const cpe = cpeParts.join(':')
-      setCpeString(cpe)
+      prodCompDispatch({
+        type: 'SET_CPE_STRING',
+        payload: cpe
+      })
     }
   }
 
