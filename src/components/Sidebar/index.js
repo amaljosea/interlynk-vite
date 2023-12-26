@@ -29,7 +29,6 @@ function Sidebar({ routes }) {
       onMouseEnter={() => setMinimize(false)}
       onMouseLeave={() => setMinimize(true)}
       w={minimize === true ? '75px' : '210px'}
-      borderRight={'1px solid #E2E8F0'}
       bg={'white'}
       height={'100vh'}
       zIndex={111}
