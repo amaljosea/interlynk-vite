@@ -1,9 +1,8 @@
 import { useMemo } from 'react'
-import { AddIcon } from '@chakra-ui/icons'
+import { AddIcon, ArrowForwardIcon } from '@chakra-ui/icons'
 import {
   Button,
   Flex,
-  Heading,
   IconButton,
   Link,
   Stack,
@@ -137,14 +136,16 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
       selector: (row) => {
         const { id, name } = row
         return (
-          <Tag
-            variant='subtle'
+          <Button
+            size='sm'
+            variant='solid'
             cursor={'pointer'}
             colorScheme={activeOrg === id ? 'green' : 'blue'}
             onClick={() => onSwitchOrg(id, name)}
+            rightIcon={activeOrg === id ? false : <ArrowForwardIcon />}
           >
-            <TagLabel>{activeOrg === id ? 'Active' : 'Set as active'}</TagLabel>
-          </Tag>
+            {activeOrg === id ? 'Active' : 'Switch to'}
+          </Button>
         )
       },
       wrap: true
