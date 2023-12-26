@@ -37,6 +37,7 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { useQuery } from '@apollo/client'
 import { GetOrg } from 'graphQL/Queries'
+import { HomeIcon } from 'components/Icons/Icons'
 
 export default function HeaderLinks(props) {
   const location = useLocation()
@@ -206,6 +207,9 @@ export default function HeaderLinks(props) {
         {location.pathname.startsWith('/vendor') && (
           <MenuList size='sm'>
             <MenuGroup title=''>
+              <Link to='/vendor/settings?tab=organization'>
+                <MenuItem icon={<HomeIcon />}>Organization</MenuItem>
+              </Link>
               <Link to='/vendor/settings?tab=person'>
                 <MenuItem icon={<SettingsIcon />}>Settings</MenuItem>
               </Link>
