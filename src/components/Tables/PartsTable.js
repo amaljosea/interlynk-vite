@@ -275,6 +275,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
           </Text>
         )
       },
+      width: '120px',
       wrap: true
     },
     {
@@ -286,18 +287,25 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
           <>
             {part.suppliers.length > 0 &&
               part.suppliers.map((item, index) => (
-                <Tag
-                  size={'md'}
-                  key={index}
-                  fontSize={14}
-                  variant='subtle'
-                  colorScheme='orange'
+                <Tooltip
+                  label={`${item.name} ${
+                    item.contactEmail && `- ${item.contactEmail}`
+                  }`}
+                  placement='top'
                 >
-                  <TagLabel>
-                    {item.name}
-                    {item.contactEmail && ` - ${item.contactEmail}`}
-                  </TagLabel>
-                </Tag>
+                  <Tag
+                    size={'md'}
+                    key={index}
+                    fontSize={14}
+                    variant='subtle'
+                    colorScheme='orange'
+                  >
+                    <TagLabel>
+                      {item.name}
+                      {item.contactEmail && ` - ${item.contactEmail}`}
+                    </TagLabel>
+                  </Tag>
+                </Tooltip>
               ))}
           </>
         )
