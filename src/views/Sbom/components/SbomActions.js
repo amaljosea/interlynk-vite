@@ -251,7 +251,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
     <>
       <Flex
         direction={'row'}
-        gap={3}
+        gap={2}
         justifyContent='flex-end'
         ml={'auto'}
         flexWrap={'wrap'}

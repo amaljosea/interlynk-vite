@@ -41,7 +41,6 @@ const DownloadModal = ({
   const [spec, setSpec] = useState('cyclonedx')
   const [format, setFormat] = useState('json')
   const [includeVulns, setIncludeVulns] = useState(false)
-  const [includeVex, setIncludeVex] = useState(false)
 
   const type = spec === 'cyclonedx' ? 'cdx' : 'spdx'
 
@@ -160,34 +159,12 @@ const DownloadModal = ({
                 {/* <Radio value='xml' disabled>XML</Radio> */}
               </Stack>
             </RadioGroup>
-
             <Stack direction='column' gap='5px'>
-              <Box
-                bg='blue.600'
-                w='100%'
-                p={2}
-                color='white'
-                fontWeight='medium'
-                fontSize='16px'
-                align='center'
-                borderRadius='lg'
-                boxShadow='md'
-              >
-                Download Options coming soon...
-              </Box>
               <Checkbox
                 isChecked={includeVulns}
                 onChange={() => setIncludeVulns(!includeVulns)}
-                disabled
               >
                 Include Vulnerabilities
-              </Checkbox>
-              <Checkbox
-                isChecked={includeVex}
-                onChange={() => setIncludeVex(!includeVex)}
-                disabled
-              >
-                Include Vulnerability Status (VEX)
               </Checkbox>
             </Stack>
           </Stack>
