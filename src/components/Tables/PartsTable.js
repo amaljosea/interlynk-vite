@@ -183,15 +183,33 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
 
   const existingVersions = []
 
-  data?.map((item) => existingVersions.push(item?.part?.primaryComponent.id))
+  data?.map((item) =>
+    existingVersions.push(
+      item?.part?.primaryComponent
+        ? item?.part?.primaryComponent.id
+        : `Uploaded ${getFullDateAndTime(
+            item?.part?.primaryComponent?.creationAt
+          )}`
+    )
+  )
 
   const sbomVersions = []
+
+  console.log('existingVersions', existingVersions)
 
   const filteredDuplicated = product ? removeDuplicates(product.sboms) : []
 
   filteredDuplicated &&
     filteredDuplicated.map((project) => {
-      if (!existingVersions?.includes(project.primaryComponent.id)) {
+      if (
+        !existingVersions?.includes(
+          project.primaryComponent
+            ? project.primaryComponent.id
+            : `Uploaded ${getFullDateAndTime(
+                project?.primaryComponent?.creationAt
+              )}`
+        )
+      ) {
         sbomVersions.push({
           label: project.primaryComponent
             ? project.primaryComponent.version
@@ -275,7 +293,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
           </Text>
         )
       },
-      width: '120px',
+      width: '200px',
       wrap: true
     },
     {
