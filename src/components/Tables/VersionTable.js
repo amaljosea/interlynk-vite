@@ -123,7 +123,7 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
             }}
           >
             <Text color={'blue.500'} minWidth='100%' my={3} fontSize={14}>
-              {primaryComponent
+              {primaryComponent && primaryComponent.version
                 ? primaryComponent.version
                 : `Uploaded ${getFullDateAndTime(creationAt)}`}
             </Text>
@@ -270,7 +270,7 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
                     onDeleteOpen()
                   }}
                 >
-                  Delete Version
+                  Delete
                 </MenuItem>
               </MenuList>
             </Portal>

@@ -133,7 +133,7 @@ const VulnTable = ({
       selector: (row) => {
         const { vuln } = row
         const { vulnInfo } = vuln
-        const { kev } = vulnInfo
+        const { kev } = vulnInfo ? vulnInfo : ''
         return (
           <Flex direction='row' alignItems={'center'} gap={2}>
             <Link href={linkURl(vuln.source, vuln.vulnId)} target={'_blank'}>
@@ -249,7 +249,7 @@ const VulnTable = ({
       selector: (row) => {
         const { vuln } = row
         const { vulnInfo } = vuln
-        const { epssScores } = vulnInfo
+        const { epssScores } = vulnInfo ? vulnInfo : ''
 
         return (
           <Flex minWidth='max-content' alignItems='center' gap='0'>
@@ -262,11 +262,11 @@ const VulnTable = ({
               alignItems='center'
             >
               <TagLabel style={{ textAlign: 'center' }}>
-                {Math.ceil(epssScores[0] * 10000)}
+                {epssScores ? Math.ceil(epssScores[0] * 10000) : 0}
                 {/* {epssScores.length > 1 && `- ${epssScores[1]}`} */}
               </TagLabel>
             </Tag>
-            {epssScores.length > 1 ? (
+            {epssScores && epssScores.length > 1 ? (
               epssScores[0] > epssScores[epssScores.length - 1] ? (
                 <Tooltip
                   placement='top'
@@ -764,14 +764,12 @@ const VulnTable = ({
       )}
 
       {/* EPSS INFO */}
-      <Stack mt={10} direction={'row'} spacing={2}>
-        <Icon as={InfoIcon} color={'blue.500'} />
+      <Stack mt={10} direction={'row'} spacing={2} justifyContent={'flex-end'} textAlign={'right'}>
+        <Link href='https://www.first.org/epss/' target='_blank' fontSize={'xs'}>* EPSS (Exploit Prediction Scoring System) is an estimation of a vulnerability exploit.
         <Text fontSize={'xs'}>
-          EPSS (Exploit Prediction Scoring System) measures how likely a
-          particular vulnerability is to be exploited in the wild. EPSS scores
-          range from 0% (the lowest probability of exploitation) to 100% (the
-          highest probability of exploitation).
+          Interlynk scales EPSS by 10,000 for a more readable score.
         </Text>
+        </Link>
       </Stack>
 
       {/* COPY DATA TABLE */}
