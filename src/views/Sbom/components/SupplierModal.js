@@ -24,11 +24,8 @@ import { addComSupplier } from 'graphQL/Mutation'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
+import { validateUrl } from 'utils'
 import { validateEmail } from 'utils'
-
-const urlPattern = new RegExp(
-  '(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w.-]*/?'
-)
 
 const SupplierModal = ({
   id,
@@ -50,9 +47,10 @@ const SupplierModal = ({
 
   const [orgName, setOrgName] = useState('')
   const [orgUrl, setOrgUrl] = useState('')
-  const [isValidUrl, setIsValidUrl] = useState(true)
+  const [isValidUrl, setIsValidUrl] = useState('')
   const [supName, setSupName] = useState('')
   const [supEmail, setSupEmail] = useState('')
+  const [emailError, setEmailError] = useState('')
 
   const onFilterRefetch = () => {
     filterRefetch({
@@ -162,18 +160,26 @@ const SupplierModal = ({
     }
   }
 
-  const onUrlChange = (e) => {
-    const { value } = e.target
-    setOrgUrl(value)
-    if (urlPattern.test(value)) {
-      setIsValidUrl(true)
-    } else {
-      setIsValidUrl(false)
+  const handleCheckEmail = () => {
+    if (!validateEmail(supEmail)) {
+      setEmailError('Email is invalid')
     }
   }
 
+  const handleCheckUrl = () => {
+    if (!validateUrl(orgUrl)) {
+      setIsValidUrl('Please enter a valid URL')
+    }
+  }
+
+  const onUrlChange = (e) => {
+    const { value } = e.target
+    setOrgUrl(value)
+    setIsValidUrl('')
+  }
+
   const isInvalid =
-    !supName || (supEmail !== '' && !validateEmail(supEmail)) || !isValidUrl
+    supName === '' || emailError != '' || (orgUrl !== '' && isValidUrl !== '')
 
   return (
     <>
@@ -225,14 +231,15 @@ const SupplierModal = ({
                 />
               </FormControl>
               {/* ORG URL */}
-              <FormControl isInvalid={!isValidUrl}>
+              <FormControl isInvalid={orgUrl !== '' && !validateUrl(orgUrl)}>
                 <FormLabel fontSize={'sm'}>URL</FormLabel>
                 <Input
                   placeholder='Enter URL'
                   value={orgUrl}
+                  onBlur={handleCheckUrl}
                   onChange={onUrlChange}
                 />
-                <FormErrorMessage>Invalid URL</FormErrorMessage>
+                <FormErrorMessage>{isValidUrl}</FormErrorMessage>
               </FormControl>
               {/* SUPPLIER NAME */}
               <FormControl isRequired>
@@ -251,11 +258,13 @@ const SupplierModal = ({
                 <Input
                   placeholder='Enter supplier email'
                   value={supEmail}
-                  onChange={(e) => setSupEmail(e.target.value)}
+                  onBlur={handleCheckEmail}
+                  onChange={(e) => {
+                    setSupEmail(e.target.value)
+                    setEmailError('')
+                  }}
                 />
-                {supEmail !== '' && !validateEmail(supEmail) && (
-                  <FormErrorMessage>Email is invalid</FormErrorMessage>
-                )}
+                <FormErrorMessage>{emailError}</FormErrorMessage>
               </FormControl>
             </Flex>
           </ModalBody>
