@@ -68,9 +68,10 @@ const ProductDetails = () => {
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
 
-  const { totalRows, activeProdTab, setActiveProdTab, prodLogState, dispatch } = useGlobalState()
+  const { totalRows, activeProdTab, setActiveProdTab, prodLogState, dispatch } =
+    useGlobalState()
   const { field, direction } = prodLogState
-  const { sbomDispatch, prodVulnDispatch } = dispatch
+  const { prodCompDispatch, prodVulnDispatch } = dispatch
 
   const { data, loading, error, refetch } = useQuery(GetProductInfo, {
     variables: {
@@ -149,7 +150,7 @@ const ProductDetails = () => {
   } = useDisclosure()
 
   const onBuildSbom = () => {
-    sbomDispatch({ type: 'CLEAR_LICENSES' })
+    prodCompDispatch({ type: 'CLEAR_LICENSES' })
     onSbomOpen()
   }
 

@@ -23,6 +23,7 @@ import {
 import CpeInput from 'components/CpeInput'
 import { CreateAutomation } from 'graphQL/Mutation'
 import { UpdateComponent, recheckHealth } from 'graphQL/Mutation'
+import { useGlobalState } from 'hooks/useGlobalState'
 import { useState, useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
 
