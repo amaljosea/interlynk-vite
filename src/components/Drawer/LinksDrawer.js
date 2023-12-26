@@ -240,10 +240,10 @@ const LinksDrawer = ({ isOpen, onClose, component, sbomId, fetchCompData }) => {
             </form>
           </DrawerBody>
           <DrawerFooter>
-            <Button variant='outline' mr={3} onClick={onClose}>
+            <Button mr={3} onClick={onClose}>
               Cancel
             </Button>
-            <Button colorScheme='blue' onClick={handleSave}>
+            <Button variant='solid' colorScheme='blue' onClick={handleSave}>
               Save
             </Button>
           </DrawerFooter>

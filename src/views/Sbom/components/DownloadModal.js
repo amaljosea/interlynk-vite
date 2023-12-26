@@ -13,7 +13,6 @@ import {
   Stack,
   Button,
   useToast,
-  Box,
   Flex,
   Spinner
 } from '@chakra-ui/react'
@@ -178,14 +177,12 @@ const DownloadModal = ({
             gap={4}
           >
             <Stack>{isLoading && <Spinner color='blue.500' />}</Stack>
-            <Stack direction='row' alignItems='center' gap={1}>
-              <Button colorScheme='gray' mr={3} onClick={onClose}>
+            <Stack direction='row' alignItems='center' spacing={3}>
+              <Button colorScheme='gray' onClick={onClose}>
                 Cancel
               </Button>
-
               <Button
                 colorScheme='blue'
-                mr={3}
                 onClick={customerView ? onDownload : handleDownload}
               >
                 Download
