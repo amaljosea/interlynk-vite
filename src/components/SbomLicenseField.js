@@ -26,7 +26,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 
 const SbomLicenseField = () => {
   const { sbomState, dispatch } = useGlobalState()
-  const { licenseType, spdxList, spdxLicenses, customList, expLicense } =
+  const { licenseType, spdxList, customList, expLicense } =
     sbomState
   const { sbomDispatch } = dispatch
 

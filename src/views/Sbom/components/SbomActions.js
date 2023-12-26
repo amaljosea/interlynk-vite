@@ -174,7 +174,6 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
     refetchSBOM(select.value)
   }
 
-  console.log('totalComp', totalComp)
 
   const handleEditSbom = () => {
     if (sbom?.primaryComponent) {

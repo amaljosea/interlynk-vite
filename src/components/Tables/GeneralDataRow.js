@@ -163,6 +163,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
   }
 
   const onLicenseOpen = () => {
+    console.log('data', data)
     sbomDispatch({ type: 'SET_LICENSES', payload: data })
     onSBMOpen()
   }
@@ -173,10 +174,24 @@ const GeneralDataRow = ({ status, data, refetch }) => {
         id: data.id,
         spec: data.spec,
         licenses: {
-          licenses: licenseType === 'license_spdx' ? spdxLicenses : undefined,
-          licensesExp: licenseType === 'license_exp' ? expLicense : undefined,
+          licenses:
+            licenseType === 'license_spdx'
+              ? spdxLicenses
+                ? spdxLicenses
+                : []
+              : undefined,
+          licensesExp:
+            licenseType === 'license_exp'
+              ? expLicense
+                ? expLicense
+                : null
+              : undefined,
           licensesCustom:
-            licenseType === 'license_custom' ? customLicenses : undefined
+            licenseType === 'license_custom'
+              ? customLicenses
+                ? customLicenses
+                : []
+              : undefined
         }
       }
     })
@@ -453,9 +468,6 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                             <TagLabel>{item}</TagLabel>
                           </Link>
                         </Tooltip>
-                        <TagCloseButton
-                          onClick={() => handleRemoveSpdx(item)}
-                        />
                       </Tag>
                     ))}
                   {/* EXPRESSION */}
@@ -474,7 +486,6 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                           <TagLabel>{data.licensesExp}</TagLabel>
                         </Link>
                       </Tooltip>
-                      <TagCloseButton onClick={handleRemoveExp} />
                     </Tag>
                   )}
                   {/* CUSTOM */}
@@ -494,9 +505,6 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                             <TagLabel>{item}</TagLabel>
                           </Link>
                         </Tooltip>
-                        <TagCloseButton
-                          onClick={() => handleRemoveCustom(item)}
-                        />
                       </Tag>
                     ))}
                 </Flex>
@@ -550,14 +558,6 @@ const GeneralDataRow = ({ status, data, refetch }) => {
               <Button
                 fontSize={'sm'}
                 colorScheme='blue'
-                // disabled={
-                //   (sbomLicenseType === 'license_spdx' &&
-                //     sbomSpdxLicense.length === 0) ||
-                //   (sbomLicenseType === 'license_exp' &&
-                //     sbomLicenseExp === '') ||
-                //   (sbomLicenseType === 'license_custom' &&
-                //     sbomCustomLicense.length === 0)
-                // }
                 onClick={onUpdateLicense}
               >
                 {data.licenses.length > 0 ? 'Update' : 'Save'}
