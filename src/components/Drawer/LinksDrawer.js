@@ -64,16 +64,19 @@ const LinksDrawer = ({ isOpen, onClose, component, sbomId, fetchCompData }) => {
   }
 
   const handleCheckUrl = () => {
-    if (!validateUrl(link)) {
+    const trimmedLink = link.trim()
+    console.log(trimmedLink)
+    if (!validateUrl(trimmedLink)) {
       setLinkError('Please enter a valid URL')
     }
   }
 
   const handleLinkChange = (e) => {
     const { value } = e.target
+    const trimmedLink = value.trim()
     setLink(value)
     setLinkError('')
-    if (value.length > 1024) {
+    if (trimmedLink.length > 1024) {
       setLinkError('Input must be 1024 characters')
     } else {
       setLinkError('')
@@ -163,7 +166,7 @@ const LinksDrawer = ({ isOpen, onClose, component, sbomId, fetchCompData }) => {
                 {/* URL */}
                 <FormControl
                   isRequired
-                  isInvalid={link !== '' && !validateUrl(link)}
+                  isInvalid={link !== '' && !validateUrl(link.trim())}
                 >
                   <FormLabel>Link</FormLabel>
                   <Input
@@ -179,7 +182,7 @@ const LinksDrawer = ({ isOpen, onClose, component, sbomId, fetchCompData }) => {
                   colorScheme='blue'
                   type='submit'
                   isDisabled={
-                    !validateUrl(link) || error !== '' || linkError !== ''
+                    !validateUrl(link.trim()) || error !== '' || linkError !== ''
                   }
                 >
                   Add
