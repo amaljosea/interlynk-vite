@@ -1,6 +1,6 @@
 // Chakra imports
 
-import React, { useState, useEffect, useContext, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {
   Drawer,
   DrawerBody,
@@ -45,10 +45,10 @@ import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import { InfoIcon, CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import { FaExpandAlt } from 'react-icons/fa'
-import GlobalContext from 'context/GlobalContext'
 import { CpeAutoComplete } from 'graphQL/Queries'
 import CpeInput from 'components/CpeInput'
 import LicenseField from 'components/LicenseField'
+import { useGlobalState } from 'hooks/useGlobalState'
 
 function ComponentDrawer(props) {
   const location = useLocation()
@@ -70,17 +70,16 @@ function ComponentDrawer(props) {
     filterRefetch
   } = props
 
+  const { prodCompState, dispatch } = useGlobalState()
   const {
-    setCompFilters,
     licenseType,
-    spdxLicense,
-    setPurlString,
-    customLicense,
+    customLicenses,
     purlString,
-    licenseExp,
-    isCpeValid,
-    setComPageIndex
-  } = useContext(GlobalContext)
+    expLicense,
+    spdxLicenses,
+    isCpeValid
+  } = prodCompState
+  const { prodCompDispatch } = dispatch
 
   const onFilterRefetch = () => {
     filterRefetch({
@@ -88,7 +87,14 @@ function ComponentDrawer(props) {
         projectId: productId,
         sbomId: sbomId
       }
-    }).then((res) => res.data && setCompFilters(res.data.sbom.filters))
+    }).then(
+      (res) =>
+        res.data &&
+        prodCompDispatch({
+          type: 'ADD_FILTER_HEADS',
+          payload: res.data.sbom.filters
+        })
+    )
   }
 
   const [getCpe] = useLazyQuery(CpeAutoComplete)
@@ -135,7 +141,7 @@ function ComponentDrawer(props) {
       setCompName(name)
       setCompVersion(version)
       setCpeList(cpes)
-      setPurlValue(purl)
+      setPurlValue(purl || '')
       setCompKind(kind)
       setCompScope(scope)
       setIsPrimary(primary)
@@ -199,9 +205,12 @@ function ComponentDrawer(props) {
     if (purlValue && purlValue !== '' && isPURLInputValid) {
       const pkg = PackageURL.fromString(purlValue)
       setPurlData(pkg)
-      setPurlString(pkg.toString())
+      prodCompDispatch({ type: 'SET_PURL_STRING', payload: pkg.toString() })
     } else {
-      setPurlString('pkg:type/name@version?key=value')
+      prodCompDispatch({
+        type: 'SET_PURL_STRING',
+        payload: 'pkg:type/name@version?key=value'
+      })
     }
     onPurlOpen()
   }
@@ -215,19 +224,26 @@ function ComponentDrawer(props) {
         version: compVersion,
         group: groupInfo,
         scope: compScope,
-        licenses:
-          spdxLicense.length === 0 &&
-          licenseExp === '' &&
-          customLicense.length === 0
-            ? undefined
-            : {
-                licenses:
-                  licenseType === 'license_spdx' ? spdxLicense : undefined,
-                licensesExp:
-                  licenseType === 'license_exp' ? licenseExp : undefined,
-                licensesCustom:
-                  licenseType === 'license_custom' ? customLicense : undefined
-              },
+        licenses: {
+          licenses:
+            licenseType === 'license_spdx'
+              ? spdxLicenses
+                ? spdxLicenses
+                : []
+              : undefined,
+          licensesExp:
+            licenseType === 'license_exp'
+              ? expLicense
+                ? expLicense
+                : null
+              : undefined,
+          licensesCustom:
+            licenseType === 'license_custom'
+              ? customLicenses
+                ? customLicenses
+                : []
+              : undefined
+        },
         cpes: cpeList,
         purl: purlValue,
         primary: isPrimary,
@@ -236,7 +252,7 @@ function ComponentDrawer(props) {
     })
       .then((res) => {
         if (res.data) {
-          setComPageIndex(1)
+          prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
           onFilterRefetch()
           onClose()
         }
@@ -263,17 +279,17 @@ function ComponentDrawer(props) {
         group: groupInfo,
         scope: compScope,
         licenses:
-          spdxLicense.length === 0 &&
-          licenseExp === '' &&
-          customLicense.length === 0
+          spdxLicenses.length === 0 &&
+          expLicense === '' &&
+          customLicenses.length === 0
             ? undefined
             : {
                 licenses:
-                  licenseType === 'license_spdx' ? spdxLicense : undefined,
+                  licenseType === 'license_spdx' ? spdxLicenses : undefined,
                 licensesExp:
-                  licenseType === 'license_exp' ? licenseExp : undefined,
+                  licenseType === 'license_exp' ? expLicense : undefined,
                 licensesCustom:
-                  licenseType === 'license_custom' ? customLicense : undefined
+                  licenseType === 'license_custom' ? customLicenses : undefined
               },
         cpes: cpeList.length > 0 ? cpeList : cpeValue !== '' ? [cpeValue] : [],
         purl: purlValue,
@@ -282,7 +298,7 @@ function ComponentDrawer(props) {
       }
     }).then((res) => {
       if (res.data) {
-        setComPageIndex(1)
+        prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
         onClose()
       }
     })

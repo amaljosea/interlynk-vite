@@ -632,6 +632,7 @@ export const UpdateComponent = gql`
         internal
         purl
         cpes
+        licenses
       }
       errors
     }

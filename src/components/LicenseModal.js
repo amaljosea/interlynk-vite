@@ -11,12 +11,11 @@ import {
   Stack,
   Text
 } from '@chakra-ui/react'
-import GlobalContext from 'context/GlobalContext'
-import { useContext } from 'react'
 import { useMutation } from '@apollo/client'
 import { sbomUpdate, CreateAutomation, recheckHealth } from 'graphQL/Mutation'
 import { useLocation } from 'react-router-dom'
 import SbomLicenseField from './SbomLicenseField'
+import { useGlobalState } from 'hooks/useGlobalState'
 
 const LicenseModal = ({
   data,
@@ -25,25 +24,25 @@ const LicenseModal = ({
   checkId,
   filterRefetch,
   refetch,
-  setPageIndex
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
 
+  const { sbomState, dispatch } = useGlobalState()
   const {
-    sbomLicenseType,
-    sbomSpdxLicense,
-    sbomLicenseExp,
-    sbomCustomLicense,
-    setCheckFilters
-  } = useContext(GlobalContext)
+    licenseType,
+    spdxLicenses,
+    customLicenses,
+    expLicense
+  } = sbomState
+  const { sbomDispatch, prodCheckDispatch } = dispatch
 
   const isInvalidLicense =
-    (sbomLicenseType === 'license_spdx' && sbomSpdxLicense.length === 0) ||
-    (sbomLicenseType === 'license_exp' && sbomLicenseExp === '') ||
-    (sbomLicenseType === 'license_custom' && sbomCustomLicense.length === 0)
+    (licenseType === 'license_spdx' && spdxLicenses.length === 0) ||
+    (licenseType === 'license_exp' && expLicense === '') ||
+    (licenseType === 'license_custom' && customLicenses.length === 0)
 
   const handleRefetch = () => {
     refetch({
@@ -66,7 +65,7 @@ const LicenseModal = ({
     filterRefetch({
       projectId: productId,
       sbomId: sbomId
-    }).then((res) => setCheckFilters(res.data.sbom.filters))
+    }).then((res) => prodCheckDispatch({type: 'ADD_FILTER_HEADS', payload: res.data.sbom.filters}))
   }
 
   const handleUpdateSBOM = async () => {
@@ -77,12 +76,12 @@ const LicenseModal = ({
           spec: data.spec,
           licenses: {
             licenses:
-              sbomLicenseType === 'license_spdx' ? sbomSpdxLicense : undefined,
+              licenseType === 'license_spdx' ? spdxLicenses : undefined,
             licensesExp:
-              sbomLicenseType === 'license_exp' ? sbomLicenseExp : undefined,
+              licenseType === 'license_exp' ? expLicense : undefined,
             licensesCustom:
-              sbomLicenseType === 'license_custom'
-                ? sbomCustomLicense
+              licenseType === 'license_custom'
+                ? customLicenses
                 : undefined
           }
         }
@@ -91,7 +90,7 @@ const LicenseModal = ({
           if (res.data) {
             onFilterRefetch()
             if (checkId) {
-              setPageIndex(1)
+              prodCheckDispatch({type: 'FETCH_DATA_SUCCESS'})
               healthRecheck({
                 variables: {
                   checkId: checkId,
@@ -114,17 +113,17 @@ const LicenseModal = ({
           projectId: productId,
           applicable: 'document',
           condition: 'missing',
-          attr: sbomLicenseType,
+          attr: licenseType,
           enabled: true,
           set: JSON.stringify(
             {
               value:
-                sbomLicenseType === 'license_spdx'
-                  ? sbomSpdxLicense
-                  : sbomLicenseType === 'license_exp'
-                  ? sbomLicenseExp
-                  : sbomLicenseType === 'license_custom'
-                  ? sbomCustomLicense
+                licenseType === 'license_spdx'
+                  ? spdxLicenses
+                  : licenseType === 'license_exp'
+                  ? expLicense
+                  : licenseType === 'license_custom'
+                  ? customLicenses
                   : ''
             },
             null,

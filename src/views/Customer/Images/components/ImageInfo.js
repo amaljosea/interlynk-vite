@@ -17,15 +17,13 @@ import {
   StackDivider,
   Button
 } from '@chakra-ui/react'
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Card from 'components/Card/Card.js'
 import CardHeader from 'components/Card/CardHeader'
 import CardBody from 'components/Card/CardBody.js'
 import { sbom } from 'variables/general'
 import { FaCubes, FaLayerGroup, FaMicroscope } from 'react-icons/fa'
 import { useLocation, useNavigate } from 'react-router-dom'
-import GlobalContext from 'context/GlobalContext'
-
 import { useQuery } from '@apollo/client'
 import { scanImage } from 'utils'
 import semver from 'semver'
@@ -36,11 +34,12 @@ import { formattedTime } from 'utils'
 import { dateTime } from 'utils'
 import Cookies from 'js-cookie'
 import ImageLogs from './ImageLogs'
+import { useGlobalState } from 'hooks/useGlobalState'
 
 function ImageInfo() {
   const [scanResults, setScanResults] = useState(null)
 
-  const { scanEnabled } = useContext(GlobalContext)
+  const { scanEnabled } = useGlobalState()
 
   const location = useLocation()
   const navigate = useNavigate()

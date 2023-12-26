@@ -317,11 +317,6 @@ const RelationshipDrawer = ({
                               <TagLabel>
                                 {comp.fromComp.name}-{comp.fromComp.version}
                               </TagLabel>
-                              <TagCloseButton
-                                onClick={() =>
-                                  handleRemove('Dependency Of', index)
-                                }
-                              />
                             </Tag>
                           ))}
                         </Flex>

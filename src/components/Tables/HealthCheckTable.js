@@ -16,12 +16,14 @@ import {
 import CustomLoader from 'components/CustomLoader'
 import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
 import LicenseModal from 'components/LicenseModal'
-import GlobalContext from 'context/GlobalContext'
+import { sbomUpdate } from 'graphQL/Mutation'
 import { CreateAutomation } from 'graphQL/Mutation'
 import { UpdateComponent } from 'graphQL/Mutation'
 import { recheckHealth, checkResultUpdate } from 'graphQL/Mutation'
+import { GetCheckFilterData } from 'graphQL/Queries'
 import { CpeAutoComplete } from 'graphQL/Queries'
-import React, { useContext, useMemo, useRef, useState } from 'react'
+import { useGlobalState } from 'hooks/useGlobalState'
+import React, { useMemo, useRef, useState, useEffect } from 'react'
 import DataTable from 'react-data-table-component'
 import { BiSolidWrench } from 'react-icons/bi'
 import { FaCheckDouble } from 'react-icons/fa'
@@ -36,47 +38,29 @@ import RowLimit from 'views/Sbom/components/RowLimit'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import SupplierModal from 'views/Sbom/components/SupplierModal'
 
-const HealthCheckTable = ({
-  productId,
-  sbomId,
-  data,
-  components,
-  pageIndex,
-  setPageIndex,
-  refetch,
-  totalRows,
-  setTotalRows,
-  filterRefetch,
-  sbomData
-}) => {
+const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
+  // GET HEALTH CHECK FILTER HEADS
+  const [getCheckFilters, { refetch: filterRefetch }] =
+    useLazyQuery(GetCheckFilterData)
+
   const customerView = location.pathname.startsWith('/customer')
   const toast = useToast()
 
+  const { totalRows, setTotalRows, prodCheckState, dispatch } = useGlobalState()
   const {
-    setLicenseType,
-    setSpdxList,
-    setSpdxLicense,
-    setLicenseExp,
-    checkFilters,
-    checkField,
-    setCheckField,
-    checkDirection,
-    setCheckDirection,
-    checkSearchInput,
-    setCheckSearchInput,
-    checkRules,
-    checkCategory,
-    checkSeverity,
-    checkStatus,
-    setCpeString,
-    setCheckAfter,
-    setCheckBefore,
-    setPurlString,
-    setCustomList,
-    setCustomLicense,
-    checkAfter,
-    checkBefore
-  } = useContext(GlobalContext)
+    field,
+    direction,
+    pageIndex,
+    searchInput,
+    rules,
+    categories,
+    severities,
+    statues,
+    filters,
+    after,
+    before
+  } = prodCheckState
+  const { prodCompDispatch, prodCheckDispatch } = dispatch
 
   const [purlValue, setPurlValue] = useState('')
   const [purlData, setPurlData] = useState(null)
@@ -92,29 +76,25 @@ const HealthCheckTable = ({
       variables: {
         projectId: productId,
         sbomId: sbomId,
-        search: checkSearchInput !== '' ? checkSearchInput : undefined,
+        search: searchInput !== '' ? searchInput : undefined,
         checkId:
-          checkRules.includes('all') || checkRules.length === 0
-            ? undefined
-            : checkRules,
+          rules.includes('all') || rules.length === 0 ? undefined : rules,
         category:
-          checkCategory.includes('all') || checkCategory.length === 0
+          categories.includes('all') || categories.length === 0
             ? undefined
-            : checkCategory,
+            : categories,
         severity:
-          checkSeverity.includes('all') || checkSeverity.length === 0
+          severities.includes('all') || severities.length === 0
             ? undefined
-            : checkSeverity,
+            : severities,
         status:
-          checkStatus.includes('all') || checkStatus.length === 0
-            ? undefined
-            : checkStatus,
+          statues.includes('all') || statues.length === 0 ? undefined : statues,
         first: totalRows,
-        // after: checkAfter !== '' ? checkAfter : undefined,
-        // last: checkBefore !== '' ? totalRows : undefined,
-        // before: checkBefore !== '' ? checkBefore : undefined,
-        field: checkField,
-        direction: checkDirection
+        // after: after !== '' ? after : undefined,
+        // last: before !== '' ? totalRows : undefined,
+        // before: before !== '' ? before : undefined,
+        field: field,
+        direction: direction
       }
     })
   }
@@ -125,7 +105,7 @@ const HealthCheckTable = ({
 
   const [getCpe] = useLazyQuery(CpeAutoComplete)
   const [updateComponent] = useMutation(UpdateComponent)
-  const [createAutoCheck] = useMutation(CreateAutomation)
+  const [updateSbom] = useMutation(sbomUpdate)
 
   const supplierBtn = useRef(null)
   const creationToolBtn = useRef(null)
@@ -220,72 +200,68 @@ const HealthCheckTable = ({
 
   // SEARCH COMPONENT
   const handleSearch = async (event) => {
-    if (event.key === 'Enter' && checkSearchInput !== '') {
+    if (event.key === 'Enter' && searchInput !== '') {
       await refetch({
         variables: {
           projectId: productId,
           sbomId: sbomId,
-          search: checkSearchInput !== '' ? checkSearchInput : undefined,
+          search: searchInput !== '' ? searchInput : undefined,
           checkId:
-            checkRules.includes('all') || checkRules.length === 0
-              ? undefined
-              : checkRules,
+            rules.includes('all') || rules.length === 0 ? undefined : rules,
           category:
-            checkCategory.includes('all') || checkCategory.length === 0
+            categories.includes('all') || categories.length === 0
               ? undefined
-              : checkCategory,
+              : categories,
           severity:
-            checkSeverity.includes('all') || checkSeverity.length === 0
+            severities.includes('all') || severities.length === 0
               ? undefined
-              : checkSeverity,
+              : severities,
           status:
-            checkStatus.includes('all') || checkStatus.length === 0
+            statues.includes('all') || statues.length === 0
               ? undefined
-              : checkStatus,
+              : statues,
           first: totalRows,
-          field: checkField,
-          direction: checkDirection
+          field: field,
+          direction: direction
+        }
+      }).then((res) => {
+        if (res.data) {
+          prodCheckDispatch({ type: 'FETCH_DATA_SUCCESS' })
         }
       })
-      setPageIndex(1)
     }
   }
 
   // CLEAR SERACH
   const handleClear = async () => {
-    setCheckSearchInput('')
-    setPageIndex(1)
     await refetch({
       variables: {
         projectId: productId,
         sbomId: sbomId,
         search: undefined,
         checkId:
-          checkRules.includes('all') || checkRules.length === 0
-            ? undefined
-            : checkRules,
+          rules.includes('all') || rules.length === 0 ? undefined : rules,
         category:
-          checkCategory.includes('all') || checkCategory.length === 0
+          categories.includes('all') || categories.length === 0
             ? undefined
-            : checkCategory,
+            : categories,
         severity:
-          checkSeverity.includes('all') || checkSeverity.length === 0
+          severities.includes('all') || severities.length === 0
             ? undefined
-            : checkSeverity,
+            : severities,
         status:
-          checkStatus.includes('all') || checkStatus.length === 0
-            ? undefined
-            : checkStatus,
+          statues.includes('all') || statues.length === 0 ? undefined : statues,
         first: totalRows,
-        field: checkField,
-        direction: checkDirection
+        field: field,
+        direction: direction
       }
-    })
+    }).then(
+      (res) => res.data && prodCheckDispatch({ type: 'CLEAR_SEARCH_INPUT' })
+    )
   }
 
   // SET ROW LENGTH
   const handleSetRow = async (e) => {
-    setTotalRows(Number(e.target.value))
     await refetch({
       variables: {
         projectId: productId,
@@ -294,11 +270,15 @@ const HealthCheckTable = ({
         last: undefined,
         after: undefined,
         before: undefined,
-        field: checkField,
-        direction: checkDirection
+        field: field,
+        direction: direction
+      }
+    }).then((res) => {
+      if (res.data) {
+        setTotalRows(Number(e.target.value))
+        prodCheckDispatch({ type: 'FETCH_DATA_SUCCESS' })
       }
     })
-    setPageIndex(1)
   }
 
   // SUB HEADER
@@ -318,20 +298,17 @@ const HealthCheckTable = ({
           {/* SEARCH COMPONENTS */}
           <SearchFilter
             id='healthcheck'
-            filterText={checkSearchInput}
-            setFilterText={setCheckSearchInput}
+            filterText={searchInput}
             onFilter={handleSearch}
             onClear={handleClear}
           />
 
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
-          {checkFilters && (
+          {filters && (
             <CheckFilterMenu
               refetch={refetch}
               productId={productId}
               sbomId={sbomId}
-              setPageIndex={setPageIndex}
-              totalRows={totalRows}
             />
           )}
         </Stack>
@@ -348,15 +325,10 @@ const HealthCheckTable = ({
         </Tooltip>
       </Flex>
     )
-  }, [checkFilters, handleReCheck])
+  }, [filters, handleReCheck])
 
   const handleOpenLicense = () => {
-    setLicenseType('license_spdx')
-    setSpdxList([])
-    setSpdxLicense([])
-    setLicenseExp('')
-    setCustomList([])
-    setCustomLicense([])
+    prodCompDispatch({ type: 'CLEAR_LICENSES' })
     onLicenseOpen()
   }
 
@@ -370,7 +342,7 @@ const HealthCheckTable = ({
     })
       .then((res) => {
         if (res.data) {
-          setPageIndex(1)
+          prodCheckDispatch({ type: 'CLEAR_PROD_CHECK' })
           healthRecheck({
             variables: {
               checkId: row.organizationRule.rule.friendlyId,
@@ -392,21 +364,35 @@ const HealthCheckTable = ({
       })
   }
 
-  // CHECK UNIQUE IDENTIFIER
-  const handleUniqueID = async (row) => {
-    setActiveRow(row)
-    await createAutoCheck({
+  const handleSbomUpdate = async (row) => {
+    await updateSbom({
       variables: {
-        projectId: productId,
-        applicable: 'component',
-        condition: 'missing',
-        attr: 'uniq_serial',
-        enabled: true,
-        compName: row.component.name,
-        compVersion: row.component.version,
-        set: JSON.stringify({ value: '' }, null, 2)
+        id: row.sbomId,
+        spec: row.sbom.spec,
+        uniqueId: true
       }
-    }).then((res) => res.data && handleComUpdate(row))
+    })
+      .then((res) => {
+        if (res.data) {
+          prodCheckDispatch({ type: 'CLEAR_PROD_CHECK' })
+          healthRecheck({
+            variables: {
+              checkId: row.organizationRule.rule.friendlyId,
+              sbomId: sbomId
+            }
+          })
+        }
+      })
+      .finally(() => {
+        setTimeout(() => {
+          toast({
+            description: 'A unique identifier has been added to the component',
+            status: 'success',
+            duration: 3000,
+            position: 'top'
+          })
+        }, 1000)
+      })
   }
 
   const handleOpen = (row) => {
@@ -470,7 +456,10 @@ const HealthCheckTable = ({
       organizationRule.rule.shortDesc === 'Component has a purl' ||
       organizationRule.rule.shortDesc === 'Component has a valid purl'
     ) {
-      setPurlString('pkg:type/name@version')
+      prodCompDispatch({
+        type: 'SET_PURL_STRING',
+        payload: 'pkg:type/name@version'
+      })
       return onPurlOpen()
     }
 
@@ -479,7 +468,10 @@ const HealthCheckTable = ({
       organizationRule.rule.shortDesc === 'Component has a valid cpe' ||
       organizationRule.rule.shortDesc === 'Component has a cpe'
     ) {
-      setCpeString('cpe:2.3:::::*:*:*:*:*:*:*')
+      prodCompDispatch({
+        type: 'SET_CPE_STRING',
+        payload: 'cpe:2.3:::::*:*:*:*:*:*:*'
+      })
       return onCpeOpen()
     }
 
@@ -659,6 +651,9 @@ const HealthCheckTable = ({
                       row.organizationRule.rule.shortDesc ===
                       'Component has a unique identifier'
                         ? handleComUpdate(row)
+                        : row.organizationRule.rule.shortDesc ===
+                          'Document has a unique identifier'
+                        ? handleSbomUpdate(row)
                         : handleOpen(row)
                     }
                     disabled={customerView}
@@ -719,78 +714,97 @@ const HealthCheckTable = ({
         after: after,
         last: before ? totalRows : undefined,
         before: before,
-        search: checkSearchInput !== '' ? checkSearchInput : undefined,
+        search: searchInput !== '' ? searchInput : undefined,
         checkId:
-          checkRules.includes('all') || checkRules.length === 0
-            ? undefined
-            : checkRules,
+          rules.includes('all') || rules.length === 0 ? undefined : rules,
         category:
-          checkCategory.includes('all') || checkCategory.length === 0
+          categories.includes('all') || categories.length === 0
             ? undefined
-            : checkCategory,
+            : categories,
         severity:
-          checkSeverity.includes('all') || checkSeverity.length === 0
+          severities.includes('all') || severities.length === 0
             ? undefined
-            : checkSeverity,
+            : severities,
         status:
-          checkStatus.includes('all') || checkStatus.length === 0
-            ? undefined
-            : checkStatus,
-        field: checkField,
-        direction: checkDirection
+          statues.includes('all') || statues.length === 0 ? undefined : statues,
+        field: field,
+        direction: direction
       }
     })
   }
 
   // SORT FUNCTION
-  const handleSort = (column, sortDirection) => {
-    setCheckField(column.id)
-    setCheckDirection(sortDirection === 'asc' ? 'ASC' : 'DESC')
-    refetch({
+  const handleSort = async (column, sortDirection) => {
+    await refetch({
       variables: {
         projectId: productId,
         sbomId: sbomId,
-        first: checkAfter !== '' ? totalRows : undefined,
-        after: checkAfter !== '' ? checkAfter : undefined,
-        last: checkBefore !== '' ? totalRows : undefined,
-        before: checkBefore !== '' ? checkBefore : undefined,
-        search: checkSearchInput !== '' ? checkSearchInput : undefined,
+        first: after !== '' ? totalRows : undefined,
+        after: after !== '' ? after : undefined,
+        last: before !== '' ? totalRows : undefined,
+        before: before !== '' ? before : undefined,
+        search: searchInput !== '' ? searchInput : undefined,
         checkId:
-          checkRules.includes('all') || checkRules.length === 0
-            ? undefined
-            : checkRules,
+          rules.includes('all') || rules.length === 0 ? undefined : rules,
         category:
-          checkCategory.includes('all') || checkCategory.length === 0
+          categories.includes('all') || categories.length === 0
             ? undefined
-            : checkCategory,
+            : categories,
         severity:
-          checkSeverity.includes('all') || checkSeverity.length === 0
+          severities.includes('all') || severities.length === 0
             ? undefined
-            : checkSeverity,
+            : severities,
         status:
-          checkStatus.includes('all') || checkStatus.length === 0
-            ? undefined
-            : checkStatus,
+          statues.includes('all') || statues.length === 0 ? undefined : statues,
         field: column.id,
         direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
       }
+    }).then((res) => {
+      if (res.data) {
+        prodCheckDispatch({
+          type: 'SET_SORT_ORDER',
+          payload: {
+            field: column.id,
+            direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+          }
+        })
+      }
     })
-    // setPageIndex(1)
   }
 
   const onPreviousPage = async () => {
-    setPageIndex((prev) => pageIndex !== 0 && prev - 1)
-    setCheckBefore(data.pageInfo.startCursor)
-    setCheckAfter('')
+    prodCheckDispatch({
+      type: 'DECREMENT_PAGE',
+      payload: data.pageInfo.startCursor
+    })
     handleRefetch(null, data.pageInfo.startCursor)
   }
 
   const onNextPage = async () => {
-    setPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
-    setCheckAfter(data.pageInfo.endCursor)
-    setCheckBefore('')
+    prodCheckDispatch({
+      type: 'INCREMENT_PAGE',
+      payload: data.pageInfo.endCursor
+    })
     handleRefetch(data.pageInfo.endCursor, null)
   }
+
+  useEffect(() => {
+    if (data) {
+      getCheckFilters({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId
+        }
+      }).then((res) => {
+        if (res.data) {
+          prodCheckDispatch({
+            type: 'ADD_FILTER_HEADS',
+            payload: res.data.sbom.filters
+          })
+        }
+      })
+    }
+  }, [data])
 
   return (
     <>
@@ -800,7 +814,7 @@ const HealthCheckTable = ({
           data={data && data.nodes}
           onSort={handleSort}
           defaultSortAsc={false}
-          defaultSortFieldId={checkField}
+          defaultSortFieldId={field}
           customStyles={customStyles}
           progressPending={data ? false : true}
           progressComponent={<CustomLoader />}
@@ -859,7 +873,6 @@ const HealthCheckTable = ({
               checkId={activeRow.organizationRule.rule.friendlyId}
               filterRefetch={filterRefetch}
               refetch={fetchCheckData}
-              setPageIndex={setPageIndex}
               data={sbomData}
             />
           )}
@@ -874,7 +887,6 @@ const HealthCheckTable = ({
               filterRefetch={filterRefetch}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
               checkId={activeRow.organizationRule.rule.friendlyId}
-              setPageIndex={setPageIndex}
               isOpen={isPrimaryOpen}
               onClose={onPrimaryClose}
               getCpe={getCpe}
@@ -891,7 +903,6 @@ const HealthCheckTable = ({
               filterRefetch={filterRefetch}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
               checkId={activeRow.organizationRule.rule.friendlyId}
-              setPageIndex={setPageIndex}
               isOpen={isLicenseOpen}
               onClose={onLicenseClose}
             />
@@ -906,7 +917,6 @@ const HealthCheckTable = ({
               filterRefetch={filterRefetch}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
               checkId={activeRow.organizationRule.rule.friendlyId}
-              setPageIndex={setPageIndex}
               isOpen={isTypeOpen}
               onClose={onTypeClose}
             />
@@ -922,7 +932,6 @@ const HealthCheckTable = ({
               isOpen={isSupplierOpen}
               onClose={onSupplierClose}
               data={null}
-              setPageIndex={setPageIndex}
               checkId={activeRow.organizationRule.rule.friendlyId}
               totalRows={totalRows}
             />
@@ -936,7 +945,6 @@ const HealthCheckTable = ({
               filterRefetch={filterRefetch}
               checkId={activeRow.organizationRule.rule.friendlyId}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
-              setPageIndex={setPageIndex}
               isOpen={isOpen}
               onClose={onClose}
             />
@@ -954,7 +962,6 @@ const HealthCheckTable = ({
               totalRows={totalRows}
               refetch={fetchCheckData}
               filterRefetch={filterRefetch}
-              setPageIndex={setPageIndex}
               checkId={activeRow.organizationRule.rule.friendlyId}
               getCpe={getCpe}
             />
@@ -974,7 +981,6 @@ const HealthCheckTable = ({
               refetch={fetchCheckData}
               filterRefetch={filterRefetch}
               totalRows={totalRows}
-              setPageIndex={setPageIndex}
               checkId={activeRow.organizationRule.rule.friendlyId}
               getCpe={getCpe}
             />
@@ -991,7 +997,6 @@ const HealthCheckTable = ({
               refetch={fetchCheckData}
               filterRefetch={filterRefetch}
               totalRows={totalRows}
-              setPageIndex={setPageIndex}
               checkId={activeRow.organizationRule.rule.friendlyId}
             />
           )}
@@ -1021,7 +1026,6 @@ const HealthCheckTable = ({
               onClose={onDocSupClose}
               suppliers={null}
               totalRows={totalRows}
-              setPageIndex={setPageIndex}
               checkId={activeRow.organizationRule.rule.friendlyId}
               shortDesc={activeRow.organizationRule.rule.shortDesc}
               getCpe={getCpe}

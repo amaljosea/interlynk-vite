@@ -12,14 +12,14 @@ import IconBox from 'components/Icons/IconBox'
 import { InterlynkLogo } from 'components/Icons/Icons'
 import { Separator } from 'components/Separator/Separator'
 import { SidebarHelp } from 'components/Sidebar/SidebarHelp'
-import GlobalContext from 'context/GlobalContext'
-import { useContext, useState } from 'react'
+import { useGlobalState } from 'hooks/useGlobalState'
+import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
 // this function creates the links and collapses that appear in the sidebar (left menu)
 
 const SidebarContent = ({ logoText, routes }) => {
-  const { minimize } = useContext(GlobalContext)
+  const { minimize } = useGlobalState()
 
   let location = useLocation()
   const urlParts = location.pathname.split('/')

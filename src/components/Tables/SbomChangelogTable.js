@@ -9,8 +9,7 @@ import {
   Tooltip
 } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
-import GlobalContext from 'context/GlobalContext'
-import React, { useMemo, useState, useContext } from 'react'
+import React, { useMemo, useEffect } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation } from 'react-router-dom'
 import { timeSince } from 'utils'
@@ -18,6 +17,9 @@ import { getFullDateAndTime, customStyles } from 'utils'
 import LogFilterMenu from 'views/Sbom/components/LogFilterMenu'
 import RowLimit from 'views/Sbom/components/RowLimit'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
+import { useGlobalState } from 'hooks/useGlobalState'
+import { useLazyQuery } from '@apollo/client'
+import { GetLogsFilterData } from 'graphQL/Queries'
 
 const setColor = (type) => {
   switch (type) {
@@ -38,21 +40,18 @@ const setColor = (type) => {
   }
 }
 
-const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
+const SbomChangelogTable = ({ data, refetch }) => {
+  // GET LOGS FILTER HEADS
+  const [getLogsFilters] = useLazyQuery(GetLogsFilterData)
+
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
-
-  const { logFilters, logField, setLogField, logDirection, setLogDirection } =
-    useContext(GlobalContext)
-
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
 
-  const [filterText, setFilterText] = useState('')
-  const [pageIndex, setPageIndex] = useState(1)
-
-  const x = window.matchMedia('(min-width: 2500px)')
-  const y = window.matchMedia('(max-width: 1440px)')
+  const { totalRows, setTotalRows, sbomLogState, dispatch } = useGlobalState()
+  const { filters, field, direction, pageIndex, searchInput } = sbomLogState
+  const { sbomLogDispatch } = dispatch
 
   // COLUMNS
   const columns = [
@@ -291,43 +290,61 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
   ]
 
   const onPreviousPage = async () => {
-    setPageIndex((prev) => pageIndex !== 0 && prev - 1)
     await refetch({
       projectId: productId,
       sbomId: sbomId,
-      first: undefined,
-      after: undefined,
       last: totalRows,
       before: data.pageInfo.startCursor,
-      field: logField,
-      direction: logDirection
-    })
+      field: field,
+      direction: direction
+    }).then(
+      (res) =>
+        res.data &&
+        sbomLogDispatch({
+          type: 'DECREMENT_PAGE',
+          payload: data.pageInfo.startCursor
+        })
+    )
   }
 
   const onNextPage = async () => {
-    setPageIndex((prev) => prev < Math.ceil(data.totalCount) && prev + 1)
     refetch({
       projectId: productId,
       sbomId: sbomId,
       first: totalRows,
       after: data.pageInfo.endCursor,
-      last: undefined,
-      before: undefined,
-      field: logField,
-      direction: logDirection
-    })
+      field: field,
+      direction: direction
+    }).then(
+      (res) =>
+        res.data &&
+        sbomLogDispatch({
+          type: 'INCREMENT_PAGE',
+          payload: { total: data.totalCount, after: data.pageInfo.endCursor }
+        })
+    )
+  }
+
+  // ON SEARCH INPUT CHANGE
+  const onSearchInputChange = (e) => {
+    sbomLogDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: e.target.value })
   }
 
   // SEARCH COMPONENT
   const handleSearch = async (event) => {
-    if (event.key === 'Enter' && filterText !== '') {
+    if (event.key === 'Enter' && searchInput !== '') {
       await refetch({
         projectId: productId,
         sbomId: sbomId,
-        search: filterText,
+        search: searchInput,
         first: totalRows
-      })
-      setPageIndex(1)
+      }).then(
+        (res) =>
+          res.data &&
+          sbomLogDispatch({
+            type: 'FETCH_DATA_SUCCESS'
+          })
+      )
     }
   }
 
@@ -338,9 +355,13 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
       sbomId: sbomId,
       search: undefined,
       first: totalRows
-    })
-    setFilterText('')
-    setPageIndex(1)
+    }).then(
+      (res) =>
+        res.data &&
+        sbomLogDispatch({
+          type: 'CLEAR_SEARCH_INPUT'
+        })
+    )
   }
 
   // SET ROW LENGTH
@@ -353,25 +374,31 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
       last: undefined,
       after: undefined,
       before: undefined,
-      field: logField,
-      direction: logDirection
-    })
-    setFilterText('')
-    setPageIndex(1)
+      field: field,
+      direction: direction
+    }).then(
+      (res) => res.data && sbomLogDispatch({ type: 'FETCH_DATA_SUCCESS' })
+    )
   }
 
-  const handleSort = (column, sortDirection) => {
-    // console.log(`column`, column)
-    // console.log(`sortDirection`, sortDirection)
-    setLogField(column.id)
-    setLogDirection(sortDirection === 'asc' ? 'ASC' : 'DESC')
-    refetch({
+  const handleSort = async (column, sortDirection) => {
+    await refetch({
       projectId: productId,
       sbomId: sbomId,
       first: totalRows,
       last: undefined,
       field: column.id,
       direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+    }).then((res) => {
+      if (res.data) {
+        sbomLogDispatch({
+          type: 'SET_SORT_ORDER',
+          payload: {
+            field: column.id,
+            direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+          }
+        })
+      }
     })
   }
 
@@ -390,27 +417,43 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
         >
           <SearchFilter
             id='changelog'
-            filterText={filterText}
-            setFilterText={setFilterText}
+            filterText={searchInput}
+            onChange={onSearchInputChange}
             onFilter={handleSearch}
             onClear={handleClear}
           />
 
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
-          {logFilters && (
+          {filters && (
             <LogFilterMenu
               refetch={refetch}
               productId={productId}
               sbomId={sbomId}
-              logFilters={logFilters}
-              setPageIndex={setPageIndex}
-              totalRows={totalRows}
             />
           )}
         </Stack>
       </Flex>
     )
-  }, [filterText, logFilters, handleClear, handleSearch])
+  }, [searchInput, filters, onSearchInputChange, handleClear, handleSearch])
+
+  useEffect(() => {
+    if (data) {
+      getLogsFilters({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId
+        }
+      }).then((res) => {
+        if (res.data) {
+          console.log('filters', res.data)
+          sbomLogDispatch({
+            type: 'ADD_FILTER_HEADS',
+            payload: res.data.sbom.filters
+          })
+        }
+      })
+    }
+  }, [data])
 
   return (
     <>
@@ -420,7 +463,7 @@ const SbomChangelogTable = ({ data, refetch, totalRows, setTotalRows }) => {
           data={data && data.nodes}
           onSort={handleSort}
           defaultSortAsc={false}
-          defaultSortFieldId={logField}
+          defaultSortFieldId={field}
           customStyles={customStyles}
           progressPending={data ? false : true}
           progressComponent={<CustomLoader />}

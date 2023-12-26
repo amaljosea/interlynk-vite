@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect } from 'react'
 // COMPONENTS
 import {
   Table,
@@ -40,7 +40,6 @@ import CardBody from 'components/Card/CardBody.js'
 import CardHeader from 'components/Card/CardHeader'
 
 // HELPERS
-import GlobalContext from 'context/GlobalContext'
 import VulnerabilityRow from 'components/Tables/VulnerabilityRow.js'
 
 // ICONS
@@ -48,6 +47,7 @@ import { BsFilterRight } from 'react-icons/bs'
 import { BiExport, BiImport } from 'react-icons/bi'
 import { UpdateImageVersion } from 'graphQL/Mutation'
 import { useMutation } from '@apollo/client'
+import { useGlobalState } from 'hooks/useGlobalState'
 
 const CustomerSBOMTable = ({
   data,
@@ -59,9 +59,7 @@ const CustomerSBOMTable = ({
   handlePreviousPage,
   handleNextPage
 }) => {
-  const { vulnerabilitiesData, setVulnerabilitiesData } = useContext(
-    GlobalContext
-  )
+  const { vulnerabilitiesData, setVulnerabilitiesData } = useGlobalState()
 
   const {
     isOpen: isRefreshOpen,
