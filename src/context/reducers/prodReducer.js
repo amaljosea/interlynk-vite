@@ -26,12 +26,15 @@ const prodReducer = (state, action) => {
     case 'DECREMENT_PAGE':
       return {
         ...state,
-        pageIndex: pageIndex !== 0 && pageIndex - 1
+        pageIndex: state.pageIndex !== 0 && state.pageIndex - 1,
+        before: payload
       }
     case 'INCREMENT_PAGE':
+      const { total, after } = payload
       return {
         ...state,
-        pageIndex: pageIndex < Math.ceil(payload) && pageIndex + 1
+        pageIndex: pageIndex < Math.ceil(total) && pageIndex + 1,
+        after: after
       }
     case 'SET_SORT_ORDER':
       return {

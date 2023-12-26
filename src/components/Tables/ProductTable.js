@@ -495,7 +495,10 @@ const ProductTable = ({ data, refetch, org }) => {
       last: totalRows,
       after: undefined,
       before: data.pageInfo.startCursor
-    }).then((res) => res.data && prodDispatch({ type: 'DECREMENT_PAGE' }))
+    }).then((res) => res.data && prodDispatch({
+      type: 'DECREMENT_PAGE',
+      payload:  data.pageInfo.startCursor
+    }))
   }
 
   // NEXT PAGE
@@ -508,7 +511,11 @@ const ProductTable = ({ data, refetch, org }) => {
     }).then(
       (res) =>
         res.data &&
-        prodDispatch({ type: 'INCREMENT_PAGE', payload: data.totalCount })
+        prodDispatch({ type: 'INCREMENT_PAGE',
+        payload: {
+          total: data.totalCount,
+          after: data.pageInfo.endCursor
+        }})
     )
   }
 
