@@ -783,7 +783,10 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
   const onNextPage = async () => {
     prodCheckDispatch({
       type: 'INCREMENT_PAGE',
-      payload: data.pageInfo.endCursor
+      payload: {
+        total: data.totalCount,
+        after: data.pageInfo.endCursor
+      }
     })
     handleRefetch(data.pageInfo.endCursor, null)
   }

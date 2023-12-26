@@ -41,7 +41,7 @@ const prodCompReducer = (state, action) => {
       return {
         ...state,
         pageIndex: state.pageIndex < Math.ceil(total) && state.pageIndex + 1,
-        after: payload
+        after: after
       }
     case 'SET_SORT_ORDER':
       return {
