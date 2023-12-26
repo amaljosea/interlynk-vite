@@ -97,7 +97,6 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
 
   const [selectedProd, setSelectedProd] = useState('')
   const [selectedVersion, setSelectedVersion] = useState('')
-  const [uniqVersions, setUniqVersions] = useState([])
   const [searchInput, setSearchInput] = useState('')
   const [activeRow, setActiveRow] = useState(null)
   const { data: allProducts } = useQuery(GetProjectData, {
