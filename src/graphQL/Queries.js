@@ -961,6 +961,9 @@ export const GetCheckResults = gql`
         nodes {
           id
           sbomId
+          sbom {
+            spec
+          }
           componentId
           primary
           status
@@ -1183,10 +1186,7 @@ export const DownloadSBOM = gql`
     $includeVulns: Boolean
   ) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
-      download(
-        sbomId: $sbomId
-        includeVulns: $includeVulns
-      )
+      download(sbomId: $sbomId, includeVulns: $includeVulns)
     }
   }
 `

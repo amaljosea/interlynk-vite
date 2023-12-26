@@ -7,9 +7,6 @@ import {
   IconButton,
   Skeleton,
   Stack,
-  Stat,
-  StatLabel,
-  StatNumber,
   Tab,
   TabList,
   TabPanel,
@@ -33,7 +30,7 @@ import {
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import VersionTable from 'components/Tables/VersionTable'
-import { useContext, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   FaCube,
   FaLayerGroup,
@@ -41,16 +38,15 @@ import {
   FaScrewdriverWrench,
   FaToggleOn,
   FaTrashCan,
-  FaUpload
+  FaUpload,
+  FaToggleOff
 } from 'react-icons/fa6'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { timeSince, getFullDateAndTime } from 'utils'
-import { vulnList } from 'variables/general'
+import { timeSince, getFullDateAndTime, removeDuplicates } from 'utils'
 import SBOM from 'views/Sbom'
 import Controls from '../Automation/components/Controls'
 import ChangeLog from '../Changelog'
 import Settings from '../Automation/components/Settings'
-import VulnsTable from 'components/Tables/VulnsTable'
 import ProductModal from './components/ProductModal'
 import UploadModal from './components/UploadModal'
 import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
@@ -59,13 +55,11 @@ import {
   GetProductInfo,
   GetProductVersions,
   GetProjectCheck,
-  GetVulnData
+  GetVulnData,
+  GetProjectLogs
 } from 'graphQL/Queries'
 import { UpdateProject, DeleteProject } from 'graphQL/Mutation'
-import { FaToggleOff } from 'react-icons/fa'
-import GlobalContext from 'context/GlobalContext'
-import { GetProjectLogs } from 'graphQL/Queries'
-import { removeDuplicates } from 'utils'
+import { useGlobalState } from 'hooks/useGlobalState'
 
 const ProductDetails = () => {
   const navigate = useNavigate()
@@ -74,23 +68,10 @@ const ProductDetails = () => {
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
 
-  const {
-    setVulnSeverity,
-    setVulnComponent,
-    setVulnStatus,
-    setVulnKev,
-    setVulnEpss,
-    setMinVal,
-    setMaxVal,
-    setCustomLicense,
-    setSpdxLicense,
-    setLicenseExp,
-    setSpdxList,
-    setCustomList,
-    prodLogField,
-    prodLogDirection,
-    totalRows
-  } = useContext(GlobalContext)
+  const { totalRows, activeProdTab, setActiveProdTab, prodLogState, dispatch } =
+    useGlobalState()
+  const { field, direction } = prodLogState
+  const { prodCompDispatch, prodVulnDispatch } = dispatch
 
   const { data, loading, error, refetch } = useQuery(GetProductInfo, {
     variables: {
@@ -136,9 +117,7 @@ const ProductDetails = () => {
     onCompleted: () => refetch({ id: productId })
   })
 
-  const [activeTab, setActiveTab] = useState(0)
-
-  const activeProdTab = Number(localStorage.getItem('activeProdTab'))
+  const activeTab = Number(localStorage.getItem('activeProdTab'))
 
   const {
     isOpen: isOpenProduct,
@@ -171,17 +150,13 @@ const ProductDetails = () => {
   } = useDisclosure()
 
   const onBuildSbom = () => {
-    setCustomLicense([])
-    setSpdxLicense([])
-    setSpdxList([])
-    setCustomList([])
-    setLicenseExp('')
+    prodCompDispatch({ type: 'CLEAR_LICENSES' })
     onSbomOpen()
   }
 
   const handleTabChange = (value) => {
     localStorage.setItem('activeProdTab', value)
-    setActiveTab(value)
+    setActiveProdTab(value)
   }
 
   // TOGGLE STATUS
@@ -207,41 +182,35 @@ const ProductDetails = () => {
 
   useEffect(() => {
     if (sbomId === null) {
-      setVulnSeverity([])
-      setVulnComponent([])
-      setVulnStatus([])
-      setVulnKev('')
-      setVulnEpss('')
-      setMinVal(0)
-      setMaxVal(10000)
+      prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
     }
   }, [sbomId])
 
   useEffect(() => {
-    if (activeProdTab === 0) {
-      setActiveTab(0)
-    } else if (activeProdTab === 1) {
-      setActiveTab(1)
+    if (activeTab === 0) {
+      setActiveProdTab(0)
+    } else if (activeTab === 1) {
+      setActiveProdTab(1)
       getRules({
         variables: {
           id: productId,
           first: totalRows
         }
       })
-    } else if (activeProdTab === 2) {
-      setActiveTab(2)
-    } else if (activeProdTab === 3) {
-      setActiveTab(3)
+    } else if (activeTab === 2) {
+      setActiveProdTab(2)
+    } else if (activeTab === 3) {
+      setActiveProdTab(3)
       getLogs({
         variables: {
           id: productId,
           first: totalRows,
-          field: prodLogField,
-          direction: prodLogDirection
+          field: field,
+          direction: direction
         }
       })
     }
-  }, [activeProdTab])
+  }, [activeTab])
 
   if (loading) {
     return (
@@ -474,7 +443,7 @@ const ProductDetails = () => {
                 variant='enclosed'
                 w={'100%'}
                 bg={'white'}
-                index={activeTab}
+                index={activeProdTab}
                 onChange={(value) => handleTabChange(value)}
               >
                 <TabList>

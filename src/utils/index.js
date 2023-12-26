@@ -617,3 +617,15 @@ export const removeDuplicates = (arr) => {
 
   return versions
 }
+
+
+export const validateUrl = (url) => {
+  const urlRegex =
+    /^(?:http|https):\/\/(?:www\.)?[a-zA-Z0-9-]+(?:\.[a-zA-Z]{2,})+(?:\/[\w-]+)*(?:\/[\w\-]+(?:\.[a-zA-Z]{2,})?)?(?:\?[\w%=&]*)?(?:#[\w\-]*)?$/
+  return urlRegex.test(url)
+}
+
+export const validateEmail = (email) => {
+  const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
+  return emailRegex.test(email)
+}

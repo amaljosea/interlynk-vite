@@ -1,5 +1,5 @@
 const prodCheckReducer = (state, action) => {
-  const { type } = action
+  const { type, payload } = action
   switch (type) {
     case 'CLEAR_PROD_CHECK':
       return {
@@ -12,6 +12,78 @@ const prodCheckReducer = (state, action) => {
         categories: [],
         severities: [],
         statues: []
+      }
+    case 'CHANGE_SEARCH_INPUT':
+      return {
+        ...state,
+        searchInput: payload
+      }
+    case 'FETCH_DATA_SUCCESS':
+      return {
+        ...state,
+        pageIndex: 1
+      }
+    case 'CLEAR_SEARCH_INPUT':
+      return {
+        ...state,
+        searchInput: '',
+        pageIndex: 1
+      }
+    case 'DECREMENT_PAGE':
+      return {
+        ...state,
+        pageIndex: pageIndex !== 0 && pageIndex - 1,
+        before: payload
+      }
+    case 'INCREMENT_PAGE':
+      return {
+        ...state,
+        pageIndex: pageIndex < Math.ceil(payload) && pageIndex + 1,
+        after: payload
+      }
+    case 'SET_SORT_ORDER':
+      return {
+        ...state,
+        field: payload.field,
+        direction: payload.direction,
+        pageIndex: 1
+      }
+    case 'ADD_FILTER_HEADS':
+      return {
+        ...state,
+        filters: payload
+      }
+    case 'FILTER_RULE':
+      return {
+        ...state,
+        rules: [...payload].includes('all') ? [] : payload,
+        pageIndex: 1,
+        after: '',
+        before: ''
+      }
+    case 'FILTER_CATEGORY':
+      return {
+        ...state,
+        categories: [...payload].includes('all') ? [] : payload,
+        pageIndex: 1,
+        after: '',
+        before: ''
+      }
+    case 'FILTER_SEVERITY':
+      return {
+        ...state,
+        severities: [...payload].includes('all') ? [] : payload,
+        pageIndex: 1,
+        after: '',
+        before: ''
+      }
+    case 'FILTER_STATUS':
+      return {
+        ...state,
+        statues: [...payload].includes('all') ? [] : payload,
+        pageIndex: 1,
+        after: '',
+        before: ''
       }
     default:
       return state

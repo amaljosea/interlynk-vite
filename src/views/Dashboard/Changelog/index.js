@@ -1,6 +1,4 @@
-import { useQuery } from '@apollo/client'
 import ChangelogTable from 'components/Tables/ChangelogTable'
-import { GetProjectLogs } from 'graphQL/Queries'
 import { useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
@@ -13,14 +11,13 @@ const ChangeLog = ({ data, refetch }) => {
   const queryParams = new URLSearchParams(location.search)
   const id = queryParams.get('id')
 
-
   useEffect(() => {
     if (!idRegex.test(id)) {
       navigate(`/vendor/products`)
     }
   }, [id])
 
-  return <ChangelogTable data={data?.project.activityLogs} refetch={refetch} />
+  return <ChangelogTable data={data?.project?.activityLogs} refetch={refetch} />
 }
 
 export default ChangeLog

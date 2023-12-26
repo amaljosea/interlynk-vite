@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import {
   Box,
   Input,
@@ -11,8 +11,8 @@ import {
   List
 } from '@chakra-ui/react'
 import { CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
-import GlobalContext from 'context/GlobalContext'
 import { PackageURL } from 'packageurl-js'
+import { useGlobalState } from 'hooks/useGlobalState'
 
 const regexPattern =
   /cpe:2\.3:[aho\*\-](:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,\/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){5}(:(([a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))?)|[\*\-]))(:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,\/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){4}/
@@ -30,47 +30,42 @@ const CpeInput = ({
   const [focusedIndex, setFocusedIndex] = useState(null)
   const listItemsRef = useRef([])
 
-  const {
-    cpeString,
-    setCpeString,
-    purlString,
-    setPurlString,
-    isCpeValid,
-    setIsCpeValid
-  } = useContext(GlobalContext)
+  const { prodCompState, dispatch } = useGlobalState()
+  const { cpeString, purlString, isCpeValid } = prodCompState
+  const { prodCompDispatch } = dispatch
 
   const updateString = (name, value) => {
     const cpeParts = cpeString.split(':')
     if (name === 'vendor') {
       cpeParts[3] = value
       const cpe = cpeParts.join(':')
-      setCpeString(cpe)
+      prodCompDispatch({ type: 'SET_CPE_STRING', payload: cpe })
     } else if (name === 'product') {
       cpeParts[4] = value
       cpeParts[5] = '*'
       const cpe = cpeParts.join(':')
-      setCpeString(cpe)
+      prodCompDispatch({ type: 'SET_CPE_STRING', payload: cpe })
     } else if (name === 'version') {
       cpeParts[5] = value === '' ? '*' : value
       const cpe = cpeParts.join(':')
-      setCpeString(cpe)
+      prodCompDispatch({ type: 'SET_CPE_STRING', payload: cpe })
     } else if (name === 'namespace') {
       const pkg = PackageURL.fromString(purlString)
       pkg.namespace = value
-      setPurlString(pkg.toString())
+      prodCompDispatch({ type: 'SET_PURL_STRING', payload: pkg.toString() })
     } else if (name === 'packageName') {
       const pkg = PackageURL.fromString(purlString)
       if (value === '') {
         pkg.name = 'name'
-        setPurlString(pkg.toString())
+        prodCompDispatch({ type: 'SET_PURL_STRING', payload: pkg.toString() })
       } else {
         pkg.name = value
-        setPurlString(pkg.toString())
+        prodCompDispatch({ type: 'SET_PURL_STRING', payload: pkg.toString() })
       }
     } else if (name === 'packageVersion') {
       const pkg = PackageURL.fromString(purlString)
       pkg.version = value
-      setPurlString(pkg.toString())
+      prodCompDispatch({ type: 'SET_PURL_STRING', payload: pkg.toString() })
     }
   }
 
@@ -131,9 +126,9 @@ const CpeInput = ({
     if (validation) {
       const matches = regexPattern.test(inputValue)
       if (matches) {
-        setIsCpeValid(true)
+        prodCompDispatch({ type: 'SET_CPE_VALIDATION', payload: true })
       } else {
-        setIsCpeValid(false)
+        prodCompDispatch({ type: 'SET_CPE_VALIDATION', payload: false })
       }
     }
   }, [inputValue])

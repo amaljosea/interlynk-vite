@@ -204,11 +204,7 @@ const SignedSbomTable = ({
                 error={error}
                 refetch={compRefetch}
                 filterRefetch={compFilterRefetch}
-                pageIndex={componentIndex}
-                setPageIndex={setComponentIndex}
                 primaryComp={data.primaryComponent}
-                totalRows={totalRows}
-                setTotalRows={setTotalRows}
               />
             )}
 
@@ -257,10 +253,6 @@ const SignedSbomTable = ({
               productId={productId}
               sbomId={sbomId}
               filterRefetch={vulnFilterRefetch}
-              pageIndex={vulnIndex}
-              setPageIndex={setVulnIndex}
-              totalRows={totalRows}
-              setTotalRows={setTotalRows}
             />
           </TabPanel>
         </TabPanels>

@@ -119,7 +119,7 @@ const Header = ({
         setProfileImage(null)
       }
     }
-  }, [])
+  }, [user])
 
   return (
     <Flex direction='column'>

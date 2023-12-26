@@ -1,8 +1,8 @@
-import { useEffect, useContext } from 'react'
+import { useEffect } from 'react'
 import { Box, Heading, Flex, Text, Stack } from '@chakra-ui/react'
-import GlobalContext from 'context/GlobalContext'
 import { findSimilarItems } from 'utils'
 import CopyTable from 'components/Tables/CopyTable'
+import { useGlobalState } from 'hooks/useGlobalState'
 
 const StepTwo = ({
   productId,
@@ -11,17 +11,10 @@ const StepTwo = ({
   currentSbomId,
   currentProductId
 }) => {
-  const {
-    vulnField,
-    vulnDirection,
-    totalVulns,
-    mergeData,
-    setMergeData,
-    currentSbom,
-    setCurrentSbom,
-    importSbom,
-    setImportSbom
-  } = useContext(GlobalContext)
+  const { prodVulnState, dispatch } = useGlobalState()
+  const { field, direction, totalVulns, mergeData, importSbom, currentSbom } =
+    prodVulnState
+  const { prodVulnDispatch } = dispatch
 
   useEffect(() => {
     if (currentSbomId && currentProductId) {
@@ -30,10 +23,15 @@ const StepTwo = ({
           projectId: currentProductId,
           sbomId: currentSbomId,
           first: totalVulns,
-          field: vulnField,
-          direction: vulnDirection
+          field: field,
+          direction: direction
         }
-      }).then((res) => setCurrentSbom(res.data.sbom.vulns.nodes))
+      }).then((res) =>
+        prodVulnDispatch({
+          type: 'UPDATE_CURRENT_SBOM',
+          payload: res.data.sbom.vulns.nodes
+        })
+      )
     }
   }, [])
 
@@ -44,22 +42,28 @@ const StepTwo = ({
           projectId: productId,
           sbomId: sbomId,
           first: totalVulns,
-          field: vulnField,
-          direction: vulnDirection
+          field: field,
+          direction: direction
         }
-      }).then((res) => setImportSbom(res.data.sbom.vulns.nodes))
+      }).then((res) =>
+        prodVulnDispatch({
+          type: 'UPDATE_IMPORT_SBOMS',
+          payload: res.data.sbom.vulns.nodes
+        })
+      )
     }
   }, [productId, sbomId])
 
   useEffect(() => {
     if (currentSbom && importSbom) {
-      // console.log('currentSbom', currentSbom)
-      // console.log('importSbom', importSbom)
+      console.log('currentSbom', currentSbom)
+      console.log('importSbom', importSbom)
       const data = findSimilarItems(currentSbom, importSbom)
       const filterData = data.filter((item) => item.importStatus !== null)
-      setMergeData(filterData)
+      prodVulnDispatch({ type: 'UPDATE_MERGE_DATA', payload: filterData })
     }
   }, [currentSbom, importSbom])
+
 
   return (
     <Box width={'90%'} mx={'auto'}>

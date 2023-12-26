@@ -108,7 +108,7 @@ const SigningModal = ({
         <form onSubmit={message === '' ? handleSave : handleSubmit}>
           <ModalContent>
             <ModalHeader>
-              {sbomData.sbom.lifecycle === 'signed' ? 'Unsign' : 'Sign'} SBOM
+              {sbomData.lifecycle === 'signed' ? 'Unsign' : 'Sign'} SBOM
             </ModalHeader>
             <ModalCloseButton />
             <ModalBody>

@@ -10,45 +10,34 @@ import {
 } from '@chakra-ui/react'
 import CheckMark from 'components/Misc/CheckMark'
 import { GetOrgRules } from 'graphQL/Queries'
-import GlobalContext from 'context/GlobalContext'
-import { useContext } from 'react'
 import { useQuery } from '@apollo/client'
 import { FaFilter } from 'react-icons/fa'
+import { useGlobalState } from 'hooks/useGlobalState'
 
-const CheckFilterMenu = ({
-  refetch,
-  productId,
-  sbomId,
-  setPageIndex,
-  totalRows
-}) => {
+const CheckFilterMenu = ({ refetch, productId, sbomId }) => {
+  const { totalRows, prodCheckState, dispatch } = useGlobalState()
   const {
-    checkSearchInput,
-    checkRules,
-    setCheckRules,
-    checkFilters,
-    checkField,
-    checkDirection,
-    checkCategory,
-    setCheckCategory,
-    checkSeverity,
-    setCheckSeverity,
-    checkStatus,
-    setCheckStatus,
-    setCheckAfter,
-    setCheckBefore
-  } = useContext(GlobalContext)
+    field,
+    direction,
+    searchInput,
+    rules,
+    categories,
+    severities,
+    statues,
+    filters,
+    after,
+    before
+  } = prodCheckState
+  const { prodCheckDispatch } = dispatch
 
-  const { checkCategories, checkStatuses } = checkFilters
+  const { checkCategories, checkStatuses } = filters
 
   const onFilter = (checkId, category, severity, status) => {
-    setCheckAfter('')
-    setCheckBefore('')
     refetch({
       variables: {
         projectId: productId,
         sbomId: sbomId,
-        search: checkSearchInput !== '' ? checkSearchInput : undefined,
+        search: searchInput !== '' ? searchInput : undefined,
         checkId:
           checkId.includes('all') || checkId.length === 0 ? undefined : checkId,
         category:
@@ -62,31 +51,42 @@ const CheckFilterMenu = ({
         status:
           status.includes('all') || status.length === 0 ? undefined : status,
         first: totalRows,
-        field: checkField,
-        direction: checkDirection
+        field: field,
+        direction: direction
       }
     })
-    setPageIndex(1)
   }
 
   const onFilterCheckId = (value) => {
-    setCheckRules(value.includes('all') ? [] : value)
-    onFilter(value, checkCategory, checkSeverity, checkStatus)
+    onFilter(value, categories, severities, statues)
+    prodCheckDispatch({
+      type: 'FILTER_RULE',
+      payload: value
+    })
   }
 
   const onFilterCategory = (value) => {
-    setCheckCategory(value.includes('all') ? [] : value)
-    onFilter(checkRules, value, checkSeverity, checkStatus)
+    onFilter(rules, value, severities, statues)
+    prodCheckDispatch({
+      type: 'FILTER_CATEGORY',
+      payload: value
+    })
   }
 
   const onFilterSeverity = (value) => {
-    setCheckSeverity(value.includes('all') ? [] : value)
-    onFilter(checkRules, checkCategory, value, checkStatus)
+    onFilter(rules, categories, value, statues)
+    prodCheckDispatch({
+      type: 'FILTER_SEVERITY',
+      payload: value
+    })
   }
 
   const onFilterStatus = (value) => {
-    setCheckStatus(value.includes('all') ? [] : value)
-    onFilter(checkRules, checkCategory, checkSeverity, value)
+    onFilter(rules, categories, severities, value)
+    prodCheckDispatch({
+      type: 'FILTER_STATUS',
+      payload: value
+    })
   }
 
   const { data } = useQuery(GetOrgRules, {
@@ -102,7 +102,7 @@ const CheckFilterMenu = ({
       {data && (
         <Box width={'fit-content'} position={'relative'}>
           <Menu closeOnBlur={true}>
-            {checkRules.length !== 0 && <CheckMark />}
+            {rules.length !== 0 && <CheckMark />}
             <MenuButton
               as={Button}
               colorScheme='blue'
@@ -120,7 +120,7 @@ const CheckFilterMenu = ({
             >
               <MenuOptionGroup
                 type='checkbox'
-                value={checkRules}
+                value={rules}
                 onChange={onFilterCheckId}
               >
                 <MenuItemOption value={'all'} fontSize={'sm'}>
@@ -156,7 +156,7 @@ const CheckFilterMenu = ({
       {/* CATEGORY */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnBlur={true}>
-          {checkCategory.length !== 0 && <CheckMark />}
+          {categories.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -169,7 +169,7 @@ const CheckFilterMenu = ({
           <MenuList>
             <MenuOptionGroup
               type='checkbox'
-              value={checkCategory}
+              value={categories}
               onChange={onFilterCategory}
             >
               <MenuItemOption value={'all'} fontSize={'sm'}>
@@ -192,7 +192,7 @@ const CheckFilterMenu = ({
       {/* SEVERITY */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {checkSeverity.length !== 0 && <CheckMark />}
+          {severities.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -205,7 +205,7 @@ const CheckFilterMenu = ({
           <MenuList>
             <MenuOptionGroup
               type='checkbox'
-              value={checkSeverity}
+              value={severities}
               onChange={onFilterSeverity}
             >
               <MenuItemOption value={'all'} fontSize={'sm'}>
@@ -228,7 +228,7 @@ const CheckFilterMenu = ({
       {/* STATUS */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {checkStatus.length !== 0 && <CheckMark />}
+          {statues.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -241,7 +241,7 @@ const CheckFilterMenu = ({
           <MenuList>
             <MenuOptionGroup
               type='checkbox'
-              value={checkStatus}
+              value={statues}
               onChange={onFilterStatus}
             >
               <MenuItemOption value={'all'} fontSize={'sm'}>

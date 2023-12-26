@@ -13,7 +13,6 @@ import {
   Stack,
   Button,
   useToast,
-  Box,
   Flex,
   Spinner
 } from '@chakra-ui/react'
@@ -41,7 +40,6 @@ const DownloadModal = ({
   const [spec, setSpec] = useState('cyclonedx')
   const [format, setFormat] = useState('json')
   const [includeVulns, setIncludeVulns] = useState(false)
-  const [includeVex, setIncludeVex] = useState(false)
 
   const type = spec === 'cyclonedx' ? 'cdx' : 'spdx'
 
@@ -160,34 +158,12 @@ const DownloadModal = ({
                 {/* <Radio value='xml' disabled>XML</Radio> */}
               </Stack>
             </RadioGroup>
-
             <Stack direction='column' gap='5px'>
-              <Box
-                bg='blue.600'
-                w='100%'
-                p={2}
-                color='white'
-                fontWeight='medium'
-                fontSize='16px'
-                align='center'
-                borderRadius='lg'
-                boxShadow='md'
-              >
-                Download Options coming soon...
-              </Box>
               <Checkbox
                 isChecked={includeVulns}
                 onChange={() => setIncludeVulns(!includeVulns)}
-                disabled
               >
                 Include Vulnerabilities
-              </Checkbox>
-              <Checkbox
-                isChecked={includeVex}
-                onChange={() => setIncludeVex(!includeVex)}
-                disabled
-              >
-                Include Vulnerability Status (VEX)
               </Checkbox>
             </Stack>
           </Stack>
@@ -201,14 +177,12 @@ const DownloadModal = ({
             gap={4}
           >
             <Stack>{isLoading && <Spinner color='blue.500' />}</Stack>
-            <Stack direction='row' alignItems='center' gap={1}>
-              <Button colorScheme='gray' mr={3} onClick={onClose}>
+            <Stack direction='row' alignItems='center' spacing={3}>
+              <Button colorScheme='gray' onClick={onClose}>
                 Cancel
               </Button>
-
               <Button
                 colorScheme='blue'
-                mr={3}
                 onClick={customerView ? onDownload : handleDownload}
               >
                 Download

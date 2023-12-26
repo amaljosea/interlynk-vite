@@ -25,7 +25,7 @@ import {
   Tooltip,
   IconButton
 } from '@chakra-ui/react'
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect } from 'react'
 import ImagesDrawer from 'components/Drawer/ImagesDrawer'
 import Card from 'components/Card/Card'
 import CardHeader from 'components/Card/CardHeader'
@@ -38,7 +38,6 @@ import {
   OrgConnectorRefresh
 } from 'graphQL/Mutation'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import GlobalContext from 'context/GlobalContext'
 import ImageTable from './ImageTable'
 import { GetImages } from 'graphQL/Queries'
 import CardBody from 'components/Card/CardBody'

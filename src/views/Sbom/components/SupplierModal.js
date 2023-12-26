@@ -17,17 +17,15 @@ import {
   Text,
   Tag
 } from '@chakra-ui/react'
-import GlobalContext from 'context/GlobalContext'
 import { CreateAutomation } from 'graphQL/Mutation'
 import { updateComSupplier } from 'graphQL/Mutation'
 import { recheckHealth } from 'graphQL/Mutation'
 import { addComSupplier } from 'graphQL/Mutation'
-import { useState, useEffect, useContext } from 'react'
+import { useGlobalState } from 'hooks/useGlobalState'
+import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
-
-const urlPattern = new RegExp(
-  '(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w.-]*/?'
-)
+import { validateUrl } from 'utils'
+import { validateEmail } from 'utils'
 
 const SupplierModal = ({
   id,
@@ -37,39 +35,35 @@ const SupplierModal = ({
   data,
   checkId,
   filterRefetch,
-  activeCheck,
-  setPageIndex
+  activeCheck
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
 
-  const { comPageIndex, setComPageIndex, setCompFilters } =
-    useContext(GlobalContext)
-
-  const validateEmail = (email) => {
-    const emailRegex =
-      /(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g
-    return emailRegex.test(email)
-  }
+  const { dispatch } = useGlobalState()
+  const { prodCompDispatch, prodCheckDispatch } = dispatch
 
   const [orgName, setOrgName] = useState('')
   const [orgUrl, setOrgUrl] = useState('')
-  const [isValidUrl, setIsValidUrl] = useState(true)
+  const [isValidUrl, setIsValidUrl] = useState('')
   const [supName, setSupName] = useState('')
   const [supEmail, setSupEmail] = useState('')
-
-  const handleRefetch = () => {
-    setComPageIndex(comPageIndex)
-    fetchCompData()
-  }
+  const [emailError, setEmailError] = useState('')
 
   const onFilterRefetch = () => {
     filterRefetch({
       projectId: productId,
       sbomId: sbomId
-    }).then((res) => res.data && setCompFilters(res.data.sbom.filters))
+    }).then(
+      (res) =>
+        res.data &&
+        prodCompDispatch({
+          type: 'ADD_FILTER_HEADS',
+          payload: res.data.sbom.filters
+        })
+    )
   }
 
   const [createSupplier] = useMutation(addComSupplier, {
@@ -112,7 +106,7 @@ const SupplierModal = ({
       .then((res) => {
         if (res.data) {
           if (checkId) {
-            setPageIndex(1)
+            prodCheckDispatch({ type: 'FETCH_DATA_SUCCESS' })
             healthRecheck({
               variables: {
                 sbomId: sbomId,
@@ -166,18 +160,26 @@ const SupplierModal = ({
     }
   }
 
-  const onUrlChange = (e) => {
-    const { value } = e.target
-    setOrgUrl(value)
-    if (urlPattern.test(value)) {
-      setIsValidUrl(true)
-    } else {
-      setIsValidUrl(false)
+  const handleCheckEmail = () => {
+    if (!validateEmail(supEmail)) {
+      setEmailError('Email is invalid')
     }
   }
 
+  const handleCheckUrl = () => {
+    if (!validateUrl(orgUrl)) {
+      setIsValidUrl('Please enter a valid URL')
+    }
+  }
+
+  const onUrlChange = (e) => {
+    const { value } = e.target
+    setOrgUrl(value)
+    setIsValidUrl('')
+  }
+
   const isInvalid =
-    !supName || (supEmail !== '' && !validateEmail(supEmail)) || !isValidUrl
+    supName === '' || emailError != '' || (orgUrl !== '' && isValidUrl !== '')
 
   return (
     <>
@@ -229,14 +231,15 @@ const SupplierModal = ({
                 />
               </FormControl>
               {/* ORG URL */}
-              <FormControl isInvalid={!isValidUrl}>
+              <FormControl isInvalid={orgUrl !== '' && !validateUrl(orgUrl)}>
                 <FormLabel fontSize={'sm'}>URL</FormLabel>
                 <Input
                   placeholder='Enter URL'
                   value={orgUrl}
+                  onBlur={handleCheckUrl}
                   onChange={onUrlChange}
                 />
-                <FormErrorMessage>Invalid URL</FormErrorMessage>
+                <FormErrorMessage>{isValidUrl}</FormErrorMessage>
               </FormControl>
               {/* SUPPLIER NAME */}
               <FormControl isRequired>
@@ -255,11 +258,13 @@ const SupplierModal = ({
                 <Input
                   placeholder='Enter supplier email'
                   value={supEmail}
-                  onChange={(e) => setSupEmail(e.target.value)}
+                  onBlur={handleCheckEmail}
+                  onChange={(e) => {
+                    setSupEmail(e.target.value)
+                    setEmailError('')
+                  }}
                 />
-                {supEmail !== '' && !validateEmail(supEmail) && (
-                  <FormErrorMessage>Email is invalid</FormErrorMessage>
-                )}
+                <FormErrorMessage>{emailError}</FormErrorMessage>
               </FormControl>
             </Flex>
           </ModalBody>

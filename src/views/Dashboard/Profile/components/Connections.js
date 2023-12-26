@@ -1,10 +1,8 @@
 // Chakra imports
 import {
   Flex,
-  Grid,
   InputGroup,
   InputRightElement,
-  Link,
   Text,
   useColorModeValue,
   Switch,
@@ -16,8 +14,7 @@ import {
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
-import React, { useState, useEffect, useContext } from 'react'
-
+import { useState, useEffect } from 'react'
 import {
   FaJira,
   FaSlack,
@@ -26,16 +23,15 @@ import {
   FaDocker
 } from 'react-icons/fa'
 import { CheckIcon } from '@chakra-ui/icons'
+import { useGlobalState } from 'hooks/useGlobalState'
 
-import GlobalContext from 'context/GlobalContext'
-
-const Connections = ({ title }) => {
+const Connections = () => {
   // Chakra color mode
   const textColor = useColorModeValue('gray.700', 'white')
   const [isSwitchOn, setIsSwitchOn] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
-  const { activeDockerHub, setActiveDockerHub } = useContext(GlobalContext)
+  const { activeDockerHub, setActiveDockerHub } = useGlobalState()
 
   const handleSwitchChange = () => {
     setIsSwitchOn(!isSwitchOn)

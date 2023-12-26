@@ -9,19 +9,14 @@ import {
   Box
 } from '@chakra-ui/react'
 import CheckMark from 'components/Misc/CheckMark'
-import GlobalContext from 'context/GlobalContext'
-import React, { useContext, useState } from 'react'
+import { useGlobalState } from 'hooks/useGlobalState'
+import React, { useState } from 'react'
 import { FaFilter } from 'react-icons/fa'
 
-const ChangelogFilterMenu = ({
-  id,
-  users,
-  actions,
-  totalRows,
-  setPageIndex,
-  refetch
-}) => {
-  const { prodLogField, prodLogDirection } = useContext(GlobalContext)
+const ChangelogFilterMenu = ({ id, users, actions, refetch }) => {
+  const { totalRows, prodLogState, dispatch } = useGlobalState()
+  const { field, direction } = prodLogState
+  const { prodLogDispatch } = dispatch
 
   const [selectedType, setSelectedType] = useState([])
   const [selectedUser, setSelectedUser] = useState([])
@@ -33,11 +28,11 @@ const ChangelogFilterMenu = ({
         id: id,
         changeType: value.includes('all') ? undefined : value,
         first: totalRows,
-        field: prodLogField,
-        direction: prodLogDirection
+        field: field,
+        direction: direction
       }
     })
-    setPageIndex(1)
+    prodLogDispatch({ type: 'FETCH_DATA_SUCCESS' })
   }
 
   const onFilterUser = (value) => {
@@ -47,11 +42,11 @@ const ChangelogFilterMenu = ({
         id: id,
         changedBy: value.includes('all') ? undefined : value,
         first: totalRows,
-        field: prodLogField,
-        direction: prodLogDirection
+        field: field,
+        direction: direction
       }
     })
-    setPageIndex(1)
+    prodLogDispatch({ type: 'FETCH_DATA_SUCCESS' })
   }
 
   return (
