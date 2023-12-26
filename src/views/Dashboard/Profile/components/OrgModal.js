@@ -18,10 +18,6 @@ import { RegisterOrganization } from 'graphQL/Mutation'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-const urlPattern = new RegExp(
-  '(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w.-]*/?'
-)
-
 const OrgModal = ({ isOpen, onClose, refetch, org, onSwitch }) => {
   const navigate = useNavigate()
   const [error, setError] = useState('')
@@ -35,9 +31,14 @@ const OrgModal = ({ isOpen, onClose, refetch, org, onSwitch }) => {
     onCompleted: () => refetch()
   })
 
+  const validateUrl = (url) => {
+    const urlRegex =
+      /^(?:http|https):\/\/(?:www\.)?[a-zA-Z0-9-]+(?:\.[a-zA-Z]{2,})+(?:\/[\w-]+)*(?:\/[\w\-]+(?:\.[a-zA-Z]{2,})?)?(?:\?[\w%=&]*)?(?:#[\w\-]*)?$/
+    return urlRegex.test(url)
+  }
+
   const validateEmail = (email) => {
-    const emailRegex =
-      /(http(s):\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
     return emailRegex.test(email)
   }
 
@@ -48,7 +49,7 @@ const OrgModal = ({ isOpen, onClose, refetch, org, onSwitch }) => {
   }
 
   const handleCheckUrl = () => {
-    if (!urlPattern.test(url)) {
+    if (!validateUrl(url)) {
       setUrlError('Please enter a valid URL')
     }
   }
@@ -101,7 +102,7 @@ const OrgModal = ({ isOpen, onClose, refetch, org, onSwitch }) => {
               />
             </FormControl>
             {/* URL */}
-            <FormControl isInvalid={url !== '' && !urlPattern.test(url)}>
+            <FormControl isInvalid={url !== '' && !validateUrl(url)}>
               <FormLabel>URL</FormLabel>
               <Input
                 type='text'
