@@ -42,8 +42,8 @@ const ChangelogFilterMenu = ({ id, users, actions, refetch }) => {
         id: id,
         changedBy: value.includes('all') ? undefined : value,
         first: totalRows,
-        field: prodLogField,
-        direction: prodLogDirection
+        field: field,
+        direction: direction
       }
     })
     prodLogDispatch({ type: 'FETCH_DATA_SUCCESS' })
