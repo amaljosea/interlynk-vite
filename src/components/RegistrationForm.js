@@ -26,7 +26,7 @@ const RegistrationForm = () => {
   const [emailError, setEmailError] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [error, setError] = useState('')
+  const [error, setError] = useState([])
   const [passError, setPassError] = useState('')
 
   const [orgRegister] = useMutation(RegisterUser)
@@ -64,7 +64,13 @@ const RegistrationForm = () => {
         password: password,
         passwordConfirmation: confirmPassword
       }
-    }).then((res) => res.data && navigate('/auth'))
+    }).then((res) => {
+      if (res.data.userRegistration.errors.length > 0) {
+        setError(res.data.userRegistration.errors)
+      } else {
+        navigate('/auth')
+      }
+    })
   }
 
   return (
@@ -80,11 +86,17 @@ const RegistrationForm = () => {
       <Text fontSize={'sm'} textAlign={'center'} color={'#555'}>
         Log in to Interlynk to continue to the dashboard.
       </Text>
-      {error !== '' && (
+      {error.length > 0 && (
         <Box mt={4} width={'100%'}>
           <Alert status='error' borderRadius={4}>
             <AlertIcon />
-            <AlertDescription>{error}</AlertDescription>
+            <AlertDescription>
+              {error.map((item, index) => (
+                <Text fontSize={'sm'} key={index}>
+                  {item}
+                </Text>
+              ))}
+            </AlertDescription>
           </Alert>
         </Box>
       )}
@@ -108,6 +120,7 @@ const RegistrationForm = () => {
             onChange={(e) => {
               setEmail(e.target.value)
               setEmailError('')
+              setError([])
             }}
             placeholder='Enter email address'
             autoComplete='off'
@@ -125,6 +138,7 @@ const RegistrationForm = () => {
             onChange={(e) => {
               setPassword(e.target.value)
               setPassError('')
+              setError([])
             }}
             placeholder='*******'
             onBlur={handleCheckPassword}
@@ -138,6 +152,7 @@ const RegistrationForm = () => {
             onChange={(e) => {
               setConfirmPassword(e.target.value)
               setPassError('')
+              setError([])
             }}
             placeholder='*******'
             onBlur={handleCheckPassword}
