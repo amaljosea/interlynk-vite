@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react'
+import React, { useState } from 'react'
 import { Flex, Button, Input, Stack } from '@chakra-ui/react'
 import {
   Drawer,
@@ -15,12 +15,10 @@ import {
   Divider,
   Text
 } from '@chakra-ui/react'
-import GlobalContext from 'context/GlobalContext'
 import { FaGithub } from 'react-icons/fa'
 import { useToast } from '@chakra-ui/react'
 
 function ProductAssembleDrawer(props) {
-  const { setProductVersionExploded } = useContext(GlobalContext)
   const {
     isOpen,
     onClose,
@@ -45,23 +43,23 @@ function ProductAssembleDrawer(props) {
 
   const handleSave = () => {
     if (productName !== '' && productVersion !== '') {
-      setProductVersionExploded((prev) => [
-        {
-          logo: FaGithub,
-          name: productName,
-          description:
-            'A tool to compose your various sboms into a single sbom',
-          version: productVersion,
-          vendor: 'Interlynk',
-          quality_score: 0,
-          sbom_links: 0,
-          risk_score: 'Not Defined',
-          updated_at: new Date().toISOString(),
-          active: true,
-          source: 'Assembled'
-        },
-        ...prev
-      ])
+      // setProductVersionExploded((prev) => [
+      //   {
+      //     logo: FaGithub,
+      //     name: productName,
+      //     description:
+      //       'A tool to compose your various sboms into a single sbom',
+      //     version: productVersion,
+      //     vendor: 'Interlynk',
+      //     quality_score: 0,
+      //     sbom_links: 0,
+      //     risk_score: 'Not Defined',
+      //     updated_at: new Date().toISOString(),
+      //     active: true,
+      //     source: 'Assembled'
+      //   },
+      //   ...prev
+      // ])
 
       setProductName('')
       setProductVersion('')

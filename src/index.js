@@ -18,18 +18,18 @@ import CustomerLayout from './layouts/Customer.js'
 import Register from './layouts/Register.js'
 import LoginLayout from './layouts/Login.js'
 import ScrollToTop from 'components/ScrollToTop.js'
-import Cookies from 'js-cookie'
-import theme from 'theme/theme.js'
-import ContextWrapper from 'context/ContextWrapper'
 import { ChakraProvider } from '@chakra-ui/react'
 import Dashboard from 'views/Dashboard/Dashboard'
 import Products from 'views/Dashboard/Products'
+import { GlobalStateProvider } from 'hooks/useGlobalState'
 import ProductList from 'views/Dashboard/Products/ProductList'
 import ProductDetails from 'views/Dashboard/Products/ProductDetails'
 import Vulnerabilities from 'views/Dashboard/Vulnerabilities'
 import Licenses from 'views/Dashboard/Linceses'
 import Profile from 'views/Dashboard/Profile'
 import Success from 'layouts/Success'
+import Cookies from 'js-cookie'
+import theme from 'theme/theme.js'
 
 const authToken = Cookies.get('authToken')
 
@@ -54,16 +54,16 @@ const authToken = Cookies.get('authToken')
 //   replaysOnErrorSampleRate: 1.0 // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
 // })
 
-const tagManagerArgs = {
-  gtmId: 'G-VDPMCV382D'
-}
+// const tagManagerArgs = {
+//   gtmId: 'G-VDPMCV382D'
+// }
 
-TagManager.initialize(tagManagerArgs)
+// TagManager.initialize(tagManagerArgs)
 
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
-      <ContextWrapper>
+      <GlobalStateProvider>
         <ChakraProvider theme={theme} resetCSS={true}>
           <ScrollToTop />
           <Routes>
@@ -101,11 +101,11 @@ ReactDOM.render(
               <Route path={`settings`} element={<Profile />} />
             </Route>
             <Route path={`login`} element={<LoginLayout />} />
-            <Route path={`customer`} element={<CustomerLayout />} />
+            {/* <Route path={`customer`} element={<CustomerLayout />} /> */}
             <Route path={`register`} element={<Register />} />
           </Routes>
         </ChakraProvider>
-      </ContextWrapper>
+      </GlobalStateProvider>
     </BrowserRouter>
   </React.StrictMode>,
   document.getElementById('root')

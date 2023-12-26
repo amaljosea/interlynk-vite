@@ -38,15 +38,15 @@ import {
 } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
 import VulnBadge from 'components/Misc/VulnBadge'
-import GlobalContext from 'context/GlobalContext'
 import { SbomPartDelete } from 'graphQL/Mutation'
 import { SbomPartCreate } from 'graphQL/Mutation'
 import { GetProject } from 'graphQL/Queries'
 import { GetProjectData } from 'graphQL/Queries'
-import { useContext, useMemo, useRef, useState } from 'react'
+import { useGlobalState } from 'hooks/useGlobalState'
+import { useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV, FaFilter } from 'react-icons/fa'
-import { useLocation, Link, useParams, useNavigate } from 'react-router-dom'
+import { useLocation, Link, useParams } from 'react-router-dom'
 import { getFullDateAndTime } from 'utils'
 import { removeDuplicates } from 'utils'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
@@ -75,7 +75,16 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const sbomId = queryParams.get('sbom')
   const prodId = queryParams.get('id')
 
-  const currentProduct = JSON.parse(localStorage.getItem(`product`))
+  const {
+    setActiveSbomTab,
+    setActiveProdTab,
+    totalRows,
+    prodState,
+    prodCompState,
+    prodVulnState,
+    dispatch
+  } = useGlobalState()
+  const { prodVulnDispatch } = dispatch
 
   const { isOpen, onOpen, onClose } = useDisclosure()
   const {
@@ -86,18 +95,6 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
 
   const addBtn = useRef()
 
-  const {
-    setActiveProdTab,
-    prodField,
-    prodDirection,
-    setVulnSeverity,
-    totalRows,
-    vulnField,
-    vulnDirection,
-    compField,
-    compDirection
-  } = useContext(GlobalContext)
-
   const [selectedProd, setSelectedProd] = useState('')
   const [selectedVersion, setSelectedVersion] = useState('')
   const [uniqVersions, setUniqVersions] = useState([])
@@ -106,8 +103,8 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const { data: allProducts } = useQuery(GetProjectData, {
     variables: {
       first: 50,
-      field: prodField,
-      direction: prodDirection
+      field: prodState.field,
+      direction: prodState.direction
     }
   })
 
@@ -236,29 +233,32 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   }
 
   const getComponents = () => {
-    setActiveProdTab(2)
+    setActiveSbomTab(2)
     getCompData({
       variables: {
         projectId: prodId,
         sbomId: sbomId,
         first: totalRows,
-        field: compField,
-        direction: compDirection
+        field: prodCompState.field,
+        direction: prodCompState.direction
       }
     })
   }
 
   const onFilterSev = async (value) => {
-    setActiveProdTab(3)
-    setVulnSeverity(value)
     await getVulnData({
       variables: {
         projectId: prodId,
         sbomId: sbomId,
         severity: value,
         first: totalRows,
-        field: vulnField,
-        direction: vulnDirection
+        field: prodVulnState.field,
+        direction: prodVulnState.direction
+      }
+    }).then((res) => {
+      if (res.data) {
+        prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
+        setActiveSbomTab(3)
       }
     })
   }
@@ -278,7 +278,10 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
               color={'blue.500'}
               minWidth='100%'
               fontSize={14}
-              onClick={() => setActiveProdTab(0)}
+              onClick={() => {
+                localStorage.setItem('activeSbomTab', 0)
+                setActiveProdTab(0)
+              }}
             >
               {part.project.name}
             </Text>

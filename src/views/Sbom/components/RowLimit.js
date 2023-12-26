@@ -1,9 +1,8 @@
 import { Select, Stack, Text } from '@chakra-ui/react'
-import GlobalContext from 'context/GlobalContext'
-import { useContext } from 'react'
+import { useGlobalState } from 'hooks/useGlobalState'
 
 const RowLimit = ({ onChange, name }) => {
-  const { totalRows } = useContext(GlobalContext)
+  const { totalRows } = useGlobalState()
 
   return (
     <Stack alignItems={'center'} direction={'row'} spacing={4}>

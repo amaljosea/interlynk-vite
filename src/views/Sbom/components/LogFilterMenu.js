@@ -9,42 +9,37 @@ import {
   Stack
 } from '@chakra-ui/react'
 import CheckMark from 'components/Misc/CheckMark'
-import GlobalContext from 'context/GlobalContext'
-import { useState, useContext } from 'react'
+import { useGlobalState } from 'hooks/useGlobalState'
+import { useState } from 'react'
 import { FaFilter } from 'react-icons/fa'
 
-const LogFilterMenu = ({
-  refetch,
-  productId,
-  sbomId,
-  setPageIndex,
-  totalRows
-}) => {
-  const { logFilters, logField, logDirection } = useContext(GlobalContext)
-  const { logChangeBys, logChangeObjects, logChangeTypes } = logFilters
+const LogFilterMenu = ({ refetch, productId, sbomId }) => {
+  const { totalRows, sbomLogState, dispatch } = useGlobalState()
+  const { filter, field, direction, pageIndex, users, objects, types } =
+    sbomLogState
+  const { sbomLogDispatch } = dispach
+  const { logChangeBys, logChangeObjects, logChangeTypes } = filters
 
   const [selectChangeBy, setSelectChangeBy] = useState([])
   const [selectChangeObj, setSelectChangeObj] = useState([])
   const [selectChangeType, setSelectChangeType] = useState([])
 
   const onFilterChangeBy = (value) => {
-    setSelectChangeBy(value.includes('all') ? [] : value)
     refetch({
       projectId: productId,
       sbomId: sbomId,
-      changedBy: value.includes('all') ? undefined : value,
+      changedBy: value,
       first: totalRows,
-      last: undefined,
-      after: undefined,
-      last: undefined,
-      field: logField,
-      direction: logDirection
+      field: field,
+      direction: direction
     })
-    setPageIndex(1)
+    sbomLogDispatch({
+      type: 'FILTER_USER',
+      payload: value.includes('all') ? [] : value
+    })
   }
 
   const onFilterChangeObj = (value) => {
-    setSelectChangeObj(value.includes('all') ? [] : value)
     refetch({
       projectId: productId,
       sbomId: sbomId,
@@ -56,11 +51,13 @@ const LogFilterMenu = ({
       field: logField,
       direction: logDirection
     })
-    setPageIndex(1)
+    sbomLogDispatch({
+      type: 'FILTER_OBJECT',
+      payload: value
+    })
   }
 
   const onFilterChangeType = (value) => {
-    setSelectChangeType(value.includes('all') ? [] : value)
     refetch({
       projectId: productId,
       sbomId: sbomId,
@@ -72,7 +69,10 @@ const LogFilterMenu = ({
       field: logField,
       direction: logDirection
     })
-    setPageIndex(1)
+    sbomLogDispatch({
+      type: 'FILTER_TYPE',
+      payload: value
+    })
   }
 
   return (

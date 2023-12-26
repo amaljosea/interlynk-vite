@@ -17,12 +17,12 @@ import {
   Text,
   Tag
 } from '@chakra-ui/react'
-import GlobalContext from 'context/GlobalContext'
 import { CreateAutomation } from 'graphQL/Mutation'
 import { updateComSupplier } from 'graphQL/Mutation'
 import { recheckHealth } from 'graphQL/Mutation'
 import { addComSupplier } from 'graphQL/Mutation'
-import { useState, useEffect, useContext } from 'react'
+import { useGlobalState } from 'hooks/useGlobalState'
+import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 
 const urlPattern = new RegExp(
@@ -37,16 +37,15 @@ const SupplierModal = ({
   data,
   checkId,
   filterRefetch,
-  activeCheck,
-  setPageIndex
+  activeCheck
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
 
-  const { comPageIndex, setComPageIndex, setCompFilters } =
-    useContext(GlobalContext)
+  const { dispatch } = useGlobalState()
+  const { prodCompDispatch, prodCheckDispatch } = dispatch
 
   const validateEmail = (email) => {
     const emailRegex =
@@ -60,16 +59,18 @@ const SupplierModal = ({
   const [supName, setSupName] = useState('')
   const [supEmail, setSupEmail] = useState('')
 
-  const handleRefetch = () => {
-    setComPageIndex(comPageIndex)
-    fetchCompData()
-  }
-
   const onFilterRefetch = () => {
     filterRefetch({
       projectId: productId,
       sbomId: sbomId
-    }).then((res) => res.data && setCompFilters(res.data.sbom.filters))
+    }).then(
+      (res) =>
+        res.data &&
+        prodCompDispatch({
+          type: 'ADD_FILTER_HEADS',
+          payload: res.data.sbom.filters
+        })
+    )
   }
 
   const [createSupplier] = useMutation(addComSupplier, {
@@ -112,7 +113,7 @@ const SupplierModal = ({
       .then((res) => {
         if (res.data) {
           if (checkId) {
-            setPageIndex(1)
+            prodCheckDispatch({ type: 'FETCH_DATA_SUCCESS' })
             healthRecheck({
               variables: {
                 sbomId: sbomId,

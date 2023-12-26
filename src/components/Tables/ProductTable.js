@@ -22,12 +22,11 @@ import {
   ListItem,
   Divider,
   Tooltip,
-  useToast,
   Stack,
   Select
 } from '@chakra-ui/react'
-import { useContext, useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { FaEllipsisV } from 'react-icons/fa'
 import {
   getFullDateAndTime,
@@ -43,8 +42,6 @@ import { UpdateProject, DeleteProject } from 'graphQL/Mutation'
 import ProductModal from 'views/Dashboard/Products/components/ProductModal'
 import UploadModal from 'views/Dashboard/Products/components/UploadModal'
 import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
-import GlobalContext from 'context/GlobalContext'
-import SearchFilter from 'views/Sbom/components/SearchFilter'
 import ProdFilterMenu from 'views/Dashboard/Products/components/ProdFilterMenu'
 import { useGlobalState } from 'hooks/useGlobalState'
 import ProdSearchFilter from 'views/Sbom/components/ProdSearchFilter'
@@ -52,25 +49,14 @@ import OrgRegister from 'views/Dashboard/Profile/components/OrgRegister'
 import Card from 'components/Card/Card'
 
 const ProductTable = ({ data, refetch, org }) => {
-  const { totalRows, setTotalRows, prodState, dispatch } = useGlobalState()
+  const { totalRows, setTotalRows, setActiveSbomTab, prodState, dispatch } =
+    useGlobalState()
   const { field, direction, searchInput, pageIndex } = prodState
-  const { prodDispatch } = dispatch
+  const { prodDispatch, sbomDispatch } = dispatch
 
-  const toast = useToast()
-  const navigate = useNavigate()
   const [activeRow, setActiveRow] = useState(null)
-  const [activeProd, setActiveProd] = useState('yes')
 
   const { isOpen, onOpen, onClose } = useDisclosure()
-
-  const {
-    setCurrentProduct,
-    setActiveProdTab,
-    setLicenseType,
-    setSpdxList,
-    setSpdxLicense,
-    setLicenseExp
-  } = useContext(GlobalContext)
 
   const {
     isOpen: isOpenProduct,
@@ -120,11 +106,8 @@ const ProductTable = ({ data, refetch, org }) => {
   })
 
   const handleOpenSbom = (row) => {
+    sbomDispatch({ type: 'CLEAR_LICENSES' })
     setActiveRow(row)
-    setLicenseType('license_spdx')
-    setSpdxList([])
-    setSpdxLicense([])
-    setLicenseExp([])
     onSbomOpen()
   }
 
@@ -182,15 +165,18 @@ const ProductTable = ({ data, refetch, org }) => {
           if (sboms.length > 0) {
             localStorage.setItem('product', JSON.stringify(product))
             localStorage.setItem('activeProdTab', 0)
-            setCurrentProduct({
-              id: id,
-              sbomId:
-                data.length > 0
-                  ? data[0].primaryComponent?.version
-                  : sboms[0].id
+            prodDispatch({
+              type: 'SET_CURRENT_PRODUCT',
+              payload: {
+                id: id,
+                sbomId:
+                  data.length > 0
+                    ? data[0].primaryComponent?.version
+                    : sboms[0].id
+              }
             })
           }
-          setActiveProdTab(0)
+          setActiveSbomTab(0)
         }
 
         return (
@@ -473,7 +459,6 @@ const ProductTable = ({ data, refetch, org }) => {
     )
   }, [
     searchInput,
-    activeProd,
     handleClear,
     handleSearch,
     handleRefresh,

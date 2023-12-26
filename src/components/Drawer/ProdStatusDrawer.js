@@ -17,24 +17,17 @@ import {
   FormControl
 } from '@chakra-ui/react'
 import VulLinkRow from 'components/Tables/VulLinkRow'
-import GlobalContext from 'context/GlobalContext'
 import { updateCompVulnVex } from 'graphQL/Mutation'
 import {
   getVexStatuses,
   getVexJustifications,
   GetCdxResponses
 } from 'graphQL/Queries'
-import { useEffect, useState, useContext } from 'react'
+import { useGlobalState } from 'hooks/useGlobalState'
+import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
-const ProdStatusDrawer = ({
-  data,
-  textColor,
-  refetch,
-  filteredData,
-  filterRefetch,
-  setPageIndex,
-}) => {
+const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
   const location = useLocation()
   const navigate = useNavigate()
   const queryParams = new URLSearchParams(location.search)
@@ -43,19 +36,19 @@ const ProdStatusDrawer = ({
   const currentProduct = JSON.parse(localStorage.getItem(`product`))
   const { data: res } = useQuery(GetCdxResponses)
 
+  const { totalRows, setActiveSbomTab, prodVulnState, dispatch } =
+    useGlobalState()
   const {
-    totalRows,
-    setVulnFilters,
-    vulnField,
-    vulnDirection,
-    vulnSearchInput,
-    vulnSeverity,
-    vulnComponent,
-    vulnStatus,
-    vulnKev,
-    vulnEpss,
-    setActiveProdTab
-  } = useContext(GlobalContext)
+    field,
+    direction,
+    searchInput,
+    severities,
+    components,
+    statues,
+    kev,
+    epss
+  } = prodVulnState
+  const { prodVulnDispatch } = dispatch
 
   const { id, componentVulnLogs } = data
 
@@ -74,12 +67,11 @@ const ProdStatusDrawer = ({
   const [statusResults, setStatusResults] = useState([])
   const [newVulnLogs, setNewVulnLogs] = useState([])
 
-
   const { data: allVexStatus } = useQuery(getVexStatuses)
   const { data: allVexJustify } = useQuery(getVexJustifications)
 
   const handleRefetch = async () => {
-    const epssRange = (vulnEpss !== '' || vulnEpss !== '0-0') && vulnEpss.split('-')
+    const epssRange = (epss !== '' || epss !== '0-0') && epss.split('-')
     const range = {
       min: parseFloat(epssRange[0]) / 10000,
       max: parseFloat(epssRange[1]) / 10000
@@ -88,24 +80,41 @@ const ProdStatusDrawer = ({
       variables: {
         projectId: productId,
         sbomId: sbomId,
-        search: vulnSearchInput !== '' ? vulnSearchInput : undefined,
-        severity: !vulnSeverity.includes('all') && vulnSeverity.length > 0 ? vulnSeverity : undefined,
-        componentName: !vulnComponent.includes('all') && vulnComponent.length > 0 ? vulnComponent : undefined,
-        status: !vulnStatus.includes('all') && vulnStatus.length > 0 ? vulnStatus : undefined,
-        kev: vulnKev === 'all' || vulnKev === '' ? undefined : vulnKev === 'yes' ? true : false,
-        epss: vulnEpss === 'all' || vulnEpss === '0-0' || vulnEpss === '' ? undefined : range,
+        search: searchInput !== '' ? searchInput : undefined,
+        severity:
+          !severities.includes('all') && severities.length > 0
+            ? severities
+            : undefined,
+        componentName:
+          !components.includes('all') && components.length > 0
+            ? components
+            : undefined,
+        status:
+          !statues.includes('all') && statues.length > 0 ? statues : undefined,
+        kev:
+          kev === 'all' || kev === ''
+            ? undefined
+            : kev === 'yes'
+            ? true
+            : false,
+        epss:
+          epss === 'all' || epss === '0-0' || epss === '' ? undefined : range,
         first: totalRows,
         // after: vulnAfter !== '' ? vulnAfter : undefined,
         // last: vulnBefore !== '' ? totalRows : undefined,
         // before: vulnBefore !== '' ? vulnBefore : undefined,
-        field: vulnField,
-        direction: vulnDirection
+        field: field,
+        direction: direction
       }
-    }).then(res => {
-      if(res.data) {
-        navigate(`/vendor/products/${currentProduct.name}?id=${productId}&sbom=${sbomId}`)
-      }
-    }).finally(()=> setActiveProdTab(3))
+    })
+      .then((res) => {
+        if (res.data) {
+          navigate(
+            `/vendor/products/${currentProduct.name}?id=${productId}&sbom=${sbomId}`
+          )
+        }
+      })
+      .finally(() => setActiveSbomTab(3))
   }
 
   const [compVexCreate] = useMutation(updateCompVulnVex, {
@@ -113,13 +122,12 @@ const ProdStatusDrawer = ({
     onCompleted: () => handleRefetch()
   })
 
-
   const handleStatusChange = (e) => {
     const { value } = e.target
     const status = e.target.options[e.target.selectedIndex].text
     setStatusTitle(value)
     setStatusName(status)
-    if(status === 'False Positive') {
+    if (status === 'False Positive') {
       setJustification(allVexJustify.vexJustifications[9].id)
     }
     if (status === 'Not Affected' || status === 'Affected') {
@@ -142,13 +150,6 @@ const ProdStatusDrawer = ({
     setJustifyName(e.target.options[e.target.selectedIndex].text)
   }
 
-  const onFilterRefetch = () => {
-    filterRefetch({
-      projectId: productId,
-      sbomId: sbomId
-    }).then((res) => setVulnFilters(res.data.sbom.filters))
-  }
-
   const handleSave = async () => {
     await compVexCreate({
       variables: {
@@ -162,7 +163,9 @@ const ProdStatusDrawer = ({
         action: actionStatement !== '' ? actionStatement : undefined,
         fixedIn: selectedTag !== '' ? selectedTag : undefined
       }
-    }).then((res) => res.data && setPageIndex(1))
+    }).then(
+      (res) => res.data && prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
+    )
   }
 
   const fixedVersions = filteredData.filter((item) => item.value !== sbomId)
@@ -398,8 +401,10 @@ const ProdStatusDrawer = ({
               onClick={handleSave}
               disabled={
                 statusTitle === '' ||
-                (statusName === 'Not Affected' && (justification === '' || impactData === '')) ||
-                (statusName === 'False Positive' && (justification === '' || impactData === '')) ||
+                (statusName === 'Not Affected' &&
+                  (justification === '' || impactData === '')) ||
+                (statusName === 'False Positive' &&
+                  (justification === '' || impactData === '')) ||
                 (statusName === 'Affected' &&
                   responseTitle === '' &&
                   actionStatement === '') ||

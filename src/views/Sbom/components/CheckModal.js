@@ -21,19 +21,18 @@ import {
   Stack,
   Tag,
   Text,
-  Tooltip,
-  VStack
+  Tooltip
 } from '@chakra-ui/react'
 import LicenseField from 'components/LicenseField'
-import GlobalContext from 'context/GlobalContext'
 import { GetComponentData } from 'graphQL/Queries'
 import {
   UpdateComponent,
   recheckHealth,
   CreateAutomation
 } from 'graphQL/Mutation'
-import { useContext, useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { useGlobalState } from 'hooks/useGlobalState'
 
 const CheckModal = ({
   activeCheck,
@@ -43,8 +42,7 @@ const CheckModal = ({
   shortDesc,
   checkId,
   filterRefetch,
-  componentId,
-  setPageIndex
+  componentId
 }) => {
   const navigate = useNavigate()
   const location = useLocation()
@@ -60,17 +58,17 @@ const CheckModal = ({
     fetchPolicy: 'network-only'
   })
 
+  const { setActiveSbomTab, prodCompState, dispatch } = useGlobalState()
   const {
-    licenseType,
-    spdxLicense,
-    licenseExp,
-    setCheckFilters,
-    setActiveProdTab,
-    customLicense,
-    compField,
-    compDirection,
-    setLicenseType
-  } = useContext(GlobalContext)
+    field,
+    direction,
+    spdxLicenses,
+    expLicense,
+    customLicenses,
+    totalComp,
+    licenseType
+  } = prodCompState
+  const { prodCheckDispatch } = dispatch
 
   const now = new Date()
   const currentTime = now.toISOString().slice(0, 16)
@@ -106,9 +104,9 @@ const CheckModal = ({
         variables: {
           projectId: productId,
           sbomId: sbomId,
-          first: 100,
-          field: compField,
-          direction: compDirection
+          first: totalComp,
+          field: field,
+          direction: direction
         }
       }).then(
         (res) => res.data && setComponentList(res.data.sbom.components.nodes)
@@ -120,7 +118,12 @@ const CheckModal = ({
     filterRefetch({
       projectId: productId,
       sbomId: sbomId
-    }).then((res) => setCheckFilters(res.data.sbom.filters))
+    }).then((res) =>
+      prodCheckDispatch({
+        type: 'ADD_FILTER_HEADS',
+        payload: res.data.sbom.filters
+      })
+    )
   }
 
   const handleComUpdate = async () => {
@@ -146,7 +149,7 @@ const CheckModal = ({
           }
         })
         .finally(() => {
-          setActiveProdTab(0)
+          setActiveSbomTab(0)
           navigate(`/vendor/products/${currentProduct.name}?id=${productId}`)
         })
     } catch (error) {
@@ -161,10 +164,10 @@ const CheckModal = ({
           id: componentId,
           sbomId: sbomId,
           licenses: {
-            licenses: licenseType === 'license_spdx' ? spdxLicense : undefined,
-            licensesExp: licenseType === 'license_exp' ? licenseExp : undefined,
+            licenses: licenseType === 'license_spdx' ? spdxLicenses : undefined,
+            licensesExp: licenseType === 'license_exp' ? expLicense : undefined,
             licensesCustom:
-              licenseType === 'license_custom' ? customLicense : undefined
+              licenseType === 'license_custom' ? customLicenses : undefined
           }
         }
       })
@@ -173,7 +176,7 @@ const CheckModal = ({
             onFilterRefetch()
           }
           if (checkId) {
-            setPageIndex(1)
+            prodCheckDispatch({ type: 'FETCH_DATA_SUCCESS' })
             healthRecheck({
               variables: {
                 compId: componentId,
@@ -198,7 +201,7 @@ const CheckModal = ({
       const filterData = data?.sbom.components.nodes.filter((str) =>
         str.name.includes(value)
       )
-      setComponentList(filterData)
+      setComponentList(filterData ? filterData : [])
     }
   }
 
@@ -266,11 +269,11 @@ const CheckModal = ({
             {
               value:
                 licenseType === 'license_spdx'
-                  ? spdxLicense
+                  ? spdxLicenses
                   : licenseType === 'license_exp'
-                  ? licenseExp
+                  ? expLicense
                   : licenseType === 'license_custom'
-                  ? customLicense
+                  ? customLicenses
                   : ''
             },
             null,
@@ -282,9 +285,12 @@ const CheckModal = ({
   }
 
   const isInvalidLicense =
-    (licenseType === 'license_spdx' && spdxLicense.length === 0) ||
-    (licenseType === 'license_exp' && licenseExp === '') ||
-    (licenseType === 'license_custom' && customLicense.length === 0)
+    (shortDesc === 'Component has license/s specified' ||
+      shortDesc === 'Componet has deprecated license/s' ||
+      shortDesc === 'Component has restrictive licenses specified') &&
+    (spdxLicenses.length === 0 ||
+      expLicense === '' ||
+      customLicenses.length === 0)
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -331,7 +337,8 @@ const CheckModal = ({
                     mt='8'
                     bg='white'
                     border='1px solid #ccc'
-                    height={'300px'}
+                    minH={'auto'}
+                    maxH={'300px'}
                     overflowY={'scroll'}
                     borderRadius={4}
                     ref={compRef}
@@ -343,7 +350,6 @@ const CheckModal = ({
                           cursor='pointer'
                           fontSize={'sm'}
                           onClick={() => {
-                            setLicenseType('')
                             setActiveComp(item)
                             setComp(item.name)
                             setComponentList([])
