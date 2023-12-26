@@ -16,6 +16,7 @@ import {
 import CustomLoader from 'components/CustomLoader'
 import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
 import LicenseModal from 'components/LicenseModal'
+import { sbomUpdate } from 'graphQL/Mutation'
 import { CreateAutomation } from 'graphQL/Mutation'
 import { UpdateComponent } from 'graphQL/Mutation'
 import { recheckHealth, checkResultUpdate } from 'graphQL/Mutation'
@@ -37,16 +38,9 @@ import RowLimit from 'views/Sbom/components/RowLimit'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import SupplierModal from 'views/Sbom/components/SupplierModal'
 
-const HealthCheckTable = ({
-  productId,
-  sbomId,
-  data,
-  refetch,
-  filterRefetch,
-  sbomData
-}) => {
+const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
   // GET HEALTH CHECK FILTER HEADS
-  const [getCheckFilters, { refetch: checkFilterRefetch }] =
+  const [getCheckFilters, { refetch: filterRefetch }] =
     useLazyQuery(GetCheckFilterData)
 
   const customerView = location.pathname.startsWith('/customer')
@@ -111,7 +105,7 @@ const HealthCheckTable = ({
 
   const [getCpe] = useLazyQuery(CpeAutoComplete)
   const [updateComponent] = useMutation(UpdateComponent)
-  const [createAutoCheck] = useMutation(CreateAutomation)
+  const [updateSbom] = useMutation(sbomUpdate)
 
   const supplierBtn = useRef(null)
   const creationToolBtn = useRef(null)
@@ -370,21 +364,35 @@ const HealthCheckTable = ({
       })
   }
 
-  // CHECK UNIQUE IDENTIFIER
-  const handleUniqueID = async (row) => {
-    setActiveRow(row)
-    await createAutoCheck({
+  const handleSbomUpdate = async (row) => {
+    await updateSbom({
       variables: {
-        projectId: productId,
-        applicable: 'component',
-        condition: 'missing',
-        attr: 'uniq_serial',
-        enabled: true,
-        compName: row.component.name,
-        compVersion: row.component.version,
-        set: JSON.stringify({ value: '' }, null, 2)
+        id: row.sbomId,
+        spec: row.sbom.spec,
+        uniqueId: true
       }
-    }).then((res) => res.data && handleComUpdate(row))
+    })
+      .then((res) => {
+        if (res.data) {
+          prodCheckDispatch({ type: 'CLEAR_PROD_CHECK' })
+          healthRecheck({
+            variables: {
+              checkId: row.organizationRule.rule.friendlyId,
+              sbomId: sbomId
+            }
+          })
+        }
+      })
+      .finally(() => {
+        setTimeout(() => {
+          toast({
+            description: 'A unique identifier has been added to the component',
+            status: 'success',
+            duration: 3000,
+            position: 'top'
+          })
+        }, 1000)
+      })
   }
 
   const handleOpen = (row) => {
@@ -643,6 +651,9 @@ const HealthCheckTable = ({
                       row.organizationRule.rule.shortDesc ===
                       'Component has a unique identifier'
                         ? handleComUpdate(row)
+                        : row.organizationRule.rule.shortDesc ===
+                          'Document has a unique identifier'
+                        ? handleSbomUpdate(row)
                         : handleOpen(row)
                     }
                     disabled={customerView}
