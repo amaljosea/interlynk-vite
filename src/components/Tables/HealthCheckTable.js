@@ -262,6 +262,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
 
   // SET ROW LENGTH
   const handleSetRow = async (e) => {
+    setTotalRows(Number(e.target.value))
     await refetch({
       variables: {
         projectId: productId,
@@ -275,7 +276,6 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
       }
     }).then((res) => {
       if (res.data) {
-        setTotalRows(Number(e.target.value))
         prodCheckDispatch({ type: 'FETCH_DATA_SUCCESS' })
       }
     })
