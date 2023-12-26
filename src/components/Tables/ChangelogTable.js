@@ -159,7 +159,8 @@ const ChangelogTable = ({ data, refetch }) => {
       (res) =>
         res.data &&
         prodLogDispatch({
-          type: 'DECREMENT_PAGE'
+          type: 'DECREMENT_PAGE',
+          payload: data.pageInfo.startCursor
         })
     )
   }
@@ -178,7 +179,10 @@ const ChangelogTable = ({ data, refetch }) => {
         res.data &&
         prodLogDispatch({
           type: 'INCREMENT_PAGE',
-          payload: data.totalCount
+          payload: {
+            total: data.totalCount,
+            after: data.pageInfo.endCursor
+          }
         })
     )
   }

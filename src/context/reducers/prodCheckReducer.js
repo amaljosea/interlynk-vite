@@ -36,10 +36,11 @@ const prodCheckReducer = (state, action) => {
         before: payload
       }
     case 'INCREMENT_PAGE':
+      const { total, after } = payload
       return {
         ...state,
-        pageIndex: state.pageIndex < Math.ceil(payload) && state.pageIndex + 1,
-        after: payload
+        pageIndex: state.pageIndex < Math.ceil(total) && state.pageIndex + 1,
+        after: after
       }
     case 'SET_SORT_ORDER':
       return {
