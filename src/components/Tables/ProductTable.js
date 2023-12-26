@@ -514,6 +514,7 @@ const ProductTable = ({ data, refetch, org }) => {
 
   // SET ROW LENGTH
   const handleSetRow = async (e) => {
+    setTotalRows(Number(e.target.value))
     await refetch({
       first: Number(e.target.value),
       last: undefined,
@@ -521,7 +522,6 @@ const ProductTable = ({ data, refetch, org }) => {
       before: undefined
     }).then((res) => {
       if (res.data) {
-        setTotalRows(Number(e.target.value))
         prodDispatch({ type: 'FETCH_DATA_SUCCESS' })
       }
     })

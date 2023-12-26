@@ -659,6 +659,7 @@ const VulnTable = ({
 
   // SET ROW LENGTH
   const handleSetRow = async (e) => {
+    setTotalRows(Number(e.target.value))
     await refetch({
       variables: {
         ...vulnData,
@@ -666,7 +667,6 @@ const VulnTable = ({
       }
     }).then((res) => {
       if (res.data) {
-        setTotalRows(Number(e.target.value))
         prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
       }
     })
