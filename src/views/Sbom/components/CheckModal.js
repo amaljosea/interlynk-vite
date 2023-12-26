@@ -164,10 +164,24 @@ const CheckModal = ({
           id: componentId,
           sbomId: sbomId,
           licenses: {
-            licenses: licenseType === 'license_spdx' ? spdxLicenses : undefined,
-            licensesExp: licenseType === 'license_exp' ? expLicense : undefined,
+            licenses:
+              licenseType === 'license_spdx'
+                ? spdxLicenses
+                  ? spdxLicenses
+                  : []
+                : undefined,
+            licensesExp:
+              licenseType === 'license_exp'
+                ? expLicense
+                  ? expLicense
+                  : null
+                : undefined,
             licensesCustom:
-              licenseType === 'license_custom' ? customLicenses : undefined
+              licenseType === 'license_custom'
+                ? customLicenses
+                  ? customLicenses
+                  : []
+                : undefined
           }
         }
       })

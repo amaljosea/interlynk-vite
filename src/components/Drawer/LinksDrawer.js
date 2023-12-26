@@ -23,12 +23,12 @@ import {
   Input,
   FormErrorMessage,
   Tooltip,
-  VStack,
   Tag
 } from '@chakra-ui/react'
 import { DeleteIcon } from '@chakra-ui/icons'
 import { useMutation } from '@apollo/client'
 import { UpdateCompLinks } from 'graphQL/Mutation'
+import { validateUrl } from 'utils'
 
 const LinksDrawer = ({ isOpen, onClose, component, sbomId, fetchCompData }) => {
   const [type, setType] = useState('')
@@ -51,10 +51,6 @@ const LinksDrawer = ({ isOpen, onClose, component, sbomId, fetchCompData }) => {
     setLinksData(urls)
   }, [externalUrls])
 
-  const urlPattern = new RegExp(
-    '(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w.-]*/?'
-  )
-
   const handleTypeChange = (e) => {
     const { value } = e.target
     setType(value)
@@ -67,9 +63,16 @@ const LinksDrawer = ({ isOpen, onClose, component, sbomId, fetchCompData }) => {
     }
   }
 
+  const handleCheckUrl = () => {
+    if (!validateUrl(link)) {
+      setLinkError('Please enter a valid URL')
+    }
+  }
+
   const handleLinkChange = (e) => {
     const { value } = e.target
     setLink(value)
+    setLinkError('')
     if (value.length > 1024) {
       setLinkError('Input must be 1024 characters')
     } else {
@@ -158,11 +161,15 @@ const LinksDrawer = ({ isOpen, onClose, component, sbomId, fetchCompData }) => {
                   <FormErrorMessage>{error}</FormErrorMessage>
                 </FormControl>
                 {/* URL */}
-                <FormControl isRequired isInvalid={linkError}>
+                <FormControl
+                  isRequired
+                  isInvalid={link !== '' && !validateUrl(link)}
+                >
                   <FormLabel>Link</FormLabel>
                   <Input
                     placeholder='Add URL'
                     value={link}
+                    onBlur={handleCheckUrl}
                     onChange={handleLinkChange}
                   />
                   <FormErrorMessage>{linkError}</FormErrorMessage>
@@ -172,7 +179,7 @@ const LinksDrawer = ({ isOpen, onClose, component, sbomId, fetchCompData }) => {
                   colorScheme='blue'
                   type='submit'
                   isDisabled={
-                    !urlPattern.test(link) || error !== '' || linkError !== ''
+                    !validateUrl(link) || error !== '' || linkError !== ''
                   }
                 >
                   Add
@@ -233,10 +240,10 @@ const LinksDrawer = ({ isOpen, onClose, component, sbomId, fetchCompData }) => {
             </form>
           </DrawerBody>
           <DrawerFooter>
-            <Button variant='outline' mr={3} onClick={onClose}>
+            <Button mr={3} onClick={onClose}>
               Cancel
             </Button>
-            <Button colorScheme='blue' onClick={handleSave}>
+            <Button variant='solid' colorScheme='blue' onClick={handleSave}>
               Save
             </Button>
           </DrawerFooter>

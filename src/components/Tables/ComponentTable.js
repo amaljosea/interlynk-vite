@@ -77,7 +77,8 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
     licenses,
     suppliers,
     scope,
-    filters
+    filters,
+    totalComp
   } = prodCompState
   const { prodCompDispatch } = dispatch
 

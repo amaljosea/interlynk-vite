@@ -1,9 +1,8 @@
-import { useMemo } from 'react'
-import { AddIcon } from '@chakra-ui/icons'
+import { useMemo, useState } from 'react'
+import { AddIcon, ArrowForwardIcon } from '@chakra-ui/icons'
 import {
   Button,
   Flex,
-  Heading,
   IconButton,
   Link,
   Stack,
@@ -12,7 +11,14 @@ import {
   Text,
   Tooltip,
   useDisclosure,
-  useToast
+  useToast,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
 import { customStyles } from 'utils'
@@ -28,10 +34,17 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
   const navigate = useNavigate()
   const toast = useToast()
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const {
+    isOpen: isWarningOpen,
+    onOpen: onWarningOpen,
+    onClose: onWarningClose
+  } = useDisclosure()
+
+  const [activeRow, setActiveRow] = useState(null)
 
   const [switchOrg] = useMutation(SwitchOrganization)
 
-  const onSwitchOrg = async (id) => {
+  const onSwitchOrg = async (id, name) => {
     await switchOrg({
       variables: {
         orgId: id
@@ -41,7 +54,7 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
         if (res.data) {
           Cookies.set('authToken', res.data.organizationSwitch.token)
           toast({
-            description: 'Organization updated successfully',
+            description: `Logged into ${name} successfully`,
             position: 'top',
             status: 'success'
           })
@@ -137,14 +150,19 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
       selector: (row) => {
         const { id } = row
         return (
-          <Tag
-            variant='subtle'
+          <Button
+            size='sm'
+            variant='solid'
             cursor={'pointer'}
             colorScheme={activeOrg === id ? 'green' : 'blue'}
-            onClick={() => onSwitchOrg(id)}
+            onClick={() => {
+              setActiveRow(row)
+              onWarningOpen()
+            }}
+            rightIcon={activeOrg === id ? false : <ArrowForwardIcon />}
           >
-            <TagLabel>{activeOrg === id ? 'Active' : 'Set as active'}</TagLabel>
-          </Tag>
+            {activeOrg === id ? 'Active' : 'Switch to'}
+          </Button>
         )
       },
       wrap: true
@@ -175,6 +193,37 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
           org={activeOrg}
           onSwitch={onSwitchOrg}
         />
+      )}
+
+      {isWarningOpen && (
+        <Modal isOpen={isWarningOpen} onClose={onWarningClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Switch Org</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Text>
+                You are about to swich to Organization:{' '}
+                <strong>{activeRow.name}</strong>
+              </Text>
+              <Text mt={6}>Click Continue to confirm</Text>
+            </ModalBody>
+
+            <ModalFooter>
+              <Button fontWeight={'medium'} mr={3} onClick={onClose}>
+                Cancel
+              </Button>
+              <Button
+                fontWeight={'medium'}
+                variant='solid'
+                colorScheme='blue'
+                onClick={() => onSwitchOrg(activeRow.id, activeRow.name)}
+              >
+                Continue
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       )}
     </>
   )

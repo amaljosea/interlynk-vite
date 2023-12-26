@@ -12,15 +12,12 @@ import {
   FormControl,
   FormLabel,
   Input,
-  FormErrorMessage,
+  FormErrorMessage
 } from '@chakra-ui/react'
 import { RegisterOrganization } from 'graphQL/Mutation'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-
-const urlPattern = new RegExp(
-  '(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w.-]*/?'
-)
+import { validateUrl, validateEmail } from 'utils'
 
 const OrgModal = ({ isOpen, onClose, refetch, org, onSwitch }) => {
   const navigate = useNavigate()
@@ -35,12 +32,6 @@ const OrgModal = ({ isOpen, onClose, refetch, org, onSwitch }) => {
     onCompleted: () => refetch()
   })
 
-  const validateEmail = (email) => {
-    const emailRegex =
-      /(http(s):\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g
-    return emailRegex.test(email)
-  }
-
   const handleCheckEmail = () => {
     if (!validateEmail(email)) {
       setEmailError('Email is invalid')
@@ -48,7 +39,7 @@ const OrgModal = ({ isOpen, onClose, refetch, org, onSwitch }) => {
   }
 
   const handleCheckUrl = () => {
-    if (!urlPattern.test(url)) {
+    if (!validateUrl(url)) {
       setUrlError('Please enter a valid URL')
     }
   }
@@ -67,7 +58,7 @@ const OrgModal = ({ isOpen, onClose, refetch, org, onSwitch }) => {
           onClose()
           navigate('/vendor/settings?tab=organization')
         } else {
-          onSwitch(orgId)
+          onSwitch(orgId, name)
         }
       }
     })
@@ -101,7 +92,7 @@ const OrgModal = ({ isOpen, onClose, refetch, org, onSwitch }) => {
               />
             </FormControl>
             {/* URL */}
-            <FormControl isInvalid={url !== '' && !urlPattern.test(url)}>
+            <FormControl isInvalid={url !== '' && !validateUrl(url)}>
               <FormLabel>URL</FormLabel>
               <Input
                 type='text'

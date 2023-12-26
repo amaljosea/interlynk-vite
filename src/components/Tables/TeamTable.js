@@ -30,7 +30,6 @@ import { FaEllipsisV } from 'react-icons/fa'
 import { getFullDateAndTime, customStyles } from 'utils'
 import TeamModal from 'views/Dashboard/Profile/components/TeamModal'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
-import userNone from 'assets/img/user.png'
 
 const TeamTable = ({ data, refetch }) => {
   const SERVER_URL = process.env.REACT_APP_SERVER
@@ -41,7 +40,7 @@ const TeamTable = ({ data, refetch }) => {
     onClose: onTeamClose
   } = useDisclosure()
   const [activeRow, setActiveRow] = useState(null)
-  const [teamSearchInput, setTeamSearchInput] = useState('')
+  const [searchInput, setSearchInput] = useState('')
 
   const [deleteUser] = useMutation(deleteOrgUser)
 
@@ -152,7 +151,7 @@ const TeamTable = ({ data, refetch }) => {
   const handleSearch = () => console.log('hello')
 
   // CLEAR SERACH
-  const handleClear = () => setTeamSearchInput('')
+  const handleClear = () => setSearchInput('')
 
   // HEADER SECTION
   const subHeaderComponent = useMemo(() => {
@@ -165,8 +164,8 @@ const TeamTable = ({ data, refetch }) => {
         {/* SEARCH COMPONENTS */}
         <SearchFilter
           id='team'
-          filterText={teamSearchInput}
-          setFilterText={setTeamSearchInput}
+          filterText={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
           onFilter={handleSearch}
           onClear={handleClear}
         />
@@ -184,7 +183,7 @@ const TeamTable = ({ data, refetch }) => {
         </Tooltip>
       </Flex>
     )
-  }, [teamSearchInput, handleSearch, handleClear])
+  }, [searchInput, handleSearch, handleClear])
 
   const handleRemove = async () => {
     try {
@@ -202,7 +201,7 @@ const TeamTable = ({ data, refetch }) => {
 
   return (
     <>
-      {data && data.users.length > 0 ? (
+      {data ? (
         <Flex flexDir={'column'} width={'100%'}>
           <DataTable
             columns={columns}
@@ -235,7 +234,6 @@ const TeamTable = ({ data, refetch }) => {
           onClose={onTeamClose}
         />
       )}
-
       {/* REMOVE MEMBER */}
       {isOpen && activeRow && (
         <Modal isOpen={isOpen} onClose={onClose}>

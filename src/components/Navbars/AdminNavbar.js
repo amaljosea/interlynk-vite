@@ -62,7 +62,7 @@ export default function AdminNavbar(props) {
     productIndex !== -1 ? urlParts.slice(productIndex + 1).join('/') : ''
 
   useEffect(() => {
-    if (productName && currentProduct.name !== decodeURI(productName)) {
+    if (productName && currentProduct?.name !== decodeURI(productName)) {
       navigate('/vendor/dashboard')
     }
   }, [])

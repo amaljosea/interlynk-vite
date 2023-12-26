@@ -21,10 +21,8 @@ import { recheckHealth, supplierUpdate, supplierCreate } from 'graphQL/Mutation'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
-
-const urlPattern = new RegExp(
-  '(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w.-]*/?'
-)
+import { validateUrl } from 'utils'
+import { validateEmail } from 'utils'
 
 const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
   const location = useLocation()
@@ -35,16 +33,12 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
   const { dispatch } = useGlobalState()
   const { prodCheckDispatch } = dispatch
 
-  const validateEmail = (email) => {
-    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
-    return emailRegex.test(email)
-  }
-
   const [orgName, setOrgName] = useState('')
   const [orgUrl, setOrgUrl] = useState('')
-  const [isValidUrl, setIsValidUrl] = useState(true)
+  const [isValidUrl, setIsValidUrl] = useState('')
   const [supName, setSupName] = useState('')
   const [supEmail, setSupEmail] = useState('')
+  const [emailError, setEmailError] = useState('')
   const [supplierError, setSupplierError] = useState('')
 
   const onSupplierChange = (e) => {
@@ -57,18 +51,28 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
     }
   }
 
-  const onUrlChange = (e) => {
-    const { value } = e.target
-    setOrgUrl(value)
-    if (urlPattern.test(value)) {
-      setIsValidUrl(true)
-    } else {
-      setIsValidUrl(false)
+  const handleCheckUrl = () => {
+    if (!validateUrl(orgUrl)) {
+      setIsValidUrl('Please enter a valid URL')
     }
   }
 
+  const handleCheckEmail = () => {
+    if (!validateEmail(supEmail)) {
+      setEmailError('Email is invalid')
+    }
+  }
+
+  const onUrlChange = (e) => {
+    const { value } = e.target
+    setOrgUrl(value)
+    setIsValidUrl('')
+  }
+
   const isInvalid =
-    !supName || (supEmail != '' && !validateEmail(supEmail)) || !isValidUrl
+    !supName ||
+    (supEmail != '' && !validateEmail(supEmail)) ||
+    isValidUrl !== ''
 
   const handleRefetch = () => {
     refetch({
@@ -175,14 +179,15 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
                 />
               </FormControl>
               {/* ORG URL */}
-              <FormControl isInvalid={!isValidUrl}>
+              <FormControl isInvalid={orgUrl !== '' && !validateUrl(orgUrl)}>
                 <FormLabel fontSize={'sm'}>URL</FormLabel>
                 <Input
                   placeholder='Enter URL'
                   value={orgUrl}
+                  onBlur={handleCheckUrl}
                   onChange={onUrlChange}
                 />
-                <FormErrorMessage>Invalid URL</FormErrorMessage>
+                <FormErrorMessage>{isValidUrl}</FormErrorMessage>
               </FormControl>
               {/* SUPPLIER NAME */}
               <FormControl isRequired isInvalid={supplierError}>
@@ -196,17 +201,19 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
               </FormControl>
               {/* SUPPLIER EMAIL */}
               <FormControl
-                isInvalid={!validateEmail(supEmail) && supEmail !== ''}
+                isInvalid={supEmail !== '' && !validateEmail(supEmail)}
               >
                 <FormLabel fontSize={'sm'}>Contact Email</FormLabel>
                 <Input
                   placeholder='Enter supplier email'
                   value={supEmail}
-                  onChange={(e) => setSupEmail(e.target.value)}
+                  onBlur={handleCheckEmail}
+                  onChange={(e) => {
+                    setSupEmail(e.target.value)
+                    setEmailError('')
+                  }}
                 />
-                {supEmail !== '' && !validateEmail(supEmail) && (
-                  <FormErrorMessage>Email is invalid</FormErrorMessage>
-                )}
+                <FormErrorMessage>{emailError}</FormErrorMessage>
               </FormControl>
             </Flex>
           </ModalBody>

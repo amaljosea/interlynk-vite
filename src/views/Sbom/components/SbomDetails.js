@@ -39,7 +39,6 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
     prodCompState,
     prodVulnState,
     setActiveSbomTab,
-    setActiveProdTab,
     dispatch
   } = useGlobalState()
   const { prodCompDispatch, prodVulnDispatch } = dispatch

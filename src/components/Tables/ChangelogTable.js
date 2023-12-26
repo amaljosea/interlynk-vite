@@ -1,12 +1,4 @@
-import {
-  Button,
-  Flex,
-  Stack,
-  Tag,
-  Tooltip,
-  Text,
-  Box,
-} from '@chakra-ui/react'
+import { Button, Flex, Stack, Tag, Tooltip, Text, Box } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
 import { useGlobalState } from 'hooks/useGlobalState'
 import React, { useEffect, useMemo, useState } from 'react'
@@ -38,8 +30,8 @@ const setColor = (type) => {
 }
 
 const ChangelogTable = ({ data, refetch }) => {
-  const { prodLogState, dispatch } = useGlobalState()
-  const { totalRows, setTotalRows, field, direction, pageIndex } = prodLogState
+  const { totalRows, setTotalRows, prodLogState, dispatch } = useGlobalState()
+  const { field, direction, pageIndex } = prodLogState
   const { prodLogDispatch } = dispatch
 
   const location = useLocation()

@@ -76,7 +76,6 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const prodId = queryParams.get('id')
 
   const {
-    setActiveSbomTab,
     setActiveProdTab,
     totalRows,
     prodState,
@@ -97,7 +96,6 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
 
   const [selectedProd, setSelectedProd] = useState('')
   const [selectedVersion, setSelectedVersion] = useState('')
-  const [uniqVersions, setUniqVersions] = useState([])
   const [searchInput, setSearchInput] = useState('')
   const [activeRow, setActiveRow] = useState(null)
   const { data: allProducts } = useQuery(GetProjectData, {
@@ -163,45 +161,6 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
         label: option.name
       }))
 
-  const product =
-    allProducts &&
-    allProducts.projects.nodes.find((item) => item.id === selectedProd)
-
-  const existingVersions = []
-
-  data?.map((item) => {
-    if (item?.part?.primaryComponent) {
-      existingVersions.push(item?.part?.primaryComponent.version)
-    } else {
-      existingVersions.push(
-        `Uploaded ${getFullDateAndTime(item?.part?.creationAt)}`
-      )
-    }
-  })
-
-  const sbomVersions = []
-
-  const filteredDuplicated = product ? removeDuplicates(product.sboms) : []
-
-  filteredDuplicated &&
-    filteredDuplicated.map((project) => {
-      if (
-        !existingVersions?.includes(
-          project.primaryComponent
-            ? project.primaryComponent.version
-            : `Uploaded ${getFullDateAndTime(project.creationAt)}`
-        )
-      ) {
-        sbomVersions.push({
-          label: project.primaryComponent
-            ? project.primaryComponent.version
-            : `Uploaded ${getFullDateAndTime(project.creationAt)}`,
-          value: project.id,
-          creationAt: project.creationAt
-        })
-      }
-    })
-
   const [getProduct] = useLazyQuery(GetProject)
 
   const handleSelectProduct = (e) => {
@@ -214,26 +173,55 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
         variables: {
           id: value
         }
-      }).then((res) => {
-        if (res.data) {
-          let versions = []
-          res.data.project.sboms.map((project) => {
-            if (project.primaryComponent) {
-              versions.push({
-                version: project.primaryComponent.version,
-                id: project.id,
-                updatedAt: project.updatedAt
-              })
-            }
-          })
-          setUniqVersions(versions)
-        }
       })
     }
   }
 
+  const product =
+    allProducts &&
+    allProducts.projects.nodes.find((item) => item.id === selectedProd)
+
+  const existingVersions = []
+
+  data?.map((item) =>
+    existingVersions.push(
+      item?.part?.primaryComponent
+        ? item?.part?.primaryComponent.id
+        : `Uploaded ${getFullDateAndTime(
+            item?.part?.primaryComponent?.creationAt
+          )}`
+    )
+  )
+
+  const sbomVersions = []
+
+  console.log('existingVersions', existingVersions)
+
+  const filteredDuplicated = product ? removeDuplicates(product.sboms) : []
+
+  filteredDuplicated &&
+    filteredDuplicated.map((project) => {
+      if (
+        !existingVersions?.includes(
+          project.primaryComponent
+            ? project.primaryComponent.id
+            : `Uploaded ${getFullDateAndTime(
+                project?.primaryComponent?.creationAt
+              )}`
+        )
+      ) {
+        sbomVersions.push({
+          label: project.primaryComponent
+            ? project.primaryComponent.version
+            : `Uploaded ${getFullDateAndTime(project.creationAt)}`,
+          value: project.id,
+          creationAt: project.creationAt
+        })
+      }
+    })
+
   const getComponents = () => {
-    setActiveSbomTab(2)
+    localStorage.setItem('activeSbomTab', 2)
     getCompData({
       variables: {
         projectId: prodId,
@@ -258,7 +246,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
     }).then((res) => {
       if (res.data) {
         prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
-        setActiveSbomTab(3)
+        localStorage.setItem('activeSbomTab', 3)
       }
     })
   }
@@ -279,6 +267,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
               minWidth='100%'
               fontSize={14}
               onClick={() => {
+                prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
                 localStorage.setItem('activeSbomTab', 0)
                 setActiveProdTab(0)
               }}
@@ -304,6 +293,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
           </Text>
         )
       },
+      width: '200px',
       wrap: true
     },
     {
@@ -315,18 +305,25 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
           <>
             {part.suppliers.length > 0 &&
               part.suppliers.map((item, index) => (
-                <Tag
-                  size={'md'}
-                  key={index}
-                  fontSize={14}
-                  variant='subtle'
-                  colorScheme='orange'
+                <Tooltip
+                  label={`${item.name} ${
+                    item.contactEmail && `- ${item.contactEmail}`
+                  }`}
+                  placement='top'
                 >
-                  <TagLabel>
-                    {item.name}
-                    {item.contactEmail && ` - ${item.contactEmail}`}
-                  </TagLabel>
-                </Tag>
+                  <Tag
+                    size={'md'}
+                    key={index}
+                    fontSize={14}
+                    variant='subtle'
+                    colorScheme='orange'
+                  >
+                    <TagLabel>
+                      {item.name}
+                      {item.contactEmail && ` - ${item.contactEmail}`}
+                    </TagLabel>
+                  </Tag>
+                </Tooltip>
               ))}
           </>
         )
@@ -338,16 +335,20 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       selector: (row) => {
         const { part } = row
         return (
-          <Tag
-            size='md'
-            variant='subtle'
-            width={16}
-            colorScheme={'blue'}
+          <Link
+            to={`/vendor/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`}
             onClick={getComponents}
-            cursor={'pointer'}
           >
-            <TagLabel mx={'auto'}>{part.stats.compCount}</TagLabel>
-          </Tag>
+            <Tag
+              size='md'
+              variant='subtle'
+              width={16}
+              colorScheme={'blue'}
+              cursor={'pointer'}
+            >
+              <TagLabel mx={'auto'}>{part.stats.compCount}</TagLabel>
+            </Tag>
+          </Link>
         )
       },
       width: '150px'
@@ -370,43 +371,51 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       name: 'VULNERABILITIES',
       selector: (row) => {
         const { part } = row
-        // const link = `/vendor/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`
+        const link = `/vendor/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`
         return (
           <Stack fontWeight={'medium'} direction={'row'}>
-            <VulnBadge
-              color='red'
-              label='Critical'
-              onClick={() => onFilterSev(['critical'])}
-            >
-              {part.stats.vulnStats.critical
-                ? part.stats.vulnStats.critical
-                : 0}
-            </VulnBadge>
-            <VulnBadge
-              color='orange'
-              label='High'
-              onClick={() => onFilterSev(['high'])}
-            >
-              {part.stats.vulnStats.high ? part.stats.vulnStats.high : 0}
-            </VulnBadge>
-            <VulnBadge
-              color='yellow'
-              label='Medium'
-              onClick={() => onFilterSev(['medium'])}
-            >
-              {part.stats.vulnStats.medium ? part.stats.vulnStats.medium : 0}
-            </VulnBadge>
-            <VulnBadge
-              color='green'
-              label='Low'
-              onClick={() => onFilterSev(['low'])}
-            >
-              {part.stats.vulnStats.low ? part.stats.vulnStats.low : 0}
-            </VulnBadge>
+            <Link to={link}>
+              <VulnBadge
+                color='red'
+                label='Critical'
+                onClick={() => onFilterSev(['critical'])}
+              >
+                {part.stats.vulnStats.critical
+                  ? part.stats.vulnStats.critical
+                  : 0}
+              </VulnBadge>
+            </Link>
+            <Link to={link}>
+              <VulnBadge
+                color='orange'
+                label='High'
+                onClick={() => onFilterSev(['high'])}
+              >
+                {part.stats.vulnStats.high ? part.stats.vulnStats.high : 0}
+              </VulnBadge>
+            </Link>
+            <Link to={link}>
+              <VulnBadge
+                color='yellow'
+                label='Medium'
+                onClick={() => onFilterSev(['medium'])}
+              >
+                {part.stats.vulnStats.medium ? part.stats.vulnStats.medium : 0}
+              </VulnBadge>
+            </Link>
+            <Link to={link}>
+              <VulnBadge
+                color='green'
+                label='Low'
+                onClick={() => onFilterSev(['low'])}
+              >
+                {part.stats.vulnStats.low ? part.stats.vulnStats.low : 0}
+              </VulnBadge>
+            </Link>
           </Stack>
         )
       },
-      width: '250px'
+      width: '300px'
     },
     {
       id: 'STATUS',
