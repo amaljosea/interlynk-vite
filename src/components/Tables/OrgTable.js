@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { AddIcon, ArrowForwardIcon } from '@chakra-ui/icons'
 import {
   Button,
@@ -11,7 +11,14 @@ import {
   Text,
   Tooltip,
   useDisclosure,
-  useToast
+  useToast,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
 import { customStyles } from 'utils'
@@ -27,6 +34,13 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
   const navigate = useNavigate()
   const toast = useToast()
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const {
+    isOpen: isWarningOpen,
+    onOpen: onWarningOpen,
+    onClose: onWarningClose
+  } = useDisclosure()
+
+  const [activeRow, setActiveRow] = useState(null)
 
   const [switchOrg] = useMutation(SwitchOrganization)
 
@@ -134,14 +148,17 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
       id: 'ACTION',
       name: 'ACTION',
       selector: (row) => {
-        const { id, name } = row
+        const { id } = row
         return (
           <Button
             size='sm'
             variant='solid'
             cursor={'pointer'}
             colorScheme={activeOrg === id ? 'green' : 'blue'}
-            onClick={() => onSwitchOrg(id, name)}
+            onClick={() => {
+              setActiveRow(row)
+              onWarningOpen()
+            }}
             rightIcon={activeOrg === id ? false : <ArrowForwardIcon />}
           >
             {activeOrg === id ? 'Active' : 'Switch to'}
@@ -176,6 +193,37 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
           org={activeOrg}
           onSwitch={onSwitchOrg}
         />
+      )}
+
+      {isWarningOpen && (
+        <Modal isOpen={isWarningOpen} onClose={onWarningClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Switch Org</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Text>
+                You are about to swich to Organization:{' '}
+                <strong>{activeRow.name}</strong>
+              </Text>
+              <Text mt={6}>Click Continue to confirm</Text>
+            </ModalBody>
+
+            <ModalFooter>
+              <Button fontWeight={'medium'} mr={3} onClick={onClose}>
+                Cancel
+              </Button>
+              <Button
+                fontWeight={'medium'}
+                variant='solid'
+                colorScheme='blue'
+                onClick={() => onSwitchOrg(activeRow.id, activeRow.name)}
+              >
+                Continue
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       )}
     </>
   )
