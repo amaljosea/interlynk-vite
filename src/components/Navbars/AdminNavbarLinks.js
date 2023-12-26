@@ -16,9 +16,7 @@ import {
   PopoverContent,
   PopoverHeader,
   PopoverBody,
-  Icon,
   Stack,
-  Code,
   Select,
   Kbd
 } from '@chakra-ui/react'
@@ -31,7 +29,6 @@ import PropTypes from 'prop-types'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { dashRoutes } from 'routes.js'
 import { FaRegKeyboard, FaSignOutAlt } from 'react-icons/fa'
-
 import Cookies from 'js-cookie'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
