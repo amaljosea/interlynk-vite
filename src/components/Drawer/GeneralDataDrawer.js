@@ -38,7 +38,7 @@ import {
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
-import { getFullDateAndTime, timeSince } from 'utils'
+import { getFullDateAndTime, timeSince, validateEmail } from 'utils'
 
 const GeneralDataDrawer = ({
   isOpen,
@@ -119,11 +119,6 @@ const GeneralDataDrawer = ({
       setExistingAuthors(data.authors ? data.authors : [])
     }
   }, [data])
-
-  const validateEmail = (email) => {
-    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
-    return emailRegex.test(email)
-  }
 
   const handleAuthorAdd = async (e) => {
     e.preventDefault()

@@ -21,6 +21,7 @@ import { recheckHealth, supplierUpdate, supplierCreate } from 'graphQL/Mutation'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
+import { validateEmail } from 'utils'
 
 const urlPattern = new RegExp(
   '(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w.-]*/?'
@@ -34,11 +35,6 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
 
   const { dispatch } = useGlobalState()
   const { prodCheckDispatch } = dispatch
-
-  const validateEmail = (email) => {
-    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
-    return emailRegex.test(email)
-  }
 
   const [orgName, setOrgName] = useState('')
   const [orgUrl, setOrgUrl] = useState('')

@@ -24,6 +24,7 @@ import { addComSupplier } from 'graphQL/Mutation'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
+import { validateEmail } from 'utils'
 
 const urlPattern = new RegExp(
   '(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w.-]*/?'
@@ -46,12 +47,6 @@ const SupplierModal = ({
 
   const { dispatch } = useGlobalState()
   const { prodCompDispatch, prodCheckDispatch } = dispatch
-
-  const validateEmail = (email) => {
-    const emailRegex =
-      /(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g
-    return emailRegex.test(email)
-  }
 
   const [orgName, setOrgName] = useState('')
   const [orgUrl, setOrgUrl] = useState('')

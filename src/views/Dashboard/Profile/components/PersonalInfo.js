@@ -15,15 +15,12 @@ import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
 import { updateOrgUser } from 'graphQL/Mutation'
 import React, { useState, useEffect } from 'react'
+import { validateEmail } from 'utils'
 
 const PersonalInfo = ({ user, refetch }) => {
   const textColor = useColorModeValue('gray.700', 'white')
   const toast = useToast()
 
-  const validateEmail = (email) => {
-    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
-    return emailRegex.test(email)
-  }
 
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')

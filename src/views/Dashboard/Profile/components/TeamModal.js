@@ -20,17 +20,13 @@ import {
 } from '@chakra-ui/react'
 import { createOrgUser } from 'graphQL/Mutation'
 import { useState } from 'react'
+import { validateEmail } from 'utils'
 
 const TeamModal = ({ isOpen, onClose, refetch }) => {
   const toast = useToast()
   const [user, setUser] = useState('')
   const [email, setEmail] = useState('')
   const [error, setError] = useState('')
-
-  const validateEmail = (email) => {
-    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
-    return emailRegex.test(email)
-  }
 
   const [createUser] = useMutation(createOrgUser, {
     onCompleted: () => refetch()
@@ -87,7 +83,7 @@ const TeamModal = ({ isOpen, onClose, refetch }) => {
             {/* EMAIL */}
             <FormControl
               isRequired
-              isInvalid={!validateEmail(email) && email !== ''}
+              isInvalid={email !== '' && !validateEmail(email)}
             >
               <FormLabel>Email</FormLabel>
               <Input
