@@ -163,45 +163,6 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
         label: option.name
       }))
 
-  const product =
-    allProducts &&
-    allProducts.projects.nodes.find((item) => item.id === selectedProd)
-
-  const existingVersions = []
-
-  data?.map((item) => {
-    if (item?.part?.primaryComponent) {
-      existingVersions.push(item?.part?.primaryComponent.version)
-    } else {
-      existingVersions.push(
-        `Uploaded ${getFullDateAndTime(item?.part?.creationAt)}`
-      )
-    }
-  })
-
-  const sbomVersions = []
-
-  const filteredDuplicated = product ? removeDuplicates(product.sboms) : []
-
-  filteredDuplicated &&
-    filteredDuplicated.map((project) => {
-      if (
-        !existingVersions?.includes(
-          project.primaryComponent
-            ? project.primaryComponent.version
-            : `Uploaded ${getFullDateAndTime(project.creationAt)}`
-        )
-      ) {
-        sbomVersions.push({
-          label: project.primaryComponent
-            ? project.primaryComponent.version
-            : `Uploaded ${getFullDateAndTime(project.creationAt)}`,
-          value: project.id,
-          creationAt: project.creationAt
-        })
-      }
-    })
-
   const [getProduct] = useLazyQuery(GetProject)
 
   const handleSelectProduct = (e) => {
@@ -214,23 +175,34 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
         variables: {
           id: value
         }
-      }).then((res) => {
-        if (res.data) {
-          let versions = []
-          res.data.project.sboms.map((project) => {
-            if (project.primaryComponent) {
-              versions.push({
-                version: project.primaryComponent.version,
-                id: project.id,
-                updatedAt: project.updatedAt
-              })
-            }
-          })
-          setUniqVersions(versions)
-        }
       })
     }
   }
+
+  const product =
+    allProducts &&
+    allProducts.projects.nodes.find((item) => item.id === selectedProd)
+
+  const existingVersions = []
+
+  data?.map((item) => existingVersions.push(item?.part?.primaryComponent.id))
+
+  const sbomVersions = []
+
+  const filteredDuplicated = product ? removeDuplicates(product.sboms) : []
+
+  filteredDuplicated &&
+    filteredDuplicated.map((project) => {
+      if (!existingVersions?.includes(project.primaryComponent.id)) {
+        sbomVersions.push({
+          label: project.primaryComponent
+            ? project.primaryComponent.version
+            : `Uploaded ${getFullDateAndTime(project.creationAt)}`,
+          value: project.id,
+          creationAt: project.creationAt
+        })
+      }
+    })
 
   const getComponents = () => {
     setActiveSbomTab(2)
