@@ -31,7 +31,7 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
 
   const [switchOrg] = useMutation(SwitchOrganization)
 
-  const onSwitchOrg = async (id) => {
+  const onSwitchOrg = async (id, name) => {
     await switchOrg({
       variables: {
         orgId: id
@@ -41,7 +41,7 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
         if (res.data) {
           Cookies.set('authToken', res.data.organizationSwitch.token)
           toast({
-            description: 'Organization updated successfully',
+            description: `Logged into ${name} successfully`,
             position: 'top',
             status: 'success'
           })
@@ -135,13 +135,13 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
       id: 'ACTION',
       name: 'ACTION',
       selector: (row) => {
-        const { id } = row
+        const { id, name } = row
         return (
           <Tag
             variant='subtle'
             cursor={'pointer'}
             colorScheme={activeOrg === id ? 'green' : 'blue'}
-            onClick={() => onSwitchOrg(id)}
+            onClick={() => onSwitchOrg(id, name)}
           >
             <TagLabel>{activeOrg === id ? 'Active' : 'Set as active'}</TagLabel>
           </Tag>

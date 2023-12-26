@@ -12,7 +12,7 @@ import {
   FormControl,
   FormLabel,
   Input,
-  FormErrorMessage,
+  FormErrorMessage
 } from '@chakra-ui/react'
 import { RegisterOrganization } from 'graphQL/Mutation'
 import { useState } from 'react'
@@ -67,7 +67,7 @@ const OrgModal = ({ isOpen, onClose, refetch, org, onSwitch }) => {
           onClose()
           navigate('/vendor/settings?tab=organization')
         } else {
-          onSwitch(orgId)
+          onSwitch(orgId, name)
         }
       }
     })
