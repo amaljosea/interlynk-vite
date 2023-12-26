@@ -1,5 +1,5 @@
 import { useMutation } from '@apollo/client'
-import { CloseIcon, EditIcon, InfoIcon, SmallCloseIcon } from '@chakra-ui/icons'
+import { EditIcon, InfoIcon } from '@chakra-ui/icons'
 import {
   Button,
   Flex,
@@ -18,7 +18,6 @@ import {
   Tag,
   TagCloseButton,
   TagLabel,
-  TagRightIcon,
   Tbody,
   Td,
   Text,
@@ -34,13 +33,13 @@ import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
 import { authorDelete } from 'graphQL/Mutation'
 import { toolDelete } from 'graphQL/Mutation'
 import { supplierDelete } from 'graphQL/Mutation'
-import { useContext, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { getFullDateAndTime } from 'utils'
 import PriSupplierModal from 'views/Sbom/components/PriSupplierModal'
 import { sbomUpdate } from 'graphQL/Mutation'
-import GlobalContext from 'context/GlobalContext'
 import SbomLicenseField from 'components/SbomLicenseField'
+import { useGlobalState } from 'hooks/useGlobalState'
 
 const GeneralDataRow = ({ status, data, refetch }) => {
   const location = useLocation()
@@ -48,26 +47,14 @@ const GeneralDataRow = ({ status, data, refetch }) => {
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
 
-  const {
-    sbomSpdxList,
-    setSbomSpdxList,
-    sbomCustomList,
-    setSbomCustomList,
-    sbomLicenseType,
-    setSbomLicenseType,
-    sbomSpdxLicense,
-    setSbomSpdxLicense,
-    sbomLicenseExp,
-    setSbomLicenseExp,
-    sbomCustomLicense,
-    setSbomCustomLicense
-  } = useContext(GlobalContext)
+  const { sbomState, dispatch } = useGlobalState()
+  const { licenseType, spdxLicenses, expLicense, customLicenses } = sbomState
+  const { sbomDispatch } = dispatch
 
   const textColor = useColorModeValue('gray.700', 'white')
   const customerView = location.pathname.startsWith('/customer')
   const [selectedKey, setSelectedKey] = useState('')
   const [activeTool, setActiveTool] = useState(null)
-  const [expLicense, setExpLicense] = useState('')
 
   const btnRef = useRef(null)
   const licenseBtn = useRef(null)
@@ -177,34 +164,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
 
   const onLicenseOpen = () => {
     console.log('data', data)
-    if (data.licenses && data.licenses.length > 0) {
-      setSbomLicenseType('license_spdx')
-      const filterData = data?.licenses.map((value) => ({
-        value: value,
-        label: value
-      }))
-      setSbomSpdxList(filterData)
-      const selectedIds = filterData.map((option) => option.value)
-      setSbomSpdxLicense(selectedIds)
-    } else if (data.licensesExp) {
-      setSbomLicenseType('license_exp')
-      setSbomLicenseExp(data?.licensesExp)
-    } else if (data.licensesCustom && data.licensesCustom.length > 0) {
-      setSbomLicenseType('license_custom')
-      const filterData = data?.licensesCustom.map((option) => ({
-        value: option,
-        label: option
-      }))
-      setSbomCustomList(filterData)
-      setSbomCustomLicense(data.licensesCustom)
-    } else {
-      setSbomLicenseType('license_spdx')
-      setSbomSpdxList([])
-      setSbomSpdxLicense([])
-      setSbomLicenseExp('')
-      setSbomCustomList([])
-      setSbomCustomLicense([])
-    }
+    sbomDispatch({ type: 'SET_LICENSES', payload: data })
     onSBMOpen()
   }
 
@@ -215,23 +175,27 @@ const GeneralDataRow = ({ status, data, refetch }) => {
         spec: data.spec,
         licenses: {
           licenses:
-            sbomLicenseType === 'license_spdx' ? sbomSpdxLicense : undefined,
+            licenseType === 'license_spdx'
+              ? spdxLicenses
+                ? spdxLicenses
+                : []
+              : undefined,
           licensesExp:
-            sbomLicenseType === 'license_exp' ? sbomLicenseExp : undefined,
+            licenseType === 'license_exp'
+              ? expLicense
+                ? expLicense
+                : null
+              : undefined,
           licensesCustom:
-            sbomLicenseType === 'license_custom' ? sbomCustomLicense : undefined
+            licenseType === 'license_custom'
+              ? customLicenses
+                ? customLicenses
+                : []
+              : undefined
         }
       }
     })
-      .then((res) => {
-        if (res.data) {
-          setSbomSpdxLicense([])
-          setSbomSpdxList([])
-          setSbomLicenseExp('')
-          setSbomCustomList([])
-          setSbomCustomLicense([])
-        }
-      })
+      .then((res) => res.data && sbomDispatch({ type: 'CLEAR_LICENSES' }))
       .finally(() => onSBMClose())
   }
 
@@ -477,7 +441,12 @@ const GeneralDataRow = ({ status, data, refetch }) => {
               <Td pl={0} fontWeight={'medium'}>
                 <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                   <Text>Data License</Text>
-                  <Icon as={InfoIcon} color={'blue.500'} onClick={onInfoOpen} cursor={'pointer'} />
+                  <Icon
+                    as={InfoIcon}
+                    color={'blue.500'}
+                    onClick={onInfoOpen}
+                    cursor={'pointer'}
+                  />
                 </Flex>
               </Td>
               <Td pl={0}>
@@ -499,9 +468,6 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                             <TagLabel>{item}</TagLabel>
                           </Link>
                         </Tooltip>
-                        <TagCloseButton
-                          onClick={() => handleRemoveSpdx(item)}
-                        />
                       </Tag>
                     ))}
                   {/* EXPRESSION */}
@@ -520,7 +486,6 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                           <TagLabel>{data.licensesExp}</TagLabel>
                         </Link>
                       </Tooltip>
-                      <TagCloseButton onClick={handleRemoveExp} />
                     </Tag>
                   )}
                   {/* CUSTOM */}
@@ -540,9 +505,6 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                             <TagLabel>{item}</TagLabel>
                           </Link>
                         </Tooltip>
-                        <TagCloseButton
-                          onClick={() => handleRemoveCustom(item)}
-                        />
                       </Tag>
                     ))}
                 </Flex>
@@ -596,14 +558,6 @@ const GeneralDataRow = ({ status, data, refetch }) => {
               <Button
                 fontSize={'sm'}
                 colorScheme='blue'
-                // disabled={
-                //   (sbomLicenseType === 'license_spdx' &&
-                //     sbomSpdxLicense.length === 0) ||
-                //   (sbomLicenseType === 'license_exp' &&
-                //     sbomLicenseExp === '') ||
-                //   (sbomLicenseType === 'license_custom' &&
-                //     sbomCustomLicense.length === 0)
-                // }
                 onClick={onUpdateLicense}
               >
                 {data.licenses.length > 0 ? 'Update' : 'Save'}

@@ -20,14 +20,14 @@ import {
   Box,
   Tag
 } from '@chakra-ui/react'
-import { useState, useEffect, useRef, useContext } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { PackageURL } from 'packageurl-js'
 import { useLocation } from 'react-router-dom'
 import { UpdateComponent, recheckHealth } from 'graphQL/Mutation'
 import { useMutation } from '@apollo/client'
 import CpeInput from 'components/CpeInput'
-import GlobalContext from 'context/GlobalContext'
 import { CreateAutomation } from 'graphQL/Mutation'
+import { useGlobalState } from 'hooks/useGlobalState'
 
 const typeOptions = [
   { value: '', label: '-- Select --' },
@@ -73,13 +73,16 @@ const PurlModal = ({
   getCpe,
   activeCheck,
   setIsValid,
-  setPageIndex,
   activeComp
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const sbomId = queryParams.get('sbom')
   const productId = queryParams.get('id')
+
+  const { prodCompState, dispatch } = useGlobalState()
+  const { purlString } = prodCompState
+  const { prodCompDispatch, prodCheckDispatch } = dispatch
 
   const [purlType, setPurlType] = useState('')
   const [namespace, setNamespace] = useState('')
@@ -92,8 +95,6 @@ const PurlModal = ({
   const [purlVersionList, setPurlVersionList] = useState([])
   const purlVersionRef = useRef()
   const [qualifiers, setQualifiers] = useState('')
-
-  const { purlString, setPurlString } = useContext(GlobalContext)
 
   const validPurlTypes = [
     'bitbucket',
@@ -166,7 +167,7 @@ const PurlModal = ({
       })
         .then(() => {
           if (checkId) {
-            setPageIndex(1)
+            prodCheckDispatch({ type: 'FETCH_DATA_SUCCESS' })
             healthRecheck({
               variables: {
                 checkId: checkId,
@@ -247,7 +248,7 @@ const PurlModal = ({
       const pkg = PackageURL.fromString(purlString)
       pkg.namespace = ''
       pkg.name = 'name'
-      setPurlString(pkg.toString())
+      prodCompDispatch({ type: 'SET_PURL_STRING', payload: pkg.toString() })
     }
   }
 
@@ -344,10 +345,10 @@ const PurlModal = ({
     const pkg = PackageURL.fromString(purlString)
     if (purlName !== '') {
       pkg.name = purlName
-      setPurlString(pkg.toString())
+      prodCompDispatch({ type: 'SET_PURL_STRING', payload: pkg.toString() })
     } else {
       pkg.name = 'name'
-      setPurlString(pkg.toString())
+      prodCompDispatch({ type: 'SET_PURL_STRING', payload: pkg.toString() })
     }
   }
 
@@ -448,7 +449,7 @@ const PurlModal = ({
     } else {
       const pkg = PackageURL.fromString(purlString)
       pkg.version = ''
-      setPurlString(pkg.toString())
+      prodCompDispatch({ type: 'SET_PURL_STRING', payload: pkg.toString() })
     }
   }
 
@@ -470,7 +471,10 @@ const PurlModal = ({
   const handleTypeChange = (e) => {
     const { value } = e.target
     setPurlType(value)
-    setPurlString('pkg:type/name@version')
+    prodCompDispatch({
+      type: 'SET_PURL_STRING',
+      payload: 'pkg:type/name@version'
+    })
     setNamespace('')
     setPurlName('')
     setPurlVersion('')
@@ -481,7 +485,10 @@ const PurlModal = ({
     if (purlType !== '') {
       const pkg = PackageURL.fromString(purlString)
       pkg.type = purlType
-      setPurlString(pkg.toString())
+      prodCompDispatch({
+        type: 'SET_PURL_STRING',
+        payload: pkg.toString()
+      })
     }
   }
 
@@ -495,10 +502,16 @@ const PurlModal = ({
     const pkg = PackageURL.fromString(purlString)
     if (namespace !== '') {
       pkg.namespace = namespace
-      setPurlString(pkg.toString())
+      prodCompDispatch({
+        type: 'SET_PURL_STRING',
+        payload: pkg.toString()
+      })
     } else {
       pkg.namespace = ''
-      setPurlString(pkg.toString())
+      prodCompDispatch({
+        type: 'SET_PURL_STRING',
+        payload: pkg.toString()
+      })
     }
   }
 
@@ -518,10 +531,16 @@ const PurlModal = ({
     const pkg = PackageURL.fromString(purlString)
     if (purlVersion !== '') {
       pkg.version = purlVersion
-      setPurlString(pkg.toString())
+      prodCompDispatch({
+        type: 'SET_PURL_STRING',
+        payload: pkg.toString()
+      })
     } else {
       pkg.version = 'version'
-      setPurlString(pkg.toString())
+      prodCompDispatch({
+        type: 'SET_PURL_STRING',
+        payload: pkg.toString()
+      })
     }
   }
 
@@ -540,10 +559,16 @@ const PurlModal = ({
         convertedObject[key] = value
       }
       pkg.qualifiers = convertedObject
-      setPurlString(pkg.toString())
+      prodCompDispatch({
+        type: 'SET_PURL_STRING',
+        payload: pkg.toString()
+      })
     } else {
       pkg.qualifiers = ''
-      setPurlString(pkg.toString())
+      prodCompDispatch({
+        type: 'SET_PURL_STRING',
+        payload: pkg.toString()
+      })
     }
   }
 

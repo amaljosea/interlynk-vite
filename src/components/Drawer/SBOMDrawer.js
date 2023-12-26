@@ -31,6 +31,7 @@ import { GetProjectData, GetImages } from 'graphQL/Queries'
 
 import MultiSelect from 'react-select'
 import { UpdateShareLynk } from 'graphQL/Mutation'
+import { validateEmail } from 'utils'
 
 function SBOMDrawer(props) {
   const toast = useToast()
@@ -62,10 +63,6 @@ function SBOMDrawer(props) {
   const [selectedProd, setSelectedProd] = useState([])
   const [productIds, setProductIds] = useState([])
 
-  const validateEmail = (email) => {
-    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
-    return emailRegex.test(email)
-  }
 
   useEffect(() => {
     if (shareUsers.length > 0 && id) {

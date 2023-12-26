@@ -167,10 +167,12 @@ function Profile() {
                 </TabPanel>
                 {/* TEAMS */}
                 <TabPanel>
-                  <TeamTable
-                    data={orgInfo?.organization || null}
-                    refetch={refetch}
-                  />
+                  {orgInfo && (
+                    <TeamTable
+                      data={orgInfo?.organization || null}
+                      refetch={refetch}
+                    />
+                  )}
                 </TabPanel>
                 {/* FEEDS */}
                 <TabPanel>

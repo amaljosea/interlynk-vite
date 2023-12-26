@@ -15,53 +15,37 @@ import {
   Input,
   Link
 } from '@chakra-ui/react'
-import { useContext, useState } from 'react'
+import { useState } from 'react'
 import ReactSelect from 'react-select'
 import CreatableSelect from 'react-select/creatable'
-import GlobalContext from 'context/GlobalContext'
 import { CpeAutoComplete } from 'graphQL/Queries'
 import { useLazyQuery } from '@apollo/client'
 import spdxValidate from 'spdx-expression-validate'
 import { MdArrowOutward } from 'react-icons/md'
+import { useGlobalState } from 'hooks/useGlobalState'
 
-const LicenseField = ({ data }) => {
-  const {
-    spdxList,
-    setSpdxList,
-    licenseType,
-    setLicenseType,
-    setSpdxLicense,
-    customLicense,
-    setCustomLicense,
-    customList,
-    setCustomList,
-    licenseExp,
-    setLicenseExp
-  } = useContext(GlobalContext)
+const LicenseField = () => {
+  const { prodCompState, dispatch } = useGlobalState()
+  const { licenseType, spdxList, customList, expLicense } = prodCompState
+  const { prodCompDispatch } = dispatch
 
   const [licenseList, setLicenseList] = useState([])
   const [isValid, setIsValid] = useState(true)
   const [getCpe] = useLazyQuery(CpeAutoComplete)
 
   const onLicenseChange = (selected) => {
-    console.log(selected)
-    setSpdxList(selected)
     if (selected) {
-      const selectedIds = selected.map((option) => option.value)
-      setSpdxLicense(selectedIds)
+      prodCompDispatch({ type: 'SET_SPDX_LICENSES', payload: selected })
     } else {
-      setSpdxLicense([])
+      prodCompDispatch({ type: 'SET_SPDX_LICENSES', payload: [] })
     }
   }
 
   const onCustomChange = (selected) => {
-    console.log(selected)
-    setCustomList(selected)
     if (selected) {
-      const selectedIds = selected.map((option) => option.value)
-      setCustomLicense(selectedIds)
+      prodCompDispatch({ type: 'SET_CUSTOM_LICENSES', payload: selected })
     } else {
-      setCustomLicense([])
+      prodCompDispatch({ type: 'SET_CUSTOM_LICENSES', payload: [] })
     }
   }
 
@@ -72,13 +56,10 @@ const LicenseField = ({ data }) => {
 
   const handleCreate = (inputValue) => {
     console.log('inputValue', inputValue)
-    const newOption = createOption(inputValue)
-    setCustomList((prev) => [newOption, ...prev])
-    setCustomLicense((prev) => [inputValue, ...prev])
+    prodCompDispatch({ type: 'CREATE_CUSTOM_LICENSES', payload: inputValue })
   }
 
   const handleInputChange = (value) => {
-    console.log('value', value)
     if (value !== '') {
       getCpe({
         variables: {
@@ -106,7 +87,7 @@ const LicenseField = ({ data }) => {
 
   const handleExpChange = (e) => {
     const { value } = e.target
-    setLicenseExp(value)
+    prodCompDispatch({ type: 'SET_EPX_LICENSE', payload: value })
     if (value !== '') {
       const trimmedInput = typeof value === 'string' ? value.trim() : ''
       const isLicenseValid = spdxValidate(trimmedInput)
@@ -117,7 +98,7 @@ const LicenseField = ({ data }) => {
   }
 
   const handleTypeChange = (value) => {
-    setLicenseType(value)
+    prodCompDispatch({ type: 'SET_LICENSE_TYPE', payload: value })
   }
 
   return (
@@ -168,9 +149,7 @@ const LicenseField = ({ data }) => {
                 />
               </Link>
             </Radio>
-            <Radio value='license_custom'>
-              Custom
-            </Radio>
+            <Radio value='license_custom'>Custom</Radio>
           </Stack>
         </RadioGroup>
         {/* SPDX LICENSE */}
@@ -205,7 +184,7 @@ const LicenseField = ({ data }) => {
           <>
             <Input
               type='text'
-              value={licenseExp}
+              value={expLicense}
               fontSize={'sm'}
               onChange={handleExpChange}
               placeholder='Enter a valid SPDX Expression'

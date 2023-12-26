@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Flex,
   IconButton,
@@ -20,9 +20,9 @@ import { getConImg, scanImage } from 'utils'
 import { FaCircleNotch, FaEllipsisV } from 'react-icons/fa'
 import { useMutation } from '@apollo/client'
 import { ImageUpdate } from 'graphQL/Mutation'
-import GlobalContext from 'context/GlobalContext'
-import semver from 'semver'
 import { useLocation, Link } from 'react-router-dom'
+import { useGlobalState } from 'hooks/useGlobalState'
+import semver from 'semver'
 
 const ImageRow = ({
   item,
@@ -37,7 +37,7 @@ const ImageRow = ({
   const queryParams = new URLSearchParams(location.search)
   const signedParams = queryParams.get('signed_url_params')
 
-  const { setScanEnabled } = useContext(GlobalContext)
+  const { setScanEnabled } = useGlobalState()
 
   const sortImages = [...item.imageScanners].sort((a, b) =>
     a.company.localeCompare(b.company)

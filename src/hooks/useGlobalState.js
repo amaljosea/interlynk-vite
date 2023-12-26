@@ -5,88 +5,146 @@ import {
   prodLogReducer,
   prodVulnReducer,
   sbomLogReducer,
-  prodReducer
+  prodReducer,
+  sbomReducer
 } from 'context/reducers'
 
 const GlobalStateContext = createContext()
 
 const GlobalStateProvider = ({ children }) => {
   const [totalRows, setTotalRows] = useState(25)
+  const [activeProdTab, setActiveProdTab] = useState(0)
+  const [activeSbomTab, setActiveSbomTab] = useState(0)
+  const [minimize, setMinimize] = useState(true)
+  const [activeDockerHub, setActiveDockerHub] = useState(true)
+  const [vulnerabilitiesData, setVulnerabilitiesData] = useState([])
+  const [scanEnabled, setScanEnabled] = useState(false)
+  // PRODUCTS
   const [prodState, prodDispatch] = useReducer(prodReducer, {
     field: 'PROJECTS_UPDATED_AT',
     direction: 'DESC',
     totalProduct: 0,
     searchInput: '',
     pageIndex: 1,
-    enabled: 'yes'
+    enabled: 'yes',
+    currentProduct: null
   })
   const [prodLogState, prodLogDispatch] = useReducer(prodLogReducer, {
     field: 'ACTIVITY_LOGS_CREATED_AT',
-    direction: 'DESC'
+    direction: 'DESC',
+    pageIndex: 1
   })
   const [prodCompState, prodCompDispatch] = useReducer(prodCompReducer, {
     field: 'COMPONENTS_UPDATED_AT',
     direction: 'DESC',
+    after: '',
+    before: '',
+    totalComp: 0,
     searchInput: '',
     pageIndex: 1,
     ecosystems: [],
     kinds: [],
     licenses: [],
     suppliers: [],
-    scope: ''
+    scope: '',
+    filters: null,
+    licenseType: 'license_spdx',
+    spdxLicenses: [],
+    spdxList: [],
+    customLicenses: [],
+    customList: [],
+    expLicense: '',
+    cpeString: '',
+    isCpeValid: true,
+    purlString: ''
   })
   const [prodVulnState, prodVulnDispatch] = useReducer(prodVulnReducer, {
     field: 'COMPONENT_VULNS_UPDATED_AT',
     direction: 'DESC',
+    after: '',
+    before: '',
+    totalVuln: 0,
     searchInput: '',
     pageIndex: 1,
     severities: [],
     components: [],
     statues: [],
     kev: '',
-    epss: {
-      min: 0,
-      max: 10000
-    }
+    epss: '',
+    minEpss: 0,
+    maxEpss: 0,
+    filters: null,
+    selectedVulns: [],
+    importSbom: [],
+    mergeData: [],
+    currentSbom: []
   })
   const [prodCheckState, prodCheckDispatch] = useReducer(prodCheckReducer, {
     field: 'CHECK_RESULTS_UPDATED_AT',
     direction: 'DESC',
+    after: '',
+    before: '',
     searchInput: '',
     pageIndex: 1,
     rules: [],
     categories: [],
     severities: [],
-    statues: []
+    statues: [],
+    filters: null
+  })
+  const [sbomState, sbomDispatch] = useReducer(sbomReducer, {
+    licenseType: 'license_spdx',
+    spdxLicenses: [],
+    spdxList: [],
+    customLicenses: [],
+    customList: [],
+    expLicense: ''
   })
   const [sbomLogState, sbomLogDispatch] = useReducer(sbomLogReducer, {
     field: 'ACTIVITY_LOGS_CREATED_AT',
     direction: 'DESC',
+    after: '',
+    before: '',
     searchInput: '',
     pageIndex: 1,
     users: [],
     objects: [],
-    types: []
+    types: [],
+    filters: null
   })
 
   return (
     <GlobalStateContext.Provider
       value={{
+        minimize,
+        setMinimize,
         totalRows,
         setTotalRows,
+        activeProdTab,
+        setActiveProdTab,
+        activeSbomTab,
+        setActiveSbomTab,
+        activeDockerHub,
+        setActiveDockerHub,
+        vulnerabilitiesData,
+        setVulnerabilitiesData,
+        scanEnabled,
+        setScanEnabled,
         prodState,
         prodLogState,
         prodCompState,
         prodVulnState,
         prodCheckState,
         sbomLogState,
+        sbomState,
         dispatch: {
           prodDispatch,
           prodLogDispatch,
           prodCompDispatch,
           prodVulnDispatch,
           prodCheckDispatch,
-          sbomLogDispatch
+          sbomLogDispatch,
+          sbomDispatch
         }
       }}
     >
