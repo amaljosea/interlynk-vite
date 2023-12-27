@@ -369,7 +369,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
       variables: {
         id: row.sbomId,
         spec: row.sbom.spec,
-        uniqueId: true
+        generateUniqueId: true
       }
     })
       .then((res) => {
