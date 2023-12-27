@@ -63,6 +63,7 @@ const ProductModal = ({
           'A project with same name already exists. Please choose an unique name'
         )
       } else {
+        navigate(`/vendor/products/${productName}?id=${id}`)
         onClose()
       }
     })
