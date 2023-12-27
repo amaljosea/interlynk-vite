@@ -400,8 +400,6 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
 
     setActiveRow(row)
 
-    console.log('row', row)
-
     // TIMESTAMP SELECTOR UI
     if (organizationRule.rule.shortDesc === 'Document creation timestamp') {
       return onOpen()
