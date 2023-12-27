@@ -79,8 +79,11 @@ const TokenInfo = ({ data, refetch }) => {
   const handleChange = (event) => {
     const { value } = event.target
     setKeyName(value)
+    setError('')
+  }
 
-    if (value.length < 4 || value.length > 128) {
+  const onTokenBlur = () => {
+    if (keyName.length < 4 || keyName.length > 128) {
       setError('Input must be between 4 and 128 characters')
     } else {
       setError('')
@@ -391,7 +394,11 @@ const TokenInfo = ({ data, refetch }) => {
             <ModalCloseButton />
             <ModalBody>
               {!activeRow && (
-                <FormControl mb={5} isRequired isInvalid={error}>
+                <FormControl
+                  mb={5}
+                  isRequired
+                  isInvalid={keyName !== '' && error !== ''}
+                >
                   <FormLabel mb={1} htmlFor='keyName'>
                     Token Name
                   </FormLabel>
@@ -402,7 +409,9 @@ const TokenInfo = ({ data, refetch }) => {
                     value={keyName}
                     minLength={4}
                     maxLength={128}
+                    onBlur={onTokenBlur}
                     onChange={handleChange}
+                    isDisabled={token !== ''}
                   />
                   <FormErrorMessage>{error}</FormErrorMessage>
                 </FormControl>
@@ -416,12 +425,20 @@ const TokenInfo = ({ data, refetch }) => {
                     value={selectedDate}
                     onChange={handleDateChange}
                     utc={true}
-                    inputProps={{ placeholder: 'Select Date and Time' }}
+                    inputProps={{
+                      placeholder: 'Select Date and Time',
+                      disabled: token !== ''
+                    }}
+                    editnle
                   />
                 </FormControl>
               )}
               <FormControl mb={5}>
-                <Checkbox isChecked={noExpire} onChange={handleExpireChange}>
+                <Checkbox
+                  isChecked={noExpire}
+                  onChange={handleExpireChange}
+                  isDisabled={token !== ''}
+                >
                   No Expiration
                 </Checkbox>
               </FormControl>
