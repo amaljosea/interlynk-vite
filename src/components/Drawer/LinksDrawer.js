@@ -212,11 +212,11 @@ const LinksDrawer = ({ isOpen, onClose, component, sbomId, fetchCompData }) => {
                               width={'260px'}
                               wordBreak={'break-all'}
                             >
-                              <Tooltip label={item.url}>
-                                {item.url.length > 35
-                                  ? `${item.url.substring(0, 35)}...`
-                                  : item.url}
-                              </Tooltip>
+                              {item.url ? (
+                                <Tooltip label={item.url}>
+                                  {item.url.length > 35 ? `${item.url.substring(0, 35)}...` : item.url}
+                                </Tooltip>
+                              ) : null}
                             </Td>
                             <Td pl={0} fontSize={'xs'}>
                               {item.name}

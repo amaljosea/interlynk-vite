@@ -381,7 +381,7 @@ const RelationshipDrawer = ({
                 <Text fontSize={'lg'} fontWeight={'medium'} mt={6}>
                   Pedigree
                 </Text>
-                {compPath.length > 0 ? (
+                {compPath?.length > 0 ? (
                   <Stack
                     width={'100%'}
                     mt={10}
@@ -390,7 +390,7 @@ const RelationshipDrawer = ({
                     alignItems={'center'}
                     justifyContent={'center'}
                   >
-                    {shortestPath.path.length > 0 ? (
+                    {shortestPath.path?.length > 0 ? (
                       shortestPath.path.map((item, index) => (
                         <>
                           <Tag
