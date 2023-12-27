@@ -439,6 +439,7 @@ const VulnTable = ({
           <SearchFilter
             id='vuln'
             filterText={searchInput}
+            onChange={onSearchInputChange}
             onFilter={handleSearch}
             onClear={handleClear}
           />
@@ -452,7 +453,9 @@ const VulnTable = ({
             />
           ) : (
             <Stack direction='row' spacing={4}>
-              {[1,2,3,4].map((_, index) => <Skeleton key={index} width={'100px'} height={'38px'} />)}
+              {[1, 2, 3, 4].map((_, index) => (
+                <Skeleton key={index} width={'100px'} height={'38px'} />
+              ))}
             </Stack>
           )}
         </Stack>
@@ -764,11 +767,23 @@ const VulnTable = ({
       )}
 
       {/* EPSS INFO */}
-      <Stack mt={10} direction={'row'} spacing={2} justifyContent={'flex-end'} textAlign={'right'}>
-        <Link href='https://www.first.org/epss/' target='_blank' fontSize={'xs'}>* EPSS (Exploit Prediction Scoring System) is an estimation of a vulnerability exploit.
-        <Text fontSize={'xs'}>
-          Interlynk scales EPSS by 10,000 for a more readable score.
-        </Text>
+      <Stack
+        mt={10}
+        direction={'row'}
+        spacing={2}
+        justifyContent={'flex-end'}
+        textAlign={'right'}
+      >
+        <Link
+          href='https://www.first.org/epss/'
+          target='_blank'
+          fontSize={'xs'}
+        >
+          * EPSS (Exploit Prediction Scoring System) is an estimation of a
+          vulnerability exploit.
+          <Text fontSize={'xs'}>
+            Interlynk scales EPSS by 10,000 for a more readable score.
+          </Text>
         </Link>
       </Stack>
 
