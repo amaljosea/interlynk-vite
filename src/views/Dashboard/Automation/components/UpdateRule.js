@@ -12,7 +12,11 @@ import {
   FormLabel,
   Select,
   Input,
-  Button
+  Button,
+  Text,
+  AlertDescription,
+  AlertIcon,
+  Alert
 } from '@chakra-ui/react'
 import { UpdateAutomation } from 'graphQL/Mutation'
 import { useState, useEffect } from 'react'
@@ -21,6 +25,7 @@ const UpdateRule = ({ isOpen, onClose, data, refetch, productId }) => {
   const [compName, setCompName] = useState('')
   const [compVersion, setCompVersion] = useState('')
   const [condition, setCondition] = useState('')
+  const [error, setError] = useState([])
 
   const [updateAutoCheck] = useMutation(UpdateAutomation)
 
@@ -46,9 +51,14 @@ const UpdateRule = ({ isOpen, onClose, data, refetch, productId }) => {
         compName: compName,
         compVersion: compVersion
       }
+    }).then((res) => {
+      if (res.data.autoCheckUpdate.errors.length === 0) {
+        refetch({ variables: { id: productId } })
+        onClose()
+      } else {
+        setError(res.data.autoCheckUpdate.errors)
+      }
     })
-      .then((res) => res.data && refetch({ variables: { id: productId } }))
-      .finally(() => onClose())
   }
 
   return (
@@ -59,6 +69,19 @@ const UpdateRule = ({ isOpen, onClose, data, refetch, productId }) => {
         <ModalCloseButton />
         <ModalBody>
           <VStack alignItems={'flex-start'} spacing={3}>
+            {error?.length > 0 && (
+              <Alert status='error' borderRadius={4} my={2}>
+                <AlertIcon />
+                <AlertDescription>
+                  {error.map((item, index) => (
+                    <Text fontSize={'sm'} key={index}>
+                      {item}
+                    </Text>
+                  ))}
+                </AlertDescription>
+              </Alert>
+            )}
+
             {/* COMPONENT NAME */}
             <FormControl
               display={data.applicability === 'component' ? 'block' : 'none'}
@@ -68,7 +91,10 @@ const UpdateRule = ({ isOpen, onClose, data, refetch, productId }) => {
                 id='compName'
                 name='compName'
                 value={compName}
-                onChange={(e) => setCompName(e.target.value)}
+                onChange={(e) => {
+                  setCompName(e.target.value)
+                  setError([])
+                }}
                 placeholder='Add component name'
               />
             </FormControl>
@@ -82,7 +108,10 @@ const UpdateRule = ({ isOpen, onClose, data, refetch, productId }) => {
                 id='compVersion'
                 name='compVersion'
                 value={compVersion}
-                onChange={(e) => setCompVersion(e.target.value)}
+                onChange={(e) => {
+                  setCompVersion(e.target.value)
+                  setError([])
+                }}
                 placeholder='Add component version'
               />
             </FormControl>
