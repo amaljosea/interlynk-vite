@@ -126,6 +126,7 @@ function Profile() {
       <Flex direction='column' pr={2} pl={5} pt={{ base: '120px', md: '75px' }}>
         {/*  HEADER */}
         <Header
+          org={orgInfo?.organization}
           user={orgInfo?.organization?.currentUser}
           selectedTab={selectedTab}
           refetch={refetch}
@@ -220,7 +221,15 @@ function Profile() {
               <TabList>
                 {['Personal Details', 'Organizations', 'Security Tokens'].map(
                   (item, index) => (
-                    <Tab key={index} _focus={{ outline: 'none' }}>
+                    <Tab
+                      key={index}
+                      _focus={{ outline: 'none' }}
+                      display={
+                        !orgInfo?.organization && item !== 'Organizations'
+                          ? 'none'
+                          : 'block'
+                      }
+                    >
                       {item}
                     </Tab>
                   )
@@ -228,7 +237,7 @@ function Profile() {
               </TabList>
               <TabPanels>
                 {/* PERSONA DETAILS */}
-                <TabPanel>
+                <TabPanel display={orgInfo?.organization ? 'block' : 'none'}>
                   <PersonalInfo
                     user={orgInfo?.organization?.currentUser || null}
                     refetch={refetch}
@@ -243,7 +252,7 @@ function Profile() {
                   />
                 </TabPanel>
                 {/* SECURITY TOKEN */}
-                <TabPanel>
+                <TabPanel display={orgInfo?.organization ? 'block' : 'none'}>
                   <TokenInfo
                     data={orgInfo?.organization?.currentUser?.apiKeys || []}
                     refetch={refetch}

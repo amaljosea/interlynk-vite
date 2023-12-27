@@ -17,6 +17,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 const Header = ({
+  org,
   selectedTab,
   setSelectedTab,
   user,
@@ -40,6 +41,8 @@ const Header = ({
       setTabIndex(0)
     }
   }
+
+  console.log('org', org)
 
   const userName = localStorage.getItem('username')
   const userEmail = localStorage.getItem('email')
@@ -210,6 +213,7 @@ const Header = ({
                 onClick={() => handleClick(tab.name)}
                 variant={`${selectedTab == tab.name ? 'solid' : 'outline'}`}
                 colorScheme='blue'
+                display={!org ? 'none' : 'block'}
               >
                 <Flex align='center' justifyContent='center'>
                   <tab.icon
