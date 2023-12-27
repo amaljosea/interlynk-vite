@@ -644,7 +644,8 @@ const VulnTable = ({
             : kev === 'yes'
             ? true
             : false,
-        epss: range || undefined,
+        epss:
+          epss === 'all' || epss === '0-0' || epss === '' ? undefined : range,
         first: totalRows,
         field: column.id,
         direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
