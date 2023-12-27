@@ -28,10 +28,13 @@ import OrgModal from 'views/Dashboard/Profile/components/OrgModal'
 import { useMutation } from '@apollo/client'
 import { SwitchOrganization } from 'graphQL/Mutation'
 import Cookies from 'js-cookie'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 const OrgTable = ({ data, refetch, activeOrg }) => {
   const navigate = useNavigate()
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const activetab = queryParams.get('tab')
   const toast = useToast()
   const { isOpen, onOpen, onClose } = useDisclosure()
   const {
@@ -155,16 +158,29 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
       selector: (row) => {
         const { id } = row
         return (
-          <Button
-            size='sm'
-            variant='solid'
-            cursor={'pointer'}
-            colorScheme={activeOrg === id ? 'green' : 'blue'}
-            onClick={activeOrg === id ? false : onSwitch(row)}
-            rightIcon={activeOrg === id ? false : <ArrowForwardIcon />}
-          >
-            {activeOrg === id ? 'Active' : 'Switch to'}
-          </Button>
+          <>
+            {activeOrg !== id ? (
+              <Button
+                size='sm'
+                variant='solid'
+                cursor={'pointer'}
+                colorScheme={'blue'}
+                onClick={() => onSwitch(row)}
+                rightIcon={<ArrowForwardIcon />}
+              >
+                Switch to
+              </Button>
+            ) : (
+              <Button
+                size='sm'
+                variant='solid'
+                cursor={'pointer'}
+                colorScheme={'green'}
+              >
+                Active
+              </Button>
+            )}
+          </>
         )
       },
       wrap: true
