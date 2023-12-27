@@ -34,7 +34,9 @@ export const GetOrg = gql`
         id
         name
         email
-        role
+        role {
+          name
+        }
         timezone
         createdAt
         profileImage {
