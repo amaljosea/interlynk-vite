@@ -369,7 +369,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
       variables: {
         id: row.sbomId,
         spec: row.sbom.spec,
-        uniqueId: true
+        generateUniqueId: true
       }
     })
       .then((res) => {
@@ -399,8 +399,6 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
     const { organizationRule } = row
 
     setActiveRow(row)
-
-    console.log('row', row)
 
     // TIMESTAMP SELECTOR UI
     if (organizationRule.rule.shortDesc === 'Document creation timestamp') {

@@ -119,7 +119,6 @@ export const updateOrgUser = gql`
         id
         name
         email
-        role
       }
     }
   }
@@ -974,6 +973,7 @@ export const sbomUpdate = gql`
     $specVersion: String
     $format: String
     $licenses: LicenseInput
+    $generateUniqueId: Boolean
   ) {
     sbomUpdate(
       input: {
@@ -982,6 +982,7 @@ export const sbomUpdate = gql`
         specVersion: $specVersion
         format: $format
         licenses: $licenses
+        generateUniqueId: $generateUniqueId
       }
     ) {
       errors

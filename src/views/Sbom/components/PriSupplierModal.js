@@ -41,6 +41,8 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
   const [emailError, setEmailError] = useState('')
   const [supplierError, setSupplierError] = useState('')
 
+  const containsSpace = /\s/.test(orgUrl)
+
   const onSupplierChange = (e) => {
     const { value } = e.target
     setSupName(value)
@@ -179,7 +181,7 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
                 />
               </FormControl>
               {/* ORG URL */}
-              <FormControl isInvalid={orgUrl !== '' && !validateUrl(orgUrl)}>
+              <FormControl isInvalid={orgUrl !== '' && !validateUrl(orgUrl) && containsSpace}>
                 <FormLabel fontSize={'sm'}>URL</FormLabel>
                 <Input
                   placeholder='Enter URL'

@@ -10,7 +10,7 @@ import {
 import PropTypes from 'prop-types'
 import React, { useState, useEffect } from 'react'
 import AdminNavbarLinks from './AdminNavbarLinks'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { vulnList } from 'variables/general'
 
 export default function AdminNavbar(props) {
@@ -28,6 +28,7 @@ export default function AdminNavbar(props) {
   const { brandText } = props
   const navigate = useNavigate()
   const location = useLocation()
+  const params = useParams()
   const queryParams = new URLSearchParams(location.search)
   const versionId = queryParams.get('v')
   const prodID = queryParams.get('id')
@@ -57,12 +58,9 @@ export default function AdminNavbar(props) {
 
   const urlParts = location.pathname.split('/')
   const category = urlParts[2]
-  const productIndex = urlParts.indexOf('products')
-  const productName =
-    productIndex !== -1 ? urlParts.slice(productIndex + 1).join('/') : ''
 
   useEffect(() => {
-    if (productName && currentProduct?.name !== decodeURI(productName)) {
+    if (params?.name && currentProduct?.name !== decodeURI(params?.name)) {
       navigate('/vendor/dashboard')
     }
   }, [])
@@ -98,34 +96,6 @@ export default function AdminNavbar(props) {
     secondaryText = 'white'
     secondaryMargin = '22px'
     paddingX = '30px'
-  }
-
-  const path = (name) => {
-    if (!location.pathname.startsWith('/customer')) {
-      switch (name) {
-        case 'Dashboard':
-          return '/vendor/dashboard'
-        case 'Images':
-          return '/vendor/images'
-        case 'Products':
-          return '/vendor/products'
-        case 'Connections':
-          return '/vendor/connections'
-        case 'Settings':
-          return `/vendor/autofix?id=${prodID}`
-        case 'Change Log':
-          return `/vendor/changelog?id=${prodID}`
-        case 'Vulnerabilities':
-          return `/vendor/vulnerabilities`
-      }
-    } else {
-      switch (name) {
-        case 'Images':
-          return '/customer/images'
-        case 'Products':
-          return '/customer/products'
-      }
-    }
   }
 
   useEffect(() => {
@@ -182,16 +152,16 @@ export default function AdminNavbar(props) {
               <Link to={`/vendor/${category}`}>{category}</Link>
             </BreadcrumbItem>
 
-            {productName && (
+            {params?.name && (
               <BreadcrumbItem
                 color={mainText}
                 isCurrentPage={sbomId && currentSBOM?.version ? false : true}
               >
                 <Link
-                  to={`/vendor/products/${productName}?id=${prodID}`}
+                  to={`/vendor/products/${params.name}?id=${prodID}`}
                   onClick={() => localStorage.removeItem('currentSBOM')}
                 >
-                  {decodeURI(productName)}
+                  {decodeURI(params.name)}
                 </Link>
               </BreadcrumbItem>
             )}

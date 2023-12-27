@@ -456,6 +456,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                     data.licenses?.map((item, index) => (
                       <Tag
                         size={'md'}
+                        key={index}
                         variant='subtle'
                         colorScheme='green'
                         width={'fit-content'}
@@ -493,6 +494,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                     data.licensesCustom.map((item, index) => (
                       <Tag
                         size={'md'}
+                        key={index}
                         variant='subtle'
                         colorScheme='green'
                         width={'fit-content'}

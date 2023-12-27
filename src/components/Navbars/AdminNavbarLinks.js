@@ -112,7 +112,7 @@ export default function HeaderLinks(props) {
       localStorage.removeItem('email')
       localStorage.removeItem('product')
       Cookies.remove('authToken')
-      console.log('handleLogout error : ', error)
+      navigate('/auth')
     }
   }
 
@@ -131,7 +131,7 @@ export default function HeaderLinks(props) {
 
   return (
     <Flex gap={4} alignItems='center' flexDirection='row'>
-      { /*  /// TODO: 1.0 Add back in when ready }
+      {/*  /// TODO: 1.0 Add back in when ready }
       {!customerView && (
         <Select
           width={'fit-content'}

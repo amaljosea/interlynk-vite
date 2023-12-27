@@ -195,8 +195,6 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
 
   const sbomVersions = []
 
-  console.log('existingVersions', existingVersions)
-
   const filteredDuplicated = product ? removeDuplicates(product.sboms) : []
 
   filteredDuplicated &&

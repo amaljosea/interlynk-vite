@@ -442,24 +442,14 @@ const CheckModal = ({
               justifyContent={'space-between'}
               alignItems={'center'}
             >
-              <Button
-                fontSize={'sm'}
-                colorScheme='blue'
-                onClick={onSaveRule}
-                disabled={isInvalidLicense}
-              >
+              <Button fontSize={'sm'} colorScheme='blue' onClick={onSaveRule}>
                 Save Rule
               </Button>
               <Stack direction={'row'} spacing={2} alignItems={'center'}>
                 <Button fontSize={'sm'} onClick={onClose}>
                   Close
                 </Button>
-                <Button
-                  fontSize={'sm'}
-                  colorScheme='blue'
-                  type='submit'
-                  disabled={isInvalidLicense}
-                >
+                <Button fontSize={'sm'} colorScheme='blue' type='submit'>
                   Save
                 </Button>
               </Stack>

@@ -52,6 +52,8 @@ const SupplierModal = ({
   const [supEmail, setSupEmail] = useState('')
   const [emailError, setEmailError] = useState('')
 
+  const containsSpace = /\s/.test(orgUrl)
+
   const onFilterRefetch = () => {
     filterRefetch({
       projectId: productId,
@@ -231,7 +233,7 @@ const SupplierModal = ({
                 />
               </FormControl>
               {/* ORG URL */}
-              <FormControl isInvalid={orgUrl !== '' && !validateUrl(orgUrl)}>
+              <FormControl isInvalid={orgUrl !== '' && !validateUrl(orgUrl) && containsSpace}>
                 <FormLabel fontSize={'sm'}>URL</FormLabel>
                 <Input
                   placeholder='Enter URL'

@@ -100,9 +100,6 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
         epss:
           epss === 'all' || epss === '0-0' || epss === '' ? undefined : range,
         first: totalRows,
-        // after: vulnAfter !== '' ? vulnAfter : undefined,
-        // last: vulnBefore !== '' ? totalRows : undefined,
-        // before: vulnBefore !== '' ? vulnBefore : undefined,
         field: field,
         direction: direction
       }
@@ -118,8 +115,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
   }
 
   const [compVexCreate] = useMutation(updateCompVulnVex, {
-    fetchPolicy: 'network-only',
-    onCompleted: () => handleRefetch()
+    fetchPolicy: 'network-only'
   })
 
   const handleStatusChange = (e) => {
@@ -127,9 +123,6 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
     const status = e.target.options[e.target.selectedIndex].text
     setStatusTitle(value)
     setStatusName(status)
-    if (status === 'False Positive') {
-      setJustification(allVexJustify.vexJustifications[9].id)
-    }
     if (status === 'Not Affected' || status === 'Affected') {
       setJustification('')
       setJustifyName('')
@@ -163,9 +156,11 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
         action: actionStatement !== '' ? actionStatement : undefined,
         fixedIn: selectedTag !== '' ? selectedTag : undefined
       }
-    }).then(
-      (res) => res.data && prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
-    )
+    })
+      .then(
+        (res) => res.data && prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
+      )
+      .finally(() => handleRefetch())
   }
 
   const fixedVersions = filteredData.filter((item) => item.value !== sbomId)
@@ -401,10 +396,14 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
               onClick={handleSave}
               disabled={
                 statusTitle === '' ||
+                (statusName === 'Not Affected' && justification === '') ||
                 (statusName === 'Not Affected' &&
-                  (justification === '' || impactData === '')) ||
+                  justifyName === 'Other (impact statment required)' &&
+                  impactData === '') ||
+                (statusName === 'False Positive' && justification === '') ||
                 (statusName === 'False Positive' &&
-                  (justification === '' || impactData === '')) ||
+                  justifyName === 'Other (impact statment required)' &&
+                  impactData === '') ||
                 (statusName === 'Affected' &&
                   responseTitle === '' &&
                   actionStatement === '') ||
