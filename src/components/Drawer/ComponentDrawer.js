@@ -49,6 +49,8 @@ import { CpeAutoComplete } from 'graphQL/Queries'
 import CpeInput from 'components/CpeInput'
 import LicenseField from 'components/LicenseField'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { GetAllComponents } from 'graphQL/Queries'
+import { CreateCompRelation } from 'graphQL/Mutation'
 
 function ComponentDrawer(props) {
   const location = useLocation()
@@ -77,9 +79,13 @@ function ComponentDrawer(props) {
     purlString,
     expLicense,
     spdxLicenses,
-    isCpeValid
+    isCpeValid,
+    totalComp
   } = prodCompState
   const { prodCompDispatch } = dispatch
+
+  const [getAllComps, { data: allComponents }] = useLazyQuery(GetAllComponents)
+  const [addRelation] = useMutation(CreateCompRelation)
 
   const onFilterRefetch = () => {
     filterRefetch({
@@ -123,6 +129,8 @@ function ComponentDrawer(props) {
   const [isPURLInputValid, setPURLInputValid] = useState(true)
   const [isPrimary, setIsPrimary] = useState(false)
   const [isInternal, setIsInternal] = useState(false)
+  const [relation, setRelation] = useState('')
+  const [component, setComponent] = useState('')
 
   useEffect(() => {
     if (data) {
@@ -252,8 +260,16 @@ function ComponentDrawer(props) {
     })
       .then((res) => {
         if (res.data) {
+          console.log(res.data.componentCreate.component.id)
           prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
           onFilterRefetch()
+          addRelation({
+            variables: {
+              from: res.data.componentCreate.component.id,
+              to: component,
+              relType: relation
+            }
+          })
           onClose()
         }
       })
@@ -372,6 +388,23 @@ function ComponentDrawer(props) {
       })
     }
   }
+
+  useEffect(() => {
+    getAllComps({
+      variables: {
+        projectId: productId,
+        sbomId: sbomId,
+        first: totalComp,
+        field: 'COMPONENTS_UPDATED_AT',
+        direction: 'DESC'
+      }
+    }).then((res) => {
+      if (res.data) {
+        setRelation('')
+        setComponent('')
+      }
+    })
+  }, [])
 
   return (
     <>
@@ -630,6 +663,55 @@ function ComponentDrawer(props) {
                   Internal component
                 </Checkbox>
               </FormControl>
+              {/* ADD RELATION */}
+              {!data && (
+                <>
+                  <Text>Relationships</Text>
+                  <FormControl>
+                    <FormLabel htmlFor='relation' color='gray.600'>
+                      Type
+                    </FormLabel>
+                    <Select
+                      id='relation'
+                      size='sm'
+                      value={relation}
+                      onChange={(e) => setRelation(e.target.value)}
+                    >
+                      <option value=''>-- Select --</option>
+                      {[{ value: 'depends_on', label: 'Depends On' }].map(
+                        (item, idx) => (
+                          <option key={idx} value={item.value}>
+                            {item.label}
+                          </option>
+                        )
+                      )}
+                    </Select>
+                  </FormControl>
+                  {allComponents && (
+                    <FormControl>
+                      <FormLabel htmlFor='component' color='gray.600'>
+                        Component
+                      </FormLabel>
+                      <Select
+                        id='component'
+                        size='sm'
+                        value={component}
+                        onChange={(e) => setComponent(e.target.value)}
+                        mb={10}
+                      >
+                        <option value=''>-- Select --</option>
+                        {[...allComponents.sbom.components.nodes]
+                          .sort((a, b) => a.name.localeCompare(b.name))
+                          .map((item, idx) => (
+                            <option key={idx} value={item.id}>
+                              {item.name}-{item.version}
+                            </option>
+                          ))}
+                      </Select>
+                    </FormControl>
+                  )}
+                </>
+              )}
             </Stack>
           </DrawerBody>
           {!customerView && (
