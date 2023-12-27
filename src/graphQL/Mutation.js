@@ -119,7 +119,6 @@ export const updateOrgUser = gql`
         id
         name
         email
-        role
       }
     }
   }

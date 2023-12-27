@@ -413,7 +413,7 @@ function ComponentDrawer(props) {
         <DrawerContent>
           <DrawerCloseButton />
           <DrawerHeader borderBottomWidth='1px' color='gray.600'>
-            {component ? 'Edit' : 'Create'} Component
+            {data ? 'Edit' : 'Add'} Component
           </DrawerHeader>
           <DrawerBody>
             <Stack direction={'column'} spacing={4}>
