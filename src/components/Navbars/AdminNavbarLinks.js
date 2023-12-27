@@ -28,13 +28,12 @@ import SidebarResponsive from 'components/Sidebar/SidebarResponsive'
 import PropTypes from 'prop-types'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { dashRoutes } from 'routes.js'
-import { FaRegKeyboard, FaSignOutAlt } from 'react-icons/fa'
+import { FaRegKeyboard, FaSignOutAlt, FaExchangeAlt } from 'react-icons/fa'
 import Cookies from 'js-cookie'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { useQuery } from '@apollo/client'
 import { GetOrg } from 'graphQL/Queries'
-import { HomeIcon } from 'components/Icons/Icons'
 
 export default function HeaderLinks(props) {
   const location = useLocation()
@@ -204,11 +203,11 @@ export default function HeaderLinks(props) {
         {location.pathname.startsWith('/vendor') && (
           <MenuList size='sm'>
             <MenuGroup title=''>
-              <Link to='/vendor/settings?tab=organization'>
-                <MenuItem icon={<HomeIcon />}>Organization</MenuItem>
-              </Link>
               <Link to='/vendor/settings?tab=person'>
                 <MenuItem icon={<SettingsIcon />}>Settings</MenuItem>
+              </Link>
+              <Link to='/vendor/settings?tab=organization'>
+                <MenuItem icon={<FaExchangeAlt />}>Organizations</MenuItem>
               </Link>
               {userName ? (
                 <MenuItem icon={<FaSignOutAlt />} onClick={handleLogout}>
