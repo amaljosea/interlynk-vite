@@ -146,7 +146,7 @@ export default function HeaderLinks(props) {
           <option value='3 weeks'>3 weeks</option>
           <option value='1 month'>1 month</option>
         </Select>
-      ) */}
+        ) */}
       {productId && !customerView && (
         <Popover isLazy>
           <PopoverTrigger>
