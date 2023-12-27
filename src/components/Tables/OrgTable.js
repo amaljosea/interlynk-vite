@@ -79,6 +79,11 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
     )
   }, [])
 
+  const onSwitch = (row) => {
+    setActiveRow(row)
+    onWarningOpen()
+  }
+
   // COLUMNS
   const columns = [
     {
@@ -155,10 +160,7 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
             variant='solid'
             cursor={'pointer'}
             colorScheme={activeOrg === id ? 'green' : 'blue'}
-            onClick={() => {
-              setActiveRow(row)
-              onWarningOpen()
-            }}
+            onClick={activeOrg === id ? false : onSwitch(row)}
             rightIcon={activeOrg === id ? false : <ArrowForwardIcon />}
           >
             {activeOrg === id ? 'Active' : 'Switch to'}
@@ -210,7 +212,7 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
             </ModalBody>
 
             <ModalFooter>
-              <Button fontWeight={'medium'} mr={3} onClick={onClose}>
+              <Button fontWeight={'medium'} mr={3} onClick={onWarningClose}>
                 Cancel
               </Button>
               <Button
