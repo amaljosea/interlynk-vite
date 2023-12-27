@@ -42,8 +42,6 @@ const Header = ({
     }
   }
 
-  console.log('org', org)
-
   const userName = localStorage.getItem('username')
   const userEmail = localStorage.getItem('email')
 

@@ -481,7 +481,6 @@ const VulnTable = ({
 
   const ExpandedComponent = ({ data }) => {
     const { vuln } = data
-
     const CustomText = styled(Text)`
       font-size: 13px;
       font-weight: bold;
@@ -563,7 +562,10 @@ const VulnTable = ({
             <Box>
               <CustomText>EPSS Percentile :</CustomText>
               <Text mt={1} fontSize={14}>
-                {(vuln.vulnInfo.epssPercentile * 100).toFixed()}%
+                {vuln?.vulnInfo?.epssPercentile
+                  ? (vuln?.vulnInfo?.epssPercentile * 100).toFixed()
+                  : 0}
+                %
               </Text>
             </Box>
           </GridItem>
