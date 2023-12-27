@@ -92,7 +92,7 @@ const TeamTable = ({ data, refetch }) => {
     {
       id: 'role',
       name: 'ROLE',
-      selector: (row) => row.role
+      selector: (row) => row?.role?.name
     },
     // JOINED DATE
     {
