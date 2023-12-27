@@ -39,6 +39,8 @@ const LinksDrawer = ({ isOpen, onClose, component, sbomId, fetchCompData }) => {
   const [linkError, setLinkError] = useState('')
   const [updateLinks] = useMutation(UpdateCompLinks)
 
+  const containsSpace = /\s/.test(link);
+
   const urls = []
 
   useEffect(() => {
@@ -166,7 +168,7 @@ const LinksDrawer = ({ isOpen, onClose, component, sbomId, fetchCompData }) => {
                 {/* URL */}
                 <FormControl
                   isRequired
-                  isInvalid={link !== '' && !validateUrl(link.trim())}
+                  isInvalid={link !== '' && !validateUrl(link.trim()) && containsSpace}
                 >
                   <FormLabel>Link</FormLabel>
                   <Input
