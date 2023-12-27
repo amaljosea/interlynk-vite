@@ -252,10 +252,10 @@ const ProductDetails = () => {
                   width={'100%'}
                   templateColumns='repeat(5, 1fr)'
                   alignItems={'top'}
-                  gap={40}
+                  gap={10}
                 >
                   {/* PRODUCT INFORMATIONS */}
-                  <GridItem colSpan={2}>
+                  <GridItem colSpan={3}>
                     <Flex
                       direction={'row'}
                       alignItems={'flex-start'}
@@ -281,7 +281,7 @@ const ProductDetails = () => {
                         </Stack>
                         {/* PRODUCT DESCRIPTION */}
                         <Text fontSize={'sm'} my={0.5}>
-                          {data.project.description}
+                          {data.project.description || ''}
                         </Text>
                         {/* PRODUCT LAST UPDATED AT */}
                         <Tooltip
@@ -371,7 +371,7 @@ const ProductDetails = () => {
                     </Flex>
                   </GridItem>
                   {/* PRODUCT ACTIONS */}
-                  <GridItem colSpan={3}>
+                  <GridItem colSpan={2}>
                     <Flex
                       direction={'row'}
                       gap={2}
