@@ -33,12 +33,16 @@ import Cookies from 'js-cookie'
 import { useEffect } from 'react'
 import axios from 'axios'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { GetOrg } from 'graphQL/Queries'
+import { useQuery } from '@apollo/client'
 
 export default function HeaderLinks(props) {
   const location = useLocation()
   const navigate = useNavigate()
 
   const { userName, setUserName } = useGlobalState()
+
+  const { data } = useQuery(GetOrg)
 
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
@@ -185,13 +189,14 @@ export default function HeaderLinks(props) {
         {location.pathname.startsWith('/vendor') && (
           <MenuList size='sm'>
             <MenuGroup title=''>
-              <Link
-                to={`/vendor/settings?tab=${
-                  org === 'undefined' ? 'organization' : 'person'
+              {data?.organization && (
+                <Link
+                  to={`/vendor/settings?tab=person
                 }`}
-              >
-                <MenuItem icon={<SettingsIcon />}>Settings</MenuItem>
-              </Link>
+                >
+                  <MenuItem icon={<SettingsIcon />}>Settings</MenuItem>
+                </Link>
+              )}
               <Link to='/vendor/settings?tab=organization'>
                 <MenuItem icon={<FaExchangeAlt />}>Organizations</MenuItem>
               </Link>
