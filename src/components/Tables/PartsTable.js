@@ -233,14 +233,12 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
 
   const onFilterSev = async (value) => {
     await getVulnData({
-      variables: {
-        projectId: prodId,
-        sbomId: sbomId,
-        severity: value,
-        first: totalRows,
-        field: prodVulnState.field,
-        direction: prodVulnState.direction
-      }
+      projectId: prodId,
+      sbomId: sbomId,
+      severity: value,
+      first: totalRows,
+      field: prodVulnState.field,
+      direction: prodVulnState.direction
     }).then((res) => {
       if (res.data) {
         prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })

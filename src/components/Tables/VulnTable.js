@@ -2,8 +2,7 @@
 import {
   ChevronDownIcon,
   ChevronUpIcon,
-  ExternalLinkIcon,
-  InfoIcon
+  ExternalLinkIcon
 } from '@chakra-ui/icons'
 import {
   Flex,
@@ -387,6 +386,9 @@ const VulnTable = ({
     projectId: productId,
     sbomId: sbomId,
     first: totalRows,
+    last: undefined,
+    after: undefined,
+    before: undefined,
     search: searchInput !== '' ? searchInput : undefined,
     severity: severities.length > 0 ? severities : undefined,
     componentName: components.length > 0 ? components : undefined,
@@ -406,7 +408,7 @@ const VulnTable = ({
   const handleSearch = async (event) => {
     if (event.key === 'Enter') {
       await refetch({
-        variables: vulnData
+        vulnData
       }).then(
         (res) => res.data && prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
       )
@@ -416,7 +418,7 @@ const VulnTable = ({
   // CLEAR SERACH
   const handleClear = async () => {
     await refetch({
-      variables: vulnData
+      vulnData
     }).then(
       (res) => res.data && prodVulnDispatch({ type: 'CLEAR_SEARCH_INPUT' })
     )
@@ -586,31 +588,31 @@ const VulnTable = ({
 
   const onPreviousPage = async () => {
     await refetch({
-      variables: {
-        ...vulnData,
-        last: totalRows,
-        before: data.pageInfo.startCursor
-      }
-    }).then(
-      (res) =>
-        res.data &&
+      ...vulnData,
+      first: undefined,
+      last: totalRows,
+      after: undefined,
+      before: data.pageInfo.startCursor
+    }).then((res) => {
+      if (res.data) {
         prodVulnDispatch({
           type: 'DECREMENT_PAGE',
           payload: data.pageInfo.startCursor
         })
-    )
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      }
+    })
   }
 
   const onNextPage = async () => {
     await refetch({
-      variables: {
-        ...vulnData,
-        first: totalRows,
-        after: data.pageInfo.endCursor
-      }
-    }).then(
-      (res) =>
-        res.data &&
+      ...vulnData,
+      first: totalRows,
+      last: undefined,
+      after: data.pageInfo.endCursor,
+      before: undefined
+    }).then((res) => {
+      if (res.data) {
         prodVulnDispatch({
           type: 'INCREMENT_PAGE',
           payload: {
@@ -618,38 +620,36 @@ const VulnTable = ({
             after: data.pageInfo.endCursor
           }
         })
-    )
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      }
+    })
   }
 
   const handleSort = async (column, sortDirection) => {
     refetch({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        signedParams: customerView ? signedParams : undefined,
-        search: searchInput !== '' ? searchInput : undefined,
-        severity:
-          !severities.includes('all') && severities.length > 0
-            ? severities
-            : undefined,
-        componentName:
-          !components.includes('all') && components.length > 0
-            ? components
-            : undefined,
-        status:
-          !statues.includes('all') && statues.length > 0 ? statues : undefined,
-        kev:
-          kev === 'all' || kev === ''
-            ? undefined
-            : kev === 'yes'
-            ? true
-            : false,
-        epss:
-          epss === 'all' || epss === '0-0' || epss === '' ? undefined : range,
-        first: totalRows,
-        field: column.id,
-        direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
-      }
+      projectId: productId,
+      sbomId: sbomId,
+      signedParams: customerView ? signedParams : undefined,
+      search: searchInput !== '' ? searchInput : undefined,
+      severity:
+        !severities.includes('all') && severities.length > 0
+          ? severities
+          : undefined,
+      componentName:
+        !components.includes('all') && components.length > 0
+          ? components
+          : undefined,
+      status:
+        !statues.includes('all') && statues.length > 0 ? statues : undefined,
+      kev:
+        kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
+      epss: epss === 'all' || epss === '0-0' || epss === '' ? undefined : range,
+      first: totalRows,
+      last: undefined,
+      after: undefined,
+      before: undefined,
+      field: column.id,
+      direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
     }).then((res) => {
       if (res.data) {
         prodVulnDispatch({
@@ -659,6 +659,7 @@ const VulnTable = ({
             direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
           }
         })
+        window.scrollTo({ top: 0, behavior: 'smooth' })
       }
     })
   }
@@ -667,10 +668,11 @@ const VulnTable = ({
   const handleSetRow = async (e) => {
     setTotalRows(Number(e.target.value))
     await refetch({
-      variables: {
-        ...vulnData,
-        first: Number(e.target.value)
-      }
+      ...vulnData,
+      first: Number(e.target.value),
+      last: undefined,
+      after: undefined,
+      before: undefined
     }).then((res) => {
       if (res.data) {
         prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
@@ -816,7 +818,6 @@ const VulnTable = ({
                 currentSbomId={sbomId}
                 currentProductId={productId}
                 onClose={onTableClose}
-                refetch={refetch}
               />
             </DrawerBody>
           </DrawerContent>

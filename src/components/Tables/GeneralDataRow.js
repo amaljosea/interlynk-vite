@@ -201,47 +201,6 @@ const GeneralDataRow = ({ status, data, refetch }) => {
       .finally(() => onSBMClose())
   }
 
-  const handleRemoveSpdx = async (license) => {
-    const filterList =
-      data.licenses.length > 0 &&
-      data.licenses.filter((item) => item !== license)
-    await updateSbom({
-      variables: {
-        id: data.id,
-        spec: data.spec,
-        licenses: {
-          licenses: filterList ? filterList : []
-        }
-      }
-    }).then((res) => res.data && onSBMClose())
-  }
-
-  const handleRemoveExp = async () => {
-    await updateSbom({
-      variables: {
-        id: data.id,
-        spec: data.spec,
-        licenses: {
-          licensesExp: null
-        }
-      }
-    }).then((res) => res.data && onSBMClose())
-  }
-
-  const handleRemoveCustom = async (license) => {
-    const filterList =
-      data.licensesCustom.length > 0 &&
-      data.licensesCustom.filter((item) => item !== license)
-    await updateSbom({
-      variables: {
-        id: data.id,
-        spec: data.spec,
-        licenses: {
-          licensesCustom: filterList ? filterList : []
-        }
-      }
-    }).then((res) => res.data && onSBMClose())
-  }
 
   // ADD KEYBOARD SHORTCUT FOR TOGGLE SBOM DRAWER
   const handleSBMDown = (event) => {

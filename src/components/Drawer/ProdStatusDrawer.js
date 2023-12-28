@@ -77,41 +77,26 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
       max: parseFloat(epssRange[1]) / 10000
     }
     await refetch({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        search: searchInput !== '' ? searchInput : undefined,
-        severity:
-          !severities.includes('all') && severities.length > 0
-            ? severities
-            : undefined,
-        componentName:
-          !components.includes('all') && components.length > 0
-            ? components
-            : undefined,
-        status:
-          !statues.includes('all') && statues.length > 0 ? statues : undefined,
-        kev:
-          kev === 'all' || kev === ''
-            ? undefined
-            : kev === 'yes'
-            ? true
-            : false,
-        epss:
-          epss === 'all' || epss === '0-0' || epss === '' ? undefined : range,
-        first: totalRows,
-        field: field,
-        direction: direction
-      }
+      projectId: productId,
+      sbomId: sbomId,
+      search: searchInput !== '' ? searchInput : undefined,
+      severity:
+        !severities.includes('all') && severities.length > 0
+          ? severities
+          : undefined,
+      componentName:
+        !components.includes('all') && components.length > 0
+          ? components
+          : undefined,
+      status:
+        !statues.includes('all') && statues.length > 0 ? statues : undefined,
+      kev:
+        kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
+      epss: epss === 'all' || epss === '0-0' || epss === '' ? undefined : range,
+      first: totalRows,
+      field: field,
+      direction: direction
     })
-      .then((res) => {
-        if (res.data) {
-          navigate(
-            `/vendor/products/${currentProduct.name}?id=${productId}&sbom=${sbomId}`
-          )
-        }
-      })
-      .finally(() => setActiveSbomTab(3))
   }
 
   const [compVexCreate] = useMutation(updateCompVulnVex, {

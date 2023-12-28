@@ -168,22 +168,22 @@ const SBOMTable = ({
         min: parseFloat(vulnEpss[0]) / 10000,
         max: parseFloat(vulnEpss[1]) / 10000
       }
-
       setActiveSbomTab(3)
       getVulnData({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          first: totalRows,
-          search: searchInput !== '' ? searchInput : undefined,
-          severity: severities.length > 0 ? severities : undefined,
-          componentName: components.length > 0 ? components : undefined,
-          status: statues.length > 0 ? statues : undefined,
-          kev: kev === 'yes' ? true : kev === 'no' ? false : undefined,
-          epss: epss !== '' && epss !== 'all' ? range : undefined,
-          field: field,
-          direction: direction
-        }
+        projectId: productId,
+        sbomId: sbomId,
+        first: totalRows,
+        last: undefined,
+        after: undefined,
+        before: undefined,
+        search: searchInput !== '' ? searchInput : undefined,
+        severity: severities.length > 0 ? severities : undefined,
+        componentName: components.length > 0 ? components : undefined,
+        status: statues.length > 0 ? statues : undefined,
+        kev: kev === 'yes' ? true : kev === 'no' ? false : undefined,
+        epss: epss !== '' && epss !== 'all' ? range : undefined,
+        field: field,
+        direction: direction
       }).then((res) => {
         if (res.data) {
           prodVulnDispatch({

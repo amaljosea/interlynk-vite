@@ -80,14 +80,12 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
 
   const onFilterSev = async (id, primaryComponent, value) => {
     await getVulnData({
-      variables: {
-        projectId: productId,
-        sbomId: id,
-        severity: value,
-        first: totalRows,
-        field: field,
-        direction: direction
-      }
+      projectId: productId,
+      sbomId: id,
+      severity: value,
+      first: totalRows,
+      field: field,
+      direction: direction
     }).then((res) => {
       if (res.data) {
         localStorage.setItem(

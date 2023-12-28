@@ -6,6 +6,8 @@ const prodVulnReducer = (state, action) => {
         ...state,
         field: 'COMPONENT_VULNS_UPDATED_AT',
         direction: 'DESC',
+        after: '',
+        before: '',
         searchInput: '',
         pageIndex: 1,
         severities: [],
