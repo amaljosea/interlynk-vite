@@ -32,14 +32,12 @@ import { FaRegKeyboard, FaSignOutAlt, FaExchangeAlt } from 'react-icons/fa'
 import Cookies from 'js-cookie'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
-import { useQuery } from '@apollo/client'
-import { GetOrg } from 'graphQL/Queries'
 
 export default function HeaderLinks(props) {
   const location = useLocation()
   const navigate = useNavigate()
-
-  const { data, error } = useQuery(GetOrg)
+  const name = localStorage.getItem('username')
+  const org = localStorage.getItem('organization')
 
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
@@ -63,21 +61,10 @@ export default function HeaderLinks(props) {
   }, [])
 
   useEffect(() => {
-    if (data?.organization?.currentUser) {
-      setUsername(data.organization.currentUser.name)
+    if (name) {
+      setUsername(name)
     }
-  }, [data])
-
-  useEffect(() => {
-    if (error) {
-      if (error.networkError) {
-        console.log('Network error:', error.networkError)
-        const statusCode = error.networkError.statusCode
-        console.log('Status code:', statusCode)
-        navigate(`/auth`)
-      }
-    }
-  }, [])
+  }, [name])
 
   // Chakra Color Mode
   let navbarIcon = useColorModeValue('gray.500', 'gray.200')
@@ -204,9 +191,11 @@ export default function HeaderLinks(props) {
         {location.pathname.startsWith('/vendor') && (
           <MenuList size='sm'>
             <MenuGroup title=''>
-              <Link to='/vendor/settings?tab=person'>
-                <MenuItem icon={<SettingsIcon />}>Settings</MenuItem>
-              </Link>
+              {org !== 'undefined' && (
+                <Link to='/vendor/settings?tab=person'>
+                  <MenuItem icon={<SettingsIcon />}>Settings</MenuItem>
+                </Link>
+              )}
               <Link to='/vendor/settings?tab=organization'>
                 <MenuItem icon={<FaExchangeAlt />}>Organizations</MenuItem>
               </Link>
