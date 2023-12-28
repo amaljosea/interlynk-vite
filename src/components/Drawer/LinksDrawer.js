@@ -39,7 +39,7 @@ const LinksDrawer = ({ isOpen, onClose, component, sbomId, fetchCompData }) => {
   const [linkError, setLinkError] = useState('')
   const [updateLinks] = useMutation(UpdateCompLinks)
 
-  const containsSpace = /\s/.test(link);
+  const containsSpace = /\s/.test(link)
 
   const urls = []
 
@@ -168,7 +168,9 @@ const LinksDrawer = ({ isOpen, onClose, component, sbomId, fetchCompData }) => {
                 {/* URL */}
                 <FormControl
                   isRequired
-                  isInvalid={link !== '' && !validateUrl(link.trim()) && containsSpace}
+                  isInvalid={
+                    (link !== '' && !validateUrl(link.trim())) || containsSpace
+                  }
                 >
                   <FormLabel>Link</FormLabel>
                   <Input
@@ -184,7 +186,9 @@ const LinksDrawer = ({ isOpen, onClose, component, sbomId, fetchCompData }) => {
                   colorScheme='blue'
                   type='submit'
                   isDisabled={
-                    !validateUrl(link.trim()) || error !== '' || linkError !== ''
+                    !validateUrl(link.trim()) ||
+                    error !== '' ||
+                    linkError !== ''
                   }
                 >
                   Add
@@ -216,7 +220,9 @@ const LinksDrawer = ({ isOpen, onClose, component, sbomId, fetchCompData }) => {
                             >
                               {item.url ? (
                                 <Tooltip label={item.url}>
-                                  {item.url.length > 35 ? `${item.url.substring(0, 35)}...` : item.url}
+                                  {item.url.length > 35
+                                    ? `${item.url.substring(0, 35)}...`
+                                    : item.url}
                                 </Tooltip>
                               ) : null}
                             </Td>
