@@ -463,14 +463,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                         colorScheme='green'
                         width={'fit-content'}
                       >
-                        <Tooltip key={index} label={item} placement={'top'}>
-                          <Link
-                            href={`https://spdx.org/licenses/${item}`}
-                            target='_blank'
-                          >
-                            <TagLabel>{item}</TagLabel>
-                          </Link>
-                        </Tooltip>
+                        <TagLabel>{item}</TagLabel>
                       </Tag>
                     ))}
                   {/* EXPRESSION */}
@@ -481,14 +474,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                       colorScheme='green'
                       width={'fit-content'}
                     >
-                      <Tooltip label={data.licensesExp} placement={'top'}>
-                        <Link
-                          href={`https://spdx.org/licenses/${data.licensesExp}`}
-                          target='_blank'
-                        >
-                          <TagLabel>{data.licensesExp}</TagLabel>
-                        </Link>
-                      </Tooltip>
+                      <TagLabel>{data.licensesExp}</TagLabel>
                     </Tag>
                   )}
                   {/* CUSTOM */}
@@ -501,14 +487,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                         colorScheme='green'
                         width={'fit-content'}
                       >
-                        <Tooltip key={index} label={item} placement={'top'}>
-                          <Link
-                            href={`https://spdx.org/licenses/${item}`}
-                            target='_blank'
-                          >
-                            <TagLabel>{item}</TagLabel>
-                          </Link>
-                        </Tooltip>
+                        <TagLabel>{item}</TagLabel>
                       </Tag>
                     ))}
                 </Flex>
