@@ -10,6 +10,8 @@ import { FaEye } from 'react-icons/fa'
 
 const ActivitiesOverview = ({ title, amount, data }) => {
   const textColor = useColorModeValue('gray.700', 'white')
+  console.log(amount)
+  console.log(data)
 
   return (
     <Card maxH='100%'>
@@ -28,11 +30,15 @@ const ActivitiesOverview = ({ title, amount, data }) => {
                 <ActivitiesOverviewRow
                   key={index}
                   logo={FaEye}
-                  title={`${`[${row.action}]`} ${row.updated} by ${row.changedBy}`}
+                  event={row.event}
+                  orig={row.orig}
+                  updated={row.updated}
+                  changedBy={row.changedBy}
                   date={row.updatedAt}
                   color={'gray'}
                   index={index}
                   arrLength={data?.length}
+                  action={row.action}
                 />
               )
             })}
