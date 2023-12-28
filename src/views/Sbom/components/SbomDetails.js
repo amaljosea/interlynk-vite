@@ -75,14 +75,15 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
     const { field, direction } = prodVulnState
     prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
     getVulnData({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        severity: value || undefined,
-        first: totalRows,
-        field: field,
-        direction: direction
-      }
+      projectId: productId,
+      sbomId: sbomId,
+      severity: value || undefined,
+      first: totalRows,
+      last: undefined,
+      after: undefined,
+      before: undefined,
+      field: field,
+      direction: direction
     }).then((res) => {
       if (res.data) {
         setActiveSbomTab(3)

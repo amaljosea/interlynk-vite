@@ -84,6 +84,9 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
       sbomId: id,
       severity: value,
       first: totalRows,
+      last: undefined,
+      after: undefined,
+      before: undefined,
       field: field,
       direction: direction
     }).then((res) => {
