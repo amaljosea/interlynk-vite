@@ -68,8 +68,14 @@ const ProductDetails = () => {
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
 
-  const { totalRows, activeProdTab, setActiveProdTab, prodLogState, dispatch } =
-    useGlobalState()
+  const {
+    totalRows,
+    activeProdTab,
+    setActiveProdTab,
+    prodLogState,
+    prodVulnState,
+    dispatch
+  } = useGlobalState()
   const { field, direction } = prodLogState
   const { prodCompDispatch, prodVulnDispatch } = dispatch
 
@@ -102,12 +108,16 @@ const ProductDetails = () => {
   })
 
   // GET VULN DATA
-  const [getVulnData, { data: vulnData, refetch: vulnRefetch }] = useLazyQuery(
-    GetVulnData,
-    {
-      fetchPolicy: 'network-only'
+  const { data: vulnData, refetch: vulnRefetch } = useQuery(GetVulnData, {
+    fetchPolicy: 'network-only',
+    variables: {
+      projectId: productId,
+      sbomId: sbomId,
+      first: totalRows,
+      field: prodVulnState.field,
+      direction: prodVulnState.direction
     }
-  )
+  })
 
   const [projectUpdate] = useMutation(UpdateProject, {
     onCompleted: () => refetch({ id: productId })
@@ -236,8 +246,7 @@ const ProductDetails = () => {
       <SBOM
         prodRefetch={refetch}
         vulnData={vulnData}
-        vulnRefetch={vulnRefetch}
-        getVulnData={getVulnData}
+        getVulnData={vulnRefetch}
       />
     )
   } else {
@@ -473,7 +482,7 @@ const ProductDetails = () => {
                         project={versions?.project}
                         productId={productId}
                         refetch={sbomRefetch}
-                        getVulnData={getVulnData}
+                        getVulnData={vulnRefetch}
                       />
                     )}
                   </TabPanel>

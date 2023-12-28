@@ -1,59 +1,41 @@
-import React, { useRef } from 'react'
 import {
-  Box,
-  Button,
-  Flex,
-  Heading,
-  Icon,
-  Image,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalOverlay,
-  Text
-} from '@chakra-ui/react'
-import { Link } from 'react-router-dom'
-import { CheckCircleIcon } from '@chakra-ui/icons'
+  ApolloClient,
+  InMemoryCache,
+  ApolloProvider,
+  createHttpLink
+} from '@apollo/client'
+import { Box, Image } from '@chakra-ui/react'
+import Invitation from 'views/Auth/Invitation'
 import DashboardBg from 'assets/img/dashboard.png'
+import { useRef } from 'react'
 
 const Success = () => {
   const navRef = useRef()
 
+  const graphqlAPI = process.env.REACT_APP_GRAPHQL_API
+
+  const httpLink = createHttpLink({
+    uri: graphqlAPI
+  })
+
+  const client = new ApolloClient({
+    link: httpLink,
+    cache: new InMemoryCache(),
+    queryDeduplication: false
+  })
+
   return (
-    <Box ref={navRef} w='100%' height={'100vh'} position={'relative'}>
-      <Image
-        src={DashboardBg}
-        width={'100%'}
-        height={'100%'}
-        pos={'absolute'}
-      />
-      <Modal isCentered size={'3xl'} isOpen={true}>
-        <ModalOverlay bg='blackAlpha.300' backdropFilter='blur(4px)' />
-        <ModalContent>
-          <ModalBody py={12}>
-            <Box
-              textAlign={'center'}
-              as={Flex}
-              alignItems={'center'}
-              justifyContent={'center'}
-              flexDir={'column'}
-            >
-              <Icon color={'green.400'} boxSize={20} as={CheckCircleIcon} />
-              <Heading my={4}>Thank You for Registration!</Heading>
-              <Text>
-                This is a confirmation that your registration has been received.
-                You will get a confirmation message once approved.
-              </Text>
-              <Link to={'/auth'}>
-                <Button variant='solid' colorScheme='blue' mt={6}>
-                  Login
-                </Button>
-              </Link>
-            </Box>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
-    </Box>
+    <ApolloProvider client={client}>
+      <Box ref={navRef} w='100%' height={'100vh'} position={'relative'}>
+        <Image
+          src={DashboardBg}
+          width={'100%'}
+          height={'100%'}
+          pos={'absolute'}
+        />
+        <Invitation />
+      </Box>
+    </ApolloProvider>
   )
 }
 

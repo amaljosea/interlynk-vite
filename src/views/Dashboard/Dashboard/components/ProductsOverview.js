@@ -10,8 +10,9 @@ import {
   Image,
   Text,
   Heading,
-  Skeleton,
-  Button
+  Button,
+  Tag,
+  Stack
 } from '@chakra-ui/react'
 // Custom components
 import Card from 'components/Card/Card'
@@ -22,34 +23,9 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 
 import { scanImage, getConImg } from 'utils'
-import { useQuery } from '@apollo/client'
-import { GetImages } from 'graphQL/Queries'
-import { useEffect } from 'react'
-import { useState } from 'react'
+import { getFullDateAndTime } from 'utils'
 
-const ProductsOverview = ({ title }) => {
-  const { data, refetch, loading, error } = useQuery(GetImages, {
-    variables: {
-      first: 10
-    }
-  })
-
-  const handlePreviousPage = () => {
-    refetch({
-      last: 10,
-      before: data && data.images.pageInfo.startCursor,
-      after: ''
-    })
-  }
-
-  const handleNextPage = () => {
-    refetch({
-      first: 10,
-      after: data && data.images.pageInfo.endCursor,
-      before: ''
-    })
-  }
-
+const ProductsOverview = ({ title, captions, data }) => {
   return (
     <Flex width={'100%'} direction='column'>
       <Flex
@@ -59,82 +35,56 @@ const ProductsOverview = ({ title }) => {
         justifyContent={'space-between'}
       >
         <Card overflowX={{ sm: 'scroll', xl: 'hidden' }}>
-          <CardHeader>
-            <Heading fontSize={'xl'}>{title}</Heading>
+          <CardHeader pt='12px'>
+            <Heading fontSize={'lg'} fontFamily={'inherit'}>
+              {title}
+            </Heading>
           </CardHeader>
           <CardBody>
-            <Table variant='simple' mt={10}>
+            <Table variant='simple' mt={7}>
               <Thead>
                 <Tr>
-                  <Th pl={1}>Image</Th>
-                  <Th pl={1}>Connector</Th>
-                  <Th pl={1}>Tags</Th>
-                  <Th pl={1}>Last Pushed</Th>
-                  <Th pl={1}>Scanners</Th>
+                  {captions.map((item, index) => (
+                    <Th key={index} pl={1} fontFamily={'inherit'}>
+                      {item}
+                    </Th>
+                  ))}
                 </Tr>
               </Thead>
               <Tbody>
-                {data && data.images &&
-                  data.images.nodes.map((item) => (
-                    <Tr key={item.id}>
+                {data?.length > 0 &&
+                  data?.map((item) => (
+                    <Tr key={item.id} fontFamily={'inherit'}>
                       <Td fontSize={'sm'} pl={1}>
-                        {item.imageVersions && item.imageVersions.length > 0 ? (
-                          <Link
-                            to={`/vendor/images?v=${
-                              item.imageVersions[item.imageVersions.length - 1]
-                                .id
-                            }&id=${item.id}`}
-                            style={{
-                              color: '#3182CE',
-                              textDecoration: 'underline'
-                            }}
-                          >
-                            {item.name}
-                          </Link>
-                        ) : (
-                          <Text>{item.name}</Text>
-                        )}
+                        {item?.name}
                       </Td>
                       <Td fontSize={'sm'} pl={1}>
-                        <Flex
-                          direction={'row'}
-                          alignItems={'center'}
-                          justifyContent={'start'}
-                          gap={2}
-                        >
-                          <Image
-                            width='6'
-                            height='6'
-                            src={getConImg(
-                              item.organizationConnector.connector.name
-                            )}
-                            alt={`${item.organizationConnector.connector.name}`}
-                          />
-                          <Text size='sm'>
-                            {item.organizationConnector.name.slice(0, 20)}...
-                          </Text>
-                        </Flex>
+                        {item?.sboms?.length || 0}
                       </Td>
                       <Td fontSize={'sm'} pl={1}>
-                        <Text>{item.imageVersions.length}</Text>
+                        {item?.sboms[0]?.stats?.compCount || 0}
                       </Td>
                       <Td fontSize={'sm'} pl={1}>
-                        <Text>
-                          {new Date(item.updatedAt).toISOString().slice(0, 10)}
-                        </Text>
+                        {item?.sboms[0]?.stats?.compLicenseCount || 0}
                       </Td>
                       <Td fontSize={'sm'} pl={1}>
-                        <Flex direction={'row'} gap={2} alignItems={'center'}>
-                          {item.imageScanners.map((result, index) => (
-                            <Image
-                              width={6}
-                              objectFit={'contain'}
-                              key={index}
-                              src={`${scanImage(result.name)}`}
-                              alt={result}
-                            />
-                          ))}
-                        </Flex>
+                        <Stack spacing={1} direction={'row'}>
+                          <Tag variant='subtle' colorScheme='red'>
+                            {item?.sboms[0]?.stats?.vulnStats?.critical || 0}
+                          </Tag>
+                          <Tag variant='subtle' colorScheme='orange'>
+                            {item?.sboms[0]?.stats?.vulnStats?.high || 0}
+                          </Tag>
+                          <Tag variant='subtle' colorScheme='yellow'>
+                            {item?.sboms[0]?.stats?.vulnStats?.medium || 0}
+                          </Tag>
+                          <Tag variant='subtle' colorScheme='green'>
+                            {item?.sboms[0]?.stats?.vulnStats?.low || 0}
+                          </Tag>
+                        </Stack>
+                      </Td>
+                      <Td fontSize={'sm'} pl={1}>
+                        {getFullDateAndTime(item.updatedAt)}
                       </Td>
                     </Tr>
                   ))}

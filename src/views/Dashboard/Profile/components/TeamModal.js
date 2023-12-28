@@ -18,7 +18,7 @@ import {
   AlertIcon,
   Text
 } from '@chakra-ui/react'
-import { createOrgUser } from 'graphQL/Mutation'
+import { InviteUser, createOrgUser } from 'graphQL/Mutation'
 import { useState } from 'react'
 import { validateEmail } from 'utils'
 
@@ -32,19 +32,23 @@ const TeamModal = ({ isOpen, onClose, refetch }) => {
     onCompleted: () => refetch()
   })
 
+  const [inviteUsers] = useMutation(InviteUser, {
+    onCompleted: () => refetch()
+  })
+
   const handleAdd = async () => {
     try {
-      await createUser({
+      await inviteUsers({
         variables: {
           name: user,
           email: email.toLowerCase()
         }
       }).then((res) => {
-        if (res.data.userCreate.errors.length > 0) {
+        if (res.data.organizationUserInvite.errors.length > 0) {
           setError(res.data.userCreate.errors[0])
         } else {
           toast({
-            description: 'User added successfully',
+            description: 'Invitation sent successfully',
             status: 'success',
             position: 'top',
             duration: 2000

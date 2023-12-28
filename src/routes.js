@@ -17,14 +17,12 @@ import {
   FaPlug,
   FaBullhorn,
   FaWindowMaximize,
-  FaExchangeAlt,
   FaBug,
   FaBalanceScale
 } from 'react-icons/fa'
 import { HomeIcon } from 'components/Icons/Icons'
 import { BsFillFolderSymlinkFill } from 'react-icons/bs'
 import Automation from 'views/Dashboard/Automation'
-import { TbSettingsAutomation } from 'react-icons/tb'
 import ChangeLog from 'views/Dashboard/Changelog'
 import Vulnerabilities from 'views/Dashboard/Vulnerabilities'
 import Licenses from 'views/Dashboard/Linceses'
@@ -92,20 +90,6 @@ export const dashRoutes = [
     name: 'Settings',
     icon: <FaRegSun color='inherit' />,
     component: Profile,
-    layout: '/vendor'
-  },
-  {
-    path: '/autofix',
-    name: 'Settings',
-    icon: <TbSettingsAutomation color='inherit' />,
-    component: Automation,
-    layout: '/vendor'
-  },
-  {
-    path: '/changelog',
-    name: 'Change Log',
-    icon: <FaExchangeAlt color='inherit' />,
-    component: ChangeLog,
     layout: '/vendor'
   }
 ]

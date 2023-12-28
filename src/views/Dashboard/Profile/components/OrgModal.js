@@ -94,7 +94,9 @@ const OrgModal = ({ isOpen, onClose, refetch, org, onSwitch }) => {
               />
             </FormControl>
             {/* URL */}
-            <FormControl isInvalid={url !== '' && !validateUrl(url) && containsSpace}>
+            <FormControl
+              isInvalid={(url !== '' && !validateUrl(url)) || containsSpace}
+            >
               <FormLabel>URL</FormLabel>
               <Input
                 type='text'

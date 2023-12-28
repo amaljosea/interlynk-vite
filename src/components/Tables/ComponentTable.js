@@ -167,7 +167,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
 
   const onLicenseOpen = (row) => {
     setActiveRow(row)
-    console.log('row',row);
+    console.log('row', row)
     prodCompDispatch({ type: 'SET_LICENSES', payload: row })
     onOpen()
   }
@@ -381,6 +381,10 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
       selector: (row) => {
         const { licenses, licensesExp, licensesCustom } = row
 
+        const totalSpdx = licenses?.length > 1 && licenses.slice(1)
+        const totalCustom =
+          licensesCustom?.length > 1 && licensesCustom.slice(1)
+
         return (
           <Flex
             alignItems={'flex-end'}
@@ -390,13 +394,26 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
             my={2}
           >
             {/* SPDX */}
-            {licenses &&
-              licenses.length > 0 &&
-              licenses.map((item, index) => (
-                <Tooltip key={index} label={item} placement={'top'}>
-                  <Link
-                    href={`https://spdx.org/licenses/${item}`}
-                    target='_blank'
+            {licenses && (
+              <Stack direction={'row'} spacing={2}>
+                {licenses.length > 0 && (
+                  <Tooltip label={licenses[0]} placement={'top'}>
+                    <Tag
+                      size={'md'}
+                      variant='subtle'
+                      colorScheme='green'
+                      width={'fit-content'}
+                    >
+                      <TagLabel>{licenses[0]}</TagLabel>
+                    </Tag>
+                  </Tooltip>
+                )}
+                {totalSpdx && (
+                  <Tooltip
+                    label={JSON.stringify(totalSpdx)
+                      .slice(1, -1)
+                      .replace(/"/g, '')}
+                    placement={'top'}
                   >
                     <Tag
                       size={'md'}
@@ -404,11 +421,13 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
                       colorScheme='green'
                       width={'fit-content'}
                     >
-                      <TagLabel>{item}</TagLabel>
+                      <TagLabel>{`+${totalSpdx.length}`}</TagLabel>
                     </Tag>
-                  </Link>
-                </Tooltip>
-              ))}
+                  </Tooltip>
+                )}
+              </Stack>
+            )}
+
             {/* EXPRESSION */}
             {licensesExp && licensesExp !== '' && (
               <Tooltip label={licensesExp} placement={'top'}>
@@ -422,21 +441,41 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
                 </Tag>
               </Tooltip>
             )}
+
             {/* CUSTOM */}
-            {licensesCustom &&
-              licensesCustom.length > 0 &&
-              licensesCustom.map((item, index) => (
-                <Tooltip key={index} label={item} placement={'top'}>
-                  <Tag
-                    size={'md'}
-                    variant='subtle'
-                    colorScheme='green'
-                    width={'fit-content'}
+            {licensesCustom && (
+              <Stack direction={'row'} spacing={2}>
+                {licensesCustom.length > 0 && (
+                  <Tooltip label={licensesCustom[0]} placement={'top'}>
+                    <Tag
+                      size={'md'}
+                      variant='subtle'
+                      colorScheme='green'
+                      width={'fit-content'}
+                    >
+                      <TagLabel>{licensesCustom[0]}</TagLabel>
+                    </Tag>
+                  </Tooltip>
+                )}
+                {totalCustom && (
+                  <Tooltip
+                    label={JSON.stringify(totalCustom)
+                      .slice(1, -1)
+                      .replace(/"/g, '')}
+                    placement={'top'}
                   >
-                    <TagLabel>{item}</TagLabel>
-                  </Tag>
-                </Tooltip>
-              ))}
+                    <Tag
+                      size={'md'}
+                      variant='subtle'
+                      colorScheme='green'
+                      width={'fit-content'}
+                    >
+                      <TagLabel>{`+${totalCustom.length}`}</TagLabel>
+                    </Tag>
+                  </Tooltip>
+                )}
+              </Stack>
+            )}
           </Flex>
         )
       },
@@ -581,8 +620,19 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
 
   // EXPAND SECTION
   const ExpandedComponent = ({ data }) => {
-    const { scope, suppliers, purl, description, cpes, name, kind, internal } =
-      data
+    const {
+      scope,
+      suppliers,
+      purl,
+      description,
+      cpes,
+      name,
+      kind,
+      internal,
+      licenses,
+      licensesExp,
+      licensesCustom
+    } = data
 
     const CustomText = styled(Text)`
       font-size: 13px;
@@ -737,6 +787,48 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
             <Text mt={1} fontSize={14} textTransform={'capitalize'}>
               {scope}
             </Text>
+          </GridItem>
+          <GridItem w='100%'>
+            <CustomText>Licenses :</CustomText>
+            <Flex alignItems={'center'} gap={2} flexWrap={'wrap'} my={2}>
+              {/* SPDX */}
+              {licenses?.length > 0 &&
+                licenses.map((item, index) => (
+                  <Tag
+                    key={index}
+                    size={'md'}
+                    variant='subtle'
+                    colorScheme='green'
+                    width={'fit-content'}
+                  >
+                    <TagLabel>{item}</TagLabel>
+                  </Tag>
+                ))}
+              {/* EXPRESSION */}
+              {licensesExp && licensesExp !== '' && (
+                <Tag
+                  size={'md'}
+                  variant='subtle'
+                  colorScheme='green'
+                  width={'fit-content'}
+                >
+                  <TagLabel>{licensesExp}</TagLabel>
+                </Tag>
+              )}
+              {/* CUSTOM */}
+              {licensesCustom?.length > 0 &&
+                licensesCustom?.map((item, index) => (
+                  <Tag
+                    key={index}
+                    size={'md'}
+                    variant='subtle'
+                    colorScheme='green'
+                    width={'fit-content'}
+                  >
+                    <TagLabel>{item}</TagLabel>
+                  </Tag>
+                ))}
+            </Flex>
           </GridItem>
         </Grid>
       </Box>

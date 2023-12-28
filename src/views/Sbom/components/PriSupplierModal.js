@@ -181,7 +181,11 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
                 />
               </FormControl>
               {/* ORG URL */}
-              <FormControl isInvalid={orgUrl !== '' && !validateUrl(orgUrl) && containsSpace}>
+              <FormControl
+                isInvalid={
+                  (orgUrl !== '' && !validateUrl(orgUrl)) || containsSpace
+                }
+              >
                 <FormLabel fontSize={'sm'}>URL</FormLabel>
                 <Input
                   placeholder='Enter URL'

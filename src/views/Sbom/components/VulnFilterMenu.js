@@ -14,7 +14,6 @@ import {
 } from '@chakra-ui/react'
 import CheckMark from 'components/Misc/CheckMark'
 import { FaFilter } from 'react-icons/fa'
-import Cookies from 'js-cookie'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useRef } from 'react'
 
@@ -64,26 +63,23 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
     }
 
     await refetch({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        severity:
-          !severity.includes('all') && severity.length > 0
-            ? severity
-            : undefined,
-        componentName:
-          !component.includes('all') && component.length > 0
-            ? component
-            : undefined,
-        status:
-          !status.includes('all') && status.length > 0 ? status : undefined,
-        kev: kev === 'yes' ? true : kev === 'false' ? false : undefined,
-        epss: epss === 'all' || epss === '' ? undefined : range,
-        first: totalRows,
-        last: undefined,
-        field: field,
-        direction: direction
-      }
+      projectId: productId,
+      sbomId: sbomId,
+      severity:
+        !severity.includes('all') && severity.length > 0 ? severity : undefined,
+      componentName:
+        !component.includes('all') && component.length > 0
+          ? component
+          : undefined,
+      status: !status.includes('all') && status.length > 0 ? status : undefined,
+      kev: kev === 'yes' ? true : kev === 'false' ? false : undefined,
+      epss: epss === 'all' || epss === '' ? undefined : range,
+      first: totalRows,
+      last: undefined,
+      after: undefined,
+      before: undefined,
+      field: field,
+      direction: direction
     })
   }
 

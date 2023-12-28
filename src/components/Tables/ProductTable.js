@@ -367,9 +367,27 @@ const ProductTable = ({ data, refetch, org }) => {
       .finally(() => onWarningClose())
   }
 
+  // CLEAR SERACH
+  const handleClear = async () => {
+    await refetch({
+      search: undefined,
+      first: totalRows,
+      last: undefined,
+      after: undefined,
+      before: undefined,
+      field: field,
+      direction: direction
+    }).then((res) => res.data && prodDispatch({ type: 'CLEAR_SEARCH_INPUT' }))
+  }
+
   // ON SEARCH INPUT CHANGE
   const onSearchInputChange = (e) => {
-    prodDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: e.target.value })
+    const { value } = e.target
+    if (value === '') {
+      handleClear()
+    } else {
+      prodDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
+    }
   }
 
   // SEARCH COMPONENT
@@ -385,19 +403,6 @@ const ProductTable = ({ data, refetch, org }) => {
         direction: direction
       }).then((res) => res.data && prodDispatch({ type: 'FETCH_DATA_SUCCESS' }))
     }
-  }
-
-  // CLEAR SERACH
-  const handleClear = async () => {
-    await refetch({
-      search: undefined,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      before: undefined,
-      field: field,
-      direction: direction
-    }).then((res) => res.data && prodDispatch({ type: 'CLEAR_SEARCH_INPUT' }))
   }
 
   // FILTER PRODUCT
@@ -430,7 +435,6 @@ const ProductTable = ({ data, refetch, org }) => {
             filterText={searchInput}
             onChange={onSearchInputChange}
             onFilter={handleSearch}
-            onClear={handleClear}
           />
           {/* FILTER PRODUCTS */}
           <ProdFilterMenu onFilter={onFilterActive} />
@@ -459,7 +463,6 @@ const ProductTable = ({ data, refetch, org }) => {
     )
   }, [
     searchInput,
-    handleClear,
     handleSearch,
     handleRefresh,
     onFilterActive,
@@ -495,10 +498,14 @@ const ProductTable = ({ data, refetch, org }) => {
       last: totalRows,
       after: undefined,
       before: data.pageInfo.startCursor
-    }).then((res) => res.data && prodDispatch({
-      type: 'DECREMENT_PAGE',
-      payload:  data.pageInfo.startCursor
-    }))
+    }).then(
+      (res) =>
+        res.data &&
+        prodDispatch({
+          type: 'DECREMENT_PAGE',
+          payload: data.pageInfo.startCursor
+        })
+    )
   }
 
   // NEXT PAGE
@@ -511,11 +518,13 @@ const ProductTable = ({ data, refetch, org }) => {
     }).then(
       (res) =>
         res.data &&
-        prodDispatch({ type: 'INCREMENT_PAGE',
-        payload: {
-          total: data.totalCount,
-          after: data.pageInfo.endCursor
-        }})
+        prodDispatch({
+          type: 'INCREMENT_PAGE',
+          payload: {
+            total: data.totalCount,
+            after: data.pageInfo.endCursor
+          }
+        })
     )
   }
 
@@ -536,78 +545,74 @@ const ProductTable = ({ data, refetch, org }) => {
 
   return (
     <>
-      {org ? (
-        <Card>
-          <Flex flexDir={'column'} width={'100%'}>
-            <DataTable
-              columns={columns}
-              onSort={handleSort}
-              data={data?.nodes}
-              customStyles={customStyles}
-              defaultSortAsc={false}
-              defaultSortFieldId={field}
-              subHeader
-              subHeaderComponent={subHeaderComponent}
-              progressPending={data ? false : true}
-              progressComponent={<CustomLoader />}
-              responsive={true}
-              persistTableHead
-            />
+      <Card>
+        <Flex flexDir={'column'} width={'100%'}>
+          <DataTable
+            columns={columns}
+            onSort={handleSort}
+            data={data?.nodes}
+            customStyles={customStyles}
+            defaultSortAsc={false}
+            defaultSortFieldId={field}
+            subHeader
+            subHeaderComponent={subHeaderComponent}
+            progressPending={data ? false : true}
+            progressComponent={<CustomLoader />}
+            responsive={true}
+            persistTableHead
+          />
 
-            {data && (
-              <Flex
-                width={'100%'}
-                flexDir={'row'}
-                gap={4}
-                alignItems={'center'}
-                mt={6}
-                justifyContent={'space-between'}
-                flexWrap={'wrap'}
-              >
-                <Stack alignItems={'center'} direction={'row'} spacing={4}>
-                  <Button
-                    colorScheme='blue'
-                    onClick={handlePreviousPage}
-                    isDisabled={!data.pageInfo.hasPreviousPage}
-                  >
-                    Prev
-                  </Button>
-                  <Button
-                    colorScheme='blue'
-                    onClick={handleNextPage}
-                    isDisabled={!data.pageInfo.hasNextPage}
-                  >
-                    Next
-                  </Button>
-                  <Box>
-                    Page {pageIndex} of{' '}
-                    {data.totalCount === 0
-                      ? 1
-                      : Math.ceil(data.totalCount / totalRows)}
-                  </Box>
-                </Stack>
+          {data && (
+            <Flex
+              width={'100%'}
+              flexDir={'row'}
+              gap={4}
+              alignItems={'center'}
+              mt={6}
+              justifyContent={'space-between'}
+              flexWrap={'wrap'}
+            >
+              <Stack alignItems={'center'} direction={'row'} spacing={4}>
+                <Button
+                  colorScheme='blue'
+                  onClick={handlePreviousPage}
+                  isDisabled={!data.pageInfo.hasPreviousPage}
+                >
+                  Prev
+                </Button>
+                <Button
+                  colorScheme='blue'
+                  onClick={handleNextPage}
+                  isDisabled={!data.pageInfo.hasNextPage}
+                >
+                  Next
+                </Button>
+                <Box>
+                  Page {pageIndex} of{' '}
+                  {data.totalCount === 0
+                    ? 1
+                    : Math.ceil(data.totalCount / totalRows)}
+                </Box>
+              </Stack>
 
-                <Stack alignItems={'center'} direction={'row'} spacing={4}>
-                  <Text>Show</Text>
-                  <Select
-                    width={20}
-                    value={totalRows}
-                    onChange={handleSetRow}
-                    id='rowlimit'
-                    name='rowlimit'
-                  >
-                    <option value={25}>25</option>
-                    <option value={50}>50</option>
-                    <option value={100}>100</option>
-                  </Select>
-                </Stack>
-              </Flex>
-            )}
-          </Flex>
-        </Card>
-      ) : (
-        <OrgRegister />
-      )}
+              <Stack alignItems={'center'} direction={'row'} spacing={4}>
+                <Text>Show</Text>
+                <Select
+                  width={20}
+                  value={totalRows}
+                  onChange={handleSetRow}
+                  id='rowlimit'
+                  name='rowlimit'
+                >
+                  <option value={25}>25</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                </Select>
+              </Stack>
+            </Flex>
+          )}
+        </Flex>
+      </Card>
 
       {/* UPLOAD SBOM */}
       {isOpenUpload && (

@@ -1,4 +1,4 @@
-import { ExternalLinkIcon, InfoIcon } from '@chakra-ui/icons'
+import { InfoIcon } from '@chakra-ui/icons'
 import {
   Flex,
   FormControl,
@@ -15,7 +15,7 @@ import {
   Input,
   Link
 } from '@chakra-ui/react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ReactSelect from 'react-select'
 import CreatableSelect from 'react-select/creatable'
 import { CpeAutoComplete } from 'graphQL/Queries'
@@ -24,13 +24,12 @@ import spdxValidate from 'spdx-expression-validate'
 import { MdArrowOutward } from 'react-icons/md'
 import { useGlobalState } from 'hooks/useGlobalState'
 
-const LicenseField = () => {
+const LicenseField = ({ isValid, setIsValid }) => {
   const { prodCompState, dispatch } = useGlobalState()
   const { licenseType, spdxList, customList, expLicense } = prodCompState
   const { prodCompDispatch } = dispatch
 
   const [licenseList, setLicenseList] = useState([])
-  const [isValid, setIsValid] = useState(true)
   const [getCpe] = useLazyQuery(CpeAutoComplete)
 
   const onLicenseChange = (selected) => {
@@ -85,13 +84,26 @@ const LicenseField = () => {
     }
   }
 
+  const [exp, setExp] = useState('')
+
+  useEffect(() => {
+    if (expLicense) {
+      setExp(expLicense)
+    }
+  }, [expLicense])
+
   const handleExpChange = (e) => {
     const { value } = e.target
-    prodCompDispatch({ type: 'SET_EPX_LICENSE', payload: value })
-    if (value !== '') {
-      const trimmedInput = typeof value === 'string' ? value.trim() : ''
+    setExp(value)
+    setIsValid(true)
+  }
+
+  const handleExpBlur = () => {
+    if (exp !== '') {
+      const trimmedInput = typeof exp === 'string' ? exp.trim() : ''
       const isLicenseValid = spdxValidate(trimmedInput)
       setIsValid(isLicenseValid)
+      prodCompDispatch({ type: 'SET_EPX_LICENSE', payload: exp })
     } else {
       setIsValid(true)
     }
@@ -184,8 +196,9 @@ const LicenseField = () => {
           <>
             <Input
               type='text'
-              value={expLicense}
+              value={exp}
               fontSize={'sm'}
+              onBlur={handleExpBlur}
               onChange={handleExpChange}
               placeholder='Enter a valid SPDX Expression'
             />

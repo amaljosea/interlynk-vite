@@ -14,6 +14,7 @@ import { useColorModeValue } from '@chakra-ui/system'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
 import { updateOrgUser } from 'graphQL/Mutation'
+import { useGlobalState } from 'hooks/useGlobalState'
 import React, { useState, useEffect } from 'react'
 import { validateEmail } from 'utils'
 
@@ -21,6 +22,7 @@ const PersonalInfo = ({ user, refetch }) => {
   const textColor = useColorModeValue('gray.700', 'white')
   const toast = useToast()
 
+  const { setUserName } = useGlobalState()
 
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -58,8 +60,9 @@ const PersonalInfo = ({ user, refetch }) => {
         }
       })
         .then((res) => {
-          if (res.data.userUpdate.errors.length == 0) {
+          if (res.data.userUpdate.errors.length === 0) {
             setMessage('Saving....')
+            setUserName(name)
             localStorage.setItem('username', name)
             localStorage.setItem('email', email)
             setTimeout(() => {

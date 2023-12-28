@@ -1,18 +1,8 @@
 // Chakra imports
-import {
-  Flex,
-  Grid,
-  SimpleGrid,
-  useColorModeValue,
-  Box
-} from '@chakra-ui/react'
-
+import { Flex, Grid, SimpleGrid, useColorModeValue } from '@chakra-ui/react'
 import BarChart from 'components/Charts/BarChart'
 import LineChart from 'components/Charts/LineChart'
-
-import { FaLayerGroup, FaLink, FaBug, FaImages } from 'react-icons/fa'
-
-import { activitiesData as activitiesOverviewData } from 'variables/general'
+import { FaLayerGroup, FaBug, FaCube, FaWindowMaximize } from 'react-icons/fa'
 import SBOMActivities from './components/ActiveUsers'
 import MiniStatistics from './components/MiniStatistics'
 import ActivitiesOverview from './components/ActivitiesOverview'
@@ -21,11 +11,29 @@ import RiskScoreOverview from './components/SalesOverview'
 import { GetOrg } from 'graphQL/Queries'
 import { useQuery } from '@apollo/client'
 import OrgRegister from '../Profile/components/OrgRegister'
+import { useEffect } from 'react'
+import { GetOrgMetrics } from 'graphQL/Queries'
 
 export default function Dashboard() {
   const iconBoxInside = useColorModeValue('white', 'white')
 
   const { data } = useQuery(GetOrg)
+  const { data: metrics } = useQuery(GetOrgMetrics)
+
+  useEffect(() => {
+    if (data) {
+      localStorage.setItem(
+        'organization',
+        JSON.stringify(data?.organization?.name)
+      )
+    }
+  }, [data])
+
+  useEffect(() => {
+    if (metrics) {
+      console.log('Matrics', metrics)
+    }
+  }, [metrics])
 
   return (
     <>
@@ -39,59 +47,39 @@ export default function Dashboard() {
         >
           {data.organization ? (
             <Flex flexDirection='column'>
-              <Grid
-                templateColumns={{ sm: '1fr', lg: '1fr' }}
-                templateRows={{ sm: '1fr', lg: '1fr' }}
-                gap='24px'
-                mb={{ lg: '26px' }}
-              >
-                <Box
-                  bg='blue.600'
-                  w='100%'
-                  px={4}
-                  py={8}
-                  color='white'
-                  fontWeight='medium'
-                  fontSize='20px'
-                  align='center'
-                  borderRadius='xl'
-                  boxShadow='md'
-                >
-                  Metrics dashboard coming soon...
-                  <br />
-                  (Samples)
-                </Box>
-              </Grid>
+              {/* STATS */}
               <SimpleGrid columns={{ sm: 1, md: 2, xl: 4 }} spacing='24px'>
                 <MiniStatistics
-                  title={'Images'}
-                  amount={'12'}
+                  title={'Active Products'}
+                  amount={metrics?.organizationMetric?.projectCount}
                   percentage={9}
                   icon={
-                    <FaImages h={'24px'} w={'24px'} color={iconBoxInside} />
+                    <FaWindowMaximize
+                      h={'24px'}
+                      w={'24px'}
+                      color={iconBoxInside}
+                    />
                   }
                 />
                 <MiniStatistics
-                  title={'Tags'}
-                  amount={'79'}
-                  percentage={4}
+                  title={'Versions'}
+                  amount={metrics?.organizationMetric?.versionCount}
                   icon={
                     <FaLayerGroup h={'24px'} w={'24px'} color={iconBoxInside} />
                   }
                 />
                 <MiniStatistics
-                  title={'Vulnerabilities'}
-                  amount={'113'}
-                  percentage={-8}
-                  icon={<FaBug h={'24px'} w={'24px'} color={iconBoxInside} />}
+                  title={'Components'}
+                  amount={metrics?.organizationMetric?.componentCount}
+                  icon={<FaCube h={'24px'} w={'24px'} color={iconBoxInside} />}
                 />
                 <MiniStatistics
-                  title={'Share Lynks'}
-                  amount={'8'}
-                  percentage={14}
-                  icon={<FaLink h={'24px'} w={'24px'} color={iconBoxInside} />}
+                  title={'Vulnerabilities'}
+                  amount={metrics?.organizationMetric?.vulnsMetric}
+                  icon={<FaBug h={'24px'} w={'24px'} color={iconBoxInside} />}
                 />
               </SimpleGrid>
+              {/* GRAPHS */}
               <Grid
                 templateColumns={{ sm: '1fr', lg: '1.3fr 1.7fr' }}
                 templateRows={{ sm: 'repeat(2, 1fr)', lg: '1fr' }}
@@ -110,25 +98,31 @@ export default function Dashboard() {
                   chart={<BarChart />}
                 />
               </Grid>
+              {/* LIST */}
               <Grid
                 templateColumns={{ sm: '1fr', md: '1fr 1fr', lg: '2fr 1fr' }}
                 templateRows={{ sm: '1fr auto', md: '1fr', lg: '1fr' }}
                 gap='24px'
               >
+                {/* RECENT IMPORTS */}
                 <ProductsOverview
-                  title={'Images overview'}
+                  title={'Recent Imports'}
                   amount={10}
                   captions={[
                     'Product',
                     'Versions',
-                    'Share Lynks',
-                    'Risk Score'
+                    'Compoents',
+                    'Licenses',
+                    'Vulnerabilities',
+                    'Last Updated'
                   ]}
+                  data={metrics?.organizationMetric?.latestProjects}
                 />
+                {/* LATEST ACTIVITIES */}
                 <ActivitiesOverview
                   title={'Recent Activities'}
-                  amount={30}
-                  data={activitiesOverviewData}
+                  amount={metrics?.organizationMetric?.latestActivity?.length}
+                  data={metrics?.organizationMetric?.latestActivity}
                 />
               </Grid>
             </Flex>

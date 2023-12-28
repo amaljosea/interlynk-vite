@@ -6,7 +6,7 @@ import { GetProjectData } from 'graphQL/Queries'
 import { useLocation } from 'react-router-dom'
 import ProductTable from 'components/Tables/ProductTable'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { GetOrg } from 'graphQL/Queries'
+import OrgRegister from '../Profile/components/OrgRegister'
 
 function ProductList() {
   const { totalRows, prodState, dispatch } = useGlobalState()
@@ -23,6 +23,8 @@ function ProductList() {
   const queryParams = new URLSearchParams(location.search)
   const product = queryParams.get('id')
 
+  const org = localStorage.getItem('organization')
+
   const { data, refetch, error } = useQuery(GetProjectData, {
     variables: {
       first: totalRows,
@@ -31,8 +33,6 @@ function ProductList() {
       direction: direction
     }
   })
-
-  const { data: orgInfo } = useQuery(GetOrg)
 
   useEffect(() => {
     if (data && data.projects && !error) {
@@ -62,17 +62,11 @@ function ProductList() {
     )
   }
 
-  return (
-    <>
-      {orgInfo && (
-        <ProductTable
-          data={data?.projects}
-          refetch={refetch}
-          org={orgInfo?.organization || null}
-        />
-      )}
-    </>
-  )
+  if (org === 'undefined') {
+    return <OrgRegister />
+  }
+
+  return <ProductTable data={data?.projects} refetch={refetch} />
 }
 
 export default ProductList

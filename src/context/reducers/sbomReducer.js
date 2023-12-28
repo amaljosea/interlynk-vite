@@ -70,7 +70,7 @@ const sbomReducer = (state, action) => {
           return {
             ...state,
             licenseType: 'license_exp',
-            expLicense: licensesExp || ''
+            expLicense: licensesExp
           }
         } else if (licensesCustom?.length > 0) {
           const filterData = licensesCustom?.map((license) => ({

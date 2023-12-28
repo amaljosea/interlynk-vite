@@ -55,6 +55,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
   const customerView = location.pathname.startsWith('/customer')
   const [selectedKey, setSelectedKey] = useState('')
   const [activeTool, setActiveTool] = useState(null)
+  const [isValid, setIsValid] = useState(true)
 
   const btnRef = useRef(null)
   const licenseBtn = useRef(null)
@@ -163,12 +164,13 @@ const GeneralDataRow = ({ status, data, refetch }) => {
   }
 
   const onLicenseOpen = () => {
-    console.log('data', data)
+    console.log(data)
     sbomDispatch({ type: 'SET_LICENSES', payload: data })
     onSBMOpen()
   }
 
   const onUpdateLicense = async () => {
+    console.log('expLicense', expLicense)
     await updateSbom({
       variables: {
         id: data.id,
@@ -184,7 +186,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
             licenseType === 'license_exp'
               ? expLicense
                 ? expLicense
-                : null
+                : ''
               : undefined,
           licensesCustom:
             licenseType === 'license_custom'
@@ -199,47 +201,6 @@ const GeneralDataRow = ({ status, data, refetch }) => {
       .finally(() => onSBMClose())
   }
 
-  const handleRemoveSpdx = async (license) => {
-    const filterList =
-      data.licenses.length > 0 &&
-      data.licenses.filter((item) => item !== license)
-    await updateSbom({
-      variables: {
-        id: data.id,
-        spec: data.spec,
-        licenses: {
-          licenses: filterList ? filterList : []
-        }
-      }
-    }).then((res) => res.data && onSBMClose())
-  }
-
-  const handleRemoveExp = async () => {
-    await updateSbom({
-      variables: {
-        id: data.id,
-        spec: data.spec,
-        licenses: {
-          licensesExp: null
-        }
-      }
-    }).then((res) => res.data && onSBMClose())
-  }
-
-  const handleRemoveCustom = async (license) => {
-    const filterList =
-      data.licensesCustom.length > 0 &&
-      data.licensesCustom.filter((item) => item !== license)
-    await updateSbom({
-      variables: {
-        id: data.id,
-        spec: data.spec,
-        licenses: {
-          licensesCustom: filterList ? filterList : []
-        }
-      }
-    }).then((res) => res.data && onSBMClose())
-  }
 
   // ADD KEYBOARD SHORTCUT FOR TOGGLE SBOM DRAWER
   const handleSBMDown = (event) => {
@@ -461,14 +422,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                         colorScheme='green'
                         width={'fit-content'}
                       >
-                        <Tooltip key={index} label={item} placement={'top'}>
-                          <Link
-                            href={`https://spdx.org/licenses/${item}`}
-                            target='_blank'
-                          >
-                            <TagLabel>{item}</TagLabel>
-                          </Link>
-                        </Tooltip>
+                        <TagLabel>{item}</TagLabel>
                       </Tag>
                     ))}
                   {/* EXPRESSION */}
@@ -479,14 +433,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                       colorScheme='green'
                       width={'fit-content'}
                     >
-                      <Tooltip label={data.licensesExp} placement={'top'}>
-                        <Link
-                          href={`https://spdx.org/licenses/${data.licensesExp}`}
-                          target='_blank'
-                        >
-                          <TagLabel>{data.licensesExp}</TagLabel>
-                        </Link>
-                      </Tooltip>
+                      <TagLabel>{data.licensesExp}</TagLabel>
                     </Tag>
                   )}
                   {/* CUSTOM */}
@@ -499,14 +446,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                         colorScheme='green'
                         width={'fit-content'}
                       >
-                        <Tooltip key={index} label={item} placement={'top'}>
-                          <Link
-                            href={`https://spdx.org/licenses/${item}`}
-                            target='_blank'
-                          >
-                            <TagLabel>{item}</TagLabel>
-                          </Link>
-                        </Tooltip>
+                        <TagLabel>{item}</TagLabel>
                       </Tag>
                     ))}
                 </Flex>
@@ -551,7 +491,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
             </ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              <SbomLicenseField data={data} />
+              <SbomLicenseField isValid={isValid} setIsValid={setIsValid} />
             </ModalBody>
             <ModalFooter>
               <Button fontSize={'sm'} mr={3} onClick={onSBMClose}>
@@ -561,6 +501,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                 fontSize={'sm'}
                 colorScheme='blue'
                 onClick={onUpdateLicense}
+                isDisabled={!isValid}
               >
                 {data.licenses.length > 0 ? 'Update' : 'Save'}
               </Button>

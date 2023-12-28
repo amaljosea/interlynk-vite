@@ -80,7 +80,7 @@ const RegistrationForm = () => {
         Welcome
       </Text>
       <Text fontSize={'sm'} textAlign={'center'} color={'#555'}>
-        Log in to Interlynk to continue to the dashboard.
+        Register to continue to the dashboard.
       </Text>
       {error.length > 0 && (
         <Box mt={4} width={'100%'}>

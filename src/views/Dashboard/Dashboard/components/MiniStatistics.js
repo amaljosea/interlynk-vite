@@ -1,22 +1,23 @@
 // Chakra imports
 import {
+  Box,
   Flex,
+  Stack,
   Stat,
-  StatHelpText,
   StatLabel,
   StatNumber,
-  useColorModeValue,
-} from "@chakra-ui/react";
+  Tag,
+  useColorModeValue
+} from '@chakra-ui/react'
 // Custom components
-import Card from "components/Card/Card.js";
-import CardBody from "components/Card/CardBody.js";
-import IconBox from "components/Icons/IconBox";
-import React from "react";
+import Card from 'components/Card/Card.js'
+import CardBody from 'components/Card/CardBody.js'
+import IconBox from 'components/Icons/IconBox'
+import React from 'react'
 
-const MiniStatistics = ({ title, amount, percentage, icon }) => {
-  const iconBlue = useColorModeValue("blue.300", "blue.300");
-  const iconTeal = useColorModeValue("teal.300", "teal.300");
-  const textColor = useColorModeValue("gray.700", "white");
+const MiniStatistics = ({ title, amount, icon }) => {
+  const iconBlue = useColorModeValue('blue.300', 'blue.300')
+  const textColor = useColorModeValue('gray.700', 'white')
 
   return (
     <Card minH='83px'>
@@ -24,35 +25,46 @@ const MiniStatistics = ({ title, amount, percentage, icon }) => {
         <Flex flexDirection='row' align='center' justify='center' w='100%'>
           <Stat me='auto'>
             <StatLabel
-              fontSize='sm'
-              color='gray.400'
-              fontWeight='bold'
-              pb='.1rem'>
+              fontSize='md'
+              color='gray.600'
+              fontWeight='semibold'
+              pb='.1rem'
+            >
               {title}
             </StatLabel>
-            <Flex>
-              <StatNumber fontSize='lg' color={textColor}>
-                {amount}
-              </StatNumber>
-              <StatHelpText
-                alignSelf='flex-end'
-                justifySelf='flex-end'
-                m='0px'
-                color={percentage > 0 ? "green.400" : "red.400"}
-                fontWeight='bold'
-                ps='3px'
-                fontSize='md'>
-                {percentage > 0 ? `+${percentage}%` : `${percentage}%`}
-              </StatHelpText>
-            </Flex>
+            <Box height={5}>
+              {title === 'Vulnerabilities' ? (
+                <Stack mt={1} spacing={1} direction={'row'}>
+                  <Tag variant='subtle' colorScheme='red'>
+                    {amount?.critical || 0}
+                  </Tag>
+                  <Tag variant='subtle' colorScheme='orange'>
+                    {amount?.high || 0}
+                  </Tag>
+                  <Tag variant='subtle' colorScheme='yellow'>
+                    {amount?.medium || 0}
+                  </Tag>
+                  <Tag variant='subtle' colorScheme='green'>
+                    {amount?.low || 0}
+                  </Tag>
+                  <Tag variant='subtle' colorScheme='gray'>
+                    {amount?.unknown || 0}
+                  </Tag>
+                </Stack>
+              ) : (
+                <StatNumber fontSize='lg' color={textColor}>
+                  {amount}
+                </StatNumber>
+              )}
+            </Box>
           </Stat>
-          <IconBox h={"45px"} w={"45px"} bg={iconBlue}>
+          <IconBox h={'45px'} w={'45px'} bg={iconBlue}>
             {icon}
           </IconBox>
         </Flex>
       </CardBody>
     </Card>
-  );
-};
+  )
+}
 
-export default MiniStatistics;
+export default MiniStatistics

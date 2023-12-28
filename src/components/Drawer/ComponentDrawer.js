@@ -131,6 +131,7 @@ function ComponentDrawer(props) {
   const [isInternal, setIsInternal] = useState(false)
   const [relation, setRelation] = useState('')
   const [component, setComponent] = useState('')
+  const [isValid, setIsValid] = useState(true)
 
   useEffect(() => {
     if (data) {
@@ -243,7 +244,7 @@ function ComponentDrawer(props) {
             licenseType === 'license_exp'
               ? expLicense
                 ? expLicense
-                : null
+                : ''
               : undefined,
           licensesCustom:
             licenseType === 'license_custom'
@@ -511,7 +512,7 @@ function ComponentDrawer(props) {
                 </Select>
               </FormControl>
               {/* LICENSES */}
-              <LicenseField data={data} />
+              <LicenseField isValid={isValid} setIsValid={setIsValid} />
               {/* PURL INPUI */}
               <FormControl
                 isReadOnly={customerView}
@@ -728,7 +729,8 @@ function ComponentDrawer(props) {
                     compName === '' ||
                     compVersion === '' ||
                     (purlValue !== '' && !isPURLInputValid) ||
-                    (cpeValue !== '' && !isCpeValid)
+                    (cpeValue !== '' && !isCpeValid) ||
+                    !isValid
                   }
                 >
                   Save
@@ -740,7 +742,8 @@ function ComponentDrawer(props) {
                   isDisabled={
                     !compKind ||
                     (purlValue !== '' && !isPURLInputValid) ||
-                    (cpeValue !== '' && !isCpeValid)
+                    (cpeValue !== '' && !isCpeValid) ||
+                    !isValid
                   }
                 >
                   Update

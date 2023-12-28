@@ -20,7 +20,7 @@ import { Link, useLocation } from 'react-router-dom'
 
 const SidebarContent = ({ logoText, routes }) => {
   const { minimize } = useGlobalState()
-
+  const org = localStorage.getItem('organization')
   let location = useLocation()
   const urlParts = location.pathname.split('/')
   const category = urlParts[2]
@@ -42,152 +42,152 @@ const SidebarContent = ({ logoText, routes }) => {
     const activeColor = useColorModeValue('gray.900', 'white')
     const inactiveColor = useColorModeValue('gray.500', 'gray.500')
 
-    return routes
-      .filter((item) => item.path !== '/autofix' && item.path !== '/changelog')
-      .map((prop, index) => {
-        if (prop.redirect) {
-          return null
-        }
-        if (prop.category) {
-          var st = {}
-          st[prop['state']] = !state[prop.state]
-          return (
-            <div key={prop.name}>
-              <Text
-                color={activeColor}
-                fontWeight='bold'
-                mb={{
-                  xl: '12px'
-                }}
-                mx='auto'
-                py='12px'
-              >
-                {document.documentElement.dir === 'rtl'
-                  ? prop.rtlName
-                  : prop.name}
-              </Text>
-              {createLinks(prop.views)}
-            </div>
-          )
-        }
-
+    return routes.map((prop, index) => {
+      if (prop.redirect) {
+        return null
+      }
+      if (prop.category) {
+        var st = {}
+        st[prop['state']] = !state[prop.state]
         return (
-          <Link
-            to={
-              prop.path === '/settings'
-                ? `${prop.layout}${prop.path}?tab=general`
-                : prop.layout + prop.path
-            }
-            key={prop.name}
-          >
-            {activeRoute(prop.layout + prop.path) === 'active' ? (
-              <Button
-                boxSize='initial'
-                justifyContent='flex-start'
-                alignItems='center'
-                title={prop.name}
-                mb={{
-                  xl: '12px'
-                }}
-                mx={{
-                  xl: 'auto'
-                }}
-                py='4px'
-                pl={'18px'}
-                bg='none'
-                _active={{
-                  bg: 'none'
-                }}
-                _hover={{
-                  bg: 'none'
-                }}
-              >
-                <Flex>
-                  {typeof prop.icon === 'string' ? (
-                    <Icon>{prop.icon}</Icon>
-                  ) : (
-                    <IconBox
-                      bg='blue.300'
-                      color='white'
-                      h='36px'
-                      w='36px'
-                      me='12px'
-                    >
-                      {prop.icon}
-                    </IconBox>
-                  )}
-                  {!minimize && (
-                    <Text
-                      color={activeColor}
-                      my='auto'
-                      fontSize='sm'
-                      transition='transform 0.1s ease-in-out'
-                      opacity={minimize ? 0 : 100}
-                    >
-                      {document.documentElement.dir === 'rtl'
-                        ? prop.rtlName
-                        : prop.name}
-                    </Text>
-                  )}
-                </Flex>
-              </Button>
-            ) : (
-              <Button
-                boxSize='initial'
-                justifyContent='flex-start'
-                alignItems='center'
-                mb={{
-                  xl: '12px'
-                }}
-                mx={{
-                  xl: 'auto'
-                }}
-                py='4px'
-                pl={'18px'}
-                bg='none'
-                _active={{
-                  bg: 'none'
-                }}
-                _hover={{
-                  bg: 'none'
-                }}
-                title={prop.name}
-              >
-                <Flex>
-                  {typeof prop.icon === 'string' ? (
-                    <Icon>{prop.icon}</Icon>
-                  ) : (
-                    <IconBox
-                      bg={inactiveBg}
-                      color='blue.300'
-                      h='36px'
-                      w='36px'
-                      me='12px'
-                    >
-                      {prop.icon}
-                    </IconBox>
-                  )}
-                  {minimize ? (
-                    ''
-                  ) : (
-                    <Text
-                      color={inactiveColor}
-                      my='auto'
-                      fontSize='sm'
-                      transition='transform 0.1s ease-in-out'
-                      opacity={minimize ? 0 : 100}
-                    >
-                      {document.documentElement.dir === 'rtl'
-                        ? prop.rtlName
-                        : prop.name}
-                    </Text>
-                  )}
-                </Flex>
-              </Button>
-            )}
-          </Link>
+          <div key={prop.name}>
+            <Text
+              color={activeColor}
+              fontWeight='bold'
+              mb={{
+                xl: '12px'
+              }}
+              mx='auto'
+              py='12px'
+            >
+              {document.documentElement.dir === 'rtl'
+                ? prop.rtlName
+                : prop.name}
+            </Text>
+            {createLinks(prop.views)}
+          </div>
         )
-      })
+      }
+
+      return (
+        <Link
+          to={
+            prop.path === '/settings'
+              ? `${prop.layout}${prop.path}?tab=${
+                  org === 'undefined' ? 'organization' : 'general'
+                }`
+              : prop.layout + prop.path
+          }
+          key={prop.name}
+        >
+          {activeRoute(prop.layout + prop.path) === 'active' ? (
+            <Button
+              boxSize='initial'
+              justifyContent='flex-start'
+              alignItems='center'
+              title={prop.name}
+              mb={{
+                xl: '12px'
+              }}
+              mx={{
+                xl: 'auto'
+              }}
+              py='4px'
+              pl={'18px'}
+              bg='none'
+              _active={{
+                bg: 'none'
+              }}
+              _hover={{
+                bg: 'none'
+              }}
+            >
+              <Flex>
+                {typeof prop.icon === 'string' ? (
+                  <Icon>{prop.icon}</Icon>
+                ) : (
+                  <IconBox
+                    bg='blue.300'
+                    color='white'
+                    h='36px'
+                    w='36px'
+                    me='12px'
+                  >
+                    {prop.icon}
+                  </IconBox>
+                )}
+                {!minimize && (
+                  <Text
+                    color={activeColor}
+                    my='auto'
+                    fontSize='sm'
+                    transition='transform 0.1s ease-in-out'
+                    opacity={minimize ? 0 : 100}
+                  >
+                    {document.documentElement.dir === 'rtl'
+                      ? prop.rtlName
+                      : prop.name}
+                  </Text>
+                )}
+              </Flex>
+            </Button>
+          ) : (
+            <Button
+              boxSize='initial'
+              justifyContent='flex-start'
+              alignItems='center'
+              mb={{
+                xl: '12px'
+              }}
+              mx={{
+                xl: 'auto'
+              }}
+              py='4px'
+              pl={'18px'}
+              bg='none'
+              _active={{
+                bg: 'none'
+              }}
+              _hover={{
+                bg: 'none'
+              }}
+              title={prop.name}
+            >
+              <Flex>
+                {typeof prop.icon === 'string' ? (
+                  <Icon>{prop.icon}</Icon>
+                ) : (
+                  <IconBox
+                    bg={inactiveBg}
+                    color='blue.300'
+                    h='36px'
+                    w='36px'
+                    me='12px'
+                  >
+                    {prop.icon}
+                  </IconBox>
+                )}
+                {minimize ? (
+                  ''
+                ) : (
+                  <Text
+                    color={inactiveColor}
+                    my='auto'
+                    fontSize='sm'
+                    transition='transform 0.1s ease-in-out'
+                    opacity={minimize ? 0 : 100}
+                  >
+                    {document.documentElement.dir === 'rtl'
+                      ? prop.rtlName
+                      : prop.name}
+                  </Text>
+                )}
+              </Flex>
+            </Button>
+          )}
+        </Link>
+      )
+    })
   }
 
   const links = <>{createLinks(routes)}</>
