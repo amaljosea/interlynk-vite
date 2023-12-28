@@ -87,6 +87,7 @@ export default function Dashboard() {
                 gap='24px'
                 mb={{ lg: '26px' }}
               >
+                {/* TODO: 1.0 Add back in when ready
                 <RiskScoreOverview
                   title={'Risk Score'}
                   percentage={-24}
@@ -97,6 +98,7 @@ export default function Dashboard() {
                   percentage={23}
                   chart={<BarChart />}
                 />
+                */}
               </Grid>
               {/* LIST */}
               <Grid
@@ -110,13 +112,13 @@ export default function Dashboard() {
                   amount={10}
                   captions={[
                     'Product',
-                    'Versions',
+                    'Version',
                     'Compoents',
                     'Licenses',
                     'Vulnerabilities',
-                    'Last Updated'
+                    'Imported'
                   ]}
-                  data={metrics?.organizationMetric?.latestProjects}
+                  data={metrics?.organizationMetric?.latestVersions}
                 />
                 {/* LATEST ACTIVITIES */}
                 <ActivitiesOverview

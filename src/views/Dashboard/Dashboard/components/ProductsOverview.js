@@ -2,6 +2,7 @@
 import {
   Flex,
   Table,
+  TagLabel,
   Thead,
   Tbody,
   Tr,
@@ -18,12 +19,13 @@ import {
 import Card from 'components/Card/Card'
 import CardHeader from 'components/Card/CardHeader'
 import CardBody from 'components/Card/CardBody'
+import VulnBadge from 'components/Misc/VulnBadge'
 
 import React from 'react'
 import { Link } from 'react-router-dom'
 
 import { scanImage, getConImg } from 'utils'
-import { getFullDateAndTime } from 'utils'
+import { getFullDateAndTime, timeSince} from 'utils'
 
 const ProductsOverview = ({ title, captions, data }) => {
   return (
@@ -56,35 +58,83 @@ const ProductsOverview = ({ title, captions, data }) => {
                   data?.map((item) => (
                     <Tr key={item.id} fontFamily={'inherit'}>
                       <Td fontSize={'sm'} pl={1}>
-                        {item?.name}
+                        {item?.project?.name}
                       </Td>
                       <Td fontSize={'sm'} pl={1}>
-                        {item?.sboms?.length || 0}
+                        {item?.primaryComponent?.version}
                       </Td>
                       <Td fontSize={'sm'} pl={1}>
-                        {item?.sboms[0]?.stats?.compCount || 0}
+                      <Tag
+                        size='md'
+                        variant='subtle'
+                        width={16}
+                        colorScheme={'blue'}
+                        cursor={'pointer'}
+                      >
+                        <TagLabel mx={'auto'}>
+                          {item?.stats?.compCount || 0}
+                        </TagLabel>
+                      </Tag>
                       </Td>
                       <Td fontSize={'sm'} pl={1}>
-                        {item?.sboms[0]?.stats?.compLicenseCount || 0}
+                      <Tag
+                        size='md'
+                        variant='subtle'
+                        width={16}
+                        colorScheme={'blue'}
+                        cursor={'pointer'}
+                      >
+                        <TagLabel mx={'auto'}>
+                          {item?.stats?.compLicenseCount || 0}
+                        </TagLabel>
+                      </Tag>
                       </Td>
                       <Td fontSize={'sm'} pl={1}>
                         <Stack spacing={1} direction={'row'}>
-                          <Tag variant='subtle' colorScheme='red'>
-                            {item?.sboms[0]?.stats?.vulnStats?.critical || 0}
-                          </Tag>
-                          <Tag variant='subtle' colorScheme='orange'>
-                            {item?.sboms[0]?.stats?.vulnStats?.high || 0}
-                          </Tag>
-                          <Tag variant='subtle' colorScheme='yellow'>
-                            {item?.sboms[0]?.stats?.vulnStats?.medium || 0}
-                          </Tag>
-                          <Tag variant='subtle' colorScheme='green'>
-                            {item?.sboms[0]?.stats?.vulnStats?.low || 0}
-                          </Tag>
+                        <Link to={'https://google.com'}>
+                        <VulnBadge
+                          color='red'
+                          label='Critical'
+                          onClick={() => onFilterSev(['critical'])}
+                        >
+                            {item?.stats?.vulnStats?.critical || 0}
+
+                        </VulnBadge>
+                        </Link>
+                        <Link to={'https://google.com'}>
+                          <VulnBadge
+                            color='orange'
+                            label='high'
+                            onClick={() => onFilterSev(['critical'])}
+                          >
+                                        {item?.stats?.vulnStats?.high || 0}
+
+                          </VulnBadge>
+                        </Link>
+                        <Link to={'https://google.com'}>
+                          <VulnBadge
+                            color='yellow'
+                            label='medium'
+                            onClick={() => onFilterSev(['critical'])}
+                          >
+                                        {item?.stats?.vulnStats?.medium || 0}
+
+                          </VulnBadge>
+                        </Link>
+                        <Link to={'https://google.com'}>
+                          <VulnBadge
+                            color='green'
+                            label='low'
+                            onClick={() => onFilterSev(['critical'])}
+                          >
+                                        {item?.stats?.vulnStats?.low || 0}
+
+                                  </VulnBadge>
+                                </Link>
                         </Stack>
                       </Td>
                       <Td fontSize={'sm'} pl={1}>
-                        {getFullDateAndTime(item.updatedAt)}
+                        {timeSince(item.createdAt)}
                       </Td>
                     </Tr>
                   ))}
