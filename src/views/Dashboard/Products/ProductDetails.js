@@ -113,6 +113,7 @@ const ProductDetails = () => {
     variables: {
       projectId: productId,
       sbomId: sbomId,
+      first: totalRows,
       field: prodVulnState.field,
       direction: prodVulnState.direction
     }
