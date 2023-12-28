@@ -111,7 +111,9 @@ function ActivitiesOverviewRow(props) {
               h={'30px'}
               w={'30px'}
               pe={'6px'}
-              mx={'5px'}
+              mx={'-10px'}
+              mr={'10px'}
+              pb={'6px'}
               zIndex='1'
               position='relative'
               color={valueToColor(action, event, orig, updated)} />
