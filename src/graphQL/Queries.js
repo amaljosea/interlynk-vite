@@ -56,6 +56,58 @@ export const GetOrg = gql`
     }
   }
 `
+// GET ORGANIZATION METRICS
+export const GetOrgMetrics = gql`
+  query GetOrgMetrics {
+    organizationMetric {
+      projectCount
+      versionCount
+      componentCount
+      vulnsMetric
+      latestImports {
+        event
+        updated
+        changedBy
+      }
+      latestVulns {
+        vulnId
+        desc
+      }
+      latestVersions {
+        id
+        primaryComponent {
+          name
+          version
+        }
+      }
+      latestProjects {
+        id
+        name
+        updatedAt
+        sboms {
+          id
+          primaryComponent {
+            name
+            version
+          }
+          stats {
+            compCount
+            compLicenseCount
+            vulnStats
+          }
+        }
+      }
+      latestActivity {
+        event
+        updatedAt
+        changedBy
+        action
+        orig
+        updated
+      }
+    }
+  }
+`
 
 // LIST CURRENT USER'S ORGANIZATIONS
 export const MyOrganizations = gql`
