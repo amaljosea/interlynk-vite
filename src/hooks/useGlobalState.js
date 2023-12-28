@@ -12,6 +12,7 @@ import {
 const GlobalStateContext = createContext()
 
 const GlobalStateProvider = ({ children }) => {
+  const [userName, setUserName] = useState('')
   const [totalRows, setTotalRows] = useState(25)
   const [activeProdTab, setActiveProdTab] = useState(0)
   const [activeSbomTab, setActiveSbomTab] = useState(0)
@@ -130,6 +131,8 @@ const GlobalStateProvider = ({ children }) => {
         setVulnerabilitiesData,
         scanEnabled,
         setScanEnabled,
+        userName,
+        setUserName,
         prodState,
         prodLogState,
         prodCompState,

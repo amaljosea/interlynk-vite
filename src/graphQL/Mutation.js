@@ -23,6 +23,35 @@ export const RegisterOrganization = gql`
   }
 `
 
+// INVITE USERS
+export const InviteUser = gql`
+  mutation InviteUser($name: String, $email: String!) {
+    organizationUserInvite(input: { email: $email, name: $name }) {
+      user {
+        id
+        email
+      }
+      errors
+    }
+  }
+`
+
+// ACCEPT INVITATION
+export const AcceptInvitation = gql`
+  mutation AcceptInvitation($token: String!, $nonce: String!) {
+    organizationUserInvitationAccept(
+      input: { invitationToken: $token, nonce: $nonce }
+    ) {
+      user {
+        email
+        name
+      }
+      userType
+      errors
+    }
+  }
+`
+
 // CREATE INTERNAL COMPONENT
 export const createOrgComp = gql`
   mutation createOrgComp($match: String!) {
@@ -103,8 +132,12 @@ export const createOrgUser = gql`
 
 // DELETE USER
 export const deleteOrgUser = gql`
-  mutation deleteOrgUser($id: ID!) {
-    userDelete(input: { id: $id }) {
+  mutation deleteOrgUser($userId: Uuid) {
+    organizationUserRemove(input: { userId: $userId }) {
+      user {
+        name
+        email
+      }
       errors
     }
   }

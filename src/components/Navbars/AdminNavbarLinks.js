@@ -30,14 +30,15 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { dashRoutes } from 'routes.js'
 import { FaRegKeyboard, FaSignOutAlt, FaExchangeAlt } from 'react-icons/fa'
 import Cookies from 'js-cookie'
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import axios from 'axios'
+import { useGlobalState } from 'hooks/useGlobalState'
 
 export default function HeaderLinks(props) {
   const location = useLocation()
   const navigate = useNavigate()
-  const name = localStorage.getItem('username')
-  const org = localStorage.getItem('organization')
+
+  const { userName, setUserName } = useGlobalState()
 
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
@@ -45,26 +46,19 @@ export default function HeaderLinks(props) {
 
   const { variant, children, fixed, secondary, onOpen, ...rest } = props
 
-  const [username, setUsername] = useState('')
-
   const authToken = Cookies.get('authToken')
 
-  const userName = localStorage.getItem('username')
+  const name = localStorage.getItem('username')
   const userEmail = localStorage.getItem('userEmail')
+  const org = localStorage.getItem('organization')
 
   useEffect(() => {
     if (location.pathname.startsWith('/vendor')) {
-      setUsername(userName)
+      setUserName(name)
     } else if (location.pathname.startsWith('/customer')) {
-      setUsername(userEmail)
+      setUserName(userEmail)
     }
   }, [])
-
-  useEffect(() => {
-    if (name) {
-      setUsername(name)
-    }
-  }, [name])
 
   // Chakra Color Mode
   let navbarIcon = useColorModeValue('gray.500', 'gray.200')
@@ -185,7 +179,7 @@ export default function HeaderLinks(props) {
           }
         >
           <Text display={{ sm: 'none', md: 'flex' }} fontSize={'sm'}>
-            {username !== '' && username !== null ? username : ''}
+            {userName || name}
           </Text>
         </MenuButton>
         {location.pathname.startsWith('/vendor') && (
@@ -199,7 +193,7 @@ export default function HeaderLinks(props) {
               <Link to='/vendor/settings?tab=organization'>
                 <MenuItem icon={<FaExchangeAlt />}>Organizations</MenuItem>
               </Link>
-              {userName ? (
+              {name ? (
                 <MenuItem icon={<FaSignOutAlt />} onClick={handleLogout}>
                   Logout
                 </MenuItem>
@@ -228,7 +222,7 @@ export default function HeaderLinks(props) {
         // logo={logo}
         {...rest}
       />
-      {!userName && (
+      {!name && (
         <Menu>
           <MenuButton>
             <BellIcon color={navbarIcon} w='18px' h='18px' />

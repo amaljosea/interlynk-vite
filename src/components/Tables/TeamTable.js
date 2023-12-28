@@ -171,7 +171,7 @@ const TeamTable = ({ data, refetch }) => {
         />
 
         {/* ADD MEMBER */}
-        <Tooltip label='Add Member' placement='top'>
+        <Tooltip label='Invite User' placement='top'>
           <IconButton
             onClick={onTeamOpen}
             icon={<AddIcon />}
@@ -189,7 +189,7 @@ const TeamTable = ({ data, refetch }) => {
     try {
       await deleteUser({
         variables: {
-          id: activeRow.id
+          userId: activeRow.id
         }
       })
         .then((res) => res.data && refetch())
