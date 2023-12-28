@@ -59,7 +59,7 @@ export const GetOrg = gql`
 
 // LIST CURRENT USER'S ORGANIZATIONS
 export const MyOrganizations = gql`
-  query myOrganizations(
+  query MyOrganizations(
     $first: Int
     $last: Int
     $after: String
@@ -109,7 +109,7 @@ export const GetOrgRules = gql`
 
 // GET ORGANIZATION SETTINGS
 export const GetOrgSettings = gql`
-  query GetOrgRules {
+  query GetOrgSettings {
     organization {
       organizationSettings {
         id
@@ -125,7 +125,7 @@ export const GetOrgSettings = gql`
 `
 
 export const GetOrgInfo = gql`
-  query GetOrganization {
+  query GetOrgInfo {
     organization {
       id
       name
@@ -792,6 +792,7 @@ export const GetAllComponents = gql`
           id
           name
           version
+          primary
         }
       }
     }
