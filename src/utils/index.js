@@ -621,7 +621,7 @@ export const removeDuplicates = (arr) => {
 
 export const validateUrl = (url) => {
   const urlRegex =
-    /^(?:http|https):\/\/(?:www\.)?[a-zA-Z0-9-]+(?:\.[a-zA-Z]{2,})+(?:\/[\w-]+)*(?:\/[\w\-]+(?:\.[a-zA-Z]{2,})?)?(?:\?[\w%=&]*)?(?:#[\w\-]*)?$/
+    /^(?:(?:https?|ftp):\/\/)?(?:www\.)?[a-zA-Z0-9-]+(?:\.[a-zA-Z]{2,})+(?:\/[\w-]*)*(?:\/[\w\-]+(?:\.[a-zA-Z]{2,})?)?(?:\?[\w%=&]*)?(?:#[\w\-]*)?$/
   return urlRegex.test(url)
 }
 
