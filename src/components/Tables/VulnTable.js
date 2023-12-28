@@ -385,10 +385,6 @@ const VulnTable = ({
   const vulnData = {
     projectId: productId,
     sbomId: sbomId,
-    first: totalRows,
-    last: undefined,
-    after: undefined,
-    before: undefined,
     search: searchInput !== '' ? searchInput : undefined,
     severity: severities.length > 0 ? severities : undefined,
     componentName: components.length > 0 ? components : undefined,
@@ -407,7 +403,13 @@ const VulnTable = ({
   // SEARCH COMPONENT
   const handleSearch = async (event) => {
     if (event.key === 'Enter') {
-      await refetch(vulnData).then(
+      await refetch({
+        ...vulnData,
+        first: totalRows,
+        last: undefined,
+        after: undefined,
+        before: undefined
+      }).then(
         (res) => res.data && prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
       )
     }
@@ -415,7 +417,13 @@ const VulnTable = ({
 
   // CLEAR SERACH
   const handleClear = async () => {
-    await refetch(vulnData).then(
+    await refetch({
+      ...vulnData,
+      first: totalRows,
+      last: undefined,
+      after: undefined,
+      before: undefined
+    }).then(
       (res) => res.data && prodVulnDispatch({ type: 'CLEAR_SEARCH_INPUT' })
     )
   }
