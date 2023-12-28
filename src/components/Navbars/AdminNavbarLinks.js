@@ -185,11 +185,13 @@ export default function HeaderLinks(props) {
         {location.pathname.startsWith('/vendor') && (
           <MenuList size='sm'>
             <MenuGroup title=''>
-              {org !== 'undefined' && (
-                <Link to='/vendor/settings?tab=person'>
-                  <MenuItem icon={<SettingsIcon />}>Settings</MenuItem>
-                </Link>
-              )}
+              <Link
+                to={`/vendor/settings?tab=${
+                  org === 'undefined' ? 'organization' : 'person'
+                }`}
+              >
+                <MenuItem icon={<SettingsIcon />}>Settings</MenuItem>
+              </Link>
               <Link to='/vendor/settings?tab=organization'>
                 <MenuItem icon={<FaExchangeAlt />}>Organizations</MenuItem>
               </Link>
