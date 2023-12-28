@@ -22,8 +22,7 @@ import { UpdateAutomation } from 'graphQL/Mutation'
 import { useState, useEffect } from 'react'
 
 const UpdateRule = ({ isOpen, onClose, data, refetch, productId }) => {
-  const [compName, setCompName] = useState('')
-  const [compVersion, setCompVersion] = useState('')
+  const [value, setValue] = useState('')
   const [condition, setCondition] = useState('')
   const [error, setError] = useState([])
 
@@ -31,12 +30,7 @@ const UpdateRule = ({ isOpen, onClose, data, refetch, productId }) => {
 
   useEffect(() => {
     if (data) {
-      setCompName(
-        data.applicability === 'component' ? data.lookup.comp_name : ''
-      )
-      setCompVersion(
-        data.applicability === 'component' ? data.lookup.comp_version : ''
-      )
+      setValue(data.setTo.value || '')
       setCondition(data.condition)
     }
   }, [])
@@ -48,8 +42,7 @@ const UpdateRule = ({ isOpen, onClose, data, refetch, productId }) => {
         projectId: productId,
         condition: condition,
         enabled: data.enabled,
-        compName: compName,
-        compVersion: compVersion
+        set: JSON.stringify({ value: value })
       }
     }).then((res) => {
       if (res.data.autoCheckUpdate.errors.length === 0) {
@@ -82,37 +75,17 @@ const UpdateRule = ({ isOpen, onClose, data, refetch, productId }) => {
               </Alert>
             )}
 
-            {/* COMPONENT NAME */}
-            <FormControl
-              display={data.applicability === 'component' ? 'block' : 'none'}
-            >
-              <FormLabel htmlFor='compName'>Component Name</FormLabel>
+            {/* VALUE */}
+            <FormControl>
+              <FormLabel htmlFor='value'>Value</FormLabel>
               <Input
-                id='compName'
-                name='compName'
-                value={compName}
+                id='value'
+                name='value'
+                value={value}
                 onChange={(e) => {
-                  setCompName(e.target.value)
+                  setValue(e.target.value)
                   setError([])
                 }}
-                placeholder='Add component name'
-              />
-            </FormControl>
-
-            {/* COMPONENT VERSION */}
-            <FormControl
-              display={data.applicability === 'component' ? 'block' : 'none'}
-            >
-              <FormLabel htmlFor='compVersion'>Component Version</FormLabel>
-              <Input
-                id='compVersion'
-                name='compVersion'
-                value={compVersion}
-                onChange={(e) => {
-                  setCompVersion(e.target.value)
-                  setError([])
-                }}
-                placeholder='Add component version'
               />
             </FormControl>
 
