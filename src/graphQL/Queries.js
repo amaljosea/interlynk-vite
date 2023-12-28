@@ -73,11 +73,21 @@ export const GetOrgMetrics = gql`
         vulnId
         desc
       }
-      latestVersions {
+      latestVersions{
         id
+        createdAt
+        updatedAt
+        project {
+          name
+        }
         primaryComponent {
           name
           version
+        }
+        stats {
+          compCount
+          compLicenseCount
+          vulnStats
         }
       }
       latestProjects {

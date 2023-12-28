@@ -28,7 +28,7 @@ const ActivitiesOverview = ({ title, amount, data }) => {
                 <ActivitiesOverviewRow
                   key={index}
                   logo={FaEye}
-                  title={`${`[${row.action}]`} ${row.updated}`}
+                  title={`${`[${row.action}]`} ${row.updated} by ${row.changedBy}`}
                   date={row.updatedAt}
                   color={'gray'}
                   index={index}
