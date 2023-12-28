@@ -20,7 +20,7 @@ const ActivitiesOverview = ({ title, amount, data }) => {
           </Text>
         </Flex>
       </CardHeader>
-      <CardBody ps='20px' pe='0px' mb='31px' position='relative'>
+      <CardBody ps='20px' pe='0px' position='relative'>
         <Flex direction='column'>
           {data?.length > 0 &&
             data?.map((row, index) => {

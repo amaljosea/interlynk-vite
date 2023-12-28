@@ -29,12 +29,7 @@ function ActivitiesOverviewRow(props) {
         ></Box>
       </Flex>
       <Flex direction='column' justifyContent='flex-start' h='100%'>
-        <Text
-          fontSize='sm'
-          color={textColor}
-          fontWeight='normal'
-          textTransform={'capitalize'}
-        >
+        <Text fontSize='sm' color={textColor} fontWeight='normal'>
           {title}
         </Text>
         <Text fontSize='sm' color='gray.400' fontWeight='normal'>
