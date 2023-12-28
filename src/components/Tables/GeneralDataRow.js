@@ -55,6 +55,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
   const customerView = location.pathname.startsWith('/customer')
   const [selectedKey, setSelectedKey] = useState('')
   const [activeTool, setActiveTool] = useState(null)
+  const [isValid, setIsValid] = useState(true)
 
   const btnRef = useRef(null)
   const licenseBtn = useRef(null)
@@ -163,12 +164,13 @@ const GeneralDataRow = ({ status, data, refetch }) => {
   }
 
   const onLicenseOpen = () => {
-    console.log('data', data)
+    console.log(data)
     sbomDispatch({ type: 'SET_LICENSES', payload: data })
     onSBMOpen()
   }
 
   const onUpdateLicense = async () => {
+    console.log('expLicense', expLicense)
     await updateSbom({
       variables: {
         id: data.id,
@@ -184,7 +186,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
             licenseType === 'license_exp'
               ? expLicense
                 ? expLicense
-                : null
+                : ''
               : undefined,
           licensesCustom:
             licenseType === 'license_custom'
@@ -551,7 +553,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
             </ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              <SbomLicenseField data={data} />
+              <SbomLicenseField isValid={isValid} setIsValid={setIsValid} />
             </ModalBody>
             <ModalFooter>
               <Button fontSize={'sm'} mr={3} onClick={onSBMClose}>
@@ -561,6 +563,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                 fontSize={'sm'}
                 colorScheme='blue'
                 onClick={onUpdateLicense}
+                isDisabled={!isValid}
               >
                 {data.licenses.length > 0 ? 'Update' : 'Save'}
               </Button>

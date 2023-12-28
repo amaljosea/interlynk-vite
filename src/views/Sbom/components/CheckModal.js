@@ -77,6 +77,7 @@ const CheckModal = ({
   const [compType, setCompType] = useState('')
   const [componentList, setComponentList] = useState([])
   const [activeComp, setActiveComp] = useState(null)
+  const [isValid, setIsValid] = useState(true)
 
   const [healthRecheck] = useMutation(recheckHealth, {
     onCompleted: () => refetch()
@@ -174,7 +175,7 @@ const CheckModal = ({
               licenseType === 'license_exp'
                 ? expLicense
                   ? expLicense
-                  : null
+                  : ''
                 : undefined,
             licensesCustom:
               licenseType === 'license_custom'
@@ -432,7 +433,7 @@ const CheckModal = ({
             {(shortDesc === 'Component has license/s specified' ||
               shortDesc === 'Componet has deprecated license/s' ||
               shortDesc === 'Component has restrictive licenses specified') && (
-              <LicenseField data={activeCheck.component} />
+              <LicenseField isValid={isValid} setIsValid={setIsValid} />
             )}
           </ModalBody>
 
