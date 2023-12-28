@@ -35,13 +35,13 @@ const ProductsOverview = ({ title, captions, data }) => {
         justifyContent={'space-between'}
       >
         <Card overflowX={{ sm: 'scroll', xl: 'hidden' }}>
-          <CardHeader>
-            <Heading fontSize={'xl'} fontFamily={'inherit'}>
+          <CardHeader pt='12px'>
+            <Heading fontSize={'lg'} fontFamily={'inherit'}>
               {title}
             </Heading>
           </CardHeader>
           <CardBody>
-            <Table variant='simple' mt={10}>
+            <Table variant='simple' mt={7}>
               <Thead>
                 <Tr>
                   {captions.map((item, index) => (

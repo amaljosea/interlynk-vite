@@ -13,9 +13,9 @@ const ActivitiesOverview = ({ title, amount, data }) => {
 
   return (
     <Card maxH='100%'>
-      <CardHeader p='12px 0px 40px 0px'>
+      <CardHeader p='12px 0px 30px 0px'>
         <Flex direction='column'>
-          <Text fontSize='lg' color={textColor} fontWeight='bold' pb='.5rem'>
+          <Text fontSize='lg' color={textColor} fontWeight='bold'>
             {title}
           </Text>
         </Flex>
