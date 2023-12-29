@@ -8,9 +8,14 @@ import { Box, Image } from '@chakra-ui/react'
 import Invitation from 'views/Auth/Invitation'
 import DashboardBg from 'assets/img/dashboard.png'
 import { useRef } from 'react'
+import { useLocation } from 'react-router-dom'
+import Confirmation from 'views/Auth/Confirmation'
 
 const Success = () => {
   const navRef = useRef()
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const confirmation = queryParams.get('confirmation_token')
 
   const graphqlAPI = process.env.REACT_APP_GRAPHQL_API
 
@@ -33,7 +38,7 @@ const Success = () => {
           height={'100%'}
           pos={'absolute'}
         />
-        <Invitation />
+        {confirmation ? <Confirmation /> : <Invitation />}
       </Box>
     </ApolloProvider>
   )

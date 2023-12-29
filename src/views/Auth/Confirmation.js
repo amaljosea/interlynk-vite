@@ -11,39 +11,30 @@ import {
 } from '@chakra-ui/react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { WarningIcon } from '@chakra-ui/icons'
-import { AcceptInvitation } from 'graphQL/Mutation'
 import { useMutation } from '@apollo/client'
+import { UserEmailConfirmation } from 'graphQL/Mutation'
 
-const Invitation = () => {
+const Confirmation = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
-  const token = queryParams.get('token')
-  const nonce = queryParams.get('nonce')
+  const token = queryParams.get('confirmation_token')
 
   const [error, setError] = useState([])
-  const [userType, setUserType] = useState('')
 
-  const [acceptInvitation] = useMutation(AcceptInvitation)
+  const [emailConfirmation] = useMutation(UserEmailConfirmation)
 
   useEffect(() => {
-    acceptInvitation({
+    emailConfirmation({
       variables: {
-        token,
-        nonce
+        token
       }
     }).then((res) => {
-      if (res.data.organizationUserInvitationAccept.errors.length > 0) {
+      console.log(res.data)
+      if (res.data.userEmailConfirmation.errors.length > 0) {
         setError(res.data.organizationUserInvitationAccept.errors)
       } else {
         setError([])
-        if (res.data.organizationUserInvitationAccept.userType === 'new_user') {
-          setUserType('new_user')
-        } else if (
-          res.data.organizationUserInvitationAccept.userType === 'existing_user'
-        ) {
-          setUserType('existing_user')
-        }
       }
     })
   }, [])
@@ -72,11 +63,7 @@ const Invitation = () => {
     )
   }
 
-  return userType === 'new_user' ? (
-    <Navigate to={'/register'} />
-  ) : (
-    <Navigate to={'/auth'} />
-  )
+  return <Navigate to={'/auth'} />
 }
 
-export default Invitation
+export default Confirmation

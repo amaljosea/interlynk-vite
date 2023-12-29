@@ -10,6 +10,7 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
+  Icon,
   Input,
   Stack,
   Text
@@ -18,6 +19,7 @@ import { RegisterUser } from 'graphQL/Mutation'
 import { useMutation } from '@apollo/client'
 import { Link, useNavigate } from 'react-router-dom'
 import { validateEmail } from 'utils'
+import { CheckCircleIcon } from '@chakra-ui/icons'
 
 const RegistrationForm = () => {
   const navigate = useNavigate()
@@ -29,9 +31,10 @@ const RegistrationForm = () => {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState([])
   const [passError, setPassError] = useState('')
+  const [isSuccess, setIsSuccess] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   const [orgRegister] = useMutation(RegisterUser)
-
 
   const isInvalid =
     email === '' ||
@@ -53,6 +56,7 @@ const RegistrationForm = () => {
   }
 
   const handleSubmit = () => {
+    setIsLoading(true)
     orgRegister({
       variables: {
         name: name,
@@ -63,10 +67,32 @@ const RegistrationForm = () => {
     }).then((res) => {
       if (res.data.userRegistration.errors.length > 0) {
         setError(res.data.userRegistration.errors)
+        setIsLoading(false)
+        setIsSuccess(false)
       } else {
-        navigate('/auth')
+        setIsSuccess(true)
+        setIsLoading(false)
       }
     })
+  }
+
+  if (isSuccess) {
+    return (
+      <Flex
+        mt={2}
+        direction={'column'}
+        alignItems={'center'}
+        justifyContent={'center'}
+      >
+        <Icon mt={5} color={'green.400'} boxSize={16} as={CheckCircleIcon} />
+        <Text fontSize={'lg'} textAlign={'center'} mt={4}>
+          Registration Successful
+        </Text>
+        <Text fontSize={'sm'} textAlign={'center'} color={'#555'}>
+          User will receive an email with confirmation link.
+        </Text>
+      </Flex>
+    )
   }
 
   return (
@@ -97,7 +123,7 @@ const RegistrationForm = () => {
         </Box>
       )}
 
-      <Stack py={'1rem'} direction={'column'} gap={2} width={'100%'} mt={4}>
+      <Stack py={'1rem'} direction={'column'} gap={2} width={'100%'}>
         <FormControl>
           <FormLabel htmlFor='organization'>Name</FormLabel>
           <Input
@@ -160,7 +186,9 @@ const RegistrationForm = () => {
           mt={5}
           onClick={handleSubmit}
           colorScheme='blue'
-          disabled={isInvalid}
+          disabled={isInvalid || isLoading}
+          isLoading={isLoading}
+          loadingText='Submitting'
         >
           Register
         </Button>

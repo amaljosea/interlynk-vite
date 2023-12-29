@@ -13,6 +13,7 @@ export const GetOrg = gql`
         id
         name
         email
+        unconfirmedEmail
         profileImage {
           filename
           url
@@ -73,12 +74,16 @@ export const GetOrgMetrics = gql`
         vulnId
         desc
       }
-      latestVersions{
+      latestVersions {
         id
         createdAt
         updatedAt
+        projectId
         project {
           name
+          sboms {
+            id
+          }
         }
         primaryComponent {
           name

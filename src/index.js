@@ -80,6 +80,7 @@ ReactDOM.render(
             <Route path={`auth`} element={<AuthLayout />} />
             <Route path={`register`} element={<Register />} />
             <Route path={`accept-user-invitation`} element={<Success />} />
+            <Route path={`confirmation`} element={<Success />} />
             <Route path={`vendor`} element={<AdminLayout />}>
               <Route
                 path=''
