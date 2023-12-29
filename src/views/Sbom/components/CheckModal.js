@@ -1,6 +1,9 @@
 import { useLazyQuery, useMutation } from '@apollo/client'
 import { InfoIcon } from '@chakra-ui/icons'
 import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
   Box,
   Button,
   Flex,
@@ -78,6 +81,7 @@ const CheckModal = ({
   const [componentList, setComponentList] = useState([])
   const [activeComp, setActiveComp] = useState(null)
   const [isValid, setIsValid] = useState(true)
+  const [error, setError] = useState('')
 
   const [healthRecheck] = useMutation(recheckHealth, {
     onCompleted: () => refetch()
@@ -241,71 +245,85 @@ const CheckModal = ({
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (shortDesc === 'Document has a primary component') {
-      handleComUpdate()
-    } else if (
-      shortDesc === 'Component has license/s specified' ||
-      shortDesc === 'Componet has deprecated license/s' ||
-      shortDesc === 'Component has restrictive licenses specified'
-    ) {
-      onLicenseUpdate()
+    if (!isInvalidLicense) {
+      if (shortDesc === 'Document has a primary component') {
+        handleComUpdate()
+      } else if (
+        shortDesc === 'Component has license/s specified' ||
+        shortDesc === 'Componet has deprecated license/s' ||
+        shortDesc === 'Component has restrictive licenses specified'
+      ) {
+        onLicenseUpdate()
+      } else {
+        onClose()
+      }
     } else {
-      onClose()
+      setError('Please add value')
+      setTimeout(() => {
+        setError('')
+      }, 2000)
     }
   }
 
   const [createAutoCheck] = useMutation(CreateAutomation)
 
-  const onSaveRule = async () => {
-    if (activeComp) {
-      await createAutoCheck({
-        variables: {
-          projectId: productId,
-          applicable: 'component',
-          condition: 'missing',
-          attr: 'primary',
-          enabled: true,
-          compName: activeComp.name,
-          compVersion: activeComp.version,
-          set: JSON.stringify({ value: true }, null, 2)
-        }
-      }).then((res) => res.data && handleComUpdate())
-    } else {
-      await createAutoCheck({
-        variables: {
-          projectId: productId,
-          applicable: 'component',
-          condition: 'missing',
-          attr: licenseType,
-          enabled: true,
-          compName: activeCheck?.component?.name,
-          compVersion: activeCheck?.component?.version,
-          set: JSON.stringify(
-            {
-              value:
-                licenseType === 'license_spdx'
-                  ? spdxLicenses
-                  : licenseType === 'license_exp'
-                  ? expLicense
-                  : licenseType === 'license_custom'
-                  ? customLicenses
-                  : ''
-            },
-            null,
-            2
-          )
-        }
-      }).then((res) => res.data && onLicenseUpdate())
-    }
-  }
-
   const isInvalidLicense =
     (shortDesc === 'Component has license/s specified' ||
       shortDesc === 'Componet has deprecated license/s' ||
       shortDesc === 'Component has restrictive licenses specified') &&
-    (spdxLicenses.length === 0 ||
-      expLicense === '' ||
-      customLicenses.length === 0)
+    spdxLicenses.length === 0 &&
+    expLicense === '' &&
+    customLicenses.length === 0
+
+  const onSaveRule = async () => {
+    if (!isInvalidLicense) {
+      if (activeComp) {
+        await createAutoCheck({
+          variables: {
+            projectId: productId,
+            applicable: 'component',
+            condition: 'missing',
+            attr: 'primary',
+            enabled: true,
+            compName: activeComp.name,
+            compVersion: activeComp.version,
+            set: JSON.stringify({ value: true }, null, 2)
+          }
+        }).then((res) => res.data && handleComUpdate())
+      } else {
+        await createAutoCheck({
+          variables: {
+            projectId: productId,
+            applicable: 'component',
+            condition: 'missing',
+            attr: licenseType,
+            enabled: true,
+            compName: activeCheck?.component?.name,
+            compVersion: activeCheck?.component?.version,
+            set: JSON.stringify(
+              {
+                value:
+                  licenseType === 'license_spdx'
+                    ? spdxLicenses
+                    : licenseType === 'license_exp'
+                    ? expLicense
+                    : licenseType === 'license_custom'
+                    ? customLicenses
+                    : ''
+              },
+              null,
+              2
+            )
+          }
+        }).then((res) => res.data && onLicenseUpdate())
+      }
+    } else {
+      setError('Please add value')
+      setTimeout(() => {
+        setError('')
+      }, 2000)
+    }
+  }
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -315,6 +333,13 @@ const CheckModal = ({
           <ModalHeader>{heading(shortDesc)}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
+            {error !== '' && (
+              <Alert status='error' borderRadius={4} mb={5}>
+                <AlertIcon />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
             {activeCheck && (
               <Flex
                 width='100%'

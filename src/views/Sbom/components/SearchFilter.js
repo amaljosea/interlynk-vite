@@ -25,12 +25,6 @@ const SearchFilter = ({ id, filterText, onChange, onFilter, onClear }) => {
     }
   }, [])
 
-  useEffect(() => {
-    if (filterText === '') {
-      onClear()
-    }
-  }, [filterText])
-
   return (
     <>
       <Box pos={'relative'} width={'300px'}>

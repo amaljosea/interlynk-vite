@@ -84,7 +84,7 @@ const ChangelogTable = ({ data, refetch }) => {
         const { orig } = row
         return (
           <Tooltip label={orig} placement='top'>
-            <Text>
+            <Text my={2}>
               {orig !== null
                 ? `${orig?.substring(0, 400)}${orig.length > 400 ? '...' : ''}`
                 : ''}
@@ -102,12 +102,8 @@ const ChangelogTable = ({ data, refetch }) => {
         const { updated } = row
         return (
           <Tooltip label={updated} placement='top'>
-            <Text overflow={'auto'}>
-              {updated !== null
-                ? `${updated?.substring(0, 50)}${
-                    updated.length > 50 ? '...' : ''
-                  }`
-                : ''}
+            <Text overflow={'auto'} my={2}>
+              {updated || ''}
             </Text>
           </Tooltip>
         )

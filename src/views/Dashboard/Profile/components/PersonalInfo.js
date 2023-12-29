@@ -8,7 +8,8 @@ import {
   Button,
   useToast,
   Box,
-  FormErrorMessage
+  FormErrorMessage,
+  FormHelperText
 } from '@chakra-ui/react'
 import { useColorModeValue } from '@chakra-ui/system'
 import CardBody from 'components/Card/CardBody'
@@ -108,6 +109,11 @@ const PersonalInfo = ({ user, refetch }) => {
           <FormControl isRequired>
             <FormLabel>Email</FormLabel>
             <Input value={email} onChange={(e) => setEmail(e.target.value)} />
+            {user?.unconfirmedEmail && (
+              <FormHelperText>
+                {JSON.stringify(user?.unconfirmedEmail)}
+              </FormHelperText>
+            )}
           </FormControl>
           {/* ACTION */}
           <Button

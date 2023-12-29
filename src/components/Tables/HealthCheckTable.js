@@ -68,7 +68,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
   const [cpeValue, setCpeValue] = useState('')
   const [cpeData, setCpeData] = useState(null)
   const [selectedCpe, setSelectedCpe] = useState(null)
-
+  const [checkSearch, setCheckSearch] = useState('')
   const [activeRow, setActiveRow] = useState(null)
 
   const fetchCheckData = () => {
@@ -198,42 +198,9 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
     }
   }
 
-  // SEARCH COMPONENT
-  const handleSearch = async (event) => {
-    if (event.key === 'Enter' && searchInput !== '') {
-      await refetch({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          search: searchInput !== '' ? searchInput : undefined,
-          checkId:
-            rules.includes('all') || rules.length === 0 ? undefined : rules,
-          category:
-            categories.includes('all') || categories.length === 0
-              ? undefined
-              : categories,
-          severity:
-            severities.includes('all') || severities.length === 0
-              ? undefined
-              : severities,
-          status:
-            statues.includes('all') || statues.length === 0
-              ? undefined
-              : statues,
-          first: totalRows,
-          field: field,
-          direction: direction
-        }
-      }).then((res) => {
-        if (res.data) {
-          prodCheckDispatch({ type: 'FETCH_DATA_SUCCESS' })
-        }
-      })
-    }
-  }
-
   // CLEAR SERACH
   const handleClear = async () => {
+    setCheckSearch('')
     await refetch({
       variables: {
         projectId: productId,
@@ -258,6 +225,51 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
     }).then(
       (res) => res.data && prodCheckDispatch({ type: 'CLEAR_SEARCH_INPUT' })
     )
+  }
+
+  // ON SEARCH INPUT CHANGE
+  const onSearchInputChange = (e) => {
+    const { value } = e.target
+    if (value === '') {
+      handleClear()
+    } else {
+      setCheckSearch(value)
+    }
+  }
+
+  // SEARCH COMPONENT
+  const handleSearch = async (event) => {
+    const { value } = event.target
+    if (event.key === 'Enter' && checkSearch !== '') {
+      await refetch({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId,
+          search: value,
+          checkId:
+            rules.includes('all') || rules.length === 0 ? undefined : rules,
+          category:
+            categories.includes('all') || categories.length === 0
+              ? undefined
+              : categories,
+          severity:
+            severities.includes('all') || severities.length === 0
+              ? undefined
+              : severities,
+          status:
+            statues.includes('all') || statues.length === 0
+              ? undefined
+              : statues,
+          first: totalRows,
+          field: field,
+          direction: direction
+        }
+      }).then((res) => {
+        if (res.data) {
+          prodCheckDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
+        }
+      })
+    }
   }
 
   // SET ROW LENGTH
@@ -298,7 +310,8 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
           {/* SEARCH COMPONENTS */}
           <SearchFilter
             id='healthcheck'
-            filterText={searchInput}
+            filterText={checkSearch}
+            onChange={onSearchInputChange}
             onFilter={handleSearch}
             onClear={handleClear}
           />
@@ -325,7 +338,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
         </Tooltip>
       </Flex>
     )
-  }, [filters, handleReCheck])
+  }, [checkSearch, filters, handleClear, onSearchInputChange, handleReCheck])
 
   const handleOpenLicense = () => {
     prodCompDispatch({ type: 'CLEAR_LICENSES' })

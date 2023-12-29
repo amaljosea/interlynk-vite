@@ -135,7 +135,7 @@ function ActivitiesOverviewRow(props) {
           {event} by {changedBy}
         </Text>
         <Flex direction='row' gap={2}>
-        <Text fontSize='sm' color={textColor} fontWeight='normal'>
+        <Text fontSize='sm' color={textColor} fontWeight='normal' width={'90%'}>
           {valueToText(action, event, orig, updated)}
         </Text>
         </Flex>

@@ -112,7 +112,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
   }
 
   const [activeRow, setActiveRow] = useState(null)
-  const [filterText, setFilterText] = useState('')
+  const [compSearch, setCompSearch] = useState('')
 
   const compBtn = useRef(null)
   const linkRef = useRef(null)
@@ -826,11 +826,6 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
     )
   }
 
-  // ON SEARCH INPUT CHANGE
-  const onSearchInputChange = (e) => {
-    prodCompDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: e.target.value })
-  }
-
   const compData = {
     projectId: productId,
     sbomId: sbomId,
@@ -852,25 +847,30 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
     direction: direction
   }
 
-  // SEARCH COMPONENT
-  const handleSearch = async (event) => {
-    if (event.key === 'Enter' && searchInput !== '') {
-      await refetch({
-        ...compData,
-        first: totalRows,
-        last: undefined,
-        after: undefined,
-        before: undefined
-      }).then(
-        (res) => res.data && prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
-      )
-    }
-  }
-
   // CLEAR SERACH
   const handleClear = async () => {
+    setCompSearch('')
     await refetch({
-      ...compData,
+      projectId: productId,
+      sbomId: sbomId,
+      search: undefined,
+      ecosystem:
+        ecosystems.includes('all') || ecosystems.length === 0
+          ? undefined
+          : ecosystems,
+      kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
+      licenses:
+        licenses.includes('all') || licenses.length === 0
+          ? undefined
+          : licenses,
+      supplierName:
+        suppliers.includes('all') || suppliers.length === 0
+          ? undefined
+          : suppliers,
+      primary: scope === 'primary' ? true : undefined,
+      internal: scope === 'internal' ? true : undefined,
+      field: field,
+      direction: direction,
       first: totalRows,
       last: undefined,
       after: undefined,
@@ -878,6 +878,53 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
     }).then(
       (res) => res.data && prodCompDispatch({ type: 'CLEAR_SEARCH_INPUT' })
     )
+  }
+
+  // ON SEARCH INPUT CHANGE
+  const onSearchInputChange = (e) => {
+    const { value } = e.target
+    if (value === '') {
+      handleClear()
+    } else {
+      setCompSearch(value)
+    }
+  }
+
+  // SEARCH COMPONENT
+  const handleSearch = async (event) => {
+    const { value } = event.target
+    if (event.key === 'Enter' && value !== '') {
+      await refetch({
+        projectId: productId,
+        sbomId: sbomId,
+        search: value,
+        ecosystem:
+          ecosystems.includes('all') || ecosystems.length === 0
+            ? undefined
+            : ecosystems,
+        kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
+        licenses:
+          licenses.includes('all') || licenses.length === 0
+            ? undefined
+            : licenses,
+        supplierName:
+          suppliers.includes('all') || suppliers.length === 0
+            ? undefined
+            : suppliers,
+        primary: scope === 'primary' ? true : undefined,
+        internal: scope === 'internal' ? true : undefined,
+        field: field,
+        direction: direction,
+        first: totalRows,
+        last: undefined,
+        after: undefined,
+        before: undefined
+      }).then(
+        (res) =>
+          res.data &&
+          prodCompDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
+      )
+    }
   }
 
   // SET ROW LENGTH
@@ -914,7 +961,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
           {/* SEARCH COMPONENTS */}
           <SearchFilter
             id='component'
-            filterText={searchInput}
+            filterText={compSearch}
             onFilter={handleSearch}
             onClear={handleClear}
             onChange={onSearchInputChange}
@@ -947,7 +994,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
         )}
       </Flex>
     )
-  }, [searchInput, onSearchInputChange, handleClear, handleSearch, filters])
+  }, [compSearch, onSearchInputChange, handleClear, handleSearch, filters])
 
   const handleRefetch = (after, before) => {
     refetch({

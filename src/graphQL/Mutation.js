@@ -36,6 +36,19 @@ export const InviteUser = gql`
   }
 `
 
+// USER EMAIL CONFIRMATION
+export const UserEmailConfirmation = gql`
+  mutation UserEmailConfirmation($token: String!) {
+    userEmailConfirmation(input: { confirmationToken: $token }) {
+      user {
+        name
+        email
+      }
+      errors
+    }
+  }
+`
+
 // ACCEPT INVITATION
 export const AcceptInvitation = gql`
   mutation AcceptInvitation($token: String!, $nonce: String!) {

@@ -40,7 +40,6 @@ const TeamModal = ({ isOpen, onClose, refetch }) => {
     try {
       await inviteUsers({
         variables: {
-          name: user,
           email: email.toLowerCase()
         }
       }).then((res) => {
@@ -65,7 +64,7 @@ const TeamModal = ({ isOpen, onClose, refetch }) => {
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Add Member</ModalHeader>
+        <ModalHeader>Invite User</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Stack direction={'column'} alignItems={'flex-start'} spacing={4}>
@@ -76,7 +75,7 @@ const TeamModal = ({ isOpen, onClose, refetch }) => {
               </Alert>
             )}
             {/* NAME */}
-            <FormControl isRequired>
+            <FormControl isRequired display={'none'}>
               <FormLabel>Name</FormLabel>
               <Input
                 type='text'
@@ -113,7 +112,7 @@ const TeamModal = ({ isOpen, onClose, refetch }) => {
           <Button
             variant='solid'
             colorScheme='blue'
-            disabled={user === '' || !validateEmail(email)}
+            disabled={!validateEmail(email)}
             onClick={handleAdd}
           >
             Add
