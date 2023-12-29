@@ -91,7 +91,7 @@ const UploadModal = ({ id, isOpen, onClose }) => {
               </Alert>
             )}
             <Box>
-              <Text fontSize={'sm'} mb={5}>Interlynk currently supports importing CycloneDX 1.4 and 1.5 SBOM in JSON format</Text>
+              <Text fontSize={'sm'} mb={5}>Interlynk currently supports importing CycloneDX 1.4/1.5 SBOM in JSON and XML formats</Text>
               <FormLabel htmlFor='file' width={'100%'} cursor={'pointer'}>
                 <Input
                   type='file'

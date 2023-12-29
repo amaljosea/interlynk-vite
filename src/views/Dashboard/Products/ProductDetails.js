@@ -32,14 +32,14 @@ import CardBody from 'components/Card/CardBody'
 import VersionTable from 'components/Tables/VersionTable'
 import { useEffect, useState } from 'react'
 import {
-  FaCube,
   FaLayerGroup,
   FaPenToSquare,
   FaScrewdriverWrench,
   FaToggleOn,
   FaTrashCan,
   FaUpload,
-  FaToggleOff
+  FaToggleOff,
+  FaWindowMaximize
 } from 'react-icons/fa6'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { timeSince, getFullDateAndTime, removeDuplicates } from 'utils'
@@ -272,7 +272,7 @@ const ProductDetails = () => {
                       width={'100%'}
                     >
                       <Icon
-                        as={FaCube}
+                        as={FaWindowMaximize}
                         h={'64px'}
                         w={'64px'}
                         color='blue.300'

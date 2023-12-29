@@ -125,7 +125,7 @@ const VulnsTable = ({ data }) => {
       selector: (row) => {
         const { vuln } = row
         const { vulnInfo } = vuln
-        const { epssScores } = vulnInfo
+        const { epssScores } = vulnInfo ? vulnInfo : ''
 
         return (
           <Flex minWidth='max-content' alignItems='center' gap='0'>

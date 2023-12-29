@@ -1,6 +1,9 @@
 // Chakra imports
 import {
+  Button,
   Flex,
+  Heading,
+  Stack,
   Table,
   TagLabel,
   Thead,
@@ -8,12 +11,8 @@ import {
   Tr,
   Th,
   Td,
-  Image,
-  Text,
-  Heading,
-  Button,
-  Tag,
-  Stack
+  Tooltip,
+  Tag
 } from '@chakra-ui/react'
 // Custom components
 import Card from 'components/Card/Card'
@@ -64,77 +63,75 @@ const ProductsOverview = ({ title, captions, data }) => {
                         {item?.primaryComponent?.version}
                       </Td>
                       <Td fontSize={'sm'} pl={1}>
-                      <Tag
-                        size='md'
-                        variant='subtle'
-                        width={16}
-                        colorScheme={'blue'}
-                        cursor={'pointer'}
-                      >
-                        <TagLabel mx={'auto'}>
-                          {item?.stats?.compCount || 0}
-                        </TagLabel>
-                      </Tag>
+                        <Tag
+                          size='md'
+                          variant='subtle'
+                          width={16}
+                          colorScheme={'blue'}
+                          cursor={'pointer'}
+                        >
+                          <TagLabel mx={'auto'}>
+                            {item?.stats?.compCount || 0}
+                          </TagLabel>
+                        </Tag>
                       </Td>
                       <Td fontSize={'sm'} pl={1}>
-                      <Tag
-                        size='md'
-                        variant='subtle'
-                        width={16}
-                        colorScheme={'blue'}
-                        cursor={'pointer'}
-                      >
-                        <TagLabel mx={'auto'}>
-                          {item?.stats?.compLicenseCount || 0}
-                        </TagLabel>
-                      </Tag>
+                        <Tag
+                          size='md'
+                          variant='subtle'
+                          width={16}
+                          colorScheme={'blue'}
+                          cursor={'pointer'}
+                        >
+                          <TagLabel mx={'auto'}>
+                            {item?.stats?.compLicenseCount || 0}
+                          </TagLabel>
+                        </Tag>
                       </Td>
                       <Td fontSize={'sm'} pl={1}>
                         <Stack spacing={1} direction={'row'}>
-                        <Link to={'https://google.com'}>
-                        <VulnBadge
-                          color='red'
-                          label='Critical'
-                          onClick={() => onFilterSev(['critical'])}
-                        >
+                          <Link to={'https://google.com'}>
+                          <VulnBadge
+                            color='red'
+                            label='Critical'
+                            onClick={() => onFilterSev(['critical'])}
+                          >
                             {item?.stats?.vulnStats?.critical || 0}
-
-                        </VulnBadge>
-                        </Link>
-                        <Link to={'https://google.com'}>
-                          <VulnBadge
-                            color='orange'
-                            label='high'
-                            onClick={() => onFilterSev(['critical'])}
-                          >
-                                        {item?.stats?.vulnStats?.high || 0}
-
                           </VulnBadge>
-                        </Link>
-                        <Link to={'https://google.com'}>
-                          <VulnBadge
-                            color='yellow'
-                            label='medium'
-                            onClick={() => onFilterSev(['critical'])}
-                          >
-                                        {item?.stats?.vulnStats?.medium || 0}
-
-                          </VulnBadge>
-                        </Link>
-                        <Link to={'https://google.com'}>
-                          <VulnBadge
-                            color='green'
-                            label='low'
-                            onClick={() => onFilterSev(['critical'])}
-                          >
-                                        {item?.stats?.vulnStats?.low || 0}
-
-                                  </VulnBadge>
-                                </Link>
+                          </Link>
+                          <Link to={'https://google.com'}>
+                            <VulnBadge
+                              color='orange'
+                              label='High'
+                              onClick={() => onFilterSev(['critical'])}
+                            >
+                              {item?.stats?.vulnStats?.high || 0}
+                            </VulnBadge>
+                          </Link>
+                          <Link to={'https://google.com'}>
+                            <VulnBadge
+                              color='yellow'
+                              label='Medium'
+                              onClick={() => onFilterSev(['critical'])}
+                            >
+                            {item?.stats?.vulnStats?.medium || 0}
+                            </VulnBadge>
+                          </Link>
+                          <Link to={'https://google.com'}>
+                            <VulnBadge
+                              color='green'
+                              label='Low'
+                              onClick={() => onFilterSev(['critical'])}
+                            >
+                              {item?.stats?.vulnStats?.low || 0}
+                            </VulnBadge>
+                          </Link>
                         </Stack>
                       </Td>
                       <Td fontSize={'sm'} pl={1}>
-                        {timeSince(item.createdAt)}
+                        <Tooltip placement='top' label={getFullDateAndTime(item.createdAt)}>
+                          {timeSince(item.createdAt)}
+                        </Tooltip>
                       </Td>
                     </Tr>
                   ))}

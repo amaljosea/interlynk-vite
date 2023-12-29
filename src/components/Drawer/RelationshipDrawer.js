@@ -258,7 +258,7 @@ const RelationshipDrawer = ({
                           .sort((a, b) => a.name.localeCompare(b.name))
                           .map((item, idx) => (
                             <option key={idx} value={item.id}>
-                              {item.name}-{item.version}{item.primary ? `- Primary` : ''}
+                              {item.name}-{item.version}{item.primary ? ` [Primary Component]` : ''}
                             </option>
                           ))}
                       </Select>

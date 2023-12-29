@@ -50,7 +50,7 @@ export default function Dashboard() {
               {/* STATS */}
               <SimpleGrid columns={{ sm: 1, md: 2, xl: 4 }} spacing='24px'>
                 <MiniStatistics
-                  title={'Active Products'}
+                  title={'Products'}
                   amount={metrics?.organizationMetric?.projectCount}
                   percentage={9}
                   icon={
