@@ -24,7 +24,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 
 import { scanImage, getConImg } from 'utils'
-import { getFullDateAndTime, timeSince} from 'utils'
+import { getFullDateAndTime, timeSince } from 'utils'
 
 const ProductsOverview = ({ title, captions, data }) => {
   return (
@@ -59,8 +59,9 @@ const ProductsOverview = ({ title, captions, data }) => {
                       <Td fontSize={'sm'} pl={1}>
                         {item?.project?.name}
                       </Td>
-                      <Td fontSize={'sm'} pl={1}>
-                        {item?.primaryComponent?.version}
+                      <Td fontSize={'sm'} pl={1} width={24}>
+                        {item?.primaryComponent?.version ||
+                          `Uploaded ${getFullDateAndTime(item?.createdAt)}`}
                       </Td>
                       <Td fontSize={'sm'} pl={1}>
                         <Tag
@@ -91,13 +92,13 @@ const ProductsOverview = ({ title, captions, data }) => {
                       <Td fontSize={'sm'} pl={1}>
                         <Stack spacing={1} direction={'row'}>
                           <Link to={'https://google.com'}>
-                          <VulnBadge
-                            color='red'
-                            label='Critical'
-                            onClick={() => onFilterSev(['critical'])}
-                          >
-                            {item?.stats?.vulnStats?.critical || 0}
-                          </VulnBadge>
+                            <VulnBadge
+                              color='red'
+                              label='Critical'
+                              onClick={() => onFilterSev(['critical'])}
+                            >
+                              {item?.stats?.vulnStats?.critical || 0}
+                            </VulnBadge>
                           </Link>
                           <Link to={'https://google.com'}>
                             <VulnBadge
@@ -114,7 +115,7 @@ const ProductsOverview = ({ title, captions, data }) => {
                               label='Medium'
                               onClick={() => onFilterSev(['critical'])}
                             >
-                            {item?.stats?.vulnStats?.medium || 0}
+                              {item?.stats?.vulnStats?.medium || 0}
                             </VulnBadge>
                           </Link>
                           <Link to={'https://google.com'}>
@@ -129,7 +130,10 @@ const ProductsOverview = ({ title, captions, data }) => {
                         </Stack>
                       </Td>
                       <Td fontSize={'sm'} pl={1}>
-                        <Tooltip placement='top' label={getFullDateAndTime(item.createdAt)}>
+                        <Tooltip
+                          placement='top'
+                          label={getFullDateAndTime(item.createdAt)}
+                        >
                           {timeSince(item.createdAt)}
                         </Tooltip>
                       </Td>
