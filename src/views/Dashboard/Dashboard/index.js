@@ -13,8 +13,17 @@ import { useQuery } from '@apollo/client'
 import OrgRegister from '../Profile/components/OrgRegister'
 import { useEffect } from 'react'
 import { GetOrgMetrics } from 'graphQL/Queries'
+import { useGlobalState } from 'hooks/useGlobalState'
+import { useLocation } from 'react-router-dom'
 
 export default function Dashboard() {
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const product = queryParams.get('id')
+
+  const { dispatch } = useGlobalState()
+  const { prodCompDispatch, prodVulnDispatch } = dispatch
+
   const iconBoxInside = useColorModeValue('white', 'white')
 
   const { data } = useQuery(GetOrg)
@@ -34,6 +43,13 @@ export default function Dashboard() {
       console.log('Matrics', metrics)
     }
   }, [metrics])
+
+  useEffect(() => {
+    if (product === null) {
+      prodCompDispatch({ type: 'CLEAR_PROD_COMP' })
+      prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
+    }
+  }, [product])
 
   return (
     <>

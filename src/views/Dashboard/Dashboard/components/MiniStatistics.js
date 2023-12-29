@@ -53,7 +53,7 @@ const MiniStatistics = ({ title, amount, icon }) => {
                 </Stack>
               ) : (
                 <StatNumber fontSize='lg' color={textColor}>
-                  {amount}
+                  {amount || 0}
                 </StatNumber>
               )}
             </Box>

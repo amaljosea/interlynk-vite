@@ -19,14 +19,81 @@ import Card from 'components/Card/Card'
 import CardHeader from 'components/Card/CardHeader'
 import CardBody from 'components/Card/CardBody'
 import VulnBadge from 'components/Misc/VulnBadge'
-
 import React from 'react'
 import { Link } from 'react-router-dom'
-
-import { scanImage, getConImg } from 'utils'
 import { getFullDateAndTime, timeSince } from 'utils'
+import { useGlobalState } from 'hooks/useGlobalState'
+import { useQuery } from '@apollo/client'
+import { GetVulnData } from 'graphQL/Queries'
 
 const ProductsOverview = ({ title, captions, data }) => {
+  const { totalRows, setActiveSbomTab, prodVulnState, dispatch } =
+    useGlobalState()
+  const { field, direction } = prodVulnState
+  const { prodDispatch, prodVulnDispatch } = dispatch
+
+  const { refetch } = useQuery(GetVulnData, {
+    fetchPolicy: 'network-only',
+    skip: true
+  })
+
+  const handleClick = (prod) => {
+    const { project, id, projectId, primaryComponent } = prod
+    const { sboms, name } = project
+
+    const product = {
+      id: projectId,
+      name: name,
+      version: primaryComponent?.version || '',
+      sbomId: id
+    }
+
+    if (sboms.length > 0) {
+      localStorage.setItem('product', JSON.stringify(product))
+      localStorage.setItem('activeProdTab', 0)
+      prodDispatch({
+        type: 'SET_CURRENT_PRODUCT',
+        payload: {
+          id: projectId,
+          sbomId: id
+        }
+      })
+    }
+    setActiveSbomTab(0)
+  }
+
+  const onVersionClick = (item) => {
+    localStorage.setItem(
+      'currentSBOM',
+      JSON.stringify({
+        version: item?.primaryComponent?.version || '',
+        id: item?.id
+      })
+    )
+    localStorage.setItem('activeSbomTab', 0)
+    setActiveSbomTab(0)
+  }
+
+  const onFilterComp = (item) => {
+    localStorage.setItem(
+      'currentSBOM',
+      JSON.stringify({
+        version: item?.primaryComponent?.version,
+        id: item.id
+      })
+    )
+    localStorage.setItem('activeSbomTab', 2)
+  }
+
+  const onFilterSev = async (id, primaryComponent, value) => {
+    localStorage.setItem(
+      'currentSBOM',
+      JSON.stringify({ version: primaryComponent?.version, id: id })
+    )
+    localStorage.setItem('activeSbomTab', 3)
+    prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
+  }
+
   return (
     <Flex width={'100%'} direction='column'>
       <Flex
@@ -56,26 +123,56 @@ const ProductsOverview = ({ title, captions, data }) => {
                 {data?.length > 0 &&
                   data?.map((item) => (
                     <Tr key={item.id} fontFamily={'inherit'}>
-                      <Td fontSize={'sm'} pl={1}>
-                        {item?.project?.name}
-                      </Td>
-                      <Td fontSize={'sm'} pl={1} width={24}>
-                        {item?.primaryComponent?.version ||
-                          `Uploaded ${getFullDateAndTime(item?.createdAt)}`}
-                      </Td>
-                      <Td fontSize={'sm'} pl={1}>
-                        <Tag
-                          size='md'
-                          variant='subtle'
-                          width={16}
-                          colorScheme={'blue'}
-                          cursor={'pointer'}
+                      {/* NAME */}
+                      <Td
+                        fontSize={'sm'}
+                        pl={1}
+                        color='blue.500'
+                        _hover={{ textDecoration: 'underline' }}
+                      >
+                        <Link
+                          to={`/vendor/products/${item?.project?.name}?id=${item?.projectId}`}
+                          onClick={() => handleClick(item)}
                         >
-                          <TagLabel mx={'auto'}>
-                            {item?.stats?.compCount || 0}
-                          </TagLabel>
-                        </Tag>
+                          {item?.project?.name}
+                        </Link>
                       </Td>
+                      {/* VERSIONS */}
+                      <Td
+                        fontSize={'sm'}
+                        pl={1}
+                        width={24}
+                        color='blue.500'
+                        _hover={{ textDecoration: 'underline' }}
+                      >
+                        <Link
+                          to={`/vendor/products/${item?.project?.name}?id=${item?.projectId}&sbom=${item?.id}`}
+                          onClick={() => onVersionClick(item)}
+                        >
+                          {item?.primaryComponent?.version ||
+                            `Uploaded ${getFullDateAndTime(item?.createdAt)}`}
+                        </Link>
+                      </Td>
+                      {/* COMPONENTS */}
+                      <Td fontSize={'sm'} pl={1}>
+                        <Link
+                          to={`/vendor/products/${item?.project?.name}?id=${item?.projectId}&sbom=${item?.id}`}
+                          onClick={() => onFilterComp(item)}
+                        >
+                          <Tag
+                            size='md'
+                            variant='subtle'
+                            width={16}
+                            colorScheme={'blue'}
+                            cursor={'pointer'}
+                          >
+                            <TagLabel mx={'auto'}>
+                              {item?.stats?.compCount || 0}
+                            </TagLabel>
+                          </Tag>
+                        </Link>
+                      </Td>
+                      {/* LICENSES */}
                       <Td fontSize={'sm'} pl={1}>
                         <Tag
                           size='md'
@@ -89,46 +186,60 @@ const ProductsOverview = ({ title, captions, data }) => {
                           </TagLabel>
                         </Tag>
                       </Td>
+                      {/* VULNERABILITIES */}
                       <Td fontSize={'sm'} pl={1}>
                         <Stack spacing={1} direction={'row'}>
-                          <Link to={'https://google.com'}>
-                            <VulnBadge
-                              color='red'
-                              label='Critical'
-                              onClick={() => onFilterSev(['critical'])}
-                            >
+                          <Link
+                            to={`/vendor/products/${item?.project?.name}?id=${item?.projectId}&sbom=${item?.id}`}
+                            onClick={() =>
+                              onFilterSev(item?.id, item?.primaryComponent, [
+                                'critical'
+                              ])
+                            }
+                          >
+                            <VulnBadge color='red' label='Critical'>
                               {item?.stats?.vulnStats?.critical || 0}
                             </VulnBadge>
                           </Link>
-                          <Link to={'https://google.com'}>
-                            <VulnBadge
-                              color='orange'
-                              label='High'
-                              onClick={() => onFilterSev(['critical'])}
-                            >
+                          <Link
+                            to={`/vendor/products/${item?.project?.name}?id=${item?.projectId}&sbom=${item?.id}`}
+                            onClick={() =>
+                              onFilterSev(item?.id, item?.primaryComponent, [
+                                'high'
+                              ])
+                            }
+                          >
+                            <VulnBadge color='orange' label='High'>
                               {item?.stats?.vulnStats?.high || 0}
                             </VulnBadge>
                           </Link>
-                          <Link to={'https://google.com'}>
-                            <VulnBadge
-                              color='yellow'
-                              label='Medium'
-                              onClick={() => onFilterSev(['critical'])}
-                            >
+                          <Link
+                            to={`/vendor/products/${item?.project?.name}?id=${item?.projectId}&sbom=${item?.id}`}
+                            onClick={() =>
+                              onFilterSev(item?.id, item?.primaryComponent, [
+                                'medium'
+                              ])
+                            }
+                          >
+                            <VulnBadge color='yellow' label='Medium'>
                               {item?.stats?.vulnStats?.medium || 0}
                             </VulnBadge>
                           </Link>
-                          <Link to={'https://google.com'}>
-                            <VulnBadge
-                              color='green'
-                              label='Low'
-                              onClick={() => onFilterSev(['critical'])}
-                            >
+                          <Link
+                            to={`/vendor/products/${item?.project?.name}?id=${item?.projectId}&sbom=${item?.id}`}
+                            onClick={() =>
+                              onFilterSev(item?.id, item?.primaryComponent, [
+                                'low'
+                              ])
+                            }
+                          >
+                            <VulnBadge color='green' label='Low'>
                               {item?.stats?.vulnStats?.low || 0}
                             </VulnBadge>
                           </Link>
                         </Stack>
                       </Td>
+                      {/* CREATED AT */}
                       <Td fontSize={'sm'} pl={1}>
                         <Tooltip
                           placement='top'

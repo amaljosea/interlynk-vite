@@ -94,6 +94,9 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
         kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
       epss: epss === 'all' || epss === '0-0' || epss === '' ? undefined : range,
       first: totalRows,
+      last: undefined,
+      after: undefined,
+      before: undefined,
       field: field,
       direction: direction
     })
