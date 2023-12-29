@@ -120,29 +120,30 @@ const SBOMTable = ({
       setActiveSbomTab(2)
       // FETCH COMPONENT DATA
       getCompData({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          search: searchInput !== '' ? searchInput : undefined,
-          ecosystem:
-            ecosystems.includes('all') || ecosystems.length === 0
-              ? undefined
-              : ecosystems,
-          kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
-          licenses:
-            licenses.includes('all') || licenses.length === 0
-              ? undefined
-              : licenses,
-          supplierName:
-            suppliers.includes('all') || suppliers.length === 0
-              ? undefined
-              : suppliers,
-          primary: scope === 'primary' ? true : undefined,
-          internal: scope === 'internal' ? true : undefined,
-          first: totalRows,
-          field: field,
-          direction: direction
-        }
+        projectId: productId,
+        sbomId: sbomId,
+        search: searchInput !== '' ? searchInput : undefined,
+        ecosystem:
+          ecosystems.includes('all') || ecosystems.length === 0
+            ? undefined
+            : ecosystems,
+        kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
+        licenses:
+          licenses.includes('all') || licenses.length === 0
+            ? undefined
+            : licenses,
+        supplierName:
+          suppliers.includes('all') || suppliers.length === 0
+            ? undefined
+            : suppliers,
+        primary: scope === 'primary' ? true : undefined,
+        internal: scope === 'internal' ? true : undefined,
+        first: totalRows,
+        last: undefined,
+        after: undefined,
+        before: undefined,
+        field: field,
+        direction: direction
       }).then((res) => {
         if (res.data) {
           prodCompDispatch({

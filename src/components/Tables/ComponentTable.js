@@ -84,38 +84,31 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
 
   const fetchCompData = async () => {
     await refetch({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        search: searchInput !== '' ? searchInput : undefined,
-        ecosystem:
-          ecosystems.includes('all') || ecosystems.length === 0
-            ? undefined
-            : ecosystems,
-        kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
-        licenses:
-          licenses.includes('all') || licenses.length === 0
-            ? undefined
-            : licenses,
-        supplierName:
-          suppliers.includes('all') || suppliers.length === 0
-            ? undefined
-            : suppliers,
-        primary: scope === 'primary' ? true : undefined,
-        internal: scope === 'internal' ? true : undefined,
-        first: totalRows,
-        field: field,
-        direction: direction
-      }
+      projectId: productId,
+      sbomId: sbomId,
+      search: searchInput !== '' ? searchInput : undefined,
+      ecosystem:
+        ecosystems.includes('all') || ecosystems.length === 0
+          ? undefined
+          : ecosystems,
+      kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
+      licenses:
+        licenses.includes('all') || licenses.length === 0
+          ? undefined
+          : licenses,
+      supplierName:
+        suppliers.includes('all') || suppliers.length === 0
+          ? undefined
+          : suppliers,
+      primary: scope === 'primary' ? true : undefined,
+      internal: scope === 'internal' ? true : undefined,
+      first: totalRows,
+      last: undefined,
+      after: undefined,
+      before: undefined,
+      field: field,
+      direction: direction
     })
-      .then((res) => {
-        if (res.data) {
-          navigate(
-            `/vendor/products/${currentProduct.name}?id=${productId}&sbom=${sbomId}`
-          )
-        }
-      })
-      .finally(() => setActiveSbomTab(2))
   }
 
   const [activeRow, setActiveRow] = useState(null)
@@ -603,13 +596,11 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
       }).then((res) => {
         if (res.data) {
           refetch({
-            variables: {
-              projectId: productId,
-              sbomId: sbomId,
-              first: totalRows,
-              field: field,
-              direction: direction
-            }
+            projectId: productId,
+            sbomId: sbomId,
+            first: totalRows,
+            field: field,
+            direction: direction
           })
         }
       })
@@ -840,33 +831,36 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
     prodCompDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: e.target.value })
   }
 
+  const compData = {
+    projectId: productId,
+    sbomId: sbomId,
+    search: searchInput !== '' ? searchInput : undefined,
+    ecosystem:
+      ecosystems.includes('all') || ecosystems.length === 0
+        ? undefined
+        : ecosystems,
+    kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
+    licenses:
+      licenses.includes('all') || licenses.length === 0 ? undefined : licenses,
+    supplierName:
+      suppliers.includes('all') || suppliers.length === 0
+        ? undefined
+        : suppliers,
+    primary: scope === 'primary' ? true : undefined,
+    internal: scope === 'internal' ? true : undefined,
+    field: field,
+    direction: direction
+  }
+
   // SEARCH COMPONENT
   const handleSearch = async (event) => {
     if (event.key === 'Enter' && searchInput !== '') {
       await refetch({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          search: searchInput !== '' ? searchInput : undefined,
-          ecosystem:
-            ecosystems.includes('all') || ecosystems.length === 0
-              ? undefined
-              : ecosystems,
-          kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
-          licenses:
-            licenses.includes('all') || licenses.length === 0
-              ? undefined
-              : licenses,
-          supplierName:
-            suppliers.includes('all') || suppliers.length === 0
-              ? undefined
-              : suppliers,
-          primary: scope === 'primary' ? true : undefined,
-          internal: scope === 'internal' ? true : undefined,
-          first: totalRows,
-          field: field,
-          direction: direction
-        }
+        ...compData,
+        first: totalRows,
+        last: undefined,
+        after: undefined,
+        before: undefined
       }).then(
         (res) => res.data && prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
       )
@@ -876,29 +870,11 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
   // CLEAR SERACH
   const handleClear = async () => {
     await refetch({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        search: undefined,
-        ecosystem:
-          ecosystems.includes('all') || ecosystems.length === 0
-            ? undefined
-            : ecosystems,
-        kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
-        licenses:
-          licenses.includes('all') || licenses.length === 0
-            ? undefined
-            : licenses,
-        supplierName:
-          suppliers.includes('all') || suppliers.length === 0
-            ? undefined
-            : suppliers,
-        primary: scope === 'primary' ? true : undefined,
-        internal: scope === 'internal' ? true : undefined,
-        first: totalRows,
-        field: field,
-        direction: direction
-      }
+      ...compData,
+      first: totalRows,
+      last: undefined,
+      after: undefined,
+      before: undefined
     }).then(
       (res) => res.data && prodCompDispatch({ type: 'CLEAR_SEARCH_INPUT' })
     )
@@ -908,13 +884,14 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
   const handleSetRow = async (e) => {
     setTotalRows(Number(e.target.value))
     await refetch({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        first: Number(e.target.value),
-        field: customerView ? signedCompField : field,
-        direction: customerView ? signedCompDirection : direction
-      }
+      projectId: productId,
+      sbomId: sbomId,
+      first: Number(e.target.value),
+      last: undefined,
+      after: undefined,
+      before: undefined,
+      field: customerView ? signedCompField : field,
+      direction: customerView ? signedCompDirection : direction
     }).then(
       (res) => res.data && prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
     )
@@ -974,60 +951,59 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
 
   const handleRefetch = (after, before) => {
     refetch({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        first: after ? totalRows : undefined,
-        after: after ? after : undefined,
-        last: before ? totalRows : undefined,
-        before: before ? before : undefined,
-        search: searchInput !== '' ? searchInput : undefined,
-        ecosystem:
-          ecosystems.includes('all') || ecosystems.length === 0
-            ? undefined
-            : ecosystems,
-        kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
-        licenses:
-          licenses.includes('all') || licenses.length === 0
-            ? undefined
-            : licenses,
-        supplierName:
-          suppliers.includes('all') || suppliers.length === 0
-            ? undefined
-            : suppliers,
-        primary: scope === 'primary' ? true : undefined,
-        internal: scope === 'internal' ? true : undefined,
-        field: customerView ? signedCompField : field,
-        direction: customerView ? signedCompDirection : direction
-      }
+      projectId: productId,
+      sbomId: sbomId,
+      first: after ? totalRows : undefined,
+      after: after ? after : undefined,
+      last: before ? totalRows : undefined,
+      before: before ? before : undefined,
+      search: searchInput !== '' ? searchInput : undefined,
+      ecosystem:
+        ecosystems.includes('all') || ecosystems.length === 0
+          ? undefined
+          : ecosystems,
+      kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
+      licenses:
+        licenses.includes('all') || licenses.length === 0
+          ? undefined
+          : licenses,
+      supplierName:
+        suppliers.includes('all') || suppliers.length === 0
+          ? undefined
+          : suppliers,
+      primary: scope === 'primary' ? true : undefined,
+      internal: scope === 'internal' ? true : undefined,
+      field: customerView ? signedCompField : field,
+      direction: customerView ? signedCompDirection : direction
     })
   }
 
   const handleSort = async (column, sortDirection) => {
     refetch({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        first: totalRows,
-        search: searchInput !== '' ? searchInput : undefined,
-        ecosystem:
-          ecosystems.includes('all') || ecosystems.length === 0
-            ? undefined
-            : ecosystems,
-        kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
-        licenses:
-          licenses.includes('all') || licenses.length === 0
-            ? undefined
-            : licenses,
-        supplierName:
-          suppliers.includes('all') || suppliers.length === 0
-            ? undefined
-            : suppliers,
-        primary: scope === 'primary' ? true : undefined,
-        internal: scope === 'internal' ? true : undefined,
-        field: column.id,
-        direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
-      }
+      projectId: productId,
+      sbomId: sbomId,
+      first: totalRows,
+      last: undefined,
+      after: undefined,
+      before: undefined,
+      search: searchInput !== '' ? searchInput : undefined,
+      ecosystem:
+        ecosystems.includes('all') || ecosystems.length === 0
+          ? undefined
+          : ecosystems,
+      kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
+      licenses:
+        licenses.includes('all') || licenses.length === 0
+          ? undefined
+          : licenses,
+      supplierName:
+        suppliers.includes('all') || suppliers.length === 0
+          ? undefined
+          : suppliers,
+      primary: scope === 'primary' ? true : undefined,
+      internal: scope === 'internal' ? true : undefined,
+      field: column.id,
+      direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
     }).then((res) => {
       if (res.data) {
         prodCompDispatch({
@@ -1042,14 +1018,16 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
   }
 
   const handlePreviousPage = async () => {
+    handleRefetch(null, data.pageInfo.startCursor)
     prodCompDispatch({
       type: 'DECREMENT_PAGE',
       payload: data.pageInfo.startCursor
     })
-    handleRefetch(null, data.pageInfo.startCursor)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const handleNextPage = async () => {
+    handleRefetch(data.pageInfo.endCursor, null)
     prodCompDispatch({
       type: 'INCREMENT_PAGE',
       payload: {
@@ -1057,7 +1035,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
         after: data.pageInfo.endCursor
       }
     })
-    handleRefetch(data.pageInfo.endCursor, null)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   useEffect(() => {

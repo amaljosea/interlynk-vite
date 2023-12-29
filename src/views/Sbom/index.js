@@ -30,7 +30,8 @@ const idRegex =
   /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
 
 function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
-  const { activeSbomTab, setActiveSbomTab, prodState } = useGlobalState()
+  const { totalRows, setActiveSbomTab, prodState, prodCompState } =
+    useGlobalState()
   const { field, direction } = prodState
   const location = useLocation()
   const navigate = useNavigate()
@@ -52,12 +53,20 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
   })
 
   // GET COMPONENT DATA
-  const [getCompData, { data: compData, error: compError }] = useLazyQuery(
-    GetComponentData,
-    {
-      fetchPolicy: 'network-only'
+  const {
+    data: compData,
+    refetch: compRefetch,
+    error: compError
+  } = useQuery(GetComponentData, {
+    fetchPolicy: 'network-only',
+    variables: {
+      projectId: productId,
+      sbomId: sbomId,
+      first: totalRows,
+      field: prodCompState.field,
+      direction: prodCompState.direction
     }
-  )
+  })
 
   const {
     data: sbomData,
@@ -143,7 +152,7 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
           <SbomInfo
             sbom={sbomData?.sbom}
             refetch={refetch}
-            getCompData={getCompData}
+            getCompData={compRefetch}
             getVulnData={getVulnData}
             prodRefetch={prodRefetch}
           />
@@ -158,7 +167,7 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
             vulnData={vulnData}
             vulnRefetch={vulnRefetch}
             getVulnData={getVulnData}
-            getCompData={getCompData}
+            getCompData={compRefetch}
             compData={compData}
             error={compError}
             type={
