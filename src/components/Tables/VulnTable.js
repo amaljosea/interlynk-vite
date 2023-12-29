@@ -93,6 +93,7 @@ const VulnTable = ({
 
   const textColor = useColorModeValue('gray.700', 'white')
   const [hideColumn, setHideColumn] = useState(false)
+  const [vulnSearch, setVulnSearch] = useState('')
   const x = window.matchMedia('(min-width: 2500px)')
   const y = window.matchMedia('(max-width: 1440px)')
 
@@ -395,30 +396,21 @@ const VulnTable = ({
     direction: direction
   }
 
-  // ON SEARCH INPUT CHANGE
-  const onSearchInputChange = (e) => {
-    prodVulnDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: e.target.value })
-  }
-
-  // SEARCH COMPONENT
-  const handleSearch = async (event) => {
-    if (event.key === 'Enter') {
-      await refetch({
-        ...vulnData,
-        first: totalRows,
-        last: undefined,
-        after: undefined,
-        before: undefined
-      }).then(
-        (res) => res.data && prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
-      )
-    }
-  }
-
   // CLEAR SERACH
   const handleClear = async () => {
+    setVulnSearch('')
     await refetch({
-      ...vulnData,
+      projectId: productId,
+      sbomId: sbomId,
+      search: undefined,
+      severity: severities.length > 0 ? severities : undefined,
+      componentName: components.length > 0 ? components : undefined,
+      status: statues.length > 0 ? statues : undefined,
+      kev:
+        kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
+      epss: epss !== '' && epss !== 'all' ? range : undefined,
+      field: field,
+      direction: direction,
       first: totalRows,
       last: undefined,
       after: undefined,
@@ -426,6 +418,48 @@ const VulnTable = ({
     }).then(
       (res) => res.data && prodVulnDispatch({ type: 'CLEAR_SEARCH_INPUT' })
     )
+  }
+
+  // ON SEARCH INPUT CHANGE
+  const onSearchInputChange = (e) => {
+    const { value } = e.target
+    if (value === '') {
+      handleClear()
+    } else {
+      setVulnSearch(value)
+    }
+  }
+
+  // SEARCH COMPONENT
+  const handleSearch = async (event) => {
+    const { value } = event.target
+    if (event.key === 'Enter') {
+      await refetch({
+        projectId: productId,
+        sbomId: sbomId,
+        search: value !== '' ? value : undefined,
+        severity: severities.length > 0 ? severities : undefined,
+        componentName: components.length > 0 ? components : undefined,
+        status: statues.length > 0 ? statues : undefined,
+        kev:
+          kev === 'all' || kev === ''
+            ? undefined
+            : kev === 'yes'
+            ? true
+            : false,
+        epss: epss !== '' && epss !== 'all' ? range : undefined,
+        field: field,
+        direction: direction,
+        first: totalRows,
+        last: undefined,
+        after: undefined,
+        before: undefined
+      }).then(
+        (res) =>
+          res.data &&
+          prodVulnDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
+      )
+    }
   }
 
   const subHeaderComponentMemo = useMemo(() => {
@@ -444,7 +478,7 @@ const VulnTable = ({
           {/* SEARCH COMPONENTS */}
           <SearchFilter
             id='vuln'
-            filterText={searchInput}
+            filterText={vulnSearch}
             onChange={onSearchInputChange}
             onFilter={handleSearch}
             onClear={handleClear}
@@ -483,7 +517,7 @@ const VulnTable = ({
         )}
       </Flex>
     )
-  }, [searchInput, filters, onSearchInputChange, handleClear, handleSearch])
+  }, [vulnSearch, filters, onSearchInputChange, handleSearch])
 
   const ExpandedComponent = ({ data }) => {
     const { vuln } = data

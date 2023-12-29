@@ -434,6 +434,7 @@ const ProductTable = ({ data, refetch, org }) => {
             id='product'
             filterText={searchInput}
             onChange={onSearchInputChange}
+            onClear={handleClear}
             onFilter={handleSearch}
           />
           {/* FILTER PRODUCTS */}
@@ -464,6 +465,7 @@ const ProductTable = ({ data, refetch, org }) => {
   }, [
     searchInput,
     handleSearch,
+    handleClear,
     handleRefresh,
     onFilterActive,
     onSearchInputChange

@@ -9,7 +9,7 @@ import {
   Tooltip
 } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
-import React, { useMemo, useEffect } from 'react'
+import React, { useMemo, useEffect, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { useLocation } from 'react-router-dom'
 import { timeSince } from 'utils'
@@ -52,6 +52,8 @@ const SbomChangelogTable = ({ data, refetch }) => {
   const { totalRows, setTotalRows, sbomLogState, dispatch } = useGlobalState()
   const { filters, field, direction, pageIndex, searchInput } = sbomLogState
   const { sbomLogDispatch } = dispatch
+
+  const [logSearch, setLogSearch] = useState('')
 
   // COLUMNS
   const columns = [
@@ -325,31 +327,9 @@ const SbomChangelogTable = ({ data, refetch }) => {
     )
   }
 
-  // ON SEARCH INPUT CHANGE
-  const onSearchInputChange = (e) => {
-    sbomLogDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: e.target.value })
-  }
-
-  // SEARCH COMPONENT
-  const handleSearch = async (event) => {
-    if (event.key === 'Enter' && searchInput !== '') {
-      await refetch({
-        projectId: productId,
-        sbomId: sbomId,
-        search: searchInput,
-        first: totalRows
-      }).then(
-        (res) =>
-          res.data &&
-          sbomLogDispatch({
-            type: 'FETCH_DATA_SUCCESS'
-          })
-      )
-    }
-  }
-
   // CLEAR SERACH
   const handleClear = async () => {
+    setLogSearch('')
     await refetch({
       projectId: productId,
       sbomId: sbomId,
@@ -362,6 +342,33 @@ const SbomChangelogTable = ({ data, refetch }) => {
           type: 'CLEAR_SEARCH_INPUT'
         })
     )
+  }
+
+  // ON SEARCH INPUT CHANGE
+  const onSearchInputChange = (e) => {
+    const { value } = e.target
+    if (value === '') {
+      handleClear()
+    } else {
+      setLogSearch(value)
+    }
+  }
+
+  // SEARCH COMPONENT
+  const handleSearch = async (event) => {
+    const { value } = event.target
+    if (event.key === 'Enter' && logSearch !== '') {
+      await refetch({
+        projectId: productId,
+        sbomId: sbomId,
+        search: value,
+        first: totalRows
+      }).then(
+        (res) =>
+          res.data &&
+          sbomLogDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
+      )
+    }
   }
 
   // SET ROW LENGTH
@@ -417,7 +424,7 @@ const SbomChangelogTable = ({ data, refetch }) => {
         >
           <SearchFilter
             id='changelog'
-            filterText={searchInput}
+            filterText={logSearch}
             onChange={onSearchInputChange}
             onFilter={handleSearch}
             onClear={handleClear}
@@ -434,7 +441,7 @@ const SbomChangelogTable = ({ data, refetch }) => {
         </Stack>
       </Flex>
     )
-  }, [searchInput, filters, onSearchInputChange, handleClear, handleSearch])
+  }, [logSearch, filters, onSearchInputChange, handleClear, handleSearch])
 
   useEffect(() => {
     if (data) {
