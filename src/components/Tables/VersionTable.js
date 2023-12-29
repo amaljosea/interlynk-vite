@@ -156,7 +156,7 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
                     id: id
                   })
                 )
-                setActiveSbomTab(2)
+                localStorage.setItem('activeSbomTab', 2)
               }}
             >
               <TagLabel mx={'auto'}>{stats?.compCount}</TagLabel>

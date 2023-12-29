@@ -53,29 +53,30 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
 
   const onFilter = (ecosystem, kind, licenses, suppliers, scope) => {
     refetch({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        first: totalRows,
-        search: searchInput !== '' ? searchInput : undefined,
-        ecosystem:
-          ecosystem.includes('all') || ecosystem.length === 0
-            ? undefined
-            : ecosystem,
-        kind: kind.includes('all') || kind.length === 0 ? undefined : kind,
-        licenses:
-          licenses.includes('all') || licenses.length === 0
-            ? undefined
-            : licenses,
-        supplierName:
-          suppliers.includes('all') || suppliers.length === 0
-            ? undefined
-            : suppliers,
-        primary: scope === 'primary' ? true : undefined,
-        internal: scope === 'internal' ? true : undefined,
-        field: field,
-        direction: direction
-      }
+      projectId: productId,
+      sbomId: sbomId,
+      first: totalRows,
+      last: undefined,
+      after: undefined,
+      before: undefined,
+      search: searchInput !== '' ? searchInput : undefined,
+      ecosystem:
+        ecosystem.includes('all') || ecosystem.length === 0
+          ? undefined
+          : ecosystem,
+      kind: kind.includes('all') || kind.length === 0 ? undefined : kind,
+      licenses:
+        licenses.includes('all') || licenses.length === 0
+          ? undefined
+          : licenses,
+      supplierName:
+        suppliers.includes('all') || suppliers.length === 0
+          ? undefined
+          : suppliers,
+      primary: scope === 'primary' ? true : undefined,
+      internal: scope === 'internal' ? true : undefined,
+      field: field,
+      direction: direction
     })
   }
 
