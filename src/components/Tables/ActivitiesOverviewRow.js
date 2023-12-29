@@ -1,7 +1,7 @@
 import { Box, Flex, Icon, Text, useColorModeValue, Tooltip, Tag } from '@chakra-ui/react'
 import React from 'react'
 import { getFullDateAndTime } from 'utils'
-import { FaPlus, FaMinus, FaEdit, FaHammer, FaRobot, FaUpload, FaDownload } from "react-icons/fa";
+import { FaPlus, FaMinus, FaEdit, FaHammer, FaRobot, FaUpload, FaDownload, FaTimesCircle } from "react-icons/fa";
 
 
 const setColor = (type) => {
@@ -46,6 +46,8 @@ function valueToColor(action, event, orig, updated) {
     return 'blue.500'
   } else if (action == 'uploaded') {
     return 'green.500'
+  } else if (action == 'failed') {
+    return 'pink.500'
   }
 }
 
@@ -69,6 +71,8 @@ function valueToIcon(action, event, orig, updated) {
     return FaDownload
   } else if (action == 'uploaded') {
     return FaUpload
+  } else if (action == 'failed') {
+    return FaTimesCircle
   }
 }
 
@@ -94,6 +98,8 @@ function valueToText(action, event, orig, updated) {
   } else if (action == 'downloaded') {
     return `${updated}`
   } else if (action == 'uploaded') {
+    return `${updated}`
+  } else if (action == 'failed') {
     return `${updated}`
   }
 }
