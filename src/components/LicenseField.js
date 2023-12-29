@@ -106,6 +106,7 @@ const LicenseField = ({ isValid, setIsValid }) => {
       prodCompDispatch({ type: 'SET_EPX_LICENSE', payload: exp })
     } else {
       setIsValid(true)
+      prodCompDispatch({ type: 'SET_EPX_LICENSE', payload: exp })
     }
   }
 
