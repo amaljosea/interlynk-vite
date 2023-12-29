@@ -50,7 +50,7 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
   const parts = queryParams.get('parts')
 
   const currentProduct = JSON.parse(localStorage.getItem(`product`))
-  const { name, id } = currentProduct
+  const { name, id } = currentProduct ? currentProduct : {}
   const currentSBOM = JSON.parse(localStorage.getItem(`currentSBOM`))
 
   const onSelectComp = () => {
