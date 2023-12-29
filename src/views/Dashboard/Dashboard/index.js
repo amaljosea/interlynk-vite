@@ -113,7 +113,7 @@ export default function Dashboard() {
                   captions={[
                     'Product',
                     'Version',
-                    'Compoents',
+                    'Components',
                     'Licenses',
                     'Vulnerabilities',
                     'Imported'
