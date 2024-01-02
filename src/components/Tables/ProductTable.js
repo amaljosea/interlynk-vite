@@ -308,7 +308,7 @@ const ProductTable = ({ data, refetch, org }) => {
                   onClick={() => handleOpenSbom(row)}
                   isDisabled={!enabled}
                 >
-                  Build SBOM
+                  Create Version
                 </MenuItem>
                 <Divider />
                 <MenuItem
