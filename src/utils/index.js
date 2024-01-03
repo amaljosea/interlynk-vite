@@ -618,11 +618,16 @@ export const removeDuplicates = (arr) => {
   return versions
 }
 
-
 export const validateUrl = (url) => {
   const urlRegex =
     /^(?:(?:https?|ftp):\/\/)?(?:www\.)?[a-zA-Z0-9-]+(?:\.[a-zA-Z]{2,})+(?:\/[\w-]*)*(?:\/[\w\-]+(?:\.[a-zA-Z]{2,})?)?(?:\?[\w%=&]*)?(?:#[\w\-]*)?$/
   return urlRegex.test(url)
+}
+
+export const validPassword = (value) => {
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{8,}$/
+  return passwordRegex.test(value)
 }
 
 export const validateEmail = (email) => {

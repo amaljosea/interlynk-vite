@@ -9,9 +9,13 @@ import {
   Flex,
   FormControl,
   FormErrorMessage,
+  FormHelperText,
   FormLabel,
   Icon,
+  IconButton,
   Input,
+  InputGroup,
+  InputRightElement,
   Stack,
   Text
 } from '@chakra-ui/react'
@@ -19,17 +23,19 @@ import { RegisterUser } from 'graphQL/Mutation'
 import { useMutation } from '@apollo/client'
 import { Link, useNavigate } from 'react-router-dom'
 import { validateEmail } from 'utils'
-import { CheckCircleIcon } from '@chakra-ui/icons'
+import { CheckCircleIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
+import { validPassword } from 'utils'
 
 const RegistrationForm = () => {
-  const navigate = useNavigate()
-
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [emailError, setEmailError] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [showConfPassword, setShowConfPassword] = useState(false)
   const [error, setError] = useState([])
+  const [invalidPassword, setInvalidPassword] = useState(false)
   const [passError, setPassError] = useState('')
   const [isSuccess, setIsSuccess] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -49,10 +55,42 @@ const RegistrationForm = () => {
     }
   }
 
-  const handleCheckPassword = () => {
-    if (confirmPassword !== '' && confirmPassword !== password) {
+  const handlePasswordChange = (e) => {
+    const { value } = e.target
+    setPassword(value)
+    if (value !== '' && value !== confirmPassword && confirmPassword !== '') {
       setPassError('Confirm password does not match password')
+    } else {
+      setPassError('')
     }
+    setInvalidPassword(false)
+    setError([])
+  }
+
+  const handleCheckPassword = () => {
+    if (!validPassword(password)) {
+      setInvalidPassword(true)
+    }
+  }
+
+  const handleConfirmChange = (e) => {
+    const { value } = e.target
+    setConfirmPassword(value)
+    if (value !== '' && value !== password && password !== '') {
+      setPassError('Confirm password does not match password')
+    } else {
+      setPassError('')
+    }
+    setInvalidPassword(false)
+    setError([])
+  }
+
+  const handleTogglePassword = () => {
+    setShowPassword(!showPassword)
+  }
+
+  const handleToggleConfirm = () => {
+    setShowConfPassword(!showConfPassword)
   }
 
   const handleSubmit = () => {
@@ -124,6 +162,7 @@ const RegistrationForm = () => {
       )}
 
       <Stack py={'1rem'} direction={'column'} gap={2} width={'100%'}>
+        {/* NAME */}
         <FormControl>
           <FormLabel htmlFor='organization'>Name</FormLabel>
           <Input
@@ -134,6 +173,7 @@ const RegistrationForm = () => {
             autoComplete='off'
           />
         </FormControl>
+        {/* EMAIL */}
         <FormControl isRequired isInvalid={emailError !== ''}>
           <FormLabel htmlFor='email'>Email address</FormLabel>
           <Input
@@ -152,33 +192,58 @@ const RegistrationForm = () => {
             <FormErrorMessage>{emailError}</FormErrorMessage>
           )}
         </FormControl>
+        {/* PASSWORD */}
         <FormControl isRequired>
           <FormLabel htmlFor='password'>Password</FormLabel>
-          <Input
-            type='password'
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value)
-              setPassError('')
-              setError([])
-            }}
-            placeholder='*******'
-            onBlur={handleCheckPassword}
-          />
+          <InputGroup>
+            <Input
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={handlePasswordChange}
+              placeholder='*******'
+              onBlur={handleCheckPassword}
+            />
+            <InputRightElement width='3.1rem'>
+              <IconButton
+                h='1.75rem'
+                size='sm'
+                bg={'transparent'}
+                onClick={handleTogglePassword}
+                icon={showPassword ? <ViewOffIcon /> : <ViewIcon />}
+              />
+            </InputRightElement>
+          </InputGroup>
+          {invalidPassword && (
+            <FormHelperText color={'red.500'}>
+              <Text mb={1}>Your password must contain:</Text>
+              <Text>1. Lower case letters {`(a-z)`}</Text>
+              <Text>2. Upper case letters {`(A-Z)`}</Text>
+              <Text>3. Special characters {`(ex. !@#&$%*)`}</Text>
+              <Text>4. Numbers {`(0-9)`}</Text>
+            </FormHelperText>
+          )}
         </FormControl>
+        {/* CONFIRM PASSWORD */}
         <FormControl mt={3} isRequired isInvalid={passError !== ''}>
           <FormLabel htmlFor='ConfirmPassword'>Confirm Password</FormLabel>
-          <Input
-            type='password'
-            value={confirmPassword}
-            onChange={(e) => {
-              setConfirmPassword(e.target.value)
-              setPassError('')
-              setError([])
-            }}
-            placeholder='*******'
-            onBlur={handleCheckPassword}
-          />
+          <InputGroup>
+            <Input
+              type={showConfPassword ? 'text' : 'password'}
+              value={confirmPassword}
+              onChange={handleConfirmChange}
+              isDisabled={!validPassword(password)}
+              placeholder='*******'
+            />
+            <InputRightElement width='3.1rem'>
+              <IconButton
+                h='1.75rem'
+                size='sm'
+                bg={'transparent'}
+                onClick={handleToggleConfirm}
+                icon={showConfPassword ? <ViewOffIcon /> : <ViewIcon />}
+              />
+            </InputRightElement>
+          </InputGroup>
           {passError !== '' && <FormErrorMessage>{passError}</FormErrorMessage>}
         </FormControl>
         <Button
