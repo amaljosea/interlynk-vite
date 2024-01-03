@@ -290,7 +290,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
         <DrawerContent>
           <DrawerCloseButton />
           <DrawerHeader borderBottomWidth='1px' color='gray.600'>
-            Create SBOM
+            Create Primary Component
           </DrawerHeader>
           <DrawerBody>
             <Stack direction={'column'} spacing={4}>

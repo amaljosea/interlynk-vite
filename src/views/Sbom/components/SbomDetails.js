@@ -1,5 +1,4 @@
 import {
-  Badge,
   Box,
   Flex,
   HStack,
@@ -10,8 +9,10 @@ import {
   Text,
   Tooltip
 } from '@chakra-ui/react'
+import { Step, Steps, useSteps } from 'chakra-ui-steps'
 import VulnBadge from 'components/Misc/VulnBadge'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useEffect } from 'react'
 import {
   FaAngleLeft,
   FaBalanceScale,
@@ -92,6 +93,36 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
     })
   }
 
+  const steps = [
+    {
+      label: 'IMPORTED',
+      description: 'Imported'
+    },
+    {
+      label: 'NOT_STARTED',
+      description: 'Audited'
+    },
+    {
+      label: 'IN_PROGRESS',
+      description: 'Vulnerability'
+    },
+    {
+      label: 'FINISHED',
+      description: 'Ready'
+    }
+  ]
+
+  const { activeStep } = useSteps({
+    initialStep:
+      vulnRunStatus === 'NOT_STARTED'
+        ? 2
+        : vulnRunStatus === 'IN_PROGRESS'
+        ? 3
+        : vulnRunStatus === 'FINISHED'
+        ? 4
+        : 1
+  })
+
   return (
     <Flex direction={'row'} alignItems={'flex-start'} gap={5} width={'100%'}>
       <Icon as={FaCubes} h={'64px'} w={'64px'} color='blue.300' />
@@ -120,9 +151,21 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
               </HStack>
             </Link>
           )}
-          <Text fontWeight={'semibold'} fontSize={25}>
-            {project?.name} : {primaryComponent?.version}
-          </Text>
+          <Stack direction={'row'} spacing={2} alignItems={'center'}>
+            <Text fontWeight={'semibold'} fontSize={25}>
+              {project?.name} : {primaryComponent?.version}
+            </Text>
+            <Tooltip label='Lifecycle stage' fontSize='md'>
+              <Tag
+                w={'fit-content'}
+                size={'sm'}
+                variant='solid'
+                colorScheme='blue'
+              >
+                <TagLabel textTransform={'capitalize'}>{lifecycle}</TagLabel>
+              </Tag>
+            </Tooltip>
+          </Stack>
         </Stack>
         <Text fontSize={'sm'} my={0.5}>
           {primaryComponent?.description}
@@ -132,30 +175,18 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
             Updated {timeSince(updatedAt)}
           </Text>
         </Tooltip>
-        <HStack mt={1} spacing={2} alignItems={'center'}>
-          <Tooltip label='Lifecycle stage' fontSize='md'>
-            <Tag
-              w={'fit-content'}
-              size={'sm'}
-              variant='solid'
-              colorScheme='blue'
-            >
-              <TagLabel textTransform={'capitalize'}>{lifecycle}</TagLabel>
-            </Tag>
-          </Tooltip>
-          {vulnRunStatus === 'IN_PROGRESS' && (
-            <Tooltip label='Vulnerability scan in progress' fontSize='md'>
-              <Tag
-                w={'fit-content'}
-                size={'sm'}
-                variant='solid'
-                colorScheme='blue'
-              >
-                <TagLabel textTransform={'capitalize'}>Scanning</TagLabel>
-              </Tag>
-            </Tooltip>
-          )}
-        </HStack>
+        <Flex flexDir='row' width='100%' mt={4}>
+          <Steps
+            size={'sm'}
+            variant='circles'
+            colorScheme='blue'
+            activeStep={activeStep}
+          >
+            {steps.map(({ description }, index) => (
+              <Step label={description} key={index}></Step>
+            ))}
+          </Steps>
+        </Flex>
         {/* STATS */}
         <Flex flexDir={'row'} alignItems={'center'} gap={4} mt={5}>
           {/* COMPONENTS */}

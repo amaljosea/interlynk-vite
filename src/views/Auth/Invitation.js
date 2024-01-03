@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import {
   Box,
+  Button,
   Flex,
+  HStack,
   Icon,
   Modal,
   ModalBody,
@@ -9,8 +11,8 @@ import {
   ModalOverlay,
   Text
 } from '@chakra-ui/react'
-import { Navigate, useLocation, useNavigate } from 'react-router-dom'
-import { WarningIcon } from '@chakra-ui/icons'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { CheckCircleIcon, WarningIcon } from '@chakra-ui/icons'
 import { AcceptInvitation } from 'graphQL/Mutation'
 import { useMutation } from '@apollo/client'
 
@@ -22,12 +24,11 @@ const Invitation = () => {
   const nonce = queryParams.get('nonce')
 
   const [error, setError] = useState([])
-  const [userType, setUserType] = useState('')
 
   const [acceptInvitation] = useMutation(AcceptInvitation)
 
-  useEffect(() => {
-    acceptInvitation({
+  const onAccept = async () => {
+    await acceptInvitation({
       variables: {
         token,
         nonce
@@ -38,15 +39,15 @@ const Invitation = () => {
       } else {
         setError([])
         if (res.data.organizationUserInvitationAccept.userType === 'new_user') {
-          setUserType('new_user')
+          navigate('/register')
         } else if (
           res.data.organizationUserInvitationAccept.userType === 'existing_user'
         ) {
-          setUserType('existing_user')
+          navigate('/auth')
         }
       }
     })
-  }, [])
+  }
 
   if (error?.length > 0) {
     return (
@@ -72,10 +73,32 @@ const Invitation = () => {
     )
   }
 
-  return userType === 'new_user' ? (
-    <Navigate to={'/register'} />
-  ) : (
-    <Navigate to={'/auth'} />
+  return (
+    <Modal isCentered size={'3xl'} isOpen={true}>
+      <ModalOverlay bg='blackAlpha.300' backdropFilter='blur(4px)' />
+      <ModalContent>
+        <ModalBody py={12}>
+          <Box
+            textAlign={'center'}
+            as={Flex}
+            alignItems={'center'}
+            justifyContent={'center'}
+            flexDir={'column'}
+          >
+            <Icon color={'green.400'} boxSize={20} as={CheckCircleIcon} />
+            <Text my={6} fontSize={20}>This is an invitation to join Interlynk</Text>
+            <HStack spacing={2}>
+              <Button variant='outline' colorScheme='blue'>
+                Decline
+              </Button>
+              <Button variant='solid' colorScheme='blue' onClick={onAccept}>
+                Accept
+              </Button>
+            </HStack>
+          </Box>
+        </ModalBody>
+      </ModalContent>
+    </Modal>
   )
 }
 

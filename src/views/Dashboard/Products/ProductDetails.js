@@ -74,6 +74,7 @@ const ProductDetails = () => {
     setActiveProdTab,
     prodLogState,
     prodVulnState,
+    prodRulesState,
     dispatch
   } = useGlobalState()
   const { field, direction } = prodLogState
@@ -204,7 +205,9 @@ const ProductDetails = () => {
       getRules({
         variables: {
           id: productId,
-          first: totalRows
+          first: totalRows,
+          field: prodRulesState.field,
+          direction: prodRulesState.direction
         }
       })
     } else if (activeTab === 2) {
@@ -389,7 +392,7 @@ const ProductDetails = () => {
                       flexWrap={'wrap'}
                     >
                       {/* EDIT PRODUCT */}
-                      <Tooltip label='Edit'>
+                      <Tooltip label='Edit Details'>
                         <IconButton
                           isDisabled={!data.project.enabled}
                           colorScheme='blue'
@@ -398,7 +401,7 @@ const ProductDetails = () => {
                         ></IconButton>
                       </Tooltip>
                       {/* UPLOAD SBOM */}
-                      <Tooltip label='Upload SBOM'>
+                      <Tooltip label='Upload Product SBOM'>
                         <IconButton
                           isDisabled={!data.project.enabled}
                           colorScheme='blue'
@@ -407,7 +410,7 @@ const ProductDetails = () => {
                         ></IconButton>
                       </Tooltip>
                       {/* BUILD SBOM */}
-                      <Tooltip label='Build SBOM'>
+                      <Tooltip label='Create Product Version'>
                         <IconButton
                           isDisabled={!data.project.enabled}
                           colorScheme='blue'
@@ -417,7 +420,11 @@ const ProductDetails = () => {
                       </Tooltip>
                       {/* UPDATE PRODUCT STATUS */}
                       <Tooltip
-                        label={data.project.enabled ? 'Disable' : 'Enable'}
+                        label={
+                          data.project.enabled
+                            ? 'Disable Product'
+                            : 'Enable Product'
+                        }
                       >
                         <IconButton
                           colorScheme={'blue'}
@@ -432,7 +439,7 @@ const ProductDetails = () => {
                         ></IconButton>
                       </Tooltip>
                       {/* ARCHIVE PRODUCT */}
-                      <Tooltip label='Archive'>
+                      <Tooltip label='Archive Product'>
                         <IconButton
                           colorScheme='red'
                           onClick={onDeleteOpen}

@@ -19,9 +19,13 @@ import {
   Alert
 } from '@chakra-ui/react'
 import { UpdateAutomation } from 'graphQL/Mutation'
+import { useGlobalState } from 'hooks/useGlobalState'
 import { useState, useEffect } from 'react'
 
 const UpdateRule = ({ isOpen, onClose, data, refetch, productId }) => {
+  const { totalRows, prodRulesState } = useGlobalState()
+  const { field, direction } = prodRulesState
+
   const [value, setValue] = useState('')
   const [condition, setCondition] = useState('')
   const [error, setError] = useState([])
@@ -46,7 +50,9 @@ const UpdateRule = ({ isOpen, onClose, data, refetch, productId }) => {
       }
     }).then((res) => {
       if (res.data.autoCheckUpdate.errors.length === 0) {
-        refetch({ variables: { id: productId } })
+        refetch({
+          variables: { id: productId, first: totalRows, field, direction }
+        })
         onClose()
       } else {
         setError(res.data.autoCheckUpdate.errors)
