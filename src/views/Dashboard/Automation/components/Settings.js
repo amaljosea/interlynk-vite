@@ -29,7 +29,8 @@ import { timeSince } from 'utils'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 const Settings = ({ data, refetch }) => {
-  const { totalRows, dispatch } = useGlobalState()
+  const { totalRows, prodRulesState, dispatch } = useGlobalState()
+  const { field, direction } = prodRulesState
   const { prodRulesDispatch } = dispatch
 
   const location = useLocation()
@@ -45,8 +46,18 @@ const Settings = ({ data, refetch }) => {
 
   const [activeRow, setActiveRow] = useState(null)
 
-  const [updateAutoCheck] = useMutation(UpdateAutomation)
-  const [deleteAutoCheck] = useMutation(DeleteAutomation)
+  const [updateAutoCheck] = useMutation(UpdateAutomation, {
+    onCompleted: () =>
+      refetch({
+        variables: { id: productId, first: totalRows, field, direction }
+      })
+  })
+  const [deleteAutoCheck] = useMutation(DeleteAutomation, {
+    onCompleted: () =>
+      refetch({
+        variables: { id: productId, first: totalRows, field, direction }
+      })
+  })
 
   const handleRemove = async () => {
     await deleteAutoCheck({
@@ -54,9 +65,7 @@ const Settings = ({ data, refetch }) => {
         autoCheckId: activeRow.id,
         projectId: productId
       }
-    })
-      .then((res) => res.data && refetch({ variables: { id: productId } }))
-      .finally(() => onDeleteClose())
+    }).then((res) => res.data && onDeleteClose())
   }
 
   const handleStatus = async (row) => {
@@ -67,7 +76,7 @@ const Settings = ({ data, refetch }) => {
         condition: row.condition,
         enabled: row.enabled ? false : true
       }
-    }).then((res) => res.data && refetch({ variables: { id: productId } }))
+    })
   }
 
   // COLUMNS
