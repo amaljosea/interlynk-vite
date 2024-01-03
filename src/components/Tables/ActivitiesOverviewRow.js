@@ -1,8 +1,24 @@
-import { Box, Flex, Icon, Text, useColorModeValue, Tooltip, Tag } from '@chakra-ui/react'
+import {
+  Box,
+  Flex,
+  Icon,
+  Text,
+  useColorModeValue,
+  Tooltip,
+  Tag
+} from '@chakra-ui/react'
 import React from 'react'
 import { getFullDateAndTime } from 'utils'
-import { FaPlus, FaMinus, FaEdit, FaHammer, FaRobot, FaUpload, FaDownload, FaTimesCircle } from "react-icons/fa";
-
+import {
+  FaPlus,
+  FaMinus,
+  FaEdit,
+  FaHammer,
+  FaRobot,
+  FaUpload,
+  FaDownload,
+  FaTimesCircle
+} from 'react-icons/fa'
 
 const setColor = (type) => {
   switch (type) {
@@ -52,7 +68,6 @@ function valueToColor(action, event, orig, updated) {
 }
 
 function valueToIcon(action, event, orig, updated) {
-  console.log('ZZZZZ', action)
   if (action == 'updated') {
     if (updated == '[]') {
       return FaMinus
@@ -77,10 +92,6 @@ function valueToIcon(action, event, orig, updated) {
 }
 
 function valueToText(action, event, orig, updated) {
-  console.log('XXXXX', event)
-  console.log('YYYYY', action)
-  console.log(orig)
-  console.log(updated)
   if (action == 'updated') {
     if (updated == '[]') {
       return `${orig}`
@@ -105,7 +116,19 @@ function valueToText(action, event, orig, updated) {
 }
 
 function ActivitiesOverviewRow(props) {
-  const { logo, title, date, color, index, arrLength, action, changedBy, event, orig, updated } = props
+  const {
+    logo,
+    title,
+    date,
+    color,
+    index,
+    arrLength,
+    action,
+    changedBy,
+    event,
+    orig,
+    updated
+  } = props
   const textColor = useColorModeValue('gray.600', 'white.300')
   const bgIconColor = useColorModeValue('white.300', 'gray.700')
 
@@ -113,17 +136,19 @@ function ActivitiesOverviewRow(props) {
     <Flex alignItems='center' minH='78px' justifyContent='start' mb='5px'>
       <Flex direction='column' h='100%'>
         <Tooltip placement='top' label={action} textTransform={'capitalize'}>
-            <Icon as={valueToIcon(action, event, orig, updated)}
-              h={'30px'}
-              w={'30px'}
-              pe={'6px'}
-              mx={'-10px'}
-              mr={'10px'}
-              pb={'6px'}
-              zIndex='1'
-              position='relative'
-              color={valueToColor(action, event, orig, updated)} />
-          </Tooltip>
+          <Icon
+            as={valueToIcon(action, event, orig, updated)}
+            h={'30px'}
+            w={'30px'}
+            pe={'6px'}
+            mx={'-10px'}
+            mr={'10px'}
+            pb={'6px'}
+            zIndex='1'
+            position='relative'
+            color={valueToColor(action, event, orig, updated)}
+          />
+        </Tooltip>
         <Box
           w='2px'
           bg='gray.200'
@@ -135,9 +160,14 @@ function ActivitiesOverviewRow(props) {
           {event} by {changedBy}
         </Text>
         <Flex direction='row' gap={2}>
-        <Text fontSize='sm' color={textColor} fontWeight='normal' width={'90%'}>
-          {valueToText(action, event, orig, updated)}
-        </Text>
+          <Text
+            fontSize='sm'
+            color={textColor}
+            fontWeight='normal'
+            width={'90%'}
+          >
+            {valueToText(action, event, orig, updated)}
+          </Text>
         </Flex>
         <Text fontSize='xs' color='gray.400' fontWeight='normal'>
           {getFullDateAndTime(date)}
