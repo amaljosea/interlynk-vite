@@ -176,16 +176,16 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
           </Text>
         </Tooltip>
         <Flex flexDir='row' width='100%' mt={4}>
-          <Steps
+{/*           <Steps
             size={'sm'}
-            variant='circles'
+            variant='simple'
             colorScheme='blue'
             activeStep={activeStep}
           >
             {steps.map(({ description }, index) => (
               <Step label={description} key={index}></Step>
             ))}
-          </Steps>
+          </Steps> */}
         </Flex>
         {/* STATS */}
         <Flex flexDir={'row'} alignItems={'center'} gap={4} mt={5}>
