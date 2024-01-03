@@ -74,6 +74,7 @@ const ProductDetails = () => {
     setActiveProdTab,
     prodLogState,
     prodVulnState,
+    prodRulesState,
     dispatch
   } = useGlobalState()
   const { field, direction } = prodLogState
@@ -204,7 +205,9 @@ const ProductDetails = () => {
       getRules({
         variables: {
           id: productId,
-          first: totalRows
+          first: totalRows,
+          field: prodRulesState.field,
+          direction: prodRulesState.direction
         }
       })
     } else if (activeTab === 2) {
@@ -417,7 +420,11 @@ const ProductDetails = () => {
                       </Tooltip>
                       {/* UPDATE PRODUCT STATUS */}
                       <Tooltip
-                        label={data.project.enabled ? 'Disable Product' : 'Enable Product'}
+                        label={
+                          data.project.enabled
+                            ? 'Disable Product'
+                            : 'Enable Product'
+                        }
                       >
                         <IconButton
                           colorScheme={'blue'}
