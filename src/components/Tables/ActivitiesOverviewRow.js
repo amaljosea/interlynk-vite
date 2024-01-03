@@ -64,6 +64,8 @@ function valueToColor(action, event, orig, updated) {
     return 'green.500'
   } else if (action == 'failed') {
     return 'pink.500'
+  } else if (action == 'destroyed') {
+    return 'pink.500'
   }
 }
 
@@ -88,6 +90,8 @@ function valueToIcon(action, event, orig, updated) {
     return FaUpload
   } else if (action == 'failed') {
     return FaTimesCircle
+  } else if (action == 'destroyed') {
+    return FaMinus
   }
 }
 
