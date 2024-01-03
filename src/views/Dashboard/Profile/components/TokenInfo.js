@@ -436,7 +436,9 @@ const TokenInfo = ({ data, refetch }) => {
                     utc={true}
                     inputProps={{
                       placeholder: 'Select Date and Time',
-                      disabled: token !== ''
+                      disabled: token !== '',
+                      onCopy: (e) => e.preventDefault(),
+                      onPaste: (e) => e.preventDefault()
                     }}
                   />
                   {!isValidDate && (
