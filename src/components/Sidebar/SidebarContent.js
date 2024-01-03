@@ -12,6 +12,7 @@ import IconBox from 'components/Icons/IconBox'
 import { InterlynkLogo } from 'components/Icons/Icons'
 import { Separator } from 'components/Separator/Separator'
 import { SidebarHelp } from 'components/Sidebar/SidebarHelp'
+import useAnalyticsEventTracker from 'hooks/useAnalyticsEventTracker'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
@@ -36,6 +37,8 @@ const SidebarContent = ({ logoText, routes }) => {
       return 'active'
     }
   }
+
+  const gaEventTracker = useAnalyticsEventTracker('Interlynk Dashboard')
 
   const createLinks = (routes) => {
     const inactiveBg = useColorModeValue('white', 'gray.700')
@@ -79,6 +82,7 @@ const SidebarContent = ({ logoText, routes }) => {
               : prop.layout + prop.path
           }
           key={prop.name}
+          onClick={() => gaEventTracker(prop.name)}
         >
           {activeRoute(prop.layout + prop.path) === 'active' ? (
             <Button

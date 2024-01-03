@@ -10,8 +10,6 @@ import { FaEye } from 'react-icons/fa'
 
 const ActivitiesOverview = ({ title, amount, data }) => {
   const textColor = useColorModeValue('gray.700', 'white')
-  console.log(amount)
-  console.log(data)
 
   return (
     <Card maxH='100%'>

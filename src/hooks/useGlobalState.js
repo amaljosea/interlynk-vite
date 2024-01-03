@@ -1,5 +1,6 @@
 import React, { useState, createContext, useContext, useReducer } from 'react'
 import {
+  prodRulesReducer,
   prodCheckReducer,
   prodCompReducer,
   prodLogReducer,
@@ -29,6 +30,11 @@ const GlobalStateProvider = ({ children }) => {
     pageIndex: 1,
     enabled: 'yes',
     currentProduct: null
+  })
+  const [prodRulesState, prodRulesDispatch] = useReducer(prodRulesReducer, {
+    field: 'AUTO_CHECKS_UPDATED_AT',
+    direction: 'DESC',
+    pageIndex: 1
   })
   const [prodLogState, prodLogDispatch] = useReducer(prodLogReducer, {
     field: 'ACTIVITY_LOGS_CREATED_AT',
@@ -138,6 +144,7 @@ const GlobalStateProvider = ({ children }) => {
         prodCompState,
         prodVulnState,
         prodCheckState,
+        prodRulesState,
         sbomLogState,
         sbomState,
         dispatch: {
@@ -146,6 +153,7 @@ const GlobalStateProvider = ({ children }) => {
           prodCompDispatch,
           prodVulnDispatch,
           prodCheckDispatch,
+          prodRulesDispatch,
           sbomLogDispatch,
           sbomDispatch
         }

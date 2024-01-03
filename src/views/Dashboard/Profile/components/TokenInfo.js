@@ -75,6 +75,7 @@ const TokenInfo = ({ data, refetch }) => {
   const [noExpire, setNoExpire] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [activeRow, setActiveRow] = useState(null)
+  const [isValidDate, setIsValidDate] = useState(true)
 
   const handleChange = (event) => {
     const { value } = event.target
@@ -93,7 +94,7 @@ const TokenInfo = ({ data, refetch }) => {
   const handleExpireChange = (e) => {
     const { checked } = e.target
     setNoExpire(checked)
-
+    setIsValidDate(true)
     if (checked === true) {
       setSelectedDate('')
     } else {
@@ -179,7 +180,13 @@ const TokenInfo = ({ data, refetch }) => {
 
   const handleDateChange = (newDate) => {
     console.log('newDate', newDate)
+    const isValidDate = newDate && !isNaN(newDate)
     setSelectedDate(newDate._d)
+    if (isValidDate) {
+      setIsValidDate(true)
+    } else {
+      setIsValidDate(false)
+    }
   }
 
   // HEADER SECTION
@@ -196,6 +203,7 @@ const TokenInfo = ({ data, refetch }) => {
               setToken('')
               setNoExpire(false)
               setActiveRow(null)
+              setIsValidDate(true)
               onOpen()
             }}
             icon={<AddIcon />}
@@ -345,7 +353,8 @@ const TokenInfo = ({ data, refetch }) => {
                   isDisabled={revoked}
                   onClick={() => {
                     setToken('')
-                    console.log(row)
+                    setSelectedDate(row?.expiresAt || '')
+                    setIsValidDate(true)
                     setActiveRow(row)
                     onOpen()
                   }}
@@ -417,7 +426,7 @@ const TokenInfo = ({ data, refetch }) => {
                 </FormControl>
               )}
               {!noExpire && (
-                <FormControl mb={5} isRequired>
+                <FormControl mb={5} isRequired isInvalid={!isValidDate}>
                   <FormLabel mb={1} htmlFor='expire'>
                     Expiration Date
                   </FormLabel>
@@ -427,10 +436,16 @@ const TokenInfo = ({ data, refetch }) => {
                     utc={true}
                     inputProps={{
                       placeholder: 'Select Date and Time',
-                      disabled: token !== ''
+                      disabled: token !== '',
+                      onCopy: (e) => e.preventDefault(),
+                      onPaste: (e) => e.preventDefault()
                     }}
-                    editnle
                   />
+                  {!isValidDate && (
+                    <FormErrorMessage>
+                      Please enter a valid datetime
+                    </FormErrorMessage>
+                  )}
                 </FormControl>
               )}
               <FormControl mb={5}>
@@ -467,6 +482,7 @@ const TokenInfo = ({ data, refetch }) => {
                   variant='solid'
                   colorScheme='blue'
                   onClick={handleUpdate}
+                  isDisabled={!isValidDate}
                 >
                   Update
                 </Button>
@@ -490,7 +506,8 @@ const TokenInfo = ({ data, refetch }) => {
                       !keyName ||
                       (selectedDate !== '' && !isValid(selectedDate)) ||
                       isLoading ||
-                      error !== ''
+                      error !== '' ||
+                      !isValidDate
                     }
                     onClick={handleCreate}
                   >

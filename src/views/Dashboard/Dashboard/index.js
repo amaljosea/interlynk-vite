@@ -39,12 +39,6 @@ export default function Dashboard() {
   }, [data])
 
   useEffect(() => {
-    if (metrics) {
-      console.log('Matrics', metrics)
-    }
-  }, [metrics])
-
-  useEffect(() => {
     if (product === null) {
       prodCompDispatch({ type: 'CLEAR_PROD_COMP' })
       prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })

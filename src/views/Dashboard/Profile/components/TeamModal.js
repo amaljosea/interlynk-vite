@@ -44,7 +44,7 @@ const TeamModal = ({ isOpen, onClose, refetch }) => {
         }
       }).then((res) => {
         if (res.data.organizationUserInvite.errors.length > 0) {
-          setError(res.data.userCreate.errors[0])
+          setError(res.data.organizationUserInvite.errors[0])
         } else {
           toast({
             description: 'Invitation sent successfully',
