@@ -618,6 +618,11 @@ export const removeDuplicates = (arr) => {
   return versions
 }
 
+export const validateCpe = (value) => {
+  const cpeRegex =
+    /^cpe:2\.3:[aho]\:[\w\-.~]+:[\w\-.~]+(?::[\w\-.~]+)?(?::[\w\-.~]+)?(?::[\w\-.~]+)?(?::[\w\-.~]+)?$/
+  return cpeRegex.test(value)
+}
 
 export const validateUrl = (url) => {
   const urlRegex =
@@ -625,7 +630,13 @@ export const validateUrl = (url) => {
   return urlRegex.test(url)
 }
 
+export const validPassword = (value) => {
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{8,}$/
+  return passwordRegex.test(value)
+}
+
 export const validateEmail = (email) => {
-  const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
+  const emailRegex = /^[a-zA-Z0-9._+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
   return emailRegex.test(email)
 }

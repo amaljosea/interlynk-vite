@@ -18,7 +18,8 @@ import {
   Alert,
   AlertIcon,
   AlertDescription,
-  Tag
+  Tag,
+  FormErrorMessage
 } from '@chakra-ui/react'
 import CpeInput from 'components/CpeInput'
 import { CreateAutomation } from 'graphQL/Mutation'
@@ -26,6 +27,7 @@ import { UpdateComponent, recheckHealth } from 'graphQL/Mutation'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useState, useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
+import { validateCpe } from 'utils'
 
 const regexPattern =
   /cpe:2\.3:[aho\*\-](:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,\/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){5}(:(([a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))?)|[\*\-]))(:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,\/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){4}/
@@ -49,6 +51,7 @@ const CpeModal = ({
   const sbomId = queryParams.get('sbom')
   const productId = queryParams.get('id')
 
+  const [error, setError] = useState('')
   const [vendor, setVendor] = useState('')
   const [vendorList, setVendorList] = useState([])
   const vendorRef = useRef()
@@ -91,17 +94,21 @@ const CpeModal = ({
 
   // ON CPE SAVE
   const handleSave = () => {
-    if (selectedCpe) {
-      onUpdateCpe(cpeString, selectedCpe.id)
+    if (validateCpe(cpeString)) {
+      if (selectedCpe) {
+        onUpdateCpe(cpeString, selectedCpe.id)
+      } else {
+        onCreateCpe(cpeString)
+      }
+      onClose()
     } else {
-      onCreateCpe(cpeString)
+      setError('Invalid CPE')
     }
-    onClose()
   }
 
   // ON CPE UPDATE
   const handleComUpdate = async () => {
-    try {
+    if (validateCpe(cpeString)) {
       await updateComponent({
         variables: {
           id: activeCheck.id,
@@ -124,8 +131,8 @@ const CpeModal = ({
           }
         })
         .finally(() => onClose())
-    } catch (error) {
-      console.log('Mutation error', error)
+    } else {
+      setError('Invalid CPE')
     }
   }
 
@@ -252,7 +259,7 @@ const CpeModal = ({
   const [createAutoCheck] = useMutation(CreateAutomation)
 
   const onSaveRule = async () => {
-    try {
+    if (validateCpe(cpeString)) {
       await createAutoCheck({
         variables: {
           projectId: productId,
@@ -271,10 +278,19 @@ const CpeModal = ({
           )
         }
       }).then((res) => res.data && handleComUpdate())
-    } catch (error) {
-      console.log('Error', error)
+    } else {
+      setError('Invalid CPE')
     }
   }
+
+  const isInvalid =
+    vendor === '' ||
+    product === '' ||
+    type === '' ||
+    vendor.includes(':') ||
+    product.includes(':') ||
+    version.includes(':') ||
+    error !== ''
 
   return (
     <>
@@ -322,7 +338,7 @@ const CpeModal = ({
             )}
             <Flex width={'100%'} direction={'column'} gap={4}>
               {/* CPE STRING */}
-              <FormControl>
+              <FormControl isInvalid={error !== ''}>
                 <FormLabel htmlFor='cpeString'>CPE String</FormLabel>
                 <Textarea
                   type='text'
@@ -334,11 +350,10 @@ const CpeModal = ({
                   fontSize='16px'
                   fontStyle={'bold'}
                   color='black'
-                  isInvalid
-                  errorBorderColor='blue.600'
                   onChange={(e) => console.log(e.target.value)}
                   disabled
                 />
+                {error !== '' && <FormErrorMessage>{error}</FormErrorMessage>}
               </FormControl>
               {/* VENDOR */}
               <CpeInput
@@ -454,14 +469,7 @@ const CpeModal = ({
                   fontSize={'sm'}
                   colorScheme='blue'
                   onClick={onSaveRule}
-                  disabled={
-                    vendor === '' ||
-                    product === '' ||
-                    type === '' ||
-                    vendor.includes(':') ||
-                    product.includes(':') ||
-                    version.includes(':')
-                  }
+                  disabled={isInvalid}
                 >
                   Save Rule
                 </Button>
@@ -477,14 +485,7 @@ const CpeModal = ({
                   variant='solid'
                   colorScheme={'blue'}
                   onClick={checkId ? handleComUpdate : handleSave}
-                  disabled={
-                    vendor === '' ||
-                    product === '' ||
-                    type === '' ||
-                    vendor.includes(':') ||
-                    product.includes(':') ||
-                    version.includes(':')
-                  }
+                  disabled={isInvalid}
                 >
                   Save
                 </Button>

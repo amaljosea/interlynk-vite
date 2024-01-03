@@ -1,6 +1,5 @@
 // Chakra imports
-import { Box, Portal, Stack, useDisclosure } from '@chakra-ui/react'
-import Footer from 'components/Footer/Footer.js'
+import { Box, Portal, Stack } from '@chakra-ui/react'
 // Layout components
 import AdminNavbar from 'components/Navbars/AdminNavbar.js'
 import Sidebar from 'components/Sidebar'
@@ -28,11 +27,7 @@ export default function Dashboard(props) {
   // states and functions
   const [sidebarVariant] = useState('transparent')
   // functions for changing the states from components
-  const getRoute = () => {
-    return window.location.pathname !== '/vendor/full-screen-maps'
-  }
 
-  const { isOpen, onOpen, onClose } = useDisclosure()
   document.documentElement.dir = 'ltr'
   // Chakra Color Mode
 
@@ -105,8 +100,6 @@ export default function Dashboard(props) {
         <Box minH='100vh' w={'96%'} pos={'absolute'} right={0}>
           <Portal>
             <AdminNavbar
-              onOpen={onOpen}
-              logoText={'Interlynk DASHBOARD'}
               brandText={getActiveRoute(dashRoutes)}
               secondary={getActiveNavbar(dashRoutes)}
             />
