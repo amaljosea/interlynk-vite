@@ -1174,10 +1174,18 @@ export const GetProjectCheck = gql`
     $before: String
     $first: Int
     $last: Int
+    $field: AutoCheckOrderByFields!
+    $direction: OrderByDirection!
   ) {
     project(id: $id) {
       id
-      autoChecks(after: $after, before: $before, first: $first, last: $last) {
+      autoChecks(
+        after: $after
+        before: $before
+        first: $first
+        last: $last
+        orderBy: { field: $field, direction: $direction }
+      ) {
         totalCount
         pageInfo {
           endCursor

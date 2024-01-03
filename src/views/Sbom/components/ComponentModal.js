@@ -14,12 +14,7 @@ import {
 import { DeleteComponent } from 'graphQL/Mutation'
 import { useLocation } from 'react-router-dom'
 
-const ComponentModal = ({
-  isOpen,
-  onClose,
-  id,
-  fetchCompData,
-}) => {
+const ComponentModal = ({ isOpen, onClose, id, fetchCompData }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const sbomId = queryParams.get('sbom')
@@ -59,10 +54,10 @@ const ComponentModal = ({
           </ModalBody>
           <ModalFooter>
             <Button colorScheme='gray' mr={3} onClick={onClose}>
-              Cancel
+              No
             </Button>
-            <Button colorScheme='blue' onClick={handleDelete}>
-              Submit
+            <Button colorScheme='red' onClick={handleDelete}>
+              Yes
             </Button>
           </ModalFooter>
         </ModalContent>

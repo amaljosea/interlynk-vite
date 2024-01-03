@@ -25,8 +25,14 @@ import { customStyles } from 'utils'
 import { DeleteAutomation, UpdateAutomation } from 'graphQL/Mutation'
 import { useMutation } from '@apollo/client'
 import { useLocation } from 'react-router-dom'
+import { timeSince } from 'utils'
+import { useGlobalState } from 'hooks/useGlobalState'
 
 const Settings = ({ data, refetch }) => {
+  const { totalRows, prodRulesState, dispatch } = useGlobalState()
+  const { field, direction } = prodRulesState
+  const { prodRulesDispatch } = dispatch
+
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
@@ -40,8 +46,18 @@ const Settings = ({ data, refetch }) => {
 
   const [activeRow, setActiveRow] = useState(null)
 
-  const [updateAutoCheck] = useMutation(UpdateAutomation)
-  const [deleteAutoCheck] = useMutation(DeleteAutomation)
+  const [updateAutoCheck] = useMutation(UpdateAutomation, {
+    onCompleted: () =>
+      refetch({
+        variables: { id: productId, first: totalRows, field, direction }
+      })
+  })
+  const [deleteAutoCheck] = useMutation(DeleteAutomation, {
+    onCompleted: () =>
+      refetch({
+        variables: { id: productId, first: totalRows, field, direction }
+      })
+  })
 
   const handleRemove = async () => {
     await deleteAutoCheck({
@@ -49,9 +65,7 @@ const Settings = ({ data, refetch }) => {
         autoCheckId: activeRow.id,
         projectId: productId
       }
-    })
-      .then((res) => res.data && refetch({ variables: { id: productId } }))
-      .finally(() => onDeleteClose())
+    }).then((res) => res.data && onDeleteClose())
   }
 
   const handleStatus = async (row) => {
@@ -62,7 +76,7 @@ const Settings = ({ data, refetch }) => {
         condition: row.condition,
         enabled: row.enabled ? false : true
       }
-    }).then((res) => res.data && refetch({ variables: { id: productId } }))
+    })
   }
 
   // COLUMNS
@@ -93,7 +107,7 @@ const Settings = ({ data, refetch }) => {
     },
     // NAME
     {
-      id: 'name',
+      id: 'AUTO_CHECKS_LOOKUP_NAME',
       name: 'NAME',
       selector: (row) => {
         const { lookup } = row
@@ -103,7 +117,8 @@ const Settings = ({ data, refetch }) => {
           </Text>
         )
       },
-      wrap: true
+      wrap: true,
+      sortable: true
     },
     // CONDITION
     {
@@ -116,12 +131,13 @@ const Settings = ({ data, refetch }) => {
     },
     // ATTRIBUTE
     {
-      id: 'attribute',
+      id: 'AUTO_CHECKS_ATTR_NAME',
       name: 'ATTRIBUTE',
       selector: (row) => {
         const { attrName } = row
         return <Tag colorScheme='blue'>{attrName}</Tag>
-      }
+      },
+      sortable: true
     },
     // FIX
     {
@@ -130,7 +146,7 @@ const Settings = ({ data, refetch }) => {
       selector: (row) => {
         const { setTo } = row
         return (
-          <HStack alignItems={'center'} justifyContent={'flex-start'}>
+          <HStack alignItems={'center'} justifyContent={'flex-start'} my={2}>
             <Text>{JSON.stringify(setTo)}</Text>
             <IconButton
               size='sm'
@@ -146,6 +162,16 @@ const Settings = ({ data, refetch }) => {
       },
       wrap: true,
       width: '25%'
+    },
+    // UPDATED AT
+    {
+      id: 'AUTO_CHECKS_UPDATED_AT',
+      name: 'UPDATED AT',
+      selector: (row) => {
+        const { updatedAt } = row
+        return <Text>{timeSince(updatedAt)}</Text>
+      },
+      sortable: true
     },
     // ACTIONS
     {
@@ -168,6 +194,27 @@ const Settings = ({ data, refetch }) => {
     }
   ]
 
+  const handleSort = async (column, sortDirection) => {
+    refetch({
+      variables: {
+        id: productId,
+        first: totalRows,
+        field: column.id,
+        direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+      }
+    }).then((res) => {
+      if (res.data) {
+        prodRulesDispatch({
+          type: 'SET_SORT_ORDER',
+          payload: {
+            field: column.id,
+            direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+          }
+        })
+      }
+    })
+  }
+
   return (
     <>
       <CardBody>
@@ -177,6 +224,7 @@ const Settings = ({ data, refetch }) => {
             title={<Text fontSize={'xl'}>Rule Automation Settings</Text>}
             data={data && data.nodes}
             customStyles={customStyles}
+            onSort={handleSort}
             progressPending={data && data.nodes ? false : true}
             progressComponent={<CustomLoader />}
             responsive={true}

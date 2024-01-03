@@ -181,7 +181,9 @@ const SupplierModal = ({
   }
 
   const isInvalid =
-    supName === '' || emailError != '' || (orgUrl !== '' && isValidUrl !== '')
+    supName === '' ||
+    (supEmail !== '' && emailError != '') ||
+    (orgUrl !== '' && isValidUrl !== '')
 
   return (
     <>

@@ -34,7 +34,7 @@ import {
 } from 'react-icons/fa'
 import { timeSince, GetIcon, getFullDateAndTime, customStyles } from 'utils'
 import { useState, useMemo, useRef, useEffect } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import ComponentModal from 'views/Sbom/components/ComponentModal'
 import SupplierModal from 'views/Sbom/components/SupplierModal'
@@ -55,18 +55,15 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
   // GET COMPONENT FILTER HEADS
   const [getCompFilters] = useLazyQuery(GetCompFilterData)
 
-  const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const customerView = location.pathname.startsWith('/customer')
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
-  const currentProduct = JSON.parse(localStorage.getItem(`product`))
   const x = window.matchMedia('(min-width: 2500px)')
   const y = window.matchMedia('(max-width: 1440px)')
 
-  const { totalRows, setTotalRows, setActiveSbomTab, prodCompState, dispatch } =
-    useGlobalState()
+  const { totalRows, setTotalRows, prodCompState, dispatch } = useGlobalState()
   const {
     field,
     direction,
@@ -109,6 +106,8 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
       field: field,
       direction: direction
     })
+      .then(() => prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' }))
+      .finally(() => window.scrollTo({ top: 0, behavior: 'smooth' }))
   }
 
   const [activeRow, setActiveRow] = useState(null)
