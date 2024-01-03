@@ -618,6 +618,12 @@ export const removeDuplicates = (arr) => {
   return versions
 }
 
+export const validateCpe = (value) => {
+  const cpeRegex =
+    /^cpe:2\.3:[aho]\:[\w\-.~]+:[\w\-.~]+(?::[\w\-.~]+)?(?::[\w\-.~]+)?(?::[\w\-.~]+)?(?::[\w\-.~]+)?$/
+  return cpeRegex.test(value)
+}
+
 export const validateUrl = (url) => {
   const urlRegex =
     /^(?:(?:https?|ftp):\/\/)?(?:www\.)?[a-zA-Z0-9-]+(?:\.[a-zA-Z]{2,})+(?:\/[\w-]*)*(?:\/[\w\-]+(?:\.[a-zA-Z]{2,})?)?(?:\?[\w%=&]*)?(?:#[\w\-]*)?$/
