@@ -22,8 +22,10 @@ import {
   useDisclosure,
   Button,
   Tooltip,
-  Tag
+  Tag,
+  useToast
 } from '@chakra-ui/react'
+import { InviteUser } from 'graphQL/Mutation'
 import { deleteOrgUser } from 'graphQL/Mutation'
 import React, { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
@@ -33,6 +35,7 @@ import TeamModal from 'views/Dashboard/Profile/components/TeamModal'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 const TeamTable = ({ data, refetch }) => {
+  const toast = useToast()
   const SERVER_URL = process.env.REACT_APP_SERVER
   const { isOpen, onOpen, onClose } = useDisclosure()
   const {
@@ -45,6 +48,10 @@ const TeamTable = ({ data, refetch }) => {
 
   const [deleteUser] = useMutation(deleteOrgUser)
 
+  const [inviteUsers] = useMutation(InviteUser, {
+    onCompleted: () => refetch()
+  })
+
   // COLUMNS
   const columns = [
     // NAME
@@ -52,7 +59,7 @@ const TeamTable = ({ data, refetch }) => {
       id: 'name',
       name: 'NAME',
       selector: (row) => {
-        const { name, email, profileImage } = row
+        const { name, profileImage } = row
         return (
           <Flex
             width={'100%'}
@@ -81,7 +88,7 @@ const TeamTable = ({ data, refetch }) => {
     {
       id: 'email',
       name: 'EMAIL',
-      selector: (row) => <Text my={2}>{row.email}</Text>,
+      selector: (row) => <Text my={2}>{row?.email}</Text>,
       wrap: true
     },
     // ROLE
@@ -139,6 +146,7 @@ const TeamTable = ({ data, refetch }) => {
       id: 'action',
       name: 'ACTION',
       selector: (row) => {
+        const { invitationStatus } = row
         return (
           <Menu>
             <MenuButton
@@ -159,6 +167,11 @@ const TeamTable = ({ data, refetch }) => {
                 >
                   Remove Member
                 </MenuItem>
+                {invitationStatus === 'declined' && (
+                  <MenuItem onClick={() => onResendInvite(row)}>
+                    Resend Invite
+                  </MenuItem>
+                )}
               </MenuList>
             </Portal>
           </Menu>
@@ -218,6 +231,30 @@ const TeamTable = ({ data, refetch }) => {
     } catch (error) {
       console.log(`Error`, error)
     }
+  }
+
+  const onResendInvite = async (row) => {
+    await inviteUsers({
+      variables: {
+        email: row?.email.toLowerCase()
+      }
+    }).then((res) => {
+      if (res.data.organizationUserInvite.errors.length > 0) {
+        toast({
+          description: res.data.organizationUserInvite.errors[0],
+          status: 'error',
+          position: 'top',
+          duration: 2000
+        })
+      } else {
+        toast({
+          description: 'Invitation sent successfully',
+          status: 'success',
+          position: 'top',
+          duration: 2000
+        })
+      }
+    })
   }
 
   return (

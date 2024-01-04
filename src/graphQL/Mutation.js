@@ -26,7 +26,7 @@ export const RegisterOrganization = gql`
 // INVITE USERS
 export const InviteUser = gql`
   mutation InviteUser($email: String!) {
-    organizationUserInvite(input: { email: $email}) {
+    organizationUserInvite(input: { email: $email }) {
       user {
         id
         email
@@ -61,6 +61,20 @@ export const AcceptInvitation = gql`
       }
       userType
       errors
+    }
+  }
+`
+
+// DECLINE INVITATION
+export const DeclineInvitation = gql`
+  mutation DeclineInvitation($nonce: String!, $token: String!) {
+    organizationUserInvitationDecline(
+      input: { nonce: $nonce, invitationToken: $token }
+    ) {
+      errors
+      user {
+        email
+      }
     }
   }
 `
@@ -1465,6 +1479,7 @@ export const RegisterUser = gql`
         email
       }
       errors
+      confirmationNeeded
     }
   }
 `
