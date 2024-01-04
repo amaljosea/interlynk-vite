@@ -18,17 +18,22 @@ import {
   ModalHeader,
   ModalFooter,
   ModalBody,
-  ModalCloseButton
+  ModalCloseButton,
+  Menu,
+  MenuButton,
+  MenuList,
+  Portal,
+  MenuItem
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
-import { customStyles } from 'utils'
-import { getFullDateAndTime } from 'utils'
+import { customStyles, getFullDateAndTime } from 'utils'
 import CustomLoader from 'components/CustomLoader'
 import OrgModal from 'views/Dashboard/Profile/components/OrgModal'
 import { useMutation } from '@apollo/client'
 import { SwitchOrganization } from 'graphQL/Mutation'
 import Cookies from 'js-cookie'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { FaEllipsisVertical } from 'react-icons/fa6'
 
 const OrgTable = ({ data, refetch, activeOrg }) => {
   const navigate = useNavigate()
@@ -93,8 +98,22 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
       id: 'NAME',
       name: 'NAME',
       selector: (row) => {
-        const { name } = row
-        return <Text fontSize={14}>{name}</Text>
+        const { name, id } = row
+        return (
+          <Stack direction={'column'} my={3}>
+            <Text fontSize={14}>{name}</Text>
+            {activeOrg === id && (
+              <Tag
+                size='sm'
+                width={'fit-content'}
+                variant='solid'
+                colorScheme='green'
+              >
+                Active
+              </Tag>
+            )}
+          </Stack>
+        )
       },
       wrap: true
     },
@@ -158,29 +177,23 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
       selector: (row) => {
         const { id } = row
         return (
-          <>
-            {activeOrg !== id ? (
-              <Button
-                size='sm'
-                variant='solid'
-                cursor={'pointer'}
-                colorScheme={'blue'}
-                onClick={() => onSwitch(row)}
-                rightIcon={<ArrowForwardIcon />}
-              >
-                Switch to
-              </Button>
-            ) : (
-              <Button
-                size='sm'
-                variant='solid'
-                cursor={'pointer'}
-                colorScheme={'green'}
-              >
-                Active
-              </Button>
-            )}
-          </>
+          <Menu>
+            <MenuButton
+              as={IconButton}
+              aria-label='Options'
+              icon={<FaEllipsisVertical />}
+              variant='none'
+              color='gray.400'
+            />
+            <Portal>
+              <MenuList size='sm'>
+                {activeOrg !== id && (
+                  <MenuItem onClick={() => onSwitch(row)}>Switch To</MenuItem>
+                )}
+                <MenuItem>Leave Organization</MenuItem>
+              </MenuList>
+            </Portal>
+          </Menu>
         )
       },
       wrap: true
