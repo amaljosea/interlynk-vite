@@ -21,7 +21,8 @@ import {
   ModalCloseButton,
   useDisclosure,
   Button,
-  Tooltip
+  Tooltip,
+  Tag
 } from '@chakra-ui/react'
 import { deleteOrgUser } from 'graphQL/Mutation'
 import React, { useMemo, useState } from 'react'
@@ -88,6 +89,29 @@ const TeamTable = ({ data, refetch }) => {
       id: 'role',
       name: 'ROLE',
       selector: (row) => row?.role?.name
+    },
+    // STATUS
+    {
+      id: 'status',
+      name: 'STATUS',
+      selector: (row) => {
+        const { invitationStatus } = row
+        return (
+          <Tag
+            variant='subtle'
+            colorScheme={
+              invitationStatus === 'invited'
+                ? 'orange'
+                : invitationStatus === 'accepted'
+                  ? 'green'
+                  : 'blue'
+            }
+            textTransform={'capitalize'}
+          >
+            {invitationStatus}
+          </Tag>
+        )
+      }
     },
     // JOINED DATE
     {
