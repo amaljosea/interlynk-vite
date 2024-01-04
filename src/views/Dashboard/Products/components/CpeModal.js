@@ -140,6 +140,10 @@ const CpeModal = ({
   const onVendorInputChange = (event) => {
     const { value } = event.target
     const val = value.replace(/\s/g, '')
+    if (val.includes('*')) {
+      return
+    }
+
     setVendor(val)
     if (val !== '') {
       getCpe({
@@ -179,6 +183,9 @@ const CpeModal = ({
   const onProductInputChange = (event) => {
     const { value } = event.target
     const val = value.replace(/\s/g, '')
+    if (val.includes('*')) {
+      return
+    }
     setProduct(val)
     if (val !== '') {
       getCpe({
@@ -208,6 +215,9 @@ const CpeModal = ({
   const onVersionInputChange = (event) => {
     const { value } = event.target
     const val = value.replace(/\s/g, '')
+    if (val.includes('*')) {
+      return
+    }
     setVersion(val)
     if (val !== '') {
       getCpe({
@@ -338,7 +348,7 @@ const CpeModal = ({
             )}
             <Flex width={'100%'} direction={'column'} gap={4}>
               {/* CPE STRING */}
-              <FormControl isInvalid={error !== ''}>
+              <FormControl>
                 <FormLabel htmlFor='cpeString'>CPE String</FormLabel>
                 <Textarea
                   type='text'
