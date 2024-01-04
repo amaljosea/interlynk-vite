@@ -69,6 +69,7 @@ const TeamTable = ({ data, refetch }) => {
               />
             </Box>
             <Box
+              width={'200px'}
               display={'flex'}
               flexWrap={'wrap'}
               flexDirection={'column'}
@@ -80,13 +81,15 @@ const TeamTable = ({ data, refetch }) => {
           </Stack>
         )
       },
-      width: '300px'
+      width: '300px',
+      wrap: true
     },
     // AUTH
     {
       id: 'email',
       name: 'EMAIL',
-      selector: (row) => row.email
+      selector: (row) => row.email,
+      wrap: true
     },
     // ROLE
     {
