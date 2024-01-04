@@ -41,6 +41,7 @@ import {
   customStyles,
   removeDuplicates
 } from 'utils'
+import SbomList from 'views/Dashboard/Products/components/SbomList'
 import RowLimit from 'views/Sbom/components/RowLimit'
 
 const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
@@ -76,6 +77,12 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
     isOpen: isDeleteOpen,
     onOpen: onDeleteOpen,
     onClose: onDeleteClose
+  } = useDisclosure()
+
+  const {
+    isOpen: isListOpen,
+    onOpen: onListOpen,
+    onClose: onListClose
   } = useDisclosure()
 
   const onFilterSev = async (id, primaryComponent, value) => {
@@ -273,6 +280,14 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
                 >
                   Delete
                 </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    setActiveRow(row)
+                    onListOpen()
+                  }}
+                >
+                  List SBOM
+                </MenuItem>
               </MenuList>
             </Portal>
           </Menu>
@@ -427,6 +442,16 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
             </ModalFooter>
           </ModalContent>
         </Modal>
+      )}
+
+      {/* SBOM LIST */}
+      {isListOpen && project && (
+        <SbomList
+          data={activeRow}
+          sboms={project?.sboms}
+          isOpen={isListOpen}
+          onClose={onListClose}
+        />
       )}
     </>
   )
