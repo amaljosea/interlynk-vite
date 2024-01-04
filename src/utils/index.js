@@ -620,7 +620,7 @@ export const removeDuplicates = (arr) => {
 
 export const validateCpe = (value) => {
   const cpeRegex =
-    /^cpe:2\.3:[aho]\:[\w\-.~]+:[\w\-.~]+(?::[\w\-.~]+)?(?::[\w\-.~]+)?(?::[\w\-.~]+)?(?::[\w\-.~]+)?$/
+    /cpe:2\.3:[aho](?::(?:[a-zA-Z0-9!"#$%&'()*+,\\\-_.\/;<=>?@\[\]^`{|}~]|\\:)+){10}$/
   return cpeRegex.test(value)
 }
 
