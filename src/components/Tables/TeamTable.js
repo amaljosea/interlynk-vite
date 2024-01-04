@@ -21,8 +21,11 @@ import {
   ModalCloseButton,
   useDisclosure,
   Button,
-  Tooltip
+  Tooltip,
+  Tag,
+  useToast
 } from '@chakra-ui/react'
+import { InviteUser } from 'graphQL/Mutation'
 import { deleteOrgUser } from 'graphQL/Mutation'
 import React, { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
@@ -32,6 +35,7 @@ import TeamModal from 'views/Dashboard/Profile/components/TeamModal'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 const TeamTable = ({ data, refetch }) => {
+  const toast = useToast()
   const SERVER_URL = process.env.REACT_APP_SERVER
   const { isOpen, onOpen, onClose } = useDisclosure()
   const {
@@ -44,6 +48,10 @@ const TeamTable = ({ data, refetch }) => {
 
   const [deleteUser] = useMutation(deleteOrgUser)
 
+  const [inviteUsers] = useMutation(InviteUser, {
+    onCompleted: () => refetch()
+  })
+
   // COLUMNS
   const columns = [
     // NAME
@@ -51,48 +59,68 @@ const TeamTable = ({ data, refetch }) => {
       id: 'name',
       name: 'NAME',
       selector: (row) => {
-        const { name, email, profileImage } = row
+        const { name, profileImage } = row
         return (
-          <Stack
+          <Flex
             width={'100%'}
             px={0}
             py='.8rem'
             direction={'row'}
-            alignItems={'flex-center'}
+            alignItems={'center'}
+            justifyContent={'center'}
+            gap={2}
           >
-            <Box width={'30px'}>
-              <Avatar
-                me={{ md: '22px' }}
-                src={profileImage && `${SERVER_URL}/${profileImage?.url}`}
-                w='30px'
-                h='30px'
-              />
-            </Box>
-            <Box
-              display={'flex'}
-              flexWrap={'wrap'}
-              flexDirection={'column'}
-              gap={1}
-            >
-              <Text fontSize={'14px'}>{name}</Text>
-              <Text color={'#666'}>{email}</Text>
-            </Box>
-          </Stack>
+            <Avatar
+              src={profileImage && `${SERVER_URL}/${profileImage?.url}`}
+              w='30px'
+              h='30px'
+            />
+            <Text width={'200px'} fontSize={'14px'}>
+              {name}
+            </Text>
+          </Flex>
         )
       },
-      width: '300px'
+      width: '300px',
+      wrap: true
     },
     // AUTH
     {
       id: 'email',
       name: 'EMAIL',
-      selector: (row) => row.email
+      selector: (row) => <Text my={2}>{row?.email}</Text>,
+      wrap: true
     },
     // ROLE
     {
       id: 'role',
       name: 'ROLE',
       selector: (row) => row?.role?.name
+    },
+    // STATUS
+    {
+      id: 'status',
+      name: 'STATUS',
+      selector: (row) => {
+        const { invitationStatus } = row
+        return (
+          <Tag
+            variant='subtle'
+            colorScheme={
+              invitationStatus === 'invited'
+                ? 'orange'
+                : invitationStatus === 'accepted'
+                  ? 'green'
+                  : invitationStatus === 'declined'
+                    ? 'red'
+                    : 'blue'
+            }
+            textTransform={'capitalize'}
+          >
+            {invitationStatus}
+          </Tag>
+        )
+      }
     },
     // JOINED DATE
     {
@@ -118,6 +146,7 @@ const TeamTable = ({ data, refetch }) => {
       id: 'action',
       name: 'ACTION',
       selector: (row) => {
+        const { invitationStatus } = row
         return (
           <Menu>
             <MenuButton
@@ -138,6 +167,11 @@ const TeamTable = ({ data, refetch }) => {
                 >
                   Remove Member
                 </MenuItem>
+                {invitationStatus === 'declined' && (
+                  <MenuItem onClick={() => onResendInvite(row)}>
+                    Resend Invite
+                  </MenuItem>
+                )}
               </MenuList>
             </Portal>
           </Menu>
@@ -199,6 +233,30 @@ const TeamTable = ({ data, refetch }) => {
     }
   }
 
+  const onResendInvite = async (row) => {
+    await inviteUsers({
+      variables: {
+        email: row?.email.toLowerCase()
+      }
+    }).then((res) => {
+      if (res.data.organizationUserInvite.errors.length > 0) {
+        toast({
+          description: res.data.organizationUserInvite.errors[0],
+          status: 'error',
+          position: 'top',
+          duration: 2000
+        })
+      } else {
+        toast({
+          description: 'Invitation sent successfully',
+          status: 'success',
+          position: 'top',
+          duration: 2000
+        })
+      }
+    })
+  }
+
   return (
     <>
       {data ? (
@@ -247,7 +305,7 @@ const TeamTable = ({ data, refetch }) => {
                   Are you sure you want to remove the following user from the
                   organization ?
                 </Text>
-                <Text fontWeight={'semibold'}>
+                <Text fontWeight={'semibold'} wordBreak={'break-all'}>
                   {activeRow.name} {`(${activeRow.email})`}
                 </Text>
               </Stack>

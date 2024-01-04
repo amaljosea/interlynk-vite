@@ -171,7 +171,7 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
           {primaryComponent?.description}
         </Text>
         <Tooltip placement='top' label={getFullDateAndTime(updatedAt)}>
-          <Text fontSize='xs' cursor={'pointer'}>
+          <Text width={'fit-content'} fontSize='xs' cursor={'pointer'}>
             Updated {timeSince(updatedAt)}
           </Text>
         </Tooltip>

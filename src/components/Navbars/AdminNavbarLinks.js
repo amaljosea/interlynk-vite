@@ -17,8 +17,9 @@ import {
   PopoverHeader,
   PopoverBody,
   Stack,
-  Select,
-  Kbd
+  Kbd,
+  Icon,
+  MenuDivider
 } from '@chakra-ui/react'
 // Custom Icons
 import { ProfileIcon, SettingsIcon } from 'components/Icons/Icons'
@@ -35,6 +36,7 @@ import axios from 'axios'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { GetOrg } from 'graphQL/Queries'
 import { useQuery } from '@apollo/client'
+import { FaUser } from 'react-icons/fa6'
 
 export default function HeaderLinks(props) {
   const location = useLocation()
@@ -53,6 +55,7 @@ export default function HeaderLinks(props) {
   const authToken = Cookies.get('authToken')
 
   const name = localStorage.getItem('username')
+  const email = localStorage.getItem('email')
   const userEmail = localStorage.getItem('userEmail')
   const org = localStorage.getItem('organization')
 
@@ -187,8 +190,25 @@ export default function HeaderLinks(props) {
           </Text>
         </MenuButton>
         {location.pathname.startsWith('/vendor') && (
-          <MenuList size='sm'>
+          <MenuList>
             <MenuGroup title=''>
+              <MenuItem>
+                <Flex flexDirection='row' alignItems={'flex-start'} gap={3}>
+                  <Icon as={FaUser} width={2.5} mt={1} />
+                  <Stack direction={'column'} spacing={-2}>
+                    <Text mt={0} mb={0}>
+                      {name}
+                    </Text>
+                    <Text mt={0} mb={0} fontSize={'sm'} color={'#718096'}>
+                      {email}
+                    </Text>
+                    <Text mt={0} mb={0} fontSize={'sm'} color={'#718096'}>
+                      {org.replace(/"/g, '')}
+                    </Text>
+                  </Stack>
+                </Flex>
+              </MenuItem>
+              <MenuDivider />
               {data?.organization && (
                 <Link
                   to={`/vendor/settings?tab=person
@@ -200,6 +220,7 @@ export default function HeaderLinks(props) {
               <Link to='/vendor/settings?tab=organization'>
                 <MenuItem icon={<FaExchangeAlt />}>Organizations</MenuItem>
               </Link>
+              <MenuDivider />
               {name ? (
                 <MenuItem icon={<FaSignOutAlt />} onClick={handleLogout}>
                   Logout

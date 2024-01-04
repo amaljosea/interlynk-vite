@@ -1069,7 +1069,6 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
       type: 'DECREMENT_PAGE',
       payload: data.pageInfo.startCursor
     })
-    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const handleNextPage = async () => {
@@ -1081,7 +1080,6 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
         after: data.pageInfo.endCursor
       }
     })
-    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   useEffect(() => {

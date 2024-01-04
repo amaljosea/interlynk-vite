@@ -15,6 +15,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { CheckCircleIcon, WarningIcon } from '@chakra-ui/icons'
 import { AcceptInvitation } from 'graphQL/Mutation'
 import { useMutation } from '@apollo/client'
+import { DeclineInvitation } from 'graphQL/Mutation'
 
 const Invitation = () => {
   const navigate = useNavigate()
@@ -26,6 +27,7 @@ const Invitation = () => {
   const [error, setError] = useState([])
 
   const [acceptInvitation] = useMutation(AcceptInvitation)
+  const [rejectInvitation] = useMutation(DeclineInvitation)
 
   const onAccept = async () => {
     await acceptInvitation({
@@ -45,6 +47,20 @@ const Invitation = () => {
         ) {
           navigate('/auth')
         }
+      }
+    })
+  }
+
+  const onReject = async () => {
+    await rejectInvitation({
+      variables: {
+        token,
+        nonce
+      }
+    }).then((res) => {
+      if (res.data) {
+        console.log(res.data)
+        navigate('/auth')
       }
     })
   }
@@ -86,9 +102,11 @@ const Invitation = () => {
             flexDir={'column'}
           >
             <Icon color={'green.400'} boxSize={20} as={CheckCircleIcon} />
-            <Text my={6} fontSize={20}>This is an invitation to join Interlynk</Text>
+            <Text my={6} fontSize={20}>
+              This is an invitation to join Interlynk
+            </Text>
             <HStack spacing={2}>
-              <Button variant='outline' colorScheme='blue'>
+              <Button variant='outline' colorScheme='blue' onClick={onReject}>
                 Decline
               </Button>
               <Button variant='solid' colorScheme='blue' onClick={onAccept}>

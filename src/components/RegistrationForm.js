@@ -27,6 +27,8 @@ import { CheckCircleIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { validPassword } from 'utils'
 
 const RegistrationForm = () => {
+  const navigate = useNavigate()
+
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [emailError, setEmailError] = useState('')
@@ -108,8 +110,12 @@ const RegistrationForm = () => {
         setIsLoading(false)
         setIsSuccess(false)
       } else {
-        setIsSuccess(true)
-        setIsLoading(false)
+        if (res.data.userRegistration.confirmationNeeded) {
+          setIsSuccess(true)
+          setIsLoading(false)
+        } else {
+          navigate('/auth')
+        }
       }
     })
   }

@@ -445,8 +445,8 @@ const VulnTable = ({
           kev === 'all' || kev === ''
             ? undefined
             : kev === 'yes'
-            ? true
-            : false,
+              ? true
+              : false,
         epss: epss !== '' && epss !== 'all' ? range : undefined,
         field: field,
         direction: direction,
@@ -637,7 +637,6 @@ const VulnTable = ({
           type: 'DECREMENT_PAGE',
           payload: data.pageInfo.startCursor
         })
-        window.scrollTo({ top: 0, behavior: 'smooth' })
       }
     })
   }
@@ -658,7 +657,6 @@ const VulnTable = ({
             after: data.pageInfo.endCursor
           }
         })
-        window.scrollTo({ top: 0, behavior: 'smooth' })
       }
     })
   }
