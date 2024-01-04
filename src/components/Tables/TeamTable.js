@@ -53,32 +53,24 @@ const TeamTable = ({ data, refetch }) => {
       selector: (row) => {
         const { name, email, profileImage } = row
         return (
-          <Stack
+          <Flex
             width={'100%'}
             px={0}
             py='.8rem'
             direction={'row'}
-            alignItems={'flex-center'}
+            alignItems={'center'}
+            justifyContent={'center'}
+            gap={2}
           >
-            <Box width={'30px'}>
-              <Avatar
-                me={{ md: '22px' }}
-                src={profileImage && `${SERVER_URL}/${profileImage?.url}`}
-                w='30px'
-                h='30px'
-              />
-            </Box>
-            <Box
-              width={'200px'}
-              display={'flex'}
-              flexWrap={'wrap'}
-              flexDirection={'column'}
-              gap={1}
-            >
-              <Text fontSize={'14px'}>{name}</Text>
-              <Text color={'#666'}>{email}</Text>
-            </Box>
-          </Stack>
+            <Avatar
+              src={profileImage && `${SERVER_URL}/${profileImage?.url}`}
+              w='30px'
+              h='30px'
+            />
+            <Text width={'200px'} fontSize={'14px'}>
+              {name}
+            </Text>
+          </Flex>
         )
       },
       width: '300px',
@@ -88,7 +80,7 @@ const TeamTable = ({ data, refetch }) => {
     {
       id: 'email',
       name: 'EMAIL',
-      selector: (row) => row.email,
+      selector: (row) => <Text my={2}>{row.email}</Text>,
       wrap: true
     },
     // ROLE
