@@ -104,7 +104,9 @@ const TeamTable = ({ data, refetch }) => {
                 ? 'orange'
                 : invitationStatus === 'accepted'
                   ? 'green'
-                  : 'blue'
+                  : invitationStatus === 'declined'
+                    ? 'red'
+                    : 'blue'
             }
             textTransform={'capitalize'}
           >
