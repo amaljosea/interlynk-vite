@@ -250,7 +250,7 @@ const TeamTable = ({ data, refetch }) => {
                   Are you sure you want to remove the following user from the
                   organization ?
                 </Text>
-                <Text fontWeight={'semibold'}>
+                <Text fontWeight={'semibold'} wordBreak={'break-all'}>
                   {activeRow.name} {`(${activeRow.email})`}
                 </Text>
               </Stack>
