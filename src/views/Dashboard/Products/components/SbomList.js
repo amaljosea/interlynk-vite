@@ -42,14 +42,14 @@ const SbomList = ({ isOpen, onClose, data, sboms }) => {
       <DrawerContent>
         <DrawerCloseButton />
         <DrawerHeader>
-          {data?.primaryComponent?.version || 'SBOM List'}
+          { data?.primaryComponent?.version ? data?.primaryComponent?.version + ' SBOM List' : 'SBOM List' }
         </DrawerHeader>
         <DrawerBody>
           <Table variant='simple' m={0} p={0}>
             <Thead>
               <Tr>
                 {[
-                  'UPLOADED AT',
+                  'UPLOADED',
                   'COMPONENTS',
                   'LICENSES',
                   'VULNERABILITIES',
@@ -75,7 +75,7 @@ const SbomList = ({ isOpen, onClose, data, sboms }) => {
                     return (
                       <Tr key={index}>
                         <Td px={0} fontSize={'sm'}>
-                          <Stack direction={'column'}>
+                          <Stack direction={'row'}>
                             <Text> {getFullDateAndTime(creationAt)}</Text>
                             {index === 0 && (
                               <Tag
