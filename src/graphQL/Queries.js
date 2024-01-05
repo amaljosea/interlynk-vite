@@ -38,6 +38,7 @@ export const GetOrg = gql`
         role {
           name
         }
+        createdAt
         invitationStatus
         invitationAcceptedAt
         profileImage {
