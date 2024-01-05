@@ -203,7 +203,7 @@ export default function HeaderLinks(props) {
                       {email}
                     </Text>
                     <Text mt={0} mb={0} fontSize={'sm'} color={'#718096'}>
-                      {org?.replace(/"/g, '')}
+                      {org !== 'undefined' ? org.replace(/"/g, '') : ''}
                     </Text>
                   </Stack>
                 </Flex>

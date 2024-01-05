@@ -23,7 +23,9 @@ import {
   Button,
   Tooltip,
   Tag,
-  useToast
+  useToast,
+  TagLabel,
+  Badge
 } from '@chakra-ui/react'
 import { InviteUser } from 'graphQL/Mutation'
 import { deleteOrgUser } from 'graphQL/Mutation'
@@ -75,9 +77,22 @@ const TeamTable = ({ data, refetch }) => {
               w='30px'
               h='30px'
             />
-            <Text width={'200px'} fontSize={'14px'}>
-              {name}
-            </Text>
+            <Stack spacing={2} direction={'row'} alignItems={'center'}>
+              <Text width={'fit-content'} fontSize={'14px'}>
+                {name}
+              </Text>
+              {row.email === data.currentUser.email && (
+                <Badge
+                  variant='outline'
+                  colorScheme='blue'
+                  py={1}
+                  px={2}
+                  borderRadius={4}
+                >
+                  You
+                </Badge>
+              )}
+            </Stack>
           </Flex>
         )
       },
@@ -105,6 +120,7 @@ const TeamTable = ({ data, refetch }) => {
         const { invitationStatus } = row
         return (
           <Tag
+            width='100px'
             variant='subtle'
             colorScheme={
               invitationStatus === 'invited'
@@ -117,7 +133,7 @@ const TeamTable = ({ data, refetch }) => {
             }
             textTransform={'capitalize'}
           >
-            {invitationStatus}
+            <TagLabel mx='auto'>{invitationStatus}</TagLabel>
           </Tag>
         )
       }
@@ -127,17 +143,19 @@ const TeamTable = ({ data, refetch }) => {
       id: 'joinedDate',
       name: 'DATE JOINED',
       selector: (row) => {
-        const { createdAt } = row
+        const { invitationAcceptedAt } = row
         return (
           <Text textTransform={'capitalize'}>
-            {getFullDateAndTime(createdAt)}
+            {invitationAcceptedAt
+              ? getFullDateAndTime(invitationAcceptedAt)
+              : ''}
           </Text>
         )
       },
       sortable: true,
       sortFunction: (a, b) => {
-        const dateA = new Date(a.createdAt)
-        const dateB = new Date(b.createdAt)
+        const dateA = new Date(a.invitationAcceptedAt)
+        const dateB = new Date(b.invitationAcceptedAt)
         return dateA - dateB // Sort in descending order
       }
     },
@@ -165,9 +183,13 @@ const TeamTable = ({ data, refetch }) => {
                     onOpen()
                   }}
                 >
-                  Remove Member
+                  {invitationStatus === 'declined' ||
+                  invitationStatus === 'invited'
+                    ? 'Revoke Invitation'
+                    : 'Remove Member'}
                 </MenuItem>
-                {invitationStatus === 'declined' && (
+                {(invitationStatus === 'declined' ||
+                  invitationStatus === 'invited') && (
                   <MenuItem onClick={() => onResendInvite(row)}>
                     Resend Invite
                   </MenuItem>

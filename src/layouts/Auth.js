@@ -19,7 +19,7 @@ import {
   Text
 } from '@chakra-ui/react'
 // core components
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import Cookies from 'js-cookie'
 import { InterlynkLogo } from 'components/Icons/Icons'
 import DashboardBg from 'assets/img/dashboard.png'
@@ -28,8 +28,13 @@ import { useState, useRef, useEffect } from 'react'
 
 export default function Auth() {
   const navigate = useNavigate()
+  const location = useLocation()
   const navRef = useRef()
-  const [email, setEmail] = useState('')
+
+  const queryParams = new URLSearchParams(location.search)
+  const emailId = queryParams.get('id')
+
+  const [email, setEmail] = useState(emailId ? emailId : '')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
 
@@ -140,6 +145,7 @@ export default function Auth() {
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder='abc@example.com'
                       autoComplete='off'
+                      isDisabled={emailId}
                     />
                   </FormControl>
                   <FormControl>

@@ -45,7 +45,9 @@ const Invitation = () => {
         } else if (
           res.data.organizationUserInvitationAccept.userType === 'existing_user'
         ) {
-          navigate('/auth')
+          navigate(
+            `/auth?id=${res.data.organizationUserInvitationAccept.user.email}`
+          )
         }
       }
     })
