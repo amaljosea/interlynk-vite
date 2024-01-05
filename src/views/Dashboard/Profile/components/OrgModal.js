@@ -70,7 +70,7 @@ const OrgModal = ({ isOpen, onClose, refetch, org, onSwitch }) => {
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Create Organization</ModalHeader>
+        <ModalHeader>Register Organization</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Flex width={'100%'} direction={'column'} gap={4}>

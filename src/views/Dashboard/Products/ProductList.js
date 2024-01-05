@@ -24,6 +24,9 @@ function ProductList() {
   const product = queryParams.get('id')
 
   const org = localStorage.getItem('organization')
+  if (!org || org === 'undefined') {
+    return <OrgRegister />
+  }
 
   const { data, refetch, error } = useQuery(GetProjectData, {
     variables: {
@@ -60,10 +63,6 @@ function ProductList() {
         </Text>
       </Flex>
     )
-  }
-
-  if (org === 'undefined') {
-    return <OrgRegister />
   }
 
   return <ProductTable data={data?.projects} refetch={refetch} />

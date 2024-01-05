@@ -111,7 +111,7 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
     return (
       <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
         <Stack direction={'row'} spacing={2} alignItems={'center'}>
-          <Tooltip label='Add Organization'>
+          <Tooltip label='Register Organization'>
             <IconButton
               colorScheme='blue'
               icon={<AddIcon />}
