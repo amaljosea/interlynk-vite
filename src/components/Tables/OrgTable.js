@@ -23,7 +23,8 @@ import {
   MenuButton,
   MenuList,
   Portal,
-  MenuItem
+  MenuItem,
+  Badge
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
 import { customStyles, getFullDateAndTime } from 'utils'
@@ -135,17 +136,18 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
       selector: (row) => {
         const { name, id } = row
         return (
-          <Stack direction={'column'} my={3}>
+          <Stack direction={'row'} my={3} alignItems={'center'}>
             <Text fontSize={14}>{name}</Text>
             {activeOrg === id && (
-              <Tag
-                size='sm'
-                width={'fit-content'}
-                variant='solid'
-                colorScheme='green'
+              <Badge
+                variant='outline'
+                colorScheme='blue'
+                py={1}
+                px={2}
+                borderRadius={4}
               >
                 Active
-              </Tag>
+              </Badge>
             )}
           </Stack>
         )
@@ -187,9 +189,10 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
         return (
           <Tag
             variant='subtle'
+            width={'100px'}
             colorScheme={status === 'approved' ? 'green' : 'blue'}
           >
-            <TagLabel fontSize={14} textTransform={'capitalize'}>
+            <TagLabel fontSize={14} textTransform={'capitalize'} mx={'auto'}>
               {status}
             </TagLabel>
           </Tag>
