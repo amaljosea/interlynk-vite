@@ -153,7 +153,7 @@ function Profile() {
                 onChange={(e) => onTabChange(e)}
               >
                 <TabList>
-                  {['General', 'Team', 'Feeds', 'Checks', 'Lists'].map(
+                  {['General', 'Users', 'Feeds', 'Checks', 'Lists'].map(
                     (item, index) => (
                       <Tab key={index} _focus={{ outline: 'none' }}>
                         {item}

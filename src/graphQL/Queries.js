@@ -38,9 +38,8 @@ export const GetOrg = gql`
         role {
           name
         }
-        timezone
-        createdAt
         invitationStatus
+        invitationAcceptedAt
         profileImage {
           filename
           url
