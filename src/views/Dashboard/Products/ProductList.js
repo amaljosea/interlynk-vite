@@ -7,6 +7,8 @@ import { useLocation } from 'react-router-dom'
 import ProductTable from 'components/Tables/ProductTable'
 import { useGlobalState } from 'hooks/useGlobalState'
 import OrgRegister from '../Profile/components/OrgRegister'
+import { displayErrorMessage } from 'utils'
+import { WarningTwoIcon } from '@chakra-ui/icons'
 
 function ProductList() {
   const { totalRows, prodState, dispatch } = useGlobalState()
@@ -58,8 +60,9 @@ function ProductList() {
   if (error) {
     return (
       <Flex my={32} alignItems={'center'} justifyContent={'center'}>
+        <WarningTwoIcon color='blue.500'/>
         <Text textAlign={'center'} fontSize={14}>
-          {error.message}
+          {displayErrorMessage(error.networkError.statusCode, error.message)}
         </Text>
       </Flex>
     )

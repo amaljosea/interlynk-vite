@@ -28,6 +28,8 @@ import TokenInfo from './components/TokenInfo'
 import TeamTable from 'components/Tables/TeamTable'
 import { MyOrganizations } from 'graphQL/Queries'
 import OrgTable from 'components/Tables/OrgTable'
+import { displayErrorMessage } from 'utils'
+import { WarningTwoIcon } from '@chakra-ui/icons'
 
 function Profile() {
   const location = useLocation()
@@ -113,9 +115,10 @@ function Profile() {
 
   if (error) {
     return (
-      <Flex my={32} alignItems={'center'} justifyContent={'center'}>
+      <Flex my={32} alignItems={'center'} justifyContent={'center'} gap={2}>
+        <WarningTwoIcon color='blue.500'/>
         <Text textAlign={'center'} fontSize={14}>
-          {error.message}
+          { displayErrorMessage(error.networkError.statusCode, error.message) }
         </Text>
       </Flex>
     )
