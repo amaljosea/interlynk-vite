@@ -15,6 +15,9 @@ import { useEffect } from 'react'
 import { GetOrgMetrics } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useLocation } from 'react-router-dom'
+import { displayErrorMessage } from 'utils'
+import { Text } from '@chakra-ui/react';
+import { WarningTwoIcon } from '@chakra-ui/icons'
 
 export default function Dashboard() {
   const location = useLocation()
@@ -26,9 +29,7 @@ export default function Dashboard() {
 
   const iconBoxInside = useColorModeValue('white', 'white')
 
-  const { data } = useQuery(GetOrg)
-  const { data: metrics } = useQuery(GetOrgMetrics)
-
+  const { data, refetch: rOrg, error: eOrg } = useQuery(GetOrg)
   useEffect(() => {
     if (data) {
       localStorage.setItem(
@@ -38,12 +39,36 @@ export default function Dashboard() {
     }
   }, [data])
 
+  const { data: metrics, refetch: rOrgMetric, error: eOrgMetric } = useQuery(GetOrgMetrics)
+
   useEffect(() => {
     if (product === null) {
       prodCompDispatch({ type: 'CLEAR_PROD_COMP' })
       prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
     }
   }, [product])
+
+  if (eOrg) {
+    return (
+      <Flex my={32} alignItems={'center'} justifyContent={'center'} gap={2}>
+        <WarningTwoIcon color='blue.500'/>
+        <Text textAlign={'center'} fontSize={14}>
+          { displayErrorMessage(eOrg.networkError.statusCode, eOrg.message) }
+        </Text>
+      </Flex>
+    )
+  }
+
+  if (eOrgMetric) {
+    return (
+      <Flex my={32} alignItems={'center'} justifyContent={'center'} gap={2}>
+        <Text textAlign={'center'} fontSize={14}>
+          <WarningTwoIcon color='blue.500'/>
+          { displayErrorMessage(eOrgMetric.networkError.statusCode, eOrgMetric.message) }
+        </Text>
+      </Flex>
+    )
+  }
 
   return (
     <>

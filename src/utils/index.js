@@ -640,3 +640,21 @@ export const validateEmail = (email) => {
   const emailRegex = /^[a-zA-Z0-9._+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
   return emailRegex.test(email)
 }
+
+export const toast_error_message_duration = 300
+
+export const displayErrorMessage = (status_code, message) => {
+  if (status_code === 200 || status_code === 400) {
+    return message
+  } else if (status_code === 401) {
+    return 'You are not authorized to view this page.'
+  } else if (status_code === 403) {
+    return 'You are forbidden to view this page.'
+  } else if (status_code === 404) {
+    return 'The request page was not found.'
+  } else if (status_code === 405) {
+    return 'The requested method is not allowed.'
+  } else {
+    return 'An internal error occured. Please retry later.'
+  }
+}
