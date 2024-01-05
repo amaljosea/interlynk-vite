@@ -1493,3 +1493,14 @@ export const SwitchOrganization = gql`
     }
   }
 `
+
+export const QuitOrganization = gql`
+  mutation QuitOrganization($id: Uuid!) {
+    organizationUserLeave(input: { organizationId: $id }) {
+      organization {
+        id
+      }
+      errors
+    }
+  }
+`

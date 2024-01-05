@@ -34,23 +34,31 @@ import { SwitchOrganization } from 'graphQL/Mutation'
 import Cookies from 'js-cookie'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { FaEllipsisVertical } from 'react-icons/fa6'
+import { QuitOrganization } from 'graphQL/Mutation'
 
 const OrgTable = ({ data, refetch, activeOrg }) => {
   const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
-  const activetab = queryParams.get('tab')
   const toast = useToast()
   const { isOpen, onOpen, onClose } = useDisclosure()
+
   const {
     isOpen: isWarningOpen,
     onOpen: onWarningOpen,
     onClose: onWarningClose
   } = useDisclosure()
 
+  const {
+    isOpen: isLeaveOpen,
+    onOpen: onLeaveOpen,
+    onClose: onLeaveClose
+  } = useDisclosure()
+
   const [activeRow, setActiveRow] = useState(null)
 
   const [switchOrg] = useMutation(SwitchOrganization)
+  const [quitOrg] = useMutation(QuitOrganization)
 
   const onSwitchOrg = async (id, name) => {
     await switchOrg({
@@ -69,6 +77,33 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
         }
       })
       .finally(() => navigate('/vendor/dashboard'))
+  }
+
+  const onLeaveOrg = async (id) => {
+    await quitOrg({
+      variables: {
+        id
+      }
+    }).then((res) => {
+      if (res?.data?.organizationUserLeave?.errors?.length > 0) {
+        toast({
+          description: res.data.organizationUserLeave.errors[0],
+          position: 'top',
+          status: 'error',
+          duration: 2000
+        })
+      } else {
+        if (data?.length === 1) {
+          localStorage.removeItem('username')
+          localStorage.removeItem('email')
+          localStorage.removeItem('product')
+          Cookies.remove('authToken')
+          navigate('/auth')
+        } else {
+          navigate('/auth')
+        }
+      }
+    })
   }
 
   const subHeaderComponent = useMemo(() => {
@@ -190,7 +225,14 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
                 {activeOrg !== id && (
                   <MenuItem onClick={() => onSwitch(row)}>Switch To</MenuItem>
                 )}
-                <MenuItem>Leave Organization</MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    setActiveRow(row)
+                    onLeaveOpen()
+                  }}
+                >
+                  Leave Organization
+                </MenuItem>
               </MenuList>
             </Portal>
           </Menu>
@@ -251,6 +293,37 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
                 onClick={() => onSwitchOrg(activeRow.id, activeRow.name)}
               >
                 Continue
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      )}
+
+      {isLeaveOpen && (
+        <Modal isOpen={isLeaveOpen} onClose={onLeaveClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Leave Organization</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Text>
+                You are about to leave Organization:{' '}
+                <strong>{activeRow.name}</strong>
+              </Text>
+              <Text mt={6}>Are you sure you wish to continue ?</Text>
+            </ModalBody>
+
+            <ModalFooter>
+              <Button fontWeight={'medium'} mr={3} onClick={onLeaveClose}>
+                Cancel
+              </Button>
+              <Button
+                fontWeight={'medium'}
+                variant='solid'
+                colorScheme='red'
+                onClick={() => onLeaveOrg(activeRow.id)}
+              >
+                Leave
               </Button>
             </ModalFooter>
           </ModalContent>
