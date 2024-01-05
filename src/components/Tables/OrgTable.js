@@ -27,7 +27,7 @@ import {
   Badge
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
-import { customStyles, getFullDateAndTime } from 'utils'
+import { customStyles, timeSince, getFullDateAndTime } from 'utils'
 import CustomLoader from 'components/CustomLoader'
 import OrgModal from 'views/Dashboard/Profile/components/OrgModal'
 import { useMutation } from '@apollo/client'
@@ -205,9 +205,21 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
       name: 'UPDATED AT',
       selector: (row) => {
         const { updatedAt } = row
-        return <Text fontSize={14}>{getFullDateAndTime(updatedAt)}</Text>
+        return (
+        <Tooltip label={getFullDateAndTime(updatedAt)} placement={'top'}>
+          <Text textTransform={'capitalize'}>
+            {timeSince(updatedAt)}
+          </Text>
+        </Tooltip>
+      )
       },
-      wrap: true
+      wrap: true,
+      sortable: true,
+      sortFunction: (a, b) => {
+        const dateA = new Date(a.updatedAt)
+        const dateB = new Date(b.updatedAt)
+        return dateA - dateB // Sort in descending order
+      }
     },
     {
       id: 'ACTION',

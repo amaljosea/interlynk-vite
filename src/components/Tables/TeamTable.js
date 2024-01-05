@@ -32,9 +32,17 @@ import { deleteOrgUser } from 'graphQL/Mutation'
 import React, { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV } from 'react-icons/fa'
-import { getFullDateAndTime, customStyles } from 'utils'
+import { getFullDateAndTime, timeSince, customStyles } from 'utils'
 import TeamModal from 'views/Dashboard/Profile/components/TeamModal'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
+
+function userTimeStart(row) {
+  let timeStart;
+  if (row.invitationStatus === 'accepted') {
+    timeStart = row.invitationAcceptedAt ? row.invitationAcceptedAt : row.createdAt;
+  }
+  return timeStart;
+}
 
 const TeamTable = ({ data, refetch }) => {
   const toast = useToast()
@@ -143,19 +151,27 @@ const TeamTable = ({ data, refetch }) => {
       id: 'joinedDate',
       name: 'DATE JOINED',
       selector: (row) => {
+        const { invitationStatus } = row
         const { invitationAcceptedAt } = row
+        const { createdAt } = row
+        const timeStart = userTimeStart(row);
         return (
-          <Text textTransform={'capitalize'}>
-            {invitationAcceptedAt
-              ? getFullDateAndTime(invitationAcceptedAt)
-              : ''}
-          </Text>
+          <Tooltip label={getFullDateAndTime(timeStart)} placement={'top'}>
+            <Text textTransform={'capitalize'}>
+              {timeStart ? timeSince(timeStart) : ''}
+            </Text>
+          </Tooltip>
         )
       },
       sortable: true,
       sortFunction: (a, b) => {
-        const dateA = new Date(a.invitationAcceptedAt)
-        const dateB = new Date(b.invitationAcceptedAt)
+        const aUserStart = userTimeStart(a);
+        const bUserStart = userTimeStart(b);
+        if (!aUserStart && !bUserStart) return 0
+        if (!aUserStart) return 1
+        if (!bUserStart) return -1
+        const dateA = new Date(aUserStart)
+        const dateB = new Date(bUserStart)
         return dateA - dateB // Sort in descending order
       }
     },
@@ -186,7 +202,7 @@ const TeamTable = ({ data, refetch }) => {
                   {invitationStatus === 'declined' ||
                   invitationStatus === 'invited'
                     ? 'Revoke Invitation'
-                    : 'Remove Member'}
+                    : 'Remove User'}
                 </MenuItem>
                 {(invitationStatus === 'declined' ||
                   invitationStatus === 'invited') && (
@@ -226,7 +242,7 @@ const TeamTable = ({ data, refetch }) => {
           onClear={handleClear}
         />
 
-        {/* ADD MEMBER */}
+        {/* ADD USER */}
         <Tooltip label='Invite User' placement='top'>
           <IconButton
             onClick={onTeamOpen}
@@ -306,7 +322,7 @@ const TeamTable = ({ data, refetch }) => {
         </Flex>
       )}
 
-      {/* ADD / UPDATE MEMBER */}
+      {/* ADD / UPDATE User */}
       {isTeamOpen && (
         <TeamModal
           refetch={refetch}
@@ -314,12 +330,12 @@ const TeamTable = ({ data, refetch }) => {
           onClose={onTeamClose}
         />
       )}
-      {/* REMOVE MEMBER */}
+      {/* REMOVE User */}
       {isOpen && activeRow && (
         <Modal isOpen={isOpen} onClose={onClose}>
           <ModalOverlay />
           <ModalContent>
-            <ModalHeader>Remove Member</ModalHeader>
+            <ModalHeader>Remove User</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               <Stack direction={'column'} spacing={2} alignItems={'flex-start'}>
