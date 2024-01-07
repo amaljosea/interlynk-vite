@@ -32,7 +32,7 @@ const Confirmation = () => {
     }).then((res) => {
       console.log(res.data)
       if (res.data.userEmailConfirmation.errors.length > 0) {
-        setError(res.data.organizationUserInvitationAccept.errors)
+        setError(res.data.userEmailConfirmation.errors)
       } else {
         setError([])
       }
