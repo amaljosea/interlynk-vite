@@ -53,7 +53,7 @@ export default function Dashboard() {
       <Flex my={32} alignItems={'center'} justifyContent={'center'} gap={2}>
         <WarningTwoIcon color='blue.500'/>
         <Text textAlign={'center'} fontSize={14}>
-          { displayErrorMessage(eOrg.networkError.statusCode, eOrg.message) }
+          { displayErrorMessage(eOrg.networkError?.statusCode, eOrg.message) }
         </Text>
       </Flex>
     )
@@ -64,7 +64,7 @@ export default function Dashboard() {
       <Flex my={32} alignItems={'center'} justifyContent={'center'} gap={2}>
         <Text textAlign={'center'} fontSize={14}>
           <WarningTwoIcon color='blue.500'/>
-          { displayErrorMessage(eOrgMetric.networkError.statusCode, eOrgMetric.message) }
+          { displayErrorMessage(eOrgMetric.networkError?.statusCode, eOrgMetric.message) }
         </Text>
       </Flex>
     )
