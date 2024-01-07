@@ -62,7 +62,7 @@ function ProductList() {
       <Flex my={32} alignItems={'center'} justifyContent={'center'}>
         <WarningTwoIcon color='blue.500'/>
         <Text textAlign={'center'} fontSize={14}>
-          {displayErrorMessage(error.networkError.statusCode, error.message)}
+          {displayErrorMessage(error.networkError?.statusCode, error.message)}
         </Text>
       </Flex>
     )

@@ -133,7 +133,7 @@ const RegistrationForm = () => {
           Registration Successful
         </Text>
         <Text fontSize={'sm'} textAlign={'center'} color={'#555'}>
-          User will receive an email with confirmation link.
+          Please check your email to confirm your account or <Link to='/auth' style={{ color: 'blue' }}>click here </Link> to login.
         </Text>
       </Flex>
     )
