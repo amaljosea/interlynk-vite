@@ -67,6 +67,11 @@ export const GetRoles = gql`
       organizationRoles {
         id
         name
+        createdAt
+        permissionsMap {
+          key
+          value
+        }
       }
     }
   }
