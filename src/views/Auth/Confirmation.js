@@ -15,7 +15,6 @@ import { useMutation } from '@apollo/client'
 import { UserEmailConfirmation } from 'graphQL/Mutation'
 
 const Confirmation = () => {
-  const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const token = queryParams.get('confirmation_token')
@@ -30,9 +29,8 @@ const Confirmation = () => {
         token
       }
     }).then((res) => {
-      console.log(res.data)
-      if (res.data.userEmailConfirmation.errors.length > 0) {
-        setError(res.data.userEmailConfirmation.errors)
+      if (res?.data?.userEmailConfirmation?.errors.length > 0) {
+        setError(res?.data?.userEmailConfirmation?.errors[0])
       } else {
         setError([])
       }
