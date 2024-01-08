@@ -140,12 +140,8 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
         <Text fontSize={'sm'} my={0.5}>
           {primaryComponent?.description}
         </Text>
-        <Tooltip placement='top' label={getFullDateAndTime(updatedAt)}>
-          <Text width={'fit-content'} fontSize='xs' cursor={'pointer'}>
-            Updated {timeSince(updatedAt)}
-          </Text>
-        </Tooltip>
-        <Flex flexDir='row' gap={2} alignItems={'center'} width='100%' mt={4}>
+          {/* SCAN STATUS */}
+          <Flex flexDir='row' gap={2} alignItems={'center'} width='100%' my={2}>
           <Tooltip label='Imported'>
             <CheckCircleIcon color={'blue.500'} />
           </Tooltip>
@@ -180,6 +176,12 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
             </Badge>
           )}
         </Flex>
+        {/* UPDATED AT */}
+        <Tooltip placement='top' label={getFullDateAndTime(updatedAt)}>
+          <Text width={'fit-content'} fontSize='xs' cursor={'pointer'}>
+            Updated {timeSince(updatedAt)}
+          </Text>
+        </Tooltip>
         {/* STATS */}
         <Flex flexDir={'row'} alignItems={'center'} gap={4} mt={5}>
           {/* COMPONENTS */}
