@@ -30,6 +30,8 @@ import { MyOrganizations } from 'graphQL/Queries'
 import OrgTable from 'components/Tables/OrgTable'
 import { displayErrorMessage } from 'utils'
 import { WarningTwoIcon } from '@chakra-ui/icons'
+import { GetRoles } from 'graphQL/Queries'
+import RoleTable from 'components/Tables/RoleTable'
 
 function Profile() {
   const location = useLocation()
@@ -58,6 +60,8 @@ function Profile() {
     fetchPolicy: 'network-only'
   })
 
+  const [getOrgRoles, { data: roles }] = useLazyQuery(GetRoles)
+
   const onTabChange = (value) => {
     setTabIndex(value)
     if (value === 0) {
@@ -65,10 +69,12 @@ function Profile() {
     } else if (value === 1) {
       navigate('/vendor/settings?tab=team')
     } else if (value === 2) {
-      navigate('/vendor/settings?tab=feeds')
+      navigate('/vendor/settings?tab=roles')
     } else if (value === 3) {
-      navigate('/vendor/settings?tab=checks')
+      navigate('/vendor/settings?tab=feeds')
     } else if (value === 4) {
+      navigate('/vendor/settings?tab=checks')
+    } else if (value === 5) {
       navigate('/vendor/settings?tab=lists')
     }
   }
@@ -91,7 +97,7 @@ function Profile() {
     } else if (activetab === 'organization') {
       setSelectedTab('PERSONAL')
       setPsIndex(1)
-      getMyOrgs()
+      getMyOrgs({ variables: { invitationStatuses: ['ACCEPTED', 'INVITED'] } })
     } else if (activetab === 'token') {
       setSelectedTab('PERSONAL')
       setPsIndex(2)
@@ -101,24 +107,28 @@ function Profile() {
     } else if (activetab === 'team') {
       setSelectedTab('ORGANIZATION')
       setTabIndex(1)
-    } else if (activetab === 'feeds') {
+    } else if (activetab === 'roles') {
       setSelectedTab('ORGANIZATION')
       setTabIndex(2)
-    } else if (activetab === 'checks') {
+      getOrgRoles()
+    } else if (activetab === 'feeds') {
       setSelectedTab('ORGANIZATION')
       setTabIndex(3)
-    } else if (activetab === 'lists') {
+    } else if (activetab === 'checks') {
       setSelectedTab('ORGANIZATION')
       setTabIndex(4)
+    } else if (activetab === 'lists') {
+      setSelectedTab('ORGANIZATION')
+      setTabIndex(5)
     }
   }, [activetab])
 
   if (error) {
     return (
       <Flex my={32} alignItems={'center'} justifyContent={'center'} gap={2}>
-        <WarningTwoIcon color='blue.500'/>
+        <WarningTwoIcon color='blue.500' />
         <Text textAlign={'center'} fontSize={14}>
-          { displayErrorMessage(error.networkError?.statusCode, error.message) }
+          {displayErrorMessage(error.networkError?.statusCode, error.message)}
         </Text>
       </Flex>
     )
@@ -156,13 +166,18 @@ function Profile() {
                 onChange={(e) => onTabChange(e)}
               >
                 <TabList>
-                  {['General', 'Users', 'Feeds', 'Checks', 'Lists'].map(
-                    (item, index) => (
-                      <Tab key={index} _focus={{ outline: 'none' }}>
-                        {item}
-                      </Tab>
-                    )
-                  )}
+                  {[
+                    'General',
+                    'Users',
+                    'Roles',
+                    'Feeds',
+                    'Checks',
+                    'Lists'
+                  ].map((item, index) => (
+                    <Tab key={index} _focus={{ outline: 'none' }}>
+                      {item}
+                    </Tab>
+                  ))}
                 </TabList>
                 <TabPanels>
                   {/* GEENRAL */}
@@ -183,6 +198,10 @@ function Profile() {
                         refetch={refetch}
                       />
                     )}
+                  </TabPanel>
+                  {/* ROLES */}
+                  <TabPanel>
+                    <RoleTable data={roles?.organization?.organizationRoles} />
                   </TabPanel>
                   {/* FEEDS */}
                   <TabPanel>

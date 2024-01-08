@@ -2,7 +2,6 @@ import { useMutation } from '@apollo/client'
 import { AddIcon } from '@chakra-ui/icons'
 import {
   Avatar,
-  Box,
   Flex,
   IconButton,
   Menu,
@@ -27,8 +26,7 @@ import {
   TagLabel,
   Badge
 } from '@chakra-ui/react'
-import { InviteUser } from 'graphQL/Mutation'
-import { deleteOrgUser } from 'graphQL/Mutation'
+import { InviteUser, deleteOrgUser } from 'graphQL/Mutation'
 import React, { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV } from 'react-icons/fa'
@@ -37,11 +35,13 @@ import TeamModal from 'views/Dashboard/Profile/components/TeamModal'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 function userTimeStart(row) {
-  let timeStart;
+  let timeStart
   if (row.invitationStatus === 'accepted') {
-    timeStart = row.invitationAcceptedAt ? row.invitationAcceptedAt : row.createdAt;
+    timeStart = row.invitationAcceptedAt
+      ? row.invitationAcceptedAt
+      : row.createdAt
   }
-  return timeStart;
+  return timeStart
 }
 
 const TeamTable = ({ data, refetch }) => {
@@ -118,7 +118,7 @@ const TeamTable = ({ data, refetch }) => {
     {
       id: 'role',
       name: 'ROLE',
-      selector: (row) => row?.role?.name
+      selector: (row) => <Text textTransform={'lowercase'}>{row?.role?.name}</Text>
     },
     // STATUS
     {
@@ -154,7 +154,7 @@ const TeamTable = ({ data, refetch }) => {
         const { invitationStatus } = row
         const { invitationAcceptedAt } = row
         const { createdAt } = row
-        const timeStart = userTimeStart(row);
+        const timeStart = userTimeStart(row)
         return (
           <Tooltip label={getFullDateAndTime(timeStart)} placement={'top'}>
             <Text textTransform={'capitalize'}>
@@ -165,8 +165,8 @@ const TeamTable = ({ data, refetch }) => {
       },
       sortable: true,
       sortFunction: (a, b) => {
-        const aUserStart = userTimeStart(a);
-        const bUserStart = userTimeStart(b);
+        const aUserStart = userTimeStart(a)
+        const bUserStart = userTimeStart(b)
         if (!aUserStart && !bUserStart) return 0
         if (!aUserStart) return 1
         if (!bUserStart) return -1

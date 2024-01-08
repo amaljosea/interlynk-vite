@@ -7,7 +7,6 @@ import {
   Button,
   Flex,
   FormControl,
-  FormErrorMessage,
   FormLabel,
   Image,
   Input,
@@ -70,10 +69,9 @@ export default function Auth() {
       .catch((error) => {
         console.log(`Error: ${error}`)
         if (error.response) {
-          const { status } = error.response
-          console.log('Status code:', status)
+          const { status, data } = error.response
           if (status === 401) {
-            setError(`Invalid email or password`)
+            setError(data)
           } else if (status === 404) {
             setError(`Internal routing error. Please try again`)
           } else {

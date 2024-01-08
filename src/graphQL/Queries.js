@@ -37,6 +37,7 @@ export const GetOrg = gql`
         email
         role {
           name
+          permissions
         }
         createdAt
         invitationStatus
@@ -58,6 +59,24 @@ export const GetOrg = gql`
     }
   }
 `
+
+// GET ORG ROLES
+export const GetRoles = gql`
+  query GetRoles {
+    organization {
+      organizationRoles {
+        id
+        name
+        createdAt
+        permissionsMap {
+          key
+          value
+        }
+      }
+    }
+  }
+`
+
 // GET ORGANIZATION METRICS
 export const GetOrgMetrics = gql`
   query GetOrgMetrics {
@@ -132,12 +151,14 @@ export const MyOrganizations = gql`
     $last: Int
     $after: String
     $before: String
+    $invitationStatuses: [OrgUserInvitationStatuses!]
   ) {
     myOrganizations(
       first: $first
       last: $last
       after: $after
       before: $before
+      invitationStatuses: $invitationStatuses
     ) {
       nodes {
         id
