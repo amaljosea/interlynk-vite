@@ -70,11 +70,11 @@ function Profile() {
       navigate('/vendor/settings?tab=team')
     } else if (value === 2) {
       navigate('/vendor/settings?tab=roles')
-    } else if (value === 2) {
-      navigate('/vendor/settings?tab=feeds')
     } else if (value === 3) {
-      navigate('/vendor/settings?tab=checks')
+      navigate('/vendor/settings?tab=feeds')
     } else if (value === 4) {
+      navigate('/vendor/settings?tab=checks')
+    } else if (value === 5) {
       navigate('/vendor/settings?tab=lists')
     }
   }
