@@ -91,7 +91,7 @@ function Profile() {
     } else if (activetab === 'organization') {
       setSelectedTab('PERSONAL')
       setPsIndex(1)
-      getMyOrgs()
+      getMyOrgs({ variables: { invitationStatuses: ['ACCEPTED', 'INVITED'] } })
     } else if (activetab === 'token') {
       setSelectedTab('PERSONAL')
       setPsIndex(2)
@@ -116,9 +116,9 @@ function Profile() {
   if (error) {
     return (
       <Flex my={32} alignItems={'center'} justifyContent={'center'} gap={2}>
-        <WarningTwoIcon color='blue.500'/>
+        <WarningTwoIcon color='blue.500' />
         <Text textAlign={'center'} fontSize={14}>
-          { displayErrorMessage(error.networkError?.statusCode, error.message) }
+          {displayErrorMessage(error.networkError?.statusCode, error.message)}
         </Text>
       </Flex>
     )

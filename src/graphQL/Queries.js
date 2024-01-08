@@ -58,6 +58,7 @@ export const GetOrg = gql`
     }
   }
 `
+
 // GET ORGANIZATION METRICS
 export const GetOrgMetrics = gql`
   query GetOrgMetrics {
@@ -132,12 +133,14 @@ export const MyOrganizations = gql`
     $last: Int
     $after: String
     $before: String
+    $invitationStatuses: [OrgUserInvitationStatuses!]
   ) {
     myOrganizations(
       first: $first
       last: $last
       after: $after
       before: $before
+      invitationStatuses: $invitationStatuses
     ) {
       nodes {
         id
