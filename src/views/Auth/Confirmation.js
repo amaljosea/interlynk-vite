@@ -9,7 +9,7 @@ import {
   ModalOverlay,
   Text
 } from '@chakra-ui/react'
-import { Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { Navigate, useLocation } from 'react-router-dom'
 import { WarningIcon } from '@chakra-ui/icons'
 import { useMutation } from '@apollo/client'
 import { UserEmailConfirmation } from 'graphQL/Mutation'
