@@ -1,4 +1,5 @@
 import {
+  Badge,
   Box,
   Flex,
   HStack,
@@ -9,10 +10,11 @@ import {
   Text,
   Tooltip
 } from '@chakra-ui/react'
-import { Step, Steps, useSteps } from 'chakra-ui-steps'
 import VulnBadge from 'components/Misc/VulnBadge'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useEffect } from 'react'
+import { Link, useLocation } from 'react-router-dom'
+import { timeSince, getFullDateAndTime } from 'utils'
+import { CheckCircleIcon } from '@chakra-ui/icons'
 import {
   FaAngleLeft,
   FaBalanceScale,
@@ -20,8 +22,6 @@ import {
   FaCube,
   FaCubes
 } from 'react-icons/fa'
-import { Link, useLocation } from 'react-router-dom'
-import { timeSince, getFullDateAndTime } from 'utils'
 
 const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
   const {
@@ -93,36 +93,6 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
     })
   }
 
-  const steps = [
-    {
-      label: 'IMPORTED',
-      description: 'Imported'
-    },
-    {
-      label: 'NOT_STARTED',
-      description: 'Audited'
-    },
-    {
-      label: 'IN_PROGRESS',
-      description: 'Vulnerability'
-    },
-    {
-      label: 'FINISHED',
-      description: 'Ready'
-    }
-  ]
-
-  const { activeStep } = useSteps({
-    initialStep:
-      vulnRunStatus === 'NOT_STARTED'
-        ? 2
-        : vulnRunStatus === 'IN_PROGRESS'
-        ? 3
-        : vulnRunStatus === 'FINISHED'
-        ? 4
-        : 1
-  })
-
   return (
     <Flex direction={'row'} alignItems={'flex-start'} gap={5} width={'100%'}>
       <Icon as={FaCubes} h={'64px'} w={'64px'} color='blue.300' />
@@ -175,17 +145,40 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
             Updated {timeSince(updatedAt)}
           </Text>
         </Tooltip>
-        <Flex flexDir='row' width='100%' mt={4}>
-{/*           <Steps
-            size={'sm'}
-            variant='simple'
-            colorScheme='blue'
-            activeStep={activeStep}
-          >
-            {steps.map(({ description }, index) => (
-              <Step label={description} key={index}></Step>
-            ))}
-          </Steps> */}
+        <Flex flexDir='row' gap={2} alignItems={'center'} width='100%' mt={4}>
+          <Tooltip label='Imported'>
+            <CheckCircleIcon color={'blue.500'} />
+          </Tooltip>
+          <Tooltip label='Audited'>
+            <CheckCircleIcon
+              color={
+                vulnRunStatus === 'NOT_STARTED' ||
+                vulnRunStatus === 'FINISHED' ||
+                vulnRunStatus === 'IN_PROGRESS'
+                  ? 'blue.500'
+                  : 'gray.400'
+              }
+            />
+          </Tooltip>
+          <Tooltip label='Vulnerability Scanned'>
+            <CheckCircleIcon
+              color={
+                vulnRunStatus === 'FINISHED' || vulnRunStatus === 'IN_PROGRESS'
+                  ? 'blue.500'
+                  : 'gray.400'
+              }
+            />
+          </Tooltip>
+          <Tooltip label='Ready'>
+            <CheckCircleIcon
+              color={vulnRunStatus === 'FINISHED' ? 'blue.500' : 'gray.400'}
+            />
+          </Tooltip>
+          {vulnRunStatus === 'IN_PROGRESS' && (
+            <Badge px={2} py={1} fontWeight={'semibold'}>
+              Scanning...
+            </Badge>
+          )}
         </Flex>
         {/* STATS */}
         <Flex flexDir={'row'} alignItems={'center'} gap={4} mt={5}>
