@@ -133,7 +133,11 @@ const RegistrationForm = () => {
           Registration Successful
         </Text>
         <Text fontSize={'sm'} textAlign={'center'} color={'#555'}>
-          Please check your email to confirm your account or <Link to='/auth' style={{ color: 'blue' }}>click here </Link> to login.
+          Please check your email to confirm your account or{' '}
+          <Link to='/auth' style={{ color: '#3182CE' }}>
+            click here{' '}
+          </Link>{' '}
+          to login.
         </Text>
       </Flex>
     )
