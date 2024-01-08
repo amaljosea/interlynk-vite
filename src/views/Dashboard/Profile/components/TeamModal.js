@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import {
   Input,
   Stack,
@@ -16,9 +16,11 @@ import {
   useToast,
   Alert,
   AlertIcon,
-  Text
+  Text,
+  Select
 } from '@chakra-ui/react'
 import { InviteUser, createOrgUser } from 'graphQL/Mutation'
+import { GetRoles } from 'graphQL/Queries'
 import { useState } from 'react'
 import { validateEmail } from 'utils'
 
@@ -26,11 +28,10 @@ const TeamModal = ({ isOpen, onClose, refetch }) => {
   const toast = useToast()
   const [user, setUser] = useState('')
   const [email, setEmail] = useState('')
+  const [role, setRole] = useState('')
   const [error, setError] = useState('')
 
-  const [createUser] = useMutation(createOrgUser, {
-    onCompleted: () => refetch()
-  })
+  const { data: roles } = useQuery(GetRoles)
 
   const [inviteUsers] = useMutation(InviteUser, {
     onCompleted: () => refetch()
@@ -40,7 +41,8 @@ const TeamModal = ({ isOpen, onClose, refetch }) => {
     try {
       await inviteUsers({
         variables: {
-          email: email.toLowerCase()
+          email: email.toLowerCase(),
+          roleId: role || undefined
         }
       }).then((res) => {
         if (res.data.organizationUserInvite.errors.length > 0) {
@@ -102,6 +104,18 @@ const TeamModal = ({ isOpen, onClose, refetch }) => {
                 <FormErrorMessage>Email is invalid</FormErrorMessage>
               )}
             </FormControl>
+            {/* ROLES */}
+            {roles && (
+              <FormControl>
+                <FormLabel>Role</FormLabel>
+                <Select value={role} onChange={(e) => setRole(e.target.value)}>
+                  <option value=''>-- Select --</option>
+                  {roles?.organization?.organizationRoles.map((item) => (
+                    <option value={item.id}>{item.name}</option>
+                  ))}
+                </Select>
+              </FormControl>
+            )}
           </Stack>
         </ModalBody>
 

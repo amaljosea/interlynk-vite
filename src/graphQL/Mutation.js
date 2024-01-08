@@ -25,8 +25,10 @@ export const RegisterOrganization = gql`
 
 // INVITE USERS
 export const InviteUser = gql`
-  mutation InviteUser($email: String!) {
-    organizationUserInvite(input: { email: $email }) {
+  mutation InviteUser($email: String!, $roleId: Uuid) {
+    organizationUserInvite(
+      input: { email: $email, organizationRoleId: $roleId }
+    ) {
       user {
         id
         email

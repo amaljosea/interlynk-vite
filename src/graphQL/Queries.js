@@ -37,6 +37,7 @@ export const GetOrg = gql`
         email
         role {
           name
+          permissions
         }
         createdAt
         invitationStatus
@@ -54,6 +55,18 @@ export const GetOrg = gql`
         id
         matchStr
         updatedAt
+      }
+    }
+  }
+`
+
+// GET ORG ROLES
+export const GetRoles = gql`
+  query GetRoles {
+    organization {
+      organizationRoles {
+        id
+        name
       }
     }
   }
