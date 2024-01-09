@@ -244,44 +244,8 @@ export default function HeaderLinks(props) {
         logoText={props.logoText}
         secondary={props.secondary}
         routes={dashRoutes}
-        // logo={logo}
         {...rest}
       />
-      {!email && (
-        <Menu>
-          <MenuButton>
-            <BellIcon color={navbarIcon} w='18px' h='18px' />
-          </MenuButton>
-          <MenuList p='16px 8px'>
-            <Flex flexDirection='column'>
-              <MenuItem borderRadius='8px' mb='10px'>
-                <ItemContent
-                  time='6 hours ago'
-                  info='SPDX 3.0 Support'
-                  boldInfo='[New Feature]'
-                  aName='Feature'
-                />
-              </MenuItem>
-              <MenuItem borderRadius='8px' mb='10px'>
-                <ItemContent
-                  time='3 days ago'
-                  info='CycloneDX 1.4 Export'
-                  boldInfo='[Fix]'
-                  aName='Bug'
-                />
-              </MenuItem>
-              <MenuItem borderRadius='8px'>
-                <ItemContent
-                  time='4 days ago'
-                  info='SBOMQS Depth Fixed'
-                  boldInfo='[Fix'
-                  aName='Bug'
-                />
-              </MenuItem>
-            </Flex>
-          </MenuList>
-        </Menu>
-      )}
     </Flex>
   )
 }
