@@ -206,12 +206,10 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
       selector: (row) => {
         const { updatedAt } = row
         return (
-        <Tooltip label={getFullDateAndTime(updatedAt)} placement={'top'}>
-          <Text textTransform={'capitalize'}>
-            {timeSince(updatedAt)}
-          </Text>
-        </Tooltip>
-      )
+          <Tooltip label={getFullDateAndTime(updatedAt)} placement={'top'}>
+            <Text textTransform={'capitalize'}>{timeSince(updatedAt)}</Text>
+          </Tooltip>
+        )
       },
       wrap: true,
       sortable: true,
@@ -287,7 +285,7 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
         <Modal isOpen={isWarningOpen} onClose={onWarningClose}>
           <ModalOverlay />
           <ModalContent>
-            <ModalHeader>Switch Org</ModalHeader>
+            <ModalHeader>Switch Organization</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               <Text>
