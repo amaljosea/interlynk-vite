@@ -31,6 +31,7 @@ import React, { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV } from 'react-icons/fa'
 import { getFullDateAndTime, timeSince, customStyles } from 'utils'
+import RoleModal from 'views/Dashboard/Profile/components/RoleModal'
 import TeamModal from 'views/Dashboard/Profile/components/TeamModal'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
@@ -53,9 +54,13 @@ const TeamTable = ({ data, refetch }) => {
     onOpen: onTeamOpen,
     onClose: onTeamClose
   } = useDisclosure()
+  const {
+    isOpen: isRoleOpen,
+    onOpen: onRoleOpen,
+    onClose: onRoleClose
+  } = useDisclosure()
   const [activeRow, setActiveRow] = useState(null)
   const [searchInput, setSearchInput] = useState('')
-
   const [deleteUser] = useMutation(deleteOrgUser)
 
   const [inviteUsers] = useMutation(InviteUser, {
@@ -123,7 +128,7 @@ const TeamTable = ({ data, refetch }) => {
       id: 'role',
       name: 'ROLE',
       selector: (row) => (
-        <Text textTransform={'lowercase'}>{row?.role?.name}</Text>
+        <Text textTransform={'lowercase'}>{row?.role?.name || ''}</Text>
       )
     },
     // STATUS
@@ -198,9 +203,17 @@ const TeamTable = ({ data, refetch }) => {
             <Portal>
               <MenuList size='sm'>
                 <MenuItem
+                  onClick={() => {
+                    console.log('row',row);
+                    setActiveRow(row)
+                    onRoleOpen()
+                  }}
+                >
+                  Change Role
+                </MenuItem>
+                <MenuItem
                   isDisabled={row.email === data.currentUser.email}
                   onClick={() => {
-                    console.log(row)
                     setActiveRow(row)
                     onOpen()
                   }}
@@ -336,6 +349,17 @@ const TeamTable = ({ data, refetch }) => {
           onClose={onTeamClose}
         />
       )}
+
+      {/* UPDATE User ROLE */}
+      {isRoleOpen && (
+        <RoleModal
+          data={activeRow}
+          refetch={refetch}
+          isOpen={isRoleOpen}
+          onClose={onRoleClose}
+        />
+      )}
+
       {/* REMOVE User */}
       {isOpen && activeRow && (
         <Modal isOpen={isOpen} onClose={onClose}>
