@@ -27,6 +27,7 @@ import {
   Badge
 } from '@chakra-ui/react'
 import { InviteUser, deleteOrgUser } from 'graphQL/Mutation'
+import { useGlobalState } from 'hooks/useGlobalState'
 import React, { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV } from 'react-icons/fa'
@@ -46,6 +47,18 @@ function userTimeStart(row) {
 }
 
 const TeamTable = ({ data, refetch }) => {
+  const { userPermissons } = useGlobalState()
+
+  const viewUsers = userPermissons?.find((item) => item.key === 'view_users')
+  const inviteUser = viewUsers?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'invite_users' && permission.value === true
+  )
+  const editUserRoles = viewUsers?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'edit_user_role' && permission.value === true
+  )
+
   const toast = useToast()
   const SERVER_URL = process.env.REACT_APP_SERVER
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -202,15 +215,17 @@ const TeamTable = ({ data, refetch }) => {
             />
             <Portal>
               <MenuList size='sm'>
-                <MenuItem
-                  onClick={() => {
-                    console.log('row',row);
-                    setActiveRow(row)
-                    onRoleOpen()
-                  }}
-                >
-                  Change Role
-                </MenuItem>
+                {editUserRoles && (
+                  <MenuItem
+                    onClick={() => {
+                      console.log('row', row)
+                      setActiveRow(row)
+                      onRoleOpen()
+                    }}
+                  >
+                    Change Role
+                  </MenuItem>
+                )}
                 <MenuItem
                   isDisabled={row.email === data.currentUser.email}
                   onClick={() => {
@@ -261,7 +276,7 @@ const TeamTable = ({ data, refetch }) => {
           onClear={handleClear}
         />
 
-        {/* ADD USER */}
+        {/* INVITE USER */}
         <Tooltip label='Invite User' placement='top'>
           <IconButton
             onClick={onTeamOpen}
@@ -270,6 +285,7 @@ const TeamTable = ({ data, refetch }) => {
             variant='solid'
             fontWeight='normal'
             fontSize={'sm'}
+            isDisabled={!inviteUser}
           />
         </Tooltip>
       </Flex>

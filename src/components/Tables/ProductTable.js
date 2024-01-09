@@ -49,10 +49,22 @@ import OrgRegister from 'views/Dashboard/Profile/components/OrgRegister'
 import Card from 'components/Card/Card'
 
 const ProductTable = ({ data, refetch, org }) => {
-  const { totalRows, setTotalRows, setActiveSbomTab, prodState, dispatch } =
-    useGlobalState()
+  const {
+    userPermissons,
+    totalRows,
+    setTotalRows,
+    setActiveSbomTab,
+    prodState,
+    dispatch
+  } = useGlobalState()
   const { field, direction, searchInput, pageIndex } = prodState
   const { prodDispatch, sbomDispatch } = dispatch
+
+  const product = userPermissons?.find((item) => item.key === 'view_product')
+  const archiveProduct = product?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'archive_product' && permission.value === true
+  )
 
   const [activeRow, setActiveRow] = useState(null)
 
@@ -151,14 +163,14 @@ const ProductTable = ({ data, refetch, org }) => {
             data.length > 0
               ? data[0].primaryComponent?.version
               : sboms.length > 0
-              ? sboms[0].primaryComponent?.version
-              : '',
+                ? sboms[0].primaryComponent?.version
+                : '',
           sbomId:
             data.length > 0
               ? data[0].primaryComponent?.version
               : sboms.length > 0
-              ? sboms[0].id
-              : ''
+                ? sboms[0].id
+                : ''
         }
 
         const handleClick = () => {
@@ -265,14 +277,14 @@ const ProductTable = ({ data, refetch, org }) => {
             filteredData.length > 0
               ? filteredData[0].label
               : sboms.length > 0
-              ? sboms[0].primaryComponent?.version
-              : '',
+                ? sboms[0].primaryComponent?.version
+                : '',
           sbomId:
             filteredData.length > 0
               ? filteredData[0].value
               : sboms.length > 0
-              ? sboms[0].id
-              : ''
+                ? sboms[0].id
+                : ''
         }
 
         return (
@@ -317,6 +329,7 @@ const ProductTable = ({ data, refetch, org }) => {
                     setActiveRow(row)
                     onDeleteOpen()
                   }}
+                  isDisabled={!archiveProduct}
                 >
                   Archive Product
                 </MenuItem>
