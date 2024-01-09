@@ -16,22 +16,27 @@ import { GetOrgMetrics } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useLocation } from 'react-router-dom'
 import { displayErrorMessage } from 'utils'
-import { Text } from '@chakra-ui/react';
+import { Text } from '@chakra-ui/react'
 import { WarningTwoIcon } from '@chakra-ui/icons'
+import { permissionList } from 'utils'
 
 export default function Dashboard() {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const product = queryParams.get('id')
 
-  const { dispatch } = useGlobalState()
+  const { dispatch, setUserPermissons } = useGlobalState()
   const { prodCompDispatch, prodVulnDispatch } = dispatch
 
   const iconBoxInside = useColorModeValue('white', 'white')
 
-  const { data, refetch: rOrg, error: eOrg } = useQuery(GetOrg)
+  const { data, error: eOrg } = useQuery(GetOrg)
   useEffect(() => {
     if (data) {
+      const permissions = permissionList(
+        data?.organization?.currentUser?.role?.permissionsMap || []
+      )
+      setUserPermissons(permissions)
       localStorage.setItem(
         'organization',
         JSON.stringify(data?.organization?.name)
@@ -39,7 +44,7 @@ export default function Dashboard() {
     }
   }, [data])
 
-  const { data: metrics, refetch: rOrgMetric, error: eOrgMetric } = useQuery(GetOrgMetrics)
+  const { data: metrics, error: eOrgMetric } = useQuery(GetOrgMetrics)
 
   useEffect(() => {
     if (product === null) {
@@ -51,9 +56,9 @@ export default function Dashboard() {
   if (eOrg) {
     return (
       <Flex my={32} alignItems={'center'} justifyContent={'center'} gap={2}>
-        <WarningTwoIcon color='blue.500'/>
+        <WarningTwoIcon color='blue.500' />
         <Text textAlign={'center'} fontSize={14}>
-          { displayErrorMessage(eOrg.networkError?.statusCode, eOrg.message) }
+          {displayErrorMessage(eOrg.networkError?.statusCode, eOrg.message)}
         </Text>
       </Flex>
     )
@@ -63,8 +68,11 @@ export default function Dashboard() {
     return (
       <Flex my={32} alignItems={'center'} justifyContent={'center'} gap={2}>
         <Text textAlign={'center'} fontSize={14}>
-          <WarningTwoIcon color='blue.500'/>
-          { displayErrorMessage(eOrgMetric.networkError?.statusCode, eOrgMetric.message) }
+          <WarningTwoIcon color='blue.500' />
+          {displayErrorMessage(
+            eOrgMetric.networkError?.statusCode,
+            eOrgMetric.message
+          )}
         </Text>
       </Flex>
     )

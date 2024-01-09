@@ -42,7 +42,12 @@ import {
   FaWindowMaximize
 } from 'react-icons/fa6'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { timeSince, getFullDateAndTime, removeDuplicates } from 'utils'
+import {
+  timeSince,
+  getFullDateAndTime,
+  removeDuplicates,
+  permissionList
+} from 'utils'
 import SBOM from 'views/Sbom'
 import Controls from '../Automation/components/Controls'
 import ChangeLog from '../Changelog'
@@ -75,10 +80,17 @@ const ProductDetails = () => {
     prodLogState,
     prodVulnState,
     prodRulesState,
-    dispatch
+    dispatch,
+    userPermissons
   } = useGlobalState()
   const { field, direction } = prodLogState
   const { prodCompDispatch, prodVulnDispatch } = dispatch
+
+  const product = userPermissons?.find((item) => item.key === 'view_product')
+  const archiveProduct = product?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'archive_product' && permission.value === true
+  )
 
   const { data, loading, error, refetch } = useQuery(GetProductInfo, {
     variables: {
@@ -444,6 +456,7 @@ const ProductDetails = () => {
                           colorScheme='red'
                           onClick={onDeleteOpen}
                           icon={<FaTrashCan />}
+                          isDisabled={!archiveProduct}
                         ></IconButton>
                       </Tooltip>
                     </Flex>

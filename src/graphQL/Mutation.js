@@ -38,6 +38,56 @@ export const InviteUser = gql`
   }
 `
 
+// UPDATE ORGANIZATION USER ROLE
+export const UpdateOrganizationUserRole = gql`
+  mutation UpdateOrganizationUserRole(
+    $userId: Uuid!
+    $organizationRoleId: Uuid
+  ) {
+    organizationUserUpdate(
+      input: { userId: $userId, organizationRoleId: $organizationRoleId }
+    ) {
+      user {
+        role {
+          id
+          name
+        }
+      }
+      errors
+    }
+  }
+`
+
+// ACCEPT ORG INVITATION
+export const AcceptOrgInvitation = gql`
+  mutation acceptInvitationById($organizationId: Uuid!) {
+    organizationUserInvitationAcceptById(
+      input: { organizationId: $organizationId }
+    ) {
+      organization {
+        name
+        invitationStatus
+      }
+      errors
+    }
+  }
+`
+
+// DECLINE ORG INVITATION
+export const DeclineOrgInvitation = gql`
+  mutation declineInvitation($organizationId: Uuid!) {
+    organizationUserInvitationDeclineById(
+      input: { organizationId: $organizationId }
+    ) {
+      organization {
+        name
+        invitationStatus
+      }
+      errors
+    }
+  }
+`
+
 // USER EMAIL CONFIRMATION
 export const UserEmailConfirmation = gql`
   mutation UserEmailConfirmation($token: String!) {

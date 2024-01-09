@@ -27,10 +27,12 @@ import {
   Badge
 } from '@chakra-ui/react'
 import { InviteUser, deleteOrgUser } from 'graphQL/Mutation'
+import { useGlobalState } from 'hooks/useGlobalState'
 import React, { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV } from 'react-icons/fa'
 import { getFullDateAndTime, timeSince, customStyles } from 'utils'
+import RoleModal from 'views/Dashboard/Profile/components/RoleModal'
 import TeamModal from 'views/Dashboard/Profile/components/TeamModal'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
@@ -45,6 +47,18 @@ function userTimeStart(row) {
 }
 
 const TeamTable = ({ data, refetch }) => {
+  const { userPermissons } = useGlobalState()
+
+  const viewUsers = userPermissons?.find((item) => item.key === 'view_users')
+  const inviteUser = viewUsers?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'invite_users' && permission.value === true
+  )
+  const editUserRoles = viewUsers?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'edit_user_role' && permission.value === true
+  )
+
   const toast = useToast()
   const SERVER_URL = process.env.REACT_APP_SERVER
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -53,9 +67,13 @@ const TeamTable = ({ data, refetch }) => {
     onOpen: onTeamOpen,
     onClose: onTeamClose
   } = useDisclosure()
+  const {
+    isOpen: isRoleOpen,
+    onOpen: onRoleOpen,
+    onClose: onRoleClose
+  } = useDisclosure()
   const [activeRow, setActiveRow] = useState(null)
   const [searchInput, setSearchInput] = useState('')
-
   const [deleteUser] = useMutation(deleteOrgUser)
 
   const [inviteUsers] = useMutation(InviteUser, {
@@ -85,7 +103,11 @@ const TeamTable = ({ data, refetch }) => {
               w='30px'
               h='30px'
             />
-            <Stack spacing={2} direction={'row'} alignItems={'center'}>
+            <Stack
+              spacing={name !== '' ? 2 : 0}
+              direction={'row'}
+              alignItems={'center'}
+            >
               <Text width={'fit-content'} fontSize={'14px'}>
                 {name}
               </Text>
@@ -118,7 +140,9 @@ const TeamTable = ({ data, refetch }) => {
     {
       id: 'role',
       name: 'ROLE',
-      selector: (row) => <Text textTransform={'lowercase'}>{row?.role?.name}</Text>
+      selector: (row) => (
+        <Text textTransform={'lowercase'}>{row?.role?.name || ''}</Text>
+      )
     },
     // STATUS
     {
@@ -191,10 +215,20 @@ const TeamTable = ({ data, refetch }) => {
             />
             <Portal>
               <MenuList size='sm'>
+                {editUserRoles && (
+                  <MenuItem
+                    onClick={() => {
+                      console.log('row', row)
+                      setActiveRow(row)
+                      onRoleOpen()
+                    }}
+                  >
+                    Change Role
+                  </MenuItem>
+                )}
                 <MenuItem
                   isDisabled={row.email === data.currentUser.email}
                   onClick={() => {
-                    console.log(row)
                     setActiveRow(row)
                     onOpen()
                   }}
@@ -242,7 +276,7 @@ const TeamTable = ({ data, refetch }) => {
           onClear={handleClear}
         />
 
-        {/* ADD USER */}
+        {/* INVITE USER */}
         <Tooltip label='Invite User' placement='top'>
           <IconButton
             onClick={onTeamOpen}
@@ -251,6 +285,7 @@ const TeamTable = ({ data, refetch }) => {
             variant='solid'
             fontWeight='normal'
             fontSize={'sm'}
+            isDisabled={!inviteUser}
           />
         </Tooltip>
       </Flex>
@@ -330,6 +365,17 @@ const TeamTable = ({ data, refetch }) => {
           onClose={onTeamClose}
         />
       )}
+
+      {/* UPDATE User ROLE */}
+      {isRoleOpen && (
+        <RoleModal
+          data={activeRow}
+          refetch={refetch}
+          isOpen={isRoleOpen}
+          onClose={onRoleClose}
+        />
+      )}
+
       {/* REMOVE User */}
       {isOpen && activeRow && (
         <Modal isOpen={isOpen} onClose={onClose}>

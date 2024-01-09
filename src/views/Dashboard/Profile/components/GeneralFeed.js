@@ -15,9 +15,18 @@ import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
 import { orgUpdate } from 'graphQL/Mutation'
+import { useGlobalState } from 'hooks/useGlobalState'
 import { useEffect, useState } from 'react'
 
 const GeneralFeed = ({ orgInfo, refetch }) => {
+  const { userPermissons } = useGlobalState()
+
+  const org = userPermissons?.find((item) => item.key === 'view_organization')
+  const updateOrgs = org?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'update_organization' && permission.value === true
+  )
+
   const toast = useToast()
   const textColor = useColorModeValue('gray.700', 'white')
   const [orgName, setOrgName] = useState('')
@@ -40,6 +49,7 @@ const GeneralFeed = ({ orgInfo, refetch }) => {
       })
         .then((res) => {
           if (res.data.organizationUpdate.errors.length === 0) {
+            localStorage.setItem('organization', orgName)
             setMessage('Saving....')
             setTimeout(() => {
               setMessage('Update')
@@ -81,15 +91,17 @@ const GeneralFeed = ({ orgInfo, refetch }) => {
               value={orgName}
               onChange={(e) => setOrgName(e.target.value)}
             />
-            <Button
-              mt={3}
-              variant='solid'
-              colorScheme={'blue'}
-              onClick={handleUpdate}
-              disabled={message === 'Saving....' || orgName === ''}
-            >
-              {message}
-            </Button>
+            {updateOrgs && (
+              <Button
+                mt={3}
+                variant='solid'
+                colorScheme={'blue'}
+                onClick={handleUpdate}
+                disabled={message === 'Saving....' || orgName === ''}
+              >
+                {message}
+              </Button>
+            )}
           </FormControl>
         </Flex>
       </CardBody>

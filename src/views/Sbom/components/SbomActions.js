@@ -37,7 +37,8 @@ import { sbomDelete } from 'graphQL/Mutation'
 import DownloadModal from './DownloadModal'
 
 const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
-  const { setActiveSbomTab, dispatch, prodCompState } = useGlobalState()
+  const { setActiveSbomTab, dispatch, prodCompState, userPermissons } =
+    useGlobalState()
   const {
     field,
     direction,
@@ -56,6 +57,12 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
     sbomLogDispatch,
     sbomDispatch
   } = dispatch
+
+  const sboms = userPermissons?.find((item) => item.key === 'view_sbom')
+  const archiveSboms = sboms?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'archive_sbom' && permission.value === true
+  )
 
   const currentProduct = JSON.parse(localStorage.getItem(`product`))
 
@@ -173,7 +180,6 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
     setSelectedVersion(select)
     refetchSBOM(select.value)
   }
-
 
   const handleEditSbom = () => {
     if (sbom?.primaryComponent) {
@@ -353,6 +359,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
             colorScheme='red'
             icon={<DeleteIcon />}
             onClick={setDeleteOpen}
+            isDisabled={!archiveSboms}
           ></IconButton>
         </Tooltip>
       </Flex>

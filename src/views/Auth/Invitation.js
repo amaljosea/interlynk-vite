@@ -9,7 +9,8 @@ import {
   ModalBody,
   ModalContent,
   ModalOverlay,
-  Text
+  Text,
+  useToast
 } from '@chakra-ui/react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { CheckCircleIcon, WarningIcon } from '@chakra-ui/icons'
@@ -18,6 +19,7 @@ import { useMutation } from '@apollo/client'
 import { DeclineInvitation } from 'graphQL/Mutation'
 
 const Invitation = () => {
+  const toast = useToast()
   const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -45,6 +47,12 @@ const Invitation = () => {
         } else if (
           res.data.organizationUserInvitationAccept.userType === 'existing_user'
         ) {
+          toast({
+            description: 'Registration Successful 👍',
+            status: 'success',
+            position: 'top',
+            duration: 4000
+          })
           navigate(
             `/auth?id=${res.data.organizationUserInvitationAccept.user.email}`
           )
@@ -82,12 +90,16 @@ const Invitation = () => {
                 flexDir={'column'}
               >
                 <Icon color={'red.400'} boxSize={20} as={WarningIcon} />
-                <Text my={6}>That didn't work because of the following error:<br />
-                {error[0]}.
-                <br />
-                <br />
-                This usually happen with a stale or revoked invitation link.
-                <br />Please contact the admin to re-send the link.</Text>
+                <Text my={6}>
+                  That didn't work because of the following error:
+                  <br />
+                  {error[0]}.
+                  <br />
+                  <br />
+                  This usually happen with a stale or revoked invitation link.
+                  <br />
+                  Please contact the admin to re-send the link.
+                </Text>
               </Box>
             )}
           </ModalBody>

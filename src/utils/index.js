@@ -658,3 +658,21 @@ export const displayErrorMessage = (status_code, message) => {
     return 'An internal error occured. Please retry later.'
   }
 }
+
+export const permissionList = (data) => {
+  if (data && data.length > 0) {
+    const keyMap = new Map(data.map((obj) => [obj.key, { ...obj }]))
+    const supersededKeys = new Set()
+    const newData = data.map((obj) => {
+      const newObj = { ...obj }
+      if (newObj.supersededBy && newObj.supersededBy.length > 0) {
+        newObj.supersededBy = newObj.supersededBy.map((key) => {
+          supersededKeys.add(key)
+          return keyMap.get(key)
+        })
+      }
+      return newObj
+    })
+    return newData.filter((obj) => !supersededKeys.has(obj.key))
+  }
+}

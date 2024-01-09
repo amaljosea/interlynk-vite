@@ -18,6 +18,16 @@ export const GetOrg = gql`
           filename
           url
         }
+        role {
+          permissionsMap {
+            category
+            description
+            key
+            name
+            supersededBy
+            value
+          }
+        }
         apiKeys {
           id
           rawToken
@@ -69,7 +79,11 @@ export const GetRoles = gql`
         name
         createdAt
         permissionsMap {
+          category
+          description
           key
+          name
+          supersededBy
           value
         }
       }
@@ -166,6 +180,7 @@ export const MyOrganizations = gql`
         email
         status
         updatedAt
+        invitationStatus
         url
       }
     }
