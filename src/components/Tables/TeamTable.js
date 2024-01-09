@@ -85,7 +85,11 @@ const TeamTable = ({ data, refetch }) => {
               w='30px'
               h='30px'
             />
-            <Stack spacing={2} direction={'row'} alignItems={'center'}>
+            <Stack
+              spacing={name !== '' ? 2 : 0}
+              direction={'row'}
+              alignItems={'center'}
+            >
               <Text width={'fit-content'} fontSize={'14px'}>
                 {name}
               </Text>
@@ -118,7 +122,9 @@ const TeamTable = ({ data, refetch }) => {
     {
       id: 'role',
       name: 'ROLE',
-      selector: (row) => <Text textTransform={'lowercase'}>{row?.role?.name}</Text>
+      selector: (row) => (
+        <Text textTransform={'lowercase'}>{row?.role?.name}</Text>
+      )
     },
     // STATUS
     {

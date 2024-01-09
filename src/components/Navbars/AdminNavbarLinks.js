@@ -61,7 +61,7 @@ export default function HeaderLinks(props) {
 
   useEffect(() => {
     if (location.pathname.startsWith('/vendor')) {
-      setUserName(name)
+      setUserName(name || email)
     } else if (location.pathname.startsWith('/customer')) {
       setUserName(userEmail)
     }
@@ -218,7 +218,7 @@ export default function HeaderLinks(props) {
                 <MenuItem icon={<FaExchangeAlt />}>Organizations</MenuItem>
               </Link>
               <MenuDivider />
-              {name ? (
+              {email ? (
                 <MenuItem icon={<FaSignOutAlt />} onClick={handleLogout}>
                   Logout
                 </MenuItem>
@@ -247,7 +247,7 @@ export default function HeaderLinks(props) {
         // logo={logo}
         {...rest}
       />
-      {!name && (
+      {!email && (
         <Menu>
           <MenuButton>
             <BellIcon color={navbarIcon} w='18px' h='18px' />
