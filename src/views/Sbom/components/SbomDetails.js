@@ -140,17 +140,15 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
         <Text fontSize={'sm'} my={0.5}>
           {primaryComponent?.description}
         </Text>
-          {/* SCAN STATUS */}
-          <Flex flexDir='row' gap={2} alignItems={'center'} width='100%' my={2}>
+        {/* SCAN STATUS */}
+        <Flex flexDir='row' gap={2} alignItems={'center'} width='100%' my={2}>
           <Tooltip label='Imported'>
             <CheckCircleIcon color={'blue.500'} />
           </Tooltip>
           <Tooltip label='Audited'>
             <CheckCircleIcon
               color={
-                vulnRunStatus === 'NOT_STARTED' ||
-                vulnRunStatus === 'FINISHED' ||
-                vulnRunStatus === 'IN_PROGRESS'
+                vulnRunStatus === 'FINISHED' || vulnRunStatus === 'IN_PROGRESS'
                   ? 'blue.500'
                   : 'gray.400'
               }
@@ -158,11 +156,7 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
           </Tooltip>
           <Tooltip label='Vulnerability Scanned'>
             <CheckCircleIcon
-              color={
-                vulnRunStatus === 'FINISHED' || vulnRunStatus === 'IN_PROGRESS'
-                  ? 'blue.500'
-                  : 'gray.400'
-              }
+              color={vulnRunStatus === 'FINISHED' ? 'blue.500' : 'gray.400'}
             />
           </Tooltip>
           <Tooltip label='Ready'>
