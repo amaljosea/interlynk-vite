@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { AddIcon, ArrowForwardIcon } from '@chakra-ui/icons'
+import { AddIcon } from '@chakra-ui/icons'
 import {
   Button,
   Flex,
@@ -31,16 +31,18 @@ import { customStyles, timeSince, getFullDateAndTime } from 'utils'
 import CustomLoader from 'components/CustomLoader'
 import OrgModal from 'views/Dashboard/Profile/components/OrgModal'
 import { useMutation } from '@apollo/client'
-import { SwitchOrganization } from 'graphQL/Mutation'
+import {
+  SwitchOrganization,
+  AcceptOrgInvitation,
+  DeclineInvitation,
+  QuitOrganization
+} from 'graphQL/Mutation'
 import Cookies from 'js-cookie'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { FaEllipsisVertical } from 'react-icons/fa6'
-import { QuitOrganization } from 'graphQL/Mutation'
 
 const OrgTable = ({ data, refetch, activeOrg }) => {
   const navigate = useNavigate()
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
   const toast = useToast()
   const { isOpen, onOpen, onClose } = useDisclosure()
 
@@ -60,6 +62,8 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
 
   const [switchOrg] = useMutation(SwitchOrganization)
   const [quitOrg] = useMutation(QuitOrganization)
+  const [acceptInvitation] = useMutation(AcceptOrgInvitation)
+  const [declineInvitation] = useMutation(DeclineInvitation)
 
   const onSwitchOrg = async (id, name) => {
     await switchOrg({
@@ -105,6 +109,44 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
         }
       }
     })
+  }
+
+  const onAccept = async (id) => {
+    await acceptInvitation({
+      variables: {
+        organizationId: id
+      }
+    })
+      .then((res) => {
+        if (res.data) {
+          console.log('res', res.data)
+          toast({
+            description: `Invitation accepted`,
+            position: 'top',
+            status: 'success'
+          })
+        }
+      })
+      .finally(() => navigate('/vendor/dashboard'))
+  }
+
+  const onDecline = async (id) => {
+    await declineInvitation({
+      variables: {
+        organizationId: id
+      }
+    })
+      .then((res) => {
+        if (res.data) {
+          console.log('res', res.data)
+          toast({
+            description: `Invitation declined`,
+            position: 'top',
+            status: 'success'
+          })
+        }
+      })
+      .finally(() => navigate('/vendor/dashboard'))
   }
 
   const subHeaderComponent = useMemo(() => {
@@ -223,7 +265,7 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
       id: 'ACTION',
       name: 'ACTION',
       selector: (row) => {
-        const { id } = row
+        const { id, invitationStatus } = row
         return (
           <Menu>
             <MenuButton
@@ -234,19 +276,26 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
               color='gray.400'
             />
             <Portal>
-              <MenuList size='sm'>
-                {activeOrg !== id && (
-                  <MenuItem onClick={() => onSwitch(row)}>Switch To</MenuItem>
-                )}
-                <MenuItem
-                  onClick={() => {
-                    setActiveRow(row)
-                    onLeaveOpen()
-                  }}
-                >
-                  Leave Organization
-                </MenuItem>
-              </MenuList>
+              {invitationStatus === 'invited' ? (
+                <MenuList size='sm'>
+                  <MenuItem onClick={() => onAccept(row.id)}>Accept</MenuItem>
+                  <MenuItem onClick={() => onDecline(row.id)}>Decline</MenuItem>
+                </MenuList>
+              ) : (
+                <MenuList size='sm'>
+                  {activeOrg !== id && (
+                    <MenuItem onClick={() => onSwitch(row)}>Switch To</MenuItem>
+                  )}
+                  <MenuItem
+                    onClick={() => {
+                      setActiveRow(row)
+                      onLeaveOpen()
+                    }}
+                  >
+                    Leave Organization
+                  </MenuItem>
+                </MenuList>
+              )}
             </Portal>
           </Menu>
         )

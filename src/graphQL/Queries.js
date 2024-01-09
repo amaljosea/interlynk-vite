@@ -71,6 +71,7 @@ export const GetRoles = gql`
         permissionsMap {
           key
           value
+          name
         }
       }
     }
@@ -166,6 +167,7 @@ export const MyOrganizations = gql`
         email
         status
         updatedAt
+        invitationStatus
         url
       }
     }
