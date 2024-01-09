@@ -210,10 +210,7 @@ export default function HeaderLinks(props) {
               </MenuItem>
               <MenuDivider />
               {data?.organization && (
-                <Link
-                  to={`/vendor/settings?tab=person
-                }`}
-                >
+                <Link to={`/vendor/settings?tab=person`}>
                   <MenuItem icon={<SettingsIcon />}>Settings</MenuItem>
                 </Link>
               )}
