@@ -82,7 +82,12 @@ const Invitation = () => {
                 flexDir={'column'}
               >
                 <Icon color={'red.400'} boxSize={20} as={WarningIcon} />
-                <Text my={6}>{error[0]}</Text>
+                <Text my={6}>That didn't work because of the following error:<br />
+                {error[0]}.
+                <br />
+                <br />
+                This usually happen with a stale or revoked invitation link.
+                <br />Please contact the admin to re-send the link.</Text>
               </Box>
             )}
           </ModalBody>
