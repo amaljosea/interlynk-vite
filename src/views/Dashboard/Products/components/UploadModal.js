@@ -92,8 +92,8 @@ const UploadModal = ({ id, isOpen, onClose }) => {
             )}
             <Box>
               <Text fontSize={'sm'} mb={5}>
-                Interlynk supports importing CycloneDX 1.2/1.3/1.4/1..5 in json
-                and xml formats and SPDX 2.2/2.3 in json format.{' '}
+                Interlynk supports importing CycloneDX versions 1.2-1.5 in JSON
+                and XML formats and SPDX 2.2 and 2.3 in JSON format.{' '}
               </Text>
               <FormLabel htmlFor='file' width={'100%'} cursor={'pointer'}>
                 <Input
