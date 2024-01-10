@@ -23,7 +23,7 @@ const LicenseModal = ({
   onClose,
   checkId,
   filterRefetch,
-  refetch,
+  refetch
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -31,12 +31,7 @@ const LicenseModal = ({
   const sbomId = queryParams.get('sbom')
 
   const { sbomState, dispatch } = useGlobalState()
-  const {
-    licenseType,
-    spdxLicenses,
-    customLicenses,
-    expLicense
-  } = sbomState
+  const { licenseType, spdxLicenses, customLicenses, expLicense } = sbomState
   const { sbomDispatch, prodCheckDispatch } = dispatch
 
   const isInvalidLicense =
@@ -65,7 +60,12 @@ const LicenseModal = ({
     filterRefetch({
       projectId: productId,
       sbomId: sbomId
-    }).then((res) => prodCheckDispatch({type: 'ADD_FILTER_HEADS', payload: res.data.sbom.filters}))
+    }).then((res) =>
+      prodCheckDispatch({
+        type: 'ADD_FILTER_HEADS',
+        payload: res.data.sbom.filters
+      })
+    )
   }
 
   const handleUpdateSBOM = async () => {
@@ -76,12 +76,22 @@ const LicenseModal = ({
           spec: data.spec,
           licenses: {
             licenses:
-              licenseType === 'license_spdx' ? spdxLicenses : undefined,
+              licenseType === 'license_spdx'
+                ? spdxLicenses
+                  ? spdxLicenses
+                  : []
+                : undefined,
             licensesExp:
-              licenseType === 'license_exp' ? expLicense : undefined,
+              licenseType === 'license_exp'
+                ? expLicense
+                  ? expLicense
+                  : ''
+                : undefined,
             licensesCustom:
               licenseType === 'license_custom'
                 ? customLicenses
+                  ? customLicenses
+                  : []
                 : undefined
           }
         }
@@ -90,7 +100,7 @@ const LicenseModal = ({
           if (res.data) {
             onFilterRefetch()
             if (checkId) {
-              prodCheckDispatch({type: 'FETCH_DATA_SUCCESS'})
+              prodCheckDispatch({ type: 'FETCH_DATA_SUCCESS' })
               healthRecheck({
                 variables: {
                   checkId: checkId,
@@ -121,10 +131,10 @@ const LicenseModal = ({
                 licenseType === 'license_spdx'
                   ? spdxLicenses
                   : licenseType === 'license_exp'
-                  ? expLicense
-                  : licenseType === 'license_custom'
-                  ? customLicenses
-                  : ''
+                    ? expLicense
+                    : licenseType === 'license_custom'
+                      ? customLicenses
+                      : ''
             },
             null,
             2

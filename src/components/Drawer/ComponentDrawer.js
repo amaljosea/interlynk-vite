@@ -295,19 +295,26 @@ function ComponentDrawer(props) {
         version: compVersion,
         group: groupInfo,
         scope: compScope,
-        licenses:
-          spdxLicenses.length === 0 &&
-          expLicense === '' &&
-          customLicenses.length === 0
-            ? undefined
-            : {
-                licenses:
-                  licenseType === 'license_spdx' ? spdxLicenses : undefined,
-                licensesExp:
-                  licenseType === 'license_exp' ? expLicense : undefined,
-                licensesCustom:
-                  licenseType === 'license_custom' ? customLicenses : undefined
-              },
+        licenses: {
+          licenses:
+            licenseType === 'license_spdx'
+              ? spdxLicenses
+                ? spdxLicenses
+                : []
+              : undefined,
+          licensesExp:
+            licenseType === 'license_exp'
+              ? expLicense
+                ? expLicense
+                : ''
+              : undefined,
+          licensesCustom:
+            licenseType === 'license_custom'
+              ? customLicenses
+                ? customLicenses
+                : []
+              : undefined
+        },
         cpes: cpeList.length > 0 ? cpeList : cpeValue !== '' ? [cpeValue] : [],
         purl: purlValue,
         primary: isPrimary,
