@@ -143,7 +143,7 @@ export default function Auth() {
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder='abc@example.com'
                       autoComplete='off'
-                      isDisabled={emailId}
+                      isReadOnly={emailId}
                     />
                   </FormControl>
                   <FormControl>

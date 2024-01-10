@@ -43,7 +43,7 @@ const Invitation = () => {
       } else {
         setError([])
         if (res.data.organizationUserInvitationAccept.userType === 'new_user') {
-          navigate('/register')
+          navigate(`/register?id=${res.data.organizationUserInvitationAccept.user.email}`)
         } else if (
           res.data.organizationUserInvitationAccept.userType === 'existing_user'
         ) {
@@ -53,9 +53,7 @@ const Invitation = () => {
             position: 'top',
             duration: 4000
           })
-          navigate(
-            `/auth?id=${res.data.organizationUserInvitationAccept.user.email}`
-          )
+          navigate(`/auth?id=${res.data.organizationUserInvitationAccept.user.email}`)
         }
       }
     })
