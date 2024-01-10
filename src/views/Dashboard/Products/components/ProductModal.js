@@ -17,7 +17,7 @@ import {
   Text,
   Textarea
 } from '@chakra-ui/react'
-import { UpdateProject, CreateProject } from 'graphQL/Mutation'
+import { CreateProjectGroup, UpdateProjectGroup } from 'graphQL/Mutation'
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
@@ -31,10 +31,10 @@ const ProductModal = ({
 }) => {
   const navigate = useNavigate()
   const params = useParams()
-  const [projectCreate] = useMutation(CreateProject, {
+  const [projectGroupCreate] = useMutation(CreateProjectGroup, {
     onCompleted: () => refetch()
   })
-  const [projectUpdate] = useMutation(UpdateProject, {
+  const [projectGroupUpdate] = useMutation(UpdateProjectGroup, {
     onCompleted: () => refetch()
   })
 
@@ -50,17 +50,17 @@ const ProductModal = ({
 
   const updateProduct = async (e) => {
     e.preventDefault()
-    await projectUpdate({
+    await projectGroupUpdate({
       variables: {
         id: id,
         name: productName,
         desc: productDesc
       }
     }).then((res) => {
-      const error = res.data.projectUpdate.errors
+      const error = res.data.projectGroupUpdate.errors
       if (error.length > 0) {
         setError(
-          'A project with same name already exists. Please choose an unique name'
+          'A project group with same name already exists. Please choose an unique name'
         )
       } else {
         params?.name
@@ -73,16 +73,17 @@ const ProductModal = ({
 
   const handleSave = async (e) => {
     e.preventDefault()
-    await projectCreate({
+    await projectGroupCreate({
       variables: {
         name: productName,
-        desc: productDesc
+        desc: productDesc,
+        enabled: true
       }
     }).then((res) => {
-      const error = res.data.projectCreate.errors
+      const error = res.data.projectGroupCreate.errors
       if (error.length > 0) {
         setError(
-          'A project with same name already exists. Please choose an unique name'
+          'A project group with same name already exists. Please choose an unique name'
         )
       } else {
         onClose()

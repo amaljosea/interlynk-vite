@@ -38,14 +38,13 @@ import CustomLoader from 'components/CustomLoader'
 import DataTable from 'react-data-table-component'
 import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
 import { useMutation } from '@apollo/client'
-import { UpdateProject, DeleteProject } from 'graphQL/Mutation'
+import { UpdateProjectGroup, DeleteProjectGroup } from 'graphQL/Mutation'
 import ProductModal from 'views/Dashboard/Products/components/ProductModal'
 import UploadModal from 'views/Dashboard/Products/components/UploadModal'
 import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import ProdFilterMenu from 'views/Dashboard/Products/components/ProdFilterMenu'
 import { useGlobalState } from 'hooks/useGlobalState'
 import ProdSearchFilter from 'views/Sbom/components/ProdSearchFilter'
-import OrgRegister from 'views/Dashboard/Profile/components/OrgRegister'
 import Card from 'components/Card/Card'
 
 const ProductTable = ({ data, refetch, org }) => {
@@ -99,7 +98,7 @@ const ProductTable = ({ data, refetch, org }) => {
     onClose: onWarningClose
   } = useDisclosure()
 
-  const [projectDelete] = useMutation(DeleteProject, {
+  const [projectGroupDelete] = useMutation(DeleteProjectGroup, {
     onCompleted: () =>
       refetch({
         first: totalRows,
@@ -108,7 +107,7 @@ const ProductTable = ({ data, refetch, org }) => {
       })
   })
 
-  const [projectUpdate] = useMutation(UpdateProject, {
+  const [projectGroupUpdate] = useMutation(UpdateProjectGroup, {
     onCompleted: () =>
       refetch({
         first: totalRows,
@@ -127,7 +126,7 @@ const ProductTable = ({ data, refetch, org }) => {
   const columns = [
     // ACTIVE
     {
-      id: 'PROJECTS_ENABLED',
+      id: 'PROJECT_GROUPS_ENABLED',
       name: 'ACTIVE',
       selector: (row) => {
         const { enabled, name } = row
@@ -149,32 +148,33 @@ const ProductTable = ({ data, refetch, org }) => {
     },
     // PRODUCT
     {
-      id: 'PROJECTS_NAME',
+      id: 'PROJECT_GROUPS_NAME',
       name: 'PRODUCT',
       selector: (row) => {
-        const { sboms, name, id } = row
-
-        const data = sboms ? removeDuplicates(sboms) : []
+        const { name, defaultProject } = row
+        const data = defaultProject
+          ? removeDuplicates(defaultProject?.sboms)
+          : []
 
         const product = {
-          id: id,
-          name: name,
+          id: defaultProject?.id || '',
+          name: defaultProject?.name || '',
           version:
-            data.length > 0
+            data?.length > 0
               ? data[0].primaryComponent?.version
-              : sboms.length > 0
-                ? sboms[0].primaryComponent?.version
+              : defaultProject?.sboms?.length > 0
+                ? defaultProject?.sboms[0].primaryComponent?.version
                 : '',
           sbomId:
-            data.length > 0
+            data?.length > 0
               ? data[0].primaryComponent?.version
-              : sboms.length > 0
-                ? sboms[0].id
+              : defaultProject?.sboms?.length > 0
+                ? defaultProject?.sboms[0].id
                 : ''
         }
 
         const handleClick = () => {
-          if (sboms.length > 0) {
+          if (defaultProject?.sboms?.length > 0) {
             localStorage.setItem('product', JSON.stringify(product))
             localStorage.setItem('activeProdTab', 0)
             prodDispatch({
@@ -182,9 +182,9 @@ const ProductTable = ({ data, refetch, org }) => {
               payload: {
                 id: id,
                 sbomId:
-                  data.length > 0
+                  data?.length > 0
                     ? data[0].primaryComponent?.version
-                    : sboms[0].id
+                    : defaultProject?.sboms[0].id || ''
               }
             })
           }
@@ -192,7 +192,10 @@ const ProductTable = ({ data, refetch, org }) => {
         }
 
         return (
-          <Link to={`/vendor/products/${name}?id=${id}`} onClick={handleClick}>
+          <Link
+            to={`/vendor/products/${defaultProject?.name}?id=${defaultProject?.id}`}
+            onClick={handleClick}
+          >
             <Text color={'blue.500'} minWidth='100%'>
               {name}
             </Text>
@@ -207,15 +210,14 @@ const ProductTable = ({ data, refetch, org }) => {
       id: 'versions',
       name: 'VERSION',
       selector: (row) => {
-        const { sboms } = row
-        const data = sboms ? removeDuplicates(sboms) : []
-        return <Text>{data.length}</Text>
+        const { projects } = row
+        return <Text>{projects?.length}</Text>
       },
       wrap: true
     },
     // DESCRIPTION
     {
-      id: 'PROJECTS_DESCRIPTION',
+      id: 'PROJECT_GROUPS_DESCRIPTION',
       name: 'DESCRIPTION',
       selector: (row) => {
         const { description } = row
@@ -232,7 +234,7 @@ const ProductTable = ({ data, refetch, org }) => {
     },
     // UPDATEDAT
     {
-      id: 'PROJECTS_UPDATED_AT',
+      id: 'PROJECT_GROUPS_UPDATED_AT',
       name: 'UPDATED AT',
       selector: (row) => {
         const { updatedAt } = row
@@ -255,37 +257,7 @@ const ProductTable = ({ data, refetch, org }) => {
       id: 'actions',
       name: 'ACTIONS',
       selector: (row) => {
-        const { enabled, id, name, sboms } = row
-        const uniqVersions = []
-        sboms &&
-          sboms.map((project) => {
-            if (project.primaryComponent) {
-              uniqVersions.push({
-                label: project.primaryComponent.version,
-                value: project.id,
-                creationAt: project.creationAt
-              })
-            }
-          })
-
-        const filteredData = uniqVersions ? removeDuplicates(uniqVersions) : []
-
-        const product = {
-          id: id,
-          name: name,
-          version:
-            filteredData.length > 0
-              ? filteredData[0].label
-              : sboms.length > 0
-                ? sboms[0].primaryComponent?.version
-                : '',
-          sbomId:
-            filteredData.length > 0
-              ? filteredData[0].value
-              : sboms.length > 0
-                ? sboms[0].id
-                : ''
-        }
+        const { enabled } = row
 
         return (
           <Menu>
@@ -344,7 +316,7 @@ const ProductTable = ({ data, refetch, org }) => {
 
   // DELETE PRODUCT
   const onProductDelete = async () => {
-    await projectDelete({
+    await projectGroupDelete({
       variables: {
         id: activeRow.id
       }
@@ -362,7 +334,7 @@ const ProductTable = ({ data, refetch, org }) => {
 
   // TOGGLE STATUS
   const toggleStatus = async () => {
-    await projectUpdate({
+    await projectGroupUpdate({
       variables: {
         id: activeRow.id,
         enabled: activeRow.enabled === true ? false : true
@@ -434,6 +406,7 @@ const ProductTable = ({ data, refetch, org }) => {
     )
   }
 
+  // HEADER
   const subHeaderComponent = useMemo(() => {
     return (
       <Flex
@@ -649,7 +622,6 @@ const ProductTable = ({ data, refetch, org }) => {
           product={null}
           description={null}
           allProjects={null}
-          type={null}
         />
       )}
 
@@ -663,7 +635,6 @@ const ProductTable = ({ data, refetch, org }) => {
           refetch={refetch}
           description={activeRow.description}
           allProjects={data.nodes}
-          type={activeRow.sboms.length > 0 && activeRow.sboms[0].format}
         />
       )}
 

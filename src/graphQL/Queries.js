@@ -228,6 +228,84 @@ export const GetOrgSettings = gql`
   }
 `
 
+// GET PROJECT GROUPS
+export const GetProjectGroups = gql`
+  query GetProjectGroups(
+    $search: String
+    $enabled: Boolean
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+    $field: ProjectGroupOrderByFields!
+    $direction: OrderByDirection!
+  ) {
+    organization {
+      projectGroups(
+        search: $search
+        enabled: $enabled
+        first: $first
+        last: $last
+        after: $after
+        before: $before
+        orderBy: { field: $field, direction: $direction }
+      ) {
+        totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          startCursor
+          hasPreviousPage
+        }
+        nodes {
+          id
+          name
+          enabled
+          defaultProject {
+            id
+            name
+            description
+            updatedAt
+            enabled
+            sboms {
+              id
+              format
+              creationAt
+              updatedAt
+              primaryComponent {
+                id
+                name
+                version
+              }
+            }
+          }
+          projects {
+            id
+            name
+            description
+            updatedAt
+            enabled
+            sboms {
+              id
+              format
+              creationAt
+              updatedAt
+              primaryComponent {
+                id
+                name
+                version
+              }
+            }
+          }
+          description
+          enabled
+          updatedAt
+        }
+      }
+    }
+  }
+`
+
 export const GetOrgInfo = gql`
   query GetOrgInfo {
     organization {

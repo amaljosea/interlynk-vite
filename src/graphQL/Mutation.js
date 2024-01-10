@@ -236,6 +236,60 @@ export const updateOrgUser = gql`
   }
 `
 
+// CREATE PROJECT GROUP
+export const CreateProjectGroup = gql`
+  mutation CreateProjectGroup(
+    $name: String!
+    $desc: String
+    $enabled: Boolean
+  ) {
+    projectGroupCreate(
+      input: { name: $name, description: $desc, enabled: $enabled }
+    ) {
+      projectGroup {
+        id
+        name
+        description
+        enabled
+        projects {
+          id
+          name
+        }
+      }
+      errors
+    }
+  }
+`
+
+// UPDATE PROJECT GROUP
+export const UpdateProjectGroup = gql`
+  mutation UpdateProjectGroup(
+    $id: Uuid!
+    $name: String
+    $desc: String
+    $enabled: Boolean
+  ) {
+    projectGroupUpdate(
+      input: { id: $id, name: $name, description: $desc, enabled: $enabled }
+    ) {
+      projectGroup {
+        id
+        name
+      }
+      errors
+    }
+  }
+`
+
+// DELETE PROJECT GROUP
+export const DeleteProjectGroup = gql`
+  mutation DeleteProjectGroup($id: Uuid!) {
+    projectGroupDelete(input: { id: $id }) {
+      errors
+    }
+  }
+`
+
 export const OrgConnectorRefresh = gql`
   mutation OrgConnectorRefresh {
     organizationConnectorRefresh(input: {}) {
