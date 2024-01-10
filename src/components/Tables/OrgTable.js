@@ -34,12 +34,12 @@ import { useMutation } from '@apollo/client'
 import {
   SwitchOrganization,
   AcceptOrgInvitation,
-  DeclineInvitation,
+  DeclineOrgInvitation,
   QuitOrganization
 } from 'graphQL/Mutation'
 import Cookies from 'js-cookie'
-import { useLocation, useNavigate } from 'react-router-dom'
 import { FaEllipsisVertical } from 'react-icons/fa6'
+import { useNavigate } from 'react-router-dom'
 
 const OrgTable = ({ data, refetch, activeOrg }) => {
   const navigate = useNavigate()
@@ -63,7 +63,7 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
   const [switchOrg] = useMutation(SwitchOrganization)
   const [quitOrg] = useMutation(QuitOrganization)
   const [acceptInvitation] = useMutation(AcceptOrgInvitation)
-  const [declineInvitation] = useMutation(DeclineInvitation)
+  const [declineInvitation] = useMutation(DeclineOrgInvitation)
 
   const onSwitchOrg = async (id, name) => {
     await switchOrg({
