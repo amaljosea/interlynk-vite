@@ -180,10 +180,7 @@ const SupplierModal = ({
     setIsValidUrl('')
   }
 
-  const isInvalid =
-    supName === '' ||
-    (supEmail !== '' && emailError != '') ||
-    (orgUrl !== '' && isValidUrl !== '')
+  const isInvalid = supName === '' || (supEmail !== '' && emailError != '')
 
   return (
     <>
@@ -287,7 +284,7 @@ const SupplierModal = ({
                   fontSize={'sm'}
                   colorScheme='blue'
                   onClick={onSaveRule}
-                  disabled={isInvalid}
+                  isDisabled={isInvalid}
                 >
                   Save Rule
                 </Button>
@@ -302,7 +299,7 @@ const SupplierModal = ({
                   <Button
                     colorScheme='blue'
                     onClick={handleUpdate}
-                    disabled={isInvalid}
+                    isDisabled={isInvalid}
                   >
                     Update
                   </Button>
@@ -310,7 +307,7 @@ const SupplierModal = ({
                   <Button
                     colorScheme='blue'
                     onClick={handleSave}
-                    disabled={isInvalid}
+                    isDisabled={isInvalid}
                   >
                     Save
                   </Button>
