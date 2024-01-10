@@ -98,7 +98,7 @@ const ProductModal = ({
         <ModalOverlay />
         <form onSubmit={id ? updateProduct : handleSave}>
           <ModalContent>
-            <ModalHeader>{product ? 'Update' : 'Add'} Product</ModalHeader>
+            <ModalHeader>{product ? 'Edit' : 'Add'} Product</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               <Flex width={'100%'} direction={'column'} gap={4}>

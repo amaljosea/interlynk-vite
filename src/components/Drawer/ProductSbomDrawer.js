@@ -61,7 +61,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
   const [compType, setCompType] = useState('')
 
   const [groupInfo, setGroupInfo] = useState('')
-  const [compScope, setCompScope] = useState('')
+  const [compScope, setCompScope] = useState('required')
   const [cpeValue, setCpeValue] = useState('')
   const [cpeList, setCpeList] = useState([])
   const [cpeData, setCpeData] = useState([])
@@ -290,7 +290,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
         <DrawerContent>
           <DrawerCloseButton />
           <DrawerHeader borderBottomWidth='1px' color='gray.600'>
-            Create Primary Component
+            Build Version
           </DrawerHeader>
           <DrawerBody>
             <Stack direction={'column'} spacing={4}>
@@ -484,7 +484,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
                   </option>
                   <option value='excluded'>Excluded</option>
                   <option value='optional'>Optional</option>
-                  <option value='required'>Required</option>
+                  <option value='required' >Required</option>
                 </Select>
               </FormControl>
               {/* PRIMARY COMPONENT */}
