@@ -19,16 +19,16 @@ import {
   Text,
   Select
 } from '@chakra-ui/react'
-import { InviteUser, createOrgUser } from 'graphQL/Mutation'
+import { InviteUser } from 'graphQL/Mutation'
 import { GetRoles } from 'graphQL/Queries'
 import { useState } from 'react'
 import { validateEmail } from 'utils'
 
-const TeamModal = ({ isOpen, onClose, refetch }) => {
+const TeamModal = ({ isOpen, onClose, refetch, data }) => {
   const toast = useToast()
   const [user, setUser] = useState('')
   const [email, setEmail] = useState('')
-  const [role, setRole] = useState('')
+  const [role, setRole] = useState(data?.role?.id)
   const [error, setError] = useState('')
 
   const { data: roles } = useQuery(GetRoles)

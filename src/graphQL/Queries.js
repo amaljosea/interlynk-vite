@@ -19,6 +19,7 @@ export const GetOrg = gql`
           url
         }
         role {
+          id
           permissionsMap {
             category
             description
@@ -46,6 +47,7 @@ export const GetOrg = gql`
         name
         email
         role {
+          id
           name
           permissions
         }
