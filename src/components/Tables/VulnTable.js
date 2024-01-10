@@ -94,6 +94,8 @@ const VulnTable = ({
   const textColor = useColorModeValue('gray.700', 'white')
   const [hideColumn, setHideColumn] = useState(false)
   const [vulnSearch, setVulnSearch] = useState('')
+  const [isPrevActive, setIsPrevActive] = useState(false)
+  const [isNextActive, setIsNextActive] = useState(false)
   const x = window.matchMedia('(min-width: 2500px)')
   const y = window.matchMedia('(max-width: 1440px)')
 
@@ -625,6 +627,7 @@ const VulnTable = ({
   }
 
   const onPreviousPage = async () => {
+    setIsPrevActive(false)
     await refetch({
       ...vulnData,
       first: undefined,
@@ -633,6 +636,7 @@ const VulnTable = ({
       before: data.pageInfo.startCursor
     }).then((res) => {
       if (res.data) {
+        setIsPrevActive(res?.data?.sbom?.vulns?.pageInfo?.hasPreviousPage)
         prodVulnDispatch({
           type: 'DECREMENT_PAGE',
           payload: data.pageInfo.startCursor
@@ -642,6 +646,7 @@ const VulnTable = ({
   }
 
   const onNextPage = async () => {
+    setIsNextActive(false)
     await refetch({
       ...vulnData,
       first: totalRows,
@@ -650,6 +655,7 @@ const VulnTable = ({
       before: undefined
     }).then((res) => {
       if (res.data) {
+        setIsNextActive(res?.data?.sbom?.vulns?.pageInfo?.hasNextPage)
         prodVulnDispatch({
           type: 'INCREMENT_PAGE',
           payload: {
@@ -732,6 +738,8 @@ const VulnTable = ({
 
   useEffect(() => {
     if (data) {
+      setIsPrevActive(data?.pageInfo?.hasPreviousPage)
+      setIsNextActive(data?.pageInfo?.hasNextPage)
       getVulnFilters({
         variables: {
           projectId: productId,
@@ -784,14 +792,14 @@ const VulnTable = ({
             <Button
               colorScheme='blue'
               onClick={onPreviousPage}
-              isDisabled={!data.pageInfo.hasPreviousPage}
+              isDisabled={!isPrevActive}
             >
               Previous
             </Button>
             <Button
               colorScheme='blue'
               onClick={onNextPage}
-              isDisabled={!data.pageInfo.hasNextPage}
+              isDisabled={!isNextActive}
             >
               Next
             </Button>
