@@ -18,25 +18,21 @@ import { useLocation } from 'react-router-dom'
 import { displayErrorMessage } from 'utils'
 import { Text } from '@chakra-ui/react'
 import { WarningTwoIcon } from '@chakra-ui/icons'
-import { permissionList } from 'utils'
 
 export default function Dashboard() {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const product = queryParams.get('id')
 
-  const { dispatch, setUserPermissons } = useGlobalState()
+  const { dispatch } = useGlobalState()
   const { prodCompDispatch, prodVulnDispatch } = dispatch
 
   const iconBoxInside = useColorModeValue('white', 'white')
 
   const { data, error: eOrg } = useQuery(GetOrg)
+
   useEffect(() => {
     if (data) {
-      const permissions = permissionList(
-        data?.organization?.currentUser?.role?.permissionsMap || []
-      )
-      setUserPermissons(permissions)
       localStorage.setItem(
         'organization',
         JSON.stringify(data?.organization?.name)
