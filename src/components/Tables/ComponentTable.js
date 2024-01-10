@@ -400,7 +400,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
                     </Tag>
                   </Tooltip>
                 )}
-                {totalSpdx && (
+                {totalSpdx.length > 0 && (
                   <Tooltip
                     label={JSON.stringify(totalSpdx)
                       .slice(1, -1)
@@ -413,7 +413,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
                       colorScheme='green'
                       width={'fit-content'}
                     >
-                      <TagLabel>{`+${totalSpdx.length}`}</TagLabel>
+                      <TagLabel width={6}>{`+${totalSpdx.length}`}</TagLabel>
                     </Tag>
                   </Tooltip>
                 )}
@@ -472,7 +472,8 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
         )
       },
       right: 'true',
-      sortable: true
+      sortable: true,
+      wrap: true
     },
     // UPDATED AT
     {
