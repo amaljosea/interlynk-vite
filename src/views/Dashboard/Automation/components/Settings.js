@@ -103,7 +103,9 @@ const Settings = ({ data, refetch }) => {
       selector: (row) => {
         const { applicability } = row
         return <Text textTransform={'capitalize'}>{applicability}</Text>
-      }
+      },
+      width: '160px',
+      wrap: true
     },
     // NAME
     {
