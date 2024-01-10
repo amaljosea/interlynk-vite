@@ -39,7 +39,8 @@ import {
   FaTrashCan,
   FaUpload,
   FaToggleOff,
-  FaWindowMaximize
+  FaWindowMaximize,
+  FaBoxArchive
 } from 'react-icons/fa6'
 import { useLocation, useNavigate } from 'react-router-dom'
 import {
@@ -404,7 +405,7 @@ const ProductDetails = () => {
                       flexWrap={'wrap'}
                     >
                       {/* EDIT PRODUCT */}
-                      <Tooltip label='Edit Details'>
+                      <Tooltip label='Edit Product'>
                         <IconButton
                           isDisabled={!data.project.enabled}
                           colorScheme='blue'
@@ -413,7 +414,7 @@ const ProductDetails = () => {
                         ></IconButton>
                       </Tooltip>
                       {/* UPLOAD SBOM */}
-                      <Tooltip label='Upload Product SBOM'>
+                      <Tooltip label='Upload SBOM'>
                         <IconButton
                           isDisabled={!data.project.enabled}
                           colorScheme='blue'
@@ -422,7 +423,7 @@ const ProductDetails = () => {
                         ></IconButton>
                       </Tooltip>
                       {/* BUILD SBOM */}
-                      <Tooltip label='Create Product Version'>
+                      <Tooltip label='Build Version'>
                         <IconButton
                           isDisabled={!data.project.enabled}
                           colorScheme='blue'
@@ -455,7 +456,7 @@ const ProductDetails = () => {
                         <IconButton
                           colorScheme='red'
                           onClick={onDeleteOpen}
-                          icon={<FaTrashCan />}
+                          icon={<FaBoxArchive />}
                           isDisabled={!archiveProduct}
                         ></IconButton>
                       </Tooltip>
