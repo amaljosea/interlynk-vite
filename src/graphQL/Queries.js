@@ -70,6 +70,26 @@ export const GetOrg = gql`
   }
 `
 
+// GET USER PERMISSIONS
+export const GetUserPermissions = gql`
+  query GetOrganization {
+    organization {
+      currentUser {
+        role {
+          permissionsMap {
+            category
+            description
+            key
+            name
+            supersededBy
+            value
+          }
+        }
+      }
+    }
+  }
+`
+
 // GET ORG ROLES
 export const GetRoles = gql`
   query GetRoles {
