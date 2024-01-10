@@ -112,6 +112,8 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
 
   const [activeRow, setActiveRow] = useState(null)
   const [compSearch, setCompSearch] = useState('')
+  const [isPrevActive, setIsPrevActive] = useState(false)
+  const [isNextActive, setIsNextActive] = useState(false)
 
   const compBtn = useRef(null)
   const linkRef = useRef(null)
@@ -996,8 +998,8 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
     )
   }, [compSearch, onSearchInputChange, handleClear, handleSearch, filters])
 
-  const handleRefetch = (after, before) => {
-    refetch({
+  const handleRefetch = async (after, before) => {
+    await refetch({
       projectId: productId,
       sbomId: sbomId,
       first: after ? totalRows : undefined,
@@ -1022,6 +1024,11 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
       internal: scope === 'internal' ? true : undefined,
       field: customerView ? signedCompField : field,
       direction: customerView ? signedCompDirection : direction
+    }).then((res) => {
+      if (res.data) {
+        setIsPrevActive(res?.data?.sbom?.components?.pageInfo?.hasPreviousPage)
+        setIsNextActive(res?.data?.sbom?.components?.pageInfo?.hasNextPage)
+      }
     })
   }
 
@@ -1065,6 +1072,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
   }
 
   const handlePreviousPage = async () => {
+    setIsPrevActive(false)
     handleRefetch(null, data.pageInfo.startCursor)
     prodCompDispatch({
       type: 'DECREMENT_PAGE',
@@ -1073,6 +1081,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
   }
 
   const handleNextPage = async () => {
+    setIsNextActive(false)
     handleRefetch(data.pageInfo.endCursor, null)
     prodCompDispatch({
       type: 'INCREMENT_PAGE',
@@ -1085,6 +1094,8 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
 
   useEffect(() => {
     if (data) {
+      setIsPrevActive(data?.pageInfo?.hasPreviousPage)
+      setIsNextActive(data?.pageInfo?.hasNextPage)
       getCompFilters({
         variables: {
           projectId: productId,
@@ -1138,14 +1149,14 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
             <Button
               colorScheme='blue'
               onClick={handlePreviousPage}
-              isDisabled={!data.pageInfo.hasPreviousPage}
+              isDisabled={!isPrevActive}
             >
               Previous
             </Button>
             <Button
               colorScheme='blue'
               onClick={handleNextPage}
-              isDisabled={!data.pageInfo.hasNextPage}
+              isDisabled={!isNextActive}
             >
               Next
             </Button>
