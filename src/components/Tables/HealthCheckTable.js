@@ -90,9 +90,6 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
         status:
           statues.includes('all') || statues.length === 0 ? undefined : statues,
         first: totalRows,
-        // after: after !== '' ? after : undefined,
-        // last: before !== '' ? totalRows : undefined,
-        // before: before !== '' ? before : undefined,
         field: field,
         direction: direction
       }
@@ -663,9 +660,9 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
                       'Component has a unique identifier'
                         ? handleComUpdate(row)
                         : row.organizationRule.rule.shortDesc ===
-                          'Document has a unique identifier'
-                        ? handleSbomUpdate(row)
-                        : handleOpen(row)
+                            'Document has a unique identifier'
+                          ? handleSbomUpdate(row)
+                          : handleOpen(row)
                     }
                     disabled={customerView}
                   />

@@ -66,7 +66,7 @@ const CpeModal = ({
 
   const { prodCompState, dispatch } = useGlobalState()
   const { cpeString } = prodCompState
-  const { prodCompDispatch } = dispatch
+  const { prodCompDispatch, prodCheckDispatch } = dispatch
 
   const [healthRecheck] = useMutation(recheckHealth, {
     onCompleted: () => refetch()
@@ -118,7 +118,7 @@ const CpeModal = ({
       })
         .then(() => {
           if (checkId) {
-            prodCompDispatch({
+            prodCheckDispatch({
               type: 'FETCH_DATA_SUCCESS'
             })
             healthRecheck({
