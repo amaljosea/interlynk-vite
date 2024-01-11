@@ -111,26 +111,6 @@ export const GetRoles = gql`
   }
 `
 
-// GET USER PERMISSIONS
-export const GetUserPermissions = gql`
-  query GetOrganization {
-    organization {
-      currentUser {
-        role {
-          permissionsMap {
-            category
-            description
-            key
-            name
-            supersededBy
-            value
-          }
-        }
-      }
-    }
-  }
-`
-
 // GET ORGANIZATION METRICS
 export const GetOrgMetrics = gql`
   query GetOrgMetrics {

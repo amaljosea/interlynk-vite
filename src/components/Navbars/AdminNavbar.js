@@ -12,6 +12,10 @@ import React, { useState, useEffect } from 'react'
 import AdminNavbarLinks from './AdminNavbarLinks'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { vulnList } from 'variables/general'
+import { useGlobalState } from 'hooks/useGlobalState'
+import { useQuery } from '@apollo/client'
+import { GetUserPermissions } from 'graphQL/Queries'
+import { permissionList } from 'utils'
 
 export default function AdminNavbar(props) {
   const { setUserPermissons } = useGlobalState()
@@ -71,8 +75,6 @@ export default function AdminNavbar(props) {
 
   const urlParts = location.pathname.split('/')
   const category = urlParts[2]
-
-  const { data } = useQuery(GetUserPermissions)
 
   useEffect(() => {
     if (data) {
