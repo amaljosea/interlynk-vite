@@ -84,7 +84,7 @@ const CpeModal = ({
   // UPDATE FIELDS DATA FROM API
   useEffect(() => {
     const matches = regexPattern.test(cpeValue)
-    if (isCpeValid) {
+    if (cpeValue.length > 0 && isCpeValid) {
       prodCompDispatch({ type: 'SET_CPE_STRING', payload: cpeValue })
       const components = cpeValue.split(':')
       setType(components[2].toLowerCase())
