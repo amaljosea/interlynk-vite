@@ -19,6 +19,8 @@ export const GetOrg = gql`
           url
         }
         role {
+          id
+          name
           permissionsMap {
             category
             description
@@ -46,6 +48,7 @@ export const GetOrg = gql`
         name
         email
         role {
+          id
           name
           permissions
         }
@@ -193,6 +196,35 @@ export const MyOrganizations = gql`
       after: $after
       before: $before
       invitationStatuses: $invitationStatuses
+    ) {
+      nodes {
+        id
+        name
+        email
+        status
+        updatedAt
+        invitationStatus
+        url
+      }
+    }
+  }
+`
+
+// LIST CURRENT USER'S ORGANIZATIONS
+export const AllOrganizations = gql`
+  query AllOrganizations(
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+    $status: OrganizationStatusEnum
+  ) {
+    allOrganizations(
+      first: $first
+      last: $last
+      after: $after
+      before: $before
+      invitationStatuses: $status
     ) {
       nodes {
         id

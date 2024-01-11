@@ -32,6 +32,8 @@ import { displayErrorMessage } from 'utils'
 import { WarningTwoIcon } from '@chakra-ui/icons'
 import { GetRoles } from 'graphQL/Queries'
 import RoleTable from 'components/Tables/RoleTable'
+import { AllOrganizations } from 'graphQL/Queries'
+import CustomLoader from 'components/CustomLoader'
 
 function Profile() {
   const location = useLocation()
@@ -57,6 +59,9 @@ function Profile() {
   const { data: orgInfo, refetch, error } = useQuery(GetOrg)
 
   const [getMyOrgs, { data: orgs }] = useLazyQuery(MyOrganizations, {
+    fetchPolicy: 'network-only'
+  })
+  const [getAllOrgs, { data: allOrgs }] = useLazyQuery(AllOrganizations, {
     fetchPolicy: 'network-only'
   })
 
@@ -97,7 +102,15 @@ function Profile() {
     } else if (activetab === 'organization') {
       setSelectedTab('PERSONAL')
       setPsIndex(1)
-      getMyOrgs({ variables: { invitationStatuses: ['ACCEPTED', 'INVITED'] } })
+      if (orgInfo?.organization?.currentUser?.role?.name === 'super_admin') {
+        getAllOrgs({
+          variables: { status: 'approved' }
+        })
+      } else {
+        getMyOrgs({
+          variables: { invitationStatuses: ['ACCEPTED', 'INVITED'] }
+        })
+      }
     } else if (activetab === 'token') {
       setSelectedTab('PERSONAL')
       setPsIndex(2)
@@ -136,7 +149,7 @@ function Profile() {
 
   return (
     <>
-      {orgInfo && (
+      {orgInfo ? (
         <Flex
           direction='column'
           pr={2}
@@ -273,11 +286,20 @@ function Profile() {
                   </TabPanel>
                   {/* ORG DETAILS */}
                   <TabPanel>
-                    <OrgTable
-                      data={orgs?.myOrganizations?.nodes || []}
-                      refetch={getMyOrgs}
-                      activeOrg={orgInfo?.organization?.id || null}
-                    />
+                    {orgInfo?.organization?.currentUser?.role?.name ===
+                    'super_admin' ? (
+                      <OrgTable
+                        data={allOrgs?.allOrganizations?.nodes || []}
+                        refetch={getAllOrgs}
+                        activeOrg={orgInfo?.organization?.id || null}
+                      />
+                    ) : (
+                      <OrgTable
+                        data={orgs?.myOrganizations?.nodes || []}
+                        refetch={getMyOrgs}
+                        activeOrg={orgInfo?.organization?.id || null}
+                      />
+                    )}
                   </TabPanel>
                   {/* SECURITY TOKEN */}
                   <TabPanel display={orgInfo?.organization ? 'block' : 'none'}>
@@ -290,6 +312,12 @@ function Profile() {
               </Tabs>
             </Card>
           )}
+        </Flex>
+      ) : (
+        <Flex mt={20}>
+          <Card>
+            <CustomLoader />
+          </Card>
         </Flex>
       )}
     </>

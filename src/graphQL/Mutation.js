@@ -75,7 +75,7 @@ export const AcceptOrgInvitation = gql`
 
 // DECLINE ORG INVITATION
 export const DeclineOrgInvitation = gql`
-  mutation declineInvitation($organizationId: Uuid!) {
+  mutation DeclineOrgInvitation($organizationId: Uuid!) {
     organizationUserInvitationDeclineById(
       input: { organizationId: $organizationId }
     ) {

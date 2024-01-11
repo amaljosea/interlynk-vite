@@ -22,7 +22,7 @@ import { GetRoles } from 'graphQL/Queries'
 import { useEffect, useState } from 'react'
 
 const RoleModal = ({ isOpen, onClose, refetch, data }) => {
-  const [role, setRole] = useState('')
+  const [role, setRole] = useState(data?.role?.id)
   const [error, setError] = useState('')
 
   const { data: roles } = useQuery(GetRoles)

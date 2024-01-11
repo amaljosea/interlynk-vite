@@ -112,6 +112,8 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
 
   const [activeRow, setActiveRow] = useState(null)
   const [compSearch, setCompSearch] = useState('')
+  const [isPrevActive, setIsPrevActive] = useState(false)
+  const [isNextActive, setIsNextActive] = useState(false)
 
   const compBtn = useRef(null)
   const linkRef = useRef(null)
@@ -400,7 +402,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
                     </Tag>
                   </Tooltip>
                 )}
-                {totalSpdx && (
+                {totalSpdx.length > 0 && (
                   <Tooltip
                     label={JSON.stringify(totalSpdx)
                       .slice(1, -1)
@@ -413,7 +415,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
                       colorScheme='green'
                       width={'fit-content'}
                     >
-                      <TagLabel>{`+${totalSpdx.length}`}</TagLabel>
+                      <TagLabel width={6}>{`+${totalSpdx.length}`}</TagLabel>
                     </Tag>
                   </Tooltip>
                 )}
@@ -472,7 +474,8 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
         )
       },
       right: 'true',
-      sortable: true
+      sortable: true,
+      wrap: true
     },
     // UPDATED AT
     {
@@ -646,29 +649,29 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
         >
           <GridItem w='100%' colSpan={3}>
             <CustomText>Description :</CustomText>
-            <Text mt={1} fontSize={14}>
+            <Text width={'90%'} mt={1} fontSize={14}>
               {description !== null ? description : ''}
             </Text>
           </GridItem>
-          <GridItem w='100%'>
+          <GridItem>
             <CustomText>Component :</CustomText>
-            <Text mt={1} fontSize={14}>
+            <Text width={'90%'} mt={1} fontSize={14}>
               {name}
             </Text>
           </GridItem>
-          <GridItem w='100%'>
+          <GridItem>
             <CustomText>Type :</CustomText>
             <Text mt={1} fontSize={14} textTransform={'capitalize'}>
               {kind}
             </Text>
           </GridItem>
-          <GridItem w='100%'>
+          <GridItem>
             <CustomText>Internal :</CustomText>
             <Text mt={1} fontSize={14}>
               {internal ? 'True' : 'False'}
             </Text>
           </GridItem>
-          <GridItem w='100%'>
+          <GridItem>
             <CustomText>Supplier :</CustomText>
             <VStack spacing={4} mt={1} alignItems={'left'}>
               {suppliers &&
@@ -697,13 +700,13 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
                 ))}
             </VStack>
           </GridItem>
-          <GridItem w='100%'>
+          <GridItem>
             <CustomText>PURL :</CustomText>
-            <Text mt={1} fontSize={14}>
+            <Text width={'90%'} mt={1} fontSize={14}>
               {purl !== null && purl !== '' ? purl : ''}
             </Text>
           </GridItem>
-          <GridItem w='100%'>
+          <GridItem>
             <CustomText>CPES :</CustomText>
             <Flex
               mt={1}
@@ -714,13 +717,13 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
             >
               {cpes?.length > 0 &&
                 cpes.map((item, index) => (
-                  <Text key={index} fontSize={14}>
+                  <Text width={'80%'} key={index} fontSize={14}>
                     {item}
                   </Text>
                 ))}
             </Flex>
           </GridItem>
-          <GridItem w='100%'>
+          <GridItem>
             <CustomText>Depends On :</CustomText>
             <Flex mt={2} alignItems={'flex-start'} gap={2} flexWrap={'wrap'}>
               {compDependency &&
@@ -747,7 +750,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
                   ))}
             </Flex>
           </GridItem>
-          <GridItem w='100%'>
+          <GridItem>
             <CustomText>Dependency Of :</CustomText>
             <Flex mt={2} alignItems={'flex-start'} gap={2} flexWrap={'wrap'}>
               {compDependency &&
@@ -772,13 +775,13 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
                 ))}
             </Flex>
           </GridItem>
-          <GridItem w='100%'>
+          <GridItem>
             <CustomText>Scope :</CustomText>
             <Text mt={1} fontSize={14} textTransform={'capitalize'}>
               {scope}
             </Text>
           </GridItem>
-          <GridItem w='100%'>
+          <GridItem>
             <CustomText>Licenses :</CustomText>
             <Flex alignItems={'center'} gap={2} flexWrap={'wrap'} my={2}>
               {/* SPDX */}
@@ -995,8 +998,8 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
     )
   }, [compSearch, onSearchInputChange, handleClear, handleSearch, filters])
 
-  const handleRefetch = (after, before) => {
-    refetch({
+  const handleRefetch = async (after, before) => {
+    await refetch({
       projectId: productId,
       sbomId: sbomId,
       first: after ? totalRows : undefined,
@@ -1021,6 +1024,11 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
       internal: scope === 'internal' ? true : undefined,
       field: customerView ? signedCompField : field,
       direction: customerView ? signedCompDirection : direction
+    }).then((res) => {
+      if (res.data) {
+        setIsPrevActive(res?.data?.sbom?.components?.pageInfo?.hasPreviousPage)
+        setIsNextActive(res?.data?.sbom?.components?.pageInfo?.hasNextPage)
+      }
     })
   }
 
@@ -1064,6 +1072,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
   }
 
   const handlePreviousPage = async () => {
+    setIsPrevActive(false)
     handleRefetch(null, data.pageInfo.startCursor)
     prodCompDispatch({
       type: 'DECREMENT_PAGE',
@@ -1072,6 +1081,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
   }
 
   const handleNextPage = async () => {
+    setIsNextActive(false)
     handleRefetch(data.pageInfo.endCursor, null)
     prodCompDispatch({
       type: 'INCREMENT_PAGE',
@@ -1084,6 +1094,8 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
 
   useEffect(() => {
     if (data) {
+      setIsPrevActive(data?.pageInfo?.hasPreviousPage)
+      setIsNextActive(data?.pageInfo?.hasNextPage)
       getCompFilters({
         variables: {
           projectId: productId,
@@ -1137,14 +1149,14 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
             <Button
               colorScheme='blue'
               onClick={handlePreviousPage}
-              isDisabled={!data.pageInfo.hasPreviousPage}
+              isDisabled={!isPrevActive}
             >
               Previous
             </Button>
             <Button
               colorScheme='blue'
               onClick={handleNextPage}
-              isDisabled={!data.pageInfo.hasNextPage}
+              isDisabled={!isNextActive}
             >
               Next
             </Button>

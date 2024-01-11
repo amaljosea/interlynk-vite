@@ -19,7 +19,9 @@ import {
   AlertIcon,
   AlertDescription,
   Tag,
-  FormErrorMessage
+  FormErrorMessage,
+  Grid,
+  Input
 } from '@chakra-ui/react'
 import CpeInput from 'components/CpeInput'
 import { CreateAutomation } from 'graphQL/Mutation'
@@ -62,11 +64,17 @@ const CpeModal = ({
   const [version, setVersion] = useState('')
   const [versionList, setVersionList] = useState([])
   const versionRef = useRef()
+  const [update, setUpdate] = useState('')
+  const [edition, setEdition] = useState('')
+  const [language, setLanguage] = useState('')
+  const [swEdition, setSwEdition] = useState('')
+  const [targetSoftware, setTargetSoftware] = useState('')
   const [hardware, setHardware] = useState('')
+  const [other, setOther] = useState('')
 
   const { prodCompState, dispatch } = useGlobalState()
-  const { cpeString } = prodCompState
-  const { prodCompDispatch } = dispatch
+  const { cpeString, isCpeValid } = prodCompState
+  const { prodCompDispatch, prodCheckDispatch } = dispatch
 
   const [healthRecheck] = useMutation(recheckHealth, {
     onCompleted: () => refetch()
@@ -76,64 +84,131 @@ const CpeModal = ({
   // UPDATE FIELDS DATA FROM API
   useEffect(() => {
     const matches = regexPattern.test(cpeValue)
-    if (matches) {
+    if (cpeValue.length > 0 && isCpeValid) {
       prodCompDispatch({ type: 'SET_CPE_STRING', payload: cpeValue })
       const components = cpeValue.split(':')
-      setType(components[2])
-      setVendor(components[3])
-      setProduct(components[4])
+      setType(components[2].toLowerCase())
+      setVendor(components[3] === '*' ? '' : components[3])
+      setProduct(components[4] === '*' ? '' : components[4])
       setVersion(components[5] === '*' ? '' : components[5])
-      setHardware(components[6] === '*' ? '' : components[6])
+      setUpdate(components[6] === '*' ? '' : components[6])
+      setEdition(components[7] === '*' ? '' : components[7])
+      setLanguage(components[8] === '*' ? '' : components[8])
+      setSwEdition(components[9] === '*' ? '' : components[9])
+      setTargetSoftware(components[10] === '*' ? '' : components[10])
+      setHardware(components[11] === '*' ? '' : components[11])
+      setOther(components[12] === '*' ? '' : components[12])
     } else {
       prodCompDispatch({
         type: 'SET_CPE_STRING',
-        payload: 'cpe:2.3:::::*:*:*:*:*:*:*'
+        payload: 'cpe:2.3:*:*:*:*:*:*:*:*:*:*:'
       })
     }
   }, [cpeValue])
 
+  // ON BLUR UPDATE
+  const onBlurUpdate = () => {
+    const cpeParts = cpeString.split(':')
+    cpeParts[6] = update === '' ? '*' : update
+    const cpe = cpeParts.join(':')
+    prodCompDispatch({ type: 'SET_CPE_STRING', payload: cpe })
+  }
+
+  // ON BLUR EDITION
+  const onBlurEdition = () => {
+    const cpeParts = cpeString.split(':')
+    cpeParts[7] = edition === '' ? '*' : edition
+    const cpe = cpeParts.join(':')
+    prodCompDispatch({ type: 'SET_CPE_STRING', payload: cpe })
+  }
+
+  // ON BLUR LANGUAGE
+  const onBlurLanguage = () => {
+    const cpeParts = cpeString.split(':')
+    cpeParts[8] = language === '' ? '*' : language
+    const cpe = cpeParts.join(':')
+    prodCompDispatch({ type: 'SET_CPE_STRING', payload: cpe })
+  }
+
+  // ON BLUR SW EDITION
+  const onBlurSwEdition = () => {
+    const cpeParts = cpeString.split(':')
+    cpeParts[9] = swEdition === '' ? '*' : swEdition
+    const cpe = cpeParts.join(':')
+    prodCompDispatch({ type: 'SET_CPE_STRING', payload: cpe })
+  }
+
+  // ON BLUR TARGET SOFTWARE
+  const onBlurTargetSoftware = () => {
+    const cpeParts = cpeString.split(':')
+    cpeParts[10] = targetSoftware === '' ? '*' : targetSoftware
+    const cpe = cpeParts.join(':')
+    prodCompDispatch({ type: 'SET_CPE_STRING', payload: cpe })
+  }
+
+  // ON BLUR OTHER
+  const onBlurOther = () => {
+    const cpeParts = cpeString.split(':')
+    cpeParts[12] = other === '' ? '*' : other
+    const cpe = cpeParts.join(':')
+    prodCompDispatch({ type: 'SET_CPE_STRING', payload: cpe })
+  }
+
   // ON CPE SAVE
   const handleSave = () => {
-    if (validateCpe(cpeString)) {
-      if (selectedCpe) {
-        onUpdateCpe(cpeString, selectedCpe.id)
-      } else {
-        onCreateCpe(cpeString)
-      }
-      onClose()
+    // if (validateCpe(cpeString)) {
+    const cpeParts = cpeString.split(':')
+    cpeParts[2] = type === '' ? '*' : type
+    cpeParts[3] = vendor === '' ? '*' : vendor
+    cpeParts[4] = product === '' ? '*' : product
+    cpeParts[5] = version === '' ? '*' : version
+    cpeParts[6] = update === '' ? '*' : update
+    cpeParts[7] = edition === '' ? '*' : edition
+    cpeParts[8] = language === '' ? '*' : language
+    cpeParts[9] = swEdition === '' ? '*' : swEdition
+    cpeParts[10] = targetSoftware === '' ? '*' : targetSoftware
+    cpeParts[11] = hardware === '' ? '*' : hardware
+    cpeParts[12] = other === '' ? '*' : other
+    const cpe = cpeParts.join(':')
+    if (selectedCpe) {
+      onUpdateCpe(cpe, selectedCpe.id)
     } else {
-      setError('Invalid CPE')
+      onCreateCpe(cpe)
     }
+    onClose()
+    // } else {
+    //   setError('Invalid CPE')
+    // }
   }
 
   // ON CPE UPDATE
   const handleComUpdate = async () => {
-    if (validateCpe(cpeString)) {
-      await updateComponent({
-        variables: {
-          id: activeCheck.id,
-          sbomId: sbomId,
-          cpes: [cpeString]
+    // if (validateCpe(cpeString)) {
+    await updateComponent({
+      variables: {
+        id: activeCheck.id,
+        sbomId: sbomId,
+        cpes: [cpeString]
+      }
+    })
+      .then(() => {
+        if (checkId) {
+          prodCheckDispatch({
+            type: 'FETCH_DATA_SUCCESS'
+          })
+          healthRecheck({
+            variables: {
+              checkId: checkId,
+              compId: activeCheck.id,
+              sbomId: sbomId
+            }
+          })
         }
       })
-        .then(() => {
-          if (checkId) {
-            prodCompDispatch({
-              type: 'FETCH_DATA_SUCCESS'
-            })
-            healthRecheck({
-              variables: {
-                checkId: checkId,
-                compId: activeCheck.id,
-                sbomId: sbomId
-              }
-            })
-          }
-        })
-        .finally(() => onClose())
-    } else {
-      setError('Invalid CPE')
-    }
+      .finally(() => onClose())
+    // } else {
+    //   setError('Invalid CPE')
+    // }
   }
 
   // ON VENDOR INPUT CHANGE
@@ -247,23 +322,14 @@ const CpeModal = ({
   // ON HARDWARE CHANGE
   const handleHardwareChange = (e) => {
     const { value } = e.target
-    const cpeParts = cpeString.split(':')
     setHardware(value)
-    if (value !== '') {
-      cpeParts[6] = value
-      const cpe = cpeParts.join(':')
-      prodCompDispatch({
-        type: 'SET_CPE_STRING',
-        payload: cpe
-      })
-    } else {
-      cpeParts[6] = '*'
-      const cpe = cpeParts.join(':')
-      prodCompDispatch({
-        type: 'SET_CPE_STRING',
-        payload: cpe
-      })
-    }
+    const cpeParts = cpeString.split(':')
+    cpeParts[11] = value === '' ? '*' : value
+    const cpe = cpeParts.join(':')
+    prodCompDispatch({
+      type: 'SET_CPE_STRING',
+      payload: cpe
+    })
   }
 
   const [createAutoCheck] = useMutation(CreateAutomation)
@@ -304,7 +370,7 @@ const CpeModal = ({
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal isOpen={isOpen} onClose={onClose} size={'2xl'}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>CPE Details</ModalHeader>
@@ -365,106 +431,189 @@ const CpeModal = ({
                 />
                 {error !== '' && <FormErrorMessage>{error}</FormErrorMessage>}
               </FormControl>
-              {/* VENDOR */}
-              <CpeInput
-                name='vendor'
-                inputValue={vendor}
-                setInputValue={setVendor}
-                cpeList={vendorList}
-                setCpeList={setVendorList}
-                inputRef={vendorRef}
-                validation={false}
-                onChange={onVendorInputChange}
-              />
-              {vendor !== '' && vendor.includes(':') && (
-                <Alert size={'sm'} status='error'>
-                  <AlertIcon />
-                  <AlertDescription fontSize={'sm'}>
-                    Invalid entry
-                  </AlertDescription>
-                </Alert>
-              )}
-              {/* TYPE */}
-              <FormControl>
-                <FormLabel htmlFor='type'>Type</FormLabel>
-                <Select
-                  id='type'
-                  name='type'
-                  size='md'
-                  fontSize={'sm'}
-                  value={type}
-                  onChange={handleTypeChange}
-                >
-                  <option value=''>-- Select --</option>
-                  <option value='a'>Application</option>
-                  <option value='o'>Operating System</option>
-                  <option value='h'>Hardware</option>
-                </Select>
-              </FormControl>
-              {/* PRODUCT */}
-              <CpeInput
-                name='product'
-                inputValue={product}
-                setInputValue={setProduct}
-                cpeList={productList}
-                setCpeList={setProductList}
-                inputRef={productRef}
-                validation={false}
-                onChange={onProductInputChange}
-              />
-              {product !== '' && product.includes(':') && (
-                <Alert size={'sm'} status='error'>
-                  <AlertIcon />
-                  <AlertDescription fontSize={'sm'}>
-                    Invalid entry
-                  </AlertDescription>
-                </Alert>
-              )}
-              {/* VERSION */}
-              <CpeInput
-                name='version'
-                inputValue={version}
-                setInputValue={setVersion}
-                cpeList={versionList}
-                setCpeList={setVersionList}
-                inputRef={versionRef}
-                validation={false}
-                onChange={onVersionInputChange}
-              />
-              {version !== '' && version.includes(':') && (
-                <Alert size={'sm'} status='error'>
-                  <AlertIcon />
-                  <AlertDescription fontSize={'sm'}>
-                    Invalid entry
-                  </AlertDescription>
-                </Alert>
-              )}
-              {/* TARGET HARDWARE */}
-              <FormControl>
-                <FormLabel htmlFor='targetHardware'>Target Hardware</FormLabel>
-                <Stack direction='column' spacing={1}>
+              <Grid templateColumns='repeat(2, 1fr)' gap={6}>
+                {/* PART */}
+                <FormControl>
+                  <FormLabel htmlFor='type'>Part</FormLabel>
                   <Select
+                    id='part'
+                    name='part'
                     size='md'
-                    id='targetHardware'
-                    name='targetHardware'
-                    value={hardware}
-                    onChange={handleHardwareChange}
+                    fontSize={'sm'}
+                    value={type}
+                    onChange={handleTypeChange}
                   >
                     <option value=''>-- Select --</option>
-                    <option value='x64'>x64</option>
-                    <option value='x86'>x86</option>
-                    <option value='x32'>x32</option>
-                    <option value='arm64'>arm64</option>
-                    <option value='amd64'>amd64</option>
-                    <option value='itanium'>itanium</option>
-                    <option value='arm'>arm</option>
-                    <option value='rj45'>rj45</option>
-                    <option value='iphone'>iphone</option>
-                    <option value='android'>android</option>
-                    <option value='*'>*</option>
+                    <option value='a'>Application</option>
+                    <option value='o'>Operating System</option>
+                    <option value='h'>Hardware</option>
                   </Select>
-                </Stack>
-              </FormControl>
+                </FormControl>
+                {/* VENDOR */}
+                <CpeInput
+                  name='vendor'
+                  inputValue={vendor}
+                  setInputValue={setVendor}
+                  cpeList={vendorList}
+                  setCpeList={setVendorList}
+                  inputRef={vendorRef}
+                  validation={false}
+                  onChange={onVendorInputChange}
+                />
+                {vendor !== '' && vendor.includes(':') && (
+                  <Alert size={'sm'} status='error'>
+                    <AlertIcon />
+                    <AlertDescription fontSize={'sm'}>
+                      Invalid entry
+                    </AlertDescription>
+                  </Alert>
+                )}
+                {/* PRODUCT */}
+                <CpeInput
+                  name='product'
+                  inputValue={product}
+                  setInputValue={setProduct}
+                  cpeList={productList}
+                  setCpeList={setProductList}
+                  inputRef={productRef}
+                  validation={false}
+                  onChange={onProductInputChange}
+                />
+                {product !== '' && product.includes(':') && (
+                  <Alert size={'sm'} status='error'>
+                    <AlertIcon />
+                    <AlertDescription fontSize={'sm'}>
+                      Invalid entry
+                    </AlertDescription>
+                  </Alert>
+                )}
+                {/* VERSION */}
+                <CpeInput
+                  name='version'
+                  inputValue={version}
+                  setInputValue={setVersion}
+                  cpeList={versionList}
+                  setCpeList={setVersionList}
+                  inputRef={versionRef}
+                  validation={false}
+                  onChange={onVersionInputChange}
+                />
+                {version !== '' && version.includes(':') && (
+                  <Alert size={'sm'} status='error'>
+                    <AlertIcon />
+                    <AlertDescription fontSize={'sm'}>
+                      Invalid entry
+                    </AlertDescription>
+                  </Alert>
+                )}
+                {/* UPDATE */}
+                <FormControl>
+                  <FormLabel>Update</FormLabel>
+                  <Input
+                    type='text'
+                    value={update}
+                    size='md'
+                    fontSize={'sm'}
+                    onChange={(e) => setUpdate(e.target.value)}
+                    onBlur={onBlurUpdate}
+                    placeholder='Enter update'
+                  />
+                </FormControl>
+                {/* EDITION */}
+                <FormControl>
+                  <FormLabel>Edition</FormLabel>
+                  <Input
+                    type='text'
+                    value={edition}
+                    size='md'
+                    fontSize={'sm'}
+                    onChange={(e) => setEdition(e.target.value)}
+                    onBlur={onBlurEdition}
+                    placeholder='Enter edition'
+                  />
+                </FormControl>
+                {/* LANGUAGE */}
+                <FormControl>
+                  <FormLabel>Language</FormLabel>
+                  <Input
+                    type='text'
+                    value={language}
+                    size='md'
+                    fontSize={'sm'}
+                    onChange={(e) => setLanguage(e.target.value)}
+                    onBlur={onBlurLanguage}
+                    placeholder='Enter language'
+                  />
+                </FormControl>
+                {/* SW EDITION */}
+                <FormControl>
+                  <FormLabel>SW Edition</FormLabel>
+                  <Input
+                    type='text'
+                    value={swEdition}
+                    size='md'
+                    fontSize={'sm'}
+                    onChange={(e) => setSwEdition(e.target.value)}
+                    onBlur={onBlurSwEdition}
+                    placeholder='Enter sw edition'
+                  />
+                </FormControl>
+                {/* TARGET SOFTWARE */}
+                <FormControl>
+                  <FormLabel>Target Software</FormLabel>
+                  <Input
+                    type='text'
+                    value={targetSoftware}
+                    size='md'
+                    fontSize={'sm'}
+                    onChange={(e) => setTargetSoftware(e.target.value)}
+                    onBlur={onBlurTargetSoftware}
+                    placeholder='Enter target software'
+                  />
+                </FormControl>
+                {/* TARGET HARDWARE */}
+                <FormControl>
+                  <FormLabel htmlFor='targetHardware'>
+                    Target Hardware
+                  </FormLabel>
+                  <Stack direction='column' spacing={1}>
+                    <Select
+                      size='md'
+                      fontSize={'sm'}
+                      id='targetHardware'
+                      name='targetHardware'
+                      value={hardware}
+                      onChange={handleHardwareChange}
+                    >
+                      <option value=''>-- Select --</option>
+                      <option value='x64'>x64</option>
+                      <option value='x86'>x86</option>
+                      <option value='x32'>x32</option>
+                      <option value='arm64'>arm64</option>
+                      <option value='amd64'>amd64</option>
+                      <option value='itanium'>itanium</option>
+                      <option value='arm'>arm</option>
+                      <option value='rj45'>rj45</option>
+                      <option value='iphone'>iphone</option>
+                      <option value='android'>android</option>
+                      <option value='*'>*</option>
+                    </Select>
+                  </Stack>
+                </FormControl>
+                {/* OTHERE */}
+                <FormControl>
+                  <FormLabel>Other</FormLabel>
+                  <Input
+                    type='text'
+                    value={other}
+                    size='md'
+                    fontSize={'sm'}
+                    onChange={(e) => setOther(e.target.value)}
+                    onBlur={onBlurOther}
+                    placeholder='Enter other'
+                  />
+                </FormControl>
+              </Grid>
             </Flex>
           </ModalBody>
 

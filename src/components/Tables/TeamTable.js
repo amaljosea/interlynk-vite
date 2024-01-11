@@ -363,6 +363,7 @@ const TeamTable = ({ data, refetch }) => {
           refetch={refetch}
           isOpen={isTeamOpen}
           onClose={onTeamClose}
+          data={data?.currentUser}
         />
       )}
 
