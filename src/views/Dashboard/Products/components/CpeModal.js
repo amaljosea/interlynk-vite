@@ -170,7 +170,7 @@ const CpeModal = ({
 
   // ON CPE UPDATE
   const handleComUpdate = async () => {
-    if (validateCpe(cpeString)) {
+    // if (validateCpe(cpeString)) {
       await updateComponent({
         variables: {
           id: activeCheck.id,
@@ -193,9 +193,9 @@ const CpeModal = ({
           }
         })
         .finally(() => onClose())
-    } else {
-      setError('Invalid CPE')
-    }
+    // } else {
+    //   setError('Invalid CPE')
+    // }
   }
 
   // ON VENDOR INPUT CHANGE
