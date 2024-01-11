@@ -4,6 +4,7 @@ import {
   Flex,
   HStack,
   Icon,
+  IconButton,
   Stack,
   Tag,
   TagLabel,
@@ -14,14 +15,13 @@ import VulnBadge from 'components/Misc/VulnBadge'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { Link, useLocation } from 'react-router-dom'
 import { timeSince, getFullDateAndTime } from 'utils'
-import { CheckCircleIcon, DownloadIcon, Search2Icon } from '@chakra-ui/icons'
+import { DownloadIcon, Search2Icon } from '@chakra-ui/icons'
 import {
   FaAngleLeft,
   FaBalanceScale,
   FaBug,
   FaCube,
-  FaCubes,
-  FaSearchengin
+  FaCubes
 } from 'react-icons/fa'
 import { FaCircleCheck } from 'react-icons/fa6'
 
@@ -144,28 +144,27 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
         </Text>
         {/* SCAN STATUS */}
         <Flex flexDir='row' gap={2} alignItems={'center'} width='100%' my={2}>
-          <Tooltip label='Imported'>
+          <Tooltip label='Imported' >
             <DownloadIcon color={'blue.500'} />
           </Tooltip>
           <Tooltip label='SBOM Checks'>
-            <Search2Icon
-              color={
+            <IconButton
+              size='xs'
+              colorScheme={
                 vulnRunStatus === 'FINISHED' || vulnRunStatus === 'IN_PROGRESS'
-                  ? 'blue.500'
-                  : 'gray.400'
+                  ? 'blue'
+                  : 'blackAlpha'
               }
+              icon={<Search2Icon />}
             />
           </Tooltip>
           <Tooltip label='Vulnerability Scan' placement='top'>
-            <Icon
-              as={FaBug}
+            <Icon as={FaBug}
               color={vulnRunStatus === 'FINISHED' ? 'blue.500' : 'gray.400'}
             />
           </Tooltip>
           <Tooltip label='Ready' placement='top'>
-            <Icon
-              as={FaCircleCheck}
-              color={vulnRunStatus === 'FINISHED' ? 'blue.500' : 'gray.400'}
+            <Icon as={FaCircleCheck} color={vulnRunStatus === 'FINISHED' ? 'blue.500' : 'gray.400'}
             />
           </Tooltip>
           {vulnRunStatus === 'IN_PROGRESS' && (

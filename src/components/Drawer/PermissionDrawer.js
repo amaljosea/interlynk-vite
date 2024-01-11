@@ -22,7 +22,7 @@ const PermissionDrawer = ({ isOpen, onClose, data }) => {
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />
-        <DrawerHeader>{data?.name || ''}</DrawerHeader>
+        <DrawerHeader>Permissions for {data?.name || ''}</DrawerHeader>
 
         <DrawerBody>
           <Stack spacing={2.5} direction={'column'} alignItems={'flex-start'}>
@@ -37,7 +37,9 @@ const PermissionDrawer = ({ isOpen, onClose, data }) => {
                   <Text fontWeight={'medium'} mb={1}>
                     {item.category}
                   </Text>
-                  <Checkbox defaultChecked={item.value}>{item.name}</Checkbox>
+                  <Checkbox defaultChecked={item.value} isReadOnly>
+                    {item.name}
+                  </Checkbox>
                   <Stack pl={6} mt={1} spacing={1}>
                     {item?.supersededBy?.length > 0 &&
                       item?.supersededBy.map(({ value, name }, index) => (
@@ -45,6 +47,7 @@ const PermissionDrawer = ({ isOpen, onClose, data }) => {
                           key={index}
                           defaultChecked={value}
                           color={'blackAlpha.800'}
+                          isReadOnly
                         >
                           {name}
                         </Checkbox>

@@ -12,10 +12,6 @@ import React, { useState, useEffect } from 'react'
 import AdminNavbarLinks from './AdminNavbarLinks'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { vulnList } from 'variables/general'
-import { useGlobalState } from 'hooks/useGlobalState'
-import { useQuery } from '@apollo/client'
-import { GetUserPermissions } from 'graphQL/Queries'
-import { permissionList } from 'utils'
 
 export default function AdminNavbar(props) {
   const { setUserPermissons } = useGlobalState()
@@ -29,6 +25,17 @@ export default function AdminNavbar(props) {
       return {}
     }
   }
+
+  const { data } = useQuery(GetUserPermissions)
+
+  useEffect(() => {
+    if (data) {
+      const permissions = permissionList(
+        data?.organization?.currentUser?.role?.permissionsMap || []
+      )
+      setUserPermissons(permissions)
+    }
+  }, [data])
 
   const [scrolled, setScrolled] = useState(false)
   const { brandText } = props

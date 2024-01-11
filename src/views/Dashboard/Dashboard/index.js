@@ -24,7 +24,7 @@ export default function Dashboard() {
   const queryParams = new URLSearchParams(location.search)
   const product = queryParams.get('id')
 
-  const { dispatch, setUserPermissons } = useGlobalState()
+  const { dispatch } = useGlobalState()
   const { prodCompDispatch, prodVulnDispatch } = dispatch
 
   const iconBoxInside = useColorModeValue('white', 'white')
