@@ -35,7 +35,8 @@ import {
   ModalHeader,
   ModalCloseButton,
   ModalBody,
-  ModalFooter
+  ModalFooter,
+  Alert
 } from '@chakra-ui/react'
 import { useLazyQuery, useMutation } from '@apollo/client'
 import { CreateComponent, UpdateComponent } from 'graphQL/Mutation'
@@ -603,7 +604,11 @@ function ComponentDrawer(props) {
                   </IconButton>
                 </Stack>
                 {/* CPE LIST  */}
-
+                {!isCpeValid && (
+                  <Alert my={2} status='error' size={'sm'} fontSize={'sm'} borderRadius={5} py={2}>
+                    Format 2.3 requires a CPE Name starting with cpe:2.3:
+                  </Alert>
+                )}
                 <Flex
                   flexDirection={'row'}
                   flexWrap={'wrap'}
