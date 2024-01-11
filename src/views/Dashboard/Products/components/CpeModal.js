@@ -87,7 +87,7 @@ const CpeModal = ({
     if (cpeValue !== '') {
       prodCompDispatch({ type: 'SET_CPE_STRING', payload: cpeValue })
       const components = cpeValue.split(':')
-      setType(components[2])
+      setType(components[2].toLowerCase())
       setVendor(components[3] === '*' ? '' : components[3])
       setProduct(components[4] === '*' ? '' : components[4])
       setVersion(components[5] === '*' ? '' : components[5])
