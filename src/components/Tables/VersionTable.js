@@ -28,12 +28,14 @@ import {
   TagLabel
 } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
+import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import VulnBadge from 'components/Misc/VulnBadge'
 import { sbomDelete } from 'graphQL/Mutation'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV } from 'react-icons/fa'
+import { FaScrewdriverWrench } from 'react-icons/fa6'
 import { Link, useParams } from 'react-router-dom'
 import {
   timeSince,
@@ -44,11 +46,11 @@ import {
 import SbomList from 'views/Dashboard/Products/components/SbomList'
 import RowLimit from 'views/Sbom/components/RowLimit'
 
-const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
+const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
   const { totalRows, setTotalRows, setActiveSbomTab, prodVulnState, dispatch } =
     useGlobalState()
   const { field, direction } = prodVulnState
-  const { prodVulnDispatch } = dispatch
+  const { prodVulnDispatch, prodCompDispatch } = dispatch
 
   const params = useParams()
 
@@ -57,12 +59,12 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
 
   const [currentPage, setCurrentPage] = useState(1)
 
-  const data = project ? removeDuplicates(project.sboms) : []
+  const sboms = project ? removeDuplicates(project.sboms) : []
 
-  const totalPages = data.length > 0 ? Math.ceil(data.length / totalRows) : 1
+  const totalPages = sboms.length > 0 ? Math.ceil(sboms.length / totalRows) : 1
 
-  const filteredData = data
-    ? data.slice((currentPage - 1) * totalRows, currentPage * totalRows)
+  const filteredData = sboms
+    ? sboms.slice((currentPage - 1) * totalRows, currentPage * totalRows)
     : []
 
   const handlePageChange = (newPage) => {
@@ -83,6 +85,12 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
     isOpen: isListOpen,
     onOpen: onListOpen,
     onClose: onListClose
+  } = useDisclosure()
+
+  const {
+    isOpen: isSbomOpen,
+    onOpen: onSbomOpen,
+    onClose: onSbomClose
   } = useDisclosure()
 
   const onFilterSev = async (id, primaryComponent, value) => {
@@ -117,7 +125,7 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
         const { primaryComponent, id, creationAt } = row
         return (
           <Link
-            to={`/vendor/products/${name}?id=${productId}&sbom=${id}`}
+            to={`/vendor/products/${data.name}?id=${productId}&sbom=${id}`}
             onClick={() => {
               localStorage.setItem(
                 'currentSBOM',
@@ -131,9 +139,8 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
             }}
           >
             <Text color={'blue.500'} minWidth='100%' my={3} fontSize={14}>
-              {primaryComponent && primaryComponent.version
-                ? primaryComponent.version
-                : `Uploaded ${getFullDateAndTime(creationAt)}`}
+              {primaryComponent?.version ||
+                `Uploaded ${getFullDateAndTime(creationAt)}`}
             </Text>
           </Link>
         )
@@ -321,10 +328,25 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
     })
   }
 
+  const onBuildSbom = () => {
+    prodCompDispatch({ type: 'CLEAR_LICENSES' })
+    onSbomOpen()
+  }
+
   const subHeaderComponent = useMemo(() => {
     return (
       <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
         <Stack direction={'row'} spacing={2} alignItems={'center'}>
+          {/* BUILD SBOM */}
+          <Tooltip label='Build Version'>
+            <IconButton
+              isDisabled={!data.enabled}
+              colorScheme='blue'
+              onClick={onBuildSbom}
+              icon={<FaScrewdriverWrench />}
+            ></IconButton>
+          </Tooltip>
+          {/* REFETCH VERSION */}
           <Tooltip label='Refresh'>
             <IconButton
               onClick={handleRefresh}
@@ -451,6 +473,17 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
           sboms={project?.sboms}
           isOpen={isListOpen}
           onClose={onListClose}
+        />
+      )}
+
+      {/* BUILD SBOM */}
+      {isSbomOpen && data && (
+        <ProductSbomDrawer
+          isOpen={isSbomOpen}
+          onClose={onSbomClose}
+          data={data}
+          refetch={refetch}
+          productId={productId}
         />
       )}
     </>

@@ -8,7 +8,7 @@ import {
   Text
 } from '@chakra-ui/react'
 import { useEffect } from 'react'
-import { GetProjectData, GetProject } from 'graphQL/Queries'
+import { GetProject } from 'graphQL/Queries'
 import { useLazyQuery, useQuery } from '@apollo/client'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { removeDuplicates } from 'utils'
@@ -26,27 +26,28 @@ const StepOne = ({
   setUniqVersions
 }) => {
   const { prodState } = useGlobalState()
-  const { field, direction, totalProduct } = prodState
+  const { data } = prodState
+  const group = JSON.parse(localStorage.getItem('product'))
 
-  const { data: allProducts } = useQuery(GetProjectData, {
-    variables: {
-      first: 100,
-      enabled: true,
-      field: field,
-      direction: direction
-    }
-  })
+  const activeGroup =
+    data && data.nodes.find((item) => item.id === group.groupId)
+
+  console.log('activeGroup', activeGroup)
 
   const productList =
-    allProducts &&
-    allProducts.projects.nodes.map((option) => ({
-      value: option.id,
-      label: option.name
-    }))
+    activeGroup &&
+    activeGroup.projects
+      .filter((item) => item.enabled === true)
+      .map((option) => ({
+        value: option.id,
+        label: option.name
+      }))
+
+  console.log('productList', productList)
 
   useEffect(() => {
-    if (allProducts) {
-      const currentProd = allProducts.projects.nodes.find(
+    if (activeGroup) {
+      const currentProd = activeGroup.projects.find(
         (item) => item.id === currentProductId
       )
       setSelectedProd(currentProd.id)
@@ -65,7 +66,7 @@ const StepOne = ({
       //   setSbomId('')
       // }
     }
-  }, [allProducts])
+  }, [data])
 
   const [getProduct] = useLazyQuery(GetProject)
 

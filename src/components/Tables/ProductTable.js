@@ -122,198 +122,6 @@ const ProductTable = ({ data, refetch, org }) => {
     onSbomOpen()
   }
 
-  // COLUMNS
-  const columns = [
-    // ACTIVE
-    {
-      id: 'PROJECT_GROUPS_ENABLED',
-      name: 'ACTIVE',
-      selector: (row) => {
-        const { enabled, name } = row
-        return (
-          <Switch
-            name={name}
-            id={name}
-            size='md'
-            isChecked={enabled}
-            onChange={() => {
-              setActiveRow(row)
-              onWarningOpen()
-            }}
-          />
-        )
-      },
-      width: '150px',
-      sortable: true
-    },
-    // PRODUCT
-    {
-      id: 'PROJECT_GROUPS_NAME',
-      name: 'PRODUCT',
-      selector: (row) => {
-        const { name, defaultProject } = row
-        const data = defaultProject
-          ? removeDuplicates(defaultProject?.sboms)
-          : []
-
-        const product = {
-          id: defaultProject?.id || '',
-          name: defaultProject?.name || '',
-          version:
-            data?.length > 0
-              ? data[0].primaryComponent?.version
-              : defaultProject?.sboms?.length > 0
-                ? defaultProject?.sboms[0].primaryComponent?.version
-                : '',
-          sbomId:
-            data?.length > 0
-              ? data[0].primaryComponent?.version
-              : defaultProject?.sboms?.length > 0
-                ? defaultProject?.sboms[0].id
-                : ''
-        }
-
-        const handleClick = () => {
-          if (defaultProject?.sboms?.length > 0) {
-            localStorage.setItem('product', JSON.stringify(product))
-            localStorage.setItem('activeProdTab', 0)
-            prodDispatch({
-              type: 'SET_CURRENT_PRODUCT',
-              payload: {
-                id: id,
-                sbomId:
-                  data?.length > 0
-                    ? data[0].primaryComponent?.version
-                    : defaultProject?.sboms[0].id || ''
-              }
-            })
-          }
-          setActiveSbomTab(0)
-        }
-
-        return (
-          <Link
-            to={`/vendor/products/${defaultProject?.name}?id=${defaultProject?.id}`}
-            onClick={handleClick}
-          >
-            <Text color={'blue.500'} minWidth='100%'>
-              {name}
-            </Text>
-          </Link>
-        )
-      },
-      wrap: true,
-      sortable: true
-    },
-    // VERSION
-    {
-      id: 'versions',
-      name: 'VERSION',
-      selector: (row) => {
-        const { projects } = row
-        return <Text>{projects?.length}</Text>
-      },
-      wrap: true
-    },
-    // DESCRIPTION
-    {
-      id: 'PROJECT_GROUPS_DESCRIPTION',
-      name: 'DESCRIPTION',
-      selector: (row) => {
-        const { description } = row
-        return (
-          <Text>
-            {description.length > 50
-              ? description.substring(0, 50) + '....'
-              : description}
-          </Text>
-        )
-      },
-      wrap: true,
-      sortable: true
-    },
-    // UPDATEDAT
-    {
-      id: 'PROJECT_GROUPS_UPDATED_AT',
-      name: 'UPDATED AT',
-      selector: (row) => {
-        const { updatedAt } = row
-        return (
-          <Tooltip label={getFullDateAndTime(updatedAt)} placement={'top'}>
-            {timeSince(updatedAt)}
-          </Tooltip>
-        )
-      },
-      sortable: true,
-      sortFunction: (a, b) => {
-        const dateA = new Date(a.updatedAt)
-        const dateB = new Date(b.updatedAt)
-        return dateA - dateB
-      },
-      wrap: true
-    },
-    // ACTIONS
-    {
-      id: 'actions',
-      name: 'ACTIONS',
-      selector: (row) => {
-        const { enabled } = row
-
-        return (
-          <Menu>
-            <MenuButton
-              as={IconButton}
-              icon={<FaEllipsisV />}
-              variant='none'
-              color='gray.400'
-            />
-            <Portal>
-              <MenuList fontSize={'sm'}>
-                <MenuItem
-                  onClick={() => {
-                    setActiveRow(row)
-                    onOpen()
-                  }}
-                  isDisabled={!enabled}
-                >
-                  Edit Product
-                </MenuItem>
-                <Divider />
-                <MenuItem
-                  onClick={() => {
-                    setActiveRow(row)
-                    onOpenUpload()
-                  }}
-                  isDisabled={!enabled}
-                >
-                  Upload SBOM
-                </MenuItem>
-                <MenuItem
-                  onClick={() => handleOpenSbom(row)}
-                  isDisabled={!enabled}
-                >
-                  Build Version
-                </MenuItem>
-                <Divider />
-                <MenuItem
-                  color='red'
-                  onClick={() => {
-                    setActiveRow(row)
-                    onDeleteOpen()
-                  }}
-                  isDisabled={!archiveProduct}
-                >
-                  Archive Product
-                </MenuItem>
-              </MenuList>
-            </Portal>
-          </Menu>
-        )
-      },
-      right: 'true'
-    }
-  ]
-
   // DELETE PRODUCT
   const onProductDelete = async () => {
     await projectGroupDelete({
@@ -437,7 +245,7 @@ const ProductTable = ({ data, refetch, org }) => {
             ></IconButton>
           </Tooltip>
           {/* ADD PRODUCT */}
-          <Tooltip label='Add Product'>
+          <Tooltip label='Add Group'>
             <IconButton
               icon={<AddIcon />}
               colorScheme='blue'
@@ -456,6 +264,202 @@ const ProductTable = ({ data, refetch, org }) => {
     onFilterActive,
     onSearchInputChange
   ])
+
+  // COLUMNS
+  const columns = [
+    // ACTIVE
+    {
+      id: 'PROJECT_GROUPS_ENABLED',
+      name: 'ACTIVE',
+      selector: (row) => {
+        const { enabled, name } = row
+        return (
+          <Switch
+            name={name}
+            id={name}
+            size='md'
+            isChecked={enabled}
+            onChange={() => {
+              setActiveRow(row)
+              onWarningOpen()
+            }}
+          />
+        )
+      },
+      width: '150px',
+      sortable: true
+    },
+    // PRODUCT
+    {
+      id: 'PROJECT_GROUPS_NAME',
+      name: 'PRODUCT',
+      selector: (row) => {
+        const { id, name, defaultProject } = row
+        const data = defaultProject
+          ? removeDuplicates(defaultProject?.sboms)
+          : []
+
+        const product = {
+          id: defaultProject?.id || '',
+          name: defaultProject?.name || '',
+          version:
+            data?.length > 0
+              ? defaultProject?.primaryComponent?.version
+              : defaultProject?.sboms?.length > 0
+                ? defaultProject?.sboms[0].primaryComponent?.version
+                : '',
+          sbomId: defaultProject
+            ? defaultProject?.primaryComponent?.version
+            : defaultProject?.sboms?.length > 0
+              ? defaultProject?.sboms[0].id
+              : '',
+          groupId: id
+        }
+
+        const handleClick = () => {
+          if (defaultProject?.sboms?.length > 0) {
+            localStorage.setItem('product', JSON.stringify(product))
+            localStorage.setItem('activeProdTab', 0)
+            prodDispatch({
+              type: 'SET_CURRENT_PRODUCT',
+              payload: {
+                id: defaultProject?.id,
+                sbomId:
+                  defaultProject?.length > 0
+                    ? defaultProject?.primaryComponent?.version
+                    : defaultProject?.sboms[0].id || ''
+              }
+            })
+          }
+          setActiveSbomTab(0)
+        }
+
+        return (
+          <Link
+            to={`/vendor/products/${defaultProject?.name}?id=${defaultProject?.id}`}
+            onClick={handleClick}
+          >
+            <Text color={'blue.500'} minWidth='100%'>
+              {name}
+            </Text>
+          </Link>
+        )
+      },
+      wrap: true,
+      sortable: true
+    },
+    // VERSION
+    {
+      id: 'versions',
+      name: 'VERSION',
+      selector: (row) => {
+        const { projects } = row
+        return <Text>{projects?.length}</Text>
+      },
+      wrap: true
+    },
+    // DESCRIPTION
+    {
+      id: 'PROJECT_GROUPS_DESCRIPTION',
+      name: 'DESCRIPTION',
+      selector: (row) => {
+        const { description } = row
+        return (
+          <Text>
+            {description.length > 50
+              ? description.substring(0, 50) + '....'
+              : description}
+          </Text>
+        )
+      },
+      wrap: true,
+      sortable: true
+    },
+    // UPDATEDAT
+    {
+      id: 'PROJECT_GROUPS_UPDATED_AT',
+      name: 'UPDATED AT',
+      selector: (row) => {
+        const { updatedAt } = row
+        return (
+          <Tooltip label={getFullDateAndTime(updatedAt)} placement={'top'}>
+            {timeSince(updatedAt)}
+          </Tooltip>
+        )
+      },
+      sortable: true,
+      sortFunction: (a, b) => {
+        const dateA = new Date(a.updatedAt)
+        const dateB = new Date(b.updatedAt)
+        return dateA - dateB
+      },
+      wrap: true
+    },
+    // ACTIONS
+    {
+      id: 'actions',
+      name: 'ACTIONS',
+      selector: (row) => {
+        const { enabled } = row
+
+        return (
+          <Menu>
+            <MenuButton
+              as={IconButton}
+              icon={<FaEllipsisV />}
+              variant='none'
+              color='gray.400'
+            />
+            <Portal>
+              <MenuList fontSize={'sm'}>
+                {/* EDIT PRODUCT */}
+                <MenuItem
+                  onClick={() => {
+                    setActiveRow(row)
+                    onOpen()
+                  }}
+                  isDisabled={!enabled}
+                >
+                  Edit Product
+                </MenuItem>
+                <Divider />
+                {/* UPLOAD SBOM */}
+                <MenuItem
+                  onClick={() => {
+                    setActiveRow(row)
+                    onOpenUpload()
+                  }}
+                  isDisabled={!enabled}
+                >
+                  Upload SBOM
+                </MenuItem>
+                {/* BUILD SBOM */}
+                <MenuItem
+                  onClick={() => handleOpenSbom(row)}
+                  isDisabled={!enabled}
+                >
+                  Build Version
+                </MenuItem>
+                <Divider />
+                {/* ARCHIVE PRODUCT GROUP */}
+                <MenuItem
+                  color='red'
+                  onClick={() => {
+                    setActiveRow(row)
+                    onDeleteOpen()
+                  }}
+                  isDisabled={!archiveProduct}
+                >
+                  Archive Product
+                </MenuItem>
+              </MenuList>
+            </Portal>
+          </Menu>
+        )
+      },
+      right: 'true'
+    }
+  ]
 
   // SORTING
   const handleSort = async (column, sortDirection) => {
@@ -605,7 +609,7 @@ const ProductTable = ({ data, refetch, org }) => {
       {/* UPLOAD SBOM */}
       {isOpenUpload && (
         <UploadModal
-          id={activeRow.id}
+          id={activeRow?.defaultProject?.id}
           isOpen={isOpenUpload}
           onClose={onCloseUpload}
         />

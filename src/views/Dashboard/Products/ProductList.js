@@ -12,7 +12,7 @@ import { GetProjectGroups } from 'graphQL/Queries'
 
 function ProductList() {
   const { totalRows, prodState, dispatch } = useGlobalState()
-  const { field, direction, enabled } = prodState
+  const { data, field, direction, enabled } = prodState
   const {
     prodDispatch,
     prodCompDispatch,
@@ -26,13 +26,18 @@ function ProductList() {
   const product = queryParams.get('id')
   const org = localStorage.getItem('organization')
 
-  const { data, refetch, error } = useQuery(GetProjectGroups, {
+  const { refetch, error } = useQuery(GetProjectGroups, {
     variables: {
       first: totalRows,
       enabled: enabled === 'yes' ? true : enabled === 'no' ? false : undefined,
       field: field,
       direction: direction
-    }
+    },
+    onCompleted: (data) =>
+      prodDispatch({
+        type: 'GET_DATA',
+        payload: data?.organization?.projectGroups
+      })
   })
 
   useEffect(() => {
@@ -68,9 +73,7 @@ function ProductList() {
     )
   }
 
-  return (
-    <ProductTable data={data?.organization?.projectGroups} refetch={refetch} />
-  )
+  return <ProductTable data={data} refetch={refetch} />
 }
 
 export default ProductList

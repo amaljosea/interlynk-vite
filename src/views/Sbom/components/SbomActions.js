@@ -262,25 +262,6 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
         ml={'auto'}
         flexWrap={'wrap'}
       >
-        {/* CHANGE ENVIRONMENT */}
-        <Flex
-          flexDirection={'row'}
-          alignItems={'center'}
-          gap={2}
-          display={'none'}
-        >
-          <BsBoxFill size={22} color='#718096' />
-          <Select name='environment' id='environment' size='md'>
-            {['All', 'Development', 'Release', 'Staging', 'Settings'].map(
-              (item, index) => (
-                <option value={item} key={index}>
-                  {item}
-                </option>
-              )
-            )}
-          </Select>
-        </Flex>
-
         {/* SBOM VERSIONS */}
         <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
           <FaLayerGroup size={21} color='#4299E1' />

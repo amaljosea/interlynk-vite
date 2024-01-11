@@ -17,6 +17,8 @@ import {
   Text,
   Textarea
 } from '@chakra-ui/react'
+import { UpdateProject } from 'graphQL/Mutation'
+import { CreateProject } from 'graphQL/Mutation'
 import { CreateProjectGroup, UpdateProjectGroup } from 'graphQL/Mutation'
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -37,6 +39,9 @@ const ProductModal = ({
   const [projectGroupUpdate] = useMutation(UpdateProjectGroup, {
     onCompleted: () => refetch()
   })
+  const [projectUpdate] = useMutation(UpdateProject, {
+    onCompleted: () => refetch()
+  })
 
   const [productName, setProductName] = useState('')
   const [productDesc, setProductDesc] = useState('')
@@ -50,25 +55,39 @@ const ProductModal = ({
 
   const updateProduct = async (e) => {
     e.preventDefault()
-    await projectGroupUpdate({
-      variables: {
-        id: id,
-        name: productName,
-        desc: productDesc
-      }
-    }).then((res) => {
-      const error = res.data.projectGroupUpdate.errors
-      if (error.length > 0) {
-        setError(
-          'A project group with same name already exists. Please choose an unique name'
-        )
-      } else {
-        params?.name
-          ? navigate(`/vendor/products/${productName}?id=${id}`)
-          : navigate(`/vendor/products`)
-        onClose()
-      }
-    })
+    if (params.name) {
+      await projectUpdate({
+        variables: {
+          id: id,
+          name: productName,
+          desc: productDesc
+        }
+      }).then((res) => {
+        const error = res.data.projectUpdate.errors
+        if (error.length > 0) {
+          setError(res.data.projectUpdate.errorp[0])
+        } else {
+          navigate(`/vendor/products/${productName}?id=${id}`)
+          // onClose()
+        }
+      })
+    } else {
+      await projectGroupUpdate({
+        variables: {
+          id: id,
+          name: productName,
+          desc: productDesc
+        }
+      }).then((res) => {
+        const error = res.data.projectGroupUpdate.errors
+        if (error.length > 0) {
+          setError(res.data.projectGroupUpdate.errors[0])
+        } else {
+          navigate(`/vendor/products`)
+          // onClose()
+        }
+      })
+    }
   }
 
   const handleSave = async (e) => {
@@ -118,7 +137,7 @@ const ProductModal = ({
                       setProductName(e.target.value)
                       setError('')
                     }}
-                    placeholder='Enter product name'
+                    placeholder={`Add product ${params && 'group'} name`}
                   />
                 </FormControl>
                 <FormControl isRequired>
@@ -126,7 +145,7 @@ const ProductModal = ({
                   <Textarea
                     value={productDesc || ''}
                     onChange={(e) => setProductDesc(e.target.value)}
-                    placeholder='Enter product description'
+                    placeholder={`Add product ${params && 'group'} description`}
                     rows={5}
                   />
                 </FormControl>

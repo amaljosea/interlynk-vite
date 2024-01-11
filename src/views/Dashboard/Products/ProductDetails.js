@@ -25,7 +25,8 @@ import {
   UnorderedList,
   ListItem,
   Button,
-  Box
+  Box,
+  Select
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
@@ -66,6 +67,7 @@ import {
 } from 'graphQL/Queries'
 import { UpdateProject, DeleteProject } from 'graphQL/Mutation'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { BsBoxFill } from 'react-icons/bs'
 
 const ProductDetails = () => {
   const navigate = useNavigate()
@@ -156,12 +158,6 @@ const ProductDetails = () => {
   } = useDisclosure()
 
   const {
-    isOpen: isSbomOpen,
-    onOpen: onSbomOpen,
-    onClose: onSbomClose
-  } = useDisclosure()
-
-  const {
     isOpen: isWarningOpen,
     onOpen: onWarningOpen,
     onClose: onWarningClose
@@ -172,11 +168,6 @@ const ProductDetails = () => {
     onOpen: onDeleteOpen,
     onClose: onDeleteClose
   } = useDisclosure()
-
-  const onBuildSbom = () => {
-    prodCompDispatch({ type: 'CLEAR_LICENSES' })
-    onSbomOpen()
-  }
 
   const handleTabChange = (value) => {
     localStorage.setItem('activeProdTab', value)
@@ -422,15 +413,6 @@ const ProductDetails = () => {
                           icon={<FaUpload />}
                         ></IconButton>
                       </Tooltip>
-                      {/* BUILD SBOM */}
-                      <Tooltip label='Build Version'>
-                        <IconButton
-                          isDisabled={!data.project.enabled}
-                          colorScheme='blue'
-                          onClick={onBuildSbom}
-                          icon={<FaScrewdriverWrench />}
-                        ></IconButton>
-                      </Tooltip>
                       {/* UPDATE PRODUCT STATUS */}
                       <Tooltip
                         label={
@@ -499,7 +481,7 @@ const ProductDetails = () => {
                   <TabPanel>
                     {data && (
                       <VersionTable
-                        name={data.project.name}
+                        data={data.project}
                         project={versions?.project}
                         productId={productId}
                         refetch={sbomRefetch}
@@ -557,15 +539,6 @@ const ProductDetails = () => {
             id={data.project.id}
             isOpen={isOpenUpload}
             onClose={onCloseUpload}
-          />
-        )}
-
-        {isSbomOpen && data && (
-          <ProductSbomDrawer
-            isOpen={isSbomOpen}
-            onClose={onSbomClose}
-            data={data.project}
-            refetch={refetch}
           />
         )}
 

@@ -19,7 +19,6 @@ import {
   Stack,
   Text
 } from '@chakra-ui/react'
-import { GetProjectData } from 'graphQL/Queries'
 import { useEffect } from 'react'
 import { useState } from 'react'
 
@@ -29,15 +28,10 @@ const CopyModal = ({ isOpen, onClose, product, version }) => {
   const [selectedVersion, setSelectedVersion] = useState('')
   const [filteredData, setFilteredData] = useState()
 
-  const { data } = useQuery(GetProjectData, {
-    variables: {
-      first: 10
-    }
-  })
-
   useEffect(() => {
     if (data) {
-      const prod = data.projects.nodes.find((item) => item.name === product)
+      // const prod = data.projects.nodes.find((item) => item.name === product)
+      const prod = {}
       // console.log(`filteredData`, prod)
       setFilteredData(prod.name)
       setSelectedProduct(prod.id)

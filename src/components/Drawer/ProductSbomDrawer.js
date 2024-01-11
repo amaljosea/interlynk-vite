@@ -47,11 +47,10 @@ import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import { CpeAutoComplete } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
 
-function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
+function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
   const toast = useToast()
 
-  const { totalRows, prodState, prodCompState, dispatch } = useGlobalState()
-  const { field, direction } = prodState
+  const { prodState, prodCompState, dispatch } = useGlobalState()
   const { licenseType, spdxLicenses, customLicenses, expLicense } =
     prodCompState
   const { prodCompDispatch } = dispatch
@@ -201,13 +200,11 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
 
   const handleRefetch = () => {
     refetch({
-      first: totalRows,
-      field: field,
-      direction: direction
+      id: productId
     })
   }
 
-  const existingVersions = data?.sboms.map(
+  const existingVersions = data?.defaultProject?.sboms.map(
     (item) => item?.primaryComponent?.version
   )
 
@@ -220,19 +217,26 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
         version: version,
         group: groupInfo,
         scope: compScope,
-        licenses:
-          spdxLicenses.length === 0 &&
-          expLicense === '' &&
-          customLicenses.length === 0
-            ? undefined
-            : {
-                licenses:
-                  licenseType === 'license_spdx' ? spdxLicenses : undefined,
-                licensesExp:
-                  licenseType === 'license_exp' ? expLicense : undefined,
-                licensesCustom:
-                  licenseType === 'license_custom' ? customLicenses : undefined
-              },
+        licenses: {
+          licenses:
+            licenseType === 'license_spdx'
+              ? spdxLicenses
+                ? spdxLicenses
+                : []
+              : undefined,
+          licensesExp:
+            licenseType === 'license_exp'
+              ? expLicense
+                ? expLicense
+                : ''
+              : undefined,
+          licensesCustom:
+            licenseType === 'license_custom'
+              ? customLicenses
+                ? customLicenses
+                : []
+              : undefined
+        },
         cpes: cpeList,
         purl: purlValue,
         primary: true,
@@ -253,7 +257,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
   const onCreateSBOM = async () => {
     await createSbom({
       variables: {
-        projectId: data.id,
+        projectId: data?.id,
         spec: 'cyclonedx',
         specVersion: '1.4',
         format: 'json'
@@ -484,7 +488,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
                   </option>
                   <option value='excluded'>Excluded</option>
                   <option value='optional'>Optional</option>
-                  <option value='required' >Required</option>
+                  <option value='required'>Required</option>
                 </Select>
               </FormControl>
               {/* PRIMARY COMPONENT */}

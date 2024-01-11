@@ -1,30 +1,14 @@
 // Chakra imports
-import {
-  Flex,
-  Skeleton,
-  Stack,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  useToast
-} from '@chakra-ui/react'
+import { Flex, Skeleton, Stack, useToast } from '@chakra-ui/react'
 import React, { useState, useEffect } from 'react'
 import Card from 'components/Card/Card.js'
 import SBOMTable from './components/SBOMTable'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { getFullDateAndTime, removeDuplicates } from 'utils'
-import { useLazyQuery, useQuery } from '@apollo/client'
-import {
-  GetProductData,
-  GetProject,
-  GetProjectData,
-  GetComponentData
-} from 'graphQL/Queries'
+import { useQuery } from '@apollo/client'
+import { GetProductData, GetProject, GetComponentData } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
 import SbomInfo from './components/SbomInfo'
-import GeneralDataRow from 'components/Tables/GeneralDataRow'
 
 const idRegex =
   /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
@@ -32,7 +16,7 @@ const idRegex =
 function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
   const { totalRows, setActiveSbomTab, prodState, prodCompState } =
     useGlobalState()
-  const { field, direction } = prodState
+  const { data: allProjectGroups } = prodState
   const location = useLocation()
   const navigate = useNavigate()
   const toast = useToast()
@@ -43,14 +27,7 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
 
   const [status, setStatus] = useState('created')
   const [totalComp, setTotalComp] = useState(0)
-
-  const { data: allProjects } = useQuery(GetProjectData, {
-    variables: {
-      first: 10,
-      field: field,
-      direction: direction
-    }
-  })
+  const group = JSON.parse(localStorage.getItem('product'))
 
   // GET COMPONENT DATA
   const {
@@ -85,9 +62,13 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
     }
   })
 
-  const selectedProject =
-    allProjects &&
-    allProjects.projects.nodes.find((item) => item.id === productId)
+  const activeGroup = allProjectGroups?.nodes.find(
+    (item) => item.id === group.groupId
+  )
+
+  const selectedProject = activeGroup?.projects.find(
+    (item) => item.id === productId
+  )
 
   const uniqVersions = []
 

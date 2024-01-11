@@ -27,7 +27,7 @@ import {
 } from '@chakra-ui/react'
 import { useMutation, useQuery } from '@apollo/client'
 import { CreateShareLynk } from 'graphQL/Mutation'
-import { GetProjectData, GetImages } from 'graphQL/Queries'
+import { GetImages } from 'graphQL/Queries'
 
 import MultiSelect from 'react-select'
 import { UpdateShareLynk } from 'graphQL/Mutation'
@@ -37,12 +37,6 @@ function SBOMDrawer(props) {
   const toast = useToast()
 
   const { isOpen, onClose, refetch, id, shareUsers, contents } = props
-
-  const { data: allProducts } = useQuery(GetProjectData, {
-    variables: {
-      first: 10
-    }
-  })
 
   const { data: allImages } = useQuery(GetImages, {
     variables: {
@@ -62,7 +56,6 @@ function SBOMDrawer(props) {
 
   const [selectedProd, setSelectedProd] = useState([])
   const [productIds, setProductIds] = useState([])
-
 
   useEffect(() => {
     if (shareUsers.length > 0 && id) {
@@ -104,12 +97,14 @@ function SBOMDrawer(props) {
 
   // Product List
 
-  const productList =
-    allProducts &&
-    allProducts.projects.nodes.map((option) => ({
-      value: option.id,
-      label: option.name
-    }))
+  // const productList =
+  //   allProducts &&
+  //   allProducts.projects.nodes.map((option) => ({
+  //     value: option.id,
+  //     label: option.name
+  //   }))
+
+  const productList = []
 
   const handleProductChange = (selected) => {
     setSelectedProd(selected)

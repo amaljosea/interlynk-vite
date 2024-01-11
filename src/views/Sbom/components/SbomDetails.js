@@ -144,7 +144,7 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
         </Text>
         {/* SCAN STATUS */}
         <Flex flexDir='row' gap={2} alignItems={'center'} width='100%' my={2}>
-          <Tooltip label='Imported' >
+          <Tooltip label='Imported'>
             <DownloadIcon color={'blue.500'} />
           </Tooltip>
           <Tooltip label='SBOM Checks'>
@@ -157,12 +157,15 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
             />
           </Tooltip>
           <Tooltip label='Vulnerability Scan' placement='top'>
-            <Icon as={FaBug}
+            <Icon
+              as={FaBug}
               color={vulnRunStatus === 'FINISHED' ? 'blue.500' : 'gray.400'}
             />
           </Tooltip>
           <Tooltip label='Ready' placement='top'>
-            <Icon as={FaCircleCheck} color={vulnRunStatus === 'FINISHED' ? 'blue.500' : 'gray.400'}
+            <Icon
+              as={FaCircleCheck}
+              color={vulnRunStatus === 'FINISHED' ? 'blue.500' : 'gray.400'}
             />
           </Tooltip>
           {vulnRunStatus === 'IN_PROGRESS' && (

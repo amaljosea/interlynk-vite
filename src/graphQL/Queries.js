@@ -91,6 +91,26 @@ export const GetRoles = gql`
   }
 `
 
+// GET USER PERMISSIONS
+export const GetUserPermissions = gql`
+  query GetOrganization {
+    organization {
+      currentUser {
+        role {
+          permissionsMap {
+            category
+            description
+            key
+            name
+            supersededBy
+            value
+          }
+        }
+      }
+    }
+  }
+`
+
 // GET ORGANIZATION METRICS
 export const GetOrgMetrics = gql`
   query GetOrgMetrics {
@@ -636,56 +656,6 @@ export const GetFeedLogs = gql`
         source
         id
         description
-      }
-    }
-  }
-`
-
-export const GetProjectData = gql`
-  query GetProjectData(
-    $search: String
-    $enabled: Boolean
-    $first: Int
-    $last: Int
-    $after: String
-    $before: String
-    $field: ProjectOrderByFields!
-    $direction: OrderByDirection!
-  ) {
-    projects(
-      search: $search
-      enabled: $enabled
-      first: $first
-      last: $last
-      after: $after
-      before: $before
-      orderBy: { field: $field, direction: $direction }
-    ) {
-      totalCount
-      pageInfo {
-        endCursor
-        hasNextPage
-        startCursor
-        hasPreviousPage
-      }
-      nodes {
-        id
-        name
-        description
-        updatedAt
-        organizationId
-        enabled
-        sboms {
-          id
-          format
-          creationAt
-          updatedAt
-          primaryComponent {
-            id
-            name
-            version
-          }
-        }
       }
     }
   }
