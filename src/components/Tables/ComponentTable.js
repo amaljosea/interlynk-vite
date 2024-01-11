@@ -649,29 +649,29 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
         >
           <GridItem w='100%' colSpan={3}>
             <CustomText>Description :</CustomText>
-            <Text mt={1} fontSize={14}>
+            <Text width={'90%'} mt={1} fontSize={14}>
               {description !== null ? description : ''}
             </Text>
           </GridItem>
-          <GridItem w='100%'>
+          <GridItem>
             <CustomText>Component :</CustomText>
-            <Text mt={1} fontSize={14}>
+            <Text width={'90%'} mt={1} fontSize={14}>
               {name}
             </Text>
           </GridItem>
-          <GridItem w='100%'>
+          <GridItem>
             <CustomText>Type :</CustomText>
             <Text mt={1} fontSize={14} textTransform={'capitalize'}>
               {kind}
             </Text>
           </GridItem>
-          <GridItem w='100%'>
+          <GridItem>
             <CustomText>Internal :</CustomText>
             <Text mt={1} fontSize={14}>
               {internal ? 'True' : 'False'}
             </Text>
           </GridItem>
-          <GridItem w='100%'>
+          <GridItem>
             <CustomText>Supplier :</CustomText>
             <VStack spacing={4} mt={1} alignItems={'left'}>
               {suppliers &&
@@ -700,13 +700,13 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
                 ))}
             </VStack>
           </GridItem>
-          <GridItem w='100%'>
+          <GridItem>
             <CustomText>PURL :</CustomText>
-            <Text mt={1} fontSize={14}>
+            <Text width={'90%'} mt={1} fontSize={14}>
               {purl !== null && purl !== '' ? purl : ''}
             </Text>
           </GridItem>
-          <GridItem w='100%'>
+          <GridItem>
             <CustomText>CPES :</CustomText>
             <Flex
               mt={1}
@@ -717,13 +717,13 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
             >
               {cpes?.length > 0 &&
                 cpes.map((item, index) => (
-                  <Text key={index} fontSize={14}>
+                  <Text width={'80%'} key={index} fontSize={14}>
                     {item}
                   </Text>
                 ))}
             </Flex>
           </GridItem>
-          <GridItem w='100%'>
+          <GridItem>
             <CustomText>Depends On :</CustomText>
             <Flex mt={2} alignItems={'flex-start'} gap={2} flexWrap={'wrap'}>
               {compDependency &&
@@ -750,7 +750,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
                   ))}
             </Flex>
           </GridItem>
-          <GridItem w='100%'>
+          <GridItem>
             <CustomText>Dependency Of :</CustomText>
             <Flex mt={2} alignItems={'flex-start'} gap={2} flexWrap={'wrap'}>
               {compDependency &&
@@ -775,13 +775,13 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
                 ))}
             </Flex>
           </GridItem>
-          <GridItem w='100%'>
+          <GridItem>
             <CustomText>Scope :</CustomText>
             <Text mt={1} fontSize={14} textTransform={'capitalize'}>
               {scope}
             </Text>
           </GridItem>
-          <GridItem w='100%'>
+          <GridItem>
             <CustomText>Licenses :</CustomText>
             <Flex alignItems={'center'} gap={2} flexWrap={'wrap'} my={2}>
               {/* SPDX */}
