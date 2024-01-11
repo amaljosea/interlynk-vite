@@ -378,7 +378,10 @@ function ComponentDrawer(props) {
     setCpeValue(val)
     if (val === '') {
       setCpeData([])
+    } else if (!val.startsWith('cpe:2.3')) {
+      prodCompDispatch({ type: 'SET_CPE_VALIDATION', payload: false })
     } else {
+      prodCompDispatch({ type: 'SET_CPE_VALIDATION', payload: true })
       getCpe({
         variables: {
           input: {
@@ -471,7 +474,7 @@ function ComponentDrawer(props) {
                   onChange={(e) => setCompVersion(e.target.value)}
                 />
               </FormControl>
-              {/* Group */}
+              {/* GROUP */}
               <FormControl>
                 <FormLabel htmlFor='groupInfo' fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
@@ -600,6 +603,7 @@ function ComponentDrawer(props) {
                   </IconButton>
                 </Stack>
                 {/* CPE LIST  */}
+
                 <Flex
                   flexDirection={'row'}
                   flexWrap={'wrap'}
