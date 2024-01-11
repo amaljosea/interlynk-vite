@@ -73,7 +73,7 @@ const CpeModal = ({
   const [other, setOther] = useState('')
 
   const { prodCompState, dispatch } = useGlobalState()
-  const { cpeString } = prodCompState
+  const { cpeString, isCpeValid } = prodCompState
   const { prodCompDispatch, prodCheckDispatch } = dispatch
 
   const [healthRecheck] = useMutation(recheckHealth, {
@@ -84,7 +84,7 @@ const CpeModal = ({
   // UPDATE FIELDS DATA FROM API
   useEffect(() => {
     const matches = regexPattern.test(cpeValue)
-    if (cpeValue !== '') {
+    if (isCpeValid) {
       prodCompDispatch({ type: 'SET_CPE_STRING', payload: cpeValue })
       const components = cpeValue.split(':')
       setType(components[2].toLowerCase())
