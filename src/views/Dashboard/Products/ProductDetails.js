@@ -31,32 +31,24 @@ import {
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import VersionTable from 'components/Tables/VersionTable'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import {
   FaLayerGroup,
   FaPenToSquare,
-  FaScrewdriverWrench,
   FaToggleOn,
-  FaTrashCan,
   FaUpload,
   FaToggleOff,
   FaWindowMaximize,
   FaBoxArchive
 } from 'react-icons/fa6'
 import { useLocation, useNavigate } from 'react-router-dom'
-import {
-  timeSince,
-  getFullDateAndTime,
-  removeDuplicates,
-  permissionList
-} from 'utils'
+import { timeSince, getFullDateAndTime, removeDuplicates } from 'utils'
 import SBOM from 'views/Sbom'
 import Controls from '../Automation/components/Controls'
 import ChangeLog from '../Changelog'
 import Settings from '../Automation/components/Settings'
 import ProductModal from './components/ProductModal'
 import UploadModal from './components/UploadModal'
-import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import { useQuery, useMutation, useLazyQuery } from '@apollo/client'
 import {
   GetProductInfo,
@@ -395,6 +387,23 @@ const ProductDetails = () => {
                       ml={'auto'}
                       flexWrap={'wrap'}
                     >
+                      {/* CHANGE ENVIRONMENT */}
+                      <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
+                        <BsBoxFill size={22} color='#718096' />
+                        <Select name='environment' id='environment' size='md'>
+                          {[
+                            'All',
+                            'Development',
+                            'Release',
+                            'Staging',
+                            'Settings'
+                          ].map((item, index) => (
+                            <option value={item} key={index}>
+                              {item}
+                            </option>
+                          ))}
+                        </Select>
+                      </Flex>
                       {/* EDIT PRODUCT */}
                       <Tooltip label='Edit Product'>
                         <IconButton
