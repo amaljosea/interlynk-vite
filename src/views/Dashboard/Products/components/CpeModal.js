@@ -157,10 +157,23 @@ const CpeModal = ({
   // ON CPE SAVE
   const handleSave = () => {
     // if (validateCpe(cpeString)) {
+    const cpeParts = cpeString.split(':')
+    cpeParts[2] = type === '' ? '*' : type
+    cpeParts[3] = vendor === '' ? '*' : vendor
+    cpeParts[4] = product === '' ? '*' : product
+    cpeParts[5] = version === '' ? '*' : version
+    cpeParts[6] = update === '' ? '*' : update
+    cpeParts[7] = edition === '' ? '*' : edition
+    cpeParts[8] = language === '' ? '*' : language
+    cpeParts[9] = swEdition === '' ? '*' : swEdition
+    cpeParts[10] = targetSoftware === '' ? '*' : targetSoftware
+    cpeParts[11] = hardware === '' ? '*' : hardware
+    cpeParts[12] = other === '' ? '*' : other
+    const cpe = cpeParts.join(':')
     if (selectedCpe) {
-      onUpdateCpe(cpeString, selectedCpe.id)
+      onUpdateCpe(cpe, selectedCpe.id)
     } else {
-      onCreateCpe(cpeString)
+      onCreateCpe(cpe)
     }
     onClose()
     // } else {
@@ -171,28 +184,28 @@ const CpeModal = ({
   // ON CPE UPDATE
   const handleComUpdate = async () => {
     // if (validateCpe(cpeString)) {
-      await updateComponent({
-        variables: {
-          id: activeCheck.id,
-          sbomId: sbomId,
-          cpes: [cpeString]
+    await updateComponent({
+      variables: {
+        id: activeCheck.id,
+        sbomId: sbomId,
+        cpes: [cpeString]
+      }
+    })
+      .then(() => {
+        if (checkId) {
+          prodCheckDispatch({
+            type: 'FETCH_DATA_SUCCESS'
+          })
+          healthRecheck({
+            variables: {
+              checkId: checkId,
+              compId: activeCheck.id,
+              sbomId: sbomId
+            }
+          })
         }
       })
-        .then(() => {
-          if (checkId) {
-            prodCheckDispatch({
-              type: 'FETCH_DATA_SUCCESS'
-            })
-            healthRecheck({
-              variables: {
-                checkId: checkId,
-                compId: activeCheck.id,
-                sbomId: sbomId
-              }
-            })
-          }
-        })
-        .finally(() => onClose())
+      .finally(() => onClose())
     // } else {
     //   setError('Invalid CPE')
     // }
