@@ -2,6 +2,11 @@ const prodReducer = (state, action) => {
   const { pageIndex } = state
   const { type, payload } = action
   switch (type) {
+    case 'GET_DATA':
+      return {
+        ...state,
+        data: payload
+      }
     case 'SET_CURRENT_PRODUCT':
       return {
         ...state,

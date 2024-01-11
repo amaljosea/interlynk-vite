@@ -24,7 +24,8 @@ const GlobalStateProvider = ({ children }) => {
   const [scanEnabled, setScanEnabled] = useState(false)
   // PRODUCTS
   const [prodState, prodDispatch] = useReducer(prodReducer, {
-    field: 'PROJECTS_UPDATED_AT',
+    data: null,
+    field: 'PROJECT_GROUPS_UPDATED_AT',
     direction: 'DESC',
     totalProduct: 0,
     searchInput: '',

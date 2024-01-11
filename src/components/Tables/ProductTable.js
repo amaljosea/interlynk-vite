@@ -38,14 +38,13 @@ import CustomLoader from 'components/CustomLoader'
 import DataTable from 'react-data-table-component'
 import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
 import { useMutation } from '@apollo/client'
-import { UpdateProject, DeleteProject } from 'graphQL/Mutation'
+import { UpdateProjectGroup, DeleteProjectGroup } from 'graphQL/Mutation'
 import ProductModal from 'views/Dashboard/Products/components/ProductModal'
 import UploadModal from 'views/Dashboard/Products/components/UploadModal'
 import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import ProdFilterMenu from 'views/Dashboard/Products/components/ProdFilterMenu'
 import { useGlobalState } from 'hooks/useGlobalState'
 import ProdSearchFilter from 'views/Sbom/components/ProdSearchFilter'
-import OrgRegister from 'views/Dashboard/Profile/components/OrgRegister'
 import Card from 'components/Card/Card'
 
 const ProductTable = ({ data, refetch, org }) => {
@@ -99,7 +98,7 @@ const ProductTable = ({ data, refetch, org }) => {
     onClose: onWarningClose
   } = useDisclosure()
 
-  const [projectDelete] = useMutation(DeleteProject, {
+  const [projectGroupDelete] = useMutation(DeleteProjectGroup, {
     onCompleted: () =>
       refetch({
         first: totalRows,
@@ -108,7 +107,7 @@ const ProductTable = ({ data, refetch, org }) => {
       })
   })
 
-  const [projectUpdate] = useMutation(UpdateProject, {
+  const [projectGroupUpdate] = useMutation(UpdateProjectGroup, {
     onCompleted: () =>
       refetch({
         first: totalRows,
@@ -123,228 +122,9 @@ const ProductTable = ({ data, refetch, org }) => {
     onSbomOpen()
   }
 
-  // COLUMNS
-  const columns = [
-    // ACTIVE
-    {
-      id: 'PROJECTS_ENABLED',
-      name: 'ACTIVE',
-      selector: (row) => {
-        const { enabled, name } = row
-        return (
-          <Switch
-            name={name}
-            id={name}
-            size='md'
-            isChecked={enabled}
-            onChange={() => {
-              setActiveRow(row)
-              onWarningOpen()
-            }}
-          />
-        )
-      },
-      width: '150px',
-      sortable: true
-    },
-    // PRODUCT
-    {
-      id: 'PROJECTS_NAME',
-      name: 'PRODUCT',
-      selector: (row) => {
-        const { sboms, name, id } = row
-
-        const data = sboms ? removeDuplicates(sboms) : []
-
-        const product = {
-          id: id,
-          name: name,
-          version:
-            data.length > 0
-              ? data[0].primaryComponent?.version
-              : sboms.length > 0
-                ? sboms[0].primaryComponent?.version
-                : '',
-          sbomId:
-            data.length > 0
-              ? data[0].primaryComponent?.version
-              : sboms.length > 0
-                ? sboms[0].id
-                : ''
-        }
-
-        const handleClick = () => {
-          if (sboms.length > 0) {
-            localStorage.setItem('product', JSON.stringify(product))
-            localStorage.setItem('activeProdTab', 0)
-            prodDispatch({
-              type: 'SET_CURRENT_PRODUCT',
-              payload: {
-                id: id,
-                sbomId:
-                  data.length > 0
-                    ? data[0].primaryComponent?.version
-                    : sboms[0].id
-              }
-            })
-          }
-          setActiveSbomTab(0)
-        }
-
-        return (
-          <Link to={`/vendor/products/${name}?id=${id}`} onClick={handleClick}>
-            <Text color={'blue.500'} minWidth='100%'>
-              {name}
-            </Text>
-          </Link>
-        )
-      },
-      wrap: true,
-      sortable: true
-    },
-    // VERSION
-    {
-      id: 'versions',
-      name: 'VERSION',
-      selector: (row) => {
-        const { sboms } = row
-        const data = sboms ? removeDuplicates(sboms) : []
-        return <Text>{data.length}</Text>
-      },
-      wrap: true
-    },
-    // DESCRIPTION
-    {
-      id: 'PROJECTS_DESCRIPTION',
-      name: 'DESCRIPTION',
-      selector: (row) => {
-        const { description } = row
-        return (
-          <Text>
-            {description.length > 50
-              ? description.substring(0, 50) + '....'
-              : description}
-          </Text>
-        )
-      },
-      wrap: true,
-      sortable: true
-    },
-    // UPDATEDAT
-    {
-      id: 'PROJECTS_UPDATED_AT',
-      name: 'UPDATED AT',
-      selector: (row) => {
-        const { updatedAt } = row
-        return (
-          <Tooltip label={getFullDateAndTime(updatedAt)} placement={'top'}>
-            {timeSince(updatedAt)}
-          </Tooltip>
-        )
-      },
-      sortable: true,
-      sortFunction: (a, b) => {
-        const dateA = new Date(a.updatedAt)
-        const dateB = new Date(b.updatedAt)
-        return dateA - dateB
-      },
-      wrap: true
-    },
-    // ACTIONS
-    {
-      id: 'actions',
-      name: 'ACTIONS',
-      selector: (row) => {
-        const { enabled, id, name, sboms } = row
-        const uniqVersions = []
-        sboms &&
-          sboms.map((project) => {
-            if (project.primaryComponent) {
-              uniqVersions.push({
-                label: project.primaryComponent.version,
-                value: project.id,
-                creationAt: project.creationAt
-              })
-            }
-          })
-
-        const filteredData = uniqVersions ? removeDuplicates(uniqVersions) : []
-
-        const product = {
-          id: id,
-          name: name,
-          version:
-            filteredData.length > 0
-              ? filteredData[0].label
-              : sboms.length > 0
-                ? sboms[0].primaryComponent?.version
-                : '',
-          sbomId:
-            filteredData.length > 0
-              ? filteredData[0].value
-              : sboms.length > 0
-                ? sboms[0].id
-                : ''
-        }
-
-        return (
-          <Menu>
-            <MenuButton
-              as={IconButton}
-              icon={<FaEllipsisV />}
-              variant='none'
-              color='gray.400'
-            />
-            <Portal>
-              <MenuList fontSize={'sm'}>
-                <MenuItem
-                  onClick={() => {
-                    setActiveRow(row)
-                    onOpen()
-                  }}
-                  isDisabled={!enabled}
-                >
-                  Edit Product
-                </MenuItem>
-                <Divider />
-                <MenuItem
-                  onClick={() => {
-                    setActiveRow(row)
-                    onOpenUpload()
-                  }}
-                  isDisabled={!enabled}
-                >
-                  Upload SBOM
-                </MenuItem>
-                <MenuItem
-                  onClick={() => handleOpenSbom(row)}
-                  isDisabled={!enabled}
-                >
-                  Build Version
-                </MenuItem>
-                <Divider />
-                <MenuItem
-                  color='red'
-                  onClick={() => {
-                    setActiveRow(row)
-                    onDeleteOpen()
-                  }}
-                  isDisabled={!archiveProduct}
-                >
-                  Archive Product
-                </MenuItem>
-              </MenuList>
-            </Portal>
-          </Menu>
-        )
-      },
-      right: 'true'
-    }
-  ]
-
   // DELETE PRODUCT
   const onProductDelete = async () => {
-    await projectDelete({
+    await projectGroupDelete({
       variables: {
         id: activeRow.id
       }
@@ -362,7 +142,7 @@ const ProductTable = ({ data, refetch, org }) => {
 
   // TOGGLE STATUS
   const toggleStatus = async () => {
-    await projectUpdate({
+    await projectGroupUpdate({
       variables: {
         id: activeRow.id,
         enabled: activeRow.enabled === true ? false : true
@@ -434,6 +214,7 @@ const ProductTable = ({ data, refetch, org }) => {
     )
   }
 
+  // HEADER
   const subHeaderComponent = useMemo(() => {
     return (
       <Flex
@@ -464,7 +245,7 @@ const ProductTable = ({ data, refetch, org }) => {
             ></IconButton>
           </Tooltip>
           {/* ADD PRODUCT */}
-          <Tooltip label='Add Product'>
+          <Tooltip label='Add Group'>
             <IconButton
               icon={<AddIcon />}
               colorScheme='blue'
@@ -483,6 +264,202 @@ const ProductTable = ({ data, refetch, org }) => {
     onFilterActive,
     onSearchInputChange
   ])
+
+  // COLUMNS
+  const columns = [
+    // ACTIVE
+    {
+      id: 'PROJECT_GROUPS_ENABLED',
+      name: 'ACTIVE',
+      selector: (row) => {
+        const { enabled, name } = row
+        return (
+          <Switch
+            name={name}
+            id={name}
+            size='md'
+            isChecked={enabled}
+            onChange={() => {
+              setActiveRow(row)
+              onWarningOpen()
+            }}
+          />
+        )
+      },
+      width: '150px',
+      sortable: true
+    },
+    // PRODUCT
+    {
+      id: 'PROJECT_GROUPS_NAME',
+      name: 'PRODUCT',
+      selector: (row) => {
+        const { id, name, defaultProject } = row
+        const data = defaultProject
+          ? removeDuplicates(defaultProject?.sboms)
+          : []
+
+        const product = {
+          id: defaultProject?.id || '',
+          name: defaultProject?.name || '',
+          version:
+            data?.length > 0
+              ? defaultProject?.primaryComponent?.version
+              : defaultProject?.sboms?.length > 0
+                ? defaultProject?.sboms[0].primaryComponent?.version
+                : '',
+          sbomId: defaultProject
+            ? defaultProject?.primaryComponent?.version
+            : defaultProject?.sboms?.length > 0
+              ? defaultProject?.sboms[0].id
+              : '',
+          groupId: id
+        }
+
+        const handleClick = () => {
+          if (defaultProject?.sboms?.length > 0) {
+            localStorage.setItem('product', JSON.stringify(product))
+            localStorage.setItem('activeProdTab', 0)
+            prodDispatch({
+              type: 'SET_CURRENT_PRODUCT',
+              payload: {
+                id: defaultProject?.id,
+                sbomId:
+                  defaultProject?.length > 0
+                    ? defaultProject?.primaryComponent?.version
+                    : defaultProject?.sboms[0].id || ''
+              }
+            })
+          }
+          setActiveSbomTab(0)
+        }
+
+        return (
+          <Link
+            to={`/vendor/products/${defaultProject?.name}?id=${defaultProject?.id}`}
+            onClick={handleClick}
+          >
+            <Text color={'blue.500'} minWidth='100%'>
+              {name}
+            </Text>
+          </Link>
+        )
+      },
+      wrap: true,
+      sortable: true
+    },
+    // VERSION
+    {
+      id: 'versions',
+      name: 'VERSION',
+      selector: (row) => {
+        const { projects } = row
+        return <Text>{projects?.length}</Text>
+      },
+      wrap: true
+    },
+    // DESCRIPTION
+    {
+      id: 'PROJECT_GROUPS_DESCRIPTION',
+      name: 'DESCRIPTION',
+      selector: (row) => {
+        const { description } = row
+        return (
+          <Text>
+            {description.length > 50
+              ? description.substring(0, 50) + '....'
+              : description}
+          </Text>
+        )
+      },
+      wrap: true,
+      sortable: true
+    },
+    // UPDATEDAT
+    {
+      id: 'PROJECT_GROUPS_UPDATED_AT',
+      name: 'UPDATED AT',
+      selector: (row) => {
+        const { updatedAt } = row
+        return (
+          <Tooltip label={getFullDateAndTime(updatedAt)} placement={'top'}>
+            {timeSince(updatedAt)}
+          </Tooltip>
+        )
+      },
+      sortable: true,
+      sortFunction: (a, b) => {
+        const dateA = new Date(a.updatedAt)
+        const dateB = new Date(b.updatedAt)
+        return dateA - dateB
+      },
+      wrap: true
+    },
+    // ACTIONS
+    {
+      id: 'actions',
+      name: 'ACTIONS',
+      selector: (row) => {
+        const { enabled } = row
+
+        return (
+          <Menu>
+            <MenuButton
+              as={IconButton}
+              icon={<FaEllipsisV />}
+              variant='none'
+              color='gray.400'
+            />
+            <Portal>
+              <MenuList fontSize={'sm'}>
+                {/* EDIT PRODUCT */}
+                <MenuItem
+                  onClick={() => {
+                    setActiveRow(row)
+                    onOpen()
+                  }}
+                  isDisabled={!enabled}
+                >
+                  Edit Product
+                </MenuItem>
+                <Divider />
+                {/* UPLOAD SBOM */}
+                <MenuItem
+                  onClick={() => {
+                    setActiveRow(row)
+                    onOpenUpload()
+                  }}
+                  isDisabled={!enabled}
+                >
+                  Upload SBOM
+                </MenuItem>
+                {/* BUILD SBOM */}
+                <MenuItem
+                  onClick={() => handleOpenSbom(row)}
+                  isDisabled={!enabled}
+                >
+                  Build Version
+                </MenuItem>
+                <Divider />
+                {/* ARCHIVE PRODUCT GROUP */}
+                <MenuItem
+                  color='red'
+                  onClick={() => {
+                    setActiveRow(row)
+                    onDeleteOpen()
+                  }}
+                  isDisabled={!archiveProduct}
+                >
+                  Archive Product
+                </MenuItem>
+              </MenuList>
+            </Portal>
+          </Menu>
+        )
+      },
+      right: 'true'
+    }
+  ]
 
   // SORTING
   const handleSort = async (column, sortDirection) => {
@@ -632,7 +609,7 @@ const ProductTable = ({ data, refetch, org }) => {
       {/* UPLOAD SBOM */}
       {isOpenUpload && (
         <UploadModal
-          id={activeRow.id}
+          id={activeRow?.defaultProject?.id}
           isOpen={isOpenUpload}
           onClose={onCloseUpload}
         />
@@ -649,7 +626,6 @@ const ProductTable = ({ data, refetch, org }) => {
           product={null}
           description={null}
           allProjects={null}
-          type={null}
         />
       )}
 
@@ -663,7 +639,6 @@ const ProductTable = ({ data, refetch, org }) => {
           refetch={refetch}
           description={activeRow.description}
           allProjects={data.nodes}
-          type={activeRow.sboms.length > 0 && activeRow.sboms[0].format}
         />
       )}
 

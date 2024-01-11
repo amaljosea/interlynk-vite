@@ -25,37 +25,30 @@ import {
   UnorderedList,
   ListItem,
   Button,
-  Box
+  Box,
+  Select
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import VersionTable from 'components/Tables/VersionTable'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import {
   FaLayerGroup,
   FaPenToSquare,
-  FaScrewdriverWrench,
   FaToggleOn,
-  FaTrashCan,
   FaUpload,
   FaToggleOff,
   FaWindowMaximize,
   FaBoxArchive
 } from 'react-icons/fa6'
 import { useLocation, useNavigate } from 'react-router-dom'
-import {
-  timeSince,
-  getFullDateAndTime,
-  removeDuplicates,
-  permissionList
-} from 'utils'
+import { timeSince, getFullDateAndTime, removeDuplicates } from 'utils'
 import SBOM from 'views/Sbom'
 import Controls from '../Automation/components/Controls'
 import ChangeLog from '../Changelog'
 import Settings from '../Automation/components/Settings'
 import ProductModal from './components/ProductModal'
 import UploadModal from './components/UploadModal'
-import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import { useQuery, useMutation, useLazyQuery } from '@apollo/client'
 import {
   GetProductInfo,
@@ -66,6 +59,7 @@ import {
 } from 'graphQL/Queries'
 import { UpdateProject, DeleteProject } from 'graphQL/Mutation'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { BsBoxFill } from 'react-icons/bs'
 
 const ProductDetails = () => {
   const navigate = useNavigate()
@@ -156,12 +150,6 @@ const ProductDetails = () => {
   } = useDisclosure()
 
   const {
-    isOpen: isSbomOpen,
-    onOpen: onSbomOpen,
-    onClose: onSbomClose
-  } = useDisclosure()
-
-  const {
     isOpen: isWarningOpen,
     onOpen: onWarningOpen,
     onClose: onWarningClose
@@ -172,11 +160,6 @@ const ProductDetails = () => {
     onOpen: onDeleteOpen,
     onClose: onDeleteClose
   } = useDisclosure()
-
-  const onBuildSbom = () => {
-    prodCompDispatch({ type: 'CLEAR_LICENSES' })
-    onSbomOpen()
-  }
 
   const handleTabChange = (value) => {
     localStorage.setItem('activeProdTab', value)
@@ -404,6 +387,23 @@ const ProductDetails = () => {
                       ml={'auto'}
                       flexWrap={'wrap'}
                     >
+                      {/* CHANGE ENVIRONMENT */}
+                      <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
+                        <BsBoxFill size={22} color='#718096' />
+                        <Select name='environment' id='environment' size='md'>
+                          {[
+                            'All',
+                            'Development',
+                            'Release',
+                            'Staging',
+                            'Settings'
+                          ].map((item, index) => (
+                            <option value={item} key={index}>
+                              {item}
+                            </option>
+                          ))}
+                        </Select>
+                      </Flex>
                       {/* EDIT PRODUCT */}
                       <Tooltip label='Edit Product'>
                         <IconButton
@@ -420,15 +420,6 @@ const ProductDetails = () => {
                           colorScheme='blue'
                           onClick={onOpenUpload}
                           icon={<FaUpload />}
-                        ></IconButton>
-                      </Tooltip>
-                      {/* BUILD SBOM */}
-                      <Tooltip label='Build Version'>
-                        <IconButton
-                          isDisabled={!data.project.enabled}
-                          colorScheme='blue'
-                          onClick={onBuildSbom}
-                          icon={<FaScrewdriverWrench />}
                         ></IconButton>
                       </Tooltip>
                       {/* UPDATE PRODUCT STATUS */}
@@ -499,7 +490,7 @@ const ProductDetails = () => {
                   <TabPanel>
                     {data && (
                       <VersionTable
-                        name={data.project.name}
+                        data={data.project}
                         project={versions?.project}
                         productId={productId}
                         refetch={sbomRefetch}
@@ -557,15 +548,6 @@ const ProductDetails = () => {
             id={data.project.id}
             isOpen={isOpenUpload}
             onClose={onCloseUpload}
-          />
-        )}
-
-        {isSbomOpen && data && (
-          <ProductSbomDrawer
-            isOpen={isSbomOpen}
-            onClose={onSbomClose}
-            data={data.project}
-            refetch={refetch}
           />
         )}
 

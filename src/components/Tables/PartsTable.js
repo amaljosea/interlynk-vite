@@ -41,7 +41,6 @@ import VulnBadge from 'components/Misc/VulnBadge'
 import { SbomPartDelete } from 'graphQL/Mutation'
 import { SbomPartCreate } from 'graphQL/Mutation'
 import { GetProject } from 'graphQL/Queries'
-import { GetProjectData } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
@@ -74,6 +73,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const queryParams = new URLSearchParams(location.search)
   const sbomId = queryParams.get('sbom')
   const prodId = queryParams.get('id')
+  const group = JSON.parse(localStorage.getItem('product'))
 
   const {
     setActiveProdTab,
@@ -83,6 +83,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
     prodVulnState,
     dispatch
   } = useGlobalState()
+  const { data: allProjectGroups } = prodState
   const { prodVulnDispatch } = dispatch
 
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -98,13 +99,6 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const [selectedVersion, setSelectedVersion] = useState('')
   const [searchInput, setSearchInput] = useState('')
   const [activeRow, setActiveRow] = useState(null)
-  const { data: allProducts } = useQuery(GetProjectData, {
-    variables: {
-      first: 50,
-      field: prodState.field,
-      direction: prodState.direction
-    }
-  })
 
   const [createSbomPart] = useMutation(SbomPartCreate)
   const [deleteSbomPart] = useMutation(SbomPartDelete)
@@ -152,9 +146,13 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       .finally(() => onDeleteClose())
   }
 
+  const activeGroup = allProjectGroups?.nodes.find(
+    (item) => item.id === group.groupId
+  )
+
   const productList =
-    allProducts &&
-    [...allProducts.projects.nodes]
+    activeGroup &&
+    activeGroup.projects
       .filter((item) => item.enabled === true)
       .map((option) => ({
         value: option.id,
@@ -177,9 +175,9 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
     }
   }
 
-  const product =
-    allProducts &&
-    allProducts.projects.nodes.find((item) => item.id === selectedProd)
+  const product = activeGroup?.projects?.find(
+    (item) => item.id === selectedProd
+  )
 
   const existingVersions = []
 
