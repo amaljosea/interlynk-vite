@@ -81,12 +81,13 @@ const ChangelogTable = ({ data, refetch }) => {
       name: 'PREVIOUS VALUE',
       wrap: true,
       selector: (row) => {
+        const { event } = row
         const { orig } = row
         return (
           <Tooltip label={orig} placement='top'>
             <Text my={2}>
               {orig !== null
-                ? `${orig?.substring(0, 400)}${orig.length > 400 ? '...' : ''}`
+                ? `${event} / ${orig.substring(0, 400)}${orig.length > 400 ? '...' : ''}`
                 : ''}
             </Text>
           </Tooltip>
@@ -99,11 +100,14 @@ const ChangelogTable = ({ data, refetch }) => {
       name: 'UPDATED VALUE',
       wrap: true,
       selector: (row) => {
+        const { event } = row
         const { updated } = row
         return (
           <Tooltip label={updated} placement='top'>
             <Text overflow={'auto'} my={2}>
-              {updated || ''}
+              {updated !== null
+                ? `${event} / ${updated.substring(0, 400)}${updated.length > 400 ? '...' : ''}`
+                : ''}
             </Text>
           </Tooltip>
         )
