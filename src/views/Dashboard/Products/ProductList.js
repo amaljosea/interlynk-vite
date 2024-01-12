@@ -26,7 +26,11 @@ function ProductList() {
   const product = queryParams.get('id')
   const org = localStorage.getItem('organization')
 
-  const { refetch, error } = useQuery(GetProjectGroups, {
+  const {
+    data: groups,
+    refetch,
+    error
+  } = useQuery(GetProjectGroups, {
     variables: {
       first: totalRows,
       enabled: enabled === 'yes' ? true : enabled === 'no' ? false : undefined,
@@ -73,7 +77,12 @@ function ProductList() {
     )
   }
 
-  return <ProductTable data={data} refetch={refetch} />
+  return (
+    <ProductTable
+      data={groups?.organization?.projectGroups}
+      refetch={refetch}
+    />
+  )
 }
 
 export default ProductList

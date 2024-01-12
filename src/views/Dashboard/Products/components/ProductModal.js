@@ -62,15 +62,14 @@ const ProductModal = ({
           name: productName,
           desc: productDesc
         }
-      }).then((res) => {
-        const error = res.data.projectUpdate.errors
-        if (error.length > 0) {
-          setError(res.data.projectUpdate.errorp[0])
-        } else {
-          navigate(`/vendor/products/${productName}?id=${id}`)
-          // onClose()
-        }
       })
+        .then((res) => {
+          const error = res.data.projectUpdate.errors
+          if (error.length > 0) {
+            setError(res.data.projectUpdate.errorp[0])
+          }
+        })
+        .finally(() => onClose())
     } else {
       await projectGroupUpdate({
         variables: {
@@ -78,15 +77,14 @@ const ProductModal = ({
           name: productName,
           desc: productDesc
         }
-      }).then((res) => {
-        const error = res.data.projectGroupUpdate.errors
-        if (error.length > 0) {
-          setError(res.data.projectGroupUpdate.errors[0])
-        } else {
-          navigate(`/vendor/products`)
-          // onClose()
-        }
       })
+        .then((res) => {
+          const error = res.data.projectGroupUpdate.errors
+          if (error.length > 0) {
+            setError(res.data.projectGroupUpdate.errors[0])
+          }
+        })
+        .finally(() => onClose())
     }
   }
 
@@ -98,16 +96,15 @@ const ProductModal = ({
         desc: productDesc,
         enabled: true
       }
-    }).then((res) => {
-      const error = res.data.projectGroupCreate.errors
-      if (error.length > 0) {
-        setError(
-          'A project group with same name already exists. Please choose an unique name'
-        )
-      } else {
-        onClose()
-      }
     })
+      .then((res) => {
+        console.log(res.data)
+        const error = res.data.projectGroupCreate.errors
+        if (error.length > 0) {
+          setError(error[0])
+        }
+      })
+      .finally(() => onClose())
   }
 
   const isInvalid = productName === '' || productDesc === '' || error !== ''
