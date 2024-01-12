@@ -134,7 +134,7 @@ const ProductsOverview = ({ title, captions, data }) => {
                           to={`/vendor/products/${item?.project?.name}?id=${item?.projectId}`}
                           onClick={() => handleClick(item)}
                         >
-                          {item?.project?.name}
+                          {item?.project?.projectGroup?.name}
                         </Link>
                       </Td>
                       {/* VERSIONS */}
