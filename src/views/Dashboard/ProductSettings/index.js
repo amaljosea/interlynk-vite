@@ -25,9 +25,15 @@ import { ProjectSettingUpdate } from 'graphQL/Mutation'
 import { useState, useEffect } from 'react'
 
 const Settings = ({ projectId, data, refetch }) => {
-  console.log('data', data)
 
   const [dataRetentionDays, setDataRetentionDays] = useState(0)
+  const [projectSettingId, setProjectSettingId] = useState(null)
+
+  useEffect(() => {
+    if (data) {
+      setProjectSettingId(data?.id)
+    }
+  }, [data])
 
   useEffect(() => {
     if (data) {
@@ -50,9 +56,10 @@ const Settings = ({ projectId, data, refetch }) => {
   } = useDisclosure()
 
   const onUpdate = async (value, id) => {
+
     await updateSettings({
       variables: {
-        id: projectId,
+        id: projectSettingId,
         checks: id === 'checks' ? value : undefined,
         intcomp: id === 'internalComp' ? value : undefined,
         autofix: id === 'automation' ? value : undefined,
@@ -98,7 +105,7 @@ const Settings = ({ projectId, data, refetch }) => {
                   onChange={(e) => onUpdate(e.target.checked, 'checks')}
                 />
                 <Text noOfLines={1} color='gray.500' fontWeight='400'>
-                  Apply Check
+                  Checks
                 </Text>
               </Flex>
               {/* APPLY AUTOMATION */}
@@ -112,7 +119,7 @@ const Settings = ({ projectId, data, refetch }) => {
                   onChange={(e) => onUpdate(e.target.checked, 'automation')}
                 />
                 <Text noOfLines={1} color='gray.500' fontWeight='400'>
-                  Apply Automation
+                  Automation
                 </Text>
               </Flex>
               {/* APPLY INTERNAL COMPONENTS */}
@@ -126,7 +133,7 @@ const Settings = ({ projectId, data, refetch }) => {
                   onChange={(e) => onUpdate(e.target.checked, 'internalComp')}
                 />
                 <Text noOfLines={1} color='gray.500' fontWeight='400'>
-                  Apply Internal Components
+                  Internal Component Labeling
                 </Text>
               </Flex>
             </VStack>
@@ -134,7 +141,7 @@ const Settings = ({ projectId, data, refetch }) => {
           {/* RIGHT */}
           <GridItem w='100%'>
             <FormControl>
-              <FormLabel>Date Retention</FormLabel>
+              <FormLabel>Retain Data For</FormLabel>
               <Select
                 width={'400px'}
                 id='dataRetention'
