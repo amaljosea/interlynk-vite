@@ -144,7 +144,10 @@ const ProductDetails = () => {
   )
 
   const [getSettings, { data: settings }] = useLazyQuery(GetProjectSettings, {
-    fetchPolicy: 'network-only'
+    fetchPolicy: 'network-only',
+    variables: {
+      id: activeEnv
+    }
   })
 
   const [getLogs, { data: prodLogs }] = useLazyQuery(GetProjectLogs, {
