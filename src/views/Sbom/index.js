@@ -63,7 +63,7 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
   })
 
   const activeGroup = allProjectGroups?.nodes.find(
-    (item) => item.id === group.groupId
+    (item) => item.id === group?.groupId
   )
 
   const selectedProject = activeGroup?.projects.find(
