@@ -237,7 +237,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
         )
       ) {
         sbomVersions.push({
-          label: project.primaryComponent
+          label: project.primaryComponent?.version.length > 0
             ? project.primaryComponent.version
             : `Uploaded ${getFullDateAndTime(project.creationAt)}`,
           value: project.id,
@@ -296,7 +296,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
                 setActiveProdTab(0)
               }}
             >
-              {part.project.name}
+              {part.project.projectGroup.name}
             </Text>
           </Link>
         )
