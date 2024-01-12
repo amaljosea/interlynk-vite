@@ -125,7 +125,7 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
           )}
           <Stack direction={'row'} alignItems={'center'} wrap={'wrap'}>
             <Text fontWeight={'semibold'} fontSize={25}>
-              {project?.name} : {primaryComponent?.version}
+              {project?.projectGroup?.name} : {primaryComponent?.version}
             </Text>
             <Tooltip label='Lifecycle stage' fontSize='md'>
               <Tag

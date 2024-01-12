@@ -141,6 +141,9 @@ export const GetOrgMetrics = gql`
           sboms {
             id
           }
+          projectGroup {
+            name
+          }
         }
         primaryComponent {
           name
@@ -825,6 +828,10 @@ export const GetProductData = gql`
       project {
         id
         name
+        projectGroup {
+          id
+          name
+        }
       }
       lifecycle
       creationAt
