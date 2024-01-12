@@ -142,6 +142,7 @@ export const GetOrgMetrics = gql`
             id
           }
           projectGroup {
+            id
             name
           }
         }
