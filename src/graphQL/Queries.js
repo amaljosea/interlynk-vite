@@ -2145,6 +2145,10 @@ export const GetSbomParts = gql`
           project {
             id
             name
+            projectGroup {
+              id
+              name
+            }
           }
           stats {
             compCount
