@@ -131,7 +131,7 @@ const ProductsOverview = ({ title, captions, data }) => {
                         _hover={{ textDecoration: 'underline' }}
                       >
                         <Link
-                          to={`/vendor/products/${item?.project?.name}?id=${item?.projectId}`}
+                          to={`/vendor/products/${item?.project?.projectGroup?.name}?id=${item?.project?.projectGroup?.id}`}
                           onClick={() => handleClick(item)}
                         >
                           {item?.project?.projectGroup?.name}
@@ -146,7 +146,7 @@ const ProductsOverview = ({ title, captions, data }) => {
                         _hover={{ textDecoration: 'underline' }}
                       >
                         <Link
-                          to={`/vendor/products/${item?.project?.name}?id=${item?.projectId}&sbom=${item?.id}`}
+                          to={`/vendor/products/${item?.project?.projectGroup?.name}?id=${item?.projectId}&sbom=${item?.id}`}
                           onClick={() => onVersionClick(item)}
                         >
                           {item?.primaryComponent?.version ||
@@ -156,7 +156,7 @@ const ProductsOverview = ({ title, captions, data }) => {
                       {/* COMPONENTS */}
                       <Td fontSize={'sm'} pl={1}>
                         <Link
-                          to={`/vendor/products/${item?.project?.name}?id=${item?.projectId}&sbom=${item?.id}`}
+                          to={`/vendor/products/${item?.project?.projectGroup?.name}?id=${item?.projectId}&sbom=${item?.id}`}
                           onClick={() => onFilterComp(item)}
                         >
                           <Tag
