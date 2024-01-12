@@ -8,16 +8,18 @@ import {
   Text
 } from '@chakra-ui/react'
 import { useEffect } from 'react'
-import { GetProject } from 'graphQL/Queries'
+import { GetProject, GetProjectGroups } from 'graphQL/Queries'
 import { useLazyQuery, useQuery } from '@apollo/client'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { removeDuplicates } from 'utils'
+import { removeDuplicates, getFullDateAndTime } from 'utils'
 
 const StepOne = ({
   setProductId,
   setSbomId,
   currentSbomId,
   currentProductId,
+  selectedGroup,
+  setSelectedGroup,
   selectedProd,
   setSelectedProd,
   selectedVersion,
@@ -25,14 +27,24 @@ const StepOne = ({
   uniqVersions,
   setUniqVersions
 }) => {
-  const { prodState } = useGlobalState()
-  const { data } = prodState
+  const { totalRows, prodState } = useGlobalState()
+  const { enabled, field, direction } = prodState
   const group = JSON.parse(localStorage.getItem('product'))
 
-  const activeGroup =
-    data && data.nodes.find((item) => item.id === group.groupId)
+  const { data } = useQuery(GetProjectGroups, {
+    variables: {
+      first: totalRows,
+      enabled: enabled === 'yes' ? true : enabled === 'no' ? false : undefined,
+      field: field,
+      direction: direction
+    }
+  })
 
-  console.log('activeGroup', activeGroup)
+  const activeGroup =
+    data &&
+    data?.organization?.projectGroups?.nodes.find(
+      (item) => item.id === group.groupId
+    )
 
   const productList =
     activeGroup &&
@@ -42,8 +54,6 @@ const StepOne = ({
         value: option.id,
         label: option.name
       }))
-
-  console.log('productList', productList)
 
   useEffect(() => {
     if (activeGroup) {
@@ -70,6 +80,12 @@ const StepOne = ({
 
   const [getProduct] = useLazyQuery(GetProject)
 
+  const handleSelectGroup = (e) => {
+    setSelectedVersion('')
+    setSelectedProd('')
+    setSelectedGroup(e.target.value)
+  }
+
   const handleSelectProduct = (e) => {
     setSelectedVersion('')
     setSelectedProd(e.target.value)
@@ -89,8 +105,9 @@ const StepOne = ({
             (item) => item.id !== currentSbomId && item.primaryComponent
           )
           if (filtered.length > 0) {
-            setSelectedVersion(filtered[0].id)
             setUniqVersions(filtered)
+            setSelectedVersion('')
+            setSbomId('')
           } else {
             setSelectedVersion('')
             setUniqVersions([])
@@ -128,10 +145,33 @@ const StepOne = ({
             gap={2}
             mt={12}
           >
-            {/* Project */}
+            {/* PROJECT GROUPS */}
+            {data?.organization?.projectGroups?.nodes?.length > 0 && (
+              <FormControl fontSize={'sm'}>
+                <FormLabel htmlFor='product' fontSize='md' color='gray.600'>
+                  Product
+                </FormLabel>
+                <Select
+                  name='groups'
+                  id='groups'
+                  value={selectedGroup}
+                  onChange={handleSelectGroup}
+                >
+                  <option value={''}>-- Select --</option>
+                  {data?.organization?.projectGroups?.nodes?.map(
+                    (item, index) => (
+                      <option key={index} value={item.id}>
+                        {item.name}
+                      </option>
+                    )
+                  )}
+                </Select>
+              </FormControl>
+            )}
+            {/* ENVIRONMENT */}
             <FormControl fontSize={'sm'}>
               <FormLabel htmlFor='product' fontSize='md' color='gray.600'>
-                Project
+                Environment
               </FormLabel>
               <Select
                 name='product'

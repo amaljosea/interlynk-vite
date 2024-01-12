@@ -358,6 +358,54 @@ export const GetProjectGroups = gql`
   }
 `
 
+// GET PROJECT SETTINGS
+export const GetProjectSettings = gql`
+  query GetProjectSettings($id: Uuid!) {
+    project(id: $id) {
+      id
+      name
+      projectSetting {
+        id
+        checksEnabled
+        automatedFixesEnabled
+        dataRetentionDays
+        internalCompMatchingEnabled
+        vulnScanningEnabled
+      }
+    }
+  }
+`
+
+// GET ACTIVE PROJECT GROUP
+export const GetProjectGroup = gql`
+  query GetProjectGroup($id: Uuid!) {
+    projectGroup(id: $id) {
+      description
+      enabled
+      id
+      name
+      organizationId
+      updatedAt
+      defaultProject {
+        description
+        enabled
+        id
+        name
+        projectGroupId
+        updatedAt
+      }
+      projects {
+        description
+        enabled
+        id
+        name
+        projectGroupId
+        updatedAt
+      }
+    }
+  }
+`
+
 export const GetOrgInfo = gql`
   query GetOrgInfo {
     organization {

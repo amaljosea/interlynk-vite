@@ -83,7 +83,7 @@ const CpeModal = ({
 
   // UPDATE FIELDS DATA FROM API
   useEffect(() => {
-    const matches = regexPattern.test(cpeValue)
+    // const matches = cpe.test(cpeValue)
     if (cpeValue.length > 0 && isCpeValid) {
       const components = cpeValue.split(':')
       const allowedValues = ['a', 'h', 'o', 'A', 'H', 'O']

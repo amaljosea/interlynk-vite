@@ -15,22 +15,27 @@ import {
   ModalHeader,
   ModalBody,
   ModalCloseButton,
-  Progress
+  Progress,
+  FormControl,
+  Select,
+  Stack,
+  FormHelperText
 } from '@chakra-ui/react'
 import { UploadSbom } from 'graphQL/Mutation'
 import { useState } from 'react'
 import { FaUpload } from 'react-icons/fa'
 
-const UploadModal = ({ id, isOpen, onClose }) => {
+const UploadModal = ({ projects, isOpen, onClose }) => {
   const toast = useToast()
   const [sbomUpload, { loading, error }] = useMutation(UploadSbom)
+  const [selectedEnv, setSelectedEnv] = useState(projects[0].id || '')
   const [errorMessage, setErrorMessage] = useState('')
 
   const handleUpload = async (file) => {
     await sbomUpload({
       variables: {
         doc: file,
-        projectId: id
+        projectId: selectedEnv
       }
     })
       .then((res) => {
@@ -90,11 +95,27 @@ const UploadModal = ({ id, isOpen, onClose }) => {
                 </AlertTitle>
               </Alert>
             )}
-            <Box>
-              <Text fontSize={'sm'} mb={5}>
-                Interlynk supports importing CycloneDX versions 1.2-1.5 in JSON
-                and XML formats and SPDX 2.2 and 2.3 in JSON format.{' '}
-              </Text>
+            <Stack spacing={4}>
+              <FormControl>
+                <FormLabel>Environment</FormLabel>
+                <Select
+                  width={'400px'}
+                  id='dataRetention'
+                  value={selectedEnv}
+                  onChange={(e) => setSelectedEnv(e.target.value)}
+                >
+                  {projects?.length > 0 &&
+                    projects?.map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.name}
+                      </option>
+                    ))}
+                </Select>
+                <FormHelperText>
+                  Interlynk supports importing CycloneDX versions 1.2-1.5 in
+                  JSON and XML formats and SPDX 2.2 and 2.3 in JSON format.{' '}
+                </FormHelperText>
+              </FormControl>
               <FormLabel htmlFor='file' width={'100%'} cursor={'pointer'}>
                 <Input
                   type='file'
@@ -114,7 +135,7 @@ const UploadModal = ({ id, isOpen, onClose }) => {
                   <FaUpload color='darkgray' size={32} />
                 </Flex>
               </FormLabel>
-            </Box>
+            </Stack>
             {loading && (
               <Box my={5}>
                 <Progress size='xs' isIndeterminate />

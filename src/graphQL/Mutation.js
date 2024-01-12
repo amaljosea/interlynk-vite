@@ -290,6 +290,39 @@ export const DeleteProjectGroup = gql`
   }
 `
 
+// PROJECT SETTINGS UPDATE
+export const ProjectSettingUpdate = gql`
+  mutation ProjectSettingUpdate(
+    $id: Uuid!
+    $checks: Boolean
+    $intcomp: Boolean
+    $days: Float
+    $autofix: Boolean
+    $vulnscan: Boolean
+  ) {
+    projectSettingUpdate(
+      input: {
+        id: $id
+        checksEnabled: $checks
+        internalCompMatchingEnabled: $intcomp
+        dataRetentionDays: $days
+        automatedFixesEnabled: $autofix
+        vulnScanningEnabled: $vulnscan
+      }
+    ) {
+      projectSetting {
+        id
+        checksEnabled
+        automatedFixesEnabled
+        dataRetentionDays
+        internalCompMatchingEnabled
+        vulnScanningEnabled
+      }
+      errors
+    }
+  }
+`
+
 export const OrgConnectorRefresh = gql`
   mutation OrgConnectorRefresh {
     organizationConnectorRefresh(input: {}) {
@@ -1607,6 +1640,48 @@ export const QuitOrganization = gql`
         id
       }
       errors
+    }
+  }
+`
+
+// CREATE ENV
+export const EnvCreate = gql`
+  mutation EnvCreate(
+    $groupId: Uuid!
+    $name: String!
+    $desc: String
+    $enabled: Boolean
+  ) {
+    projectCreate(
+      input: {
+        projectGroupId: $groupId
+        name: $name
+        description: $desc
+        enabled: $enabled
+      }
+    ) {
+      errors
+      project {
+        description
+        enabled
+        id
+        name
+        projectGroupId
+        updatedAt
+      }
+    }
+  }
+`
+
+// CREATE ENV
+export const EnvDelete = gql`
+  mutation EnvDelete($id: Uuid!) {
+    projectDelete(input: { id: $id }) {
+      errors
+      project {
+        id
+        name
+      }
     }
   }
 `
