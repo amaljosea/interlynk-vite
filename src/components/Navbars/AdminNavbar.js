@@ -184,7 +184,7 @@ export default function AdminNavbar(props) {
                 isCurrentPage={sbomId && currentSBOM?.version ? false : true}
               >
                 <Link
-                  to={`/vendor/products/${params.name}?id=${prodID}`}
+                  to={`/vendor/products/${params.name}?id=${currentProduct?.groupId}`}
                   onClick={() => localStorage.removeItem('currentSBOM')}
                 >
                   {decodeURI(params.name)}

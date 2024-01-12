@@ -17,73 +17,31 @@ import {
   Text,
   Textarea
 } from '@chakra-ui/react'
-import { UpdateProject } from 'graphQL/Mutation'
-import { CreateProject } from 'graphQL/Mutation'
-import { CreateProjectGroup, UpdateProjectGroup } from 'graphQL/Mutation'
-import { useState, useEffect } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { EnvCreate } from 'graphQL/Mutation'
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
-const ProductModal = ({
-  id,
-  isOpen,
-  onClose,
-  product,
-  description,
-  refetch
-}) => {
+const EnvModal = ({ groupId, isOpen, onClose, refetch }) => {
   const navigate = useNavigate()
-  const params = useParams()
-  const [projectGroupCreate] = useMutation(CreateProjectGroup, {
-    onCompleted: () => refetch()
-  })
-  const [projectGroupUpdate] = useMutation(UpdateProjectGroup, {
-    onCompleted: () => refetch()
-  })
+
+  const [projectCreate] = useMutation(EnvCreate)
 
   const [productName, setProductName] = useState('')
   const [productDesc, setProductDesc] = useState('')
 
-  useEffect(() => {
-    setProductName(product)
-    setProductDesc(description)
-  }, [id])
-
   const [error, setError] = useState('')
-
-  const updateProduct = async (e) => {
-    e.preventDefault()
-    await projectGroupUpdate({
-      variables: {
-        id: id,
-        name: productName,
-        desc: productDesc
-      }
-    })
-      .then((res) => {
-        const error = res.data.projectGroupUpdate.errors
-        if (error.length > 0) {
-          setError(res.data.projectGroupUpdate.errors[0])
-        }
-      })
-      .finally(() => onClose())
-  }
 
   const handleSave = async (e) => {
     e.preventDefault()
-    await projectGroupCreate({
+    await projectCreate({
       variables: {
+        groupId,
         name: productName,
         desc: productDesc,
         enabled: true
       }
     })
-      .then((res) => {
-        console.log(res.data)
-        const error = res.data.projectGroupCreate.errors
-        if (error.length > 0) {
-          setError(error[0])
-        }
-      })
+      .then((res) => res.data && refetch({ id: groupId }))
       .finally(() => onClose())
   }
 
@@ -93,9 +51,9 @@ const ProductModal = ({
     <>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-        <form onSubmit={id ? updateProduct : handleSave}>
+        <form onSubmit={handleSave}>
           <ModalContent>
-            <ModalHeader>{product ? 'Edit' : 'Add'} Product</ModalHeader>
+            <ModalHeader>Add Environment</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               <Flex width={'100%'} direction={'column'} gap={4}>
@@ -114,7 +72,7 @@ const ProductModal = ({
                       setProductName(e.target.value)
                       setError('')
                     }}
-                    placeholder={`Add product ${params && 'group'} name`}
+                    placeholder={`Add product  name`}
                   />
                 </FormControl>
                 <FormControl isRequired>
@@ -122,7 +80,7 @@ const ProductModal = ({
                   <Textarea
                     value={productDesc || ''}
                     onChange={(e) => setProductDesc(e.target.value)}
-                    placeholder={`Add product ${params && 'group'} description`}
+                    placeholder={`Add product description`}
                     rows={5}
                   />
                 </FormControl>
@@ -132,15 +90,9 @@ const ProductModal = ({
               <Button colorScheme='gray' mr={3} onClick={onClose}>
                 Cancel
               </Button>
-              {id ? (
-                <Button colorScheme='blue' type='submit' disabled={isInvalid}>
-                  Update
-                </Button>
-              ) : (
-                <Button colorScheme='blue' type='submit' disabled={isInvalid}>
-                  Save
-                </Button>
-              )}
+              <Button colorScheme='blue' type='submit' disabled={isInvalid}>
+                Save
+              </Button>
             </ModalFooter>
           </ModalContent>
         </form>
@@ -149,4 +101,4 @@ const ProductModal = ({
   )
 }
 
-export default ProductModal
+export default EnvModal

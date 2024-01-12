@@ -340,7 +340,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
           {/* BUILD SBOM */}
           <Tooltip label='Build Version'>
             <IconButton
-              isDisabled={!data.enabled}
+              isDisabled={!data?.enabled}
               colorScheme='blue'
               onClick={onBuildSbom}
               icon={<FaScrewdriverWrench />}

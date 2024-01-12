@@ -245,7 +245,7 @@ const ProductTable = ({ data, refetch, org }) => {
             ></IconButton>
           </Tooltip>
           {/* ADD PRODUCT */}
-          <Tooltip label='Add Group'>
+          <Tooltip label='Add Product'>
             <IconButton
               icon={<AddIcon />}
               colorScheme='blue'
@@ -300,8 +300,8 @@ const ProductTable = ({ data, refetch, org }) => {
           : []
 
         const product = {
-          id: defaultProject?.id || '',
-          name: defaultProject?.name || '',
+          id: id,
+          name: name,
           version:
             data?.length > 0
               ? defaultProject?.primaryComponent?.version
@@ -319,6 +319,7 @@ const ProductTable = ({ data, refetch, org }) => {
         const handleClick = () => {
           if (defaultProject?.sboms?.length > 0) {
             localStorage.setItem('product', JSON.stringify(product))
+            localStorage.setItem('activeEnv', defaultProject?.id)
             localStorage.setItem('activeProdTab', 0)
             prodDispatch({
               type: 'SET_CURRENT_PRODUCT',
@@ -335,10 +336,7 @@ const ProductTable = ({ data, refetch, org }) => {
         }
 
         return (
-          <Link
-            to={`/vendor/products/${defaultProject?.name}?id=${defaultProject?.id}`}
-            onClick={handleClick}
-          >
+          <Link to={`/vendor/products/${name}?id=${id}`} onClick={handleClick}>
             <Text color={'blue.500'} minWidth='100%'>
               {name}
             </Text>
@@ -348,13 +346,24 @@ const ProductTable = ({ data, refetch, org }) => {
       wrap: true,
       sortable: true
     },
-    // VERSION
+    // ENVIRONMENT
     {
-      id: 'versions',
-      name: 'VERSION',
+      id: 'ENVIRONMENT',
+      name: 'ENVIRONMENT',
       selector: (row) => {
         const { projects } = row
         return <Text>{projects?.length}</Text>
+      },
+      wrap: true
+    },
+    // VERSION
+    {
+      id: 'VERSION',
+      name: 'VERSION',
+      selector: (row) => {
+        const { projects } = row
+        const totalSbom = projects?.reduce((count, project) => count + project.sboms.length, 0);
+        return <Text>{totalSbom || 0}</Text>
       },
       wrap: true
     },
@@ -609,7 +618,7 @@ const ProductTable = ({ data, refetch, org }) => {
       {/* UPLOAD SBOM */}
       {isOpenUpload && (
         <UploadModal
-          id={activeRow?.defaultProject?.id}
+          projects={activeRow?.projects}
           isOpen={isOpenUpload}
           onClose={onCloseUpload}
         />
