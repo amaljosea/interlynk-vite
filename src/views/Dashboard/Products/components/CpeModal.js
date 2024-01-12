@@ -85,23 +85,38 @@ const CpeModal = ({
   useEffect(() => {
     const matches = regexPattern.test(cpeValue)
     if (cpeValue.length > 0 && isCpeValid) {
-      prodCompDispatch({ type: 'SET_CPE_STRING', payload: cpeValue })
       const components = cpeValue.split(':')
-      setType(components[2].toLowerCase())
-      setVendor(components[3] === '*' ? '' : components[3])
-      setProduct(components[4] === '*' ? '' : components[4])
-      setVersion(components[5] === '*' ? '' : components[5])
-      setUpdate(components[6] === '*' ? '' : components[6])
-      setEdition(components[7] === '*' ? '' : components[7])
-      setLanguage(components[8] === '*' ? '' : components[8])
-      setSwEdition(components[9] === '*' ? '' : components[9])
-      setTargetSoftware(components[10] === '*' ? '' : components[10])
-      setHardware(components[11] === '*' ? '' : components[11])
-      setOther(components[12] === '*' ? '' : components[12])
+      const allowedValues = ['a', 'h', 'o', 'A', 'H', 'O']
+      const isValid = components[2] && allowedValues.includes(components[2].toLowerCase())
+      if(isValid) {
+        setType( components[2].toLowerCase())
+      } else {
+        setType('')
+      }
+      setVendor(components[3]?.replace(/\*/g, '') || '')
+      setProduct(components[4]?.replace(/\*/g, '') || '')
+      setVersion(components[5]?.replace(/\*/g, '') || '')
+      setUpdate(components[6]?.replace(/\*/g, '') || '')
+      setEdition(components[7]?.replace(/\*/g, '') || '')
+      setLanguage(components[8]?.replace(/\*/g, '') || '')
+      setSwEdition(components[9]?.replace(/\*/g, '') || '')
+      setTargetSoftware(components[10]?.replace(/\*/g, '') || '')
+      setHardware(components[11]?.replace(/\*/g, '') || '')
+      setOther(components[12]?.replace(/\*/g, '') || '')
+      prodCompDispatch({
+        type: 'SET_CPE_STRING',
+        payload: `cpe:2.3:${isValid ? components[2].toLowerCase() : '*'}:${components[3] || '*'}:${
+          components[4] || '*'
+        }:${components[5] || '*'}:${components[6] || '*'}:${
+          components[7] || '*'
+        }:${components[8] || '*'}:${components[9] || '*'}:${
+          components[10] || '*'
+        }:${components[11] || '*'}:${components[12] || '*'}`
+      })
     } else {
       prodCompDispatch({
         type: 'SET_CPE_STRING',
-        payload: 'cpe:2.3:*:*:*:*:*:*:*:*:*:*:'
+        payload: 'cpe:2.3:*:*:*:*:*:*:*:*:*:*:*'
       })
     }
   }, [cpeValue])
@@ -218,7 +233,6 @@ const CpeModal = ({
     if (val.includes('*')) {
       return
     }
-
     setVendor(val)
     if (val !== '') {
       getCpe({
