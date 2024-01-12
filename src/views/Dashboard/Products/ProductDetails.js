@@ -424,7 +424,7 @@ const ProductDetails = () => {
                     {activeEnv
                       ? activeGroup?.projects?.find(
                           (item) => item.id === activeEnv
-                        ).name
+                        )?.name
                       : ''}
                   </MenuButton>
                   <MenuList>

@@ -45,8 +45,8 @@ const EnvironmentDrawer = ({ data, isOpen, onClose, refetch }) => {
     return (
       <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
         <Stack direction={'row'} spacing={2} alignItems={'center'}>
-          {/* ADD PRODUCT */}
-          <Tooltip label='Add Product' placement='left'>
+          {/* ADD ENV */}
+          <Tooltip label='Add Environment' placement='left'>
             <IconButton
               icon={<AddIcon />}
               colorScheme='blue'

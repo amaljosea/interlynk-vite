@@ -53,7 +53,7 @@ const EnvModal = ({ groupId, isOpen, onClose, refetch }) => {
         <ModalOverlay />
         <form onSubmit={handleSave}>
           <ModalContent>
-            <ModalHeader>Add Product</ModalHeader>
+            <ModalHeader>Add Environment</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               <Flex width={'100%'} direction={'column'} gap={4}>
