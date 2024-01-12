@@ -123,7 +123,7 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
               </HStack>
             </Link>
           )}
-          <Stack direction={'row'} spacing={2} alignItems={'center'}>
+          <Stack direction={'row'} alignItems={'center'} wrap={'wrap'}>
             <Text fontWeight={'semibold'} fontSize={25}>
               {project?.name} : {primaryComponent?.version}
             </Text>
@@ -144,8 +144,12 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
         </Text>
         {/* SCAN STATUS */}
         <Flex flexDir='row' gap={2} alignItems={'center'} width='100%' my={2}>
-          <Tooltip label='Imported' >
-            <DownloadIcon color={'blue.500'} />
+          <Tooltip label='Imported'>
+            <IconButton
+              size='xs'
+              colorScheme={'blue'}
+              icon={<DownloadIcon />}
+            />
           </Tooltip>
           <Tooltip label='SBOM Checks'>
             <IconButton
@@ -158,13 +162,18 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
               icon={<Search2Icon />}
             />
           </Tooltip>
-          <Tooltip label='Vulnerability Scan' placement='top'>
-            <Icon as={FaBug}
-              color={vulnRunStatus === 'FINISHED' ? 'blue.500' : 'gray.400'}
+          <Tooltip label='Vulnerability Scan'>
+            <IconButton
+              size='xs'
+              colorScheme={vulnRunStatus === 'FINISHED' ? 'blue' : 'blackAlpha'}
+              icon={<FaBug />}
             />
           </Tooltip>
-          <Tooltip label='Ready' placement='top'>
-            <Icon as={FaCircleCheck} color={vulnRunStatus === 'FINISHED' ? 'blue.500' : 'gray.400'}
+          <Tooltip label='Ready'>
+            <IconButton
+              size='xs'
+              colorScheme={vulnRunStatus === 'FINISHED' ? 'blue' : 'blackAlpha'}
+              icon={<FaCircleCheck />}
             />
           </Tooltip>
           {vulnRunStatus === 'IN_PROGRESS' && (
