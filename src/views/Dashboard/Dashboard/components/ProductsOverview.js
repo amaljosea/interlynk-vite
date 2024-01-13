@@ -190,7 +190,7 @@ const ProductsOverview = ({ title, captions, data }) => {
                       <Td fontSize={'sm'} pl={1}>
                         <Stack spacing={1} direction={'row'}>
                           <Link
-                            to={`/vendor/products/${item?.project?.name}?id=${item?.projectId}&sbom=${item?.id}`}
+                            to={`/vendor/products/${item?.project?.projectGroup?.name}?id=${item?.projectId}&sbom=${item?.id}`}
                             onClick={() =>
                               onFilterSev(item?.id, item?.primaryComponent, [
                                 'critical'
@@ -202,7 +202,7 @@ const ProductsOverview = ({ title, captions, data }) => {
                             </VulnBadge>
                           </Link>
                           <Link
-                            to={`/vendor/products/${item?.project?.name}?id=${item?.projectId}&sbom=${item?.id}`}
+                            to={`/vendor/products/${item?.project?.projectGroup?.name}?id=${item?.projectId}&sbom=${item?.id}`}
                             onClick={() =>
                               onFilterSev(item?.id, item?.primaryComponent, [
                                 'high'
@@ -214,7 +214,7 @@ const ProductsOverview = ({ title, captions, data }) => {
                             </VulnBadge>
                           </Link>
                           <Link
-                            to={`/vendor/products/${item?.project?.name}?id=${item?.projectId}&sbom=${item?.id}`}
+                            to={`/vendor/products/${item?.project?.projectGroup?.name}?id=${item?.projectId}&sbom=${item?.id}`}
                             onClick={() =>
                               onFilterSev(item?.id, item?.primaryComponent, [
                                 'medium'
@@ -226,7 +226,7 @@ const ProductsOverview = ({ title, captions, data }) => {
                             </VulnBadge>
                           </Link>
                           <Link
-                            to={`/vendor/products/${item?.project?.name}?id=${item?.projectId}&sbom=${item?.id}`}
+                            to={`/vendor/products/${item?.project?.projectGroup?.name}?id=${item?.projectId}&sbom=${item?.id}`}
                             onClick={() =>
                               onFilterSev(item?.id, item?.primaryComponent, [
                                 'low'
