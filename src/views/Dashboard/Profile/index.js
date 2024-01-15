@@ -306,7 +306,7 @@ function Profile() {
           )}
         </Flex>
       ) : (
-        <Flex mt={20}>
+        <Flex pr={2} pl={5} pt={{ base: '120px', md: '75px' }}>
           <Card>
             <CustomLoader />
           </Card>
