@@ -273,7 +273,7 @@ const ProductDetails = () => {
         }
       })
     }
-  }, [activeTab])
+  }, [activeTab, activeEnv])
 
   if (loading) {
     return (
