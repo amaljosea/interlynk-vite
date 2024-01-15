@@ -66,6 +66,11 @@ const OrgModal = ({ isOpen, onClose, refetch, org, onSwitch }) => {
     })
   }
 
+  const isInvalid =
+    name === '' ||
+    (email !== '' && emailError !== '') ||
+    (url !== '' && !validateUrl(url))
+
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
@@ -137,7 +142,7 @@ const OrgModal = ({ isOpen, onClose, refetch, org, onSwitch }) => {
           </Button>
           <Button
             colorScheme='blue'
-            disabled={name === '' || emailError !== ''}
+            disabled={isInvalid}
             onClick={handleCreate}
           >
             Save
