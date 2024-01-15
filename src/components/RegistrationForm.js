@@ -33,7 +33,7 @@ const RegistrationForm = () => {
   const emailId = queryParams.get('id')
 
   const [name, setName] = useState('')
-  const [email, setEmail] = useState(emailId || '')
+  const [email, setEmail] = useState(emailId?.replace(/\s+/g, '+') || '')
   const [emailError, setEmailError] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [password, setPassword] = useState('')

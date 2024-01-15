@@ -126,7 +126,7 @@ const TeamModal = ({ isOpen, onClose, refetch, data }) => {
           <Button
             variant='solid'
             colorScheme='blue'
-            disabled={!validateEmail(email)}
+            disabled={!validateEmail(email) || role === ''}
             onClick={handleAdd}
           >
             Add

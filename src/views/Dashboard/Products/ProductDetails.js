@@ -273,7 +273,7 @@ const ProductDetails = () => {
         }
       })
     }
-  }, [activeTab])
+  }, [activeTab, activeEnv])
 
   if (loading) {
     return (
@@ -428,7 +428,7 @@ const ProductDetails = () => {
                       ? activeGroup?.projects?.find(
                           (item) => item.id === activeEnv
                         )?.name
-                      : ''}
+                      : 'Default'}
                   </MenuButton>
                   <MenuList>
                     <MenuOptionGroup
@@ -645,6 +645,7 @@ const ProductDetails = () => {
             onClose={onEnvClose}
             data={activeGroup}
             refetch={refetch}
+            activeEnv={activeEnv}
           />
         )}
       </>

@@ -22,8 +22,12 @@ import { useMemo } from 'react'
 import EnvModal from 'views/Dashboard/Products/components/EnvModal'
 import { useMutation } from '@apollo/client'
 import { EnvDelete } from 'graphQL/Mutation'
+import { useGlobalState } from 'hooks/useGlobalState'
 
-const EnvironmentDrawer = ({ data, isOpen, onClose, refetch }) => {
+const EnvironmentDrawer = ({ data, isOpen, onClose, refetch, activeEnv }) => {
+  const { totalRows, prodState } = useGlobalState()
+  const { field, direction } = prodState
+
   const {
     isOpen: isProdOpen,
     onOpen: onProdOpen,
@@ -37,7 +41,15 @@ const EnvironmentDrawer = ({ data, isOpen, onClose, refetch }) => {
       variables: {
         id
       }
-    }).then((res) => res.data && refetch({ id: data?.id }))
+    }).then(
+      (res) =>
+        res.data &&
+        refetch({
+          first: totalRows,
+          field: field,
+          direction: direction
+        })
+    )
   }
 
   // TABLE HEADER
@@ -67,7 +79,7 @@ const EnvironmentDrawer = ({ data, isOpen, onClose, refetch }) => {
     {
       id: 'NAME',
       name: 'NAME',
-      selector: (row) => <Text textTransform={'capitalize'}>{row?.name}</Text>,
+      selector: (row) => <Text>{row?.name}</Text>,
       wrap: true
     },
     // VERSION
@@ -98,6 +110,7 @@ const EnvironmentDrawer = ({ data, isOpen, onClose, refetch }) => {
           icon={<DeleteIcon />}
           colorScheme='red'
           variant='solid'
+          isDisabled={row?.name === 'default' || row?.id === activeEnv}
           onClick={() => handleDelete(row?.id)}
         />
       ),

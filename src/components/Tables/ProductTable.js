@@ -375,7 +375,7 @@ const ProductTable = ({ data, refetch, org }) => {
         const { description } = row
         return (
           <Text>
-            {description.length > 50
+            {description?.length > 50
               ? description.substring(0, 50) + '....'
               : description}
           </Text>

@@ -22,12 +22,9 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 const EnvModal = ({ groupId, isOpen, onClose, refetch }) => {
-  const navigate = useNavigate()
-
   const [projectCreate] = useMutation(EnvCreate)
 
   const [productName, setProductName] = useState('')
-  const [productDesc, setProductDesc] = useState('')
 
   const [error, setError] = useState('')
 
@@ -37,7 +34,6 @@ const EnvModal = ({ groupId, isOpen, onClose, refetch }) => {
       variables: {
         groupId,
         name: productName,
-        desc: productDesc,
         enabled: true
       }
     })
@@ -45,7 +41,7 @@ const EnvModal = ({ groupId, isOpen, onClose, refetch }) => {
       .finally(() => onClose())
   }
 
-  const isInvalid = productName === '' || productDesc === '' || error !== ''
+  const isInvalid = productName === '' || error !== ''
 
   return (
     <>
@@ -72,16 +68,6 @@ const EnvModal = ({ groupId, isOpen, onClose, refetch }) => {
                       setProductName(e.target.value)
                       setError('')
                     }}
-                    placeholder={`Add product  name`}
-                  />
-                </FormControl>
-                <FormControl isRequired>
-                  <FormLabel>Description</FormLabel>
-                  <Textarea
-                    value={productDesc || ''}
-                    onChange={(e) => setProductDesc(e.target.value)}
-                    placeholder={`Add product description`}
-                    rows={5}
                   />
                 </FormControl>
               </Flex>

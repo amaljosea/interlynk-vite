@@ -1,5 +1,11 @@
 // Chakra imports
-import { Flex, Grid, SimpleGrid, useColorModeValue } from '@chakra-ui/react'
+import {
+  Flex,
+  Grid,
+  SimpleGrid,
+  Skeleton,
+  useColorModeValue
+} from '@chakra-ui/react'
 import BarChart from 'components/Charts/BarChart'
 import LineChart from 'components/Charts/LineChart'
 import { FaLayerGroup, FaBug, FaCube, FaWindowMaximize } from 'react-icons/fa'
@@ -18,6 +24,8 @@ import { useLocation } from 'react-router-dom'
 import { displayErrorMessage } from 'utils'
 import { Text } from '@chakra-ui/react'
 import { WarningTwoIcon } from '@chakra-ui/icons'
+import CustomLoader from 'components/CustomLoader'
+import Card from 'components/Card/Card'
 
 export default function Dashboard() {
   const location = useLocation()
@@ -29,7 +37,7 @@ export default function Dashboard() {
 
   const iconBoxInside = useColorModeValue('white', 'white')
 
-  const { data, error: eOrg } = useQuery(GetOrg)
+  const { data, error: eOrg, loading } = useQuery(GetOrg)
 
   useEffect(() => {
     if (data) {
@@ -70,6 +78,40 @@ export default function Dashboard() {
             eOrgMetric.message
           )}
         </Text>
+      </Flex>
+    )
+  }
+
+  if (loading) {
+    return (
+      <Flex
+        flexDirection='column'
+        pt={{ base: '120px', md: '74px' }}
+        gap={12}
+        pr={2}
+        pl={5}
+      >
+        <SimpleGrid columns={{ sm: 1, md: 2, xl: 4 }} spacing='24px'>
+          {[1, 2, 3, 4].map((_, index) => (
+            <Card key={index}>
+              <Flex width={'100%'} gap={3} direction={'column'} mt={1}>
+                <Skeleton width={'100%'} height='20px' />
+                <Skeleton width={'100%'} height='20px' />
+              </Flex>
+            </Card>
+          ))}
+        </SimpleGrid>
+        <Grid
+          templateColumns={{ sm: '1fr', md: '1fr 1fr', lg: '2fr 1fr' }}
+          templateRows={{ sm: '1fr auto', md: '1fr', lg: '1fr' }}
+          gap='24px'
+        >
+          {[1, 2].map((_, index) => (
+            <Card key={index}>
+              <CustomLoader />
+            </Card>
+          ))}
+        </Grid>
       </Flex>
     )
   }

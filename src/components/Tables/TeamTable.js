@@ -217,6 +217,7 @@ const TeamTable = ({ data, refetch }) => {
               <MenuList size='sm'>
                 {editUserRoles && (
                   <MenuItem
+                    isDisabled={row.email === data.currentUser.email}
                     onClick={() => {
                       console.log('row', row)
                       setActiveRow(row)
