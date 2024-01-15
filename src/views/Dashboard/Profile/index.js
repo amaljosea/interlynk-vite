@@ -1,9 +1,7 @@
 // Chakra imports
 import {
-  Button,
   Flex,
   Grid,
-  Heading,
   Tab,
   TabList,
   TabPanel,
@@ -34,12 +32,14 @@ import { GetRoles } from 'graphQL/Queries'
 import RoleTable from 'components/Tables/RoleTable'
 import { AllOrganizations } from 'graphQL/Queries'
 import CustomLoader from 'components/CustomLoader'
+import { useGlobalState } from 'hooks/useGlobalState'
 
 function Profile() {
   const location = useLocation()
   const navigate = useNavigate()
   const queryParams = new URLSearchParams(location.search)
   const activetab = queryParams.get('tab')
+  const { totalRows } = useGlobalState()
 
   const tabs = [
     {
@@ -58,14 +58,16 @@ function Profile() {
 
   const { data: orgInfo, refetch, error } = useQuery(GetOrg)
 
-  const [getMyOrgs, { data: orgs }] = useLazyQuery(MyOrganizations, {
-    fetchPolicy: 'network-only'
+  const { data: orgs, refetch: myOrgRefetch } = useQuery(MyOrganizations, {
+    variables: { invitationStatuses: ['ACCEPTED', 'INVITED'] }
   })
-  const [getAllOrgs, { data: allOrgs }] = useLazyQuery(AllOrganizations, {
-    fetchPolicy: 'network-only'
+  const { data: allOrgs, refetch: allOrgRefetch } = useQuery(AllOrganizations, {
+    variables: { first: totalRows, status: 'approved' }
   })
 
   const [getOrgRoles, { data: roles }] = useLazyQuery(GetRoles)
+
+  const isAdmin = orgInfo?.organization?.currentUser?.superAdmin
 
   const onTabChange = (value) => {
     setTabIndex(value)
@@ -102,15 +104,6 @@ function Profile() {
     } else if (activetab === 'organization') {
       setSelectedTab('PERSONAL')
       setPsIndex(1)
-      if (orgInfo?.organization?.currentUser?.role?.name === 'super_admin') {
-        getAllOrgs({
-          variables: { status: 'approved' }
-        })
-      } else {
-        getMyOrgs({
-          variables: { invitationStatuses: ['ACCEPTED', 'INVITED'] }
-        })
-      }
     } else if (activetab === 'token') {
       setSelectedTab('PERSONAL')
       setPsIndex(2)
@@ -134,7 +127,7 @@ function Profile() {
       setSelectedTab('ORGANIZATION')
       setTabIndex(5)
     }
-  }, [activetab])
+  }, [activetab, isAdmin])
 
   if (error) {
     return (
@@ -286,17 +279,16 @@ function Profile() {
                   </TabPanel>
                   {/* ORG DETAILS */}
                   <TabPanel>
-                    {orgInfo?.organization?.currentUser?.role?.name ===
-                    'super_admin' ? (
+                    {isAdmin ? (
                       <OrgTable
                         data={allOrgs?.allOrganizations?.nodes || []}
-                        refetch={getAllOrgs}
+                        refetch={allOrgRefetch}
                         activeOrg={orgInfo?.organization?.id || null}
                       />
                     ) : (
                       <OrgTable
                         data={orgs?.myOrganizations?.nodes || []}
-                        refetch={getMyOrgs}
+                        refetch={myOrgRefetch}
                         activeOrg={orgInfo?.organization?.id || null}
                       />
                     )}

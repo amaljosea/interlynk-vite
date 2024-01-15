@@ -13,6 +13,7 @@ export const GetOrg = gql`
         id
         name
         email
+        superAdmin
         unconfirmedEmail
         profileImage {
           filename
@@ -228,7 +229,7 @@ export const AllOrganizations = gql`
       last: $last
       after: $after
       before: $before
-      invitationStatuses: $status
+      status: $status
     ) {
       nodes {
         id
@@ -236,7 +237,6 @@ export const AllOrganizations = gql`
         email
         status
         updatedAt
-        invitationStatus
         url
       }
     }
