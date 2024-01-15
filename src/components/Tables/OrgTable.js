@@ -24,7 +24,11 @@ import {
   MenuList,
   Portal,
   MenuItem,
-  Badge
+  Badge,
+  Box,
+  Alert,
+  AlertIcon,
+  AlertDescription
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
 import { customStyles, timeSince, getFullDateAndTime } from 'utils'
@@ -44,6 +48,7 @@ import { useNavigate } from 'react-router-dom'
 const OrgTable = ({ data, refetch, activeOrg }) => {
   const navigate = useNavigate()
   const toast = useToast()
+  const [leaveError, setLeaveError] = useState('')
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const {
@@ -91,12 +96,7 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
       }
     }).then((res) => {
       if (res?.data?.organizationUserLeave?.errors?.length > 0) {
-        toast({
-          description: res.data.organizationUserLeave.errors[0],
-          position: 'top',
-          status: 'error',
-          duration: 2000
-        })
+        setLeaveError(res?.data?.organizationUserLeave?.errors[0])
       } else {
         if (data?.length === 1) {
           localStorage.removeItem('username')
@@ -265,7 +265,7 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
       id: 'ACTION',
       name: 'ACTION',
       selector: (row) => {
-        const { id, invitationStatus } = row
+        const { id, invitationStatus, superAdmin } = row
         return (
           <Menu>
             <MenuButton
@@ -287,8 +287,10 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
                     <MenuItem onClick={() => onSwitch(row)}>Switch To</MenuItem>
                   )}
                   <MenuItem
+                    isDisabled={superAdmin}
                     onClick={() => {
                       setActiveRow(row)
+                      setLeaveError('')
                       onLeaveOpen()
                     }}
                   >
@@ -368,6 +370,16 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
             <ModalHeader>Leave Organization</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
+              {leaveError !== '' && (
+                <Box mb={5} width={'100%'}>
+                  <Alert status='error' borderRadius={4}>
+                    <AlertIcon />
+                    <AlertDescription fontSize={'sm'}>
+                      {leaveError}
+                    </AlertDescription>
+                  </Alert>
+                </Box>
+              )}
               <Text>
                 You are about to leave Organization:{' '}
                 <strong>{activeRow.name}</strong>
