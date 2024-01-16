@@ -619,9 +619,10 @@ export const removeDuplicates = (arr) => {
 }
 
 export const validateCpe = (value) => {
-  const cpeRegex =
-    /^cpe:2\.3:[aho\*\­](:(((\?*|\*?)([a­zA­Z0­9\­\._]|(\\[\\\*\?!"#$$%&'\(\)\+,/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\­])){5}(:(([a­zA­Z]{2,3}(­([a­zA­Z]{2}|[0­9]{3}))?)|[\*\­]))(:(((\?*|\*?)([a­zA­Z0­9\­\._]|(\\[\\\*\?!"#$$%&'\(\)\+,/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\­])){4}$/
-  return cpeRegex.test(value)
+  // Modified from https://csrc.nist.gov/schema/cpe/2.3/cpe-naming_2.3.xsd to support empty fields
+  const regexPattern =
+  /cpe:2\.3:[aho\*\-](:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])?){5}(:(([a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))?)|[\*\-])?)(:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])?){4}/
+  return regexPattern.test(value)
 }
 
 export const validateUrl = (url) => {
