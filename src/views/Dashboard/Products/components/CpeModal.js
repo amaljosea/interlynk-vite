@@ -642,7 +642,7 @@ const CpeModal = ({
                   fontSize={'sm'}
                   colorScheme='blue'
                   onClick={onSaveRule}
-                  disabled={isInvalid}
+                  disabled={!validateCpe(cpeString)}
                 >
                   Save Rule
                 </Button>
@@ -658,7 +658,7 @@ const CpeModal = ({
                   variant='solid'
                   colorScheme={'blue'}
                   onClick={checkId ? handleComUpdate : handleSave}
-                  disabled={isInvalid}
+                  disabled={!validateCpe(cpeString)}
                 >
                   Save
                 </Button>
