@@ -71,12 +71,12 @@ const SbomList = ({ isOpen, onClose, data, sboms }) => {
                     return dateB - dateA
                   })
                   .map((item, index) => {
-                    const { creationAt, stats, lifecycle, updatedAt } = item
+                    const { createdAt, stats, lifecycle, updatedAt } = item
                     return (
                       <Tr key={index}>
                         <Td px={0} fontSize={'sm'}>
                           <Stack direction={'row'}>
-                            <Text> {getFullDateAndTime(creationAt)}</Text>
+                            <Text> {getFullDateAndTime(createdAt)}</Text>
                             {index === 0 && (
                               <Tag
                                 size='sm'

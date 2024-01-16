@@ -775,6 +775,7 @@ export const GetProductVersions = gql`
         creationAt
         updatedAt
         lifecycle
+        createdAt
         primaryComponent {
           id
           name
