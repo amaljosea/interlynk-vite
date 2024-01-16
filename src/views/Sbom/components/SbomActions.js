@@ -2,7 +2,6 @@ import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 import {
   Flex,
   IconButton,
-  Select,
   Tooltip,
   useDisclosure,
   Modal,
@@ -20,7 +19,6 @@ import {
   Spinner
 } from '@chakra-ui/react'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { BsBoxFill } from 'react-icons/bs'
 import { FaFileDownload, FaLayerGroup } from 'react-icons/fa'
 import { TbSignature, TbSignatureOff } from 'react-icons/tb'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
@@ -37,7 +35,7 @@ import { sbomDelete } from 'graphQL/Mutation'
 import DownloadModal from './DownloadModal'
 
 const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
-  const { setActiveSbomTab, dispatch, prodCompState, userPermissons } =
+  const { totalRows, setActiveSbomTab, dispatch, prodCompState, userPermissons } =
     useGlobalState()
   const {
     field,
