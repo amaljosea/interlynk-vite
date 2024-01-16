@@ -87,6 +87,7 @@ const ProductDetails = () => {
     userPermissons
   } = useGlobalState()
   const { field, direction } = prodLogState
+  const { enabled } = prodState
   const { prodVulnDispatch } = dispatch
 
   const activeProd = localStorage.getItem('activeEnv')
@@ -101,12 +102,7 @@ const ProductDetails = () => {
   const { data, refetch, loading, error } = useQuery(GetProjectGroups, {
     variables: {
       first: totalRows,
-      enabled:
-        prodState.enabled === 'yes'
-          ? true
-          : enabled === 'no'
-            ? false
-            : undefined,
+      enabled: enabled === 'yes' ? true : enabled === 'no' ? false : undefined,
       field: prodState.field,
       direction: prodState.direction
     },

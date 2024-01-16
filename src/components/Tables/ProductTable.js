@@ -145,8 +145,8 @@ const ProductTable = ({ data, refetch, org }) => {
   const toggleStatus = async () => {
     await projectGroupUpdate({
       variables: {
-        id: activeRow.id,
-        enabled: activeRow.enabled === true ? false : true
+        id: activeRow?.id,
+        enabled: activeRow?.enabled === true ? false : true
       }
     })
       .then(
