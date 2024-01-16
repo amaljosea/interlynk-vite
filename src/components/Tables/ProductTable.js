@@ -656,7 +656,7 @@ const ProductTable = ({ data, refetch, org }) => {
         <ProductSbomDrawer
           isOpen={isSbomOpen}
           onClose={onSbomClose}
-          data={activeRow}
+          data={activeRow?.projects}
           refetch={refetch}
         />
       )}

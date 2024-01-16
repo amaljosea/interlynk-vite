@@ -47,6 +47,7 @@ import SbomList from 'views/Dashboard/Products/components/SbomList'
 import RowLimit from 'views/Sbom/components/RowLimit'
 
 const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
+  console.log('data', data)
   const { totalRows, setTotalRows, setActiveSbomTab, prodVulnState, dispatch } =
     useGlobalState()
   const { field, direction } = prodVulnState
@@ -481,7 +482,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
         <ProductSbomDrawer
           isOpen={isSbomOpen}
           onClose={onSbomClose}
-          data={data}
+          data={data?.projects}
           refetch={refetch}
           productId={productId}
         />
