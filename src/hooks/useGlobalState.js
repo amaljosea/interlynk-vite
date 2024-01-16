@@ -1,5 +1,6 @@
 import React, { useState, createContext, useContext, useReducer } from 'react'
 import {
+  globalVulnReducer,
   prodRulesReducer,
   prodCheckReducer,
   prodCompReducer,
@@ -32,6 +33,13 @@ const GlobalStateProvider = ({ children }) => {
     pageIndex: 1,
     enabled: 'yes',
     currentProduct: null
+  })
+  // GLOBAL VULNERABILITIES
+  const [globalVulnState, globalVulnDispatch] = useReducer(globalVulnReducer, {
+    field: 'GLOBAL_VULNS_UPDATED_AT',
+    direction: 'DESC',
+    searchInput: '',
+    pageIndex: 1
   })
   const [prodRulesState, prodRulesDispatch] = useReducer(prodRulesReducer, {
     field: 'AUTO_CHECKS_UPDATED_AT',
@@ -143,6 +151,7 @@ const GlobalStateProvider = ({ children }) => {
         setScanEnabled,
         userName,
         setUserName,
+        globalVulnState,
         prodState,
         prodLogState,
         prodCompState,
@@ -152,6 +161,7 @@ const GlobalStateProvider = ({ children }) => {
         sbomLogState,
         sbomState,
         dispatch: {
+          globalVulnDispatch,
           prodDispatch,
           prodLogDispatch,
           prodCompDispatch,

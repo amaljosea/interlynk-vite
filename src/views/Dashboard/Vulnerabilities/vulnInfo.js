@@ -17,7 +17,7 @@ import {
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
-import { FaBalanceScale, FaCube, FaCubes, FaBug } from 'react-icons/fa'
+import { FaCube, FaCubes, FaBug } from 'react-icons/fa'
 import { useLocation } from 'react-router-dom'
 import { timeSince, getFullDateAndTime } from 'utils'
 import VulnProdTable from './components/ProdTable'
@@ -27,11 +27,11 @@ const VulnInfo = ({ data }) => {
   const queryParams = new URLSearchParams(location.search)
   const vulnId = queryParams.get('id')
 
-  const vulnData = data.find((item) => item.id === vulnId)
+  const vulnData = data ? data.nodes?.find((item) => item.id === vulnId) : null
 
   const prodData = [
     {
-      id: '35004de9-4cb8-437e-a026-a23e87c15a53',
+      id: 0,
       product: {
         name: 'dropwizard-core',
         version: '2.3.5'
@@ -46,7 +46,7 @@ const VulnInfo = ({ data }) => {
       vexJustification: null
     },
     {
-      id: '35004de9-4cb8-437e-a026-a23e87c15a53',
+      id: 1,
       product: {
         name: 'dropwizard-core',
         version: '2.3.4'
@@ -61,7 +61,7 @@ const VulnInfo = ({ data }) => {
       vexJustification: null
     },
     {
-      id: '35004de9-4cb8-437e-a026-a23e87c15a53',
+      id: 2,
       product: {
         name: 'dropwizard-core',
         version: '2.3.3'
@@ -76,7 +76,7 @@ const VulnInfo = ({ data }) => {
       vexJustification: null
     },
     {
-      id: '05d93b5e-3164-4661-859f-6296f2567260',
+      id: 3,
       product: {
         name: 'purl-mapper',
         version: '1.3.2'
@@ -91,7 +91,7 @@ const VulnInfo = ({ data }) => {
       vexJustification: null
     },
     {
-      id: '06c5eb02-75ad-4055-894d-dccc80d165af',
+      id: 4,
       product: {
         name: 'lynk-api',
         version: '0.3.4'
@@ -104,7 +104,7 @@ const VulnInfo = ({ data }) => {
       vexJustification: null
     },
     {
-      id: '06c5eb02-75ad-4055-894d-dccc80d165af',
+      id: 5,
       product: {
         name: 'lynk-api',
         version: '0.3.3'
@@ -117,7 +117,7 @@ const VulnInfo = ({ data }) => {
       vexJustification: null
     },
     {
-      id: 'b134e43d-31b8-4fee-95cf-7a7b320a2ddf',
+      id: 6,
       product: {
         name: 'sbomex',
         version: '0.11.0'
@@ -130,7 +130,7 @@ const VulnInfo = ({ data }) => {
       vexJustification: null
     },
     {
-      id: 'b134e43d-31b8-4fee-95cf-7a7b320a2ddf',
+      id: 7,
       product: {
         name: 'sbomex',
         version: '0.10.0'
@@ -147,7 +147,7 @@ const VulnInfo = ({ data }) => {
   return (
     <Flex direction='column' pt={{ base: '120px', md: '74px' }} pr={2} pl={5}>
       {/* Product Info */}
-      {vulnId && (
+      {vulnData && (
         <Card mb='6'>
           <CardBody>
             <Grid
@@ -168,18 +168,20 @@ const VulnInfo = ({ data }) => {
                   <Flex direction={'column'} gap={0.5}>
                     {/* PRODUCT TITLE */}
                     <Text fontWeight={'semibold'} fontSize={18}>
-                      {vulnData.vuln.vulnId}
+                      {vulnData.id}
                     </Text>
 
                     <Text fontSize={'sm'} my={0.5}>
-                    H2 Console in versions since 1.1.100 (2008-10-14) to 2.0.204 (2021-12-21) inclusive allows loading of custom classes from remote servers through JNDI.
+                      H2 Console in versions since 1.1.100 (2008-10-14) to
+                      2.0.204 (2021-12-21) inclusive allows loading of custom
+                      classes from remote servers through JNDI.
                     </Text>
                     <Tooltip
                       placement='top'
-                      label={getFullDateAndTime(vulnData.vuln.updatedAt)}
+                      label={getFullDateAndTime(vulnData.updatedAt)}
                     >
                       <Text fontSize='xs' cursor={'pointer'} my={1.5}>
-                        Updated {timeSince(vulnData.vuln.updatedAt)}
+                        Updated {timeSince(vulnData.updatedAt)}
                       </Text>
                     </Tooltip>
                     {/* --------------- STATS ------------------- */}
@@ -198,7 +200,7 @@ const VulnInfo = ({ data }) => {
                             fontWeight={'medium'}
                             bg={'none'}
                           >
-                            {vulnData.vuln.prods}
+                            {/* {vulnData.prods} */} 0
                           </Badge>
                           <Text fontSize={'xs'}>Products</Text>
                         </Box>
@@ -217,7 +219,7 @@ const VulnInfo = ({ data }) => {
                             fontWeight={'medium'}
                             bg={'none'}
                           >
-                            {vulnData.vuln.resolved}
+                            {/* {vulnData.vuln.resolved} */} 0
                           </Badge>
                           <Text fontSize={'xs'}>Components</Text>
                         </Box>
@@ -240,7 +242,7 @@ const VulnInfo = ({ data }) => {
                                 borderRadius='md'
                                 cursor={'pointer'}
                               >
-                                {vulnData.vuln.cvssScore}
+                                {vulnData.cvssScore}
                               </Badge>
                             </Tooltip>
                             <Tooltip label='EPSS' placement='top'>
@@ -252,7 +254,7 @@ const VulnInfo = ({ data }) => {
                                 borderRadius='md'
                                 cursor={'pointer'}
                               >
-                                {Math.ceil(vulnData.vuln.vulnInfo.epssScore * 10000)}
+                                {Math.ceil(vulnData?.vulnInfo?.epssScore * 10000 || 0)}
                               </Badge>
                             </Tooltip>
                             <Tooltip label='KEV' placement='top'>
@@ -264,7 +266,7 @@ const VulnInfo = ({ data }) => {
                                 borderRadius='md'
                                 cursor={'pointer'}
                               >
-                                {vulnData.vuln.vulnInfo.epssScore ? '-' : 'K'}
+                                {vulnData?.vulnInfo?.epssScore ? '-' : 'K'}
                               </Badge>
                             </Tooltip>
                           </Stack>

@@ -49,14 +49,13 @@ export const dashRoutes = [
     component: Products,
     layout: '/vendor'
   },
-  /// TODO: 1.0 Add back in when ready
-  // {
-  //   path: '/vulnerabilities',
-  //   name: 'Vulnerabilities',
-  //   icon: <FaBug color='inherit' />,
-  //   component: Vulnerabilities,
-  //   layout: '/vendor'
-  // },
+  {
+    path: '/vulnerabilities',
+    name: 'Vulnerabilities',
+    icon: <FaBug color='inherit' />,
+    component: Vulnerabilities,
+    layout: '/vendor'
+  },
   // {
   //   path: '/licenses',
   //   name: 'Licenses',
