@@ -36,7 +36,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
   const currentProduct = JSON.parse(localStorage.getItem(`product`))
   const { data: res } = useQuery(GetCdxResponses)
 
-  const { totalRows, setActiveSbomTab, prodVulnState, dispatch } =
+  const { totalRows, userPermissons, prodVulnState, dispatch } =
     useGlobalState()
   const {
     field,
@@ -49,6 +49,12 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
     epss
   } = prodVulnState
   const { prodVulnDispatch } = dispatch
+
+  const sboms = userPermissons?.find((item) => item.key === 'view_sbom')
+  const editVulns = sboms?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'edit_vulnerabilities' && permission.value === true
+  )
 
   const { id, componentVulnLogs } = data
 
@@ -402,7 +408,8 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
                   responseTitle === '' &&
                   actionStatement === '') ||
                 (responseTitle !== '' && actionStatement === '') ||
-                (responseTitle === 'update' && selectedTag === '')
+                (responseTitle === 'update' && selectedTag === '') ||
+                !editVulns
               }
             >
               Add

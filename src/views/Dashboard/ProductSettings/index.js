@@ -22,12 +22,19 @@ import {
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
 import { ProjectSettingUpdate } from 'graphQL/Mutation'
+import { useGlobalState } from 'hooks/useGlobalState'
 import { useState, useEffect } from 'react'
 
-const Settings = ({ projectId, data, refetch }) => {
-
+const Settings = ({ enabled, data, refetch }) => {
+  const { userPermissons } = useGlobalState()
   const [dataRetentionDays, setDataRetentionDays] = useState(0)
   const [projectSettingId, setProjectSettingId] = useState(null)
+
+  const product = userPermissons?.find((item) => item.key === 'view_product')
+  const editControls = product?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'edit_product_controls' && permission.value === true
+  )
 
   useEffect(() => {
     if (data) {
@@ -56,7 +63,6 @@ const Settings = ({ projectId, data, refetch }) => {
   } = useDisclosure()
 
   const onUpdate = async (value, id) => {
-
     await updateSettings({
       variables: {
         id: projectSettingId,
@@ -89,6 +95,7 @@ const Settings = ({ projectId, data, refetch }) => {
                   id='vulnScan'
                   isChecked={data?.vulnScanningEnabled}
                   onChange={(e) => onUpdate(e.target.checked, 'vulnScan')}
+                  isDisabled={!enabled || !editControls}
                 />
                 <Text noOfLines={1} color='gray.500' fontWeight='400'>
                   Vulnerability Scan
@@ -103,6 +110,7 @@ const Settings = ({ projectId, data, refetch }) => {
                   id='checks'
                   isChecked={data?.checksEnabled}
                   onChange={(e) => onUpdate(e.target.checked, 'checks')}
+                  isDisabled={!enabled || !editControls}
                 />
                 <Text noOfLines={1} color='gray.500' fontWeight='400'>
                   Checks
@@ -117,6 +125,7 @@ const Settings = ({ projectId, data, refetch }) => {
                   id='automation'
                   isChecked={data?.automatedFixesEnabled}
                   onChange={(e) => onUpdate(e.target.checked, 'automation')}
+                  isDisabled={!enabled || !editControls}
                 />
                 <Text noOfLines={1} color='gray.500' fontWeight='400'>
                   Automation
@@ -131,6 +140,7 @@ const Settings = ({ projectId, data, refetch }) => {
                   id='internalComp'
                   isChecked={data?.internalCompMatchingEnabled}
                   onChange={(e) => onUpdate(e.target.checked, 'internalComp')}
+                  isDisabled={!enabled || !editControls}
                 />
                 <Text noOfLines={1} color='gray.500' fontWeight='400'>
                   Internal Component Labeling
@@ -147,6 +157,7 @@ const Settings = ({ projectId, data, refetch }) => {
                 id='dataRetention'
                 value={dataRetentionDays}
                 onChange={(e) => setDataRetentionDays(e.target.value)}
+                isDisabled={!enabled || !editControls}
               >
                 <option value={30}>30 Days</option>
                 <option value={90}>90 Days</option>
@@ -154,16 +165,18 @@ const Settings = ({ projectId, data, refetch }) => {
                 <option value={0}>Forever</option>
               </Select>
             </FormControl>
-            <Button
-              colorScheme='blue'
-              variant='solid'
-              mt={2}
-              onClick={() =>
-                onUpdate(Number(dataRetentionDays), 'dataRetention')
-              }
-            >
-              Update
-            </Button>
+            {(enabled || editControls) && (
+              <Button
+                colorScheme='blue'
+                variant='solid'
+                mt={2}
+                onClick={() =>
+                  onUpdate(Number(dataRetentionDays), 'dataRetention')
+                }
+              >
+                Update
+              </Button>
+            )}
           </GridItem>
         </Grid>
       </CardBody>

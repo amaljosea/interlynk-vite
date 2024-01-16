@@ -90,6 +90,11 @@ const OrgRegister = () => {
     })
   }
 
+  const isInvalid =
+    name === '' ||
+    (email !== '' && emailError !== '') ||
+    (url !== '' && !validateUrl(url))
+
   return (
     <>
       <Card p={20} alignItems={'center'} justifyContent={'center'} height={64}>
@@ -177,7 +182,7 @@ const OrgRegister = () => {
               </Button>
               <Button
                 colorScheme='blue'
-                disabled={name === '' || emailError !== ''}
+                disabled={isInvalid}
                 onClick={handleCreate}
               >
                 Save

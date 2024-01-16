@@ -2,7 +2,6 @@ import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 import {
   Flex,
   IconButton,
-  Select,
   Tooltip,
   useDisclosure,
   Modal,
@@ -20,7 +19,6 @@ import {
   Spinner
 } from '@chakra-ui/react'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { BsBoxFill } from 'react-icons/bs'
 import { FaFileDownload, FaLayerGroup } from 'react-icons/fa'
 import { TbSignature, TbSignatureOff } from 'react-icons/tb'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
@@ -37,8 +35,13 @@ import { sbomDelete } from 'graphQL/Mutation'
 import DownloadModal from './DownloadModal'
 
 const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
-  const { setActiveSbomTab, dispatch, prodCompState, userPermissons } =
-    useGlobalState()
+  const {
+    totalRows,
+    setActiveSbomTab,
+    dispatch,
+    prodCompState,
+    userPermissons
+  } = useGlobalState()
   const {
     field,
     direction,
@@ -62,6 +65,9 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
   const archiveSboms = sboms?.supersededBy?.some(
     (permission) =>
       permission.key === 'archive_sbom' && permission.value === true
+  )
+  const signSboms = sboms?.supersededBy?.some(
+    (permission) => permission.key === 'sign_sbom' && permission.value === true
   )
 
   const currentProduct = JSON.parse(localStorage.getItem(`product`))
@@ -295,14 +301,14 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
           />
         </Flex>
 
-        {/* EDIT SBOM */}
+        {/* UPDATE PRIMARY COMPONENT */}
         <Tooltip label='Edit'>
           <IconButton
             isDisabled={status === 'signed'}
             colorScheme='blue'
             icon={<EditIcon />}
             onClick={handleEditSbom}
-          ></IconButton>
+          />
         </Tooltip>
 
         {/* SIGNED SBOM */}
@@ -312,7 +318,8 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
               colorScheme='blue'
               icon={<TbSignature size={22} />}
               onClick={setVerifyOpen}
-            ></IconButton>
+              isDisabled={!signSboms}
+            />
           </Tooltip>
         ) : (
           <Tooltip label='Unsigned'>
@@ -320,7 +327,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
               colorScheme='blue'
               icon={<TbSignatureOff size={22} />}
               onClick={setVerifyOpen}
-            ></IconButton>
+            />
           </Tooltip>
         )}
 

@@ -46,7 +46,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
   const customerView = location.pathname.startsWith('/customer')
   const toast = useToast()
 
-  const { totalRows, setTotalRows, prodCheckState, dispatch } = useGlobalState()
+  const { userPermissons, totalRows, setTotalRows, prodCheckState, dispatch } = useGlobalState()
   const {
     field,
     direction,
@@ -61,6 +61,12 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
     before
   } = prodCheckState
   const { prodCompDispatch, prodCheckDispatch } = dispatch
+
+  const sboms = userPermissons?.find((item) => item.key === 'view_sbom')
+  const editChecks = sboms?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'edit_checks' && permission.value === true
+  )
 
   const [purlValue, setPurlValue] = useState('')
   const [purlData, setPurlData] = useState(null)
@@ -664,7 +670,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
                           ? handleSbomUpdate(row)
                           : handleOpen(row)
                     }
-                    disabled={customerView}
+                    disabled={customerView || !editChecks}
                   />
                 </Tooltip>
 
@@ -676,7 +682,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
                     fontWeight='normal'
                     icon={<GoSkip size={18} />}
                     onClick={() => updateIssue(id)}
-                    disabled={customerView}
+                    disabled={customerView || !editChecks}
                   />
                 </Tooltip>
               </Stack>

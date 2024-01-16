@@ -410,6 +410,54 @@ export const GetProjectGroup = gql`
   }
 `
 
+// GET GLOBAL VULNERABILITIES
+export const GetGlobalVulns = gql`
+  query Organization($first: Int, $last: Int, $after: String, $before: String) {
+    organization {
+      vulns(after: $after, first: $first, before: $before, last: $last) {
+        totalCount
+        nodes {
+          cvssScore
+          cvssVector
+          desc
+          id
+          lastModifiedAt
+          nvdAliasId
+          organizationId
+          publishedAt
+          sev
+          source
+          updatedAt
+          vulnId
+          metrics {
+            affectedCount
+            falsePositiveCount
+            fixedCount
+            inTriageCount
+            notAffectedCount
+            unspecifiedCount
+          }
+          vulnInfo {
+            cveId
+            epssPercentile
+            epssScore
+            epssScores
+            id
+            kev
+            updatedAt
+          }
+        }
+        pageInfo {
+          endCursor
+          hasNextPage
+          hasPreviousPage
+          startCursor
+        }
+      }
+    }
+  }
+`
+
 export const GetOrgInfo = gql`
   query GetOrgInfo {
     organization {
@@ -775,6 +823,7 @@ export const GetProductVersions = gql`
         creationAt
         updatedAt
         lifecycle
+        createdAt
         primaryComponent {
           id
           name

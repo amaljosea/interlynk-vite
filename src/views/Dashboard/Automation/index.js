@@ -29,13 +29,20 @@ import { timeSince } from 'utils'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 const Automation = ({ data, refetch }) => {
-  const { totalRows, prodRulesState, dispatch } = useGlobalState()
+  const { totalRows, userPermissons, prodRulesState, dispatch } =
+    useGlobalState()
   const { field, direction } = prodRulesState
   const { prodRulesDispatch } = dispatch
 
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
+
+  const product = userPermissons?.find((item) => item.key === 'view_product')
+  const editAutomations = product?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'edit_product_automations' && permission.value === true
+  )
 
   const { isOpen, onOpen, onClose } = useDisclosure()
   const {
@@ -91,6 +98,7 @@ const Automation = ({ data, refetch }) => {
           <Switch
             isChecked={enabled}
             onChange={() => handleStatus(row)}
+            isDisabled={!editAutomations}
           ></Switch>
         )
       },
@@ -158,6 +166,7 @@ const Automation = ({ data, refetch }) => {
               }}
               colorScheme='blue'
               icon={<SettingsIcon />}
+              isDisabled={!editAutomations}
             />
           </HStack>
         )
@@ -189,6 +198,7 @@ const Automation = ({ data, refetch }) => {
             size='sm'
             icon={<DeleteIcon />}
             colorScheme='red'
+            isDisabled={!editAutomations}
           />
         )
       },

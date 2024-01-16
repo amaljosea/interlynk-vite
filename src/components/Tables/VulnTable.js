@@ -76,7 +76,8 @@ const VulnTable = ({
   const customerView = location.pathname.startsWith('/customer')
   const signedParams = Cookies.get(`signedParamId`)
 
-  const { totalRows, setTotalRows, prodVulnState, dispatch } = useGlobalState()
+  const { userPermissons, totalRows, setTotalRows, prodVulnState, dispatch } =
+    useGlobalState()
   const {
     pageIndex,
     field,
@@ -90,6 +91,12 @@ const VulnTable = ({
     filters
   } = prodVulnState
   const { prodVulnDispatch } = dispatch
+
+  const sboms = userPermissons?.find((item) => item.key === 'view_sbom')
+  const editVulns = sboms?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'edit_vulnerabilities' && permission.value === true
+  )
 
   const textColor = useColorModeValue('gray.700', 'white')
   const [hideColumn, setHideColumn] = useState(false)
@@ -464,7 +471,7 @@ const VulnTable = ({
     }
   }
 
-  const subHeaderComponentMemo = useMemo(() => {
+  const subHeader = useMemo(() => {
     return (
       <Flex
         width={'100%'}
@@ -513,6 +520,7 @@ const VulnTable = ({
                 prodVulnDispatch({ type: 'RESET_SELECTED_VULN' })
                 onTableOpen()
               }}
+              isDisabled={!editVulns}
               icon={<FaCopy size={18} />}
             />
           </Tooltip>
@@ -770,7 +778,7 @@ const VulnTable = ({
           progressPending={data ? false : true}
           progressComponent={<CustomLoader />}
           subHeader
-          subHeaderComponent={subHeaderComponentMemo}
+          subHeaderComponent={subHeader}
           responsive
           expandableRows
           expandOnRowClicked
