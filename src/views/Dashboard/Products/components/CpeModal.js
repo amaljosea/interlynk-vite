@@ -31,9 +31,6 @@ import { useState, useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
 import { validateCpe } from 'utils'
 
-const regexPattern =
-  /cpe:2\.3:[aho\*\-](:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,\/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){5}(:(([a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))?)|[\*\-]))(:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,\/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){4}/
-
 const CpeModal = ({
   data,
   isOpen,
@@ -188,7 +185,7 @@ const CpeModal = ({
     if (selectedCpe) {
       onUpdateCpe(cpe, selectedCpe.id)
     } else {
-      onCreateCpe(cpe)
+      setError('Invalid CPE')
     }
     onClose()
     } else {

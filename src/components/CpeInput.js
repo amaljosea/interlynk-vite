@@ -15,9 +15,6 @@ import { PackageURL } from 'packageurl-js'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { validateCpe } from 'utils'
 
-const regexPattern =
-  /cpe:2\.3:[aho\*\-](:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,\/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){5}(:(([a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))?)|[\*\-]))(:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,\/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){4}/
-
 const CpeInput = ({
   name,
   inputValue,
