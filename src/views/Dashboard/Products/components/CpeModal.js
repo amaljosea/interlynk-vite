@@ -31,9 +31,6 @@ import { useState, useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
 import { validateCpe } from 'utils'
 
-const regexPattern =
-  /cpe:2\.3:[aho\*\-](:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,\/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){5}(:(([a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))?)|[\*\-]))(:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,\/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){4}/
-
 const CpeModal = ({
   data,
   isOpen,
@@ -171,59 +168,59 @@ const CpeModal = ({
 
   // ON CPE SAVE
   const handleSave = () => {
-    // if (validateCpe(cpeString)) {
-    const cpeParts = cpeString.split(':')
-    cpeParts[2] = type === '' ? '*' : type
-    cpeParts[3] = vendor === '' ? '*' : vendor
-    cpeParts[4] = product === '' ? '*' : product
-    cpeParts[5] = version === '' ? '*' : version
-    cpeParts[6] = update === '' ? '*' : update
-    cpeParts[7] = edition === '' ? '*' : edition
-    cpeParts[8] = language === '' ? '*' : language
-    cpeParts[9] = swEdition === '' ? '*' : swEdition
-    cpeParts[10] = targetSoftware === '' ? '*' : targetSoftware
-    cpeParts[11] = hardware === '' ? '*' : hardware
-    cpeParts[12] = other === '' ? '*' : other
-    const cpe = cpeParts.join(':')
-    if (selectedCpe) {
-      onUpdateCpe(cpe, selectedCpe.id)
+    if (validateCpe(cpeString)) {
+      const cpeParts = cpeString.split(':')
+      cpeParts[2] = type === '' ? '*' : type
+      cpeParts[3] = vendor === '' ? '*' : vendor
+      cpeParts[4] = product === '' ? '*' : product
+      cpeParts[5] = version === '' ? '*' : version
+      cpeParts[6] = update === '' ? '*' : update
+      cpeParts[7] = edition === '' ? '*' : edition
+      cpeParts[8] = language === '' ? '*' : language
+      cpeParts[9] = swEdition === '' ? '*' : swEdition
+      cpeParts[10] = targetSoftware === '' ? '*' : targetSoftware
+      cpeParts[11] = hardware === '' ? '*' : hardware
+      cpeParts[12] = other === '' ? '*' : other
+      const cpe = cpeParts.join(':')
+      if (selectedCpe) {
+        onUpdateCpe(cpe, selectedCpe.id)
+      } else {
+        onCreateCpe(cpe)
+      }
+      onClose()
     } else {
-      onCreateCpe(cpe)
+      setError('Invalid CPE')
     }
-    onClose()
-    // } else {
-    //   setError('Invalid CPE')
-    // }
   }
 
   // ON CPE UPDATE
   const handleComUpdate = async () => {
-    // if (validateCpe(cpeString)) {
-    await updateComponent({
-      variables: {
-        id: activeCheck.id,
-        sbomId: sbomId,
-        cpes: [cpeString]
-      }
-    })
-      .then(() => {
-        if (checkId) {
-          prodCheckDispatch({
-            type: 'FETCH_DATA_SUCCESS'
-          })
-          healthRecheck({
-            variables: {
-              checkId: checkId,
-              compId: activeCheck.id,
-              sbomId: sbomId
-            }
-          })
+    if (validateCpe(cpeString)) {
+      await updateComponent({
+        variables: {
+          id: activeCheck.id,
+          sbomId: sbomId,
+          cpes: [cpeString]
         }
       })
-      .finally(() => onClose())
-    // } else {
-    //   setError('Invalid CPE')
-    // }
+        .then(() => {
+          if (checkId) {
+            prodCheckDispatch({
+              type: 'FETCH_DATA_SUCCESS'
+            })
+            healthRecheck({
+              variables: {
+                checkId: checkId,
+                compId: activeCheck.id,
+                sbomId: sbomId
+              }
+            })
+          }
+        })
+        .finally(() => onClose())
+     } else {
+       setError('Invalid CPE')
+     }
   }
 
   // ON VENDOR INPUT CHANGE
