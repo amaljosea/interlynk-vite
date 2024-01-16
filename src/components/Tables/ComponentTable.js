@@ -63,7 +63,8 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
   const x = window.matchMedia('(min-width: 2500px)')
   const y = window.matchMedia('(max-width: 1440px)')
 
-  const { totalRows, setTotalRows, prodCompState, dispatch } = useGlobalState()
+  const { userPermissons, totalRows, setTotalRows, prodCompState, dispatch } =
+    useGlobalState()
   const {
     field,
     direction,
@@ -78,6 +79,12 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
     totalComp
   } = prodCompState
   const { prodCompDispatch } = dispatch
+
+  const sboms = userPermissons?.find((item) => item.key === 'view_sbom')
+  const updateComponent = sboms?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'update_sbom_components' && permission.value === true
+  )
 
   const fetchCompData = async () => {
     await refetch({
@@ -517,7 +524,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
                   <MenuList size='sm'>
                     <MenuItem
                       onClick={() => onLicenseOpen(row)}
-                      isDisabled={status === 'signed'}
+                      isDisabled={status === 'signed' || !updateComponent}
                     >
                       Edit Component
                     </MenuItem>
@@ -828,27 +835,6 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
     )
   }
 
-  const compData = {
-    projectId: productId,
-    sbomId: sbomId,
-    search: searchInput !== '' ? searchInput : undefined,
-    ecosystem:
-      ecosystems.includes('all') || ecosystems.length === 0
-        ? undefined
-        : ecosystems,
-    kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
-    licenses:
-      licenses.includes('all') || licenses.length === 0 ? undefined : licenses,
-    supplierName:
-      suppliers.includes('all') || suppliers.length === 0
-        ? undefined
-        : suppliers,
-    primary: scope === 'primary' ? true : undefined,
-    internal: scope === 'internal' ? true : undefined,
-    field: field,
-    direction: direction
-  }
-
   // CLEAR SERACH
   const handleClear = async () => {
     setCompSearch('')
@@ -947,7 +933,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
   }
 
   // HEADER SECTION
-  const subHeaderComponentMemo = useMemo(() => {
+  const subHeader = useMemo(() => {
     return (
       <Flex
         width={'100%'}
@@ -990,7 +976,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
               variant='solid'
               fontWeight='normal'
               fontSize={'sm'}
-              isDisabled={lifecycle === 'signed'}
+              isDisabled={lifecycle === 'signed' || !updateComponent}
             />
           </Tooltip>
         )}
@@ -1125,7 +1111,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
           progressPending={data ? false : true}
           progressComponent={<CustomLoader />}
           subHeader
-          subHeaderComponent={subHeaderComponentMemo}
+          subHeaderComponent={subHeader}
           expandableRows
           expandOnRowClicked
           persistTableHead

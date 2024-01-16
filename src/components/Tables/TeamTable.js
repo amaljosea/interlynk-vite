@@ -58,6 +58,10 @@ const TeamTable = ({ data, refetch }) => {
     (permission) =>
       permission.key === 'edit_user_role' && permission.value === true
   )
+  const removeUser = viewUsers?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'remove_user' && permission.value === true
+  )
 
   const toast = useToast()
   const SERVER_URL = process.env.REACT_APP_SERVER
@@ -215,20 +219,20 @@ const TeamTable = ({ data, refetch }) => {
             />
             <Portal>
               <MenuList size='sm'>
-                {editUserRoles && (
-                  <MenuItem
-                    isDisabled={row.email === data.currentUser.email}
-                    onClick={() => {
-                      console.log('row', row)
-                      setActiveRow(row)
-                      onRoleOpen()
-                    }}
-                  >
-                    Change Role
-                  </MenuItem>
-                )}
                 <MenuItem
-                  isDisabled={row.email === data.currentUser.email}
+                  isDisabled={
+                    row.email === data.currentUser.email || !editUserRoles
+                  }
+                  onClick={() => {
+                    console.log('row', row)
+                    setActiveRow(row)
+                    onRoleOpen()
+                  }}
+                >
+                  Change Role
+                </MenuItem>
+                <MenuItem
+                  isDisabled={row.email === data.currentUser.email || !removeUser}
                   onClick={() => {
                     setActiveRow(row)
                     onOpen()

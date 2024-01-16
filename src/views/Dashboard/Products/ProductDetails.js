@@ -93,10 +93,16 @@ const ProductDetails = () => {
   const activeProd = localStorage.getItem('activeEnv')
   const [activeEnv, setActiveEnv] = useState(activeProd || '')
 
-  const product = userPermissons?.find((item) => item.key === 'view_product')
+  const product = userPermissons?.find(
+    (item) => item.key === 'view_product_group'
+  )
+  const updateProduct = product?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'update_product_group' && permission.value === true
+  )
   const archiveProduct = product?.supersededBy?.some(
     (permission) =>
-      permission.key === 'archive_product' && permission.value === true
+      permission.key === 'archive_product_group' && permission.value === true
   )
 
   const { data, refetch, loading, error } = useQuery(GetProjectGroups, {
@@ -356,11 +362,11 @@ const ProductDetails = () => {
                       {/* EDIT PRODUCT */}
                       <Tooltip label='Edit Product'>
                         <IconButton
-                          isDisabled={!activeGroup?.enabled}
+                          isDisabled={!activeGroup?.enabled || !updateProduct}
                           colorScheme='blue'
                           onClick={onOpenProduct}
                           icon={<FaPenToSquare />}
-                        ></IconButton>
+                        />
                       </Tooltip>
                       {/* UPLOAD SBOM */}
                       <Tooltip label='Upload SBOM'>
@@ -369,7 +375,7 @@ const ProductDetails = () => {
                           colorScheme='blue'
                           onClick={onOpenUpload}
                           icon={<FaUpload />}
-                        ></IconButton>
+                        />
                       </Tooltip>
                       {/* UPDATE PRODUCT STATUS */}
                       <Tooltip
@@ -389,7 +395,7 @@ const ProductDetails = () => {
                               <FaToggleOn />
                             )
                           }
-                        ></IconButton>
+                        />
                       </Tooltip>
                       {/* ARCHIVE PRODUCT */}
                       <Tooltip label='Archive Product'>
@@ -398,7 +404,7 @@ const ProductDetails = () => {
                           onClick={onDeleteOpen}
                           icon={<FaBoxArchive />}
                           isDisabled={!archiveProduct}
-                        ></IconButton>
+                        />
                       </Tooltip>
                     </Flex>
                   </GridItem>

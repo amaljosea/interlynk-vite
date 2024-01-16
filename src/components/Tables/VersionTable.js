@@ -47,17 +47,30 @@ import SbomList from 'views/Dashboard/Products/components/SbomList'
 import RowLimit from 'views/Sbom/components/RowLimit'
 
 const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
-  console.log('data', data)
-  const { totalRows, setTotalRows, setActiveSbomTab, prodVulnState, dispatch } =
-    useGlobalState()
+  const {
+    userPermissons,
+    totalRows,
+    setTotalRows,
+    setActiveSbomTab,
+    prodVulnState,
+    dispatch
+  } = useGlobalState()
   const { field, direction } = prodVulnState
   const { prodVulnDispatch, prodCompDispatch } = dispatch
 
-  const params = useParams()
+  const sbom = userPermissons?.find((item) => item.key === 'view_sbom')
+  const createSbom = sbom?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'create_sbom' && permission.value === true
+  )
+  const archiveSbom = sbom?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'archive_sbom' && permission.value === true
+  )
 
+  const params = useParams()
   const [isLoading, setIsLoading] = useState(false)
   const [activeRow, setActiveRow] = useState(null)
-
   const [currentPage, setCurrentPage] = useState(1)
 
   const sboms = project ? removeDuplicates(project.sboms) : []
@@ -285,6 +298,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
                     setActiveRow(row)
                     onDeleteOpen()
                   }}
+                  isDisabled={!archiveSbom}
                 >
                   Delete
                 </MenuItem>
@@ -341,11 +355,11 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
           {/* BUILD SBOM */}
           <Tooltip label='Build Version'>
             <IconButton
-              isDisabled={!data?.enabled}
+              isDisabled={!data?.enabled || !createSbom}
               colorScheme='blue'
               onClick={onBuildSbom}
               icon={<FaScrewdriverWrench />}
-            ></IconButton>
+            />
           </Tooltip>
           {/* REFETCH VERSION */}
           <Tooltip label='Refresh'>

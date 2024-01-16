@@ -47,7 +47,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import ProdSearchFilter from 'views/Sbom/components/ProdSearchFilter'
 import Card from 'components/Card/Card'
 
-const ProductTable = ({ data, refetch, org }) => {
+const ProductTable = ({ data, refetch }) => {
   const {
     userPermissons,
     totalRows,
@@ -58,11 +58,19 @@ const ProductTable = ({ data, refetch, org }) => {
   } = useGlobalState()
   const { field, direction, searchInput, pageIndex } = prodState
   const { prodDispatch, sbomDispatch } = dispatch
-
-  const product = userPermissons?.find((item) => item.key === 'view_product')
+  
+  const product = userPermissons?.find((item) => item.key === 'view_product_group')
+  const addProduct = product?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'create_product_group' && permission.value === true
+  )
+  const updateProduct = product?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'update_product_group' && permission.value === true
+  )
   const archiveProduct = product?.supersededBy?.some(
     (permission) =>
-      permission.key === 'archive_product' && permission.value === true
+      permission.key === 'archive_product_group' && permission.value === true
   )
 
   const [activeRow, setActiveRow] = useState(null)
@@ -252,6 +260,7 @@ const ProductTable = ({ data, refetch, org }) => {
               colorScheme='blue'
               variant='solid'
               onClick={onOpenProduct}
+              isDisabled={!addProduct}
             />
           </Tooltip>
         </Stack>
@@ -443,6 +452,7 @@ const ProductTable = ({ data, refetch, org }) => {
                     onOpenUpload()
                   }}
                   isDisabled={!enabled}
+                  isDisabled={!updateProduct}
                 >
                   Upload SBOM
                 </MenuItem>
