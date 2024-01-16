@@ -25,7 +25,7 @@ import {
   Stack,
   Select
 } from '@chakra-ui/react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FaEllipsisV } from 'react-icons/fa'
 import {
@@ -66,7 +66,8 @@ const ProductTable = ({ data, refetch, org }) => {
   )
 
   const [activeRow, setActiveRow] = useState(null)
-
+  const [isPrevActive, setIsPrevActive] = useState(false)
+  const [isNextActive, setIsNextActive] = useState(false)
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const {
@@ -362,7 +363,10 @@ const ProductTable = ({ data, refetch, org }) => {
       name: 'VERSION',
       selector: (row) => {
         const { projects } = row
-        const totalSbom = projects?.reduce((count, project) => count + project.sboms.length, 0);
+        const totalSbom = projects?.reduce(
+          (count, project) => count + project.sboms.length,
+          0
+        )
         return <Text>{totalSbom || 0}</Text>
       },
       wrap: true
@@ -494,39 +498,45 @@ const ProductTable = ({ data, refetch, org }) => {
 
   // PREV PAGE
   const handlePreviousPage = async () => {
+    setIsPrevActive(false)
     await refetch({
       first: undefined,
       last: totalRows,
       after: undefined,
-      before: data.pageInfo.startCursor
-    }).then(
-      (res) =>
-        res.data &&
+      before: data?.pageInfo?.startCursor
+    }).then((res) => {
+      if (res.data) {
+        const project = res?.data?.organization?.projectGroups
         prodDispatch({
           type: 'DECREMENT_PAGE',
-          payload: data.pageInfo.startCursor
+          payload: project?.pageInfo?.startCursor
         })
-    )
+        setIsPrevActive(project?.pageInfo?.hasPreviousPage)
+      }
+    })
   }
 
   // NEXT PAGE
   const handleNextPage = async () => {
+    setIsNextActive(false)
     await refetch({
       first: totalRows,
       last: undefined,
-      after: data.pageInfo.endCursor,
+      after: data?.pageInfo?.endCursor,
       before: undefined
-    }).then(
-      (res) =>
-        res.data &&
+    }).then((res) => {
+      if (res.data) {
+        const project = res?.data?.organization?.projectGroups
         prodDispatch({
           type: 'INCREMENT_PAGE',
           payload: {
-            total: data.totalCount,
-            after: data.pageInfo.endCursor
+            total: project?.totalCount,
+            after: project?.pageInfo?.endCursor
           }
         })
-    )
+        setIsNextActive(project?.pageInfo?.hasNextPage)
+      }
+    })
   }
 
   // SET ROW LENGTH
@@ -543,6 +553,13 @@ const ProductTable = ({ data, refetch, org }) => {
       }
     })
   }
+
+  useEffect(() => {
+    if (data) {
+      setIsPrevActive(data?.pageInfo?.hasPreviousPage)
+      setIsNextActive(data?.pageInfo?.hasNextPage)
+    }
+  }, [data])
 
   return (
     <>
@@ -577,14 +594,14 @@ const ProductTable = ({ data, refetch, org }) => {
                 <Button
                   colorScheme='blue'
                   onClick={handlePreviousPage}
-                  isDisabled={!data.pageInfo.hasPreviousPage}
+                  isDisabled={!isPrevActive}
                 >
                   Prev
                 </Button>
                 <Button
                   colorScheme='blue'
                   onClick={handleNextPage}
-                  isDisabled={!data.pageInfo.hasNextPage}
+                  isDisabled={!isNextActive}
                 >
                   Next
                 </Button>
