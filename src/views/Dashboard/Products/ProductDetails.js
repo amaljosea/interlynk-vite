@@ -517,6 +517,7 @@ const ProductDetails = () => {
                     <Settings
                       projectId={activeGroup?.defaultProject?.id}
                       data={settings?.project?.projectSetting}
+                      enabled={activeGroup?.enabled}
                       refetch={getSettings}
                     />
                   </TabPanel>

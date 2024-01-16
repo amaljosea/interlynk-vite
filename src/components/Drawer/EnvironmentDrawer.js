@@ -63,6 +63,7 @@ const EnvironmentDrawer = ({ data, isOpen, onClose, refetch, activeEnv }) => {
               icon={<AddIcon />}
               colorScheme='blue'
               variant='solid'
+              isDisabled={!data?.enabled}
               onClick={() => {
                 onProdOpen()
               }}
