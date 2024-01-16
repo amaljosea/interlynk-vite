@@ -123,17 +123,17 @@ const CpeInput = ({
     listItemsRef.current[0]?.focus()
   }, [])
 
-  // useEffect(() => {
-  //   if (validation) {
-  //     const matches = validateCpe(inputValue)
-  //     console.log('matches', matches)
-  //     if (matches) {
-  //       prodCompDispatch({ type: 'SET_CPE_VALIDATION', payload: true })
-  //     } else {
-  //       prodCompDispatch({ type: 'SET_CPE_VALIDATION', payload: false })
-  //     }
-  //   }
-  // }, [inputValue])
+  useEffect(() => {
+    if (validation) {
+      const matches = validateCpe(inputValue)
+      console.log('matches', matches)
+      if (matches) {
+        prodCompDispatch({ type: 'SET_CPE_VALIDATION', payload: true })
+      } else {
+        prodCompDispatch({ type: 'SET_CPE_VALIDATION', payload: false })
+      }
+    }
+  }, [inputValue])
 
   useEffect(() => {
     const handleClickOutside = (event) => {

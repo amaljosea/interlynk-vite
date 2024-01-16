@@ -171,7 +171,7 @@ const CpeModal = ({
 
   // ON CPE SAVE
   const handleSave = () => {
-    // if (validateCpe(cpeString)) {
+    if (validateCpe(cpeString)) {
     const cpeParts = cpeString.split(':')
     cpeParts[2] = type === '' ? '*' : type
     cpeParts[3] = vendor === '' ? '*' : vendor
@@ -191,14 +191,14 @@ const CpeModal = ({
       onCreateCpe(cpe)
     }
     onClose()
-    // } else {
-    //   setError('Invalid CPE')
-    // }
+    } else {
+      setError('Invalid CPE')
+    }
   }
 
   // ON CPE UPDATE
   const handleComUpdate = async () => {
-    // if (validateCpe(cpeString)) {
+    if (validateCpe(cpeString)) {
     await updateComponent({
       variables: {
         id: activeCheck.id,
@@ -221,9 +221,9 @@ const CpeModal = ({
         }
       })
       .finally(() => onClose())
-    // } else {
-    //   setError('Invalid CPE')
-    // }
+    } else {
+      setError('Invalid CPE')
+    }
   }
 
   // ON VENDOR INPUT CHANGE
