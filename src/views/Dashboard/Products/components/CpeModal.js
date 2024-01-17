@@ -35,7 +35,7 @@ const CpeModal = ({
   data,
   isOpen,
   onClose,
-  onCreateCpe,
+  setCpeValue,
   onUpdateCpe,
   selectedCpe,
   cpeValue,
@@ -84,9 +84,10 @@ const CpeModal = ({
     if (cpeValue.length > 0 && isCpeValid) {
       const components = cpeValue.split(':')
       const allowedValues = ['a', 'h', 'o', 'A', 'H', 'O']
-      const isValid = components[2] && allowedValues.includes(components[2].toLowerCase())
-      if(isValid) {
-        setType( components[2].toLowerCase())
+      const isValid =
+        components[2] && allowedValues.includes(components[2].toLowerCase())
+      if (isValid) {
+        setType(components[2].toLowerCase())
       } else {
         setType('')
       }
@@ -102,13 +103,15 @@ const CpeModal = ({
       setOther(components[12]?.replace(/\*/g, '') || '')
       prodCompDispatch({
         type: 'SET_CPE_STRING',
-        payload: `cpe:2.3:${isValid ? components[2].toLowerCase() : '*'}:${components[3] || '*'}:${
-          components[4] || '*'
-        }:${components[5] || '*'}:${components[6] || '*'}:${
-          components[7] || '*'
-        }:${components[8] || '*'}:${components[9] || '*'}:${
-          components[10] || '*'
-        }:${components[11] || '*'}:${components[12] || '*'}`
+        payload: `cpe:2.3:${isValid ? components[2].toLowerCase() : '*'}:${
+          components[3] || '*'
+        }:${components[4] || '*'}:${components[5] || '*'}:${
+          components[6] || '*'
+        }:${components[7] || '*'}:${components[8] || '*'}:${
+          components[9] || '*'
+        }:${components[10] || '*'}:${components[11] || '*'}:${
+          components[12] || '*'
+        }`
       })
     } else {
       prodCompDispatch({
@@ -168,56 +171,35 @@ const CpeModal = ({
 
   // ON CPE SAVE
   const handleSave = () => {
-    if (validateCpe(cpeString)) {
-    const cpeParts = cpeString.split(':')
-    cpeParts[2] = type === '' ? '*' : type
-    cpeParts[3] = vendor === '' ? '*' : vendor
-    cpeParts[4] = product === '' ? '*' : product
-    cpeParts[5] = version === '' ? '*' : version
-    cpeParts[6] = update === '' ? '*' : update
-    cpeParts[7] = edition === '' ? '*' : edition
-    cpeParts[8] = language === '' ? '*' : language
-    cpeParts[9] = swEdition === '' ? '*' : swEdition
-    cpeParts[10] = targetSoftware === '' ? '*' : targetSoftware
-    cpeParts[11] = hardware === '' ? '*' : hardware
-    cpeParts[12] = other === '' ? '*' : other
-    const cpe = cpeParts.join(':')
-    if (selectedCpe) {
-      onUpdateCpe(cpe, selectedCpe.id)
-    } else {
-      setError('Invalid CPE')
-    }
+    setCpeValue(cpeString)
     onClose()
-    } else {
-      setError('Invalid CPE')
-    }
   }
 
   // ON CPE UPDATE
   const handleComUpdate = async () => {
     if (validateCpe(cpeString)) {
-    await updateComponent({
-      variables: {
-        id: activeCheck.id,
-        sbomId: sbomId,
-        cpes: [cpeString]
-      }
-    })
-      .then(() => {
-        if (checkId) {
-          prodCheckDispatch({
-            type: 'FETCH_DATA_SUCCESS'
-          })
-          healthRecheck({
-            variables: {
-              checkId: checkId,
-              compId: activeCheck.id,
-              sbomId: sbomId
-            }
-          })
+      await updateComponent({
+        variables: {
+          id: activeCheck.id,
+          sbomId: sbomId,
+          cpes: [cpeString]
         }
       })
-      .finally(() => onClose())
+        .then(() => {
+          if (checkId) {
+            prodCheckDispatch({
+              type: 'FETCH_DATA_SUCCESS'
+            })
+            healthRecheck({
+              variables: {
+                checkId: checkId,
+                compId: activeCheck.id,
+                sbomId: sbomId
+              }
+            })
+          }
+        })
+        .finally(() => onClose())
     } else {
       setError('Invalid CPE')
     }
@@ -253,10 +235,17 @@ const CpeModal = ({
   // ON TYPE CHANGE
   const handleTypeChange = (e) => {
     const { value } = e.target
+    const cpeParts = cpeString.split(':')
     setType(value)
     if (value !== '') {
-      const cpeParts = cpeString.split(':')
       cpeParts[2] = e.target.value
+      const cpe = cpeParts.join(':')
+      prodCompDispatch({
+        type: 'SET_CPE_STRING',
+        payload: cpe
+      })
+    } else {
+      cpeParts[2] = ''
       const cpe = cpeParts.join(':')
       prodCompDispatch({
         type: 'SET_CPE_STRING',
@@ -635,12 +624,7 @@ const CpeModal = ({
               alignItems={'center'}
             >
               {checkId ? (
-                <Button
-                  fontSize={'sm'}
-                  colorScheme='blue'
-                  onClick={onSaveRule}
-                  disabled={!validateCpe(cpeString)}
-                >
+                <Button fontSize={'sm'} colorScheme='blue' onClick={onSaveRule}>
                   Save Rule
                 </Button>
               ) : (
@@ -655,7 +639,6 @@ const CpeModal = ({
                   variant='solid'
                   colorScheme={'blue'}
                   onClick={checkId ? handleComUpdate : handleSave}
-                  disabled={!validateCpe(cpeString)}
                 >
                   Save
                 </Button>
