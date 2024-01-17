@@ -21,7 +21,7 @@ import SearchFilter from 'views/Sbom/components/SearchFilter'
 import VulnBadge from 'components/Misc/VulnBadge'
 import { useGlobalState } from 'hooks/useGlobalState'
 
-const VulnsTable = ({ data, refetch }) => {
+const GlobalVulnTable = ({ data, refetch }) => {
   const { totalRows, setTotalRows, globalVulnState, dispatch } =
     useGlobalState()
   const { pageIndex } = globalVulnState
@@ -422,4 +422,4 @@ const VulnsTable = ({ data, refetch }) => {
   )
 }
 
-export default VulnsTable
+export default GlobalVulnTable

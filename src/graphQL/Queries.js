@@ -468,6 +468,7 @@ export const GetGlobalVulnData = gql`
       updatedAt
       cvssScore
       vulnInfo {
+        id
         epssScore
       }
       organization {
