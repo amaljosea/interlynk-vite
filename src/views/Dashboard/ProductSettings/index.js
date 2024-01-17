@@ -17,7 +17,8 @@ import {
   Flex,
   FormControl,
   FormLabel,
-  Select
+  Select,
+  useToast
 } from '@chakra-ui/react'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
@@ -26,6 +27,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useState, useEffect } from 'react'
 
 const Settings = ({ enabled, data, refetch }) => {
+  const toast = useToast()
   const { userPermissons } = useGlobalState()
   const [dataRetentionDays, setDataRetentionDays] = useState(0)
   const [projectSettingId, setProjectSettingId] = useState(null)
@@ -72,7 +74,16 @@ const Settings = ({ enabled, data, refetch }) => {
         vulnscan: id === 'vulnScan' ? value : undefined,
         days: id === 'dataRetention' ? value : undefined
       }
-    }).then((res) => res.data && refetch({ id: id }))
+    })
+      .then((res) => res.data && refetch({ id: id }))
+      .finally(() =>
+        toast({
+          description: 'Retention updated successfully',
+          position: 'top',
+          status: 'success',
+          duration: 3000
+        })
+      )
   }
 
   return (
