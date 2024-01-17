@@ -61,8 +61,8 @@ const ProductTable = ({ data, refetch }) => {
     dispatch
   } = useGlobalState();
 
-  // const paginationSizes = [25, 50, 100];
-  const paginationSizes = [5, 10, 15];
+  const paginationSizes = [25, 50, 100];
+
   const [totalRows, setTotalRows] = useState(paginationSizes[0]);
 
   const { field, direction, searchInput, pageIndex } = prodState;
@@ -73,12 +73,10 @@ const ProductTable = ({ data, refetch }) => {
       [userPermissions]
   );
 
-  const canAddProduct = useMemo(
+  const canAddProduct =
       () => productPermissions?.supersededBy?.some(
           permission => permission.key === 'create_product_group' && permission.value
-      ),
-      [productPermissions]
-  );
+      );
 
   const canUpdateProduct = useMemo(
       () => productPermissions?.supersededBy?.some(
