@@ -44,7 +44,7 @@ export default function HeaderLinks(props) {
 
   const { userName, setUserName } = useGlobalState()
 
-  const { data } = useQuery(GetOrg)
+  const { data, error } = useQuery(GetOrg)
 
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
@@ -64,6 +64,13 @@ export default function HeaderLinks(props) {
       setUserName(name || email)
     } else if (location.pathname.startsWith('/customer')) {
       setUserName(userEmail)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!name || !email || error) {
+      Cookies.remove('authToken')
+      navigate('/auth')
     }
   }, [])
 
@@ -218,15 +225,9 @@ export default function HeaderLinks(props) {
                 <MenuItem icon={<FaExchangeAlt />}>Organizations</MenuItem>
               </Link>
               <MenuDivider />
-              {email ? (
-                <MenuItem icon={<FaSignOutAlt />} onClick={handleLogout}>
-                  Logout
-                </MenuItem>
-              ) : (
-                <Link to='/'>
-                  <MenuItem icon={<FaSignOutAlt />}>Login</MenuItem>
-                </Link>
-              )}
+              <MenuItem icon={<FaSignOutAlt />} onClick={handleLogout}>
+                Logout
+              </MenuItem>
             </MenuGroup>
           </MenuList>
         )}
