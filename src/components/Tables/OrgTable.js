@@ -302,7 +302,8 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
           </Menu>
         )
       },
-      wrap: true
+      wrap: true,
+      right: 'true'
     }
   ]
 
