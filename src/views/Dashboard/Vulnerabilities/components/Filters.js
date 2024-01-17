@@ -51,7 +51,12 @@ const Filters = () => {
           >
             Product
           </MenuButton>
-          <MenuList>
+          <MenuList
+            minHeight={'auto'}
+            maxHeight={'300px'}
+            overflow={'hidden'}
+            overflowY={'scroll'}
+          >
             <MenuOptionGroup
               type='checkbox'
               value={components}
@@ -103,7 +108,12 @@ const Filters = () => {
           >
             Component
           </MenuButton>
-          <MenuList>
+          <MenuList
+            minHeight={'auto'}
+            maxHeight={'300px'}
+            overflow={'hidden'}
+            overflowY={'scroll'}
+          >
             <MenuOptionGroup
               type='checkbox'
               value={statuses}
@@ -119,11 +129,7 @@ const Filters = () => {
                 'sbomex',
                 'sbomlc'
               ].map((item, index) => (
-                <MenuItemOption
-                  key={index}
-                  value={item}
-                  fontSize={'sm'}
-                >
+                <MenuItemOption key={index} value={item} fontSize={'sm'}>
                   {item}
                 </MenuItemOption>
               ))}
@@ -144,7 +150,12 @@ const Filters = () => {
           >
             Status
           </MenuButton>
-          <MenuList>
+          <MenuList
+            minHeight={'auto'}
+            maxHeight={'300px'}
+            overflow={'hidden'}
+            overflowY={'scroll'}
+          >
             <MenuOptionGroup
               type='checkbox'
               value={statuses}

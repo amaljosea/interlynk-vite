@@ -480,6 +480,12 @@ export const GetGlobalVulnData = gql`
       }
       componentVulns {
         totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          hasPreviousPage
+          startCursor
+        }
         nodes {
           vexStatus {
             id

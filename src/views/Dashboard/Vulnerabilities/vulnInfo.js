@@ -18,132 +18,10 @@ import {
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 import { FaCube, FaCubes, FaBug } from 'react-icons/fa'
-import { useLocation } from 'react-router-dom'
 import { timeSince, getFullDateAndTime } from 'utils'
 import VulnProdTable from './components/ProdTable'
 
 const VulnInfo = ({ data, refetch }) => {
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const vulnId = queryParams.get('id')
-
-  console.log('data', data)
-
-  const prodData = [
-    {
-      id: 0,
-      product: {
-        name: 'dropwizard-core',
-        version: '2.3.5'
-      },
-      component: {
-        name: 'snakeyaml',
-        version: '1.26'
-      },
-      vexStatus: {
-        name: 'In Triage'
-      },
-      vexJustification: null
-    },
-    {
-      id: 1,
-      product: {
-        name: 'dropwizard-core',
-        version: '2.3.4'
-      },
-      component: {
-        name: 'snakeyaml',
-        version: '1.26'
-      },
-      vexStatus: {
-        name: 'In Triage'
-      },
-      vexJustification: null
-    },
-    {
-      id: 2,
-      product: {
-        name: 'dropwizard-core',
-        version: '2.3.3'
-      },
-      component: {
-        name: 'snakeyaml',
-        version: '1.26'
-      },
-      vexStatus: {
-        name: 'Not Affected'
-      },
-      vexJustification: null
-    },
-    {
-      id: 3,
-      product: {
-        name: 'purl-mapper',
-        version: '1.3.2'
-      },
-      component: {
-        name: 'snakeyaml',
-        version: '1.26'
-      },
-      vexStatus: {
-        name: 'Affected'
-      },
-      vexJustification: null
-    },
-    {
-      id: 4,
-      product: {
-        name: 'lynk-api',
-        version: '0.3.4'
-      },
-      component: {
-        name: 'snakeyaml',
-        version: '1.26'
-      },
-      vexStatus: null,
-      vexJustification: null
-    },
-    {
-      id: 5,
-      product: {
-        name: 'lynk-api',
-        version: '0.3.3'
-      },
-      component: {
-        name: 'snakeyaml',
-        version: '1.26'
-      },
-      vexStatus: null,
-      vexJustification: null
-    },
-    {
-      id: 6,
-      product: {
-        name: 'sbomex',
-        version: '0.11.0'
-      },
-      component: {
-        name: 'snakeyaml',
-        version: '1.26'
-      },
-      vexStatus: null,
-      vexJustification: null
-    },
-    {
-      id: 7,
-      product: {
-        name: 'sbomex',
-        version: '0.10.0'
-      },
-      component: {
-        name: 'snakeyaml',
-        version: '1.25'
-      },
-      vexStatus: null,
-      vexJustification: null
-    }
-  ]
-
   return (
     <Flex direction='column' pt={{ base: '120px', md: '74px' }} pr={2} pl={5}>
       {/* Product Info */}
@@ -156,7 +34,6 @@ const VulnInfo = ({ data, refetch }) => {
               alignItems={'top'}
             >
               {/* LEFT */}
-
               <GridItem colSpan={2}>
                 <Flex
                   direction={'row'}
@@ -198,7 +75,8 @@ const VulnInfo = ({ data, refetch }) => {
                             fontWeight={'medium'}
                             bg={'none'}
                           >
-                            {data?.organization?.projectGroups?.nodes?.length || 0}
+                            {data?.organization?.projectGroups?.nodes?.length ||
+                              0}
                           </Badge>
                           <Text fontSize={'xs'}>Products</Text>
                         </Box>
