@@ -67,8 +67,15 @@ export default function Dashboard(props) {
 
   useEffect(() => {
     if (authToken) {
-      const expired = isTokenExpired(authToken)
-      if (expired === true) {
+      try {
+        const expired = isTokenExpired(authToken)
+        if (expired === true) {
+          Cookies.remove('authToken')
+          navigate('/auth')
+        }
+      }
+      catch (err) {
+        console.error('Invalid Token Error:', err);
         Cookies.remove('authToken')
         navigate('/auth')
       }
