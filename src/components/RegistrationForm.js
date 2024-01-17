@@ -201,6 +201,7 @@ const RegistrationForm = () => {
             autoComplete='off'
             onBlur={handleCheckEmail}
             isReadOnly={emailId}
+            disabled={emailId ? true : false}
           />
           {emailError !== '' && (
             <FormErrorMessage>{emailError}</FormErrorMessage>
