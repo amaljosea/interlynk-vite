@@ -25,10 +25,10 @@ import { UploadSbom } from 'graphQL/Mutation'
 import { useState } from 'react'
 import { FaUpload } from 'react-icons/fa'
 
-const UploadModal = ({ projects, isOpen, onClose }) => {
+const UploadModal = ({ projects, isOpen, onClose, activeEnv }) => {
   const toast = useToast()
   const [sbomUpload, { loading, error }] = useMutation(UploadSbom)
-  const [selectedEnv, setSelectedEnv] = useState(projects[0].id || '')
+  const [selectedEnv, setSelectedEnv] = useState(activeEnv || projects[0].id)
   const [errorMessage, setErrorMessage] = useState('')
 
   const handleUpload = async (file) => {
