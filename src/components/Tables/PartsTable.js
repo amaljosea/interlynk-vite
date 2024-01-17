@@ -590,7 +590,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
                   >
                     <option value={''}>-- Select --</option>
                     {allProjects?.organization?.projectGroups?.nodes
-                      .filter((item) => item.id !== group.groupId)
+                      .filter((item) => item.id !== group?.groupId)
                       .map((item, index) => (
                         <option key={index} value={item.id}>
                           {item.name}
