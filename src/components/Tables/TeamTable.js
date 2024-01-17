@@ -145,7 +145,7 @@ const TeamTable = ({ data, refetch }) => {
       id: 'role',
       name: 'ROLE',
       selector: (row) => (
-        <Text textTransform={'lowercase'}>{row?.role?.name || ''}</Text>
+        <Text textTransform={'capitalize'}>{row?.role?.name || ''}</Text>
       )
     },
     // STATUS
