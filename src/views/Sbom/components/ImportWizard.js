@@ -197,7 +197,7 @@ const ImportWizard = ({
                 variant='solid'
                 colorScheme='blue'
                 onClick={nextStep}
-                disabled={selectedVersion === ''}
+                disabled={selectedVersion === '' || selectedGroup === '' || selectedProd === ''}
               >
                 Next
               </Button>
