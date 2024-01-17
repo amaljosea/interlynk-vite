@@ -30,29 +30,24 @@ import {
   IconButton,
   Flex,
   Icon,
-  InputRightElement,
-  Tag,
-  TagLabel,
-  TagCloseButton
+  InputRightElement
 } from '@chakra-ui/react'
 import { useLazyQuery, useMutation } from '@apollo/client'
 import { sbomCreate, CreateComponent } from 'graphQL/Mutation'
 import LicenseField from 'components/LicenseField'
 import { CheckIcon, InfoIcon, WarningTwoIcon } from '@chakra-ui/icons'
-import CpeInput from 'components/CpeInput'
 import { FaExpandAlt } from 'react-icons/fa'
 import { PackageURL } from 'packageurl-js'
 import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import { CpeAutoComplete } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { validateCpe } from 'utils'
 import CpeField from 'components/CpeField'
 
 function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
   const toast = useToast()
 
-  const { prodState, prodCompState, dispatch } = useGlobalState()
+  const { prodCompState, dispatch } = useGlobalState()
   const { licenseType, spdxLicenses, customLicenses, expLicense } =
     prodCompState
   const { prodCompDispatch } = dispatch
