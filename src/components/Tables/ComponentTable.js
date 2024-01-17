@@ -63,7 +63,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
   const x = window.matchMedia('(min-width: 2500px)')
   const y = window.matchMedia('(max-width: 1440px)')
 
-  const { userPermissons, totalRows, setTotalRows, prodCompState, dispatch } =
+  const { userPermissions, totalRows, setTotalRows, prodCompState, dispatch } =
     useGlobalState()
   const {
     field,
@@ -80,7 +80,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
   } = prodCompState
   const { prodCompDispatch } = dispatch
 
-  const sboms = userPermissons?.find((item) => item.key === 'view_sbom')
+  const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
   const updateComponent = sboms?.supersededBy?.some(
     (permission) =>
       permission.key === 'update_sbom_components' && permission.value === true

@@ -46,7 +46,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
   const customerView = location.pathname.startsWith('/customer')
   const toast = useToast()
 
-  const { userPermissons, totalRows, setTotalRows, prodCheckState, dispatch } = useGlobalState()
+  const { userPermissions, totalRows, setTotalRows, prodCheckState, dispatch } = useGlobalState()
   const {
     field,
     direction,
@@ -62,7 +62,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
   } = prodCheckState
   const { prodCompDispatch, prodCheckDispatch } = dispatch
 
-  const sboms = userPermissons?.find((item) => item.key === 'view_sbom')
+  const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
   const editChecks = sboms?.supersededBy?.some(
     (permission) =>
       permission.key === 'edit_checks' && permission.value === true

@@ -47,9 +47,9 @@ function userTimeStart(row) {
 }
 
 const TeamTable = ({ data, refetch }) => {
-  const { userPermissons } = useGlobalState()
+  const { userPermissions } = useGlobalState()
 
-  const viewUsers = userPermissons?.find((item) => item.key === 'view_users')
+  const viewUsers = userPermissions?.find((item) => item.key === 'view_users')
   const inviteUser = viewUsers?.supersededBy?.some(
     (permission) =>
       permission.key === 'invite_users' && permission.value === true

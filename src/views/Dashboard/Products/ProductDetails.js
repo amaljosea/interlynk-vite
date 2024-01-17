@@ -84,7 +84,7 @@ const ProductDetails = () => {
     prodVulnState,
     prodRulesState,
     dispatch,
-    userPermissons
+    userPermissions
   } = useGlobalState()
   const { field, direction } = prodLogState
   const { enabled } = prodState
@@ -93,7 +93,7 @@ const ProductDetails = () => {
   const activeProd = localStorage.getItem('activeEnv')
   const [activeEnv, setActiveEnv] = useState(activeProd || '')
 
-  const product = userPermissons?.find(
+  const product = userPermissions?.find(
     (item) => item.key === 'view_product_group'
   )
   const updateProduct = product?.supersededBy?.some(
