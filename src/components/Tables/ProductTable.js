@@ -1,5 +1,4 @@
 import {
-  Box,
   IconButton,
   Text,
   Switch,
@@ -22,8 +21,7 @@ import {
   ListItem,
   Divider,
   Tooltip,
-  Stack,
-  Select
+  Stack
 } from '@chakra-ui/react'
 import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
 import { FaEllipsisV } from 'react-icons/fa'
@@ -69,16 +67,30 @@ const ProductTable = ({ data, refetch }) => {
 
   const { field, direction, searchInput, pageIndex } = prodState;
   const { prodDispatch, sbomDispatch } = dispatch;
-  const product = userPermissions?.find((item) => item.key === 'view_product')
 
   const productPermissions = useMemo(
-      () => userPermissions?.find(item => item.key === 'view_product'),
+      () => userPermissions?.find(item => item.key === 'view_product_group'),
       [userPermissions]
   );
 
+  const canAddProduct = useMemo(
+      () => productPermissions?.supersededBy?.some(
+          permission => permission.key === 'create_product_group' && permission.value
+      ),
+      [productPermissions]
+  );
+
+  const canUpdateProduct = useMemo(
+      () => productPermissions?.supersededBy?.some(
+          permission => permission.key === 'update_product_group' && permission.value
+      ),
+      [productPermissions]
+  );
+
+
   const canArchiveProduct = useMemo(
       () => productPermissions?.supersededBy?.some(
-          permission => permission.key === 'archive_product' && permission.value
+          permission => permission.key === 'archive_product_group' && permission.value
       ),
       [productPermissions]
   );
@@ -250,6 +262,7 @@ const ProductTable = ({ data, refetch }) => {
                   colorScheme='blue'
                   variant='solid'
                   onClick={onOpenProduct}
+                  isDisabled={!canAddProduct}
               />
             </Tooltip>
           </Stack>
@@ -431,7 +444,7 @@ const ProductTable = ({ data, refetch }) => {
                         setActiveRow(row)
                         onOpenUpload()
                       }}
-                      isDisabled={!enabled}
+                      isDisabled={!enabled || !canUpdateProduct}
                   >
                     Upload SBOM
                   </MenuItem>
