@@ -358,8 +358,8 @@ const ProductTable = ({ data, refetch }) => {
     },
     // ENVIRONMENT
     {
-      id: 'ENVIRONMENT',
-      name: 'ENVIRONMENT',
+      id: 'ENVIRONMENTS',
+      name: 'ENVIRONMENTS',
       selector: (row) => {
         const { projects } = row
         return <Text>{projects?.length}</Text>
@@ -368,8 +368,8 @@ const ProductTable = ({ data, refetch }) => {
     },
     // VERSION
     {
-      id: 'VERSION',
-      name: 'VERSION',
+      id: 'VERSIONS',
+      name: 'VERSIONS',
       selector: (row) => {
         const { projects } = row
         const totalSbom = projects?.reduce(
