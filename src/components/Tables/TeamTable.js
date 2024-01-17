@@ -232,7 +232,9 @@ const TeamTable = ({ data, refetch }) => {
                   Change Role
                 </MenuItem>
                 <MenuItem
-                  isDisabled={row.email === data.currentUser.email || !removeUser}
+                  isDisabled={
+                    row.email === data.currentUser.email || !removeUser
+                  }
                   onClick={() => {
                     setActiveRow(row)
                     onOpen()
@@ -244,7 +246,8 @@ const TeamTable = ({ data, refetch }) => {
                     : 'Remove User'}
                 </MenuItem>
                 {(invitationStatus === 'declined' ||
-                  invitationStatus === 'invited') && (
+                  invitationStatus === 'invited' ||
+                  invitationStatus === 'pending_registration') && (
                   <MenuItem onClick={() => onResendInvite(row)}>
                     Resend Invite
                   </MenuItem>
