@@ -22,12 +22,12 @@ import { useLocation } from 'react-router-dom'
 import { timeSince, getFullDateAndTime } from 'utils'
 import VulnProdTable from './components/ProdTable'
 
-const VulnInfo = ({ data }) => {
+const VulnInfo = ({ data, refetch }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const vulnId = queryParams.get('id')
 
-  const vulnData = data ? data.nodes?.find((item) => item.id === vulnId) : null
+  console.log('data', data)
 
   const prodData = [
     {
@@ -147,7 +147,7 @@ const VulnInfo = ({ data }) => {
   return (
     <Flex direction='column' pt={{ base: '120px', md: '74px' }} pr={2} pl={5}>
       {/* Product Info */}
-      {vulnData && (
+      {data && (
         <Card mb='6'>
           <CardBody>
             <Grid
@@ -168,20 +168,18 @@ const VulnInfo = ({ data }) => {
                   <Flex direction={'column'} gap={0.5}>
                     {/* PRODUCT TITLE */}
                     <Text fontWeight={'semibold'} fontSize={18}>
-                      {vulnData.id}
+                      {data?.vulnId}
                     </Text>
 
                     <Text fontSize={'sm'} my={0.5}>
-                      H2 Console in versions since 1.1.100 (2008-10-14) to
-                      2.0.204 (2021-12-21) inclusive allows loading of custom
-                      classes from remote servers through JNDI.
+                      {data?.desc}
                     </Text>
                     <Tooltip
                       placement='top'
-                      label={getFullDateAndTime(vulnData.updatedAt)}
+                      label={getFullDateAndTime(data?.updatedAt)}
                     >
                       <Text fontSize='xs' cursor={'pointer'} my={1.5}>
-                        Updated {timeSince(vulnData.updatedAt)}
+                        Updated {timeSince(data?.updatedAt)}
                       </Text>
                     </Tooltip>
                     {/* --------------- STATS ------------------- */}
@@ -200,7 +198,7 @@ const VulnInfo = ({ data }) => {
                             fontWeight={'medium'}
                             bg={'none'}
                           >
-                            {/* {vulnData.prods} */} 0
+                            {data?.organization?.projectGroups?.nodes?.length || 0}
                           </Badge>
                           <Text fontSize={'xs'}>Products</Text>
                         </Box>
@@ -219,7 +217,7 @@ const VulnInfo = ({ data }) => {
                             fontWeight={'medium'}
                             bg={'none'}
                           >
-                            {/* {vulnData.vuln.resolved} */} 0
+                            {data?.componentVulns?.nodes?.length || 0}
                           </Badge>
                           <Text fontSize={'xs'}>Components</Text>
                         </Box>
@@ -242,7 +240,7 @@ const VulnInfo = ({ data }) => {
                                 borderRadius='md'
                                 cursor={'pointer'}
                               >
-                                {vulnData.cvssScore}
+                                {data?.cvssScore}
                               </Badge>
                             </Tooltip>
                             <Tooltip label='EPSS' placement='top'>
@@ -254,7 +252,9 @@ const VulnInfo = ({ data }) => {
                                 borderRadius='md'
                                 cursor={'pointer'}
                               >
-                                {Math.ceil(vulnData?.vulnInfo?.epssScore * 10000 || 0)}
+                                {Math.ceil(
+                                  data.vulnInfo?.epssScore * 10000 || 0
+                                )}
                               </Badge>
                             </Tooltip>
                             <Tooltip label='KEV' placement='top'>
@@ -266,7 +266,7 @@ const VulnInfo = ({ data }) => {
                                 borderRadius='md'
                                 cursor={'pointer'}
                               >
-                                {vulnData?.vulnInfo?.epssScore ? '-' : 'K'}
+                                {data?.vulnInfo?.epssScore ? '-' : 'K'}
                               </Badge>
                             </Tooltip>
                           </Stack>
@@ -297,7 +297,7 @@ const VulnInfo = ({ data }) => {
           <TabPanels>
             {/* PRODUCTS TABLE */}
             <TabPanel px={1}>
-              <VulnProdTable data={prodData} />
+              <VulnProdTable data={data?.componentVulns} />
             </TabPanel>
           </TabPanels>
         </Tabs>

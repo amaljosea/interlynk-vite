@@ -1,11 +1,12 @@
 import { Flex } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
-import VulnsTable from 'components/Tables/VulnsTable'
+import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
 import VulnInfo from './vulnInfo'
 import { useLocation } from 'react-router-dom'
 import { useQuery } from '@apollo/client'
 import { GetGlobalVulns } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { GetGlobalVulnData } from 'graphQL/Queries'
 
 const Vulnerabilities = () => {
   const location = useLocation()
@@ -18,8 +19,12 @@ const Vulnerabilities = () => {
     variables: { first: totalRows }
   })
 
+  const { data: vulnData, refetch: vulnRefetch } = useQuery(GetGlobalVulnData, {
+    variables: { vulnId: vulnId }
+  })
+
   if (vulnId && location.pathname === '/vendor/vulnerabilities') {
-    return <VulnInfo data={data?.organization?.vulns} />
+    return <VulnInfo data={vulnData?.vuln} refetch={vulnRefetch} />
   } else {
     return (
       <Flex
@@ -29,7 +34,7 @@ const Vulnerabilities = () => {
         pl={5}
       >
         <Card>
-          <VulnsTable data={data?.organization?.vulns} refetch={refetch} />
+          <GlobalVulnTable data={data?.organization?.vulns} refetch={refetch} />
         </Card>
       </Flex>
     )

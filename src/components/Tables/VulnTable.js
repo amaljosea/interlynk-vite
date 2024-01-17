@@ -62,7 +62,7 @@ const statusColor = (status) => {
   }
 }
 
-const VulnTable = ({
+const GlobalVulnTable = ({
   data,
   refetch,
   productId,
@@ -879,4 +879,4 @@ const VulnTable = ({
   )
 }
 
-export default VulnTable
+export default GlobalVulnTable

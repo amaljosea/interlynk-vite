@@ -52,7 +52,10 @@ const VulnsTable = ({ data, refetch }) => {
       selector: (row) => {
         const { vulnId, id } = row
         return (
-          <Link to={`/vendor/vulnerabilities?id=${id}`}>
+          <Link
+            to={`/vendor/vulnerabilities?id=${id}`}
+            onClick={() => localStorage.setItem('activeVuln', vulnId)}
+          >
             <Text fontSize='sm' color={'blue.500'}>
               {vulnId || ''}
             </Text>
