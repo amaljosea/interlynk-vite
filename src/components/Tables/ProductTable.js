@@ -28,7 +28,7 @@ import {
 import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
 import { FaEllipsisV } from 'react-icons/fa'
 
-import {useCallback, useMemo, useState} from 'react'
+import {useCallback, useEffect, useMemo, useState} from 'react'
 import { Link } from 'react-router-dom'
 
 import { useMutation } from '@apollo/client'
@@ -55,15 +55,17 @@ import Card from 'components/Card/Card'
 import Pagination from '../Pagination';
 
 
-const ProductTable = ({ data, refetch, org }) => {
+const ProductTable = ({ data, refetch }) => {
   const {
     userPermissions,
-    totalRows,
-    setTotalRows,
     setActiveSbomTab,
     prodState,
     dispatch
   } = useGlobalState();
+
+  // const paginationSizes = [25, 50, 100];
+  const paginationSizes = [5, 10, 15];
+  const [totalRows, setTotalRows] = useState(paginationSizes[0]);
 
   const { field, direction, searchInput, pageIndex } = prodState;
   const { prodDispatch, sbomDispatch } = dispatch;
@@ -545,8 +547,16 @@ const ProductTable = ({ data, refetch, org }) => {
     persistTableHead: true,
   }
 
-  const parentPaginationSizes = [25, 50, 100];
-
+  useEffect(() => {
+    if (!data) {
+      refetch({
+        first: totalRows,
+        enabled: true,
+        field: "PROJECT_GROUPS_UPDATED_AT",
+        direction: "DESC"
+      });
+    }
+  }, [data, refetch, totalRows]);
 
   return (
       <>
@@ -555,7 +565,7 @@ const ProductTable = ({ data, refetch, org }) => {
             <DataTable {...dataTableProps} />
             {data && (
                 <Pagination
-                    paginationSizes={parentPaginationSizes}
+                    paginationSizes={paginationSizes}
                     pageIndex={pageIndex}
                     totalRows={totalRows}
                     totalCount={data.totalCount}
