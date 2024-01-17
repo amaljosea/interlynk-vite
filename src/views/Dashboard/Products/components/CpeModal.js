@@ -70,7 +70,7 @@ const CpeModal = ({
   const [other, setOther] = useState('')
 
   const { prodCompState, dispatch } = useGlobalState()
-  const { cpeString, isCpeValid } = prodCompState
+  const { cpeString } = prodCompState
   const { prodCompDispatch, prodCheckDispatch } = dispatch
 
   const [healthRecheck] = useMutation(recheckHealth, {
@@ -80,8 +80,7 @@ const CpeModal = ({
 
   // UPDATE FIELDS DATA FROM API
   useEffect(() => {
-    // const matches = cpe.test(cpeValue)
-    if (cpeValue.length > 0 && isCpeValid) {
+    if (cpeValue !== '') {
       const components = cpeValue.split(':')
       const allowedValues = ['a', 'h', 'o', 'A', 'H', 'O']
       const isValid =
@@ -358,15 +357,6 @@ const CpeModal = ({
       setError('Invalid CPE')
     }
   }
-
-  const isInvalid =
-    vendor === '' ||
-    product === '' ||
-    type === '' ||
-    vendor.includes(':') ||
-    product.includes(':') ||
-    version.includes(':') ||
-    error !== ''
 
   return (
     <>

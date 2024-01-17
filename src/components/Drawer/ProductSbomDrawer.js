@@ -30,28 +30,24 @@ import {
   IconButton,
   Flex,
   Icon,
-  InputRightElement,
-  Tag,
-  TagLabel,
-  TagCloseButton
+  InputRightElement
 } from '@chakra-ui/react'
 import { useLazyQuery, useMutation } from '@apollo/client'
 import { sbomCreate, CreateComponent } from 'graphQL/Mutation'
 import LicenseField from 'components/LicenseField'
 import { CheckIcon, InfoIcon, WarningTwoIcon } from '@chakra-ui/icons'
-import CpeInput from 'components/CpeInput'
 import { FaExpandAlt } from 'react-icons/fa'
 import { PackageURL } from 'packageurl-js'
 import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import { CpeAutoComplete } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { validateCpe } from 'utils'
+import CpeField from 'components/CpeField'
 
 function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
   const toast = useToast()
 
-  const { prodState, prodCompState, dispatch } = useGlobalState()
+  const { prodCompState, dispatch } = useGlobalState()
   const { licenseType, spdxLicenses, customLicenses, expLicense } =
     prodCompState
   const { prodCompDispatch } = dispatch
@@ -169,34 +165,25 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
     }
   }
 
-  const deleteCpe = (index) => {
-    const updatedItems = cpeList.filter((_, i) => i !== index)
-    setCpeList(updatedItems)
-  }
-
   const handleCpeChange = (e) => {
     const { value } = e.target
     const val = value.replace(/\s/g, '')
     setCpeValue(val)
-    if (val === '') {
-      setCpeData([])
-    } else {
-      getCpe({
-        variables: {
-          input: {
-            idType: 'cpe',
-            ecosystem: 'cpe',
-            search: {
-              idUri: val
-            }
+    getCpe({
+      variables: {
+        input: {
+          idType: 'cpe',
+          ecosystem: 'cpe',
+          search: {
+            idUri: val
           }
         }
-      }).then((res) => {
-        if (res.data) {
-          setCpeData(res.data.idAutoComplete.result)
-        }
-      })
-    }
+      }
+    }).then((res) => {
+      if (res?.data) {
+        setCpeData(res?.data?.idAutoComplete?.result || [])
+      }
+    })
   }
 
   const handleRefetch = () => {
@@ -238,7 +225,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
                 : []
               : undefined
         },
-        cpes: cpeList,
+        cpes: cpeValue !== '' ? [cpeValue] : [],
         purl: purlValue,
         primary: true,
         internal: false
@@ -427,15 +414,13 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
               {/* CPE INPUT */}
               <FormControl>
                 <Stack direction={'row'} width={'100%'} spacing={2}>
-                  <CpeInput
-                    name='cpe'
+                  <CpeField
+                    inputRef={cpeRef}
                     inputValue={cpeValue}
                     setInputValue={setCpeValue}
                     cpeList={cpeData}
                     setCpeList={setCpeData}
                     onChange={handleCpeChange}
-                    inputRef={cpeRef}
-                    validation={true}
                   />
                   <IconButton
                     icon={<FaExpandAlt />}
@@ -449,29 +434,6 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
                     Details
                   </IconButton>
                 </Stack>
-                {/* CPE LIST  */}
-                <Flex
-                  flexDirection={'row'}
-                  flexWrap={'wrap'}
-                  spacing={2}
-                  gap={2}
-                  mt={2}
-                >
-                  {cpeList?.map((item, index) => (
-                    <Tag key={index} variant='solid' colorScheme={'blue'}>
-                      <TagLabel
-                        cursor={'pointer'}
-                        onClick={() => {
-                          setCpeValue(item)
-                          setSelectedCpe({ id: index, name: item })
-                        }}
-                      >
-                        {item}
-                      </TagLabel>
-                      <TagCloseButton onClick={() => deleteCpe(index)} />
-                    </Tag>
-                  ))}
-                </Flex>
               </FormControl>
               {/* SCOPE */}
               <FormControl>
@@ -514,7 +476,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
             <Button
               colorScheme='blue'
               onClick={handleCreateSBOM}
-              disabled={sbomName === '' || compType === '' || version === '' || !validateCpe(cpeValue)}
+              disabled={sbomName === '' || compType === '' || version === ''}
             >
               Save
             </Button>
