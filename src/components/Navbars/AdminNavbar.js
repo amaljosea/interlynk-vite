@@ -208,7 +208,7 @@ export default function AdminNavbar(props) {
               </BreadcrumbItem>
             )}
 
-            {prodID && (
+            {prodID && category === 'vulnerabilities' && (
               <BreadcrumbItem color={mainText}>
                 <BreadcrumbLink>{activeVuln || ''}</BreadcrumbLink>
               </BreadcrumbItem>
