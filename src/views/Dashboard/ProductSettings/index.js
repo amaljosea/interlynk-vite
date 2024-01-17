@@ -77,10 +77,6 @@ const Settings = ({ enabled, data, refetch }) => {
 
   return (
     <>
-      <CardHeader my={3}>
-        <Text fontSize={18}>Control Settings</Text>
-      </CardHeader>
-
       <CardBody py={4}>
         <Grid width={'100%'} templateColumns='repeat(2, 1fr)' gap={6}>
           {/* LEFT */}

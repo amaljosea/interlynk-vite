@@ -233,7 +233,6 @@ const Automation = ({ data, refetch }) => {
         <Flex flexDir={'column'} width={'100%'}>
           <DataTable
             columns={columns}
-            title={<Text fontSize={'xl'}>Rule Automation Settings</Text>}
             data={data && data.nodes}
             customStyles={customStyles}
             onSort={handleSort}
