@@ -136,7 +136,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
       id: 'VERSION',
       name: 'VERSION',
       selector: (row) => {
-        const { primaryComponent, id, creationAt } = row
+        const { primaryComponent, id, createdAt } = row
         return (
           <Link
             to={`/vendor/products/${data.name}?id=${productId}&sbom=${id}`}
@@ -154,7 +154,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
           >
             <Text color={'blue.500'} minWidth='100%' my={3} fontSize={14}>
               {primaryComponent?.version ||
-                `Uploaded ${getFullDateAndTime(creationAt)}`}
+                `Uploaded ${getFullDateAndTime(createdAt)}`}
             </Text>
           </Link>
         )

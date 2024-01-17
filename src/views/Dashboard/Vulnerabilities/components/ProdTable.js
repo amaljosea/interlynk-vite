@@ -85,35 +85,35 @@ const VulnProdTable = ({ data }) => {
       id: 'PRODUCT_NAME',
       name: 'PRODUCT',
       selector: (row) => {
-        const { product } = row
+        const { component } = row
         return (
-          <Tooltip label={product.name} placement='top'>
+          <Tooltip
+            label={component?.sbom?.project?.projectGroup?.name || ''}
+            placement='top'
+          >
             <Text textTransform={'capitalize'}>
-              {product.name !== null
-                ? `${product.name?.substring(0, 30)}${
-                    product.name.length > 30 ? '...' : ''
-                  }`
-                : ''}
+              {component?.sbom?.project?.projectGroup?.name || ''}
             </Text>
           </Tooltip>
         )
       },
       wrap: true,
-      width: '15%',
-      sortable: true
+      width: '15%'
     },
     // VERSION
     {
       id: 'PRODUCT_VERSIONN',
       name: 'VERSION',
       selector: (row) => (
-        <Tooltip label={row.product.version} placement='top'>
-          {row.product.version}
+        <Tooltip
+          label={row?.component?.sbom?.primaryComponent?.version || ''}
+          placement='top'
+        >
+          {row?.component?.sbom?.primaryComponent?.version || ''}
         </Tooltip>
       ),
       wrap: true,
-      width: '12%',
-      sortable: true
+      width: '12%'
     },
     // VULN COMPONENT
     {
@@ -122,33 +122,25 @@ const VulnProdTable = ({ data }) => {
       selector: (row) => {
         const { component } = row
         return (
-          <Tooltip label={component.name} placement='top'>
-            <Text textTransform={'capitalize'}>
-              {component.name !== null
-                ? `${component.name?.substring(0, 30)}${
-                    component.name.length > 30 ? '...' : ''
-                  }`
-                : ''}
-            </Text>
+          <Tooltip label={component?.name} placement='top'>
+            <Text textTransform={'capitalize'}>{component?.name || ''}</Text>
           </Tooltip>
         )
       },
       wrap: true,
-      width: '15%',
-      sortable: true
+      width: '15%'
     },
     // VULN VERSION
     {
       id: 'COMPONENTS_VERSION',
       name: 'VERSION',
       selector: (row) => (
-        <Tooltip label={row.component.version} placement='top'>
-          {row.component.version}
+        <Tooltip label={row?.component?.version} placement='top'>
+          {row?.component?.version || ''}
         </Tooltip>
       ),
       wrap: true,
-      width: '12%',
-      sortable: true
+      width: '12%'
     },
     // STATUS
     {
@@ -161,12 +153,10 @@ const VulnProdTable = ({ data }) => {
             size='md'
             variant='solid'
             width={'130px'}
-            colorScheme={statusColor(
-              vexStatus ? vexStatus.name : 'Unspecified'
-            )}
+            colorScheme={statusColor(vexStatus?.name || 'Unspecified')}
           >
             <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
-              {vexStatus !== null ? vexStatus.name : 'Unspecified'}
+              {vexStatus?.name || 'Unspecified'}
             </TagLabel>
           </Tag>
         )
@@ -214,7 +204,7 @@ const VulnProdTable = ({ data }) => {
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
           columns={columns}
-          data={data}
+          data={data?.nodes || []}
           customStyles={customStyles}
           progressPending={data ? false : true}
           progressComponent={<CustomLoader />}

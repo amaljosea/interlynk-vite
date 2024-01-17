@@ -458,6 +458,81 @@ export const GetGlobalVulns = gql`
   }
 `
 
+// GET SINGLE GLOBAL VULNERABILITIES
+export const GetGlobalVulnData = gql`
+  query GetVulnData($vulnId: Uuid!) {
+    vuln(id: $vulnId) {
+      id
+      desc
+      vulnId
+      updatedAt
+      cvssScore
+      vulnInfo {
+        id
+        epssScore
+      }
+      organization {
+        projectGroups {
+          nodes {
+            name
+          }
+        }
+      }
+      componentVulns {
+        totalCount
+        nodes {
+          vexStatus {
+            id
+            name
+          }
+          component {
+            id
+            name
+            version
+            sbom {
+              project {
+                name
+                projectGroup {
+                  name
+                }
+              }
+              primaryComponent {
+                id
+                name
+                version
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
+// GET PROJECT GROUP VULN DATA
+export const GetProjectGrpupComponentVulns = gql`
+  query GetProjectGrpupComponentVulns($projectGroupId: Uuid!) {
+    projectGroup(id: $projectGroupId) {
+      componentVulns {
+        nodes {
+          vexStatus {
+            name
+          }
+          vuln {
+            vulnId
+            cvssScore
+            vulnInfo {
+              epssScore
+            }
+            source
+            sev
+          }
+        }
+      }
+    }
+  }
+`
+
 export const GetOrgInfo = gql`
   query GetOrgInfo {
     organization {
@@ -821,6 +896,7 @@ export const GetProductVersions = gql`
       sboms {
         id
         creationAt
+        createdAt
         updatedAt
         lifecycle
         createdAt
@@ -884,6 +960,7 @@ export const GetProductData = gql`
         }
       }
       lifecycle
+      createdAt
       creationAt
       updatedAt
       licenses

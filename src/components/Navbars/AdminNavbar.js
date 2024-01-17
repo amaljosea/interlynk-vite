@@ -11,7 +11,6 @@ import PropTypes from 'prop-types'
 import React, { useState, useEffect } from 'react'
 import AdminNavbarLinks from './AdminNavbarLinks'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { vulnList } from 'variables/general'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useQuery } from '@apollo/client'
 import { GetUserPermissions } from 'graphQL/Queries'
@@ -52,6 +51,7 @@ export default function AdminNavbar(props) {
   const parts = queryParams.get('parts')
   const sbomId = queryParams.get('sbom')
 
+  const activeVuln = localStorage.getItem('activeVuln')
   const imageName = localStorage.getItem('Image')
   const currentProduct = (() => {
     try {
@@ -70,8 +70,6 @@ export default function AdminNavbar(props) {
     }
   })()
   const subProduct = localStorage.getItem('subProduct')
-
-  const vulnData = vulnList.find((item) => item.id === prodID)
 
   const urlParts = location.pathname.split('/')
   const category = urlParts[2]
@@ -210,11 +208,9 @@ export default function AdminNavbar(props) {
               </BreadcrumbItem>
             )}
 
-            {vulnData && (
+            {prodID && category === 'vulnerabilities' && (
               <BreadcrumbItem color={mainText}>
-                <Link to={`/vendor/vulnerabilities?id=${prodID}`}>
-                  {vulnData?.vuln.vulnId}
-                </Link>
+                <BreadcrumbLink>{activeVuln || ''}</BreadcrumbLink>
               </BreadcrumbItem>
             )}
 

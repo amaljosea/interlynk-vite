@@ -555,6 +555,7 @@ const ProductDetails = () => {
             projects={activeGroup?.projects}
             isOpen={isOpenUpload}
             onClose={onCloseUpload}
+            activeEnv={activeEnv}
           />
         )}
 

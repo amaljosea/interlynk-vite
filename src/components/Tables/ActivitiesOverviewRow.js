@@ -160,7 +160,8 @@ function ActivitiesOverviewRow(props) {
             fontSize='sm'
             color={textColor}
             fontWeight='normal'
-            width={'90%'}
+            width={'95%'}
+            wordBreak={'break-all'}
           >
             {valueToText(action, event, orig, updated)}
           </Text>
