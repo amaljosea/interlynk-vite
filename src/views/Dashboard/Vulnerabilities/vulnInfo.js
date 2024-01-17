@@ -34,7 +34,7 @@ const VulnInfo = ({ data, refetch }) => {
               alignItems={'top'}
             >
               {/* LEFT */}
-              <GridItem colSpan={2}>
+              <GridItem colSpan={4}>
                 <Flex
                   direction={'row'}
                   alignItems={'flex-start'}
@@ -49,7 +49,7 @@ const VulnInfo = ({ data, refetch }) => {
                     </Text>
 
                     <Text fontSize={'sm'} my={0.5}>
-                      {data?.desc}
+                      {data?.desc || ''}
                     </Text>
                     <Tooltip
                       placement='top'
