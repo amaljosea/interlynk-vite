@@ -17,7 +17,8 @@ import { GetUserPermissions } from 'graphQL/Queries'
 import { permissionList } from 'utils'
 
 export default function AdminNavbar(props) {
-  const { setUserPermissons } = useGlobalState()
+  const { setUserPermissons, dispatch } = useGlobalState()
+  const { globalVulnDispatch } = dispatch
 
   function parseJSONSafely(str) {
     try {
@@ -173,7 +174,14 @@ export default function AdminNavbar(props) {
             </BreadcrumbItem>
 
             <BreadcrumbItem color={mainText} textTransform={'capitalize'}>
-              <Link to={`/vendor/${category}`}>{category}</Link>
+              <Link
+                to={`/vendor/${category}`}
+                onClick={() =>
+                  globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
+                }
+              >
+                {category}
+              </Link>
             </BreadcrumbItem>
 
             {params?.name && (

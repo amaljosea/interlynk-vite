@@ -58,8 +58,10 @@ const ProductTable = ({ data, refetch }) => {
   } = useGlobalState()
   const { field, direction, searchInput, pageIndex } = prodState
   const { prodDispatch, sbomDispatch } = dispatch
-  
-  const product = userPermissons?.find((item) => item.key === 'view_product_group')
+
+  const product = userPermissons?.find(
+    (item) => item.key === 'view_product_group'
+  )
   const addProduct = product?.supersededBy?.some(
     (permission) =>
       permission.key === 'create_product_group' && permission.value === true
@@ -451,8 +453,7 @@ const ProductTable = ({ data, refetch }) => {
                     setActiveRow(row)
                     onOpenUpload()
                   }}
-                  isDisabled={!enabled}
-                  isDisabled={!updateProduct}
+                  isDisabled={!enabled || !updateProduct}
                 >
                   Upload SBOM
                 </MenuItem>
