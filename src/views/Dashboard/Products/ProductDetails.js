@@ -474,7 +474,7 @@ const ProductDetails = () => {
                     'versions',
                     ,
                     /// TODO: 1.0 Add back in when ready
-                    /* 'vulnerabilities', */ 'automation',
+                    /* 'vulnerabilities', */ 'automation rules',
                     'settings',
                     'change log'
                   ].map((item, index) => (
