@@ -738,7 +738,7 @@ function ComponentDrawer(props) {
                     compName === '' ||
                     compVersion === '' ||
                     (purlValue !== '' && !isPURLInputValid) ||
-                    (cpeValue !== '' && !isCpeValid) ||
+                    !validateCpe(cpeValue) ||
                     !isValid
                   }
                 >

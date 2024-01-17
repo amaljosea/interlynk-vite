@@ -46,6 +46,7 @@ import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import { CpeAutoComplete } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { validateCpe } from 'utils'
 
 function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
   const toast = useToast()
@@ -513,7 +514,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
             <Button
               colorScheme='blue'
               onClick={handleCreateSBOM}
-              disabled={sbomName === '' || compType === '' || version === ''}
+              disabled={sbomName === '' || compType === '' || version === '' || !validateCpe(cpeValue)}
             >
               Save
             </Button>
