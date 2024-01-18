@@ -45,7 +45,7 @@ const EnvModal = ({ groupId, isOpen, onClose, onEnvClose, refetch }) => {
       })
       .finally(() => {
         toast({
-          description: 'Environment addedd successfully',
+          description: 'Environment added successfully',
           status: 'success',
           position: 'top',
           duration: 3000
