@@ -169,7 +169,9 @@ const TeamTable = ({ data, refetch }) => {
             }
             textTransform={'capitalize'}
           >
-            <TagLabel mx='auto'>{invitationStatus}</TagLabel>
+            <TagLabel mx='auto'>
+              {invitationStatus?.replace(/_/g, ' ')}
+            </TagLabel>
           </Tag>
         )
       }
