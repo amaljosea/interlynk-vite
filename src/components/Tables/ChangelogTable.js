@@ -29,7 +29,7 @@ const setColor = (type) => {
   }
 }
 
-const ChangelogTable = ({ data, refetch }) => {
+const ChangelogTable = ({ data, refetch, activeEnv }) => {
   const { totalRows, setTotalRows, prodLogState, dispatch } = useGlobalState()
   const { field, direction, pageIndex } = prodLogState
   const { prodLogDispatch } = dispatch
@@ -87,7 +87,9 @@ const ChangelogTable = ({ data, refetch }) => {
           <Tooltip label={orig} placement='top'>
             <Text my={2}>
               {orig !== null
-                ? `${event} / ${orig.substring(0, 400)}${orig.length > 400 ? '...' : ''}`
+                ? `${event} / ${orig.substring(0, 400)}${
+                    orig.length > 400 ? '...' : ''
+                  }`
                 : ''}
             </Text>
           </Tooltip>
@@ -106,7 +108,9 @@ const ChangelogTable = ({ data, refetch }) => {
           <Tooltip label={updated} placement='top'>
             <Text overflow={'auto'} my={2}>
               {updated !== null
-                ? `${event} / ${updated.substring(0, 400)}${updated.length > 400 ? '...' : ''}`
+                ? `${event} / ${updated.substring(0, 400)}${
+                    updated.length > 400 ? '...' : ''
+                  }`
                 : ''}
             </Text>
           </Tooltip>
@@ -149,7 +153,7 @@ const ChangelogTable = ({ data, refetch }) => {
   const onPreviousPage = async () => {
     await refetch({
       variables: {
-        id: productId,
+        id: activeEnv,
         last: totalRows,
         before: data.pageInfo.startCursor,
         field: field,
@@ -168,9 +172,9 @@ const ChangelogTable = ({ data, refetch }) => {
   const onNextPage = async () => {
     await refetch({
       variables: {
-        id: productId,
+        id: activeEnv,
         first: totalRows,
-        after: data.pageInfo.endCursor,
+        after: data?.pageInfo?.endCursor,
         field: field,
         direction: direction
       }
@@ -192,7 +196,7 @@ const ChangelogTable = ({ data, refetch }) => {
     if (event.key === 'Enter' && filterText !== '') {
       await refetch({
         variables: {
-          id: productId,
+          id: activeEnv,
           search: filterText,
           first: totalRows,
           field: field,
@@ -212,7 +216,7 @@ const ChangelogTable = ({ data, refetch }) => {
   const handleClear = async () => {
     await refetch({
       variables: {
-        id: productId,
+        id: activeEnv,
         search: undefined,
         first: totalRows,
         field: field,
@@ -231,7 +235,7 @@ const ChangelogTable = ({ data, refetch }) => {
   const handleSort = async (column, sortDirection) => {
     await refetch({
       variables: {
-        id: productId,
+        id: activeEnv,
         first: totalRows,
         field: column.id,
         direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
@@ -254,7 +258,7 @@ const ChangelogTable = ({ data, refetch }) => {
     setTotalRows(Number(e.target.value))
     await refetch({
       variables: {
-        id: productId,
+        id: activeEnv,
         first: Number(e.target.value),
         field: field,
         direction: direction
