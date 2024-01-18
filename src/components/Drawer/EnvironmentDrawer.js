@@ -23,6 +23,7 @@ import EnvModal from 'views/Dashboard/Products/components/EnvModal'
 import { useMutation } from '@apollo/client'
 import { EnvDelete } from 'graphQL/Mutation'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { isDefaultEnv } from 'utils'
 
 const EnvironmentDrawer = ({ data, isOpen, onClose, refetch, activeEnv }) => {
   const { totalRows, prodState } = useGlobalState()
@@ -80,7 +81,14 @@ const EnvironmentDrawer = ({ data, isOpen, onClose, refetch, activeEnv }) => {
     {
       id: 'NAME',
       name: 'NAME',
-      selector: (row) => <Text>{row?.name}</Text>,
+      selector: (row) => {
+        const { name } = row
+        return (
+          <Text textTransform={isDefaultEnv(name) ? 'capitalize' : 'none'}>
+            {name}
+          </Text>
+        )
+      },
       wrap: true
     },
     // VERSION
@@ -105,16 +113,19 @@ const EnvironmentDrawer = ({ data, isOpen, onClose, refetch, activeEnv }) => {
     {
       id: 'ACTIONS',
       name: 'ACTIONS',
-      selector: (row) => (
-        <IconButton
-          size='xs'
-          icon={<DeleteIcon />}
-          colorScheme='red'
-          variant='solid'
-          isDisabled={row?.name === 'default' || row?.id === activeEnv}
-          onClick={() => handleDelete(row?.id)}
-        />
-      ),
+      selector: (row) => {
+        const { name, id } = row
+        return (
+          <IconButton
+            size='xs'
+            icon={<DeleteIcon />}
+            colorScheme='red'
+            variant='solid'
+            isDisabled={isDefaultEnv(name) || id === activeEnv}
+            onClick={() => handleDelete(id)}
+          />
+        )
+      },
       wrap: true
     }
   ]
@@ -131,7 +142,7 @@ const EnvironmentDrawer = ({ data, isOpen, onClose, refetch, activeEnv }) => {
             <Flex flexDir={'column'} width={'100%'}>
               <DataTable
                 columns={columns}
-                data={data && data.projects}
+                data={data?.projects || []}
                 customStyles={customStyles}
                 progressPending={data ? false : true}
                 progressComponent={<CustomLoader />}

@@ -620,7 +620,7 @@ export const removeDuplicates = (arr) => {
 
 export const validateCpe = (value) => {
   const cpeRegex =
-  /^cpe:2\.3:[aho\*\-]?(:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])?){5}(:(([a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))?)|[\*\-])?)(:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])?){4}/
+    /^cpe:2\.3:[aho\*\-]?(:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])?){5}(:(([a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))?)|[\*\-])?)(:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])?){4}/
   return cpeRegex.test(value)
 }
 
@@ -674,5 +674,19 @@ export const permissionList = (data) => {
       return newObj
     })
     return newData.filter((obj) => !supersededKeys.has(obj.key))
+  }
+}
+
+export const isDefaultEnv = (name) => {
+  switch (name) {
+    case 'default':
+      return true
+      break
+    case 'development':
+      return true
+    case 'production':
+      return true
+    default:
+      return false
   }
 }

@@ -25,7 +25,6 @@ const EnvModal = ({ groupId, isOpen, onClose, refetch }) => {
   const [projectCreate] = useMutation(EnvCreate)
 
   const [productName, setProductName] = useState('')
-
   const [error, setError] = useState('')
 
   const handleSave = async (e) => {
@@ -36,9 +35,14 @@ const EnvModal = ({ groupId, isOpen, onClose, refetch }) => {
         name: productName,
         enabled: true
       }
+    }).then((res) => {
+      if (res?.data?.projectCreate?.errors?.length > 0) {
+        setError(res?.data?.projectCreate?.errors[0])
+      } else {
+        refetch({ id: groupId })
+        onClose()
+      }
     })
-      .then((res) => res.data && refetch({ id: groupId }))
-      .finally(() => onClose())
   }
 
   const isInvalid = productName === '' || error !== ''
@@ -55,8 +59,9 @@ const EnvModal = ({ groupId, isOpen, onClose, refetch }) => {
               <Flex width={'100%'} direction={'column'} gap={4}>
                 {error !== '' && (
                   <Alert status='error'>
-                    <AlertIcon />
-                    <Text fontSize={'sm'}>{error}</Text>
+                    <Text fontSize={'sm'} pr={2}>
+                      {error}
+                    </Text>
                   </Alert>
                 )}
                 <FormControl isRequired>

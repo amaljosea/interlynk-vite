@@ -67,6 +67,7 @@ import Settings from '../ProductSettings'
 import CardHeader from 'components/Card/CardHeader'
 import { ChevronDownIcon, ViewIcon } from '@chakra-ui/icons'
 import EnvironmentDrawer from 'components/Drawer/EnvironmentDrawer'
+import { isDefaultEnv } from 'utils'
 
 const ProductDetails = () => {
   const navigate = useNavigate()
@@ -239,6 +240,10 @@ const ProductDetails = () => {
       .then((res) => res.data && onDeleteClose())
       .finally(() => navigate('/vendor/products'))
   }
+
+  const defaultEnv = activeEnv
+    ? activeGroup?.projects?.find((item) => item.id === activeEnv)?.name
+    : ''
 
   useEffect(() => {
     if (sbomId === null) {
@@ -423,14 +428,12 @@ const ProductDetails = () => {
                     variant={'solid'}
                     colorScheme='blue'
                     fontSize={'sm'}
-                    textTransform={'capitalize'}
+                    textTransform={
+                      isDefaultEnv(defaultEnv) ? 'capitalize' : 'none'
+                    }
                     rightIcon={<ChevronDownIcon />}
                   >
-                    {activeEnv
-                      ? activeGroup?.projects?.find(
-                          (item) => item.id === activeEnv
-                        )?.name
-                      : 'Default'}
+                    {defaultEnv}
                   </MenuButton>
                   <MenuList>
                     <MenuOptionGroup
@@ -443,7 +446,9 @@ const ProductDetails = () => {
                           fontSize={'sm'}
                           value={item?.id}
                           key={item?.id}
-                          textTransform={'capitalize'}
+                          textTransform={
+                            isDefaultEnv(item?.name) ? 'capitalize' : 'none'
+                          }
                         >
                           {item?.name}
                         </MenuItemOption>
