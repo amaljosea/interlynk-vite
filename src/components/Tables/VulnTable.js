@@ -99,12 +99,9 @@ const VulnTable = ({
   )
 
   const textColor = useColorModeValue('gray.700', 'white')
-  const [hideColumn, setHideColumn] = useState(false)
   const [vulnSearch, setVulnSearch] = useState('')
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
-  const x = window.matchMedia('(min-width: 2500px)')
-  const y = window.matchMedia('(max-width: 1440px)')
 
   const {
     isOpen: isTableOpen,
@@ -171,7 +168,7 @@ const VulnTable = ({
           </Flex>
         )
       },
-      width: y.matches ? '15%' : '20%',
+      width: '15%',
       sortable: true
     },
     // SEVERITY
@@ -199,8 +196,9 @@ const VulnTable = ({
           </>
         )
       },
-      width: '120px',
-      sortable: true
+      width: '8%',
+      sortable: true,
+      wrap: true
     },
     // SOURCE
     {
@@ -223,8 +221,9 @@ const VulnTable = ({
           </Tag>
         )
       },
-      width: '110px',
-      sortable: true
+      width: '8%',
+      sortable: true,
+      wrap: true
     },
     // CVSS
     {
@@ -248,8 +247,9 @@ const VulnTable = ({
           </Flex>
         )
       },
-      width: '90px',
-      sortable: true
+      width: '8%',
+      sortable: true,
+      wrap: true
     },
     // EPSS
     {
@@ -299,8 +299,9 @@ const VulnTable = ({
           </Flex>
         )
       },
-      width: '120px',
-      sortable: true
+      width: '10%',
+      sortable: true,
+      wrap: true
     },
     // COMPONENT
     {
@@ -321,9 +322,8 @@ const VulnTable = ({
         )
       },
       wrap: true,
-      width: y.matches ? '10%' : x.matches ? '18%' : '15%',
-      sortable: true,
-      omit: hideColumn
+      width: '12%',
+      sortable: true
     },
     // VERSION
     {
@@ -335,9 +335,8 @@ const VulnTable = ({
         </Tooltip>
       ),
       wrap: true,
-      width: y.matches ? '10%' : x.matches ? '18%' : '12%',
-      sortable: true,
-      omit: hideColumn
+      width: '12%',
+      sortable: true
     },
     // STATUS
     {
@@ -360,6 +359,8 @@ const VulnTable = ({
           </Tag>
         )
       },
+      width: '12%',
+      wrap: true,
       sortable: true
     },
     // UPDATED AT
@@ -475,14 +476,15 @@ const VulnTable = ({
     return (
       <Flex
         width={'100%'}
-        alignItems={'center'}
+        alignItems={'flex-start'}
         justifyContent={'space-between'}
       >
-        <Stack
+        <Flex
           width={'100%'}
-          direction={'row'}
-          spacing={4}
+          flexDirection={'row'}
+          gap={4}
           alignItems={'flex-start'}
+          flexWrap={'wrap'}
         >
           {/* SEARCH COMPONENTS */}
           <SearchFilter
@@ -507,7 +509,7 @@ const VulnTable = ({
               ))}
             </Stack>
           )}
-        </Stack>
+        </Flex>
 
         {!customerView && (
           <Tooltip label='Import Statuses'>
@@ -731,20 +733,6 @@ const VulnTable = ({
   }
 
   useEffect(() => {
-    const handleResize = () => {
-      const scaleThreshold = 1.1
-      const currentScale = window.devicePixelRatio
-      setHideColumn(currentScale > scaleThreshold)
-    }
-    window.addEventListener('resize', handleResize)
-    handleResize()
-
-    return () => {
-      window.removeEventListener('resize', handleResize)
-    }
-  }, [])
-
-  useEffect(() => {
     if (data) {
       setIsPrevActive(data?.pageInfo?.hasPreviousPage)
       setIsNextActive(data?.pageInfo?.hasNextPage)
@@ -766,9 +754,10 @@ const VulnTable = ({
 
   return (
     <>
-      {/* TABLE */}
-      <Flex flexDir={'column'} width={'100%'}>
+      <Flex flexDir={'column'} width={'100%'} overflowX={'scroll'}>
+        {/* TABLE */}
         <DataTable
+          className='data-table-container'
           columns={columns}
           data={data && data.nodes}
           customStyles={customStyles}
@@ -779,7 +768,7 @@ const VulnTable = ({
           progressComponent={<CustomLoader />}
           subHeader
           subHeaderComponent={subHeader}
-          responsive
+          responsive={true}
           expandableRows
           expandOnRowClicked
           persistTableHead

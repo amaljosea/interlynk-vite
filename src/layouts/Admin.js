@@ -22,6 +22,7 @@ import { jwtDecode } from 'jwt-decode'
 
 export default function Dashboard(props) {
   const authToken = Cookies.get('authToken')
+  const highRes = window.matchMedia('(min-width: 2500px)')
   const navigate = useNavigate()
   const { ...rest } = props
   // states and functions
@@ -73,9 +74,8 @@ export default function Dashboard(props) {
           Cookies.remove('authToken')
           navigate('/auth')
         }
-      }
-      catch (err) {
-        console.error('Invalid Token Error:', err);
+      } catch (err) {
+        console.error('Invalid Token Error:', err)
         Cookies.remove('authToken')
         navigate('/auth')
       }
@@ -104,7 +104,12 @@ export default function Dashboard(props) {
           sidebarVariant={sidebarVariant}
           {...rest}
         />
-        <Box minH='100vh' w={'96%'} pos={'absolute'} right={0}>
+        <Box
+          minH='100vh'
+          w={highRes.matches ? '98%' : '96%'}
+          pos={'absolute'}
+          right={0}
+        >
           <Portal>
             <AdminNavbar
               brandText={getActiveRoute(dashRoutes)}
