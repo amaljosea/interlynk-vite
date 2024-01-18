@@ -156,7 +156,7 @@ const TeamTable = ({ data, refetch }) => {
         const { invitationStatus } = row
         return (
           <Tag
-            width='100px'
+            width='fit-content'
             variant='subtle'
             colorScheme={
               invitationStatus === 'invited'
