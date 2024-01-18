@@ -32,9 +32,11 @@ const VexModal = ({
   onClose,
   refetch,
   selectedVulns,
-  setSelectedVulns
+  setSelectedVulns,
+  setPageIndex,
+  setToggleClear
 }) => {
-  const {totalRows} = useGlobalState()
+  const { totalRows } = useGlobalState()
 
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -108,6 +110,7 @@ const VexModal = ({
   const fixedVersions = uniqVersions.filter((item) => item.value !== sbomId)
 
   const handleSave = () => {
+    setToggleClear(false)
     if (selectedVulns?.length > 0) {
       selectedVulns?.map((item) => {
         compVexCreate({
@@ -126,7 +129,9 @@ const VexModal = ({
         })
           .then((res) => {
             if (res.data) {
-              refetch({ variables: {id: vulnId, first: totalRows} })
+              refetch({ variables: { id: vulnId, first: totalRows } })
+              setPageIndex(1)
+              setToggleClear(true)
             }
           })
           .finally(() => onClose())

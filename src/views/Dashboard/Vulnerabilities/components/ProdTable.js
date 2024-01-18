@@ -64,6 +64,7 @@ const VulnProdTable = ({ data, refetch }) => {
   const [pageIndex, setPageIndex] = useState(1)
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
+  const [toggleClear, setToggleClear] = useState(false)
 
   // COLUMNS
   const columns = [
@@ -270,6 +271,7 @@ const VulnProdTable = ({ data, refetch }) => {
           responsive
           persistTableHead
           selectableRows
+          clearSelectedRows={toggleClear}
           onSelectedRowsChange={handleChange}
         />
 
@@ -331,6 +333,8 @@ const VulnProdTable = ({ data, refetch }) => {
           refetch={refetch}
           selectedVulns={selectedVulns}
           setSelectedVulns={setSelectedVulns}
+          setPageIndex={setPageIndex}
+          setToggleClear={setToggleClear}
         />
       )}
     </>
