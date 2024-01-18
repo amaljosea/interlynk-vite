@@ -76,14 +76,16 @@ const Settings = ({ enabled, data, refetch }) => {
       }
     })
       .then((res) => res.data && refetch({ id: id }))
-      .finally(() =>
-        toast({
-          description: 'Retention updated successfully',
-          position: 'top',
-          status: 'success',
-          duration: 3000
-        })
-      )
+      .finally(() => {
+        if (id === 'dataRetention') {
+          toast({
+            description: `Retention updated successfully`,
+            position: 'top',
+            status: 'success',
+            duration: 3000
+          })
+        }
+      })
   }
 
   return (
