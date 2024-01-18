@@ -1,4 +1,4 @@
-name: Build and Push SBOM to Interlynk
+name: SBOM from Release
 
 on:
   release:
