@@ -156,10 +156,7 @@ const ProductDetails = () => {
   )
 
   const [getSettings, { data: settings }] = useLazyQuery(GetProjectSettings, {
-    fetchPolicy: 'network-only',
-    variables: {
-      id: activeEnv
-    }
+    fetchPolicy: 'network-only'
   })
 
   const [getLogs, { data: prodLogs }] = useLazyQuery(GetProjectLogs, {
@@ -543,15 +540,19 @@ const ProductDetails = () => {
                   {/* SETTINGS */}
                   <TabPanel>
                     <Settings
-                      projectId={activeGroup?.defaultProject?.id}
                       data={settings?.project?.projectSetting}
                       enabled={activeGroup?.enabled}
+                      activeEnv={activeEnv}
                       refetch={getSettings}
                     />
                   </TabPanel>
                   {/* CHANGE LOG */}
                   <TabPanel>
-                    <ChangeLog data={prodLogs} refetch={getLogs} />
+                    <ChangeLog
+                      data={prodLogs}
+                      refetch={getLogs}
+                      activeEnv={activeEnv}
+                    />
                   </TabPanel>
                 </TabPanels>
               </Tabs>
