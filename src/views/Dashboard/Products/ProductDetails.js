@@ -454,7 +454,7 @@ const ProductDetails = () => {
                         icon={<ViewIcon />}
                         onClick={() => onEnvOpen()}
                       >
-                        View all environments
+                        Manage Environments
                       </MenuItem>
                     </MenuOptionGroup>
                   </MenuList>
