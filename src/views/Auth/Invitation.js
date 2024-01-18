@@ -27,6 +27,7 @@ const Invitation = () => {
   const nonce = queryParams.get('nonce')
 
   const [error, setError] = useState([])
+  const [isRejected, setIsRejected] = useState(false)
 
   const [acceptInvitation] = useMutation(AcceptInvitation)
   const [rejectInvitation] = useMutation(DeclineInvitation)
@@ -43,7 +44,9 @@ const Invitation = () => {
       } else {
         setError([])
         if (res.data.organizationUserInvitationAccept.userType === 'new_user') {
-          navigate(`/register?id=${res.data.organizationUserInvitationAccept.user.email}`)
+          navigate(
+            `/register?id=${res.data.organizationUserInvitationAccept.user.email}`
+          )
         } else if (
           res.data.organizationUserInvitationAccept.userType === 'existing_user'
         ) {
@@ -53,7 +56,9 @@ const Invitation = () => {
             position: 'top',
             duration: 4000
           })
-          navigate(`/auth?id=${res.data.organizationUserInvitationAccept.user.email}`)
+          navigate(
+            `/auth?id=${res.data.organizationUserInvitationAccept.user.email}`
+          )
         }
       }
     })
@@ -67,8 +72,7 @@ const Invitation = () => {
       }
     }).then((res) => {
       if (res.data) {
-        console.log(res.data)
-        navigate('/auth')
+        setIsRejected(true)
       }
     })
   }
@@ -118,18 +122,27 @@ const Invitation = () => {
             justifyContent={'center'}
             flexDir={'column'}
           >
-            <Icon color={'green.400'} boxSize={20} as={CheckCircleIcon} />
+            <Icon
+              color={isRejected ? 'red.400' : 'green.500'}
+              boxSize={20}
+              as={isRejected ? WarningIcon : CheckCircleIcon}
+            />
             <Text my={6} fontSize={20}>
-              This is an invitation to join Interlynk
+              {isRejected
+                ? 'Invitation Rejected'
+                : 'This is an invitation to join Interlynk'}
             </Text>
-            <HStack spacing={2}>
-              <Button variant='outline' colorScheme='blue' onClick={onReject}>
-                Decline
-              </Button>
-              <Button variant='solid' colorScheme='blue' onClick={onAccept}>
-                Accept
-              </Button>
-            </HStack>
+            {!isRejected && (
+              <HStack spacing={2}>
+                <Button variant='outline' colorScheme='blue' onClick={onReject}>
+                  Decline
+                </Button>
+
+                <Button variant='solid' colorScheme='blue' onClick={onAccept}>
+                  Accept
+                </Button>
+              </HStack>
+            )}
           </Box>
         </ModalBody>
       </ModalContent>
