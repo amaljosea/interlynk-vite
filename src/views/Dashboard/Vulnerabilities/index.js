@@ -13,10 +13,12 @@ const Vulnerabilities = () => {
   const queryParams = new URLSearchParams(location.search)
   const vulnId = queryParams.get('id')
 
-  const { totalRows } = useGlobalState()
+  const { totalRows, dispatch } = useGlobalState()
+  const { globalVulnDispatch } = dispatch
 
   const { data, refetch } = useQuery(GetGlobalVulns, {
-    variables: { first: totalRows }
+    variables: { first: totalRows },
+    onCompleted: () => globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
   })
 
   const { data: vulnData, refetch: vulnRefetch } = useQuery(GetGlobalVulnData, {
