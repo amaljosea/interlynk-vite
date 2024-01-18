@@ -24,6 +24,7 @@ import {
 import { UploadSbom } from 'graphQL/Mutation'
 import { useState } from 'react'
 import { FaUpload } from 'react-icons/fa'
+import { isDefaultEnv } from 'utils'
 
 const UploadModal = ({ projects, isOpen, onClose, activeEnv }) => {
   const toast = useToast()
@@ -79,6 +80,10 @@ const UploadModal = ({ projects, isOpen, onClose, activeEnv }) => {
     }
   }
 
+  const defaultEnv = activeEnv
+    ? projects?.find((item) => item.id === activeEnv)?.name
+    : ''
+
   return (
     <>
       <Modal isOpen={isOpen} onClose={onClose}>
@@ -102,6 +107,9 @@ const UploadModal = ({ projects, isOpen, onClose, activeEnv }) => {
                   width={'400px'}
                   id='dataRetention'
                   value={selectedEnv}
+                  textTransform={
+                    isDefaultEnv(defaultEnv) ? 'capitalize' : 'none'
+                  }
                   onChange={(e) => setSelectedEnv(e.target.value)}
                 >
                   {projects?.length > 0 &&

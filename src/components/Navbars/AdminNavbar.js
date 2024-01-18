@@ -83,12 +83,6 @@ export default function AdminNavbar(props) {
     }
   }, [data])
 
-  useEffect(() => {
-    if (params?.name && currentProduct?.name !== decodeURI(params?.name)) {
-      navigate('/vendor/dashboard')
-    }
-  }, [])
-
   // Here are all the props that may change depending on navbar's type or state.(secondary, variant, scrolled)
   let mainText = useColorModeValue('gray.700', 'gray.200')
   let secondaryText = useColorModeValue('gray.400', 'gray.200')

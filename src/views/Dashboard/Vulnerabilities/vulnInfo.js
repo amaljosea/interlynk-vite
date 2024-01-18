@@ -118,7 +118,7 @@ const VulnInfo = ({ data, refetch }) => {
                                 borderRadius='md'
                                 cursor={'pointer'}
                               >
-                                {data?.cvssScore}
+                                {data?.cvssScore || 0}
                               </Badge>
                             </Tooltip>
                             <Tooltip label='EPSS' placement='top'>
@@ -175,7 +175,7 @@ const VulnInfo = ({ data, refetch }) => {
           <TabPanels>
             {/* PRODUCTS TABLE */}
             <TabPanel px={1}>
-              <VulnProdTable data={data?.componentVulns} />
+              <VulnProdTable data={data?.componentVulns} refetch={refetch} />
             </TabPanel>
           </TabPanels>
         </Tabs>
