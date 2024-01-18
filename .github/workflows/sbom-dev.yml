@@ -1,7 +1,6 @@
 name: SBOM from Dev Branches
 
-on:
-  push:
+on: [push]
 
 jobs:
   build-sbom:
