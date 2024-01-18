@@ -79,4 +79,11 @@ describe('validateCpe', () => {
     expect(validateCpe(invalidCpe)).toBe(false);
   });
 
+  test('ISSUE-1503 CPEs should behave as expected', () => {
+    const validCpe = 'cpe:2.3:o:microsoft:windows_10_22h2::x64::::::*';
+    expect(validateCpe(validCpe)).toBe(true);
+    const partialCpe = 'cpe:2.3:a:byobu:byobu';
+    expect(validateCpe(partialCpe)).toBe(false);
+  });
+
 });
