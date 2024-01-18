@@ -416,6 +416,12 @@ export const GetGlobalVulns = gql`
     organization {
       vulns(after: $after, first: $first, before: $before, last: $last) {
         totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          hasPreviousPage
+          startCursor
+        }
         nodes {
           cvssScore
           cvssVector
@@ -447,12 +453,6 @@ export const GetGlobalVulns = gql`
             updatedAt
           }
         }
-        pageInfo {
-          endCursor
-          hasNextPage
-          hasPreviousPage
-          startCursor
-        }
       }
     }
   }
@@ -460,8 +460,14 @@ export const GetGlobalVulns = gql`
 
 // GET SINGLE GLOBAL VULNERABILITIES
 export const GetGlobalVulnData = gql`
-  query GetVulnData($vulnId: Uuid!) {
-    vuln(id: $vulnId) {
+  query GetVulnData(
+    $id: Uuid!
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+  ) {
+    vuln(id: $id) {
       id
       desc
       vulnId
@@ -478,7 +484,12 @@ export const GetGlobalVulnData = gql`
           }
         }
       }
-      componentVulns {
+      componentVulns(
+        first: $first
+        last: $last
+        after: $after
+        before: $before
+      ) {
         totalCount
         pageInfo {
           endCursor
@@ -487,6 +498,8 @@ export const GetGlobalVulnData = gql`
           startCursor
         }
         nodes {
+          id
+          vulnId
           vexStatus {
             id
             name
@@ -517,21 +530,51 @@ export const GetGlobalVulnData = gql`
 
 // GET PROJECT GROUP VULN DATA
 export const GetProjectGrpupComponentVulns = gql`
-  query GetProjectGrpupComponentVulns($projectGroupId: Uuid!) {
-    projectGroup(id: $projectGroupId) {
-      componentVulns {
+  query GetProjectGrpupComponentVulns(
+    $id: Uuid!
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+  ) {
+    projectGroup(id: $id) {
+      componentVulns(
+        first: $first
+        last: $last
+        after: $after
+        before: $before
+      ) {
+        totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          hasPreviousPage
+          startCursor
+        }
         nodes {
+          id
+          vulnId
           vexStatus {
+            id
             name
           }
-          vuln {
-            vulnId
-            cvssScore
-            vulnInfo {
-              epssScore
+          component {
+            id
+            name
+            version
+            sbom {
+              project {
+                name
+                projectGroup {
+                  name
+                }
+              }
+              primaryComponent {
+                id
+                name
+                version
+              }
             }
-            source
-            sev
           }
         }
       }

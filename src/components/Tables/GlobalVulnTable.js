@@ -62,7 +62,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
           </Link>
         )
       },
-      width: '25%'
+      width: '20%'
     },
     // SEVERITY
     {
@@ -89,7 +89,8 @@ const GlobalVulnTable = ({ data, refetch }) => {
           </>
         )
       },
-      width: '120px'
+      width: '8%',
+      wrap: true
     },
     // SOURCE
     {
@@ -112,7 +113,8 @@ const GlobalVulnTable = ({ data, refetch }) => {
           </Tag>
         )
       },
-      width: '110px'
+      width: '8%',
+      wrap: true
     },
     // CVSS
     {
@@ -134,7 +136,8 @@ const GlobalVulnTable = ({ data, refetch }) => {
           </Flex>
         )
       },
-      width: '90px'
+      width: '8%',
+      wrap: true
     },
     // EPSS
     {
@@ -185,7 +188,8 @@ const GlobalVulnTable = ({ data, refetch }) => {
           </Flex>
         )
       },
-      width: '150px'
+      width: '9%',
+      wrap: true
     },
     // STATUSES
     {
@@ -225,7 +229,8 @@ const GlobalVulnTable = ({ data, refetch }) => {
           </Stack>
         )
       },
-      width: '250px'
+      width: '20%',
+      wrap: true
     },
     // UPDATED AT
     {
