@@ -168,6 +168,7 @@ const EnvironmentDrawer = ({ data, isOpen, onClose, refetch, activeEnv }) => {
         <EnvModal
           isOpen={isProdOpen}
           onClose={onProdClose}
+          onEnvClose={onClose}
           groupId={data?.id}
           refetch={refetch}
         />
