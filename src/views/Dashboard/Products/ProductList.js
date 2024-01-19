@@ -12,7 +12,7 @@ import { GetProjectGroups } from 'graphQL/Queries'
 
 function ProductList() {
   const { totalRows, prodState, dispatch } = useGlobalState()
-  const { data, field, direction, enabled } = prodState
+  const { data, field, direction, enabled, searchInput } = prodState
   const {
     prodDispatch,
     prodCompDispatch,
@@ -32,10 +32,9 @@ function ProductList() {
     error
   } = useQuery(GetProjectGroups, {
     variables: {
+      direction: direction,
       first: totalRows,
-      enabled: enabled === 'yes' ? true : enabled === 'no' ? false : undefined,
-      field: field,
-      direction: direction
+      field: field
     },
     onCompleted: (data) =>
       prodDispatch({

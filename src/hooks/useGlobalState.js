@@ -31,7 +31,7 @@ const GlobalStateProvider = ({ children }) => {
     totalProduct: 0,
     searchInput: '',
     pageIndex: 1,
-    enabled: 'yes',
+    enabled: 'all',
     currentProduct: null
   })
   // GLOBAL VULNERABILITIES
