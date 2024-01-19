@@ -37,6 +37,24 @@ const prodLogReducer = (state, action) => {
         direction: payload.direction,
         pageIndex: 1
       }
+    case 'FILTER_TYPE':
+      return {
+        ...state,
+        type: [...payload].includes('all') ? [] : payload,
+        pageIndex: 1
+      }
+    case 'FILTER_USER':
+      return {
+        ...state,
+        user: [...payload].includes('all') ? [] : payload,
+        pageIndex: 1
+      }
+    case 'FILTER_OBJECT':
+      return {
+        ...state,
+        object: [...payload].includes('all') ? [] : payload,
+        pageIndex: 1
+      }
     default:
       return state
   }

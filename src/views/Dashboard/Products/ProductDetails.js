@@ -87,7 +87,7 @@ const ProductDetails = () => {
     dispatch,
     userPermissions
   } = useGlobalState()
-  const { field, direction, searchInput } = prodLogState
+  const { field, direction, searchInput, type, user, object } = prodLogState
   const { prodVulnDispatch } = dispatch
 
   const activeProd = localStorage.getItem('activeEnv')
@@ -260,6 +260,9 @@ const ProductDetails = () => {
       getLogs({
         variables: {
           search: searchInput !== '' ? searchInput : undefined,
+          changeType: type?.length === 0 ? undefined : type,
+          changedBy: user?.length === 0 ? undefined : user,
+          changeObject: object?.length === 0 ? undefined : object,
           id: activeEnv,
           first: totalRows,
           field: field,

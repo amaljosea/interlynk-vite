@@ -50,6 +50,9 @@ const GlobalStateProvider = ({ children }) => {
     field: 'ACTIVITY_LOGS_CREATED_AT',
     direction: 'DESC',
     searchInput: '',
+    type: [],
+    user: [],
+    object: [],
     pageIndex: 1
   })
   const [prodCompState, prodCompDispatch] = useReducer(prodCompReducer, {

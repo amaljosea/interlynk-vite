@@ -12,21 +12,16 @@ import CheckMark from 'components/Misc/CheckMark'
 import FilterButton from 'components/Misc/FilterButton'
 import { GetLogFilters } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
-import React, { useState } from 'react'
 
 const ChangelogFilterMenu = ({ id, refetch }) => {
   const { totalRows, prodLogState, dispatch } = useGlobalState()
-  const { field, direction, searchInput } = prodLogState
+  const { field, direction, searchInput, user, type, object } = prodLogState
   const { prodLogDispatch } = dispatch
 
   const { data, error, loading } = useQuery(GetLogFilters, {
     variables: { id: id },
     fetchPolicy: 'network-only'
   })
-
-  const [selectedType, setSelectedType] = useState([])
-  const [selectedUser, setSelectedUser] = useState([])
-  const [selectObject, setSelectObject] = useState([])
 
   const logData = {
     id,
@@ -36,54 +31,66 @@ const ChangelogFilterMenu = ({ id, refetch }) => {
     search: searchInput !== '' ? searchInput : undefined
   }
 
-  const onFilterType = (value) => {
-    setSelectedType(value.includes('all') ? [] : value)
-    refetch({
+  const onFilterType = async (value) => {
+    await refetch({
       variables: {
         changeType: value.includes('all') ? undefined : value,
+        changedBy: user?.length === 0 ? undefined : user,
+        changeObject: object?.length === 0 ? undefined : object,
         ...logData
       }
+    }).then((res) => {
+      if (res.data) {
+        prodLogDispatch({ type: 'FILTER_TYPE', payload: value })
+      }
     })
-    prodLogDispatch({ type: 'FETCH_DATA_SUCCESS' })
   }
 
-  const onFilterUser = (value) => {
-    setSelectedUser(value.includes('all') ? [] : value)
-    refetch({
+  const onFilterUser = async (value) => {
+    await refetch({
       variables: {
+        changeType: type?.length === 0 ? undefined : type,
         changedBy: value.includes('all') ? undefined : value,
+        changeObject: object?.length === 0 ? undefined : object,
         ...logData
       }
+    }).then((res) => {
+      if (res.data) {
+        prodLogDispatch({ type: 'FILTER_USER', payload: value })
+      }
     })
-    prodLogDispatch({ type: 'FETCH_DATA_SUCCESS' })
   }
 
-  const onFilterObject = (value) => {
-    setSelectObject(value.includes('all') ? [] : value)
-    refetch({
+  const onFilterObject = async (value) => {
+    await refetch({
       variables: {
+        changeType: type?.length === 0 ? undefined : type,
+        changedBy: user?.length === 0 ? undefined : user,
         changeObject: value.includes('all') ? undefined : value,
         ...logData
       }
+    }).then((res) => {
+      if (res.data) {
+        prodLogDispatch({ type: 'FILTER_OBJECT', payload: value })
+      }
     })
-    prodLogDispatch({ type: 'FETCH_DATA_SUCCESS' })
   }
 
-  if (loading) return <Text>Loading...</Text>
+  if (loading) return <Text pt={2}>Loading...</Text>
 
-  if (error) return <Text>Something went wrong...</Text>
+  if (error) return <Text pt={2}>Something went wrong...</Text>
 
   return (
     <Flex alignItems={'center'} gap={4}>
       {/* TYPE FILTER */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {selectedType.length !== 0 && <CheckMark />}
+          {type.length !== 0 && <CheckMark />}
           <FilterButton>Type</FilterButton>
           <MenuList minWidth='240px'>
             <MenuOptionGroup
               type='checkbox'
-              value={selectedType}
+              value={type}
               onChange={onFilterType}
             >
               <MenuItemOption value={'all'} fontSize={'sm'}>
@@ -109,12 +116,12 @@ const ChangelogFilterMenu = ({ id, refetch }) => {
       {/* USER FILTER */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {selectedUser.length !== 0 && <CheckMark />}
+          {user.length !== 0 && <CheckMark />}
           <FilterButton>User</FilterButton>
           <MenuList minWidth='240px'>
             <MenuOptionGroup
               type='checkbox'
-              value={selectedUser}
+              value={user}
               onChange={onFilterUser}
             >
               <MenuItemOption value={'all'} fontSize={'sm'}>
@@ -135,12 +142,12 @@ const ChangelogFilterMenu = ({ id, refetch }) => {
       {/* OBJECTS FILTER */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {selectObject.length !== 0 && <CheckMark />}
+          {object.length !== 0 && <CheckMark />}
           <FilterButton>Object</FilterButton>
           <MenuList minWidth='240px'>
             <MenuOptionGroup
               type='checkbox'
-              value={selectObject}
+              value={object}
               onChange={onFilterObject}
             >
               <MenuItemOption value={'all'} fontSize={'sm'}>
