@@ -28,15 +28,11 @@ import { useLocation } from 'react-router-dom'
 import { timeSince } from 'utils'
 import { useGlobalState } from 'hooks/useGlobalState'
 
-const Automation = ({ data, refetch }) => {
+const Automation = ({ data, refetch, productId }) => {
   const { totalRows, userPermissions, prodRulesState, dispatch } =
     useGlobalState()
   const { field, direction } = prodRulesState
   const { prodRulesDispatch } = dispatch
-
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const productId = queryParams.get('id')
 
   const product = userPermissions?.find((item) => item.key === 'view_product')
   const editAutomations = product?.supersededBy?.some(

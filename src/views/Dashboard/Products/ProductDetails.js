@@ -536,6 +536,7 @@ const ProductDetails = () => {
                     <Automation
                       data={rules?.project.autoChecks}
                       refetch={getRules}
+                      productId={activeEnv}
                     />
                   </TabPanel>
                   {/* SETTINGS */}
