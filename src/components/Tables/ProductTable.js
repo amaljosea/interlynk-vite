@@ -47,6 +47,7 @@ import UploadModal from 'views/Dashboard/Products/components/UploadModal'
 import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import ProdFilterMenu from 'views/Dashboard/Products/components/ProdFilterMenu'
 import { useGlobalState } from 'hooks/useGlobalState'
+import ProdSearchFilter from 'views/Sbom/components/ProdSearchFilter'
 import Card from 'components/Card/Card'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import StatusModal from 'views/Dashboard/Products/components/StatusModal'
@@ -674,50 +675,14 @@ const ProductTable = ({ data, refetch }) => {
         )}
 
         {/* DISABLED */}
-        {isWarning && (
-            <Modal isOpen={isWarning} onClose={onWarningClose}>
-              <ModalOverlay />
-              <ModalContent>
-                <ModalHeader>
-                  {activeRow.enabled ? 'Disable' : 'Enable'} Product
-                </ModalHeader>
-                <ModalCloseButton />
-                <ModalBody>
-                  <Text>
-                    {activeRow.enabled ? 'Disable' : 'Enable'} this product will:{' '}
-                  </Text>
-                  <UnorderedList>
-                    <Flex flexDir={'column'} gap={1} mt={4}>
-                      {[
-                        `${
-                            activeRow.enabled ? 'Disable' : 'Enable'
-                        } this product, its versions and SBOMs`,
-                        `${
-                            activeRow.enabled ? 'Disable' : 'Enable'
-                        } access to the product for all users`,
-                        `${
-                            activeRow.enabled ? 'Disable' : 'Enable'
-                        } uploads of SBOMs to this product`
-                      ].map((item, index) => (
-                          <ListItem key={index}>{item}</ListItem>
-                      ))}
-                    </Flex>
-                  </UnorderedList>
-                  <Text mt={10}>Are you sure you wish to continue?</Text>
-                </ModalBody>
-                <ModalFooter>
-                  <Button mr={3} onClick={onWarningClose}>
-                    No
-                  </Button>
-                  <Button
-                      colorScheme={activeRow.enabled ? 'red' : 'green'}
-                      onClick={toggleStatus}
-                  >
-                    Yes
-                  </Button>
-                </ModalFooter>
-              </ModalContent>
-            </Modal>
+          {isWarningOpen && data && (
+            <StatusModal
+              isOpen={isWarningOpen}
+              onClose={onWarningClose}
+              group={data?.projectGroup}
+              grouId={productId}
+              refetch={refetch}
+            />
         )}
       </>
   )
