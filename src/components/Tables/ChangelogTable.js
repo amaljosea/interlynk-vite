@@ -1,11 +1,9 @@
 import { Button, Flex, Stack, Tag, Tooltip, Text, Box } from '@chakra-ui/react'
+import React, { useEffect, useMemo, useState } from 'react'
+import { timeSince, getFullDateAndTime, customStyles } from 'utils'
+import DataTable from 'react-data-table-component'
 import CustomLoader from 'components/CustomLoader'
 import { useGlobalState } from 'hooks/useGlobalState'
-import React, { useEffect, useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
-import { useLocation } from 'react-router-dom'
-import { timeSince } from 'utils'
-import { getFullDateAndTime, customStyles } from 'utils'
 import ChangelogFilterMenu from 'views/Sbom/components/ChangelogFilterMenu'
 import RowLimit from 'views/Sbom/components/RowLimit'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
@@ -31,26 +29,18 @@ const setColor = (type) => {
 
 const ChangelogTable = ({ data, refetch, activeEnv }) => {
   const { totalRows, setTotalRows, prodLogState, dispatch } = useGlobalState()
-  const { field, direction, pageIndex } = prodLogState
+  const {
+    field,
+    direction,
+    pageIndex,
+    searchInput: search,
+    type,
+    object,
+    user
+  } = prodLogState
   const { prodLogDispatch } = dispatch
 
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-
-  const productId = queryParams.get('id')
-
   const [searchInput, setSearchInput] = useState('')
-  const [userFilters, setUserFilters] = useState([])
-  const [typeFilters, setTypeFilters] = useState([])
-
-  useEffect(() => {
-    if (data) {
-      const users = data?.nodes?.map((item) => item.changedBy) || []
-      const actions = data?.nodes?.map((item) => item.action) || []
-      setUserFilters(users)
-      setTypeFilters(actions)
-    }
-  }, [data])
 
   // COLUMNS
   const columns = [
@@ -150,14 +140,22 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
     }
   ]
 
+  const logData = {
+    id: activeEnv,
+    changeType: type?.length === 0 ? undefined : type,
+    changedBy: user?.length === 0 ? undefined : user,
+    changeObject: object?.length === 0 ? undefined : object,
+    field,
+    direction
+  }
+
   const onPreviousPage = async () => {
     await refetch({
       variables: {
-        id: activeEnv,
         last: totalRows,
         before: data.pageInfo.startCursor,
-        field: field,
-        direction: direction
+        search: search !== '' ? search : undefined,
+        ...logData
       }
     }).then(
       (res) =>
@@ -172,11 +170,10 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
   const onNextPage = async () => {
     await refetch({
       variables: {
-        id: activeEnv,
         first: totalRows,
         after: data?.pageInfo?.endCursor,
-        field: field,
-        direction: direction
+        search: search !== '' ? search : undefined,
+        ...logData
       }
     }).then(
       (res) =>
@@ -197,11 +194,9 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
     if (event.key === 'Enter' && value !== '') {
       await refetch({
         variables: {
-          id: activeEnv,
           search: value,
           first: totalRows,
-          field: field,
-          direction: direction
+          ...logData
         }
       }).then(
         (res) =>
@@ -216,11 +211,9 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
     setSearchInput('')
     await refetch({
       variables: {
-        id: activeEnv,
         search: undefined,
         first: totalRows,
-        field: field,
-        direction: direction
+        ...logData
       }
     }).then(
       (res) =>
@@ -247,6 +240,10 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
       variables: {
         id: activeEnv,
         first: totalRows,
+        search: search !== '' ? search : undefined,
+        changeType: type?.length === 0 ? undefined : type,
+        changedBy: user?.length === 0 ? undefined : user,
+        changeObject: object?.length === 0 ? undefined : object,
         field: column.id,
         direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
       }
@@ -268,10 +265,9 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
     setTotalRows(Number(e.target.value))
     await refetch({
       variables: {
-        id: activeEnv,
+        search: search !== '' ? search : undefined,
         first: Number(e.target.value),
-        field: field,
-        direction: direction
+        ...logData
       }
     }).then(
       (res) =>
@@ -304,12 +300,7 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
             onFilter={handleSearch}
           />
 
-          <ChangelogFilterMenu
-            refetch={refetch}
-            users={userFilters}
-            actions={typeFilters}
-            id={activeEnv}
-          />
+          <ChangelogFilterMenu refetch={refetch} id={activeEnv} />
         </Stack>
       </Flex>
     )
