@@ -58,6 +58,11 @@ const prodReducer = (state, action) => {
         ...state,
         totalProduct: payload
       }
+    case 'CLEAR_FILTER':
+      return {
+        ...state,
+        enabled: 'all'
+      }
     default:
       return state
   }

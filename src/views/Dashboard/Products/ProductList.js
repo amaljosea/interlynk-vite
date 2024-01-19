@@ -58,6 +58,7 @@ function ProductList() {
       prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
       prodCheckDispatch({ type: 'CLEAR_PROD_CHECK' })
       sbomLogDispatch({ type: 'CLEAR_SBOM_LOG' })
+      prodDispatch({ type: 'CLEAR_FILTER' })
     }
   }, [product])
 
