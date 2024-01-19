@@ -139,7 +139,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
         const { primaryComponent, id, createdAt } = row
         return (
           <Link
-            to={`/vendor/products/${data.name}?id=${productId}&sbom=${id}`}
+            to={`/vendor/products/${data?.name}?id=${productId}&sbom=${id}`}
             onClick={() => {
               localStorage.setItem(
                 'currentSBOM',

@@ -22,13 +22,9 @@ import { useMemo } from 'react'
 import EnvModal from 'views/Dashboard/Products/components/EnvModal'
 import { useMutation } from '@apollo/client'
 import { EnvDelete } from 'graphQL/Mutation'
-import { useGlobalState } from 'hooks/useGlobalState'
 import { isDefaultEnv } from 'utils'
 
 const EnvironmentDrawer = ({ data, isOpen, onClose, refetch, activeEnv }) => {
-  const { totalRows, prodState } = useGlobalState()
-  const { field, direction } = prodState
-
   const {
     isOpen: isProdOpen,
     onOpen: onProdOpen,
@@ -46,9 +42,7 @@ const EnvironmentDrawer = ({ data, isOpen, onClose, refetch, activeEnv }) => {
       (res) =>
         res.data &&
         refetch({
-          first: totalRows,
-          field: field,
-          direction: direction
+          id: data?.id
         })
     )
   }

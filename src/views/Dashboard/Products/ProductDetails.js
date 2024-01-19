@@ -24,7 +24,6 @@ import {
   UnorderedList,
   ListItem,
   Button,
-  Select,
   Menu,
   MenuButton,
   MenuList,
@@ -53,13 +52,12 @@ import ProductModal from './components/ProductModal'
 import UploadModal from './components/UploadModal'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useQuery, useMutation, useLazyQuery } from '@apollo/client'
-import { DeleteProjectGroup, UpdateProjectGroup } from 'graphQL/Mutation'
+import { DeleteProjectGroup } from 'graphQL/Mutation'
 import {
   GetProductVersions,
   GetProjectCheck,
   GetVulnData,
   GetProjectLogs,
-  GetProjectGroups,
   GetProjectSettings
 } from 'graphQL/Queries'
 import Settings from '../ProductSettings'
@@ -69,6 +67,8 @@ import EnvironmentDrawer from 'components/Drawer/EnvironmentDrawer'
 import { isDefaultEnv } from 'utils'
 import { GetProjectGroupComponentVulns } from 'graphQL/Queries'
 import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
+import StatusModal from './components/StatusModal'
+import { GetProjectGroup } from 'graphQL/Queries'
 
 const ProductDetails = () => {
   const navigate = useNavigate()
@@ -81,7 +81,6 @@ const ProductDetails = () => {
     totalRows,
     activeProdTab,
     setActiveProdTab,
-    prodState,
     prodLogState,
     prodVulnState,
     prodRulesState,
@@ -89,7 +88,6 @@ const ProductDetails = () => {
     userPermissions
   } = useGlobalState()
   const { field, direction, searchInput } = prodLogState
-  const { enabled } = prodState
   const { prodVulnDispatch } = dispatch
 
   const activeProd = localStorage.getItem('activeEnv')
@@ -107,22 +105,11 @@ const ProductDetails = () => {
       permission.key === 'archive_product_group' && permission.value === true
   )
 
-  const { data, refetch, loading, error } = useQuery(GetProjectGroups, {
+  const { data, refetch, loading, error } = useQuery(GetProjectGroup, {
+    fetchPolicy: 'network-only',
     variables: {
-      first: totalRows,
-      enabled: enabled === 'yes' ? true : enabled === 'no' ? false : undefined,
-      field: prodState.field,
-      direction: prodState.direction
+      id: productId
     }
-    // onCompleted: (data) => {
-    //   if (data) {
-    //     const activeGroup = data?.organization?.projectGroups?.nodes.find(
-    //       (item) => item.id === productId
-    //     )
-    //     localStorage.setItem('activeEnv', activeGroup?.defaultProject?.id)
-    //     setActiveEnv(activeGroup?.defaultProject?.id)
-    //   }
-    // }
   })
 
   const activeGroup =
@@ -134,6 +121,7 @@ const ProductDetails = () => {
   const { data: versions, refetch: sbomRefetch } = useQuery(
     GetProductVersions,
     {
+      fetchPolicy: 'network-only',
       variables: {
         id: activeEnv
       }
@@ -176,10 +164,6 @@ const ProductDetails = () => {
       field: prodVulnState.field,
       direction: prodVulnState.direction
     }
-  })
-
-  const [projectUpdate] = useMutation(UpdateProjectGroup, {
-    onCompleted: () => refetch({ id: productId })
   })
 
   const [projectDelete] = useMutation(DeleteProjectGroup, {
@@ -229,16 +213,6 @@ const ProductDetails = () => {
     setActiveEnv(value)
   }
 
-  // TOGGLE STATUS
-  const toggleStatus = async () => {
-    await projectUpdate({
-      variables: {
-        id: activeGroup?.id,
-        enabled: activeGroup?.enabled === true ? false : true
-      }
-    }).then((res) => res.data && onWarningClose())
-  }
-
   // DELETE PRODUCT
   const onProductDelete = async () => {
     await projectDelete({
@@ -250,9 +224,10 @@ const ProductDetails = () => {
       .finally(() => navigate('/vendor/products'))
   }
 
-  const defaultEnv = activeEnv
-    ? activeGroup?.projects?.find((item) => item.id === activeEnv)?.name
-    : ''
+  const defaultEnv =
+    data && activeEnv
+      ? data?.projectGroup?.projects.find((item) => item.id === activeEnv)?.name
+      : ''
 
   useEffect(() => {
     if (sbomId === null) {
@@ -357,12 +332,12 @@ const ProductDetails = () => {
                           alignItems={'left'}
                         >
                           <Text fontWeight={'semibold'} fontSize={25}>
-                            {activeGroup?.name || ''}
+                            {data?.projectGroup?.name || ''}
                           </Text>
                         </Stack>
                         {/* PRODUCT DESCRIPTION */}
                         <Text fontSize={'sm'}>
-                          {activeGroup?.description || ''}
+                          {data?.projectGroup?.description || ''}
                         </Text>
                       </Flex>
                     </Flex>
@@ -379,7 +354,9 @@ const ProductDetails = () => {
                       {/* EDIT PRODUCT */}
                       <Tooltip label='Edit Product'>
                         <IconButton
-                          isDisabled={!activeGroup?.enabled || !updateProduct}
+                          isDisabled={
+                            !data?.projectGroup?.enabled || !updateProduct
+                          }
                           colorScheme='blue'
                           onClick={onOpenProduct}
                           icon={<FaPenToSquare />}
@@ -388,7 +365,7 @@ const ProductDetails = () => {
                       {/* UPLOAD SBOM */}
                       <Tooltip label='Upload SBOM'>
                         <IconButton
-                          isDisabled={!activeGroup?.enabled}
+                          isDisabled={!data?.projectGroup?.enabled}
                           colorScheme='blue'
                           onClick={onOpenUpload}
                           icon={<FaUpload />}
@@ -397,7 +374,7 @@ const ProductDetails = () => {
                       {/* UPDATE PRODUCT STATUS */}
                       <Tooltip
                         label={
-                          activeGroup?.enabled
+                          data?.projectGroup?.enabled
                             ? 'Disable Product'
                             : 'Enable Product'
                         }
@@ -406,7 +383,7 @@ const ProductDetails = () => {
                           colorScheme={'blue'}
                           onClick={onWarningOpen}
                           icon={
-                            activeGroup?.enabled ? (
+                            data?.projectGroup?.enabled ? (
                               <FaToggleOff />
                             ) : (
                               <FaToggleOn />
@@ -453,7 +430,7 @@ const ProductDetails = () => {
                       value={activeEnv}
                       onChange={onChangeEnv}
                     >
-                      {activeGroup?.projects?.map((item) => (
+                      {data?.projectGroup?.projects?.map((item) => (
                         <MenuItemOption
                           fontSize={'sm'}
                           value={item?.id}
@@ -510,7 +487,7 @@ const ProductDetails = () => {
                       <VersionTable
                         productId={activeEnv}
                         project={versions?.project}
-                        data={activeGroup}
+                        data={data?.projectGroup}
                         getVulnData={vulnRefetch}
                         refetch={sbomRefetch}
                       />
@@ -544,7 +521,7 @@ const ProductDetails = () => {
                   <TabPanel>
                     <Settings
                       data={settings?.project?.projectSetting}
-                      enabled={activeGroup?.enabled}
+                      enabled={data?.projectGroup?.enabled}
                       activeEnv={activeEnv}
                       refetch={getSettings}
                     />
@@ -566,9 +543,9 @@ const ProductDetails = () => {
         {/* CREATE PRODUCT */}
         {data && isOpenProduct && (
           <ProductModal
-            description={activeGroup?.description}
-            product={activeGroup?.name}
-            id={activeGroup?.id}
+            description={data?.projectGroup?.description}
+            product={data?.projectGroup?.name}
+            id={data?.projectGroup?.id}
             onClose={onCloseProduct}
             isOpen={isOpenProduct}
             refetch={refetch}
@@ -578,7 +555,7 @@ const ProductDetails = () => {
         {/* UPLOAD SBOM */}
         {isOpenUpload && data && (
           <UploadModal
-            projects={activeGroup?.projects}
+            projects={data?.projectGroup?.projects}
             isOpen={isOpenUpload}
             onClose={onCloseUpload}
             activeEnv={activeEnv}
@@ -587,50 +564,13 @@ const ProductDetails = () => {
 
         {/* DISABLED */}
         {isWarningOpen && data && (
-          <Modal isOpen={isWarningOpen} onClose={onWarningClose}>
-            <ModalOverlay />
-            <ModalContent>
-              <ModalHeader>
-                {activeGroup?.enabled ? 'Disable' : 'Enable'} Product
-              </ModalHeader>
-              <ModalCloseButton />
-              <ModalBody>
-                <Text>
-                  {activeGroup?.enabled ? 'Disable' : 'Enable'} this product
-                  will:{' '}
-                </Text>
-                <UnorderedList>
-                  <Flex flexDir={'column'} gap={1} mt={4}>
-                    {[
-                      `${
-                        activeGroup?.enabled ? 'Disable' : 'Enable'
-                      } this product, its versions and SBOMs`,
-                      `${
-                        activeGroup?.enabled ? 'Disable' : 'Enable'
-                      } access to the product for all users`,
-                      `${
-                        activeGroup?.enabled ? 'Disable' : 'Enable'
-                      } uploads of SBOMs to this product`
-                    ].map((item, index) => (
-                      <ListItem key={index}>{item}</ListItem>
-                    ))}
-                  </Flex>
-                </UnorderedList>
-                <Text mt={10}>Are you sure you wish to continue?</Text>
-              </ModalBody>
-              <ModalFooter>
-                <Button mr={3} onClick={onWarningClose}>
-                  No
-                </Button>
-                <Button
-                  colorScheme={data?.project?.enabled ? 'red' : 'green'}
-                  onClick={toggleStatus}
-                >
-                  Yes
-                </Button>
-              </ModalFooter>
-            </ModalContent>
-          </Modal>
+          <StatusModal
+            isOpen={isWarningOpen}
+            onClose={onWarningClose}
+            group={data?.projectGroup}
+            grouId={productId}
+            refetch={refetch}
+          />
         )}
 
         {/* DELETE */}
@@ -673,7 +613,7 @@ const ProductDetails = () => {
           <EnvironmentDrawer
             isOpen={isEnvOpen}
             onClose={onEnvClose}
-            data={activeGroup}
+            data={data?.projectGroup}
             refetch={refetch}
             activeEnv={activeEnv}
           />
