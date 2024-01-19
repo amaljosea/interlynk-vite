@@ -19,9 +19,9 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useEffect, useState } from 'react'
 
 const GeneralFeed = ({ orgInfo, refetch }) => {
-  const { userPermissons } = useGlobalState()
+  const { userPermissions } = useGlobalState()
 
-  const org = userPermissons?.find((item) => item.key === 'view_organization')
+  const org = userPermissions?.find((item) => item.key === 'view_organization')
   const updateOrgs = org?.supersededBy?.some(
     (permission) =>
       permission.key === 'update_organization' && permission.value === true

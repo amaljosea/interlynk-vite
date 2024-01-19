@@ -76,7 +76,7 @@ const VulnTable = ({
   const customerView = location.pathname.startsWith('/customer')
   const signedParams = Cookies.get(`signedParamId`)
 
-  const { userPermissons, totalRows, setTotalRows, prodVulnState, dispatch } =
+  const { userPermissions, totalRows, setTotalRows, prodVulnState, dispatch } =
     useGlobalState()
   const {
     pageIndex,
@@ -92,7 +92,7 @@ const VulnTable = ({
   } = prodVulnState
   const { prodVulnDispatch } = dispatch
 
-  const sboms = userPermissons?.find((item) => item.key === 'view_sbom')
+  const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
   const editVulns = sboms?.supersededBy?.some(
     (permission) =>
       permission.key === 'edit_vulnerabilities' && permission.value === true

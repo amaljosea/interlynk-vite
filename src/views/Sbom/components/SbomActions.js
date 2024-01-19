@@ -40,7 +40,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
     setActiveSbomTab,
     dispatch,
     prodCompState,
-    userPermissons
+    userPermissions
   } = useGlobalState()
   const {
     field,
@@ -61,7 +61,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
     sbomDispatch
   } = dispatch
 
-  const sboms = userPermissons?.find((item) => item.key === 'view_sbom')
+  const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
   const archiveSboms = sboms?.supersededBy?.some(
     (permission) =>
       permission.key === 'archive_sbom' && permission.value === true

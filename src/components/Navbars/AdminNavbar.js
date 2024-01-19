@@ -17,7 +17,7 @@ import { GetUserPermissions } from 'graphQL/Queries'
 import { permissionList } from 'utils'
 
 export default function AdminNavbar(props) {
-  const { setUserPermissons } = useGlobalState()
+  const { setUserPermissions } = useGlobalState()
 
   function parseJSONSafely(str) {
     try {
@@ -36,7 +36,7 @@ export default function AdminNavbar(props) {
       const permissions = permissionList(
         data?.organization?.currentUser?.role?.permissionsMap || []
       )
-      setUserPermissons(permissions)
+      setUserPermissions(permissions)
     }
   }, [data])
 
@@ -79,7 +79,7 @@ export default function AdminNavbar(props) {
       const permissions = permissionList(
         data?.organization?.currentUser?.role?.permissionsMap || []
       )
-      setUserPermissons(permissions)
+      setUserPermissions(permissions)
     }
   }, [data])
 

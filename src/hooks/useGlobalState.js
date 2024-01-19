@@ -14,7 +14,7 @@ import {
 const GlobalStateContext = createContext()
 
 const GlobalStateProvider = ({ children }) => {
-  const [userPermissons, setUserPermissons] = useState([])
+  const [userPermissions, setUserPermissions] = useState([])
   const [userName, setUserName] = useState('')
   const [totalRows, setTotalRows] = useState(25)
   const [activeProdTab, setActiveProdTab] = useState(0)
@@ -145,8 +145,8 @@ const GlobalStateProvider = ({ children }) => {
         setActiveDockerHub,
         vulnerabilitiesData,
         setVulnerabilitiesData,
-        userPermissons,
-        setUserPermissons,
+        userPermissions,
+        setUserPermissions,
         scanEnabled,
         setScanEnabled,
         userName,

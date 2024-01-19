@@ -48,7 +48,7 @@ import RowLimit from 'views/Sbom/components/RowLimit'
 
 const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
   const {
-    userPermissons,
+    userPermissions,
     totalRows,
     setTotalRows,
     setActiveSbomTab,
@@ -58,7 +58,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
   const { field, direction } = prodVulnState
   const { prodVulnDispatch, prodCompDispatch } = dispatch
 
-  const sbom = userPermissons?.find((item) => item.key === 'view_sbom')
+  const sbom = userPermissions?.find((item) => item.key === 'view_sbom')
   const createSbom = sbom?.supersededBy?.some(
     (permission) =>
       permission.key === 'create_sbom' && permission.value === true

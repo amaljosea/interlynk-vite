@@ -36,7 +36,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
   const currentProduct = JSON.parse(localStorage.getItem(`product`))
   const { data: res } = useQuery(GetCdxResponses)
 
-  const { totalRows, userPermissons, prodVulnState, dispatch } =
+  const { totalRows, userPermissions, prodVulnState, dispatch } =
     useGlobalState()
   const {
     field,
@@ -50,7 +50,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
   } = prodVulnState
   const { prodVulnDispatch } = dispatch
 
-  const sboms = userPermissons?.find((item) => item.key === 'view_sbom')
+  const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
   const editVulns = sboms?.supersededBy?.some(
     (permission) =>
       permission.key === 'edit_vulnerabilities' && permission.value === true

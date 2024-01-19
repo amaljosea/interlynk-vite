@@ -27,11 +27,11 @@ import { useState, useEffect } from 'react'
 
 const Settings = ({ enabled, data, refetch, activeEnv }) => {
   const toast = useToast()
-  const { userPermissons } = useGlobalState()
+  const { userPermissions } = useGlobalState()
   const [dataRetentionDays, setDataRetentionDays] = useState(0)
   const [projectSettingId, setProjectSettingId] = useState(null)
 
-  const product = userPermissons?.find((item) => item.key === 'view_product')
+  const product = userPermissions?.find((item) => item.key === 'view_product')
   const editControls = product?.supersededBy?.some(
     (permission) =>
       permission.key === 'edit_product_controls' && permission.value === true

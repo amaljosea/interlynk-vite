@@ -1,5 +1,4 @@
 import {
-  Box,
   IconButton,
   Text,
   Switch,
@@ -22,23 +21,27 @@ import {
   ListItem,
   Divider,
   Tooltip,
-  Stack,
-  Select
+  Stack
 } from '@chakra-ui/react'
-import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
 import { FaEllipsisV } from 'react-icons/fa'
+
+import {useCallback, useEffect, useMemo, useState} from 'react'
+import { Link } from 'react-router-dom'
+
+import { useMutation } from '@apollo/client'
+import { UpdateProjectGroup, DeleteProjectGroup } from 'graphQL/Mutation'
+
 import {
   getFullDateAndTime,
   timeSince,
   customStyles,
   removeDuplicates
 } from 'utils'
-import CustomLoader from 'components/CustomLoader'
+
 import DataTable from 'react-data-table-component'
-import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
-import { useMutation } from '@apollo/client'
-import { UpdateProjectGroup, DeleteProjectGroup } from 'graphQL/Mutation'
+
+import CustomLoader from 'components/CustomLoader'
 import ProductModal from 'views/Dashboard/Products/components/ProductModal'
 import UploadModal from 'views/Dashboard/Products/components/UploadModal'
 import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
@@ -47,38 +50,51 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import ProdSearchFilter from 'views/Sbom/components/ProdSearchFilter'
 import Card from 'components/Card/Card'
 
+import Pagination from '../Pagination';
+
+
 const ProductTable = ({ data, refetch }) => {
   const {
-    userPermissons,
-    totalRows,
-    setTotalRows,
+    userPermissions,
     setActiveSbomTab,
     prodState,
     dispatch
-  } = useGlobalState()
-  const { field, direction, searchInput, pageIndex } = prodState
-  const { prodDispatch, sbomDispatch } = dispatch
+  } = useGlobalState();
 
-  const product = userPermissons?.find(
-    (item) => item.key === 'view_product_group'
-  )
-  const addProduct = product?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'create_product_group' && permission.value === true
-  )
-  const updateProduct = product?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'update_product_group' && permission.value === true
-  )
-  const archiveProduct = product?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'archive_product_group' && permission.value === true
-  )
+  const paginationSizes = [25, 50, 100];
 
-  const [activeRow, setActiveRow] = useState(null)
-  const [isPrevActive, setIsPrevActive] = useState(false)
-  const [isNextActive, setIsNextActive] = useState(false)
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const [totalRows, setTotalRows] = useState(paginationSizes[0]);
+
+  const { field, direction, searchInput, pageIndex } = prodState;
+  const { prodDispatch, sbomDispatch } = dispatch;
+
+  const productPermissions = useMemo(
+      () => userPermissions?.find(item => item.key === 'view_product_group'),
+      [userPermissions]
+  );
+
+  const canAddProduct =
+      () => productPermissions?.supersededBy?.some(
+          permission => permission.key === 'create_product_group' && permission.value
+      );
+
+  const canUpdateProduct = useMemo(
+      () => productPermissions?.supersededBy?.some(
+          permission => permission.key === 'update_product_group' && permission.value
+      ),
+      [productPermissions]
+  );
+
+
+  const canArchiveProduct = useMemo(
+      () => productPermissions?.supersededBy?.some(
+          permission => permission.key === 'archive_product_group' && permission.value
+      ),
+      [productPermissions]
+  );
+
+  const [activeRow, setActiveRow] = useState(null);
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const {
     isOpen: isOpenProduct,
@@ -109,70 +125,54 @@ const ProductTable = ({ data, refetch }) => {
     onClose: onWarningClose
   } = useDisclosure()
 
-  const [projectGroupDelete] = useMutation(DeleteProjectGroup, {
-    onCompleted: () =>
-      refetch({
-        first: totalRows,
-        field: field,
-        direction: direction
-      })
-  })
+  const [deleteProjectGroup] = useMutation(DeleteProjectGroup, {
+    onCompleted: () => refetch({ first: totalRows, field, direction })
+  });
 
-  const [projectGroupUpdate] = useMutation(UpdateProjectGroup, {
-    onCompleted: () =>
-      refetch({
-        first: totalRows,
-        field: field,
-        direction: direction
-      })
-  })
+  const [updateProjectGroup] = useMutation(UpdateProjectGroup, {
+    onCompleted: () => refetch({ first: totalRows, field, direction })
+  });
 
-  const handleOpenSbom = (row) => {
-    sbomDispatch({ type: 'CLEAR_LICENSES' })
-    setActiveRow(row)
-    onSbomOpen()
-  }
+  const handleOpenSbom = useCallback((row) => {
+    sbomDispatch({ type: 'CLEAR_LICENSES' });
+    setActiveRow(row);
+    onSbomOpen();
+  }, [sbomDispatch, setActiveRow, onSbomOpen]);
 
-  // DELETE PRODUCT
-  const onProductDelete = async () => {
-    await projectGroupDelete({
+  const onProductDelete = useCallback(async () => {
+    await deleteProjectGroup({
       variables: {
         id: activeRow.id
       }
-    }).then((res) => res.data && onDeleteClose())
-  }
+    }).then(res => res.data && onDeleteClose());
+  }, [deleteProjectGroup, activeRow, onDeleteClose]);
 
-  // REFRESH PRODUCTS
-  const handleRefresh = async () => {
+  const handleRefresh = useCallback(async () => {
     await refetch({
       first: totalRows,
-      field: field,
-      direction: direction
-    })
-  }
+      field,
+      direction
+    });
+  }, [refetch, totalRows, field, direction]);
 
-  // TOGGLE STATUS
-  const toggleStatus = async () => {
-    await projectGroupUpdate({
+  const toggleStatus = useCallback(async () => {
+    await updateProjectGroup({
       variables: {
-        id: activeRow?.id,
-        enabled: activeRow?.enabled === true ? false : true
+        id: activeRow.id,
+        enabled: !activeRow.enabled
       }
-    })
-      .then(
-        (res) =>
-          res.data &&
-          refetch({
-            first: totalRows,
-            field: field,
-            direction: direction
-          })
-      )
-      .finally(() => onWarningClose())
-  }
+    }).then(res => {
+      if (res.data) {
+        refetch({
+          first: totalRows,
+          field,
+          direction
+        });
+      }
+    }).finally(onWarningClose);
+  }, [updateProjectGroup, activeRow, refetch, totalRows, field, direction, onWarningClose]);
 
-  // CLEAR SERACH
-  const handleClear = async () => {
+  const handleClear = useCallback(async () => {
     await refetch({
       search: undefined,
       first: totalRows,
@@ -181,21 +181,19 @@ const ProductTable = ({ data, refetch }) => {
       before: undefined,
       field: field,
       direction: direction
-    }).then((res) => res.data && prodDispatch({ type: 'CLEAR_SEARCH_INPUT' }))
-  }
+    }).then(res => res.data && prodDispatch({ type: 'CLEAR_SEARCH_INPUT' }));
+  }, [refetch, totalRows, prodDispatch]);
 
-  // ON SEARCH INPUT CHANGE
-  const onSearchInputChange = (e) => {
-    const { value } = e.target
+  const onSearchInputChange = useCallback(event => {
+    const { value } = event.target;
     if (value === '') {
-      handleClear()
+      handleClear();
     } else {
-      prodDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
+      prodDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value });
     }
-  }
+  }, [handleClear, prodDispatch]);
 
-  // SEARCH COMPONENT
-  const handleSearch = (event) => {
+  const handleSearch = useCallback((event) => {
     if (event.key === 'Enter' && searchInput !== '') {
       refetch({
         search: searchInput,
@@ -205,80 +203,74 @@ const ProductTable = ({ data, refetch }) => {
         before: undefined,
         field: field,
         direction: direction
-      }).then((res) => res.data && prodDispatch({ type: 'FETCH_DATA_SUCCESS' }))
+      }).then(res => res.data && prodDispatch({ type: 'FETCH_DATA_SUCCESS' }));
     }
-  }
+  }, [refetch, searchInput, totalRows, prodDispatch]);
 
-  // FILTER PRODUCT
-  const onFilterActive = async (value) => {
+  const onFilterActive = useCallback(async (value) => {
     await refetch({
-      enabled: value === 'all' ? undefined : value === 'yes' ? true : false,
+      enabled: value === 'all' ? undefined : value === 'yes',
       first: totalRows,
       last: undefined,
       after: undefined,
       before: undefined,
       field: field,
       direction: direction
-    }).then(
-      (res) =>
-        res.data && prodDispatch({ type: 'ON_FILTER_ACTIVE', payload: value })
-    )
-  }
+    }).then(res => {
+      if (res.data) {
+        prodDispatch({ type: 'ON_FILTER_ACTIVE', payload: value });
+      }
+    });
+  }, [refetch, totalRows, prodDispatch]);
 
   // HEADER
   const subHeaderComponent = useMemo(() => {
     return (
-      <Flex
-        width={'100%'}
-        alignItems={'center'}
-        justifyContent={'space-between'}
-      >
-        <Stack direction={'row'} spacing={2} alignItems={'center'}>
-          {/* SEARCH PRODUCTS */}
-          <ProdSearchFilter
-            id='product'
-            filterText={searchInput}
-            onChange={onSearchInputChange}
-            onClear={handleClear}
-            onFilter={handleSearch}
-          />
-          {/* FILTER PRODUCTS */}
-          <ProdFilterMenu onFilter={onFilterActive} />
-        </Stack>
-
-        <Stack direction={'row'} spacing={2} alignItems={'center'}>
-          {/* REFRESH */}
-          <Tooltip label='Refresh'>
-            <IconButton
-              onClick={handleRefresh}
-              colorScheme='blue'
-              icon={<RepeatIcon />}
-            ></IconButton>
-          </Tooltip>
-          {/* ADD PRODUCT */}
-          <Tooltip label='Add Product'>
-            <IconButton
-              icon={<AddIcon />}
-              colorScheme='blue'
-              variant='solid'
-              onClick={onOpenProduct}
-              isDisabled={!addProduct}
+        <Flex
+            width={'100%'}
+            alignItems={'center'}
+            justifyContent={'space-between'}
+        >
+          <Stack direction={'row'} spacing={2} alignItems={'center'}>
+            {/* SEARCH PRODUCTS */}
+            <ProdSearchFilter
+                id='product'
+                filterText={searchInput}
+                onChange={onSearchInputChange}
+                onClear={handleClear}
+                onFilter={handleSearch}
             />
-          </Tooltip>
-        </Stack>
-      </Flex>
-    )
-  }, [
-    searchInput,
-    handleSearch,
-    handleClear,
-    handleRefresh,
-    onFilterActive,
-    onSearchInputChange
-  ])
+            {/* FILTER PRODUCTS */}
+            <ProdFilterMenu onFilter={onFilterActive} />
+          </Stack>
+
+          <Stack direction={'row'} spacing={2} alignItems={'center'}>
+            {/* REFRESH */}
+            <Tooltip label='Refresh'>
+              <IconButton
+                  onClick={handleRefresh}
+                  colorScheme='blue'
+                  icon={<RepeatIcon />}
+              ></IconButton>
+            </Tooltip>
+            {/* ADD PRODUCT */}
+            <Tooltip label='Add Product'>
+              <IconButton
+                  icon={<AddIcon />}
+                  colorScheme='blue'
+                  variant='solid'
+                  onClick={onOpenProduct}
+                  isDisabled={!canAddProduct}
+              />
+            </Tooltip>
+          </Stack>
+        </Flex>
+    );
+  }, [searchInput, handleSearch, handleClear, handleRefresh, onFilterActive, onSearchInputChange]);
+
 
   // COLUMNS
-  const columns = [
+  const columns = useMemo(() => [
     // ACTIVE
     {
       id: 'PROJECT_GROUPS_ENABLED',
@@ -286,16 +278,16 @@ const ProductTable = ({ data, refetch }) => {
       selector: (row) => {
         const { enabled, name } = row
         return (
-          <Switch
-            name={name}
-            id={name}
-            size='md'
-            isChecked={enabled}
-            onChange={() => {
-              setActiveRow(row)
-              onWarningOpen()
-            }}
-          />
+            <Switch
+                name={name}
+                id={name}
+                size='md'
+                isChecked={enabled}
+                onChange={() => {
+                  setActiveRow(row)
+                  onWarningOpen()
+                }}
+            />
         )
       },
       width: '150px',
@@ -308,23 +300,23 @@ const ProductTable = ({ data, refetch }) => {
       selector: (row) => {
         const { id, name, defaultProject } = row
         const data = defaultProject
-          ? removeDuplicates(defaultProject?.sboms)
-          : []
+            ? removeDuplicates(defaultProject?.sboms)
+            : []
 
         const product = {
           id: id,
           name: name,
           version:
-            data?.length > 0
+              data?.length > 0
+                  ? defaultProject?.primaryComponent?.version
+                  : defaultProject?.sboms?.length > 0
+                      ? defaultProject?.sboms[0].primaryComponent?.version
+                      : '',
+          sbomId: defaultProject
               ? defaultProject?.primaryComponent?.version
               : defaultProject?.sboms?.length > 0
-                ? defaultProject?.sboms[0].primaryComponent?.version
-                : '',
-          sbomId: defaultProject
-            ? defaultProject?.primaryComponent?.version
-            : defaultProject?.sboms?.length > 0
-              ? defaultProject?.sboms[0].id
-              : '',
+                  ? defaultProject?.sboms[0].id
+                  : '',
           groupId: id
         }
 
@@ -338,9 +330,9 @@ const ProductTable = ({ data, refetch }) => {
               payload: {
                 id: defaultProject?.id,
                 sbomId:
-                  defaultProject?.length > 0
-                    ? defaultProject?.primaryComponent?.version
-                    : defaultProject?.sboms[0].id || ''
+                    defaultProject?.length > 0
+                        ? defaultProject?.primaryComponent?.version
+                        : defaultProject?.sboms[0].id || ''
               }
             })
           }
@@ -348,11 +340,11 @@ const ProductTable = ({ data, refetch }) => {
         }
 
         return (
-          <Link to={`/vendor/products/${name}?id=${id}`} onClick={handleClick}>
-            <Text color={'blue.500'} minWidth='100%'>
-              {name}
-            </Text>
-          </Link>
+            <Link to={`/vendor/products/${name}?id=${id}`} onClick={handleClick}>
+              <Text color={'blue.500'} minWidth='100%'>
+                {name}
+              </Text>
+            </Link>
         )
       },
       wrap: true,
@@ -360,8 +352,8 @@ const ProductTable = ({ data, refetch }) => {
     },
     // ENVIRONMENT
     {
-      id: 'ENVIRONMENTS',
-      name: 'ENVIRONMENTS',
+      id: 'ENVIRONMENT',
+      name: 'ENVIRONMENT',
       selector: (row) => {
         const { projects } = row
         return <Text>{projects?.length}</Text>
@@ -370,14 +362,11 @@ const ProductTable = ({ data, refetch }) => {
     },
     // VERSION
     {
-      id: 'VERSIONS',
-      name: 'VERSIONS',
+      id: 'VERSION',
+      name: 'VERSION',
       selector: (row) => {
         const { projects } = row
-        const totalSbom = projects?.reduce(
-          (count, project) => count + project.sboms.length,
-          0
-        )
+        const totalSbom = projects?.reduce((count, project) => count + project.sboms.length, 0);
         return <Text>{totalSbom || 0}</Text>
       },
       wrap: true
@@ -389,11 +378,11 @@ const ProductTable = ({ data, refetch }) => {
       selector: (row) => {
         const { description } = row
         return (
-          <Text>
-            {description?.length > 50
-              ? description.substring(0, 50) + '....'
-              : description}
-          </Text>
+            <Text>
+              {description?.length > 50
+                  ? description.substring(0, 50) + '....'
+                  : description}
+            </Text>
         )
       },
       wrap: true,
@@ -406,9 +395,9 @@ const ProductTable = ({ data, refetch }) => {
       selector: (row) => {
         const { updatedAt } = row
         return (
-          <Tooltip label={getFullDateAndTime(updatedAt)} placement={'top'}>
-            {timeSince(updatedAt)}
-          </Tooltip>
+            <Tooltip label={getFullDateAndTime(updatedAt)} placement={'top'}>
+              {timeSince(updatedAt)}
+            </Tooltip>
         )
       },
       sortable: true,
@@ -427,350 +416,306 @@ const ProductTable = ({ data, refetch }) => {
         const { enabled } = row
 
         return (
-          <Menu>
-            <MenuButton
-              as={IconButton}
-              icon={<FaEllipsisV />}
-              variant='none'
-              color='gray.400'
-            />
-            <Portal>
-              <MenuList fontSize={'sm'}>
-                {/* EDIT PRODUCT */}
-                <MenuItem
-                  onClick={() => {
-                    setActiveRow(row)
-                    onOpen()
-                  }}
-                  isDisabled={!enabled}
-                >
-                  Edit Product
-                </MenuItem>
-                <Divider />
-                {/* UPLOAD SBOM */}
-                <MenuItem
-                  onClick={() => {
-                    setActiveRow(row)
-                    onOpenUpload()
-                  }}
-                  isDisabled={!enabled || !updateProduct}
-                >
-                  Upload SBOM
-                </MenuItem>
-                {/* BUILD SBOM */}
-                <MenuItem
-                  onClick={() => handleOpenSbom(row)}
-                  isDisabled={!enabled}
-                >
-                  Build Version
-                </MenuItem>
-                <Divider />
-                {/* ARCHIVE PRODUCT GROUP */}
-                <MenuItem
-                  color='red'
-                  onClick={() => {
-                    setActiveRow(row)
-                    onDeleteOpen()
-                  }}
-                  isDisabled={!archiveProduct}
-                >
-                  Archive Product
-                </MenuItem>
-              </MenuList>
-            </Portal>
-          </Menu>
+            <Menu>
+              <MenuButton
+                  as={IconButton}
+                  icon={<FaEllipsisV />}
+                  variant='none'
+                  color='gray.400'
+              />
+              <Portal>
+                <MenuList fontSize={'sm'}>
+                  {/* EDIT PRODUCT */}
+                  <MenuItem
+                      onClick={() => {
+                        setActiveRow(row)
+                        onOpen()
+                      }}
+                      isDisabled={!enabled}
+                  >
+                    Edit Product
+                  </MenuItem>
+                  <Divider />
+                  {/* UPLOAD SBOM */}
+                  <MenuItem
+                      onClick={() => {
+                        setActiveRow(row)
+                        onOpenUpload()
+                      }}
+                      isDisabled={!enabled || !canUpdateProduct}
+                  >
+                    Upload SBOM
+                  </MenuItem>
+                  {/* BUILD SBOM */}
+                  <MenuItem
+                      onClick={() => handleOpenSbom(row)}
+                      isDisabled={!enabled}
+                  >
+                    Build Version
+                  </MenuItem>
+                  <Divider />
+                  {/* ARCHIVE PRODUCT GROUP */}
+                  <MenuItem
+                      color='red'
+                      onClick={() => {
+                        setActiveRow(row)
+                        onDeleteOpen()
+                      }}
+                      isDisabled={!canArchiveProduct}
+                  >
+                    Archive Product
+                  </MenuItem>
+                </MenuList>
+              </Portal>
+            </Menu>
         )
       },
       right: 'true'
     }
-  ]
+  ], [setActiveRow, onWarningOpen, canArchiveProduct]);
 
-  // SORTING
-  const handleSort = async (column, sortDirection) => {
+  const handleSort = useCallback(async (column, sortDirection) => {
     await refetch({
       first: totalRows,
       search: undefined,
       field: column.id,
       direction: sortDirection === 'asc' ? 'ASC' : 'DESC',
-      field: field,
-      direction: direction
-    }).then(
-      (res) =>
-        res.data &&
+    }).then(res => {
+      if (res.data) {
         prodDispatch({
           type: 'SET_SORT_ORDER',
           payload: {
             field: column.id,
-            direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
-          }
-        })
-    )
-  }
+            direction: sortDirection === 'asc' ? 'ASC' : 'DESC',
+          },
+        });
+      }
+    });
+  }, [refetch, totalRows, prodDispatch]);
 
-  // PREV PAGE
-  const handlePreviousPage = async () => {
-    setIsPrevActive(false)
+  const handlePreviousPage = useCallback(async () => {
     await refetch({
       first: undefined,
       last: totalRows,
       after: undefined,
-      before: data?.pageInfo?.startCursor
-    }).then((res) => {
+      before: data.pageInfo.startCursor,
+    }).then(res => {
       if (res.data) {
-        const project = res?.data?.organization?.projectGroups
         prodDispatch({
           type: 'DECREMENT_PAGE',
-          payload: project?.pageInfo?.startCursor
-        })
-        setIsPrevActive(project?.pageInfo?.hasPreviousPage)
+          payload: data.pageInfo.startCursor,
+        });
       }
-    })
-  }
+    });
+  }, [refetch, totalRows, data, prodDispatch]);
 
-  // NEXT PAGE
-  const handleNextPage = async () => {
-    setIsNextActive(false)
+  const handleNextPage = useCallback(async () => {
     await refetch({
       first: totalRows,
       last: undefined,
-      after: data?.pageInfo?.endCursor,
-      before: undefined
-    }).then((res) => {
+      after: data.pageInfo.endCursor,
+      before: undefined,
+    }).then(res => {
       if (res.data) {
-        const project = res?.data?.organization?.projectGroups
         prodDispatch({
           type: 'INCREMENT_PAGE',
           payload: {
-            total: project?.totalCount,
-            after: project?.pageInfo?.endCursor
-          }
-        })
-        setIsNextActive(project?.pageInfo?.hasNextPage)
+            total: data.totalCount,
+            after: data.pageInfo.endCursor,
+          },
+        });
       }
-    })
-  }
+    });
+  }, [refetch, totalRows, data, prodDispatch]);
 
-  // SET ROW LENGTH
-  const handleSetRow = async (e) => {
-    setTotalRows(Number(e.target.value))
+  const handleSetRow = useCallback(async (e) => {
+    const newTotalRows = Number(e.target.value);
+    setTotalRows(newTotalRows);
     await refetch({
-      first: Number(e.target.value),
+      first: newTotalRows,
       last: undefined,
       after: undefined,
-      before: undefined
-    }).then((res) => {
+      before: undefined,
+    }).then(res => {
       if (res.data) {
-        prodDispatch({ type: 'FETCH_DATA_SUCCESS' })
+        prodDispatch({ type: 'FETCH_DATA_SUCCESS' });
       }
-    })
+    });
+  }, [refetch, setTotalRows, prodDispatch]);
+
+  const dataTableProps = {
+    columns: columns,
+    data: data?.nodes,
+    onSort: handleSort,
+    customStyles: customStyles,
+    defaultSortFieldId: field,
+    defaultSortAsc: false,
+    subHeader: true,
+    subHeaderComponent: subHeaderComponent,
+    progressPending: !data,
+    progressComponent: <CustomLoader />,
+    responsive: true,
+    persistTableHead: true,
   }
 
   useEffect(() => {
-    if (data) {
-      setIsPrevActive(data?.pageInfo?.hasPreviousPage)
-      setIsNextActive(data?.pageInfo?.hasNextPage)
+    if (!data) {
+      refetch({
+        first: totalRows,
+        enabled: true,
+        field: "PROJECT_GROUPS_UPDATED_AT",
+        direction: "DESC"
+      });
     }
-  }, [data])
+  }, [data, refetch, totalRows]);
 
   return (
-    <>
-      <Card>
-        <Flex flexDir={'column'} width={'100%'}>
-          <DataTable
-            columns={columns}
-            onSort={handleSort}
-            data={data?.nodes}
-            customStyles={customStyles}
-            defaultSortAsc={false}
-            defaultSortFieldId={field}
-            subHeader
-            subHeaderComponent={subHeaderComponent}
-            progressPending={data ? false : true}
-            progressComponent={<CustomLoader />}
-            responsive={true}
-            persistTableHead
-          />
+      <>
+        <Card>
+          <Flex flexDir={'column'} width={'100%'}>
+            <DataTable {...dataTableProps} />
+            {data && (
+                <Pagination
+                    paginationSizes={paginationSizes}
+                    pageIndex={pageIndex}
+                    totalRows={totalRows}
+                    totalCount={data.totalCount}
+                    onPreviousPage={handlePreviousPage}
+                    onNextPage={handleNextPage}
+                    onSetRow={handleSetRow}
+                />
+            )}
+          </Flex>
+        </Card>
 
-          {data && (
-            <Flex
-              width={'100%'}
-              flexDir={'row'}
-              gap={4}
-              alignItems={'center'}
-              mt={6}
-              justifyContent={'space-between'}
-              flexWrap={'wrap'}
-            >
-              <Stack alignItems={'center'} direction={'row'} spacing={4}>
-                <Button
-                  colorScheme='blue'
-                  onClick={handlePreviousPage}
-                  isDisabled={!isPrevActive}
-                >
-                  Prev
-                </Button>
-                <Button
-                  colorScheme='blue'
-                  onClick={handleNextPage}
-                  isDisabled={!isNextActive}
-                >
-                  Next
-                </Button>
-                <Box>
-                  Page {pageIndex} of{' '}
-                  {data.totalCount === 0
-                    ? 1
-                    : Math.ceil(data.totalCount / totalRows)}
-                </Box>
-              </Stack>
+        {/* UPLOAD SBOM */}
+        {isOpenUpload && (
+            <UploadModal
+                projects={activeRow?.projects}
+                isOpen={isOpenUpload}
+                onClose={onCloseUpload}
+            />
+        )}
 
-              <Stack alignItems={'center'} direction={'row'} spacing={4}>
-                <Text>Show</Text>
-                <Select
-                  width={20}
-                  value={totalRows}
-                  onChange={handleSetRow}
-                  id='rowlimit'
-                  name='rowlimit'
-                >
-                  <option value={25}>25</option>
-                  <option value={50}>50</option>
-                  <option value={100}>100</option>
-                </Select>
-              </Stack>
-            </Flex>
-          )}
-        </Flex>
-      </Card>
+        {/* CREATE PRODUCT */}
+        {isOpenProduct && (
+            <ProductModal
+                isOpen={isOpenProduct}
+                refetch={refetch}
+                totalRows={totalRows}
+                onClose={onCloseProduct}
+                id={null}
+                product={null}
+                description={null}
+                allProjects={null}
+            />
+        )}
 
-      {/* UPLOAD SBOM */}
-      {isOpenUpload && (
-        <UploadModal
-          projects={activeRow?.projects}
-          isOpen={isOpenUpload}
-          onClose={onCloseUpload}
-        />
-      )}
+        {/* UPDATE PRODUCT */}
+        {isOpen && data && (
+            <ProductModal
+                id={activeRow.id}
+                isOpen={isOpen}
+                onClose={onClose}
+                product={activeRow.name}
+                refetch={refetch}
+                description={activeRow.description}
+                allProjects={data.nodes}
+            />
+        )}
 
-      {/* CREATE PRODUCT */}
-      {isOpenProduct && (
-        <ProductModal
-          isOpen={isOpenProduct}
-          refetch={refetch}
-          totalRows={totalRows}
-          onClose={onCloseProduct}
-          id={null}
-          product={null}
-          description={null}
-          allProjects={null}
-        />
-      )}
+        {/* PROD SBOM DRAWER */}
+        {isSbomOpen && (
+            <ProductSbomDrawer
+                isOpen={isSbomOpen}
+                onClose={onSbomClose}
+                data={activeRow}
+                refetch={refetch}
+            />
+        )}
 
-      {/* UPDATE PRODUCT */}
-      {isOpen && data && (
-        <ProductModal
-          id={activeRow.id}
-          isOpen={isOpen}
-          onClose={onClose}
-          product={activeRow.name}
-          refetch={refetch}
-          description={activeRow.description}
-          allProjects={data.nodes}
-        />
-      )}
+        {/* DELETE */}
+        {isDeleteOpen && (
+            <Modal isOpen={isDeleteOpen} onClose={onDeleteClose}>
+              <ModalOverlay />
+              <ModalContent>
+                <ModalHeader>Archive Product</ModalHeader>
+                <ModalCloseButton />
+                <ModalBody>
+                  <Text>Archiving this product will: </Text>
+                  <UnorderedList>
+                    <Flex flexDir={'column'} gap={1} mt={4}>
+                      {[
+                        'remove this product, its versions and SBOMs',
+                        'remove access to the product for all users',
+                        'disable uploads of SBOMs to this product'
+                      ].map((item, index) => (
+                          <ListItem key={index}>{item}</ListItem>
+                      ))}
+                    </Flex>
+                  </UnorderedList>
+                  <br />
+                  <Text mt={10}>Are you sure you wish to continue?</Text>
+                </ModalBody>
+                <ModalFooter>
+                  <Button mr={3} onClick={onDeleteClose}>
+                    No
+                  </Button>
+                  <Button colorScheme='red' onClick={onProductDelete}>
+                    Yes
+                  </Button>
+                </ModalFooter>
+              </ModalContent>
+            </Modal>
+        )}
 
-      {/* PROD SBOM DRAWER */}
-      {isSbomOpen && (
-        <ProductSbomDrawer
-          isOpen={isSbomOpen}
-          onClose={onSbomClose}
-          data={activeRow?.projects}
-          refetch={refetch}
-        />
-      )}
-
-      {/* DELETE */}
-      {isDeleteOpen && (
-        <Modal isOpen={isDeleteOpen} onClose={onDeleteClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Archive Product</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Text>Archiving this product will: </Text>
-              <UnorderedList>
-                <Flex flexDir={'column'} gap={1} mt={4}>
-                  {[
-                    'remove this product, its versions and SBOMs',
-                    'remove access to the product for all users',
-                    'disable uploads of SBOMs to this product'
-                  ].map((item, index) => (
-                    <ListItem key={index}>{item}</ListItem>
-                  ))}
-                </Flex>
-              </UnorderedList>
-              <br />
-              <Text mt={10}>Are you sure you wish to continue?</Text>
-            </ModalBody>
-            <ModalFooter>
-              <Button mr={3} onClick={onDeleteClose}>
-                No
-              </Button>
-              <Button colorScheme='red' onClick={onProductDelete}>
-                Yes
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-      )}
-
-      {/* DISABLED */}
-      {isWarning && (
-        <Modal isOpen={isWarning} onClose={onWarningClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>
-              {activeRow.enabled ? 'Disable' : 'Enable'} Product
-            </ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Text>
-                {activeRow.enabled ? 'Disable' : 'Enable'} this product will:{' '}
-              </Text>
-              <UnorderedList>
-                <Flex flexDir={'column'} gap={1} mt={4}>
-                  {[
-                    `${
-                      activeRow.enabled ? 'Disable' : 'Enable'
-                    } this product, its versions and SBOMs`,
-                    `${
-                      activeRow.enabled ? 'Disable' : 'Enable'
-                    } access to the product for all users`,
-                    `${
-                      activeRow.enabled ? 'Disable' : 'Enable'
-                    } uploads of SBOMs to this product`
-                  ].map((item, index) => (
-                    <ListItem key={index}>{item}</ListItem>
-                  ))}
-                </Flex>
-              </UnorderedList>
-              <Text mt={10}>Are you sure you wish to continue?</Text>
-            </ModalBody>
-            <ModalFooter>
-              <Button mr={3} onClick={onWarningClose}>
-                No
-              </Button>
-              <Button
-                colorScheme={activeRow.enabled ? 'red' : 'green'}
-                onClick={toggleStatus}
-              >
-                Yes
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-      )}
-    </>
+        {/* DISABLED */}
+        {isWarning && (
+            <Modal isOpen={isWarning} onClose={onWarningClose}>
+              <ModalOverlay />
+              <ModalContent>
+                <ModalHeader>
+                  {activeRow.enabled ? 'Disable' : 'Enable'} Product
+                </ModalHeader>
+                <ModalCloseButton />
+                <ModalBody>
+                  <Text>
+                    {activeRow.enabled ? 'Disable' : 'Enable'} this product will:{' '}
+                  </Text>
+                  <UnorderedList>
+                    <Flex flexDir={'column'} gap={1} mt={4}>
+                      {[
+                        `${
+                            activeRow.enabled ? 'Disable' : 'Enable'
+                        } this product, its versions and SBOMs`,
+                        `${
+                            activeRow.enabled ? 'Disable' : 'Enable'
+                        } access to the product for all users`,
+                        `${
+                            activeRow.enabled ? 'Disable' : 'Enable'
+                        } uploads of SBOMs to this product`
+                      ].map((item, index) => (
+                          <ListItem key={index}>{item}</ListItem>
+                      ))}
+                    </Flex>
+                  </UnorderedList>
+                  <Text mt={10}>Are you sure you wish to continue?</Text>
+                </ModalBody>
+                <ModalFooter>
+                  <Button mr={3} onClick={onWarningClose}>
+                    No
+                  </Button>
+                  <Button
+                      colorScheme={activeRow.enabled ? 'red' : 'green'}
+                      onClick={toggleStatus}
+                  >
+                    Yes
+                  </Button>
+                </ModalFooter>
+              </ModalContent>
+            </Modal>
+        )}
+      </>
   )
 }
 
