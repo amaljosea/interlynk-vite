@@ -46,7 +46,6 @@ import {
   FaBoxArchive
 } from 'react-icons/fa6'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { removeDuplicates } from 'utils'
 import SBOM from 'views/Sbom'
 import ChangeLog from '../Changelog'
 import Automation from '../Automation'
@@ -68,8 +67,8 @@ import CardHeader from 'components/Card/CardHeader'
 import { ChevronDownIcon, ViewIcon } from '@chakra-ui/icons'
 import EnvironmentDrawer from 'components/Drawer/EnvironmentDrawer'
 import { isDefaultEnv } from 'utils'
-import { GetProjectGrpupComponentVulns } from 'graphQL/Queries'
-import VulnProdTable from '../Vulnerabilities/components/ProdTable'
+import { GetProjectGroupComponentVulns } from 'graphQL/Queries'
+import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
 
 const ProductDetails = () => {
   const navigate = useNavigate()
@@ -114,7 +113,7 @@ const ProductDetails = () => {
       enabled: enabled === 'yes' ? true : enabled === 'no' ? false : undefined,
       field: prodState.field,
       direction: prodState.direction
-    },
+    }
     // onCompleted: (data) => {
     //   if (data) {
     //     const activeGroup = data?.organization?.projectGroups?.nodes.find(
@@ -143,10 +142,14 @@ const ProductDetails = () => {
 
   // const versionData = versions ? removeDuplicates(versions?.project?.sboms) : []
 
-  const [getGlobalVulnData, { data: globalvulnData }] = useLazyQuery(
-    GetProjectGrpupComponentVulns,
+  const { data: globalVulnData, refetch: globalVulnRefetch } = useQuery(
+    GetProjectGroupComponentVulns,
     {
-      fetchPolicy: 'network-only'
+      fetchPolicy: 'network-only',
+      variables: {
+        id: productId,
+        first: totalRows
+      }
     }
   )
 
@@ -262,12 +265,6 @@ const ProductDetails = () => {
       setActiveProdTab(0)
     } else if (activeTab === 1) {
       setActiveProdTab(1)
-      getGlobalVulnData({
-        variables: {
-          id: productId,
-          first: totalRows
-        }
-      }).then((res) => console.log('res', res.data))
     } else if (activeTab === 2) {
       setActiveProdTab(2)
       getRules({
@@ -520,9 +517,13 @@ const ProductDetails = () => {
                   </TabPanel>
                   {/* VULNERABILITIES */}
                   <TabPanel>
-                    <VulnProdTable
+                    {/* <VulnProdTable
                       data={globalvulnData?.projectGroup?.componentVulns}
                       refetch={getGlobalVulnData}
+                    /> */}
+                    <GlobalVulnTable
+                      data={globalVulnData?.projectGroup?.componentVulns}
+                      refetch={globalVulnRefetch}
                     />
                   </TabPanel>
                   {/* AUTOMATIONS */}

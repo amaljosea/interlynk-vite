@@ -529,8 +529,8 @@ export const GetGlobalVulnData = gql`
 `
 
 // GET PROJECT GROUP VULN DATA
-export const GetProjectGrpupComponentVulns = gql`
-  query GetProjectGrpupComponentVulns(
+export const GetProjectGroupComponentVulns = gql`
+  query GetProjectGroupComponentVulns(
     $id: Uuid!
     $first: Int
     $last: Int
@@ -554,6 +554,7 @@ export const GetProjectGrpupComponentVulns = gql`
         nodes {
           id
           vulnId
+          updatedAt
           vexStatus {
             id
             name
@@ -574,6 +575,37 @@ export const GetProjectGrpupComponentVulns = gql`
                 name
                 version
               }
+            }
+          }
+          vuln {
+            cvssScore
+            cvssVector
+            desc
+            id
+            lastModifiedAt
+            nvdAliasId
+            organizationId
+            publishedAt
+            sev
+            source
+            updatedAt
+            vulnId
+            metrics {
+              affectedCount
+              falsePositiveCount
+              fixedCount
+              inTriageCount
+              notAffectedCount
+              unspecifiedCount
+            }
+            vulnInfo {
+              cveId
+              epssPercentile
+              epssScore
+              epssScores
+              id
+              kev
+              updatedAt
             }
           }
         }
