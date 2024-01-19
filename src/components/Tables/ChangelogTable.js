@@ -39,14 +39,14 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
 
   const productId = queryParams.get('id')
 
-  const [filterText, setFilterText] = useState('')
+  const [searchInput, setSearchInput] = useState('')
   const [userFilters, setUserFilters] = useState([])
   const [typeFilters, setTypeFilters] = useState([])
 
   useEffect(() => {
-    if (data && (userFilters.length === 0 || typeFilters.length === 0)) {
-      const users = data.nodes.map((item) => item.changedBy)
-      const actions = data.nodes.map((item) => item.action)
+    if (data) {
+      const users = data?.nodes?.map((item) => item.changedBy) || []
+      const actions = data?.nodes?.map((item) => item.action) || []
       setUserFilters(users)
       setTypeFilters(actions)
     }
@@ -193,11 +193,12 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
 
   // SEARCH COMPONENT
   const handleSearch = async (event) => {
-    if (event.key === 'Enter' && filterText !== '') {
+    const { value } = event.target
+    if (event.key === 'Enter' && value !== '') {
       await refetch({
         variables: {
           id: activeEnv,
-          search: filterText,
+          search: value,
           first: totalRows,
           field: field,
           direction: direction
@@ -205,15 +206,14 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
       }).then(
         (res) =>
           res.data &&
-          prodLogDispatch({
-            type: 'FETCH_DATA_SUCCESS'
-          })
+          prodLogDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
       )
     }
   }
 
   // CLEAR SERACH
   const handleClear = async () => {
+    setSearchInput('')
     await refetch({
       variables: {
         id: activeEnv,
@@ -226,9 +226,19 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
       (res) =>
         res.data &&
         prodLogDispatch({
-          type: 'FETCH_DATA_SUCCESS'
+          type: 'CLEAR_SEARCH_INPUT'
         })
     )
+  }
+
+  // ON SEARCH INPUT CHANGE
+  const onSearchInputChange = (e) => {
+    const { value } = e.target
+    if (value === '') {
+      handleClear()
+    } else {
+      setSearchInput(value)
+    }
   }
 
   // SORTING
@@ -288,23 +298,22 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
         >
           <SearchFilter
             id='prodChangelog'
-            filterText={filterText}
-            setFilterText={setFilterText}
-            onFilter={handleSearch}
+            filterText={searchInput}
+            onChange={onSearchInputChange}
             onClear={handleClear}
+            onFilter={handleSearch}
           />
 
           <ChangelogFilterMenu
             refetch={refetch}
             users={userFilters}
             actions={typeFilters}
-            totalRows={totalRows}
-            id={productId}
+            id={activeEnv}
           />
         </Stack>
       </Flex>
     )
-  }, [filterText, handleClear, handleSearch])
+  }, [searchInput, onSearchInputChange, handleClear, handleSearch])
 
   return (
     <>

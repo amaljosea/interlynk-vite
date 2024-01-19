@@ -1,35 +1,47 @@
+import { useQuery } from '@apollo/client'
 import {
   Menu,
-  MenuButton,
   MenuList,
   MenuOptionGroup,
   MenuItemOption,
-  Button,
   Flex,
-  Box
+  Box,
+  Text
 } from '@chakra-ui/react'
 import CheckMark from 'components/Misc/CheckMark'
+import FilterButton from 'components/Misc/FilterButton'
+import { GetLogFilters } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
 import React, { useState } from 'react'
-import { FaFilter } from 'react-icons/fa'
 
-const ChangelogFilterMenu = ({ id, users, actions, refetch }) => {
+const ChangelogFilterMenu = ({ id, refetch }) => {
   const { totalRows, prodLogState, dispatch } = useGlobalState()
-  const { field, direction } = prodLogState
+  const { field, direction, searchInput } = prodLogState
   const { prodLogDispatch } = dispatch
+
+  const { data, error, loading } = useQuery(GetLogFilters, {
+    variables: { id: id },
+    fetchPolicy: 'network-only'
+  })
 
   const [selectedType, setSelectedType] = useState([])
   const [selectedUser, setSelectedUser] = useState([])
+  const [selectObject, setSelectObject] = useState([])
+
+  const logData = {
+    id,
+    field,
+    direction,
+    first: totalRows,
+    search: searchInput !== '' ? searchInput : undefined
+  }
 
   const onFilterType = (value) => {
     setSelectedType(value.includes('all') ? [] : value)
     refetch({
       variables: {
-        id: id,
         changeType: value.includes('all') ? undefined : value,
-        first: totalRows,
-        field: field,
-        direction: direction
+        ...logData
       }
     })
     prodLogDispatch({ type: 'FETCH_DATA_SUCCESS' })
@@ -39,15 +51,27 @@ const ChangelogFilterMenu = ({ id, users, actions, refetch }) => {
     setSelectedUser(value.includes('all') ? [] : value)
     refetch({
       variables: {
-        id: id,
         changedBy: value.includes('all') ? undefined : value,
-        first: totalRows,
-        field: field,
-        direction: direction
+        ...logData
       }
     })
     prodLogDispatch({ type: 'FETCH_DATA_SUCCESS' })
   }
+
+  const onFilterObject = (value) => {
+    setSelectObject(value.includes('all') ? [] : value)
+    refetch({
+      variables: {
+        changeObject: value.includes('all') ? undefined : value,
+        ...logData
+      }
+    })
+    prodLogDispatch({ type: 'FETCH_DATA_SUCCESS' })
+  }
+
+  if (loading) return <Text>Loading...</Text>
+
+  if (error) return <Text>Something went wrong...</Text>
 
   return (
     <Flex alignItems={'center'} gap={4}>
@@ -55,15 +79,7 @@ const ChangelogFilterMenu = ({ id, users, actions, refetch }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
           {selectedType.length !== 0 && <CheckMark />}
-          <MenuButton
-            as={Button}
-            colorScheme='blue'
-            fontWeight='normal'
-            fontSize={'sm'}
-            leftIcon={<FaFilter size={14} />}
-          >
-            Type
-          </MenuButton>
+          <FilterButton>Type</FilterButton>
           <MenuList minWidth='240px'>
             <MenuOptionGroup
               type='checkbox'
@@ -73,17 +89,19 @@ const ChangelogFilterMenu = ({ id, users, actions, refetch }) => {
               <MenuItemOption value={'all'} fontSize={'sm'}>
                 All
               </MenuItemOption>
-              {actions.length > 0 &&
-                [...new Set(actions)].map((p, index) => (
-                  <MenuItemOption
-                    value={p}
-                    key={index}
-                    fontSize={'sm'}
-                    textTransform={'capitalize'}
-                  >
-                    {p}
-                  </MenuItemOption>
-                ))}
+              {data?.project?.activityLogFilters?.logChangeTypes?.length > 0 &&
+                data?.project?.activityLogFilters?.logChangeTypes?.map(
+                  (p, index) => (
+                    <MenuItemOption
+                      value={p}
+                      key={index}
+                      fontSize={'sm'}
+                      textTransform={'capitalize'}
+                    >
+                      {p}
+                    </MenuItemOption>
+                  )
+                )}
             </MenuOptionGroup>
           </MenuList>
         </Menu>
@@ -92,15 +110,7 @@ const ChangelogFilterMenu = ({ id, users, actions, refetch }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
           {selectedUser.length !== 0 && <CheckMark />}
-          <MenuButton
-            as={Button}
-            colorScheme='blue'
-            fontWeight='normal'
-            fontSize={'sm'}
-            leftIcon={<FaFilter size={14} />}
-          >
-            User
-          </MenuButton>
+          <FilterButton>User</FilterButton>
           <MenuList minWidth='240px'>
             <MenuOptionGroup
               type='checkbox'
@@ -110,12 +120,46 @@ const ChangelogFilterMenu = ({ id, users, actions, refetch }) => {
               <MenuItemOption value={'all'} fontSize={'sm'}>
                 All
               </MenuItemOption>
-              {users.length > 0 &&
-                [...new Set(users)].map((p, index) => (
-                  <MenuItemOption value={p} key={index} fontSize={'sm'}>
-                    {p}
-                  </MenuItemOption>
-                ))}
+              {data?.project?.activityLogFilters?.logChangeBys?.length > 0 &&
+                data?.project?.activityLogFilters?.logChangeBys?.map(
+                  (p, index) => (
+                    <MenuItemOption value={p} key={index} fontSize={'sm'}>
+                      {p}
+                    </MenuItemOption>
+                  )
+                )}
+            </MenuOptionGroup>
+          </MenuList>
+        </Menu>
+      </Box>
+      {/* OBJECTS FILTER */}
+      <Box width={'fit-content'} position={'relative'}>
+        <Menu closeOnSelect={true}>
+          {selectObject.length !== 0 && <CheckMark />}
+          <FilterButton>Object</FilterButton>
+          <MenuList minWidth='240px'>
+            <MenuOptionGroup
+              type='checkbox'
+              value={selectObject}
+              onChange={onFilterObject}
+            >
+              <MenuItemOption value={'all'} fontSize={'sm'}>
+                All
+              </MenuItemOption>
+              {data?.project?.activityLogFilters?.logChangeObjects?.length >
+                0 &&
+                data?.project?.activityLogFilters?.logChangeObjects?.map(
+                  (p, index) => (
+                    <MenuItemOption
+                      value={p}
+                      key={index}
+                      fontSize={'sm'}
+                      textTransform={'capitalize'}
+                    >
+                      {p?.replace(/_/g, ' ')}
+                    </MenuItemOption>
+                  )
+                )}
             </MenuOptionGroup>
           </MenuList>
         </Menu>

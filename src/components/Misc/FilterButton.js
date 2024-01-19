@@ -1,5 +1,5 @@
 import { Button, MenuButton } from '@chakra-ui/react'
-import { FaFilter } from 'react-icons/fa6'
+import { FaFilter } from 'react-icons/fa'
 
 const FilterButton = ({ children }) => {
   return (

@@ -1637,6 +1637,19 @@ export const GetProjectLogs = gql`
   }
 `
 
+// GET ACTIVITY LOG FILTERS
+export const GetLogFilters = gql`
+  query Project($id: Uuid!) {
+    project(id: $id) {
+      activityLogFilters {
+        logChangeBys
+        logChangeObjects
+        logChangeTypes
+      }
+    }
+  }
+`
+
 export const DownloadSBOM = gql`
   query downloadSbom(
     $projectId: Uuid!

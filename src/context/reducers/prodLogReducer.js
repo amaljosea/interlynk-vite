@@ -6,6 +6,17 @@ const prodLogReducer = (state, action) => {
         ...state,
         pageIndex: 1
       }
+    case 'CHANGE_SEARCH_INPUT':
+      return {
+        ...state,
+        searchInput: payload
+      }
+    case 'CLEAR_SEARCH_INPUT':
+      return {
+        ...state,
+        searchInput: '',
+        pageIndex: 1
+      }
     case 'DECREMENT_PAGE':
       return {
         ...state,

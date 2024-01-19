@@ -88,7 +88,7 @@ const ProductDetails = () => {
     dispatch,
     userPermissions
   } = useGlobalState()
-  const { field, direction } = prodLogState
+  const { field, direction, searchInput } = prodLogState
   const { enabled } = prodState
   const { prodVulnDispatch } = dispatch
 
@@ -284,6 +284,7 @@ const ProductDetails = () => {
       setActiveProdTab(4)
       getLogs({
         variables: {
+          search: searchInput !== '' ? searchInput : undefined,
           id: activeEnv,
           first: totalRows,
           field: field,
