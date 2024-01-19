@@ -623,6 +623,7 @@ const ProductTable = ({ data, refetch }) => {
                 refetch={refetch}
                 description={activeRow.description}
                 allProjects={data.nodes}
+                activeEnv={activeEnv}
             />
         )}
 
