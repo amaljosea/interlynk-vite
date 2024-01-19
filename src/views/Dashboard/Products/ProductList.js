@@ -32,6 +32,8 @@ function ProductList() {
     error
   } = useQuery(GetProjectGroups, {
     variables: {
+      search: searchInput !== '' ? searchInput : undefined,
+      enabled: enabled === 'yes' ? true : enabled === 'no' ? false : undefined,
       direction: direction,
       first: totalRows,
       field: field
@@ -58,7 +60,6 @@ function ProductList() {
       prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
       prodCheckDispatch({ type: 'CLEAR_PROD_CHECK' })
       sbomLogDispatch({ type: 'CLEAR_SBOM_LOG' })
-      prodDispatch({ type: 'CLEAR_FILTER' })
     }
   }, [product])
 
