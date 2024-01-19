@@ -96,6 +96,8 @@ const ProductTable = ({ data, refetch }) => {
   const [activeRow, setActiveRow] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
+  const activeEnv = localStorage.getItem('activeEnv')
+
   const {
     isOpen: isOpenProduct,
     onOpen: onOpenProduct,
@@ -413,7 +415,7 @@ const ProductTable = ({ data, refetch }) => {
       id: 'actions',
       name: 'ACTIONS',
       selector: (row) => {
-        const { enabled } = row
+        const { enabled, defaultProject } = row
 
         return (
             <Menu>

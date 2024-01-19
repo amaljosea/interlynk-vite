@@ -107,14 +107,22 @@ const UploadModal = ({ projects, isOpen, onClose, activeEnv }) => {
                   width={'400px'}
                   id='dataRetention'
                   value={selectedEnv}
+                  onChange={(e) => setSelectedEnv(e.target.value)}
                   textTransform={
                     isDefaultEnv(defaultEnv) ? 'capitalize' : 'none'
                   }
-                  onChange={(e) => setSelectedEnv(e.target.value)}
                 >
                   {projects?.length > 0 &&
                     projects?.map((item) => (
-                      <option key={item.id} value={item.id}>
+                      <option
+                        key={item.id}
+                        value={item.id}
+                        style={{
+                          textTransform: isDefaultEnv(item.name)
+                            ? 'capitalize'
+                            : 'none'
+                        }}
+                      >
                         {item.name}
                       </option>
                     ))}

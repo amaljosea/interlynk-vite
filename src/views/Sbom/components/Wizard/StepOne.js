@@ -7,11 +7,12 @@ import {
   Select,
   Text
 } from '@chakra-ui/react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { GetProject, GetProjectGroups } from 'graphQL/Queries'
 import { useLazyQuery, useQuery } from '@apollo/client'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { removeDuplicates, getFullDateAndTime } from 'utils'
+import { removeDuplicates } from 'utils'
+import { isDefaultEnv } from 'utils'
 
 const StepOne = ({
   setProductId,
@@ -30,6 +31,8 @@ const StepOne = ({
   const { totalRows, prodState } = useGlobalState()
   const { enabled, field, direction } = prodState
   const group = JSON.parse(localStorage.getItem('product'))
+
+  const [envName, setEnvName] = useState('')
 
   const { data } = useQuery(GetProjectGroups, {
     variables: {
@@ -61,6 +64,7 @@ const StepOne = ({
         (item) => item.id === currentProductId
       )
       setSelectedProd(currentProd.id)
+      setEnvName(currentProd?.name)
       setProductId(currentProd.id)
       // const filterVersion = [...currentProd.sboms].filter(
       //   (item) => item.id !== currentSbomId
@@ -87,9 +91,12 @@ const StepOne = ({
   }
 
   const handleSelectProduct = (e) => {
+    const { value } = e.target
+    const env = e.target.options[e.target.selectedIndex].text
+    setEnvName(env)
     setSelectedVersion('')
-    setSelectedProd(e.target.value)
-    setProductId(e.target.value)
+    setSelectedProd(value)
+    setProductId(value)
   }
 
   useEffect(() => {
@@ -178,10 +185,19 @@ const StepOne = ({
                 id='product'
                 value={selectedProd}
                 onChange={handleSelectProduct}
+                textTransform={isDefaultEnv(envName) ? 'capitalize' : 'none'}
               >
                 <option value={''}>-- Select --</option>
                 {productList.map((item, index) => (
-                  <option key={index} value={item.value}>
+                  <option
+                    key={index}
+                    value={item.value}
+                    style={{
+                      textTransform: isDefaultEnv(item.label)
+                        ? 'capitalize'
+                        : 'none'
+                    }}
+                  >
                     {item.label}
                   </option>
                 ))}
