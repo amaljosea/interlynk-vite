@@ -67,6 +67,9 @@ import Settings from '../ProductSettings'
 import CardHeader from 'components/Card/CardHeader'
 import { ChevronDownIcon, ViewIcon } from '@chakra-ui/icons'
 import EnvironmentDrawer from 'components/Drawer/EnvironmentDrawer'
+import { isDefaultEnv } from 'utils'
+import { GetProjectGrpupComponentVulns } from 'graphQL/Queries'
+import VulnProdTable from '../Vulnerabilities/components/ProdTable'
 
 const ProductDetails = () => {
   const navigate = useNavigate()
@@ -140,16 +143,20 @@ const ProductDetails = () => {
 
   // const versionData = versions ? removeDuplicates(versions?.project?.sboms) : []
 
+  const [getGlobalVulnData, { data: globalvulnData }] = useLazyQuery(
+    GetProjectGrpupComponentVulns,
+    {
+      fetchPolicy: 'network-only'
+    }
+  )
+
   const [getRules, { data: rules, error: rulesError }] = useLazyQuery(
     GetProjectCheck,
     { fetchPolicy: 'network-only' }
   )
 
   const [getSettings, { data: settings }] = useLazyQuery(GetProjectSettings, {
-    fetchPolicy: 'network-only',
-    variables: {
-      id: activeEnv
-    }
+    fetchPolicy: 'network-only'
   })
 
   const [getLogs, { data: prodLogs }] = useLazyQuery(GetProjectLogs, {
@@ -240,6 +247,10 @@ const ProductDetails = () => {
       .finally(() => navigate('/vendor/products'))
   }
 
+  const defaultEnv = activeEnv
+    ? activeGroup?.projects?.find((item) => item.id === activeEnv)?.name
+    : ''
+
   useEffect(() => {
     if (sbomId === null) {
       prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
@@ -251,6 +262,14 @@ const ProductDetails = () => {
       setActiveProdTab(0)
     } else if (activeTab === 1) {
       setActiveProdTab(1)
+      getGlobalVulnData({
+        variables: {
+          id: productId,
+          first: totalRows
+        }
+      }).then((res) => console.log('res', res.data))
+    } else if (activeTab === 2) {
+      setActiveProdTab(2)
       getRules({
         variables: {
           id: activeEnv,
@@ -259,13 +278,13 @@ const ProductDetails = () => {
           direction: prodRulesState.direction
         }
       }).then((res) => console.log('res', res.data))
-    } else if (activeTab === 2) {
-      setActiveProdTab(2)
+    } else if (activeTab === 3) {
+      setActiveProdTab(3)
       getSettings({
         variables: { id: activeEnv }
       })
-    } else if (activeTab === 3) {
-      setActiveProdTab(3)
+    } else if (activeTab === 4) {
+      setActiveProdTab(4)
       getLogs({
         variables: {
           id: activeEnv,
@@ -423,14 +442,12 @@ const ProductDetails = () => {
                     variant={'solid'}
                     colorScheme='blue'
                     fontSize={'sm'}
-                    textTransform={'capitalize'}
+                    textTransform={
+                      isDefaultEnv(defaultEnv) ? 'capitalize' : 'none'
+                    }
                     rightIcon={<ChevronDownIcon />}
                   >
-                    {activeEnv
-                      ? activeGroup?.projects?.find(
-                          (item) => item.id === activeEnv
-                        )?.name
-                      : 'Default'}
+                    {defaultEnv}
                   </MenuButton>
                   <MenuList>
                     <MenuOptionGroup
@@ -443,7 +460,9 @@ const ProductDetails = () => {
                           fontSize={'sm'}
                           value={item?.id}
                           key={item?.id}
-                          textTransform={'capitalize'}
+                          textTransform={
+                            isDefaultEnv(item?.name) ? 'capitalize' : 'none'
+                          }
                         >
                           {item?.name}
                         </MenuItemOption>
@@ -472,9 +491,8 @@ const ProductDetails = () => {
                 <TabList>
                   {[
                     'versions',
-                    ,
-                    /// TODO: 1.0 Add back in when ready
-                    /* 'vulnerabilities', */ 'automation rules',
+                    'vulnerabilities',
+                    'automation rules',
                     'settings',
                     'change log'
                   ].map((item, index) => (
@@ -500,12 +518,13 @@ const ProductDetails = () => {
                       />
                     )}
                   </TabPanel>
-                  {/* VULNERABILITIES * /}
-                  /// TODO: 1.0 Add back in when ready
+                  {/* VULNERABILITIES */}
                   <TabPanel>
-                    <VulnsTable data={vulnList} />
+                    <VulnProdTable
+                      data={globalvulnData?.projectGroup?.componentVulns}
+                      refetch={getGlobalVulnData}
+                    />
                   </TabPanel>
-                  * /}
                   {/* AUTOMATIONS */}
                   <TabPanel>
                     {rulesError && (
@@ -521,15 +540,19 @@ const ProductDetails = () => {
                   {/* SETTINGS */}
                   <TabPanel>
                     <Settings
-                      projectId={activeGroup?.defaultProject?.id}
                       data={settings?.project?.projectSetting}
                       enabled={activeGroup?.enabled}
+                      activeEnv={activeEnv}
                       refetch={getSettings}
                     />
                   </TabPanel>
                   {/* CHANGE LOG */}
                   <TabPanel>
-                    <ChangeLog data={prodLogs} refetch={getLogs} />
+                    <ChangeLog
+                      data={prodLogs}
+                      refetch={getLogs}
+                      activeEnv={activeEnv}
+                    />
                   </TabPanel>
                 </TabPanels>
               </Tabs>

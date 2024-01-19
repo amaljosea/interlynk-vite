@@ -1,13 +1,14 @@
-name: SBOM from Release
+name: SBOM from Dev Branches
 
 on:
-  release:
-    types:
-      - created
+  create:
+  push:
+    branches:
+      - '*'
 
 jobs:
   build-sbom:
-    name: SBOM build and Push to Platform
+    name: SBOM Dev build and Push to Platform
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -26,11 +27,11 @@ jobs:
         run: echo "tag=$(git describe --tags HEAD)" > $GITHUB_ENV
       - name: Build SBOM
         run: |
-          syft --source-name 'lynk-app-dash' --source-version ${{ env.tag }} --exclude ./public -o cyclonedx-json@1.4 --file lynk-app-dash.cdx.json .
+          syft --source-name 'lynk-app-dash' --source-version ${{ github.ref_name }} --exclude ./public -o cyclonedx-json@1.4 --file lynk-app-dash.cdx.json .
       - name: Upload SBOM
         run: |
           curl -v "https://api.interlynk.io/lynkapi" \
             -H "Authorization: Bearer ${{ secrets.INTERLYNK_SECURITY_TOKEN }}" \
-            -F 'operations={"query":"mutation uploadSbom($doc: Upload!, $projectId: ID!) { sbomUpload(input: { doc: $doc, projectId: $projectId }) { errors } }","variables":{"doc":null,"projectId": "${{ vars.INTERLYNK_PRODUCT_ID }}" }}' \
+            -F 'operations={"query":"mutation uploadSbom($doc: Upload!, $projectId: ID!) { sbomUpload(input: { doc: $doc, projectId: $projectId }) { errors } }","variables":{"doc":null,"projectId": "${{ vars.INTERLYNK_DEV_PRODUCT_ID }}" }}' \
             -F 'map={"0":["variables.doc"]}' \
             -F '0=@"lynk-app-dash.cdx.json";type=application/json'

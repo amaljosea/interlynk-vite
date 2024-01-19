@@ -72,7 +72,7 @@ export default function HeaderLinks(props) {
       Cookies.remove('authToken')
       navigate('/auth')
     }
-  }, [])
+  }, [error])
 
   // Chakra Color Mode
   let navbarIcon = useColorModeValue('gray.500', 'gray.200')

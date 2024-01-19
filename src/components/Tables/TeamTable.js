@@ -156,7 +156,7 @@ const TeamTable = ({ data, refetch }) => {
         const { invitationStatus } = row
         return (
           <Tag
-            width='100px'
+            width='fit-content'
             variant='subtle'
             colorScheme={
               invitationStatus === 'invited'
@@ -169,7 +169,9 @@ const TeamTable = ({ data, refetch }) => {
             }
             textTransform={'capitalize'}
           >
-            <TagLabel mx='auto'>{invitationStatus}</TagLabel>
+            <TagLabel mx='auto'>
+              {invitationStatus?.replace(/_/g, ' ')}
+            </TagLabel>
           </Tag>
         )
       }

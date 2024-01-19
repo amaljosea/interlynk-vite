@@ -60,8 +60,6 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
   const customerView = location.pathname.startsWith('/customer')
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
-  const x = window.matchMedia('(min-width: 2500px)')
-  const y = window.matchMedia('(max-width: 1440px)')
 
   const { userPermissions, totalRows, setTotalRows, prodCompState, dispatch } =
     useGlobalState()
@@ -341,7 +339,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
         )
       },
       wrap: true,
-      width: '24%',
+      width: '15%',
       sortable: true
     },
     // VERSION
@@ -349,7 +347,8 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
       id: 'COMPONENTS_VERSION',
       name: 'VERSION',
       selector: (row) => <p style={{ textWrap: 'pretty' }}>{row.version}</p>,
-      width: '16%',
+      width: '15%',
+      wrap: true,
       sortable: true
     },
     // PURL
@@ -371,14 +370,15 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
         )
       },
       sortable: true,
-      width: x.matches ? '30%' : '20%',
+      width: '20%',
+      wrap: true,
       grow: 2
     },
     // LICENSES
     {
       id: 'COMPONENTS_LICENSES',
       name: 'LICENSES',
-      width: '16%',
+      width: '15%',
       selector: (row) => {
         const { licenses, licensesExp, licensesCustom } = row
 
@@ -494,13 +494,14 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
         </Tooltip>
       ),
       sortable: true,
-      width: '12%',
+      width: '10%',
       sortFunction: (a, b) => {
         const dateA = new Date(a.updatedAt)
         const dateB = new Date(b.updatedAt)
         return dateA - dateB // Sort in descending order
       },
-      right: 'true'
+      right: 'true',
+      wrap: true
     },
     // ACTION
     {
