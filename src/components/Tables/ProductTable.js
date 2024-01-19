@@ -323,21 +323,19 @@ const ProductTable = ({ data, refetch }) => {
         }
 
         const handleClick = () => {
-          if (defaultProject?.sboms?.length > 0) {
-            localStorage.setItem('product', JSON.stringify(product))
-            localStorage.setItem('activeEnv', defaultProject?.id)
-            localStorage.setItem('activeProdTab', 0)
-            prodDispatch({
-              type: 'SET_CURRENT_PRODUCT',
-              payload: {
-                id: defaultProject?.id,
-                sbomId:
-                    defaultProject?.length > 0
-                        ? defaultProject?.primaryComponent?.version
-                        : defaultProject?.sboms[0].id || ''
-              }
-            })
-          }
+          localStorage.setItem('product', JSON.stringify(product))
+          localStorage.setItem('activeEnv', defaultProject?.id)
+          localStorage.setItem('activeProdTab', 0)
+          prodDispatch({
+            type: 'SET_CURRENT_PRODUCT',
+            payload: {
+              id: defaultProject?.id,
+              sbomId:
+                defaultProject?.length > 0
+                  ? defaultProject?.primaryComponent?.version
+                  : defaultProject?.sboms[0]?.id || ''
+            }
+          })
           setActiveSbomTab(0)
         }
 
@@ -441,6 +439,7 @@ const ProductTable = ({ data, refetch }) => {
                   {/* UPLOAD SBOM */}
                   <MenuItem
                       onClick={() => {
+                        localStorage.setItem('activeEnv', defaultProject?.id)
                         setActiveRow(row)
                         onOpenUpload()
                       }}
@@ -596,6 +595,7 @@ const ProductTable = ({ data, refetch }) => {
                 projects={activeRow?.projects}
                 isOpen={isOpenUpload}
                 onClose={onCloseUpload}
+                activeEnv={activeEnv}
             />
         )}
 
