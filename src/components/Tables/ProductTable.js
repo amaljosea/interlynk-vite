@@ -47,8 +47,9 @@ import UploadModal from 'views/Dashboard/Products/components/UploadModal'
 import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import ProdFilterMenu from 'views/Dashboard/Products/components/ProdFilterMenu'
 import { useGlobalState } from 'hooks/useGlobalState'
-import ProdSearchFilter from 'views/Sbom/components/ProdSearchFilter'
 import Card from 'components/Card/Card'
+import SearchFilter from 'views/Sbom/components/SearchFilter'
+import StatusModal from 'views/Dashboard/Products/components/StatusModal'
 
 import Pagination from '../Pagination';
 
@@ -122,7 +123,7 @@ const ProductTable = ({ data, refetch }) => {
   } = useDisclosure()
 
   const {
-    isOpen: isWarning,
+    isOpen: isWarningOpen,
     onOpen: onWarningOpen,
     onClose: onWarningClose
   } = useDisclosure()
@@ -198,7 +199,7 @@ const ProductTable = ({ data, refetch }) => {
   const handleSearch = useCallback((event) => {
     if (event.key === 'Enter' && searchInput !== '') {
       refetch({
-        search: searchInput,
+        search: value,
         first: totalRows,
         last: undefined,
         after: undefined,
@@ -623,6 +624,7 @@ const ProductTable = ({ data, refetch }) => {
                 refetch={refetch}
                 description={activeRow.description}
                 allProjects={data.nodes}
+                activeEnv={activeEnv}
             />
         )}
 

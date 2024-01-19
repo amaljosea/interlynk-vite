@@ -339,7 +339,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
         )
       },
       wrap: true,
-      width: '15%',
+      width: '20%',
       sortable: true
     },
     // VERSION
@@ -370,7 +370,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
         )
       },
       sortable: true,
-      width: '20%',
+      width: '15%',
       wrap: true,
       grow: 2
     },
@@ -494,7 +494,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
         </Tooltip>
       ),
       sortable: true,
-      width: '10%',
+      width: '12%',
       sortFunction: (a, b) => {
         const dateA = new Date(a.updatedAt)
         const dateB = new Date(b.updatedAt)

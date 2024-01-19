@@ -15,17 +15,23 @@ import DataTable from 'react-data-table-component'
 import { useEffect, useMemo, useState } from 'react'
 import { sevColor, timeSince, getFullDateAndTime, customStyles } from 'utils'
 import CustomLoader from 'components/CustomLoader'
-import { Link } from 'react-router-dom'
+import { Link, useLocation, useParams } from 'react-router-dom'
 import VulnsFilters from 'views/Dashboard/Vulnerabilities/components/VulnsFilter'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import VulnBadge from 'components/Misc/VulnBadge'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 const GlobalVulnTable = ({ data, refetch }) => {
+  const params = useParams()
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const groupId = queryParams.get('id')
+
   const { totalRows, setTotalRows, globalVulnState, dispatch } =
     useGlobalState()
   const { pageIndex } = globalVulnState
   const { globalVulnDispatch } = dispatch
+
   const [searchInput, setSearchInput] = useState('')
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
@@ -50,7 +56,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
       name: 'ID',
       wrap: true,
       selector: (row) => {
-        const { vulnId, id } = row
+        const { vulnId, id } = params?.name ? row?.vuln : row
         return (
           <Link
             to={`/vendor/vulnerabilities?id=${id}`}
@@ -62,14 +68,14 @@ const GlobalVulnTable = ({ data, refetch }) => {
           </Link>
         )
       },
-      width: '20%'
+      width: '15%'
     },
     // SEVERITY
     {
       id: 'VULNS_SEV',
       name: 'SEVERITY',
       selector: (row) => {
-        const { sev } = row
+        const { sev } = params?.name ? row?.vuln : row
         return (
           <>
             {sev !== null ? (
@@ -89,7 +95,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
           </>
         )
       },
-      width: '8%',
+      width: '9%',
       wrap: true
     },
     // SOURCE
@@ -97,7 +103,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
       id: 'VULNS_SOURCE',
       name: 'SOURCE',
       selector: (row) => {
-        const { source } = row
+        const { source } = params?.name ? row?.vuln : row
         return (
           <Tag
             size='sm'
@@ -121,7 +127,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
       id: 'VULNS_CVSS_SCORE',
       name: 'CVSS',
       selector: (row) => {
-        const { cvssScore, cvssVector } = row
+        const { cvssScore, cvssVector } = params?.name ? row?.vuln : row
         return (
           <Flex minWidth='max-content' alignItems='center' gap='2'>
             <Tag
@@ -144,7 +150,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
       id: 'VULN_INFOS_EPSS_SCORES',
       name: 'EPSS*',
       selector: (row) => {
-        const { vulnInfo } = row
+        const { vulnInfo } = params?.name ? row?.vuln : row
         const { epssScores } = vulnInfo ? vulnInfo : ''
 
         return (
@@ -196,7 +202,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
       id: 'STATUSES',
       name: 'STATUSES',
       selector: (row) => {
-        const { metrics } = row
+        const { metrics } = params?.name ? row?.vuln : row
         const {
           affectedCount,
           falsePositiveCount,
@@ -252,10 +258,8 @@ const GlobalVulnTable = ({ data, refetch }) => {
     }
   ]
 
-  const [vulnSearchInput, setVulnSearchInput] = useState('')
-
   // SEARCH COMPONENT
-  const handleSearch = async () => {
+  const handleSearch = async (event) => {
     const { value } = event.target
   }
 
@@ -295,13 +299,16 @@ const GlobalVulnTable = ({ data, refetch }) => {
   const handlePreviousPage = async () => {
     setIsPrevActive(false)
     await refetch({
+      id: params?.name ? groupId : undefined,
       first: undefined,
       last: totalRows,
       after: undefined,
       before: data?.pageInfo?.startCursor
     }).then((res) => {
       if (res.data) {
-        const project = res?.data?.organization?.vulns
+        const project = params?.name
+          ? res?.data?.projectGroup?.componentVulns
+          : res?.data?.organization?.vulns
         globalVulnDispatch({
           type: 'DECREMENT_PAGE',
           payload: project?.pageInfo?.startCursor
@@ -315,13 +322,16 @@ const GlobalVulnTable = ({ data, refetch }) => {
   const handleNextPage = async () => {
     setIsNextActive(false)
     await refetch({
+      id: params?.name ? groupId : undefined,
       first: totalRows,
       last: undefined,
       after: data?.pageInfo?.endCursor,
       before: undefined
     }).then((res) => {
       if (res.data) {
-        const project = res?.data?.organization?.vulns
+        const project = params?.name
+          ? res?.data?.projectGroup?.componentVulns
+          : res?.data?.organization?.vulns
         globalVulnDispatch({
           type: 'INCREMENT_PAGE',
           payload: {
@@ -339,6 +349,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
     const { value } = e.target
     setTotalRows(Number(value))
     await refetch({
+      id: params?.name ? groupId : undefined,
       first: Number(value),
       last: undefined,
       after: undefined,

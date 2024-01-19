@@ -6,6 +6,17 @@ const prodLogReducer = (state, action) => {
         ...state,
         pageIndex: 1
       }
+    case 'CHANGE_SEARCH_INPUT':
+      return {
+        ...state,
+        searchInput: payload
+      }
+    case 'CLEAR_SEARCH_INPUT':
+      return {
+        ...state,
+        searchInput: '',
+        pageIndex: 1
+      }
     case 'DECREMENT_PAGE':
       return {
         ...state,
@@ -24,6 +35,24 @@ const prodLogReducer = (state, action) => {
         ...state,
         field: payload.field,
         direction: payload.direction,
+        pageIndex: 1
+      }
+    case 'FILTER_TYPE':
+      return {
+        ...state,
+        type: [...payload].includes('all') ? [] : payload,
+        pageIndex: 1
+      }
+    case 'FILTER_USER':
+      return {
+        ...state,
+        user: [...payload].includes('all') ? [] : payload,
+        pageIndex: 1
+      }
+    case 'FILTER_OBJECT':
+      return {
+        ...state,
+        object: [...payload].includes('all') ? [] : payload,
         pageIndex: 1
       }
     default:

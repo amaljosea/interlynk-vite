@@ -373,7 +373,14 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                           {item.contactName}
                           {item.contactEmail && ` (${item.contactEmail})`}
                           {item.url ? (
-                            <Link href={item.url} isExternal>
+                            <Link
+                              href={
+                                item?.url?.startsWith('http')
+                                  ? item.url
+                                  : `http://${item.url}`
+                              }
+                              isExternal
+                            >
                               {' '}
                               {item.name}
                             </Link>

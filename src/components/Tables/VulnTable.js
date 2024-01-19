@@ -196,7 +196,7 @@ const VulnTable = ({
           </>
         )
       },
-      width: '8%',
+      width: '9%',
       sortable: true,
       wrap: true
     },
@@ -221,7 +221,7 @@ const VulnTable = ({
           </Tag>
         )
       },
-      width: '8%',
+      width: '9%',
       sortable: true,
       wrap: true
     },
@@ -335,7 +335,7 @@ const VulnTable = ({
         </Tooltip>
       ),
       wrap: true,
-      width: '12%',
+      width: '10%',
       sortable: true
     },
     // STATUS
