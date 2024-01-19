@@ -115,15 +115,15 @@ const ProductDetails = () => {
       field: prodState.field,
       direction: prodState.direction
     },
-    onCompleted: (data) => {
-      if (data) {
-        const activeGroup = data?.organization?.projectGroups?.nodes.find(
-          (item) => item.id === productId
-        )
-        localStorage.setItem('activeEnv', activeGroup?.defaultProject?.id)
-        setActiveEnv(activeGroup?.defaultProject?.id)
-      }
-    }
+    // onCompleted: (data) => {
+    //   if (data) {
+    //     const activeGroup = data?.organization?.projectGroups?.nodes.find(
+    //       (item) => item.id === productId
+    //     )
+    //     localStorage.setItem('activeEnv', activeGroup?.defaultProject?.id)
+    //     setActiveEnv(activeGroup?.defaultProject?.id)
+    //   }
+    // }
   })
 
   const activeGroup =
