@@ -42,7 +42,7 @@ const EnvironmentDrawer = ({ data, isOpen, onClose, refetch, activeEnv }) => {
       (res) =>
         res.data &&
         refetch({
-          id: data?.id
+          id: data?.projectGroup?.id
         })
     )
   }
@@ -58,7 +58,7 @@ const EnvironmentDrawer = ({ data, isOpen, onClose, refetch, activeEnv }) => {
               icon={<AddIcon />}
               colorScheme='blue'
               variant='solid'
-              isDisabled={!data?.enabled}
+              isDisabled={!data?.projectGroup?.enabled}
               onClick={() => {
                 onProdOpen()
               }}
@@ -136,9 +136,9 @@ const EnvironmentDrawer = ({ data, isOpen, onClose, refetch, activeEnv }) => {
             <Flex flexDir={'column'} width={'100%'}>
               <DataTable
                 columns={columns}
-                data={data?.projects || []}
+                data={data?.projectGroup?.projects || []}
                 customStyles={customStyles}
-                progressPending={data ? false : true}
+                progressPending={data?.projectGroup ? false : true}
                 progressComponent={<CustomLoader />}
                 subHeader
                 subHeaderComponent={Header}
@@ -163,7 +163,7 @@ const EnvironmentDrawer = ({ data, isOpen, onClose, refetch, activeEnv }) => {
           isOpen={isProdOpen}
           onClose={onProdClose}
           onEnvClose={onClose}
-          groupId={data?.id}
+          groupId={data?.projectGroup?.id}
           refetch={refetch}
         />
       )}

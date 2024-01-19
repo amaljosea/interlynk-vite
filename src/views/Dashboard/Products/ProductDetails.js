@@ -613,7 +613,7 @@ const ProductDetails = () => {
           <EnvironmentDrawer
             isOpen={isEnvOpen}
             onClose={onEnvClose}
-            data={data?.projectGroup}
+            data={data}
             refetch={refetch}
             activeEnv={activeEnv}
           />
