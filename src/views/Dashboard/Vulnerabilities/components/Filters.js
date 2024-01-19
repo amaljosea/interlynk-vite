@@ -1,56 +1,28 @@
 import {
   Box,
-  Button,
   Menu,
-  MenuButton,
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
   Stack
 } from '@chakra-ui/react'
-import { CheckIcon } from '@chakra-ui/icons'
-import { FaFilter } from 'react-icons/fa'
 import { useState } from 'react'
-
-const CheckMark = () => {
-  return (
-    <CheckIcon
-      w={5}
-      h={5}
-      bg={'white'}
-      color={'blue.500'}
-      border={'1px solid #4299E1'}
-      rounded={'full'}
-      p={'4px'}
-      position={'absolute'}
-      right={-1}
-      top={-1}
-      zIndex={11}
-    />
-  )
-}
+import FilterButton from 'components/Misc/FilterButton'
+import CheckMark from 'components/Misc/CheckMark'
 
 const Filters = () => {
-  const [components, setComponents] = useState([])
+  const [products, setProducts] = useState([])
+  const [versions, setVersions] = useState([])
   const [statuses, setStatuses] = useState([])
+  const [envs, setEnvs] = useState([])
 
   return (
     <Stack direction={'row'} alignItems={'center'} gap={1}>
       {/* PRODUCTS */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {components.length !== 0 && !components.includes('all') && (
-            <CheckMark />
-          )}
-          <MenuButton
-            as={Button}
-            colorScheme='blue'
-            fontWeight='normal'
-            fontSize={'sm'}
-            leftIcon={<FaFilter size={14} />}
-          >
-            Product
-          </MenuButton>
+          {products.length !== 0 && !products.includes('all') && <CheckMark />}
+          <FilterButton>Product</FilterButton>
           <MenuList
             minHeight={'auto'}
             maxHeight={'300px'}
@@ -59,9 +31,9 @@ const Filters = () => {
           >
             <MenuOptionGroup
               type='checkbox'
-              value={components}
+              value={products}
               onChange={(value) =>
-                setComponents(value.includes('all') ? [] : value)
+                setProducts(value.includes('all') ? [] : value)
               }
             >
               {[
@@ -71,16 +43,7 @@ const Filters = () => {
                 'guava',
                 'h2',
                 'http2-hpack',
-                'http2-server',
-                'jackson-databind',
-                'jersey-common',
-                'jetty-http',
-                'jetty-server',
-                'jetty-servlets',
-                'liquibase-core',
-                'logback-classic',
-                'logback-core',
-                'snakeyaml'
+                'http2-server'
               ].map((item, index) => (
                 <MenuItemOption
                   key={index}
@@ -98,16 +61,8 @@ const Filters = () => {
       {/* VERSIONS */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {statuses.length !== 0 && !statuses.includes('all') && <CheckMark />}
-          <MenuButton
-            as={Button}
-            colorScheme='blue'
-            fontWeight='normal'
-            fontSize={'sm'}
-            leftIcon={<FaFilter size={14} />}
-          >
-            Component
-          </MenuButton>
+          {versions.length !== 0 && !versions.includes('all') && <CheckMark />}
+          <FilterButton>Versions</FilterButton>
           <MenuList
             minHeight={'auto'}
             maxHeight={'300px'}
@@ -116,20 +71,52 @@ const Filters = () => {
           >
             <MenuOptionGroup
               type='checkbox'
-              value={statuses}
+              value={versions}
               onChange={(value) =>
-                setStatuses(value.includes('all') ? [] : value)
+                setVersions(value.includes('all') ? [] : value)
               }
             >
+              {['1.0.0', '2.3.1', '2.3.2', '2.3.3', '3.0.0', '4.0.0'].map(
+                (item, index) => (
+                  <MenuItemOption key={index} value={item} fontSize={'sm'}>
+                    {item}
+                  </MenuItemOption>
+                )
+              )}
+            </MenuOptionGroup>
+          </MenuList>
+        </Menu>
+      </Box>
+      {/* ENVIRONMENT */}
+      <Box width={'fit-content'} position={'relative'}>
+        <Menu closeOnSelect={true}>
+          {envs.length !== 0 && !envs.includes('all') && <CheckMark />}
+          <FilterButton>Environment</FilterButton>
+          <MenuList
+            minHeight={'auto'}
+            maxHeight={'300px'}
+            overflow={'hidden'}
+            overflowY={'scroll'}
+          >
+            <MenuOptionGroup
+              type='checkbox'
+              value={envs}
+              onChange={(value) => setEnvs(value.includes('all') ? [] : value)}
+            >
               {[
-                'lynk-api',
-                'lynk-dash-app',
-                'sbomqs',
-                'sbomgr',
-                'sbomex',
-                'sbomlc'
+                'all',
+                'default',
+                'development',
+                'production',
+                'feature',
+                'improvement'
               ].map((item, index) => (
-                <MenuItemOption key={index} value={item} fontSize={'sm'}>
+                <MenuItemOption
+                  key={index}
+                  value={item}
+                  fontSize={'sm'}
+                  textTransform={'capitalize'}
+                >
                   {item}
                 </MenuItemOption>
               ))}
@@ -137,19 +124,11 @@ const Filters = () => {
           </MenuList>
         </Menu>
       </Box>
-      {/* Statuses */}
+      {/* STATUSES */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
           {statuses.length !== 0 && !statuses.includes('all') && <CheckMark />}
-          <MenuButton
-            as={Button}
-            colorScheme='blue'
-            fontWeight='normal'
-            fontSize={'sm'}
-            leftIcon={<FaFilter size={14} />}
-          >
-            Status
-          </MenuButton>
+          <FilterButton>Status</FilterButton>
           <MenuList
             minHeight={'auto'}
             maxHeight={'300px'}
@@ -165,7 +144,8 @@ const Filters = () => {
             >
               {[
                 'All',
-                'Under Investigation',
+                'Unspecified',
+                'In Triage',
                 'Not Affected',
                 'False Positive',
                 'Affected',

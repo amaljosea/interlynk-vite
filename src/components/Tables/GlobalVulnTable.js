@@ -258,8 +258,6 @@ const GlobalVulnTable = ({ data, refetch }) => {
     }
   ]
 
-  const [vulnSearchInput, setVulnSearchInput] = useState('')
-
   // SEARCH COMPONENT
   const handleSearch = async (event) => {
     const { value } = event.target

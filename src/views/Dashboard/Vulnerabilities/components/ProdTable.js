@@ -18,6 +18,7 @@ import Filters from './Filters'
 import { useGlobalState } from 'hooks/useGlobalState'
 import VexModal from './VexModal'
 import { useLocation, useParams } from 'react-router-dom'
+import SearchFilter from 'views/Sbom/components/SearchFilter'
 
 const customStyles = {
   headCells: {
@@ -62,6 +63,7 @@ const VulnProdTable = ({ data, refetch }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [selectedVulns, setSelectedVulns] = useState([])
   const [pageIndex, setPageIndex] = useState(1)
+  const [searchInput, setSearchInput] = useState('')
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
   const [toggleClear, setToggleClear] = useState(false)
@@ -70,23 +72,33 @@ const VulnProdTable = ({ data, refetch }) => {
   const columns = [
     // PRODUCTS
     {
-      id: 'PRODUCT_NAME',
+      id: 'PRODUCT_GROUP',
       name: 'PRODUCT',
       selector: (row) => {
         const { component } = row
         return (
-          <Tooltip
-            label={component?.sbom?.project?.projectGroup?.name || ''}
-            placement='top'
-          >
-            <Text textTransform={'capitalize'}>
-              {component?.sbom?.project?.projectGroup?.name || ''}
-            </Text>
-          </Tooltip>
+          <Text textTransform={'capitalize'}>
+            {component?.sbom?.project?.projectGroup?.name || ''}
+          </Text>
         )
       },
       wrap: true,
       width: '15%'
+    },
+    // ENV
+    {
+      id: 'ENVIRONMENT',
+      name: 'ENVIRONMENT',
+      selector: (row) => {
+        const { component } = row
+        return (
+          <Text textTransform={'capitalize'}>
+            {component?.sbom?.project?.name || ''}
+          </Text>
+        )
+      },
+      wrap: true,
+      width: '12%'
     },
     // VERSION
     {
@@ -154,6 +166,26 @@ const VulnProdTable = ({ data, refetch }) => {
     }
   ]
 
+  // SEARCH COMPONENT
+  const handleSearch = async (event) => {
+    const { value } = event.target
+  }
+
+  // CLEAR SERACH
+  const handleClear = async () => {
+    setSearchInput('')
+  }
+
+  // ON SEARCH INPUT CHANGE
+  const onSearchInputChange = (e) => {
+    const { value } = e.target
+    if (value === '') {
+      handleClear()
+    } else {
+      setSearchInput(value)
+    }
+  }
+
   const subHeaderComponent = useMemo(() => {
     return (
       <Flex
@@ -162,7 +194,17 @@ const VulnProdTable = ({ data, refetch }) => {
         justifyContent={'space-between'}
       >
         {/* FILTER */}
-        <Filters />
+        <Stack spacing={4} alignItems={'center'} direction={'row'}>
+          <SearchFilter
+            id='globalVulns'
+            filterText={searchInput}
+            onFilter={handleSearch}
+            onClear={handleClear}
+            onChange={onSearchInputChange}
+          />
+
+          <Filters />
+        </Stack>
 
         {/* UPDATE STATUES */}
         {selectedVulns.length > 0 && (
@@ -178,7 +220,13 @@ const VulnProdTable = ({ data, refetch }) => {
         )}
       </Flex>
     )
-  }, [selectedVulns])
+  }, [
+    selectedVulns,
+    searchInput,
+    onSearchInputChange,
+    handleClear,
+    handleSearch
+  ])
 
   const handleChange = (state) => {
     setSelectedVulns(state.selectedRows)
