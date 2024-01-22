@@ -26,7 +26,7 @@ import ReactSelect from 'react-select'
 import { useRef, useState } from 'react'
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { GetProject } from 'graphQL/Queries'
-import { removeDuplicates, getFullDateAndTime } from 'utils'
+import { removeDuplicates, normalizeSBOMVersion } from 'utils'
 import CheckModal from './CheckModal'
 import { GetAllComponents } from 'graphQL/Queries'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
@@ -148,11 +148,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
   filteredDuplicated &&
     filteredDuplicated.map((project) => {
       uniqVersions.push({
-        label:
-          project?.primaryComponent?.version ||
-          `Uploaded ${getFullDateAndTime(project.creationAt)}`,
-        value: project.id,
-        creationAt: project.creationAt
+        label: normalizeSBOMVersion(project),
       })
     })
 
@@ -166,7 +162,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
           localStorage.setItem(
             'currentSBOM',
             JSON.stringify({
-              version: res.data.sbom.primaryComponent?.version,
+              version: normalizeSBOMVersion(res.data.sbom),
               id: res.data.sbom.id
             })
           )
@@ -362,7 +358,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
           productId={productId}
           sbomId={sbomId}
           productName={sbom?.project?.name}
-          version={sbom?.primaryComponent?.version}
+          version={normalizeSBOMVersion(sbom)}
         />
       )}
 
@@ -413,7 +409,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
           isOpen={isCopied}
           onClose={onCopiedClose}
           product={sbom?.project?.name}
-          version={sbom?.primaryComponent?.version}
+          version={normalizeSBOMVersion(sbom)}
         />
       )}
 
