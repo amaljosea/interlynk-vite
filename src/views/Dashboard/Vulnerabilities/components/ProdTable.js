@@ -19,6 +19,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import VexModal from './VexModal'
 import { useLocation, useParams } from 'react-router-dom'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
+import { normalizeSBOMVersion } from 'utils'
 
 const customStyles = {
   headCells: {

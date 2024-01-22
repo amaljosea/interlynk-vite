@@ -283,12 +283,14 @@ function Profile() {
                       <OrgTable
                         data={allOrgs?.allOrganizations?.nodes || []}
                         refetch={allOrgRefetch}
+                        isAdmin={isAdmin}
                         activeOrg={orgInfo?.organization?.id || null}
                       />
                     ) : (
                       <OrgTable
                         data={orgs?.myOrganizations?.nodes || []}
                         refetch={myOrgRefetch}
+                        isAdmin={isAdmin}
                         activeOrg={orgInfo?.organization?.id || null}
                       />
                     )}
