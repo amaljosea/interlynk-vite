@@ -598,23 +598,36 @@ export const customStyles = {
   }
 }
 
+export const normalizeSBOMVersion = (sbom) => {
+  if (sbom?.primaryComponent?.version) {
+    return sbom.primaryComponent.version
+  } else if (sbom?.primaryComponent?.name) {
+    return sbom.primaryComponent.name
+  } else if (sbom?.creationAt) {
+    return 'Uploaded: ' + getFullDateAndTime(sbom?.creationAt)
+  }
+  return ''
+}
+
 // REMOVE DUPLICATE PRODUCTS VERSIONS
 export const removeDuplicates = (arr) => {
   const uniqueVersions = {}
+
   for (const item of arr) {
+    const normalizedVersion = normalizeSBOMVersion(item)
     if (
-      !uniqueVersions[item.primaryComponent?.version] ||
-      item.updatedAt > uniqueVersions[item.primaryComponent?.version].creationAt
+      !uniqueVersions[normalizedVersion] ||
+      item.updatedAt > uniqueVersions[normalizedVersion].creationAt
     ) {
-      uniqueVersions[item.primaryComponent?.version] = item
+      uniqueVersions[normalizedVersion] = item
     }
   }
+
   const versions = Object.values(uniqueVersions).sort((a, b) => {
     const dateA = new Date(a.creationAt)
     const dateB = new Date(b.creationAt)
     return dateB - dateA
   })
-
   return versions
 }
 

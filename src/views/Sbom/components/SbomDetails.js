@@ -14,7 +14,7 @@ import {
 import VulnBadge from 'components/Misc/VulnBadge'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { Link, useLocation } from 'react-router-dom'
-import { timeSince, getFullDateAndTime } from 'utils'
+import { timeSince, getFullDateAndTime, normalizeSBOMVersion } from 'utils'
 import { DownloadIcon, Search2Icon } from '@chakra-ui/icons'
 import {
   FaAngleLeft,
@@ -55,6 +55,7 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
   const currentProduct = JSON.parse(localStorage.getItem(`product`))
   const { name, id } = currentProduct ? currentProduct : {}
   const currentSBOM = JSON.parse(localStorage.getItem(`currentSBOM`))
+  console.log('CURRENT SBOM', currentSBOM)
 
   const onSelectComp = () => {
     const { field, direction } = prodCompState
@@ -118,14 +119,14 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
                   color={'blue.500'}
                   textDecor={'underline'}
                 >
-                  {name} : {currentSBOM.version}
+                  {name} : {normalizeSBOMVersion(currentSBOM)}
                 </Text>
               </HStack>
             </Link>
           )}
           <Stack direction={'row'} alignItems={'center'} wrap={'wrap'}>
             <Text fontWeight={'semibold'} fontSize={25}>
-              {project?.projectGroup?.name} : {primaryComponent?.version}
+              {project?.projectGroup?.name} : {normalizeSBOMVersion(sbom)}
             </Text>
             <Tooltip label='Lifecycle stage' fontSize='md'>
               <Tag

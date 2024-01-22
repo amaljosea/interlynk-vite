@@ -106,10 +106,10 @@ const VulnProdTable = ({ data, refetch }) => {
       name: 'VERSION',
       selector: (row) => (
         <Tooltip
-          label={row?.component?.sbom?.primaryComponent?.version || ''}
+          label={normalizeSBOMVersion(row?.component?.sbom)}
           placement='top'
         >
-          {row?.component?.sbom?.primaryComponent?.version || ''}
+          {normalizeSBOMVersion(row?.component?.sbom)}
         </Tooltip>
       ),
       wrap: true,
