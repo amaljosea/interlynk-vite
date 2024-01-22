@@ -20,6 +20,7 @@ import SearchFilter from 'views/Sbom/components/SearchFilter'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useLazyQuery } from '@apollo/client'
 import { GetLogsFilterData } from 'graphQL/Queries'
+import Pagination from "../Pagination";
 
 const setColor = (type) => {
   switch (type) {
@@ -41,6 +42,8 @@ const setColor = (type) => {
 }
 
 const SbomChangelogTable = ({ data, refetch }) => {
+  const paginationSizes = [25, 50, 100]
+
   // GET LOGS FILTER HEADS
   const [getLogsFilters] = useLazyQuery(GetLogsFilterData)
 
@@ -291,7 +294,7 @@ const SbomChangelogTable = ({ data, refetch }) => {
     }
   ]
 
-  const onPreviousPage = async () => {
+  const handlePreviousPage = async () => {
     await refetch({
       projectId: productId,
       sbomId: sbomId,
@@ -309,7 +312,7 @@ const SbomChangelogTable = ({ data, refetch }) => {
     )
   }
 
-  const onNextPage = async () => {
+  const handleNextPage = async () => {
     refetch({
       projectId: productId,
       sbomId: sbomId,
@@ -483,39 +486,17 @@ const SbomChangelogTable = ({ data, refetch }) => {
 
       {/* PAGINATION */}
       {data && (
-        <Flex
-          width={'100%'}
-          flexDir={'row'}
-          gap={4}
-          alignItems={'center'}
-          mt={6}
-          justifyContent={'space-between'}
-        >
-          <Stack alignItems={'center'} direction={'row'} spacing={4}>
-            <Button
-              colorScheme='blue'
-              onClick={onPreviousPage}
-              isDisabled={!data.pageInfo.hasPreviousPage}
-            >
-              Previous
-            </Button>
-            <Button
-              colorScheme='blue'
-              onClick={onNextPage}
-              isDisabled={!data.pageInfo.hasNextPage}
-            >
-              Next
-            </Button>
-            <Box>
-              Page {pageIndex} of{' '}
-              {data.totalCount === 0
-                ? 1
-                : Math.ceil(data.totalCount / totalRows)}
-            </Box>
-          </Stack>
-
-          <RowLimit onChange={handleSetRow} name='changelogRow' />
-        </Flex>
+          <Pagination
+              paginationSizes={paginationSizes}
+              pageIndex={pageIndex}
+              totalRows={totalRows}
+              totalCount={data.totalCount}
+              onPreviousPage={handlePreviousPage}
+              onNextPage={handleNextPage}
+              onSetRow={handleSetRow}
+              hasNextPage={data.pageInfo.hasNextPage}
+              hasPreviousPage={data.pageInfo.hasPreviousPage}
+          />
       )}
     </>
   )

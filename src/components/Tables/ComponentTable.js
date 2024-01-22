@@ -50,8 +50,12 @@ import RowLimit from 'views/Sbom/components/RowLimit'
 import { useGlobalState } from 'hooks/useGlobalState'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import { GetCompFilterData } from 'graphQL/Queries'
+import Pagination from "../Pagination";
 
 const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
+
+  const paginationSizes = [25, 50, 100]
+
   // GET COMPONENT FILTER HEADS
   const [getCompFilters] = useLazyQuery(GetCompFilterData)
 
@@ -1124,40 +1128,17 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
 
       {/* PAGINATION */}
       {data && (
-        <Flex
-          width={'100%'}
-          flexDir={'row'}
-          gap={4}
-          alignItems={'center'}
-          justifyContent={'space-between'}
-          mt={6}
-        >
-          <Stack alignItems={'center'} direction={'row'} spacing={4}>
-            <Button
-              colorScheme='blue'
-              onClick={handlePreviousPage}
-              isDisabled={!isPrevActive}
-            >
-              Previous
-            </Button>
-            <Button
-              colorScheme='blue'
-              onClick={handleNextPage}
-              isDisabled={!isNextActive}
-            >
-              Next
-            </Button>
-            <Box>
-              Page {pageIndex} of{' '}
-              {data.totalCount === 0
-                ? 1
-                : Math.ceil(data.totalCount / totalRows)}
-            </Box>
-          </Stack>
-
-          {/* ROW LIMIT */}
-          <RowLimit onChange={handleSetRow} name='componentRow' />
-        </Flex>
+          <Pagination
+              paginationSizes={paginationSizes}
+              pageIndex={pageIndex}
+              totalRows={totalRows}
+              totalCount={data.totalCount}
+              onPreviousPage={handlePreviousPage}
+              onNextPage={handleNextPage}
+              onSetRow={handleSetRow}
+              hasNextPage={data.pageInfo.hasNextPage}
+              hasPreviousPage={data.pageInfo.hasPreviousPage}
+          />
       )}
 
       {/* ACTIONS */}

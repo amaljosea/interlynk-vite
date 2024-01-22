@@ -1,24 +1,14 @@
 // Chakra imports
-import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons'
-import {
-  Flex,
-  Text,
-  Tag,
-  TagLabel,
-  Tooltip,
-  Stack,
-  Button,
-  Box,
-  Select
-} from '@chakra-ui/react'
-import DataTable from 'react-data-table-component'
 import { useEffect, useMemo, useState } from 'react'
+import { Flex,Text,Tag,TagLabel,Tooltip,Stack,Button,Box,Select } from '@chakra-ui/react'
 import { sevColor, timeSince, getFullDateAndTime, customStyles } from 'utils'
-import CustomLoader from 'components/CustomLoader'
+import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons'
 import { Link, useLocation, useParams } from 'react-router-dom'
+import DataTable from 'react-data-table-component'
+import CustomLoader from 'components/CustomLoader'
+import VulnBadge from 'components/Misc/VulnBadge'
 import VulnsFilters from 'views/Dashboard/Vulnerabilities/components/VulnsFilter'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
-import VulnBadge from 'components/Misc/VulnBadge'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 const GlobalVulnTable = ({ data, refetch }) => {
@@ -32,7 +22,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
   const { pageIndex } = globalVulnState
   const { globalVulnDispatch } = dispatch
 
-  const [searchInput, setSearchInput] = useState('')
+  const [filterText, setFilterText] = useState('')
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
 
@@ -261,11 +251,17 @@ const GlobalVulnTable = ({ data, refetch }) => {
   // SEARCH COMPONENT
   const handleSearch = async (event) => {
     const { value } = event.target
+    if (event.key === 'Enter' && filterText !== '') {
+      refetch({ search: value, first: totalRows, last: undefined, after: undefined, before: undefined})
+      .then((res) => res?.data && globalVulnDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value }))
+    }
   }
 
   // CLEAR SERACH
   const handleClear = async () => {
-    setSearchInput('')
+    setFilterText('')
+    await refetch({search: undefined,first: totalRows,last: undefined,after: undefined,before: undefined})
+    .then((res) => res?.data && globalVulnDispatch({type: 'CLEAR_SEARCH_INPUT'}))
   }
 
   // ON SEARCH INPUT CHANGE
@@ -274,7 +270,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
     if (value === '') {
       handleClear()
     } else {
-      setSearchInput(value)
+      setFilterText(value)
     }
   }
 
@@ -284,16 +280,16 @@ const GlobalVulnTable = ({ data, refetch }) => {
       <Flex width={'100%'} alignItems={'center'} gap={3}>
         <SearchFilter
           id='globalVulns'
-          filterText={searchInput}
+          filterText={filterText}
           onFilter={handleSearch}
           onClear={handleClear}
           onChange={onSearchInputChange}
         />
 
-        <VulnsFilters />
+        <VulnsFilters refetch={refetch} />
       </Flex>
     )
-  }, [searchInput, onSearchInputChange, handleClear, handleSearch])
+  }, [filterText, onSearchInputChange, handleClear, handleSearch])
 
   // ON PREV PAGE
   const handlePreviousPage = async () => {
