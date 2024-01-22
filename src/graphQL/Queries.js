@@ -558,13 +558,23 @@ export const GetProjectGroupComponentVulns = gql`
     $last: Int
     $after: String
     $before: String
+    $severity: [String!]
+    $projectGroupIds: [Uuid!]
+    $status: [String!]
+    $kev: Boolean
+    $epss: RangeInput
   ) {
     projectGroup(id: $id) {
       componentVulns(
-        first: $first
-        last: $last
         after: $after
+        first: $first
         before: $before
+        last: $last
+        projectGroupIds: $projectGroupIds
+        status: $status
+        severity: $severity
+        kev: $kev
+        epss: $epss
       ) {
         totalCount
         pageInfo {

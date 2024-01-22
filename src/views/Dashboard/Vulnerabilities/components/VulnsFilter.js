@@ -12,6 +12,7 @@ import {
   Stack,
   useDisclosure,
 } from '@chakra-ui/react'
+import { useLocation, useParams } from 'react-router-dom'
 import CheckMark from 'components/Misc/CheckMark'
 import FilterButton from 'components/Misc/FilterButton'
 import { GetProjectGroups } from 'graphQL/Queries'
@@ -19,6 +20,12 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useRef } from 'react'
 
 const VulnsFilters = ({ refetch }) => {
+  const params = useParams()
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const groupId = queryParams.get('id')
+
+
   const { totalRows, globalVulnState, prodState, dispatch } = useGlobalState()
   const { severities, products, statues, kev, epss, minEpss, maxEpss } =
     globalVulnState
@@ -56,22 +63,26 @@ const VulnsFilters = ({ refetch }) => {
   const vulnData = { first: totalRows, last: undefined, after: undefined, before: undefined }
 
   const onFilterProduct = async (value) => {
-    await refetch({ projectGroupIds: value?.includes('all') ? undefined : value, ...vulnData })
+    await refetch({id: params?.name ? groupId : undefined, 
+    projectGroupIds: value?.includes('all') ? undefined : value, ...vulnData })
     .then((res) => res?.data && globalVulnDispatch({ type: 'FILTER_PRODUCT', payload: value }))
   }
 
   const onFilterSeverity = async (value) => {
-    await refetch({ severity: value?.includes('all') ? undefined: value, ...vulnData })
+    await refetch({id: params?.name ? groupId : undefined, 
+    severity: value?.includes('all') ? undefined: value, ...vulnData })
     .then((res) => res?.data && globalVulnDispatch({ type: 'FILTER_SEVERITY', payload: value }))
   }
 
   const onFilterStatus = async (value) => {
-    await refetch({ status: value.includes('all') ? undefined: value, ...vulnData })
+    await refetch({id: params?.name ? groupId : undefined, 
+    status: value.includes('all') ? undefined: value, ...vulnData })
     .then((res) => res?.data && globalVulnDispatch({ type: 'FILTER_STATUS', payload: value }))
   }
 
   const onFilterKev = async (value) => {
-    await refetch({ kev: value === 'yes' ? true : value === 'false' ? false : undefined, ...vulnData })
+    await refetch({id: params?.name ? groupId : undefined, 
+    kev: value === 'yes' ? true : value === 'false' ? false : undefined, ...vulnData })
     .then((res) => res?.data && globalVulnDispatch({ type: 'FILTER_KEV', payload: value }))
   }
 
@@ -81,7 +92,8 @@ const VulnsFilters = ({ refetch }) => {
       min: parseFloat(epssRange[0]) / 10000,
       max: parseFloat(epssRange[1]) / 10000
     }
-    await refetch({ epss: value === 'all' || value === '' ? undefined : range, ...vulnData })
+    await refetch({id: params?.name ? groupId : undefined, 
+    epss: value === 'all' || value === '' ? undefined : range, ...vulnData })
     .then((res) => res?.data && globalVulnDispatch({ type: 'FILTER_EPSS', payload: value }))
   }
 
@@ -90,7 +102,8 @@ const VulnsFilters = ({ refetch }) => {
       min: parseFloat(minEpss) / 10000,
       max: parseFloat(maxEpss) / 10000
     }
-    await refetch({ epss: range, ...vulnData })
+    await refetch({id: params?.name ? groupId : undefined, 
+    epss: range, ...vulnData })
     .then((res) => res?.data && globalVulnDispatch({ type: 'SET_EPSS', payload: `${minEpss}-${maxEpss}` }))
     .finally(() => onClose())
   }
@@ -99,7 +112,7 @@ const VulnsFilters = ({ refetch }) => {
     <Stack direction={'row'} alignItems={'center'} gap={1}>
       {/* PRODUCTS */}
       {data && (
-      <Box width={'fit-content'} position={'relative'}>
+      <Box width={'fit-content'} position={'relative'} display={params?.name ? 'none' : 'block'}>
         <Menu closeOnSelect={true}>
           {products?.length !== 0 && !products.includes('all') && (
             <CheckMark />
