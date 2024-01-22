@@ -170,3 +170,5 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
 }
 
 export default SBOM
+
+
