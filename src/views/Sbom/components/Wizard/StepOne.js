@@ -13,6 +13,7 @@ import { useLazyQuery, useQuery } from '@apollo/client'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { removeDuplicates } from 'utils'
 import { isDefaultEnv } from 'utils'
+import { getFullDateAndTime } from 'utils'
 
 const StepOne = ({
   setProductId,
@@ -46,7 +47,7 @@ const StepOne = ({
   const activeGroup =
     data &&
     data?.organization?.projectGroups?.nodes.find(
-      (item) => item.id === group.groupId
+      (item) => item.id === selectedGroup
     )
 
   const productList =
@@ -63,9 +64,9 @@ const StepOne = ({
       const currentProd = activeGroup.projects.find(
         (item) => item.id === currentProductId
       )
-      setSelectedProd(currentProd.id)
+      setSelectedProd(currentProd?.id)
       setEnvName(currentProd?.name)
-      setProductId(currentProd.id)
+      setProductId(currentProd?.id)
       // const filterVersion = [...currentProd.sboms].filter(
       //   (item) => item.id !== currentSbomId
       // )
@@ -108,9 +109,7 @@ const StepOne = ({
       }).then((res) => {
         if (res.data) {
           const data = removeDuplicates(res.data.project.sboms)
-          const filtered = [...data].filter(
-            (item) => item.id !== currentSbomId && item.primaryComponent
-          )
+          const filtered = [...data].filter((item) => item.id !== currentSbomId)
           if (filtered.length > 0) {
             setUniqVersions(filtered)
             setSelectedVersion('')
@@ -221,7 +220,9 @@ const StepOne = ({
                 {uniqVersions.length > 0 &&
                   uniqVersions.map((item, index) => (
                     <option key={index} value={item.id}>
-                      {item.primaryComponent?.version}
+                      {item.primaryComponent
+                        ? item.primaryComponent.version
+                        : `Uploaded at ${getFullDateAndTime(item.creationAt)}`}
                     </option>
                   ))}
               </Select>
