@@ -24,7 +24,7 @@ import { updateCompVulnVex } from 'graphQL/Mutation'
 import { useMutation, useQuery } from '@apollo/client'
 import { useLocation } from 'react-router-dom'
 import { GetProject } from 'graphQL/Queries'
-import { removeDuplicates, getFullDateAndTime } from 'utils'
+import { removeDuplicates, getFullDateAndTime, normalizeSBOMVersion } from 'utils'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 const VexModal = ({
@@ -99,11 +99,7 @@ const VexModal = ({
   filteredDuplicated &&
     filteredDuplicated.map((project) => {
       uniqVersions.push({
-        label:
-          project?.primaryComponent?.version ||
-          `Uploaded ${getFullDateAndTime(project.creationAt)}`,
-        value: project.id,
-        creationAt: project.creationAt
+        label: normalizeSBOMVersion(project),
       })
     })
 

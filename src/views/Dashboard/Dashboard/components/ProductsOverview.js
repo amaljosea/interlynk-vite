@@ -21,7 +21,7 @@ import CardBody from 'components/Card/CardBody'
 import VulnBadge from 'components/Misc/VulnBadge'
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { getFullDateAndTime, timeSince } from 'utils'
+import { getFullDateAndTime, timeSince, normalizeSBOMVersion } from 'utils'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useQuery } from '@apollo/client'
 import { GetVulnData } from 'graphQL/Queries'
@@ -44,7 +44,7 @@ const ProductsOverview = ({ title, captions, data }) => {
     const product = {
       id: projectId,
       name: name,
-      version: primaryComponent?.version || '',
+      version: normalizeSBOMVersion(prod),
       sbomId: id
     }
 
@@ -66,7 +66,7 @@ const ProductsOverview = ({ title, captions, data }) => {
     localStorage.setItem(
       'currentSBOM',
       JSON.stringify({
-        version: item?.primaryComponent?.version || '',
+        version: normalizeSBOMVersion(item),
         id: item?.id
       })
     )
@@ -78,17 +78,17 @@ const ProductsOverview = ({ title, captions, data }) => {
     localStorage.setItem(
       'currentSBOM',
       JSON.stringify({
-        version: item?.primaryComponent?.version,
+        version: normalizeSBOMVersion(item),
         id: item.id
       })
     )
     localStorage.setItem('activeSbomTab', 2)
   }
 
-  const onFilterSev = async (id, primaryComponent, value) => {
+  const onFilterSev = async (id, version, value) => {
     localStorage.setItem(
       'currentSBOM',
-      JSON.stringify({ version: primaryComponent?.version, id: id })
+      JSON.stringify({ version: version, id: id })
     )
     localStorage.setItem('activeSbomTab', 3)
     prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
@@ -149,8 +149,7 @@ const ProductsOverview = ({ title, captions, data }) => {
                           to={`/vendor/products/${item?.project?.projectGroup?.name}?id=${item?.projectId}&sbom=${item?.id}`}
                           onClick={() => onVersionClick(item)}
                         >
-                          {item?.primaryComponent?.version ||
-                            `Uploaded ${getFullDateAndTime(item?.createdAt)}`}
+                          {normalizeSBOMVersion(item)}
                         </Link>
                       </Td>
                       {/* COMPONENTS */}
@@ -192,7 +191,7 @@ const ProductsOverview = ({ title, captions, data }) => {
                           <Link
                             to={`/vendor/products/${item?.project?.projectGroup?.name}?id=${item?.projectId}&sbom=${item?.id}`}
                             onClick={() =>
-                              onFilterSev(item?.id, item?.primaryComponent, [
+                              onFilterSev(item?.id, normalizeSBOMVersion(item), [
                                 'critical'
                               ])
                             }
@@ -204,7 +203,7 @@ const ProductsOverview = ({ title, captions, data }) => {
                           <Link
                             to={`/vendor/products/${item?.project?.projectGroup?.name}?id=${item?.projectId}&sbom=${item?.id}`}
                             onClick={() =>
-                              onFilterSev(item?.id, item?.primaryComponent, [
+                              onFilterSev(item?.id, normalizeSBOMVersion(item), [
                                 'high'
                               ])
                             }
@@ -216,7 +215,7 @@ const ProductsOverview = ({ title, captions, data }) => {
                           <Link
                             to={`/vendor/products/${item?.project?.projectGroup?.name}?id=${item?.projectId}&sbom=${item?.id}`}
                             onClick={() =>
-                              onFilterSev(item?.id, item?.primaryComponent, [
+                              onFilterSev(item?.id, normalizeSBOMVersion(item), [
                                 'medium'
                               ])
                             }
@@ -228,7 +227,7 @@ const ProductsOverview = ({ title, captions, data }) => {
                           <Link
                             to={`/vendor/products/${item?.project?.projectGroup?.name}?id=${item?.projectId}&sbom=${item?.id}`}
                             onClick={() =>
-                              onFilterSev(item?.id, item?.primaryComponent, [
+                              onFilterSev(item?.id, normalizeSBOMVersion(item), [
                                 'low'
                               ])
                             }

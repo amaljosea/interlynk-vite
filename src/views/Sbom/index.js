@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import Card from 'components/Card/Card.js'
 import SBOMTable from './components/SBOMTable'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { getFullDateAndTime, removeDuplicates } from 'utils'
+import { removeDuplicates, normalizeSBOMVersion } from 'utils'
 import { useQuery } from '@apollo/client'
 import { GetProductData, GetProject, GetComponentData } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -77,11 +77,7 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
   filteredDuplicated &&
     filteredDuplicated.map((project) => {
       uniqVersions.push({
-        label:
-          project?.primaryComponent?.version ||
-          `Uploaded ${getFullDateAndTime(project.creationAt)}`,
-        value: project.id,
-        creationAt: project.creationAt
+        label: normalizeSBOMVersion(project)
       })
     })
 
