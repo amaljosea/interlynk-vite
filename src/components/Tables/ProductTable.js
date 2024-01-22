@@ -30,7 +30,7 @@ import {useCallback, useEffect, useMemo, useState} from 'react'
 import { Link } from 'react-router-dom'
 
 import { useMutation } from '@apollo/client'
-import { UpdateProjectGroup, DeleteProjectGroup } from 'graphQL/Mutation'
+import { DeleteProjectGroup } from 'graphQL/Mutation'
 
 import {
   getFullDateAndTime,
@@ -40,18 +40,15 @@ import {
 } from 'utils'
 
 import DataTable from 'react-data-table-component'
-
 import CustomLoader from 'components/CustomLoader'
 import ProductModal from 'views/Dashboard/Products/components/ProductModal'
 import UploadModal from 'views/Dashboard/Products/components/UploadModal'
 import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import ProdFilterMenu from 'views/Dashboard/Products/components/ProdFilterMenu'
 import { useGlobalState } from 'hooks/useGlobalState'
-import ProdSearchFilter from 'views/Sbom/components/ProdSearchFilter'
 import Card from 'components/Card/Card'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import StatusModal from 'views/Dashboard/Products/components/StatusModal'
-
 import Pagination from '../Pagination';
 
 
@@ -65,10 +62,13 @@ const ProductTable = ({ data, refetch }) => {
 
   const paginationSizes = [25, 50, 100];
 
-  const [totalRows, setTotalRows] = useState(paginationSizes[0]);
 
   const { field, direction, searchInput, pageIndex } = prodState;
   const { prodDispatch, sbomDispatch } = dispatch;
+
+  
+  const [totalRows, setTotalRows] = useState(paginationSizes[0]);
+  const [filterText, setFilterText] = useState(searchInput)
 
   const productPermissions = useMemo(
       () => userPermissions?.find(item => item.key === 'view_product_group'),
@@ -133,10 +133,6 @@ const ProductTable = ({ data, refetch }) => {
     onCompleted: () => refetch({ first: totalRows, field, direction })
   });
 
-  const [updateProjectGroup] = useMutation(UpdateProjectGroup, {
-    onCompleted: () => refetch({ first: totalRows, field, direction })
-  });
-
   const handleOpenSbom = useCallback((row) => {
     sbomDispatch({ type: 'CLEAR_LICENSES' });
     setActiveRow(row);
@@ -159,24 +155,8 @@ const ProductTable = ({ data, refetch }) => {
     });
   }, [refetch, totalRows, field, direction]);
 
-  const toggleStatus = useCallback(async () => {
-    await updateProjectGroup({
-      variables: {
-        id: activeRow.id,
-        enabled: !activeRow.enabled
-      }
-    }).then(res => {
-      if (res.data) {
-        refetch({
-          first: totalRows,
-          field,
-          direction
-        });
-      }
-    }).finally(onWarningClose);
-  }, [updateProjectGroup, activeRow, refetch, totalRows, field, direction, onWarningClose]);
-
   const handleClear = useCallback(async () => {
+    setFilterText('')
     await refetch({
       search: undefined,
       first: totalRows,
@@ -193,12 +173,13 @@ const ProductTable = ({ data, refetch }) => {
     if (value === '') {
       handleClear();
     } else {
-      prodDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value });
+      setFilterText(value)
     }
   }, [handleClear, prodDispatch]);
 
   const handleSearch = useCallback((event) => {
-    if (event.key === 'Enter' && searchInput !== '') {
+    const { value } = event.target
+    if (event.key === 'Enter' && filterText !== '') {
       refetch({
         search: value,
         first: totalRows,
@@ -207,9 +188,9 @@ const ProductTable = ({ data, refetch }) => {
         before: undefined,
         field: field,
         direction: direction
-      }).then(res => res.data && prodDispatch({ type: 'FETCH_DATA_SUCCESS' }));
+      }).then(res => res.data && prodDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value }));
     }
-  }, [refetch, searchInput, totalRows, prodDispatch]);
+  }, [refetch, filterText, totalRows, prodDispatch]);
 
   const onFilterActive = useCallback(async (value) => {
     await refetch({
@@ -237,9 +218,9 @@ const ProductTable = ({ data, refetch }) => {
         >
           <Stack direction={'row'} spacing={2} alignItems={'center'}>
             {/* SEARCH PRODUCTS */}
-            <ProdSearchFilter
+            <SearchFilter
                 id='product'
-                filterText={searchInput}
+                filterText={filterText}
                 onChange={onSearchInputChange}
                 onClear={handleClear}
                 onFilter={handleSearch}
