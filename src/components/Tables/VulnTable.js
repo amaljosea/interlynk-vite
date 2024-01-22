@@ -45,6 +45,7 @@ import ImportWizard from 'views/Sbom/components/ImportWizard'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useLazyQuery } from '@apollo/client'
 import { GetVulnFilterData } from 'graphQL/Queries'
+import Pagination from "../Pagination";
 
 const statusColor = (status) => {
   if (status && status === 'Fixed') {
@@ -97,6 +98,8 @@ const VulnTable = ({
     (permission) =>
       permission.key === 'edit_vulnerabilities' && permission.value === true
   )
+
+  const paginationSizes = [25, 50, 100]
 
   const textColor = useColorModeValue('gray.700', 'white')
   const [vulnSearch, setVulnSearch] = useState('')
@@ -636,7 +639,7 @@ const VulnTable = ({
     )
   }
 
-  const onPreviousPage = async () => {
+  const handlePreviousPage = async () => {
     setIsPrevActive(false)
     await refetch({
       ...vulnData,
@@ -655,7 +658,7 @@ const VulnTable = ({
     })
   }
 
-  const onNextPage = async () => {
+  const handleNextPage = async () => {
     setIsNextActive(false)
     await refetch({
       ...vulnData,
@@ -778,38 +781,17 @@ const VulnTable = ({
 
       {/* PAGINATION */}
       {data && (
-        <Flex
-          flexDir={'row'}
-          gap={4}
-          alignItems={'center'}
-          mt={6}
-          justifyContent={'space-between'}
-        >
-          <Stack alignItems={'center'} direction={'row'} spacing={4}>
-            <Button
-              colorScheme='blue'
-              onClick={onPreviousPage}
-              isDisabled={!isPrevActive}
-            >
-              Previous
-            </Button>
-            <Button
-              colorScheme='blue'
-              onClick={onNextPage}
-              isDisabled={!isNextActive}
-            >
-              Next
-            </Button>
-            <Box>
-              Page {pageIndex} of{' '}
-              {data.totalCount === 0
-                ? 1
-                : Math.ceil(data.totalCount / totalRows)}
-            </Box>
-          </Stack>
-
-          <RowLimit onChange={handleSetRow} name='vulnerabilities' />
-        </Flex>
+          <Pagination
+              paginationSizes={paginationSizes}
+              pageIndex={pageIndex}
+              totalRows={totalRows}
+              totalCount={data.totalCount}
+              onPreviousPage={handlePreviousPage}
+              onNextPage={handleNextPage}
+              onSetRow={handleSetRow}
+              hasNextPage={data.pageInfo.hasNextPage}
+              hasPreviousPage={data.pageInfo.hasPreviousPage}
+          />
       )}
 
       {/* EPSS INFO */}
