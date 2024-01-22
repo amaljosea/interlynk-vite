@@ -86,4 +86,21 @@ describe('validateCpe', () => {
     expect(validateCpe(partialCpe)).toBe(false);
   });
 
+  test('ISSUE-1533 CPE should not have more than 12 parts', () => {
+    const invalidCPE = 'cpe:2.3:a:advanced_ajax_page_loader_project:advanced_ajax_page_loader:1.0.0:*:*:*:*:wordpress:*:*:*:*:*:*:*:*';
+    expect(validateCpe(invalidCPE)).toBe(false);
+  })
+
+  test('ISSUE-1538 CPE should not have invalid unquoted character', () => {
+    const invalidCPE = 'cpe:2.3:a:c:::::::::**********';
+    expect(validateCpe(invalidCPE)).toBe(false);
+  })
+
+  test('ISSUE-1539 Valid CPE showing invalid', () => {
+    const invalidCPE = 'cpe:2.3:h:c?:test:---------:sd:sxs:000::::'; // Invalid lang code
+    expect(validateCpe(invalidCPE)).toBe(false);
+    const validCPE = 'cpe:2.3:h:c?:test:---------:sd:sxs:en-gb::::'; // Fixed language code
+    expect(validateCpe(validCPE)).toBe(true);
+  })
+
 });

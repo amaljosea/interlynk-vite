@@ -156,7 +156,9 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
       .then((res) => {
         if (res.data) {
           prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
-          setIsActive(true)
+          setTimeout(() => {
+            setIsActive(true)
+          }, 2000)
         }
       })
       .finally(() => handleRefetch())
