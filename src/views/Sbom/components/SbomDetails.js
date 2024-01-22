@@ -118,14 +118,14 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
                   color={'blue.500'}
                   textDecor={'underline'}
                 >
-                  {name} : {currentSBOM.version}
+                  {name} : {currentSBOM?.version}
                 </Text>
               </HStack>
             </Link>
           )}
           <Stack direction={'row'} alignItems={'center'} wrap={'wrap'}>
             <Text fontWeight={'semibold'} fontSize={25}>
-              {project?.projectGroup?.name} : {primaryComponent?.version}
+              {project?.projectGroup?.name} : {currentSBOM?.version}
             </Text>
             <Tooltip label='Lifecycle stage' fontSize='md'>
               <Tag
