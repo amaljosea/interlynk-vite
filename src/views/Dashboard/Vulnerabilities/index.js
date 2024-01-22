@@ -8,11 +8,13 @@ import { GetGlobalVulns } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { GetGlobalVulnData } from 'graphQL/Queries'
 import { useEffect } from 'react'
+import OrgRegister from '../Profile/components/OrgRegister'
 
 const Vulnerabilities = () => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const vulnId = queryParams.get('id')
+  const org = localStorage.getItem('organization')
 
   const { totalRows, dispatch } = useGlobalState()
   const { globalVulnDispatch } = dispatch
@@ -31,6 +33,19 @@ const Vulnerabilities = () => {
       })
     }
   }, [vulnId])
+
+  if (!org || org === 'undefined') {
+    return (
+      <Flex
+        flexDirection='column'
+        pt={{ base: '120px', md: '74px' }}
+        pr={2}
+        pl={5}
+      >
+        <OrgRegister />
+      </Flex>
+    )
+  }
 
   if (vulnId && location.pathname === '/vendor/vulnerabilities') {
     return <VulnInfo data={vulnData?.vuln} refetch={getVulnData} />
