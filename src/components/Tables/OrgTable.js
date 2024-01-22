@@ -211,7 +211,7 @@ const OrgTable = ({ data, refetch, activeOrg, isAdmin }) => {
     },
     {
       id: 'CONTACT_EMAIL',
-      name: 'CONTACT EMAIL',
+      name: 'CONTACT',
       selector: (row) => {
         const { email } = row
         return <Text fontSize={14}>{email}</Text>
