@@ -21,7 +21,7 @@ import {
 } from '@chakra-ui/react'
 import VulnBadge from 'components/Misc/VulnBadge'
 import { timeSince } from 'utils'
-import { getFullDateAndTime } from 'utils'
+import { getFullDateAndTime, normalizeSBOMVersion } from 'utils'
 
 const SbomList = ({ isOpen, onClose, data, sboms }) => {
   console.log('data', data)
@@ -31,7 +31,7 @@ const SbomList = ({ isOpen, onClose, data, sboms }) => {
     sboms?.length > 0 &&
     sboms?.filter(
       (item) =>
-        item?.primaryComponent?.version === data?.primaryComponent?.version
+        normalizeSBOMVersion(item) === normalizeSBOMVersion(data)
     )
 
   console.log('duplicates', duplicateSboms)
@@ -42,7 +42,7 @@ const SbomList = ({ isOpen, onClose, data, sboms }) => {
       <DrawerContent>
         <DrawerCloseButton />
         <DrawerHeader>
-          { data?.primaryComponent?.version ? data?.primaryComponent?.version + ' SBOM List' : 'SBOM List' }
+          { normalizeSBOMVersion(data) + ' SBOM List' }
         </DrawerHeader>
         <DrawerBody>
           <Table variant='simple' m={0} p={0}>

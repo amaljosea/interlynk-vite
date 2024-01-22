@@ -28,12 +28,11 @@ import {
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useLazyQuery, useQuery } from '@apollo/client'
 import { GetSignedSBOM, GetProjectInfo } from 'graphQL/Queries'
-import { timeSince } from 'utils'
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import DownloadModal from 'views/Sbom/components/DownloadModal'
 import Cookies from 'js-cookie'
-import { getFullDateAndTime } from 'utils'
+import { getFullDateAndTime, normalizeSBOMVersion, timeSince } from 'utils'
 import { GetSignedProductData } from 'graphQL/Queries'
 import { GetSignedProjects } from 'graphQL/Queries'
 import SignedSbomTable from './SBOMTable'
@@ -192,7 +191,7 @@ function ProductInfo() {
                       {/* -------------- PRODUCT TITLE ------------------- */}
                       <Text fontWeight={'semibold'} fontSize={20}>
                         {sbomData.sbom.project.name} :{' '}
-                        {sbomData.sbom.primaryComponent?.version}
+                        {normalizeSBOMVersion(sbomData.sbom)}
                       </Text>
                       <Text fontSize={'sm'}>
                         A common specification for continous delivery events
