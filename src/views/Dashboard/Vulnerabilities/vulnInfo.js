@@ -20,6 +20,7 @@ import CardBody from 'components/Card/CardBody.js'
 import { FaCube, FaCubes, FaBug } from 'react-icons/fa'
 import { timeSince, getFullDateAndTime } from 'utils'
 import VulnProdTable from './components/ProdTable'
+import { FaCodeMerge } from 'react-icons/fa6'
 
 const VulnInfo = ({ data, refetch }) => {
   return (
@@ -81,6 +82,26 @@ const VulnInfo = ({ data, refetch }) => {
                           <Text fontSize={'xs'}>Products</Text>
                         </Box>
                       </Stack>
+                      {/* VERSIONS */}
+                      <Stack
+                        direction={'row'}
+                        alignItems={'flex-start'}
+                        spacing={2}
+                      >
+                        <Icon h={4} w={4} color='#777' as={FaCodeMerge} />
+                        <Box>
+                          <Badge
+                            mr={1}
+                            fontSize={'xl'}
+                            fontWeight={'medium'}
+                            bg={'none'}
+                          >
+                            {data?.organization?.projectGroups?.nodes?.length ||
+                              0}
+                          </Badge>
+                          <Text fontSize={'xs'}>Versions</Text>
+                        </Box>
+                      </Stack>
                       {/* COMPONENTS */}
                       <Stack
                         direction={'row'}
@@ -118,7 +139,7 @@ const VulnInfo = ({ data, refetch }) => {
                                 borderRadius='md'
                                 cursor={'pointer'}
                               >
-                                {data?.cvssScore}
+                                {data?.cvssScore || 0}
                               </Badge>
                             </Tooltip>
                             <Tooltip label='EPSS' placement='top'>
@@ -175,7 +196,7 @@ const VulnInfo = ({ data, refetch }) => {
           <TabPanels>
             {/* PRODUCTS TABLE */}
             <TabPanel px={1}>
-              <VulnProdTable data={data?.componentVulns} />
+              <VulnProdTable data={data?.componentVulns} refetch={refetch} />
             </TabPanel>
           </TabPanels>
         </Tabs>

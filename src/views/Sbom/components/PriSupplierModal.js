@@ -73,8 +73,8 @@ const PriSupplierModal = ({ isOpen, onClose, refetch, suppliers, checkId }) => {
 
   const isInvalid =
     !supName ||
-    (supEmail != '' && !validateEmail(supEmail)) ||
-    isValidUrl !== ''
+    (supEmail !== '' && !validateEmail(supEmail)) ||
+    (orgUrl !== '' && !validateUrl(orgUrl))
 
   const handleRefetch = () => {
     refetch({

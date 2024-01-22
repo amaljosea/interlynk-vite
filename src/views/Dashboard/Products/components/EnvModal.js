@@ -13,19 +13,16 @@ import {
   FormLabel,
   Input,
   Alert,
-  AlertIcon,
   Text,
-  Textarea
+  useToast
 } from '@chakra-ui/react'
 import { EnvCreate } from 'graphQL/Mutation'
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 
-const EnvModal = ({ groupId, isOpen, onClose, refetch }) => {
+const EnvModal = ({ groupId, isOpen, onClose, onEnvClose, refetch }) => {
+  const toast = useToast()
   const [projectCreate] = useMutation(EnvCreate)
-
   const [productName, setProductName] = useState('')
-
   const [error, setError] = useState('')
 
   const handleSave = async (e) => {
@@ -37,8 +34,23 @@ const EnvModal = ({ groupId, isOpen, onClose, refetch }) => {
         enabled: true
       }
     })
-      .then((res) => res.data && refetch({ id: groupId }))
-      .finally(() => onClose())
+      .then((res) => {
+        if (res?.data?.projectCreate?.errors?.length > 0) {
+          setError(res?.data?.projectCreate?.errors[0])
+        } else {
+          refetch({ id: groupId })
+          onClose()
+          onEnvClose()
+        }
+      })
+      .finally(() => {
+        toast({
+          description: 'Environment added successfully',
+          status: 'success',
+          position: 'top',
+          duration: 3000
+        })
+      })
   }
 
   const isInvalid = productName === '' || error !== ''
@@ -55,8 +67,9 @@ const EnvModal = ({ groupId, isOpen, onClose, refetch }) => {
               <Flex width={'100%'} direction={'column'} gap={4}>
                 {error !== '' && (
                   <Alert status='error'>
-                    <AlertIcon />
-                    <Text fontSize={'sm'}>{error}</Text>
+                    <Text fontSize={'sm'} pr={2}>
+                      {error}
+                    </Text>
                   </Alert>
                 )}
                 <FormControl isRequired>

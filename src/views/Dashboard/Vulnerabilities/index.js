@@ -1,17 +1,19 @@
+import { useEffect } from 'react'
 import { Flex } from '@chakra-ui/react'
-import Card from 'components/Card/Card'
-import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
-import VulnInfo from './vulnInfo'
 import { useLocation } from 'react-router-dom'
-import { useQuery } from '@apollo/client'
-import { GetGlobalVulns } from 'graphQL/Queries'
+import { useLazyQuery, useQuery } from '@apollo/client'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { GetGlobalVulnData } from 'graphQL/Queries'
+import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
+import { GetGlobalVulns, GetGlobalVulnData } from 'graphQL/Queries'
+import OrgRegister from '../Profile/components/OrgRegister'
+import Card from 'components/Card/Card'
+import VulnInfo from './vulnInfo'
 
 const Vulnerabilities = () => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const vulnId = queryParams.get('id')
+  const org = localStorage.getItem('organization')
 
   const { totalRows, dispatch } = useGlobalState()
   const { globalVulnDispatch } = dispatch
@@ -21,12 +23,33 @@ const Vulnerabilities = () => {
     onCompleted: () => globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
   })
 
-  const { data: vulnData, refetch: vulnRefetch } = useQuery(GetGlobalVulnData, {
-    variables: { vulnId: vulnId }
-  })
+  const [getVulnData, { data: vulnData }] = useLazyQuery(GetGlobalVulnData)
+
+  useEffect(() => {
+    if (vulnId) {
+      getVulnData({
+        variables: { id: vulnId, first: totalRows }
+      })
+    } else {
+      globalVulnDispatch({ type: 'CLEAR_GLOBAL_VULN' })
+    }
+  }, [vulnId])
+
+  if (!org || org === 'undefined') {
+    return (
+      <Flex
+        flexDirection='column'
+        pt={{ base: '120px', md: '74px' }}
+        pr={2}
+        pl={5}
+      >
+        <OrgRegister />
+      </Flex>
+    )
+  }
 
   if (vulnId && location.pathname === '/vendor/vulnerabilities') {
-    return <VulnInfo data={vulnData?.vuln} refetch={vulnRefetch} />
+    return <VulnInfo data={vulnData?.vuln} refetch={getVulnData} />
   } else {
     return (
       <Flex

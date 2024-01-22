@@ -1,6 +1,7 @@
-name: Build and Push SBOM from Dev to Interlynk
+name: SBOM from Dev Branches
 
 on:
+  create:
   push:
     branches:
       - '*'

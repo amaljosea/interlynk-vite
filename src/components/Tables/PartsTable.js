@@ -45,8 +45,8 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV, FaFilter } from 'react-icons/fa'
 import { useLocation, Link, useParams } from 'react-router-dom'
-import { getFullDateAndTime, removeDuplicates } from 'utils'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
+import { isDefaultEnv, normalizeSBOMVersion, removeDuplicates } from 'utils'
 
 const customStyles = {
   headCells: {
@@ -92,13 +92,13 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   } = useDisclosure()
 
   const addBtn = useRef()
-
   const [selectedProd, setSelectedProd] = useState('')
   const [selectedVersion, setSelectedVersion] = useState('')
   const [searchInput, setSearchInput] = useState('')
   const [activeRow, setActiveRow] = useState(null)
   const [selectedGroup, setSelectedGroup] = useState('')
   const [envList, setEnvList] = useState([])
+  const [envName, setEnvName] = useState('')
 
   const { data: allProjects } = useQuery(GetProjectGroups, {
     variables: {
@@ -188,7 +188,10 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const handleSelectProduct = (e) => {
     const { value } = e.target
     setSelectedProd(value)
+    const env = e.target.options[e.target.selectedIndex].text
+    setEnvName(env)
     if (value === '') {
+      1
       setSelectedVersion('')
     } else {
       getProduct({
@@ -212,13 +215,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const existingVersions = []
 
   data?.map((item) =>
-    existingVersions.push(
-      item?.part?.primaryComponent
-        ? item?.part?.primaryComponent.id
-        : `Uploaded ${getFullDateAndTime(
-            item?.part?.primaryComponent?.creationAt
-          )}`
-    )
+    existingVersions.push(normalizeSBOMVersion(item.part))
   )
 
   const sbomVersions = []
@@ -227,19 +224,12 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
 
   filteredDuplicated &&
     filteredDuplicated.map((project) => {
+      const normalizedVersion = normalizeSBOMVersion(project)
       if (
-        !existingVersions?.includes(
-          project.primaryComponent
-            ? project.primaryComponent.id
-            : `Uploaded ${getFullDateAndTime(
-                project?.primaryComponent?.creationAt
-              )}`
-        )
+        !existingVersions?.includes(normalizedVersion)
       ) {
         sbomVersions.push({
-          label: project.primaryComponent?.version.length > 0
-            ? project.primaryComponent.version
-            : `Uploaded ${getFullDateAndTime(project.creationAt)}`,
+          label: normalizedVersion,
           value: project.id,
           creationAt: project.creationAt
         })
@@ -311,9 +301,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
         const { part } = row
         return (
           <Text fontSize={14}>
-            {part.primaryComponent
-              ? part.primaryComponent.version
-              : `Uploaded at ${getFullDateAndTime(part.creationAt)}`}
+            {normalizeSBOMVersion(part)}
           </Text>
         )
       },
@@ -609,12 +597,22 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
                     id='product'
                     value={selectedProd}
                     onChange={handleSelectProduct}
+                    textTransform={
+                      isDefaultEnv(envName) ? 'capitalize' : 'none'
+                    }
                   >
                     <option value={''}>-- Select --</option>
                     {envList?.length > 0 &&
-                      // .filter((item) => item.value !== prodId)
                       envList.map((item, index) => (
-                        <option key={index} value={item.value}>
+                        <option
+                          key={index}
+                          value={item.value}
+                          style={{
+                            textTransform: isDefaultEnv(item.label)
+                              ? 'capitalize'
+                              : 'none'
+                          }}
+                        >
                           {item.label}
                         </option>
                       ))}

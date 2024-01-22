@@ -47,11 +47,11 @@ const GeneralDataRow = ({ status, data, refetch }) => {
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
 
-  const { userPermissons, sbomState, dispatch } = useGlobalState()
+  const { userPermissions, sbomState, dispatch } = useGlobalState()
   const { licenseType, spdxLicenses, expLicense, customLicenses } = sbomState
   const { sbomDispatch } = dispatch
 
-  const sboms = userPermissons?.find((item) => item.key === 'view_sbom')
+  const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
   const updateSboms = sboms?.supersededBy?.some(
     (permission) =>
       permission.key === 'update_sbom' && permission.value === true
@@ -373,7 +373,14 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                           {item.contactName}
                           {item.contactEmail && ` (${item.contactEmail})`}
                           {item.url ? (
-                            <Link href={item.url} isExternal>
+                            <Link
+                              href={
+                                item?.url?.startsWith('http')
+                                  ? item.url
+                                  : `http://${item.url}`
+                              }
+                              isExternal
+                            >
                               {' '}
                               {item.name}
                             </Link>

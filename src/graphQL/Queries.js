@@ -412,10 +412,38 @@ export const GetProjectGroup = gql`
 
 // GET GLOBAL VULNERABILITIES
 export const GetGlobalVulns = gql`
-  query Organization($first: Int, $last: Int, $after: String, $before: String) {
+  query Organization(
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+    $search: String
+    $severity: [String!]
+    $projectGroupIds: [Uuid!]
+    $status: [String!]
+    $kev: Boolean
+    $epss: RangeInput
+  ) {
     organization {
-      vulns(after: $after, first: $first, before: $before, last: $last) {
+      vulns(
+        after: $after
+        first: $first
+        before: $before
+        last: $last
+        search: $search
+        projectGroupIds: $projectGroupIds
+        status: $status
+        severity: $severity
+        kev: $kev
+        epss: $epss
+      ) {
         totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          hasPreviousPage
+          startCursor
+        }
         nodes {
           cvssScore
           cvssVector
@@ -447,12 +475,6 @@ export const GetGlobalVulns = gql`
             updatedAt
           }
         }
-        pageInfo {
-          endCursor
-          hasNextPage
-          hasPreviousPage
-          startCursor
-        }
       }
     }
   }
@@ -460,8 +482,14 @@ export const GetGlobalVulns = gql`
 
 // GET SINGLE GLOBAL VULNERABILITIES
 export const GetGlobalVulnData = gql`
-  query GetVulnData($vulnId: Uuid!) {
-    vuln(id: $vulnId) {
+  query GetVulnData(
+    $id: Uuid!
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+  ) {
+    vuln(id: $id) {
       id
       desc
       vulnId
@@ -478,7 +506,12 @@ export const GetGlobalVulnData = gql`
           }
         }
       }
-      componentVulns {
+      componentVulns(
+        first: $first
+        last: $last
+        after: $after
+        before: $before
+      ) {
         totalCount
         pageInfo {
           endCursor
@@ -487,6 +520,8 @@ export const GetGlobalVulnData = gql`
           startCursor
         }
         nodes {
+          id
+          vulnId
           vexStatus {
             id
             name
@@ -516,22 +551,94 @@ export const GetGlobalVulnData = gql`
 `
 
 // GET PROJECT GROUP VULN DATA
-export const GetProjectGrpupComponentVulns = gql`
-  query GetProjectGrpupComponentVulns($projectGroupId: Uuid!) {
-    projectGroup(id: $projectGroupId) {
-      componentVulns {
+export const GetProjectGroupComponentVulns = gql`
+  query GetProjectGroupComponentVulns(
+    $id: Uuid!
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+    $severity: [String!]
+    $projectGroupIds: [Uuid!]
+    $status: [String!]
+    $kev: Boolean
+    $epss: RangeInput
+  ) {
+    projectGroup(id: $id) {
+      componentVulns(
+        after: $after
+        first: $first
+        before: $before
+        last: $last
+        projectGroupIds: $projectGroupIds
+        status: $status
+        severity: $severity
+        kev: $kev
+        epss: $epss
+      ) {
+        totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          hasPreviousPage
+          startCursor
+        }
         nodes {
+          id
+          vulnId
+          updatedAt
           vexStatus {
+            id
             name
           }
-          vuln {
-            vulnId
-            cvssScore
-            vulnInfo {
-              epssScore
+          component {
+            id
+            name
+            version
+            sbom {
+              project {
+                name
+                projectGroup {
+                  name
+                }
+              }
+              primaryComponent {
+                id
+                name
+                version
+              }
             }
-            source
+          }
+          vuln {
+            cvssScore
+            cvssVector
+            desc
+            id
+            lastModifiedAt
+            nvdAliasId
+            organizationId
+            publishedAt
             sev
+            source
+            updatedAt
+            vulnId
+            metrics {
+              affectedCount
+              falsePositiveCount
+              fixedCount
+              inTriageCount
+              notAffectedCount
+              unspecifiedCount
+            }
+            vulnInfo {
+              cveId
+              epssPercentile
+              epssScore
+              epssScores
+              id
+              kev
+              updatedAt
+            }
           }
         }
       }
@@ -1557,6 +1664,19 @@ export const GetProjectLogs = gql`
           updatedAt
           changedBy
         }
+      }
+    }
+  }
+`
+
+// GET ACTIVITY LOG FILTERS
+export const GetLogFilters = gql`
+  query Project($id: Uuid!) {
+    project(id: $id) {
+      activityLogFilters {
+        logChangeBys
+        logChangeObjects
+        logChangeTypes
       }
     }
   }

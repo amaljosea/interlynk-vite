@@ -47,9 +47,9 @@ function userTimeStart(row) {
 }
 
 const TeamTable = ({ data, refetch }) => {
-  const { userPermissons } = useGlobalState()
+  const { userPermissions } = useGlobalState()
 
-  const viewUsers = userPermissons?.find((item) => item.key === 'view_users')
+  const viewUsers = userPermissions?.find((item) => item.key === 'view_users')
   const inviteUser = viewUsers?.supersededBy?.some(
     (permission) =>
       permission.key === 'invite_users' && permission.value === true
@@ -156,7 +156,7 @@ const TeamTable = ({ data, refetch }) => {
         const { invitationStatus } = row
         return (
           <Tag
-            width='100px'
+            width='fit-content'
             variant='subtle'
             colorScheme={
               invitationStatus === 'invited'
@@ -169,7 +169,9 @@ const TeamTable = ({ data, refetch }) => {
             }
             textTransform={'capitalize'}
           >
-            <TagLabel mx='auto'>{invitationStatus}</TagLabel>
+            <TagLabel mx='auto'>
+              {invitationStatus?.replace(/_/g, ' ')}
+            </TagLabel>
           </Tag>
         )
       }

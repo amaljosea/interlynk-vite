@@ -180,7 +180,10 @@ const SupplierModal = ({
     setIsValidUrl('')
   }
 
-  const isInvalid = supName === '' || (supEmail !== '' && emailError != '')
+  const isInvalid =
+    supName === '' ||
+    (supEmail !== '' && !validateEmail(supEmail)) ||
+    (orgUrl !== '' && !validateUrl(orgUrl))
 
   return (
     <>

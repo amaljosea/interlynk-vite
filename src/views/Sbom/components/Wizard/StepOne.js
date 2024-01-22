@@ -7,11 +7,11 @@ import {
   Select,
   Text
 } from '@chakra-ui/react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { GetProject, GetProjectGroups } from 'graphQL/Queries'
 import { useLazyQuery, useQuery } from '@apollo/client'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { removeDuplicates, getFullDateAndTime } from 'utils'
+import { isDefaultEnv, normalizeSBOMVersion, removeDuplicates } from 'utils'
 
 const StepOne = ({
   setProductId,
@@ -31,6 +31,8 @@ const StepOne = ({
   const { enabled, field, direction } = prodState
   const group = JSON.parse(localStorage.getItem('product'))
 
+  const [envName, setEnvName] = useState('')
+
   const { data } = useQuery(GetProjectGroups, {
     variables: {
       first: totalRows,
@@ -43,7 +45,7 @@ const StepOne = ({
   const activeGroup =
     data &&
     data?.organization?.projectGroups?.nodes.find(
-      (item) => item.id === group.groupId
+      (item) => item.id === selectedGroup
     )
 
   const productList =
@@ -60,8 +62,9 @@ const StepOne = ({
       const currentProd = activeGroup.projects.find(
         (item) => item.id === currentProductId
       )
-      setSelectedProd(currentProd.id)
-      setProductId(currentProd.id)
+      setSelectedProd(currentProd?.id)
+      setEnvName(currentProd?.name)
+      setProductId(currentProd?.id)
       // const filterVersion = [...currentProd.sboms].filter(
       //   (item) => item.id !== currentSbomId
       // )
@@ -87,9 +90,12 @@ const StepOne = ({
   }
 
   const handleSelectProduct = (e) => {
+    const { value } = e.target
+    const env = e.target.options[e.target.selectedIndex].text
+    setEnvName(env)
     setSelectedVersion('')
-    setSelectedProd(e.target.value)
-    setProductId(e.target.value)
+    setSelectedProd(value)
+    setProductId(value)
   }
 
   useEffect(() => {
@@ -101,9 +107,7 @@ const StepOne = ({
       }).then((res) => {
         if (res.data) {
           const data = removeDuplicates(res.data.project.sboms)
-          const filtered = [...data].filter(
-            (item) => item.id !== currentSbomId && item.primaryComponent
-          )
+          const filtered = [...data].filter((item) => item.id !== currentSbomId)
           if (filtered.length > 0) {
             setUniqVersions(filtered)
             setSelectedVersion('')
@@ -178,10 +182,19 @@ const StepOne = ({
                 id='product'
                 value={selectedProd}
                 onChange={handleSelectProduct}
+                textTransform={isDefaultEnv(envName) ? 'capitalize' : 'none'}
               >
                 <option value={''}>-- Select --</option>
                 {productList.map((item, index) => (
-                  <option key={index} value={item.value}>
+                  <option
+                    key={index}
+                    value={item.value}
+                    style={{
+                      textTransform: isDefaultEnv(item.label)
+                        ? 'capitalize'
+                        : 'none'
+                    }}
+                  >
                     {item.label}
                   </option>
                 ))}
@@ -205,7 +218,7 @@ const StepOne = ({
                 {uniqVersions.length > 0 &&
                   uniqVersions.map((item, index) => (
                     <option key={index} value={item.id}>
-                      {item.primaryComponent?.version}
+                      {normalizeSBOMVersion(item)}
                     </option>
                   ))}
               </Select>

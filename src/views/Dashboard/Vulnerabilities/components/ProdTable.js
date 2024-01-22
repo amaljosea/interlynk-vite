@@ -7,18 +7,7 @@ import {
   Tooltip,
   Button,
   useDisclosure,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-  SimpleGrid,
-  FormControl,
-  FormLabel,
   Select,
-  Textarea,
   Stack,
   Box
 } from '@chakra-ui/react'
@@ -26,9 +15,11 @@ import DataTable from 'react-data-table-component'
 import { useEffect, useMemo, useState } from 'react'
 import CustomLoader from 'components/CustomLoader'
 import Filters from './Filters'
-import { getVexStatuses, getVexJustifications } from 'graphQL/Queries'
-import { useLazyQuery } from '@apollo/client'
 import { useGlobalState } from 'hooks/useGlobalState'
+import VexModal from './VexModal'
+import { useLocation, useParams } from 'react-router-dom'
+import SearchFilter from 'views/Sbom/components/SearchFilter'
+import { normalizeSBOMVersion } from 'utils'
 
 const customStyles = {
   headCells: {
@@ -63,48 +54,52 @@ const statusColor = (status) => {
   }
 }
 
-const VulnProdTable = ({ data }) => {
-  const { totalRows } = useGlobalState()
+const VulnProdTable = ({ data, refetch }) => {
+  const params = useParams()
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const id = queryParams.get('id')
+  const { totalRows, setTotalRows } = useGlobalState()
 
-  const [getStatus, { data: allVexStatus }] = useLazyQuery(getVexStatuses)
-
+  const { isOpen, onOpen, onClose } = useDisclosure()
   const [selectedVulns, setSelectedVulns] = useState([])
   const [pageIndex, setPageIndex] = useState(1)
+  const [searchInput, setSearchInput] = useState('')
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
-  const { isOpen, onOpen, onClose } = useDisclosure()
-
-  const [statusTitle, setStatusTitle] = useState('')
-  const [details, setDetails] = useState('')
-  const [notes, setNotes] = useState('')
-
-  const handleStatusChange = (e) => {
-    const { value } = e.target
-    const status = e.target.options[e.target.selectedIndex].text
-    setStatusTitle(value)
-  }
+  const [toggleClear, setToggleClear] = useState(false)
 
   // COLUMNS
   const columns = [
     // PRODUCTS
     {
-      id: 'PRODUCT_NAME',
+      id: 'PRODUCT_GROUP',
       name: 'PRODUCT',
       selector: (row) => {
         const { component } = row
         return (
-          <Tooltip
-            label={component?.sbom?.project?.projectGroup?.name || ''}
-            placement='top'
-          >
-            <Text textTransform={'capitalize'}>
-              {component?.sbom?.project?.projectGroup?.name || ''}
-            </Text>
-          </Tooltip>
+          <Text textTransform={'capitalize'}>
+            {component?.sbom?.project?.projectGroup?.name || ''}
+          </Text>
         )
       },
       wrap: true,
       width: '15%'
+    },
+    // ENV
+    {
+      id: 'ENVIRONMENT',
+      name: 'ENVIRONMENT',
+      selector: (row) => {
+        const { component } = row
+        return (
+          <Text textTransform={'capitalize'}>
+            {component?.sbom?.project?.name || ''}
+          </Text>
+        )
+      },
+      wrap: true,
+      width: '12%'
     },
     // VERSION
     {
@@ -112,14 +107,14 @@ const VulnProdTable = ({ data }) => {
       name: 'VERSION',
       selector: (row) => (
         <Tooltip
-          label={row?.component?.sbom?.primaryComponent?.version || ''}
+          label={normalizeSBOMVersion(row?.component?.sbom)}
           placement='top'
         >
-          {row?.component?.sbom?.primaryComponent?.version || ''}
+          {normalizeSBOMVersion(row?.component?.sbom)}
         </Tooltip>
       ),
       wrap: true,
-      width: '12%'
+      width: '10%'
     },
     // VULN COMPONENT
     {
@@ -134,7 +129,7 @@ const VulnProdTable = ({ data }) => {
         )
       },
       wrap: true,
-      width: '15%'
+      width: '25%'
     },
     // VULN VERSION
     {
@@ -167,10 +162,30 @@ const VulnProdTable = ({ data }) => {
           </Tag>
         )
       },
-      sortable: true,
-      width: '150px'
+      wrap: true,
+      right: 'true'
     }
   ]
+
+  // SEARCH COMPONENT
+  const handleSearch = async (event) => {
+    const { value } = event.target
+  }
+
+  // CLEAR SERACH
+  const handleClear = async () => {
+    setSearchInput('')
+  }
+
+  // ON SEARCH INPUT CHANGE
+  const onSearchInputChange = (e) => {
+    const { value } = e.target
+    if (value === '') {
+      handleClear()
+    } else {
+      setSearchInput(value)
+    }
+  }
 
   const subHeaderComponent = useMemo(() => {
     return (
@@ -180,7 +195,17 @@ const VulnProdTable = ({ data }) => {
         justifyContent={'space-between'}
       >
         {/* FILTER */}
-        <Filters />
+        <Stack spacing={4} alignItems={'center'} direction={'row'}>
+          <SearchFilter
+            id='globalVulns'
+            filterText={searchInput}
+            onFilter={handleSearch}
+            onClear={handleClear}
+            onChange={onSearchInputChange}
+          />
+
+          <Filters />
+        </Stack>
 
         {/* UPDATE STATUES */}
         {selectedVulns.length > 0 && (
@@ -189,29 +214,89 @@ const VulnProdTable = ({ data }) => {
             colorScheme='blue'
             fontWeight='normal'
             fontSize={'sm'}
-            onClick={() => {
-              getStatus().then((res) => res.data && onOpen())
-            }}
+            onClick={onOpen}
           >
             Set Status
           </Button>
         )}
       </Flex>
     )
-  }, [selectedVulns])
+  }, [
+    selectedVulns,
+    searchInput,
+    onSearchInputChange,
+    handleClear,
+    handleSearch
+  ])
 
   const handleChange = (state) => {
     setSelectedVulns(state.selectedRows)
   }
 
   // ON PREV PAGE
-  const handlePreviousPage = async () => {}
+  const handlePreviousPage = async () => {
+    setIsPrevActive(false)
+    await refetch({
+      variables: {
+        id,
+        first: undefined,
+        last: totalRows,
+        after: undefined,
+        before: data?.pageInfo?.startCursor
+      }
+    }).then((res) => {
+      if (res.data) {
+        const project = params?.name
+          ? res?.data?.projectGroup?.componentVulns
+          : res?.data?.vuln?.componentVulns
+        setPageIndex((index) => index !== 0 && index - 1)
+        setIsPrevActive(project?.pageInfo?.hasPreviousPage)
+      }
+    })
+  }
 
   // ON NEXT PAGE
-  const handleNextPage = async () => {}
+  const handleNextPage = async () => {
+    setIsNextActive(false)
+    await refetch({
+      variables: {
+        id,
+        first: totalRows,
+        last: undefined,
+        after: data?.pageInfo?.endCursor,
+        before: undefined
+      }
+    }).then((res) => {
+      if (res.data) {
+        const project = params?.name
+          ? res?.data?.projectGroup?.componentVulns
+          : res?.data?.vuln?.componentVulns
+        setPageIndex(
+          (index) => index < Math.ceil(project?.totalCount) && index + 1
+        )
+        setIsNextActive(project?.pageInfo?.hasNextPage)
+      }
+    })
+  }
 
   // ON SET ROW
-  const handleSetRow = async (e) => {}
+  const handleSetRow = async (e) => {
+    const { value } = e.target
+    setTotalRows(Number(value))
+    await refetch({
+      variables: {
+        id,
+        first: Number(value),
+        last: undefined,
+        after: undefined,
+        before: undefined
+      }
+    }).then((res) => {
+      if (res.data) {
+        setPageIndex(1)
+      }
+    })
+  }
 
   useEffect(() => {
     if (data) {
@@ -235,6 +320,7 @@ const VulnProdTable = ({ data }) => {
           responsive
           persistTableHead
           selectableRows
+          clearSelectedRows={toggleClear}
           onSelectedRowsChange={handleChange}
         />
 
@@ -290,83 +376,15 @@ const VulnProdTable = ({ data }) => {
       </Flex>
 
       {isOpen && selectedVulns.length > 0 && (
-        <Modal isOpen={isOpen} onClose={onClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Update Status</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <SimpleGrid row={5} spacing={4}>
-                {/* TYPES */}
-                <FormControl>
-                  <FormLabel htmlFor='vexType' fontSize='sm' color={'gray.600'}>
-                    Status
-                  </FormLabel>
-                  <Select
-                    id='vexType'
-                    name='vexType'
-                    fontSize='sm'
-                    value={statusTitle}
-                    onChange={handleStatusChange}
-                  >
-                    <option value=''>-- Select Status --</option>
-                    {allVexStatus ? (
-                      allVexStatus.vexStatuses.map((st, idx) => (
-                        <option key={idx} value={st.id}>
-                          {st.name}
-                        </option>
-                      ))
-                    ) : (
-                      <option value={''}>No data found</option>
-                    )}
-                  </Select>
-                </FormControl>
-                {/* DETAILS */}
-                <FormControl>
-                  <FormLabel htmlFor='details' fontSize='sm' color={'gray.600'}>
-                    Details
-                  </FormLabel>
-                  <Textarea
-                    rows={2}
-                    name='details'
-                    id='details'
-                    placeholder='Add details'
-                    fontSize='sm'
-                    value={details}
-                    onChange={(e) => setDetails(e.target.value)}
-                  />
-                </FormControl>
-                {/* INTERNAL NOTES */}
-                <FormControl>
-                  <FormLabel
-                    htmlFor='internalNotes'
-                    fontSize='sm'
-                    color={'gray.600'}
-                  >
-                    Internal Notes
-                  </FormLabel>
-                  <Textarea
-                    rows={2}
-                    name='internalNotes'
-                    id='internalNotes'
-                    placeholder='Add notes'
-                    fontSize='sm'
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                  />
-                </FormControl>
-              </SimpleGrid>
-            </ModalBody>
-            <ModalFooter>
-              <Button mr={3} onClick={onClose}>
-                Close
-              </Button>
-              <Button variant='solid' colorScheme='blue' m>
-                Save
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+        <VexModal
+          isOpen={isOpen}
+          onClose={onClose}
+          refetch={refetch}
+          selectedVulns={selectedVulns}
+          setSelectedVulns={setSelectedVulns}
+          setPageIndex={setPageIndex}
+          setToggleClear={setToggleClear}
+        />
       )}
     </>
   )

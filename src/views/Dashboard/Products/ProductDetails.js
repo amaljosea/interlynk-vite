@@ -24,7 +24,6 @@ import {
   UnorderedList,
   ListItem,
   Button,
-  Select,
   Menu,
   MenuButton,
   MenuList,
@@ -46,7 +45,6 @@ import {
   FaBoxArchive
 } from 'react-icons/fa6'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { removeDuplicates } from 'utils'
 import SBOM from 'views/Sbom'
 import ChangeLog from '../Changelog'
 import Automation from '../Automation'
@@ -54,19 +52,23 @@ import ProductModal from './components/ProductModal'
 import UploadModal from './components/UploadModal'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useQuery, useMutation, useLazyQuery } from '@apollo/client'
-import { DeleteProjectGroup, UpdateProjectGroup } from 'graphQL/Mutation'
+import { DeleteProjectGroup } from 'graphQL/Mutation'
 import {
   GetProductVersions,
   GetProjectCheck,
   GetVulnData,
   GetProjectLogs,
-  GetProjectGroups,
   GetProjectSettings
 } from 'graphQL/Queries'
 import Settings from '../ProductSettings'
 import CardHeader from 'components/Card/CardHeader'
 import { ChevronDownIcon, ViewIcon } from '@chakra-ui/icons'
 import EnvironmentDrawer from 'components/Drawer/EnvironmentDrawer'
+import { isDefaultEnv } from 'utils'
+import { GetProjectGroupComponentVulns } from 'graphQL/Queries'
+import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
+import StatusModal from './components/StatusModal'
+import { GetProjectGroup } from 'graphQL/Queries'
 
 const ProductDetails = () => {
   const navigate = useNavigate()
@@ -79,21 +81,19 @@ const ProductDetails = () => {
     totalRows,
     activeProdTab,
     setActiveProdTab,
-    prodState,
     prodLogState,
     prodVulnState,
     prodRulesState,
     dispatch,
-    userPermissons
+    userPermissions
   } = useGlobalState()
-  const { field, direction } = prodLogState
-  const { enabled } = prodState
+  const { field, direction, searchInput, type, user, object } = prodLogState
   const { prodVulnDispatch } = dispatch
 
   const activeProd = localStorage.getItem('activeEnv')
   const [activeEnv, setActiveEnv] = useState(activeProd || '')
 
-  const product = userPermissons?.find(
+  const product = userPermissions?.find(
     (item) => item.key === 'view_product_group'
   )
   const updateProduct = product?.supersededBy?.some(
@@ -105,21 +105,10 @@ const ProductDetails = () => {
       permission.key === 'archive_product_group' && permission.value === true
   )
 
-  const { data, refetch, loading, error } = useQuery(GetProjectGroups, {
+  const { data, refetch, loading, error } = useQuery(GetProjectGroup, {
+    fetchPolicy: 'network-only',
     variables: {
-      first: totalRows,
-      enabled: enabled === 'yes' ? true : enabled === 'no' ? false : undefined,
-      field: prodState.field,
-      direction: prodState.direction
-    },
-    onCompleted: (data) => {
-      if (data) {
-        const activeGroup = data?.organization?.projectGroups?.nodes.find(
-          (item) => item.id === productId
-        )
-        localStorage.setItem('activeEnv', activeGroup?.defaultProject?.id)
-        setActiveEnv(activeGroup?.defaultProject?.id)
-      }
+      id: productId
     }
   })
 
@@ -132,6 +121,7 @@ const ProductDetails = () => {
   const { data: versions, refetch: sbomRefetch } = useQuery(
     GetProductVersions,
     {
+      fetchPolicy: 'network-only',
       variables: {
         id: activeEnv
       }
@@ -140,16 +130,24 @@ const ProductDetails = () => {
 
   // const versionData = versions ? removeDuplicates(versions?.project?.sboms) : []
 
+  const { data: globalVulnData, refetch: globalVulnRefetch } = useQuery(
+    GetProjectGroupComponentVulns,
+    {
+      fetchPolicy: 'network-only',
+      variables: {
+        id: productId,
+        first: totalRows
+      }
+    }
+  )
+
   const [getRules, { data: rules, error: rulesError }] = useLazyQuery(
     GetProjectCheck,
     { fetchPolicy: 'network-only' }
   )
 
   const [getSettings, { data: settings }] = useLazyQuery(GetProjectSettings, {
-    fetchPolicy: 'network-only',
-    variables: {
-      id: activeEnv
-    }
+    fetchPolicy: 'network-only'
   })
 
   const [getLogs, { data: prodLogs }] = useLazyQuery(GetProjectLogs, {
@@ -166,10 +164,6 @@ const ProductDetails = () => {
       field: prodVulnState.field,
       direction: prodVulnState.direction
     }
-  })
-
-  const [projectUpdate] = useMutation(UpdateProjectGroup, {
-    onCompleted: () => refetch({ id: productId })
   })
 
   const [projectDelete] = useMutation(DeleteProjectGroup, {
@@ -219,16 +213,6 @@ const ProductDetails = () => {
     setActiveEnv(value)
   }
 
-  // TOGGLE STATUS
-  const toggleStatus = async () => {
-    await projectUpdate({
-      variables: {
-        id: activeGroup?.id,
-        enabled: activeGroup?.enabled === true ? false : true
-      }
-    }).then((res) => res.data && onWarningClose())
-  }
-
   // DELETE PRODUCT
   const onProductDelete = async () => {
     await projectDelete({
@@ -239,6 +223,11 @@ const ProductDetails = () => {
       .then((res) => res.data && onDeleteClose())
       .finally(() => navigate('/vendor/products'))
   }
+
+  const defaultEnv =
+    data && activeEnv
+      ? data?.projectGroup?.projects.find((item) => item.id === activeEnv)?.name
+      : ''
 
   useEffect(() => {
     if (sbomId === null) {
@@ -251,6 +240,8 @@ const ProductDetails = () => {
       setActiveProdTab(0)
     } else if (activeTab === 1) {
       setActiveProdTab(1)
+    } else if (activeTab === 2) {
+      setActiveProdTab(2)
       getRules({
         variables: {
           id: activeEnv,
@@ -259,15 +250,19 @@ const ProductDetails = () => {
           direction: prodRulesState.direction
         }
       }).then((res) => console.log('res', res.data))
-    } else if (activeTab === 2) {
-      setActiveProdTab(2)
+    } else if (activeTab === 3) {
+      setActiveProdTab(3)
       getSettings({
         variables: { id: activeEnv }
       })
-    } else if (activeTab === 3) {
-      setActiveProdTab(3)
+    } else if (activeTab === 4) {
+      setActiveProdTab(4)
       getLogs({
         variables: {
+          search: searchInput !== '' ? searchInput : undefined,
+          changeType: type?.length === 0 ? undefined : type,
+          changedBy: user?.length === 0 ? undefined : user,
+          changeObject: object?.length === 0 ? undefined : object,
           id: activeEnv,
           first: totalRows,
           field: field,
@@ -340,12 +335,12 @@ const ProductDetails = () => {
                           alignItems={'left'}
                         >
                           <Text fontWeight={'semibold'} fontSize={25}>
-                            {activeGroup?.name || ''}
+                            {data?.projectGroup?.name || ''}
                           </Text>
                         </Stack>
                         {/* PRODUCT DESCRIPTION */}
                         <Text fontSize={'sm'}>
-                          {activeGroup?.description || ''}
+                          {data?.projectGroup?.description || ''}
                         </Text>
                       </Flex>
                     </Flex>
@@ -362,7 +357,9 @@ const ProductDetails = () => {
                       {/* EDIT PRODUCT */}
                       <Tooltip label='Edit Product'>
                         <IconButton
-                          isDisabled={!activeGroup?.enabled || !updateProduct}
+                          isDisabled={
+                            !data?.projectGroup?.enabled || !updateProduct
+                          }
                           colorScheme='blue'
                           onClick={onOpenProduct}
                           icon={<FaPenToSquare />}
@@ -371,7 +368,7 @@ const ProductDetails = () => {
                       {/* UPLOAD SBOM */}
                       <Tooltip label='Upload SBOM'>
                         <IconButton
-                          isDisabled={!activeGroup?.enabled}
+                          isDisabled={!data?.projectGroup?.enabled}
                           colorScheme='blue'
                           onClick={onOpenUpload}
                           icon={<FaUpload />}
@@ -380,7 +377,7 @@ const ProductDetails = () => {
                       {/* UPDATE PRODUCT STATUS */}
                       <Tooltip
                         label={
-                          activeGroup?.enabled
+                          data?.projectGroup?.enabled
                             ? 'Disable Product'
                             : 'Enable Product'
                         }
@@ -389,7 +386,7 @@ const ProductDetails = () => {
                           colorScheme={'blue'}
                           onClick={onWarningOpen}
                           icon={
-                            activeGroup?.enabled ? (
+                            data?.projectGroup?.enabled ? (
                               <FaToggleOff />
                             ) : (
                               <FaToggleOn />
@@ -423,14 +420,12 @@ const ProductDetails = () => {
                     variant={'solid'}
                     colorScheme='blue'
                     fontSize={'sm'}
-                    textTransform={'capitalize'}
+                    textTransform={
+                      isDefaultEnv(defaultEnv) ? 'capitalize' : 'none'
+                    }
                     rightIcon={<ChevronDownIcon />}
                   >
-                    {activeEnv
-                      ? activeGroup?.projects?.find(
-                          (item) => item.id === activeEnv
-                        )?.name
-                      : 'Default'}
+                    {defaultEnv}
                   </MenuButton>
                   <MenuList>
                     <MenuOptionGroup
@@ -438,12 +433,14 @@ const ProductDetails = () => {
                       value={activeEnv}
                       onChange={onChangeEnv}
                     >
-                      {activeGroup?.projects?.map((item) => (
+                      {data?.projectGroup?.projects?.map((item) => (
                         <MenuItemOption
                           fontSize={'sm'}
                           value={item?.id}
                           key={item?.id}
-                          textTransform={'capitalize'}
+                          textTransform={
+                            isDefaultEnv(item?.name) ? 'capitalize' : 'none'
+                          }
                         >
                           {item?.name}
                         </MenuItemOption>
@@ -472,9 +469,8 @@ const ProductDetails = () => {
                 <TabList>
                   {[
                     'versions',
-                    ,
-                    /// TODO: 1.0 Add back in when ready
-                    /* 'vulnerabilities', */ 'automation rules',
+                    'vulnerabilities',
+                    'automation rules',
                     'settings',
                     'change log'
                   ].map((item, index) => (
@@ -494,18 +490,19 @@ const ProductDetails = () => {
                       <VersionTable
                         productId={activeEnv}
                         project={versions?.project}
-                        data={activeGroup}
+                        data={data?.projectGroup}
                         getVulnData={vulnRefetch}
                         refetch={sbomRefetch}
                       />
                     )}
                   </TabPanel>
-                  {/* VULNERABILITIES * /}
-                  /// TODO: 1.0 Add back in when ready
+                  {/* VULNERABILITIES */}
                   <TabPanel>
-                    <VulnsTable data={vulnList} />
+                    <GlobalVulnTable
+                      data={globalVulnData?.projectGroup?.componentVulns}
+                      refetch={globalVulnRefetch}
+                    />
                   </TabPanel>
-                  * /}
                   {/* AUTOMATIONS */}
                   <TabPanel>
                     {rulesError && (
@@ -516,20 +513,25 @@ const ProductDetails = () => {
                     <Automation
                       data={rules?.project.autoChecks}
                       refetch={getRules}
+                      productId={activeEnv}
                     />
                   </TabPanel>
                   {/* SETTINGS */}
                   <TabPanel>
                     <Settings
-                      projectId={activeGroup?.defaultProject?.id}
                       data={settings?.project?.projectSetting}
-                      enabled={activeGroup?.enabled}
+                      enabled={data?.projectGroup?.enabled}
+                      activeEnv={activeEnv}
                       refetch={getSettings}
                     />
                   </TabPanel>
                   {/* CHANGE LOG */}
                   <TabPanel>
-                    <ChangeLog data={prodLogs} refetch={getLogs} />
+                    <ChangeLog
+                      data={prodLogs}
+                      refetch={getLogs}
+                      activeEnv={activeEnv}
+                    />
                   </TabPanel>
                 </TabPanels>
               </Tabs>
@@ -540,9 +542,9 @@ const ProductDetails = () => {
         {/* CREATE PRODUCT */}
         {data && isOpenProduct && (
           <ProductModal
-            description={activeGroup?.description}
-            product={activeGroup?.name}
-            id={activeGroup?.id}
+            description={data?.projectGroup?.description}
+            product={data?.projectGroup?.name}
+            id={data?.projectGroup?.id}
             onClose={onCloseProduct}
             isOpen={isOpenProduct}
             refetch={refetch}
@@ -552,7 +554,7 @@ const ProductDetails = () => {
         {/* UPLOAD SBOM */}
         {isOpenUpload && data && (
           <UploadModal
-            projects={activeGroup?.projects}
+            projects={data?.projectGroup?.projects}
             isOpen={isOpenUpload}
             onClose={onCloseUpload}
             activeEnv={activeEnv}
@@ -561,50 +563,13 @@ const ProductDetails = () => {
 
         {/* DISABLED */}
         {isWarningOpen && data && (
-          <Modal isOpen={isWarningOpen} onClose={onWarningClose}>
-            <ModalOverlay />
-            <ModalContent>
-              <ModalHeader>
-                {activeGroup?.enabled ? 'Disable' : 'Enable'} Product
-              </ModalHeader>
-              <ModalCloseButton />
-              <ModalBody>
-                <Text>
-                  {activeGroup?.enabled ? 'Disable' : 'Enable'} this product
-                  will:{' '}
-                </Text>
-                <UnorderedList>
-                  <Flex flexDir={'column'} gap={1} mt={4}>
-                    {[
-                      `${
-                        activeGroup?.enabled ? 'Disable' : 'Enable'
-                      } this product, its versions and SBOMs`,
-                      `${
-                        activeGroup?.enabled ? 'Disable' : 'Enable'
-                      } access to the product for all users`,
-                      `${
-                        activeGroup?.enabled ? 'Disable' : 'Enable'
-                      } uploads of SBOMs to this product`
-                    ].map((item, index) => (
-                      <ListItem key={index}>{item}</ListItem>
-                    ))}
-                  </Flex>
-                </UnorderedList>
-                <Text mt={10}>Are you sure you wish to continue?</Text>
-              </ModalBody>
-              <ModalFooter>
-                <Button mr={3} onClick={onWarningClose}>
-                  No
-                </Button>
-                <Button
-                  colorScheme={data?.project?.enabled ? 'red' : 'green'}
-                  onClick={toggleStatus}
-                >
-                  Yes
-                </Button>
-              </ModalFooter>
-            </ModalContent>
-          </Modal>
+          <StatusModal
+            isOpen={isWarningOpen}
+            onClose={onWarningClose}
+            group={data?.projectGroup}
+            grouId={productId}
+            refetch={refetch}
+          />
         )}
 
         {/* DELETE */}
@@ -647,7 +612,7 @@ const ProductDetails = () => {
           <EnvironmentDrawer
             isOpen={isEnvOpen}
             onClose={onEnvClose}
-            data={activeGroup}
+            data={data}
             refetch={refetch}
             activeEnv={activeEnv}
           />

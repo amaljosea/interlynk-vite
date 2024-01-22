@@ -44,12 +44,15 @@ import {
 import Cookies from 'js-cookie'
 import { FaEllipsisVertical } from 'react-icons/fa6'
 import { useNavigate } from 'react-router-dom'
+import { useGlobalState } from 'hooks/useGlobalState'
 
-const OrgTable = ({ data, refetch, activeOrg }) => {
+const OrgTable = ({ data, refetch, activeOrg, isAdmin }) => {
   const navigate = useNavigate()
   const toast = useToast()
   const [leaveError, setLeaveError] = useState('')
   const { isOpen, onOpen, onClose } = useDisclosure()
+
+  const { totalRows } = useGlobalState()
 
   const {
     isOpen: isWarningOpen,
@@ -146,7 +149,17 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
           })
         }
       })
-      .finally(() => navigate('/vendor/dashboard'))
+      .finally(() => {
+        if (isAdmin) {
+          refetch({
+            variables: { first: totalRows, status: 'approved' }
+          })
+        } else {
+          refetch({
+            variables: { invitationStatuses: ['ACCEPTED', 'INVITED'] }
+          })
+        }
+      })
   }
 
   const subHeaderComponent = useMemo(() => {

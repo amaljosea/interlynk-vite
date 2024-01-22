@@ -17,7 +17,7 @@ import { GetUserPermissions } from 'graphQL/Queries'
 import { permissionList } from 'utils'
 
 export default function AdminNavbar(props) {
-  const { setUserPermissons } = useGlobalState()
+  const { setUserPermissions } = useGlobalState()
 
   function parseJSONSafely(str) {
     try {
@@ -36,7 +36,7 @@ export default function AdminNavbar(props) {
       const permissions = permissionList(
         data?.organization?.currentUser?.role?.permissionsMap || []
       )
-      setUserPermissons(permissions)
+      setUserPermissions(permissions)
     }
   }, [data])
 
@@ -79,15 +79,9 @@ export default function AdminNavbar(props) {
       const permissions = permissionList(
         data?.organization?.currentUser?.role?.permissionsMap || []
       )
-      setUserPermissons(permissions)
+      setUserPermissions(permissions)
     }
   }, [data])
-
-  useEffect(() => {
-    if (params?.name && currentProduct?.name !== decodeURI(params?.name)) {
-      navigate('/vendor/dashboard')
-    }
-  }, [])
 
   // Here are all the props that may change depending on navbar's type or state.(secondary, variant, scrolled)
   let mainText = useColorModeValue('gray.700', 'gray.200')
@@ -182,7 +176,7 @@ export default function AdminNavbar(props) {
                 isCurrentPage={sbomId && currentSBOM?.version ? false : true}
               >
                 <Link
-                  to={`/vendor/products/${params.name}?id=${currentProduct?.groupId}`}
+                  to={`/vendor/products/${params.name}?id=${currentProduct?.id}`}
                   onClick={() => localStorage.removeItem('currentSBOM')}
                 >
                   {decodeURI(params.name)}

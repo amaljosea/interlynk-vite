@@ -14,7 +14,7 @@ import {
 const GlobalStateContext = createContext()
 
 const GlobalStateProvider = ({ children }) => {
-  const [userPermissons, setUserPermissons] = useState([])
+  const [userPermissions, setUserPermissions] = useState([])
   const [userName, setUserName] = useState('')
   const [totalRows, setTotalRows] = useState(25)
   const [activeProdTab, setActiveProdTab] = useState(0)
@@ -38,7 +38,16 @@ const GlobalStateProvider = ({ children }) => {
   const [globalVulnState, globalVulnDispatch] = useReducer(globalVulnReducer, {
     field: 'GLOBAL_VULNS_UPDATED_AT',
     direction: 'DESC',
+    after:'',
+    before:'',
     searchInput: '',
+    severities: [],
+    products: [],
+    statues: [],
+    kev: '',
+    epss: '',
+    minEpss: 0,
+    maxEpss: 0,
     pageIndex: 1
   })
   const [prodRulesState, prodRulesDispatch] = useReducer(prodRulesReducer, {
@@ -49,6 +58,10 @@ const GlobalStateProvider = ({ children }) => {
   const [prodLogState, prodLogDispatch] = useReducer(prodLogReducer, {
     field: 'ACTIVITY_LOGS_CREATED_AT',
     direction: 'DESC',
+    searchInput: '',
+    type: [],
+    user: [],
+    object: [],
     pageIndex: 1
   })
   const [prodCompState, prodCompDispatch] = useReducer(prodCompReducer, {
@@ -145,8 +158,8 @@ const GlobalStateProvider = ({ children }) => {
         setActiveDockerHub,
         vulnerabilitiesData,
         setVulnerabilitiesData,
-        userPermissons,
-        setUserPermissons,
+        userPermissions,
+        setUserPermissions,
         scanEnabled,
         setScanEnabled,
         userName,

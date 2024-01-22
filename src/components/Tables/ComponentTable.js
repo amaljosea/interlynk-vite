@@ -50,8 +50,12 @@ import RowLimit from 'views/Sbom/components/RowLimit'
 import { useGlobalState } from 'hooks/useGlobalState'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import { GetCompFilterData } from 'graphQL/Queries'
+import Pagination from "../Pagination";
 
 const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
+
+  const paginationSizes = [25, 50, 100]
+
   // GET COMPONENT FILTER HEADS
   const [getCompFilters] = useLazyQuery(GetCompFilterData)
 
@@ -60,10 +64,8 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
   const customerView = location.pathname.startsWith('/customer')
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
-  const x = window.matchMedia('(min-width: 2500px)')
-  const y = window.matchMedia('(max-width: 1440px)')
 
-  const { userPermissons, totalRows, setTotalRows, prodCompState, dispatch } =
+  const { userPermissions, totalRows, setTotalRows, prodCompState, dispatch } =
     useGlobalState()
   const {
     field,
@@ -80,7 +82,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
   } = prodCompState
   const { prodCompDispatch } = dispatch
 
-  const sboms = userPermissons?.find((item) => item.key === 'view_sbom')
+  const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
   const updateComponent = sboms?.supersededBy?.some(
     (permission) =>
       permission.key === 'update_sbom_components' && permission.value === true
@@ -341,7 +343,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
         )
       },
       wrap: true,
-      width: '24%',
+      width: '20%',
       sortable: true
     },
     // VERSION
@@ -349,7 +351,8 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
       id: 'COMPONENTS_VERSION',
       name: 'VERSION',
       selector: (row) => <p style={{ textWrap: 'pretty' }}>{row.version}</p>,
-      width: '16%',
+      width: '15%',
+      wrap: true,
       sortable: true
     },
     // PURL
@@ -371,14 +374,15 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
         )
       },
       sortable: true,
-      width: x.matches ? '30%' : '20%',
+      width: '15%',
+      wrap: true,
       grow: 2
     },
     // LICENSES
     {
       id: 'COMPONENTS_LICENSES',
       name: 'LICENSES',
-      width: '16%',
+      width: '15%',
       selector: (row) => {
         const { licenses, licensesExp, licensesCustom } = row
 
@@ -500,7 +504,8 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
         const dateB = new Date(b.updatedAt)
         return dateA - dateB // Sort in descending order
       },
-      right: 'true'
+      right: 'true',
+      wrap: true
     },
     // ACTION
     {
@@ -1123,40 +1128,17 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
 
       {/* PAGINATION */}
       {data && (
-        <Flex
-          width={'100%'}
-          flexDir={'row'}
-          gap={4}
-          alignItems={'center'}
-          justifyContent={'space-between'}
-          mt={6}
-        >
-          <Stack alignItems={'center'} direction={'row'} spacing={4}>
-            <Button
-              colorScheme='blue'
-              onClick={handlePreviousPage}
-              isDisabled={!isPrevActive}
-            >
-              Previous
-            </Button>
-            <Button
-              colorScheme='blue'
-              onClick={handleNextPage}
-              isDisabled={!isNextActive}
-            >
-              Next
-            </Button>
-            <Box>
-              Page {pageIndex} of{' '}
-              {data.totalCount === 0
-                ? 1
-                : Math.ceil(data.totalCount / totalRows)}
-            </Box>
-          </Stack>
-
-          {/* ROW LIMIT */}
-          <RowLimit onChange={handleSetRow} name='componentRow' />
-        </Flex>
+          <Pagination
+              paginationSizes={paginationSizes}
+              pageIndex={pageIndex}
+              totalRows={totalRows}
+              totalCount={data.totalCount}
+              onPreviousPage={handlePreviousPage}
+              onNextPage={handleNextPage}
+              onSetRow={handleSetRow}
+              hasNextPage={data.pageInfo.hasNextPage}
+              hasPreviousPage={data.pageInfo.hasPreviousPage}
+          />
       )}
 
       {/* ACTIONS */}
