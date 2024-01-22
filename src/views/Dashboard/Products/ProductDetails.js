@@ -498,10 +498,6 @@ const ProductDetails = () => {
                   </TabPanel>
                   {/* VULNERABILITIES */}
                   <TabPanel>
-                    {/* <VulnProdTable
-                      data={globalvulnData?.projectGroup?.componentVulns}
-                      refetch={getGlobalVulnData}
-                    /> */}
                     <GlobalVulnTable
                       data={globalVulnData?.projectGroup?.componentVulns}
                       refetch={globalVulnRefetch}
