@@ -59,7 +59,7 @@ const ProductTable = ({ data, refetch }) => {
   const { userPermissions, setActiveSbomTab, prodState, dispatch } =
     useGlobalState()
 
-  const paginationSizes = [5, 10, 15]
+  const paginationSizes = [25, 50, 100]
 
   const { field, direction, searchInput, pageIndex } = prodState
   const { prodDispatch, sbomDispatch } = dispatch
