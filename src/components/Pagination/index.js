@@ -13,7 +13,7 @@ const Pagination = ({
     hasNextPage
 }) => {
 
-    const totalPages = Math.ceil(totalCount / totalRows);
+    const totalPages = Math.ceil(totalCount / totalRows) || 1
 
     return (
         <Flex
