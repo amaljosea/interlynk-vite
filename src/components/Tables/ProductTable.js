@@ -585,9 +585,13 @@ const ProductTable = ({ data, refetch }) => {
         enabled: true,
         field: 'PROJECT_GROUPS_UPDATED_AT',
         direction: 'DESC'
+      }).then((res) => {
+        if (res.data) {
+          prodDispatch({ type: 'FETCH_DATA_SUCCESS' })
+        }
       })
     }
-  }, [data, refetch, totalRows])
+  }, [data, refetch, totalRows, prodDispatch])
 
   return (
     <>
@@ -603,6 +607,8 @@ const ProductTable = ({ data, refetch }) => {
               onPreviousPage={handlePreviousPage}
               onNextPage={handleNextPage}
               onSetRow={handleSetRow}
+              hasNextPage={data.pageInfo.hasNextPage}
+              hasPreviousPage={data.pageInfo.hasPreviousPage}
             />
           )}
         </Flex>

@@ -412,9 +412,31 @@ export const GetProjectGroup = gql`
 
 // GET GLOBAL VULNERABILITIES
 export const GetGlobalVulns = gql`
-  query Organization($first: Int, $last: Int, $after: String, $before: String) {
+  query Organization(
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+    $search: String
+    $severity: [String!]
+    $projectGroupIds: [Uuid!]
+    $status: [String!]
+    $kev: Boolean
+    $epss: RangeInput
+  ) {
     organization {
-      vulns(after: $after, first: $first, before: $before, last: $last) {
+      vulns(
+        after: $after
+        first: $first
+        before: $before
+        last: $last
+        search: $search
+        projectGroupIds: $projectGroupIds
+        status: $status
+        severity: $severity
+        kev: $kev
+        epss: $epss
+      ) {
         totalCount
         pageInfo {
           endCursor
@@ -536,13 +558,23 @@ export const GetProjectGroupComponentVulns = gql`
     $last: Int
     $after: String
     $before: String
+    $severity: [String!]
+    $projectGroupIds: [Uuid!]
+    $status: [String!]
+    $kev: Boolean
+    $epss: RangeInput
   ) {
     projectGroup(id: $id) {
       componentVulns(
-        first: $first
-        last: $last
         after: $after
+        first: $first
         before: $before
+        last: $last
+        projectGroupIds: $projectGroupIds
+        status: $status
+        severity: $severity
+        kev: $kev
+        epss: $epss
       ) {
         totalCount
         pageInfo {
