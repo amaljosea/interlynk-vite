@@ -1,38 +1,159 @@
+import { useQuery } from '@apollo/client'
 import {
   Box,
   Button,
+  Flex,
+  Input,
   Menu,
-  MenuButton,
   MenuItemOption,
   MenuList,
+  MenuDivider,
   MenuOptionGroup,
-  Stack
+  Stack,
+  useDisclosure,
 } from '@chakra-ui/react'
+import { useLocation, useParams } from 'react-router-dom'
 import CheckMark from 'components/Misc/CheckMark'
-import { FaFilter } from 'react-icons/fa'
-import { useState } from 'react'
 import FilterButton from 'components/Misc/FilterButton'
+import { GetProjectGroups } from 'graphQL/Queries'
+import { useGlobalState } from 'hooks/useGlobalState'
+import { useRef } from 'react'
 
-const VulnsFilters = () => {
-  const [severity, setSeverity] = useState([])
-  const [statuses, setStatuses] = useState([])
-  const [kev, setKev] = useState('')
-  const [epss, setEpss] = useState('')
+const VulnsFilters = ({ refetch }) => {
+  const params = useParams()
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const groupId = queryParams.get('id')
+
+
+  const { totalRows, globalVulnState, prodState, dispatch } = useGlobalState()
+  const { severities, products, statues, kev, epss, minEpss, maxEpss } =
+    globalVulnState
+  const { globalVulnDispatch } = dispatch
+
+  const { data } = useQuery(GetProjectGroups, {
+    variables: {
+      first: totalRows,
+      enabled: true,
+      field: prodState?.field,
+      direction: prodState?.direction
+    }
+  })
+
+  const minRef = useRef()
+  const maxRef = useRef()
+
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  
+
+  const onMinKeyDown = (e) => {
+    if (e.key === 'ArrowRight') {
+      e.preventDefault()
+      maxRef.current.focus()
+    }
+  }
+
+  const onMaxKeyDown = (e) => {
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault()
+      minRef.current.focus()
+    }
+  }
+
+  const vulnData = { first: totalRows, last: undefined, after: undefined, before: undefined }
+
+  const onFilterProduct = async (value) => {
+    await refetch({id: params?.name ? groupId : undefined, 
+    projectGroupIds: value?.includes('all') ? undefined : value, ...vulnData })
+    .then((res) => res?.data && globalVulnDispatch({ type: 'FILTER_PRODUCT', payload: value }))
+  }
+
+  const onFilterSeverity = async (value) => {
+    await refetch({id: params?.name ? groupId : undefined, 
+    severity: value?.includes('all') ? undefined: value, ...vulnData })
+    .then((res) => res?.data && globalVulnDispatch({ type: 'FILTER_SEVERITY', payload: value }))
+  }
+
+  const onFilterStatus = async (value) => {
+    await refetch({id: params?.name ? groupId : undefined, 
+    status: value.includes('all') ? undefined: value, ...vulnData })
+    .then((res) => res?.data && globalVulnDispatch({ type: 'FILTER_STATUS', payload: value }))
+  }
+
+  const onFilterKev = async (value) => {
+    await refetch({id: params?.name ? groupId : undefined, 
+    kev: value === 'yes' ? true : value === 'false' ? false : undefined, ...vulnData })
+    .then((res) => res?.data && globalVulnDispatch({ type: 'FILTER_KEV', payload: value }))
+  }
+
+  const onFilterEpss = async (value) => {
+    const epssRange = value !== 'all' && value !== '' && value.split('-')
+    const range = {
+      min: parseFloat(epssRange[0]) / 10000,
+      max: parseFloat(epssRange[1]) / 10000
+    }
+    await refetch({id: params?.name ? groupId : undefined, 
+    epss: value === 'all' || value === '' ? undefined : range, ...vulnData })
+    .then((res) => res?.data && globalVulnDispatch({ type: 'FILTER_EPSS', payload: value }))
+  }
+
+  const handleSubmit = async () => {
+    const range = {
+      min: parseFloat(minEpss) / 10000,
+      max: parseFloat(maxEpss) / 10000
+    }
+    await refetch({id: params?.name ? groupId : undefined, 
+    epss: range, ...vulnData })
+    .then((res) => res?.data && globalVulnDispatch({ type: 'SET_EPSS', payload: `${minEpss}-${maxEpss}` }))
+    .finally(() => onClose())
+  }
 
   return (
     <Stack direction={'row'} alignItems={'center'} gap={1}>
+      {/* PRODUCTS */}
+      {data && (
+      <Box width={'fit-content'} position={'relative'} display={params?.name ? 'none' : 'block'}>
+        <Menu closeOnSelect={true}>
+          {products?.length !== 0 && !products.includes('all') && (
+            <CheckMark />
+          )}
+          <FilterButton>Product</FilterButton>
+          <MenuList>
+            <MenuOptionGroup
+              type='checkbox'
+              value={products}
+              onChange={onFilterProduct}
+            >
+              <MenuItemOption value={'all'} fontSize={'sm'}>All</MenuItemOption>
+              {data?.organization?.projectGroups?.nodes?.map(
+                (item, index) => (
+                  <MenuItemOption
+                    key={index}
+                    value={item.id}
+                    fontSize={'sm'}
+                    textTransform={'capitalize'}
+                  >
+                    {item.name}
+                  </MenuItemOption>
+                )
+              )}
+            </MenuOptionGroup>
+          </MenuList>
+        </Menu>
+      </Box>
+      )}
       {/* SEVERITY */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {severity.length !== 0 && !severity.includes('all') && <CheckMark />}
+          {severities?.length !== 0 && !severities.includes('all') && (
+            <CheckMark />
+          )}
           <FilterButton>Severity</FilterButton>
           <MenuList>
             <MenuOptionGroup
               type='checkbox'
-              value={severity}
-              onChange={(value) =>
-                setSeverity(value.includes('all') ? [] : value)
-              }
+              value={severities}
+              onChange={onFilterSeverity}
             >
               {['all', 'critical', 'high', 'medium', 'low'].map(
                 (item, index) => (
@@ -53,24 +174,21 @@ const VulnsFilters = () => {
       {/* STATUSES */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {statuses.length !== 0 && !statuses.includes('all') && <CheckMark />}
+          {statues.length !== 0 && !statues.includes('all') && <CheckMark />}
           <FilterButton>Status</FilterButton>
           <MenuList>
             <MenuOptionGroup
               type='checkbox'
-              value={statuses}
-              onChange={(value) =>
-                setStatuses(value.includes('all') ? [] : value)
-              }
+              value={statues}
+              onChange={onFilterStatus}
             >
               {[
                 'all',
-                'Unspecified',
-                'In Triage',
-                'Not Affected',
-                'False Positive',
                 'Affected',
-                'Fixed'
+                'False Positive',
+                'Fixed',
+                'In Triage',
+                'Not Affected'
               ].map((item, index) => (
                 <MenuItemOption
                   key={index}
@@ -94,7 +212,7 @@ const VulnsFilters = () => {
             <MenuOptionGroup
               type='radio'
               value={kev}
-              onChange={(value) => setKev(value)}
+              onChange={onFilterKev}
             >
               {['all', 'yes', 'no'].map((item, index) => (
                 <MenuItemOption
@@ -112,14 +230,14 @@ const VulnsFilters = () => {
       </Box>
       {/* EPSS */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={true}>
+        <Menu closeOnSelect={true} isOpen={isOpen} onClose={onClose}>
           {epss !== '' && epss !== 'all' && <CheckMark />}
-          <FilterButton>EPSS</FilterButton>
+          <FilterButton onClick={onOpen}>EPSS</FilterButton>
           <MenuList>
             <MenuOptionGroup
               type='radio'
               value={epss}
-              onChange={(value) => setEpss(value)}
+              onChange={onFilterEpss}
             >
               {['all', '0-100', '100-500', '500-1000', '1000-10000'].map(
                 (item, index) => (
@@ -134,6 +252,55 @@ const VulnsFilters = () => {
                 )
               )}
             </MenuOptionGroup>
+            <MenuDivider />
+            <Flex flexDirection={'column'} alignItems={'flex-start'}>
+              <Stack direction={'row'} alignItems={'center'} pl={8}>
+                <Input
+                  type='number'
+                  width={'75px'}
+                  size='sm'
+                  placeholder={'min'}
+                  id='minValue'
+                  name='minValue'
+                  value={minEpss}
+                  ref={minRef}
+                  onKeyDown={onMinKeyDown}
+                  onChange={(e) =>
+                    globalVulnDispatch({
+                      type: 'SET_MIN_EPSS',
+                      payload: e.target.value
+                    })
+                  }
+                />
+                <Box>-</Box>
+                <Input
+                  type='number'
+                  width={'75px'}
+                  size='sm'
+                  placeholder={'max'}
+                  id='maxValue'
+                  name='maxValue'
+                  value={maxEpss}
+                  ref={maxRef}
+                  onKeyDown={onMaxKeyDown}
+                  onChange={(e) =>
+                    globalVulnDispatch({
+                      type: 'SET_MAX_EPSS',
+                      payload: e.target.value
+                    })
+                  }
+                />
+              </Stack>
+              <Button
+                ml={8}
+                my={2}
+                size='sm'
+                onClick={handleSubmit}
+                isDisabled={Number(maxEpss) <= Number(minEpss) || maxEpss === 0}
+              >
+                Submit
+              </Button>
+            </Flex>
           </MenuList>
         </Menu>
       </Box>

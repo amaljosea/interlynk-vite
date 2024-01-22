@@ -38,7 +38,16 @@ const GlobalStateProvider = ({ children }) => {
   const [globalVulnState, globalVulnDispatch] = useReducer(globalVulnReducer, {
     field: 'GLOBAL_VULNS_UPDATED_AT',
     direction: 'DESC',
+    after:'',
+    before:'',
     searchInput: '',
+    severities: [],
+    products: [],
+    statues: [],
+    kev: '',
+    epss: '',
+    minEpss: 0,
+    maxEpss: 0,
     pageIndex: 1
   })
   const [prodRulesState, prodRulesDispatch] = useReducer(prodRulesReducer, {
