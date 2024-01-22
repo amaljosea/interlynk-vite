@@ -33,10 +33,11 @@ import { useMutation } from '@apollo/client'
 import { UpdateProjectGroup, DeleteProjectGroup } from 'graphQL/Mutation'
 
 import {
-  getFullDateAndTime,
-  timeSince,
   customStyles,
-  removeDuplicates
+  getFullDateAndTime,
+  normalizeSBOMVersion,
+  removeDuplicates,
+  timeSince,
 } from 'utils'
 
 import DataTable from 'react-data-table-component'
@@ -312,14 +313,14 @@ const ProductTable = ({ data, refetch }) => {
           name: name,
           version:
               data?.length > 0
-                  ? defaultProject?.primaryComponent?.version
+                  ? normalizeSBOMVersion(defaultProject)
                   : defaultProject?.sboms?.length > 0
-                      ? defaultProject?.sboms[0].primaryComponent?.version
+                      ? normalizeSBOMVersion(defaultProject?.sboms[0])
                       : '',
           sbomId: defaultProject
-              ? defaultProject?.primaryComponent?.version
+              ? defaultProject?.primaryComponent?.id
               : defaultProject?.sboms?.length > 0
-                  ? defaultProject?.sboms[0].id
+                  ? defaultProject?.sboms[0]?.id
                   : '',
           groupId: id
         }
@@ -334,7 +335,7 @@ const ProductTable = ({ data, refetch }) => {
               id: defaultProject?.id,
               sbomId:
                 defaultProject?.length > 0
-                  ? defaultProject?.primaryComponent?.version
+                  ? defaultProject?.primaryComponent?.id
                   : defaultProject?.sboms[0]?.id || ''
             }
           })
