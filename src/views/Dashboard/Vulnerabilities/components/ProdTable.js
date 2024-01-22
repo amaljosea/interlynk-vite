@@ -19,6 +19,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import VexModal from './VexModal'
 import { useLocation, useParams } from 'react-router-dom'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
+import { normalizeSBOMVersion } from 'utils'
 
 const customStyles = {
   headCells: {
@@ -106,10 +107,10 @@ const VulnProdTable = ({ data, refetch }) => {
       name: 'VERSION',
       selector: (row) => (
         <Tooltip
-          label={row?.component?.sbom?.primaryComponent?.version || ''}
+          label={normalizeSBOMVersion(row?.component?.sbom)}
           placement='top'
         >
-          {row?.component?.sbom?.primaryComponent?.version || ''}
+          {normalizeSBOMVersion(row?.component?.sbom)}
         </Tooltip>
       ),
       wrap: true,

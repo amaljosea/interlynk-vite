@@ -11,9 +11,7 @@ import { useEffect, useState } from 'react'
 import { GetProject, GetProjectGroups } from 'graphQL/Queries'
 import { useLazyQuery, useQuery } from '@apollo/client'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { removeDuplicates } from 'utils'
-import { isDefaultEnv } from 'utils'
-import { getFullDateAndTime } from 'utils'
+import { isDefaultEnv, normalizeSBOMVersion, removeDuplicates } from 'utils'
 
 const StepOne = ({
   setProductId,
@@ -220,9 +218,7 @@ const StepOne = ({
                 {uniqVersions.length > 0 &&
                   uniqVersions.map((item, index) => (
                     <option key={index} value={item.id}>
-                      {item.primaryComponent
-                        ? item.primaryComponent.version
-                        : `Uploaded at ${getFullDateAndTime(item.creationAt)}`}
+                      {normalizeSBOMVersion(item)}
                     </option>
                   ))}
               </Select>

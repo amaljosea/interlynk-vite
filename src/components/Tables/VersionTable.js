@@ -41,7 +41,8 @@ import {
   timeSince,
   getFullDateAndTime,
   customStyles,
-  removeDuplicates
+  removeDuplicates,
+  normalizeSBOMVersion
 } from 'utils'
 import SbomList from 'views/Dashboard/Products/components/SbomList'
 import RowLimit from 'views/Sbom/components/RowLimit'
@@ -107,7 +108,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
     onClose: onSbomClose
   } = useDisclosure()
 
-  const onFilterSev = async (id, primaryComponent, value) => {
+  const onFilterSev = async (id, version, value) => {
     await getVulnData({
       projectId: productId,
       sbomId: id,
@@ -122,7 +123,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
       if (res.data) {
         localStorage.setItem(
           'currentSBOM',
-          JSON.stringify({ version: primaryComponent?.version, id: id })
+          JSON.stringify({ version: version, id: id })
         )
         localStorage.setItem('activeSbomTab', 3)
         prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
@@ -144,9 +145,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
               localStorage.setItem(
                 'currentSBOM',
                 JSON.stringify({
-                  version: primaryComponent
-                    ? primaryComponent?.version
-                    : `Uploaded at ${getFullDateAndTime(creationAt)}`,
+                  version: version,
                   id: id
                 })
               )
@@ -155,8 +154,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
             }}
           >
             <Text color={'blue.500'} minWidth='100%' my={3} fontSize={14}>
-              {primaryComponent?.version ||
-                `Uploaded ${getFullDateAndTime(createdAt)}`}
+              {normalizeSBOMVersion(row)}
             </Text>
           </Link>
         )
@@ -182,7 +180,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
                 localStorage.setItem(
                   'currentSBOM',
                   JSON.stringify({
-                    version: primaryComponent?.version,
+                    version: version,
                     id: id
                   })
                 )
@@ -215,11 +213,13 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
       selector: (row) => {
         const { stats, id, primaryComponent } = row
         const link = `/vendor/products/${params.name}?id=${productId}&sbom=${id}`
+        const version = normalizeSBOMVersion(row)
+
         return (
           <Stack fontWeight={'medium'} direction={'row'}>
             <Link
               to={link}
-              onClick={() => onFilterSev(id, primaryComponent, ['critical'])}
+              onClick={() => onFilterSev(id, version, ['critical'])}
             >
               <VulnBadge color='red' label='Critical'>
                 {stats?.vulnStats?.critical ? stats.vulnStats.critical : 0}
@@ -227,7 +227,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
             </Link>
             <Link
               to={link}
-              onClick={() => onFilterSev(id, primaryComponent, ['high'])}
+              onClick={() => onFilterSev(id, version, ['high'])}
             >
               <VulnBadge color='orange' label='High'>
                 {stats?.vulnStats?.high ? stats.vulnStats.high : 0}
@@ -235,7 +235,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
             </Link>
             <Link
               to={link}
-              onClick={() => onFilterSev(id, primaryComponent, ['medium'])}
+              onClick={() => onFilterSev(id, version, ['medium'])}
             >
               <VulnBadge color='yellow' label='Medium'>
                 {stats?.vulnStats?.medium ? stats.vulnStats.medium : 0}
@@ -243,7 +243,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
             </Link>
             <Link
               to={link}
-              onClick={() => onFilterSev(id, primaryComponent, ['low'])}
+              onClick={() => onFilterSev(id, version, ['low'])}
             >
               <VulnBadge color='green' label='Low'>
                 {stats?.vulnStats?.low ? stats.vulnStats.low : 0}
@@ -268,8 +268,22 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
       }
     },
     {
+      id: 'CREATEDAT',
+      name: 'CREATED',
+      selector: (row) => {
+        const { creationAt } = row
+
+        return (
+          <Tooltip label={getFullDateAndTime(creationAt)} placement='top'>
+            <Text>{timeSince(creationAt)}</Text>
+          </Tooltip>
+        )
+      },
+      right: 'false'
+    },
+    {
       id: 'UPDATEDAT',
-      name: 'UPDATED AT',
+      name: 'UPDATED',
       selector: (row) => {
         const { updatedAt } = row
 
@@ -279,7 +293,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
           </Tooltip>
         )
       },
-      right: 'true'
+      right: 'false'
     },
     {
       id: 'ACTION',
@@ -298,19 +312,19 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
                 <MenuItem
                   onClick={() => {
                     setActiveRow(row)
+                    onListOpen()
+                  }}
+                >
+                  List SBOM
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    setActiveRow(row)
                     onDeleteOpen()
                   }}
                   isDisabled={!archiveSbom}
                 >
                   Delete
-                </MenuItem>
-                <MenuItem
-                  onClick={() => {
-                    setActiveRow(row)
-                    onListOpen()
-                  }}
-                >
-                  List SBOM
                 </MenuItem>
               </MenuList>
             </Portal>

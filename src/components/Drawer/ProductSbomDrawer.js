@@ -42,6 +42,7 @@ import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import { CpeAutoComplete } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { normalizeSBOMVersion } from 'utils'
 import CpeField from 'components/CpeField'
 
 function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
@@ -193,7 +194,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
   }
 
   const existingVersions = data?.defaultProject?.sboms.map(
-    (item) => item?.primaryComponent?.version
+    (item) => normalizeSBOMVersion(item)
   )
 
   const handleCreateComp = async (id) => {

@@ -45,9 +45,8 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV, FaFilter } from 'react-icons/fa'
 import { useLocation, Link, useParams } from 'react-router-dom'
-import { getFullDateAndTime, removeDuplicates } from 'utils'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
-import { isDefaultEnv } from 'utils'
+import { isDefaultEnv, normalizeSBOMVersion, removeDuplicates } from 'utils'
 
 const customStyles = {
   headCells: {
@@ -216,13 +215,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const existingVersions = []
 
   data?.map((item) =>
-    existingVersions.push(
-      item?.part?.primaryComponent
-        ? item?.part?.primaryComponent.id
-        : `Uploaded ${getFullDateAndTime(
-            item?.part?.primaryComponent?.creationAt
-          )}`
-    )
+    existingVersions.push(normalizeSBOMVersion(item.part))
   )
 
   const sbomVersions = []
@@ -231,20 +224,12 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
 
   filteredDuplicated &&
     filteredDuplicated.map((project) => {
+      const normalizedVersion = normalizeSBOMVersion(project)
       if (
-        !existingVersions?.includes(
-          project.primaryComponent
-            ? project.primaryComponent.id
-            : `Uploaded ${getFullDateAndTime(
-                project?.primaryComponent?.creationAt
-              )}`
-        )
+        !existingVersions?.includes(normalizedVersion)
       ) {
         sbomVersions.push({
-          label:
-            project.primaryComponent?.version.length > 0
-              ? project.primaryComponent.version
-              : `Uploaded ${getFullDateAndTime(project.creationAt)}`,
+          label: normalizedVersion,
           value: project.id,
           creationAt: project.creationAt
         })
@@ -316,9 +301,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
         const { part } = row
         return (
           <Text fontSize={14}>
-            {part.primaryComponent
-              ? part.primaryComponent.version
-              : `Uploaded at ${getFullDateAndTime(part.creationAt)}`}
+            {normalizeSBOMVersion(part)}
           </Text>
         )
       },

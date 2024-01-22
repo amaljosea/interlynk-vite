@@ -8,8 +8,12 @@ const Pagination = ({
     totalCount,
     onPreviousPage,
     onNextPage,
-    onSetRow
+    onSetRow,
+    hasPreviousPage,
+    hasNextPage
 }) => {
+
+    const totalPages = Math.ceil(totalCount / totalRows);
 
     return (
         <Flex
@@ -22,14 +26,14 @@ const Pagination = ({
             flexWrap={'wrap'}
         >
             <Stack alignItems={'center'} direction={'row'} spacing={4}>
-                <Button colorScheme='blue' onClick={onPreviousPage} isDisabled={pageIndex === 1}>
+                <Button colorScheme='blue' onClick={onPreviousPage} isDisabled={!hasPreviousPage}>
                     Prev
                 </Button>
-                <Button colorScheme='blue' onClick={onNextPage} isDisabled={pageIndex === Math.ceil(totalCount / totalRows)}>
+                <Button colorScheme='blue' onClick={onNextPage} isDisabled={!hasNextPage}>
                     Next
                 </Button>
                 <Box>
-                    Page {pageIndex} of {Math.ceil(totalCount / totalRows)}
+                    Page {pageIndex} of {totalPages}
                 </Box>
             </Stack>
 

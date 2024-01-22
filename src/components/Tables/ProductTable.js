@@ -33,10 +33,11 @@ import { useMutation } from '@apollo/client'
 import { DeleteProjectGroup } from 'graphQL/Mutation'
 
 import {
-  getFullDateAndTime,
-  timeSince,
   customStyles,
-  removeDuplicates
+  getFullDateAndTime,
+  normalizeSBOMVersion,
+  removeDuplicates,
+  timeSince,
 } from 'utils'
 
 import DataTable from 'react-data-table-component'
@@ -317,40 +318,37 @@ const ProductTable = ({ data, refetch }) => {
             name: name,
             version:
               data?.length > 0
-                ? defaultProject?.primaryComponent?.version
-                : defaultProject?.sboms?.length > 0
-                  ? defaultProject?.sboms[0].primaryComponent?.version
-                  : '',
-            sbomId: defaultProject
-              ? defaultProject?.primaryComponent?.version
+                  ? normalizeSBOMVersion(defaultProject)
+                  : defaultProject?.sboms?.length > 0
+                      ? normalizeSBOMVersion(defaultProject?.sboms[0])
+                      : '',
+          sbomId: defaultProject
+              ? defaultProject?.primaryComponent?.id
               : defaultProject?.sboms?.length > 0
-                ? defaultProject?.sboms[0].id
-                : '',
-            groupId: id
-          }
+                  ? defaultProject?.sboms[0]?.id
+                  : '',
+          groupId: id
+        }
 
-          const handleClick = () => {
-            localStorage.setItem('product', JSON.stringify(product))
-            localStorage.setItem('activeEnv', defaultProject?.id)
-            localStorage.setItem('activeProdTab', 0)
-            prodDispatch({
-              type: 'SET_CURRENT_PRODUCT',
-              payload: {
-                id: defaultProject?.id,
-                sbomId:
-                  defaultProject?.length > 0
-                    ? defaultProject?.primaryComponent?.version
-                    : defaultProject?.sboms[0]?.id || ''
-              }
-            })
-            setActiveSbomTab(0)
-          }
+        const handleClick = () => {
+          localStorage.setItem('product', JSON.stringify(product))
+          localStorage.setItem('activeEnv', defaultProject?.id)
+          localStorage.setItem('activeProdTab', 0)
+          prodDispatch({
+            type: 'SET_CURRENT_PRODUCT',
+            payload: {
+              id: defaultProject?.id,
+              sbomId:
+                defaultProject?.length > 0
+                  ? defaultProject?.primaryComponent?.id
+                  : defaultProject?.sboms[0]?.id || ''
+            }
+          })
+          setActiveSbomTab(0)
+        }
 
-          return (
-            <Link
-              to={`/vendor/products/${name}?id=${id}`}
-              onClick={handleClick}
-            >
+        return (
+            <Link to={`/vendor/products/${name}?id=${id}`} onClick={handleClick}>
               <Text color={'blue.500'} minWidth='100%'>
                 {name}
               </Text>
@@ -587,9 +585,13 @@ const ProductTable = ({ data, refetch }) => {
         enabled: true,
         field: 'PROJECT_GROUPS_UPDATED_AT',
         direction: 'DESC'
+      }).then((res) => {
+        if (res.data) {
+          prodDispatch({ type: 'FETCH_DATA_SUCCESS' })
+        }
       })
     }
-  }, [data, refetch, totalRows])
+  }, [data, refetch, totalRows, prodDispatch])
 
   return (
     <>
@@ -605,6 +607,8 @@ const ProductTable = ({ data, refetch }) => {
               onPreviousPage={handlePreviousPage}
               onNextPage={handleNextPage}
               onSetRow={handleSetRow}
+              hasNextPage={data.pageInfo.hasNextPage}
+              hasPreviousPage={data.pageInfo.hasPreviousPage}
             />
           )}
         </Flex>
