@@ -141,7 +141,7 @@ const ProductsOverview = ({ title, captions, data }) => {
                       <Td
                         fontSize={'sm'}
                         pl={1}
-                        width={24}
+                        width={32}
                         color='blue.500'
                         _hover={{ textDecoration: 'underline' }}
                       >
@@ -153,7 +153,7 @@ const ProductsOverview = ({ title, captions, data }) => {
                         </Link>
                       </Td>
                       {/* COMPONENTS */}
-                      <Td fontSize={'sm'} pl={1}>
+                      <Td fontSize={'sm'} pl={1} width={10}>
                         <Link
                           to={`/vendor/products/${item?.project?.projectGroup?.name}?id=${item?.projectId}&sbom=${item?.id}`}
                           onClick={() => onFilterComp(item)}
