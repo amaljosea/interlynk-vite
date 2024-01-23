@@ -32,9 +32,7 @@ import {
   UnorderedList,
   ListItem,
   Alert,
-  AlertIcon,
-  AlertTitle,
-  AlertDescription
+  AlertIcon
 } from '@chakra-ui/react'
 import { useMemo, useRef, useState } from 'react'
 import CustomLoader from 'components/CustomLoader'
@@ -46,7 +44,12 @@ import DataTable from 'react-data-table-component'
 import { FaEllipsisV, FaFilter } from 'react-icons/fa'
 import { useLocation, Link, useParams } from 'react-router-dom'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
-import { isDefaultEnv, normalizeSBOMVersion, removeDuplicates } from 'utils'
+import {
+  isDefaultEnv,
+  normalizeSBOMVersion,
+  removeDuplicates,
+  envOrderList
+} from 'utils'
 
 const customStyles = {
   headCells: {
@@ -215,21 +218,35 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const existingVersions = []
 
   data?.map((item) =>
-    existingVersions.push(normalizeSBOMVersion(item.part))
+    existingVersions.push(
+      item?.part?.primaryComponent
+        ? item?.part?.primaryComponent.id
+        : `Uploaded ${getFullDateAndTime(
+            item?.part?.primaryComponent?.creationAt
+          )}`
+    )
   )
 
   const sbomVersions = []
 
   const filteredDuplicated = product ? removeDuplicates(product.sboms) : []
 
+
   filteredDuplicated &&
     filteredDuplicated.map((project) => {
-      const normalizedVersion = normalizeSBOMVersion(project)
       if (
-        true
+        !existingVersions?.includes(
+          project.primaryComponent
+            ? project.primaryComponent.id
+            : `Uploaded ${getFullDateAndTime(
+                project?.primaryComponent?.creationAt
+              )}`
+        )
       ) {
         sbomVersions.push({
-          label: normalizedVersion,
+          label: project.primaryComponent
+            ? project.primaryComponent.version
+            : `Uploaded ${getFullDateAndTime(project.creationAt)}`,
           value: project.id,
           creationAt: project.creationAt
         })
@@ -299,11 +316,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       name: 'VERSION',
       selector: (row) => {
         const { part } = row
-        return (
-          <Text fontSize={14}>
-            {normalizeSBOMVersion(part)}
-          </Text>
-        )
+        return <Text fontSize={14}>{normalizeSBOMVersion(part)}</Text>
       },
       width: '200px',
       wrap: true
@@ -619,7 +632,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
                   >
                     <option value={''}>-- Select --</option>
                     {envList?.length > 0 &&
-                      envList.map((item, index) => (
+                      envOrderList(envList).map((item, index) => (
                         <option
                           key={index}
                           value={item.value}

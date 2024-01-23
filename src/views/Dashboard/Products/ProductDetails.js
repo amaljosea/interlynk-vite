@@ -69,6 +69,9 @@ import { GetProjectGroupComponentVulns } from 'graphQL/Queries'
 import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
 import StatusModal from './components/StatusModal'
 import { GetProjectGroup } from 'graphQL/Queries'
+import VulnInfo from '../Vulnerabilities/vulnInfo'
+import { GetGlobalVulnData } from 'graphQL/Queries'
+import { filterEnvList } from 'utils'
 
 const ProductDetails = () => {
   const navigate = useNavigate()
@@ -76,6 +79,7 @@ const ProductDetails = () => {
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
+  const vulnId = queryParams.get('vulnId')
 
   const {
     totalRows,
@@ -169,6 +173,8 @@ const ProductDetails = () => {
   const [projectDelete] = useMutation(DeleteProjectGroup, {
     onCompleted: () => refetch({ id: productId })
   })
+
+  const [getVulnData, { data: vulnInfo }] = useLazyQuery(GetGlobalVulnData)
 
   const activeTab = Number(localStorage.getItem('activeProdTab'))
 
@@ -272,6 +278,14 @@ const ProductDetails = () => {
     }
   }, [activeTab, activeEnv])
 
+  useEffect(() => {
+    if (vulnId) {
+      getVulnData({
+        variables: { id: vulnId, first: totalRows }
+      })
+    }
+  }, [vulnId])
+
   if (loading) {
     return (
       <Card>
@@ -299,327 +313,332 @@ const ProductDetails = () => {
         getVulnData={vulnRefetch}
       />
     )
-  } else {
-    return (
-      <>
-        <Flex flexDirection={'column'} alignItems={'flex-start'} gap={6}>
-          {/* INFO SECTION */}
-          <Card>
-            <CardBody>
-              {data && (
-                <Grid
-                  width={'100%'}
-                  templateColumns='repeat(5, 1fr)'
-                  alignItems={'top'}
-                  gap={10}
-                >
-                  {/* PRODUCT INFORMATIONS */}
-                  <GridItem colSpan={3}>
-                    <Flex
-                      direction={'row'}
-                      alignItems={'flex-start'}
-                      gap={5}
-                      width={'100%'}
-                    >
-                      <Icon
-                        as={FaWindowMaximize}
-                        h={'64px'}
-                        w={'64px'}
-                        color='blue.300'
-                      />
-                      <Flex direction={'column'} gap={0.5}>
-                        {/* PRODUCT TITLE */}
-                        <Stack
-                          direction={'column'}
-                          spacing={1}
-                          alignItems={'left'}
-                        >
-                          <Text fontWeight={'semibold'} fontSize={25}>
-                            {data?.projectGroup?.name || ''}
-                          </Text>
-                        </Stack>
-                        {/* PRODUCT DESCRIPTION */}
-                        <Text fontSize={'sm'}>
-                          {data?.projectGroup?.description || ''}
+  }
+
+  if (vulnId) {
+    return <VulnInfo data={vulnInfo?.vuln} refetch={getVulnData} />
+  }
+
+  return (
+    <>
+      <Flex flexDirection={'column'} alignItems={'flex-start'} gap={6}>
+        {/* INFO SECTION */}
+        <Card>
+          <CardBody>
+            {data && (
+              <Grid
+                width={'100%'}
+                templateColumns='repeat(5, 1fr)'
+                alignItems={'top'}
+                gap={10}
+              >
+                {/* PRODUCT INFORMATIONS */}
+                <GridItem colSpan={3}>
+                  <Flex
+                    direction={'row'}
+                    alignItems={'flex-start'}
+                    gap={5}
+                    width={'100%'}
+                  >
+                    <Icon
+                      as={FaWindowMaximize}
+                      h={'64px'}
+                      w={'64px'}
+                      color='blue.300'
+                    />
+                    <Flex direction={'column'} gap={0.5}>
+                      {/* PRODUCT TITLE */}
+                      <Stack
+                        direction={'column'}
+                        spacing={1}
+                        alignItems={'left'}
+                      >
+                        <Text fontWeight={'semibold'} fontSize={25}>
+                          {data?.projectGroup?.name || ''}
                         </Text>
-                      </Flex>
+                      </Stack>
+                      {/* PRODUCT DESCRIPTION */}
+                      <Text fontSize={'sm'}>
+                        {data?.projectGroup?.description || ''}
+                      </Text>
                     </Flex>
-                  </GridItem>
-                  {/* PRODUCT ACTIONS */}
-                  <GridItem colSpan={2}>
-                    <Flex
-                      direction={'row'}
-                      gap={2}
-                      justifyContent='flex-end'
-                      ml={'auto'}
-                      flexWrap={'wrap'}
+                  </Flex>
+                </GridItem>
+                {/* PRODUCT ACTIONS */}
+                <GridItem colSpan={2}>
+                  <Flex
+                    direction={'row'}
+                    gap={2}
+                    justifyContent='flex-end'
+                    ml={'auto'}
+                    flexWrap={'wrap'}
+                  >
+                    {/* EDIT PRODUCT */}
+                    <Tooltip label='Edit Product'>
+                      <IconButton
+                        isDisabled={
+                          !data?.projectGroup?.enabled || !updateProduct
+                        }
+                        colorScheme='blue'
+                        onClick={onOpenProduct}
+                        icon={<FaPenToSquare />}
+                      />
+                    </Tooltip>
+                    {/* UPLOAD SBOM */}
+                    <Tooltip label='Upload SBOM'>
+                      <IconButton
+                        isDisabled={!data?.projectGroup?.enabled}
+                        colorScheme='blue'
+                        onClick={onOpenUpload}
+                        icon={<FaUpload />}
+                      />
+                    </Tooltip>
+                    {/* UPDATE PRODUCT STATUS */}
+                    <Tooltip
+                      label={
+                        data?.projectGroup?.enabled
+                          ? 'Disable Product'
+                          : 'Enable Product'
+                      }
                     >
-                      {/* EDIT PRODUCT */}
-                      <Tooltip label='Edit Product'>
-                        <IconButton
-                          isDisabled={
-                            !data?.projectGroup?.enabled || !updateProduct
-                          }
-                          colorScheme='blue'
-                          onClick={onOpenProduct}
-                          icon={<FaPenToSquare />}
-                        />
-                      </Tooltip>
-                      {/* UPLOAD SBOM */}
-                      <Tooltip label='Upload SBOM'>
-                        <IconButton
-                          isDisabled={!data?.projectGroup?.enabled}
-                          colorScheme='blue'
-                          onClick={onOpenUpload}
-                          icon={<FaUpload />}
-                        />
-                      </Tooltip>
-                      {/* UPDATE PRODUCT STATUS */}
-                      <Tooltip
-                        label={
-                          data?.projectGroup?.enabled
-                            ? 'Disable Product'
-                            : 'Enable Product'
+                      <IconButton
+                        colorScheme={'blue'}
+                        onClick={onWarningOpen}
+                        icon={
+                          data?.projectGroup?.enabled ? (
+                            <FaToggleOff />
+                          ) : (
+                            <FaToggleOn />
+                          )
+                        }
+                      />
+                    </Tooltip>
+                    {/* ARCHIVE PRODUCT */}
+                    <Tooltip label='Archive Product'>
+                      <IconButton
+                        colorScheme='red'
+                        onClick={onDeleteOpen}
+                        icon={<FaBoxArchive />}
+                        isDisabled={!archiveProduct}
+                      />
+                    </Tooltip>
+                  </Flex>
+                </GridItem>
+              </Grid>
+            )}
+          </CardBody>
+        </Card>
+        {/* TAB SECTION */}
+        <Card>
+          <CardHeader>
+            <Flex width={'100%'} justifyContent={'flex-end'}>
+              {/* CHANGE ENVIRONMENT */}
+              <Menu>
+                <MenuButton
+                  as={Button}
+                  variant={'solid'}
+                  colorScheme='blue'
+                  fontSize={'sm'}
+                  textTransform={
+                    isDefaultEnv(defaultEnv) ? 'capitalize' : 'none'
+                  }
+                  rightIcon={<ChevronDownIcon />}
+                >
+                  {defaultEnv}
+                </MenuButton>
+                <MenuList>
+                  <MenuOptionGroup
+                    type='radio'
+                    value={activeEnv}
+                    onChange={onChangeEnv}
+                  >
+                    {filterEnvList(data?.projectGroup?.projects)?.map((item) => (
+                      <MenuItemOption
+                        fontSize={'sm'}
+                        value={item?.id}
+                        key={item?.id}
+                        textTransform={
+                          isDefaultEnv(item?.name) ? 'capitalize' : 'none'
                         }
                       >
-                        <IconButton
-                          colorScheme={'blue'}
-                          onClick={onWarningOpen}
-                          icon={
-                            data?.projectGroup?.enabled ? (
-                              <FaToggleOff />
-                            ) : (
-                              <FaToggleOn />
-                            )
-                          }
-                        />
-                      </Tooltip>
-                      {/* ARCHIVE PRODUCT */}
-                      <Tooltip label='Archive Product'>
-                        <IconButton
-                          colorScheme='red'
-                          onClick={onDeleteOpen}
-                          icon={<FaBoxArchive />}
-                          isDisabled={!archiveProduct}
-                        />
-                      </Tooltip>
-                    </Flex>
-                  </GridItem>
-                </Grid>
-              )}
-            </CardBody>
-          </Card>
-          {/* TAB SECTION */}
-          <Card>
-            <CardHeader>
-              <Flex width={'100%'} justifyContent={'flex-end'}>
-                {/* CHANGE ENVIRONMENT */}
-                <Menu>
-                  <MenuButton
-                    as={Button}
-                    variant={'solid'}
-                    colorScheme='blue'
-                    fontSize={'sm'}
-                    textTransform={
-                      isDefaultEnv(defaultEnv) ? 'capitalize' : 'none'
-                    }
-                    rightIcon={<ChevronDownIcon />}
-                  >
-                    {defaultEnv}
-                  </MenuButton>
-                  <MenuList>
-                    <MenuOptionGroup
-                      type='radio'
-                      value={activeEnv}
-                      onChange={onChangeEnv}
-                    >
-                      {data?.projectGroup?.projects?.map((item) => (
-                        <MenuItemOption
-                          fontSize={'sm'}
-                          value={item?.id}
-                          key={item?.id}
-                          textTransform={
-                            isDefaultEnv(item?.name) ? 'capitalize' : 'none'
-                          }
-                        >
-                          {item?.name}
-                        </MenuItemOption>
-                      ))}
-                      <MenuDivider />
-                      <MenuItem
-                        fontSize={'sm'}
-                        icon={<ViewIcon />}
-                        onClick={() => onEnvOpen()}
-                      >
-                        Manage Environments
-                      </MenuItem>
-                    </MenuOptionGroup>
-                  </MenuList>
-                </Menu>
-              </Flex>
-            </CardHeader>
-            <CardBody mt={6}>
-              <Tabs
-                variant='enclosed'
-                w={'100%'}
-                bg={'white'}
-                index={activeProdTab}
-                onChange={(value) => handleTabChange(value)}
-              >
-                <TabList>
-                  {[
-                    'versions',
-                    'vulnerabilities',
-                    'automation rules',
-                    'settings',
-                    'change log'
-                  ].map((item, index) => (
-                    <Tab
-                      key={index}
-                      _focus={{ outline: 'none' }}
-                      textTransform={'capitalize'}
-                    >
-                      {item}
-                    </Tab>
-                  ))}
-                </TabList>
-                <TabPanels>
-                  {/* VERSIONS */}
-                  <TabPanel>
-                    {data && (
-                      <VersionTable
-                        productId={activeEnv}
-                        project={versions?.project}
-                        data={data?.projectGroup}
-                        getVulnData={vulnRefetch}
-                        refetch={sbomRefetch}
-                      />
-                    )}
-                  </TabPanel>
-                  {/* VULNERABILITIES */}
-                  <TabPanel>
-                    <GlobalVulnTable
-                      data={globalVulnData?.projectGroup?.componentVulns}
-                      refetch={globalVulnRefetch}
-                    />
-                  </TabPanel>
-                  {/* AUTOMATIONS */}
-                  <TabPanel>
-                    {rulesError && (
-                      <Text textAlign={'center'} my={6}>
-                        {JSON.stringify(rulesError)}
-                      </Text>
-                    )}
-                    <Automation
-                      data={rules?.project.autoChecks}
-                      refetch={getRules}
-                      productId={activeEnv}
-                    />
-                  </TabPanel>
-                  {/* SETTINGS */}
-                  <TabPanel>
-                    <Settings
-                      data={settings?.project?.projectSetting}
-                      enabled={data?.projectGroup?.enabled}
-                      activeEnv={activeEnv}
-                      refetch={getSettings}
-                    />
-                  </TabPanel>
-                  {/* CHANGE LOG */}
-                  <TabPanel>
-                    <ChangeLog
-                      data={prodLogs}
-                      refetch={getLogs}
-                      activeEnv={activeEnv}
-                    />
-                  </TabPanel>
-                </TabPanels>
-              </Tabs>
-            </CardBody>
-          </Card>
-        </Flex>
-
-        {/* CREATE PRODUCT */}
-        {data && isOpenProduct && (
-          <ProductModal
-            description={data?.projectGroup?.description}
-            product={data?.projectGroup?.name}
-            id={data?.projectGroup?.id}
-            onClose={onCloseProduct}
-            isOpen={isOpenProduct}
-            refetch={refetch}
-          />
-        )}
-
-        {/* UPLOAD SBOM */}
-        {isOpenUpload && data && (
-          <UploadModal
-            projects={data?.projectGroup?.projects}
-            isOpen={isOpenUpload}
-            onClose={onCloseUpload}
-            activeEnv={activeEnv}
-          />
-        )}
-
-        {/* DISABLED */}
-        {isWarningOpen && data && (
-          <StatusModal
-            isOpen={isWarningOpen}
-            onClose={onWarningClose}
-            group={data?.projectGroup}
-            grouId={productId}
-            refetch={refetch}
-          />
-        )}
-
-        {/* DELETE */}
-        {isDeleteOpen && (
-          <Modal isOpen={isDeleteOpen} onClose={onDeleteClose}>
-            <ModalOverlay />
-            <ModalContent>
-              <ModalHeader>Archive Product</ModalHeader>
-              <ModalCloseButton />
-              <ModalBody>
-                <Text>Archiving this product will: </Text>
-                <UnorderedList>
-                  <Flex flexDir={'column'} gap={1} mt={4}>
-                    {[
-                      'remove this product, its versions and SBOMs',
-                      'remove access to the product for all users',
-                      'disable uploads of SBOMs to this product'
-                    ].map((item, index) => (
-                      <ListItem key={index}>{item}</ListItem>
+                        {item?.name}
+                      </MenuItemOption>
                     ))}
-                  </Flex>
-                </UnorderedList>
-                <br />
-                <Text mt={10}>Are you sure you wish to continue?</Text>
-              </ModalBody>
-              <ModalFooter>
-                <Button mr={3} onClick={onDeleteClose}>
-                  No
-                </Button>
-                <Button colorScheme='red' onClick={onProductDelete}>
-                  Yes
-                </Button>
-              </ModalFooter>
-            </ModalContent>
-          </Modal>
-        )}
+                    <MenuDivider />
+                    <MenuItem
+                      fontSize={'sm'}
+                      icon={<ViewIcon />}
+                      onClick={() => onEnvOpen()}
+                    >
+                      Manage Environments
+                    </MenuItem>
+                  </MenuOptionGroup>
+                </MenuList>
+              </Menu>
+            </Flex>
+          </CardHeader>
+          <CardBody mt={6}>
+            <Tabs
+              variant='enclosed'
+              w={'100%'}
+              bg={'white'}
+              index={activeProdTab}
+              onChange={(value) => handleTabChange(value)}
+            >
+              <TabList>
+                {[
+                  'versions',
+                  'vulnerabilities',
+                  'automation rules',
+                  'settings',
+                  'change log'
+                ].map((item, index) => (
+                  <Tab
+                    key={index}
+                    _focus={{ outline: 'none' }}
+                    textTransform={'capitalize'}
+                  >
+                    {item}
+                  </Tab>
+                ))}
+              </TabList>
+              <TabPanels>
+                {/* VERSIONS */}
+                <TabPanel px={0}>
+                  {data && (
+                    <VersionTable
+                      productId={activeEnv}
+                      project={versions?.project}
+                      data={data?.projectGroup}
+                      getVulnData={vulnRefetch}
+                      refetch={sbomRefetch}
+                    />
+                  )}
+                </TabPanel>
+                {/* VULNERABILITIES */}
+                <TabPanel px={0}>
+                  <GlobalVulnTable
+                    data={globalVulnData?.projectGroup?.componentVulns}
+                    refetch={globalVulnRefetch}
+                  />
+                </TabPanel>
+                {/* AUTOMATIONS */}
+                <TabPanel px={0}>
+                  {rulesError && (
+                    <Text textAlign={'center'} my={6}>
+                      {JSON.stringify(rulesError)}
+                    </Text>
+                  )}
+                  <Automation
+                    data={rules?.project.autoChecks}
+                    refetch={getRules}
+                    productId={activeEnv}
+                  />
+                </TabPanel>
+                {/* SETTINGS */}
+                <TabPanel px={0}>
+                  <Settings
+                    data={settings?.project?.projectSetting}
+                    enabled={data?.projectGroup?.enabled}
+                    activeEnv={activeEnv}
+                    refetch={getSettings}
+                  />
+                </TabPanel>
+                {/* CHANGE LOG */}
+                <TabPanel px={0}>
+                  <ChangeLog
+                    data={prodLogs}
+                    refetch={getLogs}
+                    activeEnv={activeEnv}
+                  />
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
+          </CardBody>
+        </Card>
+      </Flex>
 
-        {/* ENV LIST */}
-        {isEnvOpen && (
-          <EnvironmentDrawer
-            isOpen={isEnvOpen}
-            onClose={onEnvClose}
-            data={data}
-            refetch={refetch}
-            activeEnv={activeEnv}
-          />
-        )}
-      </>
-    )
-  }
+      {/* CREATE PRODUCT */}
+      {data && isOpenProduct && (
+        <ProductModal
+          description={data?.projectGroup?.description}
+          product={data?.projectGroup?.name}
+          id={data?.projectGroup?.id}
+          onClose={onCloseProduct}
+          isOpen={isOpenProduct}
+          refetch={refetch}
+        />
+      )}
+
+      {/* UPLOAD SBOM */}
+      {isOpenUpload && data && (
+        <UploadModal
+          projects={data?.projectGroup?.projects}
+          isOpen={isOpenUpload}
+          onClose={onCloseUpload}
+          activeEnv={activeEnv}
+        />
+      )}
+
+      {/* DISABLED */}
+      {isWarningOpen && data && (
+        <StatusModal
+          isOpen={isWarningOpen}
+          onClose={onWarningClose}
+          group={data?.projectGroup}
+          grouId={productId}
+          refetch={refetch}
+        />
+      )}
+
+      {/* DELETE */}
+      {isDeleteOpen && (
+        <Modal isOpen={isDeleteOpen} onClose={onDeleteClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Archive Product</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Text>Archiving this product will: </Text>
+              <UnorderedList>
+                <Flex flexDir={'column'} gap={1} mt={4}>
+                  {[
+                    'remove this product, its versions and SBOMs',
+                    'remove access to the product for all users',
+                    'disable uploads of SBOMs to this product'
+                  ].map((item, index) => (
+                    <ListItem key={index}>{item}</ListItem>
+                  ))}
+                </Flex>
+              </UnorderedList>
+              <br />
+              <Text mt={10}>Are you sure you wish to continue?</Text>
+            </ModalBody>
+            <ModalFooter>
+              <Button mr={3} onClick={onDeleteClose}>
+                No
+              </Button>
+              <Button colorScheme='red' onClick={onProductDelete}>
+                Yes
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      )}
+
+      {/* ENV LIST */}
+      {isEnvOpen && (
+        <EnvironmentDrawer
+          isOpen={isEnvOpen}
+          onClose={onEnvClose}
+          data={data}
+          refetch={refetch}
+          activeEnv={activeEnv}
+          setActiveEnv={setActiveEnv}
+        />
+      )}
+    </>
+  )
 }
 
 export default ProductDetails

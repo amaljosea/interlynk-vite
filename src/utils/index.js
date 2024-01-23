@@ -703,3 +703,39 @@ export const isDefaultEnv = (name) => {
       return false
   }
 }
+
+export const filterEnvList = (projects) => {
+  const defaultEnvs = [...projects].filter(
+    (item) =>
+      item.name === 'default' ||
+      item.name === 'development' ||
+      item.name === 'production'
+  )
+  const newEnvs = [...projects]
+    .filter(
+      (item) =>
+        item.name !== 'default' &&
+        item.name !== 'development' &&
+        item.name !== 'production'
+    )
+    .sort((a, b) => a.name.localeCompare(b.name))
+  return [...defaultEnvs, ...newEnvs]
+}
+
+export const envOrderList = (projects) => {
+  const defaultEnvs = [...projects].filter(
+    (item) =>
+      item.label === 'default' ||
+      item.label === 'development' ||
+      item.label === 'production'
+  )
+  const newEnvs = [...projects]
+    .filter(
+      (item) =>
+        item.label !== 'default' &&
+        item.label !== 'development' &&
+        item.label !== 'production'
+    )
+    .sort((a, b) => a.label.localeCompare(b.label))
+  return [...defaultEnvs, ...newEnvs]
+}

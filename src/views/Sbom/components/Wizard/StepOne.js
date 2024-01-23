@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react'
 import { GetProject, GetProjectGroups } from 'graphQL/Queries'
 import { useLazyQuery, useQuery } from '@apollo/client'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { isDefaultEnv, normalizeSBOMVersion, removeDuplicates } from 'utils'
+import { isDefaultEnv, normalizeSBOMVersion, removeDuplicates,envOrderList } from 'utils'
 
 const StepOne = ({
   setProductId,
@@ -185,19 +185,20 @@ const StepOne = ({
                 textTransform={isDefaultEnv(envName) ? 'capitalize' : 'none'}
               >
                 <option value={''}>-- Select --</option>
-                {productList.map((item, index) => (
-                  <option
-                    key={index}
-                    value={item.value}
-                    style={{
-                      textTransform: isDefaultEnv(item.label)
-                        ? 'capitalize'
-                        : 'none'
-                    }}
-                  >
-                    {item.label}
-                  </option>
-                ))}
+                {productList?.length > 0 &&
+                  envOrderList(productList).map((item, index) => (
+                    <option
+                      key={index}
+                      value={item.value}
+                      style={{
+                        textTransform: isDefaultEnv(item.label)
+                          ? 'capitalize'
+                          : 'none'
+                      }}
+                    >
+                      {item.label}
+                    </option>
+                  ))}
               </Select>
             </FormControl>
             {/* Version */}

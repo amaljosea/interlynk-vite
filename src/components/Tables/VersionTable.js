@@ -145,7 +145,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
               localStorage.setItem(
                 'currentSBOM',
                 JSON.stringify({
-                  version: version,
+                  version: primaryComponent ? primaryComponent?.version : `Uploaded at ${getFullDateAndTime(creationAt)}`,
                   id: id
                 })
               )
@@ -512,7 +512,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
         <ProductSbomDrawer
           isOpen={isSbomOpen}
           onClose={onSbomClose}
-          data={data?.projects}
+          data={data}
           refetch={refetch}
           productId={productId}
         />

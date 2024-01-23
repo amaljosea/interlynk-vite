@@ -8,6 +8,7 @@ import ChangelogFilterMenu from 'views/Sbom/components/ChangelogFilterMenu'
 import RowLimit from 'views/Sbom/components/RowLimit'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import {RepeatIcon} from "@chakra-ui/icons";
+import Pagination from "../Pagination";
 
 const setColor = (type) => {
   switch (type) {
@@ -29,6 +30,8 @@ const setColor = (type) => {
 }
 
 const ChangelogTable = ({ data, refetch, activeEnv }) => {
+  const paginationSizes = [25, 50, 100]
+
   const { totalRows, setTotalRows, prodLogState, dispatch } = useGlobalState()
   const {
     field,
@@ -150,7 +153,7 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
     direction
   }
 
-  const onPreviousPage = async () => {
+  const handlePreviousPage = async () => {
     await refetch({
       variables: {
         last: totalRows,
@@ -168,7 +171,7 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
     )
   }
 
-  const onNextPage = async () => {
+  const handleNextPage = async () => {
     await refetch({
       variables: {
         first: totalRows,
@@ -338,39 +341,17 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
 
       {/* PAGINATION */}
       {data && (
-        <Flex
-          width={'100%'}
-          flexDir={'row'}
-          gap={4}
-          alignItems={'center'}
-          mt={6}
-          justifyContent={'space-between'}
-        >
-          <Stack alignItems={'center'} direction={'row'} spacing={4}>
-            <Button
-              colorScheme='blue'
-              onClick={onPreviousPage}
-              isDisabled={!data.pageInfo.hasPreviousPage}
-            >
-              Previous
-            </Button>
-            <Button
-              colorScheme='blue'
-              onClick={onNextPage}
-              isDisabled={!data.pageInfo.hasNextPage}
-            >
-              Next
-            </Button>
-            <Box>
-              Page {pageIndex} of{' '}
-              {data.totalCount === 0
-                ? 1
-                : Math.ceil(data.totalCount / totalRows)}
-            </Box>
-          </Stack>
-
-          <RowLimit onChange={handleSetRow} name='prodChangelogRow' />
-        </Flex>
+          <Pagination
+              paginationSizes={paginationSizes}
+              pageIndex={pageIndex}
+              totalRows={totalRows}
+              totalCount={data.totalCount}
+              onPreviousPage={handlePreviousPage}
+              onNextPage={handleNextPage}
+              onSetRow={handleSetRow}
+              hasNextPage={data.pageInfo.hasNextPage}
+              hasPreviousPage={data.pageInfo.hasPreviousPage}
+          />
       )}
     </>
   )

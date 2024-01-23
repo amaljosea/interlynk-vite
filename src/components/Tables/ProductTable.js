@@ -37,7 +37,7 @@ import {
   getFullDateAndTime,
   normalizeSBOMVersion,
   removeDuplicates,
-  timeSince,
+  timeSince
 } from 'utils'
 
 import DataTable from 'react-data-table-component'
@@ -63,7 +63,7 @@ const ProductTable = ({ data, refetch }) => {
   const paginationSizes = [25, 50, 100]
 
   const { field, direction, searchInput, pageIndex } = prodState
-  const { prodDispatch, sbomDispatch } = dispatch
+  const { prodDispatch, prodCompDispatch } = dispatch
 
   const [totalRows, setTotalRows] = useState(paginationSizes[0])
   const [filterText, setFilterText] = useState(searchInput)
@@ -137,11 +137,11 @@ const ProductTable = ({ data, refetch }) => {
 
   const handleOpenSbom = useCallback(
     (row) => {
-      sbomDispatch({ type: 'CLEAR_LICENSES' })
+      prodCompDispatch({ type: 'CLEAR_LICENSES' })
       setActiveRow(row)
       onSbomOpen()
     },
-    [sbomDispatch, setActiveRow, onSbomOpen]
+    [prodCompDispatch, setActiveRow, onSbomOpen]
   )
 
   const onProductDelete = useCallback(async () => {
@@ -210,7 +210,7 @@ const ProductTable = ({ data, refetch }) => {
   const onFilterActive = useCallback(
     async (value) => {
       await refetch({
-        enabled: value === 'all' ? undefined : value === 'yes',
+        enabled: value === 'yes' ? true : value === 'no' ? false : undefined,
         first: totalRows,
         last: undefined,
         after: undefined,
@@ -318,37 +318,40 @@ const ProductTable = ({ data, refetch }) => {
             name: name,
             version:
               data?.length > 0
-                  ? normalizeSBOMVersion(defaultProject)
-                  : defaultProject?.sboms?.length > 0
-                      ? normalizeSBOMVersion(defaultProject?.sboms[0])
-                      : '',
-          sbomId: defaultProject
+                ? normalizeSBOMVersion(defaultProject)
+                : defaultProject?.sboms?.length > 0
+                  ? normalizeSBOMVersion(defaultProject?.sboms[0])
+                  : '',
+            sbomId: defaultProject
               ? defaultProject?.primaryComponent?.id
               : defaultProject?.sboms?.length > 0
-                  ? defaultProject?.sboms[0]?.id
-                  : '',
-          groupId: id
-        }
+                ? defaultProject?.sboms[0]?.id
+                : '',
+            groupId: id
+          }
 
-        const handleClick = () => {
-          localStorage.setItem('product', JSON.stringify(product))
-          localStorage.setItem('activeEnv', defaultProject?.id)
-          localStorage.setItem('activeProdTab', 0)
-          prodDispatch({
-            type: 'SET_CURRENT_PRODUCT',
-            payload: {
-              id: defaultProject?.id,
-              sbomId:
-                defaultProject?.length > 0
-                  ? defaultProject?.primaryComponent?.id
-                  : defaultProject?.sboms[0]?.id || ''
-            }
-          })
-          setActiveSbomTab(0)
-        }
+          const handleClick = () => {
+            localStorage.setItem('product', JSON.stringify(product))
+            localStorage.setItem('activeEnv', defaultProject?.id)
+            localStorage.setItem('activeProdTab', 0)
+            prodDispatch({
+              type: 'SET_CURRENT_PRODUCT',
+              payload: {
+                id: defaultProject?.id,
+                sbomId:
+                  defaultProject?.length > 0
+                    ? defaultProject?.primaryComponent?.id
+                    : defaultProject?.sboms[0]?.id || ''
+              }
+            })
+            setActiveSbomTab(0)
+          }
 
-        return (
-            <Link to={`/vendor/products/${name}?id=${id}`} onClick={handleClick}>
+          return (
+            <Link
+              to={`/vendor/products/${name}?id=${id}`}
+              onClick={handleClick}
+            >
               <Text color={'blue.500'} minWidth='100%'>
                 {name}
               </Text>
@@ -577,21 +580,6 @@ const ProductTable = ({ data, refetch }) => {
     responsive: true,
     persistTableHead: true
   }
-
-  useEffect(() => {
-    if (!data) {
-      refetch({
-        first: totalRows,
-        enabled: true,
-        field: 'PROJECT_GROUPS_UPDATED_AT',
-        direction: 'DESC'
-      }).then((res) => {
-        if (res.data) {
-          prodDispatch({ type: 'FETCH_DATA_SUCCESS' })
-        }
-      })
-    }
-  }, [data, refetch, totalRows, prodDispatch])
 
   return (
     <>

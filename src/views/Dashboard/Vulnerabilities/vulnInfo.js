@@ -24,7 +24,7 @@ import { FaCodeMerge } from 'react-icons/fa6'
 
 const VulnInfo = ({ data, refetch }) => {
   return (
-    <Flex direction='column' pt={{ base: '120px', md: '74px' }} pr={2} pl={5}>
+    <>
       {/* Product Info */}
       {data && (
         <Card mb='6'>
@@ -201,7 +201,7 @@ const VulnInfo = ({ data, refetch }) => {
           </TabPanels>
         </Tabs>
       </Card>
-    </Flex>
+    </>
   )
 }
 

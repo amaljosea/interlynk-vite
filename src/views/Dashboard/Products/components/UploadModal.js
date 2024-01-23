@@ -24,7 +24,7 @@ import {
 import { UploadSbom } from 'graphQL/Mutation'
 import { useState } from 'react'
 import { FaUpload } from 'react-icons/fa'
-import { isDefaultEnv } from 'utils'
+import { filterEnvList, isDefaultEnv } from 'utils'
 
 const UploadModal = ({ projects, isOpen, onClose, activeEnv }) => {
   const toast = useToast()
@@ -113,7 +113,7 @@ const UploadModal = ({ projects, isOpen, onClose, activeEnv }) => {
                   }
                 >
                   {projects?.length > 0 &&
-                    projects?.map((item) => (
+                    filterEnvList(projects).map((item) => (
                       <option
                         key={item.id}
                         value={item.id}

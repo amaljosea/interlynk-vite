@@ -1,4 +1,4 @@
-import { AddIcon, DeleteIcon } from '@chakra-ui/icons'
+import { AddIcon, CheckCircleIcon, DeleteIcon } from '@chakra-ui/icons'
 import {
   Drawer,
   DrawerBody,
@@ -7,29 +7,59 @@ import {
   DrawerOverlay,
   DrawerContent,
   DrawerCloseButton,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
   Button,
   Text,
   Flex,
   Tooltip,
   IconButton,
   Stack,
-  useDisclosure
+  useDisclosure,
+  UnorderedList,
+  ListItem,
 } from '@chakra-ui/react'
-import { timeSince, customStyles, getFullDateAndTime } from 'utils'
+import {
+  timeSince,
+  customStyles,
+  getFullDateAndTime,
+  isDefaultEnv,
+  removeDuplicates,
+  filterEnvList
+} from 'utils'
 import CustomLoader from 'components/CustomLoader'
 import DataTable from 'react-data-table-component'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import EnvModal from 'views/Dashboard/Products/components/EnvModal'
 import { useMutation } from '@apollo/client'
 import { EnvDelete } from 'graphQL/Mutation'
-import { isDefaultEnv } from 'utils'
 
-const EnvironmentDrawer = ({ data, isOpen, onClose, refetch, activeEnv }) => {
+const EnvironmentDrawer = ({
+  data,
+  isOpen,
+  onClose,
+  refetch,
+  activeEnv,
+  setActiveEnv
+}) => {
   const {
     isOpen: isProdOpen,
     onOpen: onProdOpen,
     onClose: onProdClose
   } = useDisclosure()
+
+  const {
+    isOpen: isWarningOpen,
+    onOpen: onWarningOpen,
+    onClose: onWarningClose
+  } = useDisclosure()
+
+  const [activeRow, setActiveRow] = useState(null)
 
   const [projectDelete] = useMutation(EnvDelete)
 
@@ -38,13 +68,18 @@ const EnvironmentDrawer = ({ data, isOpen, onClose, refetch, activeEnv }) => {
       variables: {
         id
       }
-    }).then(
-      (res) =>
-        res.data &&
-        refetch({
-          id: data?.projectGroup?.id
-        })
-    )
+    })
+      .then((res) => {
+        if (res?.data) {
+          if (id === activeEnv) {
+            setActiveEnv(data?.projectGroup?.defaultProject?.id)
+          }
+          refetch({
+            id: data?.projectGroup?.id
+          })
+        }
+      })
+      .finally(() => onWarningClose())
   }
 
   // TABLE HEADER
@@ -76,20 +111,23 @@ const EnvironmentDrawer = ({ data, isOpen, onClose, refetch, activeEnv }) => {
       id: 'NAME',
       name: 'NAME',
       selector: (row) => {
-        const { name } = row
+        const { id, name } = row
         return (
-          <Text textTransform={isDefaultEnv(name) ? 'capitalize' : 'none'}>
-            {name}
-          </Text>
+          <Flex flexDir={'row'} gap={2} alignItems={'flex-start'}>
+            <Text textTransform={isDefaultEnv(name) ? 'capitalize' : 'none'}>
+              {name}
+            </Text>
+            {id === activeEnv && <CheckCircleIcon color={'blue.500'} />}
+          </Flex>
         )
       },
       wrap: true
     },
     // VERSION
     {
-      id: 'VERSION',
-      name: 'VERSION',
-      selector: (row) => <Text>{row?.sboms?.length}</Text>,
+      id: 'VERSIONS',
+      name: 'VERSIONS',
+      selector: (row) => <Text>{removeDuplicates(row?.sboms)?.length}</Text>,
       wrap: true
     },
     // CREATED AT
@@ -115,8 +153,11 @@ const EnvironmentDrawer = ({ data, isOpen, onClose, refetch, activeEnv }) => {
             icon={<DeleteIcon />}
             colorScheme='red'
             variant='solid'
-            isDisabled={isDefaultEnv(name) || id === activeEnv}
-            onClick={() => handleDelete(id)}
+            isDisabled={isDefaultEnv(name)}
+            onClick={() => {
+              setActiveRow(row)
+              onWarningOpen()
+            }}
           />
         )
       },
@@ -131,13 +172,18 @@ const EnvironmentDrawer = ({ data, isOpen, onClose, refetch, activeEnv }) => {
         <DrawerContent>
           <DrawerCloseButton />
           <DrawerHeader>Environments</DrawerHeader>
-
           <DrawerBody>
             <Flex flexDir={'column'} width={'100%'}>
               <DataTable
                 columns={columns}
-                data={data?.projectGroup?.projects || []}
+                data={
+                  data?.projectGroup
+                    ? filterEnvList(data?.projectGroup?.projects)
+                    : []
+                }
                 customStyles={customStyles}
+                defaultSortAsc
+                defaultSortFieldId={'NAME'}
                 progressPending={data?.projectGroup ? false : true}
                 progressComponent={<CustomLoader />}
                 subHeader
@@ -162,10 +208,46 @@ const EnvironmentDrawer = ({ data, isOpen, onClose, refetch, activeEnv }) => {
         <EnvModal
           isOpen={isProdOpen}
           onClose={onProdClose}
-          onEnvClose={onClose}
           groupId={data?.projectGroup?.id}
           refetch={refetch}
         />
+      )}
+
+      {/* DELETE WARNING */}
+      {isWarningOpen && activeRow && (
+        <Modal isOpen={isWarningOpen} onClose={onWarningClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>{activeRow?.name}</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Text>Archiving this environment will: </Text>
+              <UnorderedList>
+                <Flex flexDir={'column'} gap={1} mt={4}>
+                  {[
+                    'remove this environment, its versions and SBOMs',
+                    'remove access to the product for all users',
+                    'disable uploads of SBOMs to this product'
+                  ].map((item, index) => (
+                    <ListItem key={index}>{item}</ListItem>
+                  ))}
+                </Flex>
+              </UnorderedList>
+              <Text mt={10}>Are you sure you wish to continue?</Text>
+            </ModalBody>
+            <ModalFooter>
+              <Button mr={3} onClick={onWarningClose}>
+                Cancel
+              </Button>
+              <Button
+                colorScheme='red'
+                onClick={() => handleDelete(activeRow?.id)}
+              >
+                Ok
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       )}
     </>
   )
