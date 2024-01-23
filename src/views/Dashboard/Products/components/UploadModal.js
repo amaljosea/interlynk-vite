@@ -113,19 +113,21 @@ const UploadModal = ({ projects, isOpen, onClose, activeEnv }) => {
                   }
                 >
                   {projects?.length > 0 &&
-                    projects?.map((item) => (
-                      <option
-                        key={item.id}
-                        value={item.id}
-                        style={{
-                          textTransform: isDefaultEnv(item.name)
-                            ? 'capitalize'
-                            : 'none'
-                        }}
-                      >
-                        {item.name}
-                      </option>
-                    ))}
+                    [...projects]
+                      .sort((a, b) => a.name.localeCompare(b.name))
+                      .map((item) => (
+                        <option
+                          key={item.id}
+                          value={item.id}
+                          style={{
+                            textTransform: isDefaultEnv(item.name)
+                              ? 'capitalize'
+                              : 'none'
+                          }}
+                        >
+                          {item.name}
+                        </option>
+                      ))}
                 </Select>
                 <FormHelperText>
                   Interlynk supports importing CycloneDX versions 1.2-1.5 in

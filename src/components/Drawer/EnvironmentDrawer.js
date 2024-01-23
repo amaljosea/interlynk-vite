@@ -22,7 +22,7 @@ import { useMemo } from 'react'
 import EnvModal from 'views/Dashboard/Products/components/EnvModal'
 import { useMutation } from '@apollo/client'
 import { EnvDelete } from 'graphQL/Mutation'
-import { isDefaultEnv } from 'utils'
+import { isDefaultEnv, removeDuplicates } from 'utils'
 
 const EnvironmentDrawer = ({ data, isOpen, onClose, refetch, activeEnv }) => {
   const {
@@ -83,13 +83,15 @@ const EnvironmentDrawer = ({ data, isOpen, onClose, refetch, activeEnv }) => {
           </Text>
         )
       },
-      wrap: true
+      wrap: true,
+      sortable: true,
+      sortFunction: (a, b) => a.name.localeCompare(b.name)
     },
     // VERSION
     {
-      id: 'VERSION',
-      name: 'VERSION',
-      selector: (row) => <Text>{row?.sboms?.length}</Text>,
+      id: 'VERSIONS',
+      name: 'VERSIONS',
+      selector: (row) => <Text>{removeDuplicates(row?.sboms)?.length}</Text>,
       wrap: true
     },
     // CREATED AT
@@ -138,6 +140,8 @@ const EnvironmentDrawer = ({ data, isOpen, onClose, refetch, activeEnv }) => {
                 columns={columns}
                 data={data?.projectGroup?.projects || []}
                 customStyles={customStyles}
+                defaultSortAsc
+                defaultSortFieldId={'NAME'}
                 progressPending={data?.projectGroup ? false : true}
                 progressComponent={<CustomLoader />}
                 subHeader
@@ -162,7 +166,6 @@ const EnvironmentDrawer = ({ data, isOpen, onClose, refetch, activeEnv }) => {
         <EnvModal
           isOpen={isProdOpen}
           onClose={onProdClose}
-          onEnvClose={onClose}
           groupId={data?.projectGroup?.id}
           refetch={refetch}
         />
