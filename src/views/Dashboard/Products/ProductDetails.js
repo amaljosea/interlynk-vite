@@ -485,7 +485,7 @@ const ProductDetails = () => {
                 </TabList>
                 <TabPanels>
                   {/* VERSIONS */}
-                  <TabPanel>
+                  <TabPanel px={0}>
                     {data && (
                       <VersionTable
                         productId={activeEnv}
@@ -497,14 +497,14 @@ const ProductDetails = () => {
                     )}
                   </TabPanel>
                   {/* VULNERABILITIES */}
-                  <TabPanel>
+                  <TabPanel px={0}>
                     <GlobalVulnTable
                       data={globalVulnData?.projectGroup?.componentVulns}
                       refetch={globalVulnRefetch}
                     />
                   </TabPanel>
                   {/* AUTOMATIONS */}
-                  <TabPanel>
+                  <TabPanel px={0}>
                     {rulesError && (
                       <Text textAlign={'center'} my={6}>
                         {JSON.stringify(rulesError)}
@@ -517,7 +517,7 @@ const ProductDetails = () => {
                     />
                   </TabPanel>
                   {/* SETTINGS */}
-                  <TabPanel>
+                  <TabPanel px={0}>
                     <Settings
                       data={settings?.project?.projectSetting}
                       enabled={data?.projectGroup?.enabled}
@@ -526,7 +526,7 @@ const ProductDetails = () => {
                     />
                   </TabPanel>
                   {/* CHANGE LOG */}
-                  <TabPanel>
+                  <TabPanel px={0}>
                     <ChangeLog
                       data={prodLogs}
                       refetch={getLogs}
