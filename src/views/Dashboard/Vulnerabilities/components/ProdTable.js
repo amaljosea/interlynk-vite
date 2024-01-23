@@ -86,21 +86,6 @@ const VulnProdTable = ({ data, refetch }) => {
       wrap: true,
       width: '15%'
     },
-    // ENV
-    {
-      id: 'ENVIRONMENT',
-      name: 'ENVIRONMENT',
-      selector: (row) => {
-        const { component } = row
-        return (
-          <Text textTransform={'capitalize'}>
-            {component?.sbom?.project?.name || ''}
-          </Text>
-        )
-      },
-      wrap: true,
-      width: '12%'
-    },
     // VERSION
     {
       id: 'PRODUCT_VERSIONN',
@@ -115,6 +100,21 @@ const VulnProdTable = ({ data, refetch }) => {
       ),
       wrap: true,
       width: '10%'
+    },
+    // ENV
+    {
+      id: 'ENVIRONMENT',
+      name: 'ENVIRONMENT',
+      selector: (row) => {
+        const { component } = row
+        return (
+          <Text textTransform={'capitalize'}>
+            {component?.sbom?.project?.name || ''}
+          </Text>
+        )
+      },
+      wrap: true,
+      width: '12%'
     },
     // VULN COMPONENT
     {
