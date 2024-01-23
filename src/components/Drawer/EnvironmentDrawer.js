@@ -83,7 +83,9 @@ const EnvironmentDrawer = ({ data, isOpen, onClose, refetch, activeEnv }) => {
           </Text>
         )
       },
-      wrap: true
+      wrap: true,
+      sortable: true,
+      sortFunction: (a, b) => a.name.localeCompare(b.name)
     },
     // VERSION
     {
@@ -138,6 +140,8 @@ const EnvironmentDrawer = ({ data, isOpen, onClose, refetch, activeEnv }) => {
                 columns={columns}
                 data={data?.projectGroup?.projects || []}
                 customStyles={customStyles}
+                defaultSortAsc
+                defaultSortFieldId={'NAME'}
                 progressPending={data?.projectGroup ? false : true}
                 progressComponent={<CustomLoader />}
                 subHeader

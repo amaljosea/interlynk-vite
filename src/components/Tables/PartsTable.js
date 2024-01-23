@@ -214,9 +214,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
 
   const existingVersions = []
 
-  data?.map((item) =>
-    existingVersions.push(normalizeSBOMVersion(item.part))
-  )
+  data?.map((item) => existingVersions.push(normalizeSBOMVersion(item.part)))
 
   const sbomVersions = []
 
@@ -225,9 +223,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   filteredDuplicated &&
     filteredDuplicated.map((project) => {
       const normalizedVersion = normalizeSBOMVersion(project)
-      if (
-        true
-      ) {
+      if (!existingVersions?.includes(normalizedVersion)) {
         sbomVersions.push({
           label: normalizedVersion,
           value: project.id,
@@ -299,11 +295,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       name: 'VERSION',
       selector: (row) => {
         const { part } = row
-        return (
-          <Text fontSize={14}>
-            {normalizeSBOMVersion(part)}
-          </Text>
-        )
+        return <Text fontSize={14}>{normalizeSBOMVersion(part)}</Text>
       },
       width: '200px',
       wrap: true
@@ -603,19 +595,21 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
                   >
                     <option value={''}>-- Select --</option>
                     {envList?.length > 0 &&
-                      envList.map((item, index) => (
-                        <option
-                          key={index}
-                          value={item.value}
-                          style={{
-                            textTransform: isDefaultEnv(item.label)
-                              ? 'capitalize'
-                              : 'none'
-                          }}
-                        >
-                          {item.label}
-                        </option>
-                      ))}
+                      [...envList]
+                        .sort((a, b) => a.label.localeCompare(b.label))
+                        .map((item, index) => (
+                          <option
+                            key={index}
+                            value={item.value}
+                            style={{
+                              textTransform: isDefaultEnv(item.label)
+                                ? 'capitalize'
+                                : 'none'
+                            }}
+                          >
+                            {item.label}
+                          </option>
+                        ))}
                   </Select>
                 </FormControl>
                 {/* Version */}
