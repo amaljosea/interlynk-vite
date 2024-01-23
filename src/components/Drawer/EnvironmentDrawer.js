@@ -1,4 +1,4 @@
-import { AddIcon, DeleteIcon } from '@chakra-ui/icons'
+import { AddIcon, CheckCircleIcon, DeleteIcon } from '@chakra-ui/icons'
 import {
   Drawer,
   DrawerBody,
@@ -22,14 +22,15 @@ import {
   Stack,
   useDisclosure,
   UnorderedList,
-  ListItem
+  ListItem,
 } from '@chakra-ui/react'
 import {
   timeSince,
   customStyles,
   getFullDateAndTime,
   isDefaultEnv,
-  removeDuplicates
+  removeDuplicates,
+  filterEnvList
 } from 'utils'
 import CustomLoader from 'components/CustomLoader'
 import DataTable from 'react-data-table-component'
@@ -110,11 +111,14 @@ const EnvironmentDrawer = ({
       id: 'NAME',
       name: 'NAME',
       selector: (row) => {
-        const { name } = row
+        const { id, name } = row
         return (
-          <Text textTransform={isDefaultEnv(name) ? 'capitalize' : 'none'}>
-            {name}
-          </Text>
+          <Flex flexDir={'row'} gap={2} alignItems={'flex-start'}>
+            <Text textTransform={isDefaultEnv(name) ? 'capitalize' : 'none'}>
+              {name}
+            </Text>
+            {id === activeEnv && <CheckCircleIcon color={'blue.500'} />}
+          </Flex>
         )
       },
       wrap: true
@@ -161,11 +165,6 @@ const EnvironmentDrawer = ({
     }
   ]
 
-  const defaultEnvs = data?.projectGroup?.projects?.slice(0, 3)
-  const newEnvs = [...data?.projectGroup?.projects?.slice(3)].sort((a, b) =>
-    a.name.localeCompare(b.name)
-  )
-
   return (
     <>
       <Drawer isOpen={isOpen} placement='right' size='lg' onClose={onClose}>
@@ -177,7 +176,11 @@ const EnvironmentDrawer = ({
             <Flex flexDir={'column'} width={'100%'}>
               <DataTable
                 columns={columns}
-                data={data?.projectGroup ? [...defaultEnvs, ...newEnvs] : []}
+                data={
+                  data?.projectGroup
+                    ? filterEnvList(data?.projectGroup?.projects)
+                    : []
+                }
                 customStyles={customStyles}
                 defaultSortAsc
                 defaultSortFieldId={'NAME'}

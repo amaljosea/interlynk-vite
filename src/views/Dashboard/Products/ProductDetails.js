@@ -71,6 +71,7 @@ import StatusModal from './components/StatusModal'
 import { GetProjectGroup } from 'graphQL/Queries'
 import VulnInfo from '../Vulnerabilities/vulnInfo'
 import { GetGlobalVulnData } from 'graphQL/Queries'
+import { filterEnvList } from 'utils'
 
 const ProductDetails = () => {
   const navigate = useNavigate()
@@ -451,20 +452,18 @@ const ProductDetails = () => {
                     value={activeEnv}
                     onChange={onChangeEnv}
                   >
-                    {[...data?.projectGroup?.projects]
-                      .sort((a, b) => a.name.localeCompare(b.name))
-                      .map((item) => (
-                        <MenuItemOption
-                          fontSize={'sm'}
-                          value={item?.id}
-                          key={item?.id}
-                          textTransform={
-                            isDefaultEnv(item?.name) ? 'capitalize' : 'none'
-                          }
-                        >
-                          {item?.name}
-                        </MenuItemOption>
-                      ))}
+                    {filterEnvList(data?.projectGroup?.projects)?.map((item) => (
+                      <MenuItemOption
+                        fontSize={'sm'}
+                        value={item?.id}
+                        key={item?.id}
+                        textTransform={
+                          isDefaultEnv(item?.name) ? 'capitalize' : 'none'
+                        }
+                      >
+                        {item?.name}
+                      </MenuItemOption>
+                    ))}
                     <MenuDivider />
                     <MenuItem
                       fontSize={'sm'}
