@@ -1,18 +1,8 @@
 // Chakra imports
 import { useEffect, useMemo, useState } from 'react'
-import {
-  Flex,
-  Text,
-  Tag,
-  TagLabel,
-  Tooltip,
-  Stack,
-  Button,
-  Box,
-  Select
-} from '@chakra-ui/react'
+import {Flex, Text, Tag, TagLabel, Tooltip, Stack, Button, Box, Select, IconButton} from '@chakra-ui/react'
 import { sevColor, timeSince, getFullDateAndTime, customStyles } from 'utils'
-import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons'
+import {ChevronDownIcon, ChevronUpIcon, RepeatIcon} from '@chakra-ui/icons'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import DataTable from 'react-data-table-component'
 import CustomLoader from 'components/CustomLoader'
@@ -309,15 +299,34 @@ const GlobalVulnTable = ({ data, refetch }) => {
   const subHeader = useMemo(() => {
     return (
       <Flex width={'100%'} alignItems={'center'} gap={3}>
-        <SearchFilter
-          id='globalVulns'
-          filterText={filterText}
-          onFilter={handleSearch}
-          onClear={handleClear}
-          onChange={onSearchInputChange}
-        />
-
-        <VulnsFilters refetch={refetch} />
+        <Stack
+            width={'100%'}
+            direction={'row'}
+            spacing={4}
+            alignItems={'flex-start'}
+        >
+          <SearchFilter
+            id='globalVulns'
+            filterText={filterText}
+            onFilter={handleSearch}
+            onClear={handleClear}
+            onChange={onSearchInputChange}
+          />
+          <VulnsFilters refetch={refetch} />
+        </Stack>
+        <Stack
+            width={'100%'}
+            direction={'row'}
+            spacing={2}
+            justifyContent={'flex-end'}>
+          <Tooltip label='Refresh'>
+            <IconButton
+                onClick={handleClear}
+                colorScheme='blue'
+                icon={<RepeatIcon />}
+            ></IconButton>
+          </Tooltip>
+        </Stack>
       </Flex>
     )
   }, [filterText, onSearchInputChange, handleClear, handleSearch])

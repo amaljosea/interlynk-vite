@@ -1,5 +1,5 @@
 import { useMutation } from '@apollo/client'
-import { AddIcon } from '@chakra-ui/icons'
+import {AddIcon, RepeatIcon} from '@chakra-ui/icons'
 import {
   Avatar,
   Flex,
@@ -278,26 +278,48 @@ const TeamTable = ({ data, refetch }) => {
         justifyContent={'space-between'}
       >
         {/* SEARCH COMPONENTS */}
-        <SearchFilter
-          id='team'
-          filterText={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
-          onFilter={handleSearch}
-          onClear={handleClear}
-        />
+        <Stack
+            width={'100%'}
+            direction={'row'}
+            spacing={4}
+            alignItems={'flex-start'}
+        >
+          <SearchFilter
+            id='team'
+            filterText={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onFilter={handleSearch}
+            onClear={handleClear}
+          />
+        </Stack>
+
+        <Stack
+            width={'100%'}
+            direction={'row'}
+            spacing={4}
+            justifyContent={'flex-end'}>
 
         {/* INVITE USER */}
-        <Tooltip label='Invite User' placement='top'>
-          <IconButton
-            onClick={onTeamOpen}
-            icon={<AddIcon />}
-            colorScheme='blue'
-            variant='solid'
-            fontWeight='normal'
-            fontSize={'sm'}
-            isDisabled={!inviteUser}
-          />
-        </Tooltip>
+          <Tooltip label='Invite User' placement='top'>
+            <IconButton
+              onClick={onTeamOpen}
+              icon={<AddIcon />}
+              colorScheme='blue'
+              variant='solid'
+              fontWeight='normal'
+              fontSize={'sm'}
+              isDisabled={!inviteUser}
+            />
+          </Tooltip>
+
+          <Tooltip label='Refresh'>
+            <IconButton
+                onClick={() => refetch()}
+                colorScheme='blue'
+                icon={<RepeatIcon />}
+            ></IconButton>
+          </Tooltip>
+        </Stack>
       </Flex>
     )
   }, [searchInput, handleSearch, handleClear])

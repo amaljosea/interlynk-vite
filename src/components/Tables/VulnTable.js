@@ -2,7 +2,7 @@
 import {
   ChevronDownIcon,
   ChevronUpIcon,
-  ExternalLinkIcon
+  ExternalLinkIcon, RepeatIcon
 } from '@chakra-ui/icons'
 import {
   Flex,
@@ -478,6 +478,7 @@ const VulnTable = ({
     }
   }
 
+
   // SCAN VULN
   const handleScan = async () => {
     await onVulnScan({
@@ -499,6 +500,13 @@ const VulnTable = ({
         })
         prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
       }
+    })
+  }
+  
+  const handleRefresh = async () => {
+    await refetch({
+      projectId: productId,
+      sbomId: sbomId,
     })
   }
 
@@ -541,6 +549,11 @@ const VulnTable = ({
           )}
         </Flex>
 
+        <Stack
+            direction={'row'}
+            spacing={4}
+            justifyContent={'flex-end'}>
+
         {!customerView && (
           <Stack direction='row' spacing={2}>
             {/* SCAN VULN */}
@@ -568,6 +581,17 @@ const VulnTable = ({
             </Tooltip>
           </Stack>
         )}
+
+        <Tooltip label='Refresh'>
+          <IconButton
+              onClick={handleRefresh}
+              colorScheme='blue'
+              icon={<RepeatIcon />}>
+          </IconButton>
+        </Tooltip>
+
+        </Stack>
+
       </Flex>
     )
   }, [vulnSearch, filters, onSearchInputChange, handleSearch])
