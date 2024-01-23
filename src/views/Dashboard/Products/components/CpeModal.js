@@ -15,9 +15,6 @@ import {
   Flex,
   Textarea,
   Text,
-  Alert,
-  AlertIcon,
-  AlertDescription,
   Tag,
   FormErrorMessage,
   Grid,
@@ -208,26 +205,25 @@ const CpeModal = ({
   const onVendorInputChange = (event) => {
     const { value } = event.target
     const val = value.replace(/\s/g, '')
-    if (val.includes('*')) {
-      return
-    }
-    setVendor(val)
-    if (val !== '') {
-      getCpe({
-        variables: {
-          input: {
-            idType: 'cpe',
-            ecosystem: 'cpe',
-            search: {
-              vendor: val
+    if (!val.includes('*') && !value.includes(':')) {
+      setVendor(val)
+      if (val !== '') {
+        getCpe({
+          variables: {
+            input: {
+              idType: 'cpe',
+              ecosystem: 'cpe',
+              search: {
+                vendor: val
+              }
             }
           }
-        }
-      }).then((res) => {
-        if (res.data) {
-          setVendorList(res.data.idAutoComplete.result)
-        }
-      })
+        }).then((res) => {
+          if (res.data) {
+            setVendorList(res.data.idAutoComplete.result)
+          }
+        })
+      }
     }
   }
 
@@ -257,31 +253,30 @@ const CpeModal = ({
   const onProductInputChange = (event) => {
     const { value } = event.target
     const val = value.replace(/\s/g, '')
-    if (val.includes('*')) {
-      return
-    }
-    setProduct(val)
-    if (val !== '') {
-      getCpe({
-        variables: {
-          input: {
-            idType: 'cpe',
-            ecosystem: 'cpe',
-            search: {
-              product: val
-            },
-            hints: {
-              cpe: {
-                vendor: vendor
+    if (!val.includes('*') && !val.includes(':')) {
+      setProduct(val)
+      if (val !== '') {
+        getCpe({
+          variables: {
+            input: {
+              idType: 'cpe',
+              ecosystem: 'cpe',
+              search: {
+                product: val
+              },
+              hints: {
+                cpe: {
+                  vendor: vendor
+                }
               }
             }
           }
-        }
-      }).then((res) => {
-        if (res.data) {
-          setProductList(res.data.idAutoComplete.result)
-        }
-      })
+        }).then((res) => {
+          if (res.data) {
+            setProductList(res.data.idAutoComplete.result)
+          }
+        })
+      }
     }
   }
 
@@ -289,32 +284,31 @@ const CpeModal = ({
   const onVersionInputChange = (event) => {
     const { value } = event.target
     const val = value.replace(/\s/g, '')
-    if (val.includes('*')) {
-      return
-    }
-    setVersion(val)
-    if (val !== '') {
-      getCpe({
-        variables: {
-          input: {
-            idType: 'cpe',
-            ecosystem: 'cpe',
-            search: {
-              version: val
-            },
-            hints: {
-              cpe: {
-                vendor: vendor,
-                product: product
+    if (!val.includes('*') && !val.includes(':')) {
+      setVersion(val)
+      if (val !== '') {
+        getCpe({
+          variables: {
+            input: {
+              idType: 'cpe',
+              ecosystem: 'cpe',
+              search: {
+                version: val
+              },
+              hints: {
+                cpe: {
+                  vendor: vendor,
+                  product: product
+                }
               }
             }
           }
-        }
-      }).then((res) => {
-        if (res.data) {
-          setVersionList(res.data.idAutoComplete.result)
-        }
-      })
+        }).then((res) => {
+          if (res.data) {
+            setVersionList(res.data.idAutoComplete.result)
+          }
+        })
+      }
     }
   }
 
@@ -329,6 +323,13 @@ const CpeModal = ({
       type: 'SET_CPE_STRING',
       payload: cpe
     })
+  }
+
+  // ON CHANGE
+  const handleOnChange = (value, setStateFunc) => {
+    if (!value.includes(':') && !value.includes('*')) {
+      setStateFunc(value)
+    }
   }
 
   const [createAutoCheck] = useMutation(CreateAutomation)
@@ -450,14 +451,6 @@ const CpeModal = ({
                   validation={false}
                   onChange={onVendorInputChange}
                 />
-                {vendor !== '' && vendor.includes(':') && (
-                  <Alert size={'sm'} status='error'>
-                    <AlertIcon />
-                    <AlertDescription fontSize={'sm'}>
-                      Invalid entry
-                    </AlertDescription>
-                  </Alert>
-                )}
                 {/* PRODUCT */}
                 <CpeInput
                   name='product'
@@ -469,14 +462,6 @@ const CpeModal = ({
                   validation={false}
                   onChange={onProductInputChange}
                 />
-                {product !== '' && product.includes(':') && (
-                  <Alert size={'sm'} status='error'>
-                    <AlertIcon />
-                    <AlertDescription fontSize={'sm'}>
-                      Invalid entry
-                    </AlertDescription>
-                  </Alert>
-                )}
                 {/* VERSION */}
                 <CpeInput
                   name='version'
@@ -488,14 +473,6 @@ const CpeModal = ({
                   validation={false}
                   onChange={onVersionInputChange}
                 />
-                {version !== '' && version.includes(':') && (
-                  <Alert size={'sm'} status='error'>
-                    <AlertIcon />
-                    <AlertDescription fontSize={'sm'}>
-                      Invalid entry
-                    </AlertDescription>
-                  </Alert>
-                )}
                 {/* UPDATE */}
                 <FormControl>
                   <FormLabel>Update</FormLabel>
@@ -504,7 +481,7 @@ const CpeModal = ({
                     value={update}
                     size='md'
                     fontSize={'sm'}
-                    onChange={(e) => setUpdate(e.target.value)}
+                    onChange={(e) => handleOnChange(e.target.value, setUpdate)}
                     onBlur={onBlurUpdate}
                     placeholder='Enter update'
                   />
@@ -517,7 +494,7 @@ const CpeModal = ({
                     value={edition}
                     size='md'
                     fontSize={'sm'}
-                    onChange={(e) => setEdition(e.target.value)}
+                    onChange={(e) => handleOnChange(e.target.value, setEdition)}
                     onBlur={onBlurEdition}
                     placeholder='Enter edition'
                   />
@@ -530,7 +507,9 @@ const CpeModal = ({
                     value={language}
                     size='md'
                     fontSize={'sm'}
-                    onChange={(e) => setLanguage(e.target.value)}
+                    onChange={(e) =>
+                      handleOnChange(e.target.value, setLanguage)
+                    }
                     onBlur={onBlurLanguage}
                     placeholder='Enter language'
                   />
@@ -543,7 +522,9 @@ const CpeModal = ({
                     value={swEdition}
                     size='md'
                     fontSize={'sm'}
-                    onChange={(e) => setSwEdition(e.target.value)}
+                    onChange={(e) =>
+                      handleOnChange(e.target.value, setSwEdition)
+                    }
                     onBlur={onBlurSwEdition}
                     placeholder='Enter sw edition'
                   />
@@ -556,7 +537,9 @@ const CpeModal = ({
                     value={targetSoftware}
                     size='md'
                     fontSize={'sm'}
-                    onChange={(e) => setTargetSoftware(e.target.value)}
+                    onChange={(e) =>
+                      handleOnChange(e.target.value, setTargetSoftware)
+                    }
                     onBlur={onBlurTargetSoftware}
                     placeholder='Enter target software'
                   />
@@ -598,7 +581,7 @@ const CpeModal = ({
                     value={other}
                     size='md'
                     fontSize={'sm'}
-                    onChange={(e) => setOther(e.target.value)}
+                    onChange={(e) => handleOnChange(e.target.value, setOther)}
                     onBlur={onBlurOther}
                     placeholder='Enter other'
                   />
