@@ -226,7 +226,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
     filteredDuplicated.map((project) => {
       const normalizedVersion = normalizeSBOMVersion(project)
       if (
-        !existingVersions?.includes(normalizedVersion)
+        true
       ) {
         sbomVersions.push({
           label: normalizedVersion,
