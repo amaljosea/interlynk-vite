@@ -1685,3 +1685,15 @@ export const EnvDelete = gql`
     }
   }
 `
+
+// MUNUAL VULN SCAN
+export const ManualVulnScan = gql`
+  mutation ManualVulnScan($id: Uuid!) {
+    sbomVulnScan(input: { sbomId: $id }) {
+      sbom {
+        id
+      }
+      errors
+    }
+  }
+`

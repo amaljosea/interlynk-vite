@@ -710,7 +710,7 @@ export const filterEnvList = (projects) => {
       item.name === 'default' ||
       item.name === 'development' ||
       item.name === 'production'
-  )
+  ).sort((a, b) => a.name.localeCompare(b.name))
   const newEnvs = [...projects]
     .filter(
       (item) =>
@@ -728,7 +728,7 @@ export const envOrderList = (projects) => {
       item.label === 'default' ||
       item.label === 'development' ||
       item.label === 'production'
-  )
+  ).sort((a, b) => a.label.localeCompare(b.label))
   const newEnvs = [...projects]
     .filter(
       (item) =>

@@ -30,8 +30,8 @@ import {
   Skeleton
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
-import { FaCopy } from 'react-icons/fa6'
-import { useState, useMemo, useEffect } from 'react'
+import { FaCopy, FaLayerGroup } from 'react-icons/fa6'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import styled from '@emotion/styled'
 import ProdStatusDrawer from 'components/Drawer/ProdStatusDrawer'
 import VulnFilterMenu from 'views/Sbom/components/VulnFilterMenu'
@@ -43,9 +43,10 @@ import { customStyles } from 'utils'
 import RowLimit from 'views/Sbom/components/RowLimit'
 import ImportWizard from 'views/Sbom/components/ImportWizard'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useLazyQuery } from '@apollo/client'
+import { useLazyQuery, useMutation } from '@apollo/client'
 import { GetVulnFilterData } from 'graphQL/Queries'
-import Pagination from "../Pagination";
+import Pagination from '../Pagination'
+import { ManualVulnScan } from 'graphQL/Mutation'
 
 const statusColor = (status) => {
   if (status && status === 'Fixed') {
@@ -92,6 +93,8 @@ const VulnTable = ({
     filters
   } = prodVulnState
   const { prodVulnDispatch } = dispatch
+
+  const [onVulnScan] = useMutation(ManualVulnScan)
 
   const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
   const editVulns = sboms?.supersededBy?.some(
@@ -475,6 +478,31 @@ const VulnTable = ({
     }
   }
 
+
+  // SCAN VULN
+  const handleScan = async () => {
+    await onVulnScan({
+      variables: { id: sbomId }
+    }).then((res) => {
+      if (res.data) {
+        refetch({
+          projectId: productId,
+          sbomId: sbomId,
+          first: totalRows,
+          search: undefined,
+          severity: undefined,
+          componentName: undefined,
+          status: undefined,
+          kev: undefined,
+          epss: undefined,
+          field: field,
+          direction: direction
+        })
+        prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
+      }
+    })
+  }
+  
   const handleRefresh = async () => {
     await refetch({
       projectId: productId,
@@ -527,20 +555,31 @@ const VulnTable = ({
             justifyContent={'flex-end'}>
 
         {!customerView && (
-          <Tooltip label='Import Statuses'>
-            <IconButton
-              variant='solid'
-              colorScheme='blue'
-              fontWeight='normal'
-              fontSize={'sm'}
-              onClick={() => {
-                prodVulnDispatch({ type: 'RESET_SELECTED_VULN' })
-                onTableOpen()
-              }}
-              isDisabled={!editVulns}
-              icon={<FaCopy size={18} />}
-            />
-          </Tooltip>
+          <Stack direction='row' spacing={2}>
+            {/* SCAN VULN */}
+            <Tooltip label='Scan Vulnerabilities'>
+              <IconButton
+                colorScheme='blue'
+                onClick={handleScan}
+                icon={<FaLayerGroup />}
+              />
+            </Tooltip>
+            // IMPORT STATUS
+            <Tooltip label='Import Statuses'>
+              <IconButton
+                variant='solid'
+                colorScheme='blue'
+                fontWeight='normal'
+                fontSize={'sm'}
+                onClick={() => {
+                  prodVulnDispatch({ type: 'RESET_SELECTED_VULN' })
+                  onTableOpen()
+                }}
+                isDisabled={!editVulns}
+                icon={<FaCopy size={18} />}
+              />
+            </Tooltip>
+          </Stack>
         )}
 
         <Tooltip label='Refresh'>
@@ -804,17 +843,17 @@ const VulnTable = ({
 
       {/* PAGINATION */}
       {data && (
-          <Pagination
-              paginationSizes={paginationSizes}
-              pageIndex={pageIndex}
-              totalRows={totalRows}
-              totalCount={data.totalCount}
-              onPreviousPage={handlePreviousPage}
-              onNextPage={handleNextPage}
-              onSetRow={handleSetRow}
-              hasNextPage={data.pageInfo.hasNextPage}
-              hasPreviousPage={data.pageInfo.hasPreviousPage}
-          />
+        <Pagination
+          paginationSizes={paginationSizes}
+          pageIndex={pageIndex}
+          totalRows={totalRows}
+          totalCount={data.totalCount}
+          onPreviousPage={handlePreviousPage}
+          onNextPage={handleNextPage}
+          onSetRow={handleSetRow}
+          hasNextPage={data.pageInfo.hasNextPage}
+          hasPreviousPage={data.pageInfo.hasPreviousPage}
+        />
       )}
 
       {/* EPSS INFO */}
