@@ -135,6 +135,7 @@ export const GetOrgMetrics = gql`
       latestVersions {
         id
         createdAt
+        creationAt
         updatedAt
         projectId
         project {
@@ -405,6 +406,17 @@ export const GetProjectGroup = gql`
         name
         projectGroupId
         updatedAt
+        sboms {
+          id
+          format
+          creationAt
+          updatedAt
+          primaryComponent {
+            id
+            name
+            version
+          }
+        }
       }
     }
   }

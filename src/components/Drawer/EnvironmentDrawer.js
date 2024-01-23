@@ -22,7 +22,7 @@ import { useMemo } from 'react'
 import EnvModal from 'views/Dashboard/Products/components/EnvModal'
 import { useMutation } from '@apollo/client'
 import { EnvDelete } from 'graphQL/Mutation'
-import { isDefaultEnv } from 'utils'
+import { isDefaultEnv, removeDuplicates } from 'utils'
 
 const EnvironmentDrawer = ({ data, isOpen, onClose, refetch, activeEnv }) => {
   const {
@@ -87,9 +87,9 @@ const EnvironmentDrawer = ({ data, isOpen, onClose, refetch, activeEnv }) => {
     },
     // VERSION
     {
-      id: 'VERSION',
-      name: 'VERSION',
-      selector: (row) => <Text>{row?.sboms?.length}</Text>,
+      id: 'VERSIONS',
+      name: 'VERSIONS',
+      selector: (row) => <Text>{removeDuplicates(row?.sboms)?.length}</Text>,
       wrap: true
     },
     // CREATED AT
