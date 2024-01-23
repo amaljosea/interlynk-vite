@@ -32,9 +32,7 @@ import {
   UnorderedList,
   ListItem,
   Alert,
-  AlertIcon,
-  AlertTitle,
-  AlertDescription
+  AlertIcon
 } from '@chakra-ui/react'
 import { useMemo, useRef, useState } from 'react'
 import CustomLoader from 'components/CustomLoader'
@@ -46,7 +44,12 @@ import DataTable from 'react-data-table-component'
 import { FaEllipsisV, FaFilter } from 'react-icons/fa'
 import { useLocation, Link, useParams } from 'react-router-dom'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
-import { isDefaultEnv, normalizeSBOMVersion, removeDuplicates } from 'utils'
+import {
+  isDefaultEnv,
+  normalizeSBOMVersion,
+  removeDuplicates,
+  envOrderList
+} from 'utils'
 
 const customStyles = {
   headCells: {
@@ -595,21 +598,19 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
                   >
                     <option value={''}>-- Select --</option>
                     {envList?.length > 0 &&
-                      [...envList]
-                        .sort((a, b) => a.label.localeCompare(b.label))
-                        .map((item, index) => (
-                          <option
-                            key={index}
-                            value={item.value}
-                            style={{
-                              textTransform: isDefaultEnv(item.label)
-                                ? 'capitalize'
-                                : 'none'
-                            }}
-                          >
-                            {item.label}
-                          </option>
-                        ))}
+                      envOrderList(envList).map((item, index) => (
+                        <option
+                          key={index}
+                          value={item.value}
+                          style={{
+                            textTransform: isDefaultEnv(item.label)
+                              ? 'capitalize'
+                              : 'none'
+                          }}
+                        >
+                          {item.label}
+                        </option>
+                      ))}
                   </Select>
                 </FormControl>
                 {/* Version */}
