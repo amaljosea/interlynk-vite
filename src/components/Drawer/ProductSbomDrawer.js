@@ -44,6 +44,7 @@ import { CpeAutoComplete } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { normalizeSBOMVersion } from 'utils'
 import CpeField from 'components/CpeField'
+import CpeInput from 'components/CpeInput'
 
 function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
   const toast = useToast()
@@ -66,6 +67,8 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
   const [purlValue, setPurlValue] = useState('')
   const [purlData, setPurlData] = useState(null)
   const [isPURLInputValid, setPURLInputValid] = useState(true)
+  const [isValid, setIsValid] = useState(true)
+
 
   const [getCpe] = useLazyQuery(CpeAutoComplete)
   const [createSbom] = useMutation(sbomCreate, {
@@ -364,7 +367,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
                 </Select>
               </FormControl>
               {/* Licenses */}
-              <LicenseField data={data?.defaultProject} />
+              <LicenseField isValid={isValid} setIsValid={setIsValid} />
               {/* PURL INPUI */}
               <FormControl isInvalid={purlValue !== '' && !isPURLInputValid}>
                 <FormLabel htmlFor='purl' fontSize={'sm'}>
@@ -415,13 +418,15 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
               {/* CPE INPUT */}
               <FormControl>
                 <Stack direction={'row'} width={'100%'} spacing={2}>
-                  <CpeField
-                    inputRef={cpeRef}
+                  <CpeInput
+                    name='cpe'
                     inputValue={cpeValue}
                     setInputValue={setCpeValue}
                     cpeList={cpeData}
                     setCpeList={setCpeData}
                     onChange={handleCpeChange}
+                    inputRef={cpeRef}
+                    validation={true}
                   />
                   <IconButton
                     icon={<FaExpandAlt />}
