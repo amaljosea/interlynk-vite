@@ -1,6 +1,16 @@
 // Chakra imports
 import { useEffect, useMemo, useState } from 'react'
-import { Flex,Text,Tag,TagLabel,Tooltip,Stack,Button,Box,Select } from '@chakra-ui/react'
+import {
+  Flex,
+  Text,
+  Tag,
+  TagLabel,
+  Tooltip,
+  Stack,
+  Button,
+  Box,
+  Select
+} from '@chakra-ui/react'
 import { sevColor, timeSince, getFullDateAndTime, customStyles } from 'utils'
 import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons'
 import { Link, useLocation, useParams } from 'react-router-dom'
@@ -16,6 +26,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const groupId = queryParams.get('id')
+  const product = JSON.parse(localStorage.getItem('product'))
 
   const { totalRows, setTotalRows, globalVulnState, dispatch } =
     useGlobalState()
@@ -49,7 +60,11 @@ const GlobalVulnTable = ({ data, refetch }) => {
         const { vulnId, id } = params?.name ? row?.vuln : row
         return (
           <Link
-            to={`/vendor/vulnerabilities?id=${id}`}
+            to={
+              params?.name
+                ? `/vendor/products/${product?.name}?id=${product?.id}&vulnId=${id}`
+                : `/vendor/vulnerabilities?id=${id}`
+            }
             onClick={() => localStorage.setItem('activeVuln', vulnId)}
           >
             <Text fontSize='sm' color={'blue.500'}>
@@ -252,16 +267,32 @@ const GlobalVulnTable = ({ data, refetch }) => {
   const handleSearch = async (event) => {
     const { value } = event.target
     if (event.key === 'Enter' && filterText !== '') {
-      refetch({ search: value, first: totalRows, last: undefined, after: undefined, before: undefined})
-      .then((res) => res?.data && globalVulnDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value }))
+      refetch({
+        search: value,
+        first: totalRows,
+        last: undefined,
+        after: undefined,
+        before: undefined
+      }).then(
+        (res) =>
+          res?.data &&
+          globalVulnDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
+      )
     }
   }
 
   // CLEAR SERACH
   const handleClear = async () => {
     setFilterText('')
-    await refetch({search: undefined,first: totalRows,last: undefined,after: undefined,before: undefined})
-    .then((res) => res?.data && globalVulnDispatch({type: 'CLEAR_SEARCH_INPUT'}))
+    await refetch({
+      search: undefined,
+      first: totalRows,
+      last: undefined,
+      after: undefined,
+      before: undefined
+    }).then(
+      (res) => res?.data && globalVulnDispatch({ type: 'CLEAR_SEARCH_INPUT' })
+    )
   }
 
   // ON SEARCH INPUT CHANGE
