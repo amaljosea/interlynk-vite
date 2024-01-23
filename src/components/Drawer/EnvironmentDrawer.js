@@ -7,29 +7,58 @@ import {
   DrawerOverlay,
   DrawerContent,
   DrawerCloseButton,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
   Button,
   Text,
   Flex,
   Tooltip,
   IconButton,
   Stack,
-  useDisclosure
+  useDisclosure,
+  UnorderedList,
+  ListItem
 } from '@chakra-ui/react'
-import { timeSince, customStyles, getFullDateAndTime } from 'utils'
+import {
+  timeSince,
+  customStyles,
+  getFullDateAndTime,
+  isDefaultEnv,
+  removeDuplicates
+} from 'utils'
 import CustomLoader from 'components/CustomLoader'
 import DataTable from 'react-data-table-component'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import EnvModal from 'views/Dashboard/Products/components/EnvModal'
 import { useMutation } from '@apollo/client'
 import { EnvDelete } from 'graphQL/Mutation'
-import { isDefaultEnv, removeDuplicates } from 'utils'
 
-const EnvironmentDrawer = ({ data, isOpen, onClose, refetch, activeEnv }) => {
+const EnvironmentDrawer = ({
+  data,
+  isOpen,
+  onClose,
+  refetch,
+  activeEnv,
+  setActiveEnv
+}) => {
   const {
     isOpen: isProdOpen,
     onOpen: onProdOpen,
     onClose: onProdClose
   } = useDisclosure()
+
+  const {
+    isOpen: isWarningOpen,
+    onOpen: onWarningOpen,
+    onClose: onWarningClose
+  } = useDisclosure()
+
+  const [activeRow, setActiveRow] = useState(null)
 
   const [projectDelete] = useMutation(EnvDelete)
 
@@ -38,13 +67,18 @@ const EnvironmentDrawer = ({ data, isOpen, onClose, refetch, activeEnv }) => {
       variables: {
         id
       }
-    }).then(
-      (res) =>
-        res.data &&
-        refetch({
-          id: data?.projectGroup?.id
-        })
-    )
+    })
+      .then((res) => {
+        if (res?.data) {
+          if (id === activeEnv) {
+            setActiveEnv(data?.projectGroup?.defaultProject?.id)
+          }
+          refetch({
+            id: data?.projectGroup?.id
+          })
+        }
+      })
+      .finally(() => onWarningClose())
   }
 
   // TABLE HEADER
@@ -83,9 +117,7 @@ const EnvironmentDrawer = ({ data, isOpen, onClose, refetch, activeEnv }) => {
           </Text>
         )
       },
-      wrap: true,
-      sortable: true,
-      sortFunction: (a, b) => a.name.localeCompare(b.name)
+      wrap: true
     },
     // VERSION
     {
@@ -117,14 +149,22 @@ const EnvironmentDrawer = ({ data, isOpen, onClose, refetch, activeEnv }) => {
             icon={<DeleteIcon />}
             colorScheme='red'
             variant='solid'
-            isDisabled={isDefaultEnv(name) || id === activeEnv}
-            onClick={() => handleDelete(id)}
+            isDisabled={isDefaultEnv(name)}
+            onClick={() => {
+              setActiveRow(row)
+              onWarningOpen()
+            }}
           />
         )
       },
       wrap: true
     }
   ]
+
+  const defaultEnvs = data?.projectGroup?.projects?.slice(0, 3)
+  const newEnvs = [...data?.projectGroup?.projects?.slice(3)].sort((a, b) =>
+    a.name.localeCompare(b.name)
+  )
 
   return (
     <>
@@ -133,12 +173,11 @@ const EnvironmentDrawer = ({ data, isOpen, onClose, refetch, activeEnv }) => {
         <DrawerContent>
           <DrawerCloseButton />
           <DrawerHeader>Environments</DrawerHeader>
-
           <DrawerBody>
             <Flex flexDir={'column'} width={'100%'}>
               <DataTable
                 columns={columns}
-                data={data?.projectGroup?.projects || []}
+                data={data?.projectGroup ? [...defaultEnvs, ...newEnvs] : []}
                 customStyles={customStyles}
                 defaultSortAsc
                 defaultSortFieldId={'NAME'}
@@ -169,6 +208,43 @@ const EnvironmentDrawer = ({ data, isOpen, onClose, refetch, activeEnv }) => {
           groupId={data?.projectGroup?.id}
           refetch={refetch}
         />
+      )}
+
+      {/* DELETE WARNING */}
+      {isWarningOpen && activeRow && (
+        <Modal isOpen={isWarningOpen} onClose={onWarningClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>{activeRow?.name}</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Text>Archiving this environment will: </Text>
+              <UnorderedList>
+                <Flex flexDir={'column'} gap={1} mt={4}>
+                  {[
+                    'remove this environment, its versions and SBOMs',
+                    'remove access to the product for all users',
+                    'disable uploads of SBOMs to this product'
+                  ].map((item, index) => (
+                    <ListItem key={index}>{item}</ListItem>
+                  ))}
+                </Flex>
+              </UnorderedList>
+              <Text mt={10}>Are you sure you wish to continue?</Text>
+            </ModalBody>
+            <ModalFooter>
+              <Button mr={3} onClick={onWarningClose}>
+                Cancel
+              </Button>
+              <Button
+                colorScheme='red'
+                onClick={() => handleDelete(activeRow?.id)}
+              >
+                Ok
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       )}
     </>
   )
