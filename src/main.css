@@ -2,6 +2,14 @@
   font-family: 'Sora', sans-serif;
 }
 
+*::-webkit-scrollbar {
+  width: 2px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: darkgrey;
+}
+
 .container {
   display: block;
   position: relative;
