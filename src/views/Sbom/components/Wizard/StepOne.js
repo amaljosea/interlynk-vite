@@ -185,19 +185,21 @@ const StepOne = ({
                 textTransform={isDefaultEnv(envName) ? 'capitalize' : 'none'}
               >
                 <option value={''}>-- Select --</option>
-                {productList.map((item, index) => (
-                  <option
-                    key={index}
-                    value={item.value}
-                    style={{
-                      textTransform: isDefaultEnv(item.label)
-                        ? 'capitalize'
-                        : 'none'
-                    }}
-                  >
-                    {item.label}
-                  </option>
-                ))}
+                {[...productList]
+                  .sort((a, b) => a.label.localeCompare(b.label))
+                  .map((item, index) => (
+                    <option
+                      key={index}
+                      value={item.value}
+                      style={{
+                        textTransform: isDefaultEnv(item.label)
+                          ? 'capitalize'
+                          : 'none'
+                      }}
+                    >
+                      {item.label}
+                    </option>
+                  ))}
               </Select>
             </FormControl>
             {/* Version */}
