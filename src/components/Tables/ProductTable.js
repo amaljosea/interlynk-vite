@@ -63,7 +63,7 @@ const ProductTable = ({ data, refetch }) => {
   const paginationSizes = [25, 50, 100]
 
   const { field, direction, searchInput, pageIndex } = prodState
-  const { prodDispatch, sbomDispatch } = dispatch
+  const { prodDispatch, prodCompDispatch } = dispatch
 
   const [totalRows, setTotalRows] = useState(paginationSizes[0])
   const [filterText, setFilterText] = useState(searchInput)
@@ -137,11 +137,11 @@ const ProductTable = ({ data, refetch }) => {
 
   const handleOpenSbom = useCallback(
     (row) => {
-      sbomDispatch({ type: 'CLEAR_LICENSES' })
+      prodCompDispatch({ type: 'CLEAR_LICENSES' })
       setActiveRow(row)
       onSbomOpen()
     },
-    [sbomDispatch, setActiveRow, onSbomOpen]
+    [prodCompDispatch, setActiveRow, onSbomOpen]
   )
 
   const onProductDelete = useCallback(async () => {
