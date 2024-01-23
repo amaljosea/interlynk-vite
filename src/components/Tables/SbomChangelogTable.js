@@ -6,7 +6,7 @@ import {
   Text,
   Box,
   TagLabel,
-  Tooltip
+  Tooltip, IconButton
 } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
 import React, { useMemo, useEffect, useState } from 'react'
@@ -21,6 +21,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useLazyQuery } from '@apollo/client'
 import { GetLogsFilterData } from 'graphQL/Queries'
 import Pagination from "../Pagination";
+import {RepeatIcon} from "@chakra-ui/icons";
 
 const setColor = (type) => {
   switch (type) {
@@ -442,6 +443,13 @@ const SbomChangelogTable = ({ data, refetch }) => {
             />
           )}
         </Stack>
+        <Tooltip label='Refresh'>
+          <IconButton
+              onClick={handleClear}
+              colorScheme='blue'
+              icon={<RepeatIcon />}
+          ></IconButton>
+        </Tooltip>
       </Flex>
     )
   }, [logSearch, filters, onSearchInputChange, handleClear, handleSearch])
