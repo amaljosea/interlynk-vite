@@ -2,7 +2,7 @@
 import {
   ChevronDownIcon,
   ChevronUpIcon,
-  ExternalLinkIcon
+  ExternalLinkIcon, RepeatIcon
 } from '@chakra-ui/icons'
 import {
   Flex,
@@ -475,6 +475,13 @@ const VulnTable = ({
     }
   }
 
+  const handleRefresh = async () => {
+    await refetch({
+      projectId: productId,
+      sbomId: sbomId,
+    })
+  }
+
   const subHeader = useMemo(() => {
     return (
       <Flex
@@ -514,6 +521,11 @@ const VulnTable = ({
           )}
         </Flex>
 
+        <Stack
+            direction={'row'}
+            spacing={4}
+            justifyContent={'flex-end'}>
+
         {!customerView && (
           <Tooltip label='Import Statuses'>
             <IconButton
@@ -530,6 +542,17 @@ const VulnTable = ({
             />
           </Tooltip>
         )}
+
+        <Tooltip label='Refresh'>
+          <IconButton
+              onClick={handleRefresh}
+              colorScheme='blue'
+              icon={<RepeatIcon />}>
+          </IconButton>
+        </Tooltip>
+
+        </Stack>
+
       </Flex>
     )
   }, [vulnSearch, filters, onSearchInputChange, handleSearch])

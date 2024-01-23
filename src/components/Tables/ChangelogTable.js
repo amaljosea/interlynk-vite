@@ -1,4 +1,4 @@
-import { Button, Flex, Stack, Tag, Tooltip, Text, Box } from '@chakra-ui/react'
+import {Button, Flex, Stack, Tag, Tooltip, Text, Box, IconButton} from '@chakra-ui/react'
 import React, { useEffect, useMemo, useState } from 'react'
 import { timeSince, getFullDateAndTime, customStyles } from 'utils'
 import DataTable from 'react-data-table-component'
@@ -7,6 +7,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import ChangelogFilterMenu from 'views/Sbom/components/ChangelogFilterMenu'
 import RowLimit from 'views/Sbom/components/RowLimit'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
+import {RepeatIcon} from "@chakra-ui/icons";
 import Pagination from "../Pagination";
 
 const setColor = (type) => {
@@ -304,8 +305,18 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
           />
 
           <ChangelogFilterMenu refetch={refetch} id={activeEnv} />
+
         </Stack>
+        <Tooltip label='Refresh'>
+          <IconButton
+              onClick={handleClear}
+              colorScheme='blue'
+              icon={<RepeatIcon />}
+          ></IconButton>
+        </Tooltip>
       </Flex>
+
+
     )
   }, [searchInput, onSearchInputChange, handleClear, handleSearch])
 
