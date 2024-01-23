@@ -635,6 +635,7 @@ const ProductDetails = () => {
           data={data}
           refetch={refetch}
           activeEnv={activeEnv}
+          setActiveEnv={setActiveEnv}
         />
       )}
     </>
