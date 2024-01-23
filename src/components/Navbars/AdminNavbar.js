@@ -50,6 +50,7 @@ export default function AdminNavbar(props) {
   const prodID = queryParams.get('id')
   const parts = queryParams.get('parts')
   const sbomId = queryParams.get('sbom')
+  const vulnId = queryParams.get('vulnId')
 
   const activeVuln = localStorage.getItem('activeVuln')
   const imageName = localStorage.getItem('Image')
@@ -202,7 +203,7 @@ export default function AdminNavbar(props) {
               </BreadcrumbItem>
             )}
 
-            {prodID && category === 'vulnerabilities' && (
+            {((prodID && category === 'vulnerabilities') || vulnId) && (
               <BreadcrumbItem color={mainText}>
                 <BreadcrumbLink>{activeVuln || ''}</BreadcrumbLink>
               </BreadcrumbItem>

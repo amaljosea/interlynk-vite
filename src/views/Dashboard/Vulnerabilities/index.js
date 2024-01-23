@@ -49,7 +49,11 @@ const Vulnerabilities = () => {
   }
 
   if (vulnId && location.pathname === '/vendor/vulnerabilities') {
-    return <VulnInfo data={vulnData?.vuln} refetch={getVulnData} />
+    return (
+      <Flex direction='column' pt={{ base: '120px', md: '74px' }} pr={2} pl={5}>
+        <VulnInfo data={vulnData?.vuln} refetch={getVulnData} />
+      </Flex>
+    )
   } else {
     return (
       <Flex
