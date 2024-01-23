@@ -217,18 +217,36 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
 
   const existingVersions = []
 
-  data?.map((item) => existingVersions.push(normalizeSBOMVersion(item.part)))
+  data?.map((item) =>
+    existingVersions.push(
+      item?.part?.primaryComponent
+        ? item?.part?.primaryComponent.id
+        : `Uploaded ${getFullDateAndTime(
+            item?.part?.primaryComponent?.creationAt
+          )}`
+    )
+  )
 
   const sbomVersions = []
 
   const filteredDuplicated = product ? removeDuplicates(product.sboms) : []
 
+
   filteredDuplicated &&
     filteredDuplicated.map((project) => {
-      const normalizedVersion = normalizeSBOMVersion(project)
-      if (!existingVersions?.includes(normalizedVersion)) {
+      if (
+        !existingVersions?.includes(
+          project.primaryComponent
+            ? project.primaryComponent.id
+            : `Uploaded ${getFullDateAndTime(
+                project?.primaryComponent?.creationAt
+              )}`
+        )
+      ) {
         sbomVersions.push({
-          label: normalizedVersion,
+          label: project.primaryComponent
+            ? project.primaryComponent.version
+            : `Uploaded ${getFullDateAndTime(project.creationAt)}`,
           value: project.id,
           creationAt: project.creationAt
         })
