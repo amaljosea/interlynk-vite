@@ -611,6 +611,9 @@ export const normalizeSBOMVersion = (sbom) => {
 
 // REMOVE DUPLICATE PRODUCTS VERSIONS
 export const removeDuplicates = (arr) => {
+  if (arr === null || arr === undefined) {
+    return []
+  }
   const uniqueVersions = {}
 
   for (const item of arr) {
