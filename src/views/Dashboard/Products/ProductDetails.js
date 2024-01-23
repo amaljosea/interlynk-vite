@@ -92,6 +92,15 @@ const ProductDetails = () => {
     userPermissions
   } = useGlobalState()
   const { field, direction, searchInput, type, user, object } = prodLogState
+  const {
+    searchInput: vulnSearch,
+    severities,
+    components,
+    statues,
+    kev,
+    epss,
+    filters
+  } = prodVulnState
   const { prodVulnDispatch } = dispatch
 
   const activeProd = localStorage.getItem('activeEnv')
@@ -158,6 +167,13 @@ const ProductDetails = () => {
     fetchPolicy: 'network-only'
   })
 
+  const vulnEpss = (epss !== 'all' || epss !== '') && epss?.split('-')
+
+  const range = {
+    min: parseFloat(vulnEpss[0]) / 10000,
+    max: parseFloat(vulnEpss[1]) / 10000
+  }
+
   // GET VULN DATA
   const { data: vulnData, refetch: vulnRefetch } = useQuery(GetVulnData, {
     fetchPolicy: 'network-only',
@@ -165,6 +181,16 @@ const ProductDetails = () => {
       projectId: activeEnv,
       sbomId: sbomId,
       first: totalRows,
+      last: undefined,
+      after: undefined,
+      before: undefined,
+      search: vulnSearch !== '' ? vulnSearch : undefined,
+      severity: severities.length > 0 ? severities : undefined,
+      componentName: components.length > 0 ? components : undefined,
+      status: statues.length > 0 ? statues : undefined,
+      kev:
+        kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
+      epss: epss !== '' && epss !== 'all' ? range : undefined,
       field: prodVulnState.field,
       direction: prodVulnState.direction
     }
@@ -452,18 +478,20 @@ const ProductDetails = () => {
                     value={activeEnv}
                     onChange={onChangeEnv}
                   >
-                    {filterEnvList(data?.projectGroup?.projects)?.map((item) => (
-                      <MenuItemOption
-                        fontSize={'sm'}
-                        value={item?.id}
-                        key={item?.id}
-                        textTransform={
-                          isDefaultEnv(item?.name) ? 'capitalize' : 'none'
-                        }
-                      >
-                        {item?.name}
-                      </MenuItemOption>
-                    ))}
+                    {filterEnvList(data?.projectGroup?.projects)?.map(
+                      (item) => (
+                        <MenuItemOption
+                          fontSize={'sm'}
+                          value={item?.id}
+                          key={item?.id}
+                          textTransform={
+                            isDefaultEnv(item?.name) ? 'capitalize' : 'none'
+                          }
+                        >
+                          {item?.name}
+                        </MenuItemOption>
+                      )
+                    )}
                     <MenuDivider />
                     <MenuItem
                       fontSize={'sm'}
