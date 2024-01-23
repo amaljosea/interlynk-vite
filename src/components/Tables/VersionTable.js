@@ -512,7 +512,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
         <ProductSbomDrawer
           isOpen={isSbomOpen}
           onClose={onSbomClose}
-          data={data?.projects}
+          data={data}
           refetch={refetch}
           productId={productId}
         />

@@ -193,8 +193,8 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
     })
   }
 
-  const existingVersions = data?.defaultProject?.sboms.map(
-    (item) => normalizeSBOMVersion(item)
+  const existingVersions = data?.projects?.defaultProject?.sboms.map((item) =>
+    normalizeSBOMVersion(item)
   )
 
   const handleCreateComp = async (id) => {
@@ -246,7 +246,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
   const onCreateSBOM = async () => {
     await createSbom({
       variables: {
-        projectId: data[0].id,
+        projectId: data?.defaultProject?.id,
         spec: 'cyclonedx',
         specVersion: '1.4',
         format: 'json'
@@ -364,7 +364,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
                 </Select>
               </FormControl>
               {/* Licenses */}
-              <LicenseField data={data[0]} />
+              <LicenseField data={data?.defaultProject} />
               {/* PURL INPUI */}
               <FormControl isInvalid={purlValue !== '' && !isPURLInputValid}>
                 <FormLabel htmlFor='purl' fontSize={'sm'}>
@@ -521,7 +521,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
           setIsValid={setPURLInputValid}
           purlValue={purlValue}
           getCpe={getCpe}
-          activeComp={data[0]}
+          activeComp={data?.defaultProject}
         />
       )}
 
@@ -536,7 +536,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
           onUpdateCpe={handleUpdateCpe}
           selectedCpe={selectedCpe}
           getCpe={getCpe}
-          activeComp={data[0]}
+          activeComp={data?.defaultProject}
         />
       )}
     </>
