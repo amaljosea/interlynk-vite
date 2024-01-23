@@ -1,5 +1,5 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import { AddIcon } from '@chakra-ui/icons'
+import {AddIcon, RepeatIcon} from '@chakra-ui/icons'
 import {
   Button,
   Flex,
@@ -491,6 +491,15 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   // CLEAR SERACH
   const handleClear = () => setSearchInput('')
 
+  const handleRefresh = async () => {
+    await refetch({
+      variables: {
+        projectId: prodId,
+        sbomId: sbomId
+      }
+    })
+  }
+
   // SUB HEADER
   const subHeaderComponent = useMemo(() => {
     return (
@@ -548,6 +557,13 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
               fontWeight='normal'
               fontSize={'sm'}
             />
+          </Tooltip>
+          <Tooltip label='Refresh'>
+            <IconButton
+                onClick={handleRefresh}
+                colorScheme='blue'
+                icon={<RepeatIcon />}
+            ></IconButton>
           </Tooltip>
         </Stack>
       </Flex>

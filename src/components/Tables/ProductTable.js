@@ -248,14 +248,6 @@ const ProductTable = ({ data, refetch }) => {
         </Stack>
 
         <Stack direction={'row'} spacing={2} alignItems={'center'}>
-          {/* REFRESH */}
-          <Tooltip label='Refresh'>
-            <IconButton
-              onClick={handleRefresh}
-              colorScheme='blue'
-              icon={<RepeatIcon />}
-            ></IconButton>
-          </Tooltip>
           {/* ADD PRODUCT */}
           <Tooltip label='Add Product'>
             <IconButton
@@ -265,6 +257,14 @@ const ProductTable = ({ data, refetch }) => {
               onClick={onOpenProduct}
               isDisabled={!canAddProduct}
             />
+          </Tooltip>
+          {/* REFRESH */}
+          <Tooltip label='Refresh'>
+            <IconButton
+                onClick={handleRefresh}
+                colorScheme='blue'
+                icon={<RepeatIcon />}
+            ></IconButton>
           </Tooltip>
         </Stack>
       </Flex>

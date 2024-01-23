@@ -1,4 +1,4 @@
-import { DeleteIcon, SettingsIcon } from '@chakra-ui/icons'
+import {DeleteIcon, RepeatIcon, SettingsIcon} from '@chakra-ui/icons'
 import {
   Flex,
   HStack,
@@ -14,19 +14,20 @@ import {
   ModalBody,
   ModalFooter,
   Button,
-  useDisclosure
+  useDisclosure, Stack, Tooltip
 } from '@chakra-ui/react'
 import CardBody from 'components/Card/CardBody'
 import CustomLoader from 'components/CustomLoader'
 import DataTable from 'react-data-table-component'
 import UpdateRule from './components/UpdateRule'
-import { useState } from 'react'
+import {useMemo, useState} from 'react'
 import { customStyles } from 'utils'
 import { DeleteAutomation, UpdateAutomation } from 'graphQL/Mutation'
 import { useMutation } from '@apollo/client'
 import { useLocation } from 'react-router-dom'
 import { timeSince } from 'utils'
 import { useGlobalState } from 'hooks/useGlobalState'
+import {FaScrewdriverWrench} from "react-icons/fa6";
 
 const Automation = ({ data, refetch, productId }) => {
   const { totalRows, userPermissions, prodRulesState, dispatch } =
@@ -223,6 +224,28 @@ const Automation = ({ data, refetch, productId }) => {
     })
   }
 
+  const handleRefresh = async () => {
+    await refetch({
+      variables: { id: productId, first: totalRows, field, direction }
+    })
+  }
+
+  const subHeaderComponent = useMemo(() => {
+    return (
+        <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
+          <Stack direction={'row'} spacing={2} alignItems={'center'}>
+            <Tooltip label='Refresh'>
+              <IconButton
+                  onClick={handleRefresh}
+                  colorScheme='blue'
+                  icon={<RepeatIcon />}
+              ></IconButton>
+            </Tooltip>
+          </Stack>
+        </Flex>
+    )
+  }, [handleRefresh])
+
   return (
     <>
       <CardBody>
@@ -236,6 +259,8 @@ const Automation = ({ data, refetch, productId }) => {
             progressComponent={<CustomLoader />}
             responsive={true}
             persistTableHead
+            subHeader
+            subHeaderComponent={subHeaderComponent}
           />
         </Flex>
       </CardBody>
