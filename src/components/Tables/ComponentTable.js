@@ -1,5 +1,5 @@
 // Chakra imports
-import { AddIcon, ViewIcon } from '@chakra-ui/icons'
+import {AddIcon, RepeatIcon, ViewIcon} from '@chakra-ui/icons'
 import {
   Flex,
   Text,
@@ -969,22 +969,35 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
             />
           )}
         </Stack>
+        <Stack
+            width={'100%'}
+            direction={'row'}
+            spacing={4}
+            justifyContent={'flex-end'}>
+          {/* CREATE COMPONENT */}
+          {!customerView && (
+              <Tooltip label='Add Component'>
+                <IconButton
+                    ref={compBtn}
+                    onClick={onCreateComponent}
+                    icon={<AddIcon />}
+                    colorScheme='blue'
+                    variant='solid'
+                    fontWeight='normal'
+                    fontSize={'sm'}
+                    isDisabled={lifecycle === 'signed' || !updateComponent}
+                />
+              </Tooltip>
+          )}
 
-        {/* CREATE COMPONENT */}
-        {!customerView && (
-          <Tooltip label='Add Component'>
+          <Tooltip label='Refresh'>
             <IconButton
-              ref={compBtn}
-              onClick={onCreateComponent}
-              icon={<AddIcon />}
-              colorScheme='blue'
-              variant='solid'
-              fontWeight='normal'
-              fontSize={'sm'}
-              isDisabled={lifecycle === 'signed' || !updateComponent}
-            />
+                onClick={fetchCompData}
+                colorScheme='blue'
+                icon={<RepeatIcon />}>
+            </IconButton>
           </Tooltip>
-        )}
+        </Stack>
       </Flex>
     )
   }, [compSearch, onSearchInputChange, handleClear, handleSearch, filters])
