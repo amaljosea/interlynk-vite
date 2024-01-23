@@ -149,6 +149,7 @@ export const GetOrgMetrics = gql`
           }
         }
         primaryComponent {
+          id
           name
           version
         }
