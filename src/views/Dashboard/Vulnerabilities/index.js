@@ -12,7 +12,7 @@ import VulnInfo from './vulnInfo'
 const Vulnerabilities = () => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
-  const vulnId = queryParams.get('id')
+  const vulnId = queryParams.get('vulnId')
   const org = localStorage.getItem('organization')
 
   const { totalRows, dispatch } = useGlobalState()
