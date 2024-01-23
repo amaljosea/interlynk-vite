@@ -19,7 +19,7 @@ import {
 import { EnvCreate } from 'graphQL/Mutation'
 import { useState } from 'react'
 
-const EnvModal = ({ groupId, isOpen, onClose, onEnvClose, refetch }) => {
+const EnvModal = ({ groupId, isOpen, onClose, refetch }) => {
   const toast = useToast()
   const [projectCreate] = useMutation(EnvCreate)
   const [productName, setProductName] = useState('')
@@ -33,24 +33,20 @@ const EnvModal = ({ groupId, isOpen, onClose, onEnvClose, refetch }) => {
         name: productName,
         enabled: true
       }
-    })
-      .then((res) => {
-        if (res?.data?.projectCreate?.errors?.length > 0) {
-          setError(res?.data?.projectCreate?.errors[0])
-        } else {
-          refetch({ id: groupId })
-          onClose()
-          onEnvClose()
-        }
-      })
-      .finally(() => {
+    }).then((res) => {
+      if (res?.data?.projectCreate?.errors?.length > 0) {
+        setError(res?.data?.projectCreate?.errors[0])
+      } else {
+        refetch({ id: groupId })
         toast({
           description: 'Environment added successfully',
           status: 'success',
           position: 'top',
           duration: 3000
         })
-      })
+        onClose()
+      }
+    })
   }
 
   const isInvalid = productName === '' || error !== ''
