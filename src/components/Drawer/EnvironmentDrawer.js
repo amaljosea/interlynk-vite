@@ -218,16 +218,16 @@ const EnvironmentDrawer = ({
         <Modal isOpen={isWarningOpen} onClose={onWarningClose}>
           <ModalOverlay />
           <ModalContent>
-            <ModalHeader>{activeRow?.name}</ModalHeader>
+            <ModalHeader>Delete {activeRow?.name}</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              <Text>Archiving this environment will: </Text>
+              <Text>Deleting this environment will: </Text>
               <UnorderedList>
                 <Flex flexDir={'column'} gap={1} mt={4}>
                   {[
-                    'remove this environment, its versions and SBOMs',
-                    'remove access to the product for all users',
-                    'disable uploads of SBOMs to this product'
+                    'remove the environment, included versions and SBOMs',
+                    'remove any external access to versions in this environment',
+                    'disable import of SBOM to this environment'
                   ].map((item, index) => (
                     <ListItem key={index}>{item}</ListItem>
                   ))}
