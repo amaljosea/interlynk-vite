@@ -40,7 +40,7 @@ const VexModal = ({
 
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
-  const vulnId = queryParams.get('id')
+  const vulnId = queryParams.get('vulnId')
 
   const [statusTitle, setStatusTitle] = useState('')
   const [statusName, setStatusName] = useState('')

@@ -63,7 +63,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
             to={
               params?.name
                 ? `/vendor/products/${product?.name}?id=${product?.id}&vulnId=${id}`
-                : `/vendor/vulnerabilities?id=${id}`
+                : `/vendor/vulnerabilities?vulnId=${id}`
             }
             onClick={() => localStorage.setItem('activeVuln', vulnId)}
           >
