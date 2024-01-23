@@ -568,6 +568,7 @@ export const GetProjectGroupComponentVulns = gql`
     $id: Uuid!
     $first: Int
     $last: Int
+    $search: String
     $after: String
     $before: String
     $severity: [String!]
@@ -582,6 +583,7 @@ export const GetProjectGroupComponentVulns = gql`
         first: $first
         before: $before
         last: $last
+        search: $search
         projectGroupIds: $projectGroupIds
         status: $status
         severity: $severity
