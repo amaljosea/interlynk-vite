@@ -472,7 +472,7 @@ const ProductDetails = () => {
                 >
                   {defaultEnv}
                 </MenuButton>
-                <MenuList>
+                <MenuList minH={'auto'} maxH={'250px'} overflowY={'scroll'}>
                   <MenuOptionGroup
                     type='radio'
                     value={activeEnv}
