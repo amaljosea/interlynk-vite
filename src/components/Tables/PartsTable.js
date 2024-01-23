@@ -76,6 +76,10 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const prodId = queryParams.get('id')
   const group = JSON.parse(localStorage.getItem('product'))
 
+  const capitalizeFirstLetter = (str) => {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
+
   const {
     setActiveProdTab,
     totalRows,
@@ -626,9 +630,6 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
                     id='product'
                     value={selectedProd}
                     onChange={handleSelectProduct}
-                    textTransform={
-                      isDefaultEnv(envName) ? 'capitalize' : 'none'
-                    }
                   >
                     <option value={''}>-- Select --</option>
                     {envList?.length > 0 &&
@@ -636,12 +637,8 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
                         <option
                           key={index}
                           value={item.value}
-                          style={{
-                            textTransform: isDefaultEnv(item.label)
-                              ? 'capitalize'
-                              : 'none'
-                          }}
-                        >
+                          label={isDefaultEnv(item.label) ? capitalizeFirstLetter(item.label) : item.label}
+                          >
                           {item.label}
                         </option>
                       ))}
