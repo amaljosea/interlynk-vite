@@ -55,7 +55,6 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
   const currentProduct = JSON.parse(localStorage.getItem(`product`))
   const { name, id } = currentProduct ? currentProduct : {}
   const currentSBOM = JSON.parse(localStorage.getItem(`currentSBOM`))
-  console.log('CURRENT SBOM', currentSBOM)
 
   const onSelectComp = () => {
     const { field, direction } = prodCompState
