@@ -599,14 +599,11 @@ export const customStyles = {
 }
 
 export const normalizeSBOMVersion = (sbom) => {
-  if (sbom?.primaryComponent?.version) {
+  if (sbom?.primaryComponent) {
     return sbom.primaryComponent.version
-  } else if (sbom?.primaryComponent?.name) {
-    return sbom.primaryComponent.name
-  } else if (sbom?.creationAt) {
-    return 'Uploaded: ' + getFullDateAndTime(sbom?.creationAt)
+  } else {
+    return `Uploaded ${getFullDateAndTime(sbom?.creationAt)}`
   }
-  return ''
 }
 
 // REMOVE DUPLICATE PRODUCTS VERSIONS
