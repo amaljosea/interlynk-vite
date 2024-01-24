@@ -139,7 +139,7 @@ const VexModal = ({
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Modal Title</ModalHeader>
+        <ModalHeader>Update Status</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <SimpleGrid row={5} spacing={4}>
