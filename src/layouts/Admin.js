@@ -1,5 +1,5 @@
 // Chakra imports
-import { Box, Portal, Stack } from '@chakra-ui/react'
+import { Box, Portal, Stack, useToast } from '@chakra-ui/react'
 // Layout components
 import AdminNavbar from 'components/Navbars/AdminNavbar.js'
 import Sidebar from 'components/Sidebar'
@@ -15,6 +15,7 @@ import {
   ApolloLink
 } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
+import { onError } from '@apollo/client/link/error';
 import Cookies from 'js-cookie'
 import { createUploadLink } from 'apollo-upload-client'
 import { getActiveNavbar, getActiveRoute } from '../utils'
@@ -51,8 +52,25 @@ export default function Dashboard(props) {
     }
   })
 
+  const toast = useToast();
+
+  const errorLink = onError(({ graphQLErrors }) => {
+    if (graphQLErrors) {
+      graphQLErrors.forEach(({ message }) => {
+        toast({
+          title: "An error occurred.",
+          description: message,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: "top"
+        });
+      });
+    }
+  });
+
   const client = new ApolloClient({
-    link: ApolloLink.from([authLink, uploadLink]),
+    link: ApolloLink.from([errorLink, authLink, uploadLink]),
     cache: new InMemoryCache(),
     queryDeduplication: false
   })

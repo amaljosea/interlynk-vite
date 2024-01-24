@@ -478,7 +478,6 @@ const VulnTable = ({
     }
   }
 
-
   // SCAN VULN
   const handleScan = async () => {
     await onVulnScan({
