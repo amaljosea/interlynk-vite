@@ -39,13 +39,13 @@ const ProductModal = ({
 
   const [productName, setProductName] = useState('')
   const [productDesc, setProductDesc] = useState('')
+  const [error, setError] = useState('')
 
   useEffect(() => {
     setProductName(product)
     setProductDesc(description)
   }, [id])
 
-  const [error, setError] = useState('')
 
   const updateProduct = async (e) => {
     e.preventDefault()
@@ -57,7 +57,7 @@ const ProductModal = ({
       }
     }).then((res) => {
       const error = res.data.projectGroupUpdate.errors
-      if (error.length > 0) {
+      if (error?.length > 0) {
         setError(res.data.projectGroupUpdate.errors[0])
       } else {
         onClose()
@@ -74,9 +74,8 @@ const ProductModal = ({
         enabled: true
       }
     }).then((res) => {
-      console.log(res.data)
       const error = res.data.projectGroupCreate.errors
-      if (error.length > 0) {
+      if (error?.length > 0) {
         setError(error[0])
       } else {
         onClose()
