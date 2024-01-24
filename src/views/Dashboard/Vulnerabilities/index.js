@@ -15,11 +15,36 @@ const Vulnerabilities = () => {
   const vulnId = queryParams.get('vulnId')
   const org = localStorage.getItem('organization')
 
-  const { totalRows, dispatch } = useGlobalState()
+  const { totalRows, globalVulnState, dispatch } = useGlobalState()
+  const {
+    searchInput,
+    severities,
+    products,
+    statues,
+    kev,
+    epss,
+  } = globalVulnState
   const { globalVulnDispatch } = dispatch
 
+  const epssRange = epss !== 'all' && epss !== '' && epss.split('-')
+  const range = {
+    min: parseFloat(epssRange[0]) / 10000,
+    max: parseFloat(epssRange[1]) / 10000
+  }
+
   const { data, refetch } = useQuery(GetGlobalVulns, {
-    variables: { first: totalRows },
+    variables: {
+      first: totalRows,
+      last: undefined,
+      after: undefined,
+      before: undefined,
+      search: searchInput !== '' ? searchInput : undefined,
+      projectGroupIds: products?.length > 0 ? products : undefined,
+      severity: severities?.length > 0 ? severities : undefined,
+      status: statues?.length > 0 ? statues : undefined,
+      kev: kev === 'yes' ? true : kev === 'false' ? false : undefined,
+      epss: epss === 'all' || epss === '' ? undefined : range
+    },
     onCompleted: () => globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
   })
 
@@ -30,8 +55,6 @@ const Vulnerabilities = () => {
       getVulnData({
         variables: { id: vulnId, first: totalRows }
       })
-    } else {
-      globalVulnDispatch({ type: 'CLEAR_GLOBAL_VULN' })
     }
   }, [vulnId])
 
