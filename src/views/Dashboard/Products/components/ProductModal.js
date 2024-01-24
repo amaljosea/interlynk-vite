@@ -17,11 +17,9 @@ import {
   Text,
   Textarea
 } from '@chakra-ui/react'
-import { UpdateProject } from 'graphQL/Mutation'
-import { CreateProject } from 'graphQL/Mutation'
 import { CreateProjectGroup, UpdateProjectGroup } from 'graphQL/Mutation'
 import { useState, useEffect } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
 const ProductModal = ({
   id,
@@ -31,7 +29,6 @@ const ProductModal = ({
   description,
   refetch
 }) => {
-  const navigate = useNavigate()
   const params = useParams()
   const [projectGroupCreate] = useMutation(CreateProjectGroup, {
     onCompleted: () => refetch()
@@ -58,14 +55,14 @@ const ProductModal = ({
         name: productName,
         desc: productDesc
       }
+    }).then((res) => {
+      const error = res.data.projectGroupUpdate.errors
+      if (error.length > 0) {
+        setError(res.data.projectGroupUpdate.errors[0])
+      } else {
+        onClose()
+      }
     })
-      .then((res) => {
-        const error = res.data.projectGroupUpdate.errors
-        if (error.length > 0) {
-          setError(res.data.projectGroupUpdate.errors[0])
-        }
-      })
-      .finally(() => onClose())
   }
 
   const handleSave = async (e) => {
@@ -76,15 +73,15 @@ const ProductModal = ({
         desc: productDesc,
         enabled: true
       }
+    }).then((res) => {
+      console.log(res.data)
+      const error = res.data.projectGroupCreate.errors
+      if (error.length > 0) {
+        setError(error[0])
+      } else {
+        onClose()
+      }
     })
-      .then((res) => {
-        console.log(res.data)
-        const error = res.data.projectGroupCreate.errors
-        if (error.length > 0) {
-          setError(error[0])
-        }
-      })
-      .finally(() => onClose())
   }
 
   const isInvalid = productName === '' || productDesc === '' || error !== ''
@@ -100,7 +97,7 @@ const ProductModal = ({
             <ModalBody>
               <Flex width={'100%'} direction={'column'} gap={4}>
                 {error !== '' && (
-                  <Alert status='error'>
+                  <Alert status='error' borderRadius={4}>
                     <AlertIcon />
                     <Text fontSize={'sm'}>{error}</Text>
                   </Alert>
