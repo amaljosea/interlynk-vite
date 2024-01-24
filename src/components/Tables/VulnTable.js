@@ -131,7 +131,7 @@ const VulnTable = ({
     } else if (cvss >= 6.0) {
       return 'yellow'
     } else {
-      return 'green'
+      return 'gray'
     }
   }
 
@@ -164,21 +164,18 @@ const VulnTable = ({
                 color={'blue.500'}
               />
             </Link>
-            <Tooltip label={vuln.vulnId} placement={'top'}>
-              <Text
-                my={3}
-                fontSize='sm'
-                color={textColor}
-                data-tag='allowRowEvents'
-              >
-                {vuln.vulnId !== null ? `${vuln.vulnId}` : ''}
-              </Text>
-            </Tooltip>
-            {kev === true && (
-              <Badge variant='subtle' colorScheme='red'>
-                KEV
-              </Badge>
-            )}
+            <Stack direction={'column'} my={2}>
+              <Tooltip label={vuln.vulnId} placement={'top'}>
+                <Text fontSize='sm' color={textColor} data-tag='allowRowEvents'>
+                  {vuln.vulnId !== null ? `${vuln.vulnId}` : ''}
+                </Text>
+              </Tooltip>
+              {kev === true && (
+                <Badge width={'fit-content'} variant='subtle' colorScheme='red'>
+                  KEV
+                </Badge>
+              )}
+            </Stack>
           </Flex>
         )
       },
@@ -192,22 +189,16 @@ const VulnTable = ({
       selector: (row) => {
         const { vuln } = row
         return (
-          <>
-            {vuln.sev !== null ? (
-              <Tag
-                size='md'
-                variant='subtle'
-                width={'80px'}
-                colorScheme={sevColor(`${vuln.sev}`)}
-              >
-                <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
-                  {vuln.sev}
-                </TagLabel>
-              </Tag>
-            ) : (
-              ''
-            )}
-          </>
+          <Tag
+            size='md'
+            variant='subtle'
+            width={'80px'}
+            colorScheme={sevColor(vuln?.sev)}
+          >
+            <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
+              {vuln?.sev || '-'}
+            </TagLabel>
+          </Tag>
         )
       },
       width: '9%',
@@ -255,7 +246,7 @@ const VulnTable = ({
               colorScheme={cvssColor(vuln.cvssScore)}
             >
               <TagLabel mx={'auto'}>
-                {vuln.cvssScore ? vuln.cvssScore : 0}
+                {vuln.cvssScore ? vuln.cvssScore : '-'}
               </TagLabel>
             </Tag>
           </Flex>
@@ -285,8 +276,9 @@ const VulnTable = ({
               alignItems='center'
             >
               <TagLabel style={{ textAlign: 'center' }}>
-                {epssScores ? Math.ceil(epssScores[0] * 10000) : 0}
-                {/* {epssScores.length > 1 && `- ${epssScores[1]}`} */}
+                {epssScores?.length > 0
+                  ? Math.ceil(epssScores[0] * 10000)
+                  : '-'}
               </TagLabel>
             </Tag>
             {epssScores && epssScores.length > 1 ? (
@@ -345,7 +337,7 @@ const VulnTable = ({
       name: 'VERSION',
       selector: (row) => (
         <Tooltip label={row.component.version} placement='top'>
-          {row.component.version}
+          <Text my={2}>{row.component.version}</Text>
         </Tooltip>
       ),
       wrap: true,

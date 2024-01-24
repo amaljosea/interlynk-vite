@@ -188,7 +188,7 @@ export const sevColor = (severity) => {
     case 'negligible':
       return 'green'
     default:
-      return 'blue'
+      return 'gray'
   }
 }
 
@@ -708,12 +708,14 @@ export const isDefaultEnv = (name) => {
 }
 
 export const filterEnvList = (projects) => {
-  const defaultEnvs = [...projects].filter(
-    (item) =>
-      item.name === 'default' ||
-      item.name === 'development' ||
-      item.name === 'production'
-  ).sort((a, b) => a.name.localeCompare(b.name))
+  const defaultEnvs = [...projects]
+    .filter(
+      (item) =>
+        item.name === 'default' ||
+        item.name === 'development' ||
+        item.name === 'production'
+    )
+    .sort((a, b) => a.name.localeCompare(b.name))
   const newEnvs = [...projects]
     .filter(
       (item) =>
@@ -726,12 +728,14 @@ export const filterEnvList = (projects) => {
 }
 
 export const envOrderList = (projects) => {
-  const defaultEnvs = [...projects].filter(
-    (item) =>
-      item.label === 'default' ||
-      item.label === 'development' ||
-      item.label === 'production'
-  ).sort((a, b) => a.label.localeCompare(b.label))
+  const defaultEnvs = [...projects]
+    .filter(
+      (item) =>
+        item.label === 'default' ||
+        item.label === 'development' ||
+        item.label === 'production'
+    )
+    .sort((a, b) => a.label.localeCompare(b.label))
   const newEnvs = [...projects]
     .filter(
       (item) =>
