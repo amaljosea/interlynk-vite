@@ -487,6 +487,12 @@ const ProductDetails = () => {
                           textTransform={
                             isDefaultEnv(item?.name) ? 'capitalize' : 'none'
                           }
+                          borderBottom={
+                            filterEnvList(data?.projectGroup?.projects)
+                              ?.length > 3 && item?.name === 'production'
+                              ? '1px solid #E2E8F0'
+                              : 'none'
+                          }
                         >
                           {item?.name}
                         </MenuItemOption>
