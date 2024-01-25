@@ -150,7 +150,8 @@ const ProductDetails = () => {
       variables: {
         id: activeEnv,
         first: totalRows
-      }
+      },
+      onCompleted: () => globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
     }
   )
 
