@@ -34,8 +34,8 @@ const ProductsOverview = ({ title, data }) => {
     }
 
     if (sboms.length > 0) {
-      localStorage.setItem('product', JSON.stringify(product))
-      localStorage.setItem('activeProdTab', 0)
+      sessionStorage.setItem('product', JSON.stringify(product))
+      sessionStorage.setItem('activeProdTab', 0)
       prodDispatch({
         type: 'SET_CURRENT_PRODUCT',
         payload: {
@@ -48,34 +48,34 @@ const ProductsOverview = ({ title, data }) => {
   }
 
   const onVersionClick = (item) => {
-    localStorage.setItem(
+    sessionStorage.setItem(
       'currentSBOM',
       JSON.stringify({
         version: normalizeSBOMVersion(item),
         id: item?.id
       })
     )
-    localStorage.setItem('activeSbomTab', 0)
+    sessionStorage.setItem('activeSbomTab', 0)
     setActiveSbomTab(0)
   }
 
   const onFilterComp = (item) => {
-    localStorage.setItem(
+    sessionStorage.setItem(
       'currentSBOM',
       JSON.stringify({
         version: normalizeSBOMVersion(item),
         id: item.id
       })
     )
-    localStorage.setItem('activeSbomTab', 2)
+    sessionStorage.setItem('activeSbomTab', 2)
   }
 
   const onFilterSev = async (id, version, value) => {
-    localStorage.setItem(
+    sessionStorage.setItem(
       'currentSBOM',
       JSON.stringify({ version: version, id: id })
     )
-    localStorage.setItem('activeSbomTab', 3)
+    sessionStorage.setItem('activeSbomTab', 3)
     prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
   }
 

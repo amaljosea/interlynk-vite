@@ -117,7 +117,7 @@ const ImageRow = ({ item, refetch }) => {
               textDecoration: 'underline'
             }}
             onClick={() => {
-              window.localStorage.setItem('Image', item.name)
+              window.sessionStorage.setItem('Image', item.name)
               setScanEnabled(item.scanEnabled ? true : false)
             }}
           >

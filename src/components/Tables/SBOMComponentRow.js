@@ -85,7 +85,7 @@ function SBOMComponentRow(props) {
   } = useDisclosure()
 
   useEffect(() => {
-    const containsData = window.localStorage.getItem('contains')
+    const containsData = window.sessionStorage.getItem('contains')
     setcontains(JSON.parse(containsData))
   }, [])
 

@@ -102,9 +102,9 @@ const OrgTable = ({ data, refetch, activeOrg, isAdmin }) => {
         setLeaveError(res?.data?.organizationUserLeave?.errors[0])
       } else {
         if (data?.length === 1) {
-          localStorage.removeItem('username')
-          localStorage.removeItem('email')
-          localStorage.removeItem('product')
+          sessionStorage.removeItem('username')
+          sessionStorage.removeItem('email')
+          sessionStorage.removeItem('product')
           Cookies.remove('authToken')
           navigate('/auth')
         } else {

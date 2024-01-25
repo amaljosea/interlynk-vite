@@ -102,7 +102,7 @@ const ProductDetails = () => {
   } = prodVulnState
   const { prodVulnDispatch,globalVulnDispatch } = dispatch
 
-  const activeProd = localStorage.getItem('activeEnv')
+  const activeProd = sessionStorage.getItem('activeEnv')
   const [activeEnv, setActiveEnv] = useState(activeProd || '')
 
   const product = userPermissions?.find(
@@ -201,7 +201,7 @@ const ProductDetails = () => {
 
   const [getVulnData, { data: vulnInfo }] = useLazyQuery(GetGlobalVulnData)
 
-  const activeTab = Number(localStorage.getItem('activeProdTab'))
+  const activeTab = Number(sessionStorage.getItem('activeProdTab'))
 
   const {
     isOpen: isOpenProduct,
@@ -234,13 +234,13 @@ const ProductDetails = () => {
   } = useDisclosure()
 
   const handleTabChange = (value) => {
-    localStorage.setItem('activeProdTab', value)
+    sessionStorage.setItem('activeProdTab', value)
     setActiveProdTab(value)
   }
 
   // ON CHANGE ENV
   const onChangeEnv = (value) => {
-    localStorage.setItem('activeEnv', value)
+    sessionStorage.setItem('activeEnv', value)
     setActiveEnv(value)
   }
 

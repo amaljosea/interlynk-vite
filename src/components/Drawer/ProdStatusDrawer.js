@@ -33,7 +33,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
-  const currentProduct = JSON.parse(localStorage.getItem(`product`))
+  const currentProduct = JSON.parse(sessionStorage.getItem(`product`))
   const { data: res } = useQuery(GetCdxResponses)
 
   const { totalRows, userPermissions, prodVulnState, dispatch } =

@@ -70,7 +70,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
     (permission) => permission.key === 'sign_sbom' && permission.value === true
   )
 
-  const currentProduct = JSON.parse(localStorage.getItem(`product`))
+  const currentProduct = JSON.parse(sessionStorage.getItem(`product`))
 
   const navigate = useNavigate()
   const location = useLocation()
@@ -160,7 +160,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
     })
       .then((res) => {
         if (res.data) {
-          localStorage.setItem(
+          sessionStorage.setItem(
             'currentSBOM',
             JSON.stringify({
               version: normalizeSBOMVersion(res.data.sbom),

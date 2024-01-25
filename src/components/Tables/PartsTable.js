@@ -58,7 +58,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const queryParams = new URLSearchParams(location.search)
   const sbomId = queryParams.get('sbom')
   const prodId = queryParams.get('id')
-  const group = JSON.parse(localStorage.getItem('product'))
+  const group = JSON.parse(sessionStorage.getItem('product'))
 
   const capitalizeFirstLetter = (str) => {
     return str.charAt(0).toUpperCase() + str.slice(1)
@@ -237,7 +237,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
     })
 
   const getComponents = () => {
-    localStorage.setItem('activeSbomTab', 2)
+    sessionStorage.setItem('activeSbomTab', 2)
     getCompData({
       variables: {
         projectId: prodId,
@@ -260,7 +260,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
     }).then((res) => {
       if (res.data) {
         prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
-        localStorage.setItem('activeSbomTab', 3)
+        sessionStorage.setItem('activeSbomTab', 3)
       }
     })
   }
@@ -282,7 +282,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
               fontSize={14}
               onClick={() => {
                 prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
-                localStorage.setItem('activeSbomTab', 0)
+                sessionStorage.setItem('activeSbomTab', 0)
                 setActiveProdTab(0)
               }}
             >

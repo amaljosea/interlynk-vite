@@ -92,7 +92,7 @@ function SBOMLinkDrawer(props) {
     }
   }
 
-  const imageName = window.localStorage.getItem('Image')
+  const imageName = window.sessionStorage.getItem('Image')
 
   const handleRemove = (item) => {
     const updatedList = emailList.filter((email) => email !== item)

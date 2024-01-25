@@ -91,7 +91,7 @@ const SBOMTable = ({
   const queryParams = new URLSearchParams(location.search);
   const productId = queryParams.get('id');
   const sbomId = queryParams.get('sbom');
-  const activeTab = Number(localStorage.getItem('activeSbomTab') || 0);
+  const activeTab = Number(sessionStorage.getItem('activeSbomTab') || 0);
 
 
   // GET SBOM PARTS
@@ -128,7 +128,7 @@ const SBOMTable = ({
   };
 
   const handleTabChange = (value) => {
-    localStorage.setItem('activeSbomTab', value);
+    sessionStorage.setItem('activeSbomTab', value);
     setActiveSbomTab(value);
   };
 

@@ -29,7 +29,7 @@ const StepOne = ({
 }) => {
   const { totalRows, prodState } = useGlobalState()
   const { enabled, field, direction } = prodState
-  const group = JSON.parse(localStorage.getItem('product'))
+  const group = JSON.parse(sessionStorage.getItem('product'))
 
   const [envName, setEnvName] = useState('')
 
