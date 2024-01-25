@@ -72,6 +72,7 @@ import { GetProjectGroup } from 'graphQL/Queries'
 import VulnInfo from '../Vulnerabilities/vulnInfo'
 import { GetGlobalVulnData } from 'graphQL/Queries'
 import { filterEnvList } from 'utils'
+import { GetProjectVulns } from 'graphQL/Queries'
 
 const ProductDetails = () => {
   const navigate = useNavigate()
@@ -143,11 +144,11 @@ const ProductDetails = () => {
   // const versionData = versions ? removeDuplicates(versions?.project?.sboms) : []
 
   const { data: globalVulnData, refetch: globalVulnRefetch } = useQuery(
-    GetProjectGroupComponentVulns,
+    GetProjectVulns,
     {
       fetchPolicy: 'network-only',
       variables: {
-        id: productId,
+        id: activeEnv,
         first: totalRows
       }
     }
@@ -241,6 +242,7 @@ const ProductDetails = () => {
 
   // ON CHANGE ENV
   const onChangeEnv = (value) => {
+    globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
     localStorage.setItem('activeEnv', value)
     setActiveEnv(value)
   }
@@ -553,7 +555,7 @@ const ProductDetails = () => {
                 {/* VULNERABILITIES */}
                 <TabPanel px={0}>
                   <GlobalVulnTable
-                    data={globalVulnData?.projectGroup?.componentVulns}
+                    data={globalVulnData?.project?.componentVulns}
                     refetch={globalVulnRefetch}
                   />
                 </TabPanel>
