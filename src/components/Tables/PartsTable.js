@@ -5,7 +5,6 @@ import {
   Flex,
   HStack,
   IconButton,
-  Input,
   Menu,
   MenuButton,
   MenuItem,
@@ -46,27 +45,12 @@ import { useLocation, Link, useParams } from 'react-router-dom'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import {
   isDefaultEnv,
+  getFullDateAndTime,
   normalizeSBOMVersion,
   removeDuplicates,
-  envOrderList
+  envOrderList,
+  customStyles
 } from 'utils'
-
-const customStyles = {
-  headCells: {
-    style: {
-      fontWeight: 'bold',
-      color: '#2D3748',
-      fontSize: '12px',
-      letterSpacing: '1px'
-    }
-  },
-  subHeader: {
-    style: {
-      padding: 0,
-      margin: 0
-    }
-  }
-}
 
 const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const location = useLocation()
@@ -515,7 +499,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
         <Stack
           width={'100%'}
           direction={'row'}
-          spacing={4}
+          spacing={2}
           alignItems={'flex-start'}
           justifyContent={'flex-end'}
         >
@@ -564,9 +548,9 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
           </Tooltip>
           <Tooltip label='Refresh'>
             <IconButton
-                onClick={handleRefresh}
-                colorScheme='blue'
-                icon={<RepeatIcon />}
+              onClick={handleRefresh}
+              colorScheme='blue'
+              icon={<RepeatIcon />}
             ></IconButton>
           </Tooltip>
         </Stack>
