@@ -149,6 +149,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
     filteredDuplicated.map((project) => {
       uniqVersions.push({
         label: normalizeSBOMVersion(project),
+        value: project?.id
       })
     })
 
