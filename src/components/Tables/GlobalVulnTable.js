@@ -1,8 +1,19 @@
 // Chakra imports
 import { useEffect, useMemo, useState } from 'react'
-import {Flex, Text, Tag, TagLabel, Tooltip, Stack, Button, Box, Select, IconButton} from '@chakra-ui/react'
+import {
+  Flex,
+  Text,
+  Tag,
+  TagLabel,
+  Tooltip,
+  Stack,
+  Button,
+  Box,
+  Select,
+  IconButton
+} from '@chakra-ui/react'
 import { sevColor, timeSince, getFullDateAndTime, customStyles } from 'utils'
-import {ChevronDownIcon, ChevronUpIcon, RepeatIcon} from '@chakra-ui/icons'
+import { ChevronDownIcon, ChevronUpIcon, RepeatIcon } from '@chakra-ui/icons'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import DataTable from 'react-data-table-component'
 import CustomLoader from 'components/CustomLoader'
@@ -34,6 +45,8 @@ const GlobalVulnTable = ({ data, refetch }) => {
       return 'orange'
     } else if (cvss >= 6.0) {
       return 'yellow'
+    } else if (cvss === '') {
+      return 'gray'
     } else {
       return 'green'
     }
@@ -72,22 +85,16 @@ const GlobalVulnTable = ({ data, refetch }) => {
       selector: (row) => {
         const { sev } = params?.name ? row?.vuln : row
         return (
-          <>
-            {sev !== null ? (
-              <Tag
-                size='md'
-                variant='subtle'
-                width={'80px'}
-                colorScheme={sevColor(`${sev}`)}
-              >
-                <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
-                  {sev}
-                </TagLabel>
-              </Tag>
-            ) : (
-              ''
-            )}
-          </>
+          <Tag
+            size='md'
+            variant='subtle'
+            width={'80px'}
+            colorScheme={sevColor(sev)}
+          >
+            <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
+              {sev || '-'}
+            </TagLabel>
+          </Tag>
         )
       },
       width: '9%',
@@ -122,7 +129,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
       id: 'VULNS_CVSS_SCORE',
       name: 'CVSS',
       selector: (row) => {
-        const { cvssScore, cvssVector } = params?.name ? row?.vuln : row
+        const { cvssScore } = params?.name ? row?.vuln : row
         return (
           <Flex minWidth='max-content' alignItems='center' gap='2'>
             <Tag
@@ -130,9 +137,9 @@ const GlobalVulnTable = ({ data, refetch }) => {
               key='md'
               variant='subtle'
               width={'50px'}
-              colorScheme={cvssColor(cvssScore)}
+              colorScheme={cvssColor(cvssScore || '')}
             >
-              <TagLabel mx={'auto'}>{cvssScore || cvssVector}</TagLabel>
+              <TagLabel mx={'auto'}>{cvssScore || '-'}</TagLabel>
             </Tag>
           </Flex>
         )
@@ -158,12 +165,11 @@ const GlobalVulnTable = ({ data, refetch }) => {
               justifyContent='center'
               alignItems='center'
             >
-              {epssScores?.length > 0 && (
-                <TagLabel style={{ textAlign: 'center' }}>
-                  {Math.ceil(epssScores[0] * 10000)}
-                  {/* {epssScores.length > 1 && `- ${epssScores[1]}`} */}
-                </TagLabel>
-              )}
+              <TagLabel style={{ textAlign: 'center' }}>
+                {epssScores?.length > 0
+                  ? Math.ceil(epssScores[0] * 10000)
+                  : '-'}
+              </TagLabel>
             </Tag>
             {epssScores?.length > 1 ? (
               epssScores[0] > epssScores[epssScores.length - 1] ? (
@@ -300,10 +306,10 @@ const GlobalVulnTable = ({ data, refetch }) => {
     return (
       <Flex width={'100%'} alignItems={'center'} gap={3}>
         <Stack
-            width={'100%'}
-            direction={'row'}
-            spacing={4}
-            alignItems={'flex-start'}
+          width={'100%'}
+          direction={'row'}
+          spacing={4}
+          alignItems={'flex-start'}
         >
           <SearchFilter
             id='globalVulns'
@@ -315,15 +321,16 @@ const GlobalVulnTable = ({ data, refetch }) => {
           <VulnsFilters refetch={refetch} />
         </Stack>
         <Stack
-            width={'100%'}
-            direction={'row'}
-            spacing={2}
-            justifyContent={'flex-end'}>
+          width={'100%'}
+          direction={'row'}
+          spacing={2}
+          justifyContent={'flex-end'}
+        >
           <Tooltip label='Refresh'>
             <IconButton
-                onClick={handleClear}
-                colorScheme='blue'
-                icon={<RepeatIcon />}
+              onClick={handleClear}
+              colorScheme='blue'
+              icon={<RepeatIcon />}
             ></IconButton>
           </Tooltip>
         </Stack>
