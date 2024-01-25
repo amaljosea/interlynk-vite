@@ -117,9 +117,8 @@ export default function Dashboard() {
     )
   }
 
-  const recentImports = metrics && removeDuplicates(metrics?.organizationMetric?.latestVersions)
-
-  console.log('recentImports',recentImports);
+  const recentImports =
+    metrics && removeDuplicates(metrics?.organizationMetric?.latestVersions)
 
   return (
     <>
@@ -195,16 +194,8 @@ export default function Dashboard() {
                 {/* RECENT IMPORTS */}
                 <ProductsOverview
                   title={'Recent Imports'}
-                  amount={10}
-                  captions={[
-                    'Product',
-                    'Version',
-                    'Components',
-                    'Licenses',
-                    'Vulnerabilities',
-                    'Imported'
-                  ]}
-                  data={recentImports}
+                  data={metrics?.organizationMetric?.latestVersions}
+                  filteredData={recentImports}
                 />
                 {/* LATEST ACTIVITIES */}
                 <ActivitiesOverview
