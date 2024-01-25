@@ -62,7 +62,7 @@ const ProductTable = ({ data, refetch }) => {
 
   const paginationSizes = [25, 50, 100]
 
-  const { field, direction, searchInput, pageIndex } = prodState
+  const { field, direction, searchInput, pageIndex,enabled } = prodState
   const { prodDispatch, prodCompDispatch } = dispatch
 
   const [totalRows, setTotalRows] = useState(paginationSizes[0])
@@ -261,9 +261,9 @@ const ProductTable = ({ data, refetch }) => {
           {/* REFRESH */}
           <Tooltip label='Refresh'>
             <IconButton
-                onClick={handleRefresh}
-                colorScheme='blue'
-                icon={<RepeatIcon />}
+              onClick={handleRefresh}
+              colorScheme='blue'
+              icon={<RepeatIcon />}
             ></IconButton>
           </Tooltip>
         </Stack>
@@ -580,6 +580,21 @@ const ProductTable = ({ data, refetch }) => {
     responsive: true,
     persistTableHead: true
   }
+
+  useEffect(() => {
+    if (!data) {
+      refetch({
+        first: totalRows,
+        enabled: enabled === 'yes' ? true : enabled === 'no' ? false : undefined,
+        field,
+        direction
+      }).then((res) => {
+        if (res.data) {
+          prodDispatch({ type: 'FETCH_DATA_SUCCESS' })
+        }
+      })
+    }
+  }, [data, refetch, totalRows, prodDispatch])
 
   return (
     <>
