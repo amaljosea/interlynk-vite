@@ -3,7 +3,12 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import DataTable from 'react-data-table-component'
 import { Flex, Heading, TagLabel, Tooltip, Tag, Text } from '@chakra-ui/react'
-import { getFullDateAndTime, timeSince, normalizeSBOMVersion, customStyles} from 'utils'
+import {
+  getFullDateAndTime,
+  timeSince,
+  normalizeSBOMVersion,
+  customStyles
+} from 'utils'
 // Custom components
 import Card from 'components/Card/Card'
 import CardHeader from 'components/Card/CardHeader'
@@ -11,8 +16,9 @@ import CardBody from 'components/Card/CardBody'
 import VulnBadge from 'components/Misc/VulnBadge'
 import CustomLoader from 'components/CustomLoader'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { removeDuplicates } from 'utils'
 
-const ProductsOverview = ({ title, data, filteredData }) => {
+const ProductsOverview = ({ title, data }) => {
   const { setActiveSbomTab, dispatch } = useGlobalState()
   const { prodDispatch, prodVulnDispatch } = dispatch
 
@@ -73,6 +79,8 @@ const ProductsOverview = ({ title, data, filteredData }) => {
     prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
   }
 
+  const filteredData = data && removeDuplicates(data)
+
   // COLUMNS
   const columns = [
     // PRODUCT
@@ -87,7 +95,7 @@ const ProductsOverview = ({ title, data, filteredData }) => {
         return (
           <Link
             to={`/vendor/products/${project?.projectGroup?.name}?id=${project?.projectGroup?.id}`}
-            style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
+            style={{ pointerEvents: uniqueSbom ? 'inherit' : 'none' }}
             onClick={() => handleClick(row)}
           >
             <Text color='blue.500'>{project?.projectGroup?.name}</Text>
@@ -175,7 +183,11 @@ const ProductsOverview = ({ title, data, filteredData }) => {
             <Link
               to={link}
               style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
-              onClick={() => uniqueSbom ? onFilterSev(id, normalizeSBOMVersion(row), ['critical']) : null}
+              onClick={() =>
+                uniqueSbom
+                  ? onFilterSev(id, normalizeSBOMVersion(row), ['critical'])
+                  : null
+              }
             >
               <VulnBadge color='red' label='Critical'>
                 {stats?.vulnStats?.critical || 0}
@@ -184,7 +196,11 @@ const ProductsOverview = ({ title, data, filteredData }) => {
             <Link
               to={link}
               style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
-              onClick={() => uniqueSbom ? onFilterSev(id, normalizeSBOMVersion(row), ['high']) : null}
+              onClick={() =>
+                uniqueSbom
+                  ? onFilterSev(id, normalizeSBOMVersion(row), ['high'])
+                  : null
+              }
             >
               <VulnBadge color='orange' label='High'>
                 {stats?.vulnStats?.high || 0}
@@ -193,7 +209,11 @@ const ProductsOverview = ({ title, data, filteredData }) => {
             <Link
               to={link}
               style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
-              onClick={() => uniqueSbom ? onFilterSev(id, normalizeSBOMVersion(row), ['medium']) : null}
+              onClick={() =>
+                uniqueSbom
+                  ? onFilterSev(id, normalizeSBOMVersion(row), ['medium'])
+                  : null
+              }
             >
               <VulnBadge color='yellow' label='Medium'>
                 {stats?.vulnStats?.medium || 0}
@@ -202,7 +222,11 @@ const ProductsOverview = ({ title, data, filteredData }) => {
             <Link
               to={link}
               style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
-              onClick={() => uniqueSbom ? onFilterSev(id, normalizeSBOMVersion(row), ['low']) : null}
+              onClick={() =>
+                uniqueSbom
+                  ? onFilterSev(id, normalizeSBOMVersion(row), ['low'])
+                  : null
+              }
             >
               <VulnBadge color='green' label='Low'>
                 {stats?.vulnStats?.low || 0}

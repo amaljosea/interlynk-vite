@@ -1697,3 +1697,13 @@ export const ManualVulnScan = gql`
     }
   }
 `
+
+// RESEND CONFIRMATION EMAIL
+export const UserResendConfirmationEmail = gql`
+  mutation UserResendConfirmationEmail($email: String!) {
+    userResendConfirmationEmail(input: { email: $email }) {
+      errors
+      success
+    }
+  }
+`
