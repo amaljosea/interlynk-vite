@@ -516,11 +516,10 @@ const VulnTable = ({
         justifyContent={'space-between'}
       >
         <Flex
-          width={'100%'}
           flexDirection={'row'}
-          gap={4}
           alignItems={'flex-start'}
           flexWrap={'wrap'}
+          gap={4}
         >
           {/* SEARCH COMPONENTS */}
           <SearchFilter
@@ -547,15 +546,12 @@ const VulnTable = ({
           )}
         </Flex>
 
-        <Stack direction='row'>
+        <Stack direction='row' alignItems={'center'} width={'fit-content'}>
+          {sbomData?.sbom?.vulnRunStatus === 'IN_PROGRESS' && (
+            <Text>Re-scan in progress</Text>
+          )}
           {/* SCAN VULN */}
-          <Tooltip
-            label={`${
-              sbomData?.sbom?.vulnRunStatus === 'IN_PROGRESS'
-                ? 'Re-scan in progress'
-                : 'Scan Vulnerabilities'
-            }`}
-          >
+          <Tooltip label={'Scan Vulnerabilities'}>
             <IconButton
               isDisabled={sbomData?.sbom?.vulnRunStatus === 'IN_PROGRESS'}
               colorScheme='blue'
