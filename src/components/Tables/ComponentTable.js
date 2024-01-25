@@ -972,24 +972,23 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
         <Stack
             width={'100%'}
             direction={'row'}
-            spacing={4}
+            spacing={2}
             justifyContent={'flex-end'}>
           {/* CREATE COMPONENT */}
           {!customerView && (
-              <Tooltip label='Add Component'>
-                <IconButton
-                    ref={compBtn}
-                    onClick={onCreateComponent}
-                    icon={<AddIcon />}
-                    colorScheme='blue'
-                    variant='solid'
-                    fontWeight='normal'
-                    fontSize={'sm'}
-                    isDisabled={lifecycle === 'signed' || !updateComponent}
-                />
-              </Tooltip>
+            <Tooltip label='Add Component'>
+              <IconButton
+                  ref={compBtn}
+                  onClick={onCreateComponent}
+                  icon={<AddIcon />}
+                  colorScheme='blue'
+                  variant='solid'
+                  fontWeight='normal'
+                  fontSize={'sm'}
+                  isDisabled={lifecycle === 'signed' || !updateComponent}
+              />
+            </Tooltip>
           )}
-
           <Tooltip label='Refresh'>
             <IconButton
                 onClick={fetchCompData}
