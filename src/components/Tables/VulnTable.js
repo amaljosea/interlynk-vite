@@ -13,7 +13,6 @@ import {
   TagLabel,
   Icon,
   useColorModeValue,
-  Button,
   Link,
   Box,
   Grid,
@@ -45,7 +44,7 @@ import { customStyles } from 'utils'
 import ImportWizard from 'views/Sbom/components/ImportWizard'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useLazyQuery, useMutation } from '@apollo/client'
-import { GetVulnFilterData, GetProductData } from 'graphQL/Queries'
+import { GetVulnFilterData } from 'graphQL/Queries'
 import { ManualVulnScan } from 'graphQL/Mutation'
 import Pagination from '../Pagination'
 
@@ -67,11 +66,13 @@ const statusColor = (status) => {
 
 const VulnTable = ({
   data,
+  sbomData,
   refetch,
   productId,
   sbomId,
   filteredData,
-  filterRefetch
+  filterRefetch,
+  sbomRefetch
 }) => {
   const toast = useToast()
   // GET VULN FILTER HEADS
@@ -97,10 +98,6 @@ const VulnTable = ({
   const { prodVulnDispatch } = dispatch
 
   const [onVulnScan] = useMutation(ManualVulnScan, {
-    fetchPolicy: 'network-only'
-  })
-
-  const [getSbomData, { data: sbomData }] = useLazyQuery(GetProductData, {
     fetchPolicy: 'network-only'
   })
 
@@ -490,11 +487,9 @@ const VulnTable = ({
         duration: 5000
       })
       if (res.data) {
-        getSbomData({
-          variables: {
-            projectId: productId,
-            sbomId: sbomId
-          }
+        sbomRefetch({
+          projectId: productId,
+          sbomId: sbomId
         })
         prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
       }
@@ -547,13 +542,13 @@ const VulnTable = ({
         </Flex>
 
         <Stack direction='row' alignItems={'center'} width={'fit-content'}>
-          {sbomData?.sbom?.vulnRunStatus === 'IN_PROGRESS' && (
+          {sbomData?.vulnRunStatus === 'IN_PROGRESS' && (
             <Text>Re-scan in progress</Text>
           )}
           {/* SCAN VULN */}
           <Tooltip label={'Scan Vulnerabilities'}>
             <IconButton
-              isDisabled={sbomData?.sbom?.vulnRunStatus === 'IN_PROGRESS'}
+              isDisabled={sbomData?.vulnRunStatus === 'IN_PROGRESS'}
               colorScheme='blue'
               onClick={handleScan}
               icon={<FaBug />}

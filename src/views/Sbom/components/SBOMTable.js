@@ -356,6 +356,8 @@ const SBOMTable = ({
               <TabPanel px={0}>
                 <VulnTable
                     data={vulnData?.sbom?.vulns}
+                    sbomData={data}
+                    sbomRefetch={refetch}
                     filteredData={filteredData}
                     refetch={getVulnData}
                     productId={productId}
