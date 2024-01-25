@@ -169,15 +169,6 @@ const EnvironmentDrawer = ({
     }
   ]
 
-  const conditionalRowStyles = [
-    {
-      when: (row) => row.name === 'production',
-      style: {
-        borderBottom: '1px solid darkgray'
-      }
-    }
-  ]
-
   return (
     <>
       <Drawer isOpen={isOpen} placement='right' size='lg' onClose={onClose}>
@@ -203,7 +194,6 @@ const EnvironmentDrawer = ({
                 subHeaderComponent={Header}
                 persistTableHead
                 responsive={true}
-                conditionalRowStyles={conditionalRowStyles}
               />
             </Flex>
           </DrawerBody>
