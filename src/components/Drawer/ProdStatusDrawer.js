@@ -69,8 +69,6 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
   const [details, setDetails] = useState('')
   const [notes, setNotes] = useState('')
   const [impactData, setImpactData] = useState('')
-  const [isActive, setIsActive] = useState(false)
-
   const [statusResults, setStatusResults] = useState([])
   const [newVulnLogs, setNewVulnLogs] = useState([])
 
@@ -139,7 +137,6 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
   }
 
   const handleSave = async () => {
-    setIsActive(false)
     await compVexCreate({
       variables: {
         compVulnId: id,
@@ -154,11 +151,19 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
       }
     })
       .then((res) => {
+        setStatusTitle('')
+        setStatusName('')
+        setJustification('')
+        setJustifyName('')
+        setSelectedTag('')
+        setActionStatement('')
+        setResponse('')
+        setResponseTitle('')
+        setDetails('')
+        setNotes('')
+        setImpactData('')
         if (res.data) {
           prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
-          setTimeout(() => {
-            setIsActive(true)
-          }, 2000)
         }
       })
       .finally(() => handleRefetch())
@@ -396,7 +401,6 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
               colorScheme='blue'
               onClick={handleSave}
               disabled={
-                !setIsActive ||
                 statusTitle === '' ||
                 (statusName === 'Not Affected' && justification === '') ||
                 (statusName === 'Not Affected' &&

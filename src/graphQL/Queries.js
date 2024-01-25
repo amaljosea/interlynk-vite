@@ -343,6 +343,10 @@ export const GetProjectGroups = gql`
             description
             updatedAt
             enabled
+            projectGroup {
+              id
+              name
+            }
             sboms {
               id
               format

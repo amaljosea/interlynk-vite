@@ -2,7 +2,8 @@
 import {
   ChevronDownIcon,
   ChevronUpIcon,
-  ExternalLinkIcon, RepeatIcon
+  ExternalLinkIcon,
+  RepeatIcon
 } from '@chakra-ui/icons'
 import {
   Flex,
@@ -27,11 +28,12 @@ import {
   DrawerCloseButton,
   IconButton,
   Badge,
-  Skeleton
+  Skeleton,
+  useToast
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
-import { FaCopy, FaLayerGroup } from 'react-icons/fa6'
-import { useState, useMemo, useEffect, useCallback } from 'react'
+import { FaBug, FaCopy } from 'react-icons/fa6'
+import { useState, useMemo, useEffect } from 'react'
 import styled from '@emotion/styled'
 import ProdStatusDrawer from 'components/Drawer/ProdStatusDrawer'
 import VulnFilterMenu from 'views/Sbom/components/VulnFilterMenu'
@@ -40,13 +42,12 @@ import SearchFilter from 'views/Sbom/components/SearchFilter'
 import CustomLoader from 'components/CustomLoader'
 import Cookies from 'js-cookie'
 import { customStyles } from 'utils'
-import RowLimit from 'views/Sbom/components/RowLimit'
 import ImportWizard from 'views/Sbom/components/ImportWizard'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useLazyQuery, useMutation } from '@apollo/client'
-import { GetVulnFilterData } from 'graphQL/Queries'
-import Pagination from '../Pagination'
+import { GetVulnFilterData, GetProductData } from 'graphQL/Queries'
 import { ManualVulnScan } from 'graphQL/Mutation'
+import Pagination from '../Pagination'
 
 const statusColor = (status) => {
   if (status && status === 'Fixed') {
@@ -72,6 +73,7 @@ const VulnTable = ({
   filteredData,
   filterRefetch
 }) => {
+  const toast = useToast()
   // GET VULN FILTER HEADS
   const [getVulnFilters] = useLazyQuery(GetVulnFilterData)
 
@@ -94,7 +96,13 @@ const VulnTable = ({
   } = prodVulnState
   const { prodVulnDispatch } = dispatch
 
-  const [onVulnScan] = useMutation(ManualVulnScan)
+  const [onVulnScan] = useMutation(ManualVulnScan, {
+    fetchPolicy: 'network-only'
+  })
+
+  const [getSbomData, { data: sbomData }] = useLazyQuery(GetProductData, {
+    fetchPolicy: 'network-only'
+  })
 
   const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
   const editVulns = sboms?.supersededBy?.some(
@@ -123,7 +131,7 @@ const VulnTable = ({
     } else if (cvss >= 6.0) {
       return 'yellow'
     } else {
-      return 'green'
+      return 'gray'
     }
   }
 
@@ -156,21 +164,18 @@ const VulnTable = ({
                 color={'blue.500'}
               />
             </Link>
-            <Tooltip label={vuln.vulnId} placement={'top'}>
-              <Text
-                my={3}
-                fontSize='sm'
-                color={textColor}
-                data-tag='allowRowEvents'
-              >
-                {vuln.vulnId !== null ? `${vuln.vulnId}` : ''}
-              </Text>
-            </Tooltip>
-            {kev === true && (
-              <Badge variant='subtle' colorScheme='red'>
-                KEV
-              </Badge>
-            )}
+            <Stack direction={'column'} my={2}>
+              <Tooltip label={vuln.vulnId} placement={'top'}>
+                <Text fontSize='sm' color={textColor} data-tag='allowRowEvents'>
+                  {vuln.vulnId !== null ? `${vuln.vulnId}` : ''}
+                </Text>
+              </Tooltip>
+              {kev === true && (
+                <Badge width={'fit-content'} variant='subtle' colorScheme='red'>
+                  KEV
+                </Badge>
+              )}
+            </Stack>
           </Flex>
         )
       },
@@ -184,22 +189,16 @@ const VulnTable = ({
       selector: (row) => {
         const { vuln } = row
         return (
-          <>
-            {vuln.sev !== null ? (
-              <Tag
-                size='md'
-                variant='subtle'
-                width={'80px'}
-                colorScheme={sevColor(`${vuln.sev}`)}
-              >
-                <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
-                  {vuln.sev}
-                </TagLabel>
-              </Tag>
-            ) : (
-              ''
-            )}
-          </>
+          <Tag
+            size='md'
+            variant='subtle'
+            width={'80px'}
+            colorScheme={sevColor(vuln?.sev)}
+          >
+            <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
+              {vuln?.sev || '-'}
+            </TagLabel>
+          </Tag>
         )
       },
       width: '9%',
@@ -247,7 +246,7 @@ const VulnTable = ({
               colorScheme={cvssColor(vuln.cvssScore)}
             >
               <TagLabel mx={'auto'}>
-                {vuln.cvssScore ? vuln.cvssScore : 0}
+                {vuln.cvssScore ? vuln.cvssScore : '-'}
               </TagLabel>
             </Tag>
           </Flex>
@@ -277,8 +276,9 @@ const VulnTable = ({
               alignItems='center'
             >
               <TagLabel style={{ textAlign: 'center' }}>
-                {epssScores ? Math.ceil(epssScores[0] * 10000) : 0}
-                {/* {epssScores.length > 1 && `- ${epssScores[1]}`} */}
+                {epssScores?.length > 0
+                  ? Math.ceil(epssScores[0] * 10000)
+                  : '-'}
               </TagLabel>
             </Tag>
             {epssScores && epssScores.length > 1 ? (
@@ -337,7 +337,7 @@ const VulnTable = ({
       name: 'VERSION',
       selector: (row) => (
         <Tooltip label={row.component.version} placement='top'>
-          {row.component.version}
+          <Text my={2}>{row.component.version}</Text>
         </Tooltip>
       ),
       wrap: true,
@@ -483,29 +483,28 @@ const VulnTable = ({
     await onVulnScan({
       variables: { id: sbomId }
     }).then((res) => {
+      toast({
+        description: 'Vulnerability re-scan started',
+        position: 'top',
+        status: 'success',
+        duration: 5000
+      })
       if (res.data) {
-        refetch({
-          projectId: productId,
-          sbomId: sbomId,
-          first: totalRows,
-          search: undefined,
-          severity: undefined,
-          componentName: undefined,
-          status: undefined,
-          kev: undefined,
-          epss: undefined,
-          field: field,
-          direction: direction
+        getSbomData({
+          variables: {
+            projectId: productId,
+            sbomId: sbomId
+          }
         })
         prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
       }
     })
   }
-  
+
   const handleRefresh = async () => {
     await refetch({
       projectId: productId,
-      sbomId: sbomId,
+      sbomId: sbomId
     })
   }
 
@@ -517,11 +516,10 @@ const VulnTable = ({
         justifyContent={'space-between'}
       >
         <Flex
-          width={'100%'}
           flexDirection={'row'}
-          gap={4}
           alignItems={'flex-start'}
           flexWrap={'wrap'}
+          gap={4}
         >
           {/* SEARCH COMPONENTS */}
           <SearchFilter
@@ -548,52 +546,46 @@ const VulnTable = ({
           )}
         </Flex>
 
-        <Stack
-            direction={'row'}
-            spacing={4}
-            justifyContent={'flex-end'}>
-
-        {!customerView && (
-          <Stack direction='row' spacing={2}>
-            {/* SCAN VULN */}
-            <Tooltip label='Scan Vulnerabilities'>
-              <IconButton
-                colorScheme='blue'
-                onClick={handleScan}
-                icon={<FaLayerGroup />}
-              />
-            </Tooltip>
-            // IMPORT STATUS
-            <Tooltip label='Import Statuses'>
-              <IconButton
-                variant='solid'
-                colorScheme='blue'
-                fontWeight='normal'
-                fontSize={'sm'}
-                onClick={() => {
-                  prodVulnDispatch({ type: 'RESET_SELECTED_VULN' })
-                  onTableOpen()
-                }}
-                isDisabled={!editVulns}
-                icon={<FaCopy size={18} />}
-              />
-            </Tooltip>
-          </Stack>
-        )}
-
-        <Tooltip label='Refresh'>
-          <IconButton
+        <Stack direction='row' alignItems={'center'} width={'fit-content'}>
+          {sbomData?.sbom?.vulnRunStatus === 'IN_PROGRESS' && (
+            <Text>Re-scan in progress</Text>
+          )}
+          {/* SCAN VULN */}
+          <Tooltip label={'Scan Vulnerabilities'}>
+            <IconButton
+              isDisabled={sbomData?.sbom?.vulnRunStatus === 'IN_PROGRESS'}
+              colorScheme='blue'
+              onClick={handleScan}
+              icon={<FaBug />}
+            />
+          </Tooltip>
+          {/* IMPORT STATUS */}
+          <Tooltip label='Import Statuses'>
+            <IconButton
+              variant='solid'
+              colorScheme='blue'
+              fontWeight='normal'
+              fontSize={'sm'}
+              onClick={() => {
+                prodVulnDispatch({ type: 'RESET_SELECTED_VULN' })
+                onTableOpen()
+              }}
+              isDisabled={!editVulns}
+              icon={<FaCopy size={18} />}
+            />
+          </Tooltip>
+          {/* REFRESH */}
+          <Tooltip label='Refresh'>
+            <IconButton
               onClick={handleRefresh}
               colorScheme='blue'
-              icon={<RepeatIcon />}>
-          </IconButton>
-        </Tooltip>
-
+              icon={<RepeatIcon />}
+            ></IconButton>
+          </Tooltip>
         </Stack>
-
       </Flex>
     )
-  }, [vulnSearch, filters, onSearchInputChange, handleSearch])
+  }, [vulnSearch, filters, onSearchInputChange, handleSearch, handleScan])
 
   const ExpandedComponent = ({ data }) => {
     const { vuln } = data
@@ -818,7 +810,7 @@ const VulnTable = ({
 
   return (
     <>
-      <Flex flexDir={'column'} width={'100%'} overflowX={'scroll'}>
+      <Flex flexDir={'column'} width={'100%'}>
         {/* TABLE */}
         <DataTable
           className='data-table-container'

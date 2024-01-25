@@ -102,8 +102,7 @@ const VulnsFilters = ({ refetch }) => {
       min: parseFloat(minEpss) / 10000,
       max: parseFloat(maxEpss) / 10000
     }
-    await refetch({id: params?.name ? groupId : undefined, 
-    epss: range, ...vulnData })
+    await refetch({id: params?.name ? groupId : undefined, epss: range, ...vulnData })
     .then((res) => res?.data && globalVulnDispatch({ type: 'SET_EPSS', payload: `${minEpss}-${maxEpss}` }))
     .finally(() => onClose())
   }

@@ -22,7 +22,7 @@ import {
   Stack,
   useDisclosure,
   UnorderedList,
-  ListItem,
+  ListItem
 } from '@chakra-ui/react'
 import {
   timeSince,
@@ -60,26 +60,30 @@ const EnvironmentDrawer = ({
   } = useDisclosure()
 
   const [activeRow, setActiveRow] = useState(null)
+  const [loading, setLoading] = useState(false)
 
   const [projectDelete] = useMutation(EnvDelete)
 
   const handleDelete = async (id) => {
+    setLoading(true)
     await projectDelete({
       variables: {
         id
       }
-    })
-      .then((res) => {
-        if (res?.data) {
-          if (id === activeEnv) {
-            setActiveEnv(data?.projectGroup?.defaultProject?.id)
-          }
-          refetch({
-            id: data?.projectGroup?.id
-          })
+    }).then((res) => {
+      if (res?.data) {
+        if (id === activeEnv) {
+          setActiveEnv(data?.projectGroup?.defaultProject?.id)
         }
-      })
-      .finally(() => onWarningClose())
+        refetch({
+          id: data?.projectGroup?.id
+        })
+        setTimeout(() => {
+          setLoading(false)
+          onWarningClose()
+        }, 1000)
+      }
+    })
   }
 
   // TABLE HEADER
@@ -241,6 +245,8 @@ const EnvironmentDrawer = ({
               </Button>
               <Button
                 colorScheme='red'
+                isLoading={loading}
+                loadingText='Deleting...'
                 onClick={() => handleDelete(activeRow?.id)}
               >
                 Ok

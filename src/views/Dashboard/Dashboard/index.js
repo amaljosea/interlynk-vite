@@ -2,6 +2,7 @@
 import {
   Flex,
   Grid,
+  GridItem,
   SimpleGrid,
   Skeleton,
   useColorModeValue
@@ -117,9 +118,6 @@ export default function Dashboard() {
     )
   }
 
-  const recentImports = metrics && removeDuplicates(metrics?.organizationMetric?.latestVersions)
-
-  console.log('recentImports',recentImports);
 
   return (
     <>
@@ -169,9 +167,8 @@ export default function Dashboard() {
               <Grid
                 templateColumns={{ sm: '1fr', lg: '1.3fr 1.7fr' }}
                 templateRows={{ sm: 'repeat(2, 1fr)', lg: '1fr' }}
-                my='26px'
-                gap='24px'
                 mb={{ lg: '26px' }}
+                gap='24px'
               >
                 {/* TODO: 1.0 Add back in when ready
                 <RiskScoreOverview
@@ -187,31 +184,22 @@ export default function Dashboard() {
                 */}
               </Grid>
               {/* LIST */}
-              <Grid
-                templateColumns={{ sm: '1fr', md: '1fr 1fr', lg: '2fr 1fr' }}
-                templateRows={{ sm: '1fr auto', md: '1fr', lg: '1fr' }}
-                gap='24px'
-              >
+              <Grid templateColumns='repeat(12, 1fr)' gap={'24px'} flexWrap={'wrap'}>
                 {/* RECENT IMPORTS */}
-                <ProductsOverview
-                  title={'Recent Imports'}
-                  amount={10}
-                  captions={[
-                    'Product',
-                    'Version',
-                    'Components',
-                    'Licenses',
-                    'Vulnerabilities',
-                    'Imported'
-                  ]}
-                  data={recentImports}
-                />
+                <GridItem colSpan={8} w='100%'>
+                  <ProductsOverview
+                    title={'Recent Imports'}
+                    data={metrics?.organizationMetric?.latestVersions}
+                  />
+                </GridItem>
                 {/* LATEST ACTIVITIES */}
-                <ActivitiesOverview
-                  title={'Recent Activities'}
-                  amount={metrics?.organizationMetric?.latestActivity?.length}
-                  data={metrics?.organizationMetric?.latestActivity}
-                />
+                <GridItem colSpan={4} w='100%'>
+                  <ActivitiesOverview
+                    title={'Recent Activities'}
+                    amount={metrics?.organizationMetric?.latestActivity?.length}
+                    data={metrics?.organizationMetric?.latestActivity}
+                  />
+                </GridItem>
               </Grid>
             </Flex>
           ) : (

@@ -1,11 +1,10 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import {AddIcon, RepeatIcon} from '@chakra-ui/icons'
+import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
 import {
   Button,
   Flex,
   HStack,
   IconButton,
-  Input,
   Menu,
   MenuButton,
   MenuItem,
@@ -46,27 +45,12 @@ import { useLocation, Link, useParams } from 'react-router-dom'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import {
   isDefaultEnv,
+  getFullDateAndTime,
   normalizeSBOMVersion,
   removeDuplicates,
-  envOrderList
+  envOrderList,
+  customStyles
 } from 'utils'
-
-const customStyles = {
-  headCells: {
-    style: {
-      fontWeight: 'bold',
-      color: '#2D3748',
-      fontSize: '12px',
-      letterSpacing: '1px'
-    }
-  },
-  subHeader: {
-    style: {
-      padding: 0,
-      margin: 0
-    }
-  }
-}
 
 const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const location = useLocation()
@@ -77,8 +61,8 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const group = JSON.parse(localStorage.getItem('product'))
 
   const capitalizeFirstLetter = (str) => {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  };
+    return str.charAt(0).toUpperCase() + str.slice(1)
+  }
 
   const {
     setActiveProdTab,
@@ -222,35 +206,30 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const existingVersions = []
 
   data?.map((item) =>
-    existingVersions.push(
-      item?.part?.primaryComponent
-        ? item?.part?.primaryComponent.id
-        : `Uploaded ${getFullDateAndTime(
-            item?.part?.primaryComponent?.creationAt
-          )}`
-    )
+    existingVersions.push({
+      group: item?.part?.project?.projectGroup?.name,
+      env: item?.part?.project?.name,
+      version: normalizeSBOMVersion(item?.part)
+    })
   )
 
   const sbomVersions = []
 
   const filteredDuplicated = product ? removeDuplicates(product.sboms) : []
 
-
   filteredDuplicated &&
     filteredDuplicated.map((project) => {
-      if (
-        !existingVersions?.includes(
-          project.primaryComponent
-            ? project.primaryComponent.id
-            : `Uploaded ${getFullDateAndTime(
-                project?.primaryComponent?.creationAt
-              )}`
-        )
-      ) {
+      const myProduct = {
+        group: product?.projectGroup?.name,
+        env: product?.name,
+        version: normalizeSBOMVersion(project)
+      }
+      const isVersionIncluded = existingVersions?.some(
+        (item) => JSON.stringify(item) === JSON.stringify(myProduct)
+      )
+      if (!isVersionIncluded) {
         sbomVersions.push({
-          label: project.primaryComponent
-            ? project.primaryComponent.version
-            : `Uploaded ${getFullDateAndTime(project.creationAt)}`,
+          label: normalizeSBOMVersion(project),
           value: project.id,
           creationAt: project.creationAt
         })
@@ -320,7 +299,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       name: 'VERSION',
       selector: (row) => {
         const { part } = row
-        return <Text fontSize={14}>{normalizeSBOMVersion(part)}</Text>
+        return <Text fontSize={14} my={2}>{normalizeSBOMVersion(part)}</Text>
       },
       width: '200px',
       wrap: true
@@ -515,7 +494,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
         <Stack
           width={'100%'}
           direction={'row'}
-          spacing={4}
+          spacing={2}
           alignItems={'flex-start'}
           justifyContent={'flex-end'}
         >
@@ -564,9 +543,9 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
           </Tooltip>
           <Tooltip label='Refresh'>
             <IconButton
-                onClick={handleRefresh}
-                colorScheme='blue'
-                icon={<RepeatIcon />}
+              onClick={handleRefresh}
+              colorScheme='blue'
+              icon={<RepeatIcon />}
             ></IconButton>
           </Tooltip>
         </Stack>
@@ -637,8 +616,12 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
                         <option
                           key={index}
                           value={item.value}
-                          label={isDefaultEnv(item.label) ? capitalizeFirstLetter(item.label) : item.label}
-                          >
+                          label={
+                            isDefaultEnv(item.label)
+                              ? capitalizeFirstLetter(item.label)
+                              : item.label
+                          }
+                        >
                           {item.label}
                         </option>
                       ))}

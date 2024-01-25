@@ -99,9 +99,8 @@ const ProductDetails = () => {
     statues,
     kev,
     epss,
-    filters
   } = prodVulnState
-  const { prodVulnDispatch } = dispatch
+  const { prodVulnDispatch,globalVulnDispatch } = dispatch
 
   const activeProd = localStorage.getItem('activeEnv')
   const [activeEnv, setActiveEnv] = useState(activeProd || '')
@@ -264,6 +263,7 @@ const ProductDetails = () => {
   useEffect(() => {
     if (sbomId === null) {
       prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
+      globalVulnDispatch({ type: 'CLEAR_GLOBAL_VULN' })
     }
   }, [sbomId])
 
@@ -486,6 +486,12 @@ const ProductDetails = () => {
                           key={item?.id}
                           textTransform={
                             isDefaultEnv(item?.name) ? 'capitalize' : 'none'
+                          }
+                          borderBottom={
+                            filterEnvList(data?.projectGroup?.projects)
+                              ?.length > 3 && item?.name === 'production'
+                              ? '1px solid #E2E8F0'
+                              : 'none'
                           }
                         >
                           {item?.name}
