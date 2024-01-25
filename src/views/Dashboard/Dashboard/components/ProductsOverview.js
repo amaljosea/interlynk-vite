@@ -22,8 +22,10 @@ const ProductsOverview = ({ title, data }) => {
   const { prodDispatch, prodVulnDispatch } = dispatch
 
   const handleClick = (prod) => {
+    console.log('prod', prod)
+
     const { project, id, projectId } = prod
-    const { sboms, name } = project
+    const { projectGroup, name } = project
 
     const product = {
       id: projectId,
@@ -32,18 +34,17 @@ const ProductsOverview = ({ title, data }) => {
       sbomId: id
     }
 
-    if (sboms.length > 0) {
-      localStorage.setItem('product', JSON.stringify(product))
-      localStorage.setItem('activeProdTab', 0)
-      prodDispatch({
-        type: 'SET_CURRENT_PRODUCT',
-        payload: {
-          id: projectId,
-          sbomId: id
-        }
-      })
-    }
+    localStorage.setItem('activeEnv', projectGroup?.defaultProject?.id)
+    localStorage.setItem('product', JSON.stringify(product))
+    localStorage.setItem('activeProdTab', 0)
     setActiveSbomTab(0)
+    prodDispatch({
+      type: 'SET_CURRENT_PRODUCT',
+      payload: {
+        id: projectId,
+        sbomId: id
+      }
+    })
   }
 
   const onVersionClick = (item) => {
@@ -112,7 +113,9 @@ const ProductsOverview = ({ title, data }) => {
             style={{ pointerEvents: uniqueSbom ? 'inherit' : 'none' }}
             onClick={() => handleClick(row)}
           >
-            <Text color={uniqueSbom ? 'blue.500': 'gray.500' }>{project?.projectGroup?.name}</Text>
+            <Text color={uniqueSbom ? 'blue.500' : 'gray.500'}>
+              {project?.projectGroup?.name}
+            </Text>
           </Link>
         )
       }
@@ -132,7 +135,7 @@ const ProductsOverview = ({ title, data }) => {
             style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
             onClick={() => onVersionClick(row)}
           >
-            <Text my={2} color={uniqueSbom ? 'blue.500': 'gray.500' }>
+            <Text my={2} color={uniqueSbom ? 'blue.500' : 'gray.500'}>
               {normalizeSBOMVersion(row)}
             </Text>
           </Link>
