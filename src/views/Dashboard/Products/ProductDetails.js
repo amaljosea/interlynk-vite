@@ -175,6 +175,7 @@ const ProductDetails = () => {
 
   // GET VULN DATA
   const { data: vulnData, refetch: vulnRefetch } = useQuery(GetVulnData, {
+    skip: sbomId ? false : true,
     fetchPolicy: 'network-only',
     variables: {
       projectId: activeEnv,
