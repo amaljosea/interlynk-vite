@@ -180,7 +180,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
                 localStorage.setItem(
                   'currentSBOM',
                   JSON.stringify({
-                    version: version,
+                    version: normalizeSBOMVersion(row),
                     id: id
                   })
                 )

@@ -569,8 +569,8 @@ export const GetGlobalVulnData = gql`
 `
 
 // GET PROJECT GROUP VULN DATA
-export const GetProjectGroupComponentVulns = gql`
-  query GetProjectGroupComponentVulns(
+export const GetProjectVulns = gql`
+  query GetProjectVulns(
     $id: Uuid!
     $first: Int
     $last: Int
@@ -583,7 +583,7 @@ export const GetProjectGroupComponentVulns = gql`
     $kev: Boolean
     $epss: RangeInput
   ) {
-    projectGroup(id: $id) {
+    project(id: $id) {
       componentVulns(
         after: $after
         first: $first
