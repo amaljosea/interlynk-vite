@@ -104,12 +104,6 @@ const OrgTable = ({ data, refetch, activeOrg, isAdmin }) => {
       if (res?.data?.organizationUserLeave?.errors?.length > 0) {
         setLeaveError(res?.data?.organizationUserLeave?.errors[0]);
       } else {
-
-        // If the user is leaving the last organization
-        if (data?.length === 1) {
-          await logoutUser();
-        }
-
         navigate('/auth');
       }
     } catch (error) {
