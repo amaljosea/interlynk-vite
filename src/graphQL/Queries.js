@@ -146,6 +146,10 @@ export const GetOrgMetrics = gql`
           projectGroup {
             id
             name
+            defaultProject {
+              id
+              name
+            }
           }
         }
         primaryComponent {
