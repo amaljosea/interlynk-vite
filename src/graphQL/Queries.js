@@ -1562,20 +1562,6 @@ export const GetChangeLogs = gql`
   }
 `
 
-// GET LOGS FILTER DATA
-export const GetLogsFilterData = gql`
-  query GetLogsFilterData($projectId: Uuid!, $sbomId: Uuid!) {
-    sbom(projectId: $projectId, sbomId: $sbomId) {
-      id
-      filters {
-        logChangeBys
-        logChangeObjects
-        logChangeTypes
-      }
-    }
-  }
-`
-
 export const GetProject = gql`
   query GetProject($id: Uuid!) {
     project(id: $id) {
