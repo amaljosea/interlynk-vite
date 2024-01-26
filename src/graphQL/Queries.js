@@ -146,6 +146,10 @@ export const GetOrgMetrics = gql`
           projectGroup {
             id
             name
+            defaultProject {
+              id
+              name
+            }
           }
         }
         primaryComponent {
@@ -548,6 +552,7 @@ export const GetGlobalVulnData = gql`
             name
             version
             sbom {
+              creationAt
               project {
                 name
                 projectGroup {
@@ -568,8 +573,8 @@ export const GetGlobalVulnData = gql`
 `
 
 // GET PROJECT GROUP VULN DATA
-export const GetProjectGroupComponentVulns = gql`
-  query GetProjectGroupComponentVulns(
+export const GetProjectVulns = gql`
+  query GetProjectVulns(
     $id: Uuid!
     $first: Int
     $last: Int
@@ -582,7 +587,7 @@ export const GetProjectGroupComponentVulns = gql`
     $kev: Boolean
     $epss: RangeInput
   ) {
-    projectGroup(id: $id) {
+    project(id: $id) {
       componentVulns(
         after: $after
         first: $first
@@ -1556,20 +1561,6 @@ export const GetChangeLogs = gql`
           loggablePrefix
           loggableType
         }
-      }
-    }
-  }
-`
-
-// GET LOGS FILTER DATA
-export const GetLogsFilterData = gql`
-  query GetLogsFilterData($projectId: Uuid!, $sbomId: Uuid!) {
-    sbom(projectId: $projectId, sbomId: $sbomId) {
-      id
-      filters {
-        logChangeBys
-        logChangeObjects
-        logChangeTypes
       }
     }
   }

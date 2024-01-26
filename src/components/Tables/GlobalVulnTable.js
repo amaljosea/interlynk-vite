@@ -14,7 +14,7 @@ import {
 } from '@chakra-ui/react'
 import { sevColor, timeSince, getFullDateAndTime, customStyles } from 'utils'
 import { ChevronDownIcon, ChevronUpIcon, RepeatIcon } from '@chakra-ui/icons'
-import { Link, useLocation, useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import DataTable from 'react-data-table-component'
 import CustomLoader from 'components/CustomLoader'
 import VulnBadge from 'components/Misc/VulnBadge'
@@ -28,6 +28,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
   const queryParams = new URLSearchParams(location.search)
   const groupId = queryParams.get('id')
   const product = JSON.parse(sessionStorage.getItem('product'))
+  const activeEnv = sessionStorage.getItem('activeEnv')
 
   const { totalRows, setTotalRows, globalVulnState, dispatch } =
     useGlobalState()
@@ -264,6 +265,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
     const { value } = event.target
     if (event.key === 'Enter' && filterText !== '') {
       refetch({
+        id: params?.name ? activeEnv : undefined,
         search: value,
         first: totalRows,
         last: undefined,
@@ -281,6 +283,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
   const handleClear = async () => {
     setFilterText('')
     await refetch({
+      id: params?.name ? activeEnv : undefined,
       search: undefined,
       first: totalRows,
       last: undefined,
@@ -342,7 +345,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
   const handlePreviousPage = async () => {
     setIsPrevActive(false)
     await refetch({
-      id: params?.name ? groupId : undefined,
+      id: params?.name ? activeEnv : undefined,
       first: undefined,
       last: totalRows,
       after: undefined,
@@ -350,7 +353,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
     }).then((res) => {
       if (res.data) {
         const project = params?.name
-          ? res?.data?.projectGroup?.componentVulns
+          ? res?.data?.project?.componentVulns
           : res?.data?.organization?.vulns
         globalVulnDispatch({
           type: 'DECREMENT_PAGE',
@@ -365,7 +368,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
   const handleNextPage = async () => {
     setIsNextActive(false)
     await refetch({
-      id: params?.name ? groupId : undefined,
+      id: params?.name ? activeEnv : undefined,
       first: totalRows,
       last: undefined,
       after: data?.pageInfo?.endCursor,
@@ -373,7 +376,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
     }).then((res) => {
       if (res.data) {
         const project = params?.name
-          ? res?.data?.projectGroup?.componentVulns
+          ? res?.data?.project?.componentVulns
           : res?.data?.organization?.vulns
         globalVulnDispatch({
           type: 'INCREMENT_PAGE',
@@ -392,7 +395,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
     const { value } = e.target
     setTotalRows(Number(value))
     await refetch({
-      id: params?.name ? groupId : undefined,
+      id: params?.name ? activeEnv : undefined,
       first: Number(value),
       last: undefined,
       after: undefined,

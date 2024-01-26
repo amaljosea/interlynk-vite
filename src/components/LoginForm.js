@@ -34,7 +34,6 @@ const LoginForm = () => {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
 
-
   const [resendInvitation, { loading }] = useMutation(
     UserResendConfirmationEmail
   )
@@ -77,7 +76,6 @@ const LoginForm = () => {
 
   const onResendEmail = async () => {
     await resendInvitation({ variables: { email } }).then((res) => {
-      console.log(res.data)
       if (res?.data?.userResendConfirmationEmail?.errors?.length > 0) {
         setError(res?.data?.userResendConfirmationEmail?.errors[0])
       } else {
@@ -111,7 +109,18 @@ const LoginForm = () => {
         <Box mt={4} width={'100%'}>
           <Alert status='error' borderRadius={4}>
             <AlertIcon />
-            <AlertDescription>{error}</AlertDescription>
+            <AlertDescription>
+              {error}
+              {error ===
+                'You have to confirm your email address before continuing.' && (
+                <p>
+                  <strong style={{ cursor: 'pointer' }} onClick={onResendEmail}>
+                    Click here{' '}
+                  </strong>
+                  to resend invitation.
+                </p>
+              )}
+            </AlertDescription>
           </Alert>
         </Box>
       )}
@@ -122,7 +131,10 @@ const LoginForm = () => {
             <Input
               type='email'
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value)
+                setError('')
+              }}
               placeholder='abc@example.com'
               autoComplete='off'
               isReadOnly={emailId}
@@ -133,30 +145,21 @@ const LoginForm = () => {
             <Input
               type='password'
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value)
+                setError('')
+              }}
               placeholder='*******'
             />
           </FormControl>
-          {error ===
-          'You have to confirm your email address before continuing.' ? (
-            <Button
-              colorScheme='blue'
-              isLoading={loading}
-              loadingText='Submitting...'
-              onClick={onResendEmail}
-            >
-              Resend Invitation
-            </Button>
-          ) : (
-            <Button
-              width='full'
-              colorScheme='blue'
-              type='submit'
-              isDisabled={error !== ''}
-            >
-              Log in
-            </Button>
-          )}
+          <Button
+            width='full'
+            colorScheme='blue'
+            type='submit'
+            isDisabled={error !== ''}
+          >
+            Log in
+          </Button>
           <Stack
             alignItems={'center'}
             justifyContent={'center'}

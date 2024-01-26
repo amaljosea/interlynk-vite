@@ -79,6 +79,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
+  const product = JSON.parse(localStorage.getItem('product'))
 
   const [status, setStatus] = useState('created')
   const [signedData, setSignedData] = useState(null)
@@ -249,8 +250,8 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
       if (res.data) {
         setTimeout(() => {
           setIsLoading(false)
-          prodRefetch({ id: productId })
-          navigate(`/vendor/products/${params.name}?id=${productId}`)
+          prodRefetch({ id: product?.groupId })
+          navigate(`/vendor/products/${params.name}?id=${product?.groupId}`)
         }, 3000)
       }
     })

@@ -361,8 +361,8 @@ const GeneralDataRow = ({ status, data, refetch }) => {
               </Td>
               <Td pl={0}>
                 <HStack spacing={4}>
-                  {data.suppliers &&
-                    data.suppliers.map((item, index) => (
+                  {data?.suppliers?.length > 0 &&
+                    data?.suppliers.map((item, index) => (
                       <Tag
                         size={'md'}
                         key={index}

@@ -56,18 +56,19 @@ function Profile() {
   const [psIndex, setPsIndex] = useState(0)
   const [selectedTab, setSelectedTab] = useState(tabs[1].name)
 
+  const isAdmin = orgInfo?.organization?.currentUser?.superAdmin
+
   const { data: orgInfo, refetch, error } = useQuery(GetOrg)
 
   const { data: orgs, refetch: myOrgRefetch } = useQuery(MyOrganizations, {
     variables: { invitationStatuses: ['ACCEPTED', 'INVITED'] }
   })
   const { data: allOrgs, refetch: allOrgRefetch } = useQuery(AllOrganizations, {
+    skip: !isAdmin,
     variables: { first: totalRows, status: 'approved' }
   })
 
   const [getOrgRoles, { data: roles }] = useLazyQuery(GetRoles)
-
-  const isAdmin = orgInfo?.organization?.currentUser?.superAdmin
 
   const onTabChange = (value) => {
     setTabIndex(value)

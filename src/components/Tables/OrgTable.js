@@ -151,9 +151,7 @@ const OrgTable = ({ data, refetch, activeOrg, isAdmin }) => {
       })
       .finally(() => {
         if (isAdmin) {
-          refetch({
-            variables: { first: totalRows, status: 'approved' }
-          })
+          refetch({ first: totalRows, status: 'approved' })
         } else {
           refetch({
             variables: { invitationStatuses: ['ACCEPTED', 'INVITED'] }

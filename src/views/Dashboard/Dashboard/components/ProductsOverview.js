@@ -16,15 +16,16 @@ import CardBody from 'components/Card/CardBody'
 import VulnBadge from 'components/Misc/VulnBadge'
 import CustomLoader from 'components/CustomLoader'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { removeDuplicates } from 'utils'
 
 const ProductsOverview = ({ title, data }) => {
   const { setActiveSbomTab, dispatch } = useGlobalState()
   const { prodDispatch, prodVulnDispatch } = dispatch
 
   const handleClick = (prod) => {
+    console.log('prod', prod)
+
     const { project, id, projectId } = prod
-    const { sboms, name } = project
+    const { projectGroup, name } = project
 
     const product = {
       id: projectId,
@@ -33,18 +34,24 @@ const ProductsOverview = ({ title, data }) => {
       sbomId: id
     }
 
-    if (sboms.length > 0) {
-      sessionStorage.setItem('product', JSON.stringify(product))
-      sessionStorage.setItem('activeProdTab', 0)
-      prodDispatch({
-        type: 'SET_CURRENT_PRODUCT',
-        payload: {
-          id: projectId,
-          sbomId: id
-        }
-      })
-    }
+    sessionStorage.setItem('activeEnv', projectGroup?.defaultProject?.id)
+    sessionStorage.setItem('product', JSON.stringify(product))
+    sessionStorage.setItem('activeProdTab', 0)
+    prodDispatch({
+      type: 'SET_CURRENT_PRODUCT',
+      payload: {
+        id: projectId,
+        sbomId: id
+      }
+    })
     setActiveSbomTab(0)
+    prodDispatch({
+      type: 'SET_CURRENT_PRODUCT',
+      payload: {
+        id: projectId,
+        sbomId: id
+      }
+    })
   }
 
   const onVersionClick = (item) => {
@@ -79,6 +86,21 @@ const ProductsOverview = ({ title, data }) => {
     prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
   }
 
+  const removeDuplicates = (versions) => {
+    const uniqueVersions = []
+    versions.forEach((version) => {
+      const duplicateIndex = uniqueVersions.findIndex(
+        (v) =>
+          v.project.projectGroup.name === version.project.projectGroup.name &&
+          normalizeSBOMVersion(v) === normalizeSBOMVersion(version)
+      )
+      if (duplicateIndex === -1) {
+        uniqueVersions.push(version)
+      }
+    })
+    return uniqueVersions
+  }
+
   const filteredData = data && removeDuplicates(data)
 
   // COLUMNS
@@ -98,7 +120,9 @@ const ProductsOverview = ({ title, data }) => {
             style={{ pointerEvents: uniqueSbom ? 'inherit' : 'none' }}
             onClick={() => handleClick(row)}
           >
-            <Text color='blue.500'>{project?.projectGroup?.name}</Text>
+            <Text color={uniqueSbom ? 'blue.500' : 'gray.500'}>
+              {project?.projectGroup?.name}
+            </Text>
           </Link>
         )
       }
@@ -118,7 +142,7 @@ const ProductsOverview = ({ title, data }) => {
             style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
             onClick={() => onVersionClick(row)}
           >
-            <Text my={2} color={'blue.500'}>
+            <Text my={2} color={uniqueSbom ? 'blue.500' : 'gray.500'}>
               {normalizeSBOMVersion(row)}
             </Text>
           </Link>
