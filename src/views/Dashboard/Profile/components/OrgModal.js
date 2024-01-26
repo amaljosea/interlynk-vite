@@ -66,11 +66,16 @@ const OrgModal = ({ isOpen, onClose, refetch, org, onSwitch }) => {
     })
   }
 
+  const isInvalid =
+    name === '' ||
+    (email !== '' && emailError !== '') ||
+    (url !== '' && !validateUrl(url))
+
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Create Organization</ModalHeader>
+        <ModalHeader>Register Organization</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Flex width={'100%'} direction={'column'} gap={4}>
@@ -137,7 +142,7 @@ const OrgModal = ({ isOpen, onClose, refetch, org, onSwitch }) => {
           </Button>
           <Button
             colorScheme='blue'
-            disabled={name === '' || emailError !== ''}
+            disabled={isInvalid}
             onClick={handleCreate}
           >
             Save

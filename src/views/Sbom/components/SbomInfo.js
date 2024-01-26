@@ -15,7 +15,7 @@ const SbomInfo = ({ sbom, refetch, getCompData, getVulnData, prodRefetch }) => {
           gap={40}
         >
           {/* SBOM INFORMATIONS */}
-          <GridItem colSpan={2}>
+          <GridItem colSpan={3}>
             <SbomDetails
               sbom={sbom}
               getCompData={getCompData}
@@ -24,7 +24,7 @@ const SbomInfo = ({ sbom, refetch, getCompData, getVulnData, prodRefetch }) => {
           </GridItem>
 
           {/* SBOM ACTIONS */}
-          <GridItem colSpan={3}>
+          <GridItem colSpan={2}>
             <SbomActions
               sbom={sbom}
               refetch={refetch}

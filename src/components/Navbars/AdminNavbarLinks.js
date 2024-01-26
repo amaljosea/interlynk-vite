@@ -17,8 +17,9 @@ import {
   PopoverHeader,
   PopoverBody,
   Stack,
-  Select,
-  Kbd
+  Kbd,
+  Icon,
+  MenuDivider
 } from '@chakra-ui/react'
 // Custom Icons
 import { ProfileIcon, SettingsIcon } from 'components/Icons/Icons'
@@ -35,6 +36,7 @@ import axios from 'axios'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { GetOrg } from 'graphQL/Queries'
 import { useQuery } from '@apollo/client'
+import { FaUser } from 'react-icons/fa6'
 
 export default function HeaderLinks(props) {
   const location = useLocation()
@@ -42,7 +44,7 @@ export default function HeaderLinks(props) {
 
   const { userName, setUserName } = useGlobalState()
 
-  const { data } = useQuery(GetOrg)
+  const { data, error } = useQuery(GetOrg)
 
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
@@ -52,17 +54,25 @@ export default function HeaderLinks(props) {
 
   const authToken = Cookies.get('authToken')
 
-  const name = localStorage.getItem('username')
-  const userEmail = localStorage.getItem('userEmail')
-  const org = localStorage.getItem('organization')
+  const name = sessionStorage.getItem('username')
+  const email = sessionStorage.getItem('email')
+  const userEmail = sessionStorage.getItem('userEmail')
+  const org = sessionStorage.getItem('organization')
 
   useEffect(() => {
     if (location.pathname.startsWith('/vendor')) {
-      setUserName(name)
+      setUserName(name || email)
     } else if (location.pathname.startsWith('/customer')) {
       setUserName(userEmail)
     }
   }, [])
+
+  useEffect(() => {
+    if (!name || !email || error) {
+      Cookies.remove('authToken')
+      navigate('/auth')
+    }
+  }, [error])
 
   // Chakra Color Mode
   let navbarIcon = useColorModeValue('gray.500', 'gray.200')
@@ -84,25 +94,25 @@ export default function HeaderLinks(props) {
         })
         .then((res) => {
           if (res.data) {
-            localStorage.removeItem('username')
-            localStorage.removeItem('email')
-            localStorage.removeItem('product')
+            sessionStorage.removeItem('username')
+            sessionStorage.removeItem('email')
+            sessionStorage.removeItem('product')
             Cookies.remove('authToken')
             navigate('/auth')
           }
         })
     } catch (error) {
       // Even in case of server error, make sure user experience moves to relogin
-      localStorage.removeItem('username')
-      localStorage.removeItem('email')
-      localStorage.removeItem('product')
+      sessionStorage.removeItem('username')
+      sessionStorage.removeItem('email')
+      sessionStorage.removeItem('product')
       Cookies.remove('authToken')
       navigate('/auth')
     }
   }
 
   const handleCustomerLogout = () => {
-    localStorage.removeItem('userEmail')
+    sessionStorage.removeItem('userEmail')
     Cookies.remove('userToken')
     window.location.href = `/login?signed_url_params=${paramId}`
   }
@@ -187,28 +197,37 @@ export default function HeaderLinks(props) {
           </Text>
         </MenuButton>
         {location.pathname.startsWith('/vendor') && (
-          <MenuList size='sm'>
+          <MenuList>
             <MenuGroup title=''>
+              <MenuItem>
+                <Flex flexDirection='row' alignItems={'flex-start'} gap={3}>
+                  <Icon as={FaUser} width={2.5} mt={1} />
+                  <Stack direction={'column'} spacing={-2}>
+                    <Text mt={0} mb={0}>
+                      {name}
+                    </Text>
+                    <Text mt={0} mb={0} fontSize={'sm'} color={'#718096'}>
+                      {email}
+                    </Text>
+                    <Text mt={0} mb={0} fontSize={'sm'} color={'#718096'}>
+                      {org !== 'undefined' ? org?.replace(/"/g, '') : ''}
+                    </Text>
+                  </Stack>
+                </Flex>
+              </MenuItem>
+              <MenuDivider />
               {data?.organization && (
-                <Link
-                  to={`/vendor/settings?tab=person
-                }`}
-                >
+                <Link to={`/vendor/settings?tab=person`}>
                   <MenuItem icon={<SettingsIcon />}>Settings</MenuItem>
                 </Link>
               )}
               <Link to='/vendor/settings?tab=organization'>
                 <MenuItem icon={<FaExchangeAlt />}>Organizations</MenuItem>
               </Link>
-              {name ? (
-                <MenuItem icon={<FaSignOutAlt />} onClick={handleLogout}>
-                  Logout
-                </MenuItem>
-              ) : (
-                <Link to='/'>
-                  <MenuItem icon={<FaSignOutAlt />}>Login</MenuItem>
-                </Link>
-              )}
+              <MenuDivider />
+              <MenuItem icon={<FaSignOutAlt />} onClick={handleLogout}>
+                Logout
+              </MenuItem>
             </MenuGroup>
           </MenuList>
         )}
@@ -226,44 +245,8 @@ export default function HeaderLinks(props) {
         logoText={props.logoText}
         secondary={props.secondary}
         routes={dashRoutes}
-        // logo={logo}
         {...rest}
       />
-      {!name && (
-        <Menu>
-          <MenuButton>
-            <BellIcon color={navbarIcon} w='18px' h='18px' />
-          </MenuButton>
-          <MenuList p='16px 8px'>
-            <Flex flexDirection='column'>
-              <MenuItem borderRadius='8px' mb='10px'>
-                <ItemContent
-                  time='6 hours ago'
-                  info='SPDX 3.0 Support'
-                  boldInfo='[New Feature]'
-                  aName='Feature'
-                />
-              </MenuItem>
-              <MenuItem borderRadius='8px' mb='10px'>
-                <ItemContent
-                  time='3 days ago'
-                  info='CycloneDX 1.4 Export'
-                  boldInfo='[Fix]'
-                  aName='Bug'
-                />
-              </MenuItem>
-              <MenuItem borderRadius='8px'>
-                <ItemContent
-                  time='4 days ago'
-                  info='SBOMQS Depth Fixed'
-                  boldInfo='[Fix'
-                  aName='Bug'
-                />
-              </MenuItem>
-            </Flex>
-          </MenuList>
-        </Menu>
-      )}
     </Flex>
   )
 }

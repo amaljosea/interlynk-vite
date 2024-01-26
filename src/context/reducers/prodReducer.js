@@ -2,6 +2,11 @@ const prodReducer = (state, action) => {
   const { pageIndex } = state
   const { type, payload } = action
   switch (type) {
+    case 'GET_DATA':
+      return {
+        ...state,
+        data: payload
+      }
     case 'SET_CURRENT_PRODUCT':
       return {
         ...state,
@@ -52,6 +57,11 @@ const prodReducer = (state, action) => {
       return {
         ...state,
         totalProduct: payload
+      }
+    case 'CLEAR_FILTER':
+      return {
+        ...state,
+        enabled: 'all'
       }
     default:
       return state

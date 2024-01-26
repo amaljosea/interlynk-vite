@@ -1,8 +1,7 @@
 import { useMutation } from '@apollo/client'
-import { AddIcon } from '@chakra-ui/icons'
+import {AddIcon, RepeatIcon} from '@chakra-ui/icons'
 import {
   Avatar,
-  Box,
   Flex,
   IconButton,
   Menu,
@@ -21,17 +20,50 @@ import {
   ModalCloseButton,
   useDisclosure,
   Button,
-  Tooltip
+  Tooltip,
+  Tag,
+  useToast,
+  TagLabel,
+  Badge
 } from '@chakra-ui/react'
-import { deleteOrgUser } from 'graphQL/Mutation'
+import { InviteUser, deleteOrgUser } from 'graphQL/Mutation'
+import { useGlobalState } from 'hooks/useGlobalState'
 import React, { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV } from 'react-icons/fa'
-import { getFullDateAndTime, customStyles } from 'utils'
+import { getFullDateAndTime, timeSince, customStyles } from 'utils'
+import RoleModal from 'views/Dashboard/Profile/components/RoleModal'
 import TeamModal from 'views/Dashboard/Profile/components/TeamModal'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 
+function userTimeStart(row) {
+  let timeStart
+  if (row.invitationStatus === 'accepted') {
+    timeStart = row.invitationAcceptedAt
+      ? row.invitationAcceptedAt
+      : row.createdAt
+  }
+  return timeStart
+}
+
 const TeamTable = ({ data, refetch }) => {
+  const { userPermissions } = useGlobalState()
+
+  const viewUsers = userPermissions?.find((item) => item.key === 'view_users')
+  const inviteUser = viewUsers?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'invite_users' && permission.value === true
+  )
+  const editUserRoles = viewUsers?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'edit_user_role' && permission.value === true
+  )
+  const removeUser = viewUsers?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'remove_user' && permission.value === true
+  )
+
+  const toast = useToast()
   const SERVER_URL = process.env.REACT_APP_SERVER
   const { isOpen, onOpen, onClose } = useDisclosure()
   const {
@@ -39,10 +71,18 @@ const TeamTable = ({ data, refetch }) => {
     onOpen: onTeamOpen,
     onClose: onTeamClose
   } = useDisclosure()
+  const {
+    isOpen: isRoleOpen,
+    onOpen: onRoleOpen,
+    onClose: onRoleClose
+  } = useDisclosure()
   const [activeRow, setActiveRow] = useState(null)
   const [searchInput, setSearchInput] = useState('')
-
   const [deleteUser] = useMutation(deleteOrgUser)
+
+  const [inviteUsers] = useMutation(InviteUser, {
+    onCompleted: () => refetch()
+  })
 
   // COLUMNS
   const columns = [
@@ -51,65 +91,117 @@ const TeamTable = ({ data, refetch }) => {
       id: 'name',
       name: 'NAME',
       selector: (row) => {
-        const { name, email, profileImage } = row
+        const { name, profileImage } = row
         return (
-          <Stack
+          <Flex
             width={'100%'}
             px={0}
             py='.8rem'
             direction={'row'}
-            alignItems={'flex-center'}
+            alignItems={'center'}
+            justifyContent={'center'}
+            gap={2}
           >
-            <Box width={'30px'}>
-              <Avatar
-                me={{ md: '22px' }}
-                src={profileImage && `${SERVER_URL}/${profileImage?.url}`}
-                w='30px'
-                h='30px'
-              />
-            </Box>
-            <Box
-              display={'flex'}
-              flexWrap={'wrap'}
-              flexDirection={'column'}
-              gap={1}
+            <Avatar
+              src={profileImage && `${SERVER_URL}/${profileImage?.url}`}
+              w='30px'
+              h='30px'
+            />
+            <Stack
+              spacing={name !== '' ? 2 : 0}
+              direction={'row'}
+              alignItems={'center'}
             >
-              <Text fontSize={'14px'}>{name}</Text>
-              <Text color={'#666'}>{email}</Text>
-            </Box>
-          </Stack>
+              <Text width={'fit-content'} fontSize={'14px'}>
+                {name}
+              </Text>
+              {row.email === data.currentUser.email && (
+                <Badge
+                  variant='outline'
+                  colorScheme='blue'
+                  py={1}
+                  px={2}
+                  borderRadius={4}
+                >
+                  You
+                </Badge>
+              )}
+            </Stack>
+          </Flex>
         )
       },
-      width: '300px'
+      width: '300px',
+      wrap: true
     },
     // AUTH
     {
       id: 'email',
       name: 'EMAIL',
-      selector: (row) => row.email
+      selector: (row) => <Text my={2}>{row?.email}</Text>,
+      wrap: true
     },
     // ROLE
     {
       id: 'role',
       name: 'ROLE',
-      selector: (row) => row?.role?.name
+      selector: (row) => (
+        <Text textTransform={'capitalize'}>{row?.role?.name || ''}</Text>
+      )
+    },
+    // STATUS
+    {
+      id: 'status',
+      name: 'STATUS',
+      selector: (row) => {
+        const { invitationStatus } = row
+        return (
+          <Tag
+            width='fit-content'
+            variant='subtle'
+            colorScheme={
+              invitationStatus === 'invited'
+                ? 'orange'
+                : invitationStatus === 'accepted'
+                  ? 'green'
+                  : invitationStatus === 'declined'
+                    ? 'red'
+                    : 'blue'
+            }
+            textTransform={'capitalize'}
+          >
+            <TagLabel mx='auto'>
+              {invitationStatus?.replace(/_/g, ' ')}
+            </TagLabel>
+          </Tag>
+        )
+      }
     },
     // JOINED DATE
     {
       id: 'joinedDate',
       name: 'DATE JOINED',
       selector: (row) => {
+        const { invitationStatus } = row
+        const { invitationAcceptedAt } = row
         const { createdAt } = row
+        const timeStart = userTimeStart(row)
         return (
-          <Text textTransform={'capitalize'}>
-            {getFullDateAndTime(createdAt)}
-          </Text>
+          <Tooltip label={getFullDateAndTime(timeStart)} placement={'top'}>
+            <Text textTransform={'capitalize'}>
+              {timeStart ? timeSince(timeStart) : ''}
+            </Text>
+          </Tooltip>
         )
       },
       sortable: true,
       sortFunction: (a, b) => {
-        const dateA = new Date(a.createdAt)
-        const dateB = new Date(b.createdAt)
+        const aUserStart = userTimeStart(a)
+        const bUserStart = userTimeStart(b)
+        if (!aUserStart && !bUserStart) return 0
+        if (!aUserStart) return 1
+        if (!bUserStart) return -1
+        const dateA = new Date(aUserStart)
+        const dateB = new Date(bUserStart)
         return dateA - dateB // Sort in descending order
       }
     },
@@ -118,6 +210,7 @@ const TeamTable = ({ data, refetch }) => {
       id: 'action',
       name: 'ACTION',
       selector: (row) => {
+        const { invitationStatus } = row
         return (
           <Menu>
             <MenuButton
@@ -129,15 +222,38 @@ const TeamTable = ({ data, refetch }) => {
             <Portal>
               <MenuList size='sm'>
                 <MenuItem
-                  isDisabled={row.email === data.currentUser.email}
+                  isDisabled={
+                    row.email === data.currentUser.email || !editUserRoles
+                  }
                   onClick={() => {
-                    console.log(row)
+                    console.log('row', row)
+                    setActiveRow(row)
+                    onRoleOpen()
+                  }}
+                >
+                  Change Role
+                </MenuItem>
+                <MenuItem
+                  isDisabled={
+                    row.email === data.currentUser.email || !removeUser
+                  }
+                  onClick={() => {
                     setActiveRow(row)
                     onOpen()
                   }}
                 >
-                  Remove Member
+                  {invitationStatus === 'declined' ||
+                  invitationStatus === 'invited'
+                    ? 'Revoke Invitation'
+                    : 'Remove User'}
                 </MenuItem>
+                {(invitationStatus === 'declined' ||
+                  invitationStatus === 'invited' ||
+                  invitationStatus === 'pending_registration') && (
+                  <MenuItem onClick={() => onResendInvite(row)}>
+                    Resend Invite
+                  </MenuItem>
+                )}
               </MenuList>
             </Portal>
           </Menu>
@@ -162,25 +278,48 @@ const TeamTable = ({ data, refetch }) => {
         justifyContent={'space-between'}
       >
         {/* SEARCH COMPONENTS */}
-        <SearchFilter
-          id='team'
-          filterText={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
-          onFilter={handleSearch}
-          onClear={handleClear}
-        />
-
-        {/* ADD MEMBER */}
-        <Tooltip label='Invite User' placement='top'>
-          <IconButton
-            onClick={onTeamOpen}
-            icon={<AddIcon />}
-            colorScheme='blue'
-            variant='solid'
-            fontWeight='normal'
-            fontSize={'sm'}
+        <Stack
+            width={'100%'}
+            direction={'row'}
+            spacing={4}
+            alignItems={'flex-start'}
+        >
+          <SearchFilter
+            id='team'
+            filterText={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onFilter={handleSearch}
+            onClear={handleClear}
           />
-        </Tooltip>
+        </Stack>
+
+        <Stack
+            width={'100%'}
+            direction={'row'}
+            spacing={4}
+            justifyContent={'flex-end'}>
+
+        {/* INVITE USER */}
+          <Tooltip label='Invite User' placement='top'>
+            <IconButton
+              onClick={onTeamOpen}
+              icon={<AddIcon />}
+              colorScheme='blue'
+              variant='solid'
+              fontWeight='normal'
+              fontSize={'sm'}
+              isDisabled={!inviteUser}
+            />
+          </Tooltip>
+
+          <Tooltip label='Refresh'>
+            <IconButton
+                onClick={() => refetch()}
+                colorScheme='blue'
+                icon={<RepeatIcon />}
+            ></IconButton>
+          </Tooltip>
+        </Stack>
       </Flex>
     )
   }, [searchInput, handleSearch, handleClear])
@@ -197,6 +336,30 @@ const TeamTable = ({ data, refetch }) => {
     } catch (error) {
       console.log(`Error`, error)
     }
+  }
+
+  const onResendInvite = async (row) => {
+    await inviteUsers({
+      variables: {
+        email: row?.email.toLowerCase()
+      }
+    }).then((res) => {
+      if (res.data.organizationUserInvite.errors.length > 0) {
+        toast({
+          description: res.data.organizationUserInvite.errors[0],
+          status: 'error',
+          position: 'top',
+          duration: 2000
+        })
+      } else {
+        toast({
+          description: 'Invitation sent successfully',
+          status: 'success',
+          position: 'top',
+          duration: 2000
+        })
+      }
+    })
   }
 
   return (
@@ -226,20 +389,32 @@ const TeamTable = ({ data, refetch }) => {
         </Flex>
       )}
 
-      {/* ADD / UPDATE MEMBER */}
+      {/* ADD / UPDATE User */}
       {isTeamOpen && (
         <TeamModal
           refetch={refetch}
           isOpen={isTeamOpen}
           onClose={onTeamClose}
+          data={data?.currentUser}
         />
       )}
-      {/* REMOVE MEMBER */}
+
+      {/* UPDATE User ROLE */}
+      {isRoleOpen && (
+        <RoleModal
+          data={activeRow}
+          refetch={refetch}
+          isOpen={isRoleOpen}
+          onClose={onRoleClose}
+        />
+      )}
+
+      {/* REMOVE User */}
       {isOpen && activeRow && (
         <Modal isOpen={isOpen} onClose={onClose}>
           <ModalOverlay />
           <ModalContent>
-            <ModalHeader>Remove Member</ModalHeader>
+            <ModalHeader>Remove User</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               <Stack direction={'column'} spacing={2} alignItems={'flex-start'}>
@@ -247,7 +422,7 @@ const TeamTable = ({ data, refetch }) => {
                   Are you sure you want to remove the following user from the
                   organization ?
                 </Text>
-                <Text fontWeight={'semibold'}>
+                <Text fontWeight={'semibold'} wordBreak={'break-all'}>
                   {activeRow.name} {`(${activeRow.email})`}
                 </Text>
               </Stack>

@@ -1,5 +1,5 @@
 // Chakra imports
-import { AddIcon, ViewIcon } from '@chakra-ui/icons'
+import {AddIcon, RepeatIcon, ViewIcon} from '@chakra-ui/icons'
 import {
   Flex,
   Text,
@@ -50,8 +50,12 @@ import RowLimit from 'views/Sbom/components/RowLimit'
 import { useGlobalState } from 'hooks/useGlobalState'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import { GetCompFilterData } from 'graphQL/Queries'
+import Pagination from "../Pagination";
 
 const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
+
+  const paginationSizes = [25, 50, 100]
+
   // GET COMPONENT FILTER HEADS
   const [getCompFilters] = useLazyQuery(GetCompFilterData)
 
@@ -60,10 +64,9 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
   const customerView = location.pathname.startsWith('/customer')
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
-  const x = window.matchMedia('(min-width: 2500px)')
-  const y = window.matchMedia('(max-width: 1440px)')
 
-  const { totalRows, setTotalRows, prodCompState, dispatch } = useGlobalState()
+  const { userPermissions, totalRows, setTotalRows, prodCompState, dispatch } =
+    useGlobalState()
   const {
     field,
     direction,
@@ -78,6 +81,12 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
     totalComp
   } = prodCompState
   const { prodCompDispatch } = dispatch
+
+  const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
+  const updateComponent = sboms?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'update_sbom_components' && permission.value === true
+  )
 
   const fetchCompData = async () => {
     await refetch({
@@ -112,6 +121,8 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
 
   const [activeRow, setActiveRow] = useState(null)
   const [compSearch, setCompSearch] = useState('')
+  const [isPrevActive, setIsPrevActive] = useState(false)
+  const [isNextActive, setIsNextActive] = useState(false)
 
   const compBtn = useRef(null)
   const linkRef = useRef(null)
@@ -332,7 +343,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
         )
       },
       wrap: true,
-      width: '24%',
+      width: '20%',
       sortable: true
     },
     // VERSION
@@ -340,7 +351,8 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
       id: 'COMPONENTS_VERSION',
       name: 'VERSION',
       selector: (row) => <p style={{ textWrap: 'pretty' }}>{row.version}</p>,
-      width: '16%',
+      width: '15%',
+      wrap: true,
       sortable: true
     },
     // PURL
@@ -362,14 +374,15 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
         )
       },
       sortable: true,
-      width: x.matches ? '30%' : '20%',
+      width: '15%',
+      wrap: true,
       grow: 2
     },
     // LICENSES
     {
       id: 'COMPONENTS_LICENSES',
       name: 'LICENSES',
-      width: '16%',
+      width: '15%',
       selector: (row) => {
         const { licenses, licensesExp, licensesCustom } = row
 
@@ -400,7 +413,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
                     </Tag>
                   </Tooltip>
                 )}
-                {totalSpdx && (
+                {totalSpdx.length > 0 && (
                   <Tooltip
                     label={JSON.stringify(totalSpdx)
                       .slice(1, -1)
@@ -413,7 +426,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
                       colorScheme='green'
                       width={'fit-content'}
                     >
-                      <TagLabel>{`+${totalSpdx.length}`}</TagLabel>
+                      <TagLabel width={6}>{`+${totalSpdx.length}`}</TagLabel>
                     </Tag>
                   </Tooltip>
                 )}
@@ -472,7 +485,8 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
         )
       },
       right: 'true',
-      sortable: true
+      sortable: true,
+      wrap: true
     },
     // UPDATED AT
     {
@@ -490,7 +504,8 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
         const dateB = new Date(b.updatedAt)
         return dateA - dateB // Sort in descending order
       },
-      right: 'true'
+      right: 'true',
+      wrap: true
     },
     // ACTION
     {
@@ -514,7 +529,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
                   <MenuList size='sm'>
                     <MenuItem
                       onClick={() => onLicenseOpen(row)}
-                      isDisabled={status === 'signed'}
+                      isDisabled={status === 'signed' || !updateComponent}
                     >
                       Edit Component
                     </MenuItem>
@@ -646,29 +661,29 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
         >
           <GridItem w='100%' colSpan={3}>
             <CustomText>Description :</CustomText>
-            <Text mt={1} fontSize={14}>
+            <Text width={'90%'} mt={1} fontSize={14}>
               {description !== null ? description : ''}
             </Text>
           </GridItem>
-          <GridItem w='100%'>
+          <GridItem>
             <CustomText>Component :</CustomText>
-            <Text mt={1} fontSize={14}>
+            <Text width={'90%'} mt={1} fontSize={14}>
               {name}
             </Text>
           </GridItem>
-          <GridItem w='100%'>
+          <GridItem>
             <CustomText>Type :</CustomText>
             <Text mt={1} fontSize={14} textTransform={'capitalize'}>
               {kind}
             </Text>
           </GridItem>
-          <GridItem w='100%'>
+          <GridItem>
             <CustomText>Internal :</CustomText>
             <Text mt={1} fontSize={14}>
               {internal ? 'True' : 'False'}
             </Text>
           </GridItem>
-          <GridItem w='100%'>
+          <GridItem>
             <CustomText>Supplier :</CustomText>
             <VStack spacing={4} mt={1} alignItems={'left'}>
               {suppliers &&
@@ -697,13 +712,13 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
                 ))}
             </VStack>
           </GridItem>
-          <GridItem w='100%'>
+          <GridItem>
             <CustomText>PURL :</CustomText>
-            <Text mt={1} fontSize={14}>
+            <Text width={'90%'} mt={1} fontSize={14}>
               {purl !== null && purl !== '' ? purl : ''}
             </Text>
           </GridItem>
-          <GridItem w='100%'>
+          <GridItem>
             <CustomText>CPES :</CustomText>
             <Flex
               mt={1}
@@ -714,13 +729,13 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
             >
               {cpes?.length > 0 &&
                 cpes.map((item, index) => (
-                  <Text key={index} fontSize={14}>
+                  <Text width={'80%'} key={index} fontSize={14}>
                     {item}
                   </Text>
                 ))}
             </Flex>
           </GridItem>
-          <GridItem w='100%'>
+          <GridItem>
             <CustomText>Depends On :</CustomText>
             <Flex mt={2} alignItems={'flex-start'} gap={2} flexWrap={'wrap'}>
               {compDependency &&
@@ -747,7 +762,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
                   ))}
             </Flex>
           </GridItem>
-          <GridItem w='100%'>
+          <GridItem>
             <CustomText>Dependency Of :</CustomText>
             <Flex mt={2} alignItems={'flex-start'} gap={2} flexWrap={'wrap'}>
               {compDependency &&
@@ -772,13 +787,13 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
                 ))}
             </Flex>
           </GridItem>
-          <GridItem w='100%'>
+          <GridItem>
             <CustomText>Scope :</CustomText>
             <Text mt={1} fontSize={14} textTransform={'capitalize'}>
               {scope}
             </Text>
           </GridItem>
-          <GridItem w='100%'>
+          <GridItem>
             <CustomText>Licenses :</CustomText>
             <Flex alignItems={'center'} gap={2} flexWrap={'wrap'} my={2}>
               {/* SPDX */}
@@ -823,27 +838,6 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
         </Grid>
       </Box>
     )
-  }
-
-  const compData = {
-    projectId: productId,
-    sbomId: sbomId,
-    search: searchInput !== '' ? searchInput : undefined,
-    ecosystem:
-      ecosystems.includes('all') || ecosystems.length === 0
-        ? undefined
-        : ecosystems,
-    kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
-    licenses:
-      licenses.includes('all') || licenses.length === 0 ? undefined : licenses,
-    supplierName:
-      suppliers.includes('all') || suppliers.length === 0
-        ? undefined
-        : suppliers,
-    primary: scope === 'primary' ? true : undefined,
-    internal: scope === 'internal' ? true : undefined,
-    field: field,
-    direction: direction
   }
 
   // CLEAR SERACH
@@ -944,7 +938,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
   }
 
   // HEADER SECTION
-  const subHeaderComponentMemo = useMemo(() => {
+  const subHeader = useMemo(() => {
     return (
       <Flex
         width={'100%'}
@@ -975,28 +969,40 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
             />
           )}
         </Stack>
-
-        {/* CREATE COMPONENT */}
-        {!customerView && (
-          <Tooltip label='Add Component'>
+        <Stack
+            width={'100%'}
+            direction={'row'}
+            spacing={2}
+            justifyContent={'flex-end'}>
+          {/* CREATE COMPONENT */}
+          {!customerView && (
+            <Tooltip label='Add Component'>
+              <IconButton
+                  ref={compBtn}
+                  onClick={onCreateComponent}
+                  icon={<AddIcon />}
+                  colorScheme='blue'
+                  variant='solid'
+                  fontWeight='normal'
+                  fontSize={'sm'}
+                  isDisabled={lifecycle === 'signed' || !updateComponent}
+              />
+            </Tooltip>
+          )}
+          <Tooltip label='Refresh'>
             <IconButton
-              ref={compBtn}
-              onClick={onCreateComponent}
-              icon={<AddIcon />}
-              colorScheme='blue'
-              variant='solid'
-              fontWeight='normal'
-              fontSize={'sm'}
-              isDisabled={lifecycle === 'signed'}
-            />
+                onClick={fetchCompData}
+                colorScheme='blue'
+                icon={<RepeatIcon />}>
+            </IconButton>
           </Tooltip>
-        )}
+        </Stack>
       </Flex>
     )
   }, [compSearch, onSearchInputChange, handleClear, handleSearch, filters])
 
-  const handleRefetch = (after, before) => {
-    refetch({
+  const handleRefetch = async (after, before) => {
+    await refetch({
       projectId: productId,
       sbomId: sbomId,
       first: after ? totalRows : undefined,
@@ -1021,6 +1027,11 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
       internal: scope === 'internal' ? true : undefined,
       field: customerView ? signedCompField : field,
       direction: customerView ? signedCompDirection : direction
+    }).then((res) => {
+      if (res.data) {
+        setIsPrevActive(res?.data?.sbom?.components?.pageInfo?.hasPreviousPage)
+        setIsNextActive(res?.data?.sbom?.components?.pageInfo?.hasNextPage)
+      }
     })
   }
 
@@ -1064,15 +1075,16 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
   }
 
   const handlePreviousPage = async () => {
+    setIsPrevActive(false)
     handleRefetch(null, data.pageInfo.startCursor)
     prodCompDispatch({
       type: 'DECREMENT_PAGE',
       payload: data.pageInfo.startCursor
     })
-    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const handleNextPage = async () => {
+    setIsNextActive(false)
     handleRefetch(data.pageInfo.endCursor, null)
     prodCompDispatch({
       type: 'INCREMENT_PAGE',
@@ -1081,11 +1093,12 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
         after: data.pageInfo.endCursor
       }
     })
-    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   useEffect(() => {
     if (data) {
+      setIsPrevActive(data?.pageInfo?.hasPreviousPage)
+      setIsNextActive(data?.pageInfo?.hasNextPage)
       getCompFilters({
         variables: {
           projectId: productId,
@@ -1115,7 +1128,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
           progressPending={data ? false : true}
           progressComponent={<CustomLoader />}
           subHeader
-          subHeaderComponent={subHeaderComponentMemo}
+          subHeaderComponent={subHeader}
           expandableRows
           expandOnRowClicked
           persistTableHead
@@ -1127,40 +1140,17 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
 
       {/* PAGINATION */}
       {data && (
-        <Flex
-          width={'100%'}
-          flexDir={'row'}
-          gap={4}
-          alignItems={'center'}
-          justifyContent={'space-between'}
-          mt={6}
-        >
-          <Stack alignItems={'center'} direction={'row'} spacing={4}>
-            <Button
-              colorScheme='blue'
-              onClick={handlePreviousPage}
-              isDisabled={!data.pageInfo.hasPreviousPage}
-            >
-              Previous
-            </Button>
-            <Button
-              colorScheme='blue'
-              onClick={handleNextPage}
-              isDisabled={!data.pageInfo.hasNextPage}
-            >
-              Next
-            </Button>
-            <Box>
-              Page {pageIndex} of{' '}
-              {data.totalCount === 0
-                ? 1
-                : Math.ceil(data.totalCount / totalRows)}
-            </Box>
-          </Stack>
-
-          {/* ROW LIMIT */}
-          <RowLimit onChange={handleSetRow} name='componentRow' />
-        </Flex>
+          <Pagination
+              paginationSizes={paginationSizes}
+              pageIndex={pageIndex}
+              totalRows={totalRows}
+              totalCount={data.totalCount}
+              onPreviousPage={handlePreviousPage}
+              onNextPage={handleNextPage}
+              onSetRow={handleSetRow}
+              hasNextPage={data.pageInfo.hasNextPage}
+              hasPreviousPage={data.pageInfo.hasPreviousPage}
+          />
       )}
 
       {/* ACTIONS */}

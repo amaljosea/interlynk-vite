@@ -1,25 +1,24 @@
 import {
-  Button,
   Flex,
   Stack,
   Tag,
   Text,
   Box,
   TagLabel,
-  Tooltip
+  Tooltip,
+  IconButton
 } from '@chakra-ui/react'
-import CustomLoader from 'components/CustomLoader'
-import React, { useMemo, useEffect, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
+import { RepeatIcon } from '@chakra-ui/icons'
 import { useLocation } from 'react-router-dom'
-import { timeSince } from 'utils'
-import { getFullDateAndTime, customStyles } from 'utils'
+import { getFullDateAndTime, customStyles, timeSince } from 'utils'
+import CustomLoader from 'components/CustomLoader'
 import LogFilterMenu from 'views/Sbom/components/LogFilterMenu'
-import RowLimit from 'views/Sbom/components/RowLimit'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useLazyQuery } from '@apollo/client'
-import { GetLogsFilterData } from 'graphQL/Queries'
+import Pagination from '../Pagination'
+
 
 const setColor = (type) => {
   switch (type) {
@@ -41,8 +40,7 @@ const setColor = (type) => {
 }
 
 const SbomChangelogTable = ({ data, refetch }) => {
-  // GET LOGS FILTER HEADS
-  const [getLogsFilters] = useLazyQuery(GetLogsFilterData)
+  const paginationSizes = [25, 50, 100]
 
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -89,6 +87,7 @@ const SbomChangelogTable = ({ data, refetch }) => {
             <Stack direction={'column'} spacing={0} my={2}>
               <Tag
                 fontSize={'sm'}
+                width={'fit-content'}
                 fontWeight={'medium'}
                 colorScheme='blue'
                 overflow={'auto'}
@@ -291,7 +290,7 @@ const SbomChangelogTable = ({ data, refetch }) => {
     }
   ]
 
-  const onPreviousPage = async () => {
+  const handlePreviousPage = async () => {
     await refetch({
       projectId: productId,
       sbomId: sbomId,
@@ -309,7 +308,7 @@ const SbomChangelogTable = ({ data, refetch }) => {
     )
   }
 
-  const onNextPage = async () => {
+  const handleNextPage = async () => {
     refetch({
       projectId: productId,
       sbomId: sbomId,
@@ -439,28 +438,16 @@ const SbomChangelogTable = ({ data, refetch }) => {
             />
           )}
         </Stack>
+        <Tooltip label='Refresh'>
+          <IconButton
+            onClick={handleClear}
+            colorScheme='blue'
+            icon={<RepeatIcon />}
+          ></IconButton>
+        </Tooltip>
       </Flex>
     )
   }, [logSearch, filters, onSearchInputChange, handleClear, handleSearch])
-
-  useEffect(() => {
-    if (data) {
-      getLogsFilters({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId
-        }
-      }).then((res) => {
-        if (res.data) {
-          console.log('filters', res.data)
-          sbomLogDispatch({
-            type: 'ADD_FILTER_HEADS',
-            payload: res.data.sbom.filters
-          })
-        }
-      })
-    }
-  }, [data])
 
   return (
     <>
@@ -483,39 +470,17 @@ const SbomChangelogTable = ({ data, refetch }) => {
 
       {/* PAGINATION */}
       {data && (
-        <Flex
-          width={'100%'}
-          flexDir={'row'}
-          gap={4}
-          alignItems={'center'}
-          mt={6}
-          justifyContent={'space-between'}
-        >
-          <Stack alignItems={'center'} direction={'row'} spacing={4}>
-            <Button
-              colorScheme='blue'
-              onClick={onPreviousPage}
-              isDisabled={!data.pageInfo.hasPreviousPage}
-            >
-              Previous
-            </Button>
-            <Button
-              colorScheme='blue'
-              onClick={onNextPage}
-              isDisabled={!data.pageInfo.hasNextPage}
-            >
-              Next
-            </Button>
-            <Box>
-              Page {pageIndex} of{' '}
-              {data.totalCount === 0
-                ? 1
-                : Math.ceil(data.totalCount / totalRows)}
-            </Box>
-          </Stack>
-
-          <RowLimit onChange={handleSetRow} name='changelogRow' />
-        </Flex>
+        <Pagination
+          paginationSizes={paginationSizes}
+          pageIndex={pageIndex}
+          totalRows={totalRows}
+          totalCount={data.totalCount}
+          onPreviousPage={handlePreviousPage}
+          onNextPage={handleNextPage}
+          onSetRow={handleSetRow}
+          hasNextPage={data.pageInfo.hasNextPage}
+          hasPreviousPage={data.pageInfo.hasPreviousPage}
+        />
       )}
     </>
   )

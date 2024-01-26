@@ -1,5 +1,4 @@
 import {
-  Box,
   IconButton,
   Text,
   Switch,
@@ -22,41 +21,86 @@ import {
   ListItem,
   Divider,
   Tooltip,
-  Stack,
-  Select
+  Stack
 } from '@chakra-ui/react'
-import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { FaEllipsisV } from 'react-icons/fa'
-import {
-  getFullDateAndTime,
-  timeSince,
-  customStyles,
-  removeDuplicates
-} from 'utils'
-import CustomLoader from 'components/CustomLoader'
-import DataTable from 'react-data-table-component'
 import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
+import { FaEllipsisV } from 'react-icons/fa'
+
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
+
 import { useMutation } from '@apollo/client'
-import { UpdateProject, DeleteProject } from 'graphQL/Mutation'
+import { DeleteProjectGroup } from 'graphQL/Mutation'
+
+import {
+  customStyles,
+  getFullDateAndTime,
+  normalizeSBOMVersion,
+  removeDuplicates,
+  timeSince
+} from 'utils'
+
+import DataTable from 'react-data-table-component'
+import CustomLoader from 'components/CustomLoader'
 import ProductModal from 'views/Dashboard/Products/components/ProductModal'
 import UploadModal from 'views/Dashboard/Products/components/UploadModal'
 import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import ProdFilterMenu from 'views/Dashboard/Products/components/ProdFilterMenu'
 import { useGlobalState } from 'hooks/useGlobalState'
-import ProdSearchFilter from 'views/Sbom/components/ProdSearchFilter'
-import OrgRegister from 'views/Dashboard/Profile/components/OrgRegister'
 import Card from 'components/Card/Card'
+import SearchFilter from 'views/Sbom/components/SearchFilter'
+import StatusModal from 'views/Dashboard/Products/components/StatusModal'
+import Pagination from '../Pagination'
 
-const ProductTable = ({ data, refetch, org }) => {
-  const { totalRows, setTotalRows, setActiveSbomTab, prodState, dispatch } =
+const ProductTable = ({ data, refetch }) => {
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const productId = queryParams.get('id')
+
+  const { userPermissions, setActiveSbomTab, prodState, dispatch } =
     useGlobalState()
-  const { field, direction, searchInput, pageIndex } = prodState
-  const { prodDispatch, sbomDispatch } = dispatch
+
+  const paginationSizes = [25, 50, 100]
+
+  const { field, direction, searchInput, pageIndex,enabled } = prodState
+  const { prodDispatch, prodCompDispatch } = dispatch
+
+  const [totalRows, setTotalRows] = useState(paginationSizes[0])
+  const [filterText, setFilterText] = useState(searchInput)
+
+  const productPermissions = useMemo(
+    () => userPermissions?.find((item) => item.key === 'view_product_group'),
+    [userPermissions]
+  )
+
+  const canAddProduct = () =>
+    productPermissions?.supersededBy?.some(
+      (permission) =>
+        permission.key === 'create_product_group' && permission.value
+    )
+
+  const canUpdateProduct = useMemo(
+    () =>
+      productPermissions?.supersededBy?.some(
+        (permission) =>
+          permission.key === 'update_product_group' && permission.value
+      ),
+    [productPermissions]
+  )
+
+  const canArchiveProduct = useMemo(
+    () =>
+      productPermissions?.supersededBy?.some(
+        (permission) =>
+          permission.key === 'archive_product_group' && permission.value
+      ),
+    [productPermissions]
+  )
 
   const [activeRow, setActiveRow] = useState(null)
-
   const { isOpen, onOpen, onClose } = useDisclosure()
+
+  const activeEnv = sessionStorage.getItem('activeEnv')
 
   const {
     isOpen: isOpenProduct,
@@ -82,293 +126,42 @@ const ProductTable = ({ data, refetch, org }) => {
   } = useDisclosure()
 
   const {
-    isOpen: isWarning,
+    isOpen: isWarningOpen,
     onOpen: onWarningOpen,
     onClose: onWarningClose
   } = useDisclosure()
 
-  const [projectDelete] = useMutation(DeleteProject, {
-    onCompleted: () =>
-      refetch({
-        first: totalRows,
-        field: field,
-        direction: direction
-      })
+  const [deleteProjectGroup] = useMutation(DeleteProjectGroup, {
+    onCompleted: () => refetch({ first: totalRows, field, direction })
   })
 
-  const [projectUpdate] = useMutation(UpdateProject, {
-    onCompleted: () =>
-      refetch({
-        first: totalRows,
-        field: field,
-        direction: direction
-      })
-  })
-
-  const handleOpenSbom = (row) => {
-    sbomDispatch({ type: 'CLEAR_LICENSES' })
-    setActiveRow(row)
-    onSbomOpen()
-  }
-
-  // COLUMNS
-  const columns = [
-    // ACTIVE
-    {
-      id: 'PROJECTS_ENABLED',
-      name: 'ACTIVE',
-      selector: (row) => {
-        const { enabled, name } = row
-        return (
-          <Switch
-            name={name}
-            id={name}
-            size='md'
-            isChecked={enabled}
-            onChange={() => {
-              setActiveRow(row)
-              onWarningOpen()
-            }}
-          />
-        )
-      },
-      width: '150px',
-      sortable: true
+  const handleOpenSbom = useCallback(
+    (row) => {
+      prodCompDispatch({ type: 'CLEAR_LICENSES' })
+      setActiveRow(row)
+      onSbomOpen()
     },
-    // PRODUCT
-    {
-      id: 'PROJECTS_NAME',
-      name: 'PRODUCT',
-      selector: (row) => {
-        const { sboms, name, id } = row
+    [prodCompDispatch, setActiveRow, onSbomOpen]
+  )
 
-        const data = sboms ? removeDuplicates(sboms) : []
-
-        const product = {
-          id: id,
-          name: name,
-          version:
-            data.length > 0
-              ? data[0].primaryComponent?.version
-              : sboms.length > 0
-              ? sboms[0].primaryComponent?.version
-              : '',
-          sbomId:
-            data.length > 0
-              ? data[0].primaryComponent?.version
-              : sboms.length > 0
-              ? sboms[0].id
-              : ''
-        }
-
-        const handleClick = () => {
-          if (sboms.length > 0) {
-            localStorage.setItem('product', JSON.stringify(product))
-            localStorage.setItem('activeProdTab', 0)
-            prodDispatch({
-              type: 'SET_CURRENT_PRODUCT',
-              payload: {
-                id: id,
-                sbomId:
-                  data.length > 0
-                    ? data[0].primaryComponent?.version
-                    : sboms[0].id
-              }
-            })
-          }
-          setActiveSbomTab(0)
-        }
-
-        return (
-          <Link to={`/vendor/products/${name}?id=${id}`} onClick={handleClick}>
-            <Text color={'blue.500'} minWidth='100%'>
-              {name}
-            </Text>
-          </Link>
-        )
-      },
-      wrap: true,
-      sortable: true
-    },
-    // VERSION
-    {
-      id: 'versions',
-      name: 'VERSION',
-      selector: (row) => {
-        const { sboms } = row
-        const data = sboms ? removeDuplicates(sboms) : []
-        return <Text>{data.length}</Text>
-      },
-      wrap: true
-    },
-    // DESCRIPTION
-    {
-      id: 'PROJECTS_DESCRIPTION',
-      name: 'DESCRIPTION',
-      selector: (row) => {
-        const { description } = row
-        return (
-          <Text>
-            {description.length > 50
-              ? description.substring(0, 50) + '....'
-              : description}
-          </Text>
-        )
-      },
-      wrap: true,
-      sortable: true
-    },
-    // UPDATEDAT
-    {
-      id: 'PROJECTS_UPDATED_AT',
-      name: 'UPDATED AT',
-      selector: (row) => {
-        const { updatedAt } = row
-        return (
-          <Tooltip label={getFullDateAndTime(updatedAt)} placement={'top'}>
-            {timeSince(updatedAt)}
-          </Tooltip>
-        )
-      },
-      sortable: true,
-      sortFunction: (a, b) => {
-        const dateA = new Date(a.updatedAt)
-        const dateB = new Date(b.updatedAt)
-        return dateA - dateB
-      },
-      wrap: true
-    },
-    // ACTIONS
-    {
-      id: 'actions',
-      name: 'ACTIONS',
-      selector: (row) => {
-        const { enabled, id, name, sboms } = row
-        const uniqVersions = []
-        sboms &&
-          sboms.map((project) => {
-            if (project.primaryComponent) {
-              uniqVersions.push({
-                label: project.primaryComponent.version,
-                value: project.id,
-                creationAt: project.creationAt
-              })
-            }
-          })
-
-        const filteredData = uniqVersions ? removeDuplicates(uniqVersions) : []
-
-        const product = {
-          id: id,
-          name: name,
-          version:
-            filteredData.length > 0
-              ? filteredData[0].label
-              : sboms.length > 0
-              ? sboms[0].primaryComponent?.version
-              : '',
-          sbomId:
-            filteredData.length > 0
-              ? filteredData[0].value
-              : sboms.length > 0
-              ? sboms[0].id
-              : ''
-        }
-
-        return (
-          <Menu>
-            <MenuButton
-              as={IconButton}
-              icon={<FaEllipsisV />}
-              variant='none'
-              color='gray.400'
-            />
-            <Portal>
-              <MenuList fontSize={'sm'}>
-                <MenuItem
-                  onClick={() => {
-                    setActiveRow(row)
-                    onOpen()
-                  }}
-                  isDisabled={!enabled}
-                >
-                  Edit Product
-                </MenuItem>
-                <Divider />
-                <MenuItem
-                  onClick={() => {
-                    setActiveRow(row)
-                    onOpenUpload()
-                  }}
-                  isDisabled={!enabled}
-                >
-                  Upload SBOM
-                </MenuItem>
-                <MenuItem
-                  onClick={() => handleOpenSbom(row)}
-                  isDisabled={!enabled}
-                >
-                  Create Version
-                </MenuItem>
-                <Divider />
-                <MenuItem
-                  color='red'
-                  onClick={() => {
-                    setActiveRow(row)
-                    onDeleteOpen()
-                  }}
-                >
-                  Archive Product
-                </MenuItem>
-              </MenuList>
-            </Portal>
-          </Menu>
-        )
-      },
-      right: 'true'
-    }
-  ]
-
-  // DELETE PRODUCT
-  const onProductDelete = async () => {
-    await projectDelete({
+  const onProductDelete = useCallback(async () => {
+    await deleteProjectGroup({
       variables: {
         id: activeRow.id
       }
     }).then((res) => res.data && onDeleteClose())
-  }
+  }, [deleteProjectGroup, activeRow, onDeleteClose])
 
-  // REFRESH PRODUCTS
-  const handleRefresh = async () => {
+  const handleRefresh = useCallback(async () => {
     await refetch({
       first: totalRows,
-      field: field,
-      direction: direction
+      field,
+      direction
     })
-  }
+  }, [refetch, totalRows, field, direction])
 
-  // TOGGLE STATUS
-  const toggleStatus = async () => {
-    await projectUpdate({
-      variables: {
-        id: activeRow.id,
-        enabled: activeRow.enabled === true ? false : true
-      }
-    })
-      .then(
-        (res) =>
-          res.data &&
-          refetch({
-            first: totalRows,
-            field: field,
-            direction: direction
-          })
-      )
-      .finally(() => onWarningClose())
-  }
-
-  // CLEAR SERACH
-  const handleClear = async () => {
+  const handleClear = useCallback(async () => {
+    setFilterText('')
     await refetch({
       search: undefined,
       first: totalRows,
@@ -378,49 +171,62 @@ const ProductTable = ({ data, refetch, org }) => {
       field: field,
       direction: direction
     }).then((res) => res.data && prodDispatch({ type: 'CLEAR_SEARCH_INPUT' }))
-  }
+  }, [refetch, totalRows, prodDispatch])
 
-  // ON SEARCH INPUT CHANGE
-  const onSearchInputChange = (e) => {
-    const { value } = e.target
-    if (value === '') {
-      handleClear()
-    } else {
-      prodDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
-    }
-  }
+  const onSearchInputChange = useCallback(
+    (event) => {
+      const { value } = event.target
+      if (value === '') {
+        handleClear()
+      } else {
+        setFilterText(value)
+      }
+    },
+    [handleClear, prodDispatch]
+  )
 
-  // SEARCH COMPONENT
-  const handleSearch = (event) => {
-    if (event.key === 'Enter' && searchInput !== '') {
-      refetch({
-        search: searchInput,
+  const handleSearch = useCallback(
+    (event) => {
+      const { value } = event.target
+      if (event.key === 'Enter' && filterText !== '') {
+        refetch({
+          search: value,
+          first: totalRows,
+          last: undefined,
+          after: undefined,
+          before: undefined,
+          field: field,
+          direction: direction
+        }).then(
+          (res) =>
+            res.data &&
+            prodDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
+        )
+      }
+    },
+    [refetch, filterText, totalRows, prodDispatch]
+  )
+
+  const onFilterActive = useCallback(
+    async (value) => {
+      await refetch({
+        enabled: value === 'yes' ? true : value === 'no' ? false : undefined,
         first: totalRows,
         last: undefined,
         after: undefined,
         before: undefined,
         field: field,
         direction: direction
-      }).then((res) => res.data && prodDispatch({ type: 'FETCH_DATA_SUCCESS' }))
-    }
-  }
+      }).then((res) => {
+        if (res.data) {
+          prodDispatch({ type: 'ON_FILTER_ACTIVE', payload: value })
+        }
+      })
+    },
+    [refetch, totalRows, prodDispatch]
+  )
 
-  // FILTER PRODUCT
-  const onFilterActive = async (value) => {
-    await refetch({
-      enabled: value === 'all' ? undefined : value === 'yes' ? true : false,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      before: undefined,
-      field: field,
-      direction: direction
-    }).then(
-      (res) =>
-        res.data && prodDispatch({ type: 'ON_FILTER_ACTIVE', payload: value })
-    )
-  }
-
+  // HEADER
   const subHeaderComponent = useMemo(() => {
     return (
       <Flex
@@ -430,9 +236,9 @@ const ProductTable = ({ data, refetch, org }) => {
       >
         <Stack direction={'row'} spacing={2} alignItems={'center'}>
           {/* SEARCH PRODUCTS */}
-          <ProdSearchFilter
+          <SearchFilter
             id='product'
-            filterText={searchInput}
+            filterText={filterText}
             onChange={onSearchInputChange}
             onClear={handleClear}
             onFilter={handleSearch}
@@ -442,14 +248,6 @@ const ProductTable = ({ data, refetch, org }) => {
         </Stack>
 
         <Stack direction={'row'} spacing={2} alignItems={'center'}>
-          {/* REFRESH */}
-          <Tooltip label='Refresh'>
-            <IconButton
-              onClick={handleRefresh}
-              colorScheme='blue'
-              icon={<RepeatIcon />}
-            ></IconButton>
-          </Tooltip>
           {/* ADD PRODUCT */}
           <Tooltip label='Add Product'>
             <IconButton
@@ -457,7 +255,16 @@ const ProductTable = ({ data, refetch, org }) => {
               colorScheme='blue'
               variant='solid'
               onClick={onOpenProduct}
+              isDisabled={!canAddProduct}
             />
+          </Tooltip>
+          {/* REFRESH */}
+          <Tooltip label='Refresh'>
+            <IconButton
+              onClick={handleRefresh}
+              colorScheme='blue'
+              icon={<RepeatIcon />}
+            ></IconButton>
           </Tooltip>
         </Stack>
       </Flex>
@@ -471,55 +278,265 @@ const ProductTable = ({ data, refetch, org }) => {
     onSearchInputChange
   ])
 
-  // SORTING
-  const handleSort = async (column, sortDirection) => {
-    await refetch({
-      first: totalRows,
-      search: undefined,
-      field: column.id,
-      direction: sortDirection === 'asc' ? 'ASC' : 'DESC',
-      field: field,
-      direction: direction
-    }).then(
-      (res) =>
-        res.data &&
-        prodDispatch({
-          type: 'SET_SORT_ORDER',
-          payload: {
-            field: column.id,
-            direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
-          }
-        })
-    )
-  }
+  // COLUMNS
+  const columns = useMemo(
+    () => [
+      // ACTIVE
+      {
+        id: 'PROJECT_GROUPS_ENABLED',
+        name: 'ACTIVE',
+        selector: (row) => {
+          const { enabled, name } = row
+          return (
+            <Switch
+              name={name}
+              id={name}
+              size='md'
+              isChecked={enabled}
+              onChange={() => {
+                setActiveRow(row)
+                onWarningOpen()
+              }}
+            />
+          )
+        },
+        width: '150px',
+        sortable: true
+      },
+      // PRODUCT
+      {
+        id: 'PROJECT_GROUPS_NAME',
+        name: 'PRODUCT',
+        selector: (row) => {
+          const { id, name, defaultProject } = row
+          const data = defaultProject
+            ? removeDuplicates(defaultProject?.sboms)
+            : []
 
-  // PREV PAGE
-  const handlePreviousPage = async () => {
+          const product = {
+            id: id,
+            name: name,
+            version:
+              data?.length > 0
+                ? normalizeSBOMVersion(defaultProject)
+                : defaultProject?.sboms?.length > 0
+                  ? normalizeSBOMVersion(defaultProject?.sboms[0])
+                  : '',
+            sbomId: defaultProject
+              ? defaultProject?.primaryComponent?.id
+              : defaultProject?.sboms?.length > 0
+                ? defaultProject?.sboms[0]?.id
+                : '',
+            groupId: id
+          }
+
+          const handleClick = () => {
+            sessionStorage.setItem('product', JSON.stringify(product))
+            sessionStorage.setItem('activeEnv', defaultProject?.id)
+            sessionStorage.setItem('activeProdTab', 0)
+            prodDispatch({
+              type: 'SET_CURRENT_PRODUCT',
+              payload: {
+                id: defaultProject?.id,
+                sbomId:
+                  defaultProject?.length > 0
+                    ? defaultProject?.primaryComponent?.id
+                    : defaultProject?.sboms[0]?.id || ''
+              }
+            })
+            setActiveSbomTab(0)
+          }
+
+          return (
+            <Link
+              to={`/vendor/products/${name}?id=${id}`}
+              onClick={handleClick}
+            >
+              <Text color={'blue.500'} minWidth='100%'>
+                {name}
+              </Text>
+            </Link>
+          )
+        },
+        wrap: true,
+        sortable: true
+      },
+      // ENVIRONMENT
+      {
+        id: 'ENVIRONMENT',
+        name: 'ENVIRONMENT',
+        selector: (row) => {
+          const { projects } = row
+          return <Text>{projects?.length}</Text>
+        },
+        wrap: true
+      },
+      // VERSION
+      {
+        id: 'VERSION',
+        name: 'VERSION',
+        selector: (row) => {
+          const { projects } = row
+          const totalSbom = projects?.reduce(
+            (count, project) => count + project.sboms.length,
+            0
+          )
+          return <Text>{totalSbom || 0}</Text>
+        },
+        wrap: true
+      },
+      // DESCRIPTION
+      {
+        id: 'PROJECT_GROUPS_DESCRIPTION',
+        name: 'DESCRIPTION',
+        selector: (row) => {
+          const { description } = row
+          return (
+            <Text>
+              {description?.length > 50
+                ? description.substring(0, 50) + '....'
+                : description}
+            </Text>
+          )
+        },
+        wrap: true,
+        sortable: true
+      },
+      // UPDATEDAT
+      {
+        id: 'PROJECT_GROUPS_UPDATED_AT',
+        name: 'UPDATED AT',
+        selector: (row) => {
+          const { updatedAt } = row
+          return (
+            <Tooltip label={getFullDateAndTime(updatedAt)} placement={'top'}>
+              {timeSince(updatedAt)}
+            </Tooltip>
+          )
+        },
+        sortable: true,
+        sortFunction: (a, b) => {
+          const dateA = new Date(a.updatedAt)
+          const dateB = new Date(b.updatedAt)
+          return dateA - dateB
+        },
+        wrap: true
+      },
+      // ACTIONS
+      {
+        id: 'actions',
+        name: 'ACTIONS',
+        selector: (row) => {
+          const { enabled, defaultProject } = row
+
+          return (
+            <Menu>
+              <MenuButton
+                as={IconButton}
+                icon={<FaEllipsisV />}
+                variant='none'
+                color='gray.400'
+              />
+              <Portal>
+                <MenuList fontSize={'sm'}>
+                  {/* EDIT PRODUCT */}
+                  <MenuItem
+                    onClick={() => {
+                      setActiveRow(row)
+                      onOpen()
+                    }}
+                    isDisabled={!enabled}
+                  >
+                    Edit Product
+                  </MenuItem>
+                  <Divider />
+                  {/* UPLOAD SBOM */}
+                  <MenuItem
+                    onClick={() => {
+                      sessionStorage.setItem('activeEnv', defaultProject?.id)
+                      setActiveRow(row)
+                      onOpenUpload()
+                    }}
+                    isDisabled={!enabled || !canUpdateProduct}
+                  >
+                    Upload SBOM
+                  </MenuItem>
+                  {/* BUILD SBOM */}
+                  <MenuItem
+                    onClick={() => handleOpenSbom(row)}
+                    isDisabled={!enabled}
+                  >
+                    Build Version
+                  </MenuItem>
+                  <Divider />
+                  {/* ARCHIVE PRODUCT GROUP */}
+                  <MenuItem
+                    color='red'
+                    onClick={() => {
+                      setActiveRow(row)
+                      onDeleteOpen()
+                    }}
+                    isDisabled={!canArchiveProduct}
+                  >
+                    Archive Product
+                  </MenuItem>
+                </MenuList>
+              </Portal>
+            </Menu>
+          )
+        },
+        right: 'true'
+      }
+    ],
+    [setActiveRow, onWarningOpen, canArchiveProduct]
+  )
+
+  const handleSort = useCallback(
+    async (column, sortDirection) => {
+      await refetch({
+        first: totalRows,
+        search: undefined,
+        field: column.id,
+        direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+      }).then((res) => {
+        if (res.data) {
+          prodDispatch({
+            type: 'SET_SORT_ORDER',
+            payload: {
+              field: column.id,
+              direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+            }
+          })
+        }
+      })
+    },
+    [refetch, totalRows, prodDispatch]
+  )
+
+  const handlePreviousPage = useCallback(async () => {
     await refetch({
       first: undefined,
       last: totalRows,
       after: undefined,
       before: data.pageInfo.startCursor
-    }).then(
-      (res) =>
-        res.data &&
+    }).then((res) => {
+      if (res.data) {
         prodDispatch({
           type: 'DECREMENT_PAGE',
           payload: data.pageInfo.startCursor
         })
-    )
-  }
+      }
+    })
+  }, [refetch, totalRows, data, prodDispatch])
 
-  // NEXT PAGE
-  const handleNextPage = async () => {
+  const handleNextPage = useCallback(async () => {
     await refetch({
       first: totalRows,
       last: undefined,
       after: data.pageInfo.endCursor,
       before: undefined
-    }).then(
-      (res) =>
-        res.data &&
+    }).then((res) => {
+      if (res.data) {
         prodDispatch({
           type: 'INCREMENT_PAGE',
           payload: {
@@ -527,91 +544,75 @@ const ProductTable = ({ data, refetch, org }) => {
             after: data.pageInfo.endCursor
           }
         })
-    )
-  }
-
-  // SET ROW LENGTH
-  const handleSetRow = async (e) => {
-    setTotalRows(Number(e.target.value))
-    await refetch({
-      first: Number(e.target.value),
-      last: undefined,
-      after: undefined,
-      before: undefined
-    }).then((res) => {
-      if (res.data) {
-        prodDispatch({ type: 'FETCH_DATA_SUCCESS' })
       }
     })
+  }, [refetch, totalRows, data, prodDispatch])
+
+  const handleSetRow = useCallback(
+    async (e) => {
+      const newTotalRows = Number(e.target.value)
+      setTotalRows(newTotalRows)
+      await refetch({
+        first: newTotalRows,
+        last: undefined,
+        after: undefined,
+        before: undefined
+      }).then((res) => {
+        if (res.data) {
+          prodDispatch({ type: 'FETCH_DATA_SUCCESS' })
+        }
+      })
+    },
+    [refetch, setTotalRows, prodDispatch]
+  )
+
+  const dataTableProps = {
+    columns: columns,
+    data: data?.nodes,
+    onSort: handleSort,
+    customStyles: customStyles,
+    defaultSortFieldId: field,
+    defaultSortAsc: false,
+    subHeader: true,
+    subHeaderComponent: subHeaderComponent,
+    progressPending: !data,
+    progressComponent: <CustomLoader />,
+    responsive: true,
+    persistTableHead: true
   }
+
+  useEffect(() => {
+    if (!data) {
+      refetch({
+        first: totalRows,
+        enabled: enabled === 'yes' ? true : enabled === 'no' ? false : undefined,
+        field,
+        direction
+      }).then((res) => {
+        if (res.data) {
+          prodDispatch({ type: 'FETCH_DATA_SUCCESS' })
+        }
+      })
+    }
+  }, [data, refetch, totalRows, prodDispatch])
 
   return (
     <>
       <Card>
         <Flex flexDir={'column'} width={'100%'}>
-          <DataTable
-            columns={columns}
-            onSort={handleSort}
-            data={data?.nodes}
-            customStyles={customStyles}
-            defaultSortAsc={false}
-            defaultSortFieldId={field}
-            subHeader
-            subHeaderComponent={subHeaderComponent}
-            progressPending={data ? false : true}
-            progressComponent={<CustomLoader />}
-            responsive={true}
-            persistTableHead
-          />
-
+          <DataTable {...dataTableProps} />
           {data && (
-            <Flex
-              width={'100%'}
-              flexDir={'row'}
-              gap={4}
-              alignItems={'center'}
-              mt={6}
-              justifyContent={'space-between'}
-              flexWrap={'wrap'}
-            >
-              <Stack alignItems={'center'} direction={'row'} spacing={4}>
-                <Button
-                  colorScheme='blue'
-                  onClick={handlePreviousPage}
-                  isDisabled={!data.pageInfo.hasPreviousPage}
-                >
-                  Prev
-                </Button>
-                <Button
-                  colorScheme='blue'
-                  onClick={handleNextPage}
-                  isDisabled={!data.pageInfo.hasNextPage}
-                >
-                  Next
-                </Button>
-                <Box>
-                  Page {pageIndex} of{' '}
-                  {data.totalCount === 0
-                    ? 1
-                    : Math.ceil(data.totalCount / totalRows)}
-                </Box>
-              </Stack>
-
-              <Stack alignItems={'center'} direction={'row'} spacing={4}>
-                <Text>Show</Text>
-                <Select
-                  width={20}
-                  value={totalRows}
-                  onChange={handleSetRow}
-                  id='rowlimit'
-                  name='rowlimit'
-                >
-                  <option value={25}>25</option>
-                  <option value={50}>50</option>
-                  <option value={100}>100</option>
-                </Select>
-              </Stack>
-            </Flex>
+            <Pagination
+              paginationSizes={paginationSizes}
+              pageIndex={pageIndex}
+              totalRows={totalRows}
+              totalCount={data.totalCount}
+              onPreviousPage={handlePreviousPage}
+              onNextPage={handleNextPage}
+              onSetRow={handleSetRow}
+              hasNextPage={data.pageInfo.hasNextPage}
+              hasPreviousPage={data.pageInfo.hasPreviousPage}
+            />
           )}
         </Flex>
       </Card>
@@ -619,9 +620,10 @@ const ProductTable = ({ data, refetch, org }) => {
       {/* UPLOAD SBOM */}
       {isOpenUpload && (
         <UploadModal
-          id={activeRow.id}
+          projects={activeRow?.projects}
           isOpen={isOpenUpload}
           onClose={onCloseUpload}
+          activeEnv={activeEnv}
         />
       )}
 
@@ -636,7 +638,6 @@ const ProductTable = ({ data, refetch, org }) => {
           product={null}
           description={null}
           allProjects={null}
-          type={null}
         />
       )}
 
@@ -650,7 +651,7 @@ const ProductTable = ({ data, refetch, org }) => {
           refetch={refetch}
           description={activeRow.description}
           allProjects={data.nodes}
-          type={activeRow.sboms.length > 0 && activeRow.sboms[0].format}
+          activeEnv={activeEnv}
         />
       )}
 
@@ -700,50 +701,14 @@ const ProductTable = ({ data, refetch, org }) => {
       )}
 
       {/* DISABLED */}
-      {isWarning && (
-        <Modal isOpen={isWarning} onClose={onWarningClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>
-              {activeRow.enabled ? 'Disable' : 'Enable'} Product
-            </ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Text>
-                {activeRow.enabled ? 'Disable' : 'Enable'} this product will:{' '}
-              </Text>
-              <UnorderedList>
-                <Flex flexDir={'column'} gap={1} mt={4}>
-                  {[
-                    `${
-                      activeRow.enabled ? 'Disable' : 'Enable'
-                    } this product, its versions and SBOMs`,
-                    `${
-                      activeRow.enabled ? 'Disable' : 'Enable'
-                    } access to the product for all users`,
-                    `${
-                      activeRow.enabled ? 'Disable' : 'Enable'
-                    } uploads of SBOMs to this product`
-                  ].map((item, index) => (
-                    <ListItem key={index}>{item}</ListItem>
-                  ))}
-                </Flex>
-              </UnorderedList>
-              <Text mt={10}>Are you sure you wish to continue?</Text>
-            </ModalBody>
-            <ModalFooter>
-              <Button mr={3} onClick={onWarningClose}>
-                No
-              </Button>
-              <Button
-                colorScheme={activeRow.enabled ? 'red' : 'green'}
-                onClick={toggleStatus}
-              >
-                Yes
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+      {isWarningOpen && data && (
+        <StatusModal
+          isOpen={isWarningOpen}
+          onClose={onWarningClose}
+          group={activeRow}
+          grouId={productId}
+          refetch={refetch}
+        />
       )}
     </>
   )

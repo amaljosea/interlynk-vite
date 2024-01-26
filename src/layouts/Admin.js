@@ -1,5 +1,5 @@
 // Chakra imports
-import { Box, Portal, Stack } from '@chakra-ui/react'
+import { Box, Portal, Stack, useToast } from '@chakra-ui/react'
 // Layout components
 import AdminNavbar from 'components/Navbars/AdminNavbar.js'
 import Sidebar from 'components/Sidebar'
@@ -15,6 +15,7 @@ import {
   ApolloLink
 } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
+import { onError } from '@apollo/client/link/error';
 import Cookies from 'js-cookie'
 import { createUploadLink } from 'apollo-upload-client'
 import { getActiveNavbar, getActiveRoute } from '../utils'
@@ -22,6 +23,7 @@ import { jwtDecode } from 'jwt-decode'
 
 export default function Dashboard(props) {
   const authToken = Cookies.get('authToken')
+  const highRes = window.matchMedia('(min-width: 2500px)')
   const navigate = useNavigate()
   const { ...rest } = props
   // states and functions
@@ -50,8 +52,25 @@ export default function Dashboard(props) {
     }
   })
 
+  const toast = useToast();
+
+  const errorLink = onError(({ graphQLErrors }) => {
+    if (graphQLErrors) {
+      graphQLErrors.forEach(({ message }) => {
+        toast({
+          title: "An error occurred.",
+          description: message,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: "top"
+        });
+      });
+    }
+  });
+
   const client = new ApolloClient({
-    link: ApolloLink.from([authLink, uploadLink]),
+    link: ApolloLink.from([errorLink, authLink, uploadLink]),
     cache: new InMemoryCache(),
     queryDeduplication: false
   })
@@ -67,8 +86,14 @@ export default function Dashboard(props) {
 
   useEffect(() => {
     if (authToken) {
-      const expired = isTokenExpired(authToken)
-      if (expired === true) {
+      try {
+        const expired = isTokenExpired(authToken)
+        if (expired === true) {
+          Cookies.remove('authToken')
+          navigate('/auth')
+        }
+      } catch (err) {
+        console.error('Invalid Token Error:', err)
         Cookies.remove('authToken')
         navigate('/auth')
       }
@@ -97,7 +122,12 @@ export default function Dashboard(props) {
           sidebarVariant={sidebarVariant}
           {...rest}
         />
-        <Box minH='100vh' w={'96%'} pos={'absolute'} right={0}>
+        <Box
+          minH='100vh'
+          w={highRes.matches ? '98%' : '96%'}
+          pos={'absolute'}
+          right={0}
+        >
           <Portal>
             <AdminNavbar
               brandText={getActiveRoute(dashRoutes)}

@@ -81,7 +81,7 @@ const OrgRegister = () => {
     }).then((res) => {
       if (res.data) {
         const orgId = res.data.organizationCreate.organization.id
-        localStorage.setItem(
+        sessionStorage.setItem(
           'organization',
           res.data.organizationCreate.organization.name
         )
@@ -89,6 +89,11 @@ const OrgRegister = () => {
       }
     })
   }
+
+  const isInvalid =
+    name === '' ||
+    (email !== '' && emailError !== '') ||
+    (url !== '' && !validateUrl(url))
 
   return (
     <>
@@ -99,10 +104,10 @@ const OrgRegister = () => {
           fontFamily={'inherit'}
           fontWeight={'semibold'}
         >
-          Register or join an Organization to get started
+          Register or join an organization to get started
         </Heading>
         <Button mt={10} variant='solid' colorScheme='blue' onClick={onOpen}>
-          Create Organiaztion
+          Register Organization
         </Button>
       </Card>
 
@@ -110,7 +115,7 @@ const OrgRegister = () => {
         <Modal isOpen={isOpen} onClose={onClose}>
           <ModalOverlay />
           <ModalContent>
-            <ModalHeader>Create Organization</ModalHeader>
+            <ModalHeader>Register Organization</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               <Flex width={'100%'} direction={'column'} gap={4}>
@@ -177,7 +182,7 @@ const OrgRegister = () => {
               </Button>
               <Button
                 colorScheme='blue'
-                disabled={name === '' || emailError !== ''}
+                disabled={isInvalid}
                 onClick={handleCreate}
               >
                 Save

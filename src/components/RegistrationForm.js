@@ -21,14 +21,19 @@ import {
 } from '@chakra-ui/react'
 import { RegisterUser } from 'graphQL/Mutation'
 import { useMutation } from '@apollo/client'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { validateEmail } from 'utils'
 import { CheckCircleIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { validPassword } from 'utils'
 
 const RegistrationForm = () => {
+  const navigate = useNavigate()
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const emailId = queryParams.get('id')
+
   const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
+  const [email, setEmail] = useState(emailId?.replace(/\s+/g, '+') || '')
   const [emailError, setEmailError] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [password, setPassword] = useState('')
@@ -108,8 +113,12 @@ const RegistrationForm = () => {
         setIsLoading(false)
         setIsSuccess(false)
       } else {
-        setIsSuccess(true)
-        setIsLoading(false)
+        if (res.data.userRegistration.confirmationNeeded) {
+          setIsSuccess(true)
+          setIsLoading(false)
+        } else {
+          navigate('/auth')
+        }
       }
     })
   }
@@ -127,7 +136,11 @@ const RegistrationForm = () => {
           Registration Successful
         </Text>
         <Text fontSize={'sm'} textAlign={'center'} color={'#555'}>
-          User will receive an email with confirmation link.
+          Please check your email to confirm your account or{' '}
+          <Link to='/auth' style={{ color: '#3182CE' }}>
+            click here{' '}
+          </Link>{' '}
+          to login.
         </Text>
       </Flex>
     )
@@ -187,6 +200,8 @@ const RegistrationForm = () => {
             placeholder='Enter email address'
             autoComplete='off'
             onBlur={handleCheckEmail}
+            isReadOnly={emailId}
+            disabled={emailId ? true : false}
           />
           {emailError !== '' && (
             <FormErrorMessage>{emailError}</FormErrorMessage>

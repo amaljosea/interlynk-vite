@@ -45,7 +45,7 @@ function SBOMs() {
   const versionId = queryParams.get('v')
   const imageId = queryParams.get('id')
 
-  localStorage.setItem('selectedVersion', versionId)
+  sessionStorage.setItem('selectedVersion', versionId)
 
   const [selectedVersion, setSelectedVersion] = useState('')
   const [selectedScanner, setSelectedScanner] = useState('')
@@ -156,7 +156,7 @@ function SBOMs() {
     setFilteredVulItems([])
     const { value } = e.target
     setSelectedVersion(value)
-    localStorage.setItem('selectedVersion', versionId)
+    sessionStorage.setItem('selectedVersion', versionId)
     refetch({ imageVersionId: value, first: 30 })
     queryParams.set('v', value)
     navigate(`/vendor/images?v=${value}&id=${imageId}`)
@@ -166,7 +166,7 @@ function SBOMs() {
 
   const handleScanner = (e) => {
     const { value } = e.target
-    localStorage.setItem('cloudScanner', value)
+    sessionStorage.setItem('cloudScanner', value)
     setSelectedScanner(value)
   }
 
@@ -228,7 +228,7 @@ function SBOMs() {
     setFilteredVulItems(filteredData)
   }, [selectedScanner])
 
-  const cldScanner = localStorage.getItem('cloudScanner')
+  const cldScanner = sessionStorage.getItem('cloudScanner')
 
   useEffect(() => {
     setSelectedScanner(cldScanner ? cldScanner : 'All')

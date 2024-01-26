@@ -2,7 +2,8 @@
 import {
   ChevronDownIcon,
   ChevronUpIcon,
-  ExternalLinkIcon
+  ExternalLinkIcon,
+  RepeatIcon
 } from '@chakra-ui/icons'
 import {
   Flex,
@@ -12,7 +13,6 @@ import {
   TagLabel,
   Icon,
   useColorModeValue,
-  Button,
   Link,
   Box,
   Grid,
@@ -27,10 +27,11 @@ import {
   DrawerCloseButton,
   IconButton,
   Badge,
-  Skeleton
+  Skeleton,
+  useToast
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
-import { FaCopy } from 'react-icons/fa6'
+import { FaBug, FaCopy } from 'react-icons/fa6'
 import { useState, useMemo, useEffect } from 'react'
 import styled from '@emotion/styled'
 import ProdStatusDrawer from 'components/Drawer/ProdStatusDrawer'
@@ -40,11 +41,12 @@ import SearchFilter from 'views/Sbom/components/SearchFilter'
 import CustomLoader from 'components/CustomLoader'
 import Cookies from 'js-cookie'
 import { customStyles } from 'utils'
-import RowLimit from 'views/Sbom/components/RowLimit'
 import ImportWizard from 'views/Sbom/components/ImportWizard'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useLazyQuery } from '@apollo/client'
+import { useLazyQuery, useMutation } from '@apollo/client'
 import { GetVulnFilterData } from 'graphQL/Queries'
+import { ManualVulnScan } from 'graphQL/Mutation'
+import Pagination from '../Pagination'
 
 const statusColor = (status) => {
   if (status && status === 'Fixed') {
@@ -64,19 +66,23 @@ const statusColor = (status) => {
 
 const VulnTable = ({
   data,
+  sbomData,
   refetch,
   productId,
   sbomId,
   filteredData,
-  filterRefetch
+  filterRefetch,
+  sbomRefetch
 }) => {
+  const toast = useToast()
   // GET VULN FILTER HEADS
   const [getVulnFilters] = useLazyQuery(GetVulnFilterData)
 
   const customerView = location.pathname.startsWith('/customer')
   const signedParams = Cookies.get(`signedParamId`)
 
-  const { totalRows, setTotalRows, prodVulnState, dispatch } = useGlobalState()
+  const { userPermissions, totalRows, setTotalRows, prodVulnState, dispatch } =
+    useGlobalState()
   const {
     pageIndex,
     field,
@@ -91,11 +97,22 @@ const VulnTable = ({
   } = prodVulnState
   const { prodVulnDispatch } = dispatch
 
+  const [onVulnScan] = useMutation(ManualVulnScan, {
+    fetchPolicy: 'network-only'
+  })
+
+  const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
+  const editVulns = sboms?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'edit_vulnerabilities' && permission.value === true
+  )
+
+  const paginationSizes = [25, 50, 100]
+
   const textColor = useColorModeValue('gray.700', 'white')
-  const [hideColumn, setHideColumn] = useState(false)
   const [vulnSearch, setVulnSearch] = useState('')
-  const x = window.matchMedia('(min-width: 2500px)')
-  const y = window.matchMedia('(max-width: 1440px)')
+  const [isPrevActive, setIsPrevActive] = useState(false)
+  const [isNextActive, setIsNextActive] = useState(false)
 
   const {
     isOpen: isTableOpen,
@@ -111,7 +128,7 @@ const VulnTable = ({
     } else if (cvss >= 6.0) {
       return 'yellow'
     } else {
-      return 'green'
+      return 'gray'
     }
   }
 
@@ -144,25 +161,22 @@ const VulnTable = ({
                 color={'blue.500'}
               />
             </Link>
-            <Tooltip label={vuln.vulnId} placement={'top'}>
-              <Text
-                my={3}
-                fontSize='sm'
-                color={textColor}
-                data-tag='allowRowEvents'
-              >
-                {vuln.vulnId !== null ? `${vuln.vulnId}` : ''}
-              </Text>
-            </Tooltip>
-            {kev === true && (
-              <Badge variant='subtle' colorScheme='red'>
-                KEV
-              </Badge>
-            )}
+            <Stack direction={'column'} my={2}>
+              <Tooltip label={vuln.vulnId} placement={'top'}>
+                <Text fontSize='sm' color={textColor} data-tag='allowRowEvents'>
+                  {vuln.vulnId !== null ? `${vuln.vulnId}` : ''}
+                </Text>
+              </Tooltip>
+              {kev === true && (
+                <Badge width={'fit-content'} variant='subtle' colorScheme='red'>
+                  KEV
+                </Badge>
+              )}
+            </Stack>
           </Flex>
         )
       },
-      width: y.matches ? '15%' : '20%',
+      width: '15%',
       sortable: true
     },
     // SEVERITY
@@ -172,26 +186,21 @@ const VulnTable = ({
       selector: (row) => {
         const { vuln } = row
         return (
-          <>
-            {vuln.sev !== null ? (
-              <Tag
-                size='md'
-                variant='subtle'
-                width={'80px'}
-                colorScheme={sevColor(`${vuln.sev}`)}
-              >
-                <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
-                  {vuln.sev}
-                </TagLabel>
-              </Tag>
-            ) : (
-              ''
-            )}
-          </>
+          <Tag
+            size='md'
+            variant='subtle'
+            width={'80px'}
+            colorScheme={sevColor(vuln?.sev)}
+          >
+            <TagLabel style={{ textTransform: 'capitalize' }} mx={'auto'}>
+              {vuln?.sev || '-'}
+            </TagLabel>
+          </Tag>
         )
       },
-      width: '120px',
-      sortable: true
+      width: '9%',
+      sortable: true,
+      wrap: true
     },
     // SOURCE
     {
@@ -214,8 +223,9 @@ const VulnTable = ({
           </Tag>
         )
       },
-      width: '110px',
-      sortable: true
+      width: '9%',
+      sortable: true,
+      wrap: true
     },
     // CVSS
     {
@@ -233,14 +243,15 @@ const VulnTable = ({
               colorScheme={cvssColor(vuln.cvssScore)}
             >
               <TagLabel mx={'auto'}>
-                {vuln.cvssScore ? vuln.cvssScore : 0}
+                {vuln.cvssScore ? vuln.cvssScore : '-'}
               </TagLabel>
             </Tag>
           </Flex>
         )
       },
-      width: '90px',
-      sortable: true
+      width: '8%',
+      sortable: true,
+      wrap: true
     },
     // EPSS
     {
@@ -262,8 +273,9 @@ const VulnTable = ({
               alignItems='center'
             >
               <TagLabel style={{ textAlign: 'center' }}>
-                {epssScores ? Math.ceil(epssScores[0] * 10000) : 0}
-                {/* {epssScores.length > 1 && `- ${epssScores[1]}`} */}
+                {epssScores?.length > 0
+                  ? Math.ceil(epssScores[0] * 10000)
+                  : '-'}
               </TagLabel>
             </Tag>
             {epssScores && epssScores.length > 1 ? (
@@ -290,8 +302,9 @@ const VulnTable = ({
           </Flex>
         )
       },
-      width: '120px',
-      sortable: true
+      width: '10%',
+      sortable: true,
+      wrap: true
     },
     // COMPONENT
     {
@@ -312,9 +325,8 @@ const VulnTable = ({
         )
       },
       wrap: true,
-      width: y.matches ? '10%' : x.matches ? '18%' : '15%',
-      sortable: true,
-      omit: hideColumn
+      width: '12%',
+      sortable: true
     },
     // VERSION
     {
@@ -322,13 +334,12 @@ const VulnTable = ({
       name: 'VERSION',
       selector: (row) => (
         <Tooltip label={row.component.version} placement='top'>
-          {row.component.version}
+          <Text my={2}>{row.component.version}</Text>
         </Tooltip>
       ),
       wrap: true,
-      width: y.matches ? '10%' : x.matches ? '18%' : '12%',
-      sortable: true,
-      omit: hideColumn
+      width: '10%',
+      sortable: true
     },
     // STATUS
     {
@@ -351,6 +362,8 @@ const VulnTable = ({
           </Tag>
         )
       },
+      width: '12%',
+      wrap: true,
       sortable: true
     },
     // UPDATED AT
@@ -445,8 +458,8 @@ const VulnTable = ({
           kev === 'all' || kev === ''
             ? undefined
             : kev === 'yes'
-            ? true
-            : false,
+              ? true
+              : false,
         epss: epss !== '' && epss !== 'all' ? range : undefined,
         field: field,
         direction: direction,
@@ -462,18 +475,46 @@ const VulnTable = ({
     }
   }
 
-  const subHeaderComponentMemo = useMemo(() => {
+  // SCAN VULN
+  const handleScan = async () => {
+    await onVulnScan({
+      variables: { id: sbomId }
+    }).then((res) => {
+      toast({
+        description: 'Vulnerability re-scan started',
+        position: 'top',
+        status: 'success',
+        duration: 5000
+      })
+      if (res.data) {
+        sbomRefetch({
+          projectId: productId,
+          sbomId: sbomId
+        })
+        prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
+      }
+    })
+  }
+
+  const handleRefresh = async () => {
+    await refetch({
+      projectId: productId,
+      sbomId: sbomId
+    })
+  }
+
+  const subHeader = useMemo(() => {
     return (
       <Flex
         width={'100%'}
-        alignItems={'center'}
+        alignItems={'flex-start'}
         justifyContent={'space-between'}
       >
-        <Stack
-          width={'100%'}
-          direction={'row'}
-          spacing={4}
+        <Flex
+          flexDirection={'row'}
           alignItems={'flex-start'}
+          flexWrap={'wrap'}
+          gap={4}
         >
           {/* SEARCH COMPONENTS */}
           <SearchFilter
@@ -498,9 +539,22 @@ const VulnTable = ({
               ))}
             </Stack>
           )}
-        </Stack>
+        </Flex>
 
-        {!customerView && (
+        <Stack direction='row' alignItems={'center'} width={'fit-content'}>
+          {sbomData?.vulnRunStatus === 'IN_PROGRESS' && (
+            <Text>Re-scan in progress</Text>
+          )}
+          {/* SCAN VULN */}
+          <Tooltip label={'Scan Vulnerabilities'}>
+            <IconButton
+              isDisabled={sbomData?.vulnRunStatus === 'IN_PROGRESS'}
+              colorScheme='blue'
+              onClick={handleScan}
+              icon={<FaBug />}
+            />
+          </Tooltip>
+          {/* IMPORT STATUS */}
           <Tooltip label='Import Statuses'>
             <IconButton
               variant='solid'
@@ -511,13 +565,22 @@ const VulnTable = ({
                 prodVulnDispatch({ type: 'RESET_SELECTED_VULN' })
                 onTableOpen()
               }}
+              isDisabled={!editVulns}
               icon={<FaCopy size={18} />}
             />
           </Tooltip>
-        )}
+          {/* REFRESH */}
+          <Tooltip label='Refresh'>
+            <IconButton
+              onClick={handleRefresh}
+              colorScheme='blue'
+              icon={<RepeatIcon />}
+            ></IconButton>
+          </Tooltip>
+        </Stack>
       </Flex>
     )
-  }, [vulnSearch, filters, onSearchInputChange, handleSearch])
+  }, [vulnSearch, filters, onSearchInputChange, handleSearch, handleScan])
 
   const ExpandedComponent = ({ data }) => {
     const { vuln } = data
@@ -624,7 +687,8 @@ const VulnTable = ({
     )
   }
 
-  const onPreviousPage = async () => {
+  const handlePreviousPage = async () => {
+    setIsPrevActive(false)
     await refetch({
       ...vulnData,
       first: undefined,
@@ -633,16 +697,17 @@ const VulnTable = ({
       before: data.pageInfo.startCursor
     }).then((res) => {
       if (res.data) {
+        setIsPrevActive(res?.data?.sbom?.vulns?.pageInfo?.hasPreviousPage)
         prodVulnDispatch({
           type: 'DECREMENT_PAGE',
           payload: data.pageInfo.startCursor
         })
-        window.scrollTo({ top: 0, behavior: 'smooth' })
       }
     })
   }
 
-  const onNextPage = async () => {
+  const handleNextPage = async () => {
+    setIsNextActive(false)
     await refetch({
       ...vulnData,
       first: totalRows,
@@ -651,6 +716,7 @@ const VulnTable = ({
       before: undefined
     }).then((res) => {
       if (res.data) {
+        setIsNextActive(res?.data?.sbom?.vulns?.pageInfo?.hasNextPage)
         prodVulnDispatch({
           type: 'INCREMENT_PAGE',
           payload: {
@@ -658,7 +724,6 @@ const VulnTable = ({
             after: data.pageInfo.endCursor
           }
         })
-        window.scrollTo({ top: 0, behavior: 'smooth' })
       }
     })
   }
@@ -719,21 +784,9 @@ const VulnTable = ({
   }
 
   useEffect(() => {
-    const handleResize = () => {
-      const scaleThreshold = 1.1
-      const currentScale = window.devicePixelRatio
-      setHideColumn(currentScale > scaleThreshold)
-    }
-    window.addEventListener('resize', handleResize)
-    handleResize()
-
-    return () => {
-      window.removeEventListener('resize', handleResize)
-    }
-  }, [])
-
-  useEffect(() => {
     if (data) {
+      setIsPrevActive(data?.pageInfo?.hasPreviousPage)
+      setIsNextActive(data?.pageInfo?.hasNextPage)
       getVulnFilters({
         variables: {
           projectId: productId,
@@ -752,9 +805,10 @@ const VulnTable = ({
 
   return (
     <>
-      {/* TABLE */}
       <Flex flexDir={'column'} width={'100%'}>
+        {/* TABLE */}
         <DataTable
+          className='data-table-container'
           columns={columns}
           data={data && data.nodes}
           customStyles={customStyles}
@@ -764,8 +818,8 @@ const VulnTable = ({
           progressPending={data ? false : true}
           progressComponent={<CustomLoader />}
           subHeader
-          subHeaderComponent={subHeaderComponentMemo}
-          responsive
+          subHeaderComponent={subHeader}
+          responsive={true}
           expandableRows
           expandOnRowClicked
           persistTableHead
@@ -775,38 +829,17 @@ const VulnTable = ({
 
       {/* PAGINATION */}
       {data && (
-        <Flex
-          flexDir={'row'}
-          gap={4}
-          alignItems={'center'}
-          mt={6}
-          justifyContent={'space-between'}
-        >
-          <Stack alignItems={'center'} direction={'row'} spacing={4}>
-            <Button
-              colorScheme='blue'
-              onClick={onPreviousPage}
-              isDisabled={!data.pageInfo.hasPreviousPage}
-            >
-              Previous
-            </Button>
-            <Button
-              colorScheme='blue'
-              onClick={onNextPage}
-              isDisabled={!data.pageInfo.hasNextPage}
-            >
-              Next
-            </Button>
-            <Box>
-              Page {pageIndex} of{' '}
-              {data.totalCount === 0
-                ? 1
-                : Math.ceil(data.totalCount / totalRows)}
-            </Box>
-          </Stack>
-
-          <RowLimit onChange={handleSetRow} name='vulnerabilities' />
-        </Flex>
+        <Pagination
+          paginationSizes={paginationSizes}
+          pageIndex={pageIndex}
+          totalRows={totalRows}
+          totalCount={data.totalCount}
+          onPreviousPage={handlePreviousPage}
+          onNextPage={handleNextPage}
+          onSetRow={handleSetRow}
+          hasNextPage={data.pageInfo.hasNextPage}
+          hasPreviousPage={data.pageInfo.hasPreviousPage}
+        />
       )}
 
       {/* EPSS INFO */}

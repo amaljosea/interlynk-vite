@@ -33,10 +33,10 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
-  const currentProduct = JSON.parse(localStorage.getItem(`product`))
+  const currentProduct = JSON.parse(sessionStorage.getItem(`product`))
   const { data: res } = useQuery(GetCdxResponses)
 
-  const { totalRows, setActiveSbomTab, prodVulnState, dispatch } =
+  const { totalRows, userPermissions, prodVulnState, dispatch } =
     useGlobalState()
   const {
     field,
@@ -49,6 +49,12 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
     epss
   } = prodVulnState
   const { prodVulnDispatch } = dispatch
+
+  const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
+  const editVulns = sboms?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'edit_vulnerabilities' && permission.value === true
+  )
 
   const { id, componentVulnLogs } = data
 
@@ -63,7 +69,6 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
   const [details, setDetails] = useState('')
   const [notes, setNotes] = useState('')
   const [impactData, setImpactData] = useState('')
-
   const [statusResults, setStatusResults] = useState([])
   const [newVulnLogs, setNewVulnLogs] = useState([])
 
@@ -145,9 +150,22 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
         fixedIn: selectedTag !== '' ? selectedTag : undefined
       }
     })
-      .then(
-        (res) => res.data && prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
-      )
+      .then((res) => {
+        setStatusTitle('')
+        setStatusName('')
+        setJustification('')
+        setJustifyName('')
+        setSelectedTag('')
+        setActionStatement('')
+        setResponse('')
+        setResponseTitle('')
+        setDetails('')
+        setNotes('')
+        setImpactData('')
+        if (res.data) {
+          prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
+        }
+      })
       .finally(() => handleRefetch())
   }
 
@@ -396,7 +414,8 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
                   responseTitle === '' &&
                   actionStatement === '') ||
                 (responseTitle !== '' && actionStatement === '') ||
-                (responseTitle === 'update' && selectedTag === '')
+                (responseTitle === 'update' && selectedTag === '') ||
+                !editVulns
               }
             >
               Add

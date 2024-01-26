@@ -13,10 +13,23 @@ export const GetOrg = gql`
         id
         name
         email
+        superAdmin
         unconfirmedEmail
         profileImage {
           filename
           url
+        }
+        role {
+          id
+          name
+          permissionsMap {
+            category
+            description
+            key
+            name
+            supersededBy
+            value
+          }
         }
         apiKeys {
           id
@@ -36,10 +49,13 @@ export const GetOrg = gql`
         name
         email
         role {
+          id
           name
+          permissions
         }
-        timezone
         createdAt
+        invitationStatus
+        invitationAcceptedAt
         profileImage {
           filename
           url
@@ -57,6 +73,48 @@ export const GetOrg = gql`
     }
   }
 `
+
+// GET USER PERMISSIONS
+export const GetUserPermissions = gql`
+  query GetOrganization {
+    organization {
+      currentUser {
+        role {
+          permissionsMap {
+            category
+            description
+            key
+            name
+            supersededBy
+            value
+          }
+        }
+      }
+    }
+  }
+`
+
+// GET ORG ROLES
+export const GetRoles = gql`
+  query GetRoles {
+    organization {
+      organizationRoles {
+        id
+        name
+        createdAt
+        permissionsMap {
+          category
+          description
+          key
+          name
+          supersededBy
+          value
+        }
+      }
+    }
+  }
+`
+
 // GET ORGANIZATION METRICS
 export const GetOrgMetrics = gql`
   query GetOrgMetrics {
@@ -77,6 +135,7 @@ export const GetOrgMetrics = gql`
       latestVersions {
         id
         createdAt
+        creationAt
         updatedAt
         projectId
         project {
@@ -84,8 +143,17 @@ export const GetOrgMetrics = gql`
           sboms {
             id
           }
+          projectGroup {
+            id
+            name
+            defaultProject {
+              id
+              name
+            }
+          }
         }
         primaryComponent {
+          id
           name
           version
         }
@@ -131,12 +199,43 @@ export const MyOrganizations = gql`
     $last: Int
     $after: String
     $before: String
+    $invitationStatuses: [OrgUserInvitationStatuses!]
   ) {
     myOrganizations(
       first: $first
       last: $last
       after: $after
       before: $before
+      invitationStatuses: $invitationStatuses
+    ) {
+      nodes {
+        id
+        name
+        email
+        status
+        updatedAt
+        invitationStatus
+        url
+      }
+    }
+  }
+`
+
+// LIST CURRENT USER'S ORGANIZATIONS
+export const AllOrganizations = gql`
+  query AllOrganizations(
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+    $status: OrganizationStatusEnum
+  ) {
+    allOrganizations(
+      first: $first
+      last: $last
+      after: $after
+      before: $before
+      status: $status
     ) {
       nodes {
         id
@@ -185,6 +284,386 @@ export const GetOrgSettings = gql`
           name
           friendlyName
           kind
+        }
+      }
+    }
+  }
+`
+
+// GET PROJECT GROUPS
+export const GetProjectGroups = gql`
+  query GetProjectGroups(
+    $search: String
+    $enabled: Boolean
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+    $field: ProjectGroupOrderByFields!
+    $direction: OrderByDirection!
+  ) {
+    organization {
+      projectGroups(
+        search: $search
+        enabled: $enabled
+        first: $first
+        last: $last
+        after: $after
+        before: $before
+        orderBy: { field: $field, direction: $direction }
+      ) {
+        totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          startCursor
+          hasPreviousPage
+        }
+        nodes {
+          id
+          name
+          enabled
+          defaultProject {
+            id
+            name
+            description
+            updatedAt
+            enabled
+            sboms {
+              id
+              format
+              creationAt
+              updatedAt
+              primaryComponent {
+                id
+                name
+                version
+              }
+            }
+          }
+          projects {
+            id
+            name
+            description
+            updatedAt
+            enabled
+            projectGroup {
+              id
+              name
+            }
+            sboms {
+              id
+              format
+              creationAt
+              updatedAt
+              primaryComponent {
+                id
+                name
+                version
+              }
+            }
+          }
+          description
+          enabled
+          updatedAt
+        }
+      }
+    }
+  }
+`
+
+// GET PROJECT SETTINGS
+export const GetProjectSettings = gql`
+  query GetProjectSettings($id: Uuid!) {
+    project(id: $id) {
+      id
+      name
+      projectSetting {
+        id
+        checksEnabled
+        automatedFixesEnabled
+        dataRetentionDays
+        internalCompMatchingEnabled
+        vulnScanningEnabled
+      }
+    }
+  }
+`
+
+// GET ACTIVE PROJECT GROUP
+export const GetProjectGroup = gql`
+  query GetProjectGroup($id: Uuid!) {
+    projectGroup(id: $id) {
+      description
+      enabled
+      id
+      name
+      organizationId
+      updatedAt
+      defaultProject {
+        description
+        enabled
+        id
+        name
+        projectGroupId
+        updatedAt
+      }
+      projects {
+        description
+        enabled
+        id
+        name
+        projectGroupId
+        updatedAt
+        sboms {
+          id
+          format
+          creationAt
+          updatedAt
+          primaryComponent {
+            id
+            name
+            version
+          }
+        }
+      }
+    }
+  }
+`
+
+// GET GLOBAL VULNERABILITIES
+export const GetGlobalVulns = gql`
+  query Organization(
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+    $search: String
+    $severity: [String!]
+    $projectGroupIds: [Uuid!]
+    $status: [String!]
+    $kev: Boolean
+    $epss: RangeInput
+  ) {
+    organization {
+      vulns(
+        after: $after
+        first: $first
+        before: $before
+        last: $last
+        search: $search
+        projectGroupIds: $projectGroupIds
+        status: $status
+        severity: $severity
+        kev: $kev
+        epss: $epss
+      ) {
+        totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          hasPreviousPage
+          startCursor
+        }
+        nodes {
+          cvssScore
+          cvssVector
+          desc
+          id
+          lastModifiedAt
+          nvdAliasId
+          organizationId
+          publishedAt
+          sev
+          source
+          updatedAt
+          vulnId
+          metrics {
+            affectedCount
+            falsePositiveCount
+            fixedCount
+            inTriageCount
+            notAffectedCount
+            unspecifiedCount
+          }
+          vulnInfo {
+            cveId
+            epssPercentile
+            epssScore
+            epssScores
+            id
+            kev
+            updatedAt
+          }
+        }
+      }
+    }
+  }
+`
+
+// GET SINGLE GLOBAL VULNERABILITIES
+export const GetGlobalVulnData = gql`
+  query GetVulnData(
+    $id: Uuid!
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+  ) {
+    vuln(id: $id) {
+      id
+      desc
+      vulnId
+      updatedAt
+      cvssScore
+      vulnInfo {
+        id
+        epssScore
+      }
+      organization {
+        projectGroups {
+          nodes {
+            name
+          }
+        }
+      }
+      componentVulns(
+        first: $first
+        last: $last
+        after: $after
+        before: $before
+      ) {
+        totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          hasPreviousPage
+          startCursor
+        }
+        nodes {
+          id
+          vulnId
+          vexStatus {
+            id
+            name
+          }
+          component {
+            id
+            name
+            version
+            sbom {
+              creationAt
+              project {
+                name
+                projectGroup {
+                  name
+                }
+              }
+              primaryComponent {
+                id
+                name
+                version
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
+// GET PROJECT GROUP VULN DATA
+export const GetProjectVulns = gql`
+  query GetProjectVulns(
+    $id: Uuid!
+    $first: Int
+    $last: Int
+    $search: String
+    $after: String
+    $before: String
+    $severity: [String!]
+    $projectGroupIds: [Uuid!]
+    $status: [String!]
+    $kev: Boolean
+    $epss: RangeInput
+  ) {
+    project(id: $id) {
+      componentVulns(
+        after: $after
+        first: $first
+        before: $before
+        last: $last
+        search: $search
+        projectGroupIds: $projectGroupIds
+        status: $status
+        severity: $severity
+        kev: $kev
+        epss: $epss
+      ) {
+        totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          hasPreviousPage
+          startCursor
+        }
+        nodes {
+          id
+          vulnId
+          updatedAt
+          vexStatus {
+            id
+            name
+          }
+          component {
+            id
+            name
+            version
+            sbom {
+              project {
+                name
+                projectGroup {
+                  name
+                }
+              }
+              primaryComponent {
+                id
+                name
+                version
+              }
+            }
+          }
+          vuln {
+            cvssScore
+            cvssVector
+            desc
+            id
+            lastModifiedAt
+            nvdAliasId
+            organizationId
+            publishedAt
+            sev
+            source
+            updatedAt
+            vulnId
+            metrics {
+              affectedCount
+              falsePositiveCount
+              fixedCount
+              inTriageCount
+              notAffectedCount
+              unspecifiedCount
+            }
+            vulnInfo {
+              cveId
+              epssPercentile
+              epssScore
+              epssScores
+              id
+              kev
+              updatedAt
+            }
+          }
         }
       }
     }
@@ -526,56 +1005,6 @@ export const GetFeedLogs = gql`
   }
 `
 
-export const GetProjectData = gql`
-  query GetProjectData(
-    $search: String
-    $enabled: Boolean
-    $first: Int
-    $last: Int
-    $after: String
-    $before: String
-    $field: ProjectOrderByFields!
-    $direction: OrderByDirection!
-  ) {
-    projects(
-      search: $search
-      enabled: $enabled
-      first: $first
-      last: $last
-      after: $after
-      before: $before
-      orderBy: { field: $field, direction: $direction }
-    ) {
-      totalCount
-      pageInfo {
-        endCursor
-        hasNextPage
-        startCursor
-        hasPreviousPage
-      }
-      nodes {
-        id
-        name
-        description
-        updatedAt
-        organizationId
-        enabled
-        sboms {
-          id
-          format
-          creationAt
-          updatedAt
-          primaryComponent {
-            id
-            name
-            version
-          }
-        }
-      }
-    }
-  }
-`
-
 // ----------------------- PRODUCT DETAILS PAGE ---------------------------
 
 // GET PROJECT INFORMATION
@@ -604,8 +1033,10 @@ export const GetProductVersions = gql`
       sboms {
         id
         creationAt
+        createdAt
         updatedAt
         lifecycle
+        createdAt
         primaryComponent {
           id
           name
@@ -660,8 +1091,13 @@ export const GetProductData = gql`
       project {
         id
         name
+        projectGroup {
+          id
+          name
+        }
       }
       lifecycle
+      createdAt
       creationAt
       updatedAt
       licenses
@@ -1130,20 +1566,6 @@ export const GetChangeLogs = gql`
   }
 `
 
-// GET LOGS FILTER DATA
-export const GetLogsFilterData = gql`
-  query GetLogsFilterData($projectId: Uuid!, $sbomId: Uuid!) {
-    sbom(projectId: $projectId, sbomId: $sbomId) {
-      id
-      filters {
-        logChangeBys
-        logChangeObjects
-        logChangeTypes
-      }
-    }
-  }
-`
-
 export const GetProject = gql`
   query GetProject($id: Uuid!) {
     project(id: $id) {
@@ -1252,6 +1674,19 @@ export const GetProjectLogs = gql`
           updatedAt
           changedBy
         }
+      }
+    }
+  }
+`
+
+// GET ACTIVITY LOG FILTERS
+export const GetLogFilters = gql`
+  query Project($id: Uuid!) {
+    project(id: $id) {
+      activityLogFilters {
+        logChangeBys
+        logChangeObjects
+        logChangeTypes
       }
     }
   }
@@ -1973,6 +2408,10 @@ export const GetSbomParts = gql`
           project {
             id
             name
+            projectGroup {
+              id
+              name
+            }
           }
           stats {
             compCount

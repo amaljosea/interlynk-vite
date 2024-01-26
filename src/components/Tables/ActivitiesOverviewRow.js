@@ -1,12 +1,4 @@
-import {
-  Box,
-  Flex,
-  Icon,
-  Text,
-  useColorModeValue,
-  Tooltip,
-  Tag
-} from '@chakra-ui/react'
+import { Box, Flex, Icon, Text, useColorModeValue } from '@chakra-ui/react'
 import React from 'react'
 import { getFullDateAndTime } from 'utils'
 import {
@@ -19,6 +11,7 @@ import {
   FaDownload,
   FaTimesCircle
 } from 'react-icons/fa'
+import Tooltip from 'components/Tooltip'
 
 const setColor = (type) => {
   switch (type) {
@@ -64,6 +57,8 @@ function valueToColor(action, event, orig, updated) {
     return 'green.500'
   } else if (action == 'failed') {
     return 'pink.500'
+  } else if (action == 'destroyed') {
+    return 'pink.500'
   }
 }
 
@@ -88,6 +83,8 @@ function valueToIcon(action, event, orig, updated) {
     return FaUpload
   } else if (action == 'failed') {
     return FaTimesCircle
+  } else if (action == 'destroyed') {
+    return FaMinus
   }
 }
 
@@ -135,7 +132,7 @@ function ActivitiesOverviewRow(props) {
   return (
     <Flex alignItems='center' minH='78px' justifyContent='start' mb='5px'>
       <Flex direction='column' h='100%'>
-        <Tooltip placement='top' label={action} textTransform={'capitalize'}>
+        <Tooltip text={action}>
           <Icon
             as={valueToIcon(action, event, orig, updated)}
             h={'30px'}
@@ -145,7 +142,6 @@ function ActivitiesOverviewRow(props) {
             mr={'10px'}
             pb={'6px'}
             zIndex='1'
-            position='relative'
             color={valueToColor(action, event, orig, updated)}
           />
         </Tooltip>
@@ -164,7 +160,8 @@ function ActivitiesOverviewRow(props) {
             fontSize='sm'
             color={textColor}
             fontWeight='normal'
-            width={'90%'}
+            width={'95%'}
+            wordBreak={'break-all'}
           >
             {valueToText(action, event, orig, updated)}
           </Text>

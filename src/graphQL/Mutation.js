@@ -25,11 +25,63 @@ export const RegisterOrganization = gql`
 
 // INVITE USERS
 export const InviteUser = gql`
-  mutation InviteUser($email: String!) {
-    organizationUserInvite(input: { email: $email}) {
+  mutation InviteUser($email: String!, $roleId: Uuid) {
+    organizationUserInvite(
+      input: { email: $email, organizationRoleId: $roleId }
+    ) {
       user {
         id
         email
+      }
+      errors
+    }
+  }
+`
+
+// UPDATE ORGANIZATION USER ROLE
+export const UpdateOrganizationUserRole = gql`
+  mutation UpdateOrganizationUserRole(
+    $userId: Uuid!
+    $organizationRoleId: Uuid
+  ) {
+    organizationUserUpdate(
+      input: { userId: $userId, organizationRoleId: $organizationRoleId }
+    ) {
+      user {
+        role {
+          id
+          name
+        }
+      }
+      errors
+    }
+  }
+`
+
+// ACCEPT ORG INVITATION
+export const AcceptOrgInvitation = gql`
+  mutation acceptInvitationById($organizationId: Uuid!) {
+    organizationUserInvitationAcceptById(
+      input: { organizationId: $organizationId }
+    ) {
+      organization {
+        name
+        invitationStatus
+      }
+      errors
+    }
+  }
+`
+
+// DECLINE ORG INVITATION
+export const DeclineOrgInvitation = gql`
+  mutation DeclineOrgInvitation($organizationId: Uuid!) {
+    organizationUserInvitationDeclineById(
+      input: { organizationId: $organizationId }
+    ) {
+      organization {
+        name
+        invitationStatus
       }
       errors
     }
@@ -61,6 +113,20 @@ export const AcceptInvitation = gql`
       }
       userType
       errors
+    }
+  }
+`
+
+// DECLINE INVITATION
+export const DeclineInvitation = gql`
+  mutation DeclineInvitation($nonce: String!, $token: String!) {
+    organizationUserInvitationDecline(
+      input: { nonce: $nonce, invitationToken: $token }
+    ) {
+      errors
+      user {
+        email
+      }
     }
   }
 `
@@ -166,6 +232,93 @@ export const updateOrgUser = gql`
         name
         email
       }
+    }
+  }
+`
+
+// CREATE PROJECT GROUP
+export const CreateProjectGroup = gql`
+  mutation CreateProjectGroup(
+    $name: String!
+    $desc: String
+    $enabled: Boolean
+  ) {
+    projectGroupCreate(
+      input: { name: $name, description: $desc, enabled: $enabled }
+    ) {
+      projectGroup {
+        id
+        name
+        description
+        enabled
+        projects {
+          id
+          name
+        }
+      }
+      errors
+    }
+  }
+`
+
+// UPDATE PROJECT GROUP
+export const UpdateProjectGroup = gql`
+  mutation UpdateProjectGroup(
+    $id: Uuid!
+    $name: String
+    $desc: String
+    $enabled: Boolean
+  ) {
+    projectGroupUpdate(
+      input: { id: $id, name: $name, description: $desc, enabled: $enabled }
+    ) {
+      projectGroup {
+        id
+        name
+      }
+      errors
+    }
+  }
+`
+
+// DELETE PROJECT GROUP
+export const DeleteProjectGroup = gql`
+  mutation DeleteProjectGroup($id: Uuid!) {
+    projectGroupDelete(input: { id: $id }) {
+      errors
+    }
+  }
+`
+
+// PROJECT SETTINGS UPDATE
+export const ProjectSettingUpdate = gql`
+  mutation ProjectSettingUpdate(
+    $id: Uuid!
+    $checks: Boolean
+    $intcomp: Boolean
+    $days: Float
+    $autofix: Boolean
+    $vulnscan: Boolean
+  ) {
+    projectSettingUpdate(
+      input: {
+        id: $id
+        checksEnabled: $checks
+        internalCompMatchingEnabled: $intcomp
+        dataRetentionDays: $days
+        automatedFixesEnabled: $autofix
+        vulnScanningEnabled: $vulnscan
+      }
+    ) {
+      projectSetting {
+        id
+        checksEnabled
+        automatedFixesEnabled
+        dataRetentionDays
+        internalCompMatchingEnabled
+        vulnScanningEnabled
+      }
+      errors
     }
   }
 `
@@ -1465,6 +1618,7 @@ export const RegisterUser = gql`
         email
       }
       errors
+      confirmationNeeded
     }
   }
 `
@@ -1475,6 +1629,81 @@ export const SwitchOrganization = gql`
     organizationSwitch(input: { organizationId: $orgId }) {
       token
       errors
+    }
+  }
+`
+
+export const QuitOrganization = gql`
+  mutation QuitOrganization($id: Uuid!) {
+    organizationUserLeave(input: { organizationId: $id }) {
+      organization {
+        id
+      }
+      errors
+    }
+  }
+`
+
+// CREATE ENV
+export const EnvCreate = gql`
+  mutation EnvCreate(
+    $groupId: Uuid!
+    $name: String!
+    $desc: String
+    $enabled: Boolean
+  ) {
+    projectCreate(
+      input: {
+        projectGroupId: $groupId
+        name: $name
+        description: $desc
+        enabled: $enabled
+      }
+    ) {
+      errors
+      project {
+        description
+        enabled
+        id
+        name
+        projectGroupId
+        updatedAt
+      }
+    }
+  }
+`
+
+// CREATE ENV
+export const EnvDelete = gql`
+  mutation EnvDelete($id: Uuid!) {
+    projectDelete(input: { id: $id }) {
+      errors
+      project {
+        id
+        name
+      }
+    }
+  }
+`
+
+// MUNUAL VULN SCAN
+export const ManualVulnScan = gql`
+  mutation ManualVulnScan($id: Uuid!) {
+    sbomVulnScan(input: { sbomId: $id }) {
+      sbom {
+        id
+      }
+      errors
+    }
+  }
+`
+
+// RESEND CONFIRMATION EMAIL
+export const UserResendConfirmationEmail = gql`
+  mutation UserResendConfirmationEmail($email: String!) {
+    userResendConfirmationEmail(input: { email: $email }) {
+      errors
+      success
     }
   }
 `

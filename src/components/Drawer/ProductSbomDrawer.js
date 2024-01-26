@@ -30,28 +30,26 @@ import {
   IconButton,
   Flex,
   Icon,
-  InputRightElement,
-  Tag,
-  TagLabel,
-  TagCloseButton
+  InputRightElement
 } from '@chakra-ui/react'
 import { useLazyQuery, useMutation } from '@apollo/client'
 import { sbomCreate, CreateComponent } from 'graphQL/Mutation'
 import LicenseField from 'components/LicenseField'
 import { CheckIcon, InfoIcon, WarningTwoIcon } from '@chakra-ui/icons'
-import CpeInput from 'components/CpeInput'
 import { FaExpandAlt } from 'react-icons/fa'
 import { PackageURL } from 'packageurl-js'
 import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import { CpeAutoComplete } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { normalizeSBOMVersion } from 'utils'
+import CpeField from 'components/CpeField'
+import CpeInput from 'components/CpeInput'
 
-function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
+function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
   const toast = useToast()
 
-  const { totalRows, prodState, prodCompState, dispatch } = useGlobalState()
-  const { field, direction } = prodState
+  const { prodCompState, dispatch } = useGlobalState()
   const { licenseType, spdxLicenses, customLicenses, expLicense } =
     prodCompState
   const { prodCompDispatch } = dispatch
@@ -61,7 +59,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
   const [compType, setCompType] = useState('')
 
   const [groupInfo, setGroupInfo] = useState('')
-  const [compScope, setCompScope] = useState('')
+  const [compScope, setCompScope] = useState('required')
   const [cpeValue, setCpeValue] = useState('')
   const [cpeList, setCpeList] = useState([])
   const [cpeData, setCpeData] = useState([])
@@ -69,6 +67,9 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
   const [purlValue, setPurlValue] = useState('')
   const [purlData, setPurlData] = useState(null)
   const [isPURLInputValid, setPURLInputValid] = useState(true)
+  const [isValid, setIsValid] = useState(true)
+
+  const activeEnv = sessionStorage.getItem('activeEnv')
 
   const [getCpe] = useLazyQuery(CpeAutoComplete)
   const [createSbom] = useMutation(sbomCreate, {
@@ -169,46 +170,35 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
     }
   }
 
-  const deleteCpe = (index) => {
-    const updatedItems = cpeList.filter((_, i) => i !== index)
-    setCpeList(updatedItems)
-  }
-
   const handleCpeChange = (e) => {
     const { value } = e.target
     const val = value.replace(/\s/g, '')
     setCpeValue(val)
-    if (val === '') {
-      setCpeData([])
-    } else {
-      getCpe({
-        variables: {
-          input: {
-            idType: 'cpe',
-            ecosystem: 'cpe',
-            search: {
-              idUri: val
-            }
+    getCpe({
+      variables: {
+        input: {
+          idType: 'cpe',
+          ecosystem: 'cpe',
+          search: {
+            idUri: val
           }
         }
-      }).then((res) => {
-        if (res.data) {
-          setCpeData(res.data.idAutoComplete.result)
-        }
-      })
-    }
+      }
+    }).then((res) => {
+      if (res?.data) {
+        setCpeData(res?.data?.idAutoComplete?.result || [])
+      }
+    })
   }
 
   const handleRefetch = () => {
     refetch({
-      first: totalRows,
-      field: field,
-      direction: direction
+      id: productId
     })
   }
 
-  const existingVersions = data?.sboms.map(
-    (item) => item?.primaryComponent?.version
+  const existingVersions = data?.projects?.defaultProject?.sboms.map((item) =>
+    normalizeSBOMVersion(item)
   )
 
   const handleCreateComp = async (id) => {
@@ -220,20 +210,27 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
         version: version,
         group: groupInfo,
         scope: compScope,
-        licenses:
-          spdxLicenses.length === 0 &&
-          expLicense === '' &&
-          customLicenses.length === 0
-            ? undefined
-            : {
-                licenses:
-                  licenseType === 'license_spdx' ? spdxLicenses : undefined,
-                licensesExp:
-                  licenseType === 'license_exp' ? expLicense : undefined,
-                licensesCustom:
-                  licenseType === 'license_custom' ? customLicenses : undefined
-              },
-        cpes: cpeList,
+        licenses: {
+          licenses:
+            licenseType === 'license_spdx'
+              ? spdxLicenses
+                ? spdxLicenses
+                : []
+              : undefined,
+          licensesExp:
+            licenseType === 'license_exp'
+              ? expLicense
+                ? expLicense
+                : ''
+              : undefined,
+          licensesCustom:
+            licenseType === 'license_custom'
+              ? customLicenses
+                ? customLicenses
+                : []
+              : undefined
+        },
+        cpes: cpeValue !== '' ? [cpeValue] : [],
         purl: purlValue,
         primary: true,
         internal: false
@@ -253,7 +250,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
   const onCreateSBOM = async () => {
     await createSbom({
       variables: {
-        projectId: data.id,
+        projectId: activeEnv,
         spec: 'cyclonedx',
         specVersion: '1.4',
         format: 'json'
@@ -290,7 +287,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
         <DrawerContent>
           <DrawerCloseButton />
           <DrawerHeader borderBottomWidth='1px' color='gray.600'>
-            Create Primary Component
+            Build Version
           </DrawerHeader>
           <DrawerBody>
             <Stack direction={'column'} spacing={4}>
@@ -371,7 +368,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
                 </Select>
               </FormControl>
               {/* Licenses */}
-              <LicenseField data={data} />
+              <LicenseField isValid={isValid} setIsValid={setIsValid} />
               {/* PURL INPUI */}
               <FormControl isInvalid={purlValue !== '' && !isPURLInputValid}>
                 <FormLabel htmlFor='purl' fontSize={'sm'}>
@@ -444,29 +441,6 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
                     Details
                   </IconButton>
                 </Stack>
-                {/* CPE LIST  */}
-                <Flex
-                  flexDirection={'row'}
-                  flexWrap={'wrap'}
-                  spacing={2}
-                  gap={2}
-                  mt={2}
-                >
-                  {cpeList?.map((item, index) => (
-                    <Tag key={index} variant='solid' colorScheme={'blue'}>
-                      <TagLabel
-                        cursor={'pointer'}
-                        onClick={() => {
-                          setCpeValue(item)
-                          setSelectedCpe({ id: index, name: item })
-                        }}
-                      >
-                        {item}
-                      </TagLabel>
-                      <TagCloseButton onClick={() => deleteCpe(index)} />
-                    </Tag>
-                  ))}
-                </Flex>
               </FormControl>
               {/* SCOPE */}
               <FormControl>
@@ -553,7 +527,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
           setIsValid={setPURLInputValid}
           purlValue={purlValue}
           getCpe={getCpe}
-          activeComp={data}
+          activeComp={data?.defaultProject}
         />
       )}
 
@@ -568,7 +542,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data }) {
           onUpdateCpe={handleUpdateCpe}
           selectedCpe={selectedCpe}
           getCpe={getCpe}
-          activeComp={data}
+          activeComp={data?.defaultProject}
         />
       )}
     </>

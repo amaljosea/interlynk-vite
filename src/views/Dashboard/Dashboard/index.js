@@ -1,5 +1,12 @@
 // Chakra imports
-import { Flex, Grid, SimpleGrid, useColorModeValue } from '@chakra-ui/react'
+import {
+  Flex,
+  Grid,
+  GridItem,
+  SimpleGrid,
+  Skeleton,
+  useColorModeValue
+} from '@chakra-ui/react'
 import BarChart from 'components/Charts/BarChart'
 import LineChart from 'components/Charts/LineChart'
 import { FaLayerGroup, FaBug, FaCube, FaWindowMaximize } from 'react-icons/fa'
@@ -15,6 +22,12 @@ import { useEffect } from 'react'
 import { GetOrgMetrics } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useLocation } from 'react-router-dom'
+import { displayErrorMessage } from 'utils'
+import { Text } from '@chakra-ui/react'
+import { WarningTwoIcon } from '@chakra-ui/icons'
+import CustomLoader from 'components/CustomLoader'
+import Card from 'components/Card/Card'
+import { removeDuplicates } from 'utils'
 
 export default function Dashboard() {
   const location = useLocation()
@@ -26,17 +39,18 @@ export default function Dashboard() {
 
   const iconBoxInside = useColorModeValue('white', 'white')
 
-  const { data } = useQuery(GetOrg)
-  const { data: metrics } = useQuery(GetOrgMetrics)
+  const { data, error: eOrg, loading } = useQuery(GetOrg)
 
   useEffect(() => {
     if (data) {
-      localStorage.setItem(
+      sessionStorage.setItem(
         'organization',
         JSON.stringify(data?.organization?.name)
       )
     }
   }, [data])
+
+  const { data: metrics, error: eOrgMetric } = useQuery(GetOrgMetrics)
 
   useEffect(() => {
     if (product === null) {
@@ -44,6 +58,66 @@ export default function Dashboard() {
       prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
     }
   }, [product])
+
+  if (eOrg) {
+    return (
+      <Flex my={32} alignItems={'center'} justifyContent={'center'} gap={2}>
+        <WarningTwoIcon color='blue.500' />
+        <Text textAlign={'center'} fontSize={14}>
+          {displayErrorMessage(eOrg.networkError?.statusCode, eOrg.message)}
+        </Text>
+      </Flex>
+    )
+  }
+
+  if (eOrgMetric) {
+    return (
+      <Flex my={32} alignItems={'center'} justifyContent={'center'} gap={2}>
+        <Text textAlign={'center'} fontSize={14}>
+          <WarningTwoIcon color='blue.500' />
+          {displayErrorMessage(
+            eOrgMetric.networkError?.statusCode,
+            eOrgMetric.message
+          )}
+        </Text>
+      </Flex>
+    )
+  }
+
+  if (loading) {
+    return (
+      <Flex
+        flexDirection='column'
+        pt={{ base: '120px', md: '74px' }}
+        gap={12}
+        pr={2}
+        pl={5}
+      >
+        <SimpleGrid columns={{ sm: 1, md: 2, xl: 4 }} spacing='24px'>
+          {[1, 2, 3, 4].map((_, index) => (
+            <Card key={index}>
+              <Flex width={'100%'} gap={3} direction={'column'} mt={1}>
+                <Skeleton width={'100%'} height='20px' />
+                <Skeleton width={'100%'} height='20px' />
+              </Flex>
+            </Card>
+          ))}
+        </SimpleGrid>
+        <Grid
+          templateColumns={{ sm: '1fr', md: '1fr 1fr', lg: '2fr 1fr' }}
+          templateRows={{ sm: '1fr auto', md: '1fr', lg: '1fr' }}
+          gap='24px'
+        >
+          {[1, 2].map((_, index) => (
+            <Card key={index}>
+              <CustomLoader />
+            </Card>
+          ))}
+        </Grid>
+      </Flex>
+    )
+  }
+
 
   return (
     <>
@@ -93,9 +167,8 @@ export default function Dashboard() {
               <Grid
                 templateColumns={{ sm: '1fr', lg: '1.3fr 1.7fr' }}
                 templateRows={{ sm: 'repeat(2, 1fr)', lg: '1fr' }}
-                my='26px'
-                gap='24px'
                 mb={{ lg: '26px' }}
+                gap='24px'
               >
                 {/* TODO: 1.0 Add back in when ready
                 <RiskScoreOverview
@@ -111,31 +184,22 @@ export default function Dashboard() {
                 */}
               </Grid>
               {/* LIST */}
-              <Grid
-                templateColumns={{ sm: '1fr', md: '1fr 1fr', lg: '2fr 1fr' }}
-                templateRows={{ sm: '1fr auto', md: '1fr', lg: '1fr' }}
-                gap='24px'
-              >
+              <Grid templateColumns='repeat(12, 1fr)' gap={'24px'} flexWrap={'wrap'}>
                 {/* RECENT IMPORTS */}
-                <ProductsOverview
-                  title={'Recent Imports'}
-                  amount={10}
-                  captions={[
-                    'Product',
-                    'Version',
-                    'Components',
-                    'Licenses',
-                    'Vulnerabilities',
-                    'Imported'
-                  ]}
-                  data={metrics?.organizationMetric?.latestVersions}
-                />
+                <GridItem colSpan={8} w='100%'>
+                  <ProductsOverview
+                    title={'Recent Imports'}
+                    data={metrics?.organizationMetric?.latestVersions}
+                  />
+                </GridItem>
                 {/* LATEST ACTIVITIES */}
-                <ActivitiesOverview
-                  title={'Recent Activities'}
-                  amount={metrics?.organizationMetric?.latestActivity?.length}
-                  data={metrics?.organizationMetric?.latestActivity}
-                />
+                <GridItem colSpan={4} w='100%'>
+                  <ActivitiesOverview
+                    title={'Recent Activities'}
+                    amount={metrics?.organizationMetric?.latestActivity?.length}
+                    data={metrics?.organizationMetric?.latestActivity}
+                  />
+                </GridItem>
               </Grid>
             </Flex>
           ) : (

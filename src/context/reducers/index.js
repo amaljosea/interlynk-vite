@@ -1,3 +1,4 @@
+import globalVulnReducer from './globalVulnReducer'
 import prodRulesReducer from './prodRulesReducer'
 import prodCheckReducer from './prodCheckReducer'
 import prodCompReducer from './prodCompReducer'
@@ -8,6 +9,7 @@ import sbomReducer from './sbomReducer'
 import prodReducer from './prodReducer'
 
 export {
+  globalVulnReducer,
   prodRulesReducer,
   prodCheckReducer,
   prodCompReducer,

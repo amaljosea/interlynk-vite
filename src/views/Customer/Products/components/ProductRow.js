@@ -2,7 +2,7 @@ import { Td, Text, Tr, Switch, Skeleton } from '@chakra-ui/react'
 import GlobalContext from 'context/GlobalContext'
 import { useContext } from 'react'
 import { Link } from 'react-router-dom'
-import { timeSince } from 'utils'
+import { timeSince, normalizeSBOMVersion } from 'utils'
 
 function ProductRow(props) {
   const { id, sbomId, name, description, updatedAt, isLoading } = props
@@ -14,7 +14,7 @@ function ProductRow(props) {
     sbomId.map((project) => {
       if (project.primaryComponent) {
         uniqVersions.push({
-          version: project.primaryComponent.version,
+          version: normalizeSBOMVersion(project),
           id: project.id,
           updatedAt: project.updatedAt
         })
@@ -66,7 +66,7 @@ function ProductRow(props) {
                 filteredData.length > 0 ? filteredData[0].id : sbomId[0].id
               }`}
               onClick={() => {
-                window.localStorage.setItem('product', name)
+                window.sessionStorage.setItem('product', name)
                 setSignedActiveTab(0)
               }}
             >

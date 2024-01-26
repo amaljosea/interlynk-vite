@@ -1,18 +1,21 @@
 import {
+  Badge,
   Box,
   Flex,
   HStack,
   Icon,
+  IconButton,
   Stack,
   Tag,
   TagLabel,
   Text,
   Tooltip
 } from '@chakra-ui/react'
-import { Step, Steps, useSteps } from 'chakra-ui-steps'
 import VulnBadge from 'components/Misc/VulnBadge'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useEffect } from 'react'
+import { Link, useLocation } from 'react-router-dom'
+import { timeSince, getFullDateAndTime, normalizeSBOMVersion } from 'utils'
+import { DownloadIcon, Search2Icon } from '@chakra-ui/icons'
 import {
   FaAngleLeft,
   FaBalanceScale,
@@ -20,8 +23,7 @@ import {
   FaCube,
   FaCubes
 } from 'react-icons/fa'
-import { Link, useLocation } from 'react-router-dom'
-import { timeSince, getFullDateAndTime } from 'utils'
+import { FaCircleCheck } from 'react-icons/fa6'
 
 const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
   const {
@@ -50,9 +52,9 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
   const sbomId = queryParams.get('sbom')
   const parts = queryParams.get('parts')
 
-  const currentProduct = JSON.parse(localStorage.getItem(`product`))
+  const currentProduct = JSON.parse(sessionStorage.getItem(`product`))
   const { name, id } = currentProduct ? currentProduct : {}
-  const currentSBOM = JSON.parse(localStorage.getItem(`currentSBOM`))
+  const currentSBOM = JSON.parse(sessionStorage.getItem(`currentSBOM`))
 
   const onSelectComp = () => {
     const { field, direction } = prodCompState
@@ -93,36 +95,6 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
     })
   }
 
-  const steps = [
-    {
-      label: 'IMPORTED',
-      description: 'Imported'
-    },
-    {
-      label: 'NOT_STARTED',
-      description: 'Audited'
-    },
-    {
-      label: 'IN_PROGRESS',
-      description: 'Vulnerability'
-    },
-    {
-      label: 'FINISHED',
-      description: 'Ready'
-    }
-  ]
-
-  const { activeStep } = useSteps({
-    initialStep:
-      vulnRunStatus === 'NOT_STARTED'
-        ? 2
-        : vulnRunStatus === 'IN_PROGRESS'
-        ? 3
-        : vulnRunStatus === 'FINISHED'
-        ? 4
-        : 1
-  })
-
   return (
     <Flex direction={'row'} alignItems={'flex-start'} gap={5} width={'100%'}>
       <Icon as={FaCubes} h={'64px'} w={'64px'} color='blue.300' />
@@ -135,7 +107,7 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
             >
               <HStack
                 onClick={() => {
-                  localStorage.setItem('activeSbomTab', 1)
+                  sessionStorage.setItem('activeSbomTab', 1)
                   setActiveSbomTab(1)
                 }}
               >
@@ -146,14 +118,14 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
                   color={'blue.500'}
                   textDecor={'underline'}
                 >
-                  {name} : {currentSBOM.version}
+                  {name} : {normalizeSBOMVersion(currentSBOM)}
                 </Text>
               </HStack>
             </Link>
           )}
-          <Stack direction={'row'} spacing={2} alignItems={'center'}>
+          <Stack direction={'row'} alignItems={'center'} wrap={'wrap'}>
             <Text fontWeight={'semibold'} fontSize={25}>
-              {project?.name} : {primaryComponent?.version}
+              {project?.projectGroup?.name} : {normalizeSBOMVersion(sbom)}
             </Text>
             <Tooltip label='Lifecycle stage' fontSize='md'>
               <Tag
@@ -170,23 +142,52 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
         <Text fontSize={'sm'} my={0.5}>
           {primaryComponent?.description}
         </Text>
+        {/* SCAN STATUS */}
+        <Flex flexDir='row' gap={2} alignItems={'center'} width='100%' my={2}>
+          <Tooltip label='Imported'>
+            <IconButton
+              size='xs'
+              colorScheme={'blue'}
+              icon={<DownloadIcon />}
+            />
+          </Tooltip>
+          <Tooltip label='SBOM Checks'>
+            <IconButton
+              size='xs'
+              colorScheme={
+                vulnRunStatus === 'FINISHED' || vulnRunStatus === 'IN_PROGRESS'
+                  ? 'blue'
+                  : 'blackAlpha'
+              }
+              icon={<Search2Icon />}
+            />
+          </Tooltip>
+          <Tooltip label='Vulnerability Scan'>
+            <IconButton
+              size='xs'
+              colorScheme={vulnRunStatus === 'FINISHED' ? 'blue' : 'blackAlpha'}
+              icon={<FaBug />}
+            />
+          </Tooltip>
+          <Tooltip label='Ready'>
+            <IconButton
+              size='xs'
+              colorScheme={vulnRunStatus === 'FINISHED' ? 'blue' : 'blackAlpha'}
+              icon={<FaCircleCheck />}
+            />
+          </Tooltip>
+          {vulnRunStatus === 'IN_PROGRESS' && (
+            <Badge px={2} py={1} fontWeight={'semibold'}>
+              Scanning...
+            </Badge>
+          )}
+        </Flex>
+        {/* UPDATED AT */}
         <Tooltip placement='top' label={getFullDateAndTime(updatedAt)}>
-          <Text fontSize='xs' cursor={'pointer'}>
+          <Text width={'fit-content'} fontSize='xs' cursor={'pointer'}>
             Updated {timeSince(updatedAt)}
           </Text>
         </Tooltip>
-        <Flex flexDir='row' width='100%' mt={4}>
-          <Steps
-            size={'sm'}
-            variant='circles'
-            colorScheme='blue'
-            activeStep={activeStep}
-          >
-            {steps.map(({ description }, index) => (
-              <Step label={description} key={index}></Step>
-            ))}
-          </Steps>
-        </Flex>
         {/* STATS */}
         <Flex flexDir={'row'} alignItems={'center'} gap={4} mt={5}>
           {/* COMPONENTS */}

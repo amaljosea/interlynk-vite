@@ -1,97 +1,307 @@
+import {DeleteIcon, RepeatIcon, SettingsIcon} from '@chakra-ui/icons'
 import {
   Flex,
-  Tabs,
-  TabList,
-  Tab,
-  TabPanels,
-  TabPanel,
-  Text
+  HStack,
+  IconButton,
+  Switch,
+  Tag,
+  Text,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+  Button,
+  useDisclosure, Stack, Tooltip
 } from '@chakra-ui/react'
-import Card from 'components/Card/Card'
-import { useEffect, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
-import Controls from './components/Controls'
-import Settings from './components/Settings'
-import { useQuery } from '@apollo/client'
-import { GetProjectCheck } from 'graphQL/Queries'
-import VulnsTable from 'components/Tables/VulnsTable'
-import { vulnList } from 'variables/general'
-import ChangeLog from '../Changelog'
+import CardBody from 'components/Card/CardBody'
+import CustomLoader from 'components/CustomLoader'
+import DataTable from 'react-data-table-component'
+import UpdateRule from './components/UpdateRule'
+import {useMemo, useState} from 'react'
+import { customStyles } from 'utils'
+import { DeleteAutomation, UpdateAutomation } from 'graphQL/Mutation'
+import { useMutation } from '@apollo/client'
+import { useLocation } from 'react-router-dom'
+import { timeSince } from 'utils'
+import { useGlobalState } from 'hooks/useGlobalState'
+import {FaScrewdriverWrench} from "react-icons/fa6";
 
-const idRegex =
-  /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
+const Automation = ({ data, refetch, productId }) => {
+  const { totalRows, userPermissions, prodRulesState, dispatch } =
+    useGlobalState()
+  const { field, direction } = prodRulesState
+  const { prodRulesDispatch } = dispatch
 
-const Automation = () => {
-  const location = useLocation()
-  const navigate = useNavigate()
-  const queryParams = new URLSearchParams(location.search)
-  const productId = queryParams.get('id')
+  const product = userPermissions?.find((item) => item.key === 'view_product')
+  const editAutomations = product?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'edit_product_automations' && permission.value === true
+  )
 
-  const [activeTab, setActiveTab] = useState(0)
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const {
+    isOpen: isDeleteOpen,
+    onOpen: onDeleteOpen,
+    onClose: onDeleteClose
+  } = useDisclosure()
 
-  const { data, error, refetch } = useQuery(GetProjectCheck, {
-    variables: {
-      id: productId,
-      first: 25
-    }
+  const [activeRow, setActiveRow] = useState(null)
+
+  const [updateAutoCheck] = useMutation(UpdateAutomation, {
+    onCompleted: () =>
+      refetch({
+        variables: { id: productId, first: totalRows, field, direction }
+      })
+  })
+  const [deleteAutoCheck] = useMutation(DeleteAutomation, {
+    onCompleted: () =>
+      refetch({
+        variables: { id: productId, first: totalRows, field, direction }
+      })
   })
 
-  const handleTabChange = (value) => {
-    setActiveTab(value)
+  const handleRemove = async () => {
+    await deleteAutoCheck({
+      variables: {
+        autoCheckId: activeRow.id,
+        projectId: productId
+      }
+    }).then((res) => res.data && onDeleteClose())
   }
 
-  useEffect(() => {
-    if (!idRegex.test(productId)) {
-      navigate(`/vendor/products`)
+  const handleStatus = async (row) => {
+    await updateAutoCheck({
+      variables: {
+        id: row.id,
+        projectId: productId,
+        condition: row.condition,
+        enabled: row.enabled ? false : true
+      }
+    })
+  }
+
+  // COLUMNS
+  const columns = [
+    // ACTIVE
+    {
+      id: 'active',
+      name: 'ACTIVE',
+      selector: (row) => {
+        const { enabled } = row
+        return (
+          <Switch
+            isChecked={enabled}
+            onChange={() => handleStatus(row)}
+            isDisabled={!editAutomations}
+          ></Switch>
+        )
+      },
+      width: '8%'
+    },
+    // RULE
+    {
+      id: 'rule',
+      name: 'RULE APPLIES TO',
+      selector: (row) => {
+        const { applicability } = row
+        return <Text textTransform={'capitalize'}>{applicability}</Text>
+      },
+      width: '160px',
+      wrap: true
+    },
+    // NAME
+    {
+      id: 'AUTO_CHECKS_LOOKUP_NAME',
+      name: 'NAME',
+      selector: (row) => {
+        const { lookup } = row
+        return (
+          <Text textTransform={'capitalize'} my={2}>
+            {lookup?.comp_name}-{lookup?.comp_version}
+          </Text>
+        )
+      },
+      wrap: true,
+      sortable: true
+    },
+    // CONDITION
+    {
+      id: 'condition',
+      name: 'CONDITION',
+      selector: (row) => {
+        const { condition } = row
+        return <Text textTransform={'capitalize'}>{condition}</Text>
+      }
+    },
+    // ATTRIBUTE
+    {
+      id: 'AUTO_CHECKS_ATTR_NAME',
+      name: 'ATTRIBUTE',
+      selector: (row) => {
+        const { attrName } = row
+        return <Tag colorScheme='blue'>{attrName}</Tag>
+      },
+      sortable: true
+    },
+    // FIX
+    {
+      id: 'fix',
+      name: 'FIX',
+      selector: (row) => {
+        const { setTo } = row
+        return (
+          <HStack alignItems={'center'} justifyContent={'flex-start'} my={2}>
+            <Text>{JSON.stringify(setTo)}</Text>
+            <IconButton
+              size='sm'
+              onClick={() => {
+                setActiveRow(row)
+                onOpen()
+              }}
+              colorScheme='blue'
+              icon={<SettingsIcon />}
+              isDisabled={!editAutomations}
+            />
+          </HStack>
+        )
+      },
+      wrap: true,
+      width: '25%'
+    },
+    // UPDATED AT
+    {
+      id: 'AUTO_CHECKS_UPDATED_AT',
+      name: 'UPDATED AT',
+      selector: (row) => {
+        const { updatedAt } = row
+        return <Text>{timeSince(updatedAt)}</Text>
+      },
+      sortable: true
+    },
+    // ACTIONS
+    {
+      id: 'actions',
+      name: 'ACTIONS',
+      selector: (row) => {
+        return (
+          <IconButton
+            onClick={() => {
+              setActiveRow(row)
+              onDeleteOpen()
+            }}
+            size='sm'
+            icon={<DeleteIcon />}
+            colorScheme='red'
+            isDisabled={!editAutomations}
+          />
+        )
+      },
+      right: 'true'
     }
-  }, [productId])
+  ]
+
+  const handleSort = async (column, sortDirection) => {
+    refetch({
+      variables: {
+        id: productId,
+        first: totalRows,
+        field: column.id,
+        direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+      }
+    }).then((res) => {
+      if (res.data) {
+        prodRulesDispatch({
+          type: 'SET_SORT_ORDER',
+          payload: {
+            field: column.id,
+            direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+          }
+        })
+      }
+    })
+  }
+
+  const handleRefresh = async () => {
+    await refetch({
+      variables: { id: productId, first: totalRows, field, direction }
+    })
+  }
+
+  const subHeaderComponent = useMemo(() => {
+    return (
+        <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
+          <Stack direction={'row'} spacing={2} alignItems={'center'}>
+            <Tooltip label='Refresh'>
+              <IconButton
+                  onClick={handleRefresh}
+                  colorScheme='blue'
+                  icon={<RepeatIcon />}
+              ></IconButton>
+            </Tooltip>
+          </Stack>
+        </Flex>
+    )
+  }, [handleRefresh])
 
   return (
-    <Flex direction='column' pt={{ base: '120px', md: '74px' }} pr={2} pl={5}>
-      <Card bg='white'>
-        <Tabs
-          variant='enclosed'
-          w={'100%'}
-          bg={'white'}
-          index={activeTab}
-          onChange={(value) => handleTabChange(value)}
-        >
-          <TabList>
-            {['Vulnerabilities', 'Automation', 'Controls', 'Change Log'].map(
-              (item, index) => (
-                <Tab key={index} _focus={{ outline: 'none' }}>
-                  {item}
-                </Tab>
-              )
-            )}
-          </TabList>
-          <TabPanels>
-            {/* VULNERABILITIES */}
-            <TabPanel>
-              <VulnsTable data={vulnList} />
-            </TabPanel>
-            {/* AUTOMATIONS */}
-            <TabPanel>
-              {error ? (
-                <Text textAlign={'center'} my={6}>
-                  {JSON.stringify(error)}
-                </Text>
-              ) : (
-                <Settings data={data?.project.autoChecks} refetch={refetch} />
-              )}
-            </TabPanel>
-            {/* CONTROLS */}
-            <TabPanel>
-              <Controls />
-            </TabPanel>
-            {/* CHANGE LOG */}
-            <TabPanel>
-              <ChangeLog />
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
-      </Card>
-    </Flex>
+    <>
+      <CardBody>
+        <Flex flexDir={'column'} width={'100%'}>
+          <DataTable
+            columns={columns}
+            data={data && data.nodes}
+            customStyles={customStyles}
+            onSort={handleSort}
+            progressPending={data && data.nodes ? false : true}
+            progressComponent={<CustomLoader />}
+            responsive={true}
+            persistTableHead
+            subHeader
+            subHeaderComponent={subHeaderComponent}
+          />
+        </Flex>
+      </CardBody>
+
+      {activeRow && isOpen && (
+        <UpdateRule
+          isOpen={isOpen}
+          onClose={onClose}
+          data={activeRow}
+          refetch={refetch}
+          productId={productId}
+        />
+      )}
+
+      {/* DELETE */}
+      {activeRow && isDeleteOpen && (
+        <Modal isOpen={isDeleteOpen} onClose={onDeleteClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Delete Automation Rule</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Text>
+                Deleting this automation rule will stop applying this change for
+                future imports of SBOM. Existing SBOM where the rule is already
+                applied will not be affected.
+              </Text>
+              <Text mt={4}>Are you sure you want to continue?</Text>
+            </ModalBody>
+            <ModalFooter>
+              <Button mr={3} onClick={onDeleteClose}>
+                No
+              </Button>
+              <Button colorScheme='red' onClick={handleRemove}>
+                Yes
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      )}
+    </>
   )
 }
 

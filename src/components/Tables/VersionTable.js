@@ -28,40 +28,58 @@ import {
   TagLabel
 } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
+import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import VulnBadge from 'components/Misc/VulnBadge'
 import { sbomDelete } from 'graphQL/Mutation'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV } from 'react-icons/fa'
+import { FaScrewdriverWrench } from 'react-icons/fa6'
 import { Link, useParams } from 'react-router-dom'
 import {
   timeSince,
   getFullDateAndTime,
   customStyles,
-  removeDuplicates
+  removeDuplicates,
+  normalizeSBOMVersion
 } from 'utils'
+import SbomList from 'views/Dashboard/Products/components/SbomList'
 import RowLimit from 'views/Sbom/components/RowLimit'
 
-const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
-  const { totalRows, setTotalRows, setActiveSbomTab, prodVulnState, dispatch } =
-    useGlobalState()
+const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
+  const {
+    userPermissions,
+    totalRows,
+    setTotalRows,
+    setActiveSbomTab,
+    prodVulnState,
+    dispatch
+  } = useGlobalState()
   const { field, direction } = prodVulnState
-  const { prodVulnDispatch } = dispatch
+  const { prodVulnDispatch, prodCompDispatch } = dispatch
+
+  const sbom = userPermissions?.find((item) => item.key === 'view_sbom')
+  const createSbom = sbom?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'create_sbom' && permission.value === true
+  )
+  const archiveSbom = sbom?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'archive_sbom' && permission.value === true
+  )
 
   const params = useParams()
-
   const [isLoading, setIsLoading] = useState(false)
   const [activeRow, setActiveRow] = useState(null)
-
   const [currentPage, setCurrentPage] = useState(1)
 
-  const data = project ? removeDuplicates(project.sboms) : []
+  const sboms = project ? removeDuplicates(project.sboms) : []
 
-  const totalPages = data.length > 0 ? Math.ceil(data.length / totalRows) : 1
+  const totalPages = sboms.length > 0 ? Math.ceil(sboms.length / totalRows) : 1
 
-  const filteredData = data
-    ? data.slice((currentPage - 1) * totalRows, currentPage * totalRows)
+  const filteredData = sboms
+    ? sboms.slice((currentPage - 1) * totalRows, currentPage * totalRows)
     : []
 
   const handlePageChange = (newPage) => {
@@ -78,7 +96,19 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
     onClose: onDeleteClose
   } = useDisclosure()
 
-  const onFilterSev = async (id, primaryComponent, value) => {
+  const {
+    isOpen: isListOpen,
+    onOpen: onListOpen,
+    onClose: onListClose
+  } = useDisclosure()
+
+  const {
+    isOpen: isSbomOpen,
+    onOpen: onSbomOpen,
+    onClose: onSbomClose
+  } = useDisclosure()
+
+  const onFilterSev = async (id, version, value) => {
     await getVulnData({
       projectId: productId,
       sbomId: id,
@@ -91,11 +121,11 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
       direction: direction
     }).then((res) => {
       if (res.data) {
-        localStorage.setItem(
+        sessionStorage.setItem(
           'currentSBOM',
-          JSON.stringify({ version: primaryComponent?.version, id: id })
+          JSON.stringify({ version: version, id: id })
         )
-        localStorage.setItem('activeSbomTab', 3)
+        sessionStorage.setItem('activeSbomTab', 3)
         prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
       }
     })
@@ -107,26 +137,24 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
       id: 'VERSION',
       name: 'VERSION',
       selector: (row) => {
-        const { primaryComponent, id, creationAt } = row
+        const { primaryComponent, id, createdAt, creationAt } = row
         return (
           <Link
-            to={`/vendor/products/${name}?id=${productId}&sbom=${id}`}
+            to={`/vendor/products/${data?.name}?id=${productId}&sbom=${id}`}
             onClick={() => {
-              localStorage.setItem(
+              sessionStorage.setItem(
                 'currentSBOM',
                 JSON.stringify({
-                  version: primaryComponent?.version,
+                  version: primaryComponent ? primaryComponent?.version : `Uploaded at ${getFullDateAndTime(creationAt)}`,
                   id: id
                 })
               )
-              localStorage.setItem('activeSbomTab', 0)
+              sessionStorage.setItem('activeSbomTab', 0)
               setActiveSbomTab(0)
             }}
           >
             <Text color={'blue.500'} minWidth='100%' my={3} fontSize={14}>
-              {primaryComponent && primaryComponent.version
-                ? primaryComponent.version
-                : `Uploaded ${getFullDateAndTime(creationAt)}`}
+              {normalizeSBOMVersion(row)}
             </Text>
           </Link>
         )
@@ -149,14 +177,14 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
               width={16}
               colorScheme={'blue'}
               onClick={() => {
-                localStorage.setItem(
+                sessionStorage.setItem(
                   'currentSBOM',
                   JSON.stringify({
-                    version: primaryComponent?.version,
+                    version: normalizeSBOMVersion(row),
                     id: id
                   })
                 )
-                localStorage.setItem('activeSbomTab', 2)
+                sessionStorage.setItem('activeSbomTab', 2)
               }}
             >
               <TagLabel mx={'auto'}>{stats?.compCount}</TagLabel>
@@ -185,11 +213,13 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
       selector: (row) => {
         const { stats, id, primaryComponent } = row
         const link = `/vendor/products/${params.name}?id=${productId}&sbom=${id}`
+        const version = normalizeSBOMVersion(row)
+
         return (
           <Stack fontWeight={'medium'} direction={'row'}>
             <Link
               to={link}
-              onClick={() => onFilterSev(id, primaryComponent, ['critical'])}
+              onClick={() => onFilterSev(id, version, ['critical'])}
             >
               <VulnBadge color='red' label='Critical'>
                 {stats?.vulnStats?.critical ? stats.vulnStats.critical : 0}
@@ -197,7 +227,7 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
             </Link>
             <Link
               to={link}
-              onClick={() => onFilterSev(id, primaryComponent, ['high'])}
+              onClick={() => onFilterSev(id, version, ['high'])}
             >
               <VulnBadge color='orange' label='High'>
                 {stats?.vulnStats?.high ? stats.vulnStats.high : 0}
@@ -205,7 +235,7 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
             </Link>
             <Link
               to={link}
-              onClick={() => onFilterSev(id, primaryComponent, ['medium'])}
+              onClick={() => onFilterSev(id, version, ['medium'])}
             >
               <VulnBadge color='yellow' label='Medium'>
                 {stats?.vulnStats?.medium ? stats.vulnStats.medium : 0}
@@ -213,7 +243,7 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
             </Link>
             <Link
               to={link}
-              onClick={() => onFilterSev(id, primaryComponent, ['low'])}
+              onClick={() => onFilterSev(id, version, ['low'])}
             >
               <VulnBadge color='green' label='Low'>
                 {stats?.vulnStats?.low ? stats.vulnStats.low : 0}
@@ -238,8 +268,22 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
       }
     },
     {
+      id: 'CREATEDAT',
+      name: 'CREATED',
+      selector: (row) => {
+        const { creationAt } = row
+
+        return (
+          <Tooltip label={getFullDateAndTime(creationAt)} placement='top'>
+            <Text>{timeSince(creationAt)}</Text>
+          </Tooltip>
+        )
+      },
+      right: 'false'
+    },
+    {
       id: 'UPDATEDAT',
-      name: 'UPDATED AT',
+      name: 'UPDATED',
       selector: (row) => {
         const { updatedAt } = row
 
@@ -249,7 +293,7 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
           </Tooltip>
         )
       },
-      right: 'true'
+      right: 'false'
     },
     {
       id: 'ACTION',
@@ -268,8 +312,17 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
                 <MenuItem
                   onClick={() => {
                     setActiveRow(row)
+                    onListOpen()
+                  }}
+                >
+                  List SBOM
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    setActiveRow(row)
                     onDeleteOpen()
                   }}
+                  isDisabled={!archiveSbom}
                 >
                   Delete
                 </MenuItem>
@@ -306,10 +359,25 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
     })
   }
 
+  const onBuildSbom = () => {
+    prodCompDispatch({ type: 'CLEAR_LICENSES' })
+    onSbomOpen()
+  }
+
   const subHeaderComponent = useMemo(() => {
     return (
       <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
         <Stack direction={'row'} spacing={2} alignItems={'center'}>
+          {/* BUILD SBOM */}
+          <Tooltip label='Build Version'>
+            <IconButton
+              isDisabled={!data?.enabled || !createSbom}
+              colorScheme='blue'
+              onClick={onBuildSbom}
+              icon={<FaScrewdriverWrench />}
+            />
+          </Tooltip>
+          {/* REFETCH VERSION */}
           <Tooltip label='Refresh'>
             <IconButton
               onClick={handleRefresh}
@@ -427,6 +495,27 @@ const VersionTable = ({ name, project, productId, refetch, getVulnData }) => {
             </ModalFooter>
           </ModalContent>
         </Modal>
+      )}
+
+      {/* SBOM LIST */}
+      {isListOpen && project && (
+        <SbomList
+          data={activeRow}
+          sboms={project?.sboms}
+          isOpen={isListOpen}
+          onClose={onListClose}
+        />
+      )}
+
+      {/* BUILD SBOM */}
+      {isSbomOpen && data && (
+        <ProductSbomDrawer
+          isOpen={isSbomOpen}
+          onClose={onSbomClose}
+          data={data}
+          refetch={refetch}
+          productId={productId}
+        />
       )}
     </>
   )

@@ -1,14 +1,14 @@
-import { Button, Flex, Stack, Tag, Tooltip, Text, Box } from '@chakra-ui/react'
+import {Button, Flex, Stack, Tag, Tooltip, Text, Box, IconButton} from '@chakra-ui/react'
+import React, { useEffect, useMemo, useState } from 'react'
+import { timeSince, getFullDateAndTime, customStyles } from 'utils'
+import DataTable from 'react-data-table-component'
 import CustomLoader from 'components/CustomLoader'
 import { useGlobalState } from 'hooks/useGlobalState'
-import React, { useEffect, useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
-import { useLocation } from 'react-router-dom'
-import { timeSince } from 'utils'
-import { getFullDateAndTime, customStyles } from 'utils'
 import ChangelogFilterMenu from 'views/Sbom/components/ChangelogFilterMenu'
 import RowLimit from 'views/Sbom/components/RowLimit'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
+import {RepeatIcon} from "@chakra-ui/icons";
+import Pagination from "../Pagination";
 
 const setColor = (type) => {
   switch (type) {
@@ -29,28 +29,22 @@ const setColor = (type) => {
   }
 }
 
-const ChangelogTable = ({ data, refetch }) => {
+const ChangelogTable = ({ data, refetch, activeEnv }) => {
+  const paginationSizes = [25, 50, 100]
+
   const { totalRows, setTotalRows, prodLogState, dispatch } = useGlobalState()
-  const { field, direction, pageIndex } = prodLogState
+  const {
+    field,
+    direction,
+    pageIndex,
+    searchInput: search,
+    type,
+    object,
+    user
+  } = prodLogState
   const { prodLogDispatch } = dispatch
 
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-
-  const productId = queryParams.get('id')
-
-  const [filterText, setFilterText] = useState('')
-  const [userFilters, setUserFilters] = useState([])
-  const [typeFilters, setTypeFilters] = useState([])
-
-  useEffect(() => {
-    if (data && (userFilters.length === 0 || typeFilters.length === 0)) {
-      const users = data.nodes.map((item) => item.changedBy)
-      const actions = data.nodes.map((item) => item.action)
-      setUserFilters(users)
-      setTypeFilters(actions)
-    }
-  }, [data])
+  const [searchInput, setSearchInput] = useState('')
 
   // COLUMNS
   const columns = [
@@ -81,12 +75,15 @@ const ChangelogTable = ({ data, refetch }) => {
       name: 'PREVIOUS VALUE',
       wrap: true,
       selector: (row) => {
+        const { event } = row
         const { orig } = row
         return (
           <Tooltip label={orig} placement='top'>
             <Text my={2}>
               {orig !== null
-                ? `${orig?.substring(0, 400)}${orig.length > 400 ? '...' : ''}`
+                ? `${event} / ${orig.substring(0, 400)}${
+                    orig.length > 400 ? '...' : ''
+                  }`
                 : ''}
             </Text>
           </Tooltip>
@@ -99,11 +96,16 @@ const ChangelogTable = ({ data, refetch }) => {
       name: 'UPDATED VALUE',
       wrap: true,
       selector: (row) => {
+        const { event } = row
         const { updated } = row
         return (
           <Tooltip label={updated} placement='top'>
             <Text overflow={'auto'} my={2}>
-              {updated || ''}
+              {updated !== null
+                ? `${event} / ${updated.substring(0, 400)}${
+                    updated.length > 400 ? '...' : ''
+                  }`
+                : ''}
             </Text>
           </Tooltip>
         )
@@ -142,14 +144,22 @@ const ChangelogTable = ({ data, refetch }) => {
     }
   ]
 
-  const onPreviousPage = async () => {
+  const logData = {
+    id: activeEnv,
+    changeType: type?.length === 0 ? undefined : type,
+    changedBy: user?.length === 0 ? undefined : user,
+    changeObject: object?.length === 0 ? undefined : object,
+    field,
+    direction
+  }
+
+  const handlePreviousPage = async () => {
     await refetch({
       variables: {
-        id: productId,
         last: totalRows,
         before: data.pageInfo.startCursor,
-        field: field,
-        direction: direction
+        search: search !== '' ? search : undefined,
+        ...logData
       }
     }).then(
       (res) =>
@@ -161,14 +171,13 @@ const ChangelogTable = ({ data, refetch }) => {
     )
   }
 
-  const onNextPage = async () => {
+  const handleNextPage = async () => {
     await refetch({
       variables: {
-        id: productId,
         first: totalRows,
-        after: data.pageInfo.endCursor,
-        field: field,
-        direction: direction
+        after: data?.pageInfo?.endCursor,
+        search: search !== '' ? search : undefined,
+        ...logData
       }
     }).then(
       (res) =>
@@ -185,50 +194,60 @@ const ChangelogTable = ({ data, refetch }) => {
 
   // SEARCH COMPONENT
   const handleSearch = async (event) => {
-    if (event.key === 'Enter' && filterText !== '') {
+    const { value } = event.target
+    if (event.key === 'Enter' && value !== '') {
       await refetch({
         variables: {
-          id: productId,
-          search: filterText,
+          search: value,
           first: totalRows,
-          field: field,
-          direction: direction
+          ...logData
         }
       }).then(
         (res) =>
           res.data &&
-          prodLogDispatch({
-            type: 'FETCH_DATA_SUCCESS'
-          })
+          prodLogDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
       )
     }
   }
 
   // CLEAR SERACH
   const handleClear = async () => {
+    setSearchInput('')
     await refetch({
       variables: {
-        id: productId,
         search: undefined,
         first: totalRows,
-        field: field,
-        direction: direction
+        ...logData
       }
     }).then(
       (res) =>
         res.data &&
         prodLogDispatch({
-          type: 'FETCH_DATA_SUCCESS'
+          type: 'CLEAR_SEARCH_INPUT'
         })
     )
+  }
+
+  // ON SEARCH INPUT CHANGE
+  const onSearchInputChange = (e) => {
+    const { value } = e.target
+    if (value === '') {
+      handleClear()
+    } else {
+      setSearchInput(value)
+    }
   }
 
   // SORTING
   const handleSort = async (column, sortDirection) => {
     await refetch({
       variables: {
-        id: productId,
+        id: activeEnv,
         first: totalRows,
+        search: search !== '' ? search : undefined,
+        changeType: type?.length === 0 ? undefined : type,
+        changedBy: user?.length === 0 ? undefined : user,
+        changeObject: object?.length === 0 ? undefined : object,
         field: column.id,
         direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
       }
@@ -250,10 +269,9 @@ const ChangelogTable = ({ data, refetch }) => {
     setTotalRows(Number(e.target.value))
     await refetch({
       variables: {
-        id: productId,
+        search: search !== '' ? search : undefined,
         first: Number(e.target.value),
-        field: field,
-        direction: direction
+        ...logData
       }
     }).then(
       (res) =>
@@ -280,23 +298,27 @@ const ChangelogTable = ({ data, refetch }) => {
         >
           <SearchFilter
             id='prodChangelog'
-            filterText={filterText}
-            setFilterText={setFilterText}
-            onFilter={handleSearch}
+            filterText={searchInput}
+            onChange={onSearchInputChange}
             onClear={handleClear}
+            onFilter={handleSearch}
           />
 
-          <ChangelogFilterMenu
-            refetch={refetch}
-            users={userFilters}
-            actions={typeFilters}
-            totalRows={totalRows}
-            id={productId}
-          />
+          <ChangelogFilterMenu refetch={refetch} id={activeEnv} />
+
         </Stack>
+        <Tooltip label='Refresh'>
+          <IconButton
+              onClick={handleClear}
+              colorScheme='blue'
+              icon={<RepeatIcon />}
+          ></IconButton>
+        </Tooltip>
       </Flex>
+
+
     )
-  }, [filterText, handleClear, handleSearch])
+  }, [searchInput, onSearchInputChange, handleClear, handleSearch])
 
   return (
     <>
@@ -319,39 +341,17 @@ const ChangelogTable = ({ data, refetch }) => {
 
       {/* PAGINATION */}
       {data && (
-        <Flex
-          width={'100%'}
-          flexDir={'row'}
-          gap={4}
-          alignItems={'center'}
-          mt={6}
-          justifyContent={'space-between'}
-        >
-          <Stack alignItems={'center'} direction={'row'} spacing={4}>
-            <Button
-              colorScheme='blue'
-              onClick={onPreviousPage}
-              isDisabled={!data.pageInfo.hasPreviousPage}
-            >
-              Previous
-            </Button>
-            <Button
-              colorScheme='blue'
-              onClick={onNextPage}
-              isDisabled={!data.pageInfo.hasNextPage}
-            >
-              Next
-            </Button>
-            <Box>
-              Page {pageIndex} of{' '}
-              {data.totalCount === 0
-                ? 1
-                : Math.ceil(data.totalCount / totalRows)}
-            </Box>
-          </Stack>
-
-          <RowLimit onChange={handleSetRow} name='prodChangelogRow' />
-        </Flex>
+          <Pagination
+              paginationSizes={paginationSizes}
+              pageIndex={pageIndex}
+              totalRows={totalRows}
+              totalCount={data.totalCount}
+              onPreviousPage={handlePreviousPage}
+              onNextPage={handleNextPage}
+              onSetRow={handleSetRow}
+              hasNextPage={data.pageInfo.hasNextPage}
+              hasPreviousPage={data.pageInfo.hasPreviousPage}
+          />
       )}
     </>
   )

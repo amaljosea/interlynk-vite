@@ -52,7 +52,7 @@ const CheckModal = ({
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
-  const currentProduct = JSON.parse(localStorage.getItem(`product`))
+  const currentProduct = JSON.parse(sessionStorage.getItem(`product`))
 
   const compRef = useRef()
 

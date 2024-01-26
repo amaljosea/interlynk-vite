@@ -18,11 +18,8 @@ import {
   InputGroup,
   Select,
   Checkbox,
-  Tag,
   Text,
   Flex,
-  TagCloseButton,
-  TagLabel,
   useToast,
   chakra,
   useDisclosure,
@@ -46,11 +43,11 @@ import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import { InfoIcon, CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import { FaExpandAlt } from 'react-icons/fa'
 import { CpeAutoComplete } from 'graphQL/Queries'
-import CpeInput from 'components/CpeInput'
 import LicenseField from 'components/LicenseField'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { GetAllComponents } from 'graphQL/Queries'
 import { CreateCompRelation } from 'graphQL/Mutation'
+import CpeField from 'components/CpeField'
 
 function ComponentDrawer(props) {
   const location = useLocation()
@@ -79,7 +76,6 @@ function ComponentDrawer(props) {
     purlString,
     expLicense,
     spdxLicenses,
-    isCpeValid,
     totalComp
   } = prodCompState
   const { prodCompDispatch } = dispatch
@@ -149,7 +145,7 @@ function ComponentDrawer(props) {
       setGroupInfo(group)
       setCompName(name)
       setCompVersion(version)
-      setCpeList(cpes)
+      setCpeValue(cpes?.length > 0 ? cpes[0] : '')
       setPurlValue(purl || '')
       setCompKind(kind)
       setCompScope(scope)
@@ -253,7 +249,7 @@ function ComponentDrawer(props) {
                 : []
               : undefined
         },
-        cpes: cpeList,
+        cpes: cpeValue !== '' ? [cpeValue] : [],
         purl: purlValue,
         primary: isPrimary,
         internal: isInternal
@@ -295,20 +291,27 @@ function ComponentDrawer(props) {
         version: compVersion,
         group: groupInfo,
         scope: compScope,
-        licenses:
-          spdxLicenses.length === 0 &&
-          expLicense === '' &&
-          customLicenses.length === 0
-            ? undefined
-            : {
-                licenses:
-                  licenseType === 'license_spdx' ? spdxLicenses : undefined,
-                licensesExp:
-                  licenseType === 'license_exp' ? expLicense : undefined,
-                licensesCustom:
-                  licenseType === 'license_custom' ? customLicenses : undefined
-              },
-        cpes: cpeList.length > 0 ? cpeList : cpeValue !== '' ? [cpeValue] : [],
+        licenses: {
+          licenses:
+            licenseType === 'license_spdx'
+              ? spdxLicenses
+                ? spdxLicenses
+                : []
+              : undefined,
+          licensesExp:
+            licenseType === 'license_exp'
+              ? expLicense
+                ? expLicense
+                : ''
+              : undefined,
+          licensesCustom:
+            licenseType === 'license_custom'
+              ? customLicenses
+                ? customLicenses
+                : []
+              : undefined
+        },
+        cpes: cpeValue !== '' ? [cpeValue] : [],
         purl: purlValue,
         primary: isPrimary,
         internal: isInternal
@@ -360,34 +363,25 @@ function ComponentDrawer(props) {
     }
   }
 
-  const deleteCpe = (index) => {
-    const updatedItems = cpeList.filter((_, i) => i !== index)
-    setCpeList(updatedItems)
-  }
-
   const handleCpeChange = (e) => {
     const { value } = e.target
     const val = value.replace(/\s/g, '')
     setCpeValue(val)
-    if (val === '') {
-      setCpeData([])
-    } else {
-      getCpe({
-        variables: {
-          input: {
-            idType: 'cpe',
-            ecosystem: 'cpe',
-            search: {
-              idUri: val
-            }
+    getCpe({
+      variables: {
+        input: {
+          idType: 'cpe',
+          ecosystem: 'cpe',
+          search: {
+            idUri: val
           }
         }
-      }).then((res) => {
-        if (res.data) {
-          setCpeData(res.data.idAutoComplete.result)
-        }
-      })
-    }
+      }
+    }).then((res) => {
+      if (res?.data) {
+        setCpeData(res?.data?.idAutoComplete?.result || [])
+      }
+    })
   }
 
   useEffect(() => {
@@ -464,7 +458,7 @@ function ComponentDrawer(props) {
                   onChange={(e) => setCompVersion(e.target.value)}
                 />
               </FormControl>
-              {/* Group */}
+              {/* GROUP */}
               <FormControl>
                 <FormLabel htmlFor='groupInfo' fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
@@ -570,15 +564,13 @@ function ComponentDrawer(props) {
               {/* CPE INPUT */}
               <FormControl>
                 <Stack direction={'row'} width={'100%'} spacing={2}>
-                  <CpeInput
-                    name='cpe'
+                  <CpeField
+                    inputRef={cpeRef}
                     inputValue={cpeValue}
                     setInputValue={setCpeValue}
                     cpeList={cpeData}
                     setCpeList={setCpeData}
                     onChange={handleCpeChange}
-                    inputRef={cpeRef}
-                    validation={true}
                   />
                   <IconButton
                     icon={<FaExpandAlt />}
@@ -592,29 +584,6 @@ function ComponentDrawer(props) {
                     Details
                   </IconButton>
                 </Stack>
-                {/* CPE LIST  */}
-                <Flex
-                  flexDirection={'row'}
-                  flexWrap={'wrap'}
-                  spacing={2}
-                  gap={2}
-                  mt={2}
-                >
-                  {cpeList?.map((item, index) => (
-                    <Tag key={index} variant='solid' colorScheme={'blue'}>
-                      <TagLabel
-                        cursor={'pointer'}
-                        onClick={() => {
-                          setCpeValue(item)
-                          setSelectedCpe({ id: index, name: item })
-                        }}
-                      >
-                        {item}
-                      </TagLabel>
-                      <TagCloseButton onClick={() => deleteCpe(index)} />
-                    </Tag>
-                  ))}
-                </Flex>
               </FormControl>
               {/* SCOPE */}
               <FormControl>
@@ -728,8 +697,6 @@ function ComponentDrawer(props) {
                     compKind === '' ||
                     compName === '' ||
                     compVersion === '' ||
-                    (purlValue !== '' && !isPURLInputValid) ||
-                    (cpeValue !== '' && !isCpeValid) ||
                     !isValid
                   }
                 >
@@ -739,12 +706,7 @@ function ComponentDrawer(props) {
                 <Button
                   colorScheme='blue'
                   onClick={handleUpdateCom}
-                  isDisabled={
-                    !compKind ||
-                    (purlValue !== '' && !isPURLInputValid) ||
-                    (cpeValue !== '' && !isCpeValid) ||
-                    !isValid
-                  }
+                  isDisabled={!compKind || !isValid}
                 >
                   Update
                 </Button>
@@ -754,6 +716,7 @@ function ComponentDrawer(props) {
         </DrawerContent>
       </Drawer>
 
+      {/* PURL EDITOR */}
       {isPurlOpen && (
         <PurlModal
           data={purlData}
@@ -767,6 +730,7 @@ function ComponentDrawer(props) {
         />
       )}
 
+      {/* CPE EDITOR */}
       {isCpeOpen && (
         <CpeModal
           data={cpeData}
@@ -782,7 +746,7 @@ function ComponentDrawer(props) {
         />
       )}
 
-      {/* disable */}
+      {/* DISABLE */}
       {isWarningOpen && (
         <Modal isOpen={isWarningOpen} onClose={onWarningClose}>
           <ModalOverlay />

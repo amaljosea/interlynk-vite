@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react'
-// CHAKRA IMPORTS
+import React, { useEffect, useState } from 'react';
 import {
   Tabs,
   TabList,
@@ -10,36 +9,66 @@ import {
   Skeleton,
   Button,
   Text
-} from '@chakra-ui/react'
-import Card from 'components/Card/Card.js'
-
-// TABLES
-import GeneralDataRow from 'components/Tables/GeneralDataRow'
-import ComponentTable from 'components/Tables/ComponentTable'
-import VulnTable from 'components/Tables/VulnTable'
-import HealthCheckTable from 'components/Tables/HealthCheckTable'
-import SbomChangelogTable from 'components/Tables/SbomChangelogTable'
-
-// API QUERIES
-import { useLazyQuery } from '@apollo/client'
-import { GetCheckResults, GetChangeLogs } from 'graphQL/Queries'
-import { useLocation } from 'react-router-dom'
-import PartsTable from 'components/Tables/PartsTable'
-import { GetSbomParts } from 'graphQL/Queries'
-import { useGlobalState } from 'hooks/useGlobalState'
+} from '@chakra-ui/react';
+import Card from 'components/Card/Card.js';
+import GeneralDataRow from 'components/Tables/GeneralDataRow';
+import ComponentTable from 'components/Tables/ComponentTable';
+import VulnTable from 'components/Tables/VulnTable';
+import HealthCheckTable from 'components/Tables/HealthCheckTable';
+import SbomChangelogTable from 'components/Tables/SbomChangelogTable';
+import PartsTable from 'components/Tables/PartsTable';
+import { useLazyQuery } from '@apollo/client';
+import { GetCheckResults, GetChangeLogs, GetSbomParts } from 'graphQL/Queries';
+import { useLocation } from 'react-router-dom';
+import { useGlobalState } from 'hooks/useGlobalState';
 
 const SBOMTable = ({
-  status,
-  type,
-  data,
-  refetch,
-  filteredData,
-  vulnData,
-  getVulnData,
-  getCompData,
-  compData,
-  error
-}) => {
+   status,
+   type,
+   data,
+   refetch,
+   filteredData,
+   vulnData,
+   getVulnData,
+   getCompData,
+   compData,
+   error
+ }) => {
+
+  // How often each tab should refetch the data (in minutes)
+  const fetchIntervalMinutes = {
+    'General': 0,
+    'Parts': 0,
+    'Components': 0,
+    'Vulnerabilities': 1,
+    'Checks': 0,
+    'Change Log': 0,
+  };
+
+  const [lastFetchTime, setLastFetchTime] = useState({
+    'General': null,
+    'Parts': null,
+    'Components': null,
+    'Vulnerabilities': null,
+    'Checks': null,
+    'Change Log': null,
+  });
+
+  const shouldFetchData = (tabName) => {
+    const lastFetch = lastFetchTime[tabName];
+    const now = new Date();
+
+    if (!lastFetch) return true; // If never fetched, fetch data
+
+    const minutesElapsed = (now - lastFetch) / 60000;
+    return minutesElapsed >= fetchIntervalMinutes[tabName];
+  };
+
+  const updateLastFetchTime = (tabName) => {
+    setLastFetchTime({ ...lastFetchTime, [tabName]: new Date() });
+  };
+
+
   const {
     totalRows,
     activeSbomTab,
@@ -58,55 +87,85 @@ const SBOMTable = ({
     sbomLogDispatch
   } = dispatch
 
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const productId = queryParams.get('id');
+  const sbomId = queryParams.get('sbom');
+  const activeTab = Number(sessionStorage.getItem('activeSbomTab') || 0);
 
-  const productId = queryParams.get('id')
-  const sbomId = queryParams.get('sbom')
-
-  const activeTab = Number(localStorage.getItem('activeSbomTab'))
-
-  const { lifecycle } = data
 
   // GET SBOM PARTS
-  const [getParts, { data: parts }] = useLazyQuery(GetSbomParts, {
+  const [getPartsData, { data: partsData }] = useLazyQuery(GetSbomParts, {
     fetchPolicy: 'network-only'
   })
 
   // GET HEALTH CHECK DATA
-  const [getCheckData, { data: checkData }] = useLazyQuery(GetCheckResults, {
+  const [getChecksData, { data: checksData }] = useLazyQuery(GetCheckResults, {
     fetchPolicy: 'network-only'
   })
 
   // GET CHANGE LOG DATA
-  const [getLogData, { data: logsData, refetch: logsRefetch }] = useLazyQuery(
-    GetChangeLogs,
-    {
-      fetchPolicy: 'network-only'
-    }
+  const [getLogsData, { data: logsData, refetch: logsRefetch }] = useLazyQuery(
+      GetChangeLogs,
+      {
+        fetchPolicy: 'network-only'
+      }
   )
 
+  const getUndefinedIfEmpty = (value) =>
+      value !== '' ? value : undefined;
+
+  const getUndefinedIfEmptyOrAll = (value, allValue = 'all') =>
+      value.includes(allValue) || value.length === 0 ? undefined : value;
+
+  const tabIndexToName = {
+    0: 'General',
+    1: 'Parts',
+    2: 'Components',
+    3: 'Vulnerabilities',
+    4: 'Checks',
+    5: 'Change Log',
+  };
+
   const handleTabChange = (value) => {
-    localStorage.setItem('activeSbomTab', value)
-    setActiveSbomTab(value)
-  }
+    sessionStorage.setItem('activeSbomTab', value);
+    setActiveSbomTab(value);
+  };
+
 
   useEffect(() => {
-    if (activeTab === 0) {
-      setActiveSbomTab(0)
+    setActiveSbomTab(activeTab);
+    fetchTabData(activeTab);
+  }, [activeTab, setActiveSbomTab]);
+
+
+  const fetchTabData = (activeTab) => {
+    const commonParams = {
+      projectId: productId,
+      sbomId: sbomId,
+      first: totalRows,
+      last: undefined,
+      after: undefined,
+      before: undefined,
+    };
+
+    const tabName = tabIndexToName[activeTab];
+
+    if (tabName === 'General' && shouldFetchData(tabName)) {
       refetch({
-        projectId: productId,
-        sbomId: sbomId
+        ...commonParams
+      }).then(() => {
+        updateLastFetchTime(tabName);
       })
-    } else if (activeTab === 1) {
-      setActiveSbomTab(1)
-      getParts({
+    } else if (tabName === 'Parts') {
+      getPartsData({
         variables: {
-          projectId: productId,
-          sbomId: sbomId
+          ...commonParams
         }
+      }).then(() => {
+        updateLastFetchTime(tabName);
       })
-    } else if (activeTab === 2) {
+    } else if (tabName === 'Components' && shouldFetchData(tabName)) {
       const {
         field,
         direction,
@@ -117,84 +176,52 @@ const SBOMTable = ({
         suppliers,
         scope
       } = prodCompState
-      setActiveSbomTab(2)
-      // FETCH COMPONENT DATA
+
       getCompData({
-        projectId: productId,
-        sbomId: sbomId,
-        search: searchInput !== '' ? searchInput : undefined,
-        ecosystem:
-          ecosystems.includes('all') || ecosystems.length === 0
-            ? undefined
-            : ecosystems,
-        kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
-        licenses:
-          licenses.includes('all') || licenses.length === 0
-            ? undefined
-            : licenses,
-        supplierName:
-          suppliers.includes('all') || suppliers.length === 0
-            ? undefined
-            : suppliers,
+        ...commonParams,
+        search: getUndefinedIfEmpty(searchInput),
+        ecosystem: getUndefinedIfEmptyOrAll(ecosystems),
+        kind: getUndefinedIfEmptyOrAll(kinds),
+        licenses: getUndefinedIfEmptyOrAll(licenses),
+        supplierName: getUndefinedIfEmptyOrAll(suppliers),
         primary: scope === 'primary' ? true : undefined,
         internal: scope === 'internal' ? true : undefined,
-        first: totalRows,
-        last: undefined,
-        after: undefined,
-        before: undefined,
-        field: field,
-        direction: direction
+        field,
+        direction
       }).then((res) => {
         if (res.data) {
           prodCompDispatch({
             type: 'SET_TOTAL_COMP',
             payload: res.data.sbom.components.totalCount
-          })
-          prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
+          });
+          prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' });
+          updateLastFetchTime(tabName);
         }
-      })
-    } else if (activeTab === 3) {
-      const {
-        field,
-        direction,
-        searchInput,
-        severities,
-        components,
-        statues,
-        kev,
-        epss
-      } = prodVulnState
-      const vulnEpss = epss !== 'all' && epss !== '' && epss.split('-')
-      const range = {
-        min: parseFloat(vulnEpss[0]) / 10000,
-        max: parseFloat(vulnEpss[1]) / 10000
-      }
-      setActiveSbomTab(3)
+      });
+    } else if (tabName === 'Vulnerabilities' && shouldFetchData(tabName)) {
+      const { field, direction, searchInput, severities, components, statues, kev, epss } = prodVulnState;
+      const vulnEpss = epss !== 'all' && epss !== '' ? epss.split('-').map(v => parseFloat(v) / 10000) : undefined;
       getVulnData({
-        projectId: productId,
-        sbomId: sbomId,
-        first: totalRows,
-        last: undefined,
-        after: undefined,
-        before: undefined,
-        search: searchInput !== '' ? searchInput : undefined,
-        severity: severities.length > 0 ? severities : undefined,
-        componentName: components.length > 0 ? components : undefined,
-        status: statues.length > 0 ? statues : undefined,
+        ...commonParams,
+        search: getUndefinedIfEmpty(searchInput),
+        severity: getUndefinedIfEmptyOrAll(severities),
+        componentName: getUndefinedIfEmptyOrAll(components),
+        status: getUndefinedIfEmptyOrAll(statues),
         kev: kev === 'yes' ? true : kev === 'no' ? false : undefined,
-        epss: epss !== '' && epss !== 'all' ? range : undefined,
-        field: field,
-        direction: direction
+        epss: epss !== '' && epss !== 'all' ? { min: vulnEpss[0], max: vulnEpss[1] } : undefined,
+        field,
+        direction
       }).then((res) => {
         if (res.data) {
           prodVulnDispatch({
             type: 'SET_TOTAL_VULNS',
             payload: res.data.sbom.vulns.totalCount
-          })
-          prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
+          });
+          prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' });
+          updateLastFetchTime(tabName);
         }
       })
-    } else if (activeTab === 4) {
+    } else if (tabName === 'Checks' && shouldFetchData(tabName)) {
       const {
         field,
         direction,
@@ -204,187 +231,163 @@ const SBOMTable = ({
         severities,
         statues
       } = prodCheckState
-      setActiveSbomTab(4)
-      // FETCH HEALTH CHECK DATA
-      getCheckData({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          search: searchInput !== '' ? searchInput : undefined,
-          checkId:
-            rules.includes('all') || rules.length === 0 ? undefined : rules,
-          category:
-            categories.includes('all') || categories.length === 0
-              ? undefined
-              : categories,
-          severity:
-            severities.includes('all') || severities.length === 0
-              ? undefined
-              : severities,
-          status:
-            statues.includes('all') || statues.length === 0
-              ? undefined
-              : statues,
-          first: totalRows,
-          field: field,
-          direction: direction
-        }
-      }).then(
-        (res) => res.data && prodCheckDispatch({ type: 'FETCH_DATA_SUCCESS' })
-      )
-    } else if (activeTab === 5) {
-      const { field, direction } = sbomLogState
-      setActiveSbomTab(5)
-      // FETCH ACTIVITY LOGS DATA
-      getLogData({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          first: totalRows,
-          field: field,
-          direction: direction
-        }
-      }).then(
-        (res) => res.data && sbomLogDispatch({ type: 'FETCH_DATA_SUCCESS' })
-      )
-    }
-  }, [activeTab])
 
-  // EXTRACT ALL THE COMPONENT NAME AND ID'S FROM SELECTED SBOM VERSION
-  const components =
-    compData &&
-    compData.sbom.components.nodes.map((item) => {
-      return {
-        value: item.name,
-        id: item.id
-      }
-    })
+      getChecksData({
+        variables: {
+          ...commonParams,
+          search: getUndefinedIfEmpty(searchInput),
+          checkId: getUndefinedIfEmptyOrAll(rules),
+          category: getUndefinedIfEmptyOrAll(categories),
+          severity: getUndefinedIfEmptyOrAll(severities),
+          status: getUndefinedIfEmptyOrAll(statues),
+          field: field || 'CHECK_RESULTS_UPDATED_AT',
+          direction: direction || 'DESC',
+        }
+      }).then((res) => {
+        if (res.data) {
+          prodCheckDispatch({type: 'FETCH_DATA_SUCCESS'})
+          updateLastFetchTime(tabName);
+        }
+      })
+    } else if (tabName === 'Change Log' && shouldFetchData(tabName)) {
+      const {field, direction} = sbomLogState
+      getLogsData({
+        variables: {
+          ...commonParams,
+          field,
+          direction
+        }
+      }).then((res) => {
+        if (res.data) {
+          sbomLogDispatch({type: 'FETCH_DATA_SUCCESS'})
+          updateLastFetchTime(tabName);
+        }
+      })
+    }
+
+  }
+
 
   return (
-    <>
-      <Card>
-        <Tabs
-          variant='enclosed'
-          index={activeSbomTab}
-          onChange={(value) => handleTabChange(value)}
-        >
-          {/* TAB LIST */}
-          <TabList mt='20px'>
-            {[
-              'General',
-              'Parts',
-              'Components',
-              'Vulnerabilities',
-              'Checks',
-              'Change Log'
-            ].map((item, index) => (
-              <Tab key={index} _focus={{ outline: 'none' }}>
-                {item}
-              </Tab>
-            ))}
-          </TabList>
-          {/* TAB PANELS */}
-          <TabPanels>
-            {/* GENERAL TABLE */}
-            <TabPanel px={1}>
-              {data ? (
-                <GeneralDataRow
-                  status={status}
-                  type={type}
-                  data={data}
-                  refetch={refetch}
+      <>
+        <Card>
+          <Tabs
+              variant='enclosed'
+              index={activeSbomTab}
+              onChange={(value) => handleTabChange(value)}
+          >
+            {/* TAB LIST */}
+            <TabList mt='20px'>
+              {Object.values(tabIndexToName).map((item, index) => (
+                  <Tab key={index} _focus={{ outline: 'none' }}>
+                    {item}
+                  </Tab>
+              ))}
+            </TabList>
+            {/* TAB PANELS */}
+            <TabPanels>
+              {/* GENERAL TABLE */}
+              <TabPanel px={1}>
+                {data ? (
+                    <GeneralDataRow
+                        status={status}
+                        type={type}
+                        data={data}
+                        refetch={refetch}
+                    />
+                ) : (
+                    <Flex width={'100%'} gap={4} direction={'column'}>
+                      <Skeleton width={'100%'} height='20px' />
+                      <Skeleton width={'100%'} height='20px' />
+                      <Skeleton width={'100%'} height='20px' />
+                      <Skeleton width={'100%'} height='20px' />
+                      <Skeleton width={'100%'} height='20px' />
+                    </Flex>
+                )}
+              </TabPanel>
+              {/* PARTS TABLE */}
+              <TabPanel px={0}>
+                <PartsTable
+                    data={partsData?.sbom.sbomParts}
+                    refetch={getPartsData}
+                    getVulnData={getVulnData}
+                    getCompData={getCompData}
                 />
-              ) : (
-                <Flex width={'100%'} gap={4} direction={'column'}>
-                  <Skeleton width={'100%'} height='20px' />
-                  <Skeleton width={'100%'} height='20px' />
-                  <Skeleton width={'100%'} height='20px' />
-                  <Skeleton width={'100%'} height='20px' />
-                  <Skeleton width={'100%'} height='20px' />
-                </Flex>
-              )}
-            </TabPanel>
-            {/* PARTS TABLE */}
-            <TabPanel px={0}>
-              <PartsTable
-                data={parts?.sbom.sbomParts}
-                refetch={getParts}
-                getVulnData={getVulnData}
-                getCompData={getCompData}
-              />
-            </TabPanel>
-            {/* COMPONENT TABLE */}
-            <TabPanel px={0}>
-              {data && (
-                <ComponentTable
-                  type={type}
-                  lifecycle={lifecycle}
-                  data={compData?.sbom?.components}
-                  refetch={getCompData}
-                  primaryComp={data.primaryComponent}
-                />
-              )}
+              </TabPanel>
+              {/* COMPONENT TABLE */}
+              <TabPanel px={0}>
+                {data && (
+                    <ComponentTable
+                        type={type}
+                        lifecycle={data.lifecycle}
+                        data={compData?.sbom?.components}
+                        refetch={getCompData}
+                        primaryComp={data.primaryComponent}
+                    />
+                )}
 
-              {error && (
-                <Flex
-                  py={10}
-                  flexDirection={'column'}
-                  gap={2}
-                  width={'70%'}
-                  mx={'auto'}
-                  alignItems={'center'}
-                  justifyContent={'center'}
-                >
-                  <Text color={'red.500'} textAlign={'center'}>
-                    {error.message}
-                  </Text>
-                  <Text>Something went wrong. Please refresh this page</Text>
-                  <Button
-                    mt={2}
-                    variant='solid'
-                    colorScheme='blue'
-                    fontWeight={'normal'}
-                    onClick={() => window.location.reload()}
-                  >
-                    Refresh
-                  </Button>
-                </Flex>
-              )}
-            </TabPanel>
-            {/* VUNERABILITIES TABLE */}
-            <TabPanel px={0}>
-              <VulnTable
-                data={vulnData?.sbom?.vulns}
-                filteredData={filteredData}
-                refetch={getVulnData}
-                productId={productId}
-                sbomId={sbomId}
-              />
-            </TabPanel>
-            {/* HEALTH CHECK TABLE */}
-            <TabPanel px={0}>
-              {data && (
-                <HealthCheckTable
-                  productId={productId}
-                  sbomId={sbomId}
-                  sbomData={data}
-                  data={checkData?.sbom?.checkResults}
-                  refetch={getCheckData}
-                  components={components}
+                {error && (
+                    <Flex
+                        py={10}
+                        flexDirection={'column'}
+                        gap={2}
+                        width={'70%'}
+                        mx={'auto'}
+                        alignItems={'center'}
+                        justifyContent={'center'}
+                    >
+                      <Text color={'red.500'} textAlign={'center'}>
+                        {error.message}
+                      </Text>
+                      <Text>Something went wrong. Please refresh this page</Text>
+                      <Button
+                          mt={2}
+                          variant='solid'
+                          colorScheme='blue'
+                          fontWeight={'normal'}
+                          onClick={() => window.location.reload()}
+                      >
+                        Refresh
+                      </Button>
+                    </Flex>
+                )}
+              </TabPanel>
+              {/* VUNERABILITIES TABLE */}
+              <TabPanel px={0}>
+                <VulnTable
+                    data={vulnData?.sbom?.vulns}
+                    sbomData={data}
+                    sbomRefetch={refetch}
+                    filteredData={filteredData}
+                    refetch={getVulnData}
+                    productId={productId}
+                    sbomId={sbomId}
                 />
-              )}
-            </TabPanel>
-            {/* CHANGELOG TABLE */}
-            <TabPanel px={0}>
-              <SbomChangelogTable
-                data={logsData?.sbom?.activityLogs}
-                refetch={logsRefetch}
-              />
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
-      </Card>
-    </>
+              </TabPanel>
+              {/* HEALTH CHECK TABLE */}
+              <TabPanel px={0}>
+                {data && (
+                    <HealthCheckTable
+                        productId={productId}
+                        sbomId={sbomId}
+                        sbomData={data}
+                        data={checksData?.sbom?.checkResults}
+                        refetch={getChecksData}
+                        components={compData?.sbom?.components.nodes.map((item) => ({ value: item.name, id: item.id }))}
+                    />
+                )}
+              </TabPanel>
+              {/* CHANGELOG TABLE */}
+              <TabPanel px={0}>
+                <SbomChangelogTable
+                    data={logsData?.sbom?.activityLogs}
+                    refetch={logsRefetch}
+                />
+              </TabPanel>
+            </TabPanels>
+          </Tabs>
+        </Card>
+      </>
   )
 }
 

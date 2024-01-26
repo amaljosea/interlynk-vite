@@ -1,9 +1,7 @@
 // Chakra imports
 import {
-  Button,
   Flex,
   Grid,
-  Heading,
   Tab,
   TabList,
   TabPanel,
@@ -28,12 +26,20 @@ import TokenInfo from './components/TokenInfo'
 import TeamTable from 'components/Tables/TeamTable'
 import { MyOrganizations } from 'graphQL/Queries'
 import OrgTable from 'components/Tables/OrgTable'
+import { displayErrorMessage } from 'utils'
+import { WarningTwoIcon } from '@chakra-ui/icons'
+import { GetRoles } from 'graphQL/Queries'
+import RoleTable from 'components/Tables/RoleTable'
+import { AllOrganizations } from 'graphQL/Queries'
+import CustomLoader from 'components/CustomLoader'
+import { useGlobalState } from 'hooks/useGlobalState'
 
 function Profile() {
   const location = useLocation()
   const navigate = useNavigate()
   const queryParams = new URLSearchParams(location.search)
   const activetab = queryParams.get('tab')
+  const { totalRows } = useGlobalState()
 
   const tabs = [
     {
@@ -50,11 +56,19 @@ function Profile() {
   const [psIndex, setPsIndex] = useState(0)
   const [selectedTab, setSelectedTab] = useState(tabs[1].name)
 
+  const isAdmin = orgInfo?.organization?.currentUser?.superAdmin
+
   const { data: orgInfo, refetch, error } = useQuery(GetOrg)
 
-  const [getMyOrgs, { data: orgs }] = useLazyQuery(MyOrganizations, {
-    fetchPolicy: 'network-only'
+  const { data: orgs, refetch: myOrgRefetch } = useQuery(MyOrganizations, {
+    variables: { invitationStatuses: ['ACCEPTED', 'INVITED'] }
   })
+  const { data: allOrgs, refetch: allOrgRefetch } = useQuery(AllOrganizations, {
+    skip: !isAdmin,
+    variables: { first: totalRows, status: 'approved' }
+  })
+
+  const [getOrgRoles, { data: roles }] = useLazyQuery(GetRoles)
 
   const onTabChange = (value) => {
     setTabIndex(value)
@@ -63,10 +77,12 @@ function Profile() {
     } else if (value === 1) {
       navigate('/vendor/settings?tab=team')
     } else if (value === 2) {
-      navigate('/vendor/settings?tab=feeds')
+      navigate('/vendor/settings?tab=roles')
     } else if (value === 3) {
-      navigate('/vendor/settings?tab=checks')
+      navigate('/vendor/settings?tab=feeds')
     } else if (value === 4) {
+      navigate('/vendor/settings?tab=checks')
+    } else if (value === 5) {
       navigate('/vendor/settings?tab=lists')
     }
   }
@@ -89,7 +105,6 @@ function Profile() {
     } else if (activetab === 'organization') {
       setSelectedTab('PERSONAL')
       setPsIndex(1)
-      getMyOrgs()
     } else if (activetab === 'token') {
       setSelectedTab('PERSONAL')
       setPsIndex(2)
@@ -99,23 +114,28 @@ function Profile() {
     } else if (activetab === 'team') {
       setSelectedTab('ORGANIZATION')
       setTabIndex(1)
-    } else if (activetab === 'feeds') {
+    } else if (activetab === 'roles') {
       setSelectedTab('ORGANIZATION')
       setTabIndex(2)
-    } else if (activetab === 'checks') {
+      getOrgRoles()
+    } else if (activetab === 'feeds') {
       setSelectedTab('ORGANIZATION')
       setTabIndex(3)
-    } else if (activetab === 'lists') {
+    } else if (activetab === 'checks') {
       setSelectedTab('ORGANIZATION')
       setTabIndex(4)
+    } else if (activetab === 'lists') {
+      setSelectedTab('ORGANIZATION')
+      setTabIndex(5)
     }
-  }, [activetab])
+  }, [activetab, isAdmin])
 
   if (error) {
     return (
-      <Flex my={32} alignItems={'center'} justifyContent={'center'}>
+      <Flex my={32} alignItems={'center'} justifyContent={'center'} gap={2}>
+        <WarningTwoIcon color='blue.500' />
         <Text textAlign={'center'} fontSize={14}>
-          {error.message}
+          {displayErrorMessage(error.networkError?.statusCode, error.message)}
         </Text>
       </Flex>
     )
@@ -123,7 +143,7 @@ function Profile() {
 
   return (
     <>
-      {orgInfo && (
+      {orgInfo ? (
         <Flex
           direction='column'
           pr={2}
@@ -153,13 +173,18 @@ function Profile() {
                 onChange={(e) => onTabChange(e)}
               >
                 <TabList>
-                  {['General', 'Team', 'Feeds', 'Checks', 'Lists'].map(
-                    (item, index) => (
-                      <Tab key={index} _focus={{ outline: 'none' }}>
-                        {item}
-                      </Tab>
-                    )
-                  )}
+                  {[
+                    'General',
+                    'Users',
+                    'Roles',
+                    'Feeds',
+                    'Checks',
+                    'Lists'
+                  ].map((item, index) => (
+                    <Tab key={index} _focus={{ outline: 'none' }}>
+                      {item}
+                    </Tab>
+                  ))}
                 </TabList>
                 <TabPanels>
                   {/* GEENRAL */}
@@ -180,6 +205,10 @@ function Profile() {
                         refetch={refetch}
                       />
                     )}
+                  </TabPanel>
+                  {/* ROLES */}
+                  <TabPanel>
+                    <RoleTable data={roles?.organization?.organizationRoles} />
                   </TabPanel>
                   {/* FEEDS */}
                   <TabPanel>
@@ -251,11 +280,21 @@ function Profile() {
                   </TabPanel>
                   {/* ORG DETAILS */}
                   <TabPanel>
-                    <OrgTable
-                      data={orgs?.myOrganizations?.nodes || []}
-                      refetch={getMyOrgs}
-                      activeOrg={orgInfo?.organization?.id || null}
-                    />
+                    {isAdmin ? (
+                      <OrgTable
+                        data={allOrgs?.allOrganizations?.nodes || []}
+                        refetch={allOrgRefetch}
+                        isAdmin={isAdmin}
+                        activeOrg={orgInfo?.organization?.id || null}
+                      />
+                    ) : (
+                      <OrgTable
+                        data={orgs?.myOrganizations?.nodes || []}
+                        refetch={myOrgRefetch}
+                        isAdmin={isAdmin}
+                        activeOrg={orgInfo?.organization?.id || null}
+                      />
+                    )}
                   </TabPanel>
                   {/* SECURITY TOKEN */}
                   <TabPanel display={orgInfo?.organization ? 'block' : 'none'}>
@@ -268,6 +307,12 @@ function Profile() {
               </Tabs>
             </Card>
           )}
+        </Flex>
+      ) : (
+        <Flex pr={2} pl={5} pt={{ base: '120px', md: '75px' }}>
+          <Card>
+            <CustomLoader />
+          </Card>
         </Flex>
       )}
     </>

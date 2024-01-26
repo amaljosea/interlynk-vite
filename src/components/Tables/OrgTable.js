@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { AddIcon, ArrowForwardIcon } from '@chakra-ui/icons'
+import { AddIcon } from '@chakra-ui/icons'
 import {
   Button,
   Flex,
@@ -18,34 +18,60 @@ import {
   ModalHeader,
   ModalFooter,
   ModalBody,
-  ModalCloseButton
+  ModalCloseButton,
+  Menu,
+  MenuButton,
+  MenuList,
+  Portal,
+  MenuItem,
+  Badge,
+  Box,
+  Alert,
+  AlertIcon,
+  AlertDescription
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
-import { customStyles } from 'utils'
-import { getFullDateAndTime } from 'utils'
+import { customStyles, timeSince, getFullDateAndTime } from 'utils'
 import CustomLoader from 'components/CustomLoader'
 import OrgModal from 'views/Dashboard/Profile/components/OrgModal'
 import { useMutation } from '@apollo/client'
-import { SwitchOrganization } from 'graphQL/Mutation'
+import {
+  SwitchOrganization,
+  AcceptOrgInvitation,
+  DeclineOrgInvitation,
+  QuitOrganization
+} from 'graphQL/Mutation'
 import Cookies from 'js-cookie'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { FaEllipsisVertical } from 'react-icons/fa6'
+import { useNavigate } from 'react-router-dom'
+import { useGlobalState } from 'hooks/useGlobalState'
 
-const OrgTable = ({ data, refetch, activeOrg }) => {
+const OrgTable = ({ data, refetch, activeOrg, isAdmin }) => {
   const navigate = useNavigate()
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const activetab = queryParams.get('tab')
   const toast = useToast()
+  const [leaveError, setLeaveError] = useState('')
   const { isOpen, onOpen, onClose } = useDisclosure()
+
+  const { totalRows } = useGlobalState()
+
   const {
     isOpen: isWarningOpen,
     onOpen: onWarningOpen,
     onClose: onWarningClose
   } = useDisclosure()
 
+  const {
+    isOpen: isLeaveOpen,
+    onOpen: onLeaveOpen,
+    onClose: onLeaveClose
+  } = useDisclosure()
+
   const [activeRow, setActiveRow] = useState(null)
 
   const [switchOrg] = useMutation(SwitchOrganization)
+  const [quitOrg] = useMutation(QuitOrganization)
+  const [acceptInvitation] = useMutation(AcceptOrgInvitation)
+  const [declineInvitation] = useMutation(DeclineOrgInvitation)
 
   const onSwitchOrg = async (id, name) => {
     await switchOrg({
@@ -66,11 +92,79 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
       .finally(() => navigate('/vendor/dashboard'))
   }
 
+  const onLeaveOrg = async (id) => {
+    await quitOrg({
+      variables: {
+        id
+      }
+    }).then((res) => {
+      if (res?.data?.organizationUserLeave?.errors?.length > 0) {
+        setLeaveError(res?.data?.organizationUserLeave?.errors[0])
+      } else {
+        if (data?.length === 1) {
+          sessionStorage.removeItem('username')
+          sessionStorage.removeItem('email')
+          sessionStorage.removeItem('product')
+          Cookies.remove('authToken')
+          navigate('/auth')
+        } else {
+          navigate('/auth')
+        }
+      }
+    })
+  }
+
+  const onAccept = async (id) => {
+    await acceptInvitation({
+      variables: {
+        organizationId: id
+      }
+    })
+      .then((res) => {
+        if (res.data) {
+          console.log('res', res.data)
+          toast({
+            description: `Invitation accepted`,
+            position: 'top',
+            status: 'success'
+          })
+        }
+      })
+      .finally(() => navigate('/vendor/dashboard'))
+  }
+
+  const onDecline = async (id) => {
+    await declineInvitation({
+      variables: {
+        organizationId: id
+      }
+    })
+      .then((res) => {
+        if (res.data) {
+          console.log('res', res.data)
+          toast({
+            description: `Invitation declined`,
+            position: 'top',
+            status: 'success'
+          })
+        }
+      })
+      .finally(() => {
+        if (isAdmin) {
+          refetch({ first: totalRows, status: 'approved' })
+        } else {
+          refetch({
+            variables: { invitationStatuses: ['ACCEPTED', 'INVITED'] }
+          })
+        }
+      })
+  }
+
   const subHeaderComponent = useMemo(() => {
     return (
       <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
         <Stack direction={'row'} spacing={2} alignItems={'center'}>
-          <Tooltip label='Add Organization'>
+          <Tooltip label='Register Organization'>
             <IconButton
               colorScheme='blue'
               icon={<AddIcon />}
@@ -93,14 +187,29 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
       id: 'NAME',
       name: 'NAME',
       selector: (row) => {
-        const { name } = row
-        return <Text fontSize={14}>{name}</Text>
+        const { name, id } = row
+        return (
+          <Stack direction={'row'} my={3} alignItems={'center'}>
+            <Text fontSize={14}>{name}</Text>
+            {activeOrg === id && (
+              <Badge
+                variant='outline'
+                colorScheme='blue'
+                py={1}
+                px={2}
+                borderRadius={4}
+              >
+                Active
+              </Badge>
+            )}
+          </Stack>
+        )
       },
       wrap: true
     },
     {
       id: 'CONTACT_EMAIL',
-      name: 'CONTACT EMAIL',
+      name: 'CONTACT',
       selector: (row) => {
         const { email } = row
         return <Text fontSize={14}>{email}</Text>
@@ -133,9 +242,10 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
         return (
           <Tag
             variant='subtle'
+            width={'100px'}
             colorScheme={status === 'approved' ? 'green' : 'blue'}
           >
-            <TagLabel fontSize={14} textTransform={'capitalize'}>
+            <TagLabel fontSize={14} textTransform={'capitalize'} mx={'auto'}>
               {status}
             </TagLabel>
           </Tag>
@@ -148,42 +258,63 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
       name: 'UPDATED AT',
       selector: (row) => {
         const { updatedAt } = row
-        return <Text fontSize={14}>{getFullDateAndTime(updatedAt)}</Text>
+        return (
+          <Tooltip label={getFullDateAndTime(updatedAt)} placement={'top'}>
+            <Text textTransform={'capitalize'}>{timeSince(updatedAt)}</Text>
+          </Tooltip>
+        )
       },
-      wrap: true
+      wrap: true,
+      sortable: true,
+      sortFunction: (a, b) => {
+        const dateA = new Date(a.updatedAt)
+        const dateB = new Date(b.updatedAt)
+        return dateA - dateB // Sort in descending order
+      }
     },
     {
       id: 'ACTION',
       name: 'ACTION',
       selector: (row) => {
-        const { id } = row
+        const { id, invitationStatus, superAdmin } = row
         return (
-          <>
-            {activeOrg !== id ? (
-              <Button
-                size='sm'
-                variant='solid'
-                cursor={'pointer'}
-                colorScheme={'blue'}
-                onClick={() => onSwitch(row)}
-                rightIcon={<ArrowForwardIcon />}
-              >
-                Switch to
-              </Button>
-            ) : (
-              <Button
-                size='sm'
-                variant='solid'
-                cursor={'pointer'}
-                colorScheme={'green'}
-              >
-                Active
-              </Button>
-            )}
-          </>
+          <Menu>
+            <MenuButton
+              as={IconButton}
+              aria-label='Options'
+              icon={<FaEllipsisVertical />}
+              variant='none'
+              color='gray.400'
+            />
+            <Portal>
+              {invitationStatus === 'invited' ? (
+                <MenuList size='sm'>
+                  <MenuItem onClick={() => onAccept(row.id)}>Accept</MenuItem>
+                  <MenuItem onClick={() => onDecline(row.id)}>Decline</MenuItem>
+                </MenuList>
+              ) : (
+                <MenuList size='sm'>
+                  {activeOrg !== id && (
+                    <MenuItem onClick={() => onSwitch(row)}>Switch To</MenuItem>
+                  )}
+                  <MenuItem
+                    isDisabled={superAdmin}
+                    onClick={() => {
+                      setActiveRow(row)
+                      setLeaveError('')
+                      onLeaveOpen()
+                    }}
+                  >
+                    Leave Organization
+                  </MenuItem>
+                </MenuList>
+              )}
+            </Portal>
+          </Menu>
         )
       },
-      wrap: true
+      wrap: true,
+      right: 'true'
     }
   ]
 
@@ -217,7 +348,7 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
         <Modal isOpen={isWarningOpen} onClose={onWarningClose}>
           <ModalOverlay />
           <ModalContent>
-            <ModalHeader>Switch Org</ModalHeader>
+            <ModalHeader>Switch Organization</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               <Text>
@@ -238,6 +369,47 @@ const OrgTable = ({ data, refetch, activeOrg }) => {
                 onClick={() => onSwitchOrg(activeRow.id, activeRow.name)}
               >
                 Continue
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      )}
+
+      {isLeaveOpen && (
+        <Modal isOpen={isLeaveOpen} onClose={onLeaveClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Leave Organization</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              {leaveError !== '' && (
+                <Box mb={5} width={'100%'}>
+                  <Alert status='error' borderRadius={4}>
+                    <AlertIcon />
+                    <AlertDescription fontSize={'sm'}>
+                      {leaveError}
+                    </AlertDescription>
+                  </Alert>
+                </Box>
+              )}
+              <Text>
+                You are about to leave Organization:{' '}
+                <strong>{activeRow.name}</strong>
+              </Text>
+              <Text mt={6}>Are you sure you wish to continue ?</Text>
+            </ModalBody>
+
+            <ModalFooter>
+              <Button fontWeight={'medium'} mr={3} onClick={onLeaveClose}>
+                Cancel
+              </Button>
+              <Button
+                fontWeight={'medium'}
+                variant='solid'
+                colorScheme='red'
+                onClick={() => onLeaveOrg(activeRow.id)}
+              >
+                Leave
               </Button>
             </ModalFooter>
           </ModalContent>

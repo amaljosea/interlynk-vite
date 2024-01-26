@@ -13,9 +13,7 @@ import {
 import { CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import { PackageURL } from 'packageurl-js'
 import { useGlobalState } from 'hooks/useGlobalState'
-
-const regexPattern =
-  /cpe:2\.3:[aho\*\-](:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,\/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){5}(:(([a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))?)|[\*\-]))(:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,\/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])){4}/
+import { validateCpe } from 'utils'
 
 const CpeInput = ({
   name,
@@ -124,7 +122,8 @@ const CpeInput = ({
 
   useEffect(() => {
     if (validation) {
-      const matches = regexPattern.test(inputValue)
+      const matches = validateCpe(inputValue)
+      console.log('matches', matches)
       if (matches) {
         prodCompDispatch({ type: 'SET_CPE_VALIDATION', payload: true })
       } else {
@@ -163,8 +162,8 @@ const CpeInput = ({
             {name === 'packageName'
               ? 'Package Name'
               : name === 'packageVersion'
-              ? 'Version'
-              : name}
+                ? 'Version'
+                : name}
           </FormLabel>
         )}
         <InputGroup>

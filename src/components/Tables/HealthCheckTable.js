@@ -37,6 +37,7 @@ import PriSupplierModal from 'views/Sbom/components/PriSupplierModal'
 import RowLimit from 'views/Sbom/components/RowLimit'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import SupplierModal from 'views/Sbom/components/SupplierModal'
+import Pagination from "../Pagination";
 
 const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
   // GET HEALTH CHECK FILTER HEADS
@@ -46,7 +47,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
   const customerView = location.pathname.startsWith('/customer')
   const toast = useToast()
 
-  const { totalRows, setTotalRows, prodCheckState, dispatch } = useGlobalState()
+  const { userPermissions, totalRows, setTotalRows, prodCheckState, dispatch } = useGlobalState()
   const {
     field,
     direction,
@@ -61,6 +62,14 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
     before
   } = prodCheckState
   const { prodCompDispatch, prodCheckDispatch } = dispatch
+
+  const paginationSizes = [25, 50, 100]
+
+  const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
+  const editChecks = sboms?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'edit_checks' && permission.value === true
+  )
 
   const [purlValue, setPurlValue] = useState('')
   const [purlData, setPurlData] = useState(null)
@@ -90,9 +99,6 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
         status:
           statues.includes('all') || statues.length === 0 ? undefined : statues,
         first: totalRows,
-        // after: after !== '' ? after : undefined,
-        // last: before !== '' ? totalRows : undefined,
-        // before: before !== '' ? before : undefined,
         field: field,
         direction: direction
       }
@@ -207,7 +213,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
         sbomId: sbomId,
         search: undefined,
         checkId:
-          rules.includes('all') || rules.length === 0 ? undefined : rules,
+            rules.includes('all') || rules.length === 0 ? undefined : rules,
         category:
           categories.includes('all') || categories.length === 0
             ? undefined
@@ -663,11 +669,11 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
                       'Component has a unique identifier'
                         ? handleComUpdate(row)
                         : row.organizationRule.rule.shortDesc ===
-                          'Document has a unique identifier'
-                        ? handleSbomUpdate(row)
-                        : handleOpen(row)
+                            'Document has a unique identifier'
+                          ? handleSbomUpdate(row)
+                          : handleOpen(row)
                     }
-                    disabled={customerView}
+                    disabled={customerView || !editChecks}
                   />
                 </Tooltip>
 
@@ -679,7 +685,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
                     fontWeight='normal'
                     icon={<GoSkip size={18} />}
                     onClick={() => updateIssue(id)}
-                    disabled={customerView}
+                    disabled={customerView || !editChecks}
                   />
                 </Tooltip>
               </Stack>
@@ -783,7 +789,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
     })
   }
 
-  const onPreviousPage = async () => {
+  const handlePreviousPage = async () => {
     prodCheckDispatch({
       type: 'DECREMENT_PAGE',
       payload: data.pageInfo.startCursor
@@ -791,7 +797,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
     handleRefetch(null, data.pageInfo.startCursor)
   }
 
-  const onNextPage = async () => {
+  const handleNextPage = async () => {
     prodCheckDispatch({
       type: 'INCREMENT_PAGE',
       payload: {
@@ -839,42 +845,20 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
         />
       </Flex>
 
-      {/* PAGINATION */}
-      {data && (
-        <Flex
-          width={'100%'}
-          flexDir={'row'}
-          gap={4}
-          alignItems={'center'}
-          mt={6}
-          justifyContent={'space-between'}
-        >
-          <Stack alignItems={'center'} direction={'row'} spacing={4}>
-            <Button
-              colorScheme='blue'
-              onClick={onPreviousPage}
-              isDisabled={!data.pageInfo.hasPreviousPage}
-            >
-              Previous
-            </Button>
-            <Button
-              colorScheme='blue'
-              onClick={onNextPage}
-              isDisabled={!data.pageInfo.hasNextPage}
-            >
-              Next
-            </Button>
-            <Box>
-              Page {pageIndex} of{' '}
-              {data.totalCount === 0
-                ? 1
-                : Math.ceil(data.totalCount / totalRows)}
-            </Box>
-          </Stack>
-
-          <RowLimit onChange={handleSetRow} name='healthCheck' />
-        </Flex>
-      )}
+        {/* PAGINATION */}
+        {data && (
+            <Pagination
+                paginationSizes={paginationSizes}
+                pageIndex={pageIndex}
+                totalRows={totalRows}
+                totalCount={data.totalCount}
+                onPreviousPage={handlePreviousPage}
+                onNextPage={handleNextPage}
+                onSetRow={handleSetRow}
+                hasNextPage={data.pageInfo.hasNextPage}
+                hasPreviousPage={data.pageInfo.hasPreviousPage}
+            />
+        )}
 
       {/* ACTIONS */}
       {activeRow !== null && (

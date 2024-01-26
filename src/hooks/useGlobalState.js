@@ -1,5 +1,6 @@
 import React, { useState, createContext, useContext, useReducer } from 'react'
 import {
+  globalVulnReducer,
   prodRulesReducer,
   prodCheckReducer,
   prodCompReducer,
@@ -13,6 +14,7 @@ import {
 const GlobalStateContext = createContext()
 
 const GlobalStateProvider = ({ children }) => {
+  const [userPermissions, setUserPermissions] = useState([])
   const [userName, setUserName] = useState('')
   const [totalRows, setTotalRows] = useState(25)
   const [activeProdTab, setActiveProdTab] = useState(0)
@@ -23,13 +25,30 @@ const GlobalStateProvider = ({ children }) => {
   const [scanEnabled, setScanEnabled] = useState(false)
   // PRODUCTS
   const [prodState, prodDispatch] = useReducer(prodReducer, {
-    field: 'PROJECTS_UPDATED_AT',
+    data: null,
+    field: 'PROJECT_GROUPS_UPDATED_AT',
     direction: 'DESC',
     totalProduct: 0,
     searchInput: '',
     pageIndex: 1,
     enabled: 'yes',
     currentProduct: null
+  })
+  // GLOBAL VULNERABILITIES
+  const [globalVulnState, globalVulnDispatch] = useReducer(globalVulnReducer, {
+    field: 'GLOBAL_VULNS_UPDATED_AT',
+    direction: 'DESC',
+    after:'',
+    before:'',
+    searchInput: '',
+    severities: [],
+    products: [],
+    statues: [],
+    kev: '',
+    epss: '',
+    minEpss: 0,
+    maxEpss: 0,
+    pageIndex: 1
   })
   const [prodRulesState, prodRulesDispatch] = useReducer(prodRulesReducer, {
     field: 'AUTO_CHECKS_UPDATED_AT',
@@ -39,6 +58,10 @@ const GlobalStateProvider = ({ children }) => {
   const [prodLogState, prodLogDispatch] = useReducer(prodLogReducer, {
     field: 'ACTIVITY_LOGS_CREATED_AT',
     direction: 'DESC',
+    searchInput: '',
+    type: [],
+    user: [],
+    object: [],
     pageIndex: 1
   })
   const [prodCompState, prodCompDispatch] = useReducer(prodCompReducer, {
@@ -135,10 +158,13 @@ const GlobalStateProvider = ({ children }) => {
         setActiveDockerHub,
         vulnerabilitiesData,
         setVulnerabilitiesData,
+        userPermissions,
+        setUserPermissions,
         scanEnabled,
         setScanEnabled,
         userName,
         setUserName,
+        globalVulnState,
         prodState,
         prodLogState,
         prodCompState,
@@ -148,6 +174,7 @@ const GlobalStateProvider = ({ children }) => {
         sbomLogState,
         sbomState,
         dispatch: {
+          globalVulnDispatch,
           prodDispatch,
           prodLogDispatch,
           prodCompDispatch,

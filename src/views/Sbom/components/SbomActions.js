@@ -2,7 +2,6 @@ import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 import {
   Flex,
   IconButton,
-  Select,
   Tooltip,
   useDisclosure,
   Modal,
@@ -20,7 +19,6 @@ import {
   Spinner
 } from '@chakra-ui/react'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { BsBoxFill } from 'react-icons/bs'
 import { FaFileDownload, FaLayerGroup } from 'react-icons/fa'
 import { TbSignature, TbSignatureOff } from 'react-icons/tb'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
@@ -28,7 +26,7 @@ import ReactSelect from 'react-select'
 import { useRef, useState } from 'react'
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { GetProject } from 'graphQL/Queries'
-import { removeDuplicates, getFullDateAndTime } from 'utils'
+import { removeDuplicates, normalizeSBOMVersion } from 'utils'
 import CheckModal from './CheckModal'
 import { GetAllComponents } from 'graphQL/Queries'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
@@ -37,7 +35,13 @@ import { sbomDelete } from 'graphQL/Mutation'
 import DownloadModal from './DownloadModal'
 
 const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
-  const { setActiveSbomTab, dispatch, prodCompState } = useGlobalState()
+  const {
+    totalRows,
+    setActiveSbomTab,
+    dispatch,
+    prodCompState,
+    userPermissions
+  } = useGlobalState()
   const {
     field,
     direction,
@@ -57,7 +61,16 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
     sbomDispatch
   } = dispatch
 
-  const currentProduct = JSON.parse(localStorage.getItem(`product`))
+  const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
+  const archiveSboms = sboms?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'archive_sbom' && permission.value === true
+  )
+  const signSboms = sboms?.supersededBy?.some(
+    (permission) => permission.key === 'sign_sbom' && permission.value === true
+  )
+
+  const currentProduct = JSON.parse(sessionStorage.getItem(`product`))
 
   const navigate = useNavigate()
   const location = useLocation()
@@ -66,6 +79,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
+  const product = JSON.parse(localStorage.getItem('product'))
 
   const [status, setStatus] = useState('created')
   const [signedData, setSignedData] = useState(null)
@@ -135,11 +149,8 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
   filteredDuplicated &&
     filteredDuplicated.map((project) => {
       uniqVersions.push({
-        label:
-          project?.primaryComponent?.version ||
-          `Uploaded ${getFullDateAndTime(project.creationAt)}`,
-        value: project.id,
-        creationAt: project.creationAt
+        label: normalizeSBOMVersion(project),
+        value: project?.id
       })
     })
 
@@ -150,10 +161,10 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
     })
       .then((res) => {
         if (res.data) {
-          localStorage.setItem(
+          sessionStorage.setItem(
             'currentSBOM',
             JSON.stringify({
-              version: res.data.sbom.primaryComponent?.version,
+              version: normalizeSBOMVersion(res.data.sbom),
               id: res.data.sbom.id
             })
           )
@@ -173,7 +184,6 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
     setSelectedVersion(select)
     refetchSBOM(select.value)
   }
-
 
   const handleEditSbom = () => {
     if (sbom?.primaryComponent) {
@@ -240,8 +250,8 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
       if (res.data) {
         setTimeout(() => {
           setIsLoading(false)
-          prodRefetch({ id: productId })
-          navigate(`/vendor/products/${params.name}?id=${productId}`)
+          prodRefetch({ id: product?.groupId })
+          navigate(`/vendor/products/${params.name}?id=${product?.groupId}`)
         }, 3000)
       }
     })
@@ -256,25 +266,6 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
         ml={'auto'}
         flexWrap={'wrap'}
       >
-        {/* CHANGE ENVIRONMENT */}
-        <Flex
-          flexDirection={'row'}
-          alignItems={'center'}
-          gap={2}
-          display={'none'}
-        >
-          <BsBoxFill size={22} color='#718096' />
-          <Select name='environment' id='environment' size='md'>
-            {['All', 'Development', 'Release', 'Staging', 'Settings'].map(
-              (item, index) => (
-                <option value={item} key={index}>
-                  {item}
-                </option>
-              )
-            )}
-          </Select>
-        </Flex>
-
         {/* SBOM VERSIONS */}
         <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
           <FaLayerGroup size={21} color='#4299E1' />
@@ -308,14 +299,14 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
           />
         </Flex>
 
-        {/* EDIT SBOM */}
+        {/* UPDATE PRIMARY COMPONENT */}
         <Tooltip label='Edit'>
           <IconButton
             isDisabled={status === 'signed'}
             colorScheme='blue'
             icon={<EditIcon />}
             onClick={handleEditSbom}
-          ></IconButton>
+          />
         </Tooltip>
 
         {/* SIGNED SBOM */}
@@ -325,7 +316,8 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
               colorScheme='blue'
               icon={<TbSignature size={22} />}
               onClick={setVerifyOpen}
-            ></IconButton>
+              isDisabled={!signSboms}
+            />
           </Tooltip>
         ) : (
           <Tooltip label='Unsigned'>
@@ -333,7 +325,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
               colorScheme='blue'
               icon={<TbSignatureOff size={22} />}
               onClick={setVerifyOpen}
-            ></IconButton>
+            />
           </Tooltip>
         )}
 
@@ -353,6 +345,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
             colorScheme='red'
             icon={<DeleteIcon />}
             onClick={setDeleteOpen}
+            isDisabled={!archiveSboms}
           ></IconButton>
         </Tooltip>
       </Flex>
@@ -367,7 +360,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
           productId={productId}
           sbomId={sbomId}
           productName={sbom?.project?.name}
-          version={sbom?.primaryComponent?.version}
+          version={normalizeSBOMVersion(sbom)}
         />
       )}
 
@@ -418,7 +411,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
           isOpen={isCopied}
           onClose={onCopiedClose}
           product={sbom?.project?.name}
-          version={sbom?.primaryComponent?.version}
+          version={normalizeSBOMVersion(sbom)}
         />
       )}
 

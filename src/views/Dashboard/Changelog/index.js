@@ -5,7 +5,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 const idRegex =
   /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
 
-const ChangeLog = ({ data, refetch }) => {
+const ChangeLog = ({ data, refetch, activeEnv }) => {
   const location = useLocation()
   const navigate = useNavigate()
   const queryParams = new URLSearchParams(location.search)
@@ -17,7 +17,13 @@ const ChangeLog = ({ data, refetch }) => {
     }
   }, [id])
 
-  return <ChangelogTable data={data?.project?.activityLogs} refetch={refetch} />
+  return (
+    <ChangelogTable
+      data={data?.project?.activityLogs}
+      refetch={refetch}
+      activeEnv={activeEnv}
+    />
+  )
 }
 
 export default ChangeLog

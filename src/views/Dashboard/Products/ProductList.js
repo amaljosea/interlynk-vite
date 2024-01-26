@@ -2,36 +2,48 @@
 import { Flex, Text } from '@chakra-ui/react'
 import { useEffect } from 'react'
 import { useQuery } from '@apollo/client'
-import { GetProjectData } from 'graphQL/Queries'
 import { useLocation } from 'react-router-dom'
 import ProductTable from 'components/Tables/ProductTable'
 import { useGlobalState } from 'hooks/useGlobalState'
 import OrgRegister from '../Profile/components/OrgRegister'
+import { displayErrorMessage } from 'utils'
+import { WarningTwoIcon } from '@chakra-ui/icons'
+import { GetProjectGroups } from 'graphQL/Queries'
 
 function ProductList() {
   const { totalRows, prodState, dispatch } = useGlobalState()
-  const { field, direction, enabled } = prodState
+  const { data, field, direction, enabled, searchInput } = prodState
   const {
     prodDispatch,
     prodCompDispatch,
     prodVulnDispatch,
     prodCheckDispatch,
-    sbomLogDispatch
+    sbomLogDispatch,
+    globalVulnDispatch
   } = dispatch
 
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const product = queryParams.get('id')
+  const org = sessionStorage.getItem('organization')
 
-  const org = localStorage.getItem('organization')
-
-  const { data, refetch, error } = useQuery(GetProjectData, {
+  const {
+    data: groups,
+    refetch,
+    error
+  } = useQuery(GetProjectGroups, {
     variables: {
-      first: totalRows,
+      search: searchInput !== '' ? searchInput : undefined,
       enabled: enabled === 'yes' ? true : enabled === 'no' ? false : undefined,
-      field: field,
-      direction: direction
-    }
+      direction: direction,
+      first: totalRows,
+      field: field
+    },
+    onCompleted: (data) =>
+      prodDispatch({
+        type: 'GET_DATA',
+        payload: data?.organization?.projectGroups
+      })
   })
 
   useEffect(() => {
@@ -49,24 +61,31 @@ function ProductList() {
       prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
       prodCheckDispatch({ type: 'CLEAR_PROD_CHECK' })
       sbomLogDispatch({ type: 'CLEAR_SBOM_LOG' })
+      globalVulnDispatch({type: 'FETCH_DATA_SUCCESS'})
     }
   }, [product])
+
+  if (!org || org === 'undefined') {
+    return <OrgRegister />
+  }
 
   if (error) {
     return (
       <Flex my={32} alignItems={'center'} justifyContent={'center'}>
+        <WarningTwoIcon color='blue.500' />
         <Text textAlign={'center'} fontSize={14}>
-          {error.message}
+          {displayErrorMessage(error.networkError?.statusCode, error.message)}
         </Text>
       </Flex>
     )
   }
 
-  if (org === 'undefined') {
-    return <OrgRegister />
-  }
-
-  return <ProductTable data={data?.projects} refetch={refetch} />
+  return (
+    <ProductTable
+      data={groups?.organization?.projectGroups}
+      refetch={refetch}
+    />
+  )
 }
 
 export default ProductList

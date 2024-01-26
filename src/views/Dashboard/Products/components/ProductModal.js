@@ -17,9 +17,9 @@ import {
   Text,
   Textarea
 } from '@chakra-ui/react'
-import { UpdateProject, CreateProject } from 'graphQL/Mutation'
+import { CreateProjectGroup, UpdateProjectGroup } from 'graphQL/Mutation'
 import { useState, useEffect } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
 const ProductModal = ({
   id,
@@ -29,43 +29,37 @@ const ProductModal = ({
   description,
   refetch
 }) => {
-  const navigate = useNavigate()
   const params = useParams()
-  const [projectCreate] = useMutation(CreateProject, {
+  const [projectGroupCreate] = useMutation(CreateProjectGroup, {
     onCompleted: () => refetch()
   })
-  const [projectUpdate] = useMutation(UpdateProject, {
+  const [projectGroupUpdate] = useMutation(UpdateProjectGroup, {
     onCompleted: () => refetch()
   })
 
   const [productName, setProductName] = useState('')
   const [productDesc, setProductDesc] = useState('')
+  const [error, setError] = useState('')
 
   useEffect(() => {
     setProductName(product)
     setProductDesc(description)
   }, [id])
 
-  const [error, setError] = useState('')
 
   const updateProduct = async (e) => {
     e.preventDefault()
-    await projectUpdate({
+    await projectGroupUpdate({
       variables: {
         id: id,
         name: productName,
         desc: productDesc
       }
     }).then((res) => {
-      const error = res.data.projectUpdate.errors
-      if (error.length > 0) {
-        setError(
-          'A project with same name already exists. Please choose an unique name'
-        )
+      const error = res.data.projectGroupUpdate.errors
+      if (error?.length > 0) {
+        setError(res.data.projectGroupUpdate.errors[0])
       } else {
-        params?.name
-          ? navigate(`/vendor/products/${productName}?id=${id}`)
-          : navigate(`/vendor/products`)
         onClose()
       }
     })
@@ -73,17 +67,16 @@ const ProductModal = ({
 
   const handleSave = async (e) => {
     e.preventDefault()
-    await projectCreate({
+    await projectGroupCreate({
       variables: {
         name: productName,
-        desc: productDesc
+        desc: productDesc,
+        enabled: true
       }
     }).then((res) => {
-      const error = res.data.projectCreate.errors
-      if (error.length > 0) {
-        setError(
-          'A project with same name already exists. Please choose an unique name'
-        )
+      const error = res.data.projectGroupCreate.errors
+      if (error?.length > 0) {
+        setError(error[0])
       } else {
         onClose()
       }
@@ -98,12 +91,12 @@ const ProductModal = ({
         <ModalOverlay />
         <form onSubmit={id ? updateProduct : handleSave}>
           <ModalContent>
-            <ModalHeader>{product ? 'Update' : 'Add'} Product</ModalHeader>
+            <ModalHeader>{product ? 'Edit' : 'Add'} Product</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               <Flex width={'100%'} direction={'column'} gap={4}>
                 {error !== '' && (
-                  <Alert status='error'>
+                  <Alert status='error' borderRadius={4}>
                     <AlertIcon />
                     <Text fontSize={'sm'}>{error}</Text>
                   </Alert>
@@ -117,7 +110,7 @@ const ProductModal = ({
                       setProductName(e.target.value)
                       setError('')
                     }}
-                    placeholder='Enter product name'
+                    placeholder={`Add product ${params && 'group'} name`}
                   />
                 </FormControl>
                 <FormControl isRequired>
@@ -125,7 +118,7 @@ const ProductModal = ({
                   <Textarea
                     value={productDesc || ''}
                     onChange={(e) => setProductDesc(e.target.value)}
-                    placeholder='Enter product description'
+                    placeholder={`Add product ${params && 'group'} description`}
                     rows={5}
                   />
                 </FormControl>

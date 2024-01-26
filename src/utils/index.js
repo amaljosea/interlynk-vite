@@ -188,7 +188,7 @@ export const sevColor = (severity) => {
     case 'negligible':
       return 'green'
     default:
-      return 'blue'
+      return 'gray'
   }
 }
 
@@ -598,29 +598,44 @@ export const customStyles = {
   }
 }
 
+export const normalizeSBOMVersion = (sbom) => {
+  if (sbom?.primaryComponent?.version) {
+    return sbom?.primaryComponent?.version
+  } else if (sbom?.primaryComponent?.name) {
+    return sbom?.primaryComponent?.name
+  } else {
+    return `Uploaded ${getFullDateAndTime(sbom?.creationAt)}`
+  }
+}
+
 // REMOVE DUPLICATE PRODUCTS VERSIONS
 export const removeDuplicates = (arr) => {
+  if (arr === null || arr === undefined) {
+    return []
+  }
   const uniqueVersions = {}
+
   for (const item of arr) {
+    const normalizedVersion = normalizeSBOMVersion(item)
     if (
-      !uniqueVersions[item.primaryComponent?.version] ||
-      item.updatedAt > uniqueVersions[item.primaryComponent?.version].creationAt
+      !uniqueVersions[normalizedVersion] ||
+      item.updatedAt > uniqueVersions[normalizedVersion].creationAt
     ) {
-      uniqueVersions[item.primaryComponent?.version] = item
+      uniqueVersions[normalizedVersion] = item
     }
   }
+
   const versions = Object.values(uniqueVersions).sort((a, b) => {
     const dateA = new Date(a.creationAt)
     const dateB = new Date(b.creationAt)
     return dateB - dateA
   })
-
   return versions
 }
 
 export const validateCpe = (value) => {
   const cpeRegex =
-    /^cpe:2\.3:[aho]\:[\w\-.~]+:[\w\-.~]+(?::[\w\-.~]+)?(?::[\w\-.~]+)?(?::[\w\-.~]+)?(?::[\w\-.~]+)?$/
+    /^cpe:2\.3:[aho\*\-]?(:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])?){5}(:(([a-zA-Z]{2,3}(-([a-zA-Z]{2}|[0-9]{3}))?)|[\*\-])?)(:(((\?*|\*?)([a-zA-Z0-9\-\._]|(\\[\\\*\?!"#$$%&'\(\)\+,/:;<=>@\[\]\^`\{\|}~]))+(\?*|\*?))|[\*\-])?){4}$/
   return cpeRegex.test(value)
 }
 
@@ -639,4 +654,94 @@ export const validPassword = (value) => {
 export const validateEmail = (email) => {
   const emailRegex = /^[a-zA-Z0-9._+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
   return emailRegex.test(email)
+}
+
+export const toast_error_message_duration = 300
+
+export const displayErrorMessage = (status_code, message) => {
+  if (status_code === 200 || status_code === 400) {
+    return message
+  } else if (status_code === 401) {
+    return 'You are not authorized to view this page.'
+  } else if (status_code === 403) {
+    return 'You are forbidden to view this page.'
+  } else if (status_code === 404) {
+    return 'The request page was not found.'
+  } else if (status_code === 405) {
+    return 'The requested method is not allowed.'
+  } else {
+    return 'An internal error occured. Please retry later.'
+  }
+}
+
+export const permissionList = (data) => {
+  if (data && data.length > 0) {
+    const keyMap = new Map(data.map((obj) => [obj.key, { ...obj }]))
+    const supersededKeys = new Set()
+    const newData = data.map((obj) => {
+      const newObj = { ...obj }
+      if (newObj.supersededBy && newObj.supersededBy.length > 0) {
+        newObj.supersededBy = newObj.supersededBy.map((key) => {
+          supersededKeys.add(key)
+          return keyMap.get(key)
+        })
+      }
+      return newObj
+    })
+    return newData.filter((obj) => !supersededKeys.has(obj.key))
+  }
+}
+
+export const isDefaultEnv = (name) => {
+  switch (name) {
+    case 'default':
+      return true
+      break
+    case 'development':
+      return true
+    case 'production':
+      return true
+    default:
+      return false
+  }
+}
+
+export const filterEnvList = (projects) => {
+  const defaultEnvs = [...projects]
+    .filter(
+      (item) =>
+        item.name === 'default' ||
+        item.name === 'development' ||
+        item.name === 'production'
+    )
+    .sort((a, b) => a.name.localeCompare(b.name))
+  const newEnvs = [...projects]
+    .filter(
+      (item) =>
+        item.name !== 'default' &&
+        item.name !== 'development' &&
+        item.name !== 'production'
+    )
+    .sort((a, b) => a.name.localeCompare(b.name))
+  return [...defaultEnvs, ...newEnvs]
+}
+
+export const envOrderList = (projects) => {
+  const defaultEnvs = [...projects]
+    .filter(
+      (item) =>
+        item.label === 'default' ||
+        item.label === 'development' ||
+        item.label === 'production'
+    )
+    .sort((a, b) => a.label.localeCompare(b.label))
+  const newEnvs = [...projects]
+    .filter(
+      (item) =>
+        item.label !== 'default' &&
+        item.label !== 'development' &&
+        item.label !== 'production'
+    )
+    .sort((a, b) => a.label.localeCompare(b.label))
+  return [...defaultEnvs, ...newEnvs]
 }

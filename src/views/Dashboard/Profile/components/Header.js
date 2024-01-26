@@ -42,8 +42,8 @@ const Header = ({
     }
   }
 
-  const userName = localStorage.getItem('username')
-  const userEmail = localStorage.getItem('email')
+  const userName = sessionStorage.getItem('username')
+  const userEmail = sessionStorage.getItem('email')
 
   const [uploadProfile] = useMutation(UploadProfileImage)
 
@@ -163,6 +163,8 @@ const Header = ({
                 width='80px'
                 height='80px'
                 cursor='pointer'
+                isDisabled={!org}
+                zIndex={-1}
               />
               <Box
                 position='absolute'
@@ -173,7 +175,7 @@ const Header = ({
                 bg='rgba(0,0,0,0.2)'
                 opacity='0'
                 transition='opacity 0.3s'
-                _hover={{ opacity: 1 }}
+                _hover={{ opacity: org ? 1 : 0 }}
                 onClick={onProfileClick}
                 borderRadius='full'
                 cursor='pointer'

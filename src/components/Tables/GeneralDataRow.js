@@ -47,9 +47,15 @@ const GeneralDataRow = ({ status, data, refetch }) => {
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
 
-  const { sbomState, dispatch } = useGlobalState()
+  const { userPermissions, sbomState, dispatch } = useGlobalState()
   const { licenseType, spdxLicenses, expLicense, customLicenses } = sbomState
   const { sbomDispatch } = dispatch
+
+  const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
+  const updateSboms = sboms?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'update_sbom' && permission.value === true
+  )
 
   const textColor = useColorModeValue('gray.700', 'white')
   const customerView = location.pathname.startsWith('/customer')
@@ -201,7 +207,6 @@ const GeneralDataRow = ({ status, data, refetch }) => {
       .finally(() => onSBMClose())
   }
 
-
   // ADD KEYBOARD SHORTCUT FOR TOGGLE SBOM DRAWER
   const handleSBMDown = (event) => {
     if (event.altKey && event.key === '2') {
@@ -282,7 +287,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                 {!customerView && (
                   <Button
                     size='sm'
-                    isDisabled={status === 'signed'}
+                    isDisabled={status === 'signed' || !updateSboms}
                     onClick={() => handleClick('tools')}
                   >
                     <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
@@ -295,7 +300,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
               <Td pl={0} fontWeight={'medium'}>
                 Created At
               </Td>
-              <Td pl={0}>{getFullDateAndTime(data.creationAt)}</Td>
+              <Td pl={0}>{getFullDateAndTime(data?.createdAt)}</Td>
               <Td pl={0}></Td>
             </Tr>
             {/* AUTHORS */}
@@ -336,7 +341,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                 {!customerView && (
                   <Button
                     size='sm'
-                    isDisabled={status === 'signed'}
+                    isDisabled={status === 'signed' || !updateSboms}
                     onClick={() => handleClick('author')}
                   >
                     <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
@@ -356,8 +361,8 @@ const GeneralDataRow = ({ status, data, refetch }) => {
               </Td>
               <Td pl={0}>
                 <HStack spacing={4}>
-                  {data.suppliers &&
-                    data.suppliers.map((item, index) => (
+                  {data?.suppliers?.length > 0 &&
+                    data?.suppliers.map((item, index) => (
                       <Tag
                         size={'md'}
                         key={index}
@@ -368,7 +373,14 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                           {item.contactName}
                           {item.contactEmail && ` (${item.contactEmail})`}
                           {item.url ? (
-                            <Link href={item.url} isExternal>
+                            <Link
+                              href={
+                                item?.url?.startsWith('http')
+                                  ? item.url
+                                  : `http://${item.url}`
+                              }
+                              isExternal
+                            >
                               {' '}
                               {item.name}
                             </Link>
@@ -389,7 +401,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                 {!customerView && (
                   <Button
                     size='sm'
-                    isDisabled={status === 'signed'}
+                    isDisabled={status === 'signed' || !updateSboms}
                     onClick={onSupOpen}
                   >
                     <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
@@ -456,7 +468,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                   <Button
                     size='sm'
                     ref={licenseBtn}
-                    isDisabled={status === 'signed'}
+                    isDisabled={status === 'signed' || !updateSboms}
                     onClick={onLicenseOpen}
                   >
                     <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />

@@ -1,11 +1,10 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import { AddIcon } from '@chakra-ui/icons'
+import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
 import {
   Button,
   Flex,
   HStack,
   IconButton,
-  Input,
   Menu,
   MenuButton,
   MenuItem,
@@ -32,41 +31,26 @@ import {
   UnorderedList,
   ListItem,
   Alert,
-  AlertIcon,
-  AlertTitle,
-  AlertDescription
+  AlertIcon
 } from '@chakra-ui/react'
+import { useMemo, useRef, useState } from 'react'
 import CustomLoader from 'components/CustomLoader'
 import VulnBadge from 'components/Misc/VulnBadge'
-import { SbomPartDelete } from 'graphQL/Mutation'
-import { SbomPartCreate } from 'graphQL/Mutation'
-import { GetProject } from 'graphQL/Queries'
-import { GetProjectData } from 'graphQL/Queries'
+import { SbomPartDelete, SbomPartCreate } from 'graphQL/Mutation'
+import { GetProjectGroups, GetProject } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useMemo, useRef, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV, FaFilter } from 'react-icons/fa'
 import { useLocation, Link, useParams } from 'react-router-dom'
-import { getFullDateAndTime } from 'utils'
-import { removeDuplicates } from 'utils'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
-
-const customStyles = {
-  headCells: {
-    style: {
-      fontWeight: 'bold',
-      color: '#2D3748',
-      fontSize: '12px',
-      letterSpacing: '1px'
-    }
-  },
-  subHeader: {
-    style: {
-      padding: 0,
-      margin: 0
-    }
-  }
-}
+import {
+  isDefaultEnv,
+  getFullDateAndTime,
+  normalizeSBOMVersion,
+  removeDuplicates,
+  envOrderList,
+  customStyles
+} from 'utils'
 
 const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const location = useLocation()
@@ -74,6 +58,11 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const queryParams = new URLSearchParams(location.search)
   const sbomId = queryParams.get('sbom')
   const prodId = queryParams.get('id')
+  const group = JSON.parse(sessionStorage.getItem('product'))
+
+  const capitalizeFirstLetter = (str) => {
+    return str.charAt(0).toUpperCase() + str.slice(1)
+  }
 
   const {
     setActiveProdTab,
@@ -83,6 +72,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
     prodVulnState,
     dispatch
   } = useGlobalState()
+  const { enabled, field, direction } = prodState
   const { prodVulnDispatch } = dispatch
 
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -93,16 +83,20 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   } = useDisclosure()
 
   const addBtn = useRef()
-
   const [selectedProd, setSelectedProd] = useState('')
   const [selectedVersion, setSelectedVersion] = useState('')
   const [searchInput, setSearchInput] = useState('')
   const [activeRow, setActiveRow] = useState(null)
-  const { data: allProducts } = useQuery(GetProjectData, {
+  const [selectedGroup, setSelectedGroup] = useState('')
+  const [envList, setEnvList] = useState([])
+  const [envName, setEnvName] = useState('')
+
+  const { data: allProjects } = useQuery(GetProjectGroups, {
     variables: {
-      first: 50,
-      field: prodState.field,
-      direction: prodState.direction
+      first: totalRows,
+      enabled: enabled === 'yes' ? true : enabled === 'no' ? false : undefined,
+      field: field,
+      direction: direction
     }
   })
 
@@ -127,6 +121,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
         }
       })
       .finally(() => {
+        setSelectedGroup('')
         setSelectedProd('')
         setSelectedVersion('')
         onClose()
@@ -152,21 +147,42 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       .finally(() => onDeleteClose())
   }
 
-  const productList =
-    allProducts &&
-    [...allProducts.projects.nodes]
-      .filter((item) => item.enabled === true)
-      .map((option) => ({
-        value: option.id,
-        label: option.name
-      }))
-
   const [getProduct] = useLazyQuery(GetProject)
+
+  const handleSelectGroup = (e) => {
+    const { value } = e.target
+    if (value !== '') {
+      setSelectedGroup(value)
+      setSelectedProd('')
+      setSelectedVersion('')
+      const activeGroup =
+        allProjects &&
+        allProjects?.organization?.projectGroups?.nodes.find(
+          (item) => item.id === value
+        )
+
+      const productList =
+        activeGroup &&
+        activeGroup.projects
+          .filter((item) => item.enabled === true)
+          .map((option) => ({
+            value: option.id,
+            label: option.name
+          }))
+
+      setEnvList(productList)
+    } else {
+      setSelectedGroup('')
+    }
+  }
 
   const handleSelectProduct = (e) => {
     const { value } = e.target
     setSelectedProd(value)
+    const env = e.target.options[e.target.selectedIndex].text
+    setEnvName(env)
     if (value === '') {
+      1
       setSelectedVersion('')
     } else {
       getProduct({
@@ -177,20 +193,24 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
     }
   }
 
-  const product =
-    allProducts &&
-    allProducts.projects.nodes.find((item) => item.id === selectedProd)
+  const activeGroup =
+    allProjects &&
+    allProjects?.organization?.projectGroups?.nodes.find(
+      (item) => item.id === selectedGroup
+    )
+
+  const product = activeGroup?.projects?.find(
+    (item) => item.id === selectedProd
+  )
 
   const existingVersions = []
 
   data?.map((item) =>
-    existingVersions.push(
-      item?.part?.primaryComponent
-        ? item?.part?.primaryComponent.id
-        : `Uploaded ${getFullDateAndTime(
-            item?.part?.primaryComponent?.creationAt
-          )}`
-    )
+    existingVersions.push({
+      group: item?.part?.project?.projectGroup?.name,
+      env: item?.part?.project?.name,
+      version: normalizeSBOMVersion(item?.part)
+    })
   )
 
   const sbomVersions = []
@@ -199,19 +219,17 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
 
   filteredDuplicated &&
     filteredDuplicated.map((project) => {
-      if (
-        !existingVersions?.includes(
-          project.primaryComponent
-            ? project.primaryComponent.id
-            : `Uploaded ${getFullDateAndTime(
-                project?.primaryComponent?.creationAt
-              )}`
-        )
-      ) {
+      const myProduct = {
+        group: product?.projectGroup?.name,
+        env: product?.name,
+        version: normalizeSBOMVersion(project)
+      }
+      const isVersionIncluded = existingVersions?.some(
+        (item) => JSON.stringify(item) === JSON.stringify(myProduct)
+      )
+      if (!isVersionIncluded) {
         sbomVersions.push({
-          label: project.primaryComponent
-            ? project.primaryComponent.version
-            : `Uploaded ${getFullDateAndTime(project.creationAt)}`,
+          label: normalizeSBOMVersion(project),
           value: project.id,
           creationAt: project.creationAt
         })
@@ -219,7 +237,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
     })
 
   const getComponents = () => {
-    localStorage.setItem('activeSbomTab', 2)
+    sessionStorage.setItem('activeSbomTab', 2)
     getCompData({
       variables: {
         projectId: prodId,
@@ -242,7 +260,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
     }).then((res) => {
       if (res.data) {
         prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
-        localStorage.setItem('activeSbomTab', 3)
+        sessionStorage.setItem('activeSbomTab', 3)
       }
     })
   }
@@ -264,11 +282,11 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
               fontSize={14}
               onClick={() => {
                 prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
-                localStorage.setItem('activeSbomTab', 0)
+                sessionStorage.setItem('activeSbomTab', 0)
                 setActiveProdTab(0)
               }}
             >
-              {part.project.name}
+              {part.project.projectGroup.name}
             </Text>
           </Link>
         )
@@ -281,13 +299,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       name: 'VERSION',
       selector: (row) => {
         const { part } = row
-        return (
-          <Text fontSize={14}>
-            {part.primaryComponent
-              ? part.primaryComponent.version
-              : `Uploaded at ${getFullDateAndTime(part.creationAt)}`}
-          </Text>
-        )
+        return <Text fontSize={14} my={2}>{normalizeSBOMVersion(part)}</Text>
       },
       width: '200px',
       wrap: true
@@ -462,6 +474,15 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   // CLEAR SERACH
   const handleClear = () => setSearchInput('')
 
+  const handleRefresh = async () => {
+    await refetch({
+      variables: {
+        projectId: prodId,
+        sbomId: sbomId
+      }
+    })
+  }
+
   // SUB HEADER
   const subHeaderComponent = useMemo(() => {
     return (
@@ -473,7 +494,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
         <Stack
           width={'100%'}
           direction={'row'}
-          spacing={4}
+          spacing={2}
           alignItems={'flex-start'}
           justifyContent={'flex-end'}
         >
@@ -520,6 +541,13 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
               fontSize={'sm'}
             />
           </Tooltip>
+          <Tooltip label='Refresh'>
+            <IconButton
+              onClick={handleRefresh}
+              colorScheme='blue'
+              icon={<RepeatIcon />}
+            ></IconButton>
+          </Tooltip>
         </Stack>
       </Flex>
     )
@@ -548,88 +576,85 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
             <ModalHeader>Add Parts</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              {productList ? (
-                <Stack spacing={4} direction={'column'} gap={2}>
-                  {/* Project */}
-                  <FormControl fontSize={'sm'}>
-                    <FormLabel htmlFor='product' fontSize='md' color='gray.600'>
-                      Project
-                    </FormLabel>
+              <Stack spacing={4} direction={'column'} gap={2}>
+                {/* PROJECTS */}
+                <FormControl fontSize={'sm'}>
+                  <FormLabel htmlFor='product' fontSize='md' color='gray.600'>
+                    Project
+                  </FormLabel>
+                  <Select
+                    name='groups'
+                    id='groups'
+                    value={selectedGroup}
+                    onChange={handleSelectGroup}
+                  >
+                    <option value={''}>-- Select --</option>
+                    {allProjects?.organization?.projectGroups?.nodes
+                      .filter((item) => item.id !== group?.groupId)
+                      .map((item, index) => (
+                        <option key={index} value={item.id}>
+                          {item.name}
+                        </option>
+                      ))}
+                  </Select>
+                </FormControl>
+                {/* ENVIRONMENTS */}
+                <FormControl fontSize={'sm'}>
+                  <FormLabel htmlFor='product' fontSize='md' color='gray.600'>
+                    Environment
+                  </FormLabel>
+                  <Select
+                    fontSize={'sm'}
+                    name='product'
+                    id='product'
+                    value={selectedProd}
+                    onChange={handleSelectProduct}
+                  >
+                    <option value={''}>-- Select --</option>
+                    {envList?.length > 0 &&
+                      envOrderList(envList).map((item, index) => (
+                        <option
+                          key={index}
+                          value={item.value}
+                          label={
+                            isDefaultEnv(item.label)
+                              ? capitalizeFirstLetter(item.label)
+                              : item.label
+                          }
+                        >
+                          {item.label}
+                        </option>
+                      ))}
+                  </Select>
+                </FormControl>
+                {/* Version */}
+                <FormControl fontSize={'sm'}>
+                  <FormLabel htmlFor='versions' fontSize='md' color='gray.600'>
+                    Version
+                  </FormLabel>
+                  {sbomVersions?.length === 0 ? (
+                    <Alert borderRadius={'md'} py={'8px'} status='info'>
+                      <AlertIcon />
+                      No version available
+                    </Alert>
+                  ) : (
                     <Select
                       fontSize={'sm'}
-                      name='product'
-                      id='product'
-                      value={selectedProd}
-                      onChange={handleSelectProduct}
+                      name='versions'
+                      id='versions'
+                      value={selectedVersion}
+                      onChange={(e) => setSelectedVersion(e.target.value)}
                     >
                       <option value={''}>-- Select --</option>
-                      {productList &&
-                        [...productList]
-                          .filter((item) => item.value !== prodId)
-                          .map((item, index) => (
-                            <option key={index} value={item.value}>
-                              {item.label}
-                            </option>
-                          ))}
+                      {sbomVersions.map((item, index) => (
+                        <option key={index} value={item.value}>
+                          {item.label}
+                        </option>
+                      ))}
                     </Select>
-                  </FormControl>
-                  {/* Version */}
-                  <FormControl fontSize={'sm'}>
-                    <FormLabel
-                      htmlFor='versions'
-                      fontSize='md'
-                      color='gray.600'
-                    >
-                      Version
-                    </FormLabel>
-                    {sbomVersions?.length === 0 ? (
-                      <Alert borderRadius={'md'} py={'8px'} status='info'>
-                        <AlertIcon />
-                        No version available
-                      </Alert>
-                    ) : (
-                      <Select
-                        fontSize={'sm'}
-                        name='versions'
-                        id='versions'
-                        value={selectedVersion}
-                        onChange={(e) => setSelectedVersion(e.target.value)}
-                      >
-                        <option value={''}>-- Select --</option>
-                        {sbomVersions.map((item, index) => (
-                          <option key={index} value={item.value}>
-                            {item.label}
-                          </option>
-                        ))}
-                      </Select>
-                    )}
-                  </FormControl>
-                </Stack>
-              ) : (
-                <Alert
-                  status='info'
-                  variant='subtle'
-                  flexDirection='column'
-                  alignItems='center'
-                  justifyContent='center'
-                  textAlign='center'
-                  height='150px'
-                  borderRadius={5}
-                >
-                  <AlertIcon boxSize='30px' mr={0} />
-                  <AlertTitle
-                    mt={4}
-                    mb={1}
-                    fontSize='lg'
-                    fontWeight={'semibold'}
-                  >
-                    There is no SBOM in this project
-                  </AlertTitle>
-                  <AlertDescription maxWidth='sm'>
-                    Please upload and try again
-                  </AlertDescription>
-                </Alert>
-              )}
+                  )}
+                </FormControl>
+              </Stack>
             </ModalBody>
 
             <ModalFooter>

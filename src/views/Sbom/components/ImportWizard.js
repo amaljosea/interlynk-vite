@@ -25,6 +25,8 @@ const ImportWizard = ({
     prodVulnState
   const { prodVulnDispatch } = dispatch
 
+  const group = JSON.parse(sessionStorage.getItem('product'))
+
   const params = useParams()
   const navigate = useNavigate()
 
@@ -34,6 +36,7 @@ const ImportWizard = ({
 
   const [productId, setProductId] = useState('')
   const [sbomId, setSbomId] = useState('')
+  const [selectedGroup, setSelectedGroup] = useState(group?.groupId || '')
   const [selectedProd, setSelectedProd] = useState('')
   const [selectedVersion, setSelectedVersion] = useState('')
   const [uniqVersions, setUniqVersions] = useState([])
@@ -98,6 +101,8 @@ const ImportWizard = ({
           setSbomId={setSbomId}
           currentSbomId={currentSbomId}
           currentProductId={currentProductId}
+          selectedGroup={selectedGroup}
+          setSelectedGroup={setSelectedGroup}
           selectedProd={selectedProd}
           setSelectedProd={setSelectedProd}
           selectedVersion={selectedVersion}
@@ -192,7 +197,7 @@ const ImportWizard = ({
                 variant='solid'
                 colorScheme='blue'
                 onClick={nextStep}
-                disabled={selectedVersion === ''}
+                disabled={selectedVersion === '' || selectedGroup === '' || selectedProd === ''}
               >
                 Next
               </Button>

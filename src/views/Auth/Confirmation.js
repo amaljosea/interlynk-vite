@@ -7,15 +7,16 @@ import {
   ModalBody,
   ModalContent,
   ModalOverlay,
-  Text
+  Text,
+  useToast
 } from '@chakra-ui/react'
-import { Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { Navigate, useLocation } from 'react-router-dom'
 import { WarningIcon } from '@chakra-ui/icons'
 import { useMutation } from '@apollo/client'
 import { UserEmailConfirmation } from 'graphQL/Mutation'
 
 const Confirmation = () => {
-  const navigate = useNavigate()
+  const toast = useToast()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const token = queryParams.get('confirmation_token')
@@ -30,11 +31,16 @@ const Confirmation = () => {
         token
       }
     }).then((res) => {
-      console.log(res.data)
-      if (res.data.userEmailConfirmation.errors.length > 0) {
-        setError(res.data.organizationUserInvitationAccept.errors)
+      if (res?.data?.userEmailConfirmation?.errors.length > 0) {
+        setError(res?.data?.userEmailConfirmation?.errors[0])
       } else {
         setError([])
+        toast({
+          description: 'Registration Successful 👍',
+          status: 'success',
+          position: 'top',
+          duration: 4000
+        })
       }
     })
   }, [])
