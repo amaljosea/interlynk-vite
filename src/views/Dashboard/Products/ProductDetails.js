@@ -98,9 +98,9 @@ const ProductDetails = () => {
     components,
     statues,
     kev,
-    epss,
+    epss
   } = prodVulnState
-  const { prodVulnDispatch,globalVulnDispatch } = dispatch
+  const { prodVulnDispatch, globalVulnDispatch } = dispatch
 
   const activeProd = localStorage.getItem('activeEnv')
   const [activeEnv, setActiveEnv] = useState(activeProd || '')
@@ -249,7 +249,7 @@ const ProductDetails = () => {
   const onProductDelete = async () => {
     await projectDelete({
       variables: {
-        id: activeGroup?.id
+        id: productId
       }
     })
       .then((res) => res.data && onDeleteClose())
