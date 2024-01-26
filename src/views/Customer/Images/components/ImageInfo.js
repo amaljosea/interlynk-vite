@@ -48,7 +48,7 @@ function ImageInfo() {
   const versionId = queryParams.get('v')
   const imageId = queryParams.get('id')
 
-  localStorage.setItem('selectedVersion', versionId)
+  sessionStorage.setItem('selectedVersion', versionId)
 
   const signedParams = Cookies.get(`signedParamId`)
 
@@ -175,7 +175,7 @@ function ImageInfo() {
     setFilteredVulItems([])
     const { value } = e.target
     setSelectedVersion(value)
-    localStorage.setItem('selectedVersion', versionId)
+    sessionStorage.setItem('selectedVersion', versionId)
     refetch({
       signedParams: signedParams,
       imageVersionId: value,
@@ -190,7 +190,7 @@ function ImageInfo() {
 
   const handleScanner = (e) => {
     const { value } = e.target
-    localStorage.setItem('cloudScanner', value)
+    sessionStorage.setItem('cloudScanner', value)
     setSelectedScanner(value)
   }
 
@@ -251,7 +251,7 @@ function ImageInfo() {
     setFilteredVulItems(filteredData)
   }, [selectedScanner])
 
-  const cldScanner = localStorage.getItem('cloudScanner')
+  const cldScanner = sessionStorage.getItem('cloudScanner')
 
   useEffect(() => {
     setSelectedScanner(cldScanner ? cldScanner : 'All')

@@ -54,10 +54,10 @@ export default function HeaderLinks(props) {
 
   const authToken = Cookies.get('authToken')
 
-  const name = localStorage.getItem('username')
-  const email = localStorage.getItem('email')
-  const userEmail = localStorage.getItem('userEmail')
-  const org = localStorage.getItem('organization')
+  const name = sessionStorage.getItem('username')
+  const email = sessionStorage.getItem('email')
+  const userEmail = sessionStorage.getItem('userEmail')
+  const org = sessionStorage.getItem('organization')
 
   useEffect(() => {
     if (location.pathname.startsWith('/vendor')) {
@@ -94,25 +94,25 @@ export default function HeaderLinks(props) {
         })
         .then((res) => {
           if (res.data) {
-            localStorage.removeItem('username')
-            localStorage.removeItem('email')
-            localStorage.removeItem('product')
+            sessionStorage.removeItem('username')
+            sessionStorage.removeItem('email')
+            sessionStorage.removeItem('product')
             Cookies.remove('authToken')
             navigate('/auth')
           }
         })
     } catch (error) {
       // Even in case of server error, make sure user experience moves to relogin
-      localStorage.removeItem('username')
-      localStorage.removeItem('email')
-      localStorage.removeItem('product')
+      sessionStorage.removeItem('username')
+      sessionStorage.removeItem('email')
+      sessionStorage.removeItem('product')
       Cookies.remove('authToken')
       navigate('/auth')
     }
   }
 
   const handleCustomerLogout = () => {
-    localStorage.removeItem('userEmail')
+    sessionStorage.removeItem('userEmail')
     Cookies.remove('userToken')
     window.location.href = `/login?signed_url_params=${paramId}`
   }

@@ -121,11 +121,11 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
       direction: direction
     }).then((res) => {
       if (res.data) {
-        localStorage.setItem(
+        sessionStorage.setItem(
           'currentSBOM',
           JSON.stringify({ version: version, id: id })
         )
-        localStorage.setItem('activeSbomTab', 3)
+        sessionStorage.setItem('activeSbomTab', 3)
         prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
       }
     })
@@ -142,14 +142,14 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
           <Link
             to={`/vendor/products/${data?.name}?id=${productId}&sbom=${id}`}
             onClick={() => {
-              localStorage.setItem(
+              sessionStorage.setItem(
                 'currentSBOM',
                 JSON.stringify({
                   version: primaryComponent ? primaryComponent?.version : `Uploaded at ${getFullDateAndTime(creationAt)}`,
                   id: id
                 })
               )
-              localStorage.setItem('activeSbomTab', 0)
+              sessionStorage.setItem('activeSbomTab', 0)
               setActiveSbomTab(0)
             }}
           >
@@ -177,14 +177,14 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
               width={16}
               colorScheme={'blue'}
               onClick={() => {
-                localStorage.setItem(
+                sessionStorage.setItem(
                   'currentSBOM',
                   JSON.stringify({
                     version: normalizeSBOMVersion(row),
                     id: id
                   })
                 )
-                localStorage.setItem('activeSbomTab', 2)
+                sessionStorage.setItem('activeSbomTab', 2)
               }}
             >
               <TagLabel mx={'auto'}>{stats?.compCount}</TagLabel>

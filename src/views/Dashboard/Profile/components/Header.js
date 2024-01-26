@@ -42,8 +42,8 @@ const Header = ({
     }
   }
 
-  const userName = localStorage.getItem('username')
-  const userEmail = localStorage.getItem('email')
+  const userName = sessionStorage.getItem('username')
+  const userEmail = sessionStorage.getItem('email')
 
   const [uploadProfile] = useMutation(UploadProfileImage)
 

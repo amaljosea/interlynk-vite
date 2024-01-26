@@ -49,7 +49,7 @@ const GeneralFeed = ({ orgInfo, refetch }) => {
       })
         .then((res) => {
           if (res.data.organizationUpdate.errors.length === 0) {
-            localStorage.setItem('organization', orgName)
+            sessionStorage.setItem('organization', orgName)
             setMessage('Saving....')
             setTimeout(() => {
               setMessage('Update')

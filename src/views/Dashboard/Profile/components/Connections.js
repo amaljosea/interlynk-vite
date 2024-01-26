@@ -45,7 +45,7 @@ const Connections = () => {
   }
 
   const handleActive = () => {
-    window.localStorage.setItem('DockerHub', !activeDockerHub)
+    window.sessionStorage.setItem('DockerHub', !activeDockerHub)
     setActiveDockerHub(!activeDockerHub)
   }
 

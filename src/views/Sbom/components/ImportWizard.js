@@ -25,7 +25,7 @@ const ImportWizard = ({
     prodVulnState
   const { prodVulnDispatch } = dispatch
 
-  const group = JSON.parse(localStorage.getItem('product'))
+  const group = JSON.parse(sessionStorage.getItem('product'))
 
   const params = useParams()
   const navigate = useNavigate()

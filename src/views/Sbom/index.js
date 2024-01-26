@@ -27,7 +27,7 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
 
   const [status, setStatus] = useState('created')
   const [totalComp, setTotalComp] = useState(0)
-  const group = JSON.parse(localStorage.getItem('product'))
+  const group = JSON.parse(sessionStorage.getItem('product'))
 
   // GET COMPONENT DATA
   const {
@@ -82,7 +82,7 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
     })
 
   const handleTabChange = (value) => {
-    localStorage.setItem('activeSbomTab', value)
+    sessionStorage.setItem('activeSbomTab', value)
     setActiveSbomTab(value)
   }
 

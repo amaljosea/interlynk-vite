@@ -66,7 +66,7 @@ function ProductRow(props) {
                 filteredData.length > 0 ? filteredData[0].id : sbomId[0].id
               }`}
               onClick={() => {
-                window.localStorage.setItem('product', name)
+                window.sessionStorage.setItem('product', name)
                 setSignedActiveTab(0)
               }}
             >

@@ -85,7 +85,7 @@ function ProductInfo() {
   useEffect(() => {
     if (sbomData) {
       // console.log(`SBOM Data`, sbomData)
-      window.localStorage.setItem('product', sbomData.sbom.project.name)
+      window.sessionStorage.setItem('product', sbomData.sbom.project.name)
     }
   }, [sbomData])
 
