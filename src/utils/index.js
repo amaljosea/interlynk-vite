@@ -599,8 +599,10 @@ export const customStyles = {
 }
 
 export const normalizeSBOMVersion = (sbom) => {
-  if (sbom?.primaryComponent) {
-    return sbom.primaryComponent.version
+  if (sbom?.primaryComponent?.version) {
+    return sbom?.primaryComponent?.version
+  } else if (sbom?.primaryComponent?.name) {
+    return sbom?.primaryComponent?.name
   } else {
     return `Uploaded ${getFullDateAndTime(sbom?.creationAt)}`
   }
