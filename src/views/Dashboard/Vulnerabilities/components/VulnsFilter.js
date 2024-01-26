@@ -23,8 +23,7 @@ const VulnsFilters = ({ refetch }) => {
   const params = useParams()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
-  const groupId = queryParams.get('id')
-
+  const activeEnv = localStorage.getItem('activeEnv')
 
   const { totalRows, globalVulnState, prodState, dispatch } = useGlobalState()
   const { severities, products, statues, kev, epss, minEpss, maxEpss } =
@@ -63,25 +62,25 @@ const VulnsFilters = ({ refetch }) => {
   const vulnData = { first: totalRows, last: undefined, after: undefined, before: undefined }
 
   const onFilterProduct = async (value) => {
-    await refetch({id: params?.name ? groupId : undefined, 
-    projectGroupIds: value?.includes('all') ? undefined : value, ...vulnData })
+    await refetch({id: params?.name ? activeEnv : undefined, 
+    projectactiveEnvs: value?.includes('all') ? undefined : value, ...vulnData })
     .then((res) => res?.data && globalVulnDispatch({ type: 'FILTER_PRODUCT', payload: value }))
   }
 
   const onFilterSeverity = async (value) => {
-    await refetch({id: params?.name ? groupId : undefined, 
+    await refetch({id: params?.name ? activeEnv : undefined, 
     severity: value?.includes('all') ? undefined: value, ...vulnData })
     .then((res) => res?.data && globalVulnDispatch({ type: 'FILTER_SEVERITY', payload: value }))
   }
 
   const onFilterStatus = async (value) => {
-    await refetch({id: params?.name ? groupId : undefined, 
+    await refetch({id: params?.name ? activeEnv : undefined, 
     status: value.includes('all') ? undefined: value, ...vulnData })
     .then((res) => res?.data && globalVulnDispatch({ type: 'FILTER_STATUS', payload: value }))
   }
 
   const onFilterKev = async (value) => {
-    await refetch({id: params?.name ? groupId : undefined, 
+    await refetch({id: params?.name ? activeEnv : undefined, 
     kev: value === 'yes' ? true : value === 'false' ? false : undefined, ...vulnData })
     .then((res) => res?.data && globalVulnDispatch({ type: 'FILTER_KEV', payload: value }))
   }
@@ -92,7 +91,7 @@ const VulnsFilters = ({ refetch }) => {
       min: parseFloat(epssRange[0]) / 10000,
       max: parseFloat(epssRange[1]) / 10000
     }
-    await refetch({id: params?.name ? groupId : undefined, 
+    await refetch({id: params?.name ? activeEnv : undefined, 
     epss: value === 'all' || value === '' ? undefined : range, ...vulnData })
     .then((res) => res?.data && globalVulnDispatch({ type: 'FILTER_EPSS', payload: value }))
   }
@@ -102,7 +101,7 @@ const VulnsFilters = ({ refetch }) => {
       min: parseFloat(minEpss) / 10000,
       max: parseFloat(maxEpss) / 10000
     }
-    await refetch({id: params?.name ? groupId : undefined, epss: range, ...vulnData })
+    await refetch({id: params?.name ? activeEnv : undefined, epss: range, ...vulnData })
     .then((res) => res?.data && globalVulnDispatch({ type: 'SET_EPSS', payload: `${minEpss}-${maxEpss}` }))
     .finally(() => onClose())
   }
