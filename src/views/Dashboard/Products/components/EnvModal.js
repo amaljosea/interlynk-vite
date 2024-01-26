@@ -14,7 +14,9 @@ import {
   Input,
   Alert,
   Text,
-  useToast
+  useToast,
+  AlertIcon,
+  AlertDescription
 } from '@chakra-ui/react'
 import { EnvCreate } from 'graphQL/Mutation'
 import { useState } from 'react'
@@ -62,10 +64,11 @@ const EnvModal = ({ groupId, isOpen, onClose, refetch }) => {
             <ModalBody>
               <Flex width={'100%'} direction={'column'} gap={4}>
                 {error !== '' && (
-                  <Alert status='error'>
-                    <Text fontSize={'sm'} pr={2}>
+                  <Alert status='error' borderRadius={4}>
+                    <AlertIcon />
+                    <AlertDescription fontSize={'sm'} pr={2}>
                       {error}
-                    </Text>
+                    </AlertDescription>
                   </Alert>
                 )}
                 <FormControl isRequired>
