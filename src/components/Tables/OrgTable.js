@@ -45,6 +45,7 @@ import Cookies from 'js-cookie'
 import { FaEllipsisVertical } from 'react-icons/fa6'
 import { useNavigate } from 'react-router-dom'
 import { useGlobalState } from 'hooks/useGlobalState'
+import {logoutUser} from "../../utils/authUtils";
 
 const OrgTable = ({ data, refetch, activeOrg, isAdmin }) => {
   const navigate = useNavigate()
@@ -93,26 +94,30 @@ const OrgTable = ({ data, refetch, activeOrg, isAdmin }) => {
   }
 
   const onLeaveOrg = async (id) => {
-    await quitOrg({
-      variables: {
-        id
-      }
-    }).then((res) => {
-      if (res?.data?.organizationUserLeave?.errors?.length > 0) {
-        setLeaveError(res?.data?.organizationUserLeave?.errors[0])
-      } else {
-        if (data?.length === 1) {
-          sessionStorage.removeItem('username')
-          sessionStorage.removeItem('email')
-          sessionStorage.removeItem('product')
-          Cookies.remove('authToken')
-          navigate('/auth')
-        } else {
-          navigate('/auth')
+    try {
+      const res = await quitOrg({
+        variables: {
+          id
         }
+      });
+
+      if (res?.data?.organizationUserLeave?.errors?.length > 0) {
+        setLeaveError(res?.data?.organizationUserLeave?.errors[0]);
+      } else {
+
+        // If the user is leaving the last organization
+        if (data?.length === 1) {
+          await logoutUser();
+        }
+
+        navigate('/auth');
       }
-    })
+    } catch (error) {
+      setLeaveError(error.message || 'An unexpected error occurred');
+    }
   }
+
+
 
   const onAccept = async (id) => {
     await acceptInvitation({
