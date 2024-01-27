@@ -57,8 +57,10 @@ const SupplierModal = ({
 
   const onFilterRefetch = () => {
     filterRefetch({
-      projectId: productId,
-      sbomId: sbomId
+      variables: {
+        projectId: productId,
+        sbomId: sbomId
+      }
     }).then(
       (res) =>
         res.data &&
