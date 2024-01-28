@@ -145,7 +145,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
               sessionStorage.setItem(
                 'currentSBOM',
                 JSON.stringify({
-                  version: primaryComponent ? primaryComponent?.version : `Uploaded at ${getFullDateAndTime(creationAt)}`,
+                  version: normalizeSBOMVersion(row),
                   id: id
                 })
               )
