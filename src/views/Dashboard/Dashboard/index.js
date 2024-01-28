@@ -89,7 +89,7 @@ export default function Dashboard() {
       <Flex
         flexDirection='column'
         pt={{ base: '120px', md: '74px' }}
-        gap={12}
+        gap={'24px'}
         pr={2}
         pl={5}
       >

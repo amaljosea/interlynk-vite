@@ -49,6 +49,7 @@ const SupplierModal = ({
   const [orgUrl, setOrgUrl] = useState('')
   const [isValidUrl, setIsValidUrl] = useState('')
   const [supName, setSupName] = useState('')
+  const [nameError, setNameError] = useState('')
   const [supEmail, setSupEmail] = useState('')
   const [emailError, setEmailError] = useState('')
 
@@ -56,8 +57,10 @@ const SupplierModal = ({
 
   const onFilterRefetch = () => {
     filterRefetch({
-      projectId: productId,
-      sbomId: sbomId
+      variables: {
+        projectId: productId,
+        sbomId: sbomId
+      }
     }).then(
       (res) =>
         res.data &&
@@ -66,6 +69,16 @@ const SupplierModal = ({
           payload: res.data.sbom.filters
         })
     )
+  }
+
+  const onSupplierChange = (e) => {
+    const { value } = e.target
+    setSupName(value)
+    if (value.length < 4 || value.length > 256) {
+      setNameError('Input must be between 4 and 256 characters')
+    } else {
+      setNameError('')
+    }
   }
 
   const [createSupplier] = useMutation(addComSupplier, {
@@ -181,7 +194,7 @@ const SupplierModal = ({
   }
 
   const isInvalid =
-    supName === '' ||
+    (supName !== '' && nameError !== '') ||
     (supEmail !== '' && !validateEmail(supEmail)) ||
     (orgUrl !== '' && !validateUrl(orgUrl))
 
@@ -250,13 +263,14 @@ const SupplierModal = ({
                 <FormErrorMessage>{isValidUrl}</FormErrorMessage>
               </FormControl>
               {/* SUPPLIER NAME */}
-              <FormControl isRequired>
+              <FormControl isRequired isInvalid={nameError}>
                 <FormLabel fontSize={'sm'}>Contact Name</FormLabel>
                 <Input
                   placeholder='Enter supplier name'
                   value={supName}
-                  onChange={(e) => setSupName(e.target.value)}
+                  onChange={onSupplierChange}
                 />
+                <FormErrorMessage>{nameError}</FormErrorMessage>
               </FormControl>
               {/* SUPPLIER EMAIL */}
               <FormControl
