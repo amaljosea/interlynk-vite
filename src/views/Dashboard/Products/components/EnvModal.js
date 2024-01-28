@@ -36,8 +36,9 @@ const EnvModal = ({ groupId, isOpen, onClose, refetch }) => {
         enabled: true
       }
     }).then((res) => {
-      if (res?.data?.projectCreate?.errors?.length > 0) {
-        setError(res?.data?.projectCreate?.errors[0])
+      const errors = res?.data?.projectCreate?.errors
+      if (errors?.length > 0) {
+        setError(errorMapping[errors[0]] || errors[0])
       } else {
         refetch({ id: groupId })
         toast({
@@ -50,6 +51,10 @@ const EnvModal = ({ groupId, isOpen, onClose, refetch }) => {
       }
     })
   }
+
+  const errorMapping = {
+    'Project not created': 'An environment with the same name already exists.',
+  };
 
   const isInvalid = productName === '' || error !== ''
 

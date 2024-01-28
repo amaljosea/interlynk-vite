@@ -480,18 +480,27 @@ const VulnTable = ({
     await onVulnScan({
       variables: { id: sbomId }
     }).then((res) => {
-      toast({
-        description: 'Vulnerability re-scan started',
-        position: 'top',
-        status: 'success',
-        duration: 5000
-      })
-      if (res.data) {
-        sbomRefetch({
-          projectId: productId,
-          sbomId: sbomId
+      if (sbomData?.vulnRunStatus === 'IN_PROGRESS') {
+        toast({
+          description: 'A scan is in-progress',
+          position: 'top',
+          status: 'info',
+          duration: 5000
         })
-        prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
+      } else {
+        if (res.data) {
+          toast({
+            description: 'Vulnerability re-scan started',
+            position: 'top',
+            status: 'success',
+            duration: 5000
+          })
+          sbomRefetch({
+            projectId: productId,
+            sbomId: sbomId
+          })
+          prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
+        }
       }
     })
   }
@@ -542,13 +551,9 @@ const VulnTable = ({
         </Flex>
 
         <Stack direction='row' alignItems={'center'} width={'fit-content'}>
-          {sbomData?.vulnRunStatus === 'IN_PROGRESS' && (
-            <Text>Re-scan in progress</Text>
-          )}
           {/* SCAN VULN */}
           <Tooltip label={'Scan Vulnerabilities'}>
             <IconButton
-              isDisabled={sbomData?.vulnRunStatus === 'IN_PROGRESS'}
               colorScheme='blue'
               onClick={handleScan}
               icon={<FaBug />}

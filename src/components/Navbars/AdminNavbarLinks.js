@@ -37,6 +37,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { GetOrg } from 'graphQL/Queries'
 import { useQuery } from '@apollo/client'
 import { FaUser } from 'react-icons/fa6'
+import {logoutUser} from "../../utils/authUtils";
 
 export default function HeaderLinks(props) {
   const location = useLocation()
@@ -69,8 +70,7 @@ export default function HeaderLinks(props) {
 
   useEffect(() => {
     if (!name || !email || error) {
-      Cookies.remove('authToken')
-      navigate('/auth')
+      logoutUser().then(r => navigate('/auth'))
     }
   }, [error])
 
@@ -81,40 +81,9 @@ export default function HeaderLinks(props) {
     navbarIcon = 'white'
   }
 
-  const paramId = Cookies.get('signedParamId')
-  const logoutURL = process.env.REACT_APP_VENDOR_LOGOUT_URL
-
   const handleLogout = async () => {
-    try {
-      await axios
-        .delete(`${logoutURL}`, {
-          headers: {
-            Authorization: authToken
-          }
-        })
-        .then((res) => {
-          if (res.data) {
-            sessionStorage.removeItem('username')
-            sessionStorage.removeItem('email')
-            sessionStorage.removeItem('product')
-            Cookies.remove('authToken')
-            navigate('/auth')
-          }
-        })
-    } catch (error) {
-      // Even in case of server error, make sure user experience moves to relogin
-      sessionStorage.removeItem('username')
-      sessionStorage.removeItem('email')
-      sessionStorage.removeItem('product')
-      Cookies.remove('authToken')
-      navigate('/auth')
-    }
-  }
-
-  const handleCustomerLogout = () => {
-    sessionStorage.removeItem('userEmail')
-    Cookies.remove('userToken')
-    window.location.href = `/login?signed_url_params=${paramId}`
+    await logoutUser();
+    navigate('/auth');
   }
 
   const shortcuts = [

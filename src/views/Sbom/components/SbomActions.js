@@ -79,7 +79,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
-  const product = JSON.parse(localStorage.getItem('product'))
+  const product = JSON.parse(sessionStorage.getItem('product'))
 
   const [status, setStatus] = useState('created')
   const [signedData, setSignedData] = useState(null)

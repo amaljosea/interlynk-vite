@@ -20,6 +20,7 @@ import Cookies from 'js-cookie'
 import { createUploadLink } from 'apollo-upload-client'
 import { getActiveNavbar, getActiveRoute } from '../utils'
 import { jwtDecode } from 'jwt-decode'
+import {logoutUser} from "../utils/authUtils";
 
 export default function Dashboard(props) {
   const authToken = Cookies.get('authToken')
@@ -89,13 +90,11 @@ export default function Dashboard(props) {
       try {
         const expired = isTokenExpired(authToken)
         if (expired === true) {
-          Cookies.remove('authToken')
-          navigate('/auth')
+          logoutUser().then(r => navigate('/auth'))
         }
       } catch (err) {
-        console.error('Invalid Token Error:', err)
-        Cookies.remove('authToken')
-        navigate('/auth')
+        console.error('Invalid Token')
+        logoutUser().then(r => navigate('/auth'))
       }
     }
   }, [])
