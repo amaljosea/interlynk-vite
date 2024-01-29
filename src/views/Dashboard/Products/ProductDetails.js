@@ -89,10 +89,18 @@ const ProductDetails = () => {
     prodLogState,
     prodVulnState,
     prodRulesState,
+    compVulnState,
     dispatch,
     userPermissions
   } = useGlobalState()
   const { field, direction, searchInput, type, user, object } = prodLogState
+  const {
+    searchInput: compVulnSearch,
+    envs,
+    statuses,
+    versions: sbomVersions,
+    products
+  } = compVulnState
   const {
     searchInput: vulnSearch,
     severities,
@@ -311,7 +319,14 @@ const ProductDetails = () => {
   useEffect(() => {
     if (vulnId) {
       getVulnData({
-        variables: { id: vulnId, first: totalRows }
+        variables: {
+          id: vulnId,
+          first: totalRows,
+          search: compVulnSearch !== '' ? compVulnSearch : undefined,
+          projectNames: envs?.length === 0 ? undefined : envs,
+          versions: sbomVersions?.length === 0 ? undefined : sbomVersions,
+          statuses: statuses?.length === 0 ? undefined : statuses
+        }
       })
     }
   }, [vulnId])
@@ -346,7 +361,13 @@ const ProductDetails = () => {
   }
 
   if (vulnId) {
-    return <VulnInfo data={vulnInfo?.vuln} refetch={getVulnData} />
+    return (
+      <VulnInfo
+        data={vulnInfo?.vuln}
+        componentVulns={vulnInfo?.componentVulns}
+        refetch={getVulnData}
+      />
+    )
   }
 
   return (

@@ -1,6 +1,7 @@
 import React, { useState, createContext, useContext, useReducer } from 'react'
 import {
   globalVulnReducer,
+  compVulnReducer,
   prodRulesReducer,
   prodCheckReducer,
   prodCompReducer,
@@ -38,8 +39,8 @@ const GlobalStateProvider = ({ children }) => {
   const [globalVulnState, globalVulnDispatch] = useReducer(globalVulnReducer, {
     field: 'GLOBAL_VULNS_UPDATED_AT',
     direction: 'DESC',
-    after:'',
-    before:'',
+    after: '',
+    before: '',
     searchInput: '',
     severities: [],
     products: [],
@@ -48,6 +49,17 @@ const GlobalStateProvider = ({ children }) => {
     epss: '',
     minEpss: 0,
     maxEpss: 0,
+    pageIndex: 1
+  })
+  // SINGLE VULNERABILITIES
+  const [compVulnState, compVulnDispatch] = useReducer(compVulnReducer, {
+    after: '',
+    before: '',
+    searchInput: '',
+    envs: [],
+    versions: [],
+    products: [],
+    statuses: [],
     pageIndex: 1
   })
   const [prodRulesState, prodRulesDispatch] = useReducer(prodRulesReducer, {
@@ -165,6 +177,7 @@ const GlobalStateProvider = ({ children }) => {
         userName,
         setUserName,
         globalVulnState,
+        compVulnState,
         prodState,
         prodLogState,
         prodCompState,
@@ -175,6 +188,7 @@ const GlobalStateProvider = ({ children }) => {
         sbomState,
         dispatch: {
           globalVulnDispatch,
+          compVulnDispatch,
           prodDispatch,
           prodLogDispatch,
           prodCompDispatch,
