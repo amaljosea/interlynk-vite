@@ -20,6 +20,7 @@ import {
 import { CreateProjectGroup, UpdateProjectGroup } from 'graphQL/Mutation'
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
+import {errorMapping} from "utils/errorUtils";
 
 const ProductModal = ({
   id,
@@ -98,7 +99,7 @@ const ProductModal = ({
                 {error !== '' && (
                   <Alert status='error' borderRadius={4}>
                     <AlertIcon />
-                    <Text fontSize={'sm'}>{error}</Text>
+                    <Text fontSize={'sm'}>{errorMapping[error] || error}</Text>
                   </Alert>
                 )}
                 <FormControl isRequired>
