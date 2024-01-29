@@ -1389,6 +1389,58 @@ export const updateCompVulnVex = gql`
   }
 `
 
+// UPDATE GLOBAL VULN STATUS
+export const UpdateGlobalVex = gql`
+  mutation UpdateGlobalVex(
+    $vulnId: Uuid!
+    $vexStatusId: Uuid!
+    $vexJustificationId: Uuid
+    $cdxResponseId: Uuid
+    $note: String
+    $impact: String
+    $detail: String
+    $action: String
+    $fixedIn: String
+    $sbomId: Uuid
+    $projectGroupId: Uuid
+    $projectId: Uuid
+  ) {
+    vulnVexUpdate(
+      input: {
+        vulnId: $vulnId
+        vexStatusId: $vexStatusId
+        vexJustificationId: $vexJustificationId
+        cdxResponseId: $cdxResponseId
+        note: $note
+        impact: $impact
+        detail: $detail
+        action: $action
+        fixedIn: $fixedIn
+        sbomId: $sbomId
+        projectGroupId: $projectGroupId
+        projectId: $projectId
+      }
+    ) {
+      errors
+      componentVulns {
+        actionStmt
+        cdxResponseId
+        componentId
+        detail
+        fixedIn
+        id
+        impact
+        note
+        vexJustificationId
+        vexStatusId
+      }
+      vuln {
+        vulnId
+      }
+    }
+  }
+`
+
 // CREATE COMPONENT RELATION
 export const CreateCompRelation = gql`
   mutation CreateCompRelation($from: Uuid!, $to: Uuid!, $relType: String!) {
