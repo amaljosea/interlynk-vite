@@ -28,9 +28,10 @@ const ProductsOverview = ({ title, data }) => {
     const { projectGroup, name } = project
 
     const product = {
+      version: normalizeSBOMVersion(prod),
+      groupId: projectGroup?.id,
       id: projectId,
       name: name,
-      version: normalizeSBOMVersion(prod),
       sbomId: id
     }
 
