@@ -173,6 +173,9 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       setEnvList(productList)
     } else {
       setSelectedGroup('')
+      setSelectedProd('')
+      setSelectedVersion('')
+      setEnvList('')
     }
   }
 
