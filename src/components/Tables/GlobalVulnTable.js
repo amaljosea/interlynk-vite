@@ -10,7 +10,8 @@ import {
   Button,
   Box,
   Select,
-  IconButton
+  IconButton,
+  Divider
 } from '@chakra-ui/react'
 import { sevColor, timeSince, getFullDateAndTime, customStyles } from 'utils'
 import { ChevronDownIcon, ChevronUpIcon, RepeatIcon } from '@chakra-ui/icons'
@@ -216,23 +217,23 @@ const GlobalVulnTable = ({ data, refetch }) => {
 
         return (
           <Stack fontWeight={'medium'} direction={'row'}>
-            <VulnBadge color='red' label='Affected'>
-              {affectedCount || 0}
-            </VulnBadge>
-            <VulnBadge color='yellow' label='False Positive'>
-              {falsePositiveCount || 0}
-            </VulnBadge>
-            <VulnBadge color='orange' label='Fixed'>
-              {fixedCount || 0}
+            <VulnBadge color='teal' label='Unspecified'>
+              {unspecifiedCount || 0}
             </VulnBadge>
             <VulnBadge color='blue' label='In Triage'>
               {inTriageCount || 0}
             </VulnBadge>
+            <VulnBadge color='red' label='Affected'>
+              {affectedCount || 0}
+            </VulnBadge>
+            <VulnBadge color='orange' label='Fixed'>
+              {fixedCount || 0}
+            </VulnBadge>
             <VulnBadge color='green' label='Not Affected'>
               {notAffectedCount || 0}
             </VulnBadge>
-            <VulnBadge color='teal' label='Unspecified'>
-              {unspecifiedCount || 0}
+            <VulnBadge color='yellow' label='False Positive'>
+              {falsePositiveCount || 0}
             </VulnBadge>
           </Stack>
         )
