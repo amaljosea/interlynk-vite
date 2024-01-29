@@ -1,5 +1,5 @@
 // Chakra imports
-import {AddIcon, RepeatIcon, ViewIcon} from '@chakra-ui/icons'
+import { AddIcon, RepeatIcon, ViewIcon } from '@chakra-ui/icons'
 import {
   Flex,
   Text,
@@ -50,10 +50,9 @@ import RowLimit from 'views/Sbom/components/RowLimit'
 import { useGlobalState } from 'hooks/useGlobalState'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import { GetCompFilterData } from 'graphQL/Queries'
-import Pagination from "../Pagination";
+import Pagination from '../Pagination'
 
 const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
-
   const paginationSizes = [25, 50, 100]
 
   // GET COMPONENT FILTER HEADS
@@ -970,31 +969,32 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
           )}
         </Stack>
         <Stack
-            width={'100%'}
-            direction={'row'}
-            spacing={2}
-            justifyContent={'flex-end'}>
+          width={'100%'}
+          direction={'row'}
+          spacing={2}
+          justifyContent={'flex-end'}
+        >
           {/* CREATE COMPONENT */}
           {!customerView && (
             <Tooltip label='Add Component'>
               <IconButton
-                  ref={compBtn}
-                  onClick={onCreateComponent}
-                  icon={<AddIcon />}
-                  colorScheme='blue'
-                  variant='solid'
-                  fontWeight='normal'
-                  fontSize={'sm'}
-                  isDisabled={lifecycle === 'signed' || !updateComponent}
+                ref={compBtn}
+                onClick={onCreateComponent}
+                icon={<AddIcon />}
+                colorScheme='blue'
+                variant='solid'
+                fontWeight='normal'
+                fontSize={'sm'}
+                isDisabled={lifecycle === 'signed' || !updateComponent}
               />
             </Tooltip>
           )}
           <Tooltip label='Refresh'>
             <IconButton
-                onClick={fetchCompData}
-                colorScheme='blue'
-                icon={<RepeatIcon />}>
-            </IconButton>
+              onClick={fetchCompData}
+              colorScheme='blue'
+              icon={<RepeatIcon />}
+            ></IconButton>
           </Tooltip>
         </Stack>
       </Flex>
@@ -1140,17 +1140,17 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
 
       {/* PAGINATION */}
       {data && (
-          <Pagination
-              paginationSizes={paginationSizes}
-              pageIndex={pageIndex}
-              totalRows={totalRows}
-              totalCount={data.totalCount}
-              onPreviousPage={handlePreviousPage}
-              onNextPage={handleNextPage}
-              onSetRow={handleSetRow}
-              hasNextPage={data.pageInfo.hasNextPage}
-              hasPreviousPage={data.pageInfo.hasPreviousPage}
-          />
+        <Pagination
+          paginationSizes={paginationSizes}
+          pageIndex={pageIndex}
+          totalRows={totalRows}
+          totalCount={data.totalCount}
+          onPreviousPage={handlePreviousPage}
+          onNextPage={handleNextPage}
+          onSetRow={handleSetRow}
+          hasNextPage={data.pageInfo.hasNextPage}
+          hasPreviousPage={data.pageInfo.hasPreviousPage}
+        />
       )}
 
       {/* ACTIONS */}
