@@ -112,11 +112,11 @@ const LoginForm = () => {
             <AlertDescription>
               {error}
               {error ===
-                'You need to verify your email address before continuing.' && (
+                'You have to confirm your email address before continuing.' && (
                 <p>
-                  <Link style={{ cursor: 'pointer', color: 'blue.500'}} onClick={onResendEmail}>
+                  <strong style={{cursor: 'pointer'}} onClick={onResendEmail}>
                     Click here{' '}
-                  </Link>
+                  </strong>
                   to resend the invitation.
                 </p>
               )}
