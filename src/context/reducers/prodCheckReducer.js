@@ -16,7 +16,8 @@ const prodCheckReducer = (state, action) => {
     case 'CHANGE_SEARCH_INPUT':
       return {
         ...state,
-        searchInput: payload
+        searchInput: payload,
+        pageIndex: 1
       }
     case 'FETCH_DATA_SUCCESS':
       return {
@@ -52,7 +53,8 @@ const prodCheckReducer = (state, action) => {
     case 'ADD_FILTER_HEADS':
       return {
         ...state,
-        filters: payload
+        filters: payload,
+        pageIndex: 1
       }
     case 'FILTER_RULE':
       return {
