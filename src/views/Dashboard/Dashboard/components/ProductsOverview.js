@@ -24,7 +24,6 @@ const ProductsOverview = ({ title, data }) => {
   const handleClick = (prod) => {
     const { project, id, projectId } = prod
     const { projectGroup, name } = project
-
     const product = {
       version: normalizeSBOMVersion(prod),
       groupId: projectGroup?.id,
@@ -32,7 +31,6 @@ const ProductsOverview = ({ title, data }) => {
       name: name,
       sbomId: id
     }
-
     sessionStorage.setItem('activeEnv', projectGroup?.defaultProject?.id)
     sessionStorage.setItem('product', JSON.stringify(product))
     sessionStorage.setItem('activeProdTab', 0)
@@ -54,6 +52,17 @@ const ProductsOverview = ({ title, data }) => {
   }
 
   const onVersionClick = (item) => {
+    const { project, id } = item
+    const { projectGroup, name } = project
+    const product = {
+      version: normalizeSBOMVersion(item),
+      groupId: projectGroup?.id,
+      id: projectGroup?.id,
+      name: name,
+      sbomId: id
+    }
+    sessionStorage.setItem('activeEnv', projectGroup?.defaultProject?.id)
+    sessionStorage.setItem('product', JSON.stringify(product))
     sessionStorage.setItem(
       'currentSBOM',
       JSON.stringify({
