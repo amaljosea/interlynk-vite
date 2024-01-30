@@ -1,4 +1,4 @@
-import {DeleteIcon, RepeatIcon, SettingsIcon} from '@chakra-ui/icons'
+import { DeleteIcon, RepeatIcon, SettingsIcon } from '@chakra-ui/icons'
 import {
   Flex,
   HStack,
@@ -14,20 +14,20 @@ import {
   ModalBody,
   ModalFooter,
   Button,
-  useDisclosure, Stack, Tooltip
+  useDisclosure,
+  Stack,
+  Tooltip
 } from '@chakra-ui/react'
 import CardBody from 'components/Card/CardBody'
 import CustomLoader from 'components/CustomLoader'
 import DataTable from 'react-data-table-component'
 import UpdateRule from './components/UpdateRule'
-import {useMemo, useState} from 'react'
+import { useMemo, useState } from 'react'
 import { customStyles } from 'utils'
 import { DeleteAutomation, UpdateAutomation } from 'graphQL/Mutation'
 import { useMutation } from '@apollo/client'
-import { useLocation } from 'react-router-dom'
 import { timeSince } from 'utils'
 import { useGlobalState } from 'hooks/useGlobalState'
-import {FaScrewdriverWrench} from "react-icons/fa6";
 
 const Automation = ({ data, refetch, productId }) => {
   const { totalRows, userPermissions, prodRulesState, dispatch } =
@@ -50,18 +50,8 @@ const Automation = ({ data, refetch, productId }) => {
 
   const [activeRow, setActiveRow] = useState(null)
 
-  const [updateAutoCheck] = useMutation(UpdateAutomation, {
-    onCompleted: () =>
-      refetch({
-        variables: { id: productId, first: totalRows, field, direction }
-      })
-  })
-  const [deleteAutoCheck] = useMutation(DeleteAutomation, {
-    onCompleted: () =>
-      refetch({
-        variables: { id: productId, first: totalRows, field, direction }
-      })
-  })
+  const [updateAutoCheck] = useMutation(UpdateAutomation)
+  const [deleteAutoCheck] = useMutation(DeleteAutomation)
 
   const handleRemove = async () => {
     await deleteAutoCheck({
@@ -69,7 +59,15 @@ const Automation = ({ data, refetch, productId }) => {
         autoCheckId: activeRow.id,
         projectId: productId
       }
-    }).then((res) => res.data && onDeleteClose())
+    })
+      .then(
+        (res) =>
+          res.data &&
+          refetch({
+            variables: { id: productId, first: totalRows, field, direction }
+          })
+      )
+      .finally(() => onDeleteClose())
   }
 
   const handleStatus = async (row) => {
@@ -80,7 +78,13 @@ const Automation = ({ data, refetch, productId }) => {
         condition: row.condition,
         enabled: row.enabled ? false : true
       }
-    })
+    }).then(
+      (res) =>
+        res?.data &&
+        refetch({
+          variables: { id: productId, first: totalRows, field, direction }
+        })
+    )
   }
 
   // COLUMNS
@@ -232,17 +236,17 @@ const Automation = ({ data, refetch, productId }) => {
 
   const subHeaderComponent = useMemo(() => {
     return (
-        <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
-          <Stack direction={'row'} spacing={2} alignItems={'center'}>
-            <Tooltip label='Refresh'>
-              <IconButton
-                  onClick={handleRefresh}
-                  colorScheme='blue'
-                  icon={<RepeatIcon />}
-              ></IconButton>
-            </Tooltip>
-          </Stack>
-        </Flex>
+      <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
+        <Stack direction={'row'} spacing={2} alignItems={'center'}>
+          <Tooltip label='Refresh'>
+            <IconButton
+              onClick={handleRefresh}
+              colorScheme='blue'
+              icon={<RepeatIcon />}
+            ></IconButton>
+          </Tooltip>
+        </Stack>
+      </Flex>
     )
   }, [handleRefresh])
 
@@ -252,10 +256,10 @@ const Automation = ({ data, refetch, productId }) => {
         <Flex flexDir={'column'} width={'100%'}>
           <DataTable
             columns={columns}
-            data={data && data.nodes}
+            data={data?.nodes || []}
             customStyles={customStyles}
             onSort={handleSort}
-            progressPending={data && data.nodes ? false : true}
+            progressPending={data ? false : true}
             progressComponent={<CustomLoader />}
             responsive={true}
             persistTableHead

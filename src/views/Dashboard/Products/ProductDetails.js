@@ -589,7 +589,7 @@ const ProductDetails = () => {
                     </Text>
                   )}
                   <Automation
-                    data={rules?.project.autoChecks}
+                    data={rules?.project?.autoChecks}
                     refetch={getRules}
                     productId={activeEnv}
                   />
