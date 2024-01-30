@@ -68,11 +68,15 @@ const VexModal = ({
     const status = e.target.options[e.target.selectedIndex].text
     setStatusTitle(value)
     setStatusName(status)
-    if (status === 'Not Affected' || status === 'Affected') {
-      setJustification('')
-      setJustifyName('')
-      setImpactData('')
-    }
+    setJustification('')
+    setJustifyName('')
+    setSelectedTag('')
+    setActionStatement('')
+    setResponse('')
+    setResponseTitle('')
+    setDetails('')
+    setNotes('')
+    setImpactData('')
   }
 
   const handleResponseChange = (e) => {
@@ -124,6 +128,17 @@ const VexModal = ({
           }
         })
           .then((res) => {
+            setStatusTitle('')
+            setStatusName('')
+            setJustification('')
+            setJustifyName('')
+            setSelectedTag('')
+            setActionStatement('')
+            setResponse('')
+            setResponseTitle('')
+            setDetails('')
+            setNotes('')
+            setImpactData('')
             if (res.data) {
               refetch({ variables: { id: vulnId, first: totalRows } })
               setToggleClear(true)
