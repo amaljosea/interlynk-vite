@@ -8,7 +8,7 @@ import {
   Tooltip,
   IconButton
 } from '@chakra-ui/react'
-import React, { useMemo, useState } from 'react'
+import React, {useEffect, useMemo, useState} from 'react'
 import DataTable from 'react-data-table-component'
 import { RepeatIcon } from '@chakra-ui/icons'
 import { useLocation } from 'react-router-dom'
@@ -40,7 +40,33 @@ const setColor = (type) => {
 }
 
 const SbomChangelogTable = ({ data, refetch }) => {
+
+
+  //This part is needed for the pagination to work. (Modify with caution)
   const paginationSizes = [25, 50, 100]
+  
+  const [isPrevActive, setIsPrevActive] = useState(false)
+  const [isNextActive, setIsNextActive] = useState(false)
+
+  useEffect(() => {
+    if (data) {
+      setIsPrevActive(data?.pageInfo?.hasPreviousPage)
+      setIsNextActive(data?.pageInfo?.hasNextPage)
+    }
+  },[data])
+
+  const setPaginationControl = (data) => {
+    setIsPrevActive(data.sbom?.activityLogs?.pageInfo?.hasPreviousPage)
+    setIsNextActive(data.sbom?.activityLogs?.pageInfo?.hasNextPage)
+  }
+
+  const disablePaginationControl = () => {
+    setIsPrevActive(false)
+    setIsNextActive(false)
+  }
+
+  //end
+
 
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -291,10 +317,14 @@ const SbomChangelogTable = ({ data, refetch }) => {
   ]
 
   const handlePreviousPage = async () => {
+    disablePaginationControl()
+
     await refetch({
       projectId: productId,
       sbomId: sbomId,
+      first: undefined,
       last: totalRows,
+      after: undefined,
       before: data.pageInfo.startCursor,
       field: field,
       direction: direction
@@ -309,11 +339,15 @@ const SbomChangelogTable = ({ data, refetch }) => {
   }
 
   const handleNextPage = async () => {
+    disablePaginationControl()
+
     refetch({
       projectId: productId,
       sbomId: sbomId,
       first: totalRows,
+      last: undefined,
       after: data.pageInfo.endCursor,
+      before: undefined,
       field: field,
       direction: direction
     }).then(
@@ -328,6 +362,8 @@ const SbomChangelogTable = ({ data, refetch }) => {
 
   // CLEAR SERACH
   const handleClear = async () => {
+    disablePaginationControl()
+
     setLogSearch('')
     await refetch({
       projectId: productId,
@@ -335,16 +371,21 @@ const SbomChangelogTable = ({ data, refetch }) => {
       search: undefined,
       first: totalRows
     }).then(
-      (res) =>
-        res.data &&
-        sbomLogDispatch({
-          type: 'CLEAR_SEARCH_INPUT'
-        })
+      (res) => {
+        if(res.data) {
+          setPaginationControl(res.data)
+
+          sbomLogDispatch({
+            type: 'CLEAR_SEARCH_INPUT'
+          })
+        }
+      }
     )
   }
 
   // ON SEARCH INPUT CHANGE
   const onSearchInputChange = (e) => {
+
     const { value } = e.target
     if (value === '') {
       handleClear()
@@ -355,23 +396,33 @@ const SbomChangelogTable = ({ data, refetch }) => {
 
   // SEARCH COMPONENT
   const handleSearch = async (event) => {
+    disablePaginationControl()
+
     const { value } = event.target
     if (event.key === 'Enter' && logSearch !== '') {
       await refetch({
         projectId: productId,
         sbomId: sbomId,
         search: value,
-        first: totalRows
+        first: totalRows,
+        last: undefined,
+        after: undefined,
+        before: undefined,
       }).then(
-        (res) =>
-          res.data &&
-          sbomLogDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
-      )
+          (res) => {
+            if (res.data) {
+              setPaginationControl(res.data)
+
+              sbomLogDispatch({type: 'CHANGE_SEARCH_INPUT', payload: value})
+            }
+          })
     }
   }
 
   // SET ROW LENGTH
   const handleSetRow = async (e) => {
+    disablePaginationControl()
+
     setTotalRows(Number(e.target.value))
     await refetch({
       projectId: productId,
@@ -383,11 +434,17 @@ const SbomChangelogTable = ({ data, refetch }) => {
       field: field,
       direction: direction
     }).then(
-      (res) => res.data && sbomLogDispatch({ type: 'FETCH_DATA_SUCCESS' })
-    )
+      (res) => {
+        if (res.data){
+          setPaginationControl(res.data)
+          sbomLogDispatch({ type: 'FETCH_DATA_SUCCESS' })
+        }
+      })
   }
 
   const handleSort = async (column, sortDirection) => {
+    disablePaginationControl()
+
     await refetch({
       projectId: productId,
       sbomId: sbomId,
@@ -397,6 +454,8 @@ const SbomChangelogTable = ({ data, refetch }) => {
       direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
     }).then((res) => {
       if (res.data) {
+        setPaginationControl(res.data)
+
         sbomLogDispatch({
           type: 'SET_SORT_ORDER',
           payload: {
@@ -470,17 +529,17 @@ const SbomChangelogTable = ({ data, refetch }) => {
 
       {/* PAGINATION */}
       {data && (
-        <Pagination
-          paginationSizes={paginationSizes}
-          pageIndex={pageIndex}
-          totalRows={totalRows}
-          totalCount={data.totalCount}
-          onPreviousPage={handlePreviousPage}
-          onNextPage={handleNextPage}
-          onSetRow={handleSetRow}
-          hasNextPage={data.pageInfo.hasNextPage}
-          hasPreviousPage={data.pageInfo.hasPreviousPage}
-        />
+          <Pagination
+              paginationSizes={paginationSizes}
+              pageIndex={pageIndex}
+              totalRows={totalRows}
+              totalCount={data.totalCount}
+              onPreviousPage={handlePreviousPage}
+              onNextPage={handleNextPage}
+              onSetRow={handleSetRow}
+              hasNextPage={isNextActive}
+              hasPreviousPage={isPrevActive}
+          />
       )}
     </>
   )
