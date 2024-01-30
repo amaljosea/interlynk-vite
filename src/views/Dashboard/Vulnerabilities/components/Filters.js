@@ -27,6 +27,7 @@ const Filters = ({ data, refetch }) => {
   const product = JSON.parse(sessionStorage.getItem('product'))
 
   const { data: project } = useQuery(GetProjectGroup, {
+    skip: params?.name ? false : true,
     variables: { id: product?.id }
   })
 
@@ -71,6 +72,8 @@ const Filters = ({ data, refetch }) => {
       }
     }).then(() => compVulnDispatch({ type: 'FILTER_STATUS', payload: value }))
   }
+
+  const envList = project && filterEnvList(project?.projectGroup?.projects)
 
   return (
     <Stack direction={'row'} alignItems={'center'} gap={1}>
@@ -144,31 +147,30 @@ const Filters = ({ data, refetch }) => {
         </Menu>
       </Box>
       {/* ENVIRONMENT */}
-      {project && (
-        <Box width={'fit-content'} position={'relative'}>
-          <Menu closeOnSelect={true}>
-            {envs.length !== 0 && !envs.includes('all') && <CheckMark />}
-            <FilterButton>Environment</FilterButton>
-            <MenuList
-              minHeight={'auto'}
-              maxHeight={'300px'}
-              overflow={'hidden'}
-              overflowY={'scroll'}
+      <Box width={'fit-content'} position={'relative'}>
+        <Menu closeOnSelect={true}>
+          {envs.length !== 0 && !envs.includes('all') && <CheckMark />}
+          <FilterButton>Environment</FilterButton>
+          <MenuList
+            minHeight={'auto'}
+            maxHeight={'300px'}
+            overflow={'hidden'}
+            overflowY={'scroll'}
+          >
+            <MenuOptionGroup
+              type='checkbox'
+              value={envs}
+              onChange={onFilterEnv}
             >
-              <MenuOptionGroup
-                type='checkbox'
-                value={envs}
-                onChange={onFilterEnv}
+              <MenuItemOption
+                value={'all'}
+                fontSize={'sm'}
+                textTransform={'capitalize'}
               >
-                <MenuItemOption
-                  value={'all'}
-                  fontSize={'sm'}
-                  textTransform={'capitalize'}
-                >
-                  all
-                </MenuItemOption>
-                {filterEnvList(project?.projectGroup?.projects).map(
-                  (item, index) => (
+                all
+              </MenuItemOption>
+              {params?.name
+                ? envList.map((item, index) => (
                     <MenuItemOption
                       key={index}
                       value={item.name}
@@ -177,13 +179,23 @@ const Filters = ({ data, refetch }) => {
                     >
                       {item.name}
                     </MenuItemOption>
-                  )
-                )}
-              </MenuOptionGroup>
-            </MenuList>
-          </Menu>
-        </Box>
-      )}
+                  ))
+                : ['default', 'development', 'production', 'others'].map(
+                    (item, index) => (
+                      <MenuItemOption
+                        key={index}
+                        value={item}
+                        fontSize={'sm'}
+                        textTransform={'capitalize'}
+                      >
+                        {item}
+                      </MenuItemOption>
+                    )
+                  )}
+            </MenuOptionGroup>
+          </MenuList>
+        </Menu>
+      </Box>
       {/* STATUSES */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
