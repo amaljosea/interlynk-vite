@@ -122,13 +122,20 @@ const prodCompReducer = (state, action) => {
             ...state,
             licenseType: 'license_spdx',
             spdxLicenses: licenses,
-            spdxList: filterData
+            spdxList: filterData,
+            expLicense: '',
+            customLicenses: [],
+            customList: []
           }
         } else if (licensesExp) {
           return {
             ...state,
             licenseType: 'license_exp',
-            expLicense: licensesExp || ''
+            expLicense: licensesExp || '',
+            spdxLicenses: [],
+            spdxList: [],
+            customLicenses: [],
+            customList: []
           }
         } else if (licensesCustom?.length > 0) {
           const filterData = licensesCustom?.map((license) => ({
@@ -138,6 +145,9 @@ const prodCompReducer = (state, action) => {
           return {
             ...state,
             licenseType: 'license_custom',
+            spdxLicenses: [],
+            spdxList: [],
+            expLicense: '',
             customLicenses: licensesCustom,
             customList: filterData
           }
