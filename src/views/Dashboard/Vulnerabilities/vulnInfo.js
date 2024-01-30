@@ -22,7 +22,7 @@ import { timeSince, getFullDateAndTime } from 'utils'
 import VulnProdTable from './components/ProdTable'
 import { FaCodeMerge } from 'react-icons/fa6'
 
-const VulnInfo = ({ data, refetch }) => {
+const VulnInfo = ({ data, componentVulns, refetch }) => {
   return (
     <>
       {/* Product Info */}
@@ -76,8 +76,7 @@ const VulnInfo = ({ data, refetch }) => {
                             fontWeight={'medium'}
                             bg={'none'}
                           >
-                            {data?.organization?.projectGroups?.nodes?.length ||
-                              0}
+                            {data?.projectGroupsCount || 0}
                           </Badge>
                           <Text fontSize={'xs'}>Products</Text>
                         </Box>
@@ -96,8 +95,7 @@ const VulnInfo = ({ data, refetch }) => {
                             fontWeight={'medium'}
                             bg={'none'}
                           >
-                            {data?.organization?.projectGroups?.nodes?.length ||
-                              0}
+                            {data?.sbomVersionsCount || 0}
                           </Badge>
                           <Text fontSize={'xs'}>Versions</Text>
                         </Box>
@@ -116,7 +114,7 @@ const VulnInfo = ({ data, refetch }) => {
                             fontWeight={'medium'}
                             bg={'none'}
                           >
-                            {data?.componentVulns?.nodes?.length || 0}
+                            {data?.componentCount || 0}
                           </Badge>
                           <Text fontSize={'xs'}>Components</Text>
                         </Box>
@@ -196,7 +194,7 @@ const VulnInfo = ({ data, refetch }) => {
           <TabPanels>
             {/* PRODUCTS TABLE */}
             <TabPanel px={1}>
-              <VulnProdTable data={data?.componentVulns} refetch={refetch} />
+              <VulnProdTable data={componentVulns} vuln={data} refetch={refetch} />
             </TabPanel>
           </TabPanels>
         </Tabs>

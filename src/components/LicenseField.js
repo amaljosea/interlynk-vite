@@ -48,11 +48,6 @@ const LicenseField = ({ isValid, setIsValid }) => {
     }
   }
 
-  const createOption = (label) => ({
-    label,
-    value: label.toLowerCase().replace(/\W/g, '')
-  })
-
   const handleCreate = (inputValue) => {
     console.log('inputValue', inputValue)
     prodCompDispatch({ type: 'CREATE_CUSTOM_LICENSES', payload: inputValue })
@@ -111,6 +106,7 @@ const LicenseField = ({ isValid, setIsValid }) => {
   }
 
   const handleTypeChange = (value) => {
+    setIsValid(true)
     prodCompDispatch({ type: 'SET_LICENSE_TYPE', payload: value })
   }
 
@@ -126,7 +122,7 @@ const LicenseField = ({ isValid, setIsValid }) => {
           </Flex>
         </FormLabel>
         {/* LICENSE TYPE */}
-        <RadioGroup size='sm' value={licenseType} onChange={handleTypeChange}>
+        <RadioGroup size='sm' value={licenseType} onChange={handleTypeChange} isDisabled={!isValid}>
           <Stack direction='row' my={4} spacing={3} alignItems={'center'}>
             <Radio value='license_spdx'>
               License ID

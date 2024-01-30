@@ -10,7 +10,9 @@ import {
   Button,
   Box,
   Select,
-  IconButton
+  IconButton,
+  Divider,
+  Avatar
 } from '@chakra-ui/react'
 import { sevColor, timeSince, getFullDateAndTime, customStyles } from 'utils'
 import { ChevronDownIcon, ChevronUpIcon, RepeatIcon } from '@chakra-ui/icons'
@@ -21,6 +23,7 @@ import VulnBadge from 'components/Misc/VulnBadge'
 import VulnsFilters from 'views/Dashboard/Vulnerabilities/components/VulnsFilter'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import { useGlobalState } from 'hooks/useGlobalState'
+import Round from 'components/Misc/Round'
 
 const GlobalVulnTable = ({ data, refetch }) => {
   const params = useParams()
@@ -215,25 +218,13 @@ const GlobalVulnTable = ({ data, refetch }) => {
         } = metrics
 
         return (
-          <Stack fontWeight={'medium'} direction={'row'}>
-            <VulnBadge color='red' label='Affected'>
-              {affectedCount || 0}
-            </VulnBadge>
-            <VulnBadge color='yellow' label='False Positive'>
-              {falsePositiveCount || 0}
-            </VulnBadge>
-            <VulnBadge color='orange' label='Fixed'>
-              {fixedCount || 0}
-            </VulnBadge>
-            <VulnBadge color='blue' label='In Triage'>
-              {inTriageCount || 0}
-            </VulnBadge>
-            <VulnBadge color='green' label='Not Affected'>
-              {notAffectedCount || 0}
-            </VulnBadge>
-            <VulnBadge color='teal' label='Unspecified'>
-              {unspecifiedCount || 0}
-            </VulnBadge>
+          <Stack fontWeight={'medium'} direction={'row'} my={2}>
+            <Round bg='gray.200' label='Unspecified'>{unspecifiedCount}</Round>
+            <Round bg='blue.100' label='In Triage'>{inTriageCount}</Round>
+            <Round bg='red.100' label='Affected'>{affectedCount}</Round>
+            <Round bg='orange.100' label='Fixed'>{fixedCount}</Round>
+            <Round bg='green.100' label='Not Affected'>{notAffectedCount}</Round>
+            <Round bg='pink.100' label='False Positive'>{falsePositiveCount}</Round>
           </Stack>
         )
       },

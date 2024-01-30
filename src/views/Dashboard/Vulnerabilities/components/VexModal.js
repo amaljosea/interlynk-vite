@@ -20,12 +20,12 @@ import {
   getVexJustifications,
   GetCdxResponses
 } from 'graphQL/Queries'
-import { updateCompVulnVex } from 'graphQL/Mutation'
 import { useMutation, useQuery } from '@apollo/client'
 import { useLocation } from 'react-router-dom'
 import { GetProject } from 'graphQL/Queries'
-import { removeDuplicates, getFullDateAndTime, normalizeSBOMVersion } from 'utils'
+import { removeDuplicates, normalizeSBOMVersion } from 'utils'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { UpdateGlobalVex } from 'graphQL/Mutation'
 
 const VexModal = ({
   isOpen,
@@ -33,7 +33,6 @@ const VexModal = ({
   refetch,
   selectedVulns,
   setSelectedVulns,
-  setPageIndex,
   setToggleClear
 }) => {
   const { totalRows } = useGlobalState()
@@ -59,7 +58,7 @@ const VexModal = ({
   const { data: allVexJustify } = useQuery(getVexJustifications)
   const { data: allCdx } = useQuery(GetCdxResponses)
 
-  const [compVexCreate] = useMutation(updateCompVulnVex, {
+  const [compVexCreate] = useMutation(UpdateGlobalVex, {
     fetchPolicy: 'network-only',
     onCompleted: () => setSelectedVulns([])
   })
@@ -69,11 +68,15 @@ const VexModal = ({
     const status = e.target.options[e.target.selectedIndex].text
     setStatusTitle(value)
     setStatusName(status)
-    if (status === 'Not Affected' || status === 'Affected') {
-      setJustification('')
-      setJustifyName('')
-      setImpactData('')
-    }
+    setJustification('')
+    setJustifyName('')
+    setSelectedTag('')
+    setActionStatement('')
+    setResponse('')
+    setResponseTitle('')
+    setDetails('')
+    setNotes('')
+    setImpactData('')
   }
 
   const handleResponseChange = (e) => {
@@ -99,7 +102,7 @@ const VexModal = ({
   filteredDuplicated &&
     filteredDuplicated.map((project) => {
       uniqVersions.push({
-        label: normalizeSBOMVersion(project),
+        label: normalizeSBOMVersion(project)
       })
     })
 
@@ -107,11 +110,12 @@ const VexModal = ({
 
   const handleSave = () => {
     setToggleClear(false)
+    console.log('selectedVulns', selectedVulns)
     if (selectedVulns?.length > 0) {
       selectedVulns?.map((item) => {
         compVexCreate({
           variables: {
-            compVulnId: item?.id,
+            vulnId: item?.vulnId,
             vexStatusId: statusTitle,
             details: details !== '' ? details : undefined,
             note: notes !== '' ? notes : undefined,
@@ -124,13 +128,23 @@ const VexModal = ({
           }
         })
           .then((res) => {
+            setStatusTitle('')
+            setStatusName('')
+            setJustification('')
+            setJustifyName('')
+            setSelectedTag('')
+            setActionStatement('')
+            setResponse('')
+            setResponseTitle('')
+            setDetails('')
+            setNotes('')
+            setImpactData('')
             if (res.data) {
               refetch({ variables: { id: vulnId, first: totalRows } })
-              setPageIndex(1)
               setToggleClear(true)
             }
           })
-          .finally(() => onClose())
+          .finally(() => window.location.reload())
       })
     }
   }

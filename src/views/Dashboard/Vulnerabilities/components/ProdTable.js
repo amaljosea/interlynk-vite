@@ -12,7 +12,7 @@ import {
   Box
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import CustomLoader from 'components/CustomLoader'
 import Filters from './Filters'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -54,19 +54,20 @@ const statusColor = (status) => {
   }
 }
 
-const VulnProdTable = ({ data, refetch }) => {
+const VulnProdTable = ({ data, vuln, refetch }) => {
   const params = useParams()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
-  const id = queryParams.get('id')
-  const { totalRows, setTotalRows } = useGlobalState()
+  const id = queryParams.get('vulnId')
+
+  const { totalRows, setTotalRows, compVulnState, dispatch } = useGlobalState()
+  const { pageIndex, searchInput, envs, statuses, versions } = compVulnState
+  const { compVulnDispatch } = dispatch
 
   const { isOpen, onOpen, onClose } = useDisclosure()
+
   const [selectedVulns, setSelectedVulns] = useState([])
-  const [pageIndex, setPageIndex] = useState(1)
-  const [searchInput, setSearchInput] = useState('')
-  const [isPrevActive, setIsPrevActive] = useState(false)
-  const [isNextActive, setIsNextActive] = useState(false)
+  const [filterInput, setFilterInput] = useState('')
   const [toggleClear, setToggleClear] = useState(false)
 
   // COLUMNS
@@ -84,7 +85,8 @@ const VulnProdTable = ({ data, refetch }) => {
         )
       },
       wrap: true,
-      width: '15%'
+      width: '15%',
+      omit: params?.name ? true : false
     },
     // VERSION
     {
@@ -167,14 +169,51 @@ const VulnProdTable = ({ data, refetch }) => {
     }
   ]
 
+  const vulnData = {
+    id,
+    first: totalRows,
+    search: searchInput !== '' ? searchInput : undefined,
+    projectNames: envs?.length === 0 ? undefined : envs,
+    versions: versions?.length === 0 ? undefined : versions,
+    statuses: statuses?.length === 0 ? undefined : statuses
+  }
+
   // SEARCH COMPONENT
   const handleSearch = async (event) => {
     const { value } = event.target
+    if (event.key === 'Enter' && filterInput !== '') {
+      refetch({
+        variables: {
+          id,
+          first: totalRows,
+          search: value,
+          projectNames: envs?.length === 0 ? undefined : envs,
+          versions: versions?.length === 0 ? undefined : versions,
+          statuses: statuses?.length === 0 ? undefined : statuses
+        }
+      }).then(
+        (res) =>
+          res.data &&
+          compVulnDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
+      )
+    }
   }
 
   // CLEAR SERACH
   const handleClear = async () => {
-    setSearchInput('')
+    setFilterInput('')
+    await refetch({
+      variables: {
+        id,
+        first: totalRows,
+        search: undefined,
+        projectNames: envs?.length === 0 ? undefined : envs,
+        versions: versions?.length === 0 ? undefined : versions,
+        statuses: statuses?.length === 0 ? undefined : statuses
+      }
+    }).then(
+      (res) => res.data && compVulnDispatch({ type: 'CLEAR_SEARCH_INPUT' })
+    )
   }
 
   // ON SEARCH INPUT CHANGE
@@ -183,7 +222,7 @@ const VulnProdTable = ({ data, refetch }) => {
     if (value === '') {
       handleClear()
     } else {
-      setSearchInput(value)
+      setFilterInput(value)
     }
   }
 
@@ -198,13 +237,13 @@ const VulnProdTable = ({ data, refetch }) => {
         <Stack spacing={4} alignItems={'center'} direction={'row'}>
           <SearchFilter
             id='globalVulns'
-            filterText={searchInput}
+            filterText={filterInput}
             onFilter={handleSearch}
             onClear={handleClear}
             onChange={onSearchInputChange}
           />
 
-          <Filters />
+          <Filters data={vuln} refetch={refetch} />
         </Stack>
 
         {/* UPDATE STATUES */}
@@ -223,7 +262,7 @@ const VulnProdTable = ({ data, refetch }) => {
     )
   }, [
     selectedVulns,
-    searchInput,
+    filterInput,
     onSearchInputChange,
     handleClear,
     handleSearch
@@ -235,46 +274,39 @@ const VulnProdTable = ({ data, refetch }) => {
 
   // ON PREV PAGE
   const handlePreviousPage = async () => {
-    setIsPrevActive(false)
     await refetch({
       variables: {
-        id,
-        first: undefined,
-        last: totalRows,
-        after: undefined,
+        ...vulnData,
         before: data?.pageInfo?.startCursor
       }
     }).then((res) => {
       if (res.data) {
-        const project = params?.name
-          ? res?.data?.projectGroup?.componentVulns
-          : res?.data?.vuln?.componentVulns
-        setPageIndex((index) => index !== 0 && index - 1)
-        setIsPrevActive(project?.pageInfo?.hasPreviousPage)
+        const project = res?.data?.componentVulns
+        compVulnDispatch({
+          type: 'DECREMENT_PAGE',
+          payload: project?.pageInfo.startCursor
+        })
       }
     })
   }
 
   // ON NEXT PAGE
   const handleNextPage = async () => {
-    setIsNextActive(false)
     await refetch({
       variables: {
-        id,
-        first: totalRows,
-        last: undefined,
-        after: data?.pageInfo?.endCursor,
-        before: undefined
+        ...vulnData,
+        after: data?.pageInfo?.endCursor
       }
     }).then((res) => {
       if (res.data) {
-        const project = params?.name
-          ? res?.data?.projectGroup?.componentVulns
-          : res?.data?.vuln?.componentVulns
-        setPageIndex(
-          (index) => index < Math.ceil(project?.totalCount) && index + 1
-        )
-        setIsNextActive(project?.pageInfo?.hasNextPage)
+        const project = res?.data?.componentVulns
+        compVulnDispatch({
+          type: 'INCREMENT_PAGE',
+          payload: {
+            total: project?.totalCount,
+            after: project?.pageInfo.endCursor
+          }
+        })
       }
     })
   }
@@ -286,24 +318,16 @@ const VulnProdTable = ({ data, refetch }) => {
     await refetch({
       variables: {
         id,
-        first: Number(value),
-        last: undefined,
-        after: undefined,
-        before: undefined
+        first: Number(value)
       }
     }).then((res) => {
       if (res.data) {
-        setPageIndex(1)
+        compVulnDispatch({
+          type: 'FETCH_DATA_SUCCESS'
+        })
       }
     })
   }
-
-  useEffect(() => {
-    if (data) {
-      setIsPrevActive(data?.pageInfo?.hasPreviousPage)
-      setIsNextActive(data?.pageInfo?.hasNextPage)
-    }
-  }, [data])
 
   return (
     <>
@@ -338,14 +362,14 @@ const VulnProdTable = ({ data, refetch }) => {
               <Button
                 colorScheme='blue'
                 onClick={handlePreviousPage}
-                isDisabled={!isPrevActive}
+                isDisabled={!data.pageInfo.hasPreviousPage}
               >
                 Prev
               </Button>
               <Button
                 colorScheme='blue'
                 onClick={handleNextPage}
-                isDisabled={!isNextActive}
+                isDisabled={!data.pageInfo.hasNextPage}
               >
                 Next
               </Button>
@@ -382,7 +406,6 @@ const VulnProdTable = ({ data, refetch }) => {
           refetch={refetch}
           selectedVulns={selectedVulns}
           setSelectedVulns={setSelectedVulns}
-          setPageIndex={setPageIndex}
           setToggleClear={setToggleClear}
         />
       )}

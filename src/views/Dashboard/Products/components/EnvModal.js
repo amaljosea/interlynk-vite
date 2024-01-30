@@ -20,6 +20,7 @@ import {
 } from '@chakra-ui/react'
 import { EnvCreate } from 'graphQL/Mutation'
 import { useState } from 'react'
+import {errorMapping} from "utils/errorUtils";
 
 const EnvModal = ({ groupId, isOpen, onClose, refetch }) => {
   const toast = useToast()
@@ -51,10 +52,6 @@ const EnvModal = ({ groupId, isOpen, onClose, refetch }) => {
       }
     })
   }
-
-  const errorMapping = {
-    'Project not created': 'An environment with the same name already exists.',
-  };
 
   const isInvalid = productName === '' || error !== ''
 
