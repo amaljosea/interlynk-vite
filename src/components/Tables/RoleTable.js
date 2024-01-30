@@ -4,7 +4,7 @@ import PermissionDrawer from 'components/Drawer/PermissionDrawer'
 import DataTable from 'react-data-table-component'
 import { useState } from 'react'
 
-const RoleTable = ({ data }) => {
+const RoleTable = ({ data, refetch }) => {
   const [activeRow, setActiveRow] = useState(null)
   const { isOpen, onOpen, onClose } = useDisclosure()
 
@@ -13,7 +13,7 @@ const RoleTable = ({ data }) => {
     {
       id: 'name',
       name: 'NAME',
-      selector: (row) => <Text my={2}>{row?.name}</Text>,
+      selector: (row) => <Text textTransform={'capitalize'} my={2}>{row?.name}</Text>,
       wrap: true
     },
     // CREATED AT
@@ -58,7 +58,7 @@ const RoleTable = ({ data }) => {
       </Flex>
 
       {isOpen && (
-        <PermissionDrawer isOpen={isOpen} onClose={onClose} data={activeRow} />
+        <PermissionDrawer isOpen={isOpen} onClose={onClose} data={activeRow} refetch={refetch} />
       )}
     </>
   )

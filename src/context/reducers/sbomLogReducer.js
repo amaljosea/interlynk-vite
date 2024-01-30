@@ -15,7 +15,8 @@ const sbomLogReducer = (state, action) => {
     case 'CHANGE_SEARCH_INPUT':
       return {
         ...state,
-        searchInput: payload
+        searchInput: payload,
+        pageIndex: 1
       }
     case 'FETCH_DATA_SUCCESS':
       return {

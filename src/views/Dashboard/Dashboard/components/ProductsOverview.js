@@ -22,18 +22,15 @@ const ProductsOverview = ({ title, data }) => {
   const { prodDispatch, prodVulnDispatch } = dispatch
 
   const handleClick = (prod) => {
-    console.log('prod', prod)
-
     const { project, id, projectId } = prod
     const { projectGroup, name } = project
-
     const product = {
-      id: projectId,
-      name: name,
       version: normalizeSBOMVersion(prod),
+      groupId: projectGroup?.id,
+      id: projectGroup?.id,
+      name: name,
       sbomId: id
     }
-
     sessionStorage.setItem('activeEnv', projectGroup?.defaultProject?.id)
     sessionStorage.setItem('product', JSON.stringify(product))
     sessionStorage.setItem('activeProdTab', 0)
@@ -55,6 +52,17 @@ const ProductsOverview = ({ title, data }) => {
   }
 
   const onVersionClick = (item) => {
+    const { project, id } = item
+    const { projectGroup, name } = project
+    const product = {
+      version: normalizeSBOMVersion(item),
+      groupId: projectGroup?.id,
+      id: projectGroup?.id,
+      name: name,
+      sbomId: id
+    }
+    sessionStorage.setItem('activeEnv', projectGroup?.defaultProject?.id)
+    sessionStorage.setItem('product', JSON.stringify(product))
     sessionStorage.setItem(
       'currentSBOM',
       JSON.stringify({
@@ -67,6 +75,17 @@ const ProductsOverview = ({ title, data }) => {
   }
 
   const onFilterComp = (item) => {
+    const { project, id } = item
+    const { projectGroup, name } = project
+    const product = {
+      version: normalizeSBOMVersion(item),
+      groupId: projectGroup?.id,
+      id: projectGroup?.id,
+      name: name,
+      sbomId: id
+    }
+    sessionStorage.setItem('product', JSON.stringify(product))
+    sessionStorage.setItem('activeEnv', projectGroup?.defaultProject?.id)
     sessionStorage.setItem(
       'currentSBOM',
       JSON.stringify({
@@ -77,7 +96,17 @@ const ProductsOverview = ({ title, data }) => {
     sessionStorage.setItem('activeSbomTab', 2)
   }
 
-  const onFilterSev = async (id, version, value) => {
+  const onFilterSev = (project, id, version, value) => {
+    const { projectGroup, name } = project
+    const product = {
+      version: version,
+      groupId: projectGroup?.id,
+      id: projectGroup?.id,
+      name: name,
+      sbomId: id
+    }
+    sessionStorage.setItem('product', JSON.stringify(product))
+    sessionStorage.setItem('activeEnv', projectGroup?.defaultProject?.id)
     sessionStorage.setItem(
       'currentSBOM',
       JSON.stringify({ version: version, id: id })
@@ -209,7 +238,9 @@ const ProductsOverview = ({ title, data }) => {
               style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
               onClick={() =>
                 uniqueSbom
-                  ? onFilterSev(id, normalizeSBOMVersion(row), ['critical'])
+                  ? onFilterSev(project, id, normalizeSBOMVersion(row), [
+                      'critical'
+                    ])
                   : null
               }
             >
@@ -222,7 +253,9 @@ const ProductsOverview = ({ title, data }) => {
               style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
               onClick={() =>
                 uniqueSbom
-                  ? onFilterSev(id, normalizeSBOMVersion(row), ['high'])
+                  ? onFilterSev(project, id, normalizeSBOMVersion(row), [
+                      'high'
+                    ])
                   : null
               }
             >
@@ -235,7 +268,9 @@ const ProductsOverview = ({ title, data }) => {
               style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
               onClick={() =>
                 uniqueSbom
-                  ? onFilterSev(id, normalizeSBOMVersion(row), ['medium'])
+                  ? onFilterSev(project, id, normalizeSBOMVersion(row), [
+                      'medium'
+                    ])
                   : null
               }
             >
@@ -248,7 +283,7 @@ const ProductsOverview = ({ title, data }) => {
               style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
               onClick={() =>
                 uniqueSbom
-                  ? onFilterSev(id, normalizeSBOMVersion(row), ['low'])
+                  ? onFilterSev(project, id, normalizeSBOMVersion(row), ['low'])
                   : null
               }
             >

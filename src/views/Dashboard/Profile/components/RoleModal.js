@@ -90,7 +90,12 @@ const RoleModal = ({ isOpen, onClose, refetch, data }) => {
           <Button mr={3} onClick={onClose}>
             Cancel
           </Button>
-          <Button variant='solid' colorScheme='blue' onClick={updateRole}>
+          <Button
+            variant='solid'
+            colorScheme='blue'
+            onClick={updateRole}
+            disabled={role === ''}
+          >
             Update
           </Button>
         </ModalFooter>

@@ -503,12 +503,17 @@ export const GetGlobalVulns = gql`
 
 // GET SINGLE GLOBAL VULNERABILITIES
 export const GetGlobalVulnData = gql`
-  query GetVulnData(
+  query GetGlobalVulnData(
     $id: Uuid!
     $first: Int
     $last: Int
     $after: String
     $before: String
+    $search: String
+    $projectGroupIds: [Uuid!]
+    $projectNames: [String!]
+    $versions: [String!]
+    $statuses: [String!]
   ) {
     vuln(id: $id) {
       id
@@ -527,43 +532,52 @@ export const GetGlobalVulnData = gql`
           }
         }
       }
-      componentVulns(
-        first: $first
-        last: $last
-        after: $after
-        before: $before
-      ) {
-        totalCount
-        pageInfo {
-          endCursor
-          hasNextPage
-          hasPreviousPage
-          startCursor
-        }
-        nodes {
+      componentCount
+      projectGroupsCount
+      sbomVersions
+      sbomVersionsCount
+    }
+    componentVulns(
+      after: $after
+      first: $first
+      before: $before
+      last: $last
+      search: $search
+      projectGroupIds: $projectGroupIds
+      projectNames: $projectNames
+      sbomVersions: $versions
+      status: $statuses
+    ) {
+      totalCount
+      pageInfo {
+        endCursor
+        hasNextPage
+        hasPreviousPage
+        startCursor
+      }
+      nodes {
+        id
+        vulnId
+        vexStatus {
           id
-          vulnId
-          vexStatus {
-            id
-            name
-          }
-          component {
-            id
-            name
-            version
-            sbom {
-              creationAt
-              project {
+          name
+        }
+        component {
+          id
+          name
+          version
+          sbom {
+            creationAt
+            project {
+              name
+              projectGroup {
                 name
-                projectGroup {
-                  name
-                }
               }
-              primaryComponent {
-                id
-                name
-                version
-              }
+            }
+            primaryComponent {
+              id
+              name
+              version
             }
           }
         }

@@ -68,7 +68,9 @@ function Profile() {
     variables: { first: totalRows, status: 'approved' }
   })
 
-  const [getOrgRoles, { data: roles }] = useLazyQuery(GetRoles)
+  const { data: roles, refetch: roleRefetch } = useQuery(GetRoles, {
+    skip: tabIndex === 2 ? false : true
+  })
 
   const onTabChange = (value) => {
     setTabIndex(value)
@@ -117,7 +119,6 @@ function Profile() {
     } else if (activetab === 'roles') {
       setSelectedTab('ORGANIZATION')
       setTabIndex(2)
-      getOrgRoles()
     } else if (activetab === 'feeds') {
       setSelectedTab('ORGANIZATION')
       setTabIndex(3)
@@ -208,7 +209,10 @@ function Profile() {
                   </TabPanel>
                   {/* ROLES */}
                   <TabPanel>
-                    <RoleTable data={roles?.organization?.organizationRoles} />
+                    <RoleTable
+                      data={roles?.organization?.organizationRoles}
+                      refetch={roleRefetch}
+                    />
                   </TabPanel>
                   {/* FEEDS */}
                   <TabPanel>
