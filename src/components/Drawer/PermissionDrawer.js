@@ -18,7 +18,7 @@ import { useState } from 'react'
 
 const PermissionDrawer = ({ isOpen, onClose, data, refetch }) => {
   const { permissionsMap } = data
-  console.log('permissionsMap', permissionsMap)
+  console.log('permissionsMap', data)
 
   const [updateRole] = useMutation(UpdateOrganizationRole, {
     onCompleted: () => refetch()
@@ -168,6 +168,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch }) => {
                     onChange={(e) =>
                       onCheckParent(e, item.category, orgManagement)
                     }
+                    isReadOnly={data?.name !== 'custom'}
                   >
                     {item.name}
                   </Checkbox>
@@ -179,6 +180,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch }) => {
                     <Checkbox
                       name={item.key}
                       isChecked={checkedOrgManage[index]}
+                      isReadOnly={data?.name !== 'custom'}
                       onChange={(e) =>
                         onCheckChild(
                           e,
@@ -203,6 +205,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch }) => {
                   <Checkbox
                     isChecked={allGroupManageChecked}
                     isIndeterminate={isGroupManageChecked}
+                    isReadOnly={data?.name !== 'custom'}
                     onChange={(e) =>
                       onCheckParent(e, item.category, groupManagement)
                     }
@@ -217,6 +220,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch }) => {
                     <Checkbox
                       name={item.key}
                       isChecked={checkedGroupManage[index]}
+                      isReadOnly={data?.name !== 'custom'}
                       onChange={(e) =>
                         onCheckChild(
                           e,
@@ -241,6 +245,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch }) => {
                   <Checkbox
                     isChecked={allProdManageChecked}
                     isIndeterminate={isProdManageChecked}
+                    isReadOnly={data?.name !== 'custom'}
                     onChange={(e) =>
                       onCheckParent(e, item.category, prodManagement)
                     }
@@ -255,6 +260,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch }) => {
                     <Checkbox
                       name={item.key}
                       isChecked={checkedProdManage[index]}
+                      isReadOnly={data?.name !== 'custom'}
                       onChange={(e) =>
                         onCheckChild(
                           e,
@@ -279,6 +285,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch }) => {
                   <Checkbox
                     isChecked={allSbomManageChecked}
                     isIndeterminate={isSbomManageChecked}
+                    isReadOnly={data?.name !== 'custom'}
                     onChange={(e) =>
                       onCheckParent(e, item.category, sbomManagement)
                     }
@@ -293,6 +300,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch }) => {
                     <Checkbox
                       name={item.key}
                       isChecked={checkedSbomManage[index]}
+                      isReadOnly={data?.name !== 'custom'}
                       onChange={(e) =>
                         onCheckChild(
                           e,
@@ -317,6 +325,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch }) => {
                   <Checkbox
                     isChecked={allUserManageChecked}
                     isIndeterminate={isUserManageChecked}
+                    isReadOnly={data?.name !== 'custom'}
                     onChange={(e) =>
                       onCheckParent(e, item.category, userManagement)
                     }
@@ -331,6 +340,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch }) => {
                     <Checkbox
                       name={item.key}
                       isChecked={checkedUserManage[index]}
+                      isReadOnly={data?.name !== 'custom'}
                       onChange={(e) =>
                         onCheckChild(
                           e,
@@ -355,6 +365,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch }) => {
                   <Checkbox
                     isChecked={allVulnManageChecked}
                     isIndeterminate={isVulnManageChecked}
+                    isReadOnly={data?.name !== 'custom'}
                     onChange={(e) =>
                       onCheckParent(e, item.category, vulnManagement)
                     }
@@ -369,6 +380,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch }) => {
                     <Checkbox
                       name={item.key}
                       isChecked={checkedVulnManage[index]}
+                      isReadOnly={data?.name !== 'custom'}
                       onChange={(e) =>
                         onCheckChild(
                           e,
