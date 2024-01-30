@@ -74,6 +74,33 @@ const VulnTable = ({
   filterRefetch,
   sbomRefetch
 }) => {
+
+  //This part is needed for the pagination to work. (Modify with caution)
+  const paginationSizes = [25, 50, 100]
+
+  const [isPrevActive, setIsPrevActive] = useState(false)
+  const [isNextActive, setIsNextActive] = useState(false)
+
+  useEffect(() => {
+    if (data) {
+      setIsPrevActive(data?.pageInfo?.hasPreviousPage)
+      setIsNextActive(data?.pageInfo?.hasNextPage)
+    }
+  },[data])
+
+  const setPaginationControl = (data) => {
+    setIsPrevActive(data.sbom?.vulns?.pageInfo?.hasPreviousPage)
+    setIsNextActive(data.sbom?.vulns?.pageInfo?.hasNextPage)
+  }
+
+  const disablePaginationControl = () => {
+    setIsPrevActive(false)
+    setIsNextActive(false)
+  }
+  
+  //end
+
+
   const toast = useToast()
   // GET VULN FILTER HEADS
   const [getVulnFilters] = useLazyQuery(GetVulnFilterData)
@@ -107,12 +134,8 @@ const VulnTable = ({
       permission.key === 'edit_vulnerabilities' && permission.value === true
   )
 
-  const paginationSizes = [25, 50, 100]
-
   const textColor = useColorModeValue('gray.700', 'white')
   const [vulnSearch, setVulnSearch] = useState('')
-  const [isPrevActive, setIsPrevActive] = useState(false)
-  const [isNextActive, setIsNextActive] = useState(false)
 
   const {
     isOpen: isTableOpen,
@@ -411,6 +434,7 @@ const VulnTable = ({
 
   // CLEAR SERACH
   const handleClear = async () => {
+    disablePaginationControl()
     setVulnSearch('')
     await refetch({
       projectId: productId,
@@ -429,7 +453,12 @@ const VulnTable = ({
       after: undefined,
       before: undefined
     }).then(
-      (res) => res.data && prodVulnDispatch({ type: 'CLEAR_SEARCH_INPUT' })
+      (res) => {
+        if(res.data){
+          setPaginationControl(res.data)
+          prodVulnDispatch({ type: 'CLEAR_SEARCH_INPUT' })
+        }
+      }
     )
   }
 
@@ -445,6 +474,7 @@ const VulnTable = ({
 
   // SEARCH COMPONENT
   const handleSearch = async (event) => {
+    disablePaginationControl()
     const { value } = event.target
     if (event.key === 'Enter') {
       await refetch({
@@ -468,15 +498,18 @@ const VulnTable = ({
         after: undefined,
         before: undefined
       }).then(
-        (res) =>
-          res.data &&
-          prodVulnDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
-      )
+        (res) => {
+          if(res.data){
+            setPaginationControl(res.data)
+            prodVulnDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
+          }
+      })
     }
   }
 
   // SCAN VULN
   const handleScan = async () => {
+    disablePaginationControl()
     await onVulnScan({
       variables: { id: sbomId }
     }).then((res) => {
@@ -498,6 +531,8 @@ const VulnTable = ({
           sbomRefetch({
             projectId: productId,
             sbomId: sbomId
+          }).then((res)=>{
+            res && setPaginationControl(res?.data)
           })
           prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
         }
@@ -506,9 +541,12 @@ const VulnTable = ({
   }
 
   const handleRefresh = async () => {
+    disablePaginationControl()
     await refetch({
       projectId: productId,
       sbomId: sbomId
+    }).then((res)=>{
+      res && setPaginationControl(res.data)
     })
   }
 
@@ -693,6 +731,7 @@ const VulnTable = ({
   }
 
   const handlePreviousPage = async () => {
+    disablePaginationControl()
     setIsPrevActive(false)
     await refetch({
       ...vulnData,
@@ -712,6 +751,7 @@ const VulnTable = ({
   }
 
   const handleNextPage = async () => {
+    disablePaginationControl()
     setIsNextActive(false)
     await refetch({
       ...vulnData,
@@ -734,6 +774,7 @@ const VulnTable = ({
   }
 
   const handleSort = async (column, sortDirection) => {
+    disablePaginationControl()
     refetch({
       projectId: productId,
       sbomId: sbomId,
@@ -760,6 +801,7 @@ const VulnTable = ({
       direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
     }).then((res) => {
       if (res.data) {
+        setPaginationControl(res.data)
         prodVulnDispatch({
           type: 'SET_SORT_ORDER',
           payload: {
@@ -774,6 +816,7 @@ const VulnTable = ({
 
   // SET ROW LENGTH
   const handleSetRow = async (e) => {
+    disablePaginationControl()
     setTotalRows(Number(e.target.value))
     await refetch({
       ...vulnData,
@@ -783,6 +826,7 @@ const VulnTable = ({
       before: undefined
     }).then((res) => {
       if (res.data) {
+        setPaginationControl(res.data)
         prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
       }
     })
@@ -790,8 +834,6 @@ const VulnTable = ({
 
   useEffect(() => {
     if (data) {
-      setIsPrevActive(data?.pageInfo?.hasPreviousPage)
-      setIsNextActive(data?.pageInfo?.hasNextPage)
       getVulnFilters({
         variables: {
           projectId: productId,
@@ -842,8 +884,8 @@ const VulnTable = ({
           onPreviousPage={handlePreviousPage}
           onNextPage={handleNextPage}
           onSetRow={handleSetRow}
-          hasNextPage={data.pageInfo.hasNextPage}
-          hasPreviousPage={data.pageInfo.hasPreviousPage}
+          hasNextPage={isNextActive}
+          hasPreviousPage={isPrevActive}
         />
       )}
 
