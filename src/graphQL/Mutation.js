@@ -38,6 +38,28 @@ export const InviteUser = gql`
   }
 `
 
+// UPDATE ORANIZATION ROLE PERMISSIONS
+export const UpdateOrganizationRole = gql`
+  mutation UpdateOrganizationRole(
+    $permissions: [SetPermissionInput!]
+    $organizationRoleId: Uuid!
+  ) {
+    organizationRoleUpdate(
+      input: {
+        permissions: $permissions
+        organizationRoleId: $organizationRoleId
+      }
+    ) {
+      organizationRole {
+        id
+        name
+        permissions
+      }
+      errors
+    }
+  }
+`
+
 // UPDATE ORGANIZATION USER ROLE
 export const UpdateOrganizationUserRole = gql`
   mutation UpdateOrganizationUserRole(
