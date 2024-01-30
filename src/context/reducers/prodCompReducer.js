@@ -123,13 +123,20 @@ const prodCompReducer = (state, action) => {
             ...state,
             licenseType: 'license_spdx',
             spdxLicenses: licenses,
-            spdxList: filterData
+            spdxList: filterData,
+            expLicense: '',
+            customLicenses: [],
+            customList: []
           }
         } else if (licensesExp) {
           return {
             ...state,
             licenseType: 'license_exp',
-            expLicense: licensesExp || ''
+            expLicense: licensesExp || '',
+            spdxLicenses: [],
+            spdxList: [],
+            customLicenses: [],
+            customList: []
           }
         } else if (licensesCustom?.length > 0) {
           const filterData = licensesCustom?.map((license) => ({
@@ -139,6 +146,9 @@ const prodCompReducer = (state, action) => {
           return {
             ...state,
             licenseType: 'license_custom',
+            spdxLicenses: [],
+            spdxList: [],
+            expLicense: '',
             customLicenses: licensesCustom,
             customList: filterData
           }
@@ -176,7 +186,9 @@ const prodCompReducer = (state, action) => {
       }
     case 'SET_SPDX_LICENSES':
       const selectedSpdx =
-        [...payload]?.length > 0 ? [...payload].map((option) => option.value) : []
+        [...payload]?.length > 0
+          ? [...payload].map((option) => option.value)
+          : []
       return {
         ...state,
         spdxLicenses: selectedSpdx,
@@ -189,7 +201,9 @@ const prodCompReducer = (state, action) => {
       }
     case 'SET_CUSTOM_LICENSES':
       const selectedCustom =
-        [...payload]?.length > 0 ? [...payload].map((option) => option.value) : []
+        [...payload]?.length > 0
+          ? [...payload].map((option) => option.value)
+          : []
       return {
         ...state,
         customLicenses: selectedCustom,
