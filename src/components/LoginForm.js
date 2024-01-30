@@ -114,10 +114,13 @@ const LoginForm = () => {
               {error ===
                 'You have to confirm your email address before continuing.' && (
                 <p>
-                  <strong style={{cursor: 'pointer'}} onClick={onResendEmail}>
-                    Click here{' '}
+                  Lost invitation link ?{' '}
+                  <strong
+                    style={{ cursor: 'pointer', fontWeight: 500, color: '#3182CE' }}
+                    onClick={onResendEmail}
+                  >
+                    Resend
                   </strong>
-                  to resend the invitation.
                 </p>
               )}
             </AlertDescription>
