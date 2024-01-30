@@ -185,7 +185,9 @@ const prodCompReducer = (state, action) => {
       }
     case 'SET_SPDX_LICENSES':
       const selectedSpdx =
-        [...payload]?.length > 0 ? [...payload].map((option) => option.value) : []
+        [...payload]?.length > 0
+          ? [...payload].map((option) => option.value)
+          : []
       return {
         ...state,
         spdxLicenses: selectedSpdx,
@@ -198,7 +200,9 @@ const prodCompReducer = (state, action) => {
       }
     case 'SET_CUSTOM_LICENSES':
       const selectedCustom =
-        [...payload]?.length > 0 ? [...payload].map((option) => option.value) : []
+        [...payload]?.length > 0
+          ? [...payload].map((option) => option.value)
+          : []
       return {
         ...state,
         customLicenses: selectedCustom,
