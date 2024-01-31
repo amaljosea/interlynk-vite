@@ -60,7 +60,11 @@ const VexModal = ({
 
   const [compVexCreate] = useMutation(UpdateGlobalVex, {
     fetchPolicy: 'network-only',
-    onCompleted: () => setSelectedVulns([])
+    onCompleted: () => {
+      refetch({ id: vulnId, first: totalRows, last: undefined })
+      setSelectedVulns([])
+      setToggleClear(true)
+    }
   })
 
   const handleStatusChange = (e) => {
@@ -105,7 +109,7 @@ const VexModal = ({
 
   const handleSave = () => {
     setToggleClear(false)
-    // console.log('selectedVulns', selectedVulns)
+    console.log('selectedVulns', selectedVulns)
     if (selectedVulns?.length > 0) {
       selectedVulns?.map((item) => {
         compVexCreate({
@@ -133,10 +137,6 @@ const VexModal = ({
           setDetails('')
           setNotes('')
           setImpactData('')
-          if (res.data) {
-            refetch({ id: vulnId, first: totalRows, last: undefined })
-            setToggleClear(true)
-          }
         })
         // .finally(() => window.location.reload())
       })
