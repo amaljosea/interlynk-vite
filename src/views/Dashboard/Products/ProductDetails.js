@@ -192,7 +192,7 @@ const ProductDetails = () => {
     skip: sbomId ? false : true,
     fetchPolicy: 'network-only',
     variables: {
-      projectId: activeEnv,
+      projectId: productId || activeEnv,
       sbomId: sbomId,
       first: totalRows,
       last: undefined,
