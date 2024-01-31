@@ -23,7 +23,7 @@ import {
 import { useMutation, useQuery } from '@apollo/client'
 import { useLocation } from 'react-router-dom'
 import { GetProject } from 'graphQL/Queries'
-import { removeDuplicates, normalizeSBOMVersion } from 'utils'
+import { normalizeSBOMVersion } from 'utils'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { UpdateGlobalVex } from 'graphQL/Mutation'
 
@@ -94,13 +94,8 @@ const VexModal = ({
 
   const uniqVersions = []
 
-  const filteredDuplicated =
-    data?.project?.sboms?.length > 0
-      ? removeDuplicates(data?.project?.sboms)
-      : []
-
-  filteredDuplicated &&
-    filteredDuplicated.map((project) => {
+  data?.project?.sboms?.length > 0 &&
+    data?.project?.sboms.map((project) => {
       uniqVersions.push({
         label: normalizeSBOMVersion(project)
       })

@@ -27,7 +27,6 @@ import { Text } from '@chakra-ui/react'
 import { WarningTwoIcon } from '@chakra-ui/icons'
 import CustomLoader from 'components/CustomLoader'
 import Card from 'components/Card/Card'
-import { removeDuplicates } from 'utils'
 
 export default function Dashboard() {
   const location = useLocation()

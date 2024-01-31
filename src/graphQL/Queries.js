@@ -1063,6 +1063,26 @@ export const GetProductVersions = gql`
           compPurlCount
           vulnStats
         }
+        alternatives {
+          id
+          creationAt
+          createdAt
+          updatedAt
+          lifecycle
+          createdAt
+          primaryComponent {
+            id
+            name
+            version
+          }
+          stats {
+            compCount
+            compLicenseCount
+            compCpeCount
+            compPurlCount
+            vulnStats
+          }
+        }
       }
     }
   }

@@ -29,7 +29,6 @@ import {
   customStyles,
   getFullDateAndTime,
   isDefaultEnv,
-  removeDuplicates,
   filterEnvList
 } from 'utils'
 import CustomLoader from 'components/CustomLoader'
@@ -134,7 +133,7 @@ const EnvironmentDrawer = ({
     {
       id: 'VERSIONS',
       name: 'VERSIONS',
-      selector: (row) => <Text>{removeDuplicates(row?.sboms)?.length}</Text>,
+      selector: (row) => <Text>{row?.sboms?.length}</Text>,
       wrap: true
     },
     // CREATED AT

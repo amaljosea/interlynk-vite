@@ -52,7 +52,13 @@ import SearchFilter from 'views/Sbom/components/SearchFilter'
 import { GetCompFilterData } from 'graphQL/Queries'
 import Pagination from '../Pagination'
 
-const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
+const ComponentTable = ({
+  lifecycle,
+  data,
+  refetch,
+  primaryComp,
+  sbomRefetch
+}) => {
   //This part is needed for the pagination to work. (Modify with caution)
   const paginationSizes = [25, 50, 100]
 
@@ -1199,6 +1205,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
               data={activeRow}
               isOpen={isOpen}
               onClose={onClose}
+              sbomRefetch={sbomRefetch}
               fetchCompData={fetchCompData}
               filterRefetch={getCompFilters}
               shortDesc={null}

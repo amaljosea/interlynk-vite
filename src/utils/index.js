@@ -604,7 +604,7 @@ export const normalizeSBOMVersion = (sbom) => {
   } else if (sbom?.primaryComponent?.name) {
     return sbom?.primaryComponent?.name
   } else {
-    return `Uploaded ${getFullDateAndTime(sbom?.creationAt)}`
+    return `Uploaded at ${getFullDateAndTime(sbom?.createdAt)}`
   }
 }
 
