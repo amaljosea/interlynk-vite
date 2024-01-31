@@ -222,6 +222,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
             <Round bg='gray.200' label='Unspecified'>{unspecifiedCount}</Round>
             <Round bg='blue.100' label='In Triage'>{inTriageCount}</Round>
             <Round bg='red.100' label='Affected'>{affectedCount}</Round>
+            <Divider orientation='vertical' colorScheme={'gray.900'} height={10} />
             <Round bg='orange.100' label='Fixed'>{fixedCount}</Round>
             <Round bg='green.100' label='Not Affected'>{notAffectedCount}</Round>
             <Round bg='pink.100' label='False Positive'>{falsePositiveCount}</Round>
