@@ -1365,6 +1365,7 @@ export const updateCompVulnVex = gql`
   mutation updateCompVulnVex(
     $compVulnId: Uuid!
     $vexStatusId: Uuid!
+    $sbomId: Uuid!
     $vexJustificationId: Uuid
     $cdxResponseId: Uuid
     $note: String
@@ -1377,6 +1378,7 @@ export const updateCompVulnVex = gql`
       input: {
         componentVulnId: $compVulnId
         vexStatusId: $vexStatusId
+        currentSbomId: $sbomId
         vexJustificationId: $vexJustificationId
         cdxResponseId: $cdxResponseId
         note: $note

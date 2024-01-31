@@ -228,7 +228,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
           </Stack>
         )
       },
-      width: '20%',
+      width: '25%',
       wrap: true
     },
     // UPDATED AT
