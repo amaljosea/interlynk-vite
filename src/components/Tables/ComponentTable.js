@@ -53,7 +53,6 @@ import { GetCompFilterData } from 'graphQL/Queries'
 import Pagination from '../Pagination'
 
 const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
-
   //This part is needed for the pagination to work. (Modify with caution)
   const paginationSizes = [25, 50, 100]
 
@@ -65,7 +64,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
       setIsPrevActive(data?.pageInfo?.hasPreviousPage)
       setIsNextActive(data?.pageInfo?.hasNextPage)
     }
-  },[data])
+  }, [data])
 
   const setPaginationControl = (data) => {
     setIsPrevActive(data.sbom?.components?.pageInfo?.hasPreviousPage)
@@ -140,7 +139,8 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
     })
       .then((res) => {
         res && setPaginationControl(res.data)
-        prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })})
+        prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
+      })
       .finally(() => window.scrollTo({ top: 0, behavior: 'smooth' }))
   }
 
@@ -250,7 +250,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
         )
         const vcs = externalUrls?.find((item) => item.name === 'vcs')
         return (
-          <Grid templateColumns='repeat(7, 1fr)' gap={2} width={'80%'} my={2}>
+          <Grid templateColumns='repeat(7, 1fr)' gap={2} my={3}>
             <GridItem colSpan={1} width={'50px'}>
               {purl !== null && purl !== '' ? (
                 <IconButton
@@ -281,7 +281,6 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
               <Tooltip placement='top' label={name}>
                 <Text data-tag='allowRowEvents'>{name}</Text>
               </Tooltip>
-
               {/* EXTERNAL REFERENCE */}
               <Stack direction={'row'} alignItems={'center'}>
                 {/* WEBSITE */}
@@ -337,36 +336,35 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
                   </Link>
                 </Tooltip>
               </Stack>
-
               {/* COMPONENT TYPE */}
-
-              {primary && (
-                <Tag
-                  width={'fit-content'}
-                  size={'sm'}
-                  variant='subtle'
-                  colorScheme='blue'
-                >
-                  <TagLabel textTransform={'capitalize'}>Primary</TagLabel>
-                </Tag>
-              )}
-
-              {internal && (
-                <Tag
-                  width={'fit-content'}
-                  size={'sm'}
-                  variant='subtle'
-                  colorScheme='cyan'
-                >
-                  <TagLabel textTransform={'capitalize'}>Internal</TagLabel>
-                </Tag>
-              )}
+              <Flex flexWrap={'wrap'} gap={2} alignItems={'center'}>
+                {primary && (
+                  <Tag
+                    width={'fit-content'}
+                    size={'sm'}
+                    variant='subtle'
+                    colorScheme='blue'
+                  >
+                    <TagLabel textTransform={'capitalize'}>Primary</TagLabel>
+                  </Tag>
+                )}
+                {internal && (
+                  <Tag
+                    width={'fit-content'}
+                    size={'sm'}
+                    variant='subtle'
+                    colorScheme='cyan'
+                  >
+                    <TagLabel textTransform={'capitalize'}>Internal</TagLabel>
+                  </Tag>
+                )}
+              </Flex>
             </GridItem>
           </Grid>
         )
       },
       wrap: true,
-      width: '20%',
+      width: '400px',
       sortable: true
     },
     // VERSION
@@ -374,7 +372,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
       id: 'COMPONENTS_VERSION',
       name: 'VERSION',
       selector: (row) => <p style={{ textWrap: 'pretty' }}>{row.version}</p>,
-      width: '15%',
+      width: '200px',
       wrap: true,
       sortable: true
     },
@@ -397,7 +395,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
         )
       },
       sortable: true,
-      width: '15%',
+      width: '300px',
       wrap: true,
       grow: 2
     },
@@ -405,7 +403,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
     {
       id: 'COMPONENTS_LICENSES',
       name: 'LICENSES',
-      width: '15%',
+      width: '200px',
       selector: (row) => {
         const { licenses, licensesExp, licensesCustom } = row
 
@@ -521,7 +519,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
         </Tooltip>
       ),
       sortable: true,
-      width: '12%',
+      width: '160px',
       sortFunction: (a, b) => {
         const dateA = new Date(a.updatedAt)
         const dateB = new Date(b.updatedAt)
@@ -606,6 +604,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
           </>
         )
       },
+      wrap: true,
       right: 'true'
     }
   ]
@@ -639,7 +638,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
             first: totalRows,
             field: field,
             direction: direction
-          }).then((res)=>{
+          }).then((res) => {
             res && setPaginationControl(res.data)
           })
         }
@@ -895,12 +894,11 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
       last: undefined,
       after: undefined,
       before: undefined
-    }).then(
-      (res) => {
-        if(res.data){
-          setPaginationControl(res.data)
-          prodCompDispatch({ type: 'CLEAR_SEARCH_INPUT' })
-        }
+    }).then((res) => {
+      if (res.data) {
+        setPaginationControl(res.data)
+        prodCompDispatch({ type: 'CLEAR_SEARCH_INPUT' })
+      }
     })
   }
 
@@ -944,13 +942,12 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
         last: undefined,
         after: undefined,
         before: undefined
-      }).then(
-        (res) =>{
-          if(res.data) {
-            setPaginationControl(res.data)
-            prodCompDispatch({type: 'CHANGE_SEARCH_INPUT', payload: value})
-          }
-        })
+      }).then((res) => {
+        if (res.data) {
+          setPaginationControl(res.data)
+          prodCompDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
+        }
+      })
     }
   }
 
@@ -967,12 +964,11 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
       before: undefined,
       field: customerView ? signedCompField : field,
       direction: customerView ? signedCompDirection : direction
-    }).then(
-      (res) => {
-        if(res.data) {
-          setPaginationControl(res.data)
-          prodCompDispatch({type: 'FETCH_DATA_SUCCESS'})
-        }
+    }).then((res) => {
+      if (res.data) {
+        setPaginationControl(res.data)
+        prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
+      }
     })
   }
 

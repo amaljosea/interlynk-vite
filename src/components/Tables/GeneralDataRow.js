@@ -300,7 +300,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
               <Td pl={0} fontWeight={'medium'}>
                 Created At
               </Td>
-              <Td pl={0}>{getFullDateAndTime(data?.createdAt)}</Td>
+              <Td pl={0}>{getFullDateAndTime(data?.creationAt)}</Td>
               <Td pl={0}></Td>
             </Tr>
             {/* AUTHORS */}

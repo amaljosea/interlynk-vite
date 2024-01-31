@@ -318,6 +318,14 @@ function ComponentDrawer(props) {
       }
     }).then((res) => {
       if (res.data) {
+        isPrimary &&
+          sessionStorage.setItem(
+            'currentSBOM',
+            JSON.stringify({
+              version: compVersion,
+              id: sbomId
+            })
+          )
         prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
         onClose()
       }
@@ -615,7 +623,6 @@ function ComponentDrawer(props) {
                     colorScheme='blue'
                     isChecked={isPrimary}
                     onChange={onWarningOpen}
-                    disabled={isInternal}
                   >
                     Primary component
                   </Checkbox>
@@ -628,7 +635,6 @@ function ComponentDrawer(props) {
                   colorScheme='blue'
                   isChecked={isInternal}
                   onChange={() => setIsInternal(!isInternal)}
-                  disabled={isPrimary}
                 >
                   Internal component
                 </Checkbox>
