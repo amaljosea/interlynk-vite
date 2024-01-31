@@ -332,6 +332,7 @@ export const GetProjectGroups = gql`
             sboms {
               id
               format
+              createdAt
               creationAt
               updatedAt
               primaryComponent {
@@ -355,6 +356,7 @@ export const GetProjectGroups = gql`
               id
               format
               creationAt
+              createdAt
               updatedAt
               primaryComponent {
                 id
@@ -2441,6 +2443,7 @@ export const GetSbomParts = gql`
         part {
           id
           lifecycle
+          createdAt
           creationAt
           project {
             id
