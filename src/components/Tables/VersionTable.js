@@ -290,7 +290,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
       sortFunction: (a, b) => {
         const dateA = new Date(a.updatedAt)
         const dateB = new Date(b.updatedAt)
-        return dateB - dateA
+        return dateA - dateB
       },
       right: 'false'
     },
@@ -403,7 +403,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
           columns={columns}
           customStyles={customStyles}
           data={project?.sboms || []}
-          defaultSortAsc={true}
+          defaultSortAsc={false}
           defaultSortFieldId={'UPDATED_AT'}
           progressComponent={<CustomLoader />}
           progressPending={project ? false : true}
