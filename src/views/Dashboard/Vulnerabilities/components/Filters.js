@@ -33,43 +33,35 @@ const Filters = ({ data, refetch }) => {
 
   const onFilterVesion = async (value) => {
     await refetch({
-      variables: {
-        id,
-        first: totalRows,
-        search: searchInput !== '' ? searchInput : undefined,
-        projectNames: envs?.length === 0 ? undefined : envs,
-        statuses: statuses?.length === 0 ? undefined : statuses,
-        versions:
-          value.includes('all') || value.length === 0 ? undefined : value
-      }
+      id,
+      first: totalRows,
+      search: searchInput !== '' ? searchInput : undefined,
+      projectNames: envs?.length === 0 ? undefined : envs,
+      statuses: statuses?.length === 0 ? undefined : statuses,
+      versions: value.includes('all') || value.length === 0 ? undefined : value
     }).then(() => compVulnDispatch({ type: 'FILTER_VERSION', payload: value }))
   }
 
   const onFilterEnv = async (value) => {
     await refetch({
-      variables: {
-        id,
-        first: totalRows,
-        search: searchInput !== '' ? searchInput : undefined,
-        versions: versions?.length === 0 ? undefined : versions,
-        statuses: statuses?.length === 0 ? undefined : statuses,
-        projectNames:
-          value.includes('all') || value.length === 0 ? undefined : value
-      }
+      id,
+      first: totalRows,
+      search: searchInput !== '' ? searchInput : undefined,
+      versions: versions?.length === 0 ? undefined : versions,
+      statuses: statuses?.length === 0 ? undefined : statuses,
+      projectNames:
+        value.includes('all') || value.length === 0 ? undefined : value
     }).then(() => compVulnDispatch({ type: 'FILTER_ENV', payload: value }))
   }
 
   const onFilterStatus = async (value) => {
     await refetch({
-      variables: {
-        id,
-        first: totalRows,
-        search: searchInput !== '' ? searchInput : undefined,
-        projectNames: envs?.length === 0 ? undefined : envs,
-        versions: versions?.length === 0 ? undefined : versions,
-        statuses:
-          value.includes('all') || value.length === 0 ? undefined : value
-      }
+      id,
+      first: totalRows,
+      search: searchInput !== '' ? searchInput : undefined,
+      projectNames: envs?.length === 0 ? undefined : envs,
+      versions: versions?.length === 0 ? undefined : versions,
+      statuses: value.includes('all') || value.length === 0 ? undefined : value
     }).then(() => compVulnDispatch({ type: 'FILTER_STATUS', payload: value }))
   }
 

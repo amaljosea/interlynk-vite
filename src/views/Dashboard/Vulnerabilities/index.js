@@ -23,14 +23,14 @@ const Vulnerabilities = () => {
     onCompleted: () => globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
   })
 
-  const [getVulnData, { data: vulnData }] = useLazyQuery(GetGlobalVulnData)
+  const { data: vulnData, refetch: getVulnData } = useQuery(GetGlobalVulnData, {
+    skip: vulnId ? false : true,
+    fetchPolicy: 'network-only',
+    variables: { id: vulnId, first: totalRows }
+  })
 
   useEffect(() => {
-    if (vulnId) {
-      getVulnData({
-        variables: { id: vulnId, first: totalRows }
-      })
-    } else {
+    if (!vulnId) {
       globalVulnDispatch({ type: 'CLEAR_GLOBAL_VULN' })
     }
   }, [vulnId])
