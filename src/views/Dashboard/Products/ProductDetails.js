@@ -149,8 +149,6 @@ const ProductDetails = () => {
     }
   )
 
-  // const versionData = versions ? removeDuplicates(versions?.project?.sboms) : []
-
   const { data: globalVulnData, refetch: globalVulnRefetch } = useQuery(
     GetProjectVulns,
     {

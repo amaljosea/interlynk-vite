@@ -148,7 +148,7 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
         </Stack>
         <Flex flexDir={'row'} gap={0.5} alignItems={'center'} flexWrap={'wrap'}>
           <Badge fontSize={'sm'}>{primaryComponent?.name}</Badge>
-          <Badge fontSize={'sm'}>:</Badge>
+          <Badge fontSize={'sm'}>{primaryComponent?.version ? ':' : ''}</Badge>
           <Badge fontSize={'sm'}>{primaryComponent?.version}</Badge>
         </Flex>
         <Text fontSize={'sm'} my={1}>

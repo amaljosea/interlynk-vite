@@ -41,7 +41,6 @@ import {
   timeSince,
   getFullDateAndTime,
   customStyles,
-  removeDuplicates,
   normalizeSBOMVersion
 } from 'utils'
 import SbomList from 'views/Dashboard/Products/components/SbomList'
@@ -74,7 +73,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
   const [activeRow, setActiveRow] = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
 
-  const sboms = project ? removeDuplicates(project.sboms) : []
+  const sboms = project ? project.sboms : []
 
   const totalPages = sboms.length > 0 ? Math.ceil(sboms.length / totalRows) : 1
 
@@ -225,10 +224,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
                 {stats?.vulnStats?.critical ? stats.vulnStats.critical : 0}
               </VulnBadge>
             </Link>
-            <Link
-              to={link}
-              onClick={() => onFilterSev(id, version, ['high'])}
-            >
+            <Link to={link} onClick={() => onFilterSev(id, version, ['high'])}>
               <VulnBadge color='orange' label='High'>
                 {stats?.vulnStats?.high ? stats.vulnStats.high : 0}
               </VulnBadge>
@@ -241,10 +237,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
                 {stats?.vulnStats?.medium ? stats.vulnStats.medium : 0}
               </VulnBadge>
             </Link>
-            <Link
-              to={link}
-              onClick={() => onFilterSev(id, version, ['low'])}
-            >
+            <Link to={link} onClick={() => onFilterSev(id, version, ['low'])}>
               <VulnBadge color='green' label='Low'>
                 {stats?.vulnStats?.low ? stats.vulnStats.low : 0}
               </VulnBadge>
@@ -282,7 +275,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
       right: 'false'
     },
     {
-      id: 'UPDATEDAT',
+      id: 'UPDATED_AT',
       name: 'UPDATED',
       selector: (row) => {
         const { updatedAt } = row
@@ -292,6 +285,12 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
             <Text>{timeSince(updatedAt)}</Text>
           </Tooltip>
         )
+      },
+      sortable: true,
+      sortFunction: (a, b) => {
+        const dateA = new Date(a.updatedAt)
+        const dateB = new Date(b.updatedAt)
+        return dateB - dateA
       },
       right: 'false'
     },
@@ -403,7 +402,9 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
           responsive={true}
           columns={columns}
           customStyles={customStyles}
-          data={filteredData && filteredData}
+          data={project?.sboms || []}
+          defaultSortAsc={true}
+          defaultSortFieldId={'UPDATED_AT'}
           progressComponent={<CustomLoader />}
           progressPending={project ? false : true}
           subHeaderComponent={subHeaderComponent}

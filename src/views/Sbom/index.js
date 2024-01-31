@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import Card from 'components/Card/Card.js'
 import SBOMTable from './components/SBOMTable'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { removeDuplicates, normalizeSBOMVersion } from 'utils'
+import { normalizeSBOMVersion } from 'utils'
 import { useQuery } from '@apollo/client'
 import { GetProductData, GetProject, GetComponentData } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -72,10 +72,8 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
 
   const uniqVersions = []
 
-  const filteredDuplicated = data ? removeDuplicates(data.project.sboms) : []
-
-  filteredDuplicated &&
-    filteredDuplicated.map((project) => {
+  data?.project?.sboms?.length > 0 &&
+    data.project.sboms.map((project) => {
       uniqVersions.push({
         label: normalizeSBOMVersion(project)
       })
@@ -166,5 +164,3 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
 }
 
 export default SBOM
-
-

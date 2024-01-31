@@ -45,9 +45,7 @@ import { useLocation, Link, useParams } from 'react-router-dom'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import {
   isDefaultEnv,
-  getFullDateAndTime,
   normalizeSBOMVersion,
-  removeDuplicates,
   envOrderList,
   customStyles
 } from 'utils'
@@ -218,7 +216,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
 
   const sbomVersions = []
 
-  const filteredDuplicated = product ? removeDuplicates(product.sboms) : []
+  const filteredDuplicated = product ? product.sboms : []
 
   filteredDuplicated &&
     filteredDuplicated.map((project) => {

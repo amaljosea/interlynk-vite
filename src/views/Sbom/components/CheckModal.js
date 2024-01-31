@@ -34,7 +34,7 @@ import {
   CreateAutomation
 } from 'graphQL/Mutation'
 import { useEffect, useState, useRef } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 const CheckModal = ({
@@ -47,12 +47,10 @@ const CheckModal = ({
   filterRefetch,
   componentId
 }) => {
-  const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
-  const currentProduct = JSON.parse(sessionStorage.getItem(`product`))
 
   const compRef = useRef()
 
@@ -109,7 +107,7 @@ const CheckModal = ({
         variables: {
           projectId: productId,
           sbomId: sbomId,
-          first: totalComp,
+          first: 100,
           field: field,
           direction: direction
         }
@@ -117,7 +115,7 @@ const CheckModal = ({
         (res) => res.data && setComponentList(res.data.sbom.components.nodes)
       )
     }
-  }, [])
+  }, [isOpen])
 
   const onFilterRefetch = () => {
     filterRefetch({
@@ -142,6 +140,17 @@ const CheckModal = ({
       })
         .then((res) => {
           if (res.data) {
+            refetch({
+              projectId: productId,
+              sbomId: sbomId
+            })
+            sessionStorage.setItem(
+              'currentSBOM',
+              JSON.stringify({
+                version: activeComp?.version,
+                id: sbomId
+              })
+            )
             onFilterRefetch()
             if (checkId) {
               healthRecheck({
@@ -155,7 +164,7 @@ const CheckModal = ({
         })
         .finally(() => {
           setActiveSbomTab(0)
-          navigate(`/vendor/products/${currentProduct.name}?id=${productId}`)
+          onClose()
         })
     } catch (error) {
       console.log('Mutation error', error)
@@ -306,10 +315,10 @@ const CheckModal = ({
                   licenseType === 'license_spdx'
                     ? spdxLicenses
                     : licenseType === 'license_exp'
-                    ? expLicense
-                    : licenseType === 'license_custom'
-                    ? customLicenses
-                    : ''
+                      ? expLicense
+                      : licenseType === 'license_custom'
+                        ? customLicenses
+                        : ''
               },
               null,
               2

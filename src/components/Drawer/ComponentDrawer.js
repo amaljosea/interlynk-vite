@@ -66,7 +66,8 @@ function ComponentDrawer(props) {
     primaryComp,
     fetchCompData,
     shortDesc,
-    filterRefetch
+    filterRefetch,
+    sbomRefetch
   } = props
 
   const { prodCompState, dispatch } = useGlobalState()
@@ -318,7 +319,8 @@ function ComponentDrawer(props) {
       }
     }).then((res) => {
       if (res.data) {
-        isPrimary &&
+        if (isPrimary) {
+          sbomRefetch({ projectId: productId, sbomId: sbomId })
           sessionStorage.setItem(
             'currentSBOM',
             JSON.stringify({
@@ -326,6 +328,7 @@ function ComponentDrawer(props) {
               id: sbomId
             })
           )
+        }
         prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
         onClose()
       }

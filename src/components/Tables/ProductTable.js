@@ -36,7 +36,6 @@ import {
   customStyles,
   getFullDateAndTime,
   normalizeSBOMVersion,
-  removeDuplicates,
   timeSince
 } from 'utils'
 
@@ -62,7 +61,7 @@ const ProductTable = ({ data, refetch }) => {
 
   const paginationSizes = [25, 50, 100]
 
-  const { field, direction, searchInput, pageIndex,enabled } = prodState
+  const { field, direction, searchInput, pageIndex, enabled } = prodState
   const { prodDispatch, prodCompDispatch } = dispatch
 
   const [totalRows, setTotalRows] = useState(paginationSizes[0])
@@ -309,10 +308,7 @@ const ProductTable = ({ data, refetch }) => {
         name: 'PRODUCT',
         selector: (row) => {
           const { id, name, defaultProject } = row
-          const data = defaultProject
-            ? removeDuplicates(defaultProject?.sboms)
-            : []
-
+          const data = defaultProject ? defaultProject?.sboms : []
           const product = {
             id: id,
             name: name,
@@ -585,7 +581,8 @@ const ProductTable = ({ data, refetch }) => {
     if (!data) {
       refetch({
         first: totalRows,
-        enabled: enabled === 'yes' ? true : enabled === 'no' ? false : undefined,
+        enabled:
+          enabled === 'yes' ? true : enabled === 'no' ? false : undefined,
         field,
         direction
       }).then((res) => {
