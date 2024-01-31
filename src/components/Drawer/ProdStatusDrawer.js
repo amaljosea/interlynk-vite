@@ -142,6 +142,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
   const handleSave = async () => {
     await compVexCreate({
       variables: {
+        sbomId: sbomId,
         compVulnId: id,
         vexStatusId: statusTitle,
         details: details !== '' ? details : undefined,
