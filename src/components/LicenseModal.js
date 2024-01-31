@@ -16,6 +16,7 @@ import { sbomUpdate, CreateAutomation, recheckHealth } from 'graphQL/Mutation'
 import { useLocation } from 'react-router-dom'
 import SbomLicenseField from './SbomLicenseField'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useState } from 'react'
 
 const LicenseModal = ({
   data,
@@ -33,6 +34,8 @@ const LicenseModal = ({
   const { sbomState, dispatch } = useGlobalState()
   const { licenseType, spdxLicenses, customLicenses, expLicense } = sbomState
   const { sbomDispatch, prodCheckDispatch } = dispatch
+
+  const [isValid, setIsValid] = useState(true)
 
   const isInvalidLicense =
     (licenseType === 'license_spdx' && spdxLicenses.length === 0) ||
@@ -153,7 +156,7 @@ const LicenseModal = ({
         <ModalHeader>Add License</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <SbomLicenseField exp={data?.licenseExp} />
+          <SbomLicenseField isValid={isValid} setIsValid={setIsValid} />
         </ModalBody>
         <ModalFooter>
           <Flex

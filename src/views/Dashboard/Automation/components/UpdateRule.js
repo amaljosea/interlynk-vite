@@ -50,9 +50,7 @@ const UpdateRule = ({ isOpen, onClose, data, refetch, productId }) => {
       }
     }).then((res) => {
       if (res.data.autoCheckUpdate.errors.length === 0) {
-        refetch({
-          variables: { id: productId, first: totalRows, field, direction }
-        })
+        refetch({ id: productId, first: totalRows, field, direction })
         onClose()
       } else {
         setError(res.data.autoCheckUpdate.errors)

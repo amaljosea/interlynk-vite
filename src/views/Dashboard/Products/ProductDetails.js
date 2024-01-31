@@ -161,10 +161,16 @@ const ProductDetails = () => {
     }
   )
 
-  const [getRules, { data: rules, error: rulesError }] = useLazyQuery(
-    GetProjectCheck,
-    { fetchPolicy: 'network-only' }
-  )
+  const { data: rules, refetch: getRules } = useQuery(GetProjectCheck, {
+    fetchPolicy: 'network-only',
+    skip: activeProdTab === 2 ? false : true,
+    variables: {
+      id: activeEnv,
+      first: totalRows,
+      field: prodRulesState.field,
+      direction: prodRulesState.direction
+    }
+  })
 
   const [getSettings, { data: settings }] = useLazyQuery(GetProjectSettings, {
     fetchPolicy: 'network-only'
@@ -284,14 +290,6 @@ const ProductDetails = () => {
       setActiveProdTab(1)
     } else if (activeTab === 2) {
       setActiveProdTab(2)
-      getRules({
-        variables: {
-          id: activeEnv,
-          first: totalRows,
-          field: prodRulesState.field,
-          direction: prodRulesState.direction
-        }
-      }).then((res) => console.log('res', res.data))
     } else if (activeTab === 3) {
       setActiveProdTab(3)
       getSettings({
@@ -581,15 +579,9 @@ const ProductDetails = () => {
                 </TabPanel>
                 {/* AUTOMATIONS */}
                 <TabPanel px={0}>
-                  {rulesError && (
-                    <Text textAlign={'center'} my={6}>
-                      {JSON.stringify(rulesError)}
-                    </Text>
-                  )}
                   <Automation
                     data={rules?.project?.autoChecks}
                     refetch={getRules}
-                    productId={activeEnv}
                   />
                 </TabPanel>
                 {/* SETTINGS */}

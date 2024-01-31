@@ -29,11 +29,12 @@ import { useMutation } from '@apollo/client'
 import { timeSince } from 'utils'
 import { useGlobalState } from 'hooks/useGlobalState'
 
-const Automation = ({ data, refetch, productId }) => {
+const Automation = ({ data, refetch }) => {
   const { totalRows, userPermissions, prodRulesState, dispatch } =
     useGlobalState()
   const { field, direction } = prodRulesState
   const { prodRulesDispatch } = dispatch
+  const activeEnv = sessionStorage.getItem('activeEnv')
 
   const product = userPermissions?.find((item) => item.key === 'view_product')
   const editAutomations = product?.supersededBy?.some(
@@ -50,41 +51,35 @@ const Automation = ({ data, refetch, productId }) => {
 
   const [activeRow, setActiveRow] = useState(null)
 
-  const [updateAutoCheck] = useMutation(UpdateAutomation)
-  const [deleteAutoCheck] = useMutation(DeleteAutomation)
+  const [updateAutoCheck] = useMutation(UpdateAutomation, {
+    fetchPolicy: 'network-only',
+    onCompleted: () =>
+      refetch({ id: activeEnv, first: totalRows, field, direction })
+  })
+  const [deleteAutoCheck] = useMutation(DeleteAutomation, {
+    fetchPolicy: 'network-only',
+    onCompleted: () =>
+      refetch({ id: activeEnv, first: totalRows, field, direction })
+  })
 
   const handleRemove = async () => {
     await deleteAutoCheck({
       variables: {
-        autoCheckId: activeRow.id,
-        projectId: productId
+        autoCheckId: activeRow?.id,
+        projectId: activeEnv
       }
-    })
-      .then(
-        (res) =>
-          res.data &&
-          refetch({
-            variables: { id: productId, first: totalRows, field, direction }
-          })
-      )
-      .finally(() => onDeleteClose())
+    }).then((res) => res.data && onDeleteClose())
   }
 
   const handleStatus = async (row) => {
     await updateAutoCheck({
       variables: {
         id: row.id,
-        projectId: productId,
+        projectId: activeEnv,
         condition: row.condition,
         enabled: row.enabled ? false : true
       }
-    }).then(
-      (res) =>
-        res?.data &&
-        refetch({
-          variables: { id: productId, first: totalRows, field, direction }
-        })
-    )
+    })
   }
 
   // COLUMNS
@@ -209,12 +204,11 @@ const Automation = ({ data, refetch, productId }) => {
 
   const handleSort = async (column, sortDirection) => {
     refetch({
-      variables: {
-        id: productId,
-        first: totalRows,
-        field: column.id,
-        direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
-      }
+      id: activeEnv,
+      first: totalRows,
+      last: undefined,
+      field: column.id,
+      direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
     }).then((res) => {
       if (res.data) {
         prodRulesDispatch({
@@ -229,9 +223,7 @@ const Automation = ({ data, refetch, productId }) => {
   }
 
   const handleRefresh = async () => {
-    await refetch({
-      variables: { id: productId, first: totalRows, field, direction }
-    })
+    await refetch({ id: activeEnv, first: totalRows, field, direction })
   }
 
   const subHeaderComponent = useMemo(() => {
@@ -275,7 +267,7 @@ const Automation = ({ data, refetch, productId }) => {
           onClose={onClose}
           data={activeRow}
           refetch={refetch}
-          productId={productId}
+          productId={activeEnv}
         />
       )}
 
