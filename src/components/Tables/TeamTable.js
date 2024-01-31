@@ -296,7 +296,7 @@ const TeamTable = ({ data, refetch }) => {
         <Stack
           width={'100%'}
           direction={'row'}
-          spacing={4}
+          spacing={2}
           justifyContent={'flex-end'}
         >
           {/* INVITE USER */}

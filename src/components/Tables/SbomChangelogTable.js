@@ -8,7 +8,7 @@ import {
   Tooltip,
   IconButton
 } from '@chakra-ui/react'
-import React, {useEffect, useMemo, useState} from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { RepeatIcon } from '@chakra-ui/icons'
 import { useLocation } from 'react-router-dom'
@@ -18,7 +18,6 @@ import LogFilterMenu from 'views/Sbom/components/LogFilterMenu'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import { useGlobalState } from 'hooks/useGlobalState'
 import Pagination from '../Pagination'
-
 
 const setColor = (type) => {
   switch (type) {
@@ -40,11 +39,9 @@ const setColor = (type) => {
 }
 
 const SbomChangelogTable = ({ data, refetch }) => {
-
-
   //This part is needed for the pagination to work. (Modify with caution)
   const paginationSizes = [25, 50, 100]
-  
+
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
 
@@ -53,7 +50,7 @@ const SbomChangelogTable = ({ data, refetch }) => {
       setIsPrevActive(data?.pageInfo?.hasPreviousPage)
       setIsNextActive(data?.pageInfo?.hasNextPage)
     }
-  },[data])
+  }, [data])
 
   const setPaginationControl = (data) => {
     setIsPrevActive(data.sbom?.activityLogs?.pageInfo?.hasPreviousPage)
@@ -66,7 +63,6 @@ const SbomChangelogTable = ({ data, refetch }) => {
   }
 
   //end
-
 
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -100,6 +96,7 @@ const SbomChangelogTable = ({ data, refetch }) => {
         )
       },
       sortable: true,
+      wrap: true,
       width: '90px'
     },
     // CHANGED OBJECT
@@ -127,6 +124,7 @@ const SbomChangelogTable = ({ data, refetch }) => {
           </Tooltip>
         )
       },
+      wrap: true,
       sortable: true
     },
     // PRIOR VALUE
@@ -203,7 +201,8 @@ const SbomChangelogTable = ({ data, refetch }) => {
             </Tooltip>
           </Flex>
         )
-      }
+      },
+      wrap: true
     },
     // UPDATED VALUE
     {
@@ -279,7 +278,8 @@ const SbomChangelogTable = ({ data, refetch }) => {
             </Tooltip>
           </Flex>
         )
-      }
+      },
+      wrap: true
     },
     // CHANGED BY
     {
@@ -291,8 +291,9 @@ const SbomChangelogTable = ({ data, refetch }) => {
         </Tooltip>
       ),
       sortable: true,
-      width: '12%',
-      right: 'true'
+      width: '200px',
+      right: 'true',
+      wrap: true,
     },
     // CHANGED ON
     {
@@ -311,8 +312,9 @@ const SbomChangelogTable = ({ data, refetch }) => {
         const dateB = new Date(b.updatedAt)
         return dateA - dateB // Sort in descending order
       },
-      width: '12%',
-      right: 'true'
+      width: '180px',
+      right: 'true',
+      wrap: true,
     }
   ]
 
@@ -370,22 +372,19 @@ const SbomChangelogTable = ({ data, refetch }) => {
       sbomId: sbomId,
       search: undefined,
       first: totalRows
-    }).then(
-      (res) => {
-        if(res.data) {
-          setPaginationControl(res.data)
+    }).then((res) => {
+      if (res.data) {
+        setPaginationControl(res.data)
 
-          sbomLogDispatch({
-            type: 'CLEAR_SEARCH_INPUT'
-          })
-        }
+        sbomLogDispatch({
+          type: 'CLEAR_SEARCH_INPUT'
+        })
       }
-    )
+    })
   }
 
   // ON SEARCH INPUT CHANGE
   const onSearchInputChange = (e) => {
-
     const { value } = e.target
     if (value === '') {
       handleClear()
@@ -407,15 +406,14 @@ const SbomChangelogTable = ({ data, refetch }) => {
         first: totalRows,
         last: undefined,
         after: undefined,
-        before: undefined,
-      }).then(
-          (res) => {
-            if (res.data) {
-              setPaginationControl(res.data)
+        before: undefined
+      }).then((res) => {
+        if (res.data) {
+          setPaginationControl(res.data)
 
-              sbomLogDispatch({type: 'CHANGE_SEARCH_INPUT', payload: value})
-            }
-          })
+          sbomLogDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
+        }
+      })
     }
   }
 
@@ -433,13 +431,12 @@ const SbomChangelogTable = ({ data, refetch }) => {
       before: undefined,
       field: field,
       direction: direction
-    }).then(
-      (res) => {
-        if (res.data){
-          setPaginationControl(res.data)
-          sbomLogDispatch({ type: 'FETCH_DATA_SUCCESS' })
-        }
-      })
+    }).then((res) => {
+      if (res.data) {
+        setPaginationControl(res.data)
+        sbomLogDispatch({ type: 'FETCH_DATA_SUCCESS' })
+      }
+    })
   }
 
   const handleSort = async (column, sortDirection) => {
@@ -529,17 +526,17 @@ const SbomChangelogTable = ({ data, refetch }) => {
 
       {/* PAGINATION */}
       {data && (
-          <Pagination
-              paginationSizes={paginationSizes}
-              pageIndex={pageIndex}
-              totalRows={totalRows}
-              totalCount={data.totalCount}
-              onPreviousPage={handlePreviousPage}
-              onNextPage={handleNextPage}
-              onSetRow={handleSetRow}
-              hasNextPage={isNextActive}
-              hasPreviousPage={isPrevActive}
-          />
+        <Pagination
+          paginationSizes={paginationSizes}
+          pageIndex={pageIndex}
+          totalRows={totalRows}
+          totalCount={data.totalCount}
+          onPreviousPage={handlePreviousPage}
+          onNextPage={handleNextPage}
+          onSetRow={handleSetRow}
+          hasNextPage={isNextActive}
+          hasPreviousPage={isPrevActive}
+        />
       )}
     </>
   )

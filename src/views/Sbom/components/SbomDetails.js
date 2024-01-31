@@ -124,9 +124,15 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
               </HStack>
             </Link>
           )}
-          <Stack direction={'row'} alignItems={'center'} wrap={'wrap'}>
+          <Flex
+            direction={'row'}
+            alignItems={'center'}
+            flexWrap={'wrap'}
+            gap={2}
+          >
             <Text fontWeight={'semibold'} fontSize={25}>
-              {project?.projectGroup?.name} : {normalizeSBOMVersion(sbom)}
+              {project?.projectGroup?.name} :{' '}
+              {currentSBOM?.version || normalizeSBOMVersion(sbom)}
             </Text>
             <Tooltip label='Lifecycle stage' fontSize='md'>
               <Tag
@@ -138,9 +144,14 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
                 <TagLabel textTransform={'capitalize'}>{lifecycle}</TagLabel>
               </Tag>
             </Tooltip>
-          </Stack>
+          </Flex>
         </Stack>
-        <Text fontSize={'sm'} my={0.5}>
+        <Flex flexDir={'row'} gap={0.5} alignItems={'center'} flexWrap={'wrap'}>
+          <Badge fontSize={'sm'}>{primaryComponent?.name}</Badge>
+          <Badge fontSize={'sm'}>:</Badge>
+          <Badge fontSize={'sm'}>{primaryComponent?.version}</Badge>
+        </Flex>
+        <Text fontSize={'sm'} my={1}>
           {primaryComponent?.description}
         </Text>
         {/* SCAN STATUS */}

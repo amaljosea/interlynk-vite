@@ -74,7 +74,6 @@ const VulnTable = ({
   filterRefetch,
   sbomRefetch
 }) => {
-
   //This part is needed for the pagination to work. (Modify with caution)
   const paginationSizes = [25, 50, 100]
 
@@ -86,7 +85,7 @@ const VulnTable = ({
       setIsPrevActive(data?.pageInfo?.hasPreviousPage)
       setIsNextActive(data?.pageInfo?.hasNextPage)
     }
-  },[data])
+  }, [data])
 
   const setPaginationControl = (data) => {
     setIsPrevActive(data.sbom?.vulns?.pageInfo?.hasPreviousPage)
@@ -97,9 +96,8 @@ const VulnTable = ({
     setIsPrevActive(false)
     setIsNextActive(false)
   }
-  
-  //end
 
+  //end
 
   const toast = useToast()
   // GET VULN FILTER HEADS
@@ -199,7 +197,7 @@ const VulnTable = ({
           </Flex>
         )
       },
-      width: '15%',
+      width: '300px',
       sortable: true
     },
     // SEVERITY
@@ -221,7 +219,7 @@ const VulnTable = ({
           </Tag>
         )
       },
-      width: '9%',
+      width: '140px',
       sortable: true,
       wrap: true
     },
@@ -246,7 +244,7 @@ const VulnTable = ({
           </Tag>
         )
       },
-      width: '9%',
+      width: '120px',
       sortable: true,
       wrap: true
     },
@@ -272,7 +270,7 @@ const VulnTable = ({
           </Flex>
         )
       },
-      width: '8%',
+      width: '120px',
       sortable: true,
       wrap: true
     },
@@ -325,7 +323,7 @@ const VulnTable = ({
           </Flex>
         )
       },
-      width: '10%',
+      width: '150px',
       sortable: true,
       wrap: true
     },
@@ -337,18 +335,12 @@ const VulnTable = ({
         const { component } = row
         return (
           <Tooltip label={component.name} placement='top'>
-            <Text textTransform={'capitalize'}>
-              {component.name !== null
-                ? `${component.name?.substring(0, 30)}${
-                    component.name.length > 30 ? '...' : ''
-                  }`
-                : ''}
-            </Text>
+            <Text textTransform={'capitalize'} my={3}>{component.name || ''}</Text>
           </Tooltip>
         )
       },
       wrap: true,
-      width: '12%',
+      width: '250px',
       sortable: true
     },
     // VERSION
@@ -361,7 +353,7 @@ const VulnTable = ({
         </Tooltip>
       ),
       wrap: true,
-      width: '10%',
+      width: '180px',
       sortable: true
     },
     // STATUS
@@ -385,7 +377,7 @@ const VulnTable = ({
           </Tag>
         )
       },
-      width: '12%',
+      width: '200px',
       wrap: true,
       sortable: true
     },
@@ -407,6 +399,7 @@ const VulnTable = ({
         const dateB = new Date(b.vuln.updatedAt)
         return dateA - dateB // Sort in descending order
       },
+      width: '150px',
       wrap: true,
       right: 'true'
     }
@@ -452,14 +445,12 @@ const VulnTable = ({
       last: undefined,
       after: undefined,
       before: undefined
-    }).then(
-      (res) => {
-        if(res.data){
-          setPaginationControl(res.data)
-          prodVulnDispatch({ type: 'CLEAR_SEARCH_INPUT' })
-        }
+    }).then((res) => {
+      if (res.data) {
+        setPaginationControl(res.data)
+        prodVulnDispatch({ type: 'CLEAR_SEARCH_INPUT' })
       }
-    )
+    })
   }
 
   // ON SEARCH INPUT CHANGE
@@ -497,12 +488,11 @@ const VulnTable = ({
         last: undefined,
         after: undefined,
         before: undefined
-      }).then(
-        (res) => {
-          if(res.data){
-            setPaginationControl(res.data)
-            prodVulnDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
-          }
+      }).then((res) => {
+        if (res.data) {
+          setPaginationControl(res.data)
+          prodVulnDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
+        }
       })
     }
   }
@@ -531,7 +521,7 @@ const VulnTable = ({
           sbomRefetch({
             projectId: productId,
             sbomId: sbomId
-          }).then((res)=>{
+          }).then((res) => {
             res && setPaginationControl(res?.data)
           })
           prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
@@ -545,7 +535,7 @@ const VulnTable = ({
     await refetch({
       projectId: productId,
       sbomId: sbomId
-    }).then((res)=>{
+    }).then((res) => {
       res && setPaginationControl(res.data)
     })
   }
