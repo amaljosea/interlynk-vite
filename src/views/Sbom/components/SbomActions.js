@@ -138,12 +138,12 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
   } = useDisclosure()
 
   const filterVersion = data
-    ? data.project.sboms.find((item) => item.id === sbomId)
+    ? data?.project?.sboms.find((item) => item.id === sbomId)
     : []
 
   const uniqVersions = []
 
-  data.project.sboms?.length > 0 &&
+  data?.project?.sboms?.length > 0 &&
     data.project.sboms.map((project) => {
       uniqVersions.push({
         label: normalizeSBOMVersion(project),

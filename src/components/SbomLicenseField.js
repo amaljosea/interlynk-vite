@@ -200,7 +200,7 @@ const SbomLicenseField = ({ isValid, setIsValid }) => {
               onChange={handleExpChange}
               placeholder='Enter valid SPDX Expression'
             />
-            {!isValid && (
+            {exp !== '' && !isValid && (
               <Alert
                 fontSize={'sm'}
                 mt='2'
