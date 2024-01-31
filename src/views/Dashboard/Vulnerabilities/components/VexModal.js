@@ -105,7 +105,7 @@ const VexModal = ({
 
   const handleSave = () => {
     setToggleClear(false)
-    console.log('selectedVulns', selectedVulns)
+    // console.log('selectedVulns', selectedVulns)
     if (selectedVulns?.length > 0) {
       selectedVulns?.map((item) => {
         compVexCreate({
@@ -121,25 +121,24 @@ const VexModal = ({
             action: actionStatement !== '' ? actionStatement : undefined,
             fixedIn: selectedTag !== '' ? selectedTag : undefined
           }
+        }).then((res) => {
+          setStatusTitle('')
+          setStatusName('')
+          setJustification('')
+          setJustifyName('')
+          setSelectedTag('')
+          setActionStatement('')
+          setResponse('')
+          setResponseTitle('')
+          setDetails('')
+          setNotes('')
+          setImpactData('')
+          if (res.data) {
+            refetch({ id: vulnId, first: totalRows, last: undefined })
+            setToggleClear(true)
+          }
         })
-          .then((res) => {
-            setStatusTitle('')
-            setStatusName('')
-            setJustification('')
-            setJustifyName('')
-            setSelectedTag('')
-            setActionStatement('')
-            setResponse('')
-            setResponseTitle('')
-            setDetails('')
-            setNotes('')
-            setImpactData('')
-            if (res.data) {
-              refetch({ variables: { id: vulnId, first: totalRows } })
-              setToggleClear(true)
-            }
-          })
-          .finally(() => window.location.reload())
+        // .finally(() => window.location.reload())
       })
     }
   }

@@ -12,7 +12,7 @@ import {
   Box
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import CustomLoader from 'components/CustomLoader'
 import Filters from './Filters'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -69,6 +69,18 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
   const [selectedVulns, setSelectedVulns] = useState([])
   const [filterInput, setFilterInput] = useState('')
   const [toggleClear, setToggleClear] = useState(false)
+  const [isPrevActive, setIsPrevActive] = useState(false)
+  const [isNextActive, setIsNextActive] = useState(false)
+
+  const setPaginationControl = (data) => {
+    setIsPrevActive(data?.pageInfo?.hasPreviousPage)
+    setIsNextActive(data?.pageInfo?.hasNextPage)
+  }
+
+  const disablePaginationControl = () => {
+    setIsPrevActive(false)
+    setIsNextActive(false)
+  }
 
   // COLUMNS
   const columns = [
@@ -169,28 +181,18 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
     }
   ]
 
-  const vulnData = {
-    id,
-    first: totalRows,
-    search: searchInput !== '' ? searchInput : undefined,
-    projectNames: envs?.length === 0 ? undefined : envs,
-    versions: versions?.length === 0 ? undefined : versions,
-    statuses: statuses?.length === 0 ? undefined : statuses
-  }
-
   // SEARCH COMPONENT
   const handleSearch = async (event) => {
     const { value } = event.target
     if (event.key === 'Enter' && filterInput !== '') {
       refetch({
-        variables: {
-          id,
-          first: totalRows,
-          search: value,
-          projectNames: envs?.length === 0 ? undefined : envs,
-          versions: versions?.length === 0 ? undefined : versions,
-          statuses: statuses?.length === 0 ? undefined : statuses
-        }
+        id,
+        first: totalRows,
+        last: undefined,
+        search: value,
+        projectNames: envs?.length === 0 ? undefined : envs,
+        versions: versions?.length === 0 ? undefined : versions,
+        statuses: statuses?.length === 0 ? undefined : statuses
       }).then(
         (res) =>
           res.data &&
@@ -203,14 +205,13 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
   const handleClear = async () => {
     setFilterInput('')
     await refetch({
-      variables: {
-        id,
-        first: totalRows,
-        search: undefined,
-        projectNames: envs?.length === 0 ? undefined : envs,
-        versions: versions?.length === 0 ? undefined : versions,
-        statuses: statuses?.length === 0 ? undefined : statuses
-      }
+      id,
+      first: totalRows,
+      last: undefined,
+      search: undefined,
+      projectNames: envs?.length === 0 ? undefined : envs,
+      versions: versions?.length === 0 ? undefined : versions,
+      statuses: statuses?.length === 0 ? undefined : statuses
     }).then(
       (res) => res.data && compVulnDispatch({ type: 'CLEAR_SEARCH_INPUT' })
     )
@@ -274,14 +275,21 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
 
   // ON PREV PAGE
   const handlePreviousPage = async () => {
+    disablePaginationControl()
     await refetch({
-      variables: {
-        ...vulnData,
-        before: data?.pageInfo?.startCursor
-      }
+      id,
+      first: undefined,
+      last: totalRows,
+      after: undefined,
+      before: data?.pageInfo?.startCursor,
+      search: searchInput !== '' ? searchInput : undefined,
+      projectNames: envs?.length === 0 ? undefined : envs,
+      versions: versions?.length === 0 ? undefined : versions,
+      statuses: statuses?.length === 0 ? undefined : statuses
     }).then((res) => {
       if (res.data) {
         const project = res?.data?.componentVulns
+        setPaginationControl(project)
         compVulnDispatch({
           type: 'DECREMENT_PAGE',
           payload: project?.pageInfo.startCursor
@@ -292,14 +300,21 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
 
   // ON NEXT PAGE
   const handleNextPage = async () => {
+    disablePaginationControl()
     await refetch({
-      variables: {
-        ...vulnData,
-        after: data?.pageInfo?.endCursor
-      }
+      id,
+      first: totalRows,
+      last: undefined,
+      after: data?.pageInfo?.endCursor,
+      before: undefined,
+      search: searchInput !== '' ? searchInput : undefined,
+      projectNames: envs?.length === 0 ? undefined : envs,
+      versions: versions?.length === 0 ? undefined : versions,
+      statuses: statuses?.length === 0 ? undefined : statuses
     }).then((res) => {
       if (res.data) {
         const project = res?.data?.componentVulns
+        setPaginationControl(project)
         compVulnDispatch({
           type: 'INCREMENT_PAGE',
           payload: {
@@ -316,10 +331,9 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
     const { value } = e.target
     setTotalRows(Number(value))
     await refetch({
-      variables: {
-        id,
-        first: Number(value)
-      }
+      id,
+      first: Number(value),
+      last: undefined
     }).then((res) => {
       if (res.data) {
         compVulnDispatch({
@@ -328,6 +342,13 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
       }
     })
   }
+
+  useEffect(() => {
+    if (data) {
+      setIsPrevActive(data?.pageInfo?.hasPreviousPage)
+      setIsNextActive(data?.pageInfo?.hasNextPage)
+    }
+  }, [data])
 
   return (
     <>
@@ -362,14 +383,14 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
               <Button
                 colorScheme='blue'
                 onClick={handlePreviousPage}
-                isDisabled={!data.pageInfo.hasPreviousPage}
+                isDisabled={!isPrevActive}
               >
                 Prev
               </Button>
               <Button
                 colorScheme='blue'
                 onClick={handleNextPage}
-                isDisabled={!data.pageInfo.hasNextPage}
+                isDisabled={!isNextActive}
               >
                 Next
               </Button>

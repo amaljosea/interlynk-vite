@@ -214,7 +214,18 @@ const ProductDetails = () => {
     onCompleted: () => refetch({ id: productId })
   })
 
-  const [getVulnData, { data: vulnInfo }] = useLazyQuery(GetGlobalVulnData)
+  const { data: vulnInfo, refetch: getVulnData } = useQuery(GetGlobalVulnData, {
+    skip: vulnId ? false : true,
+    fetchPolicy: 'network-only',
+    variables: {
+      id: vulnId,
+      first: totalRows,
+      search: compVulnSearch !== '' ? compVulnSearch : undefined,
+      projectNames: envs?.length === 0 ? undefined : envs,
+      versions: sbomVersions?.length === 0 ? undefined : sbomVersions,
+      statuses: statuses?.length === 0 ? undefined : statuses
+    }
+  })
 
   const activeTab = Number(sessionStorage.getItem('activeProdTab'))
 
@@ -311,21 +322,6 @@ const ProductDetails = () => {
       })
     }
   }, [activeTab, activeEnv])
-
-  useEffect(() => {
-    if (vulnId) {
-      getVulnData({
-        variables: {
-          id: vulnId,
-          first: totalRows,
-          search: compVulnSearch !== '' ? compVulnSearch : undefined,
-          projectNames: envs?.length === 0 ? undefined : envs,
-          versions: sbomVersions?.length === 0 ? undefined : sbomVersions,
-          statuses: statuses?.length === 0 ? undefined : statuses
-        }
-      })
-    }
-  }, [vulnId])
 
   if (loading) {
     return (
