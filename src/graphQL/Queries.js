@@ -540,6 +540,7 @@ export const GetGlobalVulnData = gql`
       sbomVersionsCount
     }
     componentVulns(
+      vulnId: $id
       after: $after
       first: $first
       before: $before
@@ -569,6 +570,7 @@ export const GetGlobalVulnData = gql`
           name
           version
           sbom {
+            id
             createdAt
             creationAt
             updatedAt

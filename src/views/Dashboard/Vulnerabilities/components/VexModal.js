@@ -26,6 +26,7 @@ import { GetProject } from 'graphQL/Queries'
 import { normalizeSBOMVersion } from 'utils'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { UpdateGlobalVex } from 'graphQL/Mutation'
+import { updateCompVulnVex } from 'graphQL/Mutation'
 
 const VexModal = ({
   isOpen,
@@ -39,7 +40,9 @@ const VexModal = ({
 
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
+  const groupId = queryParams.get('id')
   const vulnId = queryParams.get('vulnId')
+  const prodId = sessionStorage.getItem('activeEnv')
 
   const [statusTitle, setStatusTitle] = useState('')
   const [statusName, setStatusName] = useState('')
@@ -58,7 +61,7 @@ const VexModal = ({
   const { data: allVexJustify } = useQuery(getVexJustifications)
   const { data: allCdx } = useQuery(GetCdxResponses)
 
-  const [compVexCreate] = useMutation(UpdateGlobalVex, {
+  const [compVexCreate] = useMutation(updateCompVulnVex, {
     fetchPolicy: 'network-only',
     onCompleted: () => {
       refetch({ id: vulnId, first: totalRows, last: undefined })
@@ -114,7 +117,8 @@ const VexModal = ({
       selectedVulns?.map((item) => {
         compVexCreate({
           variables: {
-            vulnId: item?.vulnId,
+            compVulnId: item?.id,
+            sbomId: item?.component?.sbom?.id,
             vexStatusId: statusTitle,
             details: details !== '' ? details : undefined,
             note: notes !== '' ? notes : undefined,
@@ -138,7 +142,7 @@ const VexModal = ({
           setNotes('')
           setImpactData('')
         })
-        // .finally(() => window.location.reload())
+        .finally(() => onClose())
       })
     }
   }
