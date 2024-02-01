@@ -12,7 +12,7 @@ import {
   Select,
   IconButton,
   Divider,
-  Avatar
+  Badge
 } from '@chakra-ui/react'
 import { sevColor, timeSince, getFullDateAndTime, customStyles } from 'utils'
 import { ChevronDownIcon, ChevronUpIcon, RepeatIcon } from '@chakra-ui/icons'
@@ -64,20 +64,27 @@ const GlobalVulnTable = ({ data, refetch }) => {
       name: 'ID',
       wrap: true,
       selector: (row) => {
-        const { vulnId, id } = params?.name ? row?.vuln : row
+        const { vulnId, id, vulnInfo } = params?.name ? row?.vuln : row
         return (
-          <Link
-            to={
-              params?.name
-                ? `/vendor/products/${product?.name}?id=${product?.id}&vulnId=${id}`
-                : `/vendor/vulnerabilities?vulnId=${id}`
-            }
-            onClick={() => sessionStorage.setItem('activeVuln', vulnId)}
-          >
-            <Text fontSize='sm' color={'blue.500'}>
-              {vulnId || ''}
-            </Text>
-          </Link>
+          <Stack spacing={1} my={2}>
+            <Link
+              to={
+                params?.name
+                  ? `/vendor/products/${product?.name}?id=${product?.id}&vulnId=${id}`
+                  : `/vendor/vulnerabilities?vulnId=${id}`
+              }
+              onClick={() => sessionStorage.setItem('activeVuln', vulnId)}
+            >
+              <Text fontSize='sm' color={'blue.500'}>
+                {vulnId || ''}
+              </Text>
+            </Link>
+            {vulnInfo?.kev === true && (
+              <Badge width={'fit-content'} variant='subtle' colorScheme='red'>
+                KEV
+              </Badge>
+            )}
+          </Stack>
         )
       },
       width: '15%'
@@ -219,13 +226,29 @@ const GlobalVulnTable = ({ data, refetch }) => {
 
         return (
           <Stack fontWeight={'medium'} direction={'row'} my={2}>
-            <Round bg='gray.200' label='Unspecified'>{unspecifiedCount}</Round>
-            <Round bg='blue.100' label='In Triage'>{inTriageCount}</Round>
-            <Round bg='red.100' label='Affected'>{affectedCount}</Round>
-            <Divider orientation='vertical' colorScheme={'gray.900'} height={10} />
-            <Round bg='orange.100' label='Fixed'>{fixedCount}</Round>
-            <Round bg='green.100' label='Not Affected'>{notAffectedCount}</Round>
-            <Round bg='pink.100' label='False Positive'>{falsePositiveCount}</Round>
+            <Round bg='gray.200' label='Unspecified'>
+              {unspecifiedCount}
+            </Round>
+            <Round bg='blue.100' label='In Triage'>
+              {inTriageCount}
+            </Round>
+            <Round bg='red.100' label='Affected'>
+              {affectedCount}
+            </Round>
+            <Divider
+              orientation='vertical'
+              colorScheme={'gray.900'}
+              height={10}
+            />
+            <Round bg='orange.100' label='Fixed'>
+              {fixedCount}
+            </Round>
+            <Round bg='green.100' label='Not Affected'>
+              {notAffectedCount}
+            </Round>
+            <Round bg='pink.100' label='False Positive'>
+              {falsePositiveCount}
+            </Round>
           </Stack>
         )
       },
