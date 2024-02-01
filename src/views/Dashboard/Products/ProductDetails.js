@@ -216,7 +216,7 @@ const ProductDetails = () => {
 
   const { data: vulnInfo, refetch: getVulnData } = useQuery(GetGlobalVulnData, {
     skip: vulnId ? false : true,
-    fetchPolicy: 'network-only',
+    fetchPolicy: 'cache-first',
     variables: {
       id: vulnId,
       first: totalRows,
