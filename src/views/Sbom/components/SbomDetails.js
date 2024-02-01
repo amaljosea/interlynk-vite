@@ -119,7 +119,7 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
                   color={'blue.500'}
                   textDecor={'underline'}
                 >
-                  {name} : {currentSBOM?.version}
+                  {name}
                 </Text>
               </HStack>
             </Link>
@@ -131,8 +131,7 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
             gap={2}
           >
             <Text fontWeight={'semibold'} fontSize={25}>
-              {project?.projectGroup?.name} :{' '}
-              {currentSBOM?.version || normalizeSBOMVersion(sbom)}
+              {project?.projectGroup?.name}
             </Text>
             <Tooltip label='Lifecycle stage' fontSize='md'>
               <Tag
@@ -147,9 +146,9 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
           </Flex>
         </Stack>
         <Flex flexDir={'row'} gap={0.5} alignItems={'center'} flexWrap={'wrap'}>
-          <Badge fontSize={'sm'}>{primaryComponent?.name}</Badge>
-          <Badge fontSize={'sm'}>{primaryComponent?.version ? ':' : ''}</Badge>
-          <Badge fontSize={'sm'}>{primaryComponent?.version}</Badge>
+          <Text>{primaryComponent?.name}</Text>
+          <Text>{primaryComponent?.version ? ':' : ''}</Text>
+          <Text>{primaryComponent?.version}</Text>
         </Flex>
         <Text fontSize={'sm'} my={1}>
           {primaryComponent?.description}
