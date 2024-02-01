@@ -61,11 +61,7 @@ const compVulnReducer = (state, action) => {
     case 'FILTER_STATUS':
       return {
         ...state,
-        statuses: [...payload]?.includes('all')
-          ? []
-          : [...payload]?.includes('Unspecified')
-            ? [null]
-            : payload,
+        statuses: [...payload]?.includes('all') ? [] : payload,
         pageIndex: 1,
         after: '',
         before: ''
