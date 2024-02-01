@@ -43,10 +43,11 @@ import Cookies from 'js-cookie'
 import { customStyles } from 'utils'
 import ImportWizard from 'views/Sbom/components/ImportWizard'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useLazyQuery, useMutation } from '@apollo/client'
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { GetVulnFilterData } from 'graphQL/Queries'
 import { ManualVulnScan } from 'graphQL/Mutation'
 import Pagination from '../Pagination'
+import { FirstDegreePartVulns } from 'graphQL/Queries'
 
 const statusColor = (status) => {
   if (status && status === 'Fixed') {
@@ -74,6 +75,18 @@ const VulnTable = ({
   filterRefetch,
   sbomRefetch
 }) => {
+  const firstDegreePart = data?.nodes?.filter(
+    (item) => item.isFirstDegreePart === true
+  )
+  const componentVulnIds = firstDegreePart?.map((item) => item?.id)
+  const sbomIds = firstDegreePart?.map((item) => item?.component?.sbom?.id)
+
+  const { data: parts } = useQuery(FirstDegreePartVulns, {
+    skip: firstDegreePart ? false : true,
+    variables: { sbomIds, componentVulnIds },
+    onCompleted: (data) => console.log('Parts', data)
+  })
+
   //This part is needed for the pagination to work. (Modify with caution)
   const paginationSizes = [25, 50, 100]
 
@@ -169,11 +182,13 @@ const VulnTable = ({
       name: 'ID',
       wrap: true,
       selector: (row) => {
-        const { vuln } = row
+        const { vuln, isPart, component } = row
+        const { sbom } = component
+        const { primaryComponent, createdAt } = sbom
         const { vulnInfo } = vuln
         const { kev } = vulnInfo ? vulnInfo : ''
         return (
-          <Flex direction='row' alignItems={'center'} gap={2}>
+          <Flex direction='row' alignItems={'flex-start'} gap={2} my={3}>
             <Link href={linkURl(vuln.source, vuln.vulnId)} target={'_blank'}>
               <Icon
                 as={ExternalLinkIcon}
@@ -182,12 +197,25 @@ const VulnTable = ({
                 color={'blue.500'}
               />
             </Link>
-            <Stack direction={'column'} my={2}>
+            <Stack direction={'column'} spacing={1.5}>
               <Tooltip label={vuln.vulnId} placement={'top'}>
                 <Text fontSize='sm' color={textColor} data-tag='allowRowEvents'>
                   {vuln.vulnId !== null ? `${vuln.vulnId}` : ''}
                 </Text>
               </Tooltip>
+              {isPart && (
+                <Text
+                  fontSize={'xs'}
+                  fontWeight={'medium'}
+                  width={'fit-content'}
+                >
+                  {primaryComponent?.name ||
+                    `Uploaded at ${getFullDateAndTime(createdAt)}`}{' '}
+                  {primaryComponent?.version
+                    ? `: ${primaryComponent?.version}`
+                    : ''}
+                </Text>
+              )}
               {kev === true && (
                 <Badge width={'fit-content'} variant='subtle' colorScheme='red'>
                   KEV
@@ -197,7 +225,7 @@ const VulnTable = ({
           </Flex>
         )
       },
-      width: '300px',
+      width: '320px',
       sortable: true
     },
     // SEVERITY
@@ -335,7 +363,9 @@ const VulnTable = ({
         const { component } = row
         return (
           <Tooltip label={component.name} placement='top'>
-            <Text textTransform={'capitalize'} my={3}>{component.name || ''}</Text>
+            <Text textTransform={'capitalize'} my={3}>
+              {component.name || ''}
+            </Text>
           </Tooltip>
         )
       },
@@ -399,7 +429,6 @@ const VulnTable = ({
         const dateB = new Date(b.vuln.updatedAt)
         return dateA - dateB // Sort in descending order
       },
-      width: '150px',
       wrap: true,
       right: 'true'
     }
