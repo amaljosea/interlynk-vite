@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import ReactDOM from 'react-dom'
 import ReactGA from 'react-ga'
 import * as Sentry from '@sentry/react'
@@ -25,8 +25,10 @@ import Profile from 'views/Dashboard/Profile'
 import Success from 'layouts/Success'
 import Cookies from 'js-cookie'
 import theme from 'theme/theme.js'
+import ChatbotPreview from 'components/ChatbotPreview'
 
 const authToken = Cookies.get('authToken')
+const env = process.env.NODE_ENV
 
 const TRACKING_ID = '411749268'
 ReactGA.initialize(TRACKING_ID)
@@ -63,6 +65,7 @@ ReactDOM.render(
     <BrowserRouter>
       <GlobalStateProvider>
         <ChakraProvider theme={theme} resetCSS={true}>
+          <ChatbotPreview env={env} />
           <ScrollToTop />
           <Routes>
             <Route
