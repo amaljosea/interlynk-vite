@@ -428,7 +428,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
             <Text size='md' my={2}>
               Status History
             </Text>
-            {(componentVulnLogs.length > 0 || newVulnLogs.length > 0) && (
+            {(componentVulnLogs?.length > 0 || newVulnLogs?.length > 0) && (
               <Table variant='simple' color={textColor} size='sm' my={2}>
                 <Thead>
                   <Tr my='.8rem'>
@@ -464,7 +464,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
               </Table>
             )}
 
-            {componentVulnLogs.length === 0 && newVulnLogs.length === 0 && (
+            {componentVulnLogs?.length === 0 && newVulnLogs?.length === 0 && (
               <Text color={'darkgrey'}>No status history found</Text>
             )}
           </Flex>

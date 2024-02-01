@@ -1400,6 +1400,8 @@ export const GetVulnData = gql`
         nodes {
           id
           impact
+          isPart
+          isFirstDegreePart
           cdxResponseId
           vuln {
             vulnId
@@ -1436,6 +1438,14 @@ export const GetVulnData = gql`
           component {
             name
             version
+            sbom {
+              id
+              createdAt
+              primaryComponent {
+                name
+                version
+              }
+            }
           }
           vexStatus {
             id
@@ -1618,6 +1628,7 @@ export const GetProject = gql`
         spec
         specVersion
         updatedAt
+        createdAt
         creationAt
         primaryComponent {
           id
@@ -2470,6 +2481,28 @@ export const GetSbomParts = gql`
             contactName
           }
         }
+      }
+    }
+  }
+`
+
+// GET ALL FIRST DEGREE PART VULNS
+export const FirstDegreePartVulns = gql`
+  query FirstDegreePartVulns($sbomIds: [Uuid!]!, $componentVulnIds: [Uuid!]!) {
+    sbomsCompVuln(sbomIds: $sbomIds, componentVulnIds: $componentVulnIds) {
+      component {
+        id
+      }
+      componentVulnLogs {
+        id
+        changedBy
+        status
+        justification
+        note
+        updatedAt
+      }
+      vuln {
+        id
       }
     }
   }
