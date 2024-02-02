@@ -20,12 +20,13 @@ import {
   getVexJustifications,
   GetCdxResponses
 } from 'graphQL/Queries'
-import { updateCompVulnVex } from 'graphQL/Mutation'
 import { useMutation, useQuery } from '@apollo/client'
 import { useLocation } from 'react-router-dom'
 import { GetProject } from 'graphQL/Queries'
-import { removeDuplicates, getFullDateAndTime, normalizeSBOMVersion } from 'utils'
+import { normalizeSBOMVersion } from 'utils'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { UpdateGlobalVex } from 'graphQL/Mutation'
+import { updateCompVulnVex } from 'graphQL/Mutation'
 
 const VexModal = ({
   isOpen,
@@ -33,14 +34,15 @@ const VexModal = ({
   refetch,
   selectedVulns,
   setSelectedVulns,
-  setPageIndex,
   setToggleClear
 }) => {
   const { totalRows } = useGlobalState()
 
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
+  const groupId = queryParams.get('id')
   const vulnId = queryParams.get('vulnId')
+  const prodId = sessionStorage.getItem('activeEnv')
 
   const [statusTitle, setStatusTitle] = useState('')
   const [statusName, setStatusName] = useState('')
@@ -61,7 +63,11 @@ const VexModal = ({
 
   const [compVexCreate] = useMutation(updateCompVulnVex, {
     fetchPolicy: 'network-only',
-    onCompleted: () => setSelectedVulns([])
+    onCompleted: () => {
+      refetch({ id: vulnId, first: totalRows, last: undefined })
+      setSelectedVulns([])
+      setToggleClear(true)
+    }
   })
 
   const handleStatusChange = (e) => {
@@ -69,11 +75,15 @@ const VexModal = ({
     const status = e.target.options[e.target.selectedIndex].text
     setStatusTitle(value)
     setStatusName(status)
-    if (status === 'Not Affected' || status === 'Affected') {
-      setJustification('')
-      setJustifyName('')
-      setImpactData('')
-    }
+    setJustification('')
+    setJustifyName('')
+    setSelectedTag('')
+    setActionStatement('')
+    setResponse('')
+    setResponseTitle('')
+    setDetails('')
+    setNotes('')
+    setImpactData('')
   }
 
   const handleResponseChange = (e) => {
@@ -91,15 +101,10 @@ const VexModal = ({
 
   const uniqVersions = []
 
-  const filteredDuplicated =
-    data?.project?.sboms?.length > 0
-      ? removeDuplicates(data?.project?.sboms)
-      : []
-
-  filteredDuplicated &&
-    filteredDuplicated.map((project) => {
+  data?.project?.sboms?.length > 0 &&
+    data?.project?.sboms.map((project) => {
       uniqVersions.push({
-        label: normalizeSBOMVersion(project),
+        label: normalizeSBOMVersion(project)
       })
     })
 
@@ -107,11 +112,13 @@ const VexModal = ({
 
   const handleSave = () => {
     setToggleClear(false)
+    console.log('selectedVulns', selectedVulns)
     if (selectedVulns?.length > 0) {
       selectedVulns?.map((item) => {
         compVexCreate({
           variables: {
             compVulnId: item?.id,
+            sbomId: item?.component?.sbom?.id,
             vexStatusId: statusTitle,
             details: details !== '' ? details : undefined,
             note: notes !== '' ? notes : undefined,
@@ -122,15 +129,20 @@ const VexModal = ({
             action: actionStatement !== '' ? actionStatement : undefined,
             fixedIn: selectedTag !== '' ? selectedTag : undefined
           }
+        }).then((res) => {
+          setStatusTitle('')
+          setStatusName('')
+          setJustification('')
+          setJustifyName('')
+          setSelectedTag('')
+          setActionStatement('')
+          setResponse('')
+          setResponseTitle('')
+          setDetails('')
+          setNotes('')
+          setImpactData('')
         })
-          .then((res) => {
-            if (res.data) {
-              refetch({ variables: { id: vulnId, first: totalRows } })
-              setPageIndex(1)
-              setToggleClear(true)
-            }
-          })
-          .finally(() => onClose())
+        .finally(() => onClose())
       })
     }
   }

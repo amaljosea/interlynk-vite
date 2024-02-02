@@ -1,5 +1,5 @@
 import { useMutation } from '@apollo/client'
-import {AddIcon, RepeatIcon} from '@chakra-ui/icons'
+import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
 import {
   Avatar,
   Flex,
@@ -279,10 +279,10 @@ const TeamTable = ({ data, refetch }) => {
       >
         {/* SEARCH COMPONENTS */}
         <Stack
-            width={'100%'}
-            direction={'row'}
-            spacing={4}
-            alignItems={'flex-start'}
+          width={'100%'}
+          direction={'row'}
+          spacing={4}
+          alignItems={'flex-start'}
         >
           <SearchFilter
             id='team'
@@ -294,12 +294,12 @@ const TeamTable = ({ data, refetch }) => {
         </Stack>
 
         <Stack
-            width={'100%'}
-            direction={'row'}
-            spacing={4}
-            justifyContent={'flex-end'}>
-
-        {/* INVITE USER */}
+          width={'100%'}
+          direction={'row'}
+          spacing={2}
+          justifyContent={'flex-end'}
+        >
+          {/* INVITE USER */}
           <Tooltip label='Invite User' placement='top'>
             <IconButton
               onClick={onTeamOpen}
@@ -314,9 +314,9 @@ const TeamTable = ({ data, refetch }) => {
 
           <Tooltip label='Refresh'>
             <IconButton
-                onClick={() => refetch()}
-                colorScheme='blue'
-                icon={<RepeatIcon />}
+              onClick={() => refetch()}
+              colorScheme='blue'
+              icon={<RepeatIcon />}
             ></IconButton>
           </Tooltip>
         </Stack>
@@ -341,7 +341,8 @@ const TeamTable = ({ data, refetch }) => {
   const onResendInvite = async (row) => {
     await inviteUsers({
       variables: {
-        email: row?.email.toLowerCase()
+        email: row?.email.toLowerCase(),
+        roleId: row?.role?.id
       }
     }).then((res) => {
       if (res.data.organizationUserInvite.errors.length > 0) {

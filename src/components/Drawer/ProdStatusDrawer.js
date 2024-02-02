@@ -25,15 +25,13 @@ import {
 } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useEffect, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 
 const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
   const location = useLocation()
-  const navigate = useNavigate()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
-  const currentProduct = JSON.parse(sessionStorage.getItem(`product`))
   const { data: res } = useQuery(GetCdxResponses)
 
   const { totalRows, userPermissions, prodVulnState, dispatch } =
@@ -108,7 +106,8 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
   }
 
   const [compVexCreate] = useMutation(updateCompVulnVex, {
-    fetchPolicy: 'network-only'
+    fetchPolicy: 'network-only',
+    onCompleted: handleRefetch
   })
 
   const handleStatusChange = (e) => {
@@ -116,11 +115,15 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
     const status = e.target.options[e.target.selectedIndex].text
     setStatusTitle(value)
     setStatusName(status)
-    if (status === 'Not Affected' || status === 'Affected') {
-      setJustification('')
-      setJustifyName('')
-      setImpactData('')
-    }
+    setJustification('')
+    setJustifyName('')
+    setSelectedTag('')
+    setActionStatement('')
+    setResponse('')
+    setResponseTitle('')
+    setDetails('')
+    setNotes('')
+    setImpactData('')
   }
 
   const handleResponseChange = (e) => {
@@ -139,6 +142,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
   const handleSave = async () => {
     await compVexCreate({
       variables: {
+        sbomId: sbomId,
         compVulnId: id,
         vexStatusId: statusTitle,
         details: details !== '' ? details : undefined,
@@ -149,24 +153,22 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
         action: actionStatement !== '' ? actionStatement : undefined,
         fixedIn: selectedTag !== '' ? selectedTag : undefined
       }
+    }).then((res) => {
+      setStatusTitle('')
+      setStatusName('')
+      setJustification('')
+      setJustifyName('')
+      setSelectedTag('')
+      setActionStatement('')
+      setResponse('')
+      setResponseTitle('')
+      setDetails('')
+      setNotes('')
+      setImpactData('')
+      if (res.data) {
+        prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
+      }
     })
-      .then((res) => {
-        setStatusTitle('')
-        setStatusName('')
-        setJustification('')
-        setJustifyName('')
-        setSelectedTag('')
-        setActionStatement('')
-        setResponse('')
-        setResponseTitle('')
-        setDetails('')
-        setNotes('')
-        setImpactData('')
-        if (res.data) {
-          prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
-        }
-      })
-      .finally(() => handleRefetch())
   }
 
   const fixedVersions = filteredData.filter((item) => item.value !== sbomId)
@@ -400,7 +402,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
               width={'fit-content'}
               colorScheme='blue'
               onClick={handleSave}
-              disabled={
+              isDisabled={
                 statusTitle === '' ||
                 (statusName === 'Not Affected' && justification === '') ||
                 (statusName === 'Not Affected' &&
@@ -426,7 +428,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
             <Text size='md' my={2}>
               Status History
             </Text>
-            {(componentVulnLogs.length > 0 || newVulnLogs.length > 0) && (
+            {(componentVulnLogs?.length > 0 || newVulnLogs?.length > 0) && (
               <Table variant='simple' color={textColor} size='sm' my={2}>
                 <Thead>
                   <Tr my='.8rem'>
@@ -462,7 +464,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
               </Table>
             )}
 
-            {componentVulnLogs.length === 0 && newVulnLogs.length === 0 && (
+            {componentVulnLogs?.length === 0 && newVulnLogs?.length === 0 && (
               <Text color={'darkgrey'}>No status history found</Text>
             )}
           </Flex>

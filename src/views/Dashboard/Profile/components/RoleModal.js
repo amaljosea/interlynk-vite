@@ -75,7 +75,7 @@ const RoleModal = ({ isOpen, onClose, refetch, data }) => {
             {roles && (
               <FormControl>
                 <FormLabel>Role</FormLabel>
-                <Select value={role} onChange={(e) => setRole(e.target.value)}>
+                <Select value={role} onChange={(e) => setRole(e.target.value)} textTransform={'capitalize'}>
                   <option value=''>-- Select --</option>
                   {roles?.organization?.organizationRoles.map((item) => (
                     <option value={item.id}>{item.name}</option>
@@ -90,7 +90,12 @@ const RoleModal = ({ isOpen, onClose, refetch, data }) => {
           <Button mr={3} onClick={onClose}>
             Cancel
           </Button>
-          <Button variant='solid' colorScheme='blue' onClick={updateRole}>
+          <Button
+            variant='solid'
+            colorScheme='blue'
+            onClick={updateRole}
+            disabled={role === ''}
+          >
             Update
           </Button>
         </ModalFooter>

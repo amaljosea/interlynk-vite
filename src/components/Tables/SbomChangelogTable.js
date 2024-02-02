@@ -8,7 +8,7 @@ import {
   Tooltip,
   IconButton
 } from '@chakra-ui/react'
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { RepeatIcon } from '@chakra-ui/icons'
 import { useLocation } from 'react-router-dom'
@@ -18,7 +18,6 @@ import LogFilterMenu from 'views/Sbom/components/LogFilterMenu'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import { useGlobalState } from 'hooks/useGlobalState'
 import Pagination from '../Pagination'
-
 
 const setColor = (type) => {
   switch (type) {
@@ -40,7 +39,30 @@ const setColor = (type) => {
 }
 
 const SbomChangelogTable = ({ data, refetch }) => {
+  //This part is needed for the pagination to work. (Modify with caution)
   const paginationSizes = [25, 50, 100]
+
+  const [isPrevActive, setIsPrevActive] = useState(false)
+  const [isNextActive, setIsNextActive] = useState(false)
+
+  useEffect(() => {
+    if (data) {
+      setIsPrevActive(data?.pageInfo?.hasPreviousPage)
+      setIsNextActive(data?.pageInfo?.hasNextPage)
+    }
+  }, [data])
+
+  const setPaginationControl = (data) => {
+    setIsPrevActive(data.sbom?.activityLogs?.pageInfo?.hasPreviousPage)
+    setIsNextActive(data.sbom?.activityLogs?.pageInfo?.hasNextPage)
+  }
+
+  const disablePaginationControl = () => {
+    setIsPrevActive(false)
+    setIsNextActive(false)
+  }
+
+  //end
 
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -74,6 +96,7 @@ const SbomChangelogTable = ({ data, refetch }) => {
         )
       },
       sortable: true,
+      wrap: true,
       width: '90px'
     },
     // CHANGED OBJECT
@@ -101,6 +124,7 @@ const SbomChangelogTable = ({ data, refetch }) => {
           </Tooltip>
         )
       },
+      wrap: true,
       sortable: true
     },
     // PRIOR VALUE
@@ -177,7 +201,8 @@ const SbomChangelogTable = ({ data, refetch }) => {
             </Tooltip>
           </Flex>
         )
-      }
+      },
+      wrap: true
     },
     // UPDATED VALUE
     {
@@ -253,7 +278,8 @@ const SbomChangelogTable = ({ data, refetch }) => {
             </Tooltip>
           </Flex>
         )
-      }
+      },
+      wrap: true
     },
     // CHANGED BY
     {
@@ -265,8 +291,9 @@ const SbomChangelogTable = ({ data, refetch }) => {
         </Tooltip>
       ),
       sortable: true,
-      width: '12%',
-      right: 'true'
+      width: '200px',
+      right: 'true',
+      wrap: true,
     },
     // CHANGED ON
     {
@@ -285,16 +312,21 @@ const SbomChangelogTable = ({ data, refetch }) => {
         const dateB = new Date(b.updatedAt)
         return dateA - dateB // Sort in descending order
       },
-      width: '12%',
-      right: 'true'
+      width: '180px',
+      right: 'true',
+      wrap: true,
     }
   ]
 
   const handlePreviousPage = async () => {
+    disablePaginationControl()
+
     await refetch({
       projectId: productId,
       sbomId: sbomId,
+      first: undefined,
       last: totalRows,
+      after: undefined,
       before: data.pageInfo.startCursor,
       field: field,
       direction: direction
@@ -309,11 +341,15 @@ const SbomChangelogTable = ({ data, refetch }) => {
   }
 
   const handleNextPage = async () => {
+    disablePaginationControl()
+
     refetch({
       projectId: productId,
       sbomId: sbomId,
       first: totalRows,
+      last: undefined,
       after: data.pageInfo.endCursor,
+      before: undefined,
       field: field,
       direction: direction
     }).then(
@@ -328,19 +364,23 @@ const SbomChangelogTable = ({ data, refetch }) => {
 
   // CLEAR SERACH
   const handleClear = async () => {
+    disablePaginationControl()
+
     setLogSearch('')
     await refetch({
       projectId: productId,
       sbomId: sbomId,
       search: undefined,
       first: totalRows
-    }).then(
-      (res) =>
-        res.data &&
+    }).then((res) => {
+      if (res.data) {
+        setPaginationControl(res.data)
+
         sbomLogDispatch({
           type: 'CLEAR_SEARCH_INPUT'
         })
-    )
+      }
+    })
   }
 
   // ON SEARCH INPUT CHANGE
@@ -355,23 +395,32 @@ const SbomChangelogTable = ({ data, refetch }) => {
 
   // SEARCH COMPONENT
   const handleSearch = async (event) => {
+    disablePaginationControl()
+
     const { value } = event.target
     if (event.key === 'Enter' && logSearch !== '') {
       await refetch({
         projectId: productId,
         sbomId: sbomId,
         search: value,
-        first: totalRows
-      }).then(
-        (res) =>
-          res.data &&
+        first: totalRows,
+        last: undefined,
+        after: undefined,
+        before: undefined
+      }).then((res) => {
+        if (res.data) {
+          setPaginationControl(res.data)
+
           sbomLogDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
-      )
+        }
+      })
     }
   }
 
   // SET ROW LENGTH
   const handleSetRow = async (e) => {
+    disablePaginationControl()
+
     setTotalRows(Number(e.target.value))
     await refetch({
       projectId: productId,
@@ -382,12 +431,17 @@ const SbomChangelogTable = ({ data, refetch }) => {
       before: undefined,
       field: field,
       direction: direction
-    }).then(
-      (res) => res.data && sbomLogDispatch({ type: 'FETCH_DATA_SUCCESS' })
-    )
+    }).then((res) => {
+      if (res.data) {
+        setPaginationControl(res.data)
+        sbomLogDispatch({ type: 'FETCH_DATA_SUCCESS' })
+      }
+    })
   }
 
   const handleSort = async (column, sortDirection) => {
+    disablePaginationControl()
+
     await refetch({
       projectId: productId,
       sbomId: sbomId,
@@ -397,6 +451,8 @@ const SbomChangelogTable = ({ data, refetch }) => {
       direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
     }).then((res) => {
       if (res.data) {
+        setPaginationControl(res.data)
+
         sbomLogDispatch({
           type: 'SET_SORT_ORDER',
           payload: {
@@ -478,8 +534,8 @@ const SbomChangelogTable = ({ data, refetch }) => {
           onPreviousPage={handlePreviousPage}
           onNextPage={handleNextPage}
           onSetRow={handleSetRow}
-          hasNextPage={data.pageInfo.hasNextPage}
-          hasPreviousPage={data.pageInfo.hasPreviousPage}
+          hasNextPage={isNextActive}
+          hasPreviousPage={isPrevActive}
         />
       )}
     </>

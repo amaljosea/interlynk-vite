@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react'
 import { GetProject, GetProjectGroups } from 'graphQL/Queries'
 import { useLazyQuery, useQuery } from '@apollo/client'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { isDefaultEnv, normalizeSBOMVersion, removeDuplicates,envOrderList } from 'utils'
+import { isDefaultEnv, normalizeSBOMVersion, envOrderList } from 'utils'
 
 const StepOne = ({
   setProductId,
@@ -106,7 +106,7 @@ const StepOne = ({
         }
       }).then((res) => {
         if (res.data) {
-          const data = removeDuplicates(res.data.project.sboms)
+          const data = res?.data?.project?.sboms
           const filtered = [...data].filter((item) => item.id !== currentSbomId)
           if (filtered.length > 0) {
             setUniqVersions(filtered)

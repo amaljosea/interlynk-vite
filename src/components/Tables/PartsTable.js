@@ -45,9 +45,7 @@ import { useLocation, Link, useParams } from 'react-router-dom'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import {
   isDefaultEnv,
-  getFullDateAndTime,
   normalizeSBOMVersion,
-  removeDuplicates,
   envOrderList,
   customStyles
 } from 'utils'
@@ -173,6 +171,9 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       setEnvList(productList)
     } else {
       setSelectedGroup('')
+      setSelectedProd('')
+      setSelectedVersion('')
+      setEnvList('')
     }
   }
 
@@ -215,10 +216,8 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
 
   const sbomVersions = []
 
-  const filteredDuplicated = product ? removeDuplicates(product.sboms) : []
-
-  filteredDuplicated &&
-    filteredDuplicated.map((project) => {
+  product?.sboms?.length > 0 &&
+    product.sboms.map((project) => {
       const myProduct = {
         group: product?.projectGroup?.name,
         env: product?.name,
@@ -230,8 +229,8 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       if (!isVersionIncluded) {
         sbomVersions.push({
           label: normalizeSBOMVersion(project),
-          value: project.id,
-          creationAt: project.creationAt
+          value: project?.id,
+          creationAt: project?.createdAt
         })
       }
     })
@@ -299,7 +298,11 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       name: 'VERSION',
       selector: (row) => {
         const { part } = row
-        return <Text fontSize={14} my={2}>{normalizeSBOMVersion(part)}</Text>
+        return (
+          <Text fontSize={14} my={2}>
+            {normalizeSBOMVersion(part)}
+          </Text>
+        )
       },
       width: '200px',
       wrap: true

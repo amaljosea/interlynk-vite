@@ -1,4 +1,3 @@
-import { CheckCircleIcon } from '@chakra-ui/icons'
 import {
   Drawer,
   DrawerBody,
@@ -16,34 +15,19 @@ import {
   TagLabel,
   Stack,
   Tooltip,
-  Text,
-  Icon
+  Text
 } from '@chakra-ui/react'
 import VulnBadge from 'components/Misc/VulnBadge'
 import { timeSince } from 'utils'
 import { getFullDateAndTime, normalizeSBOMVersion } from 'utils'
 
-const SbomList = ({ isOpen, onClose, data, sboms }) => {
-  console.log('data', data)
-  console.log('sboms', sboms)
-
-  const duplicateSboms =
-    sboms?.length > 0 &&
-    sboms?.filter(
-      (item) =>
-        normalizeSBOMVersion(item) === normalizeSBOMVersion(data)
-    )
-
-  console.log('duplicates', duplicateSboms)
-
+const SbomList = ({ isOpen, onClose, data }) => {
   return (
     <Drawer size='2xl' isOpen={isOpen} placement='right' onClose={onClose}>
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />
-        <DrawerHeader>
-          { normalizeSBOMVersion(data) + ' SBOM List' }
-        </DrawerHeader>
+        <DrawerHeader>{normalizeSBOMVersion(data) + ' SBOM List'}</DrawerHeader>
         <DrawerBody>
           <Table variant='simple' m={0} p={0}>
             <Thead>
@@ -63,8 +47,8 @@ const SbomList = ({ isOpen, onClose, data, sboms }) => {
               </Tr>
             </Thead>
             <Tbody>
-              {duplicateSboms?.length > 0 &&
-                duplicateSboms
+              {data?.alternatives?.length > 0 &&
+                [...data?.alternatives]
                   .sort((a, b) => {
                     const dateA = new Date(a.updatedAt)
                     const dateB = new Date(b.updatedAt)
@@ -74,22 +58,12 @@ const SbomList = ({ isOpen, onClose, data, sboms }) => {
                     const { createdAt, stats, lifecycle, updatedAt } = item
                     return (
                       <Tr key={index}>
-                        <Td px={0} fontSize={'sm'}>
+                        <Td px={0} fontSize={'sm'} width='280px'>
                           <Stack direction={'row'}>
-                            <Text> {getFullDateAndTime(createdAt)}</Text>
-                            {index === 0 && (
-                              <Tag
-                                size='sm'
-                                width={'fit-content'}
-                                variant='subtle'
-                                colorScheme='green'
-                              >
-                                Active
-                              </Tag>
-                            )}
+                            <Text>{getFullDateAndTime(createdAt)}</Text>
                           </Stack>
                         </Td>
-                        <Td px={0} fontSize={'sm'}>
+                        <Td px={0} fontSize={'sm'} width='150px'>
                           <Tag
                             size='md'
                             variant='subtle'
@@ -101,7 +75,7 @@ const SbomList = ({ isOpen, onClose, data, sboms }) => {
                             </TagLabel>
                           </Tag>
                         </Td>
-                        <Td px={0} fontSize={'sm'}>
+                        <Td px={0} fontSize={'sm'} width='150px'>
                           <Tag
                             size='md'
                             variant='subtle'
@@ -112,7 +86,7 @@ const SbomList = ({ isOpen, onClose, data, sboms }) => {
                             <TagLabel mx={'auto'}>{stats?.compCount}</TagLabel>
                           </Tag>
                         </Td>
-                        <Td px={0} fontSize={'sm'}>
+                        <Td px={0} fontSize={'sm'} width='300px'>
                           <Stack fontWeight={'medium'} direction={'row'}>
                             <VulnBadge color='red' label='Critical'>
                               {stats?.vulnStats?.critical
@@ -134,7 +108,7 @@ const SbomList = ({ isOpen, onClose, data, sboms }) => {
                             </VulnBadge>
                           </Stack>
                         </Td>
-                        <Td px={0} fontSize={'sm'}>
+                        <Td px={0} fontSize={'sm'} width='200px'>
                           <Tag
                             width={24}
                             colorScheme='cyan'

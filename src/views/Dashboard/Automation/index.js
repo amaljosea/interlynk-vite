@@ -1,4 +1,4 @@
-import {DeleteIcon, RepeatIcon, SettingsIcon} from '@chakra-ui/icons'
+import { DeleteIcon, RepeatIcon, SettingsIcon } from '@chakra-ui/icons'
 import {
   Flex,
   HStack,
@@ -14,26 +14,27 @@ import {
   ModalBody,
   ModalFooter,
   Button,
-  useDisclosure, Stack, Tooltip
+  useDisclosure,
+  Stack,
+  Tooltip
 } from '@chakra-ui/react'
 import CardBody from 'components/Card/CardBody'
 import CustomLoader from 'components/CustomLoader'
 import DataTable from 'react-data-table-component'
 import UpdateRule from './components/UpdateRule'
-import {useMemo, useState} from 'react'
+import { useMemo, useState } from 'react'
 import { customStyles } from 'utils'
 import { DeleteAutomation, UpdateAutomation } from 'graphQL/Mutation'
 import { useMutation } from '@apollo/client'
-import { useLocation } from 'react-router-dom'
 import { timeSince } from 'utils'
 import { useGlobalState } from 'hooks/useGlobalState'
-import {FaScrewdriverWrench} from "react-icons/fa6";
 
-const Automation = ({ data, refetch, productId }) => {
+const Automation = ({ data, refetch }) => {
   const { totalRows, userPermissions, prodRulesState, dispatch } =
     useGlobalState()
   const { field, direction } = prodRulesState
   const { prodRulesDispatch } = dispatch
+  const activeEnv = sessionStorage.getItem('activeEnv')
 
   const product = userPermissions?.find((item) => item.key === 'view_product')
   const editAutomations = product?.supersededBy?.some(
@@ -51,23 +52,21 @@ const Automation = ({ data, refetch, productId }) => {
   const [activeRow, setActiveRow] = useState(null)
 
   const [updateAutoCheck] = useMutation(UpdateAutomation, {
+    fetchPolicy: 'network-only',
     onCompleted: () =>
-      refetch({
-        variables: { id: productId, first: totalRows, field, direction }
-      })
+      refetch({ id: activeEnv, first: totalRows, field, direction })
   })
   const [deleteAutoCheck] = useMutation(DeleteAutomation, {
+    fetchPolicy: 'network-only',
     onCompleted: () =>
-      refetch({
-        variables: { id: productId, first: totalRows, field, direction }
-      })
+      refetch({ id: activeEnv, first: totalRows, field, direction })
   })
 
   const handleRemove = async () => {
     await deleteAutoCheck({
       variables: {
-        autoCheckId: activeRow.id,
-        projectId: productId
+        autoCheckId: activeRow?.id,
+        projectId: activeEnv
       }
     }).then((res) => res.data && onDeleteClose())
   }
@@ -76,7 +75,7 @@ const Automation = ({ data, refetch, productId }) => {
     await updateAutoCheck({
       variables: {
         id: row.id,
-        projectId: productId,
+        projectId: activeEnv,
         condition: row.condition,
         enabled: row.enabled ? false : true
       }
@@ -205,12 +204,11 @@ const Automation = ({ data, refetch, productId }) => {
 
   const handleSort = async (column, sortDirection) => {
     refetch({
-      variables: {
-        id: productId,
-        first: totalRows,
-        field: column.id,
-        direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
-      }
+      id: activeEnv,
+      first: totalRows,
+      last: undefined,
+      field: column.id,
+      direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
     }).then((res) => {
       if (res.data) {
         prodRulesDispatch({
@@ -225,24 +223,22 @@ const Automation = ({ data, refetch, productId }) => {
   }
 
   const handleRefresh = async () => {
-    await refetch({
-      variables: { id: productId, first: totalRows, field, direction }
-    })
+    await refetch({ id: activeEnv, first: totalRows, field, direction })
   }
 
   const subHeaderComponent = useMemo(() => {
     return (
-        <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
-          <Stack direction={'row'} spacing={2} alignItems={'center'}>
-            <Tooltip label='Refresh'>
-              <IconButton
-                  onClick={handleRefresh}
-                  colorScheme='blue'
-                  icon={<RepeatIcon />}
-              ></IconButton>
-            </Tooltip>
-          </Stack>
-        </Flex>
+      <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
+        <Stack direction={'row'} spacing={2} alignItems={'center'}>
+          <Tooltip label='Refresh'>
+            <IconButton
+              onClick={handleRefresh}
+              colorScheme='blue'
+              icon={<RepeatIcon />}
+            ></IconButton>
+          </Tooltip>
+        </Stack>
+      </Flex>
     )
   }, [handleRefresh])
 
@@ -252,10 +248,10 @@ const Automation = ({ data, refetch, productId }) => {
         <Flex flexDir={'column'} width={'100%'}>
           <DataTable
             columns={columns}
-            data={data && data.nodes}
+            data={data?.nodes || []}
             customStyles={customStyles}
             onSort={handleSort}
-            progressPending={data && data.nodes ? false : true}
+            progressPending={data ? false : true}
             progressComponent={<CustomLoader />}
             responsive={true}
             persistTableHead
@@ -271,7 +267,7 @@ const Automation = ({ data, refetch, productId }) => {
           onClose={onClose}
           data={activeRow}
           refetch={refetch}
-          productId={productId}
+          productId={activeEnv}
         />
       )}
 

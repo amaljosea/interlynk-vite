@@ -43,10 +43,11 @@ import Cookies from 'js-cookie'
 import { customStyles } from 'utils'
 import ImportWizard from 'views/Sbom/components/ImportWizard'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useLazyQuery, useMutation } from '@apollo/client'
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { GetVulnFilterData } from 'graphQL/Queries'
 import { ManualVulnScan } from 'graphQL/Mutation'
 import Pagination from '../Pagination'
+import { FirstDegreePartVulns } from 'graphQL/Queries'
 
 const statusColor = (status) => {
   if (status && status === 'Fixed') {
@@ -74,6 +75,43 @@ const VulnTable = ({
   filterRefetch,
   sbomRefetch
 }) => {
+  const firstDegreePart = data?.nodes?.filter(
+    (item) => item.isFirstDegreePart === true
+  )
+  const componentVulnIds = firstDegreePart?.map((item) => item?.id)
+  const sbomIds = firstDegreePart?.map((item) => item?.component?.sbom?.id)
+
+  const { data: parts } = useQuery(FirstDegreePartVulns, {
+    skip: firstDegreePart ? false : true,
+    variables: { sbomIds, componentVulnIds },
+    onCompleted: (data) => console.log('Parts', data)
+  })
+
+  //This part is needed for the pagination to work. (Modify with caution)
+  const paginationSizes = [25, 50, 100]
+
+  const [isPrevActive, setIsPrevActive] = useState(false)
+  const [isNextActive, setIsNextActive] = useState(false)
+
+  useEffect(() => {
+    if (data) {
+      setIsPrevActive(data?.pageInfo?.hasPreviousPage)
+      setIsNextActive(data?.pageInfo?.hasNextPage)
+    }
+  }, [data])
+
+  const setPaginationControl = (data) => {
+    setIsPrevActive(data.sbom?.vulns?.pageInfo?.hasPreviousPage)
+    setIsNextActive(data.sbom?.vulns?.pageInfo?.hasNextPage)
+  }
+
+  const disablePaginationControl = () => {
+    setIsPrevActive(false)
+    setIsNextActive(false)
+  }
+
+  //end
+
   const toast = useToast()
   // GET VULN FILTER HEADS
   const [getVulnFilters] = useLazyQuery(GetVulnFilterData)
@@ -107,12 +145,8 @@ const VulnTable = ({
       permission.key === 'edit_vulnerabilities' && permission.value === true
   )
 
-  const paginationSizes = [25, 50, 100]
-
   const textColor = useColorModeValue('gray.700', 'white')
   const [vulnSearch, setVulnSearch] = useState('')
-  const [isPrevActive, setIsPrevActive] = useState(false)
-  const [isNextActive, setIsNextActive] = useState(false)
 
   const {
     isOpen: isTableOpen,
@@ -148,11 +182,13 @@ const VulnTable = ({
       name: 'ID',
       wrap: true,
       selector: (row) => {
-        const { vuln } = row
+        const { vuln, isPart, component } = row
+        const { sbom } = component
+        const { primaryComponent, createdAt } = sbom
         const { vulnInfo } = vuln
         const { kev } = vulnInfo ? vulnInfo : ''
         return (
-          <Flex direction='row' alignItems={'center'} gap={2}>
+          <Flex direction='row' alignItems={'flex-start'} gap={2} my={3}>
             <Link href={linkURl(vuln.source, vuln.vulnId)} target={'_blank'}>
               <Icon
                 as={ExternalLinkIcon}
@@ -161,12 +197,25 @@ const VulnTable = ({
                 color={'blue.500'}
               />
             </Link>
-            <Stack direction={'column'} my={2}>
+            <Stack direction={'column'} spacing={1.5}>
               <Tooltip label={vuln.vulnId} placement={'top'}>
                 <Text fontSize='sm' color={textColor} data-tag='allowRowEvents'>
                   {vuln.vulnId !== null ? `${vuln.vulnId}` : ''}
                 </Text>
               </Tooltip>
+              {isPart && (
+                <Text
+                  fontSize={'xs'}
+                  fontWeight={'medium'}
+                  width={'fit-content'}
+                >
+                  {primaryComponent?.name ||
+                    `Uploaded at ${getFullDateAndTime(createdAt)}`}{' '}
+                  {primaryComponent?.version
+                    ? `: ${primaryComponent?.version}`
+                    : ''}
+                </Text>
+              )}
               {kev === true && (
                 <Badge width={'fit-content'} variant='subtle' colorScheme='red'>
                   KEV
@@ -176,7 +225,7 @@ const VulnTable = ({
           </Flex>
         )
       },
-      width: '15%',
+      width: '320px',
       sortable: true
     },
     // SEVERITY
@@ -198,7 +247,7 @@ const VulnTable = ({
           </Tag>
         )
       },
-      width: '9%',
+      width: '140px',
       sortable: true,
       wrap: true
     },
@@ -223,7 +272,7 @@ const VulnTable = ({
           </Tag>
         )
       },
-      width: '9%',
+      width: '120px',
       sortable: true,
       wrap: true
     },
@@ -249,7 +298,7 @@ const VulnTable = ({
           </Flex>
         )
       },
-      width: '8%',
+      width: '120px',
       sortable: true,
       wrap: true
     },
@@ -302,7 +351,7 @@ const VulnTable = ({
           </Flex>
         )
       },
-      width: '10%',
+      width: '150px',
       sortable: true,
       wrap: true
     },
@@ -314,18 +363,14 @@ const VulnTable = ({
         const { component } = row
         return (
           <Tooltip label={component.name} placement='top'>
-            <Text textTransform={'capitalize'}>
-              {component.name !== null
-                ? `${component.name?.substring(0, 30)}${
-                    component.name.length > 30 ? '...' : ''
-                  }`
-                : ''}
+            <Text textTransform={'capitalize'} my={3}>
+              {component.name || ''}
             </Text>
           </Tooltip>
         )
       },
       wrap: true,
-      width: '12%',
+      width: '250px',
       sortable: true
     },
     // VERSION
@@ -338,7 +383,7 @@ const VulnTable = ({
         </Tooltip>
       ),
       wrap: true,
-      width: '10%',
+      width: '180px',
       sortable: true
     },
     // STATUS
@@ -362,7 +407,7 @@ const VulnTable = ({
           </Tag>
         )
       },
-      width: '12%',
+      width: '200px',
       wrap: true,
       sortable: true
     },
@@ -411,6 +456,7 @@ const VulnTable = ({
 
   // CLEAR SERACH
   const handleClear = async () => {
+    disablePaginationControl()
     setVulnSearch('')
     await refetch({
       projectId: productId,
@@ -428,9 +474,12 @@ const VulnTable = ({
       last: undefined,
       after: undefined,
       before: undefined
-    }).then(
-      (res) => res.data && prodVulnDispatch({ type: 'CLEAR_SEARCH_INPUT' })
-    )
+    }).then((res) => {
+      if (res.data) {
+        setPaginationControl(res.data)
+        prodVulnDispatch({ type: 'CLEAR_SEARCH_INPUT' })
+      }
+    })
   }
 
   // ON SEARCH INPUT CHANGE
@@ -445,6 +494,7 @@ const VulnTable = ({
 
   // SEARCH COMPONENT
   const handleSearch = async (event) => {
+    disablePaginationControl()
     const { value } = event.target
     if (event.key === 'Enter') {
       await refetch({
@@ -467,16 +517,18 @@ const VulnTable = ({
         last: undefined,
         after: undefined,
         before: undefined
-      }).then(
-        (res) =>
-          res.data &&
+      }).then((res) => {
+        if (res.data) {
+          setPaginationControl(res.data)
           prodVulnDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
-      )
+        }
+      })
     }
   }
 
   // SCAN VULN
   const handleScan = async () => {
+    disablePaginationControl()
     await onVulnScan({
       variables: { id: sbomId }
     }).then((res) => {
@@ -498,6 +550,8 @@ const VulnTable = ({
           sbomRefetch({
             projectId: productId,
             sbomId: sbomId
+          }).then((res) => {
+            res && setPaginationControl(res?.data)
           })
           prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
         }
@@ -506,9 +560,12 @@ const VulnTable = ({
   }
 
   const handleRefresh = async () => {
+    disablePaginationControl()
     await refetch({
       projectId: productId,
       sbomId: sbomId
+    }).then((res) => {
+      res && setPaginationControl(res.data)
     })
   }
 
@@ -693,6 +750,7 @@ const VulnTable = ({
   }
 
   const handlePreviousPage = async () => {
+    disablePaginationControl()
     setIsPrevActive(false)
     await refetch({
       ...vulnData,
@@ -712,6 +770,7 @@ const VulnTable = ({
   }
 
   const handleNextPage = async () => {
+    disablePaginationControl()
     setIsNextActive(false)
     await refetch({
       ...vulnData,
@@ -734,6 +793,7 @@ const VulnTable = ({
   }
 
   const handleSort = async (column, sortDirection) => {
+    disablePaginationControl()
     refetch({
       projectId: productId,
       sbomId: sbomId,
@@ -760,6 +820,7 @@ const VulnTable = ({
       direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
     }).then((res) => {
       if (res.data) {
+        setPaginationControl(res.data)
         prodVulnDispatch({
           type: 'SET_SORT_ORDER',
           payload: {
@@ -774,6 +835,7 @@ const VulnTable = ({
 
   // SET ROW LENGTH
   const handleSetRow = async (e) => {
+    disablePaginationControl()
     setTotalRows(Number(e.target.value))
     await refetch({
       ...vulnData,
@@ -783,6 +845,7 @@ const VulnTable = ({
       before: undefined
     }).then((res) => {
       if (res.data) {
+        setPaginationControl(res.data)
         prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
       }
     })
@@ -790,8 +853,6 @@ const VulnTable = ({
 
   useEffect(() => {
     if (data) {
-      setIsPrevActive(data?.pageInfo?.hasPreviousPage)
-      setIsNextActive(data?.pageInfo?.hasNextPage)
       getVulnFilters({
         variables: {
           projectId: productId,
@@ -842,8 +903,8 @@ const VulnTable = ({
           onPreviousPage={handlePreviousPage}
           onNextPage={handleNextPage}
           onSetRow={handleSetRow}
-          hasNextPage={data.pageInfo.hasNextPage}
-          hasPreviousPage={data.pageInfo.hasPreviousPage}
+          hasNextPage={isNextActive}
+          hasPreviousPage={isPrevActive}
         />
       )}
 

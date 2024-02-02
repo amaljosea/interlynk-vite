@@ -15,12 +15,12 @@ import {
   ApolloLink
 } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
-import { onError } from '@apollo/client/link/error';
+import { onError } from '@apollo/client/link/error'
 import Cookies from 'js-cookie'
 import { createUploadLink } from 'apollo-upload-client'
 import { getActiveNavbar, getActiveRoute } from '../utils'
 import { jwtDecode } from 'jwt-decode'
-import {logoutUser} from "../utils/authUtils";
+import { logoutUser } from '../utils/authUtils'
 
 export default function Dashboard(props) {
   const authToken = Cookies.get('authToken')
@@ -53,22 +53,23 @@ export default function Dashboard(props) {
     }
   })
 
-  const toast = useToast();
+  const toast = useToast()
+  const env = process.env.NODE_ENV
 
   const errorLink = onError(({ graphQLErrors }) => {
-    if (graphQLErrors) {
+    if (graphQLErrors && env !== 'production') {
       graphQLErrors.forEach(({ message }) => {
         toast({
-          title: "An error occurred.",
+          title: 'An error occurred.',
           description: message,
-          status: "error",
+          status: 'error',
           duration: 5000,
           isClosable: true,
-          position: "top"
-        });
-      });
+          position: 'top'
+        })
+      })
     }
-  });
+  })
 
   const client = new ApolloClient({
     link: ApolloLink.from([errorLink, authLink, uploadLink]),
@@ -90,11 +91,11 @@ export default function Dashboard(props) {
       try {
         const expired = isTokenExpired(authToken)
         if (expired === true) {
-          logoutUser().then(r => navigate('/auth'))
+          logoutUser().then((r) => navigate('/auth'))
         }
       } catch (err) {
         console.error('Invalid Token')
-        logoutUser().then(r => navigate('/auth'))
+        logoutUser().then((r) => navigate('/auth'))
       }
     }
   }, [])

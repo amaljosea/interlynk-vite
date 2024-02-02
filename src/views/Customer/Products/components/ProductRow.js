@@ -62,9 +62,7 @@ function ProductRow(props) {
             <Skeleton height='20px' />
           ) : sbomId.length > 0 ? (
             <Link
-              to={`/customer/products?p=${id}&sbom=${
-                filteredData.length > 0 ? filteredData[0].id : sbomId[0].id
-              }`}
+              to={`/customer/products?p=${id}&sbom=${sbomId[0].id}`}
               onClick={() => {
                 window.sessionStorage.setItem('product', name)
                 setSignedActiveTab(0)

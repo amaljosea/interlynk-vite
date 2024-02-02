@@ -53,7 +53,8 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
   const parts = queryParams.get('parts')
 
   const currentProduct = JSON.parse(sessionStorage.getItem(`product`))
-  const { name, id } = currentProduct ? currentProduct : {}
+  const id = sessionStorage.getItem('activeEnv')
+  const { name } = currentProduct ? currentProduct : {}
   const currentSBOM = JSON.parse(sessionStorage.getItem(`currentSBOM`))
 
   const onSelectComp = () => {
@@ -103,7 +104,7 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
         <Stack direction={'column'} spacing={1} alignItems={'left'}>
           {currentProduct && parts && currentSBOM && (
             <Link
-              to={`/vendor/products/${name}?&id=${id}&sbom=${currentSBOM.id}`}
+              to={`/vendor/products/${name}?&id=${id}&sbom=${currentSBOM?.id}`}
             >
               <HStack
                 onClick={() => {
@@ -118,14 +119,19 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
                   color={'blue.500'}
                   textDecor={'underline'}
                 >
-                  {name} : {normalizeSBOMVersion(currentSBOM)}
+                  {name}
                 </Text>
               </HStack>
             </Link>
           )}
-          <Stack direction={'row'} alignItems={'center'} wrap={'wrap'}>
+          <Flex
+            direction={'row'}
+            alignItems={'center'}
+            flexWrap={'wrap'}
+            gap={2}
+          >
             <Text fontWeight={'semibold'} fontSize={25}>
-              {project?.projectGroup?.name} : {normalizeSBOMVersion(sbom)}
+              {project?.projectGroup?.name}
             </Text>
             <Tooltip label='Lifecycle stage' fontSize='md'>
               <Tag
@@ -137,9 +143,14 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
                 <TagLabel textTransform={'capitalize'}>{lifecycle}</TagLabel>
               </Tag>
             </Tooltip>
-          </Stack>
+          </Flex>
         </Stack>
-        <Text fontSize={'sm'} my={0.5}>
+        <Flex flexDir={'row'} gap={0.5} alignItems={'center'} flexWrap={'wrap'}>
+          <Text>{primaryComponent?.name}</Text>
+          <Text>{primaryComponent?.version ? ':' : ''}</Text>
+          <Text>{primaryComponent?.version}</Text>
+        </Flex>
+        <Text fontSize={'sm'} my={1}>
           {primaryComponent?.description}
         </Text>
         {/* SCAN STATUS */}

@@ -69,7 +69,7 @@ export default function HeaderLinks(props) {
   }, [])
 
   useEffect(() => {
-    if (!name || !email || error) {
+    if (!email || error) {
       logoutUser().then(r => navigate('/auth'))
     }
   }, [error])

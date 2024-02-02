@@ -1,4 +1,5 @@
 import globalVulnReducer from './globalVulnReducer'
+import compVulnReducer from './compVulnReducer'
 import prodRulesReducer from './prodRulesReducer'
 import prodCheckReducer from './prodCheckReducer'
 import prodCompReducer from './prodCompReducer'
@@ -10,6 +11,7 @@ import prodReducer from './prodReducer'
 
 export {
   globalVulnReducer,
+  compVulnReducer,
   prodRulesReducer,
   prodCheckReducer,
   prodCompReducer,

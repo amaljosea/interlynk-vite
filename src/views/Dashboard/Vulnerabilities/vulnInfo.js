@@ -13,7 +13,8 @@ import {
   TabPanel,
   Stack,
   Box,
-  Badge
+  Tag,
+  TagLabel
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
@@ -21,8 +22,9 @@ import { FaCube, FaCubes, FaBug } from 'react-icons/fa'
 import { timeSince, getFullDateAndTime } from 'utils'
 import VulnProdTable from './components/ProdTable'
 import { FaCodeMerge } from 'react-icons/fa6'
+import VulnBadge from 'components/Misc/VulnBadge'
 
-const VulnInfo = ({ data, refetch }) => {
+const VulnInfo = ({ data, componentVulns, refetch }) => {
   return (
     <>
       {/* Product Info */}
@@ -61,24 +63,21 @@ const VulnInfo = ({ data, refetch }) => {
                       </Text>
                     </Tooltip>
                     {/* --------------- STATS ------------------- */}
-                    <Flex flexDir={'row'} alignItems={'center'} gap={4} mt={10}>
+                    <Flex flexDir={'row'} alignItems={'center'} gap={4} mt={6}>
                       {/* PRODUCTS */}
                       <Stack
                         direction={'row'}
                         alignItems={'flex-start'}
                         spacing={2}
                       >
-                        <Icon h={4} w={4} color='#777' as={FaCubes} />
+                        <Icon h={5} w={5} color='#777' as={FaCubes} />
                         <Box>
-                          <Badge
-                            mr={1}
-                            fontSize={'xl'}
-                            fontWeight={'medium'}
-                            bg={'none'}
-                          >
-                            {data?.organization?.projectGroups?.nodes?.length ||
-                              0}
-                          </Badge>
+                          <Tag variant='subtle' width={16} colorScheme={'blue'}>
+                            <TagLabel mx={'auto'}>
+                              {data?.projectGroupsCount || 0}
+                            </TagLabel>
+                          </Tag>
+
                           <Text fontSize={'xs'}>Products</Text>
                         </Box>
                       </Stack>
@@ -88,17 +87,13 @@ const VulnInfo = ({ data, refetch }) => {
                         alignItems={'flex-start'}
                         spacing={2}
                       >
-                        <Icon h={4} w={4} color='#777' as={FaCodeMerge} />
+                        <Icon h={5} w={5} color='#777' as={FaCodeMerge} />
                         <Box>
-                          <Badge
-                            mr={1}
-                            fontSize={'xl'}
-                            fontWeight={'medium'}
-                            bg={'none'}
-                          >
-                            {data?.organization?.projectGroups?.nodes?.length ||
-                              0}
-                          </Badge>
+                          <Tag variant='subtle' width={16} colorScheme={'blue'}>
+                            <TagLabel mx={'auto'}>
+                              {data?.sbomVersionsCount || 0}
+                            </TagLabel>
+                          </Tag>
                           <Text fontSize={'xs'}>Versions</Text>
                         </Box>
                       </Stack>
@@ -108,16 +103,13 @@ const VulnInfo = ({ data, refetch }) => {
                         alignItems={'flex-start'}
                         spacing={2}
                       >
-                        <Icon h={'20px'} w={'20px'} color='#777' as={FaCube} />
+                        <Icon h={5} w={5} color='#777' as={FaCube} />
                         <Box>
-                          <Badge
-                            mr={1}
-                            fontSize={'xl'}
-                            fontWeight={'medium'}
-                            bg={'none'}
-                          >
-                            {data?.componentVulns?.nodes?.length || 0}
-                          </Badge>
+                          <Tag variant='subtle' width={16} colorScheme={'blue'}>
+                            <TagLabel mx={'auto'}>
+                              {data?.componentCount || 0}
+                            </TagLabel>
+                          </Tag>
                           <Text fontSize={'xs'}>Components</Text>
                         </Box>
                       </Stack>
@@ -127,47 +119,18 @@ const VulnInfo = ({ data, refetch }) => {
                         alignItems={'flex-start'}
                         spacing={2}
                       >
-                        <Icon h={4} w={4} color='#777' as={FaBug} />
+                        <Icon h={5} w={5} color='#777' as={FaBug} />
                         <Box>
                           <Stack fontWeight={'medium'} direction={'row'}>
-                            <Tooltip label='CVSS' placement='top'>
-                              <Badge
-                                fontSize={'xl'}
-                                fontWeight={'medium'}
-                                variant='subtle'
-                                colorScheme='red'
-                                borderRadius='md'
-                                cursor={'pointer'}
-                              >
-                                {data?.cvssScore || 0}
-                              </Badge>
-                            </Tooltip>
-                            <Tooltip label='EPSS' placement='top'>
-                              <Badge
-                                fontSize={'xl'}
-                                fontWeight={'medium'}
-                                variant='subtle'
-                                colorScheme='orange'
-                                borderRadius='md'
-                                cursor={'pointer'}
-                              >
-                                {Math.ceil(
-                                  data.vulnInfo?.epssScore * 10000 || 0
-                                )}
-                              </Badge>
-                            </Tooltip>
-                            <Tooltip label='KEV' placement='top'>
-                              <Badge
-                                fontSize={'xl'}
-                                fontWeight={'medium'}
-                                variant='subtle'
-                                colorScheme='yellow'
-                                borderRadius='md'
-                                cursor={'pointer'}
-                              >
-                                {data?.vulnInfo?.epssScore ? '-' : 'K'}
-                              </Badge>
-                            </Tooltip>
+                            <VulnBadge color='red' label='CVSS'>
+                              {data?.cvssScore || 0}
+                            </VulnBadge>
+                            <VulnBadge color='orange' label='EPSS'>
+                              {Math.ceil(data.vulnInfo?.epssScore * 10000 || 0)}
+                            </VulnBadge>
+                            <VulnBadge color='cyan' label='KEV'>
+                              {data?.vulnInfo?.kev ? 'K' : '-'}
+                            </VulnBadge>
                           </Stack>
                           <Text fontSize={'xs'}>Vulnerabilities</Text>
                         </Box>
@@ -196,7 +159,11 @@ const VulnInfo = ({ data, refetch }) => {
           <TabPanels>
             {/* PRODUCTS TABLE */}
             <TabPanel px={1}>
-              <VulnProdTable data={data?.componentVulns} refetch={refetch} />
+              <VulnProdTable
+                data={componentVulns}
+                vuln={data}
+                refetch={refetch}
+              />
             </TabPanel>
           </TabPanels>
         </Tabs>

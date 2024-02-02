@@ -10,7 +10,9 @@ import {
   Button,
   Box,
   Select,
-  IconButton
+  IconButton,
+  Divider,
+  Badge
 } from '@chakra-ui/react'
 import { sevColor, timeSince, getFullDateAndTime, customStyles } from 'utils'
 import { ChevronDownIcon, ChevronUpIcon, RepeatIcon } from '@chakra-ui/icons'
@@ -21,6 +23,7 @@ import VulnBadge from 'components/Misc/VulnBadge'
 import VulnsFilters from 'views/Dashboard/Vulnerabilities/components/VulnsFilter'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import { useGlobalState } from 'hooks/useGlobalState'
+import Round from 'components/Misc/Round'
 
 const GlobalVulnTable = ({ data, refetch }) => {
   const params = useParams()
@@ -61,20 +64,27 @@ const GlobalVulnTable = ({ data, refetch }) => {
       name: 'ID',
       wrap: true,
       selector: (row) => {
-        const { vulnId, id } = params?.name ? row?.vuln : row
+        const { vulnId, id, vulnInfo } = params?.name ? row?.vuln : row
         return (
-          <Link
-            to={
-              params?.name
-                ? `/vendor/products/${product?.name}?id=${product?.id}&vulnId=${id}`
-                : `/vendor/vulnerabilities?vulnId=${id}`
-            }
-            onClick={() => sessionStorage.setItem('activeVuln', vulnId)}
-          >
-            <Text fontSize='sm' color={'blue.500'}>
-              {vulnId || ''}
-            </Text>
-          </Link>
+          <Stack spacing={1} my={2}>
+            <Link
+              to={
+                params?.name
+                  ? `/vendor/products/${product?.name}?id=${product?.id}&vulnId=${id}`
+                  : `/vendor/vulnerabilities?vulnId=${id}`
+              }
+              onClick={() => sessionStorage.setItem('activeVuln', vulnId)}
+            >
+              <Text fontSize='sm' color={'blue.500'}>
+                {vulnId || ''}
+              </Text>
+            </Link>
+            {vulnInfo?.kev === true && (
+              <Badge width={'fit-content'} variant='subtle' colorScheme='red'>
+                KEV
+              </Badge>
+            )}
+          </Stack>
         )
       },
       width: '15%'
@@ -215,29 +225,34 @@ const GlobalVulnTable = ({ data, refetch }) => {
         } = metrics
 
         return (
-          <Stack fontWeight={'medium'} direction={'row'}>
-            <VulnBadge color='red' label='Affected'>
-              {affectedCount || 0}
-            </VulnBadge>
-            <VulnBadge color='yellow' label='False Positive'>
-              {falsePositiveCount || 0}
-            </VulnBadge>
-            <VulnBadge color='orange' label='Fixed'>
-              {fixedCount || 0}
-            </VulnBadge>
-            <VulnBadge color='blue' label='In Triage'>
-              {inTriageCount || 0}
-            </VulnBadge>
-            <VulnBadge color='green' label='Not Affected'>
-              {notAffectedCount || 0}
-            </VulnBadge>
-            <VulnBadge color='teal' label='Unspecified'>
-              {unspecifiedCount || 0}
-            </VulnBadge>
+          <Stack fontWeight={'medium'} direction={'row'} my={2}>
+            <Round bg='gray.200' label='Unspecified'>
+              {unspecifiedCount}
+            </Round>
+            <Round bg='blue.100' label='In Triage'>
+              {inTriageCount}
+            </Round>
+            <Round bg='red.100' label='Affected'>
+              {affectedCount}
+            </Round>
+            <Divider
+              orientation='vertical'
+              colorScheme={'gray.900'}
+              height={10}
+            />
+            <Round bg='orange.100' label='Fixed'>
+              {fixedCount}
+            </Round>
+            <Round bg='green.100' label='Not Affected'>
+              {notAffectedCount}
+            </Round>
+            <Round bg='pink.100' label='False Positive'>
+              {falsePositiveCount}
+            </Round>
           </Stack>
         )
       },
-      width: '20%',
+      width: '25%',
       wrap: true
     },
     // UPDATED AT

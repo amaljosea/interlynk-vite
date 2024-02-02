@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { Flex } from '@chakra-ui/react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import { useLazyQuery, useQuery } from '@apollo/client'
 import { useGlobalState } from 'hooks/useGlobalState'
 import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
@@ -23,14 +23,14 @@ const Vulnerabilities = () => {
     onCompleted: () => globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
   })
 
-  const [getVulnData, { data: vulnData }] = useLazyQuery(GetGlobalVulnData)
+  const { data: vulnData, refetch: getVulnData } = useQuery(GetGlobalVulnData, {
+    skip: vulnId ? false : true,
+    fetchPolicy: 'network-only',
+    variables: { id: vulnId, first: totalRows }
+  })
 
   useEffect(() => {
-    if (vulnId) {
-      getVulnData({
-        variables: { id: vulnId, first: totalRows }
-      })
-    } else {
+    if (!vulnId) {
       globalVulnDispatch({ type: 'CLEAR_GLOBAL_VULN' })
     }
   }, [vulnId])
@@ -51,7 +51,11 @@ const Vulnerabilities = () => {
   if (vulnId && location.pathname === '/vendor/vulnerabilities') {
     return (
       <Flex direction='column' pt={{ base: '120px', md: '74px' }} pr={2} pl={5}>
-        <VulnInfo data={vulnData?.vuln} refetch={getVulnData} />
+        <VulnInfo
+          data={vulnData?.vuln}
+          componentVulns={vulnData?.componentVulns}
+          refetch={getVulnData}
+        />
       </Flex>
     )
   } else {

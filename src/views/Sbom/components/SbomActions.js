@@ -26,7 +26,7 @@ import ReactSelect from 'react-select'
 import { useRef, useState } from 'react'
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { GetProject } from 'graphQL/Queries'
-import { removeDuplicates, normalizeSBOMVersion } from 'utils'
+import { normalizeSBOMVersion } from 'utils'
 import CheckModal from './CheckModal'
 import { GetAllComponents } from 'graphQL/Queries'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
@@ -50,8 +50,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
     kinds,
     licenses,
     suppliers,
-    scope,
-    totalComp
+    scope
   } = prodCompState
   const {
     prodCompDispatch,
@@ -139,15 +138,13 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
   } = useDisclosure()
 
   const filterVersion = data
-    ? data.project.sboms.find((item) => item.id === sbomId)
+    ? data?.project?.sboms.find((item) => item.id === sbomId)
     : []
 
   const uniqVersions = []
 
-  const filteredDuplicated = data ? removeDuplicates(data.project.sboms) : []
-
-  filteredDuplicated &&
-    filteredDuplicated.map((project) => {
+  data?.project?.sboms?.length > 0 &&
+    data.project.sboms.map((project) => {
       uniqVersions.push({
         label: normalizeSBOMVersion(project),
         value: project?.id
@@ -186,6 +183,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
   }
 
   const handleEditSbom = () => {
+    console.log('sbom', sbom)
     if (sbom?.primaryComponent) {
       sbomDispatch({ type: 'SET_LICENSES', payload: sbom?.primaryComponent })
       setSBMOpen()
@@ -194,7 +192,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
         variables: {
           projectId: productId,
           sbomId: sbomId,
-          first: totalComp,
+          first: 100,
           field: field,
           direction: direction
         }

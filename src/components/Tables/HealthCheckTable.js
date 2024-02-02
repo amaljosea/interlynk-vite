@@ -37,9 +37,34 @@ import PriSupplierModal from 'views/Sbom/components/PriSupplierModal'
 import RowLimit from 'views/Sbom/components/RowLimit'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import SupplierModal from 'views/Sbom/components/SupplierModal'
-import Pagination from "../Pagination";
+import Pagination from '../Pagination'
 
 const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
+  //This part is needed for the pagination to work. (Modify with caution)
+  const paginationSizes = [25, 50, 100]
+
+  const [isPrevActive, setIsPrevActive] = useState(false)
+  const [isNextActive, setIsNextActive] = useState(false)
+
+  useEffect(() => {
+    if (data) {
+      setIsPrevActive(data?.pageInfo?.hasPreviousPage)
+      setIsNextActive(data?.pageInfo?.hasNextPage)
+    }
+  }, [data])
+
+  const setPaginationControl = (data) => {
+    setIsPrevActive(data.sbom?.checkResults?.pageInfo?.hasPreviousPage)
+    setIsNextActive(data.sbom?.checkResults?.pageInfo?.hasNextPage)
+  }
+
+  const disablePaginationControl = () => {
+    setIsPrevActive(false)
+    setIsNextActive(false)
+  }
+
+  //end
+
   // GET HEALTH CHECK FILTER HEADS
   const [getCheckFilters, { refetch: filterRefetch }] =
     useLazyQuery(GetCheckFilterData)
@@ -47,7 +72,8 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
   const customerView = location.pathname.startsWith('/customer')
   const toast = useToast()
 
-  const { userPermissions, totalRows, setTotalRows, prodCheckState, dispatch } = useGlobalState()
+  const { userPermissions, totalRows, setTotalRows, prodCheckState, dispatch } =
+    useGlobalState()
   const {
     field,
     direction,
@@ -61,9 +87,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
     after,
     before
   } = prodCheckState
-  const { prodCompDispatch, prodCheckDispatch } = dispatch
-
-  const paginationSizes = [25, 50, 100]
+  const { prodCompDispatch, prodCheckDispatch, sbomDispatch } = dispatch
 
   const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
   const editChecks = sboms?.supersededBy?.some(
@@ -81,6 +105,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
   const [activeRow, setActiveRow] = useState(null)
 
   const fetchCheckData = () => {
+    disablePaginationControl()
     refetch({
       variables: {
         projectId: productId,
@@ -101,6 +126,10 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
         first: totalRows,
         field: field,
         direction: direction
+      }
+    }).then((res) => {
+      if (res.data) {
+        setPaginationControl(res.data)
       }
     })
   }
@@ -206,6 +235,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
 
   // CLEAR SERACH
   const handleClear = async () => {
+    disablePaginationControl()
     setCheckSearch('')
     await refetch({
       variables: {
@@ -213,7 +243,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
         sbomId: sbomId,
         search: undefined,
         checkId:
-            rules.includes('all') || rules.length === 0 ? undefined : rules,
+          rules.includes('all') || rules.length === 0 ? undefined : rules,
         category:
           categories.includes('all') || categories.length === 0
             ? undefined
@@ -228,9 +258,12 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
         field: field,
         direction: direction
       }
-    }).then(
-      (res) => res.data && prodCheckDispatch({ type: 'CLEAR_SEARCH_INPUT' })
-    )
+    }).then((res) => {
+      if (res.data) {
+        setPaginationControl(res.data)
+        prodCheckDispatch({ type: 'CLEAR_SEARCH_INPUT' })
+      }
+    })
   }
 
   // ON SEARCH INPUT CHANGE
@@ -245,6 +278,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
 
   // SEARCH COMPONENT
   const handleSearch = async (event) => {
+    disablePaginationControl()
     const { value } = event.target
     if (event.key === 'Enter' && checkSearch !== '') {
       await refetch({
@@ -272,6 +306,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
         }
       }).then((res) => {
         if (res.data) {
+          setPaginationControl(res.data)
           prodCheckDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
         }
       })
@@ -280,6 +315,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
 
   // SET ROW LENGTH
   const handleSetRow = async (e) => {
+    disablePaginationControl()
     setTotalRows(Number(e.target.value))
     await refetch({
       variables: {
@@ -294,6 +330,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
       }
     }).then((res) => {
       if (res.data) {
+        setPaginationControl(res.data)
         prodCheckDispatch({ type: 'FETCH_DATA_SUCCESS' })
       }
     })
@@ -445,6 +482,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
     if (
       organizationRule.rule.shortDesc === 'Document has data license specified'
     ) {
+      sbomDispatch({ type: 'CLEAR_LICENSES' })
       return onDataLicenseOpen()
     }
 
@@ -723,6 +761,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
   ]
 
   const handleRefetch = (after, before) => {
+    disablePaginationControl()
     refetch({
       variables: {
         projectId: productId,
@@ -747,11 +786,16 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
         field: field,
         direction: direction
       }
+    }).then((res) => {
+      if (res.data) {
+        setPaginationControl(res.data)
+      }
     })
   }
 
   // SORT FUNCTION
   const handleSort = async (column, sortDirection) => {
+    disablePaginationControl()
     await refetch({
       variables: {
         projectId: productId,
@@ -778,6 +822,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
       }
     }).then((res) => {
       if (res.data) {
+        setPaginationControl(res.data)
         prodCheckDispatch({
           type: 'SET_SORT_ORDER',
           payload: {
@@ -790,6 +835,8 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
   }
 
   const handlePreviousPage = async () => {
+    disablePaginationControl()
+
     prodCheckDispatch({
       type: 'DECREMENT_PAGE',
       payload: data.pageInfo.startCursor
@@ -798,6 +845,8 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
   }
 
   const handleNextPage = async () => {
+    disablePaginationControl()
+
     prodCheckDispatch({
       type: 'INCREMENT_PAGE',
       payload: {
@@ -845,20 +894,20 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
         />
       </Flex>
 
-        {/* PAGINATION */}
-        {data && (
-            <Pagination
-                paginationSizes={paginationSizes}
-                pageIndex={pageIndex}
-                totalRows={totalRows}
-                totalCount={data.totalCount}
-                onPreviousPage={handlePreviousPage}
-                onNextPage={handleNextPage}
-                onSetRow={handleSetRow}
-                hasNextPage={data.pageInfo.hasNextPage}
-                hasPreviousPage={data.pageInfo.hasPreviousPage}
-            />
-        )}
+      {/* PAGINATION */}
+      {data && (
+        <Pagination
+          paginationSizes={paginationSizes}
+          pageIndex={pageIndex}
+          totalRows={totalRows}
+          totalCount={data.totalCount}
+          onPreviousPage={handlePreviousPage}
+          onNextPage={handleNextPage}
+          onSetRow={handleSetRow}
+          hasNextPage={isNextActive}
+          hasPreviousPage={isPrevActive}
+        />
+      )}
 
       {/* ACTIONS */}
       {activeRow !== null && (

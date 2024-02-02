@@ -1,5 +1,5 @@
 // Chakra imports
-import {AddIcon, RepeatIcon, ViewIcon} from '@chakra-ui/icons'
+import { AddIcon, RepeatIcon, ViewIcon } from '@chakra-ui/icons'
 import {
   Flex,
   Text,
@@ -50,11 +50,38 @@ import RowLimit from 'views/Sbom/components/RowLimit'
 import { useGlobalState } from 'hooks/useGlobalState'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import { GetCompFilterData } from 'graphQL/Queries'
-import Pagination from "../Pagination";
+import Pagination from '../Pagination'
 
-const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
-
+const ComponentTable = ({
+  lifecycle,
+  data,
+  refetch,
+  primaryComp,
+  sbomRefetch
+}) => {
+  //This part is needed for the pagination to work. (Modify with caution)
   const paginationSizes = [25, 50, 100]
+
+  const [isPrevActive, setIsPrevActive] = useState(false)
+  const [isNextActive, setIsNextActive] = useState(false)
+
+  useEffect(() => {
+    if (data) {
+      setIsPrevActive(data?.pageInfo?.hasPreviousPage)
+      setIsNextActive(data?.pageInfo?.hasNextPage)
+    }
+  }, [data])
+
+  const setPaginationControl = (data) => {
+    setIsPrevActive(data.sbom?.components?.pageInfo?.hasPreviousPage)
+    setIsNextActive(data.sbom?.components?.pageInfo?.hasNextPage)
+  }
+
+  const disablePaginationControl = () => {
+    setIsPrevActive(false)
+    setIsNextActive(false)
+  }
+  //end
 
   // GET COMPONENT FILTER HEADS
   const [getCompFilters] = useLazyQuery(GetCompFilterData)
@@ -89,6 +116,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
   )
 
   const fetchCompData = async () => {
+    disablePaginationControl()
     await refetch({
       projectId: productId,
       sbomId: sbomId,
@@ -115,14 +143,15 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
       field: field,
       direction: direction
     })
-      .then(() => prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' }))
+      .then((res) => {
+        res && setPaginationControl(res.data)
+        prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
+      })
       .finally(() => window.scrollTo({ top: 0, behavior: 'smooth' }))
   }
 
   const [activeRow, setActiveRow] = useState(null)
   const [compSearch, setCompSearch] = useState('')
-  const [isPrevActive, setIsPrevActive] = useState(false)
-  const [isNextActive, setIsNextActive] = useState(false)
 
   const compBtn = useRef(null)
   const linkRef = useRef(null)
@@ -227,7 +256,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
         )
         const vcs = externalUrls?.find((item) => item.name === 'vcs')
         return (
-          <Grid templateColumns='repeat(7, 1fr)' gap={2} width={'80%'} my={2}>
+          <Grid templateColumns='repeat(7, 1fr)' gap={2} my={3}>
             <GridItem colSpan={1} width={'50px'}>
               {purl !== null && purl !== '' ? (
                 <IconButton
@@ -258,7 +287,6 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
               <Tooltip placement='top' label={name}>
                 <Text data-tag='allowRowEvents'>{name}</Text>
               </Tooltip>
-
               {/* EXTERNAL REFERENCE */}
               <Stack direction={'row'} alignItems={'center'}>
                 {/* WEBSITE */}
@@ -314,36 +342,35 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
                   </Link>
                 </Tooltip>
               </Stack>
-
               {/* COMPONENT TYPE */}
-
-              {primary && (
-                <Tag
-                  width={'fit-content'}
-                  size={'sm'}
-                  variant='subtle'
-                  colorScheme='blue'
-                >
-                  <TagLabel textTransform={'capitalize'}>Primary</TagLabel>
-                </Tag>
-              )}
-
-              {internal && (
-                <Tag
-                  width={'fit-content'}
-                  size={'sm'}
-                  variant='subtle'
-                  colorScheme='cyan'
-                >
-                  <TagLabel textTransform={'capitalize'}>Internal</TagLabel>
-                </Tag>
-              )}
+              <Flex flexWrap={'wrap'} gap={2} alignItems={'center'}>
+                {primary && (
+                  <Tag
+                    width={'fit-content'}
+                    size={'sm'}
+                    variant='subtle'
+                    colorScheme='blue'
+                  >
+                    <TagLabel textTransform={'capitalize'}>Primary</TagLabel>
+                  </Tag>
+                )}
+                {internal && (
+                  <Tag
+                    width={'fit-content'}
+                    size={'sm'}
+                    variant='subtle'
+                    colorScheme='cyan'
+                  >
+                    <TagLabel textTransform={'capitalize'}>Internal</TagLabel>
+                  </Tag>
+                )}
+              </Flex>
             </GridItem>
           </Grid>
         )
       },
       wrap: true,
-      width: '20%',
+      width: '400px',
       sortable: true
     },
     // VERSION
@@ -351,7 +378,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
       id: 'COMPONENTS_VERSION',
       name: 'VERSION',
       selector: (row) => <p style={{ textWrap: 'pretty' }}>{row.version}</p>,
-      width: '15%',
+      width: '200px',
       wrap: true,
       sortable: true
     },
@@ -374,7 +401,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
         )
       },
       sortable: true,
-      width: '15%',
+      width: '300px',
       wrap: true,
       grow: 2
     },
@@ -382,7 +409,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
     {
       id: 'COMPONENTS_LICENSES',
       name: 'LICENSES',
-      width: '15%',
+      width: '200px',
       selector: (row) => {
         const { licenses, licensesExp, licensesCustom } = row
 
@@ -498,7 +525,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
         </Tooltip>
       ),
       sortable: true,
-      width: '12%',
+      width: '160px',
       sortFunction: (a, b) => {
         const dateA = new Date(a.updatedAt)
         const dateB = new Date(b.updatedAt)
@@ -583,6 +610,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
           </>
         )
       },
+      wrap: true,
       right: 'true'
     }
   ]
@@ -609,12 +637,15 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
         }
       }).then((res) => {
         if (res.data) {
+          disablePaginationControl()
           refetch({
             projectId: productId,
             sbomId: sbomId,
             first: totalRows,
             field: field,
             direction: direction
+          }).then((res) => {
+            res && setPaginationControl(res.data)
           })
         }
       })
@@ -843,6 +874,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
   // CLEAR SERACH
   const handleClear = async () => {
     setCompSearch('')
+    disablePaginationControl()
     await refetch({
       projectId: productId,
       sbomId: sbomId,
@@ -868,9 +900,12 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
       last: undefined,
       after: undefined,
       before: undefined
-    }).then(
-      (res) => res.data && prodCompDispatch({ type: 'CLEAR_SEARCH_INPUT' })
-    )
+    }).then((res) => {
+      if (res.data) {
+        setPaginationControl(res.data)
+        prodCompDispatch({ type: 'CLEAR_SEARCH_INPUT' })
+      }
+    })
   }
 
   // ON SEARCH INPUT CHANGE
@@ -887,6 +922,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
   const handleSearch = async (event) => {
     const { value } = event.target
     if (event.key === 'Enter' && value !== '') {
+      disablePaginationControl()
       await refetch({
         projectId: productId,
         sbomId: sbomId,
@@ -912,17 +948,19 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
         last: undefined,
         after: undefined,
         before: undefined
-      }).then(
-        (res) =>
-          res.data &&
+      }).then((res) => {
+        if (res.data) {
+          setPaginationControl(res.data)
           prodCompDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
-      )
+        }
+      })
     }
   }
 
   // SET ROW LENGTH
   const handleSetRow = async (e) => {
     setTotalRows(Number(e.target.value))
+    disablePaginationControl()
     await refetch({
       projectId: productId,
       sbomId: sbomId,
@@ -932,9 +970,12 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
       before: undefined,
       field: customerView ? signedCompField : field,
       direction: customerView ? signedCompDirection : direction
-    }).then(
-      (res) => res.data && prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
-    )
+    }).then((res) => {
+      if (res.data) {
+        setPaginationControl(res.data)
+        prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
+      }
+    })
   }
 
   // HEADER SECTION
@@ -970,31 +1011,32 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
           )}
         </Stack>
         <Stack
-            width={'100%'}
-            direction={'row'}
-            spacing={2}
-            justifyContent={'flex-end'}>
+          width={'100%'}
+          direction={'row'}
+          spacing={2}
+          justifyContent={'flex-end'}
+        >
           {/* CREATE COMPONENT */}
           {!customerView && (
             <Tooltip label='Add Component'>
               <IconButton
-                  ref={compBtn}
-                  onClick={onCreateComponent}
-                  icon={<AddIcon />}
-                  colorScheme='blue'
-                  variant='solid'
-                  fontWeight='normal'
-                  fontSize={'sm'}
-                  isDisabled={lifecycle === 'signed' || !updateComponent}
+                ref={compBtn}
+                onClick={onCreateComponent}
+                icon={<AddIcon />}
+                colorScheme='blue'
+                variant='solid'
+                fontWeight='normal'
+                fontSize={'sm'}
+                isDisabled={lifecycle === 'signed' || !updateComponent}
               />
             </Tooltip>
           )}
           <Tooltip label='Refresh'>
             <IconButton
-                onClick={fetchCompData}
-                colorScheme='blue'
-                icon={<RepeatIcon />}>
-            </IconButton>
+              onClick={fetchCompData}
+              colorScheme='blue'
+              icon={<RepeatIcon />}
+            ></IconButton>
           </Tooltip>
         </Stack>
       </Flex>
@@ -1002,6 +1044,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
   }, [compSearch, onSearchInputChange, handleClear, handleSearch, filters])
 
   const handleRefetch = async (after, before) => {
+    disablePaginationControl()
     await refetch({
       projectId: productId,
       sbomId: sbomId,
@@ -1029,13 +1072,13 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
       direction: customerView ? signedCompDirection : direction
     }).then((res) => {
       if (res.data) {
-        setIsPrevActive(res?.data?.sbom?.components?.pageInfo?.hasPreviousPage)
-        setIsNextActive(res?.data?.sbom?.components?.pageInfo?.hasNextPage)
+        setPaginationControl(res.data)
       }
     })
   }
 
   const handleSort = async (column, sortDirection) => {
+    disablePaginationControl()
     refetch({
       projectId: productId,
       sbomId: sbomId,
@@ -1063,6 +1106,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
       direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
     }).then((res) => {
       if (res.data) {
+        setPaginationControl(res.data)
         prodCompDispatch({
           type: 'SET_SORT_ORDER',
           payload: {
@@ -1075,7 +1119,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
   }
 
   const handlePreviousPage = async () => {
-    setIsPrevActive(false)
+    disablePaginationControl()
     handleRefetch(null, data.pageInfo.startCursor)
     prodCompDispatch({
       type: 'DECREMENT_PAGE',
@@ -1084,7 +1128,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
   }
 
   const handleNextPage = async () => {
-    setIsNextActive(false)
+    disablePaginationControl()
     handleRefetch(data.pageInfo.endCursor, null)
     prodCompDispatch({
       type: 'INCREMENT_PAGE',
@@ -1140,17 +1184,17 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
 
       {/* PAGINATION */}
       {data && (
-          <Pagination
-              paginationSizes={paginationSizes}
-              pageIndex={pageIndex}
-              totalRows={totalRows}
-              totalCount={data.totalCount}
-              onPreviousPage={handlePreviousPage}
-              onNextPage={handleNextPage}
-              onSetRow={handleSetRow}
-              hasNextPage={data.pageInfo.hasNextPage}
-              hasPreviousPage={data.pageInfo.hasPreviousPage}
-          />
+        <Pagination
+          paginationSizes={paginationSizes}
+          pageIndex={pageIndex}
+          totalRows={totalRows}
+          totalCount={data.totalCount}
+          onPreviousPage={handlePreviousPage}
+          onNextPage={handleNextPage}
+          onSetRow={handleSetRow}
+          hasNextPage={isNextActive}
+          hasPreviousPage={isPrevActive}
+        />
       )}
 
       {/* ACTIONS */}
@@ -1161,6 +1205,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp }) => {
               data={activeRow}
               isOpen={isOpen}
               onClose={onClose}
+              sbomRefetch={sbomRefetch}
               fetchCompData={fetchCompData}
               filterRefetch={getCompFilters}
               shortDesc={null}

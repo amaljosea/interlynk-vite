@@ -38,6 +38,28 @@ export const InviteUser = gql`
   }
 `
 
+// UPDATE ORANIZATION ROLE PERMISSIONS
+export const UpdateOrganizationRole = gql`
+  mutation UpdateOrganizationRole(
+    $permissions: [SetPermissionInput!]
+    $organizationRoleId: Uuid!
+  ) {
+    organizationRoleUpdate(
+      input: {
+        permissions: $permissions
+        organizationRoleId: $organizationRoleId
+      }
+    ) {
+      organizationRole {
+        id
+        name
+        permissions
+      }
+      errors
+    }
+  }
+`
+
 // UPDATE ORGANIZATION USER ROLE
 export const UpdateOrganizationUserRole = gql`
   mutation UpdateOrganizationUserRole(
@@ -1343,6 +1365,7 @@ export const updateCompVulnVex = gql`
   mutation updateCompVulnVex(
     $compVulnId: Uuid!
     $vexStatusId: Uuid!
+    $sbomId: Uuid!
     $vexJustificationId: Uuid
     $cdxResponseId: Uuid
     $note: String
@@ -1355,6 +1378,7 @@ export const updateCompVulnVex = gql`
       input: {
         componentVulnId: $compVulnId
         vexStatusId: $vexStatusId
+        currentSbomId: $sbomId
         vexJustificationId: $vexJustificationId
         cdxResponseId: $cdxResponseId
         note: $note
@@ -1385,6 +1409,58 @@ export const updateCompVulnVex = gql`
         fixedIn
       }
       errors
+    }
+  }
+`
+
+// UPDATE GLOBAL VULN STATUS
+export const UpdateGlobalVex = gql`
+  mutation UpdateGlobalVex(
+    $vulnId: Uuid!
+    $vexStatusId: Uuid!
+    $vexJustificationId: Uuid
+    $cdxResponseId: Uuid
+    $note: String
+    $impact: String
+    $detail: String
+    $action: String
+    $fixedIn: String
+    $sbomId: Uuid
+    $projectGroupId: Uuid
+    $projectId: Uuid
+  ) {
+    vulnVexUpdate(
+      input: {
+        vulnId: $vulnId
+        vexStatusId: $vexStatusId
+        vexJustificationId: $vexJustificationId
+        cdxResponseId: $cdxResponseId
+        note: $note
+        impact: $impact
+        detail: $detail
+        action: $action
+        fixedIn: $fixedIn
+        sbomId: $sbomId
+        projectGroupId: $projectGroupId
+        projectId: $projectId
+      }
+    ) {
+      errors
+      componentVulns {
+        actionStmt
+        cdxResponseId
+        componentId
+        detail
+        fixedIn
+        id
+        impact
+        note
+        vexJustificationId
+        vexStatusId
+      }
+      vuln {
+        vulnId
+      }
     }
   }
 `
