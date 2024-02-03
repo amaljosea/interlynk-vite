@@ -20,7 +20,7 @@ import {
   getVexJustifications,
   GetCdxResponses
 } from 'graphQL/Queries'
-import { useMutation, useQuery } from '@apollo/client'
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useLocation } from 'react-router-dom'
 import { GetProject } from 'graphQL/Queries'
 import { normalizeSBOMVersion } from 'utils'
@@ -29,6 +29,7 @@ import { UpdateGlobalVex } from 'graphQL/Mutation'
 import { updateCompVulnVex } from 'graphQL/Mutation'
 
 const VexModal = ({
+  groups,
   isOpen,
   onClose,
   refetch,
@@ -37,6 +38,8 @@ const VexModal = ({
   setToggleClear
 }) => {
   const { totalRows } = useGlobalState()
+
+  console.log(groups)
 
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -48,6 +51,7 @@ const VexModal = ({
   const [statusName, setStatusName] = useState('')
   const [justification, setJustification] = useState('')
   const [justifyName, setJustifyName] = useState('')
+  const [selectEnv, setSelectEnv] = useState('')
   const [selectedTag, setSelectedTag] = useState('')
   const [actionStatement, setActionStatement] = useState('')
   const [response, setResponse] = useState('')
@@ -56,10 +60,12 @@ const VexModal = ({
   const [notes, setNotes] = useState('')
   const [impactData, setImpactData] = useState('')
 
-  const { data } = useQuery(GetProject, { variables: { id: vulnId } })
+  const [getProject, { data }] = useLazyQuery(GetProject)
   const { data: allVexStatus } = useQuery(getVexStatuses)
   const { data: allVexJustify } = useQuery(getVexJustifications)
   const { data: allCdx } = useQuery(GetCdxResponses)
+
+  const [getProduct] = useLazyQuery(GetProject)
 
   const [compVexCreate] = useMutation(updateCompVulnVex, {
     fetchPolicy: 'network-only',
@@ -99,16 +105,23 @@ const VexModal = ({
     setJustifyName(e.target.options[e.target.selectedIndex].text)
   }
 
-  const uniqVersions = []
+  const handleEnvChange = async (e) => {
+    setSelectEnv(e.target.value)
+    await getProject({
+      variables: { id: e.target.value }
+    }).then((res) => console.log(res.data))
+  }
 
-  data?.project?.sboms?.length > 0 &&
-    data?.project?.sboms.map((project) => {
-      uniqVersions.push({
-        label: normalizeSBOMVersion(project)
-      })
-    })
+  // const uniqVersions = []
 
-  const fixedVersions = uniqVersions.filter((item) => item.value !== sbomId)
+  // data?.project?.sboms?.length > 0 &&
+  //   data?.project?.sboms.map((project) => {
+  //     uniqVersions.push({
+  //       label: normalizeSBOMVersion(project)
+  //     })
+  //   })
+
+  // const fixedVersions = uniqVersions.filter((item) => item.value !== sbomId)
 
   const handleSave = () => {
     setToggleClear(false)
@@ -129,20 +142,21 @@ const VexModal = ({
             action: actionStatement !== '' ? actionStatement : undefined,
             fixedIn: selectedTag !== '' ? selectedTag : undefined
           }
-        }).then((res) => {
-          setStatusTitle('')
-          setStatusName('')
-          setJustification('')
-          setJustifyName('')
-          setSelectedTag('')
-          setActionStatement('')
-          setResponse('')
-          setResponseTitle('')
-          setDetails('')
-          setNotes('')
-          setImpactData('')
         })
-        .finally(() => onClose())
+          .then((res) => {
+            setStatusTitle('')
+            setStatusName('')
+            setJustification('')
+            setJustifyName('')
+            setSelectedTag('')
+            setActionStatement('')
+            setResponse('')
+            setResponseTitle('')
+            setDetails('')
+            setNotes('')
+            setImpactData('')
+          })
+          .finally(() => onClose())
       })
     }
   }
@@ -251,6 +265,35 @@ const VexModal = ({
                     fontSize='sm'
                     color='gray.600'
                   >
+                    Project Environment
+                  </FormLabel>
+                  <Select
+                    id='env'
+                    name='env'
+                    value={selectEnv}
+                    onChange={handleEnvChange}
+                    textTransform={'capitalize'}
+                    fontSize='sm'
+                    color='gray.600'
+                  >
+                    <option value=''>-- Select --</option>
+                    {groups?.projectGroup?.projects.length > 0 ? (
+                      groups?.projectGroup?.projects.map((item, index) => (
+                        <option key={index} value={item.id} name={item.name}>
+                          {item.name}
+                        </option>
+                      ))
+                    ) : (
+                      <option value=''>-- --</option>
+                    )}
+                  </Select>
+                </FormControl>
+                <FormControl width={'100%'}>
+                  <FormLabel
+                    htmlFor='fixedVersion'
+                    fontSize='sm'
+                    color='gray.600'
+                  >
                     Fixed Version
                   </FormLabel>
                   <Select
@@ -258,18 +301,15 @@ const VexModal = ({
                     name='fixedVersion'
                     value={selectedTag}
                     onChange={(e) => setSelectedTag(e.target.value)}
+                    textTransform={'capitalize'}
                     fontSize='sm'
                     color='gray.600'
                   >
                     <option value=''>-- Select --</option>
-                    {fixedVersions.length > 0 ? (
-                      fixedVersions.map((item, index) => (
-                        <option
-                          key={index}
-                          value={item.value}
-                          name={item.label}
-                        >
-                          {item.label}
+                    {data?.project?.sboms?.length > 0 ? (
+                      data?.project?.sboms?.map((item, index) => (
+                        <option key={index} value={normalizeSBOMVersion(item)} name={normalizeSBOMVersion(item)}>
+                          {normalizeSBOMVersion(item)}
                         </option>
                       ))
                     ) : (
