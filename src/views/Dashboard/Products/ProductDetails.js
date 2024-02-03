@@ -299,6 +299,10 @@ const ProductDetails = () => {
       setActiveProdTab(0)
     } else if (activeTab === 1) {
       setActiveProdTab(1)
+      globalVulnRefetch({
+        id: activeEnv,
+        first: totalRows
+      })
     } else if (activeTab === 2) {
       setActiveProdTab(2)
     } else if (activeTab === 3) {
