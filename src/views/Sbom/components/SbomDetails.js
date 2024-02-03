@@ -136,10 +136,13 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
             </Text>
           </Flex>
         </Stack>
-        <Flex flexDir={'row'} gap={1} alignItems={'center'} flexWrap={'wrap'}>
+        <Flex flexDir={'row'} alignItems={'center'} flexWrap={'wrap'}>
           <Text>{primaryComponent?.name}</Text>
           <Text>{primaryComponent?.version ? ':' : ''}</Text>
-          <Text>{primaryComponent?.version || `: Uploaded at ${getFullDateAndTime(sbom?.createdAt)}`}</Text>
+          <Text mr={1.5}>
+            {primaryComponent?.version ||
+              `Uploaded at ${getFullDateAndTime(sbom?.createdAt)}`}
+          </Text>
           <Tooltip label='Lifecycle stage' fontSize='md'>
             <Tag
               w={'fit-content'}
