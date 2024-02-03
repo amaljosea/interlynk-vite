@@ -34,6 +34,7 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
     vulnRunStatus,
     stats
   } = sbom
+  console.log('sbom', sbom)
   const { compCount, compLicenseCount, vulnStats } = stats
   const { critical, high, medium, low } = vulnStats
 
@@ -133,22 +134,22 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
             <Text fontWeight={'semibold'} fontSize={25}>
               {project?.projectGroup?.name}
             </Text>
-            <Tooltip label='Lifecycle stage' fontSize='md'>
-              <Tag
-                w={'fit-content'}
-                size={'sm'}
-                variant='solid'
-                colorScheme='blue'
-              >
-                <TagLabel textTransform={'capitalize'}>{lifecycle}</TagLabel>
-              </Tag>
-            </Tooltip>
           </Flex>
         </Stack>
-        <Flex flexDir={'row'} gap={0.5} alignItems={'center'} flexWrap={'wrap'}>
+        <Flex flexDir={'row'} gap={1} alignItems={'center'} flexWrap={'wrap'}>
           <Text>{primaryComponent?.name}</Text>
           <Text>{primaryComponent?.version ? ':' : ''}</Text>
-          <Text>{primaryComponent?.version}</Text>
+          <Text>{primaryComponent?.version || `: Uploaded at ${getFullDateAndTime(sbom?.createdAt)}`}</Text>
+          <Tooltip label='Lifecycle stage' fontSize='md'>
+            <Tag
+              w={'fit-content'}
+              size={'sm'}
+              variant='solid'
+              colorScheme='blue'
+            >
+              <TagLabel textTransform={'capitalize'}>{lifecycle}</TagLabel>
+            </Tag>
+          </Tooltip>
         </Flex>
         <Text fontSize={'sm'} my={1}>
           {primaryComponent?.description}
