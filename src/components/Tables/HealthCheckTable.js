@@ -94,6 +94,10 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
     (permission) =>
       permission.key === 'edit_checks' && permission.value === true
   )
+  const updateSboms = sboms?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'update_sbom' && permission.value === true
+  )
 
   const [purlValue, setPurlValue] = useState('')
   const [purlData, setPurlData] = useState(null)
@@ -711,7 +715,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
                           ? handleSbomUpdate(row)
                           : handleOpen(row)
                     }
-                    disabled={customerView || !editChecks}
+                    disabled={customerView || !editChecks || !updateSboms}
                   />
                 </Tooltip>
 
@@ -723,7 +727,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
                     fontWeight='normal'
                     icon={<GoSkip size={18} />}
                     onClick={() => updateIssue(id)}
-                    disabled={customerView || !editChecks}
+                    disabled={customerView || !editChecks || !updateSboms}
                   />
                 </Tooltip>
               </Stack>
