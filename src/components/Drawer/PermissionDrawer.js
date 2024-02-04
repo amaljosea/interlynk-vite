@@ -128,7 +128,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
     return null
   }
 
-  const onCheckChild = async (e, category, index, list, roles) => {
+  const onCheckChild = async (e, category, index, list, allChecked, roles) => {
     if (role !== 'custom') {
       const updatedCheckedItems = [...roles]
       updatedCheckedItems[index] = e.target.checked
@@ -150,7 +150,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
         variables: {
           organizationRoleId: data?.id,
           permissions: [
-            { permissionKey: list[0]?.key, value: true },
+            { permissionKey: list[0]?.key, value: allChecked ? true : false },
             { permissionKey: filterItem?.key, value: e.target.checked }
           ]
         }
@@ -199,6 +199,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
                           item.category,
                           index,
                           orgManagement,
+                          allOrgManageChecked,
                           checkedOrgManage
                         )
                       }
@@ -239,6 +240,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
                           item.category,
                           index,
                           groupManagement,
+                          allGroupManageChecked,
                           checkedGroupManage
                         )
                       }
@@ -279,6 +281,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
                           item.category,
                           index,
                           prodManagement,
+                          allProdManageChecked,
                           checkedProdManage
                         )
                       }
@@ -319,6 +322,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
                           item.category,
                           index,
                           sbomManagement,
+                          allSbomManageChecked,
                           checkedSbomManage
                         )
                       }
@@ -359,6 +363,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
                           item.category,
                           index,
                           userManagement,
+                          allUserManageChecked,
                           checkedUserManage
                         )
                       }
@@ -399,6 +404,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
                           item.category,
                           index,
                           vulnManagement,
+                          allVulnManageChecked,
                           checkedVulnManage
                         )
                       }
