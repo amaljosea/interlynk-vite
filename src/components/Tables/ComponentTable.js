@@ -560,7 +560,7 @@ const ComponentTable = ({
                     >
                       Edit Component
                     </MenuItem>
-                    <MenuItem onClick={() => handleOpen(row)}>
+                    <MenuItem onClick={() => handleOpen(row)} isDisabled={!updateComponent}>
                       Edit Relationships
                     </MenuItem>
                     <MenuItem
@@ -568,7 +568,7 @@ const ComponentTable = ({
                         setActiveRow(row)
                         onSupOpen()
                       }}
-                      isDisabled={status === 'signed'}
+                      isDisabled={status === 'signed' || !updateComponent}
                     >
                       {suppliers.length > 0 ? 'Edit' : 'Add'} Supplier
                     </MenuItem>
@@ -577,7 +577,7 @@ const ComponentTable = ({
                         setActiveRow(row)
                         onLinkOpen()
                       }}
-                      isDisabled={status === 'signed'}
+                      isDisabled={status === 'signed' || !updateComponent}
                     >
                       Edit Links
                     </MenuItem>
