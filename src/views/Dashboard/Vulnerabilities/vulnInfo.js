@@ -13,7 +13,6 @@ import {
   TabPanel,
   Stack,
   Box,
-  Badge,
   Tag,
   TagLabel
 } from '@chakra-ui/react'
@@ -130,7 +129,7 @@ const VulnInfo = ({ data, componentVulns, refetch }) => {
                               {Math.ceil(data.vulnInfo?.epssScore * 10000 || 0)}
                             </VulnBadge>
                             <VulnBadge color='cyan' label='KEV'>
-                              {data?.vulnInfo?.epssScore ? '-' : 'K'}
+                              {data?.vulnInfo?.kev ? 'K' : '-'}
                             </VulnBadge>
                           </Stack>
                           <Text fontSize={'xs'}>Vulnerabilities</Text>
