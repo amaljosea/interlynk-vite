@@ -415,6 +415,7 @@ const VulnTable = ({
     {
       id: 'COMPONENT_VULNS_UPDATED_AT',
       name: 'UPDATED AT',
+      width: '150px',
       selector: (row) => (
         <Tooltip
           label={getFullDateAndTime(row.vuln.updatedAt)}
