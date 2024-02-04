@@ -52,8 +52,6 @@ function Profile() {
     }
   ]
 
-  console.log('userPermissions', userPermissions)
-
   const viewOrg = userPermissions?.find(
     (item) => item.key === 'view_organization'
   )
@@ -305,7 +303,10 @@ function Profile() {
                         display={
                           !orgInfo?.organization && item !== 'Organizations'
                             ? 'none'
-                            : 'block'
+                            : viewOrg.value === false &&
+                                item === 'Organizations'
+                              ? 'none'
+                              : 'block'
                         }
                       >
                         {item}
