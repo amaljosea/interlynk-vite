@@ -52,10 +52,12 @@ function Profile() {
     }
   ]
 
-  console.log('User Permissions', userPermissions)
+  console.log('userPermissions', userPermissions)
 
+  const viewOrg = userPermissions?.find(
+    (item) => item.key === 'view_organization'
+  )
   const viewUsers = userPermissions?.find((item) => item.key === 'view_users')
-
   const viewFeeds = userPermissions?.find((item) => item.key === 'view_feeds')
   const manageFeeds = viewFeeds?.supersededBy?.some(
     (permission) =>
@@ -145,6 +147,14 @@ function Profile() {
     }
   }, [activetab, isAdmin])
 
+  useEffect(() => {
+    if (viewOrg?.value === false) {
+      navigate(`/vendor/settings?tab=person`)
+    } else {
+      navigate(`/vendor/settings?tab=organization`)
+    }
+  }, [])
+
   if (error) {
     return (
       <Flex my={32} alignItems={'center'} justifyContent={'center'} gap={2}>
@@ -174,7 +184,11 @@ function Profile() {
             setSelectedTab={setSelectedTab}
             setTabIndex={setTabIndex}
             setPsIndex={setPsIndex}
-            tabs={tabs}
+            tabs={
+              viewOrg?.value
+                ? tabs
+                : tabs.filter((item) => item.name !== 'ORGANIZATION')
+            }
           />
 
           {/*  ORGANIZATION */}
