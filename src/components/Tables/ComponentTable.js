@@ -114,6 +114,10 @@ const ComponentTable = ({
     (permission) =>
       permission.key === 'update_sbom_components' && permission.value === true
   )
+  const updateSboms = sboms?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'update_sbom' && permission.value === true
+  )
 
   const fetchCompData = async () => {
     disablePaginationControl()
@@ -556,11 +560,16 @@ const ComponentTable = ({
                   <MenuList size='sm'>
                     <MenuItem
                       onClick={() => onLicenseOpen(row)}
-                      isDisabled={status === 'signed' || !updateComponent}
+                      isDisabled={
+                        status === 'signed' || !updateComponent || !updateSboms
+                      }
                     >
                       Edit Component
                     </MenuItem>
-                    <MenuItem onClick={() => handleOpen(row)}>
+                    <MenuItem
+                      onClick={() => handleOpen(row)}
+                      isDisabled={!updateComponent || !updateSboms}
+                    >
                       Edit Relationships
                     </MenuItem>
                     <MenuItem
@@ -568,7 +577,9 @@ const ComponentTable = ({
                         setActiveRow(row)
                         onSupOpen()
                       }}
-                      isDisabled={status === 'signed'}
+                      isDisabled={
+                        status === 'signed' || !updateComponent || !updateSboms
+                      }
                     >
                       {suppliers.length > 0 ? 'Edit' : 'Add'} Supplier
                     </MenuItem>
@@ -577,7 +588,9 @@ const ComponentTable = ({
                         setActiveRow(row)
                         onLinkOpen()
                       }}
-                      isDisabled={status === 'signed'}
+                      isDisabled={
+                        status === 'signed' || !updateComponent || !updateSboms
+                      }
                     >
                       Edit Links
                     </MenuItem>
@@ -589,7 +602,11 @@ const ComponentTable = ({
                           setActiveRow(row)
                           onDelOpen()
                         }}
-                        isDisabled={status === 'signed'}
+                        isDisabled={
+                          status === 'signed' ||
+                          !updateComponent ||
+                          !updateSboms
+                        }
                       >
                         Delete
                       </MenuItem>
@@ -1027,7 +1044,9 @@ const ComponentTable = ({
                 variant='solid'
                 fontWeight='normal'
                 fontSize={'sm'}
-                isDisabled={lifecycle === 'signed' || !updateComponent}
+                isDisabled={
+                  lifecycle === 'signed' || !updateComponent || !updateSboms
+                }
               />
             </Tooltip>
           )}

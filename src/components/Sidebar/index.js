@@ -1,25 +1,13 @@
 /*eslint-disable*/
 // chakra imports
 import { Box } from '@chakra-ui/react'
-import { useEffect, useState } from 'react'
 import SidebarContent from './SidebarContent'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 // FUNCTIONS
 
 function Sidebar({ routes }) {
-  const { minimize, activeDockerHub, setMinimize } = useGlobalState()
-
-  const [filterRoutes, setFilterRoutes] = useState([])
-
-  useEffect(() => {
-    if (!activeDockerHub) {
-      const allRoutes = routes.filter((item) => item.name !== 'Images')
-      setFilterRoutes(allRoutes)
-    } else {
-      setFilterRoutes(routes)
-    }
-  }, [activeDockerHub])
+  const { minimize, setMinimize } = useGlobalState()
 
   // SIDEBAR
   return (
@@ -33,7 +21,7 @@ function Sidebar({ routes }) {
       height={'100vh'}
       zIndex={111}
     >
-      <SidebarContent routes={filterRoutes} logoText={'Interlynk'} />
+      <SidebarContent routes={routes} logoText={'Interlynk'} />
     </Box>
   )
 }

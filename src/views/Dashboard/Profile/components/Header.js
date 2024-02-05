@@ -13,6 +13,7 @@ import {
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 import { UploadProfileImage } from 'graphQL/Mutation'
+import { useGlobalState } from 'hooks/useGlobalState'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
@@ -28,8 +29,12 @@ const Header = ({
 }) => {
   const navigate = useNavigate()
   const toast = useToast()
+  const  { userPermissions } = useGlobalState()
   const textColor = useColorModeValue('gray.700', 'white')
   const emailColor = useColorModeValue('gray.500', 'gray.300')
+
+  const viewOrg = userPermissions?.find((item) => item.key === "view_organization")
+
 
   const handleClick = (name) => {
     setSelectedTab(name)

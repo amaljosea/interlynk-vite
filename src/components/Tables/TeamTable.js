@@ -54,9 +54,12 @@ const TeamTable = ({ data, refetch }) => {
     (permission) =>
       permission.key === 'invite_users' && permission.value === true
   )
-  const editUserRoles = viewUsers?.supersededBy?.some(
+  const editUserRole = viewUsers?.supersededBy?.some(
     (permission) =>
       permission.key === 'edit_user_role' && permission.value === true
+  )
+  const editTeam = viewUsers?.supersededBy?.some(
+    (permission) => permission.key === 'edit_team' && permission.value === true
   )
   const removeUser = viewUsers?.supersededBy?.some(
     (permission) =>
@@ -223,7 +226,7 @@ const TeamTable = ({ data, refetch }) => {
               <MenuList size='sm'>
                 <MenuItem
                   isDisabled={
-                    row.email === data.currentUser.email || !editUserRoles
+                    row.email === data.currentUser.email || !editUserRole
                   }
                   onClick={() => {
                     console.log('row', row)
@@ -250,7 +253,7 @@ const TeamTable = ({ data, refetch }) => {
                 {(invitationStatus === 'declined' ||
                   invitationStatus === 'invited' ||
                   invitationStatus === 'pending_registration') && (
-                  <MenuItem onClick={() => onResendInvite(row)}>
+                  <MenuItem onClick={() => onResendInvite(row)} isDisabled={!inviteUser}>
                     Resend Invite
                   </MenuItem>
                 )}
