@@ -19,33 +19,35 @@ import { useState } from 'react'
 const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
   const { permissionsMap } = data
 
+  const [permissions, setPermissions] = useState(permissionsMap)
+
   const [updateRole] = useMutation(UpdateOrganizationRole, {
     onCompleted: () => refetch()
   })
 
-  const orgManagement = [...permissionsMap]?.filter(
+  const orgManagement = permissions?.filter(
     (item) => item.category === 'Organization Management'
   )
-  const groupManagement = [...permissionsMap]?.filter(
+  const groupManagement = permissions?.filter(
     (item) => item.category === 'Product Group Management'
   )
-  const prodManagement = [...permissionsMap]?.filter(
+  const prodManagement = permissions?.filter(
     (item) => item.category === 'Product Management'
   )
-  const sbomManagement = [...permissionsMap]?.filter(
+  const sbomManagement = permissions?.filter(
     (item) => item.category === 'SBOM Management'
   )
-  const userManagement = [...permissionsMap]?.filter(
+  const userManagement = permissions?.filter(
     (item) => item.category === 'User Management'
   )
-  const vulnManagement = [...permissionsMap]?.filter(
+  const vulnManagement = permissions?.filter(
     (item) => item.category === 'Vulnerability Management'
   )
 
   // ORGANIZATION MANAGEMENT
   const [checkedOrgManage, setCheckedOrgManage] = useState(
     orgManagement
-      .filter((item) => item.supersededBy.length === 0)
+      ?.filter((item) => item.supersededBy.length === 0)
       .map((item) => item.value)
   )
   const allOrgManageChecked = checkedOrgManage.every(Boolean)
@@ -54,7 +56,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
   // PRODUCT GROUP MANAGEMENT
   const [checkedGroupManage, setCheckedGroupManage] = useState(
     groupManagement
-      .filter((item) => item.supersededBy.length === 0)
+      ?.filter((item) => item.supersededBy.length === 0)
       .map((item) => item.value)
   )
   const allGroupManageChecked = checkedGroupManage.every(Boolean)
@@ -63,7 +65,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
   // PRODUCT MANAGEMENT
   const [checkedProdManage, setCheckedProdManage] = useState(
     prodManagement
-      .filter((item) => item.supersededBy.length === 0)
+      ?.filter((item) => item.supersededBy.length === 0)
       .map((item) => item.value)
   )
   const allProdManageChecked = checkedProdManage.every(Boolean)
@@ -72,7 +74,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
   // SBOM MANAGEMENT
   const [checkedSbomManage, setCheckedSbomManage] = useState(
     sbomManagement
-      .filter((item) => item.supersededBy.length === 0)
+      ?.filter((item) => item.supersededBy.length === 0)
       .map((item) => item.value)
   )
   const allSbomManageChecked = checkedSbomManage.every(Boolean)
@@ -81,7 +83,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
   // USER MANAGEMENT
   const [checkedUserManage, setCheckedUserManage] = useState(
     userManagement
-      .filter((item) => item.supersededBy.length === 0)
+      ?.filter((item) => item.supersededBy.length === 0)
       .map((item) => item.value)
   )
   const allUserManageChecked = checkedUserManage.every(Boolean)
@@ -90,7 +92,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
   // VULN MANAGEMENT
   const [checkedVulnManage, setCheckedVulnManage] = useState(
     vulnManagement
-      .filter((item) => item.supersededBy.length === 0)
+      ?.filter((item) => item.supersededBy.length === 0)
       .map((item) => item.value)
   )
   const allVulnManageChecked = checkedVulnManage.every(Boolean)
@@ -122,6 +124,14 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
         }))
         await updateRole({
           variables: { organizationRoleId: data?.id, permissions: permissions }
+        }).then((res) => {
+          if (res?.data) {
+            console.log(res.data)
+            setPermissions(
+              res?.data?.organizationRoleUpdate?.organizationRole
+                ?.permissionsMap
+            )
+          }
         })
       }
     }
@@ -130,6 +140,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
 
   const onCheckChild = async (e, category, index, list, allChecked, roles) => {
     if (role !== 'custom') {
+      const selector = permissions.filter((item) => item.category === category)
       const updatedCheckedItems = [...roles]
       updatedCheckedItems[index] = e.target.checked
       if (category === 'Organization Management') {
@@ -145,14 +156,31 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
       } else {
         setCheckedVulnManage(updatedCheckedItems)
       }
-      const filterItem = list.find((item) => item.key === e.target.name)
+      const filterItem = selector.find((item) => item?.key === e.target.name)
+      const active = selector.some(
+        (item) =>
+          item?.supersededBy?.length === 0 &&
+          item?.key !== e.target.name &&
+          item?.value === true
+      )
+      console.log('active', active)
       await updateRole({
         variables: {
           organizationRoleId: data?.id,
           permissions: [
-            { permissionKey: list[0]?.key, value: allChecked ? true : false },
+            {
+              permissionKey: selector[0]?.key,
+              value: !active && e.target.checked === false ? false : true
+            },
             { permissionKey: filterItem?.key, value: e.target.checked }
           ]
+        }
+      }).then((res) => {
+        if (res?.data) {
+          console.log('data', res.data)
+          setPermissions(
+            res?.data?.organizationRoleUpdate?.organizationRole?.permissionsMap
+          )
         }
       })
     }
@@ -160,6 +188,8 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
   }
 
   const readOnly = data?.name !== 'custom' && role !== 'admin'
+
+  console.log('permissions', permissions)
 
   return (
     <Drawer isOpen={isOpen} placement='right' size='md' onClose={onClose}>
@@ -172,9 +202,10 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
             {/* ORGANIZATION MANAGEMENT */}
             <Box>
               {orgManagement
-                .filter((item) => item.supersededBy.length > 0)
-                .map((item) => (
+                ?.filter((item) => item.supersededBy.length > 0)
+                .map((item, index) => (
                   <Checkbox
+                    key={index}
                     isChecked={allOrgManageChecked}
                     isIndeterminate={isOrgManageChecked}
                     isReadOnly={readOnly}
@@ -187,9 +218,10 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
                 ))}
               <Stack pl={6} mt={1} spacing={1}>
                 {orgManagement
-                  .filter((item) => item.supersededBy.length === 0)
+                  ?.filter((item) => item.supersededBy.length === 0)
                   .map((item, index) => (
                     <Checkbox
+                      key={index}
                       name={item.key}
                       isChecked={checkedOrgManage[index]}
                       isReadOnly={readOnly}
@@ -213,9 +245,10 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
             {/* PROJECT GROUP MANAGEMENT */}
             <Box mt={6}>
               {groupManagement
-                .filter((item) => item.supersededBy.length > 0)
-                .map((item) => (
+                ?.filter((item) => item.supersededBy.length > 0)
+                .map((item, index) => (
                   <Checkbox
+                    key={index}
                     isChecked={allGroupManageChecked}
                     isIndeterminate={isGroupManageChecked}
                     isReadOnly={readOnly}
@@ -228,9 +261,10 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
                 ))}
               <Stack pl={6} mt={1} spacing={1}>
                 {groupManagement
-                  .filter((item) => item.supersededBy.length === 0)
+                  ?.filter((item) => item.supersededBy.length === 0)
                   .map((item, index) => (
                     <Checkbox
+                      key={index}
                       name={item.key}
                       isChecked={checkedGroupManage[index]}
                       isReadOnly={readOnly}
@@ -254,9 +288,10 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
             {/* PROJECT MANAGEMENT */}
             <Box mt={6}>
               {prodManagement
-                .filter((item) => item.supersededBy.length > 0)
-                .map((item) => (
+                ?.filter((item) => item.supersededBy.length > 0)
+                .map((item, index) => (
                   <Checkbox
+                    key={index}
                     isChecked={allProdManageChecked}
                     isIndeterminate={isProdManageChecked}
                     isReadOnly={readOnly}
@@ -269,9 +304,10 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
                 ))}
               <Stack pl={6} mt={1} spacing={1}>
                 {prodManagement
-                  .filter((item) => item.supersededBy.length === 0)
+                  ?.filter((item) => item.supersededBy.length === 0)
                   .map((item, index) => (
                     <Checkbox
+                      key={index}
                       name={item.key}
                       isChecked={checkedProdManage[index]}
                       isReadOnly={readOnly}
@@ -295,9 +331,10 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
             {/* SBOM MANAGEMENT */}
             <Box mt={6}>
               {sbomManagement
-                .filter((item) => item.supersededBy.length > 0)
-                .map((item) => (
+                ?.filter((item) => item.supersededBy.length > 0)
+                .map((item, index) => (
                   <Checkbox
+                    key={index}
                     isChecked={allSbomManageChecked}
                     isIndeterminate={isSbomManageChecked}
                     isReadOnly={readOnly}
@@ -310,9 +347,10 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
                 ))}
               <Stack pl={6} mt={1} spacing={1}>
                 {sbomManagement
-                  .filter((item) => item.supersededBy.length === 0)
+                  ?.filter((item) => item.supersededBy.length === 0)
                   .map((item, index) => (
                     <Checkbox
+                      key={index}
                       name={item.key}
                       isChecked={checkedSbomManage[index]}
                       isReadOnly={readOnly}
@@ -336,9 +374,10 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
             {/* USER MANAGEMENT */}
             <Box mt={6}>
               {userManagement
-                .filter((item) => item.supersededBy.length > 0)
-                .map((item) => (
+                ?.filter((item) => item.supersededBy.length > 0)
+                .map((item, index) => (
                   <Checkbox
+                    key={index}
                     isChecked={allUserManageChecked}
                     isIndeterminate={isUserManageChecked}
                     isReadOnly={readOnly}
@@ -351,9 +390,10 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
                 ))}
               <Stack pl={6} mt={1} spacing={1}>
                 {userManagement
-                  .filter((item) => item.supersededBy.length === 0)
+                  ?.filter((item) => item.supersededBy.length === 0)
                   .map((item, index) => (
                     <Checkbox
+                      key={index}
                       name={item.key}
                       isChecked={checkedUserManage[index]}
                       isReadOnly={readOnly}
@@ -377,9 +417,10 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
             {/* VULN MANAGEMENT */}
             <Box mt={6}>
               {vulnManagement
-                .filter((item) => item.supersededBy.length > 0)
-                .map((item) => (
+                ?.filter((item) => item.supersededBy.length > 0)
+                .map((item, index) => (
                   <Checkbox
+                    key={index}
                     isChecked={allVulnManageChecked}
                     isIndeterminate={isVulnManageChecked}
                     isReadOnly={readOnly}
@@ -392,9 +433,10 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
                 ))}
               <Stack pl={6} mt={1} spacing={1}>
                 {vulnManagement
-                  .filter((item) => item.supersededBy.length === 0)
+                  ?.filter((item) => item.supersededBy.length === 0)
                   .map((item, index) => (
                     <Checkbox
+                      key={index}
                       name={item.key}
                       isChecked={checkedVulnManage[index]}
                       isReadOnly={readOnly}

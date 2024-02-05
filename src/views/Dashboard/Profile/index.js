@@ -151,7 +151,7 @@ function Profile() {
     if (viewOrg?.value === false) {
       navigate(`/vendor/settings?tab=person`)
     } else {
-      navigate(`/vendor/settings?tab=organization`)
+      navigate(`/vendor/settings?tab=person`)
     }
   }, [])
 
