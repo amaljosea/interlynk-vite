@@ -137,9 +137,9 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
           </Flex>
         </Stack>
         <Flex flexDir={'row'} alignItems={'center'} flexWrap={'wrap'}>
-          <Text>{primaryComponent?.name}</Text>
-          <Text>{primaryComponent?.version ? ':' : ''}</Text>
-          <Text mr={1.5}>
+          <Text fontSize={22}>{primaryComponent?.name}</Text>
+          <Text fontSize={22}>{primaryComponent?.version ? ':' : ''}</Text>
+          <Text mr={2} fontSize={22}>
             {primaryComponent?.version ||
               `Uploaded at ${getFullDateAndTime(sbom?.createdAt)}`}
           </Text>
