@@ -215,14 +215,11 @@ const ComponentTable = ({
 
   const handleOpen = (row) => {
     setActiveRow(row)
+    onRelationOpen()
     getComPath({
       variables: {
         compId: row.id,
         sbomId: sbomId
-      }
-    }).then((res) => {
-      if (res.data) {
-        onRelationOpen()
       }
     })
   }
