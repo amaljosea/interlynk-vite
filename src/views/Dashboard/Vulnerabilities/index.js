@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { Flex } from '@chakra-ui/react'
-import { useLocation, useParams } from 'react-router-dom'
-import { useLazyQuery, useQuery } from '@apollo/client'
+import { useLocation } from 'react-router-dom'
+import { useQuery } from '@apollo/client'
 import { useGlobalState } from 'hooks/useGlobalState'
 import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
 import { GetGlobalVulns, GetGlobalVulnData } from 'graphQL/Queries'
@@ -15,11 +15,27 @@ const Vulnerabilities = () => {
   const vulnId = queryParams.get('vulnId')
   const org = sessionStorage.getItem('organization')
 
-  const { totalRows, dispatch } = useGlobalState()
+  const { totalRows, globalVulnState, dispatch } = useGlobalState()
+  const { searchInput, severities, products, statues, kev, epss } =
+    globalVulnState
   const { globalVulnDispatch } = dispatch
 
+  const epssRange = epss !== 'all' && epss !== '' && epss?.split('-')
+  const range = {
+    min: parseFloat(epssRange[0]) / 10000,
+    max: parseFloat(epssRange[1]) / 10000
+  }
+
   const { data, refetch } = useQuery(GetGlobalVulns, {
-    variables: { first: totalRows },
+    variables: {
+      first: totalRows,
+      search: searchInput !== '' ? searchInput : undefined,
+      projectactiveEnvs: products?.length === 0 ? undefined : products,
+      severity: severities?.length === 0 ? undefined : severities,
+      status: statues?.length === 0 ? undefined : statues,
+      kev: kev === 'yes' ? true : kev === 'false' ? false : undefined,
+      epss: epss === 'all' || epss === '' ? undefined : range
+    },
     onCompleted: () => globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
   })
 
