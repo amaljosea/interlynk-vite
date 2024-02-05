@@ -52,14 +52,37 @@ import StatusModal from 'views/Dashboard/Products/components/StatusModal'
 import Pagination from '../Pagination'
 
 const ProductTable = ({ data, refetch }) => {
+  //This part is needed for the pagination to work. (Modify with caution)
+  const paginationSizes = [25, 50, 100]
+
+  const [isPrevActive, setIsPrevActive] = useState(false)
+  const [isNextActive, setIsNextActive] = useState(false)
+
+  useEffect(() => {
+    if (data) {
+      setIsPrevActive(data?.pageInfo?.hasPreviousPage)
+      setIsNextActive(data?.pageInfo?.hasNextPage)
+    }
+  }, [data])
+
+  const setPaginationControl = (data) => {
+    setIsPrevActive(data.organization?.projectGroups?.pageInfo?.hasPreviousPage)
+    setIsNextActive(data.organization?.projectGroups?.pageInfo?.hasNextPage)
+  }
+
+  const disablePaginationControl = () => {
+    setIsPrevActive(false)
+    setIsNextActive(false)
+  }
+  //end
+
+
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
 
   const { userPermissions, setActiveSbomTab, prodState, dispatch } =
     useGlobalState()
-
-  const paginationSizes = [25, 50, 100]
 
   const { field, direction, searchInput, pageIndex, enabled } = prodState
   const { prodDispatch, prodCompDispatch } = dispatch
@@ -131,7 +154,14 @@ const ProductTable = ({ data, refetch }) => {
   } = useDisclosure()
 
   const [deleteProjectGroup] = useMutation(DeleteProjectGroup, {
-    onCompleted: () => refetch({ first: totalRows, field, direction })
+    onCompleted: () => {
+      disablePaginationControl()
+      refetch({ first: totalRows, field, direction }).then((res) => {
+        if (res.data) {
+          setPaginationControl(res.data)
+        }
+      })
+    }
   })
 
   const handleOpenSbom = useCallback(
@@ -152,15 +182,21 @@ const ProductTable = ({ data, refetch }) => {
   }, [deleteProjectGroup, activeRow, onDeleteClose])
 
   const handleRefresh = useCallback(async () => {
+    disablePaginationControl()
     await refetch({
       first: totalRows,
       field,
       direction
+    }).then((res) => {
+      if (res.data) {
+        setPaginationControl(res.data)
+      }
     })
   }, [refetch, totalRows, field, direction])
 
   const handleClear = useCallback(async () => {
     setFilterText('')
+    disablePaginationControl()
     await refetch({
       search: undefined,
       first: totalRows,
@@ -169,7 +205,12 @@ const ProductTable = ({ data, refetch }) => {
       before: undefined,
       field: field,
       direction: direction
-    }).then((res) => res.data && prodDispatch({ type: 'CLEAR_SEARCH_INPUT' }))
+    }).then((res) => {
+      if (res.data) {
+        setPaginationControl(res.data)
+        prodDispatch({ type: 'CLEAR_SEARCH_INPUT' })
+      }
+    })
   }, [refetch, totalRows, prodDispatch])
 
   const onSearchInputChange = useCallback(
@@ -188,6 +229,7 @@ const ProductTable = ({ data, refetch }) => {
     (event) => {
       const { value } = event.target
       if (event.key === 'Enter' && filterText !== '') {
+        disablePaginationControl()
         refetch({
           search: value,
           first: totalRows,
@@ -197,10 +239,12 @@ const ProductTable = ({ data, refetch }) => {
           field: field,
           direction: direction
         }).then(
-          (res) =>
-            res.data &&
-            prodDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
-        )
+          (res) => {
+            if (res.data) {
+              setPaginationControl(res.data)
+              prodDispatch({type: 'CHANGE_SEARCH_INPUT', payload: value})
+            }
+          })
       }
     },
     [refetch, filterText, totalRows, prodDispatch]
@@ -208,6 +252,7 @@ const ProductTable = ({ data, refetch }) => {
 
   const onFilterActive = useCallback(
     async (value) => {
+        disablePaginationControl()
       await refetch({
         enabled: value === 'yes' ? true : value === 'no' ? false : undefined,
         first: totalRows,
@@ -218,6 +263,7 @@ const ProductTable = ({ data, refetch }) => {
         direction: direction
       }).then((res) => {
         if (res.data) {
+          setPaginationControl(res.data)
           prodDispatch({ type: 'ON_FILTER_ACTIVE', payload: value })
         }
       })
@@ -489,6 +535,7 @@ const ProductTable = ({ data, refetch }) => {
 
   const handleSort = useCallback(
     async (column, sortDirection) => {
+      disablePaginationControl()
       await refetch({
         first: totalRows,
         search: undefined,
@@ -496,6 +543,7 @@ const ProductTable = ({ data, refetch }) => {
         direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
       }).then((res) => {
         if (res.data) {
+          setPaginationControl(res.data)
           prodDispatch({
             type: 'SET_SORT_ORDER',
             payload: {
@@ -510,6 +558,7 @@ const ProductTable = ({ data, refetch }) => {
   )
 
   const handlePreviousPage = useCallback(async () => {
+    disablePaginationControl()
     await refetch({
       first: undefined,
       last: totalRows,
@@ -526,6 +575,7 @@ const ProductTable = ({ data, refetch }) => {
   }, [refetch, totalRows, data, prodDispatch])
 
   const handleNextPage = useCallback(async () => {
+    disablePaginationControl()
     await refetch({
       first: totalRows,
       last: undefined,
@@ -548,6 +598,7 @@ const ProductTable = ({ data, refetch }) => {
     async (e) => {
       const newTotalRows = Number(e.target.value)
       setTotalRows(newTotalRows)
+      disablePaginationControl()
       await refetch({
         first: newTotalRows,
         last: undefined,
@@ -555,6 +606,7 @@ const ProductTable = ({ data, refetch }) => {
         before: undefined
       }).then((res) => {
         if (res.data) {
+          setPaginationControl(res.data)
           prodDispatch({ type: 'FETCH_DATA_SUCCESS' })
         }
       })
@@ -577,22 +629,6 @@ const ProductTable = ({ data, refetch }) => {
     persistTableHead: true
   }
 
-  useEffect(() => {
-    if (!data) {
-      refetch({
-        first: totalRows,
-        enabled:
-          enabled === 'yes' ? true : enabled === 'no' ? false : undefined,
-        field,
-        direction
-      }).then((res) => {
-        if (res.data) {
-          prodDispatch({ type: 'FETCH_DATA_SUCCESS' })
-        }
-      })
-    }
-  }, [data, refetch, totalRows, prodDispatch])
-
   return (
     <>
       <Card>
@@ -607,8 +643,8 @@ const ProductTable = ({ data, refetch }) => {
               onPreviousPage={handlePreviousPage}
               onNextPage={handleNextPage}
               onSetRow={handleSetRow}
-              hasNextPage={data.pageInfo.hasNextPage}
-              hasPreviousPage={data.pageInfo.hasPreviousPage}
+              hasNextPage={isNextActive}
+              hasPreviousPage={isPrevActive}
             />
           )}
         </Flex>
