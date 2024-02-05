@@ -13,7 +13,9 @@ import {
   Select,
   Stack,
   Textarea,
-  FormControl
+  FormControl,
+  Text,
+  Alert
 } from '@chakra-ui/react'
 import {
   getVexStatuses,
@@ -27,9 +29,13 @@ import { normalizeSBOMVersion } from 'utils'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { UpdateGlobalVex } from 'graphQL/Mutation'
 import { updateCompVulnVex } from 'graphQL/Mutation'
+import { GetProjectGroup } from 'graphQL/Queries'
+import { envOrderList } from 'utils'
+import { filterEnvList } from 'utils'
 
 const VexModal = ({
-  groups,
+  selectedGroup,
+  checkEquals,
   isOpen,
   onClose,
   refetch,
@@ -64,8 +70,6 @@ const VexModal = ({
   const { data: allVexStatus } = useQuery(getVexStatuses)
   const { data: allVexJustify } = useQuery(getVexJustifications)
   const { data: allCdx } = useQuery(GetCdxResponses)
-
-  const [getProduct] = useLazyQuery(GetProject)
 
   const [compVexCreate] = useMutation(updateCompVulnVex, {
     fetchPolicy: 'network-only',
@@ -112,16 +116,12 @@ const VexModal = ({
     }).then((res) => console.log(res.data))
   }
 
-  // const uniqVersions = []
-
-  // data?.project?.sboms?.length > 0 &&
-  //   data?.project?.sboms.map((project) => {
-  //     uniqVersions.push({
-  //       label: normalizeSBOMVersion(project)
-  //     })
-  //   })
-
-  // const fixedVersions = uniqVersions.filter((item) => item.value !== sbomId)
+  const { data: groups } = useQuery(GetProjectGroup, {
+    skip: checkEquals ? false : true,
+    variables: {
+      id: selectedGroup
+    }
+  })
 
   const handleSave = () => {
     setToggleClear(false)
@@ -252,73 +252,97 @@ const VexModal = ({
               </FormControl>
             )}
             {/* FIXED VERSION */}
-            {statusName === 'Affected' && responseTitle === 'Update' && (
-              <Stack
-                width={'100%'}
-                direction={'column'}
-                spacing={4}
-                alignItems={'flex-start'}
-              >
-                <FormControl width={'100%'}>
-                  <FormLabel
-                    htmlFor='fixedVersion'
-                    fontSize='sm'
-                    color='gray.600'
-                  >
-                    Project Environment
-                  </FormLabel>
-                  <Select
-                    id='env'
-                    name='env'
-                    value={selectEnv}
-                    onChange={handleEnvChange}
-                    textTransform={'capitalize'}
-                    fontSize='sm'
-                    color='gray.600'
-                  >
-                    <option value=''>-- Select --</option>
-                    {groups?.projectGroup?.projects.length > 0 ? (
-                      groups?.projectGroup?.projects.map((item, index) => (
-                        <option key={index} value={item.id} name={item.name}>
-                          {item.name}
-                        </option>
-                      ))
-                    ) : (
-                      <option value=''>-- --</option>
-                    )}
-                  </Select>
-                </FormControl>
-                <FormControl width={'100%'}>
-                  <FormLabel
-                    htmlFor='fixedVersion'
-                    fontSize='sm'
-                    color='gray.600'
-                  >
-                    Fixed Version
-                  </FormLabel>
-                  <Select
-                    id='fixedVersion'
-                    name='fixedVersion'
-                    value={selectedTag}
-                    onChange={(e) => setSelectedTag(e.target.value)}
-                    textTransform={'capitalize'}
-                    fontSize='sm'
-                    color='gray.600'
-                  >
-                    <option value=''>-- Select --</option>
-                    {data?.project?.sboms?.length > 0 ? (
-                      data?.project?.sboms?.map((item, index) => (
-                        <option key={index} value={normalizeSBOMVersion(item)} name={normalizeSBOMVersion(item)}>
-                          {normalizeSBOMVersion(item)}
-                        </option>
-                      ))
-                    ) : (
-                      <option value=''>-- --</option>
-                    )}
-                  </Select>
-                </FormControl>
-              </Stack>
-            )}
+            {statusName === 'Affected' &&
+              responseTitle === 'Update' &&
+              groups && (
+                <Stack
+                  width={'100%'}
+                  direction={'column'}
+                  spacing={4}
+                  alignItems={'flex-start'}
+                >
+                  <FormControl width={'100%'}>
+                    <FormLabel
+                      htmlFor='fixedVersion'
+                      fontSize='sm'
+                      color='gray.600'
+                    >
+                      Project Environment
+                    </FormLabel>
+                    <Select
+                      id='env'
+                      name='env'
+                      value={selectEnv}
+                      onChange={handleEnvChange}
+                      textTransform={'capitalize'}
+                      fontSize='sm'
+                      color='gray.600'
+                    >
+                      <option value=''>-- Select --</option>
+                      {groups?.projectGroup?.projects.length > 0 ? (
+                        filterEnvList(groups?.projectGroup?.projects).map(
+                          (item, index) => (
+                            <option
+                              key={index}
+                              value={item.id}
+                              name={item.name}
+                            >
+                              {item.name}
+                            </option>
+                          )
+                        )
+                      ) : (
+                        <option value=''>-- --</option>
+                      )}
+                    </Select>
+                  </FormControl>
+                  <FormControl width={'100%'}>
+                    <FormLabel
+                      htmlFor='fixedVersion'
+                      fontSize='sm'
+                      color='gray.600'
+                    >
+                      Fixed Version
+                    </FormLabel>
+                    <Select
+                      id='fixedVersion'
+                      name='fixedVersion'
+                      value={selectedTag}
+                      onChange={(e) => setSelectedTag(e.target.value)}
+                      textTransform={'capitalize'}
+                      fontSize='sm'
+                      color='gray.600'
+                    >
+                      <option value=''>-- Select --</option>
+                      {data?.project?.sboms?.length > 0 ? (
+                        data?.project?.sboms?.map((item, index) => (
+                          <option
+                            key={index}
+                            value={normalizeSBOMVersion(item)}
+                            name={normalizeSBOMVersion(item)}
+                          >
+                            {normalizeSBOMVersion(item)}
+                          </option>
+                        ))
+                      ) : (
+                        <option value=''>-- --</option>
+                      )}
+                    </Select>
+                  </FormControl>
+                </Stack>
+              )}
+            {statusName === 'Affected' &&
+              responseTitle === 'Update' &&
+              !groups && (
+                <Alert
+                  status='error'
+                  borderRadius={4}
+                  size={'sm'}
+                  fontSize={'sm'}
+                >
+                  Product versions are different. Please select same version.
+                </Alert>
+              )}
             {/* IMPACT STATEMENT */}
             {(statusName === 'Not Affected' ||
               statusName === 'False Positive') && (
