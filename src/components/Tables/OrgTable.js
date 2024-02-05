@@ -45,7 +45,6 @@ import Cookies from 'js-cookie'
 import { FaEllipsisVertical } from 'react-icons/fa6'
 import { useNavigate } from 'react-router-dom'
 import { useGlobalState } from 'hooks/useGlobalState'
-import {logoutUser} from "../../utils/authUtils";
 
 const OrgTable = ({ data, refetch, activeOrg, isAdmin }) => {
   const navigate = useNavigate()
@@ -53,7 +52,19 @@ const OrgTable = ({ data, refetch, activeOrg, isAdmin }) => {
   const [leaveError, setLeaveError] = useState('')
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const { totalRows } = useGlobalState()
+  const { totalRows, userPermissions } = useGlobalState()
+
+  const viewOrg = userPermissions?.find(
+    (item) => item.key === 'view_organization'
+  )
+  const updateOrg = viewOrg?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'update_organization' && permission.value === true
+  )
+  const removeOrg = viewOrg?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'remove_organization' && permission.value === true
+  )
 
   const {
     isOpen: isWarningOpen,
@@ -99,19 +110,17 @@ const OrgTable = ({ data, refetch, activeOrg, isAdmin }) => {
         variables: {
           id
         }
-      });
+      })
 
       if (res?.data?.organizationUserLeave?.errors?.length > 0) {
-        setLeaveError(res?.data?.organizationUserLeave?.errors[0]);
+        setLeaveError(res?.data?.organizationUserLeave?.errors[0])
       } else {
-        navigate('/auth');
+        navigate('/auth')
       }
     } catch (error) {
-      setLeaveError(error.message || 'An unexpected error occurred');
+      setLeaveError(error.message || 'An unexpected error occurred')
     }
   }
-
-
 
   const onAccept = async (id) => {
     await acceptInvitation({
@@ -168,6 +177,7 @@ const OrgTable = ({ data, refetch, activeOrg, isAdmin }) => {
               colorScheme='blue'
               icon={<AddIcon />}
               onClick={onOpen}
+              isDisabled={!updateOrg}
             ></IconButton>
           </Tooltip>
         </Stack>
@@ -297,7 +307,7 @@ const OrgTable = ({ data, refetch, activeOrg, isAdmin }) => {
                     <MenuItem onClick={() => onSwitch(row)}>Switch To</MenuItem>
                   )}
                   <MenuItem
-                    isDisabled={superAdmin}
+                    isDisabled={superAdmin || !removeOrg}
                     onClick={() => {
                       setActiveRow(row)
                       setLeaveError('')
