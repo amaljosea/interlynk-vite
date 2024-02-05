@@ -37,7 +37,7 @@ const GlobalStateProvider = ({ children }) => {
   })
   // GLOBAL VULNERABILITIES
   const [globalVulnState, globalVulnDispatch] = useReducer(globalVulnReducer, {
-    field: 'GLOBAL_VULNS_UPDATED_AT',
+    field: 'VULNS_UPDATED_AT',
     direction: 'DESC',
     after: '',
     before: '',

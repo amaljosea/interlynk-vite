@@ -73,6 +73,7 @@ import VulnInfo from '../Vulnerabilities/vulnInfo'
 import { GetGlobalVulnData } from 'graphQL/Queries'
 import { filterEnvList } from 'utils'
 import { GetProjectVulns } from 'graphQL/Queries'
+import { GetGlobalVulns } from 'graphQL/Queries'
 
 const ProductDetails = () => {
   const navigate = useNavigate()
@@ -89,6 +90,7 @@ const ProductDetails = () => {
     prodLogState,
     prodVulnState,
     prodRulesState,
+    globalVulnState,
     compVulnState,
     dispatch,
     userPermissions
@@ -149,13 +151,26 @@ const ProductDetails = () => {
     }
   )
 
+  const epssRange = globalVulnState.epss !== 'all' && globalVulnState.epss !== '' && globalVulnState.epss?.split('-')
+  const vulnRange = {
+    min: parseFloat(epssRange[0]) / 10000,
+    max: parseFloat(epssRange[1]) / 10000
+  }
+
   const { data: globalVulnData, refetch: globalVulnRefetch } = useQuery(
-    GetProjectVulns,
+    GetGlobalVulns,
     {
-      fetchPolicy: 'network-only',
+      fetchPolicy:'network-only',
       variables: {
-        id: activeEnv,
-        first: totalRows
+        first: totalRows,
+        field: globalVulnState.field,
+        direction: globalVulnState.direction,
+        search: globalVulnState.searchInput !== '' ? globalVulnState.searchInput : undefined,
+        projectGroupIds: [productId],
+        severity: globalVulnState.severities?.length === 0 ? undefined : globalVulnState.severities,
+        status: globalVulnState.statues?.length === 0 ? undefined : globalVulnState.statues,
+        kev: globalVulnState.kev === 'yes' ? true : globalVulnState.kev === 'false' ? false : undefined,
+        epss: globalVulnState.epss === 'all' || globalVulnState.epss === '' ? undefined : vulnRange
       },
       onCompleted: () => globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
     }
@@ -573,7 +588,7 @@ const ProductDetails = () => {
                 {/* VULNERABILITIES */}
                 <TabPanel px={0}>
                   <GlobalVulnTable
-                    data={globalVulnData?.project?.componentVulns}
+                    data={globalVulnData?.organization?.vulns}
                     refetch={globalVulnRefetch}
                   />
                 </TabPanel>

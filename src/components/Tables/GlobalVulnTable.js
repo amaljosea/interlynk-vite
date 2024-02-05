@@ -34,7 +34,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
 
   const { totalRows, setTotalRows, globalVulnState, dispatch } =
     useGlobalState()
-  const { pageIndex } = globalVulnState
+  const { pageIndex, field, direction } = globalVulnState
   const { globalVulnDispatch } = dispatch
 
   const [filterText, setFilterText] = useState('')
@@ -63,7 +63,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
       name: 'ID',
       wrap: true,
       selector: (row) => {
-        const { vulnId, id, vulnInfo } = params?.name ? row?.vuln : row
+        const { vulnId, id, vulnInfo } = row
         return (
           <Stack spacing={1} my={2}>
             <Link
@@ -86,14 +86,15 @@ const GlobalVulnTable = ({ data, refetch }) => {
           </Stack>
         )
       },
-      width: '15%'
+      width: '15%',
+      sortable: true
     },
     // SEVERITY
     {
       id: 'VULNS_SEV',
       name: 'SEVERITY',
       selector: (row) => {
-        const { sev } = params?.name ? row?.vuln : row
+        const { sev } = row
         return (
           <Tag
             size='md'
@@ -115,7 +116,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
       id: 'VULNS_SOURCE',
       name: 'SOURCE',
       selector: (row) => {
-        const { source } = params?.name ? row?.vuln : row
+        const { source } = row
         return (
           <Tag
             size='sm'
@@ -132,14 +133,15 @@ const GlobalVulnTable = ({ data, refetch }) => {
         )
       },
       width: '8%',
-      wrap: true
+      wrap: true,
+      sortable: true
     },
     // CVSS
     {
       id: 'VULNS_CVSS_SCORE',
       name: 'CVSS',
       selector: (row) => {
-        const { cvssScore } = params?.name ? row?.vuln : row
+        const { cvssScore } = row
         return (
           <Flex minWidth='max-content' alignItems='center' gap='2'>
             <Tag
@@ -155,14 +157,15 @@ const GlobalVulnTable = ({ data, refetch }) => {
         )
       },
       width: '8%',
-      wrap: true
+      wrap: true,
+      sortable: true
     },
     // EPSS
     {
       id: 'VULN_INFOS_EPSS_SCORES',
       name: 'EPSS*',
       selector: (row) => {
-        const { vulnInfo } = params?.name ? row?.vuln : row
+        const { vulnInfo } = row
         const { epssScores } = vulnInfo ? vulnInfo : ''
 
         return (
@@ -213,7 +216,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
       id: 'STATUSES',
       name: 'STATUSES',
       selector: (row) => {
-        const { metrics } = params?.name ? row?.vuln : row
+        const { metrics } = row
         const {
           affectedCount,
           falsePositiveCount,
@@ -256,7 +259,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
     },
     // UPDATED AT
     {
-      id: 'COMPONENT_VULNS_UPDATED_AT',
+      id: 'VULNS_UPDATED_AT',
       name: 'UPDATED AT',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row?.updatedAt)} placement={'top'}>
@@ -279,7 +282,6 @@ const GlobalVulnTable = ({ data, refetch }) => {
     const { value } = event.target
     if (event.key === 'Enter' && filterText !== '') {
       refetch({
-        id: params?.name ? activeEnv : undefined,
         search: value,
         first: totalRows,
         last: undefined,
@@ -297,7 +299,6 @@ const GlobalVulnTable = ({ data, refetch }) => {
   const handleClear = async () => {
     setFilterText('')
     await refetch({
-      id: params?.name ? activeEnv : undefined,
       search: undefined,
       first: totalRows,
       last: undefined,
@@ -359,16 +360,13 @@ const GlobalVulnTable = ({ data, refetch }) => {
   const handlePreviousPage = async () => {
     setIsPrevActive(false)
     await refetch({
-      id: params?.name ? activeEnv : undefined,
       first: undefined,
       last: totalRows,
       after: undefined,
       before: data?.pageInfo?.startCursor
     }).then((res) => {
       if (res.data) {
-        const project = params?.name
-          ? res?.data?.project?.componentVulns
-          : res?.data?.organization?.vulns
+        const project = res?.data?.organization?.vulns
         globalVulnDispatch({
           type: 'DECREMENT_PAGE',
           payload: project?.pageInfo?.startCursor
@@ -382,16 +380,13 @@ const GlobalVulnTable = ({ data, refetch }) => {
   const handleNextPage = async () => {
     setIsNextActive(false)
     await refetch({
-      id: params?.name ? activeEnv : undefined,
       first: totalRows,
       last: undefined,
       after: data?.pageInfo?.endCursor,
       before: undefined
     }).then((res) => {
       if (res.data) {
-        const project = params?.name
-          ? res?.data?.project?.componentVulns
-          : res?.data?.organization?.vulns
+        const project = res?.data?.organization?.vulns
         globalVulnDispatch({
           type: 'INCREMENT_PAGE',
           payload: {
@@ -409,7 +404,6 @@ const GlobalVulnTable = ({ data, refetch }) => {
     const { value } = e.target
     setTotalRows(Number(value))
     await refetch({
-      id: params?.name ? activeEnv : undefined,
       first: Number(value),
       last: undefined,
       after: undefined,
@@ -417,6 +411,25 @@ const GlobalVulnTable = ({ data, refetch }) => {
     }).then((res) => {
       if (res.data) {
         globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
+      }
+    })
+  }
+
+  // SORTING
+  const handleSort = async (column, sortDirection) => {
+    await refetch({
+      first: totalRows,
+      field: column.id,
+      direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+    }).then((res) => {
+      if (res.data) {
+        globalVulnDispatch({
+          type: 'SET_SORT_ORDER',
+          payload: {
+            field: column.id,
+            direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+          }
+        })
       }
     })
   }
@@ -435,6 +448,9 @@ const GlobalVulnTable = ({ data, refetch }) => {
         <DataTable
           columns={columns}
           data={data?.nodes || []}
+          onSort={handleSort}
+          defaultSortFieldId={field}
+          defaultSortAsc={false}
           customStyles={customStyles}
           progressPending={data ? false : true}
           progressComponent={<CustomLoader />}

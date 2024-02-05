@@ -16,7 +16,7 @@ const Vulnerabilities = () => {
   const org = sessionStorage.getItem('organization')
 
   const { totalRows, globalVulnState, dispatch } = useGlobalState()
-  const { searchInput, severities, products, statues, kev, epss } =
+  const { field, direction, searchInput, severities, products, statues, kev, epss } =
     globalVulnState
   const { globalVulnDispatch } = dispatch
 
@@ -27,10 +27,13 @@ const Vulnerabilities = () => {
   }
 
   const { data, refetch } = useQuery(GetGlobalVulns, {
+    fetchPolicy:'network-only',
     variables: {
       first: totalRows,
+      field: field,
+      direction: direction,
       search: searchInput !== '' ? searchInput : undefined,
-      projectactiveEnvs: products?.length === 0 ? undefined : products,
+      projectGroupIds: products?.length === 0 ? undefined : products,
       severity: severities?.length === 0 ? undefined : severities,
       status: statues?.length === 0 ? undefined : statues,
       kev: kev === 'yes' ? true : kev === 'false' ? false : undefined,

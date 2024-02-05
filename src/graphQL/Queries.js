@@ -446,6 +446,8 @@ export const GetGlobalVulns = gql`
     $status: [String!]
     $kev: Boolean
     $epss: RangeInput
+    $field: VulnOrderByFields!
+    $direction: OrderByDirection!
   ) {
     organization {
       vulns(
@@ -459,6 +461,7 @@ export const GetGlobalVulns = gql`
         severity: $severity
         kev: $kev
         epss: $epss
+        orderBy: {field: $field, direction: $direction}
       ) {
         totalCount
         pageInfo {
