@@ -20,6 +20,8 @@ import VexModal from './VexModal'
 import { useLocation, useParams } from 'react-router-dom'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import { normalizeSBOMVersion } from 'utils'
+import { useLazyQuery } from '@apollo/client'
+import { GetProjectGroup } from 'graphQL/Queries'
 
 const customStyles = {
   headCells: {
@@ -269,8 +271,22 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
     handleSearch
   ])
 
+  const [getGroup, { data: groupData }] = useLazyQuery(GetProjectGroup)
+
   const handleChange = (state) => {
+    const version =
+      state.selectedRows[0].component.sbom.primaryComponent.version
+    const versionData = state.selectedRows.map(
+      (item) => item?.component?.sbom?.primaryComponent?.version
+    )
     setSelectedVulns(state.selectedRows)
+    if (versionData.includes(version)) {
+      getGroup({
+        variables: {
+          id: state.selectedRows[0].component.sbom.project.projectGroup.id
+        }
+      }).then((data) => console.log(data))
+    }
   }
 
   // ON PREV PAGE
@@ -425,6 +441,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
           isOpen={isOpen}
           onClose={onClose}
           refetch={refetch}
+          groups={groupData}
           selectedVulns={selectedVulns}
           setSelectedVulns={setSelectedVulns}
           setToggleClear={setToggleClear}
