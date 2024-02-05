@@ -63,6 +63,9 @@ const LoginForm = () => {
           const { status, data } = error.response
           if (status === 401) {
             setError(data)
+            setTimeout(() => {
+              setError('')
+            }, 2000)
           } else if (status === 404) {
             setError(`Internal routing error. Please try again`)
           } else {
@@ -116,7 +119,11 @@ const LoginForm = () => {
                 <p>
                   Lost invitation link ?{' '}
                   <strong
-                    style={{ cursor: 'pointer', fontWeight: 500, color: '#3182CE' }}
+                    style={{
+                      cursor: 'pointer',
+                      fontWeight: 500,
+                      color: '#3182CE'
+                    }}
                     onClick={onResendEmail}
                   >
                     Resend
