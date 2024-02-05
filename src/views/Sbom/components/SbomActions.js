@@ -65,6 +65,11 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
     (permission) =>
       permission.key === 'archive_sbom' && permission.value === true
   )
+  const updateSboms = sboms?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'update_sbom' && permission.value === true
+  )
+
   const signSboms = sboms?.supersededBy?.some(
     (permission) => permission.key === 'sign_sbom' && permission.value === true
   )
@@ -300,7 +305,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
         {/* UPDATE PRIMARY COMPONENT */}
         <Tooltip label='Edit'>
           <IconButton
-            isDisabled={status === 'signed'}
+            isDisabled={status === 'signed' || !updateSboms}
             colorScheme='blue'
             icon={<EditIcon />}
             onClick={handleEditSbom}
@@ -314,7 +319,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
               colorScheme='blue'
               icon={<TbSignature size={22} />}
               onClick={setVerifyOpen}
-              isDisabled={!signSboms}
+              isDisabled={!signSboms || !updateSboms}
             />
           </Tooltip>
         ) : (
@@ -323,7 +328,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
               colorScheme='blue'
               icon={<TbSignatureOff size={22} />}
               onClick={setVerifyOpen}
-              isDisabled={!signSboms}
+              isDisabled={!signSboms || !updateSboms}
             />
           </Tooltip>
         )}

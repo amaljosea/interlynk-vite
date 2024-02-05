@@ -68,10 +68,17 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
     prodState,
     prodCompState,
     prodVulnState,
+    userPermissions,
     dispatch
   } = useGlobalState()
   const { enabled, field, direction } = prodState
   const { prodVulnDispatch } = dispatch
+
+  const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
+  const updateSboms = sboms?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'update_sbom' && permission.value === true
+  )
 
   const { isOpen, onOpen, onClose } = useDisclosure()
   const {
@@ -455,6 +462,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
             <Portal>
               <MenuList size='sm'>
                 <MenuItem
+                  isDisabled={!updateSboms}
                   onClick={() => {
                     setActiveRow(row)
                     onDeleteOpen()
@@ -542,6 +550,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
               variant='solid'
               fontWeight='normal'
               fontSize={'sm'}
+              isDisabled={!updateSboms}
             />
           </Tooltip>
           <Tooltip label='Refresh'>
