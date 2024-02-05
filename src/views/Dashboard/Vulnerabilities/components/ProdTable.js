@@ -69,6 +69,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const [selectedVulns, setSelectedVulns] = useState([])
+  const [selectedGroup, setSelectedGroup] = useState('')
   const [filterInput, setFilterInput] = useState('')
   const [toggleClear, setToggleClear] = useState(false)
   const [isPrevActive, setIsPrevActive] = useState(false)
@@ -271,21 +272,34 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
     handleSearch
   ])
 
-  const [getGroup, { data: groupData }] = useLazyQuery(GetProjectGroup)
+  const areArraysEqual = (arr1, arr2) => {
+    // Check if the arrays have the same length
+    if (arr1.length !== arr2.length) {
+      return false
+    }
+
+    // Check if all elements in both arrays are equal
+    return arr1.every((element, index) => element === arr2[index])
+  }
+
+  const [checkEquals, setCheckEquals] = useState(false)
 
   const handleChange = (state) => {
+    setSelectedVulns(state?.selectedRows)
     const version =
-      state.selectedRows[0].component.sbom.primaryComponent.version
+      state?.selectedRows[0]?.component?.sbom?.primaryComponent?.version
     const versionData = state.selectedRows.map(
       (item) => item?.component?.sbom?.primaryComponent?.version
     )
-    setSelectedVulns(state.selectedRows)
-    if (versionData.includes(version)) {
-      getGroup({
-        variables: {
-          id: state.selectedRows[0].component.sbom.project.projectGroup.id
-        }
-      }).then((data) => console.log(data))
+    const sameData = versionData.filter((item) => item === version)
+    const checkEquality = areArraysEqual(versionData, sameData)
+    setCheckEquals(checkEquality)
+    if (checkEquality) {
+      setSelectedGroup(
+        state?.selectedRows[0]?.component?.sbom?.project?.projectGroup?.id
+      )
+    } else {
+      setSelectedGroup('')
     }
   }
 
@@ -441,7 +455,8 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
           isOpen={isOpen}
           onClose={onClose}
           refetch={refetch}
-          groups={groupData}
+          checkEquals={checkEquals}
+          selectedGroup={selectedGroup}
           selectedVulns={selectedVulns}
           setSelectedVulns={setSelectedVulns}
           setToggleClear={setToggleClear}
