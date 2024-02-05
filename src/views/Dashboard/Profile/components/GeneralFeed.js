@@ -90,6 +90,7 @@ const GeneralFeed = ({ orgInfo, refetch }) => {
             <Input
               value={orgName}
               onChange={(e) => setOrgName(e.target.value)}
+              readOnly={!updateOrgs}
             />
             {updateOrgs && (
               <Button
