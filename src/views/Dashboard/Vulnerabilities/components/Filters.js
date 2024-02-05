@@ -131,7 +131,7 @@ const Filters = ({ data, refetch }) => {
               {data?.sbomVersions?.length > 0 &&
                 data?.sbomVersions.map((item, index) => (
                   <MenuItemOption key={index} value={item} fontSize={'sm'}>
-                    {item}
+                    {item || 'Unversioned'}
                   </MenuItemOption>
                 ))}
             </MenuOptionGroup>
