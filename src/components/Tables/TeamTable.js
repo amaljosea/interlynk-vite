@@ -253,7 +253,7 @@ const TeamTable = ({ data, refetch }) => {
                 {(invitationStatus === 'declined' ||
                   invitationStatus === 'invited' ||
                   invitationStatus === 'pending_registration') && (
-                  <MenuItem onClick={() => onResendInvite(row)}>
+                  <MenuItem onClick={() => onResendInvite(row)} isDisabled={!inviteUser}>
                     Resend Invite
                   </MenuItem>
                 )}

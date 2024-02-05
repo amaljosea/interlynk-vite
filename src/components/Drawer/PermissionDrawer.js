@@ -145,15 +145,15 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
       } else {
         setCheckedVulnManage(updatedCheckedItems)
       }
-      console.log('list', list)
       const filterItem = list.find((item) => item.key === e.target.name)
-      console.log('item', item)
-      const permissions = list.map((item) => ({
-        permissionKey: item?.key,
-        value: e.target.checked
-      }))
       await updateRole({
-        variables: { organizationRoleId: data?.id, permissions: permissions }
+        variables: {
+          organizationRoleId: data?.id,
+          permissions: [
+            { permissionKey: list[0]?.key, value: true },
+            { permissionKey: filterItem?.key, value: e.target.checked }
+          ]
+        }
       })
     }
     return null
