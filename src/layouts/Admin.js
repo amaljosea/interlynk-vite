@@ -54,9 +54,10 @@ export default function Dashboard(props) {
   })
 
   const toast = useToast()
+  const env = process.env.NODE_ENV
 
   const errorLink = onError(({ graphQLErrors }) => {
-    if (graphQLErrors) {
+    if (graphQLErrors && env !== 'production') {
       graphQLErrors.forEach(({ message }) => {
         toast({
           title: 'An error occurred.',
