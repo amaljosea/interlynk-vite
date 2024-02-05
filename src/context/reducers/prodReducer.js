@@ -5,17 +5,20 @@ const prodReducer = (state, action) => {
     case 'GET_DATA':
       return {
         ...state,
-        data: payload
+        data: payload,
+        pageIndex: 1
       }
     case 'SET_CURRENT_PRODUCT':
       return {
         ...state,
-        currentProduct: payload
+        currentProduct: payload,
+        pageIndex: 1
       }
     case 'CHANGE_SEARCH_INPUT':
       return {
         ...state,
-        searchInput: payload
+        searchInput: payload,
+        pageIndex: 1
       }
     case 'FETCH_DATA_SUCCESS':
       return {
@@ -45,7 +48,8 @@ const prodReducer = (state, action) => {
       return {
         ...state,
         field: payload.field,
-        direction: payload.direction
+        direction: payload.direction,
+        pageIndex: 1
       }
     case 'ON_FILTER_ACTIVE':
       return {
@@ -56,12 +60,14 @@ const prodReducer = (state, action) => {
     case 'SET_TOTAL_PRODUCT':
       return {
         ...state,
-        totalProduct: payload
+        totalProduct: payload,
+        pageIndex: 1
       }
     case 'CLEAR_FILTER':
       return {
         ...state,
-        enabled: 'all'
+        enabled: 'all',
+        pageIndex: 1
       }
     default:
       return state
