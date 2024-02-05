@@ -167,6 +167,7 @@ const Settings = ({ enabled, data, refetch, activeEnv }) => {
                 onChange={(e) => setDataRetentionDays(e.target.value)}
                 isDisabled={!enabled || !editControls}
               >
+                <option value={1}>1 Day</option>
                 <option value={30}>30 Days</option>
                 <option value={90}>90 Days</option>
                 <option value={365}>1 Year</option>
