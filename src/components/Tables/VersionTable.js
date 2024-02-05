@@ -402,7 +402,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
           responsive={true}
           columns={columns}
           customStyles={customStyles}
-          data={project?.sboms || []}
+          data={filteredData}
           defaultSortAsc={false}
           defaultSortFieldId={'UPDATED_AT'}
           progressComponent={<CustomLoader />}
@@ -427,7 +427,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
               onClick={() => handlePageChange(currentPage - 1)}
               isDisabled={currentPage === 1}
             >
-              Previous
+              Prev
             </Button>
             <Button
               colorScheme='blue'

@@ -30,7 +30,30 @@ const setColor = (type) => {
 }
 
 const ChangelogTable = ({ data, refetch, activeEnv }) => {
+  //This part is needed for the pagination to work. (Modify with caution)
   const paginationSizes = [25, 50, 100]
+
+  const [isPrevActive, setIsPrevActive] = useState(false)
+  const [isNextActive, setIsNextActive] = useState(false)
+
+  useEffect(() => {
+    if (data) {
+      setIsPrevActive(data?.pageInfo?.hasPreviousPage)
+      setIsNextActive(data?.pageInfo?.hasNextPage)
+    }
+  }, [data])
+
+  const setPaginationControl = (data) => {
+    setIsPrevActive(data.project?.activityLogs?.pageInfo?.hasPreviousPage)
+    setIsNextActive(data.project?.activityLogs?.pageInfo?.hasNextPage)
+  }
+
+  const disablePaginationControl = () => {
+    setIsPrevActive(false)
+    setIsNextActive(false)
+  }
+
+  //end
 
   const { totalRows, setTotalRows, prodLogState, dispatch } = useGlobalState()
   const {
@@ -154,6 +177,8 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
   }
 
   const handlePreviousPage = async () => {
+    disablePaginationControl()
+
     await refetch({
       variables: {
         last: totalRows,
@@ -172,6 +197,8 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
   }
 
   const handleNextPage = async () => {
+    disablePaginationControl()
+
     await refetch({
       variables: {
         first: totalRows,
@@ -194,6 +221,8 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
 
   // SEARCH COMPONENT
   const handleSearch = async (event) => {
+    disablePaginationControl()
+
     const { value } = event.target
     if (event.key === 'Enter' && value !== '') {
       await refetch({
@@ -203,15 +232,19 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
           ...logData
         }
       }).then(
-        (res) =>
-          res.data &&
-          prodLogDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
-      )
-    }
+        (res) => {
+          if (res.data){
+            setPaginationControl(res.data)
+            prodLogDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
+          }
+        }
+      )}
   }
 
   // CLEAR SERACH
   const handleClear = async () => {
+    disablePaginationControl()
+
     setSearchInput('')
     await refetch({
       variables: {
@@ -220,11 +253,14 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
         ...logData
       }
     }).then(
-      (res) =>
-        res.data &&
-        prodLogDispatch({
-          type: 'CLEAR_SEARCH_INPUT'
-        })
+      (res) => {
+        if (res.data) {
+          setPaginationControl(res.data)
+          prodLogDispatch({
+            type: 'CLEAR_SEARCH_INPUT'
+          })
+        }
+      }
     )
   }
 
@@ -240,6 +276,8 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
 
   // SORTING
   const handleSort = async (column, sortDirection) => {
+    disablePaginationControl()
+
     await refetch({
       variables: {
         id: activeEnv,
@@ -253,6 +291,7 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
       }
     }).then((res) => {
       if (res.data) {
+        setPaginationControl(res.data)
         prodLogDispatch({
           type: 'SET_SORT_ORDER',
           payload: {
@@ -266,6 +305,8 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
 
   // SET ROW LENGTH
   const handleSetRow = async (e) => {
+    disablePaginationControl()
+
     setTotalRows(Number(e.target.value))
     await refetch({
       variables: {
@@ -274,11 +315,14 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
         ...logData
       }
     }).then(
-      (res) =>
-        res.data &&
-        prodLogDispatch({
-          type: 'FETCH_DATA_SUCCESS'
-        })
+      (res) => {
+        if (res.data) {
+          setPaginationControl(res.data)
+          prodLogDispatch({
+            type: 'FETCH_DATA_SUCCESS'
+          })
+        }
+      }
     )
   }
 
@@ -349,8 +393,8 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
               onPreviousPage={handlePreviousPage}
               onNextPage={handleNextPage}
               onSetRow={handleSetRow}
-              hasNextPage={data.pageInfo.hasNextPage}
-              hasPreviousPage={data.pageInfo.hasPreviousPage}
+              hasNextPage={isNextActive}
+              hasPreviousPage={isPrevActive}
           />
       )}
     </>
