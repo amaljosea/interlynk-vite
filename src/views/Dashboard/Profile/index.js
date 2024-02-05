@@ -39,7 +39,7 @@ function Profile() {
   const navigate = useNavigate()
   const queryParams = new URLSearchParams(location.search)
   const activetab = queryParams.get('tab')
-  const { totalRows } = useGlobalState()
+  const { totalRows, userPermissions } = useGlobalState()
 
   const tabs = [
     {
@@ -51,6 +51,20 @@ function Profile() {
       icon: FaBuilding
     }
   ]
+
+  console.log('User Permissions', userPermissions)
+
+  const viewUsers = userPermissions?.find((item) => item.key === 'view_users')
+
+  const viewFeeds = userPermissions?.find((item) => item.key === 'view_feeds')
+  const manageFeeds = viewFeeds?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'mange_feeds' && permission.value === true
+  )
+  const manageListing = viewFeeds?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'manage_listing' && permission.value === true
+  )
 
   const [tabIndex, setTabIndex] = useState(0)
   const [psIndex, setPsIndex] = useState(0)
@@ -182,7 +196,17 @@ function Profile() {
                     'Checks',
                     'Lists'
                   ].map((item, index) => (
-                    <Tab key={index} _focus={{ outline: 'none' }}>
+                    <Tab
+                      key={index}
+                      _focus={{ outline: 'none' }}
+                      display={
+                        (item === 'Lists' && !manageListing) ||
+                        (item === 'Feeds' && !manageFeeds) ||
+                        (item === 'Users' && !viewUsers.value)
+                          ? 'none'
+                          : 'block'
+                      }
+                    >
                       {item}
                     </Tab>
                   ))}
@@ -211,11 +235,12 @@ function Profile() {
                   <TabPanel>
                     <RoleTable
                       data={roles?.organization?.organizationRoles}
+                      role={orgInfo?.organization?.currentUser?.role?.name}
                       refetch={roleRefetch}
                     />
                   </TabPanel>
                   {/* FEEDS */}
-                  <TabPanel>
+                  <TabPanel display={manageFeeds ? 'block' : 'none'}>
                     <Grid
                       width={'100%'}
                       templateColumns={{ sm: '1fr', xl: 'repeat(3, 1fr)' }}

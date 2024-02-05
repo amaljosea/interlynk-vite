@@ -16,9 +16,8 @@ import {
 import { UpdateOrganizationRole } from 'graphQL/Mutation'
 import { useState } from 'react'
 
-const PermissionDrawer = ({ isOpen, onClose, data, refetch }) => {
+const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
   const { permissionsMap } = data
-  console.log('permissionsMap', data)
 
   const [updateRole] = useMutation(UpdateOrganizationRole, {
     onCompleted: () => refetch()
@@ -99,23 +98,56 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch }) => {
     checkedVulnManage.some(Boolean) && !allVulnManageChecked
 
   const onCheckParent = async (e, category, list) => {
-    const filterData = list
-      .filter((item) => item?.supersededBy?.length === 0)
-      .map((_) => e.target.checked)
-    if (filterData) {
-      if (category === 'Organization Management') {
-        setCheckedOrgManage(filterData)
-      } else if (category === 'Product Group Management') {
-        setCheckedGroupManage(filterData)
-      } else if (category === 'Product Management') {
-        setCheckedProdManage(filterData)
-      } else if (category === 'SBOM Management') {
-        setCheckedSbomManage(filterData)
-      } else if (category === 'User Management') {
-        setCheckedUserManage(filterData)
-      } else {
-        setCheckedVulnManage(filterData)
+    if (role !== 'custom') {
+      const filterData = list
+        .filter((item) => item?.supersededBy?.length === 0)
+        .map((_) => e.target.checked)
+      if (filterData) {
+        if (category === 'Organization Management') {
+          setCheckedOrgManage(filterData)
+        } else if (category === 'Product Group Management') {
+          setCheckedGroupManage(filterData)
+        } else if (category === 'Product Management') {
+          setCheckedProdManage(filterData)
+        } else if (category === 'SBOM Management') {
+          setCheckedSbomManage(filterData)
+        } else if (category === 'User Management') {
+          setCheckedUserManage(filterData)
+        } else {
+          setCheckedVulnManage(filterData)
+        }
+        const permissions = list.map((item) => ({
+          permissionKey: item?.key,
+          value: e.target.checked
+        }))
+        await updateRole({
+          variables: { organizationRoleId: data?.id, permissions: permissions }
+        })
       }
+    }
+    return null
+  }
+
+  const onCheckChild = async (e, category, index, list, roles) => {
+    if (role !== 'custom') {
+      const updatedCheckedItems = [...roles]
+      updatedCheckedItems[index] = e.target.checked
+      if (category === 'Organization Management') {
+        setCheckedOrgManage(updatedCheckedItems)
+      } else if (category === 'Product Group Management') {
+        setCheckedGroupManage(updatedCheckedItems)
+      } else if (category === 'Product Management') {
+        setCheckedProdManage(updatedCheckedItems)
+      } else if (category === 'SBOM Management') {
+        setCheckedSbomManage(updatedCheckedItems)
+      } else if (category === 'User Management') {
+        setCheckedUserManage(updatedCheckedItems)
+      } else {
+        setCheckedVulnManage(updatedCheckedItems)
+      }
+      console.log('list', list)
+      const filterItem = list.find((item) => item.key === e.target.name)
+      console.log('item', item)
       const permissions = list.map((item) => ({
         permissionKey: item?.key,
         value: e.target.checked
@@ -124,30 +156,10 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch }) => {
         variables: { organizationRoleId: data?.id, permissions: permissions }
       })
     }
+    return null
   }
 
-  const onCheckChild = async (e, category, index, list, roles) => {
-    const updatedCheckedItems = [...roles]
-    updatedCheckedItems[index] = e.target.checked
-    if (category === 'Organization Management') {
-      setCheckedOrgManage(updatedCheckedItems)
-    } else if (category === 'Product Group Management') {
-      setCheckedGroupManage(updatedCheckedItems)
-    } else if (category === 'Product Management') {
-      setCheckedProdManage(updatedCheckedItems)
-    } else if (category === 'SBOM Management') {
-      setCheckedSbomManage(updatedCheckedItems)
-    } else if (category === 'User Management') {
-      setCheckedUserManage(updatedCheckedItems)
-    } else {
-      setCheckedVulnManage(updatedCheckedItems)
-    }
-    const item = list.find((item) => item.key === e.target.name)
-    const permissions = [{ permissionKey: item?.key, value: e.target.checked }]
-    await updateRole({
-      variables: { organizationRoleId: data?.id, permissions: permissions }
-    })
-  }
+  const readOnly = data?.name !== 'custom' && role !== 'admin'
 
   return (
     <Drawer isOpen={isOpen} placement='right' size='md' onClose={onClose}>
@@ -165,10 +177,10 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch }) => {
                   <Checkbox
                     isChecked={allOrgManageChecked}
                     isIndeterminate={isOrgManageChecked}
+                    isReadOnly={readOnly}
                     onChange={(e) =>
                       onCheckParent(e, item.category, orgManagement)
                     }
-                    isReadOnly={data?.name !== 'custom'}
                   >
                     {item.name}
                   </Checkbox>
@@ -180,7 +192,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch }) => {
                     <Checkbox
                       name={item.key}
                       isChecked={checkedOrgManage[index]}
-                      isReadOnly={data?.name !== 'custom'}
+                      isReadOnly={readOnly}
                       onChange={(e) =>
                         onCheckChild(
                           e,
@@ -205,7 +217,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch }) => {
                   <Checkbox
                     isChecked={allGroupManageChecked}
                     isIndeterminate={isGroupManageChecked}
-                    isReadOnly={data?.name !== 'custom'}
+                    isReadOnly={readOnly}
                     onChange={(e) =>
                       onCheckParent(e, item.category, groupManagement)
                     }
@@ -220,7 +232,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch }) => {
                     <Checkbox
                       name={item.key}
                       isChecked={checkedGroupManage[index]}
-                      isReadOnly={data?.name !== 'custom'}
+                      isReadOnly={readOnly}
                       onChange={(e) =>
                         onCheckChild(
                           e,
@@ -245,7 +257,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch }) => {
                   <Checkbox
                     isChecked={allProdManageChecked}
                     isIndeterminate={isProdManageChecked}
-                    isReadOnly={data?.name !== 'custom'}
+                    isReadOnly={readOnly}
                     onChange={(e) =>
                       onCheckParent(e, item.category, prodManagement)
                     }
@@ -260,7 +272,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch }) => {
                     <Checkbox
                       name={item.key}
                       isChecked={checkedProdManage[index]}
-                      isReadOnly={data?.name !== 'custom'}
+                      isReadOnly={readOnly}
                       onChange={(e) =>
                         onCheckChild(
                           e,
@@ -285,7 +297,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch }) => {
                   <Checkbox
                     isChecked={allSbomManageChecked}
                     isIndeterminate={isSbomManageChecked}
-                    isReadOnly={data?.name !== 'custom'}
+                    isReadOnly={readOnly}
                     onChange={(e) =>
                       onCheckParent(e, item.category, sbomManagement)
                     }
@@ -300,7 +312,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch }) => {
                     <Checkbox
                       name={item.key}
                       isChecked={checkedSbomManage[index]}
-                      isReadOnly={data?.name !== 'custom'}
+                      isReadOnly={readOnly}
                       onChange={(e) =>
                         onCheckChild(
                           e,
@@ -325,7 +337,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch }) => {
                   <Checkbox
                     isChecked={allUserManageChecked}
                     isIndeterminate={isUserManageChecked}
-                    isReadOnly={data?.name !== 'custom'}
+                    isReadOnly={readOnly}
                     onChange={(e) =>
                       onCheckParent(e, item.category, userManagement)
                     }
@@ -340,7 +352,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch }) => {
                     <Checkbox
                       name={item.key}
                       isChecked={checkedUserManage[index]}
-                      isReadOnly={data?.name !== 'custom'}
+                      isReadOnly={readOnly}
                       onChange={(e) =>
                         onCheckChild(
                           e,
@@ -365,7 +377,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch }) => {
                   <Checkbox
                     isChecked={allVulnManageChecked}
                     isIndeterminate={isVulnManageChecked}
-                    isReadOnly={data?.name !== 'custom'}
+                    isReadOnly={readOnly}
                     onChange={(e) =>
                       onCheckParent(e, item.category, vulnManagement)
                     }
@@ -380,7 +392,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch }) => {
                     <Checkbox
                       name={item.key}
                       isChecked={checkedVulnManage[index]}
-                      isReadOnly={data?.name !== 'custom'}
+                      isReadOnly={readOnly}
                       onChange={(e) =>
                         onCheckChild(
                           e,

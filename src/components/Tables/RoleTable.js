@@ -4,7 +4,7 @@ import PermissionDrawer from 'components/Drawer/PermissionDrawer'
 import DataTable from 'react-data-table-component'
 import { useState } from 'react'
 
-const RoleTable = ({ data, refetch }) => {
+const RoleTable = ({ data, refetch, role }) => {
   const [activeRow, setActiveRow] = useState(null)
   const { isOpen, onOpen, onClose } = useDisclosure()
 
@@ -58,7 +58,7 @@ const RoleTable = ({ data, refetch }) => {
       </Flex>
 
       {isOpen && (
-        <PermissionDrawer isOpen={isOpen} onClose={onClose} data={activeRow} refetch={refetch} />
+        <PermissionDrawer isOpen={isOpen} onClose={onClose} data={activeRow} refetch={refetch} role={role} />
       )}
     </>
   )
