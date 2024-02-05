@@ -22,6 +22,12 @@ const globalVulnReducer = (state, action) => {
         ...state,
         pageIndex: 1
       }
+    case 'SET_SORT_ORDER':
+      return {
+        ...state,
+        field: payload.field,
+        direction: payload.direction
+      }
     case 'CHANGE_SEARCH_INPUT':
       return {
         ...state,
