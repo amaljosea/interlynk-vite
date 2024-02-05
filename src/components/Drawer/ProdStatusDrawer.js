@@ -153,22 +153,18 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
         action: actionStatement !== '' ? actionStatement : undefined,
         fixedIn: selectedTag !== '' ? selectedTag : undefined
       }
-    }).then((res) => {
-      setStatusTitle('')
-      setStatusName('')
-      setJustification('')
-      setJustifyName('')
-      setSelectedTag('')
-      setActionStatement('')
-      setResponse('')
-      setResponseTitle('')
-      setDetails('')
-      setNotes('')
-      setImpactData('')
-      if (res.data) {
-        prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
-      }
-    })
+    }).then((res) => res.data && prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' }))
+    setStatusTitle('')
+    setStatusName('')
+    setJustification('')
+    setJustifyName('')
+    setSelectedTag('')
+    setActionStatement('')
+    setResponse('')
+    setResponseTitle('')
+    setDetails('')
+    setNotes('')
+    setImpactData('')
   }
 
   const fixedVersions = filteredData.filter((item) => item.value !== sbomId)
