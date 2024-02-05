@@ -54,6 +54,14 @@ export const UpdateOrganizationRole = gql`
         id
         name
         permissions
+        permissionsMap {
+          category
+          description
+          key
+          name
+          supersededBy
+          value
+        }
       }
       errors
     }
