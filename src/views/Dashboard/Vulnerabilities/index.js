@@ -13,7 +13,7 @@ const Vulnerabilities = () => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const vulnId = queryParams.get('vulnId')
-  const org = sessionStorage.getItem('organization')
+  const org = localStorage.getItem('organization')
 
   const { totalRows, globalVulnState, dispatch } = useGlobalState()
   const { field, direction, searchInput, severities, products, statues, kev, epss } =

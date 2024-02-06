@@ -64,7 +64,7 @@ function ProductRow(props) {
             <Link
               to={`/customer/products?p=${id}&sbom=${sbomId[0].id}`}
               onClick={() => {
-                window.sessionStorage.setItem('product', name)
+                window.localStorage.setItem('product', name)
                 setSignedActiveTab(0)
               }}
             >

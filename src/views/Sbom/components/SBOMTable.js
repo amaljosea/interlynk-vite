@@ -89,7 +89,7 @@ const SBOMTable = ({
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
-  const activeTab = Number(sessionStorage.getItem('activeSbomTab') || 0)
+  const activeTab = Number(localStorage.getItem('activeSbomTab') || 0)
 
   // GET SBOM PARTS
   const [getPartsData, { data: partsData }] = useLazyQuery(GetSbomParts, {
@@ -124,7 +124,7 @@ const SBOMTable = ({
   }
 
   const handleTabChange = (value) => {
-    sessionStorage.setItem('activeSbomTab', value)
+    localStorage.setItem('activeSbomTab', value)
     setActiveSbomTab(value)
   }
 
