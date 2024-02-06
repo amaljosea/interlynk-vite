@@ -759,7 +759,7 @@ const ComponentTable = ({
           </GridItem>
           <GridItem>
             <CustomText>PURL :</CustomText>
-            <Text width={'90%'} mt={1} fontSize={14}>
+            <Text wordBreak={'break-all'} mt={1} fontSize={14}>
               {purl !== null && purl !== '' ? purl : ''}
             </Text>
           </GridItem>
@@ -774,7 +774,7 @@ const ComponentTable = ({
             >
               {cpes?.length > 0 &&
                 cpes.map((item, index) => (
-                  <Text width={'80%'} key={index} fontSize={14}>
+                  <Text key={index} fontSize={14} wordBreak={'break-all'}>
                     {item}
                   </Text>
                 ))}
@@ -794,14 +794,13 @@ const ComponentTable = ({
                       placement='top'
                     >
                       <Tag
-                        size={'sm'}
+                        size='sm'
+                        padding={1}
                         variant='subtle'
                         colorScheme={'blue'}
-                        width={'fit-content'}
+                        wordBreak={'break-all'}
                       >
-                        <TagLabel>
-                          {comp.toComp.name}-{comp.toComp.version}
-                        </TagLabel>
+                        {comp.toComp.name}-{comp.toComp.version}
                       </Tag>
                     </Tooltip>
                   ))}
@@ -819,14 +818,13 @@ const ComponentTable = ({
                     placement='top'
                   >
                     <Tag
-                      size={'sm'}
+                      size='sm'
+                      padding={1}
                       variant='subtle'
                       colorScheme={'blue'}
-                      width={'fit-content'}
+                      wordBreak={'break-all'}
                     >
-                      <TagLabel>
-                        {comp.fromComp.name}-{comp.fromComp.version}
-                      </TagLabel>
+                      {comp.fromComp.name}-{comp.fromComp.version}
                     </Tag>
                   </Tooltip>
                 ))}
