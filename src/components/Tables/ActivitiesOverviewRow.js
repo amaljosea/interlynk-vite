@@ -89,11 +89,20 @@ function valueToIcon(action, event, orig, updated) {
 }
 
 function valueToText(action, event, orig, updated) {
+  console.log('action', action)
+  console.log('event', event)
+  console.log('orig', orig)
+  console.log('updated', updated)
+  console.log('---------------------------')
   if (action == 'updated') {
     if (updated == '[]') {
       return `${orig}`
     } else if (orig == '[]') {
       return `${updated}`
+    } else if (event === 'primary') {
+      return `Modified: ${orig === 'f' ? 'False' : 'True'} to ${
+        updated === 't' ? 'True' : 'False'
+      }`
     } else {
       return `Modified: ${orig} to ${updated}`
     }
@@ -151,21 +160,13 @@ function ActivitiesOverviewRow(props) {
           h={index === arrLength - 1 ? '15px' : '100%'}
         ></Box>
       </Flex>
-      <Flex direction='column' justifyContent='flex-start' h='100%'>
+      <Flex direction='column' justifyContent='flex-start' w={'99%'} h='100%'>
         <Text fontSize='sm' color={textColor} fontWeight='normal'>
           {event} by {changedBy}
         </Text>
-        <Flex direction='row' gap={2}>
-          <Text
-            fontSize='sm'
-            color={textColor}
-            fontWeight='normal'
-            width={'95%'}
-            wordBreak={'break-all'}
-          >
-            {valueToText(action, event, orig, updated)}
-          </Text>
-        </Flex>
+        <Text fontSize='sm' color={textColor} fontWeight='normal' width={'99%'}>
+          {valueToText(action, event, orig, updated)}
+        </Text>
         <Text fontSize='xs' color='gray.400' fontWeight='normal'>
           {getFullDateAndTime(date)}
         </Text>
