@@ -173,7 +173,7 @@ const Automation = ({ data, refetch }) => {
     // UPDATED AT
     {
       id: 'AUTO_CHECKS_UPDATED_AT',
-      name: 'UPDATED AT',
+      name: 'UPDATED',
       selector: (row) => {
         const { updatedAt } = row
         return <Text>{timeSince(updatedAt)}</Text>

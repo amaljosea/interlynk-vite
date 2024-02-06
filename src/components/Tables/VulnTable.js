@@ -414,7 +414,7 @@ const VulnTable = ({
     // UPDATED AT
     {
       id: 'COMPONENT_VULNS_UPDATED_AT',
-      name: 'UPDATED AT',
+      name: 'UPDATED',
       width: '150px',
       selector: (row) => (
         <Tooltip

@@ -1,4 +1,13 @@
-import {Button, Flex, Stack, Tag, Tooltip, Text, Box, IconButton} from '@chakra-ui/react'
+import {
+  Button,
+  Flex,
+  Stack,
+  Tag,
+  Tooltip,
+  Text,
+  Box,
+  IconButton
+} from '@chakra-ui/react'
 import React, { useEffect, useMemo, useState } from 'react'
 import { timeSince, getFullDateAndTime, customStyles } from 'utils'
 import DataTable from 'react-data-table-component'
@@ -7,8 +16,8 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import ChangelogFilterMenu from 'views/Sbom/components/ChangelogFilterMenu'
 import RowLimit from 'views/Sbom/components/RowLimit'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
-import {RepeatIcon} from "@chakra-ui/icons";
-import Pagination from "../Pagination";
+import { RepeatIcon } from '@chakra-ui/icons'
+import Pagination from '../Pagination'
 
 const setColor = (type) => {
   switch (type) {
@@ -150,7 +159,7 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
     // CHANGED ON
     {
       id: 'ACTIVITY_LOGS_CREATED_AT',
-      name: 'CHANGED ON',
+      name: 'CHANGED',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
           <Text>{timeSince(row.updatedAt)}</Text>
@@ -231,14 +240,13 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
           first: totalRows,
           ...logData
         }
-      }).then(
-        (res) => {
-          if (res.data){
-            setPaginationControl(res.data)
-            prodLogDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
-          }
+      }).then((res) => {
+        if (res.data) {
+          setPaginationControl(res.data)
+          prodLogDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
         }
-      )}
+      })
+    }
   }
 
   // CLEAR SERACH
@@ -252,16 +260,14 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
         first: totalRows,
         ...logData
       }
-    }).then(
-      (res) => {
-        if (res.data) {
-          setPaginationControl(res.data)
-          prodLogDispatch({
-            type: 'CLEAR_SEARCH_INPUT'
-          })
-        }
+    }).then((res) => {
+      if (res.data) {
+        setPaginationControl(res.data)
+        prodLogDispatch({
+          type: 'CLEAR_SEARCH_INPUT'
+        })
       }
-    )
+    })
   }
 
   // ON SEARCH INPUT CHANGE
@@ -314,16 +320,14 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
         first: Number(e.target.value),
         ...logData
       }
-    }).then(
-      (res) => {
-        if (res.data) {
-          setPaginationControl(res.data)
-          prodLogDispatch({
-            type: 'FETCH_DATA_SUCCESS'
-          })
-        }
+    }).then((res) => {
+      if (res.data) {
+        setPaginationControl(res.data)
+        prodLogDispatch({
+          type: 'FETCH_DATA_SUCCESS'
+        })
       }
-    )
+    })
   }
 
   const subHeaderComponentMemo = useMemo(() => {
@@ -349,18 +353,15 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
           />
 
           <ChangelogFilterMenu refetch={refetch} id={activeEnv} />
-
         </Stack>
         <Tooltip label='Refresh'>
           <IconButton
-              onClick={handleClear}
-              colorScheme='blue'
-              icon={<RepeatIcon />}
+            onClick={handleClear}
+            colorScheme='blue'
+            icon={<RepeatIcon />}
           ></IconButton>
         </Tooltip>
       </Flex>
-
-
     )
   }, [searchInput, onSearchInputChange, handleClear, handleSearch])
 
@@ -385,17 +386,17 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
 
       {/* PAGINATION */}
       {data && (
-          <Pagination
-              paginationSizes={paginationSizes}
-              pageIndex={pageIndex}
-              totalRows={totalRows}
-              totalCount={data.totalCount}
-              onPreviousPage={handlePreviousPage}
-              onNextPage={handleNextPage}
-              onSetRow={handleSetRow}
-              hasNextPage={isNextActive}
-              hasPreviousPage={isPrevActive}
-          />
+        <Pagination
+          paginationSizes={paginationSizes}
+          pageIndex={pageIndex}
+          totalRows={totalRows}
+          totalCount={data.totalCount}
+          onPreviousPage={handlePreviousPage}
+          onNextPage={handleNextPage}
+          onSetRow={handleSetRow}
+          hasNextPage={isNextActive}
+          hasPreviousPage={isPrevActive}
+        />
       )}
     </>
   )

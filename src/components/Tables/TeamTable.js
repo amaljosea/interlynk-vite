@@ -182,7 +182,7 @@ const TeamTable = ({ data, refetch }) => {
     // JOINED DATE
     {
       id: 'joinedDate',
-      name: 'DATE JOINED',
+      name: 'JOINED',
       selector: (row) => {
         const { invitationStatus } = row
         const { invitationAcceptedAt } = row
@@ -253,7 +253,10 @@ const TeamTable = ({ data, refetch }) => {
                 {(invitationStatus === 'declined' ||
                   invitationStatus === 'invited' ||
                   invitationStatus === 'pending_registration') && (
-                  <MenuItem onClick={() => onResendInvite(row)} isDisabled={!inviteUser}>
+                  <MenuItem
+                    onClick={() => onResendInvite(row)}
+                    isDisabled={!inviteUser}
+                  >
                     Resend Invite
                   </MenuItem>
                 )}

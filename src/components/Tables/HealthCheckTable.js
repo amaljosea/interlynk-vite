@@ -674,7 +674,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
     // UPDATED AT
     {
       id: 'CHECK_RESULTS_UPDATED_AT',
-      name: 'UPDATED AT',
+      name: 'UPDATED',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
           {timeSince(row.updatedAt)}
