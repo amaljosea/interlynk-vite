@@ -63,9 +63,6 @@ const LoginForm = () => {
           const { status, data } = error.response
           if (status === 401) {
             setError(data)
-            setTimeout(() => {
-              setError('')
-            }, 2000)
           } else if (status === 404) {
             setError(`Internal routing error. Please try again`)
           } else {
@@ -162,12 +159,7 @@ const LoginForm = () => {
               placeholder='*******'
             />
           </FormControl>
-          <Button
-            width='full'
-            colorScheme='blue'
-            type='submit'
-            isDisabled={error !== ''}
-          >
+          <Button width='full' colorScheme='blue' type='submit'>
             Log in
           </Button>
           <Stack
