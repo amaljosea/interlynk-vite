@@ -52,6 +52,10 @@ const GeneralDataRow = ({ status, data, refetch }) => {
   const { sbomDispatch } = dispatch
 
   const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
+  const updateComponent = sboms?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'update_sbom_components' && permission.value === true
+  )
   const updateSboms = sboms?.supersededBy?.some(
     (permission) =>
       permission.key === 'update_sbom' && permission.value === true
@@ -271,7 +275,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                         <TagLabel>
                           {item.name} - {item.version}
                         </TagLabel>
-                        {!customerView && (
+                        {updateComponent && (
                           <TagCloseButton
                             onClick={() => {
                               setActiveTool(item)
