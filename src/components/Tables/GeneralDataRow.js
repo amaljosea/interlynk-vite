@@ -291,7 +291,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                 {!customerView && (
                   <Button
                     size='sm'
-                    isDisabled={status === 'signed' || !updateSboms}
+                    isDisabled={status === 'signed' || !updateComponent}
                     onClick={() => handleClick('tools')}
                   >
                     <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
@@ -345,7 +345,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                 {!customerView && (
                   <Button
                     size='sm'
-                    isDisabled={status === 'signed' || !updateSboms}
+                    isDisabled={status === 'signed' || !updateComponent}
                     onClick={() => handleClick('author')}
                   >
                     <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
@@ -405,7 +405,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                 {!customerView && (
                   <Button
                     size='sm'
-                    isDisabled={status === 'signed' || !updateSboms}
+                    isDisabled={status === 'signed' || !updateComponent}
                     onClick={onSupOpen}
                   >
                     <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
@@ -472,7 +472,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                   <Button
                     size='sm'
                     ref={licenseBtn}
-                    isDisabled={status === 'signed' || !updateSboms}
+                    isDisabled={status === 'signed' || !updateComponent}
                     onClick={onLicenseOpen}
                   >
                     <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
