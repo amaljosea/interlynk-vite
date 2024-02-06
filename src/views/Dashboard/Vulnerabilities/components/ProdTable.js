@@ -93,11 +93,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
       name: 'PRODUCT',
       selector: (row) => {
         const { component } = row
-        return (
-          <Text textTransform={'capitalize'}>
-            {component?.sbom?.project?.projectGroup?.name || ''}
-          </Text>
-        )
+        return <Text>{component?.sbom?.project?.projectGroup?.name || ''}</Text>
       },
       wrap: true,
       width: '15%',
