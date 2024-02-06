@@ -260,7 +260,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
     // UPDATED AT
     {
       id: 'VULNS_UPDATED_AT',
-      name: 'UPDATED AT',
+      name: 'UPDATED',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row?.updatedAt)} placement={'top'}>
           {timeSince(row?.updatedAt)}

@@ -264,7 +264,7 @@ const OrgTable = ({ data, refetch, activeOrg, isAdmin }) => {
     },
     {
       id: 'UPDATED_AT',
-      name: 'UPDATED AT',
+      name: 'UPDATED',
       selector: (row) => {
         const { updatedAt } = row
         return (

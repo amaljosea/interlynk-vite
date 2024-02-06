@@ -13,13 +13,17 @@ const RoleTable = ({ data, refetch, role }) => {
     {
       id: 'name',
       name: 'NAME',
-      selector: (row) => <Text textTransform={'capitalize'} my={2}>{row?.name}</Text>,
+      selector: (row) => (
+        <Text textTransform={'capitalize'} my={2}>
+          {row?.name}
+        </Text>
+      ),
       wrap: true
     },
     // CREATED AT
     {
       id: 'createdAt',
-      name: 'CREATED AT',
+      name: 'CREATED',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row?.createdAt)} placement='top'>
           <Text textTransform={'lowercase'}>{timeSince(row?.createdAt)}</Text>
@@ -58,7 +62,13 @@ const RoleTable = ({ data, refetch, role }) => {
       </Flex>
 
       {isOpen && (
-        <PermissionDrawer isOpen={isOpen} onClose={onClose} data={activeRow} refetch={refetch} role={role} />
+        <PermissionDrawer
+          isOpen={isOpen}
+          onClose={onClose}
+          data={activeRow}
+          refetch={refetch}
+          role={role}
+        />
       )}
     </>
   )

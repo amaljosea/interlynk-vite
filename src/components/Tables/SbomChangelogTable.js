@@ -293,12 +293,12 @@ const SbomChangelogTable = ({ data, refetch }) => {
       sortable: true,
       width: '200px',
       right: 'true',
-      wrap: true,
+      wrap: true
     },
     // CHANGED ON
     {
       id: 'ACTIVITY_LOGS_CREATED_AT',
-      name: 'CHANGED ON',
+      name: 'CHANGED',
       selector: (row) => (
         <Box width={'fit-content'}>
           <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
@@ -314,7 +314,7 @@ const SbomChangelogTable = ({ data, refetch }) => {
       },
       width: '180px',
       right: 'true',
-      wrap: true,
+      wrap: true
     }
   ]
 

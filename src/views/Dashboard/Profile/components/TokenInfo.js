@@ -265,7 +265,7 @@ const TokenInfo = ({ data, refetch }) => {
     // UPDATED
     {
       id: 'updated',
-      name: 'UPDATED AT',
+      name: 'UPDATED',
       selector: (row) => <Text>{getFullDateAndTime(row.updatedAt)}</Text>,
       sortable: true,
       sortFunction: (a, b) => {

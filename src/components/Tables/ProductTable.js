@@ -76,7 +76,6 @@ const ProductTable = ({ data, refetch }) => {
   }
   //end
 
-
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
@@ -238,13 +237,12 @@ const ProductTable = ({ data, refetch }) => {
           before: undefined,
           field: field,
           direction: direction
-        }).then(
-          (res) => {
-            if (res.data) {
-              setPaginationControl(res.data)
-              prodDispatch({type: 'CHANGE_SEARCH_INPUT', payload: value})
-            }
-          })
+        }).then((res) => {
+          if (res.data) {
+            setPaginationControl(res.data)
+            prodDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
+          }
+        })
       }
     },
     [refetch, filterText, totalRows, prodDispatch]
@@ -252,7 +250,7 @@ const ProductTable = ({ data, refetch }) => {
 
   const onFilterActive = useCallback(
     async (value) => {
-        disablePaginationControl()
+      disablePaginationControl()
       await refetch({
         enabled: value === 'yes' ? true : value === 'no' ? false : undefined,
         first: totalRows,
@@ -447,7 +445,7 @@ const ProductTable = ({ data, refetch }) => {
       // UPDATEDAT
       {
         id: 'PROJECT_GROUPS_UPDATED_AT',
-        name: 'UPDATED AT',
+        name: 'UPDATED',
         selector: (row) => {
           const { updatedAt } = row
           return (
