@@ -444,7 +444,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
           {/* ROW LIMIT */}
           <RowLimit
             onChange={(e) => {
-              setTotalRows(e.target.value)
+              setTotalRows(parseInt(e.target.value))
               setCurrentPage(1)
             }}
             name='componentRow'
