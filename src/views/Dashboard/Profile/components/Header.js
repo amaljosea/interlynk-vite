@@ -29,12 +29,8 @@ const Header = ({
 }) => {
   const navigate = useNavigate()
   const toast = useToast()
-  const  { userPermissions } = useGlobalState()
   const textColor = useColorModeValue('gray.700', 'white')
   const emailColor = useColorModeValue('gray.500', 'gray.300')
-
-  const viewOrg = userPermissions?.find((item) => item.key === "view_organization")
-
 
   const handleClick = (name) => {
     setSelectedTab(name)

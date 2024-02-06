@@ -89,11 +89,6 @@ function valueToIcon(action, event, orig, updated) {
 }
 
 function valueToText(action, event, orig, updated) {
-  console.log('action', action)
-  console.log('event', event)
-  console.log('orig', orig)
-  console.log('updated', updated)
-  console.log('---------------------------')
   if (action == 'updated') {
     if (updated == '[]') {
       return `${orig}`

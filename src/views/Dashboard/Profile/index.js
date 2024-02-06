@@ -40,9 +40,7 @@ function Profile() {
   const queryParams = new URLSearchParams(location.search)
   const activetab = queryParams.get('tab')
   const { totalRows, userPermissions } = useGlobalState()
-
-  console.log('userPermissions', userPermissions)
-
+  
   const tabs = [
     {
       name: 'PERSONAL',
