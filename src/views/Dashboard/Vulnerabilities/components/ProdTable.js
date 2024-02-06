@@ -112,6 +112,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
         </Tooltip>
       ),
       wrap: true,
+      right: 'true',
       width: '10%'
     },
     // ENV
@@ -154,6 +155,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
         </Tooltip>
       ),
       wrap: true,
+      right: 'true',
       width: '12%'
     },
     // STATUS

@@ -274,6 +274,7 @@ const OrgTable = ({ data, refetch, activeOrg, isAdmin }) => {
         )
       },
       wrap: true,
+      right:'true',
       sortable: true,
       sortFunction: (a, b) => {
         const dateA = new Date(a.updatedAt)

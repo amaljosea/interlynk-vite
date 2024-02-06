@@ -260,7 +260,8 @@ const TokenInfo = ({ data, refetch }) => {
         const dateB = new Date(b.createdAt)
         return dateA - dateB
       },
-      wrap: true
+      wrap: true,
+      right: 'true'
     },
     // UPDATED
     {
@@ -273,7 +274,8 @@ const TokenInfo = ({ data, refetch }) => {
         const dateB = new Date(b.updatedAt)
         return dateA - dateB
       },
-      wrap: true
+      wrap: true,
+      right: 'true'
     },
     // EXPIRES
     {
@@ -284,7 +286,8 @@ const TokenInfo = ({ data, refetch }) => {
           {row.expiresAt ? getFullDateAndTime(row.expiresAt) : 'No Expiration'}
         </Text>
       ),
-      wrap: true
+      wrap: true,
+      right: 'true'
     },
     // STATUS
     {
@@ -319,8 +322,8 @@ const TokenInfo = ({ data, refetch }) => {
               {!revoked && !expired
                 ? 'Active'
                 : revoked
-                ? 'Revoked'
-                : 'Expired'}
+                  ? 'Revoked'
+                  : 'Expired'}
             </TagLabel>
           </Tag>
         )

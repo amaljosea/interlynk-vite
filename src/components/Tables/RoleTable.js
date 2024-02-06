@@ -28,7 +28,8 @@ const RoleTable = ({ data, refetch, role }) => {
         <Tooltip label={getFullDateAndTime(row?.createdAt)} placement='top'>
           <Text textTransform={'lowercase'}>{timeSince(row?.createdAt)}</Text>
         </Tooltip>
-      )
+      ),
+      right: 'true'
     },
     // PERMISSIONS
     {
@@ -46,7 +47,8 @@ const RoleTable = ({ data, refetch, role }) => {
         >
           Permissions
         </Button>
-      )
+      ),
+      right: 'true'
     }
   ]
   return (

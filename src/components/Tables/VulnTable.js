@@ -384,7 +384,8 @@ const VulnTable = ({
       ),
       wrap: true,
       width: '180px',
-      sortable: true
+      sortable: true,
+      right: 'true'
     },
     // STATUS
     {

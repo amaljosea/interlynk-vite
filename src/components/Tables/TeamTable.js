@@ -196,6 +196,7 @@ const TeamTable = ({ data, refetch }) => {
           </Tooltip>
         )
       },
+      right:'true',
       sortable: true,
       sortFunction: (a, b) => {
         const aUserStart = userTimeStart(a)
