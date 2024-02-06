@@ -211,15 +211,15 @@ const SupplierModal = ({
           <ModalBody>
             {data && (
               <Flex
-                width='100%'
+                width='99%'
                 direction={'row'}
                 alignItems={'center'}
                 justifyContent={'flex-start'}
-                wrap={'wrap'}
+                flexWrap={'wrap'}
                 gap={2}
                 mb={4}
               >
-                <Text fontWeight={'medium'}>{data.name}</Text>
+                <Text fontWeight={'medium'} wordBreak={'break-all'}>{data.name}</Text>
                 <Tag colorScheme='blue'>{data.version}</Tag>
               </Flex>
             )}
