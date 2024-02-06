@@ -147,14 +147,6 @@ function Profile() {
     }
   }, [activetab, isAdmin])
 
-  useEffect(() => {
-    if (viewOrg?.value === false) {
-      navigate(`/vendor/settings?tab=person`)
-    } else {
-      navigate(`/vendor/settings?tab=person`)
-    }
-  }, [])
-
   if (error) {
     return (
       <Flex my={32} alignItems={'center'} justifyContent={'center'} gap={2}>
@@ -184,11 +176,7 @@ function Profile() {
             setSelectedTab={setSelectedTab}
             setTabIndex={setTabIndex}
             setPsIndex={setPsIndex}
-            tabs={
-              viewOrg?.value
-                ? tabs
-                : tabs.filter((item) => item.name !== 'ORGANIZATION')
-            }
+            tabs={tabs}
           />
 
           {/*  ORGANIZATION */}
@@ -299,18 +287,7 @@ function Profile() {
                 <TabList>
                   {['Personal Details', 'Organizations', 'Security Tokens'].map(
                     (item, index) => (
-                      <Tab
-                        key={index}
-                        _focus={{ outline: 'none' }}
-                        display={
-                          !orgInfo?.organization && item !== 'Organizations'
-                            ? 'none'
-                            : viewOrg.value === false &&
-                                item === 'Organizations'
-                              ? 'none'
-                              : 'block'
-                        }
-                      >
+                      <Tab key={index} _focus={{ outline: 'none' }}>
                         {item}
                       </Tab>
                     )
