@@ -312,6 +312,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
         )
       },
       width: '200px',
+      right: 'true',
       wrap: true
     },
     {
@@ -595,6 +596,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
                     Project
                   </FormLabel>
                   <Select
+                    fontSize={'sm'}
                     name='groups'
                     id='groups'
                     value={selectedGroup}

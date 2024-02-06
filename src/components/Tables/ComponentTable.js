@@ -381,7 +381,8 @@ const ComponentTable = ({
       selector: (row) => <p style={{ textWrap: 'pretty' }}>{row.version}</p>,
       width: '200px',
       wrap: true,
-      sortable: true
+      sortable: true,
+      right: 'true'
     },
     // PURL
     {

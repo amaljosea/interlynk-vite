@@ -401,32 +401,8 @@ const ProductTable = ({ data, refetch }) => {
         wrap: true,
         sortable: true
       },
-      // ENVIRONMENT
-      {
-        id: 'ENVIRONMENT',
-        name: 'ENVIRONMENT',
-        selector: (row) => {
-          const { projects } = row
-          return <Text>{projects?.length}</Text>
-        },
-        wrap: true
-      },
-      // VERSION
-      {
-        id: 'VERSION',
-        name: 'VERSION',
-        selector: (row) => {
-          const { projects } = row
-          const totalSbom = projects?.reduce(
-            (count, project) => count + project.sboms.length,
-            0
-          )
-          return <Text>{totalSbom || 0}</Text>
-        },
-        wrap: true
-      },
-      // DESCRIPTION
-      {
+       // DESCRIPTION
+       {
         id: 'PROJECT_GROUPS_DESCRIPTION',
         name: 'DESCRIPTION',
         selector: (row) => {
@@ -441,6 +417,32 @@ const ProductTable = ({ data, refetch }) => {
         },
         wrap: true,
         sortable: true
+      },
+      // ENVIRONMENT
+      {
+        id: 'ENVIRONMENT',
+        name: 'ENVIRONMENT',
+        selector: (row) => {
+          const { projects } = row
+          return <Text>{projects?.length}</Text>
+        },
+        wrap: true,
+        right: 'true'
+      },
+      // VERSION
+      {
+        id: 'VERSION',
+        name: 'VERSION',
+        selector: (row) => {
+          const { projects } = row
+          const totalSbom = projects?.reduce(
+            (count, project) => count + project.sboms.length,
+            0
+          )
+          return <Text>{totalSbom || 0}</Text>
+        },
+        wrap: true,
+        right: 'true'
       },
       // UPDATEDAT
       {
@@ -460,7 +462,8 @@ const ProductTable = ({ data, refetch }) => {
           const dateB = new Date(b.updatedAt)
           return dateA - dateB
         },
-        wrap: true
+        wrap: true,
+        right: 'true'
       },
       // ACTIONS
       {
