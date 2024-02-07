@@ -95,7 +95,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
                     ? `/vendor/products/${product?.name}?id=${product?.id}&vulnId=${id}`
                     : `/vendor/vulnerabilities?vulnId=${id}`
                 }
-                onClick={() => sessionStorage.setItem('activeVuln', vulnId)}
+                onClick={() => localStorage.setItem('activeVuln', vulnId)}
               >
                 <Text fontSize='sm' color={'blue.500'}>
                   {vulnId || ''}
