@@ -99,12 +99,12 @@ const SupplierModal = ({
   })
 
   useEffect(() => {
-    if (data && data.suppliers.length > 0) {
+    if (data && data?.suppliers?.length > 0) {
       const { suppliers } = data
-      setOrgName(suppliers[0].name)
-      setOrgUrl(suppliers[0].url)
-      setSupName(suppliers[0].contactName)
-      setSupEmail(suppliers[0].contactEmail)
+      setOrgName(suppliers[0].name || '')
+      setOrgUrl(suppliers[0].url || '')
+      setSupName(suppliers[0].contactName || '')
+      setSupEmail(suppliers[0].contactEmail || '')
     }
   }, [])
 
@@ -194,7 +194,8 @@ const SupplierModal = ({
   }
 
   const isInvalid =
-    supName === '' || nameError !== '' ||
+    supName === '' ||
+    nameError !== '' ||
     (supEmail !== '' && !validateEmail(supEmail)) ||
     (orgUrl !== '' && !validateUrl(orgUrl))
 
@@ -219,7 +220,9 @@ const SupplierModal = ({
                 gap={2}
                 mb={4}
               >
-                <Text fontWeight={'medium'} wordBreak={'break-all'}>{data.name}</Text>
+                <Text fontWeight={'medium'} wordBreak={'break-all'}>
+                  {data.name}
+                </Text>
                 <Tag colorScheme='blue'>{data.version}</Tag>
               </Flex>
             )}

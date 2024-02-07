@@ -51,7 +51,7 @@ function CustomerComponentRow(props) {
   const [contains, setcontains] = useState({})
 
   useEffect(() => {
-    const containsData = window.sessionStorage.getItem('contains')
+    const containsData = window.localStorage.getItem('contains')
     setcontains(JSON.parse(containsData))
   }, [])
 

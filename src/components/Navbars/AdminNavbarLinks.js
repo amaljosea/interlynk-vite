@@ -55,10 +55,10 @@ export default function HeaderLinks(props) {
 
   const authToken = Cookies.get('authToken')
 
-  const name = sessionStorage.getItem('username')
-  const email = sessionStorage.getItem('email')
-  const userEmail = sessionStorage.getItem('userEmail')
-  const org = sessionStorage.getItem('organization')
+  const name = localStorage.getItem('username')
+  const email = localStorage.getItem('email')
+  const userEmail = localStorage.getItem('userEmail')
+  const org = localStorage.getItem('organization')
 
   useEffect(() => {
     if (location.pathname.startsWith('/vendor')) {

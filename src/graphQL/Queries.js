@@ -524,8 +524,12 @@ export const GetGlobalVulnData = gql`
       id
       desc
       vulnId
+      source
       updatedAt
       cvssScore
+      cvssVector
+      publishedAt
+      lastModifiedAt
       vulnInfo {
         id
         kev
@@ -578,6 +582,7 @@ export const GetGlobalVulnData = gql`
             createdAt
             creationAt
             updatedAt
+            projectVersion
             project {
               name
               projectGroup {
@@ -1114,9 +1119,7 @@ export const GetProductData = gql`
         internal
         purl
         cpes
-        licenses
         licensesExp
-        licensesCustom
         updatedAt
         uniqueId
         kind
@@ -1145,9 +1148,7 @@ export const GetProductData = gql`
       createdAt
       creationAt
       updatedAt
-      licenses
       licensesExp
-      licensesCustom
       format
       spec
       specVersion
@@ -1229,7 +1230,6 @@ export const GetComponentData = gql`
           internal
           purl
           cpes
-          licenses
           updatedAt
           uniqueId
           kind
@@ -1237,7 +1237,6 @@ export const GetComponentData = gql`
           publisher
           description
           licensesExp
-          licensesCustom
           group
           scope
           externalUrls {
@@ -1533,9 +1532,7 @@ export const GetCheckResults = gql`
             id
             name
             version
-            licenses
             licensesExp
-            licensesCustom
           }
           organizationRule {
             severity

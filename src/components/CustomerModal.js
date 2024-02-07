@@ -66,7 +66,7 @@ const CustomerModal = ({ refetch }) => {
         console.log(response.data)
         const { status } = response.data
         if (status.code === 200) {
-          sessionStorage.setItem('userEmail', status.data.user.email)
+          localStorage.setItem('userEmail', status.data.user.email)
           Cookies.set('userToken', response.headers.authorization)
           window.location.reload()
         }

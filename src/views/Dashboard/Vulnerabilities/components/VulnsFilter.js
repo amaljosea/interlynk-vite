@@ -23,7 +23,7 @@ const VulnsFilters = ({ refetch }) => {
   const params = useParams()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
-  const activeEnv = sessionStorage.getItem('activeEnv')
+  const activeEnv = localStorage.getItem('activeEnv')
 
   const { totalRows, globalVulnState, prodState, dispatch } = useGlobalState()
   const { severities, products, statues, kev, epss, minEpss, maxEpss } =

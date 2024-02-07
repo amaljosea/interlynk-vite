@@ -52,11 +52,11 @@ export default function AdminNavbar(props) {
   const sbomId = queryParams.get('sbom')
   const vulnId = queryParams.get('vulnId')
 
-  const activeVuln = sessionStorage.getItem('activeVuln')
-  const imageName = sessionStorage.getItem('Image')
+  const activeVuln = localStorage.getItem('activeVuln')
+  const imageName = localStorage.getItem('Image')
   const currentProduct = (() => {
     try {
-      return parseJSONSafely(sessionStorage.getItem(`product`))
+      return parseJSONSafely(localStorage.getItem(`product`))
     } catch (error) {
       console.log(error)
       return null
@@ -64,13 +64,13 @@ export default function AdminNavbar(props) {
   })()
   const currentSBOM = (() => {
     try {
-      return parseJSONSafely(sessionStorage.getItem(`currentSBOM`))
+      return parseJSONSafely(localStorage.getItem(`currentSBOM`))
     } catch (error) {
       console.log(error)
       return null
     }
   })()
-  const subProduct = sessionStorage.getItem('subProduct')
+  const subProduct = localStorage.getItem('subProduct')
 
   const urlParts = location.pathname.split('/')
   const category = urlParts[2]
@@ -119,7 +119,7 @@ export default function AdminNavbar(props) {
 
   useEffect(() => {
     if (!parts) {
-      window.sessionStorage.removeItem('subProduct')
+      window.localStorage.removeItem('subProduct')
     }
   }, [parts])
 
@@ -178,7 +178,7 @@ export default function AdminNavbar(props) {
               >
                 <Link
                   to={`/vendor/products/${params.name}?id=${currentProduct?.groupId}`}
-                  onClick={() => sessionStorage.removeItem('currentSBOM')}
+                  onClick={() => localStorage.removeItem('currentSBOM')}
                 >
                   {decodeURI(params.name)}
                 </Link>
@@ -196,7 +196,7 @@ export default function AdminNavbar(props) {
                 <BreadcrumbLink
                   href=''
                   color={mainText}
-                  onClick={() => window.sessionStorage.removeItem('subProduct')}
+                  onClick={() => window.localStorage.removeItem('subProduct')}
                 >
                   {imageName}
                 </BreadcrumbLink>

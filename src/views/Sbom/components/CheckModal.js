@@ -144,7 +144,7 @@ const CheckModal = ({
               projectId: productId,
               sbomId: sbomId
             })
-            sessionStorage.setItem(
+            localStorage.setItem(
               'currentSBOM',
               JSON.stringify({
                 version: activeComp?.version,
@@ -178,23 +178,11 @@ const CheckModal = ({
           id: componentId,
           sbomId: sbomId,
           licenses: {
-            licenses:
-              licenseType === 'license_spdx'
-                ? spdxLicenses
-                  ? spdxLicenses
-                  : []
-                : undefined,
             licensesExp:
               licenseType === 'license_exp'
                 ? expLicense
                   ? expLicense
                   : ''
-                : undefined,
-            licensesCustom:
-              licenseType === 'license_custom'
-                ? customLicenses
-                  ? customLicenses
-                  : []
                 : undefined
           }
         }

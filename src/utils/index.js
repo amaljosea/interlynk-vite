@@ -749,3 +749,10 @@ export const envOrderList = (projects) => {
 
 export const purlString = (value) => PackageURL.fromString(value)
  
+export const linkURl = (type, id) => {
+  if (type === 'osv') {
+    return `https://osv.dev/vulnerability/${id}`
+  } else {
+    return `https://nvd.nist.gov/vuln/detail/${id}`
+  }
+}

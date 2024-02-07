@@ -51,7 +51,7 @@ const VexModal = ({
   const queryParams = new URLSearchParams(location.search)
   const groupId = queryParams.get('id')
   const vulnId = queryParams.get('vulnId')
-  const prodId = sessionStorage.getItem('activeEnv')
+  const prodId = localStorage.getItem('activeEnv')
 
   const [statusTitle, setStatusTitle] = useState('')
   const [statusName, setStatusName] = useState('')

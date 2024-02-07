@@ -42,7 +42,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (data) {
-      sessionStorage.setItem(
+      localStorage.setItem(
         'organization',
         JSON.stringify(data?.organization?.name)
       )

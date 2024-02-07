@@ -122,9 +122,14 @@ const LicenseField = ({ isValid, setIsValid }) => {
           </Flex>
         </FormLabel>
         {/* LICENSE TYPE */}
-        <RadioGroup size='sm' value={licenseType} onChange={handleTypeChange} isDisabled={!isValid}>
-          <Stack direction='row' my={4} spacing={3} alignItems={'center'}>
-            <Radio value='license_spdx'>
+        <RadioGroup
+          size='sm'
+          value={licenseType}
+          onChange={handleTypeChange}
+          isDisabled={!isValid}
+        >
+          <Stack direction='row' my={4} spacing={0} alignItems={'center'}>
+            <Radio value='license_spdx' display='none'>
               License ID
               <Link
                 href={
@@ -158,7 +163,9 @@ const LicenseField = ({ isValid, setIsValid }) => {
                 />
               </Link>
             </Radio>
-            <Radio value='license_custom'>Custom</Radio>
+            <Radio value='license_custom' display={'none'}>
+              Custom
+            </Radio>
           </Stack>
         </RadioGroup>
         {/* SPDX LICENSE */}

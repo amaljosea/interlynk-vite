@@ -113,7 +113,7 @@ const ProductDetails = () => {
   } = prodVulnState
   const { prodVulnDispatch, globalVulnDispatch } = dispatch
 
-  const activeProd = sessionStorage.getItem('activeEnv')
+  const activeProd = localStorage.getItem('activeEnv')
   const [activeEnv, setActiveEnv] = useState(activeProd || '')
 
   const product = userPermissions?.find(
@@ -242,7 +242,7 @@ const ProductDetails = () => {
     }
   })
 
-  const activeTab = Number(sessionStorage.getItem('activeProdTab'))
+  const activeTab = Number(localStorage.getItem('activeProdTab'))
 
   const {
     isOpen: isOpenProduct,
@@ -275,14 +275,14 @@ const ProductDetails = () => {
   } = useDisclosure()
 
   const handleTabChange = (value) => {
-    sessionStorage.setItem('activeProdTab', value)
+    localStorage.setItem('activeProdTab', value)
     setActiveProdTab(value)
   }
 
   // ON CHANGE ENV
   const onChangeEnv = (value) => {
     globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
-    sessionStorage.setItem('activeEnv', value)
+    localStorage.setItem('activeEnv', value)
     setActiveEnv(value)
   }
 
