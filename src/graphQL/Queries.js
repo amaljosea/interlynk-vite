@@ -524,9 +524,12 @@ export const GetGlobalVulnData = gql`
       id
       desc
       vulnId
+      source
       updatedAt
       cvssScore
-      source
+      cvssVector
+      publishedAt
+      lastModifiedAt
       vulnInfo {
         id
         kev
