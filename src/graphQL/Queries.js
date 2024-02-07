@@ -579,6 +579,7 @@ export const GetGlobalVulnData = gql`
             createdAt
             creationAt
             updatedAt
+            projectVersion
             project {
               name
               projectGroup {
