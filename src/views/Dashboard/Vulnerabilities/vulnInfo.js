@@ -134,17 +134,27 @@ const VulnInfo = ({ data, componentVulns, refetch }) => {
                         <Icon h={5} w={5} color='#777' as={FaBug} />
                         <Box>
                           <Stack fontWeight={'medium'} direction={'row'}>
-                            <VulnBadge color='red' label='CVSS'>
-                              {data?.cvssScore || 0}
-                            </VulnBadge>
-                            <VulnBadge color='orange' label='EPSS'>
-                              {Math.ceil(data.vulnInfo?.epssScore * 10000 || 0)}
-                            </VulnBadge>
-                            <VulnBadge color='cyan' label='KEV'>
-                              {data?.vulnInfo?.kev ? 'K' : '-'}
-                            </VulnBadge>
+                            <Flex flexDir={'column'} alignItems={'flex-start'}>
+                              <VulnBadge color='red' label='CVSS'>
+                                {data?.cvssScore || 0}
+                              </VulnBadge>
+                              <Text fontSize={'xs'}>CVSS</Text>
+                            </Flex>
+                            <Flex flexDir={'column'} alignItems={'flex-start'}>
+                              <VulnBadge color='orange' label='EPSS'>
+                                {Math.ceil(
+                                  data.vulnInfo?.epssScore * 10000 || 0
+                                )}
+                              </VulnBadge>
+                              <Text fontSize={'xs'}>EPSS</Text>
+                            </Flex>
+                            <Flex flexDir={'column'} alignItems={'flex-start'}>
+                              <VulnBadge color='cyan' label='KEV'>
+                                {data?.vulnInfo?.kev ? 'K' : '-'}
+                              </VulnBadge>
+                              <Text fontSize={'xs'}>KEV</Text>
+                            </Flex>
                           </Stack>
-                          <Text fontSize={'xs'}>Vulnerabilities</Text>
                         </Box>
                       </Stack>
                     </Flex>
