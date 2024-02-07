@@ -748,3 +748,4 @@ export const envOrderList = (projects) => {
 }
 
 export const purlString = (value) => PackageURL.fromString(value)
+ 

@@ -6,11 +6,6 @@ import {
   useColorModeValue,
   Popover,
   PopoverTrigger,
-  PopoverContent,
-  PopoverHeader,
-  PopoverBody,
-  PopoverArrow,
-  PopoverCloseButton,
   Stack
 } from '@chakra-ui/react'
 import React from 'react'
@@ -26,8 +21,8 @@ import {
   FaTimesCircle
 } from 'react-icons/fa'
 import Tooltip from 'components/Tooltip'
-import { PackageURL } from 'packageurl-js'
 import { purlString } from 'utils'
+import PurlCard from 'components/Misc/PurlCard'
 
 const setColor = (type) => {
   switch (type) {
@@ -190,35 +185,7 @@ function ActivitiesOverviewRow(props) {
               </Text>
             </Stack>
           </PopoverTrigger>
-          <PopoverContent>
-            <PopoverArrow />
-            <PopoverCloseButton />
-            <PopoverHeader>PURL</PopoverHeader>
-            <PopoverBody>
-              <Stack spacing={1}>
-                <Text fontSize='sm'>
-                  Type: <strong>{purlString(updated)?.type}</strong>
-                </Text>
-                <Text fontSize='sm'>
-                  Namespace: <strong>{purlString(updated)?.namespace}</strong>
-                </Text>
-                <Text fontSize='sm'>
-                  Package Name: <strong>{purlString(updated)?.name}</strong>
-                </Text>
-                <Text fontSize='sm'>
-                  Package Version:{' '}
-                  <strong>{purlString(updated)?.version}</strong>
-                </Text>
-                <Text fontSize='sm'>
-                  Qualifiers:{' '}
-                  <strong>
-                    {' '}
-                    {JSON.stringify(purlString(updated)?.qualifiers || '')}
-                  </strong>
-                </Text>
-              </Stack>
-            </PopoverBody>
-          </PopoverContent>
+          <PurlCard value={updated} />
         </Popover>
       ) : (
         <Flex direction='column' justifyContent='flex-start' w={'99%'} h='100%'>
