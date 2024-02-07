@@ -332,7 +332,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                         <TagLabel>
                           {item.name} - {item.email}
                         </TagLabel>
-                        {!customerView && (
+                        {updateComponent && (
                           <TagCloseButton
                             onClick={() => handleAuthorRemove(item.id)}
                           />
@@ -392,7 +392,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                             ` ${item.name}`
                           )}
                         </TagLabel>
-                        {!customerView && (
+                        {updateComponent && (
                           <TagCloseButton
                             onClick={() => handleSupRemove(item.id)}
                           />
