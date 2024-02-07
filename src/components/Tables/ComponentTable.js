@@ -19,9 +19,15 @@ import {
   GridItem,
   TagCloseButton,
   Link,
-  Button,
   Divider,
-  VStack
+  VStack,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverHeader,
+  PopoverBody,
+  PopoverArrow,
+  PopoverCloseButton
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
@@ -51,6 +57,8 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import { GetCompFilterData } from 'graphQL/Queries'
 import Pagination from '../Pagination'
+import { purlString } from 'utils'
+import PurlCard from 'components/Misc/PurlCard'
 
 const ComponentTable = ({
   lifecycle,
@@ -393,9 +401,12 @@ const ComponentTable = ({
         return (
           <>
             {purl !== null && purl !== '' ? (
-              <Tooltip placement='top' label={purl}>
-                <p style={{ textWrap: 'pretty' }}>{purl}</p>
-              </Tooltip>
+              <Popover>
+                <PopoverTrigger>
+                  <Text>{purl}</Text>
+                </PopoverTrigger>
+                <PurlCard value={purl} />
+              </Popover>
             ) : (
               ''
             )}

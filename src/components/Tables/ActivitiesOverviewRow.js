@@ -1,4 +1,13 @@
-import { Box, Flex, Icon, Text, useColorModeValue } from '@chakra-ui/react'
+import {
+  Box,
+  Flex,
+  Icon,
+  Text,
+  useColorModeValue,
+  Popover,
+  PopoverTrigger,
+  Stack
+} from '@chakra-ui/react'
 import React from 'react'
 import { getFullDateAndTime } from 'utils'
 import {
@@ -12,6 +21,8 @@ import {
   FaTimesCircle
 } from 'react-icons/fa'
 import Tooltip from 'components/Tooltip'
+import { purlString } from 'utils'
+import PurlCard from 'components/Misc/PurlCard'
 
 const setColor = (type) => {
   switch (type) {
@@ -131,7 +142,6 @@ function ActivitiesOverviewRow(props) {
     updated
   } = props
   const textColor = useColorModeValue('gray.600', 'white.300')
-  const bgIconColor = useColorModeValue('white.300', 'gray.700')
 
   return (
     <Flex alignItems='center' minH='78px' justifyContent='start' mb='5px'>
@@ -155,17 +165,46 @@ function ActivitiesOverviewRow(props) {
           h={index === arrLength - 1 ? '15px' : '100%'}
         ></Box>
       </Flex>
-      <Flex direction='column' justifyContent='flex-start' w={'99%'} h='100%'>
-        <Text fontSize='sm' color={textColor} fontWeight='normal'>
-          {event} by {changedBy}
-        </Text>
-        <Text fontSize='sm' color={textColor} fontWeight='normal' width={'99%'}>
-          {valueToText(action, event, orig, updated)}
-        </Text>
-        <Text fontSize='xs' color='gray.400' fontWeight='normal'>
-          {getFullDateAndTime(date)}
-        </Text>
-      </Flex>
+      {event === 'purl' ? (
+        <Popover>
+          <PopoverTrigger>
+            <Stack direction={'column'} spacing={0} cursor={'pointer'}>
+              <Text fontSize='sm' color={textColor} fontWeight='normal'>
+                {event} by {changedBy}
+              </Text>
+              <Text
+                fontSize='sm'
+                color={textColor}
+                fontWeight='normal'
+                width={'99%'}
+              >
+                {valueToText(action, event, orig, updated)}
+              </Text>
+              <Text fontSize='xs' color='gray.400' fontWeight='normal'>
+                {getFullDateAndTime(date)}
+              </Text>
+            </Stack>
+          </PopoverTrigger>
+          <PurlCard value={updated} />
+        </Popover>
+      ) : (
+        <Flex direction='column' justifyContent='flex-start' w={'99%'} h='100%'>
+          <Text fontSize='sm' color={textColor} fontWeight='normal'>
+            {event} by {changedBy}
+          </Text>
+          <Text
+            fontSize='sm'
+            color={textColor}
+            fontWeight='normal'
+            width={'99%'}
+          >
+            {valueToText(action, event, orig, updated)}
+          </Text>
+          <Text fontSize='xs' color='gray.400' fontWeight='normal'>
+            {getFullDateAndTime(date)}
+          </Text>
+        </Flex>
+      )}
     </Flex>
   )
 }
