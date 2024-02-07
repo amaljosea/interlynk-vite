@@ -186,23 +186,11 @@ const GeneralDataRow = ({ status, data, refetch }) => {
         id: data.id,
         spec: data.spec,
         licenses: {
-          licenses:
-            licenseType === 'license_spdx'
-              ? spdxLicenses
-                ? spdxLicenses
-                : []
-              : undefined,
           licensesExp:
             licenseType === 'license_exp'
               ? expLicense
                 ? expLicense
                 : ''
-              : undefined,
-          licensesCustom:
-            licenseType === 'license_custom'
-              ? customLicenses
-                ? customLicenses
-                : []
               : undefined
         }
       }
@@ -519,7 +507,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                 onClick={onUpdateLicense}
                 isDisabled={!isValid}
               >
-                {data.licenses.length > 0 ? 'Update' : 'Save'}
+                {data?.licensesExp?.length > 0 ? 'Update' : 'Save'}
               </Button>
             </ModalFooter>
           </ModalContent>

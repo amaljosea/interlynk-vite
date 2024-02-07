@@ -9,7 +9,7 @@ const sbomReducer = (state, action) => {
     case 'CLEAR_LICENSES':
       return {
         ...state,
-        licenseType: 'license_spdx',
+        licenseType: 'license_exp',
         spdxLicenses: [],
         spdxList: [],
         customLicenses: [],
@@ -64,13 +64,20 @@ const sbomReducer = (state, action) => {
             ...state,
             licenseType: 'license_spdx',
             spdxLicenses: licenses,
-            spdxList: filterData
+            spdxList: filterData,
+            expLicense: '',
+            customLicenses: [],
+            customList: []
           }
-        } else if (licensesExp) {
+        } else if (licensesExp !== null) {
           return {
             ...state,
             licenseType: 'license_exp',
-            expLicense: licensesExp
+            expLicense: licensesExp,
+            spdxLicenses: [],
+            spdxList: [],
+            customLicenses: [],
+            customList: []
           }
         } else if (licensesCustom?.length > 0) {
           const filterData = licensesCustom?.map((license) => ({
@@ -81,7 +88,10 @@ const sbomReducer = (state, action) => {
             ...state,
             licenseType: 'license_custom',
             customLicenses: licensesCustom,
-            customList: filterData
+            customList: filterData,
+            spdxLicenses: [],
+            spdxList: [],
+            expLicense: ''
           }
         } else {
           return {

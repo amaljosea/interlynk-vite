@@ -90,7 +90,7 @@ const GlobalStateProvider = ({ children }) => {
     suppliers: [],
     scope: '',
     filters: null,
-    licenseType: 'license_spdx',
+    licenseType: 'license_exp',
     spdxLicenses: [],
     spdxList: [],
     customLicenses: [],
@@ -135,7 +135,7 @@ const GlobalStateProvider = ({ children }) => {
     filters: null
   })
   const [sbomState, sbomDispatch] = useReducer(sbomReducer, {
-    licenseType: 'license_spdx',
+    licenseType: 'license_exp',
     spdxLicenses: [],
     spdxList: [],
     customLicenses: [],

@@ -123,8 +123,8 @@ const SbomLicenseField = ({ isValid, setIsValid }) => {
         </FormLabel>
         {/* LICENSE TYPE */}
         <RadioGroup size='sm' value={licenseType} onChange={handleTypeChange}>
-          <Stack direction='row' my={4} spacing={3} alignItems={'center'}>
-            <Radio value='license_spdx'>
+          <Stack direction='row' my={4} spacing={0} alignItems={'center'}>
+            <Radio value='license_spdx' display={'none'}>
               License ID
               <Link
                 href={
@@ -159,7 +159,9 @@ const SbomLicenseField = ({ isValid, setIsValid }) => {
                 />
               </Link>
             </Radio>
-            <Radio value='license_custom'>Custom</Radio>
+            <Radio value='license_custom' display={'none'}>
+              Custom
+            </Radio>
           </Stack>
         </RadioGroup>
         {/* SPDX LICENSE */}
