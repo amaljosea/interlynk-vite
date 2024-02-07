@@ -860,7 +860,6 @@ export const UpdateComponent = gql`
         internal
         purl
         cpes
-        licenses
       }
       errors
     }
@@ -1222,9 +1221,7 @@ export const sbomUpdate = gql`
           email
         }
         creationAt
-        licenses
         licensesExp
-        licensesCustom
         lifecycle
         project {
           name

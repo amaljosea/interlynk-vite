@@ -78,23 +78,11 @@ const LicenseModal = ({
           id: data.id,
           spec: data.spec,
           licenses: {
-            licenses:
-              licenseType === 'license_spdx'
-                ? spdxLicenses
-                  ? spdxLicenses
-                  : []
-                : undefined,
             licensesExp:
               licenseType === 'license_exp'
                 ? expLicense
                   ? expLicense
                   : ''
-                : undefined,
-            licensesCustom:
-              licenseType === 'license_custom'
-                ? customLicenses
-                  ? customLicenses
-                  : []
                 : undefined
           }
         }

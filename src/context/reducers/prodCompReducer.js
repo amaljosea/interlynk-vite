@@ -104,7 +104,7 @@ const prodCompReducer = (state, action) => {
     case 'CLEAR_LICENSES':
       return {
         ...state,
-        licenseType: 'license_spdx',
+        licenseType: 'license_exp',
         spdxLicenses: [],
         spdxList: [],
         customLicenses: [],
@@ -128,11 +128,11 @@ const prodCompReducer = (state, action) => {
             customLicenses: [],
             customList: []
           }
-        } else if (licensesExp) {
+        } else if (licensesExp !== null) {
           return {
             ...state,
             licenseType: 'license_exp',
-            expLicense: licensesExp || '',
+            expLicense: licensesExp,
             spdxLicenses: [],
             spdxList: [],
             customLicenses: [],
