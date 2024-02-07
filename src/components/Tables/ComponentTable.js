@@ -19,9 +19,15 @@ import {
   GridItem,
   TagCloseButton,
   Link,
-  Button,
   Divider,
-  VStack
+  VStack,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverHeader,
+  PopoverBody,
+  PopoverArrow,
+  PopoverCloseButton
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
@@ -51,6 +57,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import { GetCompFilterData } from 'graphQL/Queries'
 import Pagination from '../Pagination'
+import { purlString } from 'utils'
 
 const ComponentTable = ({
   lifecycle,
@@ -393,9 +400,34 @@ const ComponentTable = ({
         return (
           <>
             {purl !== null && purl !== '' ? (
-              <Tooltip placement='top' label={purl}>
-                <p style={{ textWrap: 'pretty' }}>{purl}</p>
-              </Tooltip>
+              <Popover>
+                <PopoverTrigger>
+                  <Text>{purl}</Text>
+                </PopoverTrigger>
+                <PopoverContent>
+                  <PopoverArrow />
+                  <PopoverCloseButton />
+                  <PopoverHeader>PURL</PopoverHeader>
+                  <PopoverBody>
+                    <Stack spacing={1}>
+                      <Text fontSize='sm'>Type: <strong>{purlString(purl)?.type}</strong></Text>
+                      <Text fontSize='sm'>
+                        Namespace: <strong>{purlString(purl)?.namespace}</strong>
+                      </Text>
+                      <Text fontSize='sm'>
+                        Package Name: <strong>{purlString(purl)?.name}</strong>
+                      </Text>
+                      <Text fontSize='sm'>
+                        Package Version: <strong>{purlString(purl)?.version}</strong>
+                      </Text>
+                      <Text fontSize='sm'>
+                        Qualifiers:{' '}
+                        <strong>{JSON.stringify(purlString(purl)?.qualifiers || '')}</strong>
+                      </Text>
+                    </Stack>
+                  </PopoverBody>
+                </PopoverContent>
+              </Popover>
             ) : (
               ''
             )}

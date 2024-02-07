@@ -48,6 +48,7 @@ import userOne from 'assets/img/abhi.png'
 import userTwo from 'assets/img/sp.png'
 import userThree from 'assets/img/rcn.jpg'
 import userNone from 'assets/img/user.png'
+import { PackageURL } from 'packageurl-js'
 
 const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
@@ -745,3 +746,5 @@ export const envOrderList = (projects) => {
     .sort((a, b) => a.label.localeCompare(b.label))
   return [...defaultEnvs, ...newEnvs]
 }
+
+export const purlString = (value) => PackageURL.fromString(value)

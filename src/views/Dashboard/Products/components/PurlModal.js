@@ -552,6 +552,7 @@ const PurlModal = ({
 
   const onQualifierBlur = () => {
     const pkg = PackageURL.fromString(purlString)
+    console.log('pkg', pkg);
     const convertedObject = {}
     if (qualifiers !== '') {
       const params = new URLSearchParams(qualifiers)
