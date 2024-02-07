@@ -144,7 +144,7 @@ const CheckModal = ({
               projectId: productId,
               sbomId: sbomId
             })
-            sessionStorage.setItem(
+            localStorage.setItem(
               'currentSBOM',
               JSON.stringify({
                 version: activeComp?.version,

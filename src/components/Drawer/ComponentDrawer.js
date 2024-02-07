@@ -321,7 +321,7 @@ function ComponentDrawer(props) {
       if (res.data) {
         if (isPrimary) {
           sbomRefetch({ projectId: productId, sbomId: sbomId })
-          sessionStorage.setItem(
+          localStorage.setItem(
             'currentSBOM',
             JSON.stringify({
               version: compVersion,

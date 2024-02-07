@@ -74,7 +74,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
     (permission) => permission.key === 'sign_sbom' && permission.value === true
   )
 
-  const currentProduct = JSON.parse(sessionStorage.getItem(`product`))
+  const currentProduct = JSON.parse(localStorage.getItem(`product`))
 
   const navigate = useNavigate()
   const location = useLocation()
@@ -83,7 +83,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
-  const product = JSON.parse(sessionStorage.getItem('product'))
+  const product = JSON.parse(localStorage.getItem('product'))
 
   const [status, setStatus] = useState('created')
   const [signedData, setSignedData] = useState(null)
@@ -163,7 +163,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
     })
       .then((res) => {
         if (res.data) {
-          sessionStorage.setItem(
+          localStorage.setItem(
             'currentSBOM',
             JSON.stringify({
               version: normalizeSBOMVersion(res.data.sbom),

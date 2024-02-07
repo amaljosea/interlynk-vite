@@ -29,8 +29,8 @@ const GlobalVulnTable = ({ data, refetch }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const groupId = queryParams.get('id')
-  const product = JSON.parse(sessionStorage.getItem('product'))
-  const activeEnv = sessionStorage.getItem('activeEnv')
+  const product = JSON.parse(localStorage.getItem('product'))
+  const activeEnv = localStorage.getItem('activeEnv')
 
   const { totalRows, setTotalRows, globalVulnState, dispatch } =
     useGlobalState()
@@ -72,7 +72,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
                   ? `/vendor/products/${product?.name}?id=${product?.id}&vulnId=${id}`
                   : `/vendor/vulnerabilities?vulnId=${id}`
               }
-              onClick={() => sessionStorage.setItem('activeVuln', vulnId)}
+              onClick={() => localStorage.setItem('activeVuln', vulnId)}
             >
               <Text fontSize='sm' color={'blue.500'}>
                 {vulnId || ''}

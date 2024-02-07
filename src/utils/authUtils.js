@@ -18,7 +18,7 @@ export const logoutUser = async () => {
         console.error('Logout failed')
     } finally {
         // Clear client-side storage and cookies regardless of server response
-        sessionStorage.clear();
+        localStorage.clear();
         Cookies.remove('authToken');
         Cookies.remove('signedParamId');
         Cookies.remove('userToken');
@@ -27,5 +27,5 @@ export const logoutUser = async () => {
 
 const logError = () => {
     console.log("Cookies:", Cookies.get())
-    console.log("Session:", sessionStorage)
+    console.log("Session:", localStorage)
 }

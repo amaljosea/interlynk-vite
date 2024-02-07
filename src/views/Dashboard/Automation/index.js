@@ -34,7 +34,7 @@ const Automation = ({ data, refetch }) => {
     useGlobalState()
   const { field, direction } = prodRulesState
   const { prodRulesDispatch } = dispatch
-  const activeEnv = sessionStorage.getItem('activeEnv')
+  const activeEnv = localStorage.getItem('activeEnv')
 
   const product = userPermissions?.find((item) => item.key === 'view_product')
   const editAutomations = product?.supersededBy?.some(

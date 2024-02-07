@@ -24,7 +24,7 @@ const Filters = ({ data, refetch }) => {
   const { searchInput, envs, statuses, versions, products } = compVulnState
   const { compVulnDispatch } = dispatch
 
-  const product = JSON.parse(sessionStorage.getItem('product'))
+  const product = JSON.parse(localStorage.getItem('product'))
 
   const { data: project } = useQuery(GetProjectGroup, {
     skip: params?.name ? false : true,
