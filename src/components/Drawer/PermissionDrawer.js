@@ -213,7 +213,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
                 ))}
               <Stack pl={6} mt={1} spacing={1}>
                 {orgManagement
-                  ?.filter((item) => item.supersededBy.length === 0)
+                  ?.filter((item) => item.supersededBy.length === 0 && item.hidden !== true)
                   .map((item, index) => (
                     <Checkbox
                       key={index}
@@ -249,7 +249,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
                 ))}
               <Stack pl={6} mt={1} spacing={1}>
                 {groupManagement
-                  ?.filter((item) => item.supersededBy.length === 0)
+                  ?.filter((item) => item.supersededBy.length === 0 && item.hidden !== true)
                   .map((item, index) => (
                     <Checkbox
                       key={index}
@@ -290,7 +290,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
                 ))}
               <Stack pl={6} mt={1} spacing={1}>
                 {prodManagement
-                  ?.filter((item) => item.supersededBy.length === 0)
+                  ?.filter((item) => item.supersededBy.length === 0 && item.hidden !== true)
                   .map((item, index) => (
                     <Checkbox
                       key={index}
@@ -326,7 +326,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
                 ))}
               <Stack pl={6} mt={1} spacing={1}>
                 {sbomManagement
-                  ?.filter((item) => item.supersededBy.length === 0)
+                  ?.filter((item) => item.supersededBy.length === 0 && item.hidden !== true)
                   .map((item, index) => (
                     <Checkbox
                       key={index}
@@ -362,7 +362,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
                 ))}
               <Stack pl={6} mt={1} spacing={1}>
                 {userManagement
-                  ?.filter((item) => item.supersededBy.length === 0)
+                  ?.filter((item) => item.supersededBy.length === 0 && item.hidden !== true)
                   .map((item, index) => (
                     <Checkbox
                       key={index}
@@ -398,7 +398,7 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
                 ))}
               <Stack pl={6} mt={1} spacing={1}>
                 {vulnManagement
-                  ?.filter((item) => item.supersededBy.length === 0)
+                  ?.filter((item) => item.supersededBy.length === 0 && item.hidden !== true)
                   .map((item, index) => (
                     <Checkbox
                       key={index}

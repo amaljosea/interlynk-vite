@@ -29,6 +29,7 @@ export const GetOrg = gql`
             name
             supersededBy
             value
+            hidden
           }
         }
         apiKeys {
@@ -87,6 +88,7 @@ export const GetUserPermissions = gql`
             name
             supersededBy
             value
+            hidden
           }
         }
       }
