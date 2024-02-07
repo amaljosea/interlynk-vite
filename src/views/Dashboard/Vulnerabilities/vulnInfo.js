@@ -25,9 +25,18 @@ import { FaCodeMerge } from 'react-icons/fa6'
 import VulnBadge from 'components/Misc/VulnBadge'
 import { Link } from 'react-router-dom'
 import { linkURl } from 'utils'
+import styled from '@emotion/styled'
 
 const VulnInfo = ({ data, componentVulns, refetch }) => {
   console.log('data', data)
+  const CustomText = styled(Text)`
+    font-size: 13px;
+    font-weight: bold;
+    color: #718096;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+  `
+
   return (
     <>
       {/* Product Info */}
@@ -38,6 +47,7 @@ const VulnInfo = ({ data, componentVulns, refetch }) => {
               width={'100%'}
               templateColumns='repeat(5, 1fr)'
               alignItems={'top'}
+              gap={24}
             >
               {/* LEFT */}
               <GridItem colSpan={4}>
@@ -159,6 +169,36 @@ const VulnInfo = ({ data, componentVulns, refetch }) => {
                       </Stack>
                     </Flex>
                   </Flex>
+                </Flex>
+              </GridItem>
+              <GridItem colSpan={1}>
+                <Flex
+                  direction={'column'}
+                  alignItems={'flex-start'}
+                  gap={5}
+                  width={'100%'}
+                >
+                  {/* Published At  */}
+                  <Box>
+                    <CustomText>Published:</CustomText>
+                    <Text mt={1} fontSize={14}>
+                      {getFullDateAndTime(data?.publishedAt)}
+                    </Text>
+                  </Box>
+                  {/* Last Modified At */}
+                  <Box>
+                    <CustomText>Last Modified:</CustomText>
+                    <Text mt={1} fontSize={14}>
+                      {getFullDateAndTime(data?.lastModifiedAt)}
+                    </Text>
+                  </Box>
+                  {/* CVSS Vector */}
+                  <Box>
+                    <CustomText>CVSS Vector :</CustomText>
+                    <Text mt={1} fontSize={14}>
+                      {data?.cvssVector}
+                    </Text>
+                  </Box>
                 </Flex>
               </GridItem>
             </Grid>
