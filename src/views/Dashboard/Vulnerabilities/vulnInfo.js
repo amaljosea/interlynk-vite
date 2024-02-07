@@ -23,8 +23,11 @@ import { timeSince, getFullDateAndTime } from 'utils'
 import VulnProdTable from './components/ProdTable'
 import { FaCodeMerge } from 'react-icons/fa6'
 import VulnBadge from 'components/Misc/VulnBadge'
+import { Link } from 'react-router-dom'
+import { linkURl } from 'utils'
 
 const VulnInfo = ({ data, componentVulns, refetch }) => {
+  console.log('data', data)
   return (
     <>
       {/* Product Info */}
@@ -47,9 +50,18 @@ const VulnInfo = ({ data, componentVulns, refetch }) => {
                   <Icon as={FaBug} h={'64px'} w={'64px'} color='blue.300' />
                   <Flex direction={'column'} gap={0.5}>
                     {/* PRODUCT TITLE */}
-                    <Text fontWeight={'semibold'} fontSize={18}>
-                      {data?.vulnId}
-                    </Text>
+                    <Link
+                      to={linkURl(data?.source, data?.vulnId)}
+                      target={'_blank'}
+                    >
+                      <Text
+                        fontWeight={'semibold'}
+                        fontSize={18}
+                        _hover={{ color: 'blue.500' }}
+                      >
+                        {data?.vulnId}
+                      </Text>
+                    </Link>
 
                     <Text fontSize={'sm'} my={0.5}>
                       {data?.desc || ''}

@@ -12,10 +12,16 @@ import {
   Select,
   IconButton,
   Divider,
-  Badge
+  Badge,
+  Icon
 } from '@chakra-ui/react'
 import { sevColor, timeSince, getFullDateAndTime, customStyles } from 'utils'
-import { ChevronDownIcon, ChevronUpIcon, RepeatIcon } from '@chakra-ui/icons'
+import {
+  ChevronDownIcon,
+  ChevronUpIcon,
+  ExternalLinkIcon,
+  RepeatIcon
+} from '@chakra-ui/icons'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import DataTable from 'react-data-table-component'
 import CustomLoader from 'components/CustomLoader'
@@ -55,6 +61,14 @@ const GlobalVulnTable = ({ data, refetch }) => {
     }
   }
 
+  const linkURl = (type, id) => {
+    if (type === 'osv') {
+      return `https://osv.dev/vulnerability/${id}`
+    } else {
+      return `https://nvd.nist.gov/vuln/detail/${id}`
+    }
+  }
+
   // COLUMNS
   const columns = [
     // CVE ID
@@ -63,21 +77,31 @@ const GlobalVulnTable = ({ data, refetch }) => {
       name: 'ID',
       wrap: true,
       selector: (row) => {
-        const { vulnId, id, vulnInfo } = row
+        const { vulnId, id, vulnInfo, source } = row
         return (
           <Stack spacing={1} my={2}>
-            <Link
-              to={
-                params?.name
-                  ? `/vendor/products/${product?.name}?id=${product?.id}&vulnId=${id}`
-                  : `/vendor/vulnerabilities?vulnId=${id}`
-              }
-              onClick={() => localStorage.setItem('activeVuln', vulnId)}
-            >
-              <Text fontSize='sm' color={'blue.500'}>
-                {vulnId || ''}
-              </Text>
-            </Link>
+            <Flex direction='row' alignItems={'flex-start'} gap={2} my={3}>
+              <Link to={linkURl(source, vulnId)} target={'_blank'}>
+                <Icon
+                  as={ExternalLinkIcon}
+                  h={'16px'}
+                  w={'16px'}
+                  color={'blue.500'}
+                />
+              </Link>
+              <Link
+                to={
+                  params?.name
+                    ? `/vendor/products/${product?.name}?id=${product?.id}&vulnId=${id}`
+                    : `/vendor/vulnerabilities?vulnId=${id}`
+                }
+                onClick={() => sessionStorage.setItem('activeVuln', vulnId)}
+              >
+                <Text fontSize='sm' color={'blue.500'}>
+                  {vulnId || ''}
+                </Text>
+              </Link>
+            </Flex>
             {vulnInfo?.kev === true && (
               <Badge width={'fit-content'} variant='subtle' colorScheme='red'>
                 KEV
