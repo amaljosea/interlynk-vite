@@ -81,7 +81,7 @@ const OrgRegister = () => {
     }).then((res) => {
       if (res.data) {
         const orgId = res.data.organizationCreate.organization.id
-        sessionStorage.setItem(
+        localStorage.setItem(
           'organization',
           res.data.organizationCreate.organization.name
         )

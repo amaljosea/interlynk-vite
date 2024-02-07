@@ -31,9 +31,9 @@ const ProductsOverview = ({ title, data }) => {
       name: name,
       sbomId: id
     }
-    sessionStorage.setItem('activeEnv', projectGroup?.defaultProject?.id)
-    sessionStorage.setItem('product', JSON.stringify(product))
-    sessionStorage.setItem('activeProdTab', 0)
+    localStorage.setItem('activeEnv', projectGroup?.defaultProject?.id)
+    localStorage.setItem('product', JSON.stringify(product))
+    localStorage.setItem('activeProdTab', 0)
     prodDispatch({
       type: 'SET_CURRENT_PRODUCT',
       payload: {
@@ -61,16 +61,16 @@ const ProductsOverview = ({ title, data }) => {
       name: name,
       sbomId: id
     }
-    sessionStorage.setItem('activeEnv', projectGroup?.defaultProject?.id)
-    sessionStorage.setItem('product', JSON.stringify(product))
-    sessionStorage.setItem(
+    localStorage.setItem('activeEnv', projectGroup?.defaultProject?.id)
+    localStorage.setItem('product', JSON.stringify(product))
+    localStorage.setItem(
       'currentSBOM',
       JSON.stringify({
         version: normalizeSBOMVersion(item),
         id: item?.id
       })
     )
-    sessionStorage.setItem('activeSbomTab', 0)
+    localStorage.setItem('activeSbomTab', 0)
     setActiveSbomTab(0)
   }
 
@@ -84,16 +84,16 @@ const ProductsOverview = ({ title, data }) => {
       name: name,
       sbomId: id
     }
-    sessionStorage.setItem('product', JSON.stringify(product))
-    sessionStorage.setItem('activeEnv', projectGroup?.defaultProject?.id)
-    sessionStorage.setItem(
+    localStorage.setItem('product', JSON.stringify(product))
+    localStorage.setItem('activeEnv', projectGroup?.defaultProject?.id)
+    localStorage.setItem(
       'currentSBOM',
       JSON.stringify({
         version: normalizeSBOMVersion(item),
         id: item.id
       })
     )
-    sessionStorage.setItem('activeSbomTab', 2)
+    localStorage.setItem('activeSbomTab', 2)
   }
 
   const onFilterSev = (project, id, version, value) => {
@@ -105,13 +105,13 @@ const ProductsOverview = ({ title, data }) => {
       name: name,
       sbomId: id
     }
-    sessionStorage.setItem('product', JSON.stringify(product))
-    sessionStorage.setItem('activeEnv', projectGroup?.defaultProject?.id)
-    sessionStorage.setItem(
+    localStorage.setItem('product', JSON.stringify(product))
+    localStorage.setItem('activeEnv', projectGroup?.defaultProject?.id)
+    localStorage.setItem(
       'currentSBOM',
       JSON.stringify({ version: version, id: id })
     )
-    sessionStorage.setItem('activeSbomTab', 3)
+    localStorage.setItem('activeSbomTab', 3)
     prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
   }
 

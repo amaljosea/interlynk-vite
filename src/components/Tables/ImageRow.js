@@ -136,7 +136,7 @@ const ImageRow = ({
               textDecoration: 'underline'
             }}
             onClick={() => {
-              window.sessionStorage.setItem('Image', item.name)
+              window.localStorage.setItem('Image', item.name)
               setScanEnabled(item.scanEnabled ? true : false)
             }}
           >

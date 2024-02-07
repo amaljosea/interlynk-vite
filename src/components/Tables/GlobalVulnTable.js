@@ -35,8 +35,8 @@ const GlobalVulnTable = ({ data, refetch }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const groupId = queryParams.get('id')
-  const product = JSON.parse(sessionStorage.getItem('product'))
-  const activeEnv = sessionStorage.getItem('activeEnv')
+  const product = JSON.parse(localStorage.getItem('product'))
+  const activeEnv = localStorage.getItem('activeEnv')
 
   const { totalRows, setTotalRows, globalVulnState, dispatch } =
     useGlobalState()

@@ -25,7 +25,7 @@ function ProductList() {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const product = queryParams.get('id')
-  const org = sessionStorage.getItem('organization')
+  const org = localStorage.getItem('organization')
 
   const {
     data: groups,
