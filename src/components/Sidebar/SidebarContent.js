@@ -21,7 +21,7 @@ import { Link, useLocation } from 'react-router-dom'
 
 const SidebarContent = ({ logoText, routes }) => {
   const { minimize } = useGlobalState()
-  const org = sessionStorage.getItem('organization')
+  const org = localStorage.getItem('organization')
   let location = useLocation()
   const urlParts = location.pathname.split('/')
   const category = urlParts[2]

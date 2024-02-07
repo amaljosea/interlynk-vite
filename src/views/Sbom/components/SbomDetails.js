@@ -53,10 +53,10 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
   const sbomId = queryParams.get('sbom')
   const parts = queryParams.get('parts')
 
-  const currentProduct = JSON.parse(sessionStorage.getItem(`product`))
-  const id = sessionStorage.getItem('activeEnv')
+  const currentProduct = JSON.parse(localStorage.getItem(`product`))
+  const id = localStorage.getItem('activeEnv')
   const { name } = currentProduct ? currentProduct : {}
-  const currentSBOM = JSON.parse(sessionStorage.getItem(`currentSBOM`))
+  const currentSBOM = JSON.parse(localStorage.getItem(`currentSBOM`))
 
   const onSelectComp = () => {
     const { field, direction } = prodCompState
@@ -109,7 +109,7 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
             >
               <HStack
                 onClick={() => {
-                  sessionStorage.setItem('activeSbomTab', 1)
+                  localStorage.setItem('activeSbomTab', 1)
                   setActiveSbomTab(1)
                 }}
               >

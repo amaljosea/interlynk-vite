@@ -69,7 +69,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
   const [isPURLInputValid, setPURLInputValid] = useState(true)
   const [isValid, setIsValid] = useState(true)
 
-  const activeEnv = sessionStorage.getItem('activeEnv')
+  const activeEnv = localStorage.getItem('activeEnv')
 
   const [getCpe] = useLazyQuery(CpeAutoComplete)
   const [createSbom] = useMutation(sbomCreate, {

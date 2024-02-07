@@ -121,7 +121,7 @@ const ProductTable = ({ data, refetch }) => {
   const [activeRow, setActiveRow] = useState(null)
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const activeEnv = sessionStorage.getItem('activeEnv')
+  const activeEnv = localStorage.getItem('activeEnv')
 
   const {
     isOpen: isOpenProduct,
@@ -371,9 +371,9 @@ const ProductTable = ({ data, refetch }) => {
           }
 
           const handleClick = () => {
-            sessionStorage.setItem('product', JSON.stringify(product))
-            sessionStorage.setItem('activeEnv', defaultProject?.id)
-            sessionStorage.setItem('activeProdTab', 0)
+            localStorage.setItem('product', JSON.stringify(product))
+            localStorage.setItem('activeEnv', defaultProject?.id)
+            localStorage.setItem('activeProdTab', 0)
             prodDispatch({
               type: 'SET_CURRENT_PRODUCT',
               payload: {
@@ -496,7 +496,7 @@ const ProductTable = ({ data, refetch }) => {
                   {/* UPLOAD SBOM */}
                   <MenuItem
                     onClick={() => {
-                      sessionStorage.setItem('activeEnv', defaultProject?.id)
+                      localStorage.setItem('activeEnv', defaultProject?.id)
                       setActiveRow(row)
                       onOpenUpload()
                     }}

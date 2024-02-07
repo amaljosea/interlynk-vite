@@ -120,11 +120,11 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
       direction: direction
     }).then((res) => {
       if (res.data) {
-        sessionStorage.setItem(
+        localStorage.setItem(
           'currentSBOM',
           JSON.stringify({ version: version, id: id })
         )
-        sessionStorage.setItem('activeSbomTab', 3)
+        localStorage.setItem('activeSbomTab', 3)
         prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
       }
     })
@@ -141,14 +141,14 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
           <Link
             to={`/vendor/products/${data?.name}?id=${productId}&sbom=${id}`}
             onClick={() => {
-              sessionStorage.setItem(
+              localStorage.setItem(
                 'currentSBOM',
                 JSON.stringify({
                   version: normalizeSBOMVersion(row),
                   id: id
                 })
               )
-              sessionStorage.setItem('activeSbomTab', 0)
+              localStorage.setItem('activeSbomTab', 0)
               prodCompDispatch({ type: 'CLEAR_PROD_COMP' })
               setActiveSbomTab(0)
             }}
@@ -177,14 +177,14 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
               width={16}
               colorScheme={'blue'}
               onClick={() => {
-                sessionStorage.setItem(
+                localStorage.setItem(
                   'currentSBOM',
                   JSON.stringify({
                     version: normalizeSBOMVersion(row),
                     id: id
                   })
                 )
-                sessionStorage.setItem('activeSbomTab', 2)
+                localStorage.setItem('activeSbomTab', 2)
               }}
             >
               <TagLabel mx={'auto'}>{stats?.compCount}</TagLabel>
@@ -445,7 +445,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
           {/* ROW LIMIT */}
           <RowLimit
             onChange={(e) => {
-              setTotalRows(e.target.value)
+              setTotalRows(parseInt(e.target.value))
               setCurrentPage(1)
             }}
             name='componentRow'
