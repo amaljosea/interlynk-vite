@@ -209,6 +209,12 @@ const ComponentTable = ({
     onToggle: onCompToggle
   } = useDisclosure()
 
+  const {
+    isOpen: isPurlOpen,
+    onOpen: onPurlOpen,
+    onClose: onPurlClose
+  } = useDisclosure()
+
   const onLicenseOpen = (row) => {
     setActiveRow(row)
     console.log('row', row)
@@ -401,12 +407,15 @@ const ComponentTable = ({
         return (
           <>
             {purl !== null && purl !== '' ? (
-              <Popover>
-                <PopoverTrigger>
-                  <Text>{purl}</Text>
-                </PopoverTrigger>
-                <PurlCard value={purl} />
-              </Popover>
+              <Text
+                my={3}
+                onClick={() => {
+                  setActiveRow(row)
+                  onPurlOpen()
+                }}
+              >
+                {purl}
+              </Text>
             ) : (
               ''
             )}
@@ -1187,7 +1196,7 @@ const ComponentTable = ({
 
   return (
     <>
-      <Flex flexDir={'column'} width={'100%'}>
+      <Flex flexDir={'column'} width={'100%'} height={'auto'}>
         <DataTable
           columns={columns}
           data={data && data.nodes}
@@ -1299,6 +1308,14 @@ const ComponentTable = ({
           shortDesc={null}
           checkId={null}
           data={null}
+        />
+      )}
+
+      {isPurlOpen && (
+        <PurlCard
+          value={activeRow?.purl}
+          isOpen={isPurlOpen}
+          onClose={onPurlClose}
         />
       )}
     </>

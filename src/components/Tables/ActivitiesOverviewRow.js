@@ -139,7 +139,9 @@ function ActivitiesOverviewRow(props) {
     changedBy,
     event,
     orig,
-    updated
+    updated,
+    setActiveRow,
+    onOpen
   } = props
   const textColor = useColorModeValue('gray.600', 'white.300')
 
@@ -166,32 +168,31 @@ function ActivitiesOverviewRow(props) {
         ></Box>
       </Flex>
       {event === 'purl' ? (
-        <Popover>
-          <PopoverTrigger>
-            <Stack
-              direction={'column'}
-              spacing={0}
-              cursor={'pointer'}
-              wordBreak={'break-all'}
-            >
-              <Text fontSize='sm' color={textColor} fontWeight='normal'>
-                {event} by {changedBy}
-              </Text>
-              <Text
-                fontSize='sm'
-                color={textColor}
-                fontWeight='normal'
-                width={'99%'}
-              >
-                {valueToText(action, event, orig, updated)}
-              </Text>
-              <Text fontSize='xs' color='gray.400' fontWeight='normal'>
-                {getFullDateAndTime(date)}
-              </Text>
-            </Stack>
-          </PopoverTrigger>
-          <PurlCard value={updated} />
-        </Popover>
+        <Stack
+          direction={'column'}
+          spacing={0}
+          cursor={'pointer'}
+          wordBreak={'break-all'}
+          onClick={() => {
+            setActiveRow(updated)
+            onOpen()
+          }}
+        >
+          <Text fontSize='sm' color={textColor} fontWeight='normal'>
+            {event} by {changedBy}
+          </Text>
+          <Text
+            fontSize='sm'
+            color={textColor}
+            fontWeight='normal'
+            width={'99%'}
+          >
+            {valueToText(action, event, orig, updated)}
+          </Text>
+          <Text fontSize='xs' color='gray.400' fontWeight='normal'>
+            {getFullDateAndTime(date)}
+          </Text>
+        </Stack>
       ) : (
         <Flex
           direction='column'
