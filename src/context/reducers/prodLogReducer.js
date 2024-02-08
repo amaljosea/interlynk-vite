@@ -1,6 +1,16 @@
 const prodLogReducer = (state, action) => {
   const { type, payload } = action
   switch (type) {
+    case 'CLEAR_STATE':
+      return {
+        field: 'ACTIVITY_LOGS_CREATED_AT',
+        direction: 'DESC',
+        searchInput: '',
+        type: [],
+        user: [],
+        object: [],
+        pageIndex: 1
+      }
     case 'FETCH_DATA_SUCCESS':
       return {
         ...state,
