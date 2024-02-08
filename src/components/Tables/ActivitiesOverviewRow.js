@@ -169,7 +169,12 @@ function ActivitiesOverviewRow(props) {
         <Popover>
           <PopoverTrigger>
             <Stack direction={'column'} spacing={0} cursor={'pointer'}>
-              <Text fontSize='sm' color={textColor} fontWeight='normal'>
+              <Text
+                fontSize='sm'
+                color={textColor}
+                fontWeight='normal'
+                wordBreak={'break-all'}
+              >
                 {event} by {changedBy}
               </Text>
               <Text
@@ -177,10 +182,16 @@ function ActivitiesOverviewRow(props) {
                 color={textColor}
                 fontWeight='normal'
                 width={'99%'}
+                wordBreak={'break-all'}
               >
                 {valueToText(action, event, orig, updated)}
               </Text>
-              <Text fontSize='xs' color='gray.400' fontWeight='normal'>
+              <Text
+                fontSize='xs'
+                color='gray.400'
+                fontWeight='normal'
+                wordBreak={'break-all'}
+              >
                 {getFullDateAndTime(date)}
               </Text>
             </Stack>
@@ -189,7 +200,12 @@ function ActivitiesOverviewRow(props) {
         </Popover>
       ) : (
         <Flex direction='column' justifyContent='flex-start' w={'99%'} h='100%'>
-          <Text fontSize='sm' color={textColor} fontWeight='normal'>
+          <Text
+            fontSize='sm'
+            color={textColor}
+            fontWeight='normal'
+            wordBreak={'break-all'}
+          >
             {event} by {changedBy}
           </Text>
           <Text
@@ -197,10 +213,16 @@ function ActivitiesOverviewRow(props) {
             color={textColor}
             fontWeight='normal'
             width={'99%'}
+            wordBreak={'break-all'}
           >
             {valueToText(action, event, orig, updated)}
           </Text>
-          <Text fontSize='xs' color='gray.400' fontWeight='normal'>
+          <Text
+            fontSize='xs'
+            color='gray.400'
+            fontWeight='normal'
+            wordBreak={'break-all'}
+          >
             {getFullDateAndTime(date)}
           </Text>
         </Flex>
