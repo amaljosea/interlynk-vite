@@ -140,6 +140,7 @@ export const GetOrgMetrics = gql`
         creationAt
         updatedAt
         projectId
+        projectVersion
         project {
           name
           sboms {
@@ -464,7 +465,7 @@ export const GetGlobalVulns = gql`
         severity: $severity
         kev: $kev
         epss: $epss
-        orderBy: {field: $field, direction: $direction}
+        orderBy: { field: $field, direction: $direction }
       ) {
         totalCount
         pageInfo {

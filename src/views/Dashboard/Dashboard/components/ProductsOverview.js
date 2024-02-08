@@ -75,10 +75,10 @@ const ProductsOverview = ({ title, data }) => {
   }
 
   const onFilterComp = (item) => {
-    const { project, id } = item
+    const { project, id, projectVersion } = item
     const { projectGroup, name } = project
     const product = {
-      version: normalizeSBOMVersion(item),
+      version: projectVersion,
       groupId: projectGroup?.id,
       id: projectGroup?.id,
       name: name,
@@ -89,7 +89,7 @@ const ProductsOverview = ({ title, data }) => {
     localStorage.setItem(
       'currentSBOM',
       JSON.stringify({
-        version: normalizeSBOMVersion(item),
+        version: projectVersion,
         id: item.id
       })
     )
@@ -163,7 +163,8 @@ const ProductsOverview = ({ title, data }) => {
       wrap: true,
       width: '150px',
       selector: (row) => {
-        const { id, project, projectId } = row
+        const { id, project, projectId, projectVersion } = row
+        console.log('row', row)
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
         return (
           <Link
@@ -172,7 +173,7 @@ const ProductsOverview = ({ title, data }) => {
             onClick={() => onVersionClick(row)}
           >
             <Text my={2} color={uniqueSbom ? 'blue.500' : 'gray.500'}>
-              {normalizeSBOMVersion(row)}
+              {projectVersion}
             </Text>
           </Link>
         )
@@ -228,7 +229,7 @@ const ProductsOverview = ({ title, data }) => {
       wrap: true,
       width: '300px',
       selector: (row) => {
-        const { id, project, projectId, stats } = row
+        const { id, project, projectId, stats, projectVersion } = row
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
         const link = `/vendor/products/${project?.projectGroup?.name}?id=${projectId}&sbom=${id}`
         return (
@@ -238,9 +239,7 @@ const ProductsOverview = ({ title, data }) => {
               style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
               onClick={() =>
                 uniqueSbom
-                  ? onFilterSev(project, id, normalizeSBOMVersion(row), [
-                      'critical'
-                    ])
+                  ? onFilterSev(project, id, projectVersion, ['critical'])
                   : null
               }
             >
@@ -253,9 +252,7 @@ const ProductsOverview = ({ title, data }) => {
               style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
               onClick={() =>
                 uniqueSbom
-                  ? onFilterSev(project, id, normalizeSBOMVersion(row), [
-                      'high'
-                    ])
+                  ? onFilterSev(project, id, projectVersion, ['high'])
                   : null
               }
             >
@@ -268,9 +265,7 @@ const ProductsOverview = ({ title, data }) => {
               style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
               onClick={() =>
                 uniqueSbom
-                  ? onFilterSev(project, id, normalizeSBOMVersion(row), [
-                      'medium'
-                    ])
+                  ? onFilterSev(project, id, projectVersion, ['medium'])
                   : null
               }
             >
@@ -283,7 +278,7 @@ const ProductsOverview = ({ title, data }) => {
               style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
               onClick={() =>
                 uniqueSbom
-                  ? onFilterSev(project, id, normalizeSBOMVersion(row), ['low'])
+                  ? onFilterSev(project, id, projectVersion, ['low'])
                   : null
               }
             >

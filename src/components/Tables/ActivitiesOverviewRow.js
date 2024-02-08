@@ -141,9 +141,22 @@ function ActivitiesOverviewRow(props) {
     orig,
     updated,
     setActiveRow,
-    onOpen
+    onOpen,
+    onCpeOpen
   } = props
   const textColor = useColorModeValue('gray.600', 'white.300')
+
+  const handleClick = (event) => {
+    if (event === 'purl') {
+      setActiveRow(updated)
+      onOpen()
+    } else if (event === 'cpes') {
+      setActiveRow(updated)
+      onCpeOpen()
+    } else {
+      return null
+    }
+  }
 
   return (
     <Flex alignItems='center' minH='78px' justifyContent='start' mb='5px'>
@@ -167,56 +180,23 @@ function ActivitiesOverviewRow(props) {
           h={index === arrLength - 1 ? '15px' : '100%'}
         ></Box>
       </Flex>
-      {event === 'purl' ? (
-        <Stack
-          direction={'column'}
-          spacing={0}
-          cursor={'pointer'}
-          wordBreak={'break-all'}
-          onClick={() => {
-            setActiveRow(updated)
-            onOpen()
-          }}
-        >
-          <Text fontSize='sm' color={textColor} fontWeight='normal'>
-            {event} by {changedBy}
-          </Text>
-          <Text
-            fontSize='sm'
-            color={textColor}
-            fontWeight='normal'
-            width={'99%'}
-          >
-            {valueToText(action, event, orig, updated)}
-          </Text>
-          <Text fontSize='xs' color='gray.400' fontWeight='normal'>
-            {getFullDateAndTime(date)}
-          </Text>
-        </Stack>
-      ) : (
-        <Flex
-          direction='column'
-          wordBreak={'break-all'}
-          justifyContent='flex-start'
-          w={'99%'}
-          h='100%'
-        >
-          <Text fontSize='sm' color={textColor} fontWeight='normal'>
-            {event} by {changedBy}
-          </Text>
-          <Text
-            fontSize='sm'
-            color={textColor}
-            fontWeight='normal'
-            width={'99%'}
-          >
-            {valueToText(action, event, orig, updated)}
-          </Text>
-          <Text fontSize='xs' color='gray.400' fontWeight='normal'>
-            {getFullDateAndTime(date)}
-          </Text>
-        </Flex>
-      )}
+      <Stack
+        direction={'column'}
+        spacing={0}
+        cursor={'pointer'}
+        wordBreak={'break-all'}
+        onClick={() => handleClick(event)}
+      >
+        <Text fontSize='sm' color={textColor} fontWeight='normal'>
+          {event} by {changedBy}
+        </Text>
+        <Text fontSize='sm' color={textColor} fontWeight='normal' width={'99%'}>
+          {valueToText(action, event, orig, updated)}
+        </Text>
+        <Text fontSize='xs' color='gray.400' fontWeight='normal'>
+          {getFullDateAndTime(date)}
+        </Text>
+      </Stack>
     </Flex>
   )
 }
