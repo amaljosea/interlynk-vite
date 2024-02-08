@@ -6,7 +6,8 @@ import {
   Box,
   TagLabel,
   Tooltip,
-  IconButton
+  IconButton,
+  useDisclosure
 } from '@chakra-ui/react'
 import React, { useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
@@ -18,6 +19,7 @@ import LogFilterMenu from 'views/Sbom/components/LogFilterMenu'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import { useGlobalState } from 'hooks/useGlobalState'
 import Pagination from '../Pagination'
+import PurlCard from 'components/Misc/PurlCard'
 
 const setColor = (type) => {
   switch (type) {
@@ -44,6 +46,9 @@ const SbomChangelogTable = ({ data, refetch }) => {
 
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
+  const [activeRow, setActiveRow] = useState('')
+
+  const { isOpen, onOpen, onClose } = useDisclosure()
 
   useEffect(() => {
     if (data) {
@@ -138,6 +143,21 @@ const SbomChangelogTable = ({ data, refetch }) => {
 
         const urls = event === 'external_urls' && JSON.parse(orig)
 
+        if (event === 'purl') {
+          return (
+            <Text
+              my={3}
+              cursor={'pointer'}
+              onClick={() => {
+                setActiveRow(orig)
+                onOpen()
+              }}
+            >
+              {orig}
+            </Text>
+          )
+        }
+
         return (
           <Flex flexWrap={'wrap'} gap={2} my={2} whiteSpace={'break-spaces'}>
             <Tooltip
@@ -213,6 +233,21 @@ const SbomChangelogTable = ({ data, refetch }) => {
         const updatedValue =
           (event === 'licenses' || event === 'cpes') && JSON.parse(updated)
         const urls = event === 'external_urls' && JSON.parse(updated)
+
+        if (event === 'purl') {
+          return (
+            <Text
+              my={3}
+              cursor={'pointer'}
+              onClick={() => {
+                setActiveRow(updated)
+                onOpen()
+              }}
+            >
+              {updated}
+            </Text>
+          )
+        }
 
         return (
           <Flex flexWrap={'wrap'} gap={2} my={2}>
@@ -507,7 +542,7 @@ const SbomChangelogTable = ({ data, refetch }) => {
 
   return (
     <>
-      <Flex flexDir={'column'} width={'100%'}>
+      <Flex flexDir={'column'} width={'100%'} position={'relative'}>
         <DataTable
           columns={columns}
           data={data && data.nodes}
@@ -536,6 +571,14 @@ const SbomChangelogTable = ({ data, refetch }) => {
           onSetRow={handleSetRow}
           hasNextPage={isNextActive}
           hasPreviousPage={isPrevActive}
+        />
+      )}
+
+      {isOpen && (
+        <PurlCard
+          value={activeRow}
+          isOpen={isOpen}
+          onClose={onClose}
         />
       )}
     </>
