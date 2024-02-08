@@ -4,6 +4,7 @@ import { Flex, Text, useColorModeValue, useDisclosure } from '@chakra-ui/react'
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 import CardHeader from 'components/Card/CardHeader.js'
+import CpeCard from 'components/Misc/CpeCard'
 import PurlCard from 'components/Misc/PurlCard'
 import ActivitiesOverviewRow from 'components/Tables/ActivitiesOverviewRow'
 import React, { useState } from 'react'
@@ -13,6 +14,11 @@ const ActivitiesOverview = ({ title, amount, data }) => {
   const textColor = useColorModeValue('gray.700', 'white')
   const [activeRow, setActiveRow] = useState('')
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const {
+    isOpen: isCpeOpen,
+    onOpen: onCpeOpen,
+    onClose: onCpeClose
+  } = useDisclosure()
 
   return (
     <>
@@ -42,6 +48,7 @@ const ActivitiesOverview = ({ title, amount, data }) => {
                     arrLength={data?.length}
                     action={row.action}
                     onOpen={onOpen}
+                    onCpeOpen={onCpeOpen}
                     setActiveRow={setActiveRow}
                   />
                 )
@@ -50,7 +57,13 @@ const ActivitiesOverview = ({ title, amount, data }) => {
         </CardBody>
       </Card>
 
-      {isOpen && <PurlCard value={activeRow} isOpen={isOpen} onClose={onClose} />}
+      {isOpen && (
+        <PurlCard value={activeRow} isOpen={isOpen} onClose={onClose} />
+      )}
+
+      {isCpeOpen && (
+        <CpeCard value={activeRow} isOpen={isCpeOpen} onClose={onCpeClose} />
+      )}
     </>
   )
 }

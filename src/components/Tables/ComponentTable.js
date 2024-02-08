@@ -59,6 +59,7 @@ import { GetCompFilterData } from 'graphQL/Queries'
 import Pagination from '../Pagination'
 import { purlString } from 'utils'
 import PurlCard from 'components/Misc/PurlCard'
+import CpeCard from 'components/Misc/CpeCard'
 
 const ComponentTable = ({
   lifecycle,
@@ -213,6 +214,12 @@ const ComponentTable = ({
     isOpen: isPurlOpen,
     onOpen: onPurlOpen,
     onClose: onPurlClose
+  } = useDisclosure()
+
+  const {
+    isOpen: isCpeOpen,
+    onOpen: onCpeOpen,
+    onClose: onCpeClose
   } = useDisclosure()
 
   const onLicenseOpen = (row) => {
@@ -795,7 +802,16 @@ const ComponentTable = ({
             >
               {cpes?.length > 0 &&
                 cpes.map((item, index) => (
-                  <Text key={index} fontSize={14} wordBreak={'break-all'}>
+                  <Text
+                    key={index}
+                    fontSize={14}
+                    wordBreak={'break-all'}
+                    cursor={'pointer'}
+                    onClick={() => {
+                      setActiveRow(data)
+                      onCpeOpen()
+                    }}
+                  >
                     {item}
                   </Text>
                 ))}
@@ -1316,6 +1332,14 @@ const ComponentTable = ({
           value={activeRow?.purl}
           isOpen={isPurlOpen}
           onClose={onPurlClose}
+        />
+      )}
+
+      {isCpeOpen && (
+        <CpeCard
+          value={activeRow?.cpes[0]}
+          isOpen={isCpeOpen}
+          onClose={onCpeClose}
         />
       )}
     </>
