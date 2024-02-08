@@ -32,18 +32,24 @@ import Round from 'components/Misc/Round'
 
 const GlobalVulnTable = ({ data, refetch }) => {
   const params = useParams()
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const groupId = queryParams.get('id')
   const product = JSON.parse(localStorage.getItem('product'))
-  const activeEnv = localStorage.getItem('activeEnv')
 
   const { totalRows, setTotalRows, globalVulnState, dispatch } =
     useGlobalState()
-  const { pageIndex, field, direction } = globalVulnState
+  const {
+    pageIndex,
+    field,
+    direction,
+    searchInput,
+    severities,
+    products,
+    statues,
+    kev,
+    epss
+  } = globalVulnState
   const { globalVulnDispatch } = dispatch
 
-  const [filterText, setFilterText] = useState('')
+  const [filterText, setFilterText] = useState(searchInput)
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
 
@@ -67,6 +73,20 @@ const GlobalVulnTable = ({ data, refetch }) => {
     } else {
       return `https://nvd.nist.gov/vuln/detail/${id}`
     }
+  }
+
+  const epssRange = epss !== 'all' && epss !== '' && epss?.split('-')
+  const range = {
+    min: parseFloat(epssRange[0]) / 10000,
+    max: parseFloat(epssRange[1]) / 10000
+  }
+
+  const vulnData = {
+    projectGroupIds: products?.length === 0 ? undefined : products,
+    severity: severities?.length === 0 ? undefined : severities,
+    status: statues?.length === 0 ? undefined : statues,
+    kev: kev === 'yes' ? true : kev === 'false' ? false : undefined,
+    epss: epss === 'all' || epss === '' ? undefined : range
   }
 
   // COLUMNS
@@ -190,8 +210,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
       name: 'EPSS*',
       selector: (row) => {
         const { vulnInfo } = row
-        const { epssScores } = vulnInfo ? vulnInfo : ''
-
+        const { epssScores } = vulnInfo
         return (
           <Flex minWidth='max-content' alignItems='center' gap='0'>
             <Tag
@@ -232,7 +251,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
           </Flex>
         )
       },
-      width: '9%',
+      width: '150px',
       wrap: true
     },
     // STATUSES
@@ -306,11 +325,13 @@ const GlobalVulnTable = ({ data, refetch }) => {
     const { value } = event.target
     if (event.key === 'Enter' && filterText !== '') {
       refetch({
-        search: value,
-        first: totalRows,
-        last: undefined,
-        after: undefined,
-        before: undefined
+        variables: {
+          field,
+          direction,
+          search: value,
+          first: totalRows,
+          ...vulnData
+        }
       }).then(
         (res) =>
           res?.data &&
@@ -323,11 +344,13 @@ const GlobalVulnTable = ({ data, refetch }) => {
   const handleClear = async () => {
     setFilterText('')
     await refetch({
-      search: undefined,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      before: undefined
+      variables: {
+        field,
+        direction,
+        search: undefined,
+        first: totalRows,
+        ...vulnData
+      }
     }).then(
       (res) => res?.data && globalVulnDispatch({ type: 'CLEAR_SEARCH_INPUT' })
     )
@@ -384,10 +407,14 @@ const GlobalVulnTable = ({ data, refetch }) => {
   const handlePreviousPage = async () => {
     setIsPrevActive(false)
     await refetch({
-      first: undefined,
-      last: totalRows,
-      after: undefined,
-      before: data?.pageInfo?.startCursor
+      variables: {
+        field,
+        direction,
+        last: totalRows,
+        before: data?.pageInfo?.startCursor,
+        search: searchInput !== '' ? searchInput : undefined,
+        ...vulnData
+      }
     }).then((res) => {
       if (res.data) {
         const project = res?.data?.organization?.vulns
@@ -404,10 +431,14 @@ const GlobalVulnTable = ({ data, refetch }) => {
   const handleNextPage = async () => {
     setIsNextActive(false)
     await refetch({
-      first: totalRows,
-      last: undefined,
-      after: data?.pageInfo?.endCursor,
-      before: undefined
+      variables: {
+        field,
+        direction,
+        first: totalRows,
+        after: data?.pageInfo?.endCursor,
+        search: searchInput !== '' ? searchInput : undefined,
+        ...vulnData
+      }
     }).then((res) => {
       if (res.data) {
         const project = res?.data?.organization?.vulns
@@ -428,10 +459,13 @@ const GlobalVulnTable = ({ data, refetch }) => {
     const { value } = e.target
     setTotalRows(Number(value))
     await refetch({
-      first: Number(value),
-      last: undefined,
-      after: undefined,
-      before: undefined
+      variables: {
+        field,
+        direction,
+        first: Number(value),
+        search: searchInput !== '' ? searchInput : undefined,
+        ...vulnData
+      }
     }).then((res) => {
       if (res.data) {
         globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
@@ -444,7 +478,9 @@ const GlobalVulnTable = ({ data, refetch }) => {
     await refetch({
       first: totalRows,
       field: column.id,
-      direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+      direction: sortDirection === 'asc' ? 'ASC' : 'DESC',
+      search: searchInput !== '' ? searchInput : undefined,
+      ...vulnData
     }).then((res) => {
       if (res.data) {
         globalVulnDispatch({
