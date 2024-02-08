@@ -431,7 +431,6 @@ const SbomChangelogTable = ({ data, refetch }) => {
   // SEARCH COMPONENT
   const handleSearch = async (event) => {
     disablePaginationControl()
-
     const { value } = event.target
     if (event.key === 'Enter' && logSearch !== '') {
       await refetch({
@@ -445,7 +444,6 @@ const SbomChangelogTable = ({ data, refetch }) => {
       }).then((res) => {
         if (res.data) {
           setPaginationControl(res.data)
-
           sbomLogDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
         }
       })

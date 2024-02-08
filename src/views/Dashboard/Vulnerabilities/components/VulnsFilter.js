@@ -10,7 +10,7 @@ import {
   MenuDivider,
   MenuOptionGroup,
   Stack,
-  useDisclosure,
+  useDisclosure
 } from '@chakra-ui/react'
 import { useLocation, useParams } from 'react-router-dom'
 import CheckMark from 'components/Misc/CheckMark'
@@ -22,12 +22,19 @@ import { useRef } from 'react'
 const VulnsFilters = ({ refetch }) => {
   const params = useParams()
   const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const activeEnv = localStorage.getItem('activeEnv')
 
   const { totalRows, globalVulnState, prodState, dispatch } = useGlobalState()
-  const { severities, products, statues, kev, epss, minEpss, maxEpss } =
-    globalVulnState
+  const {
+    field,
+    direction,
+    severities,
+    products,
+    statues,
+    kev,
+    epss,
+    minEpss,
+    maxEpss
+  } = globalVulnState
   const { globalVulnDispatch } = dispatch
 
   const { data } = useQuery(GetProjectGroups, {
@@ -44,7 +51,6 @@ const VulnsFilters = ({ refetch }) => {
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-
   const onMinKeyDown = (e) => {
     if (e.key === 'ArrowRight') {
       e.preventDefault()
@@ -59,81 +65,110 @@ const VulnsFilters = ({ refetch }) => {
     }
   }
 
-  const vulnData = { first: totalRows, last: undefined, after: undefined, before: undefined }
+  const vulnData = { first: totalRows, field, direction }
 
-  const onFilterProduct = async (value) => {
-    await refetch({projectGroupIds: value?.includes('all') ? undefined : value, ...vulnData })
-    .then((res) => res?.data && globalVulnDispatch({ type: 'FILTER_PRODUCT', payload: value }))
-  }
-
-  const onFilterSeverity = async (value) => {
-    await refetch({severity: value?.includes('all') ? undefined: value, ...vulnData })
-    .then((res) => res?.data && globalVulnDispatch({ type: 'FILTER_SEVERITY', payload: value }))
-  }
-
-  const onFilterStatus = async (value) => {
-    await refetch({status: value.includes('all') ? undefined: value, ...vulnData })
-    .then((res) => res?.data && globalVulnDispatch({ type: 'FILTER_STATUS', payload: value }))
-  }
-
-  const onFilterKev = async (value) => {
-    await refetch({kev: value === 'yes' ? true : value === 'false' ? false : undefined, ...vulnData })
-    .then((res) => res?.data && globalVulnDispatch({ type: 'FILTER_KEV', payload: value }))
-  }
-
-  const onFilterEpss = async (value) => {
-    const epssRange = value !== 'all' && value !== '' && value.split('-')
+  const handleRefetch = async (groupIds, severities, statuses, kev, epss) => {
+    const epssRange = epss !== 'all' && epss !== '' && epss.split('-')
     const range = {
       min: parseFloat(epssRange[0]) / 10000,
       max: parseFloat(epssRange[1]) / 10000
     }
-    await refetch({epss: value === 'all' || value === '' ? undefined : range, ...vulnData })
-    .then((res) => res?.data && globalVulnDispatch({ type: 'FILTER_EPSS', payload: value }))
+    await refetch({
+      variables: {
+        first: totalRows,
+        projectGroupIds:
+          groupIds?.includes('all') || groupIds?.length === 0
+            ? undefined
+            : groupIds,
+        severity:
+          severities?.includes('all') || severities?.length === 0
+            ? undefined
+            : severities,
+        status:
+          statuses.includes('all') || statuses?.length === 0
+            ? undefined
+            : statuses,
+        kev: kev === 'yes' ? true : kev === 'false' ? false : undefined,
+        epss: epss === 'all' || epss === '' ? undefined : range,
+        field,
+        direction
+      }
+    })
+  }
+
+  const onFilterProduct = async (value) => {
+    handleRefetch(value, severities, statues, kev, epss)
+    globalVulnDispatch({ type: 'FILTER_PRODUCT', payload: value })
+  }
+
+  const onFilterSeverity = async (value) => {
+    handleRefetch(products, value, statues, kev, epss)
+    globalVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
+  }
+
+  const onFilterStatus = async (value) => {
+    handleRefetch(products, severities, value, kev, epss)
+    globalVulnDispatch({ type: 'FILTER_STATUS', payload: value })
+  }
+
+  const onFilterKev = async (value) => {
+    handleRefetch(products, severities, statues, value, epss)
+    globalVulnDispatch({ type: 'FILTER_KEV', payload: value })
+  }
+
+  const onFilterEpss = async (value) => {
+    handleRefetch(products, severities, statues, kev, value)
+    globalVulnDispatch({ type: 'FILTER_EPSS', payload: value })
   }
 
   const handleSubmit = async () => {
-    const range = {
-      min: parseFloat(minEpss) / 10000,
-      max: parseFloat(maxEpss) / 10000
-    }
-    await refetch({epss: range, ...vulnData })
-    .then((res) => res?.data && globalVulnDispatch({ type: 'SET_EPSS', payload: `${minEpss}-${maxEpss}` }))
-    .finally(() => onClose())
+    handleRefetch(products, severities, statues, kev, `${minEpss}-${maxEpss}`)
+    globalVulnDispatch({
+      type: 'SET_EPSS',
+      payload: `${minEpss}-${maxEpss}`
+    })
+    onClose()
   }
 
   return (
     <Stack direction={'row'} alignItems={'center'} gap={1}>
       {/* PRODUCTS */}
       {data && (
-      <Box width={'fit-content'} position={'relative'} display={params?.name ? 'none' : 'block'}>
-        <Menu closeOnSelect={true}>
-          {products?.length !== 0 && !products.includes('all') && (
-            <CheckMark />
-          )}
-          <FilterButton>Product</FilterButton>
-          <MenuList>
-            <MenuOptionGroup
-              type='checkbox'
-              value={products}
-              onChange={onFilterProduct}
-            >
-              <MenuItemOption value={'all'} fontSize={'sm'}>All</MenuItemOption>
-              {data?.organization?.projectGroups?.nodes?.map(
-                (item, index) => (
-                  <MenuItemOption
-                    key={index}
-                    value={item.id}
-                    fontSize={'sm'}
-                    textTransform={'capitalize'}
-                  >
-                    {item.name}
-                  </MenuItemOption>
-                )
-              )}
-            </MenuOptionGroup>
-          </MenuList>
-        </Menu>
-      </Box>
+        <Box
+          width={'fit-content'}
+          position={'relative'}
+          display={params?.name ? 'none' : 'block'}
+        >
+          <Menu closeOnSelect={true}>
+            {products?.length !== 0 && !products.includes('all') && (
+              <CheckMark />
+            )}
+            <FilterButton>Product</FilterButton>
+            <MenuList>
+              <MenuOptionGroup
+                type='checkbox'
+                value={products}
+                onChange={onFilterProduct}
+              >
+                <MenuItemOption value={'all'} fontSize={'sm'}>
+                  All
+                </MenuItemOption>
+                {data?.organization?.projectGroups?.nodes?.map(
+                  (item, index) => (
+                    <MenuItemOption
+                      key={index}
+                      value={item.id}
+                      fontSize={'sm'}
+                      textTransform={'capitalize'}
+                    >
+                      {item.name}
+                    </MenuItemOption>
+                  )
+                )}
+              </MenuOptionGroup>
+            </MenuList>
+          </Menu>
+        </Box>
       )}
       {/* SEVERITY */}
       <Box width={'fit-content'} position={'relative'}>
@@ -202,11 +237,7 @@ const VulnsFilters = ({ refetch }) => {
           {kev !== 'all' && kev !== '' && <CheckMark />}
           <FilterButton>KEV</FilterButton>
           <MenuList>
-            <MenuOptionGroup
-              type='radio'
-              value={kev}
-              onChange={onFilterKev}
-            >
+            <MenuOptionGroup type='radio' value={kev} onChange={onFilterKev}>
               {['all', 'yes', 'no'].map((item, index) => (
                 <MenuItemOption
                   key={index}
@@ -227,11 +258,7 @@ const VulnsFilters = ({ refetch }) => {
           {epss !== '' && epss !== 'all' && <CheckMark />}
           <FilterButton onClick={onOpen}>EPSS</FilterButton>
           <MenuList>
-            <MenuOptionGroup
-              type='radio'
-              value={epss}
-              onChange={onFilterEpss}
-            >
+            <MenuOptionGroup type='radio' value={epss} onChange={onFilterEpss}>
               {['all', '0-100', '100-500', '500-1000', '1000-10000'].map(
                 (item, index) => (
                   <MenuItemOption

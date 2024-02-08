@@ -137,7 +137,7 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
             </Text>
           </Flex>
         </Stack>
-        <Flex flexDir={'row'} alignItems={'center'} flexWrap={'wrap'}>
+        <Flex flexDir={'row'} gap={1} alignItems={'center'} flexWrap={'wrap'}>
           <Text fontSize={22}>{primaryComponent?.name}</Text>
           <Text fontSize={22}>{primaryComponent?.version ? ':' : ''}</Text>
           <Text mr={2} fontSize={22}>

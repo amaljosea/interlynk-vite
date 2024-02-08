@@ -151,30 +151,18 @@ const ProductDetails = () => {
     }
   )
 
-  const epssRange = globalVulnState.epss !== 'all' && globalVulnState.epss !== '' && globalVulnState.epss?.split('-')
+  const epssRange =
+    globalVulnState.epss !== 'all' &&
+    globalVulnState.epss !== '' &&
+    globalVulnState.epss?.split('-')
   const vulnRange = {
     min: parseFloat(epssRange[0]) / 10000,
     max: parseFloat(epssRange[1]) / 10000
   }
 
-  const { data: globalVulnData, refetch: globalVulnRefetch } = useQuery(
-    GetGlobalVulns,
-    {
-      fetchPolicy:'network-only',
-      variables: {
-        first: totalRows,
-        field: globalVulnState.field,
-        direction: globalVulnState.direction,
-        search: globalVulnState.searchInput !== '' ? globalVulnState.searchInput : undefined,
-        projectGroupIds: [productId],
-        severity: globalVulnState.severities?.length === 0 ? undefined : globalVulnState.severities,
-        status: globalVulnState.statues?.length === 0 ? undefined : globalVulnState.statues,
-        kev: globalVulnState.kev === 'yes' ? true : globalVulnState.kev === 'false' ? false : undefined,
-        epss: globalVulnState.epss === 'all' || globalVulnState.epss === '' ? undefined : vulnRange
-      },
-      onCompleted: () => globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
-    }
-  )
+  const [getVulns, { data: globalVulnData }] = useLazyQuery(GetGlobalVulns, {
+    fetchPolicy: 'network-only'
+  })
 
   const { data: rules, refetch: getRules } = useQuery(GetProjectCheck, {
     fetchPolicy: 'network-only',
@@ -314,9 +302,35 @@ const ProductDetails = () => {
       setActiveProdTab(0)
     } else if (activeTab === 1) {
       setActiveProdTab(1)
-      globalVulnRefetch({
-        id: activeEnv,
-        first: totalRows
+      getVulns({
+        variables: {
+          first: totalRows,
+          field: globalVulnState.field,
+          direction: globalVulnState.direction,
+          search:
+            globalVulnState.searchInput !== ''
+              ? globalVulnState.searchInput
+              : undefined,
+          projectGroupIds: [productId],
+          severity:
+            globalVulnState.severities?.length === 0
+              ? undefined
+              : globalVulnState.severities,
+          status:
+            globalVulnState.statues?.length === 0
+              ? undefined
+              : globalVulnState.statues,
+          kev:
+            globalVulnState.kev === 'yes'
+              ? true
+              : globalVulnState.kev === 'false'
+                ? false
+                : undefined,
+          epss:
+            globalVulnState.epss === 'all' || globalVulnState.epss === ''
+              ? undefined
+              : vulnRange
+        }
       })
     } else if (activeTab === 2) {
       setActiveProdTab(2)
@@ -589,7 +603,7 @@ const ProductDetails = () => {
                 <TabPanel px={0}>
                   <GlobalVulnTable
                     data={globalVulnData?.organization?.vulns}
-                    refetch={globalVulnRefetch}
+                    refetch={getVulns}
                   />
                 </TabPanel>
                 {/* AUTOMATIONS */}

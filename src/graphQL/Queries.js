@@ -438,7 +438,7 @@ export const GetProjectGroup = gql`
 
 // GET GLOBAL VULNERABILITIES
 export const GetGlobalVulns = gql`
-  query Organization(
+  query GetGlobalVulns(
     $first: Int
     $last: Int
     $after: String

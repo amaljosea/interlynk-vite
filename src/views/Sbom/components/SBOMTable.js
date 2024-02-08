@@ -259,10 +259,11 @@ const SBOMTable = ({
         }
       })
     } else if (tabName === 'Change Log' && shouldFetchData(tabName)) {
-      const { field, direction } = sbomLogState
+      const { field, direction, searchInput } = sbomLogState
       getLogsData({
         variables: {
           ...commonParams,
+          search: searchInput !== '' ? searchInput : undefined,
           field,
           direction
         }
