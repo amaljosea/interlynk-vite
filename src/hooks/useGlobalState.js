@@ -17,7 +17,7 @@ const GlobalStateContext = createContext()
 const GlobalStateProvider = ({ children }) => {
   const [userPermissions, setUserPermissions] = useState([])
   const [userName, setUserName] = useState('')
-  const [totalRows, setTotalRows] = useState(5)
+  const [totalRows, setTotalRows] = useState(25)
   const [activeProdTab, setActiveProdTab] = useState(0)
   const [activeSbomTab, setActiveSbomTab] = useState(0)
   const [minimize, setMinimize] = useState(true)
