@@ -1451,6 +1451,12 @@ export const GetVulnData = gql`
             sbom {
               id
               createdAt
+              projectVersion
+              project {
+                projectGroup {
+                  name
+                }
+              }
               primaryComponent {
                 name
                 version

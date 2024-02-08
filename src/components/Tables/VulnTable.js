@@ -167,8 +167,6 @@ const VulnTable = ({
     }
   }
 
-
-
   // COLUMNS
   const columns = [
     // CVE ID
@@ -179,7 +177,7 @@ const VulnTable = ({
       selector: (row) => {
         const { vuln, isPart, component } = row
         const { sbom } = component
-        const { primaryComponent, createdAt } = sbom
+        const { primaryComponent, createdAt, projectVersion, project } = sbom
         const { vulnInfo } = vuln
         const { kev } = vulnInfo ? vulnInfo : ''
         return (
@@ -204,11 +202,7 @@ const VulnTable = ({
                   fontWeight={'medium'}
                   width={'fit-content'}
                 >
-                  {primaryComponent?.name ||
-                    `Uploaded at ${getFullDateAndTime(createdAt)}`}{' '}
-                  {primaryComponent?.version
-                    ? `: ${primaryComponent?.version}`
-                    : ''}
+                  {project?.projectGroup?.name || ''} : {projectVersion || ''}
                 </Text>
               )}
               {kev === true && (
