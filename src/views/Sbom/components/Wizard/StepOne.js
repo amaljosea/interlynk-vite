@@ -219,7 +219,7 @@ const StepOne = ({
                 {uniqVersions.length > 0 &&
                   uniqVersions.map((item, index) => (
                     <option key={index} value={item.id}>
-                      {normalizeSBOMVersion(item)}
+                      {item?.projectVersion}
                     </option>
                   ))}
               </Select>

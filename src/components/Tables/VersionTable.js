@@ -136,7 +136,8 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
       id: 'VERSION',
       name: 'VERSION',
       selector: (row) => {
-        const { primaryComponent, id, createdAt, creationAt } = row
+        const { primaryComponent, id, createdAt, creationAt, projectVersion } =
+          row
         return (
           <Link
             to={`/vendor/products/${data?.name}?id=${productId}&sbom=${id}`}
@@ -144,7 +145,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
               localStorage.setItem(
                 'currentSBOM',
                 JSON.stringify({
-                  version: normalizeSBOMVersion(row),
+                  version: projectVersion,
                   id: id
                 })
               )
@@ -154,7 +155,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
             }}
           >
             <Text color={'blue.500'} minWidth='100%' my={3} fontSize={14}>
-              {normalizeSBOMVersion(row)}
+              {projectVersion}
             </Text>
           </Link>
         )

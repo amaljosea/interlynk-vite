@@ -360,6 +360,7 @@ export const GetProjectGroups = gql`
               creationAt
               createdAt
               updatedAt
+              projectVersion
               primaryComponent {
                 id
                 name
@@ -1069,6 +1070,7 @@ export const GetProductVersions = gql`
         updatedAt
         lifecycle
         createdAt
+        projectVersion
         primaryComponent {
           id
           name
@@ -1113,6 +1115,7 @@ export const GetProductData = gql`
       id
       updatedAt
       vulnRunStatus
+      projectVersion
       primaryComponent {
         id
         name
@@ -1634,6 +1637,7 @@ export const GetProject = gql`
         updatedAt
         createdAt
         creationAt
+        projectVersion
         primaryComponent {
           id
           name
@@ -2461,6 +2465,7 @@ export const GetSbomParts = gql`
           lifecycle
           createdAt
           creationAt
+          projectVersion
           project {
             id
             name

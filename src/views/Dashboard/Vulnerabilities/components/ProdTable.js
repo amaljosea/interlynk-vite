@@ -96,7 +96,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
         return <Text>{component?.sbom?.project?.projectGroup?.name || ''}</Text>
       },
       wrap: true,
-      width: '15%',
+      width: '200px',
       omit: params?.name ? true : false
     },
     // VERSION
@@ -112,7 +112,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
       ),
       wrap: true,
       right: 'true',
-      width: '10%'
+      width: '220px'
     },
     // ENV
     {
@@ -127,7 +127,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
         )
       },
       wrap: true,
-      width: '12%'
+      width: '220px'
     },
     // VULN COMPONENT
     {
@@ -142,7 +142,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
         )
       },
       wrap: true,
-      width: '25%'
+      width: '400px'
     },
     // VULN VERSION
     {
@@ -155,7 +155,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
       ),
       wrap: true,
       right: 'true',
-      width: '12%'
+      width: '200px'
     },
     // STATUS
     {

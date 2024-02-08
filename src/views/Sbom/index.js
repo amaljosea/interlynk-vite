@@ -75,7 +75,7 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
   data?.project?.sboms?.length > 0 &&
     data.project.sboms.map((project) => {
       uniqVersions.push({
-        label: normalizeSBOMVersion(project)
+        label: project?.projectVersion
       })
     })
 
