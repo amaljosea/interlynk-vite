@@ -30,7 +30,6 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { UpdateGlobalVex } from 'graphQL/Mutation'
 import { updateCompVulnVex } from 'graphQL/Mutation'
 import { GetProjectGroup } from 'graphQL/Queries'
-import { envOrderList } from 'utils'
 import { filterEnvList } from 'utils'
 
 const VexModal = ({
@@ -318,10 +317,10 @@ const VexModal = ({
                         data?.project?.sboms?.map((item, index) => (
                           <option
                             key={index}
-                            value={normalizeSBOMVersion(item)}
-                            name={normalizeSBOMVersion(item)}
+                            value={item?.projectVersion}
+                            name={item?.projectVersion}
                           >
-                            {normalizeSBOMVersion(item)}
+                            {item?.projectVersion}
                           </option>
                         ))
                       ) : (

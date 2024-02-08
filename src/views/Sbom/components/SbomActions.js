@@ -151,7 +151,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
   data?.project?.sboms?.length > 0 &&
     data.project.sboms.map((project) => {
       uniqVersions.push({
-        label: normalizeSBOMVersion(project),
+        label: project?.projectVersion,
         value: project?.id
       })
     })

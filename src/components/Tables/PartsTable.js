@@ -228,14 +228,14 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       const myProduct = {
         group: product?.projectGroup?.name,
         env: product?.name,
-        version: normalizeSBOMVersion(project)
+        version: project?.projectVersion
       }
       const isVersionIncluded = existingVersions?.some(
         (item) => JSON.stringify(item) === JSON.stringify(myProduct)
       )
       if (!isVersionIncluded) {
         sbomVersions.push({
-          label: normalizeSBOMVersion(project),
+          label: project?.projectVersion,
           value: project?.id,
           creationAt: project?.createdAt
         })
@@ -307,7 +307,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
         const { part } = row
         return (
           <Text fontSize={14} my={2}>
-            {normalizeSBOMVersion(part)}
+            {part?.projectVersion}
           </Text>
         )
       },

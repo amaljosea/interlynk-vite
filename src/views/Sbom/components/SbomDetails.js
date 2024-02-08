@@ -28,6 +28,7 @@ import { FaCircleCheck } from 'react-icons/fa6'
 const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
   const {
     project,
+    projectVersion,
     primaryComponent,
     updatedAt,
     lifecycle,
@@ -140,8 +141,7 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
           <Text fontSize={22}>{primaryComponent?.name}</Text>
           <Text fontSize={22}>{primaryComponent?.version ? ':' : ''}</Text>
           <Text mr={2} fontSize={22}>
-            {primaryComponent?.version ||
-              `Uploaded at ${getFullDateAndTime(sbom?.createdAt)}`}
+            {projectVersion}
           </Text>
           <Tooltip label='Lifecycle stage' fontSize='md'>
             <Tag
