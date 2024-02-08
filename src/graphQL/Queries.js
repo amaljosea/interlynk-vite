@@ -293,6 +293,60 @@ export const GetOrgSettings = gql`
   }
 `
 
+export const GetProductTable = gql`
+  query GetProjectTable(
+    $search: String
+    $enabled: Boolean
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+    $field: ProjectGroupOrderByFields!
+    $direction: OrderByDirection!
+  ) {
+    organization {
+      projectGroups(
+        search: $search
+        enabled: $enabled
+        first: $first
+        last: $last
+        after: $after
+        before: $before
+        orderBy: { field: $field, direction: $direction }
+      ) {
+        totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          startCursor
+          hasPreviousPage
+        }
+        nodes {
+          id
+          name
+          enabled
+          defaultProject {
+            id
+          }
+          projects {
+            id
+            name
+            description
+            updatedAt
+            enabled
+            sboms {
+              id
+            }
+          }
+          description
+          enabled
+          updatedAt
+        }
+      }
+    }
+  }
+`
+
 // GET PROJECT GROUPS
 export const GetProjectGroups = gql`
   query GetProjectGroups(

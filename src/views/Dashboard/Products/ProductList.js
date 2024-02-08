@@ -8,7 +8,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import OrgRegister from '../Profile/components/OrgRegister'
 import { displayErrorMessage } from 'utils'
 import { WarningTwoIcon } from '@chakra-ui/icons'
-import { GetProjectGroups } from 'graphQL/Queries'
+import { GetProductTable } from 'graphQL/Queries'
 
 function ProductList() {
   const { totalRows, prodState, dispatch } = useGlobalState()
@@ -31,7 +31,7 @@ function ProductList() {
     data: groups,
     refetch,
     error
-  } = useQuery(GetProjectGroups, {
+  } = useQuery(GetProductTable, {
     variables: {
       search: searchInput !== '' ? searchInput : undefined,
       enabled: enabled === 'yes' ? true : enabled === 'no' ? false : undefined,

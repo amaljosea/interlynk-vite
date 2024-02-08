@@ -352,21 +352,9 @@ const ProductTable = ({ data, refetch }) => {
         name: 'PRODUCT',
         selector: (row) => {
           const { id, name, defaultProject } = row
-          const data = defaultProject ? defaultProject?.sboms : []
           const product = {
             id: id,
             name: name,
-            version:
-              data?.length > 0
-                ? normalizeSBOMVersion(defaultProject)
-                : defaultProject?.sboms?.length > 0
-                  ? normalizeSBOMVersion(defaultProject?.sboms[0])
-                  : '',
-            sbomId: defaultProject
-              ? defaultProject?.primaryComponent?.id
-              : defaultProject?.sboms?.length > 0
-                ? defaultProject?.sboms[0]?.id
-                : '',
             groupId: id
           }
 
@@ -378,10 +366,6 @@ const ProductTable = ({ data, refetch }) => {
               type: 'SET_CURRENT_PRODUCT',
               payload: {
                 id: defaultProject?.id,
-                sbomId:
-                  defaultProject?.length > 0
-                    ? defaultProject?.primaryComponent?.id
-                    : defaultProject?.sboms[0]?.id || ''
               }
             })
             setActiveSbomTab(0)
