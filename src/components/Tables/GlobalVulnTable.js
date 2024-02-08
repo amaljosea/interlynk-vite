@@ -356,6 +356,19 @@ const GlobalVulnTable = ({ data, refetch }) => {
     )
   }
 
+  // CLEAR SERACH
+  const handleRefresh = async () => {
+    await refetch({
+      variables: {
+        field,
+        direction,
+        first: totalRows
+      }
+    }).then(
+      (res) => res?.data && globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
+    )
+  }
+
   // ON SEARCH INPUT CHANGE
   const onSearchInputChange = (e) => {
     const { value } = e.target
@@ -393,7 +406,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
         >
           <Tooltip label='Refresh'>
             <IconButton
-              onClick={handleClear}
+              onClick={handleRefresh}
               colorScheme='blue'
               icon={<RepeatIcon />}
             ></IconButton>
@@ -401,7 +414,13 @@ const GlobalVulnTable = ({ data, refetch }) => {
         </Stack>
       </Flex>
     )
-  }, [filterText, onSearchInputChange, handleClear, handleSearch])
+  }, [
+    filterText,
+    onSearchInputChange,
+    handleClear,
+    handleSearch,
+    handleRefresh
+  ])
 
   // ON PREV PAGE
   const handlePreviousPage = async () => {
