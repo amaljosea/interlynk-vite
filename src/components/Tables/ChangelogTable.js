@@ -1,11 +1,9 @@
 import {
-  Button,
   Flex,
   Stack,
   Tag,
   Tooltip,
   Text,
-  Box,
   IconButton
 } from '@chakra-ui/react'
 import React, { useEffect, useMemo, useState } from 'react'
@@ -14,7 +12,6 @@ import DataTable from 'react-data-table-component'
 import CustomLoader from 'components/CustomLoader'
 import { useGlobalState } from 'hooks/useGlobalState'
 import ChangelogFilterMenu from 'views/Sbom/components/ChangelogFilterMenu'
-import RowLimit from 'views/Sbom/components/RowLimit'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import { RepeatIcon } from '@chakra-ui/icons'
 import Pagination from '../Pagination'
@@ -249,10 +246,26 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
     }
   }
 
+  const handleRefresh = async () => {
+    await refetch({
+      variables: {
+        id: activeEnv,
+        first: totalRows,
+        field,
+        direction
+      }
+    }).then((res) => {
+      if (res.data) {
+        prodLogDispatch({
+          type: 'FETCH_DATA_SUCCESS'
+        })
+      }
+    })
+  }
+
   // CLEAR SERACH
   const handleClear = async () => {
     disablePaginationControl()
-
     setSearchInput('')
     await refetch({
       variables: {
@@ -356,14 +369,14 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
         </Stack>
         <Tooltip label='Refresh'>
           <IconButton
-            onClick={handleClear}
+            onClick={handleRefresh}
             colorScheme='blue'
             icon={<RepeatIcon />}
           ></IconButton>
         </Tooltip>
       </Flex>
     )
-  }, [searchInput, onSearchInputChange, handleClear, handleSearch])
+  }, [searchInput, onSearchInputChange, handleClear, handleSearch, handleRefresh])
 
   return (
     <>
