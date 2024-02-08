@@ -1,11 +1,4 @@
-import {
-  Flex,
-  Stack,
-  Tag,
-  Tooltip,
-  Text,
-  IconButton
-} from '@chakra-ui/react'
+import { Flex, Stack, Tag, Tooltip, Text, IconButton } from '@chakra-ui/react'
 import React, { useEffect, useMemo, useState } from 'react'
 import { timeSince, getFullDateAndTime, customStyles } from 'utils'
 import DataTable from 'react-data-table-component'
@@ -247,6 +240,7 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
   }
 
   const handleRefresh = async () => {
+    disablePaginationControl()
     await refetch({
       variables: {
         id: activeEnv,
@@ -256,8 +250,9 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
       }
     }).then((res) => {
       if (res.data) {
+        setPaginationControl(res.data)
         prodLogDispatch({
-          type: 'FETCH_DATA_SUCCESS'
+          type: 'CLEAR_STATE'
         })
       }
     })
@@ -376,7 +371,13 @@ const ChangelogTable = ({ data, refetch, activeEnv }) => {
         </Tooltip>
       </Flex>
     )
-  }, [searchInput, onSearchInputChange, handleClear, handleSearch, handleRefresh])
+  }, [
+    searchInput,
+    onSearchInputChange,
+    handleClear,
+    handleSearch,
+    handleRefresh
+  ])
 
   return (
     <>
