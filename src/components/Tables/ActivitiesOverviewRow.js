@@ -168,7 +168,12 @@ function ActivitiesOverviewRow(props) {
       {event === 'purl' ? (
         <Popover>
           <PopoverTrigger>
-            <Stack direction={'column'} spacing={0} cursor={'pointer'}>
+            <Stack
+              direction={'column'}
+              spacing={0}
+              cursor={'pointer'}
+              wordBreak={'break-all'}
+            >
               <Text fontSize='sm' color={textColor} fontWeight='normal'>
                 {event} by {changedBy}
               </Text>
@@ -188,7 +193,13 @@ function ActivitiesOverviewRow(props) {
           <PurlCard value={updated} />
         </Popover>
       ) : (
-        <Flex direction='column' justifyContent='flex-start' w={'99%'} h='100%'>
+        <Flex
+          direction='column'
+          wordBreak={'break-all'}
+          justifyContent='flex-start'
+          w={'99%'}
+          h='100%'
+        >
           <Text fontSize='sm' color={textColor} fontWeight='normal'>
             {event} by {changedBy}
           </Text>
