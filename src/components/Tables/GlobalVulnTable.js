@@ -210,7 +210,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
       name: 'EPSS*',
       selector: (row) => {
         const { vulnInfo } = row
-        const { epssScores } = vulnInfo
+        const { epssScores } = vulnInfo || ''
         return (
           <Flex minWidth='max-content' alignItems='center' gap='0'>
             <Tag
