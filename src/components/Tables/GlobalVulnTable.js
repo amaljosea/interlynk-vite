@@ -109,24 +109,30 @@ const GlobalVulnTable = ({ data, refetch }) => {
                   color={'blue.500'}
                 />
               </Link>
-              <Link
-                to={
-                  params?.name
-                    ? `/vendor/products/${product?.name}?id=${product?.id}&vulnId=${id}`
-                    : `/vendor/vulnerabilities?vulnId=${id}`
-                }
-                onClick={() => localStorage.setItem('activeVuln', vulnId)}
-              >
-                <Text fontSize='sm' color={'blue.500'}>
-                  {vulnId || ''}
-                </Text>
-              </Link>
+              <Stack>
+                <Link
+                  to={
+                    params?.name
+                      ? `/vendor/products/${product?.name}?id=${product?.id}&vulnId=${id}`
+                      : `/vendor/vulnerabilities?vulnId=${id}`
+                  }
+                  onClick={() => localStorage.setItem('activeVuln', vulnId)}
+                >
+                  <Text fontSize='sm' color={'blue.500'}>
+                    {vulnId || ''}
+                  </Text>
+                </Link>
+                {vulnInfo?.kev === true && (
+                  <Badge
+                    width={'fit-content'}
+                    variant='subtle'
+                    colorScheme='red'
+                  >
+                    KEV
+                  </Badge>
+                )}
+              </Stack>
             </Flex>
-            {vulnInfo?.kev === true && (
-              <Badge width={'fit-content'} variant='subtle' colorScheme='red'>
-                KEV
-              </Badge>
-            )}
           </Stack>
         )
       },
