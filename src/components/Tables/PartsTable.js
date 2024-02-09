@@ -49,6 +49,7 @@ import {
   envOrderList,
   customStyles
 } from 'utils'
+import { GetProductData } from 'graphQL/Queries'
 
 const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const location = useLocation()
@@ -94,7 +95,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const [activeRow, setActiveRow] = useState(null)
   const [selectedGroup, setSelectedGroup] = useState('')
   const [envList, setEnvList] = useState([])
-  const [envName, setEnvName] = useState('')
+  const [newPartExists, setNewPartExists] = useState(false)
 
   const { data: allProjects } = useQuery(GetProjectGroups, {
     variables: {
@@ -105,10 +106,17 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
     }
   })
 
+  const { refetch: sbomRefetch } = useQuery(GetProductData, {
+    fetchPolicy: 'network-only',
+    skip: newPartExists ? false : true,
+    variables: { projectId: prodId, sbomId: sbomId }
+  })
+
   const [createSbomPart] = useMutation(SbomPartCreate)
   const [deleteSbomPart] = useMutation(SbomPartDelete)
 
   const handleCreatePart = async () => {
+    setNewPartExists(true)
     await createSbomPart({
       variables: {
         parentSbomId: sbomId,
@@ -117,15 +125,12 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
     })
       .then((res) => {
         if (res.data) {
-          refetch({
-            variables: {
-              projectId: prodId,
-              sbomId: sbomId
-            }
-          })
+          sbomRefetch({ projectId: prodId, sbomId: sbomId })
+          refetch({ variables: { projectId: prodId, sbomId: sbomId } })
         }
       })
       .finally(() => {
+        setNewPartExists(false)
         setSelectedGroup('')
         setSelectedProd('')
         setSelectedVersion('')
@@ -188,9 +193,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
     const { value } = e.target
     setSelectedProd(value)
     const env = e.target.options[e.target.selectedIndex].text
-    setEnvName(env)
     if (value === '') {
-      1
       setSelectedVersion('')
     } else {
       getProduct({
@@ -496,7 +499,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
         projectId: prodId,
         sbomId: sbomId
       }
-    })
+    }).then((res) => res?.data && sbomRefetch({ projectId: prodId, sbomId: sbomId }))
   }
 
   // SUB HEADER
