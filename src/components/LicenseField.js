@@ -202,7 +202,7 @@ const LicenseField = ({ isValid, setIsValid }) => {
               type='text'
               value={exp}
               fontSize={'sm'}
-              onBlur={handleExpBlur}
+              // onBlur={handleExpBlur}
               onChange={handleExpChange}
               placeholder='Enter a valid SPDX Expression'
             />

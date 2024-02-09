@@ -198,7 +198,7 @@ const SbomLicenseField = ({ isValid, setIsValid }) => {
               type='text'
               value={exp}
               fontSize={'sm'}
-              onBlur={handleExpBlur}
+              // onBlur={handleExpBlur}
               onChange={handleExpChange}
               placeholder='Enter valid SPDX Expression'
             />
