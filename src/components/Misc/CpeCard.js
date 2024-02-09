@@ -38,7 +38,7 @@ const CpeCard = ({ value, isOpen, onClose }) => {
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>CPE</ModalHeader>
+        <ModalHeader>CPE Details</ModalHeader>
         <ModalCloseButton />
         <ModalBody pb={6}>
           <Text fontWeight={'semibold'} py={2}>
