@@ -1,5 +1,5 @@
 // Chakra imports
-import React from 'react'
+import React, { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import DataTable from 'react-data-table-component'
 import { Flex, Heading, TagLabel, Tooltip, Tag, Text } from '@chakra-ui/react'
@@ -11,13 +11,11 @@ import {
 } from 'utils'
 // Custom components
 import Card from 'components/Card/Card'
-import CardHeader from 'components/Card/CardHeader'
-import CardBody from 'components/Card/CardBody'
 import VulnBadge from 'components/Misc/VulnBadge'
 import CustomLoader from 'components/CustomLoader'
 import { useGlobalState } from 'hooks/useGlobalState'
 
-const ProductsOverview = ({ title, data }) => {
+const ProductsOverview = ({ title, data, refetch }) => {
   const { setActiveSbomTab, dispatch } = useGlobalState()
   const { prodDispatch, prodVulnDispatch } = dispatch
 
@@ -164,7 +162,6 @@ const ProductsOverview = ({ title, data }) => {
       width: '150px',
       selector: (row) => {
         const { id, project, projectId, projectVersion } = row
-        console.log('row', row)
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
         return (
           <Link
@@ -307,34 +304,36 @@ const ProductsOverview = ({ title, data }) => {
     }
   ]
 
-  return (
-    <Flex width={'100%'} direction='column'>
+  // HEADER SECTION
+  const subHeader = useMemo(() => {
+    return (
       <Flex
-        dir='row'
         width={'100%'}
         alignItems={'center'}
         justifyContent={'space-between'}
       >
-        <Card>
-          <CardHeader pt='12px'>
-            <Heading fontSize={'lg'} fontFamily={'inherit'}>
-              {title}
-            </Heading>
-          </CardHeader>
-          <CardBody width='100%' mt={4} overflowX={'scroll'}>
-            <DataTable
-              columns={columns}
-              data={data || []}
-              customStyles={customStyles}
-              progressPending={data ? false : true}
-              progressComponent={<CustomLoader />}
-              persistTableHead
-              responsive
-            />
-          </CardBody>
-        </Card>
+        {/* HEADING */}
+        <Heading fontSize={'lg'} fontFamily={'inherit'}>
+          {title}
+        </Heading>
       </Flex>
-    </Flex>
+    )
+  }, [])
+
+  return (
+    <Card>
+      <DataTable
+        subHeader
+        responsive
+        persistTableHead
+        columns={columns}
+        data={data || []}
+        customStyles={customStyles}
+        progressPending={data ? false : true}
+        progressComponent={<CustomLoader />}
+        subHeaderComponent={subHeader}
+      />
+    </Card>
   )
 }
 

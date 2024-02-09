@@ -230,7 +230,6 @@ const TeamTable = ({ data, refetch }) => {
                     row.email === data.currentUser.email || !editUserRole
                   }
                   onClick={() => {
-                    console.log('row', row)
                     setActiveRow(row)
                     onRoleOpen()
                   }}

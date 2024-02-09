@@ -1,5 +1,3 @@
-// Chakra Icons
-import { BellIcon } from '@chakra-ui/icons'
 // Chakra Imports
 import {
   Flex,
@@ -19,41 +17,36 @@ import {
   Stack,
   Kbd,
   Icon,
-  MenuDivider
+  MenuDivider,
+  Button,
+  MenuItemOption,
+  MenuOptionGroup
 } from '@chakra-ui/react'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { useQuery } from '@apollo/client'
+import { GetOrg } from 'graphQL/Queries'
+import { dashRoutes } from 'routes.js'
+import PropTypes from 'prop-types'
+import { useEffect } from 'react'
 // Custom Icons
 import { ProfileIcon, SettingsIcon } from 'components/Icons/Icons'
-// Custom Components
-import { ItemContent } from 'components/Menu/ItemContent'
-import SidebarResponsive from 'components/Sidebar/SidebarResponsive'
-import PropTypes from 'prop-types'
-import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { dashRoutes } from 'routes.js'
 import { FaRegKeyboard, FaSignOutAlt, FaExchangeAlt } from 'react-icons/fa'
-import Cookies from 'js-cookie'
-import { useEffect } from 'react'
-import axios from 'axios'
-import { useGlobalState } from 'hooks/useGlobalState'
-import { GetOrg } from 'graphQL/Queries'
-import { useQuery } from '@apollo/client'
 import { FaUser } from 'react-icons/fa6'
-import {logoutUser} from "../../utils/authUtils";
+// Custom Components
+import SidebarResponsive from 'components/Sidebar/SidebarResponsive'
+import { useGlobalState } from 'hooks/useGlobalState'
+import { logoutUser } from 'utils/authUtils'
 
 export default function HeaderLinks(props) {
   const location = useLocation()
   const navigate = useNavigate()
-
-  const { userName, setUserName } = useGlobalState()
-
+  const { userName, setUserName, envName, setEnvName } = useGlobalState()
   const { data, error } = useQuery(GetOrg)
-
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
-  const customerView = location.pathname.startsWith('/customer')
+  const dashboardView = location.pathname === '/vendor/dashboard'
 
   const { variant, children, fixed, secondary, onOpen, ...rest } = props
-
-  const authToken = Cookies.get('authToken')
 
   const name = localStorage.getItem('username')
   const email = localStorage.getItem('email')
@@ -70,7 +63,7 @@ export default function HeaderLinks(props) {
 
   useEffect(() => {
     if (!email || error) {
-      logoutUser().then(r => navigate('/auth'))
+      logoutUser().then((r) => navigate('/auth'))
     }
   }, [error])
 
@@ -82,8 +75,8 @@ export default function HeaderLinks(props) {
   }
 
   const handleLogout = async () => {
-    await logoutUser();
-    navigate('/auth');
+    await logoutUser()
+    navigate('/auth')
   }
 
   const shortcuts = [
@@ -95,23 +88,24 @@ export default function HeaderLinks(props) {
 
   return (
     <Flex gap={4} alignItems='center' flexDirection='row'>
-      {/*  /// TODO: 1.0 Add back in when ready }
-      {!customerView && (
-        <Select
-          width={'fit-content'}
-          bg={'white'}
-          size='sm'
-          name='duration'
-          id='duration'
-        >
-          <option value='Today'>Today</option>
-          <option value='1 weeks'>1 weeks</option>
-          <option value='2 weeks'>2 weeks</option>
-          <option value='3 weeks'>3 weeks</option>
-          <option value='1 month'>1 month</option>
-        </Select>
-        ) */}
-      {productId && !customerView && (
+      {/* ENVIRONMENT */}
+      {dashboardView && (
+        <Menu closeOnSelect={true}>
+          <MenuButton as={Button} size='sm' colorScheme='blue' fontWeight='medium' fontSize='sm'>
+            Environment
+          </MenuButton>
+          <MenuList>
+            <MenuOptionGroup value={envName} onChange={(value) => setEnvName(value)} type='radio'>
+              {['default', 'development', 'production'].map((item, index) => (
+                <MenuItemOption key={index} value={item} fontSize='sm' textTransform={'capitalize'}>
+                  {item}
+                </MenuItemOption>
+              ))}
+            </MenuOptionGroup>
+          </MenuList>
+        </Menu>
+      )}
+      {productId && (
         <Popover isLazy>
           <PopoverTrigger>
             <IconButton

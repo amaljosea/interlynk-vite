@@ -16,7 +16,7 @@ import ActivitiesOverview from './components/ActivitiesOverview'
 import ProductsOverview from './components/ProductsOverview'
 import RiskScoreOverview from './components/SalesOverview'
 import { GetOrg } from 'graphQL/Queries'
-import { useQuery } from '@apollo/client'
+import { useLazyQuery } from '@apollo/client'
 import OrgRegister from '../Profile/components/OrgRegister'
 import { useEffect } from 'react'
 import { GetOrgMetrics } from 'graphQL/Queries'
@@ -33,23 +33,26 @@ export default function Dashboard() {
   const queryParams = new URLSearchParams(location.search)
   const product = queryParams.get('id')
 
-  const { dispatch } = useGlobalState()
+  const { dispatch, envName } = useGlobalState()
   const { prodCompDispatch, prodVulnDispatch } = dispatch
 
   const iconBoxInside = useColorModeValue('white', 'white')
 
-  const { data, error: eOrg, loading } = useQuery(GetOrg)
+  const [getOrgData, { data, error: eOrg, loading }] = useLazyQuery(GetOrg, {fetchPolicy: 'network-only'})
+  const [getMetrics, { data: metrics, error: eOrgMetric }] = useLazyQuery(GetOrgMetrics, {fetchPolicy: 'network-only'})
 
   useEffect(() => {
-    if (data) {
-      localStorage.setItem(
-        'organization',
-        JSON.stringify(data?.organization?.name)
-      )
-    }
-  }, [data])
+    getOrgData()
+  }, [])
 
-  const { data: metrics, error: eOrgMetric } = useQuery(GetOrgMetrics)
+  useEffect(() => {
+    getMetrics({variables: {env: envName}})
+  }, [envName])
+  
+
+  useEffect(() => {
+    if (data) localStorage.setItem('organization', JSON.stringify(data?.organization?.name))
+  }, [data])
 
   useEffect(() => {
     if (product === null) {
@@ -117,7 +120,6 @@ export default function Dashboard() {
     )
   }
 
-
   return (
     <>
       {data && (
@@ -183,12 +185,17 @@ export default function Dashboard() {
                 */}
               </Grid>
               {/* LIST */}
-              <Grid templateColumns='repeat(12, 1fr)' gap={'24px'} flexWrap={'wrap'}>
+              <Grid
+                templateColumns='repeat(12, 1fr)'
+                gap={'24px'}
+                flexWrap={'wrap'}
+              >
                 {/* RECENT IMPORTS */}
                 <GridItem colSpan={8} w='100%'>
                   <ProductsOverview
                     title={'Recent Imports'}
                     data={metrics?.organizationMetric?.latestVersions}
+                    refetch={getMetrics}
                   />
                 </GridItem>
                 {/* LATEST ACTIVITIES */}

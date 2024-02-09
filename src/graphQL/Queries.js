@@ -119,8 +119,8 @@ export const GetRoles = gql`
 
 // GET ORGANIZATION METRICS
 export const GetOrgMetrics = gql`
-  query GetOrgMetrics {
-    organizationMetric {
+  query GetOrgMetrics($env: String) {
+    organizationMetric(envName: $env) {
       projectCount
       versionCount
       componentCount

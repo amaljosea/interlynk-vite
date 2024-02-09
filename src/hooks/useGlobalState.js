@@ -1,16 +1,5 @@
 import React, { useState, createContext, useContext, useReducer } from 'react'
-import {
-  globalVulnReducer,
-  compVulnReducer,
-  prodRulesReducer,
-  prodCheckReducer,
-  prodCompReducer,
-  prodLogReducer,
-  prodVulnReducer,
-  sbomLogReducer,
-  prodReducer,
-  sbomReducer
-} from 'context/reducers'
+import { globalVulnReducer, compVulnReducer, prodRulesReducer, prodCheckReducer, prodCompReducer, prodLogReducer,prodVulnReducer, sbomLogReducer, prodReducer, sbomReducer } from 'context/reducers'
 
 const GlobalStateContext = createContext()
 
@@ -24,6 +13,7 @@ const GlobalStateProvider = ({ children }) => {
   const [activeDockerHub, setActiveDockerHub] = useState(true)
   const [vulnerabilitiesData, setVulnerabilitiesData] = useState([])
   const [scanEnabled, setScanEnabled] = useState(false)
+  const [envName, setEnvName] = useState('default')
   // PRODUCTS
   const [prodState, prodDispatch] = useReducer(prodReducer, {
     data: null,
@@ -157,48 +147,7 @@ const GlobalStateProvider = ({ children }) => {
 
   return (
     <GlobalStateContext.Provider
-      value={{
-        minimize,
-        setMinimize,
-        totalRows,
-        setTotalRows,
-        activeProdTab,
-        setActiveProdTab,
-        activeSbomTab,
-        setActiveSbomTab,
-        activeDockerHub,
-        setActiveDockerHub,
-        vulnerabilitiesData,
-        setVulnerabilitiesData,
-        userPermissions,
-        setUserPermissions,
-        scanEnabled,
-        setScanEnabled,
-        userName,
-        setUserName,
-        globalVulnState,
-        compVulnState,
-        prodState,
-        prodLogState,
-        prodCompState,
-        prodVulnState,
-        prodCheckState,
-        prodRulesState,
-        sbomLogState,
-        sbomState,
-        dispatch: {
-          globalVulnDispatch,
-          compVulnDispatch,
-          prodDispatch,
-          prodLogDispatch,
-          prodCompDispatch,
-          prodVulnDispatch,
-          prodCheckDispatch,
-          prodRulesDispatch,
-          sbomLogDispatch,
-          sbomDispatch
-        }
-      }}
+      value={{minimize, setMinimize,totalRows,setTotalRows,activeProdTab,setActiveProdTab,activeSbomTab,setActiveSbomTab,activeDockerHub, setActiveDockerHub, vulnerabilitiesData, setVulnerabilitiesData,userPermissions, setUserPermissions, scanEnabled, setScanEnabled, userName, setUserName, envName, setEnvName,globalVulnState, compVulnState, prodState, prodLogState, prodCompState, prodVulnState, prodCheckState, prodRulesState, sbomLogState, sbomState, dispatch: {globalVulnDispatch, compVulnDispatch, prodDispatch,prodLogDispatch, prodCompDispatch, prodVulnDispatch, prodCheckDispatch, prodRulesDispatch, sbomLogDispatch,sbomDispatch}}}
     >
       {children}
     </GlobalStateContext.Provider>
@@ -207,9 +156,7 @@ const GlobalStateProvider = ({ children }) => {
 
 const useGlobalState = () => {
   const context = useContext(GlobalStateContext)
-  if (!context) {
-    throw new Error('useGlobalState must be used within a GlobalStateProvider')
-  }
+  if (!context) throw new Error('useGlobalState must be used within a GlobalStateProvider')
   return context
 }
 

@@ -136,8 +136,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
       id: 'VERSION',
       name: 'VERSION',
       selector: (row) => {
-        const { primaryComponent, id, createdAt, creationAt, projectVersion } =
-          row
+        const { id, projectVersion } = row
         return (
           <Link
             to={`/vendor/products/${data?.name}?id=${productId}&sbom=${id}`}
@@ -212,7 +211,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
       id: 'VULNERABILITIES',
       name: 'VULNERABILITIES',
       selector: (row) => {
-        const { stats, id, primaryComponent } = row
+        const { stats, id } = row
         const link = `/vendor/products/${params.name}?id=${productId}&sbom=${id}`
         const version = normalizeSBOMVersion(row)
 

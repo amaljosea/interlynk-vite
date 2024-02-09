@@ -224,7 +224,6 @@ const ComponentTable = ({
 
   const onLicenseOpen = (row) => {
     setActiveRow(row)
-    console.log('row', row)
     prodCompDispatch({ type: 'SET_LICENSES', payload: row })
     onOpen()
   }
