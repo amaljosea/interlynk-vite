@@ -300,19 +300,37 @@ const GlobalVulnTable = ({ data, refetch }) => {
       width: '25%',
       wrap: true
     },
-    // UPDATED AT
+    // PUBLISHED AT
     {
-      id: 'VULNS_UPDATED_AT',
-      name: 'UPDATED',
+      id: 'VULNS_PUBLISHED_AT',
+      name: 'PUBLISHED',
       selector: (row) => (
-        <Tooltip label={getFullDateAndTime(row?.updatedAt)} placement={'top'}>
-          {timeSince(row?.updatedAt)}
+        <Tooltip label={getFullDateAndTime(row?.publishedAt)} placement={'top'}>
+          {timeSince(row?.publishedAt)}
         </Tooltip>
       ),
       sortable: true,
       sortFunction: (a, b) => {
-        const dateA = new Date(a?.updatedAt)
-        const dateB = new Date(b?.updatedAt)
+        const dateA = new Date(a?.publishedAt)
+        const dateB = new Date(b?.publishedAt)
+        return dateA - dateB // Sort in descending order
+      },
+      wrap: true,
+      right: 'true'
+    },
+    // MODIFIED AT
+    {
+      id: 'VULNS_MODIFIED_AT',
+      name: 'MODIFIED',
+      selector: (row) => (
+        <Tooltip label={getFullDateAndTime(row?.lastModifiedAt)} placement={'top'}>
+          {timeSince(row?.lastModifiedAt)}
+        </Tooltip>
+      ),
+      sortable: true,
+      sortFunction: (a, b) => {
+        const dateA = new Date(a?.lastModifiedAt)
+        const dateB = new Date(b?.lastModifiedAt)
         return dateA - dateB // Sort in descending order
       },
       wrap: true,

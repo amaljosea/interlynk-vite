@@ -15,7 +15,7 @@ const Vulnerabilities = () => {
   const vulnId = queryParams.get('vulnId')
   const org = localStorage.getItem('organization')
 
-  const { totalRows, globalVulnState, dispatch } = useGlobalState()
+  const { totalRows, globalVulnState } = useGlobalState()
   const {
     field,
     direction,
@@ -33,7 +33,7 @@ const Vulnerabilities = () => {
     max: parseFloat(epssRange[1]) / 10000
   }
 
-  const [getVulns, { data, refetch }] = useLazyQuery(GetGlobalVulns, {
+  const [getVulns, { data }] = useLazyQuery(GetGlobalVulns, {
     fetchPolicy: 'network-only'
   })
 
