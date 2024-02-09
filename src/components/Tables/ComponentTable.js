@@ -787,7 +787,16 @@ const ComponentTable = ({
           </GridItem>
           <GridItem>
             <CustomText>PURL :</CustomText>
-            <Text wordBreak={'break-all'} mt={1} fontSize={14}>
+            <Text
+              wordBreak={'break-all'}
+              mt={1}
+              fontSize={14}
+              cursor={'pointer'}
+              onClick={() => {
+                setActiveRow(data)
+                onPurlOpen()
+              }}
+            >
               {purl !== null && purl !== '' ? purl : ''}
             </Text>
           </GridItem>

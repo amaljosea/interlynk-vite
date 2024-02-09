@@ -33,7 +33,7 @@ const PurlCard = ({ value, isOpen, onClose }) => {
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>PURL</ModalHeader>
+        <ModalHeader>PURL Details</ModalHeader>
         <ModalCloseButton />
         <ModalBody pb={6}>
           <Text fontWeight={'semibold'} py={2}>
