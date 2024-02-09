@@ -70,7 +70,14 @@ export default function AdminNavbar(props) {
       return null
     }
   })()
-  const subProduct = localStorage.getItem('subProduct')
+  const subProduct = (() => {
+    try {
+      return parseJSONSafely(localStorage.getItem('subProduct'))
+    } catch (error) {
+      console.log(error)
+      return null
+    }
+  })()
 
   const urlParts = location.pathname.split('/')
   const category = urlParts[2]
@@ -210,8 +217,14 @@ export default function AdminNavbar(props) {
             )}
 
             {subProduct && parts && (
+                <BreadcrumbItem color={mainText}>
+                  <BreadcrumbLink color={mainText}>{subProduct?.name || ''}</BreadcrumbLink>
+                </BreadcrumbItem>
+            )}
+
+            {subProduct && parts && (
               <BreadcrumbItem color={mainText}>
-                <BreadcrumbLink color={mainText}>{subProduct}</BreadcrumbLink>
+                <BreadcrumbLink color={mainText}>{subProduct?.version || ''}</BreadcrumbLink>
               </BreadcrumbItem>
             )}
           </Breadcrumb>

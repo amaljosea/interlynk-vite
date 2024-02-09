@@ -289,6 +289,10 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
               onClick={() => {
                 prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
                 localStorage.setItem('activeSbomTab', 0)
+                localStorage.setItem('subProduct', JSON.stringify({
+                  name: part?.project?.projectGroup?.name,
+                  version: part?.projectVersion
+                }))
                 setActiveProdTab(0)
               }}
             >
