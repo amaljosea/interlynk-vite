@@ -190,7 +190,7 @@ function ActivitiesOverviewRow(props) {
         <Text fontSize='sm' color={textColor} fontWeight='normal'>
           {event} by {changedBy}
         </Text>
-        <Text fontSize='sm' color={textColor} fontWeight='normal' width={'99%'}>
+        <Text fontSize='sm' color={textColor} fontWeight='normal' wordBreak={'break-all'}>
           {valueToText(action, event, orig, updated)}
         </Text>
         <Text fontSize='xs' color='gray.400' fontWeight='normal'>

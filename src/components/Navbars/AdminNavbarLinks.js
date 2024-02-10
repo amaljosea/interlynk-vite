@@ -36,6 +36,7 @@ import { FaUser } from 'react-icons/fa6'
 import SidebarResponsive from 'components/Sidebar/SidebarResponsive'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { logoutUser } from 'utils/authUtils'
+import { ChevronDownIcon } from '@chakra-ui/icons'
 
 export default function HeaderLinks(props) {
   const location = useLocation()
@@ -91,7 +92,7 @@ export default function HeaderLinks(props) {
       {/* ENVIRONMENT */}
       {dashboardView && (
         <Menu closeOnSelect={true}>
-          <MenuButton as={Button} size='sm' colorScheme='blue' fontWeight='medium' fontSize='sm'>
+          <MenuButton as={Button} size='sm' colorScheme='blue' fontWeight='medium' fontSize='sm' rightIcon={<ChevronDownIcon />}>
             Environment
           </MenuButton>
           <MenuList>
