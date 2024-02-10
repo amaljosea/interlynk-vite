@@ -315,12 +315,14 @@ const GlobalVulnTable = ({ data, refetch }) => {
           {timeSince(row?.publishedAt)}
         </Tooltip>
       ),
+      /*
       sortable: true,
       sortFunction: (a, b) => {
         const dateA = new Date(a?.publishedAt)
         const dateB = new Date(b?.publishedAt)
         return dateA - dateB // Sort in descending order
       },
+      */
       wrap: true,
       right: 'true'
     },
@@ -333,12 +335,14 @@ const GlobalVulnTable = ({ data, refetch }) => {
           {timeSince(row?.lastModifiedAt)}
         </Tooltip>
       ),
+      /*
       sortable: true,
       sortFunction: (a, b) => {
         const dateA = new Date(a?.lastModifiedAt)
         const dateB = new Date(b?.lastModifiedAt)
         return dateA - dateB // Sort in descending order
       },
+      */
       wrap: true,
       right: 'true'
     }
