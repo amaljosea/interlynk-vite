@@ -14,19 +14,19 @@ import {
 import { useEffect, useState } from 'react'
 
 const CvssText = ({ children }) => (
-  <Text fontSize='sm' textAlign={'right'} fontWeight={'semibold'}>
+  <Text fontSize='xs' textAlign={'right'} fontWeight={'semibold'}>
     {children}
   </Text>
 )
 
-const CvssTag = ({ value, children }) => (
+const CvssTag = ({ value, red, orange, children }) => (
   <Tag
-    width={'fit-content'}
+    width={'100px'}
+    justifyContent={'center'}
     ml={'auto'}
     size='sm'
     variant='subtle'
-    fontWeight={'semibold'}
-    colorScheme={value === 'H' ? 'red' : value === 'L' ? 'green' : 'gray'}
+    colorScheme={red.includes(value) ? 'red' : orange.includes(value) ? 'orange' : 'gray'}
   >
     <TagLabel>{children}</TagLabel>
   </Tag>
@@ -101,67 +101,67 @@ const CvssCard = ({ value }) => {
   }
 
   return (
-    <PopoverContent>
+    <PopoverContent minWidth='400'>
       <PopoverArrow />
       <PopoverCloseButton />
-      <PopoverHeader>CVSS {cvssObject?.CVSS}</PopoverHeader>
+      <PopoverHeader align={'center'} pt={4} fontWeight='bold' border='0'>CVSS Vector</PopoverHeader>
       <PopoverBody>
         <Stack spacing={1}>
-          <Text fontWeight={'semibold'} fontSize={'sm'} py={2}>
+          <Tag justifyContent={'center'} fontSize={'sm'} py={2}>
             {value}
-          </Text>
+          </Tag>
           <Divider />
           <Stack spacing={2} py={3}>
-            {/* Attack Complexity */}
-            <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-              <Text fontSize={'sm'}>Attack Complexity</Text>
-              <CvssTag value={cvssObject?.AC}>
-                {attackComplexity(cvssObject?.AC)}
-              </CvssTag>
-            </Grid>
-            <Divider />
-            {/* Confidentiality */}
-            <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-              <Text fontSize={'sm'}>Confidentiality</Text>
-              <CvssTag value={cvssObject?.C}>
-                {confidentiality(cvssObject?.C)}
-              </CvssTag>
-            </Grid>
-            <Divider />
             {/* Attack Vector */}
             <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
               <Text fontSize={'sm'}>Attack Vector</Text>
-              <CvssText>{attackVector(cvssObject?.AV)}</CvssText>
+              <CvssTag value={cvssObject?.AV} red={['N']} orange={['A', 'L']}>{attackVector(cvssObject?.AV)}</CvssTag>
+            </Grid>
+            <Divider />
+            {/* Attack Complexity */}
+            <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
+              <Text fontSize={'sm'} >Attack Complexity</Text>
+              <CvssTag value={cvssObject?.AC} red={['L']} orange={[]}>
+                {attackComplexity(cvssObject?.AC)}
+              </CvssTag>
             </Grid>
             <Divider />
             {/* Privileges Required */}
             <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
               <Text fontSize={'sm'}>Privileges Required</Text>
-              <CvssText>{confidentiality(cvssObject?.PR)}</CvssText>
+              <CvssTag value={cvssObject?.PR} red={['N']} orange={['L']}>{confidentiality(cvssObject?.PR)}</CvssTag>
             </Grid>
             <Divider />
             {/* User Interaction */}
             <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
               <Text fontSize={'sm'}>User Interaction</Text>
-              <CvssText>{userInteraction(cvssObject?.UI)}</CvssText>
+              <CvssTag value={cvssObject?.UI} red={['N']} orange={[]}>{userInteraction(cvssObject?.UI)}</CvssTag>
             </Grid>
             <Divider />
             {/* Scope */}
             <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
               <Text fontSize={'sm'}>Scope</Text>
-              <CvssText>{scope(cvssObject?.S)}</CvssText>
+              <CvssTag value={cvssObject?.S} red={'C'} orange={[]}>{scope(cvssObject?.S)}</CvssTag>
+            </Grid>
+            <Divider />
+            {/* Confidentiality */}
+            <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
+              <Text fontSize={'sm'}>Confidentiality Impact</Text>
+              <CvssTag value={cvssObject?.C} red={['H']} orange={['L']}>
+                {confidentiality(cvssObject?.C)}
+              </CvssTag>
             </Grid>
             <Divider />
             {/* Integrity */}
             <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-              <Text fontSize={'sm'}>Integrity</Text>
-              <CvssText>{confidentiality(cvssObject?.I)}</CvssText>
+              <Text fontSize={'sm'}>Integrity Impact</Text>
+              <CvssTag value={cvssObject?.I} red={['H']} orange={['L']}>{confidentiality(cvssObject?.I)}</CvssTag>
             </Grid>
             <Divider />
             {/* Availability */}
             <Grid alignItems={'center'} templateColumns='repeat(2, 1fr)'>
-              <Text fontSize={'sm'}>Availability</Text>
-              <CvssText>{confidentiality(cvssObject?.A)}</CvssText>
+              <Text fontSize={'sm'}>Availability Impact</Text>
+              <CvssTag value={cvssObject?.A} red={['H']} orange={['L']}>{confidentiality(cvssObject?.A)}</CvssTag>
             </Grid>
           </Stack>
         </Stack>

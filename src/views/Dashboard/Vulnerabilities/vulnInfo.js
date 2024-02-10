@@ -137,7 +137,7 @@ const VulnInfo = ({ data, componentVulns, refetch }) => {
                   >
                     <Icon h={4} w={4} color='#777' as={FaBug} />
                     <Box>
-                      <Stack fontWeight={'medium'} direction={'row'}>
+                      <Stack direction={'row'}>
                         <Flex flexDir={'column'} alignItems={'center'}>
                           <VulnBadge color='red' label='CVSS'>
                             {data?.cvssScore || 0}
