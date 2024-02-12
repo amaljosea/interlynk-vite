@@ -105,7 +105,7 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
         <Stack direction={'column'} spacing={1} alignItems={'left'}>
           {currentProduct && parts && currentSBOM && (
             <Link
-              to={`/vendor/products/${name}?&id=${id}&sbom=${currentSBOM?.id}`}
+              to={`/vendor/products/${name}?id=${id}&sbom=${currentSBOM?.id}`}
             >
               <HStack
                 onClick={() => {

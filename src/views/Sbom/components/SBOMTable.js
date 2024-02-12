@@ -320,7 +320,7 @@ const SBOMTable = ({
             {/* PARTS TABLE */}
             <TabPanel px={0}>
               <PartsTable
-                data={partsData?.sbom.sbomParts}
+                data={partsData?.sbom?.sbomParts}
                 refetch={getPartsData}
                 getVulnData={getVulnData}
                 getCompData={getCompData}

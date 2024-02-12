@@ -17,7 +17,7 @@ import { GetUserPermissions } from 'graphQL/Queries'
 import { permissionList } from 'utils'
 
 export default function AdminNavbar(props) {
-  const { setUserPermissions } = useGlobalState()
+  const { setUserPermissions,setActiveSbomTab } = useGlobalState()
 
   function parseJSONSafely(str) {
     try {
@@ -53,6 +53,7 @@ export default function AdminNavbar(props) {
   const vulnId = queryParams.get('vulnId')
 
   const activeVuln = localStorage.getItem('activeVuln')
+  const activeEnv = localStorage.getItem('activeEnv')
   const imageName = localStorage.getItem('Image')
   const currentProduct = (() => {
     try {
@@ -193,8 +194,11 @@ export default function AdminNavbar(props) {
             )}
 
             {sbomId && currentSBOM?.version && (
-              <BreadcrumbItem color={mainText} isCurrentPage>
-                <BreadcrumbLink href=''>{currentSBOM?.version}</BreadcrumbLink>
+              <BreadcrumbItem color={mainText} isCurrentPage={parts ? false : true}>
+                <BreadcrumbLink href={parts ? `/vendor/products/${currentProduct?.name}?id=${activeEnv}&sbom=${currentSBOM?.id}` : ''} onClick={() => {
+                   localStorage.setItem('activeSbomTab', 0)
+                   setActiveSbomTab(0)
+                }}>{currentSBOM?.version}</BreadcrumbLink>
               </BreadcrumbItem>
             )}
 
