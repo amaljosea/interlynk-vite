@@ -71,7 +71,7 @@ const Filters = ({ data, refetch }) => {
     <Stack direction={'row'} alignItems={'center'} gap={1}>
       {/* PRODUCTS */}
       <Box width={'fit-content'} position={'relative'} display={'none'}>
-        <Menu closeOnSelect={true}>
+        <Menu closeOnSelect={false}>
           {products.length !== 0 && !products.includes('all') && <CheckMark />}
           <FilterButton>Product</FilterButton>
           <MenuList
@@ -111,7 +111,7 @@ const Filters = ({ data, refetch }) => {
       </Box>
       {/* VERSIONS */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={true}>
+        <Menu closeOnSelect={false}>
           {versions.length !== 0 && !versions.includes('all') && <CheckMark />}
           <FilterButton>Versions</FilterButton>
           <MenuList
@@ -140,7 +140,7 @@ const Filters = ({ data, refetch }) => {
       </Box>
       {/* ENVIRONMENT */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={true}>
+        <Menu closeOnSelect={false}>
           {envs.length !== 0 && !envs.includes('all') && <CheckMark />}
           <FilterButton>Environment</FilterButton>
           <MenuList
@@ -190,7 +190,7 @@ const Filters = ({ data, refetch }) => {
       </Box>
       {/* STATUSES */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={true}>
+        <Menu closeOnSelect={false}>
           {statuses.length !== 0 && !statuses.includes('all') && <CheckMark />}
           <FilterButton>Status</FilterButton>
           <MenuList

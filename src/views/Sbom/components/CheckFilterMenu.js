@@ -101,7 +101,7 @@ const CheckFilterMenu = ({ refetch, productId, sbomId }) => {
       {/* CHECK ID */}
       {data && (
         <Box width={'fit-content'} position={'relative'}>
-          <Menu closeOnBlur={true}>
+          <Menu closeOnSelect={false}>
             {rules.length !== 0 && <CheckMark />}
             <MenuButton
               as={Button}
@@ -155,7 +155,7 @@ const CheckFilterMenu = ({ refetch, productId, sbomId }) => {
       )}
       {/* CATEGORY */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnBlur={true}>
+        <Menu closeOnSelect={false}>
           {categories.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
@@ -191,7 +191,7 @@ const CheckFilterMenu = ({ refetch, productId, sbomId }) => {
       </Box>
       {/* SEVERITY */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={true}>
+        <Menu closeOnSelect={false}>
           {severities.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
@@ -227,7 +227,7 @@ const CheckFilterMenu = ({ refetch, productId, sbomId }) => {
       </Box>
       {/* STATUS */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={true}>
+        <Menu closeOnSelect={false}>
           {statues.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}

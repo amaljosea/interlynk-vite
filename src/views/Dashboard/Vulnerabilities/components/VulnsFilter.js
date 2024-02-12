@@ -139,7 +139,7 @@ const VulnsFilters = ({ refetch }) => {
           position={'relative'}
           display={params?.name ? 'none' : 'block'}
         >
-          <Menu closeOnSelect={true}>
+          <Menu closeOnSelect={false}>
             {products?.length !== 0 && !products.includes('all') && (
               <CheckMark />
             )}
@@ -172,7 +172,7 @@ const VulnsFilters = ({ refetch }) => {
       )}
       {/* SEVERITY */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={true}>
+        <Menu closeOnSelect={false}>
           {severities?.length !== 0 && !severities.includes('all') && (
             <CheckMark />
           )}
@@ -201,7 +201,7 @@ const VulnsFilters = ({ refetch }) => {
       </Box>
       {/* STATUSES */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={true}>
+        <Menu closeOnSelect={false}>
           {statues.length !== 0 && !statues.includes('all') && <CheckMark />}
           <FilterButton>Status</FilterButton>
           <MenuList>
@@ -233,7 +233,7 @@ const VulnsFilters = ({ refetch }) => {
       </Box>
       {/* KEV */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={true}>
+        <Menu closeOnSelect={false}>
           {kev !== 'all' && kev !== '' && <CheckMark />}
           <FilterButton>KEV</FilterButton>
           <MenuList>
@@ -254,7 +254,7 @@ const VulnsFilters = ({ refetch }) => {
       </Box>
       {/* EPSS */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={true} isOpen={isOpen} onClose={onClose}>
+        <Menu closeOnSelect={false} isOpen={isOpen} onClose={onClose}>
           {epss !== '' && epss !== 'all' && <CheckMark />}
           <FilterButton onClick={onOpen}>EPSS</FilterButton>
           <MenuList>

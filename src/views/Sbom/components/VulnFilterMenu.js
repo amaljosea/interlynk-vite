@@ -180,7 +180,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       </Box>
       {/* SEVERITY */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={true}>
+        <Menu closeOnSelect={false}>
           {severities.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
@@ -216,7 +216,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       </Box>
       {/* COMPONENT NAME */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={true}>
+        <Menu closeOnSelect={false}>
           {components.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
@@ -257,7 +257,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       </Box>
       {/* STATUS */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={true}>
+        <Menu closeOnSelect={false}>
           {statues.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
@@ -298,7 +298,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       </Box>
       {/* KEV */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={true}>
+        <Menu closeOnSelect={false}>
           {kev !== 'all' && kev !== '' && <CheckMark />}
           <MenuButton
             as={Button}
@@ -327,7 +327,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       </Box>
       {/* EPSS */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={true} isOpen={isOpen} onClose={onClose}>
+        <Menu closeOnSelect={false} isOpen={isOpen} onClose={onClose}>
           {epss !== '' && epss !== 'all' && <CheckMark />}
           <MenuButton
             as={Button}

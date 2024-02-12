@@ -121,23 +121,13 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
     <Stack direction={'row'} alignItems={'center'} gap={1}>
       {/* ECOSYSTEM */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={true}>
+        <Menu closeOnSelect={false}>
           {ecosystems.length !== 0 && <CheckMark />}
-          <MenuButton
-            as={Button}
-            colorScheme='blue'
-            fontWeight='normal'
-            fontSize={'sm'}
-            leftIcon={<FaFilter size={14} />}
-          >
+          <MenuButton as={Button} colorScheme='blue' fontWeight='normal' fontSize={'sm'} leftIcon={<FaFilter size={14} />}>
             Ecosystem
           </MenuButton>
-          <List>
-            <MenuOptionGroup
-              type='checkbox'
-              value={ecosystems}
-              onChange={onFilterEcosystem}
-            >
+          <MenuList>
+            <MenuOptionGroup type='checkbox' value={ecosystems} onChange={onFilterEcosystem}>
               <MenuItemOption value={'all'} fontSize={'sm'}>
                 All
               </MenuItemOption>
@@ -147,64 +137,39 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
                 </MenuItemOption>
               ))}
             </MenuOptionGroup>
-          </List>
+          </MenuList>
         </Menu>
       </Box>
       {/* KIND */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={true}>
+        <Menu closeOnSelect={false}>
           {kinds.length !== 0 && <CheckMark />}
-          <MenuButton
-            as={Button}
-            colorScheme='blue'
-            fontWeight='normal'
-            fontSize={'sm'}
-            leftIcon={<FaFilter size={14} />}
-          >
+          <MenuButton as={Button} colorScheme='blue' fontWeight='normal' fontSize={'sm'} leftIcon={<FaFilter size={14} />}>
             Type
           </MenuButton>
-          <List>
-            <MenuOptionGroup
-              type='checkbox'
-              value={kinds}
-              onChange={onFilterKind}
-            >
+          <MenuList>
+            <MenuOptionGroup type='checkbox' value={kinds} onChange={onFilterKind}>
               <MenuItemOption value={'all'} fontSize={'sm'}>
                 All
               </MenuItemOption>
               {filterKinds?.map((item, index) => (
-                <MenuItemOption
-                  key={index}
-                  value={item}
-                  fontSize={'sm'}
-                  textTransform={'capitalize'}
-                >
+                <MenuItemOption key={index} value={item} fontSize={'sm'} textTransform={'capitalize'}>
                   {item}
                 </MenuItemOption>
               ))}
             </MenuOptionGroup>
-          </List>
+          </MenuList>
         </Menu>
       </Box>
       {/* LICENSES */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={true}>
+        <Menu closeOnSelect={false}>
           {licenses.length !== 0 && <CheckMark />}
-          <MenuButton
-            as={Button}
-            colorScheme='blue'
-            fontWeight='normal'
-            fontSize={'sm'}
-            leftIcon={<FaFilter size={14} />}
-          >
+          <MenuButton as={Button} colorScheme='blue' fontWeight='normal' fontSize={'sm'} leftIcon={<FaFilter size={14} />}>
             Licenses
           </MenuButton>
-          <List>
-            <MenuOptionGroup
-              type='checkbox'
-              value={licenses}
-              onChange={onFilterLicense}
-            >
+          <MenuList width={'400px'} height={'500px'} overflowY={'scroll'}>
+            <MenuOptionGroup type='checkbox' value={licenses} onChange={onFilterLicense} >
               <MenuItemOption value={'all'} fontSize={'sm'}>
                 All
               </MenuItemOption>
@@ -214,28 +179,18 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
                 </MenuItemOption>
               ))}
             </MenuOptionGroup>
-          </List>
+          </MenuList>
         </Menu>
       </Box>
       {/* SUPPLIER */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={true}>
+        <Menu closeOnSelect={false}>
           {suppliers.length !== 0 && <CheckMark />}
-          <MenuButton
-            as={Button}
-            colorScheme='blue'
-            fontWeight='normal'
-            fontSize={'sm'}
-            leftIcon={<FaFilter size={14} />}
-          >
+          <MenuButton as={Button} colorScheme='blue' fontWeight='normal' fontSize={'sm'} leftIcon={<FaFilter size={14} />}>
             Suppliers
           </MenuButton>
-          <List>
-            <MenuOptionGroup
-              type='checkbox'
-              value={suppliers}
-              onChange={onFilterSupplier}
-            >
+          <MenuList>
+            <MenuOptionGroup type='checkbox' value={suppliers} onChange={onFilterSupplier}>
               <MenuItemOption value={'all'} fontSize={'sm'}>
                 All
               </MenuItemOption>
@@ -245,31 +200,20 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
                 </MenuItemOption>
               ))}
             </MenuOptionGroup>
-          </List>
+          </MenuList>
         </Menu>
       </Box>
       {/* TYPE */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={true}>
+        <Menu closeOnSelect={false}>
           {scope !== '' && scope !== 'all' && <CheckMark />}
-          <MenuButton
-            as={Button}
-            colorScheme='blue'
-            fontWeight='normal'
-            fontSize={'sm'}
-            leftIcon={<FaFilter size={14} />}
-          >
+          <MenuButton as={Button} colorScheme='blue' fontWeight='normal' fontSize={'sm'} leftIcon={<FaFilter size={14} />}>
             Visibility
           </MenuButton>
           <MenuList>
             <MenuOptionGroup type='radio' value={scope} onChange={onFilterType}>
               {['all', 'primary', 'internal'].map((item, index) => (
-                <MenuItemOption
-                  value={item}
-                  key={index}
-                  fontSize={'sm'}
-                  textTransform={'capitalize'}
-                >
+                <MenuItemOption value={item} key={index} fontSize={'sm'} textTransform={'capitalize'}>
                   {item}
                 </MenuItemOption>
               ))}

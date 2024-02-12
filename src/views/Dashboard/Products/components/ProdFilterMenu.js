@@ -18,7 +18,7 @@ const ProdFilterMenu = ({ onFilter }) => {
     <Stack direction={'row'} alignItems={'center'} gap={1}>
       {/* ACTIVE */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={true}>
+        <Menu closeOnSelect={false}>
           {enabled !== '' && enabled !== 'all' && <CheckMark />}
           <FilterButton>Active</FilterButton>
           <MenuList>
