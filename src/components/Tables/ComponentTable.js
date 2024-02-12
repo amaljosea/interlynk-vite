@@ -733,13 +733,13 @@ const ComponentTable = ({
         >
           <GridItem w='100%' colSpan={3}>
             <CustomText>Description :</CustomText>
-            <Text width={'90%'} mt={1} fontSize={14}>
+            <Text width={'90%'} mt={1} fontSize={14} wordBreak={'break-all'}>
               {description !== null ? description : ''}
             </Text>
           </GridItem>
           <GridItem>
             <CustomText>Component :</CustomText>
-            <Text width={'90%'} mt={1} fontSize={14}>
+            <Text width={'90%'} mt={1} fontSize={14} wordBreak={'break-all'}>
               {name}
             </Text>
           </GridItem>
@@ -751,7 +751,7 @@ const ComponentTable = ({
           </GridItem>
           <GridItem>
             <CustomText>Internal :</CustomText>
-            <Text mt={1} fontSize={14}>
+            <Text mt={1} fontSize={14} wordBreak={'break-all'}>
               {internal ? 'True' : 'False'}
             </Text>
           </GridItem>
@@ -767,7 +767,7 @@ const ComponentTable = ({
                     colorScheme='orange'
                     width={'fit-content'}
                   >
-                    <TagLabel>
+                    <Text wordBreak={'break-all'}>
                       {item.contactName}
                       {item.contactEmail && ` (${item.contactEmail})`}
                       {item.url ? (
@@ -778,7 +778,7 @@ const ComponentTable = ({
                       ) : (
                         ` ${item.name}`
                       )}
-                    </TagLabel>
+                    </Text>
                     <TagCloseButton onClick={() => handleSupRemove(item.id)} />
                   </Tag>
                 ))}
@@ -838,14 +838,10 @@ const ComponentTable = ({
                       label={comp.toComp.name}
                       placement='top'
                     >
-                      <Tag
-                        size='sm'
-                        padding={1}
-                        variant='subtle'
-                        colorScheme={'blue'}
-                        wordBreak={'break-all'}
-                      >
-                        {comp.toComp.name}-{comp.toComp.version}
+                      <Tag size='sm' padding={1} variant='subtle' colorScheme={'blue'} wordBreak={'break-all'}>
+                        <Text wordBreak={'break-all'}>
+                          {comp.toComp.name}-{comp.toComp.version}
+                        </Text>
                       </Tag>
                     </Tooltip>
                   ))}
@@ -857,19 +853,11 @@ const ComponentTable = ({
               {compDependency &&
                 compDependency.component.dependencyOf.length > 0 &&
                 compDependency.component.dependencyOf.map((comp, index) => (
-                  <Tooltip
-                    key={index}
-                    label={comp.fromComp.name}
-                    placement='top'
-                  >
-                    <Tag
-                      size='sm'
-                      padding={1}
-                      variant='subtle'
-                      colorScheme={'blue'}
-                      wordBreak={'break-all'}
-                    >
-                      {comp.fromComp.name}-{comp.fromComp.version}
+                  <Tooltip key={index} label={comp.fromComp.name} placement='top'>
+                    <Tag size='sm' padding={1} variant='subtle' colorScheme={'blue'} >
+                      <Text wordBreak={'break-all'}>
+                        {comp.fromComp.name}-{comp.fromComp.version}
+                      </Text>
                     </Tag>
                   </Tooltip>
                 ))}
@@ -887,38 +875,21 @@ const ComponentTable = ({
               {/* SPDX */}
               {licenses?.length > 0 &&
                 licenses.map((item, index) => (
-                  <Tag
-                    key={index}
-                    size={'md'}
-                    variant='subtle'
-                    colorScheme='green'
-                    width={'fit-content'}
-                  >
-                    <TagLabel>{item}</TagLabel>
+                  <Tag key={index} size={'md'} variant='subtle' colorScheme='green' width={'fit-content'}>
+                    <Text wordBreak={'break-all'}>{item}</Text>
                   </Tag>
                 ))}
               {/* EXPRESSION */}
               {licensesExp && licensesExp !== '' && (
-                <Tag
-                  size={'md'}
-                  variant='subtle'
-                  colorScheme='green'
-                  width={'fit-content'}
-                >
-                  <TagLabel>{licensesExp}</TagLabel>
+                <Tag size={'md'} variant='subtle' colorScheme='green' width={'fit-content'}>
+                  <Text wordBreak={'break-all'}>{licensesExp}</Text>
                 </Tag>
               )}
               {/* CUSTOM */}
               {licensesCustom?.length > 0 &&
                 licensesCustom?.map((item, index) => (
-                  <Tag
-                    key={index}
-                    size={'md'}
-                    variant='subtle'
-                    colorScheme='green'
-                    width={'fit-content'}
-                  >
-                    <TagLabel>{item}</TagLabel>
+                  <Tag key={index} size={'md'} variant='subtle' colorScheme='green' width={'fit-content'}>
+                    <Text wordBreak={'break-all'}>{item}</Text>
                   </Tag>
                 ))}
             </Flex>
