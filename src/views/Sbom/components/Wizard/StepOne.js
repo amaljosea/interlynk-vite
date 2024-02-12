@@ -5,7 +5,9 @@ import {
   FormControl,
   FormLabel,
   Select,
-  Text
+  Text,
+  Alert,
+  AlertIcon
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { GetProject, GetProjectGroups } from 'graphQL/Queries'
@@ -206,23 +208,29 @@ const StepOne = ({
               <FormLabel htmlFor='versions' fontSize='md' color='gray.600'>
                 Version
               </FormLabel>
-              <Select
-                name='versions'
-                id='versions'
-                value={selectedVersion}
-                onChange={(e) => {
-                  setSelectedVersion(e.target.value)
-                  setSbomId(e.target.value)
-                }}
-              >
-                <option value={''}>-- Select --</option>
-                {uniqVersions.length > 0 &&
-                  uniqVersions.map((item, index) => (
+              {uniqVersions.length > 0 ? (
+                <Select
+                  name='versions'
+                  id='versions'
+                  value={selectedVersion}
+                  onChange={(e) => {
+                    setSelectedVersion(e.target.value)
+                    setSbomId(e.target.value)
+                  }}
+                >
+                  <option value={''}>-- Select --</option>
+                  {uniqVersions.map((item, index) => (
                     <option key={index} value={item.id}>
                       {item?.projectVersion}
                     </option>
                   ))}
-              </Select>
+                </Select>
+              ) : (
+                <Alert borderRadius={'md'} py={'8px'} status='info'>
+                  <AlertIcon />
+                  No version available
+                </Alert>
+              )}
             </FormControl>
           </Stack>
         )}
