@@ -31,7 +31,7 @@ import { useEffect } from 'react'
 // Custom Icons
 import { ProfileIcon, SettingsIcon } from 'components/Icons/Icons'
 import { FaRegKeyboard, FaSignOutAlt, FaExchangeAlt } from 'react-icons/fa'
-import { FaUser } from 'react-icons/fa6'
+import { FaCode, FaInbox, FaSquareArrowUpRight, FaUser } from 'react-icons/fa6'
 // Custom Components
 import SidebarResponsive from 'components/Sidebar/SidebarResponsive'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -45,6 +45,8 @@ export default function HeaderLinks(props) {
   const { data, error } = useQuery(GetOrg)
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
+  const sbomId = queryParams.get('sbom')
+  const group = JSON.parse(localStorage.getItem('product'))
   const dashboardView = location.pathname === '/vendor/dashboard'
 
   const { variant, children, fixed, secondary, onOpen, ...rest } = props
@@ -80,23 +82,37 @@ export default function HeaderLinks(props) {
     navigate('/auth')
   }
 
-  const shortcuts = [
-    {
-      key: 'Ctrl + /',
-      title: 'Search'
+  const shortcuts = [{key: 'Ctrl + /',title: 'Search'}]
+
+  const handleEnvChange = (value) => {
+    localStorage.setItem('environment', value)
+    setEnvName(value)
+    if(sbomId) {
+      navigate(`/vendor/products/${group?.name}?id=${group?.id}`)
     }
-  ]
+  }
+
+  const envIcon = (env) => {
+    switch (env) {
+      case 'default':
+        return <FaInbox />
+      case 'development':
+        return <FaCode />
+      case 'production':
+        return <FaSquareArrowUpRight />
+    }
+  }
 
   return (
     <Flex gap={4} alignItems='center' flexDirection='row'>
       {/* ENVIRONMENT */}
-      {dashboardView && (
+      {(dashboardView || productId) && (
         <Menu closeOnSelect={true}>
-          <MenuButton as={Button} size='sm' colorScheme='blue' fontWeight='medium' fontSize='sm' rightIcon={<ChevronDownIcon />}>
-            Environment
+          <MenuButton as={Button} size='sm' colorScheme='blue' fontWeight='medium' fontSize='sm' leftIcon={envIcon(envName)} rightIcon={<ChevronDownIcon />} textTransform='capitalize'>
+            {envName || 'Default'}
           </MenuButton>
           <MenuList>
-            <MenuOptionGroup value={envName} onChange={(value) => setEnvName(value)} type='radio'>
+            <MenuOptionGroup value={envName} onChange={(value) => handleEnvChange(value)} type='radio'>
               {['default', 'development', 'production'].map((item, index) => (
                 <MenuItemOption key={index} value={item} fontSize='sm' textTransform={'capitalize'}>
                   {item}
@@ -109,12 +125,7 @@ export default function HeaderLinks(props) {
       {productId && (
         <Popover isLazy>
           <PopoverTrigger>
-            <IconButton
-              m={0}
-              p={0}
-              variant='ghost'
-              icon={<FaRegKeyboard fontSize={24} color='darkgray' />}
-            />
+            <IconButton m={0} p={0} variant='ghost' icon={<FaRegKeyboard fontSize={24} color='darkgray' />}/>
           </PopoverTrigger>
           <PopoverContent>
             <PopoverHeader fontWeight='medium'>

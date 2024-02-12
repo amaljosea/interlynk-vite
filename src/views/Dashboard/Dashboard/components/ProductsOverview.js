@@ -18,18 +18,15 @@ import { useGlobalState } from 'hooks/useGlobalState'
 const ProductsOverview = ({ title, data, refetch }) => {
   const { setActiveSbomTab, dispatch } = useGlobalState()
   const { prodDispatch, prodVulnDispatch } = dispatch
+  const environment = localStorage.getItem('environment')
 
   const handleClick = (prod) => {
-    const { project, id, projectId } = prod
+    console.log('prod', prod)
+    const { project, id, projectId, projectVersion } = prod
     const { projectGroup, name } = project
-    const product = {
-      version: normalizeSBOMVersion(prod),
-      groupId: projectGroup?.id,
-      id: projectGroup?.id,
-      name: name,
-      sbomId: id
-    }
-    localStorage.setItem('activeEnv', projectGroup?.defaultProject?.id)
+    // const env = projects?.find((item) => item.name === environment)
+    const product = {version: projectVersion, groupId: projectGroup?.id, id: projectGroup?.id, name: name, sbomId: id, defaultEnv: projectGroup?.defaultProject?.id }
+    localStorage.setItem('activeEnv', project?.id)
     localStorage.setItem('product', JSON.stringify(product))
     localStorage.setItem('activeProdTab', 0)
     prodDispatch({

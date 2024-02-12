@@ -15,6 +15,8 @@ import {
 const GlobalStateContext = createContext()
 
 const GlobalStateProvider = ({ children }) => {
+  const env = localStorage.getItem('environment')
+
   const [userPermissions, setUserPermissions] = useState([])
   const [userName, setUserName] = useState('')
   const [totalRows, setTotalRows] = useState(25)
@@ -24,7 +26,7 @@ const GlobalStateProvider = ({ children }) => {
   const [activeDockerHub, setActiveDockerHub] = useState(true)
   const [vulnerabilitiesData, setVulnerabilitiesData] = useState([])
   const [scanEnabled, setScanEnabled] = useState(false)
-  const [envName, setEnvName] = useState('default')
+  const [envName, setEnvName] = useState(env || 'default')
   // PRODUCTS
   const [prodState, prodDispatch] = useReducer(prodReducer, {
     data: null,

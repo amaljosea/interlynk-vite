@@ -115,6 +115,8 @@ const ProductDetails = () => {
   const { prodVulnDispatch, globalVulnDispatch } = dispatch
 
   const activeProd = localStorage.getItem('activeEnv')
+  const group = JSON.stringify(localStorage.getItem('product'))
+  const environment = localStorage.getItem('environment')
   const [activeEnv, setActiveEnv] = useState(activeProd || '')
 
   const product = userPermissions?.find(
@@ -358,6 +360,17 @@ const ProductDetails = () => {
     }
   }, [activeTab, activeEnv])
 
+  useEffect(() => {
+    if (environment && data) {
+      const env = data?.projectGroup?.projects.find(
+        (item) => item.name === environment
+      )
+      globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
+      localStorage.setItem('activeEnv', env?.id)
+      setActiveEnv(env?.id)
+    }
+  }, [environment])
+
   if (loading) {
     return (
       <Card>
@@ -513,6 +526,7 @@ const ProductDetails = () => {
               {/* CHANGE ENVIRONMENT */}
               <Menu>
                 <MenuButton
+                  display='none'
                   as={Button}
                   variant={'solid'}
                   colorScheme='blue'

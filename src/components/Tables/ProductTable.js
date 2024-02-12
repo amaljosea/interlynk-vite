@@ -50,6 +50,7 @@ import Card from 'components/Card/Card'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import StatusModal from 'views/Dashboard/Products/components/StatusModal'
 import Pagination from '../Pagination'
+import { FaCode, FaInbox, FaSquareArrowUpRight } from 'react-icons/fa6'
 
 const ProductTable = ({ data, refetch }) => {
   //This part is needed for the pagination to work. (Modify with caution)
@@ -80,8 +81,7 @@ const ProductTable = ({ data, refetch }) => {
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
 
-  const { userPermissions, setActiveSbomTab, prodState, dispatch } =
-    useGlobalState()
+  const { userPermissions, setActiveSbomTab, prodState, dispatch } = useGlobalState()
 
   const { field, direction, searchInput, pageIndex, enabled } = prodState
   const { prodDispatch, prodCompDispatch } = dispatch
@@ -122,6 +122,7 @@ const ProductTable = ({ data, refetch }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const activeEnv = localStorage.getItem('activeEnv')
+  const environment = localStorage.getItem('environment')
 
   const {
     isOpen: isOpenProduct,
@@ -351,42 +352,28 @@ const ProductTable = ({ data, refetch }) => {
         id: 'PROJECT_GROUPS_NAME',
         name: 'PRODUCT',
         selector: (row) => {
-          const { id, name, defaultProject } = row
-          const product = {
-            id: id,
-            name: name,
-            groupId: id
-          }
-
+          const { id, name, projects, defaultProject } = row
+          const product = { id: id, name: name, groupId: id }
           const handleClick = () => {
+            const env = projects?.find((item) => item.name === environment)
+            prodDispatch({ type: 'SET_CURRENT_PRODUCT', payload: { id: env?.id || defaultProject?.id }})
+            localStorage.setItem('activeEnv', env?.id || defaultProject?.id)
             localStorage.setItem('product', JSON.stringify(product))
-            localStorage.setItem('activeEnv', defaultProject?.id)
             localStorage.setItem('activeProdTab', 0)
-            prodDispatch({
-              type: 'SET_CURRENT_PRODUCT',
-              payload: {
-                id: defaultProject?.id,
-              }
-            })
             setActiveSbomTab(0)
           }
 
           return (
-            <Link
-              to={`/vendor/products/${name}?id=${id}`}
-              onClick={handleClick}
-            >
-              <Text color={'blue.500'} minWidth='100%'>
-                {name}
-              </Text>
+            <Link to={`/vendor/products/${name}?id=${id}`} onClick={handleClick}>
+              <Text color={'blue.500'} minWidth='100%'>{name}</Text>
             </Link>
           )
         },
         wrap: true,
         sortable: true
       },
-       // DESCRIPTION
-       {
+      // DESCRIPTION
+      {
         id: 'PROJECT_GROUPS_DESCRIPTION',
         name: 'DESCRIPTION',
         selector: (row) => {
@@ -404,19 +391,73 @@ const ProductTable = ({ data, refetch }) => {
       },
       // ENVIRONMENT
       {
-        id: 'ENVIRONMENT',
-        name: 'ENVIRONMENT',
+        id: 'ENVIRONMENTS',
+        name: 'ENVIRONMENTS',
         selector: (row) => {
-          const { projects } = row
-          return <Text>{projects?.length}</Text>
+          const { id, name, projects } = row
+          const product = { id: id, name: name, groupId: id }
+
+          const handleClick = (value) => {
+            const env = projects?.find((item) => item.name === value)
+            localStorage.setItem('product', JSON.stringify(product))
+            localStorage.setItem('environment', env?.name)
+            localStorage.setItem('activeEnv', env?.id)
+            localStorage.setItem('activeProdTab', 0)
+            prodDispatch({ type: 'SET_CURRENT_PRODUCT', payload: { id: env?.id } })
+            setActiveSbomTab(0)
+          }
+
+          return (
+            <Stack direction={'row'} spacing={2} alignItems={'center'}>
+              <Tooltip label='Default'>
+                <Link
+                  to={`/vendor/products/${name}?id=${id}`}
+                  onClick={() => handleClick('default')}
+                >
+                  <IconButton
+                    size='sm'
+                    colorScheme='blue'
+                    aria-label='Default'
+                    icon={<FaInbox />}
+                  />
+                </Link>
+              </Tooltip>
+              <Tooltip label='Development'>
+                <Link
+                  to={`/vendor/products/${name}?id=${id}`}
+                  onClick={() => handleClick('development')}
+                >
+                  <IconButton
+                    size='sm'
+                    colorScheme='blue'
+                    aria-label='Development'
+                    icon={<FaCode />}
+                  />
+                </Link>
+              </Tooltip>
+              <Tooltip label='Production'>
+                <Link
+                  to={`/vendor/products/${name}?id=${id}`}
+                  onClick={() => handleClick('production')}
+                >
+                  <IconButton
+                    size='sm'
+                    colorScheme='blue'
+                    aria-label='Production'
+                    icon={<FaSquareArrowUpRight />}
+                  />
+                </Link>
+              </Tooltip>
+            </Stack>
+          )
         },
         wrap: true,
         right: 'true'
       },
       // VERSION
       {
-        id: 'VERSION',
-        name: 'VERSION',
+        id: 'VERSIONS',
+        name: 'VERSIONS',
         selector: (row) => {
           const { projects } = row
           const totalSbom = projects?.reduce(

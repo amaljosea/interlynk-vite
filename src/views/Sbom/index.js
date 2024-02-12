@@ -14,7 +14,7 @@ const idRegex =
   /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
 
 function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
-  const { totalRows, setActiveSbomTab, prodState, prodCompState } =
+  const { totalRows, envName, setActiveSbomTab, prodState, prodCompState } =
     useGlobalState()
   const { data: allProjectGroups } = prodState
   const location = useLocation()
@@ -28,6 +28,7 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
   const [status, setStatus] = useState('created')
   const [totalComp, setTotalComp] = useState(0)
   const group = JSON.parse(localStorage.getItem('product'))
+  const environment = localStorage.getItem('environment')
 
   // GET COMPONENT DATA
   const {
@@ -105,6 +106,7 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
       window.location.href = `/vendor/products`
     }
   }, [productId, sbomId])
+
 
   useEffect(() => {
     if (error) {

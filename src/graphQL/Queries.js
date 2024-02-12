@@ -142,6 +142,7 @@ export const GetOrgMetrics = gql`
         projectId
         projectVersion
         project {
+          id
           name
           sboms {
             id
