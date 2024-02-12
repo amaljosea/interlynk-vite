@@ -319,7 +319,8 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
               colorScheme='blue'
               icon={<TbSignature size={22} />}
               onClick={setVerifyOpen}
-              isDisabled={!signSboms || !updateSboms}
+              // isDisabled={!signSboms || !updateSboms}
+              isDisabled={true}
             />
           </Tooltip>
         ) : (
@@ -328,7 +329,8 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
               colorScheme='blue'
               icon={<TbSignatureOff size={22} />}
               onClick={setVerifyOpen}
-              isDisabled={!signSboms || !updateSboms}
+              // isDisabled={!signSboms || !updateSboms}
+              isDisabled={true}
             />
           </Tooltip>
         )}
