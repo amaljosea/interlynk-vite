@@ -1,5 +1,16 @@
 import React, { useState, createContext, useContext, useReducer } from 'react'
-import { globalVulnReducer, compVulnReducer, prodRulesReducer, prodCheckReducer, prodCompReducer, prodLogReducer,prodVulnReducer, sbomLogReducer, prodReducer, sbomReducer } from 'context/reducers'
+import {
+  globalVulnReducer,
+  compVulnReducer,
+  prodRulesReducer,
+  prodCheckReducer,
+  prodCompReducer,
+  prodLogReducer,
+  prodVulnReducer,
+  sbomLogReducer,
+  prodReducer,
+  sbomReducer
+} from 'context/reducers'
 
 const GlobalStateContext = createContext()
 
@@ -101,6 +112,7 @@ const GlobalStateProvider = ({ children }) => {
     severities: [],
     components: [],
     statues: [],
+    source: 'BOTH',
     kev: '',
     epss: '',
     minEpss: 0,
@@ -147,7 +159,50 @@ const GlobalStateProvider = ({ children }) => {
 
   return (
     <GlobalStateContext.Provider
-      value={{minimize, setMinimize,totalRows,setTotalRows,activeProdTab,setActiveProdTab,activeSbomTab,setActiveSbomTab,activeDockerHub, setActiveDockerHub, vulnerabilitiesData, setVulnerabilitiesData,userPermissions, setUserPermissions, scanEnabled, setScanEnabled, userName, setUserName, envName, setEnvName,globalVulnState, compVulnState, prodState, prodLogState, prodCompState, prodVulnState, prodCheckState, prodRulesState, sbomLogState, sbomState, dispatch: {globalVulnDispatch, compVulnDispatch, prodDispatch,prodLogDispatch, prodCompDispatch, prodVulnDispatch, prodCheckDispatch, prodRulesDispatch, sbomLogDispatch,sbomDispatch}}}
+      value={{
+        minimize,
+        setMinimize,
+        totalRows,
+        setTotalRows,
+        activeProdTab,
+        setActiveProdTab,
+        activeSbomTab,
+        setActiveSbomTab,
+        activeDockerHub,
+        setActiveDockerHub,
+        vulnerabilitiesData,
+        setVulnerabilitiesData,
+        userPermissions,
+        setUserPermissions,
+        scanEnabled,
+        setScanEnabled,
+        userName,
+        setUserName,
+        envName,
+        setEnvName,
+        globalVulnState,
+        compVulnState,
+        prodState,
+        prodLogState,
+        prodCompState,
+        prodVulnState,
+        prodCheckState,
+        prodRulesState,
+        sbomLogState,
+        sbomState,
+        dispatch: {
+          globalVulnDispatch,
+          compVulnDispatch,
+          prodDispatch,
+          prodLogDispatch,
+          prodCompDispatch,
+          prodVulnDispatch,
+          prodCheckDispatch,
+          prodRulesDispatch,
+          sbomLogDispatch,
+          sbomDispatch
+        }
+      }}
     >
       {children}
     </GlobalStateContext.Provider>
@@ -156,7 +211,8 @@ const GlobalStateProvider = ({ children }) => {
 
 const useGlobalState = () => {
   const context = useContext(GlobalStateContext)
-  if (!context) throw new Error('useGlobalState must be used within a GlobalStateProvider')
+  if (!context)
+    throw new Error('useGlobalState must be used within a GlobalStateProvider')
   return context
 }
 

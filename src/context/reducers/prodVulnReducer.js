@@ -13,6 +13,7 @@ const prodVulnReducer = (state, action) => {
         severities: [],
         components: [],
         statues: [],
+        source: 'BOTH',
         kev: '',
         epss: '',
         min: 0,
@@ -64,6 +65,14 @@ const prodVulnReducer = (state, action) => {
       return {
         ...state,
         filters: payload
+      }
+    case 'FILTER_SOURCE':
+      return {
+        ...state,
+        source: payload,
+        pageIndex: 1,
+        after: '',
+        before: ''
       }
     case 'FILTER_COMPONENT':
       return {

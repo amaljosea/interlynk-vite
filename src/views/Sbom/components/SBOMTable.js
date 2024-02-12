@@ -200,9 +200,12 @@ const SBOMTable = ({
         severities,
         components,
         statues,
+        source,
         kev,
         epss
       } = prodVulnState
+      console.log('source', source)
+
       const vulnEpss =
         epss !== 'all' && epss !== ''
           ? epss.split('-').map((v) => parseFloat(v) / 10000)
@@ -210,6 +213,7 @@ const SBOMTable = ({
       getVulnData({
         ...commonParams,
         search: getUndefinedIfEmpty(searchInput),
+        source: (source === 'BOTH' || source === '') ? undefined : source,
         severity: getUndefinedIfEmptyOrAll(severities),
         componentName: getUndefinedIfEmptyOrAll(components),
         status: getUndefinedIfEmptyOrAll(statues),

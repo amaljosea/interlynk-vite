@@ -1430,6 +1430,7 @@ export const GetVulnData = gql`
     $severity: [String!]
     $status: [String!]
     $componentName: [String!]
+    $source: SbomVulnSourceEnum
     $kev: Boolean
     $epss: RangeInput
     $first: Int
@@ -1446,6 +1447,7 @@ export const GetVulnData = gql`
         severity: $severity
         status: $status
         componentName: $componentName
+        vulnerabilitySource: $source
         kev: $kev
         epss: $epss
         after: $after

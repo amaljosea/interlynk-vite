@@ -35,7 +35,6 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
     vulnRunStatus,
     stats
   } = sbom
-  console.log('sbom', sbom)
   const { compCount, compLicenseCount, vulnStats } = stats
   const { critical, high, medium, low } = vulnStats
 

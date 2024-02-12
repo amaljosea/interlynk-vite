@@ -25,6 +25,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
     severities,
     components,
     statues,
+    source,
     kev,
     epss,
     filters,
@@ -54,7 +55,14 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
     }
   }
 
-  const handleRefetch = async (severity, component, status, kev, epss) => {
+  const handleRefetch = async (
+    source,
+    severity,
+    component,
+    status,
+    kev,
+    epss
+  ) => {
     const epssRange = epss !== 'all' && epss !== '' && epss.split('-')
 
     const range = {
@@ -65,6 +73,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
     await refetch({
       projectId: productId,
       sbomId: sbomId,
+      source: (source === 'BOTH' || source === '') ? undefined : source,
       severity:
         !severity.includes('all') && severity.length > 0 ? severity : undefined,
       componentName:
@@ -83,8 +92,16 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
     })
   }
 
+  const onFilterSource = (value) => {
+    handleRefetch(value, severities, components, statues, kev, epss)
+    prodVulnDispatch({
+      type: 'FILTER_SOURCE',
+      payload: value
+    })
+  }
+
   const onFilterCompName = (value) => {
-    handleRefetch(severities, value, statues, kev, epss)
+    handleRefetch(source, severities, value, statues, kev, epss)
     prodVulnDispatch({
       type: 'FILTER_COMPONENT',
       payload: value
@@ -92,7 +109,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
   }
 
   const onFilterSeverity = (value) => {
-    handleRefetch(value, components, statues, kev, epss)
+    handleRefetch(source, value, components, statues, kev, epss)
     prodVulnDispatch({
       type: 'FILTER_SEVERITY',
       payload: value
@@ -100,7 +117,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
   }
 
   const onFilterStatus = (value) => {
-    handleRefetch(severities, components, value, kev, epss)
+    handleRefetch(source, severities, components, value, kev, epss)
     prodVulnDispatch({
       type: 'FILTER_STATUS',
       payload: value
@@ -108,23 +125,59 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
   }
 
   const onFilterKev = (value) => {
-    handleRefetch(severities, components, statues, value, epss)
+    handleRefetch(source, severities, components, statues, value, epss)
     prodVulnDispatch({ type: 'FILTER_KEV', payload: value })
   }
 
   const onFilterEpss = (value) => {
-    handleRefetch(severities, components, statues, kev, value)
+    handleRefetch(source, severities, components, statues, kev, value)
     prodVulnDispatch({ type: 'FILTER_EPSS', payload: value })
   }
 
   const handleSubmit = () => {
-    handleRefetch(severities, components, statues, kev, `${minEpss}-${maxEpss}`)
+    handleRefetch(
+      source,
+      severities,
+      components,
+      statues,
+      kev,
+      `${minEpss}-${maxEpss}`
+    )
     prodVulnDispatch({ type: 'SET_EPSS', payload: `${minEpss}-${maxEpss}` })
     onClose()
   }
 
+
   return (
     <Stack direction={'row'} alignItems={'center'} gap={1}>
+      {/* ORIGIN */}
+      <Box width={'fit-content'} position={'relative'}>
+        <Menu closeOnSelect={true}>
+          {(source !== '' && source !== 'BOTH') && <CheckMark />}
+          <MenuButton
+            as={Button}
+            colorScheme='blue'
+            fontWeight='normal'
+            fontSize={'sm'}
+            leftIcon={<FaFilter size={14} />}
+          >
+            Origin
+          </MenuButton>
+          <MenuList>
+            <MenuOptionGroup
+              type='radio'
+              value={source}
+              onChange={onFilterSource}
+            >
+              {['BOTH','COMPONENT', 'PART'].map((item, index) => (
+                <MenuItemOption key={index} value={item} fontSize={'sm'} >
+                  {item}
+                </MenuItemOption>
+              ))}
+            </MenuOptionGroup>
+          </MenuList>
+        </Menu>
+      </Box>
       {/* SEVERITY */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>

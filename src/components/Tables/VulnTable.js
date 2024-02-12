@@ -130,6 +130,7 @@ const VulnTable = ({
     severities,
     components,
     statues,
+    source,
     kev,
     epss,
     filters
@@ -436,6 +437,7 @@ const VulnTable = ({
     projectId: productId,
     sbomId: sbomId,
     search: searchInput !== '' ? searchInput : undefined,
+    source: (source === 'BOTH' || source === '') ? undefined : source,
     severity: severities.length > 0 ? severities : undefined,
     componentName: components.length > 0 ? components : undefined,
     status: statues.length > 0 ? statues : undefined,
@@ -453,6 +455,7 @@ const VulnTable = ({
       projectId: productId,
       sbomId: sbomId,
       search: undefined,
+      source: (source === 'BOTH' || source === '') ? undefined : source,
       severity: severities.length > 0 ? severities : undefined,
       componentName: components.length > 0 ? components : undefined,
       status: statues.length > 0 ? statues : undefined,
@@ -492,6 +495,7 @@ const VulnTable = ({
         projectId: productId,
         sbomId: sbomId,
         search: value !== '' ? value : undefined,
+        source: (source === 'BOTH' || source === '') ? undefined : source,
         severity: severities.length > 0 ? severities : undefined,
         componentName: components.length > 0 ? components : undefined,
         status: statues.length > 0 ? statues : undefined,
@@ -790,6 +794,7 @@ const VulnTable = ({
       sbomId: sbomId,
       signedParams: customerView ? signedParams : undefined,
       search: searchInput !== '' ? searchInput : undefined,
+      source: (source === 'BOTH' || source === '') ? undefined : source,
       severity:
         !severities.includes('all') && severities.length > 0
           ? severities

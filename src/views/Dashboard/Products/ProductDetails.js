@@ -100,6 +100,7 @@ const ProductDetails = () => {
     searchInput: compVulnSearch,
     envs,
     statuses,
+    source,
     versions: sbomVersions,
     products
   } = compVulnState
@@ -203,6 +204,7 @@ const ProductDetails = () => {
       before: undefined,
       search: vulnSearch !== '' ? vulnSearch : undefined,
       severity: severities.length > 0 ? severities : undefined,
+      source: (source === 'BOTH' || source === '') ? undefined : source,
       componentName: components.length > 0 ? components : undefined,
       status: statues.length > 0 ? statues : undefined,
       kev:
