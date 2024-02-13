@@ -86,7 +86,7 @@ const CpeField = ({
 
   const handleBlur = (e) => {
     e.preventDefault()
-    handleValidate(inputValue)
+    inputValue !== '' && handleValidate(inputValue)
   }
 
   useEffect(() => {
@@ -131,7 +131,7 @@ const CpeField = ({
           />
           {inputValue !== '' && (
             <InputRightElement align='center' zIndex={-1}>
-              {isCpeValid ? (
+              {isCpeValid === true ? (
                 <CheckIcon color='green' />
               ) : (
                 <WarningTwoIcon color='red' />

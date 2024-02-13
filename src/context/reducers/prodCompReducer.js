@@ -12,13 +12,23 @@ const prodCompReducer = (state, action) => {
         suppliers: [],
         licenses: [],
         kinds: [],
-        scope: ''
+        scope: '',
+        filters: null,
+        licenseType: 'license_exp',
+        spdxLicenses: [],
+        spdxList: [],
+        customLicenses: [],
+        customList: [],
+        expLicense: '',
+        cpeString: '',
+        isCpeValid: true,
+        purlString: ''
       }
     case 'CHANGE_SEARCH_INPUT':
       return {
         ...state,
         searchInput: payload,
-        pageIndex: 1,
+        pageIndex: 1
       }
     case 'FETCH_DATA_SUCCESS':
       return {

@@ -59,56 +59,22 @@ function ComponentDrawer(props) {
 
   const customerView = location.pathname.startsWith('/customer')
 
-  const {
-    isOpen,
-    onClose,
-    data,
-    primaryComp,
-    fetchCompData,
-    shortDesc,
-    filterRefetch,
-    sbomRefetch
-  } = props
-
+  const { isOpen, onClose, data, primaryComp, fetchCompData, shortDesc, filterRefetch, sbomRefetch } = props
   const { prodCompState, dispatch } = useGlobalState()
-  const {
-    licenseType,
-    customLicenses,
-    purlString,
-    expLicense,
-    spdxLicenses,
-    totalComp
-  } = prodCompState
+  const { licenseType, purlString, expLicense, totalComp } = prodCompState
   const { prodCompDispatch } = dispatch
 
   const [getAllComps, { data: allComponents }] = useLazyQuery(GetAllComponents)
   const [addRelation] = useMutation(CreateCompRelation)
 
   const onFilterRefetch = () => {
-    filterRefetch({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId
-      }
-    }).then(
-      (res) =>
-        res.data &&
-        prodCompDispatch({
-          type: 'ADD_FILTER_HEADS',
-          payload: res.data.sbom.filters
-        })
-    )
+    filterRefetch({variables: { projectId: productId, sbomId: sbomId } })
+      .then( (res) => res.data && prodCompDispatch({type: 'ADD_FILTER_HEADS',payload: res.data.sbom.filters}))
   }
 
   const [getCpe] = useLazyQuery(CpeAutoComplete)
-
-  const [createComponent] = useMutation(CreateComponent, {
-    onCompleted: () => fetchCompData()
-  })
-
-  const [updateComponent] = useMutation(UpdateComponent, {
-    onCompleted: () => fetchCompData()
-  })
+  const [createComponent] = useMutation(CreateComponent, {onCompleted: () => fetchCompData()})
+  const [updateComponent] = useMutation(UpdateComponent, {onCompleted: () => fetchCompData()})
 
   const cpeRef = useRef()
 
@@ -132,17 +98,7 @@ function ComponentDrawer(props) {
 
   useEffect(() => {
     if (data) {
-      const {
-        name,
-        version,
-        kind,
-        cpes,
-        purl,
-        primary,
-        internal,
-        group,
-        scope
-      } = data
+      const { name, version, kind, cpes, purl, primary, internal, group, scope } = data
       setGroupInfo(group)
       setCompName(name)
       setCompVersion(version)
@@ -678,12 +634,7 @@ function ComponentDrawer(props) {
                 <Button
                   colorScheme='blue'
                   onClick={handleCreateCom}
-                  isDisabled={
-                    compKind === '' ||
-                    compName === '' ||
-                    compVersion === '' ||
-                    !isValid
-                  }
+                  isDisabled={ compKind === '' || compName === '' || compVersion === '' || !isValid}
                 >
                   Save
                 </Button>
