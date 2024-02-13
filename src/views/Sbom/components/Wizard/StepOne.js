@@ -163,7 +163,6 @@ const StepOne = ({
                   value={selectedGroup}
                   onChange={handleSelectGroup}
                 >
-                  <option value={''}>-- Select --</option>
                   {data?.organization?.projectGroups?.nodes?.map(
                     (item, index) => (
                       <option key={index} value={item.id}>
