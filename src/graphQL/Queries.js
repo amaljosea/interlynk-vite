@@ -643,7 +643,9 @@ export const GetGlobalVulnData = gql`
             creationAt
             updatedAt
             projectVersion
+            hasConnectedSboms
             project {
+              id
               name
               projectGroup {
                 id
@@ -655,6 +657,36 @@ export const GetGlobalVulnData = gql`
               name
               version
             }
+          }
+        }
+      }
+    }
+  }
+`
+
+// GET ALL CONNECTED SBOMS
+export const GetConnectedSbom = gql`
+  query GetConnectedSbom(
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $componentVulnId: Uuid!
+  ) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      connectedSboms {
+        projectVersion
+        project {
+          name
+          projectGroup {
+            name
+          }
+        }
+        parentDispositionFrom(componentVulnId: $componentVulnId) {
+          id
+          vexStatus {
+            name
+          }
+          vexJustinfication {
+            name
           }
         }
       }

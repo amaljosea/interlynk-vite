@@ -136,7 +136,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
           </Stack>
         )
       },
-      width: '15%',
+      width: '250px',
       sortable: true
     },
     // SEVERITY
@@ -158,7 +158,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
           </Tag>
         )
       },
-      width: '9%',
+      width: '150px',
       wrap: true
     },
     // SOURCE
@@ -182,7 +182,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
           </Tag>
         )
       },
-      width: '8%',
+      width: '120px',
       wrap: true,
       sortable: true
     },
@@ -206,7 +206,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
           </Flex>
         )
       },
-      width: '8%',
+      width: '120px',
       wrap: true,
       sortable: true
     },
@@ -303,7 +303,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
           </Stack>
         )
       },
-      width: '25%',
+      width: '350px',
       wrap: true
     },
     // PUBLISHED AT
@@ -312,7 +312,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
       name: 'PUBLISHED',
       selector: (row) => (
         <Tooltip label={getFullDateAndTime(row?.publishedAt)} placement={'top'}>
-          {timeSince(row?.publishedAt)}
+          <Text textAlign={'right'}>{timeSince(row?.publishedAt)}</Text>
         </Tooltip>
       ),
       sortable: true,
@@ -329,11 +329,8 @@ const GlobalVulnTable = ({ data, refetch }) => {
       id: 'VULNS_LAST_MODIFIED_AT',
       name: 'MODIFIED',
       selector: (row) => (
-        <Tooltip
-          label={getFullDateAndTime(row?.lastModifiedAt)}
-          placement={'top'}
-        >
-          {timeSince(row?.lastModifiedAt)}
+        <Tooltip label={getFullDateAndTime(row?.lastModifiedAt)} placement={'top'}>
+          <Text textAlign={'right'}>{timeSince(row?.lastModifiedAt)}</Text>
         </Tooltip>
       ),
       sortable: true,

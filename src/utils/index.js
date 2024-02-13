@@ -194,16 +194,18 @@ export const sevColor = (severity) => {
 }
 
 export const statusColor = (status) => {
-  if (status && status.name === 'Fixed') {
+  if (status && status === 'Fixed') {
     return 'blue'
-  } else if (status && status.name === 'Not Affected') {
+  } else if (status && status === 'Not Affected') {
     return 'green'
-  } else if (status && status.name == 'Affected') {
+  } else if (status && status === 'Affected') {
     return 'red'
-  } else if (status && status.name === 'False Positive') {
-    return 'gray'
-  } else {
+  } else if (status && status === 'False Positive') {
+    return 'purple'
+  } else if (status && status === 'In Triage') {
     return 'cyan'
+  } else {
+    return 'gray'
   }
 }
 
@@ -756,3 +758,5 @@ export const linkURl = (type, id) => {
     return `https://nvd.nist.gov/vuln/detail/${id}`
   }
 }
+
+

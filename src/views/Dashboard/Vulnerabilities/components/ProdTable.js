@@ -9,7 +9,8 @@ import {
   useDisclosure,
   Select,
   Stack,
-  Box
+  Box,
+  IconButton
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
 import { useEffect, useMemo, useState } from 'react'
@@ -19,6 +20,13 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import VexModal from './VexModal'
 import { useLocation, useParams } from 'react-router-dom'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
+import { normalizeSBOMVersion } from 'utils'
+import { useLazyQuery } from '@apollo/client'
+import { GetProjectGroup } from 'graphQL/Queries'
+import { FaFolderTree } from 'react-icons/fa6'
+import ConnectedSbomDrawer from 'components/Drawer/ConnectedSbomDrawer'
+import { GetConnectedSbom } from 'graphQL/Queries'
+import { statusColor } from 'utils'
 
 const customStyles = {
   headCells: {
@@ -37,21 +45,7 @@ const customStyles = {
   }
 }
 
-const statusColor = (status) => {
-  if (status && status === 'Fixed') {
-    return 'blue'
-  } else if (status && status === 'Not Affected') {
-    return 'green'
-  } else if (status && status === 'Affected') {
-    return 'red'
-  } else if (status && status === 'False Positive') {
-    return 'purple'
-  } else if (status && status === 'In Triage') {
-    return 'cyan'
-  } else {
-    return 'gray'
-  }
-}
+
 
 const VulnProdTable = ({ data, vuln, refetch }) => {
   const params = useParams()
@@ -63,14 +57,28 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
   const { pageIndex, searchInput, envs, statuses, versions } = compVulnState
   const { compVulnDispatch } = dispatch
 
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const [getSboms,{data: connectedSboms}] = useLazyQuery(GetConnectedSbom)
+  
 
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const { isOpen: isSbomOpen, onOpen: onSbomOpen, onClose: onSbomClose } = useDisclosure()
+
+  const [activeRow, setActiveRow] = useState(null)
   const [selectedVulns, setSelectedVulns] = useState([])
   const [selectedGroup, setSelectedGroup] = useState('')
   const [filterInput, setFilterInput] = useState('')
   const [toggleClear, setToggleClear] = useState(false)
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
+
+  const handlePreview = async (row) => {
+    console.log('row',row);
+    const { component } = row
+    await getSboms({variables: {projectId: component?.sbom?.project?.id, sbomId: component?.sbom?.id, componentVulnId: component?.id}}).then(() => {
+      setActiveRow(row)
+      onSbomOpen()
+    })
+  }
 
   const setPaginationControl = (data) => {
     setIsPrevActive(data?.pageInfo?.hasPreviousPage)
@@ -90,7 +98,14 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
       name: 'PRODUCT',
       selector: (row) => {
         const { component } = row
-        return <Text>{component?.sbom?.project?.projectGroup?.name || ''}</Text>
+        return (
+          <Flex flexDir={'row'} gap={2} alignItems={'center'} flexWrap={'wrap'}>
+            <Tooltip label='Also affected'>
+              <IconButton isDisabled={!component?.sbom?.hasConnectedSboms} icon={<FaFolderTree />} onClick={() => handlePreview(row)} size='xs' colorScheme='blue'/>
+            </Tooltip>
+            <Text>{component?.sbom?.project?.projectGroup?.name || ''}</Text>
+          </Flex>
+        )
       },
       wrap: true,
       width: '200px',
@@ -443,6 +458,8 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
           </Flex>
         )}
       </Flex>
+
+      {isSbomOpen && connectedSboms && <ConnectedSbomDrawer data={connectedSboms?.sbom} isOpen={isSbomOpen} onClose={onSbomClose} />}
 
       {isOpen && selectedVulns.length > 0 && (
         <VexModal

@@ -26,7 +26,7 @@ const Vulnerabilities = () => {
   const { data: vulnData, refetch: getVulnData } = useQuery(GetGlobalVulnData, {
     skip: vulnId ? false : true,
     fetchPolicy: 'network-only',
-    variables: { id: vulnId, first: totalRows }
+    variables: { id: vulnId, componentVulnId: vulnId, first: totalRows }
   })
 
   useEffect(() => {
