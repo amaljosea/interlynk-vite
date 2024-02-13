@@ -273,52 +273,38 @@ const CheckModal = ({
     customLicenses.length === 0
 
   const onSaveRule = async () => {
-    if (!isInvalidLicense) {
-      if (activeComp) {
-        await createAutoCheck({
-          variables: {
-            projectId: productId,
-            applicable: 'component',
-            condition: 'missing',
-            attr: 'primary',
-            enabled: true,
-            compName: activeComp.name,
-            compVersion: activeComp.version,
-            set: JSON.stringify({ value: true }, null, 2)
-          }
-        }).then((res) => res.data && handleComUpdate())
-      } else {
-        await createAutoCheck({
-          variables: {
-            projectId: productId,
-            applicable: 'component',
-            condition: 'missing',
-            attr: licenseType,
-            enabled: true,
-            compName: activeCheck?.component?.name,
-            compVersion: activeCheck?.component?.version,
-            set: JSON.stringify(
-              {
-                value:
-                  licenseType === 'license_spdx'
-                    ? spdxLicenses
-                    : licenseType === 'license_exp'
-                      ? expLicense
-                      : licenseType === 'license_custom'
-                        ? customLicenses
-                        : ''
-              },
-              null,
-              2
-            )
-          }
-        }).then((res) => res.data && onLicenseUpdate())
-      }
+    if (activeComp) {
+      await createAutoCheck({
+        variables: {
+          projectId: productId,
+          applicable: 'component',
+          condition: 'missing',
+          attr: 'primary',
+          enabled: true,
+          compName: activeComp.name,
+          compVersion: activeComp.version,
+          set: JSON.stringify({ value: true }, null, 2)
+        }
+      }).then((res) => res.data && handleComUpdate())
     } else {
-      setError('Please add value')
-      setTimeout(() => {
-        setError('')
-      }, 2000)
+      await createAutoCheck({
+        variables: {
+          projectId: productId,
+          applicable: 'component',
+          condition: 'missing',
+          attr: licenseType,
+          enabled: true,
+          compName: activeCheck?.component?.name,
+          compVersion: activeCheck?.component?.version,
+          set: JSON.stringify(
+            {
+              value: expLicense
+            },
+            null,
+            2
+          )
+        }
+      }).then((res) => res.data && onLicenseUpdate())
     }
   }
 

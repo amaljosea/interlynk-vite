@@ -94,17 +94,7 @@ const SbomLicenseField = ({ isValid, setIsValid }) => {
     setIsValid(true)
   }
 
-  const handleExpBlur = () => {
-    if (exp !== '') {
-      const trimmedInput = typeof exp === 'string' ? exp.trim() : ''
-      const isLicenseValid = spdxValidate(trimmedInput)
-      setIsValid(isLicenseValid)
-      sbomDispatch({ type: 'SET_EPX_LICENSE', payload: exp })
-    } else {
-      setIsValid(true)
-      sbomDispatch({ type: 'SET_EPX_LICENSE', payload: null })
-    }
-  }
+  const handleExpBlur = () => sbomDispatch({ type: 'SET_EPX_LICENSE', payload: exp })
 
   const handleTypeChange = (value) => {
     sbomDispatch({ type: 'SET_LICENSE_TYPE', payload: value })
@@ -198,7 +188,7 @@ const SbomLicenseField = ({ isValid, setIsValid }) => {
               type='text'
               value={exp}
               fontSize={'sm'}
-              // onBlur={handleExpBlur}
+              onBlur={handleExpBlur}
               onChange={handleExpChange}
               placeholder='Enter valid SPDX Expression'
             />

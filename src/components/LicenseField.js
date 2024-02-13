@@ -93,17 +93,7 @@ const LicenseField = ({ isValid, setIsValid }) => {
     setIsValid(true)
   }
 
-  const handleExpBlur = () => {
-    if (exp !== '') {
-      const trimmedInput = typeof exp === 'string' ? exp.trim() : ''
-      const isLicenseValid = spdxValidate(trimmedInput)
-      setIsValid(isLicenseValid)
-      prodCompDispatch({ type: 'SET_EPX_LICENSE', payload: exp })
-    } else {
-      setIsValid(true)
-      prodCompDispatch({ type: 'SET_EPX_LICENSE', payload: exp })
-    }
-  }
+  const handleExpBlur = () => prodCompDispatch({ type: 'SET_EPX_LICENSE', payload: exp })
 
   const handleTypeChange = (value) => {
     setIsValid(true)
@@ -202,7 +192,7 @@ const LicenseField = ({ isValid, setIsValid }) => {
               type='text'
               value={exp}
               fontSize={'sm'}
-              // onBlur={handleExpBlur}
+              onBlur={handleExpBlur}
               onChange={handleExpChange}
               placeholder='Enter a valid SPDX Expression'
             />
