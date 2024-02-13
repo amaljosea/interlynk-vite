@@ -172,18 +172,11 @@ const VulnInfo = ({ data, componentVulns, refetch }) => {
                     <Flex flexDir={'column'} alignItems={'center'}>
                       <Popover>
                         <PopoverTrigger>
-                          <Tag
-                            variant='subtle'
-                            width={'full'}
-                            colorScheme={'cyan'}
-                            cursor={'pointer'}
-                          >
-                            <TagLabel mx={'auto'}>
-                              {data?.cvssVector || 0}
-                            </TagLabel>
+                          <Tag variant='subtle' width={'full'} colorScheme={'cyan'} cursor={'pointer'}>
+                            <TagLabel mx={'auto'}>{data?.cvssVector || '-'}</TagLabel>
                           </Tag>
                         </PopoverTrigger>
-                        <CvssCard value={data?.cvssVector} />
+                        {data?.cvssVector && <CvssCard value={data?.cvssVector} />}
                       </Popover>
                       <Text fontSize={'xs'}>CVSS Vector</Text>
                     </Flex>
