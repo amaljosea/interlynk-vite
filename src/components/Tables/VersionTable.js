@@ -222,12 +222,12 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
               onClick={() => onFilterSev(id, version, ['critical'])}
             >
               <VulnBadge color='red' label='Critical'>
-                {stats?.vulnStats?.critical ? stats.vulnStats.critical : 0}
+                {stats?.vulnStats?.critical || 0}
               </VulnBadge>
             </Link>
             <Link to={link} onClick={() => onFilterSev(id, version, ['high'])}>
               <VulnBadge color='orange' label='High'>
-                {stats?.vulnStats?.high ? stats.vulnStats.high : 0}
+                {stats?.vulnStats?.high || 0}
               </VulnBadge>
             </Link>
             <Link
@@ -235,18 +235,26 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
               onClick={() => onFilterSev(id, version, ['medium'])}
             >
               <VulnBadge color='yellow' label='Medium'>
-                {stats?.vulnStats?.medium ? stats.vulnStats.medium : 0}
+                {stats?.vulnStats?.medium || 0}
               </VulnBadge>
             </Link>
             <Link to={link} onClick={() => onFilterSev(id, version, ['low'])}>
               <VulnBadge color='green' label='Low'>
-                {stats?.vulnStats?.low ? stats.vulnStats.low : 0}
+                {stats?.vulnStats?.low || 0}
+              </VulnBadge>
+            </Link>
+            <Link
+              to={link}
+              onClick={() => onFilterSev(id, version, ['unknown'])}
+            >
+              <VulnBadge color='gray' label='Unknown'>
+                {stats?.vulnStats?.unknown || 0}
               </VulnBadge>
             </Link>
           </Stack>
         )
       },
-      width: '300px'
+      width: '360px'
     },
     {
       id: 'STATUS',

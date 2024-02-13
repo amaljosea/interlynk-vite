@@ -292,10 +292,13 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
               onClick={() => {
                 prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
                 localStorage.setItem('activeSbomTab', 0)
-                localStorage.setItem('subProduct', JSON.stringify({
-                  name: part?.project?.projectGroup?.name,
-                  version: part?.projectVersion
-                }))
+                localStorage.setItem(
+                  'subProduct',
+                  JSON.stringify({
+                    name: part?.project?.projectGroup?.name,
+                    version: part?.projectVersion
+                  })
+                )
                 setActiveProdTab(0)
               }}
             >
@@ -401,47 +404,34 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
         return (
           <Stack fontWeight={'medium'} direction={'row'}>
             <Link to={link}>
-              <VulnBadge
-                color='red'
-                label='Critical'
-                onClick={() => onFilterSev(['critical'])}
-              >
-                {part.stats.vulnStats.critical
-                  ? part.stats.vulnStats.critical
-                  : 0}
+              <VulnBadge color='red' label='Critical' onClick={() => onFilterSev(['critical'])}>
+                {part?.stats?.vulnStats?.critical || 0}
               </VulnBadge>
             </Link>
             <Link to={link}>
-              <VulnBadge
-                color='orange'
-                label='High'
-                onClick={() => onFilterSev(['high'])}
-              >
-                {part.stats.vulnStats.high ? part.stats.vulnStats.high : 0}
+              <VulnBadge color='orange' label='High' onClick={() => onFilterSev(['high'])}>
+                {part?.stats?.vulnStats?.high || 0}
               </VulnBadge>
             </Link>
             <Link to={link}>
-              <VulnBadge
-                color='yellow'
-                label='Medium'
-                onClick={() => onFilterSev(['medium'])}
-              >
-                {part.stats.vulnStats.medium ? part.stats.vulnStats.medium : 0}
+              <VulnBadge color='yellow' label='Medium' onClick={() => onFilterSev(['medium'])}>
+                {part?.stats?.vulnStats?.medium || 0}
               </VulnBadge>
             </Link>
             <Link to={link}>
-              <VulnBadge
-                color='green'
-                label='Low'
-                onClick={() => onFilterSev(['low'])}
-              >
-                {part.stats.vulnStats.low ? part.stats.vulnStats.low : 0}
+              <VulnBadge color='green' label='Low' onClick={() => onFilterSev(['low'])}>
+                {part?.stats?.vulnStats?.low || 0}
+              </VulnBadge>
+            </Link>
+            <Link to={link}>
+              <VulnBadge color='gray' label='Unknown' onClick={() => onFilterSev(['unknown'])}>
+                {part?.stats?.vulnStats?.unknown || 0}
               </VulnBadge>
             </Link>
           </Stack>
         )
       },
-      width: '300px'
+      width: '360px'
     },
     {
       id: 'STATUS',
@@ -499,7 +489,9 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
         projectId: prodId,
         sbomId: sbomId
       }
-    }).then((res) => res?.data && sbomRefetch({ projectId: prodId, sbomId: sbomId }))
+    }).then(
+      (res) => res?.data && sbomRefetch({ projectId: prodId, sbomId: sbomId })
+    )
   }
 
   // SUB HEADER

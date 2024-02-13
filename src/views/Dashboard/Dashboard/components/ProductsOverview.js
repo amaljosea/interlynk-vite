@@ -25,7 +25,14 @@ const ProductsOverview = ({ title, data, refetch }) => {
     const { project, id, projectId, projectVersion } = prod
     const { projectGroup, name } = project
     // const env = projects?.find((item) => item.name === environment)
-    const product = {version: projectVersion, groupId: projectGroup?.id, id: projectGroup?.id, name: name, sbomId: id, defaultEnv: projectGroup?.defaultProject?.id }
+    const product = {
+      version: projectVersion,
+      groupId: projectGroup?.id,
+      id: projectGroup?.id,
+      name: name,
+      sbomId: id,
+      defaultEnv: projectGroup?.defaultProject?.id
+    }
     localStorage.setItem('activeEnv', project?.id)
     localStorage.setItem('product', JSON.stringify(product))
     localStorage.setItem('activeProdTab', 0)
@@ -221,7 +228,7 @@ const ProductsOverview = ({ title, data, refetch }) => {
       id: 'VULNERABILITIES',
       name: 'VULNERABILITIES',
       wrap: true,
-      width: '300px',
+      width: '350px',
       selector: (row) => {
         const { id, project, projectId, stats, projectVersion } = row
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
@@ -278,6 +285,19 @@ const ProductsOverview = ({ title, data, refetch }) => {
             >
               <VulnBadge color='green' label='Low'>
                 {stats?.vulnStats?.low || 0}
+              </VulnBadge>
+            </Link>
+            <Link
+              to={link}
+              style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
+              onClick={() =>
+                uniqueSbom
+                  ? onFilterSev(project, id, projectVersion, ['unknown'])
+                  : null
+              }
+            >
+              <VulnBadge color='gray' label='Unknown'>
+                {stats?.vulnStats?.unknown || 0}
               </VulnBadge>
             </Link>
           </Flex>

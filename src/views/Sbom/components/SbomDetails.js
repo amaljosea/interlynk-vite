@@ -36,7 +36,7 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
     stats
   } = sbom
   const { compCount, compLicenseCount, vulnStats } = stats
-  const { critical, high, medium, low } = vulnStats
+  const { critical, high, medium, low, unknown } = vulnStats
 
   const {
     totalRows,
@@ -272,6 +272,13 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
                   onClick={() => onFilterVuln(['low'])}
                 >
                   {low ? low : 0}
+                </VulnBadge>
+                <VulnBadge
+                  color='gray'
+                  label='Unknown'
+                  onClick={() => onFilterVuln(['unknown'])}
+                >
+                  {unknown ? unknown : 0}
                 </VulnBadge>
               </Stack>
               <Text
