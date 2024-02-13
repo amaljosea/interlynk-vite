@@ -136,7 +136,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
           </Stack>
         )
       },
-      width: '250px',
+      width: '280px',
       sortable: true
     },
     // SEVERITY
@@ -182,7 +182,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
           </Tag>
         )
       },
-      width: '120px',
+      width: '130px',
       wrap: true,
       sortable: true
     },
@@ -206,7 +206,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
           </Flex>
         )
       },
-      width: '120px',
+      width: '130px',
       wrap: true,
       sortable: true
     },
@@ -257,7 +257,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
           </Flex>
         )
       },
-      width: '150px',
+      width: '130px',
       wrap: true
     },
     // STATUSES

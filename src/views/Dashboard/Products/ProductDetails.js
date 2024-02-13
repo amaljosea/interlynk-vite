@@ -206,7 +206,7 @@ const ProductDetails = () => {
       before: undefined,
       search: vulnSearch !== '' ? vulnSearch : undefined,
       severity: severities.length > 0 ? severities : undefined,
-      source: (source === 'BOTH' || source === '') ? undefined : source,
+      source: source === 'BOTH' || source === '' ? undefined : source,
       componentName: components.length > 0 ? components : undefined,
       status: statues.length > 0 ? statues : undefined,
       kev:
@@ -227,6 +227,8 @@ const ProductDetails = () => {
     variables: {
       id: vulnId,
       first: totalRows,
+      projectIds: [activeEnv],
+      projectGroupIds: [productId],
       search: compVulnSearch !== '' ? compVulnSearch : undefined,
       projectNames: envs?.length === 0 ? undefined : envs,
       versions: sbomVersions?.length === 0 ? undefined : sbomVersions,
@@ -309,31 +311,15 @@ const ProductDetails = () => {
       getVulns({
         variables: {
           first: totalRows,
+          projectIds: [activeEnv],
+          projectGroupIds: [productId],
           field: globalVulnState.field,
           direction: globalVulnState.direction,
-          search:
-            globalVulnState.searchInput !== ''
-              ? globalVulnState.searchInput
-              : undefined,
-          projectGroupIds: [productId],
-          severity:
-            globalVulnState.severities?.length === 0
-              ? undefined
-              : globalVulnState.severities,
-          status:
-            globalVulnState.statues?.length === 0
-              ? undefined
-              : globalVulnState.statues,
-          kev:
-            globalVulnState.kev === 'yes'
-              ? true
-              : globalVulnState.kev === 'false'
-                ? false
-                : undefined,
-          epss:
-            globalVulnState.epss === 'all' || globalVulnState.epss === ''
-              ? undefined
-              : vulnRange
+          search: globalVulnState.searchInput !== '' ? globalVulnState.searchInput : undefined,
+          severity: globalVulnState.severities?.length === 0 ? undefined : globalVulnState.severities,
+          status: globalVulnState.statues?.length === 0 ? undefined : globalVulnState.statues,
+          kev: globalVulnState.kev === 'yes' ? true : globalVulnState.kev === 'false' ? false : undefined,
+          epss: globalVulnState.epss === 'all' || globalVulnState.epss === '' ? undefined : vulnRange
         }
       })
     } else if (activeTab === 2) {
