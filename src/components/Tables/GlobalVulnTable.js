@@ -22,7 +22,7 @@ import {
   ExternalLinkIcon,
   RepeatIcon
 } from '@chakra-ui/icons'
-import { Link, useLocation, useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import DataTable from 'react-data-table-component'
 import CustomLoader from 'components/CustomLoader'
 import VulnsFilters from 'views/Dashboard/Vulnerabilities/components/VulnsFilter'
@@ -315,20 +315,18 @@ const GlobalVulnTable = ({ data, refetch }) => {
           {timeSince(row?.publishedAt)}
         </Tooltip>
       ),
-      /*
       sortable: true,
       sortFunction: (a, b) => {
         const dateA = new Date(a?.publishedAt)
         const dateB = new Date(b?.publishedAt)
         return dateA - dateB // Sort in descending order
       },
-      */
       wrap: true,
       right: 'true'
     },
     // MODIFIED AT
     {
-      id: 'VULNS_MODIFIED_AT',
+      id: 'VULNS_LAST_MODIFIED_AT',
       name: 'MODIFIED',
       selector: (row) => (
         <Tooltip
@@ -338,14 +336,12 @@ const GlobalVulnTable = ({ data, refetch }) => {
           {timeSince(row?.lastModifiedAt)}
         </Tooltip>
       ),
-      /*
       sortable: true,
       sortFunction: (a, b) => {
         const dateA = new Date(a?.lastModifiedAt)
         const dateB = new Date(b?.lastModifiedAt)
         return dateA - dateB // Sort in descending order
       },
-      */
       wrap: true,
       right: 'true'
     }
