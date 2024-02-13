@@ -481,6 +481,7 @@ export const GetProjectGroup = gql`
           format
           creationAt
           updatedAt
+          projectVersion
           primaryComponent {
             id
             name

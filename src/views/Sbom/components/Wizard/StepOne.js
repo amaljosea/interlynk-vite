@@ -13,7 +13,7 @@ import { useEffect, useState } from 'react'
 import { GetProject, GetProjectGroups } from 'graphQL/Queries'
 import { useLazyQuery, useQuery } from '@apollo/client'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { isDefaultEnv, normalizeSBOMVersion, envOrderList } from 'utils'
+import { isDefaultEnv, envOrderList } from 'utils'
 
 const StepOne = ({
   setProductId,

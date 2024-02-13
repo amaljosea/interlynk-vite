@@ -18,8 +18,7 @@ import {
   Text
 } from '@chakra-ui/react'
 import VulnBadge from 'components/Misc/VulnBadge'
-import { timeSince } from 'utils'
-import { getFullDateAndTime, normalizeSBOMVersion } from 'utils'
+import { timeSince, getFullDateAndTime } from 'utils'
 
 const SbomList = ({ isOpen, onClose, data }) => {
   return (
@@ -27,22 +26,13 @@ const SbomList = ({ isOpen, onClose, data }) => {
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />
-        <DrawerHeader>{normalizeSBOMVersion(data) + ' SBOM List'}</DrawerHeader>
+        <DrawerHeader>{data?.projectVersion + ' SBOM List'}</DrawerHeader>
         <DrawerBody>
           <Table variant='simple' m={0} p={0}>
             <Thead>
               <Tr>
-                {[
-                  'UPLOADED',
-                  'COMPONENTS',
-                  'LICENSES',
-                  'VULNERABILITIES',
-                  'STATUS',
-                  'UPDATED AT'
-                ].map((item, index) => (
-                  <Th px={0} fontFamily={'inherit'} key={index}>
-                    {item}
-                  </Th>
+                {['UPLOADED','COMPONENTS','LICENSES','VULNERABILITIES','STATUS','UPDATED AT'].map((item, index) => (
+                  <Th px={0} fontFamily={'inherit'} key={index}>{item}</Th>
                 ))}
               </Tr>
             </Thead>

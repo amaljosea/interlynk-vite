@@ -37,12 +37,7 @@ import DataTable from 'react-data-table-component'
 import { FaEllipsisV } from 'react-icons/fa'
 import { FaScrewdriverWrench } from 'react-icons/fa6'
 import { Link, useParams } from 'react-router-dom'
-import {
-  timeSince,
-  getFullDateAndTime,
-  customStyles,
-  normalizeSBOMVersion
-} from 'utils'
+import { timeSince, getFullDateAndTime, customStyles } from 'utils'
 import SbomList from 'views/Dashboard/Products/components/SbomList'
 import RowLimit from 'views/Sbom/components/RowLimit'
 
@@ -166,7 +161,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
       id: 'COMPONENTS',
       name: 'COMPONENTS',
       selector: (row) => {
-        const { stats, id, primaryComponent } = row
+        const { stats, id, projectVersion } = row
         return (
           <Link
             to={`/vendor/products/${params.name}?id=${productId}&sbom=${id}`}
@@ -179,10 +174,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
               onClick={() => {
                 localStorage.setItem(
                   'currentSBOM',
-                  JSON.stringify({
-                    version: normalizeSBOMVersion(row),
-                    id: id
-                  })
+                  JSON.stringify({ version: projectVersion, id: id })
                 )
                 localStorage.setItem('activeSbomTab', 2)
               }}
@@ -211,34 +203,38 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
       id: 'VULNERABILITIES',
       name: 'VULNERABILITIES',
       selector: (row) => {
-        const { stats, id } = row
+        const { stats, id, projectVersion } = row
         const link = `/vendor/products/${params.name}?id=${productId}&sbom=${id}`
-        const version = normalizeSBOMVersion(row)
-
         return (
           <Stack fontWeight={'medium'} direction={'row'}>
             <Link
               to={link}
-              onClick={() => onFilterSev(id, version, ['critical'])}
+              onClick={() => onFilterSev(id, projectVersion, ['critical'])}
             >
               <VulnBadge color='red' label='Critical'>
                 {stats?.vulnStats?.critical || 0}
               </VulnBadge>
             </Link>
-            <Link to={link} onClick={() => onFilterSev(id, version, ['high'])}>
+            <Link
+              to={link}
+              onClick={() => onFilterSev(id, projectVersion, ['high'])}
+            >
               <VulnBadge color='orange' label='High'>
                 {stats?.vulnStats?.high || 0}
               </VulnBadge>
             </Link>
             <Link
               to={link}
-              onClick={() => onFilterSev(id, version, ['medium'])}
+              onClick={() => onFilterSev(id, projectVersion, ['medium'])}
             >
               <VulnBadge color='yellow' label='Medium'>
                 {stats?.vulnStats?.medium || 0}
               </VulnBadge>
             </Link>
-            <Link to={link} onClick={() => onFilterSev(id, version, ['low'])}>
+            <Link
+              to={link}
+              onClick={() => onFilterSev(id, projectVersion, ['low'])}
+            >
               <VulnBadge color='green' label='Low'>
                 {stats?.vulnStats?.low || 0}
               </VulnBadge>
@@ -286,6 +282,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
     {
       id: 'UPDATED_AT',
       name: 'UPDATED',
+      width: '200px',
       selector: (row) => {
         const { updatedAt } = row
 

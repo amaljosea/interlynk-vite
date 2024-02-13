@@ -338,7 +338,6 @@ const SBOMTable = ({
                   primaryComp={data.primaryComponent}
                 />
               )}
-
               {error && (
                 <Flex
                   py={10}

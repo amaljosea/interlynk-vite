@@ -19,9 +19,6 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import VexModal from './VexModal'
 import { useLocation, useParams } from 'react-router-dom'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
-import { normalizeSBOMVersion } from 'utils'
-import { useLazyQuery } from '@apollo/client'
-import { GetProjectGroup } from 'graphQL/Queries'
 
 const customStyles = {
   headCells: {

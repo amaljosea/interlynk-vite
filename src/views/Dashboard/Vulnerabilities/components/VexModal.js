@@ -24,12 +24,9 @@ import {
 } from 'graphQL/Queries'
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useLocation } from 'react-router-dom'
-import { GetProject } from 'graphQL/Queries'
-import { normalizeSBOMVersion } from 'utils'
+import { GetProject, GetProjectGroup } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { UpdateGlobalVex } from 'graphQL/Mutation'
 import { updateCompVulnVex } from 'graphQL/Mutation'
-import { GetProjectGroup } from 'graphQL/Queries'
 import { filterEnvList } from 'utils'
 
 const VexModal = ({

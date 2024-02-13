@@ -26,7 +26,6 @@ import ReactSelect from 'react-select'
 import { useRef, useState } from 'react'
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { GetProject } from 'graphQL/Queries'
-import { normalizeSBOMVersion } from 'utils'
 import CheckModal from './CheckModal'
 import { GetAllComponents } from 'graphQL/Queries'
 import ComponentDrawer from 'components/Drawer/ComponentDrawer'
@@ -166,8 +165,8 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
           localStorage.setItem(
             'currentSBOM',
             JSON.stringify({
-              version: normalizeSBOMVersion(res.data.sbom),
-              id: res.data.sbom.id
+              version: res?.data?.sbom?.projectVersion,
+              id: res?.data?.sbom?.id
             })
           )
         }
@@ -366,7 +365,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
           productId={productId}
           sbomId={sbomId}
           productName={sbom?.project?.name}
-          version={normalizeSBOMVersion(sbom)}
+          version={sbom?.projectVersion}
         />
       )}
 
@@ -417,7 +416,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
           isOpen={isCopied}
           onClose={onCopiedClose}
           product={sbom?.project?.name}
-          version={normalizeSBOMVersion(sbom)}
+          version={sbom?.projectVersion}
         />
       )}
 

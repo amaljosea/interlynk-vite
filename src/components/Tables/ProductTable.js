@@ -32,12 +32,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { useMutation } from '@apollo/client'
 import { DeleteProjectGroup } from 'graphQL/Mutation'
 
-import {
-  customStyles,
-  getFullDateAndTime,
-  normalizeSBOMVersion,
-  timeSince
-} from 'utils'
+import { customStyles, getFullDateAndTime, timeSince } from 'utils'
 
 import DataTable from 'react-data-table-component'
 import CustomLoader from 'components/CustomLoader'
@@ -379,11 +374,7 @@ const ProductTable = ({ data, refetch }) => {
         selector: (row) => {
           const { description } = row
           return (
-            <Text>
-              {description?.length > 50
-                ? description.substring(0, 50) + '....'
-                : description}
-            </Text>
+            <Text>{description?.length > 50 ? description.substring(0, 50) + '....' : description}</Text>
           )
         },
         wrap: true,
@@ -411,42 +402,18 @@ const ProductTable = ({ data, refetch }) => {
           return (
             <Stack direction={'row'} spacing={2} alignItems={'center'}>
               <Tooltip label='Default'>
-                <Link
-                  to={`/vendor/products/${name}?id=${id}`}
-                  onClick={() => handleClick('default')}
-                >
-                  <IconButton
-                    size='sm'
-                    colorScheme='blue'
-                    aria-label='Default'
-                    icon={<FaInbox />}
-                  />
+                <Link to={`/vendor/products/${name}?id=${id}`} onClick={() => handleClick('default')}>
+                  <IconButton size='sm' colorScheme='blue' aria-label='Default' icon={<FaInbox />}/>
                 </Link>
               </Tooltip>
               <Tooltip label='Development'>
-                <Link
-                  to={`/vendor/products/${name}?id=${id}`}
-                  onClick={() => handleClick('development')}
-                >
-                  <IconButton
-                    size='sm'
-                    colorScheme='blue'
-                    aria-label='Development'
-                    icon={<FaCode />}
-                  />
+                <Link to={`/vendor/products/${name}?id=${id}`} onClick={() => handleClick('development')}>
+                  <IconButton size='sm' colorScheme='blue' aria-label='Development' icon={<FaCode />}/>
                 </Link>
               </Tooltip>
               <Tooltip label='Production'>
-                <Link
-                  to={`/vendor/products/${name}?id=${id}`}
-                  onClick={() => handleClick('production')}
-                >
-                  <IconButton
-                    size='sm'
-                    colorScheme='blue'
-                    aria-label='Production'
-                    icon={<FaSquareArrowUpRight />}
-                  />
+                <Link to={`/vendor/products/${name}?id=${id}`} onClick={() => handleClick('production')}>
+                  <IconButton size='sm' colorScheme='blue' aria-label='Production' icon={<FaSquareArrowUpRight />}/>
                 </Link>
               </Tooltip>
             </Stack>
@@ -500,12 +467,7 @@ const ProductTable = ({ data, refetch }) => {
 
           return (
             <Menu>
-              <MenuButton
-                as={IconButton}
-                icon={<FaEllipsisV />}
-                variant='none'
-                color='gray.400'
-              />
+              <MenuButton as={IconButton} icon={<FaEllipsisV />} variant='none' color='gray.400'/>
               <Portal>
                 <MenuList fontSize={'sm'}>
                   {/* EDIT PRODUCT */}
@@ -531,10 +493,7 @@ const ProductTable = ({ data, refetch }) => {
                     Upload SBOM
                   </MenuItem>
                   {/* BUILD SBOM */}
-                  <MenuItem
-                    onClick={() => handleOpenSbom(row)}
-                    isDisabled={!enabled}
-                  >
+                  <MenuItem onClick={() => handleOpenSbom(row)} isDisabled={!enabled}>
                     Build Version
                   </MenuItem>
                   <Divider />

@@ -42,13 +42,11 @@ import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import { CpeAutoComplete } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { normalizeSBOMVersion } from 'utils'
-import CpeField from 'components/CpeField'
 import CpeInput from 'components/CpeInput'
 
 function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
   const toast = useToast()
-
+  console.log('data', data)
   const { prodCompState, dispatch } = useGlobalState()
   const { licenseType, spdxLicenses, customLicenses, expLicense } =
     prodCompState
@@ -197,9 +195,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
     })
   }
 
-  const existingVersions = data?.projects?.defaultProject?.sboms.map((item) =>
-    normalizeSBOMVersion(item)
-  )
+  const existingVersions = data?.projects?.sboms.map((item) => item?.projectVersion)
 
   const handleCreateComp = async (id) => {
     await createComponent({

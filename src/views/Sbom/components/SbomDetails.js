@@ -14,7 +14,7 @@ import {
 import VulnBadge from 'components/Misc/VulnBadge'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { Link, useLocation } from 'react-router-dom'
-import { timeSince, getFullDateAndTime, normalizeSBOMVersion } from 'utils'
+import { timeSince, getFullDateAndTime } from 'utils'
 import { DownloadIcon, Search2Icon } from '@chakra-ui/icons'
 import {
   FaAngleLeft,
