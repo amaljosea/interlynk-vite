@@ -16,26 +16,12 @@ const Vulnerabilities = () => {
   const org = localStorage.getItem('organization')
 
   const { totalRows, globalVulnState } = useGlobalState()
-  const {
-    field,
-    direction,
-    searchInput,
-    severities,
-    products,
-    statues,
-    kev,
-    epss
-  } = globalVulnState
+  const { field, direction, searchInput, severities, products, statues, kev, epss } = globalVulnState
 
   const epssRange = epss !== 'all' && epss !== '' && epss?.split('-')
-  const range = {
-    min: parseFloat(epssRange[0]) / 10000,
-    max: parseFloat(epssRange[1]) / 10000
-  }
+  const range = { min: parseFloat(epssRange[0]) / 10000, max: parseFloat(epssRange[1]) / 10000 }
 
-  const [getVulns, { data }] = useLazyQuery(GetGlobalVulns, {
-    fetchPolicy: 'network-only'
-  })
+  const [getVulns, { data }] = useLazyQuery(GetGlobalVulns, {fetchPolicy: 'network-only'})
 
   const { data: vulnData, refetch: getVulnData } = useQuery(GetGlobalVulnData, {
     skip: vulnId ? false : true,
@@ -44,29 +30,13 @@ const Vulnerabilities = () => {
   })
 
   useEffect(() => {
-    getVulns({
-      variables: {
-        first: totalRows,
-        field: field,
-        direction: direction,
-        search: searchInput !== '' ? searchInput : undefined,
-        projectGroupIds: products?.length === 0 ? undefined : products,
-        severity: severities?.length === 0 ? undefined : severities,
-        status: statues?.length === 0 ? undefined : statues,
-        kev: kev === 'yes' ? true : kev === 'false' ? false : undefined,
-        epss: epss === 'all' || epss === '' ? undefined : range
-      }
-    })
-  }, [])
+    if (data === undefined) {
+      getVulns({ variables: { first: totalRows, field: field, direction: direction, search: searchInput !== '' ? searchInput : undefined, projectGroupIds: products?.length === 0 ? undefined : products, severity: severities?.length === 0 ? undefined : severities, status: statues?.length === 0 ? undefined : statues, kev: kev === 'yes' ? true : kev === 'false' ? false : undefined, epss: epss === 'all' || epss === '' ? undefined : range } }) }
+  }, [data])
 
   if (!org || org === 'undefined') {
     return (
-      <Flex
-        flexDirection='column'
-        pt={{ base: '120px', md: '74px' }}
-        pr={2}
-        pl={5}
-      >
+      <Flex flexDirection='column' pt={{ base: '120px', md: '74px' }} pr={2} pl={5}>
         <OrgRegister />
       </Flex>
     )
@@ -75,26 +45,14 @@ const Vulnerabilities = () => {
   if (vulnId && location.pathname === '/vendor/vulnerabilities') {
     return (
       <Flex direction='column' pt={{ base: '120px', md: '74px' }} pr={2} pl={5}>
-        <VulnInfo
-          data={vulnData?.vuln}
-          componentVulns={vulnData?.componentVulns}
-          refetch={getVulnData}
-        />
+        <VulnInfo data={vulnData?.vuln} componentVulns={vulnData?.componentVulns} refetch={getVulnData}/>
       </Flex>
     )
   } else {
     return (
-      <Flex
-        flexDirection='column'
-        pt={{ base: '120px', md: '74px' }}
-        pr={2}
-        pl={5}
-      >
+      <Flex flexDirection='column' pt={{ base: '120px', md: '74px' }} pr={2} pl={5}>
         <Card>
-          <GlobalVulnTable
-            data={data?.organization?.vulns}
-            refetch={getVulns}
-          />
+          <GlobalVulnTable data={data?.organization?.vulns} refetch={getVulns}/>
         </Card>
       </Flex>
     )

@@ -331,7 +331,10 @@ const GlobalVulnTable = ({ data, refetch }) => {
       id: 'VULNS_MODIFIED_AT',
       name: 'MODIFIED',
       selector: (row) => (
-        <Tooltip label={getFullDateAndTime(row?.lastModifiedAt)} placement={'top'}>
+        <Tooltip
+          label={getFullDateAndTime(row?.lastModifiedAt)}
+          placement={'top'}
+        >
           {timeSince(row?.lastModifiedAt)}
         </Tooltip>
       ),
@@ -554,6 +557,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
           columns={columns}
+          keyField='PUBLISHED'
           data={data?.nodes || []}
           onSort={handleSort}
           defaultSortFieldId={field}
