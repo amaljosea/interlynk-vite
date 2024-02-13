@@ -1181,7 +1181,6 @@ export const sbomCreate = gql`
       sbom {
         id
         creationAt
-        licenses
         lifecycle
         project {
           name

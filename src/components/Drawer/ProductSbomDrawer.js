@@ -211,23 +211,11 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
         group: groupInfo,
         scope: compScope,
         licenses: {
-          licenses:
-            licenseType === 'license_spdx'
-              ? spdxLicenses
-                ? spdxLicenses
-                : []
-              : undefined,
           licensesExp:
             licenseType === 'license_exp'
               ? expLicense
                 ? expLicense
                 : ''
-              : undefined,
-          licensesCustom:
-            licenseType === 'license_custom'
-              ? customLicenses
-                ? customLicenses
-                : []
               : undefined
         },
         cpes: cpeValue !== '' ? [cpeValue] : [],
