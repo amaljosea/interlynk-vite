@@ -81,7 +81,7 @@ const ProductTable = ({ data, refetch }) => {
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
 
-  const { userPermissions, setActiveSbomTab, prodState, dispatch } = useGlobalState()
+  const { userPermissions, setEnvName, setActiveSbomTab, prodState, dispatch } = useGlobalState()
 
   const { field, direction, searchInput, pageIndex, enabled } = prodState
   const { prodDispatch, prodCompDispatch } = dispatch
@@ -404,6 +404,7 @@ const ProductTable = ({ data, refetch }) => {
             localStorage.setItem('activeEnv', env?.id)
             localStorage.setItem('activeProdTab', 0)
             prodDispatch({ type: 'SET_CURRENT_PRODUCT', payload: { id: env?.id } })
+            setEnvName(env?.name)
             setActiveSbomTab(0)
           }
 
