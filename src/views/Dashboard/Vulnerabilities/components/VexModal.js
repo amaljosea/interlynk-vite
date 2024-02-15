@@ -14,14 +14,9 @@ import {
   Stack,
   Textarea,
   FormControl,
-  Text,
   Alert
 } from '@chakra-ui/react'
-import {
-  getVexStatuses,
-  getVexJustifications,
-  GetCdxResponses
-} from 'graphQL/Queries'
+import { getVexStatuses, getVexJustifications, GetCdxResponses } from 'graphQL/Queries'
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useLocation } from 'react-router-dom'
 import { GetProject, GetProjectGroup } from 'graphQL/Queries'
@@ -29,25 +24,11 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { updateCompVulnVex } from 'graphQL/Mutation'
 import { filterEnvList } from 'utils'
 
-const VexModal = ({
-  selectedGroup,
-  checkEquals,
-  isOpen,
-  onClose,
-  refetch,
-  selectedVulns,
-  setSelectedVulns,
-  setToggleClear
-}) => {
+const VexModal = ({ selectedGroup, checkEquals, isOpen, onClose, refetch, selectedVulns, setSelectedVulns, setToggleClear }) => {
   const { totalRows } = useGlobalState()
-
-  console.log(groups)
-
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
-  const groupId = queryParams.get('id')
   const vulnId = queryParams.get('vulnId')
-  const prodId = localStorage.getItem('activeEnv')
 
   const [statusTitle, setStatusTitle] = useState('')
   const [statusName, setStatusName] = useState('')
@@ -128,11 +109,12 @@ const VexModal = ({
           variables: {
             compVulnId: item?.id,
             sbomId: item?.component?.sbom?.id,
+            projectGroupId: item?.component?.sbom?.project?.projectGroup?.id,
+            projectId: item?.component?.sbom?.project?.id,
             vexStatusId: statusTitle,
             details: details !== '' ? details : undefined,
             note: notes !== '' ? notes : undefined,
-            vexJustificationId:
-              justification !== '' ? justification : undefined,
+            vexJustificationId: justification !== '' ? justification : undefined,
             cdxResponseId: response !== '' ? response : undefined,
             impact: impactData === '' ? undefined : impactData,
             action: actionStatement !== '' ? actionStatement : undefined,
