@@ -49,6 +49,7 @@ import { ManualVulnScan } from 'graphQL/Mutation'
 import Pagination from '../Pagination'
 import { FirstDegreePartVulns } from 'graphQL/Queries'
 import { linkURl } from 'utils'
+import CvssCard from 'components/Misc/CvssCard'
 
 const statusColor = (status) => {
   if (status && status === 'Fixed') {
@@ -87,6 +88,8 @@ const VulnTable = ({
     variables: { sbomIds, componentVulnIds },
     onCompleted: (data) => console.log('Parts', data)
   })
+
+  const { isOpen, onOpen, onClose } = useDisclosure()
 
   //This part is needed for the pagination to work. (Modify with caution)
   const paginationSizes = [25, 50, 100]
@@ -437,7 +440,7 @@ const VulnTable = ({
     projectId: productId,
     sbomId: sbomId,
     search: searchInput !== '' ? searchInput : undefined,
-    source: (source === 'BOTH' || source === '') ? undefined : source,
+    source: source === 'BOTH' || source === '' ? undefined : source,
     severity: severities.length > 0 ? severities : undefined,
     componentName: components.length > 0 ? components : undefined,
     status: statues.length > 0 ? statues : undefined,
@@ -455,7 +458,7 @@ const VulnTable = ({
       projectId: productId,
       sbomId: sbomId,
       search: undefined,
-      source: (source === 'BOTH' || source === '') ? undefined : source,
+      source: source === 'BOTH' || source === '' ? undefined : source,
       severity: severities.length > 0 ? severities : undefined,
       componentName: components.length > 0 ? components : undefined,
       status: statues.length > 0 ? statues : undefined,
@@ -495,7 +498,7 @@ const VulnTable = ({
         projectId: productId,
         sbomId: sbomId,
         search: value !== '' ? value : undefined,
-        source: (source === 'BOTH' || source === '') ? undefined : source,
+        source: source === 'BOTH' || source === '' ? undefined : source,
         severity: severities.length > 0 ? severities : undefined,
         componentName: components.length > 0 ? components : undefined,
         status: statues.length > 0 ? statues : undefined,
@@ -693,9 +696,13 @@ const VulnTable = ({
             {/* CVSS Vector */}
             <Box>
               <CustomText>CVSS Vector :</CustomText>
-              <Text mt={1} fontSize={14}>
-                {vuln.cvssVector}
-              </Text>
+              {vuln?.cvssVector ? (
+                <Tooltip bg='gray.50' label={<CvssCard value={vuln?.cvssVector} />} placement='top'>
+                  <Text mt={1} fontSize={14} cursor={'pointer'}>{vuln?.cvssVector || '-'}</Text>
+                </Tooltip>
+              ) : (
+                <Text mt={1} fontSize={14} cursor={'pointer'}>{vuln?.cvssVector || '-'}</Text>
+              )}
             </Box>
             {/* NVD ALIAS ID */}
             {vuln.nvdAliasId ? (
@@ -794,7 +801,7 @@ const VulnTable = ({
       sbomId: sbomId,
       signedParams: customerView ? signedParams : undefined,
       search: searchInput !== '' ? searchInput : undefined,
-      source: (source === 'BOTH' || source === '') ? undefined : source,
+      source: source === 'BOTH' || source === '' ? undefined : source,
       severity:
         !severities.includes('all') && severities.length > 0
           ? severities

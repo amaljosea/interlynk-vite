@@ -15,7 +15,8 @@ import {
   Stack,
   Box,
   Tag,
-  TagLabel
+  TagLabel,
+  Tooltip
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
@@ -170,14 +171,17 @@ const VulnInfo = ({ data, componentVulns, refetch }) => {
                       style={{ marginTop: '3px', color: '#777' }}
                     ></i>
                     <Flex flexDir={'column'} alignItems={'center'}>
-                      <Popover>
-                        <PopoverTrigger>
-                          <Tag variant='subtle' width={'full'} colorScheme={'cyan'} cursor={'pointer'}>
+                      {data?.cvssVector ? (
+                        <Tooltip bg='gray.50' label={<CvssCard value={data?.cvssVector} />} placement='top'>
+                          <Tag variant='subtle' width={'full'} colorScheme={'cyan'} cursor={'pointer'} >
                             <TagLabel mx={'auto'}>{data?.cvssVector || '-'}</TagLabel>
                           </Tag>
-                        </PopoverTrigger>
-                        {data?.cvssVector && <CvssCard value={data?.cvssVector} />}
-                      </Popover>
+                        </Tooltip>
+                      ) : (
+                        <Tag variant='subtle' width={'full'} colorScheme={'cyan'} cursor={'pointer'}>
+                          <TagLabel mx={'auto'}>{data?.cvssVector || '-'}</TagLabel>
+                        </Tag>
+                      )}
                       <Text fontSize={'xs'}>CVSS Vector</Text>
                     </Flex>
                   </Stack>
