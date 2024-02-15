@@ -195,7 +195,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
     })
   }
 
-  const existingVersions = data?.projects?.sboms?.map((item) => item?.projectVersion)
+  const existingVersions = data?.projects?.defaultProject?.sboms?.map((item) => item?.projectVersion)
 
   const handleCreateComp = async (id) => {
     await createComponent({
