@@ -10,25 +10,19 @@ import {
 } from '@chakra-ui/react'
 import CheckMark from 'components/Misc/CheckMark'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useState } from 'react'
 import { FaFilter } from 'react-icons/fa'
 
 const LogFilterMenu = ({ refetch, productId, sbomId }) => {
   const { totalRows, sbomLogState, dispatch } = useGlobalState()
-  const { filter, field, direction, pageIndex, users, objects, types } =
-    sbomLogState
-  const { sbomLogDispatch } = dispach
-  const { logChangeBys, logChangeObjects, logChangeTypes } = filters
-
-  const [selectChangeBy, setSelectChangeBy] = useState([])
-  const [selectChangeObj, setSelectChangeObj] = useState([])
-  const [selectChangeType, setSelectChangeType] = useState([])
+  const { filters, field, direction, users, objects, types } = sbomLogState
+  const { logChangeBys, logChangeObjects, logChangeTypes } = filters || ''
+  const { sbomLogDispatch } = dispatch
 
   const onFilterChangeBy = (value) => {
     refetch({
       projectId: productId,
       sbomId: sbomId,
-      changedBy: value,
+      changedBy: value.includes('all') ? undefined : value,
       first: totalRows,
       field: field,
       direction: direction
@@ -48,8 +42,8 @@ const LogFilterMenu = ({ refetch, productId, sbomId }) => {
       last: undefined,
       after: undefined,
       last: undefined,
-      field: logField,
-      direction: logDirection
+      field: field,
+      direction: direction
     })
     sbomLogDispatch({
       type: 'FILTER_OBJECT',
@@ -66,8 +60,8 @@ const LogFilterMenu = ({ refetch, productId, sbomId }) => {
       last: undefined,
       after: undefined,
       last: undefined,
-      field: logField,
-      direction: logDirection
+      field: field,
+      direction: direction
     })
     sbomLogDispatch({
       type: 'FILTER_TYPE',
@@ -80,7 +74,7 @@ const LogFilterMenu = ({ refetch, productId, sbomId }) => {
       {/* USER */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnBlur={true}>
-          {selectChangeBy.length !== 0 && <CheckMark />}
+          {users?.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -98,7 +92,7 @@ const LogFilterMenu = ({ refetch, productId, sbomId }) => {
           >
             <MenuOptionGroup
               type='checkbox'
-              value={selectChangeBy}
+              value={users}
               onChange={onFilterChangeBy}
             >
               <MenuItemOption value={'all'} fontSize={'sm'}>
@@ -116,7 +110,7 @@ const LogFilterMenu = ({ refetch, productId, sbomId }) => {
       {/* OBJECT */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {selectChangeObj.length !== 0 && <CheckMark />}
+          {objects?.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -134,7 +128,7 @@ const LogFilterMenu = ({ refetch, productId, sbomId }) => {
           >
             <MenuOptionGroup
               type='checkbox'
-              value={selectChangeObj}
+              value={objects}
               onChange={onFilterChangeObj}
             >
               <MenuItemOption value={'all'} fontSize={'sm'}>
@@ -157,7 +151,7 @@ const LogFilterMenu = ({ refetch, productId, sbomId }) => {
       {/* TYPE */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
-          {selectChangeType.length !== 0 && <CheckMark />}
+          {types?.length !== 0 && <CheckMark />}
           <MenuButton
             as={Button}
             colorScheme='blue'
@@ -175,7 +169,7 @@ const LogFilterMenu = ({ refetch, productId, sbomId }) => {
           >
             <MenuOptionGroup
               type='checkbox'
-              value={selectChangeType}
+              value={types}
               onChange={onFilterChangeType}
             >
               <MenuItemOption value={'all'} fontSize={'sm'}>

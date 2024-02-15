@@ -1852,6 +1852,19 @@ export const GetLogFilters = gql`
   }
 `
 
+// GET ACTIVITY LOG FILTERS
+export const GetSbomLogFilters = gql`
+  query GetSbomLogFilters($projectId: Uuid!, $sbomId: Uuid!) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      activityLogFilters {
+        logChangeBys
+        logChangeObjects
+        logChangeTypes
+      }
+    }
+  }
+`
+
 export const DownloadSBOM = gql`
   query downloadSbom(
     $projectId: Uuid!
