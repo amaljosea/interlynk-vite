@@ -372,7 +372,7 @@ const VulnTable = ({
       name: 'VERSION',
       selector: (row) => (
         <Tooltip label={row.component.version} placement='top'>
-          <Text my={2}>{row.component.version}</Text>
+          <Text textAlign='right' my={2}>{row.component.version}</Text>
         </Tooltip>
       ),
       wrap: true,
