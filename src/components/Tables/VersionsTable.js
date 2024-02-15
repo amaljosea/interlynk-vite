@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client'
+import {useMutation, useQuery} from '@apollo/client'
 import { RepeatIcon } from '@chakra-ui/icons'
 import {
   Flex,
@@ -32,20 +32,108 @@ import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import VulnBadge from 'components/Misc/VulnBadge'
 import { sbomDelete } from 'graphQL/Mutation'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useEffect, useMemo, useState } from 'react'
+import {useCallback, useEffect, useMemo, useState} from 'react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV } from 'react-icons/fa'
 import { FaScrewdriverWrench } from 'react-icons/fa6'
 import { Link, useParams } from 'react-router-dom'
 import { timeSince, getFullDateAndTime, customStyles } from 'utils'
 import SbomList from 'views/Dashboard/Products/components/SbomList'
-import RowLimit from 'views/Sbom/components/RowLimit'
+import Pagination from "../Pagination";
+import {GetVersionsTable} from "../../graphQL/Queries";
 
-const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
+const VersionsTable = ({ projectGroup, productId, getVulnData }) => {
+
+  const { data, refetch } = useQuery(
+      GetVersionsTable,
+      {
+        fetchPolicy: 'network-only',
+        variables: {
+          id: productId
+        }
+      }
+  )
+  const versions = data?.project?.sbomVersions
+
+  //This part is needed for the pagination to work. (Modify with caution)
+  const paginationSizes = [25, 50, 100]
+  const [totalRows, setTotalRows] = useState(paginationSizes[0])
+
+  const [isPrevActive, setIsPrevActive] = useState(false)
+  const [isNextActive, setIsNextActive] = useState(false)
+
+  useEffect(() => {
+    if (versions) {
+      setIsPrevActive(versions.pageInfo?.hasPreviousPage)
+      setIsNextActive(versions.pageInfo?.hasNextPage)
+    }
+  }, [versions])
+
+  const setPaginationControl = (data) => {
+    setIsPrevActive(data.project?.sbomVersions?.pageInfo?.hasPreviousPage)
+    setIsNextActive(data.project?.sbomVersions?.pageInfo?.hasNextPage)
+  }
+
+  const disablePaginationControl = () => {
+    setIsPrevActive(false)
+    setIsNextActive(false)
+  }
+  //end
+
+  const handleNextPage = useCallback(async () => {
+    disablePaginationControl()
+    setCurrentPage(currentPage + 1)
+
+    await refetch({
+      first: totalRows,
+      last: undefined,
+      after: versions.pageInfo.endCursor,
+      before: undefined
+    }).then((res) => {
+      if (res.data) {
+        setPaginationControl(res.data);
+      }
+    });
+  }, [refetch, totalRows, versions, currentPage]);
+
+  const handlePreviousPage = useCallback(async () => {
+    disablePaginationControl()
+    setCurrentPage(currentPage - 1)
+
+    await refetch({
+      first: undefined,
+      last: totalRows,
+      after: undefined,
+      before: versions.pageInfo.startCursor
+    }).then((res) => {
+      if (res.data) {
+        setPaginationControl(res.data);
+      }
+    });
+  }, [refetch, totalRows, versions, currentPage]);
+
+  const handleSetRow = useCallback(
+      async (e) => {
+        const newTotalRows = Number(e.target.value)
+        setCurrentPage(1)
+        setTotalRows(newTotalRows)
+        disablePaginationControl()
+        await refetch({
+          first: newTotalRows,
+          last: undefined,
+          after: undefined,
+          before: undefined
+        }).then((res) => {
+          if (res.data) {
+            setPaginationControl(res.data)
+          }
+        })
+      },
+      [refetch, setTotalRows]
+  )
+
   const {
     userPermissions,
-    totalRows,
-    setTotalRows,
     setActiveSbomTab,
     prodVulnState,
     dispatch
@@ -68,19 +156,6 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
   const [activeRow, setActiveRow] = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
 
-  const sboms = project ? project.sboms : []
-
-  const totalPages = sboms.length > 0 ? Math.ceil(sboms.length / totalRows) : 1
-
-  const filteredData = sboms
-    ? sboms.slice((currentPage - 1) * totalRows, currentPage * totalRows)
-    : []
-
-  const handlePageChange = (newPage) => {
-    if (newPage >= 1 && newPage <= totalPages) {
-      setCurrentPage(newPage)
-    }
-  }
 
   const [deleteSbom] = useMutation(sbomDelete)
 
@@ -134,7 +209,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
         const { id, projectVersion } = row
         return (
           <Link
-            to={`/vendor/products/${data?.name}?id=${productId}&sbom=${id}`}
+            to={`/vendor/products/${projectGroup?.name}?id=${productId}&sbom=${id}`}
             onClick={() => {
               localStorage.setItem(
                 'currentSBOM',
@@ -359,8 +434,18 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
 
   // REFRESH PRODUCTS
   const handleRefresh = async () => {
+    disablePaginationControl()
+    setCurrentPage(1)
     await refetch({
-      id: productId
+      id: productId,
+      first: totalRows,
+      after: undefined,
+      before: undefined,
+      last: undefined
+    }).then((res) => {
+      if (res.data) {
+        setPaginationControl(res.data)
+      }
     })
   }
 
@@ -376,7 +461,7 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
           {/* BUILD SBOM */}
           <Tooltip label='Build Version'>
             <IconButton
-              isDisabled={!data?.enabled || !createSbom}
+              isDisabled={!projectGroup?.enabled || !createSbom}
               colorScheme='blue'
               onClick={onBuildSbom}
               icon={<FaScrewdriverWrench />}
@@ -395,68 +480,39 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
     )
   }, [handleRefresh])
 
-  useEffect(() => {
-    setCurrentPage(1)
-  }, [project])
+  const dataTableProps = {
+    columns: columns,
+    data: versions?.nodes,
+    customStyles: customStyles,
+    defaultSortFieldId: 'UPDATED_AT',
+    defaultSortAsc: false,
+    subHeader: true,
+    subHeaderComponent: subHeaderComponent,
+    progressPending: !versions,
+    progressComponent: <CustomLoader />,
+    responsive: true,
+    persistTableHead: true
+  }
+
 
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
-        <DataTable
-          subHeader
-          persistTableHead
-          responsive={true}
-          columns={columns}
-          customStyles={customStyles}
-          data={filteredData}
-          defaultSortAsc={false}
-          defaultSortFieldId={'UPDATED_AT'}
-          progressComponent={<CustomLoader />}
-          progressPending={project ? false : true}
-          subHeaderComponent={subHeaderComponent}
-        />
+        <DataTable {...dataTableProps}/>
+        {versions && (
+            <Pagination
+                paginationSizes={paginationSizes}
+                pageIndex={currentPage}
+                totalRows={totalRows}
+                totalCount={versions.totalCount}
+                onPreviousPage={handlePreviousPage}
+                onNextPage={handleNextPage}
+                onSetRow={handleSetRow}
+                hasNextPage={isNextActive}
+                hasPreviousPage={isPrevActive}
+            />
+        )}
       </Flex>
-
-      {/* PAGINATION */}
-      {project && (
-        <Flex
-          width={'100%'}
-          flexDir={'row'}
-          gap={4}
-          alignItems={'center'}
-          justifyContent={'space-between'}
-          mt={6}
-        >
-          <Stack alignItems={'center'} direction={'row'} spacing={4}>
-            <Button
-              colorScheme='blue'
-              onClick={() => handlePageChange(currentPage - 1)}
-              isDisabled={currentPage === 1}
-            >
-              Prev
-            </Button>
-            <Button
-              colorScheme='blue'
-              onClick={() => handlePageChange(currentPage + 1)}
-              isDisabled={currentPage === totalPages}
-            >
-              Next
-            </Button>
-            <Box>
-              Page {currentPage} of {totalPages}
-            </Box>
-          </Stack>
-
-          {/* ROW LIMIT */}
-          <RowLimit
-            onChange={(e) => {
-              setTotalRows(parseInt(e.target.value))
-              setCurrentPage(1)
-            }}
-            name='componentRow'
-          />
-        </Flex>
-      )}
 
       {/* DELETE VERSION */}
       {isDeleteOpen && (
@@ -505,21 +561,21 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
       )}
 
       {/* SBOM LIST */}
-      {isListOpen && project && (
+      {isListOpen && versions && (
         <SbomList
           data={activeRow}
-          sboms={project?.sboms}
+          sboms={versions}
           isOpen={isListOpen}
           onClose={onListClose}
         />
       )}
 
       {/* BUILD SBOM */}
-      {isSbomOpen && data && (
+      {isSbomOpen && projectGroup && (
         <ProductSbomDrawer
           isOpen={isSbomOpen}
           onClose={onSbomClose}
-          data={data}
+          data={projectGroup}
           refetch={refetch}
           productId={productId}
         />
@@ -528,4 +584,4 @@ const VersionTable = ({ data, project, productId, refetch, getVulnData }) => {
   )
 }
 
-export default VersionTable
+export default VersionsTable

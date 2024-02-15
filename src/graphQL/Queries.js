@@ -294,6 +294,28 @@ export const GetOrgSettings = gql`
   }
 `
 
+export const GetProductNames = gql`
+  query GetProductNames(
+    $enabled: Boolean
+    $first: Int
+    $field: ProjectGroupOrderByFields!
+    $direction: OrderByDirection!
+  ) {
+    organization {
+      projectGroups(
+        enabled: $enabled
+        first: $first
+        orderBy: { field: $field, direction: $direction }
+      ) {
+        nodes {
+          id
+          name
+        }
+      }
+    }
+  }
+`
+
 export const GetProductTable = gql`
   query GetProjectTable(
     $search: String
@@ -1151,7 +1173,34 @@ export const GetProductInfo = gql`
     }
   }
 `
-
+export const GetVersionsTable = gql`
+  query GetVersionsTable($id: Uuid!, $first: Int, $after: String, $last: Int, $before: String) {
+    project(id: $id) {
+      id
+      sbomVersions(first: $first, after: $after, last: $last, before: $before) {
+        totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          startCursor
+          hasPreviousPage
+        }
+        nodes {
+          id
+          creationAt
+          updatedAt
+          lifecycle
+          projectVersion
+          stats {
+            compCount
+            compLicenseCount
+            vulnStats
+          }
+        }
+      }
+    }
+  }
+`
 export const GetProductVersions = gql`
   query GetProductVersions($id: Uuid!) {
     project(id: $id) {
