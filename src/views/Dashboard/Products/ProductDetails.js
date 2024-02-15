@@ -653,7 +653,7 @@ const ProductDetails = () => {
       {/* UPLOAD SBOM */}
       {isOpenUpload && data && (
         <UploadModal
-          projects={data?.projectGroup?.projects}
+          data={data?.projectGroup}
           isOpen={isOpenUpload}
           onClose={onCloseUpload}
           activeEnv={activeEnv}

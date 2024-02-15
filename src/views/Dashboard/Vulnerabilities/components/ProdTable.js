@@ -124,7 +124,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
       ),
       wrap: true,
       right: 'true',
-      width: '220px'
+      width: '250px'
     },
     // ENV
     {
@@ -162,12 +162,14 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
       name: 'VERSION',
       selector: (row) => (
         <Tooltip label={row?.component?.version} placement='top'>
-          {row?.component?.version || ''}
+          <Text my={2} textAlign={'right'}>
+            {row?.component?.version || ''}
+          </Text>
         </Tooltip>
       ),
       wrap: true,
       right: 'true',
-      width: '200px'
+      width: '250px'
     },
     // STATUS
     {

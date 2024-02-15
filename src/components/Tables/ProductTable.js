@@ -639,7 +639,7 @@ const ProductTable = ({ data, refetch }) => {
       {/* UPLOAD SBOM */}
       {isOpenUpload && (
         <UploadModal
-          projects={activeRow?.projects}
+          data={activeRow}
           isOpen={isOpenUpload}
           onClose={onCloseUpload}
           activeEnv={activeEnv}
