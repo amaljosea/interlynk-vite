@@ -32,7 +32,7 @@ const Vulnerabilities = () => {
   useEffect(() => {
     if (data === undefined) {
       getVulns({ variables: { first: totalRows, field: field, direction: direction, search: searchInput !== '' ? searchInput : undefined, projectGroupIds: products?.length === 0 ? undefined : products, severity: severities?.length === 0 ? undefined : severities, status: statues?.length === 0 ? undefined : statues, kev: kev === 'yes' ? true : kev === 'false' ? false : undefined, epss: epss === 'all' || epss === '' ? undefined : range } }) }
-  }, [data])
+  }, [])
 
   if (!org || org === 'undefined') {
     return (

@@ -158,6 +158,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
           </Tag>
         )
       },
+      sortable: true,
       width: '150px',
       wrap: true
     },
@@ -257,6 +258,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
           </Flex>
         )
       },
+      sortable: true,
       width: '130px',
       wrap: true
     },
@@ -329,7 +331,10 @@ const GlobalVulnTable = ({ data, refetch }) => {
       id: 'VULNS_LAST_MODIFIED_AT',
       name: 'MODIFIED',
       selector: (row) => (
-        <Tooltip label={getFullDateAndTime(row?.lastModifiedAt)} placement={'top'}>
+        <Tooltip
+          label={getFullDateAndTime(row?.lastModifiedAt)}
+          placement={'top'}
+        >
           <Text textAlign={'right'}>{timeSince(row?.lastModifiedAt)}</Text>
         </Tooltip>
       ),
@@ -519,11 +524,13 @@ const GlobalVulnTable = ({ data, refetch }) => {
   // SORTING
   const handleSort = async (column, sortDirection) => {
     await refetch({
-      first: totalRows,
-      field: column.id,
-      direction: sortDirection === 'asc' ? 'ASC' : 'DESC',
-      search: searchInput !== '' ? searchInput : undefined,
-      ...vulnData
+      variables: {
+        first: totalRows,
+        field: column.id,
+        direction: sortDirection === 'asc' ? 'ASC' : 'DESC',
+        search: searchInput !== '' ? searchInput : undefined,
+        ...vulnData
+      }
     }).then((res) => {
       if (res.data) {
         globalVulnDispatch({
