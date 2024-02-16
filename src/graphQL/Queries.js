@@ -1174,7 +1174,13 @@ export const GetProductInfo = gql`
   }
 `
 export const GetVersionsTable = gql`
-  query GetVersionsTable($id: Uuid!, $first: Int, $after: String, $last: Int, $before: String) {
+  query GetVersionsTable(
+    $id: Uuid!
+    $first: Int
+    $after: String
+    $last: Int
+    $before: String
+  ) {
     project(id: $id) {
       id
       sbomVersions(first: $first, after: $after, last: $last, before: $before) {
@@ -2675,6 +2681,39 @@ export const FirstDegreePartVulns = gql`
       }
       vuln {
         id
+      }
+    }
+  }
+`
+
+// GET ALL SHARELYNKS
+export const GetSharelynks = gql`
+  query GetSharelynks(
+    $ids: [Uuid!]
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+  ) {
+    shareLynks(
+      projectGroupIds: $ids
+      after: $after
+      before: $before
+      first: $first
+      last: $last
+    ) {
+      totalCount
+      nodes {
+        enabled
+        id
+        signedUrlParams
+        updatedAt
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+        hasPreviousPage
+        startCursor
       }
     }
   }

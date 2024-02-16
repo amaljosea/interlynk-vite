@@ -29,7 +29,7 @@ import { FaEllipsisV } from 'react-icons/fa'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
-import { useMutation } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import { DeleteProjectGroup } from 'graphQL/Mutation'
 
 import { customStyles, getFullDateAndTime, timeSince } from 'utils'
@@ -46,6 +46,8 @@ import SearchFilter from 'views/Sbom/components/SearchFilter'
 import StatusModal from 'views/Dashboard/Products/components/StatusModal'
 import Pagination from '../Pagination'
 import { FaCode, FaInbox, FaSquareArrowUpRight } from 'react-icons/fa6'
+import { GetSharelynks } from 'graphQL/Queries'
+import ShareLynkDrawer from 'components/Drawer/ShareLynkDrawer'
 
 const ProductTable = ({ data, refetch }) => {
   //This part is needed for the pagination to work. (Modify with caution)
@@ -75,6 +77,8 @@ const ProductTable = ({ data, refetch }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
+  const activeEnv = localStorage.getItem('activeEnv')
+  const environment = localStorage.getItem('environment')
 
   const { userPermissions, setEnvName, setActiveSbomTab, prodState, dispatch } =
     useGlobalState()
@@ -84,6 +88,39 @@ const ProductTable = ({ data, refetch }) => {
 
   const [totalRows, setTotalRows] = useState(paginationSizes[0])
   const [filterText, setFilterText] = useState(searchInput)
+  const [activeRow, setActiveRow] = useState(null)
+
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const {
+    isOpen: isOpenProduct,
+    onOpen: onOpenProduct,
+    onClose: onCloseProduct
+  } = useDisclosure()
+  const {
+    isOpen: isOpenUpload,
+    onOpen: onOpenUpload,
+    onClose: onCloseUpload
+  } = useDisclosure()
+  const {
+    isOpen: isSbomOpen,
+    onOpen: onSbomOpen,
+    onClose: onSbomClose
+  } = useDisclosure()
+  const {
+    isOpen: isDeleteOpen,
+    onOpen: onDeleteOpen,
+    onClose: onDeleteClose
+  } = useDisclosure()
+  const {
+    isOpen: isWarningOpen,
+    onOpen: onWarningOpen,
+    onClose: onWarningClose
+  } = useDisclosure()
+  const {
+    isOpen: isLynkOpen,
+    onOpen: onLynkOpen,
+    onClose: onLynkClose
+  } = useDisclosure()
 
   const productPermissions = useMemo(
     () => userPermissions?.find((item) => item.key === 'view_product_group'),
@@ -114,40 +151,18 @@ const ProductTable = ({ data, refetch }) => {
     [productPermissions]
   )
 
-  const [activeRow, setActiveRow] = useState(null)
-  const { isOpen, onOpen, onClose } = useDisclosure()
-
-  const activeEnv = localStorage.getItem('activeEnv')
-  const environment = localStorage.getItem('environment')
-
   const {
-    isOpen: isOpenProduct,
-    onOpen: onOpenProduct,
-    onClose: onCloseProduct
-  } = useDisclosure()
-
-  const {
-    isOpen: isOpenUpload,
-    onOpen: onOpenUpload,
-    onClose: onCloseUpload
-  } = useDisclosure()
-
-  const {
-    isOpen: isSbomOpen,
-    onOpen: onSbomOpen,
-    onClose: onSbomClose
-  } = useDisclosure()
-  const {
-    isOpen: isDeleteOpen,
-    onOpen: onDeleteOpen,
-    onClose: onDeleteClose
-  } = useDisclosure()
-
-  const {
-    isOpen: isWarningOpen,
-    onOpen: onWarningOpen,
-    onClose: onWarningClose
-  } = useDisclosure()
+    data: lynks,
+    refetch: lynkRefetch,
+    error
+  } = useQuery(GetSharelynks, {
+    skip: activeRow ? false : true,
+    fetchPolicy: 'network-only',
+    variables: {
+      ids: activeRow ? [activeRow?.id] : undefined,
+      first: totalRows
+    }
+  })
 
   const [deleteProjectGroup] = useMutation(DeleteProjectGroup, {
     onCompleted: () => {
@@ -265,6 +280,11 @@ const ProductTable = ({ data, refetch }) => {
     },
     [refetch, totalRows, prodDispatch]
   )
+
+  const onSharelynkOpen = (row) => {
+    setActiveRow(row)
+    onLynkOpen()
+  }
 
   // HEADER
   const subHeaderComponent = useMemo(() => {
@@ -511,6 +531,13 @@ const ProductTable = ({ data, refetch }) => {
                   >
                     Build Version
                   </MenuItem>
+                  {/* VIEW SHARELYNK */}
+                  <MenuItem
+                    isDisabled={!enabled}
+                    onClick={() => onSharelynkOpen(row)}
+                  >
+                    View ShareLynk
+                  </MenuItem>
                   <Divider />
                   {/* ARCHIVE PRODUCT GROUP */}
                   <MenuItem
@@ -636,7 +663,17 @@ const ProductTable = ({ data, refetch }) => {
         <Flex flexDir={'column'} width={'100%'}>
           <DataTable {...dataTableProps} />
           {data && (
-            <Pagination paginationSizes={paginationSizes} pageIndex={pageIndex} totalRows={totalRows} totalCount={data.totalCount} onPreviousPage={handlePreviousPage} onNextPage={handleNextPage} onSetRow={handleSetRow} hasNextPage={isNextActive} hasPreviousPage={isPrevActive} />
+            <Pagination
+              paginationSizes={paginationSizes}
+              pageIndex={pageIndex}
+              totalRows={totalRows}
+              totalCount={data.totalCount}
+              onPreviousPage={handlePreviousPage}
+              onNextPage={handleNextPage}
+              onSetRow={handleSetRow}
+              hasNextPage={isNextActive}
+              hasPreviousPage={isPrevActive}
+            />
           )}
         </Flex>
       </Card>
@@ -703,7 +740,25 @@ const ProductTable = ({ data, refetch }) => {
 
       {/* DISABLED */}
       {isWarningOpen && data && (
-        <StatusModal isOpen={isWarningOpen} onClose={onWarningClose} group={activeRow} grouId={productId} refetch={refetch} />
+        <StatusModal
+          isOpen={isWarningOpen}
+          onClose={onWarningClose}
+          group={activeRow}
+          grouId={productId}
+          refetch={refetch}
+        />
+      )}
+
+      {/* ShareLynks */}
+      {isLynkOpen && (
+        <ShareLynkDrawer
+          error={error}
+          groupId={activeRow?.id}
+          data={lynks?.shareLynks}
+          refetch={lynkRefetch}
+          isOpen={isLynkOpen}
+          onClose={onLynkClose}
+        />
       )}
     </>
   )

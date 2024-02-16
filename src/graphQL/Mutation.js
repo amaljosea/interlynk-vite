@@ -599,77 +599,77 @@ export const VexVulnCreate = gql`
   }
 `
 
-export const CreateShareLynk = gql`
-  mutation CreateShareLynk(
-    $enabled: Boolean
-    $emails: [String!]!
-    $projects: [Uuid!]
-    $images: [Uuid!]
-  ) {
-    shareLynkCreate(
-      input: {
-        enabled: $enabled
-        shareUsers: $emails
-        projectIds: $projects
-        imageIds: $images
-      }
-    ) {
-      shareLynk {
-        id
-        enabled
-        contents {
-          __typename
-          ... on Project {
-            id
-            name
-            description
-          }
-        }
-        shareUsers {
-          email
-        }
-      }
-      errors
-    }
-  }
-`
+// export const CreateShareLynk = gql`
+//   mutation CreateShareLynk(
+//     $enabled: Boolean
+//     $emails: [String!]!
+//     $projects: [Uuid!]
+//     $images: [Uuid!]
+//   ) {
+//     shareLynkCreate(
+//       input: {
+//         enabled: $enabled
+//         shareUsers: $emails
+//         projectIds: $projects
+//         imageIds: $images
+//       }
+//     ) {
+//       shareLynk {
+//         id
+//         enabled
+//         contents {
+//           __typename
+//           ... on Project {
+//             id
+//             name
+//             description
+//           }
+//         }
+//         shareUsers {
+//           email
+//         }
+//       }
+//       errors
+//     }
+//   }
+// `
 
-export const UpdateShareLynk = gql`
-  mutation UpdateShareLynk(
-    $shareLynkId: Uuid!
-    $emails: [String!]
-    $projects: [Uuid!]
-    $images: [Uuid!]
-    $enabled: Boolean
-  ) {
-    shareLynkUpdate(
-      input: {
-        enabled: $enabled
-        shareLynkId: $shareLynkId
-        shareUsers: $emails
-        projectIds: $projects
-        imageIds: $images
-      }
-    ) {
-      shareLynk {
-        id
-        enabled
-        contents {
-          __typename
-          ... on Project {
-            id
-            name
-            description
-          }
-        }
-        shareUsers {
-          email
-        }
-      }
-      errors
-    }
-  }
-`
+// export const UpdateShareLynk = gql`
+//   mutation UpdateShareLynk(
+//     $shareLynkId: Uuid!
+//     $emails: [String!]
+//     $projects: [Uuid!]
+//     $images: [Uuid!]
+//     $enabled: Boolean
+//   ) {
+//     shareLynkUpdate(
+//       input: {
+//         enabled: $enabled
+//         shareLynkId: $shareLynkId
+//         shareUsers: $emails
+//         projectIds: $projects
+//         imageIds: $images
+//       }
+//     ) {
+//       shareLynk {
+//         id
+//         enabled
+//         contents {
+//           __typename
+//           ... on Project {
+//             id
+//             name
+//             description
+//           }
+//         }
+//         shareUsers {
+//           email
+//         }
+//       }
+//       errors
+//     }
+//   }
+// `
 
 export const DeleteShareLynk = gql`
   mutation DeleteShareLynk($id: ID!) {
@@ -1784,6 +1784,42 @@ export const UserResendConfirmationEmail = gql`
     userResendConfirmationEmail(input: { email: $email }) {
       errors
       success
+    }
+  }
+`
+
+// CREATE SHARELYNK
+export const CreateShareLynk = gql`
+  mutation CreateShareLynk(
+    $id: [Uuid!]!
+    $enabled: Boolean
+    $expiresAt: ISO8601DateTime
+  ) {
+    shareLynkCreate(
+      input: { enabled: $enabled, expiresAt: $expiresAt, projectGroupIds: $id }
+    ) {
+      errors
+    }
+  }
+`
+
+// UPDATE SHARELYNK
+export const UpdateShareLynk = gql`
+  mutation UpdateShareLynk(
+    $linkId: Uuid!
+    $id: [Uuid!]!
+    $enabled: Boolean
+    $expiresAt: ISO8601DateTime
+  ) {
+    shareLynkUpdate(
+      input: {
+        shareLynkId: $linkId
+        enabled: $enabled
+        expiresAt: $expiresAt
+        projectGroupIds: $id
+      }
+    ) {
+      errors
     }
   }
 `
