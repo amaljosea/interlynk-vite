@@ -255,14 +255,6 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
       .finally(() => onClose())
   }
 
-  const handleCreateSBOM = async () => {
-    if (existingVersions?.includes(version)) {
-      onWarningOpen()
-    } else {
-      onCreateSBOM()
-    }
-  }
-
   return (
     <>
       <Drawer isOpen={isOpen} placement='right' onClose={onClose} size='md'>
@@ -466,7 +458,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
             </Button>
             <Button
               colorScheme='blue'
-              onClick={handleCreateSBOM}
+              onClick={onCreateSBOM}
               disabled={sbomName === '' || compType === '' || version === ''}
             >
               Save
