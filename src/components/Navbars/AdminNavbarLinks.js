@@ -23,7 +23,7 @@ import {
   MenuOptionGroup
 } from '@chakra-ui/react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { useQuery } from '@apollo/client'
+import { useLazyQuery, useQuery } from '@apollo/client'
 import { GetOrg } from 'graphQL/Queries'
 import { dashRoutes } from 'routes.js'
 import PropTypes from 'prop-types'
@@ -37,6 +37,7 @@ import SidebarResponsive from 'components/Sidebar/SidebarResponsive'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { logoutUser } from 'utils/authUtils'
 import { ChevronDownIcon } from '@chakra-ui/icons'
+import { GetProjectGroup } from 'graphQL/Queries'
 
 export default function HeaderLinks(props) {
   const location = useLocation()
@@ -82,13 +83,21 @@ export default function HeaderLinks(props) {
     navigate('/auth')
   }
 
-  const shortcuts = [{key: 'Ctrl + /',title: 'Search'}]
+  const shortcuts = [{ key: 'Ctrl + /', title: 'Search' }]
+
+  const [getProdGroup] = useLazyQuery(GetProjectGroup, {fetchPolicy: 'network-only'})
 
   const handleEnvChange = (value) => {
     localStorage.setItem('environment', value)
     setEnvName(value)
-    if(sbomId) {
-      navigate(`/vendor/products/${group?.name}?id=${group?.id}`)
+    if (sbomId) {
+      getProdGroup({ variables: { id: group?.id } }).then((res) => {
+        if (res?.data) {
+          const env = res?.data?.projectGroup?.projects?.find((item) => item.name === value)
+          localStorage.setItem('activeEnv', env?.id)
+          navigate(`/vendor/products/${group?.name}?id=${group?.id}`)
+        }
+      })
     }
   }
 
@@ -108,13 +117,31 @@ export default function HeaderLinks(props) {
       {/* ENVIRONMENT */}
       {(dashboardView || productId) && (
         <Menu closeOnSelect={true}>
-          <MenuButton as={Button} size='sm' colorScheme='blue' fontWeight='medium' fontSize='sm' leftIcon={envIcon(envName)} rightIcon={<ChevronDownIcon />} textTransform='capitalize'>
+          <MenuButton
+            as={Button}
+            size='sm'
+            colorScheme='blue'
+            fontWeight='medium'
+            fontSize='sm'
+            leftIcon={envIcon(envName)}
+            rightIcon={<ChevronDownIcon />}
+            textTransform='capitalize'
+          >
             {envName || 'Default'}
           </MenuButton>
           <MenuList>
-            <MenuOptionGroup value={envName} onChange={(value) => handleEnvChange(value)} type='radio'>
+            <MenuOptionGroup
+              value={envName}
+              onChange={(value) => handleEnvChange(value)}
+              type='radio'
+            >
               {['default', 'development', 'production'].map((item, index) => (
-                <MenuItemOption key={index} value={item} fontSize='sm' textTransform={'capitalize'}>
+                <MenuItemOption
+                  key={index}
+                  value={item}
+                  fontSize='sm'
+                  textTransform={'capitalize'}
+                >
                   {item}
                 </MenuItemOption>
               ))}
@@ -125,7 +152,12 @@ export default function HeaderLinks(props) {
       {productId && (
         <Popover isLazy>
           <PopoverTrigger>
-            <IconButton m={0} p={0} variant='ghost' icon={<FaRegKeyboard fontSize={24} color='darkgray' />}/>
+            <IconButton
+              m={0}
+              p={0}
+              variant='ghost'
+              icon={<FaRegKeyboard fontSize={24} color='darkgray' />}
+            />
           </PopoverTrigger>
           <PopoverContent>
             <PopoverHeader fontWeight='medium'>

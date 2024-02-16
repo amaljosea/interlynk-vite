@@ -58,20 +58,18 @@ import {
   GetVulnData,
   GetProjectLogs,
   GetProjectSettings,
+  GetProjectGroup,
+  GetGlobalVulnData,
+  GetGlobalVulns
 } from 'graphQL/Queries'
 import Settings from '../ProductSettings'
 import CardHeader from 'components/Card/CardHeader'
 import { ChevronDownIcon, ViewIcon } from '@chakra-ui/icons'
 import EnvironmentDrawer from 'components/Drawer/EnvironmentDrawer'
-import { isDefaultEnv } from 'utils'
+import { isDefaultEnv, filterEnvList } from 'utils'
 import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
 import StatusModal from './components/StatusModal'
-import { GetProjectGroup } from 'graphQL/Queries'
 import VulnInfo from '../Vulnerabilities/vulnInfo'
-import { GetGlobalVulnData } from 'graphQL/Queries'
-import { filterEnvList } from 'utils'
-import { GetProjectVulns } from 'graphQL/Queries'
-import { GetGlobalVulns } from 'graphQL/Queries'
 
 const ProductDetails = () => {
   const navigate = useNavigate()
@@ -297,11 +295,28 @@ const ProductDetails = () => {
           projectGroupIds: [productId],
           field: globalVulnState.field,
           direction: globalVulnState.direction,
-          search: globalVulnState.searchInput !== '' ? globalVulnState.searchInput : undefined,
-          severity: globalVulnState.severities?.length === 0 ? undefined : globalVulnState.severities,
-          status: globalVulnState.statues?.length === 0 ? undefined : globalVulnState.statues,
-          kev: globalVulnState.kev === 'yes' ? true : globalVulnState.kev === 'false' ? false : undefined,
-          epss: globalVulnState.epss === 'all' || globalVulnState.epss === '' ? undefined : vulnRange
+          search:
+            globalVulnState.searchInput !== ''
+              ? globalVulnState.searchInput
+              : undefined,
+          severity:
+            globalVulnState.severities?.length === 0
+              ? undefined
+              : globalVulnState.severities,
+          status:
+            globalVulnState.statues?.length === 0
+              ? undefined
+              : globalVulnState.statues,
+          kev:
+            globalVulnState.kev === 'yes'
+              ? true
+              : globalVulnState.kev === 'false'
+                ? false
+                : undefined,
+          epss:
+            globalVulnState.epss === 'all' || globalVulnState.epss === ''
+              ? undefined
+              : vulnRange
         }
       })
     } else if (activeTab === 2) {
@@ -330,6 +345,7 @@ const ProductDetails = () => {
 
   useEffect(() => {
     if (environment && data) {
+      console.log('Environment changed')
       const env = data?.projectGroup?.projects.find(
         (item) => item.name === environment
       )
@@ -609,7 +625,7 @@ const ProductDetails = () => {
                   <ChangeLog
                     data={prodLogs}
                     refetch={getLogs}
-                    activeEnv={activeEnv}
+                    activeEnv={activeProd}
                   />
                 </TabPanel>
               </TabPanels>

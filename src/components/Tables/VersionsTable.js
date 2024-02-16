@@ -42,14 +42,14 @@ import SbomList from 'views/Dashboard/Products/components/SbomList'
 import Pagination from "../Pagination";
 import {GetVersionsTable} from "../../graphQL/Queries";
 
-const VersionsTable = ({ projectGroup, productId, getVulnData }) => {
-
+const VersionsTable = ({ projectGroup, getVulnData }) => {
+  const activeProd = localStorage.getItem('activeEnv')
   const { data, refetch } = useQuery(
       GetVersionsTable,
       {
         fetchPolicy: 'network-only',
         variables: {
-          id: productId
+          id: activeProd
         }
       }
   )
@@ -179,7 +179,7 @@ const VersionsTable = ({ projectGroup, productId, getVulnData }) => {
 
   const onFilterSev = async (id, version, value) => {
     await getVulnData({
-      projectId: productId,
+      projectId: activeProd,
       sbomId: id,
       severity: value,
       first: totalRows,
@@ -209,7 +209,7 @@ const VersionsTable = ({ projectGroup, productId, getVulnData }) => {
         const { id, projectVersion } = row
         return (
           <Link
-            to={`/vendor/products/${projectGroup?.name}?id=${productId}&sbom=${id}`}
+            to={`/vendor/products/${projectGroup?.name}?id=${activeProd}&sbom=${id}`}
             onClick={() => {
               localStorage.setItem(
                 'currentSBOM',
@@ -239,7 +239,7 @@ const VersionsTable = ({ projectGroup, productId, getVulnData }) => {
         const { stats, id, projectVersion } = row
         return (
           <Link
-            to={`/vendor/products/${params.name}?id=${productId}&sbom=${id}`}
+            to={`/vendor/products/${params.name}?id=${activeProd}&sbom=${id}`}
           >
             <Tag
               size='md'
@@ -279,7 +279,7 @@ const VersionsTable = ({ projectGroup, productId, getVulnData }) => {
       name: 'VULNERABILITIES',
       selector: (row) => {
         const { stats, id, projectVersion } = row
-        const link = `/vendor/products/${params.name}?id=${productId}&sbom=${id}`
+        const link = `/vendor/products/${params.name}?id=${activeProd}&sbom=${id}`
         return (
           <Stack fontWeight={'medium'} direction={'row'}>
             <Link
@@ -425,7 +425,7 @@ const VersionsTable = ({ projectGroup, productId, getVulnData }) => {
       if (res.data.sbomDelete?.errors?.length === 0) {
         setTimeout(() => {
           setIsLoading(false)
-          refetch({ id: productId })
+          refetch({ id: activeProd })
           onDeleteClose()
         }, 4000)
       }
@@ -437,7 +437,7 @@ const VersionsTable = ({ projectGroup, productId, getVulnData }) => {
     disablePaginationControl()
     setCurrentPage(1)
     await refetch({
-      id: productId,
+      id: activeProd,
       first: totalRows,
       after: undefined,
       before: undefined,
@@ -577,7 +577,7 @@ const VersionsTable = ({ projectGroup, productId, getVulnData }) => {
           onClose={onSbomClose}
           data={projectGroup}
           refetch={refetch}
-          productId={productId}
+          productId={activeProd}
         />
       )}
     </>

@@ -223,7 +223,6 @@ const GeneralDataRow = ({ status, data, refetch }) => {
           variant='simple'
           color={textColor}
           size='sm'
-          mt={10}
         >
           {/* TABLE HEAD */}
           <Thead>

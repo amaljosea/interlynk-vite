@@ -1909,7 +1909,7 @@ export const GetProjectLogs = gql`
 
 // GET ACTIVITY LOG FILTERS
 export const GetLogFilters = gql`
-  query Project($id: Uuid!) {
+  query GetLogFilters($id: Uuid!) {
     project(id: $id) {
       activityLogFilters {
         logChangeBys
