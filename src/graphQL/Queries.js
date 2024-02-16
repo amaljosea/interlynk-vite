@@ -1202,6 +1202,19 @@ export const GetVersionsTable = gql`
             compLicenseCount
             vulnStats
           }
+          alternatives {
+            id
+            creationAt
+            updatedAt
+            lifecycle
+            projectVersion
+            stats {
+              compCount
+              compLicenseCount
+              vulnStats
+              __typename
+            }
+          }
         }
       }
     }

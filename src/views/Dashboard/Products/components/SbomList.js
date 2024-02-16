@@ -45,12 +45,12 @@ const SbomList = ({ isOpen, onClose, data }) => {
                     return dateB - dateA
                   })
                   .map((item, index) => {
-                    const { createdAt, stats, lifecycle, updatedAt } = item
+                    const { creationAt, stats, lifecycle, updatedAt } = item
                     return (
                       <Tr key={index}>
                         <Td px={0} fontSize={'sm'} width='280px'>
                           <Stack direction={'row'}>
-                            <Text>{getFullDateAndTime(createdAt)}</Text>
+                            <Text>{getFullDateAndTime(creationAt)}</Text>
                           </Stack>
                         </Td>
                         <Td px={0} fontSize={'sm'} width='150px'>
