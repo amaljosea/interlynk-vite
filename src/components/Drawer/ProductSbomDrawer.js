@@ -176,6 +176,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
     })
   }
 
+
   const handleCreateComp = async (id) => {
     await createComponent({
       variables: {
