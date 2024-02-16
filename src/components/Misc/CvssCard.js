@@ -1,4 +1,4 @@
-import { Stack, Text, Divider, Grid, Tag, TagLabel } from '@chakra-ui/react'
+import { Stack, Text, Divider, Grid, Tag, TagLabel, Heading } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 
 const CvssText = ({ children }) => (
@@ -81,7 +81,8 @@ const CvssCard = ({ value }) => {
 
   return (
     <Stack spacing={1} p={2}>
-      <Tag justifyContent={'center'} fontSize={'sm'} py={2} mb={1} wordBreak={'break-all'}>
+      <Heading fontFamily={'inherit'} color='#222' size={8} mb={2}>CVSS Vector</Heading>
+      <Tag justifyContent={'center'} fontSize={'sm'} py={2} wordBreak={'break-all'}>
         {value}
       </Tag>
       <Divider />
