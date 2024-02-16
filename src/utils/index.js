@@ -699,7 +699,6 @@ export const isDefaultEnv = (name) => {
   switch (name) {
     case 'default':
       return true
-      break
     case 'development':
       return true
     case 'production':

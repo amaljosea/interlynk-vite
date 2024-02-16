@@ -13,7 +13,7 @@ import { useEffect, useState } from 'react'
 import { GetProject, GetProjectGroups } from 'graphQL/Queries'
 import { useLazyQuery, useQuery } from '@apollo/client'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { isDefaultEnv, envOrderList } from 'utils'
+import { envOrderList } from 'utils'
 
 const StepOne = ({
   setProductId,
@@ -81,7 +81,7 @@ const StepOne = ({
       //   setSbomId('')
       // }
     }
-  }, [data])
+  }, [])
 
   const [getProduct] = useLazyQuery(GetProject)
 
@@ -183,7 +183,7 @@ const StepOne = ({
                 id='product'
                 value={selectedProd}
                 onChange={handleSelectProduct}
-                textTransform={isDefaultEnv(envName) ? 'capitalize' : 'none'}
+                textTransform={'capitalize'}
               >
                 <option value={''}>-- Select --</option>
                 {productList?.length > 0 &&
@@ -191,11 +191,7 @@ const StepOne = ({
                     <option
                       key={index}
                       value={item.value}
-                      style={{
-                        textTransform: isDefaultEnv(item.label)
-                          ? 'capitalize'
-                          : 'none'
-                      }}
+                      style={{textTransform: 'capitalize'}}
                     >
                       {item.label}
                     </option>
