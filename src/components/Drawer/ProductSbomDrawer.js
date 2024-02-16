@@ -214,7 +214,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
   const onCreateSBOM = async () => {
     await createSbom({
       variables: {
-        projectId: activeEnv,
+        projectId: data?.defaultProject?.id,
         spec: 'cyclonedx',
         specVersion: '1.4',
         format: 'json'

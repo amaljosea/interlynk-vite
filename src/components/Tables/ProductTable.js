@@ -700,7 +700,7 @@ const ProductTable = ({ data, refetch }) => {
 
       {/* PROD SBOM DRAWER */}
       {isSbomOpen && (
-        <ProductSbomDrawer isOpen={isSbomOpen} onClose={onSbomClose} data={activeRow} refetch={refetch} />
+        <ProductSbomDrawer isOpen={isSbomOpen} onClose={onSbomClose} data={activeRow} refetch={refetch} productId={activeRow?.id} />
       )}
 
       {/* DELETE */}
