@@ -76,7 +76,8 @@ const ProductTable = ({ data, refetch }) => {
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
 
-  const { userPermissions, setEnvName, setActiveSbomTab, prodState, dispatch } = useGlobalState()
+  const { userPermissions, setEnvName, setActiveSbomTab, prodState, dispatch } =
+    useGlobalState()
 
   const { field, direction, searchInput, pageIndex, enabled } = prodState
   const { prodDispatch, prodCompDispatch } = dispatch
@@ -351,7 +352,10 @@ const ProductTable = ({ data, refetch }) => {
           const product = { id: id, name: name, groupId: id }
           const handleClick = () => {
             const env = projects?.find((item) => item.name === environment)
-            prodDispatch({ type: 'SET_CURRENT_PRODUCT', payload: { id: env?.id || defaultProject?.id }})
+            prodDispatch({
+              type: 'SET_CURRENT_PRODUCT',
+              payload: { id: env?.id || defaultProject?.id }
+            })
             localStorage.setItem('activeEnv', env?.id || defaultProject?.id)
             localStorage.setItem('product', JSON.stringify(product))
             localStorage.setItem('activeProdTab', 0)
@@ -359,8 +363,13 @@ const ProductTable = ({ data, refetch }) => {
           }
 
           return (
-            <Link to={`/vendor/products/${name}?id=${id}`} onClick={handleClick}>
-              <Text color={'blue.500'} minWidth='100%'>{name}</Text>
+            <Link
+              to={`/vendor/products/${name}?id=${id}`}
+              onClick={handleClick}
+            >
+              <Text color={'blue.500'} minWidth='100%'>
+                {name}
+              </Text>
             </Link>
           )
         },
@@ -374,7 +383,11 @@ const ProductTable = ({ data, refetch }) => {
         selector: (row) => {
           const { description } = row
           return (
-            <Text>{description?.length > 50 ? description.substring(0, 50) + '....' : description}</Text>
+            <Text>
+              {description?.length > 50
+                ? description.substring(0, 50) + '....'
+                : description}
+            </Text>
           )
         },
         wrap: true,
@@ -394,7 +407,10 @@ const ProductTable = ({ data, refetch }) => {
             localStorage.setItem('environment', env?.name)
             localStorage.setItem('activeEnv', env?.id)
             localStorage.setItem('activeProdTab', 0)
-            prodDispatch({ type: 'SET_CURRENT_PRODUCT', payload: { id: env?.id } })
+            prodDispatch({
+              type: 'SET_CURRENT_PRODUCT',
+              payload: { id: env?.id }
+            })
             setEnvName(env?.name)
             setActiveSbomTab(0)
           }
@@ -403,24 +419,23 @@ const ProductTable = ({ data, refetch }) => {
             <Stack direction={'row'} spacing={2} alignItems={'center'}>
               <Tooltip label='Default'>
                 <Link to={`/vendor/products/${name}?id=${id}`} onClick={() => handleClick('default')}>
-                  <IconButton size='sm' colorScheme='blue' aria-label='Default' icon={<FaInbox />}/>
+                  <IconButton size='sm' colorScheme='gray' aria-label='Default' icon={<FaInbox color='#4A5568' />}/>
                 </Link>
               </Tooltip>
               <Tooltip label='Development'>
-                <Link to={`/vendor/products/${name}?id=${id}`} onClick={() => handleClick('development')}>
-                  <IconButton size='sm' colorScheme='blue' aria-label='Development' icon={<FaCode />}/>
+                <Link to={`/vendor/products/${name}?id=${id}`} onClick={() => handleClick('development')} >
+                  <IconButton size='sm' colorScheme='gray' aria-label='Development' icon={<FaCode color='#4A5568' />} />
                 </Link>
               </Tooltip>
               <Tooltip label='Production'>
-                <Link to={`/vendor/products/${name}?id=${id}`} onClick={() => handleClick('production')}>
-                  <IconButton size='sm' colorScheme='blue' aria-label='Production' icon={<FaSquareArrowUpRight />}/>
+                <Link to={`/vendor/products/${name}?id=${id}`} onClick={() => handleClick('production')} >
+                  <IconButton size='sm' colorScheme='gray' aria-label='Production' icon={<FaSquareArrowUpRight color='#4A5568' />}/>
                 </Link>
               </Tooltip>
             </Stack>
           )
         },
         wrap: true,
-        right: 'true'
       },
       // VERSION
       {
@@ -428,10 +443,7 @@ const ProductTable = ({ data, refetch }) => {
         name: 'VERSIONS',
         selector: (row) => {
           const { projects } = row
-          const totalSbom = projects?.reduce(
-            (count, project) => count + project.sboms.length,
-            0
-          )
+          const totalSbom = projects?.reduce((count, project) => count + project.sboms.length,0)
           return <Text>{totalSbom || 0}</Text>
         },
         wrap: true,
@@ -467,7 +479,7 @@ const ProductTable = ({ data, refetch }) => {
 
           return (
             <Menu>
-              <MenuButton as={IconButton} icon={<FaEllipsisV />} variant='none' color='gray.400'/>
+              <MenuButton as={IconButton} icon={<FaEllipsisV />} variant='none' color='gray.400' />
               <Portal>
                 <MenuList fontSize={'sm'}>
                   {/* EDIT PRODUCT */}
@@ -493,7 +505,10 @@ const ProductTable = ({ data, refetch }) => {
                     Upload SBOM
                   </MenuItem>
                   {/* BUILD SBOM */}
-                  <MenuItem onClick={() => handleOpenSbom(row)} isDisabled={!enabled}>
+                  <MenuItem
+                    onClick={() => handleOpenSbom(row)}
+                    isDisabled={!enabled}
+                  >
                     Build Version
                   </MenuItem>
                   <Divider />
@@ -621,17 +636,7 @@ const ProductTable = ({ data, refetch }) => {
         <Flex flexDir={'column'} width={'100%'}>
           <DataTable {...dataTableProps} />
           {data && (
-            <Pagination
-              paginationSizes={paginationSizes}
-              pageIndex={pageIndex}
-              totalRows={totalRows}
-              totalCount={data.totalCount}
-              onPreviousPage={handlePreviousPage}
-              onNextPage={handleNextPage}
-              onSetRow={handleSetRow}
-              hasNextPage={isNextActive}
-              hasPreviousPage={isPrevActive}
-            />
+            <Pagination paginationSizes={paginationSizes} pageIndex={pageIndex} totalRows={totalRows} totalCount={data.totalCount} onPreviousPage={handlePreviousPage} onNextPage={handleNextPage} onSetRow={handleSetRow} hasNextPage={isNextActive} hasPreviousPage={isPrevActive} />
           )}
         </Flex>
       </Card>
@@ -648,40 +653,17 @@ const ProductTable = ({ data, refetch }) => {
 
       {/* CREATE PRODUCT */}
       {isOpenProduct && (
-        <ProductModal
-          isOpen={isOpenProduct}
-          refetch={refetch}
-          totalRows={totalRows}
-          onClose={onCloseProduct}
-          id={null}
-          product={null}
-          description={null}
-          allProjects={null}
-        />
+        <ProductModal isOpen={isOpenProduct} refetch={refetch} totalRows={totalRows} onClose={onCloseProduct} id={null} product={null} description={null} allProjects={null} />
       )}
 
       {/* UPDATE PRODUCT */}
       {isOpen && data && (
-        <ProductModal
-          id={activeRow.id}
-          isOpen={isOpen}
-          onClose={onClose}
-          product={activeRow.name}
-          refetch={refetch}
-          description={activeRow.description}
-          allProjects={data.nodes}
-          activeEnv={activeEnv}
-        />
+        <ProductModal id={activeRow.id} isOpen={isOpen} onClose={onClose} product={activeRow.name} refetch={refetch} description={activeRow.description} allProjects={data.nodes} activeEnv={activeEnv} />
       )}
 
       {/* PROD SBOM DRAWER */}
       {isSbomOpen && (
-        <ProductSbomDrawer
-          isOpen={isSbomOpen}
-          onClose={onSbomClose}
-          data={activeRow}
-          refetch={refetch}
-        />
+        <ProductSbomDrawer isOpen={isSbomOpen} onClose={onSbomClose} data={activeRow} refetch={refetch} />
       )}
 
       {/* DELETE */}
@@ -721,13 +703,7 @@ const ProductTable = ({ data, refetch }) => {
 
       {/* DISABLED */}
       {isWarningOpen && data && (
-        <StatusModal
-          isOpen={isWarningOpen}
-          onClose={onWarningClose}
-          group={activeRow}
-          grouId={productId}
-          refetch={refetch}
-        />
+        <StatusModal isOpen={isWarningOpen} onClose={onWarningClose} group={activeRow} grouId={productId} refetch={refetch} />
       )}
     </>
   )
