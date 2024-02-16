@@ -159,7 +159,7 @@ function ActivitiesOverviewRow(props) {
   }
 
   return (
-    <Flex alignItems='center' minH='78px' justifyContent='start' mb='5px'>
+    <Flex alignItems='flex-start' minH='78px' justifyContent='start' mb='5px'>
       <Flex direction='column' h='100%'>
         <Tooltip text={action}>
           <Icon
