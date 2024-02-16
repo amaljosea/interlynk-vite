@@ -106,6 +106,7 @@ export const GetRoles = gql`
         createdAt
         permissionsMap {
           category
+          hidden
           description
           key
           name
