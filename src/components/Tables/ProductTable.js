@@ -156,7 +156,7 @@ const ProductTable = ({ data, refetch }) => {
     refetch: lynkRefetch,
     error
   } = useQuery(GetSharelynks, {
-    skip: activeRow ? false : true,
+    skip: activeRow && isLynkOpen ? false : true,
     fetchPolicy: 'network-only',
     variables: {
       ids: activeRow ? [activeRow?.id] : undefined,
