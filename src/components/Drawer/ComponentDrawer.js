@@ -262,6 +262,7 @@ function ComponentDrawer(props) {
           )
         }
         prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
+        onFilterRefetch()
         onClose()
       }
     })
