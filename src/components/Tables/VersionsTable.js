@@ -482,13 +482,13 @@ const VersionsTable = ({ projectGroup, productId, getVulnData }) => {
 
   const dataTableProps = {
     columns: columns,
-    data: versions?.nodes,
+    data: data?.project?.sbomVersions?.nodes || [],
     customStyles: customStyles,
     defaultSortFieldId: 'UPDATED_AT',
     defaultSortAsc: false,
     subHeader: true,
     subHeaderComponent: subHeaderComponent,
-    progressPending: !versions,
+    progressPending: !data?.project?.sbomVersions,
     progressComponent: <CustomLoader />,
     responsive: true,
     persistTableHead: true
@@ -500,17 +500,17 @@ const VersionsTable = ({ projectGroup, productId, getVulnData }) => {
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable {...dataTableProps}/>
         {versions && (
-            <Pagination
-                paginationSizes={paginationSizes}
-                pageIndex={currentPage}
-                totalRows={totalRows}
-                totalCount={versions.totalCount}
-                onPreviousPage={handlePreviousPage}
-                onNextPage={handleNextPage}
-                onSetRow={handleSetRow}
-                hasNextPage={isNextActive}
-                hasPreviousPage={isPrevActive}
-            />
+          <Pagination
+            paginationSizes={paginationSizes}
+            pageIndex={currentPage}
+            totalRows={totalRows}
+            totalCount={versions.totalCount}
+            onPreviousPage={handlePreviousPage}
+            onNextPage={handleNextPage}
+            onSetRow={handleSetRow}
+            hasNextPage={isNextActive}
+            hasPreviousPage={isPrevActive}
+          />
         )}
       </Flex>
 

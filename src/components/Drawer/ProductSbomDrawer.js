@@ -67,8 +67,8 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
   const activeEnv = localStorage.getItem('activeEnv')
 
   const [getCpe] = useLazyQuery(CpeAutoComplete)
-  const [createSbom] = useMutation(sbomCreate, { onCompleted: () => handleRefetch()})
-  const [createComponent] = useMutation(CreateComponent)
+  const [createSbom] = useMutation(sbomCreate)
+  const [createComponent] = useMutation(CreateComponent,{ onCompleted: () => handleRefetch()})
 
   const { isOpen: isWarningOpen, onOpen: onWarningOpen, onClose: onWarningClose } = useDisclosure()
   const { isOpen: isPurlOpen, onOpen: onPurlOpen, onClose: onPurlClose } = useDisclosure()
