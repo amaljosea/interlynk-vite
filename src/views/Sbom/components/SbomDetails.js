@@ -207,7 +207,7 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
           {/* COMPONENTS */}
           <Stack direction={'row'} alignItems={'flex-start'} spacing={2}>
             <Icon h={4} w={4} mt={1} color='#777' as={FaCube} />
-            <Box>
+            <Flex flexDir={'column'} alignItems={'center'}>
               <Tag size='md' variant='subtle' width={16} colorScheme={'blue'}>
                 <TagLabel mx={'auto'}>{compCount}</TagLabel>
               </Tag>
@@ -220,7 +220,7 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
               >
                 Components
               </Text>
-            </Box>
+            </Flex>
           </Stack>
           {/* LICENSES */}
           <Stack direction={'row'} alignItems={'flex-start'} spacing={2}>
@@ -231,19 +231,19 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
               color='#777'
               as={FaBalanceScale}
             />
-            <Box>
+             <Flex flexDir={'column'} alignItems={'center'}>
               <Tag size='md' variant='subtle' width={16} colorScheme={'blue'}>
                 <TagLabel mx={'auto'}>{compLicenseCount}</TagLabel>
               </Tag>
               <Text mt={1} fontSize={'xs'}>
                 Licenses
               </Text>
-            </Box>
+            </Flex>
           </Stack>
           {/* VULNERABILITIES */}
           <Stack direction={'row'} alignItems={'flex-start'} spacing={2}>
             <Icon mt={1} h={4} w={4} color='#777' as={FaBug} />
-            <Box>
+            <Flex flexDir={'column'} alignItems={'center'}>
               <Stack fontWeight={'medium'} direction={'row'}>
                 <VulnBadge
                   color='red'
@@ -290,7 +290,7 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
               >
                 Vulnerabilities
               </Text>
-            </Box>
+            </Flex>
           </Stack>
         </Flex>
       </Flex>

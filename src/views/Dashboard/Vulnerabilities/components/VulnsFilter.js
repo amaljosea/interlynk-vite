@@ -15,13 +15,12 @@ import {
 import { useLocation, useParams } from 'react-router-dom'
 import CheckMark from 'components/Misc/CheckMark'
 import FilterButton from 'components/Misc/FilterButton'
-import { GetProjectGroups } from 'graphQL/Queries'
+import { GetProductNames } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useRef } from 'react'
 
 const VulnsFilters = ({ refetch }) => {
   const params = useParams()
-  const location = useLocation()
 
   const { totalRows, globalVulnState, prodState, dispatch } = useGlobalState()
   const {
@@ -37,7 +36,7 @@ const VulnsFilters = ({ refetch }) => {
   } = globalVulnState
   const { globalVulnDispatch } = dispatch
 
-  const { data } = useQuery(GetProjectGroups, {
+  const { data } = useQuery(GetProductNames, {
     variables: {
       first: totalRows,
       enabled: true,
@@ -64,8 +63,6 @@ const VulnsFilters = ({ refetch }) => {
       minRef.current.focus()
     }
   }
-
-  const vulnData = { first: totalRows, field, direction }
 
   const handleRefetch = async (groupIds, severities, statuses, kev, epss) => {
     const epssRange = epss !== 'all' && epss !== '' && epss.split('-')

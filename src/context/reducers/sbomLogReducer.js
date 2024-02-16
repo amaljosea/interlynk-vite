@@ -10,7 +10,8 @@ const sbomLogReducer = (state, action) => {
         pageIndex: 1,
         users: [],
         objects: [],
-        types: []
+        types: [],
+        filters: null,
       }
     case 'CHANGE_SEARCH_INPUT':
       return {

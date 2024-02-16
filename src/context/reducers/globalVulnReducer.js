@@ -7,6 +7,8 @@ const globalVulnReducer = (state, action) => {
         ...state,
         after: '',
         before: '',
+        field: 'VULNS_VULN_ID',
+        direction: 'DESC',
         searchInput: '',
         pageIndex: 1,
         severities: [],

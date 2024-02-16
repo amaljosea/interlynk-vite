@@ -19,15 +19,19 @@ import {
   FormControl,
   Select,
   Stack,
-  FormHelperText
+  FormHelperText,
+  Tag
 } from '@chakra-ui/react'
 import { UploadSbom } from 'graphQL/Mutation'
 import { useState } from 'react'
 import { FaUpload } from 'react-icons/fa'
+import { useParams } from 'react-router-dom'
 import { filterEnvList, isDefaultEnv } from 'utils'
 
-const UploadModal = ({ projects, isOpen, onClose, activeEnv }) => {
+const UploadModal = ({ data, isOpen, onClose, activeEnv }) => {
+  const params = useParams()
   const toast = useToast()
+  const { projects, name } = data || ''
   const [sbomUpload, { loading, error }] = useMutation(UploadSbom)
   const [selectedEnv, setSelectedEnv] = useState(activeEnv || projects[0].id)
   const [errorMessage, setErrorMessage] = useState('')
@@ -92,6 +96,11 @@ const UploadModal = ({ projects, isOpen, onClose, activeEnv }) => {
           <ModalHeader>Upload SBOM</ModalHeader>
           <ModalCloseButton onClick={() => setErrorMessage('')} />
           <ModalBody pb={4}>
+            {!params?.name && (
+            <Tag colorScheme='blue' mb={4}>
+              <Text fontWeight={'medium'} wordBreak={'break-all'}>{name}</Text>
+            </Tag>
+            )}
             {errorMessage !== '' && (
               <Alert status='error' mb={4} borderRadius={5}>
                 <AlertIcon />

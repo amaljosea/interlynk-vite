@@ -7,7 +7,8 @@ import {
   TagLabel,
   Tooltip,
   IconButton,
-  useDisclosure
+  useDisclosure,
+  Skeleton
 } from '@chakra-ui/react'
 import React, { useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
@@ -20,6 +21,8 @@ import SearchFilter from 'views/Sbom/components/SearchFilter'
 import { useGlobalState } from 'hooks/useGlobalState'
 import Pagination from '../Pagination'
 import PurlCard from 'components/Misc/PurlCard'
+import { GetSbomLogFilters } from 'graphQL/Queries'
+import { useLazyQuery } from '@apollo/client'
 
 const setColor = (type) => {
   switch (type) {
@@ -75,10 +78,13 @@ const SbomChangelogTable = ({ data, refetch }) => {
   const sbomId = queryParams.get('sbom')
 
   const { totalRows, setTotalRows, sbomLogState, dispatch } = useGlobalState()
-  const { filters, field, direction, pageIndex, searchInput } = sbomLogState
+  const { filters, field, direction, pageIndex } = sbomLogState
   const { sbomLogDispatch } = dispatch
 
   const [logSearch, setLogSearch] = useState('')
+
+  // GET SBOM CHANGELOG FILTER HEADS
+  const [getSbomLogFilters] = useLazyQuery(GetSbomLogFilters)
 
   // COLUMNS
   const columns = [
@@ -517,14 +523,19 @@ const SbomChangelogTable = ({ data, refetch }) => {
             onFilter={handleSearch}
             onClear={handleClear}
           />
-
           {/* FILTER COMPONENTS BASED ON ECOSYSTEM */}
-          {filters && (
+          {filters ? (
             <LogFilterMenu
               refetch={refetch}
               productId={productId}
               sbomId={sbomId}
             />
+          ) : (
+            <Stack direction='row' spacing={4}>
+              {[1, 2, 3].map((_, index) => (
+                <Skeleton key={index} width={'100px'} height={'38px'} />
+              ))}
+            </Stack>
           )}
         </Stack>
         <Tooltip label='Refresh'>
@@ -532,11 +543,29 @@ const SbomChangelogTable = ({ data, refetch }) => {
             onClick={handleClear}
             colorScheme='blue'
             icon={<RepeatIcon />}
-          ></IconButton>
+          />
         </Tooltip>
       </Flex>
     )
   }, [logSearch, filters, onSearchInputChange, handleClear, handleSearch])
+
+  useEffect(() => {
+    if (data) {
+      getSbomLogFilters({
+        variables: {
+          projectId: productId,
+          sbomId: sbomId
+        }
+      }).then((res) => {
+        if (res?.data) {
+          sbomLogDispatch({
+            type: 'ADD_FILTER_HEADS',
+            payload: res?.data?.sbom?.activityLogFilters
+          })
+        }
+      })
+    }
+  }, [data])
 
   return (
     <>
@@ -573,11 +602,7 @@ const SbomChangelogTable = ({ data, refetch }) => {
       )}
 
       {isOpen && (
-        <PurlCard
-          value={activeRow}
-          isOpen={isOpen}
-          onClose={onClose}
-        />
+        <PurlCard value={activeRow} isOpen={isOpen} onClose={onClose} />
       )}
     </>
   )

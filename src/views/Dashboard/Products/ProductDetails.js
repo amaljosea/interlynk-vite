@@ -34,7 +34,7 @@ import {
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
-import VersionTable from 'components/Tables/VersionTable'
+import VersionsTable from 'components/Tables/VersionsTable'
 import { useEffect, useState } from 'react'
 import {
   FaPenToSquare,
@@ -54,18 +54,16 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useQuery, useMutation, useLazyQuery } from '@apollo/client'
 import { DeleteProjectGroup } from 'graphQL/Mutation'
 import {
-  GetProductVersions,
   GetProjectCheck,
   GetVulnData,
   GetProjectLogs,
-  GetProjectSettings
+  GetProjectSettings,
 } from 'graphQL/Queries'
 import Settings from '../ProductSettings'
 import CardHeader from 'components/Card/CardHeader'
 import { ChevronDownIcon, ViewIcon } from '@chakra-ui/icons'
 import EnvironmentDrawer from 'components/Drawer/EnvironmentDrawer'
 import { isDefaultEnv } from 'utils'
-import { GetProjectGroupComponentVulns } from 'graphQL/Queries'
 import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
 import StatusModal from './components/StatusModal'
 import { GetProjectGroup } from 'graphQL/Queries'
@@ -137,22 +135,6 @@ const ProductDetails = () => {
       id: productId
     }
   })
-
-  const activeGroup =
-    data &&
-    data?.organization?.projectGroups?.nodes.find(
-      (item) => item.id === productId
-    )
-
-  const { data: versions, refetch: sbomRefetch } = useQuery(
-    GetProductVersions,
-    {
-      fetchPolicy: 'network-only',
-      variables: {
-        id: activeEnv
-      }
-    }
-  )
 
   const epssRange =
     globalVulnState.epss !== 'all' &&
@@ -592,12 +574,10 @@ const ProductDetails = () => {
                 {/* VERSIONS */}
                 <TabPanel px={0}>
                   {data && (
-                    <VersionTable
+                    <VersionsTable
                       productId={activeEnv}
-                      project={versions?.project}
-                      data={data?.projectGroup}
+                      projectGroup={data?.projectGroup}
                       getVulnData={vulnRefetch}
-                      refetch={sbomRefetch}
                     />
                   )}
                 </TabPanel>
@@ -653,7 +633,7 @@ const ProductDetails = () => {
       {/* UPLOAD SBOM */}
       {isOpenUpload && data && (
         <UploadModal
-          projects={data?.projectGroup?.projects}
+          data={data?.projectGroup}
           isOpen={isOpenUpload}
           onClose={onCloseUpload}
           activeEnv={activeEnv}
