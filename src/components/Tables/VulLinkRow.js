@@ -1,7 +1,8 @@
-import { Td, Tr } from '@chakra-ui/react'
+import { Flex, Td, Tr } from '@chakra-ui/react'
 import Tooltip from 'components/Tooltip'
 import React from 'react'
 import { BiNote } from 'react-icons/bi'
+import { FaExpand } from 'react-icons/fa6'
 import { getFullDateAndTime, timeSince } from 'utils'
 
 const VulLinkRow = ({
@@ -10,23 +11,19 @@ const VulLinkRow = ({
   status,
   timestamp,
   note,
-  impact
+  impact,
+  onSelect
 }) => {
   return (
     <Tr>
       <Td fontSize={'xs'} pl={0}>
-        {username}
-      </Td>
-      <Td fontSize={'xs'} pl={0}>
-        {status}
+        <Flex flexDir={'row'} alignItems={'center'} gap={2}>
+          <FaExpand cursor={'pointer'} onClick={onSelect} />
+          {status}
+        </Flex>
       </Td>
       <Td fontSize={'xs'} pl={0}>
         {justification}
-      </Td>
-      <Td fontSize={'xs'} pl={0}>
-        <Tooltip text={getFullDateAndTime(timestamp)}>
-          {timeSince(timestamp)}
-        </Tooltip>
       </Td>
       <Td fontSize={'xs'} pl={0}>
         {impact && (
@@ -41,6 +38,14 @@ const VulLinkRow = ({
             <BiNote />
           </Tooltip>
         )}
+      </Td>
+      <Td fontSize={'xs'} pl={0}>
+        {username}
+      </Td>
+      <Td fontSize={'xs'} pl={0}>
+        <Tooltip text={getFullDateAndTime(timestamp)}>
+          {timeSince(timestamp)}
+        </Tooltip>
       </Td>
     </Tr>
   )

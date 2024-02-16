@@ -43,7 +43,7 @@ import DataTable from 'react-data-table-component'
 import { FaEllipsisV, FaFilter } from 'react-icons/fa'
 import { useLocation, Link, useParams } from 'react-router-dom'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
-import { isDefaultEnv, envOrderList, customStyles } from 'utils'
+import { isDefaultEnv, envOrderList, customStyles,capitalizeFirstLetter } from 'utils'
 import { GetProductData } from 'graphQL/Queries'
 
 const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
@@ -54,9 +54,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const prodId = queryParams.get('id')
   const group = JSON.parse(localStorage.getItem('product'))
 
-  const capitalizeFirstLetter = (str) => {
-    return str.charAt(0).toUpperCase() + str.slice(1)
-  }
+
 
   const { setActiveProdTab, totalRows, prodState, prodCompState, prodVulnState, userPermissions, dispatch } = useGlobalState()
   const { enabled, field, direction } = prodState

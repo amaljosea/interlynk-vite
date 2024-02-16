@@ -18,14 +18,11 @@ import {
 } from '@chakra-ui/react'
 import VulLinkRow from 'components/Tables/VulLinkRow'
 import { updateCompVulnVex } from 'graphQL/Mutation'
-import {
-  getVexStatuses,
-  getVexJustifications,
-  GetCdxResponses
-} from 'graphQL/Queries'
+import { getVexStatuses, getVexJustifications, GetCdxResponses } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
+import { capitalizeFirstLetter } from 'utils'
 
 const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
   const location = useLocation()
@@ -34,18 +31,8 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
   const sbomId = queryParams.get('sbom')
   const { data: res } = useQuery(GetCdxResponses)
 
-  const { totalRows, userPermissions, prodVulnState, dispatch } =
-    useGlobalState()
-  const {
-    field,
-    direction,
-    searchInput,
-    severities,
-    components,
-    statues,
-    kev,
-    epss
-  } = prodVulnState
+  const { totalRows, userPermissions, prodVulnState, dispatch } = useGlobalState()
+  const { field, direction, searchInput, severities, components, statues, kev, epss } = prodVulnState
   const { prodVulnDispatch } = dispatch
 
   const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
@@ -105,10 +92,10 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
     })
   }
 
-  const [compVexCreate] = useMutation(updateCompVulnVex, {
-    fetchPolicy: 'network-only',
-    onCompleted: handleRefetch
-  })
+  const [compVexCreate] = useMutation(updateCompVulnVex, { fetchPolicy: 'network-only', onCompleted: handleRefetch })
+
+  const fixedVersions = filteredData?.filter((item) => item.value !== sbomId)
+
 
   const handleStatusChange = (e) => {
     const { value } = e.target
@@ -153,7 +140,9 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
         action: actionStatement !== '' ? actionStatement : undefined,
         fixedIn: selectedTag !== '' ? selectedTag : undefined
       }
-    }).then((res) => res.data && prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' }))
+    }).then(
+      (res) => res.data && prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
+    )
     setStatusTitle('')
     setStatusName('')
     setJustification('')
@@ -167,7 +156,23 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
     setImpactData('')
   }
 
-  const fixedVersions = filteredData.filter((item) => item.value !== sbomId)
+  const handleSelect = (item) => {
+    const filterStatus = allVexStatus?.vexStatuses?.find((st) => st.name === item?.status)
+    const filterJustify = allVexJustify?.vexJustifications?.find((st) => st?.name === item?.justification)
+    const filterRes = res?.cdxResponses?.find((st) => st?.name?.toLowerCase() === item?.response?.toLowerCase())
+    setStatusTitle(filterStatus?.id || '')
+    setStatusName(item?.status || '')
+    setJustification(filterJustify?.id || '')
+    setJustifyName(item?.justification || '')
+    setActionStatement(item?.actionStmt || '')
+    setResponse(filterRes?.id || '')
+    setResponseTitle(capitalizeFirstLetter(item?.response) || '')
+    setSelectedTag(item?.fixedIn || '')
+    setDetails(item?.detail || '')
+    setNotes(item?.note || '')
+    setImpactData(item?.impact || '')
+  }
+
 
   useEffect(() => {
     if (componentVulnLogs) {
@@ -188,23 +193,15 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
         <SimpleGrid row={5} spacing={4}>
           {!location.pathname.startsWith('/customer') && (
             <>
+              {/* STATUS */}
               <FormControl>
-                <FormLabel htmlFor='vexType' fontSize='sm' color={'gray.600'}>
-                  Status
-                </FormLabel>
-                <Select
-                  id='vexType'
-                  name='vexType'
-                  fontSize='sm'
-                  value={statusTitle}
-                  onChange={handleStatusChange}
+                <FormLabel htmlFor='vexType' fontSize='sm' color={'gray.600'}>Status</FormLabel>
+                <Select id='vexType' name='vexType' fontSize='sm' value={statusTitle} onChange={handleStatusChange}
                 >
                   <option value=''>-- Select Status --</option>
                   {allVexStatus ? (
                     allVexStatus.vexStatuses.map((st, idx) => (
-                      <option key={idx} value={st.id}>
-                        {st.name}
-                      </option>
+                      <option key={idx} value={st.id}>{st.name}</option>
                     ))
                   ) : (
                     <option value={''}>No data found</option>
@@ -215,27 +212,12 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
               {(statusName === 'Not Affected' ||
                 statusName === 'False Positive') && (
                 <FormControl>
-                  <FormLabel
-                    htmlFor='justification'
-                    fontSize='sm'
-                    color='gray.600'
-                  >
-                    Justification
-                  </FormLabel>
-                  <Select
-                    id='justification'
-                    name='justification'
-                    value={justification}
-                    onChange={handleJustifyChange}
-                    fontSize='sm'
-                    color='gray.600'
-                  >
+                  <FormLabel htmlFor='justification' fontSize='sm' color='gray.600'>Justification</FormLabel>
+                  <Select id='justification' name='justification' value={justification} onChange={handleJustifyChange} fontSize='sm' color='gray.600'>
                     <option value=''>-- Select --</option>
                     {allVexJustify ? (
                       allVexJustify.vexJustifications.map((justify, idx) => (
-                        <option key={idx} value={justify.id}>
-                          {justify.name}
-                        </option>
+                        <option key={idx} value={justify.id}>{justify.name}</option>
                       ))
                     ) : (
                       <option value={''}>No data found</option>
@@ -246,24 +228,13 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
               {/* RESPONSE */}
               {statusName === 'Affected' && (
                 <FormControl>
-                  <FormLabel htmlFor='response' fontSize='sm' color='gray.600'>
-                    Response
-                  </FormLabel>
+                  <FormLabel htmlFor='response' fontSize='sm' color='gray.600'>Response</FormLabel>
                   {res && (
-                    <Select
-                      id='response'
-                      name='response'
-                      value={response}
-                      onChange={handleResponseChange}
-                      fontSize='sm'
-                      color='gray.600'
-                    >
+                    <Select id='response' name='response' value={response} onChange={handleResponseChange} fontSize='sm'  color='gray.600'>
                       <option value=''>-- Select --</option>
-                      {res.cdxResponses.length > 0 &&
-                        res.cdxResponses.map((item, idx) => (
-                          <option key={idx} value={item.id}>
-                            {item.name}
-                          </option>
+                      {res?.cdxResponses?.length > 0 &&
+                        res?.cdxResponses?.map((item, idx) => (
+                          <option key={idx} value={item.id}>{item.name}</option>
                         ))}
                     </Select>
                   )}
@@ -271,38 +242,14 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
               )}
               {/* FIXED VERSION */}
               {statusName === 'Affected' && responseTitle === 'Update' && (
-                <Stack
-                  width={'100%'}
-                  direction={'column'}
-                  spacing={4}
-                  alignItems={'flex-start'}
-                >
+                <Stack width={'100%'} direction={'column'} spacing={4} alignItems={'flex-start'}>
                   <FormControl width={'100%'}>
-                    <FormLabel
-                      htmlFor='fixedVersion'
-                      fontSize='sm'
-                      color='gray.600'
-                    >
-                      Fixed Version
-                    </FormLabel>
-                    <Select
-                      id='fixedVersion'
-                      name='fixedVersion'
-                      value={selectedTag}
-                      onChange={(e) => setSelectedTag(e.target.value)}
-                      fontSize='sm'
-                      color='gray.600'
-                    >
+                    <FormLabel htmlFor='fixedVersion' fontSize='sm' color='gray.600'>Fixed Version</FormLabel>
+                    <Select id='fixedVersion' name='fixedVersion' value={selectedTag} onChange={(e) => setSelectedTag(e.target.value)} fontSize='sm' color='gray.600'>
                       <option value=''>-- Select --</option>
                       {fixedVersions.length > 0 ? (
                         fixedVersions.map((item, index) => (
-                          <option
-                            key={index}
-                            value={item.value}
-                            name={item.label}
-                          >
-                            {item.label}
-                          </option>
+                          <option key={index} value={item.label} name={item.label}>{item.label}</option>
                         ))
                       ) : (
                         <option value=''>-- --</option>
@@ -315,52 +262,21 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
               {(statusName === 'Not Affected' ||
                 statusName === 'False Positive') && (
                 <FormControl>
-                  <FormLabel
-                    htmlFor='impactStatement'
-                    fontSize='sm'
-                    color='gray.600'
-                  >
-                    Impact Statement
-                  </FormLabel>
-                  <Textarea
-                    type='text'
-                    name='impactStatement'
-                    rows={2}
-                    id='impactStatement'
-                    placeholder='Add impact statement'
-                    value={impactData}
-                    onChange={(e) => setImpactData(e.target.value)}
-                    fontSize='sm'
-                  />
+                  <FormLabel htmlFor='impactStatement' fontSize='sm' color='gray.600'>Impact Statement</FormLabel>
+                  <Textarea type='text' name='impactStatement' rows={2} id='impactStatement' placeholder='Add impact statement' value={impactData} onChange={(e) => setImpactData(e.target.value)} fontSize='sm'/>
                 </FormControl>
               )}
               {/* ACTION STATEMENT */}
               {statusName === 'Affected' && (
                 <FormControl>
-                  <FormLabel
-                    htmlFor='actionStatement'
-                    fontSize='sm'
-                    color={'gray.600'}
-                  >
-                    Action Statement
-                  </FormLabel>
-                  <Textarea
-                    rows={2}
-                    name='actionStatement'
-                    id='actionStatement'
-                    placeholder='Add statement'
-                    fontSize='sm'
-                    value={actionStatement}
-                    onChange={(e) => setActionStatement(e.target.value)}
-                  />
+                  <FormLabel htmlFor='actionStatement' fontSize='sm' color={'gray.600'}>Action Statement</FormLabel>
+                  <Textarea rows={2} name='actionStatement' id='actionStatement' placeholder='Add statement' fontSize='sm' value={actionStatement} onChange={(e) => setActionStatement(e.target.value)}/>
                 </FormControl>
               )}
               {/* DETAILS */}
               {(statusName === 'In Triage' || statusName === 'Affected') && (
                 <FormControl>
-                  <FormLabel htmlFor='details' fontSize='sm' color={'gray.600'}>
-                    Details
-                  </FormLabel>
+                  <FormLabel htmlFor='details' fontSize='sm' color={'gray.600'}>Details</FormLabel>
                   <Textarea
                     rows={2}
                     name='details'
@@ -374,22 +290,8 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
               )}
               {/* INTERNAL NOTES */}
               <FormControl>
-                <FormLabel
-                  htmlFor='internalNotes'
-                  fontSize='sm'
-                  color={'gray.600'}
-                >
-                  Internal Notes
-                </FormLabel>
-                <Textarea
-                  rows={2}
-                  name='internalNotes'
-                  id='internalNotes'
-                  placeholder='Add notes'
-                  fontSize='sm'
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                />
+                <FormLabel htmlFor='internalNotes' fontSize='sm' color={'gray.600'}>Internal Notes</FormLabel>
+                <Textarea rows={2} name='internalNotes' id='internalNotes' placeholder='Add notes' fontSize='sm' value={notes} onChange={(e) => setNotes(e.target.value)}/>
               </FormControl>
             </>
           )}
@@ -428,33 +330,15 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
               <Table variant='simple' color={textColor} size='sm' my={2}>
                 <Thead>
                   <Tr my='.8rem'>
-                    {[
-                      'Username',
-                      'Status',
-                      'Justification',
-                      'Timestamp',
-                      'Impact',
-                      'Note'
-                    ].map((item, index) => (
-                      <Th key={index} color='gray.400' pl={0}>
-                        <Box>{item}</Box>
-                      </Th>
+                    {['Status','Justification','Impact','Notes','By','Created'].map((item, index) => (
+                      <Th key={index} color='gray.500' pl={0}><Box>{item}</Box></Th>
                     ))}
                   </Tr>
                 </Thead>
                 <Tbody>
                   {statusResults.length > 0 &&
                     statusResults.map((item) => (
-                      <VulLinkRow
-                        key={item.id}
-                        id={item.id}
-                        username={item.changedBy}
-                        justification={item.justification}
-                        status={item.status}
-                        timestamp={item.updatedAt}
-                        note={item.note}
-                        impact={item.impact}
-                      />
+                      <VulLinkRow key={item.id} id={item.id} username={item.changedBy} justification={item.justification} status={item.status} timestamp={item.updatedAt} note={item.note} impact={item.impact} onSelect={() => handleSelect(item)}/>
                     ))}
                 </Tbody>
               </Table>
