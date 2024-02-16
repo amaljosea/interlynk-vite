@@ -482,13 +482,13 @@ const VersionsTable = ({ projectGroup, productId, getVulnData }) => {
 
   const dataTableProps = {
     columns: columns,
-    data: data?.project?.sbomVersions?.nodes || [],
+    data: versions?.nodes || [],
     customStyles: customStyles,
     defaultSortFieldId: 'UPDATED_AT',
     defaultSortAsc: false,
     subHeader: true,
     subHeaderComponent: subHeaderComponent,
-    progressPending: !data?.project?.sbomVersions,
+    progressPending: !versions,
     progressComponent: <CustomLoader />,
     responsive: true,
     persistTableHead: true
