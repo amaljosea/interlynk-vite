@@ -1,4 +1,4 @@
-import {useMutation, useQuery} from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import { RepeatIcon } from '@chakra-ui/icons'
 import {
   Flex,
@@ -32,27 +32,27 @@ import ProductSbomDrawer from 'components/Drawer/ProductSbomDrawer'
 import VulnBadge from 'components/Misc/VulnBadge'
 import { sbomDelete } from 'graphQL/Mutation'
 import { useGlobalState } from 'hooks/useGlobalState'
-import {useCallback, useEffect, useMemo, useState} from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV } from 'react-icons/fa'
 import { FaScrewdriverWrench } from 'react-icons/fa6'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useLocation, useParams } from 'react-router-dom'
 import { timeSince, getFullDateAndTime, customStyles } from 'utils'
 import SbomList from 'views/Dashboard/Products/components/SbomList'
-import Pagination from "../Pagination";
-import {GetVersionsTable} from "../../graphQL/Queries";
+import Pagination from '../Pagination'
+import { GetVersionsTable } from '../../graphQL/Queries'
 
 const VersionsTable = ({ projectGroup, getVulnData }) => {
+  const location = useLocation()
+  const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : "customer"
+  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const activeProd = localStorage.getItem('activeEnv')
-  const { data, refetch } = useQuery(
-      GetVersionsTable,
-      {
-        fetchPolicy: 'network-only',
-        variables: {
-          id: activeProd
-        }
-      }
-  )
+  const { data, refetch } = useQuery(GetVersionsTable, {
+    fetchPolicy: 'network-only',
+    variables: {
+      id: activeProd
+    }
+  })
   const versions = data?.project?.sbomVersions
 
   //This part is needed for the pagination to work. (Modify with caution)
@@ -91,10 +91,10 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
       before: undefined
     }).then((res) => {
       if (res.data) {
-        setPaginationControl(res.data);
+        setPaginationControl(res.data)
       }
-    });
-  }, [refetch, totalRows, versions, currentPage]);
+    })
+  }, [refetch, totalRows, versions, currentPage])
 
   const handlePreviousPage = useCallback(async () => {
     disablePaginationControl()
@@ -107,37 +107,33 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
       before: versions.pageInfo.startCursor
     }).then((res) => {
       if (res.data) {
-        setPaginationControl(res.data);
+        setPaginationControl(res.data)
       }
-    });
-  }, [refetch, totalRows, versions, currentPage]);
+    })
+  }, [refetch, totalRows, versions, currentPage])
 
   const handleSetRow = useCallback(
-      async (e) => {
-        const newTotalRows = Number(e.target.value)
-        setCurrentPage(1)
-        setTotalRows(newTotalRows)
-        disablePaginationControl()
-        await refetch({
-          first: newTotalRows,
-          last: undefined,
-          after: undefined,
-          before: undefined
-        }).then((res) => {
-          if (res.data) {
-            setPaginationControl(res.data)
-          }
-        })
-      },
-      [refetch, setTotalRows]
+    async (e) => {
+      const newTotalRows = Number(e.target.value)
+      setCurrentPage(1)
+      setTotalRows(newTotalRows)
+      disablePaginationControl()
+      await refetch({
+        first: newTotalRows,
+        last: undefined,
+        after: undefined,
+        before: undefined
+      }).then((res) => {
+        if (res.data) {
+          setPaginationControl(res.data)
+        }
+      })
+    },
+    [refetch, setTotalRows]
   )
 
-  const {
-    userPermissions,
-    setActiveSbomTab,
-    prodVulnState,
-    dispatch
-  } = useGlobalState()
+  const { userPermissions, setActiveSbomTab, prodVulnState, dispatch } =
+    useGlobalState()
   const { field, direction } = prodVulnState
   const { prodVulnDispatch, prodCompDispatch } = dispatch
 
@@ -155,7 +151,6 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [activeRow, setActiveRow] = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
-
 
   const [deleteSbom] = useMutation(sbomDelete)
 
@@ -209,7 +204,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
         const { id, projectVersion } = row
         return (
           <Link
-            to={`/vendor/products/${projectGroup?.name}?id=${activeProd}&sbom=${id}`}
+            to={`/${path}/products/${projectGroup?.name}?id=${activeProd}&sbom=${id}`}
             onClick={() => {
               localStorage.setItem(
                 'currentSBOM',
@@ -239,7 +234,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
         const { stats, id, projectVersion } = row
         return (
           <Link
-            to={`/vendor/products/${params.name}?id=${activeProd}&sbom=${id}`}
+            to={`/${path}/products/${params.name}?id=${activeProd}&sbom=${id}`}
           >
             <Tag
               size='md'
@@ -279,7 +274,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
       name: 'VULNERABILITIES',
       selector: (row) => {
         const { stats, id, projectVersion } = row
-        const link = `/vendor/products/${params.name}?id=${activeProd}&sbom=${id}`
+        const link = `/${path}/products/${params.name}?id=${activeProd}&sbom=${id}`
         return (
           <Stack fontWeight={'medium'} direction={'row'}>
             <Link
@@ -390,6 +385,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
             <Portal>
               <MenuList fontSize={16}>
                 <MenuItem
+                  isDisabled={signedUrlParams}
                   onClick={() => {
                     setActiveRow(row)
                     onListOpen()
@@ -402,7 +398,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
                     setActiveRow(row)
                     onDeleteOpen()
                   }}
-                  isDisabled={!archiveSbom}
+                  isDisabled={!archiveSbom || signedUrlParams}
                 >
                   Delete
                 </MenuItem>
@@ -461,7 +457,9 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
           {/* BUILD SBOM */}
           <Tooltip label='Build Version'>
             <IconButton
-              isDisabled={!projectGroup?.enabled || !createSbom}
+              isDisabled={
+                !projectGroup?.enabled || !createSbom || signedUrlParams
+              }
               colorScheme='blue'
               onClick={onBuildSbom}
               icon={<FaScrewdriverWrench />}
@@ -494,11 +492,10 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
     persistTableHead: true
   }
 
-
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
-        <DataTable {...dataTableProps}/>
+        <DataTable {...dataTableProps} />
         {versions && (
           <Pagination
             paginationSizes={paginationSizes}

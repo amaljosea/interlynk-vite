@@ -1,22 +1,13 @@
 // Chakra imports
-import {
-  Box,
-  ChakraProvider,
-  Portal,
-  Stack,
-  useDisclosure
-} from '@chakra-ui/react'
+import { Box, Portal, Stack, useToast } from '@chakra-ui/react'
 // Layout components
 import AdminNavbar from 'components/Navbars/AdminNavbar.js'
 import Sidebar from 'components/Sidebar'
-import React, { useState } from 'react'
-import { Route, Routes, Switch } from 'react-router-dom'
-// Custom Chakra theme
-import theme from 'theme/theme.js'
+import React, { useState, useEffect } from 'react'
+import { Outlet, redirect, useLocation, useNavigate } from 'react-router-dom'
 // Custom components
 import PanelContainer from '../components/Layout/PanelContainer'
 import PanelContent from '../components/Layout/PanelContent'
-import { customerRoutes } from 'routes.js'
 import {
   ApolloClient,
   InMemoryCache,
@@ -24,52 +15,26 @@ import {
   ApolloLink
 } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
+import { onError } from '@apollo/client/link/error'
 import Cookies from 'js-cookie'
 import { getActiveNavbar, getActiveRoute } from '../utils'
 import { createUploadLink } from 'apollo-upload-client'
-import ContextWrapper from 'context/ContextWrapper'
+import { logoutUser } from 'utils/authUtils'
+import { customerRoutes } from 'routes'
 
 export default function Customer(props) {
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const signedUrlParams = queryParams.get('signed_url_params')
+
+  const authToken = Cookies.get('authToken')
+  const highRes = window.matchMedia('(min-width: 2500px)')
+  const navigate = useNavigate()
   const { ...rest } = props
-
   // states and functions
-  const [sidebarVariant, setSidebarVariant] = useState('transparent')
-  // functions for changing the states from components
-  const getRoute = () => {
-    return window.location.pathname !== '/vendor/full-screen-maps'
-  }
+  const [sidebarVariant] = useState('transparent')
 
-  const getRoutes = (routes) => {
-    return routes.map((prop, key) => {
-      // console.log('getting routes')
-      if (prop.collapse) {
-        // console.log('getting routes collapse')
-        return getRoutes(prop.views)
-      }
-      if (prop.category === 'account') {
-        // console.log('getting account')
-        return getRoutes(prop.views)
-      }
-      if (prop.layout === '/customer') {
-        // console.log('getting admin')
-        return (
-          <Route
-            path={prop.layout + prop.path}
-            component={prop.component}
-            key={key}
-          />
-        )
-      } else {
-        return null
-      }
-    })
-  }
-
-  const { onOpen } = useDisclosure()
   document.documentElement.dir = 'ltr'
-  // Chakra Color Mode
-
-  const userToken = Cookies.get('userToken')
 
   const graphqlAPI = process.env.REACT_APP_GRAPHQL_API
 
@@ -81,14 +46,68 @@ export default function Customer(props) {
     return {
       headers: {
         ...headers,
-        authorization: userToken ? userToken : ''
+        authorization: authToken
       }
     }
   })
-  const client = new ApolloClient({
-    link: ApolloLink.from([authLink, uploadLink]),
-    cache: new InMemoryCache()
+
+  const toast = useToast()
+  const env = process.env.NODE_ENV
+
+  const errorLink = onError(({ graphQLErrors }) => {
+    if (graphQLErrors && env !== 'production') {
+      graphQLErrors.forEach(({ message }) => {
+        toast({
+          title: 'An error occurred.',
+          description: message,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+          position: 'top'
+        })
+      })
+    }
   })
+
+  const client = new ApolloClient({
+    link: ApolloLink.from([errorLink, authLink, uploadLink]),
+    cache: new InMemoryCache(),
+    queryDeduplication: false
+  })
+
+  const isTokenExpired = (token) => {
+    const decodedToken = jwtDecode(token)
+    if (!decodedToken) {
+      return true
+    }
+    const currentTime = Date.now() / 1000
+    return decodedToken.exp < currentTime
+  }
+
+  useEffect(() => {
+    if (authToken) {
+      try {
+        const expired = isTokenExpired(authToken)
+        if (expired === true) {
+          logoutUser().then((r) => navigate('/auth'))
+        }
+      } catch (err) {
+        console.error('Invalid Token')
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    if (location.pathname === '/customer') {
+      redirect('/customer/products')
+    }
+  }, [location])
+
+  useEffect(() => {
+    if (signedUrlParams) {
+      sessionStorage.setItem('signedUrlParams', signedUrlParams)
+    }
+  }, [signedUrlParams])
 
   return (
     <ApolloProvider client={client}>
@@ -103,20 +122,17 @@ export default function Customer(props) {
         <Box minH='100vh' w={'96%'} pos={'absolute'} right={0}>
           <Portal>
             <AdminNavbar
-              onOpen={onOpen}
               logoText={'Interlynk DASHBOARD'}
               brandText={getActiveRoute(customerRoutes)}
               secondary={getActiveNavbar(customerRoutes)}
             />
           </Portal>
           <Box bg='rgba(0,0,0,0.04)' minH={'100vh'} maxH={'100%'}>
-            {getRoute() && (
-              <PanelContent>
-                <PanelContainer>
-                  <Routes>{getRoutes(customerRoutes)}</Routes>
-                </PanelContainer>
-              </PanelContent>
-            )}
+            <PanelContent>
+              <PanelContainer>
+                <Outlet />
+              </PanelContainer>
+            </PanelContent>
           </Box>
         </Box>
       </Stack>

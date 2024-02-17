@@ -89,6 +89,7 @@ const SBOMTable = ({
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
+  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const activeTab = Number(localStorage.getItem('activeSbomTab') || 0)
 
   // GET SBOM PARTS
@@ -213,7 +214,7 @@ const SBOMTable = ({
       getVulnData({
         ...commonParams,
         search: getUndefinedIfEmpty(searchInput),
-        source: (source === 'BOTH' || source === '') ? undefined : source,
+        source: source === 'BOTH' || source === '' ? undefined : source,
         severity: getUndefinedIfEmptyOrAll(severities),
         componentName: getUndefinedIfEmptyOrAll(components),
         status: getUndefinedIfEmptyOrAll(statues),
@@ -291,7 +292,14 @@ const SBOMTable = ({
           {/* TAB LIST */}
           <TabList mt='20px'>
             {Object.values(tabIndexToName).map((item, index) => (
-              <Tab key={index} _focus={{ outline: 'none' }}>
+              <Tab
+                key={index}
+                _focus={{ outline: 'none' }}
+                isDisabled={
+                  signedUrlParams &&
+                  (item === 'Checks' || item === 'Change Log')
+                }
+              >
                 {item}
               </Tab>
             ))}

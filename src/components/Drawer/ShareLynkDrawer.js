@@ -109,7 +109,7 @@ const ShareLynkDrawer = ({
       name: 'LINK',
       selector: (row) => {
         const sbomLink = useClipboard(
-          `${domain}/login?signed_url_params=${row?.signedUrlParams}`
+          `${domain}/customer?signed_url_params=${row?.signedUrlParams}`
         )
         return (
           <Flex my={2} gap={2} alignItems={'center'}>

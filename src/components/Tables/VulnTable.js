@@ -39,7 +39,6 @@ import VulnFilterMenu from 'views/Sbom/components/VulnFilterMenu'
 import { sevColor, timeSince, getFullDateAndTime } from 'utils'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import CustomLoader from 'components/CustomLoader'
-import Cookies from 'js-cookie'
 import { customStyles } from 'utils'
 import ImportWizard from 'views/Sbom/components/ImportWizard'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -77,6 +76,7 @@ const VulnTable = ({
   filterRefetch,
   sbomRefetch
 }) => {
+  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const firstDegreePart = data?.nodes?.filter(
     (item) => item.isFirstDegreePart === true
   )
@@ -88,8 +88,6 @@ const VulnTable = ({
     variables: { sbomIds, componentVulnIds },
     onCompleted: (data) => console.log('Parts', data)
   })
-
-  const { isOpen, onOpen, onClose } = useDisclosure()
 
   //This part is needed for the pagination to work. (Modify with caution)
   const paginationSizes = [25, 50, 100]
@@ -119,9 +117,6 @@ const VulnTable = ({
   const toast = useToast()
   // GET VULN FILTER HEADS
   const [getVulnFilters] = useLazyQuery(GetVulnFilterData)
-
-  const customerView = location.pathname.startsWith('/customer')
-  const signedParams = Cookies.get(`signedParamId`)
 
   const { userPermissions, totalRows, setTotalRows, prodVulnState, dispatch } =
     useGlobalState()
@@ -611,6 +606,7 @@ const VulnTable = ({
             <IconButton
               colorScheme='blue'
               onClick={handleScan}
+              isDisabled={signedUrlParams}
               icon={<FaBug />}
             />
           </Tooltip>
@@ -625,7 +621,7 @@ const VulnTable = ({
                 prodVulnDispatch({ type: 'RESET_SELECTED_VULN' })
                 onTableOpen()
               }}
-              isDisabled={!editVulns}
+              isDisabled={!editVulns || signedUrlParams}
               icon={<FaCopy size={18} />}
             />
           </Tooltip>
@@ -799,7 +795,7 @@ const VulnTable = ({
     refetch({
       projectId: productId,
       sbomId: sbomId,
-      signedParams: customerView ? signedParams : undefined,
+      signedParams: undefined,
       search: searchInput !== '' ? searchInput : undefined,
       source: source === 'BOTH' || source === '' ? undefined : source,
       severity:

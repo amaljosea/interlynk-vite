@@ -57,7 +57,6 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import { GetCompFilterData } from 'graphQL/Queries'
 import Pagination from '../Pagination'
-import { purlString } from 'utils'
 import PurlCard from 'components/Misc/PurlCard'
 import CpeCard from 'components/Misc/CpeCard'
 
@@ -68,6 +67,7 @@ const ComponentTable = ({
   primaryComp,
   sbomRefetch
 }) => {
+  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   //This part is needed for the pagination to work. (Modify with caution)
   const paginationSizes = [25, 50, 100]
 
@@ -585,14 +585,19 @@ const ComponentTable = ({
                     <MenuItem
                       onClick={() => onLicenseOpen(row)}
                       isDisabled={
-                        status === 'signed' || !updateComponent || !updateSboms
+                        status === 'signed' ||
+                        !updateComponent ||
+                        !updateSboms ||
+                        signedUrlParams
                       }
                     >
                       Edit Component
                     </MenuItem>
                     <MenuItem
                       onClick={() => handleOpen(row)}
-                      isDisabled={!updateComponent || !updateSboms}
+                      isDisabled={
+                        !updateComponent || !updateSboms || signedUrlParams
+                      }
                     >
                       Edit Relationships
                     </MenuItem>
@@ -602,7 +607,10 @@ const ComponentTable = ({
                         onSupOpen()
                       }}
                       isDisabled={
-                        status === 'signed' || !updateComponent || !updateSboms
+                        status === 'signed' ||
+                        !updateComponent ||
+                        !updateSboms ||
+                        signedUrlParams
                       }
                     >
                       {suppliers.length > 0 ? 'Edit' : 'Add'} Supplier
@@ -613,7 +621,10 @@ const ComponentTable = ({
                         onLinkOpen()
                       }}
                       isDisabled={
-                        status === 'signed' || !updateComponent || !updateSboms
+                        status === 'signed' ||
+                        !updateComponent ||
+                        !updateSboms ||
+                        signedUrlParams
                       }
                     >
                       Edit Links
@@ -629,7 +640,8 @@ const ComponentTable = ({
                         isDisabled={
                           status === 'signed' ||
                           !updateComponent ||
-                          !updateSboms
+                          !updateSboms ||
+                          signedUrlParams
                         }
                       >
                         Delete
@@ -838,7 +850,13 @@ const ComponentTable = ({
                       label={comp.toComp.name}
                       placement='top'
                     >
-                      <Tag size='sm' padding={1} variant='subtle' colorScheme={'blue'} wordBreak={'break-all'}>
+                      <Tag
+                        size='sm'
+                        padding={1}
+                        variant='subtle'
+                        colorScheme={'blue'}
+                        wordBreak={'break-all'}
+                      >
                         <Text wordBreak={'break-all'}>
                           {comp.toComp.name}-{comp.toComp.version}
                         </Text>
@@ -853,8 +871,17 @@ const ComponentTable = ({
               {compDependency &&
                 compDependency.component.dependencyOf.length > 0 &&
                 compDependency.component.dependencyOf.map((comp, index) => (
-                  <Tooltip key={index} label={comp.fromComp.name} placement='top'>
-                    <Tag size='sm' padding={1} variant='subtle' colorScheme={'blue'} >
+                  <Tooltip
+                    key={index}
+                    label={comp.fromComp.name}
+                    placement='top'
+                  >
+                    <Tag
+                      size='sm'
+                      padding={1}
+                      variant='subtle'
+                      colorScheme={'blue'}
+                    >
                       <Text wordBreak={'break-all'}>
                         {comp.fromComp.name}-{comp.fromComp.version}
                       </Text>
@@ -875,20 +902,37 @@ const ComponentTable = ({
               {/* SPDX */}
               {licenses?.length > 0 &&
                 licenses.map((item, index) => (
-                  <Tag key={index} size={'md'} variant='subtle' colorScheme='green' width={'fit-content'}>
+                  <Tag
+                    key={index}
+                    size={'md'}
+                    variant='subtle'
+                    colorScheme='green'
+                    width={'fit-content'}
+                  >
                     <Text wordBreak={'break-all'}>{item}</Text>
                   </Tag>
                 ))}
               {/* EXPRESSION */}
               {licensesExp && licensesExp !== '' && (
-                <Tag size={'md'} variant='subtle' colorScheme='green' width={'fit-content'}>
+                <Tag
+                  size={'md'}
+                  variant='subtle'
+                  colorScheme='green'
+                  width={'fit-content'}
+                >
                   <Text wordBreak={'break-all'}>{licensesExp}</Text>
                 </Tag>
               )}
               {/* CUSTOM */}
               {licensesCustom?.length > 0 &&
                 licensesCustom?.map((item, index) => (
-                  <Tag key={index} size={'md'} variant='subtle' colorScheme='green' width={'fit-content'}>
+                  <Tag
+                    key={index}
+                    size={'md'}
+                    variant='subtle'
+                    colorScheme='green'
+                    width={'fit-content'}
+                  >
                     <Text wordBreak={'break-all'}>{item}</Text>
                   </Tag>
                 ))}
@@ -996,8 +1040,8 @@ const ComponentTable = ({
       last: undefined,
       after: undefined,
       before: undefined,
-      field: customerView ? signedCompField : field,
-      direction: customerView ? signedCompDirection : direction
+      field: field,
+      direction: direction
     }).then((res) => {
       if (res.data) {
         setPaginationControl(res.data)
@@ -1045,22 +1089,23 @@ const ComponentTable = ({
           justifyContent={'flex-end'}
         >
           {/* CREATE COMPONENT */}
-          {!customerView && (
-            <Tooltip label='Add Component'>
-              <IconButton
-                ref={compBtn}
-                onClick={onCreateComponent}
-                icon={<AddIcon />}
-                colorScheme='blue'
-                variant='solid'
-                fontWeight='normal'
-                fontSize={'sm'}
-                isDisabled={
-                  lifecycle === 'signed' || !updateComponent || !updateSboms
-                }
-              />
-            </Tooltip>
-          )}
+          <Tooltip label='Add Component'>
+            <IconButton
+              ref={compBtn}
+              onClick={onCreateComponent}
+              icon={<AddIcon />}
+              colorScheme='blue'
+              variant='solid'
+              fontWeight='normal'
+              fontSize={'sm'}
+              isDisabled={
+                lifecycle === 'signed' ||
+                !updateComponent ||
+                !updateSboms ||
+                signedUrlParams
+              }
+            />
+          </Tooltip>
           <Tooltip label='Refresh'>
             <IconButton
               onClick={fetchCompData}
@@ -1098,8 +1143,8 @@ const ComponentTable = ({
           : suppliers,
       primary: scope === 'primary' ? true : undefined,
       internal: scope === 'internal' ? true : undefined,
-      field: customerView ? signedCompField : field,
-      direction: customerView ? signedCompDirection : direction
+      field: field,
+      direction: direction
     }).then((res) => {
       if (res.data) {
         setPaginationControl(res.data)
@@ -1198,7 +1243,7 @@ const ComponentTable = ({
           onSort={handleSort}
           customStyles={customStyles}
           defaultSortAsc={false}
-          defaultSortFieldId={customerView ? signedCompField : field}
+          defaultSortFieldId={field}
           progressPending={data ? false : true}
           progressComponent={<CustomLoader />}
           subHeader

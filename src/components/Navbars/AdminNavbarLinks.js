@@ -52,6 +52,8 @@ export default function HeaderLinks(props) {
 
   const { variant, children, fixed, secondary, onOpen, ...rest } = props
 
+  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+
   const name = localStorage.getItem('username')
   const email = localStorage.getItem('email')
   const userEmail = localStorage.getItem('userEmail')
@@ -85,7 +87,9 @@ export default function HeaderLinks(props) {
 
   const shortcuts = [{ key: 'Ctrl + /', title: 'Search' }]
 
-  const [getProdGroup] = useLazyQuery(GetProjectGroup, {fetchPolicy: 'network-only'})
+  const [getProdGroup] = useLazyQuery(GetProjectGroup, {
+    fetchPolicy: 'network-only'
+  })
 
   const handleEnvChange = (value) => {
     localStorage.setItem('environment', value)
@@ -93,7 +97,9 @@ export default function HeaderLinks(props) {
     if (sbomId) {
       getProdGroup({ variables: { id: group?.id } }).then((res) => {
         if (res?.data) {
-          const env = res?.data?.projectGroup?.projects?.find((item) => item.name === value)
+          const env = res?.data?.projectGroup?.projects?.find(
+            (item) => item.name === value
+          )
           localStorage.setItem('activeEnv', env?.id)
           navigate(`/vendor/products/${group?.name}?id=${group?.id}`)
         }
@@ -115,7 +121,7 @@ export default function HeaderLinks(props) {
   return (
     <Flex gap={4} alignItems='center' flexDirection='row'>
       {/* ENVIRONMENT */}
-      {(dashboardView || productId) && (
+      {productId && (
         <Menu closeOnSelect={true}>
           <MenuButton
             as={Button}
@@ -159,7 +165,7 @@ export default function HeaderLinks(props) {
               icon={<FaRegKeyboard fontSize={24} color='darkgray' />}
             />
           </PopoverTrigger>
-          <PopoverContent>
+          <PopoverContent pos={'relative'} right={10}>
             <PopoverHeader fontWeight='medium'>
               Keyboard Shortcuts
             </PopoverHeader>
@@ -176,78 +182,80 @@ export default function HeaderLinks(props) {
           </PopoverContent>
         </Popover>
       )}
-      <Menu>
-        <MenuButton
-          as={IconButton}
-          aria-label='Options'
-          variant='none'
-          color='gray.400'
-          ms='0px'
-          px='0px'
-          rightIcon={
-            document.documentElement.dir ? (
-              ''
-            ) : (
-              <ProfileIcon color={navbarIcon} w='22px' h='22px' me='0px' />
-            )
-          }
-          leftIcon={
-            document.documentElement.dir ? (
-              <ProfileIcon color={navbarIcon} w='22px' h='22px' me='0px' />
-            ) : (
-              ''
-            )
-          }
-        >
-          <Text display={{ sm: 'none', md: 'flex' }} fontSize={'sm'}>
-            {userName || name}
-          </Text>
-        </MenuButton>
-        {location.pathname.startsWith('/vendor') && (
-          <MenuList>
-            <MenuGroup title=''>
-              <MenuItem>
-                <Flex flexDirection='row' alignItems={'flex-start'} gap={3}>
-                  <Icon as={FaUser} width={2.5} mt={1} />
-                  <Stack direction={'column'} spacing={-2}>
-                    <Text mt={0} mb={0}>
-                      {name}
-                    </Text>
-                    <Text mt={0} mb={0} fontSize={'sm'} color={'#718096'}>
-                      {email}
-                    </Text>
-                    <Text mt={0} mb={0} fontSize={'sm'} color={'#718096'}>
-                      {org !== 'undefined' ? org?.replace(/"/g, '') : ''}
-                    </Text>
-                  </Stack>
-                </Flex>
-              </MenuItem>
-              <MenuDivider />
-              {data?.organization && (
-                <Link to={`/vendor/settings?tab=person`}>
-                  <MenuItem icon={<SettingsIcon />}>Settings</MenuItem>
+      {!signedUrlParams && (
+        <Menu>
+          <MenuButton
+            as={IconButton}
+            aria-label='Options'
+            variant='none'
+            color='gray.400'
+            ms='0px'
+            px='0px'
+            rightIcon={
+              document.documentElement.dir ? (
+                ''
+              ) : (
+                <ProfileIcon color={navbarIcon} w='22px' h='22px' me='0px' />
+              )
+            }
+            leftIcon={
+              document.documentElement.dir ? (
+                <ProfileIcon color={navbarIcon} w='22px' h='22px' me='0px' />
+              ) : (
+                ''
+              )
+            }
+          >
+            <Text display={{ sm: 'none', md: 'flex' }} fontSize={'sm'}>
+              {userName || name}
+            </Text>
+          </MenuButton>
+          {location.pathname.startsWith('/vendor') && (
+            <MenuList>
+              <MenuGroup title=''>
+                <MenuItem>
+                  <Flex flexDirection='row' alignItems={'flex-start'} gap={3}>
+                    <Icon as={FaUser} width={2.5} mt={1} />
+                    <Stack direction={'column'} spacing={-2}>
+                      <Text mt={0} mb={0}>
+                        {name}
+                      </Text>
+                      <Text mt={0} mb={0} fontSize={'sm'} color={'#718096'}>
+                        {email}
+                      </Text>
+                      <Text mt={0} mb={0} fontSize={'sm'} color={'#718096'}>
+                        {org !== 'undefined' ? org?.replace(/"/g, '') : ''}
+                      </Text>
+                    </Stack>
+                  </Flex>
+                </MenuItem>
+                <MenuDivider />
+                {data?.organization && (
+                  <Link to={`/vendor/settings?tab=person`}>
+                    <MenuItem icon={<SettingsIcon />}>Settings</MenuItem>
+                  </Link>
+                )}
+                <Link to='/vendor/settings?tab=organization'>
+                  <MenuItem icon={<FaExchangeAlt />}>Organizations</MenuItem>
                 </Link>
-              )}
-              <Link to='/vendor/settings?tab=organization'>
-                <MenuItem icon={<FaExchangeAlt />}>Organizations</MenuItem>
-              </Link>
-              <MenuDivider />
-              <MenuItem icon={<FaSignOutAlt />} onClick={handleLogout}>
-                Logout
-              </MenuItem>
-            </MenuGroup>
-          </MenuList>
-        )}
-        {location.pathname.startsWith('/customer') && (
+                <MenuDivider />
+                <MenuItem icon={<FaSignOutAlt />} onClick={handleLogout}>
+                  Logout
+                </MenuItem>
+              </MenuGroup>
+            </MenuList>
+          )}
+          {/* {location.pathname.startsWith('/customer') && (
           <MenuList size='sm'>
             <MenuGroup title=''>
-              <MenuItem icon={<SettingsIcon />} onClick={handleCustomerLogout}>
+              <MenuItem icon={<SettingsIcon />} onClick={handleLogout}>
                 Log out
               </MenuItem>
             </MenuGroup>
           </MenuList>
-        )}
-      </Menu>
+        )} */}
+        </Menu>
+      )}
       <SidebarResponsive
         logoText={props.logoText}
         secondary={props.secondary}
