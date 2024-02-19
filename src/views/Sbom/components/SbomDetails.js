@@ -203,12 +203,17 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
           </Text>
         </Tooltip>
         {/* STATS */}
-        <Flex flexDir={'row'} alignItems={'center'} gap={4} mt={5}>
+        <Flex flexDir={'row'} alignItems={'center'} gap={6} mt={5}>
           {/* COMPONENTS */}
           <Stack direction={'row'} alignItems={'flex-start'} spacing={2}>
             <Icon h={4} w={4} mt={1} color='#777' as={FaCube} />
             <Flex flexDir={'column'} alignItems={'center'}>
-              <Tag size='md' variant='subtle' width={16} colorScheme={'blue'}>
+              <Tag
+                size='md'
+                variant='subtle'
+                width={'full'}
+                colorScheme={'blue'}
+              >
                 <TagLabel mx={'auto'}>{compCount}</TagLabel>
               </Tag>
               <Text
@@ -231,7 +236,7 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
               color='#777'
               as={FaBalanceScale}
             />
-             <Flex flexDir={'column'} alignItems={'center'}>
+            <Flex flexDir={'column'} alignItems={'center'}>
               <Tag size='md' variant='subtle' width={16} colorScheme={'blue'}>
                 <TagLabel mx={'auto'}>{compLicenseCount}</TagLabel>
               </Tag>
