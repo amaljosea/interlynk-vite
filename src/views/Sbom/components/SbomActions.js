@@ -32,6 +32,7 @@ import ComponentDrawer from 'components/Drawer/ComponentDrawer'
 import SigningModal from './SigningModal'
 import { sbomDelete } from 'graphQL/Mutation'
 import DownloadModal from './DownloadModal'
+import { GetCompFilterData } from 'graphQL/Queries'
 
 const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
   const {
@@ -105,6 +106,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
   })
 
   const [getAllComps, { data: allComponents }] = useLazyQuery(GetAllComponents)
+  const [getCompFilters] = useLazyQuery(GetCompFilterData)
 
   const [deleteSbom] = useMutation(sbomDelete)
 
@@ -187,7 +189,6 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
   }
 
   const handleEditSbom = () => {
-    console.log('sbom', sbom)
     if (sbom?.primaryComponent) {
       sbomDispatch({ type: 'SET_LICENSES', payload: sbom?.primaryComponent })
       setSBMOpen()
@@ -387,8 +388,10 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
           isOpen={isSBMOpen}
           onClose={setSBMClose}
           btnRef={btnRef}
+          sbomRefetch={refetch}
           data={sbom?.primaryComponent}
           fetchCompData={fetchCompData}
+          filterRefetch={getCompFilters}
           shortDesc={null}
           totalRows={null}
         />
