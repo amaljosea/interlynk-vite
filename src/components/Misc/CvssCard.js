@@ -2,7 +2,7 @@ import { Stack, Text, Divider, Grid, Tag, TagLabel, Heading } from '@chakra-ui/r
 import { useEffect, useState } from 'react'
 
 const CvssText = ({ children }) => (
-  <Text fontSize='sm' textAlign={'left'} fontWeight={'medium'} color={'#222'}>
+  <Text fontSize='xs' textAlign={'left'} fontWeight={'medium'} color={'#222'}>
     {children}
   </Text>
 )
