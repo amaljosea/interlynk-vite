@@ -3,6 +3,7 @@ import {
   Box,
   Flex,
   Image,
+  Img,
   Modal,
   ModalBody,
   ModalContent,
@@ -11,8 +12,8 @@ import {
 } from '@chakra-ui/react'
 // core components
 import { useNavigate } from 'react-router-dom'
-import { InterlynkLogo } from 'components/Icons/Icons'
 import DashboardBg from 'assets/img/dashboard.png'
+import InterlynkLogo from 'assets/img/logo.png'
 import LoginForm from 'components/LoginForm'
 import { useEffect, useRef } from 'react'
 import Cookies from 'js-cookie'
@@ -63,8 +64,9 @@ export default function Auth() {
                 width={'100%'}
                 alignItems={'center'}
                 justifyContent={'center'}
+                gap={1}
               >
-                <InterlynkLogo w='40px' h='40px' me='5px' />
+                <Img src={InterlynkLogo} w='40px' h='40px' me='5px' />
                 <Text fontSize={'3xl'} fontWeight={600} mt={2}>
                   Interlynk
                 </Text>

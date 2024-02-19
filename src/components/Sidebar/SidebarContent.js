@@ -1,6 +1,7 @@
 /*eslint-disable*/
 // chakra imports
 import {
+  Img,
   Box,
   Button,
   Flex,
@@ -9,7 +10,7 @@ import {
   useColorModeValue
 } from '@chakra-ui/react'
 import IconBox from 'components/Icons/IconBox'
-import { InterlynkLogo } from 'components/Icons/Icons'
+import InterlynkLogo from 'assets/img/logo.png'
 import { Separator } from 'components/Separator/Separator'
 import { SidebarHelp } from 'components/Sidebar/SidebarHelp'
 import useAnalyticsEventTracker from 'hooks/useAnalyticsEventTracker'
@@ -210,7 +211,7 @@ const SidebarContent = ({ logoText, routes }) => {
             alignItems='center'
             fontSize='11px'
           >
-            <InterlynkLogo w='32px' h='32px' me='10px' />
+            <Img src={InterlynkLogo} w='32px' h='32px' me='10px' />
             {minimize ? (
               ''
             ) : (

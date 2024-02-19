@@ -3,6 +3,7 @@ import {
   Box,
   Flex,
   Image,
+  Img,
   Modal,
   ModalBody,
   ModalContent,
@@ -10,7 +11,7 @@ import {
   Text
 } from '@chakra-ui/react'
 // core components
-import { InterlynkLogo } from 'components/Icons/Icons'
+import InterlynkLogo from 'assets/img/logo.png'
 import DashboardBg from 'assets/img/dashboard.png'
 import React, { useRef } from 'react'
 import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink } from '@apollo/client'
@@ -48,8 +49,9 @@ export default function Register() {
                 width={'100%'}
                 alignItems={'center'}
                 justifyContent={'center'}
+                gap={1}
               >
-                <InterlynkLogo w='40px' h='40px' me='5px' />
+                <Img src={InterlynkLogo} w='40px' h='40px' me='5px' />
                 <Text fontSize={'3xl'} fontWeight={600} mt={2}>
                   Interlynk
                 </Text>
