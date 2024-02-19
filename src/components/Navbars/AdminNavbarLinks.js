@@ -205,9 +205,9 @@ export default function HeaderLinks(props) {
             )
           }
         >
-        <Text display={{ sm: 'none', md: 'flex' }} fontSize={'sm'}>
+          <Text display={{ sm: 'none', md: 'flex' }} fontSize={'sm'}>
             {userName || name}
-        </Text>
+          </Text>
         </MenuButton>
         {location.pathname.startsWith('/vendor') && (
           <MenuList>
@@ -216,12 +216,8 @@ export default function HeaderLinks(props) {
                 <Flex flexDirection='row' alignItems={'flex-start'} gap={3}>
                   <Icon as={FaUser} width={2.5} mt={1} />
                   <Stack direction={'column'} spacing={-2}>
-                    <Text mt={0} mb={0}>
-                      {name}
-                    </Text>
-                    <Text mt={0} mb={0} fontSize={'sm'} color={'#718096'}>
-                      {email}
-                    </Text>
+                    <Text mt={0} mb={0}>{name}</Text>
+                    <Text mt={0} mb={0} fontSize={'sm'} color={'#718096'}>{email}</Text>
                     <Text mt={0} mb={0} fontSize={'sm'} color={'#718096'}>
                       {org !== 'undefined' ? org?.replace(/"/g, '') : ''}
                     </Text>
@@ -229,18 +225,22 @@ export default function HeaderLinks(props) {
                 </Flex>
               </MenuItem>
               <MenuDivider />
-              {data?.organization && (
-                <Link to={`/vendor/settings?tab=person`}>
-                  <MenuItem icon={<SettingsIcon />}>Settings</MenuItem>
-                </Link>
-                <MenuDivider />
-                <MenuItem icon={<FaSignOutAlt />} onClick={handleLogout}>
-                  Logout
+              <Link to={`/vendor/settings?tab=person`}>
+                <MenuItem icon={<SettingsIcon />} display={data?.organization ? 'flex' : 'none'}>
+                  Settings
                 </MenuItem>
-              </MenuGroup>
-            </MenuList>
-          )}
-          {/* {location.pathname.startsWith('/customer') && (
+              </Link>
+              <Link to='/vendor/settings?tab=organization'>
+                <MenuItem icon={<FaExchangeAlt />} display={data?.organization ? 'flex' : 'none'} >
+                  Organizations
+                </MenuItem>
+              </Link>
+              <MenuDivider />
+              <MenuItem icon={<FaSignOutAlt />} onClick={handleLogout}>Logout</MenuItem>
+            </MenuGroup>
+          </MenuList>
+        )}
+        {/* {location.pathname.startsWith('/customer') && (
           <MenuList size='sm'>
             <MenuGroup title=''>
               <MenuItem icon={<SettingsIcon />} onClick={handleLogout}>
@@ -249,8 +249,7 @@ export default function HeaderLinks(props) {
             </MenuGroup>
           </MenuList>
         )} */}
-        </Menu>
-      )}
+      </Menu>
       <SidebarResponsive
         logoText={props.logoText}
         secondary={props.secondary}
