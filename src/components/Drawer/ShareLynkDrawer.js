@@ -62,7 +62,11 @@ const ShareLynkDrawer = ({
     if (isValidDate) {
       setIsValidDate(true)
     } else {
-      setIsValidDate(false)
+      if (typeof newDate === 'string' && newDate === '') {
+        setIsValidDate(true)
+      } else {
+        setIsValidDate(false)
+      }
     }
   }
 
@@ -194,7 +198,7 @@ const ShareLynkDrawer = ({
             <ModalHeader>Create ShareLynk</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              <FormControl mb={5} isRequired isInvalid={!isValidDate}>
+              <FormControl mb={5} isInvalid={!isValidDate}>
                 <FormLabel mb={1} htmlFor='expire'>
                   Expiration Date
                 </FormLabel>
@@ -223,7 +227,7 @@ const ShareLynkDrawer = ({
                 fontSize={'sm'}
                 variant='solid'
                 colorScheme='blue'
-                isDisabled={selectedDate === '' || !isValidDate}
+                isDisabled={selectedDate !== '' && !isValidDate}
                 onClick={handleCreateLynk}
               >
                 Add
