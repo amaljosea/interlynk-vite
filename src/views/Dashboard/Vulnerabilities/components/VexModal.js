@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Modal,
   ModalOverlay,
@@ -14,9 +14,14 @@ import {
   Stack,
   Textarea,
   FormControl,
-  Alert
+  Alert,
+  Checkbox
 } from '@chakra-ui/react'
-import { getVexStatuses, getVexJustifications, GetCdxResponses } from 'graphQL/Queries'
+import {
+  getVexStatuses,
+  getVexJustifications,
+  GetCdxResponses
+} from 'graphQL/Queries'
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { useLocation } from 'react-router-dom'
 import { GetProject, GetProjectGroup } from 'graphQL/Queries'
@@ -24,7 +29,16 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { updateCompVulnVex } from 'graphQL/Mutation'
 import { filterEnvList } from 'utils'
 
-const VexModal = ({ selectedGroup, checkEquals, isOpen, onClose, refetch, selectedVulns, setSelectedVulns, setToggleClear }) => {
+const VexModal = ({
+  selectedGroup,
+  checkEquals,
+  isOpen,
+  onClose,
+  refetch,
+  selectedVulns,
+  setSelectedVulns,
+  setToggleClear
+}) => {
   const { totalRows } = useGlobalState()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -42,6 +56,7 @@ const VexModal = ({ selectedGroup, checkEquals, isOpen, onClose, refetch, select
   const [details, setDetails] = useState('')
   const [notes, setNotes] = useState('')
   const [impactData, setImpactData] = useState('')
+  const [upstream, setUpstream] = useState(false)
 
   const [getProject, { data }] = useLazyQuery(GetProject)
   const { data: allVexStatus } = useQuery(getVexStatuses)
@@ -111,10 +126,12 @@ const VexModal = ({ selectedGroup, checkEquals, isOpen, onClose, refetch, select
             sbomId: item?.component?.sbom?.id,
             projectGroupId: item?.component?.sbom?.project?.projectGroup?.id,
             projectId: item?.component?.sbom?.project?.id,
+            propagateVex: upstream,
             vexStatusId: statusTitle,
             details: details !== '' ? details : undefined,
             note: notes !== '' ? notes : undefined,
-            vexJustificationId: justification !== '' ? justification : undefined,
+            vexJustificationId:
+              justification !== '' ? justification : undefined,
             cdxResponseId: response !== '' ? response : undefined,
             impact: impactData === '' ? undefined : impactData,
             action: actionStatement !== '' ? actionStatement : undefined,
@@ -138,6 +155,14 @@ const VexModal = ({ selectedGroup, checkEquals, isOpen, onClose, refetch, select
       })
     }
   }
+
+  useEffect(() => {
+    if (statusName === 'Not Affected' || statusName === 'False Positive') {
+      setUpstream(true)
+    } else  {
+      setUpstream(false)
+    }
+  }, [statusName])
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -400,6 +425,12 @@ const VexModal = ({ selectedGroup, checkEquals, isOpen, onClose, refetch, select
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
               />
+            </FormControl>
+            {/* UPSTERAM PRODUCT */}
+            <FormControl>
+              <Checkbox size='sm' isChecked={upstream}>
+                Also update upstream products
+              </Checkbox>
             </FormControl>
           </SimpleGrid>
         </ModalBody>

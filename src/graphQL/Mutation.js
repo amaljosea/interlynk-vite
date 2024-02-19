@@ -1370,6 +1370,7 @@ export const updateCompVulnVex = gql`
     $compVulnId: Uuid!
     $vexStatusId: Uuid!
     $sbomId: Uuid!
+    $propagateVex: Boolean
     $vexJustificationId: Uuid
     $cdxResponseId: Uuid
     $note: String
@@ -1383,6 +1384,7 @@ export const updateCompVulnVex = gql`
         componentVulnId: $compVulnId
         vexStatusId: $vexStatusId
         currentSbomId: $sbomId
+        propagateVex: $propagateVex
         vexJustificationId: $vexJustificationId
         cdxResponseId: $cdxResponseId
         note: $note
