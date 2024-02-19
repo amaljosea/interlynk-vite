@@ -49,10 +49,10 @@ export default function HeaderLinks(props) {
   const sbomId = queryParams.get('sbom')
   const group = JSON.parse(localStorage.getItem('product'))
   const dashboardView = location.pathname === '/vendor/dashboard'
+  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
   const { variant, children, fixed, secondary, onOpen, ...rest } = props
 
-  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
   const name = localStorage.getItem('username')
   const email = localStorage.getItem('email')
@@ -121,7 +121,7 @@ export default function HeaderLinks(props) {
   return (
     <Flex gap={4} alignItems='center' flexDirection='row'>
       {/* ENVIRONMENT */}
-      {productId && (
+      {(dashboardView || location?.pathname?.startsWith('/vendor/products')) && (
         <Menu closeOnSelect={true}>
           <MenuButton
             as={Button}
