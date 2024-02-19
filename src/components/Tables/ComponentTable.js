@@ -566,9 +566,8 @@ const ComponentTable = ({
     {
       id: 'action',
       name: 'ACTION',
-      selector: (row) => {
-        const { suppliers, status, primary, id } = row
-
+      selector: (row, rowIndex) => {
+        const { suppliers, status, primary } = row
         return (
           <>
             {!customerView ? (
@@ -629,7 +628,8 @@ const ComponentTable = ({
                         isDisabled={
                           status === 'signed' ||
                           !updateComponent ||
-                          !updateSboms
+                          !updateSboms ||
+                          data?.nodes?.length === 1
                         }
                       >
                         Delete
@@ -838,7 +838,13 @@ const ComponentTable = ({
                       label={comp.toComp.name}
                       placement='top'
                     >
-                      <Tag size='sm' padding={1} variant='subtle' colorScheme={'blue'} wordBreak={'break-all'}>
+                      <Tag
+                        size='sm'
+                        padding={1}
+                        variant='subtle'
+                        colorScheme={'blue'}
+                        wordBreak={'break-all'}
+                      >
                         <Text wordBreak={'break-all'}>
                           {comp.toComp.name}-{comp.toComp.version}
                         </Text>
@@ -853,8 +859,17 @@ const ComponentTable = ({
               {compDependency &&
                 compDependency.component.dependencyOf.length > 0 &&
                 compDependency.component.dependencyOf.map((comp, index) => (
-                  <Tooltip key={index} label={comp.fromComp.name} placement='top'>
-                    <Tag size='sm' padding={1} variant='subtle' colorScheme={'blue'} >
+                  <Tooltip
+                    key={index}
+                    label={comp.fromComp.name}
+                    placement='top'
+                  >
+                    <Tag
+                      size='sm'
+                      padding={1}
+                      variant='subtle'
+                      colorScheme={'blue'}
+                    >
                       <Text wordBreak={'break-all'}>
                         {comp.fromComp.name}-{comp.fromComp.version}
                       </Text>
@@ -875,20 +890,37 @@ const ComponentTable = ({
               {/* SPDX */}
               {licenses?.length > 0 &&
                 licenses.map((item, index) => (
-                  <Tag key={index} size={'md'} variant='subtle' colorScheme='green' width={'fit-content'}>
+                  <Tag
+                    key={index}
+                    size={'md'}
+                    variant='subtle'
+                    colorScheme='green'
+                    width={'fit-content'}
+                  >
                     <Text wordBreak={'break-all'}>{item}</Text>
                   </Tag>
                 ))}
               {/* EXPRESSION */}
               {licensesExp && licensesExp !== '' && (
-                <Tag size={'md'} variant='subtle' colorScheme='green' width={'fit-content'}>
+                <Tag
+                  size={'md'}
+                  variant='subtle'
+                  colorScheme='green'
+                  width={'fit-content'}
+                >
                   <Text wordBreak={'break-all'}>{licensesExp}</Text>
                 </Tag>
               )}
               {/* CUSTOM */}
               {licensesCustom?.length > 0 &&
                 licensesCustom?.map((item, index) => (
-                  <Tag key={index} size={'md'} variant='subtle' colorScheme='green' width={'fit-content'}>
+                  <Tag
+                    key={index}
+                    size={'md'}
+                    variant='subtle'
+                    colorScheme='green'
+                    width={'fit-content'}
+                  >
                     <Text wordBreak={'break-all'}>{item}</Text>
                   </Tag>
                 ))}
