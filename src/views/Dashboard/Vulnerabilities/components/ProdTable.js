@@ -52,6 +52,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const id = queryParams.get('vulnId')
+  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
   const { totalRows, setTotalRows, compVulnState, dispatch } = useGlobalState()
   const { pageIndex, searchInput, envs, statuses, versions } = compVulnState
@@ -269,6 +270,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
             fontWeight='normal'
             fontSize={'sm'}
             onClick={onOpen}
+            isDisabled={signedUrlParams}
           >
             Set Status
           </Button>

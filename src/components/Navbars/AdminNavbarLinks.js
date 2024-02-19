@@ -182,42 +182,46 @@ export default function HeaderLinks(props) {
           </PopoverContent>
         </Popover>
       )}
-      <Menu>
-        <MenuButton
-          as={IconButton}
-          aria-label='Options'
-          variant='none'
-          color='gray.400'
-          ms='0px'
-          px='0px'
-          rightIcon={
-            document.documentElement.dir ? (
-              ''
-            ) : (
-              <ProfileIcon color={navbarIcon} w='22px' h='22px' me='0px' />
-            )
-          }
-          leftIcon={
-            document.documentElement.dir ? (
-              <ProfileIcon color={navbarIcon} w='22px' h='22px' me='0px' />
-            ) : (
-              ''
-            )
-          }
-        >
-          <Text display={{ sm: 'none', md: 'flex' }} fontSize={'sm'}>
-            {userName || name}
-          </Text>
-        </MenuButton>
-        {location.pathname.startsWith('/vendor') && (
+      {!signedUrlParams && (
+        <Menu>
+          <MenuButton
+            as={IconButton}
+            aria-label='Options'
+            variant='none'
+            color='gray.400'
+            ms='0px'
+            px='0px'
+            rightIcon={
+              document.documentElement.dir ? (
+                ''
+              ) : (
+                <ProfileIcon color={navbarIcon} w='22px' h='22px' me='0px' />
+              )
+            }
+            leftIcon={
+              document.documentElement.dir ? (
+                <ProfileIcon color={navbarIcon} w='22px' h='22px' me='0px' />
+              ) : (
+                ''
+              )
+            }
+          >
+            <Text display={{ sm: 'none', md: 'flex' }} fontSize={'sm'}>
+              {userName || name}
+            </Text>
+          </MenuButton>
           <MenuList>
             <MenuGroup title=''>
               <MenuItem>
                 <Flex flexDirection='row' alignItems={'flex-start'} gap={3}>
                   <Icon as={FaUser} width={2.5} mt={1} />
                   <Stack direction={'column'} spacing={-2}>
-                    <Text mt={0} mb={0}>{name}</Text>
-                    <Text mt={0} mb={0} fontSize={'sm'} color={'#718096'}>{email}</Text>
+                    <Text mt={0} mb={0}>
+                      {name}
+                    </Text>
+                    <Text mt={0} mb={0} fontSize={'sm'} color={'#718096'}>
+                      {email}
+                    </Text>
                     <Text mt={0} mb={0} fontSize={'sm'} color={'#718096'}>
                       {org !== 'undefined' ? org?.replace(/"/g, '') : ''}
                     </Text>
@@ -226,30 +230,29 @@ export default function HeaderLinks(props) {
               </MenuItem>
               <MenuDivider />
               <Link to={`/vendor/settings?tab=person`}>
-                <MenuItem icon={<SettingsIcon />} display={data?.organization ? 'flex' : 'none'}>
+                <MenuItem
+                  icon={<SettingsIcon />}
+                  display={data?.organization ? 'flex' : 'none'}
+                >
                   Settings
                 </MenuItem>
               </Link>
               <Link to='/vendor/settings?tab=organization'>
-                <MenuItem icon={<FaExchangeAlt />} display={data?.organization ? 'flex' : 'none'} >
+                <MenuItem
+                  icon={<FaExchangeAlt />}
+                  display={data?.organization ? 'flex' : 'none'}
+                >
                   Organizations
                 </MenuItem>
               </Link>
               <MenuDivider />
-              <MenuItem icon={<FaSignOutAlt />} onClick={handleLogout}>Logout</MenuItem>
-            </MenuGroup>
-          </MenuList>
-        )}
-        {/* {location.pathname.startsWith('/customer') && (
-          <MenuList size='sm'>
-            <MenuGroup title=''>
-              <MenuItem icon={<SettingsIcon />} onClick={handleLogout}>
-                Log out
+              <MenuItem icon={<FaSignOutAlt />} onClick={handleLogout}>
+                Logout
               </MenuItem>
             </MenuGroup>
           </MenuList>
-        )} */}
-      </Menu>
+        </Menu>
+      )}
       <SidebarResponsive
         logoText={props.logoText}
         secondary={props.secondary}
