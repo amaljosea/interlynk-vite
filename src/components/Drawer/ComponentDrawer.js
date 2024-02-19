@@ -202,7 +202,7 @@ function ComponentDrawer(props) {
     })
       .then((res) => {
         if (res.data) {
-          console.log(res.data.componentCreate.component.id)
+          sbomRefetch({ projectId: productId, sbomId: sbomId })
           prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
           onFilterRefetch()
           addRelation({

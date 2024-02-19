@@ -1274,6 +1274,7 @@ const ComponentTable = ({
               isOpen={isDelOpen}
               onClose={onDelClose}
               id={activeRow.id}
+              sbomRefetch={sbomRefetch}
               fetchCompData={fetchCompData}
             />
           )}
@@ -1324,6 +1325,7 @@ const ComponentTable = ({
           onClose={onCompClose}
           fetchCompData={fetchCompData}
           filterRefetch={getCompFilters}
+          sbomRefetch={sbomRefetch}
           primaryComp={primaryComp}
           shortDesc={null}
           checkId={null}

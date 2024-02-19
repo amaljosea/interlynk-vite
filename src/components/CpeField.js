@@ -30,7 +30,7 @@ const CpeField = ({
 
   const handleValidate = (value) => {
     const matches = validateCpe(value)
-    if (matches) {
+    if (matches && value !== '') {
       prodCompDispatch({ type: 'SET_CPE_VALIDATION', payload: true })
     } else {
       prodCompDispatch({ type: 'SET_CPE_VALIDATION', payload: false })
@@ -48,9 +48,6 @@ const CpeField = ({
     if (e.key === 'Enter' || e.key === 'Tab') {
       setInputValue(inputValue)
       setCpeList([])
-      if (inputValue === '') {
-        updateString(name, inputValue)
-      }
     }
 
     if (e.key === 'ArrowDown') {

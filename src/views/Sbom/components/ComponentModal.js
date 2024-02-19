@@ -14,9 +14,16 @@ import {
 import { DeleteComponent } from 'graphQL/Mutation'
 import { useLocation } from 'react-router-dom'
 
-const ComponentModal = ({ isOpen, onClose, id, fetchCompData }) => {
+const ComponentModal = ({
+  isOpen,
+  onClose,
+  id,
+  fetchCompData,
+  sbomRefetch
+}) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
+  const prodId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
 
   const [deleteComponent] = useMutation(DeleteComponent, {
@@ -24,16 +31,17 @@ const ComponentModal = ({ isOpen, onClose, id, fetchCompData }) => {
   })
 
   const handleDelete = async () => {
-    try {
-      await deleteComponent({
-        variables: {
-          id: id,
-          sbomId: sbomId
-        }
-      }).then(() => onClose())
-    } catch (error) {
-      console.error('Mutation error:', error)
-    }
+    await deleteComponent({
+      variables: {
+        id: id,
+        sbomId: sbomId
+      }
+    }).then((res) => {
+      if (res?.data) {
+        sbomRefetch({ projectId: prodId, sbomId: sbomId })
+        onClose()
+      }
+    })
   }
 
   return (
