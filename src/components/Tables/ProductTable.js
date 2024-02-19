@@ -439,17 +439,17 @@ const ProductTable = ({ data, refetch }) => {
             <Stack direction={'row'} spacing={2} alignItems={'center'}>
               <Tooltip label='Default'>
                 <Link to={`/vendor/products/${name}?id=${id}`} onClick={() => handleClick('default')}>
-                  <IconButton size='sm' colorScheme='gray' aria-label='Default' icon={<FaInbox color='#4A5568' />}/>
+                  <IconButton size='sm' colorScheme='blue' icon={<FaInbox />}/>
                 </Link>
               </Tooltip>
               <Tooltip label='Development'>
                 <Link to={`/vendor/products/${name}?id=${id}`} onClick={() => handleClick('development')} >
-                  <IconButton size='sm' colorScheme='gray' aria-label='Development' icon={<FaCode color='#4A5568' />} />
+                  <IconButton size='sm' colorScheme='blue' icon={<FaCode />} />
                 </Link>
               </Tooltip>
               <Tooltip label='Production'>
                 <Link to={`/vendor/products/${name}?id=${id}`} onClick={() => handleClick('production')} >
-                  <IconButton size='sm' colorScheme='gray' aria-label='Production' icon={<FaSquareArrowUpRight color='#4A5568' />}/>
+                  <IconButton size='sm' colorScheme='blue' icon={<FaSquareArrowUpRight />}/>
                 </Link>
               </Tooltip>
             </Stack>
