@@ -74,13 +74,6 @@ const ComponentTable = ({
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
 
-  useEffect(() => {
-    if (data) {
-      setIsPrevActive(data?.pageInfo?.hasPreviousPage)
-      setIsNextActive(data?.pageInfo?.hasNextPage)
-    }
-  }, [data])
-
   const setPaginationControl = (data) => {
     setIsPrevActive(data.sbom?.components?.pageInfo?.hasPreviousPage)
     setIsNextActive(data.sbom?.components?.pageInfo?.hasNextPage)
@@ -1219,7 +1212,7 @@ const ComponentTable = ({
         }
       })
     }
-  }, [data])
+  }, [data, prodCompDispatch])
 
   return (
     <>

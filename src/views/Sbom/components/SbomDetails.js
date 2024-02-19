@@ -61,13 +61,21 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
   const onSelectComp = () => {
     const { field, direction } = prodCompState
     getCompData({
-      variables: {
-        projectId: productId,
-        sbomId: sbomId,
-        first: totalRows,
-        field: field,
-        direction: direction
-      }
+      projectId: productId,
+      sbomId: sbomId,
+      first: totalRows,
+      last: undefined,
+      after: undefined,
+      before: undefined,
+      search: undefined,
+      ecosystem: undefined,
+      kind: undefined,
+      licenses: undefined,
+      supplierName: undefined,
+      primary: undefined,
+      internal: undefined,
+      field: field,
+      direction: direction
     }).then((res) => {
       if (res.data) {
         setActiveSbomTab(2)
