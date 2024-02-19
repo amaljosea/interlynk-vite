@@ -14,25 +14,27 @@ import Header from './components/Header'
 import { useEffect, useState } from 'react'
 import AdvisoryFeeds from './components/AdvisoryFeeds'
 import ExploitFeeds from './components/ExploitFeeds'
-import { useLazyQuery, useQuery } from '@apollo/client'
 import ApiFeed from './components/ApiFeed'
 import Card from 'components/Card/Card'
 import ComponentFeed from './components/ComponentFeed'
 import GeneralFeed from './components/GeneralFeed'
 import PersonalInfo from './components/PersonalInfo'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { GetOrg } from 'graphQL/Queries'
 import TokenInfo from './components/TokenInfo'
 import TeamTable from 'components/Tables/TeamTable'
-import { MyOrganizations } from 'graphQL/Queries'
+import {
+  GetOrg,
+  GetRoles,
+  MyOrganizations,
+  AllOrganizations
+} from 'graphQL/Queries'
 import OrgTable from 'components/Tables/OrgTable'
 import { displayErrorMessage } from 'utils'
 import { WarningTwoIcon } from '@chakra-ui/icons'
-import { GetRoles } from 'graphQL/Queries'
 import RoleTable from 'components/Tables/RoleTable'
-import { AllOrganizations } from 'graphQL/Queries'
 import CustomLoader from 'components/CustomLoader'
 import { useGlobalState } from 'hooks/useGlobalState'
+import { useQuery } from '@apollo/client'
 
 function Profile() {
   const location = useLocation()
@@ -41,15 +43,22 @@ function Profile() {
   const activetab = queryParams.get('tab')
   const { totalRows, userPermissions } = useGlobalState()
 
-  const tabs = [{name: 'PERSONAL',icon: FaUserCircle},{name: 'ORGANIZATION',icon: FaBuilding}]
-  const viewOrg = userPermissions?.find((item) => item.key === 'view_organization')
+  const tabs = [
+    { name: 'PERSONAL', icon: FaUserCircle },
+    { name: 'ORGANIZATION', icon: FaBuilding }
+  ]
+  const viewOrg = userPermissions?.find(
+    (item) => item.key === 'view_organization'
+  )
   const viewUsers = userPermissions?.find((item) => item.key === 'view_users')
   const viewFeeds = userPermissions?.find((item) => item.key === 'view_feeds')
-  const manageFeeds = viewFeeds?.supersededBy?.some((permission) =>
-    permission.key === 'manage_feeds' && permission.value === true
+  const manageFeeds = viewFeeds?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'manage_feeds' && permission.value === true
   )
-  const manageListing = viewFeeds?.supersededBy?.some((permission) =>
-    permission.key === 'manage_listing' && permission.value === true
+  const manageListing = viewFeeds?.supersededBy?.some(
+    (permission) =>
+      permission.key === 'manage_listing' && permission.value === true
   )
 
   const [tabIndex, setTabIndex] = useState(0)
@@ -67,7 +76,6 @@ function Profile() {
     skip: !isAdmin,
     variables: { first: totalRows, status: 'approved' }
   })
-
   const { data: roles, refetch: roleRefetch } = useQuery(GetRoles, {
     skip: tabIndex === 2 ? false : true
   })
@@ -220,6 +228,7 @@ function Profile() {
                   {/* ROLES */}
                   <TabPanel>
                     <RoleTable
+                      tabIndex={tabIndex}
                       data={roles?.organization?.organizationRoles}
                       role={orgInfo?.organization?.currentUser?.role?.name}
                       refetch={roleRefetch}

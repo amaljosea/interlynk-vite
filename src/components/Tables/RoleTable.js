@@ -4,8 +4,8 @@ import PermissionDrawer from 'components/Drawer/PermissionDrawer'
 import DataTable from 'react-data-table-component'
 import { useState } from 'react'
 
-const RoleTable = ({ data, refetch, role }) => {
-  const [activeRow, setActiveRow] = useState(null)
+const RoleTable = ({ data, role, tabIndex }) => {
+  const [selectedRole, setSelectedRole] = useState(null)
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const columns = [
@@ -41,7 +41,7 @@ const RoleTable = ({ data, refetch, role }) => {
           colorScheme='blue'
           size='sm'
           onClick={() => {
-            setActiveRow(row)
+            setSelectedRole(row?.name)
             onOpen()
           }}
         >
@@ -51,6 +51,7 @@ const RoleTable = ({ data, refetch, role }) => {
       right: 'true'
     }
   ]
+
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
@@ -67,9 +68,9 @@ const RoleTable = ({ data, refetch, role }) => {
         <PermissionDrawer
           isOpen={isOpen}
           onClose={onClose}
-          data={activeRow}
-          refetch={refetch}
-          role={role}
+          selectedRole={selectedRole}
+          tabIndex={tabIndex}
+          userRole={role}
         />
       )}
     </>

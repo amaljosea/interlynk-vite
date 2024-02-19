@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import {
   Drawer,
   DrawerBody,
@@ -14,126 +14,45 @@ import {
   Divider
 } from '@chakra-ui/react'
 import { UpdateOrganizationRole } from 'graphQL/Mutation'
-import { useState } from 'react'
+import { GetAllPermissions } from 'graphQL/Queries'
 
-const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
-  const { permissionsMap } = data
-
-  const [permissions, setPermissions] = useState(permissionsMap)
-
+const PermissionDrawer = ({
+  isOpen,
+  onClose,
+  tabIndex,
+  selectedRole,
+  userRole
+}) => {
+  const { data, refetch } = useQuery(GetAllPermissions, {
+    skip: tabIndex === 2 ? false : true
+  })
   const [updateRole] = useMutation(UpdateOrganizationRole, {
     onCompleted: () => refetch()
   })
 
-  const orgManagement = permissionsMap?.filter(
-    (item) =>
-      item.category === 'Organization Management' && item.hidden === null
-  )
-  const groupManagement = permissionsMap?.filter(
-    (item) => item.category === 'Product Management' && item.hidden === null
-  )
-  const prodManagement = permissionsMap?.filter(
-    (item) =>
-      item.category === 'Product Environment Management' && item.hidden === null
-  )
-  const sbomManagement = permissionsMap?.filter(
-    (item) => item.category === 'SBOM Management' && item.hidden === null
-  )
-  const userManagement = permissionsMap?.filter(
-    (item) => item.category === 'User Management' && item.hidden === null
-  )
-  const vulnManagement = permissionsMap?.filter(
-    (item) =>
-      item.category === 'Vulnerability Management' && item.hidden === null
-  )
+  const activeRole =
+    data &&
+    data?.organization?.organizationRoles?.find(
+      (item) => item?.name === selectedRole
+    )
 
-  // ORGANIZATION MANAGEMENT
-  const [checkedOrgManage, setCheckedOrgManage] = useState(
-    orgManagement
-      ?.filter((item) => item.supersededBy.length === 0)
-      .map((item) => item.value)
-  )
-  const allOrgManageChecked = checkedOrgManage.every(Boolean)
-  const isOrgManageChecked =
-    checkedOrgManage.some(Boolean) && !allOrgManageChecked
-  // PRODUCT GROUP MANAGEMENT
-  const [checkedGroupManage, setCheckedGroupManage] = useState(
-    groupManagement
-      ?.filter((item) => item.supersededBy.length === 0)
-      .map((item) => item.value)
-  )
-  const allGroupManageChecked = checkedGroupManage.every(Boolean)
-  const isGroupManageChecked =
-    checkedGroupManage.some(Boolean) && !allGroupManageChecked
-  // PRODUCT MANAGEMENT
-  const [checkedProdManage, setCheckedProdManage] = useState(
-    prodManagement
-      ?.filter((item) => item.supersededBy.length === 0)
-      .map((item) => item.value)
-  )
-  const allProdManageChecked = checkedProdManage.every(Boolean)
-  const isProdManageChecked =
-    checkedProdManage.some(Boolean) && !allProdManageChecked
-  // SBOM MANAGEMENT
-  const [checkedSbomManage, setCheckedSbomManage] = useState(
-    sbomManagement
-      ?.filter((item) => item.supersededBy.length === 0)
-      .map((item) => item.value)
-  )
-  const allSbomManageChecked = checkedSbomManage.every(Boolean)
-  const isSbomManageChecked =
-    checkedSbomManage.some(Boolean) && !allSbomManageChecked
-  // USER MANAGEMENT
-  const [checkedUserManage, setCheckedUserManage] = useState(
-    userManagement
-      ?.filter((item) => item.supersededBy.length === 0)
-      .map((item) => item.value)
-  )
-  const allUserManageChecked = checkedUserManage.every(Boolean)
-  const isUserManageChecked =
-    checkedUserManage.some(Boolean) && !allUserManageChecked
-  // VULN MANAGEMENT
-  const [checkedVulnManage, setCheckedVulnManage] = useState(
-    vulnManagement
-      ?.filter((item) => item.supersededBy.length === 0)
-      .map((item) => item.value)
-  )
-  const allVulnManageChecked = checkedVulnManage.every(Boolean)
-  const isVulnManageChecked =
-    checkedVulnManage.some(Boolean) && !allVulnManageChecked
-
-  const onCheckParent = async (e, category, list) => {
-    if (role !== 'custom') {
+  const onCheckParent = async (e, category) => {
+    if (userRole !== 'custom') {
+      const list = activeRole?.permissionsMap?.filter(
+        (item) => item.category === category && item.hidden === null
+      )
       const filterData = list
         .filter((item) => item?.supersededBy?.length === 0)
         .map((_) => e.target.checked)
       if (filterData) {
-        if (category === 'Organization Management') {
-          setCheckedOrgManage(filterData)
-        } else if (category === 'Product Management') {
-          setCheckedGroupManage(filterData)
-        } else if (category === 'Product Environment Management') {
-          setCheckedProdManage(filterData)
-        } else if (category === 'SBOM Management') {
-          setCheckedSbomManage(filterData)
-        } else if (category === 'User Management') {
-          setCheckedUserManage(filterData)
-        } else {
-          setCheckedVulnManage(filterData)
-        }
         const permissions = list.map((item) => ({
           permissionKey: item?.key,
           value: e.target.checked
         }))
         await updateRole({
-          variables: { organizationRoleId: data?.id, permissions: permissions }
-        }).then((res) => {
-          if (res?.data) {
-            const data =
-              res?.data?.organizationRoleUpdate?.organizationRole?.permissionsMap?.filter(
-                (item) => item.hidden === null
-              )
-            setPermissions(data)
+          variables: {
+            organizationRoleId: activeRole?.id,
+            permissions: permissions
           }
         })
       }
@@ -141,93 +60,72 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
     return null
   }
 
-  const onCheckChild = async (e, category, index, roles) => {
-    if (role !== 'custom') {
-      const selector = permissions.filter((item) => item.category === category)
-      const updatedCheckedItems = [...roles]
-      updatedCheckedItems[index] = e.target.checked
-      if (category === 'Organization Management') {
-        setCheckedOrgManage(updatedCheckedItems)
-      } else if (category === 'Product Management') {
-        setCheckedGroupManage(updatedCheckedItems)
-      } else if (category === 'Product Environment Management') {
-        setCheckedProdManage(updatedCheckedItems)
-      } else if (category === 'SBOM Management') {
-        setCheckedSbomManage(updatedCheckedItems)
-      } else if (category === 'User Management') {
-        setCheckedUserManage(updatedCheckedItems)
-      } else {
-        setCheckedVulnManage(updatedCheckedItems)
-      }
-      const filterItem = selector.find((item) => item?.key === e.target.name)
-      const active = selector.some(
-        (item) =>
-          item?.supersededBy?.length === 0 &&
-          item?.key !== e.target.name &&
-          item?.value === true
+  const onCheckChild = async (e, category) => {
+    if (userRole !== 'custom') {
+      const selector = activeRole?.permissionsMap?.filter(
+        (item) => item.category === category
       )
+      const filterItem = selector?.find((item) => item?.key === e.target.name)
       await updateRole({
         variables: {
-          organizationRoleId: data?.id,
+          organizationRoleId: activeRole?.id,
           permissions: [
             {
               permissionKey: selector[0]?.key,
-              value: !active && e.target.checked === false ? false : true
+              value: e.target.checked ? true : selector[0]?.value
             },
             { permissionKey: filterItem?.key, value: e.target.checked }
           ]
-        }
-      }).then((res) => {
-        if (res?.data) {
-          res?.data?.organizationRoleUpdate?.organizationRole?.permissionsMap?.filter(
-            (item) => item.hidden === null
-          )
-          setPermissions(data)
         }
       })
     }
     return null
   }
 
-  const readOnly = data?.name !== 'custom' && role !== 'admin'
+  const readOnly = activeRole?.name !== 'custom' && userRole !== 'admin'
 
   return (
     <Drawer isOpen={isOpen} placement='right' size='md' onClose={onClose}>
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />
-        <DrawerHeader>Permissions for {data?.name || ''}</DrawerHeader>
+        <DrawerHeader>Permissions for {activeRole?.name || ''}</DrawerHeader>
         <DrawerBody>
           <Stack spacing={4} dir='column'>
             {/* ORGANIZATION MANAGEMENT */}
             <Box>
-              {orgManagement
-                ?.filter((item) => item.supersededBy.length > 0)
+              {activeRole?.permissionsMap
+                ?.filter(
+                  (item) =>
+                    item.category === 'Organization Management' &&
+                    item.hidden === null &&
+                    item.supersededBy.length > 0
+                )
                 .map((item, index) => (
                   <Checkbox
                     key={index}
-                    isChecked={allOrgManageChecked}
-                    isIndeterminate={isOrgManageChecked}
+                    isChecked={item.value}
                     isReadOnly={readOnly}
-                    onChange={(e) =>
-                      onCheckParent(e, item.category, orgManagement)
-                    }
+                    onChange={(e) => onCheckParent(e, item.category)}
                   >
                     {item.name}
                   </Checkbox>
                 ))}
               <Stack pl={6} mt={1} spacing={1}>
-                {orgManagement
-                  .filter((item) => item.supersededBy.length === 0)
+                {activeRole?.permissionsMap
+                  ?.filter(
+                    (item) =>
+                      item.category === 'Organization Management' &&
+                      item.hidden === null &&
+                      item.supersededBy.length === 0
+                  )
                   .map((item, index) => (
                     <Checkbox
                       key={index}
                       name={item.key}
-                      isChecked={checkedOrgManage[index]}
+                      isChecked={item?.value}
                       isReadOnly={readOnly}
-                      onChange={(e) =>
-                        onCheckChild(e, item.category, index, checkedOrgManage)
-                      }
+                      onChange={(e) => onCheckChild(e, item.category)}
                     >
                       {item.name}
                     </Checkbox>
@@ -237,38 +135,38 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
             <Divider />
             {/* PROJECT GROUP MANAGEMENT */}
             <Box mt={6}>
-              {groupManagement
-                ?.filter((item) => item.supersededBy.length > 0)
+              {activeRole?.permissionsMap
+                ?.filter(
+                  (item) =>
+                    item.category === 'Product Management' &&
+                    item.hidden === null &&
+                    item.supersededBy.length > 0
+                )
                 .map((item, index) => (
                   <Checkbox
                     key={index}
-                    isChecked={allGroupManageChecked}
-                    isIndeterminate={isGroupManageChecked}
+                    isChecked={item?.value}
                     isReadOnly={readOnly}
-                    onChange={(e) =>
-                      onCheckParent(e, item.category, groupManagement)
-                    }
+                    onChange={(e) => onCheckParent(e, item.category)}
                   >
                     {item.name}
                   </Checkbox>
                 ))}
               <Stack pl={6} mt={1} spacing={1}>
-                {groupManagement
-                  ?.filter((item) => item.supersededBy.length === 0)
+                {activeRole?.permissionsMap
+                  ?.filter(
+                    (item) =>
+                      item.category === 'Product Management' &&
+                      item.hidden === null &&
+                      item.supersededBy.length === 0
+                  )
                   .map((item, index) => (
                     <Checkbox
                       key={index}
                       name={item.key}
-                      isChecked={checkedGroupManage[index]}
+                      isChecked={item.value}
                       isReadOnly={readOnly}
-                      onChange={(e) =>
-                        onCheckChild(
-                          e,
-                          item.category,
-                          index,
-                          checkedGroupManage
-                        )
-                      }
+                      onChange={(e) => onCheckChild(e, item.category)}
                     >
                       {item.name}
                     </Checkbox>
@@ -278,33 +176,38 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
             <Divider />
             {/* PROJECT MANAGEMENT */}
             <Box mt={6}>
-              {prodManagement
-                ?.filter((item) => item.supersededBy.length > 0)
+              {activeRole?.permissionsMap
+                ?.filter(
+                  (item) =>
+                    item.category === 'Product Environment Management' &&
+                    item.hidden === null &&
+                    item.supersededBy.length > 0
+                )
                 .map((item, index) => (
                   <Checkbox
                     key={index}
-                    isChecked={allProdManageChecked}
-                    isIndeterminate={isProdManageChecked}
+                    isChecked={item?.value}
                     isReadOnly={readOnly}
-                    onChange={(e) =>
-                      onCheckParent(e, item.category, prodManagement)
-                    }
+                    onChange={(e) => onCheckParent(e, item.category)}
                   >
                     {item.name}
                   </Checkbox>
                 ))}
               <Stack pl={6} mt={1} spacing={1}>
-                {prodManagement
-                  ?.filter((item) => item.supersededBy.length === 0)
+                {activeRole?.permissionsMap
+                  ?.filter(
+                    (item) =>
+                      item.category === 'Product Environment Management' &&
+                      item.hidden === null &&
+                      item.supersededBy.length === 0
+                  )
                   .map((item, index) => (
                     <Checkbox
                       key={index}
                       name={item.key}
-                      isChecked={checkedProdManage[index]}
+                      isChecked={item.value}
                       isReadOnly={readOnly}
-                      onChange={(e) =>
-                        onCheckChild(e, item.category, index, checkedProdManage)
-                      }
+                      onChange={(e) => onCheckChild(e, item.category)}
                     >
                       {item.name}
                     </Checkbox>
@@ -314,33 +217,38 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
             <Divider />
             {/* SBOM MANAGEMENT */}
             <Box mt={6}>
-              {sbomManagement
-                ?.filter((item) => item.supersededBy.length > 0)
+              {activeRole?.permissionsMap
+                ?.filter(
+                  (item) =>
+                    item.category === 'SBOM Management' &&
+                    item.hidden === null &&
+                    item.supersededBy.length > 0
+                )
                 .map((item, index) => (
                   <Checkbox
                     key={index}
-                    isChecked={allSbomManageChecked}
-                    isIndeterminate={isSbomManageChecked}
+                    isChecked={item?.value}
                     isReadOnly={readOnly}
-                    onChange={(e) =>
-                      onCheckParent(e, item.category, sbomManagement)
-                    }
+                    onChange={(e) => onCheckParent(e, item.category)}
                   >
                     {item.name}
                   </Checkbox>
                 ))}
               <Stack pl={6} mt={1} spacing={1}>
-                {sbomManagement
-                  ?.filter((item) => item.supersededBy.length === 0)
+                {activeRole?.permissionsMap
+                  ?.filter(
+                    (item) =>
+                      item.category === 'SBOM Management' &&
+                      item.hidden === null &&
+                      item.supersededBy.length === 0
+                  )
                   .map((item, index) => (
                     <Checkbox
                       key={index}
                       name={item.key}
-                      isChecked={checkedSbomManage[index]}
+                      isChecked={item.value}
                       isReadOnly={readOnly}
-                      onChange={(e) =>
-                        onCheckChild(e, item.category, index, checkedSbomManage)
-                      }
+                      onChange={(e) => onCheckChild(e, item.category)}
                     >
                       {item.name}
                     </Checkbox>
@@ -350,33 +258,38 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
             <Divider />
             {/* USER MANAGEMENT */}
             <Box mt={6}>
-              {userManagement
-                ?.filter((item) => item.supersededBy.length > 0)
+              {activeRole?.permissionsMap
+                ?.filter(
+                  (item) =>
+                    item.category === 'User Management' &&
+                    item.hidden === null &&
+                    item.supersededBy.length > 0
+                )
                 .map((item, index) => (
                   <Checkbox
                     key={index}
-                    isChecked={allUserManageChecked}
-                    isIndeterminate={isUserManageChecked}
+                    isChecked={item?.value}
                     isReadOnly={readOnly}
-                    onChange={(e) =>
-                      onCheckParent(e, item.category, userManagement)
-                    }
+                    onChange={(e) => onCheckParent(e, item.category)}
                   >
                     {item.name}
                   </Checkbox>
                 ))}
               <Stack pl={6} mt={1} spacing={1}>
-                {userManagement
-                  ?.filter((item) => item.supersededBy.length === 0)
+                {activeRole?.permissionsMap
+                  ?.filter(
+                    (item) =>
+                      item.category === 'User Management' &&
+                      item.hidden === null &&
+                      item.supersededBy.length === 0
+                  )
                   .map((item, index) => (
                     <Checkbox
                       key={index}
                       name={item.key}
-                      isChecked={checkedUserManage[index]}
+                      isChecked={item.value}
                       isReadOnly={readOnly}
-                      onChange={(e) =>
-                        onCheckChild(e, item.category, index, checkedUserManage)
-                      }
+                      onChange={(e) => onCheckChild(e, item.category)}
                     >
                       {item.name}
                     </Checkbox>
@@ -386,36 +299,38 @@ const PermissionDrawer = ({ isOpen, onClose, data, refetch, role }) => {
             <Divider />
             {/* VULN MANAGEMENT */}
             <Box mt={6}>
-              {vulnManagement
-                ?.filter((item) => item.supersededBy.length > 0)
+              {activeRole?.permissionsMap
+                ?.filter(
+                  (item) =>
+                    item.category === 'Vulnerability Management' &&
+                    item.hidden === null &&
+                    item.supersededBy.length > 0
+                )
                 .map((item, index) => (
                   <Checkbox
                     key={index}
-                    isChecked={allVulnManageChecked}
-                    isIndeterminate={isVulnManageChecked}
+                    isChecked={item.value}
                     isReadOnly={readOnly}
-                    onChange={(e) =>
-                      onCheckParent(e, item.category, vulnManagement)
-                    }
+                    onChange={(e) => onCheckParent(e, item.category)}
                   >
                     {item.name}
                   </Checkbox>
                 ))}
               <Stack pl={6} mt={1} spacing={1}>
-                {vulnManagement
+                {activeRole?.permissionsMap
                   ?.filter(
                     (item) =>
-                      item.supersededBy.length === 0 && item.hidden !== true
+                      item.category === 'Vulnerability Management' &&
+                      item.hidden === null &&
+                      item.supersededBy.length === 0
                   )
                   .map((item, index) => (
                     <Checkbox
                       key={index}
                       name={item.key}
-                      isChecked={checkedVulnManage[index]}
+                      isChecked={item.value}
                       isReadOnly={readOnly}
-                      onChange={(e) =>
-                        onCheckChild(e, item.category, index, checkedVulnManage)
-                      }
+                      onChange={(e) => onCheckChild(e, item.category)}
                     >
                       {item.name}
                     </Checkbox>

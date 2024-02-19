@@ -96,14 +96,13 @@ export const GetUserPermissions = gql`
   }
 `
 
-// GET ORG ROLES
-export const GetRoles = gql`
-  query GetRoles {
+// GET ALL PERMISSIONS
+export const GetAllPermissions = gql`
+  query GetAllPermissions {
     organization {
       organizationRoles {
         id
         name
-        createdAt
         permissionsMap {
           category
           hidden
@@ -113,6 +112,19 @@ export const GetRoles = gql`
           supersededBy
           value
         }
+      }
+    }
+  }
+`
+
+// GET ORG ROLES
+export const GetRoles = gql`
+  query GetRoles {
+    organization {
+      organizationRoles {
+        id
+        name
+        createdAt
       }
     }
   }
