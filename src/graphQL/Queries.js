@@ -1295,6 +1295,7 @@ export const GetProductData = gql`
         description
         licensesExp
         group
+        scope
       }
       stats {
         compCount

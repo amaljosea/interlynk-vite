@@ -182,61 +182,56 @@ export default function HeaderLinks(props) {
           </PopoverContent>
         </Popover>
       )}
-      {!signedUrlParams && (
-        <Menu>
-          <MenuButton
-            as={IconButton}
-            aria-label='Options'
-            variant='none'
-            color='gray.400'
-            ms='0px'
-            px='0px'
-            rightIcon={
-              document.documentElement.dir ? (
-                ''
-              ) : (
-                <ProfileIcon color={navbarIcon} w='22px' h='22px' me='0px' />
-              )
-            }
-            leftIcon={
-              document.documentElement.dir ? (
-                <ProfileIcon color={navbarIcon} w='22px' h='22px' me='0px' />
-              ) : (
-                ''
-              )
-            }
-          >
-            <Text display={{ sm: 'none', md: 'flex' }} fontSize={'sm'}>
-              {userName || name}
-            </Text>
-          </MenuButton>
-          {location.pathname.startsWith('/vendor') && (
-            <MenuList>
-              <MenuGroup title=''>
-                <MenuItem>
-                  <Flex flexDirection='row' alignItems={'flex-start'} gap={3}>
-                    <Icon as={FaUser} width={2.5} mt={1} />
-                    <Stack direction={'column'} spacing={-2}>
-                      <Text mt={0} mb={0}>
-                        {name}
-                      </Text>
-                      <Text mt={0} mb={0} fontSize={'sm'} color={'#718096'}>
-                        {email}
-                      </Text>
-                      <Text mt={0} mb={0} fontSize={'sm'} color={'#718096'}>
-                        {org !== 'undefined' ? org?.replace(/"/g, '') : ''}
-                      </Text>
-                    </Stack>
-                  </Flex>
-                </MenuItem>
-                <MenuDivider />
-                {data?.organization && (
-                  <Link to={`/vendor/settings?tab=person`}>
-                    <MenuItem icon={<SettingsIcon />}>Settings</MenuItem>
-                  </Link>
-                )}
-                <Link to='/vendor/settings?tab=organization'>
-                  <MenuItem icon={<FaExchangeAlt />}>Organizations</MenuItem>
+      <Menu>
+        <MenuButton
+          as={IconButton}
+          aria-label='Options'
+          variant='none'
+          color='gray.400'
+          ms='0px'
+          px='0px'
+          rightIcon={
+            document.documentElement.dir ? (
+              ''
+            ) : (
+              <ProfileIcon color={navbarIcon} w='22px' h='22px' me='0px' />
+            )
+          }
+          leftIcon={
+            document.documentElement.dir ? (
+              <ProfileIcon color={navbarIcon} w='22px' h='22px' me='0px' />
+            ) : (
+              ''
+            )
+          }
+        >
+        <Text display={{ sm: 'none', md: 'flex' }} fontSize={'sm'}>
+            {userName || name}
+        </Text>
+        </MenuButton>
+        {location.pathname.startsWith('/vendor') && (
+          <MenuList>
+            <MenuGroup title=''>
+              <MenuItem>
+                <Flex flexDirection='row' alignItems={'flex-start'} gap={3}>
+                  <Icon as={FaUser} width={2.5} mt={1} />
+                  <Stack direction={'column'} spacing={-2}>
+                    <Text mt={0} mb={0}>
+                      {name}
+                    </Text>
+                    <Text mt={0} mb={0} fontSize={'sm'} color={'#718096'}>
+                      {email}
+                    </Text>
+                    <Text mt={0} mb={0} fontSize={'sm'} color={'#718096'}>
+                      {org !== 'undefined' ? org?.replace(/"/g, '') : ''}
+                    </Text>
+                  </Stack>
+                </Flex>
+              </MenuItem>
+              <MenuDivider />
+              {data?.organization && (
+                <Link to={`/vendor/settings?tab=person`}>
+                  <MenuItem icon={<SettingsIcon />}>Settings</MenuItem>
                 </Link>
                 <MenuDivider />
                 <MenuItem icon={<FaSignOutAlt />} onClick={handleLogout}>

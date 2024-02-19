@@ -78,7 +78,7 @@ const VulnInfo = ({ data, componentVulns, refetch }) => {
                   flexDir={'row'}
                   alignItems={'center'}
                   flexWrap={'wrap'}
-                  gap={4}
+                  gap={6}
                   mt={6}
                 >
                   {/* PRODUCTS */}
@@ -122,7 +122,7 @@ const VulnInfo = ({ data, componentVulns, refetch }) => {
                   >
                     <Icon h={'18px'} w={'18px'} color='#777' as={FaCube} />
                     <Flex flexDir={'column'} alignItems={'center'}>
-                      <Tag variant='subtle' width={16} colorScheme={'blue'}>
+                      <Tag variant='subtle' width={'full'} colorScheme={'blue'}>
                         <TagLabel mx={'auto'}>
                           {data?.componentCount || 0}
                         </TagLabel>
@@ -172,14 +172,32 @@ const VulnInfo = ({ data, componentVulns, refetch }) => {
                     ></i>
                     <Flex flexDir={'column'} alignItems={'center'}>
                       {data?.cvssVector ? (
-                        <Tooltip bg='gray.50' label={<CvssCard value={data?.cvssVector} />} placement='top'>
-                          <Tag variant='subtle' width={'full'} colorScheme={'cyan'} cursor={'pointer'} >
-                            <TagLabel mx={'auto'}>{data?.cvssVector || '-'}</TagLabel>
+                        <Tooltip
+                          bg='gray.50'
+                          label={<CvssCard value={data?.cvssVector} />}
+                          placement='top'
+                        >
+                          <Tag
+                            variant='subtle'
+                            width={'full'}
+                            colorScheme={'cyan'}
+                            cursor={'pointer'}
+                          >
+                            <TagLabel mx={'auto'}>
+                              {data?.cvssVector || '-'}
+                            </TagLabel>
                           </Tag>
                         </Tooltip>
                       ) : (
-                        <Tag variant='subtle' width={'full'} colorScheme={'cyan'} cursor={'pointer'}>
-                          <TagLabel mx={'auto'}>{data?.cvssVector || '-'}</TagLabel>
+                        <Tag
+                          variant='subtle'
+                          width={'full'}
+                          colorScheme={'cyan'}
+                          cursor={'pointer'}
+                        >
+                          <TagLabel mx={'auto'}>
+                            {data?.cvssVector || '-'}
+                          </TagLabel>
                         </Tag>
                       )}
                       <Text fontSize={'xs'}>CVSS Vector</Text>

@@ -74,13 +74,6 @@ const ComponentTable = ({
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
 
-  useEffect(() => {
-    if (data) {
-      setIsPrevActive(data?.pageInfo?.hasPreviousPage)
-      setIsNextActive(data?.pageInfo?.hasNextPage)
-    }
-  }, [data])
-
   const setPaginationControl = (data) => {
     setIsPrevActive(data.sbom?.components?.pageInfo?.hasPreviousPage)
     setIsNextActive(data.sbom?.components?.pageInfo?.hasNextPage)
@@ -566,9 +559,8 @@ const ComponentTable = ({
     {
       id: 'action',
       name: 'ACTION',
-      selector: (row) => {
-        const { suppliers, status, primary, id } = row
-
+      selector: (row, rowIndex) => {
+        const { suppliers, status, primary } = row
         return (
           <>
             {!customerView ? (
@@ -641,7 +633,7 @@ const ComponentTable = ({
                           status === 'signed' ||
                           !updateComponent ||
                           !updateSboms ||
-                          signedUrlParams
+                          data?.nodes?.length === 1
                         }
                       >
                         Delete
@@ -1232,7 +1224,7 @@ const ComponentTable = ({
         }
       })
     }
-  }, [data])
+  }, [data, prodCompDispatch])
 
   return (
     <>
@@ -1294,6 +1286,7 @@ const ComponentTable = ({
               isOpen={isDelOpen}
               onClose={onDelClose}
               id={activeRow.id}
+              sbomRefetch={sbomRefetch}
               fetchCompData={fetchCompData}
             />
           )}
@@ -1344,6 +1337,7 @@ const ComponentTable = ({
           onClose={onCompClose}
           fetchCompData={fetchCompData}
           filterRefetch={getCompFilters}
+          sbomRefetch={sbomRefetch}
           primaryComp={primaryComp}
           shortDesc={null}
           checkId={null}

@@ -40,30 +40,16 @@ function Profile() {
   const queryParams = new URLSearchParams(location.search)
   const activetab = queryParams.get('tab')
   const { totalRows, userPermissions } = useGlobalState()
-  
-  const tabs = [
-    {
-      name: 'PERSONAL',
-      icon: FaUserCircle
-    },
-    {
-      name: 'ORGANIZATION',
-      icon: FaBuilding
-    }
-  ]
 
-  const viewOrg = userPermissions?.find(
-    (item) => item.key === 'view_organization'
-  )
+  const tabs = [{name: 'PERSONAL',icon: FaUserCircle},{name: 'ORGANIZATION',icon: FaBuilding}]
+  const viewOrg = userPermissions?.find((item) => item.key === 'view_organization')
   const viewUsers = userPermissions?.find((item) => item.key === 'view_users')
   const viewFeeds = userPermissions?.find((item) => item.key === 'view_feeds')
-  const manageFeeds = viewFeeds?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'mange_feeds' && permission.value === true
+  const manageFeeds = viewFeeds?.supersededBy?.some((permission) =>
+    permission.key === 'manage_feeds' && permission.value === true
   )
-  const manageListing = viewFeeds?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'manage_listing' && permission.value === true
+  const manageListing = viewFeeds?.supersededBy?.some((permission) =>
+    permission.key === 'manage_listing' && permission.value === true
   )
 
   const [tabIndex, setTabIndex] = useState(0)

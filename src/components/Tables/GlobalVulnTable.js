@@ -29,13 +29,31 @@ import VulnsFilters from 'views/Dashboard/Vulnerabilities/components/VulnsFilter
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import { useGlobalState } from 'hooks/useGlobalState'
 import Round from 'components/Misc/Round'
+import Pagination from "../Pagination";
 
 const GlobalVulnTable = ({ data, refetch }) => {
+
+  //This part is needed for the pagination to work. (Modify with caution)
+  const paginationSizes = [25, 50, 100]
+  const [totalRows, setTotalRows] = useState(paginationSizes[0])
+
+  const [isPrevActive, setIsPrevActive] = useState(false)
+  const [isNextActive, setIsNextActive] = useState(false)
+
+  useEffect(() => {
+    if (data) {
+      setIsPrevActive(data.pageInfo?.hasPreviousPage)
+      setIsNextActive(data.pageInfo?.hasNextPage)
+    }
+  }, [data])
+  //end
+
+
   const params = useParams()
   const product = JSON.parse(localStorage.getItem('product'))
   const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : "customer"
 
-  const { totalRows, setTotalRows, globalVulnState, dispatch } =
+  const { globalVulnState, dispatch } =
     useGlobalState()
   const {
     pageIndex,
@@ -51,8 +69,6 @@ const GlobalVulnTable = ({ data, refetch }) => {
   const { globalVulnDispatch } = dispatch
 
   const [filterText, setFilterText] = useState(searchInput)
-  const [isPrevActive, setIsPrevActive] = useState(false)
-  const [isNextActive, setIsNextActive] = useState(false)
 
   const cvssColor = (cvss) => {
     if (cvss >= 9.0) {
@@ -545,13 +561,6 @@ const GlobalVulnTable = ({ data, refetch }) => {
     })
   }
 
-  useEffect(() => {
-    if (data) {
-      setIsPrevActive(data?.pageInfo?.hasPreviousPage)
-      setIsNextActive(data?.pageInfo?.hasNextPage)
-    }
-  }, [data])
-
   return (
     <>
       {/* TABLE */}
@@ -573,53 +582,17 @@ const GlobalVulnTable = ({ data, refetch }) => {
         />
 
         {data && (
-          <Flex
-            width={'100%'}
-            flexDir={'row'}
-            gap={4}
-            alignItems={'center'}
-            mt={6}
-            justifyContent={'space-between'}
-            flexWrap={'wrap'}
-          >
-            <Stack alignItems={'center'} direction={'row'} spacing={4}>
-              <Button
-                colorScheme='blue'
-                onClick={handlePreviousPage}
-                isDisabled={!isPrevActive}
-              >
-                Prev
-              </Button>
-              <Button
-                colorScheme='blue'
-                onClick={handleNextPage}
-                isDisabled={!isNextActive}
-              >
-                Next
-              </Button>
-              <Box>
-                Page {pageIndex} of{' '}
-                {data.totalCount === 0
-                  ? 1
-                  : Math.ceil(data.totalCount / totalRows)}
-              </Box>
-            </Stack>
-
-            <Stack alignItems={'center'} direction={'row'} spacing={4}>
-              <Text>Show</Text>
-              <Select
-                width={20}
-                value={totalRows}
-                onChange={handleSetRow}
-                id='rowlimit'
-                name='rowlimit'
-              >
-                <option value={25}>25</option>
-                <option value={50}>50</option>
-                <option value={100}>100</option>
-              </Select>
-            </Stack>
-          </Flex>
+            <Pagination
+                paginationSizes={paginationSizes}
+                pageIndex={pageIndex}
+                totalRows={totalRows}
+                totalCount={data.totalCount}
+                onPreviousPage={handlePreviousPage}
+                onNextPage={handleNextPage}
+                onSetRow={handleSetRow}
+                hasNextPage={isNextActive}
+                hasPreviousPage={isPrevActive}
+            />
         )}
       </Flex>
     </>

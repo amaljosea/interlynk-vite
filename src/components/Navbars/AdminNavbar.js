@@ -17,7 +17,7 @@ import { GetUserPermissions } from 'graphQL/Queries'
 import { permissionList } from 'utils'
 
 export default function AdminNavbar(props) {
-  const { setUserPermissions,setActiveSbomTab } = useGlobalState()
+  const { setUserPermissions, setActiveSbomTab } = useGlobalState()
 
   function parseJSONSafely(str) {
     try {
@@ -41,7 +41,7 @@ export default function AdminNavbar(props) {
   }, [data])
 
   const [scrolled, setScrolled] = useState(false)
-  const { brandText } = props
+  const { brandText, tabRes } = props
   const navigate = useNavigate()
   const location = useLocation()
   const params = useParams()
@@ -158,10 +158,14 @@ export default function AdminNavbar(props) {
           sm: 'column',
           md: 'row'
         }}
-        alignItems={{ xl: 'center' }}
+        alignItems={'center'}
         justifyContent={'space-between'}
       >
-        <Box pos={'relative'} left={'40'} mb={{ sm: '8px', md: '0px' }}>
+        <Box
+          pos={'relative'}
+          left={tabRes?.matches ? 24 : 44}
+          mb={{ sm: '8px', md: '0px' }}
+        >
           <Breadcrumb>
             <BreadcrumbItem color={mainText}>
               <Link
@@ -195,11 +199,23 @@ export default function AdminNavbar(props) {
             )}
 
             {sbomId && currentSBOM?.version && (
-              <BreadcrumbItem color={mainText} isCurrentPage={parts ? false : true}>
-                <BreadcrumbLink href={parts ? `/${path}/products/${currentProduct?.name}?id=${activeEnv}&sbom=${currentSBOM?.id}` : ''} onClick={() => {
-                   localStorage.setItem('activeSbomTab', 0)
-                   setActiveSbomTab(0)
-                }}>{currentSBOM?.version}</BreadcrumbLink>
+              <BreadcrumbItem
+                color={mainText}
+                isCurrentPage={parts ? false : true}
+              >
+                <BreadcrumbLink
+                  href={
+                    parts
+                      ? `/vendor/products/${currentProduct?.name}?id=${activeEnv}&sbom=${currentSBOM?.id}`
+                      : ''
+                  }
+                  onClick={() => {
+                    localStorage.setItem('activeSbomTab', 0)
+                    setActiveSbomTab(0)
+                  }}
+                >
+                  {currentSBOM?.version}
+                </BreadcrumbLink>
               </BreadcrumbItem>
             )}
 
@@ -222,14 +238,18 @@ export default function AdminNavbar(props) {
             )}
 
             {subProduct && parts && (
-                <BreadcrumbItem color={mainText}>
-                  <BreadcrumbLink color={mainText}>{subProduct?.name || ''}</BreadcrumbLink>
-                </BreadcrumbItem>
+              <BreadcrumbItem color={mainText}>
+                <BreadcrumbLink color={mainText}>
+                  {subProduct?.name || ''}
+                </BreadcrumbLink>
+              </BreadcrumbItem>
             )}
 
             {subProduct && parts && (
               <BreadcrumbItem color={mainText}>
-                <BreadcrumbLink color={mainText}>{subProduct?.version || ''}</BreadcrumbLink>
+                <BreadcrumbLink color={mainText}>
+                  {subProduct?.version || ''}
+                </BreadcrumbLink>
               </BreadcrumbItem>
             )}
           </Breadcrumb>
