@@ -25,6 +25,7 @@ import { logoutUser } from '../utils/authUtils'
 export default function Dashboard(props) {
   const authToken = Cookies.get('authToken')
   const highRes = window.matchMedia('(min-width: 2500px)')
+  const tabRes = window.matchMedia('(max-width: 1199px)')
   const navigate = useNavigate()
   const { ...rest } = props
   // states and functions
@@ -124,12 +125,13 @@ export default function Dashboard(props) {
         />
         <Box
           minH='100vh'
-          w={highRes.matches ? '98%' : '96%'}
+          w={highRes?.matches ? '98%' : tabRes?.matches ? '100%' : '96%'}
           pos={'absolute'}
           right={0}
         >
           <Portal>
             <AdminNavbar
+              tabRes={tabRes}
               brandText={getActiveRoute(dashRoutes)}
               secondary={getActiveNavbar(dashRoutes)}
             />

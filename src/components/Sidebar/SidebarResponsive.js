@@ -107,10 +107,10 @@ function SidebarResponsive(props) {
                   <Icon>{prop.icon}</Icon>
                 ) : (
                   <IconBox
-                    bg='teal.300'
+                    bg='blue.300'
                     color='white'
-                    h='30px'
-                    w='30px'
+                    h='36px'
+                    w='36px'
                     me='12px'
                   >
                     {prop.icon}
@@ -158,9 +158,9 @@ function SidebarResponsive(props) {
                 ) : (
                   <IconBox
                     bg={inactiveBg}
-                    color='teal.300'
-                    h='30px'
-                    w='30px'
+                    color='blue.300'
+                    h='36px'
+                    w='36px'
                     me='12px'
                   >
                     {prop.icon}
@@ -221,6 +221,7 @@ function SidebarResponsive(props) {
       alignItems='center'
     >
       <HamburgerIcon
+        cursor={'pointer'}
         color={hamburgerColor}
         w='18px'
         h='18px'
