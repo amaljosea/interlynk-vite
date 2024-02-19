@@ -43,9 +43,11 @@ import { useGlobalState } from 'hooks/useGlobalState'
 
 const GeneralDataRow = ({ status, data, refetch }) => {
   const location = useLocation()
+  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
+  
 
   const { userPermissions, sbomState, dispatch } = useGlobalState()
   const { licenseType, spdxLicenses, expLicense, customLicenses } = sbomState
@@ -278,7 +280,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                 {!customerView && (
                   <Button
                     size='sm'
-                    isDisabled={status === 'signed' || !updateComponent}
+                    isDisabled={status === 'signed' || !updateComponent || signedUrlParams}
                     onClick={() => handleClick('tools')}
                   >
                     <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
@@ -332,7 +334,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                 {!customerView && (
                   <Button
                     size='sm'
-                    isDisabled={status === 'signed' || !updateComponent}
+                    isDisabled={status === 'signed' || !updateComponent || signedUrlParams}
                     onClick={() => handleClick('author')}
                   >
                     <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
@@ -392,7 +394,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                 {!customerView && (
                   <Button
                     size='sm'
-                    isDisabled={status === 'signed' || !updateComponent}
+                    isDisabled={status === 'signed' || !updateComponent || signedUrlParams}
                     onClick={onSupOpen}
                   >
                     <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
@@ -459,7 +461,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                   <Button
                     size='sm'
                     ref={licenseBtn}
-                    isDisabled={status === 'signed' || !updateComponent}
+                    isDisabled={status === 'signed' || !updateComponent || signedUrlParams}
                     onClick={onLicenseOpen}
                   >
                     <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />

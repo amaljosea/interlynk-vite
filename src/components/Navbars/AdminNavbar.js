@@ -51,6 +51,7 @@ export default function AdminNavbar(props) {
   const parts = queryParams.get('parts')
   const sbomId = queryParams.get('sbom')
   const vulnId = queryParams.get('vulnId')
+  const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : "customer"
 
   const activeVuln = localStorage.getItem('activeVuln')
   const activeEnv = localStorage.getItem('activeEnv')
@@ -180,7 +181,7 @@ export default function AdminNavbar(props) {
             </BreadcrumbItem>
 
             <BreadcrumbItem color={mainText} textTransform={'capitalize'}>
-              <Link to={`/vendor/${category}`}>{category}</Link>
+              <Link to={`/${path}/${category}`}>{category}</Link>
             </BreadcrumbItem>
 
             {params?.name && (
@@ -189,7 +190,7 @@ export default function AdminNavbar(props) {
                 isCurrentPage={sbomId && currentSBOM?.version ? false : true}
               >
                 <Link
-                  to={`/vendor/products/${params.name}?id=${currentProduct?.groupId}`}
+                  to={`/${path}/products/${params.name}?id=${currentProduct?.groupId}`}
                   onClick={() => localStorage.removeItem('currentSBOM')}
                 >
                   {decodeURI(params.name)}

@@ -35,6 +35,8 @@ import DownloadModal from './DownloadModal'
 import { GetCompFilterData } from 'graphQL/Queries'
 
 const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
+  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+
   const {
     totalRows,
     setActiveSbomTab,
@@ -84,6 +86,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
   const product = JSON.parse(localStorage.getItem('product'))
+  const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : "customer"
 
   const [status, setStatus] = useState('created')
   const [signedData, setSignedData] = useState(null)
@@ -174,7 +177,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
         }
       })
       .finally(() => {
-        navigate(`/vendor/products/${productName}?id=${productId}&sbom=${id}`)
+        navigate(`/${path}/products/${productName}?id=${productId}&sbom=${id}`)
         // setActiveProdTab(0)
       })
   }
@@ -236,7 +239,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
     }).then((res) => {
       if (res.data) {
         navigate(
-          `/vendor/products/${currentProduct.name}?id=${productId}&sbom=${sbomId}`
+          `/${path}/products/${currentProduct.name}?id=${productId}&sbom=${sbomId}`
         )
       }
     })
@@ -254,7 +257,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
         setTimeout(() => {
           setIsLoading(false)
           prodRefetch({ id: product?.groupId })
-          navigate(`/vendor/products/${params.name}?id=${product?.groupId}`)
+          navigate(`/${path}/products/${params.name}?id=${product?.groupId}`)
         }, 3000)
       }
     })
@@ -305,7 +308,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
         {/* UPDATE PRIMARY COMPONENT */}
         <Tooltip label='Edit'>
           <IconButton
-            isDisabled={status === 'signed' || !updateSboms}
+            isDisabled={status === 'signed' || !updateSboms || signedUrlParams}
             colorScheme='blue'
             icon={<EditIcon />}
             onClick={handleEditSbom}
@@ -351,7 +354,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
             colorScheme='red'
             icon={<DeleteIcon />}
             onClick={setDeleteOpen}
-            isDisabled={!archiveSboms}
+            isDisabled={!archiveSboms || signedUrlParams}
           ></IconButton>
         </Tooltip>
       </Flex>

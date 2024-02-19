@@ -29,6 +29,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
+  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const { data: res } = useQuery(GetCdxResponses)
 
   const { totalRows, userPermissions, prodVulnState, dispatch } = useGlobalState()
@@ -191,7 +192,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
     <Stack spacing='24px'>
       <Box>
         <SimpleGrid row={5} spacing={4}>
-          {!location.pathname.startsWith('/customer') && (
+          {!signedUrlParams && (
             <>
               {/* STATUS */}
               <FormControl>
@@ -295,7 +296,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
               </FormControl>
             </>
           )}
-          {!location.pathname.startsWith('/customer') && (
+          {!signedUrlParams && (
             <Button
               width={'fit-content'}
               colorScheme='blue'

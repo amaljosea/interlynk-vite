@@ -51,6 +51,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
 
   const params = useParams()
   const product = JSON.parse(localStorage.getItem('product'))
+  const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : "customer"
 
   const { globalVulnState, dispatch } =
     useGlobalState()
@@ -129,8 +130,8 @@ const GlobalVulnTable = ({ data, refetch }) => {
                 <Link
                   to={
                     params?.name
-                      ? `/vendor/products/${product?.name}?id=${product?.id}&vulnId=${id}`
-                      : `/vendor/vulnerabilities?vulnId=${id}`
+                      ? `/${path}/products/${product?.name}?id=${product?.id}&vulnId=${id}`
+                      : `/${path}/vulnerabilities?vulnId=${id}`
                   }
                   onClick={() => localStorage.setItem('activeVuln', vulnId)}
                 >

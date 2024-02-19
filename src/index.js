@@ -103,7 +103,26 @@ ReactDOM.render(
               <Route path={`settings`} element={<Profile />} />
             </Route>
             <Route path={`login`} element={<LoginLayout />} />
-            {/* <Route path={`customer`} element={<CustomerLayout />} /> */}
+            <Route path={`customer`} element={<CustomerLayout />}>
+              <Route
+                path=''
+                element={
+                  location.pathname === '/customer' ? (
+                    <Navigate replace to='/customer/products' />
+                  ) : (
+                    <Navigate replace to={location.pathname} />
+                  )
+                }
+              />
+              <Route path={`dashboard`} element={<Dashboard />} />
+              <Route path={`products`} element={<Products />}>
+                <Route index element={<ProductList />} />
+                <Route path={`:name`} element={<ProductDetails />} />
+              </Route>
+              <Route path={`vulnerabilities`} element={<Vulnerabilities />} />
+              <Route path={`licenses`} element={<Licenses />} />
+              <Route path={`settings`} element={<Profile />} />
+            </Route>
             <Route path={`register`} element={<Register />} />
           </Routes>
         </ChakraProvider>

@@ -50,6 +50,8 @@ import { GetSharelynks } from 'graphQL/Queries'
 import ShareLynkDrawer from 'components/Drawer/ShareLynkDrawer'
 
 const ProductTable = ({ data, refetch }) => {
+  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+
   //This part is needed for the pagination to work. (Modify with caution)
   const paginationSizes = [25, 50, 100]
 
@@ -79,6 +81,8 @@ const ProductTable = ({ data, refetch }) => {
   const productId = queryParams.get('id')
   const activeEnv = localStorage.getItem('activeEnv')
   const environment = localStorage.getItem('environment')
+  const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : "customer"
+
 
   const { userPermissions, setEnvName, setActiveSbomTab, prodState, dispatch } =
     useGlobalState()
@@ -306,7 +310,6 @@ const ProductTable = ({ data, refetch }) => {
           {/* FILTER PRODUCTS */}
           <ProdFilterMenu onFilter={onFilterActive} />
         </Stack>
-
         <Stack direction={'row'} spacing={2} alignItems={'center'}>
           {/* ADD PRODUCT */}
           <Tooltip label='Add Product'>
@@ -315,7 +318,7 @@ const ProductTable = ({ data, refetch }) => {
               colorScheme='blue'
               variant='solid'
               onClick={onOpenProduct}
-              isDisabled={!canAddProduct}
+              isDisabled={!canAddProduct || signedUrlParams}
             />
           </Tooltip>
           {/* REFRESH */}
@@ -331,6 +334,7 @@ const ProductTable = ({ data, refetch }) => {
     )
   }, [
     searchInput,
+    signedUrlParams,
     handleSearch,
     handleClear,
     handleRefresh,
@@ -353,6 +357,7 @@ const ProductTable = ({ data, refetch }) => {
               id={name}
               size='md'
               isChecked={enabled}
+              isDisabled={signedUrlParams}
               onChange={() => {
                 setActiveRow(row)
                 onWarningOpen()
@@ -384,7 +389,7 @@ const ProductTable = ({ data, refetch }) => {
 
           return (
             <Link
-              to={`/vendor/products/${name}?id=${id}`}
+              to={`/${path}/products/${name}?id=${id}`}
               onClick={handleClick}
             >
               <Text color={'blue.500'} minWidth='100%'>
@@ -455,7 +460,7 @@ const ProductTable = ({ data, refetch }) => {
             </Stack>
           )
         },
-        wrap: true,
+        wrap: true
       },
       // VERSION
       {
@@ -463,7 +468,10 @@ const ProductTable = ({ data, refetch }) => {
         name: 'VERSIONS',
         selector: (row) => {
           const { projects } = row
-          const totalSbom = projects?.reduce((count, project) => count + project.sboms.length,0)
+          const totalSbom = projects?.reduce(
+            (count, project) => count + project.sboms.length,
+            0
+          )
           return <Text>{totalSbom || 0}</Text>
         },
         wrap: true,
@@ -499,7 +507,12 @@ const ProductTable = ({ data, refetch }) => {
 
           return (
             <Menu>
-              <MenuButton as={IconButton} icon={<FaEllipsisV />} variant='none' color='gray.400' />
+              <MenuButton
+                as={IconButton}
+                icon={<FaEllipsisV />}
+                variant='none'
+                color='gray.400'
+              />
               <Portal>
                 <MenuList fontSize={'sm'}>
                   {/* EDIT PRODUCT */}
@@ -508,7 +521,7 @@ const ProductTable = ({ data, refetch }) => {
                       setActiveRow(row)
                       onOpen()
                     }}
-                    isDisabled={!enabled}
+                    isDisabled={!enabled || signedUrlParams}
                   >
                     Edit Product
                   </MenuItem>
@@ -520,24 +533,28 @@ const ProductTable = ({ data, refetch }) => {
                       setActiveRow(row)
                       onOpenUpload()
                     }}
-                    isDisabled={!enabled || !canUpdateProduct}
+                    isDisabled={
+                      !enabled || !canUpdateProduct || signedUrlParams
+                    }
                   >
                     Upload SBOM
                   </MenuItem>
                   {/* BUILD SBOM */}
                   <MenuItem
                     onClick={() => handleOpenSbom(row)}
-                    isDisabled={!enabled}
+                    isDisabled={!enabled || signedUrlParams}
                   >
                     Build Version
                   </MenuItem>
                   {/* VIEW SHARELYNK */}
-                  <MenuItem
-                    isDisabled={!enabled}
-                    onClick={() => onSharelynkOpen(row)}
-                  >
-                    View ShareLynk
-                  </MenuItem>
+                  {!signedUrlParams && (
+                    <MenuItem
+                      isDisabled={!enabled}
+                      onClick={() => onSharelynkOpen(row)}
+                    >
+                      View ShareLynk
+                    </MenuItem>
+                  )}
                   <Divider />
                   {/* ARCHIVE PRODUCT GROUP */}
                   <MenuItem
@@ -546,7 +563,7 @@ const ProductTable = ({ data, refetch }) => {
                       setActiveRow(row)
                       onDeleteOpen()
                     }}
-                    isDisabled={!canArchiveProduct}
+                    isDisabled={!canArchiveProduct || signedUrlParams}
                   >
                     Archive Product
                   </MenuItem>
@@ -690,17 +707,41 @@ const ProductTable = ({ data, refetch }) => {
 
       {/* CREATE PRODUCT */}
       {isOpenProduct && (
-        <ProductModal isOpen={isOpenProduct} refetch={refetch} totalRows={totalRows} onClose={onCloseProduct} id={null} product={null} description={null} allProjects={null} />
+        <ProductModal
+          isOpen={isOpenProduct}
+          refetch={refetch}
+          totalRows={totalRows}
+          onClose={onCloseProduct}
+          id={null}
+          product={null}
+          description={null}
+          allProjects={null}
+        />
       )}
 
       {/* UPDATE PRODUCT */}
       {isOpen && data && (
-        <ProductModal id={activeRow.id} isOpen={isOpen} onClose={onClose} product={activeRow.name} refetch={refetch} description={activeRow.description} allProjects={data.nodes} activeEnv={activeEnv} />
+        <ProductModal
+          id={activeRow.id}
+          isOpen={isOpen}
+          onClose={onClose}
+          product={activeRow.name}
+          refetch={refetch}
+          description={activeRow.description}
+          allProjects={data.nodes}
+          activeEnv={activeEnv}
+        />
       )}
 
       {/* PROD SBOM DRAWER */}
       {isSbomOpen && (
-        <ProductSbomDrawer isOpen={isSbomOpen} onClose={onSbomClose} data={activeRow} refetch={refetch} productId={activeRow?.id} />
+        <ProductSbomDrawer
+          isOpen={isSbomOpen}
+          onClose={onSbomClose}
+          data={activeRow}
+          refetch={refetch}
+          productId={activeRow?.id}
+        />
       )}
 
       {/* DELETE */}

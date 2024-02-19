@@ -52,9 +52,9 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const queryParams = new URLSearchParams(location.search)
   const sbomId = queryParams.get('sbom')
   const prodId = queryParams.get('id')
+  const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : "customer"
   const group = JSON.parse(localStorage.getItem('product'))
-
-
+  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
   const { setActiveProdTab, totalRows, prodState, prodCompState, prodVulnState, userPermissions, dispatch } = useGlobalState()
   const { enabled, field, direction } = prodState
@@ -268,7 +268,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
         const { part } = row
         return (
           <Link
-            to={`/vendor/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`}
+            to={`/${path}/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`}
           >
             <Text
               color={'blue.500'}
@@ -350,7 +350,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
         const { part } = row
         return (
           <Link
-            to={`/vendor/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`}
+            to={`/${path}/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`}
             onClick={getComponents}
           >
             <Tag
@@ -385,7 +385,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       name: 'VULNERABILITIES',
       selector: (row) => {
         const { part } = row
-        const link = `/vendor/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`
+        const link = `/${path}/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`
         return (
           <Stack fontWeight={'medium'} direction={'row'}>
             <Link to={link}>
@@ -445,7 +445,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
             <Portal>
               <MenuList size='sm'>
                 <MenuItem
-                  isDisabled={!updateSboms}
+                  isDisabled={!updateSboms || signedUrlParams}
                   onClick={() => {
                     setActiveRow(row)
                     onDeleteOpen()
@@ -535,7 +535,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
               variant='solid'
               fontWeight='normal'
               fontSize={'sm'}
-              isDisabled={!updateSboms}
+              isDisabled={!updateSboms || signedUrlParams}
             />
           </Tooltip>
           <Tooltip label='Refresh'>

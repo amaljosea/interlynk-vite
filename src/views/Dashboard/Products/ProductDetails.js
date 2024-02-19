@@ -78,6 +78,7 @@ const ProductDetails = () => {
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
   const vulnId = queryParams.get('vulnId')
+  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
   const {
     totalRows,
@@ -452,7 +453,9 @@ const ProductDetails = () => {
                     <Tooltip label='Edit Product'>
                       <IconButton
                         isDisabled={
-                          !data?.projectGroup?.enabled || !updateProduct
+                          !data?.projectGroup?.enabled ||
+                          !updateProduct ||
+                          signedUrlParams
                         }
                         colorScheme='blue'
                         onClick={onOpenProduct}
@@ -462,7 +465,9 @@ const ProductDetails = () => {
                     {/* UPLOAD SBOM */}
                     <Tooltip label='Upload SBOM'>
                       <IconButton
-                        isDisabled={!data?.projectGroup?.enabled}
+                        isDisabled={
+                          !data?.projectGroup?.enabled || signedUrlParams
+                        }
                         colorScheme='blue'
                         onClick={onOpenUpload}
                         icon={<FaUpload />}
@@ -479,6 +484,7 @@ const ProductDetails = () => {
                       <IconButton
                         colorScheme={'blue'}
                         onClick={onWarningOpen}
+                        isDisabled={signedUrlParams}
                         icon={
                           data?.projectGroup?.enabled ? (
                             <FaToggleOff />
@@ -494,7 +500,7 @@ const ProductDetails = () => {
                         colorScheme='red'
                         onClick={onDeleteOpen}
                         icon={<FaBoxArchive />}
-                        isDisabled={!archiveProduct}
+                        isDisabled={!archiveProduct || signedUrlParams}
                       />
                     </Tooltip>
                   </Flex>
@@ -581,6 +587,12 @@ const ProductDetails = () => {
                     key={index}
                     _focus={{ outline: 'none' }}
                     textTransform={'capitalize'}
+                    isDisabled={
+                      signedUrlParams &&
+                      (item === 'automation rules' ||
+                        item === 'settings' ||
+                        item === 'change log')
+                    }
                   >
                     {item}
                   </Tab>

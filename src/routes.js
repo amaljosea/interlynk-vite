@@ -95,17 +95,10 @@ export const dashRoutes = [
 
 export const customerRoutes = [
   {
-    path: '/images',
-    name: 'Images',
-    icon: <FaImages color='inherit' />,
-    component: CustomerImages,
-    layout: '/customer'
-  },
-  {
     path: '/products',
     name: 'Products',
     icon: <FaWindowMaximize color='inherit' />,
-    component: CustomerProducts,
+    component: Products,
     layout: '/customer'
   }
 ]
