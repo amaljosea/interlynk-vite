@@ -69,6 +69,7 @@ const ShareLynkDrawer = ({
   const handleCreateLynk = async () => {
     await createLynk({ variables: { enabled: true, id: [groupId] } }).then(
       (res) => {
+        setSelectedDate('')
         if (res?.data) {
           refetch()
           onShareLynkClose()
