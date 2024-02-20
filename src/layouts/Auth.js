@@ -67,9 +67,7 @@ export default function Auth() {
                 gap={1}
               >
                 <Img src={InterlynkLogo} w='40px' h='40px' me='5px' />
-                <Text fontSize={'3xl'} fontWeight={600} mt={2}>
-                  Interlynk
-                </Text>
+                <Text fontSize={'3xl'} fontWeight={600}>Interlynk</Text>
               </Flex>
               {/* LOGIN FORM */}
               <LoginForm />

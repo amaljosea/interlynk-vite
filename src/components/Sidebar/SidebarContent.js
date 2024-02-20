@@ -212,13 +212,7 @@ const SidebarContent = ({ logoText, routes }) => {
             fontSize='11px'
           >
             <Img src={InterlynkLogo} w='32px' h='32px' me='10px' />
-            {minimize ? (
-              ''
-            ) : (
-              <Text fontSize='lg' mt='12px'>
-                {logoText}
-              </Text>
-            )}
+            {minimize ? '' : <Text fontSize='xl'>{logoText}</Text>}
           </Box>
         </Link>
         <Separator></Separator>
