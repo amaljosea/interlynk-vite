@@ -24,7 +24,8 @@ import {
   FormErrorMessage,
   Input,
   useClipboard,
-  Alert
+  Alert,
+  Checkbox
 } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
 import { useMemo, useState } from 'react'
@@ -44,17 +45,20 @@ const ShareLynkDrawer = ({
   groupId,
   refetch
 }) => {
-  console.log('data', data)
   const domain = window.location.origin
   const [createLynk] = useMutation(CreateShareLynk)
+
+  const defaultDate = new Date()
+  defaultDate.setDate(defaultDate.getDate() + 90)
 
   const {
     isOpen: isShareLykOpen,
     onOpen: onShareLynkOpen,
     onClose: onShareLynkClose
   } = useDisclosure()
-  const [selectedDate, setSelectedDate] = useState('')
+  const [selectedDate, setSelectedDate] = useState(null)
   const [isValidDate, setIsValidDate] = useState(true)
+  const [noExpire, setNoExpire] = useState(false)
 
   const handleDateChange = (newDate) => {
     const isValidDate = newDate && !isNaN(newDate)
@@ -70,16 +74,31 @@ const ShareLynkDrawer = ({
     }
   }
 
+  const handleExpireChange = (e) => {
+    const { checked } = e.target
+    setNoExpire(checked)
+    setIsValidDate(true)
+    if (checked === true) {
+      setSelectedDate('')
+    } else {
+      setSelectedDate(defaultDate)
+    }
+  }
+
   const handleCreateLynk = async () => {
-    await createLynk({ variables: { enabled: true, id: [groupId] } }).then(
-      (res) => {
-        setSelectedDate('')
-        if (res?.data) {
-          refetch()
-          onShareLynkClose()
-        }
+    await createLynk({
+      variables: {
+        enabled: true,
+        id: [groupId],
+        expiresAt: new Date(selectedDate).toISOString()
       }
-    )
+    }).then((res) => {
+      setSelectedDate('')
+      if (res?.data) {
+        refetch()
+        onShareLynkClose()
+      }
+    })
   }
 
   // HEADER SECTION
@@ -104,7 +123,7 @@ const ShareLynkDrawer = ({
       id: 'ENABLED',
       name: 'ACTIVE',
       selector: (row) => {
-        return <Switch size='md' isChecked={row?.enabled} />
+        return <Switch size='md' isChecked={row?.enabled} isReadOnly />
       },
       width: '90px'
     },
@@ -198,25 +217,32 @@ const ShareLynkDrawer = ({
             <ModalHeader>Create ShareLynk</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              <FormControl mb={5} isInvalid={!isValidDate}>
-                <FormLabel mb={1} htmlFor='expire'>
-                  Expiration Date
-                </FormLabel>
-                <Datetime
-                  value={selectedDate}
-                  onChange={handleDateChange}
-                  utc={true}
-                  inputProps={{
-                    placeholder: 'Select Date and Time',
-                    onCopy: (e) => e.preventDefault(),
-                    onPaste: (e) => e.preventDefault()
-                  }}
-                />
-                {!isValidDate && (
-                  <FormErrorMessage>
-                    Please enter a valid datetime
-                  </FormErrorMessage>
-                )}
+              {!noExpire && (
+                <FormControl mb={3} isInvalid={!isValidDate}>
+                  <FormLabel mb={1} htmlFor='expire'>
+                    Expiration Date
+                  </FormLabel>
+                  <Datetime
+                    value={selectedDate}
+                    onChange={handleDateChange}
+                    utc={true}
+                    inputProps={{
+                      placeholder: 'Select Date and Time',
+                      onCopy: (e) => e.preventDefault(),
+                      onPaste: (e) => e.preventDefault()
+                    }}
+                  />
+                  {!isValidDate && (
+                    <FormErrorMessage>
+                      Please enter a valid datetime
+                    </FormErrorMessage>
+                  )}
+                </FormControl>
+              )}
+              <FormControl mb={3}>
+                <Checkbox isChecked={noExpire} onChange={handleExpireChange}>
+                  No Expiration
+                </Checkbox>
               </FormControl>
             </ModalBody>
             <ModalFooter>
@@ -227,7 +253,10 @@ const ShareLynkDrawer = ({
                 fontSize={'sm'}
                 variant='solid'
                 colorScheme='blue'
-                isDisabled={selectedDate !== '' && !isValidDate}
+                isDisabled={
+                  (selectedDate !== '' && !isValidDate) ||
+                  (!selectedDate && noExpire === false)
+                }
                 onClick={handleCreateLynk}
               >
                 Add
