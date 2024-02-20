@@ -20,14 +20,7 @@ import {
   TagCloseButton,
   Link,
   Divider,
-  VStack,
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-  PopoverHeader,
-  PopoverBody,
-  PopoverArrow,
-  PopoverCloseButton
+  VStack
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
@@ -47,15 +40,13 @@ import SupplierModal from 'views/Sbom/components/SupplierModal'
 import LinksDrawer from 'components/Drawer/LinksDrawer'
 import styled from '@emotion/styled'
 import { useLazyQuery, useMutation } from '@apollo/client'
-import { GetComponentPath, GetCompDependency } from 'graphQL/Queries'
+import { GetComponentPath, GetCompFilterData } from 'graphQL/Queries'
 import { deleteComSupplier } from 'graphQL/Mutation'
 import CompFilterMenu from 'views/Sbom/components/CompFilterMenu'
 import CustomLoader from 'components/CustomLoader'
 import RelationshipDrawer from 'components/Drawer/RelationshipDrawer'
-import RowLimit from 'views/Sbom/components/RowLimit'
 import { useGlobalState } from 'hooks/useGlobalState'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
-import { GetCompFilterData } from 'graphQL/Queries'
 import Pagination from '../Pagination'
 import PurlCard from 'components/Misc/PurlCard'
 import CpeCard from 'components/Misc/CpeCard'
@@ -165,12 +156,6 @@ const ComponentTable = ({
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const [getComPath, { data: comPath }] = useLazyQuery(GetComponentPath)
-  const [getDependency, { data: compDependency }] = useLazyQuery(
-    GetCompDependency,
-    {
-      fetchPolicy: 'network-only'
-    }
-  )
 
   const {
     isOpen: isDelOpen,
@@ -662,18 +647,6 @@ const ComponentTable = ({
 
   const [deleteSupplier] = useMutation(deleteComSupplier)
 
-  const handleRowClicked = (state, data) => {
-    const { id } = data
-    if (state === true) {
-      getDependency({
-        variables: {
-          compId: id,
-          sbomId: sbomId
-        }
-      })
-    }
-  }
-
   const handleSupRemove = async (id) => {
     try {
       await deleteSupplier({
@@ -712,7 +685,9 @@ const ComponentTable = ({
       internal,
       licenses,
       licensesExp,
-      licensesCustom
+      licensesCustom,
+      dependencyOf,
+      dependsOn
     } = data
 
     const CustomText = styled(Text)`
@@ -832,9 +807,8 @@ const ComponentTable = ({
           <GridItem>
             <CustomText>Depends On :</CustomText>
             <Flex mt={2} alignItems={'flex-start'} gap={2} flexWrap={'wrap'}>
-              {compDependency &&
-                compDependency.component.dependsOn.length > 0 &&
-                [...compDependency.component.dependsOn]
+              {dependsOn?.length > 0 &&
+                [...dependsOn]
                   .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
                   .map((comp, index) => (
                     <Tooltip
@@ -860,9 +834,8 @@ const ComponentTable = ({
           <GridItem>
             <CustomText>Dependency Of :</CustomText>
             <Flex mt={2} alignItems={'flex-start'} gap={2} flexWrap={'wrap'}>
-              {compDependency &&
-                compDependency.component.dependencyOf.length > 0 &&
-                compDependency.component.dependencyOf.map((comp, index) => (
+              {dependencyOf?.length > 0 &&
+                dependencyOf?.map((comp, index) => (
                   <Tooltip
                     key={index}
                     label={comp.fromComp.name}
@@ -1243,7 +1216,6 @@ const ComponentTable = ({
           expandableRows
           expandOnRowClicked
           persistTableHead
-          onRowExpandToggled={handleRowClicked}
           expandableRowsComponent={ExpandedComponent}
           responsive={true}
         />
@@ -1324,7 +1296,6 @@ const ComponentTable = ({
               compPath={comPath.component.pathToPrimary}
               total={totalComp}
               fetchCompData={fetchCompData}
-              refetch={getDependency}
             />
           )}
         </>

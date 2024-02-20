@@ -1430,6 +1430,30 @@ export const GetComponentData = gql`
             contactEmail
             contactName
           }
+          dependencyOf {
+            id
+            relType
+            fromId
+            toId
+            fromComp {
+              id
+              name
+              version
+            }
+            updatedAt
+          }
+          dependsOn {
+            id
+            relType
+            fromId
+            toId
+            toComp {
+              id
+              name
+              version
+            }
+            updatedAt
+          }
         }
       }
     }
