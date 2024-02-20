@@ -38,6 +38,7 @@ import { GetSignedProjects } from 'graphQL/Queries'
 import SignedSbomTable from './SBOMTable'
 import { GetSignedVulnData } from 'graphQL/Queries'
 import GlobalContext from 'context/GlobalContext'
+import { ShareLynkProjectGroups } from 'graphQL/Queries'
 
 function ProductInfo() {
   const initialRef = useRef(null)
@@ -70,7 +71,7 @@ function ProductInfo() {
     }
   })
 
-  const { data: allProjects } = useQuery(GetSignedProjects)
+  const { data: allProjects } = useQuery(ShareLynkProjectGroups)
 
   const { data } = useQuery(GetProjectInfo, {
     variables: {

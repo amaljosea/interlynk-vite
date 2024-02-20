@@ -48,6 +48,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { GetAllComponents } from 'graphQL/Queries'
 import { CreateCompRelation } from 'graphQL/Mutation'
 import CpeField from 'components/CpeField'
+import { AllShareComponents } from 'graphQL/Queries'
 
 function ComponentDrawer(props) {
   const location = useLocation()
@@ -56,25 +57,48 @@ function ComponentDrawer(props) {
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
-
+  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const customerView = location.pathname.startsWith('/customer')
 
-  const { isOpen, onClose, data, primaryComp, fetchCompData, shortDesc, filterRefetch, sbomRefetch } = props
+  const {
+    isOpen,
+    onClose,
+    data,
+    primaryComp,
+    fetchCompData,
+    shortDesc,
+    filterRefetch,
+    sbomRefetch
+  } = props
   const { prodCompState, dispatch } = useGlobalState()
   const { licenseType, purlString, expLicense, totalComp } = prodCompState
   const { prodCompDispatch } = dispatch
 
-  const [getAllComps, { data: allComponents }] = useLazyQuery(GetAllComponents)
+  const [getAllComps, { data: allComponents }] = useLazyQuery(
+    signedUrlParams ? AllShareComponents : GetAllComponents
+  )
   const [addRelation] = useMutation(CreateCompRelation)
 
   const onFilterRefetch = () => {
-    filterRefetch({variables: { projectId: productId, sbomId: sbomId } })
-      .then( (res) => res.data && prodCompDispatch({type: 'ADD_FILTER_HEADS',payload: res.data.sbom.filters}))
+    filterRefetch({ variables: { projectId: productId, sbomId: sbomId } }).then(
+      (res) =>
+        res.data &&
+        prodCompDispatch({
+          type: 'ADD_FILTER_HEADS',
+          payload: signedUrlParams
+            ? res?.data?.shareLynkQuery?.sbom?.filters
+            : res?.data?.sbom?.filters
+        })
+    )
   }
 
   const [getCpe] = useLazyQuery(CpeAutoComplete)
-  const [createComponent] = useMutation(CreateComponent, {onCompleted: () => fetchCompData()})
-  const [updateComponent] = useMutation(UpdateComponent, {onCompleted: () => fetchCompData()})
+  const [createComponent] = useMutation(CreateComponent, {
+    onCompleted: () => fetchCompData()
+  })
+  const [updateComponent] = useMutation(UpdateComponent, {
+    onCompleted: () => fetchCompData()
+  })
 
   const cpeRef = useRef()
 
@@ -98,7 +122,17 @@ function ComponentDrawer(props) {
 
   useEffect(() => {
     if (data) {
-      const { name, version, kind, cpes, purl, primary, internal, group, scope } = data
+      const {
+        name,
+        version,
+        kind,
+        cpes,
+        purl,
+        primary,
+        internal,
+        group,
+        scope
+      } = data
       setGroupInfo(group)
       setCompName(name)
       setCompVersion(version)
@@ -331,11 +365,11 @@ function ComponentDrawer(props) {
   useEffect(() => {
     getAllComps({
       variables: {
-        projectId: productId,
+        projectId: signedUrlParams ? undefined : productId,
+        field: signedUrlParams ? undefined : 'COMPONENTS_UPDATED_AT',
+        direction: signedUrlParams ? undefined : 'DESC',
         sbomId: sbomId,
-        first: totalComp,
-        field: 'COMPONENTS_UPDATED_AT',
-        direction: 'DESC'
+        first: totalComp
       }
     }).then((res) => {
       if (res.data) {
@@ -492,17 +526,19 @@ function ComponentDrawer(props) {
                       ) : null}
                     </InputRightElement>
                   </InputGroup>
-                  <IconButton
-                    icon={<FaExpandAlt />}
-                    size='md'
-                    fontWeight={'normal'}
-                    variant='solid'
-                    colorScheme='blue'
-                    width={'fit-content'}
-                    onClick={handlePurlModal}
-                  >
-                    Details
-                  </IconButton>
+                  {!signedUrlParams && (
+                    <IconButton
+                      icon={<FaExpandAlt />}
+                      size='md'
+                      fontWeight={'normal'}
+                      variant='solid'
+                      colorScheme='blue'
+                      width={'fit-content'}
+                      onClick={handlePurlModal}
+                    >
+                      Details
+                    </IconButton>
+                  )}
                 </Stack>
               </FormControl>
               {/* CPE INPUT */}
@@ -516,17 +552,19 @@ function ComponentDrawer(props) {
                     setCpeList={setCpeData}
                     onChange={handleCpeChange}
                   />
-                  <IconButton
-                    icon={<FaExpandAlt />}
-                    ize='md'
-                    fontWeight={'normal'}
-                    variant='solid'
-                    colorScheme='blue'
-                    width={'fit-content'}
-                    onClick={onCpeOpen}
-                  >
-                    Details
-                  </IconButton>
+                  {!signedUrlParams && (
+                    <IconButton
+                      icon={<FaExpandAlt />}
+                      ize='md'
+                      fontWeight={'normal'}
+                      variant='solid'
+                      colorScheme='blue'
+                      width={'fit-content'}
+                      onClick={onCpeOpen}
+                    >
+                      Details
+                    </IconButton>
+                  )}
                 </Stack>
               </FormControl>
               {/* SCOPE */}
@@ -635,7 +673,12 @@ function ComponentDrawer(props) {
                 <Button
                   colorScheme='blue'
                   onClick={handleCreateCom}
-                  isDisabled={ compKind === '' || compName === '' || compVersion === '' || !isValid}
+                  isDisabled={
+                    compKind === '' ||
+                    compName === '' ||
+                    compVersion === '' ||
+                    !isValid
+                  }
                 >
                   Save
                 </Button>

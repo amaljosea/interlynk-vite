@@ -27,7 +27,7 @@ export default function Customer(props) {
   const queryParams = new URLSearchParams(location.search)
   const signedUrlParams = queryParams.get('signed_url_params')
 
-  const authToken = Cookies.get('authToken')
+  const authToken = sessionStorage.getItem('signedUrlParams')
   const highRes = window.matchMedia('(min-width: 2500px)')
   const navigate = useNavigate()
   const { ...rest } = props
@@ -46,7 +46,7 @@ export default function Customer(props) {
     return {
       headers: {
         ...headers,
-        authorization: authToken
+        'Interlynk-ShareLynk-Token': signedUrlParams || authToken
       }
     }
   })
@@ -74,28 +74,6 @@ export default function Customer(props) {
     cache: new InMemoryCache(),
     queryDeduplication: false
   })
-
-  const isTokenExpired = (token) => {
-    const decodedToken = jwtDecode(token)
-    if (!decodedToken) {
-      return true
-    }
-    const currentTime = Date.now() / 1000
-    return decodedToken.exp < currentTime
-  }
-
-  useEffect(() => {
-    if (authToken) {
-      try {
-        const expired = isTokenExpired(authToken)
-        if (expired === true) {
-          logoutUser().then((r) => navigate('/auth'))
-        }
-      } catch (err) {
-        console.error('Invalid Token')
-      }
-    }
-  }, [])
 
   useEffect(() => {
     if (location.pathname === '/customer') {

@@ -26,6 +26,7 @@ const List = ({ children }) => {
 }
 
 const CompFilterMenu = ({ refetch, productId, sbomId }) => {
+  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const customerView = location.pathname.startsWith('/customer')
   const { prodCompState, dispatch } = useGlobalState()
   const {
@@ -53,7 +54,7 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
 
   const onFilter = (ecosystem, kind, licenses, suppliers, scope) => {
     refetch({
-      projectId: productId,
+      projectId: signedUrlParams ? undefined : productId,
       sbomId: sbomId,
       first: totalRows,
       last: undefined,
@@ -75,8 +76,8 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
           : suppliers,
       primary: scope === 'primary' ? true : undefined,
       internal: scope === 'internal' ? true : undefined,
-      field: field,
-      direction: direction
+      field: signedUrlParams ? undefined : field,
+      direction: signedUrlParams ? undefined : direction
     })
   }
 

@@ -49,6 +49,7 @@ import Pagination from '../Pagination'
 import { FirstDegreePartVulns } from 'graphQL/Queries'
 import { linkURl } from 'utils'
 import CvssCard from 'components/Misc/CvssCard'
+import { ShareVulnFilters } from 'graphQL/Queries'
 
 const statusColor = (status) => {
   if (status && status === 'Fixed') {
@@ -84,7 +85,7 @@ const VulnTable = ({
   const sbomIds = firstDegreePart?.map((item) => item?.component?.sbom?.id)
 
   const { data: parts } = useQuery(FirstDegreePartVulns, {
-    skip: firstDegreePart ? false : true,
+    skip: firstDegreePart && !signedUrlParams ? false : true,
     variables: { sbomIds, componentVulnIds },
     onCompleted: (data) => console.log('Parts', data)
   })
@@ -116,7 +117,9 @@ const VulnTable = ({
 
   const toast = useToast()
   // GET VULN FILTER HEADS
-  const [getVulnFilters] = useLazyQuery(GetVulnFilterData)
+  const [getVulnFilters] = useLazyQuery(
+    signedUrlParams ? ShareVulnFilters : GetVulnFilterData
+  )
 
   const { userPermissions, totalRows, setTotalRows, prodVulnState, dispatch } =
     useGlobalState()
@@ -367,7 +370,9 @@ const VulnTable = ({
       name: 'VERSION',
       selector: (row) => (
         <Tooltip label={row.component.version} placement='top'>
-          <Text textAlign='right' my={2}>{row.component.version}</Text>
+          <Text textAlign='right' my={2}>
+            {row.component.version}
+          </Text>
         </Tooltip>
       ),
       wrap: true,
@@ -490,7 +495,7 @@ const VulnTable = ({
     const { value } = event.target
     if (event.key === 'Enter') {
       await refetch({
-        projectId: productId,
+        projectId: signedUrlParams ? undefined : productId,
         sbomId: sbomId,
         search: value !== '' ? value : undefined,
         source: source === 'BOTH' || source === '' ? undefined : source,
@@ -504,8 +509,8 @@ const VulnTable = ({
               ? true
               : false,
         epss: epss !== '' && epss !== 'all' ? range : undefined,
-        field: field,
-        direction: direction,
+        field: signedUrlParams ? undefined : field,
+        direction: signedUrlParams ? undefined : direction,
         first: totalRows,
         last: undefined,
         after: undefined,
@@ -693,11 +698,19 @@ const VulnTable = ({
             <Box>
               <CustomText>CVSS Vector :</CustomText>
               {vuln?.cvssVector ? (
-                <Tooltip bg='gray.50' label={<CvssCard value={vuln?.cvssVector} />} placement='top'>
-                  <Text mt={1} fontSize={14} cursor={'pointer'}>{vuln?.cvssVector || '-'}</Text>
+                <Tooltip
+                  bg='gray.50'
+                  label={<CvssCard value={vuln?.cvssVector} />}
+                  placement='top'
+                >
+                  <Text mt={1} fontSize={14} cursor={'pointer'}>
+                    {vuln?.cvssVector || '-'}
+                  </Text>
                 </Tooltip>
               ) : (
-                <Text mt={1} fontSize={14} cursor={'pointer'}>{vuln?.cvssVector || '-'}</Text>
+                <Text mt={1} fontSize={14} cursor={'pointer'}>
+                  {vuln?.cvssVector || '-'}
+                </Text>
               )}
             </Box>
             {/* NVD ALIAS ID */}
@@ -861,7 +874,9 @@ const VulnTable = ({
         if (res.data) {
           prodVulnDispatch({
             type: 'ADD_FILTER_HEADS',
-            payload: res.data.sbom.filters
+            payload: signedUrlParams
+              ? res?.data?.shareLynkQuery?.sbom?.filters
+              : res?.data?.sbom?.filters
           })
         }
       })

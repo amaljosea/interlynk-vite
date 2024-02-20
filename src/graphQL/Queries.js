@@ -77,7 +77,7 @@ export const GetOrg = gql`
 
 // GET USER PERMISSIONS
 export const GetUserPermissions = gql`
-  query GetOrganization {
+  query GetUserPermissions {
     organization {
       currentUser {
         role {
@@ -522,6 +522,38 @@ export const GetProjectGroup = gql`
             name
             version
           }
+        }
+      }
+    }
+  }
+`
+
+// GET ACTIVCE PROJECT GROUP FOR PUBLIC VIEW
+export const ShareLynkProjectGroup = gql`
+  query ShareLynkProjectGroup($id: Uuid!) {
+    shareLynkQuery {
+      projectGroup(id: $id) {
+        description
+        enabled
+        id
+        name
+        organizationId
+        updatedAt
+        defaultProject {
+          description
+          enabled
+          id
+          name
+          projectGroupId
+          updatedAt
+        }
+        projects {
+          description
+          enabled
+          id
+          name
+          projectGroupId
+          updatedAt
         }
       }
     }
@@ -1225,7 +1257,6 @@ export const GetVersionsTable = gql`
               compCount
               compLicenseCount
               vulnStats
-              __typename
             }
           }
         }
@@ -1233,6 +1264,55 @@ export const GetVersionsTable = gql`
     }
   }
 `
+
+// GET SHARED PRODUCT VERSION
+export const ShareVersionTable = gql`
+  query ShareVersionTable(
+    $id: Uuid!
+    $first: Int
+    $after: String
+    $last: Int
+    $before: String
+  ) {
+    shareLynkQuery {
+      project(id: $id) {
+        sbomVersions(
+          first: $first
+          after: $after
+          last: $last
+          before: $before
+        ) {
+          totalCount
+          nodes {
+            id
+            creationAt
+            updatedAt
+            lifecycle
+            projectVersion
+            stats {
+              compCount
+              compLicenseCount
+              vulnStats
+            }
+            alternatives {
+              id
+              creationAt
+              updatedAt
+              lifecycle
+              projectVersion
+              stats {
+                compCount
+                compLicenseCount
+                vulnStats
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
 export const GetProductVersions = gql`
   query GetProductVersions($id: Uuid!) {
     project(id: $id) {
@@ -1359,6 +1439,84 @@ export const GetProductData = gql`
   }
 `
 
+// GET SHARE PRODUCT INFO
+export const ShareProductData = gql`
+  query ShareProductData($sbomId: Uuid!) {
+    shareLynkQuery {
+      sbom(id: $sbomId) {
+        id
+        updatedAt
+        projectVersion
+        primaryComponent {
+          id
+          name
+          version
+          primary
+          internal
+          purl
+          cpes
+          licensesExp
+          updatedAt
+          uniqueId
+          kind
+          copyright
+          publisher
+          description
+          licensesExp
+          group
+          scope
+        }
+        stats {
+          compCount
+          compLicenseCount
+          compCpeCount
+          compPurlCount
+          vulnStats
+        }
+        project {
+          id
+          name
+          projectGroup {
+            id
+            name
+          }
+        }
+        lifecycle
+        createdAt
+        creationAt
+        updatedAt
+        licensesExp
+        format
+        spec
+        specVersion
+        tools {
+          id
+          name
+          version
+          vendor
+          updatedAt
+        }
+        project {
+          name
+        }
+        authors {
+          id
+          name
+          email
+          updatedAt
+        }
+        suppliers {
+          id
+          name
+          url
+          contactEmail
+          contactName
+        }
+      }
+    }
+  }
+`
+
 // GET COMPONENT DATA
 export const GetComponentData = gql`
   query GetComponentData(
@@ -1460,6 +1618,73 @@ export const GetComponentData = gql`
   }
 `
 
+export const ShareComponentData = gql`
+  query ShareComponentData(
+    $sbomId: Uuid!
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+    $search: String
+    $licenses: [String!]
+    $supplierName: [String!]
+    $ecosystem: [String!]
+    $kind: [String!]
+    $internal: Boolean
+    $primary: Boolean
+  ) {
+    shareLynkQuery {
+      sbom(id: $sbomId) {
+        components(
+          sbomId: $sbomId
+          after: $after
+          before: $before
+          first: $first
+          last: $last
+          search: $search
+          licenses: $licenses
+          supplierName: $supplierName
+          ecosystem: $ecosystem
+          kind: $kind
+          internal: $internal
+          primary: $primary
+        ) {
+          totalCount
+          nodes {
+            id
+            name
+            version
+            primary
+            internal
+            purl
+            cpes
+            updatedAt
+            uniqueId
+            kind
+            copyright
+            publisher
+            description
+            licensesExp
+            group
+            scope
+            externalUrls {
+              name
+              url
+            }
+            suppliers {
+              id
+              name
+              url
+              contactEmail
+              contactName
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
 // GET COMPONENT DEPENDENCY
 export const GetCompDependency = gql`
   query GetCompDependency($compId: Uuid!, $sbomId: Uuid!) {
@@ -1512,7 +1737,7 @@ export const GetComponentPath = gql`
 
 // GET ALL COMPONENT DATA
 export const GetAllComponents = gql`
-  query GetSbom(
+  query GetAllComponents(
     $projectId: Uuid!
     $sbomId: Uuid!
     $first: Int
@@ -1549,6 +1774,30 @@ export const GetAllComponents = gql`
     }
   }
 `
+// GET ALL SHARE COMPONENTS
+export const AllShareComponents = gql`
+  query AllShareComponents(
+    $sbomId: Uuid!
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+  ) {
+    shareLynkQuery {
+      sbom(id: $sbomId) {
+        components(
+          sbomId: $sbomId
+          after: $after
+          before: $before
+          first: $first
+          last: $last
+        ) {
+          totalCount
+        }
+      }
+    }
+  }
+`
 
 // GET COMPONENT FILTER DATA
 export const GetCompFilterData = gql`
@@ -1560,6 +1809,22 @@ export const GetCompFilterData = gql`
         supplierNames
         kinds
         licenses
+      }
+    }
+  }
+`
+
+// GET SHARE COMPONENT FILTER DATA =
+export const ShareCompFilters = gql`
+  query ShareLynkQuery($sbomId: Uuid!) {
+    shareLynkQuery {
+      sbom(id: $sbomId) {
+        filters {
+          ecosystems
+          supplierNames
+          kinds
+          licenses
+        }
       }
     }
   }
@@ -1676,6 +1941,102 @@ export const GetVulnData = gql`
     }
   }
 `
+// SHARE VULNERABILITIES DATA
+export const ShareVulnData = gql`
+  query ShareVulnData(
+    $sbomId: Uuid!
+    $search: String
+    $severity: [String!]
+    $status: [String!]
+    $componentName: [String!]
+    $source: SbomVulnSourceEnum
+    $kev: Boolean
+    $epss: RangeInput
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+  ) {
+    shareLynkQuery {
+      sbom(id: $sbomId) {
+        vulns(
+          sbomId: $sbomId
+          search: $search
+          severity: $severity
+          status: $status
+          componentName: $componentName
+          vulnerabilitySource: $source
+          kev: $kev
+          epss: $epss
+          after: $after
+          before: $before
+          first: $first
+          last: $last
+        ) {
+          totalCount
+          nodes {
+            id
+            impact
+            isPart
+            isFirstDegreePart
+            cdxResponseId
+            vuln {
+              vulnId
+              desc
+              sev
+              cvssScore
+              cvssVector
+              source
+              publishedAt
+              lastModifiedAt
+              nvdAliasId
+              updatedAt
+            }
+            componentVulnLogs {
+              id
+              changedBy
+              status
+              justification
+              impact
+              note
+              detail
+              response
+              actionStmt
+              fixedIn
+              updatedAt
+            }
+            component {
+              name
+              version
+              sbom {
+                id
+                createdAt
+                projectVersion
+                project {
+                  projectGroup {
+                    name
+                  }
+                }
+                primaryComponent {
+                  name
+                  version
+                }
+              }
+            }
+            vexStatus {
+              id
+              name
+            }
+            vexJustification {
+              id
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+`
 
 // GET VULNERABILITIES FILTER DATA
 export const GetVulnFilterData = gql`
@@ -1686,6 +2047,21 @@ export const GetVulnFilterData = gql`
         vulnCompNames
         vulnSeverities
         vulnStatuses
+      }
+    }
+  }
+`
+
+// GET SHARE VULN FILTER DATA
+export const ShareVulnFilters = gql`
+  query ShareVulnFilters($sbomId: Uuid!) {
+    shareLynkQuery {
+      sbom(id: $sbomId) {
+        filters {
+          vulnCompNames
+          vulnSeverities
+          vulnStatuses
+        }
       }
     }
   }
@@ -1855,6 +2231,34 @@ export const GetProject = gql`
   }
 `
 
+// GET SHARE PROJECT
+export const ShareProject = gql`
+  query ShareProject($id: Uuid!) {
+    shareLynkQuery {
+      project(id: $id) {
+        id
+        name
+        description
+        updatedAt
+        sboms {
+          id
+          spec
+          specVersion
+          updatedAt
+          createdAt
+          creationAt
+          projectVersion
+          primaryComponent {
+            id
+            name
+            version
+          }
+        }
+      }
+    }
+  }
+`
+
 export const GetProjectCheck = gql`
   query GetProjectCheck(
     $id: Uuid!
@@ -2011,21 +2415,41 @@ export const GetAllShareLynks = gql`
 `
 
 // Customer page - Get All shared products
-export const GetSignedProjects = gql`
-  query getSignedProjects($signedParams: String!) {
-    projects(signedParams: $signedParams) {
-      id
-      description
-      name
-      updatedAt
-      sboms {
-        id
-        format
-        updatedAt
-        primaryComponent {
+export const ShareLynkProjectGroups = gql`
+  query ShareLynkProjectGroups(
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+  ) {
+    shareLynkQuery {
+      projectGroups(
+        first: $first
+        last: $last
+        after: $after
+        before: $before
+      ) {
+        totalCount
+        nodes {
           id
           name
-          version
+          enabled
+          defaultProject {
+            id
+          }
+          projects {
+            id
+            name
+            description
+            updatedAt
+            enabled
+            sboms {
+              id
+            }
+          }
+          description
+          enabled
+          updatedAt
         }
       }
     }
@@ -2346,7 +2770,7 @@ export const GetSignedComponentData = gql`
 
 // GET ALL COMPONENT DATA
 export const GetSignedAllComponents = gql`
-  query GetSbom(
+  query GetSignedAllComponents(
     $projectId: Uuid!
     $sbomId: Uuid!
     $signedParams: String!
@@ -2354,8 +2778,6 @@ export const GetSignedAllComponents = gql`
     $last: Int
     $after: String
     $before: String
-    $field: ComponentOrderByFields!
-    $direction: OrderByDirection!
   ) {
     sbom(projectId: $projectId, sbomId: $sbomId, signedParams: $signedParams) {
       id

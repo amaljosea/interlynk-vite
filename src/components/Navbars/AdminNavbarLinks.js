@@ -43,7 +43,6 @@ export default function HeaderLinks(props) {
   const location = useLocation()
   const navigate = useNavigate()
   const { userName, setUserName, envName, setEnvName } = useGlobalState()
-  const { data, error } = useQuery(GetOrg)
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
@@ -53,6 +52,7 @@ export default function HeaderLinks(props) {
 
   const { variant, children, fixed, secondary, onOpen, ...rest } = props
 
+  const { data, error } = useQuery(GetOrg, { skip: signedUrlParams })
 
   const name = localStorage.getItem('username')
   const email = localStorage.getItem('email')
@@ -68,10 +68,10 @@ export default function HeaderLinks(props) {
   }, [])
 
   useEffect(() => {
-    if (!email || error) {
+    if ((!email || error) && location.pathname.startsWith('/vendor')) {
       logoutUser().then((r) => navigate('/auth'))
     }
-  }, [error])
+  }, [error, location])
 
   // Chakra Color Mode
   let navbarIcon = useColorModeValue('gray.500', 'gray.200')

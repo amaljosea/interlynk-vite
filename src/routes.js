@@ -98,7 +98,7 @@ export const customerRoutes = [
     path: '/products',
     name: 'Products',
     icon: <FaWindowMaximize color='inherit' />,
-    component: Products,
+    component: CustomerProducts,
     layout: '/customer'
   }
 ]

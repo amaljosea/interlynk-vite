@@ -108,8 +108,9 @@ export default function Dashboard(props) {
   }, [])
 
   useEffect(() => {
-    if (location.pathname === '/vendor') {
+    if (location.pathname.startsWith('/vendor')) {
       redirect('/vendor/dashboard')
+      sessionStorage.removeItem('signedUrlParams')
     }
   }, [location])
 

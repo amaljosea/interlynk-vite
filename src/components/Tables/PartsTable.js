@@ -142,7 +142,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       .finally(() => onDeleteClose())
   }
 
-  const [getProduct] = useLazyQuery(GetProject)
+  const [getProduct] = useLazyQuery(GetProject, {skip: signedUrlParams ? true : false})
 
   const handleSelectGroup = (e) => {
     const { value } = e.target

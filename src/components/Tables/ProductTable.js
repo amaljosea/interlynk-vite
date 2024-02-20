@@ -81,8 +81,7 @@ const ProductTable = ({ data, refetch }) => {
   const productId = queryParams.get('id')
   const activeEnv = localStorage.getItem('activeEnv')
   const environment = localStorage.getItem('environment')
-  const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : "customer"
-
+  const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
 
   const { userPermissions, setEnvName, setActiveSbomTab, prodState, dispatch } =
     useGlobalState()
@@ -443,18 +442,31 @@ const ProductTable = ({ data, refetch }) => {
           return (
             <Stack direction={'row'} spacing={2} alignItems={'center'}>
               <Tooltip label='Default'>
-                <Link to={`/vendor/products/${name}?id=${id}`} onClick={() => handleClick('default')}>
-                  <IconButton size='sm' colorScheme='blue' icon={<FaInbox />}/>
+                <Link
+                  to={`/vendor/products/${name}?id=${id}`}
+                  onClick={() => handleClick('default')}
+                >
+                  <IconButton size='sm' colorScheme='blue' icon={<FaInbox />} />
                 </Link>
               </Tooltip>
               <Tooltip label='Development'>
-                <Link to={`/vendor/products/${name}?id=${id}`} onClick={() => handleClick('development')} >
+                <Link
+                  to={`/vendor/products/${name}?id=${id}`}
+                  onClick={() => handleClick('development')}
+                >
                   <IconButton size='sm' colorScheme='blue' icon={<FaCode />} />
                 </Link>
               </Tooltip>
               <Tooltip label='Production'>
-                <Link to={`/vendor/products/${name}?id=${id}`} onClick={() => handleClick('production')} >
-                  <IconButton size='sm' colorScheme='blue' icon={<FaSquareArrowUpRight />}/>
+                <Link
+                  to={`/vendor/products/${name}?id=${id}`}
+                  onClick={() => handleClick('production')}
+                >
+                  <IconButton
+                    size='sm'
+                    colorScheme='blue'
+                    icon={<FaSquareArrowUpRight />}
+                  />
                 </Link>
               </Tooltip>
             </Stack>
@@ -469,7 +481,7 @@ const ProductTable = ({ data, refetch }) => {
         selector: (row) => {
           const { projects } = row
           const totalSbom = projects?.reduce(
-            (count, project) => count + project.sboms.length,
+            (count, project) => count + project?.sboms?.length || 0,
             0
           )
           return <Text>{totalSbom || 0}</Text>
@@ -521,7 +533,7 @@ const ProductTable = ({ data, refetch }) => {
                       setActiveRow(row)
                       onOpen()
                     }}
-                    isDisabled={!enabled || signedUrlParams}
+                    isDisabled={!enabled}
                   >
                     Edit Product
                   </MenuItem>
@@ -533,28 +545,24 @@ const ProductTable = ({ data, refetch }) => {
                       setActiveRow(row)
                       onOpenUpload()
                     }}
-                    isDisabled={
-                      !enabled || !canUpdateProduct || signedUrlParams
-                    }
+                    isDisabled={!enabled || !canUpdateProduct}
                   >
                     Upload SBOM
                   </MenuItem>
                   {/* BUILD SBOM */}
                   <MenuItem
                     onClick={() => handleOpenSbom(row)}
-                    isDisabled={!enabled || signedUrlParams}
+                    isDisabled={!enabled}
                   >
                     Build Version
                   </MenuItem>
                   {/* VIEW SHARELYNK */}
-                  {!signedUrlParams && (
-                    <MenuItem
-                      isDisabled={!enabled}
-                      onClick={() => onSharelynkOpen(row)}
-                    >
-                      View ShareLynk
-                    </MenuItem>
-                  )}
+                  <MenuItem
+                    isDisabled={!enabled}
+                    onClick={() => onSharelynkOpen(row)}
+                  >
+                    View ShareLynk
+                  </MenuItem>
                   <Divider />
                   {/* ARCHIVE PRODUCT GROUP */}
                   <MenuItem
@@ -563,7 +571,7 @@ const ProductTable = ({ data, refetch }) => {
                       setActiveRow(row)
                       onDeleteOpen()
                     }}
-                    isDisabled={!canArchiveProduct || signedUrlParams}
+                    isDisabled={!canArchiveProduct}
                   >
                     Archive Product
                   </MenuItem>
@@ -572,7 +580,8 @@ const ProductTable = ({ data, refetch }) => {
             </Menu>
           )
         },
-        right: 'true'
+        right: 'true',
+        omit: signedUrlParams
       }
     ],
     [setActiveRow, onWarningOpen, canArchiveProduct]
@@ -679,12 +688,12 @@ const ProductTable = ({ data, refetch }) => {
       <Card>
         <Flex flexDir={'column'} width={'100%'}>
           <DataTable {...dataTableProps} />
-          {data && (
+          {data?.pageInfo && (
             <Pagination
               paginationSizes={paginationSizes}
               pageIndex={pageIndex}
               totalRows={totalRows}
-              totalCount={data.totalCount}
+              totalCount={data?.totalCount}
               onPreviousPage={handlePreviousPage}
               onNextPage={handleNextPage}
               onSetRow={handleSetRow}

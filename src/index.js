@@ -27,6 +27,10 @@ import Cookies from 'js-cookie'
 import theme from 'theme/theme.js'
 import ChatbotPreview from 'components/ChatbotPreview'
 
+import PubProducts from 'views/Customer/Products'
+import PubProductList from 'views/Customer/Products/ProductList'
+import PubProductDetails from 'views/Customer/Products/ProductDetails'
+
 const authToken = Cookies.get('authToken')
 const env = process.env.NODE_ENV
 
@@ -83,16 +87,6 @@ ReactDOM.render(
             <Route path={`accept-user-invitation`} element={<Success />} />
             <Route path={`confirmation`} element={<Success />} />
             <Route path={`vendor`} element={<AdminLayout />}>
-              <Route
-                path=''
-                element={
-                  location.pathname === '/vendor' ? (
-                    <Navigate replace to='/vendor/dashboard' />
-                  ) : (
-                    <Navigate replace to={location.pathname} />
-                  )
-                }
-              />
               <Route path={`dashboard`} element={<Dashboard />} />
               <Route path={`products`} element={<Products />}>
                 <Route index element={<ProductList />} />
@@ -114,14 +108,10 @@ ReactDOM.render(
                   )
                 }
               />
-              <Route path={`dashboard`} element={<Dashboard />} />
-              <Route path={`products`} element={<Products />}>
-                <Route index element={<ProductList />} />
-                <Route path={`:name`} element={<ProductDetails />} />
+              <Route path={`products`} element={<PubProducts />}>
+                <Route index element={<PubProductList />} />
+                <Route path={`:name`} element={<PubProductDetails />} />
               </Route>
-              <Route path={`vulnerabilities`} element={<Vulnerabilities />} />
-              <Route path={`licenses`} element={<Licenses />} />
-              <Route path={`settings`} element={<Profile />} />
             </Route>
             <Route path={`register`} element={<Register />} />
           </Routes>

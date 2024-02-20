@@ -50,6 +50,7 @@ import SearchFilter from 'views/Sbom/components/SearchFilter'
 import Pagination from '../Pagination'
 import PurlCard from 'components/Misc/PurlCard'
 import CpeCard from 'components/Misc/CpeCard'
+import { ShareCompFilters } from 'graphQL/Queries'
 
 const ComponentTable = ({
   lifecycle,
@@ -77,7 +78,9 @@ const ComponentTable = ({
   //end
 
   // GET COMPONENT FILTER HEADS
-  const [getCompFilters] = useLazyQuery(GetCompFilterData)
+  const [getCompFilters] = useLazyQuery(
+    signedUrlParams ? ShareCompFilters : GetCompFilterData
+  )
 
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -961,7 +964,7 @@ const ComponentTable = ({
     if (event.key === 'Enter' && value !== '') {
       disablePaginationControl()
       await refetch({
-        projectId: productId,
+        projectId: signedUrlParams ? undefined : productId,
         sbomId: sbomId,
         search: value,
         ecosystem:
@@ -979,8 +982,8 @@ const ComponentTable = ({
             : suppliers,
         primary: scope === 'primary' ? true : undefined,
         internal: scope === 'internal' ? true : undefined,
-        field: field,
-        direction: direction,
+        field: signedUrlParams ? undefined : field,
+        direction: signedUrlParams ? undefined : direction,
         first: totalRows,
         last: undefined,
         after: undefined,
@@ -1192,7 +1195,9 @@ const ComponentTable = ({
         if (res.data) {
           prodCompDispatch({
             type: 'ADD_FILTER_HEADS',
-            payload: res.data.sbom.filters
+            payload: signedUrlParams
+              ? res?.data?.shareLynkQuery?.sbom?.filters
+              : res?.data?.sbom?.filters
           })
         }
       })

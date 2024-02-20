@@ -18,6 +18,7 @@ import { permissionList } from 'utils'
 
 export default function AdminNavbar(props) {
   const { setUserPermissions, setActiveSbomTab } = useGlobalState()
+  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
   function parseJSONSafely(str) {
     try {
@@ -29,7 +30,7 @@ export default function AdminNavbar(props) {
     }
   }
 
-  const { data } = useQuery(GetUserPermissions)
+  const { data } = useQuery(GetUserPermissions, { skip: signedUrlParams })
 
   useEffect(() => {
     if (data) {
@@ -51,7 +52,7 @@ export default function AdminNavbar(props) {
   const parts = queryParams.get('parts')
   const sbomId = queryParams.get('sbom')
   const vulnId = queryParams.get('vulnId')
-  const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : "customer"
+  const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
 
   const activeVuln = localStorage.getItem('activeVuln')
   const activeEnv = localStorage.getItem('activeEnv')

@@ -33,6 +33,9 @@ import SigningModal from './SigningModal'
 import { sbomDelete } from 'graphQL/Mutation'
 import DownloadModal from './DownloadModal'
 import { GetCompFilterData } from 'graphQL/Queries'
+import { ShareCompFilters } from 'graphQL/Queries'
+import { ShareProject } from 'graphQL/Queries'
+import { AllShareComponents } from 'graphQL/Queries'
 
 const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
@@ -86,7 +89,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
   const product = JSON.parse(localStorage.getItem('product'))
-  const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : "customer"
+  const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
 
   const [status, setStatus] = useState('created')
   const [signedData, setSignedData] = useState(null)
@@ -102,14 +105,18 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
   const initialRef = useRef(null)
   const finalRef = useRef(null)
 
-  const { data } = useQuery(GetProject, {
+  const { data } = useQuery(signedUrlParams ? ShareProject : GetProject, {
     variables: {
       id: productId
     }
   })
 
-  const [getAllComps, { data: allComponents }] = useLazyQuery(GetAllComponents)
-  const [getCompFilters] = useLazyQuery(GetCompFilterData)
+  const [getAllComps, { data: allComponents }] = useLazyQuery(
+    signedUrlParams ? AllShareComponents : GetAllComponents
+  )
+  const [getCompFilters] = useLazyQuery(
+    signedUrlParams ? ShareCompFilters : GetCompFilterData
+  )
 
   const [deleteSbom] = useMutation(sbomDelete)
 
@@ -150,11 +157,29 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
     ? data?.project?.sboms.find((item) => item.id === sbomId)
     : []
 
+  const shareFilterVersion = data
+    ? data?.shareLynkQuery?.project?.sboms.find((item) => item.id === sbomId)
+    : []
+
   const uniqVersions = []
+  const uniqShareVersions = []
 
   data?.project?.sboms?.length > 0 &&
     data.project.sboms.map((project) => {
       uniqVersions.push({
+        label: project?.projectVersion,
+        value: project?.id
+      })
+    })
+
+  const isSearchable =
+    filterVersion && filterVersion?.primaryComponent ? true : false
+  const isShareSearchable =
+    shareFilterVersion && shareFilterVersion?.primaryComponent ? true : false
+
+  data?.shareLynkQuery?.project?.sboms?.length > 0 &&
+    data.shareLynkQuery?.project.sboms.map((project) => {
+      uniqShareVersions.push({
         label: project?.projectVersion,
         value: project?.id
       })
@@ -198,11 +223,11 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
     } else {
       getAllComps({
         variables: {
-          projectId: productId,
+          projectId: signedUrlParams ? undefined : productId,
+          field: signedUrlParams ? undefined : 'COMPONENTS_UPDATED_AT',
+          direction: signedUrlParams ? undefined : 'DESC',
           sbomId: sbomId,
-          first: 100,
-          field: field,
-          direction: direction
+          first: 100
         }
       }).then(() => {
         setActiveSbomTab(2)
@@ -294,13 +319,11 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
             value={selectedVersion}
             onChange={handleSBOMChange}
             className='react-select'
-            isSearchable={
-              filterVersion && filterVersion.primaryComponent ? true : false
-            }
+            isSearchable={signedUrlParams ? isShareSearchable : isSearchable}
             type='text'
             placeholder='Search versions'
             name='versions'
-            options={uniqVersions}
+            options={signedUrlParams ? uniqShareVersions : uniqVersions}
             noOptionsMessage={() => null}
           />
         </Flex>
@@ -308,7 +331,8 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
         {/* UPDATE PRIMARY COMPONENT */}
         <Tooltip label='Edit'>
           <IconButton
-            isDisabled={status === 'signed' || !updateSboms || signedUrlParams}
+            display={signedUrlParams ? 'none' : 'flex'}
+            isDisabled={status === 'signed' || !updateSboms}
             colorScheme='blue'
             icon={<EditIcon />}
             onClick={handleEditSbom}
@@ -319,6 +343,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
         {status === 'signed' ? (
           <Tooltip label='Signed'>
             <IconButton
+              display={signedUrlParams ? 'none' : 'flex'}
               colorScheme='blue'
               icon={<TbSignature size={22} />}
               onClick={setVerifyOpen}
@@ -329,6 +354,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
         ) : (
           <Tooltip label='Unsigned'>
             <IconButton
+              display={signedUrlParams ? 'none' : 'flex'}
               colorScheme='blue'
               icon={<TbSignatureOff size={22} />}
               onClick={setVerifyOpen}
@@ -351,10 +377,11 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
         {/* DELETE SBOM */}
         <Tooltip label='Delete'>
           <IconButton
+            display={signedUrlParams ? 'none' : 'flex'}
             colorScheme='red'
             icon={<DeleteIcon />}
             onClick={setDeleteOpen}
-            isDisabled={!archiveSboms || signedUrlParams}
+            isDisabled={!archiveSboms}
           ></IconButton>
         </Tooltip>
       </Flex>

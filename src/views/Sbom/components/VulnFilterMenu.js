@@ -18,6 +18,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useRef } from 'react'
 
 const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
+  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const { totalRows, prodVulnState, dispatch } = useGlobalState()
   const {
     field,
@@ -71,7 +72,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
     }
 
     await refetch({
-      projectId: productId,
+      projectId: signedUrlParams ? undefined : productId,
       sbomId: sbomId,
       source: source === 'BOTH' || source === '' ? undefined : source,
       severity:
@@ -87,29 +88,29 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       last: undefined,
       after: undefined,
       before: undefined,
-      field: field,
-      direction: direction
+      field: signedUrlParams ? undefined : field,
+      direction: signedUrlParams ? undefined : direction
     })
   }
 
   const onFilterSource = (value) => {
     handleRefetch(value, severities, components, statues, kev, epss)
-    prodVulnDispatch({type: 'FILTER_SOURCE',payload: value})
+    prodVulnDispatch({ type: 'FILTER_SOURCE', payload: value })
   }
 
   const onFilterCompName = (value) => {
     handleRefetch(source, severities, value, statues, kev, epss)
-    prodVulnDispatch({type: 'FILTER_COMPONENT',payload: value})
+    prodVulnDispatch({ type: 'FILTER_COMPONENT', payload: value })
   }
 
   const onFilterSeverity = (value) => {
     handleRefetch(source, value, components, statues, kev, epss)
-    prodVulnDispatch({type: 'FILTER_SEVERITY',payload: value})
+    prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
   }
 
   const onFilterStatus = (value) => {
     handleRefetch(source, severities, components, value, kev, epss)
-    prodVulnDispatch({type: 'FILTER_STATUS',payload: value})
+    prodVulnDispatch({ type: 'FILTER_STATUS', payload: value })
   }
 
   const onFilterKev = (value) => {
@@ -123,7 +124,14 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
   }
 
   const handleSubmit = () => {
-    handleRefetch(source,severities,components,statues,kev,`${minEpss}-${maxEpss}`)
+    handleRefetch(
+      source,
+      severities,
+      components,
+      statues,
+      kev,
+      `${minEpss}-${maxEpss}`
+    )
     prodVulnDispatch({ type: 'SET_EPSS', payload: `${minEpss}-${maxEpss}` })
     onClose()
   }
@@ -134,14 +142,30 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
           {source !== '' && source !== 'BOTH' && <CheckMark />}
-          <MenuButton as={Button} colorScheme='blue' fontWeight='normal' fontSize={'sm'} leftIcon={<FaFilter size={14} />}>
+          <MenuButton
+            as={Button}
+            colorScheme='blue'
+            fontWeight='normal'
+            fontSize={'sm'}
+            leftIcon={<FaFilter size={14} />}
+          >
             Origin
           </MenuButton>
           <MenuList>
-            <MenuOptionGroup type='radio' value={source} onChange={onFilterSource}>
-              <MenuItemOption value={'BOTH'} fontSize={'sm'}>Both</MenuItemOption>
-              <MenuItemOption value={'COMPONENT'} fontSize={'sm'}>Component</MenuItemOption>
-              <MenuItemOption value={'PART'} fontSize={'sm'}>Part</MenuItemOption>
+            <MenuOptionGroup
+              type='radio'
+              value={source}
+              onChange={onFilterSource}
+            >
+              <MenuItemOption value={'BOTH'} fontSize={'sm'}>
+                Both
+              </MenuItemOption>
+              <MenuItemOption value={'COMPONENT'} fontSize={'sm'}>
+                Component
+              </MenuItemOption>
+              <MenuItemOption value={'PART'} fontSize={'sm'}>
+                Part
+              </MenuItemOption>
             </MenuOptionGroup>
           </MenuList>
         </Menu>
@@ -150,16 +174,31 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={false}>
           {severities.length !== 0 && <CheckMark />}
-          <MenuButton as={Button} colorScheme='blue' fontWeight='normal' fontSize={'sm'} leftIcon={<FaFilter size={14} />}>
+          <MenuButton
+            as={Button}
+            colorScheme='blue'
+            fontWeight='normal'
+            fontSize={'sm'}
+            leftIcon={<FaFilter size={14} />}
+          >
             Severity
           </MenuButton>
           <MenuList>
-            <MenuOptionGroup type='checkbox' value={severities} onChange={onFilterSeverity}>
+            <MenuOptionGroup
+              type='checkbox'
+              value={severities}
+              onChange={onFilterSeverity}
+            >
               <MenuItemOption value={'all'} fontSize={'sm'}>
                 All
               </MenuItemOption>
               {vulnSeverities?.map((item, index) => (
-                <MenuItemOption key={index} value={item} fontSize={'sm'} textTransform={'capitalize'} >
+                <MenuItemOption
+                  key={index}
+                  value={item}
+                  fontSize={'sm'}
+                  textTransform={'capitalize'}
+                >
                   {item}
                 </MenuItemOption>
               ))}
@@ -171,16 +210,36 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={false}>
           {components.length !== 0 && <CheckMark />}
-          <MenuButton as={Button} colorScheme='blue' fontWeight='normal' fontSize={'sm'} leftIcon={<FaFilter size={14} />}>
+          <MenuButton
+            as={Button}
+            colorScheme='blue'
+            fontWeight='normal'
+            fontSize={'sm'}
+            leftIcon={<FaFilter size={14} />}
+          >
             Component
           </MenuButton>
-          <MenuList minHeight={'auto'} maxHeight={'300px'} overflow={'hidden'} overflowY={'scroll'}>
-            <MenuOptionGroup type='checkbox' value={components} onChange={onFilterCompName} >
+          <MenuList
+            minHeight={'auto'}
+            maxHeight={'300px'}
+            overflow={'hidden'}
+            overflowY={'scroll'}
+          >
+            <MenuOptionGroup
+              type='checkbox'
+              value={components}
+              onChange={onFilterCompName}
+            >
               <MenuItemOption value={'all'} fontSize={'sm'}>
                 All
               </MenuItemOption>
               {vulnCompNames?.map((item, index) => (
-                <MenuItemOption key={index} value={item} fontSize={'sm'} textTransform={'capitalize'}>
+                <MenuItemOption
+                  key={index}
+                  value={item}
+                  fontSize={'sm'}
+                  textTransform={'capitalize'}
+                >
                   {item}
                 </MenuItemOption>
               ))}
@@ -192,16 +251,36 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={false}>
           {statues.length !== 0 && <CheckMark />}
-          <MenuButton as={Button} colorScheme='blue' fontWeight='normal' fontSize={'sm'} leftIcon={<FaFilter size={14} />}>
+          <MenuButton
+            as={Button}
+            colorScheme='blue'
+            fontWeight='normal'
+            fontSize={'sm'}
+            leftIcon={<FaFilter size={14} />}
+          >
             Status
           </MenuButton>
-          <MenuList minHeight={'auto'} maxHeight={'300px'} overflow={'hidden'} overflowY={'scroll'}>
-            <MenuOptionGroup type='checkbox' value={statues} onChange={onFilterStatus}>
+          <MenuList
+            minHeight={'auto'}
+            maxHeight={'300px'}
+            overflow={'hidden'}
+            overflowY={'scroll'}
+          >
+            <MenuOptionGroup
+              type='checkbox'
+              value={statues}
+              onChange={onFilterStatus}
+            >
               <MenuItemOption value={'all'} fontSize={'sm'}>
                 All
               </MenuItemOption>
               {vulnStatuses?.map((item, index) => (
-                <MenuItemOption key={index} value={item} fontSize={'sm'} textTransform={'capitalize'}>
+                <MenuItemOption
+                  key={index}
+                  value={item}
+                  fontSize={'sm'}
+                  textTransform={'capitalize'}
+                >
                   {item}
                 </MenuItemOption>
               ))}
@@ -213,13 +292,24 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={false}>
           {kev !== 'all' && kev !== '' && <CheckMark />}
-          <MenuButton as={Button} colorScheme='blue' fontWeight='normal' fontSize={'sm'} leftIcon={<FaFilter size={14} />}>
+          <MenuButton
+            as={Button}
+            colorScheme='blue'
+            fontWeight='normal'
+            fontSize={'sm'}
+            leftIcon={<FaFilter size={14} />}
+          >
             KEV
           </MenuButton>
           <MenuList>
             <MenuOptionGroup type='radio' value={kev} onChange={onFilterKev}>
               {['all', 'yes', 'no'].map((item, index) => (
-                <MenuItemOption key={index} value={item} fontSize={'sm'} textTransform={'capitalize'}>
+                <MenuItemOption
+                  key={index}
+                  value={item}
+                  fontSize={'sm'}
+                  textTransform={'capitalize'}
+                >
                   {item}
                 </MenuItemOption>
               ))}
@@ -231,7 +321,14 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={false} isOpen={isOpen} onClose={onClose}>
           {epss !== '' && epss !== 'all' && <CheckMark />}
-          <MenuButton as={Button} colorScheme='blue' fontWeight='normal' fontSize={'sm'} leftIcon={<FaFilter size={14} />} onClick={onOpen}>
+          <MenuButton
+            as={Button}
+            colorScheme='blue'
+            fontWeight='normal'
+            fontSize={'sm'}
+            leftIcon={<FaFilter size={14} />}
+            onClick={onOpen}
+          >
             EPSS*
           </MenuButton>
           <MenuList>
@@ -286,7 +383,13 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
                   }
                 />
               </Stack>
-              <Button ml={8} my={2} size='sm' onClick={handleSubmit} isDisabled={Number(maxEpss) <= Number(minEpss) || maxEpss === 0}>
+              <Button
+                ml={8}
+                my={2}
+                size='sm'
+                onClick={handleSubmit}
+                isDisabled={Number(maxEpss) <= Number(minEpss) || maxEpss === 0}
+              >
                 Submit
               </Button>
             </Flex>

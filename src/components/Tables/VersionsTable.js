@@ -40,20 +40,27 @@ import { Link, useLocation, useParams } from 'react-router-dom'
 import { timeSince, getFullDateAndTime, customStyles } from 'utils'
 import SbomList from 'views/Dashboard/Products/components/SbomList'
 import Pagination from '../Pagination'
-import { GetVersionsTable } from '../../graphQL/Queries'
+import { GetVersionsTable, ShareVersionTable } from 'graphQL/Queries'
 
 const VersionsTable = ({ projectGroup, getVulnData }) => {
   const location = useLocation()
-  const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : "customer"
+  const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const activeProd = localStorage.getItem('activeEnv')
-  const { data, refetch } = useQuery(GetVersionsTable, {
-    fetchPolicy: 'network-only',
-    variables: {
-      id: activeProd
+
+  const { data, refetch, error } = useQuery(
+    signedUrlParams ? ShareVersionTable : GetVersionsTable,
+    {
+      fetchPolicy: 'network-only',
+      variables: {
+        id: activeProd
+      }
     }
-  })
-  const versions = data?.project?.sbomVersions
+  )
+
+  const versions = signedUrlParams
+    ? data?.shareLynkQuery?.project?.sbomVersions
+    : data?.project?.sbomVersions
 
   //This part is needed for the pagination to work. (Modify with caution)
   const paginationSizes = [25, 50, 100]
@@ -181,8 +188,8 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
       last: undefined,
       after: undefined,
       before: undefined,
-      field: field,
-      direction: direction
+      field: signedUrlParams ? undefined : field,
+      direction: signedUrlParams ? undefined : direction
     }).then((res) => {
       if (res.data) {
         localStorage.setItem(
@@ -227,6 +234,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
       wrap: true,
       width: '250px'
     },
+    // COMPONENTS
     {
       id: 'COMPONENTS',
       name: 'COMPONENTS',
@@ -256,6 +264,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
       },
       width: '150px'
     },
+    // LICENSES
     {
       id: 'LICENSES',
       name: 'LICENSES',
@@ -269,6 +278,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
       },
       width: '150px'
     },
+    // VULNERABILITIES
     {
       id: 'VULNERABILITIES',
       name: 'VULNERABILITIES',
@@ -322,6 +332,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
       },
       width: '360px'
     },
+    // STATUS
     {
       id: 'STATUS',
       name: 'STATUS',
@@ -335,6 +346,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
         )
       }
     },
+    // CREATED AT
     {
       id: 'CREATEDAT',
       name: 'CREATED',
@@ -349,6 +361,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
       },
       right: 'false'
     },
+    // UPDATED AT
     {
       id: 'UPDATED_AT',
       name: 'UPDATED',
@@ -370,6 +383,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
       },
       right: 'false'
     },
+    // ACTIONS
     {
       id: 'ACTION',
       name: 'ACTION',
@@ -385,7 +399,6 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
             <Portal>
               <MenuList fontSize={16}>
                 <MenuItem
-                  isDisabled={signedUrlParams}
                   onClick={() => {
                     setActiveRow(row)
                     onListOpen()
@@ -492,11 +505,18 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
     persistTableHead: true
   }
 
+  if (error)
+    return (
+      <Text textAlign={'center'} my={2}>
+        Something went wrong
+      </Text>
+    )
+
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable {...dataTableProps} />
-        {versions && (
+        {versions?.pageInfo && (
           <Pagination
             paginationSizes={paginationSizes}
             pageIndex={currentPage}
