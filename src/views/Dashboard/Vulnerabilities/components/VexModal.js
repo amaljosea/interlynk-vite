@@ -428,7 +428,7 @@ const VexModal = ({
             </FormControl>
             {/* UPSTERAM PRODUCT */}
             <FormControl>
-              <Checkbox size='sm' isChecked={upstream}>
+              <Checkbox size='sm' isChecked={upstream} onChange={(e) => setUpstream(e.target.checked)}>
                 Also update upstream products
               </Checkbox>
             </FormControl>
