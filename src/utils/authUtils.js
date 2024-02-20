@@ -19,6 +19,7 @@ export const logoutUser = async () => {
     } finally {
         // Clear client-side storage and cookies regardless of server response
         localStorage.clear();
+        sessionStorage.clear();
         Cookies.remove('authToken');
         Cookies.remove('signedParamId');
         Cookies.remove('userToken');
