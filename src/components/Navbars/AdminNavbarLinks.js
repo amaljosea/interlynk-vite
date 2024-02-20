@@ -121,7 +121,7 @@ export default function HeaderLinks(props) {
   return (
     <Flex gap={4} alignItems='center' flexDirection='row'>
       {/* ENVIRONMENT */}
-      {(dashboardView || location?.pathname?.startsWith('/vendor/products')) && (
+      {(dashboardView || productId) && (
         <Menu closeOnSelect={true}>
           <MenuButton
             as={Button}
