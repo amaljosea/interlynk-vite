@@ -207,7 +207,7 @@ export default function AdminNavbar(props) {
                 <BreadcrumbLink
                   href={
                     parts
-                      ? `/vendor/products/${currentProduct?.name}?id=${activeEnv}&sbom=${currentSBOM?.id}`
+                      ? `/${path}/products/${currentProduct?.name}?id=${activeEnv}&sbom=${currentSBOM?.id}`
                       : ''
                   }
                   onClick={() => {

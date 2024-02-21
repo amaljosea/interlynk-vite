@@ -14,11 +14,12 @@ const VulLinkRow = ({
   impact,
   onSelect
 }) => {
+  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   return (
     <Tr>
       <Td fontSize={'xs'} pl={0}>
         <Flex flexDir={'row'} alignItems={'center'} gap={2}>
-          <FaExpand cursor={'pointer'} onClick={onSelect} />
+          {!signedUrlParams && <FaExpand cursor={'pointer'} onClick={onSelect} />}
           {status}
         </Flex>
       </Td>

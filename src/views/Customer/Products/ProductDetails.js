@@ -97,6 +97,16 @@ const ProductDetails = () => {
     }
   }, [sbomId])
 
+  useEffect(() => {
+    if (environment && data) {
+      const env = data?.shareLynkQuery?.projectGroup?.projects.find(
+        (item) => item.name === environment
+      )
+      localStorage.setItem('activeEnv', env?.id)
+      setActiveEnv(env?.id)
+    }
+  }, [environment])
+
   if (loading) {
     return (
       <Card>

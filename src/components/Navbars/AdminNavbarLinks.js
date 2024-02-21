@@ -38,6 +38,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { logoutUser } from 'utils/authUtils'
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import { GetProjectGroup } from 'graphQL/Queries'
+import { ShareLynkProjectGroup } from 'graphQL/Queries'
 
 export default function HeaderLinks(props) {
   const location = useLocation()
@@ -49,6 +50,7 @@ export default function HeaderLinks(props) {
   const group = JSON.parse(localStorage.getItem('product'))
   const dashboardView = location.pathname === '/vendor/dashboard'
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+  const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
 
   const { variant, children, fixed, secondary, onOpen, ...rest } = props
 
@@ -87,9 +89,12 @@ export default function HeaderLinks(props) {
 
   const shortcuts = [{ key: 'Ctrl + /', title: 'Search' }]
 
-  const [getProdGroup] = useLazyQuery(GetProjectGroup, {
-    fetchPolicy: 'network-only'
-  })
+  const [getProdGroup] = useLazyQuery(
+    signedUrlParams ? ShareLynkProjectGroup : GetProjectGroup,
+    {
+      fetchPolicy: 'network-only'
+    }
+  )
 
   const handleEnvChange = (value) => {
     localStorage.setItem('environment', value)
@@ -97,11 +102,19 @@ export default function HeaderLinks(props) {
     if (sbomId) {
       getProdGroup({ variables: { id: group?.id } }).then((res) => {
         if (res?.data) {
-          const env = res?.data?.projectGroup?.projects?.find(
-            (item) => item.name === value
-          )
-          localStorage.setItem('activeEnv', env?.id)
-          navigate(`/vendor/products/${group?.name}?id=${group?.id}`)
+          if (signedUrlParams) {
+            const env = res?.data?.shareLynkQuery?.projectGroup?.projects?.find(
+              (item) => item.name === value
+            )
+            localStorage.setItem('activeEnv', env?.id)
+            navigate(`/customer/products/${group?.name}?id=${group?.id}`)
+          } else {
+            const env = res?.data?.projectGroup?.projects?.find(
+              (item) => item.name === value
+            )
+            localStorage.setItem('activeEnv', env?.id)
+            navigate(`/vendor/products/${group?.name}?id=${group?.id}`)
+          }
         }
       })
     }

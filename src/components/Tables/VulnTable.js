@@ -908,12 +908,12 @@ const VulnTable = ({
       </Flex>
 
       {/* PAGINATION */}
-      {data && (
+      {data?.pageInfo && (
         <Pagination
           paginationSizes={paginationSizes}
           pageIndex={pageIndex}
           totalRows={totalRows}
-          totalCount={data.totalCount}
+          totalCount={data?.totalCount}
           onPreviousPage={handlePreviousPage}
           onNextPage={handleNextPage}
           onSetRow={handleSetRow}

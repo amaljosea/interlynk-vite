@@ -43,6 +43,7 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
     prodCompState,
     prodVulnState,
     setActiveSbomTab,
+    setActiveCsSbomTab,
     dispatch
   } = useGlobalState()
   const { prodCompDispatch, prodVulnDispatch } = dispatch
@@ -62,7 +63,7 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
   const onSelectComp = () => {
     const { field, direction } = prodCompState
     getCompData({
-      projectId: productId,
+      projectId: signedUrlParams ? undefined : productId,
       sbomId: sbomId,
       first: totalRows,
       last: undefined,
@@ -75,11 +76,15 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
       supplierName: undefined,
       primary: undefined,
       internal: undefined,
-      field: field,
-      direction: direction
+      field: signedUrlParams ? undefined : field,
+      direction: signedUrlParams ? undefined : direction
     }).then((res) => {
       if (res.data) {
-        setActiveSbomTab(2)
+        if (signedUrlParams) {
+          setActiveCsSbomTab(1)
+        } else {
+          setActiveSbomTab(2)
+        }
         prodCompDispatch({ type: 'CLEAR_PROD_COMP' })
       }
     })
@@ -89,18 +94,22 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
     const { field, direction } = prodVulnState
     prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
     getVulnData({
-      projectId: productId,
+      projectId: signedUrlParams ? undefined : productId,
       sbomId: sbomId,
       severity: value || undefined,
       first: totalRows,
       last: undefined,
       after: undefined,
       before: undefined,
-      field: field,
-      direction: direction
+      field: signedUrlParams ? undefined : field,
+      direction: signedUrlParams ? undefined : direction
     }).then((res) => {
       if (res.data) {
-        setActiveSbomTab(3)
+        if (signedUrlParams) {
+          setActiveCsSbomTab(2)
+        } else {
+          setActiveSbomTab(3)
+        }
         prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value || [] })
       }
     })

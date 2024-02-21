@@ -21,7 +21,7 @@ const ProductList = () => {
   if (error) {
     return (
       <Card>
-        <Flex my={32} alignItems={'center'} justifyContent={'center'}>
+        <Flex my={24} alignItems={'center'} justifyContent={'center'}>
           <WarningTwoIcon color='blue.500' />
           <Text textAlign={'center'} fontSize={14}>
             {displayErrorMessage(error.networkError?.statusCode, error.message)}

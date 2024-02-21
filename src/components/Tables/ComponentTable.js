@@ -1111,8 +1111,8 @@ const ComponentTable = ({
           : suppliers,
       primary: scope === 'primary' ? true : undefined,
       internal: scope === 'internal' ? true : undefined,
-      field: field,
-      direction: direction
+      field: signedUrlParams ? undefined : field,
+      direction: signedUrlParams ? undefined : direction
     }).then((res) => {
       if (res.data) {
         setPaginationControl(res.data)
@@ -1227,7 +1227,7 @@ const ComponentTable = ({
       </Flex>
 
       {/* PAGINATION */}
-      {data && (
+      {data?.pageInfo && (
         <Pagination
           paginationSizes={paginationSizes}
           pageIndex={pageIndex}

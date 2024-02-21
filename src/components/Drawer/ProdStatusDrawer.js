@@ -35,7 +35,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
-  const { data: res } = useQuery(GetCdxResponses)
+  const { data: res } = useQuery(GetCdxResponses, {skip: signedUrlParams})
 
   const { totalRows, userPermissions, prodVulnState, dispatch } =
     useGlobalState()
@@ -74,8 +74,8 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
   const [statusResults, setStatusResults] = useState([])
   const [newVulnLogs, setNewVulnLogs] = useState([])
 
-  const { data: allVexStatus } = useQuery(getVexStatuses)
-  const { data: allVexJustify } = useQuery(getVexJustifications)
+  const { data: allVexStatus } = useQuery(getVexStatuses,{skip: signedUrlParams})
+  const { data: allVexJustify } = useQuery(getVexJustifications,{skip: signedUrlParams})
 
   const handleRefetch = async () => {
     const epssRange = (epss !== '' || epss !== '0-0') && epss.split('-')

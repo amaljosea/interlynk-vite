@@ -203,7 +203,7 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
           <MenuList
             width={'300px'}
             minH='auto'
-            maxH={'500px'}
+            maxH={'350px'}
             overflowY={'scroll'}
           >
             <MenuOptionGroup

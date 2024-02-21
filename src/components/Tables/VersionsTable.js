@@ -181,7 +181,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
 
   const onFilterSev = async (id, version, value) => {
     await getVulnData({
-      projectId: activeProd,
+      projectId: signedUrlParams ? undefined : activeProd,
       sbomId: id,
       severity: value,
       first: totalRows,
@@ -196,7 +196,11 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
           'currentSBOM',
           JSON.stringify({ version: version, id: id })
         )
-        localStorage.setItem('activeSbomTab', 3)
+        if (signedUrlParams) {
+          localStorage.setItem('activeCsSbomTab', 2)
+        } else {
+          localStorage.setItem('activeSbomTab', 3)
+        }
         prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
       }
     })
@@ -254,7 +258,11 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
                   'currentSBOM',
                   JSON.stringify({ version: projectVersion, id: id })
                 )
-                localStorage.setItem('activeSbomTab', 2)
+                if (signedUrlParams) {
+                  localStorage.setItem('activeCsSbomTab', 1)
+                } else {
+                  localStorage.setItem('activeSbomTab', 2)
+                }
               }}
             >
               <TagLabel mx={'auto'}>{stats?.compCount}</TagLabel>

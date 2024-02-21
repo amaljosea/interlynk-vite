@@ -199,11 +199,11 @@ const ProductTable = ({ data, refetch }) => {
     disablePaginationControl()
     await refetch({
       first: totalRows,
-      field,
-      direction
+      field: signedUrlParams ? undefined : field,
+      direction: signedUrlParams ? undefined : direction
     }).then((res) => {
       if (res.data) {
-        setPaginationControl(res.data)
+        setPaginationControl(res?.data)
       }
     })
   }, [refetch, totalRows, field, direction])
@@ -217,8 +217,8 @@ const ProductTable = ({ data, refetch }) => {
       last: undefined,
       after: undefined,
       before: undefined,
-      field: field,
-      direction: direction
+      field: signedUrlParams ? undefined : field,
+      direction: signedUrlParams ? undefined : direction
     }).then((res) => {
       if (res.data) {
         setPaginationControl(res.data)
@@ -250,8 +250,8 @@ const ProductTable = ({ data, refetch }) => {
           last: undefined,
           after: undefined,
           before: undefined,
-          field: field,
-          direction: direction
+          field: signedUrlParams ? undefined : field,
+          direction: signedUrlParams ? undefined : direction
         }).then((res) => {
           if (res.data) {
             setPaginationControl(res.data)
@@ -272,8 +272,8 @@ const ProductTable = ({ data, refetch }) => {
         last: undefined,
         after: undefined,
         before: undefined,
-        field: field,
-        direction: direction
+        field: signedUrlParams ? undefined : field,
+        direction: signedUrlParams ? undefined : direction
       }).then((res) => {
         if (res.data) {
           setPaginationControl(res.data)
