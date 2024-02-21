@@ -134,7 +134,7 @@ export default function HeaderLinks(props) {
   return (
     <Flex gap={4} alignItems='center' flexDirection='row'>
       {/* ENVIRONMENT */}
-      {(dashboardView || productId) && (
+      {(dashboardView || productId) && org !== 'undefined' && (
         <Menu closeOnSelect={true}>
           <MenuButton
             as={Button}

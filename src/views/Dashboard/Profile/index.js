@@ -280,7 +280,7 @@ function Profile() {
                 <TabList>
                   {['Personal Details', 'Organizations', 'Security Tokens'].map(
                     (item, index) => (
-                      <Tab key={index} _focus={{ outline: 'none' }}>
+                      <Tab key={index} _focus={{ outline: 'none' }} isDisabled={orgInfo?.organization === null && (item === 'Personal Details' || item === 'Security Tokens')}>
                         {item}
                       </Tab>
                     )

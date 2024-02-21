@@ -1,5 +1,8 @@
 // Chakra imports
 import {
+  Alert,
+  AlertIcon,
+  AlertTitle,
   Flex,
   Grid,
   GridItem,
@@ -38,20 +41,28 @@ export default function Dashboard() {
 
   const iconBoxInside = useColorModeValue('white', 'white')
 
-  const [getOrgData, { data, error: eOrg, loading }] = useLazyQuery(GetOrg, {fetchPolicy: 'network-only'})
-  const [getMetrics, { data: metrics, error: eOrgMetric }] = useLazyQuery(GetOrgMetrics, {fetchPolicy: 'network-only'})
+  const [getOrgData, { data, error: eOrg, loading }] = useLazyQuery(GetOrg, {
+    fetchPolicy: 'network-only'
+  })
+  const [getMetrics, { data: metrics, error: eOrgMetric }] = useLazyQuery(
+    GetOrgMetrics,
+    { fetchPolicy: 'network-only' }
+  )
 
   useEffect(() => {
     getOrgData()
   }, [])
 
   useEffect(() => {
-    getMetrics({variables: {env: envName}})
+    getMetrics({ variables: { env: envName } })
   }, [envName])
-  
 
   useEffect(() => {
-    if (data) localStorage.setItem('organization', JSON.stringify(data?.organization?.name))
+    if (data)
+      localStorage.setItem(
+        'organization',
+        JSON.stringify(data?.organization?.name)
+      )
   }, [data])
 
   useEffect(() => {
@@ -74,14 +85,12 @@ export default function Dashboard() {
 
   if (eOrgMetric) {
     return (
-      <Flex my={32} alignItems={'center'} justifyContent={'center'} gap={2}>
-        <Text textAlign={'center'} fontSize={14}>
-          <WarningTwoIcon color='blue.500' />
-          {displayErrorMessage(
-            eOrgMetric.networkError?.statusCode,
-            eOrgMetric.message
-          )}
-        </Text>
+      <Flex flexDirection='column' pt={{ base: '120px', md: '74px' }} gap={'24px'} pr={2} pl={5}>
+        <Alert status='error'>
+          <AlertIcon />
+          <AlertTitle>{displayErrorMessage(eOrgMetric.networkError?.statusCode,eOrgMetric.message)}
+          </AlertTitle>
+        </Alert>
       </Flex>
     )
   }
