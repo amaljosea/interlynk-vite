@@ -20,6 +20,7 @@ import { useNavigate } from 'react-router-dom'
 import { validateUrl, validateEmail } from 'utils'
 
 const OrgModal = ({ isOpen, onClose, refetch, org, onSwitch }) => {
+  console.log('org', org)
   const navigate = useNavigate()
   const [error, setError] = useState('')
   const [name, setName] = useState('')
@@ -46,30 +47,29 @@ const OrgModal = ({ isOpen, onClose, refetch, org, onSwitch }) => {
     }
   }
 
-  const handleCreate = async () => {
-    await registerOrg({
+  const handleCreate = () => {
+    registerOrg({
       variables: {
         name,
         url,
         email
       }
     }).then((res) => {
-      if (res.data) {
-        const orgId = res.data.organizationCreate.organization.id
-        if (org) {
-          onClose()
-          navigate('/vendor/settings?tab=organization')
-        } else {
-          onSwitch(orgId, name)
-        }
+      if (org) {
+        onClose()
+        navigate('/vendor/settings?tab=organization')
+      } else {
+        const orgId = res?.data?.organizationCreate?.organization?.id
+        onSwitch(orgId, name)
       }
     })
+    setName('')
+    setEmail('')
+    setEmailError('')
+    setUrl('')
   }
 
-  const isInvalid =
-    name === '' ||
-    (email !== '' && emailError !== '') ||
-    (url !== '' && !validateUrl(url))
+  const isInvalid = name === '' || (email !== '' && emailError !== '') || (url !== '' && !validateUrl(url))
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -142,7 +142,7 @@ const OrgModal = ({ isOpen, onClose, refetch, org, onSwitch }) => {
           </Button>
           <Button
             colorScheme='blue'
-            disabled={isInvalid}
+            isDisabled={isInvalid}
             onClick={handleCreate}
           >
             Save
