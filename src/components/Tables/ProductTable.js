@@ -443,7 +443,7 @@ const ProductTable = ({ data, refetch }) => {
             <Stack direction={'row'} spacing={2} alignItems={'center'}>
               <Tooltip label='Default'>
                 <Link
-                  to={`/vendor/products/${name}?id=${id}`}
+                  to={`/${path}/products/${name}?id=${id}`}
                   onClick={() => handleClick('default')}
                 >
                   <IconButton size='sm' colorScheme='blue' icon={<FaInbox />} />
@@ -451,7 +451,7 @@ const ProductTable = ({ data, refetch }) => {
               </Tooltip>
               <Tooltip label='Development'>
                 <Link
-                  to={`/vendor/products/${name}?id=${id}`}
+                  to={`/${path}/products/${name}?id=${id}`}
                   onClick={() => handleClick('development')}
                 >
                   <IconButton size='sm' colorScheme='blue' icon={<FaCode />} />
@@ -459,7 +459,7 @@ const ProductTable = ({ data, refetch }) => {
               </Tooltip>
               <Tooltip label='Production'>
                 <Link
-                  to={`/vendor/products/${name}?id=${id}`}
+                  to={`/${path}/products/${name}?id=${id}`}
                   onClick={() => handleClick('production')}
                 >
                   <IconButton
