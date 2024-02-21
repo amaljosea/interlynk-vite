@@ -65,11 +65,12 @@ function Profile() {
   const [psIndex, setPsIndex] = useState(0)
   const [selectedTab, setSelectedTab] = useState(tabs[1].name)
 
-  const isAdmin = orgInfo?.organization?.currentUser?.superAdmin
-
   const { data: orgInfo, refetch, error } = useQuery(GetOrg)
 
+  const isAdmin = orgInfo && orgInfo?.organization?.currentUser?.superAdmin
+
   const { data: orgs, refetch: myOrgRefetch } = useQuery(MyOrganizations, {
+    skip: isAdmin,
     variables: { invitationStatuses: ['ACCEPTED', 'INVITED'] }
   })
   const { data: allOrgs, refetch: allOrgRefetch } = useQuery(AllOrganizations, {
@@ -280,7 +281,15 @@ function Profile() {
                 <TabList>
                   {['Personal Details', 'Organizations', 'Security Tokens'].map(
                     (item, index) => (
-                      <Tab key={index} _focus={{ outline: 'none' }} isDisabled={orgInfo?.organization === null && (item === 'Personal Details' || item === 'Security Tokens')}>
+                      <Tab
+                        key={index}
+                        _focus={{ outline: 'none' }}
+                        isDisabled={
+                          orgInfo?.organization === null &&
+                          (item === 'Personal Details' ||
+                            item === 'Security Tokens')
+                        }
+                      >
                         {item}
                       </Tab>
                     )
@@ -296,7 +305,7 @@ function Profile() {
                   </TabPanel>
                   {/* ORG DETAILS */}
                   <TabPanel>
-                    {isAdmin ? (
+                    {isAdmin === true ? (
                       <OrgTable
                         data={allOrgs?.allOrganizations?.nodes || []}
                         refetch={allOrgRefetch}
