@@ -621,7 +621,7 @@ const ComponentTable = ({
                           status === 'signed' ||
                           !updateComponent ||
                           !updateSboms ||
-                          data?.nodes?.length === 1
+                          totalComp?.length === 1
                         }
                       >
                         Delete

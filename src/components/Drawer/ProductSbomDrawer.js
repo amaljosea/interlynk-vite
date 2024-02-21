@@ -46,8 +46,9 @@ import CpeInput from 'components/CpeInput'
 
 function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
   const toast = useToast()
+  const activeEnv = localStorage.getItem('activeEnv')
   const { prodCompState, dispatch } = useGlobalState()
-  const { licenseType, spdxLicenses, customLicenses, expLicense } = prodCompState
+  const { licenseType, expLicense } = prodCompState
   const { prodCompDispatch } = dispatch
 
   const [sbomName, setSbomName] = useState('')
@@ -63,8 +64,6 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
   const [purlData, setPurlData] = useState(null)
   const [isPURLInputValid, setPURLInputValid] = useState(true)
   const [isValid, setIsValid] = useState(true)
-
-  const activeEnv = localStorage.getItem('activeEnv')
 
   const [getCpe] = useLazyQuery(CpeAutoComplete)
   const [createSbom] = useMutation(sbomCreate)
@@ -214,7 +213,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
   const onCreateSBOM = async () => {
     await createSbom({
       variables: {
-        projectId: data?.defaultProject?.id,
+        projectId: activeEnv,
         spec: 'cyclonedx',
         specVersion: '1.4',
         format: 'json'
