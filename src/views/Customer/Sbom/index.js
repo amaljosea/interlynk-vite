@@ -17,13 +17,13 @@ const idRegex =
   /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
 
 function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
-  const { totalRows, envName, setActiveSbomTab, prodState, prodCompState } =
+  const { totalRows, envName, activeCsSbomTab, prodState, prodCompState } =
     useGlobalState()
   const { data: allProjectGroups } = prodState
   const location = useLocation()
   const navigate = useNavigate()
   const toast = useToast()
-
+  
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
@@ -31,7 +31,6 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
   const [status, setStatus] = useState('created')
   const [totalComp, setTotalComp] = useState(0)
   const group = JSON.parse(localStorage.getItem('product'))
-  const environment = localStorage.getItem('environment')
 
   // GET COMPONENT DATA
   const {
@@ -39,6 +38,7 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
     refetch: compRefetch,
     error: compError
   } = useQuery(ShareComponentData, {
+    skip: activeCsSbomTab === 1 ? false : true,
     fetchPolicy: 'network-only',
     variables: {
       sbomId: sbomId,

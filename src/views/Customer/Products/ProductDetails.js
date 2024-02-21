@@ -33,7 +33,7 @@ const ProductDetails = () => {
   const vulnId = queryParams.get('vulnId')
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
-  const activeProd = localStorage.getItem('activeEnv')
+  const activeProd = localStorage.getItem('publicEnv')
   const group = JSON.stringify(localStorage.getItem('product'))
   const environment = localStorage.getItem('environment')
   const [activeEnv, setActiveEnv] = useState(activeProd || '')
@@ -42,6 +42,7 @@ const ProductDetails = () => {
     totalRows,
     activeCsProdTab,
     setActiveCsProdTab,
+    activeCsSbomTab,
     prodVulnState,
     dispatch
   } = useGlobalState()
@@ -74,7 +75,7 @@ const ProductDetails = () => {
     skip: sbomId ? false : true,
     fetchPolicy: 'network-only',
     variables: {
-      projectId: productId || activeEnv,
+      projectId: signedUrlParams ? undefined : productId || activeEnv,
       sbomId: sbomId,
       first: totalRows,
       last: undefined,
@@ -102,7 +103,8 @@ const ProductDetails = () => {
       const env = data?.shareLynkQuery?.projectGroup?.projects.find(
         (item) => item.name === environment
       )
-      localStorage.setItem('activeEnv', env?.id)
+      console.log('env',env);
+      localStorage.setItem('publicEnv', env?.id)
       setActiveEnv(env?.id)
     }
   }, [environment])

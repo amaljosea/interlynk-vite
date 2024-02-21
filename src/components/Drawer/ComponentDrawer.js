@@ -80,7 +80,7 @@ function ComponentDrawer(props) {
   const [addRelation] = useMutation(CreateCompRelation)
 
   const onFilterRefetch = () => {
-    filterRefetch({ variables: { projectId: productId, sbomId: sbomId } }).then(
+    filterRefetch({ projectId: productId, sbomId: sbomId } ).then(
       (res) =>
         res.data &&
         prodCompDispatch({
@@ -386,12 +386,12 @@ function ComponentDrawer(props) {
         <DrawerContent>
           <DrawerCloseButton />
           <DrawerHeader borderBottomWidth='1px' color='gray.600'>
-            {data ? 'Edit' : 'Add'} Component
+            {signedUrlParams ? 'Component' : data ? 'Edit Component' : 'Add Component'}
           </DrawerHeader>
           <DrawerBody>
             <Stack direction={'column'} spacing={4}>
               {/* Name */}
-              <FormControl>
+              <FormControl isReadOnly={signedUrlParams}>
                 <FormLabel htmlFor='compName' fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>
@@ -414,7 +414,7 @@ function ComponentDrawer(props) {
                 />
               </FormControl>
               {/* Version */}
-              <FormControl>
+              <FormControl isReadOnly={signedUrlParams}>
                 <FormLabel htmlFor='compVersion' fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
                     <Text>
@@ -437,7 +437,7 @@ function ComponentDrawer(props) {
                 />
               </FormControl>
               {/* GROUP */}
-              <FormControl>
+              <FormControl isReadOnly={signedUrlParams}>
                 <FormLabel htmlFor='groupInfo' fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
                     <Text>Group</Text>
@@ -463,7 +463,9 @@ function ComponentDrawer(props) {
                   size='md'
                   fontSize={'sm'}
                   value={compKind}
-                  onChange={(e) => setCompKind(e.target.value)}
+                  onChange={(e) =>
+                    signedUrlParams ? null : setCompKind(e.target.value)
+                  }
                 >
                   <option value='' style={{ background: 'lightgray' }}>
                     -- Select --
@@ -576,7 +578,9 @@ function ComponentDrawer(props) {
                   size='md'
                   fontSize={'sm'}
                   value={compScope}
-                  onChange={(e) => setCompScope(e.target.value)}
+                  onChange={(e) =>
+                    signedUrlParams ? null : setCompScope(e.target.value)
+                  }
                 >
                   <option value='' style={{ background: 'lightgray' }}>
                     -- Select --
@@ -587,7 +591,7 @@ function ComponentDrawer(props) {
                 </Select>
               </FormControl>
               {/* PRIMARY COMPONENT */}
-              <FormControl isReadOnly={customerView}>
+              <FormControl isReadOnly={signedUrlParams}>
                 <Flex alignItems={'center'} gap={2} mt={4}>
                   {shortDesc === 'Primary Component' && !isPrimary && (
                     <WarningTwoIcon w={4} h={4} color='red.500' />
@@ -603,7 +607,7 @@ function ComponentDrawer(props) {
                 </Flex>
               </FormControl>
               {/* INTERNAL COMPONENT */}
-              <FormControl isReadOnly={customerView}>
+              <FormControl isReadOnly={signedUrlParams}>
                 <Checkbox
                   size='sm'
                   colorScheme='blue'

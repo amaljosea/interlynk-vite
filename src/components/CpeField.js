@@ -21,6 +21,7 @@ const CpeField = ({
   inputRef,
   onChange
 }) => {
+  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const { prodCompState, dispatch } = useGlobalState()
   const { isCpeValid } = prodCompState
   const { prodCompDispatch } = dispatch
@@ -120,6 +121,7 @@ const CpeField = ({
             size='md'
             fontSize={'sm'}
             placeholder={'CPE'}
+            readOnly={signedUrlParams}
             value={inputValue}
             onChange={onChange}
             autoComplete='off'

@@ -25,6 +25,7 @@ import { MdArrowOutward } from 'react-icons/md'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 const LicenseField = ({ isValid, setIsValid }) => {
+  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const { prodCompState, dispatch } = useGlobalState()
   const { licenseType, spdxList, customList, expLicense } = prodCompState
   const { prodCompDispatch } = dispatch
@@ -93,7 +94,8 @@ const LicenseField = ({ isValid, setIsValid }) => {
     setIsValid(true)
   }
 
-  const handleExpBlur = () => prodCompDispatch({ type: 'SET_EPX_LICENSE', payload: exp })
+  const handleExpBlur = () =>
+    prodCompDispatch({ type: 'SET_EPX_LICENSE', payload: exp })
 
   const handleTypeChange = (value) => {
     setIsValid(true)
@@ -194,6 +196,7 @@ const LicenseField = ({ isValid, setIsValid }) => {
               fontSize={'sm'}
               onBlur={handleExpBlur}
               onChange={handleExpChange}
+              isReadOnly={signedUrlParams}
               placeholder='Enter a valid SPDX Expression'
             />
             {!isValid && (

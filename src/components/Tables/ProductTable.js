@@ -295,20 +295,22 @@ const ProductTable = ({ data, refetch }) => {
       <Flex
         width={'100%'}
         alignItems={'center'}
-        justifyContent={'space-between'}
+        justifyContent={signedUrlParams ? 'flex-end' : 'space-between'}
       >
-        <Stack direction={'row'} spacing={2} alignItems={'center'}>
-          {/* SEARCH PRODUCTS */}
-          <SearchFilter
-            id='product'
-            filterText={filterText}
-            onChange={onSearchInputChange}
-            onClear={handleClear}
-            onFilter={handleSearch}
-          />
-          {/* FILTER PRODUCTS */}
-          <ProdFilterMenu onFilter={onFilterActive} />
-        </Stack>
+        {!signedUrlParams && (
+          <Stack direction={'row'} spacing={2} alignItems={'center'}>
+            {/* SEARCH PRODUCTS */}
+            <SearchFilter
+              id='product'
+              filterText={filterText}
+              onChange={onSearchInputChange}
+              onClear={handleClear}
+              onFilter={handleSearch}
+            />
+            {/* FILTER PRODUCTS */}
+            <ProdFilterMenu onFilter={onFilterActive} />
+          </Stack>
+        )}
         <Stack direction={'row'} spacing={2} alignItems={'center'}>
           {/* ADD PRODUCT */}
           <Tooltip label='Add Product'>
@@ -316,8 +318,9 @@ const ProductTable = ({ data, refetch }) => {
               icon={<AddIcon />}
               colorScheme='blue'
               variant='solid'
+              hidden={signedUrlParams}
               onClick={onOpenProduct}
-              isDisabled={!canAddProduct || signedUrlParams}
+              isDisabled={!canAddProduct}
             />
           </Tooltip>
           {/* REFRESH */}
@@ -380,7 +383,10 @@ const ProductTable = ({ data, refetch }) => {
               type: 'SET_CURRENT_PRODUCT',
               payload: { id: env?.id || defaultProject?.id }
             })
-            localStorage.setItem('activeEnv', env?.id || defaultProject?.id)
+            localStorage.setItem(
+              signedUrlParams ? 'publicEnv' : 'activeEnv',
+              env?.id || defaultProject?.id
+            )
             localStorage.setItem('product', JSON.stringify(product))
             localStorage.setItem('activeProdTab', 0)
             setActiveSbomTab(0)
@@ -429,7 +435,10 @@ const ProductTable = ({ data, refetch }) => {
             const env = projects?.find((item) => item.name === value)
             localStorage.setItem('product', JSON.stringify(product))
             localStorage.setItem('environment', env?.name)
-            localStorage.setItem('activeEnv', env?.id)
+            localStorage.setItem(
+              signedUrlParams ? 'publicEnv' : 'activeEnv',
+              env?.id
+            )
             localStorage.setItem('activeProdTab', 0)
             prodDispatch({
               type: 'SET_CURRENT_PRODUCT',

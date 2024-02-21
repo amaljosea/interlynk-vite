@@ -367,6 +367,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
         {/* DOWNLOAD SBOM */}
         <Tooltip label='Download'>
           <IconButton
+            display={signedUrlParams ? 'none' : 'flex'}
             icon={<FaFileDownload />}
             onClick={onOpen}
             size='md'

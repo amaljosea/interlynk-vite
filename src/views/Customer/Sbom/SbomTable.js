@@ -91,7 +91,7 @@ const SbomTable = ({
 
   const fetchTabData = (activeTab) => {
     const commonParams = {
-      projectId: productId,
+      projectId: signedUrlParams ? undefined : productId,
       sbomId: sbomId,
       first: totalRows,
       last: undefined,

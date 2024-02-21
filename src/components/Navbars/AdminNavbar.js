@@ -17,7 +17,8 @@ import { GetUserPermissions } from 'graphQL/Queries'
 import { permissionList } from 'utils'
 
 export default function AdminNavbar(props) {
-  const { setUserPermissions, setActiveSbomTab } = useGlobalState()
+  const { setUserPermissions, setActiveSbomTab, setActiveCsSbomTab } =
+    useGlobalState()
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
   function parseJSONSafely(str) {
@@ -192,7 +193,16 @@ export default function AdminNavbar(props) {
               >
                 <Link
                   to={`/${path}/products/${params.name}?id=${currentProduct?.groupId}`}
-                  onClick={() => localStorage.removeItem('currentSBOM')}
+                  onClick={() => {
+                    localStorage.removeItem('currentSBOM')
+                    if (signedUrlParams) {
+                      setActiveCsSbomTab(0)
+                      localStorage.setItem('activeCsSbomTab', 0)
+                    } else {
+                      setActiveSbomTab(0)
+                      localStorage.setItem('activeSbomTab', 0)
+                    }
+                  }}
                 >
                   {decodeURI(params.name)}
                 </Link>

@@ -106,14 +106,14 @@ export default function HeaderLinks(props) {
             const env = res?.data?.shareLynkQuery?.projectGroup?.projects?.find(
               (item) => item.name === value
             )
-            localStorage.setItem('activeEnv', env?.id)
-            navigate(`/customer/products/${group?.name}?id=${group?.id}`)
+            localStorage.setItem('publicEnv', env?.id)
+            window.location.href = `/customer/products/${group?.name}?id=${group?.id}`
           } else {
             const env = res?.data?.projectGroup?.projects?.find(
               (item) => item.name === value
             )
             localStorage.setItem('activeEnv', env?.id)
-            navigate(`/vendor/products/${group?.name}?id=${group?.id}`)
+            window.location.href =  `/vendor/products/${group?.name}?id=${group?.id}`
           }
         }
       })

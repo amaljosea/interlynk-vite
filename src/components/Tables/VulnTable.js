@@ -96,13 +96,6 @@ const VulnTable = ({
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
 
-  useEffect(() => {
-    if (data) {
-      setIsPrevActive(data?.pageInfo?.hasPreviousPage)
-      setIsNextActive(data?.pageInfo?.hasNextPage)
-    }
-  }, [data])
-
   const setPaginationControl = (data) => {
     setIsPrevActive(data.sbom?.vulns?.pageInfo?.hasPreviousPage)
     setIsNextActive(data.sbom?.vulns?.pageInfo?.hasNextPage)
@@ -116,13 +109,15 @@ const VulnTable = ({
   //end
 
   const toast = useToast()
-  // GET VULN FILTER HEADS
-  const [getVulnFilters] = useLazyQuery(
-    signedUrlParams ? ShareVulnFilters : GetVulnFilterData
-  )
 
-  const { userPermissions, totalRows, setTotalRows, prodVulnState, dispatch } =
-    useGlobalState()
+  const {
+    userPermissions,
+    totalRows,
+    setTotalRows,
+    activeCsSbomTab,
+    prodVulnState,
+    dispatch
+  } = useGlobalState()
   const {
     pageIndex,
     field,
@@ -137,6 +132,21 @@ const VulnTable = ({
     filters
   } = prodVulnState
   const { prodVulnDispatch } = dispatch
+
+  // GET VULN FILTER HEADS
+  const { refetch: getVulnFilters } = useQuery(
+    signedUrlParams ? ShareVulnFilters : GetVulnFilterData,
+    {
+      fetchPolicy: 'cache-first',
+      variables: { projectId: signedUrlParams ? undefined : productId, sbomId: sbomId },
+      onCompleted: (data) => {
+        prodVulnDispatch({
+          type: 'ADD_FILTER_HEADS',
+          payload: signedUrlParams ? data?.shareLynkQuery?.sbom?.filters : data?.sbom?.filters
+        })
+      }
+    }
+  )
 
   const [onVulnScan] = useMutation(ManualVulnScan, {
     fetchPolicy: 'network-only'
@@ -437,7 +447,7 @@ const VulnTable = ({
   }
 
   const vulnData = {
-    projectId: productId,
+    projectId: signedUrlParams ? undefined : productId,
     sbomId: sbomId,
     search: searchInput !== '' ? searchInput : undefined,
     source: source === 'BOTH' || source === '' ? undefined : source,
@@ -446,8 +456,8 @@ const VulnTable = ({
     status: statues.length > 0 ? statues : undefined,
     kev: kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
     epss: epss !== '' && epss !== 'all' ? range : undefined,
-    field: field,
-    direction: direction
+    field: signedUrlParams ? undefined : field,
+    direction: signedUrlParams ? undefined : direction
   }
 
   // CLEAR SERACH
@@ -611,7 +621,7 @@ const VulnTable = ({
             <IconButton
               colorScheme='blue'
               onClick={handleScan}
-              isDisabled={signedUrlParams}
+              hidden={signedUrlParams}
               icon={<FaBug />}
             />
           </Tooltip>
@@ -626,7 +636,8 @@ const VulnTable = ({
                 prodVulnDispatch({ type: 'RESET_SELECTED_VULN' })
                 onTableOpen()
               }}
-              isDisabled={!editVulns || signedUrlParams}
+              hidden={signedUrlParams}
+              isDisabled={!editVulns}
               icon={<FaCopy size={18} />}
             />
           </Tooltip>
@@ -865,21 +876,8 @@ const VulnTable = ({
 
   useEffect(() => {
     if (data) {
-      getVulnFilters({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId
-        }
-      }).then((res) => {
-        if (res.data) {
-          prodVulnDispatch({
-            type: 'ADD_FILTER_HEADS',
-            payload: signedUrlParams
-              ? res?.data?.shareLynkQuery?.sbom?.filters
-              : res?.data?.sbom?.filters
-          })
-        }
-      })
+      setIsPrevActive(data?.pageInfo?.hasPreviousPage)
+      setIsNextActive(data?.pageInfo?.hasNextPage)
     }
   }, [data])
 

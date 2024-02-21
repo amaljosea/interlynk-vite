@@ -12,11 +12,6 @@ const ProductList = () => {
     variables: { first: 25 }
   })
 
-  useEffect(() => {
-    if (data) {
-      console.log('Data', data)
-    }
-  }, [])
 
   if (error) {
     return (

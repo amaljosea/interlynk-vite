@@ -21,9 +21,10 @@ import { Link, useLocation } from 'react-router-dom'
 // this function creates the links and collapses that appear in the sidebar (left menu)
 
 const SidebarContent = ({ logoText, routes }) => {
+  let location = useLocation()
   const { minimize } = useGlobalState()
   const org = localStorage.getItem('organization')
-  let location = useLocation()
+  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const urlParts = location.pathname.split('/')
   const category = urlParts[2]
 
@@ -200,7 +201,7 @@ const SidebarContent = ({ logoText, routes }) => {
   return (
     <>
       <Box pt={'25px'} mb='12px' pos={'relative'}>
-        <Link to={`/vendor/dashboard`}>
+        <Link to={signedUrlParams ? `/customer/products` : `/vendor/dashboard`}>
           <Box
             display='flex'
             lineHeight='100%'

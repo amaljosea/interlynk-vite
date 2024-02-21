@@ -1813,7 +1813,7 @@ export const GetCompFilterData = gql`
 
 // GET SHARE COMPONENT FILTER DATA =
 export const ShareCompFilters = gql`
-  query ShareLynkQuery($sbomId: Uuid!) {
+  query ShareCompFilters($sbomId: Uuid!) {
     shareLynkQuery {
       sbom(id: $sbomId) {
         filters {

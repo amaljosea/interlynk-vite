@@ -46,14 +46,15 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
   const location = useLocation()
   const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
-  const activeProd = localStorage.getItem('activeEnv')
+  const activeProd = localStorage.getItem(signedUrlParams ? 'publicEnv' : 'activeEnv')
 
   const { data, refetch, error } = useQuery(
     signedUrlParams ? ShareVersionTable : GetVersionsTable,
     {
       fetchPolicy: 'network-only',
       variables: {
-        id: activeProd
+        id: activeProd,
+        first: totalRows
       }
     }
   )
@@ -71,8 +72,8 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
 
   useEffect(() => {
     if (versions) {
-      setIsPrevActive(versions.pageInfo?.hasPreviousPage)
-      setIsNextActive(versions.pageInfo?.hasNextPage)
+      setIsPrevActive(versions?.pageInfo?.hasPreviousPage)
+      setIsNextActive(versions?.pageInfo?.hasNextPage)
     }
   }, [versions])
 
@@ -478,9 +479,8 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
           {/* BUILD SBOM */}
           <Tooltip label='Build Version'>
             <IconButton
-              isDisabled={
-                !projectGroup?.enabled || !createSbom || signedUrlParams
-              }
+              isDisabled={!projectGroup?.enabled || !createSbom}
+              hidden={signedUrlParams}
               colorScheme='blue'
               onClick={onBuildSbom}
               icon={<FaScrewdriverWrench />}

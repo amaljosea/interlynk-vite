@@ -39,7 +39,7 @@ import ComponentModal from 'views/Sbom/components/ComponentModal'
 import SupplierModal from 'views/Sbom/components/SupplierModal'
 import LinksDrawer from 'components/Drawer/LinksDrawer'
 import styled from '@emotion/styled'
-import { useLazyQuery, useMutation } from '@apollo/client'
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { GetComponentPath, GetCompFilterData } from 'graphQL/Queries'
 import { deleteComSupplier } from 'graphQL/Mutation'
 import CompFilterMenu from 'views/Sbom/components/CompFilterMenu'
@@ -59,6 +59,11 @@ const ComponentTable = ({
   primaryComp,
   sbomRefetch
 }) => {
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const customerView = location.pathname.startsWith('/customer')
+  const productId = queryParams.get('id')
+  const sbomId = queryParams.get('sbom')
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   //This part is needed for the pagination to work. (Modify with caution)
   const paginationSizes = [25, 50, 100]
@@ -77,18 +82,7 @@ const ComponentTable = ({
   }
   //end
 
-  // GET COMPONENT FILTER HEADS
-  const [getCompFilters] = useLazyQuery(
-    signedUrlParams ? ShareCompFilters : GetCompFilterData
-  )
-
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const customerView = location.pathname.startsWith('/customer')
-  const productId = queryParams.get('id')
-  const sbomId = queryParams.get('sbom')
-
-  const { userPermissions, totalRows, setTotalRows, prodCompState, dispatch } =
+  const { userPermissions, totalRows, setTotalRows, activeCsSbomTab, prodCompState, dispatch } =
     useGlobalState()
   const {
     field,
@@ -105,6 +99,21 @@ const ComponentTable = ({
   } = prodCompState
   const { prodCompDispatch } = dispatch
 
+  // GET COMPONENT FILTER HEADS
+  const {refetch: getCompFilters} = useQuery(
+    signedUrlParams ? ShareCompFilters : GetCompFilterData,
+    {
+      fetchPolicy: 'cache-first',
+      variables: { projectId: signedUrlParams ? undefined : productId, sbomId: sbomId },
+      onCompleted: (data) => {
+        prodCompDispatch({
+          type: 'ADD_FILTER_HEADS',
+          payload: signedUrlParams ? data?.shareLynkQuery?.sbom?.filters : data?.sbom?.filters
+        })
+      }
+    }
+  )
+
   const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
   const updateComponent = sboms?.supersededBy?.some(
     (permission) =>
@@ -118,7 +127,7 @@ const ComponentTable = ({
   const fetchCompData = async () => {
     disablePaginationControl()
     await refetch({
-      projectId: productId,
+      projectId: signedUrlParams ? undefined : productId,
       sbomId: sbomId,
       search: searchInput !== '' ? searchInput : undefined,
       ecosystem:
@@ -140,8 +149,8 @@ const ComponentTable = ({
       last: undefined,
       after: undefined,
       before: undefined,
-      field: field,
-      direction: direction
+      field: signedUrlParams ? undefined : field,
+      direction: signedUrlParams ? undefined : direction
     })
       .then((res) => {
         res && setPaginationControl(res.data)
@@ -1066,11 +1075,9 @@ const ComponentTable = ({
               variant='solid'
               fontWeight='normal'
               fontSize={'sm'}
+              hidden={signedUrlParams}
               isDisabled={
-                lifecycle === 'signed' ||
-                !updateComponent ||
-                !updateSboms ||
-                signedUrlParams
+                lifecycle === 'signed' || !updateComponent || !updateSboms
               }
             />
           </Tooltip>
@@ -1186,23 +1193,8 @@ const ComponentTable = ({
     if (data) {
       setIsPrevActive(data?.pageInfo?.hasPreviousPage)
       setIsNextActive(data?.pageInfo?.hasNextPage)
-      getCompFilters({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId
-        }
-      }).then((res) => {
-        if (res.data) {
-          prodCompDispatch({
-            type: 'ADD_FILTER_HEADS',
-            payload: signedUrlParams
-              ? res?.data?.shareLynkQuery?.sbom?.filters
-              : res?.data?.sbom?.filters
-          })
-        }
-      })
     }
-  }, [data, prodCompDispatch])
+  }, [data])
 
   return (
     <>
