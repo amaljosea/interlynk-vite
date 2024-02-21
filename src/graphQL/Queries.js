@@ -756,9 +756,6 @@ export const GetConnectedSbom = gql`
           vexStatus {
             name
           }
-          vexJustinfication {
-            name
-          }
         }
       }
     }

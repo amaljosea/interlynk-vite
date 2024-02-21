@@ -74,8 +74,8 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
 
   const handlePreview = async (row) => {
     console.log('row',row);
-    const { component } = row
-    await getSboms({variables: {projectId: component?.sbom?.project?.id, sbomId: component?.sbom?.id, componentVulnId: component?.id}}).then(() => {
+    const { id, component } = row
+    await getSboms({variables: {projectId: component?.sbom?.project?.id, sbomId: component?.sbom?.id, componentVulnId: id}}).then(() => {
       setActiveRow(row)
       onSbomOpen()
     })
