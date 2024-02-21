@@ -90,10 +90,11 @@ const ShareLynkDrawer = ({
       variables: {
         enabled: true,
         id: [groupId],
-        expiresAt: new Date(selectedDate).toISOString()
+        expiresAt: noExpire ? undefined : new Date(selectedDate).toISOString()
       }
     }).then((res) => {
       setSelectedDate('')
+      setNoExpire(false)
       if (res?.data) {
         refetch()
         onShareLynkClose()
