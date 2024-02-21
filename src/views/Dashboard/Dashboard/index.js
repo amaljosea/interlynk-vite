@@ -1,8 +1,5 @@
 // Chakra imports
 import {
-  Alert,
-  AlertIcon,
-  AlertTitle,
   Flex,
   Grid,
   GridItem,
@@ -85,12 +82,14 @@ export default function Dashboard() {
 
   if (eOrgMetric) {
     return (
-      <Flex flexDirection='column' pt={{ base: '120px', md: '74px' }} gap={'24px'} pr={2} pl={5}>
-        <Alert status='error'>
-          <AlertIcon />
-          <AlertTitle>{displayErrorMessage(eOrgMetric.networkError?.statusCode,eOrgMetric.message)}
-          </AlertTitle>
-        </Alert>
+      <Flex
+        flexDirection='column'
+        pt={{ base: '120px', md: '74px' }}
+        gap={'24px'}
+        pr={2}
+        pl={5}
+      >
+        <OrgRegister />
       </Flex>
     )
   }
