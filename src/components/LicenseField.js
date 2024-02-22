@@ -13,25 +13,31 @@ import {
   Alert,
   AlertIcon,
   Input,
-  Link
+  Link,
+  useDisclosure
 } from '@chakra-ui/react'
 import { useState, useEffect } from 'react'
 import ReactSelect from 'react-select'
 import CreatableSelect from 'react-select/creatable'
 import { CpeAutoComplete } from 'graphQL/Queries'
 import { useLazyQuery } from '@apollo/client'
-import spdxValidate from 'spdx-expression-validate'
 import { MdArrowOutward } from 'react-icons/md'
 import { useGlobalState } from 'hooks/useGlobalState'
+import InfoModal from './InfoModal'
 
 const LicenseField = ({ isValid, setIsValid }) => {
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
-  const { prodCompState, dispatch } = useGlobalState()
+  const { prodCompState, activeSbomTab, dispatch } = useGlobalState()
   const { licenseType, spdxList, customList, expLicense } = prodCompState
   const { prodCompDispatch } = dispatch
 
   const [licenseList, setLicenseList] = useState([])
+  const [infoHeading, setInfoHeading] = useState('')
+  const [infoText, setInfoText] = useState('')
+  const [infoUrl, setInfoUrl] = useState('')
   const [getCpe] = useLazyQuery(CpeAutoComplete)
+
+  const { isOpen: isInfoOpen, onOpen: onInfoOpen, onClose: onInfoClose } = useDisclosure()
 
   const onLicenseChange = (selected) => {
     if (selected) {
@@ -102,15 +108,28 @@ const LicenseField = ({ isValid, setIsValid }) => {
     prodCompDispatch({ type: 'SET_LICENSE_TYPE', payload: value })
   }
 
+  const licenseInfo = `Component license refers to the licensing terms and conditions associated with a specific software component listed in the SBOM document.`
+
+  const onCheckLicesne = () => {
+    setInfoHeading(`License`)
+    setInfoText(licenseInfo)
+    setInfoUrl(``)
+    onInfoOpen()
+  }
+
+
   return (
-    <VStack spacing={4} alignItems={'flex-start'}>
+    <>
+      <VStack spacing={4} alignItems={'flex-start'}>
       <FormControl>
         <FormLabel htmlFor={licenseType}>
           <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
             <Text>Licenses</Text>
-            <Tooltip label='List of licenses applicable to the component'>
-              <Icon as={InfoIcon} color={'blue.500'} />
-            </Tooltip>
+            {activeSbomTab === 4 ? (
+              <Tooltip label={licenseInfo}><Icon as={InfoIcon} color={'blue.500'} /></Tooltip>
+            ) : (
+              <Icon as={InfoIcon} color={'blue.500'} cursor={'pointer'} onClick={onCheckLicesne} />
+            )}
           </Flex>
         </FormLabel>
         {/* LICENSE TYPE */}
@@ -241,7 +260,20 @@ const LicenseField = ({ isValid, setIsValid }) => {
           />
         )}
       </FormControl>
-    </VStack>
+      </VStack>
+
+      {/* INFO MODAL */}
+      {isInfoOpen && (
+        <InfoModal
+          isOpen={isInfoOpen}
+          onClose={onInfoClose}
+          heading={infoHeading}
+          body={infoText}
+          url={infoUrl}
+        />
+      )}
+    </>
+    
   )
 }
 

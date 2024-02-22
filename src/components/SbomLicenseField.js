@@ -100,13 +100,14 @@ const SbomLicenseField = ({ isValid, setIsValid }) => {
     sbomDispatch({ type: 'SET_LICENSE_TYPE', payload: value })
   }
 
+
   return (
     <VStack spacing={4} alignItems={'flex-start'}>
       <FormControl>
         <FormLabel htmlFor={'licenseType'}>
           <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
             <Text>Licenses</Text>
-            <Tooltip label='List of licenses applicable to the component'>
+            <Tooltip label='Data licence is a legal arrangement between the creator of the data and the end-user, or the place the data will be deposited, specifying what users can do with the data'>
               <Icon as={InfoIcon} color={'blue.500'} />
             </Tooltip>
           </Flex>

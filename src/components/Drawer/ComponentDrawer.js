@@ -49,6 +49,7 @@ import { GetAllComponents } from 'graphQL/Queries'
 import { CreateCompRelation } from 'graphQL/Mutation'
 import CpeField from 'components/CpeField'
 import { AllShareComponents } from 'graphQL/Queries'
+import InfoModal from 'components/InfoModal'
 
 function ComponentDrawer(props) {
   const location = useLocation()
@@ -80,7 +81,7 @@ function ComponentDrawer(props) {
   const [addRelation] = useMutation(CreateCompRelation)
 
   const onFilterRefetch = () => {
-    filterRefetch({ projectId: productId, sbomId: sbomId } ).then(
+    filterRefetch({ projectId: productId, sbomId: sbomId }).then(
       (res) =>
         res.data &&
         prodCompDispatch({
@@ -119,6 +120,9 @@ function ComponentDrawer(props) {
   const [relation, setRelation] = useState('')
   const [component, setComponent] = useState('')
   const [isValid, setIsValid] = useState(true)
+  const [infoHeading, setInfoHeading] = useState('')
+  const [infoText, setInfoText] = useState('')
+  const [infoUrl, setInfoUrl] = useState('')
 
   useEffect(() => {
     if (data) {
@@ -160,6 +164,12 @@ function ComponentDrawer(props) {
       setCompVersion('')
     }
   }, [])
+
+  const {
+    isOpen: isInfoOpen,
+    onOpen: onInfoOpen,
+    onClose: onInfoClose
+  } = useDisclosure()
 
   const {
     isOpen: isPurlOpen,
@@ -362,6 +372,34 @@ function ComponentDrawer(props) {
     })
   }
 
+  const onCheckName = () => {
+    setInfoHeading(`Name`)
+    setInfoText(`The component name within an SBOM serves as a unique identifier for a particular software component, helping to distinguish it from others and providing clarity when referring to or discussing components within the software supply chain.`)
+    setInfoUrl(``)
+    onInfoOpen()
+  }
+
+  const onCheckVersion = () => {
+    setInfoHeading(`Version`)
+    setInfoText(`A component version refers to the specific version or release of a software component that is included in the SBOM. It indicates the precise iteration of the component being referenced within the software produc`)
+    setInfoUrl(``)
+    onInfoOpen()
+  }
+
+  const onCheckGroup = () => {
+    setInfoHeading(`Group`)
+    setInfoText(`Component group refers to a categorization or grouping of related software components within the SBOM document. Component groups are typically used to organize components based on their function, purpose, or other relevant criteria.`)
+    setInfoUrl(``)
+    onInfoOpen()
+  }
+
+  const onCheckIdentifiers = () => {
+    setInfoHeading(`Identifiers`)
+    setInfoText(`Component identifiers refer to unique identifiers assigned to each software component listed in the SBOM document. These identifiers serve to uniquely identify and distinguish one component from another within the software inventory.`)
+    setInfoUrl(``)
+    onInfoOpen()
+  }
+
   useEffect(() => {
     getAllComps({
       variables: {
@@ -386,7 +424,11 @@ function ComponentDrawer(props) {
         <DrawerContent>
           <DrawerCloseButton />
           <DrawerHeader borderBottomWidth='1px' color='gray.600'>
-            {signedUrlParams ? 'Component' : data ? 'Edit Component' : 'Add Component'}
+            {signedUrlParams
+              ? 'Component'
+              : data
+                ? 'Edit Component'
+                : 'Add Component'}
           </DrawerHeader>
           <DrawerBody>
             <Stack direction={'column'} spacing={4}>
@@ -400,9 +442,7 @@ function ComponentDrawer(props) {
                         *
                       </chakra.span>
                     </Text>
-                    <Tooltip label='Component Name'>
-                      <Icon as={InfoIcon} color={'blue.500'} />
-                    </Tooltip>
+                    <Icon as={InfoIcon} color={'blue.500'} cursor={'pointer'} onClick={onCheckName}/>
                   </Flex>
                 </FormLabel>
                 <Input
@@ -423,9 +463,7 @@ function ComponentDrawer(props) {
                         *
                       </chakra.span>
                     </Text>
-                    <Tooltip label='Component Version'>
-                      <Icon as={InfoIcon} color={'blue.500'} />
-                    </Tooltip>
+                    <Icon as={InfoIcon} color={'blue.500'} cursor={'pointer'} onClick={onCheckVersion} />
                   </Flex>
                 </FormLabel>
                 <Input
@@ -441,9 +479,7 @@ function ComponentDrawer(props) {
                 <FormLabel htmlFor='groupInfo' fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
                     <Text>Group</Text>
-                    <Tooltip label='Group Info'>
-                      <Icon as={InfoIcon} color={'blue.500'} />
-                    </Tooltip>
+                    <Icon as={InfoIcon} color={'blue.500'} cursor={'pointer'} onClick={onCheckGroup} />
                   </Flex>
                 </FormLabel>
                 <Input
@@ -499,9 +535,7 @@ function ComponentDrawer(props) {
                         <WarningTwoIcon w={4} h={4} color='red.500' />
                       )}
                     <Text>Identifiers</Text>
-                    <Tooltip label='Component identifiers such as package URL (PURL) or Common Platform Enumeration (CPE) are used for consistent naming of the component. Both CycloneDX and SPDX supports identifying component names with CPE and PURL'>
-                      <Icon as={InfoIcon} color={'blue.500'} />
-                    </Tooltip>
+                    <Icon as={InfoIcon} color={'blue.500'} cursor={'pointer'} onClick={onCheckIdentifiers} />
                   </Flex>
                 </FormLabel>
                 <Stack direction={'row'} spacing={2}>
@@ -776,6 +810,17 @@ function ComponentDrawer(props) {
             </ModalFooter>
           </ModalContent>
         </Modal>
+      )}
+
+      {/* INFO MODAL */}
+      {isInfoOpen && (
+        <InfoModal
+          isOpen={isInfoOpen}
+          onClose={onInfoClose}
+          heading={infoHeading}
+          body={infoText}
+          url={infoUrl}
+        />
       )}
     </>
   )

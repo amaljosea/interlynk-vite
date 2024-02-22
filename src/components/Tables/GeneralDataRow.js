@@ -23,10 +23,9 @@ import {
   Text,
   Th,
   Thead,
-  Tooltip,
   Tr,
   useColorModeValue,
-  useDisclosure
+  useDisclosure,
 } from '@chakra-ui/react'
 import CardBody from 'components/Card/CardBody'
 import GeneralDataDrawer from 'components/Drawer/GeneralDataDrawer'
@@ -40,6 +39,16 @@ import PriSupplierModal from 'views/Sbom/components/PriSupplierModal'
 import { sbomUpdate } from 'graphQL/Mutation'
 import SbomLicenseField from 'components/SbomLicenseField'
 import { useGlobalState } from 'hooks/useGlobalState'
+import InfoModal from 'components/InfoModal'
+
+const InfoLabel = ({ title, onClick }) => {
+  return (
+    <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
+      <Text>{title}</Text>
+      <Icon as={InfoIcon} color={'blue.500'} cursor={'pointer'} onClick={onClick} />
+    </Flex>
+  )
+}
 
 const GeneralDataRow = ({ status, data, refetch }) => {
   const location = useLocation()
@@ -47,10 +56,9 @@ const GeneralDataRow = ({ status, data, refetch }) => {
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
-  
 
   const { userPermissions, sbomState, dispatch } = useGlobalState()
-  const { licenseType, spdxLicenses, expLicense, customLicenses } = sbomState
+  const { licenseType, expLicense } = sbomState
   const { sbomDispatch } = dispatch
 
   const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
@@ -68,6 +76,9 @@ const GeneralDataRow = ({ status, data, refetch }) => {
   const [selectedKey, setSelectedKey] = useState('')
   const [activeTool, setActiveTool] = useState(null)
   const [isValid, setIsValid] = useState(true)
+  const [infoHeading, setInfoHeading] = useState('')
+  const [infoText, setInfoText] = useState('')
+  const [infoUrl, setInfoUrl] = useState('')
 
   const btnRef = useRef(null)
   const licenseBtn = useRef(null)
@@ -100,18 +111,13 @@ const GeneralDataRow = ({ status, data, refetch }) => {
   } = useDisclosure()
 
   const handleRefetch = () => {
-    refetch({
-      projectId: productId,
-      sbomId: sbomId
-    })
+    refetch({ projectId: productId, sbomId: sbomId })
   }
 
   const [deleteSupplier] = useMutation(supplierDelete)
   const [deleteTool] = useMutation(toolDelete)
   const [deleteAuthor] = useMutation(authorDelete)
-  const [updateSbom] = useMutation(sbomUpdate, {
-    onCompleted: () => handleRefetch()
-  })
+  const [updateSbom] = useMutation(sbomUpdate, { onCompleted: () => handleRefetch() })
 
   const handleToolRemove = async (id) => {
     try {
@@ -176,7 +182,6 @@ const GeneralDataRow = ({ status, data, refetch }) => {
   }
 
   const onLicenseOpen = () => {
-    console.log(data)
     sbomDispatch({ type: 'SET_LICENSES', payload: data })
     onSBMOpen()
   }
@@ -208,6 +213,34 @@ const GeneralDataRow = ({ status, data, refetch }) => {
     }
   }
 
+  const onCheckTool = () => {
+    setInfoHeading(`Creation Tool`)
+    setInfoText(`Creator Tool(s) identify all the software tools and their versions used in building the SBOM. Interlynk is automatically added as one of the tools`)
+    setInfoUrl(``)
+    onInfoOpen()
+  }
+
+  const onCheckAuthor = () => {
+    setInfoHeading(`Author`)
+    setInfoText(`In case of non-automated SBOM generation, Author(s) identifies the name and email of persons involved in building the SBOM.`)
+    setInfoUrl(``)
+    onInfoOpen()
+  }
+
+  const onCheckSupplier = () => {
+    setInfoHeading(`Supplier`)
+    setInfoText(`Supplier identify the name and email of the organization that built, distributed or package the application. For Open-source components, it can refer to the name of the project or entity distributing the project.`)
+    setInfoUrl(``)
+    onInfoOpen()
+  }
+
+  const onCheckLicense = () => {
+    setInfoHeading(`Data License`)
+    setInfoText(`Data licence is a legal arrangement between the creator of the data and the end-user, or the place the data will be deposited, specifying what users can do with the data`)
+    setInfoUrl(`https://spdx.dev/about/overview`)
+    onInfoOpen()
+  }
+
   // KEYBOARD EVENT LISTNER FOR SBOM DRAWER
   useEffect(() => {
     window.addEventListener('keydown', handleSBMDown)
@@ -229,21 +262,14 @@ const GeneralDataRow = ({ status, data, refetch }) => {
           {/* TABLE HEAD */}
           <Thead>
             <Tr>
-              <Th></Th>
-              <Th></Th>
-              <Th></Th>
+              {[1,2,3].map((_, index) => <Th key={index}></Th>)}
             </Tr>
           </Thead>
           <Tbody>
             {/* CREATION TOOLS */}
             <Tr>
               <Td pl={0} fontWeight={'medium'}>
-                <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-                  <Text>Creation Tools</Text>
-                  <Tooltip label='Creator Tool(s) identify all the software tools and their versions used in building the SBOM. Interlynk is automatically added as one of the tools'>
-                    <Icon as={InfoIcon} color={'blue.500'} />
-                  </Tooltip>
-                </Flex>
+                <InfoLabel title={`Creation Tool`} onClick={onCheckTool} />
               </Td>
               <Td pl={0}>
                 <Flex
@@ -280,7 +306,9 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                 {!customerView && (
                   <Button
                     size='sm'
-                    isDisabled={status === 'signed' || !updateComponent || signedUrlParams}
+                    isDisabled={
+                      status === 'signed' || !updateComponent || signedUrlParams
+                    }
                     onClick={() => handleClick('tools')}
                   >
                     <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
@@ -299,12 +327,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
             {/* AUTHORS */}
             <Tr>
               <Td pl={0} fontWeight={'medium'}>
-                <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-                  <Text>Author(s)</Text>
-                  <Tooltip label='In case of non-automated SBOM generation, Author(s) identifies the name and email of persons involved in building the SBOM.'>
-                    <Icon as={InfoIcon} color={'blue.500'} />
-                  </Tooltip>
-                </Flex>
+                <InfoLabel title={`Authors`} onClick={onCheckAuthor} />
               </Td>
               <Td pl={0}>
                 <Stack spacing={2} direction={'column'}>
@@ -334,7 +357,9 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                 {!customerView && (
                   <Button
                     size='sm'
-                    isDisabled={status === 'signed' || !updateComponent || signedUrlParams}
+                    isDisabled={
+                      status === 'signed' || !updateComponent || signedUrlParams
+                    }
                     onClick={() => handleClick('author')}
                   >
                     <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
@@ -345,12 +370,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
             {/* SUPPLIERS */}
             <Tr>
               <Td pl={0} fontWeight={'medium'}>
-                <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-                  <Text>Supplier</Text>
-                  <Tooltip label='Supplier identify the name and email of the organization that built, distributed or package the application. For Open-source components, it can refer to the name of the project or entity distributing the project.'>
-                    <Icon as={InfoIcon} color={'blue.500'} />
-                  </Tooltip>
-                </Flex>
+                <InfoLabel title={`Supplier`} onClick={onCheckSupplier} />
               </Td>
               <Td pl={0}>
                 <HStack spacing={4}>
@@ -394,7 +414,9 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                 {!customerView && (
                   <Button
                     size='sm'
-                    isDisabled={status === 'signed' || !updateComponent || signedUrlParams}
+                    isDisabled={
+                      status === 'signed' || !updateComponent || signedUrlParams
+                    }
                     onClick={onSupOpen}
                   >
                     <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
@@ -405,15 +427,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
             {/* LICENSES */}
             <Tr>
               <Td pl={0} fontWeight={'medium'}>
-                <Flex flexDirection={'row'} alignItems={'center'} gap={2.5}>
-                  <Text>Data License</Text>
-                  <Icon
-                    as={InfoIcon}
-                    color={'blue.500'}
-                    onClick={onInfoOpen}
-                    cursor={'pointer'}
-                  />
-                </Flex>
+                <InfoLabel title={`Data License`} onClick={onCheckLicense} />
               </Td>
               <Td pl={0}>
                 <Flex alignItems={'center'} gap={2} flexWrap={'wrap'}>
@@ -461,7 +475,9 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                   <Button
                     size='sm'
                     ref={licenseBtn}
-                    isDisabled={status === 'signed' || !updateComponent || signedUrlParams}
+                    isDisabled={
+                      status === 'signed' || !updateComponent || signedUrlParams
+                    }
                     onClick={onLicenseOpen}
                   >
                     <Icon as={EditIcon} color={'blue.500'} cursor={'pointer'} />
@@ -560,39 +576,13 @@ const GeneralDataRow = ({ status, data, refetch }) => {
 
       {/* INFO MODAL */}
       {isInfoOpen && (
-        <Modal
+        <InfoModal
           isOpen={isInfoOpen}
           onClose={onInfoClose}
-          motionPreset='slideInBottom'
-        >
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Data Licenses</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Text>
-                Data licence is a legal arrangement between the creator of the
-                data and the end-user, or the place the data will be deposited,
-                specifying what users can do with the data
-              </Text>
-              <Link href='https://spdx.dev/about/overview' target='_blank'>
-                <Text mt={4} color='blue.500' fontWeight={'medium'}>
-                  Learn more about data licenses
-                </Text>
-              </Link>
-            </ModalBody>
-
-            <ModalFooter>
-              <Button
-                variant='unstyled'
-                colorScheme='red'
-                onClick={onInfoClose}
-              >
-                Close
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+          heading={infoHeading}
+          body={infoText}
+          url={infoUrl}
+        />
       )}
     </>
   )
