@@ -35,6 +35,7 @@ import RoleTable from 'components/Tables/RoleTable'
 import CustomLoader from 'components/CustomLoader'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useQuery } from '@apollo/client'
+import { GetOrgSettings } from 'graphQL/Queries'
 
 function Profile() {
   const location = useLocation()
@@ -65,7 +66,11 @@ function Profile() {
   const [psIndex, setPsIndex] = useState(0)
   const [selectedTab, setSelectedTab] = useState(tabs[1].name)
 
-  const { data: orgInfo, refetch, error } = useQuery(GetOrg)
+  const {
+    data: orgInfo,
+    refetch,
+    error
+  } = useQuery(GetOrg, { skip: orgInfo === undefined ? false : true })
 
   const isAdmin = orgInfo && orgInfo?.organization?.currentUser?.superAdmin
 
@@ -80,6 +85,8 @@ function Profile() {
   const { data: roles, refetch: roleRefetch } = useQuery(GetRoles, {
     skip: tabIndex === 2 ? false : true
   })
+
+  const { data: settingsData, refetch: settingsRefetch } = useQuery(GetOrgSettings)
 
   const onTabChange = (value) => {
     setTabIndex(value)
@@ -237,14 +244,22 @@ function Profile() {
                   </TabPanel>
                   {/* FEEDS */}
                   <TabPanel display={manageFeeds ? 'block' : 'none'}>
-                    <Grid
-                      width={'100%'}
-                      templateColumns={{ sm: '1fr', xl: 'repeat(3, 1fr)' }}
-                      gap='22px'
-                    >
-                      <AdvisoryFeeds />
-                      <ExploitFeeds />
-                    </Grid>
+                    {settingsData && (
+                      <Grid
+                        width={'100%'}
+                        templateColumns={{ sm: '1fr', xl: 'repeat(3, 1fr)' }}
+                        gap='22px'
+                      >
+                        <AdvisoryFeeds
+                          data={settingsData}
+                          refetch={settingsRefetch}
+                        />
+                        <ExploitFeeds
+                          data={settingsData}
+                          refetch={settingsRefetch}
+                        />
+                      </Grid>
+                    )}
                   </TabPanel>
                   {/* RULES */}
                   <TabPanel>

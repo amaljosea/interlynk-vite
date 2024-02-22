@@ -4,7 +4,6 @@ import {
   Flex,
   Input,
   Menu,
-  MenuButton,
   MenuDivider,
   MenuItemOption,
   MenuList,
@@ -13,8 +12,8 @@ import {
   useDisclosure
 } from '@chakra-ui/react'
 import CheckMark from 'components/Misc/CheckMark'
-import { FaFilter } from 'react-icons/fa'
 import { useGlobalState } from 'hooks/useGlobalState'
+import MenuHeading from 'components/Misc/MenuHeading'
 import { useRef } from 'react'
 
 const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
@@ -142,15 +141,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
           {source !== '' && source !== 'BOTH' && <CheckMark />}
-          <MenuButton
-            as={Button}
-            colorScheme='blue'
-            fontWeight='normal'
-            fontSize={'sm'}
-            leftIcon={<FaFilter size={14} />}
-          >
-            Origin
-          </MenuButton>
+          <MenuHeading title={'Origin'} />
           <MenuList>
             <MenuOptionGroup
               type='radio'
@@ -174,15 +165,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={false}>
           {severities.length !== 0 && <CheckMark />}
-          <MenuButton
-            as={Button}
-            colorScheme='blue'
-            fontWeight='normal'
-            fontSize={'sm'}
-            leftIcon={<FaFilter size={14} />}
-          >
-            Severity
-          </MenuButton>
+          <MenuHeading title={'Severity'} />
           <MenuList>
             <MenuOptionGroup
               type='checkbox'
@@ -210,15 +193,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={false}>
           {components.length !== 0 && <CheckMark />}
-          <MenuButton
-            as={Button}
-            colorScheme='blue'
-            fontWeight='normal'
-            fontSize={'sm'}
-            leftIcon={<FaFilter size={14} />}
-          >
-            Component
-          </MenuButton>
+          <MenuHeading title={'Component'} />
           <MenuList
             minHeight={'auto'}
             maxHeight={'300px'}
@@ -251,15 +226,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={false}>
           {statues.length !== 0 && <CheckMark />}
-          <MenuButton
-            as={Button}
-            colorScheme='blue'
-            fontWeight='normal'
-            fontSize={'sm'}
-            leftIcon={<FaFilter size={14} />}
-          >
-            Status
-          </MenuButton>
+          <MenuHeading title={'Status'} />
           <MenuList
             minHeight={'auto'}
             maxHeight={'300px'}
@@ -292,15 +259,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={false}>
           {kev !== 'all' && kev !== '' && <CheckMark />}
-          <MenuButton
-            as={Button}
-            colorScheme='blue'
-            fontWeight='normal'
-            fontSize={'sm'}
-            leftIcon={<FaFilter size={14} />}
-          >
-            KEV
-          </MenuButton>
+          <MenuHeading title={'KEV'} />
           <MenuList>
             <MenuOptionGroup type='radio' value={kev} onChange={onFilterKev}>
               {['all', 'yes', 'no'].map((item, index) => (
@@ -321,16 +280,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={false} isOpen={isOpen} onClose={onClose}>
           {epss !== '' && epss !== 'all' && <CheckMark />}
-          <MenuButton
-            as={Button}
-            colorScheme='blue'
-            fontWeight='normal'
-            fontSize={'sm'}
-            leftIcon={<FaFilter size={14} />}
-            onClick={onOpen}
-          >
-            EPSS*
-          </MenuButton>
+          <MenuHeading title={'EPSS*'} onClick={onOpen} />
           <MenuList>
             <MenuOptionGroup type='radio' value={epss} onChange={onFilterEpss}>
               <MenuItemOption value={'all'} fontSize={'sm'}>

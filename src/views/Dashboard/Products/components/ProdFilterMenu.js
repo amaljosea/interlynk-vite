@@ -8,7 +8,7 @@ import {
 } from '@chakra-ui/react'
 import CheckMark from 'components/Misc/CheckMark'
 import { useGlobalState } from 'hooks/useGlobalState'
-import FilterButton from 'components/Misc/FilterButton'
+import MenuHeading from 'components/Misc/MenuHeading'
 
 const ProdFilterMenu = ({ onFilter }) => {
   const { prodState } = useGlobalState()
@@ -20,7 +20,7 @@ const ProdFilterMenu = ({ onFilter }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={false}>
           {enabled !== '' && enabled !== 'all' && <CheckMark />}
-          <FilterButton>Active</FilterButton>
+          <MenuHeading title={'Active'} />
           <MenuList>
             <MenuOptionGroup type='radio' value={enabled} onChange={onFilter}>
               {['all', 'yes', 'no'].map((item, index) => (

@@ -1,7 +1,7 @@
 import { Button, MenuButton } from '@chakra-ui/react'
 import { FaFilter } from 'react-icons/fa'
 
-const FilterButton = ({ children, onClick }) => {
+const MenuHeading = ({ title, onClick }) => {
   return (
     <MenuButton
       as={Button}
@@ -11,9 +11,9 @@ const FilterButton = ({ children, onClick }) => {
       leftIcon={<FaFilter size={14} />}
       onClick={onClick}
     >
-      {children}
+      {title}
     </MenuButton>
   )
 }
 
-export default FilterButton
+export default MenuHeading

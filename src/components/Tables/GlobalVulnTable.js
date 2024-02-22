@@ -582,17 +582,17 @@ const GlobalVulnTable = ({ data, refetch }) => {
         />
 
         {data && (
-            <Pagination
-                paginationSizes={paginationSizes}
-                pageIndex={pageIndex}
-                totalRows={totalRows}
-                totalCount={data.totalCount}
-                onPreviousPage={handlePreviousPage}
-                onNextPage={handleNextPage}
-                onSetRow={handleSetRow}
-                hasNextPage={isNextActive}
-                hasPreviousPage={isPrevActive}
-            />
+          <Pagination
+            paginationSizes={paginationSizes}
+            pageIndex={pageIndex}
+            totalRows={totalRows}
+            totalCount={data.totalCount}
+            onPreviousPage={handlePreviousPage}
+            onNextPage={handleNextPage}
+            onSetRow={handleSetRow}
+            hasNextPage={isNextActive}
+            hasPreviousPage={isPrevActive}
+          />
         )}
       </Flex>
     </>

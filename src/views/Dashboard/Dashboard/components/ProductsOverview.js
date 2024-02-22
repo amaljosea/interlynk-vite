@@ -15,7 +15,7 @@ import VulnBadge from 'components/Misc/VulnBadge'
 import CustomLoader from 'components/CustomLoader'
 import { useGlobalState } from 'hooks/useGlobalState'
 
-const ProductsOverview = ({ title, data, refetch }) => {
+const ProductsOverview = ({ title, data }) => {
   const { setActiveSbomTab, dispatch } = useGlobalState()
   const { prodDispatch, prodVulnDispatch } = dispatch
   const environment = localStorage.getItem('environment')

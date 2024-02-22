@@ -1,8 +1,6 @@
 import {
   Box,
-  Button,
   Menu,
-  MenuButton,
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
@@ -10,7 +8,7 @@ import {
 } from '@chakra-ui/react'
 import CheckMark from 'components/Misc/CheckMark'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { FaFilter } from 'react-icons/fa'
+import MenuHeading from 'components/Misc/MenuHeading'
 
 const LogFilterMenu = ({ refetch, productId, sbomId }) => {
   const { totalRows, sbomLogState, dispatch } = useGlobalState()
@@ -75,15 +73,7 @@ const LogFilterMenu = ({ refetch, productId, sbomId }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnBlur={true}>
           {users?.length !== 0 && <CheckMark />}
-          <MenuButton
-            as={Button}
-            colorScheme='blue'
-            fontWeight='normal'
-            fontSize={'sm'}
-            leftIcon={<FaFilter size={14} />}
-          >
-            User
-          </MenuButton>
+          <MenuHeading title={'User'} />
           <MenuList
             minHeight={'auto'}
             maxHeight={'300px'}
@@ -111,15 +101,7 @@ const LogFilterMenu = ({ refetch, productId, sbomId }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
           {objects?.length !== 0 && <CheckMark />}
-          <MenuButton
-            as={Button}
-            colorScheme='blue'
-            fontWeight='normal'
-            fontSize={'sm'}
-            leftIcon={<FaFilter size={14} />}
-          >
-            Object
-          </MenuButton>
+          <MenuHeading title={'Object'} />
           <MenuList
             minHeight={'auto'}
             maxHeight={'300px'}
@@ -152,15 +134,7 @@ const LogFilterMenu = ({ refetch, productId, sbomId }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
           {types?.length !== 0 && <CheckMark />}
-          <MenuButton
-            as={Button}
-            colorScheme='blue'
-            fontWeight='normal'
-            fontSize={'sm'}
-            leftIcon={<FaFilter size={14} />}
-          >
-            Type
-          </MenuButton>
+          <MenuHeading title={'Type'} />
           <MenuList
             minHeight={'auto'}
             maxHeight={'300px'}

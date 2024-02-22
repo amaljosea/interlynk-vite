@@ -9,7 +9,7 @@ import {
   Text
 } from '@chakra-ui/react'
 import CheckMark from 'components/Misc/CheckMark'
-import FilterButton from 'components/Misc/FilterButton'
+import MenuHeading from 'components/Misc/MenuHeading'
 import { GetLogFilters } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
 
@@ -86,7 +86,7 @@ const ChangelogFilterMenu = ({ id, refetch }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
           {type.length !== 0 && <CheckMark />}
-          <FilterButton>Type</FilterButton>
+          <MenuHeading title={'Type'} />
           <MenuList minWidth='240px'>
             <MenuOptionGroup
               type='checkbox'
@@ -117,7 +117,7 @@ const ChangelogFilterMenu = ({ id, refetch }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
           {user.length !== 0 && <CheckMark />}
-          <FilterButton>User</FilterButton>
+          <MenuHeading title={'User'} />
           <MenuList minWidth='240px'>
             <MenuOptionGroup
               type='checkbox'
@@ -143,7 +143,7 @@ const ChangelogFilterMenu = ({ id, refetch }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={true}>
           {object.length !== 0 && <CheckMark />}
-          <FilterButton>Object</FilterButton>
+          <MenuHeading title={'Object'} />
           <MenuList minWidth='240px'>
             <MenuOptionGroup
               type='checkbox'

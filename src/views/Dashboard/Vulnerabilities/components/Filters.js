@@ -6,7 +6,7 @@ import {
   MenuOptionGroup,
   Stack
 } from '@chakra-ui/react'
-import FilterButton from 'components/Misc/FilterButton'
+import MenuHeading from 'components/Misc/MenuHeading'
 import CheckMark from 'components/Misc/CheckMark'
 import { useLocation, useParams } from 'react-router-dom'
 import { useQuery } from '@apollo/client'
@@ -73,7 +73,7 @@ const Filters = ({ data, refetch }) => {
       <Box width={'fit-content'} position={'relative'} display={'none'}>
         <Menu closeOnSelect={false}>
           {products.length !== 0 && !products.includes('all') && <CheckMark />}
-          <FilterButton>Product</FilterButton>
+          <MenuHeading title={'Product'} />
           <MenuList
             minHeight={'auto'}
             maxHeight={'300px'}
@@ -113,7 +113,7 @@ const Filters = ({ data, refetch }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={false}>
           {versions.length !== 0 && !versions.includes('all') && <CheckMark />}
-          <FilterButton>Versions</FilterButton>
+          <MenuHeading title={'Versions'} />
           <MenuList
             minHeight={'auto'}
             maxHeight={'300px'}
@@ -142,7 +142,7 @@ const Filters = ({ data, refetch }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={false}>
           {envs.length !== 0 && !envs.includes('all') && <CheckMark />}
-          <FilterButton>Environment</FilterButton>
+          <MenuHeading title={'Environment'} />
           <MenuList
             minHeight={'auto'}
             maxHeight={'300px'}
@@ -192,7 +192,7 @@ const Filters = ({ data, refetch }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={false}>
           {statuses.length !== 0 && !statuses.includes('all') && <CheckMark />}
-          <FilterButton>Status</FilterButton>
+          <MenuHeading title={'Status'} />
           <MenuList
             minHeight={'auto'}
             maxHeight={'300px'}

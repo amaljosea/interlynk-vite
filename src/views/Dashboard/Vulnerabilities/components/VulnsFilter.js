@@ -12,9 +12,9 @@ import {
   Stack,
   useDisclosure
 } from '@chakra-ui/react'
-import { useLocation, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import CheckMark from 'components/Misc/CheckMark'
-import FilterButton from 'components/Misc/FilterButton'
+import MenuHeading from 'components/Misc/MenuHeading'
 import { GetProductNames } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useRef } from 'react'
@@ -140,7 +140,7 @@ const VulnsFilters = ({ refetch }) => {
             {products?.length !== 0 && !products.includes('all') && (
               <CheckMark />
             )}
-            <FilterButton>Product</FilterButton>
+            <MenuHeading title={'Product'} />
             <MenuList>
               <MenuOptionGroup
                 type='checkbox'
@@ -173,7 +173,7 @@ const VulnsFilters = ({ refetch }) => {
           {severities?.length !== 0 && !severities.includes('all') && (
             <CheckMark />
           )}
-          <FilterButton>Severity</FilterButton>
+          <MenuHeading title={'Severity'} />
           <MenuList>
             <MenuOptionGroup
               type='checkbox'
@@ -200,7 +200,7 @@ const VulnsFilters = ({ refetch }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={false}>
           {statues.length !== 0 && !statues.includes('all') && <CheckMark />}
-          <FilterButton>Status</FilterButton>
+          <MenuHeading title={'Status'} />
           <MenuList>
             <MenuOptionGroup
               type='checkbox'
@@ -232,7 +232,7 @@ const VulnsFilters = ({ refetch }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={false}>
           {kev !== 'all' && kev !== '' && <CheckMark />}
-          <FilterButton>KEV</FilterButton>
+          <MenuHeading title={'KEV'} />
           <MenuList>
             <MenuOptionGroup type='radio' value={kev} onChange={onFilterKev}>
               {['all', 'yes', 'no'].map((item, index) => (
@@ -253,7 +253,7 @@ const VulnsFilters = ({ refetch }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={false} isOpen={isOpen} onClose={onClose}>
           {epss !== '' && epss !== 'all' && <CheckMark />}
-          <FilterButton onClick={onOpen}>EPSS</FilterButton>
+          <MenuHeading title={'EPSS'} onClick={onOpen} />
           <MenuList>
             <MenuOptionGroup type='radio' value={epss} onChange={onFilterEpss}>
               {['all', '0-100', '100-500', '500-1000', '1000-10000'].map(

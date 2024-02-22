@@ -14,22 +14,15 @@ import CardHeader from 'components/Card/CardHeader'
 import React from 'react'
 import { useMutation, useQuery } from '@apollo/client'
 import { OrgSettingUpdate, OrgSettingCreate } from 'graphQL/Mutation'
-import { GetOrgSettings } from 'graphQL/Queries'
 
-const AdvisoryFeeds = () => {
+const AdvisoryFeeds = ({ data, refetch }) => {
   const textColor = useColorModeValue('gray.700', 'white')
-
-  const { data, refetch } = useQuery(GetOrgSettings)
-
   const [organizationSettingCreate] = useMutation(OrgSettingCreate)
   const [organizationSettingUpdate] = useMutation(OrgSettingUpdate)
 
-  const filteredFeed =
-    data &&
-    data.organization &&
-    data.organization.organizationSettings.filter(
-      (item) => item.setting.kind === `advisory_feed`
-    )
+  const filteredFeed = data?.organization?.organizationSettings?.filter(
+    (item) => item.setting.kind === `advisory_feed`
+  )
 
   const handleChange = async (e, id, feed) => {
     try {

@@ -1,8 +1,6 @@
 import {
   Box,
-  Button,
   Menu,
-  MenuButton,
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
@@ -10,7 +8,7 @@ import {
 } from '@chakra-ui/react'
 import CheckMark from 'components/Misc/CheckMark'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { FaFilter } from 'react-icons/fa'
+import MenuHeading from 'components/Misc/MenuHeading'
 
 const List = ({ children }) => {
   return (
@@ -27,7 +25,6 @@ const List = ({ children }) => {
 
 const CompFilterMenu = ({ refetch, productId, sbomId }) => {
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
-  const customerView = location.pathname.startsWith('/customer')
   const { prodCompState, dispatch } = useGlobalState()
   const {
     totalRows,
@@ -39,9 +36,7 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
     kinds,
     licenses,
     suppliers,
-    scope,
-    after,
-    before
+    scope
   } = prodCompState
   const { prodCompDispatch } = dispatch
 
@@ -124,15 +119,7 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={false}>
           {ecosystems.length !== 0 && <CheckMark />}
-          <MenuButton
-            as={Button}
-            colorScheme='blue'
-            fontWeight='normal'
-            fontSize={'sm'}
-            leftIcon={<FaFilter size={14} />}
-          >
-            Ecosystem
-          </MenuButton>
+          <MenuHeading title={'Ecosystem'} />
           <MenuList>
             <MenuOptionGroup
               type='checkbox'
@@ -155,15 +142,7 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={false}>
           {kinds.length !== 0 && <CheckMark />}
-          <MenuButton
-            as={Button}
-            colorScheme='blue'
-            fontWeight='normal'
-            fontSize={'sm'}
-            leftIcon={<FaFilter size={14} />}
-          >
-            Type
-          </MenuButton>
+          <MenuHeading title={'Type'} />
           <MenuList>
             <MenuOptionGroup
               type='checkbox'
@@ -191,15 +170,7 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={false}>
           {licenses.length !== 0 && <CheckMark />}
-          <MenuButton
-            as={Button}
-            colorScheme='blue'
-            fontWeight='normal'
-            fontSize={'sm'}
-            leftIcon={<FaFilter size={14} />}
-          >
-            Licenses
-          </MenuButton>
+          <MenuHeading title={'Licenses'} />
           <MenuList
             width={'300px'}
             minH='auto'
@@ -227,15 +198,7 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={false}>
           {suppliers.length !== 0 && <CheckMark />}
-          <MenuButton
-            as={Button}
-            colorScheme='blue'
-            fontWeight='normal'
-            fontSize={'sm'}
-            leftIcon={<FaFilter size={14} />}
-          >
-            Suppliers
-          </MenuButton>
+          <MenuHeading title={'Suppliers'} />
           <MenuList>
             <MenuOptionGroup
               type='checkbox'
@@ -258,15 +221,7 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={false}>
           {scope !== '' && scope !== 'all' && <CheckMark />}
-          <MenuButton
-            as={Button}
-            colorScheme='blue'
-            fontWeight='normal'
-            fontSize={'sm'}
-            leftIcon={<FaFilter size={14} />}
-          >
-            Visibility
-          </MenuButton>
+          <MenuHeading title={'Visibility'} />
           <MenuList>
             <MenuOptionGroup type='radio' value={scope} onChange={onFilterType}>
               {['all', 'primary', 'internal'].map((item, index) => (

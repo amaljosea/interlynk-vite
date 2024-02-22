@@ -2,7 +2,6 @@ import {
   Box,
   Button,
   Menu,
-  MenuButton,
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
@@ -11,8 +10,8 @@ import {
 import CheckMark from 'components/Misc/CheckMark'
 import { GetOrgRules } from 'graphQL/Queries'
 import { useQuery } from '@apollo/client'
-import { FaFilter } from 'react-icons/fa'
 import { useGlobalState } from 'hooks/useGlobalState'
+import MenuHeading from 'components/Misc/MenuHeading'
 
 const CheckFilterMenu = ({ refetch, productId, sbomId }) => {
   const { totalRows, prodCheckState, dispatch } = useGlobalState()
@@ -24,9 +23,7 @@ const CheckFilterMenu = ({ refetch, productId, sbomId }) => {
     categories,
     severities,
     statues,
-    filters,
-    after,
-    before
+    filters
   } = prodCheckState
   const { prodCheckDispatch } = dispatch
 
@@ -103,15 +100,7 @@ const CheckFilterMenu = ({ refetch, productId, sbomId }) => {
         <Box width={'fit-content'} position={'relative'}>
           <Menu closeOnSelect={false}>
             {rules.length !== 0 && <CheckMark />}
-            <MenuButton
-              as={Button}
-              colorScheme='blue'
-              fontWeight='normal'
-              fontSize={'sm'}
-              leftIcon={<FaFilter size={14} />}
-            >
-              Check ID
-            </MenuButton>
+            <MenuHeading title={'Check ID'} />
             <MenuList
               minHeight={'auto'}
               maxHeight={'300px'}
@@ -157,15 +146,7 @@ const CheckFilterMenu = ({ refetch, productId, sbomId }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={false}>
           {categories.length !== 0 && <CheckMark />}
-          <MenuButton
-            as={Button}
-            colorScheme='blue'
-            fontWeight='normal'
-            fontSize={'sm'}
-            leftIcon={<FaFilter size={14} />}
-          >
-            Category
-          </MenuButton>
+          <MenuHeading title={'Category'} />
           <MenuList>
             <MenuOptionGroup
               type='checkbox'
@@ -193,15 +174,7 @@ const CheckFilterMenu = ({ refetch, productId, sbomId }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={false}>
           {severities.length !== 0 && <CheckMark />}
-          <MenuButton
-            as={Button}
-            colorScheme='blue'
-            fontWeight='normal'
-            fontSize={'sm'}
-            leftIcon={<FaFilter size={14} />}
-          >
-            Severity
-          </MenuButton>
+          <MenuHeading title={'Severity'} />
           <MenuList>
             <MenuOptionGroup
               type='checkbox'
@@ -229,15 +202,7 @@ const CheckFilterMenu = ({ refetch, productId, sbomId }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={false}>
           {statues.length !== 0 && <CheckMark />}
-          <MenuButton
-            as={Button}
-            colorScheme='blue'
-            fontWeight='normal'
-            fontSize={'sm'}
-            leftIcon={<FaFilter size={14} />}
-          >
-            Status
-          </MenuButton>
+          <MenuHeading title={'Status'} />
           <MenuList>
             <MenuOptionGroup
               type='checkbox'

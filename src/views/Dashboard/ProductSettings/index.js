@@ -167,11 +167,11 @@ const Settings = ({ enabled, data, refetch, activeEnv }) => {
                 onChange={(e) => setDataRetentionDays(e.target.value)}
                 isDisabled={!enabled || !editControls}
               >
-                <option value={1}>1 Day</option>
-                <option value={30}>30 Days</option>
-                <option value={90}>90 Days</option>
-                <option value={365}>1 Year</option>
-                <option value={0}>Forever</option>
+                {[1, 30, 90, 365, 0].map((item, index) => (
+                  <option key={index} value={item}>
+                    {item !== 0 && item} {item === 365 ? 'Year' : item === 0 ? 'Forever' : 'Days'}
+                  </option>
+                ))}
               </Select>
             </FormControl>
             {(enabled || editControls) && (
@@ -179,6 +179,7 @@ const Settings = ({ enabled, data, refetch, activeEnv }) => {
                 colorScheme='blue'
                 variant='solid'
                 mt={2}
+                isDisabled
                 onClick={() =>
                   onUpdate(Number(dataRetentionDays), 'dataRetention')
                 }

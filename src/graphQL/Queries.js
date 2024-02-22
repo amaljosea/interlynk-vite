@@ -22,15 +22,6 @@ export const GetOrg = gql`
         role {
           id
           name
-          permissionsMap {
-            category
-            description
-            key
-            name
-            supersededBy
-            value
-            hidden
-          }
         }
         apiKeys {
           id
