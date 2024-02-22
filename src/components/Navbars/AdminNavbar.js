@@ -12,14 +12,28 @@ import React, { useState, useEffect } from 'react'
 import AdminNavbarLinks from './AdminNavbarLinks'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useQuery } from '@apollo/client'
 import { GetUserPermissions } from 'graphQL/Queries'
+import { useQuery } from '@apollo/client'
 import { permissionList } from 'utils'
 
 export default function AdminNavbar(props) {
-  const { setUserPermissions, setActiveSbomTab, setActiveCsSbomTab } =
-    useGlobalState()
+  const {
+    setActiveSbomTab,
+    setActiveCsSbomTab,
+    userPermissions,
+    setUserPermissions
+  } = useGlobalState()
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+
+  const {} = useQuery(GetUserPermissions, {
+    skip: [...userPermissions]?.length === 0 ? false : true,
+    onCompleted: (data) => {
+      const permissions = permissionList(
+        data?.organization?.currentUser?.role?.permissionsMap || []
+      )
+      setUserPermissions(permissions)
+    }
+  })
 
   function parseJSONSafely(str) {
     try {
@@ -30,17 +44,6 @@ export default function AdminNavbar(props) {
       return {}
     }
   }
-
-  const { data } = useQuery(GetUserPermissions, { skip: signedUrlParams })
-
-  useEffect(() => {
-    if (data) {
-      const permissions = permissionList(
-        data?.organization?.currentUser?.role?.permissionsMap || []
-      )
-      setUserPermissions(permissions)
-    }
-  }, [data])
 
   const [scrolled, setScrolled] = useState(false)
   const { brandText, tabRes } = props
@@ -85,15 +88,6 @@ export default function AdminNavbar(props) {
 
   const urlParts = location.pathname.split('/')
   const category = urlParts[2]
-
-  useEffect(() => {
-    if (data) {
-      const permissions = permissionList(
-        data?.organization?.currentUser?.role?.permissionsMap || []
-      )
-      setUserPermissions(permissions)
-    }
-  }, [data])
 
   // Here are all the props that may change depending on navbar's type or state.(secondary, variant, scrolled)
   let mainText = useColorModeValue('gray.700', 'gray.200')
