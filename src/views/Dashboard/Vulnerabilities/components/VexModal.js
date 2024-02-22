@@ -137,29 +137,26 @@ const VexModal = ({
             action: actionStatement !== '' ? actionStatement : undefined,
             fixedIn: selectedTag !== '' ? selectedTag : undefined
           }
-        })
-          .then((res) => {
-            setStatusTitle('')
-            setStatusName('')
-            setJustification('')
-            setJustifyName('')
-            setSelectedTag('')
-            setActionStatement('')
-            setResponse('')
-            setResponseTitle('')
-            setDetails('')
-            setNotes('')
-            setImpactData('')
-          })
-          .finally(() => onClose())
+        }).then((res) => res?.data && onClose())
       })
     }
+    setStatusTitle('')
+    setStatusName('')
+    setJustification('')
+    setJustifyName('')
+    setSelectedTag('')
+    setActionStatement('')
+    setResponse('')
+    setResponseTitle('')
+    setDetails('')
+    setNotes('')
+    setImpactData('')
   }
 
   useEffect(() => {
     if (statusName === 'Not Affected' || statusName === 'False Positive') {
       setUpstream(true)
-    } else  {
+    } else {
       setUpstream(false)
     }
   }, [statusName])
@@ -428,7 +425,11 @@ const VexModal = ({
             </FormControl>
             {/* UPSTERAM PRODUCT */}
             <FormControl>
-              <Checkbox size='sm' isChecked={upstream} onChange={(e) => setUpstream(e.target.checked)}>
+              <Checkbox
+                size='sm'
+                isChecked={upstream}
+                onChange={(e) => setUpstream(e.target.checked)}
+              >
                 Also update upstream products
               </Checkbox>
             </FormControl>

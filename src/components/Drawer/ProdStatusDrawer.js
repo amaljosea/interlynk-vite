@@ -35,7 +35,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
-  const { data: res } = useQuery(GetCdxResponses, {skip: signedUrlParams})
+  const { data: res } = useQuery(GetCdxResponses, { skip: signedUrlParams })
 
   const { totalRows, userPermissions, prodVulnState, dispatch } =
     useGlobalState()
@@ -74,8 +74,12 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
   const [statusResults, setStatusResults] = useState([])
   const [newVulnLogs, setNewVulnLogs] = useState([])
 
-  const { data: allVexStatus } = useQuery(getVexStatuses,{skip: signedUrlParams})
-  const { data: allVexJustify } = useQuery(getVexJustifications,{skip: signedUrlParams})
+  const { data: allVexStatus } = useQuery(getVexStatuses, {
+    skip: signedUrlParams
+  })
+  const { data: allVexJustify } = useQuery(getVexJustifications, {
+    skip: signedUrlParams
+  })
 
   const handleRefetch = async () => {
     const epssRange = (epss !== '' || epss !== '0-0') && epss.split('-')
@@ -145,8 +149,8 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
     setJustifyName(e.target.options[e.target.selectedIndex].text)
   }
 
-  const handleSave = async () => {
-    await compVexCreate({
+  const handleSave = () => {
+    compVexCreate({
       variables: {
         sbomId: sbomId,
         compVulnId: id,
@@ -202,7 +206,7 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
   useEffect(() => {
     if (statusName === 'Not Affected' || statusName === 'False Positive') {
       setUpstream(true)
-    } else  {
+    } else {
       setUpstream(false)
     }
   }, [statusName])
@@ -432,7 +436,11 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
               </FormControl>
               {/* UPSTERAM PRODUCT */}
               <FormControl>
-                <Checkbox size='sm' isChecked={upstream} onChange={(e) => setUpstream(e.target.checked)}>
+                <Checkbox
+                  size='sm'
+                  isChecked={upstream}
+                  onChange={(e) => setUpstream(e.target.checked)}
+                >
                   Also update upstream products
                 </Checkbox>
               </FormControl>
