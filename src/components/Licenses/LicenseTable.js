@@ -11,21 +11,25 @@ import {
   Icon,
   Tooltip,
   IconButton,
-  useDisclosure, Menu, MenuButton, Portal, MenuList, MenuItem
+  useDisclosure,
+  Menu,
+  MenuButton,
+  Portal,
+  MenuList,
+  MenuItem
 } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
-import {useCallback, useEffect, useMemo, useState} from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import LicenseDrawer from './LicenseDrawer'
 import LicenseFilter from './LicenseFilter'
 import RowLimit from 'views/Sbom/components/RowLimit'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import { customStyles } from 'utils'
-import {FaEllipsisV} from "react-icons/fa";
-import Pagination from "../Pagination";
+import { FaEllipsisV } from 'react-icons/fa'
+import Pagination from '../Pagination'
 
 const LicenseTable = ({ data, refetch }) => {
-
   const licenses = data?.nodes
 
   // PAGINATION
@@ -107,7 +111,6 @@ const LicenseTable = ({ data, refetch }) => {
 
   // PAGINATION END
 
-
   const [searchInput, setSearchInput] = useState('')
   const [activeRow, setActiveRow] = useState(null)
 
@@ -165,6 +168,7 @@ const LicenseTable = ({ data, refetch }) => {
     {
       id: 'NAME',
       name: 'NAME',
+      width: '250px',
       wrap: true,
       selector: ({ content: { name } }) => {
         const handleClick = () => {
@@ -177,10 +181,7 @@ const LicenseTable = ({ data, refetch }) => {
             gap={2}
             cursor={'pointer'}
           >
-            <Link
-                to={`/vendor/licenses/bal`}
-                onClick={handleClick}
-            >
+            <Link to={`/vendor/licenses/bal`} onClick={handleClick}>
               <Text
                 color={'blue.500'}
                 my={3}
@@ -198,27 +199,27 @@ const LicenseTable = ({ data, refetch }) => {
     {
       id: 'SPDX_ID',
       name: 'SPDX ID',
-      selector: ({content: { shortId, url }}) => {
+      width: '250px',
+      wrap: true,
+      selector: ({ content: { shortId, url } }) => {
         return (
-            <Flex
-                direction='row'
-                alignItems={'center'}
-                gap={2}
-            >
-              <Tag variant='subtle' >
-                <TagLabel my={1} style={{whiteSpace: "normal"}}>
-                  {shortId || 'Not Available'}
-                </TagLabel>
-              </Tag>
-              <Link href={url?.replace('.json','.html')} isExternal>
-                {url && <Icon
-                    as={ExternalLinkIcon}
-                    h={'16px'}
-                    w={'16px'}
-                    color={'blue.500'}
-                />}
-              </Link>
-            </Flex>
+          <Flex direction='row' alignItems={'center'} gap={2}>
+            <Tag variant='subtle'>
+              <TagLabel my={1} style={{ whiteSpace: 'normal' }}>
+                {shortId || 'Not Available'}
+              </TagLabel>
+            </Tag>
+            <Link href={url?.replace('.json', '.html')} isExternal>
+              {url && (
+                <Icon
+                  as={ExternalLinkIcon}
+                  h={'16px'}
+                  w={'16px'}
+                  color={'blue.500'}
+                />
+              )}
+            </Link>
+          </Flex>
         )
       }
     },
@@ -226,9 +227,11 @@ const LicenseTable = ({ data, refetch }) => {
     {
       id: 'ATTRIBUTION',
       name: 'ATTRIBUTION',
-      selector: ({attribution}) => {
-        if(!attribution || attribution == "UNKNOWN") {
-          attribution = "Not Available"
+      width: '180px',
+      wrap: true,
+      selector: ({ attribution }) => {
+        if (!attribution || attribution == 'UNKNOWN') {
+          attribution = 'Not Available'
         }
         return (
           <Text textTransform='capitalize'>{attribution.toLowerCase()}</Text>
@@ -239,34 +242,40 @@ const LicenseTable = ({ data, refetch }) => {
     {
       id: 'COPYLEFT',
       name: 'COPYLEFT',
-      selector: ({copyLeft}) => {
-        if(!copyLeft || copyLeft == "UNKNOWN") {
-          copyLeft = "Not Available"
+      width: '180px',
+      wrap: true,
+      selector: ({ copyLeft }) => {
+        if (!copyLeft || copyLeft == 'UNKNOWN') {
+          copyLeft = 'Not Available'
         }
-        return (
-          <Text textTransform='capitalize'>{copyLeft.toLowerCase()}</Text>
-        )
+        return <Text textTransform='capitalize'>{copyLeft.toLowerCase()}</Text>
       }
     },
     // REQUIRES SOURCE CODE
     {
       id: 'REQUIRES SOURCE CODE',
       name: 'REQUIRES SOURCE CODE',
-      selector: ({sourceDistribution}) => {
-        if(!sourceDistribution || sourceDistribution == "UNKNOWN") {
-          sourceDistribution = "Not Available"
+      width: '250px',
+      wrap: true,
+      selector: ({ sourceDistribution }) => {
+        if (!sourceDistribution || sourceDistribution == 'UNKNOWN') {
+          sourceDistribution = 'Not Available'
         }
         return (
-          <Text textTransform='capitalize'>{sourceDistribution.toLowerCase()}</Text>
+          <Text textTransform='capitalize'>
+            {sourceDistribution.toLowerCase()}
+          </Text>
         )
       }
     },
     {
       id: 'PERMITS MODIFICATIONS',
       name: 'PERMITS MODIFICATIONS',
-      selector: ({modifications}) => {
-        if(!modifications || modifications == "UNKNOWN") {
-          modifications = "Not Available"
+      width: '250px',
+      wrap: true,
+      selector: ({ modifications }) => {
+        if (!modifications || modifications == 'UNKNOWN') {
+          modifications = 'Not Available'
         }
         return (
           <Text textTransform='capitalize'>{modifications.toLowerCase()}</Text>
@@ -277,8 +286,10 @@ const LicenseTable = ({ data, refetch }) => {
     {
       id: 'STATUS',
       name: 'STATUS',
-      selector: ({state}) => {
-        state =  state?.toLowerCase() || 'Not Available'
+      width: '150px',
+      wrap: true,
+      selector: ({ state }) => {
+        state = state?.toLowerCase() || 'Not Available'
         return (
           <Tag
             size='md'
@@ -306,7 +317,6 @@ const LicenseTable = ({ data, refetch }) => {
       id: 'actions',
       name: 'ACTIONS',
       selector: (row) => {
-
         return (
           <Menu>
             <MenuButton
@@ -314,22 +324,22 @@ const LicenseTable = ({ data, refetch }) => {
               icon={<FaEllipsisV />}
               variant='none'
               color='gray.400'
-          />
-          <Portal>
-            <MenuList fontSize={'sm'}>
-              {/* EDIT PRODUCT */}
-              <MenuItem
+            />
+            <Portal>
+              <MenuList fontSize={'sm'}>
+                {/* EDIT PRODUCT */}
+                <MenuItem
                   onClick={() => {
                     setActiveRow(row)
                     onOpen()
                   }}
                   isDisabled={false}
-              >
-                Edit Product
-              </MenuItem>
-            </MenuList>
-          </Portal>
-        </Menu>
+                >
+                  Edit Product
+                </MenuItem>
+              </MenuList>
+            </Portal>
+          </Menu>
         )
       },
       right: 'true'
@@ -370,7 +380,12 @@ const LicenseTable = ({ data, refetch }) => {
       )}
 
       {isOpen && (
-        <LicenseDrawer isOpen={isOpen} refetch={refetch} onClose={onClose} data={activeRow} />
+        <LicenseDrawer
+          isOpen={isOpen}
+          refetch={refetch}
+          onClose={onClose}
+          data={activeRow}
+        />
       )}
     </>
   )
