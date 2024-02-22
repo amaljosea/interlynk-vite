@@ -1825,3 +1825,51 @@ export const UpdateShareLynk = gql`
     }
   }
 `
+
+export const CreateLicense = gql`
+  mutation CreateLicense(
+    $name: String!,
+    $state: LicensesState!,
+    $attribution: LicensesObligationStatus,
+    $copyLeft: LicensesObligationCopyLeft,
+    $requiresSourceCode: LicensesObligationStatus,
+    $permitsModifications: LicensesObligationStatus
+  ) {
+  organizationLicenseCreate(input: {
+    name: $name,
+    state: $state,
+    attribution: $attribution,
+    copyLeft: $copyLeft,
+    sourceDistribution: $requiresSourceCode,
+    modifications: $permitsModifications,
+  })
+  {
+    errors
+  }
+}
+`
+
+export const UpdateLicense = gql`
+  mutation LicenseUpdate(
+    $id: ID!,
+    $state: LicensesState!,
+    $attribution: LicensesObligationStatus,
+    $copyLeft: LicensesObligationCopyLeft,
+    $requiresSourceCode: LicensesObligationStatus,
+    $permitsModifications: LicensesObligationStatus
+  ) {
+  organizationLicenseUpdate(input: {
+    id: $id,
+    state: $state,
+    attribution: $attribution,
+    copyLeft: $copyLeft,
+    sourceDistribution: $requiresSourceCode,
+    modifications: $permitsModifications,
+  })
+  {
+    errors
+  }
+}
+`
+
+

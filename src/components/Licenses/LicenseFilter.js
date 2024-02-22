@@ -38,7 +38,7 @@ const LicenseFilter = () => {
                 setStatus(value.includes('all') ? [] : value)
               }
             >
-              {['all', 'approved', 'rejected'].map((item, index) => (
+              {['all', 'approved', 'rejected', 'unspecified'].map((item, index) => (
                 <MenuItemOption
                   key={index}
                   value={item}

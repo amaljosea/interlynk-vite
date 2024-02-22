@@ -3188,3 +3188,67 @@ export const GetSharelynks = gql`
     }
   }
 `
+
+// GET DATA FOR LICENSE TABLE
+
+export const GetLicensesTable = gql`
+  query GetLicensesTable(
+    $first: Int
+    $after: String
+    $last: Int
+    $before: String) {
+    organization {
+      licenses(
+        first: $first,
+        last: $last,
+        after: $after,
+        before: $before,
+        orderBy: { direction: DESC, field: ORGANIZATION_LICENSES_STATE }
+        ) {
+        totalCount
+        pageInfo {
+          hasNextPage
+          endCursor
+          hasPreviousPage
+          startCursor
+        }
+        nodes{
+          id
+          state
+          attribution
+          attributionKeys
+          copyLeft
+          sourceDistribution
+          modifications
+          warranty
+          governingLaws
+          deprecated
+          restrictive
+          osiApproved
+          fsfLibre
+          createdAt
+          updatedAt
+          content{
+            __typename
+            ... on License {
+              id
+              name
+              shortId
+              text
+              comment
+              url
+            }
+            ... on LicenseCustom {
+              id
+              name
+              text
+              url
+              comment
+            }
+          }
+          __typename
+        }
+      }
+    }
+  }
+`
