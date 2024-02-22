@@ -16,7 +16,7 @@ import ActivitiesOverview from './components/ActivitiesOverview'
 import ProductsOverview from './components/ProductsOverview'
 import RiskScoreOverview from './components/SalesOverview'
 import { GetOrg } from 'graphQL/Queries'
-import { useLazyQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 import OrgRegister from '../Profile/components/OrgRegister'
 import { useEffect } from 'react'
 import { GetOrgMetrics } from 'graphQL/Queries'
@@ -32,35 +32,27 @@ export default function Dashboard() {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const product = queryParams.get('id')
-
   const { dispatch, envName } = useGlobalState()
   const { prodCompDispatch, prodVulnDispatch } = dispatch
 
   const iconBoxInside = useColorModeValue('white', 'white')
 
-  const [getOrgData, { data, error: eOrg, loading }] = useLazyQuery(GetOrg, {
-    fetchPolicy: 'network-only'
+  const {
+    data,
+    error: eOrg,
+    loading
+  } = useQuery(GetOrg, {
+    skip: data === undefined ? false : true,
+    onCompleted: (data) => {
+      console.log('Get organization')
+      localStorage.setItem('organization', data?.organization?.name)
+    }
   })
-  const [getMetrics, { data: metrics, error: eOrgMetric }] = useLazyQuery(
-    GetOrgMetrics,
-    { fetchPolicy: 'network-only' }
-  )
 
-  useEffect(() => {
-    getOrgData()
-  }, [])
-
-  useEffect(() => {
-    getMetrics({ variables: { env: envName } })
-  }, [envName])
-
-  useEffect(() => {
-    if (data)
-      localStorage.setItem(
-        'organization',
-        JSON.stringify(data?.organization?.name)
-      )
-  }, [data])
+  const { data: metrics, error: eOrgMetric } = useQuery(GetOrgMetrics, {
+    skip: metrics === undefined ? false : true,
+    variables: { env: envName }
+  })
 
   useEffect(() => {
     if (product === null) {
@@ -203,7 +195,6 @@ export default function Dashboard() {
                   <ProductsOverview
                     title={'Recent Imports'}
                     data={metrics?.organizationMetric?.latestVersions}
-                    refetch={getMetrics}
                   />
                 </GridItem>
                 {/* LATEST ACTIVITIES */}

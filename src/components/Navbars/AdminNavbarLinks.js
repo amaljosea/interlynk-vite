@@ -23,8 +23,7 @@ import {
   MenuOptionGroup
 } from '@chakra-ui/react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { useLazyQuery, useQuery } from '@apollo/client'
-import { GetOrg } from 'graphQL/Queries'
+import { useLazyQuery } from '@apollo/client'
 import { dashRoutes } from 'routes.js'
 import PropTypes from 'prop-types'
 import { useEffect } from 'react'
@@ -48,13 +47,11 @@ export default function HeaderLinks(props) {
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
   const group = JSON.parse(localStorage.getItem('product'))
+  const organization = localStorage.getItem('organization')
   const dashboardView = location.pathname === '/vendor/dashboard'
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
-  const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
 
   const { variant, children, fixed, secondary, onOpen, ...rest } = props
-
-  const { data, error } = useQuery(GetOrg, { skip: signedUrlParams })
 
   const name = localStorage.getItem('username')
   const email = localStorage.getItem('email')
@@ -70,10 +67,10 @@ export default function HeaderLinks(props) {
   }, [])
 
   useEffect(() => {
-    if ((!email || error) && location.pathname.startsWith('/vendor')) {
+    if ((!email) && location.pathname.startsWith('/vendor')) {
       logoutUser().then((r) => navigate('/auth'))
     }
-  }, [error, location])
+  }, [location])
 
   // Chakra Color Mode
   let navbarIcon = useColorModeValue('gray.500', 'gray.200')
@@ -245,7 +242,7 @@ export default function HeaderLinks(props) {
               <Link to={`/vendor/settings?tab=person`}>
                 <MenuItem
                   icon={<SettingsIcon />}
-                  display={data?.organization ? 'flex' : 'none'}
+                  display={organization ? 'flex' : 'none'}
                 >
                   Settings
                 </MenuItem>
@@ -253,7 +250,7 @@ export default function HeaderLinks(props) {
               <Link to='/vendor/settings?tab=organization'>
                 <MenuItem
                   icon={<FaExchangeAlt />}
-                  display={data?.organization ? 'flex' : 'none'}
+                  display={organization ? 'flex' : 'none'}
                 >
                   Organizations
                 </MenuItem>
