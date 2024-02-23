@@ -50,7 +50,7 @@ export default function Dashboard() {
   })
 
   const { data: metrics, error: eOrgMetric } = useQuery(GetOrgMetrics, {
-    skip: metrics === undefined ? false : true,
+    skip: data?.organization?.name ? false : true,
     variables: { env: envName }
   })
 
