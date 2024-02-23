@@ -1874,20 +1874,39 @@ export const CreateLicense = gql`
     $copyLeft: LicensesObligationCopyLeft
     $requiresSourceCode: LicensesObligationStatus
     $permitsModifications: LicensesObligationStatus
+    $text: String
+    $url: String
+    $comment: String
+    $attributionKeys: String
+    $warranty: String
+    $governingLaws: String
+    $deprecated: Boolean
+    $restrictive: Boolean
+    $fsfLibre: Boolean
+    $osiApproved: Boolean
   ) {
-    organizationLicenseCreate(
-      input: {
-        name: $name
-        state: $state
-        attribution: $attribution
-        copyLeft: $copyLeft
-        sourceDistribution: $requiresSourceCode
-        modifications: $permitsModifications
-      }
-    ) {
-      errors
-    }
+  organizationLicenseCreate(input: {
+    name: $name,
+    state: $state,
+    attribution: $attribution
+    copyLeft: $copyLeft
+    sourceDistribution: $requiresSourceCode
+    modifications: $permitsModifications
+    text: $text
+    url: $url
+    comment: $comment
+    attributionKeys: $attributionKeys
+    warranty: $warranty
+    governingLaws: $governingLaws
+    deprecated: $deprecated
+    restrictive: $restrictive
+    fsfLibre: $fsfLibre
+    osiApproved: $osiApproved
+  })
+  {
+    errors
   }
+}
 `
 
 export const UpdateLicense = gql`
@@ -1895,21 +1914,34 @@ export const UpdateLicense = gql`
     $id: ID!
     $state: LicensesState!
     $attribution: LicensesObligationStatus
+    $attributionKeys: String
     $copyLeft: LicensesObligationCopyLeft
     $requiresSourceCode: LicensesObligationStatus
     $permitsModifications: LicensesObligationStatus
+    $warranty: String
+    $governingLaws: String
+    $deprecated: Boolean
+    $restrictive: Boolean
+    $fsfLibre: Boolean
+    $osiApproved: Boolean
   ) {
-    organizationLicenseUpdate(
-      input: {
-        id: $id
-        state: $state
-        attribution: $attribution
-        copyLeft: $copyLeft
-        sourceDistribution: $requiresSourceCode
-        modifications: $permitsModifications
-      }
-    ) {
-      errors
-    }
+  organizationLicenseUpdate(input: {
+    id: $id
+    state: $state
+    attribution: $attribution
+    copyLeft: $copyLeft
+    sourceDistribution: $requiresSourceCode
+    modifications: $permitsModifications
+    attributionKeys: $attributionKeys
+    warranty: $warranty
+    governingLaws: $governingLaws
+    deprecated: $deprecated
+    restrictive: $restrictive
+    fsfLibre: $fsfLibre
+    osiApproved: $osiApproved
+  })
+  {
+    errors
   }
+}
 `
