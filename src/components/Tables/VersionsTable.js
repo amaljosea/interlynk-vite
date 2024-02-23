@@ -48,6 +48,9 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const activeProd = localStorage.getItem(signedUrlParams ? 'publicEnv' : 'activeEnv')
 
+  const paginationSizes = [25, 50, 100]
+  const [totalRows, setTotalRows] = useState(paginationSizes[0])
+
   const { data, refetch, error } = useQuery(
     signedUrlParams ? ShareVersionTable : GetVersionsTable,
     {
@@ -64,8 +67,6 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
     : data?.project?.sbomVersions
 
   //This part is needed for the pagination to work. (Modify with caution)
-  const paginationSizes = [25, 50, 100]
-  const [totalRows, setTotalRows] = useState(paginationSizes[0])
 
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
