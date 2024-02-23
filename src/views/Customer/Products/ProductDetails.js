@@ -42,11 +42,10 @@ const ProductDetails = () => {
     totalRows,
     activeCsProdTab,
     setActiveCsProdTab,
-    activeCsSbomTab,
     prodVulnState,
     dispatch
   } = useGlobalState()
-  const { searchInput, severities, components, statues, source, kev, epss } =
+  const { field, direction, searchInput, severities, components, statues, source, kev, epss } =
     prodVulnState
   const { prodVulnDispatch } = dispatch
 
@@ -88,7 +87,9 @@ const ProductDetails = () => {
       status: statues.length > 0 ? statues : undefined,
       kev:
         kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
-      epss: epss !== '' && epss !== 'all' ? range : undefined
+      epss: epss !== '' && epss !== 'all' ? range : undefined,
+      field,
+      direction
     }
   })
 

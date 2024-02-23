@@ -85,8 +85,8 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       last: undefined,
       after: undefined,
       before: undefined,
-      field: signedUrlParams ? undefined : field,
-      direction: signedUrlParams ? undefined : direction
+      field: field,
+      direction: direction
     })
   }
 

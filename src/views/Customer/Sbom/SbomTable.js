@@ -131,6 +131,8 @@ const SbomTable = ({
         supplierName: getUndefinedIfEmptyOrAll(suppliers),
         primary: scope === 'primary' ? true : undefined,
         internal: scope === 'internal' ? true : undefined,
+        field: field,
+        direction: direction
       }).then((res) => {
         if (res.data) {
           prodCompDispatch({
@@ -171,6 +173,8 @@ const SbomTable = ({
           epss !== '' && epss !== 'all'
             ? { min: vulnEpss[0], max: vulnEpss[1] }
             : undefined,
+        field: field,
+        direction: direction
       }).then((res) => {
         if (res.data) {
           prodVulnDispatch({

@@ -17,9 +17,10 @@ const idRegex =
   /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
 
 function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
-  const { totalRows, envName, activeCsSbomTab, prodState, prodCompState } =
+  const { totalRows, activeCsSbomTab, prodState, prodCompState } =
     useGlobalState()
   const { data: allProjectGroups } = prodState
+  const {field, direction} = prodCompState
   const location = useLocation()
   const navigate = useNavigate()
   const toast = useToast()
@@ -42,7 +43,9 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
     fetchPolicy: 'network-only',
     variables: {
       sbomId: sbomId,
-      first: totalRows
+      first: totalRows,
+      field,
+      direction
     }
   })
 

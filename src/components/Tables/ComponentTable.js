@@ -156,8 +156,8 @@ const ComponentTable = ({
       last: undefined,
       after: undefined,
       before: undefined,
-      field: signedUrlParams ? undefined : field,
-      direction: signedUrlParams ? undefined : direction
+      field: field,
+      direction: direction
     })
       .then((res) => {
         res && setPaginationControl(res.data)
@@ -1000,12 +1000,12 @@ const ComponentTable = ({
         primary: scope === 'primary' ? true : undefined,
         internal: scope === 'internal' ? true : undefined,
         direct: direct === 'Yes' ? true : false,
-        field: signedUrlParams ? undefined : field,
-        direction: signedUrlParams ? undefined : direction,
         first: totalRows,
         last: undefined,
         after: undefined,
-        before: undefined
+        before: undefined,
+        field: field,
+        direction: direction,
       }).then((res) => {
         if (res.data) {
           setPaginationControl(res.data)
@@ -1128,8 +1128,8 @@ const ComponentTable = ({
       primary: scope === 'primary' ? true : undefined,
       internal: scope === 'internal' ? true : undefined,
       direct: direct === 'Yes' ? true : false,
-      field: signedUrlParams ? undefined : field,
-      direction: signedUrlParams ? undefined : direction
+      field: field,
+      direction: direction
     }).then((res) => {
       if (res?.data) {
         setPaginationControl(res?.data)

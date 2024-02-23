@@ -1629,6 +1629,8 @@ export const ShareComponentData = gql`
     $kind: [String!]
     $internal: Boolean
     $primary: Boolean
+    $field: ComponentOrderByFields!
+    $direction: OrderByDirection!
   ) {
     shareLynkQuery {
       sbom(id: $sbomId) {
@@ -1645,6 +1647,7 @@ export const ShareComponentData = gql`
           kind: $kind
           internal: $internal
           primary: $primary
+          orderBy: { field: $field, direction: $direction }
         ) {
           totalCount
           pageInfo {
@@ -1962,6 +1965,8 @@ export const ShareVulnData = gql`
     $last: Int
     $after: String
     $before: String
+    $field: ComponentVulnOrderByFields!
+    $direction: OrderByDirection!
   ) {
     shareLynkQuery {
       sbom(id: $sbomId) {
@@ -1978,6 +1983,7 @@ export const ShareVulnData = gql`
           before: $before
           first: $first
           last: $last
+          orderBy: { field: $field, direction: $direction }
         ) {
           totalCount
           pageInfo {

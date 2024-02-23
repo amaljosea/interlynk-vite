@@ -4,7 +4,6 @@ import { Flex, Text } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import ProductTable from 'components/Tables/ProductTable'
 import { ShareLynkProjectGroups } from 'graphQL/Queries'
-import { useEffect } from 'react'
 import { displayErrorMessage } from 'utils'
 
 const ProductList = () => {

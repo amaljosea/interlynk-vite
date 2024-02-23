@@ -73,8 +73,8 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
       primary: scope === 'primary' ? true : undefined,
       internal: scope === 'internal' ? true : undefined,
       direct: direct === 'Yes' ? true : false,
-      field: signedUrlParams ? undefined : field,
-      direction: signedUrlParams ? undefined : direction
+      field: field,
+      direction: direction
     })
   }
 

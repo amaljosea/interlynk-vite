@@ -130,7 +130,6 @@ const VulnTable = ({
     userPermissions,
     totalRows,
     setTotalRows,
-    activeCsSbomTab,
     prodVulnState,
     dispatch
   } = useGlobalState()
@@ -215,7 +214,7 @@ const VulnTable = ({
       selector: (row) => {
         const { vuln, isPart, component } = row
         const { sbom } = component
-        const { primaryComponent, createdAt, projectVersion, project } = sbom
+        const {  projectVersion, project } = sbom
         const { vulnInfo } = vuln
         const { kev } = vulnInfo ? vulnInfo : ''
         return (
@@ -483,8 +482,8 @@ const VulnTable = ({
     kev: kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
     epss: epss !== '' && epss !== 'all' ? range : undefined,
     direct: direct === 'Yes' ? true : false,
-    field: signedUrlParams ? undefined : field,
-    direction: signedUrlParams ? undefined : direction
+    field: field,
+    direction: direction
   }
 
   // CLEAR SERACH
@@ -548,12 +547,12 @@ const VulnTable = ({
               : false,
         epss: epss !== '' && epss !== 'all' ? range : undefined,
         direct: direct === 'Yes' ? true : false,
-        field: signedUrlParams ? undefined : field,
-        direction: signedUrlParams ? undefined : direction,
         first: totalRows,
         last: undefined,
         after: undefined,
-        before: undefined
+        before: undefined,
+        field: field,
+        direction: direction,
       }).then((res) => {
         if (res.data) {
           setPaginationControl(res.data)
