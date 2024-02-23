@@ -66,8 +66,13 @@ const ProductTable = ({ data, refetch }) => {
   }, [data])
 
   const setPaginationControl = (data) => {
-    setIsPrevActive(data.organization?.projectGroups?.pageInfo?.hasPreviousPage)
-    setIsNextActive(data.organization?.projectGroups?.pageInfo?.hasNextPage)
+    if(signedUrlParams) {
+      setIsPrevActive(data?.shareLynkQuery?.projectGroups?.pageInfo?.hasPreviousPage)
+      setIsNextActive(data?.shareLynkQuery?.projectGroups?.pageInfo?.hasNextPage)
+    } else {
+      setIsPrevActive(data?.organization?.projectGroups?.pageInfo?.hasPreviousPage)
+      setIsNextActive(data?.organization?.projectGroups?.pageInfo?.hasNextPage)
+    }
   }
 
   const disablePaginationControl = () => {
@@ -645,6 +650,7 @@ const ProductTable = ({ data, refetch }) => {
       after: data.pageInfo.endCursor,
       before: undefined
     }).then((res) => {
+      console.log(res.data);
       if (res.data) {
         prodDispatch({
           type: 'INCREMENT_PAGE',

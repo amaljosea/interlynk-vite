@@ -1271,6 +1271,12 @@ export const ShareVersionTable = gql`
           before: $before
         ) {
           totalCount
+          pageInfo {
+            endCursor
+            hasNextPage
+            hasPreviousPage
+            startCursor
+          }
           nodes {
             id
             creationAt
@@ -1638,6 +1644,12 @@ export const ShareComponentData = gql`
           primary: $primary
         ) {
           totalCount
+          pageInfo {
+            endCursor
+            hasNextPage
+            hasPreviousPage
+            startCursor
+          }
           nodes {
             id
             name
@@ -1962,6 +1974,12 @@ export const ShareVulnData = gql`
           last: $last
         ) {
           totalCount
+          pageInfo {
+            endCursor
+            hasNextPage
+            hasPreviousPage
+            startCursor
+          }
           nodes {
             id
             impact
@@ -2418,6 +2436,12 @@ export const ShareLynkProjectGroups = gql`
         before: $before
       ) {
         totalCount
+        pageInfo {
+          endCursor
+          hasNextPage
+          hasPreviousPage
+          startCursor
+        }
         nodes {
           id
           name
@@ -3188,13 +3212,14 @@ export const GetLicensesTable = gql`
     $first: Int
     $after: String
     $last: Int
-    $before: String) {
+    $before: String
+  ) {
     organization {
       licenses(
-        first: $first,
-        last: $last,
-        after: $after,
-        before: $before,
+        first: $first
+        last: $last
+        after: $after
+        before: $before
         orderBy: { direction: $direction, field: ORGANIZATION_LICENSES_STATE }
         ) {
         totalCount
@@ -3204,7 +3229,7 @@ export const GetLicensesTable = gql`
           hasPreviousPage
           startCursor
         }
-        nodes{
+        nodes {
           id
           state
           attribution
@@ -3220,7 +3245,7 @@ export const GetLicensesTable = gql`
           fsfLibre
           createdAt
           updatedAt
-          content{
+          content {
             __typename
             ... on License {
               id

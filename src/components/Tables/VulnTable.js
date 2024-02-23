@@ -97,8 +97,13 @@ const VulnTable = ({
   const [isNextActive, setIsNextActive] = useState(false)
 
   const setPaginationControl = (data) => {
-    setIsPrevActive(data.sbom?.vulns?.pageInfo?.hasPreviousPage)
-    setIsNextActive(data.sbom?.vulns?.pageInfo?.hasNextPage)
+    if(signedUrlParams) {
+      setIsPrevActive(data?.shareLynkQuery?.sbom?.vulns?.pageInfo?.hasPreviousPage)
+      setIsNextActive(data?.shareLynkQuery?.sbom?.vulns?.pageInfo?.hasNextPage)
+    } else {
+      setIsPrevActive(data?.sbom?.vulns?.pageInfo?.hasPreviousPage)
+      setIsNextActive(data?.sbom?.vulns?.pageInfo?.hasNextPage)
+    }
   }
 
   const disablePaginationControl = () => {
@@ -782,7 +787,7 @@ const VulnTable = ({
       before: data.pageInfo.startCursor
     }).then((res) => {
       if (res.data) {
-        setIsPrevActive(res?.data?.sbom?.vulns?.pageInfo?.hasPreviousPage)
+        setPaginationControl(res?.data)
         prodVulnDispatch({
           type: 'DECREMENT_PAGE',
           payload: data.pageInfo.startCursor
@@ -802,7 +807,7 @@ const VulnTable = ({
       before: undefined
     }).then((res) => {
       if (res.data) {
-        setIsNextActive(res?.data?.sbom?.vulns?.pageInfo?.hasNextPage)
+        setPaginationControl(res?.data)
         prodVulnDispatch({
           type: 'INCREMENT_PAGE',
           payload: {

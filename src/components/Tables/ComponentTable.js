@@ -72,8 +72,13 @@ const ComponentTable = ({
   const [isNextActive, setIsNextActive] = useState(false)
 
   const setPaginationControl = (data) => {
-    setIsPrevActive(data.sbom?.components?.pageInfo?.hasPreviousPage)
-    setIsNextActive(data.sbom?.components?.pageInfo?.hasNextPage)
+    if(signedUrlParams) {
+      setIsPrevActive(data?.shareLynkQuery?.sbom?.components?.pageInfo?.hasPreviousPage)
+      setIsNextActive(data?.shareLynkQuery?.sbom?.components?.pageInfo?.hasNextPage)
+    } else {
+      setIsPrevActive(data?.sbom?.components?.pageInfo?.hasPreviousPage)
+      setIsNextActive(data?.sbom?.components?.pageInfo?.hasNextPage)
+    }
   }
 
   const disablePaginationControl = () => {
@@ -82,7 +87,7 @@ const ComponentTable = ({
   }
   //end
 
-  const { userPermissions, totalRows, setTotalRows, activeCsSbomTab, prodCompState, dispatch } =
+  const { userPermissions, totalRows, setTotalRows, prodCompState, dispatch } =
     useGlobalState()
   const {
     field,
@@ -1121,8 +1126,8 @@ const ComponentTable = ({
       field: signedUrlParams ? undefined : field,
       direction: signedUrlParams ? undefined : direction
     }).then((res) => {
-      if (res.data) {
-        setPaginationControl(res.data)
+      if (res?.data) {
+        setPaginationControl(res?.data)
       }
     })
   }
@@ -1156,7 +1161,7 @@ const ComponentTable = ({
       direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
     }).then((res) => {
       if (res.data) {
-        setPaginationControl(res.data)
+        setPaginationControl(res?.data)
         prodCompDispatch({
           type: 'SET_SORT_ORDER',
           payload: {
