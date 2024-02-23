@@ -337,6 +337,47 @@ const PermissionDrawer = ({
                   ))}
               </Stack>
             </Box>
+            <Divider />
+            {/* LICENSE MANAGEMENT */}
+            <Box mt={6}>
+              {activeRole?.permissionsMap
+                ?.filter(
+                  (item) =>
+                    item.category === 'License Management' &&
+                    item.hidden === null &&
+                    item.supersededBy.length > 0
+                )
+                .map((item, index) => (
+                  <Checkbox
+                    key={index}
+                    isChecked={item.value}
+                    isReadOnly={readOnly}
+                    onChange={(e) => onCheckParent(e, item.category)}
+                  >
+                    {item.name}
+                  </Checkbox>
+                ))}
+              <Stack pl={6} mt={1} spacing={1}>
+                {activeRole?.permissionsMap
+                  ?.filter(
+                    (item) =>
+                      item.category === 'License Management' &&
+                      item.hidden === null &&
+                      item.supersededBy.length === 0
+                  )
+                  .map((item, index) => (
+                    <Checkbox
+                      key={index}
+                      name={item.key}
+                      isChecked={item.value}
+                      isReadOnly={readOnly}
+                      onChange={(e) => onCheckChild(e, item.category)}
+                    >
+                      {item.name}
+                    </Checkbox>
+                  ))}
+              </Stack>
+            </Box>
           </Stack>
         </DrawerBody>
 
