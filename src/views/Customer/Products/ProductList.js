@@ -4,13 +4,15 @@ import { Flex, Text } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import ProductTable from 'components/Tables/ProductTable'
 import { ShareLynkProjectGroups } from 'graphQL/Queries'
+import { useGlobalState } from 'hooks/useGlobalState'
 import { displayErrorMessage } from 'utils'
 
 const ProductList = () => {
+  const { prodState } = useGlobalState()
+  const { field, direction } = prodState
   const { data, error, refetch } = useQuery(ShareLynkProjectGroups, {
-    variables: { first: 25 }
+    variables: { first: 25, field, direction }
   })
-
 
   if (error) {
     return (

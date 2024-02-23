@@ -2435,17 +2435,22 @@ export const GetAllShareLynks = gql`
 // Customer page - Get All shared products
 export const ShareLynkProjectGroups = gql`
   query ShareLynkProjectGroups(
+    $search: String
     $first: Int
     $last: Int
     $after: String
     $before: String
+    $field: ShareLynkProjectGroupOrderByFields!
+    $direction: OrderByDirection!
   ) {
     shareLynkQuery {
       projectGroups(
+        search: $search
         first: $first
         last: $last
         after: $after
         before: $before
+        orderBy: { field: $field, direction: $direction }
       ) {
         totalCount
         pageInfo {
@@ -3235,7 +3240,7 @@ export const GetLicensesTable = gql`
         before: $before
         status: $status
         orderBy: { direction: $direction, field: ORGANIZATION_LICENSES_STATE }
-        ) {
+      ) {
         totalCount
         pageInfo {
           hasNextPage

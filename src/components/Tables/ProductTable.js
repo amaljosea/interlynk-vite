@@ -66,11 +66,17 @@ const ProductTable = ({ data, refetch }) => {
   }, [data])
 
   const setPaginationControl = (data) => {
-    if(signedUrlParams) {
-      setIsPrevActive(data?.shareLynkQuery?.projectGroups?.pageInfo?.hasPreviousPage)
-      setIsNextActive(data?.shareLynkQuery?.projectGroups?.pageInfo?.hasNextPage)
+    if (signedUrlParams) {
+      setIsPrevActive(
+        data?.shareLynkQuery?.projectGroups?.pageInfo?.hasPreviousPage
+      )
+      setIsNextActive(
+        data?.shareLynkQuery?.projectGroups?.pageInfo?.hasNextPage
+      )
     } else {
-      setIsPrevActive(data?.organization?.projectGroups?.pageInfo?.hasPreviousPage)
+      setIsPrevActive(
+        data?.organization?.projectGroups?.pageInfo?.hasPreviousPage
+      )
       setIsNextActive(data?.organization?.projectGroups?.pageInfo?.hasNextPage)
     }
   }
@@ -204,8 +210,8 @@ const ProductTable = ({ data, refetch }) => {
     disablePaginationControl()
     await refetch({
       first: totalRows,
-      field: signedUrlParams ? undefined : field,
-      direction: signedUrlParams ? undefined : direction
+      field: field,
+      direction: direction
     }).then((res) => {
       if (res.data) {
         setPaginationControl(res?.data)
@@ -222,8 +228,8 @@ const ProductTable = ({ data, refetch }) => {
       last: undefined,
       after: undefined,
       before: undefined,
-      field: signedUrlParams ? undefined : field,
-      direction: signedUrlParams ? undefined : direction
+      field: field,
+      direction: direction
     }).then((res) => {
       if (res.data) {
         setPaginationControl(res.data)
@@ -255,8 +261,8 @@ const ProductTable = ({ data, refetch }) => {
           last: undefined,
           after: undefined,
           before: undefined,
-          field: signedUrlParams ? undefined : field,
-          direction: signedUrlParams ? undefined : direction
+          field: field,
+          direction: direction
         }).then((res) => {
           if (res.data) {
             setPaginationControl(res.data)
@@ -277,8 +283,8 @@ const ProductTable = ({ data, refetch }) => {
         last: undefined,
         after: undefined,
         before: undefined,
-        field: signedUrlParams ? undefined : field,
-        direction: signedUrlParams ? undefined : direction
+        field: field,
+        direction: direction
       }).then((res) => {
         if (res.data) {
           setPaginationControl(res.data)
@@ -300,22 +306,21 @@ const ProductTable = ({ data, refetch }) => {
       <Flex
         width={'100%'}
         alignItems={'center'}
-        justifyContent={signedUrlParams ? 'flex-end' : 'space-between'}
+        justifyContent={'space-between'}
       >
-        {!signedUrlParams && (
-          <Stack direction={'row'} spacing={2} alignItems={'center'}>
-            {/* SEARCH PRODUCTS */}
-            <SearchFilter
-              id='product'
-              filterText={filterText}
-              onChange={onSearchInputChange}
-              onClear={handleClear}
-              onFilter={handleSearch}
-            />
-            {/* FILTER PRODUCTS */}
-            <ProdFilterMenu onFilter={onFilterActive} />
-          </Stack>
-        )}
+        <Stack direction={'row'} spacing={2} alignItems={'center'}>
+          {/* SEARCH PRODUCTS */}
+          <SearchFilter
+            id='product'
+            filterText={filterText}
+            onChange={onSearchInputChange}
+            onClear={handleClear}
+            onFilter={handleSearch}
+          />
+          {/* FILTER PRODUCTS */}
+          {!signedUrlParams && <ProdFilterMenu onFilter={onFilterActive} />}
+        </Stack>
+
         <Stack direction={'row'} spacing={2} alignItems={'center'}>
           {/* ADD PRODUCT */}
           <Tooltip label='Add Product'>
@@ -631,7 +636,9 @@ const ProductTable = ({ data, refetch }) => {
       first: undefined,
       last: totalRows,
       after: undefined,
-      before: data.pageInfo.startCursor
+      before: data.pageInfo.startCursor,
+      field,
+      direction
     }).then((res) => {
       if (res.data) {
         prodDispatch({
@@ -648,9 +655,11 @@ const ProductTable = ({ data, refetch }) => {
       first: totalRows,
       last: undefined,
       after: data.pageInfo.endCursor,
-      before: undefined
+      before: undefined,
+      field,
+      direction
     }).then((res) => {
-      console.log(res.data);
+      console.log(res.data)
       if (res.data) {
         prodDispatch({
           type: 'INCREMENT_PAGE',
@@ -672,7 +681,9 @@ const ProductTable = ({ data, refetch }) => {
         first: newTotalRows,
         last: undefined,
         after: undefined,
-        before: undefined
+        before: undefined,
+        field,
+        direction
       }).then((res) => {
         if (res.data) {
           setPaginationControl(res.data)
