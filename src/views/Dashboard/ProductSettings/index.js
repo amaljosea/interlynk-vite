@@ -34,20 +34,8 @@ const Settings = ({ enabled, data, refetch, activeEnv }) => {
   const product = userPermissions?.find((item) => item.key === 'view_product')
   const editControls = product?.supersededBy?.some(
     (permission) =>
-      permission.key === 'edit_product_controls' && permission.value === true
+      permission.key === 'update_product_settings' && permission.value === true
   )
-
-  useEffect(() => {
-    if (data) {
-      setProjectSettingId(data?.id)
-    }
-  }, [data])
-
-  useEffect(() => {
-    if (data) {
-      setDataRetentionDays(data?.dataRetentionDays)
-    }
-  }, [data])
 
   const [updateSettings] = useMutation(ProjectSettingUpdate)
 
@@ -86,6 +74,13 @@ const Settings = ({ enabled, data, refetch, activeEnv }) => {
         }
       })
   }
+
+  useEffect(() => {
+    if (data) {
+      setProjectSettingId(data?.id)
+      setDataRetentionDays(data?.dataRetentionDays)
+    }
+  }, [data])
 
   return (
     <>
@@ -168,18 +163,18 @@ const Settings = ({ enabled, data, refetch, activeEnv }) => {
                 isDisabled={!enabled || !editControls}
               >
                 {[1, 30, 90, 365, 0].map((item, index) => (
-                  <option key={index} value={item}>
-                    {item !== 0 && item} {item === 365 ? 'Year' : item === 0 ? 'Forever' : 'Days'}
-                  </option>
+                 <option key={index} value={item}>
+                  {item !== 0 && item} {item === 365 ? 'Year' : item === 0 ? 'Forever' : 'Days'}
+                 </option>
                 ))}
               </Select>
             </FormControl>
-            {(enabled || editControls) && (
+            {editControls === true && (
               <Button
                 colorScheme='blue'
                 variant='solid'
                 mt={2}
-                isDisabled
+                isDisabled={!enabled}
                 onClick={() =>
                   onUpdate(Number(dataRetentionDays), 'dataRetention')
                 }

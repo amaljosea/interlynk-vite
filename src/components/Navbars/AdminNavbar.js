@@ -17,16 +17,13 @@ import { useQuery } from '@apollo/client'
 import { permissionList } from 'utils'
 
 export default function AdminNavbar(props) {
-  const {
-    setActiveSbomTab,
-    setActiveCsSbomTab,
-    userPermissions,
-    setUserPermissions
-  } = useGlobalState()
+  const { setActiveSbomTab, setActiveCsSbomTab, setUserPermissions } =
+    useGlobalState()
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
+  const org = localStorage.getItem('organization')
 
   const {} = useQuery(GetUserPermissions, {
-    skip: [...userPermissions]?.length === 0 && !signedUrlParams ? false : true,
+    skip: org === undefined ? true : false,
     onCompleted: (data) => {
       const permissions = permissionList(
         data?.organization?.currentUser?.role?.permissionsMap || []
