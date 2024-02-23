@@ -61,7 +61,8 @@ const ShareLynkDrawer = ({
   const [noExpire, setNoExpire] = useState(false)
 
   const handleDateChange = (newDate) => {
-    const isValidDate = newDate && !isNaN(newDate)
+    const currentDate = new Date()
+    const isValidDate = newDate && !isNaN(newDate) && newDate?._d > currentDate
     setSelectedDate(newDate._d)
     if (isValidDate) {
       setIsValidDate(true)
@@ -235,7 +236,7 @@ const ShareLynkDrawer = ({
                   />
                   {!isValidDate && (
                     <FormErrorMessage>
-                      Please enter a valid datetime
+                      Please enter a valid expiry date
                     </FormErrorMessage>
                   )}
                 </FormControl>
