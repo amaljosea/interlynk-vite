@@ -691,6 +691,7 @@ export const GetGlobalVulnData = gql`
       nodes {
         id
         vulnId
+        updatedAt
         vexStatus {
           id
           name
@@ -1923,6 +1924,7 @@ export const GetVulnData = gql`
               projectVersion
               project {
                 projectGroup {
+                  id
                   name
                 }
               }
@@ -2842,7 +2844,7 @@ export const GetSignedCompFilterData = gql`
 
 // PRODUCT VULNERABILITIES DATA
 export const GetSignedVulnData = gql`
-  query GetVulnData(
+  query GetSignedVulnData(
     $projectId: Uuid!
     $sbomId: Uuid!
     $signedParams: String!

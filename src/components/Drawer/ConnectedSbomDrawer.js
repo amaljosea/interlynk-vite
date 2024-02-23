@@ -18,6 +18,7 @@ import {
 import { statusColor } from 'utils'
 
 const ConnectedSbomDrawer = ({ data, isOpen, onClose }) => {
+  console.log('data',data);
   return (
     <Drawer size='lg' isOpen={isOpen} placement='right' onClose={onClose}>
       <DrawerOverlay />

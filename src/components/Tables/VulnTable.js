@@ -28,7 +28,8 @@ import {
   IconButton,
   Badge,
   Skeleton,
-  useToast
+  useToast,
+  Button
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
 import { FaBug, FaCopy } from 'react-icons/fa6'
@@ -50,6 +51,8 @@ import { FirstDegreePartVulns } from 'graphQL/Queries'
 import { linkURl } from 'utils'
 import CvssCard from 'components/Misc/CvssCard'
 import { ShareVulnFilters } from 'graphQL/Queries'
+import VexModal from 'views/Dashboard/Vulnerabilities/components/VexModal'
+import { areArraysEqual } from 'utils'
 
 const statusColor = (status) => {
   if (status && status === 'Fixed') {
@@ -93,12 +96,20 @@ const VulnTable = ({
   //This part is needed for the pagination to work. (Modify with caution)
   const paginationSizes = [25, 50, 100]
 
+  const textColor = useColorModeValue('gray.700', 'white')
+  const [vulnSearch, setVulnSearch] = useState('')
+  const [toggleClear, setToggleClear] = useState(false)
+  const [selectedVulns, setSelectedVulns] = useState([])
+  const [selectedGroup, setSelectedGroup] = useState('')
+  const [checkEquals, setCheckEquals] = useState(false)
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
 
   const setPaginationControl = (data) => {
-    if(signedUrlParams) {
-      setIsPrevActive(data?.shareLynkQuery?.sbom?.vulns?.pageInfo?.hasPreviousPage)
+    if (signedUrlParams) {
+      setIsPrevActive(
+        data?.shareLynkQuery?.sbom?.vulns?.pageInfo?.hasPreviousPage
+      )
       setIsNextActive(data?.shareLynkQuery?.sbom?.vulns?.pageInfo?.hasNextPage)
     } else {
       setIsPrevActive(data?.sbom?.vulns?.pageInfo?.hasPreviousPage)
@@ -140,19 +151,21 @@ const VulnTable = ({
   const { prodVulnDispatch } = dispatch
 
   // GET VULN FILTER HEADS
-  const { refetch: getVulnFilters } = useQuery(
-    signedUrlParams ? ShareVulnFilters : GetVulnFilterData,
-    {
-      fetchPolicy: 'cache-first',
-      variables: { projectId: signedUrlParams ? undefined : productId, sbomId: sbomId },
-      onCompleted: (data) => {
-        prodVulnDispatch({
-          type: 'ADD_FILTER_HEADS',
-          payload: signedUrlParams ? data?.shareLynkQuery?.sbom?.filters : data?.sbom?.filters
-        })
-      }
+  const {} = useQuery(signedUrlParams ? ShareVulnFilters : GetVulnFilterData, {
+    fetchPolicy: 'cache-first',
+    variables: {
+      projectId: signedUrlParams ? undefined : productId,
+      sbomId: sbomId
+    },
+    onCompleted: (data) => {
+      prodVulnDispatch({
+        type: 'ADD_FILTER_HEADS',
+        payload: signedUrlParams
+          ? data?.shareLynkQuery?.sbom?.filters
+          : data?.sbom?.filters
+      })
     }
-  )
+  })
 
   const [onVulnScan] = useMutation(ManualVulnScan, {
     fetchPolicy: 'network-only'
@@ -164,8 +177,15 @@ const VulnTable = ({
       permission.key === 'edit_vulnerabilities' && permission.value === true
   )
 
-  const textColor = useColorModeValue('gray.700', 'white')
-  const [vulnSearch, setVulnSearch] = useState('')
+  const handleChange = (state) => {
+    console.log('state', state)
+    setSelectedVulns(state?.selectedRows)
+    setSelectedGroup(
+      state?.selectedRows[0]?.component?.sbom?.project?.projectGroup?.id
+    )
+  }
+
+  const { isOpen, onOpen, onClose } = useDisclosure()
 
   const {
     isOpen: isTableOpen,
@@ -232,7 +252,7 @@ const VulnTable = ({
           </Flex>
         )
       },
-      width: '320px',
+      width: '280px',
       sortable: true
     },
     // SEVERITY
@@ -625,6 +645,19 @@ const VulnTable = ({
         </Flex>
 
         <Stack direction='row' alignItems={'center'} width={'fit-content'}>
+          {/* UPDATE STATUES */}
+          {selectedVulns.length > 0 && (
+            <Button
+              variant='solid'
+              colorScheme='blue'
+              fontWeight='normal'
+              fontSize={'sm'}
+              onClick={onOpen}
+              isDisabled={signedUrlParams}
+            >
+              Set Status
+            </Button>
+          )}
           {/* SCAN VULN */}
           <Tooltip label={'Scan Vulnerabilities'}>
             <IconButton
@@ -912,6 +945,9 @@ const VulnTable = ({
           expandOnRowClicked
           persistTableHead
           expandableRowsComponent={ExpandedComponent}
+          selectableRows
+          clearSelectedRows={toggleClear}
+          onSelectedRowsChange={handleChange}
         />
       </Flex>
 
@@ -981,6 +1017,19 @@ const VulnTable = ({
             </DrawerBody>
           </DrawerContent>
         </Drawer>
+      )}
+
+      {isOpen && selectedVulns.length > 0 && (
+        <VexModal
+          isOpen={isOpen}
+          onClose={onClose}
+          refetch={refetch}
+          checkEquals={true}
+          selectedGroup={selectedGroup}
+          selectedVulns={selectedVulns}
+          setSelectedVulns={setSelectedVulns}
+          setToggleClear={setToggleClear}
+        />
       )}
     </>
   )

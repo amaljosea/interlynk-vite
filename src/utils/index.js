@@ -761,3 +761,13 @@ export const linkURl = (type, id) => {
 export const capitalizeFirstLetter = (str) => {
   return str?.charAt(0)?.toUpperCase() + str?.slice(1)
 }
+
+export const areArraysEqual = (arr1, arr2) => {
+  // Check if the arrays have the same length
+  if (arr1.length !== arr2.length) {
+    return false
+  }
+
+  // Check if all elements in both arrays are equal
+  return arr1.every((element, index) => element === arr2[index])
+}

@@ -1419,10 +1419,50 @@ export const updateCompVulnVex = gql`
   }
 `
 
+// UPDATE MULTIPLE VULN STATUS
+export const updateBulkCompVex = gql`
+  mutation updateBulkCompVex(
+    $comVulnIds: [Uuid!]!
+    $vexStatusId: Uuid!
+    $sbomId: Uuid
+    $propagateVex: Boolean
+    $vexJustificationId: Uuid
+    $cdxResponseId: Uuid
+    $note: String
+    $impact: String
+    $detail: String
+    $action: String
+    $fixedIn: String
+  ) {
+    componentVexBulkUpdate(
+      input: {
+        componentVulnIds: $comVulnIds
+        vexStatusId: $vexStatusId
+        currentSbomId: $sbomId
+        propagateVex: $propagateVex
+        vexJustificationId: $vexJustificationId
+        cdxResponseId: $cdxResponseId
+        note: $note
+        impact: $impact
+        detail: $detail
+        action: $action
+        fixedIn: $fixedIn
+      }
+    ) {
+      clientMutationId
+      errors
+      componentVulns {
+        id
+        vulnId
+      }
+    }
+  }
+`
+
 // UPDATE GLOBAL VULN STATUS
-export const UpdateGlobalVex = gql`
-  mutation UpdateGlobalVex(
-    $vulnId: Uuid!
+export const updateBulkVulnVex = gql`
+  mutation updateBulkVulnVex(
+    $vulnIds: [Uuid!]!
     $vexStatusId: Uuid!
     $vexJustificationId: Uuid
     $cdxResponseId: Uuid
@@ -1435,9 +1475,9 @@ export const UpdateGlobalVex = gql`
     $projectGroupId: Uuid
     $projectId: Uuid
   ) {
-    vulnVexUpdate(
+    vulnVexBulkUpdate(
       input: {
-        vulnId: $vulnId
+        vulnIds: $vulnIds
         vexStatusId: $vexStatusId
         vexJustificationId: $vexJustificationId
         cdxResponseId: $cdxResponseId
@@ -1834,39 +1874,20 @@ export const CreateLicense = gql`
     $copyLeft: LicensesObligationCopyLeft
     $requiresSourceCode: LicensesObligationStatus
     $permitsModifications: LicensesObligationStatus
-    $text: String
-    $url: String
-    $comment: String
-    $attributionKeys: String
-    $warranty: String
-    $governingLaws: String
-    $deprecated: Boolean
-    $restrictive: Boolean
-    $fsfLibre: Boolean
-    $osiApproved: Boolean
   ) {
-  organizationLicenseCreate(input: {
-    name: $name,
-    state: $state,
-    attribution: $attribution
-    copyLeft: $copyLeft
-    sourceDistribution: $requiresSourceCode
-    modifications: $permitsModifications
-    text: $text
-    url: $url
-    comment: $comment
-    attributionKeys: $attributionKeys
-    warranty: $warranty
-    governingLaws: $governingLaws
-    deprecated: $deprecated
-    restrictive: $restrictive
-    fsfLibre: $fsfLibre
-    osiApproved: $osiApproved
-  })
-  {
-    errors
+    organizationLicenseCreate(
+      input: {
+        name: $name
+        state: $state
+        attribution: $attribution
+        copyLeft: $copyLeft
+        sourceDistribution: $requiresSourceCode
+        modifications: $permitsModifications
+      }
+    ) {
+      errors
+    }
   }
-}
 `
 
 export const UpdateLicense = gql`
@@ -1874,36 +1895,21 @@ export const UpdateLicense = gql`
     $id: ID!
     $state: LicensesState!
     $attribution: LicensesObligationStatus
-    $attributionKeys: String
     $copyLeft: LicensesObligationCopyLeft
     $requiresSourceCode: LicensesObligationStatus
     $permitsModifications: LicensesObligationStatus
-    $warranty: String
-    $governingLaws: String
-    $deprecated: Boolean
-    $restrictive: Boolean
-    $fsfLibre: Boolean
-    $osiApproved: Boolean
   ) {
-  organizationLicenseUpdate(input: {
-    id: $id
-    state: $state
-    attribution: $attribution
-    copyLeft: $copyLeft
-    sourceDistribution: $requiresSourceCode
-    modifications: $permitsModifications
-    attributionKeys: $attributionKeys
-    warranty: $warranty
-    governingLaws: $governingLaws
-    deprecated: $deprecated
-    restrictive: $restrictive
-    fsfLibre: $fsfLibre
-    osiApproved: $osiApproved
-  })
-  {
-    errors
+    organizationLicenseUpdate(
+      input: {
+        id: $id
+        state: $state
+        attribution: $attribution
+        copyLeft: $copyLeft
+        sourceDistribution: $requiresSourceCode
+        modifications: $permitsModifications
+      }
+    ) {
+      errors
+    }
   }
-}
 `
-
-

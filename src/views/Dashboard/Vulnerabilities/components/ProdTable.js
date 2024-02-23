@@ -20,31 +20,12 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import VexModal from './VexModal'
 import { useLocation, useParams } from 'react-router-dom'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
-import { normalizeSBOMVersion } from 'utils'
 import { useLazyQuery } from '@apollo/client'
-import { GetProjectGroup } from 'graphQL/Queries'
 import { FaFolderTree } from 'react-icons/fa6'
 import ConnectedSbomDrawer from 'components/Drawer/ConnectedSbomDrawer'
 import { GetConnectedSbom } from 'graphQL/Queries'
-import { statusColor } from 'utils'
-
-const customStyles = {
-  headCells: {
-    style: {
-      fontWeight: 'bold',
-      color: '#2D3748',
-      fontSize: '12px',
-      letterSpacing: '1px'
-    }
-  },
-  subHeader: {
-    style: {
-      padding: 0,
-      margin: 0
-    }
-  }
-}
-
+import { statusColor, timeSince, areArraysEqual, getFullDateAndTime } from 'utils'
+import { customStyles } from 'utils'
 
 
 const VulnProdTable = ({ data, vuln, refetch }) => {
@@ -58,13 +39,16 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
   const { pageIndex, searchInput, envs, statuses, versions } = compVulnState
   const { compVulnDispatch } = dispatch
 
-  const [getSboms,{data: connectedSboms}] = useLazyQuery(GetConnectedSbom)
-  
+  const [getSboms, { data: connectedSboms }] = useLazyQuery(GetConnectedSbom)
 
   const { isOpen, onOpen, onClose } = useDisclosure()
-  const { isOpen: isSbomOpen, onOpen: onSbomOpen, onClose: onSbomClose } = useDisclosure()
+  const {
+    isOpen: isSbomOpen,
+    onOpen: onSbomOpen,
+    onClose: onSbomClose
+  } = useDisclosure()
 
-  const [activeRow, setActiveRow] = useState(null)
+  const [statusResults, setStatusResults] = useState([])
   const [selectedVulns, setSelectedVulns] = useState([])
   const [selectedGroup, setSelectedGroup] = useState('')
   const [filterInput, setFilterInput] = useState('')
@@ -73,10 +57,16 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
   const [isNextActive, setIsNextActive] = useState(false)
 
   const handlePreview = async (row) => {
-    console.log('row',row);
     const { id, component } = row
-    await getSboms({variables: {projectId: component?.sbom?.project?.id, sbomId: component?.sbom?.id, componentVulnId: id}}).then(() => {
-      setActiveRow(row)
+    await getSboms({
+      fetchPolicy: 'network-only',
+      variables: {
+        projectId: component?.sbom?.project?.id,
+        sbomId: component?.sbom?.id,
+        componentVulnId: id
+      }
+    }).then((res) => {
+      console.log(res?.data)
       onSbomOpen()
     })
   }
@@ -102,7 +92,13 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
         return (
           <Flex flexDir={'row'} gap={2} alignItems={'center'} flexWrap={'wrap'}>
             <Tooltip label='Also affected'>
-              <IconButton isDisabled={!component?.sbom?.hasConnectedSboms} icon={<FaFolderTree />} onClick={() => handlePreview(row)} size='xs' colorScheme='blue'/>
+              <IconButton
+                isDisabled={!component?.sbom?.hasConnectedSboms}
+                icon={<FaFolderTree />}
+                onClick={() => handlePreview(row)}
+                size='xs'
+                colorScheme='blue'
+              />
             </Tooltip>
             <Text>{component?.sbom?.project?.projectGroup?.name || ''}</Text>
           </Flex>
@@ -170,7 +166,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
       ),
       wrap: true,
       right: 'true',
-      width: '250px'
+      width: '220px'
     },
     // STATUS
     {
@@ -193,6 +189,22 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
       },
       wrap: true,
       right: 'true'
+    },
+    // UPDATED AT
+    {
+      id: 'VEX_UPDATED_AT',
+      name: 'UPDATED',
+      selector: (row) => (
+        <Tooltip
+          label={getFullDateAndTime(row?.updatedAt)}
+          placement={'top'}
+        >
+          {timeSince(row?.updatedAt)}
+        </Tooltip>
+      ),
+      width: '160px',
+      right: 'true',
+      wrap: true
     }
   ]
 
@@ -285,19 +297,10 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
     handleSearch
   ])
 
-  const areArraysEqual = (arr1, arr2) => {
-    // Check if the arrays have the same length
-    if (arr1.length !== arr2.length) {
-      return false
-    }
-
-    // Check if all elements in both arrays are equal
-    return arr1.every((element, index) => element === arr2[index])
-  }
-
   const [checkEquals, setCheckEquals] = useState(false)
 
   const handleChange = (state) => {
+    console.log(state)
     setSelectedVulns(state?.selectedRows)
     const version =
       state?.selectedRows[0]?.component?.sbom?.primaryComponent?.version
@@ -393,13 +396,26 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
     }
   }, [data])
 
+  useEffect(() => {
+    if (data) {
+      const sortedData =
+        data &&
+        [...data?.nodes].sort((a, b) => {
+          const dateA = new Date(a.updatedAt)
+          const dateB = new Date(b.updatedAt)
+          return dateB - dateA
+        })
+      setStatusResults(sortedData)
+    }
+  }, [data])
+
   return (
     <>
       {/* TABLE */}
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
           columns={columns}
-          data={data?.nodes || []}
+          data={statusResults || []}
           customStyles={customStyles}
           progressPending={data ? false : true}
           progressComponent={<CustomLoader />}
@@ -463,7 +479,13 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
         )}
       </Flex>
 
-      {isSbomOpen && connectedSboms && <ConnectedSbomDrawer data={connectedSboms?.sbom} isOpen={isSbomOpen} onClose={onSbomClose} />}
+      {isSbomOpen && connectedSboms && (
+        <ConnectedSbomDrawer
+          data={connectedSboms?.sbom}
+          isOpen={isSbomOpen}
+          onClose={onSbomClose}
+        />
+      )}
 
       {isOpen && selectedVulns.length > 0 && (
         <VexModal

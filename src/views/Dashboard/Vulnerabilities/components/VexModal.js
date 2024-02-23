@@ -28,6 +28,8 @@ import { GetProject, GetProjectGroup } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { updateCompVulnVex } from 'graphQL/Mutation'
 import { filterEnvList } from 'utils'
+import { updateBulkCompVex } from 'graphQL/Mutation'
+import { updateBulkVulnVex } from 'graphQL/Mutation'
 
 const VexModal = ({
   selectedGroup,
@@ -39,10 +41,13 @@ const VexModal = ({
   setSelectedVulns,
   setToggleClear
 }) => {
-  const { totalRows } = useGlobalState()
+  const { totalRows, prodVulnState } = useGlobalState()
+  const { field, direction } = prodVulnState
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const vulnId = queryParams.get('vulnId')
+  const productId = queryParams.get('id')
+  const sbomId = queryParams.get('sbom')
 
   const [statusTitle, setStatusTitle] = useState('')
   const [statusName, setStatusName] = useState('')
@@ -63,10 +68,21 @@ const VexModal = ({
   const { data: allVexJustify } = useQuery(getVexJustifications)
   const { data: allCdx } = useQuery(GetCdxResponses)
 
-  const [compVexCreate] = useMutation(updateCompVulnVex, {
+  const [compVexCreate] = useMutation(updateBulkCompVex, {
     fetchPolicy: 'network-only',
     onCompleted: () => {
-      refetch({ id: vulnId, first: totalRows, last: undefined })
+      if (sbomId) {
+        refetch({
+          projectId: productId,
+          sbomId: sbomId,
+          first: totalRows,
+          last: undefined,
+          field,
+          direction
+        })
+      } else {
+        refetch({ id: vulnId, first: totalRows, last: undefined })
+      }
       setSelectedVulns([])
       setToggleClear(true)
     }
@@ -115,31 +131,27 @@ const VexModal = ({
     }
   })
 
+  console.log('groups', groups)
+
   const handleSave = () => {
     setToggleClear(false)
     console.log('selectedVulns', selectedVulns)
-    if (selectedVulns?.length > 0) {
-      selectedVulns?.map((item) => {
-        compVexCreate({
-          variables: {
-            compVulnId: item?.id,
-            sbomId: item?.component?.sbom?.id,
-            projectGroupId: item?.component?.sbom?.project?.projectGroup?.id,
-            projectId: item?.component?.sbom?.project?.id,
-            propagateVex: upstream,
-            vexStatusId: statusTitle,
-            details: details !== '' ? details : undefined,
-            note: notes !== '' ? notes : undefined,
-            vexJustificationId:
-              justification !== '' ? justification : undefined,
-            cdxResponseId: response !== '' ? response : undefined,
-            impact: impactData === '' ? undefined : impactData,
-            action: actionStatement !== '' ? actionStatement : undefined,
-            fixedIn: selectedTag !== '' ? selectedTag : undefined
-          }
-        }).then((res) => res?.data && onClose())
-      })
-    }
+    const vulnIds = selectedVulns?.map((item) => item?.id)
+    compVexCreate({
+      variables: {
+        comVulnIds: vulnIds,
+        sbomId: sbomId || undefined,
+        propagateVex: sbomId ? undefined : upstream,
+        vexStatusId: statusTitle,
+        details: details !== '' ? details : undefined,
+        note: notes !== '' ? notes : undefined,
+        vexJustificationId: justification !== '' ? justification : undefined,
+        cdxResponseId: response !== '' ? response : undefined,
+        impact: impactData === '' ? undefined : impactData,
+        action: actionStatement !== '' ? actionStatement : undefined,
+        fixedIn: selectedTag !== '' ? selectedTag : undefined
+      }
+    }).then((res) => res?.data && onClose())
     setStatusTitle('')
     setStatusName('')
     setJustification('')
@@ -315,15 +327,17 @@ const VexModal = ({
                     >
                       <option value=''>-- Select --</option>
                       {data?.project?.sboms?.length > 0 ? (
-                        data?.project?.sboms?.map((item, index) => (
-                          <option
-                            key={index}
-                            value={item?.projectVersion}
-                            name={item?.projectVersion}
-                          >
-                            {item?.projectVersion}
-                          </option>
-                        ))
+                        data?.project?.sboms
+                          ?.filter((item) => item?.id !== sbomId)
+                          ?.map((item, index) => (
+                            <option
+                              key={index}
+                              value={item?.projectVersion}
+                              name={item?.projectVersion}
+                            >
+                              {item?.projectVersion}
+                            </option>
+                          ))
                       ) : (
                         <option value=''>-- --</option>
                       )}
