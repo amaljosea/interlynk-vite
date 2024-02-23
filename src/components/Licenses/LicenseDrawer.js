@@ -168,9 +168,6 @@ const LicenseDrawer = ({ isOpen, onClose, data, refetch }) => {
                 value={state}
                 onChange={(e) => setState(e.target.value)}
               >
-                <option value='' style={{ background: 'lightgray' }}>
-                  -- Select --
-                </option>
                 <option value='APPROVED'>Approved</option>
                 <option value='REJECTED'>Rejected</option>
                 <option value='UNSPECIFIED'>Unspecified</option>

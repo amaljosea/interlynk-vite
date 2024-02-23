@@ -7,6 +7,9 @@ import {GetLicensesTable} from "../../graphQL/Queries";
 const Licenses = () => {
     const { data, refetch } = useQuery(GetLicensesTable, {
         fetchPolicy: 'network-only',
+        variables: {
+            direction: 'DESC'
+        }
     })
 
     const licenses = data?.organization?.licenses

@@ -4,8 +4,6 @@ import {
   Tag,
   Text,
   Stack,
-  Button,
-  Box,
   Link,
   TagLabel,
   Icon,
@@ -23,7 +21,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import LicenseDrawer from './LicenseDrawer'
 import LicenseFilter from './LicenseFilter'
-import RowLimit from 'views/Sbom/components/RowLimit'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import { customStyles } from 'utils'
 import { FaEllipsisV } from 'react-icons/fa'
@@ -31,6 +28,8 @@ import Pagination from '../Pagination'
 
 const LicenseTable = ({ data, refetch }) => {
   const licenses = data?.nodes
+
+  const [direction, setDirection] = useState('DESC')
 
   // PAGINATION
   const paginationSizes = [25, 50, 100]
@@ -65,13 +64,14 @@ const LicenseTable = ({ data, refetch }) => {
       first: undefined,
       last: totalRows,
       after: undefined,
-      before: data.pageInfo.startCursor
+      before: data.pageInfo.startCursor,
+      direction: direction
     }).then((res) => {
       if (res.data) {
         setPaginationControl(res.data)
       }
     })
-  }, [refetch, totalRows, data, currentPage])
+  }, [refetch, totalRows, data, currentPage, direction])
 
   const handleSetRow = useCallback(
     async (e) => {
@@ -83,14 +83,15 @@ const LicenseTable = ({ data, refetch }) => {
         first: newTotalRows,
         last: undefined,
         after: undefined,
-        before: undefined
+        before: undefined,
+        direction: direction
       }).then((res) => {
         if (res.data) {
           setPaginationControl(res.data)
         }
       })
     },
-    [refetch, setTotalRows]
+    [refetch, setTotalRows, direction]
   )
 
   const handleNextPage = useCallback(async () => {
@@ -101,13 +102,14 @@ const LicenseTable = ({ data, refetch }) => {
       first: totalRows,
       last: undefined,
       after: data.pageInfo.endCursor,
-      before: undefined
+      before: undefined,
+      direction: direction
     }).then((res) => {
       if (res.data) {
         setPaginationControl(res.data)
       }
     })
-  }, [refetch, totalRows, data, currentPage])
+  }, [refetch, totalRows, data, currentPage, direction])
 
   // PAGINATION END
 
@@ -122,7 +124,30 @@ const LicenseTable = ({ data, refetch }) => {
     setSearchInput('')
   }
 
-  const { isOpen, onOpen, onClose, onToggle } = useDisclosure()
+  // SORT
+
+  const handleSort = useCallback(async (column, sortDirection) => {
+    disablePaginationControl()
+
+    setCurrentPage(1)
+
+    await refetch({
+      direction: sortDirection.toUpperCase(),
+      first: totalRows,
+      field: column.id,
+      after: undefined,
+      before: undefined,
+      last: undefined,
+
+    }).then((res) => {
+      if (res.data) {
+        setDirection(sortDirection.toUpperCase())
+        setPaginationControl(res.data)
+      }
+    })
+  },[refetch, totalRows, direction])
+
+  const { isOpen, onOpen, onClose } = useDisclosure()
 
   const subHeaderComponent = useMemo(() => {
     return (
@@ -202,6 +227,9 @@ const LicenseTable = ({ data, refetch }) => {
       width: '250px',
       wrap: true,
       selector: ({ content: { shortId, url } }) => {
+        if (!url && shortId) {
+          url = `https://spdx.org/licenses/${shortId}.html`
+        }
         return (
           <Flex direction='row' alignItems={'center'} gap={2}>
             <Tag variant='subtle'>
@@ -230,7 +258,7 @@ const LicenseTable = ({ data, refetch }) => {
       width: '180px',
       wrap: true,
       selector: ({ attribution }) => {
-        if (!attribution || attribution == 'UNKNOWN') {
+        if (!attribution || attribution === 'UNKNOWN') {
           attribution = 'Not Available'
         }
         return (
@@ -245,7 +273,7 @@ const LicenseTable = ({ data, refetch }) => {
       width: '180px',
       wrap: true,
       selector: ({ copyLeft }) => {
-        if (!copyLeft || copyLeft == 'UNKNOWN') {
+        if (!copyLeft || copyLeft === 'UNKNOWN') {
           copyLeft = 'Not Available'
         }
         return <Text textTransform='capitalize'>{copyLeft.toLowerCase()}</Text>
@@ -258,7 +286,7 @@ const LicenseTable = ({ data, refetch }) => {
       width: '250px',
       wrap: true,
       selector: ({ sourceDistribution }) => {
-        if (!sourceDistribution || sourceDistribution == 'UNKNOWN') {
+        if (!sourceDistribution || sourceDistribution === 'UNKNOWN') {
           sourceDistribution = 'Not Available'
         }
         return (
@@ -274,7 +302,7 @@ const LicenseTable = ({ data, refetch }) => {
       width: '250px',
       wrap: true,
       selector: ({ modifications }) => {
-        if (!modifications || modifications == 'UNKNOWN') {
+        if (!modifications || modifications === 'UNKNOWN') {
           modifications = 'Not Available'
         }
         return (
@@ -288,6 +316,7 @@ const LicenseTable = ({ data, refetch }) => {
       name: 'STATUS',
       width: '150px',
       wrap: true,
+      sortable: true,
       selector: ({ state }) => {
         state = state?.toLowerCase() || 'Not Available'
         return (
@@ -299,7 +328,7 @@ const LicenseTable = ({ data, refetch }) => {
                 ? 'green'
                 : state === 'rejected'
                   ? 'red'
-                  : state == 'unspecified'
+                  : state === 'unspecified'
                     ? 'orange'
                     : 'blue'
             }
@@ -357,6 +386,7 @@ const LicenseTable = ({ data, refetch }) => {
           defaultSortFieldId={'UPDATED_AT'}
           progressPending={data ? false : true}
           progressComponent={<CustomLoader />}
+          onSort={handleSort}
           subHeader
           subHeaderComponent={subHeaderComponent}
           responsive
