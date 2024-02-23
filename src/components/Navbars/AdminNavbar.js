@@ -20,10 +20,9 @@ export default function AdminNavbar(props) {
   const { setActiveSbomTab, setActiveCsSbomTab, setUserPermissions } =
     useGlobalState()
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
-  const org = localStorage.getItem('organization')
 
   const {} = useQuery(GetUserPermissions, {
-    skip: org === undefined ? true : false,
+    skip: signedUrlParams ? true : false,
     onCompleted: (data) => {
       const permissions = permissionList(
         data?.organization?.currentUser?.role?.permissionsMap || []
