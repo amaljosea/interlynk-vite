@@ -12,7 +12,7 @@ import {
   FormLabel,
   Input,
   Select,
-  Text, RadioGroup, Radio
+  Text, RadioGroup, Radio, Checkbox, Textarea
 } from '@chakra-ui/react'
 import React, { useState, useEffect } from 'react'
 import {CreateLicense, UpdateLicense} from "../../graphQL/Mutation";
@@ -20,7 +20,18 @@ import {useMutation} from "@apollo/client";
 
 const LicenseDrawer = ({ isOpen, onClose, data, refetch }) => {
   const [name, setName] = useState('')
-  const [spdxId, setSpdxId] = useState('')
+  const [text, setText] = useState('')
+  const [url, setUrl] = useState('')
+  const [comment, setComment] = useState('')
+  const [attributionKeys, setAttributionKeys] = useState('')
+  const [warranty, setWarranty] = useState('')
+  const [governingLaws, setGoverningLaws] = useState('')
+
+  const [deprecated, setDeprecated] = useState(false)
+  const [restrictive, setRestrictive] = useState(false)
+  const [fsfLibre, setFsfLibre] = useState(false)
+  const [osiApproved, setOsiApproved] = useState(false)
+
   const [attribution, setAttribution] = useState('UNKNOWN')
   const [copyLeft, setCopyLeft] = useState(data?.copyLeft || 'UNKNOWN')
   const [requiresSourceCode, setRequiresSourceCode] = useState('UNKNOWN')
@@ -39,7 +50,17 @@ const LicenseDrawer = ({ isOpen, onClose, data, refetch }) => {
         attribution,
         copyLeft,
         requiresSourceCode,
-        permitsModifications
+        permitsModifications,
+        text,
+        url,
+        comment,
+        attributionKeys,
+        warranty,
+        governingLaws,
+        deprecated,
+        restrictive,
+        fsfLibre,
+        osiApproved
       }
     })
     await refetch()
@@ -52,9 +73,16 @@ const LicenseDrawer = ({ isOpen, onClose, data, refetch }) => {
         id: data.id,
         state,
         attribution,
+        attributionKeys,
         copyLeft,
         requiresSourceCode,
-        permitsModifications
+        permitsModifications,
+        warranty,
+        governingLaws,
+        deprecated,
+        restrictive,
+        fsfLibre,
+        osiApproved
       }
     })
     await refetch()
@@ -64,7 +92,18 @@ const LicenseDrawer = ({ isOpen, onClose, data, refetch }) => {
   useEffect(() => {
     if (data) {
       setName(data.content.name)
-      setSpdxId(data.content.shortId)
+      setText(data.content.text)
+      setUrl(data.content.url)
+      setComment(data.content.comment)
+      setAttributionKeys(data.attributionKeys)
+      setWarranty(data.warranty)
+      setGoverningLaws(data.governingLaws)
+
+      setDeprecated(data.deprecated)
+      setRestrictive(data.restrictive)
+      setFsfLibre(data.fsfLibre)
+      setOsiApproved(data.osiApproved)
+
       setState(data.state)
       setAttribution(data.attribution)
       setCopyLeft(data.copyLeft)
@@ -81,7 +120,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, refetch }) => {
         <DrawerHeader>{data ? 'Edit' : 'Add'} License</DrawerHeader>
         <DrawerBody>
           <Stack direction={'column'} spacing={4} alignItems={'flex-start'}>
-            {/* NAME */}
+
             <FormControl isRequired>
               <FormLabel htmlFor='name'>Name</FormLabel>
               <Input
@@ -91,21 +130,86 @@ const LicenseDrawer = ({ isOpen, onClose, data, refetch }) => {
                 value={name}
                 placeholder='Add name'
                 onChange={(e) => setName(e.target.value)}
+                disabled={data}
               />
             </FormControl>
-            {/* SPDX ID */}
+
             <FormControl>
-              <FormLabel htmlFor='spdxId'>SPDX ID</FormLabel>
-              <Input
-                name='spdxId'
-                id='spdxId'
-                value={spdxId}
+              <FormLabel htmlFor='text'>Text</FormLabel>
+              <Textarea
+                height={'200px'}
+                name='text'
+                id='text'
                 fontSize={'sm'}
-                placeholder='Add SPDX ID'
-                disabled
-                onChange={(e) => setSpdxId(e.target.value)}
+                value={text}
+                placeholder='Add text'
+                onChange={(e) => setText(e.target.value)}
+                disabled={data}
               />
             </FormControl>
+
+            <FormControl>
+              <FormLabel htmlFor='url'>URL</FormLabel>
+              <Input
+                name='url'
+                id='url'
+                fontSize={'sm'}
+                value={url}
+                placeholder='Add url'
+                onChange={(e) => setUrl(e.target.value)}
+                disabled={data}
+              />
+            </FormControl>
+
+            <FormControl>
+              <FormLabel htmlFor='comment'>Comment</FormLabel>
+              <Input
+                name='comment'
+                id='name'
+                fontSize={'sm'}
+                value={comment}
+                placeholder='Add name'
+                onChange={(e) => setComment(e.target.value)}
+                disabled={data}
+              />
+            </FormControl>
+
+            <FormControl>
+              <FormLabel htmlFor='url'>Attribution Keys</FormLabel>
+              <Input
+                name='attributionKeys'
+                id='attributionKeys'
+                fontSize={'sm'}
+                value={attributionKeys}
+                placeholder='Add attribution keys'
+                onChange={(e) => setAttributionKeys(e.target.value)}
+              />
+            </FormControl>
+
+            <FormControl>
+              <FormLabel htmlFor='url'>Warranty</FormLabel>
+              <Input
+                name='warranty'
+                id='warranty'
+                fontSize={'sm'}
+                value={warranty}
+                placeholder='Add warranty'
+                onChange={(e) => setWarranty(e.target.value)}
+              />
+            </FormControl>
+
+            <FormControl>
+              <FormLabel htmlFor='url'>Governing Laws</FormLabel>
+              <Input
+                name='governingLaws'
+                id='governingLaws'
+                fontSize={'sm'}
+                value={governingLaws}
+                placeholder='Add governing laws'
+                onChange={(e) => setGoverningLaws(e.target.value)}
+              />
+            </FormControl>
+
             {/* Attribution */}
             <FormControl>
               <FormLabel htmlFor='attribution'>Attribution</FormLabel>
@@ -117,7 +221,8 @@ const LicenseDrawer = ({ isOpen, onClose, data, refetch }) => {
                 <option value="NO">No</option>
               </Select>
             </FormControl>
-            {/* CopyLeft */}
+
+              {/* CopyLeft */}
             <FormControl>
               <FormLabel htmlFor='CopyLeft'>CopyLeft</FormLabel>
               <Select onChange={(e) => setCopyLeft(e.target.value)}
@@ -159,6 +264,43 @@ const LicenseDrawer = ({ isOpen, onClose, data, refetch }) => {
                 </Radio>
               </RadioGroup>
             </FormControl>
+
+            <Checkbox
+              isChecked={deprecated}
+              size='sm'
+              colorScheme='blue'
+              onChange={(e) => setDeprecated(e.target.checked)}
+            >
+              Is deprecated?
+            </Checkbox>
+
+            <Checkbox
+              isChecked={restrictive}
+              size='sm'
+              colorScheme='blue'
+              onChange={(e) => setRestrictive(e.target.checked)}
+            >
+              Is restrictive?
+            </Checkbox>
+
+            <Checkbox
+              isChecked={fsfLibre}
+              size='sm'
+              colorScheme='blue'
+              onChange={(e) => setFsfLibre(e.target.checked)}
+            >
+              Is FSF Libre?
+            </Checkbox>
+
+            <Checkbox
+            isChecked={osiApproved}
+            size='sm'
+            colorScheme='blue'
+            onChange={(e) => setOsiApproved(e.target.checked)}
+          >
+            OSI Approved?
+          </Checkbox>
+
             {/* STATUS */}
             <FormControl>
               <FormLabel htmlFor='state'>Status</FormLabel>

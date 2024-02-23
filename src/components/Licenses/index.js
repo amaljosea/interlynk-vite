@@ -8,7 +8,8 @@ const Licenses = () => {
     const { data, refetch } = useQuery(GetLicensesTable, {
         fetchPolicy: 'network-only',
         variables: {
-            direction: 'DESC'
+            direction: 'ASC',
+            status: "unspecified"
         }
     })
 

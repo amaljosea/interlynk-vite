@@ -1828,20 +1828,40 @@ export const UpdateShareLynk = gql`
 
 export const CreateLicense = gql`
   mutation CreateLicense(
-    $name: String!,
-    $state: LicensesState!,
-    $attribution: LicensesObligationStatus,
-    $copyLeft: LicensesObligationCopyLeft,
-    $requiresSourceCode: LicensesObligationStatus,
+    $name: String!
+    $state: LicensesState!
+    $attribution: LicensesObligationStatus
+    $copyLeft: LicensesObligationCopyLeft
+    $requiresSourceCode: LicensesObligationStatus
     $permitsModifications: LicensesObligationStatus
+    $text: String
+    $url: String
+    $comment: String
+    $attributionKeys: String
+    $warranty: String
+    $governingLaws: String
+    $deprecated: Boolean
+    $restrictive: Boolean
+    $fsfLibre: Boolean
+    $osiApproved: Boolean
   ) {
   organizationLicenseCreate(input: {
     name: $name,
     state: $state,
-    attribution: $attribution,
-    copyLeft: $copyLeft,
-    sourceDistribution: $requiresSourceCode,
-    modifications: $permitsModifications,
+    attribution: $attribution
+    copyLeft: $copyLeft
+    sourceDistribution: $requiresSourceCode
+    modifications: $permitsModifications
+    text: $text
+    url: $url
+    comment: $comment
+    attributionKeys: $attributionKeys
+    warranty: $warranty
+    governingLaws: $governingLaws
+    deprecated: $deprecated
+    restrictive: $restrictive
+    fsfLibre: $fsfLibre
+    osiApproved: $osiApproved
   })
   {
     errors
@@ -1851,20 +1871,34 @@ export const CreateLicense = gql`
 
 export const UpdateLicense = gql`
   mutation LicenseUpdate(
-    $id: ID!,
-    $state: LicensesState!,
-    $attribution: LicensesObligationStatus,
-    $copyLeft: LicensesObligationCopyLeft,
-    $requiresSourceCode: LicensesObligationStatus,
+    $id: ID!
+    $state: LicensesState!
+    $attribution: LicensesObligationStatus
+    $attributionKeys: String
+    $copyLeft: LicensesObligationCopyLeft
+    $requiresSourceCode: LicensesObligationStatus
     $permitsModifications: LicensesObligationStatus
+    $warranty: String
+    $governingLaws: String
+    $deprecated: Boolean
+    $restrictive: Boolean
+    $fsfLibre: Boolean
+    $osiApproved: Boolean
   ) {
   organizationLicenseUpdate(input: {
-    id: $id,
-    state: $state,
-    attribution: $attribution,
-    copyLeft: $copyLeft,
-    sourceDistribution: $requiresSourceCode,
-    modifications: $permitsModifications,
+    id: $id
+    state: $state
+    attribution: $attribution
+    copyLeft: $copyLeft
+    sourceDistribution: $requiresSourceCode
+    modifications: $permitsModifications
+    attributionKeys: $attributionKeys
+    warranty: $warranty
+    governingLaws: $governingLaws
+    deprecated: $deprecated
+    restrictive: $restrictive
+    fsfLibre: $fsfLibre
+    osiApproved: $osiApproved
   })
   {
     errors

@@ -1,4 +1,4 @@
-import { AddIcon, ExternalLinkIcon } from '@chakra-ui/icons'
+import {AddIcon, ExternalLinkIcon, RepeatIcon} from '@chakra-ui/icons'
 import {
   Flex,
   Tag,
@@ -116,13 +116,6 @@ const LicenseTable = ({ data, refetch }) => {
   const [searchInput, setSearchInput] = useState('')
   const [activeRow, setActiveRow] = useState(null)
 
-  // SEARCH COMPONENT
-  const handleSearch = async () => {}
-
-  // CLEAR SERACH
-  const handleClear = async () => {
-    setSearchInput('')
-  }
 
   // SORT
 
@@ -134,7 +127,6 @@ const LicenseTable = ({ data, refetch }) => {
     await refetch({
       direction: sortDirection.toUpperCase(),
       first: totalRows,
-      field: column.id,
       after: undefined,
       before: undefined,
       last: undefined,
@@ -146,6 +138,86 @@ const LicenseTable = ({ data, refetch }) => {
       }
     })
   },[refetch, totalRows, direction])
+
+
+  const handleFilter = useCallback(
+    async (value) => {
+      disablePaginationControl()
+
+      setCurrentPage(1)
+
+      await refetch({
+        status: value[0],
+        first: totalRows,
+        last: undefined,
+        after: undefined,
+        before: undefined,
+      }).then((res) => {
+        if (res.data) {
+          setPaginationControl(res.data)
+        }
+      })
+    },
+    [refetch, totalRows]
+  )
+
+  const handleClear = useCallback(async () => {
+    setSearchInput('')
+    disablePaginationControl()
+    await refetch({
+      search: undefined,
+      first: totalRows,
+      last: undefined,
+      after: undefined,
+      before: undefined,
+    }).then((res) => {
+      if (res.data) {
+        setPaginationControl(res.data)
+      }
+    })
+  }, [refetch, totalRows])
+
+  const onSearchInputChange = useCallback(
+    (event) => {
+      const { value } = event.target
+
+      if (value === '') {
+        handleClear()
+      } else {
+        setSearchInput(value)
+      }
+    },
+    [handleClear]
+  )
+
+  const handleSearch = useCallback(
+    (event) => {
+      const { key, target: { value } } = event
+
+      if (key === 'Enter' && searchInput) {
+        disablePaginationControl()
+        refetch({
+          search: value,
+          first: totalRows,
+        }).then((res) => {
+          if (res.data) {
+            setPaginationControl(res.data)
+          }
+        })
+      }
+    },
+    [refetch, searchInput, totalRows]
+  )
+
+  const handleRefresh = useCallback(async () => {
+    disablePaginationControl()
+    await refetch({}).then((res) => {
+      if (res.data) {
+        setPaginationControl(res.data)
+      }
+    })
+  })
+
 
   const { isOpen, onOpen, onClose } = useDisclosure()
 
@@ -165,8 +237,9 @@ const LicenseTable = ({ data, refetch }) => {
             setFilterText={setSearchInput}
             onFilter={handleSearch}
             onClear={handleClear}
+            onChange={onSearchInputChange}
           />
-          <LicenseFilter />
+          <LicenseFilter onFilter={handleFilter}/>
         </Stack>
 
         {/* ADD LICNESE */}
@@ -183,6 +256,13 @@ const LicenseTable = ({ data, refetch }) => {
             fontSize={'sm'}
           />
         </Tooltip>
+        <Tooltip label='Refresh'>
+          <IconButton
+            onClick={handleRefresh}
+            colorScheme='blue'
+            icon={<RepeatIcon />}
+          ></IconButton>
+        </Tooltip>
       </Flex>
     )
   }, [searchInput, handleClear, handleSearch])
@@ -196,26 +276,19 @@ const LicenseTable = ({ data, refetch }) => {
       width: '250px',
       wrap: true,
       selector: ({ content: { name } }) => {
-        const handleClick = () => {
-          console.log('clicked')
-        }
         return (
           <Flex
             direction='row'
             alignItems={'center'}
             gap={2}
-            cursor={'pointer'}
           >
-            <Link to={`/vendor/licenses/bal`} onClick={handleClick}>
               <Text
                 color={'blue.500'}
                 my={3}
                 fontWeight={'medium'}
-                _hover={{ textDecoration: 'underline' }}
               >
                 {name}
               </Text>
-            </Link>
           </Flex>
         )
       }
@@ -227,9 +300,6 @@ const LicenseTable = ({ data, refetch }) => {
       width: '250px',
       wrap: true,
       selector: ({ content: { shortId, url } }) => {
-        if (!url && shortId) {
-          url = `https://spdx.org/licenses/${shortId}.html`
-        }
         return (
           <Flex direction='row' alignItems={'center'} gap={2}>
             <Tag variant='subtle'>
@@ -356,7 +426,7 @@ const LicenseTable = ({ data, refetch }) => {
             />
             <Portal>
               <MenuList fontSize={'sm'}>
-                {/* EDIT PRODUCT */}
+                {/* Edit License */}
                 <MenuItem
                   onClick={() => {
                     setActiveRow(row)
@@ -364,7 +434,7 @@ const LicenseTable = ({ data, refetch }) => {
                   }}
                   isDisabled={false}
                 >
-                  Edit Product
+                  Edit License
                 </MenuItem>
               </MenuList>
             </Portal>

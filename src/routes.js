@@ -18,7 +18,7 @@ import {
   FaBullhorn,
   FaWindowMaximize,
   FaBug,
-  FaKey
+  FaBalanceScale
 } from 'react-icons/fa'
 import { HomeIcon } from 'components/Icons/Icons'
 import { BsFillFolderSymlinkFill } from 'react-icons/bs'
@@ -59,7 +59,7 @@ export const dashRoutes = [
   {
     path: '/licenses',
     name: 'Licenses',
-    icon: <FaKey color='inherit' />,
+    icon: <FaBalanceScale color='inherit' />,
     component: Licenses,
     layout: '/vendor'
   },
