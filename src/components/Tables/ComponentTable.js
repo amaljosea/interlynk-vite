@@ -777,7 +777,7 @@ const ComponentTable = ({
                         ` ${item.name}`
                       )}
                     </Text>
-                    <TagCloseButton onClick={() => handleSupRemove(item.id)} />
+                    {!signedUrlParams && <TagCloseButton onClick={() => handleSupRemove(item.id)} />}
                   </Tag>
                 ))}
             </VStack>

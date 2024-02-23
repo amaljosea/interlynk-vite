@@ -16,6 +16,7 @@ import ComponentTable from 'components/Tables/ComponentTable'
 import VulnTable from 'components/Tables/VulnTable'
 import { useLocation } from 'react-router-dom'
 import Card from 'components/Card/Card'
+import { FaLock } from 'react-icons/fa6'
 
 const SbomTable = ({
   status,
@@ -80,8 +81,10 @@ const SbomTable = ({
 
   const tabIndexToName = {
     0: 'General',
-    2: 'Components',
-    3: 'Vulnerabilities'
+    1: 'Components',
+    2: 'Vulnerabilities',
+    3: 'Checks',
+    4: 'Change Log'
   }
 
   const handleTabChange = (value) => {
@@ -196,7 +199,14 @@ const SbomTable = ({
         {/* TAB LIST */}
         <TabList mt='20px'>
           {Object.values(tabIndexToName).map((item, index) => (
-            <Tab key={index} _focus={{ outline: 'none' }}>
+            <Tab
+              key={index}
+              _focus={{ outline: 'none' }}
+              isDisabled={item === 'Checks' || item === 'Change Log'}
+            >
+              {(item === 'Checks' || item === 'Change Log') && (
+                <FaLock color='darkgray' style={{ marginRight: '6px' }} />
+              )}
               {item}
             </Tab>
           ))}

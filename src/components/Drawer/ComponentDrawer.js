@@ -374,28 +374,36 @@ function ComponentDrawer(props) {
 
   const onCheckName = () => {
     setInfoHeading(`Name`)
-    setInfoText(`The component name within an SBOM serves as a unique identifier for a particular software component, helping to distinguish it from others and providing clarity when referring to or discussing components within the software supply chain.`)
+    setInfoText(
+      `The component name within an SBOM serves as a unique identifier for a particular software component, helping to distinguish it from others and providing clarity when referring to or discussing components within the software supply chain.`
+    )
     setInfoUrl(``)
     onInfoOpen()
   }
 
   const onCheckVersion = () => {
     setInfoHeading(`Version`)
-    setInfoText(`A component version refers to the specific version or release of a software component that is included in the SBOM. It indicates the precise iteration of the component being referenced within the software produc`)
+    setInfoText(
+      `A component version refers to the specific version or release of a software component that is included in the SBOM. It indicates the precise iteration of the component being referenced within the software produc`
+    )
     setInfoUrl(``)
     onInfoOpen()
   }
 
   const onCheckGroup = () => {
     setInfoHeading(`Group`)
-    setInfoText(`Component group refers to a categorization or grouping of related software components within the SBOM document. Component groups are typically used to organize components based on their function, purpose, or other relevant criteria.`)
+    setInfoText(
+      `Component group refers to a categorization or grouping of related software components within the SBOM document. Component groups are typically used to organize components based on their function, purpose, or other relevant criteria.`
+    )
     setInfoUrl(``)
     onInfoOpen()
   }
 
   const onCheckIdentifiers = () => {
     setInfoHeading(`Identifiers`)
-    setInfoText(`Component identifiers refer to unique identifiers assigned to each software component listed in the SBOM document. These identifiers serve to uniquely identify and distinguish one component from another within the software inventory.`)
+    setInfoText(
+      `Component identifiers refer to unique identifiers assigned to each software component listed in the SBOM document. These identifiers serve to uniquely identify and distinguish one component from another within the software inventory.`
+    )
     setInfoUrl(``)
     onInfoOpen()
   }
@@ -442,7 +450,12 @@ function ComponentDrawer(props) {
                         *
                       </chakra.span>
                     </Text>
-                    <Icon as={InfoIcon} color={'blue.500'} cursor={'pointer'} onClick={onCheckName}/>
+                    <Icon
+                      as={InfoIcon}
+                      color={'blue.500'}
+                      cursor={'pointer'}
+                      onClick={onCheckName}
+                    />
                   </Flex>
                 </FormLabel>
                 <Input
@@ -463,7 +476,12 @@ function ComponentDrawer(props) {
                         *
                       </chakra.span>
                     </Text>
-                    <Icon as={InfoIcon} color={'blue.500'} cursor={'pointer'} onClick={onCheckVersion} />
+                    <Icon
+                      as={InfoIcon}
+                      color={'blue.500'}
+                      cursor={'pointer'}
+                      onClick={onCheckVersion}
+                    />
                   </Flex>
                 </FormLabel>
                 <Input
@@ -479,7 +497,12 @@ function ComponentDrawer(props) {
                 <FormLabel htmlFor='groupInfo' fontSize={'sm'}>
                   <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
                     <Text>Group</Text>
-                    <Icon as={InfoIcon} color={'blue.500'} cursor={'pointer'} onClick={onCheckGroup} />
+                    <Icon
+                      as={InfoIcon}
+                      color={'blue.500'}
+                      cursor={'pointer'}
+                      onClick={onCheckGroup}
+                    />
                   </Flex>
                 </FormLabel>
                 <Input
@@ -499,9 +522,8 @@ function ComponentDrawer(props) {
                   size='md'
                   fontSize={'sm'}
                   value={compKind}
-                  onChange={(e) =>
-                    signedUrlParams ? null : setCompKind(e.target.value)
-                  }
+                  isDisabled={signedUrlParams}
+                  onChange={(e) => setCompKind(e.target.value)}
                 >
                   <option value='' style={{ background: 'lightgray' }}>
                     -- Select --
@@ -535,7 +557,12 @@ function ComponentDrawer(props) {
                         <WarningTwoIcon w={4} h={4} color='red.500' />
                       )}
                     <Text>Identifiers</Text>
-                    <Icon as={InfoIcon} color={'blue.500'} cursor={'pointer'} onClick={onCheckIdentifiers} />
+                    <Icon
+                      as={InfoIcon}
+                      color={'blue.500'}
+                      cursor={'pointer'}
+                      onClick={onCheckIdentifiers}
+                    />
                   </Flex>
                 </FormLabel>
                 <Stack direction={'row'} spacing={2}>
@@ -612,9 +639,8 @@ function ComponentDrawer(props) {
                   size='md'
                   fontSize={'sm'}
                   value={compScope}
-                  onChange={(e) =>
-                    signedUrlParams ? null : setCompScope(e.target.value)
-                  }
+                  isDisabled={signedUrlParams}
+                  onChange={(e) => setCompScope(e.target.value)}
                 >
                   <option value='' style={{ background: 'lightgray' }}>
                     -- Select --

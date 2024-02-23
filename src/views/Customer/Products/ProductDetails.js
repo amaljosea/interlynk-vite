@@ -14,7 +14,7 @@ import {
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
-import { FaWindowMaximize } from 'react-icons/fa6'
+import { FaLock, FaWindowMaximize } from 'react-icons/fa6'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useQuery } from '@apollo/client'
 import { ShareLynkProjectGroup } from 'graphQL/Queries'
@@ -103,7 +103,7 @@ const ProductDetails = () => {
       const env = data?.shareLynkQuery?.projectGroup?.projects.find(
         (item) => item.name === environment
       )
-      console.log('env',env);
+      console.log('env', env)
       localStorage.setItem('publicEnv', env?.id)
       setActiveEnv(env?.id)
     }
@@ -200,15 +200,30 @@ const ProductDetails = () => {
               onChange={(value) => handleTabChange(value)}
             >
               <TabList>
-                {['versions'].map((item, index) => (
-                  <Tab
-                    key={index}
-                    _focus={{ outline: 'none' }}
-                    textTransform={'capitalize'}
-                  >
-                    {item}
-                  </Tab>
-                ))}
+                {['versions', 'automation rules', 'settings', 'change log'].map(
+                  (item, index) => (
+                    <Tab
+                      key={index}
+                      _focus={{ outline: 'none' }}
+                      textTransform={'capitalize'}
+                      isDisabled={
+                        item === 'automation rules' ||
+                        item === 'settings' ||
+                        item === 'change log'
+                      }
+                    >
+                      {(item === 'automation rules' ||
+                        item === 'settings' ||
+                        item === 'change log') && (
+                        <FaLock
+                          color='darkgray'
+                          style={{ marginRight: '6px' }}
+                        />
+                      )}
+                      {item}
+                    </Tab>
+                  )
+                )}
               </TabList>
               <TabPanels>
                 {/* VERSIONS */}
