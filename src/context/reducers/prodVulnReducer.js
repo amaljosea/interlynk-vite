@@ -17,7 +17,8 @@ const prodVulnReducer = (state, action) => {
         kev: '',
         epss: '',
         min: 0,
-        max: 0
+        max: 0,
+        direct: 'No'
       }
     case 'CHANGE_SEARCH_INPUT':
       return {
@@ -115,6 +116,14 @@ const prodVulnReducer = (state, action) => {
         before: '',
         minEpss: 0,
         maxEpss: 0
+      }
+    case 'FILTER_DIRECT':
+      return {
+        ...state,
+        direct: payload,
+        pageIndex: 1,
+        after: '',
+        before: ''
       }
     case 'SET_EPSS':
       return {

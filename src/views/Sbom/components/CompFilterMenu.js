@@ -36,7 +36,8 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
     kinds,
     licenses,
     suppliers,
-    scope
+    scope,
+    direct
   } = prodCompState
   const { prodCompDispatch } = dispatch
 
@@ -47,7 +48,7 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
     licenses: filterLicenses
   } = filters
 
-  const onFilter = (ecosystem, kind, licenses, suppliers, scope) => {
+  const onFilter = (ecosystem, kind, licenses, suppliers, scope, direct) => {
     refetch({
       projectId: signedUrlParams ? undefined : productId,
       sbomId: sbomId,
@@ -71,13 +72,14 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
           : suppliers,
       primary: scope === 'primary' ? true : undefined,
       internal: scope === 'internal' ? true : undefined,
+      direct: direct === 'Yes' ? true : false,
       field: signedUrlParams ? undefined : field,
       direction: signedUrlParams ? undefined : direction
     })
   }
 
   const onFilterEcosystem = (value) => {
-    onFilter(value, kinds, licenses, suppliers, scope)
+    onFilter(value, kinds, licenses, suppliers, scope, direct)
     prodCompDispatch({
       type: 'FILTER_ECOSYSTEM',
       payload: value
@@ -85,7 +87,7 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
   }
 
   const onFilterKind = (value) => {
-    onFilter(ecosystems, value, licenses, suppliers, scope)
+    onFilter(ecosystems, value, licenses, suppliers, scope, direct)
     prodCompDispatch({
       type: 'FILTER_KIND',
       payload: value
@@ -93,7 +95,7 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
   }
 
   const onFilterLicense = (value) => {
-    onFilter(ecosystems, kinds, value, suppliers, scope)
+    onFilter(ecosystems, kinds, value, suppliers, scope, direct)
     prodCompDispatch({
       type: 'FILTER_LICENSE',
       payload: value
@@ -101,7 +103,7 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
   }
 
   const onFilterSupplier = (value) => {
-    onFilter(ecosystems, kinds, licenses, value, scope)
+    onFilter(ecosystems, kinds, licenses, value, scope, direct)
     prodCompDispatch({
       type: 'FILTER_SUPPLIER',
       payload: value
@@ -109,8 +111,13 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
   }
 
   const onFilterType = (value) => {
-    onFilter(ecosystems, kinds, licenses, suppliers, value)
+    onFilter(ecosystems, kinds, licenses, suppliers, value, direct)
     prodCompDispatch({ type: 'FILTER_SCOPE', payload: value })
+  }
+
+  const onFilterDirect = (value) => {
+    onFilter(ecosystems, kinds, licenses, suppliers, scope, value)
+    prodCompDispatch({ type: 'FILTER_DIRECT', payload: value })
   }
 
   return (
@@ -234,6 +241,19 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
                   {item}
                 </MenuItemOption>
               ))}
+            </MenuOptionGroup>
+          </MenuList>
+        </Menu>
+      </Box>
+      {/* DIRECT */}
+      <Box width={'fit-content'} position={'relative'}>
+        <Menu closeOnSelect={false}>
+          {direct !== '' && <CheckMark />}
+          <MenuHeading title={'Direct'} />
+          <MenuList>
+            <MenuOptionGroup type='radio' value={direct} onChange={onFilterDirect}>
+              <MenuItemOption value={'Yes'} fontSize={'sm'}>Yes</MenuItemOption>
+              <MenuItemOption value={'No'} fontSize={'sm'}>No</MenuItemOption>
             </MenuOptionGroup>
           </MenuList>
         </Menu>

@@ -116,7 +116,7 @@ const SbomTable = ({
         kinds,
         licenses,
         suppliers,
-        scope
+        scope,
       } = prodCompState
 
       getCompData({
@@ -127,7 +127,7 @@ const SbomTable = ({
         licenses: getUndefinedIfEmptyOrAll(licenses),
         supplierName: getUndefinedIfEmptyOrAll(suppliers),
         primary: scope === 'primary' ? true : undefined,
-        internal: scope === 'internal' ? true : undefined
+        internal: scope === 'internal' ? true : undefined,
       }).then((res) => {
         if (res.data) {
           prodCompDispatch({
@@ -148,7 +148,7 @@ const SbomTable = ({
         statues,
         source,
         kev,
-        epss
+        epss,
       } = prodVulnState
       console.log('source', source)
 
@@ -167,7 +167,7 @@ const SbomTable = ({
         epss:
           epss !== '' && epss !== 'all'
             ? { min: vulnEpss[0], max: vulnEpss[1] }
-            : undefined
+            : undefined,
       }).then((res) => {
         if (res.data) {
           prodVulnDispatch({

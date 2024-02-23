@@ -100,6 +100,7 @@ const ComponentTable = ({
     suppliers,
     scope,
     filters,
+    direct,
     totalComp
   } = prodCompState
   const { prodCompDispatch } = dispatch
@@ -150,6 +151,7 @@ const ComponentTable = ({
           : suppliers,
       primary: scope === 'primary' ? true : undefined,
       internal: scope === 'internal' ? true : undefined,
+      direct: direct === 'Yes' ? true : false,
       first: totalRows,
       last: undefined,
       after: undefined,
@@ -948,6 +950,7 @@ const ComponentTable = ({
           : suppliers,
       primary: scope === 'primary' ? true : undefined,
       internal: scope === 'internal' ? true : undefined,
+      direct: direct === 'Yes' ? true : false,
       field: field,
       direction: direction,
       first: totalRows,
@@ -996,6 +999,7 @@ const ComponentTable = ({
             : suppliers,
         primary: scope === 'primary' ? true : undefined,
         internal: scope === 'internal' ? true : undefined,
+        direct: direct === 'Yes' ? true : false,
         field: signedUrlParams ? undefined : field,
         direction: signedUrlParams ? undefined : direction,
         first: totalRows,
@@ -1123,6 +1127,7 @@ const ComponentTable = ({
           : suppliers,
       primary: scope === 'primary' ? true : undefined,
       internal: scope === 'internal' ? true : undefined,
+      direct: direct === 'Yes' ? true : false,
       field: signedUrlParams ? undefined : field,
       direction: signedUrlParams ? undefined : direction
     }).then((res) => {
@@ -1157,6 +1162,7 @@ const ComponentTable = ({
           : suppliers,
       primary: scope === 'primary' ? true : undefined,
       internal: scope === 'internal' ? true : undefined,
+      direct: direct === 'Yes' ? true : false,
       field: column.id,
       direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
     }).then((res) => {

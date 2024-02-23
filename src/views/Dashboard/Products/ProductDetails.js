@@ -107,7 +107,8 @@ const ProductDetails = () => {
     components,
     statues,
     kev,
-    epss
+    epss,
+    direct
   } = prodVulnState
   const { prodVulnDispatch, globalVulnDispatch } = dispatch
 
@@ -193,6 +194,7 @@ const ProductDetails = () => {
       kev:
         kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
       epss: epss !== '' && epss !== 'all' ? range : undefined,
+      direct: direct === 'Yes' ? true : false,
       field: prodVulnState.field,
       direction: prodVulnState.direction
     }

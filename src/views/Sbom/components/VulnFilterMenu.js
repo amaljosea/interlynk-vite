@@ -30,7 +30,8 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
     epss,
     filters,
     minEpss,
-    maxEpss
+    maxEpss,
+    direct
   } = prodVulnState
   const { prodVulnDispatch } = dispatch
 
@@ -55,14 +56,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
     }
   }
 
-  const handleRefetch = async (
-    source,
-    severity,
-    component,
-    status,
-    kev,
-    epss
-  ) => {
+  const handleRefetch = () => {
     const epssRange = epss !== 'all' && epss !== '' && epss.split('-')
 
     const range = {
@@ -70,19 +64,23 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       max: parseFloat(epssRange[1]) / 10000
     }
 
-    await refetch({
+    refetch({
       projectId: signedUrlParams ? undefined : productId,
       sbomId: sbomId,
       source: source === 'BOTH' || source === '' ? undefined : source,
       severity:
-        !severity.includes('all') && severity.length > 0 ? severity : undefined,
-      componentName:
-        !component.includes('all') && component.length > 0
-          ? component
+        !severities.includes('all') && severities.length > 0
+          ? severities
           : undefined,
-      status: !status.includes('all') && status.length > 0 ? status : undefined,
+      componentName:
+        !components.includes('all') && components.length > 0
+          ? components
+          : undefined,
+      status:
+        !statues.includes('all') && statues.length > 0 ? statues : undefined,
       kev: kev === 'yes' ? true : kev === 'false' ? false : undefined,
       epss: epss === 'all' || epss === '' ? undefined : range,
+      direct: direct === 'Yes' ? true : false,
       first: totalRows,
       last: undefined,
       after: undefined,
@@ -93,45 +91,43 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
   }
 
   const onFilterSource = (value) => {
-    handleRefetch(value, severities, components, statues, kev, epss)
     prodVulnDispatch({ type: 'FILTER_SOURCE', payload: value })
+    handleRefetch()
   }
 
   const onFilterCompName = (value) => {
-    handleRefetch(source, severities, value, statues, kev, epss)
     prodVulnDispatch({ type: 'FILTER_COMPONENT', payload: value })
+    handleRefetch()
   }
 
   const onFilterSeverity = (value) => {
-    handleRefetch(source, value, components, statues, kev, epss)
     prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
+    handleRefetch()
   }
 
   const onFilterStatus = (value) => {
-    handleRefetch(source, severities, components, value, kev, epss)
     prodVulnDispatch({ type: 'FILTER_STATUS', payload: value })
+    handleRefetch()
   }
 
   const onFilterKev = (value) => {
-    handleRefetch(source, severities, components, statues, value, epss)
     prodVulnDispatch({ type: 'FILTER_KEV', payload: value })
+    handleRefetch()
   }
 
   const onFilterEpss = (value) => {
-    handleRefetch(source, severities, components, statues, kev, value)
     prodVulnDispatch({ type: 'FILTER_EPSS', payload: value })
+    handleRefetch()
+  }
+
+  const onFilterDirect = (value) => {
+    prodVulnDispatch({ type: 'FILTER_DIRECT', payload: value })
+    handleRefetch()
   }
 
   const handleSubmit = () => {
-    handleRefetch(
-      source,
-      severities,
-      components,
-      statues,
-      kev,
-      `${minEpss}-${maxEpss}`
-    )
     prodVulnDispatch({ type: 'SET_EPSS', payload: `${minEpss}-${maxEpss}` })
+    handleRefetch()
     onClose()
   }
 
@@ -343,6 +339,27 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
                 Submit
               </Button>
             </Flex>
+          </MenuList>
+        </Menu>
+      </Box>
+      {/* DIRECT */}
+      <Box width={'fit-content'} position={'relative'}>
+        <Menu closeOnSelect={false}>
+          {direct !== '' && <CheckMark />}
+          <MenuHeading title={'Direct'} />
+          <MenuList>
+            <MenuOptionGroup
+              type='radio'
+              value={direct}
+              onChange={onFilterDirect}
+            >
+              <MenuItemOption value={'Yes'} fontSize={'sm'}>
+                Yes
+              </MenuItemOption>
+              <MenuItemOption value={'No'} fontSize={'sm'}>
+                No
+              </MenuItemOption>
+            </MenuOptionGroup>
           </MenuList>
         </Menu>
       </Box>

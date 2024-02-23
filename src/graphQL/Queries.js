@@ -1527,6 +1527,7 @@ export const GetComponentData = gql`
     $kind: [String!]
     $internal: Boolean
     $primary: Boolean
+    $direct: Boolean
     $field: ComponentOrderByFields!
     $direction: OrderByDirection!
   ) {
@@ -1545,6 +1546,7 @@ export const GetComponentData = gql`
         kind: $kind
         internal: $internal
         primary: $primary
+        direct: $direct
         orderBy: { field: $field, direction: $direction }
       ) {
         totalCount
@@ -1842,6 +1844,7 @@ export const GetVulnData = gql`
     $source: SbomVulnSourceEnum
     $kev: Boolean
     $epss: RangeInput
+    $direct: Boolean
     $first: Int
     $last: Int
     $after: String
@@ -1859,6 +1862,7 @@ export const GetVulnData = gql`
         vulnerabilitySource: $source
         kev: $kev
         epss: $epss
+        direct: $direct
         after: $after
         before: $before
         first: $first

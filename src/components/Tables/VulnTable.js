@@ -134,7 +134,8 @@ const VulnTable = ({
     source,
     kev,
     epss,
-    filters
+    filters,
+    direct
   } = prodVulnState
   const { prodVulnDispatch } = dispatch
 
@@ -461,6 +462,7 @@ const VulnTable = ({
     status: statues.length > 0 ? statues : undefined,
     kev: kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
     epss: epss !== '' && epss !== 'all' ? range : undefined,
+    direct: direct === 'Yes' ? true : false,
     field: signedUrlParams ? undefined : field,
     direction: signedUrlParams ? undefined : direction
   }
@@ -480,6 +482,7 @@ const VulnTable = ({
       kev:
         kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
       epss: epss !== '' && epss !== 'all' ? range : undefined,
+      direct: direct === 'Yes' ? true : false,
       field: field,
       direction: direction,
       first: totalRows,
@@ -524,6 +527,7 @@ const VulnTable = ({
               ? true
               : false,
         epss: epss !== '' && epss !== 'all' ? range : undefined,
+        direct: direct === 'Yes' ? true : false,
         field: signedUrlParams ? undefined : field,
         direction: signedUrlParams ? undefined : direction,
         first: totalRows,
@@ -840,6 +844,7 @@ const VulnTable = ({
       kev:
         kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
       epss: epss === 'all' || epss === '0-0' || epss === '' ? undefined : range,
+      direct: direct === 'Yes' ? true : false,
       first: totalRows,
       last: undefined,
       after: undefined,

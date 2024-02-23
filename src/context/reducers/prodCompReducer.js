@@ -13,6 +13,7 @@ const prodCompReducer = (state, action) => {
         licenses: [],
         kinds: [],
         scope: '',
+        direct: 'No',
         licenseType: 'license_exp',
         spdxLicenses: [],
         spdxList: [],
@@ -106,6 +107,14 @@ const prodCompReducer = (state, action) => {
       return {
         ...state,
         scope: payload,
+        pageIndex: 1,
+        after: '',
+        before: ''
+      }
+    case 'FILTER_DIRECT':
+      return {
+        ...state,
+        direct: payload,
         pageIndex: 1,
         after: '',
         before: ''
