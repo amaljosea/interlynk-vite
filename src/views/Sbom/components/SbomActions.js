@@ -396,7 +396,7 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
           onClose={onClose}
           productId={productId}
           sbomId={sbomId}
-          productName={sbom?.project?.name}
+          productName={sbom?.project?.projectGroup?.name}
           version={sbom?.projectVersion}
         />
       )}
