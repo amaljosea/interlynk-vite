@@ -202,21 +202,15 @@ const ProductDetails = () => {
               onChange={(value) => handleTabChange(value)}
             >
               <TabList>
-                {['versions', 'automation rules', 'settings', 'change log'].map(
+                {['versions','vulnerabilities', 'automation rules', 'settings', 'change log'].map(
                   (item, index) => (
                     <Tab
                       key={index}
                       _focus={{ outline: 'none' }}
                       textTransform={'capitalize'}
-                      isDisabled={
-                        item === 'automation rules' ||
-                        item === 'settings' ||
-                        item === 'change log'
-                      }
+                      isDisabled={ item === 'automation rules' || item === 'settings' || item === 'change log' || item === 'vulnerabilities'}
                     >
-                      {(item === 'automation rules' ||
-                        item === 'settings' ||
-                        item === 'change log') && (
+                      {(item === 'automation rules' || item === 'settings' || item === 'change log' || item === 'vulnerabilities') && (
                         <FaLock
                           color='darkgray'
                           style={{ marginRight: '6px' }}
