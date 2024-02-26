@@ -76,8 +76,8 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
       supplierName: undefined,
       primary: undefined,
       internal: undefined,
-      field: signedUrlParams ? undefined : field,
-      direction: signedUrlParams ? undefined : direction
+      field: field,
+      direction: direction
     }).then((res) => {
       if (res.data) {
         if (signedUrlParams) {
@@ -101,8 +101,8 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
       last: undefined,
       after: undefined,
       before: undefined,
-      field: signedUrlParams ? undefined : field,
-      direction: signedUrlParams ? undefined : direction
+      field: field,
+      direction: direction
     }).then((res) => {
       if (res.data) {
         if (signedUrlParams) {
