@@ -94,13 +94,13 @@ const ShareLynkDrawer = ({
         expiresAt: noExpire ? undefined : new Date(selectedDate).toISOString()
       }
     }).then((res) => {
-      setSelectedDate('')
-      setNoExpire(false)
       if (res?.data) {
         refetch()
         onShareLynkClose()
       }
     })
+    setSelectedDate('')
+    setNoExpire(false)
   }
 
   // HEADER SECTION
