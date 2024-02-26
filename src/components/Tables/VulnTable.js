@@ -944,7 +944,7 @@ const VulnTable = ({
           expandOnRowClicked
           persistTableHead
           expandableRowsComponent={ExpandedComponent}
-          selectableRows
+          selectableRows={!signedUrlParams}
           clearSelectedRows={toggleClear}
           onSelectedRowsChange={handleChange}
         />
