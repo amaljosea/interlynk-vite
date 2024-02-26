@@ -17,11 +17,12 @@ import VulnTable from 'components/Tables/VulnTable'
 import HealthCheckTable from 'components/Tables/HealthCheckTable'
 import SbomChangelogTable from 'components/Tables/SbomChangelogTable'
 import PartsTable from 'components/Tables/PartsTable'
-import { useLazyQuery } from '@apollo/client'
-import { GetCheckResults, GetChangeLogs, GetSbomParts } from 'graphQL/Queries'
+import {useLazyQuery} from '@apollo/client'
+import {GetCheckResults, GetChangeLogs, GetSbomParts, GetSbomLicensesTable} from 'graphQL/Queries'
 import { useLocation } from 'react-router-dom'
 import { useGlobalState } from 'hooks/useGlobalState'
 import SupportTable from 'components/Tables/SupportTable'
+import LicenseTable from "../../../components/Licenses/LicenseTable"
 
 const SBOMTable = ({
   status,
@@ -37,22 +38,24 @@ const SBOMTable = ({
 }) => {
   // How often each tab should refetch the data (in minutes)
   const fetchIntervalMinutes = {
-    General: 0,
-    Parts: 0,
-    Components: 1,
-    Vulnerabilities: 1,
-    Support: 0,
-    Checks: 0,
+    'General': 0,
+    'Parts': 0,
+    'Components': 0,
+    'Vulnerabilities': 0.5,
+    'Licenses': 0,
+    'Support': 0,
+    'Checks': 0,
     'Change Log': 0
   }
 
   const [lastFetchTime, setLastFetchTime] = useState({
-    General: null,
-    Parts: null,
-    Components: null,
-    Vulnerabilities: null,
-    Support: null,
-    Checks: null,
+    'General': null,
+    'Parts': null,
+    'Components': null,
+    'Vulnerabilities': null,
+    'Licenses': null,
+    'Support': null,
+    'Checks': null,
     'Change Log': null
   })
 
@@ -106,12 +109,15 @@ const SBOMTable = ({
   })
 
   // GET CHANGE LOG DATA
-  const [getLogsData, { data: logsData, refetch: logsRefetch }] = useLazyQuery(
-    GetChangeLogs,
-    {
+  const [getLogsData, { data: logsData, refetch: logsRefetch }] = useLazyQuery(GetChangeLogs, {
       fetchPolicy: 'network-only'
     }
   )
+
+  // GET LICENSES DATA
+ const [getLicensesData, { data: licensesData }] = useLazyQuery(GetSbomLicensesTable, {
+   fetchPolicy: 'network-only'
+ })
 
   const getUndefinedIfEmpty = (value) => (value !== '' ? value : undefined)
 
@@ -123,9 +129,10 @@ const SBOMTable = ({
     1: 'Parts',
     2: 'Components',
     3: 'Vulnerabilities',
-    4: 'Support',
-    5: 'Checks',
-    6: 'Change Log'
+    4: 'Licenses',
+    5: 'Support',
+    6: 'Checks',
+    7: 'Change Log'
   }
 
   const handleTabChange = (value) => {
@@ -240,6 +247,14 @@ const SBOMTable = ({
             payload: res.data.sbom.vulns.totalCount
           })
           prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
+          updateLastFetchTime(tabName)
+        }
+      })
+    } else if (tabName === 'Licenses' && shouldFetchData(tabName)) {
+      getLicensesData({
+      }).then((res) => {
+        if (res.data) {
+          console.log('licensesData', res.data)
           updateLastFetchTime(tabName)
         }
       })
@@ -395,6 +410,13 @@ const SBOMTable = ({
             {/* SUPPORT TABLE */}
             <TabPanel px={0}>
               <SupportTable data={null} />
+            </TabPanel>
+            {/* LICENSES TABLE */}
+            <TabPanel px={0}>
+                <LicenseTable
+                  data={licensesData?.sbom?.licenses}
+                  refetch={getLicensesData}
+                />
             </TabPanel>
             {/* HEALTH CHECK TABLE */}
             <TabPanel px={0}>
