@@ -50,14 +50,20 @@ const SbomTable = ({
   // How often each tab should refetch the data (in minutes)
   const fetchIntervalMinutes = {
     General: 0,
+    Parts: 0,
     Components: 0,
-    Vulnerabilities: 1
+    Vulnerabilities: 1,
+    Checks: 0,
+    'Change Log': 0
   }
 
   const [lastFetchTime, setLastFetchTime] = useState({
     General: null,
+    Parts: null,
     Components: null,
-    Vulnerabilities: null
+    Vulnerabilities: null,
+    Checks: null,
+    'Change Log': null
   })
 
   const shouldFetchData = (tabName) => {
@@ -81,10 +87,11 @@ const SbomTable = ({
 
   const tabIndexToName = {
     0: 'General',
-    1: 'Components',
-    2: 'Vulnerabilities',
-    3: 'Checks',
-    4: 'Change Log'
+    1: 'Parts',
+    2: 'Components',
+    3: 'Vulnerabilities',
+    4: 'Checks',
+    5: 'Change Log'
   }
 
   const handleTabChange = (value) => {
@@ -119,9 +126,8 @@ const SbomTable = ({
         kinds,
         licenses,
         suppliers,
-        scope,
+        scope
       } = prodCompState
-
       getCompData({
         ...commonParams,
         search: getUndefinedIfEmpty(searchInput),
@@ -153,7 +159,7 @@ const SbomTable = ({
         statues,
         source,
         kev,
-        epss,
+        epss
       } = prodVulnState
       console.log('source', source)
 
@@ -206,9 +212,11 @@ const SbomTable = ({
             <Tab
               key={index}
               _focus={{ outline: 'none' }}
-              isDisabled={item === 'Checks' || item === 'Change Log'}
+              isDisabled={
+                item === 'Parts' || item === 'Checks' || item === 'Change Log'
+              }
             >
-              {(item === 'Checks' || item === 'Change Log') && (
+              {(item === 'Parts' || item === 'Checks' || item === 'Change Log') && (
                 <FaLock color='darkgray' style={{ marginRight: '6px' }} />
               )}
               {item}
@@ -236,6 +244,8 @@ const SbomTable = ({
               </Flex>
             )}
           </TabPanel>
+          {/* PARTS TABLE */}
+          <TabPanel px={1}></TabPanel>
           {/* COMPONENT TABLE */}
           <TabPanel px={0}>
             {data && (
@@ -286,6 +296,10 @@ const SbomTable = ({
               sbomId={sbomId}
             />
           </TabPanel>
+          {/* CHECKS TABLE */}
+          <TabPanel px={1}></TabPanel>
+          {/* CHANGE LOG TABLE */}
+          <TabPanel px={1}></TabPanel>
         </TabPanels>
       </Tabs>
     </Card>

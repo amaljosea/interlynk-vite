@@ -20,11 +20,10 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
   const { totalRows, activeCsSbomTab, prodState, prodCompState } =
     useGlobalState()
   const { data: allProjectGroups } = prodState
-  const {field, direction} = prodCompState
+  const { field, direction } = prodCompState
   const location = useLocation()
   const navigate = useNavigate()
   const toast = useToast()
-  
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
@@ -39,7 +38,6 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
     refetch: compRefetch,
     error: compError
   } = useQuery(ShareComponentData, {
-    skip: activeCsSbomTab === 1 ? false : true,
     fetchPolicy: 'network-only',
     variables: {
       sbomId: sbomId,
