@@ -48,12 +48,17 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const activeProd = localStorage.getItem(signedUrlParams ? 'publicEnv' : 'activeEnv')
 
+  const { userPermissions, activeProdTab, setActiveSbomTab, prodVulnState, dispatch } = useGlobalState()
+  const { field, direction } = prodVulnState
+  const { prodVulnDispatch, prodCompDispatch } = dispatch
+
   const paginationSizes = [25, 50, 100]
   const [totalRows, setTotalRows] = useState(paginationSizes[0])
 
   const { data, refetch, error } = useQuery(
     signedUrlParams ? ShareVersionTable : GetVersionsTable,
     {
+      skip: activeProdTab === 0 ? false : true,
       fetchPolicy: 'network-only',
       variables: {
         id: activeProd,
@@ -140,11 +145,6 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
     },
     [refetch, setTotalRows]
   )
-
-  const { userPermissions, setActiveSbomTab, prodVulnState, dispatch } =
-    useGlobalState()
-  const { field, direction } = prodVulnState
-  const { prodVulnDispatch, prodCompDispatch } = dispatch
 
   const sbom = userPermissions?.find((item) => item.key === 'view_sbom')
   const createSbom = sbom?.supersededBy?.some(

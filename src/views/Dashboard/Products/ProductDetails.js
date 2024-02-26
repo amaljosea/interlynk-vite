@@ -161,10 +161,12 @@ const ProductDetails = () => {
   })
 
   const [getSettings, { data: settings }] = useLazyQuery(GetProjectSettings, {
+    skip: activeProdTab === 3 ? false : true,
     fetchPolicy: 'network-only'
   })
 
   const [getLogs, { data: prodLogs }] = useLazyQuery(GetProjectLogs, {
+    skip: activeProdTab === 4 ? false : true,
     fetchPolicy: 'network-only'
   })
 

@@ -21,7 +21,7 @@ import { useRef } from 'react'
 
 const VulnsFilters = ({ refetch }) => {
   const params = useParams()
-
+  
   const { totalRows, globalVulnState, prodState, dispatch } = useGlobalState()
   const {
     field,
@@ -37,6 +37,8 @@ const VulnsFilters = ({ refetch }) => {
   const { globalVulnDispatch } = dispatch
 
   const { data } = useQuery(GetProductNames, {
+    skip: window.location.pathname.startsWith(`/vendor/products`) ? true : false,
+    fetchPolicy: 'network-only',
     variables: {
       first: totalRows,
       enabled: true,

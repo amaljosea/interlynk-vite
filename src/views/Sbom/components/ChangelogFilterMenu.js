@@ -14,11 +14,12 @@ import { GetLogFilters } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
 
 const ChangelogFilterMenu = ({ id, refetch }) => {
-  const { totalRows, prodLogState, dispatch } = useGlobalState()
+  const { totalRows, activeProdTab, prodLogState, dispatch } = useGlobalState()
   const { field, direction, searchInput, user, type, object } = prodLogState
   const { prodLogDispatch } = dispatch
 
   const { data, error, loading } = useQuery(GetLogFilters, {
+    skip: activeProdTab === 4 ? false : true,
     variables: { id: id },
     fetchPolicy: 'network-only'
   })
