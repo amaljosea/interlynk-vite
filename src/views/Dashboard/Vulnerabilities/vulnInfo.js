@@ -78,7 +78,7 @@ const VulnInfo = ({ data, componentVulns, refetch }) => {
                   flexDir={'row'}
                   alignItems={'center'}
                   flexWrap={'wrap'}
-                  gap={6}
+                  gap={8}
                   mt={6}
                 >
                   {/* PRODUCTS */}
@@ -166,7 +166,8 @@ const VulnInfo = ({ data, componentVulns, refetch }) => {
                     alignItems={'flex-start'}
                     spacing={2}
                   >
-                    <i className='fa-solid fa-person-through-window'
+                    <i
+                      className='fa-solid fa-person-through-window'
                       style={{ marginTop: '3px', color: '#777' }}
                     ></i>
                     <Flex flexDir={'column'} alignItems={'center'}>

@@ -228,7 +228,7 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
           </Text>
         </Tooltip>
         {/* STATS */}
-        <Flex flexDir={'row'} alignItems={'center'} gap={6} mt={5}>
+        <Flex flexDir={'row'} alignItems={'center'} gap={8} mt={5}>
           {/* COMPONENTS */}
           <Stack direction={'row'} alignItems={'flex-start'} spacing={2}>
             <Icon h={4} w={4} mt={1} color='#777' as={FaCube} />
