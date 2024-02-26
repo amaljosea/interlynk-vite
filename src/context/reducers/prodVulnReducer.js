@@ -18,7 +18,7 @@ const prodVulnReducer = (state, action) => {
         epss: '',
         min: 0,
         max: 0,
-        direct: 'No'
+        direct: false
       }
     case 'CHANGE_SEARCH_INPUT':
       return {

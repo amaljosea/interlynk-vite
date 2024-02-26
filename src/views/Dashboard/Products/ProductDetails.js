@@ -194,7 +194,7 @@ const ProductDetails = () => {
       kev:
         kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
       epss: epss !== '' && epss !== 'all' ? range : undefined,
-      direct: direct === 'Yes' ? true : false,
+      direct: direct === true ? true :  undefined,
       field: prodVulnState.field,
       direction: prodVulnState.direction
     }

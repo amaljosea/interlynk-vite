@@ -126,7 +126,8 @@ const SbomTable = ({
         kinds,
         licenses,
         suppliers,
-        scope
+        scope,
+        direct
       } = prodCompState
       getCompData({
         ...commonParams,
@@ -137,6 +138,7 @@ const SbomTable = ({
         supplierName: getUndefinedIfEmptyOrAll(suppliers),
         primary: scope === 'primary' ? true : undefined,
         internal: scope === 'internal' ? true : undefined,
+        direct: direct === true ? true :  undefined,
         field: field,
         direction: direction
       }).then((res) => {
@@ -159,7 +161,8 @@ const SbomTable = ({
         statues,
         source,
         kev,
-        epss
+        epss,
+        direct
       } = prodVulnState
       console.log('source', source)
 
@@ -179,6 +182,7 @@ const SbomTable = ({
           epss !== '' && epss !== 'all'
             ? { min: vulnEpss[0], max: vulnEpss[1] }
             : undefined,
+        direct: direct === true ? true : undefined,
         field: field,
         direction: direction
       }).then((res) => {

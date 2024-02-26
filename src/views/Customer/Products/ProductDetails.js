@@ -45,7 +45,7 @@ const ProductDetails = () => {
     prodVulnState,
     dispatch
   } = useGlobalState()
-  const { field, direction, searchInput, severities, components, statues, source, kev, epss } =
+  const { field, direction, searchInput, severities, components, statues, source, kev, epss, direct } =
     prodVulnState
   const { prodVulnDispatch } = dispatch
 
@@ -88,6 +88,7 @@ const ProductDetails = () => {
       kev:
         kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
       epss: epss !== '' && epss !== 'all' ? range : undefined,
+      direct: direct === true ? true :  undefined,
       field,
       direction
     }

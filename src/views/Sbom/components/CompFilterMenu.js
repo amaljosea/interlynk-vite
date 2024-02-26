@@ -1,10 +1,13 @@
 import {
   Box,
+  Flex,
   Menu,
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
-  Stack
+  Stack,
+  Switch,
+  Text
 } from '@chakra-ui/react'
 import CheckMark from 'components/Misc/CheckMark'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -72,7 +75,7 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
           : suppliers,
       primary: scope === 'primary' ? true : undefined,
       internal: scope === 'internal' ? true : undefined,
-      direct: direct === 'Yes' ? true : false,
+      direct: direct === true ? true :  undefined,
       field: field,
       direction: direction
     })
@@ -115,9 +118,9 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
     prodCompDispatch({ type: 'FILTER_SCOPE', payload: value })
   }
 
-  const onFilterDirect = (value) => {
-    onFilter(ecosystems, kinds, licenses, suppliers, scope, value)
-    prodCompDispatch({ type: 'FILTER_DIRECT', payload: value })
+  const onFilterDirect = (e) => {
+    onFilter(ecosystems, kinds, licenses, suppliers, scope, e.target.checked)
+    prodCompDispatch({ type: 'FILTER_DIRECT', payload: e.target.checked })
   }
 
   return (
@@ -246,18 +249,10 @@ const CompFilterMenu = ({ refetch, productId, sbomId }) => {
         </Menu>
       </Box>
       {/* DIRECT */}
-      <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={false}>
-          {direct !== '' && <CheckMark />}
-          <MenuHeading title={'Direct'} />
-          <MenuList>
-            <MenuOptionGroup type='radio' value={direct} onChange={onFilterDirect}>
-              <MenuItemOption value={'Yes'} fontSize={'sm'}>Yes</MenuItemOption>
-              <MenuItemOption value={'No'} fontSize={'sm'}>No</MenuItemOption>
-            </MenuOptionGroup>
-          </MenuList>
-        </Menu>
-      </Box>
+      <Flex align='center' gap={2}>
+        <Switch id='isDirect' isChecked={direct} onChange={onFilterDirect} />
+        <Text>Direct</Text>
+      </Flex>
     </Stack>
   )
 }

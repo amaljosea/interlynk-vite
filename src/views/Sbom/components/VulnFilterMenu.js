@@ -9,6 +9,8 @@ import {
   MenuList,
   MenuOptionGroup,
   Stack,
+  Switch,
+  Text,
   useDisclosure
 } from '@chakra-ui/react'
 import CheckMark from 'components/Misc/CheckMark'
@@ -80,7 +82,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
         !statues.includes('all') && statues.length > 0 ? statues : undefined,
       kev: kev === 'yes' ? true : kev === 'false' ? false : undefined,
       epss: epss === 'all' || epss === '' ? undefined : range,
-      direct: direct === 'Yes' ? true : false,
+      direct: direct === true ? true :  undefined,
       first: totalRows,
       last: undefined,
       after: undefined,
@@ -120,8 +122,8 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
     handleRefetch()
   }
 
-  const onFilterDirect = (value) => {
-    prodVulnDispatch({ type: 'FILTER_DIRECT', payload: value })
+  const onFilterDirect = (e) => {
+    prodVulnDispatch({ type: 'FILTER_DIRECT', payload: e.target.checked })
     handleRefetch()
   }
 
@@ -343,26 +345,10 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
         </Menu>
       </Box>
       {/* DIRECT */}
-      <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={false}>
-          {direct !== '' && <CheckMark />}
-          <MenuHeading title={'Direct'} />
-          <MenuList>
-            <MenuOptionGroup
-              type='radio'
-              value={direct}
-              onChange={onFilterDirect}
-            >
-              <MenuItemOption value={'Yes'} fontSize={'sm'}>
-                Yes
-              </MenuItemOption>
-              <MenuItemOption value={'No'} fontSize={'sm'}>
-                No
-              </MenuItemOption>
-            </MenuOptionGroup>
-          </MenuList>
-        </Menu>
-      </Box>
+      <Flex align='center' gap={2}>
+        <Switch id='isDirect' isChecked={direct} onChange={onFilterDirect} />
+        <Text>Direct</Text>
+      </Flex>
     </Stack>
   )
 }

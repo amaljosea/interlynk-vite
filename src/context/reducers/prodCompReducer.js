@@ -13,7 +13,7 @@ const prodCompReducer = (state, action) => {
         licenses: [],
         kinds: [],
         scope: '',
-        direct: 'No',
+        direct: false,
         licenseType: 'license_exp',
         spdxLicenses: [],
         spdxList: [],

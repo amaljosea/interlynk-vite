@@ -43,7 +43,7 @@ import CustomLoader from 'components/CustomLoader'
 import { customStyles } from 'utils'
 import ImportWizard from 'views/Sbom/components/ImportWizard'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import { GetVulnFilterData } from 'graphQL/Queries'
 import { ManualVulnScan } from 'graphQL/Mutation'
 import Pagination from '../Pagination'
@@ -52,7 +52,6 @@ import { linkURl } from 'utils'
 import CvssCard from 'components/Misc/CvssCard'
 import { ShareVulnFilters } from 'graphQL/Queries'
 import VexModal from 'views/Dashboard/Vulnerabilities/components/VexModal'
-import { areArraysEqual } from 'utils'
 
 const statusColor = (status) => {
   if (status && status === 'Fixed') {
@@ -101,7 +100,6 @@ const VulnTable = ({
   const [toggleClear, setToggleClear] = useState(false)
   const [selectedVulns, setSelectedVulns] = useState([])
   const [selectedGroup, setSelectedGroup] = useState('')
-  const [checkEquals, setCheckEquals] = useState(false)
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
 
@@ -481,7 +479,7 @@ const VulnTable = ({
     status: statues.length > 0 ? statues : undefined,
     kev: kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
     epss: epss !== '' && epss !== 'all' ? range : undefined,
-    direct: direct === 'Yes' ? true : false,
+    direct: direct === true ? true :  undefined,
     field: field,
     direction: direction
   }
@@ -501,7 +499,7 @@ const VulnTable = ({
       kev:
         kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
       epss: epss !== '' && epss !== 'all' ? range : undefined,
-      direct: direct === 'Yes' ? true : false,
+      direct: direct === true ? true :  undefined,
       field: field,
       direction: direction,
       first: totalRows,
@@ -546,7 +544,7 @@ const VulnTable = ({
               ? true
               : false,
         epss: epss !== '' && epss !== 'all' ? range : undefined,
-        direct: direct === 'Yes' ? true : false,
+        direct: direct === true ? true :  undefined,
         first: totalRows,
         last: undefined,
         after: undefined,
@@ -876,7 +874,7 @@ const VulnTable = ({
       kev:
         kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
       epss: epss === 'all' || epss === '0-0' || epss === '' ? undefined : range,
-      direct: direct === 'Yes' ? true : false,
+      direct: direct === true ? true :  undefined,
       first: totalRows,
       last: undefined,
       after: undefined,

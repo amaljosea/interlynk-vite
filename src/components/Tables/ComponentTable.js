@@ -151,7 +151,7 @@ const ComponentTable = ({
           : suppliers,
       primary: scope === 'primary' ? true : undefined,
       internal: scope === 'internal' ? true : undefined,
-      direct: direct === 'Yes' ? true : false,
+      direct: direct === true ? true :  undefined,
       first: totalRows,
       last: undefined,
       after: undefined,
@@ -950,7 +950,7 @@ const ComponentTable = ({
           : suppliers,
       primary: scope === 'primary' ? true : undefined,
       internal: scope === 'internal' ? true : undefined,
-      direct: direct === 'Yes' ? true : false,
+      direct: direct === true ? true :  undefined,
       field: field,
       direction: direction,
       first: totalRows,
@@ -999,7 +999,7 @@ const ComponentTable = ({
             : suppliers,
         primary: scope === 'primary' ? true : undefined,
         internal: scope === 'internal' ? true : undefined,
-        direct: direct === 'Yes' ? true : false,
+        direct: direct === true ? true :  undefined,
         first: totalRows,
         last: undefined,
         after: undefined,
@@ -1127,7 +1127,7 @@ const ComponentTable = ({
           : suppliers,
       primary: scope === 'primary' ? true : undefined,
       internal: scope === 'internal' ? true : undefined,
-      direct: direct === 'Yes' ? true : false,
+      direct: direct === true ? true :  undefined,
       field: field,
       direction: direction
     }).then((res) => {
@@ -1162,7 +1162,7 @@ const ComponentTable = ({
           : suppliers,
       primary: scope === 'primary' ? true : undefined,
       internal: scope === 'internal' ? true : undefined,
-      direct: direct === 'Yes' ? true : false,
+      direct: direct === true ? true :  undefined,
       field: column.id,
       direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
     }).then((res) => {

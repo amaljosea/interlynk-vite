@@ -182,7 +182,7 @@ const SBOMTable = ({
         supplierName: getUndefinedIfEmptyOrAll(suppliers),
         primary: scope === 'primary' ? true : undefined,
         internal: scope === 'internal' ? true : undefined,
-        direct: direct === 'Yes' ? true : false,
+        direct: direct === true ? true :  undefined,
         field,
         direction
       }).then((res) => {
@@ -226,7 +226,7 @@ const SBOMTable = ({
           epss !== '' && epss !== 'all'
             ? { min: vulnEpss[0], max: vulnEpss[1] }
             : undefined,
-        direct: direct === 'Yes' ? true : false,
+        direct: direct === true ? true :  undefined,
         field,
         direction
       }).then((res) => {
