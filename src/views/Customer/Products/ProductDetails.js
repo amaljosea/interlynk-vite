@@ -82,7 +82,7 @@ const ProductDetails = () => {
       before: undefined,
       search: searchInput !== '' ? searchInput : undefined,
       severity: severities.length > 0 ? severities : undefined,
-      source: source === 'BOTH' || source === '' ? undefined : source,
+      source: source === true ? 'PART' : undefined,
       componentName: components.length > 0 ? components : undefined,
       status: statues.length > 0 ? statues : undefined,
       kev:

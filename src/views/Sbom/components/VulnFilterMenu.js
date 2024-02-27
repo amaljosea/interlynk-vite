@@ -69,13 +69,9 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
     refetch({
       projectId: signedUrlParams ? undefined : productId,
       sbomId: sbomId,
-      source: source === 'BOTH' || source === '' ? undefined : source,
-      severity:
-        !severity.includes('all') && severity.length > 0 ? severity : undefined,
-      componentName:
-        !component.includes('all') && component.length > 0
-          ? component
-          : undefined,
+      source: source === true ? 'PART' : undefined,
+      severity: !severity.includes('all') && severity.length > 0 ? severity : undefined,
+      componentName: !component.includes('all') && component.length > 0 ? component : undefined,
       status: !status.includes('all') && status.length > 0 ? status : undefined,
       kev: kev === 'yes' ? true : kev === 'false' ? false : undefined,
       epss: epss === 'all' || epss === '' ? undefined : range,
@@ -89,9 +85,9 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
     })
   }
 
-  const onFilterSource = (value) => {
-    prodVulnDispatch({ type: 'FILTER_SOURCE', payload: value })
-    handleRefetch(value, severities, components, statues, kev, epss, direct)
+  const onFilterOrigin = (e) => {
+    prodVulnDispatch({ type: 'FILTER_SOURCE', payload: e.target.checked })
+    handleRefetch(e.target.checked, severities, components, statues, kev, epss, direct)
   }
 
   const onFilterCompName = (value) => {
@@ -132,30 +128,6 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
 
   return (
     <Stack direction={'row'} alignItems={'center'} gap={1}>
-      {/* ORIGIN */}
-      <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={true}>
-          {source !== '' && source !== 'BOTH' && <CheckMark />}
-          <MenuHeading title={'Origin'} />
-          <MenuList>
-            <MenuOptionGroup
-              type='radio'
-              value={source}
-              onChange={onFilterSource}
-            >
-              <MenuItemOption value={'BOTH'} fontSize={'sm'}>
-                Both
-              </MenuItemOption>
-              <MenuItemOption value={'COMPONENT'} fontSize={'sm'}>
-                Component
-              </MenuItemOption>
-              <MenuItemOption value={'PART'} fontSize={'sm'}>
-                Part
-              </MenuItemOption>
-            </MenuOptionGroup>
-          </MenuList>
-        </Menu>
-      </Box>
       {/* SEVERITY */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={false}>
@@ -345,6 +317,11 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       <Flex align='center' gap={2}>
         <Switch id='isDirect' isChecked={direct} onChange={onFilterDirect} />
         <Text>Direct</Text>
+      </Flex>
+      {/* ORIGIN */}
+      <Flex align='center' gap={2}>
+        <Switch id='isDirect' isChecked={source} onChange={onFilterOrigin} />
+        <Text>Parts</Text>
       </Flex>
     </Stack>
   )

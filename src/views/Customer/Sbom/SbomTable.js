@@ -177,7 +177,7 @@ const SbomTable = ({
       getVulnData({
         ...commonParams,
         search: getUndefinedIfEmpty(searchInput),
-        source: source === 'BOTH' || source === '' ? undefined : source,
+        source: source === true ? 'PART' : undefined,
         severity: getUndefinedIfEmptyOrAll(severities),
         componentName: getUndefinedIfEmptyOrAll(components),
         status: getUndefinedIfEmptyOrAll(statues),

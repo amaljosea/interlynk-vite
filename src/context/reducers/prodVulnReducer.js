@@ -13,7 +13,7 @@ const prodVulnReducer = (state, action) => {
         severities: [],
         components: [],
         statues: [],
-        source: 'BOTH',
+        source: false,
         kev: '',
         epss: '',
         min: 0,
