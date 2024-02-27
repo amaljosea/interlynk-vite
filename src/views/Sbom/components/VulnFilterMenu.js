@@ -58,7 +58,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
     }
   }
 
-  const handleRefetch = () => {
+  const handleRefetch = (source, severity, component, status, kev, epss, direct) => {
     const epssRange = epss !== 'all' && epss !== '' && epss.split('-')
 
     const range = {
@@ -70,16 +70,9 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       projectId: signedUrlParams ? undefined : productId,
       sbomId: sbomId,
       source: source === 'BOTH' || source === '' ? undefined : source,
-      severity:
-        !severities.includes('all') && severities.length > 0
-          ? severities
-          : undefined,
-      componentName:
-        !components.includes('all') && components.length > 0
-          ? components
-          : undefined,
-      status:
-        !statues.includes('all') && statues.length > 0 ? statues : undefined,
+      severity: !severity.includes('all') && severity.length > 0 ? severity : undefined,
+      componentName: !component.includes('all') && component.length > 0 ? component : undefined,
+      status: !status.includes('all') && status.length > 0 ? status : undefined,
       kev: kev === 'yes' ? true : kev === 'false' ? false : undefined,
       epss: epss === 'all' || epss === '' ? undefined : range,
       direct: direct === true ? true :  undefined,
@@ -94,42 +87,42 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
 
   const onFilterSource = (value) => {
     prodVulnDispatch({ type: 'FILTER_SOURCE', payload: value })
-    handleRefetch()
+    handleRefetch(value, severities, components, statues, kev, epss, direct)
   }
 
   const onFilterCompName = (value) => {
     prodVulnDispatch({ type: 'FILTER_COMPONENT', payload: value })
-    handleRefetch()
+    handleRefetch(source, severities, value, statues, kev, epss, direct)
   }
 
   const onFilterSeverity = (value) => {
     prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
-    handleRefetch()
+    handleRefetch(source, value, components, statues, kev, epss, direct)
   }
 
   const onFilterStatus = (value) => {
     prodVulnDispatch({ type: 'FILTER_STATUS', payload: value })
-    handleRefetch()
+    handleRefetch(source, severities, components, value, kev, epss, direct)
   }
 
   const onFilterKev = (value) => {
     prodVulnDispatch({ type: 'FILTER_KEV', payload: value })
-    handleRefetch()
+    handleRefetch(source, severities, components, statues, value, epss, direct)
   }
 
   const onFilterEpss = (value) => {
     prodVulnDispatch({ type: 'FILTER_EPSS', payload: value })
-    handleRefetch()
+    handleRefetch(source, severities, components, statues, kev, value, direct)
   }
 
   const onFilterDirect = (e) => {
     prodVulnDispatch({ type: 'FILTER_DIRECT', payload: e.target.checked })
-    handleRefetch()
+    handleRefetch(source, severities, components, statues, kev, epss, e.target.checked)
   }
 
   const handleSubmit = () => {
     prodVulnDispatch({ type: 'SET_EPSS', payload: `${minEpss}-${maxEpss}` })
-    handleRefetch()
+    handleRefetch(source, severities, components, statues, kev, `${minEpss}-${maxEpss}`, direct)
     onClose()
   }
 
