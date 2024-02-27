@@ -58,7 +58,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
     }
   }
 
-  const handleRefetch = (source, severity, component, status, kev, epss, direct) => {
+  const handleRefetch = (source,severity,component,status,kev,epss,direct) => {
     const epssRange = epss !== 'all' && epss !== '' && epss.split('-')
 
     const range = {
@@ -70,12 +70,16 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       projectId: signedUrlParams ? undefined : productId,
       sbomId: sbomId,
       source: source === 'BOTH' || source === '' ? undefined : source,
-      severity: !severity.includes('all') && severity.length > 0 ? severity : undefined,
-      componentName: !component.includes('all') && component.length > 0 ? component : undefined,
+      severity:
+        !severity.includes('all') && severity.length > 0 ? severity : undefined,
+      componentName:
+        !component.includes('all') && component.length > 0
+          ? component
+          : undefined,
       status: !status.includes('all') && status.length > 0 ? status : undefined,
       kev: kev === 'yes' ? true : kev === 'false' ? false : undefined,
       epss: epss === 'all' || epss === '' ? undefined : range,
-      direct: direct === true ? true :  undefined,
+      direct: direct === true ? true : undefined,
       first: totalRows,
       last: undefined,
       after: undefined,
@@ -271,7 +275,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={false} isOpen={isOpen} onClose={onClose}>
           {epss !== '' && epss !== 'all' && <CheckMark />}
-          <MenuHeading title={'EPSS*'} onClick={onOpen} />
+          <MenuHeading title={'EPSS'} onClick={onOpen} />
           <MenuList>
             <MenuOptionGroup type='radio' value={epss} onChange={onFilterEpss}>
               <MenuItemOption value={'all'} fontSize={'sm'}>
@@ -280,7 +284,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
               {['0-100', '100-500', '500-1000', '1000-10000'].map(
                 (item, index) => (
                   <MenuItemOption key={index} value={item} fontSize={'sm'}>
-                    {item}
+                    {item.split('-')[0] / 10000}-{item.split('-')[1] / 10000}{' %'}
                   </MenuItemOption>
                 )
               )}

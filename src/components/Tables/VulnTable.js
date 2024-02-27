@@ -124,13 +124,8 @@ const VulnTable = ({
 
   const toast = useToast()
 
-  const {
-    userPermissions,
-    totalRows,
-    setTotalRows,
-    prodVulnState,
-    dispatch
-  } = useGlobalState()
+  const { userPermissions, totalRows, setTotalRows, prodVulnState, dispatch } =
+    useGlobalState()
   const {
     pageIndex,
     field,
@@ -212,7 +207,7 @@ const VulnTable = ({
       selector: (row) => {
         const { vuln, isPart, component } = row
         const { sbom } = component
-        const {  projectVersion, project } = sbom
+        const { projectVersion, project } = sbom
         const { vulnInfo } = vuln
         const { kev } = vulnInfo ? vulnInfo : ''
         return (
@@ -329,44 +324,42 @@ const VulnTable = ({
     // EPSS
     {
       id: 'VULN_INFOS_EPSS_SCORES',
-      name: 'EPSS*',
+      name: 'EPSS',
       selector: (row) => {
         const { vuln } = row
         const { vulnInfo } = vuln
         const { epssScores } = vulnInfo ? vulnInfo : ''
-
         return (
-          <Flex minWidth='max-content' alignItems='center' gap='0'>
-            <Tag
-              size='md'
-              key='md'
-              variant='subtle'
-              width={'60px'}
-              justifyContent='center'
-              alignItems='center'
+          <Flex alignItems='center' gap='0'>
+            <Tooltip
+              placement='top'
+              label={epssScores?.length > 0 ? epssScores[0] * 100 + ' %' : '-'}
             >
-              <TagLabel style={{ textAlign: 'center' }}>
-                {epssScores?.length > 0
-                  ? Math.ceil(epssScores[0] * 10000)
-                  : '-'}
-              </TagLabel>
-            </Tag>
+              <Tag
+                size='md'
+                key='md'
+                variant='subtle'
+                width={'100px'}
+                justifyContent='center'
+                alignItems='center'
+              >
+                <TagLabel>
+                  {epssScores?.length > 0 ? epssScores[0] * 100 + ' %' : '-'}
+                </TagLabel>
+              </Tag>
+            </Tooltip>
             {epssScores && epssScores.length > 1 ? (
               epssScores[0] > epssScores[epssScores.length - 1] ? (
                 <Tooltip
                   placement='top'
-                  label={`Up from ${Math.ceil(
-                    epssScores[epssScores.length - 1] * 10000
-                  )} last week`}
+                  label={`Up from ${epssScores[epssScores.length - 1] * 100} % last week`}
                 >
                   <ChevronUpIcon w={5} h={5} color='green.500' />
                 </Tooltip>
               ) : epssScores[0] < epssScores[epssScores.length - 1] ? (
                 <Tooltip
                   placement='top'
-                  label={`Down from ${Math.ceil(
-                    epssScores[epssScores.length - 1] * 10000
-                  )} last week`}
+                  label={`Down from ${epssScores[epssScores.length - 1] * 100} % last week`}
                 >
                   <ChevronDownIcon w={5} h={5} color='red.500' />
                 </Tooltip>
@@ -479,7 +472,7 @@ const VulnTable = ({
     status: statues.length > 0 ? statues : undefined,
     kev: kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
     epss: epss !== '' && epss !== 'all' ? range : undefined,
-    direct: direct === true ? true :  undefined,
+    direct: direct === true ? true : undefined,
     field: field,
     direction: direction
   }
@@ -499,7 +492,7 @@ const VulnTable = ({
       kev:
         kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
       epss: epss !== '' && epss !== 'all' ? range : undefined,
-      direct: direct === true ? true :  undefined,
+      direct: direct === true ? true : undefined,
       field: field,
       direction: direction,
       first: totalRows,
@@ -544,13 +537,13 @@ const VulnTable = ({
               ? true
               : false,
         epss: epss !== '' && epss !== 'all' ? range : undefined,
-        direct: direct === true ? true :  undefined,
+        direct: direct === true ? true : undefined,
         first: totalRows,
         last: undefined,
         after: undefined,
         before: undefined,
         field: field,
-        direction: direction,
+        direction: direction
       }).then((res) => {
         if (res.data) {
           setPaginationControl(res.data)
@@ -874,7 +867,7 @@ const VulnTable = ({
       kev:
         kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
       epss: epss === 'all' || epss === '0-0' || epss === '' ? undefined : range,
-      direct: direct === true ? true :  undefined,
+      direct: direct === true ? true : undefined,
       first: totalRows,
       last: undefined,
       after: undefined,
@@ -962,27 +955,6 @@ const VulnTable = ({
           hasPreviousPage={isPrevActive}
         />
       )}
-
-      {/* EPSS INFO */}
-      <Stack
-        mt={10}
-        direction={'row'}
-        spacing={2}
-        justifyContent={'flex-end'}
-        textAlign={'right'}
-      >
-        <Link
-          href='https://www.first.org/epss/'
-          target='_blank'
-          fontSize={'xs'}
-        >
-          * EPSS (Exploit Prediction Scoring System) is an estimation of a
-          vulnerability exploit.
-          <Text fontSize={'xs'}>
-            Interlynk scales EPSS by 10,000 for a more readable score.
-          </Text>
-        </Link>
-      </Stack>
 
       {/* COPY DATA TABLE */}
       {isTableOpen && data && (

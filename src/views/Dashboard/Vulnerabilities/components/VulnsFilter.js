@@ -21,7 +21,7 @@ import { useRef } from 'react'
 
 const VulnsFilters = ({ refetch }) => {
   const params = useParams()
-  
+
   const { totalRows, globalVulnState, prodState, dispatch } = useGlobalState()
   const {
     field,
@@ -37,7 +37,9 @@ const VulnsFilters = ({ refetch }) => {
   const { globalVulnDispatch } = dispatch
 
   const { data } = useQuery(GetProductNames, {
-    skip: window.location.pathname.startsWith(`/vendor/products`) ? true : false,
+    skip: window.location.pathname.startsWith(`/vendor/products`)
+      ? true
+      : false,
     fetchPolicy: 'network-only',
     variables: {
       first: totalRows,
@@ -258,15 +260,12 @@ const VulnsFilters = ({ refetch }) => {
           <MenuHeading title={'EPSS'} onClick={onOpen} />
           <MenuList>
             <MenuOptionGroup type='radio' value={epss} onChange={onFilterEpss}>
-              {['all', '0-100', '100-500', '500-1000', '1000-10000'].map(
+              <MenuItemOption value={'all'} fontSize={'sm'}>All</MenuItemOption>
+              {['0-100', '100-500', '500-1000', '1000-10000'].map(
                 (item, index) => (
-                  <MenuItemOption
-                    key={index}
-                    value={item}
-                    fontSize={'sm'}
-                    textTransform={'capitalize'}
-                  >
-                    {item}
+                  <MenuItemOption key={index} value={item} fontSize={'sm'}>
+                    {item.split('-')[0] / 10000}-{item.split('-')[1] / 10000}
+                    {' %'}
                   </MenuItemOption>
                 )
               )}
