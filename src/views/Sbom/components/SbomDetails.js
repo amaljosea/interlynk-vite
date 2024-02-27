@@ -81,7 +81,7 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
     }).then((res) => {
       if (res.data) {
         if (signedUrlParams) {
-          setActiveCsSbomTab(1)
+          setActiveCsSbomTab(2)
         } else {
           setActiveSbomTab(2)
         }
@@ -106,7 +106,7 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
     }).then((res) => {
       if (res.data) {
         if (signedUrlParams) {
-          setActiveCsSbomTab(2)
+          setActiveCsSbomTab(3)
         } else {
           setActiveSbomTab(3)
         }
