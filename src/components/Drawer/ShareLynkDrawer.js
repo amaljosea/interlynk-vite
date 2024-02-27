@@ -86,8 +86,8 @@ const ShareLynkDrawer = ({
     }
   }
 
-  const handleCreateLynk = async () => {
-    await createLynk({
+  const handleCreateLynk = () => {
+    createLynk({
       variables: {
         enabled: true,
         id: [groupId],
