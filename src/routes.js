@@ -26,6 +26,7 @@ import Automation from 'views/Dashboard/Automation'
 import ChangeLog from 'views/Dashboard/Changelog'
 import Vulnerabilities from 'views/Dashboard/Vulnerabilities'
 import Licenses from 'components/Licenses'
+import Support from 'views/Dashboard/Support'
 
 export const dashRoutes = [
   {
@@ -77,13 +78,13 @@ export const dashRoutes = [
   //   component: Feed,
   //   layout: '/vendor'
   // },
-  // {
-  //   path: '/connections',
-  //   name: 'Connections',
-  //   icon: <FaPlug color='inherit' />,
-  //   component: Connections,
-  //   layout: '/vendor'
-  // },
+  {
+    path: '/support',
+    name: 'Support',
+    icon: <FaPlug color='inherit' />,
+    component: Support,
+    layout: '/vendor'
+  },
   {
     path: '/settings',
     name: 'Settings',

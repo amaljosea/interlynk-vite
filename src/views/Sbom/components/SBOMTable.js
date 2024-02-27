@@ -21,6 +21,7 @@ import { useLazyQuery } from '@apollo/client'
 import { GetCheckResults, GetChangeLogs, GetSbomParts } from 'graphQL/Queries'
 import { useLocation } from 'react-router-dom'
 import { useGlobalState } from 'hooks/useGlobalState'
+import SupportTable from 'components/Tables/SupportTable'
 
 const SBOMTable = ({
   status,
@@ -38,8 +39,9 @@ const SBOMTable = ({
   const fetchIntervalMinutes = {
     General: 0,
     Parts: 0,
-    Components: 0,
+    Components: 1,
     Vulnerabilities: 1,
+    Support: 0,
     Checks: 0,
     'Change Log': 0
   }
@@ -49,6 +51,7 @@ const SBOMTable = ({
     Parts: null,
     Components: null,
     Vulnerabilities: null,
+    Support: null,
     Checks: null,
     'Change Log': null
   })
@@ -120,8 +123,9 @@ const SBOMTable = ({
     1: 'Parts',
     2: 'Components',
     3: 'Vulnerabilities',
-    4: 'Checks',
-    5: 'Change Log'
+    4: 'Support',
+    5: 'Checks',
+    6: 'Change Log'
   }
 
   const handleTabChange = (value) => {
@@ -182,7 +186,7 @@ const SBOMTable = ({
         supplierName: getUndefinedIfEmptyOrAll(suppliers),
         primary: scope === 'primary' ? true : undefined,
         internal: scope === 'internal' ? true : undefined,
-        direct: direct === true ? true :  undefined,
+        direct: direct === true ? true : undefined,
         field,
         direction
       }).then((res) => {
@@ -226,7 +230,7 @@ const SBOMTable = ({
           epss !== '' && epss !== 'all'
             ? { min: vulnEpss[0], max: vulnEpss[1] }
             : undefined,
-        direct: direct === true ? true :  undefined,
+        direct: direct === true ? true : undefined,
         field,
         direction
       }).then((res) => {
@@ -387,6 +391,10 @@ const SBOMTable = ({
                 productId={productId}
                 sbomId={sbomId}
               />
+            </TabPanel>
+            {/* SUPPORT TABLE */}
+            <TabPanel px={0}>
+              <SupportTable data={null} />
             </TabPanel>
             {/* HEALTH CHECK TABLE */}
             <TabPanel px={0}>

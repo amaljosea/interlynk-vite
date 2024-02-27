@@ -17,6 +17,7 @@ import VulnTable from 'components/Tables/VulnTable'
 import { useLocation } from 'react-router-dom'
 import Card from 'components/Card/Card'
 import { FaLock } from 'react-icons/fa6'
+import SupportTable from 'components/Tables/SupportTable'
 
 const SbomTable = ({
   status,
@@ -53,6 +54,7 @@ const SbomTable = ({
     Parts: 0,
     Components: 0,
     Vulnerabilities: 1,
+    Support: 0,
     Checks: 0,
     'Change Log': 0
   }
@@ -62,6 +64,7 @@ const SbomTable = ({
     Parts: null,
     Components: null,
     Vulnerabilities: null,
+    Support: null,
     Checks: null,
     'Change Log': null
   })
@@ -90,8 +93,9 @@ const SbomTable = ({
     1: 'Parts',
     2: 'Components',
     3: 'Vulnerabilities',
-    4: 'Checks',
-    5: 'Change Log'
+    4: 'Support',
+    5: 'Checks',
+    6: 'Change Log'
   }
 
   const handleTabChange = (value) => {
@@ -138,7 +142,7 @@ const SbomTable = ({
         supplierName: getUndefinedIfEmptyOrAll(suppliers),
         primary: scope === 'primary' ? true : undefined,
         internal: scope === 'internal' ? true : undefined,
-        direct: direct === true ? true :  undefined,
+        direct: direct === true ? true : undefined,
         field: field,
         direction: direction
       }).then((res) => {
@@ -216,11 +220,9 @@ const SbomTable = ({
             <Tab
               key={index}
               _focus={{ outline: 'none' }}
-              isDisabled={
-                item === 'Parts' || item === 'Checks' || item === 'Change Log'
-              }
+              isDisabled={item === 'Parts' || item === 'Checks' || item === 'Change Log' || item === 'Support'}
             >
-              {(item === 'Parts' || item === 'Checks' || item === 'Change Log') && (
+              {(item === 'Parts' || item === 'Checks' || item === 'Change Log' || item === 'Support') && (
                 <FaLock color='darkgray' style={{ marginRight: '6px' }} />
               )}
               {item}
@@ -299,6 +301,10 @@ const SbomTable = ({
               productId={productId}
               sbomId={sbomId}
             />
+          </TabPanel>
+          {/* SUPPORT TABLE */}
+          <TabPanel px={0}>
+            <SupportTable data={null} />
           </TabPanel>
           {/* CHECKS TABLE */}
           <TabPanel px={1}></TabPanel>
