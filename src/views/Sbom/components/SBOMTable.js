@@ -22,7 +22,7 @@ import {GetCheckResults, GetChangeLogs, GetSbomParts, GetSbomLicensesTable} from
 import { useLocation } from 'react-router-dom'
 import { useGlobalState } from 'hooks/useGlobalState'
 import SupportTable from 'components/Tables/SupportTable'
-import LicenseTable from "../../../components/Licenses/LicenseTable"
+import SbomLicenseTable from "../../../components/Licenses/SbomLicenseTable"
 
 const SBOMTable = ({
   status,
@@ -252,6 +252,9 @@ const SBOMTable = ({
       })
     } else if (tabName === 'Licenses' && shouldFetchData(tabName)) {
       getLicensesData({
+        variables: {
+          ...commonParams,
+        }
       }).then((res) => {
         if (res.data) {
           console.log('licensesData', res.data)
@@ -407,16 +410,16 @@ const SBOMTable = ({
                 sbomId={sbomId}
               />
             </TabPanel>
+            {/* LICENSES TABLE */}
+            <TabPanel px={0}>
+                <SbomLicenseTable
+                  data={licensesData?.sbom?.componentLicenses}
+                  refetch={getLicensesData}
+                />
+            </TabPanel>
             {/* SUPPORT TABLE */}
             <TabPanel px={0}>
               <SupportTable data={null} />
-            </TabPanel>
-            {/* LICENSES TABLE */}
-            <TabPanel px={0}>
-                <LicenseTable
-                  data={licensesData?.sbom?.licenses}
-                  refetch={getLicensesData}
-                />
             </TabPanel>
             {/* HEALTH CHECK TABLE */}
             <TabPanel px={0}>
