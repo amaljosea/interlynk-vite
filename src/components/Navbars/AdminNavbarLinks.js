@@ -36,27 +36,31 @@ import SidebarResponsive from 'components/Sidebar/SidebarResponsive'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { logoutUser } from 'utils/authUtils'
 import { ChevronDownIcon } from '@chakra-ui/icons'
-import { GetProjectGroup } from 'graphQL/Queries'
-import { ShareLynkProjectGroup } from 'graphQL/Queries'
+import {
+  GetOrgName,
+  GetProjectGroup,
+  ShareLynkProjectGroup
+} from 'graphQL/Queries'
 
 export default function HeaderLinks(props) {
   const location = useLocation()
   const navigate = useNavigate()
-  const { userName, setUserName, envName, setEnvName } = useGlobalState()
+  const { userName, userPermissions, setUserName, envName, setEnvName } = useGlobalState()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
   const group = JSON.parse(localStorage.getItem('product'))
-  const organization = localStorage.getItem('organization')
   const dashboardView = location.pathname === '/vendor/dashboard'
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
-
-  const { variant, children, fixed, secondary, onOpen, ...rest } = props
-
   const name = localStorage.getItem('username')
   const email = localStorage.getItem('email')
   const userEmail = localStorage.getItem('userEmail')
-  const org = localStorage.getItem('organization')
+
+  const [fetchOrg, { data }] = useLazyQuery(GetOrgName, {
+    fetchPolicy: 'network-only'
+  })
+
+  const { variant, children, fixed, secondary, onOpen, ...rest } = props
 
   useEffect(() => {
     if (location.pathname.startsWith('/vendor')) {
@@ -67,7 +71,7 @@ export default function HeaderLinks(props) {
   }, [])
 
   useEffect(() => {
-    if ((!email) && location.pathname.startsWith('/vendor')) {
+    if (!email && location.pathname.startsWith('/vendor')) {
       logoutUser().then((r) => navigate('/auth'))
     }
   }, [location])
@@ -110,7 +114,7 @@ export default function HeaderLinks(props) {
               (item) => item.name === value
             )
             localStorage.setItem('activeEnv', env?.id)
-            window.location.href =  `/vendor/products/${group?.name}?id=${group?.id}`
+            window.location.href = `/vendor/products/${group?.name}?id=${group?.id}`
           }
         }
       })
@@ -131,7 +135,7 @@ export default function HeaderLinks(props) {
   return (
     <Flex gap={4} alignItems='center' flexDirection='row'>
       {/* ENVIRONMENT */}
-      {(dashboardView || productId) && org !== 'undefined' && (
+      {(dashboardView || productId) && (
         <Menu closeOnSelect={true}>
           <MenuButton
             as={Button}
@@ -201,6 +205,7 @@ export default function HeaderLinks(props) {
             color='gray.400'
             ms='0px'
             px='0px'
+            onClick={() => fetchOrg()}
             rightIcon={
               document.documentElement.dir ? (
                 ''
@@ -233,7 +238,7 @@ export default function HeaderLinks(props) {
                       {email}
                     </Text>
                     <Text mt={0} mb={0} fontSize={'sm'} color={'#718096'}>
-                      {org !== 'undefined' ? org?.replace(/"/g, '') : ''}
+                      {data?.organization?.name || ''}
                     </Text>
                   </Stack>
                 </Flex>
@@ -242,7 +247,7 @@ export default function HeaderLinks(props) {
               <Link to={`/vendor/settings?tab=person`}>
                 <MenuItem
                   icon={<SettingsIcon />}
-                  display={organization ? 'flex' : 'none'}
+                  display={data?.organization ? 'flex' : 'none'}
                 >
                   Settings
                 </MenuItem>
@@ -250,7 +255,7 @@ export default function HeaderLinks(props) {
               <Link to='/vendor/settings?tab=organization'>
                 <MenuItem
                   icon={<FaExchangeAlt />}
-                  display={organization ? 'flex' : 'none'}
+                  display={data?.organization ? 'flex' : 'none'}
                 >
                   Organizations
                 </MenuItem>

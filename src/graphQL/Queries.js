@@ -1,5 +1,14 @@
 import { gql } from '@apollo/client'
 
+// GET ORG NAME
+export const GetOrgName = gql`
+  query GetOrgName {
+    organization {
+      name
+    }
+  }
+`
+
 // GET ORG INFO
 export const GetOrg = gql`
   query GetOrganization {
