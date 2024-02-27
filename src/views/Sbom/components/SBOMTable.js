@@ -115,7 +115,7 @@ const SBOMTable = ({
   )
 
   // GET LICENSES DATA
- const [getLicensesData, { data: licensesData }] = useLazyQuery(GetSbomLicensesTable, {
+ const [getLicensesData, { data: licensesData, refetch: licensesRefetch }] = useLazyQuery(GetSbomLicensesTable, {
    fetchPolicy: 'network-only'
  })
 
@@ -414,7 +414,7 @@ const SBOMTable = ({
             <TabPanel px={0}>
                 <SbomLicenseTable
                   data={licensesData?.sbom?.componentLicenses}
-                  refetch={getLicensesData}
+                  refetch={licensesRefetch}
                 />
             </TabPanel>
             {/* SUPPORT TABLE */}

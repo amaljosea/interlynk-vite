@@ -1,35 +1,21 @@
-import {AddIcon, ExternalLinkIcon, RepeatIcon} from '@chakra-ui/icons'
+import {RepeatIcon} from '@chakra-ui/icons'
 import {
   Flex,
   Tag,
   Text,
-  Stack,
-  Link,
   TagLabel,
-  Icon,
   Tooltip,
   IconButton,
   useDisclosure,
-  Menu,
-  MenuButton,
-  Portal,
-  MenuList,
-  MenuItem
 } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import LicenseDrawer from './LicenseDrawer'
-import LicenseFilter from './LicenseFilter'
-import SearchFilter from 'views/Sbom/components/SearchFilter'
 import { customStyles } from 'utils'
-import { FaEllipsisV } from 'react-icons/fa'
 import Pagination from '../Pagination'
 
 const SbomLicenseTable = ({ data, refetch }) => {
   const licenses = data?.nodes
-
-  const [direction, setDirection] = useState('DESC')
 
   // PAGINATION
   const paginationSizes = [25, 50, 100]
@@ -65,13 +51,12 @@ const SbomLicenseTable = ({ data, refetch }) => {
       last: totalRows,
       after: undefined,
       before: data.pageInfo.startCursor,
-      direction: direction
     }).then((res) => {
       if (res.data) {
         setPaginationControl(res.data)
       }
     })
-  }, [refetch, totalRows, data, currentPage, direction])
+  }, [refetch, totalRows, data, currentPage])
 
   const handleSetRow = useCallback(
     async (e) => {
@@ -84,14 +69,13 @@ const SbomLicenseTable = ({ data, refetch }) => {
         last: undefined,
         after: undefined,
         before: undefined,
-        direction: direction
       }).then((res) => {
         if (res.data) {
           setPaginationControl(res.data)
         }
       })
     },
-    [refetch, setTotalRows, direction]
+    [refetch, setTotalRows]
   )
 
   const handleNextPage = useCallback(async () => {
@@ -102,160 +86,29 @@ const SbomLicenseTable = ({ data, refetch }) => {
       first: totalRows,
       last: undefined,
       after: data.pageInfo.endCursor,
-      before: undefined,
-      direction: direction
+      before: undefined
     }).then((res) => {
       if (res.data) {
         setPaginationControl(res.data)
       }
     })
-  }, [refetch, totalRows, data, currentPage, direction])
+  }, [refetch, totalRows, data, currentPage])
 
   // PAGINATION END
 
-  const [searchInput, setSearchInput] = useState('')
-  const [activeRow, setActiveRow] = useState(null)
-
-
-  // SORT
-
-  const handleSort = useCallback(async (column, sortDirection) => {
-    disablePaginationControl()
-
-    setCurrentPage(1)
-
-    await refetch({
-      direction: sortDirection.toUpperCase(),
-      first: totalRows,
-      after: undefined,
-      before: undefined,
-      last: undefined,
-
-    }).then((res) => {
-      if (res.data) {
-        setDirection(sortDirection.toUpperCase())
-        setPaginationControl(res.data)
-      }
-    })
-  },[refetch, totalRows, direction])
-
-
-  const handleFilter = useCallback(
-    async (value) => {
-      disablePaginationControl()
-
-      setCurrentPage(1)
-
-      await refetch({
-        status: value[0],
-        first: totalRows,
-        last: undefined,
-        after: undefined,
-        before: undefined,
-      }).then((res) => {
-        if (res.data) {
-          setPaginationControl(res.data)
-        }
-      })
-    },
-    [refetch, totalRows]
-  )
-
-  const handleClear = useCallback(async () => {
-    setSearchInput('')
-    disablePaginationControl()
-    await refetch({
-      search: undefined,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      before: undefined,
-    }).then((res) => {
-      if (res.data) {
-        setPaginationControl(res.data)
-      }
-    })
-  }, [refetch, totalRows])
-
-  const onSearchInputChange = useCallback(
-    (event) => {
-      const { value } = event.target
-
-      if (value === '') {
-        handleClear()
-      } else {
-        setSearchInput(value)
-      }
-    },
-    [handleClear]
-  )
-
-  const handleSearch = useCallback(
-    (event) => {
-      const { key, target: { value } } = event
-
-      if (key === 'Enter' && searchInput) {
-        disablePaginationControl()
-        refetch({
-          search: value,
-          first: totalRows,
-        }).then((res) => {
-          if (res.data) {
-            setPaginationControl(res.data)
-          }
-        })
-      }
-    },
-    [refetch, searchInput, totalRows]
-  )
-
   const handleRefresh = useCallback(async () => {
     disablePaginationControl()
-    await refetch({}).then((res) => {
+    await refetch({
+    }).then((res) => {
       if (res.data) {
         setPaginationControl(res.data)
       }
     })
   })
 
-
-  const { isOpen, onOpen, onClose } = useDisclosure()
-
   const subHeaderComponent = useMemo(() => {
     return (
-      <Flex width={'100%'} alignItems={'center'} gap={3}>
-        <Stack
-          width={'100%'}
-          direction={'row'}
-          spacing={4}
-          alignItems={'center'}
-        >
-          {/* SEARCH FILTER */}
-          <SearchFilter
-            id='license'
-            filterText={searchInput}
-            setFilterText={setSearchInput}
-            onFilter={handleSearch}
-            onClear={handleClear}
-            onChange={onSearchInputChange}
-          />
-          <LicenseFilter onFilter={handleFilter}/>
-        </Stack>
-
-        {/* ADD LICNESE */}
-        <Tooltip label='Add License'>
-          <IconButton
-            onClick={() => {
-              setActiveRow(null)
-              onOpen()
-            }}
-            icon={<AddIcon />}
-            colorScheme='blue'
-            variant='solid'
-            fontWeight='normal'
-            fontSize={'sm'}
-          />
-        </Tooltip>
+      <Flex width={'100%'} alignItems={'center'} justifyContent='flex-end' gap={3}>
         <Tooltip label='Refresh'>
           <IconButton
             onClick={handleRefresh}
@@ -265,7 +118,7 @@ const SbomLicenseTable = ({ data, refetch }) => {
         </Tooltip>
       </Flex>
     )
-  }, [searchInput, handleClear, handleSearch])
+  }, )
 
   // COLUMNS
   const columns = [
@@ -273,6 +126,7 @@ const SbomLicenseTable = ({ data, refetch }) => {
     {
       id: 'LICENSE_EXPRESSION',
       name: 'LICENSE EXPRESSION',
+      width: '300px',
       wrap: true,
       selector: ({ licenseExpression }) => {
         return (
@@ -296,13 +150,14 @@ const SbomLicenseTable = ({ data, refetch }) => {
     {
       id: 'COMPONENT_LIST',
       name: 'COMPONENT LIST',
+      width: '1000px',
       wrap: true,
       selector: ({ components }) => {
         return (
-          <Flex direction='row' alignItems={'center'} gap={2}>
+          <Flex direction='row' py={5} alignItems={'center'} wrap='wrap' gap={2}>
             {components?.map(
               (component, index) =>
-                <Tag variant='subtle' key={index}>
+                <Tag variant='subtle' key={index} >
                   <TagLabel my={1} style={{ whiteSpace: 'normal' }}>
                     {component.name}
                   </TagLabel>
@@ -355,7 +210,6 @@ const SbomLicenseTable = ({ data, refetch }) => {
           defaultSortFieldId={'UPDATED_AT'}
           progressPending={data ? false : true}
           progressComponent={<CustomLoader />}
-          onSort={handleSort}
           subHeader
           subHeaderComponent={subHeaderComponent}
           responsive
@@ -375,15 +229,6 @@ const SbomLicenseTable = ({ data, refetch }) => {
           onSetRow={handleSetRow}
           hasNextPage={isNextActive}
           hasPreviousPage={isPrevActive}
-        />
-      )}
-
-      {isOpen && (
-        <LicenseDrawer
-          isOpen={isOpen}
-          refetch={refetch}
-          onClose={onClose}
-          data={activeRow}
         />
       )}
     </>
