@@ -3308,12 +3308,12 @@ export const GetLicensesTable = gql`
 
 export const GetSbomLicensesTable = gql`
   query GetSbomLicenseTable(
-  $projectId: Uuid!
-  $sbomId: Uuid!
-  $first: Int
-  $last: Int
-  $after: String
-  $before: String
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
   ) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
       id
@@ -3337,10 +3337,44 @@ export const GetSbomLicensesTable = gql`
             state
           }
           components {
-            name 
+            name
           }
           derivedState
         }
+      }
+    }
+  }
+`
+
+// GET SBOM DRIFT
+export const GetSbomDrift = gql`
+  query GetSbomDrift(
+    $subjectSbomId: Uuid!
+    $projectId: Uuid!
+    $targetSbomId: Uuid!
+  ) {
+    sbom(projectId: $projectId, sbomId: $subjectSbomId) {
+      id
+      spec
+      sbomDrift(targetSbomId: $targetSbomId) {
+        subjectComponentId
+        subjectComponent {
+          name
+          version
+          purl
+          cpes
+          licensesExp
+        }
+        targetComponentId
+        targetComponent {
+          name
+          version
+          purl
+          cpes
+          licensesExp
+        }
+        diffTags
+        diffType
       }
     }
   }

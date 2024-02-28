@@ -31,6 +31,7 @@ import PubProducts from 'views/Customer/Products'
 import PubProductList from 'views/Customer/Products/ProductList'
 import PubProductDetails from 'views/Customer/Products/ProductDetails'
 import Support from 'views/Dashboard/Support'
+import Tools from 'views/Dashboard/Tools'
 
 
 const authToken = Cookies.get('authToken')
@@ -92,6 +93,7 @@ ReactDOM.render(
               </Route>
               <Route path={`vulnerabilities`} element={<Vulnerabilities />} />
               <Route path={`licenses`} element={<Licenses />} />
+              <Route path={`tools`} element={<Tools />} />
               <Route path={`support`} element={<Support />} />
               <Route path={`settings`} element={<Profile />} />
             </Route>

@@ -27,6 +27,7 @@ import ChangeLog from 'views/Dashboard/Changelog'
 import Vulnerabilities from 'views/Dashboard/Vulnerabilities'
 import Licenses from 'components/Licenses'
 import Support from 'views/Dashboard/Support'
+import { FaToolbox } from 'react-icons/fa6'
 
 export const dashRoutes = [
   {
@@ -78,6 +79,13 @@ export const dashRoutes = [
   //   component: Feed,
   //   layout: '/vendor'
   // },
+  {
+    path: '/tools',
+    name: 'Tools',
+    icon: <FaToolbox color='inherit' />,
+    component: () => 'Tool',
+    layout: '/vendor'
+  },
   {
     path: '/support',
     name: 'Support',
