@@ -24,8 +24,7 @@ import {
   Tr
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
-import { GetSbomDrift } from 'graphQL/Queries'
-import { GetProductData, GetProject, GetProjectGroups } from 'graphQL/Queries'
+import { GetSbomDrift, GetProductsForSbomDrift, GetProductData, GetProject } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
 import React, { useEffect, useState } from 'react'
 import DataTable from 'react-data-table-component'
@@ -200,10 +199,9 @@ const Tools = () => {
   const [getDrift] = useLazyQuery(GetSbomDrift, {
     fetchPolicy: 'network-only'
   })
-  const { data } = useQuery(GetProjectGroups, {
+  const { data } = useQuery(GetProductsForSbomDrift, {
     fetchPolicy: 'network-only',
     variables: {
-      first: totalRows,
       enabled: true,
       field: field,
       direction: direction

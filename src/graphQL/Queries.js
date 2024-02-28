@@ -3390,3 +3390,36 @@ export const GetSbomDrift = gql`
     }
   }
 `
+
+// GET PROJECT GROUPS FOR SBOM DRIFT
+export const GetProductsForSbomDrift = gql`
+  query GetProductsForSbomDrift(
+    $enabled: Boolean
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+    $field: ProjectGroupOrderByFields!
+    $direction: OrderByDirection!
+  ) {
+    organization {
+      projectGroups(
+        enabled: $enabled
+        first: $first
+        last: $last
+        after: $after
+        before: $before
+        orderBy: { field: $field, direction: $direction }
+      ) {
+        nodes {
+          id
+          name
+          projects {
+            id
+            name
+          }
+        }
+      }
+    }
+  }
+`
