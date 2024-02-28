@@ -612,6 +612,7 @@ const VulnTable = ({
         width={'100%'}
         alignItems={'flex-start'}
         justifyContent={'space-between'}
+        gap={4}
       >
         <Flex
           flexDirection={'row'}
