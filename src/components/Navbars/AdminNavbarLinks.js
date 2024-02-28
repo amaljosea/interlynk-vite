@@ -45,10 +45,12 @@ import {
 export default function HeaderLinks(props) {
   const location = useLocation()
   const navigate = useNavigate()
-  const { userName, userPermissions, setUserName, envName, setEnvName } = useGlobalState()
+  const { userName, userPermissions, setUserName, envName, setEnvName } =
+    useGlobalState()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
+  const vulnId = queryParams.get('vulnId')
   const group = JSON.parse(localStorage.getItem('product'))
   const dashboardView = location.pathname === '/vendor/dashboard'
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
@@ -135,7 +137,7 @@ export default function HeaderLinks(props) {
   return (
     <Flex gap={4} alignItems='center' flexDirection='row'>
       {/* ENVIRONMENT */}
-      {(dashboardView || productId) && (
+      {(dashboardView || productId) && !vulnId && (
         <Menu closeOnSelect={true}>
           <MenuButton
             as={Button}
