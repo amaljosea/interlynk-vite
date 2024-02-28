@@ -17,9 +17,8 @@ import {
   Spinner
 } from '@chakra-ui/react'
 import { useLazyQuery } from '@apollo/client'
-import { DownloadSBOM } from 'graphQL/Queries'
+import { DownloadSBOM, SignedSbomDownload } from 'graphQL/Queries'
 import { useState } from 'react'
-import { useLocation } from 'react-router-dom'
 
 const DownloadModal = ({
   finalRef,
@@ -32,14 +31,14 @@ const DownloadModal = ({
   sbomId
 }) => {
   const toast = useToast()
-  const location = useLocation()
-  const customerView = location.pathname.startsWith('/customer')
+  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
-  const [getData] = useLazyQuery(DownloadSBOM)
+  const [getData] = useLazyQuery(signedUrlParams ? SignedSbomDownload : DownloadSBOM)
 
   const [spec, setSpec] = useState('cyclonedx')
   const [format, setFormat] = useState('json')
   const [includeVulns, setIncludeVulns] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   const type = spec === 'cyclonedx' ? 'cdx' : 'spdx'
 
@@ -69,14 +68,12 @@ const DownloadModal = ({
     }
   }
 
-  const [isLoading, setIsLoading] = useState(false)
-
   const handleDownload = async () => {
     setIsLoading(true)
     try {
       await getData({
         variables: {
-          projectId: productId,
+          projectId: signedUrlParams ? undefined : productId,
           sbomId: sbomId,
           includeVulns
         }
@@ -85,7 +82,9 @@ const DownloadModal = ({
           console.log(`res`, res)
           if (res.called) {
             setIsLoading(false)
-            const decodedData = window.atob(res.data.sbom.download)
+            const decodedData = signedUrlParams
+              ? window.atob(res?.data?.shareLynkQuery?.sbom?.download)
+              : window.atob(res?.data?.sbom?.download)
             const parsedJson = JSON.parse(decodedData)
             if (format === 'json') {
               downloadJsonFile(parsedJson)
@@ -103,31 +102,6 @@ const DownloadModal = ({
         position: 'top',
         status: 'error'
       })
-    }
-  }
-
-  const onDownload = async () => {
-    try {
-      await getData({
-        variables: {
-          projectId: productId,
-          sbomId: sbomId,
-          includeVulns
-        }
-      })
-        .then((res) => {
-          console.log(`res`, res)
-          const decodedData = window.atob(res.data.sbom.download)
-          const parsedJson = JSON.parse(decodedData)
-          if (format === 'json') {
-            downloadJsonFile(parsedJson)
-          } else {
-            downloadXmlFile(decodedData)
-          }
-        })
-        .finally(() => onClose())
-    } catch (error) {
-      console.log(`Error`, error)
     }
   }
 
@@ -181,10 +155,7 @@ const DownloadModal = ({
               <Button colorScheme='gray' onClick={onClose}>
                 Cancel
               </Button>
-              <Button
-                colorScheme='blue'
-                onClick={customerView ? onDownload : handleDownload}
-              >
+              <Button colorScheme='blue' onClick={handleDownload}>
                 Download
               </Button>
             </Stack>

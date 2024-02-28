@@ -2405,7 +2405,7 @@ export const GetSbomLogFilters = gql`
     }
   }
 `
-
+// DOWNLOAD SBOM FROM VENDOR SITE
 export const DownloadSBOM = gql`
   query downloadSbom(
     $projectId: Uuid!
@@ -2414,6 +2414,17 @@ export const DownloadSBOM = gql`
   ) {
     sbom(projectId: $projectId, sbomId: $sbomId) {
       download(sbomId: $sbomId, includeVulns: $includeVulns)
+    }
+  }
+`
+
+// DOWNLOAD SBOM FROM PUBLIC SITE
+export const SignedSbomDownload = gql`
+  query SignedSbomDownload($sbomId: Uuid!, $includeVulns: Boolean) {
+    shareLynkQuery {
+      sbom(id: $sbomId) {
+        download(sbomId: $sbomId, includeVulns: $includeVulns)
+      }
     }
   }
 `
