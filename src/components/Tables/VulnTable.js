@@ -468,8 +468,8 @@ const VulnTable = ({
   const vulnEpss = (epss !== 'all' || epss !== '') && epss?.split('-')
 
   const range = {
-    min: parseFloat(vulnEpss[0]) / 10000,
-    max: parseFloat(vulnEpss[1]) / 10000
+    min: parseFloat(vulnEpss[0]) / 100,
+    max: parseFloat(vulnEpss[1]) / 100
   }
 
   const vulnData = {

@@ -83,8 +83,8 @@ const SignedSbomTable = ({
   const epss = signedVulnEpss !== 'all' && signedVulnEpss.split('-')
 
   const range = {
-    min: parseFloat(epss[0]),
-    max: parseFloat(epss[1])
+    min: parseFloat(epss[0]) / 100,
+    max: parseFloat(epss[1]) / 100
   }
 
   // FETCH FILTER DATA BASE ON SELECTED TAB

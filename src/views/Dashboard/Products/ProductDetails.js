@@ -141,8 +141,8 @@ const ProductDetails = () => {
     globalVulnState.epss !== '' &&
     globalVulnState.epss?.split('-')
   const vulnRange = {
-    min: parseFloat(epssRange[0]) / 10000,
-    max: parseFloat(epssRange[1]) / 10000
+    min: parseFloat(epssRange[0]) / 100,
+    max: parseFloat(epssRange[1]) / 100
   }
 
   const [getVulns, { data: globalVulnData }] = useLazyQuery(GetGlobalVulns, {
@@ -173,8 +173,8 @@ const ProductDetails = () => {
   const vulnEpss = (epss !== 'all' || epss !== '') && epss?.split('-')
 
   const range = {
-    min: parseFloat(vulnEpss[0]) / 10000,
-    max: parseFloat(vulnEpss[1]) / 10000
+    min: parseFloat(vulnEpss[0]) / 100,
+    max: parseFloat(vulnEpss[1]) / 100
   }
 
   // GET VULN DATA

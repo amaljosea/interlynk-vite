@@ -19,7 +19,7 @@ const Vulnerabilities = () => {
   const { field, direction, searchInput, severities, products, statues, kev, epss } = globalVulnState
 
   const epssRange = epss !== 'all' && epss !== '' && epss?.split('-')
-  const range = { min: parseFloat(epssRange[0]) / 10000, max: parseFloat(epssRange[1]) / 10000 }
+  const range = { min: parseFloat(epssRange[0]) / 100, max: parseFloat(epssRange[1]) / 100 }
 
   const [getVulns, { data }] = useLazyQuery(GetGlobalVulns, {fetchPolicy: 'network-only'})
 

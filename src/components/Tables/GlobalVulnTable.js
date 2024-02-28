@@ -7,9 +7,6 @@ import {
   TagLabel,
   Tooltip,
   Stack,
-  Button,
-  Box,
-  Select,
   IconButton,
   Divider,
   Badge,
@@ -91,8 +88,8 @@ const GlobalVulnTable = ({ data, refetch }) => {
 
   const epssRange = epss !== 'all' && epss !== '' && epss?.split('-')
   const range = {
-    min: parseFloat(epssRange[0]) / 10000,
-    max: parseFloat(epssRange[1]) / 10000
+    min: parseFloat(epssRange[0]) / 100,
+    max: parseFloat(epssRange[1]) / 100
   }
 
   const vulnData = {

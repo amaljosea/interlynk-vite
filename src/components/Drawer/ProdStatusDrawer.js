@@ -84,8 +84,8 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
   const handleRefetch = async () => {
     const epssRange = (epss !== '' || epss !== '0-0') && epss.split('-')
     const range = {
-      min: parseFloat(epssRange[0]) / 10000,
-      max: parseFloat(epssRange[1]) / 10000
+      min: parseFloat(epssRange[0]) / 100,
+      max: parseFloat(epssRange[1]) / 100
     }
     await refetch({
       projectId: productId,

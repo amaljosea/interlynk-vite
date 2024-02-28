@@ -10,7 +10,10 @@ import {
   MenuDivider,
   MenuOptionGroup,
   Stack,
-  useDisclosure
+  useDisclosure,
+  InputRightAddon,
+  InputGroup,
+  InputLeftAddon
 } from '@chakra-ui/react'
 import { useParams } from 'react-router-dom'
 import CheckMark from 'components/Misc/CheckMark'
@@ -71,8 +74,8 @@ const VulnsFilters = ({ refetch }) => {
   const handleRefetch = async (groupIds, severities, statuses, kev, epss) => {
     const epssRange = epss !== 'all' && epss !== '' && epss.split('-')
     const range = {
-      min: parseFloat(epssRange[0]) / 10000,
-      max: parseFloat(epssRange[1]) / 10000
+      min: parseFloat(epssRange[0]) / 100,
+      max: parseFloat(epssRange[1]) / 100
     }
     await refetch({
       variables: {
@@ -260,58 +263,60 @@ const VulnsFilters = ({ refetch }) => {
           <MenuHeading title={'EPSS'} onClick={onOpen} />
           <MenuList>
             <MenuOptionGroup type='radio' value={epss} onChange={onFilterEpss}>
-              <MenuItemOption value={'all'} fontSize={'sm'}>All</MenuItemOption>
-              {['0-100', '100-500', '500-1000', '1000-10000'].map(
-                (item, index) => (
-                  <MenuItemOption key={index} value={item} fontSize={'sm'}>
-                    {item.split('-')[0] / 100}-{item.split('-')[1] / 100}
-                    {' %'}
-                  </MenuItemOption>
-                )
-              )}
+              <MenuItemOption value={'all'} fontSize={'sm'}>
+                All
+              </MenuItemOption>
+              {['0-0.1', '0.1-1', '1-10', '10-100'].map((item, index) => (
+                <MenuItemOption key={index} value={item} fontSize={'sm'}>
+                  {`${item} %`}
+                </MenuItemOption>
+              ))}
             </MenuOptionGroup>
             <MenuDivider />
             <Flex flexDirection={'column'} alignItems={'flex-start'}>
-              <Stack direction={'row'} alignItems={'center'} pl={8}>
-                <Input
-                  type='number'
-                  width={'75px'}
-                  size='sm'
-                  placeholder={'min'}
-                  id='minValue'
-                  name='minValue'
-                  value={minEpss}
-                  ref={minRef}
-                  onKeyDown={onMinKeyDown}
-                  onChange={(e) =>
-                    globalVulnDispatch({
-                      type: 'SET_MIN_EPSS',
-                      payload: e.target.value
-                    })
-                  }
-                />
-                <Box>-</Box>
-                <Input
-                  type='number'
-                  width={'75px'}
-                  size='sm'
-                  placeholder={'max'}
-                  id='maxValue'
-                  name='maxValue'
-                  value={maxEpss}
-                  ref={maxRef}
-                  onKeyDown={onMaxKeyDown}
-                  onChange={(e) =>
-                    globalVulnDispatch({
-                      type: 'SET_MAX_EPSS',
-                      payload: e.target.value
-                    })
-                  }
-                />
+              <Stack direction={'column'} alignItems={'center'} pl={8}>
+                <InputGroup size='sm'>
+                  <InputLeftAddon width={14}>Min</InputLeftAddon>
+                  <Input
+                    type='number'
+                    width={'64px'}
+                    id='minValue'
+                    name='minValue'
+                    value={minEpss}
+                    ref={minRef}
+                    onKeyDown={onMinKeyDown}
+                    onChange={(e) =>
+                      globalVulnDispatch({
+                        type: 'SET_MIN_EPSS',
+                        payload: e.target.value
+                      })
+                    }
+                  />
+                  <InputRightAddon>%</InputRightAddon>
+                </InputGroup>
+                <InputGroup size='sm'>
+                  <InputLeftAddon width={14}>Max</InputLeftAddon>
+                  <Input
+                    type='number'
+                    width={'64px'}
+                    id='maxValue'
+                    name='maxValue'
+                    value={maxEpss}
+                    ref={maxRef}
+                    onKeyDown={onMaxKeyDown}
+                    onChange={(e) =>
+                      globalVulnDispatch({
+                        type: 'SET_MAX_EPSS',
+                        payload: e.target.value
+                      })
+                    }
+                  />
+                  <InputRightAddon>%</InputRightAddon>
+                </InputGroup>
               </Stack>
               <Button
                 ml={8}
-                my={2}
+                my={3}
                 size='sm'
                 onClick={handleSubmit}
                 isDisabled={Number(maxEpss) <= Number(minEpss) || maxEpss === 0}

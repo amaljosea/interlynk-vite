@@ -53,8 +53,9 @@ const SbomTable = ({
     'General': 0,
     'Parts': 0,
     'Components': 0,
-    'Vulnerabilities': 1,
-    'Support: 0,
+    'Vulnerabilities': 0.5,
+    'Licenses': 0,
+    'Support': 0,
     'Checks': 0,
     'Change Log': 0
   }
@@ -64,6 +65,7 @@ const SbomTable = ({
     'Parts': null,
     'Components': null,
     'Vulnerabilities': null,
+    'Licenses': null,
     'Support': null,
     'Checks': null,
     'Change Log': null
@@ -93,9 +95,10 @@ const SbomTable = ({
     1: 'Parts',
     2: 'Components',
     3: 'Vulnerabilities',
-    4: 'Support',
-    5: 'Checks',
-    6: 'Change Log'
+    4: 'Licenses',
+    5: 'Support',
+    6: 'Checks',
+    7: 'Change Log'
   }
 
   const handleTabChange = (value) => {
@@ -168,8 +171,6 @@ const SbomTable = ({
         epss,
         direct
       } = prodVulnState
-      console.log('source', source)
-
       const vulnEpss =
         epss !== 'all' && epss !== ''
           ? epss.split('-').map((v) => parseFloat(v) / 10000)
@@ -184,7 +185,7 @@ const SbomTable = ({
         kev: kev === 'yes' ? true : kev === 'no' ? false : undefined,
         epss:
           epss !== '' && epss !== 'all'
-            ? { min: vulnEpss[0], max: vulnEpss[1] }
+            ? { min: parseFloat(vulnEpss[0]) / 100, max: parseFloat(vulnEpss[1]) / 100 }
             : undefined,
         direct: direct === true ? true : undefined,
         field: field,
@@ -220,17 +221,9 @@ const SbomTable = ({
             <Tab
               key={index}
               _focus={{ outline: 'none' }}
-              isDisabled={
-                item === 'Parts' ||
-                item === 'Checks' ||
-                item === 'Change Log' ||
-                item === 'Support'
-              }
+              isDisabled={item === 'Parts' || item === 'Checks' || item === 'Change Log' || item === 'Support' || item === 'Licenses'}
             >
-              {(item === 'Parts' ||
-                item === 'Checks' ||
-                item === 'Change Log' ||
-                item === 'Support') && (
+              {(item === 'Parts' || item === 'Checks' || item === 'Change Log' || item === 'Support' || item === 'Licenses') && (
                 <FaLock color='darkgray' style={{ marginRight: '6px' }} />
               )}
               {item}
