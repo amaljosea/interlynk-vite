@@ -12,7 +12,7 @@ import {
   FormLabel,
   Input,
   Select,
-  Text, RadioGroup, Radio, Checkbox, Textarea
+  Text, RadioGroup, Radio, Checkbox, Textarea, Link
 } from '@chakra-ui/react'
 import React, { useState, useEffect } from 'react'
 import {CreateLicense, UpdateLicense} from "../../graphQL/Mutation";
@@ -40,6 +40,8 @@ const LicenseDrawer = ({ isOpen, onClose, data, refetch }) => {
 
   const [createLicense] = useMutation(CreateLicense)
   const [updateLicense] = useMutation(UpdateLicense)
+
+  const [drawerSize, setDrawerSize] = useState('md')
 
 
   const handleCreateLicense = async () => {
@@ -112,12 +114,21 @@ const LicenseDrawer = ({ isOpen, onClose, data, refetch }) => {
     }
   }, [data])
 
+  const handleExpand = () => {
+    if (drawerSize === 'md') {
+      setDrawerSize('full')
+    } else {
+      setDrawerSize('md')
+    }
+  }
+
   return (
-    <Drawer isOpen={isOpen} placement='right' onClose={onClose} size='md'>
+    <Drawer isOpen={isOpen} placement='right' onClose={onClose} size={drawerSize}>
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />
-        <DrawerHeader>{data ? 'Edit' : 'Add'} License</DrawerHeader>
+        {drawerSize === 'md' ? <DrawerHeader>{data ? 'Edit' : 'Add'} License</DrawerHeader> :
+        <DrawerHeader>License</DrawerHeader>}
         <DrawerBody>
           <Stack direction={'column'} spacing={4} alignItems={'flex-start'}>
 
@@ -135,9 +146,20 @@ const LicenseDrawer = ({ isOpen, onClose, data, refetch }) => {
             </FormControl>
 
             <FormControl>
-              <FormLabel htmlFor='text'>Text</FormLabel>
+              <FormLabel htmlFor='text'>
+                License Text
+                <Link
+                  color={'blue.500'}
+                  mx={2}
+                  _hover = {{textDecoration: 'underline'}}
+                  fontWeight={'medium'}
+                  fontSize={'11px'}
+                  onClick={handleExpand}>
+                  {drawerSize === 'md' && '(Expand)'}
+                </Link>
+              </FormLabel>
               <Textarea
-                height={'200px'}
+                height={drawerSize === 'md'? '200px': '800px'}
                 name='text'
                 id='text'
                 fontSize={'sm'}
@@ -145,100 +167,115 @@ const LicenseDrawer = ({ isOpen, onClose, data, refetch }) => {
                 placeholder='Add text'
                 onChange={(e) => setText(e.target.value)}
                 disabled={data}
+                resize={'none'}
               />
             </FormControl>
+            {drawerSize === 'md' && (<>
+              <FormControl>
+                <FormLabel htmlFor='url'>URL</FormLabel>
+                <Input
+                  name='url'
+                  id='url'
+                  fontSize={'sm'}
+                  value={url}
+                  placeholder='Add url'
+                  onChange={(e) => setUrl(e.target.value)}
+                  disabled={data}
+                />
+              </FormControl>
 
-            <FormControl>
-              <FormLabel htmlFor='url'>URL</FormLabel>
-              <Input
-                name='url'
-                id='url'
-                fontSize={'sm'}
-                value={url}
-                placeholder='Add url'
-                onChange={(e) => setUrl(e.target.value)}
-                disabled={data}
-              />
-            </FormControl>
+              <FormControl>
+                <FormLabel htmlFor='comment'>Comment</FormLabel>
+                <Input
+                  name='comment'
+                  id='name'
+                  fontSize={'sm'}
+                  value={comment}
+                  placeholder='Add name'
+                  onChange={(e) => setComment(e.target.value)}
+                  disabled={data}
+                />
+              </FormControl>
 
-            <FormControl>
-              <FormLabel htmlFor='comment'>Comment</FormLabel>
-              <Input
-                name='comment'
-                id='name'
-                fontSize={'sm'}
-                value={comment}
-                placeholder='Add name'
-                onChange={(e) => setComment(e.target.value)}
-                disabled={data}
-              />
-            </FormControl>
+              <FormControl>
+                <FormLabel htmlFor='url'>Attribution Keys</FormLabel>
+                <Input
+                  name='attributionKeys'
+                  id='attributionKeys'
+                  fontSize={'sm'}
+                  value={attributionKeys}
+                  placeholder='Add attribution keys'
+                  onChange={(e) => setAttributionKeys(e.target.value)}
+                />
+              </FormControl>
 
-            <FormControl>
-              <FormLabel htmlFor='url'>Attribution Keys</FormLabel>
-              <Input
-                name='attributionKeys'
-                id='attributionKeys'
-                fontSize={'sm'}
-                value={attributionKeys}
-                placeholder='Add attribution keys'
-                onChange={(e) => setAttributionKeys(e.target.value)}
-              />
-            </FormControl>
+              <FormControl>
+                <FormLabel htmlFor='url'>Warranty</FormLabel>
+                <Input
+                  name='warranty'
+                  id='warranty'
+                  fontSize={'sm'}
+                  value={warranty}
+                  placeholder='Add warranty'
+                  onChange={(e) => setWarranty(e.target.value)}
+                />
+              </FormControl>
 
-            <FormControl>
-              <FormLabel htmlFor='url'>Warranty</FormLabel>
-              <Input
-                name='warranty'
-                id='warranty'
-                fontSize={'sm'}
-                value={warranty}
-                placeholder='Add warranty'
-                onChange={(e) => setWarranty(e.target.value)}
-              />
-            </FormControl>
+              <FormControl>
+                <FormLabel htmlFor='url'>Governing Laws</FormLabel>
+                <Input
+                  name='governingLaws'
+                  id='governingLaws'
+                  fontSize={'sm'}
+                  value={governingLaws}
+                  placeholder='Add governing laws'
+                  onChange={(e) => setGoverningLaws(e.target.value)}
+                />
+              </FormControl>
 
-            <FormControl>
-              <FormLabel htmlFor='url'>Governing Laws</FormLabel>
-              <Input
-                name='governingLaws'
-                id='governingLaws'
-                fontSize={'sm'}
-                value={governingLaws}
-                placeholder='Add governing laws'
-                onChange={(e) => setGoverningLaws(e.target.value)}
-              />
-            </FormControl>
+              {/* Attribution */}
+              <FormControl>
+                <FormLabel htmlFor='attribution'>Attribution</FormLabel>
+                <Select onChange={(e) => setAttribution(e.target.value)}
+                        value={attribution} fontSize={'sm'}
+                >
+                  <option value="UNKNOWN">Unknown</option>
+                  <option value="YES">Yes</option>
+                  <option value="NO">No</option>
+                </Select>
+              </FormControl>
 
-            {/* Attribution */}
-            <FormControl>
-              <FormLabel htmlFor='attribution'>Attribution</FormLabel>
-              <Select onChange={(e) => setAttribution(e.target.value)}
-                      value={attribution} fontSize={'sm'}
-              >
-                <option value="UNKNOWN">Unknown</option>
-                <option value="YES">Yes</option>
-                <option value="NO">No</option>
-              </Select>
-            </FormControl>
+                {/* CopyLeft */}
+              <FormControl>
+                <FormLabel htmlFor='CopyLeft'>CopyLeft</FormLabel>
+                <Select onChange={(e) => setCopyLeft(e.target.value)}
+                        value={copyLeft} fontSize={'sm'}
+                >
+                  <option value="UNKNOWN">Unknown</option>
+                  <option value="PERMISSIVE">Permissive</option>
+                  <option value="COPYLEFT">Copyleft</option>
+                  <option value="WEAK">Weak</option>
+                </Select>
+              </FormControl>
 
-              {/* CopyLeft */}
-            <FormControl>
-              <FormLabel htmlFor='CopyLeft'>CopyLeft</FormLabel>
-              <Select onChange={(e) => setCopyLeft(e.target.value)}
-                      value={copyLeft} fontSize={'sm'}
-              >
-                <option value="UNKNOWN">Unknown</option>
-                <option value="PERMISSIVE">Permissive</option>
-                <option value="COPYLEFT">Copyleft</option>
-                <option value="WEAK">Weak</option>
-              </Select>
-            </FormControl>
-
-            {/* Radios */}
-            <FormControl>
-              <FormLabel htmlFor='requiresSourceCode'>Requires Source Code</FormLabel>
-                <RadioGroup onChange={setRequiresSourceCode} value={requiresSourceCode}>
+              {/* Radios */}
+              <FormControl>
+                <FormLabel htmlFor='requiresSourceCode'>Requires Source Code</FormLabel>
+                  <RadioGroup onChange={setRequiresSourceCode} value={requiresSourceCode}>
+                    <Radio mx={5} size='md' colorScheme='blue' value="YES">
+                      <Text fontSize='sm'>Yes</Text>
+                    </Radio>
+                    <Radio mx={5} size='md' colorScheme='blue' value="NO">
+                      <Text fontSize='sm'>No</Text>
+                    </Radio>
+                    <Radio mx={5} size='md' colorScheme='blue' value="UNKNOWN">
+                      <Text fontSize='sm'>Unknown</Text>
+                    </Radio>
+                  </RadioGroup>
+              </FormControl>
+              <FormControl>
+                <FormLabel htmlFor='permitsModifications'>Permits Modifications</FormLabel>
+                <RadioGroup onChange={setPermitsModifications} value={permitsModifications}>
                   <Radio mx={5} size='md' colorScheme='blue' value="YES">
                     <Text fontSize='sm'>Yes</Text>
                   </Radio>
@@ -249,59 +286,44 @@ const LicenseDrawer = ({ isOpen, onClose, data, refetch }) => {
                     <Text fontSize='sm'>Unknown</Text>
                   </Radio>
                 </RadioGroup>
-            </FormControl>
-            <FormControl>
-              <FormLabel htmlFor='permitsModifications'>Permits Modifications</FormLabel>
-              <RadioGroup onChange={setPermitsModifications} value={permitsModifications}>
-                <Radio mx={5} size='md' colorScheme='blue' value="YES">
-                  <Text fontSize='sm'>Yes</Text>
-                </Radio>
-                <Radio mx={5} size='md' colorScheme='blue' value="NO">
-                  <Text fontSize='sm'>No</Text>
-                </Radio>
-                <Radio mx={5} size='md' colorScheme='blue' value="UNKNOWN">
-                  <Text fontSize='sm'>Unknown</Text>
-                </Radio>
-              </RadioGroup>
-            </FormControl>
+              </FormControl>
 
-            <Checkbox
-              isChecked={deprecated}
+              <Checkbox
+                isChecked={deprecated}
+                size='sm'
+                colorScheme='blue'
+                onChange={(e) => setDeprecated(e.target.checked)}
+              >
+                Is deprecated?
+              </Checkbox>
+
+              <Checkbox
+                isChecked={restrictive}
+                size='sm'
+                colorScheme='blue'
+                onChange={(e) => setRestrictive(e.target.checked)}
+              >
+                Is restrictive?
+              </Checkbox>
+
+              <Checkbox
+                isChecked={fsfLibre}
+                size='sm'
+                colorScheme='blue'
+                onChange={(e) => setFsfLibre(e.target.checked)}
+              >
+                Is FSF Libre?
+              </Checkbox>
+
+              <Checkbox
+              isChecked={osiApproved}
               size='sm'
               colorScheme='blue'
-              onChange={(e) => setDeprecated(e.target.checked)}
+              onChange={(e) => setOsiApproved(e.target.checked)}
             >
-              Is deprecated?
-            </Checkbox>
+                OSI Approved?
+              </Checkbox>
 
-            <Checkbox
-              isChecked={restrictive}
-              size='sm'
-              colorScheme='blue'
-              onChange={(e) => setRestrictive(e.target.checked)}
-            >
-              Is restrictive?
-            </Checkbox>
-
-            <Checkbox
-              isChecked={fsfLibre}
-              size='sm'
-              colorScheme='blue'
-              onChange={(e) => setFsfLibre(e.target.checked)}
-            >
-              Is FSF Libre?
-            </Checkbox>
-
-            <Checkbox
-            isChecked={osiApproved}
-            size='sm'
-            colorScheme='blue'
-            onChange={(e) => setOsiApproved(e.target.checked)}
-          >
-            OSI Approved?
-          </Checkbox>
-
-            {/* STATUS */}
             <FormControl>
               <FormLabel htmlFor='state'>Status</FormLabel>
               <Select
@@ -315,6 +337,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, refetch }) => {
                 <option value='UNSPECIFIED'>Unspecified</option>
               </Select>
             </FormControl>
+          </>)}
           </Stack>
         </DrawerBody>
 
@@ -322,23 +345,30 @@ const LicenseDrawer = ({ isOpen, onClose, data, refetch }) => {
           <Button mr={3} onClick={onClose}>
             Cancel
           </Button>
-          {!data ? (
+          {drawerSize === 'md'?
+            data ? (
+              <Button
+                colorScheme='blue'
+                onClick={handleCreateLicense}
+                disabled={name === ''}
+              >
+                Save
+              </Button>
+            ) : (
+              <Button
+                colorScheme='blue'
+                onClick={handleUpdateLicense}
+                disabled={name === ''}
+              >
+                Update
+              </Button>
+            ) :
             <Button
               colorScheme='blue'
-              onClick={handleCreateLicense}
-              disabled={name === ''}
-            >
-              Save
+              onClick={handleExpand}>
+              Back
             </Button>
-          ) : (
-            <Button
-              colorScheme='blue'
-              onClick={handleUpdateLicense}
-              disabled={name === ''}
-            >
-              Update
-            </Button>
-          )}
+          }
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
