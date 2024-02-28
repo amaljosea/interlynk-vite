@@ -3303,3 +3303,45 @@ export const GetLicensesTable = gql`
     }
   }
 `
+
+// GET DATA FOR SBOM LICENSE TABLE
+
+export const GetSbomLicensesTable = gql`
+  query GetSbomLicenseTable(
+  $projectId: Uuid!
+  $sbomId: Uuid!
+  $first: Int
+  $last: Int
+  $after: String
+  $before: String
+  ) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      id
+      componentLicenses(
+        first: $first
+        last: $last
+        after: $after
+        before: $before
+      ) {
+        totalCount
+        pageInfo {
+          hasNextPage
+          endCursor
+          hasPreviousPage
+          startCursor
+        }
+        nodes {
+          licenseExpression
+          licenses {
+            __typename
+            state
+          }
+          components {
+            name 
+          }
+          derivedState
+        }
+      }
+    }
+  }
+`
