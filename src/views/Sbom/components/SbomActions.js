@@ -195,8 +195,8 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
           localStorage.setItem(
             'currentSBOM',
             JSON.stringify({
-              version: res?.data?.sbom?.projectVersion,
-              id: res?.data?.sbom?.id
+              version: signedUrlParams ? res?.data?.shareLynkQuery?.sbom?.projectVersion : res?.data?.sbom?.projectVersion,
+              id: signedUrlParams ? res?.data?.shareLynkQuery?.sbom?.id :  res?.data?.sbom?.id
             })
           )
         }
