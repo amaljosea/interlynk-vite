@@ -45,8 +45,18 @@ const ProductDetails = () => {
     prodVulnState,
     dispatch
   } = useGlobalState()
-  const { field, direction, searchInput, severities, components, statues, source, kev, epss, direct } =
-    prodVulnState
+  const {
+    field,
+    direction,
+    searchInput,
+    severities,
+    components,
+    statues,
+    source,
+    kev,
+    epss,
+    direct
+  } = prodVulnState
   const { prodVulnDispatch } = dispatch
 
   const { data, refetch, loading, error } = useQuery(ShareLynkProjectGroup, {
@@ -82,13 +92,13 @@ const ProductDetails = () => {
       before: undefined,
       search: searchInput !== '' ? searchInput : undefined,
       severity: severities.length > 0 ? severities : undefined,
-      source: source === true ? 'PART' : undefined,
+      source: source === true ? undefined : 'COMPONENT',
       componentName: components.length > 0 ? components : undefined,
       status: statues.length > 0 ? statues : undefined,
       kev:
         kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
       epss: epss !== '' && epss !== 'all' ? range : undefined,
-      direct: direct === true ? true :  undefined,
+      direct: direct === true ? true : undefined,
       field,
       direction
     }
@@ -202,24 +212,33 @@ const ProductDetails = () => {
               onChange={(value) => handleTabChange(value)}
             >
               <TabList>
-                {['versions','vulnerabilities', 'automation rules', 'settings', 'change log'].map(
-                  (item, index) => (
-                    <Tab
-                      key={index}
-                      _focus={{ outline: 'none' }}
-                      textTransform={'capitalize'}
-                      isDisabled={ item === 'automation rules' || item === 'settings' || item === 'change log' || item === 'vulnerabilities'}
-                    >
-                      {(item === 'automation rules' || item === 'settings' || item === 'change log' || item === 'vulnerabilities') && (
-                        <FaLock
-                          color='darkgray'
-                          style={{ marginRight: '6px' }}
-                        />
-                      )}
-                      {item}
-                    </Tab>
-                  )
-                )}
+                {[
+                  'versions',
+                  'vulnerabilities',
+                  'automation rules',
+                  'settings',
+                  'change log'
+                ].map((item, index) => (
+                  <Tab
+                    key={index}
+                    _focus={{ outline: 'none' }}
+                    textTransform={'capitalize'}
+                    isDisabled={
+                      item === 'automation rules' ||
+                      item === 'settings' ||
+                      item === 'change log' ||
+                      item === 'vulnerabilities'
+                    }
+                  >
+                    {(item === 'automation rules' ||
+                      item === 'settings' ||
+                      item === 'change log' ||
+                      item === 'vulnerabilities') && (
+                      <FaLock color='darkgray' style={{ marginRight: '6px' }} />
+                    )}
+                    {item}
+                  </Tab>
+                ))}
               </TabList>
               <TabPanels>
                 {/* VERSIONS */}

@@ -58,7 +58,15 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
     }
   }
 
-  const handleRefetch = (source,severity,component,status,kev,epss,direct) => {
+  const handleRefetch = (
+    source,
+    severity,
+    component,
+    status,
+    kev,
+    epss,
+    direct
+  ) => {
     const epssRange = epss !== 'all' && epss !== '' && epss.split('-')
 
     const range = {
@@ -69,9 +77,13 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
     refetch({
       projectId: signedUrlParams ? undefined : productId,
       sbomId: sbomId,
-      source: source === true ? 'PART' : undefined,
-      severity: !severity.includes('all') && severity.length > 0 ? severity : undefined,
-      componentName: !component.includes('all') && component.length > 0 ? component : undefined,
+      source: source === true ? undefined : 'COMPONENT',
+      severity:
+        !severity.includes('all') && severity.length > 0 ? severity : undefined,
+      componentName:
+        !component.includes('all') && component.length > 0
+          ? component
+          : undefined,
       status: !status.includes('all') && status.length > 0 ? status : undefined,
       kev: kev === 'yes' ? true : kev === 'false' ? false : undefined,
       epss: epss === 'all' || epss === '' ? undefined : range,
@@ -87,7 +99,15 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
 
   const onFilterOrigin = (e) => {
     prodVulnDispatch({ type: 'FILTER_SOURCE', payload: e.target.checked })
-    handleRefetch(e.target.checked, severities, components, statues, kev, epss, direct)
+    handleRefetch(
+      e.target.checked,
+      severities,
+      components,
+      statues,
+      kev,
+      epss,
+      direct
+    )
   }
 
   const onFilterCompName = (value) => {
@@ -117,12 +137,28 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
 
   const onFilterDirect = (e) => {
     prodVulnDispatch({ type: 'FILTER_DIRECT', payload: e.target.checked })
-    handleRefetch(source, severities, components, statues, kev, epss, e.target.checked)
+    handleRefetch(
+      source,
+      severities,
+      components,
+      statues,
+      kev,
+      epss,
+      e.target.checked
+    )
   }
 
   const handleSubmit = () => {
     prodVulnDispatch({ type: 'SET_EPSS', payload: `${minEpss}-${maxEpss}` })
-    handleRefetch(source, severities, components, statues, kev, `${minEpss}-${maxEpss}`, direct)
+    handleRefetch(
+      source,
+      severities,
+      components,
+      statues,
+      kev,
+      `${minEpss}-${maxEpss}`,
+      direct
+    )
     onClose()
   }
 
@@ -256,7 +292,8 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
               {['0-100', '100-500', '500-1000', '1000-10000'].map(
                 (item, index) => (
                   <MenuItemOption key={index} value={item} fontSize={'sm'}>
-                    {item.split('-')[0] / 100}-{item.split('-')[1] / 100}{' %'}
+                    {item.split('-')[0] / 100}-{item.split('-')[1] / 100}
+                    {' %'}
                   </MenuItemOption>
                 )
               )}

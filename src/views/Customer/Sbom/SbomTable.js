@@ -50,22 +50,22 @@ const SbomTable = ({
 
   // How often each tab should refetch the data (in minutes)
   const fetchIntervalMinutes = {
-    General: 0,
-    Parts: 0,
-    Components: 0,
-    Vulnerabilities: 1,
-    Support: 0,
-    Checks: 0,
+    'General': 0,
+    'Parts': 0,
+    'Components': 0,
+    'Vulnerabilities': 1,
+    'Support: 0,
+    'Checks': 0,
     'Change Log': 0
   }
 
   const [lastFetchTime, setLastFetchTime] = useState({
-    General: null,
-    Parts: null,
-    Components: null,
-    Vulnerabilities: null,
-    Support: null,
-    Checks: null,
+    'General': null,
+    'Parts': null,
+    'Components': null,
+    'Vulnerabilities': null,
+    'Support': null,
+    'Checks': null,
     'Change Log': null
   })
 
@@ -177,7 +177,7 @@ const SbomTable = ({
       getVulnData({
         ...commonParams,
         search: getUndefinedIfEmpty(searchInput),
-        source: source === true ? 'PART' : undefined,
+        source: source === true ? undefined : 'COMPONENT',
         severity: getUndefinedIfEmptyOrAll(severities),
         componentName: getUndefinedIfEmptyOrAll(components),
         status: getUndefinedIfEmptyOrAll(statues),
@@ -220,9 +220,17 @@ const SbomTable = ({
             <Tab
               key={index}
               _focus={{ outline: 'none' }}
-              isDisabled={item === 'Parts' || item === 'Checks' || item === 'Change Log' || item === 'Support'}
+              isDisabled={
+                item === 'Parts' ||
+                item === 'Checks' ||
+                item === 'Change Log' ||
+                item === 'Support'
+              }
             >
-              {(item === 'Parts' || item === 'Checks' || item === 'Change Log' || item === 'Support') && (
+              {(item === 'Parts' ||
+                item === 'Checks' ||
+                item === 'Change Log' ||
+                item === 'Support') && (
                 <FaLock color='darkgray' style={{ marginRight: '6px' }} />
               )}
               {item}

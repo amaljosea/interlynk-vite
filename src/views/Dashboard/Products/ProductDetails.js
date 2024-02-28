@@ -190,13 +190,13 @@ const ProductDetails = () => {
       before: undefined,
       search: vulnSearch !== '' ? vulnSearch : undefined,
       severity: severities.length > 0 ? severities : undefined,
-      source: source === true ? 'PART' : undefined,
+      source: source === true ? undefined : 'COMPONENT',
       componentName: components.length > 0 ? components : undefined,
       status: statues.length > 0 ? statues : undefined,
       kev:
         kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
       epss: epss !== '' && epss !== 'all' ? range : undefined,
-      direct: direct === true ? true :  undefined,
+      direct: direct === true ? true : undefined,
       field: prodVulnState.field,
       direction: prodVulnState.direction
     }

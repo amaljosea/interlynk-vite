@@ -333,7 +333,11 @@ const VulnTable = ({
           <Flex alignItems='center' gap='0'>
             <Tooltip
               placement='top'
-              label={epssScores?.length > 0 ? `${(epssScores[0] * 100).toFixed(3)} %` : '-'}
+              label={
+                epssScores?.length > 0
+                  ? `${(epssScores[0] * 100).toFixed(3)} %`
+                  : '-'
+              }
             >
               <Tag
                 size='md'
@@ -344,7 +348,9 @@ const VulnTable = ({
                 alignItems='center'
               >
                 <TagLabel>
-                  {epssScores?.length > 0 ? `${(epssScores[0] * 100).toFixed(3)} %` : '-'}
+                  {epssScores?.length > 0
+                    ? `${(epssScores[0] * 100).toFixed(3)} %`
+                    : '-'}
                 </TagLabel>
               </Tag>
             </Tooltip>
@@ -352,20 +358,24 @@ const VulnTable = ({
               epssScores[0] > epssScores[epssScores.length - 1] ? (
                 <Tooltip
                   placement='top'
-                  label={`Up from ${(epssScores[epssScores.length - 1] * 100).toFixed(3)} % last week`}
+                  label={`Up from ${(
+                    epssScores[epssScores.length - 1] * 100
+                  ).toFixed(3)} % last week`}
                 >
                   <ChevronUpIcon w={5} h={5} color='green.500' />
                 </Tooltip>
               ) : epssScores[0] < epssScores[epssScores.length - 1] ? (
                 <Tooltip
                   placement='top'
-                  label={`Down from ${(epssScores[epssScores.length - 1] * 100).toFixed(3)} % last week`}
+                  label={`Down from ${(
+                    epssScores[epssScores.length - 1] * 100
+                  ).toFixed(3)} % last week`}
                 >
                   <ChevronDownIcon w={5} h={5} color='red.500' />
                 </Tooltip>
               ) : null
             ) : null}
-        </Flex>
+          </Flex>
         )
       },
       width: '150px',
@@ -466,7 +476,7 @@ const VulnTable = ({
     projectId: signedUrlParams ? undefined : productId,
     sbomId: sbomId,
     search: searchInput !== '' ? searchInput : undefined,
-    source: source === true ? 'PART' : undefined,
+    source: source === true ? undefined : 'COMPONENT',
     severity: severities.length > 0 ? severities : undefined,
     componentName: components.length > 0 ? components : undefined,
     status: statues.length > 0 ? statues : undefined,
@@ -485,7 +495,7 @@ const VulnTable = ({
       projectId: productId,
       sbomId: sbomId,
       search: undefined,
-      source: source === true ? 'PART' : undefined,
+      source: source === true ? undefined : 'COMPONENT',
       severity: severities.length > 0 ? severities : undefined,
       componentName: components.length > 0 ? components : undefined,
       status: statues.length > 0 ? statues : undefined,
@@ -526,7 +536,7 @@ const VulnTable = ({
         projectId: signedUrlParams ? undefined : productId,
         sbomId: sbomId,
         search: value !== '' ? value : undefined,
-        source: source === true ? 'PART' : undefined,
+        source: source === true ? undefined : 'COMPONENT',
         severity: severities.length > 0 ? severities : undefined,
         componentName: components.length > 0 ? components : undefined,
         status: statues.length > 0 ? statues : undefined,
@@ -853,7 +863,7 @@ const VulnTable = ({
       sbomId: sbomId,
       signedParams: undefined,
       search: searchInput !== '' ? searchInput : undefined,
-      source: source === true ? 'PART' : undefined,
+      source: source === true ? undefined : 'COMPONENT',
       severity:
         !severities.includes('all') && severities.length > 0
           ? severities

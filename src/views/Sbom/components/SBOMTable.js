@@ -17,12 +17,17 @@ import VulnTable from 'components/Tables/VulnTable'
 import HealthCheckTable from 'components/Tables/HealthCheckTable'
 import SbomChangelogTable from 'components/Tables/SbomChangelogTable'
 import PartsTable from 'components/Tables/PartsTable'
-import {useLazyQuery} from '@apollo/client'
-import {GetCheckResults, GetChangeLogs, GetSbomParts, GetSbomLicensesTable} from 'graphQL/Queries'
+import { useLazyQuery } from '@apollo/client'
+import {
+  GetCheckResults,
+  GetChangeLogs,
+  GetSbomParts,
+  GetSbomLicensesTable
+} from 'graphQL/Queries'
 import { useLocation } from 'react-router-dom'
 import { useGlobalState } from 'hooks/useGlobalState'
 import SupportTable from 'components/Tables/SupportTable'
-import SbomLicenseTable from "../../../components/Licenses/SbomLicenseTable"
+import SbomLicenseTable from '../../../components/Licenses/SbomLicenseTable'
 
 const SBOMTable = ({
   status,
@@ -109,15 +114,18 @@ const SBOMTable = ({
   })
 
   // GET CHANGE LOG DATA
-  const [getLogsData, { data: logsData, refetch: logsRefetch }] = useLazyQuery(GetChangeLogs, {
+  const [getLogsData, { data: logsData, refetch: logsRefetch }] = useLazyQuery(
+    GetChangeLogs,
+    {
       fetchPolicy: 'network-only'
     }
   )
 
   // GET LICENSES DATA
- const [getLicensesData, { data: licensesData, refetch: licensesRefetch }] = useLazyQuery(GetSbomLicensesTable, {
-   fetchPolicy: 'network-only'
- })
+  const [getLicensesData, { data: licensesData, refetch: licensesRefetch }] =
+    useLazyQuery(GetSbomLicensesTable, {
+      fetchPolicy: 'network-only'
+    })
 
   const getUndefinedIfEmpty = (value) => (value !== '' ? value : undefined)
 
@@ -228,7 +236,7 @@ const SBOMTable = ({
       getVulnData({
         ...commonParams,
         search: getUndefinedIfEmpty(searchInput),
-        source: source === true ? 'PART' : undefined,
+        source: source === true ? undefined : 'COMPONENT',
         severity: getUndefinedIfEmptyOrAll(severities),
         componentName: getUndefinedIfEmptyOrAll(components),
         status: getUndefinedIfEmptyOrAll(statues),
@@ -253,7 +261,7 @@ const SBOMTable = ({
     } else if (tabName === 'Licenses' && shouldFetchData(tabName)) {
       getLicensesData({
         variables: {
-          ...commonParams,
+          ...commonParams
         }
       }).then((res) => {
         if (res.data) {
@@ -412,10 +420,10 @@ const SBOMTable = ({
             </TabPanel>
             {/* LICENSES TABLE */}
             <TabPanel px={0}>
-                <SbomLicenseTable
-                  data={licensesData?.sbom?.componentLicenses}
-                  refetch={licensesRefetch}
-                />
+              <SbomLicenseTable
+                data={licensesData?.sbom?.componentLicenses}
+                refetch={licensesRefetch}
+              />
             </TabPanel>
             {/* SUPPORT TABLE */}
             <TabPanel px={0}>
