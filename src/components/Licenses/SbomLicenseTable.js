@@ -6,7 +6,7 @@ import {
   TagLabel,
   Tooltip,
   IconButton,
-  useDisclosure,
+  Box,
 } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -153,16 +153,20 @@ const SbomLicenseTable = ({ data, refetch }) => {
       width: '1000px',
       wrap: true,
       selector: ({ components }) => {
+
+        let sortedComponents = [...components]
+        sortedComponents.sort((a, b) => a.name.localeCompare(b.name))
+
         return (
           <Flex direction='row' py={5} alignItems={'center'} wrap='wrap' gap={2}>
-            {components?.map(
-              (component, index) =>
-                <Tag variant='subtle' key={index} >
-                  <TagLabel my={1} style={{ whiteSpace: 'normal' }}>
-                    {component.name}
-                  </TagLabel>
-                </Tag>
-            )}
+            <Tag variant='subtle'>
+              <TagLabel my={1} style={{ whiteSpace: 'normal' }}>
+                {sortedComponents[0].name}
+              </TagLabel>
+            </Tag>
+            <Text>
+              {sortedComponents.length > 1 ? `+${sortedComponents.length - 1} more` : ''}
+            </Text>
           </Flex>
         )
       }
@@ -199,6 +203,38 @@ const SbomLicenseTable = ({ data, refetch }) => {
     }
   ]
 
+  const ExpandedRow = ({ data: {components} }) => {
+
+    let sortedComponents = [...components]
+    sortedComponents.sort((a, b) => a.name.localeCompare(b.name))
+
+    return (
+      <Box
+        width={'100%'}
+        p={5}
+        boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
+      >
+        <Flex
+          direction='row'
+          py={5}
+          alignItems={'center'}
+          wrap='wrap'
+          gap={2}
+          marginLeft={'350px'}
+        >
+          {sortedComponents?.map(
+            (component, index) =>
+              <Tag variant='subtle' key={index} >
+                <TagLabel my={1} style={{ whiteSpace: 'normal' }}>
+                  {component.name}
+                </TagLabel>
+              </Tag>
+          )}
+        </Flex>
+      </Box>
+    )
+  }
+
   return (
     <>
       <Flex flexDir={'column'} width={'100%'}>
@@ -214,6 +250,9 @@ const SbomLicenseTable = ({ data, refetch }) => {
           subHeaderComponent={subHeaderComponent}
           responsive
           persistTableHead
+          expandableRows
+          expandOnRowClicked
+          expandableRowsComponent={ExpandedRow}
         />
       </Flex>
 
