@@ -29,10 +29,9 @@ import VulnsFilters from 'views/Dashboard/Vulnerabilities/components/VulnsFilter
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import { useGlobalState } from 'hooks/useGlobalState'
 import Round from 'components/Misc/Round'
-import Pagination from "../Pagination";
+import Pagination from '../Pagination'
 
 const GlobalVulnTable = ({ data, refetch }) => {
-
   //This part is needed for the pagination to work. (Modify with caution)
   const paginationSizes = [25, 50, 100]
   const [totalRows, setTotalRows] = useState(paginationSizes[0])
@@ -48,13 +47,11 @@ const GlobalVulnTable = ({ data, refetch }) => {
   }, [data])
   //end
 
-
   const params = useParams()
   const product = JSON.parse(localStorage.getItem('product'))
-  const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : "customer"
+  const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
 
-  const { globalVulnState, dispatch } =
-    useGlobalState()
+  const { globalVulnState, dispatch } = useGlobalState()
   const {
     pageIndex,
     field,
@@ -239,7 +236,7 @@ const GlobalVulnTable = ({ data, refetch }) => {
           <Flex alignItems='center' gap='0'>
             <Tooltip
               placement='top'
-              label={epssScores?.length > 0 ? epssScores[0] * 100 + ' %' : '-'}
+              label={epssScores?.length > 0 ? `${(epssScores[0] * 100).toFixed(3)} %` : '-'}
             >
               <Tag
                 size='md'
@@ -250,28 +247,28 @@ const GlobalVulnTable = ({ data, refetch }) => {
                 alignItems='center'
               >
                 <TagLabel>
-                  {epssScores?.length > 0 ? epssScores[0] * 100 + ' %' : '-'}
+                  {epssScores?.length > 0 ? `${(epssScores[0] * 100).toFixed(3)} %` : '-'}
                 </TagLabel>
               </Tag>
             </Tooltip>
-          {epssScores && epssScores.length > 1 ? (
-            epssScores[0] > epssScores[epssScores.length - 1] ? (
-              <Tooltip
-                placement='top'
-                label={`Up from ${epssScores[epssScores.length - 1] * 100} % last week`}
-              >
-                <ChevronUpIcon w={5} h={5} color='green.500' />
-              </Tooltip>
-            ) : epssScores[0] < epssScores[epssScores.length - 1] ? (
-              <Tooltip
-                placement='top'
-                label={`Down from ${epssScores[epssScores.length - 1] * 100} % last week`}
-              >
-                <ChevronDownIcon w={5} h={5} color='red.500' />
-              </Tooltip>
-            ) : null
-          ) : null}
-        </Flex>
+            {epssScores && epssScores.length > 1 ? (
+              epssScores[0] > epssScores[epssScores.length - 1] ? (
+                <Tooltip
+                  placement='top'
+                  label={`Up from ${(epssScores[epssScores.length - 1] * 100).toFixed(3)} % last week`}
+                >
+                  <ChevronUpIcon w={5} h={5} color='green.500' />
+                </Tooltip>
+              ) : epssScores[0] < epssScores[epssScores.length - 1] ? (
+                <Tooltip
+                  placement='top'
+                  label={`Down from ${(epssScores[epssScores.length - 1] * 100).toFixed(3)} % last week`}
+                >
+                  <ChevronDownIcon w={5} h={5} color='red.500' />
+                </Tooltip>
+              ) : null
+            ) : null}
+          </Flex>
         )
       },
       sortable: true,

@@ -330,10 +330,10 @@ const VulnTable = ({
         const { vulnInfo } = vuln
         const { epssScores } = vulnInfo ? vulnInfo : ''
         return (
-          <Flex minWidth='max-content' alignItems='center' gap='0'>
+          <Flex alignItems='center' gap='0'>
             <Tooltip
               placement='top'
-              label={epssScores?.length > 0 ? epssScores[0] * 100 + ' %' : '-'}
+              label={epssScores?.length > 0 ? `${(epssScores[0] * 100).toFixed(3)} %` : '-'}
             >
               <Tag
                 size='md'
@@ -344,7 +344,7 @@ const VulnTable = ({
                 alignItems='center'
               >
                 <TagLabel>
-                  {epssScores?.length > 0 ? epssScores[0] * 100 + ' %' : '-'}
+                  {epssScores?.length > 0 ? `${(epssScores[0] * 100).toFixed(3)} %` : '-'}
                 </TagLabel>
               </Tag>
             </Tooltip>
@@ -352,24 +352,20 @@ const VulnTable = ({
               epssScores[0] > epssScores[epssScores.length - 1] ? (
                 <Tooltip
                   placement='top'
-                  label={`Up from ${
-                    epssScores[epssScores.length - 1] * 100
-                  } % last week`}
+                  label={`Up from ${(epssScores[epssScores.length - 1] * 100).toFixed(3)} % last week`}
                 >
                   <ChevronUpIcon w={5} h={5} color='green.500' />
                 </Tooltip>
               ) : epssScores[0] < epssScores[epssScores.length - 1] ? (
                 <Tooltip
                   placement='top'
-                  label={`Down from ${
-                    epssScores[epssScores.length - 1] * 100
-                  } % last week`}
+                  label={`Down from ${(epssScores[epssScores.length - 1] * 100).toFixed(3)} % last week`}
                 >
                   <ChevronDownIcon w={5} h={5} color='red.500' />
                 </Tooltip>
               ) : null
             ) : null}
-          </Flex>
+        </Flex>
         )
       },
       width: '150px',

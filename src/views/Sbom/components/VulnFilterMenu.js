@@ -256,7 +256,7 @@ const VulnFilterMenu = ({ refetch, productId, sbomId }) => {
               {['0-100', '100-500', '500-1000', '1000-10000'].map(
                 (item, index) => (
                   <MenuItemOption key={index} value={item} fontSize={'sm'}>
-                    {item.split('-')[0] / 10000}-{item.split('-')[1] / 10000}{' %'}
+                    {item.split('-')[0] / 100}-{item.split('-')[1] / 100}{' %'}
                   </MenuItemOption>
                 )
               )}
