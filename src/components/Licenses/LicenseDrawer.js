@@ -346,7 +346,7 @@ const LicenseDrawer = ({ isOpen, onClose, data, refetch }) => {
             Cancel
           </Button>
           {drawerSize === 'md'?
-            data ? (
+            !data ? (
               <Button
                 colorScheme='blue'
                 onClick={handleCreateLicense}
