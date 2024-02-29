@@ -76,7 +76,7 @@ const ToolsFilterMenu = ({ data, setData }) => {
             <CheckMark />
           )}
           <MenuHeading title={'Components'} />
-          <MenuList width={'300px'} height={'400px'} overflowY={'scroll'}>
+          <MenuList width={'300px'} minH={'auto'} maxH={'400px'} overflowY={'scroll'}>
             <MenuOptionGroup
               type='checkbox'
               value={components}
