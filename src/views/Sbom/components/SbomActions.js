@@ -165,12 +165,18 @@ const SbomActions = ({ sbom, refetch, getCompData, prodRefetch }) => {
   const uniqShareVersions = []
 
   data?.project?.sboms?.length > 0 &&
-    data.project.sboms.map((project) => {
-      uniqVersions.push({
-        label: project?.projectVersion,
-        value: project?.id
+    [...data.project.sboms]
+      .sort((a, b) => {
+        const dateA = new Date(a.updatedAt)
+        const dateB = new Date(b.updatedAt)
+        return dateB - dateA
       })
-    })
+      .map((project) => {
+        uniqVersions.push({
+          label: project?.projectVersion,
+          value: project?.id
+        })
+      })
 
   const isSearchable =
     filterVersion && filterVersion?.primaryComponent ? true : false
