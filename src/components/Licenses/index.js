@@ -9,7 +9,6 @@ const Licenses = () => {
         fetchPolicy: 'network-only',
         variables: {
             direction: 'ASC',
-            status: "unspecified",
             first: 25
         }
     })
