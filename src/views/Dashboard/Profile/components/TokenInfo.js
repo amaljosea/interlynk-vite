@@ -436,7 +436,6 @@ const TokenInfo = ({ data, refetch }) => {
                   <Datetime
                     value={selectedDate}
                     onChange={handleDateChange}
-                    utc={true}
                     inputProps={{
                       placeholder: 'Select Date and Time',
                       disabled: token !== '',

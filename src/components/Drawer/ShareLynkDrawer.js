@@ -227,7 +227,6 @@ const ShareLynkDrawer = ({
                   <Datetime
                     value={selectedDate}
                     onChange={handleDateChange}
-                    utc={true}
                     inputProps={{
                       placeholder: 'Select Date and Time',
                       onCopy: (e) => e.preventDefault(),
