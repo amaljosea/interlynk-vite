@@ -13,7 +13,7 @@ import {useState} from 'react'
 import { FaFilter } from 'react-icons/fa'
 
 const LicenseFilter = ( {onFilter} ) => {
-  const [status, setStatus] = useState(['unspecified'])
+  const [status, setStatus] = useState([undefined])
   const availableStatus = {
     all: undefined,
     approved: 'approved',
