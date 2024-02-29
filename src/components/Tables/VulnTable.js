@@ -32,7 +32,7 @@ import {
   Button
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
-import { FaBug, FaCopy } from 'react-icons/fa6'
+import { FaBug, FaCopy, FaPen } from 'react-icons/fa6'
 import { useState, useMemo, useEffect } from 'react'
 import styled from '@emotion/styled'
 import ProdStatusDrawer from 'components/Drawer/ProdStatusDrawer'
@@ -612,13 +612,13 @@ const VulnTable = ({
         width={'100%'}
         alignItems={'flex-start'}
         justifyContent={'space-between'}
-        gap={4}
+        gap={2}
       >
         <Flex
           flexDirection={'row'}
           alignItems={'flex-start'}
           flexWrap={'wrap'}
-          gap={4}
+          gap={3}
         >
           {/* SEARCH COMPONENTS */}
           <SearchFilter
@@ -648,16 +648,14 @@ const VulnTable = ({
         <Stack direction='row' alignItems={'center'} width={'fit-content'}>
           {/* UPDATE STATUES */}
           {selectedVulns.length > 0 && (
-            <Button
-              variant='solid'
-              colorScheme='blue'
-              fontWeight='normal'
-              fontSize={'sm'}
-              onClick={onOpen}
-              isDisabled={signedUrlParams}
-            >
-              Set Status
-            </Button>
+            <Tooltip label={'Set Status'}>
+              <IconButton
+                colorScheme='blue'
+                onClick={onOpen}
+                hidden={signedUrlParams}
+                icon={<FaPen />}
+              />
+            </Tooltip>
           )}
           {/* SCAN VULN */}
           <Tooltip label={'Scan Vulnerabilities'}>

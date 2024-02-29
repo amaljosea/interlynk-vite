@@ -7,7 +7,7 @@ const MenuHeading = ({ title, onClick }) => {
       as={Button}
       colorScheme='blue'
       fontWeight='normal'
-      fontSize={'sm'}
+      fontSize='sm'
       leftIcon={<FaFilter size={14} />}
       onClick={onClick}
     >
