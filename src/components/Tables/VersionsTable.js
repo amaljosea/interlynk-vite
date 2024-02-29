@@ -35,20 +35,29 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV } from 'react-icons/fa'
-import { FaScrewdriverWrench } from 'react-icons/fa6'
+import { FaCodeCompare, FaScrewdriverWrench } from 'react-icons/fa6'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { timeSince, getFullDateAndTime, customStyles } from 'utils'
 import SbomList from 'views/Dashboard/Products/components/SbomList'
 import Pagination from '../Pagination'
 import { GetVersionsTable, ShareVersionTable } from 'graphQL/Queries'
+import ToolsDrawer from 'components/Drawer/ToolsDrawer'
 
 const VersionsTable = ({ projectGroup, getVulnData }) => {
   const location = useLocation()
   const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
-  const activeProd = localStorage.getItem(signedUrlParams ? 'publicEnv' : 'activeEnv')
+  const activeProd = localStorage.getItem(
+    signedUrlParams ? 'publicEnv' : 'activeEnv'
+  )
 
-  const { userPermissions, activeProdTab, setActiveSbomTab, prodVulnState, dispatch } = useGlobalState()
+  const {
+    userPermissions,
+    activeProdTab,
+    setActiveSbomTab,
+    prodVulnState,
+    dispatch
+  } = useGlobalState()
   const { field, direction } = prodVulnState
   const { prodVulnDispatch, prodCompDispatch } = dispatch
 
@@ -75,6 +84,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
 
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
+  const [selectedSbom, setSelectedSbom] = useState([])
 
   useEffect(() => {
     if (versions) {
@@ -162,6 +172,12 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
   const [currentPage, setCurrentPage] = useState(1)
 
   const [deleteSbom] = useMutation(sbomDelete)
+
+  const {
+    isOpen: isToolOpen,
+    onOpen: onToolOpen,
+    onClose: onToolClose
+  } = useDisclosure()
 
   const {
     isOpen: isDeleteOpen,
@@ -477,6 +493,16 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
     return (
       <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
         <Stack direction={'row'} spacing={2} alignItems={'center'}>
+          {/* COMPARE VERSION */}
+          {selectedSbom?.length === 2 && (
+            <Tooltip label='Compare'>
+              <IconButton
+                onClick={onToolOpen}
+                colorScheme='blue'
+                icon={<FaCodeCompare />}
+              ></IconButton>
+            </Tooltip>
+          )}
           {/* BUILD SBOM */}
           <Tooltip label='Build Version'>
             <IconButton
@@ -500,6 +526,11 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
     )
   }, [handleRefresh])
 
+  const handleChange = (state) => {
+    console.log(state)
+    setSelectedSbom(state?.selectedRows)
+  }
+
   const dataTableProps = {
     columns: columns,
     data: versions?.nodes || [],
@@ -511,7 +542,9 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
     progressPending: !versions,
     progressComponent: <CustomLoader />,
     responsive: true,
-    persistTableHead: true
+    persistTableHead: true,
+    selectableRows: true,
+    onSelectedRowsChange: handleChange
   }
 
   if (error)
@@ -604,6 +637,14 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
           data={projectGroup}
           refetch={refetch}
           productId={activeProd}
+        />
+      )}
+
+      {isToolOpen && (
+        <ToolsDrawer
+          data={selectedSbom}
+          isOpen={isToolOpen}
+          onClose={onToolClose}
         />
       )}
     </>
