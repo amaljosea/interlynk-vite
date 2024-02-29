@@ -1,7 +1,9 @@
 import { useLazyQuery, useQuery } from '@apollo/client'
 import {
   Alert,
+  AlertDescription,
   AlertIcon,
+  Badge,
   Button,
   Flex,
   FormControl,
@@ -10,6 +12,7 @@ import {
   GridItem,
   HStack,
   Heading,
+  Icon,
   Link,
   Select,
   Stack,
@@ -25,14 +28,28 @@ import {
   Tr
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
-import { GetSbomDrift, GetProductsForSbomDrift, GetProductData, GetProject } from 'graphQL/Queries'
+import CustomLoader from 'components/CustomLoader'
+import {
+  GetSbomDrift,
+  GetProductsForSbomDrift,
+  GetProductData,
+  GetProject
+} from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { FaTimes } from 'react-icons/fa'
-import { FaPlus, FaRecycle, FaTrash } from 'react-icons/fa6'
+import { FaTimes, FaWindowMaximize } from 'react-icons/fa'
+import {
+  FaCodeCompare,
+  FaPlus,
+  FaRecycle,
+  FaScaleUnbalanced,
+  FaTrash
+} from 'react-icons/fa6'
+import ReactSelect from 'react-select'
 import { customStyles } from 'utils'
 import { getFullDateAndTime, envOrderList } from 'utils'
+import ToolsFilterMenu from './Filters'
 
 const SbomInfo = ({ data }) => {
   return (
@@ -188,16 +205,17 @@ const SbomInfo = ({ data }) => {
 }
 
 const Tools = () => {
-  const { totalRows, prodState } = useGlobalState()
+  const { prodState } = useGlobalState()
   const { field, direction } = prodState
 
   const [drifts, setDrifts] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
 
   const [getProduct] = useLazyQuery(GetProject, { fetchPolicy: 'network-only' })
   const [getSbomData] = useLazyQuery(GetProductData, {
     fetchPolicy: 'network-only'
   })
-  const [getDrift] = useLazyQuery(GetSbomDrift, {
+  const [getDrift, { data: driftData }] = useLazyQuery(GetSbomDrift, {
     fetchPolicy: 'network-only'
   })
   const { data } = useQuery(GetProductsForSbomDrift, {
@@ -217,11 +235,11 @@ const Tools = () => {
       selector: (row) => {
         const { diffType } = row
         return (
-          <Button
-            width={'130px'}
-            size='sm'
-            pointerEvents={'none'}
+          <Badge
+            width={24}
+            p={2}
             textTransform={'capitalize'}
+            textAlign={'center'}
             colorScheme={
               diffType === 'added'
                 ? 'green'
@@ -240,7 +258,7 @@ const Tools = () => {
             }
           >
             {diffType}
-          </Button>
+          </Badge>
         )
       },
       wrap: true,
@@ -252,100 +270,158 @@ const Tools = () => {
       selector: (row) => (
         <Text>{row?.subjectComponent?.name || row?.targetComponent?.name}</Text>
       ),
-      width: '320px',
+      width: '250px',
       wrap: true
     },
     {
       id: 'VERSION',
       name: 'VERSION',
       selector: (row) => {
-        const { subjectComponent, targetComponent } = row
-        return (
-          <Flex my={4} flexWrap={'wrap'} alignItems={'center'} gap={2}>
-            {targetComponent?.version && (
+        const { subjectComponent, targetComponent, diffTags } = row
+        if (diffTags?.includes('version')) {
+          return (
+            <Flex my={4} flexWrap={'wrap'} alignItems={'center'} gap={2}>
               <Tag py={1.5} colorScheme='red'>
                 {targetComponent?.version}
               </Tag>
-            )}
-            {subjectComponent?.version && (
               <Tag py={1.5} colorScheme='green'>
                 {subjectComponent?.version}
               </Tag>
-            )}
-          </Flex>
-        )
+            </Flex>
+          )
+        } else {
+          return (
+            <Tag py={1.5}>
+              {subjectComponent?.version || targetComponent?.version}
+            </Tag>
+          )
+        }
       },
       width: '200px',
+      wrap: true
+    },
+    {
+      id: 'LICENSE EXP',
+      name: 'LICENSE EXP',
+      selector: (row) => {
+        const { subjectComponent, targetComponent, diffTags } = row
+        if (diffTags?.includes('license_exp')) {
+          return (
+            <Flex my={4} flexWrap={'wrap'} alignItems={'center'} gap={2}>
+              <Tag py={1.5} colorScheme='red'>
+                {targetComponent?.licensesExp}
+              </Tag>
+              <Tag py={1.5} colorScheme='green'>
+                {subjectComponent?.licensesExp}
+              </Tag>
+            </Flex>
+          )
+        } else {
+          return (
+            <Tag my={4} py={1.5}>
+              {subjectComponent?.licensesExp ||
+                targetComponent?.licensesExp ||
+                '-'}
+            </Tag>
+          )
+        }
+      },
+      width: '220px',
       wrap: true
     },
     {
       id: 'PURL',
       name: 'PURL',
       selector: (row) => {
-        const { subjectComponent, targetComponent } = row
-        return (
-          <Flex my={4} flexWrap={'wrap'} alignItems={'center'} gap={2}>
-            {targetComponent?.purl && (
+        const { subjectComponent, targetComponent, diffTags } = row
+        if (diffTags?.includes('purl')) {
+          return (
+            <Flex my={4} flexWrap={'wrap'} alignItems={'center'} gap={2}>
               <Tag py={1.5} colorScheme='red'>
-                {targetComponent?.purl}
+                {targetComponent?.purl || '-'}
               </Tag>
-            )}
-            {subjectComponent?.purl && (
               <Tag py={1.5} colorScheme='green'>
-                {subjectComponent?.purl}
+                {subjectComponent?.purl || '-'}
               </Tag>
-            )}
-          </Flex>
-        )
+            </Flex>
+          )
+        } else {
+          return (
+            <Tag my={4} py={1.5}>
+              {subjectComponent?.purl || targetComponent?.purl || '-'}
+            </Tag>
+          )
+        }
       },
-      width: '400px',
+      width: '360px',
       wrap: true
     },
     {
       id: 'CPE',
       name: 'CPE',
       selector: (row) => {
-        const { subjectComponent, targetComponent } = row
-        return (
-          <Flex my={4} flexWrap={'wrap'} alignItems={'center'} gap={2}>
-            {targetComponent?.cpe?.length > 0 && (
+        const { subjectComponent, targetComponent, diffTags } = row
+        if (diffTags?.includes('cpe')) {
+          return (
+            <Flex my={4} flexWrap={'wrap'} alignItems={'center'} gap={2}>
               <Tag py={1.5} colorScheme='red'>
-                {targetComponent?.cpe[0]}
+                {targetComponent?.cpe?.length > 0 && targetComponent?.cpe[0]}
               </Tag>
-            )}
-            {subjectComponent?.cpe?.length > 0 && (
               <Tag py={1.5} colorScheme='green'>
-                {subjectComponent?.cpe[0]}
+                {subjectComponent?.cpe?.length > 0 && subjectComponent?.cpe[0]}
               </Tag>
-            )}
-          </Flex>
-        )
+            </Flex>
+          )
+        } else {
+          return (
+            <Tag py={1.5}>
+              {(targetComponent?.cpe?.length > 0 && targetComponent?.cpe[0]) ||
+                (subjectComponent?.cpe?.length > 0 &&
+                  subjectComponent?.cpe[0]) ||
+                '-'}
+            </Tag>
+          )
+        }
       },
       width: '250px',
       wrap: true
     }
   ]
 
+  // SUB HEADER
+  const subHeader = useMemo(() => {
+    return (
+      <Flex
+        width={'100%'}
+        alignItems={'center'}
+        justifyContent={'flex-start'}
+        mb={4}
+      >
+        <ToolsFilterMenu
+          data={driftData?.sbom?.sbomDrift}
+          setData={setDrifts}
+        />
+      </Flex>
+    )
+  }, [drifts, setDrifts])
+
   // -------------- SBOM 1 --------------
   const [selectedGroupOne, setSelectedGroupOne] = useState('')
   const [selectedProdOne, setSelectedProdOne] = useState('')
-  const [selectedVersionOne, setSelectedVersionOne] = useState('')
-  const [versionNameOne, setVersionNameOne] = useState('')
+  const [selectedVersionOne, setSelectedVersionOne] = useState(null)
   const [uniqVersionsOne, setUniqVersionsOne] = useState([])
   const [productListOne, setProductListOne] = useState([])
   const [firstSbomInfo, setFirstSbomInfo] = useState(null)
 
   const onSelectGroupOne = (e) => {
     setSelectedGroupOne(e.target.value)
-    setSelectedVersionOne('')
-    setVersionNameOne('')
+    setSelectedVersionOne(null)
     setSelectedProdOne('')
   }
 
   const onSelectProductOne = (e) => {
     const { value } = e.target
-    setSelectedVersionOne('')
-    setVersionNameOne('')
+    setSelectedVersionOne(null)
     setSelectedProdOne(value)
   }
 
@@ -353,7 +429,7 @@ const Tools = () => {
     getSbomData({
       variables: {
         projectId: selectedProdOne,
-        sbomId: selectedVersionOne
+        sbomId: selectedVersionOne?.value
       }
     }).then((res) => {
       if (res?.data) {
@@ -366,8 +442,7 @@ const Tools = () => {
   const onClearOne = () => {
     setSelectedGroupOne('')
     setSelectedProdOne('')
-    setSelectedVersionOne('')
-    setVersionNameOne('')
+    setSelectedVersionOne(null)
     setProductListOne([])
     setUniqVersionsOne([])
     setFirstSbomInfo(null)
@@ -388,20 +463,37 @@ const Tools = () => {
   }, [selectedGroupOne])
 
   useEffect(() => {
-    if (selectedProdOne !== '' && selectedVersionOne === '') {
+    if (selectedProdOne !== '' && selectedVersionOne === null) {
       getProduct({
         variables: {
           id: selectedProdOne
         }
       }).then((res) => {
         if (res.data) {
-          const data = res?.data?.project?.sboms
+          const data = [...res?.data?.project?.sboms]?.sort((a, b) => {
+            const dateA = new Date(a.updatedAt)
+            const dateB = new Date(b.updatedAt)
+            return dateB - dateA
+          })
           if (data?.length > 0) {
-            setUniqVersionsOne(data)
-            setSelectedVersionOne('')
+            const versions = []
+            data
+              ?.filter(
+                (item) =>
+                  item.id !== selectedVersionTwo?.value &&
+                  item?.projectVersion !== selectedVersionTwo?.label
+              )
+              ?.map((sbom) => {
+                versions.push({
+                  label: sbom?.projectVersion,
+                  value: sbom?.id
+                })
+              })
+            setUniqVersionsOne(versions)
+            setSelectedVersionOne(null)
           } else {
-            setSelectedVersionOne('')
             setUniqVersionsOne([])
+            setSelectedVersionOne(null)
           }
         }
       })
@@ -411,23 +503,20 @@ const Tools = () => {
   // ------------- SBOM 2 --------------
   const [selectedGroupTwo, setSelectedGroupTwo] = useState('')
   const [selectedProdTwo, setSelectedProdTwo] = useState('')
-  const [selectedVersionTwo, setSelectedVersionTwo] = useState('')
-  const [versionNameTwo, setVersionNameTwo] = useState('')
+  const [selectedVersionTwo, setSelectedVersionTwo] = useState(null)
   const [uniqVersionsTwo, setUniqVersionsTwo] = useState([])
   const [productListTwo, setProductListTwo] = useState([])
   const [secondSbomInfo, setSecondSbomInfo] = useState(null)
 
   const onSelectGroupTwo = (e) => {
     setSelectedGroupTwo(e.target.value)
-    setSelectedVersionTwo('')
-    setVersionNameTwo('')
+    setSelectedVersionTwo(null)
     setSelectedProdTwo('')
   }
 
   const onSelectProductTwo = (e) => {
     const { value } = e.target
-    setSelectedVersionTwo('')
-    setVersionNameTwo('')
+    setSelectedVersionTwo(null)
     setSelectedProdTwo(value)
   }
 
@@ -435,7 +524,7 @@ const Tools = () => {
     getSbomData({
       variables: {
         projectId: selectedProdTwo,
-        sbomId: selectedVersionTwo
+        sbomId: selectedVersionTwo?.value
       }
     }).then((res) => {
       if (res?.data) {
@@ -447,8 +536,7 @@ const Tools = () => {
   const onClearTwo = () => {
     setSelectedGroupTwo('')
     setSelectedProdTwo('')
-    setSelectedVersionTwo('')
-    setVersionNameTwo('')
+    setSelectedVersionTwo(null)
     setProductListTwo([])
     setUniqVersionsTwo([])
     setSecondSbomInfo(null)
@@ -469,19 +557,36 @@ const Tools = () => {
   }, [selectedGroupTwo])
 
   useEffect(() => {
-    if (selectedProdTwo !== '' && selectedVersionTwo === '') {
+    if (selectedProdTwo !== '' && selectedVersionTwo === null) {
       getProduct({
         variables: {
           id: selectedProdTwo
         }
       }).then((res) => {
         if (res.data) {
-          const data = res?.data?.project?.sboms
+          const data = [...res?.data?.project?.sboms]?.sort((a, b) => {
+            const dateA = new Date(a.updatedAt)
+            const dateB = new Date(b.updatedAt)
+            return dateB - dateA
+          })
           if (data?.length > 0) {
-            setUniqVersionsTwo(data)
-            setSelectedVersionTwo('')
+            const versions = []
+            data
+              ?.filter(
+                (item) =>
+                  item.id !== selectedVersionOne?.value &&
+                  item?.projectVersion !== selectedVersionOne?.label
+              )
+              ?.map((sbom) => {
+                versions.push({
+                  label: sbom?.projectVersion,
+                  value: sbom?.id
+                })
+              })
+            setUniqVersionsTwo(versions)
+            setSelectedVersionTwo(null)
           } else {
-            setSelectedVersionTwo('')
+            setSelectedVersionTwo(null)
             setUniqVersionsTwo([])
           }
         }
@@ -494,11 +599,12 @@ const Tools = () => {
       getDrift({
         variables: {
           projectId: selectedProdOne,
-          subjectSbomId: selectedVersionOne,
-          targetSbomId: selectedVersionTwo
+          subjectSbomId: selectedVersionOne?.value,
+          targetSbomId: selectedVersionTwo?.value
         }
       }).then((res) => {
         if (res?.data) {
+          setIsLoading(false)
           console.log('dif', res?.data?.sbom?.sbomDrift)
           setDrifts(res?.data?.sbom?.sbomDrift)
         }
@@ -506,13 +612,54 @@ const Tools = () => {
     }
   }, [firstSbomInfo, secondSbomInfo])
 
+  const handleCompare = () => {
+    setIsLoading(true)
+    !firstSbomInfo && onSubmitSbomOne()
+    !secondSbomInfo && onSubmitSbomTwo()
+  }
+
   return (
     <Flex
       flexDirection='column'
       pt={{ base: '120px', md: '74px' }}
+      gap={6}
       pr={2}
       pl={5}
     >
+      {/* HEADER */}
+      <Card p={5}>
+        <Flex
+          alignItems={'flex-start'}
+          gap={5}
+          justifyContent={'space-between'}
+        >
+          <HStack spacing={4} alignItems={'flex-start'}>
+            <Icon
+              as={FaScaleUnbalanced}
+              h={'64px'}
+              w={'64px'}
+              color='blue.300'
+            />
+            <Stack spacing={0}>
+              <Text fontWeight={'semibold'} fontSize={24}>
+                SBOM Comparison
+              </Text>
+              <Text>
+                It refers to the process of comparing SBOMs from different
+                software packages or versions.{' '}
+              </Text>
+            </Stack>
+          </HStack>
+          <Button
+            colorScheme='blue'
+            rightIcon={<FaCodeCompare />}
+            onClick={handleCompare}
+            isDisabled={firstSbomInfo && secondSbomInfo}
+          >
+            Compare
+          </Button>
+        </Flex>
+      </Card>
       {/* SBOM SELECTIONS */}
       <Grid templateColumns='repeat(2, 1fr)' gap={6}>
         {/* SBOM ONE */}
@@ -537,7 +684,6 @@ const Tools = () => {
                   <Tag colorScheme='blue' width={'fit-content'}>
                     {firstSbomInfo?.project?.name}
                   </Tag>
-                  <Text></Text>
                 </Stack>
               ) : (
                 <Heading
@@ -604,16 +750,11 @@ const Tools = () => {
                     id='productOne'
                     value={selectedProdOne}
                     onChange={onSelectProductOne}
-                    textTransform={'capitalize'}
                   >
                     <option value={''}>-- Select --</option>
                     {productListOne?.length > 0 &&
                       envOrderList(productListOne).map((item, index) => (
-                        <option
-                          key={index}
-                          value={item.value}
-                          style={{ textTransform: 'capitalize' }}
-                        >
+                        <option key={index} value={item.value}>
                           {item.label}
                         </option>
                       ))}
@@ -629,48 +770,39 @@ const Tools = () => {
                     Version
                   </FormLabel>
                   {uniqVersionsOne.length > 0 ? (
-                    <Select
-                      name='versionOne'
-                      id='versionOne'
-                      value={selectedVersionOne}
-                      onChange={(e) => {
-                        setSelectedVersionOne(e.target.value)
-                        const version =
-                          e.target.options[e.target.selectedIndex].text
-                        setVersionNameOne(version)
+                    <ReactSelect
+                      styles={{
+                        control: (baseStyles, state) => ({
+                          ...baseStyles,
+                          borderColor: state.isFocused ? 'inherit' : 'inherit',
+                          fontSize: '14px',
+                          padding: '2px 0',
+                          '&:hover': {
+                            borderColor: '#CBD5E0'
+                          }
+                        })
                       }}
-                    >
-                      <option value={''}>-- Select --</option>
-                      {uniqVersionsOne
-                        ?.filter(
-                          (item) =>
-                            item.id !== selectedVersionTwo &&
-                            item?.projectVersion !== versionNameTwo
-                        )
-                        .map((item, index) => (
-                          <option key={index} value={item.id}>
-                            {item?.projectVersion}
-                          </option>
-                        ))}
-                    </Select>
+                      components={{
+                        DropdownIndicator: () => null,
+                        IndicatorSeparator: () => null
+                      }}
+                      value={selectedVersionOne}
+                      onChange={(value) => setSelectedVersionOne(value)}
+                      className='react-select'
+                      isSearchable
+                      type='text'
+                      placeholder='Select versions'
+                      name='versions'
+                      options={uniqVersionsOne}
+                      noOptionsMessage={() => null}
+                    />
                   ) : (
                     <Alert borderRadius={'md'} py={'8px'} status='info'>
                       <AlertIcon />
-                      No version available
+                      <AlertDescription>No version available</AlertDescription>
                     </Alert>
                   )}
                 </FormControl>
-                {/* SUBMIT */}
-                <Button
-                  width={'fit-content'}
-                  colorScheme='blue'
-                  onClick={onSubmitSbomOne}
-                  isDisabled={
-                    selectedProdOne === '' || selectedVersionOne === ''
-                  }
-                >
-                  Submit
-                </Button>
               </Stack>
             )}
           </Card>
@@ -693,7 +825,6 @@ const Tools = () => {
                   <Tag colorScheme='blue' width={'fit-content'}>
                     {secondSbomInfo?.project?.name}
                   </Tag>
-                  <Text></Text>
                 </Stack>
               ) : (
                 <Heading
@@ -760,16 +891,11 @@ const Tools = () => {
                     id='productTwo'
                     value={selectedProdTwo}
                     onChange={onSelectProductTwo}
-                    textTransform={'capitalize'}
                   >
                     <option value={''}>-- Select --</option>
                     {productListTwo?.length > 0 &&
                       envOrderList(productListTwo).map((item, index) => (
-                        <option
-                          key={index}
-                          value={item.value}
-                          style={{ textTransform: 'capitalize' }}
-                        >
+                        <option key={index} value={item.value}>
                           {item.label}
                         </option>
                       ))}
@@ -785,59 +911,54 @@ const Tools = () => {
                     Version
                   </FormLabel>
                   {uniqVersionsTwo.length > 0 ? (
-                    <Select
-                      name='versionTwo'
-                      id='versionTwo'
-                      value={selectedVersionTwo}
-                      onChange={(e) => {
-                        setSelectedVersionTwo(e.target.value)
-                        const version =
-                          e.target.options[e.target.selectedIndex].text
-                        setVersionNameTwo(version)
+                    <ReactSelect
+                      styles={{
+                        control: (baseStyles, state) => ({
+                          ...baseStyles,
+                          borderColor: state.isFocused ? 'inherit' : 'inherit',
+                          fontSize: '14px',
+                          padding: '2px 0',
+                          '&:hover': {
+                            borderColor: '#CBD5E0'
+                          }
+                        })
                       }}
-                    >
-                      <option value={''}>-- Select --</option>
-                      {uniqVersionsTwo
-                        ?.filter(
-                          (item) =>
-                            item.id !== selectedVersionOne &&
-                            item?.projectVersion !== versionNameOne
-                        )
-                        ?.map((item, index) => (
-                          <option key={index} value={item.id}>
-                            {item?.projectVersion}
-                          </option>
-                        ))}
-                    </Select>
+                      components={{
+                        DropdownIndicator: () => null,
+                        IndicatorSeparator: () => null
+                      }}
+                      value={selectedVersionTwo}
+                      onChange={(value) => setSelectedVersionTwo(value)}
+                      className='react-select'
+                      isSearchable
+                      type='text'
+                      placeholder='Select versions'
+                      name='versions'
+                      options={uniqVersionsTwo}
+                      noOptionsMessage={() => null}
+                    />
                   ) : (
                     <Alert borderRadius={'md'} py={'8px'} status='info'>
                       <AlertIcon />
-                      No version available
+                      <AlertDescription>No version available</AlertDescription>
                     </Alert>
                   )}
                 </FormControl>
-                {/* SUBMIT */}
-                <Button
-                  width={'fit-content'}
-                  colorScheme='blue'
-                  onClick={onSubmitSbomTwo}
-                  isDisabled={
-                    selectedProdTwo === '' || selectedVersionTwo === ''
-                  }
-                >
-                  Submit
-                </Button>
               </Stack>
             )}
           </Card>
         </GridItem>
       </Grid>
       {/* SBOM DIFFERENCE */}
-      <Card width='100%' mt={6}>
+      <Card width='100%'>
         <DataTable
           columns={columns}
           data={drifts || []}
           customStyles={customStyles}
+          progressPending={isLoading}
+          subHeader
+          subHeaderComponent={subHeader}
+          progressComponent={<CustomLoader />}
           persistTableHead
           responsive={true}
         />
