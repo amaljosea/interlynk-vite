@@ -30,4 +30,4 @@ jobs:
           syft --source-name 'lynk-app-dash' --source-version ${{ github.ref_name }} --exclude ./public -o cyclonedx-json@1.4 --file lynk-app-dash.cdx.json .
       - name: Upload SBOM
         run: |
-          python3 pylynk.py upload --prod 'lynk-dash-app' --sbom lynk-app-dash.cdx.json --${{ secrets.INTERLYNK_SECURITY_TOKEN }}
+          python3 /tmp/pylynk.py upload --prod 'lynk-dash-app' --sbom lynk-app-dash.cdx.json --${{ secrets.INTERLYNK_SECURITY_TOKEN }}
