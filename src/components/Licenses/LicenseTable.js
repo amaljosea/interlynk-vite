@@ -273,7 +273,7 @@ const LicenseTable = ({ data, refetch }) => {
     {
       id: 'NAME',
       name: 'NAME',
-      width: '250px',
+      width: '21%',
       wrap: true,
       selector: ({ content: { name } }) => {
         return (
@@ -297,7 +297,7 @@ const LicenseTable = ({ data, refetch }) => {
     {
       id: 'SPDX_ID',
       name: 'SPDX ID',
-      width: '250px',
+      width: '15%',
       wrap: true,
       selector: ({ content: { shortId, url } }) => {
         return (
@@ -325,7 +325,7 @@ const LicenseTable = ({ data, refetch }) => {
     {
       id: 'ATTRIBUTION',
       name: 'ATTRIBUTION',
-      width: '180px',
+      width: '11%',
       wrap: true,
       selector: ({ attribution }) => {
         if (!attribution || attribution === 'UNKNOWN') {
@@ -340,7 +340,7 @@ const LicenseTable = ({ data, refetch }) => {
     {
       id: 'COPYLEFT',
       name: 'COPYLEFT',
-      width: '180px',
+      width: '11%',
       wrap: true,
       selector: ({ copyLeft }) => {
         if (!copyLeft || copyLeft === 'UNKNOWN') {
@@ -353,7 +353,7 @@ const LicenseTable = ({ data, refetch }) => {
     {
       id: 'REQUIRES SOURCE CODE',
       name: 'REQUIRES SOURCE CODE',
-      width: '250px',
+      width: '11%',
       wrap: true,
       selector: ({ sourceDistribution }) => {
         if (!sourceDistribution || sourceDistribution === 'UNKNOWN') {
@@ -369,7 +369,7 @@ const LicenseTable = ({ data, refetch }) => {
     {
       id: 'PERMITS MODIFICATIONS',
       name: 'PERMITS MODIFICATIONS',
-      width: '250px',
+      width: '11%',
       wrap: true,
       selector: ({ modifications }) => {
         if (!modifications || modifications === 'UNKNOWN') {
@@ -384,7 +384,7 @@ const LicenseTable = ({ data, refetch }) => {
     {
       id: 'STATUS',
       name: 'STATUS',
-      width: '150px',
+      width: '12%',
       wrap: true,
       sortable: true,
       selector: ({ state }) => {
@@ -415,6 +415,7 @@ const LicenseTable = ({ data, refetch }) => {
     {
       id: 'actions',
       name: 'ACTIONS',
+      width: '8%',
       selector: (row) => {
         return (
           <Menu>
