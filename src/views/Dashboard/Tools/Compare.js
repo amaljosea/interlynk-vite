@@ -829,11 +829,16 @@ const Compare = ({ selectedSboms }) => {
                     isDisabled={selectedSboms?.length > 0}
                     value={selectedProdOne}
                     onChange={onSelectProductOne}
+                    textTransform={'capitalize'}
                   >
                     <option value={''}>-- Select --</option>
                     {productListOne?.length > 0 &&
                       envOrderList(productListOne).map((item, index) => (
-                        <option key={index} value={item.value}>
+                        <option
+                          key={index}
+                          value={item.value}
+                          style={{ textTransform: 'capitalize' }}
+                        >
                           {item.label}
                         </option>
                       ))}
@@ -973,11 +978,16 @@ const Compare = ({ selectedSboms }) => {
                     value={selectedProdTwo}
                     onChange={onSelectProductTwo}
                     isDisabled={selectedSboms?.length > 0}
+                    textTransform={'capitalize'}
                   >
                     <option value={''}>-- Select --</option>
                     {productListTwo?.length > 0 &&
                       envOrderList(productListTwo).map((item, index) => (
-                        <option key={index} value={item.value}>
+                        <option
+                          key={index}
+                          value={item.value}
+                          style={{ textTransform: 'capitalize' }}
+                        >
                           {item.label}
                         </option>
                       ))}
