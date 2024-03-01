@@ -771,3 +771,12 @@ export const areArraysEqual = (arr1, arr2) => {
   // Check if all elements in both arrays are equal
   return arr1.every((element, index) => element === arr2[index])
 }
+
+export const sortByUpdatedAt = (data) => {
+  const sortedData = [...data]?.sort((a, b) => {
+    const dateA = new Date(a.updatedAt)
+    const dateB = new Date(b.updatedAt)
+    return dateB - dateA
+  })
+  return sortedData
+}

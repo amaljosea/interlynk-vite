@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@apollo/client'
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { RepeatIcon } from '@chakra-ui/icons'
 import {
   Flex,
@@ -40,8 +40,15 @@ import { Link, useLocation, useParams } from 'react-router-dom'
 import { timeSince, getFullDateAndTime, customStyles } from 'utils'
 import SbomList from 'views/Dashboard/Products/components/SbomList'
 import Pagination from '../Pagination'
-import { GetVersionsTable, ShareVersionTable } from 'graphQL/Queries'
+import {
+  GetVersionsTable,
+  ShareVersionTable,
+  GetSbomAlternatives
+} from 'graphQL/Queries'
 import ToolsDrawer from 'components/Drawer/ToolsDrawer'
+import { GetSbomDrift } from 'graphQL/Queries'
+import { sortByUpdatedAt } from 'utils'
+import { GetSbomVersions } from 'graphQL/Queries'
 
 const VersionsTable = ({ projectGroup, getVulnData }) => {
   const location = useLocation()
@@ -56,6 +63,10 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
     activeProdTab,
     setActiveSbomTab,
     prodVulnState,
+    setClearSelect,
+    clearSelect,
+    selectedSbom,
+    setSelectedSbom,
     dispatch
   } = useGlobalState()
   const { field, direction } = prodVulnState
@@ -63,16 +74,29 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
 
   const paginationSizes = [25, 50, 100]
   const [totalRows, setTotalRows] = useState(paginationSizes[0])
+  const [isPrevActive, setIsPrevActive] = useState(false)
+  const [isNextActive, setIsNextActive] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [drifts, setDrifts] = useState([])
+
+  const [getAlternatives, { data: sbomAlts }] = useLazyQuery(
+    GetSbomAlternatives,
+    { fetchPolicy: 'network-only' }
+  )
+  const [getVersions, { data: allVersions }] = useLazyQuery(GetSbomVersions, {
+    fetchPolicy: 'network-only'
+  })
+  const [getDrift, { data: driftData }] = useLazyQuery(GetSbomDrift, {
+    fetchPolicy: 'network-only'
+  })
 
   const { data, refetch, error } = useQuery(
     signedUrlParams ? ShareVersionTable : GetVersionsTable,
     {
-      skip: activeProdTab === 0 ? false : true,
+      skip: activeProdTab === 0 && !isToolOpen ? false : true,
       fetchPolicy: 'network-only',
-      variables: {
-        id: activeProd,
-        first: totalRows
-      }
+      variables: { id: activeProd, first: totalRows },
+      onCompleted: () => setClearSelect(false)
     }
   )
 
@@ -81,10 +105,6 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
     : data?.project?.sbomVersions
 
   //This part is needed for the pagination to work. (Modify with caution)
-
-  const [isPrevActive, setIsPrevActive] = useState(false)
-  const [isNextActive, setIsNextActive] = useState(false)
-  const [selectedSbom, setSelectedSbom] = useState([])
 
   useEffect(() => {
     if (versions) {
@@ -224,8 +244,15 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
     })
   }
 
+  const handleListSbom = (row) => {
+    getAlternatives({ variables: { projectId: activeProd, sbomId: row?.id } })
+    setActiveRow(row)
+    onListOpen()
+  }
+
   // COLUMNS
   const columns = [
+    // VERSION
     {
       id: 'VERSION',
       name: 'VERSION',
@@ -424,12 +451,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
             />
             <Portal>
               <MenuList fontSize={16}>
-                <MenuItem
-                  onClick={() => {
-                    setActiveRow(row)
-                    onListOpen()
-                  }}
-                >
+                <MenuItem onClick={() => handleListSbom(row)}>
                   List SBOM
                 </MenuItem>
                 <MenuItem
@@ -489,17 +511,61 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
     onSbomOpen()
   }
 
+  const handleChange = (state) => {
+    setClearSelect(false)
+    setSelectedSbom(state?.selectedRows)
+  }
+
+  const handleCompare = () => {
+    setLoading(true)
+    if (selectedSbom?.length === 2) {
+      getVersions({ variables: { id: activeProd } }).then(() => {
+        const versions = sortByUpdatedAt(selectedSbom)
+        getDrift({
+          variables: {
+            projectId: activeProd,
+            subjectSbomId: versions[0]?.id,
+            targetSbomId: versions[1]?.id
+          }
+        }).then((res) => {
+          if (res?.data) {
+            setDrifts(res?.data?.sbom?.sbomDrift)
+            setLoading(false)
+            onToolOpen()
+          }
+        })
+      })
+    }
+  }
+
   const subHeaderComponent = useMemo(() => {
     return (
-      <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
+      <Flex
+        width={'100%'}
+        alignItems={'center'}
+        justifyContent={'space-between'}
+      >
+        <Stack>
+          {selectedSbom?.length === 1 && (
+            <Text color={'red.500'}>
+              ** Select one more version to enable comparison
+            </Text>
+          )}
+          {selectedSbom?.length > 2 && (
+            <Text color={'red.500'}>
+              ** Comparison is permitted with only two versions
+            </Text>
+          )}
+        </Stack>
         <Stack direction={'row'} spacing={2} alignItems={'center'}>
           {/* COMPARE VERSION */}
           {selectedSbom?.length === 2 && (
-            <Tooltip label='Compare'>
+            <Tooltip label='Compare Version'>
               <IconButton
-                onClick={onToolOpen}
+                onClick={handleCompare}
                 colorScheme='blue'
                 icon={<FaCodeCompare />}
+                isLoading={loading}
               ></IconButton>
             </Tooltip>
           )}
@@ -524,12 +590,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
         </Stack>
       </Flex>
     )
-  }, [handleRefresh])
-
-  const handleChange = (state) => {
-    console.log(state)
-    setSelectedSbom(state?.selectedRows)
-  }
+  }, [handleRefresh, handleCompare])
 
   const dataTableProps = {
     columns: columns,
@@ -544,6 +605,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
     responsive: true,
     persistTableHead: true,
     selectableRows: true,
+    clearSelectedRows: clearSelect === true,
     onSelectedRowsChange: handleChange
   }
 
@@ -556,7 +618,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
 
   return (
     <>
-      <Flex flexDir={'column'} width={'100%'}>
+      <Flex flexDir={'column'} width={'100%'} className='version_table'>
         <DataTable {...dataTableProps} />
         {versions?.pageInfo && (
           <Pagination
@@ -622,7 +684,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
       {/* SBOM LIST */}
       {isListOpen && versions && (
         <SbomList
-          data={activeRow}
+          data={sbomAlts?.sbom}
           sboms={versions}
           isOpen={isListOpen}
           onClose={onListClose}
@@ -640,11 +702,15 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
         />
       )}
 
-      {isToolOpen && (
+      {isToolOpen && allVersions && (
         <ToolsDrawer
-          data={selectedSbom}
+          versionList={allVersions?.project?.sbomVersions}
+          diffs={driftData}
+          data={drifts}
           isOpen={isToolOpen}
           onClose={onToolClose}
+          setData={setDrifts}
+          selectedSbom={selectedSbom}
         />
       )}
     </>

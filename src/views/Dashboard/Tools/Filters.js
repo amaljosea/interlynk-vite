@@ -15,6 +15,7 @@ const ToolsFilterMenu = ({ data, setData }) => {
   const [components, setComponents] = useState([])
 
   const componentList = data?.map((item) => item?.targetComponent?.name || item?.subjectComponent?.name)
+  const statusList = ['all', 'added', 'changed', 'removed']
 
   const onFilterStatus = (value) => {
     if (value.includes('all') || value?.length === 0) {
@@ -33,8 +34,7 @@ const ToolsFilterMenu = ({ data, setData }) => {
       setData(data)
     } else {
       setComponents(value)
-      const filterData = data?.filter((item) =>
-        value?.includes(
+      const filterData = data?.filter((item) => value?.includes(
           item?.targetComponent?.name || item?.subjectComponent?.name
         )
       )
@@ -50,18 +50,9 @@ const ToolsFilterMenu = ({ data, setData }) => {
           {diffs?.length !== 0 && !diffs.includes('all') && <CheckMark />}
           <MenuHeading title={'Status'} />
           <MenuList>
-            <MenuOptionGroup
-              type='checkbox'
-              value={diffs}
-              onChange={onFilterStatus}
-            >
-              {['all', 'added', 'changed', 'removed']?.map((item, index) => (
-                <MenuItemOption
-                  key={index}
-                  value={item}
-                  fontSize={'sm'}
-                  textTransform={'capitalize'}
-                >
+            <MenuOptionGroup type='checkbox' value={diffs} onChange={onFilterStatus}>
+              {statusList?.map((item, index) => (
+                <MenuItemOption key={index} value={item} fontSize={'sm'} textTransform={'capitalize'}>
                   {item}
                 </MenuItemOption>
               ))}
@@ -77,21 +68,10 @@ const ToolsFilterMenu = ({ data, setData }) => {
           )}
           <MenuHeading title={'Components'} />
           <MenuList width={'300px'} minH={'auto'} maxH={'400px'} overflowY={'scroll'}>
-            <MenuOptionGroup
-              type='checkbox'
-              value={components}
-              onChange={onFilterComponent}
-            >
-              <MenuItemOption fontSize={'sm'} value='all'>
-                All
-              </MenuItemOption>
+            <MenuOptionGroup type='checkbox' value={components} onChange={onFilterComponent}>
+              <MenuItemOption fontSize={'sm'} value='all'>All</MenuItemOption>
               {componentList?.map((item, index) => (
-                <MenuItemOption
-                  key={index}
-                  value={item}
-                  fontSize={'sm'}
-                  textTransform={'capitalize'}
-                >
+                <MenuItemOption key={index} value={item} fontSize={'sm'} textTransform={'capitalize'}>
                   {item}
                 </MenuItemOption>
               ))}

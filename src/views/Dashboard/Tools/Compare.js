@@ -13,203 +13,23 @@ import {
   HStack,
   Heading,
   Icon,
-  Link,
+  IconButton,
   Select,
   Stack,
-  Table,
-  TableContainer,
   Tag,
-  TagLabel,
-  Tbody,
-  Td,
-  Text,
-  Th,
-  Thead,
-  Tr
+  Text
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
-import CustomLoader from 'components/CustomLoader'
-import {
-  GetSbomDrift,
-  GetProductsForSbomDrift,
-  GetProductData,
-  GetProject
-} from 'graphQL/Queries'
+import { GetSbomDrift, GetProductsForSbomDrift, GetProductData, GetProject } from 'graphQL/Queries'
+import { FaCodeCompare, FaScaleUnbalanced, FaX } from 'react-icons/fa6'
 import { useGlobalState } from 'hooks/useGlobalState'
-import React, { useEffect, useMemo, useState } from 'react'
-import DataTable from 'react-data-table-component'
-import { FaTimes } from 'react-icons/fa'
-import {
-  FaCodeCompare,
-  FaPlus,
-  FaRecycle,
-  FaScaleUnbalanced,
-  FaTrash
-} from 'react-icons/fa6'
+import { envOrderList, sortByUpdatedAt } from 'utils'
+import DiffTable from 'components/Tables/DiffTable'
+import React, { useEffect, useState } from 'react'
+import SbomInfo from 'components/SbomInfo'
 import ReactSelect from 'react-select'
-import { customStyles, getFullDateAndTime, envOrderList } from 'utils'
-import ToolsFilterMenu from './Filters'
-import { useLocation } from 'react-router-dom'
-
-const SbomInfo = ({ data }) => {
-  return (
-    <TableContainer overflowY={'scroll'}>
-      <Table variant='simple'>
-        <Thead>
-          <Tr>
-            <Th></Th>
-            <Th></Th>
-          </Tr>
-        </Thead>
-        <Tbody fontSize={'sm'}>
-          {/* CREATION TOOLS */}
-          <Tr>
-            <Td pl={0}>Creation Tool</Td>
-            <Td>
-              <Flex
-                flexDirection={'row'}
-                alignItems={'flex-start'}
-                flexWrap={'wrap'}
-                gap={2.5}
-              >
-                {data?.tools &&
-                  data?.tools.map((item, index) => (
-                    <Tag
-                      size={'md'}
-                      key={index}
-                      variant='subtle'
-                      colorScheme='teal'
-                      width={'fit-content'}
-                    >
-                      <TagLabel>
-                        {item.name} - {item.version}
-                      </TagLabel>
-                    </Tag>
-                  ))}
-              </Flex>
-            </Td>
-          </Tr>
-          {/* CREATED AT */}
-          <Tr>
-            <Td pl={0}>Created At</Td>
-            <Td>{getFullDateAndTime(data?.creationAt)}</Td>
-          </Tr>
-          {/* AUTHOR */}
-          <Tr>
-            <Td pl={0}>Author</Td>
-            <Td>
-              <Stack spacing={2} direction={'column'}>
-                {data?.authors.length > 0 &&
-                  data?.authors.map((item, index) => (
-                    <Tag
-                      size={'md'}
-                      key={index}
-                      variant='subtle'
-                      colorScheme='blue'
-                      width={'fit-content'}
-                    >
-                      <TagLabel>
-                        {item.name} - {item.email}
-                      </TagLabel>
-                    </Tag>
-                  ))}
-              </Stack>
-            </Td>
-          </Tr>
-          {/* SUPPLOER */}
-          <Tr>
-            <Td pl={0}>Supplier</Td>
-            <Td>
-              <HStack spacing={4}>
-                {data?.suppliers?.length > 0 &&
-                  data?.suppliers.map((item, index) => (
-                    <Tag
-                      size={'md'}
-                      key={index}
-                      variant='subtle'
-                      colorScheme='orange'
-                    >
-                      <TagLabel>
-                        {item.contactName}
-                        {item.contactEmail && ` (${item.contactEmail})`}
-                        {item.url ? (
-                          <Link
-                            href={
-                              item?.url?.startsWith('http')
-                                ? item.url
-                                : `http://${item.url}`
-                            }
-                            isExternal
-                          >
-                            {' '}
-                            {item.name}
-                          </Link>
-                        ) : (
-                          ` ${item.name}`
-                        )}
-                      </TagLabel>
-                    </Tag>
-                  ))}
-              </HStack>
-            </Td>
-          </Tr>
-          {/* DATA LICENSE */}
-          <Tr>
-            <Td pl={0}>Data License</Td>
-            <Td>
-              <Flex alignItems={'center'} gap={2} flexWrap={'wrap'}>
-                {/* SPDX */}
-                {data.licenses?.length > 0 &&
-                  data.licenses?.map((item, index) => (
-                    <Tag
-                      size={'md'}
-                      key={index}
-                      variant='subtle'
-                      colorScheme='green'
-                      width={'fit-content'}
-                    >
-                      <TagLabel>{item}</TagLabel>
-                    </Tag>
-                  ))}
-                {/* EXPRESSION */}
-                {data.licensesExp && data.licensesExp !== '' && (
-                  <Tag
-                    size={'md'}
-                    variant='subtle'
-                    colorScheme='green'
-                    width={'fit-content'}
-                  >
-                    <TagLabel>{data.licensesExp}</TagLabel>
-                  </Tag>
-                )}
-                {/* CUSTOM */}
-                {data.licensesCustom?.length > 0 &&
-                  data.licensesCustom.map((item, index) => (
-                    <Tag
-                      size={'md'}
-                      key={index}
-                      variant='subtle'
-                      colorScheme='green'
-                      width={'fit-content'}
-                    >
-                      <TagLabel>{item}</TagLabel>
-                    </Tag>
-                  ))}
-              </Flex>
-            </Td>
-          </Tr>
-        </Tbody>
-      </Table>
-    </TableContainer>
-  )
-}
 
 const Compare = ({ selectedSboms }) => {
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const productId = queryParams.get('id')
-  const activeEnv = localStorage.getItem('activeEnv')
-
   const { prodState } = useGlobalState()
   const { field, direction } = prodState
 
@@ -217,199 +37,12 @@ const Compare = ({ selectedSboms }) => {
   const [isLoading, setIsLoading] = useState(false)
 
   const [getProduct] = useLazyQuery(GetProject, { fetchPolicy: 'network-only' })
-  const [getSbomData] = useLazyQuery(GetProductData, {
-    fetchPolicy: 'network-only'
-  })
-  const [getDrift, { data: driftData }] = useLazyQuery(GetSbomDrift, {
-    fetchPolicy: 'network-only'
-  })
+  const [getSbomData] = useLazyQuery(GetProductData, {fetchPolicy: 'network-only'})
+  const [getDrift, { data: driftData }] = useLazyQuery(GetSbomDrift, {fetchPolicy: 'network-only'})
   const { data } = useQuery(GetProductsForSbomDrift, {
     fetchPolicy: 'network-only',
-    variables: {
-      enabled: true,
-      field: field,
-      direction: direction
-    }
+    variables: {enabled: true,field: field,direction: direction}
   })
-
-  // COLUMNS
-  const columns = [
-    {
-      id: 'DIFFERENCE',
-      name: 'DIFFERENCE',
-      selector: (row) => {
-        const { diffType } = row
-        return (
-          <Badge
-            width={24}
-            p={2}
-            textTransform={'capitalize'}
-            textAlign={'center'}
-            colorScheme={
-              diffType === 'added'
-                ? 'green'
-                : diffType === 'removed'
-                  ? 'red'
-                  : 'blue'
-            }
-            leftIcon={
-              diffType === 'added' ? (
-                <FaPlus />
-              ) : diffType === 'removed' ? (
-                <FaTrash />
-              ) : (
-                <FaRecycle />
-              )
-            }
-          >
-            {diffType}
-          </Badge>
-        )
-      },
-      wrap: true,
-      width: '200px'
-    },
-    {
-      id: 'NAME',
-      name: 'NAME',
-      selector: (row) => (
-        <Text>{row?.subjectComponent?.name || row?.targetComponent?.name}</Text>
-      ),
-      width: '250px',
-      wrap: true
-    },
-    {
-      id: 'VERSION',
-      name: 'VERSION',
-      selector: (row) => {
-        const { subjectComponent, targetComponent, diffTags } = row
-        if (diffTags?.includes('version')) {
-          return (
-            <Flex my={4} flexWrap={'wrap'} alignItems={'center'} gap={2}>
-              <Tag py={1.5} colorScheme='red'>
-                {targetComponent?.version}
-              </Tag>
-              <Tag py={1.5} colorScheme='green'>
-                {subjectComponent?.version}
-              </Tag>
-            </Flex>
-          )
-        } else {
-          return (
-            <Tag py={1.5}>
-              {subjectComponent?.version || targetComponent?.version}
-            </Tag>
-          )
-        }
-      },
-      width: '200px',
-      wrap: true
-    },
-    {
-      id: 'LICENSE EXP',
-      name: 'LICENSE EXP',
-      selector: (row) => {
-        const { subjectComponent, targetComponent, diffTags } = row
-        if (diffTags?.includes('license_exp')) {
-          return (
-            <Flex my={4} flexWrap={'wrap'} alignItems={'center'} gap={2}>
-              <Tag py={1.5} colorScheme='red'>
-                {targetComponent?.licensesExp}
-              </Tag>
-              <Tag py={1.5} colorScheme='green'>
-                {subjectComponent?.licensesExp}
-              </Tag>
-            </Flex>
-          )
-        } else {
-          return (
-            <Tag my={4} py={1.5}>
-              {subjectComponent?.licensesExp ||
-                targetComponent?.licensesExp ||
-                '-'}
-            </Tag>
-          )
-        }
-      },
-      width: '220px',
-      wrap: true
-    },
-    {
-      id: 'PURL',
-      name: 'PURL',
-      selector: (row) => {
-        const { subjectComponent, targetComponent, diffTags } = row
-        if (diffTags?.includes('purl')) {
-          return (
-            <Flex my={4} flexWrap={'wrap'} alignItems={'center'} gap={2}>
-              <Tag py={1.5} colorScheme='red'>
-                {targetComponent?.purl || '-'}
-              </Tag>
-              <Tag py={1.5} colorScheme='green'>
-                {subjectComponent?.purl || '-'}
-              </Tag>
-            </Flex>
-          )
-        } else {
-          return (
-            <Tag my={4} py={1.5}>
-              {subjectComponent?.purl || targetComponent?.purl || '-'}
-            </Tag>
-          )
-        }
-      },
-      width: '360px',
-      wrap: true
-    },
-    {
-      id: 'CPE',
-      name: 'CPE',
-      selector: (row) => {
-        const { subjectComponent, targetComponent, diffTags } = row
-        if (diffTags?.includes('cpe')) {
-          return (
-            <Flex my={4} flexWrap={'wrap'} alignItems={'center'} gap={2}>
-              <Tag py={1.5} colorScheme='red'>
-                {targetComponent?.cpe?.length > 0 && targetComponent?.cpe[0]}
-              </Tag>
-              <Tag py={1.5} colorScheme='green'>
-                {subjectComponent?.cpe?.length > 0 && subjectComponent?.cpe[0]}
-              </Tag>
-            </Flex>
-          )
-        } else {
-          return (
-            <Tag py={1.5}>
-              {(targetComponent?.cpe?.length > 0 && targetComponent?.cpe[0]) ||
-                (subjectComponent?.cpe?.length > 0 &&
-                  subjectComponent?.cpe[0]) ||
-                '-'}
-            </Tag>
-          )
-        }
-      },
-      width: '250px',
-      wrap: true
-    }
-  ]
-
-  // SUB HEADER
-  const subHeader = useMemo(() => {
-    return (
-      <Flex
-        width={'100%'}
-        alignItems={'center'}
-        justifyContent={'flex-start'}
-        mb={4}
-        px={4}
-      >
-        <ToolsFilterMenu
-          data={driftData?.sbom?.sbomDrift}
-          setData={setDrifts}
-        />
-      </Flex>
-    )
-  }, [drifts, setDrifts])
 
   // -------------- SBOM 1 --------------
   const [selectedGroupOne, setSelectedGroupOne] = useState('')
@@ -421,14 +54,16 @@ const Compare = ({ selectedSboms }) => {
 
   const onSelectGroupOne = (e) => {
     setSelectedGroupOne(e.target.value)
-    setSelectedVersionOne(null)
+    setProductListOne([])
     setSelectedProdOne('')
+    setUniqVersionsOne([])
+    setSelectedVersionOne(null)
   }
 
   const onSelectProductOne = (e) => {
-    const { value } = e.target
+    setSelectedProdOne(e.target.value)
+    setUniqVersionsOne([])
     setSelectedVersionOne(null)
-    setSelectedProdOne(value)
   }
 
   const onSubmitSbomOne = () => {
@@ -448,11 +83,6 @@ const Compare = ({ selectedSboms }) => {
   }
 
   const onClearOne = () => {
-    setSelectedGroupOne('')
-    setSelectedProdOne('')
-    setSelectedVersionOne(null)
-    setProductListOne([])
-    setUniqVersionsOne([])
     setFirstSbomInfo(null)
     setDrifts([])
   }
@@ -478,18 +108,12 @@ const Compare = ({ selectedSboms }) => {
         }
       }).then((res) => {
         if (res.data) {
-          const data = [...res?.data?.project?.sboms]?.sort((a, b) => {
-            const dateA = new Date(a.updatedAt)
-            const dateB = new Date(b.updatedAt)
-            return dateB - dateA
-          })
+          const data = sortByUpdatedAt(res?.data?.project?.sboms)
           if (data?.length > 0) {
             const versions = []
             data
               ?.filter(
-                (item) =>
-                  item.id !== selectedVersionTwo?.value &&
-                  item?.projectVersion !== selectedVersionTwo?.label
+                (item) => item?.projectVersion !== selectedVersionTwo?.label
               )
               ?.map((sbom) => {
                 versions.push({
@@ -518,14 +142,16 @@ const Compare = ({ selectedSboms }) => {
 
   const onSelectGroupTwo = (e) => {
     setSelectedGroupTwo(e.target.value)
-    setSelectedVersionTwo(null)
+    setProductListTwo([])
     setSelectedProdTwo('')
+    setUniqVersionsTwo([])
+    setSelectedVersionTwo(null)
   }
 
   const onSelectProductTwo = (e) => {
-    const { value } = e.target
+    setSelectedProdTwo(e.target.value)
+    setUniqVersionsTwo([])
     setSelectedVersionTwo(null)
-    setSelectedProdTwo(value)
   }
 
   const onSubmitSbomTwo = () => {
@@ -544,11 +170,6 @@ const Compare = ({ selectedSboms }) => {
   }
 
   const onClearTwo = () => {
-    setSelectedGroupTwo('')
-    setSelectedProdTwo('')
-    setSelectedVersionTwo(null)
-    setProductListTwo([])
-    setUniqVersionsTwo([])
     setSecondSbomInfo(null)
     setDrifts([])
   }
@@ -574,18 +195,12 @@ const Compare = ({ selectedSboms }) => {
         }
       }).then((res) => {
         if (res.data) {
-          const data = [...res?.data?.project?.sboms]?.sort((a, b) => {
-            const dateA = new Date(a.updatedAt)
-            const dateB = new Date(b.updatedAt)
-            return dateB - dateA
-          })
+          const data = sortByUpdatedAt(res?.data?.project?.sboms)
           if (data?.length > 0) {
             const versions = []
             data
               ?.filter(
-                (item) =>
-                  item.id !== selectedVersionOne?.value &&
-                  item?.projectVersion !== selectedVersionOne?.label
+                (item) => item?.projectVersion !== selectedVersionOne?.label
               )
               ?.map((sbom) => {
                 versions.push({
@@ -628,158 +243,46 @@ const Compare = ({ selectedSboms }) => {
     !secondSbomInfo && onSubmitSbomTwo()
   }
 
-  const sortByUpdatedAt = (data) => {
-    const sortedData = [...data]?.sort((a, b) => {
-      const dateA = new Date(a.updatedAt)
-      const dateB = new Date(b.updatedAt)
-      return dateB - dateA
-    })
-    return sortedData
-  }
-
-  const filterSbom = (data, activeVerion) => {
-    const versionList = []
-    data
-      ?.filter(
-        (item) =>
-          item.id !== activeVerion?.id &&
-          item?.projectVersion !== activeVerion?.projectVersion
-      )
-      ?.map((sbom) => {
-        versionList.push({
-          label: sbom?.projectVersion,
-          value: sbom?.id
-        })
-      })
-    return versionList
-  }
-
-  useEffect(() => {
-    if (productId) {
-      setSelectedGroupOne(productId)
-      setSelectedGroupTwo(productId)
-      const activeGroup = data?.organization?.projectGroups?.nodes.find(
-        (item) => item.id === productId
-      )
-      const result = activeGroup?.projects?.map((option) => ({
-        value: option.id,
-        label: option.name
-      }))
-      setProductListOne(result)
-      setProductListTwo(result)
-      setSelectedProdOne(activeEnv)
-      setSelectedProdTwo(activeEnv)
-      getProduct({
-        variables: {
-          id: activeEnv
-        }
-      }).then((res) => {
-        if (res.data) {
-          const activeSboms = sortByUpdatedAt(selectedSboms)
-          console.log('activeSboms', activeSboms)
-          const versions = sortByUpdatedAt(res?.data?.project?.sboms)
-          if (versions?.length > 0) {
-            const versionsOne = filterSbom(versions, activeSboms[1])
-            console.log('versionsOne', versionsOne)
-            const versionsTwo = filterSbom(versions, activeSboms[0])
-            console.log('versionsTwo', versionsTwo)
-            setUniqVersionsOne(versionsOne)
-            setUniqVersionsTwo(versionsTwo)
-            setSelectedVersionOne({
-              value: activeSboms[0]?.id,
-              label: activeSboms[0]?.projectVersion
-            })
-            setSelectedVersionTwo({
-              value: activeSboms[1]?.id,
-              label: activeSboms[1]?.projectVersion
-            })
-          }
-        }
-      })
-    }
-  }, [productId, data])
-
   return (
     <>
       {/* HEADER */}
       <Card p={5}>
-        <Flex
-          alignItems={'flex-start'}
-          gap={5}
-          justifyContent={'space-between'}
-        >
+        <Flex alignItems={'flex-start'} gap={5} justifyContent={'space-between'}>
           <HStack spacing={4} alignItems={'flex-start'}>
-            <Icon
-              as={FaScaleUnbalanced}
-              h={'64px'}
-              w={'64px'}
-              color='blue.300'
-            />
+            <Icon as={FaScaleUnbalanced} h={'64px'} w={'64px'} color='blue.300' />
             <Stack spacing={0}>
-              <Text fontWeight={'semibold'} fontSize={24}>
-                SBOM Comparison
-              </Text>
-              <Text>
-                It refers to the process of comparing SBOMs from different
-                software packages or versions.{' '}
-              </Text>
+              <Text fontWeight={'semibold'} fontSize={24}>SBOM Comparison</Text>
+              <Text>It refers to the process of comparing SBOMs from different software packages or versions</Text>
             </Stack>
           </HStack>
-          {(!firstSbomInfo || !secondSbomInfo) && (
-            <Button
-              colorScheme='blue'
-              rightIcon={<FaCodeCompare />}
-              onClick={handleCompare}
-              isDisabled={!selectedVersionOne || !selectedVersionTwo}
-            >
-              Compare
-            </Button>
-          )}
         </Flex>
       </Card>
       {/* SBOM SELECTIONS */}
       <Grid templateColumns='repeat(2, 1fr)' gap={6}>
         {/* SBOM ONE */}
         <GridItem w='100%'>
-          <Card p={10} h='450px' overflowY='scroll'>
-            <Flex
-              alignItems={'flex-start'}
-              flexWrap={'wrap'}
-              justifyContent={'space-between'}
-            >
+          <Card p={8} h='450px' overflowY='scroll'>
+            <Flex alignItems={'flex-start'} flexWrap={'wrap'} justifyContent={'space-between'}>
               {firstSbomInfo ? (
                 <Stack>
-                  <Heading
-                    fontWeight={'semibold'}
-                    color={'#333'}
-                    fontFamily={'inherit'}
-                    size='md'
-                  >
-                    {firstSbomInfo?.project?.projectGroup?.name} :{' '}
-                    {firstSbomInfo?.projectVersion}
-                  </Heading>
-                  <Tag colorScheme='blue' width={'fit-content'}>
+                  <Flex alignItems={'flex-end'} gap={1}>
+                    <Heading fontWeight={'semibold'} color={'#333'} fontFamily={'inherit'} size='md'>
+                      {firstSbomInfo?.project?.projectGroup?.name} :{' '}
+                      {firstSbomInfo?.projectVersion}
+                    </Heading>
+                    <Badge px={1} width={'fit-content'}>Primary</Badge>
+                  </Flex>
+                  <Tag colorScheme='blue' width={'fit-content'} textTransform={'capitalize'}>
                     {firstSbomInfo?.project?.name}
                   </Tag>
                 </Stack>
               ) : (
-                <Heading
-                  fontWeight={'semibold'}
-                  fontFamily={'inherit'}
-                  size='md'
-                >
+                <Heading fontWeight={'semibold'} fontFamily={'inherit'} size='md'>
                   Select First SBOM
                 </Heading>
               )}
               {firstSbomInfo && !selectedSboms && (
-                <Button
-                  leftIcon={<FaTimes />}
-                  size='sm'
-                  colorScheme={'red'}
-                  onClick={onClearOne}
-                >
-                  Clear
-                </Button>
+                <IconButton icon={<FaX />} size='sm' colorScheme='red' onClick={onClearOne}/>
               )}
             </Flex>
             {firstSbomInfo ? (
@@ -789,56 +292,27 @@ const Compare = ({ selectedSboms }) => {
                 {/* PROJECT GROUPS */}
                 {data?.organization?.projectGroups?.nodes?.length > 0 && (
                   <FormControl fontSize={'sm'}>
-                    <FormLabel
-                      htmlFor='groupOne'
-                      fontSize='md'
-                      color='gray.600'
-                    >
+                    <FormLabel htmlFor='groupOne' fontSize='md' color='gray.600'>
                       Product
                     </FormLabel>
-                    <Select
-                      name='groupOne'
-                      id='groupOne'
-                      isDisabled={selectedSboms?.length > 0}
-                      value={selectedGroupOne}
-                      onChange={onSelectGroupOne}
-                    >
+                    <Select name='groupOne' id='groupOne' isDisabled={selectedSboms?.length > 0} value={selectedGroupOne} onChange={onSelectGroupOne}>
                       <option value=''>-- Select --</option>
                       {data?.organization?.projectGroups?.nodes?.map(
-                        (item, index) => (
-                          <option key={index} value={item.id}>
-                            {item.name}
-                          </option>
-                        )
+                        (item, index) => <option key={index} value={item.id}>{item.name}</option>
                       )}
                     </Select>
                   </FormControl>
                 )}
                 {/* ENVIRONMENT */}
                 <FormControl fontSize={'sm'}>
-                  <FormLabel
-                    htmlFor='productOne'
-                    fontSize='md'
-                    color='gray.600'
-                  >
+                  <FormLabel htmlFor='productOne' fontSize='md' color='gray.600'>
                     Environment
                   </FormLabel>
-                  <Select
-                    name='productOne'
-                    id='productOne'
-                    isDisabled={selectedSboms?.length > 0}
-                    value={selectedProdOne}
-                    onChange={onSelectProductOne}
-                    textTransform={'capitalize'}
-                  >
+                  <Select name='productOne' id='productOne' isDisabled={selectedSboms?.length > 0} value={selectedProdOne} onChange={onSelectProductOne} textTransform={'capitalize'}>
                     <option value={''}>-- Select --</option>
                     {productListOne?.length > 0 &&
                       envOrderList(productListOne).map((item, index) => (
-                        <option
-                          key={index}
-                          value={item.value}
-                          style={{ textTransform: 'capitalize' }}
-                        >
+                        <option key={index} value={item.value} style={{ textTransform: 'capitalize' }}>
                           {item.label}
                         </option>
                       ))}
@@ -846,11 +320,7 @@ const Compare = ({ selectedSboms }) => {
                 </FormControl>
                 {/* VERSION */}
                 <FormControl fontSize={'sm'}>
-                  <FormLabel
-                    htmlFor='versionOne'
-                    fontSize='md'
-                    color='gray.600'
-                  >
+                  <FormLabel htmlFor='versionOne' fontSize='md' color='gray.600'>
                     Version
                   </FormLabel>
                   {uniqVersionsOne.length > 0 ? (
@@ -894,41 +364,25 @@ const Compare = ({ selectedSboms }) => {
         </GridItem>
         {/* SBOM TWO */}
         <GridItem w='100%'>
-          <Card p={10} h='450px' overflowY='scroll'>
+          <Card p={8} h='450px' overflowY='scroll'>
             <Flex alignItems={'flex-start'} justifyContent={'space-between'}>
               {secondSbomInfo ? (
                 <Stack>
-                  <Heading
-                    fontWeight={'semibold'}
-                    color={'#333'}
-                    fontFamily={'inherit'}
-                    size='md'
-                  >
+                  <Heading fontWeight={'semibold'} color={'#333'} fontFamily={'inherit'} size='md'>
                     {secondSbomInfo?.project?.projectGroup?.name} :{' '}
                     {secondSbomInfo?.projectVersion}
                   </Heading>
-                  <Tag colorScheme='blue' width={'fit-content'}>
+                  <Tag colorScheme='blue' width={'fit-content'} textTransform={'capitalize'}>
                     {secondSbomInfo?.project?.name}
                   </Tag>
                 </Stack>
               ) : (
-                <Heading
-                  fontWeight={'semibold'}
-                  fontFamily={'inherit'}
-                  size='md'
-                >
+                <Heading fontWeight={'semibold'} fontFamily={'inherit'} size='md'>
                   Select Second SBOM
                 </Heading>
               )}
               {secondSbomInfo && !selectedSboms && (
-                <Button
-                  leftIcon={<FaTimes />}
-                  size='sm'
-                  colorScheme='red'
-                  onClick={onClearTwo}
-                >
-                  Clear
-                </Button>
+                <IconButton icon={<FaX />} size='sm' colorScheme='red' onClick={onClearTwo}/>
               )}
             </Flex>
             {secondSbomInfo ? (
@@ -938,56 +392,27 @@ const Compare = ({ selectedSboms }) => {
                 {/* PROJECT GROUPS */}
                 {data?.organization?.projectGroups?.nodes?.length > 0 && (
                   <FormControl fontSize={'sm'}>
-                    <FormLabel
-                      htmlFor='groupTwo'
-                      fontSize='md'
-                      color='gray.600'
-                    >
+                    <FormLabel htmlFor='groupTwo' fontSize='md' color='gray.600'>
                       Product
                     </FormLabel>
-                    <Select
-                      name='groupTwo'
-                      id='groupTwo'
-                      isDisabled={selectedSboms?.length > 0}
-                      value={selectedGroupTwo}
-                      onChange={onSelectGroupTwo}
-                    >
+                    <Select name='groupTwo' id='groupTwo' isDisabled={selectedVersionOne === null} value={selectedGroupTwo} onChange={onSelectGroupTwo}>
                       <option value=''>-- Select --</option>
                       {data?.organization?.projectGroups?.nodes?.map(
-                        (item, index) => (
-                          <option key={index} value={item.id}>
-                            {item.name}
-                          </option>
-                        )
+                        (item, index) => <option key={index} value={item.id}>{item.name}</option>
                       )}
                     </Select>
                   </FormControl>
                 )}
                 {/* ENVIRONMENT */}
                 <FormControl fontSize={'sm'}>
-                  <FormLabel
-                    htmlFor='productTwo'
-                    fontSize='md'
-                    color='gray.600'
-                  >
+                  <FormLabel htmlFor='productTwo' fontSize='md' color='gray.600'>
                     Environment
                   </FormLabel>
-                  <Select
-                    name='productTwo'
-                    id='productTwo'
-                    value={selectedProdTwo}
-                    onChange={onSelectProductTwo}
-                    isDisabled={selectedSboms?.length > 0}
-                    textTransform={'capitalize'}
-                  >
+                  <Select name='productTwo' id='productTwo' value={selectedProdTwo} onChange={onSelectProductTwo} isDisabled={selectedVersionOne === null} textTransform={'capitalize'}>
                     <option value={''}>-- Select --</option>
                     {productListTwo?.length > 0 &&
                       envOrderList(productListTwo).map((item, index) => (
-                        <option
-                          key={index}
-                          value={item.value}
-                          style={{ textTransform: 'capitalize' }}
-                        >
+                        <option key={index} value={item.value} style={{ textTransform: 'capitalize' }}>
                           {item.label}
                         </option>
                       ))}
@@ -995,11 +420,7 @@ const Compare = ({ selectedSboms }) => {
                 </FormControl>
                 {/* VERSION */}
                 <FormControl fontSize={'sm'}>
-                  <FormLabel
-                    htmlFor='versionTwo'
-                    fontSize='md'
-                    color='gray.600'
-                  >
+                  <FormLabel htmlFor='versionTwo' fontSize='md' color='gray.600'>
                     Version
                   </FormLabel>
                   {uniqVersionsTwo.length > 0 ? (
@@ -1028,7 +449,7 @@ const Compare = ({ selectedSboms }) => {
                       name='versions'
                       options={uniqVersionsTwo}
                       noOptionsMessage={() => null}
-                      isDisabled={selectedSboms?.length > 0}
+                      isDisabled={selectedVersionOne === null}
                     />
                   ) : (
                     <Alert borderRadius={'md'} py={'8px'} status='info'>
@@ -1037,6 +458,12 @@ const Compare = ({ selectedSboms }) => {
                     </Alert>
                   )}
                 </FormControl>
+                {/* SUBMIT */}
+                {(!firstSbomInfo || !secondSbomInfo) && (
+                  <Button width={'fit-content'} colorScheme='blue' leftIcon={<FaCodeCompare />} onClick={handleCompare} isDisabled={!selectedVersionOne || !selectedVersionTwo}>
+                    Compare
+                  </Button>
+                )}
               </Stack>
             )}
           </Card>
@@ -1044,17 +471,7 @@ const Compare = ({ selectedSboms }) => {
       </Grid>
       {/* SBOM DIFFERENCE */}
       <Card width='100%'>
-        <DataTable
-          columns={columns}
-          data={drifts || []}
-          customStyles={customStyles}
-          progressPending={isLoading}
-          subHeader
-          subHeaderComponent={subHeader}
-          progressComponent={<CustomLoader />}
-          persistTableHead
-          responsive={true}
-        />
+        <DiffTable diffs={driftData} data={drifts} setData={setDrifts} isLoading={isLoading}/>
       </Card>
     </>
   )

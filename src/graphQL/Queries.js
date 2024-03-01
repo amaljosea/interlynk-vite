@@ -1245,18 +1245,72 @@ export const GetVersionsTable = gql`
             compLicenseCount
             vulnStats
           }
-          alternatives {
-            id
-            creationAt
-            updatedAt
-            lifecycle
-            projectVersion
-            stats {
-              compCount
-              compLicenseCount
-              vulnStats
+        }
+      }
+    }
+  }
+`
+
+// GET SBOM VERSIONS
+export const GetSbomVersions = gql`
+  query GetSbomVersions($id: Uuid!) {
+    project(id: $id) {
+      sbomVersions {
+        nodes {
+          id
+          creationAt
+          projectVersion
+          project {
+            name
+            projectGroup {
+              name
             }
           }
+          licensesExp
+          tools {
+            id
+            name
+            version
+            vendor
+            updatedAt
+          }
+          project {
+            name
+          }
+          authors {
+            id
+            name
+            email
+            updatedAt
+          }
+          suppliers {
+            id
+            name
+            url
+            contactEmail
+            contactName
+          }
+        }
+      }
+    }
+  }
+`
+
+// GET SBOM ALTERNATIVES
+export const GetSbomAlternatives = gql`
+  query GetSbomAlternatives($projectId: Uuid!, $sbomId: Uuid!) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      projectVersion
+      alternatives {
+        id
+        creationAt
+        updatedAt
+        lifecycle
+        projectVersion
+        stats {
+          compCount
+          compLicenseCount
+          vulnStats
         }
       }
     }
@@ -2648,7 +2702,6 @@ export const GetSignedImageVerion = gql`
 `
 
 // Get signed product
-
 export const GetProjectInfo = gql`
   query getProjectInfo($signedParams: String!, $projectId: Uuid!) {
     project(signedParams: $signedParams, projectId: $projectId) {

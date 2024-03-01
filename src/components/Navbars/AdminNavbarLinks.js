@@ -45,8 +45,14 @@ import {
 export default function HeaderLinks(props) {
   const location = useLocation()
   const navigate = useNavigate()
-  const { userName, userPermissions, setUserName, envName, setEnvName } =
-    useGlobalState()
+  const {
+    userName,
+    setClearSelect,
+    setSelectedSbom,
+    setUserName,
+    envName,
+    setEnvName
+  } = useGlobalState()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
@@ -102,6 +108,8 @@ export default function HeaderLinks(props) {
   const handleEnvChange = (value) => {
     localStorage.setItem('environment', value)
     setEnvName(value)
+    setClearSelect(true)
+    setSelectedSbom([])
     if (sbomId) {
       getProdGroup({ variables: { id: group?.id } }).then((res) => {
         if (res?.data) {
