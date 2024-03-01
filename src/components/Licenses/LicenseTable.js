@@ -6,7 +6,6 @@ import {
   Stack,
   Link,
   TagLabel,
-  Icon,
   Tooltip,
   IconButton,
   useDisclosure,
@@ -14,7 +13,7 @@ import {
   MenuButton,
   Portal,
   MenuList,
-  MenuItem
+  MenuItem, Grid, GridItem
 } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -22,9 +21,10 @@ import DataTable from 'react-data-table-component'
 import LicenseDrawer from './LicenseDrawer'
 import LicenseFilter from './LicenseFilter'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
-import { customStyles } from 'utils'
-import { FaEllipsisV } from 'react-icons/fa'
+import {customStyles} from 'utils'
+import {FaEllipsisV} from 'react-icons/fa'
 import Pagination from '../Pagination'
+import {FaScaleBalanced} from "react-icons/fa6";
 
 const LicenseTable = ({ data, refetch }) => {
   const licenses = data?.nodes
@@ -277,30 +277,53 @@ const LicenseTable = ({ data, refetch }) => {
       wrap: true,
       selector: ({ content: { name, shortId, url } }) => {
         return (
-          <Flex direction='row' alignItems={'center'} gap={2}>
-            <Text
-              color={'blue.500'}
-              my={3}
-              fontWeight={'medium'}
-            >
-              {name}
-            </Text>
-            <Tag variant='subtle'>
-              <TagLabel my={1} style={{ whiteSpace: 'normal' }}>
-                {shortId || 'Not Available'}
-              </TagLabel>
-            </Tag>
-            <Link href={url?.replace('.json', '.html')} isExternal>
-              {url && (
-                <Icon
-                  as={ExternalLinkIcon}
-                  h={'16px'}
-                  w={'16px'}
-                  color={'blue.500'}
+          <Grid templateColumns='repeat(7, 1fr)' gap={2} my={3}>
+            <GridItem colSpan={1} width={'50px'}>
+              { (
+                <IconButton
+                  isRound={true}
+                  variant='solid'
+                  colorScheme='gray'
+                  icon={<FaScaleBalanced fontSize={16} />}
                 />
               )}
-            </Link>
-          </Flex>
+            </GridItem>
+            <GridItem
+              colSpan={6}
+              display={'flex'}
+              flexWrap={'wrap'}
+              flexDirection={'column'}
+              gap={2}
+            >
+              <Text data-tag='allowRowEvents'>{name}</Text>
+              <Flex flexWrap={'wrap'} gap={2} alignItems={'center'}>
+                {shortId && (
+                  <Tag
+                    width={'fit-content'}
+                    size={'sm'}
+                    variant='subtle'
+                    colorScheme='blue'
+                  >
+                    <TagLabel>{shortId}</TagLabel>
+                  </Tag>
+                )}
+                {url && (
+                  <Link
+                    href={shortId? url.replace('.json', '.html') : url}
+                    isExternal
+                    color={'blue.500'}
+                    fontSize={'sm'}
+                    fontWeight={'normal'}
+                    display={'flex'}
+                    alignItems={'center'}
+                    gap={1}
+                  >
+                    <ExternalLinkIcon />
+                  </Link>
+                )}
+              </Flex>
+            </GridItem>
+          </Grid>
         )
       }
     },
