@@ -136,7 +136,6 @@ const SbomLicenseTable = ({ data, refetch }) => {
             gap={2}
           >
             <Text
-              color={'blue.500'}
               my={3}
               fontWeight={'medium'}
             >
@@ -164,7 +163,7 @@ const SbomLicenseTable = ({ data, refetch }) => {
             wrap='wrap'
             gap={2}
             onClick={(e) => {
-              e.currentTarget.parentElement.click();
+              e.currentTarget.parentElement.click()
             }}
           >
             <Tag variant='subtle'>
