@@ -273,35 +273,18 @@ const LicenseTable = ({ data, refetch }) => {
     {
       id: 'NAME',
       name: 'NAME',
-      width: '21%',
+      width: '24%',
       wrap: true,
-      selector: ({ content: { name } }) => {
-        return (
-          <Flex
-            direction='row'
-            alignItems={'center'}
-            gap={2}
-          >
-              <Text
-                color={'blue.500'}
-                my={3}
-                fontWeight={'medium'}
-              >
-                {name}
-              </Text>
-          </Flex>
-        )
-      }
-    },
-    // SPDX ID
-    {
-      id: 'SPDX_ID',
-      name: 'SPDX ID',
-      width: '15%',
-      wrap: true,
-      selector: ({ content: { shortId, url } }) => {
+      selector: ({ content: { name, shortId, url } }) => {
         return (
           <Flex direction='row' alignItems={'center'} gap={2}>
+            <Text
+              color={'blue.500'}
+              my={3}
+              fontWeight={'medium'}
+            >
+              {name}
+            </Text>
             <Tag variant='subtle'>
               <TagLabel my={1} style={{ whiteSpace: 'normal' }}>
                 {shortId || 'Not Available'}
@@ -325,7 +308,7 @@ const LicenseTable = ({ data, refetch }) => {
     {
       id: 'ATTRIBUTION',
       name: 'ATTRIBUTION',
-      width: '11%',
+      width: '14%',
       wrap: true,
       selector: ({ attribution }) => {
         if (!attribution || attribution === 'UNKNOWN') {
@@ -340,7 +323,7 @@ const LicenseTable = ({ data, refetch }) => {
     {
       id: 'COPYLEFT',
       name: 'COPYLEFT',
-      width: '11%',
+      width: '14%',
       wrap: true,
       selector: ({ copyLeft }) => {
         if (!copyLeft || copyLeft === 'UNKNOWN') {
@@ -353,7 +336,7 @@ const LicenseTable = ({ data, refetch }) => {
     {
       id: 'REQUIRES SOURCE CODE',
       name: 'REQUIRES SOURCE CODE',
-      width: '11%',
+      width: '14%',
       wrap: true,
       selector: ({ sourceDistribution }) => {
         if (!sourceDistribution || sourceDistribution === 'UNKNOWN') {
@@ -369,7 +352,7 @@ const LicenseTable = ({ data, refetch }) => {
     {
       id: 'PERMITS MODIFICATIONS',
       name: 'PERMITS MODIFICATIONS',
-      width: '11%',
+      width: '14%',
       wrap: true,
       selector: ({ modifications }) => {
         if (!modifications || modifications === 'UNKNOWN') {
