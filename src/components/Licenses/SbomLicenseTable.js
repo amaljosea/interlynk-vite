@@ -146,10 +146,10 @@ const SbomLicenseTable = ({ data, refetch }) => {
         )
       }
     },
-    // COMPONENT LIST
+    // COMPONENTS
     {
-      id: 'COMPONENT_LIST',
-      name: 'COMPONENT LIST',
+      id: 'COMPONENTS',
+      name: 'COMPONENTS',
       width: '60%',
       wrap: true,
       selector: ({ components }) => {
