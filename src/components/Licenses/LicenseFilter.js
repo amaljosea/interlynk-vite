@@ -21,23 +21,39 @@ const LicenseFilter = ( {onFilter} ) => {
     unspecified: 'unspecified'
   }
 
+  const [spdx, setSpdx] = useState([undefined])
+  const availableSpdxFilters = {
+    all: undefined,
+    spdx: 'spdx',
+    custom: 'custom',
+  }
+
   const handleStatusChange = (newStatus) => {
     newStatus = [newStatus[newStatus.length - 1]] // only allow one status at a time
 
     setStatus(newStatus)
-    onFilter(newStatus)
+    onFilter('status', newStatus)
   }
 
-  const menuItems = Object.entries(availableStatus).map(([key, value]) => (
-    <MenuItemOption
-      key={key}
-      value={value}
-      fontSize={'sm'}
-      textTransform={'capitalize'}
-    >
-      {key}
-    </MenuItemOption>
-  ))
+  const handleSpdxChange = (newSpdx) => {
+    newSpdx = [newSpdx[newSpdx.length - 1]] // only allow one filter item at a time
+
+    setSpdx(newSpdx)
+    onFilter('spdx', newSpdx)
+  }
+
+  const generateMenuItems = (availableFilters) => {
+    return Object.entries(availableFilters).map(([key, value]) => (
+      <MenuItemOption
+        key={key}
+        value={value}
+        fontSize={'sm'}
+        textTransform={'capitalize'}
+      >
+        {key}
+      </MenuItemOption>
+    ))
+  }
 
 
   return (
@@ -60,7 +76,30 @@ const LicenseFilter = ( {onFilter} ) => {
               value={status}
               onChange={handleStatusChange}
             >
-              {menuItems}
+              {generateMenuItems(availableStatus)}
+            </MenuOptionGroup>
+          </MenuList>
+        </Menu>
+      </Box>
+      <Box width={'fit-content'} position={'relative'}>
+        <Menu closeOnSelect={true}>
+          {spdx[0] && <CheckMark />}
+          <MenuButton
+            as={Button}
+            colorScheme='blue'
+            fontWeight='normal'
+            fontSize={'sm'}
+            leftIcon={<FaFilter size={14} />}
+          >
+            SDPX
+          </MenuButton>
+          <MenuList>
+            <MenuOptionGroup
+              type='checkbox'
+              value={spdx}
+              onChange={handleSpdxChange}
+            >
+              {generateMenuItems(availableSpdxFilters)}
             </MenuOptionGroup>
           </MenuList>
         </Menu>

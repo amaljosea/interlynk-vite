@@ -27,11 +27,11 @@ import Pagination from '../Pagination'
 import {FaScaleBalanced} from "react-icons/fa6";
 
 const LicenseTable = ({ data, refetch }) => {
+
   const licenses = data?.nodes
 
-  const [direction, setDirection] = useState('DESC')
+  const [direction, setDirection] = useState('ASC')
 
-  // PAGINATION
   const paginationSizes = [25, 50, 100]
 
   const [currentPage, setCurrentPage] = useState(1)
@@ -111,7 +111,6 @@ const LicenseTable = ({ data, refetch }) => {
     })
   }, [refetch, totalRows, data, currentPage, direction])
 
-  // PAGINATION END
 
   const [searchInput, setSearchInput] = useState('')
   const [activeRow, setActiveRow] = useState(null)
@@ -141,22 +140,30 @@ const LicenseTable = ({ data, refetch }) => {
 
 
   const handleFilter = useCallback(
-    async (value) => {
+    async (filterName, value) => {
       disablePaginationControl()
-
       setCurrentPage(1)
 
-      await refetch({
-        status: value[0],
-        first: totalRows,
-        last: undefined,
-        after: undefined,
-        before: undefined,
-      }).then((res) => {
-        if (res.data) {
-          setPaginationControl(res.data)
-        }
-      })
+      switch (filterName) {
+        case 'status':
+          await refetch({
+            status: value[0],
+            first: totalRows,
+            last: undefined,
+            after: undefined,
+            before: undefined,
+          }).then((res) => {
+            if (res.data) {
+              setPaginationControl(res.data)
+            }
+          })
+          break
+        case 'spdx':
+          // handle spdx filter
+          break
+        default:
+          break
+      }
     },
     [refetch, totalRows]
   )
