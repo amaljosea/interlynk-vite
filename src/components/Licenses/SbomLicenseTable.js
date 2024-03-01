@@ -158,7 +158,15 @@ const SbomLicenseTable = ({ data, refetch }) => {
         sortedComponents.sort((a, b) => a.name.localeCompare(b.name))
 
         return (
-          <Flex direction='row' py={5} alignItems={'center'} wrap='wrap' gap={2}>
+          <Flex
+            direction='row' py={5}
+            alignItems={'center'}
+            wrap='wrap'
+            gap={2}
+            onClick={(e) => {
+              e.currentTarget.parentElement.click();
+            }}
+          >
             <Tag variant='subtle'>
               <TagLabel my={1} style={{ whiteSpace: 'normal' }}>
                 {sortedComponents[0].name}
