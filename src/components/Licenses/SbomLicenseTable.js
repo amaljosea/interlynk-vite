@@ -126,7 +126,7 @@ const SbomLicenseTable = ({ data, refetch }) => {
     {
       id: 'LICENSE_EXPRESSION',
       name: 'LICENSE EXPRESSION',
-      width: '300px',
+      width: '20%',
       wrap: true,
       selector: ({ licenseExpression }) => {
         return (
@@ -136,7 +136,6 @@ const SbomLicenseTable = ({ data, refetch }) => {
             gap={2}
           >
             <Text
-              color={'blue.500'}
               my={3}
               fontWeight={'medium'}
             >
@@ -146,11 +145,11 @@ const SbomLicenseTable = ({ data, refetch }) => {
         )
       }
     },
-    // COMPONENT LIST
+    // COMPONENTS
     {
-      id: 'COMPONENT_LIST',
-      name: 'COMPONENT LIST',
-      width: '1000px',
+      id: 'COMPONENTS',
+      name: 'COMPONENTS',
+      width: '60%',
       wrap: true,
       selector: ({ components }) => {
 
@@ -158,7 +157,15 @@ const SbomLicenseTable = ({ data, refetch }) => {
         sortedComponents.sort((a, b) => a.name.localeCompare(b.name))
 
         return (
-          <Flex direction='row' py={5} alignItems={'center'} wrap='wrap' gap={2}>
+          <Flex
+            direction='row' py={5}
+            alignItems={'center'}
+            wrap='wrap'
+            gap={2}
+            onClick={(e) => {
+              e.currentTarget.parentElement.click()
+            }}
+          >
             <Tag variant='subtle'>
               <TagLabel my={1} style={{ whiteSpace: 'normal' }}>
                 {sortedComponents[0].name}
@@ -177,6 +184,7 @@ const SbomLicenseTable = ({ data, refetch }) => {
       name: 'STATUS',
       wrap: true,
       sortable: true,
+      width: '20%',
       selector: ({ derivedState }) => {
         derivedState = derivedState?.toLowerCase() || 'Not Available'
         return (
