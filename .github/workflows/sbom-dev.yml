@@ -9,7 +9,7 @@ on:
 jobs:
   build-sbom:
     name: SBOM Dev build and Push to Platform
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     permissions:
       id-token: write
       contents: write
