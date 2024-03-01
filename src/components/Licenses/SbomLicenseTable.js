@@ -126,7 +126,7 @@ const SbomLicenseTable = ({ data, refetch }) => {
     {
       id: 'LICENSE_EXPRESSION',
       name: 'LICENSE EXPRESSION',
-      width: '300px',
+      width: '20%',
       wrap: true,
       selector: ({ licenseExpression }) => {
         return (
@@ -150,7 +150,7 @@ const SbomLicenseTable = ({ data, refetch }) => {
     {
       id: 'COMPONENT_LIST',
       name: 'COMPONENT LIST',
-      width: '1000px',
+      width: '60%',
       wrap: true,
       selector: ({ components }) => {
 
@@ -177,6 +177,7 @@ const SbomLicenseTable = ({ data, refetch }) => {
       name: 'STATUS',
       wrap: true,
       sortable: true,
+      width: '20%',
       selector: ({ derivedState }) => {
         derivedState = derivedState?.toLowerCase() || 'Not Available'
         return (
