@@ -251,8 +251,8 @@ const Compare = ({ selectedSboms }) => {
           <HStack spacing={4} alignItems={'flex-start'}>
             <Icon as={FaScaleUnbalanced} h={'64px'} w={'64px'} color='blue.300' />
             <Stack spacing={0}>
-              <Text fontWeight={'semibold'} fontSize={24}>SBOM Comparison</Text>
-              <Text>It refers to the process of comparing SBOMs from different software packages or versions</Text>
+              <Text fontWeight={'semibold'} fontSize={24}>SBOM Compare</Text>
+              <Text>This tool lists compare two SBOMs and report results as added, removed, and modified components with their licenses, PURL, and CPEs compared</Text>
             </Stack>
           </HStack>
         </Flex>
@@ -460,9 +460,11 @@ const Compare = ({ selectedSboms }) => {
                 </FormControl>
                 {/* SUBMIT */}
                 {(!firstSbomInfo || !secondSbomInfo) && (
-                  <Button width={'fit-content'} colorScheme='blue' leftIcon={<FaCodeCompare />} onClick={handleCompare} isDisabled={!selectedVersionOne || !selectedVersionTwo}>
-                    Compare
-                  </Button>
+                  <Flex justifyContent={'flex-end'}>
+                    <Button width={'fit-content'} colorScheme='blue' leftIcon={<FaCodeCompare />} onClick={handleCompare} isDisabled={!selectedVersionOne || !selectedVersionTwo}>
+                      Compare
+                    </Button>
+                  </Flex>
                 )}
               </Stack>
             )}
