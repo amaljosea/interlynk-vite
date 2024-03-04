@@ -14,7 +14,13 @@ const DiffTable = ({ diffs, data, setData, isLoading, sbomOne, sbomTwo }) => {
       selector: (row) => {
         const { diffType } = row
         return (
-          <Badge width={24} p={2} textTransform={'capitalize'} textAlign={'center'} colorScheme={diffType === 'added' ? 'green' : diffType === 'removed' ? 'red' : 'blue'}>
+          <Badge
+            width={24}
+            p={2}
+            textTransform={'capitalize'}
+            textAlign={'center'}
+            colorScheme={diffType === 'added' ? 'green' : diffType === 'removed' ? 'red' : 'blue'}
+          >
             {diffType}
           </Badge>
         )
@@ -26,7 +32,7 @@ const DiffTable = ({ diffs, data, setData, isLoading, sbomOne, sbomTwo }) => {
       id: 'NAME',
       name: 'NAME',
       selector: (row) => (
-        <Text>{row?.subjectComponent?.name || row?.targetComponent?.name}</Text>
+        <Text>{row?.subjectComponent?.name || row?.targetComponent?.name || '-'}</Text>
       ),
       width: '250px',
       wrap: true
@@ -39,15 +45,13 @@ const DiffTable = ({ diffs, data, setData, isLoading, sbomOne, sbomTwo }) => {
         if (diffTags?.includes('version')) {
           return (
             <Flex my={4} flexWrap={'wrap'} alignItems={'center'} gap={2}>
-              <Tag py={1.5} colorScheme='red'>{targetComponent?.version}</Tag>
-              <Tag py={1.5} colorScheme='green'>{subjectComponent?.version}</Tag>
+              <Tag py={1.5} colorScheme='red' hidden={targetComponent?.version === ''}>{targetComponent?.version}</Tag>
+              <Tag py={1.5} colorScheme='green' hidden={subjectComponent?.version === ''}>{subjectComponent?.version}</Tag>
             </Flex>
           )
         } else {
           return (
-            <Tag py={1.5}>
-              {subjectComponent?.version || targetComponent?.version || '-'}
-            </Tag>
+            <Tag py={1.5}>{subjectComponent?.version || targetComponent?.version || '-'}</Tag>
           )
         }
       },
@@ -62,8 +66,12 @@ const DiffTable = ({ diffs, data, setData, isLoading, sbomOne, sbomTwo }) => {
         if (diffTags?.includes('licenses_exp')) {
           return (
             <Flex my={4} flexWrap={'wrap'} alignItems={'center'} gap={2}>
-              <Tag py={1.5} colorScheme='red'>{targetComponent?.licensesExp}</Tag>
-              <Tag py={1.5} colorScheme='green'>{subjectComponent?.licensesExp}</Tag>
+              <Tag py={1.5} colorScheme='red' hidden={targetComponent?.licensesExp === ''}>
+                {targetComponent?.licensesExp}
+              </Tag>
+              <Tag py={1.5} colorScheme='green' hidden={subjectComponent?.licensesExp === ''}>
+                {subjectComponent?.licensesExp}
+              </Tag>
             </Flex>
           )
         } else {
@@ -85,13 +93,15 @@ const DiffTable = ({ diffs, data, setData, isLoading, sbomOne, sbomTwo }) => {
         if (diffTags?.includes('purl')) {
           return (
             <Flex my={4} flexWrap={'wrap'} alignItems={'center'} gap={2}>
-              <Tag py={1.5} colorScheme='red'>{targetComponent?.purl || '-'}</Tag>
-              <Tag py={1.5} colorScheme='green'>{subjectComponent?.purl || '-'}</Tag>
+              <Tag py={1.5} colorScheme='red' hidden={targetComponent?.purl === ''}>{targetComponent?.purl || '-'}</Tag>
+              <Tag py={1.5} colorScheme='green' hidden={subjectComponent?.purl === ''}>{subjectComponent?.purl || '-'}</Tag>
             </Flex>
           )
         } else {
           return (
-            <Tag my={4} py={1.5}>{subjectComponent?.purl || targetComponent?.purl || '-'}</Tag>
+            <Tag my={4} py={1.5}>
+              {subjectComponent?.purl || targetComponent?.purl || '-'}
+            </Tag>
           )
         }
       },
@@ -109,14 +119,18 @@ const DiffTable = ({ diffs, data, setData, isLoading, sbomOne, sbomTwo }) => {
               {targetComponent?.cpes?.length > 0 && (
                 <Flex flexDir={'column'} gap={2} alignItems={'flex-start'}>
                   {targetComponent?.cpes?.map((item, index) => (
-                    <Tag key={index} py={1.5} colorScheme='red'>{item}</Tag>
+                    <Tag key={index} py={1.5} colorScheme='red'>
+                      {item}
+                    </Tag>
                   ))}
                 </Flex>
               )}
               {subjectComponent?.cpes?.length > 0 && (
                 <Flex flexDir={'column'} gap={2} alignItems={'flex-start'}>
                   {subjectComponent?.cpes?.map((item, index) => (
-                    <Tag key={index} py={1.5} colorScheme='green'>{item}</Tag>
+                    <Tag key={index} py={1.5} colorScheme='green'>
+                      {item}
+                    </Tag>
                   ))}
                 </Flex>
               )}
@@ -128,14 +142,18 @@ const DiffTable = ({ diffs, data, setData, isLoading, sbomOne, sbomTwo }) => {
               {targetComponent?.cpes?.length > 0 && (
                 <Flex flexDir={'column'} gap={2} alignItems={'flex-start'}>
                   {targetComponent?.cpes?.map((item, index) => (
-                    <Tag key={index} py={1.5}>{item}</Tag>
+                    <Tag key={index} py={1.5}>
+                      {item}
+                    </Tag>
                   ))}
                 </Flex>
               )}
               {subjectComponent?.cpes?.length > 0 && (
                 <Flex flexDir={'column'} gap={2} alignItems={'flex-start'}>
                   {subjectComponent?.cpes?.map((item, index) => (
-                    <Tag key={index} py={1.5}>{item}</Tag>
+                    <Tag key={index} py={1.5}>
+                      {item}
+                    </Tag>
                   ))}
                 </Flex>
               )}
@@ -152,7 +170,7 @@ const DiffTable = ({ diffs, data, setData, isLoading, sbomOne, sbomTwo }) => {
   const subHeader = useMemo(() => {
     return (
       <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-start'} mb={4} px={4}>
-       {sbomOne && sbomTwo && <ToolsFilterMenu data={diffs?.sbom?.sbomDrift} setData={setData} />}
+        {sbomOne && sbomTwo && <ToolsFilterMenu data={diffs?.sbomDrift} setData={setData} />}
       </Flex>
     )
   }, [data, setData])

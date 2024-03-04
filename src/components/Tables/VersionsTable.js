@@ -49,6 +49,9 @@ import ToolsDrawer from 'components/Drawer/ToolsDrawer'
 import { GetSbomDrift } from 'graphQL/Queries'
 import { sortByUpdatedAt } from 'utils'
 import { GetSbomVersions } from 'graphQL/Queries'
+import { GetShareSbomAlternatives } from 'graphQL/Queries'
+import { GetShareSbomVersions } from 'graphQL/Queries'
+import { GetShareSbomDrift } from 'graphQL/Queries'
 
 const VersionsTable = ({ projectGroup, getVulnData }) => {
   const location = useLocation()
@@ -80,15 +83,21 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
   const [drifts, setDrifts] = useState([])
 
   const [getAlternatives, { data: sbomAlts }] = useLazyQuery(
-    GetSbomAlternatives,
+    signedUrlParams ? GetShareSbomAlternatives : GetSbomAlternatives,
     { fetchPolicy: 'network-only' }
   )
-  const [getVersions, { data: allVersions }] = useLazyQuery(GetSbomVersions, {
-    fetchPolicy: 'network-only'
-  })
-  const [getDrift, { data: driftData }] = useLazyQuery(GetSbomDrift, {
-    fetchPolicy: 'network-only'
-  })
+  const [getVersions, { data: allVersions }] = useLazyQuery(
+    signedUrlParams ? GetShareSbomVersions : GetSbomVersions,
+    {
+      fetchPolicy: 'network-only'
+    }
+  )
+  const [getDrift, { data: driftData }] = useLazyQuery(
+    signedUrlParams ? GetShareSbomDrift : GetSbomDrift,
+    {
+      fetchPolicy: 'network-only'
+    }
+  )
 
   const { data, refetch, error } = useQuery(
     signedUrlParams ? ShareVersionTable : GetVersionsTable,
@@ -245,7 +254,12 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
   }
 
   const handleListSbom = (row) => {
-    getAlternatives({ variables: { projectId: activeProd, sbomId: row?.id } })
+    getAlternatives({
+      variables: {
+        projectId: signedUrlParams ? undefined : activeProd,
+        sbomId: row?.id
+      }
+    })
     setActiveRow(row)
     onListOpen()
   }
@@ -523,13 +537,13 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
         const versions = sortByUpdatedAt(selectedSbom)
         getDrift({
           variables: {
-            projectId: activeProd,
+            projectId: signedUrlParams ? undefined : activeProd,
             subjectSbomId: versions[0]?.id,
             targetSbomId: versions[1]?.id
           }
         }).then((res) => {
           if (res?.data) {
-            setDrifts(res?.data?.sbom?.sbomDrift)
+            setDrifts(signedUrlParams ? res?.data?.shareLynkQuery?.sbom?.sbomDrift : res?.data?.sbom?.sbomDrift)
             setLoading(false)
             onToolOpen()
           }
@@ -684,7 +698,9 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
       {/* SBOM LIST */}
       {isListOpen && versions && (
         <SbomList
-          data={sbomAlts?.sbom}
+          data={
+            signedUrlParams ? sbomAlts?.shareLynkQuery?.sbom : sbomAlts?.sbom
+          }
           sboms={versions}
           isOpen={isListOpen}
           onClose={onListClose}
@@ -704,8 +720,12 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
 
       {isToolOpen && allVersions && (
         <ToolsDrawer
-          versionList={allVersions?.project?.sbomVersions}
-          diffs={driftData}
+          versionList={
+            signedUrlParams
+              ? allVersions?.shareLynkQuery?.project?.sbomVersions
+              : allVersions?.project?.sbomVersions
+          }
+          diffs={signedUrlParams ? driftData?.shareLynkQuery?.sbom : driftData?.sbom}
           data={drifts}
           isOpen={isToolOpen}
           onClose={onToolClose}

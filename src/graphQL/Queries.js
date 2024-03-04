@@ -1216,6 +1216,7 @@ export const GetProductInfo = gql`
     }
   }
 `
+// GET PRODUCT VERSION
 export const GetVersionsTable = gql`
   query GetVersionsTable(
     $id: Uuid!
@@ -1352,18 +1353,76 @@ export const ShareVersionTable = gql`
               compLicenseCount
               vulnStats
             }
-            alternatives {
-              id
-              creationAt
-              updatedAt
-              lifecycle
-              projectVersion
-              stats {
-                compCount
-                compLicenseCount
-                vulnStats
+          }
+        }
+      }
+    }
+  }
+`
+
+// GET SHARED SBOM VERSIONS
+export const GetShareSbomVersions = gql`
+  query GetShareSbomVersions($id: Uuid!) {
+    shareLynkQuery {
+      project(id: $id) {
+        sbomVersions {
+          nodes {
+            id
+            creationAt
+            projectVersion
+            project {
+              name
+              projectGroup {
+                name
               }
             }
+            licensesExp
+            tools {
+              id
+              name
+              version
+              vendor
+              updatedAt
+            }
+            project {
+              name
+            }
+            authors {
+              id
+              name
+              email
+              updatedAt
+            }
+            suppliers {
+              id
+              name
+              url
+              contactEmail
+              contactName
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
+// GET SBOM ALTERNATIVES
+export const GetShareSbomAlternatives = gql`
+  query GetShareSbomAlternatives($sbomId: Uuid!) {
+    shareLynkQuery {
+      sbom(sbomId: $sbomId) {
+        projectVersion
+        alternatives {
+          id
+          creationAt
+          updatedAt
+          lifecycle
+          projectVersion
+          stats {
+            compCount
+            compLicenseCount
+            vulnStats
           }
         }
       }
@@ -3439,6 +3498,37 @@ export const GetSbomDrift = gql`
         }
         diffTags
         diffType
+      }
+    }
+  }
+`
+// GET SBOM DRIFT
+export const GetShareSbomDrift = gql`
+  query GetSharedSbomDrift($subjectSbomId: Uuid!, $targetSbomId: Uuid!) {
+    shareLynkQuery {
+      sbom(id: $subjectSbomId) {
+        id
+        spec
+        sbomDrift(targetSbomId: $targetSbomId) {
+          subjectComponentId
+          subjectComponent {
+            name
+            version
+            purl
+            cpes
+            licensesExp
+          }
+          targetComponentId
+          targetComponent {
+            name
+            version
+            purl
+            cpes
+            licensesExp
+          }
+          diffTags
+          diffType
+        }
       }
     }
   }
