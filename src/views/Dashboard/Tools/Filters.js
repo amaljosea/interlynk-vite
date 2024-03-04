@@ -48,7 +48,7 @@ const ToolsFilterMenu = ({ data, setData }) => {
       <Box width={'fit-content'} position={'relative'}>
         <Menu closeOnSelect={false}>
           {diffs?.length !== 0 && !diffs.includes('all') && <CheckMark />}
-          <MenuHeading title={'Status'} />
+          <MenuHeading title={'Difference'} />
           <MenuList>
             <MenuOptionGroup type='checkbox' value={diffs} onChange={onFilterStatus}>
               {statusList?.map((item, index) => (
