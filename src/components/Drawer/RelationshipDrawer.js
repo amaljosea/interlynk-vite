@@ -29,7 +29,7 @@ import {
   FormErrorMessage,
   FormErrorIcon,
   useDisclosure,
-  VStack
+  chakra
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
@@ -37,7 +37,8 @@ import CardHeader from 'components/Card/CardHeader'
 import RelDeleteModal from 'components/RelDeleteModal'
 import { CreateCompRelation, DeleteCompRelation } from 'graphQL/Mutation'
 import { GetCompDependency, GetAllComponents } from 'graphQL/Queries'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import Tree from 'react-d3-tree'
 import { useLocation } from 'react-router-dom'
 
 const findShortestPath = (pathArray, currentShortestPath = []) => {
@@ -258,7 +259,8 @@ const RelationshipDrawer = ({
                           .sort((a, b) => a.name.localeCompare(b.name))
                           .map((item, idx) => (
                             <option key={idx} value={item.id}>
-                              {item.name}-{item.version}{item.primary ? ` [Primary Component]` : ''}
+                              {item.name}-{item.version}
+                              {item.primary ? ` [Primary Component]` : ''}
                             </option>
                           ))}
                       </Select>
@@ -379,7 +381,8 @@ const RelationshipDrawer = ({
 
                 {/* PATHS */}
                 <Text fontSize={'lg'} fontWeight={'medium'} mt={6}>
-                  Pedigree
+                  {/* Pedigree */}
+                  Tree View
                 </Text>
                 {compPath?.length > 0 ? (
                   <Stack

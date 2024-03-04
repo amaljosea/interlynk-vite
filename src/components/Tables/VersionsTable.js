@@ -720,11 +720,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
 
       {isToolOpen && allVersions && (
         <ToolsDrawer
-          versionList={
-            signedUrlParams
-              ? allVersions?.shareLynkQuery?.project?.sbomVersions
-              : allVersions?.project?.sbomVersions
-          }
+          versionList={ signedUrlParams ? allVersions?.shareLynkQuery?.project?.sbomVersions : allVersions?.project?.sbomVersions }
           diffs={signedUrlParams ? driftData?.shareLynkQuery?.sbom : driftData?.sbom}
           data={drifts}
           isOpen={isToolOpen}

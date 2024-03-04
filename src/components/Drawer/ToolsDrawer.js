@@ -16,19 +16,24 @@ import {
 import Card from 'components/Card/Card'
 import SbomInfo from 'components/SbomInfo'
 import DiffTable from 'components/Tables/DiffTable'
+import { useGlobalState } from 'hooks/useGlobalState'
 import React from 'react'
 
 const ToolsDrawer = ({ data, diffs, setData, selectedSbom, versionList, isOpen, onClose }) => {
+  const  {setClearSelect, setSelectedSbom} = useGlobalState()
   const versionsOne = versionList?.nodes?.find((item) => item?.id === selectedSbom[1]?.id)
   const versionsTwo = versionList?.nodes?.find((item) => item?.id === selectedSbom[0]?.id)
-  // console.log('versionsOne', versionsOne)
-  // console.log('versionsTwo', versionsTwo)
+
+  const handleClose = () => {
+    setClearSelect(true)
+    setSelectedSbom([])
+  }
 
   return (
     <Drawer size='full' isOpen={isOpen} placement='bottom' onClose={onClose}>
       <DrawerOverlay />
       <DrawerContent>
-        <DrawerCloseButton mt={2} />
+        <DrawerCloseButton mt={2} onClick={handleClose} />
         <DrawerHeader>SBOM Comparison</DrawerHeader>
         <DrawerBody>
           {/* SBOM INFO */}

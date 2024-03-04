@@ -94,7 +94,7 @@ const ProductTable = ({ data, refetch }) => {
   const environment = localStorage.getItem('environment')
   const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
 
-  const { userPermissions, setEnvName, setActiveSbomTab, prodState, dispatch } =
+  const { userPermissions, setEnvName, setClearSelect, setSelectedSbom, setActiveSbomTab, prodState, dispatch } =
     useGlobalState()
 
   const { field, direction, searchInput, pageIndex, enabled } = prodState
@@ -388,6 +388,8 @@ const ProductTable = ({ data, refetch }) => {
           const { id, name, projects, defaultProject } = row
           const product = { id: id, name: name, groupId: id }
           const handleClick = () => {
+            setClearSelect(true)
+            setSelectedSbom([])
             const env = projects?.find((item) => item.name === environment)
             prodDispatch({
               type: 'SET_CURRENT_PRODUCT',

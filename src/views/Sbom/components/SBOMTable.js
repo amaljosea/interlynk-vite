@@ -28,6 +28,7 @@ import { useLocation } from 'react-router-dom'
 import { useGlobalState } from 'hooks/useGlobalState'
 import SupportTable from 'components/Tables/SupportTable'
 import SbomLicenseTable from '../../../components/Licenses/SbomLicenseTable'
+import GraphView from './GraphView'
 
 const SBOMTable = ({
   status,
@@ -49,8 +50,9 @@ const SBOMTable = ({
     'Vulnerabilities': 0.5,
     'Licenses': 0,
     'Support': 0,
+    'Relationship': 0,
     'Checks': 0,
-    'Change Log': 0
+    'Change Log': 0,
   }
 
   const [lastFetchTime, setLastFetchTime] = useState({
@@ -60,8 +62,9 @@ const SBOMTable = ({
     'Vulnerabilities': null,
     'Licenses': null,
     'Support': null,
+    'Relationship': null,
     'Checks': null,
-    'Change Log': null
+    'Change Log': null,
   })
 
   const shouldFetchData = (tabName) => {
@@ -139,8 +142,9 @@ const SBOMTable = ({
     3: 'Vulnerabilities',
     4: 'Licenses',
     5: 'Support',
-    6: 'Checks',
-    7: 'Change Log'
+    6: 'Relationship',
+    7: 'Checks',
+    8: 'Change Log',
   }
 
   const handleTabChange = (value) => {
@@ -266,6 +270,18 @@ const SBOMTable = ({
       }).then((res) => {
         if (res.data) {
           console.log('licensesData', res.data)
+          updateLastFetchTime(tabName)
+        }
+      })
+    } else if (tabName === 'Relationship' && shouldFetchData(tabName)) {
+      const { field, direction } = prodCompState
+      getCompData({
+        ...commonParams,
+        primary: true,
+        field,
+        direction
+      }).then((res) => {
+        if (res?.data) {
           updateLastFetchTime(tabName)
         }
       })
@@ -428,6 +444,10 @@ const SBOMTable = ({
             {/* SUPPORT TABLE */}
             <TabPanel px={0}>
               <SupportTable data={null} />
+            </TabPanel>
+            {/* RELATIONSHIP TABLE */}
+            <TabPanel px={0}>
+              <GraphView data={compData?.sbom?.components} />
             </TabPanel>
             {/* HEALTH CHECK TABLE */}
             <TabPanel px={0}>

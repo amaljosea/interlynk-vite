@@ -1820,6 +1820,8 @@ export const GetCompDependency = gql`
   query GetCompDependency($compId: Uuid!, $sbomId: Uuid!) {
     component(id: $compId, sbomId: $sbomId) {
       id
+      name
+      version
       dependencyOf {
         id
         relType
