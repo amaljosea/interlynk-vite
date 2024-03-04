@@ -5,7 +5,7 @@ import ToolsFilterMenu from 'views/Dashboard/Tools/Filters'
 import React, { useMemo } from 'react'
 import { customStyles } from 'utils'
 
-const DiffTable = ({ diffs, data, setData, isLoading }) => {
+const DiffTable = ({ diffs, data, setData, isLoading, sbomOne, sbomTwo }) => {
   // COLUMNS
   const columns = [
     {
@@ -152,7 +152,7 @@ const DiffTable = ({ diffs, data, setData, isLoading }) => {
   const subHeader = useMemo(() => {
     return (
       <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-start'} mb={4} px={4}>
-       {data?.length > 0 && <ToolsFilterMenu data={diffs?.sbom?.sbomDrift} setData={setData} />}
+       {sbomOne && sbomTwo && <ToolsFilterMenu data={diffs?.sbom?.sbomDrift} setData={setData} />}
       </Flex>
     )
   }, [data, setData])

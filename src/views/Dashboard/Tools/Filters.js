@@ -46,7 +46,7 @@ const ToolsFilterMenu = ({ data, setData }) => {
     <Stack direction={'row'} alignItems={'center'} gap={2}>
       {/* STATUS */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={false}>
+        <Menu placement='top' closeOnSelect={false}>
           {diffs?.length !== 0 && !diffs.includes('all') && <CheckMark />}
           <MenuHeading title={'Difference'} />
           <MenuList>
@@ -62,16 +62,16 @@ const ToolsFilterMenu = ({ data, setData }) => {
       </Box>
       {/* COMPONENTS */}
       <Box width={'fit-content'} position={'relative'}>
-        <Menu closeOnSelect={false}>
+        <Menu placement='top' closeOnSelect={false}>
           {components?.length !== 0 && !components.includes('all') && (
             <CheckMark />
           )}
           <MenuHeading title={'Components'} />
-          <MenuList width={'300px'} minH={'auto'} maxH={'400px'} overflowY={'scroll'}>
+          <MenuList minW='auto' maxW={'320px'} minH={'auto'} maxH={'300px'} overflowY={'scroll'}>
             <MenuOptionGroup type='checkbox' value={components} onChange={onFilterComponent}>
               <MenuItemOption fontSize={'sm'} value='all'>All</MenuItemOption>
               {componentList?.map((item, index) => (
-                <MenuItemOption key={index} value={item} fontSize={'sm'} textTransform={'capitalize'}>
+                <MenuItemOption key={index} value={item} fontSize={'sm'} textTransform={'capitalize'} wordBreak={'break-all'}>
                   {item}
                 </MenuItemOption>
               ))}
