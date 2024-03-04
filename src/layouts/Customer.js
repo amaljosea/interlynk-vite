@@ -4,7 +4,7 @@ import { Box, Portal, Stack, useToast } from '@chakra-ui/react'
 import AdminNavbar from 'components/Navbars/AdminNavbar.js'
 import Sidebar from 'components/Sidebar'
 import React, { useState, useEffect } from 'react'
-import { Outlet, redirect, useLocation, useNavigate } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 // Custom components
 import PanelContainer from '../components/Layout/PanelContainer'
 import PanelContent from '../components/Layout/PanelContent'
@@ -16,10 +16,8 @@ import {
 } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
 import { onError } from '@apollo/client/link/error'
-import Cookies from 'js-cookie'
 import { getActiveNavbar, getActiveRoute } from '../utils'
 import { createUploadLink } from 'apollo-upload-client'
-import { logoutUser } from 'utils/authUtils'
 import { customerRoutes } from 'routes'
 
 export default function Customer(props) {
@@ -29,7 +27,6 @@ export default function Customer(props) {
 
   const authToken = sessionStorage.getItem('signedUrlParams')
   const highRes = window.matchMedia('(min-width: 2500px)')
-  const navigate = useNavigate()
   const { ...rest } = props
   // states and functions
   const [sidebarVariant] = useState('transparent')
@@ -74,12 +71,6 @@ export default function Customer(props) {
     cache: new InMemoryCache(),
     queryDeduplication: false
   })
-
-  useEffect(() => {
-    if (location.pathname === '/customer') {
-      redirect('/customer/products')
-    }
-  }, [location])
 
   useEffect(() => {
     if (signedUrlParams) {

@@ -3346,6 +3346,12 @@ export const GetSharelynks = gql`
         id
         signedUrlParams
         updatedAt
+        contents {
+          ... on ProjectGroup {
+            id
+            name
+          }
+        }
       }
       pageInfo {
         endCursor

@@ -134,8 +134,9 @@ const ShareLynkDrawer = ({
       id: 'SIGNED_URL',
       name: 'LINK',
       selector: (row) => {
+        const { enabled, contents } = row
         const sbomLink = useClipboard(
-          `${domain}/customer?signed_url_params=${row?.signedUrlParams}`
+          `${domain}/customer/products?id=${contents[0]?.id}&signed_url_params=${row?.signedUrlParams}`
         )
         return (
           <Flex my={2} gap={2} alignItems={'center'}>
@@ -149,7 +150,7 @@ const ShareLynkDrawer = ({
               fontSize={'sm'}
             />
             <IconButton
-              isDisabled={!row?.enabled}
+              isDisabled={!enabled}
               size='sm'
               onClick={() => sbomLink.onCopy()}
               colorScheme={sbomLink.hasCopied ? 'whatsapp' : 'gray'}

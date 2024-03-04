@@ -73,13 +73,7 @@ ReactDOM.render(
           <Routes>
             <Route
               path=''
-              element={
-                authToken ? (
-                  <Navigate replace to='/vendor/dashboard' />
-                ) : (
-                  <Navigate replace to='/auth' />
-                )
-              }
+              element={authToken ? <Navigate replace to='/vendor/dashboard' /> : <Navigate replace to='/auth' />}
             />
             <Route path={`auth`} element={<AuthLayout />} />
             <Route path={`register`} element={<Register />} />
@@ -99,16 +93,6 @@ ReactDOM.render(
             </Route>
             <Route path={`login`} element={<LoginLayout />} />
             <Route path={`customer`} element={<CustomerLayout />}>
-              <Route
-                path=''
-                element={
-                  location.pathname === '/customer' ? (
-                    <Navigate replace to='/customer/products' />
-                  ) : (
-                    <Navigate replace to={location.pathname} />
-                  )
-                }
-              />
               <Route path={`products`} element={<PubProducts />}>
                 <Route index element={<PubProductList />} />
                 <Route path={`:name`} element={<PubProductDetails />} />
