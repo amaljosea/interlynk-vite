@@ -3376,6 +3376,7 @@ export const GetLicensesTable = gql`
     $before: String
     $status: [String!]
     $search: String
+    $licenseType: [String!]
   ) {
     organization {
       licenses(
@@ -3385,6 +3386,7 @@ export const GetLicensesTable = gql`
         before: $before
         status: $status
         search: $search
+        licenseType: $licenseType
         orderBy: { direction: $direction, field: ORGANIZATION_LICENSES_STATE }
       ) {
         totalCount

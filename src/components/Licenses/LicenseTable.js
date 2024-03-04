@@ -159,7 +159,17 @@ const LicenseTable = ({ data, refetch }) => {
           })
           break
         case 'spdx':
-          // handle spdx filter
+          await refetch({
+            licenseType: value[0],
+            first: totalRows,
+            last: undefined,
+            after: undefined,
+            before: undefined,
+          }).then((res) => {
+            if (res.data) {
+              setPaginationControl(res.data)
+            }
+          })
           break
         default:
           break

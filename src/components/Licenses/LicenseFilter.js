@@ -24,8 +24,8 @@ const LicenseFilter = ( {onFilter} ) => {
   const [spdx, setSpdx] = useState([undefined])
   const availableSpdxFilters = {
     all: undefined,
-    spdx: 'spdx',
-    custom: 'custom',
+    spdx: 'License',
+    custom: 'LicenseCustom',
   }
 
   const handleStatusChange = (newStatus) => {
@@ -91,7 +91,7 @@ const LicenseFilter = ( {onFilter} ) => {
             fontSize={'sm'}
             leftIcon={<FaFilter size={14} />}
           >
-            SDPX
+            License Type
           </MenuButton>
           <MenuList>
             <MenuOptionGroup
