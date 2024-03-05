@@ -18,7 +18,7 @@ import {
 import { useEffect, useState } from 'react'
 import ReactSelect from 'react-select'
 import CreatableSelect from 'react-select/creatable'
-import { idAutoComplete } from 'graphQL/Queries'
+import { CpeAutoComplete } from 'graphQL/Queries'
 import { useLazyQuery } from '@apollo/client'
 import spdxValidate from 'spdx-expression-validate'
 import { MdArrowOutward } from 'react-icons/md'
@@ -30,7 +30,7 @@ const SbomLicenseField = ({ isValid, setIsValid }) => {
   const { sbomDispatch } = dispatch
 
   const [licenseList, setLicenseList] = useState([])
-  const [getCpe] = useLazyQuery(idAutoComplete)
+  const [getCpe] = useLazyQuery(CpeAutoComplete)
 
   const onLicenseChange = (selected) => {
     console.log('selected', selected)

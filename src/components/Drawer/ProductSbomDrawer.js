@@ -40,7 +40,7 @@ import { FaExpandAlt } from 'react-icons/fa'
 import { PackageURL } from 'packageurl-js'
 import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
-import { idAutoComplete } from 'graphQL/Queries'
+import { CpeAutoComplete } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
 import CpeInput from 'components/CpeInput'
 import { useParams } from 'react-router-dom'
@@ -79,7 +79,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
   }
 
 
-  const [getCpe] = useLazyQuery(idAutoComplete)
+  const [getCpe] = useLazyQuery(CpeAutoComplete)
   const [createSbom] = useMutation(sbomCreate)
   const [createComponent] = useMutation(CreateComponent,{ onCompleted: () => handleRefetch()})
 

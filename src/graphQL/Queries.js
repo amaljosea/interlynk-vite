@@ -3290,13 +3290,23 @@ export const GetSignedLogsFilterData = gql`
 `
 
 // CPE AUTOCOMPLETE
-export const idAutoComplete = gql`
-  query idAutoComplete($input: IdAutoCompletionInput!) {
+export const CpeAutoComplete = gql`
+  query CpeAutoComplete($input: IdAutoCompletionInput!) {
     idAutoComplete(input: $input) {
       result
     }
   }
 `
+
+export const LicenseAutoComplete = gql`
+  query LicenseAutoComplete($search: String!) {
+    licenseAutoComplete(search: $search) {
+      result
+      type
+    }
+  }
+`
+
 
 // GET CDX RESPONSE
 export const GetCdxResponses = gql`

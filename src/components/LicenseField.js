@@ -11,7 +11,9 @@ import {
 } from '@chakra-ui/react'
 import { useState, useEffect } from 'react'
 import ReactSelect from 'react-select'
-import { idAutoComplete } from 'graphQL/Queries'
+
+import { LicenseAutoComplete } from 'graphQL/Queries'
+
 import { useLazyQuery } from '@apollo/client'
 import { useGlobalState } from 'hooks/useGlobalState'
 import InfoModal from './InfoModal'
@@ -25,7 +27,8 @@ const LicenseField = ({ isValid, setIsValid }) => {
   const [infoHeading, setInfoHeading] = useState('')
   const [infoText, setInfoText] = useState('')
   const [infoUrl, setInfoUrl] = useState('')
-  const [getLicense] = useLazyQuery(idAutoComplete)
+
+  const [getLicense] = useLazyQuery(LicenseAutoComplete, {  fetchPolicy: 'network-only' })
 
   const { isOpen: isInfoOpen, onOpen: onInfoOpen, onClose: onInfoClose } = useDisclosure()
 
@@ -38,17 +41,11 @@ const LicenseField = ({ isValid, setIsValid }) => {
     if (value !== '') {
       getLicense({
         variables: {
-          input: {
-            idType: 'spdx',
-            ecosystem: 'spdx',
-            search: {
-              shortId: value
-            }
-          }
+          search: value
         }
       }).then((res) => {
         if (res.data) {
-          const licenses = res.data.idAutoComplete.result.map((value) => ({
+          const licenses = res.data.licenseAutoComplete.result.map((value) => ({
             value: value,
             label: value
           }))

@@ -21,7 +21,7 @@ import { CreateAutomation } from 'graphQL/Mutation'
 import { UpdateComponent } from 'graphQL/Mutation'
 import { recheckHealth, checkResultUpdate } from 'graphQL/Mutation'
 import { GetCheckFilterData } from 'graphQL/Queries'
-import { idAutoComplete } from 'graphQL/Queries'
+import { CpeAutoComplete } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
 import React, { useMemo, useRef, useState, useEffect } from 'react'
 import DataTable from 'react-data-table-component'
@@ -142,7 +142,7 @@ const HealthCheckTable = ({ productId, sbomId, data, refetch, sbomData }) => {
     onCompleted: () => fetchCheckData()
   })
 
-  const [getCpe] = useLazyQuery(idAutoComplete)
+  const [getCpe] = useLazyQuery(CpeAutoComplete)
   const [updateComponent] = useMutation(UpdateComponent)
   const [updateSbom] = useMutation(sbomUpdate)
 
