@@ -3290,8 +3290,8 @@ export const GetSignedLogsFilterData = gql`
 `
 
 // CPE AUTOCOMPLETE
-export const CpeAutoComplete = gql`
-  query CpeAutoComplete($input: IdAutoCompletionInput!) {
+export const idAutoComplete = gql`
+  query idAutoComplete($input: IdAutoCompletionInput!) {
     idAutoComplete(input: $input) {
       result
     }

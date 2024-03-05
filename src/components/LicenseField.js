@@ -19,7 +19,7 @@ import {
 import { useState, useEffect } from 'react'
 import ReactSelect from 'react-select'
 import CreatableSelect from 'react-select/creatable'
-import { CpeAutoComplete } from 'graphQL/Queries'
+import { idAutoComplete } from 'graphQL/Queries'
 import { useLazyQuery } from '@apollo/client'
 import { MdArrowOutward } from 'react-icons/md'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -35,7 +35,7 @@ const LicenseField = ({ isValid, setIsValid }) => {
   const [infoHeading, setInfoHeading] = useState('')
   const [infoText, setInfoText] = useState('')
   const [infoUrl, setInfoUrl] = useState('')
-  const [getCpe] = useLazyQuery(CpeAutoComplete)
+  const [getCpe] = useLazyQuery(idAutoComplete)
 
   const { isOpen: isInfoOpen, onOpen: onInfoOpen, onClose: onInfoClose } = useDisclosure()
 

@@ -42,7 +42,7 @@ import PurlModal from 'views/Dashboard/Products/components/PurlModal'
 import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import { InfoIcon, CheckIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import { FaExpandAlt } from 'react-icons/fa'
-import { CpeAutoComplete } from 'graphQL/Queries'
+import { idAutoComplete } from 'graphQL/Queries'
 import LicenseField from 'components/LicenseField'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { GetAllComponents } from 'graphQL/Queries'
@@ -93,7 +93,7 @@ function ComponentDrawer(props) {
     )
   }
 
-  const [getCpe] = useLazyQuery(CpeAutoComplete)
+  const [getCpe] = useLazyQuery(idAutoComplete)
   const [createComponent] = useMutation(CreateComponent, {
     onCompleted: () => fetchCompData()
   })
