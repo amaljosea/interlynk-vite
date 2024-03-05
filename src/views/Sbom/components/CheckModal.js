@@ -178,12 +178,7 @@ const CheckModal = ({
           id: componentId,
           sbomId: sbomId,
           licenses: {
-            licensesExp:
-              licenseType === 'license_exp'
-                ? expLicense
-                  ? expLicense
-                  : ''
-                : undefined
+            licensesExp: expLicense || '',
           }
         }
       })

@@ -195,12 +195,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
         group: groupInfo,
         scope: compScope,
         licenses: {
-          licensesExp:
-            licenseType === 'license_exp'
-              ? expLicense
-                ? expLicense
-                : ''
-              : undefined
+          licensesExp: expLicense || '',
         },
         cpes: cpeValue !== '' ? [cpeValue] : [],
         purl: purlValue,

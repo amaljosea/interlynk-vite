@@ -231,12 +231,7 @@ function ComponentDrawer(props) {
         group: groupInfo,
         scope: compScope,
         licenses: {
-          licensesExp:
-            licenseType === 'license_exp'
-              ? expLicense
-                ? expLicense
-                : ''
-              : undefined
+          licensesExp: expLicense || '',
         },
         cpes: cpeValue !== '' ? [cpeValue] : [],
         purl: purlValue,
