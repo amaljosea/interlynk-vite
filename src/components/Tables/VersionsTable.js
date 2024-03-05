@@ -24,7 +24,6 @@ import {
   Button,
   ListItem,
   Spinner,
-  Box,
   TagLabel
 } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
@@ -34,24 +33,32 @@ import { sbomDelete } from 'graphQL/Mutation'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
-import { FaEllipsisV } from 'react-icons/fa'
-import { FaCodeCompare, FaScrewdriverWrench } from 'react-icons/fa6'
+import {
+  FaCodeCompare,
+  FaScrewdriverWrench,
+  FaEllipsisVertical
+} from 'react-icons/fa6'
 import { Link, useLocation, useParams } from 'react-router-dom'
-import { timeSince, getFullDateAndTime, customStyles } from 'utils'
+import ToolsDrawer from 'components/Drawer/ToolsDrawer'
 import SbomList from 'views/Dashboard/Products/components/SbomList'
+import SearchFilter from 'views/Sbom/components/SearchFilter'
 import Pagination from '../Pagination'
 import {
   GetVersionsTable,
   ShareVersionTable,
-  GetSbomAlternatives
+  GetSbomAlternatives,
+  GetSbomDrift,
+  GetSbomVersions,
+  GetShareSbomAlternatives,
+  GetShareSbomVersions,
+  GetShareSbomDrift
 } from 'graphQL/Queries'
-import ToolsDrawer from 'components/Drawer/ToolsDrawer'
-import { GetSbomDrift } from 'graphQL/Queries'
-import { sortByUpdatedAt } from 'utils'
-import { GetSbomVersions } from 'graphQL/Queries'
-import { GetShareSbomAlternatives } from 'graphQL/Queries'
-import { GetShareSbomVersions } from 'graphQL/Queries'
-import { GetShareSbomDrift } from 'graphQL/Queries'
+import {
+  timeSince,
+  getFullDateAndTime,
+  customStyles,
+  sortByUpdatedAt
+} from 'utils'
 
 const VersionsTable = ({ projectGroup, getVulnData }) => {
   const location = useLocation()
@@ -77,6 +84,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
 
   const paginationSizes = [25, 50, 100]
   const [totalRows, setTotalRows] = useState(paginationSizes[0])
+  const [searchInput, setSearchInput] = useState('')
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -459,7 +467,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
           <Menu>
             <MenuButton
               as={IconButton}
-              icon={<FaEllipsisV />}
+              icon={<FaEllipsisVertical />}
               variant='none'
               color='gray.400'
             />
@@ -543,7 +551,11 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
           }
         }).then((res) => {
           if (res?.data) {
-            setDrifts(signedUrlParams ? res?.data?.shareLynkQuery?.sbom?.sbomDrift : res?.data?.sbom?.sbomDrift)
+            setDrifts(
+              signedUrlParams
+                ? res?.data?.shareLynkQuery?.sbom?.sbomDrift
+                : res?.data?.sbom?.sbomDrift
+            )
             setLoading(false)
             onToolOpen()
           }
@@ -552,6 +564,32 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
     }
   }
 
+  // CLEAR SERACH
+  const handleClear = async () => {
+    setSearchInput('')
+  }
+
+  // ON SEARCH INPUT CHANGE
+  const onSearchInputChange = (e) => {
+    const { value } = e.target
+    if (value === '') {
+      handleClear()
+    } else {
+      setSearchInput(value)
+    }
+  }
+
+  // SEARCH COMPONENT
+  const handleSearch = async (event) => {
+    setSearchInput(event.target.value)
+  }
+
+  const filteredItems = versions?.nodes?.filter(
+    (item) =>
+      item?.projectVersion &&
+      item?.projectVersion.toLowerCase().includes(searchInput.toLowerCase())
+  )
+
   const subHeaderComponent = useMemo(() => {
     return (
       <Flex
@@ -559,7 +597,14 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
         alignItems={'center'}
         justifyContent={'space-between'}
       >
-        <Stack>
+        <Stack direction={'row'} alignItems={'center'} spacing={3}>
+          <SearchFilter
+            id='versions'
+            filterText={searchInput}
+            onChange={onSearchInputChange}
+            onClear={handleClear}
+            onFilter={handleSearch}
+          />
           {selectedSbom?.length === 1 && (
             <Text color={'red.500'}>
               ** Select one more version to enable comparison
@@ -604,11 +649,17 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
         </Stack>
       </Flex>
     )
-  }, [handleRefresh, handleCompare])
+  }, [
+    handleRefresh,
+    handleCompare,
+    onSearchInputChange,
+    handleClear,
+    handleSearch
+  ])
 
   const dataTableProps = {
     columns: columns,
-    data: versions?.nodes || [],
+    data: filteredItems || [],
     customStyles: customStyles,
     defaultSortFieldId: 'UPDATED_AT',
     defaultSortAsc: false,
@@ -720,8 +771,14 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
 
       {isToolOpen && allVersions && (
         <ToolsDrawer
-          versionList={ signedUrlParams ? allVersions?.shareLynkQuery?.project?.sbomVersions : allVersions?.project?.sbomVersions }
-          diffs={signedUrlParams ? driftData?.shareLynkQuery?.sbom : driftData?.sbom}
+          versionList={
+            signedUrlParams
+              ? allVersions?.shareLynkQuery?.project?.sbomVersions
+              : allVersions?.project?.sbomVersions
+          }
+          diffs={
+            signedUrlParams ? driftData?.shareLynkQuery?.sbom : driftData?.sbom
+          }
           data={drifts}
           isOpen={isToolOpen}
           onClose={onToolClose}
