@@ -22,7 +22,7 @@ export default function AdminNavbar(props) {
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
   const {} = useQuery(GetUserPermissions, {
-    skip: (signedUrlParams || userPermissions?.length > 0) ? true : false,
+    skip: signedUrlParams ? true : false,
     onCompleted: (data) => {
       const permissions = permissionList(
         data?.organization?.currentUser?.role?.permissionsMap || []
