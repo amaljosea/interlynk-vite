@@ -710,42 +710,22 @@ export const isDefaultEnv = (name) => {
 
 export const filterEnvList = (projects) => {
   const defaultEnvs = [...projects]
-    .filter(
-      (item) =>
-        item.name === 'default' ||
-        item.name === 'development' ||
-        item.name === 'production'
-    )
-    .sort((a, b) => a.name.localeCompare(b.name))
+  .filter((item) => item.name === 'default' || item.name === 'development' || item.name === 'production')
+  .sort((a, b) => a?.name?.localeCompare(b?.name))
   const newEnvs = [...projects]
-    .filter(
-      (item) =>
-        item.name !== 'default' &&
-        item.name !== 'development' &&
-        item.name !== 'production'
-    )
-    .sort((a, b) => a.name.localeCompare(b.name))
-  return [...defaultEnvs, ...newEnvs]
+  .filter((item) => item.name !== 'default' && item.name !== 'development' && item.name !== 'production')
+  .sort((a, b) => a?.name?.localeCompare(b?.name))
+  return defaultEnvs && newEnvs ? [...defaultEnvs, ...newEnvs] : []
 }
 
 export const envOrderList = (projects) => {
   const defaultEnvs = [...projects]
-    .filter(
-      (item) =>
-        item.label === 'default' ||
-        item.label === 'development' ||
-        item.label === 'production'
-    )
-    .sort((a, b) => a.label.localeCompare(b.label))
+  .filter((item) => item.label === 'default' || item.label === 'development' || item.label === 'production')
+  .sort((a, b) => a?.label?.localeCompare(b?.label))
   const newEnvs = [...projects]
-    .filter(
-      (item) =>
-        item.label !== 'default' &&
-        item.label !== 'development' &&
-        item.label !== 'production'
-    )
-    .sort((a, b) => a.label.localeCompare(b.label))
-  return [...defaultEnvs, ...newEnvs]
+  .filter((item) => item.label !== 'default' && item.label !== 'development' && item.label !== 'production')
+  .sort((a, b) => a?.label?.localeCompare(b?.label))
+  return defaultEnvs && newEnvs ? [...defaultEnvs, ...newEnvs] : []
 }
 
 export const purlString = (value) => PackageURL.fromString(value)

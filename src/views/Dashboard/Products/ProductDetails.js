@@ -515,63 +515,7 @@ const ProductDetails = () => {
         </Card>
         {/* TAB SECTION */}
         <Card>
-          <CardHeader>
-            <Flex width={'100%'} justifyContent={'flex-end'}>
-              {/* CHANGE ENVIRONMENT */}
-              <Menu>
-                <MenuButton
-                  display='none'
-                  as={Button}
-                  variant={'solid'}
-                  colorScheme='blue'
-                  fontSize={'sm'}
-                  textTransform={
-                    isDefaultEnv(defaultEnv) ? 'capitalize' : 'none'
-                  }
-                  rightIcon={<ChevronDownIcon />}
-                >
-                  {defaultEnv}
-                </MenuButton>
-                <MenuList minH={'auto'} maxH={'250px'} overflowY={'scroll'}>
-                  <MenuOptionGroup
-                    type='radio'
-                    value={activeEnv}
-                    onChange={onChangeEnv}
-                  >
-                    {filterEnvList(data?.projectGroup?.projects)?.map(
-                      (item) => (
-                        <MenuItemOption
-                          fontSize={'sm'}
-                          value={item?.id}
-                          key={item?.id}
-                          textTransform={
-                            isDefaultEnv(item?.name) ? 'capitalize' : 'none'
-                          }
-                          borderBottom={
-                            filterEnvList(data?.projectGroup?.projects)
-                              ?.length > 3 && item?.name === 'production'
-                              ? '1px solid #E2E8F0'
-                              : 'none'
-                          }
-                        >
-                          {item?.name}
-                        </MenuItemOption>
-                      )
-                    )}
-                    <MenuDivider />
-                    <MenuItem
-                      fontSize={'sm'}
-                      icon={<ViewIcon />}
-                      onClick={() => onEnvOpen()}
-                    >
-                      Manage Environments
-                    </MenuItem>
-                  </MenuOptionGroup>
-                </MenuList>
-              </Menu>
-            </Flex>
-          </CardHeader>
-          <CardBody mt={6}>
+          <CardBody>
             <Tabs
               variant='enclosed'
               w={'100%'}
