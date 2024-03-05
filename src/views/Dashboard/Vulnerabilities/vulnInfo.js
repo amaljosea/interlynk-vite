@@ -2,11 +2,7 @@
 import {
   Flex,
   Icon,
-  Grid,
-  GridItem,
   Text,
-  Popover,
-  PopoverTrigger,
   TabList,
   Tabs,
   Tab,
@@ -16,20 +12,20 @@ import {
   Box,
   Tag,
   TagLabel,
-  Tooltip
+  useDisclosure
 } from '@chakra-ui/react'
 import Card from 'components/Card/Card.js'
 import CardBody from 'components/Card/CardBody.js'
 import { FaCube, FaCubes, FaBug } from 'react-icons/fa'
-import { getFullDateAndTime } from 'utils'
+import { getFullDateAndTime, linkURl } from 'utils'
 import VulnProdTable from './components/ProdTable'
-import { FaCodeMerge, FaVectorSquare } from 'react-icons/fa6'
+import { FaCodeMerge } from 'react-icons/fa6'
 import VulnBadge from 'components/Misc/VulnBadge'
 import { Link } from 'react-router-dom'
-import { linkURl } from 'utils'
 import CvssCard from 'components/Misc/CvssCard'
 
 const VulnInfo = ({ data, componentVulns, refetch }) => {
+  const {isOpen, onOpen, onClose} = useDisclosure()
   return (
     <>
       {/* Product Info */}
@@ -172,22 +168,17 @@ const VulnInfo = ({ data, componentVulns, refetch }) => {
                     ></i>
                     <Flex flexDir={'column'} alignItems={'center'}>
                       {data?.cvssVector ? (
-                        <Tooltip
-                          bg='gray.50'
-                          label={<CvssCard value={data?.cvssVector} />}
-                          placement='top'
+                        <Tag
+                         variant='subtle'
+                         width={'full'}
+                         colorScheme={'cyan'}
+                         cursor={'pointer'}
+                         onClick={onOpen}
                         >
-                          <Tag
-                            variant='subtle'
-                            width={'full'}
-                            colorScheme={'cyan'}
-                            cursor={'pointer'}
-                          >
-                            <TagLabel mx={'auto'}>
-                              {data?.cvssVector || '-'}
-                            </TagLabel>
-                          </Tag>
-                        </Tooltip>
+                         <TagLabel mx={'auto'}>
+                           {data?.cvssVector || '-'}
+                         </TagLabel>
+                       </Tag>
                       ) : (
                         <Tag
                           variant='subtle'
@@ -234,6 +225,9 @@ const VulnInfo = ({ data, componentVulns, refetch }) => {
           </TabPanels>
         </Tabs>
       </Card>
+
+      {/* CVSS CARD */}
+      {isOpen && <CvssCard isOpen={isOpen} onClose={onClose} value={data?.cvssVector} />}
     </>
   )
 }
