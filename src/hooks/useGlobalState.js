@@ -9,7 +9,8 @@ import {
   prodVulnReducer,
   sbomLogReducer,
   prodReducer,
-  sbomReducer
+  sbomReducer,
+  versionReducer
 } from 'context/reducers'
 
 const GlobalStateContext = createContext()
@@ -41,6 +42,13 @@ const GlobalStateProvider = ({ children }) => {
     pageIndex: 1,
     enabled: 'yes',
     currentProduct: null
+  })
+  // SBOM VERSIONS
+  const [versionState, versionDispatch] = useReducer(versionReducer, {
+    field: 'SBOMS_UPDATED_AT',
+    direction: 'DESC',
+    searchInput: '',
+    pageIndex: 1
   })
   // GLOBAL VULNERABILITIES
   const [globalVulnState, globalVulnDispatch] = useReducer(globalVulnReducer, {
@@ -206,6 +214,7 @@ const GlobalStateProvider = ({ children }) => {
         prodRulesState,
         sbomLogState,
         sbomState,
+        versionState,
         dispatch: {
           globalVulnDispatch,
           compVulnDispatch,
@@ -216,7 +225,8 @@ const GlobalStateProvider = ({ children }) => {
           prodCheckDispatch,
           prodRulesDispatch,
           sbomLogDispatch,
-          sbomDispatch
+          sbomDispatch,
+          versionDispatch
         }
       }}
     >

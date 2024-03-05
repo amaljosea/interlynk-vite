@@ -77,18 +77,26 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
     clearSelect,
     selectedSbom,
     setSelectedSbom,
+    versionState,
     dispatch
   } = useGlobalState()
+  const { searchInput } = versionState
   const { field, direction } = prodVulnState
-  const { prodVulnDispatch, prodCompDispatch } = dispatch
+  const { prodVulnDispatch, prodCompDispatch, versionDispatch } = dispatch
 
   const paginationSizes = [25, 50, 100]
   const [totalRows, setTotalRows] = useState(paginationSizes[0])
-  const [searchInput, setSearchInput] = useState('')
+  const [filterText, setFilterText] = useState(searchInput)
   const [isPrevActive, setIsPrevActive] = useState(false)
   const [isNextActive, setIsNextActive] = useState(false)
   const [loading, setLoading] = useState(false)
   const [drifts, setDrifts] = useState([])
+
+  const versionData = {
+    id: activeProd,
+    field: versionState?.field,
+    direction: versionState?.direction
+  }
 
   const [getAlternatives, { data: sbomAlts }] = useLazyQuery(
     signedUrlParams ? GetShareSbomAlternatives : GetSbomAlternatives,
@@ -112,7 +120,11 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
     {
       skip: activeProdTab === 0 && !isToolOpen ? false : true,
       fetchPolicy: 'network-only',
-      variables: { id: activeProd, first: totalRows },
+      variables: {
+        ...versionData,
+        first: totalRows,
+        search: searchInput !== '' ? searchInput : undefined
+      },
       onCompleted: () => setClearSelect(false)
     }
   )
@@ -146,6 +158,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
     setCurrentPage(currentPage + 1)
 
     await refetch({
+      ...versionData,
       first: totalRows,
       last: undefined,
       after: versions.pageInfo.endCursor,
@@ -160,8 +173,8 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
   const handlePreviousPage = useCallback(async () => {
     disablePaginationControl()
     setCurrentPage(currentPage - 1)
-
     await refetch({
+      ...versionData,
       first: undefined,
       last: totalRows,
       after: undefined,
@@ -180,6 +193,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
       setTotalRows(newTotalRows)
       disablePaginationControl()
       await refetch({
+        ...versionData,
         first: newTotalRows,
         last: undefined,
         after: undefined,
@@ -276,7 +290,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
   const columns = [
     // VERSION
     {
-      id: 'VERSION',
+      id: 'SBOMS_PROJECT_VERSION',
       name: 'VERSION',
       selector: (row) => {
         const { id, projectVersion } = row
@@ -303,7 +317,8 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
         )
       },
       wrap: true,
-      width: '250px'
+      width: '250px',
+      sortable: true
     },
     // COMPONENTS
     {
@@ -423,7 +438,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
     },
     // CREATED AT
     {
-      id: 'CREATEDAT',
+      id: 'SBOMS_CREATED_AT',
       name: 'CREATED',
       selector: (row) => {
         const { creationAt } = row
@@ -434,11 +449,12 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
           </Tooltip>
         )
       },
-      right: 'false'
+      right: 'false',
+      sortable: true
     },
     // UPDATED AT
     {
-      id: 'UPDATED_AT',
+      id: 'SBOMS_UPDATED_AT',
       name: 'UPDATED',
       width: '200px',
       selector: (row) => {
@@ -566,7 +582,16 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
 
   // CLEAR SERACH
   const handleClear = async () => {
-    setSearchInput('')
+    setFilterText('')
+    await refetch({
+      ...versionData,
+      first: totalRows,
+      search: undefined,
+      last: undefined,
+      after: undefined,
+      before: undefined
+    }).then((res) => res?.data && versionDispatch({ type: 'CLEAR_SEARCH_INPUT' })
+    )
   }
 
   // ON SEARCH INPUT CHANGE
@@ -575,20 +600,23 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
     if (value === '') {
       handleClear()
     } else {
-      setSearchInput(value)
+      setFilterText(value)
     }
   }
 
   // SEARCH COMPONENT
   const handleSearch = async (event) => {
-    setSearchInput(event.target.value)
+    const { value } = event.target
+    if (event.key === 'Enter' && filterText !== '') {
+      refetch({
+        ...versionData,
+        search: value,
+        first: totalRows,
+        after: undefined,
+        before: undefined
+      }).then((res) => res?.data && versionDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value }))
+    }
   }
-
-  const filteredItems = versions?.nodes?.filter(
-    (item) =>
-      item?.projectVersion &&
-      item?.projectVersion.toLowerCase().includes(searchInput.toLowerCase())
-  )
 
   const subHeaderComponent = useMemo(() => {
     return (
@@ -600,7 +628,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
         <Stack direction={'row'} alignItems={'center'} spacing={3}>
           <SearchFilter
             id='versions'
-            filterText={searchInput}
+            filterText={filterText}
             onChange={onSearchInputChange}
             onClear={handleClear}
             onFilter={handleSearch}
@@ -650,6 +678,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
       </Flex>
     )
   }, [
+    filterText,
     handleRefresh,
     handleCompare,
     onSearchInputChange,
@@ -657,11 +686,31 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
     handleSearch
   ])
 
+  const handleSort = async (column, sortDirection) => {
+    await refetch({
+      id: activeProd,
+      first: undefined,
+      last: totalRows,
+      after: undefined,
+      before: undefined,
+      field: column.id,
+      direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+    }).then((res) => {
+      if (res.data) {
+        versionDispatch({
+          type: 'SET_SORT_ORDER',
+          payload: { field: column.id, direction: sortDirection === 'asc' ? 'ASC' : 'DESC' }
+        })
+      }
+    })
+  }
+
   const dataTableProps = {
     columns: columns,
-    data: filteredItems || [],
+    data: versions?.nodes || [],
     customStyles: customStyles,
-    defaultSortFieldId: 'UPDATED_AT',
+    onSort: handleSort,
+    defaultSortFieldId: versionState?.field,
     defaultSortAsc: false,
     subHeader: true,
     subHeaderComponent: subHeaderComponent,

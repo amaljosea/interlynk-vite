@@ -47,7 +47,8 @@ import CpeInput from 'components/CpeInput'
 function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
   const toast = useToast()
   const activeEnv = localStorage.getItem('activeEnv')
-  const { prodCompState, dispatch } = useGlobalState()
+  const { totalRows, prodCompState, versionState, dispatch } = useGlobalState()
+  const { field, direction } = versionState 
   const { licenseType, expLicense } = prodCompState
   const { prodCompDispatch } = dispatch
 
@@ -64,6 +65,18 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
   const [purlData, setPurlData] = useState(null)
   const [isPURLInputValid, setPURLInputValid] = useState(true)
   const [isValid, setIsValid] = useState(true)
+
+  const handleRefetch = () => {
+    refetch({
+      id: productId,
+      first: totalRows,
+      after: undefined,
+      before: undefined,
+      field,
+      direction
+    })
+  }
+
 
   const [getCpe] = useLazyQuery(CpeAutoComplete)
   const [createSbom] = useMutation(sbomCreate)
@@ -169,12 +182,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
     })
   }
 
-  const handleRefetch = () => {
-    refetch({
-      id: productId
-    })
-  }
-
+ 
 
   const handleCreateComp = async (id) => {
     await createComponent({

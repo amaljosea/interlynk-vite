@@ -1224,10 +1224,20 @@ export const GetVersionsTable = gql`
     $after: String
     $last: Int
     $before: String
+    $search: String
+    $field: SbomOrderByFields!
+    $direction: OrderByDirection!
   ) {
     project(id: $id) {
       id
-      sbomVersions(first: $first, after: $after, last: $last, before: $before) {
+      sbomVersions(
+        first: $first
+        after: $after
+        last: $last
+        before: $before
+        search: $search
+        orderBy: { direction: $direction, field: $field }
+      ) {
         totalCount
         pageInfo {
           endCursor
@@ -1326,6 +1336,9 @@ export const ShareVersionTable = gql`
     $after: String
     $last: Int
     $before: String
+    $search: String
+    $field: SbomOrderByFields!
+    $direction: OrderByDirection!
   ) {
     shareLynkQuery {
       project(id: $id) {
@@ -1334,6 +1347,8 @@ export const ShareVersionTable = gql`
           after: $after
           last: $last
           before: $before
+          search: $search
+          orderBy: { direction: $direction, field: $field }
         ) {
           totalCount
           pageInfo {
