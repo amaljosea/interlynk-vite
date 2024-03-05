@@ -159,11 +159,7 @@ const VulnsFilters = ({ refetch }) => {
                 </MenuItemOption>
                 {data?.organization?.projectGroups?.nodes?.map(
                   (item, index) => (
-                    <MenuItemOption
-                      key={index}
-                      value={item.id}
-                      fontSize={'sm'}
-                    >
+                    <MenuItemOption key={index} value={item.id} fontSize={'sm'}>
                       {item.name}
                     </MenuItemOption>
                   )
