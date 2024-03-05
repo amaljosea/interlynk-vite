@@ -106,6 +106,8 @@ const SBOMTable = ({
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const activeTab = Number(localStorage.getItem('activeSbomTab') || 0)
 
+  const [activeComp, setActiveComp] = useState(null)
+
   // GET SBOM PARTS
   const [getPartsData, { data: partsData }] = useLazyQuery(GetSbomParts, {
     fetchPolicy: 'network-only'
@@ -393,6 +395,7 @@ const SBOMTable = ({
                   data={compData?.sbom?.components}
                   refetch={getCompData}
                   sbomRefetch={refetch}
+                  setActiveComp={setActiveComp}
                   primaryComp={data.primaryComponent}
                 />
               )}
@@ -447,7 +450,7 @@ const SBOMTable = ({
             </TabPanel>
             {/* RELATIONSHIP TABLE */}
             <TabPanel px={0}>
-              <GraphView data={compData?.sbom?.components} />
+              <GraphView data={compData?.sbom?.components} activeComp={activeComp} />
             </TabPanel>
             {/* HEALTH CHECK TABLE */}
             <TabPanel px={0}>

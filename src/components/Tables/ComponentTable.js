@@ -57,7 +57,8 @@ const ComponentTable = ({
   data,
   refetch,
   primaryComp,
-  sbomRefetch
+  sbomRefetch,
+  setActiveComp
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -87,7 +88,7 @@ const ComponentTable = ({
   }
   //end
 
-  const { userPermissions, totalRows, setTotalRows, prodCompState, dispatch } =
+  const { userPermissions, totalRows, setTotalRows, setActiveSbomTab, prodCompState, dispatch } =
     useGlobalState()
   const {
     field,
@@ -625,6 +626,17 @@ const ComponentTable = ({
                     >
                       Edit Links
                     </MenuItem>
+                    <MenuItem
+                        onClick={() => handleGraphView(row)}
+                        isDisabled={
+                          status === 'signed' ||
+                          !updateComponent ||
+                          !updateSboms ||
+                          totalComp?.length === 1
+                        }
+                      >
+                        Graph View
+                      </MenuItem>
                     <Divider />
                     {primary === false && (
                       <MenuItem
@@ -663,6 +675,12 @@ const ComponentTable = ({
       right: 'true'
     }
   ]
+
+  const handleGraphView  = (row) => {
+    setActiveComp(row)
+    localStorage.setItem('activeSbomTab', 6)
+    setActiveSbomTab(6)
+  }
 
   const [deleteSupplier] = useMutation(deleteComSupplier)
 
