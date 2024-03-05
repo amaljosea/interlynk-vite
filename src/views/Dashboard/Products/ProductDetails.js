@@ -618,6 +618,8 @@ const ProductDetails = () => {
                   <GlobalVulnTable
                     data={globalVulnData?.organization?.vulns}
                     refetch={getVulns}
+                    activeEnv={activeEnv}
+                    productId={productId}
                   />
                 </TabPanel>
                 {/* AUTOMATIONS */}

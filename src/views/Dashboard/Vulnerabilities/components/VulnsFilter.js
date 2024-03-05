@@ -148,7 +148,7 @@ const VulnsFilters = ({ refetch }) => {
               <CheckMark />
             )}
             <MenuHeading title={'Product'} />
-            <MenuList>
+            <MenuList minH={'auto'} maxH={'300px'} overflowY={'scroll'}>
               <MenuOptionGroup
                 type='checkbox'
                 value={products}
@@ -163,7 +163,6 @@ const VulnsFilters = ({ refetch }) => {
                       key={index}
                       value={item.id}
                       fontSize={'sm'}
-                      textTransform={'capitalize'}
                     >
                       {item.name}
                     </MenuItemOption>

@@ -28,7 +28,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import Round from 'components/Misc/Round'
 import Pagination from '../Pagination'
 
-const GlobalVulnTable = ({ data, refetch }) => {
+const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
   //This part is needed for the pagination to work. (Modify with caution)
   const paginationSizes = [25, 50, 100]
   const [totalRows, setTotalRows] = useState(paginationSizes[0])
@@ -401,7 +401,9 @@ const GlobalVulnTable = ({ data, refetch }) => {
       variables: {
         field,
         direction,
-        first: totalRows
+        first: totalRows,
+        projectIds: [activeEnv],
+        projectGroupIds: [productId],
       }
     }).then(
       (res) => res?.data && globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
