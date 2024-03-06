@@ -191,6 +191,7 @@ const ProductTable = ({ data, refetch }) => {
 
   const handleOpenSbom = useCallback(
     (row) => {
+      localStorage.getItem('activeEnv', row?.defaultProject?.id)
       prodCompDispatch({ type: 'CLEAR_LICENSES' })
       setActiveRow(row)
       onSbomOpen()

@@ -43,12 +43,13 @@ import CpeModal from 'views/Dashboard/Products/components/CpeModal'
 import { CpeAutoComplete } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
 import CpeInput from 'components/CpeInput'
+import { useParams } from 'react-router-dom'
 
 function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
   const toast = useToast()
+  const params = useParams()
   const activeEnv = localStorage.getItem('activeEnv')
-  const { totalRows, prodCompState, versionState, dispatch } = useGlobalState()
-  const { field, direction } = versionState 
+  const { totalRows, prodState, prodCompState, versionState, dispatch } = useGlobalState()
   const { licenseType, expLicense } = prodCompState
   const { prodCompDispatch } = dispatch
 
@@ -68,12 +69,12 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
 
   const handleRefetch = () => {
     refetch({
-      id: productId,
+      id: params?.name ? productId : undefined,
       first: totalRows,
       after: undefined,
       before: undefined,
-      field,
-      direction
+      field: params?.name ? versionState?.field : prodState?.field,
+      direction: params?.name ? versionState?.direction : prodState?.direction
     })
   }
 
