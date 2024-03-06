@@ -3598,3 +3598,42 @@ export const GetProductsForSbomDrift = gql`
     }
   }
 `
+// GET COMPONENT SUPPORT INFO
+export const ComponentSupportInfos = gql`
+  query ComponentSupportInfos(
+    $sbomId: Uuid
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+    $field: SupportComponentOrderByFields!
+    $direction: OrderByDirection!
+    $search: String
+  ) {
+    componentSupportInfos(
+      sbomId: $sbomId
+      search: $search
+      orderBy: { field: $field, direction: $direction }
+      first: $first
+      last: $last
+      after: $after
+      before: $before
+    ) {
+      totalCount
+      pageInfo {
+        endCursor
+        hasNextPage
+        hasPreviousPage
+        startCursor
+      }
+      nodes {
+        lts
+        eolDate
+        eolSupport
+        cpes
+        name
+        version
+      }
+    }
+  }
+`

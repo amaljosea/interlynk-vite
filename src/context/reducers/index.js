@@ -10,18 +10,6 @@ import sbomReducer from './sbomReducer'
 import prodReducer from './prodReducer'
 import versionReducer from './versionReducer'
 import toolsReducer from './toolsReducer'
+import supportReducer from './supportReducer'
 
-export {
-  globalVulnReducer,
-  compVulnReducer,
-  prodRulesReducer,
-  prodCheckReducer,
-  prodCompReducer,
-  prodLogReducer,
-  prodVulnReducer,
-  sbomLogReducer,
-  sbomReducer,
-  prodReducer,
-  versionReducer,
-  toolsReducer
-}
+export { globalVulnReducer, compVulnReducer, prodRulesReducer, prodCheckReducer, prodCompReducer, prodLogReducer, prodVulnReducer, sbomLogReducer, sbomReducer, prodReducer, versionReducer, toolsReducer, supportReducer }

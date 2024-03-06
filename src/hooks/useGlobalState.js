@@ -11,7 +11,8 @@ import {
   prodReducer,
   sbomReducer,
   versionReducer,
-  toolsReducer
+  toolsReducer,
+  supportReducer
 } from 'context/reducers'
 
 const GlobalStateContext = createContext()
@@ -173,6 +174,15 @@ const GlobalStateProvider = ({ children }) => {
     types: [],
     filters: null
   })
+   // SBOM VERSIONS
+   const [supportState, supportDispatch] = useReducer(supportReducer, {
+    pageIndex: 1,
+    searchInput: '',
+    after:'',
+    before: '',
+    field: 'COMPONENTS_EOL_DATE',
+    direction: 'DESC'
+  })
   // SBOM VERSIONS
   const [toolsState, toolsDispatch] = useReducer(toolsReducer, {
     drifts: [],
@@ -225,6 +235,7 @@ const GlobalStateProvider = ({ children }) => {
         sbomState,
         versionState,
         toolsState,
+        supportState,
         dispatch: {
           globalVulnDispatch,
           compVulnDispatch,
@@ -237,7 +248,8 @@ const GlobalStateProvider = ({ children }) => {
           sbomLogDispatch,
           sbomDispatch,
           versionDispatch,
-          toolsDispatch
+          toolsDispatch,
+          supportDispatch
         }
       }}
     >

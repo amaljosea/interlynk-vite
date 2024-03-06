@@ -29,6 +29,7 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import SupportTable from 'components/Tables/SupportTable'
 import SbomLicenseTable from '../../../components/Licenses/SbomLicenseTable'
 import GraphView from './GraphView'
+import { ComponentSupportInfos } from 'graphQL/Queries'
 
 const SBOMTable = ({
   status,
@@ -89,6 +90,7 @@ const SBOMTable = ({
     prodVulnState,
     prodCheckState,
     sbomLogState,
+    supportState,
     dispatch
   } = useGlobalState()
 
@@ -120,10 +122,12 @@ const SBOMTable = ({
 
   // GET CHANGE LOG DATA
   const [getLogsData, { data: logsData, refetch: logsRefetch }] = useLazyQuery(
-    GetChangeLogs,
-    {
-      fetchPolicy: 'network-only'
-    }
+    GetChangeLogs, { fetchPolicy: 'network-only'}
+  )
+
+   // GET COMPONENT SUPPORT INFO
+   const [getSupportInfos, { data: support }] = useLazyQuery(
+    ComponentSupportInfos, { fetchPolicy: 'network-only'}
   )
 
   // GET LICENSES DATA
@@ -272,6 +276,22 @@ const SBOMTable = ({
       }).then((res) => {
         if (res.data) {
           console.log('licensesData', res.data)
+          updateLastFetchTime(tabName)
+        }
+      })
+    } else if (tabName === 'Support' && shouldFetchData(tabName)) {
+      const {searchInput, field, direction} = supportState
+      getSupportInfos({
+        variables: {
+          sbomId,
+          field,
+          direction,
+          first: totalRows, 
+          search: searchInput !== '' ? searchInput : undefined,
+        }
+      }).then((res) => {
+        if (res?.data) {
+          console.log('Support data', res.data)
           updateLastFetchTime(tabName)
         }
       })
@@ -446,7 +466,7 @@ const SBOMTable = ({
             </TabPanel>
             {/* SUPPORT TABLE */}
             <TabPanel px={0}>
-              <SupportTable data={null} />
+              <SupportTable data={support?.componentSupportInfos} refetch={getSupportInfos} sbomId={sbomId} />
             </TabPanel>
             {/* RELATIONSHIP TABLE */}
             <TabPanel px={0}>
