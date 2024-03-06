@@ -473,7 +473,7 @@ const Compare = ({ selectedSboms }) => {
       </Grid>
       {/* SBOM DIFFERENCE */}
       <Card width='100%'>
-        <DiffTable diffs={driftData} data={drifts} setData={setDrifts} isLoading={isLoading} sbomOne={firstSbomInfo} sbomTwo={secondSbomInfo}/>
+        <DiffTable diffs={driftData?.sbom} data={drifts} setData={setDrifts} isLoading={isLoading} sbomOne={firstSbomInfo} sbomTwo={secondSbomInfo}/>
       </Card>
     </>
   )

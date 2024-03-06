@@ -87,7 +87,7 @@ const ToolsDrawer = ({ data, diffs, setData, selectedSbom, versionList, isOpen, 
             </GridItem>
           </Grid>
           {/* SBOM DIFFERENCE */}
-          <DiffTable diffs={diffs} data={data} setData={setData} isLoading={diffs?.sbomDrift ? false : true}/>
+          <DiffTable diffs={diffs} data={data} setData={setData} isLoading={diffs?.sbomDrift ? false : true} sbomOne={versionsOne} sbomTwo={versionsTwo}/>
         </DrawerBody>
       </DrawerContent>
     </Drawer>
