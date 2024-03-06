@@ -174,7 +174,7 @@ const GraphView = ({ data, activeComp }) => {
               separation={{ nonSiblings: 1, siblings: 1 }}
               depthFactor='600'
               enableLegacyTransitions={true}
-              pathFunc={'diagonal'}
+              pathFunc={'step'}
               renderCustomNodeElement={(rd3tProps) =>
                 renderForeignObjectNode({
                   ...rd3tProps,

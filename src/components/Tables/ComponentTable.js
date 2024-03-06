@@ -635,7 +635,7 @@ const ComponentTable = ({
                           totalComp?.length === 1
                         }
                       >
-                        Graph View
+                        View Relationships
                       </MenuItem>
                     <Divider />
                     {primary === false && (

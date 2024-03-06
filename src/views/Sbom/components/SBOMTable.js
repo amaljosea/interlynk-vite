@@ -50,7 +50,7 @@ const SBOMTable = ({
     'Vulnerabilities': 0.5,
     'Licenses': 0,
     'Support': 0,
-    'Relationship': 0,
+    'Relationships': 0,
     'Checks': 0,
     'Change Log': 0,
   }
@@ -62,7 +62,7 @@ const SBOMTable = ({
     'Vulnerabilities': null,
     'Licenses': null,
     'Support': null,
-    'Relationship': null,
+    'Relationships': null,
     'Checks': null,
     'Change Log': null,
   })
@@ -144,7 +144,7 @@ const SBOMTable = ({
     3: 'Vulnerabilities',
     4: 'Licenses',
     5: 'Support',
-    6: 'Relationship',
+    6: 'Relationships',
     7: 'Checks',
     8: 'Change Log',
   }
@@ -275,7 +275,7 @@ const SBOMTable = ({
           updateLastFetchTime(tabName)
         }
       })
-    } else if (tabName === 'Relationship' && shouldFetchData(tabName)) {
+    } else if (tabName === 'Relationships' && shouldFetchData(tabName)) {
       const { field, direction } = prodCompState
       getCompData({
         ...commonParams,
