@@ -29,7 +29,6 @@ import {
   Badge,
   Skeleton,
   useToast,
-  Button
 } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
 import { FaBug, FaCopy, FaPen } from 'react-icons/fa6'
@@ -96,6 +95,7 @@ const VulnTable = ({
   const paginationSizes = [25, 50, 100]
 
   const textColor = useColorModeValue('gray.700', 'white')
+  const [activeRow, setActiveRow] = useState(null)
   const [vulnSearch, setVulnSearch] = useState('')
   const [toggleClear, setToggleClear] = useState(false)
   const [selectedVulns, setSelectedVulns] = useState([])
@@ -124,22 +124,8 @@ const VulnTable = ({
 
   const toast = useToast()
 
-  const { userPermissions, totalRows, setTotalRows, prodVulnState, dispatch } =
-    useGlobalState()
-  const {
-    pageIndex,
-    field,
-    direction,
-    searchInput,
-    severities,
-    components,
-    statues,
-    source,
-    kev,
-    epss,
-    filters,
-    direct
-  } = prodVulnState
+  const { userPermissions, totalRows, setTotalRows, prodVulnState, dispatch } = useGlobalState()
+  const { pageIndex, field, direction, searchInput, severities, components, statues, source, kev, epss, filters, direct } = prodVulnState
   const { prodVulnDispatch } = dispatch
 
   // GET VULN FILTER HEADS
@@ -178,12 +164,8 @@ const VulnTable = ({
   }
 
   const { isOpen, onOpen, onClose } = useDisclosure()
-
-  const {
-    isOpen: isTableOpen,
-    onOpen: onTableOpen,
-    onClose: onTableClose
-  } = useDisclosure()
+  const { isOpen:isCvssOpen, onOpen:onCvssOpen, onClose:onCvssClose } = useDisclosure()
+  const { isOpen: isTableOpen, onOpen: onTableOpen, onClose: onTableClose } = useDisclosure()
 
   const cvssColor = (cvss) => {
     if (cvss >= 9.0) {
@@ -755,14 +737,28 @@ const VulnTable = ({
                   label={<CvssCard value={vuln?.cvssVector} />}
                   placement='top'
                 >
-                  <Text mt={1} fontSize={14} cursor={'pointer'}>
+                  <Tag
+                    variant='subtle'
+                    width={'fit-content'}
+                    colorScheme={'cyan'}
+                    cursor={'pointer'}
+                    onClick={() => {
+                      setActiveRow(data)
+                      onCvssOpen()
+                    }}
+                  >
                     {vuln?.cvssVector || '-'}
-                  </Text>
+                  </Tag>
                 </Tooltip>
               ) : (
-                <Text mt={1} fontSize={14} cursor={'pointer'}>
+                <Tag
+                  variant='subtle'
+                  width={'fit-content'}
+                  colorScheme={'cyan'}
+                  cursor={'pointer'}
+                >
                   {vuln?.cvssVector || '-'}
-                </Text>
+                </Tag>
               )}
             </Box>
             {/* NVD ALIAS ID */}
@@ -1007,6 +1003,15 @@ const VulnTable = ({
           selectedVulns={selectedVulns}
           setSelectedVulns={setSelectedVulns}
           setToggleClear={setToggleClear}
+        />
+      )}
+
+      {/* CVSS CARD */}
+      {isCvssOpen && (
+        <CvssCard
+          isOpen={isCvssOpen}
+          onClose={onCvssClose}
+          value={activeRow?.vuln?.cvssVector}
         />
       )}
     </>
