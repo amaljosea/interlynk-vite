@@ -18,7 +18,7 @@ import RiskScoreOverview from './components/SalesOverview'
 import { GetOrg } from 'graphQL/Queries'
 import { useQuery } from '@apollo/client'
 import OrgRegister from '../Profile/components/OrgRegister'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { GetOrgMetrics } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useLocation } from 'react-router-dom'
@@ -32,10 +32,15 @@ export default function Dashboard() {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const product = queryParams.get('id')
-  const { dispatch, envName } = useGlobalState()
+  const { dispatch, envName, userPermissions } = useGlobalState()
   const { prodCompDispatch, prodVulnDispatch } = dispatch
 
   const iconBoxInside = useColorModeValue('white', 'white')
+
+  const productPermissions = useMemo(
+    () => userPermissions?.find((item) => item.key === 'view_product_group'),
+    [userPermissions]
+  )
 
   const {
     data,
@@ -50,7 +55,7 @@ export default function Dashboard() {
   })
 
   const { data: metrics, error: eOrgMetric } = useQuery(GetOrgMetrics, {
-    skip: data?.organization?.name ? false : true,
+    skip: data?.organization?.name && productPermissions?.value === true ? false : true,
     variables: { env: envName }
   })
 
@@ -72,7 +77,7 @@ export default function Dashboard() {
     )
   }
 
-  if (eOrgMetric) {
+  if (eOrg && eOrgMetric) {
     return (
       <Flex
         flexDirection='column'
@@ -194,7 +199,7 @@ export default function Dashboard() {
                 <GridItem colSpan={8} w='100%'>
                   <ProductsOverview
                     title={'Recent Imports'}
-                    data={metrics?.organizationMetric?.latestVersions}
+                    data={metrics?.organizationMetric?.latestVersions || []}
                   />
                 </GridItem>
                 {/* LATEST ACTIVITIES */}

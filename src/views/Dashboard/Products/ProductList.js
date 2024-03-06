@@ -1,6 +1,6 @@
 // Chakra imports
 import { Flex, Text } from '@chakra-ui/react'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useQuery } from '@apollo/client'
 import { useLocation } from 'react-router-dom'
 import ProductTable from 'components/Tables/ProductTable'
@@ -11,7 +11,7 @@ import { WarningTwoIcon } from '@chakra-ui/icons'
 import { GetProductTable } from 'graphQL/Queries'
 
 function ProductList() {
-  const { totalRows, prodState, dispatch } = useGlobalState()
+  const { totalRows, prodState, userPermissions, dispatch } = useGlobalState()
   const { data, field, direction, enabled, searchInput } = prodState
   const {
     prodDispatch,
@@ -27,11 +27,17 @@ function ProductList() {
   const product = queryParams.get('id')
   const org = localStorage.getItem('organization')
 
+  const productPermissions = useMemo(
+    () => userPermissions?.find((item) => item.key === 'view_product_group'),
+    [userPermissions]
+  )
+
   const {
     data: groups,
     refetch,
     error
   } = useQuery(GetProductTable, {
+    skip: productPermissions?.value === true ? false : true,
     variables: {
       search: searchInput !== '' ? searchInput : undefined,
       enabled: enabled === 'yes' ? true : enabled === 'no' ? false : undefined,
@@ -61,7 +67,7 @@ function ProductList() {
       prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
       prodCheckDispatch({ type: 'CLEAR_PROD_CHECK' })
       sbomLogDispatch({ type: 'CLEAR_SBOM_LOG' })
-      globalVulnDispatch({type: 'FETCH_DATA_SUCCESS'})
+      globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
     }
   }, [product])
 
@@ -82,7 +88,7 @@ function ProductList() {
 
   return (
     <ProductTable
-      data={groups?.organization?.projectGroups}
+      data={groups?.organization?.projectGroups || []}
       refetch={refetch}
     />
   )

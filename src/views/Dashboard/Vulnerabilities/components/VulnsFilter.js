@@ -20,12 +20,12 @@ import CheckMark from 'components/Misc/CheckMark'
 import MenuHeading from 'components/Misc/MenuHeading'
 import { GetProductNames } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useRef } from 'react'
+import { useMemo, useRef } from 'react'
 
 const VulnsFilters = ({ refetch }) => {
   const params = useParams()
 
-  const { totalRows, globalVulnState, prodState, dispatch } = useGlobalState()
+  const { totalRows, globalVulnState, prodState, userPermissions, dispatch } = useGlobalState()
   const {
     field,
     direction,
@@ -39,8 +39,13 @@ const VulnsFilters = ({ refetch }) => {
   } = globalVulnState
   const { globalVulnDispatch } = dispatch
 
+  const productPermissions = useMemo(
+    () => userPermissions?.find((item) => item.key === 'view_product_group'),
+    [userPermissions]
+  )
+
   const { data } = useQuery(GetProductNames, {
-    skip: window.location.pathname.startsWith(`/vendor/products`)
+    skip: (window.location.pathname.startsWith(`/vendor/products`) || productPermissions?.value === false)
       ? true
       : false,
     fetchPolicy: 'network-only',

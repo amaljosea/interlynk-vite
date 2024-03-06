@@ -25,21 +25,26 @@ import { FaCodeCompare, FaScaleUnbalanced, FaX } from 'react-icons/fa6'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { envOrderList, sortByUpdatedAt } from 'utils'
 import DiffTable from 'components/Tables/DiffTable'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import SbomInfo from 'components/SbomInfo'
 import ReactSelect from 'react-select'
 
 const Compare = ({ selectedSboms }) => {
-  const { prodState,toolsState, dispatch } = useGlobalState()
+  const { prodState, userPermissions, dispatch } = useGlobalState()
   const { field, direction } = prodState
   const { toolsDispatch } = dispatch
 
   const [isLoading, setIsLoading] = useState(false)
 
+  const productPermissions = useMemo(
+    () => userPermissions?.find((item) => item.key === 'view_product_group'),
+    [userPermissions]
+  )
   const [getProduct] = useLazyQuery(GetProject, { fetchPolicy: 'network-only' })
   const [getSbomData] = useLazyQuery(GetProductData, {fetchPolicy: 'network-only'})
   const [getDrift, { data: driftData }] = useLazyQuery(GetSbomDrift, {fetchPolicy: 'network-only'})
   const { data } = useQuery(GetProductsForSbomDrift, {
+    skip: productPermissions?.value === true ? false : true,
     fetchPolicy: 'network-only',
     variables: {enabled: true,field: field,direction: direction}
   })

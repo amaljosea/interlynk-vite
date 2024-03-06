@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { Flex } from '@chakra-ui/react'
 import { useLocation } from 'react-router-dom'
 import { useLazyQuery, useQuery } from '@apollo/client'
@@ -15,11 +15,16 @@ const Vulnerabilities = () => {
   const vulnId = queryParams.get('vulnId')
   const org = localStorage.getItem('organization')
 
-  const { totalRows, globalVulnState } = useGlobalState()
+  const { totalRows, globalVulnState, userPermissions } = useGlobalState()
   const { field, direction, searchInput, severities, products, statues, kev, epss } = globalVulnState
 
   const epssRange = epss !== 'all' && epss !== '' && epss?.split('-')
   const range = { min: parseFloat(epssRange[0]) / 100, max: parseFloat(epssRange[1]) / 100 }
+
+  const productPermissions = useMemo(
+    () => userPermissions?.find((item) => item.key === 'view_product_group'),
+    [userPermissions]
+  )
 
   const [getVulns, { data }] = useLazyQuery(GetGlobalVulns, {fetchPolicy: 'network-only'})
 
@@ -30,7 +35,7 @@ const Vulnerabilities = () => {
   })
 
   useEffect(() => {
-    if (data === undefined) {
+    if (data === undefined && productPermissions?.value === true) {
       getVulns({ variables: { first: totalRows, field: field, direction: direction, search: searchInput !== '' ? searchInput : undefined, projectGroupIds: products?.length === 0 ? undefined : products, severity: severities?.length === 0 ? undefined : severities, status: statues?.length === 0 ? undefined : statues, kev: kev === 'yes' ? true : kev === 'false' ? false : undefined, epss: epss === 'all' || epss === '' ? undefined : range } }) }
   }, [])
 
@@ -45,14 +50,14 @@ const Vulnerabilities = () => {
   if (vulnId && location.pathname === '/vendor/vulnerabilities') {
     return (
       <Flex direction='column' pt={{ base: '120px', md: '74px' }} pr={2} pl={5}>
-        <VulnInfo data={vulnData?.vuln} componentVulns={vulnData?.componentVulns} refetch={getVulnData}/>
+        <VulnInfo data={vulnData?.vuln} componentVulns={vulnData?.componentVulns || []} refetch={getVulnData}/>
       </Flex>
     )
   } else {
     return (
       <Flex flexDirection='column' pt={{ base: '120px', md: '74px' }} pr={2} pl={5}>
         <Card>
-          <GlobalVulnTable data={data?.organization?.vulns} refetch={getVulns}/>
+          <GlobalVulnTable data={data?.organization?.vulns || []} refetch={getVulns}/>
         </Card>
       </Flex>
     )
