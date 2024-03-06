@@ -181,6 +181,7 @@ const LicenseTable = ({ data, refetch }) => {
   const handleClear = useCallback(async () => {
     setSearchInput('')
     disablePaginationControl()
+    setCurrentPage(1)
     await refetch({
       search: undefined,
       first: totalRows,
@@ -213,9 +214,13 @@ const LicenseTable = ({ data, refetch }) => {
 
       if (key === 'Enter' && searchInput) {
         disablePaginationControl()
+        setCurrentPage(1)
         refetch({
           search: value,
           first: totalRows,
+          last: undefined,
+          after: undefined,
+          before: undefined,
         }).then((res) => {
           if (res.data) {
             setPaginationControl(res.data)
