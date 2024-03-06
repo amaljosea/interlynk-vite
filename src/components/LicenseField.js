@@ -7,7 +7,7 @@ import {
   Icon,
   Text,
   VStack,
-  useDisclosure
+  useDisclosure, TagLabel, Tag
 } from '@chakra-ui/react'
 import { useState, useEffect } from 'react'
 import ReactSelect from 'react-select'
@@ -20,10 +20,12 @@ import InfoModal from './InfoModal'
 
 const LicenseField = ({ isValid, setIsValid }) => {
   const { prodCompState, activeSbomTab, dispatch } = useGlobalState()
-  const { licenseType, spdxList } = prodCompState
+  const { spdxList } = prodCompState
   const { prodCompDispatch } = dispatch
 
   const [licenseList, setLicenseList] = useState([])
+  const [licenseType, setLicenseType] = useState('')
+
   const [infoHeading, setInfoHeading] = useState('')
   const [infoText, setInfoText] = useState('')
   const [infoUrl, setInfoUrl] = useState('')
@@ -50,6 +52,7 @@ const LicenseField = ({ isValid, setIsValid }) => {
             label: value
           }))
           setLicenseList(licenses)
+          setLicenseType(res.data.licenseAutoComplete.type)
         }
       })
     } else {
@@ -81,7 +84,6 @@ const LicenseField = ({ isValid, setIsValid }) => {
           </Flex>
         </FormLabel>
         {/* LICENSE */}
-        {licenseType === 'license_exp' && (
           <ReactSelect
             styles={{
               control: (baseStyles, state) => ({
@@ -94,7 +96,6 @@ const LicenseField = ({ isValid, setIsValid }) => {
                 }
               })
             }}
-            isMulti
             components={{
               DropdownIndicator: () => null,
               IndicatorSeparator: () => null
@@ -105,8 +106,20 @@ const LicenseField = ({ isValid, setIsValid }) => {
             onInputChange={handleInputChange}
             placeholder={'Enter License'}
             className='react-select'
+            isClearable
+            isMulti
           />
-        )}
+        {licenseType && <Flex justifyContent="flex-end">
+          <Tag
+            width={'fit-content'}
+            size={'sm'}
+            my={2}
+            variant='subtle'
+            colorScheme='orange'
+          >
+            <TagLabel>{licenseType}</TagLabel>
+          </Tag>
+        </Flex>}
       </FormControl>
       </VStack>
 
