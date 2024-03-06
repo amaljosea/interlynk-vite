@@ -90,7 +90,7 @@ const VulnProdTable = ({ data, vuln, refetch }) => {
       selector: (row) => {
         const { component } = row
         return (
-          <Flex flexDir={'row'} gap={2} alignItems={'center'} flexWrap={'wrap'}>
+          <Flex flexDir={'row'} my={3} gap={2} alignItems={'center'}>
             <Tooltip label='Also affected'>
               <IconButton
                 isDisabled={!component?.sbom?.hasConnectedSboms}
