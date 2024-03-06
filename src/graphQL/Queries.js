@@ -3450,6 +3450,7 @@ export const GetLicensesTable = gql`
               text
               url
               comment
+              spdxId
             }
           }
           __typename

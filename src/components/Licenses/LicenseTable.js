@@ -295,9 +295,9 @@ const LicenseTable = ({ data, refetch }) => {
     {
       id: 'NAME',
       name: 'NAME',
-      width: '24%',
+      width: '32%',
       wrap: true,
-      selector: ({ content: { name, shortId, url } }) => {
+      selector: ({ content: { name, shortId, url, spdxId } }) => {
         return (
           <Grid templateColumns='repeat(7, 1fr)' gap={2} my={3}>
             <GridItem colSpan={1} width={'50px'}>
@@ -319,14 +319,14 @@ const LicenseTable = ({ data, refetch }) => {
             >
               <Text data-tag='allowRowEvents'>{name}</Text>
               <Flex flexWrap={'wrap'} gap={2} alignItems={'center'}>
-                {shortId && (
+                {(shortId || spdxId) && (
                   <Tag
                     width={'fit-content'}
-                    size={'sm'}
+                    size='sm'
                     variant='subtle'
                     colorScheme='blue'
                   >
-                    <TagLabel>{shortId}</TagLabel>
+                    <TagLabel>{shortId || spdxId}</TagLabel>
                   </Tag>
                 )}
                 {url && (
@@ -353,7 +353,7 @@ const LicenseTable = ({ data, refetch }) => {
     {
       id: 'ATTRIBUTION',
       name: 'ATTRIBUTION',
-      width: '14%',
+      width: '12%',
       wrap: true,
       selector: ({ attribution }) => {
         if (!attribution || attribution === 'UNKNOWN') {
@@ -368,7 +368,7 @@ const LicenseTable = ({ data, refetch }) => {
     {
       id: 'COPYLEFT',
       name: 'COPYLEFT',
-      width: '14%',
+      width: '12%',
       wrap: true,
       selector: ({ copyLeft }) => {
         if (!copyLeft || copyLeft === 'UNKNOWN') {
@@ -381,7 +381,7 @@ const LicenseTable = ({ data, refetch }) => {
     {
       id: 'REQUIRES SOURCE CODE',
       name: 'REQUIRES SOURCE CODE',
-      width: '14%',
+      width: '12%',
       wrap: true,
       selector: ({ sourceDistribution }) => {
         if (!sourceDistribution || sourceDistribution === 'UNKNOWN') {
@@ -397,7 +397,7 @@ const LicenseTable = ({ data, refetch }) => {
     {
       id: 'PERMITS MODIFICATIONS',
       name: 'PERMITS MODIFICATIONS',
-      width: '14%',
+      width: '12%',
       wrap: true,
       selector: ({ modifications }) => {
         if (!modifications || modifications === 'UNKNOWN') {
