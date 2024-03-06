@@ -2152,6 +2152,13 @@ export const ShareVulnData = gql`
               lastModifiedAt
               nvdAliasId
               updatedAt
+              vulnInfo {
+                cveId
+                epssScore
+                epssScores
+                epssPercentile
+                kev
+              }
             }
             componentVulnLogs {
               id
