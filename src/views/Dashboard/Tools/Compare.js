@@ -458,15 +458,15 @@ const Compare = ({ selectedSboms }) => {
                     </Alert>
                   )}
                 </FormControl>
-                {/* SUBMIT */}
-                {(!firstSbomInfo || !secondSbomInfo) && (
-                  <Flex justifyContent={'flex-end'}>
-                    <Button width={'fit-content'} colorScheme='blue' leftIcon={<FaCodeCompare />} onClick={handleCompare} isDisabled={!selectedVersionOne || !selectedVersionTwo}>
-                      Compare
-                    </Button>
-                  </Flex>
-                )}
               </Stack>
+            )}
+            {/* SUBMIT */}
+            {(!firstSbomInfo || !secondSbomInfo) && (
+              <Flex justifyContent={'flex-end'} mt={6}>
+                <Button width={'fit-content'} colorScheme='blue' leftIcon={<FaCodeCompare />} onClick={handleCompare} isDisabled={!selectedVersionOne || !selectedVersionTwo}>
+                  Compare
+                </Button>
+              </Flex>
             )}
           </Card>
         </GridItem>
