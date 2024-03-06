@@ -2,10 +2,55 @@ import CustomLoader from 'components/CustomLoader'
 import DataTable from 'react-data-table-component'
 import { Badge, Flex, Tag, Text } from '@chakra-ui/react'
 import ToolsFilterMenu from 'views/Dashboard/Tools/Filters'
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { customStyles } from 'utils'
+import SearchFilter from 'views/Sbom/components/SearchFilter'
+import { useGlobalState } from 'hooks/useGlobalState'
 
-const DiffTable = ({ diffs, data, setData, isLoading, sbomOne, sbomTwo }) => {
+const DiffTable = ({ diffs, isLoading, sbomOne, sbomTwo }) => {
+  const { toolsState, dispatch } = useGlobalState()
+  const { searchInput, difference, component } = toolsState
+  const { toolsDispatch } = dispatch
+
+  const [filterText, setFilterText] = useState(searchInput)
+
+  const filteredData = diffs?.sbomDrift?.filter(
+    (item) =>
+      (item?.subjectComponent?.name || item?.targetComponent?.name) &&
+      (item?.subjectComponent?.name || item?.targetComponent?.name)
+        .toLowerCase()
+        .includes(searchInput.toLowerCase()) &&
+      item?.diffType?.toLowerCase().includes(difference.toLowerCase()) &&
+      (item?.subjectComponent?.name || item?.targetComponent?.name) &&
+      (item?.subjectComponent?.name || item?.targetComponent?.name)
+        .toLowerCase()
+        .includes(component.toLowerCase())
+  )
+
+  // CLEAR SERACH
+  const handleClear = () => {
+    setFilterText('')
+    toolsDispatch({ type: 'CLEAR_SEARCH_INPUT' })
+  }
+
+  // ON SEARCH INPUT CHANGE
+  const onSearchInputChange = (e) => {
+    const { value } = e.target
+    if (value === '') {
+      handleClear()
+    } else {
+      setFilterText(value)
+    }
+  }
+
+  // SEARCH COMPONENT
+  const handleSearch = (event) => {
+    const { value } = event.target
+    if (event.key === 'Enter' && filterText !== '') {
+      toolsDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
+    }
+  }
+
   // COLUMNS
   const columns = [
     {
@@ -19,7 +64,13 @@ const DiffTable = ({ diffs, data, setData, isLoading, sbomOne, sbomTwo }) => {
             p={2}
             textTransform={'capitalize'}
             textAlign={'center'}
-            colorScheme={diffType === 'added' ? 'green' : diffType === 'removed' ? 'red' : 'blue'}
+            colorScheme={
+              diffType === 'added'
+                ? 'green'
+                : diffType === 'removed'
+                  ? 'red'
+                  : 'blue'
+            }
           >
             {diffType}
           </Badge>
@@ -32,7 +83,9 @@ const DiffTable = ({ diffs, data, setData, isLoading, sbomOne, sbomTwo }) => {
       id: 'NAME',
       name: 'NAME',
       selector: (row) => (
-        <Text>{row?.subjectComponent?.name || row?.targetComponent?.name || '-'}</Text>
+        <Text>
+          {row?.subjectComponent?.name || row?.targetComponent?.name || '-'}
+        </Text>
       ),
       width: '250px',
       wrap: true
@@ -45,13 +98,27 @@ const DiffTable = ({ diffs, data, setData, isLoading, sbomOne, sbomTwo }) => {
         if (diffTags?.includes('version')) {
           return (
             <Flex my={4} flexWrap={'wrap'} alignItems={'center'} gap={2}>
-              <Tag py={1.5} colorScheme='red' hidden={targetComponent?.version === ''}>{targetComponent?.version}</Tag>
-              <Tag py={1.5} colorScheme='green' hidden={subjectComponent?.version === ''}>{subjectComponent?.version}</Tag>
+              <Tag
+                py={1.5}
+                colorScheme='red'
+                hidden={targetComponent?.version === ''}
+              >
+                {targetComponent?.version}
+              </Tag>
+              <Tag
+                py={1.5}
+                colorScheme='green'
+                hidden={subjectComponent?.version === ''}
+              >
+                {subjectComponent?.version}
+              </Tag>
             </Flex>
           )
         } else {
           return (
-            <Tag py={1.5}>{subjectComponent?.version || targetComponent?.version || '-'}</Tag>
+            <Tag py={1.5}>
+              {subjectComponent?.version || targetComponent?.version || '-'}
+            </Tag>
           )
         }
       },
@@ -66,10 +133,18 @@ const DiffTable = ({ diffs, data, setData, isLoading, sbomOne, sbomTwo }) => {
         if (diffTags?.includes('licenses_exp')) {
           return (
             <Flex my={4} flexWrap={'wrap'} alignItems={'center'} gap={2}>
-              <Tag py={1.5} colorScheme='red' hidden={targetComponent?.licensesExp === ''}>
+              <Tag
+                py={1.5}
+                colorScheme='red'
+                hidden={targetComponent?.licensesExp === ''}
+              >
                 {targetComponent?.licensesExp}
               </Tag>
-              <Tag py={1.5} colorScheme='green' hidden={subjectComponent?.licensesExp === ''}>
+              <Tag
+                py={1.5}
+                colorScheme='green'
+                hidden={subjectComponent?.licensesExp === ''}
+              >
                 {subjectComponent?.licensesExp}
               </Tag>
             </Flex>
@@ -77,7 +152,9 @@ const DiffTable = ({ diffs, data, setData, isLoading, sbomOne, sbomTwo }) => {
         } else {
           return (
             <Tag my={4} py={1.5}>
-              {subjectComponent?.licensesExp || targetComponent?.licensesExp || '-'}
+              {subjectComponent?.licensesExp ||
+                targetComponent?.licensesExp ||
+                '-'}
             </Tag>
           )
         }
@@ -93,8 +170,20 @@ const DiffTable = ({ diffs, data, setData, isLoading, sbomOne, sbomTwo }) => {
         if (diffTags?.includes('purl')) {
           return (
             <Flex my={4} flexWrap={'wrap'} alignItems={'center'} gap={2}>
-              <Tag py={1.5} colorScheme='red' hidden={targetComponent?.purl === ''}>{targetComponent?.purl || '-'}</Tag>
-              <Tag py={1.5} colorScheme='green' hidden={subjectComponent?.purl === ''}>{subjectComponent?.purl || '-'}</Tag>
+              <Tag
+                py={1.5}
+                colorScheme='red'
+                hidden={targetComponent?.purl === ''}
+              >
+                {targetComponent?.purl || '-'}
+              </Tag>
+              <Tag
+                py={1.5}
+                colorScheme='green'
+                hidden={subjectComponent?.purl === ''}
+              >
+                {subjectComponent?.purl || '-'}
+              </Tag>
             </Flex>
           )
         } else {
@@ -169,19 +258,30 @@ const DiffTable = ({ diffs, data, setData, isLoading, sbomOne, sbomTwo }) => {
   // SUB HEADER
   const subHeader = useMemo(() => {
     return (
-      <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-start'} mb={4} px={4}>
-        {sbomOne && sbomTwo && <ToolsFilterMenu data={diffs?.sbomDrift} setData={setData} />}
-      </Flex>
+      <>
+        <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-start'} mb={4} px={4} gap={4}>
+          <SearchFilter id='compareVersions' filterText={filterText} onChange={onSearchInputChange} onClear={handleClear} onFilter={handleSearch}/>
+          <ToolsFilterMenu />
+        </Flex>
+      </>
     )
-  }, [data, setData])
+  }, [filterText, handleClear, handleSearch, onSearchInputChange])
+
+  useEffect(() => {
+    if (diffs && diffs?.sbomDrift?.length > 0) {
+      const componentList = diffs?.sbomDrift?.map((item) => item?.targetComponent?.name || item?.subjectComponent?.name)
+      const statusList = ['all', 'added', 'changed', 'removed']
+      toolsDispatch({ type: 'ADD_FILTER_HEADS', payload: { componentList, statusList }})
+    }
+  }, [diffs])
 
   return (
     <DataTable
       columns={columns}
-      data={data || []}
+      data={filteredData || []}
       customStyles={customStyles}
       progressPending={isLoading}
-      subHeader
+      subHeader={sbomOne && sbomTwo && diffs?.sbomDrift ? true : false}
       subHeaderComponent={subHeader}
       progressComponent={<CustomLoader />}
       persistTableHead

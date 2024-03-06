@@ -9,6 +9,7 @@ import sbomLogReducer from './sbomLogReducer'
 import sbomReducer from './sbomReducer'
 import prodReducer from './prodReducer'
 import versionReducer from './versionReducer'
+import toolsReducer from './toolsReducer'
 
 export {
   globalVulnReducer,
@@ -21,5 +22,6 @@ export {
   sbomLogReducer,
   sbomReducer,
   prodReducer,
-  versionReducer
+  versionReducer,
+  toolsReducer
 }

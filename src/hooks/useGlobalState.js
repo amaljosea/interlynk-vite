@@ -10,7 +10,8 @@ import {
   sbomLogReducer,
   prodReducer,
   sbomReducer,
-  versionReducer
+  versionReducer,
+  toolsReducer
 } from 'context/reducers'
 
 const GlobalStateContext = createContext()
@@ -172,6 +173,14 @@ const GlobalStateProvider = ({ children }) => {
     types: [],
     filters: null
   })
+  // SBOM VERSIONS
+  const [toolsState, toolsDispatch] = useReducer(toolsReducer, {
+    drifts: [],
+    difference: '',
+    component: '',
+    searchInput: '',
+    filters: null
+  })
 
   return (
     <GlobalStateContext.Provider
@@ -215,6 +224,7 @@ const GlobalStateProvider = ({ children }) => {
         sbomLogState,
         sbomState,
         versionState,
+        toolsState,
         dispatch: {
           globalVulnDispatch,
           compVulnDispatch,
@@ -226,7 +236,8 @@ const GlobalStateProvider = ({ children }) => {
           prodRulesDispatch,
           sbomLogDispatch,
           sbomDispatch,
-          versionDispatch
+          versionDispatch,
+          toolsDispatch
         }
       }}
     >

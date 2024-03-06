@@ -30,10 +30,10 @@ import SbomInfo from 'components/SbomInfo'
 import ReactSelect from 'react-select'
 
 const Compare = ({ selectedSboms }) => {
-  const { prodState } = useGlobalState()
+  const { prodState,toolsState, dispatch } = useGlobalState()
   const { field, direction } = prodState
+  const { toolsDispatch } = dispatch
 
-  const [drifts, setDrifts] = useState([])
   const [isLoading, setIsLoading] = useState(false)
 
   const [getProduct] = useLazyQuery(GetProject, { fetchPolicy: 'network-only' })
@@ -84,7 +84,7 @@ const Compare = ({ selectedSboms }) => {
 
   const onClearOne = () => {
     setFirstSbomInfo(null)
-    setDrifts([])
+    toolsDispatch({type:'SET_DATA', payload: []})
   }
 
   useEffect(() => {
@@ -171,7 +171,7 @@ const Compare = ({ selectedSboms }) => {
 
   const onClearTwo = () => {
     setSecondSbomInfo(null)
-    setDrifts([])
+    toolsDispatch({type:'SET_DATA', payload: []})
   }
 
   useEffect(() => {
@@ -230,8 +230,7 @@ const Compare = ({ selectedSboms }) => {
       }).then((res) => {
         if (res?.data) {
           setIsLoading(false)
-          console.log('dif', res?.data?.sbom?.sbomDrift)
-          setDrifts(res?.data?.sbom?.sbomDrift)
+          toolsDispatch({type:'SET_DATA', payload: res?.data?.sbom?.sbomDrift})
         }
       })
     }
@@ -267,8 +266,8 @@ const Compare = ({ selectedSboms }) => {
                 <Stack>
                   <Flex alignItems={'flex-end'} gap={1}>
                     <Heading fontWeight={'semibold'} color={'#333'} fontFamily={'inherit'} size='md'>
-                      {firstSbomInfo?.project?.projectGroup?.name} :{' '}
-                      {firstSbomInfo?.projectVersion}
+                      {firstSbomInfo?.project?.projectGroup?.name?.length > 20 ? `${firstSbomInfo?.project?.projectGroup?.name?.substring(0,20)}...` : firstSbomInfo?.project?.projectGroup?.name} :{' '}
+                      {firstSbomInfo?.projectVersion?.length > 20 ? `${firstSbomInfo?.projectVersion?.substring(0,20)}...` : firstSbomInfo?.projectVersion}
                     </Heading>
                     <Badge px={1} width={'fit-content'}>Primary</Badge>
                   </Flex>
@@ -277,9 +276,7 @@ const Compare = ({ selectedSboms }) => {
                   </Tag>
                 </Stack>
               ) : (
-                <Heading fontWeight={'semibold'} fontFamily={'inherit'} size='md'>
-                  Select First SBOM
-                </Heading>
+                <Heading fontWeight={'semibold'} fontFamily={'inherit'} size='md'>Select First SBOM</Heading>
               )}
               {firstSbomInfo && !selectedSboms && (
                 <IconButton icon={<FaX />} size='sm' colorScheme='red' onClick={onClearOne}/>
@@ -292,9 +289,7 @@ const Compare = ({ selectedSboms }) => {
                 {/* PROJECT GROUPS */}
                 {data?.organization?.projectGroups?.nodes?.length > 0 && (
                   <FormControl fontSize={'sm'}>
-                    <FormLabel htmlFor='groupOne' fontSize='md' color='gray.600'>
-                      Product
-                    </FormLabel>
+                    <FormLabel htmlFor='groupOne' fontSize='md' color='gray.600'>Product</FormLabel>
                     <Select name='groupOne' id='groupOne' isDisabled={selectedSboms?.length > 0} value={selectedGroupOne} onChange={onSelectGroupOne}>
                       <option value=''>-- Select --</option>
                       {data?.organization?.projectGroups?.nodes?.map(
@@ -320,9 +315,7 @@ const Compare = ({ selectedSboms }) => {
                 </FormControl>
                 {/* VERSION */}
                 <FormControl fontSize={'sm'}>
-                  <FormLabel htmlFor='versionOne' fontSize='md' color='gray.600'>
-                    Version
-                  </FormLabel>
+                  <FormLabel htmlFor='versionOne' fontSize='md' color='gray.600'>Version</FormLabel>
                   {uniqVersionsOne.length > 0 ? (
                     <ReactSelect
                       styles={{
@@ -377,9 +370,7 @@ const Compare = ({ selectedSboms }) => {
                   </Tag>
                 </Stack>
               ) : (
-                <Heading fontWeight={'semibold'} fontFamily={'inherit'} size='md'>
-                  Select Second SBOM
-                </Heading>
+                <Heading fontWeight={'semibold'} fontFamily={'inherit'} size='md'>Select Second SBOM</Heading>
               )}
               {secondSbomInfo && !selectedSboms && (
                 <IconButton icon={<FaX />} size='sm' colorScheme='red' onClick={onClearTwo}/>
@@ -392,9 +383,7 @@ const Compare = ({ selectedSboms }) => {
                 {/* PROJECT GROUPS */}
                 {data?.organization?.projectGroups?.nodes?.length > 0 && (
                   <FormControl fontSize={'sm'}>
-                    <FormLabel htmlFor='groupTwo' fontSize='md' color='gray.600'>
-                      Product
-                    </FormLabel>
+                    <FormLabel htmlFor='groupTwo' fontSize='md' color='gray.600'>Product</FormLabel>
                     <Select name='groupTwo' id='groupTwo' isDisabled={selectedVersionOne === null} value={selectedGroupTwo} onChange={onSelectGroupTwo}>
                       <option value=''>-- Select --</option>
                       {data?.organization?.projectGroups?.nodes?.map(
@@ -405,9 +394,7 @@ const Compare = ({ selectedSboms }) => {
                 )}
                 {/* ENVIRONMENT */}
                 <FormControl fontSize={'sm'}>
-                  <FormLabel htmlFor='productTwo' fontSize='md' color='gray.600'>
-                    Environment
-                  </FormLabel>
+                  <FormLabel htmlFor='productTwo' fontSize='md' color='gray.600'>Environment</FormLabel>
                   <Select name='productTwo' id='productTwo' value={selectedProdTwo} onChange={onSelectProductTwo} isDisabled={selectedVersionOne === null} textTransform={'capitalize'}>
                     <option value={''}>-- Select --</option>
                     {productListTwo?.length > 0 &&
@@ -420,9 +407,7 @@ const Compare = ({ selectedSboms }) => {
                 </FormControl>
                 {/* VERSION */}
                 <FormControl fontSize={'sm'}>
-                  <FormLabel htmlFor='versionTwo' fontSize='md' color='gray.600'>
-                    Version
-                  </FormLabel>
+                  <FormLabel htmlFor='versionTwo' fontSize='md' color='gray.600'>Version</FormLabel>
                   {uniqVersionsTwo.length > 0 ? (
                     <ReactSelect
                       styles={{
@@ -473,7 +458,7 @@ const Compare = ({ selectedSboms }) => {
       </Grid>
       {/* SBOM DIFFERENCE */}
       <Card width='100%'>
-        <DiffTable diffs={driftData?.sbom} data={drifts} setData={setDrifts} isLoading={isLoading} sbomOne={firstSbomInfo} sbomTwo={secondSbomInfo}/>
+        <DiffTable diffs={driftData?.sbom} isLoading={isLoading} sbomOne={firstSbomInfo} sbomTwo={secondSbomInfo}/>
       </Card>
     </>
   )
