@@ -45,7 +45,7 @@ const GlobalStateProvider = ({ children }) => {
   })
   // SBOM VERSIONS
   const [versionState, versionDispatch] = useReducer(versionReducer, {
-    field: 'SBOMS_UPDATED_AT',
+    field: 'SBOMS_CREATED_AT',
     direction: 'DESC',
     searchInput: '',
     pageIndex: 1
