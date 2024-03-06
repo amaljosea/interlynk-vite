@@ -15,7 +15,7 @@ const prodCompReducer = (state, action) => {
         scope: '',
         direct: false,
         licenseType: 'license_exp',
-        spdxList: [],
+        licenseString: [],
         expLicense: '',
         cpeString: '',
         isCpeValid: true,
@@ -130,7 +130,6 @@ const prodCompReducer = (state, action) => {
           ...state,
           licenseType: 'license_exp',
           expLicense: licensesExp,
-          spdxList: [],
         }
       }
     case 'SET_PURL_STRING':
@@ -149,14 +148,11 @@ const prodCompReducer = (state, action) => {
         isCpeValid: payload
       }
     case 'SET_LICENSE_FIELD':
-      const selectedSpdx =
-        [...payload]?.length > 0
-          ? [...payload].map((option) => option.value)
-          : []
+
       return {
         ...state,
-        spdxList: payload,
-        expLicense: selectedSpdx[0]
+        licenseString: payload,
+        expLicense: payload[0]?.value
       }
     default:
       return state

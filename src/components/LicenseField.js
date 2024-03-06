@@ -20,7 +20,7 @@ import InfoModal from './InfoModal'
 
 const LicenseField = ({ isValid, setIsValid }) => {
   const { prodCompState, activeSbomTab, dispatch } = useGlobalState()
-  const { spdxList } = prodCompState
+  const { licenseString } = prodCompState
   const { prodCompDispatch } = dispatch
 
   const [licenseList, setLicenseList] = useState([])
@@ -35,12 +35,16 @@ const LicenseField = ({ isValid, setIsValid }) => {
   const { isOpen: isInfoOpen, onOpen: onInfoOpen, onClose: onInfoClose } = useDisclosure()
 
   const onLicenseChange = (selected) => {
-    selected = selected || []
-      prodCompDispatch({ type: 'SET_LICENSE_FIELD', payload: selected })
+
+    selected = [selected[selected.length - 1]] // only allow one license to be selected
+
+    prodCompDispatch({ type: 'SET_LICENSE_FIELD', payload: selected })
   }
 
   const handleInputChange = (value) => {
     if (value !== '') {
+      prodCompDispatch({ type: 'SET_LICENSE_FIELD', payload: [] }) // clear license field
+
       getLicense({
         variables: {
           search: value
@@ -100,13 +104,12 @@ const LicenseField = ({ isValid, setIsValid }) => {
               DropdownIndicator: () => null,
               IndicatorSeparator: () => null
             }}
-            value={spdxList}
+            value={licenseString}
             options={licenseList}
             onChange={onLicenseChange}
             onInputChange={handleInputChange}
             placeholder={'Enter License'}
             className='react-select'
-            isClearable
             isMulti
           />
         {licenseType && <Flex justifyContent="flex-end">
