@@ -405,12 +405,9 @@ const ProductTable = ({ data, refetch }) => {
           }
 
           return (
-            <Link
-              to={`/${path}/products/${name}?id=${id}`}
-              onClick={handleClick}
-            >
-              <Text color={'blue.500'} minWidth='100%'>
-                {name}
+            <Link to={`/${path}/products/${name}?id=${id}`} onClick={handleClick}>
+              <Text color={'blue.500'} minWidth='100%' my={3}>
+                {name?.length > 20 ? `${name?.substring(0,20)}...` : name}
               </Text>
             </Link>
           )

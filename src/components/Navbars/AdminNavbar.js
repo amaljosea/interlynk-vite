@@ -10,23 +10,20 @@ import {
 import PropTypes from 'prop-types'
 import React, { useState, useEffect } from 'react'
 import AdminNavbarLinks from './AdminNavbarLinks'
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { Link, useLocation, useParams } from 'react-router-dom'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { GetUserPermissions } from 'graphQL/Queries'
 import { useQuery } from '@apollo/client'
 import { permissionList } from 'utils'
 
 export default function AdminNavbar(props) {
-  const { setActiveSbomTab, setActiveCsSbomTab, userPermissions, setUserPermissions } =
-    useGlobalState()
+  const { setActiveSbomTab, setActiveCsSbomTab, setUserPermissions } = useGlobalState()
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
   const {} = useQuery(GetUserPermissions, {
     skip: signedUrlParams ? true : false,
     onCompleted: (data) => {
-      const permissions = permissionList(
-        data?.organization?.currentUser?.role?.permissionsMap || []
-      )
+      const permissions = permissionList(data?.organization?.currentUser?.role?.permissionsMap || [])
       setUserPermissions(permissions)
     }
   })
@@ -43,7 +40,6 @@ export default function AdminNavbar(props) {
 
   const [scrolled, setScrolled] = useState(false)
   const { brandText, tabRes } = props
-  const navigate = useNavigate()
   const location = useLocation()
   const params = useParams()
   const queryParams = new URLSearchParams(location.search)
@@ -144,20 +140,8 @@ export default function AdminNavbar(props) {
       top='12px'
       width={'100%'}
     >
-      <Flex
-        width={'100%'}
-        flexDirection={{
-          sm: 'column',
-          md: 'row'
-        }}
-        alignItems={'center'}
-        justifyContent={'space-between'}
-      >
-        <Box
-          pos={'relative'}
-          left={tabRes?.matches ? 24 : 44}
-          mb={{ sm: '8px', md: '0px' }}
-        >
+      <Flex width={'100%'} flexDirection={{ sm: 'column', md: 'row' }} alignItems={'center'} justifyContent={'space-between'}>
+        <Box pos={'relative'} left={tabRes?.matches ? 24 : 44} mb={{ sm: '8px', md: '0px' }}>
           <Breadcrumb>
             <BreadcrumbItem color={mainText}>
               <Link
@@ -177,10 +161,7 @@ export default function AdminNavbar(props) {
             </BreadcrumbItem>
 
             {params?.name && (
-              <BreadcrumbItem
-                color={mainText}
-                isCurrentPage={sbomId && currentSBOM?.version ? false : true}
-              >
+              <BreadcrumbItem color={mainText} isCurrentPage={sbomId && currentSBOM?.version ? false : true}>
                 <Link
                   to={`/${path}/products/${params.name}?id=${currentProduct?.groupId}`}
                   onClick={() => {
@@ -194,19 +175,15 @@ export default function AdminNavbar(props) {
                     }
                   }}
                 >
-                  {decodeURI(params.name)}
+                  {decodeURI(params.name)?.length > 20 ? `${decodeURI(params.name)?.substring(0,20)}...` : decodeURI(params.name)}
                 </Link>
               </BreadcrumbItem>
             )}
 
             {sbomId && currentSBOM?.version && (
-              <BreadcrumbItem
-                color={mainText}
-                isCurrentPage={parts ? false : true}
-              >
+              <BreadcrumbItem color={mainText} isCurrentPage={parts ? false : true}>
                 <BreadcrumbLink
-                  href={
-                    parts
+                  href={parts
                       ? `/${path}/products/${currentProduct?.name}?id=${activeEnv}&sbom=${currentSBOM?.id}`
                       : ''
                   }
@@ -240,29 +217,20 @@ export default function AdminNavbar(props) {
 
             {subProduct && parts && (
               <BreadcrumbItem color={mainText}>
-                <BreadcrumbLink color={mainText}>
-                  {subProduct?.name || ''}
-                </BreadcrumbLink>
+                <BreadcrumbLink color={mainText}>{subProduct?.name || ''}</BreadcrumbLink>
               </BreadcrumbItem>
             )}
 
             {subProduct && parts && (
               <BreadcrumbItem color={mainText}>
-                <BreadcrumbLink color={mainText}>
-                  {subProduct?.version || ''}
-                </BreadcrumbLink>
+                <BreadcrumbLink color={mainText}>{subProduct?.version || ''}</BreadcrumbLink>
               </BreadcrumbItem>
             )}
           </Breadcrumb>
         </Box>
 
         <Box>
-          <AdminNavbarLinks
-            onOpen={props.onOpen}
-            logoText={props.logoText}
-            secondary={props.secondary}
-            fixed={props.fixed}
-          />
+          <AdminNavbarLinks onOpen={props.onOpen} logoText={props.logoText} secondary={props.secondary} fixed={props.fixed}/>
         </Box>
       </Flex>
     </Flex>

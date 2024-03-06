@@ -433,7 +433,7 @@ const ProductDetails = () => {
                         spacing={1}
                         alignItems={'left'}
                       >
-                        <Text fontWeight={'semibold'} fontSize={25}>
+                        <Text fontWeight={'semibold'} fontSize={25} lineHeight={1.2}>
                           {data?.projectGroup?.name || ''}
                         </Text>
                       </Stack>
