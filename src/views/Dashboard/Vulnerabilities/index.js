@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react'
-import { Flex } from '@chakra-ui/react'
+import { Flex, Text } from '@chakra-ui/react'
 import { useLocation } from 'react-router-dom'
 import { useLazyQuery, useQuery } from '@apollo/client'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -50,18 +50,21 @@ const Vulnerabilities = () => {
   if (vulnId && location.pathname === '/vendor/vulnerabilities') {
     return (
       <Flex direction='column' pt={{ base: '120px', md: '74px' }} pr={2} pl={5}>
-        <VulnInfo data={vulnData?.vuln} componentVulns={vulnData?.componentVulns || []} refetch={getVulnData}/>
-      </Flex>
-    )
-  } else {
-    return (
-      <Flex flexDirection='column' pt={{ base: '120px', md: '74px' }} pr={2} pl={5}>
-        <Card>
-          <GlobalVulnTable data={data?.organization?.vulns || []} refetch={getVulns}/>
-        </Card>
+        <VulnInfo data={vulnData?.vuln} componentVulns={vulnData?.componentVulns} refetch={getVulnData}/>
       </Flex>
     )
   }
+  
+  if (productPermissions?.value === false) return <Text textAlign={'center'} mt={32}>There are no records to display</Text>
+  
+  return (
+    <Flex flexDirection='column' pt={{ base: '120px', md: '74px' }} pr={2} pl={5}>
+      <Card>
+        <GlobalVulnTable data={data?.organization?.vulns} refetch={getVulns}/>
+      </Card>
+    </Flex>
+  )
+  
 }
 
 export default Vulnerabilities

@@ -233,7 +233,11 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
           <Flex alignItems='center' gap='0'>
             <Tooltip
               placement='top'
-              label={epssScores?.length > 0 ? `${(epssScores[0] * 100).toFixed(3)} %` : '-'}
+              label={
+                epssScores?.length > 0
+                  ? `${(epssScores[0] * 100).toFixed(3)} %`
+                  : '-'
+              }
             >
               <Tag
                 size='md'
@@ -244,7 +248,9 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
                 alignItems='center'
               >
                 <TagLabel>
-                  {epssScores?.length > 0 ? `${(epssScores[0] * 100).toFixed(3)} %` : '-'}
+                  {epssScores?.length > 0
+                    ? `${(epssScores[0] * 100).toFixed(3)} %`
+                    : '-'}
                 </TagLabel>
               </Tag>
             </Tooltip>
@@ -403,7 +409,7 @@ const GlobalVulnTable = ({ data, refetch, activeEnv, productId }) => {
         direction,
         first: totalRows,
         projectIds: [activeEnv],
-        projectGroupIds: [productId],
+        projectGroupIds: [productId]
       }
     }).then(
       (res) => res?.data && globalVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })

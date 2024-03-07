@@ -86,9 +86,11 @@ function ProductList() {
     )
   }
 
+  if (productPermissions?.value === false) return <Text textAlign={'center'} mt={30}>There are no records to display</Text>
+
   return (
     <ProductTable
-      data={groups?.organization?.projectGroups || []}
+      data={groups?.organization?.projectGroups}
       refetch={refetch}
     />
   )

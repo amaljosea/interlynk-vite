@@ -55,7 +55,10 @@ export default function Dashboard() {
   })
 
   const { data: metrics, error: eOrgMetric } = useQuery(GetOrgMetrics, {
-    skip: data?.organization?.name && productPermissions?.value === true ? false : true,
+    skip:
+      data?.organization?.name && productPermissions?.value === true
+        ? false
+        : true,
     variables: { env: envName }
   })
 
@@ -199,7 +202,8 @@ export default function Dashboard() {
                 <GridItem colSpan={8} w='100%'>
                   <ProductsOverview
                     title={'Recent Imports'}
-                    data={metrics?.organizationMetric?.latestVersions || []}
+                    data={metrics?.organizationMetric?.latestVersions}
+                    prodPermissions={productPermissions}
                   />
                 </GridItem>
                 {/* LATEST ACTIVITIES */}
@@ -208,6 +212,7 @@ export default function Dashboard() {
                     title={'Recent Activities'}
                     amount={metrics?.organizationMetric?.latestActivity?.length}
                     data={metrics?.organizationMetric?.latestActivity}
+                    prodPermissions={productPermissions}
                   />
                 </GridItem>
               </Grid>

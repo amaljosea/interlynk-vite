@@ -15,7 +15,7 @@ import VulnBadge from 'components/Misc/VulnBadge'
 import CustomLoader from 'components/CustomLoader'
 import { useGlobalState } from 'hooks/useGlobalState'
 
-const ProductsOverview = ({ title, data }) => {
+const ProductsOverview = ({ title, data, prodPermissions }) => {
   const { setActiveSbomTab, dispatch } = useGlobalState()
   const { prodDispatch, prodVulnDispatch } = dispatch
   const environment = localStorage.getItem('environment')
@@ -56,10 +56,19 @@ const ProductsOverview = ({ title, data }) => {
   const onVersionClick = (item) => {
     const { project, id, projectVersion } = item
     const { projectGroup, name } = project
-    const product = { version: projectVersion, groupId: projectGroup?.id, id: projectGroup?.id, name: name, sbomId: id }
+    const product = {
+      version: projectVersion,
+      groupId: projectGroup?.id,
+      id: projectGroup?.id,
+      name: name,
+      sbomId: id
+    }
     localStorage.setItem('activeEnv', projectGroup?.defaultProject?.id)
     localStorage.setItem('product', JSON.stringify(product))
-    localStorage.setItem('currentSBOM', JSON.stringify({version: projectVersion,id: item?.id}))
+    localStorage.setItem(
+      'currentSBOM',
+      JSON.stringify({ version: projectVersion, id: item?.id })
+    )
     localStorage.setItem('activeSbomTab', 0)
     setActiveSbomTab(0)
   }
@@ -88,10 +97,19 @@ const ProductsOverview = ({ title, data }) => {
 
   const onFilterSev = (project, id, version, value) => {
     const { projectGroup, name } = project
-    const product = {version: version,groupId: projectGroup?.id,id: projectGroup?.id,name: name,sbomId: id}
+    const product = {
+      version: version,
+      groupId: projectGroup?.id,
+      id: projectGroup?.id,
+      name: name,
+      sbomId: id
+    }
     localStorage.setItem('product', JSON.stringify(product))
     localStorage.setItem('activeEnv', projectGroup?.defaultProject?.id)
-    localStorage.setItem('currentSBOM',JSON.stringify({ version: version, id: id }))
+    localStorage.setItem(
+      'currentSBOM',
+      JSON.stringify({ version: version, id: id })
+    )
     localStorage.setItem('activeSbomTab', 3)
     prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
   }
@@ -125,8 +143,14 @@ const ProductsOverview = ({ title, data }) => {
         const { id, project } = row
         const uniqueSbom = filteredData?.find((item) => item?.id === id)
         return (
-          <Link to={`/vendor/products/${project?.projectGroup?.name}?id=${project?.projectGroup?.id}`} style={{ pointerEvents: uniqueSbom ? 'inherit' : 'none' }} onClick={() => handleClick(row)}>
-            <Text color={uniqueSbom ? 'blue.500' : 'gray.500'}>{project?.projectGroup?.name}</Text>
+          <Link
+            to={`/vendor/products/${project?.projectGroup?.name}?id=${project?.projectGroup?.id}`}
+            style={{ pointerEvents: uniqueSbom ? 'inherit' : 'none' }}
+            onClick={() => handleClick(row)}
+          >
+            <Text color={uniqueSbom ? 'blue.500' : 'gray.500'}>
+              {project?.projectGroup?.name}
+            </Text>
           </Link>
         )
       }
@@ -312,17 +336,26 @@ const ProductsOverview = ({ title, data }) => {
 
   return (
     <Card>
-      <DataTable
-        subHeader
-        responsive
-        persistTableHead
-        columns={columns}
-        data={data || []}
-        customStyles={customStyles}
-        progressPending={data ? false : true}
-        progressComponent={<CustomLoader />}
-        subHeaderComponent={subHeader}
-      />
+      {prodPermissions?.value === false ? (
+        <Flex width={'100%'} flexDir={'column'} gap={4}>
+          <Heading fontSize={'lg'} fontFamily={'inherit'}>
+            {title}
+          </Heading>
+          <Text textAlign={'center'}>No record to display</Text>
+        </Flex>
+      ) : (
+        <DataTable
+          subHeader
+          responsive
+          persistTableHead
+          columns={columns}
+          data={data || []}
+          customStyles={customStyles}
+          progressPending={data ? false : true}
+          progressComponent={<CustomLoader />}
+          subHeaderComponent={subHeader}
+        />
+      )}
     </Card>
   )
 }
