@@ -760,3 +760,21 @@ export const sortByUpdatedAt = (data) => {
   })
   return sortedData
 }
+
+export const truncatedValue = (name) => {
+  if(name !== '') {
+    return name?.length > 20 ? `${name?.substring(0,20)}...` : name
+  } else {
+    return name
+  }
+}
+
+export const parseJSONSafely = (str) => {
+  try {
+    return JSON.parse(str)
+  } catch (e) {
+    console.err(e)
+    // Return a default object, or null based on use case.
+    return {}
+  }
+}

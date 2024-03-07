@@ -43,7 +43,7 @@ import DataTable from 'react-data-table-component'
 import { FaEllipsisV, FaFilter } from 'react-icons/fa'
 import { useLocation, Link, useParams } from 'react-router-dom'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
-import { isDefaultEnv, envOrderList, customStyles,capitalizeFirstLetter } from 'utils'
+import { isDefaultEnv, envOrderList, customStyles,capitalizeFirstLetter, parseJSONSafely } from 'utils'
 import { GetProductData } from 'graphQL/Queries'
 
 const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
@@ -54,6 +54,14 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const prodId = queryParams.get('id')
   const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : "customer"
   const group = JSON.parse(localStorage.getItem('product'))
+  const subProduct = (() => {
+    try {
+      return parseJSONSafely(localStorage.getItem('subProduct'))
+    } catch (error) {
+      console.log(error)
+      return null
+    }
+  })()
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
   const { setActiveProdTab, totalRows, prodState, prodCompState, prodVulnState, userPermissions, dispatch } = useGlobalState()
@@ -61,17 +69,10 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const { prodVulnDispatch } = dispatch
 
   const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
-  const updateSboms = sboms?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'update_sbom' && permission.value === true
-  )
+  const updateSboms = sboms?.supersededBy?.some((permission) => permission.key === 'update_sbom' && permission.value === true )
 
   const { isOpen, onOpen, onClose } = useDisclosure()
-  const {
-    isOpen: isDeleteOpen,
-    onOpen: onDeleteOpen,
-    onClose: onDeleteClose
-  } = useDisclosure()
+  const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose} = useDisclosure()
 
   const addBtn = useRef()
   const [selectedProd, setSelectedProd] = useState('')
@@ -259,6 +260,21 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
     })
   }
 
+  const onSelectPart = (part) => {
+    prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
+    localStorage.setItem('activeSbomTab', 0)
+    const { id, project, projectVersion } = part
+    const { projectGroup } = project
+    if(subProduct?.name && !subProduct?.children) {
+      localStorage.setItem('subProduct', JSON.stringify({...subProduct, children: { name: projectGroup?.name, version: projectVersion, projectId: project?.id, sbomId: id } }))
+    } else if (subProduct?.name && subProduct?.children) {
+      localStorage.setItem('subProduct', JSON.stringify({ name: subProduct?.name, version: subProduct?.version, projectId: subProduct?.projectId, sbomId: subProduct?.sbomId, children: { ...subProduct?.children, children: { name: projectGroup?.name, version: projectVersion, projectId: project?.id, sbomId: id } } }))
+    } else {
+      localStorage.setItem('subProduct', JSON.stringify({name: projectGroup?.name,version: projectVersion,projectId: project?.id,sbomId: id }))
+    }
+    setActiveProdTab(0)
+  }
+
   // COLUMNS
   const columns = [
     {
@@ -270,23 +286,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
           <Link
             to={`/${path}/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`}
           >
-            <Text
-              color={'blue.500'}
-              minWidth='100%'
-              fontSize={14}
-              onClick={() => {
-                prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
-                localStorage.setItem('activeSbomTab', 0)
-                localStorage.setItem(
-                  'subProduct',
-                  JSON.stringify({
-                    name: part?.project?.projectGroup?.name,
-                    version: part?.projectVersion
-                  })
-                )
-                setActiveProdTab(0)
-              }}
-            >
+            <Text color={'blue.500'} minWidth='100%' fontSize={14} onClick={() => onSelectPart(part)}>
               {part.project.projectGroup.name}
             </Text>
           </Link>
@@ -528,6 +528,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
 
           <Tooltip label='Add Part' placement='top'>
             <IconButton
+              display={subProduct?.name && subProduct?.children?.name && subProduct?.children?.children?.name ? 'none' : 'flex'}
               ref={addBtn}
               onClick={onOpen}
               icon={<AddIcon />}
@@ -588,7 +589,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
                   >
                     <option value={''}>-- Select --</option>
                     {allProjects?.organization?.projectGroups?.nodes
-                      .filter((item) => item.id !== group?.groupId)
+                      .filter((item) => item.id !== group?.groupId && item?.name !== subProduct?.name && item?.name !== subProduct?.children?.name && item?.name !== subProduct?.children?.children?.name && item?.name !== subProduct?.children?.children?.children?.name)
                       .map((item, index) => (
                         <option key={index} value={item.id}>
                           {item.name}

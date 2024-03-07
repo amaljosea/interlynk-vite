@@ -1752,7 +1752,7 @@ export const GetComponentData = gql`
   }
 `
 
-// GET COMPONENT DATA
+// GET PRIMARY COMPONENT DATA
 export const GetPrimaryComponent = gql`
   query GetPrimaryComponent(
     $projectId: Uuid!

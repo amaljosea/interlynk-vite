@@ -1,51 +1,18 @@
-import {
-  Badge,
-  Box,
-  Flex,
-  HStack,
-  Icon,
-  IconButton,
-  Stack,
-  Tag,
-  TagLabel,
-  Text,
-  Tooltip
-} from '@chakra-ui/react'
+import { Badge, Flex, HStack, Icon, IconButton, Stack, Tag, TagLabel, Text, Tooltip } from '@chakra-ui/react'
 import VulnBadge from 'components/Misc/VulnBadge'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { Link, useLocation } from 'react-router-dom'
-import { timeSince, getFullDateAndTime } from 'utils'
+import { timeSince, getFullDateAndTime, parseJSONSafely } from 'utils'
 import { DownloadIcon, Search2Icon } from '@chakra-ui/icons'
-import {
-  FaAngleLeft,
-  FaBalanceScale,
-  FaBug,
-  FaCube,
-  FaCubes
-} from 'react-icons/fa'
+import { FaAngleLeft, FaBalanceScale, FaBug, FaCube, FaCubes } from 'react-icons/fa'
 import { FaCircleCheck } from 'react-icons/fa6'
+import { useEffect } from 'react'
 
 const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
-  const {
-    project,
-    projectVersion,
-    primaryComponent,
-    updatedAt,
-    lifecycle,
-    vulnRunStatus,
-    stats
-  } = sbom
+  const { project, projectVersion, primaryComponent, updatedAt, lifecycle, vulnRunStatus, stats } = sbom
   const { compCount, compLicenseCount, vulnStats } = stats
   const { critical, high, medium, low, unknown } = vulnStats
-
-  const {
-    totalRows,
-    prodCompState,
-    prodVulnState,
-    setActiveSbomTab,
-    setActiveCsSbomTab,
-    dispatch
-  } = useGlobalState()
+  const {totalRows, prodCompState, prodVulnState, setActiveSbomTab, setActiveCsSbomTab, dispatch} = useGlobalState()
   const { prodCompDispatch, prodVulnDispatch } = dispatch
 
   const location = useLocation()
@@ -54,8 +21,22 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
   const sbomId = queryParams.get('sbom')
   const parts = queryParams.get('parts')
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
-
-  const currentProduct = JSON.parse(localStorage.getItem(`product`))
+  const subProduct = (() => {
+    try {
+      return parseJSONSafely(localStorage.getItem('subProduct'))
+    } catch (error) {
+      console.log(error)
+      return null
+    }
+  })()
+  const currentProduct = (() => {
+    try {
+      return parseJSONSafely(localStorage.getItem('product'))
+    } catch (error) {
+      console.log(error)
+      return null
+    }
+  })()
   const id = localStorage.getItem('activeEnv')
   const { name } = currentProduct ? currentProduct : {}
   const currentSBOM = JSON.parse(localStorage.getItem(`currentSBOM`))
@@ -90,6 +71,11 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
     })
   }
 
+  const onSelectLicenses = () => {
+    localStorage.setItem('activeSbomTab', 4)
+    setActiveSbomTab(4)
+  }
+
   const onFilterVuln = (value) => {
     const { field, direction } = prodVulnState
     prodVulnDispatch({ type: 'CLEAR_PROD_VULN' })
@@ -115,6 +101,55 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
     })
   }
 
+  const handlePart = () => {
+    if (subProduct?.children && !subProduct?.children?.children) {
+      localStorage.setItem(
+        'subProduct',
+        JSON.stringify({
+          name: subProduct?.name,
+          version: subProduct?.version,
+          projectId: subProduct?.projectId,
+          sbomId: subProduct?.sbomId
+        })
+      )
+    } else if (subProduct?.children?.children) {
+      localStorage.setItem(
+        'subProduct',
+        JSON.stringify({
+          name: subProduct?.name,
+          version: subProduct?.version,
+          projectId: subProduct?.projectId,
+          sbomId: subProduct?.sbomId,
+          children: {
+            name: subProduct?.children?.name,
+            version: subProduct?.children?.version,
+            projectId: subProduct?.children?.projectId,
+            sbomId: subProduct?.children?.sbomId
+          }
+        })
+      )
+    } else {
+      localStorage.removeItem('subProduct')
+    }
+  }
+
+  const parentLink = () => {
+    if (subProduct?.children && !subProduct?.children?.children) {
+      return `/vendor/products/${name}?id=${subProduct?.projectId}&sbom=${subProduct?.sbomId}&parts=true`
+    } else if (subProduct?.children?.children) {
+      return `/vendor/products/${name}?id=${subProduct?.children?.projectId}&sbom=${subProduct?.children?.sbomId}&parts=true`
+    } else {
+      return `/vendor/products/${name}?id=${id}&sbom=${currentSBOM?.id}`
+    }
+  }
+
+  useEffect(() => {
+    window.onpopstate = () => {
+      console.log(`Pressed back button`);
+      handlePart()
+    }
+  })
+
   return (
     <Flex direction={'row'} alignItems={'flex-start'} gap={5} width={'100%'}>
       <Icon as={FaCubes} h={'64px'} w={'64px'} color='blue.300' />
@@ -122,9 +157,7 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
         {/* PRODUCT TITLE */}
         <Stack direction={'column'} spacing={1} alignItems={'left'}>
           {currentProduct && parts && currentSBOM && (
-            <Link
-              to={`/vendor/products/${name}?id=${id}&sbom=${currentSBOM?.id}`}
-            >
+            <Link to={parentLink()} onClick={handlePart}>
               <HStack
                 onClick={() => {
                   localStorage.setItem('activeSbomTab', 1)
@@ -132,41 +165,22 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
                 }}
               >
                 <FaAngleLeft size={18} color='#3182CE' />
-                <Text
-                  fontWeight={'semibold'}
-                  fontSize={18}
-                  color={'blue.500'}
-                  textDecor={'underline'}
-                >
-                  {name}
+                <Text fontWeight={'semibold'} fontSize={18} color={'blue.500'} textDecor={'underline'}>
+                  {subProduct?.children && !subProduct?.children?.children ? subProduct?.name : subProduct?.children?.children ? subProduct?.children?.name : name}
                 </Text>
               </HStack>
             </Link>
           )}
-          <Flex
-            direction={'row'}
-            alignItems={'center'}
-            flexWrap={'wrap'}
-            gap={2}
-          >
-            <Text fontWeight={'semibold'} fontSize={25}>
-              {project?.projectGroup?.name}
-            </Text>
+          <Flex direction={'row'} alignItems={'center'} flexWrap={'wrap'} gap={2}>
+            <Text fontWeight={'semibold'} fontSize={25}>{project?.projectGroup?.name}</Text>
           </Flex>
         </Stack>
         <Flex flexDir={'row'} gap={1} alignItems={'center'} flexWrap={'wrap'}>
           <Text fontSize={22}>{primaryComponent?.name}</Text>
           <Text fontSize={22}>{primaryComponent?.version ? ':' : ''}</Text>
-          <Text mr={2} fontSize={22}>
-            {projectVersion}
-          </Text>
+          <Text mr={2} fontSize={22}>{projectVersion}</Text>
           <Tooltip label='Lifecycle stage' fontSize='md'>
-            <Tag
-              w={'fit-content'}
-              size={'sm'}
-              variant='solid'
-              colorScheme='blue'
-            >
+            <Tag w={'fit-content'} size={'sm'} variant='solid' colorScheme='blue'>
               <TagLabel textTransform={'capitalize'}>{lifecycle}</TagLabel>
             </Tag>
           </Tooltip>
@@ -178,54 +192,25 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
         {!signedUrlParams && (
           <Flex flexDir='row' gap={2} alignItems={'center'} width='100%' my={2}>
             <Tooltip label='Imported'>
-              <IconButton
-                size='xs'
-                colorScheme={'blue'}
-                icon={<DownloadIcon />}
-              />
+              <IconButton size='xs' colorScheme={'blue'} icon={<DownloadIcon />} />
             </Tooltip>
             <Tooltip label='SBOM Checks'>
-              <IconButton
-                size='xs'
-                colorScheme={
-                  vulnRunStatus === 'FINISHED' ||
-                  vulnRunStatus === 'IN_PROGRESS'
-                    ? 'blue'
-                    : 'blackAlpha'
-                }
-                icon={<Search2Icon />}
-              />
+              <IconButton size='xs' colorScheme={vulnRunStatus === 'FINISHED' || vulnRunStatus === 'IN_PROGRESS' ? 'blue' : 'blackAlpha'} icon={<Search2Icon />} />
             </Tooltip>
             <Tooltip label='Vulnerability Scan'>
-              <IconButton
-                size='xs'
-                colorScheme={
-                  vulnRunStatus === 'FINISHED' ? 'blue' : 'blackAlpha'
-                }
-                icon={<FaBug />}
-              />
+              <IconButton size='xs' colorScheme={vulnRunStatus === 'FINISHED' ? 'blue' : 'blackAlpha'} icon={<FaBug />} />
             </Tooltip>
             <Tooltip label='Ready'>
-              <IconButton
-                size='xs'
-                colorScheme={
-                  vulnRunStatus === 'FINISHED' ? 'blue' : 'blackAlpha'
-                }
-                icon={<FaCircleCheck />}
-              />
+              <IconButton size='xs' colorScheme={vulnRunStatus === 'FINISHED' ? 'blue' : 'blackAlpha'} icon={<FaCircleCheck />} />
             </Tooltip>
             {vulnRunStatus === 'IN_PROGRESS' && (
-              <Badge px={2} py={1} fontWeight={'semibold'}>
-                Scanning...
-              </Badge>
+              <Badge px={2} py={1} fontWeight={'semibold'}>Scanning...</Badge>
             )}
           </Flex>
         )}
         {/* UPDATED AT */}
         <Tooltip placement='top' label={getFullDateAndTime(updatedAt)}>
-          <Text width={'fit-content'} fontSize='xs' cursor={'pointer'}>
-            Updated {timeSince(updatedAt)}
-          </Text>
+          <Text width={'fit-content'} fontSize='xs' cursor={'pointer'}>Updated {timeSince(updatedAt)}</Text>
         </Tooltip>
         {/* STATS */}
         <Flex flexDir={'row'} alignItems={'center'} gap={8} mt={5}>
@@ -233,39 +218,22 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
           <Stack direction={'row'} alignItems={'flex-start'} spacing={2}>
             <Icon h={4} w={4} mt={1} color='#777' as={FaCube} />
             <Flex flexDir={'column'} alignItems={'center'}>
-              <Tag
-                size='md'
-                variant='subtle'
-                width={'full'}
-                colorScheme={'blue'}
-              >
+              <Tag size='md' variant='subtle' width={'full'} colorScheme={'blue'}>
                 <TagLabel mx={'auto'}>{compCount}</TagLabel>
               </Tag>
-              <Text
-                mt={1}
-                fontSize={'xs'}
-                onClick={onSelectComp}
-                cursor={'pointer'}
-                _hover={{ textDecoration: 'underline' }}
-              >
+              <Text mt={1} fontSize={'xs'} onClick={onSelectComp} cursor={'pointer'} _hover={{ textDecoration: 'underline' }}>
                 Components
               </Text>
             </Flex>
           </Stack>
           {/* LICENSES */}
           <Stack direction={'row'} alignItems={'flex-start'} spacing={2}>
-            <Icon
-              mt={1}
-              h={'20px'}
-              w={'20px'}
-              color='#777'
-              as={FaBalanceScale}
-            />
+            <Icon mt={1} h={'20px'} w={'20px'} color='#777' as={FaBalanceScale} />
             <Flex flexDir={'column'} alignItems={'center'}>
-              <Tag size='md' variant='subtle' width={16} colorScheme={'blue'}>
+              <Tag cursor={'pointer'} size='md' variant='subtle' width={16} colorScheme={'blue'} onClick={onSelectLicenses}>
                 <TagLabel mx={'auto'}>{compLicenseCount}</TagLabel>
               </Tag>
-              <Text mt={1} fontSize={'xs'}>
+              <Text cursor={'pointer'} mt={1} fontSize={'xs'} onClick={onSelectLicenses}>
                 Licenses
               </Text>
             </Flex>
@@ -275,49 +243,23 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
             <Icon mt={1} h={4} w={4} color='#777' as={FaBug} />
             <Flex flexDir={'column'} alignItems={'center'}>
               <Stack fontWeight={'medium'} direction={'row'}>
-                <VulnBadge
-                  color='red'
-                  label='Critical'
-                  onClick={() => onFilterVuln(['critical'])}
-                >
+                <VulnBadge color='red' label='Critical' onClick={() => onFilterVuln(['critical'])}>
                   {critical ? critical : 0}
                 </VulnBadge>
-                <VulnBadge
-                  color='orange'
-                  label='High'
-                  onClick={() => onFilterVuln(['high'])}
-                >
+                <VulnBadge color='orange' label='High' onClick={() => onFilterVuln(['high'])}>
                   {high ? high : 0}
                 </VulnBadge>
-                <VulnBadge
-                  color='yellow'
-                  label='Medium'
-                  onClick={() => onFilterVuln(['medium'])}
-                >
+                <VulnBadge color='yellow' label='Medium' onClick={() => onFilterVuln(['medium'])}>
                   {medium ? medium : 0}
                 </VulnBadge>
-                <VulnBadge
-                  color='green'
-                  label='Low'
-                  onClick={() => onFilterVuln(['low'])}
-                >
+                <VulnBadge color='green' label='Low' onClick={() => onFilterVuln(['low'])}>
                   {low ? low : 0}
                 </VulnBadge>
-                <VulnBadge
-                  color='gray'
-                  label='Unknown'
-                  onClick={() => onFilterVuln(['unknown'])}
-                >
+                <VulnBadge color='gray' label='Unknown' onClick={() => onFilterVuln(['unknown'])}>
                   {unknown ? unknown : 0}
                 </VulnBadge>
               </Stack>
-              <Text
-                fontSize={'xs'}
-                mt={1}
-                onClick={() => onFilterVuln(null)}
-                style={{ cursor: 'pointer' }}
-                _hover={{ textDecoration: 'underline' }}
-              >
+              <Text fontSize={'xs'} mt={1} onClick={() => onFilterVuln(null)} style={{ cursor: 'pointer' }} _hover={{ textDecoration: 'underline' }}>
                 Vulnerabilities
               </Text>
             </Flex>

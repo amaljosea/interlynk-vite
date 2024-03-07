@@ -1,15 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import {
-  Tabs,
-  TabList,
-  Tab,
-  TabPanel,
-  TabPanels,
-  Flex,
-  Skeleton,
-  Button,
-  Text
-} from '@chakra-ui/react'
+import { Tabs, TabList, Tab, TabPanel, TabPanels, Flex, Skeleton, Button, Text } from '@chakra-ui/react'
 import Card from 'components/Card/Card.js'
 import GeneralDataRow from 'components/Tables/GeneralDataRow'
 import ComponentTable from 'components/Tables/ComponentTable'
@@ -18,63 +8,25 @@ import HealthCheckTable from 'components/Tables/HealthCheckTable'
 import SbomChangelogTable from 'components/Tables/SbomChangelogTable'
 import PartsTable from 'components/Tables/PartsTable'
 import { useLazyQuery } from '@apollo/client'
-import {
-  GetCheckResults,
-  GetChangeLogs,
-  GetSbomParts,
-  GetSbomLicensesTable
-} from 'graphQL/Queries'
+import { GetCheckResults, GetChangeLogs, GetSbomParts, GetSbomLicensesTable, GetPrimaryComponent, ComponentSupportInfos } from 'graphQL/Queries'
 import { useLocation } from 'react-router-dom'
 import { useGlobalState } from 'hooks/useGlobalState'
 import SupportTable from 'components/Tables/SupportTable'
 import SbomLicenseTable from '../../../components/Licenses/SbomLicenseTable'
 import GraphView from './GraphView'
-import { ComponentSupportInfos } from 'graphQL/Queries'
-import { GetPrimaryComponent } from 'graphQL/Queries'
+import { parseJSONSafely } from 'utils'
 
-const SBOMTable = ({
-  status,
-  type,
-  data,
-  refetch,
-  filteredData,
-  vulnData,
-  getVulnData,
-  getCompData,
-  compData,
-  error
+const SBOMTable = ({ status, type, data, refetch, filteredData, vulnData, getVulnData, getCompData, compData, error
 }) => {
   // How often each tab should refetch the data (in minutes)
-  const fetchIntervalMinutes = {
-    'General': 0,
-    'Parts': 0,
-    'Components': 0,
-    'Vulnerabilities': 0.5,
-    'Licenses': 0,
-    'Support': 0,
-    'Relationships': 0,
-    'Checks': 0,
-    'Change Log': 0,
-  }
+  const fetchIntervalMinutes = { 'General': 0, 'Parts': 0, 'Components': 0, 'Vulnerabilities': 0.5, 'Licenses': 0, 'Support': 0, 'Relationships': 0, 'Checks': 0, 'Change Log': 0 }
 
-  const [lastFetchTime, setLastFetchTime] = useState({
-    'General': null,
-    'Parts': null,
-    'Components': null,
-    'Vulnerabilities': null,
-    'Licenses': null,
-    'Support': null,
-    'Relationships': null,
-    'Checks': null,
-    'Change Log': null,
-  })
+  const [lastFetchTime, setLastFetchTime] = useState({ 'General': null, 'Parts': null, 'Components': null, 'Vulnerabilities': null, 'Licenses': null, 'Support': null, 'Relationships': null, 'Checks': null, 'Change Log': null })
 
   const shouldFetchData = (tabName) => {
     const lastFetch = lastFetchTime[tabName]
     const now = new Date()
-
     if (!lastFetch) return true // If never fetched, fetch data
-
     const minutesElapsed = (now - lastFetch) / 60000
     return minutesElapsed >= fetchIntervalMinutes[tabName]
   }
@@ -83,24 +35,8 @@ const SBOMTable = ({
     setLastFetchTime({ ...lastFetchTime, [tabName]: new Date() })
   }
 
-  const {
-    totalRows,
-    activeSbomTab,
-    setActiveSbomTab,
-    prodCompState,
-    prodVulnState,
-    prodCheckState,
-    sbomLogState,
-    supportState,
-    dispatch
-  } = useGlobalState()
-
-  const {
-    prodCompDispatch,
-    prodVulnDispatch,
-    prodCheckDispatch,
-    sbomLogDispatch
-  } = dispatch
+  const { totalRows, activeSbomTab, setActiveSbomTab, prodCompState, prodVulnState, prodCheckState, sbomLogState, supportState, dispatch } = useGlobalState()
+  const {prodCompDispatch, prodVulnDispatch, prodCheckDispatch, sbomLogDispatch } = dispatch
 
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -108,56 +44,40 @@ const SBOMTable = ({
   const sbomId = queryParams.get('sbom')
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const activeTab = Number(localStorage.getItem('activeSbomTab') || 0)
+  const subProduct = (() => {
+    try {
+      return parseJSONSafely(localStorage.getItem('subProduct'))
+    } catch (error) {
+      console.log(error)
+      return null
+    }
+  })()
+
 
   const [activeComp, setActiveComp] = useState(null)
 
   // GET SBOM PARTS
-  const [getPartsData, { data: partsData }] = useLazyQuery(GetSbomParts, {
-    fetchPolicy: 'network-only'
-  })
+  const [getPartsData, { data: partsData }] = useLazyQuery(GetSbomParts, {fetchPolicy: 'network-only' })
 
   // GET HEALTH CHECK DATA
-  const [getChecksData, { data: checksData }] = useLazyQuery(GetCheckResults, {
-    fetchPolicy: 'network-only'
-  })
+  const [getChecksData, { data: checksData }] = useLazyQuery(GetCheckResults, { fetchPolicy: 'network-only' })
 
   // GET CHANGE LOG DATA
-  const [getLogsData, { data: logsData, refetch: logsRefetch }] = useLazyQuery(
-    GetChangeLogs, { fetchPolicy: 'network-only'}
-  )
+  const [getLogsData, { data: logsData, refetch: logsRefetch }] = useLazyQuery(GetChangeLogs, { fetchPolicy: 'network-only'})
 
   // GET PRIMARY COMPONENT
-  const [getPrimaryComp, { data: primaryComp }] = useLazyQuery(
-    GetPrimaryComponent, { fetchPolicy: 'network-only'}
-  )
+  const [getPrimaryComp, { data: primaryComp }] = useLazyQuery(GetPrimaryComponent, { fetchPolicy: 'network-only'})
 
-   // GET COMPONENT SUPPORT INFO
-   const [getSupportInfos, { data: support }] = useLazyQuery(
-    ComponentSupportInfos, { fetchPolicy: 'network-only'}
-  )
+  // GET COMPONENT SUPPORT INFO
+  const [getSupportInfos, { data: support }] = useLazyQuery(ComponentSupportInfos, { fetchPolicy: 'network-only'})
 
   // GET LICENSES DATA
-  const [getLicensesData, { data: licensesData, refetch: licensesRefetch }] =
-    useLazyQuery(GetSbomLicensesTable, {
-      fetchPolicy: 'network-only'
-    })
+  const [getLicensesData, { data: licensesData, refetch: licensesRefetch }] = useLazyQuery(GetSbomLicensesTable, {fetchPolicy: 'network-only'})
 
   const getUndefinedIfEmpty = (value) => (value !== '' ? value : undefined)
+  const getUndefinedIfEmptyOrAll = (value, allValue = 'all') => value.includes(allValue) || value.length === 0 ? undefined : value
 
-  const getUndefinedIfEmptyOrAll = (value, allValue = 'all') =>
-    value.includes(allValue) || value.length === 0 ? undefined : value
-
-  const tabIndexToName = {
-    0: 'General',
-    1: 'Parts',
-    2: 'Components',
-    3: 'Vulnerabilities',
-    4: 'Licenses',
-    5: 'Support',
-    6: 'Relationships',
-    7: 'Checks',
-    8: 'Change Log',
-  }
+  const tabIndexToName = { 0: 'General', 1: 'Parts', 2: 'Components', 3: 'Vulnerabilities', 4: 'Licenses', 5: 'Support', 6: 'Relationships', 7: 'Checks', 8: 'Change Log' }
 
   const handleTabChange = (value) => {
     localStorage.setItem('activeSbomTab', value)
@@ -261,7 +181,7 @@ const SBOMTable = ({
           {/* TAB LIST */}
           <TabList mt='20px'>
             {Object.values(tabIndexToName).map((item, index) => (
-              <Tab key={index} _focus={{ outline: 'none' }} isDisabled={ signedUrlParams && (item === 'Checks' || item === 'Change Log')}>
+              <Tab key={index} _focus={{ outline: 'none' }} display={item === 'Parts' && subProduct?.name && subProduct?.children?.name && subProduct?.children?.children?.name ? 'none' : 'flex'} isDisabled={ signedUrlParams && (item === 'Checks' || item === 'Change Log')}>
                 {item}
               </Tab>
             ))}
