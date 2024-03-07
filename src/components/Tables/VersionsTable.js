@@ -442,7 +442,6 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
       name: 'CREATED',
       selector: (row) => {
         const { creationAt } = row
-
         return (
           <Tooltip label={getFullDateAndTime(creationAt)} placement='top'>
             <Text>{timeSince(creationAt)}</Text>
@@ -450,7 +449,12 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
         )
       },
       right: 'false',
-      sortable: true
+      sortable: true,
+      sortFunction: (a, b) => {
+        const dateA = new Date(a.creationAt)
+        const dateB = new Date(b.creationAt)
+        return dateA - dateB
+      },
     },
     // UPDATED AT
     {
