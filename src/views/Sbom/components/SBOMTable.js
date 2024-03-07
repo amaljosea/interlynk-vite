@@ -30,6 +30,7 @@ import SupportTable from 'components/Tables/SupportTable'
 import SbomLicenseTable from '../../../components/Licenses/SbomLicenseTable'
 import GraphView from './GraphView'
 import { ComponentSupportInfos } from 'graphQL/Queries'
+import { GetPrimaryComponent } from 'graphQL/Queries'
 
 const SBOMTable = ({
   status,
@@ -125,6 +126,11 @@ const SBOMTable = ({
     GetChangeLogs, { fetchPolicy: 'network-only'}
   )
 
+  // GET PRIMARY COMPONENT
+  const [getPrimaryComp, { data: primaryComp }] = useLazyQuery(
+    GetPrimaryComponent, { fetchPolicy: 'network-only'}
+  )
+
    // GET COMPONENT SUPPORT INFO
    const [getSupportInfos, { data: support }] = useLazyQuery(
     ComponentSupportInfos, { fetchPolicy: 'network-only'}
@@ -164,85 +170,26 @@ const SBOMTable = ({
   }, [activeTab, setActiveSbomTab])
 
   const fetchTabData = (activeTab) => {
-    const commonParams = {
-      projectId: productId,
-      sbomId: sbomId,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      before: undefined
-    }
-
+    const commonParams = { projectId: productId, sbomId: sbomId, first: totalRows, last: undefined, after: undefined, before: undefined }
     const tabName = tabIndexToName[activeTab]
-
     if (tabName === 'General' && shouldFetchData(tabName)) {
-      refetch({
-        ...commonParams
-      }).then(() => {
-        updateLastFetchTime(tabName)
-      })
+      refetch({ ...commonParams }).then(() => updateLastFetchTime(tabName))
     } else if (tabName === 'Parts') {
-      getPartsData({
-        variables: {
-          ...commonParams
-        }
-      }).then(() => {
-        updateLastFetchTime(tabName)
-      })
+      getPartsData({ variables: {...commonParams } })
+      .then(() => updateLastFetchTime(tabName))
     } else if (tabName === 'Components' && shouldFetchData(tabName)) {
-      const {
-        field,
-        direction,
-        searchInput,
-        ecosystems,
-        kinds,
-        licenses,
-        suppliers,
-        scope,
-        direct
-      } = prodCompState
-
-      getCompData({
-        ...commonParams,
-        search: getUndefinedIfEmpty(searchInput),
-        ecosystem: getUndefinedIfEmptyOrAll(ecosystems),
-        kind: getUndefinedIfEmptyOrAll(kinds),
-        licenses: getUndefinedIfEmptyOrAll(licenses),
-        supplierName: getUndefinedIfEmptyOrAll(suppliers),
-        primary: scope === 'primary' ? true : undefined,
-        internal: scope === 'internal' ? true : undefined,
-        direct: direct === true ? true : undefined,
-        field,
-        direction
-      }).then((res) => {
+      const { field, direction, searchInput, ecosystems, kinds, licenses, suppliers, scope, direct } = prodCompState
+      getCompData({ ...commonParams, search: getUndefinedIfEmpty(searchInput), ecosystem: getUndefinedIfEmptyOrAll(ecosystems), kind: getUndefinedIfEmptyOrAll(kinds), licenses: getUndefinedIfEmptyOrAll(licenses), supplierName: getUndefinedIfEmptyOrAll(suppliers), primary: scope === 'primary' ? true : undefined, internal: scope === 'internal' ? true : undefined, direct: direct === true ? true : undefined, field, direction })
+      .then((res) => {
         if (res.data) {
-          prodCompDispatch({
-            type: 'SET_TOTAL_COMP',
-            payload: res.data.sbom.components.totalCount
-          })
+          prodCompDispatch({ type: 'SET_TOTAL_COMP', payload: res.data.sbom.components.totalCount })
           prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
           updateLastFetchTime(tabName)
         }
       })
     } else if (tabName === 'Vulnerabilities' && shouldFetchData(tabName)) {
-      const {
-        field,
-        direction,
-        searchInput,
-        severities,
-        components,
-        statues,
-        source,
-        kev,
-        epss,
-        direct
-      } = prodVulnState
-      console.log('source', source)
-
-      const vulnEpss =
-        epss !== 'all' && epss !== ''
-          ? epss.split('-').map((v) => parseFloat(v) / 10000)
-          : undefined
+      const { field, direction, searchInput, severities, components, statues, source, kev, epss, direct } = prodVulnState
+      const vulnEpss = epss !== 'all' && epss !== '' ? epss.split('-').map((v) => parseFloat(v) / 10000) : undefined
       getVulnData({
         ...commonParams,
         search: getUndefinedIfEmpty(searchInput),
@@ -251,85 +198,45 @@ const SBOMTable = ({
         componentName: getUndefinedIfEmptyOrAll(components),
         status: getUndefinedIfEmptyOrAll(statues),
         kev: kev === 'yes' ? true : kev === 'no' ? false : undefined,
-        epss:
-          epss !== '' && epss !== 'all'
-            ? { min: vulnEpss[0], max: vulnEpss[1] }
-            : undefined,
+        epss: epss !== '' && epss !== 'all' ? { min: vulnEpss[0], max: vulnEpss[1] } : undefined,
         direct: direct === true ? true : undefined,
         field,
         direction
       }).then((res) => {
         if (res.data) {
-          prodVulnDispatch({
-            type: 'SET_TOTAL_VULNS',
-            payload: res.data.sbom.vulns.totalCount
-          })
+          prodVulnDispatch({ type: 'SET_TOTAL_VULNS', payload: res.data.sbom.vulns.totalCount })
           prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
           updateLastFetchTime(tabName)
         }
       })
     } else if (tabName === 'Licenses' && shouldFetchData(tabName)) {
-      getLicensesData({
-        variables: {
-          ...commonParams
-        }
-      }).then((res) => {
+      getLicensesData({ variables: { ...commonParams }})
+      .then((res) => {
         if (res.data) {
-          console.log('licensesData', res.data)
           updateLastFetchTime(tabName)
         }
       })
     } else if (tabName === 'Support' && shouldFetchData(tabName)) {
       const {searchInput, field, direction} = supportState
-      getSupportInfos({
-        variables: {
-          sbomId,
-          field,
-          direction,
-          first: totalRows, 
-          search: searchInput !== '' ? searchInput : undefined,
-        }
-      }).then((res) => {
+      getSupportInfos({ variables: { sbomId, field, direction, first: totalRows,  search: searchInput !== '' ? searchInput : undefined } })
+      .then((res) => {
         if (res?.data) {
-          console.log('Support data', res.data)
           updateLastFetchTime(tabName)
         }
       })
     } else if (tabName === 'Relationships' && shouldFetchData(tabName)) {
       const { field, direction } = prodCompState
-      getCompData({
-        ...commonParams,
-        primary: true,
-        field,
-        direction
-      }).then((res) => {
+      getPrimaryComp({ variables: { projectId: productId, sbomId: sbomId, primary: true, field, direction } })
+      .then((res) => {
         if (res?.data) {
           updateLastFetchTime(tabName)
         }
       })
     } else if (tabName === 'Checks' && shouldFetchData(tabName)) {
-      const {
-        field,
-        direction,
-        searchInput,
-        rules,
-        categories,
-        severities,
-        statues
-      } = prodCheckState
-
+      const { field, direction, searchInput, rules, categories, severities, statues } = prodCheckState
       getChecksData({
-        variables: {
-          ...commonParams,
-          search: getUndefinedIfEmpty(searchInput),
-          checkId: getUndefinedIfEmptyOrAll(rules),
-          category: getUndefinedIfEmptyOrAll(categories),
-          severity: getUndefinedIfEmptyOrAll(severities),
-          status: getUndefinedIfEmptyOrAll(statues),
-          field: field || 'CHECK_RESULTS_UPDATED_AT',
-          direction: direction || 'DESC'
-        }
-      }).then((res) => {
+        variables: { ...commonParams, search: getUndefinedIfEmpty(searchInput), checkId: getUndefinedIfEmptyOrAll(rules), category: getUndefinedIfEmptyOrAll(categories), severity: getUndefinedIfEmptyOrAll(severities), status: getUndefinedIfEmptyOrAll(statues), field: field || 'CHECK_RESULTS_UPDATED_AT', direction: direction || 'DESC' } })
+        .then((res) => {
         if (res.data) {
           prodCheckDispatch({ type: 'FETCH_DATA_SUCCESS' })
           updateLastFetchTime(tabName)
@@ -337,14 +244,8 @@ const SBOMTable = ({
       })
     } else if (tabName === 'Change Log' && shouldFetchData(tabName)) {
       const { field, direction, searchInput } = sbomLogState
-      getLogsData({
-        variables: {
-          ...commonParams,
-          search: searchInput !== '' ? searchInput : undefined,
-          field,
-          direction
-        }
-      }).then((res) => {
+      getLogsData({ variables: { ...commonParams, search: searchInput !== '' ? searchInput : undefined, field, direction } })
+      .then((res) => {
         if (res.data) {
           sbomLogDispatch({ type: 'FETCH_DATA_SUCCESS' })
           updateLastFetchTime(tabName)
@@ -356,22 +257,11 @@ const SBOMTable = ({
   return (
     <>
       <Card>
-        <Tabs
-          variant='enclosed'
-          index={activeSbomTab}
-          onChange={(value) => handleTabChange(value)}
-        >
+        <Tabs variant='enclosed' index={activeSbomTab} onChange={(value) => handleTabChange(value)}>
           {/* TAB LIST */}
           <TabList mt='20px'>
             {Object.values(tabIndexToName).map((item, index) => (
-              <Tab
-                key={index}
-                _focus={{ outline: 'none' }}
-                isDisabled={
-                  signedUrlParams &&
-                  (item === 'Checks' || item === 'Change Log')
-                }
-              >
+              <Tab key={index} _focus={{ outline: 'none' }} isDisabled={ signedUrlParams && (item === 'Checks' || item === 'Change Log')}>
                 {item}
               </Tab>
             ))}
@@ -381,12 +271,7 @@ const SBOMTable = ({
             {/* GENERAL TABLE */}
             <TabPanel px={1}>
               {data ? (
-                <GeneralDataRow
-                  status={status}
-                  type={type}
-                  data={data}
-                  refetch={refetch}
-                />
+                <GeneralDataRow status={status} type={type} data={data} refetch={refetch}/>
               ) : (
                 <Flex width={'100%'} gap={4} direction={'column'}>
                   <Skeleton width={'100%'} height='20px' />
@@ -399,47 +284,19 @@ const SBOMTable = ({
             </TabPanel>
             {/* PARTS TABLE */}
             <TabPanel px={0}>
-              <PartsTable
-                data={partsData?.sbom?.sbomParts}
-                refetch={getPartsData}
-                getVulnData={getVulnData}
-                getCompData={getCompData}
-              />
+              <PartsTable data={partsData?.sbom?.sbomParts} refetch={getPartsData} getVulnData={getVulnData} getCompData={getCompData}/>
             </TabPanel>
             {/* COMPONENT TABLE */}
             <TabPanel px={0}>
               {data && (
-                <ComponentTable
-                  type={type}
-                  lifecycle={data.lifecycle}
-                  data={compData?.sbom?.components}
-                  refetch={getCompData}
-                  sbomRefetch={refetch}
-                  setActiveComp={setActiveComp}
-                  primaryComp={data.primaryComponent}
+                <ComponentTable type={type} lifecycle={data.lifecycle} data={compData?.sbom?.components} refetch={getCompData} sbomRefetch={refetch} setActiveComp={setActiveComp} primaryComp={data.primaryComponent}
                 />
               )}
               {error && (
-                <Flex
-                  py={10}
-                  flexDirection={'column'}
-                  gap={2}
-                  width={'70%'}
-                  mx={'auto'}
-                  alignItems={'center'}
-                  justifyContent={'center'}
-                >
-                  <Text color={'red.500'} textAlign={'center'}>
-                    {error.message}
-                  </Text>
+                <Flex py={10} flexDirection={'column'} gap={2} width={'70%'} mx={'auto'} alignItems={'center'} justifyContent={'center'}>
+                  <Text color={'red.500'} textAlign={'center'}>{error.message}</Text>
                   <Text>Something went wrong. Please refresh this page</Text>
-                  <Button
-                    mt={2}
-                    variant='solid'
-                    colorScheme='blue'
-                    fontWeight={'normal'}
-                    onClick={() => window.location.reload()}
-                  >
+                  <Button mt={2} variant='solid' colorScheme='blue' fontWeight={'normal'} onClick={() => window.location.reload()}>
                     Refresh
                   </Button>
                 </Flex>
@@ -447,22 +304,11 @@ const SBOMTable = ({
             </TabPanel>
             {/* VUNERABILITIES TABLE */}
             <TabPanel px={0}>
-              <VulnTable
-                data={vulnData?.sbom?.vulns}
-                sbomData={data}
-                sbomRefetch={refetch}
-                filteredData={filteredData}
-                refetch={getVulnData}
-                productId={productId}
-                sbomId={sbomId}
-              />
+              <VulnTable data={vulnData?.sbom?.vulns} sbomData={data} sbomRefetch={refetch} filteredData={filteredData} refetch={getVulnData} productId={productId} sbomId={sbomId}/>
             </TabPanel>
             {/* LICENSES TABLE */}
             <TabPanel px={0}>
-              <SbomLicenseTable
-                data={licensesData?.sbom?.componentLicenses}
-                refetch={licensesRefetch}
-              />
+              <SbomLicenseTable data={licensesData?.sbom?.componentLicenses} refetch={licensesRefetch}/>
             </TabPanel>
             {/* SUPPORT TABLE */}
             <TabPanel px={0}>
@@ -470,7 +316,7 @@ const SBOMTable = ({
             </TabPanel>
             {/* RELATIONSHIP TABLE */}
             <TabPanel px={0}>
-              <GraphView data={compData?.sbom?.components} activeComp={activeComp} />
+              <GraphView data={primaryComp?.sbom?.components} activeComp={activeComp} />
             </TabPanel>
             {/* HEALTH CHECK TABLE */}
             <TabPanel px={0}>
@@ -490,10 +336,7 @@ const SBOMTable = ({
             </TabPanel>
             {/* CHANGELOG TABLE */}
             <TabPanel px={0}>
-              <SbomChangelogTable
-                data={logsData?.sbom?.activityLogs}
-                refetch={logsRefetch}
-              />
+              <SbomChangelogTable data={logsData?.sbom?.activityLogs} refetch={logsRefetch}/>
             </TabPanel>
           </TabPanels>
         </Tabs>

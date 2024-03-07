@@ -1752,6 +1752,31 @@ export const GetComponentData = gql`
   }
 `
 
+// GET COMPONENT DATA
+export const GetPrimaryComponent = gql`
+  query GetPrimaryComponent(
+    $projectId: Uuid!
+    $sbomId: Uuid!
+    $primary: Boolean
+    $field: ComponentOrderByFields!
+    $direction: OrderByDirection!
+  ) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      id
+      components(
+        sbomId: $sbomId
+        primary: $primary
+        orderBy: { field: $field, direction: $direction }
+      ) {
+        totalCount
+        nodes {
+          id
+        }
+      }
+    }
+  }
+`
+
 export const ShareComponentData = gql`
   query ShareComponentData(
     $sbomId: Uuid!
