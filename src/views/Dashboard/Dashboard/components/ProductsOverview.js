@@ -93,6 +93,30 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
       })
     )
     localStorage.setItem('activeSbomTab', 2)
+    setActiveSbomTab(2)
+  }
+
+  const onFilterLicense = (item) => {
+    const { project, id, projectVersion } = item
+    const { projectGroup, name } = project
+    const product = {
+      version: projectVersion,
+      groupId: projectGroup?.id,
+      id: projectGroup?.id,
+      name: name,
+      sbomId: id
+    }
+    localStorage.setItem('product', JSON.stringify(product))
+    localStorage.setItem('activeEnv', projectGroup?.defaultProject?.id)
+    localStorage.setItem(
+      'currentSBOM',
+      JSON.stringify({
+        version: projectVersion,
+        id: item.id
+      })
+    )
+    localStorage.setItem('activeSbomTab', 4)
+    setActiveSbomTab(4)
   }
 
   const onFilterSev = (project, id, version, value) => {
@@ -212,11 +236,18 @@ const ProductsOverview = ({ title, data, prodPermissions }) => {
       wrap: true,
       width: '120px',
       selector: (row) => {
-        const { stats } = row
+        const { id, project, projectId, stats } = row
+        const uniqueSbom = filteredData?.find((item) => item?.id === id)
         return (
-          <Tag size='md' variant='subtle' width={16} colorScheme={'blue'}>
-            <TagLabel mx={'auto'}>{stats?.compLicenseCount || 0}</TagLabel>
-          </Tag>
+          <Link
+            to={`/vendor/products/${project?.projectGroup?.name}?id=${projectId}&sbom=${id}`}
+            style={{ pointerEvents: uniqueSbom ? '' : 'none' }}
+            onClick={() => (uniqueSbom ? onFilterLicense(row) : null)}
+          >
+            <Tag size='md' variant='subtle' width={16} colorScheme={'blue'}>
+              <TagLabel mx={'auto'}>{stats?.compLicenseCount || 0}</TagLabel>
+            </Tag>
+          </Link>
         )
       }
     },

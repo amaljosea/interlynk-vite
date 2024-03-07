@@ -38,7 +38,7 @@ import {
   FaScrewdriverWrench,
   FaEllipsisVertical
 } from 'react-icons/fa6'
-import { Link, useLocation, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import ToolsDrawer from 'components/Drawer/ToolsDrawer'
 import SbomList from 'views/Dashboard/Products/components/SbomList'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
@@ -62,24 +62,12 @@ import {
 
 const VersionsTable = ({ projectGroup, getVulnData }) => {
   const location = useLocation()
+  const navigate = useNavigate()
   const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
-  const activeProd = localStorage.getItem(
-    signedUrlParams ? 'publicEnv' : 'activeEnv'
-  )
+  const activeProd = localStorage.getItem(signedUrlParams ? 'publicEnv' : 'activeEnv')
 
-  const {
-    userPermissions,
-    activeProdTab,
-    setActiveSbomTab,
-    prodVulnState,
-    setClearSelect,
-    clearSelect,
-    selectedSbom,
-    setSelectedSbom,
-    versionState,
-    dispatch
-  } = useGlobalState()
+  const { userPermissions, activeProdTab, setActiveSbomTab, prodVulnState, setClearSelect, clearSelect, selectedSbom, setSelectedSbom, versionState, dispatch } = useGlobalState()
   const { searchInput } = versionState
   const { field, direction } = prodVulnState
   const { prodVulnDispatch, prodCompDispatch, versionDispatch } = dispatch
@@ -286,6 +274,13 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
     onListOpen()
   }
 
+  const onSelectLicenses = (row) => {
+    const { id } = row
+    localStorage.setItem('activeSbomTab', 4)
+    setActiveSbomTab(4)
+    navigate(`/${path}/products/${projectGroup?.name}?id=${activeProd}&sbom=${id}`)
+  }
+
   // COLUMNS
   const columns = [
     // VERSION
@@ -361,7 +356,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
       selector: (row) => {
         const { stats } = row
         return (
-          <Tag size='md' variant='subtle' width={16} colorScheme={'blue'}>
+          <Tag size='md' variant='subtle' width={16} colorScheme={'blue'} cursor={'pointer'} onClick={() => onSelectLicenses(row)}>
             <TagLabel mx={'auto'}>{stats?.compLicenseCount}</TagLabel>
           </Tag>
         )
