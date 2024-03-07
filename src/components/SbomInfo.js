@@ -1,19 +1,4 @@
-import {
-  Flex,
-  HStack,
-  Link,
-  Stack,
-  Table,
-  TableContainer,
-  Tag,
-  TagLabel,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr
-} from '@chakra-ui/react'
-import React from 'react'
+import { Flex, HStack, Link, Stack, Table, TableContainer, Tag, TagLabel, Tbody, Td, Text, Th, Thead, Tr } from '@chakra-ui/react'
 import { getFullDateAndTime } from 'utils'
 
 const SbomInfo = ({ data }) => {
@@ -32,11 +17,8 @@ const SbomInfo = ({ data }) => {
             <Td pl={0}>Creation Tool</Td>
             <Td>
               <Flex flexDirection={'row'} alignItems={'flex-start'} flexWrap={'wrap'} gap={2.5}>
-                {data?.tools &&
-                  data?.tools.map((item, index) => (
-                    <Tag size={'md'} key={index} variant='subtle' colorScheme='teal' width={'fit-content'}>
-                      <TagLabel>{item.name} - {item.version}</TagLabel>
-                    </Tag>
+                {data?.tools && data?.tools.map((item, index) => (
+                    <Text key={index}>{item.name} - {item.version}</Text>
                   ))}
               </Flex>
             </Td>

@@ -20,12 +20,11 @@ import { useGlobalState } from 'hooks/useGlobalState'
 import React from 'react'
 
 const ToolsDrawer = ({ data, diffs, setData, selectedSbom, versionList, isOpen, onClose }) => {
-  const  {setClearSelect, setSelectedSbom} = useGlobalState()
+  const  { setSelectedSbom} = useGlobalState()
   const versionsOne = versionList?.nodes?.find((item) => item?.id === selectedSbom[1]?.id)
   const versionsTwo = versionList?.nodes?.find((item) => item?.id === selectedSbom[0]?.id)
 
   const handleClose = () => {
-    setClearSelect(true)
     setSelectedSbom([])
   }
 
@@ -37,12 +36,12 @@ const ToolsDrawer = ({ data, diffs, setData, selectedSbom, versionList, isOpen, 
         <DrawerHeader>SBOM Comparison</DrawerHeader>
         <DrawerBody>
           {/* SBOM INFO */}
-          <Grid templateColumns='repeat(2, 1fr)' gap={6}>
+          <Grid templateColumns='repeat(2, 1fr)' gap={6} mb={12}>
             {/* SBOM ONE */}
             <GridItem w='100%'>
-              <Card px={4} h='450px' overflowY='scroll'>
+              <Card width='100%' bg={'green.100'} px={6} h='450px' overflowY='scroll'>
                 {versionsOne && (
-                  <Flex alignItems={'flex-start'} flexWrap={'wrap'} flexDirection={'column'}>
+                  <Flex width={'100%'} flexDirection={'column'}>
                     {/* HEADIING */}
                     <Stack>
                       <Flex alignItems={'flex-end'} gap={1}>
@@ -50,11 +49,8 @@ const ToolsDrawer = ({ data, diffs, setData, selectedSbom, versionList, isOpen, 
                           {versionsOne?.project?.projectGroup?.name} :{' '}
                           {versionsOne?.projectVersion}
                         </Heading>
-                        <Badge px={1} width={'fit-content'}>
-                          Primary
-                        </Badge>
                       </Flex>
-                      <Tag colorScheme='blue' width={'fit-content'} textTransform={'capitalize'}>
+                      <Tag variant='solid' colorScheme='green' width={'fit-content'} textTransform={'capitalize'}>
                         {versionsOne?.project?.name}
                       </Tag>
                     </Stack>
@@ -66,16 +62,16 @@ const ToolsDrawer = ({ data, diffs, setData, selectedSbom, versionList, isOpen, 
             </GridItem>
             {/* SBOM TWO */}
             <GridItem w='100%'>
-              <Card px={4} h='450px' overflowY='scroll'>
+              <Card bg={'red.100'} px={6} h='450px' overflowY='scroll'>
                 {versionsTwo && (
-                  <Flex alignItems={'flex-start'} flexWrap={'wrap'} flexDirection={'column'}>
+                  <Flex width='100%' flexWrap={'wrap'} flexDirection={'column'}>
                     {/* HEADIING */}
                     <Stack>
                       <Heading fontWeight={'semibold'} color={'#333'} fontFamily={'inherit'} size='md'>
                         {versionsTwo?.project?.projectGroup?.name} :{' '}
                         {versionsTwo?.projectVersion}
                       </Heading>
-                      <Tag colorScheme='blue' width={'fit-content'} textTransform={'capitalize'}>
+                      <Tag variant='solid' colorScheme='red' width={'fit-content'} textTransform={'capitalize'}>
                         {versionsTwo?.project?.name}
                       </Tag>
                     </Stack>

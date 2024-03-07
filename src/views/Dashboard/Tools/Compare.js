@@ -265,18 +265,15 @@ const Compare = ({ selectedSboms }) => {
       <Grid templateColumns='repeat(2, 1fr)' gap={6}>
         {/* SBOM ONE */}
         <GridItem w='100%'>
-          <Card p={8} h='450px' overflowY='scroll'>
+          <Card bg={'green.100'} p={8} h='450px' overflowY='scroll'>
             <Flex alignItems={'flex-start'} flexWrap={'wrap'} justifyContent={'space-between'}>
               {firstSbomInfo ? (
                 <Stack>
-                  <Flex alignItems={'flex-end'} gap={1}>
-                    <Heading fontWeight={'semibold'} color={'#333'} fontFamily={'inherit'} size='md'>
-                      {firstSbomInfo?.project?.projectGroup?.name?.length > 20 ? `${firstSbomInfo?.project?.projectGroup?.name?.substring(0,20)}...` : firstSbomInfo?.project?.projectGroup?.name} :{' '}
-                      {firstSbomInfo?.projectVersion?.length > 20 ? `${firstSbomInfo?.projectVersion?.substring(0,20)}...` : firstSbomInfo?.projectVersion}
-                    </Heading>
-                    <Badge px={1} width={'fit-content'}>Primary</Badge>
-                  </Flex>
-                  <Tag colorScheme='blue' width={'fit-content'} textTransform={'capitalize'}>
+                  <Heading fontWeight={'semibold'} color={'#333'} fontFamily={'inherit'} size='md'>
+                    {firstSbomInfo?.project?.projectGroup?.name?.length > 20 ? `${firstSbomInfo?.project?.projectGroup?.name?.substring(0,20)}...` : firstSbomInfo?.project?.projectGroup?.name} :{' '}
+                    {firstSbomInfo?.projectVersion?.length > 20 ? `${firstSbomInfo?.projectVersion?.substring(0,20)}...` : firstSbomInfo?.projectVersion}
+                  </Heading>
+                  <Tag variant='solid' colorScheme='green' width={'fit-content'} textTransform={'capitalize'}>
                     {firstSbomInfo?.project?.name}
                   </Tag>
                 </Stack>
@@ -284,7 +281,7 @@ const Compare = ({ selectedSboms }) => {
                 <Heading fontWeight={'semibold'} fontFamily={'inherit'} size='md'>Select First SBOM</Heading>
               )}
               {firstSbomInfo && !selectedSboms && (
-                <IconButton icon={<FaX />} size='sm' colorScheme='red' onClick={onClearOne}/>
+                <IconButton icon={<FaX />} size='sm' colorScheme='blackAlpha' onClick={onClearOne}/>
               )}
             </Flex>
             {firstSbomInfo ? (
@@ -295,7 +292,7 @@ const Compare = ({ selectedSboms }) => {
                 {data?.organization?.projectGroups?.nodes?.length > 0 && (
                   <FormControl fontSize={'sm'}>
                     <FormLabel htmlFor='groupOne' fontSize='md' color='gray.600'>Product</FormLabel>
-                    <Select name='groupOne' id='groupOne' isDisabled={selectedSboms?.length > 0} value={selectedGroupOne} onChange={onSelectGroupOne}>
+                    <Select bg={'white'} name='groupOne' id='groupOne' isDisabled={selectedSboms?.length > 0} value={selectedGroupOne} onChange={onSelectGroupOne}>
                       <option value=''>-- Select --</option>
                       {data?.organization?.projectGroups?.nodes?.map(
                         (item, index) => <option key={index} value={item.id}>{item.name}</option>
@@ -308,7 +305,7 @@ const Compare = ({ selectedSboms }) => {
                   <FormLabel htmlFor='productOne' fontSize='md' color='gray.600'>
                     Environment
                   </FormLabel>
-                  <Select name='productOne' id='productOne' isDisabled={selectedSboms?.length > 0} value={selectedProdOne} onChange={onSelectProductOne} textTransform={'capitalize'}>
+                  <Select bg={'white'} name='productOne' id='productOne' isDisabled={selectedSboms?.length > 0} value={selectedProdOne} onChange={onSelectProductOne} textTransform={'capitalize'}>
                     <option value={''}>-- Select --</option>
                     {productListOne?.length > 0 &&
                       envOrderList(productListOne).map((item, index) => (
@@ -362,7 +359,7 @@ const Compare = ({ selectedSboms }) => {
         </GridItem>
         {/* SBOM TWO */}
         <GridItem w='100%'>
-          <Card p={8} h='450px' overflowY='scroll'>
+          <Card bg={'red.100'} p={8} h='450px' overflowY='scroll'>
             <Flex alignItems={'flex-start'} justifyContent={'space-between'}>
               {secondSbomInfo ? (
                 <Stack>
@@ -370,7 +367,7 @@ const Compare = ({ selectedSboms }) => {
                     {secondSbomInfo?.project?.projectGroup?.name} :{' '}
                     {secondSbomInfo?.projectVersion}
                   </Heading>
-                  <Tag colorScheme='blue' width={'fit-content'} textTransform={'capitalize'}>
+                  <Tag variant='solid' colorScheme='red' width={'fit-content'} textTransform={'capitalize'}>
                     {secondSbomInfo?.project?.name}
                   </Tag>
                 </Stack>
@@ -378,7 +375,7 @@ const Compare = ({ selectedSboms }) => {
                 <Heading fontWeight={'semibold'} fontFamily={'inherit'} size='md'>Select Second SBOM</Heading>
               )}
               {secondSbomInfo && !selectedSboms && (
-                <IconButton icon={<FaX />} size='sm' colorScheme='red' onClick={onClearTwo}/>
+                <IconButton icon={<FaX />} size='sm' colorScheme='blackAlpha' onClick={onClearTwo}/>
               )}
             </Flex>
             {secondSbomInfo ? (
@@ -389,7 +386,7 @@ const Compare = ({ selectedSboms }) => {
                 {data?.organization?.projectGroups?.nodes?.length > 0 && (
                   <FormControl fontSize={'sm'}>
                     <FormLabel htmlFor='groupTwo' fontSize='md' color='gray.600'>Product</FormLabel>
-                    <Select name='groupTwo' id='groupTwo' isDisabled={selectedVersionOne === null} value={selectedGroupTwo} onChange={onSelectGroupTwo}>
+                    <Select bg={'white'} name='groupTwo' id='groupTwo' isDisabled={selectedVersionOne === null} value={selectedGroupTwo} onChange={onSelectGroupTwo}>
                       <option value=''>-- Select --</option>
                       {data?.organization?.projectGroups?.nodes?.map(
                         (item, index) => <option key={index} value={item.id}>{item.name}</option>
@@ -400,7 +397,7 @@ const Compare = ({ selectedSboms }) => {
                 {/* ENVIRONMENT */}
                 <FormControl fontSize={'sm'}>
                   <FormLabel htmlFor='productTwo' fontSize='md' color='gray.600'>Environment</FormLabel>
-                  <Select name='productTwo' id='productTwo' value={selectedProdTwo} onChange={onSelectProductTwo} isDisabled={selectedVersionOne === null} textTransform={'capitalize'}>
+                  <Select bg={'white'} name='productTwo' id='productTwo' value={selectedProdTwo} onChange={onSelectProductTwo} isDisabled={selectedVersionOne === null} textTransform={'capitalize'}>
                     <option value={''}>-- Select --</option>
                     {productListTwo?.length > 0 &&
                       envOrderList(productListTwo).map((item, index) => (
@@ -453,7 +450,7 @@ const Compare = ({ selectedSboms }) => {
             {/* SUBMIT */}
             {(!firstSbomInfo || !secondSbomInfo) && (
               <Flex justifyContent={'flex-end'} mt={6}>
-                <Button width={'fit-content'} colorScheme='blue' leftIcon={<FaCodeCompare />} onClick={handleCompare} isDisabled={!selectedVersionOne || !selectedVersionTwo}>
+                <Button width={'fit-content'} colorScheme='blackAlpha' leftIcon={<FaCodeCompare />} onClick={handleCompare} isDisabled={!selectedVersionOne || !selectedVersionTwo}>
                   Compare
                 </Button>
               </Flex>
