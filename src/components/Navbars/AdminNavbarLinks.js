@@ -1,29 +1,7 @@
 // Chakra Imports
-import {
-  Flex,
-  IconButton,
-  Menu,
-  MenuButton,
-  MenuGroup,
-  MenuItem,
-  MenuList,
-  Text,
-  useColorModeValue,
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-  PopoverHeader,
-  PopoverBody,
-  Stack,
-  Kbd,
-  Icon,
-  MenuDivider,
-  Button,
-  MenuItemOption,
-  MenuOptionGroup
-} from '@chakra-ui/react'
+import { Flex, IconButton, Menu, MenuButton, MenuGroup, MenuItem, MenuList, Text, useColorModeValue, Popover, PopoverTrigger, PopoverContent, PopoverHeader, PopoverBody, Stack, Kbd, Icon, MenuDivider, Button, MenuItemOption, MenuOptionGroup } from '@chakra-ui/react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { useLazyQuery } from '@apollo/client'
+import { useLazyQuery, useQuery } from '@apollo/client'
 import { dashRoutes } from 'routes.js'
 import PropTypes from 'prop-types'
 import { useEffect } from 'react'
@@ -36,23 +14,11 @@ import SidebarResponsive from 'components/Sidebar/SidebarResponsive'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { logoutUser } from 'utils/authUtils'
 import { ChevronDownIcon } from '@chakra-ui/icons'
-import {
-  GetOrgName,
-  GetProjectGroup,
-  ShareLynkProjectGroup
-} from 'graphQL/Queries'
+import { GetOrgName, GetProjectGroup, ShareLynkProjectGroup, GetProductTable } from 'graphQL/Queries'
 
 export default function HeaderLinks(props) {
   const location = useLocation()
   const navigate = useNavigate()
-  const {
-    userName,
-    setClearSelect,
-    setSelectedSbom,
-    setUserName,
-    envName,
-    setEnvName
-  } = useGlobalState()
   const queryParams = new URLSearchParams(location.search)
   const productId = queryParams.get('id')
   const sbomId = queryParams.get('sbom')
@@ -64,9 +30,12 @@ export default function HeaderLinks(props) {
   const email = localStorage.getItem('email')
   const userEmail = localStorage.getItem('userEmail')
 
-  const [fetchOrg, { data }] = useLazyQuery(GetOrgName, {
-    fetchPolicy: 'network-only'
-  })
+  const { totalRows, userName, setClearSelect, setSelectedSbom, setUserName, envName, setEnvName, prodState } = useGlobalState()
+  const { field, direction } = prodState
+
+  const [fetchOrg, { data }] = useLazyQuery(GetOrgName, {fetchPolicy: 'network-only'})
+  const { data: groups } = useQuery(GetProductTable, { skip: groups === undefined ? false : true, variables: { first: totalRows, direction, field }})
+  const [getProdGroup] = useLazyQuery(signedUrlParams ? ShareLynkProjectGroup : GetProjectGroup, {fetchPolicy: 'network-only'})
 
   const { variant, children, fixed, secondary, onOpen, ...rest } = props
 
@@ -97,13 +66,6 @@ export default function HeaderLinks(props) {
   }
 
   const shortcuts = [{ key: 'Ctrl + /', title: 'Search' }]
-
-  const [getProdGroup] = useLazyQuery(
-    signedUrlParams ? ShareLynkProjectGroup : GetProjectGroup,
-    {
-      fetchPolicy: 'network-only'
-    }
-  )
 
   const handleEnvChange = (value) => {
     localStorage.setItem('environment', value)
@@ -145,33 +107,15 @@ export default function HeaderLinks(props) {
   return (
     <Flex gap={4} alignItems='center' flexDirection='row'>
       {/* ENVIRONMENT */}
-      {(dashboardView || productId) && !vulnId && (
+      {(dashboardView || productId) && !vulnId && groups?.organization?.projectGroups?.nodes?.length > 0 && (
         <Menu closeOnSelect={true}>
-          <MenuButton
-            as={Button}
-            size='sm'
-            colorScheme='blue'
-            fontWeight='medium'
-            fontSize='sm'
-            leftIcon={envIcon(envName)}
-            rightIcon={<ChevronDownIcon />}
-            textTransform='capitalize'
-          >
+          <MenuButton as={Button} size='sm' colorScheme='blue' fontWeight='medium' fontSize='sm' leftIcon={envIcon(envName)} rightIcon={<ChevronDownIcon />} textTransform='capitalize'>
             {envName || 'Default'}
           </MenuButton>
           <MenuList>
-            <MenuOptionGroup
-              value={envName}
-              onChange={(value) => handleEnvChange(value)}
-              type='radio'
-            >
+            <MenuOptionGroup value={envName} onChange={(value) => handleEnvChange(value)} type='radio'>
               {['default', 'development', 'production'].map((item, index) => (
-                <MenuItemOption
-                  key={index}
-                  value={item}
-                  fontSize='sm'
-                  textTransform={'capitalize'}
-                >
+                <MenuItemOption key={index} value={item} fontSize='sm' textTransform={'capitalize'}>
                   {item}
                 </MenuItemOption>
               ))}
@@ -182,17 +126,10 @@ export default function HeaderLinks(props) {
       {productId && (
         <Popover isLazy>
           <PopoverTrigger>
-            <IconButton
-              m={0}
-              p={0}
-              variant='ghost'
-              icon={<FaRegKeyboard fontSize={24} color='darkgray' />}
-            />
+            <IconButton m={0} p={0} variant='ghost' icon={<FaRegKeyboard fontSize={24} color='darkgray' />} />
           </PopoverTrigger>
           <PopoverContent pos={'relative'} right={10}>
-            <PopoverHeader fontWeight='medium'>
-              Keyboard Shortcuts
-            </PopoverHeader>
+            <PopoverHeader fontWeight='medium'>Keyboard Shortcuts</PopoverHeader>
             <PopoverBody>
               <Flex gap={2} direction={'column'}>
                 {shortcuts.map((item, index) => (
@@ -208,29 +145,7 @@ export default function HeaderLinks(props) {
       )}
       {!signedUrlParams && (
         <Menu>
-          <MenuButton
-            as={IconButton}
-            aria-label='Options'
-            variant='none'
-            color='gray.400'
-            ms='0px'
-            px='0px'
-            onClick={() => fetchOrg()}
-            rightIcon={
-              document.documentElement.dir ? (
-                ''
-              ) : (
-                <ProfileIcon color={navbarIcon} w='22px' h='22px' me='0px' />
-              )
-            }
-            leftIcon={
-              document.documentElement.dir ? (
-                <ProfileIcon color={navbarIcon} w='22px' h='22px' me='0px' />
-              ) : (
-                ''
-              )
-            }
-          >
+          <MenuButton as={IconButton} aria-label='Options' variant='none' color='gray.400' ms='0px' px='0px' onClick={() => fetchOrg()} rightIcon={document.documentElement.dir ? '' : <ProfileIcon color={navbarIcon} w='22px' h='22px' me='0px' />} leftIcon={document.documentElement.dir ? <ProfileIcon color={navbarIcon} w='22px' h='22px' me='0px' /> : '' }>
             <Text display={{ sm: 'none', md: 'flex' }} fontSize={'sm'}>
               {userName || name}
             </Text>
@@ -241,49 +156,30 @@ export default function HeaderLinks(props) {
                 <Flex flexDirection='row' alignItems={'flex-start'} gap={3}>
                   <Icon as={FaUser} width={2.5} mt={1} />
                   <Stack direction={'column'} spacing={-2}>
-                    <Text mt={0} mb={0}>
-                      {name}
-                    </Text>
-                    <Text mt={0} mb={0} fontSize={'sm'} color={'#718096'}>
-                      {email}
-                    </Text>
-                    <Text mt={0} mb={0} fontSize={'sm'} color={'#718096'}>
-                      {data?.organization?.name || ''}
-                    </Text>
+                    <Text mt={0} mb={0}>{name}</Text>
+                    <Text mt={0} mb={0} fontSize={'sm'} color={'#718096'}>{email}</Text>
+                    <Text mt={0} mb={0} fontSize={'sm'} color={'#718096'}>{data?.organization?.name || ''}</Text>
                   </Stack>
                 </Flex>
               </MenuItem>
               <MenuDivider />
               <Link to={`/vendor/settings?tab=person`}>
-                <MenuItem
-                  icon={<SettingsIcon />}
-                  display={data?.organization ? 'flex' : 'none'}
-                >
+                <MenuItem icon={<SettingsIcon />} display={data?.organization ? 'flex' : 'none'}>
                   Settings
                 </MenuItem>
               </Link>
               <Link to='/vendor/settings?tab=organization'>
-                <MenuItem
-                  icon={<FaExchangeAlt />}
-                  display={data?.organization ? 'flex' : 'none'}
-                >
+                <MenuItem icon={<FaExchangeAlt />} display={data?.organization ? 'flex' : 'none'}>
                   Organizations
                 </MenuItem>
               </Link>
               <MenuDivider />
-              <MenuItem icon={<FaSignOutAlt />} onClick={handleLogout}>
-                Logout
-              </MenuItem>
+              <MenuItem icon={<FaSignOutAlt />} onClick={handleLogout}>Logout</MenuItem>
             </MenuGroup>
           </MenuList>
         </Menu>
       )}
-      <SidebarResponsive
-        logoText={props.logoText}
-        secondary={props.secondary}
-        routes={dashRoutes}
-        {...rest}
-      />
+      <SidebarResponsive logoText={props.logoText} secondary={props.secondary} routes={dashRoutes} {...rest}/>
     </Flex>
   )
 }
