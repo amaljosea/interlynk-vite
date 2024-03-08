@@ -34,7 +34,7 @@ export default function HeaderLinks(props) {
   const { field, direction } = prodState
 
   const [fetchOrg, { data }] = useLazyQuery(GetOrgName, {fetchPolicy: 'network-only'})
-  const { data: groups } = useQuery(GetProductTable, { skip: groups === undefined ? false : true, variables: { first: totalRows, direction, field }})
+  const { data: groups } = useQuery(GetProductTable, { skip: groups === undefined && !signedUrlParams ? false : true, variables: { first: totalRows, direction, field }})
   const [getProdGroup] = useLazyQuery(signedUrlParams ? ShareLynkProjectGroup : GetProjectGroup, {fetchPolicy: 'network-only'})
 
   const { variant, children, fixed, secondary, onOpen, ...rest } = props

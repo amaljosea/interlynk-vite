@@ -1,35 +1,14 @@
 import { useGlobalState } from 'hooks/useGlobalState'
 import React, { useEffect, useState } from 'react'
-import {
-  Tabs,
-  TabList,
-  Tab,
-  TabPanel,
-  TabPanels,
-  Flex,
-  Skeleton,
-  Button,
-  Text
-} from '@chakra-ui/react'
+import { Tabs, TabList, Tab, TabPanel, TabPanels, Flex, Skeleton, Button, Text } from '@chakra-ui/react'
 import GeneralDataRow from 'components/Tables/GeneralDataRow'
 import ComponentTable from 'components/Tables/ComponentTable'
 import VulnTable from 'components/Tables/VulnTable'
 import { useLocation } from 'react-router-dom'
 import Card from 'components/Card/Card'
 import { FaLock } from 'react-icons/fa6'
-import SupportTable from 'components/Tables/SupportTable'
 
-const SbomTable = ({
-  status,
-  type,
-  data,
-  refetch,
-  filteredData,
-  vulnData,
-  getVulnData,
-  getCompData,
-  compData,
-  error
+const SbomTable = ({ status, type, data, refetch, filteredData, vulnData, getVulnData, getCompData, compData, error
 }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -38,68 +17,27 @@ const SbomTable = ({
   const activeTab = Number(localStorage.getItem('activeCsSbomTab') || 0)
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
-  const {
-    activeCsSbomTab,
-    setActiveCsSbomTab,
-    totalRows,
-    prodCompState,
-    prodVulnState,
-    dispatch
-  } = useGlobalState()
+  const { activeCsSbomTab, setActiveCsSbomTab, totalRows, prodCompState, prodVulnState, dispatch } = useGlobalState()
   const { prodCompDispatch, prodVulnDispatch } = dispatch
 
   // How often each tab should refetch the data (in minutes)
-  const fetchIntervalMinutes = {
-    'General': 0,
-    'Parts': 0,
-    'Components': 0,
-    'Vulnerabilities': 0.5,
-    'Licenses': 0,
-    'Support': 0,
-    'Checks': 0,
-    'Change Log': 0
-  }
+  const fetchIntervalMinutes = { 'General': 0, 'Parts': 0, 'Components': 0, 'Vulnerabilities': 0.5, 'Licenses': 0, 'Support': 0, 'Relationships': 0, 'Checks': 0, 'Change Log': 0 }
 
-  const [lastFetchTime, setLastFetchTime] = useState({
-    'General': null,
-    'Parts': null,
-    'Components': null,
-    'Vulnerabilities': null,
-    'Licenses': null,
-    'Support': null,
-    'Checks': null,
-    'Change Log': null
-  })
+  const [lastFetchTime, setLastFetchTime] = useState({ 'General': null, 'Parts': null, 'Components': null, 'Vulnerabilities': null, 'Licenses': null, 'Support': null, 'Relationships': null, 'Checks': null, 'Change Log': null })
+
+  const tabIndexToName = { 0: 'General', 1: 'Parts', 2: 'Components', 3: 'Vulnerabilities', 4: 'Licenses', 5: 'Support', 6: 'Relationships', 7: 'Checks', 8: 'Change Log' }
 
   const shouldFetchData = (tabName) => {
     const lastFetch = lastFetchTime[tabName]
     const now = new Date()
-
     if (!lastFetch) return true // If never fetched, fetch data
-
     const minutesElapsed = (now - lastFetch) / 60000
     return minutesElapsed >= fetchIntervalMinutes[tabName]
   }
 
-  const updateLastFetchTime = (tabName) => {
-    setLastFetchTime({ ...lastFetchTime, [tabName]: new Date() })
-  }
-
+  const updateLastFetchTime = (tabName) => setLastFetchTime({ ...lastFetchTime, [tabName]: new Date() })
   const getUndefinedIfEmpty = (value) => (value !== '' ? value : undefined)
-
-  const getUndefinedIfEmptyOrAll = (value, allValue = 'all') =>
-    value.includes(allValue) || value.length === 0 ? undefined : value
-
-  const tabIndexToName = {
-    0: 'General',
-    1: 'Parts',
-    2: 'Components',
-    3: 'Vulnerabilities',
-    4: 'Licenses',
-    5: 'Support',
-    6: 'Checks',
-    7: 'Change Log'
-  }
+  const getUndefinedIfEmptyOrAll = (value, allValue = 'all') => value.includes(allValue) || value.length === 0 ? undefined : value
 
   const handleTabChange = (value) => {
     localStorage.setItem('activeCsSbomTab', value)
@@ -107,35 +45,12 @@ const SbomTable = ({
   }
 
   const fetchTabData = (activeTab) => {
-    const commonParams = {
-      projectId: signedUrlParams ? undefined : productId,
-      sbomId: sbomId,
-      first: totalRows,
-      last: undefined,
-      after: undefined,
-      before: undefined
-    }
-
+    const commonParams = { projectId: signedUrlParams ? undefined : productId, sbomId: sbomId, first: totalRows, last: undefined, after: undefined, before: undefined }
     const tabName = tabIndexToName[activeTab]
-
     if (tabName === 'General' && shouldFetchData(tabName)) {
-      refetch({
-        ...commonParams
-      }).then(() => {
-        updateLastFetchTime(tabName)
-      })
+      refetch({ ...commonParams }).then(() => updateLastFetchTime(tabName))
     } else if (tabName === 'Components' && shouldFetchData(tabName)) {
-      const {
-        field,
-        direction,
-        searchInput,
-        ecosystems,
-        kinds,
-        licenses,
-        suppliers,
-        scope,
-        direct
-      } = prodCompState
+      const { field, direction, searchInput, ecosystems, kinds, licenses, suppliers, scope, direct } = prodCompState
       getCompData({
         ...commonParams,
         search: getUndefinedIfEmpty(searchInput),
@@ -159,22 +74,8 @@ const SbomTable = ({
         }
       })
     } else if (tabName === 'Vulnerabilities' && shouldFetchData(tabName)) {
-      const {
-        field,
-        direction,
-        searchInput,
-        severities,
-        components,
-        statues,
-        source,
-        kev,
-        epss,
-        direct
-      } = prodVulnState
-      const vulnEpss =
-        epss !== 'all' && epss !== ''
-          ? epss.split('-').map((v) => parseFloat(v) / 10000)
-          : undefined
+      const { field, direction, searchInput, severities, components, statues, source, kev, epss, direct } = prodVulnState
+      const vulnEpss = epss !== 'all' && epss !== '' ? epss.split('-').map((v) => parseFloat(v) / 10000) : undefined
       getVulnData({
         ...commonParams,
         search: getUndefinedIfEmpty(searchInput),
@@ -192,10 +93,7 @@ const SbomTable = ({
         direction: direction
       }).then((res) => {
         if (res.data) {
-          prodVulnDispatch({
-            type: 'SET_TOTAL_VULNS',
-            payload: res?.data?.shareLynkQuery?.sbom?.vulns?.totalCount
-          })
+          prodVulnDispatch({ type: 'SET_TOTAL_VULNS', payload: res?.data?.shareLynkQuery?.sbom?.vulns?.totalCount })
           prodVulnDispatch({ type: 'FETCH_DATA_SUCCESS' })
           updateLastFetchTime(tabName)
         }
@@ -210,20 +108,12 @@ const SbomTable = ({
 
   return (
     <Card>
-      <Tabs
-        variant='enclosed'
-        index={activeCsSbomTab}
-        onChange={(value) => handleTabChange(value)}
-      >
+      <Tabs variant='enclosed' index={activeCsSbomTab} onChange={(value) => handleTabChange(value)}>
         {/* TAB LIST */}
         <TabList mt='20px'>
           {Object.values(tabIndexToName).map((item, index) => (
-            <Tab
-              key={index}
-              _focus={{ outline: 'none' }}
-              isDisabled={item === 'Parts' || item === 'Checks' || item === 'Change Log' || item === 'Support' || item === 'Licenses'}
-            >
-              {(item === 'Parts' || item === 'Checks' || item === 'Change Log' || item === 'Support' || item === 'Licenses') && (
+            <Tab key={index} _focus={{ outline: 'none' }} isDisabled={item === 'Parts' || item === 'Checks' || item === 'Change Log' || item === 'Support' || item === 'Licenses' || item === 'Relationships'}>
+              {(item === 'Parts' || item === 'Checks' || item === 'Change Log' || item === 'Support' || item === 'Licenses' || item === 'Relationships') && (
                 <FaLock color='darkgray' style={{ marginRight: '6px' }} />
               )}
               {item}
@@ -235,12 +125,7 @@ const SbomTable = ({
           {/* GENERAL TABLE */}
           <TabPanel px={1}>
             {data ? (
-              <GeneralDataRow
-                status={status}
-                type={type}
-                data={data}
-                refetch={refetch}
-              />
+              <GeneralDataRow status={status} type={type} data={data} refetch={refetch} />
             ) : (
               <Flex width={'100%'} gap={4} direction={'column'}>
                 <Skeleton width={'100%'} height='20px' />
@@ -256,36 +141,13 @@ const SbomTable = ({
           {/* COMPONENT TABLE */}
           <TabPanel px={0}>
             {data && (
-              <ComponentTable
-                type={type}
-                lifecycle={data.lifecycle}
-                data={compData?.sbom?.components}
-                refetch={getCompData}
-                sbomRefetch={refetch}
-                primaryComp={data.primaryComponent}
-              />
+              <ComponentTable type={type} lifecycle={data.lifecycle} data={compData?.sbom?.components} refetch={getCompData} sbomRefetch={refetch} primaryComp={data.primaryComponent} />
             )}
             {error && (
-              <Flex
-                py={10}
-                flexDirection={'column'}
-                gap={2}
-                width={'70%'}
-                mx={'auto'}
-                alignItems={'center'}
-                justifyContent={'center'}
-              >
-                <Text color={'red.500'} textAlign={'center'}>
-                  {error.message}
-                </Text>
+              <Flex py={10} flexDirection={'column'} gap={2} width={'70%'} mx={'auto'} alignItems={'center'} justifyContent={'center'}>
+                <Text color={'red.500'} textAlign={'center'}>{error.message}</Text>
                 <Text>Something went wrong. Please refresh this page</Text>
-                <Button
-                  mt={2}
-                  variant='solid'
-                  colorScheme='blue'
-                  fontWeight={'normal'}
-                  onClick={() => window.location.reload()}
-                >
+                <Button mt={2} variant='solid' colorScheme='blue' fontWeight={'normal'} onClick={() => window.location.reload()}>
                   Refresh
                 </Button>
               </Flex>
@@ -293,20 +155,12 @@ const SbomTable = ({
           </TabPanel>
           {/* VUNERABILITIES TABLE */}
           <TabPanel px={0}>
-            <VulnTable
-              data={vulnData?.sbom?.vulns}
-              sbomData={data}
-              sbomRefetch={refetch}
-              filteredData={filteredData}
-              refetch={getVulnData}
-              productId={productId}
-              sbomId={sbomId}
-            />
+            <VulnTable data={vulnData?.sbom?.vulns} sbomData={data} sbomRefetch={refetch} filteredData={filteredData} refetch={getVulnData} productId={productId} sbomId={sbomId} />
           </TabPanel>
           {/* SUPPORT TABLE */}
-          <TabPanel px={0}>
-            <SupportTable data={null} />
-          </TabPanel>
+          <TabPanel px={0}></TabPanel>
+          {/* RELATIONSHIPS TABLE */}
+          <TabPanel px={0}></TabPanel>
           {/* CHECKS TABLE */}
           <TabPanel px={1}></TabPanel>
           {/* CHANGE LOG TABLE */}
