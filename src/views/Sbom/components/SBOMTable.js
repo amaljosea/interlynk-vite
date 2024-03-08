@@ -181,7 +181,7 @@ const SBOMTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
           {/* TAB LIST */}
           <TabList mt='20px'>
             {Object.values(tabIndexToName).map((item, index) => (
-              <Tab key={index} _focus={{ outline: 'none' }} display={item === 'Parts' && subProduct?.name && subProduct?.children?.name && subProduct?.children?.children?.name ? 'none' : 'flex'} isDisabled={ signedUrlParams && (item === 'Checks' || item === 'Change Log')}>
+              <Tab key={index} _focus={{ outline: 'none' }} display={item === 'Parts' && subProduct?.name && subProduct?.childOne?.name && subProduct?.childTwo?.name && subProduct?.childThree?.name && subProduct?.childFour?.name ? 'none' : 'flex'} isDisabled={ signedUrlParams && (item === 'Checks' || item === 'Change Log')}>
                 {item}
               </Tab>
             ))}

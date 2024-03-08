@@ -102,42 +102,33 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
   }
 
   const handlePart = () => {
-    if (subProduct?.children && !subProduct?.children?.children) {
-      localStorage.setItem(
-        'subProduct',
-        JSON.stringify({
-          name: subProduct?.name,
-          version: subProduct?.version,
-          projectId: subProduct?.projectId,
-          sbomId: subProduct?.sbomId
-        })
-      )
-    } else if (subProduct?.children?.children) {
-      localStorage.setItem(
-        'subProduct',
-        JSON.stringify({
-          name: subProduct?.name,
-          version: subProduct?.version,
-          projectId: subProduct?.projectId,
-          sbomId: subProduct?.sbomId,
-          children: {
-            name: subProduct?.children?.name,
-            version: subProduct?.children?.version,
-            projectId: subProduct?.children?.projectId,
-            sbomId: subProduct?.children?.sbomId
-          }
-        })
-      )
+    const newData = { ...subProduct };
+    if (subProduct?.childFour) {
+      delete newData.childFour;
+      localStorage.setItem('subProduct', JSON.stringify(newData));
+    } else if (subProduct?.childThree) {
+      delete newData.childThree;
+      localStorage.setItem('subProduct', JSON.stringify(newData));
+    } else if (subProduct?.childTwo) {
+      delete newData.childTwo;
+      localStorage.setItem('subProduct', JSON.stringify(newData));
+    } else if (subProduct?.childOne) {
+      delete newData.childOne;
+      localStorage.setItem('subProduct', JSON.stringify(newData));
     } else {
       localStorage.removeItem('subProduct')
     }
   }
 
   const parentLink = () => {
-    if (subProduct?.children && !subProduct?.children?.children) {
+    if (subProduct?.childFour) {
+      return `/vendor/products/${name}?id=${subProduct?.childThree?.projectId}&sbom=${subProduct?.childThree?.sbomId}&parts=true`
+    } else if (subProduct?.childThree) {
+      return `/vendor/products/${name}?id=${subProduct?.childTwo?.projectId}&sbom=${subProduct?.childTwo?.sbomId}&parts=true`
+    } else if (subProduct?.childTwo) {
+      return `/vendor/products/${name}?id=${subProduct?.childOne?.projectId}&sbom=${subProduct?.childOne?.sbomId}&parts=true`
+    } else if(subProduct?.childOne){
       return `/vendor/products/${name}?id=${subProduct?.projectId}&sbom=${subProduct?.sbomId}&parts=true`
-    } else if (subProduct?.children?.children) {
-      return `/vendor/products/${name}?id=${subProduct?.children?.projectId}&sbom=${subProduct?.children?.sbomId}&parts=true`
     } else {
       return `/vendor/products/${name}?id=${id}&sbom=${currentSBOM?.id}`
     }
@@ -166,7 +157,7 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
               >
                 <FaAngleLeft size={18} color='#3182CE' />
                 <Text fontWeight={'semibold'} fontSize={18} color={'blue.500'} textDecor={'underline'}>
-                  {subProduct?.children && !subProduct?.children?.children ? subProduct?.name : subProduct?.children?.children ? subProduct?.children?.name : name}
+                  {subProduct?.childFour ? subProduct?.childThree?.name : subProduct?.childThree ? subProduct?.childTwo?.name : subProduct?.childTwo ? subProduct?.childOne?.name : subProduct?.childOne ? subProduct?.name : name}
                 </Text>
               </HStack>
             </Link>

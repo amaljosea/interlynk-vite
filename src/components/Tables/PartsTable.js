@@ -31,20 +31,21 @@ import {
   UnorderedList,
   ListItem,
   Alert,
-  AlertIcon
+  AlertIcon,
+  AlertDescription,
+  AlertTitle
 } from '@chakra-ui/react'
 import { useMemo, useRef, useState } from 'react'
 import CustomLoader from 'components/CustomLoader'
 import VulnBadge from 'components/Misc/VulnBadge'
 import { SbomPartDelete, SbomPartCreate } from 'graphQL/Mutation'
-import { GetProjectGroups, GetProject } from 'graphQL/Queries'
+import { GetProjectGroups, GetProject, GetSbomParts, GetProductData } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
 import DataTable from 'react-data-table-component'
 import { FaEllipsisV, FaFilter } from 'react-icons/fa'
 import { useLocation, Link, useParams } from 'react-router-dom'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
-import { isDefaultEnv, envOrderList, customStyles,capitalizeFirstLetter, parseJSONSafely } from 'utils'
-import { GetProductData } from 'graphQL/Queries'
+import { isDefaultEnv, envOrderList, customStyles, capitalizeFirstLetter, parseJSONSafely } from 'utils'
 
 const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const location = useLocation()
@@ -52,7 +53,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const queryParams = new URLSearchParams(location.search)
   const sbomId = queryParams.get('sbom')
   const prodId = queryParams.get('id')
-  const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : "customer"
+  const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
   const group = JSON.parse(localStorage.getItem('product'))
   const subProduct = (() => {
     try {
@@ -97,6 +98,14 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
     skip: newPartExists ? false : true,
     variables: { projectId: prodId, sbomId: sbomId }
   })
+
+  const { data: partsData } = useQuery(GetSbomParts, {
+    fetchPolicy: 'network-only',
+    skip: selectedProd && selectedVersion ? false : true,
+    variables: { projectId: selectedProd, sbomId: selectedVersion }
+  })
+  const isExists = partsData?.sbom?.sbomParts?.some((item) => item?.part?.project?.id === prodId && item?.part?.id === sbomId)
+  console.log('isExists', isExists)
 
   const [createSbomPart] = useMutation(SbomPartCreate)
   const [deleteSbomPart] = useMutation(SbomPartDelete)
@@ -200,6 +209,8 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
     (item) => item.id === selectedProd
   )
 
+  // console.log('product', product);
+
   const existingVersions = []
 
   data?.map((item) =>
@@ -265,12 +276,19 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
     localStorage.setItem('activeSbomTab', 0)
     const { id, project, projectVersion } = part
     const { projectGroup } = project
-    if(subProduct?.name && !subProduct?.children) {
-      localStorage.setItem('subProduct', JSON.stringify({...subProduct, children: { name: projectGroup?.name, version: projectVersion, projectId: project?.id, sbomId: id } }))
-    } else if (subProduct?.name && subProduct?.children) {
-      localStorage.setItem('subProduct', JSON.stringify({ name: subProduct?.name, version: subProduct?.version, projectId: subProduct?.projectId, sbomId: subProduct?.sbomId, children: { ...subProduct?.children, children: { name: projectGroup?.name, version: projectVersion, projectId: project?.id, sbomId: id } } }))
+    if ( subProduct?.name && !subProduct?.childOne && !subProduct?.childTwo && !subProduct?.childThree && !subProduct?.childFour ) {
+      localStorage.setItem('subProduct', JSON.stringify({ ...subProduct, childOne: { name: projectGroup?.name, version: projectVersion, projectId: project?.id, sbomId: id } }) )
     } else {
-      localStorage.setItem('subProduct', JSON.stringify({name: projectGroup?.name,version: projectVersion,projectId: project?.id,sbomId: id }))
+      localStorage.setItem('subProduct', JSON.stringify({ name: projectGroup?.name, version: projectVersion, projectId: project?.id, sbomId: id }) )
+    }
+    if (subProduct?.childOne?.name) {
+      localStorage.setItem('subProduct', JSON.stringify({ ...subProduct, childTwo: { name: projectGroup?.name, version: projectVersion, projectId: project?.id, sbomId: id } }) )
+    }
+    if (subProduct?.childTwo?.name) {
+      localStorage.setItem('subProduct', JSON.stringify({ ...subProduct, childThree: { name: projectGroup?.name, version: projectVersion, projectId: project?.id, sbomId: id } }) )
+    }
+    if (subProduct?.childThree?.name) {
+      localStorage.setItem('subProduct', JSON.stringify({...subProduct, childFour: { name: projectGroup?.name, version: projectVersion, projectId: project?.id, sbomId: id } }) )
     }
     setActiveProdTab(0)
   }
@@ -283,9 +301,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       selector: (row) => {
         const { part } = row
         return (
-          <Link
-            to={`/${path}/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`}
-          >
+          <Link to={`/${path}/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`}>
             <Text color={'blue.500'} minWidth='100%' fontSize={14} onClick={() => onSelectPart(part)}>
               {part.project.projectGroup.name}
             </Text>
@@ -301,9 +317,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       selector: (row) => {
         const { part } = row
         return (
-          <Text fontSize={14} my={2}>
-            {part?.projectVersion}
-          </Text>
+          <Text fontSize={14} my={2}>{part?.projectVersion}</Text>
         )
       },
       width: '200px',
@@ -325,13 +339,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
                   }`}
                   placement='top'
                 >
-                  <Tag
-                    size={'md'}
-                    key={index}
-                    fontSize={14}
-                    variant='subtle'
-                    colorScheme='orange'
-                  >
+                  <Tag size={'md'} key={index} fontSize={14} variant='subtle' colorScheme='orange'>
                     <TagLabel>
                       {item.name}
                       {item.contactEmail && ` - ${item.contactEmail}`}
@@ -349,17 +357,8 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       selector: (row) => {
         const { part } = row
         return (
-          <Link
-            to={`/${path}/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`}
-            onClick={getComponents}
-          >
-            <Tag
-              size='md'
-              variant='subtle'
-              width={16}
-              colorScheme={'blue'}
-              cursor={'pointer'}
-            >
+          <Link to={`/${path}/products/${params.name}?id=${part.project.id}&sbom=${part.id}&parts=true`} onClick={getComponents}>
+            <Tag size='md' variant='subtle' width={16} colorScheme={'blue'} cursor={'pointer'}>
               <TagLabel mx={'auto'}>{part.stats.compCount}</TagLabel>
             </Tag>
           </Link>
@@ -436,12 +435,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       selector: (row) => {
         return (
           <Menu>
-            <MenuButton
-              as={IconButton}
-              icon={<FaEllipsisV />}
-              variant='none'
-              color='gray.400'
-            />
+            <MenuButton as={IconButton} icon={<FaEllipsisV />} variant='none' color='gray.400'/>
             <Portal>
               <MenuList size='sm'>
                 <MenuItem
@@ -469,57 +463,26 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   const handleClear = () => setSearchInput('')
 
   const handleRefresh = async () => {
-    await refetch({
-      variables: {
-        projectId: prodId,
-        sbomId: sbomId
-      }
-    }).then(
-      (res) => res?.data && sbomRefetch({ projectId: prodId, sbomId: sbomId })
-    )
+    await refetch({ variables: { projectId: prodId, sbomId: sbomId } }).then((res) => res?.data && sbomRefetch({ projectId: prodId, sbomId: sbomId }) )
   }
 
   // SUB HEADER
   const subHeaderComponent = useMemo(() => {
     return (
-      <Flex
-        width={'100%'}
-        alignItems={'center'}
-        justifyContent={'space-between'}
-      >
-        <Stack
-          width={'100%'}
-          direction={'row'}
-          spacing={2}
-          alignItems={'flex-start'}
-          justifyContent={'flex-end'}
-        >
+      <Flex width={'100%'} alignItems={'center'} justifyContent={'space-between'}>
+        <Stack width={'100%'} direction={'row'} spacing={2} alignItems={'flex-start'} justifyContent={'flex-end'}>
           <HStack spacing={4} display={'none'}>
             {/* SEARCH COMPONENTS */}
-            <SearchFilter
-              id='team'
-              filterText={searchInput}
-              setFilterText={setSearchInput}
-              onFilter={handleSearch}
-              onClear={handleClear}
-            />
+            <SearchFilter id='team' filterText={searchInput} setFilterText={setSearchInput} onFilter={handleSearch} onClear={handleClear}/>
             {/* FILTER */}
             <Menu closeOnSelect={true}>
-              <MenuButton
-                as={Button}
-                colorScheme='blue'
-                fontWeight='normal'
-                fontSize={'sm'}
-                leftIcon={<FaFilter size={14} />}
-              >
+              <MenuButton as={Button} colorScheme='blue' fontWeight='normal' fontSize={'sm'} leftIcon={<FaFilter size={14} />}>
                 Supplier
               </MenuButton>
               <MenuList>
                 <MenuOptionGroup type='checkbox'>
                   {['Interlynk', 'Biotronik', 'Oracle'].map((item, index) => (
-                    <MenuItemOption key={index} value={item} fontSize={'sm'}>
-                      {item}
-                    </MenuItemOption>
+                    <MenuItemOption key={index} value={item} fontSize={'sm'}>{item}</MenuItemOption>
                   ))}
                 </MenuOptionGroup>
               </MenuList>
@@ -528,7 +491,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
 
           <Tooltip label='Add Part' placement='top'>
             <IconButton
-              display={subProduct?.name && subProduct?.children?.name && subProduct?.children?.children?.name ? 'none' : 'flex'}
+              display={subProduct?.name && subProduct?.childOne?.name && subProduct?.childTwo?.name && subProduct?.childThree?.name && subProduct?.childFour?.name ? 'none' : 'flex'}
               ref={addBtn}
               onClick={onOpen}
               icon={<AddIcon />}
@@ -540,11 +503,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
             />
           </Tooltip>
           <Tooltip label='Refresh'>
-            <IconButton
-              onClick={handleRefresh}
-              colorScheme='blue'
-              icon={<RepeatIcon />}
-            ></IconButton>
+            <IconButton onClick={handleRefresh} colorScheme='blue' icon={<RepeatIcon />} />
           </Tooltip>
         </Stack>
       </Flex>
@@ -577,23 +536,13 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
               <Stack spacing={4} direction={'column'} gap={2}>
                 {/* PROJECTS */}
                 <FormControl fontSize={'sm'}>
-                  <FormLabel htmlFor='product' fontSize='md' color='gray.600'>
-                    Project
-                  </FormLabel>
-                  <Select
-                    fontSize={'sm'}
-                    name='groups'
-                    id='groups'
-                    value={selectedGroup}
-                    onChange={handleSelectGroup}
-                  >
+                  <FormLabel htmlFor='product' fontSize='md' color='gray.600'>Project</FormLabel>
+                  <Select fontSize={'sm'} name='groups' id='groups' value={selectedGroup} onChange={handleSelectGroup}>
                     <option value={''}>-- Select --</option>
                     {allProjects?.organization?.projectGroups?.nodes
-                      .filter((item) => item.id !== group?.groupId && item?.name !== subProduct?.name && item?.name !== subProduct?.children?.name && item?.name !== subProduct?.children?.children?.name && item?.name !== subProduct?.children?.children?.children?.name)
+                      .filter((item) => item.id !== group?.groupId && item?.name !== subProduct?.name && item?.name !== subProduct?.childOne?.name && item?.name !== subProduct?.childTwo?.name && item?.name !== subProduct?.childThree?.name && item?.name !== subProduct?.childFour?.name)
                       .map((item, index) => (
-                        <option key={index} value={item.id}>
-                          {item.name}
-                        </option>
+                        <option key={index} value={item.id}>{item.name}</option>
                       ))}
                   </Select>
                 </FormControl>
@@ -602,13 +551,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
                   <FormLabel htmlFor='product' fontSize='md' color='gray.600'>
                     Environment
                   </FormLabel>
-                  <Select
-                    fontSize={'sm'}
-                    name='product'
-                    id='product'
-                    value={selectedProd}
-                    onChange={handleSelectProduct}
-                  >
+                  <Select fontSize={'sm'} name='product' id='product' value={selectedProd} onChange={handleSelectProduct}>
                     <option value={''}>-- Select --</option>
                     {envList?.length > 0 &&
                       envOrderList(envList).map((item, index) => (
@@ -637,36 +580,27 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
                       No version available
                     </Alert>
                   ) : (
-                    <Select
-                      fontSize={'sm'}
-                      name='versions'
-                      id='versions'
-                      value={selectedVersion}
-                      onChange={(e) => setSelectedVersion(e.target.value)}
-                    >
+                    <Select fontSize={'sm'} name='versions' id='versions' value={selectedVersion} onChange={(e) => setSelectedVersion(e.target.value)}>
                       <option value={''}>-- Select --</option>
                       {sbomVersions.map((item, index) => (
-                        <option key={index} value={item.value}>
-                          {item.label}
-                        </option>
+                        <option key={index} value={item.value}>{item.label}</option>
                       ))}
                     </Select>
                   )}
                 </FormControl>
+                {isExists === true && (
+                  <Alert borderRadius={4} status='error'>
+                    <AlertIcon />
+                    <AlertDescription>
+                      Same version already exists inside selected SBOM
+                    </AlertDescription>
+                  </Alert>
+                )}
               </Stack>
             </ModalBody>
-
             <ModalFooter>
-              <Button mr={3} fontSize={'sm'} onClick={onClose}>
-                Close
-              </Button>
-              <Button
-                fontSize={'sm'}
-                variant='solid'
-                colorScheme='blue'
-                onClick={handleCreatePart}
-                disabled={selectedVersion === ''}
-              >
+              <Button mr={3} fontSize={'sm'} onClick={onClose}>Close</Button>
+              <Button fontSize={'sm'} variant='solid' colorScheme='blue' onClick={handleCreatePart} disabled={selectedVersion === '' || isExists === true}>
                 Add
               </Button>
             </ModalFooter>
@@ -685,24 +619,17 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
               <Text>Deleting this version will: </Text>
               <UnorderedList>
                 <Flex flexDir={'column'} gap={1} mt={4}>
-                  {[
-                    'remove this versions and its SBOM',
-                    'remove access to this version for all users'
-                  ].map((item, index) => (
+                  {['remove this versions and its SBOM','remove access to this version for all users']
+                  .map((item, index) => (
                     <ListItem key={index}>{item}</ListItem>
                   ))}
                 </Flex>
               </UnorderedList>
-
               <Text mt={6}>Are you sure you wish to continue ?</Text>
             </ModalBody>
             <ModalFooter>
-              <Button mr={3} onClick={onDeleteClose}>
-                No
-              </Button>
-              <Button onClick={handleRemove} colorScheme='red'>
-                Yes
-              </Button>
+              <Button mr={3} onClick={onDeleteClose}>No</Button>
+              <Button onClick={handleRemove} colorScheme='red'>Yes</Button>
             </ModalFooter>
           </ModalContent>
         </Modal>
