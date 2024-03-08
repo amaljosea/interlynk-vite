@@ -265,7 +265,7 @@ const Compare = ({ selectedSboms }) => {
       <Grid templateColumns='repeat(2, 1fr)' gap={6}>
         {/* SBOM ONE */}
         <GridItem w='100%'>
-          <Card bg={'green.100'} p={8} h='450px' overflowY='scroll'>
+          <Card border={'2px solid green'} p={8} h='450px' overflowY='scroll'>
             <Flex alignItems={'flex-start'} flexWrap={'wrap'} justifyContent={'space-between'}>
               {firstSbomInfo ? (
                 <Stack>
@@ -347,7 +347,7 @@ const Compare = ({ selectedSboms }) => {
                       noOptionsMessage={() => null}
                     />
                   ) : (
-                    <Alert borderRadius={'md'} py={'8px'} status='info'>
+                    <Alert borderRadius={'md'} py={'8px'} bg='white'>
                       <AlertIcon />
                       <AlertDescription>No version available</AlertDescription>
                     </Alert>
@@ -359,7 +359,7 @@ const Compare = ({ selectedSboms }) => {
         </GridItem>
         {/* SBOM TWO */}
         <GridItem w='100%'>
-          <Card bg={'red.100'} p={8} h='450px' overflowY='scroll'>
+          <Card border={'2px solid red'} p={8} h='450px' overflowY='scroll'>
             <Flex alignItems={'flex-start'} justifyContent={'space-between'}>
               {secondSbomInfo ? (
                 <Stack>
@@ -439,7 +439,7 @@ const Compare = ({ selectedSboms }) => {
                       isDisabled={selectedVersionOne === null}
                     />
                   ) : (
-                    <Alert borderRadius={'md'} py={'8px'} status='info'>
+                    <Alert borderRadius={'md'} py={'8px'} bg='white'>
                       <AlertIcon />
                       <AlertDescription>No version available</AlertDescription>
                     </Alert>
@@ -450,7 +450,7 @@ const Compare = ({ selectedSboms }) => {
             {/* SUBMIT */}
             {(!firstSbomInfo || !secondSbomInfo) && (
               <Flex justifyContent={'flex-end'} mt={6}>
-                <Button width={'fit-content'} colorScheme='blackAlpha' leftIcon={<FaCodeCompare />} onClick={handleCompare} isDisabled={!selectedVersionOne || !selectedVersionTwo}>
+                <Button width={'fit-content'} colorScheme='blue' leftIcon={<FaCodeCompare />} onClick={handleCompare} isDisabled={!selectedVersionOne || !selectedVersionTwo}>
                   Compare
                 </Button>
               </Flex>
