@@ -1,14 +1,4 @@
-import {
-  Alert,
-  Box,
-  Flex,
-  Heading,
-  IconButton,
-  Stack,
-  Tag,
-  Text,
-  Tooltip
-} from '@chakra-ui/react'
+import { Alert, Box, Flex, IconButton, Stack, Tag, Text, Tooltip } from '@chakra-ui/react'
 import React, { useEffect, useState, useCallback } from 'react'
 import { GetCompDependency } from 'graphQL/Queries'
 import { useLocation } from 'react-router-dom'
@@ -33,31 +23,14 @@ export const useCenteredTree = (defaultTranslate = { x: 0, y: 0 }) => {
   return [dimensions, translate, containerRef]
 }
 
-const renderForeignObjectNode = ({
-  nodeDatum,
-  toggleNode,
-  foreignObjectProps,
-  activeComp
-}) => {
+const renderForeignObjectNode = ({ nodeDatum, toggleNode, foreignObjectProps, activeComp }) => {
   // console.log('nodeDatum', nodeDatum)
   return (
     <g>
       <circle fill={'dodgerblue'} r='20' onClick={toggleNode} />
       <foreignObject {...foreignObjectProps} y={-20}>
         <Flex width={'100%'} flexDirection={'column'} alignItems={'flex-start'}>
-          <Box
-            p={3}
-            left={12}
-            bg={'blue.500'}
-            minW={'fit-content'}
-            maxW={'300px'}
-            position={'relative'}
-            fontWeight={'medium'}
-            colorScheme='blue'
-            wordBreak={'break-all'}
-            borderRadius={5}
-            color={'white'}
-          >
+          <Box p={3} left={12} bg={'blue.500'} minW={'fit-content'} maxW={'300px'} position={'relative'} fontWeight={'medium'} colorScheme='blue' wordBreak={'break-all'} borderRadius={5} color={'white'}>
             <Stack direction={'column'}>
               <Text wordBreak={'break-all'} lineHeight={1.3}>{nodeDatum?.name}</Text>
               {activeComp === null && !nodeDatum?.attributes?.version && (
@@ -133,30 +106,13 @@ const GraphView = ({ data, activeComp }) => {
   return (
     <Card overflow='hidden'>
       <CardHeader mb={6}>
-        <Flex
-          width={'100%'}
-          alignItems={'center'}
-          justifyContent={'space-between'}
-        >
-          <Heading size='md' fontWeight={'medium'}>
-            Graph View
-          </Heading>
+        <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
           <Flex alignItems={'center'} gap={2}>
             <Tooltip label='Zoom In'>
-              <IconButton
-                colorScheme='blue'
-                onClick={handleZoomIn}
-                isDisabled={zoom > 0.8}
-                icon={<BiZoomIn size={20} />}
-              />
+              <IconButton colorScheme='blue' onClick={handleZoomIn} isDisabled={zoom > 0.8} icon={<BiZoomIn size={20} />} />
             </Tooltip>
             <Tooltip label='Zoom Out'>
-              <IconButton
-                colorScheme='blue'
-                onClick={handleZoomOut}
-                isDisabled={zoom < 0.2}
-                icon={<BiZoomOut size={20} />}
-              />
+              <IconButton colorScheme='blue' onClick={handleZoomOut} isDisabled={zoom < 0.2} icon={<BiZoomOut size={20} />} />
             </Tooltip>
           </Flex>
         </Flex>
