@@ -1,34 +1,7 @@
-import {
-  Drawer,
-  DrawerBody,
-  DrawerHeader,
-  DrawerOverlay,
-  DrawerContent,
-  DrawerCloseButton,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-  Tooltip,
-  Text,
-  Switch,
-  Flex,
-  IconButton,
-  useDisclosure,
-  Button,
-  FormControl,
-  FormLabel,
-  FormErrorMessage,
-  Input,
-  useClipboard,
-  Alert,
-  Checkbox
-} from '@chakra-ui/react'
+import { Drawer, DrawerBody, DrawerHeader, DrawerOverlay, DrawerContent, DrawerCloseButton, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Tooltip, Text, Switch, Flex, IconButton, useDisclosure, Button, FormControl, FormLabel, FormErrorMessage, Input, useClipboard, Alert, Checkbox } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
 import { useMemo, useState } from 'react'
+import { PiFileSvgDuotone } from 'react-icons/pi'
 import DataTable from 'react-data-table-component'
 import { FaCheck, FaPlus, FaRegCopy } from 'react-icons/fa6'
 import { timeSince, getFullDateAndTime, customStyles } from 'utils'
@@ -37,25 +10,15 @@ import 'react-datetime/css/react-datetime.css'
 import { useMutation } from '@apollo/client'
 import { CreateShareLynk } from 'graphQL/Mutation'
 
-const ShareLynkDrawer = ({
-  error,
-  isOpen,
-  onClose,
-  data,
-  groupId,
-  refetch
-}) => {
+const ShareLynkDrawer = ({ error, isOpen, onClose, data, groupId, refetch }) => {
   const domain = window.location.origin
+  const BACKEND_URL = process.env.REACT_APP_SERVER
   const [createLynk] = useMutation(CreateShareLynk)
 
   const defaultDate = new Date()
   defaultDate.setDate(defaultDate.getDate() + 90)
 
-  const {
-    isOpen: isShareLykOpen,
-    onOpen: onShareLynkOpen,
-    onClose: onShareLynkClose
-  } = useDisclosure()
+  const { isOpen: isShareLykOpen, onOpen: onShareLynkOpen, onClose: onShareLynkClose } = useDisclosure()
   const [selectedDate, setSelectedDate] = useState(null)
   const [isValidDate, setIsValidDate] = useState(true)
   const [noExpire, setNoExpire] = useState(false)
@@ -103,20 +66,23 @@ const ShareLynkDrawer = ({
     setNoExpire(false)
   }
 
+  const svgLink = useClipboard(`${BACKEND_URL}/api/v1/badges?type=hcard&project_group_id=${groupId}`)
+
   // HEADER SECTION
   const subHeader = useMemo(() => {
     return (
-      <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'}>
+      <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-end'} gap={2}>
+        {data?.nodes?.length > 0 && (
+          <Tooltip label='SVG Link' placement='left'>
+            <IconButton onClick={() => svgLink.onCopy()} colorScheme={svgLink.hasCopied ? 'whatsapp' : 'blue'} icon={svgLink.hasCopied ? <FaCheck /> : <PiFileSvgDuotone size={26} />} />
+          </Tooltip>
+        )}
         <Tooltip label='Add ShareLynk' placement='left'>
-          <IconButton
-            colorScheme='blue'
-            icon={<FaPlus />}
-            onClick={onShareLynkOpen}
-          />
+          <IconButton colorScheme='blue' icon={<FaPlus />} onClick={onShareLynkOpen}/>
         </Tooltip>
       </Flex>
     )
-  }, [onShareLynkOpen])
+  }, [svgLink, onShareLynkOpen])
 
   // COLUMNS
   const columns = [
@@ -140,22 +106,8 @@ const ShareLynkDrawer = ({
         )
         return (
           <Flex my={2} gap={2} alignItems={'center'}>
-            <Input
-              size='sm'
-              value={sbomLink.value}
-              onChange={(e) => sbomLink.setValue(e.target.value)}
-              width={'350px'}
-              isReadOnly
-              pointerEvents={'none'}
-              fontSize={'sm'}
-            />
-            <IconButton
-              isDisabled={!enabled}
-              size='sm'
-              onClick={() => sbomLink.onCopy()}
-              colorScheme={sbomLink.hasCopied ? 'whatsapp' : 'gray'}
-              icon={sbomLink.hasCopied ? <FaCheck /> : <FaRegCopy />}
-            />
+            <Input size='sm' value={sbomLink.value} onChange={(e) => sbomLink.setValue(e.target.value)} width={'350px'} isReadOnly pointerEvents={'none'} fontSize={'sm'} />
+            <IconButton isDisabled={!enabled} size='sm' onClick={() => sbomLink.onCopy()} colorScheme={sbomLink.hasCopied ? 'whatsapp' : 'gray'} icon={sbomLink.hasCopied ? <FaCheck /> : <FaRegCopy />}/>
           </Flex>
         )
       },
@@ -222,9 +174,7 @@ const ShareLynkDrawer = ({
             <ModalBody>
               {!noExpire && (
                 <FormControl mb={3} isInvalid={!isValidDate}>
-                  <FormLabel mb={1} htmlFor='expire'>
-                    Expiration Date
-                  </FormLabel>
+                  <FormLabel mb={1} htmlFor='expire'>Expiration Date</FormLabel>
                   <Datetime
                     value={selectedDate}
                     onChange={handleDateChange}
@@ -242,25 +192,14 @@ const ShareLynkDrawer = ({
                 </FormControl>
               )}
               <FormControl mb={3}>
-                <Checkbox isChecked={noExpire} onChange={handleExpireChange}>
-                  No Expiration
-                </Checkbox>
+                <Checkbox isChecked={noExpire} onChange={handleExpireChange}>No Expiration</Checkbox>
               </FormControl>
             </ModalBody>
             <ModalFooter>
               <Button mr={3} fontSize={'sm'} onClick={onClose}>
                 Close
               </Button>
-              <Button
-                fontSize={'sm'}
-                variant='solid'
-                colorScheme='blue'
-                isDisabled={
-                  (selectedDate !== '' && !isValidDate) ||
-                  (!selectedDate && noExpire === false)
-                }
-                onClick={handleCreateLynk}
-              >
+              <Button fontSize={'sm'} variant='solid' colorScheme='blue' isDisabled={(selectedDate !== '' && !isValidDate) || (!selectedDate && noExpire === false)} onClick={handleCreateLynk}>
                 Add
               </Button>
             </ModalFooter>
