@@ -295,7 +295,7 @@ const LicenseTable = ({ data, refetch }) => {
     {
       id: 'NAME',
       name: 'NAME',
-      width: '32%',
+      width: '35%',
       wrap: true,
       selector: ({ content: { name, shortId, url, spdxId } }) => {
         return (
@@ -353,7 +353,7 @@ const LicenseTable = ({ data, refetch }) => {
     {
       id: 'ATTRIBUTION',
       name: 'ATTRIBUTION',
-      width: '12%',
+      width: '11%',
       wrap: true,
       selector: ({ attribution }) => {
         if (!attribution || attribution === 'UNKNOWN') {
@@ -368,7 +368,7 @@ const LicenseTable = ({ data, refetch }) => {
     {
       id: 'COPYLEFT',
       name: 'COPYLEFT',
-      width: '12%',
+      width: '11%',
       wrap: true,
       selector: ({ copyLeft }) => {
         if (!copyLeft || copyLeft === 'UNKNOWN') {
@@ -381,7 +381,7 @@ const LicenseTable = ({ data, refetch }) => {
     {
       id: 'REQUIRES SOURCE CODE',
       name: 'REQUIRES SOURCE CODE',
-      width: '12%',
+      width: '11%',
       wrap: true,
       selector: ({ sourceDistribution }) => {
         if (!sourceDistribution || sourceDistribution === 'UNKNOWN') {
@@ -397,7 +397,7 @@ const LicenseTable = ({ data, refetch }) => {
     {
       id: 'PERMITS MODIFICATIONS',
       name: 'PERMITS MODIFICATIONS',
-      width: '12%',
+      width: '11%',
       wrap: true,
       selector: ({ modifications }) => {
         if (!modifications || modifications === 'UNKNOWN') {
