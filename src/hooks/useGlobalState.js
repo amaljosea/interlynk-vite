@@ -180,7 +180,7 @@ const GlobalStateProvider = ({ children }) => {
     searchInput: '',
     after:'',
     before: '',
-    field: 'COMPONENTS_EOL_DATE',
+    field: 'EOL_INFOS_EOL_DATE',
     direction: 'DESC'
   })
   // SBOM VERSIONS

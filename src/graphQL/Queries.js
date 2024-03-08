@@ -3632,7 +3632,7 @@ export const ComponentSupportInfos = gql`
     $last: Int
     $after: String
     $before: String
-    $field: SupportComponentOrderByFields!
+    $field: SupportEolInfoOrderByFields!
     $direction: OrderByDirection!
     $search: String
   ) {
