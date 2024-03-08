@@ -15,10 +15,7 @@ const prodCompReducer = (state, action) => {
         scope: '',
         direct: false,
         licenseType: 'license_exp',
-        spdxLicenses: [],
-        spdxList: [],
-        customLicenses: [],
-        customList: [],
+        licenseString: [],
         expLicense: '',
         cpeString: '',
         isCpeValid: true,
@@ -123,63 +120,16 @@ const prodCompReducer = (state, action) => {
       return {
         ...state,
         licenseType: 'license_exp',
-        spdxLicenses: [],
         spdxList: [],
-        customLicenses: [],
-        customList: [],
         expLicense: ''
       }
     case 'SET_LICENSES':
       if (payload) {
-        const { licenses, licensesExp, licensesCustom } = payload
-        if (licenses?.length > 0) {
-          const filterData = licenses?.map((license) => ({
-            value: license,
-            label: license
-          }))
-          return {
-            ...state,
-            licenseType: 'license_spdx',
-            spdxLicenses: licenses,
-            spdxList: filterData,
-            expLicense: '',
-            customLicenses: [],
-            customList: []
-          }
-        } else if (licensesExp !== null) {
-          return {
-            ...state,
-            licenseType: 'license_exp',
-            expLicense: licensesExp,
-            spdxLicenses: [],
-            spdxList: [],
-            customLicenses: [],
-            customList: []
-          }
-        } else if (licensesCustom?.length > 0) {
-          const filterData = licensesCustom?.map((license) => ({
-            value: license,
-            label: license
-          }))
-          return {
-            ...state,
-            licenseType: 'license_custom',
-            spdxLicenses: [],
-            spdxList: [],
-            expLicense: '',
-            customLicenses: licensesCustom,
-            customList: filterData
-          }
-        } else {
-          return {
-            ...state,
-            licenseType: 'license_spdx',
-            spdxLicenses: [],
-            spdxList: [],
-            customLicenses: [],
-            customList: [],
-            expLicense: ''
-          }
+        const {licensesExp} = payload
+        return {
+          ...state,
+          licenseType: 'license_exp',
+          expLicense: licensesExp,
         }
       }
     case 'SET_PURL_STRING':
@@ -197,46 +147,12 @@ const prodCompReducer = (state, action) => {
         ...state,
         isCpeValid: payload
       }
-    case 'SET_LICENSE_TYPE':
+    case 'SET_LICENSE_FIELD':
+
       return {
         ...state,
-        licenseType: payload
-      }
-    case 'SET_SPDX_LICENSES':
-      const selectedSpdx =
-        [...payload]?.length > 0
-          ? [...payload].map((option) => option.value)
-          : []
-      return {
-        ...state,
-        spdxLicenses: selectedSpdx,
-        spdxList: payload
-      }
-    case 'SET_EPX_LICENSE':
-      return {
-        ...state,
-        expLicense: payload
-      }
-    case 'SET_CUSTOM_LICENSES':
-      const selectedCustom =
-        [...payload]?.length > 0
-          ? [...payload].map((option) => option.value)
-          : []
-      return {
-        ...state,
-        customLicenses: selectedCustom,
-        customList: payload
-      }
-    case 'CREATE_CUSTOM_LICENSES':
-      const createOption = (label) => ({
-        label,
-        value: label.toLowerCase().replace(/\W/g, '')
-      })
-      const newOption = createOption(payload)
-      return {
-        ...state,
-        customLicenses: [...state.customLicenses, payload],
-        customList: [...state.customList, newOption]
+        licenseString: payload,
+        expLicense: payload[0]?.value
       }
     default:
       return state

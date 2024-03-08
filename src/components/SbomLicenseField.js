@@ -32,6 +32,10 @@ const SbomLicenseField = ({ isValid, setIsValid }) => {
   const [licenseList, setLicenseList] = useState([])
   const [getCpe] = useLazyQuery(CpeAutoComplete)
 
+ useEffect(() => {
+   sbomDispatch({ type: 'SET_LICENSE_TYPE', payload: 'license_exp' })
+ }, []) // This will be removed after the refactor
+
   const onLicenseChange = (selected) => {
     console.log('selected', selected)
     if (selected) {

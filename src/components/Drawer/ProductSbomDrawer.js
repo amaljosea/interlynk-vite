@@ -34,7 +34,7 @@ import {
 } from '@chakra-ui/react'
 import { useLazyQuery, useMutation } from '@apollo/client'
 import { sbomCreate, CreateComponent } from 'graphQL/Mutation'
-import LicenseField from 'components/LicenseField'
+import LicenseField from 'components/Licenses/LicenseField'
 import { CheckIcon, InfoIcon, WarningTwoIcon } from '@chakra-ui/icons'
 import { FaExpandAlt } from 'react-icons/fa'
 import { PackageURL } from 'packageurl-js'
@@ -195,12 +195,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
         group: groupInfo,
         scope: compScope,
         licenses: {
-          licensesExp:
-            licenseType === 'license_exp'
-              ? expLicense
-                ? expLicense
-                : ''
-              : undefined
+          licensesExp: expLicense || '',
         },
         cpes: cpeValue !== '' ? [cpeValue] : [],
         purl: purlValue,

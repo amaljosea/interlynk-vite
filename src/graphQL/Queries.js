@@ -3298,6 +3298,16 @@ export const CpeAutoComplete = gql`
   }
 `
 
+export const LicenseAutoComplete = gql`
+  query LicenseAutoComplete($search: String!) {
+    licenseAutoComplete(search: $search) {
+      result
+      type
+    }
+  }
+`
+
+
 // GET CDX RESPONSE
 export const GetCdxResponses = gql`
   query GetCdxResponses {
