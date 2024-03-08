@@ -218,7 +218,7 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
           <Stack direction={'row'} alignItems={'flex-start'} spacing={2}>
             <Icon h={4} w={4} mt={1} color='#777' as={FaCube} />
             <Flex flexDir={'column'} alignItems={'center'}>
-              <Tag size='md' variant='subtle' width={'full'} colorScheme={'blue'}>
+              <Tag size='md' variant='subtle' width={'full'} colorScheme={'blue'} cursor={'pointer'} onClick={onSelectComp}>
                 <TagLabel mx={'auto'}>{compCount}</TagLabel>
               </Tag>
               <Text mt={1} fontSize={'xs'} onClick={onSelectComp} cursor={'pointer'} _hover={{ textDecoration: 'underline' }}>
@@ -233,7 +233,7 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
               <Tag cursor={'pointer'} size='md' variant='subtle' width={16} colorScheme={'blue'} onClick={onSelectLicenses}>
                 <TagLabel mx={'auto'}>{compLicenseCount}</TagLabel>
               </Tag>
-              <Text cursor={'pointer'} mt={1} fontSize={'xs'} onClick={onSelectLicenses}>
+              <Text cursor={'pointer'} mt={1} fontSize={'xs'} _hover={{ textDecoration: 'underline' }} onClick={onSelectLicenses}>
                 Licenses
               </Text>
             </Flex>
