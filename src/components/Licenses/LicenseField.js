@@ -16,7 +16,7 @@ import { LicenseAutoComplete } from 'graphQL/Queries'
 
 import { useLazyQuery } from '@apollo/client'
 import { useGlobalState } from 'hooks/useGlobalState'
-import InfoModal from './InfoModal'
+import InfoModal from '../InfoModal'
 
 const LicenseField = ({ isValid, setIsValid }) => {
   const { prodCompState, activeSbomTab, dispatch } = useGlobalState()

@@ -26,7 +26,7 @@ import {
   Text,
   Tooltip
 } from '@chakra-ui/react'
-import LicenseField from 'components/LicenseField'
+import LicenseField from 'components/Licenses/LicenseField'
 import { GetComponentData } from 'graphQL/Queries'
 import {
   UpdateComponent,
