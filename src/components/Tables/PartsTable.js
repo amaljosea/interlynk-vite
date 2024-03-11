@@ -1,40 +1,6 @@
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { AddIcon, RepeatIcon } from '@chakra-ui/icons'
-import {
-  Button,
-  Flex,
-  HStack,
-  IconButton,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItemOption,
-  MenuList,
-  MenuOptionGroup,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-  Portal,
-  Stack,
-  Text,
-  Tooltip,
-  useDisclosure,
-  FormControl,
-  FormLabel,
-  Select,
-  Tag,
-  TagLabel,
-  UnorderedList,
-  ListItem,
-  Alert,
-  AlertIcon,
-  AlertDescription,
-  AlertTitle
-} from '@chakra-ui/react'
+import { Button, Flex, HStack, IconButton, Menu, MenuButton, MenuItem, MenuItemOption, MenuList, MenuOptionGroup, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Portal, Stack, Text, Tooltip, useDisclosure, FormControl, FormLabel, Select, Tag, TagLabel, UnorderedList, ListItem, Alert, AlertIcon,  AlertDescription } from '@chakra-ui/react'
 import { useMemo, useRef, useState } from 'react'
 import CustomLoader from 'components/CustomLoader'
 import VulnBadge from 'components/Misc/VulnBadge'
@@ -63,8 +29,18 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       return null
     }
   })()
+  const currentSbom = (() => {
+    try {
+      return parseJSONSafely(localStorage.getItem('currentSBOM'))
+    } catch (error) {
+      console.log(error)
+      return null
+    }
+  })()
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
+  const filterData = data?.length > 0 && data?.filter((item) => item?.part?.id !== currentSbom?.id)
+  
   const { setActiveProdTab, totalRows, prodState, prodCompState, prodVulnState, userPermissions, dispatch } = useGlobalState()
   const { enabled, field, direction } = prodState
   const { prodVulnDispatch } = dispatch
@@ -515,7 +491,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
       <Flex flexDir={'column'} width={'100%'}>
         <DataTable
           columns={columns}
-          data={data}
+          data={filterData}
           customStyles={customStyles}
           persistTableHead
           subHeader
