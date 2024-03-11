@@ -226,7 +226,7 @@ const DiffTable = ({ diffs, isLoading, sbomOne, sbomTwo }) => {
   return (
     <DataTable
       columns={columns}
-      data={filteredData || []}
+      data={sbomOne && sbomTwo ? filteredData : []}
       customStyles={customStyles}
       progressPending={isLoading}
       subHeader={sbomOne && sbomTwo && diffs?.sbomDrift ? true : false}
