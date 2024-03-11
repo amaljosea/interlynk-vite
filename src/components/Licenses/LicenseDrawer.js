@@ -17,13 +17,15 @@ import {
 import React, { useState, useEffect } from 'react'
 import {CreateLicense, UpdateLicense} from "../../graphQL/Mutation";
 import {useMutation} from "@apollo/client";
+import CreatableSelect from "react-select/creatable";
 
 const LicenseDrawer = ({ isOpen, onClose, data, refetch }) => {
+
   const [name, setName] = useState('')
   const [text, setText] = useState('')
   const [url, setUrl] = useState('')
   const [comment, setComment] = useState('')
-  const [attributionKeys, setAttributionKeys] = useState('')
+  const [attributionKeys, setAttributionKeys] = useState([])
   const [warranty, setWarranty] = useState('')
   const [governingLaws, setGoverningLaws] = useState('')
 
@@ -199,13 +201,22 @@ const LicenseDrawer = ({ isOpen, onClose, data, refetch }) => {
 
               <FormControl>
                 <FormLabel htmlFor='url'>Attribution Keys</FormLabel>
-                <Input
+                <CreatableSelect
+                  isMulti
                   name='attributionKeys'
                   id='attributionKeys'
-                  fontSize={'sm'}
-                  value={attributionKeys}
                   placeholder='Add attribution keys'
-                  onChange={(e) => setAttributionKeys(e.target.value)}
+                  size={'sm'}
+                  value={attributionKeys.map(value => ({ label: value, value: value }))}
+                  onChange={(values) => setAttributionKeys(values.map(v => v.value))}
+                  styles={{
+                    placeholder: (defaultStyles) => {
+                      return {
+                        ...defaultStyles,
+                        fontSize: 'small'
+                      }
+                    }
+                  }}
                 />
               </FormControl>
 

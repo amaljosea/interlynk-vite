@@ -1877,7 +1877,7 @@ export const CreateLicense = gql`
     $text: String
     $url: String
     $comment: String
-    $attributionKeys: String
+    $attributionKeys: [String!]
     $warranty: String
     $governingLaws: String
     $deprecated: Boolean
@@ -1914,7 +1914,7 @@ export const UpdateLicense = gql`
     $id: ID!
     $state: LicensesState!
     $attribution: LicensesObligationStatus
-    $attributionKeys: String
+    $attributionKeys: [String!]
     $copyLeft: LicensesObligationCopyLeft
     $requiresSourceCode: LicensesObligationStatus
     $permitsModifications: LicensesObligationStatus
