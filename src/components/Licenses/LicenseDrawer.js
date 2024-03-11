@@ -207,8 +207,8 @@ const LicenseDrawer = ({ isOpen, onClose, data, refetch }) => {
                   id='attributionKeys'
                   placeholder='Add attribution keys'
                   size={'sm'}
-                  value={attributionKeys.map(value => ({ label: value, value: value }))}
-                  onChange={(values) => setAttributionKeys(values.map(v => v.value))}
+                  value={attributionKeys?.map(value => ({ label: value, value: value }))}
+                  onChange={(values) => setAttributionKeys(values?.map(v => v.value))}
                   styles={{
                     placeholder: (defaultStyles) => {
                       return {
