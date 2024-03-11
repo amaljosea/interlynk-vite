@@ -3301,8 +3301,10 @@ export const CpeAutoComplete = gql`
 export const LicenseAutoComplete = gql`
   query LicenseAutoComplete($search: String!) {
     licenseAutoComplete(search: $search) {
-      result
-      type
+      result {
+        type
+        value
+      }
     }
   }
 `

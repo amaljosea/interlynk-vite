@@ -39,6 +39,8 @@ const LicenseField = ({ isValid, setIsValid }) => {
     selected = [selected[selected.length - 1]] // only allow one license to be selected
 
     prodCompDispatch({ type: 'SET_LICENSE_FIELD', payload: selected })
+
+    setLicenseType(selected[0]?.type)
   }
 
   const handleInputChange = (value) => {
@@ -51,12 +53,14 @@ const LicenseField = ({ isValid, setIsValid }) => {
         }
       }).then((res) => {
         if (res.data) {
-          const licenses = res.data.licenseAutoComplete.result.map((value) => ({
-            value: value,
-            label: value
-          }))
-          setLicenseList(licenses)
-          setLicenseType(res.data.licenseAutoComplete.type)
+          const licenses = res.data.licenseAutoComplete.result.map((license) => {
+            return { value: license.value, label: license.value, type: license.type}
+          })
+
+          //Remove duplicates values if any. Doing this since filtering over 25 entries is not expensive
+          const uniqueLicenses = licenses.filter((v, i, a) => a.findIndex(t => (t.value === v.value)) === i)
+
+          setLicenseList(uniqueLicenses)
         }
       })
     } else {
@@ -66,7 +70,7 @@ const LicenseField = ({ isValid, setIsValid }) => {
 
   const licenseInfo = `Component license refers to the licensing terms and conditions associated with a specific software component listed in the SBOM document.`
 
-  const onCheckLicesne = () => {
+  const onCheckLicense = () => {
     setInfoHeading(`License`)
     setInfoText(licenseInfo)
     setInfoUrl(``)
@@ -83,7 +87,7 @@ const LicenseField = ({ isValid, setIsValid }) => {
             {activeSbomTab === 4 ? (
               <Tooltip label={licenseInfo}><Icon as={InfoIcon} color={'blue.500'} /></Tooltip>
             ) : (
-              <Icon as={InfoIcon} color={'blue.500'} cursor={'pointer'} onClick={onCheckLicesne} />
+              <Icon as={InfoIcon} color={'blue.500'} cursor={'pointer'} onClick={onCheckLicense} />
             )}
           </Flex>
         </FormLabel>
