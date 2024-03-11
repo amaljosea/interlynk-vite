@@ -118,7 +118,7 @@ const GraphView = ({ data, activeComp }) => {
         </Flex>
       </CardHeader>
       {data?.nodes?.length === 0 && !compDependency ? (
-        <Alert>Relation doesn't exists</Alert>
+        <Alert>No relationship found</Alert>
       ) : (
         <Box style={containerStyles} ref={containerRef}>
           {treeView && (
