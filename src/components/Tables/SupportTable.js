@@ -1,14 +1,14 @@
-import { Flex, IconButton, Stack, Tooltip } from '@chakra-ui/react'
+import { Flex, IconButton, Stack, Text, Tooltip } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
 import DataTable from 'react-data-table-component'
 import { useMemo, useState, useEffect } from 'react'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
-import { FaCheckDouble } from 'react-icons/fa6'
 import { customStyles } from 'utils'
 import { BiSolidWrench } from 'react-icons/bi'
 import { GoSkip } from 'react-icons/go'
 import { useGlobalState } from 'hooks/useGlobalState'
 import Pagination from 'components/Pagination'
+import { RepeatIcon } from '@chakra-ui/icons'
 
 const SupportTable = ({ sbomId, data, refetch }) => {
   const { totalRows, setTotalRows, supportState, dispatch } = useGlobalState()
@@ -20,11 +20,11 @@ const SupportTable = ({ sbomId, data, refetch }) => {
   const [isNextActive, setIsNextActive] = useState(false)
   const [filterText, setFilterText] = useState('')
 
-  const supportData = {
-    sbomId,
-    first: totalRows,
-    field,
-    direction
+  const supportData = { sbomId, first: totalRows, field, direction }
+
+  const setPaginationControl = (data) => {
+    setIsPrevActive(data?.pageInfo?.hasPreviousPage)
+    setIsNextActive(data?.pageInfo?.hasNextPage)
   }
 
   const handleRefetch = async (after, before) => {
@@ -42,15 +42,12 @@ const SupportTable = ({ sbomId, data, refetch }) => {
       }
     }).then((res) => {
       if (res?.data) {
-        setPaginationControl(res?.data)
+        console.log('res', res?.data?.componentSupportInfos);
+        setPaginationControl(res?.data?.componentSupportInfos)
       }
     })
   }
 
-  const setPaginationControl = (data) => {
-    setIsPrevActive(data?.pageInfo?.hasPreviousPage)
-    setIsNextActive(data?.pageInfo?.hasNextPage)
-  }
 
   const disablePaginationControl = () => {
     setIsPrevActive(false)
@@ -192,7 +189,7 @@ const SupportTable = ({ sbomId, data, refetch }) => {
           <IconButton
             colorScheme='blue'
             onClick={handleRefresh}
-            icon={<FaCheckDouble />}
+            icon={<RepeatIcon />}
           />
         </Tooltip>
       </Flex>
@@ -210,9 +207,9 @@ const SupportTable = ({ sbomId, data, refetch }) => {
     {
       id: 'EOL_INFOS_NAME',
       name: 'COMPONENT',
-      selector: (row) => row?.name,
+      selector: (row) => <Text my={4}>{row?.name}</Text>,
       wrap: true,
-      width: '200px',
+      width: '350px',
       sortable: true
     },
     {
@@ -264,23 +261,11 @@ const SupportTable = ({ sbomId, data, refetch }) => {
         return (
           <Stack direction={'row'} alignItems={'center'} spacing={2}>
             <Tooltip label='Fix'>
-              <IconButton
-                size='sm'
-                variant='solid'
-                colorScheme='blue'
-                fontWeight='normal'
-                icon={<BiSolidWrench size={18} />}
-              />
+              <IconButton size='sm' variant='solid' colorScheme='blue' fontWeight='normal' icon={<BiSolidWrench size={18} />} />
             </Tooltip>
 
             <Tooltip label='Ignore'>
-              <IconButton
-                size='sm'
-                variant='solid'
-                colorScheme='blue'
-                fontWeight='normal'
-                icon={<GoSkip size={18} />}
-              />
+              <IconButton size='sm' variant='solid' colorScheme='blue' fontWeight='normal' icon={<GoSkip size={18} />} />
             </Tooltip>
           </Stack>
         )
@@ -319,7 +304,7 @@ const SupportTable = ({ sbomId, data, refetch }) => {
           paginationSizes={paginationSizes}
           pageIndex={pageIndex}
           totalRows={totalRows}
-          totalCount={data.totalCount}
+          totalCount={data?.totalCount}
           onPreviousPage={handlePreviousPage}
           onNextPage={handleNextPage}
           onSetRow={handleSetRow}

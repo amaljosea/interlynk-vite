@@ -23,7 +23,7 @@ const Support = () => {
         }
       })
     }
-  }, [data])
+  }, [])
 
   return (
     <Flex flexDirection='column' pt={{ base: '120px', md: '74px' }} pr={2} pl={5}>
