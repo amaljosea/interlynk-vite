@@ -1,16 +1,5 @@
 import { useMutation } from '@apollo/client'
-import {
-  Text,
-  FormControl,
-  FormLabel,
-  Flex,
-  Input,
-  Button,
-  useToast,
-  Box,
-  FormErrorMessage,
-  FormHelperText
-} from '@chakra-ui/react'
+import { Text, FormControl, FormLabel, Flex, Input, Button, useToast, Box, FormErrorMessage, FormHelperText, Grid, GridItem } from '@chakra-ui/react'
 import { useColorModeValue } from '@chakra-ui/system'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
@@ -29,6 +18,8 @@ const PersonalInfo = ({ user, refetch }) => {
   const [email, setEmail] = useState('')
   const [message, setMessage] = useState('Update')
   const [error, setError] = useState('')
+  const [oldPassword, setOldPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
 
   useEffect(() => {
     if (user) {
@@ -88,48 +79,47 @@ const PersonalInfo = ({ user, refetch }) => {
   return (
     <Box px={0} mx={0}>
       <CardHeader p='12px 0' mb='12px'>
-        <Text fontSize='lg' color={textColor} fontWeight='bold'>
-          Personal Details
-        </Text>
+        <Text fontSize='lg' color={textColor} fontWeight='bold'>Personal Details</Text>
       </CardHeader>
       <CardBody px='5px'>
-        <Flex
-          width={'40%'}
-          flexDirection={'column'}
-          alignItems={'flex-start'}
-          gap={6}
-        >
-          {/* NAME */}
-          <FormControl isRequired isInvalid={error}>
-            <FormLabel>Name</FormLabel>
-            <Input value={name} onChange={handleNameChange} />
-            <FormErrorMessage>{error}</FormErrorMessage>
-          </FormControl>
-          {/* EMAIL */}
-          <FormControl isRequired>
-            <FormLabel>Email</FormLabel>
-            <Input value={email} onChange={(e) => setEmail(e.target.value)} />
-            {user?.unconfirmedEmail && (
-              <FormHelperText>
-                {JSON.stringify(user?.unconfirmedEmail)}
-              </FormHelperText>
-            )}
-          </FormControl>
-          {/* ACTION */}
-          <Button
-            variant='solid'
-            colorScheme='blue'
-            onClick={handleUpdate}
-            disabled={
-              message === 'Saving....' ||
-              !name ||
-              !validateEmail(email) ||
-              error !== ''
-            }
-          >
-            {message}
-          </Button>
-        </Flex>
+        <Grid width={'100%'} templateColumns='repeat(2, 1fr)' gap={12}>
+          <GridItem>
+            <Flex width={'100%'} flexDirection={'column'} alignItems={'flex-start'} gap={6}>
+              {/* NAME */}
+              <FormControl isRequired isInvalid={error}>
+                <FormLabel>Name</FormLabel>
+                <Input value={name} onChange={handleNameChange} />
+                <FormErrorMessage>{error}</FormErrorMessage>
+              </FormControl>
+              {/* EMAIL */}
+              <FormControl isRequired>
+                <FormLabel>Email</FormLabel>
+                <Input value={email} onChange={(e) => setEmail(e.target.value)}/>
+                {user?.unconfirmedEmail && <FormHelperText>{JSON.stringify(user?.unconfirmedEmail)}</FormHelperText>}
+              </FormControl>
+              {/* ACTION */}
+              <Button variant='solid' colorScheme='blue' onClick={handleUpdate} disabled={ message === 'Saving....' || !name || !validateEmail(email) || error !== '' }>
+                {message}
+              </Button>
+            </Flex>
+          </GridItem>
+          <GridItem>
+            <Flex width={'100%'} flexDirection={'column'} alignItems={'flex-start'} gap={6}>
+              {/* OLD PASSWORD */}
+              <FormControl>
+                <FormLabel>Old Password</FormLabel>
+                <Input type='password' value={oldPassword} onChange={(e) => setOldPassword(e.target.value)}/>
+              </FormControl>
+              {/* NEW PASSWORD */}
+              <FormControl>
+                <FormLabel>New Password</FormLabel>
+                <Input type='password' value={newPassword} onChange={(e) => setNewPassword(e.target.value)}/>
+              </FormControl>
+              {/* ACTION */}
+              <Button variant='solid' colorScheme='blue'>Change Password</Button>
+            </Flex>
+          </GridItem>
+        </Grid>
       </CardBody>
     </Box>
   )
