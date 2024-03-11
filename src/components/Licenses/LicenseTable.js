@@ -1,39 +1,24 @@
 import {AddIcon, ExternalLinkIcon, RepeatIcon} from '@chakra-ui/icons'
-import {
-  Flex,
-  Tag,
-  Text,
-  Stack,
-  Link,
-  TagLabel,
-  Tooltip,
-  IconButton,
-  useDisclosure,
-  Menu,
-  MenuButton,
-  Portal,
-  MenuList,
-  MenuItem, Grid, GridItem
-} from '@chakra-ui/react'
+import { Flex, Tag, Text, Stack, Link, TagLabel, Tooltip, IconButton, useDisclosure, Menu, MenuButton, Portal, MenuList, MenuItem, Grid, GridItem } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import LicenseDrawer from './LicenseDrawer'
 import LicenseFilter from './LicenseFilter'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
-import {customStyles} from 'utils'
 import {FaEllipsisV} from 'react-icons/fa'
 import Pagination from '../Pagination'
 import {FaScaleBalanced} from "react-icons/fa6";
+import {customStyles} from 'utils'
 
 const LicenseTable = ({ data, refetch }) => {
-
   const licenses = data?.nodes
-
   const [direction, setDirection] = useState('ASC')
-
   const paginationSizes = [25, 50, 100]
 
+
+  const [searchInput, setSearchInput] = useState('')
+  const [activeRow, setActiveRow] = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
   const [totalRows, setTotalRows] = useState(paginationSizes[0])
   const [isPrevActive, setIsPrevActive] = useState(false)
@@ -59,7 +44,6 @@ const LicenseTable = ({ data, refetch }) => {
   const handlePreviousPage = useCallback(async () => {
     disablePaginationControl()
     setCurrentPage(currentPage - 1)
-
     await refetch({
       first: undefined,
       last: totalRows,
@@ -97,7 +81,6 @@ const LicenseTable = ({ data, refetch }) => {
   const handleNextPage = useCallback(async () => {
     disablePaginationControl()
     setCurrentPage(currentPage + 1)
-
     await refetch({
       first: totalRows,
       last: undefined,
@@ -111,18 +94,10 @@ const LicenseTable = ({ data, refetch }) => {
     })
   }, [refetch, totalRows, data, currentPage, direction])
 
-
-  const [searchInput, setSearchInput] = useState('')
-  const [activeRow, setActiveRow] = useState(null)
-
-
   // SORT
-
   const handleSort = useCallback(async (column, sortDirection) => {
     disablePaginationControl()
-
     setCurrentPage(1)
-
     await refetch({
       direction: sortDirection.toUpperCase(),
       first: totalRows,
@@ -246,21 +221,9 @@ const LicenseTable = ({ data, refetch }) => {
   const subHeaderComponent = useMemo(() => {
     return (
       <Flex width={'100%'} alignItems={'center'} gap={3}>
-        <Stack
-          width={'100%'}
-          direction={'row'}
-          spacing={4}
-          alignItems={'center'}
-        >
+        <Stack width={'100%'} direction={'row'} spacing={4} alignItems={'center'}>
           {/* SEARCH FILTER */}
-          <SearchFilter
-            id='license'
-            filterText={searchInput}
-            setFilterText={setSearchInput}
-            onFilter={handleSearch}
-            onClear={handleClear}
-            onChange={onSearchInputChange}
-          />
+          <SearchFilter id='license' filterText={searchInput} setFilterText={setSearchInput} onFilter={handleSearch} onClear={handleClear} onChange={onSearchInputChange}/>
           <LicenseFilter onFilter={handleFilter}/>
         </Stack>
 
@@ -279,11 +242,7 @@ const LicenseTable = ({ data, refetch }) => {
           />
         </Tooltip>
         <Tooltip label='Refresh'>
-          <IconButton
-            onClick={handleRefresh}
-            colorScheme='blue'
-            icon={<RepeatIcon />}
-          ></IconButton>
+          <IconButton onClick={handleRefresh} colorScheme='blue' icon={<RepeatIcon />} />
         </Tooltip>
       </Flex>
     )
@@ -299,47 +258,20 @@ const LicenseTable = ({ data, refetch }) => {
       wrap: true,
       selector: ({ content: { name, shortId, url, spdxId } }) => {
         return (
-          <Grid templateColumns='repeat(7, 1fr)' gap={2} my={3}>
+          <Grid templateColumns='repeat(12, 1fr)' gap={2} my={3}>
             <GridItem colSpan={1} width={'50px'}>
-              { (
-                <IconButton
-                  isRound={true}
-                  variant='solid'
-                  colorScheme='gray'
-                  icon={<FaScaleBalanced fontSize={16} />}
-                />
-              )}
+              <IconButton isRound={true} variant='solid' colorScheme='gray' icon={<FaScaleBalanced fontSize={16} />} />
             </GridItem>
-            <GridItem
-              colSpan={6}
-              display={'flex'}
-              flexWrap={'wrap'}
-              flexDirection={'column'}
-              gap={2}
-            >
+            <GridItem colSpan={11} display={'flex'} flexWrap={'wrap'} flexDirection={'column'} gap={2}>
               <Text data-tag='allowRowEvents'>{name}</Text>
               <Flex flexWrap={'wrap'} gap={2} alignItems={'center'}>
                 {(shortId || spdxId) && (
-                  <Tag
-                    width={'fit-content'}
-                    size='sm'
-                    variant='subtle'
-                    colorScheme='blue'
-                  >
+                  <Tag width={'fit-content'} size='sm' variant='subtle' colorScheme='blue'>
                     <TagLabel>{shortId || spdxId}</TagLabel>
                   </Tag>
                 )}
                 {url && (
-                  <Link
-                    href={shortId? url.replace('.json', '.html') : url}
-                    isExternal
-                    color={'blue.500'}
-                    fontSize={'sm'}
-                    fontWeight={'normal'}
-                    display={'flex'}
-                    alignItems={'center'}
-                    gap={1}
-                  >
+                  <Link href={shortId? url.replace('.json', '.html') : url} isExternal color={'blue.500'} fontSize={'sm'} fontWeight={'normal'} display={'flex'} alignItems={'center'} gap={1}>
                     <ExternalLinkIcon />
                   </Link>
                 )}
@@ -388,9 +320,7 @@ const LicenseTable = ({ data, refetch }) => {
           sourceDistribution = 'Not Available'
         }
         return (
-          <Text textTransform='capitalize'>
-            {sourceDistribution.toLowerCase()}
-          </Text>
+          <Text textTransform='capitalize'>{sourceDistribution.toLowerCase()}</Text>
         )
       }
     },
@@ -418,23 +348,8 @@ const LicenseTable = ({ data, refetch }) => {
       selector: ({ state }) => {
         state = state?.toLowerCase() || 'Not Available'
         return (
-          <Tag
-            size='md'
-            variant='solid'
-            colorScheme={
-              state === 'approved'
-                ? 'green'
-                : state === 'rejected'
-                  ? 'red'
-                  : state === 'unspecified'
-                    ? 'orange'
-                    : 'blue'
-            }
-            width={'110px'}
-          >
-            <TagLabel mx={'auto'} textTransform={'capitalize'}>
-              {state}
-            </TagLabel>
+          <Tag size='md' variant='solid' colorScheme={state === 'approved' ? 'green' : state === 'rejected' ? 'red' : state === 'unspecified' ? 'orange' : 'blue'} width={'110px'}>
+            <TagLabel mx={'auto'} textTransform={'capitalize'}>{state}</TagLabel>
           </Tag>
         )
       }
@@ -447,12 +362,7 @@ const LicenseTable = ({ data, refetch }) => {
       selector: (row) => {
         return (
           <Menu>
-            <MenuButton
-              as={IconButton}
-              icon={<FaEllipsisV />}
-              variant='none'
-              color='gray.400'
-            />
+            <MenuButton as={IconButton} icon={<FaEllipsisV />} variant='none' color='gray.400'/>
             <Portal>
               <MenuList fontSize={'sm'}>
                 {/* Edit License */}
@@ -509,12 +419,7 @@ const LicenseTable = ({ data, refetch }) => {
       )}
 
       {isOpen && (
-        <LicenseDrawer
-          isOpen={isOpen}
-          refetch={refetch}
-          onClose={onClose}
-          data={activeRow}
-        />
+        <LicenseDrawer isOpen={isOpen} refetch={refetch} onClose={onClose} data={activeRow} />
       )}
     </>
   )
