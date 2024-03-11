@@ -4,7 +4,7 @@ const supportReducer = (state, action) => {
     case 'CLEAR_SBOM_LOG':
       return {
         ...state,
-        field: 'COMPONENTS_EOL_DATE',
+        field: 'EOL_INFOS_EOL_DATE',
         direction: 'DESC',
         searchInput: '',
         pageIndex: 1,

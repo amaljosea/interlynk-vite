@@ -208,7 +208,7 @@ const SupportTable = ({ sbomId, data, refetch }) => {
   // COLUMNS
   const columns = [
     {
-      id: 'COMPONENTS_NAME',
+      id: 'EOL_INFOS_NAME',
       name: 'COMPONENT',
       selector: (row) => row?.name,
       wrap: true,
@@ -216,7 +216,7 @@ const SupportTable = ({ sbomId, data, refetch }) => {
       sortable: true
     },
     {
-      id: 'COMPONENTS_VERSION',
+      id: 'EOL_INFOS_VERSION',
       name: 'VERSION',
       selector: (row) => row?.version,
       width: '200px',
@@ -224,7 +224,7 @@ const SupportTable = ({ sbomId, data, refetch }) => {
       sortable: true
     },
     {
-      id: 'COMPONENTS_LTS',
+      id: 'EOL_INFOS_LTS',
       name: 'LTS',
       selector: (row) => (row?.lts ? 'True' : 'False'),
       width: '200px',
@@ -232,7 +232,7 @@ const SupportTable = ({ sbomId, data, refetch }) => {
       sortable: true
     },
     {
-      id: 'COMPONENTS_EOL_DATE',
+      id: 'EOL_INFOS_EOL_DATE',
       name: 'END-OF-LIFE',
       selector: (row) => row?.eolDate || '',
       width: '250px',
@@ -245,7 +245,7 @@ const SupportTable = ({ sbomId, data, refetch }) => {
       }
     },
     {
-      id: 'COMPONENTS_EOL_SUPPORT',
+      id: 'EOL_INFOS_EOL_SUPPORT',
       name: 'END-OF-SERVICE',
       selector: (row) => row?.eolSupport || '',
       width: '250px',
