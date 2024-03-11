@@ -7,6 +7,9 @@ import VulnTable from 'components/Tables/VulnTable'
 import { useLocation } from 'react-router-dom'
 import Card from 'components/Card/Card'
 import { FaLock } from 'react-icons/fa6'
+import { GetShareLicensesTable } from 'graphQL/Queries'
+import { useLazyQuery } from '@apollo/client'
+import SbomLicenseTable from 'components/Licenses/SbomLicenseTable'
 
 const SbomTable = ({ status, type, data, refetch, filteredData, vulnData, getVulnData, getCompData, compData, error
 }) => {
@@ -26,6 +29,9 @@ const SbomTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
   const [lastFetchTime, setLastFetchTime] = useState({ 'General': null, 'Parts': null, 'Components': null, 'Vulnerabilities': null, 'Licenses': null, 'Support': null, 'Relationships': null, 'Checks': null, 'Change Log': null })
 
   const tabIndexToName = { 0: 'General', 1: 'Parts', 2: 'Components', 3: 'Vulnerabilities', 4: 'Licenses', 5: 'Support', 6: 'Relationships', 7: 'Checks', 8: 'Change Log' }
+
+  // GET LICENSES DATA
+  const [getLicensesData, { data: licensesData }] = useLazyQuery(GetShareLicensesTable, {fetchPolicy: 'network-only'})
 
   const shouldFetchData = (tabName) => {
     const lastFetch = lastFetchTime[tabName]
@@ -98,6 +104,13 @@ const SbomTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
           updateLastFetchTime(tabName)
         }
       })
+    } else if (tabName === 'Licenses' && shouldFetchData(tabName)) {
+      getLicensesData({ variables: { ...commonParams }})
+      .then((res) => {
+        if (res.data) {
+          updateLastFetchTime(tabName)
+        }
+      })
     }
   }
 
@@ -112,8 +125,8 @@ const SbomTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
         {/* TAB LIST */}
         <TabList mt='20px'>
           {Object.values(tabIndexToName).map((item, index) => (
-            <Tab key={index} _focus={{ outline: 'none' }} isDisabled={item === 'Parts' || item === 'Checks' || item === 'Change Log' || item === 'Support' || item === 'Licenses' || item === 'Relationships'}>
-              {(item === 'Parts' || item === 'Checks' || item === 'Change Log' || item === 'Support' || item === 'Licenses' || item === 'Relationships') && (
+            <Tab key={index} _focus={{ outline: 'none' }} isDisabled={item === 'Parts' || item === 'Checks' || item === 'Change Log' || item === 'Support' || item === 'Relationships'}>
+              {(item === 'Parts' || item === 'Checks' || item === 'Change Log' || item === 'Support' || item === 'Relationships') && (
                 <FaLock color='darkgray' style={{ marginRight: '6px' }} />
               )}
               {item}
@@ -156,6 +169,10 @@ const SbomTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
           {/* VUNERABILITIES TABLE */}
           <TabPanel px={0}>
             <VulnTable data={vulnData?.sbom?.vulns} sbomData={data} sbomRefetch={refetch} filteredData={filteredData} refetch={getVulnData} productId={productId} sbomId={sbomId} />
+          </TabPanel>
+          {/* LICENSES TABLE */}
+          <TabPanel px={0}>
+            <SbomLicenseTable data={licensesData?.shareLynkQuery?.sbom?.componentLicenses} />
           </TabPanel>
           {/* SUPPORT TABLE */}
           <TabPanel px={0}></TabPanel>

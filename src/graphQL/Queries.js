@@ -3496,7 +3496,6 @@ export const GetLicensesTable = gql`
 `
 
 // GET DATA FOR SBOM LICENSE TABLE
-
 export const GetSbomLicensesTable = gql`
   query GetSbomLicenseTable(
     $projectId: Uuid!
@@ -3531,6 +3530,47 @@ export const GetSbomLicensesTable = gql`
             name
           }
           derivedState
+        }
+      }
+    }
+  }
+`
+
+// GET DATA FOR PUBLIC LINCESE TABLE
+export const GetShareLicensesTable = gql`
+  query GetShareLicensesTable(
+    $sbomId: Uuid!
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+  ) {
+    shareLynkQuery {
+      sbom(id: $sbomId) {
+        componentLicenses(
+          first: $first
+          last: $last
+          after: $after
+          before: $before
+        ) {
+          totalCount
+          pageInfo {
+            hasNextPage
+            endCursor
+            hasPreviousPage
+            startCursor
+          }
+          nodes {
+            licenseExpression
+            licenses {
+              __typename
+              state
+            }
+            components {
+              name
+            }
+            derivedState
+          }
         }
       }
     }
