@@ -106,6 +106,8 @@ export default function HeaderLinks(props) {
 
   return (
     <Flex gap={4} alignItems='center' flexDirection='row'>
+      {/* JOIN WAITLIST */}
+      {signedUrlParams && <Link to='https://www.interlynk.io/sign-up' target='_blank'><Button colorScheme='blue' size='sm'>Sign up</Button></Link>}
       {/* ENVIRONMENT */}
       {(dashboardView || productId) && !vulnId && groups?.organization?.projectGroups?.nodes?.length > 0 && (
         <Menu closeOnSelect={true}>
