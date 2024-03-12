@@ -34,6 +34,10 @@ const LicenseField = ({ isValid, setIsValid, isDisabled }) => {
 
   const { isOpen: isInfoOpen, onOpen: onInfoOpen, onClose: onInfoClose } = useDisclosure()
 
+  useEffect(() => {
+    prodCompDispatch({ type: 'SET_LICENSE_FIELD', payload: [] }) // clear license field
+  }, [])
+
   const onLicenseChange = (selected) => {
 
     selected = [selected[selected.length - 1]] // only allow one license to be selected
