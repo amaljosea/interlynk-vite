@@ -18,7 +18,7 @@ import { useLazyQuery } from '@apollo/client'
 import { useGlobalState } from 'hooks/useGlobalState'
 import InfoModal from '../InfoModal'
 
-const LicenseField = ({ isValid, setIsValid }) => {
+const LicenseField = ({ isValid, setIsValid, isDisabled }) => {
   const { prodCompState, activeSbomTab, dispatch } = useGlobalState()
   const { licenseString } = prodCompState
   const { prodCompDispatch } = dispatch
@@ -93,6 +93,7 @@ const LicenseField = ({ isValid, setIsValid }) => {
         </FormLabel>
         {/* LICENSE */}
           <ReactSelect
+            isDisabled={isDisabled}
             styles={{
               control: (baseStyles, state) => ({
                 ...baseStyles,
