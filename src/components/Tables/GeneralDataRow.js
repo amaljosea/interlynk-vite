@@ -37,9 +37,9 @@ import { useLocation } from 'react-router-dom'
 import { getFullDateAndTime } from 'utils'
 import PriSupplierModal from 'views/Sbom/components/PriSupplierModal'
 import { sbomUpdate } from 'graphQL/Mutation'
-import SbomLicenseField from 'components/SbomLicenseField'
 import { useGlobalState } from 'hooks/useGlobalState'
 import InfoModal from 'components/InfoModal'
+import LicenseField from "../Licenses/LicenseField";
 
 const InfoLabel = ({ title, onClick }) => {
   return (
@@ -51,6 +51,7 @@ const InfoLabel = ({ title, onClick }) => {
 }
 
 const GeneralDataRow = ({ status, data, refetch }) => {
+
   const location = useLocation()
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
   const queryParams = new URLSearchParams(location.search)
@@ -187,19 +188,13 @@ const GeneralDataRow = ({ status, data, refetch }) => {
   }
 
   const onUpdateLicense = async () => {
-    console.log('expLicense', expLicense)
     await updateSbom({
       variables: {
         id: data.id,
         spec: data.spec,
         licenses: {
-          licensesExp:
-            licenseType === 'license_exp'
-              ? expLicense
-                ? expLicense
-                : ''
-              : undefined
-        }
+          licensesExp: expLicense || '',
+        },
       }
     })
       .then((res) => res.data && sbomDispatch({ type: 'CLEAR_LICENSES' }))
@@ -455,19 +450,6 @@ const GeneralDataRow = ({ status, data, refetch }) => {
                       <TagLabel>{data.licensesExp}</TagLabel>
                     </Tag>
                   )}
-                  {/* CUSTOM */}
-                  {data.licensesCustom?.length > 0 &&
-                    data.licensesCustom.map((item, index) => (
-                      <Tag
-                        size={'md'}
-                        key={index}
-                        variant='subtle'
-                        colorScheme='green'
-                        width={'fit-content'}
-                      >
-                        <TagLabel>{item}</TagLabel>
-                      </Tag>
-                    ))}
                 </Flex>
               </Td>
               <Td pl={0}>
@@ -512,7 +494,7 @@ const GeneralDataRow = ({ status, data, refetch }) => {
             </ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              <SbomLicenseField isValid={isValid} setIsValid={setIsValid} />
+              <LicenseField sbomView={true} isValid={isValid} setIsValid={setIsValid} />
             </ModalBody>
             <ModalFooter>
               <Button fontSize={'sm'} mr={3} onClick={onSBMClose}>

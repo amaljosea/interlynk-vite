@@ -81,7 +81,6 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
     variables: { projectId: selectedProd, sbomId: selectedVersion }
   })
   const isExists = partsData?.sbom?.sbomParts?.some((item) => item?.part?.project?.id === prodId && item?.part?.id === sbomId)
-  console.log('isExists', isExists)
 
   const [createSbomPart] = useMutation(SbomPartCreate)
   const [deleteSbomPart] = useMutation(SbomPartDelete)

@@ -295,7 +295,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
                 </Select>
               </FormControl>
               {/* Licenses */}
-              <LicenseField isValid={isValid} setIsValid={setIsValid} />
+              <LicenseField sbomView={false} isValid={isValid} setIsValid={setIsValid} />
               {/* PURL INPUI */}
               <FormControl isInvalid={purlValue !== '' && !isPURLInputValid}>
                 <FormLabel htmlFor='purl' fontSize={'sm'}>
