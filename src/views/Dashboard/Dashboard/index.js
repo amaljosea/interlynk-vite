@@ -14,16 +14,16 @@ import OrgRegister from '../Profile/components/OrgRegister'
 import { useEffect, useMemo } from 'react'
 import { GetOrgMetrics } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import { displayErrorMessage } from 'utils'
 import { Text } from '@chakra-ui/react'
 import { WarningTwoIcon } from '@chakra-ui/icons'
 import CustomLoader from 'components/CustomLoader'
 import Card from 'components/Card/Card'
+import { logoutUser } from 'utils/authUtils'
 
 export default function Dashboard() {
   const location = useLocation()
-  const navigate = useNavigate()
   const queryParams = new URLSearchParams(location.search)
   const product = queryParams.get('id')
   const { dispatch, envName, userPermissions } = useGlobalState()
@@ -51,19 +51,14 @@ export default function Dashboard() {
   }, [product])
 
   if (eOrg) {
-    if (eOrg.networkError && eOrg.networkError.statusCode === 401) {
-      console.log('Unauthorized Access. Please log in.');
-      navigate('/auth');
-    } else {
-      return (
-        <Flex my={32} alignItems={'center'} justifyContent={'center'} gap={2}>
-          <WarningTwoIcon color='blue.500' />
-          <Text textAlign={'center'} fontSize={14}>
-            {displayErrorMessage(eOrg.networkError?.statusCode, eOrg.message)}
-          </Text>
-        </Flex>
-      )
-    }
+    return (
+      <Flex my={32} alignItems={'center'} justifyContent={'center'} gap={2}>
+        <WarningTwoIcon color='blue.500' />
+        <Text textAlign={'center'} fontSize={14}>
+          {displayErrorMessage(eOrg.networkError?.statusCode, eOrg.message)}
+        </Text>
+      </Flex>
+    )
   }
 
   if (eOrg && eOrgMetric) {
@@ -105,21 +100,9 @@ export default function Dashboard() {
               {/* STATS */}
               <SimpleGrid columns={{ sm: 1, md: 2, xl: 4 }} spacing='24px'>
                 <MiniStatistics title={'Products'} amount={metrics?.organizationMetric?.projectCount} percentage={9} icon={<FaWindowMaximize h={'24px'} w={'24px'} color={iconBoxInside}/>}/>
-                <MiniStatistics
-                  title={'Versions'}
-                  amount={metrics?.organizationMetric?.versionCount}
-                  icon={<FaLayerGroup h={'24px'} w={'24px'} color={iconBoxInside} />}
-                />
-                <MiniStatistics
-                  title={'Components'}
-                  amount={metrics?.organizationMetric?.componentCount}
-                  icon={<FaCube h={'24px'} w={'24px'} color={iconBoxInside} />}
-                />
-                <MiniStatistics
-                  title={'Vulnerabilities'}
-                  amount={metrics?.organizationMetric?.vulnsMetric}
-                  icon={<FaBug h={'24px'} w={'24px'} color={iconBoxInside} />}
-                />
+                <MiniStatistics title={'Versions'} amount={metrics?.organizationMetric?.versionCount} icon={<FaLayerGroup h={'24px'} w={'24px'} color={iconBoxInside} />}/>
+                <MiniStatistics title={'Components'} amount={metrics?.organizationMetric?.componentCount} icon={<FaCube h={'24px'} w={'24px'} color={iconBoxInside} />}/>
+                <MiniStatistics title={'Vulnerabilities'} amount={metrics?.organizationMetric?.vulnsMetric} icon={<FaBug h={'24px'} w={'24px'} color={iconBoxInside} />}/>
               </SimpleGrid>
               {/* GRAPHS */}
               <Grid templateColumns={{ sm: '1fr', lg: '1.3fr 1.7fr' }} templateRows={{ sm: 'repeat(2, 1fr)', lg: '1fr' }} mb={{ lg: '26px' }} gap='24px'>
@@ -140,20 +123,11 @@ export default function Dashboard() {
               <Grid templateColumns='repeat(12, 1fr)' gap={'24px'} flexWrap={'wrap'}>
                 {/* RECENT IMPORTS */}
                 <GridItem colSpan={8} w='100%'>
-                  <ProductsOverview
-                    title={'Recent Imports'}
-                    data={metrics?.organizationMetric?.latestVersions}
-                    prodPermissions={productPermissions}
-                  />
+                  <ProductsOverview title={'Recent Imports'} data={metrics?.organizationMetric?.latestVersions} prodPermissions={productPermissions} />
                 </GridItem>
                 {/* LATEST ACTIVITIES */}
                 <GridItem colSpan={4} w='100%'>
-                  <ActivitiesOverview
-                    title={'Recent Activities'}
-                    amount={metrics?.organizationMetric?.latestActivity?.length}
-                    data={metrics?.organizationMetric?.latestActivity}
-                    prodPermissions={productPermissions}
-                  />
+                  <ActivitiesOverview title={'Recent Activities'} amount={metrics?.organizationMetric?.latestActivity?.length} data={metrics?.organizationMetric?.latestActivity} prodPermissions={productPermissions} />
                 </GridItem>
               </Grid>
             </Flex>

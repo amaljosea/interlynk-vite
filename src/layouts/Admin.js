@@ -8,12 +8,7 @@ import { Outlet, redirect, useNavigate } from 'react-router-dom'
 import { dashRoutes } from 'routes.js'
 import PanelContainer from '../components/Layout/PanelContainer'
 import PanelContent from '../components/Layout/PanelContent'
-import {
-  ApolloClient,
-  InMemoryCache,
-  ApolloProvider,
-  ApolloLink
-} from '@apollo/client'
+import { ApolloClient, InMemoryCache, ApolloProvider, ApolloLink } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
 import { onError } from '@apollo/client/link/error'
 import Cookies from 'js-cookie'
@@ -41,33 +36,25 @@ export default function Dashboard(props) {
   //   uri: graphqlAPI
   // })
 
-  const uploadLink = createUploadLink({
-    uri: graphqlAPI
-  })
+  const uploadLink = createUploadLink({ uri: graphqlAPI })
 
   const authLink = setContext((_, { headers }) => {
     return {
-      headers: {
-        ...headers,
-        authorization: authToken
-      }
+      headers: { ...headers, authorization: authToken }
     }
   })
 
   const toast = useToast()
   const env = process.env.NODE_ENV
 
-  const errorLink = onError(({ graphQLErrors }) => {
+  const errorLink = onError(({ graphQLErrors, networkError  }) => {
+    if (networkError?.statusCode === 401) {
+      console.log('Unauthorized Access. Please log in.');
+      logoutUser().then((r) => navigate('/auth'))
+    }
     if (graphQLErrors && env !== 'production') {
       graphQLErrors.forEach(({ message }) => {
-        toast({
-          title: 'An error occurred.',
-          description: message,
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-          position: 'top'
-        })
+        toast({ title: 'An error occurred.', description: message, status: 'error', duration: 5000, isClosable: true, position: 'top' })
       })
     }
   })
@@ -75,7 +62,7 @@ export default function Dashboard(props) {
   const client = new ApolloClient({
     link: ApolloLink.from([errorLink, authLink, uploadLink]),
     cache: new InMemoryCache(),
-    queryDeduplication: false
+    queryDeduplication: false,
   })
 
   const isTokenExpired = (token) => {
@@ -99,7 +86,7 @@ export default function Dashboard(props) {
         logoutUser().then((r) => navigate('/auth'))
       }
     }
-  }, [])
+  }, [authToken])
 
   useEffect(() => {
     if (!authToken) {
@@ -117,32 +104,13 @@ export default function Dashboard(props) {
   return (
     <ApolloProvider client={client}>
       <Stack width={'100%'} direction={'row'} alignItems={'flex-start'}>
-        <Sidebar
-          routes={dashRoutes}
-          logoText={'Interlynk DASHBOARD'}
-          display='none'
-          sidebarVariant={sidebarVariant}
-          {...rest}
-        />
-        <Box
-          minH='100vh'
-          w={highRes?.matches ? '98%' : tabRes?.matches ? '100%' : '96%'}
-          pos={'absolute'}
-          right={0}
-        >
+        <Sidebar routes={dashRoutes} logoText={'Interlynk DASHBOARD'} display='none' sidebarVariant={sidebarVariant} {...rest} />
+        <Box minH='100vh' w={highRes?.matches ? '98%' : tabRes?.matches ? '100%' : '96%'} pos={'absolute'} right={0}>
           <Portal>
-            <AdminNavbar
-              tabRes={tabRes}
-              brandText={getActiveRoute(dashRoutes)}
-              secondary={getActiveNavbar(dashRoutes)}
-            />
+            <AdminNavbar tabRes={tabRes} brandText={getActiveRoute(dashRoutes)} secondary={getActiveNavbar(dashRoutes)} />
           </Portal>
           <Box bg='rgba(0,0,0,0.04)' minH={'100vh'} maxH={'100%'}>
-            <PanelContent>
-              <PanelContainer>
-                <Outlet />
-              </PanelContainer>
-            </PanelContent>
+            <PanelContent><PanelContainer><Outlet /></PanelContainer></PanelContent>
           </Box>
         </Box>
       </Stack>
