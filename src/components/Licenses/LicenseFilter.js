@@ -15,17 +15,17 @@ import { FaFilter } from 'react-icons/fa'
 const LicenseFilter = ( {onFilter} ) => {
   const [status, setStatus] = useState([undefined])
   const availableStatus = {
-    all: undefined,
-    approved: 'approved',
-    rejected: 'rejected',
-    unspecified: 'unspecified'
+    All: undefined,
+    Approved: 'approved',
+    Rejected: 'rejected',
+    Unspecified: 'unspecified'
   }
 
   const [spdx, setSpdx] = useState([undefined])
   const availableSpdxFilters = {
-    all: undefined,
-    spdx: 'License',
-    custom: 'LicenseCustom',
+    All: undefined,
+    SPDX: 'License',
+    Custom: 'LicenseCustom',
   }
 
   const handleStatusChange = (newStatus) => {
@@ -48,7 +48,6 @@ const LicenseFilter = ( {onFilter} ) => {
         key={key}
         value={value}
         fontSize={'sm'}
-        textTransform={'capitalize'}
       >
         {key}
       </MenuItemOption>
