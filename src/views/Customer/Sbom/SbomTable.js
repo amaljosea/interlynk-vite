@@ -31,7 +31,7 @@ const SbomTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
   const tabIndexToName = { 0: 'General', 1: 'Parts', 2: 'Components', 3: 'Vulnerabilities', 4: 'Licenses', 5: 'Support', 6: 'Relationships', 7: 'Checks', 8: 'Change Log' }
 
   // GET LICENSES DATA
-  const [getLicensesData, { data: licensesData }] = useLazyQuery(GetShareLicensesTable, {fetchPolicy: 'network-only'})
+  const [getLicensesData, { data: licensesData, refetch: licenseRefetch }] = useLazyQuery(GetShareLicensesTable, {fetchPolicy: 'network-only'})
 
   const shouldFetchData = (tabName) => {
     const lastFetch = lastFetchTime[tabName]
@@ -172,7 +172,7 @@ const SbomTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
           </TabPanel>
           {/* LICENSES TABLE */}
           <TabPanel px={0}>
-            <SbomLicenseTable data={licensesData?.shareLynkQuery?.sbom?.componentLicenses} />
+            <SbomLicenseTable data={licensesData?.shareLynkQuery?.sbom?.componentLicenses} refetch={licenseRefetch} />
           </TabPanel>
           {/* SUPPORT TABLE */}
           <TabPanel px={0}></TabPanel>
