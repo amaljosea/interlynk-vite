@@ -436,7 +436,7 @@ const CheckModal = ({
             {(shortDesc === 'Component has license/s specified' ||
               shortDesc === 'Componet has deprecated license/s' ||
               shortDesc === 'Component has restrictive licenses specified') && (
-              <LicenseField isValid={isValid} setIsValid={setIsValid} />
+              <LicenseField sbomView={false} isValid={isValid} setIsValid={setIsValid} />
             )}
           </ModalBody>
 

@@ -139,7 +139,8 @@ const GlobalStateProvider = ({ children }) => {
     selectedVulns: [],
     importSbom: [],
     mergeData: [],
-    currentSbom: []
+    currentSbom: [],
+    licenseString: []
   })
   const [prodCheckState, prodCheckDispatch] = useReducer(prodCheckReducer, {
     field: 'CHECK_RESULTS_UPDATED_AT',
@@ -160,7 +161,8 @@ const GlobalStateProvider = ({ children }) => {
     spdxList: [],
     customLicenses: [],
     customList: [],
-    expLicense: ''
+    expLicense: '',
+    licenseString: []
   })
   const [sbomLogState, sbomLogDispatch] = useReducer(sbomLogReducer, {
     field: 'ACTIVITY_LOGS_CREATED_AT',

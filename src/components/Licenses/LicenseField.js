@@ -18,10 +18,21 @@ import { useLazyQuery } from '@apollo/client'
 import { useGlobalState } from 'hooks/useGlobalState'
 import InfoModal from '../InfoModal'
 
-const LicenseField = ({ isValid, setIsValid, isDisabled }) => {
-  const { prodCompState, activeSbomTab, dispatch } = useGlobalState()
-  const { licenseString } = prodCompState
-  const { prodCompDispatch } = dispatch
+const LicenseField = ({ isValid, setIsValid, isDisabled, sbomView }) => {
+
+  useEffect(() => {
+    dispatcher({ type: 'SET_LICENSE_FIELD', payload: [] }) // clear license field
+  }, [])
+
+
+  const { prodCompState, activeSbomTab, dispatch, sbomState } = useGlobalState()
+
+  const { prodCompDispatch, sbomDispatch } = dispatch
+
+  const licenseString = sbomView ? sbomState.licenseString : prodCompState.licenseString
+
+  const dispatcher = sbomView ? sbomDispatch : prodCompDispatch
+
 
   const [licenseList, setLicenseList] = useState([])
   const [licenseType, setLicenseType] = useState('')
@@ -34,22 +45,18 @@ const LicenseField = ({ isValid, setIsValid, isDisabled }) => {
 
   const { isOpen: isInfoOpen, onOpen: onInfoOpen, onClose: onInfoClose } = useDisclosure()
 
-  useEffect(() => {
-    prodCompDispatch({ type: 'SET_LICENSE_FIELD', payload: [] }) // clear license field
-  }, [])
-
   const onLicenseChange = (selected) => {
 
     selected = [selected[selected.length - 1]] // only allow one license to be selected
 
-    prodCompDispatch({ type: 'SET_LICENSE_FIELD', payload: selected })
+    dispatcher({ type: 'SET_LICENSE_FIELD', payload: selected })
 
     setLicenseType(selected[0]?.type)
   }
 
   const handleInputChange = (value) => {
     if (value !== '') {
-      prodCompDispatch({ type: 'SET_LICENSE_FIELD', payload: [] }) // clear license field
+      dispatcher({ type: 'SET_LICENSE_FIELD', payload: [] }) // clear license field
 
       getLicense({
         variables: {

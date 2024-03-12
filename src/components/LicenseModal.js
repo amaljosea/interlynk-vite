@@ -14,9 +14,9 @@ import {
 import { useMutation } from '@apollo/client'
 import { sbomUpdate, CreateAutomation, recheckHealth } from 'graphQL/Mutation'
 import { useLocation } from 'react-router-dom'
-import SbomLicenseField from './SbomLicenseField'
 import { useGlobalState } from 'hooks/useGlobalState'
-import { useState } from 'react'
+import {useEffect, useState} from 'react'
+import LicenseField from "./Licenses/LicenseField";
 
 const LicenseModal = ({
   data,
@@ -37,10 +37,7 @@ const LicenseModal = ({
 
   const [isValid, setIsValid] = useState(true)
 
-  const isInvalidLicense =
-    (licenseType === 'license_spdx' && spdxLicenses.length === 0) ||
-    (licenseType === 'license_exp' && expLicense === '') ||
-    (licenseType === 'license_custom' && customLicenses.length === 0)
+  const isInvalidLicense = (expLicense === '')
 
   const handleRefetch = () => {
     refetch({
@@ -78,13 +75,8 @@ const LicenseModal = ({
           id: data.id,
           spec: data.spec,
           licenses: {
-            licensesExp:
-              licenseType === 'license_exp'
-                ? expLicense
-                  ? expLicense
-                  : ''
-                : undefined
-          }
+            licensesExp: expLicense || '',
+          },
         }
       })
         .then((res) => {
@@ -118,14 +110,7 @@ const LicenseModal = ({
           enabled: true,
           set: JSON.stringify(
             {
-              value:
-                licenseType === 'license_spdx'
-                  ? spdxLicenses
-                  : licenseType === 'license_exp'
-                    ? expLicense
-                    : licenseType === 'license_custom'
-                      ? customLicenses
-                      : ''
+              value: expLicense || '',
             },
             null,
             2
@@ -144,7 +129,7 @@ const LicenseModal = ({
         <ModalHeader>Add License</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <SbomLicenseField isValid={isValid} setIsValid={setIsValid} />
+          <LicenseField sbomView={true} isValid={isValid} setIsValid={setIsValid} />
         </ModalBody>
         <ModalFooter>
           <Flex
