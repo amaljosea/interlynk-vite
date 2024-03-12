@@ -20,6 +20,7 @@ const PersonalInfo = ({ user, refetch }) => {
   const [error, setError] = useState('')
   const [oldPassword, setOldPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
 
   useEffect(() => {
     if (user) {
@@ -114,6 +115,11 @@ const PersonalInfo = ({ user, refetch }) => {
               <FormControl>
                 <FormLabel>New Password</FormLabel>
                 <Input type='password' value={newPassword} onChange={(e) => setNewPassword(e.target.value)}/>
+              </FormControl>
+               {/* CONFIRM PASSWORD */}
+               <FormControl>
+                <FormLabel>Confirm Password</FormLabel>
+                <Input type='password' value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}/>
               </FormControl>
               {/* ACTION */}
               <Button variant='solid' colorScheme='blue'>Change Password</Button>
