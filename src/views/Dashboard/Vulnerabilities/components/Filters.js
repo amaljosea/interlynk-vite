@@ -1,11 +1,4 @@
-import {
-  Box,
-  Menu,
-  MenuItemOption,
-  MenuList,
-  MenuOptionGroup,
-  Stack
-} from '@chakra-ui/react'
+import { Box, Menu, MenuItemOption, MenuList, MenuOptionGroup, Stack } from '@chakra-ui/react'
 import MenuHeading from 'components/Misc/MenuHeading'
 import CheckMark from 'components/Misc/CheckMark'
 import { useLocation, useParams } from 'react-router-dom'
@@ -49,8 +42,7 @@ const Filters = ({ data, refetch }) => {
       search: searchInput !== '' ? searchInput : undefined,
       versions: versions?.length === 0 ? undefined : versions,
       statuses: statuses?.length === 0 ? undefined : statuses,
-      projectNames:
-        value.includes('all') || value.length === 0 ? undefined : value
+      projectNames: value.includes('all') || value.length === 0 ? undefined : value
     }).then(() => compVulnDispatch({ type: 'FILTER_ENV', payload: value }))
   }
 
@@ -74,34 +66,11 @@ const Filters = ({ data, refetch }) => {
         <Menu closeOnSelect={false}>
           {products.length !== 0 && !products.includes('all') && <CheckMark />}
           <MenuHeading title={'Product'} />
-          <MenuList
-            minHeight={'auto'}
-            maxHeight={'300px'}
-            overflow={'hidden'}
-            overflowY={'scroll'}
-          >
-            <MenuOptionGroup
-              type='checkbox'
-              value={products}
-              onChange={(value) =>
-                setProducts(value.includes('all') ? [] : value)
-              }
-            >
-              {[
-                'all',
-                'amqp-client',
-                'commons-text',
-                'guava',
-                'h2',
-                'http2-hpack',
-                'http2-server'
-              ].map((item, index) => (
-                <MenuItemOption
-                  key={index}
-                  value={item}
-                  fontSize={'sm'}
-                  textTransform={'capitalize'}
-                >
+          <MenuList minHeight={'auto'} maxHeight={'300px'} overflow={'hidden'} overflowY={'scroll'}>
+            <MenuOptionGroup type='checkbox' value={products} onChange={(value) => console.log(value)}>
+              {[ 'all', 'amqp-client', 'commons-text', 'guava', 'h2', 'http2-hpack', 'http2-server']
+              .map((item, index) => (
+                <MenuItemOption key={index} value={item} fontSize={'sm'} textTransform={'capitalize'}>
                   {item}
                 </MenuItemOption>
               ))}
@@ -114,26 +83,12 @@ const Filters = ({ data, refetch }) => {
         <Menu closeOnSelect={false}>
           {versions.length !== 0 && !versions.includes('all') && <CheckMark />}
           <MenuHeading title={'Versions'} />
-          <MenuList
-            minHeight={'auto'}
-            maxHeight={'300px'}
-            overflow={'hidden'}
-            overflowY={'scroll'}
-          >
-            <MenuOptionGroup
-              type='checkbox'
-              value={versions}
-              onChange={onFilterVesion}
-            >
-              <MenuItemOption value={'all'} fontSize={'sm'}>
-                All
-              </MenuItemOption>
-              {data?.sbomVersions?.length > 0 &&
-                data?.sbomVersions.map((item, index) => (
-                  <MenuItemOption key={index} value={item} fontSize={'sm'}>
-                    {item || 'Unversioned'}
-                  </MenuItemOption>
-                ))}
+          <MenuList minHeight={'auto'} maxHeight={'300px'} overflow={'hidden'} overflowY={'scroll'}>
+            <MenuOptionGroup type='checkbox' value={versions} onChange={onFilterVesion}>
+              <MenuItemOption value={'all'} fontSize={'sm'}>All</MenuItemOption>
+              {data?.sbomVersions?.length > 0 && data?.sbomVersions.map((item, index) => (
+                <MenuItemOption key={index} value={item} fontSize={'sm'}>{item || 'Unversioned'}</MenuItemOption>
+              ))}
             </MenuOptionGroup>
           </MenuList>
         </Menu>
@@ -143,43 +98,18 @@ const Filters = ({ data, refetch }) => {
         <Menu closeOnSelect={false}>
           {envs.length !== 0 && !envs.includes('all') && <CheckMark />}
           <MenuHeading title={'Environment'} />
-          <MenuList
-            minHeight={'auto'}
-            maxHeight={'300px'}
-            overflow={'hidden'}
-            overflowY={'scroll'}
-          >
-            <MenuOptionGroup
-              type='checkbox'
-              value={envs}
-              onChange={onFilterEnv}
-            >
-              <MenuItemOption
-                value={'all'}
-                fontSize={'sm'}
-                textTransform={'capitalize'}
-              >
-                all
-              </MenuItemOption>
+          <MenuList minHeight={'auto'} maxHeight={'300px'} overflow={'hidden'} overflowY={'scroll'}>
+            <MenuOptionGroup type='checkbox' value={envs} onChange={onFilterEnv}>
+              <MenuItemOption value={'all'} fontSize={'sm'} textTransform={'capitalize'}>all</MenuItemOption>
               {params?.name
                 ? envList.map((item, index) => (
-                    <MenuItemOption
-                      key={index}
-                      value={item.name}
-                      fontSize={'sm'}
-                      textTransform={'capitalize'}
-                    >
+                    <MenuItemOption key={index} value={item.name} fontSize={'sm'} textTransform={'capitalize'}>
                       {item.name}
                     </MenuItemOption>
                   ))
                 : ['default', 'development', 'production', 'others'].map(
                     (item, index) => (
-                      <MenuItemOption
-                        key={index}
-                        value={item}
-                        fontSize={'sm'}
-                        textTransform={'capitalize'}
-                      >
+                      <MenuItemOption key={index} value={item} fontSize={'sm'} textTransform={'capitalize'}>
                         {item}
                       </MenuItemOption>
                     )
@@ -189,36 +119,15 @@ const Filters = ({ data, refetch }) => {
         </Menu>
       </Box>
       {/* STATUSES */}
-      <Box width={'fit-content'} position={'relative'}>
+      <Box width={'fit-content'} position={'relative'} hidden>
         <Menu closeOnSelect={false}>
           {statuses.length !== 0 && !statuses.includes('all') && <CheckMark />}
           <MenuHeading title={'Status'} />
-          <MenuList
-            minHeight={'auto'}
-            maxHeight={'300px'}
-            overflow={'hidden'}
-            overflowY={'scroll'}
-          >
-            <MenuOptionGroup
-              type='checkbox'
-              value={statuses}
-              onChange={onFilterStatus}
-            >
-              {[
-                'all',
-                'Unspecified',
-                'In Triage',
-                'Not Affected',
-                'False Positive',
-                'Affected',
-                'Fixed'
-              ].map((item, index) => (
-                <MenuItemOption
-                  key={index}
-                  value={item}
-                  fontSize={'sm'}
-                  textTransform={'capitalize'}
-                >
+          <MenuList minHeight={'auto'} maxHeight={'300px'} overflow={'hidden'} overflowY={'scroll'}>
+            <MenuOptionGroup type='checkbox' value={statuses} onChange={onFilterStatus}>
+              {['all','Unspecified','In Triage','Not Affected','False Positive','Affected','Fixed']
+              .map((item, index) => (
+                <MenuItemOption key={index} value={item} fontSize={'sm'} textTransform={'capitalize'}>
                   {item}
                 </MenuItemOption>
               ))}
