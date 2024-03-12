@@ -39,7 +39,7 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
   })()
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
-  const filterData = data?.length > 0 && data?.filter((item) => item?.part?.id !== currentSbom?.id)
+  const filterData = data?.length > 0 && data?.filter((item) => item?.part?.id !== currentSbom?.id && item?.part?.id !== subProduct?.sbomId && item?.part?.id !== subProduct?.childOne?.sbomId && item?.part?.id !== subProduct?.childTwo?.sbomId && item?.part?.id !== subProduct?.childThree?.sbomId && item?.part?.id !== subProduct?.childFour?.sbomId)
   
   const { setActiveProdTab, totalRows, prodState, prodCompState, prodVulnState, userPermissions, dispatch } = useGlobalState()
   const { enabled, field, direction } = prodState
