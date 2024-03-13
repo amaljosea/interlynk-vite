@@ -308,17 +308,9 @@ const PartsTable = ({ data, refetch, getVulnData, getCompData }) => {
           <>
             {part.suppliers.length > 0 &&
               part.suppliers.map((item, index) => (
-                <Tooltip
-                  label={`${item.name} ${
-                    item.contactEmail && `- ${item.contactEmail}`
-                  }`}
-                  placement='top'
-                >
+                <Tooltip label={`${item.contactName} ${item.contactEmail && `- ${item.contactEmail}`}`} placement='top'>
                   <Tag size={'md'} key={index} fontSize={14} variant='subtle' colorScheme='orange'>
-                    <TagLabel>
-                      {item.name}
-                      {item.contactEmail && ` - ${item.contactEmail}`}
-                    </TagLabel>
+                    <TagLabel>{item.contactName || ''}{item.contactEmail && ` - ${item.contactEmail}`}</TagLabel>
                   </Tag>
                 </Tooltip>
               ))}
