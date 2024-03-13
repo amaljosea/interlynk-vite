@@ -3363,6 +3363,22 @@ export const GetSbomParts = gql`
   }
 `
 
+// CHECK EXISTING SBOM PARTS
+export const CheckDeepParts = gql`
+  query CheckDeepParts($projectId: Uuid!, $sbomId: Uuid!) {
+    sbom(sbomId: $sbomId, projectId: $projectId) {
+      deepParts {
+        id
+        project {
+          projectGroup {
+            name
+          }
+        }
+      }
+    }
+  }
+`
+
 // GET ALL FIRST DEGREE PART VULNS
 export const FirstDegreePartVulns = gql`
   query FirstDegreePartVulns($sbomIds: [Uuid!]!, $componentVulnIds: [Uuid!]!) {
