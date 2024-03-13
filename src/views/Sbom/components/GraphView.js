@@ -7,6 +7,7 @@ import { useQuery } from '@apollo/client'
 import Tree from 'react-d3-tree'
 import CardHeader from 'components/Card/CardHeader'
 import { BiZoomIn, BiZoomOut } from 'react-icons/bi'
+import { GetShareCompDependency } from 'graphQL/Queries'
 
 const containerStyles = { width: '100vw', height: '60vh' }
 
@@ -51,6 +52,7 @@ const GraphView = ({ data, activeComp }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const sbomId = queryParams.get('sbom')
+  const signedUrlParams = sessionStorage.getItem('signedUrlParams')
 
   const [treeView, setTreeView] = useState(null)
   const [zoom, setZoom] = useState(Number(1))
@@ -66,11 +68,11 @@ const GraphView = ({ data, activeComp }) => {
   }
   const separation = { siblings: 1.5, nonSiblings: 2 }
 
-  const { data: compDependency } = useQuery(GetCompDependency, {
+  const { data: compDependency } = useQuery(signedUrlParams ? GetShareCompDependency : GetCompDependency, {
     skip: data?.nodes?.length > 0 ? false : true,
     variables: {
       compId: activeComp?.id || data?.nodes[0]?.id,
-      sbomId: sbomId
+      sbomId: signedUrlParams ? undefined : sbomId
     }
   })
 
@@ -80,26 +82,31 @@ const GraphView = ({ data, activeComp }) => {
   useEffect(() => {
     if (compDependency) {
       // console.log('compDependency', compDependency)
-      const dependencyOfNodes = compDependency?.component?.dependencyOf?.map(
-        (relation) => ({
-          name: relation.fromComp.name,
-          attributes: { version: relation.fromComp.version }
-        })
-      )
-      const dependsOnNodes = compDependency?.component?.dependsOn?.map(
-        (relation) => ({
-          name: relation.toComp.name,
-          attributes: { version: relation.toComp.version }
-        })
-      )
-      const data = {
-        name:
-          compDependency?.component?.name ||
-          compDependency?.component?.version ||
-          '----',
-        children: dependsOnNodes
+      if(signedUrlParams) {
+        const dependsOnNodes = compDependency?.shareLynkQuery?.component?.dependsOn?.map(
+          (relation) => ({
+            name: relation.toComp.name,
+            attributes: { version: relation.toComp.version }
+          })
+        )
+        const data = {
+          name:  compDependency?.shareLynkQuery?.component?.name || compDependency?.shareLynkQuery?.component?.version || '----',
+          children: dependsOnNodes
+        }
+        setTreeView(data)
+      } else {
+        const dependsOnNodes = compDependency?.component?.dependsOn?.map(
+          (relation) => ({
+            name: relation.toComp.name,
+            attributes: { version: relation.toComp.version }
+          })
+        )
+        const data = {
+          name: compDependency?.component?.name || compDependency?.component?.version || '----',
+          children: dependsOnNodes
+        }
+        setTreeView(data)
       }
-      setTreeView(data)
     }
   }, [compDependency])
 

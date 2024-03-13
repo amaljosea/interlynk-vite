@@ -10,6 +10,8 @@ import { FaLock } from 'react-icons/fa6'
 import { GetShareLicensesTable } from 'graphQL/Queries'
 import { useLazyQuery } from '@apollo/client'
 import SbomLicenseTable from 'components/Licenses/SbomLicenseTable'
+import { GetSharPrimartComp } from 'graphQL/Queries'
+import GraphView from 'views/Sbom/components/GraphView'
 
 const SbomTable = ({ status, type, data, refetch, filteredData, vulnData, getVulnData, getCompData, compData, error
 }) => {
@@ -23,12 +25,17 @@ const SbomTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
   const { activeCsSbomTab, setActiveCsSbomTab, totalRows, prodCompState, prodVulnState, dispatch } = useGlobalState()
   const { prodCompDispatch, prodVulnDispatch } = dispatch
 
+  const [activeComp, setActiveComp] = useState(null)
+
   // How often each tab should refetch the data (in minutes)
   const fetchIntervalMinutes = { 'General': 0, 'Parts': 0, 'Components': 0, 'Vulnerabilities': 0.5, 'Licenses': 0, 'Support': 0, 'Relationships': 0, 'Checks': 0, 'Change Log': 0 }
 
   const [lastFetchTime, setLastFetchTime] = useState({ 'General': null, 'Parts': null, 'Components': null, 'Vulnerabilities': null, 'Licenses': null, 'Support': null, 'Relationships': null, 'Checks': null, 'Change Log': null })
 
   const tabIndexToName = { 0: 'General', 1: 'Parts', 2: 'Components', 3: 'Vulnerabilities', 4: 'Licenses', 5: 'Support', 6: 'Relationships', 7: 'Checks', 8: 'Change Log' }
+
+  // GET PRIMARY COMPONENT
+  const [getPrimaryComp, { data: primaryComp }] = useLazyQuery(GetSharPrimartComp, { fetchPolicy: 'network-only'})
 
   // GET LICENSES DATA
   const [getLicensesData, { data: licensesData, refetch: licenseRefetch }] = useLazyQuery(GetShareLicensesTable, {fetchPolicy: 'network-only'})
@@ -111,6 +118,14 @@ const SbomTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
           updateLastFetchTime(tabName)
         }
       })
+    } else if (tabName === 'Relationships' && shouldFetchData(tabName)) {
+      const { field, direction } = prodCompState
+      getPrimaryComp({ variables: { sbomId: sbomId, primary: true, field, direction } })
+      .then((res) => {
+        if (res?.data) {
+          updateLastFetchTime(tabName)
+        }
+      })
     }
   }
 
@@ -125,8 +140,8 @@ const SbomTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
         {/* TAB LIST */}
         <TabList mt='20px'>
           {Object.values(tabIndexToName).map((item, index) => (
-            <Tab key={index} _focus={{ outline: 'none' }} isDisabled={item === 'Parts' || item === 'Checks' || item === 'Change Log' || item === 'Support' || item === 'Relationships'}>
-              {(item === 'Parts' || item === 'Checks' || item === 'Change Log' || item === 'Support' || item === 'Relationships') && (
+            <Tab key={index} _focus={{ outline: 'none' }} isDisabled={item === 'Parts' || item === 'Checks' || item === 'Change Log' || item === 'Support'}>
+              {(item === 'Parts' || item === 'Checks' || item === 'Change Log' || item === 'Support') && (
                 <FaLock color='darkgray' style={{ marginRight: '6px' }} />
               )}
               {item}
@@ -154,7 +169,7 @@ const SbomTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
           {/* COMPONENT TABLE */}
           <TabPanel px={0}>
             {data && (
-              <ComponentTable type={type} lifecycle={data.lifecycle} data={compData?.sbom?.components} refetch={getCompData} sbomRefetch={refetch} primaryComp={data.primaryComponent} />
+              <ComponentTable type={type} lifecycle={data.lifecycle} data={compData?.sbom?.components} refetch={getCompData} sbomRefetch={refetch} setActiveComp={setActiveComp} primaryComp={data.primaryComponent} />
             )}
             {error && (
               <Flex py={10} flexDirection={'column'} gap={2} width={'70%'} mx={'auto'} alignItems={'center'} justifyContent={'center'}>
@@ -177,7 +192,9 @@ const SbomTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
           {/* SUPPORT TABLE */}
           <TabPanel px={0}></TabPanel>
           {/* RELATIONSHIPS TABLE */}
-          <TabPanel px={0}></TabPanel>
+          <TabPanel px={0}>
+            <GraphView data={primaryComp?.shareLynkQuery?.sbom?.components} activeComp={activeComp} />
+          </TabPanel>
           {/* CHECKS TABLE */}
           <TabPanel px={1}></TabPanel>
           {/* CHANGE LOG TABLE */}

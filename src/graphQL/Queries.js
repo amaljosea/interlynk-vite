@@ -1777,6 +1777,31 @@ export const GetPrimaryComponent = gql`
   }
 `
 
+export const GetSharPrimartComp = gql`
+  query ShareComponentData(
+    $sbomId: Uuid!
+    $primary: Boolean
+    $field: ComponentOrderByFields!
+    $direction: OrderByDirection!
+  ) {
+    shareLynkQuery {
+      sbom(id: $sbomId) {
+        id
+        components(
+          sbomId: $sbomId
+          primary: $primary
+          orderBy: { field: $field, direction: $direction }
+        ) {
+          totalCount
+          nodes {
+            id
+          }
+        }
+      }
+    }
+  }
+`
+
 export const ShareComponentData = gql`
   query ShareComponentData(
     $sbomId: Uuid!
@@ -1848,6 +1873,30 @@ export const ShareComponentData = gql`
               contactEmail
               contactName
             }
+            dependencyOf {
+              id
+              relType
+              fromId
+              toId
+              fromComp {
+                id
+                name
+                version
+              }
+              updatedAt
+            }
+            dependsOn {
+              id
+              relType
+              fromId
+              toId
+              toComp {
+                id
+                name
+                version
+              }
+              updatedAt
+            }
           }
         }
       }
@@ -1885,6 +1934,43 @@ export const GetCompDependency = gql`
           version
         }
         updatedAt
+      }
+    }
+  }
+`
+
+// GET SHARED COMPONENT DEPENDENCY
+export const GetShareCompDependency = gql`
+  query GetShareCompDependency($compId: Uuid!) {
+    shareLynkQuery {
+      component(id: $compId) {
+        id
+        name
+        version
+        dependencyOf {
+          id
+          relType
+          fromId
+          toId
+          fromComp {
+            id
+            name
+            version
+          }
+          updatedAt
+        }
+        dependsOn {
+          id
+          relType
+          fromId
+          toId
+          toComp {
+            id
+            name
+            version
+          }
+          updatedAt
+        }
       }
     }
   }
@@ -3308,7 +3394,6 @@ export const LicenseAutoComplete = gql`
     }
   }
 `
-
 
 // GET CDX RESPONSE
 export const GetCdxResponses = gql`
