@@ -1,18 +1,18 @@
-import { Flex, IconButton, Stack, Text, Tooltip } from '@chakra-ui/react'
+import { Checkbox, Flex, IconButton, Stack, Switch, Text, Tooltip } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
 import DataTable from 'react-data-table-component'
 import { useMemo, useState, useEffect } from 'react'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
-import { customStyles } from 'utils'
+import { customStyles, timeSince, getFullDateAndTime } from 'utils'
 import { BiSolidWrench } from 'react-icons/bi'
 import { GoSkip } from 'react-icons/go'
 import { useGlobalState } from 'hooks/useGlobalState'
 import Pagination from 'components/Pagination'
 import { RepeatIcon } from '@chakra-ui/icons'
 
-const SupportTable = ({ sbomId, data, refetch }) => {
+const SupportTable = ({ projectId, sbomId, data, refetch }) => {
   const { totalRows, setTotalRows, supportState, dispatch } = useGlobalState()
-  const { pageIndex, searchInput, field, direction } = supportState
+  const { pageIndex, field, direction } = supportState
   const { supportDispatch } = dispatch
 
   const paginationSizes = [25, 50, 100]
@@ -31,14 +31,8 @@ const SupportTable = ({ sbomId, data, refetch }) => {
     disablePaginationControl()
     await refetch({
       variables: {
-        sbomId,
-        first: after ? totalRows : undefined,
-        after: after ? after : undefined,
-        last: before ? totalRows : undefined,
-        before: before ? before : undefined,
-        search: searchInput !== '' ? searchInput : undefined,
-        field,
-        direction
+        projectId: projectId || undefined,
+        sbomId: sbomId || undefined
       }
     }).then((res) => {
       if (res?.data) {
@@ -58,8 +52,8 @@ const SupportTable = ({ sbomId, data, refetch }) => {
     disablePaginationControl()
     await refetch({
       variables: {
-        ...supportData,
-        first: totalRows
+        projectId: projectId || undefined,
+        sbomId: sbomId || undefined
       }
     }).then(
       (res) => res?.data && supportDispatch({ type: 'CLEAR_SEARCH_INPUT' })
@@ -71,9 +65,8 @@ const SupportTable = ({ sbomId, data, refetch }) => {
     setFilterText('')
     await refetch({
       variables: {
-        ...supportData,
-        first: totalRows,
-        search: undefined
+        projectId: projectId || undefined,
+        sbomId: sbomId || undefined
       }
     }).then(
       (res) => res?.data && supportDispatch({ type: 'CLEAR_SEARCH_INPUT' })
@@ -96,9 +89,8 @@ const SupportTable = ({ sbomId, data, refetch }) => {
     if (event.key === 'Enter' && filterText !== '') {
       refetch({
         variables: {
-          ...supportData,
-          search: value,
-          first: totalRows
+          projectId: projectId || undefined,
+          sbomId: sbomId || undefined
         }
       }).then(
         (res) =>
@@ -111,10 +103,8 @@ const SupportTable = ({ sbomId, data, refetch }) => {
   const handleSort = async (column, sortDirection) => {
     await refetch({
       variables: {
-        sbomId,
-        first: totalRows,
-        field: column.id,
-        direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
+        projectId: projectId || undefined,
+        sbomId: sbomId || undefined
       }
     }).then((res) => {
       if (res.data) {
@@ -135,10 +125,8 @@ const SupportTable = ({ sbomId, data, refetch }) => {
     disablePaginationControl()
     await refetch({
       variables: {
-        sbomId,
-        first: Number(e.target.value),
-        field,
-        direction
+        projectId: projectId || undefined,
+        sbomId: sbomId || undefined
       }
     }).then((res) => {
       if (res.data) {
@@ -172,87 +160,90 @@ const SupportTable = ({ sbomId, data, refetch }) => {
   // SUB HEADER
   const subHeader = useMemo(() => {
     return (
-      <Flex
-        width={'100%'}
-        alignItems={'center'}
-        justifyContent={'space-between'}
-      >
+      <Flex width={'100%'} alignItems={'center'} justifyContent={'space-between'}>
         {/* SEARCH COMPONENTS */}
-        <SearchFilter
-          id='support'
-          filterText={filterText}
-          onChange={onSearchInputChange}
-          onClear={handleClear}
-          onFilter={handleSearch}
-        />
+        <SearchFilter id='support' filterText={filterText} onChange={onSearchInputChange} onClear={handleClear} onFilter={handleSearch} />
         <Tooltip label='Refresh'>
-          <IconButton
-            colorScheme='blue'
-            onClick={handleRefresh}
-            icon={<RepeatIcon />}
-          />
+          <IconButton colorScheme='blue' onClick={handleRefresh} icon={<RepeatIcon />} />
         </Tooltip>
       </Flex>
     )
-  }, [
-    filterText,
-    onSearchInputChange,
-    handleClear,
-    handleSearch,
-    handleRefresh
-  ])
+  }, [filterText, onSearchInputChange, handleClear, handleSearch, handleRefresh])
 
   // COLUMNS
   const columns = [
     {
+      id: 'ENABLED',
+      name: 'ACTIVE',
+      selector: (row) => {
+        const { enabled } = row
+        return <Switch size='md' defaultChecked={enabled} isReadOnly />
+      },
+      width: '150px',
+      sortable: true
+    },
+    {
       id: 'EOL_INFOS_NAME',
       name: 'COMPONENT',
-      selector: (row) => <Text my={4}>{row?.name}</Text>,
+      selector: (row) => <Text my={4}>{row?.productName}</Text>,
       wrap: true,
-      width: '350px',
-      sortable: true
+      width: '350px'
     },
     {
       id: 'EOL_INFOS_VERSION',
       name: 'VERSION',
-      selector: (row) => row?.version,
+      selector: (row) => row?.productVersion,
       width: '200px',
-      wrap: true,
-      sortable: true
+      wrap: true
     },
     {
-      id: 'EOL_INFOS_LTS',
-      name: 'LTS',
-      selector: (row) => (row?.lts ? 'True' : 'False'),
-      width: '200px',
-      wrap: true,
-      sortable: true
+      id: 'DEPRECATED',
+      name: 'DEPRECATED',
+      selector: (row) => <Checkbox defaultChecked={row?.deprecated} />,
+      wrap: true
+    },
+    {
+      id: 'OUTDATED',
+      name: 'OUTDATED',
+      selector: (row) => <Checkbox defaultChecked={row?.outdated} />,
+      wrap: true
     },
     {
       id: 'EOL_INFOS_EOL_DATE',
       name: 'END-OF-LIFE',
-      selector: (row) => row?.eolDate || '',
+      selector: (row) => row?.eol || '',
       width: '250px',
       wrap: true,
       sortable: true,
       sortFunction: (a, b) => {
-        const dateA = new Date(a.eolDate)
-        const dateB = new Date(b.eolDate)
+        const dateA = new Date(a.eol)
+        const dateB = new Date(b.eol)
         return dateA - dateB
       }
     },
     {
       id: 'EOL_INFOS_EOL_SUPPORT',
       name: 'END-OF-SERVICE',
-      selector: (row) => row?.eolSupport || '',
+      selector: (row) => row?.eos || '',
       width: '250px',
       wrap: true,
       sortable: true,
       sortFunction: (a, b) => {
-        const dateA = new Date(a.eolSupport)
-        const dateB = new Date(b.eolSupport)
+        const dateA = new Date(a.eos)
+        const dateB = new Date(b.eos)
         return dateA - dateB
       }
+    },
+    // UPDATED AT
+    {
+      id: 'UPDATED_AT',
+      name: 'UPDATED',
+      selector: (row) => (
+        <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>{timeSince(row.updatedAt)}</Tooltip>
+      ),
+      width: '160px',
+      right: 'true',
+      wrap: true
     },
     {
       id: 'ACTION',
@@ -270,7 +261,8 @@ const SupportTable = ({ sbomId, data, refetch }) => {
           </Stack>
         )
       },
-      right: 'true'
+      right: 'true',
+      omit: true
     }
   ]
 

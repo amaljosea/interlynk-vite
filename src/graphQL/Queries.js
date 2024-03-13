@@ -3676,41 +3676,72 @@ export const GetProductsForSbomDrift = gql`
     }
   }
 `
-// GET COMPONENT SUPPORT INFO
-export const ComponentSupportInfos = gql`
-  query ComponentSupportInfos(
-    $sbomId: Uuid
-    $first: Int
-    $last: Int
-    $after: String
-    $before: String
-    $field: SupportEolInfoOrderByFields!
-    $direction: OrderByDirection!
-    $search: String
-  ) {
-    componentSupportInfos(
-      sbomId: $sbomId
-      search: $search
-      orderBy: { field: $field, direction: $direction }
-      first: $first
-      last: $last
-      after: $after
-      before: $before
-    ) {
-      totalCount
-      pageInfo {
-        endCursor
-        hasNextPage
-        hasPreviousPage
-        startCursor
+
+// GET SBOM SUPPORT INFO
+export const GetSbomSupportTab = gql`
+  query GetSbomSupportTab($projectId: Uuid!, $sbomId: Uuid!) {
+    sbom(projectId: $projectId, sbomId: $sbomId) {
+      supports {
+        nodes {
+          ... on ComponentSupport {
+            id
+            productName
+            productVersion
+            idUri
+            deprecated
+            outdated
+            eos
+            eol
+            createdAt
+            updatedAt
+          }
+          ... on ComponentSupportOverride {
+            id
+            enabled
+            productName
+            productVersion
+            idUri
+            deprecated
+            outdated
+            eos
+            eol
+            createdAt
+            updatedAt
+          }
+        }
       }
+    }
+  }
+`
+
+// GET SUPPORT INFO
+export const GetSupportTab = gql`
+  query GetSupportTab {
+    supports {
       nodes {
-        lts
-        eolDate
-        eolSupport
-        cpes
-        name
-        version
+        ... on ComponentSupport {
+          id
+          productName
+          productVersion
+          deprecated
+          outdated
+          eol
+          eos
+          createdAt
+          updatedAt
+        }
+        ... on ComponentSupportOverride {
+          id
+          productName
+          productVersion
+          enabled
+          deprecated
+          outdated
+          eol
+          eos
+          createdAt
+          updatedAt
+        }
       }
     }
   }

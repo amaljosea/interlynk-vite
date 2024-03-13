@@ -8,13 +8,13 @@ import HealthCheckTable from 'components/Tables/HealthCheckTable'
 import SbomChangelogTable from 'components/Tables/SbomChangelogTable'
 import PartsTable from 'components/Tables/PartsTable'
 import { useLazyQuery } from '@apollo/client'
-import { GetCheckResults, GetChangeLogs, GetSbomParts, GetSbomLicensesTable, GetPrimaryComponent, ComponentSupportInfos } from 'graphQL/Queries'
 import { useLocation } from 'react-router-dom'
 import { useGlobalState } from 'hooks/useGlobalState'
 import SupportTable from 'components/Tables/SupportTable'
 import SbomLicenseTable from '../../../components/Licenses/SbomLicenseTable'
 import GraphView from './GraphView'
 import { parseJSONSafely } from 'utils'
+import { GetSbomSupportTab, GetSbomParts, GetCheckResults, GetChangeLogs, GetPrimaryComponent, GetSbomLicensesTable  } from 'graphQL/Queries'
 
 const SBOMTable = ({ status, type, data, refetch, filteredData, vulnData, getVulnData, getCompData, compData, error
 }) => {
@@ -69,7 +69,7 @@ const SBOMTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
   const [getPrimaryComp, { data: primaryComp }] = useLazyQuery(GetPrimaryComponent, { fetchPolicy: 'network-only'})
 
   // GET COMPONENT SUPPORT INFO
-  const [getSupportInfos, { data: support }] = useLazyQuery(ComponentSupportInfos, { fetchPolicy: 'network-only'})
+  const [getSupportInfos, { data: support }] = useLazyQuery(GetSbomSupportTab, { fetchPolicy: 'network-only'})
 
   // GET LICENSES DATA
   const [getLicensesData, { data: licensesData, refetch: licensesRefetch }] = useLazyQuery(GetSbomLicensesTable, {fetchPolicy: 'network-only'})
@@ -137,8 +137,7 @@ const SBOMTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
         }
       })
     } else if (tabName === 'Support' && shouldFetchData(tabName)) {
-      const {searchInput, field, direction} = supportState
-      getSupportInfos({ variables: { sbomId, field, direction, first: totalRows,  search: searchInput !== '' ? searchInput : undefined } })
+      getSupportInfos({ variables: { projectId: productId, sbomId } })
       .then((res) => {
         if (res?.data) {
           updateLastFetchTime(tabName)
@@ -232,7 +231,7 @@ const SBOMTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
             </TabPanel>
             {/* SUPPORT TABLE */}
             <TabPanel px={0}>
-              <SupportTable data={support?.componentSupportInfos} refetch={getSupportInfos} sbomId={sbomId} />
+              <SupportTable data={support?.sbom?.supports} refetch={getSupportInfos} sbomId={sbomId} projectId={productId} />
             </TabPanel>
             {/* RELATIONSHIP TABLE */}
             <TabPanel px={0}>
