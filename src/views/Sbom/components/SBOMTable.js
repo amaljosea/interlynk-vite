@@ -240,17 +240,7 @@ const SBOMTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
             {/* HEALTH CHECK TABLE */}
             <TabPanel px={0}>
               {data && (
-                <HealthCheckTable
-                  productId={productId}
-                  sbomId={sbomId}
-                  sbomData={data}
-                  data={checksData?.sbom?.checkResults}
-                  refetch={getChecksData}
-                  components={compData?.sbom?.components.nodes.map((item) => ({
-                    value: item.name,
-                    id: item.id
-                  }))}
-                />
+                <HealthCheckTable productId={productId} sbomId={sbomId} sbomData={data} data={checksData?.sbom?.checkResults} refetch={getChecksData} components={compData?.sbom?.components.nodes.map((item) => ({ value: item.name, id: item.id }))} />
               )}
             </TabPanel>
             {/* CHANGELOG TABLE */}

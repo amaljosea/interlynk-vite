@@ -8,14 +8,14 @@ import { useQuery } from '@apollo/client'
 import { GetProductData, GetProject, GetComponentData } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
 import SbomInfo from './components/SbomInfo'
+import { GetSbomParts } from 'graphQL/Queries'
 
-const idRegex =
-  /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
+const idRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
 
 function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
-  const { totalRows, envName, setActiveSbomTab, prodState, prodCompState } =
-    useGlobalState()
+  const { totalRows, setActiveSbomTab, prodState, prodCompState, dispatch } = useGlobalState()
   const { data: allProjectGroups } = prodState
+  const { prodVulnDispatch } = dispatch
   const location = useLocation()
   const navigate = useNavigate()
   const toast = useToast()
@@ -27,40 +27,24 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
   const [status, setStatus] = useState('created')
   const [totalComp, setTotalComp] = useState(0)
   const group = JSON.parse(localStorage.getItem('product'))
-  const environment = localStorage.getItem('environment')
 
   // GET COMPONENT DATA
-  const {
-    data: compData,
-    refetch: compRefetch,
-    error: compError
-  } = useQuery(GetComponentData, {
+  const { data: compData, refetch: compRefetch, error: compError } = useQuery(GetComponentData, {
     fetchPolicy: 'network-only',
-    variables: {
-      projectId: productId,
-      sbomId: sbomId,
-      first: totalRows,
-      field: prodCompState.field,
-      direction: prodCompState.direction
-    }
+    variables: { projectId: productId, sbomId: sbomId, first: totalRows, field: prodCompState.field, direction: prodCompState.direction }
   })
 
-  const {
-    data: sbomData,
-    refetch,
-    error
-  } = useQuery(GetProductData, {
-    variables: {
-      projectId: productId,
-      sbomId: sbomId
-    }
+  // GET SBOM PARTS
+  const {} = useQuery(GetSbomParts, { 
+    skip: sbomId ? false: true, 
+    fetchPolicy: 'network-only',
+    variables: { projectId: productId, sbomId: sbomId, first: totalRows },
+    onCompleted: (data) => data?.sbom?.sbomParts?.length > 0 && prodVulnDispatch({ type: 'FILTER_SOURCE', payload: true })
   })
 
-  const { data } = useQuery(GetProject, {
-    variables: {
-      id: productId
-    }
-  })
+  const { data: sbomData, refetch, error } = useQuery(GetProductData, { variables: { projectId: productId, sbomId: sbomId } })
+
+  const { data } = useQuery(GetProject, { variables: { id: productId } })
 
   const activeGroup = allProjectGroups?.nodes.find(
     (item) => item.id === group?.groupId
@@ -72,12 +56,7 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
 
   const uniqVersions = []
 
-  data?.project?.sboms?.length > 0 &&
-    data.project.sboms.map((project) => {
-      uniqVersions.push({
-        label: project?.projectVersion
-      })
-    })
+  data?.project?.sboms?.length > 0 && data.project.sboms.map((project) => uniqVersions.push({ label: project?.projectVersion }))
 
   const handleTabChange = (value) => {
     localStorage.setItem('activeSbomTab', value)
@@ -94,7 +73,6 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
   // KEYBOARD EVENT LISTNER FOR TOGGLE DOWNLOAD MODAL
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDownload)
-
     return () => {
       window.removeEventListener('keydown', handleKeyDownload)
     }
@@ -106,15 +84,9 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
     }
   }, [productId, sbomId])
 
-
   useEffect(() => {
     if (error) {
-      toast({
-        description: error.message,
-        status: 'error',
-        duration: 2000,
-        position: 'top'
-      })
+      toast({ description: error.message, status: 'error', duration: 2000, position: 'top' })
       navigate('/vendor/products')
     }
   }, [])
@@ -146,10 +118,7 @@ function SBOM({ vulnData, vulnRefetch, getVulnData, prodRefetch }) {
             getCompData={compRefetch}
             compData={compData}
             error={compError}
-            type={
-              selectedProject?.sboms.length > 0 &&
-              selectedProject.sboms[0].format
-            }
+            type={ selectedProject?.sboms.length > 0 && selectedProject.sboms[0].format }
           />
         </Stack>
       ) : (
