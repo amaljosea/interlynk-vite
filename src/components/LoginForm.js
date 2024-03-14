@@ -1,18 +1,5 @@
 // chakra imports
-import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
-  Box,
-  Button,
-  Flex,
-  FormControl,
-  FormLabel,
-  Input,
-  Stack,
-  Text,
-  useToast
-} from '@chakra-ui/react'
+import { Alert, AlertDescription, AlertIcon, Box, Button, Flex, FormControl, FormHelperText, FormLabel, Input, Stack, Text, useToast } from '@chakra-ui/react'
 // core components
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { UserResendConfirmationEmail } from 'graphQL/Mutation'
@@ -41,13 +28,9 @@ const LoginForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault()
     axios
-      .post(`${loginURL}`, {
-        user: {
-          email,
-          password
-        }
-      })
+      .post(`${loginURL}`, { user: { email, password } })
       .then((response) => {
+        console.log('response', response)
         const { status } = response.data
         if (status.code === 200) {
           localStorage.removeItem('product')
@@ -62,7 +45,7 @@ const LoginForm = () => {
         if (error.response) {
           const { status, data } = error.response
           if (status === 401) {
-            setError(data)
+            setError(data?.error)
           } else if (status === 404) {
             setError(`Internal routing error. Please try again`)
           } else {
@@ -82,26 +65,14 @@ const LoginForm = () => {
         setEmail('')
         setPassword('')
         setError('')
-        toast({
-          description: 'Invitation sent successfully',
-          status: 'success',
-          position: 'top',
-          duration: 3000
-        })
+        toast({ description: 'Invitation sent successfully', status: 'success', position: 'top', duration: 3000 })
       }
     })
   }
 
   return (
-    <Flex
-      mt={2}
-      direction={'column'}
-      alignItems={'center'}
-      justifyContent={'center'}
-    >
-      <Text fontSize={'lg'} textAlign={'center'}>
-        Welcome
-      </Text>
+    <Flex mt={2} direction={'column'} alignItems={'center'} justifyContent={'center'}>
+      <Text fontSize={'lg'} textAlign={'center'}>Welcome</Text>
       <Text fontSize={'sm'} textAlign={'center'} color={'#555'}>
         Log in to Interlynk to continue to the dashboard.
       </Text>
@@ -115,14 +86,7 @@ const LoginForm = () => {
                 'You have to confirm your email address before continuing.' && (
                 <p>
                   Lost invitation link ?{' '}
-                  <strong
-                    style={{
-                      cursor: 'pointer',
-                      fontWeight: 500,
-                      color: '#3182CE'
-                    }}
-                    onClick={onResendEmail}
-                  >
+                  <strong style={{ cursor: 'pointer', fontWeight: 500, color: '#3182CE' }} onClick={onResendEmail}>
                     Resend
                   </strong>
                 </p>
@@ -132,7 +96,7 @@ const LoginForm = () => {
         </Box>
       )}
       <form style={{ width: '100%' }} onSubmit={handleSubmit}>
-        <Stack py={'1rem'} direction={'column'} gap={3} width={'100%'} mt={4}>
+        <Stack py={'1rem'} direction={'column'} gap={4} width={'100%'} mt={4}>
           <FormControl>
             <FormLabel htmlFor='email'>Email address</FormLabel>
             <Input
@@ -158,21 +122,15 @@ const LoginForm = () => {
               }}
               placeholder='*******'
             />
+            <Link to={'/reset_password'}>
+              <FormHelperText _hover={{ color: 'blue.500' }}>Forgot password ?</FormHelperText>
+            </Link>
           </FormControl>
-          <Button width='full' colorScheme='blue' type='submit'>
-            Log in
-          </Button>
-          <Stack
-            alignItems={'center'}
-            justifyContent={'center'}
-            direction={'row'}
-            spacing={2}
-          >
+          <Button width='full' colorScheme='blue' type='submit'>Log in</Button>
+          <Stack alignItems={'center'} justifyContent={'center'} direction={'row'} spacing={2}>
             <Text fontSize={'sm'}>{`Don't have an account ?`}</Text>
             <Link to={'/register'}>
-              <Text fontSize='sm' color='blue.500' fontWeight={'medium'}>
-                Register
-              </Text>
+              <Text fontSize='sm' color='blue.500' fontWeight={'medium'}>Register</Text>
             </Link>
           </Stack>
         </Stack>

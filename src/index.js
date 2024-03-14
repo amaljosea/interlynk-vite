@@ -32,6 +32,7 @@ import PubProductList from 'views/Customer/Products/ProductList'
 import PubProductDetails from 'views/Customer/Products/ProductDetails'
 import Support from 'views/Dashboard/Support'
 import Tools from 'views/Dashboard/Tools'
+import Reset from 'layouts/Reset'
 
 
 const authToken = Cookies.get('authToken')
@@ -76,6 +77,7 @@ ReactDOM.render(
               element={authToken ? <Navigate replace to='/vendor/dashboard' /> : <Navigate replace to='/auth' />}
             />
             <Route path={`auth`} element={<AuthLayout />} />
+            <Route path={`reset_password`} element={<Reset />} />
             <Route path={`register`} element={<Register />} />
             <Route path={`accept-user-invitation`} element={<Success />} />
             <Route path={`confirmation`} element={<Success />} />
