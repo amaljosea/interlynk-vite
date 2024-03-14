@@ -1885,28 +1885,29 @@ export const CreateLicense = gql`
     $fsfLibre: Boolean
     $osiApproved: Boolean
   ) {
-  organizationLicenseCreate(input: {
-    name: $name,
-    state: $state,
-    attribution: $attribution
-    copyLeft: $copyLeft
-    sourceDistribution: $requiresSourceCode
-    modifications: $permitsModifications
-    text: $text
-    url: $url
-    comment: $comment
-    attributionKeys: $attributionKeys
-    warranty: $warranty
-    governingLaws: $governingLaws
-    deprecated: $deprecated
-    restrictive: $restrictive
-    fsfLibre: $fsfLibre
-    osiApproved: $osiApproved
-  })
-  {
-    errors
+    organizationLicenseCreate(
+      input: {
+        name: $name
+        state: $state
+        attribution: $attribution
+        copyLeft: $copyLeft
+        sourceDistribution: $requiresSourceCode
+        modifications: $permitsModifications
+        text: $text
+        url: $url
+        comment: $comment
+        attributionKeys: $attributionKeys
+        warranty: $warranty
+        governingLaws: $governingLaws
+        deprecated: $deprecated
+        restrictive: $restrictive
+        fsfLibre: $fsfLibre
+        osiApproved: $osiApproved
+      }
+    ) {
+      errors
+    }
   }
-}
 `
 
 export const UpdateLicense = gql`
@@ -1925,23 +1926,43 @@ export const UpdateLicense = gql`
     $fsfLibre: Boolean
     $osiApproved: Boolean
   ) {
-  organizationLicenseUpdate(input: {
-    id: $id
-    state: $state
-    attribution: $attribution
-    copyLeft: $copyLeft
-    sourceDistribution: $requiresSourceCode
-    modifications: $permitsModifications
-    attributionKeys: $attributionKeys
-    warranty: $warranty
-    governingLaws: $governingLaws
-    deprecated: $deprecated
-    restrictive: $restrictive
-    fsfLibre: $fsfLibre
-    osiApproved: $osiApproved
-  })
-  {
-    errors
+    organizationLicenseUpdate(
+      input: {
+        id: $id
+        state: $state
+        attribution: $attribution
+        copyLeft: $copyLeft
+        sourceDistribution: $requiresSourceCode
+        modifications: $permitsModifications
+        attributionKeys: $attributionKeys
+        warranty: $warranty
+        governingLaws: $governingLaws
+        deprecated: $deprecated
+        restrictive: $restrictive
+        fsfLibre: $fsfLibre
+        osiApproved: $osiApproved
+      }
+    ) {
+      errors
+    }
   }
-}
+`
+
+export const UpdateUserPassword = gql`
+  mutation UpdateUserPassword(
+    $currentPassword: String!
+    $newPassword: String!
+    $newPasswordConfirmation: String!
+  ) {
+    userUpdatePassword(
+      input: {
+        currentPassword: $currentPassword
+        newPassword: $newPassword
+        newPasswordConfirmation: $newPasswordConfirmation
+      }
+    ) {
+      errors
+      updatedToken
+    }
+  }
 `

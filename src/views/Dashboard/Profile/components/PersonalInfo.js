@@ -1,16 +1,21 @@
 import { useMutation } from '@apollo/client'
-import { Text, FormControl, FormLabel, Flex, Input, Button, useToast, Box, FormErrorMessage, FormHelperText, Grid, GridItem } from '@chakra-ui/react'
+import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
+import { Text, FormControl, FormLabel, Flex, Input, Button, useToast, Box, FormErrorMessage, FormHelperText, Grid, GridItem, InputRightElement, IconButton, InputGroup, Alert, AlertIcon, AlertDescription } from '@chakra-ui/react'
 import { useColorModeValue } from '@chakra-ui/system'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
-import { updateOrgUser } from 'graphQL/Mutation'
+import { UpdateUserPassword, updateOrgUser } from 'graphQL/Mutation'
 import { useGlobalState } from 'hooks/useGlobalState'
 import React, { useState, useEffect } from 'react'
-import { validateEmail } from 'utils'
+import { useNavigate } from 'react-router-dom'
+import { validPassword, validateEmail } from 'utils'
+import Cookies from 'js-cookie'
+
 
 const PersonalInfo = ({ user, refetch }) => {
   const textColor = useColorModeValue('gray.700', 'white')
   const toast = useToast()
+  const navigate = useNavigate()
 
   const { setUserName } = useGlobalState()
 
@@ -19,8 +24,61 @@ const PersonalInfo = ({ user, refetch }) => {
   const [message, setMessage] = useState('Update')
   const [error, setError] = useState('')
   const [oldPassword, setOldPassword] = useState('')
+  const [showOldPass, setShowOldPass] = useState(false)
   const [newPassword, setNewPassword] = useState('')
+  const [showNewPass, setShowNewPass] = useState(false)
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [showConfPass, setShowConfPass] = useState(false)
+  const [invalidPassword, setInvalidPassword] = useState(false)
+  const [passError, setPassError] = useState('')
+
+  const [updateUser] = useMutation(updateOrgUser)
+  const [updatePassword] = useMutation(UpdateUserPassword)
+
+  const handleOldPassChange = (e) => {
+    const { value } = e.target
+    setOldPassword(value)
+  }
+
+  const onToggleOldPass = () => {
+    setShowOldPass(!showOldPass)
+  }
+
+  const handleNewPassChange = (e) => {
+    const { value } = e.target
+    setNewPassword(value)
+    if (value !== '' && value !== confirmPassword && confirmPassword !== '') {
+      setPassError('Confirm password does not match password')
+    } else {
+      setPassError('')
+    }
+    setInvalidPassword(false)
+  }
+
+  const onToggleNewPass = () => {
+    setShowNewPass(!showNewPass)
+  }
+
+  const handleCheckPassword = () => {
+    if (!validPassword(newPassword)) {
+      setInvalidPassword(true)
+    }
+  }
+
+  const handleConfirmChange = (e) => {
+    const { value } = e.target
+    setConfirmPassword(value)
+    if (value !== '' && value !== newPassword && newPassword !== '') {
+      setPassError('Confirm password does not match password')
+    } else {
+      setPassError('')
+    }
+    setInvalidPassword(false)
+  }
+
+  const onToggleConfirmPass = () => {
+    setShowConfPass(!showConfPass)
+  }
 
   useEffect(() => {
     if (user) {
@@ -41,17 +99,9 @@ const PersonalInfo = ({ user, refetch }) => {
     }
   }
 
-  const [updateUser] = useMutation(updateOrgUser)
-
   const handleUpdate = async () => {
     try {
-      await updateUser({
-        variables: {
-          id: user.id,
-          name: name,
-          email: email
-        }
-      })
+      await updateUser({ variables: { id: user.id, name: name, email: email }})
         .then((res) => {
           if (res.data.userUpdate.errors.length === 0) {
             setMessage('Saving....')
@@ -60,21 +110,30 @@ const PersonalInfo = ({ user, refetch }) => {
             localStorage.setItem('email', email)
             setTimeout(() => {
               setMessage('Update')
-              toast({
-                description: 'User details updated successfully',
-                status: 'success',
-                position: 'top',
-                duration: 2000
-              })
+              toast({ description: 'User details updated successfully', status: 'success', position: 'top', duration: 2000 })
             }, 2000)
           }
         })
-        .finally(() => {
-          refetch()
-        })
+        .finally(() => refetch())
     } catch (error) {
       console.log(`Error`, error)
     }
+  }
+
+  const handleUpdatePassword = async () => {
+    await updatePassword({ variables: { currentPassword: oldPassword, newPassword: newPassword, newPasswordConfirmation: confirmPassword } })
+      .then((res) => {
+        if (res?.data) {
+          console.log(res?.data)
+          Cookies.set('authToken', res?.data?.userUpdatePassword?.updatedToken)
+          toast({description:'Password updated successfully',status:'success',position:'top',duration:3000})
+        }
+      })
+      .then(() => {
+        setTimeout(() => {
+          navigate('/vendor/dashboard')
+        }, 1000);
+      })
   }
 
   return (
@@ -95,11 +154,13 @@ const PersonalInfo = ({ user, refetch }) => {
               {/* EMAIL */}
               <FormControl isRequired>
                 <FormLabel>Email</FormLabel>
-                <Input value={email} onChange={(e) => setEmail(e.target.value)}/>
-                {user?.unconfirmedEmail && <FormHelperText>{JSON.stringify(user?.unconfirmedEmail)}</FormHelperText>}
+                <Input value={email} onChange={(e) => setEmail(e.target.value)} />
+                {user?.unconfirmedEmail && (
+                  <FormHelperText>{JSON.stringify(user?.unconfirmedEmail)}</FormHelperText>
+                )}
               </FormControl>
               {/* ACTION */}
-              <Button variant='solid' colorScheme='blue' onClick={handleUpdate} disabled={ message === 'Saving....' || !name || !validateEmail(email) || error !== '' }>
+              <Button variant='solid' colorScheme='blue' onClick={handleUpdate} disabled={ message === 'Saving....' || !name || !validateEmail(email) || error !== ''} >
                 {message}
               </Button>
             </Flex>
@@ -109,20 +170,50 @@ const PersonalInfo = ({ user, refetch }) => {
               {/* OLD PASSWORD */}
               <FormControl>
                 <FormLabel>Old Password</FormLabel>
-                <Input type='password' value={oldPassword} onChange={(e) => setOldPassword(e.target.value)}/>
+                <InputGroup>
+                  <Input type={showOldPass ? 'text' : 'password'} value={oldPassword} onChange={handleOldPassChange} placeholder='*******' />
+                  <InputRightElement width='3.1rem'>
+                    <IconButton h='1.75rem' size='sm' bg={'transparent'} onClick={onToggleOldPass} icon={showOldPass ? <ViewOffIcon /> : <ViewIcon />} />
+                  </InputRightElement>
+                </InputGroup>
               </FormControl>
               {/* NEW PASSWORD */}
               <FormControl>
                 <FormLabel>New Password</FormLabel>
-                <Input type='password' value={newPassword} onChange={(e) => setNewPassword(e.target.value)}/>
+                <InputGroup>
+                  <Input type={showNewPass ? 'text' : 'password'} value={newPassword} onChange={handleNewPassChange} placeholder='*******' onBlur={handleCheckPassword} />
+                  <InputRightElement width='3.1rem'>
+                    <IconButton h='1.75rem' size='sm' bg={'transparent'} onClick={onToggleNewPass} icon={showNewPass ? <ViewOffIcon /> : <ViewIcon />} />
+                  </InputRightElement>
+                </InputGroup>
+                {invalidPassword && (
+                  <FormHelperText color={'red.500'}>
+                    <Text mb={1}>Your password must contain:</Text>
+                    <Text>1. Lower case letters {`(a-z)`}</Text>
+                    <Text>2. Upper case letters {`(A-Z)`}</Text>
+                    <Text>3. Special characters {`(ex. !@#&$%*)`}</Text>
+                    <Text>4. Numbers {`(0-9)`}</Text>
+                  </FormHelperText>
+                )}
+                {oldPassword !== '' && newPassword !== '' && oldPassword === newPassword && (
+                  <FormHelperText color={'red.500'}>Old password and new password cannot be same</FormHelperText>
+                )}
               </FormControl>
-               {/* CONFIRM PASSWORD */}
-               <FormControl>
+              {/* CONFIRM PASSWORD */}
+              <FormControl isInvalid={passError !== ''}>
                 <FormLabel>Confirm Password</FormLabel>
-                <Input type='password' value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}/>
+                <InputGroup>
+                  <Input type={showConfPass ? 'text' : 'password'} value={confirmPassword} onChange={handleConfirmChange} isDisabled={!validPassword(newPassword)} placeholder='*******' />
+                  <InputRightElement width='3.1rem'>
+                    <IconButton h='1.75rem' size='sm' bg={'transparent'} onClick={onToggleConfirmPass} icon={showConfPass ? <ViewOffIcon /> : <ViewIcon />} />
+                  </InputRightElement>
+                </InputGroup>
+                {passError !== '' && <FormErrorMessage>{passError}</FormErrorMessage>}
               </FormControl>
               {/* ACTION */}
-              <Button variant='solid' colorScheme='blue'>Change Password</Button>
+              <Button variant='solid' colorScheme='blue' isDisabled={ oldPassword === '' || newPassword === '' || confirmPassword === '' ||  newPassword !== confirmPassword || oldPassword === newPassword } onClick={handleUpdatePassword}>
+                Change Password
+              </Button>
             </Flex>
           </GridItem>
         </Grid>
