@@ -78,6 +78,7 @@ const ResetForm = () => {
         }
       })
       .catch((error) => {
+        setIsLoading(false)
         console.log(`Error: ${error}`)
         if (error.response) {
           const { status, data } = error.response
