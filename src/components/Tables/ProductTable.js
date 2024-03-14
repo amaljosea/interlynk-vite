@@ -211,11 +211,15 @@ const ProductTable = ({ data, refetch }) => {
     disablePaginationControl()
     await refetch({
       first: totalRows,
+      after: undefined,
+      last: undefined,
+      before: undefined,
       field: field,
       direction: direction
     }).then((res) => {
       if (res.data) {
         setPaginationControl(res?.data)
+        prodDispatch({type: 'FETCH_DATA_SUCCESS'})
       }
     })
   }, [refetch, totalRows, field, direction])
