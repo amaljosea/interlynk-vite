@@ -1,4 +1,4 @@
-import { Checkbox, Flex, IconButton, Stack, Switch, Text, Tooltip } from '@chakra-ui/react'
+import { Flex, IconButton, Stack, Switch, Text, Tooltip } from '@chakra-ui/react'
 import CustomLoader from 'components/CustomLoader'
 import DataTable from 'react-data-table-component'
 import { useMemo, useState, useEffect } from 'react'
@@ -9,6 +9,8 @@ import { GoSkip } from 'react-icons/go'
 import { useGlobalState } from 'hooks/useGlobalState'
 import Pagination from 'components/Pagination'
 import { RepeatIcon } from '@chakra-ui/icons'
+import { FaCheck } from 'react-icons/fa6'
+import { FaTimes } from 'react-icons/fa'
 
 const SupportTable = ({ projectId, sbomId, data, refetch }) => {
   const { totalRows, setTotalRows, supportState, dispatch } = useGlobalState()
@@ -180,7 +182,7 @@ const SupportTable = ({ projectId, sbomId, data, refetch }) => {
         return <Switch size='md' defaultChecked={enabled} isReadOnly />
       },
       width: '150px',
-      sortable: true
+      omit: true,
     },
     {
       id: 'EOL_INFOS_NAME',
@@ -199,13 +201,13 @@ const SupportTable = ({ projectId, sbomId, data, refetch }) => {
     {
       id: 'DEPRECATED',
       name: 'DEPRECATED',
-      selector: (row) => <Checkbox defaultChecked={row?.deprecated} />,
+      selector: (row) => row?.deprecated ? <IconButton pointerEvents={'none'} colorScheme='green' size='sm' icon={<FaCheck />} /> : <IconButton pointerEvents={'none'}  size='sm' icon={<FaTimes />}/>,
       wrap: true
     },
     {
       id: 'OUTDATED',
       name: 'OUTDATED',
-      selector: (row) => <Checkbox defaultChecked={row?.outdated} />,
+      selector: (row) => row?.outdated ? <IconButton pointerEvents={'none'} colorScheme='green' size='sm' icon={<FaCheck />} /> : <IconButton pointerEvents={'none'} size='sm' icon={<FaTimes />}/>,
       wrap: true
     },
     {
@@ -213,26 +215,14 @@ const SupportTable = ({ projectId, sbomId, data, refetch }) => {
       name: 'END-OF-LIFE',
       selector: (row) => row?.eol || '',
       width: '250px',
-      wrap: true,
-      sortable: true,
-      sortFunction: (a, b) => {
-        const dateA = new Date(a.eol)
-        const dateB = new Date(b.eol)
-        return dateA - dateB
-      }
+      wrap: true
     },
     {
       id: 'EOL_INFOS_EOL_SUPPORT',
       name: 'END-OF-SERVICE',
       selector: (row) => row?.eos || '',
       width: '250px',
-      wrap: true,
-      sortable: true,
-      sortFunction: (a, b) => {
-        const dateA = new Date(a.eos)
-        const dateB = new Date(b.eos)
-        return dateA - dateB
-      }
+      wrap: true
     },
     // UPDATED AT
     {
