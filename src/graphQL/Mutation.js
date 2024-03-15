@@ -1966,3 +1966,108 @@ export const UpdateUserPassword = gql`
     }
   }
 `
+
+export const CreateCompSupportOverride = gql`
+  mutation CreateCompSupportOverride(
+    $idUri: String!
+    $name: String!
+    $version: String
+    $eol: ISO8601Date
+    $eos: ISO8601Date
+    $outdated: Boolean
+    $deprecated: Boolean
+    $enabled: Boolean
+  ) {
+    componentSupportOverrideCreate(
+      input: {
+        idUri: $idUri
+        productName: $name
+        productVersion: $version
+        eol: $eol
+        eos: $eos
+        deprecated: $deprecated
+        outdated: $outdated
+        enabled: $enabled
+      }
+    ) {
+      componentSupportOverride {
+        id
+        idUri
+        productName
+        productVersion
+        eol
+        eos
+        enabled
+        deprecated
+        outdated
+        updatedAt
+        createdAt
+      }
+      errors
+    }
+  }
+`
+
+export const UpdateCompSupportOverride = gql`
+  mutation UpdateCompSupportOverride(
+    $id: Uuid!
+    $idUri: String
+    $name: String
+    $version: String
+    $eol: ISO8601Date
+    $eos: ISO8601Date
+    $outdated: Boolean
+    $deprecated: Boolean
+    $enabled: Boolean
+  ) {
+    componentSupportOverrideUpdate(
+      input: {
+        id: $id
+        idUri: $idUri
+        productName: $name
+        productVersion: $version
+        eol: $eol
+        eos: $eos
+        deprecated: $deprecated
+        outdated: $outdated
+        enabled: $enabled
+      }
+    ) {
+      componentSupportOverride {
+        id
+        enabled
+        idUri
+        productName
+        productVersion
+        eol
+        eos
+        deprecated
+        outdated
+        updatedAt
+        createdAt
+      }
+      errors
+    }
+  }
+`
+
+export const DeleteCompSupportOverride = gql`
+  mutation DeleteCompSupportOverride($id: Uuid!) {
+    componentSupportOverrideDelete(input: { id: $id }) {
+      componentSupportOverride {
+        id
+        enabled
+        idUri
+        productName
+        productVersion
+        eol
+        eos
+        deprecated
+        outdated
+        updatedAt
+        createdAt
+      }
+      errors
+    }
+  }
+`

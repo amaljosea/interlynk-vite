@@ -3817,11 +3817,36 @@ export const GetSbomSupportTab = gql`
 
 // GET SUPPORT INFO
 export const GetSupportTab = gql`
-  query GetSupportTab {
-    supports {
+  query GetSupportTab(
+    $globalSearch: String
+    $search: String
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
+    $field: ComponentSupportOverrideOrderByFields!
+    $direction: OrderByDirection!
+  ) {
+    supports(
+      globalSearch: $globalSearch
+      search: $search
+      first: $first
+      last: $last
+      after: $after
+      before: $before
+      orderBy: { field: $field, direction: $direction }
+    ) {
+      totalCount
+      pageInfo {
+        endCursor
+        hasNextPage
+        hasPreviousPage
+        startCursor
+      }
       nodes {
         ... on ComponentSupport {
           id
+          idUri
           productName
           productVersion
           deprecated
@@ -3833,6 +3858,7 @@ export const GetSupportTab = gql`
         }
         ... on ComponentSupportOverride {
           id
+          idUri
           productName
           productVersion
           enabled

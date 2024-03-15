@@ -182,7 +182,7 @@ const GlobalStateProvider = ({ children }) => {
     searchInput: '',
     after:'',
     before: '',
-    field: 'EOL_INFOS_EOL_DATE',
+    field: 'COMPONENT_SUPPORT_OVERRIDES_UPDATED_AT',
     direction: 'DESC'
   })
   // SBOM VERSIONS

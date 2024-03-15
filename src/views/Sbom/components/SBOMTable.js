@@ -231,7 +231,7 @@ const SBOMTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
             </TabPanel>
             {/* SUPPORT TABLE */}
             <TabPanel px={0}>
-              <SupportTable data={support?.sbom?.supports} refetch={getSupportInfos} sbomId={sbomId} projectId={productId} />
+              <SupportTable data={support?.sbom?.supports} refetch={getSupportInfos} />
             </TabPanel>
             {/* RELATIONSHIP TABLE */}
             <TabPanel px={0}>
