@@ -120,8 +120,8 @@ const PersonalInfo = ({ user, refetch }) => {
     }
   }
 
-  const handleUpdatePassword = async () => {
-    await updatePassword({ variables: { currentPassword: oldPassword, newPassword: newPassword, newPasswordConfirmation: confirmPassword } })
+  const handleUpdatePassword = () => {
+     updatePassword({ variables: { currentPassword: oldPassword, newPassword: newPassword, newPasswordConfirmation: confirmPassword } })
       .then((res) => {
         if (res?.data) {
           console.log(res?.data)
@@ -129,11 +129,7 @@ const PersonalInfo = ({ user, refetch }) => {
           toast({description:'Password updated successfully',status:'success',position:'top',duration:3000})
         }
       })
-      .then(() => {
-        setTimeout(() => {
-          window.location.href = `/vendor/dashboard`
-        }, 1000);
-      })
+      .finally(() => window.location.href = `/vendor/dashboard`)
   }
 
   return (
