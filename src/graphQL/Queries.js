@@ -62,10 +62,6 @@ export const GetOrg = gql`
           url
         }
       }
-      organizationConnectors {
-        enabled
-        name
-      }
       organizationComponents {
         id
         matchStr
