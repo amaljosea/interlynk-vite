@@ -193,8 +193,7 @@ const ProductDetails = () => {
       source: source === true ? undefined : 'COMPONENT',
       componentName: components.length > 0 ? components : undefined,
       status: statues.length > 0 ? statues : undefined,
-      kev:
-        kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
+      kev: kev === 'all' || kev === '' ? undefined : kev === 'yes' ? true : false,
       epss: epss !== '' && epss !== 'all' ? range : undefined,
       direct: direct === true ? true : undefined,
       field: prodVulnState.field,
