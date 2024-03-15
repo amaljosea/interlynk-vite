@@ -131,7 +131,7 @@ const PersonalInfo = ({ user, refetch }) => {
       })
       .then(() => {
         setTimeout(() => {
-          navigate('/vendor/dashboard')
+          window.location.href = `/vendor/dashboard`
         }, 1000);
       })
   }
@@ -212,7 +212,7 @@ const PersonalInfo = ({ user, refetch }) => {
               </FormControl>
               {/* ACTION */}
               <Button variant='solid' colorScheme='blue' isDisabled={ oldPassword === '' || newPassword === '' || confirmPassword === '' ||  newPassword !== confirmPassword || oldPassword === newPassword } onClick={handleUpdatePassword}>
-                Change Password
+                Update
               </Button>
             </Flex>
           </GridItem>
