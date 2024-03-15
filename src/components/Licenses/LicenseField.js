@@ -18,12 +18,20 @@ import { useLazyQuery } from '@apollo/client'
 import { useGlobalState } from 'hooks/useGlobalState'
 import InfoModal from '../InfoModal'
 
-const LicenseField = ({ isValid, setIsValid, isDisabled, sbomView }) => {
+const LicenseField = ({ isValid, setIsValid, isDisabled, sbomView, license }) => {
 
   useEffect(() => {
-    dispatcher({ type: 'SET_LICENSE_FIELD', payload: [] }) // clear license field
+    if (license) {
+      const payload = {
+        value: license,
+        label: license,
+      }
+      dispatcher({ type: 'SET_LICENSE_FIELD', payload: [payload] })
+    }
+    return () => {
+      dispatcher({ type: 'SET_LICENSE_FIELD', payload: [] }); // clear license field while unmounting
+    };
   }, [])
-
 
   const { prodCompState, activeSbomTab, dispatch, sbomState } = useGlobalState()
 
@@ -64,7 +72,7 @@ const LicenseField = ({ isValid, setIsValid, isDisabled, sbomView }) => {
         }
       }).then((res) => {
         if (res.data) {
-          const licenses = res.data.licenseAutoComplete.result.map((license) => {
+          const licenses = res.data.licenseAutoComplete?.result?.map((license) => {
             return { value: license.value, label: license.value, type: license.type}
           })
 

@@ -539,7 +539,7 @@ function ComponentDrawer(props) {
                 </Select>
               </FormControl>
               {/* LICENSES */}
-              <LicenseField sbomView={false} isDisabled={signedUrlParams} isValid={isValid} setIsValid={setIsValid} />
+              <LicenseField license={data?.licensesExp} sbomView={false} isDisabled={signedUrlParams} isValid={isValid} setIsValid={setIsValid} />
               {/* PURL INPUI */}
               <FormControl
                 isReadOnly={customerView}
