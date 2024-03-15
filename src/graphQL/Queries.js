@@ -759,183 +759,12 @@ export const GetConnectedSbom = gql`
   }
 `
 
-// GET PROJECT GROUP VULN DATA
-export const GetProjectVulns = gql`
-  query GetProjectVulns(
-    $id: Uuid!
-    $first: Int
-    $last: Int
-    $search: String
-    $after: String
-    $before: String
-    $severity: [String!]
-    $projectGroupIds: [Uuid!]
-    $status: [String!]
-    $kev: Boolean
-    $epss: RangeInput
-  ) {
-    project(id: $id) {
-      componentVulns(
-        after: $after
-        first: $first
-        before: $before
-        last: $last
-        search: $search
-        projectGroupIds: $projectGroupIds
-        status: $status
-        severity: $severity
-        kev: $kev
-        epss: $epss
-      ) {
-        totalCount
-        pageInfo {
-          endCursor
-          hasNextPage
-          hasPreviousPage
-          startCursor
-        }
-        nodes {
-          id
-          vulnId
-          updatedAt
-          vexStatus {
-            id
-            name
-          }
-          component {
-            id
-            name
-            version
-            sbom {
-              project {
-                name
-                projectGroup {
-                  name
-                }
-              }
-              primaryComponent {
-                id
-                name
-                version
-              }
-            }
-          }
-          vuln {
-            cvssScore
-            cvssVector
-            desc
-            id
-            lastModifiedAt
-            nvdAliasId
-            organizationId
-            publishedAt
-            sev
-            source
-            updatedAt
-            vulnId
-            metrics {
-              affectedCount
-              falsePositiveCount
-              fixedCount
-              inTriageCount
-              notAffectedCount
-              unspecifiedCount
-            }
-            vulnInfo {
-              cveId
-              epssPercentile
-              epssScore
-              epssScores
-              id
-              kev
-              updatedAt
-            }
-          }
-        }
-      }
-    }
-  }
-`
-
-export const GetOrgInfo = gql`
-  query GetOrgInfo {
-    organization {
-      id
-      name
-      email
-      url
-      organizationSettings {
-        id
-        value
-        setting {
-          id
-          name
-          kind
-        }
-      }
-    }
-  }
-`
-
-export const GetAllConnectors = gql`
-  query GetAllConnectors {
-    connectors {
-      id
-      name
-      kind
-    }
-  }
-`
-
-export const GetAllOrgConnectors = gql`
-  query GetAllOrgConnectors {
-    organizationConnectors {
-      id
-      connector {
-        name
-      }
-      name
-      username
-      updatedAt
-      enabled
-    }
-  }
-`
-
 export const getAllScanners = gql`
   query GetAllScanners {
     scanners {
       id
       company
       name
-    }
-  }
-`
-
-export const GetAllImages = gql`
-  query GetAllImages {
-    images {
-      id
-      name
-      scanEnabled
-      organizationConnector {
-        id
-        name
-        connector {
-          name
-        }
-      }
-      lastPushedAt
-      imageScanners {
-        id
-        name
-        company
-      }
-      imageVersions {
-        id
-        name
-      }
-      updatedAt
     }
   }
 `
@@ -949,28 +778,6 @@ export const getImage = gql`
       imageVersions {
         id
         name
-      }
-    }
-  }
-`
-
-export const getVulnerabilities = gql`
-  query getVulnerabilities($id: ID!) {
-    images(organizationId: $id) {
-      id
-      name
-      scanResults {
-        id
-        cveId
-        compName
-        compVersion
-        fixedInComp
-        fixedInImage
-        cvssv3
-        scanner {
-          id
-          name
-        }
       }
     }
   }
@@ -1143,17 +950,6 @@ export const GetImgVersionPagination = gql`
   }
 `
 
-export const GetSettings = gql`
-  query GetAllSettings {
-    settings {
-      id
-      name
-      kind
-      friendlyName
-    }
-  }
-`
-
 export const GetFeedLogs = gql`
   query GetFeed(
     $date: String!
@@ -1194,24 +990,7 @@ export const GetFeedLogs = gql`
 
 // ----------------------- PRODUCT DETAILS PAGE ---------------------------
 
-// GET PROJECT INFORMATION
-export const GetProductInfo = gql`
-  query GetProjectInfo($id: Uuid!) {
-    project(id: $id) {
-      id
-      name
-      description
-      enabled
-      updatedAt
-      sboms {
-        id
-        primaryComponent {
-          version
-        }
-      }
-    }
-  }
-`
+
 // GET PRODUCT VERSION
 export const GetVersionsTable = gql`
   query GetVersionsTable(
@@ -1433,55 +1212,6 @@ export const GetShareSbomAlternatives = gql`
           stats {
             compCount
             compLicenseCount
-            vulnStats
-          }
-        }
-      }
-    }
-  }
-`
-
-export const GetProductVersions = gql`
-  query GetProductVersions($id: Uuid!) {
-    project(id: $id) {
-      id
-      sboms {
-        id
-        creationAt
-        createdAt
-        updatedAt
-        lifecycle
-        createdAt
-        projectVersion
-        primaryComponent {
-          id
-          name
-          version
-        }
-        stats {
-          compCount
-          compLicenseCount
-          compCpeCount
-          compPurlCount
-          vulnStats
-        }
-        alternatives {
-          id
-          creationAt
-          createdAt
-          updatedAt
-          lifecycle
-          createdAt
-          primaryComponent {
-            id
-            name
-            version
-          }
-          stats {
-            compCount
-            compLicenseCount
-            compCpeCount
-            compPurlCount
             vulnStats
           }
         }
@@ -3064,43 +2794,6 @@ export const GetSignedComponentData = gql`
   }
 `
 
-// GET ALL COMPONENT DATA
-export const GetSignedAllComponents = gql`
-  query GetSignedAllComponents(
-    $projectId: Uuid!
-    $sbomId: Uuid!
-    $signedParams: String!
-    $first: Int
-    $last: Int
-    $after: String
-    $before: String
-  ) {
-    sbom(projectId: $projectId, sbomId: $sbomId, signedParams: $signedParams) {
-      id
-      components(
-        sbomId: $sbomId
-        after: $after
-        before: $before
-        first: $first
-        last: $last
-        orderBy: { field: $field, direction: $direction }
-      ) {
-        totalCount
-        pageInfo {
-          endCursor
-          hasNextPage
-          startCursor
-          hasPreviousPage
-        }
-        nodes {
-          id
-          name
-        }
-      }
-    }
-  }
-`
-
 // GET COMPONENT FILTER DATA
 export const GetSignedCompFilterData = gql`
   query GetSignedCompFilterData(
@@ -3220,152 +2913,6 @@ export const GetSignedVulnFilterData = gql`
         vulnCompNames
         vulnSeverities
         vulnStatuses
-      }
-    }
-  }
-`
-
-// HEALTH CHECK RESULTES
-export const GetSignedCheckResults = gql`
-  query GetCheckResults(
-    $projectId: Uuid!
-    $sbomId: Uuid!
-    $signedParams: String!
-    $category: [String!]
-    $status: [String!]
-    $severity: [String!]
-    $componentName: [String!]
-    $first: Int
-    $last: Int
-    $after: String
-    $before: String
-    $field: CheckResultOrderByFields!
-    $direction: OrderByDirection!
-  ) {
-    sbom(projectId: $projectId, sbomId: $sbomId, signedParams: $signedParams) {
-      id
-      checkResults(
-        sbomId: $sbomId
-        category: $category
-        status: $status
-        severity: $severity
-        componentName: $componentName
-        after: $after
-        before: $before
-        first: $first
-        last: $last
-        orderBy: { field: $field, direction: $direction }
-      ) {
-        totalCount
-        pageInfo {
-          endCursor
-          hasNextPage
-          startCursor
-          hasPreviousPage
-        }
-        nodes {
-          id
-          sbomId
-          componentId
-          primary
-          status
-          updatedAt
-          component {
-            id
-            name
-          }
-          organizationRule {
-            severity
-            action
-            rule {
-              shortDesc
-              longDesc
-              friendlyId
-            }
-          }
-        }
-      }
-    }
-  }
-`
-
-// GET HEALTH CHECK FILTER DATA
-export const GetSignedCheckFilterData = gql`
-  query GetCheckFilterData($projectId: Uuid!, $sbomId: Uuid!) {
-    sbom(projectId: $projectId, sbomId: $sbomId) {
-      id
-      filters {
-        checkCategories
-        checkSeverities
-        checkStatuses
-      }
-    }
-  }
-`
-
-// CHANGE LOG DATA
-export const GetSignedChangeLogs = gql`
-  query GetChangeLogs(
-    $projectId: Uuid!
-    $sbomId: Uuid!
-    $search: String
-    $changedBy: [String!]
-    $changeObject: [String!]
-    $changeType: [String!]
-    $first: Int
-    $last: Int
-    $after: String
-    $before: String
-    $field: ActivityLogOrderByFields!
-    $direction: OrderByDirection!
-  ) {
-    sbom(projectId: $projectId, sbomId: $sbomId) {
-      id
-      activityLogs(
-        sbomId: $sbomId
-        search: $search
-        changedBy: $changedBy
-        changeObject: $changeObject
-        changeType: $changeType
-        after: $after
-        before: $before
-        first: $first
-        last: $last
-        orderBy: { field: $field, direction: $direction }
-      ) {
-        totalCount
-        totalCount
-        pageInfo {
-          endCursor
-          hasNextPage
-          startCursor
-          hasPreviousPage
-        }
-        nodes {
-          event
-          action
-          orig
-          updated
-          createdAt
-          updatedAt
-          changedBy
-          loggablePrefix
-          loggableType
-        }
-      }
-    }
-  }
-`
-
-// GET LOGS FILTER DATA
-export const GetSignedLogsFilterData = gql`
-  query GetLogsFilterData($projectId: Uuid!, $sbomId: Uuid!) {
-    sbom(projectId: $projectId, sbomId: $sbomId) {
-      id
-      filters {
-        logChangeBys
-        logChangeObjects
-        logChangeTypes
       }
     }
   }

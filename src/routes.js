@@ -1,29 +1,19 @@
 // Vendor pages
 import Dashboard from 'views/Dashboard/Dashboard'
 import Profile from 'views/Dashboard/Profile'
-import Images from 'views/Dashboard/Images'
-import Feed from 'views/Dashboard/Feed'
 import Products from 'views/Dashboard/Products'
-import Connections from 'views/Dashboard/Connections'
-import Sharelynk from 'views/Dashboard/Sharelynk'
 
-// Customer pages
-import CustomerImages from 'views/Customer/Images'
+
 import CustomerProducts from 'views/Customer/Products'
 
 import {
   FaRegSun,
-  FaImages,
   FaPlug,
-  FaBullhorn,
   FaWindowMaximize,
   FaBug,
   FaBalanceScale
 } from 'react-icons/fa'
 import { HomeIcon } from 'components/Icons/Icons'
-import { BsFillFolderSymlinkFill } from 'react-icons/bs'
-import Automation from 'views/Dashboard/Automation'
-import ChangeLog from 'views/Dashboard/Changelog'
 import Vulnerabilities from 'views/Dashboard/Vulnerabilities'
 import Licenses from 'components/Licenses'
 import Support from 'views/Dashboard/Support'
@@ -37,13 +27,6 @@ export const dashRoutes = [
     component: Dashboard,
     layout: '/vendor'
   },
-  // {
-  //   path: '/images',
-  //   name: 'Images',
-  //   icon: <FaImages color='inherit' />,
-  //   component: Images,
-  //   layout: '/vendor'
-  // },
   {
     path: '/products',
     name: 'Products',
