@@ -1,36 +1,9 @@
 // Chakra imports
 import { AddIcon, RepeatIcon, ViewIcon } from '@chakra-ui/icons'
-import {
-  Flex,
-  Text,
-  Stack,
-  Box,
-  IconButton,
-  Tooltip,
-  MenuButton,
-  Menu,
-  Portal,
-  MenuList,
-  MenuItem,
-  useDisclosure,
-  Tag,
-  TagLabel,
-  Grid,
-  GridItem,
-  TagCloseButton,
-  Link,
-  Divider,
-  VStack
-} from '@chakra-ui/react'
+import { Flex, Text, Stack, Box, IconButton, Tooltip, MenuButton, Menu, Portal, MenuList, MenuItem, useDisclosure, Tag, TagLabel, Grid, GridItem, TagCloseButton, Link, Divider, VStack } from '@chakra-ui/react'
 import DataTable from 'react-data-table-component'
 import { BsFillPatchQuestionFill } from 'react-icons/bs'
-import {
-  FaEllipsisV,
-  FaGlobe,
-  FaHouseUser,
-  FaLightbulb,
-  FaSitemap
-} from 'react-icons/fa'
+import { FaEllipsisV, FaGlobe, FaHouseUser, FaLightbulb, FaSitemap } from 'react-icons/fa'
 import { timeSince, GetIcon, getFullDateAndTime, customStyles } from 'utils'
 import { useState, useMemo, useRef, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
@@ -52,14 +25,7 @@ import PurlCard from 'components/Misc/PurlCard'
 import CpeCard from 'components/Misc/CpeCard'
 import { ShareCompFilters } from 'graphQL/Queries'
 
-const ComponentTable = ({
-  lifecycle,
-  data,
-  refetch,
-  primaryComp,
-  sbomRefetch,
-  setActiveComp
-}) => {
+const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, setActiveComp }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const customerView = location.pathname.startsWith('/customer')
@@ -88,22 +54,8 @@ const ComponentTable = ({
   }
   //end
 
-  const { userPermissions, totalRows, setTotalRows, setActiveSbomTab, prodCompState, dispatch } =
-    useGlobalState()
-  const {
-    field,
-    direction,
-    pageIndex,
-    searchInput,
-    ecosystems,
-    kinds,
-    licenses,
-    suppliers,
-    scope,
-    filters,
-    direct,
-    totalComp
-  } = prodCompState
+  const { userPermissions, totalRows, setTotalRows, setActiveSbomTab, prodCompState, dispatch } = useGlobalState()
+  const { field, direction, pageIndex, searchInput, ecosystems, kinds, licenses, suppliers, scope, filters, direct, totalComp } = prodCompState
   const { prodCompDispatch } = dispatch
 
   // GET COMPONENT FILTER HEADS
@@ -113,23 +65,14 @@ const ComponentTable = ({
       fetchPolicy: 'cache-first',
       variables: { projectId: signedUrlParams ? undefined : productId, sbomId: sbomId },
       onCompleted: (data) => {
-        prodCompDispatch({
-          type: 'ADD_FILTER_HEADS',
-          payload: signedUrlParams ? data?.shareLynkQuery?.sbom?.filters : data?.sbom?.filters
-        })
+        prodCompDispatch({ type: 'ADD_FILTER_HEADS', payload: signedUrlParams ? data?.shareLynkQuery?.sbom?.filters : data?.sbom?.filters })
       }
     }
   )
 
   const sboms = userPermissions?.find((item) => item.key === 'view_sbom')
-  const updateComponent = sboms?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'update_sbom_components' && permission.value === true
-  )
-  const updateSboms = sboms?.supersededBy?.some(
-    (permission) =>
-      permission.key === 'update_sbom' && permission.value === true
-  )
+  const updateComponent = sboms?.supersededBy?.some((permission) => permission.key === 'update_sbom_components' && permission.value === true)
+  const updateSboms = sboms?.supersededBy?.some((permission) => permission.key === 'update_sbom' && permission.value === true)
 
   const fetchCompData = async () => {
     disablePaginationControl()
@@ -137,19 +80,10 @@ const ComponentTable = ({
       projectId: signedUrlParams ? undefined : productId,
       sbomId: sbomId,
       search: searchInput !== '' ? searchInput : undefined,
-      ecosystem:
-        ecosystems.includes('all') || ecosystems.length === 0
-          ? undefined
-          : ecosystems,
+      ecosystem: ecosystems.includes('all') || ecosystems.length === 0 ? undefined : ecosystems,
       kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
-      licenses:
-        licenses.includes('all') || licenses.length === 0
-          ? undefined
-          : licenses,
-      supplierName:
-        suppliers.includes('all') || suppliers.length === 0
-          ? undefined
-          : suppliers,
+      licenses: licenses.includes('all') || licenses.length === 0 ? undefined : licenses,
+      supplierName: suppliers.includes('all') || suppliers.length === 0 ? undefined : suppliers,
       primary: scope === 'primary' ? true : undefined,
       internal: scope === 'internal' ? true : undefined,
       direct: direct === true ? true :  undefined,
@@ -163,6 +97,8 @@ const ComponentTable = ({
       .then((res) => {
         res && setPaginationControl(res.data)
         prodCompDispatch({ type: 'FETCH_DATA_SUCCESS' })
+        prodCompDispatch({ type: 'SET_TOTAL_COMP', payload: res?.data?.sbom?.components?.totalCount })
+
       })
       .finally(() => window.scrollTo({ top: 0, behavior: 'smooth' }))
   }
@@ -177,48 +113,13 @@ const ComponentTable = ({
 
   const [getComPath, { data: comPath }] = useLazyQuery(GetComponentPath)
 
-  const {
-    isOpen: isDelOpen,
-    onOpen: onDelOpen,
-    onClose: onDelClose
-  } = useDisclosure()
-
-  const {
-    isOpen: isSupOpen,
-    onOpen: onSupOpen,
-    onClose: onSupClose
-  } = useDisclosure()
-
-  const {
-    isOpen: isLinkOpen,
-    onOpen: onLinkOpen,
-    onClose: onLinkClose
-  } = useDisclosure()
-
-  const {
-    isOpen: isRelationOpen,
-    onOpen: onRelationOpen,
-    onClose: onRelationClose
-  } = useDisclosure()
-
-  const {
-    isOpen: isCompOpen,
-    onOpen: onCompOpen,
-    onClose: onCompClose,
-    onToggle: onCompToggle
-  } = useDisclosure()
-
-  const {
-    isOpen: isPurlOpen,
-    onOpen: onPurlOpen,
-    onClose: onPurlClose
-  } = useDisclosure()
-
-  const {
-    isOpen: isCpeOpen,
-    onOpen: onCpeOpen,
-    onClose: onCpeClose
-  } = useDisclosure()
+  const { isOpen: isDelOpen, onOpen: onDelOpen, onClose: onDelClose } = useDisclosure()
+  const { isOpen: isSupOpen, onOpen: onSupOpen, onClose: onSupClose } = useDisclosure()
+  const { isOpen: isLinkOpen, onOpen: onLinkOpen, onClose: onLinkClose } = useDisclosure()
+  const { isOpen: isRelationOpen, onOpen: onRelationOpen, onClose: onRelationClose } = useDisclosure()
+  const { isOpen: isCompOpen, onOpen: onCompOpen, onClose: onCompClose, onToggle: onCompToggle } = useDisclosure()
+  const { isOpen: isPurlOpen, onOpen: onPurlOpen, onClose: onPurlClose } = useDisclosure()
+  const { isOpen: isCpeOpen, onOpen: onCpeOpen, onClose: onCpeClose } = useDisclosure()
 
   const onLicenseOpen = (row) => {
     setActiveRow(row)
@@ -234,12 +135,7 @@ const ComponentTable = ({
   const handleOpen = (row) => {
     setActiveRow(row)
     onRelationOpen()
-    getComPath({
-      variables: {
-        compId: row.id,
-        sbomId: sbomId
-      }
-    })
+    getComPath({ variables: { compId: row.id, sbomId: sbomId } })
   }
 
   // ADD KEYBOARD SHORTCUT FOR TOGGLE COMPONENT DRAWER
@@ -252,7 +148,6 @@ const ComponentTable = ({
   // KEYBOARD EVENT LISTNER FOR COMPONENT DRAWER
   useEffect(() => {
     window.addEventListener('keydown', handleCompDown)
-
     return () => {
       window.removeEventListener('keydown', handleCompDown)
     }
@@ -278,108 +173,50 @@ const ComponentTable = ({
           <Grid templateColumns='repeat(7, 1fr)' gap={2} my={3}>
             <GridItem colSpan={1} width={'50px'}>
               {purl !== null && purl !== '' ? (
-                <IconButton
-                  isRound={true}
-                  variant='solid'
-                  colorScheme='gray'
-                  icon={GetIcon(purl.split('/')[0])}
-                />
+                <IconButton isRound={true} variant='solid' colorScheme='gray' icon={GetIcon(purl.split('/')[0])} />
               ) : (
-                <IconButton
-                  isRound={true}
-                  variant='solid'
-                  colorScheme='gray'
-                  icon={
-                    <BsFillPatchQuestionFill color='#4299E1' fontSize={24} />
-                  }
-                />
+                <IconButton isRound={true} variant='solid' colorScheme='gray' icon={ <BsFillPatchQuestionFill color='#4299E1' fontSize={24} /> } />
               )}
             </GridItem>
-            <GridItem
-              colSpan={6}
-              display={'flex'}
-              flexWrap={'wrap'}
-              flexDirection={'column'}
-              gap={2}
-            >
+            <GridItem colSpan={6} display={'flex'} flexWrap={'wrap'} flexDirection={'column'} gap={2} >
               {/* COMPONENT NAME */}
-              <Tooltip placement='top' label={name}>
-                <Text data-tag='allowRowEvents'>{name}</Text>
-              </Tooltip>
+              <Tooltip placement='top' label={name}><Text data-tag='allowRowEvents'>{name}</Text></Tooltip>
               {/* EXTERNAL REFERENCE */}
               <Stack direction={'row'} alignItems={'center'}>
                 {/* WEBSITE */}
                 <Tooltip placement='top' label={website?.url}>
                   <Link href={website?.url} isExternal>
-                    <IconButton
-                      type='button'
-                      size='xs'
-                      variant='solid'
-                      isDisabled={!website}
-                      colorScheme='gray'
-                      icon={<FaGlobe fontSize={16} />}
-                    />
+                    <IconButton type='button' size='xs' variant='solid' isDisabled={!website} colorScheme='gray' icon={<FaGlobe fontSize={16} />} />
                   </Link>
                 </Tooltip>
                 {/* DISTRIBUTION */}
                 <Tooltip placement='top' label={vcs?.url}>
                   <Link href={vcs?.url} isExternal>
-                    <IconButton
-                      type='button'
-                      size='xs'
-                      variant='solid'
-                      colorScheme='gray'
-                      isDisabled={!vcs}
-                      icon={<FaSitemap fontSize={16} />}
-                    />
+                    <IconButton type='button' size='xs' variant='solid' colorScheme='gray' isDisabled={!vcs} icon={<FaSitemap fontSize={16} />} />
                   </Link>
                 </Tooltip>
                 {/* ADVISORIES */}
                 <Tooltip placement='top' label={issueTracker?.url}>
                   <Link href={issueTracker?.url} isExternal>
-                    <IconButton
-                      type='button'
-                      size='xs'
-                      variant='solid'
-                      colorScheme='gray'
-                      isDisabled={!issueTracker}
-                      icon={<FaHouseUser fontSize={16} />}
-                    />
+                    <IconButton type='button' size='xs' variant='solid' colorScheme='gray' isDisabled={!issueTracker} icon={<FaHouseUser fontSize={16} />} />
                   </Link>
                 </Tooltip>
                 {/* SUPPORT */}
                 <Tooltip placement='top' label={distribution?.url}>
                   <Link href={distribution?.url} isExternal>
-                    <IconButton
-                      type='button'
-                      size='xs'
-                      variant='solid'
-                      isDisabled={!distribution}
-                      colorScheme='gray'
-                      icon={<FaLightbulb fontSize={16} />}
-                    />
+                    <IconButton type='button' size='xs' variant='solid' isDisabled={!distribution} colorScheme='gray' icon={<FaLightbulb fontSize={16} />} />
                   </Link>
                 </Tooltip>
               </Stack>
               {/* COMPONENT TYPE */}
               <Flex flexWrap={'wrap'} gap={2} alignItems={'center'}>
                 {primary && (
-                  <Tag
-                    width={'fit-content'}
-                    size={'sm'}
-                    variant='subtle'
-                    colorScheme='blue'
-                  >
+                  <Tag width={'fit-content'} size={'sm'} variant='subtle' colorScheme='blue' >
                     <TagLabel textTransform={'capitalize'}>Primary</TagLabel>
                   </Tag>
                 )}
                 {internal && (
-                  <Tag
-                    width={'fit-content'}
-                    size={'sm'}
-                    variant='subtle'
-                    colorScheme='cyan'
-                  >
+                  <Tag width={'fit-content'} size={'sm'} variant='subtle' colorScheme='cyan' >
                     <TagLabel textTransform={'capitalize'}>Internal</TagLabel>
                   </Tag>
                 )}
@@ -444,41 +281,23 @@ const ComponentTable = ({
           licensesCustom?.length > 1 && licensesCustom.slice(1)
 
         return (
-          <Flex
-            alignItems={'flex-end'}
-            justifyContent={'flex-end'}
-            gap={2}
-            flexWrap={'wrap'}
-            my={2}
-          >
+          <Flex alignItems={'flex-end'} justifyContent={'flex-end'} gap={2} flexWrap={'wrap'} my={2} >
             {/* SPDX */}
             {licenses && (
               <Stack direction={'row'} spacing={2}>
                 {licenses.length > 0 && (
                   <Tooltip label={licenses[0]} placement={'top'}>
-                    <Tag
-                      size={'md'}
-                      variant='subtle'
-                      colorScheme='green'
-                      width={'fit-content'}
-                    >
+                    <Tag size={'md'} variant='subtle' colorScheme='green' width={'fit-content'} >
                       <TagLabel>{licenses[0]}</TagLabel>
                     </Tag>
                   </Tooltip>
                 )}
                 {totalSpdx.length > 0 && (
                   <Tooltip
-                    label={JSON.stringify(totalSpdx)
-                      .slice(1, -1)
-                      .replace(/"/g, '')}
+                    label={JSON.stringify(totalSpdx).slice(1, -1).replace(/"/g, '')}
                     placement={'top'}
                   >
-                    <Tag
-                      size={'md'}
-                      variant='subtle'
-                      colorScheme='green'
-                      width={'fit-content'}
-                    >
+                    <Tag size={'md'} variant='subtle' colorScheme='green' width={'fit-content'} >
                       <TagLabel width={6}>{`+${totalSpdx.length}`}</TagLabel>
                     </Tag>
                   </Tooltip>
@@ -489,12 +308,7 @@ const ComponentTable = ({
             {/* EXPRESSION */}
             {licensesExp && licensesExp !== '' && (
               <Tooltip label={licensesExp} placement={'top'}>
-                <Tag
-                  size={'md'}
-                  variant='subtle'
-                  colorScheme='green'
-                  width={'fit-content'}
-                >
+                <Tag size={'md'} variant='subtle' colorScheme='green' width={'fit-content'} >
                   <TagLabel>{licensesExp}</TagLabel>
                 </Tag>
               </Tooltip>
@@ -505,29 +319,17 @@ const ComponentTable = ({
               <Stack direction={'row'} spacing={2}>
                 {licensesCustom.length > 0 && (
                   <Tooltip label={licensesCustom[0]} placement={'top'}>
-                    <Tag
-                      size={'md'}
-                      variant='subtle'
-                      colorScheme='green'
-                      width={'fit-content'}
-                    >
+                    <Tag size={'md'} variant='subtle' colorScheme='green' width={'fit-content'} >
                       <TagLabel>{licensesCustom[0]}</TagLabel>
                     </Tag>
                   </Tooltip>
                 )}
                 {totalCustom && (
                   <Tooltip
-                    label={JSON.stringify(totalCustom)
-                      .slice(1, -1)
-                      .replace(/"/g, '')}
+                    label={JSON.stringify(totalCustom).slice(1, -1).replace(/"/g, '')}
                     placement={'top'}
                   >
-                    <Tag
-                      size={'md'}
-                      variant='subtle'
-                      colorScheme='green'
-                      width={'fit-content'}
-                    >
+                    <Tag size={'md'} variant='subtle' colorScheme='green' width={'fit-content'}>
                       <TagLabel>{`+${totalCustom.length}`}</TagLabel>
                     </Tag>
                   </Tooltip>
@@ -546,9 +348,7 @@ const ComponentTable = ({
       id: 'COMPONENTS_UPDATED_AT',
       name: 'UPDATED',
       selector: (row) => (
-        <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>
-          {timeSince(row.updatedAt)}
-        </Tooltip>
+        <Tooltip label={getFullDateAndTime(row.updatedAt)} placement={'top'}>{timeSince(row.updatedAt)}</Tooltip>
       ),
       sortable: true,
       width: '160px',
@@ -570,31 +370,18 @@ const ComponentTable = ({
           <>
             {!customerView ? (
               <Menu>
-                <MenuButton
-                  as={IconButton}
-                  aria-label='Options'
-                  icon={<FaEllipsisV />}
-                  variant='none'
-                  color='gray.400'
-                />
+                <MenuButton as={IconButton} aria-label='Options' icon={<FaEllipsisV />} variant='none' color='gray.400' />
                 <Portal>
                   <MenuList size='sm'>
                     <MenuItem
                       onClick={() => onLicenseOpen(row)}
-                      isDisabled={
-                        status === 'signed' ||
-                        !updateComponent ||
-                        !updateSboms ||
-                        signedUrlParams
-                      }
+                      isDisabled={ status === 'signed' || !updateComponent || !updateSboms || signedUrlParams }
                     >
                       Edit Component
                     </MenuItem>
                     <MenuItem
                       onClick={() => handleOpen(row)}
-                      isDisabled={
-                        !updateComponent || !updateSboms || signedUrlParams
-                      }
+                      isDisabled={!updateComponent || !updateSboms || signedUrlParams}
                     >
                       Edit Relationships
                     </MenuItem>
@@ -603,12 +390,7 @@ const ComponentTable = ({
                         setActiveRow(row)
                         onSupOpen()
                       }}
-                      isDisabled={
-                        status === 'signed' ||
-                        !updateComponent ||
-                        !updateSboms ||
-                        signedUrlParams
-                      }
+                      isDisabled={ status === 'signed' || !updateComponent || !updateSboms || signedUrlParams }
                     >
                       {suppliers.length > 0 ? 'Edit' : 'Add'} Supplier
                     </MenuItem>
@@ -617,23 +399,13 @@ const ComponentTable = ({
                         setActiveRow(row)
                         onLinkOpen()
                       }}
-                      isDisabled={
-                        status === 'signed' ||
-                        !updateComponent ||
-                        !updateSboms ||
-                        signedUrlParams
-                      }
+                      isDisabled={ status === 'signed' || !updateComponent || !updateSboms || signedUrlParams }
                     >
                       Edit Links
                     </MenuItem>
                     <MenuItem
                         onClick={() => handleGraphView(row)}
-                        isDisabled={
-                          status === 'signed' ||
-                          !updateComponent ||
-                          !updateSboms ||
-                          totalComp?.length === 1
-                        }
+                        isDisabled={ status === 'signed' || !updateComponent || !updateSboms || totalComp?.length === 1 }
                       >
                         View Relationships
                       </MenuItem>
@@ -645,12 +417,7 @@ const ComponentTable = ({
                           setActiveRow(row)
                           onDelOpen()
                         }}
-                        isDisabled={
-                          status === 'signed' ||
-                          !updateComponent ||
-                          !updateSboms ||
-                          totalComp?.length === 1
-                        }
+                        isDisabled={ status === 'signed' || !updateComponent || !updateSboms || totalComp?.length === 1 }
                       >
                         Delete
                       </MenuItem>
@@ -1002,19 +769,10 @@ const ComponentTable = ({
         projectId: signedUrlParams ? undefined : productId,
         sbomId: sbomId,
         search: value,
-        ecosystem:
-          ecosystems.includes('all') || ecosystems.length === 0
-            ? undefined
-            : ecosystems,
+        ecosystem: ecosystems.includes('all') || ecosystems.length === 0 ? undefined : ecosystems,
         kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
-        licenses:
-          licenses.includes('all') || licenses.length === 0
-            ? undefined
-            : licenses,
-        supplierName:
-          suppliers.includes('all') || suppliers.length === 0
-            ? undefined
-            : suppliers,
+        licenses: licenses.includes('all') || licenses.length === 0 ? undefined : licenses,
+        supplierName: suppliers.includes('all') || suppliers.length === 0 ? undefined : suppliers,
         primary: scope === 'primary' ? true : undefined,
         internal: scope === 'internal' ? true : undefined,
         direct: direct === true ? true :  undefined,
@@ -1130,19 +888,10 @@ const ComponentTable = ({
       last: before ? totalRows : undefined,
       before: before ? before : undefined,
       search: searchInput !== '' ? searchInput : undefined,
-      ecosystem:
-        ecosystems.includes('all') || ecosystems.length === 0
-          ? undefined
-          : ecosystems,
+      ecosystem: ecosystems.includes('all') || ecosystems.length === 0 ? undefined : ecosystems,
       kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
-      licenses:
-        licenses.includes('all') || licenses.length === 0
-          ? undefined
-          : licenses,
-      supplierName:
-        suppliers.includes('all') || suppliers.length === 0
-          ? undefined
-          : suppliers,
+      licenses: licenses.includes('all') || licenses.length === 0 ? undefined : licenses,
+      supplierName: suppliers.includes('all') || suppliers.length === 0 ? undefined : suppliers,
       primary: scope === 'primary' ? true : undefined,
       internal: scope === 'internal' ? true : undefined,
       direct: direct === true ? true :  undefined,
@@ -1165,19 +914,10 @@ const ComponentTable = ({
       after: undefined,
       before: undefined,
       search: searchInput !== '' ? searchInput : undefined,
-      ecosystem:
-        ecosystems.includes('all') || ecosystems.length === 0
-          ? undefined
-          : ecosystems,
+      ecosystem: ecosystems.includes('all') || ecosystems.length === 0 ? undefined : ecosystems,
       kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
-      licenses:
-        licenses.includes('all') || licenses.length === 0
-          ? undefined
-          : licenses,
-      supplierName:
-        suppliers.includes('all') || suppliers.length === 0
-          ? undefined
-          : suppliers,
+      licenses: licenses.includes('all') || licenses.length === 0 ? undefined : licenses,
+      supplierName: suppliers.includes('all') || suppliers.length === 0 ? undefined : suppliers,
       primary: scope === 'primary' ? true : undefined,
       internal: scope === 'internal' ? true : undefined,
       direct: direct === true ? true :  undefined,
@@ -1188,10 +928,7 @@ const ComponentTable = ({
         setPaginationControl(res?.data)
         prodCompDispatch({
           type: 'SET_SORT_ORDER',
-          payload: {
-            field: column.id,
-            direction: sortDirection === 'asc' ? 'ASC' : 'DESC'
-          }
+          payload: { field: column.id, direction: sortDirection === 'asc' ? 'ASC' : 'DESC' }
         })
       }
     })
@@ -1211,10 +948,7 @@ const ComponentTable = ({
     handleRefetch(data.pageInfo.endCursor, null)
     prodCompDispatch({
       type: 'INCREMENT_PAGE',
-      payload: {
-        total: data.totalCount,
-        after: data.pageInfo.endCursor
-      }
+      payload: { total: data.totalCount, after: data.pageInfo.endCursor }
     })
   }
 
@@ -1266,96 +1000,38 @@ const ComponentTable = ({
       {activeRow !== null && (
         <>
           {isOpen && (
-            <ComponentDrawer
-              data={activeRow}
-              isOpen={isOpen}
-              onClose={onClose}
-              sbomRefetch={sbomRefetch}
-              fetchCompData={fetchCompData}
-              filterRefetch={getCompFilters}
-              shortDesc={null}
-              checkId={null}
-              primaryComp={primaryComp}
-            />
+            <ComponentDrawer data={activeRow} isOpen={isOpen} onClose={onClose} sbomRefetch={sbomRefetch} fetchCompData={fetchCompData} filterRefetch={getCompFilters} shortDesc={null} checkId={null} primaryComp={primaryComp} />
           )}
 
           {isDelOpen && (
-            <ComponentModal
-              isOpen={isDelOpen}
-              onClose={onDelClose}
-              id={activeRow.id}
-              sbomRefetch={sbomRefetch}
-              fetchCompData={fetchCompData}
-            />
+            <ComponentModal isOpen={isDelOpen} onClose={onDelClose} id={activeRow.id} sbomRefetch={sbomRefetch} fetchCompData={fetchCompData} />
           )}
 
           {isSupOpen && (
-            <SupplierModal
-              id={activeRow.id}
-              refetch={fetchCompData}
-              filterRefetch={getCompFilters}
-              isOpen={isSupOpen}
-              onClose={onSupClose}
-              data={activeRow}
-              shortDesc={null}
-              checkId={null}
-            />
+            <SupplierModal id={activeRow.id} refetch={fetchCompData} filterRefetch={getCompFilters} isOpen={isSupOpen} onClose={onSupClose} data={activeRow} shortDesc={null} checkId={null} />
           )}
 
           {isLinkOpen && (
-            <LinksDrawer
-              component={activeRow}
-              btnRef={linkRef}
-              isOpen={isLinkOpen}
-              onClose={onLinkClose}
-              fetchCompData={fetchCompData}
-              productId={productId}
-              sbomId={sbomId}
-            />
+            <LinksDrawer component={activeRow} btnRef={linkRef} isOpen={isLinkOpen} onClose={onLinkClose} fetchCompData={fetchCompData} productId={productId} sbomId={sbomId} />
           )}
 
           {isRelationOpen && comPath && (
-            <RelationshipDrawer
-              isOpen={isRelationOpen}
-              onClose={onRelationClose}
-              data={activeRow}
-              compPath={comPath.component.pathToPrimary}
-              total={totalComp}
-              fetchCompData={fetchCompData}
-            />
+            <RelationshipDrawer isOpen={isRelationOpen} onClose={onRelationClose} data={activeRow} compPath={comPath.component.pathToPrimary} total={totalComp} fetchCompData={fetchCompData} />
           )}
         </>
       )}
 
       {/* COMPONENT DRAWER */}
-      {isCompOpen && !customerView && (
-        <ComponentDrawer
-          isOpen={isCompOpen}
-          onClose={onCompClose}
-          fetchCompData={fetchCompData}
-          filterRefetch={getCompFilters}
-          sbomRefetch={sbomRefetch}
-          primaryComp={primaryComp}
-          shortDesc={null}
-          checkId={null}
-          data={null}
-        />
+      {isCompOpen && (
+        <ComponentDrawer isOpen={isCompOpen} onClose={onCompClose} fetchCompData={fetchCompData} filterRefetch={getCompFilters} sbomRefetch={sbomRefetch} primaryComp={primaryComp} shortDesc={null} checkId={null} data={null} />
       )}
 
       {isPurlOpen && (
-        <PurlCard
-          value={activeRow?.purl}
-          isOpen={isPurlOpen}
-          onClose={onPurlClose}
-        />
+        <PurlCard value={activeRow?.purl} isOpen={isPurlOpen} onClose={onPurlClose} />
       )}
 
       {isCpeOpen && (
-        <CpeCard
-          value={activeRow?.cpes[0]}
-          isOpen={isCpeOpen}
-          onClose={onCpeClose}
-        />
+        <CpeCard value={activeRow?.cpes[0]} isOpen={isCpeOpen} onClose={onCpeClose} />
       )}
     </>
   )

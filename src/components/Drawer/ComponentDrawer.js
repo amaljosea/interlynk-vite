@@ -138,9 +138,9 @@ function ComponentDrawer(props) {
     onPurlOpen()
   }
 
-  const handleCreateCom = async () => {
+  const handleCreateCom = () => {
     setDisabled(true)
-    await createComponent({
+    createComponent({
       variables: { sbomId: sbomId, kind: compKind, name: compName, version: compVersion, group: groupInfo, scope: compScope, licenses: { licensesExp: expLicense || '' }, cpes: cpeValue !== '' ? [cpeValue] : [], purl: purlValue, primary: isPrimary, internal: isInternal }
     })
       .then((res) => {
@@ -169,9 +169,9 @@ function ComponentDrawer(props) {
     setIsValid(true)
   }
 
-  const handleUpdateCom = async () => {
+  const handleUpdateCom = () => {
     setDisabled(true)
-    await updateComponent({
+    updateComponent({
       variables: { id: data?.id, sbomId: sbomId, kind: compKind, name: compName, version: compVersion, group: groupInfo, scope: compScope, licenses: { licensesExp: licenseType === 'license_exp' ? expLicense ? expLicense : '' : undefined }, cpes: cpeValue !== '' ? [cpeValue] : [], purl: purlValue, primary: isPrimary, internal: isInternal }
     }).then((res) => {
       if (res.data) {
