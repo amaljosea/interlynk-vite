@@ -650,7 +650,7 @@ export const validateUrl = (url) => {
 
 export const validPassword = (value) => {
   const passwordRegex =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&$%^*])(?=.*\d)[a-zA-Z\d.!@#&$%^*\s-]{8,}$/
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[<>^~!@#$%^&*()-_=+{}|\\;:'",.?/`])(.{8,16})$/
   return passwordRegex.test(value)
 }
 
