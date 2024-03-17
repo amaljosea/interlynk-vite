@@ -70,6 +70,8 @@ import { isDefaultEnv, filterEnvList } from 'utils'
 import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
 import StatusModal from './components/StatusModal'
 import VulnInfo from '../Vulnerabilities/vulnInfo'
+import {FaBell} from "react-icons/fa";
+import NotificationMenuBell from "../../../components/Notifications/NotificationMenuBell";
 
 const ProductDetails = () => {
   const navigate = useNavigate()
@@ -452,6 +454,8 @@ const ProductDetails = () => {
                     ml={'auto'}
                     flexWrap={'wrap'}
                   >
+                    {/* Notifications */}
+                    <NotificationMenuBell/>
                     {/* EDIT PRODUCT */}
                     <Tooltip label='Edit Product'>
                       <IconButton
