@@ -184,7 +184,7 @@ const PersonalInfo = ({ user, refetch }) => {
                 </InputGroup>
                 {invalidPassword && (
                   <FormHelperText color={'red.500'}>
-                    <Text mb={1}>Your password must contain:</Text>
+                    <Text mb={1}>Your password must be 8-16 characters contain:</Text>
                     <Text>1. Lower case letters {`(a-z)`}</Text>
                     <Text>2. Upper case letters {`(A-Z)`}</Text>
                     <Text>3. Special characters {`(ex. !@#&$%*)`}</Text>

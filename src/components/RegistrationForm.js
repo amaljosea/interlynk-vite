@@ -4,9 +4,8 @@ import { Alert, AlertDescription, AlertIcon, Box, Button, Flex, FormControl, For
 import { RegisterUser } from 'graphQL/Mutation'
 import { useMutation } from '@apollo/client'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { validateEmail } from 'utils'
+import { validateEmail, validPassword } from 'utils'
 import { CheckCircleIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
-import { validPassword } from 'utils'
 
 const RegistrationForm = () => {
   const navigate = useNavigate()
@@ -159,7 +158,7 @@ const RegistrationForm = () => {
           </InputGroup>
           {invalidPassword && (
             <FormHelperText color={'red.500'}>
-              <Text mb={1}>Your password must contain:</Text>
+              <Text mb={1}>Your password must be 8-16 characters contain:</Text>
               <Text>1. Lower case letters {`(a-z)`}</Text>
               <Text>2. Upper case letters {`(A-Z)`}</Text>
               <Text>3. Special characters {`(ex. !@#&$%*)`}</Text>
