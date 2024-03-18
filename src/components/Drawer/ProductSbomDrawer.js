@@ -1,36 +1,6 @@
 // Chakra imports
 import React, { useState, useRef } from 'react'
-import {
-  Drawer,
-  DrawerBody,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerOverlay,
-  DrawerContent,
-  DrawerCloseButton,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
-  Button,
-  Stack,
-  FormControl,
-  FormLabel,
-  Input,
-  Select,
-  useToast,
-  Checkbox,
-  useDisclosure,
-  Text,
-  Tooltip,
-  InputGroup,
-  IconButton,
-  Flex,
-  Icon,
-  InputRightElement
+import { Drawer, DrawerBody, DrawerFooter, DrawerHeader, DrawerOverlay, DrawerContent, DrawerCloseButton, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Button, Stack, FormControl, FormLabel, Input, Select, useToast, Checkbox, useDisclosure, Text, Tooltip, InputGroup, IconButton, Flex, Icon, InputRightElement
 } from '@chakra-ui/react'
 import { useLazyQuery, useMutation } from '@apollo/client'
 import { sbomCreate, CreateComponent } from 'graphQL/Mutation'
@@ -66,6 +36,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
   const [purlData, setPurlData] = useState(null)
   const [isPURLInputValid, setPURLInputValid] = useState(true)
   const [isValid, setIsValid] = useState(true)
+  const [disabled, setDisabled] = useState(false)  
 
   const handleRefetch = () => {
     refetch({
@@ -112,10 +83,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
       setPurlData(pkg)
       prodCompDispatch({ type: 'SET_PURL_STRING', payload: pkg.toString() })
     } else {
-      prodCompDispatch({
-        type: 'SET_PURL_STRING',
-        payload: 'pkg:type/name@version?key=value'
-      })
+      prodCompDispatch({ type: 'SET_PURL_STRING', payload: 'pkg:type/name@version?key=value' })
     }
     onPurlOpen()
   }
@@ -126,12 +94,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
   const handleCreateCpe = (string) => {
     const cpeItem = cpeList?.find((item) => item === string)
     if (cpeItem) {
-      toast({
-        description: 'CPE already exists',
-        status: 'error',
-        position: 'top',
-        duration: 3000
-      })
+      toast({ description: 'CPE already exists', status: 'error', position: 'top', duration: 3000 })
     } else {
       setCpeList([...cpeList, string])
       setCpeData([])
@@ -143,12 +106,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
   const handleUpdateCpe = (string, id) => {
     const cpeItem = cpeList?.find((item) => item === string)
     if (cpeItem) {
-      toast({
-        description: 'CPE already exists',
-        status: 'error',
-        position: 'top',
-        duration: 3000
-      })
+      toast({ description: 'CPE already exists', status: 'error', position: 'top', duration: 3000 })
     } else if (cpeList?.find((item, index) => index === id)) {
       const updatedData = cpeList?.map((item, index) => {
         if (index === id) {
@@ -166,16 +124,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
     const { value } = e.target
     const val = value.replace(/\s/g, '')
     setCpeValue(val)
-    getCpe({
-      variables: {
-        input: {
-          idType: 'cpe',
-          ecosystem: 'cpe',
-          search: {
-            idUri: val
-          }
-        }
-      }
+    getCpe({ variables: { input: { idType: 'cpe', ecosystem: 'cpe', search: { idUri: val } } }
     }).then((res) => {
       if (res?.data) {
         setCpeData(res?.data?.idAutoComplete?.result || [])
@@ -194,9 +143,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
         version: version,
         group: groupInfo,
         scope: compScope,
-        licenses: {
-          licensesExp: expLicense || '',
-        },
+        licenses: { licensesExp: expLicense || '', },
         cpes: cpeValue !== '' ? [cpeValue] : [],
         purl: purlValue,
         primary: true,
@@ -205,63 +152,54 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
     }).then(
       (res) =>
         res.data &&
-        toast({
-          description: 'SBOM added successfully',
-          status: 'success',
-          position: 'top',
-          duration: 3000
-        })
+        toast({ description: 'SBOM added successfully', status: 'success', position: 'top', duration: 3000 })
     )
   }
 
-  const onCreateSBOM = async () => {
-    await createSbom({
-      variables: {
-        projectId: activeEnv,
-        spec: 'cyclonedx',
-        specVersion: '1.4',
-        format: 'json'
-      }
+  const onCreateSBOM = () => {
+    setDisabled(true)
+    createSbom({variables: { projectId: activeEnv, spec: 'cyclonedx', specVersion: '1.4', format: 'json'}
     })
       .then((res) => {
         if (res.data.sbomCreate.errors.length === 0) {
+          setDisabled(false)
           handleCreateComp(res.data.sbomCreate.sbom.id)
         } else {
-          toast({
-            description: res.data.sbomCreate.errors,
-            status: 'error',
-            position: 'top',
-            duration: 4000
+          toast({ description: res.data.sbomCreate.errors, status: 'error', position: 'top', duration: 4000
           })
         }
       })
       .finally(() => onClose())
+      setSbomName('')
+      setVersion('')
+      setCompType('')
+      setGroupInfo('')
+      setCompScope('required')
+      setCpeValue('')
+      setCpeList([])
+      setCpeData([])
+      setSelectedCpe(null)
+      setPurlValue('')
+      setPurlData(null)
   }
 
   return (
     <>
       <Drawer isOpen={isOpen} placement='right' onClose={onClose} size='md'>
         <DrawerOverlay />
-
         <DrawerContent>
           <DrawerCloseButton />
-          <DrawerHeader borderBottomWidth='1px' color='gray.600'>
-            Build Version
-          </DrawerHeader>
+          <DrawerHeader borderBottomWidth='1px' color='gray.600'>Build Version</DrawerHeader>
           <DrawerBody>
             <Stack direction={'column'} spacing={4}>
               {/* NAME */}
               <FormControl isRequired>
-                <FormLabel htmlFor='sbomName' fontSize={'sm'}>
-                  Name
-                </FormLabel>
+                <FormLabel htmlFor='sbomName' fontSize={'sm'}>Name</FormLabel>
                 <Input fontSize={'sm'} type='text' id='sbomName' name='sbomName' value={sbomName} onChange={(e) => setSbomName(e.target.value)} placeholder='Enter name'/>
               </FormControl>
               {/* VERSION */}
               <FormControl isRequired>
-                <FormLabel htmlFor='sbomVersion' fontSize={'sm'}>
-                  Version
-                </FormLabel>
+                <FormLabel htmlFor='sbomVersion' fontSize={'sm'}>Version</FormLabel>
                 <Input fontSize={'sm'} type='text' id='sbomVersion' name='sbomVersion' vaue={version} onChange={(e) => setVersion(e.target.value)} placeholder='Enter version' />
               </FormControl>
               {/* Group */}
@@ -337,9 +275,7 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
               <FormControl>
                 <FormLabel htmlFor='compScope'>Scope</FormLabel>
                 <Select id='compScope' name='compScope' size='md' fontSize={'sm'} value={compScope} onChange={(e) => setCompScope(e.target.value)}>
-                  <option value='' style={{ background: 'lightgray' }}>
-                    -- Select --
-                  </option>
+                  <option value='' style={{ background: 'lightgray' }}>-- Select --</option>
                   <option value='excluded'>Excluded</option>
                   <option value='optional'>Optional</option>
                   <option value='required'>Required</option>
@@ -354,10 +290,8 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
             </Stack>
           </DrawerBody>
           <DrawerFooter borderTopWidth='1px'>
-            <Button mr={3} onClick={onClose}>
-              Cancel
-            </Button>
-            <Button colorScheme='blue' onClick={onCreateSBOM} disabled={sbomName === '' || compType === '' || version === ''}>
+            <Button mr={3} onClick={onClose}>Cancel</Button>
+            <Button colorScheme='blue' onClick={onCreateSBOM} disabled={sbomName === '' || compType === '' || version === '' || disabled}>
               Save
             </Button>
           </DrawerFooter>
@@ -380,12 +314,8 @@ function ProductSbomDrawer({ isOpen, onClose, refetch, data, productId }) {
               <Text mt={10}>Are you sure you wish to continue?</Text>
             </ModalBody>
             <ModalFooter>
-              <Button mr={3} onClick={onWarningClose}>
-                Cancel
-              </Button>
-              <Button colorScheme='red' onClick={onCreateSBOM}>
-                Ok
-              </Button>
+              <Button mr={3} onClick={onWarningClose}>Cancel</Button>
+              <Button colorScheme='red' onClick={onCreateSBOM}>Ok</Button>
             </ModalFooter>
           </ModalContent>
         </Modal>
