@@ -1,355 +1,88 @@
-// Custom icons
-import {
-  AdobexdLogo,
-  AtlassianLogo,
-  JiraLogo,
-  SlackLogo,
-  SpotifyLogo
-} from 'components/Icons/Icons.js'
 
 import { AiOutlineExclamation } from 'react-icons/ai'
+import { FaEye, FaThumbsUp, FaTools, FaBug, FaShare, FaGithub, FaArrowDown, FaArrowUp, FaFilePdf } from 'react-icons/fa'
 
-import {
-  FaEye,
-  FaThumbsUp,
-  FaTools,
-  FaBug,
-  FaShare,
-  FaGithub,
-  FaArrowDown,
-  FaArrowUp,
-  FaFilePdf
-} from 'react-icons/fa'
-
-export const healthChecks = [
+export const sagData = [
   {
-    id: 1,
-    healthCheckId: 'SB-HC-10',
-    severity: 'critical',
-    shortDesc: 'Primary Component',
-    longDesc: 'Document is missing a primary component',
-    resolution: 'Unresolved',
-    status: 'fix'
+    supplierName: 'Reliable Energy Analytics LLC',
+    productName: 'SAGCTR_inquiry/getByProdCatlabel',
+    productVersion: '2024-0316_SAG-CTR',
+    sagScore: 23.75,
+    currentDate: '2024-03-18',
+    category: 'Internet Web Service API',
+    label: 'SAG Trusted Internet Web API'
   },
   {
-    id: 2,
-    healthCheckId: 'SB-HC-5',
-    severity: 'high',
-    shortDesc: 'Creation Time',
-    longDesc: 'Document is missing a creation timestamp',
-    resolution: 'Fixed',
-    status: 'fix'
-  },
-  // Component Biotronik.Cabo.Shared-0.0.0-UnknownVersion
-  {
-    id: 3,
-    healthCheckId: 'SB-HC-7',
-    severity: 'high',
-    shortDesc: 'Primary Author',
-    longDesc: 'Document is missing authors',
-    resolution: 'Unresolved',
-    status: 'fix'
+    supplierName: 'Reliable Energy Analytics LLC',
+    productName: 'SAGCTR_inquiry/getlabels',
+    productVersion: '2024-0315_SAG-CTR',
+    sagScore: 15.25,
+    currentDate: '2024-03-17',
+    category: 'Internet Web Service API',
+    label: 'SAG Trusted Internet Web API'
   },
   {
-    id: 4,
-    healthCheckId: 'SB-HC-23',
-    severity: 'high',
-    shortDesc: 'Primary Relationship',
-    resolution: 'Fixed',
-    longDesc:
-      'Component: Biotronik.Cabo.Shared-0.0.0-UnknownVersion is not related to Primary Component',
-    status: 'fix'
+    supplierName: 'Reliable Energy Analytics LLC',
+    productName: 'SAGCTR_inquiry/getProductCategories',
+    productVersion: '2024-0307_SAG-CTR',
+    sagScore: 10.75,
+    currentDate: '2024-03-16',
+    category: 'Internet Web Service API',
+    label: 'SAG Trusted Internet Web API'
   },
   {
-    id: 5,
-    healthCheckId: 'SB-HC-17',
-    severity: 'high',
-    shortDesc: 'Component Identifier',
-    longDesc:
-      'Component: Biotronik.Cabo.Shared-0.0.0-UnknownVersion: is mssing a Package URL (PURL)',
-    status: 'fix',
-    resolution: 'Unresolved'
+    supplierName: 'Reliable Energy Analytics LLC',
+    productName: 'SAGCTR_inquiry/getTrustedProduct',
+    productVersion: '2024-0307_SAG-CTR',
+    sagScore: 21.11,
+    currentDate: '2024-03-15',
+    category: 'Internet Web Service API',
+    label: 'SAG Trusted Internet Web API'
   },
   {
-    id: 6,
-    healthCheckId: 'SB-HC-19',
-    severity: 'high',
-    shortDesc: 'Component Identifier',
-    longDesc:
-      'Component: Biotronik.Cabo.Shared-0.0.0-UnknownVersion is Common Platform Enumeration (CPE)',
-    status: 'fix',
-    resolution: 'Fixed'
+    supplierName: 'Reliable Energy Analytics LLC',
+    productName: 'SAG-PM (TM)',
+    productVersion: '1.2',
+    sagScore: 34.23,
+    currentDate: '2024-03-15',
+    category: 'Desktop Software Application',
+    label: 'SAG Trusted Software'
   },
   {
-    id: 7,
-    healthCheckId: 'SB-HC-15',
-    severity: 'low',
-    shortDesc: 'Component Supplier',
-    longDesc:
-      'Component: Biotronik.Cabo.Shared-0.0.0-UnknownVersion is missing s a supplier',
-    status: 'fix',
-    resolution: 'Fixed'
+    supplierName: 'Reliable Energy Analytics LLC',
+    productName: 'SAG-PM (TM)',
+    productVersion: '1.2.1',
+    sagScore: 65.23,
+    currentDate: '2024-03-14',
+    category: 'Desktop Software Application',
+    label: 'SAG Trusted Software'
   },
   {
-    id: 8,
-    healthCheckId: 'SB-HC-12',
-    severity: 'high',
-    shortDesc: 'Component Version',
-    longDesc:
-      'Component: Biotronik.Cabo.Shared-0.0.0-UnknownVersion is missing a version',
-    status: 'fix',
-    resolution: 'Unresolved'
-  },
-
-  // Component system.reactive.compatibility.5.0.0.nupkg
-  {
-    id: 9,
-    healthCheckId: 'SB-HC-23',
-    severity: 'critical',
-    shortDesc: 'Component Relationship',
-    longDesc:
-      'Component: system.reactive.compatibility.5.0.0.nupkg is not related to Primary Component',
-    status: 'fix',
-    resolution: 'Unresolved'
+    supplierName: 'Reliable Energy Analytics LLC',
+    productName: 'SAG-PM (TM)',
+    productVersion: '1.2.2',
+    sagScore: 11.05,
+    currentDate: '2024-03-13',
+    category: 'Desktop Software Application',
+    label: 'SAG Purl SWID Trusted Product'
   },
   {
-    id: 10,
-    healthCheckId: 'SB-HC-17',
-    severity: 'high',
-    shortDesc: 'Component Identifier',
-    longDesc:
-      'Component: system.reactive.compatibility.5.0.0.nupkg is missing a Package URL (PURL)',
-    status: 'fix',
-    resolution: 'Ignored'
+    supplierName: 'Reliable Energy Analytics LLC',
+    productName: 'SAG-PM (TM)',
+    productVersion: '1.2.2',
+    sagScore: 23.75,
+    currentDate: '2024-03-12',
+    category: 'Vendor Response File',
+    label: 'SAG Trusted Artifact'
   },
   {
-    id: 11,
-    healthCheckId: 'SB-HC-13',
-    severity: 'high',
-    shortDesc: 'Component Type',
-    longDesc:
-      'Component: system.reactive.compatibility.5.0.0.nupkg is missing a type',
-    status: 'fix',
-    resolution: 'Ignored'
-  },
-  {
-    id: 12,
-    healthCheckId: 'SB-HC-15',
-    severity: 'low',
-    shortDesc: 'Component Supplier',
-    longDesc:
-      'Component: system.reactive.compatibility.5.0.0.nupkg is missing a supplier',
-    status: 'fix',
-    resolution: 'Fixed'
-  },
-
-  // Component couchbase.lite.enterprise.3.0.0.nupkg
-  {
-    id: 13,
-    healthCheckId: 'SB-HC-24',
-    severity: 'medium',
-    shortDesc: 'Component Identifier',
-    longDesc:
-      'Component: system.reactive.compatibility.5.0.0.nupkg is missing a unique identifier',
-    status: 'fix',
-    resolution: 'Unresolved'
-  },
-  {
-    id: 14,
-    healthCheckId: 'SB-HC-23',
-    severity: 'critical',
-    shortDesc: 'Component Relationship',
-    longDesc:
-      'Component: system.reactive.compatibility.5.0.0.nupkg is not related to Primary Component',
-    status: 'fix',
-    resolution: 'Ignored'
-  },
-  {
-    id: 15,
-    healthCheckId: 'SB-HC-19',
-    severity: 'high',
-    shortDesc: 'Component Identifier',
-    longDesc:
-      'Component: system.reactive.compatibility.5.0.0.nupkg is missing a Common Platform Enumeration (CPE)',
-    status: 'fix',
-    resolution: 'Ignored'
-  },
-  {
-    id: 16,
-    healthCheckId: 'SB-HC-15',
-    severity: 'low',
-    shortDesc: 'Component Supplier',
-    longDesc:
-      'Component: system.reactive.compatibility.5.0.0.nupkg is missing a supplier',
-    status: 'fix',
-    resolution: 'Ignored'
-  }
-]
-
-export const orgHealthChecks = [
-  {
-    id: 1,
-    title: 'SB-HC-4',
-    link: 'https://www.interlynk.io/',
-    description: 'SBOM Document has a unique identifier',
-    long_desc:
-      'SBOM document has a unique identifier field i.e serialNumber for CDX and SPDXID + namespace for SPDX.',
-    status: 'High'
-  },
-  {
-    id: 2,
-    title: 'SB-HC-5',
-    link: 'https://www.interlynk.io/',
-    description: 'Document creation timestamp',
-    long_desc: 'SBOM document contains a creation timestamp',
-    status: 'High'
-  },
-  {
-    id: 3,
-    title: 'SB-HC-6',
-    link: 'https://www.interlynk.io/',
-    description: 'Document has creation tools present',
-    long_desc: 'SBOM lists tools used to create the document.',
-    status: 'High'
-  },
-  {
-    id: 4,
-    title: 'SB-HC-7',
-    link: 'https://www.interlynk.io/',
-    description: 'Document has authors present',
-    long_desc: 'SBOM lists authors who created this document.',
-    status: 'High'
-  },
-  {
-    id: 5,
-    title: 'SB-HC-8',
-    link: 'https://www.interlynk.io/',
-    description: 'Document has suppliers present',
-    long_desc:
-      'SBOM lists the organization that supplied the component that the bom describes. The supplier may often be the manufacturer, but may also be a distributor or repackager.SBOM lists the organization that supplied the component that the bom describes. The supplier may often be the manufacturer, but may also be a distributor or repackager.',
-    status: 'High'
-  },
-  {
-    id: 6,
-    title: 'SB-HC-9',
-    link: 'https://www.interlynk.io/',
-    description: 'Document has data license specified',
-    long_desc:
-      'This is to alleviate any concern that content in the sbom document is subject to any form of intellectual property right that could restrict the re-use of the information or the creation of another SBOM document for the same project(s).',
-    status: 'High'
-  },
-  {
-    id: 7,
-    title: 'SB-HC-10',
-    link: 'https://www.interlynk.io/',
-    description: 'Document has a primary component',
-    long_desc:
-      'SBOM is used to describe a primary component or package. A primary component is a component that is directly included in a product or service.',
-    status: 'Critical'
-  },
-  {
-    id: 8,
-    title: 'SB-HC-11',
-    link: 'https://www.interlynk.io/',
-    description: 'Component has a name',
-    long_desc:
-      'The name of each component is a short, essential identifier to be maintained.',
-    status: 'High'
-  },
-  {
-    id: 9,
-    title: 'SB-HC-12',
-    link: 'https://www.interlynk.io/',
-    description: 'Component has a version',
-    long_desc:
-      'The versioning of a component is a useful for identification purposes and for indicating later changes of the component version.',
-    status: 'High'
-  },
-  {
-    id: 10,
-    title: 'SB-HC-13',
-    link: 'https://www.interlynk.io/',
-    description: 'Component has a type',
-    long_desc:
-      'This is a reasonable estimate of the most likely component usage from the producer and consumer perspective from which both parties can draw conclusions about the context in which the component exists.',
-    status: 'Low'
-  },
-  {
-    id: 11,
-    title: 'SB-HC-14',
-    link: 'https://www.interlynk.io/',
-    description: 'Component has a valid type',
-    long_desc:
-      'The type of each component is a valid type as defined by the specification.',
-    status: 'Low'
-  },
-  {
-    id: 12,
-    title: 'SB-HC-15',
-    link: 'https://www.interlynk.io/',
-    description: 'Component has a supplier',
-    long_desc:
-      'Component has a supplier that is a valid organization as defined by the specification.',
-    status: 'Low'
-  },
-  {
-    id: 13,
-    title: 'SB-HC-16',
-    link: 'https://www.interlynk.io/',
-    description: 'Component has a unique identifier',
-    long_desc:
-      'Component has a unique identifier that is a valid based on sbom spec. Can be used for lookups in other db e.g vulns db.',
-    status: 'High'
-  },
-  {
-    id: 14,
-    title: 'SB-HC-17',
-    link: 'https://www.interlynk.io/',
-    description: 'Component has a Package URL (PURL)',
-    long_desc: 'Component has a purl, which can be used to lookup vulns.',
-    status: 'High'
-  },
-  {
-    id: 15,
-    title: 'SB-HC-18',
-    link: 'https://www.interlynk.io/',
-    description: 'Component has a valid Package URL (PURL)',
-    long_desc: 'Component has a valid purl, which can be used to lookup vulns.',
-    status: 'High'
-  },
-  {
-    id: 16,
-    title: 'SB-HC-19',
-    link: 'https://www.interlynk.io/',
-    description: 'Component has a Common Platform Enumeration (CPE)',
-    long_desc:
-      'Component has a cpe, which can be used to lookup vulns from nvd.',
-    status: 'High'
-  },
-  {
-    id: 17,
-    title: 'SB-HC-20',
-    link: 'https://www.interlynk.io/',
-    description: 'Component has a valid Common Platform Enumeration (CPE)',
-    long_desc:
-      'Component has a valid cpe, which can be used to lookup vulns from nvd.',
-    status: 'High'
-  },
-  {
-    id: 18,
-    title: 'SB-HC-21',
-    link: 'https://www.interlynk.io/',
-    description: 'Component has license/s specified',
-    long_desc: 'Component has license/s specified.',
-    status: 'Medium'
-  },
-  {
-    id: 19,
-    title: 'SB-HC-22',
-    link: 'https://www.interlynk.io/',
-    description: 'Componet has deprecated license/s',
-    long_desc: 'Component has deprecated license/s.',
-    status: 'Medium'
+    supplierName: 'Reliable Energy Analytics LLC',
+    productName: 'SAG-PM (TM)',
+    productVersion: '1.2.2',
+    sagScore: 44.75,
+    currentDate: '2024-03-10',
+    category: 'Desktop Software Application',
+    label: 'SAG Trusted Software'
   }
 ]
 
@@ -1122,44 +855,6 @@ export const sbom = [
   }
 ]
 
-export const tablesProjectData = [
-  {
-    logo: AdobexdLogo,
-    name: 'Interlynk Version',
-    budget: '$14,000',
-    status: 'Working',
-    progression: 60
-  },
-  {
-    logo: AtlassianLogo,
-    name: 'Add Progress Track',
-    budget: '$3,000',
-    status: 'Canceled',
-    progression: 10
-  },
-  {
-    logo: SlackLogo,
-    name: 'Fix Platform Errors',
-    budget: 'Not set',
-    status: 'Done',
-    progression: 100
-  },
-  {
-    logo: SpotifyLogo,
-    name: 'Launch our Mobile App',
-    budget: '$32,000',
-    status: 'Done',
-    progression: 100
-  },
-  {
-    logo: JiraLogo,
-    name: 'Add the New Pricing Page',
-    budget: '$400',
-    status: 'Working',
-    progression: 25
-  }
-]
-
 export const invoicesData = [
   {
     date: 'March, 01, 2020',
@@ -1258,188 +953,5 @@ export const olderTransactions = [
     date: '25 March 2021, at 16:30 PM',
     price: '- $987',
     logo: FaArrowDown
-  }
-]
-
-export const vulnList = [
-  {
-    id: '31b66fcd-469a-4f06-bd64-8c8fa3554526',
-    impact: null,
-    vuln: {
-      vulnId: 'GHSA-h376-j262-vhq6',
-      desc: 'RCE in H2 Console',
-      sev: 'critical',
-      cvssScore: 9.8,
-      cvssVector: 'CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H',
-      source: 'osv',
-      publishedAt: '2022-01-06T23:55:09Z',
-      lastModifiedAt: '2023-11-08T04:07:06Z',
-      nvdAliasId: 'CVE-2021-42392',
-      updatedAt: '2023-12-02T13:11:38Z',
-      prods: 4,
-      resolved: 4,
-      vulnInfo: {
-        cveId: 'CVE-2021-42392',
-        epssScore: 0.46489,
-        epssScores: [0.46489, 0.46489],
-        epssPercentile: 0.9709,
-        kev: false,
-        __typename: 'VulnInfo'
-      },
-      __typename: 'GlobalVuln'
-    },
-    componentVulnLogs: [],
-    component: {
-      name: 'h2',
-      version: '1.4.200',
-      __typename: 'Component'
-    },
-    vexStatus: null,
-    vexJustification: null,
-    __typename: 'ComponentVuln'
-  },
-  {
-    id: 'a9f2be62-2aea-4568-bea5-77748917220a',
-    impact: null,
-    vuln: {
-      vulnId: 'GHSA-7rpj-hg47-cx62',
-      desc: 'Improper Restriction of XML External Entity Reference in com.h2database:h2.',
-      sev: 'high',
-      cvssScore: 8.1,
-      cvssVector: 'CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:H',
-      source: 'osv',
-      publishedAt: '2021-12-16T14:29:57Z',
-      lastModifiedAt: '2023-11-08T22:13:32Z',
-      nvdAliasId: 'CVE-2021-23463',
-      updatedAt: '2023-12-02T13:11:38Z',
-      prods: 9,
-      resolved: 3,
-      vulnInfo: {
-        cveId: 'CVE-2021-23463',
-        epssScore: 0.00473,
-        epssScores: [0.00473, 0.00473],
-        epssPercentile: 0.72881,
-        kev: false,
-        __typename: 'VulnInfo'
-      },
-      __typename: 'GlobalVuln'
-    },
-    componentVulnLogs: [],
-    component: {
-      name: 'h2',
-      version: '1.4.200',
-      __typename: 'Component'
-    },
-    vexStatus: null,
-    vexJustification: null,
-    __typename: 'ComponentVuln'
-  },
-  {
-    id: '4e24bc4c-0798-4492-802a-edc1c911d0cf',
-    impact: null,
-    vuln: {
-      vulnId: 'GHSA-45hx-wfhj-473x',
-      desc: 'Arbitrary code execution in H2 Console',
-      sev: 'critical',
-      cvssScore: 9.8,
-      cvssVector: 'CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H',
-      source: 'osv',
-      publishedAt: '2022-01-21T23:07:39Z',
-      lastModifiedAt: '2023-11-08T04:08:17Z',
-      nvdAliasId: 'CVE-2022-23221',
-      updatedAt: '2023-12-02T13:11:38Z',
-      prods: 1,
-      resolved: 0,
-      vulnInfo: {
-        cveId: 'CVE-2022-23221',
-        epssScore: 0.0677,
-        epssScores: [0.0677, 0.0677],
-        epssPercentile: 0.93112,
-        kev: false,
-        __typename: 'VulnInfo'
-      },
-      __typename: 'GlobalVuln'
-    },
-    componentVulnLogs: [],
-    component: {
-      name: 'h2',
-      version: '1.4.200',
-      __typename: 'Component'
-    },
-    vexStatus: null,
-    vexJustification: null,
-    __typename: 'ComponentVuln'
-  },
-  {
-    id: '16082b3a-ac6c-4f99-8afe-ee04d44d019f',
-    impact: null,
-    vuln: {
-      vulnId: 'GHSA-22wj-vf5f-wrvj',
-      desc: 'Password exposure in H2 Database ',
-      sev: 'high',
-      cvssScore: 7.8,
-      cvssVector: 'CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H',
-      source: 'osv',
-      publishedAt: '2022-11-23T21:30:31Z',
-      lastModifiedAt: '2023-11-08T04:10:54Z',
-      nvdAliasId: 'CVE-2022-45868',
-      updatedAt: '2023-12-02T13:11:38Z',
-      prods: 6,
-      resolved: 6,
-      vulnInfo: {
-        cveId: 'CVE-2022-45868',
-        epssScore: 0.00042,
-        epssScores: [0.00042, 0.00042],
-        epssPercentile: 0.05735,
-        kev: false,
-        __typename: 'VulnInfo'
-      },
-      __typename: 'GlobalVuln'
-    },
-    componentVulnLogs: [],
-    component: {
-      name: 'h2',
-      version: '1.4.200',
-      __typename: 'Component'
-    },
-    vexStatus: null,
-    vexJustification: null,
-    __typename: 'ComponentVuln'
-  },
-  {
-    id: '271b31c4-4605-4b89-936d-16ab370d4bb8',
-    impact: null,
-    vuln: {
-      vulnId: 'GHSA-wgh7-54f2-x98r',
-      desc: 'HTTP/2 HPACK integer overflow and buffer allocation',
-      sev: 'high',
-      cvssScore: 7.5,
-      cvssVector: 'CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H',
-      source: 'osv',
-      publishedAt: '2023-10-10T21:16:23Z',
-      lastModifiedAt: '2023-11-16T18:46:02Z',
-      nvdAliasId: 'CVE-2023-36478',
-      updatedAt: '2023-12-02T13:11:38Z',
-      prods: 7,
-      resolved: 0,
-      vulnInfo: {
-        cveId: 'CVE-2023-36478',
-        epssScore: 0.0025,
-        epssScores: [0.0025, 0.0025],
-        epssPercentile: 0.62647,
-        kev: false,
-        __typename: 'VulnInfo'
-      },
-      __typename: 'GlobalVuln'
-    },
-    componentVulnLogs: [],
-    component: {
-      name: 'http2-hpack',
-      version: '9.4.46.v20220331',
-      __typename: 'Component'
-    },
-    vexStatus: null,
-    vexJustification: null,
-    __typename: 'ComponentVuln'
   }
 ]

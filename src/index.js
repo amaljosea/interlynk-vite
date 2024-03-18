@@ -33,6 +33,7 @@ import PubProductDetails from 'views/Customer/Products/ProductDetails'
 import Support from 'views/Dashboard/Support'
 import Tools from 'views/Dashboard/Tools'
 import Reset from 'layouts/Reset'
+import Sag from 'views/Dashboard/SAG'
 
 
 const authToken = Cookies.get('authToken')
@@ -87,6 +88,7 @@ ReactDOM.render(
                 <Route index element={<ProductList />} />
                 <Route path={`:name`} element={<ProductDetails />} />
               </Route>
+              <Route path={`SAG`} element={<Sag />} />
               <Route path={`vulnerabilities`} element={<Vulnerabilities />} />
               <Route path={`licenses`} element={<Licenses />} />
               <Route path={`tools`} element={<Tools />} />
