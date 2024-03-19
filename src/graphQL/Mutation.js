@@ -2228,3 +2228,25 @@ export const DeletePolicyRule = gql`
     }
   }
 `
+
+// UPDATE NOTIFICATION PREFERENCE
+
+export const UpdateNotificationPreference = gql`
+  mutation NotificationPreferenceUpdate(
+    $notificationPreferences: [NotificationPreferenceArguments!]!
+    $projectId: Uuid
+  ) {
+    notificationPreferenceUpdate(
+      input: {
+        notificationPreferences: $notificationPreferences
+        projectId: $projectId
+      }
+    ) {
+      currentNotificationPreference {
+        id
+        userId
+        projectId
+      }
+    }
+  }
+`
