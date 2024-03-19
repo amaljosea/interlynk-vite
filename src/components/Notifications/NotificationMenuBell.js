@@ -12,8 +12,11 @@ import {
 import {FaBell, FaFilter} from "react-icons/fa";
 import CheckMark from "../Misc/CheckMark";
 import {useEffect, useState} from "react";
+import {UpdateNotificationPreference} from "../../graphQL/Mutation";
+import {useMutation} from "@apollo/client";
 
 const NotificationMenuBell = () => {
+  const [updatePreference] = useMutation(UpdateNotificationPreference)
 
   useEffect(() => {
     //API call to get user's notification preferences
@@ -29,9 +32,17 @@ const NotificationMenuBell = () => {
     'Policies': 'policies',
   }
   const handlePreferenceChange = (newPreference) => {
-    newPreference = [newPreference[newPreference.length - 1]] // only allow one status at a time
+    if (newPreference.includes('none') || newPreference.includes('all')) {
+      newPreference = [newPreference[newPreference.length - 1]] // only allow one status at a time
+    }
+    //API call to update user's notification preferences
+    updatePreference({
+      variables: {
+        notificationPreferences: newPreference,
+        projectId: localStorage['activeEnv']
+      }
+    }).then(r => console.log(r))
 
-    //Mutation to update user's notification preferences
     setPreference(newPreference)
   }
 
@@ -50,7 +61,7 @@ const NotificationMenuBell = () => {
 
   return (
     <Box width={'fit-content'} position={'relative'}>
-      <Menu closeOnSelect={true}>
+      <Menu closeOnSelect={false}>
         {preference[0] != 'none' && <CheckMark />}
         <MenuButton>
           <IconButton
