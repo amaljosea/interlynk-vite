@@ -2071,3 +2071,160 @@ export const DeleteCompSupportOverride = gql`
     }
   }
 `
+
+// CREATE POLICY
+export const PolicyCreate = gql`
+  mutation PolicyCreate(
+    $name: String!
+    $isEnabled: Boolean
+    $operator: PolicyOperatorEnum!
+    $resultType: PolicyResultTypeEnum!
+  ) {
+    policyCreate(
+      input: {
+        name: $name
+        isEnabled: $isEnabled
+        operator: $operator
+        resultType: $resultType
+      }
+    ) {
+      policy {
+        id
+        name
+        isEnabled
+        operator
+        resultType
+      }
+      errors
+    }
+  }
+`
+
+// UPDATE POLICY
+export const PolicyUpdate = gql`
+  mutation PolicyUpdate(
+    $id: Uuid!
+    $name: String
+    $isEnabled: Boolean
+    $operator: PolicyOperatorEnum
+    $resultType: PolicyResultTypeEnum
+  ) {
+    policyUpdate(
+      input: {
+        id: $id
+        name: $name
+        isEnabled: $isEnabled
+        operator: $operator
+        resultType: $resultType
+      }
+    ) {
+      policy {
+        id
+        name
+        isEnabled
+        operator
+        resultType
+      }
+      errors
+    }
+  }
+`
+
+// DELETE POLICY
+export const PolicyDelete = gql`
+  mutation PolicyDelete($id: Uuid!) {
+    policyDelete(input: { id: $id }) {
+      errors
+      policy {
+        createdAt
+        id
+        isEnabled
+        name
+        operator
+        organizationId
+        resultType
+        updatedAt
+      }
+    }
+  }
+`
+
+// CREATE POLICY RULE
+export const CreatePolicyRule = gql`
+  mutation CreatePolicyRule(
+    $policyId: Uuid!
+    $operator: PolicyRuleOperatorEnum!
+    $value: String!
+    $subject: PolicyRuleSubjectEnum!
+  ) {
+    policyRuleCreate(
+      input: {
+        policyId: $policyId
+        operator: $operator
+        value: $value
+        subject: $subject
+      }
+    ) {
+      policyRule {
+        createdAt
+        id
+        operator
+        policyId
+        subject
+        updatedAt
+        value
+      }
+      errors
+    }
+  }
+`
+
+// UPDATE POLICY RULE
+export const UpdatePolicyRule = gql`
+  mutation UpdatePolicyRule(
+    $id: Uuid!
+    $policyId: Uuid!
+    $operator: PolicyRuleOperatorEnum
+    $subject: PolicyRuleSubjectEnum
+    $value: String
+  ) {
+    policyRuleUpdate(
+      input: {
+        id: $id
+        policyId: $policyId
+        operator: $operator
+        value: $value
+        subject: $subject
+      }
+    ) {
+      errors
+      policyRule {
+        createdAt
+        id
+        operator
+        policyId
+        subject
+        updatedAt
+        value
+      }
+    }
+  }
+`
+
+// DELETE POLICY RULE
+export const DeletePolicyRule = gql`
+  mutation DeletePolicyRule($id: Uuid!) {
+    policyRuleDelete(input: { id: $id }) {
+      policyRule {
+        createdAt
+        id
+        operator
+        policyId
+        subject
+        updatedAt
+        value
+      }
+      errors
+    }
+  }
+`

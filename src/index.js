@@ -34,6 +34,7 @@ import Support from 'views/Dashboard/Support'
 import Tools from 'views/Dashboard/Tools'
 import Reset from 'layouts/Reset'
 import Sag from 'views/Dashboard/SAG'
+import Policies from 'views/Dashboard/Policies'
 
 
 const authToken = Cookies.get('authToken')
@@ -93,6 +94,7 @@ ReactDOM.render(
               <Route path={`licenses`} element={<Licenses />} />
               <Route path={`tools`} element={<Tools />} />
               <Route path={`support`} element={<Support />} />
+              <Route path={`policies`} element={<Policies />} />
               <Route path={`settings`} element={<Profile />} />
             </Route>
             <Route path={`login`} element={<LoginLayout />} />

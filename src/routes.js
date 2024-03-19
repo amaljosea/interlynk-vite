@@ -4,18 +4,20 @@ import Profile from 'views/Dashboard/Profile'
 import Products from 'views/Dashboard/Products'
 import CustomerProducts from 'views/Customer/Products'
 import { FaRegSun, FaPlug, FaWindowMaximize, FaBug, FaBalanceScale } from 'react-icons/fa'
+import { MdPolicy } from 'react-icons/md'
 import { HomeIcon } from 'components/Icons/Icons'
 import Vulnerabilities from 'views/Dashboard/Vulnerabilities'
 import Licenses from 'components/Licenses'
 import Support from 'views/Dashboard/Support'
 import { FaStar, FaToolbox } from 'react-icons/fa6'
+import Policies from 'views/Dashboard/Policies'
 
 export const dashRoutes = [
   { path: '/dashboard', name: 'Dashboard', icon: <HomeIcon color='inherit' />, component: Dashboard, layout: '/vendor'
   },
   { path: '/products', name: 'Products', icon: <FaWindowMaximize color='inherit' />, component: Products, layout: '/vendor'
   },
-  { path: '/SAG', name: 'SAG', icon: <FaStar color='inherit' size={20} />, component: Products, layout: '/vendor'
+  { path: '/SAG', name: 'SAG', icon: <FaStar color='inherit' size={18} />, component: Products, layout: '/vendor'
   },
   { path: '/vulnerabilities', name: 'Vulnerabilities', icon: <FaBug color='inherit' />, component: Vulnerabilities, layout: '/vendor'
   },
@@ -40,6 +42,9 @@ export const dashRoutes = [
   },
   { 
     path: '/support', name: 'Support', icon: <FaPlug color='inherit' />, component: Support, layout: '/vendor'
+  },
+  { 
+    path: '/policies', name: 'Policies', icon: <MdPolicy color='inherit' />, component: Policies, layout: '/vendor'
   },
   {
     path: '/settings', name: 'Settings',icon: <FaRegSun color='inherit' />,component: Profile,layout: '/vendor'

@@ -990,7 +990,6 @@ export const GetFeedLogs = gql`
 
 // ----------------------- PRODUCT DETAILS PAGE ---------------------------
 
-
 // GET PRODUCT VERSION
 export const GetVersionsTable = gql`
   query GetVersionsTable(
@@ -3413,6 +3412,62 @@ export const GetSupportTab = gql`
           updatedAt
         }
       }
+    }
+  }
+`
+
+// GET POLICIES
+export const GetPolicies = gql`
+  query GetPolicies(
+    $search: String
+    $after: String
+    $before: String
+    $first: Int
+    $last: Int
+  ) {
+    policies(
+      search: $search
+      after: $after
+      before: $before
+      first: $first
+      last: $last
+    ) {
+      totalCount
+      nodes {
+        createdAt
+        id
+        isEnabled
+        name
+        operator
+        resultType
+        updatedAt
+        policyRules {
+          id
+          operator
+          policyId
+          subject
+          updatedAt
+          value
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+        hasPreviousPage
+        startCursor
+      }
+    }
+  }
+`
+
+// GET POLICY SUBJECTS
+export const PolicySubjectOperators = gql`
+  query PolicySubjectOperators {
+    policySubjectOperatorMapping {
+      category
+      name
+      operators
+      subject
     }
   }
 `

@@ -12,7 +12,8 @@ import {
   sbomReducer,
   versionReducer,
   toolsReducer,
-  supportReducer
+  supportReducer,
+  policyReducer
 } from 'context/reducers'
 
 const GlobalStateContext = createContext()
@@ -193,6 +194,15 @@ const GlobalStateProvider = ({ children }) => {
     searchInput: '',
     filters: null
   })
+   // POLICIES
+   const [policyState, policyDispatch] = useReducer(policyReducer, {
+    pageIndex: 1,
+    searchInput: '',
+    after:'',
+    before: '',
+    field: 'POLICIES_UPDATED_AT',
+    direction: 'DESC'
+  })
 
   return (
     <GlobalStateContext.Provider
@@ -238,6 +248,7 @@ const GlobalStateProvider = ({ children }) => {
         versionState,
         toolsState,
         supportState,
+        policyState,
         dispatch: {
           globalVulnDispatch,
           compVulnDispatch,
@@ -251,7 +262,8 @@ const GlobalStateProvider = ({ children }) => {
           sbomDispatch,
           versionDispatch,
           toolsDispatch,
-          supportDispatch
+          supportDispatch,
+          policyDispatch
         }
       }}
     >
