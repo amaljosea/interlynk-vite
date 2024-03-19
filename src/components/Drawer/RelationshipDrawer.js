@@ -72,18 +72,16 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, fetchCompData, compP
 
   const recentComp = Math.max(...dependsOnList.map((item) => new Date(item.updatedAt).getTime()))
 
-  const handleAdd = async () => {
-    await addRelation({variables: { from: id, to: component, relType: relation }})
+  const handleAdd = () => {
+    addRelation({variables: { from: id, to: component, relType: relation }})
       .then((res) => {
         if (res.data) {
           setIsAdded(true)
           setDependsOnList((prev) => [ ...prev, res.data.componentRelationCreate.compRelation ])
         }
-      })
-      .finally(() => {
-        setRelation('')
-        setComponent('')
-      })
+    })
+    setRelation('')
+    setComponent('')
   }
 
   const handleRemove = async () => {
@@ -200,9 +198,7 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, fetchCompData, compP
                             .map((comp, index) => (
                               <Tooltip key={index} label={comp.toComp.name} placement='top' >
                                 <Tag size={'sm'} variant='subtle' colorScheme={ index == 0 && isAdded ? 'green' : 'blue' } width={'fit-content'}>
-                                  <TagLabel>
-                                    {comp.toComp.name?.substring(0, 50)}-{comp.toComp.version}
-                                  </TagLabel>
+                                  <TagLabel>{comp.toComp.name?.substring(0, 50)}-{comp.toComp.version}</TagLabel>
                                   <TagCloseButton
                                     onClick={() => {
                                       setActiveComp(comp)
@@ -243,9 +239,7 @@ const RelationshipDrawer = ({ isOpen, onClose, data, total, fetchCompData, compP
                   </Stack>
                 ) : (
                   <Stack width={'100%'} alignItems={'center'} justifyContent={'center'} >
-                    <Tag size='sm' colorScheme='green'>
-                      {name} - {version}
-                    </Tag>
+                    <Tag size='sm' colorScheme='green'>{name} - {version}</Tag>
                   </Stack>
                 )}
               </Flex>
