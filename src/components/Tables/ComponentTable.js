@@ -24,6 +24,7 @@ import Pagination from '../Pagination'
 import PurlCard from 'components/Misc/PurlCard'
 import CpeCard from 'components/Misc/CpeCard'
 import { ShareCompFilters } from 'graphQL/Queries'
+import { openSsf } from 'variables/general'
 
 const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, setActiveComp }) => {
   const location = useLocation()
@@ -373,16 +374,10 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, se
                 <MenuButton as={IconButton} aria-label='Options' icon={<FaEllipsisV />} variant='none' color='gray.400' />
                 <Portal>
                   <MenuList size='sm'>
-                    <MenuItem
-                      onClick={() => onLicenseOpen(row)}
-                      isDisabled={ status === 'signed' || !updateComponent || !updateSboms || signedUrlParams }
-                    >
+                    <MenuItem onClick={() => onLicenseOpen(row)} isDisabled={ status === 'signed' || !updateComponent || !updateSboms || signedUrlParams } >
                       Edit Component
                     </MenuItem>
-                    <MenuItem
-                      onClick={() => handleOpen(row)}
-                      isDisabled={!updateComponent || !updateSboms || signedUrlParams}
-                    >
+                    <MenuItem onClick={() => handleOpen(row)} isDisabled={!updateComponent || !updateSboms || signedUrlParams} >
                       Edit Relationships
                     </MenuItem>
                     <MenuItem
@@ -403,10 +398,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, se
                     >
                       Edit Links
                     </MenuItem>
-                    <MenuItem
-                        onClick={() => handleGraphView(row)}
-                        isDisabled={ status === 'signed' || !updateComponent || !updateSboms || totalComp?.length === 1 }
-                      >
+                    <MenuItem onClick={() => handleGraphView(row)} isDisabled={ status === 'signed' || !updateComponent || !updateSboms || totalComp?.length === 1 } >
                         View Relationships
                       </MenuItem>
                     <Divider />
@@ -478,21 +470,9 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, se
 
   // EXPAND SECTION
   const ExpandedComponent = ({ data }) => {
-    const {
-      scope,
-      suppliers,
-      purl,
-      description,
-      cpes,
-      name,
-      kind,
-      internal,
-      licenses,
-      licensesExp,
-      licensesCustom,
-      dependencyOf,
-      dependsOn
-    } = data
+    const { scope, suppliers, purl, description, cpes, name, kind, internal, licenses, licensesExp, licensesCustom, dependencyOf, dependsOn } = data
+
+    const openSSF = openSsf?.find((item) => item?.name === purl)
 
     const CustomText = styled(Text)`
       font-size: 13px;
@@ -508,12 +488,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, se
         p={5}
         boxShadow='inset 0px -5px 5px rgba(0, 0, 0, 0.08), inset 0px 5px 5px rgba(0, 0, 0, 0.08)'
       >
-        <Grid
-          templateColumns='repeat(3, 1fr)'
-          gap={6}
-          width={'80%'}
-          margin={'0 auto'}
-        >
+        <Grid templateColumns='repeat(3, 1fr)' gap={6} width={'80%'} margin={'0 auto'}>
           <GridItem w='100%' colSpan={3}>
             <CustomText>Description :</CustomText>
             <Text width={'90%'} mt={1} fontSize={14} wordBreak={'break-all'}>
@@ -543,24 +518,12 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, se
             <VStack spacing={4} mt={1} alignItems={'left'}>
               {suppliers &&
                 suppliers.map((item, index) => (
-                  <Tag
-                    size={'md'}
-                    key={index}
-                    variant='subtle'
-                    colorScheme='orange'
-                    width={'fit-content'}
-                  >
+                  <Tag size={'md'} key={index} variant='subtle' colorScheme='orange' width={'fit-content'} >
                     <Text wordBreak={'break-all'}>
                       {item.contactName}
                       {item.contactEmail && ` (${item.contactEmail})`}
-                      {item.url ? (
-                        <Link href={item.url} isExternal>
-                          {' '}
-                          {item.name}
-                        </Link>
-                      ) : (
-                        ` ${item.name}`
-                      )}
+                      {item.url ? (<Link href={item.url} isExternal>{' '}{item.name}</Link>
+                      ) : (` ${item.name}` )}
                     </Text>
                     {!signedUrlParams && <TagCloseButton onClick={() => handleSupRemove(item.id)} />}
                   </Tag>
@@ -584,13 +547,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, se
           </GridItem>
           <GridItem>
             <CustomText>CPES :</CustomText>
-            <Flex
-              mt={1}
-              flexDirection={'column'}
-              alignItems={'flex-start'}
-              gap={1}
-              flexWrap={'wrap'}
-            >
+            <Flex mt={1} flexDirection={'column'} alignItems={'flex-start'} gap={1} flexWrap={'wrap'}>
               {cpes?.length > 0 &&
                 cpes.map((item, index) => (
                   <Text
@@ -615,21 +572,9 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, se
                 [...dependsOn]
                   .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
                   .map((comp, index) => (
-                    <Tooltip
-                      key={index}
-                      label={comp.toComp.name}
-                      placement='top'
-                    >
-                      <Tag
-                        size='sm'
-                        padding={1}
-                        variant='subtle'
-                        colorScheme={'blue'}
-                        wordBreak={'break-all'}
-                      >
-                        <Text wordBreak={'break-all'}>
-                          {comp.toComp.name}-{comp.toComp.version}
-                        </Text>
+                    <Tooltip key={index} label={comp.toComp.name} placement='top'>
+                      <Tag size='sm' padding={1} variant='subtle' colorScheme={'blue'} wordBreak={'break-all'}>
+                        <Text wordBreak={'break-all'}>{comp.toComp.name}-{comp.toComp.version}</Text>
                       </Tag>
                     </Tooltip>
                   ))}
@@ -640,20 +585,9 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, se
             <Flex mt={2} alignItems={'flex-start'} gap={2} flexWrap={'wrap'}>
               {dependencyOf?.length > 0 &&
                 dependencyOf?.map((comp, index) => (
-                  <Tooltip
-                    key={index}
-                    label={comp.fromComp.name}
-                    placement='top'
-                  >
-                    <Tag
-                      size='sm'
-                      padding={1}
-                      variant='subtle'
-                      colorScheme={'blue'}
-                    >
-                      <Text wordBreak={'break-all'}>
-                        {comp.fromComp.name}-{comp.fromComp.version}
-                      </Text>
+                  <Tooltip key={index} label={comp.fromComp.name} placement='top' >
+                    <Tag size='sm' padding={1} variant='subtle' colorScheme={'blue'}>
+                      <Text wordBreak={'break-all'}>{comp.fromComp.name}-{comp.fromComp.version}</Text>
                     </Tag>
                   </Tooltip>
                 ))}
@@ -661,9 +595,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, se
           </GridItem>
           <GridItem>
             <CustomText>Scope :</CustomText>
-            <Text mt={1} fontSize={14} textTransform={'capitalize'}>
-              {scope}
-            </Text>
+            <Text mt={1} fontSize={14} textTransform={'capitalize'}>{scope}</Text>
           </GridItem>
           <GridItem>
             <CustomText>Licenses :</CustomText>
@@ -671,41 +603,28 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, se
               {/* SPDX */}
               {licenses?.length > 0 &&
                 licenses.map((item, index) => (
-                  <Tag
-                    key={index}
-                    size={'md'}
-                    variant='subtle'
-                    colorScheme='green'
-                    width={'fit-content'}
-                  >
+                  <Tag key={index} size={'md'} variant='subtle' colorScheme='green' width={'fit-content'}>
                     <Text wordBreak={'break-all'}>{item}</Text>
                   </Tag>
                 ))}
               {/* EXPRESSION */}
               {licensesExp && licensesExp !== '' && (
-                <Tag
-                  size={'md'}
-                  variant='subtle'
-                  colorScheme='green'
-                  width={'fit-content'}
-                >
+                <Tag size={'md'} variant='subtle' colorScheme='green' width={'fit-content'}>
                   <Text wordBreak={'break-all'}>{licensesExp}</Text>
                 </Tag>
               )}
               {/* CUSTOM */}
               {licensesCustom?.length > 0 &&
                 licensesCustom?.map((item, index) => (
-                  <Tag
-                    key={index}
-                    size={'md'}
-                    variant='subtle'
-                    colorScheme='green'
-                    width={'fit-content'}
-                  >
+                  <Tag key={index} size={'md'} variant='subtle' colorScheme='green' width={'fit-content'}>
                     <Text wordBreak={'break-all'}>{item}</Text>
                   </Tag>
                 ))}
             </Flex>
+          </GridItem>
+          <GridItem>
+            <CustomText>OpenSSF Scorecard :</CustomText>
+            <Tag mt={1.5} variant='subtle' colorScheme={'blue'}>{openSSF?.score || '-'}</Tag>
           </GridItem>
         </Grid>
       </Box>
@@ -720,19 +639,10 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, se
       projectId: productId,
       sbomId: sbomId,
       search: undefined,
-      ecosystem:
-        ecosystems.includes('all') || ecosystems.length === 0
-          ? undefined
-          : ecosystems,
+      ecosystem: ecosystems.includes('all') || ecosystems.length === 0 ? undefined : ecosystems,
       kind: kinds.includes('all') || kinds.length === 0 ? undefined : kinds,
-      licenses:
-        licenses.includes('all') || licenses.length === 0
-          ? undefined
-          : licenses,
-      supplierName:
-        suppliers.includes('all') || suppliers.length === 0
-          ? undefined
-          : suppliers,
+      licenses: licenses.includes('all') || licenses.length === 0 ? undefined : licenses,
+      supplierName: suppliers.includes('all') || suppliers.length === 0 ? undefined : suppliers,
       primary: scope === 'primary' ? true : undefined,
       internal: scope === 'internal' ? true : undefined,
       direct: direct === true ? true :  undefined,
