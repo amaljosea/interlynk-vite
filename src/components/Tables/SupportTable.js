@@ -167,12 +167,12 @@ const SupportTable = ({ data, refetch }) => {
     )
   }, [filterText,onSearchInputChange,handleClear,handleSearch,handleRefresh])
 
-  // const onChangeStatus = async (e, row) => {
-  //   e.preventDefault()
-  //   await updateSupport({
-  //     variables: { id: row?.id, enabled: e.target.checked }
-  //   }).then((res) => res?.data && refetch({ ...supportData }))
-  // }
+  const onChangeStatus = async (e, row) => {
+    e.preventDefault()
+    await updateSupport({
+      variables: { id: row?.id, enabled: e.target.checked }
+    }).then((res) => res?.data && refetch({ variables: {...supportData } }))
+  }
 
   const onDeleteSupport = async (id) => {
     await deleteSupport({ variables: { id } }).then((res) => res?.data && refetch({ variables: { ...supportData } }))
@@ -186,12 +186,7 @@ const SupportTable = ({ data, refetch }) => {
       selector: (row) => {
         const { enabled } = row
         return (
-          <Switch
-            size='md'
-            defaultChecked={enabled}
-            isReadOnly
-            // onChange={(e) => onChangeStatus(e, row)}
-          />
+          <Switch size='md' isChecked={enabled} onChange={(e) => onChangeStatus(e, row)} />
         )
       },
       width: '150px',

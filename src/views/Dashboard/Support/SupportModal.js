@@ -102,11 +102,11 @@ const SupportModal = ({ data, isOpen, onClose, refetch }) => {
 
   useEffect(() => {
     if (data) {
-      setIdUri(data?.idUri)
-      setProductName(data?.productName)
-      setProductVersion(data?.productVersion)
-      setEos(new Date(data?.eos))
-      setEol(new Date(data?.eol))
+      setIdUri(data?.idUri || '')
+      setProductName(data?.productName || '')
+      setProductVersion(data?.productVersion || '')
+      setEos(data?.eos ? new Date(data?.eos) : null)
+      setEol(data?.eol ? new Date(data?.eol) : null)
       setDeprecated(data?.deprecated)
       setOutdated(data?.outdated)
     }
@@ -160,20 +160,16 @@ const SupportModal = ({ data, isOpen, onClose, refetch }) => {
                   <Datetime value={eos} timeFormat={false} onChange={handleEosChange} inputProps={{ onCopy: (e) => e.preventDefault(), onPaste: (e) => e.preventDefault() }} />
                   {!isValidEos && <FormErrorMessage>Please enter a valid expiry date</FormErrorMessage>}
                 </FormControl>
-                {data?.deprecated !== true && (
-                  <FormControl>
-                    <Checkbox isChecked={deprecated} onChange={(e) => setDeprecated(e.target.checked)}>
-                      Deprecated
-                    </Checkbox>
-                  </FormControl>
-                )}
-                {data?.outdated !== true && (
-                  <FormControl>
-                    <Checkbox isChecked={outdated} onChange={(e) => setOutdated(e.target.checked)} >
-                      Outdated
-                    </Checkbox>
-                  </FormControl>
-                )}
+                <FormControl>
+                  <Checkbox isChecked={deprecated} onChange={(e) => setDeprecated(e.target.checked)}>
+                    Deprecated
+                  </Checkbox>
+                </FormControl>
+                <FormControl>
+                  <Checkbox isChecked={outdated} onChange={(e) => setOutdated(e.target.checked)} >
+                    Outdated
+                  </Checkbox>
+                </FormControl>
               </Flex>
             </ModalBody>
             <ModalFooter>
