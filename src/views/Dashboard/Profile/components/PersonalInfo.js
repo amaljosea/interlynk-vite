@@ -7,7 +7,6 @@ import CardHeader from 'components/Card/CardHeader'
 import { UpdateUserPassword, updateOrgUser } from 'graphQL/Mutation'
 import { useGlobalState } from 'hooks/useGlobalState'
 import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { validPassword, validateEmail } from 'utils'
 import Cookies from 'js-cookie'
 
@@ -15,7 +14,6 @@ import Cookies from 'js-cookie'
 const PersonalInfo = ({ user, refetch }) => {
   const textColor = useColorModeValue('gray.700', 'white')
   const toast = useToast()
-  const navigate = useNavigate()
 
   const { setUserName } = useGlobalState()
 
@@ -123,13 +121,17 @@ const PersonalInfo = ({ user, refetch }) => {
   const handleUpdatePassword = () => {
      updatePassword({ variables: { currentPassword: oldPassword, newPassword: newPassword, newPasswordConfirmation: confirmPassword } })
       .then((res) => {
-        if (res?.data) {
-          console.log(res?.data)
+        console.log(res?.data)
+        const errors = res?.data?.userUpdatePassword?.errors
+        if (errors?.length > 0) {
+          toast({ description: errors[0], status: 'error', position: 'top', duration: 2000 })
+        } else {
           Cookies.set('authToken', res?.data?.userUpdatePassword?.updatedToken)
           toast({description:'Password updated successfully',status:'success',position:'top',duration:3000})
+          window.location.href = `/vendor/dashboard`
         }
       })
-      .finally(() => window.location.href = `/vendor/dashboard`)
+
   }
 
   return (
@@ -187,7 +189,7 @@ const PersonalInfo = ({ user, refetch }) => {
                     <Text mb={1}>Your password must be 8-16 characters contain:</Text>
                     <Text>1. Lower case letters {`(a-z)`}</Text>
                     <Text>2. Upper case letters {`(A-Z)`}</Text>
-                    <Text>3. Special characters {`(ex. !@#&$%*)`}</Text>
+                    <Text>3. Special characters {`(ex. !@#&$%*.)`}</Text>
                     <Text>4. Numbers {`(0-9)`}</Text>
                   </FormHelperText>
                 )}
