@@ -35,7 +35,13 @@ export default function Dashboard() {
 
   const { data, error: eOrg, loading } = useQuery(GetOrg, {
     skip: data === undefined ? false : true,
-    onCompleted: (data) => localStorage.setItem('organization', data?.organization?.name)
+    fetchPolicy: 'network-only',
+    onCompleted: (data) => {
+      if(data) {
+        localStorage.setItem('organization', data?.organization?.name)
+        localStorage.setItem('isSuperAdmin', data?.organization?.currentUser?.superAdmin)
+      }
+    }
   })
 
   const { data: metrics, error: eOrgMetric } = useQuery(GetOrgMetrics, {

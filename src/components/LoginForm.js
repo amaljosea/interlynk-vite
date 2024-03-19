@@ -37,7 +37,7 @@ const LoginForm = () => {
           localStorage.setItem('username', status.data.user.name)
           localStorage.setItem('email', status.data.user.email)
           Cookies.set('authToken', response.headers.authorization)
-          navigate('/vendor/dashboard')
+          window.location.href = '/vendor/dashboard'
         }
       })
       .catch((error) => {
