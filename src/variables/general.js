@@ -55,6 +55,7 @@ export const sagData = [
     sagScore: 65.23,
     currentDate: '2024-03-14',
     category: 'Desktop Software Application',
+    link: 'https://softwareassuranceguardian.com/SAG-PM_VendorResponse_V1_2_2.xml',
     label: 'SAG Trusted Software'
   },
   {
@@ -82,6 +83,7 @@ export const sagData = [
     sagScore: 44.75,
     currentDate: '2024-03-10',
     category: 'Desktop Software Application',
+    link: 'https://softwareassuranceguardian.com/SAG-PM_VendorResponse_V1_2_2.xml',
     label: 'SAG Trusted Software'
   }
 ]
