@@ -11,18 +11,12 @@ import StepThree from './Wizard/StepThree'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useGlobalState } from 'hooks/useGlobalState'
 
-const ImportWizard = ({
-  variant,
-  currentSbomId,
-  currentProductId,
-  onClose
-}) => {
+const ImportWizard = ({ variant, currentSbomId, currentProductId, onClose }) => {
   const [compVexCreate] = useMutation(updateCompVulnVex)
   const [getVulns] = useLazyQuery(GetVulnData)
 
   const { prodVulnState, dispatch } = useGlobalState()
-  const { totalVulns, field, direction, importSbom, selectedVulns } =
-    prodVulnState
+  const { totalVulns, field, direction, importSbom, selectedVulns } = prodVulnState
   const { prodVulnDispatch } = dispatch
 
   const group = JSON.parse(localStorage.getItem('product'))
@@ -30,9 +24,7 @@ const ImportWizard = ({
   const params = useParams()
   const navigate = useNavigate()
 
-  const { nextStep, prevStep, activeStep } = useSteps({
-    initialStep: 0
-  })
+  const { nextStep, prevStep, activeStep } = useSteps({ initialStep: 0 })
 
   const [productId, setProductId] = useState('')
   const [sbomId, setSbomId] = useState('')
@@ -42,15 +34,7 @@ const ImportWizard = ({
   const [uniqVersions, setUniqVersions] = useState([])
 
   const refetchCurrentVuln = async () => {
-    await getVulns({
-      variables: {
-        projectId: currentProductId,
-        sbomId: currentSbomId,
-        first: totalVulns,
-        field: field,
-        direction: direction
-      }
-    })
+    await getVulns({ variables: { projectId: currentProductId, sbomId: currentSbomId, first: totalVulns, field: field, direction: direction } })
       .then((res) => {
         if (res.data) {
           const data = findSimilarItems(res.data.sbom.vulns.nodes, importSbom)
@@ -59,9 +43,7 @@ const ImportWizard = ({
         }
       })
       .finally(() => {
-        navigate(
-          `/vendor/products/${params.name}?id=${currentProductId}&sbom=${currentSbomId}`
-        )
+        navigate(`/vendor/products/${params.name}?id=${currentProductId}&sbom=${currentSbomId}`)
         onClose()
       })
   }
@@ -72,17 +54,14 @@ const ImportWizard = ({
       selectedVulns.map((item) => {
         compVexCreate({
           variables: {
+            sbomId: currentSbomId,
             compVulnId: item.id,
             note: item.importNotes ? item.importNotes : undefined,
             vexStatusId: item.importStatus.id,
-            vexJustificationId: item.importJustification
-              ? item.importJustification.id
-              : undefined,
+            vexJustificationId: item.importJustification ? item.importJustification.id : undefined,
             impact: item.importStatement ? item.importStatement : undefined,
             details: item.importDetail ? item.importDetail : undefined,
-            cdxResponseId: item.importResponse
-              ? item.importResponse
-              : undefined,
+            cdxResponseId: item.importResponse ? item.importResponse : undefined,
             fixedIn: item.importFixedIn ? item.importFixedIn : undefined,
             action: item.importActionStmt ? item.importActionStmt : undefined
           }
@@ -96,32 +75,13 @@ const ImportWizard = ({
     {
       label: 'Product',
       component: (
-        <StepOne
-          setProductId={setProductId}
-          setSbomId={setSbomId}
-          currentSbomId={currentSbomId}
-          currentProductId={currentProductId}
-          selectedGroup={selectedGroup}
-          setSelectedGroup={setSelectedGroup}
-          selectedProd={selectedProd}
-          setSelectedProd={setSelectedProd}
-          selectedVersion={selectedVersion}
-          setSelectedVersion={setSelectedVersion}
-          uniqVersions={uniqVersions}
-          setUniqVersions={setUniqVersions}
-        />
+        <StepOne setProductId={setProductId} setSbomId={setSbomId} currentSbomId={currentSbomId} currentProductId={currentProductId} selectedGroup={selectedGroup} setSelectedGroup={setSelectedGroup} selectedProd={selectedProd} setSelectedProd={setSelectedProd} selectedVersion={selectedVersion} setSelectedVersion={setSelectedVersion} uniqVersions={uniqVersions} setUniqVersions={setUniqVersions} />
       )
     },
     {
       label: 'Import',
       component: (
-        <StepTwo
-          currentSbomId={currentSbomId}
-          currentProductId={currentProductId}
-          getVulns={getVulns}
-          productId={productId}
-          sbomId={sbomId}
-        />
+        <StepTwo currentSbomId={currentSbomId} currentProductId={currentProductId} getVulns={getVulns} productId={productId} sbomId={sbomId} />
       )
     }
   ]
@@ -135,45 +95,20 @@ const ImportWizard = ({
       <Steps variant={variant} colorScheme='blue' activeStep={activeStep}>
         {steps.map(({ label, component }, index) => (
           <Step label={label} key={label}>
-            <Flex
-              width={'100%'}
-              flexDir={'column'}
-              alignItems={'center'}
-              justifyContent={'center'}
-              sx={{ p: 8, bg, my: 8, rounded: 'md' }}
-            >
+            <Flex width={'100%'} flexDir={'column'} alignItems={'center'} justifyContent={'center'} sx={{ p: 8, bg, my: 8, rounded: 'md' }}>
               {component}
             </Flex>
           </Step>
         ))}
       </Steps>
       {hasCompletedAllSteps && (
-        <Flex
-          width={'100%'}
-          flexDir={'column'}
-          alignItems={'center'}
-          justifyContent={'center'}
-          sx={{ p: 8, bg, my: 8, rounded: 'md' }}
-        >
+        <Flex width={'100%'} flexDir={'column'} alignItems={'center'} justifyContent={'center'} sx={{ p: 8, bg, my: 8, rounded: 'md' }}>
           <StepThree />
         </Flex>
       )}
-      <Flex
-        width='100%'
-        justify='flex-end'
-        gap={4}
-        pos={'absolute'}
-        bottom={2}
-        right={0}
-        py={5}
-        pr={8}
-      >
+      <Flex width='100%' justify='flex-end' gap={4} pos={'absolute'} bottom={2} right={0} py={5} pr={8}>
         {hasCompletedAllSteps ? (
-          <Button
-            variant='solid'
-            colorScheme='green'
-            onClick={refetchCurrentVuln}
-          >
+          <Button variant='solid' colorScheme='green' onClick={refetchCurrentVuln}>
             Done
           </Button>
         ) : (
@@ -193,23 +128,13 @@ const ImportWizard = ({
             )}
 
             {activeStep === 0 && (
-              <Button
-                variant='solid'
-                colorScheme='blue'
-                onClick={nextStep}
-                disabled={selectedVersion === '' || selectedGroup === '' || selectedProd === ''}
-              >
+              <Button variant='solid' colorScheme='blue' onClick={nextStep} disabled={selectedVersion === '' || selectedGroup === '' || selectedProd === ''}>
                 Next
               </Button>
             )}
 
             {activeStep === 1 && (
-              <Button
-                variant='solid'
-                colorScheme='blue'
-                onClick={handleSubmit}
-                disabled={selectedVulns.length === 0}
-              >
+              <Button variant='solid' colorScheme='blue' onClick={handleSubmit} disabled={selectedVulns.length === 0}>
                 Submit
               </Button>
             )}
