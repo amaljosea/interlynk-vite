@@ -50,7 +50,7 @@ const SagFilters = ({ category, setCategory, label, setLabel, supplier, setSuppl
       <Box width={'fit-content'} position={'relative'}>
         <Menu placement='top' closeOnSelect={false}>
           {(category !== 'all' && category !== '') && <CheckMark />}
-          <MenuHeading title={'Category'} />
+          <MenuHeading title={'Product Category'} />
           <MenuList>
             <MenuOptionGroup type='radio' value={category} onChange={onFilterCategory}>
               {['all','Internet Web Service API','Desktop Software Application','Vendor Response File'].map((item, index) => (
@@ -66,7 +66,7 @@ const SagFilters = ({ category, setCategory, label, setLabel, supplier, setSuppl
       <Box width={'fit-content'} position={'relative'}>
         <Menu placement='top' closeOnSelect={false}>
           {(label !== 'all' && label !== '') && <CheckMark />}
-          <MenuHeading title={'Label'} />
+          <MenuHeading title={'Label Type'} />
           <MenuList minW='auto' maxW={'320px'} minH={'auto'} maxH={'300px'} overflowY={'scroll'} >
             <MenuOptionGroup type='radio' value={label} onChange={onFilterLabel}>
               {['all','SAG Trusted Software','SAG Trusted Artifact','SAG Purl SWID Trusted Product'].map((item, index) => (
