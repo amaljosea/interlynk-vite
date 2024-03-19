@@ -75,14 +75,14 @@ const SagTable = ({ data }) => {
     },
     {
       id: 'CATEGORY',
-      name: 'CATEGORY',
+      name: 'PRODUCT CATEGORY',
       selector: (row) => <Text>{row?.category}</Text>,
       width: '220px',
       wrap: true
     },
     {
       id: 'LABEL',
-      name: 'LABEL',
+      name: 'LABEL TYPE',
       selector: (row) => <Text>{row?.label}</Text>,
       width: '220px',
       wrap: true
