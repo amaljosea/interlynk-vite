@@ -1,19 +1,22 @@
 import CustomLoader from 'components/CustomLoader'
 import DataTable from 'react-data-table-component'
-import { Button, Flex, Text } from '@chakra-ui/react'
+import { Badge, Button, Flex, IconButton, Stack, Text } from '@chakra-ui/react'
 import React, { useMemo, useState } from 'react'
 import { customStyles } from 'utils'
 import SearchFilter from 'views/Sbom/components/SearchFilter'
 import SagFilters from 'views/Dashboard/SAG/Filters'
 import Card from 'components/Card/Card'
+import { Link } from 'react-router-dom'
+import { FaEnvelope } from 'react-icons/fa6'
 
 const SagTable = ({ data }) => {
   const [searchInput, setSearchInput] = useState('')
   const [filterText, setFilterText] = useState(searchInput)
+  const [supplier, setSupplier] = useState('')
   const [category, setCategory] = useState('')
   const [label, setLabel] = useState('')
 
-  const filteredData = data?.filter((item) => item?.productName?.toLowerCase().includes(searchInput.toLowerCase()) && item?.category?.toLowerCase().includes(category.toLowerCase()) && item?.label?.toLowerCase().includes(label.toLowerCase()))
+  const filteredData = data?.filter((item) => item?.productName?.toLowerCase().includes(searchInput.toLowerCase()) && item?.supplierName?.toLowerCase().includes(supplier.toLowerCase()) && item?.category?.toLowerCase().includes(category.toLowerCase()) && item?.label?.toLowerCase().includes(label.toLowerCase()))
 
   // CLEAR SERACH
   const handleClear = () => {
@@ -44,7 +47,15 @@ const SagTable = ({ data }) => {
     {
       id: 'PRODUCT_NAME',
       name: 'PRODUCT NAME',
-      selector: (row) => <Text>{row?.productName}</Text>,
+      selector: (row) => {
+        const {supplierName, productName} = row
+        return (
+          <Stack my={4} alignItems={'flex-start'} spacing={2}>
+            <Text>{productName}</Text>
+            <Badge p={1}>{supplierName}</Badge>
+          </Stack>
+        )
+      },
       wrap: true,
       width: '300px'
     },
@@ -52,14 +63,14 @@ const SagTable = ({ data }) => {
       id: 'PRODUCT_VERSION',
       name: 'PRODUCT VERSION',
       selector: (row) => <Text>{row?.productVersion}</Text>,
-      width: '250px',
+      width:'200px',
       wrap: true
     },
     {
       id: 'SAG_SCORE',
       name: 'SAG SCORE',
       selector: (row) => <Button pointerEvents={'none'} size='xs' variant='outline' colorScheme='blue' width={'60px'}>{row?.sagScore}</Button>,
-      width: '200px',
+      width:'150px',
       wrap: true
     },
     {
@@ -73,14 +84,21 @@ const SagTable = ({ data }) => {
       id: 'LABEL',
       name: 'LABEL',
       selector: (row) => <Text>{row?.label}</Text>,
-      width: '360px',
+      width: '250px',
+      wrap: true
+    },
+    {
+      id: 'OMB-M-22-18 CRITERIA',
+      name: 'OMB-M-22-18 CRITERIA',
+      selector: (row) => <Link to={`https://softwareassuranceguardian.com/SAGCTR_inquiry/getWEBHOSTLabel?ProductID=92656E7EFFBDF3B2DE818E81786D16EFA4489B886C826D70BFD803AF38947430`} target='_blank'><IconButton colorScheme='blue' size='sm' icon={<FaEnvelope/>} /></Link>,
+      width:'220px',
       wrap: true
     },
     {
       id: 'UPDATED_AT',
       name: 'UPDATED',
       selector: (row) => <Text>{row.currentDate}</Text>,
-      right: 'true',
+      right:'true',
       wrap: true
     }
   ]
@@ -91,11 +109,11 @@ const SagTable = ({ data }) => {
       <>
         <Flex width={'100%'} alignItems={'center'} justifyContent={'flex-start'} mb={4} px={4} gap={4}>
           <SearchFilter id='sagData' filterText={filterText} onChange={onSearchInputChange} onClear={handleClear} onFilter={handleSearch} />
-          <SagFilters category={category} setCategory={setCategory} label={label} setLabel={setLabel} />
+          <SagFilters category={category} setCategory={setCategory} label={label} setLabel={setLabel} supplier={supplier} setSupplier={setSupplier} />
         </Flex>
       </>
     )
-  }, [filterText, category, label, setCategory, setLabel, handleClear, handleSearch, onSearchInputChange])
+  }, [filterText, category, label, setCategory, setLabel, supplier, setSupplier, handleClear, handleSearch, onSearchInputChange])
 
   return (
     <Card>

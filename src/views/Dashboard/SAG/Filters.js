@@ -2,10 +2,17 @@ import { Box, Menu, MenuItemOption, MenuList, MenuOptionGroup, Stack } from '@ch
 import CheckMark from 'components/Misc/CheckMark'
 import MenuHeading from 'components/Misc/MenuHeading'
 
-const SagFilters = ({ category, setCategory, label, setLabel }) => {
+const SagFilters = ({ category, setCategory, label, setLabel, supplier, setSupplier }) => {
+
+  const onFilterSupplier = (value) => {
+    if (value === 'all') {
+      setSupplier('')
+    } else {
+      setSupplier(value)
+    }
+  }
 
   const onFilterCategory = (value) => {
-    console.log('value', value)
     if (value === 'all') {
       setCategory('')
     } else {
@@ -23,6 +30,22 @@ const SagFilters = ({ category, setCategory, label, setLabel }) => {
 
   return (
     <Stack direction={'row'} alignItems={'center'} gap={2}>
+       {/* SUPPLIER */}
+       <Box width={'fit-content'} position={'relative'}>
+        <Menu placement='top' closeOnSelect={false}>
+          {(supplier !== 'all' && supplier !== '') && <CheckMark />}
+          <MenuHeading title={'Supplier'} />
+          <MenuList>
+            <MenuOptionGroup type='radio' value={supplier} onChange={onFilterSupplier}>
+              {['all','Reliable Energy Analytics LLC'].map((item, index) => (
+                <MenuItemOption key={index} value={item} fontSize={'sm'} textTransform={'capitalize'} >
+                  {item}
+                </MenuItemOption>
+              ))}
+            </MenuOptionGroup>
+          </MenuList>
+        </Menu>
+      </Box>
       {/* CATEGORY */}
       <Box width={'fit-content'} position={'relative'}>
         <Menu placement='top' closeOnSelect={false}>
