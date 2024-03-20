@@ -208,7 +208,7 @@ const SBOMTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
             {/* COMPONENT TABLE */}
             <TabPanel px={0}>
               {data && (
-                <ComponentTable type={type} lifecycle={data.lifecycle} data={compData?.sbom?.components} refetch={getCompData} sbomRefetch={refetch} setActiveComp={setActiveComp} primaryComp={data.primaryComponent}
+                <ComponentTable type={type} lifecycle={data.lifecycle} data={compData?.sbom?.components} refetch={getCompData} sbomRefetch={refetch} activeComp={activeComp} setActiveComp={setActiveComp} primaryComp={data.primaryComponent}
                 />
               )}
               {error && (
@@ -235,7 +235,7 @@ const SBOMTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
             </TabPanel>
             {/* RELATIONSHIP TABLE */}
             <TabPanel px={0}>
-              <GraphView data={primaryComp?.sbom?.components} activeComp={activeComp} />
+              <GraphView data={primaryComp?.sbom?.components} activeComp={null} />
             </TabPanel>
             {/* HEALTH CHECK TABLE */}
             <TabPanel px={0}>
