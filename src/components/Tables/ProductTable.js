@@ -94,8 +94,7 @@ const ProductTable = ({ data, refetch }) => {
   const environment = localStorage.getItem('environment')
   const path = location?.pathname?.startsWith('/vendor') ? 'vendor' : 'customer'
 
-  const { userPermissions, setEnvName, setClearSelect, setSelectedSbom, setActiveSbomTab, prodState, dispatch } =
-    useGlobalState()
+  const { userPermissions, setEnvName, setClearSelect, setSelectedSbom, setActiveSbomTab, prodState, dispatch } = useGlobalState()
 
   const { field, direction, searchInput, pageIndex, enabled } = prodState
   const { prodDispatch, prodCompDispatch } = dispatch
@@ -105,65 +104,22 @@ const ProductTable = ({ data, refetch }) => {
   const [activeRow, setActiveRow] = useState(null)
 
   const { isOpen, onOpen, onClose } = useDisclosure()
-  const {
-    isOpen: isOpenProduct,
-    onOpen: onOpenProduct,
-    onClose: onCloseProduct
-  } = useDisclosure()
-  const {
-    isOpen: isOpenUpload,
-    onOpen: onOpenUpload,
-    onClose: onCloseUpload
-  } = useDisclosure()
-  const {
-    isOpen: isSbomOpen,
-    onOpen: onSbomOpen,
-    onClose: onSbomClose
-  } = useDisclosure()
-  const {
-    isOpen: isDeleteOpen,
-    onOpen: onDeleteOpen,
-    onClose: onDeleteClose
-  } = useDisclosure()
-  const {
-    isOpen: isWarningOpen,
-    onOpen: onWarningOpen,
-    onClose: onWarningClose
-  } = useDisclosure()
-  const {
-    isOpen: isLynkOpen,
-    onOpen: onLynkOpen,
-    onClose: onLynkClose
-  } = useDisclosure()
+  const { isOpen: isOpenProduct, onOpen: onOpenProduct, onClose: onCloseProduct } = useDisclosure()
+  const { isOpen: isOpenUpload, onOpen: onOpenUpload, onClose: onCloseUpload } = useDisclosure()
+  const { isOpen: isSbomOpen, onOpen: onSbomOpen, onClose: onSbomClose } = useDisclosure()
+  const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure()
+  const { isOpen: isWarningOpen, onOpen: onWarningOpen, onClose: onWarningClose } = useDisclosure()
+  const { isOpen: isLynkOpen, onOpen: onLynkOpen, onClose: onLynkClose } = useDisclosure()
 
-  const productPermissions = useMemo(
-    () => userPermissions?.find((item) => item.key === 'view_product_group'),
-    [userPermissions]
-  )
+  const productPermissions = useMemo(() => userPermissions?.find((item) => item.key === 'view_product_group'), [userPermissions])
 
-  const canAddProduct = () =>
-    productPermissions?.supersededBy?.some(
-      (permission) =>
-        permission.key === 'create_product_group' && permission.value
-    )
+  const canAddProduct = useMemo(() => productPermissions?.supersededBy?.some((permission) => permission.key === 'create_product_group' && permission.value),[productPermissions])
 
-  const canUpdateProduct = useMemo(
-    () =>
-      productPermissions?.supersededBy?.some(
-        (permission) =>
-          permission.key === 'update_product_group' && permission.value
-      ),
-    [productPermissions]
-  )
+  const canCreateSBOM = useMemo(() => productPermissions?.supersededBy?.some((permission) => permission.key === 'create_sbom' && permission.value), [productPermissions] )
 
-  const canArchiveProduct = useMemo(
-    () =>
-      productPermissions?.supersededBy?.some(
-        (permission) =>
-          permission.key === 'archive_product_group' && permission.value
-      ),
-    [productPermissions]
-  )
+  const canUpdateProduct = useMemo(() => productPermissions?.supersededBy?.some((permission) => permission.key === 'update_product_group' && permission.value), [productPermissions] )
+
+  const canArchiveProduct = useMemo(() => productPermissions?.supersededBy?.some((permission) => permission.key === 'archive_product_group' && permission.value ), [productPermissions])
 
   const {
     data: lynks,
@@ -200,10 +156,7 @@ const ProductTable = ({ data, refetch }) => {
   )
 
   const onProductDelete = useCallback(async () => {
-    await deleteProjectGroup({
-      variables: {
-        id: activeRow.id
-      }
+    await deleteProjectGroup({ variables: { id: activeRow.id }
     }).then((res) => res.data && onDeleteClose())
   }, [deleteProjectGroup, activeRow, onDeleteClose])
 
@@ -308,56 +261,26 @@ const ProductTable = ({ data, refetch }) => {
   // HEADER
   const subHeaderComponent = useMemo(() => {
     return (
-      <Flex
-        width={'100%'}
-        alignItems={'center'}
-        justifyContent={'space-between'}
-      >
+      <Flex width={'100%'} alignItems={'center'} justifyContent={'space-between'}>
         <Stack direction={'row'} spacing={2} alignItems={'center'}>
           {/* SEARCH PRODUCTS */}
-          <SearchFilter
-            id='product'
-            filterText={filterText}
-            onChange={onSearchInputChange}
-            onClear={handleClear}
-            onFilter={handleSearch}
-          />
+          <SearchFilter id='product' filterText={filterText} onChange={onSearchInputChange} onClear={handleClear} onFilter={handleSearch} />
           {/* FILTER PRODUCTS */}
           {!signedUrlParams && <ProdFilterMenu onFilter={onFilterActive} />}
         </Stack>
-
         <Stack direction={'row'} spacing={2} alignItems={'center'}>
           {/* ADD PRODUCT */}
           <Tooltip label='Add Product'>
-            <IconButton
-              icon={<AddIcon />}
-              colorScheme='blue'
-              variant='solid'
-              hidden={signedUrlParams}
-              onClick={onOpenProduct}
-              isDisabled={!canAddProduct}
-            />
+            <IconButton icon={<AddIcon />} colorScheme='blue' variant='solid' hidden={signedUrlParams} onClick={onOpenProduct} isDisabled={!canAddProduct} />
           </Tooltip>
           {/* REFRESH */}
           <Tooltip label='Refresh'>
-            <IconButton
-              onClick={handleRefresh}
-              colorScheme='blue'
-              icon={<RepeatIcon />}
-            ></IconButton>
+            <IconButton onClick={handleRefresh} colorScheme='blue' icon={<RepeatIcon />} />
           </Tooltip>
         </Stack>
       </Flex>
     )
-  }, [
-    searchInput,
-    signedUrlParams,
-    handleSearch,
-    handleClear,
-    handleRefresh,
-    onFilterActive,
-    onSearchInputChange
-  ])
+  }, [ searchInput, signedUrlParams, handleSearch, handleClear, handleRefresh, onFilterActive, onSearchInputChange ])
 
   // COLUMNS
   const columns = useMemo(
@@ -568,14 +491,14 @@ const ProductTable = ({ data, refetch }) => {
                       setActiveRow(row)
                       onOpenUpload()
                     }}
-                    isDisabled={!enabled || !canUpdateProduct}
+                    isDisabled={!enabled || !canUpdateProduct || !canCreateSBOM}
                   >
                     Upload SBOM
                   </MenuItem>
                   {/* BUILD SBOM */}
                   <MenuItem
                     onClick={() => handleOpenSbom(row)}
-                    isDisabled={!enabled}
+                    isDisabled={!enabled || !canCreateSBOM}
                   >
                     Build Version
                   </MenuItem>
