@@ -41,10 +41,11 @@ const ProductDetails = () => {
   const [activeEnv, setActiveEnv] = useState(activeProd || '')
 
   const product = userPermissions?.find((item) => item.key === 'view_product_group')
+  const sbomPermission = userPermissions?.find((item) => item.key === 'view_sbom')
   const vulnsPermissions = useMemo(() => userPermissions?.find((item) => item.key === 'view_feeds'), [userPermissions])
   const updateProduct = product?.supersededBy?.some((permission) =>permission.key === 'update_product_group' && permission.value === true)
   const archiveProduct = product?.supersededBy?.some((permission) =>permission.key === 'archive_product_group' && permission.value === true)
-  const canCreateSBOM = useMemo(() => product?.supersededBy?.some((permission) => permission.key === 'create_sbom' && permission.value === true), [product] )
+  const canCreateSBOM = useMemo(() => sbomPermission?.supersededBy?.some((permission) => permission.key === 'create_sbom' && permission.value === true), [sbomPermission] )
 
   const { data, refetch, loading, error } = useQuery(GetProjectGroup, { fetchPolicy: 'network-only', variables: { id: productId } })
 
