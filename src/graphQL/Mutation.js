@@ -2234,18 +2234,16 @@ export const DeletePolicyRule = gql`
 export const UpdateNotificationPreference = gql`
   mutation NotificationPreferenceUpdate(
     $notificationPreferences: [NotificationPreferenceArguments!]!
-    $projectId: Uuid
+    $envId: Uuid
   ) {
     notificationPreferenceUpdate(
       input: {
         notificationPreferences: $notificationPreferences
-        projectId: $projectId
+        envId: $envId
       }
     ) {
       currentNotificationPreference {
         id
-        userId
-        projectId
       }
     }
   }

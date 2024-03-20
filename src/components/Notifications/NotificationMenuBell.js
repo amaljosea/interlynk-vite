@@ -1,27 +1,32 @@
 import {
   Box,
-  Button,
   IconButton,
   Menu,
   MenuButton,
-  MenuItem, MenuItemOption,
+  MenuItemOption,
   MenuList,
-  MenuOptionGroup,
-  Tooltip
+  MenuOptionGroup
 } from "@chakra-ui/react";
-import {FaBell, FaFilter} from "react-icons/fa";
+import {FaBell} from "react-icons/fa";
 import CheckMark from "../Misc/CheckMark";
 import {useEffect, useState} from "react";
-import {UpdateNotificationPreference} from "../../graphQL/Mutation";
-import {useMutation} from "@apollo/client";
+import {UpdateNotificationPreference} from "graphQL/Mutation";
+import {useMutation, useQuery} from "@apollo/client";
+import {GetUserNotificationPreferences} from "graphQL/Queries";
 
 const NotificationMenuBell = () => {
   const [updatePreference] = useMutation(UpdateNotificationPreference)
+  const { data } = useQuery(GetUserNotificationPreferences, {
+    variables: {
+      envId: localStorage['activeEnv']
+    }
+  })
 
   useEffect(() => {
-    //API call to get user's notification preferences
-    setPreference(['none'])
-  }, [])
+    if (data) {
+      setPreference(data.notificationPreferences || ['none'])
+    }
+  }, [data])
 
   const [preference, setPreference] = useState([])
   const notificationPreferences = {
@@ -39,11 +44,12 @@ const NotificationMenuBell = () => {
     updatePreference({
       variables: {
         notificationPreferences: newPreference,
-        projectId: localStorage['activeEnv']
+        envId: localStorage['activeEnv']
       }
-    }).then(r => console.log(r))
+    }).then((res) => {
+      setPreference(newPreference)
+    })
 
-    setPreference(newPreference)
   }
 
   const generateMenuItems = (notificationPreferences) => {
