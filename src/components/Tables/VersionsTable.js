@@ -560,32 +560,19 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
               <Text>Deleting this version will: </Text>
               <UnorderedList>
                 <Flex flexDir={'column'} gap={1} mt={4}>
-                  {[
-                    'remove this versions and its SBOM',
-                    'remove access to this version for all users'
-                  ].map((item, index) => (
-                    <ListItem key={index}>{item}</ListItem>
-                  ))}
+                  {['remove this versions and its SBOM','remove access to this version for all users']
+                  .map((item, index) => <ListItem key={index}>{item}</ListItem>)}
                 </Flex>
               </UnorderedList>
               <br />
               <Text mt={10}>Are you sure you wish to continue?</Text>
             </ModalBody>
             <ModalFooter>
-              <Flex
-                width={'100%'}
-                alignItems={'center'}
-                justifyContent={'space-between'}
-                gap={4}
-              >
+              <Flex width={'100%'} alignItems={'center'} justifyContent={'space-between'} gap={4}>
                 <Stack>{isLoading && <Spinner color='red.500' />}</Stack>
                 <Stack direction='row' alignItems='center' gap={1}>
                   <Button onClick={onDeleteClose}>No</Button>
-                  <Button
-                    colorScheme='red'
-                    onClick={handleDelete}
-                    disabled={isLoading}
-                  >
+                  <Button colorScheme='red' onClick={handleDelete} disabled={isLoading}>
                     {isLoading ? 'Deleting...' : 'Yes'}
                   </Button>
                 </Stack>
@@ -598,9 +585,7 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
       {/* SBOM LIST */}
       {isListOpen && versions && (
         <SbomList
-          data={
-            signedUrlParams ? sbomAlts?.shareLynkQuery?.sbom : sbomAlts?.sbom
-          }
+          data={signedUrlParams ? sbomAlts?.shareLynkQuery?.sbom : sbomAlts?.sbom}
           sboms={versions}
           isOpen={isListOpen}
           onClose={onListClose}
@@ -620,14 +605,8 @@ const VersionsTable = ({ projectGroup, getVulnData }) => {
 
       {isToolOpen && allVersions && (
         <ToolsDrawer
-          versionList={
-            signedUrlParams
-              ? allVersions?.shareLynkQuery?.project?.sbomVersions
-              : allVersions?.project?.sbomVersions
-          }
-          diffs={
-            signedUrlParams ? driftData?.shareLynkQuery?.sbom : driftData?.sbom
-          }
+          versionList={ signedUrlParams ? allVersions?.shareLynkQuery?.project?.sbomVersions : allVersions?.project?.sbomVersions }
+          diffs={signedUrlParams ? driftData?.shareLynkQuery?.sbom : driftData?.sbom}
           data={drifts}
           isOpen={isToolOpen}
           onClose={onToolClose}
