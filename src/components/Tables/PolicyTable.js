@@ -1,7 +1,7 @@
 import CustomLoader from 'components/CustomLoader'
 import DataTable from 'react-data-table-component'
 import styled from '@emotion/styled'
-import { Box, Flex, Grid, GridItem, Heading, IconButton, Input, Menu, MenuButton, MenuItem, MenuList, Portal, Stack, Switch, Text, Tooltip, useDisclosure, useToast } from '@chakra-ui/react'
+import { Box, Flex, Grid, GridItem, Heading, IconButton, Input, Menu, MenuButton, MenuItem, MenuList, Portal, Stack, Switch, Tag, Text, Tooltip, useDisclosure, useToast } from '@chakra-ui/react'
 import { customStyles } from 'utils'
 import { getFullDateAndTime, timeSince } from 'utils'
 import { FaEllipsisV, FaPlus } from 'react-icons/fa'
@@ -16,9 +16,16 @@ import { useMutation } from '@apollo/client'
 import { FaPen, FaTrash } from 'react-icons/fa6'
 import RuleModal from 'views/Dashboard/Policies/RuleModal'
 import { DeletePolicyRule } from 'graphQL/Mutation'
+import { useLocation } from 'react-router-dom'
+import { PolicyExclusionCreate } from 'graphQL/Mutation'
+import { DeletePolicyExclusion } from 'graphQL/Mutation'
+import { updatedValue } from 'utils'
 
 const PolicyTable = ({ data, refetch }) => {
   const toast = useToast()
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const productId = queryParams.get('id')
   const { totalRows, policyState, dispatch } = useGlobalState()
   const { pageIndex, searchInput } = policyState
   const { policyDispatch } = dispatch
@@ -34,10 +41,10 @@ const PolicyTable = ({ data, refetch }) => {
   const [deletePolicy] = useMutation(PolicyDelete)
   const [onDeleteRule] = useMutation(DeletePolicyRule)
 
-  const policyData = {
-    search: searchInput === '' ? undefined : searchInput,
-    first: totalRows
-  }
+  const [createExclusion] = useMutation(PolicyExclusionCreate)
+  const [deleteExclusion] = useMutation(DeletePolicyExclusion)
+
+  const policyData = { projectId: productId || undefined, search: (productId || searchInput === '') ? undefined : searchInput, first: totalRows }
 
   const setPaginationControl = (data) => {
     setIsPrevActive(data?.pageInfo?.hasPreviousPage)
@@ -56,7 +63,8 @@ const PolicyTable = ({ data, refetch }) => {
     disablePaginationControl()
     await refetch({
       variables: {
-        search: searchInput === '' ? undefined : searchInput,
+        projectId: productId || undefined,
+        search: (productId || searchInput === '') ? undefined : searchInput,
         first: totalRows
       }
     }).then(
@@ -67,7 +75,7 @@ const PolicyTable = ({ data, refetch }) => {
   // CLEAR SERACH
   const handleClear = async () => {
     setFilterText('')
-    await refetch({ variables: { search: undefined, first: totalRows } }).then(
+    await refetch({ variables: { projectId: productId || undefined, search: undefined, first: totalRows } }).then(
       (res) => res?.data && policyDispatch({ type: 'CLEAR_SEARCH_INPUT' })
     )
   }
@@ -86,7 +94,7 @@ const PolicyTable = ({ data, refetch }) => {
   const handleSearch = async (event) => {
     const { value } = event.target
     if (event.key === 'Enter' && filterText !== '') {
-      refetch({ variables: { search: value, first: totalRows } }).then(
+      refetch({ variables: { projectId: productId || undefined, search: productId ? undefined : value, first: totalRows } }).then(
         (res) =>
           res?.data &&
           policyDispatch({ type: 'CHANGE_SEARCH_INPUT', payload: value })
@@ -143,19 +151,44 @@ const PolicyTable = ({ data, refetch }) => {
     })
   }
 
+  const handleCreateExclusion = async (id) => {
+    await createExclusion({variables:{policyId: id, projectId: productId}})
+    .then((res) => {
+      const errors = res?.data?.policyExclusionCreate?.errors
+      if (errors?.length > 0) {
+        toast({ description: errors[0], status: 'error', position: 'top', duration: 2000 })
+      } else {
+        refetch({ variables: { ...policyData } })
+      }
+    })
+  }
+
+  const handleDeleteExclusion = async (id) => {
+    await deleteExclusion({variables:{policyId: id, projectId: productId}})
+    .then((res) => {
+      const errors = res?.data?.policyExclusionDelete?.errors
+      if (errors?.length > 0) {
+        toast({ description: errors[0], status: 'error', position: 'top', duration: 2000 })
+      } else {
+        refetch({ variables: { ...policyData } })
+      }
+    })
+  }
+
   // SUB HEADER
   const subHeader = useMemo(() => {
     return (
       <Flex
         width={'100%'}
         alignItems={'center'}
-        justifyContent={'space-between'}
+        justifyContent={productId ? 'flex-end' : 'space-between'}
       >
         {/* SEARCH COMPONENTS */}
-        <SearchFilter id='support' filterText={filterText} onChange={onSearchInputChange} onClear={handleClear} onFilter={handleSearch} />
+        {!productId && <SearchFilter id='support' filterText={filterText} onChange={onSearchInputChange} onClear={handleClear} onFilter={handleSearch} />}
         <Stack spacing={2} alignItems={'center'} direction={'row'}>
           <Tooltip label='Create Policy'>
             <IconButton
+              hidden={productId}
               colorScheme='blue'
               onClick={() => {
                 setActiveRow(null)
@@ -183,7 +216,8 @@ const PolicyTable = ({ data, refetch }) => {
           <Switch size='md' isChecked={isEnabled} onChange={(e) => onChangeStatus(e, row)} />
         )
       },
-      width: '150px'
+      width: '150px',
+      omit: productId
     },
     {
       id: 'NAME',
@@ -212,6 +246,13 @@ const PolicyTable = ({ data, refetch }) => {
       width: '250px',
       wrap: true
     },
+    {
+      id: 'EXCLUSION',
+      name: 'EXCLUSION ',
+      selector: (row) => <Tag variant='solid' colorScheme='blue' textTransform={'capitalize'}>{JSON.stringify(row?.isExcluded)}</Tag>,
+      width: '150px',
+      omit: !productId
+    },
     // UPDATED AT
     {
       id: 'UPDATED_AT',
@@ -234,8 +275,11 @@ const PolicyTable = ({ data, refetch }) => {
             <MenuButton as={IconButton} icon={<FaEllipsisV />} variant='none' color='gray.400' />
             <Portal>
               <MenuList fontSize={'sm'}>
+                {/* UPDATE EXCLUSION */}
+                <MenuItem hidden={!productId} onClick={() => row?.isExcluded ? handleDeleteExclusion(row?.id) : handleCreateExclusion(row?.id)}>{row?.isExcluded ? 'Delete' : 'Create'} Exclusion</MenuItem>
                 {/* EDIT POLICY */}
                 <MenuItem
+                  hidden={productId}
                   onClick={() => {
                     setActiveRow(row)
                     onOpen()
@@ -245,6 +289,7 @@ const PolicyTable = ({ data, refetch }) => {
                 </MenuItem>
                 {/* ADD POLICY RULE */}
                 <MenuItem
+                  hidden={productId}
                   onClick={() => {
                     setActiveRow(row)
                     setActiveRule(null)
@@ -254,7 +299,7 @@ const PolicyTable = ({ data, refetch }) => {
                   Add Policy Rule
                 </MenuItem>
                 {/* DELETE POLICY  */}
-                <MenuItem color='red' onClick={() => onDeletePolicy(row?.id)}>
+                <MenuItem color='red' onClick={() => onDeletePolicy(row?.id)} hidden={productId}>
                   Archive Policy
                 </MenuItem>
               </MenuList>
@@ -301,10 +346,10 @@ const PolicyTable = ({ data, refetch }) => {
         {policyRules?.map((item, index) => (
           <Grid width={'90%'} templateColumns='repeat(12, 1fr)' gap={6} mb={3} mx={'auto'} >
             <GridItem colSpan={3}>
-              <Input bg={'#EDF2F7'} size='sm' fontSize={'sm'} isReadOnly defaultValue={item?.subject} />
+              <Input bg={'#EDF2F7'} size='sm' fontSize={'sm'} isReadOnly defaultValue={updatedValue(item?.subject)} />
             </GridItem>
             <GridItem colSpan={3}>
-              <Input bg={'#EDF2F7'} size='sm' fontSize={'sm'} isReadOnly defaultValue={item?.operator} />
+              <Input bg={'#EDF2F7'} size='sm' fontSize={'sm'} isReadOnly defaultValue={updatedValue(item?.operator)} />
             </GridItem>
             <GridItem colSpan={5}>
               <Input bg={'#EDF2F7'} size='sm' fontSize={'sm'} isReadOnly defaultValue={item?.value} />
@@ -312,15 +357,17 @@ const PolicyTable = ({ data, refetch }) => {
             <GridItem colSpan={1}>
               <Flex gap={3} justifyContent={'flex-end'}>
                 <IconButton
+                  hidden={productId}
                   size='sm'
                   colorScheme='blue'
                   icon={<FaPen />}
                   onClick={() => {
+                    setActiveRow(data)
                     setActiveRule(item)
                     onRuleOpen()
                   }}
                 />
-                <IconButton size='sm' colorScheme='red' icon={<FaTrash />} onClick={() => handleDeleteRule(item)} />
+                <IconButton size='sm' colorScheme='red' icon={<FaTrash />} onClick={() => handleDeleteRule(item)}  hidden={productId} />
               </Flex>
             </GridItem>
           </Grid>

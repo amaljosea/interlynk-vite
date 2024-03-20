@@ -15,13 +15,15 @@ import SbomLicenseTable from '../../../components/Licenses/SbomLicenseTable'
 import GraphView from './GraphView'
 import { parseJSONSafely } from 'utils'
 import { GetSbomSupportTab, GetSbomParts, GetCheckResults, GetChangeLogs, GetPrimaryComponent, GetSbomLicensesTable  } from 'graphQL/Queries'
+import { GetProjectPolicies } from 'graphQL/Queries'
+import PolicyTable from 'components/Tables/PolicyTable'
 
 const SBOMTable = ({ status, type, data, refetch, filteredData, vulnData, getVulnData, getCompData, compData, error
 }) => {
   // How often each tab should refetch the data (in minutes)
-  const fetchIntervalMinutes = { 'General': 0, 'Parts': 0, 'Components': 0, 'Vulnerabilities': 0.5, 'Licenses': 0, 'Support': 0, 'Relationships': 0, 'Checks': 0, 'Change Log': 0 }
+  const fetchIntervalMinutes = { 'General': 0, 'Parts': 0, 'Components': 0, 'Vulnerabilities': 0.5, 'Licenses': 0, 'Policies': 0, 'Support': 0, 'Relationships': 0, 'Checks': 0, 'Change Log': 0 }
 
-  const [lastFetchTime, setLastFetchTime] = useState({ 'General': null, 'Parts': null, 'Components': null, 'Vulnerabilities': null, 'Licenses': null, 'Support': null, 'Relationships': null, 'Checks': null, 'Change Log': null })
+  const [lastFetchTime, setLastFetchTime] = useState({ 'General': null, 'Parts': null, 'Components': null, 'Vulnerabilities': null, 'Licenses': null, 'Policies': null, 'Support': null, 'Relationships': null, 'Checks': null, 'Change Log': null })
 
   const shouldFetchData = (tabName) => {
     const lastFetch = lastFetchTime[tabName]
@@ -35,7 +37,7 @@ const SBOMTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
     setLastFetchTime({ ...lastFetchTime, [tabName]: new Date() })
   }
 
-  const { totalRows, activeSbomTab, setActiveSbomTab, prodCompState, prodVulnState, prodCheckState, sbomLogState, supportState, dispatch } = useGlobalState()
+  const { totalRows, activeSbomTab, setActiveSbomTab, prodCompState, prodVulnState, prodCheckState, sbomLogState, dispatch } = useGlobalState()
   const {prodCompDispatch, prodVulnDispatch, prodCheckDispatch, sbomLogDispatch } = dispatch
 
   const location = useLocation()
@@ -74,10 +76,13 @@ const SBOMTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
   // GET LICENSES DATA
   const [getLicensesData, { data: licensesData, refetch: licensesRefetch }] = useLazyQuery(GetSbomLicensesTable, {fetchPolicy: 'network-only'})
 
+  // GET POLICY DATA
+  const [getPolicyData, { data: policyData }] = useLazyQuery(GetProjectPolicies, {fetchPolicy: 'network-only'})
+
   const getUndefinedIfEmpty = (value) => (value !== '' ? value : undefined)
   const getUndefinedIfEmptyOrAll = (value, allValue = 'all') => value.includes(allValue) || value.length === 0 ? undefined : value
 
-  const tabIndexToName = { 0: 'General', 1: 'Parts', 2: 'Components', 3: 'Vulnerabilities', 4: 'Licenses', 5: 'Support', 6: 'Relationships', 7: 'Checks', 8: 'Change Log' }
+  const tabIndexToName = { 0: 'General', 1: 'Parts', 2: 'Components', 3: 'Vulnerabilities', 4: 'Licenses', 5: 'Policies', 6: 'Support', 7: 'Relationships', 8: 'Checks', 9: 'Change Log' }
 
   const handleTabChange = (value) => {
     localStorage.setItem('activeSbomTab', value)
@@ -131,6 +136,13 @@ const SBOMTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
       })
     } else if (tabName === 'Licenses' && shouldFetchData(tabName)) {
       getLicensesData({ variables: { ...commonParams }})
+      .then((res) => {
+        if (res.data) {
+          updateLastFetchTime(tabName)
+        }
+      })
+    } else if (tabName === 'Policies' && shouldFetchData(tabName)) {
+      getPolicyData({ variables: { projectId: productId, first: totalRows }})
       .then((res) => {
         if (res.data) {
           updateLastFetchTime(tabName)
@@ -228,6 +240,10 @@ const SBOMTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
             {/* LICENSES TABLE */}
             <TabPanel px={0}>
               <SbomLicenseTable data={licensesData?.sbom?.componentLicenses} refetch={licensesRefetch}/>
+            </TabPanel>
+            {/* POLICY TABLE */}
+            <TabPanel px={0}>
+              <PolicyTable data={policyData?.projectPolicies} refetch={getPolicyData} />
             </TabPanel>
             {/* SUPPORT TABLE */}
             <TabPanel px={0}>
