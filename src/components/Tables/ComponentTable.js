@@ -25,9 +25,8 @@ import PurlCard from 'components/Misc/PurlCard'
 import CpeCard from 'components/Misc/CpeCard'
 import { ShareCompFilters } from 'graphQL/Queries'
 import { openSsf } from 'variables/general'
-import GraphDrawer from 'components/Drawer/GraphDrawer'
 
-const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, activeComp, setActiveComp }) => {
+const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, setActiveComp }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const customerView = location.pathname.startsWith('/customer')
@@ -111,11 +110,10 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
   const compBtn = useRef(null)
   const linkRef = useRef(null)
 
+  const { isOpen, onOpen, onClose } = useDisclosure()
 
   const [getComPath, { data: comPath }] = useLazyQuery(GetComponentPath)
 
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const { isOpen: isGraphOpen, onOpen: onGraphOpen, onClose: onGraphClose } = useDisclosure()
   const { isOpen: isDelOpen, onOpen: onDelOpen, onClose: onDelClose } = useDisclosure()
   const { isOpen: isSupOpen, onOpen: onSupOpen, onClose: onSupClose } = useDisclosure()
   const { isOpen: isLinkOpen, onOpen: onLinkOpen, onClose: onLinkClose } = useDisclosure()
@@ -165,12 +163,8 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
       selector: (row) => {
         const { purl, name, primary, internal, externalUrls } = row
         const website = externalUrls?.find((item) => item.name === 'website')
-        const distribution = externalUrls?.find(
-          (item) => item.name === 'distribution'
-        )
-        const issueTracker = externalUrls?.find(
-          (item) => item.name === 'issue-tracker'
-        )
+        const distribution = externalUrls?.find((item) => item.name === 'distribution')
+        const issueTracker = externalUrls?.find((item) => item.name === 'issue-tracker')
         const vcs = externalUrls?.find((item) => item.name === 'vcs')
         return (
           <Grid templateColumns='repeat(7, 1fr)' gap={2} my={3}>
@@ -278,11 +272,8 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
       width: '200px',
       selector: (row) => {
         const { licenses, licensesExp, licensesCustom } = row
-
         const totalSpdx = licenses?.length > 1 && licenses.slice(1)
-        const totalCustom =
-          licensesCustom?.length > 1 && licensesCustom.slice(1)
-
+        const totalCustom = licensesCustom?.length > 1 && licensesCustom.slice(1)
         return (
           <Flex alignItems={'flex-end'} justifyContent={'flex-end'} gap={2} flexWrap={'wrap'} my={2} >
             {/* SPDX */}
@@ -296,10 +287,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
                   </Tooltip>
                 )}
                 {totalSpdx.length > 0 && (
-                  <Tooltip
-                    label={JSON.stringify(totalSpdx).slice(1, -1).replace(/"/g, '')}
-                    placement={'top'}
-                  >
+                  <Tooltip label={JSON.stringify(totalSpdx).slice(1, -1).replace(/"/g, '')} placement={'top'}>
                     <Tag size={'md'} variant='subtle' colorScheme='green' width={'fit-content'} >
                       <TagLabel width={6}>{`+${totalSpdx.length}`}</TagLabel>
                     </Tag>
@@ -307,7 +295,6 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
                 )}
               </Stack>
             )}
-
             {/* EXPRESSION */}
             {licensesExp && licensesExp !== '' && (
               <Tooltip label={licensesExp} placement={'top'}>
@@ -316,7 +303,6 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
                 </Tag>
               </Tooltip>
             )}
-
             {/* CUSTOM */}
             {licensesCustom && (
               <Stack direction={'row'} spacing={2}>
@@ -328,10 +314,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
                   </Tooltip>
                 )}
                 {totalCustom && (
-                  <Tooltip
-                    label={JSON.stringify(totalCustom).slice(1, -1).replace(/"/g, '')}
-                    placement={'top'}
-                  >
+                  <Tooltip label={JSON.stringify(totalCustom).slice(1, -1).replace(/"/g, '')} placement={'top'}>
                     <Tag size={'md'} variant='subtle' colorScheme='green' width={'fit-content'}>
                       <TagLabel>{`+${totalCustom.length}`}</TagLabel>
                     </Tag>
@@ -376,18 +359,16 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
                 <MenuButton as={IconButton} aria-label='Options' icon={<FaEllipsisV />} variant='none' color='gray.400' />
                 <Portal>
                   <MenuList size='sm'>
-                    <MenuItem onClick={() => onLicenseOpen(row)} isDisabled={ status === 'signed' || !updateComponent || !updateSboms || signedUrlParams } >
+                    <MenuItem onClick={() => onLicenseOpen(row)} isDisabled={status === 'signed' || !updateComponent}>
                       Edit Component
                     </MenuItem>
-                    <MenuItem onClick={() => handleOpen(row)} isDisabled={!updateComponent || !updateSboms || signedUrlParams} >
-                      Edit Relationships
-                    </MenuItem>
+                    <MenuItem onClick={() => handleOpen(row)} isDisabled={!updateComponent} >Edit Relationships</MenuItem>
                     <MenuItem
                       onClick={() => {
                         setActiveRow(row)
                         onSupOpen()
                       }}
-                      isDisabled={ status === 'signed' || !updateComponent || !updateSboms || signedUrlParams }
+                      isDisabled={ status === 'signed' || !updateComponent}
                     >
                       {suppliers.length > 0 ? 'Edit' : 'Add'} Supplier
                     </MenuItem>
@@ -396,11 +377,11 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
                         setActiveRow(row)
                         onLinkOpen()
                       }}
-                      isDisabled={ status === 'signed' || !updateComponent || !updateSboms || signedUrlParams }
+                      isDisabled={ status === 'signed' || !updateComponent}
                     >
                       Edit Links
                     </MenuItem>
-                    <MenuItem onClick={() => handleGraphView(row)} isDisabled={ status === 'signed' || !updateComponent || !updateSboms || totalComp?.length === 1 } >
+                    <MenuItem onClick={() => handleGraphView(row)} isDisabled={ status === 'signed' || !updateComponent || totalComp?.length === 1 } >
                         View Relationships
                       </MenuItem>
                     <Divider />
@@ -411,7 +392,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
                           setActiveRow(row)
                           onDelOpen()
                         }}
-                        isDisabled={ status === 'signed' || !updateComponent || !updateSboms || totalComp?.length === 1 }
+                        isDisabled={ status === 'signed' || !updateComponent || totalComp?.length === 1 }
                       >
                         Delete
                       </MenuItem>
@@ -439,29 +420,19 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
 
   const handleGraphView  = (row) => {
     setActiveComp(row)
-    onGraphOpen()
+    localStorage.setItem('activeSbomTab', 6)
+    setActiveSbomTab(6)
   }
 
   const [deleteSupplier] = useMutation(deleteComSupplier)
 
   const handleSupRemove = async (id) => {
     try {
-      await deleteSupplier({
-        variables: {
-          id: id
-        }
-      }).then((res) => {
+      await deleteSupplier({ variables: { id: id } }).then((res) => {
         if (res.data) {
           disablePaginationControl()
-          refetch({
-            projectId: productId,
-            sbomId: sbomId,
-            first: totalRows,
-            field: field,
-            direction: direction
-          }).then((res) => {
-            res && setPaginationControl(res.data)
-          })
+          refetch({ projectId: productId, sbomId: sbomId, first: totalRows, field: field, direction: direction })
+          .then((res) => res && setPaginationControl(res.data))
         }
       })
     } catch (error) {
@@ -498,21 +469,15 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
           </GridItem>
           <GridItem>
             <CustomText>Component :</CustomText>
-            <Text width={'90%'} mt={1} fontSize={14} wordBreak={'break-all'}>
-              {name}
-            </Text>
+            <Text width={'90%'} mt={1} fontSize={14} wordBreak={'break-all'}>{name}</Text>
           </GridItem>
           <GridItem>
             <CustomText>Type :</CustomText>
-            <Text mt={1} fontSize={14} textTransform={'capitalize'}>
-              {kind}
-            </Text>
+            <Text mt={1} fontSize={14} textTransform={'capitalize'}>{kind}</Text>
           </GridItem>
           <GridItem>
             <CustomText>Internal :</CustomText>
-            <Text mt={1} fontSize={14} wordBreak={'break-all'}>
-              {internal ? 'True' : 'False'}
-            </Text>
+            <Text mt={1} fontSize={14} wordBreak={'break-all'}>{internal ? 'True' : 'False'}</Text>
           </GridItem>
           <GridItem>
             <CustomText>Supplier :</CustomText>
@@ -906,8 +871,6 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, ac
           hasPreviousPage={isPrevActive}
         />
       )}
-
-      {isGraphOpen && activeComp && <GraphDrawer isOpen={isGraphOpen} onClose={onGraphClose} activeComp={activeComp} />}
 
       {/* ACTIONS */}
       {activeRow !== null && (
