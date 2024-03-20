@@ -84,7 +84,8 @@ const SagTable = ({ data }) => {
       id: 'LABEL',
       name: 'LABEL TYPE',
       selector: (row) => <Text>{row?.label}</Text>,
-      width: '220px',
+      width: '300px',
+      size: 'lg',
       wrap: true
     },
     {
