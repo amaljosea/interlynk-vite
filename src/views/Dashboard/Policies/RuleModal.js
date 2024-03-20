@@ -4,6 +4,7 @@ import { UpdatePolicyRule, CreatePolicyRule } from 'graphQL/Mutation'
 import { PolicySubjectOperators } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
 import { useEffect, useState } from 'react'
+import { updatedValue } from 'utils'
 
 const RuleModal = ({ activeRow, data, isOpen, onClose, refetch }) => {
   const toast = useToast()
@@ -15,10 +16,7 @@ const RuleModal = ({ activeRow, data, isOpen, onClose, refetch }) => {
   const [value, setValue] = useState('')
   const [error, setError] = useState('')
 
-  const { data: subOperators } = useQuery(PolicySubjectOperators, {
-    skip: subject === '' ? true : false,
-    fetchPolicy: 'network-only'
-  })
+  const { data: subOperators } = useQuery(PolicySubjectOperators, { fetchPolicy: 'network-only' })
 
   const filterOperators =
     subOperators &&
@@ -91,6 +89,7 @@ const RuleModal = ({ activeRow, data, isOpen, onClose, refetch }) => {
 
   useEffect(() => {
     if (data) {
+      console.log('data',data);
       setValue(data?.value || '')
       setOperator(data?.operator || '')
       setSubject(data?.subject || '')
@@ -118,12 +117,9 @@ const RuleModal = ({ activeRow, data, isOpen, onClose, refetch }) => {
                 )}
                 <FormControl isRequired>
                   <FormLabel>Subject</FormLabel>
-                  <Select id='subject' name='subject' value={subject} onChange={onSubjectChange} textTransform={'capitalize'} fontSize='sm'>
-                    <option value=''>-- Select --</option>
-                    {['VULNERABILITY_EPSS','VULNERABILITY_KEV','VULNERABILITY_CVE','VULNERABILITY_SEV','COMPONENT_PURL','COMPONENT_NAME','COMPONENT_VERSION','COMPONENT_CPE','LICENSE_SPDX_ID','LICENSE_CUSTOM'].map((item, index) => (
-                      <option key={index} value={item} style={{ textTransform: 'capitalize' }} >
-                        {item}
-                      </option>
+                  <Select fontSize={'sm'} value={subject} onChange={onSubjectChange} placeholder="-- Select --" textTransform={'capitalize'}>
+                    {subOperators?.policySubjectOperatorMapping?.map((rule, index) => (
+                      <option key={index} value={rule.subject} style={{textTransform:'capitalize'}}>{rule.category} {rule?.name}</option>
                     ))}
                   </Select>
                 </FormControl>
@@ -133,7 +129,7 @@ const RuleModal = ({ activeRow, data, isOpen, onClose, refetch }) => {
                     <option value=''>-- Select --</option>
                     {filterOperators?.operators?.map((item, index) => (
                       <option key={index} value={item} style={{ textTransform: 'capitalize' }} >
-                        {item}
+                        {updatedValue(item)}
                       </option>
                     ))}
                   </Select>

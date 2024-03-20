@@ -2228,3 +2228,39 @@ export const DeletePolicyRule = gql`
     }
   }
 `
+
+// CREATE POLICY EXCLUSION
+export const PolicyExclusionCreate = gql`
+  mutation PolicyExclusionCreate($policyId: Uuid!, $projectId: Uuid!) {
+    policyExclusionCreate(
+      input: { policyId: $policyId, projectId: $projectId }
+    ) {
+      errors
+      policyExclusion {
+        createdAt
+        id
+        policyId
+        projectId
+        updatedAt
+      }
+    }
+  }
+`
+
+// DELETE POLICY EXCLUSION
+export const DeletePolicyExclusion = gql`
+  mutation DeletePolicyExclusion($policyId: Uuid!, $projectId: Uuid!) {
+    policyExclusionDelete(
+      input: { policyId: $policyId, projectId: $projectId }
+    ) {
+      errors
+      policyExclusion {
+        createdAt
+        id
+        policyId
+        projectId
+        updatedAt
+      }
+    }
+  }
+`
