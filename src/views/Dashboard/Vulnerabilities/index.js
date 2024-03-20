@@ -21,10 +21,8 @@ const Vulnerabilities = () => {
   const epssRange = epss !== 'all' && epss !== '' && epss?.split('-')
   const range = { min: parseFloat(epssRange[0]) / 100, max: parseFloat(epssRange[1]) / 100 }
 
-  const productPermissions = useMemo(
-    () => userPermissions?.find((item) => item.key === 'view_product_group'),
-    [userPermissions]
-  )
+  const productPermissions = useMemo(() => userPermissions?.find((item) => item.key === 'view_product_group'), [userPermissions])
+  const vulnsPermissions = useMemo(() => userPermissions?.find((item) => item.key === 'view_feeds'), [userPermissions])
 
   const [getVulns, { data }] = useLazyQuery(GetGlobalVulns, {fetchPolicy: 'network-only'})
 
@@ -35,7 +33,7 @@ const Vulnerabilities = () => {
   })
 
   useEffect(() => {
-    if (data === undefined && productPermissions?.value === true) {
+    if (data === undefined && productPermissions?.value === true && vulnsPermissions?.value === true) {
       getVulns({ variables: { first: totalRows, field: field, direction: direction, search: searchInput !== '' ? searchInput : undefined, projectGroupIds: products?.length === 0 ? undefined : products, severity: severities?.length === 0 ? undefined : severities, status: statues?.length === 0 ? undefined : statues, kev: kev === 'yes' ? true : kev === 'false' ? false : undefined, epss: epss === 'all' || epss === '' ? undefined : range } }) }
   }, [])
 
@@ -60,7 +58,11 @@ const Vulnerabilities = () => {
   return (
     <Flex flexDirection='column' pt={{ base: '120px', md: '74px' }} pr={2} pl={5}>
       <Card>
-        <GlobalVulnTable data={data?.organization?.vulns} refetch={getVulns}/>
+        {vulnsPermissions?.value === true ? (
+         <GlobalVulnTable data={data?.organization?.vulns} refetch={getVulns}/>
+        ) : (
+          <Text>You are not allowed to access this data</Text>
+        )}
       </Card>
     </Flex>
   )

@@ -113,9 +113,11 @@ const ProductTable = ({ data, refetch }) => {
 
   const productPermissions = useMemo(() => userPermissions?.find((item) => item.key === 'view_product_group'), [userPermissions])
 
+  const sbomPermissions = useMemo(() => userPermissions?.find((item) => item.key === 'view_sbom'), [userPermissions])
+
   const canAddProduct = useMemo(() => productPermissions?.supersededBy?.some((permission) => permission.key === 'create_product_group' && permission.value),[productPermissions])
 
-  const canCreateSBOM = useMemo(() => productPermissions?.supersededBy?.some((permission) => permission.key === 'create_sbom' && permission.value), [productPermissions] )
+  const canCreateSBOM = useMemo(() => sbomPermissions?.supersededBy?.some((permission) => permission.key === 'create_sbom' && permission.value), [productPermissions] )
 
   const canUpdateProduct = useMemo(() => productPermissions?.supersededBy?.some((permission) => permission.key === 'update_product_group' && permission.value), [productPermissions] )
 
@@ -479,7 +481,7 @@ const ProductTable = ({ data, refetch }) => {
                       setActiveRow(row)
                       onOpen()
                     }}
-                    isDisabled={!enabled}
+                    isDisabled={!enabled || !canAddProduct}
                   >
                     Edit Product
                   </MenuItem>
@@ -504,7 +506,7 @@ const ProductTable = ({ data, refetch }) => {
                   </MenuItem>
                   {/* VIEW SHARELYNK */}
                   <MenuItem
-                    isDisabled={!enabled}
+                    isDisabled={!enabled || !canAddProduct}
                     onClick={() => onSharelynkOpen(row)}
                   >
                     View ShareLynk

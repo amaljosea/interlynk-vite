@@ -41,6 +41,7 @@ const ProductDetails = () => {
   const [activeEnv, setActiveEnv] = useState(activeProd || '')
 
   const product = userPermissions?.find((item) => item.key === 'view_product_group')
+  const vulnsPermissions = useMemo(() => userPermissions?.find((item) => item.key === 'view_feeds'), [userPermissions])
   const updateProduct = product?.supersededBy?.some((permission) =>permission.key === 'update_product_group' && permission.value === true)
   const archiveProduct = product?.supersededBy?.some((permission) =>permission.key === 'archive_product_group' && permission.value === true)
   const canCreateSBOM = useMemo(() => product?.supersededBy?.some((permission) => permission.key === 'create_sbom' && permission.value === true), [product] )
@@ -82,7 +83,7 @@ const ProductDetails = () => {
 
   // GET VULN DATA
   const { data: vulnData, refetch: vulnRefetch } = useQuery(GetVulnData, {
-    skip: sbomId ? false : true,
+    skip: sbomId && vulnsPermissions?.value === true ? false : true,
     fetchPolicy: 'network-only',
     variables: {
       projectId: productId || activeEnv,
@@ -109,7 +110,7 @@ const ProductDetails = () => {
   })
 
   const { data: vulnInfo, refetch: getVulnData } = useQuery(GetGlobalVulnData, {
-    skip: vulnId ? false : true,
+    skip: vulnId && vulnsPermissions?.value === true ? false : true,
     fetchPolicy: 'cache-first',
     variables: {
       id: vulnId,

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Tabs, TabList, Tab, TabPanel, TabPanels, Flex, Skeleton, Button, Text } from '@chakra-ui/react'
 import Card from 'components/Card/Card.js'
 import GeneralDataRow from 'components/Tables/GeneralDataRow'
@@ -37,8 +37,10 @@ const SBOMTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
     setLastFetchTime({ ...lastFetchTime, [tabName]: new Date() })
   }
 
-  const { totalRows, activeSbomTab, setActiveSbomTab, prodCompState, prodVulnState, prodCheckState, sbomLogState, dispatch } = useGlobalState()
+  const { totalRows, userPermissions, activeSbomTab, setActiveSbomTab, prodCompState, prodVulnState, prodCheckState, sbomLogState, dispatch } = useGlobalState()
   const {prodCompDispatch, prodVulnDispatch, prodCheckDispatch, sbomLogDispatch } = dispatch
+  
+  const vulnsPermissions = useMemo(() => userPermissions?.find((item) => item.key === 'view_feeds'), [userPermissions])
 
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -112,7 +114,7 @@ const SBOMTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
           updateLastFetchTime(tabName)
         }
       })
-    } else if (tabName === 'Vulnerabilities' && shouldFetchData(tabName)) {
+    } else if (tabName === 'Vulnerabilities' && shouldFetchData(tabName) && vulnsPermissions?.value === true) {
       const { field, direction, searchInput, severities, components, statues, source, kev, epss, direct } = prodVulnState
       const vulnEpss = epss !== 'all' && epss !== '' ? epss.split('-').map((v) => parseFloat(v) / 10000) : undefined
       getVulnData({
@@ -235,7 +237,11 @@ const SBOMTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
             </TabPanel>
             {/* VUNERABILITIES TABLE */}
             <TabPanel px={0}>
-              <VulnTable data={vulnData?.sbom?.vulns} sbomData={data} sbomRefetch={refetch} filteredData={filteredData} refetch={getVulnData} productId={productId} sbomId={sbomId}/>
+              {vulnsPermissions?.value === true ? (
+                <VulnTable data={vulnData?.sbom?.vulns} sbomData={data} sbomRefetch={refetch} filteredData={filteredData} refetch={getVulnData} productId={productId} sbomId={sbomId}/>
+              ) : (
+                <Text mt={4} textAlign={'center'}>You don't have permission to access this data</Text>
+              )}
             </TabPanel>
             {/* LICENSES TABLE */}
             <TabPanel px={0}>
