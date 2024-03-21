@@ -29,6 +29,14 @@ const SupportModal = ({ data, isOpen, onClose, refetch }) => {
     refetch({ variables: { search: searchInput === '' ? undefined : searchInput, first: totalRows, field: field, direction: direction } })
   }
 
+  const onBlurUri = () => {
+    if(idUri?.startsWith('pkg') || idUri?.startsWith('cpe')) {
+      setError('')
+    } else {
+      setError('Invalid entry')
+    }
+  }
+
   const handleEolChange = (newDate) => {
     const currentDate = new Date()
     console.log('newDate', newDate)
@@ -129,12 +137,13 @@ const SupportModal = ({ data, isOpen, onClose, refetch }) => {
                   </Alert>
                 )}
                 <FormControl isRequired>
-                  <FormLabel>URI</FormLabel>
+                  <FormLabel>PURL / CPE</FormLabel>
                   <Input type='text' value={idUri}
                     onChange={(e) => {
                       setIdUri(e.target.value)
                       setError('')
                     }}
+                    onKeyDown={onBlurUri}
                   />
                 </FormControl>
                 <FormControl isRequired>
