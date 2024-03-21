@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client'
-import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Button, Flex, FormControl, FormLabel, Input, Alert, AlertIcon, AlertDescription, Select, Tag, useToast } from '@chakra-ui/react'
+import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Button, Flex, FormControl, FormLabel, Input, Alert, AlertIcon, AlertDescription, Select, Tag, useToast, Grid, GridItem } from '@chakra-ui/react'
 import { UpdatePolicyRule, CreatePolicyRule } from 'graphQL/Mutation'
 import { PolicySubjectOperators } from 'graphQL/Queries'
 import { useGlobalState } from 'hooks/useGlobalState'
@@ -14,6 +14,8 @@ const RuleModal = ({ activeRow, data, isOpen, onClose, refetch }) => {
   const [operator, setOperator] = useState('')
   const [subject, setSubject] = useState('')
   const [value, setValue] = useState('')
+  const [min, setMin] = useState(0)
+  const [max, setMax] = useState(0)
   const [error, setError] = useState('')
 
   const { data: subOperators } = useQuery(PolicySubjectOperators, { fetchPolicy: 'network-only' })
@@ -134,10 +136,41 @@ const RuleModal = ({ activeRow, data, isOpen, onClose, refetch }) => {
                     ))}
                   </Select>
                 </FormControl>
-                <FormControl isRequired>
-                  <FormLabel>Value</FormLabel>
-                  <Input type='text' name='value' value={value} fontSize='sm' onChange={onValueChange} />
-                </FormControl>
+                {subject === 'VULNERABILITY_SEV' && (
+                  <FormControl isRequired>
+                    <FormLabel>Value</FormLabel>
+                    <Select id='operator' name='operator' value={value} onChange={onValueChange} textTransform={'capitalize'} fontSize='sm'>
+                      <option value=''>-- Select --</option>
+                      {['Critical','High','Medium','Low'].map((item, index) => (
+                        <option key={index} value={item} style={{ textTransform: 'capitalize' }} >
+                          {item}
+                        </option>
+                      ))}
+                    </Select>
+                  </FormControl>
+                )}
+                {operator === 'RANGE' && (
+                  <Grid templateColumns={`repeat(2,1fr)`} gap={4}>
+                    <GridItem>
+                      <FormControl isRequired>
+                        <FormLabel>Min</FormLabel>
+                        <Input type='text' name='min' value={min} fontSize='sm' onChange={(e) => setMin(e.target.value)} />
+                      </FormControl>
+                    </GridItem>
+                    <GridItem>
+                      <FormControl isRequired>
+                        <FormLabel>Max</FormLabel>
+                        <Input type='text' name='max' value={max} fontSize='sm' onChange={(e) => setMax(e.target.value)} onKeyDown={() => setValue(`{min:${min},max:${max}}`)}/>
+                      </FormControl>
+                    </GridItem>
+                  </Grid>
+                )}
+                {subject !== 'VULNERABILITY_SEV' && operator !== 'RANGE' && (
+                  <FormControl isRequired>
+                    <FormLabel>Value</FormLabel>
+                    <Input type='text' name='value' value={value} fontSize='sm' onChange={onValueChange} />
+                  </FormControl>
+                )}
               </Flex>
             </ModalBody>
             <ModalFooter>
