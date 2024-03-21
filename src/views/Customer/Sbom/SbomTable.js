@@ -28,11 +28,11 @@ const SbomTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
   const [activeComp, setActiveComp] = useState(null)
 
   // How often each tab should refetch the data (in minutes)
-  const fetchIntervalMinutes = { 'General': 0, 'Parts': 0, 'Components': 0, 'Vulnerabilities': 0.5, 'Licenses': 0, 'Support': 0, 'Relationships': 0, 'Checks': 0, 'Change Log': 0 }
+  const fetchIntervalMinutes = { 'General': 0, 'Parts': 0, 'Components': 0, 'Vulnerabilities': 0.5, 'Licenses': 0, 'Support': 0, 'Checks': 0, 'Change Log': 0 }
 
-  const [lastFetchTime, setLastFetchTime] = useState({ 'General': null, 'Parts': null, 'Components': null, 'Vulnerabilities': null, 'Licenses': null, 'Support': null, 'Relationships': null, 'Checks': null, 'Change Log': null })
+  const [lastFetchTime, setLastFetchTime] = useState({ 'General': null, 'Parts': null, 'Components': null, 'Vulnerabilities': null, 'Licenses': null, 'Support': null, 'Checks': null, 'Change Log': null })
 
-  const tabIndexToName = { 0: 'General', 1: 'Parts', 2: 'Components', 3: 'Vulnerabilities', 4: 'Licenses', 5: 'Support', 6: 'Relationships', 7: 'Checks', 8: 'Change Log' }
+  const tabIndexToName = { 0: 'General', 1: 'Parts', 2: 'Components', 3: 'Vulnerabilities', 4: 'Licenses', 5: 'Support', 6: 'Checks', 7: 'Change Log' }
 
   // GET PRIMARY COMPONENT
   const [getPrimaryComp, { data: primaryComp }] = useLazyQuery(GetSharPrimartComp, { fetchPolicy: 'network-only'})
@@ -118,14 +118,6 @@ const SbomTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
           updateLastFetchTime(tabName)
         }
       })
-    } else if (tabName === 'Relationships' && shouldFetchData(tabName)) {
-      const { field, direction } = prodCompState
-      getPrimaryComp({ variables: { sbomId: sbomId, primary: true, field, direction } })
-      .then((res) => {
-        if (res?.data) {
-          updateLastFetchTime(tabName)
-        }
-      })
     }
   }
 
@@ -191,10 +183,6 @@ const SbomTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
           </TabPanel>
           {/* SUPPORT TABLE */}
           <TabPanel px={0}></TabPanel>
-          {/* RELATIONSHIPS TABLE */}
-          <TabPanel px={0}>
-            <GraphView data={primaryComp?.shareLynkQuery?.sbom?.components} activeComp={activeComp} />
-          </TabPanel>
           {/* CHECKS TABLE */}
           <TabPanel px={1}></TabPanel>
           {/* CHANGE LOG TABLE */}

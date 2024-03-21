@@ -25,8 +25,9 @@ import PurlCard from 'components/Misc/PurlCard'
 import CpeCard from 'components/Misc/CpeCard'
 import { ShareCompFilters } from 'graphQL/Queries'
 import { openSsf } from 'variables/general'
+import GraphDrawer from 'components/Drawer/GraphDrawer'
 
-const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, setActiveComp }) => {
+const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, activeComp, setActiveComp }) => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const customerView = location.pathname.startsWith('/customer')
@@ -115,6 +116,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, se
   const [getComPath, { data: comPath }] = useLazyQuery(GetComponentPath)
 
   const { isOpen: isDelOpen, onOpen: onDelOpen, onClose: onDelClose } = useDisclosure()
+  const { isOpen: isGraphOpen, onOpen: onGraphOpen, onClose: onGraphClose } = useDisclosure()
   const { isOpen: isSupOpen, onOpen: onSupOpen, onClose: onSupClose } = useDisclosure()
   const { isOpen: isLinkOpen, onOpen: onLinkOpen, onClose: onLinkClose } = useDisclosure()
   const { isOpen: isRelationOpen, onOpen: onRelationOpen, onClose: onRelationClose } = useDisclosure()
@@ -362,7 +364,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, se
                     <MenuItem onClick={() => onLicenseOpen(row)} isDisabled={status === 'signed' || !updateComponent}>
                       Edit Component
                     </MenuItem>
-                    <MenuItem onClick={() => handleOpen(row)} isDisabled={!updateComponent} >Edit Relationships</MenuItem>
+                    <MenuItem onClick={() => handleOpen(row)} isDisabled={!updateComponent}>Edit Relationships</MenuItem>
                     <MenuItem
                       onClick={() => {
                         setActiveRow(row)
@@ -420,8 +422,7 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, se
 
   const handleGraphView  = (row) => {
     setActiveComp(row)
-    localStorage.setItem('activeSbomTab', 6)
-    setActiveSbomTab(6)
+    onGraphOpen()
   }
 
   const [deleteSupplier] = useMutation(deleteComSupplier)
@@ -871,6 +872,8 @@ const ComponentTable = ({ lifecycle, data, refetch, primaryComp, sbomRefetch, se
           hasPreviousPage={isPrevActive}
         />
       )}
+
+      {isGraphOpen && activeComp && <GraphDrawer isOpen={isGraphOpen} onClose={onGraphClose} primaryComp={null} activeComp={activeComp} /> }
 
       {/* ACTIONS */}
       {activeRow !== null && (

@@ -12,18 +12,16 @@ import { useLocation } from 'react-router-dom'
 import { useGlobalState } from 'hooks/useGlobalState'
 import SupportTable from 'components/Tables/SupportTable'
 import SbomLicenseTable from '../../../components/Licenses/SbomLicenseTable'
-import GraphView from './GraphView'
 import { parseJSONSafely } from 'utils'
-import { GetSbomSupportTab, GetSbomParts, GetCheckResults, GetChangeLogs, GetPrimaryComponent, GetSbomLicensesTable  } from 'graphQL/Queries'
-import { GetProjectPolicies } from 'graphQL/Queries'
+import { GetSbomSupportTab, GetSbomParts, GetCheckResults, GetChangeLogs, GetSbomLicensesTable, GetProjectPolicies  } from 'graphQL/Queries'
 import PolicyTable from 'components/Tables/PolicyTable'
 
 const SBOMTable = ({ status, type, data, refetch, filteredData, vulnData, getVulnData, getCompData, compData, error
 }) => {
   // How often each tab should refetch the data (in minutes)
-  const fetchIntervalMinutes = { 'General': 0, 'Parts': 0, 'Components': 0, 'Vulnerabilities': 0.5, 'Licenses': 0, 'Policies': 0, 'Support': 0, 'Relationships': 0, 'Checks': 0, 'Change Log': 0 }
+  const fetchIntervalMinutes = { 'General': 0, 'Parts': 0, 'Components': 0, 'Vulnerabilities': 0.5, 'Licenses': 0, 'Policies': 0, 'Support': 0, 'Checks': 0, 'Change Log': 0 }
 
-  const [lastFetchTime, setLastFetchTime] = useState({ 'General': null, 'Parts': null, 'Components': null, 'Vulnerabilities': null, 'Licenses': null, 'Policies': null, 'Support': null, 'Relationships': null, 'Checks': null, 'Change Log': null })
+  const [lastFetchTime, setLastFetchTime] = useState({ 'General': null, 'Parts': null, 'Components': null, 'Vulnerabilities': null, 'Licenses': null, 'Policies': null, 'Support': null, 'Checks': null, 'Change Log': null })
 
   const shouldFetchData = (tabName) => {
     const lastFetch = lastFetchTime[tabName]
@@ -69,9 +67,6 @@ const SBOMTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
   // GET CHANGE LOG DATA
   const [getLogsData, { data: logsData, refetch: logsRefetch }] = useLazyQuery(GetChangeLogs, { fetchPolicy: 'network-only'})
 
-  // GET PRIMARY COMPONENT
-  const [getPrimaryComp, { data: primaryComp }] = useLazyQuery(GetPrimaryComponent, { fetchPolicy: 'network-only'})
-
   // GET COMPONENT SUPPORT INFO
   const [getSupportInfos, { data: support }] = useLazyQuery(GetSbomSupportTab, { fetchPolicy: 'network-only'})
 
@@ -84,7 +79,7 @@ const SBOMTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
   const getUndefinedIfEmpty = (value) => (value !== '' ? value : undefined)
   const getUndefinedIfEmptyOrAll = (value, allValue = 'all') => value.includes(allValue) || value.length === 0 ? undefined : value
 
-  const tabIndexToName = { 0: 'General', 1: 'Parts', 2: 'Components', 3: 'Vulnerabilities', 4: 'Licenses', 5: 'Policies', 6: 'Support', 7: 'Relationships', 8: 'Checks', 9: 'Change Log' }
+  const tabIndexToName = { 0: 'General', 1: 'Parts', 2: 'Components', 3: 'Vulnerabilities', 4: 'Licenses', 5: 'Policies', 6: 'Support', 7: 'Checks', 8: 'Change Log' }
 
   const handleTabChange = (value) => {
     localStorage.setItem('activeSbomTab', value)
@@ -152,14 +147,6 @@ const SBOMTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
       })
     } else if (tabName === 'Support' && shouldFetchData(tabName)) {
       getSupportInfos({ variables: { projectId: productId, sbomId } })
-      .then((res) => {
-        if (res?.data) {
-          updateLastFetchTime(tabName)
-        }
-      })
-    } else if (tabName === 'Relationships' && shouldFetchData(tabName)) {
-      const { field, direction } = prodCompState
-      getPrimaryComp({ variables: { projectId: productId, sbomId: sbomId, primary: true, field, direction } })
       .then((res) => {
         if (res?.data) {
           updateLastFetchTime(tabName)
@@ -254,10 +241,6 @@ const SBOMTable = ({ status, type, data, refetch, filteredData, vulnData, getVul
             {/* SUPPORT TABLE */}
             <TabPanel px={0}>
               <SupportTable data={support?.sbom?.supports} refetch={getSupportInfos} />
-            </TabPanel>
-            {/* RELATIONSHIP TABLE */}
-            <TabPanel px={0}>
-              <GraphView data={primaryComp?.sbom?.components} activeComp={null} />
             </TabPanel>
             {/* HEALTH CHECK TABLE */}
             <TabPanel px={0}>
