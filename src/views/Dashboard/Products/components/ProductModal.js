@@ -1,42 +1,14 @@
 import { useMutation } from '@apollo/client'
-import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-  Button,
-  Flex,
-  FormControl,
-  FormLabel,
-  Input,
-  Alert,
-  AlertIcon,
-  Text,
-  Textarea
-} from '@chakra-ui/react'
+import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Button, Flex, FormControl, FormLabel, Input, Alert, AlertIcon, Text, Textarea } from '@chakra-ui/react'
 import { CreateProjectGroup, UpdateProjectGroup } from 'graphQL/Mutation'
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import {errorMapping} from "utils/errorUtils";
 
-const ProductModal = ({
-  id,
-  isOpen,
-  onClose,
-  product,
-  description,
-  refetch
-}) => {
+const ProductModal = ({id,isOpen,onClose,product,description,refetch}) => {
   const params = useParams()
-  const [projectGroupCreate] = useMutation(CreateProjectGroup, {
-    onCompleted: () => refetch()
-  })
-  const [projectGroupUpdate] = useMutation(UpdateProjectGroup, {
-    onCompleted: () => refetch()
-  })
+  const [projectGroupCreate] = useMutation(CreateProjectGroup, {onCompleted: () => refetch()})
+  const [projectGroupUpdate] = useMutation(UpdateProjectGroup, {onCompleted: () => refetch()})
 
   const [productName, setProductName] = useState('')
   const [productDesc, setProductDesc] = useState('')
@@ -51,11 +23,7 @@ const ProductModal = ({
   const updateProduct = async (e) => {
     e.preventDefault()
     await projectGroupUpdate({
-      variables: {
-        id: id,
-        name: productName,
-        desc: productDesc
-      }
+      variables: { id: id, name: productName, desc: productDesc }
     }).then((res) => {
       const error = res.data.projectGroupUpdate.errors
       if (error?.length > 0) {
@@ -69,11 +37,7 @@ const ProductModal = ({
   const handleSave = async (e) => {
     e.preventDefault()
     await projectGroupCreate({
-      variables: {
-        name: productName,
-        desc: productDesc,
-        enabled: true
-      }
+      variables: { name: productName, desc: productDesc, enabled: true }
     }).then((res) => {
       const error = res.data.projectGroupCreate.errors
       if (error?.length > 0) {
@@ -84,7 +48,7 @@ const ProductModal = ({
     })
   }
 
-  const isInvalid = productName === '' || productDesc === '' || error !== ''
+  const isInvalid = productName === '' || error !== ''
 
   return (
     <>
@@ -114,7 +78,7 @@ const ProductModal = ({
                     placeholder={`Add product ${params && 'group'} name`}
                   />
                 </FormControl>
-                <FormControl isRequired>
+                <FormControl>
                   <FormLabel>Description</FormLabel>
                   <Textarea
                     value={productDesc || ''}
@@ -126,17 +90,11 @@ const ProductModal = ({
               </Flex>
             </ModalBody>
             <ModalFooter>
-              <Button colorScheme='gray' mr={3} onClick={onClose}>
-                Cancel
-              </Button>
+              <Button colorScheme='gray' mr={3} onClick={onClose}>Cancel</Button>
               {id ? (
-                <Button colorScheme='blue' type='submit' disabled={isInvalid}>
-                  Update
-                </Button>
+                <Button colorScheme='blue' type='submit' disabled={isInvalid}>Update</Button>
               ) : (
-                <Button colorScheme='blue' type='submit' disabled={isInvalid}>
-                  Save
-                </Button>
+                <Button colorScheme='blue' type='submit' disabled={isInvalid}>Save</Button>
               )}
             </ModalFooter>
           </ModalContent>
