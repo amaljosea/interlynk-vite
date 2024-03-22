@@ -102,10 +102,7 @@ const SbomDetails = ({ sbom, getCompData, getVulnData }) => {
           setActiveSbomTab(3)
         }
         prodVulnDispatch({ type: 'FILTER_SOURCE', payload: true })
-        prodVulnDispatch({
-          type: 'FILTER_STATS_SEVERITY',
-          payload: value || []
-        })
+        prodVulnDispatch({ type: 'FILTER_SEVERITY', payload: value })
       }
     })
   }
