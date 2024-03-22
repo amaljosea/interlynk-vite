@@ -68,7 +68,9 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
 
   const onCheckJustify = () => {
     setInfoHeading(`Justification`)
-    setInfoText(`...`)
+    setInfoText(`For statements conveying a "not affected" status, a VEX statement MUST include either a status justification or
+    an impact statement informing why the product is not affected by the vulnerability.
+    Justifications are fixed labels defined by VEX. See Status Justifications below for valid values.`)
     setInfoUrl(``)
     onOpen()
   }
@@ -82,21 +84,22 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
 
   const onCheckFixedVersion = () => {
     setInfoHeading(`Fixed Version`)
-    setInfoText(`...`)
+    setInfoText(`For "affected" status with "update" response, Fixed Version can be used to indicate which version of the product includes a fix.`)
     setInfoUrl(``)
     onOpen()
   }
 
   const onCheckImpact = () => {
     setInfoHeading(`Impact Statement`)
-    setInfoText(`...`)
+    setInfoText(`For status “not affected”, if justification is not provided, an impact statement must be included \
+    that further explains how or why the listed product is “not affected” by this vulnerability. Impact Statement is optional if a justification is provided.`)
     setInfoUrl(``)
     onOpen()
   }
 
   const onCheckAction = () => {
     setInfoHeading(`Action Statement`)
-    setInfoText(`...`)
+    setInfoText(`For status “affected”, an action statement must be included that describes actions to remediate or mitigate the vulnerability.`)
     setInfoUrl(``)
     onOpen()
   }
@@ -110,7 +113,8 @@ const ProdStatusDrawer = ({ data, textColor, refetch, filteredData }) => {
 
   const onCheckNotes = () => {
     setInfoHeading(`Internal Notes`)
-    setInfoText(`...`)
+    setInfoText(` Internal notes or observations made by the team handling the vulnerability, which may include additional context, discussions, or considerations relevant to the analysis or response process. \
+    These notes are not exported with the product SBOM or VEX are only used for internal communication and documentation purposes.`)
     setInfoUrl(``)
     onOpen()
   }
