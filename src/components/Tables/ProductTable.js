@@ -273,7 +273,7 @@ const ProductTable = ({ data, refetch }) => {
         <Stack direction={'row'} spacing={2} alignItems={'center'}>
           {/* ADD PRODUCT */}
           <Tooltip label='Add Product'>
-            <IconButton icon={<AddIcon />} colorScheme='blue' variant='solid' hidden={signedUrlParams} onClick={onOpenProduct} isDisabled={!canAddProduct} />
+            <IconButton icon={<AddIcon />} colorScheme='blue' variant='solid' hidden={signedUrlParams} onClick={onOpenProduct} />
           </Tooltip>
           {/* REFRESH */}
           <Tooltip label='Refresh'>
@@ -496,13 +496,6 @@ const ProductTable = ({ data, refetch }) => {
                     isDisabled={!enabled || !canUpdateProduct || !canCreateSBOM}
                   >
                     Upload SBOM
-                  </MenuItem>
-                  {/* BUILD SBOM */}
-                  <MenuItem
-                    onClick={() => handleOpenSbom(row)}
-                    isDisabled={!enabled || !canCreateSBOM}
-                  >
-                    Build Version
                   </MenuItem>
                   {/* VIEW SHARELYNK */}
                   <MenuItem
