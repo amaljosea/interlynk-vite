@@ -28,7 +28,6 @@ const GlobalStateProvider = ({ children }) => {
   const [activeCsProdTab, setActiveCsProdTab] = useState(0)
   const [activeSbomTab, setActiveSbomTab] = useState(0)
   const [activeCsSbomTab, setActiveCsSbomTab] = useState(0)
-  const [minimize, setMinimize] = useState(true)
   const [activeDockerHub, setActiveDockerHub] = useState(true)
   const [vulnerabilitiesData, setVulnerabilitiesData] = useState([])
   const [scanEnabled, setScanEnabled] = useState(false)
@@ -207,8 +206,6 @@ const GlobalStateProvider = ({ children }) => {
   return (
     <GlobalStateContext.Provider
       value={{
-        minimize,
-        setMinimize,
         totalRows,
         setTotalRows,
         activeProdTab,

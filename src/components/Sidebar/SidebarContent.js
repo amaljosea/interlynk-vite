@@ -6,15 +6,13 @@ import InterlynkLogo from 'assets/img/logo.png'
 import { Separator } from 'components/Separator/Separator'
 import { SidebarHelp } from 'components/Sidebar/SidebarHelp'
 import useAnalyticsEventTracker from 'hooks/useAnalyticsEventTracker'
-import { useGlobalState } from 'hooks/useGlobalState'
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
 // this function creates the links and collapses that appear in the sidebar (left menu)
 
-const SidebarContent = ({ logoText, routes }) => {
+const SidebarContent = ({ minimize, logoText, routes }) => {
   let location = useLocation()
-  const { minimize } = useGlobalState()
   const org = localStorage.getItem('organization')
   const isSuperAdmin = localStorage.getItem('isSuperAdmin')
   const signedUrlParams = sessionStorage.getItem('signedUrlParams')
@@ -60,7 +58,11 @@ const SidebarContent = ({ logoText, routes }) => {
       }
 
       return (
-        <Link to={prop.path === '/settings' ? `${prop.layout}${prop.path}?tab=${org === 'undefined' ? 'organization' : 'general'}` : prop.layout + prop.path } key={prop.name} onClick={() => gaEventTracker(prop.name)} >
+        <Link
+          to={prop.path === '/settings' ? `${prop.layout}${prop.path}?tab=${org === 'undefined' ? 'organization' : 'general'}` : prop.layout + prop.path }
+          key={prop.name}
+          onClick={() => gaEventTracker(prop.name)}
+        >
           {activeRoute(prop.layout + prop.path) === 'active' ? (
             <Button boxSize='initial' justifyContent='flex-start' alignItems='center' title={prop.name} mb={{ xl: '12px' }} mx={{ xl: 'auto' }} py='4px' pl={'18px'} bg='none' _active={{ bg: 'none' }} _hover={{ bg: 'none' }}>
               <Flex>
@@ -87,7 +89,7 @@ const SidebarContent = ({ logoText, routes }) => {
                 {minimize ? (
                   ''
                 ) : (
-                  <Text color={inactiveColor} my='auto' fontSize='sm' transition='transform 0.1s ease-in-out' opacity={minimize ? 0 : 100}>
+                  <Text color={inactiveColor} my='auto' fontSize='sm' transition='transform 0.1s ease-in-out' opacity={minimize ? 0 : 100} >
                     {document.documentElement.dir === 'rtl' ? prop.rtlName : prop.name}
                   </Text>
                 )}
@@ -99,7 +101,7 @@ const SidebarContent = ({ logoText, routes }) => {
     })
   }
 
-  const links = <>{createLinks(filterRoutes)}</>  
+  const links = <>{createLinks(filterRoutes)}</>
 
   return (
     <>
@@ -112,9 +114,7 @@ const SidebarContent = ({ logoText, routes }) => {
         </Link>
         <Separator></Separator>
       </Box>
-      <Stack direction='column' mb='40px'>
-        <Box>{links}</Box>
-      </Stack>
+      <Stack direction='column' mb='40px'><Box>{links}</Box></Stack>
       <SidebarHelp />
     </>
   )
