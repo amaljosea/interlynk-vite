@@ -333,44 +333,27 @@ const PolicyTable = ({ data, refetch }) => {
         <Heading mb={6} fontFamily={'inherit'} fontSize={'sm'} color={'#555'} width={'90%'} mx={'auto'} >
           CONDITIONS
         </Heading>
-        <Grid width={'90%'} templateColumns='repeat(12, 1fr)' gap={6} mb={4} mx={'auto'} >
-          <GridItem colSpan={3}>
+        <Grid width={'90%'} templateColumns='repeat(3, 1fr)' gap={6} mb={4} mx={'auto'} >
+          <GridItem>
             <CustomText>subject</CustomText>
           </GridItem>
-          <GridItem colSpan={3}>
+          <GridItem>
             <CustomText>operator</CustomText>
           </GridItem>
-          <GridItem colSpan={5}>
+          <GridItem>
             <CustomText>value</CustomText>
           </GridItem>
-          <GridItem colSpan={1}></GridItem>
         </Grid>
         {policyRules?.map((item, index) => (
-          <Grid width={'90%'} templateColumns='repeat(12, 1fr)' gap={6} mb={3} mx={'auto'} >
-            <GridItem colSpan={3}>
+          <Grid width={'90%'} templateColumns='repeat(3, 1fr)' gap={6} mb={3} mx={'auto'} >
+            <GridItem>
               <Input bg={'#EDF2F7'} size='sm' fontSize={'sm'} isReadOnly defaultValue={updatedValue(item?.subject)} />
             </GridItem>
-            <GridItem colSpan={3}>
+            <GridItem>
               <Input bg={'#EDF2F7'} size='sm' fontSize={'sm'} isReadOnly defaultValue={updatedValue(item?.operator)} />
             </GridItem>
-            <GridItem colSpan={5}>
+            <GridItem>
               <Input bg={'#EDF2F7'} size='sm' fontSize={'sm'} isReadOnly defaultValue={item?.value} />
-            </GridItem>
-            <GridItem colSpan={1}>
-              <Flex gap={3} justifyContent={'flex-end'}>
-                <IconButton
-                  hidden={productId}
-                  size='sm'
-                  colorScheme='blue'
-                  icon={<FaPen />}
-                  onClick={() => {
-                    setActiveRow(data)
-                    setActiveRule(item)
-                    onRuleOpen()
-                  }}
-                />
-                <IconButton size='sm' colorScheme='red' icon={<FaTrash />} onClick={() => handleDeleteRule(item)}  hidden={productId} />
-              </Flex>
             </GridItem>
           </Grid>
         ))}
