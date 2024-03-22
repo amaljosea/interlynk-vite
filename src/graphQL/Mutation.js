@@ -2264,3 +2264,24 @@ export const DeletePolicyExclusion = gql`
     }
   }
 `
+
+// UPDATE NOTIFICATION PREFERENCE
+
+export const UpdateNotificationPreference = gql`
+  mutation NotificationPreferenceUpdate(
+    $notificationPreferences: [NotificationPreferenceArguments!]!
+    $envId: Uuid
+  ) {
+    notificationPreferenceUpdate(
+      input: {
+        notificationPreferences: $notificationPreferences
+        envId: $envId
+      }
+    ) {
+      currentNotificationPreference {
+        id
+      }
+    }
+  }
+`
+

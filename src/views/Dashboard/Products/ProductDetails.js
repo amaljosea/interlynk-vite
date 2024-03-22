@@ -19,6 +19,8 @@ import EnvironmentDrawer from 'components/Drawer/EnvironmentDrawer'
 import GlobalVulnTable from 'components/Tables/GlobalVulnTable'
 import StatusModal from './components/StatusModal'
 import VulnInfo from '../Vulnerabilities/vulnInfo'
+import {FaBell} from "react-icons/fa";
+import NotificationMenuBell from "../../../components/Notifications/NotificationMenuBell";
 
 const ProductDetails = () => {
   const navigate = useNavigate()
@@ -331,7 +333,15 @@ const ProductDetails = () => {
                 </GridItem>
                 {/* PRODUCT ACTIONS */}
                 <GridItem colSpan={2}>
-                  <Flex direction={'row'} gap={2} justifyContent='flex-end' ml={'auto'} flexWrap={'wrap'} >
+                  <Flex
+                    direction={'row'}
+                    gap={2}
+                    justifyContent='flex-end'
+                    ml={'auto'}
+                    flexWrap={'wrap'}
+                  >
+                    {/* Notifications */}
+                    <NotificationMenuBell/>
                     {/* EDIT PRODUCT */}
                     <Tooltip label='Edit Product'>
                       <IconButton isDisabled={!data?.projectGroup?.enabled || !updateProduct || signedUrlParams } colorScheme='blue' onClick={onOpenProduct} icon={<FaPenToSquare />} />

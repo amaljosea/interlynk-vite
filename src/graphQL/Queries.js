@@ -3516,3 +3516,11 @@ export const GetProjectPolicies = gql`
     }
   }
 `
+
+// GET USER NOTIFICATIONS PREFRENCES
+
+export const GetUserNotificationPreferences = gql`
+  query GetUserNotificationPreferences($envId: Uuid!) {
+    notificationPreferences(envId: $envId)
+  }
+`
